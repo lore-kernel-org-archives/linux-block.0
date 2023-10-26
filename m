@@ -2,76 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BAAC27C47
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3353CC27C57
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344880AbjJZVoe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1344830AbjJZVoe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 26 Oct 2023 17:44:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41528 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344830AbjJZVoW (ORCPT
+        with ESMTP id S234875AbjJZVoX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 17:44:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 845C2D4F
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:46 -0700 (PDT)
+        Thu, 26 Oct 2023 17:44:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5864D5A
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698356505;
+        s=mimecast20190719; t=1698356508;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r6LRWmr2icS5jnOcuwPWBxMt8CIdZmzqcRONcHqSLZ4=;
-        b=I29p6XONTRwReoWZ6W9JGMPQPf6hDWkTo1I1amG+tLUgdzAEqBNkvjOebHUHXAN5V2JtqG
-        2yzMEmlb1B5PPCjr8LWbFrr4W4nzQWtS4wu37kViBnjhXfXjxp3z6ljSGVcSaEFZsmSpiW
-        3+7wmdLgerbr6AcX9VPEp5cx2ZKDNJE=
+        bh=voNjYh+XCHZBSQn3Cd55J1ZDlYEQhHPpLgFtmB0aszM=;
+        b=UA/hnJ9mcg8c3Ctt9gXpJmxBAmrlw+18KL9CQS1XH4q5T+Jzo2xLVifZmJAVR/UKaCYdxk
+        CFj8myVMg38gcwQQCFWmwqn2I1WVSyWfat/Vsb5m0MqJAjctCUUFRiQLKWfGPXnoqSAhzA
+        NrEfhLjrr2BIZwrVCY1yPosNd3BUO2M=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-zWM1SzR6OvOKnkX2Il0A6Q-1; Thu, 26 Oct 2023 17:41:41 -0400
-X-MC-Unique: zWM1SzR6OvOKnkX2Il0A6Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-127-Gb3BrOKiOeOl1_qi0lPuOA-1; Thu, 26 Oct 2023 17:41:43 -0400
+X-MC-Unique: Gb3BrOKiOeOl1_qi0lPuOA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9575B1019C86;
-        Thu, 26 Oct 2023 21:41:41 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 60524857F8C;
+        Thu, 26 Oct 2023 21:41:43 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7241D40C6F79;
-        Thu, 26 Oct 2023 21:41:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 05AD81C060B0;
+        Thu, 26 Oct 2023 21:41:43 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id 174F33003C; Thu, 26 Oct 2023 17:41:41 -0400 (EDT)
+        id AFBDC3003D; Thu, 26 Oct 2023 17:41:42 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 25/39] dm vdo: add slab structure, slab journal and reference counters
-Date:   Thu, 26 Oct 2023 17:41:22 -0400
-Message-Id: <20231026214136.1067410-26-msakai@redhat.com>
+Subject: [PATCH v4 34/39] dm vdo: add the on-disk formats and marshalling of vdo structures
+Date:   Thu, 26 Oct 2023 17:41:31 -0400
+Message-Id: <20231026214136.1067410-35-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Most of the vdo volume belongs to the slab depot. The depot contains a
-collection of slabs. The slabs can be up to 32GB, and are divided into
-three sections. Most of a slab consists of a linear sequence of 4K blocks.
-These blocks are used either to store data, or to hold portions of the
-block map (see subsequent patches). In addition to the data blocks, each
-slab has a set of reference counters, using 1 byte for each data block.
-Finally each slab has a journal. Reference updates are written to the slab
-journal, which is written out one block at a time as each block fills. A
-copy of the reference counters is kept in memory, and are written out a
-block at a time, in oldest-dirtied-order whenever there is a need to
-reclaim slab journal space. The journal is used both to ensure that the
-main recovery journal (see subsequent patches) can regularly free up space,
-and also to amortize the cost of updating individual reference blocks.
-
-This patch adds the slab structure as well as the slab journal and
-reference counters.
+Add data and methods for marshalling and unmarshalling the persistent
+metadata.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
@@ -81,2737 +67,2819 @@ Co-developed-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/slab-depot.c | 2460 ++++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/slab-depot.h |  253 ++++
- 2 files changed, 2713 insertions(+)
- create mode 100644 drivers/md/dm-vdo/slab-depot.c
- create mode 100644 drivers/md/dm-vdo/slab-depot.h
+ drivers/md/dm-vdo/encodings.c | 1488 +++++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/encodings.h | 1307 +++++++++++++++++++++++++++++
+ 2 files changed, 2795 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/encodings.c
+ create mode 100644 drivers/md/dm-vdo/encodings.h
 
-diff --git a/drivers/md/dm-vdo/slab-depot.c b/drivers/md/dm-vdo/slab-depot.c
+diff --git a/drivers/md/dm-vdo/encodings.c b/drivers/md/dm-vdo/encodings.c
 new file mode 100644
-index 000000000000..48adf297a394
+index 000000000000..00ed1e70b647
 --- /dev/null
-+++ b/drivers/md/dm-vdo/slab-depot.c
-@@ -0,0 +1,2460 @@
++++ b/drivers/md/dm-vdo/encodings.c
+@@ -0,0 +1,1488 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#include "slab-depot.h"
++#include "encodings.h"
 +
-+#include <linux/atomic.h>
-+#include <linux/bio.h>
 +#include <linux/log2.h>
-+#include <linux/min_heap.h>
-+#include <linux/minmax.h>
 +
 +#include "logger.h"
 +#include "memory-alloc.h"
-+#include "numeric.h"
 +#include "permassert.h"
-+#include "string-utils.h"
 +
-+#include "action-manager.h"
-+#include "admin-state.h"
-+#include "completion.h"
 +#include "constants.h"
-+#include "data-vio.h"
-+#include "encodings.h"
-+#include "io-submitter.h"
-+#include "physical-zone.h"
-+#include "priority-table.h"
-+#include "recovery-journal.h"
-+#include "repair.h"
 +#include "status-codes.h"
 +#include "types.h"
-+#include "vdo.h"
-+#include "vio.h"
-+#include "wait-queue.h"
 +
-+static const u64 BYTES_PER_WORD = sizeof(u64);
-+static const bool NORMAL_OPERATION = true;
++struct geometry_block {
++	char magic_number[VDO_GEOMETRY_MAGIC_NUMBER_SIZE];
++	struct packed_header header;
++	u32 checksum;
++} __packed;
 +
-+/**
-+ * get_lock() - Get the lock object for a slab journal block by sequence number.
-+ * @journal: vdo_slab journal to retrieve from.
-+ * @sequence_number: Sequence number of the block.
-+ *
-+ * Return: The lock object for the given sequence number.
-+ */
-+static inline struct journal_lock * __must_check
-+get_lock(struct slab_journal *journal, sequence_number_t sequence_number)
-+{
-+	return &journal->locks[sequence_number % journal->size];
-+}
-+
-+static bool is_slab_open(struct vdo_slab *slab)
-+{
-+	return (!vdo_is_state_quiescing(&slab->state) && !vdo_is_state_quiescent(&slab->state));
-+}
-+
-+/**
-+ * must_make_entries_to_flush() - Check whether there are entry waiters which should delay a flush.
-+ * @journal: The journal to check.
-+ *
-+ * Return: true if there are no entry waiters, or if the slab is unrecovered.
-+ */
-+static inline bool __must_check must_make_entries_to_flush(struct slab_journal *journal)
-+{
-+	return ((journal->slab->status != VDO_SLAB_REBUILDING) &&
-+		vdo_has_waiters(&journal->entry_waiters));
-+}
-+
-+/**
-+ * is_reaping() - Check whether a reap is currently in progress.
-+ * @journal: The journal which may be reaping.
-+ *
-+ * Return: true if the journal is reaping.
-+ */
-+static inline bool __must_check is_reaping(struct slab_journal *journal)
-+{
-+	return (journal->head != journal->unreapable);
-+}
-+
-+/**
-+ * initialize_tail_block() - Initialize tail block as a new block.
-+ * @journal: The journal whose tail block is being initialized.
-+ */
-+static void initialize_tail_block(struct slab_journal *journal)
-+{
-+	struct slab_journal_block_header *header = &journal->tail_header;
-+
-+	header->sequence_number = journal->tail;
-+	header->entry_count = 0;
-+	header->has_block_map_increments = false;
-+}
-+
-+/**
-+ * initialize_journal_state() - Set all journal fields appropriately to start journaling.
-+ * @journal: The journal to be reset, based on its tail sequence number.
-+ */
-+static void initialize_journal_state(struct slab_journal *journal)
-+{
-+	journal->unreapable = journal->head;
-+	journal->reap_lock = get_lock(journal, journal->unreapable);
-+	journal->next_commit = journal->tail;
-+	journal->summarized = journal->last_summarized = journal->tail;
-+	initialize_tail_block(journal);
-+}
-+
-+/**
-+ * block_is_full() - Check whether a journal block is full.
-+ * @journal: The slab journal for the block.
-+ *
-+ * Return: true if the tail block is full.
-+ */
-+static bool __must_check block_is_full(struct slab_journal *journal)
-+{
-+	journal_entry_count_t count = journal->tail_header.entry_count;
-+
-+	return (journal->tail_header.has_block_map_increments ?
-+		(journal->full_entries_per_block == count) :
-+		(journal->entries_per_block == count));
-+}
-+
-+static void add_entries(struct slab_journal *journal);
-+static void update_tail_block_location(struct slab_journal *journal);
-+static void release_journal_locks(struct waiter *waiter, void *context);
-+
-+/**
-+ * is_slab_journal_blank() - Check whether a slab's journal is blank.
-+ *
-+ * A slab journal is blank if it has never had any entries recorded in it.
-+ *
-+ * Return: true if the slab's journal has never been modified.
-+ */
-+static bool is_slab_journal_blank(const struct vdo_slab *slab)
-+{
-+	return ((slab->journal.tail == 1) && (slab->journal.tail_header.entry_count == 0));
-+}
-+
-+/**
-+ * mark_slab_journal_dirty() - Put a slab journal on the dirty ring of its allocator in the correct
-+ *                             order.
-+ * @journal: The journal to be marked dirty.
-+ * @lock: The recovery journal lock held by the slab journal.
-+ */
-+static void mark_slab_journal_dirty(struct slab_journal *journal, sequence_number_t lock)
-+{
-+	struct slab_journal *dirty_journal;
-+	struct list_head *dirty_list = &journal->slab->allocator->dirty_slab_journals;
-+
-+	ASSERT_LOG_ONLY(journal->recovery_lock == 0, "slab journal was clean");
-+
-+	journal->recovery_lock = lock;
-+	list_for_each_entry_reverse(dirty_journal, dirty_list, dirty_entry) {
-+		if (dirty_journal->recovery_lock <= journal->recovery_lock)
-+			break;
-+	}
-+
-+	list_move_tail(&journal->dirty_entry, dirty_journal->dirty_entry.next);
-+}
-+
-+static void mark_slab_journal_clean(struct slab_journal *journal)
-+{
-+	journal->recovery_lock = 0;
-+	list_del_init(&journal->dirty_entry);
-+}
-+
-+static void check_if_slab_drained(struct vdo_slab *slab)
-+{
-+	bool read_only;
-+	struct slab_journal *journal = &slab->journal;
-+	const struct admin_state_code *code;
-+
-+	if (!vdo_is_state_draining(&slab->state) ||
-+	    must_make_entries_to_flush(journal) ||
-+	    is_reaping(journal) ||
-+	    journal->waiting_to_commit ||
-+	    !list_empty(&journal->uncommitted_blocks) ||
-+	    journal->updating_slab_summary ||
-+	    (slab->active_count > 0))
-+		return;
-+
-+	/* When not suspending or recovering, the slab must be clean. */
-+	code = vdo_get_admin_state_code(&slab->state);
-+	read_only = vdo_is_read_only(slab->allocator->depot->vdo);
-+	if (!read_only &&
-+	    vdo_has_waiters(&slab->dirty_blocks) &&
-+	    (code != VDO_ADMIN_STATE_SUSPENDING) &&
-+	    (code != VDO_ADMIN_STATE_RECOVERING))
-+		return;
-+
-+	vdo_finish_draining_with_result(&slab->state, (read_only ? VDO_READ_ONLY : VDO_SUCCESS));
-+}
-+
-+/**
-+ * finish_reaping() - Actually advance the head of the journal now that any necessary flushes are
-+ *                    complete.
-+ * @journal: The journal to be reaped.
-+ */
-+static void finish_reaping(struct slab_journal *journal)
-+{
-+	journal->head = journal->unreapable;
-+	add_entries(journal);
-+	check_if_slab_drained(journal->slab);
-+}
-+
-+static void reap_slab_journal(struct slab_journal *journal);
-+
-+/**
-+ * complete_reaping() - Finish reaping now that we have flushed the lower layer and then try
-+ *                      reaping again in case we deferred reaping due to an outstanding vio.
-+ * @completion: The flush vio.
-+ */
-+static void complete_reaping(struct vdo_completion *completion)
-+{
-+	struct slab_journal *journal = completion->parent;
-+
-+	return_vio_to_pool(journal->slab->allocator->vio_pool,
-+			   vio_as_pooled_vio(as_vio(UDS_FORGET(completion))));
-+	finish_reaping(journal);
-+	reap_slab_journal(journal);
-+}
-+
-+/**
-+ * handle_flush_error() - Handle an error flushing the lower layer.
-+ * @completion: The flush vio.
-+ */
-+static void handle_flush_error(struct vdo_completion *completion)
-+{
-+	vio_record_metadata_io_error(as_vio(completion));
-+	vdo_enter_read_only_mode(completion->vdo, completion->result);
-+	complete_reaping(completion);
-+}
-+
-+static void flush_endio(struct bio *bio)
-+{
-+	struct vio *vio = bio->bi_private;
-+	struct slab_journal *journal = vio->completion.parent;
-+
-+	continue_vio_after_io(vio,
-+			      complete_reaping,
-+			      journal->slab->allocator->thread_id);
-+}
-+
-+/**
-+ * flush_for_reaping() - A waiter callback for getting a vio with which to flush the lower layer
-+ *                       prior to reaping.
-+ * @waiter: The journal as a flush waiter.
-+ * @context: The newly acquired flush vio.
-+ */
-+static void flush_for_reaping(struct waiter *waiter, void *context)
-+{
-+	struct slab_journal *journal = container_of(waiter, struct slab_journal, flush_waiter);
-+	struct pooled_vio *pooled = context;
-+	struct vio *vio = &pooled->vio;
-+
-+	vio->completion.parent = journal;
-+	submit_flush_vio(vio, flush_endio, handle_flush_error);
-+}
-+
-+/**
-+ * reap_slab_journal() - Conduct a reap on a slab journal to reclaim unreferenced blocks.
-+ * @journal: The slab journal.
-+ */
-+static void reap_slab_journal(struct slab_journal *journal)
-+{
-+	bool reaped = false;
-+
-+	if (is_reaping(journal))
-+		/* We already have a reap in progress so wait for it to finish. */
-+		return;
-+
-+	if ((journal->slab->status != VDO_SLAB_REBUILT) ||
-+	    !vdo_is_state_normal(&journal->slab->state) ||
-+	    vdo_is_read_only(journal->slab->allocator->depot->vdo))
-+		/*
-+		 * We must not reap in the first two cases, and there's no point in read-only mode.
-+		 */
-+		return;
-+
++static const struct header GEOMETRY_BLOCK_HEADER_5_0 = {
++	.id = VDO_GEOMETRY_BLOCK,
++	.version = {
++		.major_version = 5,
++		.minor_version = 0,
++	},
 +	/*
-+	 * Start reclaiming blocks only when the journal head has no references. Then stop when a
-+	 * block is referenced or reap reaches the most recently written block, referenced by the
-+	 * slab summary, which has the sequence number just before the tail.
++	 * Note: this size isn't just the payload size following the header, like it is everywhere
++	 * else in VDO.
 +	 */
-+	while ((journal->unreapable < journal->tail) && (journal->reap_lock->count == 0)) {
-+		reaped = true;
-+		journal->unreapable++;
-+		journal->reap_lock++;
-+		if (journal->reap_lock == &journal->locks[journal->size])
-+			journal->reap_lock = &journal->locks[0];
-+	}
++	.size = sizeof(struct geometry_block) + sizeof(struct volume_geometry),
++};
 +
-+	if (!reaped)
-+		return;
-+
++static const struct header GEOMETRY_BLOCK_HEADER_4_0 = {
++	.id = VDO_GEOMETRY_BLOCK,
++	.version = {
++		.major_version = 4,
++		.minor_version = 0,
++	},
 +	/*
-+	 * It is never safe to reap a slab journal block without first issuing a flush, regardless
-+	 * of whether a user flush has been received or not. In the absence of the flush, the
-+	 * reference block write which released the locks allowing the slab journal to reap may not
-+	 * be persisted. Although slab summary writes will eventually issue flushes, multiple slab
-+	 * journal block writes can be issued while previous slab summary updates have not yet been
-+	 * made. Even though those slab journal block writes will be ignored if the slab summary
-+	 * update is not persisted, they may still overwrite the to-be-reaped slab journal block
-+	 * resulting in a loss of reference count updates (VDO-2912).
++	 * Note: this size isn't just the payload size following the header, like it is everywhere
++	 * else in VDO.
 +	 */
-+	journal->flush_waiter.callback = flush_for_reaping;
-+	acquire_vio_from_pool(journal->slab->allocator->vio_pool, &journal->flush_waiter);
-+}
-+
-+/**
-+ * adjust_slab_journal_block_reference() - Adjust the reference count for a slab journal block.
-+ * @journal: The slab journal.
-+ * @sequence_number: The journal sequence number of the referenced block.
-+ * @adjustment: Amount to adjust the reference counter.
-+ *
-+ * Note that when the adjustment is negative, the slab journal will be reaped.
-+ */
-+static void
-+adjust_slab_journal_block_reference(struct slab_journal *journal,
-+				    sequence_number_t sequence_number,
-+				    int adjustment)
-+{
-+	struct journal_lock *lock;
-+
-+	if (sequence_number == 0)
-+		return;
-+
-+	if (journal->slab->status == VDO_SLAB_REPLAYING)
-+		/* Locks should not be used during offline replay. */
-+		return;
-+
-+	ASSERT_LOG_ONLY((adjustment != 0), "adjustment must be non-zero");
-+	lock = get_lock(journal, sequence_number);
-+	if (adjustment < 0)
-+		ASSERT_LOG_ONLY((-adjustment <= lock->count),
-+				"adjustment %d of lock count %u for slab journal block %llu must not underflow",
-+				adjustment,
-+				lock->count,
-+				(unsigned long long) sequence_number);
-+
-+	lock->count += adjustment;
-+	if (lock->count == 0)
-+		reap_slab_journal(journal);
-+}
-+
-+/**
-+ * release_journal_locks() - Callback invoked after a slab summary update completes.
-+ * @waiter: The slab summary waiter that has just been notified.
-+ * @context: The result code of the update.
-+ *
-+ * Registered in the constructor on behalf of update_tail_block_location().
-+ *
-+ * Implements waiter_callback.
-+ */
-+static void release_journal_locks(struct waiter *waiter, void *context)
-+{
-+	sequence_number_t first, i;
-+	struct slab_journal *journal =
-+		container_of(waiter, struct slab_journal, slab_summary_waiter);
-+	int result = *((int *)context);
-+
-+	if (result != VDO_SUCCESS) {
-+		if (result != VDO_READ_ONLY)
-+			/*
-+			 * Don't bother logging what might be lots of errors if we are already in
-+			 * read-only mode.
-+			 */
-+			uds_log_error_strerror(result,
-+					       "failed slab summary update %llu",
-+					       (unsigned long long) journal->summarized);
-+
-+		journal->updating_slab_summary = false;
-+		vdo_enter_read_only_mode(journal->slab->allocator->depot->vdo, result);
-+		check_if_slab_drained(journal->slab);
-+		return;
-+	}
-+
-+	if (journal->partial_write_in_progress && (journal->summarized == journal->tail)) {
-+		journal->partial_write_in_progress = false;
-+		add_entries(journal);
-+	}
-+
-+	first = journal->last_summarized;
-+	journal->last_summarized = journal->summarized;
-+	for (i = journal->summarized - 1; i >= first; i--) {
-+		/*
-+		 * Release the lock the summarized block held on the recovery journal. (During
-+		 * replay, recovery_start will always be 0.)
-+		 */
-+		if (journal->recovery_journal != NULL) {
-+			zone_count_t zone_number = journal->slab->allocator->zone_number;
-+			struct journal_lock *lock = get_lock(journal, i);
-+
-+			vdo_release_recovery_journal_block_reference(journal->recovery_journal,
-+								     lock->recovery_start,
-+								     VDO_ZONE_TYPE_PHYSICAL,
-+								     zone_number);
-+		}
-+
-+		/*
-+		 * Release our own lock against reaping for blocks that are committed. (This
-+		 * function will not change locks during replay.)
-+		 */
-+		adjust_slab_journal_block_reference(journal, i, -1);
-+	}
-+
-+	journal->updating_slab_summary = false;
-+
-+	reap_slab_journal(journal);
-+
-+	/* Check if the slab summary needs to be updated again. */
-+	update_tail_block_location(journal);
-+}
-+
-+/**
-+ * update_tail_block_location() - Update the tail block location in the slab summary, if necessary.
-+ * @journal: The slab journal that is updating its tail block location.
-+ */
-+static void update_tail_block_location(struct slab_journal *journal)
-+{
-+	block_count_t free_block_count;
-+	struct vdo_slab *slab = journal->slab;
-+
-+	if (journal->updating_slab_summary ||
-+	    vdo_is_read_only(journal->slab->allocator->depot->vdo) ||
-+	    (journal->last_summarized >= journal->next_commit)) {
-+		check_if_slab_drained(slab);
-+		return;
-+	}
-+
-+	if (slab->status != VDO_SLAB_REBUILT) {
-+		u8 hint = slab->allocator->summary_entries[slab->slab_number].fullness_hint;
-+
-+		free_block_count = ((block_count_t) hint) << slab->allocator->depot->hint_shift;
-+	} else {
-+		free_block_count = slab->free_blocks;
-+	}
-+
-+	journal->summarized = journal->next_commit;
-+	journal->updating_slab_summary = true;
-+
-+	/*
-+	 * Update slab summary as dirty.
-+	 * vdo_slab journal can only reap past sequence number 1 when all the ref counts for this
-+	 * slab have been written to the layer. Therefore, indicate that the ref counts must be
-+	 * loaded when the journal head has reaped past sequence number 1.
-+	 */
-+	update_slab_summary_entry(slab,
-+				  &journal->slab_summary_waiter,
-+				  journal->summarized % journal->size,
-+				  (journal->head > 1),
-+				  false,
-+				  free_block_count);
-+}
-+
-+/**
-+ * reopen_slab_journal() - Reopen a slab's journal by emptying it and then adding pending entries.
-+ */
-+static void reopen_slab_journal(struct vdo_slab *slab)
-+{
-+	struct slab_journal *journal = &slab->journal;
-+	sequence_number_t block;
-+
-+	ASSERT_LOG_ONLY(journal->tail_header.entry_count == 0,
-+			"vdo_slab journal's active block empty before reopening");
-+	journal->head = journal->tail;
-+	initialize_journal_state(journal);
-+
-+	/* Ensure no locks are spuriously held on an empty journal. */
-+	for (block = 1; block <= journal->size; block++)
-+		ASSERT_LOG_ONLY((get_lock(journal, block)->count == 0),
-+				"Scrubbed journal's block %llu is not locked",
-+				(unsigned long long) block);
-+
-+	add_entries(journal);
-+}
-+
-+static sequence_number_t get_committing_sequence_number(const struct pooled_vio *vio)
-+{
-+	const struct packed_slab_journal_block *block =
-+		(const struct packed_slab_journal_block *) vio->vio.data;
-+
-+	return __le64_to_cpu(block->header.sequence_number);
-+}
-+
-+/**
-+ * complete_write() - Handle post-commit processing.
-+ * @completion: The write vio as a completion.
-+ *
-+ * This is the callback registered by write_slab_journal_block().
-+ */
-+static void complete_write(struct vdo_completion *completion)
-+{
-+	int result = completion->result;
-+	struct pooled_vio *pooled = vio_as_pooled_vio(as_vio(completion));
-+	struct slab_journal *journal = completion->parent;
-+	sequence_number_t committed = get_committing_sequence_number(pooled);
-+
-+	list_del_init(&pooled->list_entry);
-+	return_vio_to_pool(journal->slab->allocator->vio_pool, UDS_FORGET(pooled));
-+
-+	if (result != VDO_SUCCESS) {
-+		vio_record_metadata_io_error(as_vio(completion));
-+		uds_log_error_strerror(result,
-+				       "cannot write slab journal block %llu",
-+				       (unsigned long long) committed);
-+		vdo_enter_read_only_mode(journal->slab->allocator->depot->vdo, result);
-+		check_if_slab_drained(journal->slab);
-+		return;
-+	}
-+
-+	WRITE_ONCE(journal->events->blocks_written, journal->events->blocks_written + 1);
-+
-+	if (list_empty(&journal->uncommitted_blocks)) {
-+		/* If no blocks are outstanding, then the commit point is at the tail. */
-+		journal->next_commit = journal->tail;
-+	} else {
-+		/* The commit point is always the beginning of the oldest incomplete block. */
-+		pooled = container_of(journal->uncommitted_blocks.next,
-+				      struct pooled_vio,
-+				      list_entry);
-+		journal->next_commit = get_committing_sequence_number(pooled);
-+	}
-+
-+	update_tail_block_location(journal);
-+}
-+
-+static void write_slab_journal_endio(struct bio *bio)
-+{
-+	struct vio *vio = bio->bi_private;
-+	struct slab_journal *journal = vio->completion.parent;
-+
-+	continue_vio_after_io(vio, complete_write, journal->slab->allocator->thread_id);
-+}
-+
-+/**
-+ * write_slab_journal_block() - Write a slab journal block.
-+ * @waiter: The vio pool waiter which was just notified.
-+ * @context: The vio pool entry for the write.
-+ *
-+ * Callback from acquire_vio_from_pool() registered in commit_tail().
-+ */
-+static void write_slab_journal_block(struct waiter *waiter, void *context)
-+{
-+	struct pooled_vio *pooled = context;
-+	struct vio *vio = &pooled->vio;
-+	struct slab_journal *journal = container_of(waiter, struct slab_journal, resource_waiter);
-+	struct slab_journal_block_header *header = &journal->tail_header;
-+	int unused_entries = journal->entries_per_block - header->entry_count;
-+	physical_block_number_t block_number;
-+	const struct admin_state_code *operation;
-+
-+	header->head = journal->head;
-+	list_add_tail(&pooled->list_entry, &journal->uncommitted_blocks);
-+	vdo_pack_slab_journal_block_header(header, &journal->block->header);
-+
-+	/* Copy the tail block into the vio. */
-+	memcpy(pooled->vio.data, journal->block, VDO_BLOCK_SIZE);
-+
-+	ASSERT_LOG_ONLY(unused_entries >= 0, "vdo_slab journal block is not overfull");
-+	if (unused_entries > 0) {
-+		/*
-+		 * Release the per-entry locks for any unused entries in the block we are about to
-+		 * write.
-+		 */
-+		adjust_slab_journal_block_reference(journal,
-+						    header->sequence_number,
-+						    -unused_entries);
-+		journal->partial_write_in_progress = !block_is_full(journal);
-+	}
-+
-+	block_number = journal->slab->journal_origin + (header->sequence_number % journal->size);
-+	vio->completion.parent = journal;
-+
-+	/*
-+	 * This block won't be read in recovery until the slab summary is updated to refer to it.
-+	 * The slab summary update does a flush which is sufficient to protect us from VDO-2331.
-+	 */
-+	submit_metadata_vio(UDS_FORGET(vio),
-+			    block_number,
-+			    write_slab_journal_endio,
-+			    complete_write,
-+			    REQ_OP_WRITE);
-+
-+	/* Since the write is submitted, the tail block structure can be reused. */
-+	journal->tail++;
-+	initialize_tail_block(journal);
-+	journal->waiting_to_commit = false;
-+
-+	operation = vdo_get_admin_state_code(&journal->slab->state);
-+	if (operation == VDO_ADMIN_STATE_WAITING_FOR_RECOVERY) {
-+		vdo_finish_operation(&journal->slab->state,
-+				     (vdo_is_read_only(journal->slab->allocator->depot->vdo) ?
-+				      VDO_READ_ONLY :
-+				      VDO_SUCCESS));
-+		return;
-+	}
-+
-+	add_entries(journal);
-+}
-+
-+/**
-+ * commit_tail() - Commit the tail block of the slab journal.
-+ * @journal: The journal whose tail block should be committed.
-+ */
-+static void commit_tail(struct slab_journal *journal)
-+{
-+	if ((journal->tail_header.entry_count == 0) && must_make_entries_to_flush(journal))
-+		/*
-+		 * There are no entries at the moment, but there are some waiters, so defer
-+		 * initiating the flush until those entries are ready to write.
-+		 */
-+		return;
-+
-+	if (vdo_is_read_only(journal->slab->allocator->depot->vdo) ||
-+	    journal->waiting_to_commit ||
-+	    (journal->tail_header.entry_count == 0))
-+		/*
-+		 * There is nothing to do since the tail block is empty, or writing, or the journal
-+		 * is in read-only mode.
-+		 */
-+		return;
-+
-+	/*
-+	 * Since we are about to commit the tail block, this journal no longer needs to be on the
-+	 * ring of journals which the recovery journal might ask to commit.
-+	 */
-+	mark_slab_journal_clean(journal);
-+
-+	journal->waiting_to_commit = true;
-+
-+	journal->resource_waiter.callback = write_slab_journal_block;
-+	acquire_vio_from_pool(journal->slab->allocator->vio_pool, &journal->resource_waiter);
-+}
-+
-+/**
-+ * encode_slab_journal_entry() - Encode a slab journal entry.
-+ * @tail_header: The unpacked header for the block.
-+ * @payload: The journal block payload to hold the entry.
-+ * @sbn: The slab block number of the entry to encode.
-+ * @operation: The type of the entry.
-+ * @increment: True if this is an increment.
-+ *
-+ * Exposed for unit tests.
-+ */
-+static void
-+encode_slab_journal_entry(struct slab_journal_block_header *tail_header,
-+			  slab_journal_payload *payload,
-+			  slab_block_number sbn,
-+			  enum journal_operation operation,
-+			  bool increment)
-+{
-+	journal_entry_count_t entry_number = tail_header->entry_count++;
-+
-+	if (operation == VDO_JOURNAL_BLOCK_MAP_REMAPPING) {
-+		if (!tail_header->has_block_map_increments) {
-+			memset(payload->full_entries.entry_types,
-+			       0,
-+			       VDO_SLAB_JOURNAL_ENTRY_TYPES_SIZE);
-+			tail_header->has_block_map_increments = true;
-+		}
-+
-+		payload->full_entries.entry_types[entry_number / 8] |=
-+			((u8)1 << (entry_number % 8));
-+	}
-+
-+	vdo_pack_slab_journal_entry(&payload->entries[entry_number], sbn, increment);
-+}
-+
-+/**
-+ * expand_journal_point() - Convert a recovery journal journal_point which refers to both an
-+ *                          increment and a decrement to a single point which refers to one or the
-+ *                          other.
-+ * @recovery_point: The journal point to convert.
-+ * @increment: Whether the current entry is an increment.
-+ *
-+ * Return: The expanded journal point
-+ *
-+ * Because each data_vio has but a single recovery journal point, but may need to make both
-+ * increment and decrement entries in the same slab journal. In order to distinguish the two
-+ * entries, the entry count of the expanded journal point is twice the actual recovery journal
-+ * entry count for increments, and one more than that for decrements.
-+ */
-+static struct journal_point
-+expand_journal_point(struct journal_point recovery_point, bool increment)
-+{
-+	recovery_point.entry_count *= 2;
-+	if (!increment)
-+		recovery_point.entry_count++;
-+
-+	return recovery_point;
-+}
-+
-+/**
-+ * add_entry() - Actually add an entry to the slab journal, potentially firing off a write if a
-+ *               block becomes full.
-+ * @journal: The slab journal to append to.
-+ * @pbn: The pbn being adjusted.
-+ * @operation: The type of entry to make.
-+ * @increment: True if this is an increment.
-+ * @recovery_point: The expanded recovery point.
-+ *
-+ * This function is synchronous.
-+ */
-+static void add_entry(struct slab_journal *journal,
-+		      physical_block_number_t pbn,
-+		      enum journal_operation operation,
-+		      bool increment,
-+		      struct journal_point recovery_point)
-+{
-+	struct packed_slab_journal_block *block = journal->block;
-+	int result;
-+
-+	result = ASSERT(vdo_before_journal_point(&journal->tail_header.recovery_point,
-+						 &recovery_point),
-+			"recovery journal point is monotonically increasing, recovery point: %llu.%u, block recovery point: %llu.%u",
-+			(unsigned long long) recovery_point.sequence_number,
-+			recovery_point.entry_count,
-+			(unsigned long long) journal->tail_header.recovery_point.sequence_number,
-+			journal->tail_header.recovery_point.entry_count);
-+	if (result != VDO_SUCCESS) {
-+		vdo_enter_read_only_mode(journal->slab->allocator->depot->vdo, result);
-+		return;
-+	}
-+
-+	if (operation == VDO_JOURNAL_BLOCK_MAP_REMAPPING) {
-+		result = ASSERT((journal->tail_header.entry_count <
-+				 journal->full_entries_per_block),
-+				"block has room for full entries");
-+		if (result != VDO_SUCCESS) {
-+			vdo_enter_read_only_mode(journal->slab->allocator->depot->vdo, result);
-+			return;
-+		}
-+	}
-+
-+	encode_slab_journal_entry(&journal->tail_header,
-+				  &block->payload,
-+				  pbn - journal->slab->start,
-+				  operation,
-+				  increment);
-+	journal->tail_header.recovery_point = recovery_point;
-+	if (block_is_full(journal))
-+		commit_tail(journal);
-+}
-+
-+static inline block_count_t journal_length(const struct slab_journal *journal)
-+{
-+	return journal->tail - journal->head;
-+}
-+
-+/**
-+ * vdo_attempt_replay_into_slab() - Replay a recovery journal entry into a slab's journal.
-+ * @slab: The slab to play into.
-+ * @pbn: The PBN for the entry.
-+ * @operation: The type of entry to add.
-+ * @increment: True if this entry is an increment.
-+ * @recovery_point: The recovery journal point corresponding to this entry.
-+ * @parent: The completion to notify when there is space to add the entry if the entry could not be
-+ *          added immediately.
-+ *
-+ * Return: true if the entry was added immediately.
-+ */
-+bool vdo_attempt_replay_into_slab(struct vdo_slab *slab,
-+				  physical_block_number_t pbn,
-+				  enum journal_operation operation,
-+				  bool increment,
-+				  struct journal_point *recovery_point,
-+				  struct vdo_completion *parent)
-+{
-+	struct slab_journal *journal = &slab->journal;
-+	struct slab_journal_block_header *header = &journal->tail_header;
-+	struct journal_point expanded = expand_journal_point(*recovery_point, increment);
-+
-+	/* Only accept entries after the current recovery point. */
-+	if (!vdo_before_journal_point(&journal->tail_header.recovery_point, &expanded))
-+		return true;
-+
-+	if ((header->entry_count >= journal->full_entries_per_block) &&
-+	    (header->has_block_map_increments || (operation == VDO_JOURNAL_BLOCK_MAP_REMAPPING)))
-+		/*
-+		 * The tail block does not have room for the entry we are attempting to add so
-+		 * commit the tail block now.
-+		 */
-+		commit_tail(journal);
-+
-+	if (journal->waiting_to_commit) {
-+		vdo_start_operation_with_waiter(&journal->slab->state,
-+						VDO_ADMIN_STATE_WAITING_FOR_RECOVERY,
-+						parent,
-+						NULL);
-+		return false;
-+	}
-+
-+	if (journal_length(journal) >= journal->size) {
-+		/*
-+		 * We must have reaped the current head before the crash, since the blocked
-+		 * threshold keeps us from having more entries than fit in a slab journal; hence we
-+		 * can just advance the head (and unreapable block), as needed.
-+		 */
-+		journal->head++;
-+		journal->unreapable++;
-+	}
-+
-+	if (journal->slab->status == VDO_SLAB_REBUILT)
-+		journal->slab->status = VDO_SLAB_REPLAYING;
-+
-+	add_entry(journal, pbn, operation, increment, expanded);
-+	return true;
-+}
-+
-+/**
-+ * requires_reaping() - Check whether the journal must be reaped before adding new entries.
-+ * @journal: The journal to check.
-+ *
-+ * Return: true if the journal must be reaped.
-+ */
-+static bool requires_reaping(const struct slab_journal *journal)
-+{
-+	return (journal_length(journal) >= journal->blocking_threshold);
-+}
-+
-+/** finish_summary_update() - A waiter callback that resets the writing state of a slab. */
-+static void finish_summary_update(struct waiter *waiter, void *context)
-+{
-+	struct vdo_slab *slab = container_of(waiter, struct vdo_slab, summary_waiter);
-+	int result = *((int *) context);
-+
-+	slab->active_count--;
-+
-+	if ((result != VDO_SUCCESS) && (result != VDO_READ_ONLY)) {
-+		uds_log_error_strerror(result, "failed to update slab summary");
-+		vdo_enter_read_only_mode(slab->allocator->depot->vdo, result);
-+	}
-+
-+	check_if_slab_drained(slab);
-+}
-+
-+static void write_reference_block(struct waiter *waiter, void *context);
-+
-+/**
-+ * launch_reference_block_write() - Launch the write of a dirty reference block by first acquiring
-+ *                                  a VIO for it from the pool.
-+ * @waiter: The waiter of the block which is starting to write.
-+ * @context: The parent slab of the block.
-+ *
-+ * This can be asynchronous since the writer will have to wait if all VIOs in the pool are
-+ * currently in use.
-+ */
-+static void launch_reference_block_write(struct waiter *waiter, void *context)
-+{
-+	struct vdo_slab *slab = context;
-+
-+	if (vdo_is_read_only(slab->allocator->depot->vdo))
-+		return;
-+
-+	slab->active_count++;
-+	container_of(waiter, struct reference_block, waiter)->is_writing = true;
-+	waiter->callback = write_reference_block;
-+	acquire_vio_from_pool(slab->allocator->vio_pool, waiter);
-+}
-+
-+static void save_dirty_reference_blocks(struct vdo_slab *slab)
-+{
-+	vdo_notify_all_waiters(&slab->dirty_blocks, launch_reference_block_write, slab);
-+	check_if_slab_drained(slab);
-+}
-+
-+/**
-+ * finish_reference_block_write() - After a reference block has written, clean it, release its
-+ *                                  locks, and return its VIO to the pool.
-+ * @completion: The VIO that just finished writing.
-+ */
-+static void finish_reference_block_write(struct vdo_completion *completion)
-+{
-+	struct vio *vio = as_vio(completion);
-+	struct pooled_vio *pooled = vio_as_pooled_vio(vio);
-+	struct reference_block *block = completion->parent;
-+	struct vdo_slab *slab = block->slab;
-+	tail_block_offset_t offset;
-+
-+	slab->active_count--;
-+
-+	/* Release the slab journal lock. */
-+	adjust_slab_journal_block_reference(&slab->journal,
-+					    block->slab_journal_lock_to_release,
-+					    -1);
-+	return_vio_to_pool(slab->allocator->vio_pool, pooled);
-+
-+	/*
-+	 * We can't clear the is_writing flag earlier as releasing the slab journal lock may cause
-+	 * us to be dirtied again, but we don't want to double enqueue.
-+	 */
-+	block->is_writing = false;
-+
-+	if (vdo_is_read_only(completion->vdo)) {
-+		check_if_slab_drained(slab);
-+		return;
-+	}
-+
-+	/* Re-queue the block if it was re-dirtied while it was writing. */
-+	if (block->is_dirty) {
-+		vdo_enqueue_waiter(&block->slab->dirty_blocks, &block->waiter);
-+		if (vdo_is_state_draining(&slab->state))
-+			/* We must be saving, and this block will otherwise not be relaunched. */
-+			save_dirty_reference_blocks(slab);
-+
-+		return;
-+	}
-+
-+	/*
-+	 * Mark the slab as clean in the slab summary if there are no dirty or writing blocks
-+	 * and no summary update in progress.
-+	 */
-+	if ((slab->active_count > 0) || vdo_has_waiters(&slab->dirty_blocks)) {
-+		check_if_slab_drained(slab);
-+		return;
-+	}
-+
-+	offset = slab->allocator->summary_entries[slab->slab_number].tail_block_offset;
-+	slab->active_count++;
-+	slab->summary_waiter.callback = finish_summary_update;
-+	update_slab_summary_entry(slab,
-+				  &slab->summary_waiter,
-+				  offset,
-+				  true,
-+				  true,
-+				  slab->free_blocks);
-+}
-+
-+/**
-+ * get_reference_counters_for_block() - Find the reference counters for a given block.
-+ * @block: The reference_block in question.
-+ *
-+ * Return: A pointer to the reference counters for this block.
-+ */
-+static vdo_refcount_t * __must_check
-+get_reference_counters_for_block(struct reference_block *block)
-+{
-+	size_t block_index = block - block->slab->reference_blocks;
-+
-+	return &block->slab->counters[block_index * COUNTS_PER_BLOCK];
-+}
-+
-+/**
-+ * pack_reference_block() - Copy data from a reference block to a buffer ready to be written out.
-+ * @block: The block to copy.
-+ * @buffer: The char buffer to fill with the packed block.
-+ */
-+static void pack_reference_block(struct reference_block *block, void *buffer)
-+{
-+	struct packed_reference_block *packed = buffer;
-+	vdo_refcount_t *counters = get_reference_counters_for_block(block);
-+	sector_count_t i;
-+	struct packed_journal_point commit_point;
-+
-+	vdo_pack_journal_point(&block->slab->slab_journal_point, &commit_point);
-+
-+	for (i = 0; i < VDO_SECTORS_PER_BLOCK; i++) {
-+		packed->sectors[i].commit_point = commit_point;
-+		memcpy(packed->sectors[i].counts,
-+		       counters + (i * COUNTS_PER_SECTOR),
-+		       (sizeof(vdo_refcount_t) * COUNTS_PER_SECTOR));
-+	}
-+}
-+
-+static void write_reference_block_endio(struct bio *bio)
-+{
-+	struct vio *vio = bio->bi_private;
-+	struct reference_block *block = vio->completion.parent;
-+	thread_id_t thread_id = block->slab->allocator->thread_id;
-+
-+	continue_vio_after_io(vio, finish_reference_block_write, thread_id);
-+}
-+
-+/**
-+ * handle_io_error() - Handle an I/O error reading or writing a reference count block.
-+ * @completion: The VIO doing the I/O as a completion.
-+ */
-+static void handle_io_error(struct vdo_completion *completion)
-+{
-+	int result = completion->result;
-+	struct vio *vio = as_vio(completion);
-+	struct vdo_slab *slab = ((struct reference_block *) completion->parent)->slab;
-+
-+	vio_record_metadata_io_error(vio);
-+	return_vio_to_pool(slab->allocator->vio_pool, vio_as_pooled_vio(vio));
-+	slab->active_count--;
-+	vdo_enter_read_only_mode(slab->allocator->depot->vdo, result);
-+	check_if_slab_drained(slab);
-+}
-+
-+/**
-+ * write_reference_block() - After a dirty block waiter has gotten a VIO from the VIO pool, copy
-+ *                           its counters and associated data into the VIO, and launch the write.
-+ * @waiter: The waiter of the dirty block.
-+ * @context: The VIO returned by the pool.
-+ */
-+static void write_reference_block(struct waiter *waiter, void *context)
-+{
-+	size_t block_offset;
-+	physical_block_number_t pbn;
-+	struct pooled_vio *pooled = context;
-+	struct vdo_completion *completion = &pooled->vio.completion;
-+	struct reference_block *block = container_of(waiter, struct reference_block, waiter);
-+
-+	pack_reference_block(block, pooled->vio.data);
-+	block_offset = (block - block->slab->reference_blocks);
-+	pbn = (block->slab->ref_counts_origin + block_offset);
-+	block->slab_journal_lock_to_release = block->slab_journal_lock;
-+	completion->parent = block;
-+
-+	/*
-+	 * Mark the block as clean, since we won't be committing any updates that happen after this
-+	 * moment. As long as VIO order is preserved, two VIOs updating this block at once will not
-+	 * cause complications.
-+	 */
-+	block->is_dirty = false;
-+
-+	/*
-+	 * Flush before writing to ensure that the recovery journal and slab journal entries which
-+	 * cover this reference update are stable (VDO-2331).
-+	 */
-+	WRITE_ONCE(block->slab->allocator->ref_counts_statistics.blocks_written,
-+		   block->slab->allocator->ref_counts_statistics.blocks_written + 1);
-+
-+	completion->callback_thread_id = ((struct block_allocator *) pooled->context)->thread_id;
-+	submit_metadata_vio(&pooled->vio,
-+			    pbn,
-+			    write_reference_block_endio,
-+			    handle_io_error,
-+			    REQ_OP_WRITE | REQ_PREFLUSH);
-+}
-+
-+static void reclaim_journal_space(struct slab_journal *journal)
-+{
-+	block_count_t length = journal_length(journal);
-+	struct vdo_slab *slab = journal->slab;
-+	block_count_t write_count = vdo_count_waiters(&slab->dirty_blocks);
-+	block_count_t written;
-+
-+	if ((length < journal->flushing_threshold) || (write_count == 0))
-+		return;
-+
-+	/* The slab journal is over the first threshold, schedule some reference block writes. */
-+	WRITE_ONCE(journal->events->flush_count, journal->events->flush_count + 1);
-+	if (length < journal->flushing_deadline)
-+		/* Schedule more writes the closer to the deadline we get. */
-+		write_count = max_t(block_count_t,
-+				    write_count / (journal->flushing_deadline - length + 1),
-+				    1);
-+
-+	for (written = 0; written < write_count; written++)
-+		vdo_notify_next_waiter(&slab->dirty_blocks, launch_reference_block_write, slab);
-+}
-+
-+/**
-+ * reference_count_to_status() - Convert a reference count to a reference status.
-+ * @count: The count to convert.
-+ *
-+ * Return: The appropriate reference status.
-+ */
-+static enum reference_status __must_check
-+reference_count_to_status(vdo_refcount_t count)
-+{
-+	if (count == EMPTY_REFERENCE_COUNT)
-+		return RS_FREE;
-+	else if (count == 1)
-+		return RS_SINGLE;
-+	else if (count == PROVISIONAL_REFERENCE_COUNT)
-+		return RS_PROVISIONAL;
-+	else
-+		return RS_SHARED;
-+}
-+
-+/**
-+ * dirty_block() - Mark a reference count block as dirty, potentially adding it to the dirty queue
-+ *                 if it wasn't already dirty.
-+ * @block: The reference block to mark as dirty.
-+ */
-+static void dirty_block(struct reference_block *block)
-+{
-+	if (block->is_dirty)
-+		return;
-+
-+	block->is_dirty = true;
-+	if (!block->is_writing)
-+		vdo_enqueue_waiter(&block->slab->dirty_blocks, &block->waiter);
-+}
-+
-+/**
-+ * get_reference_block() - Get the reference block that covers the given block index.
-+ */
-+static struct reference_block * __must_check
-+get_reference_block(struct vdo_slab *slab, slab_block_number index)
-+{
-+	return &slab->reference_blocks[index / COUNTS_PER_BLOCK];
-+}
-+
-+/**
-+ * slab_block_number_from_pbn() - Determine the index within the slab of a particular physical
-+ *                                block number.
-+ * @slab: The slab.
-+ * @physical_block_number: The physical block number.
-+ * @slab_block_number_ptr: A pointer to the slab block number.
-+ *
-+ * Return: VDO_SUCCESS or an error code.
-+ */
-+static int __must_check
-+slab_block_number_from_pbn(struct vdo_slab *slab,
-+			   physical_block_number_t physical_block_number,
-+			   slab_block_number *slab_block_number_ptr)
-+{
-+	u64 slab_block_number;
-+
-+	if (physical_block_number < slab->start)
-+		return VDO_OUT_OF_RANGE;
-+
-+	slab_block_number = physical_block_number - slab->start;
-+	if (slab_block_number >= slab->allocator->depot->slab_config.data_blocks)
-+		return VDO_OUT_OF_RANGE;
-+
-+	*slab_block_number_ptr = slab_block_number;
-+	return VDO_SUCCESS;
-+}
-+
-+/**
-+ * get_reference_counter() - Get the reference counter that covers the given physical block number.
-+ * @slab: The slab to query.
-+ * @pbn: The physical block number.
-+ * @counter_ptr: A pointer to the reference counter.
-+ */
-+static int __must_check
-+get_reference_counter(struct vdo_slab *slab,
-+		      physical_block_number_t pbn,
-+		      vdo_refcount_t **counter_ptr)
-+{
-+	slab_block_number index;
-+	int result = slab_block_number_from_pbn(slab, pbn, &index);
-+
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	*counter_ptr = &slab->counters[index];
-+
-+	return VDO_SUCCESS;
-+}
-+
-+static unsigned int calculate_slab_priority(struct vdo_slab *slab)
-+{
-+	block_count_t free_blocks = slab->free_blocks;
-+	unsigned int unopened_slab_priority = slab->allocator->unopened_slab_priority;
-+	unsigned int priority;
-+
-+	/*
-+	 * Wholly full slabs must be the only ones with lowest priority, 0.
-+	 *
-+	 * Slabs that have never been opened (empty, newly initialized, and never been written to)
-+	 * have lower priority than previously opened slabs that have a significant number of free
-+	 * blocks. This ranking causes VDO to avoid writing physical blocks for the first time
-+	 * unless there are very few free blocks that have been previously written to.
-+	 *
-+	 * Since VDO doesn't discard blocks currently, reusing previously written blocks makes VDO
-+	 * a better client of any underlying storage that is thinly-provisioned (though discarding
-+	 * would be better).
-+	 *
-+	 * For all other slabs, the priority is derived from the logarithm of the number of free
-+	 * blocks. Slabs with the same order of magnitude of free blocks have the same priority.
-+	 * With 2^23 blocks, the priority will range from 1 to 25. The reserved
-+	 * unopened_slab_priority divides the range and is skipped by the logarithmic mapping.
-+	 */
-+
-+	if (free_blocks == 0)
-+		return 0;
-+
-+	if (is_slab_journal_blank(slab))
-+		return unopened_slab_priority;
-+
-+	priority = (1 + ilog2(free_blocks));
-+	return ((priority < unopened_slab_priority) ? priority : priority + 1);
-+}
++	.size = sizeof(struct geometry_block) + sizeof(struct volume_geometry_4_0),
++};
++
++const u8 VDO_GEOMETRY_MAGIC_NUMBER[VDO_GEOMETRY_MAGIC_NUMBER_SIZE + 1] = "dmvdo001";
++
++enum {
++	PAGE_HEADER_4_1_SIZE = 8 + 8 + 8 + 1 + 1 + 1 + 1,
++};
++
++static const struct version_number BLOCK_MAP_4_1 = {
++	.major_version = 4,
++	.minor_version = 1,
++};
++
++const struct header VDO_BLOCK_MAP_HEADER_2_0 = {
++	.id = VDO_BLOCK_MAP,
++	.version = {
++		.major_version = 2,
++		.minor_version = 0,
++	},
++	.size = sizeof(struct block_map_state_2_0),
++};
++
++const struct header VDO_RECOVERY_JOURNAL_HEADER_7_0 = {
++	.id = VDO_RECOVERY_JOURNAL,
++	.version = {
++			.major_version = 7,
++			.minor_version = 0,
++		},
++	.size = sizeof(struct recovery_journal_state_7_0),
++};
++
++const struct header VDO_SLAB_DEPOT_HEADER_2_0 = {
++	.id = VDO_SLAB_DEPOT,
++	.version = {
++		.major_version = 2,
++		.minor_version = 0,
++	},
++	.size = sizeof(struct slab_depot_state_2_0),
++};
++
++const struct header VDO_LAYOUT_HEADER_3_0 = {
++	.id = VDO_LAYOUT,
++	.version = {
++		.major_version = 3,
++		.minor_version = 0,
++	},
++	.size = sizeof(struct layout_3_0) + (sizeof(struct partition_3_0) * VDO_PARTITION_COUNT),
++};
++
++static const enum partition_id REQUIRED_PARTITIONS[] = {
++	VDO_BLOCK_MAP_PARTITION,
++	VDO_SLAB_DEPOT_PARTITION,
++	VDO_RECOVERY_JOURNAL_PARTITION,
++	VDO_SLAB_SUMMARY_PARTITION,
++};
 +
 +/*
-+ * Slabs are essentially prioritized by an approximation of the number of free blocks in the slab
-+ * so slabs with lots of free blocks with be opened for allocation before slabs that have few free
-+ * blocks.
++ * The current version for the data encoded in the super block. This must be changed any time there
++ * is a change to encoding of the component data of any VDO component.
 + */
-+static void prioritize_slab(struct vdo_slab *slab)
-+{
-+	ASSERT_LOG_ONLY(list_empty(&slab->allocq_entry),
-+			"a slab must not already be on a ring when prioritizing");
-+	slab->priority = calculate_slab_priority(slab);
-+	vdo_priority_table_enqueue(slab->allocator->prioritized_slabs,
-+				   slab->priority,
-+				   &slab->allocq_entry);
-+}
++static const struct version_number VDO_COMPONENT_DATA_41_0 = {
++	.major_version = 41,
++	.minor_version = 0,
++};
++
++const struct version_number VDO_VOLUME_VERSION_67_0 = {
++	.major_version = 67,
++	.minor_version = 0,
++};
++
++static const struct header SUPER_BLOCK_HEADER_12_0 = {
++	.id = VDO_SUPER_BLOCK,
++	.version = {
++			.major_version = 12,
++			.minor_version = 0,
++		},
++
++	/* This is the minimum size, if the super block contains no components. */
++	.size = VDO_SUPER_BLOCK_FIXED_SIZE - VDO_ENCODED_HEADER_SIZE,
++};
 +
 +/**
-+ * adjust_free_block_count() - Adjust the free block count and (if needed) reprioritize the slab.
-+ * @increment: should be true if the free block count went up.
-+ */
-+static void adjust_free_block_count(struct vdo_slab *slab, bool increment)
-+{
-+	struct block_allocator *allocator = slab->allocator;
-+
-+	WRITE_ONCE(allocator->allocated_blocks,
-+		   allocator->allocated_blocks + (increment ? -1 : 1));
-+
-+	/* The open slab doesn't need to be reprioritized until it is closed. */
-+	if (slab == allocator->open_slab)
-+		return;
-+
-+	/* Don't bother adjusting the priority table if unneeded. */
-+	if (slab->priority == calculate_slab_priority(slab))
-+		return;
-+
-+	/*
-+	 * Reprioritize the slab to reflect the new free block count by removing it from the table
-+	 * and re-enqueuing it with the new priority.
-+	 */
-+	vdo_priority_table_remove(allocator->prioritized_slabs, &slab->allocq_entry);
-+	prioritize_slab(slab);
-+}
-+
-+/**
-+ * increment_for_data() - Increment the reference count for a data block.
-+ * @slab: The slab which owns the block.
-+ * @block: The reference block which contains the block being updated.
-+ * @block_number: The block to update.
-+ * @old_status: The reference status of the data block before this increment.
-+ * @lock: The pbn_lock associated with this increment (may be NULL).
-+ * @counter_ptr: A pointer to the count for the data block (in, out).
-+ * @adjust_block_count: Whether to update the allocator's free block count.
++ * validate_version() - Check whether a version matches an expected version.
++ * @expected_version: The expected version.
++ * @actual_version: The version being validated.
++ * @component_name: The name of the component or the calling function (for error logging).
 + *
-+ * Return: VDO_SUCCESS or an error.
++ * Logs an error describing a mismatch.
++ *
++ * Return: VDO_SUCCESS             if the versions are the same,
++ *         VDO_UNSUPPORTED_VERSION if the versions don't match.
 + */
-+static int increment_for_data(struct vdo_slab *slab,
-+			      struct reference_block *block,
-+			      slab_block_number block_number,
-+			      enum reference_status old_status,
-+			      struct pbn_lock *lock,
-+			      vdo_refcount_t *counter_ptr,
-+			      bool adjust_block_count)
++static int __must_check validate_version(struct version_number expected_version,
++					 struct version_number actual_version,
++					 const char *component_name)
 +{
-+	switch (old_status) {
-+	case RS_FREE:
-+		*counter_ptr = 1;
-+		block->allocated_count++;
-+		slab->free_blocks--;
-+		if (adjust_block_count)
-+			adjust_free_block_count(slab, false);
-+
-+		break;
-+
-+	case RS_PROVISIONAL:
-+		*counter_ptr = 1;
-+		break;
-+
-+	default:
-+		/* Single or shared */
-+		if (*counter_ptr >= MAXIMUM_REFERENCE_COUNT)
-+			return uds_log_error_strerror(VDO_REF_COUNT_INVALID,
-+						      "Incrementing a block already having 254 references (slab %u, offset %u)",
-+						      slab->slab_number,
-+						      block_number);
-+		(*counter_ptr)++;
-+	}
-+
-+	if (lock != NULL)
-+		vdo_unassign_pbn_lock_provisional_reference(lock);
++	if (!vdo_are_same_version(expected_version, actual_version))
++		return uds_log_error_strerror(VDO_UNSUPPORTED_VERSION,
++					      "%s version mismatch, expected %d.%d, got %d.%d",
++					      component_name,
++					      expected_version.major_version,
++					      expected_version.minor_version,
++					      actual_version.major_version,
++					      actual_version.minor_version);
 +	return VDO_SUCCESS;
 +}
 +
 +/**
-+ * decrement_for_data() - Decrement the reference count for a data block.
-+ * @slab: The slab which owns the block.
-+ * @block: The reference block which contains the block being updated.
-+ * @block_number: The block to update.
-+ * @old_status: The reference status of the data block before this decrement.
-+ * @updater: The reference updater doing this operation in case we need to look up the pbn lock.
-+ * @lock: The pbn_lock associated with the block being decremented (may be NULL).
-+ * @counter_ptr: A pointer to the count for the data block (in, out).
-+ * @adjust_block_count: Whether to update the allocator's free block count.
++ * vdo_validate_header() - Check whether a header matches expectations.
++ * @expected_header: The expected header.
++ * @actual_header: The header being validated.
++ * @exact_size: If true, the size fields of the two headers must be the same, otherwise it is
++ *              required that actual_header.size >= expected_header.size.
++ * @name: The name of the component or the calling function (for error logging).
 + *
-+ * Return: VDO_SUCCESS or an error.
++ * Logs an error describing the first mismatch found.
++ *
++ * Return: VDO_SUCCESS             if the header meets expectations,
++ *         VDO_INCORRECT_COMPONENT if the component ids don't match,
++ *         VDO_UNSUPPORTED_VERSION if the versions or sizes don't match.
 + */
-+static int decrement_for_data(struct vdo_slab *slab,
-+			      struct reference_block *block,
-+			      slab_block_number block_number,
-+			      enum reference_status old_status,
-+			      struct reference_updater *updater,
-+			      vdo_refcount_t *counter_ptr,
-+			      bool adjust_block_count)
++int vdo_validate_header(const struct header *expected_header,
++			const struct header *actual_header,
++			bool exact_size,
++			const char *name)
 +{
-+	switch (old_status) {
-+	case RS_FREE:
-+		return uds_log_error_strerror(VDO_REF_COUNT_INVALID,
-+					      "Decrementing free block at offset %u in slab %u",
-+					      block_number,
-+					      slab->slab_number);
-+
-+	case RS_PROVISIONAL:
-+	case RS_SINGLE:
-+		if (updater->zpbn.zone != NULL) {
-+			struct pbn_lock *lock = vdo_get_physical_zone_pbn_lock(updater->zpbn.zone,
-+									       updater->zpbn.pbn);
-+
-+			if (lock != NULL) {
-+				/*
-+				 * There is a read lock on this block, so the block must not become
-+				 * unreferenced.
-+				 */
-+				*counter_ptr = PROVISIONAL_REFERENCE_COUNT;
-+				vdo_assign_pbn_lock_provisional_reference(lock);
-+				break;
-+			}
-+		}
-+
-+		*counter_ptr = EMPTY_REFERENCE_COUNT;
-+		block->allocated_count--;
-+		slab->free_blocks++;
-+		if (adjust_block_count)
-+			adjust_free_block_count(slab, true);
-+
-+		break;
-+
-+	default:
-+		/* Shared */
-+		(*counter_ptr)--;
-+	}
-+
-+	return VDO_SUCCESS;
-+}
-+
-+/**
-+ * increment_for_block_map() - Increment the reference count for a block map page.
-+ * @slab: The slab which owns the block.
-+ * @block: The reference block which contains the block being updated.
-+ * @block_number: The block to update.
-+ * @old_status: The reference status of the block before this increment.
-+ * @lock: The pbn_lock associated with this increment (may be NULL).
-+ * @normal_operation: Whether we are in normal operation vs. recovery or rebuild.
-+ * @counter_ptr: A pointer to the count for the block (in, out).
-+ * @adjust_block_count: Whether to update the allocator's free block count.
-+ *
-+ * All block map increments should be from provisional to MAXIMUM_REFERENCE_COUNT. Since block map
-+ * blocks never dedupe they should never be adjusted from any other state. The adjustment always
-+ * results in MAXIMUM_REFERENCE_COUNT as this value is used to prevent dedupe against block map
-+ * blocks.
-+ *
-+ * Return: VDO_SUCCESS or an error.
-+ */
-+static int increment_for_block_map(struct vdo_slab *slab,
-+				   struct reference_block *block,
-+				   slab_block_number block_number,
-+				   enum reference_status old_status,
-+				   struct pbn_lock *lock,
-+				   bool normal_operation,
-+				   vdo_refcount_t *counter_ptr,
-+				   bool adjust_block_count)
-+{
-+	switch (old_status) {
-+	case RS_FREE:
-+		if (normal_operation)
-+			return uds_log_error_strerror(VDO_REF_COUNT_INVALID,
-+						      "Incrementing unallocated block map block (slab %u, offset %u)",
-+						      slab->slab_number,
-+						      block_number);
-+
-+		*counter_ptr = MAXIMUM_REFERENCE_COUNT;
-+		block->allocated_count++;
-+		slab->free_blocks--;
-+		if (adjust_block_count)
-+			adjust_free_block_count(slab, false);
-+
-+		return VDO_SUCCESS;
-+
-+	case RS_PROVISIONAL:
-+		if (!normal_operation)
-+			return uds_log_error_strerror(VDO_REF_COUNT_INVALID,
-+						      "Block map block had provisional reference during replay (slab %u, offset %u)",
-+						      slab->slab_number,
-+						      block_number);
-+
-+		*counter_ptr = MAXIMUM_REFERENCE_COUNT;
-+		if (lock != NULL)
-+			vdo_unassign_pbn_lock_provisional_reference(lock);
-+		return VDO_SUCCESS;
-+
-+	default:
-+		return uds_log_error_strerror(VDO_REF_COUNT_INVALID,
-+					      "Incrementing a block map block which is already referenced %u times (slab %u, offset %u)",
-+					      *counter_ptr,
-+					      slab->slab_number,
-+					      block_number);
-+	}
-+}
-+
-+static bool __must_check is_valid_journal_point(const struct journal_point *point)
-+{
-+	return ((point != NULL) && (point->sequence_number > 0));
-+}
-+
-+/**
-+ * update_reference_count() - Update the reference count of a block.
-+ * @slab: The slab which owns the block.
-+ * @block: The reference block which contains the block being updated.
-+ * @block_number: The block to update.
-+ * @slab_journal_point: The slab journal point at which this update is journaled.
-+ * @updater: The reference updater.
-+ * @normal_operation: Whether we are in normal operation vs. recovery or rebuild.
-+ * @adjust_block_count: Whether to update the slab's free block count.
-+ * @provisional_decrement_ptr: A pointer which will be set to true if this update was a decrement
-+ *                             of a provisional reference.
-+ *
-+ * Return: VDO_SUCCESS or an error.
-+ */
-+static int
-+update_reference_count(struct vdo_slab *slab,
-+		       struct reference_block *block,
-+		       slab_block_number block_number,
-+		       const struct journal_point *slab_journal_point,
-+		       struct reference_updater *updater,
-+		       bool normal_operation,
-+		       bool adjust_block_count,
-+		       bool *provisional_decrement_ptr)
-+{
-+	vdo_refcount_t *counter_ptr = &slab->counters[block_number];
-+	enum reference_status old_status = reference_count_to_status(*counter_ptr);
 +	int result;
 +
-+	if (!updater->increment) {
-+		result = decrement_for_data(slab,
-+					    block,
-+					    block_number,
-+					    old_status,
-+					    updater,
-+					    counter_ptr,
-+					    adjust_block_count);
-+		if ((result == VDO_SUCCESS) && (old_status == RS_PROVISIONAL)) {
-+			if (provisional_decrement_ptr != NULL)
-+				*provisional_decrement_ptr = true;
-+			return VDO_SUCCESS;
-+		}
-+	} else if (updater->operation == VDO_JOURNAL_DATA_REMAPPING) {
-+		result = increment_for_data(slab,
-+					    block,
-+					    block_number,
-+					    old_status,
-+					    updater->lock,
-+					    counter_ptr,
-+					    adjust_block_count);
-+	} else {
-+		result = increment_for_block_map(slab,
-+						 block,
-+						 block_number,
-+						 old_status,
-+						 updater->lock,
-+						 normal_operation,
-+						 counter_ptr,
-+						 adjust_block_count);
-+	}
++	if (expected_header->id != actual_header->id)
++		return uds_log_error_strerror(VDO_INCORRECT_COMPONENT,
++					      "%s ID mismatch, expected %d, got %d",
++					      name,
++					      expected_header->id,
++					      actual_header->id);
 +
++	result = validate_version(expected_header->version, actual_header->version, name);
 +	if (result != VDO_SUCCESS)
 +		return result;
 +
-+	if (is_valid_journal_point(slab_journal_point))
-+		slab->slab_journal_point = *slab_journal_point;
++	if ((expected_header->size > actual_header->size) ||
++	    (exact_size && (expected_header->size < actual_header->size)))
++		return uds_log_error_strerror(VDO_UNSUPPORTED_VERSION,
++					      "%s size mismatch, expected %zu, got %zu",
++					      name,
++					      expected_header->size,
++					      actual_header->size);
 +
 +	return VDO_SUCCESS;
 +}
 +
-+static int __must_check
-+adjust_reference_count(struct vdo_slab *slab,
-+		       struct reference_updater *updater,
-+		       const struct journal_point *slab_journal_point)
++static void encode_version_number(u8 *buffer, size_t *offset, struct version_number version)
 +{
-+	slab_block_number block_number;
-+	int result;
-+	struct reference_block *block;
-+	bool provisional_decrement = false;
++	struct packed_version_number packed = vdo_pack_version_number(version);
 +
-+	if (!is_slab_open(slab))
-+		return VDO_INVALID_ADMIN_STATE;
++	memcpy(buffer + *offset, &packed, sizeof(packed));
++	*offset += sizeof(packed);
++}
 +
-+	result = slab_block_number_from_pbn(slab, updater->zpbn.pbn, &block_number);
-+	if (result != VDO_SUCCESS)
-+		return result;
++void vdo_encode_header(u8 *buffer, size_t *offset, const struct header *header)
++{
++	struct packed_header packed = vdo_pack_header(header);
 +
-+	block = get_reference_block(slab, block_number);
-+	result = update_reference_count(slab,
-+					block,
-+					block_number,
-+					slab_journal_point,
-+					updater,
-+					NORMAL_OPERATION,
-+					true,
-+					&provisional_decrement);
-+	if ((result != VDO_SUCCESS) || provisional_decrement)
-+		return result;
++	memcpy(buffer + *offset, &packed, sizeof(packed));
++	*offset += sizeof(packed);
++}
 +
-+	if (block->is_dirty && (block->slab_journal_lock > 0)) {
-+		sequence_number_t entry_lock = slab_journal_point->sequence_number;
-+		/*
-+		 * This block is already dirty and a slab journal entry has been made for it since
-+		 * the last time it was clean. We must release the per-entry slab journal lock for
-+		 * the entry associated with the update we are now doing.
-+		 */
-+		result = ASSERT(is_valid_journal_point(slab_journal_point),
-+				"Reference count adjustments need slab journal points.");
-+		if (result != VDO_SUCCESS)
-+			return result;
++static void decode_version_number(u8 *buffer, size_t *offset, struct version_number *version)
++{
++	struct packed_version_number packed;
 +
-+		adjust_slab_journal_block_reference(&slab->journal, entry_lock, -1);
-+		return VDO_SUCCESS;
-+	}
++	memcpy(&packed, buffer + *offset, sizeof(packed));
++	*offset += sizeof(packed);
++	*version = vdo_unpack_version_number(packed);
++}
 +
-+	/*
-+	 * This may be the first time we are applying an update for which there is a slab journal
-+	 * entry to this block since the block was cleaned. Therefore, we convert the per-entry
-+	 * slab journal lock to an uncommitted reference block lock, if there is a per-entry lock.
-+	 */
-+	if (is_valid_journal_point(slab_journal_point))
-+		block->slab_journal_lock = slab_journal_point->sequence_number;
-+	else
-+		block->slab_journal_lock = 0;
++void vdo_decode_header(u8 *buffer, size_t *offset, struct header *header)
++{
++	struct packed_header packed;
 +
-+	dirty_block(block);
-+	return VDO_SUCCESS;
++	memcpy(&packed, buffer + *offset, sizeof(packed));
++	*offset += sizeof(packed);
++
++	*header = vdo_unpack_header(&packed);
 +}
 +
 +/**
-+ * add_entry_from_waiter() - Add an entry to the slab journal.
-+ * @waiter: The vio which should make an entry now.
-+ * @context: The slab journal to make an entry in.
-+ *
-+ * This callback is invoked by add_entries() once it has determined that we are ready to make
-+ * another entry in the slab journal. Implements waiter_callback.
-+ */
-+static void add_entry_from_waiter(struct waiter *waiter, void *context)
-+{
-+	int result;
-+	struct reference_updater *updater = container_of(waiter, struct reference_updater, waiter);
-+	struct data_vio *data_vio = data_vio_from_reference_updater(updater);
-+	struct slab_journal *journal = context;
-+	struct slab_journal_block_header *header = &journal->tail_header;
-+	struct journal_point slab_journal_point = {
-+		.sequence_number = header->sequence_number,
-+		.entry_count = header->entry_count,
-+	};
-+	sequence_number_t recovery_block = data_vio->recovery_journal_point.sequence_number;
-+
-+	if (header->entry_count == 0) {
-+		/*
-+		 * This is the first entry in the current tail block, so get a lock on the recovery
-+		 * journal which we will hold until this tail block is committed.
-+		 */
-+		get_lock(journal, header->sequence_number)->recovery_start = recovery_block;
-+		if (journal->recovery_journal != NULL) {
-+			zone_count_t zone_number = journal->slab->allocator->zone_number;
-+
-+			vdo_acquire_recovery_journal_block_reference(journal->recovery_journal,
-+								     recovery_block,
-+								     VDO_ZONE_TYPE_PHYSICAL,
-+								     zone_number);
-+		}
-+
-+		mark_slab_journal_dirty(journal, recovery_block);
-+		reclaim_journal_space(journal);
-+	}
-+
-+	add_entry(journal,
-+		  updater->zpbn.pbn,
-+		  updater->operation,
-+		  updater->increment,
-+		  expand_journal_point(data_vio->recovery_journal_point, updater->increment));
-+
-+	if (journal->slab->status != VDO_SLAB_REBUILT) {
-+		/*
-+		 * If the slab is unrecovered, scrubbing will take care of the count since the
-+		 * update is now recorded in the journal.
-+		 */
-+		adjust_slab_journal_block_reference(journal,
-+						    slab_journal_point.sequence_number,
-+						    -1);
-+		result = VDO_SUCCESS;
-+	} else {
-+		/* Now that an entry has been made in the slab journal, update the counter. */
-+		result = adjust_reference_count(journal->slab, updater, &slab_journal_point);
-+	}
-+
-+	if (updater->increment)
-+		continue_data_vio_with_error(data_vio, result);
-+	else
-+		vdo_continue_completion(&data_vio->decrement_completion, result);
-+}
-+
-+/**
-+ * is_next_entry_a_block_map_increment() - Check whether the next entry to be made is a block map
-+ *                                         increment.
-+ * @journal: The journal.
-+ *
-+ * Return: true if the first entry waiter's operation is a block map increment.
-+ */
-+static inline bool is_next_entry_a_block_map_increment(struct slab_journal *journal)
-+{
-+	struct waiter *waiter = vdo_get_first_waiter(&journal->entry_waiters);
-+	struct reference_updater *updater = container_of(waiter, struct reference_updater, waiter);
-+
-+	return (updater->operation == VDO_JOURNAL_BLOCK_MAP_REMAPPING);
-+}
-+
-+/**
-+ * add_entries() - Add as many entries as possible from the queue of vios waiting to make entries.
-+ * @journal: The journal to which entries may be added.
-+ *
-+ * By processing the queue in order, we ensure that slab journal entries are made in the same order
-+ * as recovery journal entries for the same increment or decrement.
-+ */
-+static void add_entries(struct slab_journal *journal)
-+{
-+	if (journal->adding_entries)
-+		/* Protect against re-entrancy. */
-+		return;
-+
-+	journal->adding_entries = true;
-+	while (vdo_has_waiters(&journal->entry_waiters)) {
-+		struct slab_journal_block_header *header = &journal->tail_header;
-+
-+		if (journal->partial_write_in_progress ||
-+		    (journal->slab->status == VDO_SLAB_REBUILDING))
-+			/*
-+			 * Don't add entries while rebuilding or while a partial write is
-+			 * outstanding (VDO-2399).
-+			 */
-+			break;
-+
-+		if (journal->waiting_to_commit) {
-+			/*
-+			 * If we are waiting for resources to write the tail block, and the tail
-+			 * block is full, we can't make another entry.
-+			 */
-+			WRITE_ONCE(journal->events->tail_busy_count,
-+				   journal->events->tail_busy_count + 1);
-+			break;
-+		} else if (is_next_entry_a_block_map_increment(journal) &&
-+			   (header->entry_count >= journal->full_entries_per_block)) {
-+			/*
-+			 * The tail block does not have room for a block map increment, so commit
-+			 * it now.
-+			 */
-+			commit_tail(journal);
-+			if (journal->waiting_to_commit) {
-+				WRITE_ONCE(journal->events->tail_busy_count,
-+					   journal->events->tail_busy_count + 1);
-+				break;
-+			}
-+		}
-+
-+		/* If the slab is over the blocking threshold, make the vio wait. */
-+		if (requires_reaping(journal)) {
-+			WRITE_ONCE(journal->events->blocked_count,
-+				   journal->events->blocked_count + 1);
-+			save_dirty_reference_blocks(journal->slab);
-+			break;
-+		}
-+
-+		if (header->entry_count == 0) {
-+			struct journal_lock *lock = get_lock(journal, header->sequence_number);
-+
-+			/*
-+			 * Check if the on disk slab journal is full. Because of the blocking and
-+			 * scrubbing thresholds, this should never happen.
-+			 */
-+			if (lock->count > 0) {
-+				ASSERT_LOG_ONLY((journal->head + journal->size) == journal->tail,
-+						"New block has locks, but journal is not full");
-+
-+				/*
-+				 * The blocking threshold must let the journal fill up if the new
-+				 * block has locks; if the blocking threshold is smaller than the
-+				 * journal size, the new block cannot possibly have locks already.
-+				 */
-+				ASSERT_LOG_ONLY((journal->blocking_threshold >= journal->size),
-+						"New block can have locks already iff blocking threshold is at the end of the journal");
-+
-+				WRITE_ONCE(journal->events->disk_full_count,
-+					   journal->events->disk_full_count + 1);
-+				save_dirty_reference_blocks(journal->slab);
-+				break;
-+			}
-+
-+			/*
-+			 * Don't allow the new block to be reaped until all of the reference count
-+			 * blocks are written and the journal block has been fully committed as
-+			 * well.
-+			 */
-+			lock->count = journal->entries_per_block + 1;
-+
-+			if (header->sequence_number == 1) {
-+				struct vdo_slab *slab = journal->slab;
-+				block_count_t i;
-+
-+				/*
-+				 * This is the first entry in this slab journal, ever. Dirty all of
-+				 * the reference count blocks. Each will acquire a lock on the tail
-+				 * block so that the journal won't be reaped until the reference
-+				 * counts are initialized. The lock acquisition must be done by the
-+				 * ref_counts since here we don't know how many reference blocks
-+				 * the ref_counts has.
-+				 */
-+				for (i = 0; i < slab->reference_block_count; i++) {
-+					slab->reference_blocks[i].slab_journal_lock = 1;
-+					dirty_block(&slab->reference_blocks[i]);
-+				}
-+
-+				adjust_slab_journal_block_reference(journal,
-+								    1,
-+								    slab->reference_block_count);
-+			}
-+		}
-+
-+		vdo_notify_next_waiter(&journal->entry_waiters, add_entry_from_waiter, journal);
-+	}
-+
-+	journal->adding_entries = false;
-+
-+	/* If there are no waiters, and we are flushing or saving, commit the tail block. */
-+	if (vdo_is_state_draining(&journal->slab->state) &&
-+	    !vdo_is_state_suspending(&journal->slab->state) &&
-+	    !vdo_has_waiters(&journal->entry_waiters))
-+		commit_tail(journal);
-+}
-+
-+/**
-+ * reset_search_cursor() - Reset the free block search back to the first reference counter in the
-+ *                         first reference block of a slab.
-+ */
-+static void reset_search_cursor(struct vdo_slab *slab)
-+{
-+	struct search_cursor *cursor = &slab->search_cursor;
-+
-+	cursor->block = cursor->first_block;
-+	cursor->index = 0;
-+	/* Unit tests have slabs with only one reference block (and it's a runt). */
-+	cursor->end_index = min_t(u32, COUNTS_PER_BLOCK, slab->block_count);
-+}
-+
-+/**
-+ * advance_search_cursor() - Advance the search cursor to the start of the next reference block in
-+ *                           a slab,
-+ *
-+ * Wraps around to the first reference block if the current block is the last reference block.
-+ *
-+ * Return: true unless the cursor was at the last reference block.
-+ */
-+static bool advance_search_cursor(struct vdo_slab *slab)
-+{
-+	struct search_cursor *cursor = &slab->search_cursor;
-+
-+	/*
-+	 * If we just finished searching the last reference block, then wrap back around to the
-+	 * start of the array.
-+	 */
-+	if (cursor->block == cursor->last_block) {
-+		reset_search_cursor(slab);
-+		return false;
-+	}
-+
-+	/* We're not already at the end, so advance to cursor to the next block. */
-+	cursor->block++;
-+	cursor->index = cursor->end_index;
-+
-+	if (cursor->block == cursor->last_block)
-+		/* The last reference block will usually be a runt. */
-+		cursor->end_index = slab->block_count;
-+	else
-+		cursor->end_index += COUNTS_PER_BLOCK;
-+	return true;
-+}
-+
-+/**
-+ * replay_reference_count_change() - Replay the reference count adjustment from a slab journal
-+ *                                   entry into the reference count for a block.
-+ * @slab: The slab.
-+ * @entry_point: The slab journal point for the entry.
-+ * @entry: The slab journal entry being replayed.
-+ *
-+ * The adjustment will be ignored if it was already recorded in the reference count.
-+ *
-+ * Return: VDO_SUCCESS or an error code.
-+ */
-+static int
-+replay_reference_count_change(struct vdo_slab *slab,
-+			      const struct journal_point *entry_point,
-+			      struct slab_journal_entry entry)
-+{
-+	int result;
-+	struct reference_block *block = get_reference_block(slab, entry.sbn);
-+	sector_count_t sector = (entry.sbn % COUNTS_PER_BLOCK) / COUNTS_PER_SECTOR;
-+	struct reference_updater updater = {
-+		.operation = entry.operation,
-+		.increment = entry.increment,
-+	};
-+
-+	if (!vdo_before_journal_point(&block->commit_points[sector], entry_point))
-+		/* This entry is already reflected in the existing counts, so do nothing. */
-+		return VDO_SUCCESS;
-+
-+	/* This entry is not yet counted in the reference counts. */
-+	result = update_reference_count(slab,
-+					block,
-+					entry.sbn,
-+					entry_point,
-+					&updater,
-+					!NORMAL_OPERATION,
-+					false,
-+					NULL);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	dirty_block(block);
-+	return VDO_SUCCESS;
-+}
-+
-+/**
-+ * find_zero_byte_in_word() - Find the array index of the first zero byte in word-sized range of
-+ *                            reference counters.
-+ * @word_ptr: A pointer to the eight counter bytes to check.
-+ * @start_index: The array index corresponding to word_ptr[0].
-+ * @fail_index: The array index to return if no zero byte is found.
-+ *
-+ * The search does no bounds checking; the function relies on the array being sufficiently padded.
-+ *
-+ * Return: The array index of the first zero byte in the word, or the value passed as fail_index if
-+ *         no zero byte was found.
-+ */
-+static inline slab_block_number
-+find_zero_byte_in_word(const u8 *word_ptr,
-+		       slab_block_number start_index,
-+		       slab_block_number fail_index)
-+{
-+	u64 word = get_unaligned_le64(word_ptr);
-+
-+	/* This looks like a loop, but GCC will unroll the eight iterations for us. */
-+	unsigned int offset;
-+
-+	for (offset = 0; offset < BYTES_PER_WORD; offset++) {
-+		/* Assumes little-endian byte order, which we have on X86. */
-+		if ((word & 0xFF) == 0)
-+			return (start_index + offset);
-+		word >>= 8;
-+	}
-+
-+	return fail_index;
-+}
-+
-+/**
-+ * vdo_find_free_block() - Find the first block with a reference count of zero in the specified
-+ *                         range of reference counter indexes.
-+ * @slab: The slab counters to scan.
-+ * @index_ptr: A pointer to hold the array index of the free block.
-+ *
-+ * Exposed for unit testing.
-+ *
-+ * Return: true if a free block was found in the specified range.
-+ */
-+static bool
-+find_free_block(const struct vdo_slab *slab, slab_block_number *index_ptr)
-+{
-+	slab_block_number zero_index;
-+	slab_block_number next_index = slab->search_cursor.index;
-+	slab_block_number end_index = slab->search_cursor.end_index;
-+	u8 *next_counter = &slab->counters[next_index];
-+	u8 *end_counter = &slab->counters[end_index];
-+
-+	/*
-+	 * Search every byte of the first unaligned word. (Array is padded so reading past end is
-+	 * safe.)
-+	 */
-+	zero_index = find_zero_byte_in_word(next_counter, next_index, end_index);
-+	if (zero_index < end_index) {
-+		*index_ptr = zero_index;
-+		return true;
-+	}
-+
-+	/*
-+	 * On architectures where unaligned word access is expensive, this would be a good place to
-+	 * advance to an alignment boundary.
-+	 */
-+	next_index += BYTES_PER_WORD;
-+	next_counter += BYTES_PER_WORD;
-+
-+	/*
-+	 * Now we're word-aligned; check an word at a time until we find a word containing a zero.
-+	 * (Array is padded so reading past end is safe.)
-+	 */
-+	while (next_counter < end_counter) {
-+		/*
-+		 * The following code is currently an exact copy of the code preceding the loop,
-+		 * but if you try to merge them by using a do loop, it runs slower because a jump
-+		 * instruction gets added at the start of the iteration.
-+		 */
-+		zero_index = find_zero_byte_in_word(next_counter, next_index, end_index);
-+		if (zero_index < end_index) {
-+			*index_ptr = zero_index;
-+			return true;
-+		}
-+
-+		next_index += BYTES_PER_WORD;
-+		next_counter += BYTES_PER_WORD;
-+	}
-+
-+	return false;
-+}
-+
-+/**
-+ * search_current_reference_block() - Search the reference block currently saved in the search
-+ *                                    cursor for a reference count of zero, starting at the saved
-+ *                                    counter index.
-+ * @slab: The slab to search.
-+ * @free_index_ptr: A pointer to receive the array index of the zero reference count.
-+ *
-+ * Return: true if an unreferenced counter was found.
-+ */
-+static bool search_current_reference_block(const struct vdo_slab *slab,
-+					   slab_block_number *free_index_ptr)
-+{
-+	/* Don't bother searching if the current block is known to be full. */
-+	return ((slab->search_cursor.block->allocated_count < COUNTS_PER_BLOCK) &&
-+		find_free_block(slab, free_index_ptr));
-+}
-+
-+/**
-+ * search_reference_blocks() - Search each reference block for a reference count of zero.
-+ * @slab: The slab to search.
-+ * @free_index_ptr: A pointer to receive the array index of the zero reference count.
-+ *
-+ * Searches each reference block for a reference count of zero, starting at the reference block and
-+ * counter index saved in the search cursor and searching up to the end of the last reference
-+ * block. The search does not wrap.
-+ *
-+ * Return: true if an unreferenced counter was found.
-+ */
-+static bool
-+search_reference_blocks(struct vdo_slab *slab, slab_block_number *free_index_ptr)
-+{
-+	/* Start searching at the saved search position in the current block. */
-+	if (search_current_reference_block(slab, free_index_ptr))
-+		return true;
-+
-+	/* Search each reference block up to the end of the slab. */
-+	while (advance_search_cursor(slab))
-+		if (search_current_reference_block(slab, free_index_ptr))
-+			return true;
-+
-+	return false;
-+}
-+
-+/**
-+ * make_provisional_reference() - Do the bookkeeping for making a provisional reference.
++ * decode_volume_geometry() - Decode the on-disk representation of a volume geometry from a buffer.
++ * @buffer: A buffer to decode from.
++ * @offset: The offset in the buffer at which to decode.
++ * @geometry: The structure to receive the decoded fields.
++ * @version: The geometry block version to decode.
 + */
 +static void
-+make_provisional_reference(struct vdo_slab *slab, slab_block_number block_number)
++decode_volume_geometry(u8 *buffer, size_t *offset, struct volume_geometry *geometry, u32 version)
 +{
-+	struct reference_block *block = get_reference_block(slab, block_number);
++	u32 unused, mem;
++	enum volume_region_id id;
++	nonce_t nonce;
++	block_count_t bio_offset = 0;
++	bool sparse;
 +
-+	/*
-+	 * Make the initial transition from an unreferenced block to a
-+	 * provisionally allocated block.
-+	 */
-+	slab->counters[block_number] = PROVISIONAL_REFERENCE_COUNT;
++	/* This is for backwards compatibility. */
++	decode_u32_le(buffer, offset, &unused);
++	geometry->unused = unused;
 +
-+	/* Account for the allocation. */
-+	block->allocated_count++;
-+	slab->free_blocks--;
-+}
++	decode_u64_le(buffer, offset, &nonce);
++	geometry->nonce = nonce;
 +
-+/**
-+ * dirty_all_reference_blocks() - Mark all reference count blocks in a slab as dirty.
-+ */
-+static void dirty_all_reference_blocks(struct vdo_slab *slab)
-+{
-+	block_count_t i;
++	memcpy((unsigned char *) &geometry->uuid, buffer + *offset, sizeof(uuid_t));
++	*offset += sizeof(uuid_t);
 +
-+	for (i = 0; i < slab->reference_block_count; i++)
-+		dirty_block(&slab->reference_blocks[i]);
-+}
++	if (version > 4)
++		decode_u64_le(buffer, offset, &bio_offset);
++	geometry->bio_offset = bio_offset;
 +
-+/**
-+ * clear_provisional_references() - Clear the provisional reference counts from a reference block.
-+ * @block: The block to clear.
-+ */
-+static void clear_provisional_references(struct reference_block *block)
-+{
-+	vdo_refcount_t *counters = get_reference_counters_for_block(block);
-+	block_count_t j;
++	for (id = 0; id < VDO_VOLUME_REGION_COUNT; id++) {
++		physical_block_number_t start_block;
++		enum volume_region_id saved_id;
 +
-+	for (j = 0; j < COUNTS_PER_BLOCK; j++) {
-+		if (counters[j] == PROVISIONAL_REFERENCE_COUNT) {
-+			counters[j] = EMPTY_REFERENCE_COUNT;
-+			block->allocated_count--;
-+		}
-+	}
-+}
++		decode_u32_le(buffer, offset, &saved_id);
++		decode_u64_le(buffer, offset, &start_block);
 +
-+static inline bool journal_points_equal(struct journal_point first, struct journal_point second)
-+{
-+	return ((first.sequence_number == second.sequence_number) &&
-+		(first.entry_count == second.entry_count));
-+}
-+
-+/**
-+ * unpack_reference_block() - Unpack reference counts blocks into the internal memory structure.
-+ * @packed: The written reference block to be unpacked.
-+ * @block: The internal reference block to be loaded.
-+ */
-+static void
-+unpack_reference_block(struct packed_reference_block *packed, struct reference_block *block)
-+{
-+	block_count_t index;
-+	sector_count_t i;
-+	struct vdo_slab *slab = block->slab;
-+	vdo_refcount_t *counters = get_reference_counters_for_block(block);
-+
-+	for (i = 0; i < VDO_SECTORS_PER_BLOCK; i++) {
-+		struct packed_reference_sector *sector = &packed->sectors[i];
-+
-+		vdo_unpack_journal_point(&sector->commit_point, &block->commit_points[i]);
-+		memcpy(counters + (i * COUNTS_PER_SECTOR),
-+		       sector->counts,
-+		       (sizeof(vdo_refcount_t) * COUNTS_PER_SECTOR));
-+		/* The slab_journal_point must be the latest point found in any sector. */
-+		if (vdo_before_journal_point(&slab->slab_journal_point, &block->commit_points[i]))
-+			slab->slab_journal_point = block->commit_points[i];
-+
-+		if ((i > 0) &&
-+		    !journal_points_equal(block->commit_points[0], block->commit_points[i])) {
-+			size_t block_index = block - block->slab->reference_blocks;
-+
-+			uds_log_warning("Torn write detected in sector %u of reference block %zu of slab %u",
-+					i,
-+					block_index,
-+					block->slab->slab_number);
-+		}
-+	}
-+
-+	block->allocated_count = 0;
-+	for (index = 0; index < COUNTS_PER_BLOCK; index++)
-+		if (counters[index] != EMPTY_REFERENCE_COUNT)
-+			block->allocated_count++;
-+}
-+
-+/**
-+ * finish_reference_block_load() - After a reference block has been read, unpack it.
-+ * @completion: The VIO that just finished reading.
-+ */
-+static void finish_reference_block_load(struct vdo_completion *completion)
-+{
-+	struct vio *vio = as_vio(completion);
-+	struct pooled_vio *pooled = vio_as_pooled_vio(vio);
-+	struct reference_block *block = completion->parent;
-+	struct vdo_slab *slab = block->slab;
-+
-+	unpack_reference_block((struct packed_reference_block *) vio->data, block);
-+	return_vio_to_pool(slab->allocator->vio_pool, pooled);
-+	slab->active_count--;
-+	clear_provisional_references(block);
-+
-+	slab->free_blocks -= block->allocated_count;
-+	check_if_slab_drained(slab);
-+}
-+
-+static void load_reference_block_endio(struct bio *bio)
-+{
-+	struct vio *vio = bio->bi_private;
-+	struct reference_block *block = vio->completion.parent;
-+
-+	continue_vio_after_io(vio, finish_reference_block_load, block->slab->allocator->thread_id);
-+}
-+
-+/**
-+ * load_reference_block() - After a block waiter has gotten a VIO from the VIO pool, load the
-+ *                          block.
-+ * @waiter: The waiter of the block to load.
-+ * @context: The VIO returned by the pool.
-+ */
-+static void load_reference_block(struct waiter *waiter, void *context)
-+{
-+	struct pooled_vio *pooled = context;
-+	struct vio *vio = &pooled->vio;
-+	struct reference_block *block = container_of(waiter, struct reference_block, waiter);
-+	size_t block_offset = (block - block->slab->reference_blocks);
-+
-+	vio->completion.parent = block;
-+	submit_metadata_vio(vio,
-+			    block->slab->ref_counts_origin + block_offset,
-+			    load_reference_block_endio,
-+			    handle_io_error,
-+			    REQ_OP_READ);
-+}
-+
-+/**
-+ * load_reference_blocks() - Load a slab's reference blocks from the underlying storage into a
-+ *                           pre-allocated reference counter.
-+ */
-+static void load_reference_blocks(struct vdo_slab *slab)
-+{
-+	block_count_t i;
-+
-+	slab->free_blocks = slab->block_count;
-+	slab->active_count = slab->reference_block_count;
-+	for (i = 0; i < slab->reference_block_count; i++) {
-+		struct waiter *waiter = &slab->reference_blocks[i].waiter;
-+
-+		waiter->callback = load_reference_block;
-+		acquire_vio_from_pool(slab->allocator->vio_pool, waiter);
-+	}
-+}
-+
-+/**
-+ * drain_slab() - Drain all reference count I/O.
-+ *
-+ * Depending upon the type of drain being performed (as recorded in the ref_count's vdo_slab), the
-+ * reference blocks may be loaded from disk or dirty reference blocks may be written out.
-+ */
-+static void drain_slab(struct vdo_slab *slab)
-+{
-+	bool save;
-+	bool load;
-+	const struct admin_state_code *state = vdo_get_admin_state_code(&slab->state);
-+
-+	if (state == VDO_ADMIN_STATE_SUSPENDING)
-+		return;
-+
-+	if ((state != VDO_ADMIN_STATE_REBUILDING) && (state != VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING))
-+		commit_tail(&slab->journal);
-+
-+	if ((state == VDO_ADMIN_STATE_RECOVERING) || (slab->counters == NULL))
-+		return;
-+
-+	save = false;
-+	load = slab->allocator->summary_entries[slab->slab_number].load_ref_counts;
-+	if (state == VDO_ADMIN_STATE_SCRUBBING) {
-+		if (load) {
-+			load_reference_blocks(slab);
-+			return;
-+		}
-+	} else if (state == VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING) {
-+		if (!load)
-+			/* These reference counts were never written, so mark them all dirty. */
-+			dirty_all_reference_blocks(slab);
-+
-+		save = true;
-+	} else if (state == VDO_ADMIN_STATE_REBUILDING) {
-+		/*
-+		 * Write out the counters if the slab has written them before, or it has any
-+		 * non-zero reference counts, or there are any slab journal blocks.
-+		 */
-+		block_count_t data_blocks = slab->allocator->depot->slab_config.data_blocks;
-+
-+		if (load ||
-+		    (slab->free_blocks != data_blocks) ||
-+		    !is_slab_journal_blank(slab)) {
-+			dirty_all_reference_blocks(slab);
-+			save = true;
-+		}
-+	} else if (state == VDO_ADMIN_STATE_SAVING) {
-+		save = (slab->status == VDO_SLAB_REBUILT);
-+	} else {
-+		vdo_finish_draining_with_result(&slab->state, VDO_SUCCESS);
-+		return;
-+	}
-+
-+	if (save)
-+		save_dirty_reference_blocks(slab);
-+}
-+
-+static int allocate_slab_counters(struct vdo_slab *slab)
-+{
-+	int result;
-+	size_t index, bytes;
-+
-+	result = ASSERT(slab->reference_blocks == NULL,
-+			"vdo_slab %u doesn't allocate refcounts twice",
-+			slab->slab_number);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	result = UDS_ALLOCATE(slab->reference_block_count,
-+			      struct reference_block,
-+			      __func__,
-+			      &slab->reference_blocks);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	/*
-+	 * Allocate such that the runt slab has a full-length memory array, plus a little padding
-+	 * so we can word-search even at the very end.
-+	 */
-+	bytes = (slab->reference_block_count * COUNTS_PER_BLOCK) + (2 * BYTES_PER_WORD);
-+	result = UDS_ALLOCATE(bytes, vdo_refcount_t, "ref counts array", &slab->counters);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(UDS_FORGET(slab->reference_blocks));
-+		return result;
-+	}
-+
-+	slab->search_cursor.first_block = slab->reference_blocks;
-+	slab->search_cursor.last_block = &slab->reference_blocks[slab->reference_block_count - 1];
-+	reset_search_cursor(slab);
-+
-+	for (index = 0; index < slab->reference_block_count; index++) {
-+		slab->reference_blocks[index] = (struct reference_block) {
-+			.slab = slab,
++		geometry->regions[id] = (struct volume_region) {
++			.id = saved_id,
++			.start_block = start_block,
 +		};
 +	}
 +
-+	return VDO_SUCCESS;
-+}
++	decode_u32_le(buffer, offset, &mem);
++	*offset += sizeof(u32);
++	sparse = buffer[(*offset)++];
 +
-+static int allocate_counters_if_clean(struct vdo_slab *slab)
-+{
-+	if (vdo_is_state_clean_load(&slab->state))
-+		return allocate_slab_counters(slab);
-+
-+	return VDO_SUCCESS;
-+}
-+
-+static void finish_loading_journal(struct vdo_completion *completion)
-+{
-+	struct vio *vio = as_vio(completion);
-+	struct slab_journal *journal = completion->parent;
-+	struct vdo_slab *slab = journal->slab;
-+	struct packed_slab_journal_block *block = (struct packed_slab_journal_block *) vio->data;
-+	struct slab_journal_block_header header;
-+
-+	vdo_unpack_slab_journal_block_header(&block->header, &header);
-+
-+	/* FIXME: should it be an error if the following conditional fails? */
-+	if ((header.metadata_type == VDO_METADATA_SLAB_JOURNAL) &&
-+	    (header.nonce == slab->allocator->nonce)) {
-+		journal->tail = header.sequence_number + 1;
-+
-+		/*
-+		 * If the slab is clean, this implies the slab journal is empty, so advance the
-+		 * head appropriately.
-+		 */
-+		journal->head = (slab->allocator->summary_entries[slab->slab_number].is_dirty ?
-+				 header.head :
-+				 journal->tail);
-+		journal->tail_header = header;
-+		initialize_journal_state(journal);
-+	}
-+
-+	return_vio_to_pool(slab->allocator->vio_pool, vio_as_pooled_vio(vio));
-+	vdo_finish_loading_with_result(&slab->state, allocate_counters_if_clean(slab));
-+}
-+
-+static void read_slab_journal_tail_endio(struct bio *bio)
-+{
-+	struct vio *vio = bio->bi_private;
-+	struct slab_journal *journal = vio->completion.parent;
-+
-+	continue_vio_after_io(vio, finish_loading_journal, journal->slab->allocator->thread_id);
-+}
-+
-+static void handle_load_error(struct vdo_completion *completion)
-+{
-+	int result = completion->result;
-+	struct slab_journal *journal = completion->parent;
-+	struct vio *vio = as_vio(completion);
-+
-+	vio_record_metadata_io_error(vio);
-+	return_vio_to_pool(journal->slab->allocator->vio_pool, vio_as_pooled_vio(vio));
-+	vdo_finish_loading_with_result(&journal->slab->state, result);
++	geometry->index_config = (struct index_config) {
++		.mem = mem,
++		.sparse = sparse,
++	};
 +}
 +
 +/**
-+ * read_slab_journal_tail() - Read the slab journal tail block by using a vio acquired from the vio
-+ *                            pool.
-+ * @waiter: The vio pool waiter which has just been notified.
-+ * @context: The vio pool entry given to the waiter.
-+ *
-+ * This is the success callback from acquire_vio_from_pool() when loading a slab journal.
++ * vdo_parse_geometry_block() - Decode and validate an encoded geometry block.
++ * @block: The encoded geometry block.
++ * @geometry: The structure to receive the decoded fields.
 + */
-+static void read_slab_journal_tail(struct waiter *waiter, void *context)
++int __must_check vdo_parse_geometry_block(u8 *block, struct volume_geometry *geometry)
 +{
-+	struct slab_journal *journal = container_of(waiter, struct slab_journal, resource_waiter);
-+	struct vdo_slab *slab = journal->slab;
-+	struct pooled_vio *pooled = context;
-+	struct vio *vio = &pooled->vio;
-+	tail_block_offset_t last_commit_point =
-+		slab->allocator->summary_entries[slab->slab_number].tail_block_offset;
-+
-+	/*
-+	 * Slab summary keeps the commit point offset, so the tail block is the block before that.
-+	 * Calculation supports small journals in unit tests.
-+	 */
-+	tail_block_offset_t tail_block = ((last_commit_point == 0) ?
-+					  (tail_block_offset_t)(journal->size - 1) :
-+					  (last_commit_point - 1));
-+
-+	vio->completion.parent = journal;
-+	vio->completion.callback_thread_id = slab->allocator->thread_id;
-+	submit_metadata_vio(vio,
-+			    slab->journal_origin + tail_block,
-+			    read_slab_journal_tail_endio,
-+			    handle_load_error,
-+			    REQ_OP_READ);
-+}
-+
-+/**
-+ * load_slab_journal() - Load a slab's journal by reading the journal's tail.
-+ */
-+static void load_slab_journal(struct vdo_slab *slab)
-+{
-+	struct slab_journal *journal = &slab->journal;
-+	tail_block_offset_t last_commit_point;
-+
-+	last_commit_point = slab->allocator->summary_entries[slab->slab_number].tail_block_offset;
-+	if ((last_commit_point == 0) &&
-+	    !slab->allocator->summary_entries[slab->slab_number].load_ref_counts) {
-+		/*
-+		 * This slab claims that it has a tail block at (journal->size - 1), but a head of
-+		 * 1. This is impossible, due to the scrubbing threshold, on a real system, so
-+		 * don't bother reading the (bogus) data off disk.
-+		 */
-+		ASSERT_LOG_ONLY(((journal->size < 16) ||
-+				 (journal->scrubbing_threshold < (journal->size - 1))),
-+				"Scrubbing threshold protects against reads of unwritten slab journal blocks");
-+		vdo_finish_loading_with_result(&slab->state, allocate_counters_if_clean(slab));
-+		return;
-+	}
-+
-+	journal->resource_waiter.callback = read_slab_journal_tail;
-+	acquire_vio_from_pool(slab->allocator->vio_pool, &journal->resource_waiter);
-+}
-+
-+static void free_slab(struct vdo_slab *slab)
-+{
-+	if (slab == NULL)
-+		return;
-+
-+	list_del(&slab->allocq_entry);
-+	UDS_FREE(UDS_FORGET(slab->journal.block));
-+	UDS_FREE(UDS_FORGET(slab->journal.locks));
-+	UDS_FREE(UDS_FORGET(slab->counters));
-+	UDS_FREE(UDS_FORGET(slab->reference_blocks));
-+	UDS_FREE(slab);
-+}
-+
-+static int initialize_slab_journal(struct vdo_slab *slab)
-+{
-+	struct slab_journal *journal = &slab->journal;
-+	const struct slab_config *slab_config = &slab->allocator->depot->slab_config;
++	u32 checksum, saved_checksum;
++	struct header header;
++	size_t offset = 0;
 +	int result;
 +
-+	result = UDS_ALLOCATE(slab_config->slab_journal_blocks,
-+			      struct journal_lock,
-+			      __func__,
-+			      &journal->locks);
++	if (memcmp(block, VDO_GEOMETRY_MAGIC_NUMBER, VDO_GEOMETRY_MAGIC_NUMBER_SIZE) != 0)
++		return VDO_BAD_MAGIC;
++	offset += VDO_GEOMETRY_MAGIC_NUMBER_SIZE;
++
++	vdo_decode_header(block, &offset, &header);
++	if (header.version.major_version <= 4)
++		result = vdo_validate_header(&GEOMETRY_BLOCK_HEADER_4_0, &header, true, __func__);
++	else
++		result = vdo_validate_header(&GEOMETRY_BLOCK_HEADER_5_0, &header, true, __func__);
 +	if (result != VDO_SUCCESS)
 +		return result;
 +
-+	result = UDS_ALLOCATE(VDO_BLOCK_SIZE,
-+			      char,
-+			      "struct packed_slab_journal_block",
-+			      (char **) &journal->block);
++	decode_volume_geometry(block, &offset, geometry, header.version.major_version);
++
++	result = ASSERT(header.size == offset + sizeof(u32),
++			"should have decoded up to the geometry checksum");
 +	if (result != VDO_SUCCESS)
 +		return result;
 +
-+	journal->slab = slab;
-+	journal->size = slab_config->slab_journal_blocks;
-+	journal->flushing_threshold = slab_config->slab_journal_flushing_threshold;
-+	journal->blocking_threshold = slab_config->slab_journal_blocking_threshold;
-+	journal->scrubbing_threshold = slab_config->slab_journal_scrubbing_threshold;
-+	journal->entries_per_block = VDO_SLAB_JOURNAL_ENTRIES_PER_BLOCK;
-+	journal->full_entries_per_block = VDO_SLAB_JOURNAL_FULL_ENTRIES_PER_BLOCK;
-+	journal->events = &slab->allocator->slab_journal_statistics;
-+	journal->recovery_journal = slab->allocator->depot->vdo->recovery_journal;
-+	journal->tail = 1;
-+	journal->head = 1;
++	/* Decode and verify the checksum. */
++	checksum = vdo_crc32(block, offset);
++	decode_u32_le(block, &offset, &saved_checksum);
 +
-+	journal->flushing_deadline = journal->flushing_threshold;
-+	/*
-+	 * Set there to be some time between the deadline and the blocking threshold, so that
-+	 * hopefully all are done before blocking.
-+	 */
-+	if ((journal->blocking_threshold - journal->flushing_threshold) > 5)
-+		journal->flushing_deadline = journal->blocking_threshold - 5;
++	return ((checksum == saved_checksum) ? VDO_SUCCESS : VDO_CHECKSUM_MISMATCH);
++}
 +
-+	journal->slab_summary_waiter.callback = release_journal_locks;
++struct block_map_page *vdo_format_block_map_page(void *buffer,
++						 nonce_t nonce,
++						 physical_block_number_t pbn,
++						 bool initialized)
++{
++	struct block_map_page *page = (struct block_map_page *) buffer;
 +
-+	INIT_LIST_HEAD(&journal->dirty_entry);
-+	INIT_LIST_HEAD(&journal->uncommitted_blocks);
++	memset(buffer, 0, VDO_BLOCK_SIZE);
++	page->version = vdo_pack_version_number(BLOCK_MAP_4_1);
++	page->header.nonce = __cpu_to_le64(nonce);
++	page->header.pbn = __cpu_to_le64(pbn);
++	page->header.initialized = initialized;
++	return page;
++}
 +
-+	journal->tail_header.nonce = slab->allocator->nonce;
-+	journal->tail_header.metadata_type = VDO_METADATA_SLAB_JOURNAL;
-+	initialize_journal_state(journal);
++enum block_map_page_validity
++vdo_validate_block_map_page(struct block_map_page *page,
++			    nonce_t nonce,
++			    physical_block_number_t pbn)
++{
++	STATIC_ASSERT_SIZEOF(struct block_map_page_header, PAGE_HEADER_4_1_SIZE);
++
++	if (!vdo_are_same_version(BLOCK_MAP_4_1, vdo_unpack_version_number(page->version)) ||
++	    !page->header.initialized ||
++	    (nonce != __le64_to_cpu(page->header.nonce)))
++		return VDO_BLOCK_MAP_PAGE_INVALID;
++
++	if (pbn != vdo_get_block_map_page_pbn(page))
++		return VDO_BLOCK_MAP_PAGE_BAD;
++
++	return VDO_BLOCK_MAP_PAGE_VALID;
++}
++
++static int
++decode_block_map_state_2_0(u8 *buffer, size_t *offset, struct block_map_state_2_0 *state)
++{
++	size_t initial_offset;
++	block_count_t flat_page_count, root_count;
++	physical_block_number_t flat_page_origin, root_origin;
++	struct header header;
++	int result;
++
++	vdo_decode_header(buffer, offset, &header);
++	result = vdo_validate_header(&VDO_BLOCK_MAP_HEADER_2_0, &header, true, __func__);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	initial_offset = *offset;
++
++	decode_u64_le(buffer, offset, &flat_page_origin);
++	result = ASSERT(flat_page_origin == VDO_BLOCK_MAP_FLAT_PAGE_ORIGIN,
++			"Flat page origin must be %u (recorded as %llu)",
++			VDO_BLOCK_MAP_FLAT_PAGE_ORIGIN,
++			(unsigned long long) state->flat_page_origin);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	decode_u64_le(buffer, offset, &flat_page_count);
++	result = ASSERT(flat_page_count == 0,
++			"Flat page count must be 0 (recorded as %llu)",
++			(unsigned long long) state->flat_page_count);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	decode_u64_le(buffer, offset, &root_origin);
++	decode_u64_le(buffer, offset, &root_count);
++
++	result = ASSERT(VDO_BLOCK_MAP_HEADER_2_0.size == *offset - initial_offset,
++			"decoded block map component size must match header size");
++	if (result != VDO_SUCCESS)
++		return result;
++
++	*state = (struct block_map_state_2_0) {
++		.flat_page_origin = flat_page_origin,
++		.flat_page_count = flat_page_count,
++		.root_origin = root_origin,
++		.root_count = root_count,
++	};
++
 +	return VDO_SUCCESS;
 +}
 +
++static void
++encode_block_map_state_2_0(u8 *buffer, size_t *offset, struct block_map_state_2_0 state)
++{
++	size_t initial_offset;
++
++	vdo_encode_header(buffer, offset, &VDO_BLOCK_MAP_HEADER_2_0);
++
++	initial_offset = *offset;
++	encode_u64_le(buffer, offset, state.flat_page_origin);
++	encode_u64_le(buffer, offset, state.flat_page_count);
++	encode_u64_le(buffer, offset, state.root_origin);
++	encode_u64_le(buffer, offset, state.root_count);
++
++	ASSERT_LOG_ONLY(VDO_BLOCK_MAP_HEADER_2_0.size == *offset - initial_offset,
++			"encoded block map component size must match header size");
++}
++
 +/**
-+ * make_slab() - Construct a new, empty slab.
-+ * @slab_origin: The physical block number within the block allocator partition of the first block
-+ *               in the slab.
-+ * @allocator: The block allocator to which the slab belongs.
-+ * @slab_number: The slab number of the slab.
-+ * @is_new: true if this slab is being allocated as part of a resize.
-+ * @slab_ptr: A pointer to receive the new slab.
++ * vdo_compute_new_forest_pages() - Compute the number of pages which must be allocated at each
++ *                                  level in order to grow the forest to a new number of entries.
++ * @entries: The new number of entries the block map must address.
++ *
++ * Return: The total number of non-leaf pages required.
++ */
++block_count_t vdo_compute_new_forest_pages(root_count_t root_count,
++					   struct boundary *old_sizes,
++					   block_count_t entries,
++					   struct boundary *new_sizes)
++{
++	page_count_t leaf_pages = max(vdo_compute_block_map_page_count(entries), 1U);
++	page_count_t level_size = DIV_ROUND_UP(leaf_pages, root_count);
++	block_count_t total_pages = 0;
++	height_t height;
++
++	for (height = 0; height < VDO_BLOCK_MAP_TREE_HEIGHT; height++) {
++		block_count_t new_pages;
++
++		level_size = DIV_ROUND_UP(level_size, VDO_BLOCK_MAP_ENTRIES_PER_PAGE);
++		new_sizes->levels[height] = level_size;
++		new_pages = level_size;
++		if (old_sizes != NULL)
++			new_pages -= old_sizes->levels[height];
++		total_pages += (new_pages * root_count);
++	}
++
++	return total_pages;
++}
++
++/**
++ * encode_recovery_journal_state_7_0() - Encode the state of a recovery journal.
++ *
++ * Return: VDO_SUCCESS or an error code.
++ */
++static void
++encode_recovery_journal_state_7_0(u8 *buffer,
++				  size_t *offset,
++				  struct recovery_journal_state_7_0 state)
++{
++	size_t initial_offset;
++
++	vdo_encode_header(buffer, offset, &VDO_RECOVERY_JOURNAL_HEADER_7_0);
++
++	initial_offset = *offset;
++	encode_u64_le(buffer, offset, state.journal_start);
++	encode_u64_le(buffer, offset, state.logical_blocks_used);
++	encode_u64_le(buffer, offset, state.block_map_data_blocks);
++
++	ASSERT_LOG_ONLY(VDO_RECOVERY_JOURNAL_HEADER_7_0.size == *offset - initial_offset,
++			"encoded recovery journal component size must match header size");
++}
++
++/**
++ * decode_recovery_journal_state_7_0() - Decode the state of a recovery journal saved in a buffer.
++ * @buffer: The buffer containing the saved state.
++ * @state: A pointer to a recovery journal state to hold the result of a successful decode.
 + *
 + * Return: VDO_SUCCESS or an error code.
 + */
 +static int __must_check
-+make_slab(physical_block_number_t slab_origin,
-+	  struct block_allocator *allocator,
-+	  slab_count_t slab_number,
-+	  bool is_new,
-+	  struct vdo_slab **slab_ptr)
++decode_recovery_journal_state_7_0(u8 *buffer,
++				  size_t *offset,
++				  struct recovery_journal_state_7_0 *state)
 +{
-+	const struct slab_config *slab_config = &allocator->depot->slab_config;
-+	struct vdo_slab *slab;
++	struct header header;
 +	int result;
++	size_t initial_offset;
++	sequence_number_t journal_start;
++	block_count_t logical_blocks_used, block_map_data_blocks;
 +
-+	result = UDS_ALLOCATE(1, struct vdo_slab, __func__, &slab);
++	vdo_decode_header(buffer, offset, &header);
++	result = vdo_validate_header(&VDO_RECOVERY_JOURNAL_HEADER_7_0, &header, true, __func__);
 +	if (result != VDO_SUCCESS)
 +		return result;
 +
-+	*slab = (struct vdo_slab) {
-+		.allocator = allocator,
-+		.start = slab_origin,
-+		.end = slab_origin + slab_config->slab_blocks,
-+		.slab_number = slab_number,
-+		.ref_counts_origin = slab_origin + slab_config->data_blocks,
-+		.journal_origin = vdo_get_slab_journal_start_block(slab_config, slab_origin),
-+		.block_count = slab_config->data_blocks,
-+		.free_blocks = slab_config->data_blocks,
-+		.reference_block_count =
-+			vdo_get_saved_reference_count_size(slab_config->data_blocks),
-+	};
-+	INIT_LIST_HEAD(&slab->allocq_entry);
++	initial_offset = *offset;
++	decode_u64_le(buffer, offset, &journal_start);
++	decode_u64_le(buffer, offset, &logical_blocks_used);
++	decode_u64_le(buffer, offset, &block_map_data_blocks);
 +
-+	result = initialize_slab_journal(slab);
++	result = ASSERT(VDO_RECOVERY_JOURNAL_HEADER_7_0.size == *offset - initial_offset,
++			"decoded recovery journal component size must match header size");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	*state = (struct recovery_journal_state_7_0) {
++		.journal_start = journal_start,
++		.logical_blocks_used = logical_blocks_used,
++		.block_map_data_blocks = block_map_data_blocks,
++	};
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_get_journal_operation_name() - Get the name of a journal operation.
++ * @operation: The operation to name.
++ *
++ * Return: The name of the operation.
++ */
++const char *vdo_get_journal_operation_name(enum journal_operation operation)
++{
++	switch (operation) {
++	case VDO_JOURNAL_DATA_REMAPPING:
++		return "data remapping";
++
++	case VDO_JOURNAL_BLOCK_MAP_REMAPPING:
++		return "block map remapping";
++
++	default:
++		return "unknown journal operation";
++	}
++}
++
++/**
++ * encode_slab_depot_state_2_0() - Encode the state of a slab depot into a buffer.
++ *
++ * Return: UDS_SUCCESS or an error.
++ */
++static void
++encode_slab_depot_state_2_0(u8 *buffer, size_t *offset, struct slab_depot_state_2_0 state)
++{
++	size_t initial_offset;
++
++	vdo_encode_header(buffer, offset, &VDO_SLAB_DEPOT_HEADER_2_0);
++
++	initial_offset = *offset;
++	encode_u64_le(buffer, offset, state.slab_config.slab_blocks);
++	encode_u64_le(buffer, offset, state.slab_config.data_blocks);
++	encode_u64_le(buffer, offset, state.slab_config.reference_count_blocks);
++	encode_u64_le(buffer, offset, state.slab_config.slab_journal_blocks);
++	encode_u64_le(buffer, offset, state.slab_config.slab_journal_flushing_threshold);
++	encode_u64_le(buffer, offset, state.slab_config.slab_journal_blocking_threshold);
++	encode_u64_le(buffer, offset, state.slab_config.slab_journal_scrubbing_threshold);
++	encode_u64_le(buffer, offset, state.first_block);
++	encode_u64_le(buffer, offset, state.last_block);
++	buffer[(*offset)++] = state.zone_count;
++
++	ASSERT_LOG_ONLY(VDO_SLAB_DEPOT_HEADER_2_0.size == *offset - initial_offset,
++			"encoded block map component size must match header size");
++}
++
++/**
++ * decode_slab_depot_state_2_0() - Decode slab depot component state version 2.0 from a buffer.
++ *
++ * Return: UDS_SUCCESS or an error code.
++ */
++static int
++decode_slab_depot_state_2_0(u8 *buffer, size_t *offset, struct slab_depot_state_2_0 *state)
++{
++	struct header header;
++	int result;
++	size_t initial_offset;
++	struct slab_config slab_config;
++	block_count_t count;
++	physical_block_number_t first_block, last_block;
++	zone_count_t zone_count;
++
++	vdo_decode_header(buffer, offset, &header);
++	result = vdo_validate_header(&VDO_SLAB_DEPOT_HEADER_2_0, &header, true, __func__);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	initial_offset = *offset;
++	decode_u64_le(buffer, offset, &count);
++	slab_config.slab_blocks = count;
++
++	decode_u64_le(buffer, offset, &count);
++	slab_config.data_blocks = count;
++
++	decode_u64_le(buffer, offset, &count);
++	slab_config.reference_count_blocks = count;
++
++	decode_u64_le(buffer, offset, &count);
++	slab_config.slab_journal_blocks = count;
++
++	decode_u64_le(buffer, offset, &count);
++	slab_config.slab_journal_flushing_threshold = count;
++
++	decode_u64_le(buffer, offset, &count);
++	slab_config.slab_journal_blocking_threshold = count;
++
++	decode_u64_le(buffer, offset, &count);
++	slab_config.slab_journal_scrubbing_threshold = count;
++
++	decode_u64_le(buffer, offset, &first_block);
++	decode_u64_le(buffer, offset, &last_block);
++	zone_count = buffer[(*offset)++];
++
++	result = ASSERT(VDO_SLAB_DEPOT_HEADER_2_0.size == *offset - initial_offset,
++			"decoded slab depot component size must match header size");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	*state = (struct slab_depot_state_2_0) {
++		.slab_config = slab_config,
++		.first_block = first_block,
++		.last_block = last_block,
++		.zone_count = zone_count,
++	};
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_configure_slab_depot() - Configure the slab depot.
++ * @partition: The slab depot partition
++ * @slab_config: The configuration of a single slab.
++ * @zone_count: The number of zones the depot will use.
++ * @state: The state structure to be configured.
++ *
++ * Configures the slab_depot for the specified storage capacity, finding the number of data blocks
++ * that will fit and still leave room for the depot metadata, then return the saved state for that
++ * configuration.
++ *
++ * Return: VDO_SUCCESS or an error code.
++ */
++int vdo_configure_slab_depot(const struct partition *partition,
++			     struct slab_config slab_config,
++			     zone_count_t zone_count,
++			     struct slab_depot_state_2_0 *state)
++{
++	block_count_t total_slab_blocks, total_data_blocks;
++	size_t slab_count;
++	physical_block_number_t last_block;
++	block_count_t slab_size = slab_config.slab_blocks;
++
++	uds_log_debug("slabDepot %s(block_count=%llu, first_block=%llu, slab_size=%llu, zone_count=%u)",
++		      __func__,
++		      (unsigned long long) partition->count,
++		      (unsigned long long) partition->offset,
++		      (unsigned long long) slab_size,
++		      zone_count);
++
++	/* We do not allow runt slabs, so we waste up to a slab's worth. */
++	slab_count = (partition->count / slab_size);
++	if (slab_count == 0)
++		return VDO_NO_SPACE;
++
++	if (slab_count > MAX_VDO_SLABS)
++		return VDO_TOO_MANY_SLABS;
++
++	total_slab_blocks = slab_count * slab_config.slab_blocks;
++	total_data_blocks = slab_count * slab_config.data_blocks;
++	last_block = partition->offset + total_slab_blocks;
++
++	*state = (struct slab_depot_state_2_0) {
++		.slab_config = slab_config,
++		.first_block = partition->offset,
++		.last_block = last_block,
++		.zone_count = zone_count,
++	};
++
++	uds_log_debug("slab_depot last_block=%llu, total_data_blocks=%llu, slab_count=%zu, left_over=%llu",
++		      (unsigned long long) last_block,
++		      (unsigned long long) total_data_blocks,
++		      slab_count,
++		      (unsigned long long) (partition->count - (last_block - partition->offset)));
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_configure_slab() - Measure and initialize the configuration to use for each slab.
++ * @slab_size: The number of blocks per slab.
++ * @slab_journal_blocks: The number of blocks for the slab journal.
++ * @slab_config: The slab configuration to initialize.
++ *
++ * Return: VDO_SUCCESS or an error code.
++ */
++int vdo_configure_slab(block_count_t slab_size,
++		       block_count_t slab_journal_blocks,
++		       struct slab_config *slab_config)
++{
++	block_count_t ref_blocks, meta_blocks, data_blocks;
++	block_count_t flushing_threshold, remaining, blocking_threshold;
++	block_count_t minimal_extra_space, scrubbing_threshold;
++
++	if (slab_journal_blocks >= slab_size)
++		return VDO_BAD_CONFIGURATION;
++
++	/*
++	 * This calculation should technically be a recurrence, but the total number of metadata
++	 * blocks is currently less than a single block of ref_counts, so we'd gain at most one
++	 * data block in each slab with more iteration.
++	 */
++	ref_blocks = vdo_get_saved_reference_count_size(slab_size - slab_journal_blocks);
++	meta_blocks = (ref_blocks + slab_journal_blocks);
++
++	/* Make sure test code hasn't configured slabs to be too small. */
++	if (meta_blocks >= slab_size)
++		return VDO_BAD_CONFIGURATION;
++
++	/*
++	 * If the slab size is very small, assume this must be a unit test and override the number
++	 * of data blocks to be a power of two (wasting blocks in the slab). Many tests need their
++	 * data_blocks fields to be the exact capacity of the configured volume, and that used to
++	 * fall out since they use a power of two for the number of data blocks, the slab size was
++	 * a power of two, and every block in a slab was a data block.
++	 *
++	 * TODO: Try to figure out some way of structuring testParameters and unit tests so this
++	 * hack isn't needed without having to edit several unit tests every time the metadata size
++	 * changes by one block.
++	 */
++	data_blocks = slab_size - meta_blocks;
++	if ((slab_size < 1024) && !is_power_of_2(data_blocks))
++		data_blocks = ((block_count_t) 1 << ilog2(data_blocks));
++
++	/*
++	 * Configure the slab journal thresholds. The flush threshold is 168 of 224 blocks in
++	 * production, or 3/4ths, so we use this ratio for all sizes.
++	 */
++	flushing_threshold = ((slab_journal_blocks * 3) + 3) / 4;
++	/*
++	 * The blocking threshold should be far enough from the flushing threshold to not produce
++	 * delays, but far enough from the end of the journal to allow multiple successive recovery
++	 * failures.
++	 */
++	remaining = slab_journal_blocks - flushing_threshold;
++	blocking_threshold = flushing_threshold + ((remaining * 5) / 7);
++	/* The scrubbing threshold should be at least 2048 entries before the end of the journal. */
++	minimal_extra_space = 1 + (MAXIMUM_VDO_USER_VIOS / VDO_SLAB_JOURNAL_FULL_ENTRIES_PER_BLOCK);
++	scrubbing_threshold = blocking_threshold;
++	if (slab_journal_blocks > minimal_extra_space)
++		scrubbing_threshold = slab_journal_blocks - minimal_extra_space;
++	if (blocking_threshold > scrubbing_threshold)
++		blocking_threshold = scrubbing_threshold;
++
++	*slab_config = (struct slab_config) {
++		.slab_blocks = slab_size,
++		.data_blocks = data_blocks,
++		.reference_count_blocks = ref_blocks,
++		.slab_journal_blocks = slab_journal_blocks,
++		.slab_journal_flushing_threshold = flushing_threshold,
++		.slab_journal_blocking_threshold = blocking_threshold,
++		.slab_journal_scrubbing_threshold = scrubbing_threshold};
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_decode_slab_journal_entry() - Decode a slab journal entry.
++ * @block: The journal block holding the entry.
++ * @entry_count: The number of the entry.
++ *
++ * Return: The decoded entry.
++ */
++struct slab_journal_entry
++vdo_decode_slab_journal_entry(struct packed_slab_journal_block *block,
++			      journal_entry_count_t entry_count)
++{
++	struct slab_journal_entry entry =
++		vdo_unpack_slab_journal_entry(&block->payload.entries[entry_count]);
++
++	if (block->header.has_block_map_increments &&
++	    ((block->payload.full_entries.entry_types[entry_count / 8] &
++	      ((u8)1 << (entry_count % 8))) != 0))
++		entry.operation = VDO_JOURNAL_BLOCK_MAP_REMAPPING;
++
++	return entry;
++}
++
++/**
++ * allocate_partition() - Allocate a partition and add it to a layout.
++ * @layout: The layout containing the partition.
++ * @id: The id of the partition.
++ * @offset: The offset into the layout at which the partition begins.
++ * @size: The size of the partition in blocks.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++static int allocate_partition(struct layout *layout,
++			      u8 id,
++			      physical_block_number_t offset,
++			      block_count_t size)
++{
++	struct partition *partition;
++	int result;
++
++	result = UDS_ALLOCATE(1, struct partition, __func__, &partition);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	partition->id = id;
++	partition->offset = offset;
++	partition->count = size;
++	partition->next = layout->head;
++	layout->head = partition;
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * make_partition() - Create a new partition from the beginning or end of the unused space in a
++ *                    layout.
++ * @layout: The layout.
++ * @id: The id of the partition to make.
++ * @size: The number of blocks to carve out; if 0, all remaining space will be used.
++ * @beginning: True if the partition should start at the beginning of the unused space.
++ *
++ * Return: A success or error code, particularly VDO_NO_SPACE if there are fewer than size blocks
++ *         remaining.
++ */
++static int __must_check
++make_partition(struct layout *layout,
++	       enum partition_id id,
++	       block_count_t size,
++	       bool beginning)
++{
++	int result;
++	physical_block_number_t offset;
++	block_count_t free_blocks = layout->last_free - layout->first_free;
++
++	if (size == 0) {
++		if (free_blocks == 0)
++			return VDO_NO_SPACE;
++		size = free_blocks;
++	} else if (size > free_blocks) {
++		return VDO_NO_SPACE;
++	}
++
++	result = vdo_get_partition(layout, id, NULL);
++	if (result != VDO_UNKNOWN_PARTITION)
++		return VDO_PARTITION_EXISTS;
++
++	offset = beginning ? layout->first_free : (layout->last_free - size);
++
++	result = allocate_partition(layout, id, offset, size);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	layout->num_partitions++;
++	if (beginning)
++		layout->first_free += size;
++	else
++		layout->last_free = layout->last_free - size;
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_initialize_layout() - Lay out the partitions of a vdo.
++ * @size: The entire size of the vdo.
++ * @origin: The start of the layout on the underlying storage in blocks.
++ * @block_map_blocks: The size of the block map partition.
++ * @journal_blocks: The size of the journal partition.
++ * @summary_blocks: The size of the slab summary partition.
++ * @layout: The layout to initialize.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_initialize_layout(block_count_t size,
++			  physical_block_number_t offset,
++			  block_count_t block_map_blocks,
++			  block_count_t journal_blocks,
++			  block_count_t summary_blocks,
++			  struct layout *layout)
++{
++	int result;
++	block_count_t necessary_size =
++		(offset + block_map_blocks + journal_blocks + summary_blocks);
++
++	if (necessary_size > size)
++		return uds_log_error_strerror(VDO_NO_SPACE, "Not enough space to make a VDO");
++
++	*layout = (struct layout) {
++		.start = offset,
++		.size = size,
++		.first_free = offset,
++		.last_free = size,
++		.num_partitions = 0,
++		.head = NULL,
++	};
++
++	result = make_partition(layout, VDO_BLOCK_MAP_PARTITION, block_map_blocks, true);
 +	if (result != VDO_SUCCESS) {
-+		free_slab(slab);
++		vdo_uninitialize_layout(layout);
 +		return result;
 +	}
 +
-+	if (is_new) {
-+		vdo_set_admin_state_code(&slab->state, VDO_ADMIN_STATE_NEW);
-+		result = allocate_slab_counters(slab);
-+		if (result != VDO_SUCCESS) {
-+			free_slab(slab);
-+			return result;
-+		}
-+	} else {
-+		vdo_set_admin_state_code(&slab->state, VDO_ADMIN_STATE_NORMAL_OPERATION);
++	result = make_partition(layout, VDO_SLAB_SUMMARY_PARTITION, summary_blocks, false);
++	if (result != VDO_SUCCESS) {
++		vdo_uninitialize_layout(layout);
++		return result;
 +	}
 +
-+	*slab_ptr = slab;
++	result = make_partition(layout, VDO_RECOVERY_JOURNAL_PARTITION, journal_blocks, false);
++	if (result != VDO_SUCCESS) {
++		vdo_uninitialize_layout(layout);
++		return result;
++	}
++
++	result = make_partition(layout, VDO_SLAB_DEPOT_PARTITION, 0, true);
++	if (result != VDO_SUCCESS)
++		vdo_uninitialize_layout(layout);
++
++	return result;
++}
++
++/**
++ * vdo_uninitialize_layout() - Clean up a layout.
++ * @layout: The layout to clean up.
++ *
++ * All partitions created by this layout become invalid pointers.
++ */
++void vdo_uninitialize_layout(struct layout *layout)
++{
++	while (layout->head != NULL) {
++		struct partition *part = layout->head;
++
++		layout->head = part->next;
++		UDS_FREE(part);
++	}
++
++	memset(layout, 0, sizeof(struct layout));
++}
++
++/**
++ * vdo_get_partition() - Get a partition by id.
++ * @layout: The layout from which to get a partition.
++ * @id: The id of the partition.
++ * @partition_ptr: A pointer to hold the partition.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_get_partition(struct layout *layout,
++		      enum partition_id id,
++		      struct partition **partition_ptr)
++{
++	struct partition *partition;
++
++	for (partition = layout->head; partition != NULL; partition = partition->next) {
++		if (partition->id == id) {
++			if (partition_ptr != NULL)
++				*partition_ptr = partition;
++			return VDO_SUCCESS;
++		}
++	}
++
++	return VDO_UNKNOWN_PARTITION;
++}
++
++/**
++ * vdo_get_known_partition() - Get a partition by id from a validated layout.
++ * @layout: The layout from which to get a partition.
++ * @id: The id of the partition.
++ *
++ * Return: the partition
++ */
++struct partition *vdo_get_known_partition(struct layout *layout, enum partition_id id)
++{
++	struct partition *partition;
++	int result = vdo_get_partition(layout, id, &partition);
++
++	ASSERT_LOG_ONLY(result == VDO_SUCCESS, "layout has expected partition: %u", id);
++
++	return partition;
++}
++
++static void encode_layout(u8 *buffer, size_t *offset, const struct layout *layout)
++{
++	const struct partition *partition;
++	size_t initial_offset;
++	struct header header = VDO_LAYOUT_HEADER_3_0;
++
++	STATIC_ASSERT_SIZEOF(enum partition_id, sizeof(u8));
++	ASSERT_LOG_ONLY(layout->num_partitions <= U8_MAX,
++			"layout partition count must fit in a byte");
++
++	vdo_encode_header(buffer, offset, &header);
++
++	initial_offset = *offset;
++	encode_u64_le(buffer, offset, layout->first_free);
++	encode_u64_le(buffer, offset, layout->last_free);
++	buffer[(*offset)++] = layout->num_partitions;
++
++	ASSERT_LOG_ONLY(sizeof(struct layout_3_0) == *offset - initial_offset,
++			"encoded size of a layout header must match structure");
++
++	for (partition = layout->head; partition != NULL; partition = partition->next) {
++		buffer[(*offset)++] = partition->id;
++		encode_u64_le(buffer, offset, partition->offset);
++		/* This field only exists for backwards compatibility */
++		encode_u64_le(buffer, offset, 0);
++		encode_u64_le(buffer, offset, partition->count);
++	}
++
++	ASSERT_LOG_ONLY(header.size == *offset - initial_offset,
++			"encoded size of a layout must match header size");
++}
++
++static int
++decode_layout(u8 *buffer,
++	      size_t *offset,
++	      physical_block_number_t start,
++	      block_count_t size,
++	      struct layout *layout)
++{
++	struct header header;
++	struct layout_3_0 layout_header;
++	struct partition *partition;
++	size_t initial_offset;
++	physical_block_number_t first_free, last_free;
++	u8 partition_count;
++	u8 i;
++	int result;
++
++	vdo_decode_header(buffer, offset, &header);
++	/* Layout is variable size, so only do a minimum size check here. */
++	result = vdo_validate_header(&VDO_LAYOUT_HEADER_3_0, &header, false, __func__);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	initial_offset = *offset;
++	decode_u64_le(buffer, offset, &first_free);
++	decode_u64_le(buffer, offset, &last_free);
++	partition_count = buffer[(*offset)++];
++	layout_header = (struct layout_3_0) {
++		.first_free = first_free,
++		.last_free = last_free,
++		.partition_count = partition_count,
++	};
++
++	result = ASSERT(sizeof(struct layout_3_0) == *offset - initial_offset,
++			"decoded size of a layout header must match structure");
++	if (result != VDO_SUCCESS)
++		return result;
++
++	layout->start = start;
++	layout->size = size;
++	layout->first_free = layout_header.first_free;
++	layout->last_free = layout_header.last_free;
++	layout->num_partitions = layout_header.partition_count;
++
++	if (layout->num_partitions > VDO_PARTITION_COUNT)
++		return uds_log_error_strerror(VDO_UNKNOWN_PARTITION,
++					      "layout has extra partitions");
++
++	for (i = 0; i < layout->num_partitions; i++) {
++		u8 id;
++		u64 partition_offset, count;
++
++		id = buffer[(*offset)++];
++		decode_u64_le(buffer, offset, &partition_offset);
++		*offset += sizeof(u64);
++		decode_u64_le(buffer, offset, &count);
++
++		result = allocate_partition(layout, id, partition_offset, count);
++		if (result != VDO_SUCCESS) {
++			vdo_uninitialize_layout(layout);
++			return result;
++		}
++	}
++
++	/* Validate that the layout has all (and only) the required partitions */
++	for (i = 0; i < VDO_PARTITION_COUNT; i++) {
++		result = vdo_get_partition(layout, REQUIRED_PARTITIONS[i], &partition);
++		if (result != VDO_SUCCESS) {
++			vdo_uninitialize_layout(layout);
++			return uds_log_error_strerror(result,
++						      "layout is missing required partition %u",
++						      REQUIRED_PARTITIONS[i]);
++		}
++
++		start += partition->count;
++	}
++
++	if (start != size) {
++		vdo_uninitialize_layout(layout);
++		return uds_log_error_strerror(UDS_BAD_STATE, "partitions do not cover the layout");
++	}
++
 +	return VDO_SUCCESS;
 +}
-diff --git a/drivers/md/dm-vdo/slab-depot.h b/drivers/md/dm-vdo/slab-depot.h
++
++/**
++ * pack_vdo_config() - Convert a vdo_config to its packed on-disk representation.
++ * @config: The vdo config to convert.
++ *
++ * Return: The platform-independent representation of the config.
++ */
++static struct packed_vdo_config pack_vdo_config(struct vdo_config config)
++{
++	return (struct packed_vdo_config) {
++		.logical_blocks = __cpu_to_le64(config.logical_blocks),
++		.physical_blocks = __cpu_to_le64(config.physical_blocks),
++		.slab_size = __cpu_to_le64(config.slab_size),
++		.recovery_journal_size = __cpu_to_le64(config.recovery_journal_size),
++		.slab_journal_blocks = __cpu_to_le64(config.slab_journal_blocks),
++	};
++}
++
++/**
++ * pack_vdo_component() - Convert a vdo_component to its packed on-disk representation.
++ * @component: The VDO component data to convert.
++ *
++ * Return: The platform-independent representation of the component.
++ */
++static struct packed_vdo_component_41_0 pack_vdo_component(const struct vdo_component component)
++{
++	return (struct packed_vdo_component_41_0) {
++		.state = __cpu_to_le32(component.state),
++		.complete_recoveries = __cpu_to_le64(component.complete_recoveries),
++		.read_only_recoveries = __cpu_to_le64(component.read_only_recoveries),
++		.config = pack_vdo_config(component.config),
++		.nonce = __cpu_to_le64(component.nonce),
++	};
++}
++
++static void encode_vdo_component(u8 *buffer, size_t *offset, struct vdo_component component)
++{
++	struct packed_vdo_component_41_0 packed;
++
++	encode_version_number(buffer, offset, VDO_COMPONENT_DATA_41_0);
++	packed = pack_vdo_component(component);
++	memcpy(buffer + *offset, &packed, sizeof(packed));
++	*offset += sizeof(packed);
++}
++
++/**
++ * unpack_vdo_config() - Convert a packed_vdo_config to its native in-memory representation.
++ * @config: The packed vdo config to convert.
++ *
++ * Return: The native in-memory representation of the vdo config.
++ */
++static struct vdo_config unpack_vdo_config(struct packed_vdo_config config)
++{
++	return (struct vdo_config) {
++		.logical_blocks = __le64_to_cpu(config.logical_blocks),
++		.physical_blocks = __le64_to_cpu(config.physical_blocks),
++		.slab_size = __le64_to_cpu(config.slab_size),
++		.recovery_journal_size = __le64_to_cpu(config.recovery_journal_size),
++		.slab_journal_blocks = __le64_to_cpu(config.slab_journal_blocks),
++	};
++}
++
++/**
++ * unpack_vdo_component_41_0() - Convert a packed_vdo_component_41_0 to its native in-memory
++ *				 representation.
++ * @component: The packed vdo component data to convert.
++ *
++ * Return: The native in-memory representation of the component.
++ */
++static struct vdo_component
++unpack_vdo_component_41_0(struct packed_vdo_component_41_0 component)
++{
++	return (struct vdo_component) {
++		.state = __le32_to_cpu(component.state),
++		.complete_recoveries = __le64_to_cpu(component.complete_recoveries),
++		.read_only_recoveries = __le64_to_cpu(component.read_only_recoveries),
++		.config = unpack_vdo_config(component.config),
++		.nonce = __le64_to_cpu(component.nonce),
++	};
++}
++
++/**
++ * vdo_decode_component() - Decode the component data for the vdo itself out of the super block.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++static int decode_vdo_component(u8 *buffer, size_t *offset, struct vdo_component *component)
++{
++	struct version_number version;
++	struct packed_vdo_component_41_0 packed;
++	int result;
++
++	decode_version_number(buffer, offset, &version);
++	result = validate_version(version, VDO_COMPONENT_DATA_41_0, "VDO component data");
++	if (result != VDO_SUCCESS)
++		return result;
++
++	memcpy(&packed, buffer + *offset, sizeof(packed));
++	*offset += sizeof(packed);
++	*component = unpack_vdo_component_41_0(packed);
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_validate_config() - Validate constraints on a VDO config.
++ * @config: The VDO config.
++ * @physical_block_count: The minimum block count of the underlying storage.
++ * @logical_block_count: The expected logical size of the VDO, or 0 if the logical size may be
++ *			 unspecified.
++ *
++ * Return: A success or error code.
++ */
++int vdo_validate_config(const struct vdo_config *config,
++			block_count_t physical_block_count,
++			block_count_t logical_block_count)
++{
++	struct slab_config slab_config;
++	int result;
++
++	result = ASSERT(config->slab_size > 0, "slab size unspecified");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = ASSERT(is_power_of_2(config->slab_size), "slab size must be a power of two");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = ASSERT(config->slab_size <= (1 << MAX_VDO_SLAB_BITS),
++			"slab size must be less than or equal to 2^%d",
++			MAX_VDO_SLAB_BITS);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = ASSERT(config->slab_journal_blocks >= MINIMUM_VDO_SLAB_JOURNAL_BLOCKS,
++			"slab journal size meets minimum size");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = ASSERT(config->slab_journal_blocks <= config->slab_size,
++			"slab journal size is within expected bound");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = vdo_configure_slab(config->slab_size, config->slab_journal_blocks, &slab_config);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = ASSERT((slab_config.data_blocks >= 1),
++			"slab must be able to hold at least one block");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = ASSERT(config->physical_blocks > 0, "physical blocks unspecified");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = ASSERT(config->physical_blocks <= MAXIMUM_VDO_PHYSICAL_BLOCKS,
++			"physical block count %llu exceeds maximum %llu",
++			(unsigned long long) config->physical_blocks,
++			(unsigned long long) MAXIMUM_VDO_PHYSICAL_BLOCKS);
++	if (result != UDS_SUCCESS)
++		return VDO_OUT_OF_RANGE;
++
++	if (physical_block_count != config->physical_blocks) {
++		uds_log_error("A physical size of %llu blocks was specified, not the %llu blocks configured in the vdo super block",
++			      (unsigned long long) physical_block_count,
++			      (unsigned long long) config->physical_blocks);
++		return VDO_PARAMETER_MISMATCH;
++	}
++
++	if (logical_block_count > 0) {
++		result = ASSERT((config->logical_blocks > 0), "logical blocks unspecified");
++		if (result != UDS_SUCCESS)
++			return result;
++
++		if (logical_block_count != config->logical_blocks) {
++			uds_log_error("A logical size of %llu blocks was specified, but that differs from the %llu blocks configured in the vdo super block",
++				      (unsigned long long) logical_block_count,
++				      (unsigned long long) config->logical_blocks);
++			return VDO_PARAMETER_MISMATCH;
++		}
++	}
++
++	result = ASSERT(config->logical_blocks <= MAXIMUM_VDO_LOGICAL_BLOCKS,
++			"logical blocks too large");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = ASSERT(config->recovery_journal_size > 0, "recovery journal size unspecified");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = ASSERT(is_power_of_2(config->recovery_journal_size),
++			"recovery journal size must be a power of two");
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return result;
++}
++
++/**
++ * vdo_destroy_component_states() - Clean up any allocations in a vdo_component_states.
++ * @states: The component states to destroy.
++ */
++void vdo_destroy_component_states(struct vdo_component_states *states)
++{
++	if (states == NULL)
++		return;
++
++	vdo_uninitialize_layout(&states->layout);
++}
++
++/**
++ * decode_components() - Decode the components now that we know the component data is a version we
++ *                       understand.
++ * @buffer: The buffer being decoded.
++ * @offset: The offset to start decoding from.
++ * @geometry: The vdo geometry
++ * @states: An object to hold the successfully decoded state.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++static int __must_check decode_components(u8 *buffer,
++					  size_t *offset,
++					  struct volume_geometry *geometry,
++					  struct vdo_component_states *states)
++{
++	int result;
++
++	decode_vdo_component(buffer, offset, &states->vdo);
++
++	result = decode_layout(buffer,
++			       offset,
++			       vdo_get_data_region_start(*geometry) + 1,
++			       states->vdo.config.physical_blocks,
++			       &states->layout);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = decode_recovery_journal_state_7_0(buffer, offset, &states->recovery_journal);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = decode_slab_depot_state_2_0(buffer, offset, &states->slab_depot);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = decode_block_map_state_2_0(buffer, offset, &states->block_map);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	ASSERT_LOG_ONLY(*offset == VDO_COMPONENT_DATA_OFFSET + VDO_COMPONENT_DATA_SIZE,
++			"All decoded component data was used");
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_decode_component_states() - Decode the payload of a super block.
++ * @buffer: The buffer containing the encoded super block contents.
++ * @geometry: The vdo geometry
++ * @states: A pointer to hold the decoded states.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_decode_component_states(u8 *buffer,
++				struct volume_geometry *geometry,
++				struct vdo_component_states *states)
++{
++	int result;
++	size_t offset = VDO_COMPONENT_DATA_OFFSET;
++
++	/* This is for backwards compatibility. */
++	decode_u32_le(buffer, &offset, &states->unused);
++
++	/* Check the VDO volume version */
++	decode_version_number(buffer, &offset, &states->volume_version);
++	result = validate_version(VDO_VOLUME_VERSION_67_0, states->volume_version, "volume");
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = decode_components(buffer, &offset, geometry, states);
++	if (result != VDO_SUCCESS)
++		vdo_uninitialize_layout(&states->layout);
++
++	return result;
++}
++
++/**
++ * vdo_validate_component_states() - Validate the decoded super block configuration.
++ * @states: The state decoded from the super block.
++ * @geometry_nonce: The nonce from the geometry block.
++ * @physical_size: The minimum block count of the underlying storage.
++ * @logical_size: The expected logical size of the VDO, or 0 if the logical size may be
++ *                unspecified.
++ *
++ * Return: VDO_SUCCESS or an error if the configuration is invalid.
++ */
++int vdo_validate_component_states(struct vdo_component_states *states,
++				  nonce_t geometry_nonce,
++				  block_count_t physical_size,
++				  block_count_t logical_size)
++{
++	if (geometry_nonce != states->vdo.nonce)
++		return uds_log_error_strerror(VDO_BAD_NONCE,
++					      "Geometry nonce %llu does not match superblock nonce %llu",
++					      (unsigned long long) geometry_nonce,
++					      (unsigned long long) states->vdo.nonce);
++
++	return vdo_validate_config(&states->vdo.config, physical_size, logical_size);
++}
++
++/**
++ * vdo_encode_component_states() - Encode the state of all vdo components in the super block.
++ */
++static void
++vdo_encode_component_states(u8 *buffer, size_t *offset, const struct vdo_component_states *states)
++{
++	/* This is for backwards compatibility. */
++	encode_u32_le(buffer, offset, states->unused);
++	encode_version_number(buffer, offset, states->volume_version);
++	encode_vdo_component(buffer, offset, states->vdo);
++	encode_layout(buffer, offset, &states->layout);
++	encode_recovery_journal_state_7_0(buffer, offset, states->recovery_journal);
++	encode_slab_depot_state_2_0(buffer, offset, states->slab_depot);
++	encode_block_map_state_2_0(buffer, offset, states->block_map);
++
++	ASSERT_LOG_ONLY(*offset == VDO_COMPONENT_DATA_OFFSET + VDO_COMPONENT_DATA_SIZE,
++			"All super block component data was encoded");
++}
++
++/**
++ * vdo_encode_super_block() - Encode a super block into its on-disk representation.
++ */
++void vdo_encode_super_block(u8 *buffer, struct vdo_component_states *states)
++{
++	u32 checksum;
++	struct header header = SUPER_BLOCK_HEADER_12_0;
++	size_t offset = 0;
++
++	header.size += VDO_COMPONENT_DATA_SIZE;
++	vdo_encode_header(buffer, &offset, &header);
++	vdo_encode_component_states(buffer, &offset, states);
++
++	checksum = vdo_crc32(buffer, offset);
++	encode_u32_le(buffer, &offset, checksum);
++
++	/*
++	 * Even though the buffer is a full block, to avoid the potential corruption from a torn
++	 * write, the entire encoding must fit in the first sector.
++	 */
++	ASSERT_LOG_ONLY(offset <= VDO_SECTOR_SIZE, "entire superblock must fit in one sector");
++}
++
++/**
++ * vdo_decode_super_block() - Decode a super block from its on-disk representation.
++ */
++int vdo_decode_super_block(u8 *buffer)
++{
++	struct header header;
++	int result;
++	u32 checksum, saved_checksum;
++	size_t offset = 0;
++
++	/* Decode and validate the header. */
++	vdo_decode_header(buffer, &offset, &header);
++	result = vdo_validate_header(&SUPER_BLOCK_HEADER_12_0, &header, false, __func__);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	if (header.size > VDO_COMPONENT_DATA_SIZE + sizeof(u32))
++		/*
++		 * We can't check release version or checksum until we know the content size, so we
++		 * have to assume a version mismatch on unexpected values.
++		 */
++		return uds_log_error_strerror(VDO_UNSUPPORTED_VERSION,
++					      "super block contents too large: %zu",
++					      header.size);
++
++	/* Skip past the component data for now, to verify the checksum. */
++	offset += VDO_COMPONENT_DATA_SIZE;
++
++	checksum = vdo_crc32(buffer, offset);
++	decode_u32_le(buffer, &offset, &saved_checksum);
++
++	result = ASSERT(offset == VDO_SUPER_BLOCK_FIXED_SIZE + VDO_COMPONENT_DATA_SIZE,
++			"must have decoded entire superblock payload");
++	if (result != VDO_SUCCESS)
++		return result;
++
++	return ((checksum != saved_checksum) ? VDO_CHECKSUM_MISMATCH : VDO_SUCCESS);
++}
+diff --git a/drivers/md/dm-vdo/encodings.h b/drivers/md/dm-vdo/encodings.h
 new file mode 100644
-index 000000000000..12086d475d1a
+index 000000000000..49b849a087d3
 --- /dev/null
-+++ b/drivers/md/dm-vdo/slab-depot.h
-@@ -0,0 +1,253 @@
++++ b/drivers/md/dm-vdo/encodings.h
+@@ -0,0 +1,1307 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef VDO_SLAB_DEPOT_H
-+#define VDO_SLAB_DEPOT_H
++#ifndef VDO_ENCODINGS_H
++#define VDO_ENCODINGS_H
 +
-+#include <linux/atomic.h>
-+#include <linux/dm-kcopyd.h>
-+#include <linux/list.h>
++#include <linux/blk_types.h>
++#include <linux/crc32.h>
++#include <linux/limits.h>
++#include <linux/uuid.h>
 +
 +#include "numeric.h"
++#include "uds.h"
 +
-+#include "admin-state.h"
-+#include "completion.h"
-+#include "data-vio.h"
-+#include "encodings.h"
-+#include "physical-zone.h"
-+#include "priority-table.h"
-+#include "recovery-journal.h"
-+#include "statistics.h"
++#include "constants.h"
 +#include "types.h"
-+#include "vio.h"
-+#include "wait-queue.h"
 +
 +/*
-+ * Represents the possible status of a block.
++ * An in-memory representation of a version number for versioned structures on disk.
++ *
++ * A version number consists of two portions, a major version and a minor version. Any format
++ * change which does not require an explicit upgrade step from the previous version should
++ * increment the minor version. Any format change which either requires an explicit upgrade step,
++ * or is wholly incompatible (i.e. can not be upgraded to), should increment the major version, and
++ * set the minor version to 0.
 + */
-+enum reference_status {
-+	RS_FREE, /* this block is free */
-+	RS_SINGLE, /* this block is singly-referenced */
-+	RS_SHARED, /* this block is shared */
-+	RS_PROVISIONAL /* this block is provisionally allocated */
++struct version_number {
++	u32 major_version;
++	u32 minor_version;
 +};
 +
-+struct vdo_slab;
++/*
++ * A packed, machine-independent, on-disk representation of a version_number. Both fields are
++ * stored in little-endian byte order.
++ */
++struct packed_version_number {
++	__le32 major_version;
++	__le32 minor_version;
++} __packed;
 +
-+struct journal_lock {
-+	u16 count;
-+	sequence_number_t recovery_start;
++/* The registry of component ids for use in headers */
++#define VDO_SUPER_BLOCK 0
++#define VDO_LAYOUT 1
++#define VDO_RECOVERY_JOURNAL 2
++#define VDO_SLAB_DEPOT 3
++#define VDO_BLOCK_MAP 4
++#define VDO_GEOMETRY_BLOCK 5
++
++/* The header for versioned data stored on disk. */
++struct header {
++	u32 id; /* The component this is a header for */
++	struct version_number version; /* The version of the data format */
++	size_t size; /* The size of the data following this header */
 +};
 +
-+struct slab_journal {
-+	/* A waiter object for getting a VIO pool entry */
-+	struct waiter resource_waiter;
-+	/* A waiter object for updating the slab summary */
-+	struct waiter slab_summary_waiter;
-+	/* A waiter object for getting a vio with which to flush */
-+	struct waiter flush_waiter;
-+	/* The queue of VIOs waiting to make an entry */
-+	struct wait_queue entry_waiters;
-+	/* The parent slab reference of this journal */
-+	struct vdo_slab *slab;
++/* A packed, machine-independent, on-disk representation of a component header. */
++struct packed_header {
++	__le32 id;
++	struct packed_version_number version;
++	__le64 size;
++} __packed;
 +
-+	/* Whether a tail block commit is pending */
-+	bool waiting_to_commit;
-+	/* Whether the journal is updating the slab summary */
-+	bool updating_slab_summary;
-+	/* Whether the journal is adding entries from the entry_waiters queue */
-+	bool adding_entries;
-+	/* Whether a partial write is in progress */
-+	bool partial_write_in_progress;
++enum {
++	VDO_GEOMETRY_BLOCK_LOCATION = 0,
++	VDO_GEOMETRY_MAGIC_NUMBER_SIZE = 8,
++	VDO_DEFAULT_GEOMETRY_BLOCK_VERSION = 5,
++};
 +
-+	/* The oldest block in the journal on disk */
++struct index_config {
++	u32 mem;
++	u32 unused;
++	bool sparse;
++} __packed;
++
++enum volume_region_id {
++	VDO_INDEX_REGION = 0,
++	VDO_DATA_REGION = 1,
++	VDO_VOLUME_REGION_COUNT,
++};
++
++struct volume_region {
++	/* The ID of the region */
++	enum volume_region_id id;
++	/*
++	 * The absolute starting offset on the device. The region continues until the next region
++	 * begins.
++	 */
++	physical_block_number_t start_block;
++} __packed;
++
++struct volume_geometry {
++	/* For backwards compatibility */
++	u32 unused;
++	/* The nonce of this volume */
++	nonce_t nonce;
++	/* The uuid of this volume */
++	uuid_t uuid;
++	/* The block offset to be applied to bios */
++	block_count_t bio_offset;
++	/* The regions in ID order */
++	struct volume_region regions[VDO_VOLUME_REGION_COUNT];
++	/* The index config */
++	struct index_config index_config;
++} __packed;
++
++/* This volume geometry struct is used for sizing only */
++struct volume_geometry_4_0 {
++	/* For backwards compatibility */
++	u32 unused;
++	/* The nonce of this volume */
++	nonce_t nonce;
++	/* The uuid of this volume */
++	uuid_t uuid;
++	/* The regions in ID order */
++	struct volume_region regions[VDO_VOLUME_REGION_COUNT];
++	/* The index config */
++	struct index_config index_config;
++} __packed;
++
++extern const u8 VDO_GEOMETRY_MAGIC_NUMBER[VDO_GEOMETRY_MAGIC_NUMBER_SIZE + 1];
++
++/**
++ * DOC: Block map entries
++ *
++ * The entry for each logical block in the block map is encoded into five bytes, which saves space
++ * in both the on-disk and in-memory layouts. It consists of the 36 low-order bits of a
++ * physical_block_number_t (addressing 256 terabytes with a 4KB block size) and a 4-bit encoding of
++ * a block_mapping_state.
++ *
++ * Of the 8 high bits of the 5-byte structure:
++ *
++ * Bits 7..4: The four highest bits of the 36-bit physical block number
++ * Bits 3..0: The 4-bit block_mapping_state
++ *
++ * The following 4 bytes are the low order bytes of the physical block number, in little-endian
++ * order.
++ *
++ * Conversion functions to and from a data location are provided.
++ */
++struct block_map_entry {
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++	unsigned mapping_state : 4;
++	unsigned pbn_high_nibble : 4;
++#else
++	unsigned pbn_high_nibble : 4;
++	unsigned mapping_state : 4;
++#endif
++
++	__le32 pbn_low_word;
++} __packed;
++
++struct block_map_page_header {
++	__le64 nonce;
++	__le64 pbn;
++
++	/** May be non-zero on disk */
++	u8 unused_long_word[8];
++
++	/* Whether this page has been written twice to disk */
++	bool initialized;
++
++	/* Always zero on disk */
++	u8 unused_byte1;
++
++	/* May be non-zero on disk */
++	u8 unused_byte2;
++	u8 unused_byte3;
++} __packed;
++
++struct block_map_page {
++	struct packed_version_number version;
++	struct block_map_page_header header;
++	struct block_map_entry entries[];
++} __packed;
++
++enum block_map_page_validity {
++	VDO_BLOCK_MAP_PAGE_VALID,
++	VDO_BLOCK_MAP_PAGE_INVALID,
++	/* Valid page found in the wrong location on disk */
++	VDO_BLOCK_MAP_PAGE_BAD,
++};
++
++struct block_map_state_2_0 {
++	physical_block_number_t flat_page_origin;
++	block_count_t flat_page_count;
++	physical_block_number_t root_origin;
++	block_count_t root_count;
++} __packed;
++
++struct boundary {
++	page_number_t levels[VDO_BLOCK_MAP_TREE_HEIGHT];
++};
++
++extern const struct header VDO_BLOCK_MAP_HEADER_2_0;
++
++/* The state of the recovery journal as encoded in the VDO super block. */
++struct recovery_journal_state_7_0 {
++	/** Sequence number to start the journal */
++	sequence_number_t journal_start;
++	/** Number of logical blocks used by VDO */
++	block_count_t logical_blocks_used;
++	/** Number of block map pages allocated */
++	block_count_t block_map_data_blocks;
++} __packed;
++
++extern const struct header VDO_RECOVERY_JOURNAL_HEADER_7_0;
++
++typedef u16 journal_entry_count_t;
++
++/*
++ * A recovery journal entry stores three physical locations: a data location that is the value of a
++ * single mapping in the block map tree, and the two locations of the block map pages and slots
++ * that are acquiring and releasing a reference to the location. The journal entry also stores an
++ * operation code that says whether the mapping is for a logical block or for the block map tree
++ * itself.
++ */
++struct recovery_journal_entry {
++	struct block_map_slot slot;
++	struct data_location mapping;
++	struct data_location unmapping;
++	enum journal_operation operation;
++};
++
++/* The packed, on-disk representation of a recovery journal entry. */
++struct packed_recovery_journal_entry {
++	/*
++	 * In little-endian bit order:
++	 * Bits 15..12: The four highest bits of the 36-bit physical block number of the block map
++	 * tree page
++	 * Bits 11..2: The 10-bit block map page slot number
++	 * Bit 1..0: The journal_operation of the entry (this actually only requires 1 bit, but
++	 *           it is convenient to keep the extra bit as part of this field.
++	 */
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++	unsigned operation : 2;
++	unsigned slot_low : 6;
++	unsigned slot_high : 4;
++	unsigned pbn_high_nibble : 4;
++#else
++	unsigned slot_low : 6;
++	unsigned operation : 2;
++	unsigned pbn_high_nibble : 4;
++	unsigned slot_high : 4;
++#endif
++
++	/*
++	 * Bits 47..16: The 32 low-order bits of the block map page PBN, in little-endian byte
++	 * order
++	 */
++	__le32 pbn_low_word;
++
++	/*
++	 * Bits 87..48: The five-byte block map entry encoding the location that will be stored in
++	 * the block map page slot
++	 */
++	struct block_map_entry mapping;
++
++	/*
++	 * Bits 127..88: The five-byte block map entry encoding the location that was stored in the
++	 * block map page slot
++	 */
++	struct block_map_entry unmapping;
++} __packed;
++
++/* The packed, on-disk representation of an old format recovery journal entry. */
++struct packed_recovery_journal_entry_1 {
++	/*
++	 * In little-endian bit order:
++	 * Bits 15..12: The four highest bits of the 36-bit physical block number of the block map
++	 *              tree page
++	 * Bits 11..2: The 10-bit block map page slot number
++	 * Bits 1..0: The 2-bit journal_operation of the entry
++	 *
++	 */
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++	unsigned operation : 2;
++	unsigned slot_low : 6;
++	unsigned slot_high : 4;
++	unsigned pbn_high_nibble : 4;
++#else
++	unsigned slot_low : 6;
++	unsigned operation : 2;
++	unsigned pbn_high_nibble : 4;
++	unsigned slot_high : 4;
++#endif
++
++	/*
++	 * Bits 47..16: The 32 low-order bits of the block map page PBN, in little-endian byte
++	 * order
++	 */
++	__le32 pbn_low_word;
++
++	/*
++	 * Bits 87..48: The five-byte block map entry encoding the location that was or will be
++	 * stored in the block map page slot
++	 */
++	struct block_map_entry block_map_entry;
++} __packed;
++
++enum journal_operation_1 {
++	VDO_JOURNAL_DATA_DECREMENT = 0,
++	VDO_JOURNAL_DATA_INCREMENT = 1,
++	VDO_JOURNAL_BLOCK_MAP_DECREMENT = 2,
++	VDO_JOURNAL_BLOCK_MAP_INCREMENT = 3,
++} __packed;
++
++struct recovery_block_header {
++	sequence_number_t block_map_head; /* Block map head sequence number */
++	sequence_number_t slab_journal_head; /* Slab journal head seq. number */
++	sequence_number_t sequence_number; /* Sequence number for this block */
++	nonce_t nonce; /* A given VDO instance's nonce */
++	block_count_t logical_blocks_used; /* Logical blocks in use */
++	block_count_t block_map_data_blocks; /* Allocated block map pages */
++	journal_entry_count_t entry_count; /* Number of entries written */
++	u8 check_byte; /* The protection check byte */
++	u8 recovery_count; /* Number of recoveries completed */
++	enum vdo_metadata_type metadata_type; /* Metadata type */
++};
++
++/*
++ * The packed, on-disk representation of a recovery journal block header. All fields are kept in
++ * little-endian byte order.
++ */
++struct packed_journal_header {
++	/* Block map head 64-bit sequence number */
++	__le64 block_map_head;
++
++	/* Slab journal head 64-bit sequence number */
++	__le64 slab_journal_head;
++
++	/* The 64-bit sequence number for this block */
++	__le64 sequence_number;
++
++	/* A given VDO instance's 64-bit nonce */
++	__le64 nonce;
++
++	/* 8-bit metadata type (should always be one for the recovery journal) */
++	u8 metadata_type;
++
++	/* 16-bit count of the entries encoded in the block */
++	__le16 entry_count;
++
++	/* 64-bit count of the logical blocks used when this block was opened */
++	__le64 logical_blocks_used;
++
++	/* 64-bit count of the block map blocks used when this block was opened */
++	__le64 block_map_data_blocks;
++
++	/* The protection check byte */
++	u8 check_byte;
++
++	/* The number of recoveries completed */
++	u8 recovery_count;
++} __packed;
++
++struct packed_journal_sector {
++	/* The protection check byte */
++	u8 check_byte;
++
++	/* The number of recoveries completed */
++	u8 recovery_count;
++
++	/* The number of entries in this sector */
++	u8 entry_count;
++
++	/* Journal entries for this sector */
++	struct packed_recovery_journal_entry entries[];
++} __packed;
++
++enum {
++	/* The number of entries in each sector (except the last) when filled */
++	RECOVERY_JOURNAL_ENTRIES_PER_SECTOR =
++		((VDO_SECTOR_SIZE - sizeof(struct packed_journal_sector)) /
++		 sizeof(struct packed_recovery_journal_entry)),
++	RECOVERY_JOURNAL_ENTRIES_PER_BLOCK = RECOVERY_JOURNAL_ENTRIES_PER_SECTOR * 7,
++	/* The number of entries in a v1 recovery journal block. */
++	RECOVERY_JOURNAL_1_ENTRIES_PER_BLOCK = 311,
++	/* The number of entries in each v1 sector (except the last) when filled */
++	RECOVERY_JOURNAL_1_ENTRIES_PER_SECTOR =
++		((VDO_SECTOR_SIZE - sizeof(struct packed_journal_sector)) /
++		 sizeof(struct packed_recovery_journal_entry_1)),
++	/* The number of entries in the last sector when a block is full */
++	RECOVERY_JOURNAL_1_ENTRIES_IN_LAST_SECTOR =
++		(RECOVERY_JOURNAL_1_ENTRIES_PER_BLOCK % RECOVERY_JOURNAL_1_ENTRIES_PER_SECTOR),
++};
++
++/* A type representing a reference count of a block. */
++typedef u8 vdo_refcount_t;
++
++/* The absolute position of an entry in a recovery journal or slab journal. */
++struct journal_point {
++	sequence_number_t sequence_number;
++	journal_entry_count_t entry_count;
++};
++
++/* A packed, platform-independent encoding of a struct journal_point. */
++struct packed_journal_point {
++	/*
++	 * The packed representation is the little-endian 64-bit representation of the low-order 48
++	 * bits of the sequence number, shifted up 16 bits, or'ed with the 16-bit entry count.
++	 *
++	 * Very long-term, the top 16 bits of the sequence number may not always be zero, as this
++	 * encoding assumes--see BZ 1523240.
++	 */
++	__le64 encoded_point;
++} __packed;
++
++/* Special vdo_refcount_t values. */
++#define EMPTY_REFERENCE_COUNT 0
++enum {
++	MAXIMUM_REFERENCE_COUNT = 254,
++	PROVISIONAL_REFERENCE_COUNT = 255,
++};
++
++enum {
++	COUNTS_PER_SECTOR =
++		((VDO_SECTOR_SIZE - sizeof(struct packed_journal_point)) / sizeof(vdo_refcount_t)),
++	COUNTS_PER_BLOCK = COUNTS_PER_SECTOR * VDO_SECTORS_PER_BLOCK,
++};
++
++/* The format of each sector of a reference_block on disk. */
++struct packed_reference_sector {
++	struct packed_journal_point commit_point;
++	vdo_refcount_t counts[COUNTS_PER_SECTOR];
++} __packed;
++
++struct packed_reference_block {
++	struct packed_reference_sector sectors[VDO_SECTORS_PER_BLOCK];
++};
++
++struct slab_depot_state_2_0 {
++	struct slab_config slab_config;
++	physical_block_number_t first_block;
++	physical_block_number_t last_block;
++	zone_count_t zone_count;
++} __packed;
++
++extern const struct header VDO_SLAB_DEPOT_HEADER_2_0;
++
++/*
++ * vdo_slab journal blocks may have one of two formats, depending upon whether or not any of the
++ * entries in the block are block map increments. Since the steady state for a VDO is that all of
++ * the necessary block map pages will be allocated, most slab journal blocks will have only data
++ * entries. Such blocks can hold more entries, hence the two formats.
++ */
++
++/* A single slab journal entry */
++struct slab_journal_entry {
++	slab_block_number sbn;
++	enum journal_operation operation;
++	bool increment;
++};
++
++/* A single slab journal entry in its on-disk form */
++typedef struct {
++	u8 offset_low8;
++	u8 offset_mid8;
++
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++	unsigned offset_high7 : 7;
++	unsigned increment : 1;
++#else
++	unsigned increment : 1;
++	unsigned offset_high7 : 7;
++#endif
++} __packed packed_slab_journal_entry;
++
++/* The unpacked representation of the header of a slab journal block */
++struct slab_journal_block_header {
++	/* Sequence number for head of journal */
 +	sequence_number_t head;
-+	/* The oldest block in the journal which may not be reaped */
-+	sequence_number_t unreapable;
-+	/* The end of the half-open interval of the active journal */
-+	sequence_number_t tail;
-+	/* The next journal block to be committed */
-+	sequence_number_t next_commit;
-+	/* The tail sequence number that is written in the slab summary */
-+	sequence_number_t summarized;
-+	/* The tail sequence number that was last summarized in slab summary */
-+	sequence_number_t last_summarized;
-+
-+	/* The sequence number of the recovery journal lock */
-+	sequence_number_t recovery_lock;
-+
-+	/*
-+	 * The number of entries which fit in a single block. Can't use the constant because unit
-+	 * tests change this number.
-+	 */
-+	journal_entry_count_t entries_per_block;
-+	/*
-+	 * The number of full entries which fit in a single block. Can't use the constant because
-+	 * unit tests change this number.
-+	 */
-+	journal_entry_count_t full_entries_per_block;
-+
-+	/* The recovery journal of the VDO (slab journal holds locks on it) */
-+	struct recovery_journal *recovery_journal;
-+
-+	/* The statistics shared by all slab journals in our physical zone */
-+	struct slab_journal_statistics *events;
-+	/* A list of the VIO pool entries for outstanding journal block writes */
-+	struct list_head uncommitted_blocks;
-+
-+	/*
-+	 * The current tail block header state. This will be packed into the block just before it
-+	 * is written.
-+	 */
-+	struct slab_journal_block_header tail_header;
-+	/* A pointer to a block-sized buffer holding the packed block data */
-+	struct packed_slab_journal_block *block;
-+
-+	/* The number of blocks in the on-disk journal */
-+	block_count_t size;
-+	/* The number of blocks at which to start pushing reference blocks */
-+	block_count_t flushing_threshold;
-+	/* The number of blocks at which all reference blocks should be writing */
-+	block_count_t flushing_deadline;
-+	/* The number of blocks at which to wait for reference blocks to write */
-+	block_count_t blocking_threshold;
-+	/* The number of blocks at which to scrub the slab before coming online */
-+	block_count_t scrubbing_threshold;
-+
-+	/* This list entry is for block_allocator to keep a queue of dirty journals */
-+	struct list_head dirty_entry;
-+
-+	/* The lock for the oldest unreaped block of the journal */
-+	struct journal_lock *reap_lock;
-+	/* The locks for each on disk block */
-+	struct journal_lock *locks;
++	/* Sequence number for this block */
++	sequence_number_t sequence_number;
++	/* The nonce for a given VDO instance */
++	nonce_t nonce;
++	/* Recovery journal point for last entry */
++	struct journal_point recovery_point;
++	/* Metadata type */
++	enum vdo_metadata_type metadata_type;
++	/* Whether this block contains block map increments */
++	bool has_block_map_increments;
++	/* The number of entries in the block */
++	journal_entry_count_t entry_count;
 +};
 +
 +/*
-+ * Reference_block structure
-+ *
-+ * Blocks are used as a proxy, permitting saves of partial refcounts.
++ * The packed, on-disk representation of a slab journal block header. All fields are kept in
++ * little-endian byte order.
 + */
-+struct reference_block {
-+	/* This block waits on the ref_counts to tell it to write */
-+	struct waiter waiter;
-+	/* The slab to which this reference_block belongs */
-+	struct vdo_slab *slab;
-+	/* The number of references in this block that represent allocations */
-+	block_size_t allocated_count;
-+	/* The slab journal block on which this block must hold a lock */
-+	sequence_number_t slab_journal_lock;
-+	/* The slab journal block which should be released when this block is committed */
-+	sequence_number_t slab_journal_lock_to_release;
-+	/* The point up to which each sector is accurate on disk */
-+	struct journal_point commit_points[VDO_SECTORS_PER_BLOCK];
-+	/* Whether this block has been modified since it was written to disk */
-+	bool is_dirty;
-+	/* Whether this block is currently writing */
-+	bool is_writing;
++struct packed_slab_journal_block_header {
++	/* 64-bit sequence number for head of journal */
++	__le64 head;
++	/* 64-bit sequence number for this block */
++	__le64 sequence_number;
++	/* Recovery journal point for the last entry, packed into 64 bits */
++	struct packed_journal_point recovery_point;
++	/* The 64-bit nonce for a given VDO instance */
++	__le64 nonce;
++	/* 8-bit metadata type (should always be two, for the slab journal) */
++	u8 metadata_type;
++	/* Whether this block contains block map increments */
++	bool has_block_map_increments;
++	/* 16-bit count of the entries encoded in the block */
++	__le16 entry_count;
++} __packed;
++
++enum {
++	VDO_SLAB_JOURNAL_PAYLOAD_SIZE =
++		VDO_BLOCK_SIZE - sizeof(struct packed_slab_journal_block_header),
++	VDO_SLAB_JOURNAL_FULL_ENTRIES_PER_BLOCK = (VDO_SLAB_JOURNAL_PAYLOAD_SIZE * 8) / 25,
++	VDO_SLAB_JOURNAL_ENTRY_TYPES_SIZE =
++		((VDO_SLAB_JOURNAL_FULL_ENTRIES_PER_BLOCK - 1) / 8) + 1,
++	VDO_SLAB_JOURNAL_ENTRIES_PER_BLOCK =
++		(VDO_SLAB_JOURNAL_PAYLOAD_SIZE / sizeof(packed_slab_journal_entry)),
 +};
 +
-+/* The search_cursor represents the saved position of a free block search. */
-+struct search_cursor {
-+	/* The reference block containing the current search index */
-+	struct reference_block *block;
-+	/* The position at which to start searching for the next free counter */
-+	slab_block_number index;
-+	/* The position just past the last valid counter in the current block */
-+	slab_block_number end_index;
++/* The payload of a slab journal block which has block map increments */
++struct full_slab_journal_entries {
++	/* The entries themselves */
++	packed_slab_journal_entry entries[VDO_SLAB_JOURNAL_FULL_ENTRIES_PER_BLOCK];
++	/* The bit map indicating which entries are block map increments */
++	u8 entry_types[VDO_SLAB_JOURNAL_ENTRY_TYPES_SIZE];
++} __packed;
 +
-+	/* A pointer to the first reference block in the slab */
-+	struct reference_block *first_block;
-+	/* A pointer to the last reference block in the slab */
-+	struct reference_block *last_block;
++typedef union {
++	/* Entries which include block map increments */
++	struct full_slab_journal_entries full_entries;
++	/* Entries which are only data updates */
++	packed_slab_journal_entry entries[VDO_SLAB_JOURNAL_ENTRIES_PER_BLOCK];
++	/* Ensure the payload fills to the end of the block */
++	u8 space[VDO_SLAB_JOURNAL_PAYLOAD_SIZE];
++} __packed slab_journal_payload;
++
++struct packed_slab_journal_block {
++	struct packed_slab_journal_block_header header;
++	slab_journal_payload payload;
++} __packed;
++
++/* The offset of a slab journal tail block. */
++typedef u8 tail_block_offset_t;
++
++struct slab_summary_entry {
++	/* Bits 7..0: The offset of the tail block within the slab journal */
++	tail_block_offset_t tail_block_offset;
++
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++	/* Bits 13..8: A hint about the fullness of the slab */
++	unsigned int fullness_hint : 6;
++	/* Bit 14: Whether the ref_counts must be loaded from the layer */
++	unsigned int load_ref_counts : 1;
++	/* Bit 15: The believed cleanliness of this slab */
++	unsigned int is_dirty : 1;
++#else
++	/* Bit 15: The believed cleanliness of this slab */
++	unsigned int is_dirty : 1;
++	/* Bit 14: Whether the ref_counts must be loaded from the layer */
++	unsigned int load_ref_counts : 1;
++	/* Bits 13..8: A hint about the fullness of the slab */
++	unsigned int fullness_hint : 6;
++#endif
++} __packed;
++
++enum {
++	VDO_SLAB_SUMMARY_FULLNESS_HINT_BITS = 6,
++	VDO_SLAB_SUMMARY_ENTRIES_PER_BLOCK = VDO_BLOCK_SIZE / sizeof(struct slab_summary_entry),
++	VDO_SLAB_SUMMARY_BLOCKS_PER_ZONE = MAX_VDO_SLABS / VDO_SLAB_SUMMARY_ENTRIES_PER_BLOCK,
++	VDO_SLAB_SUMMARY_BLOCKS = VDO_SLAB_SUMMARY_BLOCKS_PER_ZONE * MAX_VDO_PHYSICAL_ZONES,
 +};
 +
-+enum slab_rebuild_status {
-+	VDO_SLAB_REBUILT,
-+	VDO_SLAB_REPLAYING,
-+	VDO_SLAB_REQUIRES_SCRUBBING,
-+	VDO_SLAB_REQUIRES_HIGH_PRIORITY_SCRUBBING,
-+	VDO_SLAB_REBUILDING,
-+};
-+
-+/*
-+ * This is the type declaration for the vdo_slab type. A vdo_slab currently consists of a run of
-+ * 2^23 data blocks, but that will soon change to dedicate a small number of those blocks for
-+ * metadata storage for the reference counts and slab journal for the slab.
-+ *
-+ * A reference count is maintained for each physical block number. The vast majority of blocks have
-+ * a very small reference count (usually 0 or 1). For references less than or equal to MAXIMUM_REFS
-+ * (254) the reference count is stored in counters[pbn].
-+ */
-+struct vdo_slab {
-+	/* A list entry to queue this slab in a block_allocator list */
-+	struct list_head allocq_entry;
-+
-+	/* The struct block_allocator that owns this slab */
-+	struct block_allocator *allocator;
-+
-+	/* The journal for this slab */
-+	struct slab_journal journal;
-+
-+	/* The slab number of this slab */
-+	slab_count_t slab_number;
-+	/* The offset in the allocator partition of the first block in this slab */
++struct layout {
 +	physical_block_number_t start;
-+	/* The offset of the first block past the end of this slab */
-+	physical_block_number_t end;
-+	/* The starting translated PBN of the slab journal */
-+	physical_block_number_t journal_origin;
-+	/* The starting translated PBN of the reference counts */
-+	physical_block_number_t ref_counts_origin;
-+
-+	/* The administrative state of the slab */
-+	struct admin_state state;
-+	/* The status of the slab */
-+	enum slab_rebuild_status status;
-+	/* Whether the slab was ever queued for scrubbing */
-+	bool was_queued_for_scrubbing;
-+
-+	/* The priority at which this slab has been queued for allocation */
-+	u8 priority;
-+
-+	/* Fields beyond this point are the reference counts for the data blocks in this slab. */
-+	/* The size of the counters array */
-+	u32 block_count;
-+	/* The number of free blocks */
-+	u32 free_blocks;
-+	/* The array of reference counts */
-+	vdo_refcount_t *counters; /* use UDS_ALLOCATE to align data ptr */
-+
-+	/* The saved block pointer and array indexes for the free block search */
-+	struct search_cursor search_cursor;
-+
-+	/* A list of the dirty blocks waiting to be written out */
-+	struct wait_queue dirty_blocks;
-+	/* The number of blocks which are currently writing */
-+	size_t active_count;
-+
-+	/* A waiter object for updating the slab summary */
-+	struct waiter summary_waiter;
-+
-+	/* The latest slab journal for which there has been a reference count update */
-+	struct journal_point slab_journal_point;
-+
-+	/* The number of reference count blocks */
-+	u32 reference_block_count;
-+	/* reference count block array */
-+	struct reference_block *reference_blocks;
++	block_count_t size;
++	physical_block_number_t first_free;
++	physical_block_number_t last_free;
++	size_t num_partitions;
++	struct partition *head;
 +};
 +
-+bool __must_check
-+vdo_attempt_replay_into_slab(struct vdo_slab *slab,
-+			     physical_block_number_t pbn,
-+			     enum journal_operation operation,
-+			     bool increment,
-+			     struct journal_point *recovery_point,
-+			     struct vdo_completion *parent);
++struct partition {
++	enum partition_id id; /* The id of this partition */
++	physical_block_number_t offset; /* The offset into the layout of this partition */
++	block_count_t count; /* The number of blocks in the partition */
++	struct partition *next; /* A pointer to the next partition in the layout */
++};
 +
-+void vdo_notify_slab_journals_are_recovered(struct vdo_completion *completion);
++struct layout_3_0 {
++	physical_block_number_t first_free;
++	physical_block_number_t last_free;
++	u8 partition_count;
++} __packed;
 +
-+#endif /* VDO_SLAB_DEPOT_H */
++struct partition_3_0 {
++	enum partition_id id;
++	physical_block_number_t offset;
++	physical_block_number_t base; /* unused but retained for backwards compatibility */
++	block_count_t count;
++} __packed;
++
++/*
++ * The configuration of the VDO service.
++ */
++struct vdo_config {
++	block_count_t logical_blocks; /* number of logical blocks */
++	block_count_t physical_blocks; /* number of physical blocks */
++	block_count_t slab_size; /* number of blocks in a slab */
++	block_count_t recovery_journal_size; /* number of recovery journal blocks */
++	block_count_t slab_journal_blocks; /* number of slab journal blocks */
++};
++
++/* This is the structure that captures the vdo fields saved as a super block component. */
++struct vdo_component {
++	enum vdo_state state;
++	u64 complete_recoveries;
++	u64 read_only_recoveries;
++	struct vdo_config config;
++	nonce_t nonce;
++};
++
++/*
++ * A packed, machine-independent, on-disk representation of the vdo_config in the VDO component
++ * data in the super block.
++ */
++struct packed_vdo_config {
++	__le64 logical_blocks;
++	__le64 physical_blocks;
++	__le64 slab_size;
++	__le64 recovery_journal_size;
++	__le64 slab_journal_blocks;
++} __packed;
++
++/*
++ * A packed, machine-independent, on-disk representation of version 41.0 of the VDO component data
++ * in the super block.
++ */
++struct packed_vdo_component_41_0 {
++	__le32 state;
++	__le64 complete_recoveries;
++	__le64 read_only_recoveries;
++	struct packed_vdo_config config;
++	__le64 nonce;
++} __packed;
++
++/*
++ * The version of the on-disk format of a VDO volume. This should be incremented any time the
++ * on-disk representation of any VDO structure changes. Changes which require only online upgrade
++ * steps should increment the minor version. Changes which require an offline upgrade or which can
++ * not be upgraded to at all should increment the major version and set the minor version to 0.
++ */
++extern const struct version_number VDO_VOLUME_VERSION_67_0;
++
++enum {
++	VDO_ENCODED_HEADER_SIZE = sizeof(struct packed_header),
++	BLOCK_MAP_COMPONENT_ENCODED_SIZE =
++		VDO_ENCODED_HEADER_SIZE + sizeof(struct block_map_state_2_0),
++	RECOVERY_JOURNAL_COMPONENT_ENCODED_SIZE =
++		VDO_ENCODED_HEADER_SIZE + sizeof(struct recovery_journal_state_7_0),
++	SLAB_DEPOT_COMPONENT_ENCODED_SIZE =
++		VDO_ENCODED_HEADER_SIZE + sizeof(struct slab_depot_state_2_0),
++	VDO_PARTITION_COUNT = 4,
++	VDO_LAYOUT_ENCODED_SIZE = (VDO_ENCODED_HEADER_SIZE +
++				   sizeof(struct layout_3_0) +
++				   (sizeof(struct partition_3_0) * VDO_PARTITION_COUNT)),
++	VDO_SUPER_BLOCK_FIXED_SIZE = VDO_ENCODED_HEADER_SIZE + sizeof(u32),
++	VDO_MAX_COMPONENT_DATA_SIZE = VDO_SECTOR_SIZE - VDO_SUPER_BLOCK_FIXED_SIZE,
++	VDO_COMPONENT_ENCODED_SIZE =
++		(sizeof(struct packed_version_number) + sizeof(struct packed_vdo_component_41_0)),
++	VDO_COMPONENT_DATA_OFFSET = VDO_ENCODED_HEADER_SIZE,
++	VDO_COMPONENT_DATA_SIZE = (sizeof(u32) +
++				   sizeof(struct packed_version_number) +
++				   VDO_COMPONENT_ENCODED_SIZE +
++				   VDO_LAYOUT_ENCODED_SIZE +
++				   RECOVERY_JOURNAL_COMPONENT_ENCODED_SIZE +
++				   SLAB_DEPOT_COMPONENT_ENCODED_SIZE +
++				   BLOCK_MAP_COMPONENT_ENCODED_SIZE),
++};
++
++/* The entirety of the component data encoded in the VDO super block. */
++struct vdo_component_states {
++	/* For backwards compatibility */
++	u32 unused;
++
++	/* The VDO volume version */
++	struct version_number volume_version;
++
++	/* Components */
++	struct vdo_component vdo;
++	struct block_map_state_2_0 block_map;
++	struct recovery_journal_state_7_0 recovery_journal;
++	struct slab_depot_state_2_0 slab_depot;
++
++	/* Our partitioning of the underlying storage */
++	struct layout layout;
++};
++
++/**
++ * vdo_are_same_version() - Check whether two version numbers are the same.
++ * @version_a: The first version.
++ * @version_b: The second version.
++ *
++ * Return: true if the two versions are the same.
++ */
++static inline bool
++vdo_are_same_version(struct version_number version_a, struct version_number version_b)
++{
++	return ((version_a.major_version == version_b.major_version) &&
++		(version_a.minor_version == version_b.minor_version));
++}
++
++/**
++ * vdo_is_upgradable_version() - Check whether an actual version is upgradable to an expected
++ *                               version.
++ * @expected_version: The expected version.
++ * @actual_version: The version being validated.
++ *
++ * An actual version is upgradable if its major number is expected but its minor number differs,
++ * and the expected version's minor number is greater than the actual version's minor number.
++ *
++ * Return: true if the actual version is upgradable.
++ */
++static inline bool vdo_is_upgradable_version(struct version_number expected_version,
++					     struct version_number actual_version)
++{
++	return ((expected_version.major_version == actual_version.major_version) &&
++		(expected_version.minor_version > actual_version.minor_version));
++}
++
++int __must_check vdo_validate_header(const struct header *expected_header,
++				     const struct header *actual_header,
++				     bool exact_size,
++				     const char *component_name);
++
++void vdo_encode_header(u8 *buffer, size_t *offset, const struct header *header);
++void vdo_decode_header(u8 *buffer, size_t *offset, struct header *header);
++
++/**
++ * vdo_pack_version_number() - Convert a version_number to its packed on-disk representation.
++ * @version: The version number to convert.
++ *
++ * Return: the platform-independent representation of the version
++ */
++static inline struct packed_version_number vdo_pack_version_number(struct version_number version)
++{
++	return (struct packed_version_number) {
++		.major_version = __cpu_to_le32(version.major_version),
++		.minor_version = __cpu_to_le32(version.minor_version),
++	};
++}
++
++/**
++ * vdo_unpack_version_number() - Convert a packed_version_number to its native in-memory
++ *                               representation.
++ * @version: The version number to convert.
++ *
++ * Return: The platform-independent representation of the version.
++ */
++static inline struct version_number vdo_unpack_version_number(struct packed_version_number version)
++{
++	return (struct version_number) {
++		.major_version = __le32_to_cpu(version.major_version),
++		.minor_version = __le32_to_cpu(version.minor_version),
++	};
++}
++
++/**
++ * vdo_pack_header() - Convert a component header to its packed on-disk representation.
++ * @header: The header to convert.
++ *
++ * Return: the platform-independent representation of the header
++ */
++static inline struct packed_header vdo_pack_header(const struct header *header)
++{
++	return (struct packed_header) {
++		.id = __cpu_to_le32(header->id),
++		.version = vdo_pack_version_number(header->version),
++		.size = __cpu_to_le64(header->size),
++	};
++}
++
++/**
++ * vdo_unpack_header() - Convert a packed_header to its native in-memory representation.
++ * @header: The header to convert.
++ *
++ * Return: The platform-independent representation of the version.
++ */
++static inline struct header vdo_unpack_header(const struct packed_header *header)
++{
++	return (struct header) {
++		.id = __le32_to_cpu(header->id),
++		.version = vdo_unpack_version_number(header->version),
++		.size = __le64_to_cpu(header->size),
++	};
++}
++
++/**
++ * vdo_get_index_region_start() - Get the start of the index region from a geometry.
++ * @geometry: The geometry.
++ *
++ * Return: The start of the index region.
++ */
++static inline physical_block_number_t __must_check
++vdo_get_index_region_start(struct volume_geometry geometry)
++{
++	return geometry.regions[VDO_INDEX_REGION].start_block;
++}
++
++/**
++ * vdo_get_data_region_start() - Get the start of the data region from a geometry.
++ * @geometry: The geometry.
++ *
++ * Return: The start of the data region.
++ */
++static inline physical_block_number_t __must_check
++vdo_get_data_region_start(struct volume_geometry geometry)
++{
++	return geometry.regions[VDO_DATA_REGION].start_block;
++}
++
++/**
++ * vdo_get_index_region_size() - Get the size of the index region from a geometry.
++ * @geometry: The geometry.
++ *
++ * Return: The size of the index region.
++ */
++static inline physical_block_number_t __must_check
++vdo_get_index_region_size(struct volume_geometry geometry)
++{
++	return vdo_get_data_region_start(geometry) -
++		vdo_get_index_region_start(geometry);
++}
++
++int __must_check vdo_parse_geometry_block(unsigned char *block, struct volume_geometry *geometry);
++
++static inline bool vdo_is_state_compressed(const enum block_mapping_state mapping_state)
++{
++	return (mapping_state > VDO_MAPPING_STATE_UNCOMPRESSED);
++}
++
++static inline struct block_map_entry
++vdo_pack_block_map_entry(physical_block_number_t pbn, enum block_mapping_state mapping_state)
++{
++	return (struct block_map_entry) {
++		.mapping_state = (mapping_state & 0x0F),
++		.pbn_high_nibble = ((pbn >> 32) & 0x0F),
++		.pbn_low_word = __cpu_to_le32(pbn & UINT_MAX),
++	};
++}
++
++static inline struct data_location vdo_unpack_block_map_entry(const struct block_map_entry *entry)
++{
++	physical_block_number_t low32 = __le32_to_cpu(entry->pbn_low_word);
++	physical_block_number_t high4 = entry->pbn_high_nibble;
++
++	return (struct data_location) {
++		.pbn = ((high4 << 32) | low32),
++		.state = entry->mapping_state,
++	};
++}
++
++static inline bool vdo_is_mapped_location(const struct data_location *location)
++{
++	return (location->state != VDO_MAPPING_STATE_UNMAPPED);
++}
++
++static inline bool vdo_is_valid_location(const struct data_location *location)
++{
++	if (location->pbn == VDO_ZERO_BLOCK)
++		return !vdo_is_state_compressed(location->state);
++	else
++		return vdo_is_mapped_location(location);
++}
++
++static inline physical_block_number_t __must_check
++vdo_get_block_map_page_pbn(const struct block_map_page *page)
++{
++	return __le64_to_cpu(page->header.pbn);
++}
++
++struct block_map_page *vdo_format_block_map_page(void *buffer,
++						 nonce_t nonce,
++						 physical_block_number_t pbn,
++						 bool initialized);
++
++enum block_map_page_validity __must_check
++vdo_validate_block_map_page(struct block_map_page *page,
++			    nonce_t nonce,
++			    physical_block_number_t pbn);
++
++static inline page_count_t vdo_compute_block_map_page_count(block_count_t entries)
++{
++	return DIV_ROUND_UP(entries, VDO_BLOCK_MAP_ENTRIES_PER_PAGE);
++}
++
++block_count_t __must_check
++vdo_compute_new_forest_pages(root_count_t root_count,
++			     struct boundary *old_sizes,
++			     block_count_t entries,
++			     struct boundary *new_sizes);
++
++/**
++ * vdo_pack_recovery_journal_entry() - Return the packed, on-disk representation of a recovery
++ *                                     journal entry.
++ * @entry: The journal entry to pack.
++ *
++ * Return: The packed representation of the journal entry.
++ */
++static inline struct packed_recovery_journal_entry
++vdo_pack_recovery_journal_entry(const struct recovery_journal_entry *entry)
++{
++	return (struct packed_recovery_journal_entry) {
++		.operation = entry->operation,
++		.slot_low = entry->slot.slot & 0x3F,
++		.slot_high = (entry->slot.slot >> 6) & 0x0F,
++		.pbn_high_nibble = (entry->slot.pbn >> 32) & 0x0F,
++		.pbn_low_word = __cpu_to_le32(entry->slot.pbn & UINT_MAX),
++		.mapping = vdo_pack_block_map_entry(entry->mapping.pbn, entry->mapping.state),
++		.unmapping = vdo_pack_block_map_entry(entry->unmapping.pbn,
++						      entry->unmapping.state),
++	};
++}
++
++/**
++ * vdo_unpack_recovery_journal_entry() - Unpack the on-disk representation of a recovery journal
++ *                                       entry.
++ * @entry: The recovery journal entry to unpack.
++ *
++ * Return: The unpacked entry.
++ */
++static inline struct recovery_journal_entry
++vdo_unpack_recovery_journal_entry(const struct packed_recovery_journal_entry *entry)
++{
++	physical_block_number_t low32 = __le32_to_cpu(entry->pbn_low_word);
++	physical_block_number_t high4 = entry->pbn_high_nibble;
++
++	return (struct recovery_journal_entry) {
++		.operation = entry->operation,
++		.slot = {
++			.pbn = ((high4 << 32) | low32),
++			.slot = (entry->slot_low | (entry->slot_high << 6)),
++		},
++		.mapping = vdo_unpack_block_map_entry(&entry->mapping),
++		.unmapping = vdo_unpack_block_map_entry(&entry->unmapping),
++	};
++}
++
++const char * __must_check vdo_get_journal_operation_name(enum journal_operation operation);
++
++/**
++ * vdo_is_valid_recovery_journal_sector() - Determine whether the header of the given sector could
++ *                                          describe a valid sector for the given journal block
++ *                                          header.
++ * @header: The unpacked block header to compare against.
++ * @sector: The packed sector to check.
++ * @sector_number: The number of the sector being checked.
++ *
++ * Return: true if the sector matches the block header.
++ */
++static inline bool __must_check
++vdo_is_valid_recovery_journal_sector(const struct recovery_block_header *header,
++				     const struct packed_journal_sector *sector,
++				     u8 sector_number)
++{
++	if ((header->check_byte != sector->check_byte) ||
++	    (header->recovery_count != sector->recovery_count))
++		return false;
++
++	if (header->metadata_type == VDO_METADATA_RECOVERY_JOURNAL_2)
++		return sector->entry_count <= RECOVERY_JOURNAL_ENTRIES_PER_SECTOR;
++
++	if (sector_number == 7)
++		return sector->entry_count <= RECOVERY_JOURNAL_1_ENTRIES_IN_LAST_SECTOR;
++
++	return sector->entry_count <= RECOVERY_JOURNAL_1_ENTRIES_PER_SECTOR;
++}
++
++/**
++ * vdo_compute_recovery_journal_block_number() - Compute the physical block number of the recovery
++ *                                               journal block which would have a given sequence
++ *                                               number.
++ * @journal_size: The size of the journal.
++ * @sequence_number: The sequence number.
++ *
++ * Return: The pbn of the journal block which would the specified sequence number.
++ */
++static inline physical_block_number_t __must_check
++vdo_compute_recovery_journal_block_number(block_count_t journal_size,
++					  sequence_number_t sequence_number)
++{
++	/*
++	 * Since journal size is a power of two, the block number modulus can just be extracted
++	 * from the low-order bits of the sequence.
++	 */
++	return (sequence_number & (journal_size - 1));
++}
++
++/**
++ * vdo_get_journal_block_sector() - Find the recovery journal sector from the block header and
++ *                                  sector number.
++ * @header: The header of the recovery journal block.
++ * @sector_number: The index of the sector (1-based).
++ *
++ * Return: A packed recovery journal sector.
++ */
++static inline struct packed_journal_sector * __must_check
++vdo_get_journal_block_sector(struct packed_journal_header *header, int sector_number)
++{
++	char *sector_data = ((char *) header) + (VDO_SECTOR_SIZE * sector_number);
++
++	return (struct packed_journal_sector *) sector_data;
++}
++
++/**
++ * vdo_pack_recovery_block_header() - Generate the packed representation of a recovery block
++ *                                    header.
++ * @header: The header containing the values to encode.
++ * @packed: The header into which to pack the values.
++ */
++static inline void vdo_pack_recovery_block_header(const struct recovery_block_header *header,
++						  struct packed_journal_header *packed)
++{
++	*packed = (struct packed_journal_header) {
++		.block_map_head = __cpu_to_le64(header->block_map_head),
++		.slab_journal_head = __cpu_to_le64(header->slab_journal_head),
++		.sequence_number = __cpu_to_le64(header->sequence_number),
++		.nonce = __cpu_to_le64(header->nonce),
++		.logical_blocks_used = __cpu_to_le64(header->logical_blocks_used),
++		.block_map_data_blocks = __cpu_to_le64(header->block_map_data_blocks),
++		.entry_count = __cpu_to_le16(header->entry_count),
++		.check_byte = header->check_byte,
++		.recovery_count = header->recovery_count,
++		.metadata_type = header->metadata_type,
++	};
++}
++
++/**
++ * vdo_unpack_recovery_block_header() - Decode the packed representation of a recovery block
++ *                                      header.
++ * @packed: The packed header to decode.
++ *
++ * Return: The unpacked header.
++ */
++static inline struct recovery_block_header
++vdo_unpack_recovery_block_header(const struct packed_journal_header *packed)
++{
++	return (struct recovery_block_header) {
++		.block_map_head = __le64_to_cpu(packed->block_map_head),
++		.slab_journal_head = __le64_to_cpu(packed->slab_journal_head),
++		.sequence_number = __le64_to_cpu(packed->sequence_number),
++		.nonce = __le64_to_cpu(packed->nonce),
++		.logical_blocks_used = __le64_to_cpu(packed->logical_blocks_used),
++		.block_map_data_blocks = __le64_to_cpu(packed->block_map_data_blocks),
++		.entry_count = __le16_to_cpu(packed->entry_count),
++		.check_byte = packed->check_byte,
++		.recovery_count = packed->recovery_count,
++		.metadata_type = packed->metadata_type,
++	};
++}
++
++/**
++ * vdo_compute_slab_count() - Compute the number of slabs a depot with given parameters would have.
++ * @first_block: PBN of the first data block.
++ * @last_block: PBN of the last data block.
++ * @slab_size_shift: Exponent for the number of blocks per slab.
++ *
++ * Return: The number of slabs.
++ */
++static inline slab_count_t
++vdo_compute_slab_count(physical_block_number_t first_block,
++		       physical_block_number_t last_block,
++		       unsigned int slab_size_shift)
++{
++	return (slab_count_t) ((last_block - first_block) >> slab_size_shift);
++}
++
++int __must_check vdo_configure_slab_depot(const struct partition *partition,
++					  struct slab_config slab_config,
++					  zone_count_t zone_count,
++					  struct slab_depot_state_2_0 *state);
++
++int __must_check vdo_configure_slab(block_count_t slab_size,
++				    block_count_t slab_journal_blocks,
++				    struct slab_config *slab_config);
++
++/**
++ * vdo_get_saved_reference_count_size() - Get the number of blocks required to save a reference
++ *                                        counts state covering the specified number of data
++ *                                        blocks.
++ * @block_count: The number of physical data blocks that can be referenced.
++ *
++ * Return: The number of blocks required to save reference counts with the given block count.
++ */
++static inline block_count_t
++vdo_get_saved_reference_count_size(block_count_t block_count)
++{
++	return DIV_ROUND_UP(block_count, COUNTS_PER_BLOCK);
++}
++
++/**
++ * vdo_get_slab_journal_start_block() - Get the physical block number of the start of the slab
++ *                                      journal relative to the start block allocator partition.
++ * @slab_config: The slab configuration of the VDO.
++ * @origin: The first block of the slab.
++ */
++static inline physical_block_number_t __must_check
++vdo_get_slab_journal_start_block(const struct slab_config *slab_config,
++				 physical_block_number_t origin)
++{
++	return origin + slab_config->data_blocks + slab_config->reference_count_blocks;
++}
++
++/**
++ * vdo_advance_journal_point() - Move the given journal point forward by one entry.
++ * @point: The journal point to adjust.
++ * @entries_per_block: The number of entries in one full block.
++ */
++static inline void
++vdo_advance_journal_point(struct journal_point *point, journal_entry_count_t entries_per_block)
++{
++	point->entry_count++;
++	if (point->entry_count == entries_per_block) {
++		point->sequence_number++;
++		point->entry_count = 0;
++	}
++}
++
++/**
++ * vdo_before_journal_point() - Check whether the first point precedes the second point.
++ * @first: The first journal point.
++ * @second: The second journal point.
++ *
++ * Return: true if the first point precedes the second point.
++ */
++static inline bool
++vdo_before_journal_point(const struct journal_point *first, const struct journal_point *second)
++{
++	return ((first->sequence_number < second->sequence_number) ||
++		((first->sequence_number == second->sequence_number) &&
++		 (first->entry_count < second->entry_count)));
++}
++
++/**
++ * vdo_pack_journal_point() - Encode the journal location represented by a
++ *                            journal_point into a packed_journal_point.
++ * @unpacked: The unpacked input point.
++ * @packed: The packed output point.
++ */
++static inline void
++vdo_pack_journal_point(const struct journal_point *unpacked, struct packed_journal_point *packed)
++{
++	packed->encoded_point =
++		__cpu_to_le64((unpacked->sequence_number << 16) | unpacked->entry_count);
++}
++
++/**
++ * vdo_unpack_journal_point() - Decode the journal location represented by a packed_journal_point
++ *                              into a journal_point.
++ * @packed: The packed input point.
++ * @unpacked: The unpacked output point.
++ */
++static inline void
++vdo_unpack_journal_point(const struct packed_journal_point *packed, struct journal_point *unpacked)
++{
++	u64 native = __le64_to_cpu(packed->encoded_point);
++
++	unpacked->sequence_number = (native >> 16);
++	unpacked->entry_count = (native & 0xffff);
++}
++
++/**
++ * vdo_pack_slab_journal_block_header() - Generate the packed representation of a slab block
++ *                                        header.
++ * @header: The header containing the values to encode.
++ * @packed: The header into which to pack the values.
++ */
++static inline void
++vdo_pack_slab_journal_block_header(const struct slab_journal_block_header *header,
++				   struct packed_slab_journal_block_header *packed)
++{
++	packed->head = __cpu_to_le64(header->head);
++	packed->sequence_number = __cpu_to_le64(header->sequence_number);
++	packed->nonce = __cpu_to_le64(header->nonce);
++	packed->entry_count = __cpu_to_le16(header->entry_count);
++	packed->metadata_type = header->metadata_type;
++	packed->has_block_map_increments = header->has_block_map_increments;
++
++	vdo_pack_journal_point(&header->recovery_point, &packed->recovery_point);
++}
++
++/**
++ * vdo_unpack_slab_journal_block_header() - Decode the packed representation of a slab block
++ *                                          header.
++ * @packed: The packed header to decode.
++ * @header: The header into which to unpack the values.
++ */
++static inline void
++vdo_unpack_slab_journal_block_header(const struct packed_slab_journal_block_header *packed,
++				     struct slab_journal_block_header *header)
++{
++	*header = (struct slab_journal_block_header) {
++		.head = __le64_to_cpu(packed->head),
++		.sequence_number = __le64_to_cpu(packed->sequence_number),
++		.nonce = __le64_to_cpu(packed->nonce),
++		.entry_count = __le16_to_cpu(packed->entry_count),
++		.metadata_type = packed->metadata_type,
++		.has_block_map_increments = packed->has_block_map_increments,
++	};
++	vdo_unpack_journal_point(&packed->recovery_point, &header->recovery_point);
++}
++
++/**
++ * vdo_pack_slab_journal_entry() - Generate the packed encoding of a slab journal entry.
++ * @packed: The entry into which to pack the values.
++ * @sbn: The slab block number of the entry to encode.
++ * @is_increment: The increment flag.
++ */
++static inline void vdo_pack_slab_journal_entry(packed_slab_journal_entry *packed,
++					       slab_block_number sbn,
++					       bool is_increment)
++{
++	packed->offset_low8 = (sbn & 0x0000FF);
++	packed->offset_mid8 = (sbn & 0x00FF00) >> 8;
++	packed->offset_high7 = (sbn & 0x7F0000) >> 16;
++	packed->increment = is_increment ? 1 : 0;
++}
++
++/**
++ * vdo_unpack_slab_journal_entry() - Decode the packed representation of a slab journal entry.
++ * @packed: The packed entry to decode.
++ *
++ * Return: The decoded slab journal entry.
++ */
++static inline struct slab_journal_entry __must_check
++vdo_unpack_slab_journal_entry(const packed_slab_journal_entry *packed)
++{
++	struct slab_journal_entry entry;
++
++	entry.sbn = packed->offset_high7;
++	entry.sbn <<= 8;
++	entry.sbn |= packed->offset_mid8;
++	entry.sbn <<= 8;
++	entry.sbn |= packed->offset_low8;
++	entry.operation = VDO_JOURNAL_DATA_REMAPPING;
++	entry.increment = packed->increment;
++	return entry;
++}
++
++struct slab_journal_entry __must_check
++vdo_decode_slab_journal_entry(struct packed_slab_journal_block *block,
++			      journal_entry_count_t entry_count);
++
++/**
++ * vdo_get_slab_summary_hint_shift() - Compute the shift for slab summary hints.
++ * @slab_size_shift: Exponent for the number of blocks per slab.
++ *
++ * Return: The hint shift.
++ */
++static inline u8 __must_check vdo_get_slab_summary_hint_shift(unsigned int slab_size_shift)
++{
++	return ((slab_size_shift > VDO_SLAB_SUMMARY_FULLNESS_HINT_BITS) ?
++		(slab_size_shift - VDO_SLAB_SUMMARY_FULLNESS_HINT_BITS) :
++		0);
++}
++
++int __must_check vdo_initialize_layout(block_count_t size,
++				       physical_block_number_t offset,
++				       block_count_t block_map_blocks,
++				       block_count_t journal_blocks,
++				       block_count_t summary_blocks,
++				       struct layout *layout);
++
++void vdo_uninitialize_layout(struct layout *layout);
++
++int __must_check vdo_get_partition(struct layout *layout,
++				   enum partition_id id,
++				   struct partition **partition_ptr);
++
++struct partition * __must_check
++vdo_get_known_partition(struct layout *layout, enum partition_id id);
++
++int vdo_validate_config(const struct vdo_config *config,
++			block_count_t physical_block_count,
++			block_count_t logical_block_count);
++
++void vdo_destroy_component_states(struct vdo_component_states *states);
++
++int __must_check
++vdo_decode_component_states(u8 *buffer,
++			    struct volume_geometry *geometry,
++			    struct vdo_component_states *states);
++
++int __must_check
++vdo_validate_component_states(struct vdo_component_states *states,
++			      nonce_t geometry_nonce,
++			      block_count_t physical_size,
++			      block_count_t logical_size);
++
++void vdo_encode_super_block(u8 *buffer, struct vdo_component_states *states);
++int __must_check vdo_decode_super_block(u8 *buffer);
++
++/* We start with 0L and postcondition with ~0L to match our historical usage in userspace. */
++static inline u32 vdo_crc32(const void *buf, unsigned long len)
++{
++	return (crc32(0L, buf, len) ^ ~0L);
++}
++
++#endif /* VDO_ENCODINGS_H */
 -- 
 2.40.0
 
