@@ -2,108 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09995C25B6E
-	for <linux-block@archiver.kernel.org>; Fri, 27 Oct 2023 12:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD58C25B47
+	for <linux-block@archiver.kernel.org>; Fri, 27 Oct 2023 18:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345686AbjJ0MGQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Oct 2023 08:06:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56304 "EHLO
+        id S232483AbjJ0SUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Oct 2023 14:20:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345787AbjJ0MGP (ORCPT
+        with ESMTP id S232615AbjJ0ST7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Oct 2023 08:06:15 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B6011F
-        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2023 05:06:13 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cc209561c3so90545ad.0
-        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2023 05:06:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698408372; x=1699013172; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MQHQ463K822d0eu3lSUzX50hYKP6nmOhDBx20ObjtTc=;
-        b=I2oYKKgAC1sTJYcIs5n2w/uDCwCmxUcLpbJVQBcv31qrGHWyQ45G8uWgU0EpzwU65i
-         /aktVLo94NjG1Ceq+VaSXNAWK2kxF92RUlFOuV4ljVloYQsWeRDwNMRIMrWEV051HUYV
-         GS7SSB+Es8bwa2ttJgjDDopbgmqvC20qTKAn50Vb1XujZyYA1QaTXfdoGdE6183ARW4k
-         Zsi1eGiP2T7JLgzTh0VW+cSb/+dhiV0+RuHyciakgJ10Fk3KeXtvDAk/jYarg4bG3roK
-         Lxbvv5oBH/azAgWljC3DBSVf/qOVt/vD9aJPwp9P/3TgQHxxYqrt2M81nXh9OKh5ofI7
-         wbDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698408372; x=1699013172;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MQHQ463K822d0eu3lSUzX50hYKP6nmOhDBx20ObjtTc=;
-        b=ITkscJIw47LsKEHGfKL4Ga94zJrZkZU6Xm+fgQ/dR1QTQczgpXWPg2ot39Dh6QdP8c
-         +IYQN9aenu9gfKvb+zclgD5oAh5De13l5Dbomh3DuEXVm9vRiB0gVZ4sAAYePdvHPaFY
-         HXar0sXZGG39BK3qJz+ov23qkXqX1q/k3Z310sfDg/BnpfhufdO4O7Meqn15+chF7G+q
-         xMaWqdCfmMSnyQ7bNEKz55oY5QUgiRu2Yz3VXyzrHMY8LoJ8Ag1/yf5C2gdzZxKrSYJ1
-         jJLmN7XghTwHmZiagzuJEMkKX82tQFxm2hkUoBVibIE5lag5uAJaO6h6tQpApGdopi+3
-         aGqQ==
-X-Gm-Message-State: AOJu0Yzs0/urSaTjR268bj7KgqnGE5Y57zjH+5n7nQA/8+oMM9x6yUQj
-        0tUoh4VyaBsAJIj6QF2colME68ON/btyA2I//fyLFw==
-X-Google-Smtp-Source: AGHT+IHaExLG43RBJIionRW/c9b84KpmLdtS6fNiD0MK5F1uxefsg3PebOwhWetdV53Pmmf6YDEOuPH/Hzj0pzzd92E=
-X-Received: by 2002:a17:902:ea0e:b0:1ca:209c:d7b9 with SMTP id
- s14-20020a170902ea0e00b001ca209cd7b9mr217852plg.2.1698408372181; Fri, 27 Oct
- 2023 05:06:12 -0700 (PDT)
+        Fri, 27 Oct 2023 14:19:59 -0400
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E04196
+        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2023 11:19:56 -0700 (PDT)
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39RE5YgB006135
+        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2023 11:19:56 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=14K4aSvh9zzHeXc3eYmxxneQuIpMkFPFLr74aX4jAbM=;
+ b=TGJuFBE1aQjjfurggepHZ27mNihKdx2Cf+0ozDFYC96is4pMipoL1wxmKukgQ4daoIXR
+ U8S8JrYgx1OEvPlyXy2wyqzAiNZKENQHJIVAiv0oaJcQDpEdu+m/19eYTERHWTvLL0J6
+ cfICDNy98PCDuTh1hB0uxaZb3cCg24DbS6XjF5pPnA6yT6PGfaHpqUGLuiY8OAyIxkKn
+ FOoMGsjTg8pwNSSfbiiUSAydR3tYLBN2V8xm7OOAQ1b8feFhNTJhsFmJrTaKYZSrl5Gi
+ eWKAzepqdRvvehXHXf0nKNB3LUXGbpa025Q/1V1Dnq/1Qs15LKoIYnAN1NcUvOEZw2Zw HA== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3u0c4pu407-4
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2023 11:19:56 -0700
+Received: from twshared16118.09.ash9.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a8:82::b) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 27 Oct 2023 11:19:54 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 3ADAD20D0939E; Fri, 27 Oct 2023 11:19:36 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <io-uring@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <hch@lst.de>, <joshi.k@samsung.com>,
+        <martin.petersen@oracle.com>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 0/4] block integrity: directly map user space addresses
+Date:   Fri, 27 Oct 2023 11:19:25 -0700
+Message-ID: <20231027181929.2589937-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230704122727.17096-1-jack@suse.cz> <20230704125702.23180-1-jack@suse.cz>
- <20230822053523.GA8949@sol.localdomain> <20230822101154.7udsf4tdwtns2prj@quack3>
- <CANp29Y6uBuSzLXuCMGzVNZjT+xFqV4dtWKWb7GR7Opx__Diuzg@mail.gmail.com> <20231024111015.k4sbjpw5fa46k6il@quack3>
-In-Reply-To: <20231024111015.k4sbjpw5fa46k6il@quack3>
-From:   Aleksandr Nogikh <nogikh@google.com>
-Date:   Fri, 27 Oct 2023 14:06:00 +0200
-Message-ID: <CANp29Y7kB5rYqmig3bmzGkCc9CVZk9d=LVEPx9_Z+binfwzqEw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
- mounted devices
-To:     Jan Kara <jack@suse.cz>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
-        Ted Tso <tytso@mit.edu>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Dmitry Vyukov <dvyukov@google.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: H6QB65NB7nYSZsNatm27fcYAf1D9tRBz
+X-Proofpoint-ORIG-GUID: H6QB65NB7nYSZsNatm27fcYAf1D9tRBz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-27_17,2023-10-27_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I see, thanks for sharing the details!
+From: Keith Busch <kbusch@kernel.org>
 
-We'll set CONFIG_BLK_DEV_WRITE_MOUNTED=3Dn on syzbot once the series is
-in linux-next.
+Handling passthrough metadata ("integrity") today introduces overhead
+and complications that we can avoid if we just map user space addresses
+directly. This patch series implements that, falling back to a kernel
+bounce buffer if necessary.
 
-On Tue, Oct 24, 2023 at 1:10=E2=80=AFPM Jan Kara <jack@suse.cz> wrote:
->
-> Hi!
->
-> On Thu 19-10-23 11:16:55, Aleksandr Nogikh wrote:
-> > Thank you for the series!
-> >
-> > Have you already had a chance to push an updated version of it?
-> > I tried to search LKML, but didn't find anything.
-> >
-> > Or did you decide to put it off until later?
->
-> So there is preliminary series sitting in VFS tree that changes how block
-> devices are open. There are some conflicts with btrfs tree and bcachefs
-> merge that complicate all this (plus there was quite some churn in VFS
-> itself due to changing rules how block devices are open) so I didn't push
-> out the series that actually forbids opening of mounted block devices
-> because that would cause a "merge from hell" issues. I plan to push out t=
-he
-> remaining patches once the merge window closes and all the dependencies a=
-re
-> hopefully in a stable state. Maybe I can push out the series earlier base=
-d
-> on linux-next so that people can have a look at the current state.
->
->                                                                 Honza
-> --
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+v1->v2:
+
+  Bounce to a kernel buffer if the user buffer fails to map to the
+  device's integrity constraints. The user address remains pinned for
+  the duration of the IO, which makes the copy out on completion safe
+  within interrupt context.
+
+  Merged up to current io_uring branch, which moved the driver owned
+  flags to a different file.
+
+Keith Busch (4):
+  block: bio-integrity: directly map user buffers
+  nvme: use bio_integrity_map_user
+  iouring: remove IORING_URING_CMD_POLLED
+  io_uring: remove uring_cmd cookie
+
+ block/bio-integrity.c     | 202 ++++++++++++++++++++++++++++++++++++++
+ drivers/nvme/host/ioctl.c | 174 +++++---------------------------
+ include/linux/bio.h       |   9 ++
+ include/linux/io_uring.h  |   9 +-
+ io_uring/uring_cmd.c      |   1 -
+ 5 files changed, 240 insertions(+), 155 deletions(-)
+
+--=20
+2.34.1
+
