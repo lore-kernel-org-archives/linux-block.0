@@ -2,190 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03866C25B6E
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 22:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09995C25B6E
+	for <linux-block@archiver.kernel.org>; Fri, 27 Oct 2023 12:06:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233234AbjJZWMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 18:12:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44626 "EHLO
+        id S1345686AbjJ0MGQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Oct 2023 08:06:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232148AbjJZWMk (ORCPT
+        with ESMTP id S1345787AbjJ0MGP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 18:12:40 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DD71BC
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 15:12:37 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3b2ea7cc821so930768b6e.1
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 15:12:37 -0700 (PDT)
+        Fri, 27 Oct 2023 08:06:15 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B6011F
+        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2023 05:06:13 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cc209561c3so90545ad.0
+        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2023 05:06:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1698358357; x=1698963157; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698408372; x=1699013172; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FyK27xM5kbIwxsUoSw19E95taRzCJvDq3pVbOquRTi4=;
-        b=RXB7vqUAQsVEoZtRnFcdwYSMSXtc6c9LbA0lTagpouOf01fdEEmMG0mdf4oUFGWoXn
-         wX06Td0qAOWNkEHp3LGRHVBIR85hpq6/bixg9NCs4nNMlukR8hX61IFeAyd9vgruIQpk
-         lEpnq5MTR7WIRemsye5aM2xL/+e1CHKBCNGb2bdDxYPmdU6COWsEnMRA+T5FG2tqeN4g
-         Zw36RqRt4PbyVAeE/GQ4mkaWZ5qIt9qNx0IN9LDpugEg62bd2mMwMzhJDDTebIdtTH9Y
-         L3lcvKsF1h9z/rebYStWYhl+G714T4BTrWjvL2WS40q2BSMBlM7CfDqoaI3mE02tXDGJ
-         NAtQ==
+        bh=MQHQ463K822d0eu3lSUzX50hYKP6nmOhDBx20ObjtTc=;
+        b=I2oYKKgAC1sTJYcIs5n2w/uDCwCmxUcLpbJVQBcv31qrGHWyQ45G8uWgU0EpzwU65i
+         /aktVLo94NjG1Ceq+VaSXNAWK2kxF92RUlFOuV4ljVloYQsWeRDwNMRIMrWEV051HUYV
+         GS7SSB+Es8bwa2ttJgjDDopbgmqvC20qTKAn50Vb1XujZyYA1QaTXfdoGdE6183ARW4k
+         Zsi1eGiP2T7JLgzTh0VW+cSb/+dhiV0+RuHyciakgJ10Fk3KeXtvDAk/jYarg4bG3roK
+         Lxbvv5oBH/azAgWljC3DBSVf/qOVt/vD9aJPwp9P/3TgQHxxYqrt2M81nXh9OKh5ofI7
+         wbDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698358357; x=1698963157;
+        d=1e100.net; s=20230601; t=1698408372; x=1699013172;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FyK27xM5kbIwxsUoSw19E95taRzCJvDq3pVbOquRTi4=;
-        b=bLrHa16E6VVQHeKz6W5BD/+gXavXlJpJPhQzwfj6XgMZFlCFiMEfUuAuVt60ZbaW4A
-         dFIfUuigKy+upbcv4FvXAFLIeLhEQ7wWJFcWiltnUzzU6atV12DAct1JwZRshJKVl/X4
-         PT6QJN4AUHzJ2a8MznRdJhoNTmrdIivvKoPjAl1iEo9GMUtZy6AOx+9Y/Zn1JoGDn/HS
-         ewbYOMWiw/I1yw5sGoasmI9WLu7lTvqb8L8ISJqmyxiAwucxE+kguE0pvjlWmwibW9YC
-         w3pFiko6UaFh7ple7J0ZzzYGHmzTpclK8+WdpJUK1Cb0zpw0FG27cG9b5u/mvFeVsnR9
-         imMA==
-X-Gm-Message-State: AOJu0YyzNSysbffS2r0+xxKttiimMHeLvXiM+ls1Oc/aW8OPOrJbvjo9
-        9x50l9BH1XUR0oGtrsorA/JwtqvRLeAoyhfAg86P
-X-Google-Smtp-Source: AGHT+IH4B/F3jSVT6Nn8xcRQnsJ1uiLuOsG9IZM1z8u2NT76JtjnCTm3iCfolyAhImJmOOQWCLxEEJfWlt1eadUfIHE=
-X-Received: by 2002:a05:6808:4d9:b0:3b2:e5f2:5a59 with SMTP id
- a25-20020a05680804d900b003b2e5f25a59mr797519oie.35.1698358356906; Thu, 26 Oct
- 2023 15:12:36 -0700 (PDT)
+        bh=MQHQ463K822d0eu3lSUzX50hYKP6nmOhDBx20ObjtTc=;
+        b=ITkscJIw47LsKEHGfKL4Ga94zJrZkZU6Xm+fgQ/dR1QTQczgpXWPg2ot39Dh6QdP8c
+         +IYQN9aenu9gfKvb+zclgD5oAh5De13l5Dbomh3DuEXVm9vRiB0gVZ4sAAYePdvHPaFY
+         HXar0sXZGG39BK3qJz+ov23qkXqX1q/k3Z310sfDg/BnpfhufdO4O7Meqn15+chF7G+q
+         xMaWqdCfmMSnyQ7bNEKz55oY5QUgiRu2Yz3VXyzrHMY8LoJ8Ag1/yf5C2gdzZxKrSYJ1
+         jJLmN7XghTwHmZiagzuJEMkKX82tQFxm2hkUoBVibIE5lag5uAJaO6h6tQpApGdopi+3
+         aGqQ==
+X-Gm-Message-State: AOJu0Yzs0/urSaTjR268bj7KgqnGE5Y57zjH+5n7nQA/8+oMM9x6yUQj
+        0tUoh4VyaBsAJIj6QF2colME68ON/btyA2I//fyLFw==
+X-Google-Smtp-Source: AGHT+IHaExLG43RBJIionRW/c9b84KpmLdtS6fNiD0MK5F1uxefsg3PebOwhWetdV53Pmmf6YDEOuPH/Hzj0pzzd92E=
+X-Received: by 2002:a17:902:ea0e:b0:1ca:209c:d7b9 with SMTP id
+ s14-20020a170902ea0e00b001ca209cd7b9mr217852plg.2.1698408372181; Fri, 27 Oct
+ 2023 05:06:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <1696457386-3010-6-git-send-email-wufan@linux.microsoft.com>
- <c53599e9d278fc55be30e3bac9411328.paul@paul-moore.com> <616a6fd7-47b1-4b46-af23-46f9b1a3eedf@linux.microsoft.com>
-In-Reply-To: <616a6fd7-47b1-4b46-af23-46f9b1a3eedf@linux.microsoft.com>
-From:   Paul Moore <paul@paul-moore.com>
-Date:   Thu, 26 Oct 2023 18:12:26 -0400
-Message-ID: <CAHC9VhScdtqJeUTTUQVk4D70tTLz4TgU_aRTMRnHa0OARyubaw@mail.gmail.com>
-Subject: Re: [PATCH RFC v11 5/19] ipe: introduce 'boot_verified' as a trust provider
-To:     Fan Wu <wufan@linux.microsoft.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, audit@vger.kernel.org,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
+References: <20230704122727.17096-1-jack@suse.cz> <20230704125702.23180-1-jack@suse.cz>
+ <20230822053523.GA8949@sol.localdomain> <20230822101154.7udsf4tdwtns2prj@quack3>
+ <CANp29Y6uBuSzLXuCMGzVNZjT+xFqV4dtWKWb7GR7Opx__Diuzg@mail.gmail.com> <20231024111015.k4sbjpw5fa46k6il@quack3>
+In-Reply-To: <20231024111015.k4sbjpw5fa46k6il@quack3>
+From:   Aleksandr Nogikh <nogikh@google.com>
+Date:   Fri, 27 Oct 2023 14:06:00 +0200
+Message-ID: <CANp29Y7kB5rYqmig3bmzGkCc9CVZk9d=LVEPx9_Z+binfwzqEw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
+ mounted devices
+To:     Jan Kara <jack@suse.cz>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
+        Ted Tso <tytso@mit.edu>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        Dmitry Vyukov <dvyukov@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 26, 2023 at 5:33=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
-wrote:
-> On 10/23/2023 8:52 PM, Paul Moore wrote:
-> > On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
-> >>
-> >> IPE is designed to provide system level trust guarantees, this usually
-> >> implies that trust starts from bootup with a hardware root of trust,
-> >> which validates the bootloader. After this, the bootloader verifies th=
-e
-> >> kernel and the initramfs.
-> >>
-> >> As there's no currently supported integrity method for initramfs, and
-> >> it's typically already verified by the bootloader, introduce a propert=
-y
-> >> that causes the first superblock to have an execution to be "pinned",
-> >> which is typically initramfs.
-> >>
-> >> When the "pinned" device is unmounted, it will be "unpinned" and
-> >> `boot_verified` property will always evaluate to false afterward.
-> >>
-> >> We use a pointer with a spin_lock to "pin" the device instead of rcu
-> >> because rcu synchronization may sleep, which is not allowed when
-> >> unmounting a device.
-> >>
-> >> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> >> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> ...
-> >> ---
-> >>   security/ipe/eval.c          | 72 ++++++++++++++++++++++++++++++++++=
-+-
-> >>   security/ipe/eval.h          |  2 +
-> >>   security/ipe/hooks.c         | 12 ++++++
-> >>   security/ipe/hooks.h         |  2 +
-> >>   security/ipe/ipe.c           |  1 +
-> >>   security/ipe/policy.h        |  2 +
-> >>   security/ipe/policy_parser.c | 35 +++++++++++++++++-
-> >>   7 files changed, 124 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/security/ipe/eval.c b/security/ipe/eval.c
-> >> index 8a8bcc5c7d7f..bdac4abc0ddb 100644
-> >> --- a/security/ipe/eval.c
-> >> +++ b/security/ipe/eval.c
-> >> @@ -9,6 +9,7 @@
-> >>   #include <linux/file.h>
-> >>   #include <linux/sched.h>
-> >>   #include <linux/rcupdate.h>
-> >> +#include <linux/spinlock.h>
-> >>
-> >>   #include "ipe.h"
-> >>   #include "eval.h"
-> >> @@ -16,6 +17,44 @@
-> >>
-> >>   struct ipe_policy __rcu *ipe_active_policy;
-> >>
-> >> +static const struct super_block *pinned_sb;
-> >> +static DEFINE_SPINLOCK(pin_lock);
-> >> +#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
-> >> +
-> >> +/**
-> >> + * pin_sb - Pin the underlying superblock of @f, marking it as truste=
-d.
-> >> + * @sb: Supplies a super_block structure to be pinned.
-> >> + */
-> >> +static void pin_sb(const struct super_block *sb)
-> >> +{
-> >> +    if (!sb)
-> >> +            return;
-> >> +    spin_lock(&pin_lock);
-> >> +    if (!pinned_sb)
-> >> +            pinned_sb =3D sb;
-> >> +    spin_unlock(&pin_lock);
-> >> +}
-> >> +
-> >> +/**
-> >> + * from_pinned - Determine whether @sb is the pinned super_block.
-> >> + * @sb: Supplies a super_block to check against the pinned super_bloc=
-k.
-> >> + *
-> >> + * Return:
-> >> + * * true   - @sb is the pinned super_block
-> >> + * * false  - @sb is not the pinned super_block
-> >> + */
-> >> +static bool from_pinned(const struct super_block *sb)
-> >> +{
-> >> +    bool rv;
-> >> +
-> >> +    if (!sb)
-> >> +            return false;
-> >> +    spin_lock(&pin_lock);
-> >> +    rv =3D !IS_ERR_OR_NULL(pinned_sb) && pinned_sb =3D=3D sb;
-> >> +    spin_unlock(&pin_lock);
-> >
-> > It's okay for an initial version, but I still think you need to get
-> > away from this spinlock in from_pinned() as quickly as possible.
-> > Maybe I'm wrong, but this looks like a major source of lock contention.
-> >
-> > I understand the issue around RCU and the potential for matching on
-> > a reused buffer/address, but if you modified IPE to have its own LSM
-> > security blob in super_block::security you could mark the superblock
-> > when it was mounted and do a lockless lookup here in from_pinned().
+I see, thanks for sharing the details!
+
+We'll set CONFIG_BLK_DEV_WRITE_MOUNTED=3Dn on syzbot once the series is
+in linux-next.
+
+On Tue, Oct 24, 2023 at 1:10=E2=80=AFPM Jan Kara <jack@suse.cz> wrote:
 >
-> Thank you for the suggestion. After some testing, I discovered that
-> switching to RCU to pin the super block and using a security blob to
-> mark a pinned super block works. This approach do avoid many spinlock
-> operations. I'll incorporate these changes in the next version of the pat=
-ch.
-
-I probably wasn't as clear as I should have been, I was thinking of
-doing away with the @pinned_sb global variable entirely, as well as
-its associated lock problems and simply marking the initramfs/initrd
-superblock when it was mounted.  I will admit that I haven't fully
-thought about all the implementation details, but I think you could
-leverage the security_sb_mount() hook to set a flag in IPE's
-superblock metadata when the initramfs was mounted.
-
---
-paul-moore.com
+> Hi!
+>
+> On Thu 19-10-23 11:16:55, Aleksandr Nogikh wrote:
+> > Thank you for the series!
+> >
+> > Have you already had a chance to push an updated version of it?
+> > I tried to search LKML, but didn't find anything.
+> >
+> > Or did you decide to put it off until later?
+>
+> So there is preliminary series sitting in VFS tree that changes how block
+> devices are open. There are some conflicts with btrfs tree and bcachefs
+> merge that complicate all this (plus there was quite some churn in VFS
+> itself due to changing rules how block devices are open) so I didn't push
+> out the series that actually forbids opening of mounted block devices
+> because that would cause a "merge from hell" issues. I plan to push out t=
+he
+> remaining patches once the merge window closes and all the dependencies a=
+re
+> hopefully in a stable state. Maybe I can push out the series earlier base=
+d
+> on linux-next so that people can have a look at the current state.
+>
+>                                                                 Honza
+> --
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
