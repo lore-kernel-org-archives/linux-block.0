@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB1AC0018C
-	for <linux-block@archiver.kernel.org>; Sat, 28 Oct 2023 21:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 489E7C001DD
+	for <linux-block@archiver.kernel.org>; Sat, 28 Oct 2023 21:15:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbjJ1VPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Oct 2023 17:15:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52584 "EHLO
+        id S229985AbjJ1VPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Oct 2023 17:15:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229908AbjJ1VPq (ORCPT
+        with ESMTP id S229941AbjJ1VPs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Oct 2023 17:15:46 -0400
+        Sat, 28 Oct 2023 17:15:48 -0400
 Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F59EB
-        for <linux-block@vger.kernel.org>; Sat, 28 Oct 2023 14:15:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25F1F4
+        for <linux-block@vger.kernel.org>; Sat, 28 Oct 2023 14:15:45 -0700 (PDT)
 Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20231028211540euoutp0127043e7b69cd7dd3c2c1bc557f4ce7d8~SYfsE6asm2659126591euoutp01B
-        for <linux-block@vger.kernel.org>; Sat, 28 Oct 2023 21:15:40 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20231028211540euoutp0127043e7b69cd7dd3c2c1bc557f4ce7d8~SYfsE6asm2659126591euoutp01B
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20231028211543euoutp017869d28617519b102c127ac01c226ca6~SYfu8lJeD3100431004euoutp01Q
+        for <linux-block@vger.kernel.org>; Sat, 28 Oct 2023 21:15:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20231028211543euoutp017869d28617519b102c127ac01c226ca6~SYfu8lJeD3100431004euoutp01Q
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1698527740;
-        bh=JNoJR/Xq7klfzP9hsOQ2xMnfdiLvLMoR5LEBEoVDOGw=;
+        s=mail20170921; t=1698527743;
+        bh=8ofABjUQrTp1kzdTCcGf7BUaZhuxx/1pi/TdtpYF5D0=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=Mm7/kBdisYvKed+Ygjkzhy9JoYAi4fful3cwN1vo9Q93LupZh5jo6Qx+rmZQKHVPd
-         DyzqzIDTQ4ta+ecdzC7gF4ZhT3ywHxbN9VgChrJTvJA8ynYNXCPcGdwAnG6/90wRR5
-         OB4t5WBqrOK4IkC+G7LWapdYxKCBFI2bfx6akZgc=
+        b=VYigV6I+Xlg2f6kz+xnces7qO2f0nE5tR01Ol4rTD112qHEJhBXjL2IHc3c+wZLc0
+         4J5CPLxTCXq6Ef4vaHJ1aZ336J5ZiBJuzTVHj3DUHIMh8LafS+j7OlzIeMZQm0qVAT
+         WE449o7Hrm2ASSKGptRHfU9DYe+D1wjPkqA1i5Rs=
 Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
         eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20231028211539eucas1p244eaee8bc62c90f79ee02e581ed59c80~SYfrfIuDH1224812248eucas1p22;
-        Sat, 28 Oct 2023 21:15:39 +0000 (GMT)
+        20231028211542eucas1p241e7ab5f2da4fdfc2cba9e250271dcbc~SYfuALImE1087910879eucas1p2E;
+        Sat, 28 Oct 2023 21:15:42 +0000 (GMT)
 Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id C0.20.11320.BF97D356; Sat, 28
-        Oct 2023 22:15:39 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20231028211538eucas1p1456b4c759a9fed51a6a77fbf2c946011~SYfqobMTB1181011810eucas1p1C;
-        Sat, 28 Oct 2023 21:15:38 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20231028211538eusmtrp241d650d122083e72da8aaaa16e6632fb~SYfqnuS2Q1141411414eusmtrp2Z;
-        Sat, 28 Oct 2023 21:15:38 +0000 (GMT)
-X-AuditID: cbfec7f4-993ff70000022c38-82-653d79fb8a21
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id A1.20.11320.EF97D356; Sat, 28
+        Oct 2023 22:15:42 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20231028211541eucas1p26663bd957cb449c7346b9dd00e33a20f~SYftgbGJH1224812248eucas1p26;
+        Sat, 28 Oct 2023 21:15:41 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20231028211541eusmtrp14898d07da8c7cf9ca684d016181d49c0~SYftf57WW0755507555eusmtrp1Z;
+        Sat, 28 Oct 2023 21:15:41 +0000 (GMT)
+X-AuditID: cbfec7f4-97dff70000022c38-85-653d79fec53a
 Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 0C.F0.25043.AF97D356; Sat, 28
-        Oct 2023 22:15:38 +0100 (BST)
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id D1.52.10549.DF97D356; Sat, 28
+        Oct 2023 22:15:41 +0100 (BST)
 Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
         eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20231028211538eusmtip1460431297fe820fa6ae8f8fd8d552ed5~SYfqdcDZX0467404674eusmtip1I;
-        Sat, 28 Oct 2023 21:15:38 +0000 (GMT)
+        20231028211541eusmtip17d9fe4ecde792d45fb6ab59803d2f652~SYftVSUg60467404674eusmtip1K;
+        Sat, 28 Oct 2023 21:15:41 +0000 (GMT)
 Received: from CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) by
         CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
-        Server (TLS) id 15.0.1497.2; Sat, 28 Oct 2023 22:15:38 +0100
+        Server (TLS) id 15.0.1497.2; Sat, 28 Oct 2023 22:15:41 +0100
 Received: from CAMSVWEXC02.scsc.local ([::1]) by CAMSVWEXC02.scsc.local
         ([fe80::3c08:6c51:fa0a:6384%13]) with mapi id 15.00.1497.012; Sat, 28 Oct
-        2023 22:15:37 +0100
+        2023 22:15:40 +0100
 From:   Daniel Gomez <da.gomez@samsung.com>
 To:     "minchan@kernel.org" <minchan@kernel.org>,
         "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
@@ -72,13 +72,13 @@ To:     "minchan@kernel.org" <minchan@kernel.org>,
 CC:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
         Pankaj Raghav <p.raghav@samsung.com>,
         Daniel Gomez <da.gomez@samsung.com>
-Subject: [RFC PATCH 02/11] test_xarray: add tests for advanced multi-index
- use
-Thread-Topic: [RFC PATCH 02/11] test_xarray: add tests for advanced
-        multi-index use
-Thread-Index: AQHaCePl1pHcrPV2xkWSZMmpwVjy+w==
-Date:   Sat, 28 Oct 2023 21:15:37 +0000
-Message-ID: <20231028211518.3424020-3-da.gomez@samsung.com>
+Subject: [RFC PATCH 04/11] shmem: return number of pages beeing freed in
+ shmem_free_swap
+Thread-Topic: [RFC PATCH 04/11] shmem: return number of pages beeing freed
+        in shmem_free_swap
+Thread-Index: AQHaCePnyXBbRf49wEefJYEMRSVIWA==
+Date:   Sat, 28 Oct 2023 21:15:40 +0000
+Message-ID: <20231028211518.3424020-5-da.gomez@samsung.com>
 In-Reply-To: <20231028211518.3424020-1-da.gomez@samsung.com>
 Accept-Language: en-US, en-GB
 Content-Language: en-US
@@ -90,222 +90,131 @@ x-originating-ip: [106.110.32.103]
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxSYRTHe+By75Wi3cTyKTUbWS0sspZ1IzPbWvGl5Zq9zLUZixs5ERlI
-        7y9mNdMPVlamQKFmmkU5yJQUXMNZovbinNNMJZLMwZqZZC+aFlxrfvudc57z///P9uDMQDtr
-        AZ4sT6eUcrGMh7KR6uc/X60cO76JiqrvDyd1lQaUfNB7GSXbXbPJj19zEdLaHUlarHaEbK/V
-        oWSfYZJF1o6bMbLrykdAln0bwsg6YwlKjv3QoXEckTajDREVmdSix/f4ovaXapHpfjYqMn3N
-        w0RNBWOIaMS0MB5PZMdIKFnyEUq5KvYA+7DW0sBQfF52bDxfmAH0i3JAAA6JtbCpeBDkADYe
-        SNwDsHnEgdKFF8Brv51MuhgBsKJ0AMsBuH/ljWcv3S8HsM5pAf8f9Q89m9poBfDN0OiUVgWA
-        DfZR4HNEieWw3m7CfIMgQsuCDXcu+QdM4gw0DGgQH3OJeNiiuYv6OIjYDRtvtTJoFsCOARfm
-        Y4RYAr3N3f5MHGIjPNdzxtcOIGKgY7TGvwqIMPih4hdGywfDbpeeQV89B5ZoLUya58GJWidK
-        8wr4stMFaI6CT+7WIzTz4Pil4qmYAth14zpKcyQsK/b4dTh/Ne2FLsR3FyQy2dBaVTplthW2
-        jbpZNHOh+0UVRnMonHyqZ1wBkZpp+TTTPDTTPDTTPIoAch8EU2pVqpRSrZFTRwUqcapKLZcK
-        DqalmsDf39Yy8cJrBuXuYYENMHBgAxBn8oI4zC0xVCBHIj5+glKmJSnVMkplAyE4wgvmLJGE
-        U4GEVJxOpVCUglL+mzLwgAUZjOpHKyUPrT1K58yUB3Yzr8hSZYzu3R2q7jjZll3ae7V8MLfz
-        qXHNhNR6sSl/y3o+jtxEue8TLxz9cUo+Vp5XGv22tjKmtdGWIh2ubjW6Tg/aBcKLg4f6xrUl
-        t93b5i/qOu9+Fz4c0j2rSXg6TG8eqrwwaXHL3ktszoekN8iA5c34VMNlKhp3nQ0xJAu5LciG
-        7T0LHZzFEewvsQlZHfnpulzUU1iVxhGHZlnkNYzXRw5SO+I69u1KMEfHIUn8gtntmfu/VMQH
-        667pHddneOteLbeum1viiUrgJ/J3yIuWSsnn3ydkCnb9HoVDyorrU6TvNDZ3CrM2V0cgq/cm
-        ZfIQ1WHxaj5TqRL/Ac0u88TcAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMKsWRmVeSWpSXmKPExsVy+t/xu7q/Km1TDX4+VbaYs34Nm8Xqu/1s
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFKsWRmVeSWpSXmKPExsWy7djPc7r/Km1TDU6/4LCYs34Nm8Xqu/1s
+        Fpef8Fk8/dTHYrH3lrbFnr0nWSwu75rDZnFvzX9Wi11/drBb3JjwlNFi2df37Ba7Ny5is/j9
+        Yw6bA6/H7IaLLB4LNpV6bF6h5XH5bKnHplWdbB6bPk1i9zgx4zeLx+dNcgEcUVw2Kak5mWWp
+        Rfp2CVwZmze/Zir4K1xxbvFp1gbGh/xdjJwcEgImEjNnnmTtYuTiEBJYwShxbN8yJgjnC6PE
+        h1mfoTKfGSUmXdjKBNNyZvNrqMRyRoknKy4iVC39coAZpEpI4AyjxNmz6hCJlYwSDybfAWtn
+        E9CU2HdyEztIQkRgNqvE4cUdjCAJZoE6iTXPZrGA2MICURJLv58DmyQiEC8x48x+oGYOIFtP
+        4tRCHZAwi4CqxPdTm8BKeAWsJe5sW8AKYnMK2Ejc/7adDcRmFJCVeLTyFzvEeHGJW0/mQ70g
+        KLFo9h5mCFtM4t+uh2wQto7E2etPGCFsA4mtS/exQNhKEn86FkKdqSdxY+oUNghbW2LZwtdQ
+        NwhKnJz5hAXkLwmBJi6J/ml/WCGaXSRWXTrNDmELS7w6vgXKlpE4PbmHZQKj9iwk981CsmMW
+        kh2zkOxYwMiyilE8tbQ4Nz212CgvtVyvODG3uDQvXS85P3cTIzC5nf53/MsOxuWvPuodYmTi
+        YDzEKMHBrCTCy+xokyrEm5JYWZValB9fVJqTWnyIUZqDRUmcVzVFPlVIID2xJDU7NbUgtQgm
+        y8TBKdXA5LH5/BK/2XEvS0rDH+p7a7B1C6yv5pZ8Hrog9fpHIc7Xjh3THu8JEH6/46rF+0/P
+        5mefTb6oK9z4ecvG5UkRh+4rPDjgsbi8KLD//7rop+uf/D6qcVXAY33SL0aBpEXfze4yzMp6
+        wDntj7HrkZbeX9t2BXJs75mxSrZj26JTbnpNnfcuWpwOKZsifMdBc1Go2pKX9mwTW5cGRRTM
+        KPx6WXLJh58OjOyf9Fd3KqSVrairSrgVuXgH+7RwsVUfY3Q3hjyP/fDw5PNtdrHL0tY0rC5x
+        9F3XG/Lth9vc68G3E5wS5jVW/D8/V28Xa/vN7fl7BH4sX5fK6JGgKX94b9IG6bVvlnLo/qhM
+        kda/yPs5eaMSS3FGoqEWc1FxIgCyhiiy3QMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMKsWRmVeSWpSXmKPExsVy+t/xu7p/K21TDV781bCYs34Nm8Xqu/1s
         Fpef8Fk8/dTHYrH3lrbFnr0nWSwu75rDZnFvzX9Wi11/drBb3JjwlNFi2df37Ba7Ny5is/j9
         Yw6bA6/H7IaLLB4LNpV6bF6h5XH5bKnHplWdbB6bPk1i9zgx4zeLx+dNcgEcUXo2RfmlJakK
-        GfnFJbZK0YYWRnqGlhZ6RiaWeobG5rFWRqZK+nY2Kak5mWWpRfp2CXoZs/ccZip4q17xZ5pV
-        A+N8hS5GDg4JAROJC6/Duxi5OIQEljIC2YtZuhg5geIyEhu/XGWFsIUl/lzrYoMo+sgosWny
-        MUYI5wyjxNv3X6EyKxklThzYwAjSwiagKbHv5CZ2kISIwGxWicOLO8ASzAJ1EmuezQLbISzg
-        J3Hv5V+wuIhAqMT8e/fZIGw9iavPnrCD2CwCqhJfTt1iB7mVV8BaovFOHYgpJJAr0d+WCVLB
-        KWAjcf/bdrBORgFZiUcrf7FDbBKXuPVkPhPEBwISS/acZ4awRSVePv4H9ZmOxNnrTxghbAOJ
-        rUv3QX2vJPGnYyHUxXoSN6ZOYYOwtSWWLXwNNodXQFDi5MwnLBMYpWchWTcLScssJC2zkLQs
-        YGRZxSiSWlqcm55bbKRXnJhbXJqXrpecn7uJEZiath37uWUH48pXH/UOMTJxMB5ilOBgVhLh
-        ZXa0SRXiTUmsrEotyo8vKs1JLT7EaAoMoYnMUqLJ+cDkmFcSb2hmYGpoYmZpYGppZqwkzutZ
-        0JEoJJCeWJKanZpakFoE08fEwSnVwOR56tOqI322ddo/H6305LugNa/mya2Hyxc0Oi3gEFdW
-        UZ7jt1j8W86BIpYct9pKs70zLRRfv1ZmvbvC2O5pkmjS07f/Hjw3vyMR4yz34L5E/rfHL0OV
-        V63h/r9YtbzMbaXg0gkvN3g8e/xo04I7nQHsnJ+UH/Hd8uZMeN5pEevvt2/hm2o1o1nqc+sU
-        pzidqp2xRsrWPVXnxBxD3ztRS4+euZXkEnrUPurpY07DJyIdfT6Sr76yX5q3IuP2g/Vci8sP
-        Oq1JO6l0IMn21pXIqJZInytlrme27NPXfuiz9tDZ99MW/zsYY17ZM+NHotDxuOUxeZvPPWA5
-        +77ONrfFXWXjqZ/He39Oq3t8SXDefKNJSizFGYmGWsxFxYkAFE7R3dYDAAA=
-X-CMS-MailID: 20231028211538eucas1p1456b4c759a9fed51a6a77fbf2c946011
+        GfnFJbZK0YYWRnqGlhZ6RiaWeobG5rFWRqZK+nY2Kak5mWWpRfp2CXoZmze/Zir4K1xxbvFp
+        1gbGh/xdjJwcEgImEmc2v2YFsYUEljJK7P4MFZeR2PjlKiuELSzx51oXWxcjF1DNR0aJrgP7
+        mSEazjBKTDhiC5FYySixc/EkdpAEm4CmxL6Tm9hBEiICs1klDi/uYARJMAvUSax5NosFxBYW
+        iJJY+v0c2CQRgXiJzn09QDUcQLaexKmFOiBhFgFVie+nNoGV8ApYS9zZtoAVpERIIFeivy0T
+        JMwpYCNx/9t2NhCbUUBW4tHKX+wQm8Qlbj2ZzwTxgIDEkj3nmSFsUYmXj/9BPaYjcfb6E0YI
+        20Bi69J9LBC2ksSfjoVQF+tJ3Jg6hQ3C1pZYtvA11DmCEidnPmGZwCg9C8m6WUhaZiFpmYWk
+        ZQEjyypGkdTS4tz03GJDveLE3OLSvHS95PzcTYzA1LTt2M/NOxjnvfqod4iRiYPxEKMEB7OS
+        CC+zo02qEG9KYmVValF+fFFpTmrxIUZTYBBNZJYSTc4HJse8knhDMwNTQxMzSwNTSzNjJXFe
+        z4KORCGB9MSS1OzU1ILUIpg+Jg5OqQYmmfIPt4terD4tu9SmM9LA3Cl3+rl9SbIbAh19csok
+        tTdrHQteNC8mwjyl+P6tJ4k7qlqZDJr1NVZr9BpOTLjBZH7d5fsBuftTpyqfOb2shdHht5SG
+        epxciZ3IgeYjy/arTw9P/KnP6X7P4siBiOmnTGbZJ+1Lf5qZsXyyQ0v7uf/rxW7yGvjcPJLJ
+        fKPhVLJB6AkOF4udC38f+i2vXs8R63PiQUOSqO/G5hNfeC55v05f5/yIxelO0gQ7ncoivYe2
+        QdOKOA6c5nj7m9FW57D0h8/XmfNub3GU5r+sVqZ49rt4lbXhhhMdbSvOqj3N330w1vbT/trU
+        /+EGZfWKps5m5+wP2Kdt0K769dNqyx8lluKMREMt5qLiRAAYunQX1gMAAA==
+X-CMS-MailID: 20231028211541eucas1p26663bd957cb449c7346b9dd00e33a20f
 X-Msg-Generator: CA
-X-RootMTR: 20231028211538eucas1p1456b4c759a9fed51a6a77fbf2c946011
+X-RootMTR: 20231028211541eucas1p26663bd957cb449c7346b9dd00e33a20f
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20231028211538eucas1p1456b4c759a9fed51a6a77fbf2c946011
+X-CMS-RootMailID: 20231028211541eucas1p26663bd957cb449c7346b9dd00e33a20f
 References: <20230919135536.2165715-1-da.gomez@samsung.com>
         <20231028211518.3424020-1-da.gomez@samsung.com>
-        <CGME20231028211538eucas1p1456b4c759a9fed51a6a77fbf2c946011@eucas1p1.samsung.com>
+        <CGME20231028211541eucas1p26663bd957cb449c7346b9dd00e33a20f@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luis Chamberlain <mcgrof@kernel.org>
+Both shmem_free_swap callers expect the number of pages being freed. In
+the large folios context, this needs to support larger values other than
+0 (used as 1 page being freed) and -ENOENT (used as 0 pages being
+freed). In preparation for large folios adoption, make shmem_free_swap
+routine return the number of pages being freed. So, returning 0 in this
+context, means 0 pages being freed.
 
-The multi index selftests are great but they don't replicate
-how we deal with the page cache exactly, which makes it a bit
-hard to follow as the page cache uses the advanced API.
-
-Add tests which use the advanced API, mimicking what we do in the
-page cache, while at it, extend the example to do what is needed for
-min order support.
-
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Tested-by: Daniel Gomez <da.gomez@samsung.com>
+Suggested-by: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- lib/test_xarray.c | 134 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 134 insertions(+)
+ mm/shmem.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/lib/test_xarray.c b/lib/test_xarray.c
-index 6c22588963bc..22a687e33dc5 100644
---- a/lib/test_xarray.c
-+++ b/lib/test_xarray.c
-@@ -694,6 +694,139 @@ static noinline void check_multi_store(struct xarray =
-*xa)
- #endif
+diff --git a/mm/shmem.c b/mm/shmem.c
+index a2ac425b97ea..9f4c9b9286e5 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -827,18 +827,22 @@ static void shmem_delete_from_page_cache(struct folio=
+ *folio, void *radswap)
  }
 =20
-+#ifdef CONFIG_XARRAY_MULTI
-+static noinline void check_xa_multi_store_adv_add(struct xarray *xa,
-+						  unsigned long index,
-+						  unsigned int order,
-+						  void *p)
-+{
-+	XA_STATE(xas, xa, index);
-+
-+	xas_set_order(&xas, index, order);
-+
-+	do {
-+		xas_lock_irq(&xas);
-+
-+		xas_store(&xas, p);
-+		XA_BUG_ON(xa, xas_error(&xas));
-+		XA_BUG_ON(xa, xa_load(xa, index) !=3D p);
-+
-+		xas_unlock_irq(&xas);
-+	} while (xas_nomem(&xas, GFP_KERNEL));
-+
-+	XA_BUG_ON(xa, xas_error(&xas));
-+}
-+
-+static noinline void check_xa_multi_store_adv_delete(struct xarray *xa,
-+						     unsigned long index,
-+						     unsigned int order)
-+{
-+	unsigned int nrpages =3D 1UL << order;
-+	unsigned long base =3D round_down(index, nrpages);
-+	XA_STATE(xas, xa, base);
-+
-+	xas_set_order(&xas, base, order);
-+	xas_store(&xas, NULL);
-+	xas_init_marks(&xas);
-+}
-+
-+static unsigned long some_val =3D 0xdeadbeef;
-+static unsigned long some_val_2 =3D 0xdeaddead;
-+
-+/* mimics the page cache */
-+static noinline void check_xa_multi_store_adv(struct xarray *xa,
-+					      unsigned long pos,
-+					      unsigned int order)
-+{
-+	unsigned int nrpages =3D 1UL << order;
-+	unsigned long index, base, next_index, next_next_index;
-+	unsigned int i;
-+
-+	index =3D pos >> PAGE_SHIFT;
-+	base =3D round_down(index, nrpages);
-+	next_index =3D round_down(base + nrpages, nrpages);
-+	next_next_index =3D round_down(next_index + nrpages, nrpages);
-+
-+	check_xa_multi_store_adv_add(xa, base, order, &some_val);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, base + i) !=3D &some_val);
-+
-+	XA_BUG_ON(xa, xa_load(xa, next_index) !=3D NULL);
-+
-+	/* Use order 0 for the next item */
-+	check_xa_multi_store_adv_add(xa, next_index, 0, &some_val_2);
-+	XA_BUG_ON(xa, xa_load(xa, next_index) !=3D &some_val_2);
-+
-+	/* Remove the next item */
-+	check_xa_multi_store_adv_delete(xa, next_index, 0);
-+
-+	/* Now use order for a new pointer */
-+	check_xa_multi_store_adv_add(xa, next_index, order, &some_val_2);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, next_index + i) !=3D &some_val_2);
-+
-+	check_xa_multi_store_adv_delete(xa, next_index, order);
-+	check_xa_multi_store_adv_delete(xa, base, order);
-+	XA_BUG_ON(xa, !xa_empty(xa));
-+
-+	/* starting fresh again */
-+
-+	/* let's test some holes now */
-+
-+	/* hole at base and next_next */
-+	check_xa_multi_store_adv_add(xa, next_index, order, &some_val_2);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, base + i) !=3D NULL);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, next_index + i) !=3D &some_val_2);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, next_next_index + i) !=3D NULL);
-+
-+	check_xa_multi_store_adv_delete(xa, next_index, order);
-+	XA_BUG_ON(xa, !xa_empty(xa));
-+
-+	/* hole at base and next */
-+
-+	check_xa_multi_store_adv_add(xa, next_next_index, order, &some_val_2);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, base + i) !=3D NULL);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, next_index + i) !=3D NULL);
-+
-+	for (i =3D 0; i < nrpages; i++)
-+		XA_BUG_ON(xa, xa_load(xa, next_next_index + i) !=3D &some_val_2);
-+
-+	check_xa_multi_store_adv_delete(xa, next_next_index, order);
-+	XA_BUG_ON(xa, !xa_empty(xa));
-+}
-+#endif
-+
-+static noinline void check_multi_store_advanced(struct xarray *xa)
-+{
-+#ifdef CONFIG_XARRAY_MULTI
-+	unsigned int max_order =3D IS_ENABLED(CONFIG_XARRAY_MULTI) ? 20 : 1;
-+	unsigned long end =3D ULONG_MAX/2;
-+	unsigned long pos, i;
-+
-+	/*
-+	 * About 117 million tests below.
-+	 */
-+	for (pos =3D 7; pos < end; pos =3D (pos * pos) + 564) {
-+		for (i =3D 0; i < max_order; i++) {
-+			check_xa_multi_store_adv(xa, pos, i);
-+			check_xa_multi_store_adv(xa, pos + 157, i);
-+		}
-+	}
-+#endif
-+}
-+
- static noinline void check_xa_alloc_1(struct xarray *xa, unsigned int base=
-)
+ /*
+- * Remove swap entry from page cache, free the swap and its page cache.
++ * Remove swap entry from page cache, free the swap and its page cache. Re=
+turns
++ * the number of pages being freed. 0 means entry not found in XArray (0 p=
+ages
++ * being freed).
+  */
+-static int shmem_free_swap(struct address_space *mapping,
++static long shmem_free_swap(struct address_space *mapping,
+ 			   pgoff_t index, void *radswap)
  {
- 	int i;
-@@ -1825,6 +1958,7 @@ static int xarray_checks(void)
- 	check_reserve(&array);
- 	check_reserve(&xa0);
- 	check_multi_store(&array);
-+	check_multi_store_advanced(&array);
- 	check_get_order(&array);
- 	check_xa_alloc();
- 	check_find(&array);
+ 	void *old;
++	long swaps_freed =3D 1UL << xa_get_order(&mapping->i_pages, index);
+=20
+ 	old =3D xa_cmpxchg_irq(&mapping->i_pages, index, radswap, NULL, 0);
+ 	if (old !=3D radswap)
+-		return -ENOENT;
++		return 0;
+ 	free_swap_and_cache(radix_to_swp_entry(radswap));
+-	return 0;
++
++	return swaps_freed;
+ }
+=20
+ /*
+@@ -990,7 +994,7 @@ static void shmem_undo_range(struct inode *inode, loff_=
+t lstart, loff_t lend,
+ 			if (xa_is_value(folio)) {
+ 				if (unfalloc)
+ 					continue;
+-				nr_swaps_freed +=3D !shmem_free_swap(mapping,
++				nr_swaps_freed +=3D shmem_free_swap(mapping,
+ 							indices[i], folio);
+ 				continue;
+ 			}
+@@ -1057,14 +1061,17 @@ static void shmem_undo_range(struct inode *inode, l=
+off_t lstart, loff_t lend,
+ 			folio =3D fbatch.folios[i];
+=20
+ 			if (xa_is_value(folio)) {
++				long swaps_freed;
++
+ 				if (unfalloc)
+ 					continue;
+-				if (shmem_free_swap(mapping, indices[i], folio)) {
++				swaps_freed =3D shmem_free_swap(mapping, indices[i], folio);
++				if (!swaps_freed) {
+ 					/* Swap was replaced by page: retry */
+ 					index =3D indices[i];
+ 					break;
+ 				}
+-				nr_swaps_freed++;
++				nr_swaps_freed +=3D swaps_freed;
+ 				continue;
+ 			}
+=20
 --=20
 2.39.2
