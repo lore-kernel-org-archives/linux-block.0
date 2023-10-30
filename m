@@ -2,93 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3694AC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 30 Oct 2023 14:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3738C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 30 Oct 2023 14:54:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231919AbjJ3Oqc convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Oct 2023 10:46:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43188 "EHLO
+        id S232542AbjJ3OyM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Oct 2023 10:54:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231598AbjJ3Oqb (ORCPT
+        with ESMTP id S231919AbjJ3OyM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Oct 2023 10:46:31 -0400
-Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E16BC6
-        for <linux-block@vger.kernel.org>; Mon, 30 Oct 2023 07:46:27 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 24DF36340E17;
-        Mon, 30 Oct 2023 15:46:26 +0100 (CET)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 83_rsuiJP0iL; Mon, 30 Oct 2023 15:46:25 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id ABA436340DE6;
-        Mon, 30 Oct 2023 15:46:25 +0100 (CET)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id F8QdIGKLfYwY; Mon, 30 Oct 2023 15:46:25 +0100 (CET)
-Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 830996342D49;
-        Mon, 30 Oct 2023 15:46:25 +0100 (CET)
-Date:   Mon, 30 Oct 2023 15:46:25 +0100 (CET)
-From:   Richard Weinberger <richard@nod.at>
-To:     hch <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-mtd <linux-mtd@lists.infradead.org>,
-        zhongjinghua@huawei.com, yukuai1@huaweicloud.com
-Message-ID: <400425098.23787.1698677185386.JavaMail.zimbra@nod.at>
-In-Reply-To: <20231030140106.1393384-1-hch@lst.de>
-References: <20231030140106.1393384-1-hch@lst.de>
-Subject: Re: [PATCH 1/2] ubi: block: don't use gendisk->first_minor for the
- idr_alloc return value
+        Mon, 30 Oct 2023 10:54:12 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70CAAC2
+        for <linux-block@vger.kernel.org>; Mon, 30 Oct 2023 07:54:10 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF88C433C8;
+        Mon, 30 Oct 2023 14:54:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698677650;
+        bh=IGxZ3WXFE2g5LtHStC1maMx/25lkQzHmz4Iz8FrsjIo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=arfIcr1PLhx/XBZRkqc8eMahg/eKkqQyCDFGPdP6in7tfw5XcRfMMl8bfFUk2FOj1
+         h8JVbT0koyb35oGfarOrJkvw2R6sMStxMzsy3ogdG41x2Q92IXU1HTdw7HgdM5nmeu
+         wRp5iGcfJA55otgY73SSniYNAUCI8z6xnTR2lgiBYMv69zkQnT9G0Y7aXWoFJbmk0/
+         gfOgUAEaBwQe90fG1ty89wyGgbw4M88i5rCaAikuwtuxNsQqvLwVD/a/VsNoQMdRtV
+         iX73Ao8pJP8YCJ2ZMZ2bdw6vDlHRKSaTkzAz+QnrvivIR6FRgbZAGd3v853YOXXlHR
+         39FuqgD23s7/Q==
+Date:   Mon, 30 Oct 2023 08:54:07 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de, joshi.k@samsung.com,
+        martin.petersen@oracle.com
+Subject: Re: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
+Message-ID: <ZT_Dj9Df07bCntQQ@kbusch-mbp.dhcp.thefacebook.com>
+References: <20231027181929.2589937-1-kbusch@meta.com>
+ <20231027181929.2589937-2-kbusch@meta.com>
+ <CGME20231030144050eucas1p12ede963088687846d9b02a27d7da525e@eucas1p1.samsung.com>
+ <20231030144047.yrwejvdyyi4vo62m@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [195.201.40.130]
-X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF97 (Linux)/8.8.12_GA_3809)
-Thread-Topic: block: don't use gendisk->first_minor for the idr_alloc return value
-Thread-Index: z+akUlFSTPw9+Ic4xTj+k92LkiWxmQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231030144047.yrwejvdyyi4vo62m@localhost>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
------ Ursprüngliche Mail -----
-> idr_alloc returns an int that is either a negative errno, or the
-> identifier actually allocated.  Use signed integer ret variable to
-> catch the return value and only assign it to gd->first_minor to prepare
-> for marking the first_minor field in the gendisk structure as unsigned.
+On Mon, Oct 30, 2023 at 03:40:47PM +0100, Pankaj Raghav wrote:
+> > +	int ret;
+> > +
+> > +	/* if bvec is on the stack, we need to allocate a copy for the completion */
+> > +	if (nr_vecs <= UIO_FASTIOV) {
+> > +		copy_vec = kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
+> > +		if (!copy_vec)
+> > +			return -ENOMEM;
+> > +		memcpy(copy_vec, bvec, nr_vecs * sizeof(*bvec));
+> > +	}
+> > +
+> > +	buf = kmalloc(len, GFP_KERNEL);
+> > +	if (!buf)
+> > +		goto free_copy;
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
-> drivers/mtd/ubi/block.c | 5 +++--
-> 1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
-> index 437c5b83ffe513..51d00b518d3197 100644
-> --- a/drivers/mtd/ubi/block.c
-> +++ b/drivers/mtd/ubi/block.c
-> @@ -402,13 +402,14 @@ int ubiblock_create(struct ubi_volume_info *vi)
-> 	gd->fops = &ubiblock_ops;
-> 	gd->major = ubiblock_major;
-> 	gd->minors = 1;
-> -	gd->first_minor = idr_alloc(&ubiblock_minor_idr, dev, 0, 0, GFP_KERNEL);
-> -	if (gd->first_minor < 0) {
-> +	ret = idr_alloc(&ubiblock_minor_idr, dev, 0, 0, GFP_KERNEL);
-> +	if (ret < 0) {
-> 		dev_err(disk_to_dev(gd),
-> 			"block: dynamic minor allocation failed");
-> 		ret = -ENODEV;
-> 		goto out_cleanup_disk;
-> 	}
-> +	gd->first_minor  = ret;
+> ret is not set to -ENOMEM here.
 
-Super minor nit, redundant space.
-
-Acked-by: Richard Weinberger <richard@nod.at>
-
-Thanks,
-//richard
+Indeed, thanks for pointing that out. I'll wait a bit longer before
+posting a v3.
