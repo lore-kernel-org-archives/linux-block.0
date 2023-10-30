@@ -2,85 +2,216 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F8AC4167D
-	for <linux-block@archiver.kernel.org>; Sun, 29 Oct 2023 23:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0612C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 30 Oct 2023 02:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbjJ2Xhl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Oct 2023 19:37:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37778 "EHLO
+        id S230510AbjJ3CHX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Oct 2023 22:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbjJ2Xhd (ORCPT
+        with ESMTP id S229569AbjJ3CHW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Oct 2023 19:37:33 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D836E9B;
-        Sun, 29 Oct 2023 16:32:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=guqQZMi+S1KSEFshVxWJ2luwQG5HPiCtpJaksTTmti0=; b=Wo7WerlJhEgpQrY5ZBqa6AaM+u
-        eR4dg/eHjvkTjQbqX3tLPPXvNPE/bgtdqm1WwiIVWjI11m6B+kDspU0GRBMULp/1I6L+mq3E66aQR
-        G81NXlVt2ghXmGThaHLgGX+uWJWG68FiQYpLF5c/gYQ0+8U9ahKnxx8x7a2/gnce4PjMEvuxF6LcO
-        e6b9sE5jh55LZ4Wic4UMfTL6J6IrCQnWpwdlV5NJfNbgu6FgVRFyhSvzl5p8UEUltyq4aPUR70u/B
-        HeZ/L0OladO+JRwUOK4qruG0SWBCzPxw53IVJ+nOKiXvRld2K/OTG9HZdS2/pG3d/R2jC7WFHuN50
-        vaepK3Tw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qxFGJ-000jDh-MM; Sun, 29 Oct 2023 23:32:07 +0000
-Date:   Sun, 29 Oct 2023 23:32:07 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Daniel Gomez <da.gomez@samsung.com>
-Cc:     "minchan@kernel.org" <minchan@kernel.org>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "hughd@google.com" <hughd@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [RFC PATCH 10/11] shmem: add large folio support to the write
- path
-Message-ID: <ZT7rd3CSr+VnKj7v@casper.infradead.org>
-References: <20230919135536.2165715-1-da.gomez@samsung.com>
- <20231028211518.3424020-1-da.gomez@samsung.com>
- <CGME20231028211551eucas1p1552b7695f12c27f4ea1b92ecb6259b31@eucas1p1.samsung.com>
- <20231028211518.3424020-11-da.gomez@samsung.com>
+        Sun, 29 Oct 2023 22:07:22 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1EB1D3;
+        Sun, 29 Oct 2023 19:07:18 -0700 (PDT)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SJc8v6764z4f3pFl;
+        Mon, 30 Oct 2023 10:07:11 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+        by mail.maildlp.com (Postfix) with ESMTP id 430A11A016F;
+        Mon, 30 Oct 2023 10:07:15 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgCHHt7RDz9la4FMEQ--.21649S3;
+        Mon, 30 Oct 2023 10:07:15 +0800 (CST)
+Subject: Re: [PATCH] nbd: pass nbd_sock to nbd_read_reply() instead of index
+To:     Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>
+Cc:     linan666@huaweicloud.com, josef@toxicpanda.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230911023308.3467802-1-linan666@huaweicloud.com>
+ <ZRT7cVFcE6QMHfie@fedora>
+ <47669fb6-3700-e327-11af-93a92b0984a0@huaweicloud.com>
+ <ZRUt/vAQNGNp6Ugx@fedora>
+ <41161d21-299c-3657-6020-0a3a9cf109ec@huaweicloud.com>
+ <ZRU/7Bx1ZJSX3Qg3@fedora>
+ <60f9a88b-b750-3579-bdfd-5421f2040406@huaweicloud.com>
+ <ZRVGWkCzKAVVL9bV@fedora>
+ <bbadaad4-172e-af7b-2a47-52f7e7c83423@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <a6393a45-8510-5734-c174-0826c7d76675@huaweicloud.com>
+Date:   Mon, 30 Oct 2023 10:07:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231028211518.3424020-11-da.gomez@samsung.com>
+In-Reply-To: <bbadaad4-172e-af7b-2a47-52f7e7c83423@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCHHt7RDz9la4FMEQ--.21649S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCF17Ar47Kw45GFW7Cw4kZwb_yoW7Jw45pr
+        48JF1UJrW5Jr18Jr18tw1UJryUtr1UJw15Wr1UJFy7Jryqyr1Yqr4UXr1YgF1UJr48Jr1U
+        tr4UJry7Zr1UJr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Oct 28, 2023 at 09:15:50PM +0000, Daniel Gomez wrote:
-> +++ b/mm/shmem.c
-> @@ -1621,6 +1621,9 @@ static struct folio *shmem_alloc_folio(gfp_t gfp, struct shmem_inode_info *info,
->  	pgoff_t ilx;
->  	struct page *page;
->  
-> +	if ((order != 0) && !(gfp & VM_HUGEPAGE))
-> +		gfp |= __GFP_COMP;
+Hi,
 
-This is silly.  Just set it unconditionally.
+在 2023/09/28 17:40, Yu Kuai 写道:
+> Hi,
+> 
+> 在 2023/09/28 17:24, Ming Lei 写道:
+>> On Thu, Sep 28, 2023 at 05:06:40PM +0800, Yu Kuai wrote:
+>>> Hi,
+>>>
+>>> 在 2023/09/28 16:57, Ming Lei 写道:
+>>>> On Thu, Sep 28, 2023 at 04:55:03PM +0800, Yu Kuai wrote:
+>>>>> Hi,
+>>>>>
+>>>>> 在 2023/09/28 15:40, Ming Lei 写道:
+>>>>>> On Thu, Sep 28, 2023 at 02:03:28PM +0800, Yu Kuai wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> 在 2023/09/28 12:05, Ming Lei 写道:
+>>>>>>>> On Mon, Sep 11, 2023 at 10:33:08AM +0800, 
+>>>>>>>> linan666@huaweicloud.com wrote:
+>>>>>>>>> From: Li Nan <linan122@huawei.com>
+>>>>>>>>>
+>>>>>>>>> If a socket is processing ioctl 'NBD_SET_SOCK', config->socks 
+>>>>>>>>> might be
+>>>>>>>>> krealloc in nbd_add_socket(), and a garbage request is received 
+>>>>>>>>> now, a UAF
+>>>>>>>>> may occurs.
+>>>>>>>>>
+>>>>>>>>>       T1
+>>>>>>>>>       nbd_ioctl
+>>>>>>>>>        __nbd_ioctl
+>>>>>>>>>         nbd_add_socket
+>>>>>>>>>          blk_mq_freeze_queue
+>>>>>>>>>                 T2
+>>>>>>>>>                       recv_work
+>>>>>>>>>                        nbd_read_reply
+>>>>>>>>>                         sock_xmit
+>>>>>>>>>          krealloc config->socks
+>>>>>>>>>                    def config->socks
+>>>>>>>>>
+>>>>>>>>> Pass nbd_sock to nbd_read_reply(). And introduce a new function
+>>>>>>>>> sock_xmit_recv(), which differs from sock_xmit only in the way 
+>>>>>>>>> it get
+>>>>>>>>> socket.
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> I am wondering why not grab queue usage counter before calling 
+>>>>>>>> nbd_read_reply()
+>>>>>>>> for avoiding such issue, something like the following change:
+>>>>>>>>
+>>>>>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>>>>>>> index df1cd0f718b8..09215b605b12 100644
+>>>>>>>> --- a/drivers/block/nbd.c
+>>>>>>>> +++ b/drivers/block/nbd.c
+>>>>>>>> @@ -837,9 +837,6 @@ static void recv_work(struct work_struct *work)
+>>>>>>>>          while (1) {
+>>>>>>>>              struct nbd_reply reply;
+>>>>>>>> -        if (nbd_read_reply(nbd, args->index, &reply))
+>>>>>>>> -            break;
+>>>>>>>> -
+>>>>>>>>              /*
+>>>>>>>>               * Grab .q_usage_counter so request pool won't go 
+>>>>>>>> away, then no
+>>>>>>>>               * request use-after-free is possible during 
+>>>>>>>> nbd_handle_reply().
+>>>>>>>> @@ -852,6 +849,9 @@ static void recv_work(struct work_struct *work)
+>>>>>>>>                  break;
+>>>>>>>>              }
+>>>>>>>
+>>>>>>> This break how nbd works, if there is no reply yet, recv_work() will
+>>>>>>> wait for reply in:
+>>>>>>>
+>>>>>>> nbd_read_reply
+>>>>>>>     sock_xmit
+>>>>>>>      sock_recvmsg
+>>>>>>>
+>>>>>>> After this change, recv_work() will just return if there is no io.
+>>>>>>
+>>>>>> OK, got it, thanks for the input.
+>>>>>>
+>>>>>> But I feel it isn't necessary & fragile to store one extra 
+>>>>>> reference of nsock in
+>>>>>> `recv_thread_args`.
+>>>>>>
+>>>>>> Just run a quick look, the only potential UAF on config->socks 
+>>>>>> should be recv_work(),
+>>>>>> so you can retrieve the `nsock` reference at the entry of 
+>>>>>> recv_work(),
+>>>>>
+>>>>> I don't understand what you mean retrieve the 'nsock', is following 
+>>>>> what
+>>>>> you expected?
+>>>>>
+>>>>> blk_queue_enter() -> prevent concurrent with nbd_add_socket
+>>>>> nsock = config->socks[args->index]
+>>>>> blk_queue_exit()
+>>>>
+>>>> Yeah, turns out you do understand, :-)
+>>>
+>>> Ok, I was not sure about this blk_queue_enter(). By the way, this
+>>
+>> blk_queue_enter() isn't exported, but you can grab ->config_lock
+>> for getting the `nsock`.
+>>
+>>> remind me of what you did to fix uaf of access queue->mq_hctx[] by
+>>> convert the array to xarray.
+>>>
+>>>
+>>> Maybe it's better to covert config->socks[] to xarray to fix this uaf as
+>>> well?
+>>
+>> ->socks[idx] is needed in nbd fast path, so xarray may not be one good 
+>> idea
+>> since xarray_load() introduces extra load, especially ->socks[] uaf
+>> should exist in recv_work() very likely. For other cases, the active
+>> block request holds queue usage counter.
+> 
+> Thanks for the explanation, grab 'config_lock' to get 'nsock' in the
+> begining sounds good to me.
 
-> +static inline unsigned int
-> +shmem_mapping_size_order(struct address_space *mapping, pgoff_t index,
-> +			 size_t size, struct shmem_sb_info *sbinfo)
-> +{
-> +	unsigned int order = ilog2(size);
-> +
-> +	if ((order <= PAGE_SHIFT) ||
-> +	    (!mapping_large_folio_support(mapping) || !sbinfo->noswap))
-> +		return 0;
-> +
-> +	order -= PAGE_SHIFT;
+After reviewing some code, I found that it's wrong to grab config_lock,
+because other context will grab such lock and flush_workqueue(), and
+there is no gurantee that recv_work() will grab the lock first.
 
-You know we have get_order(), right?
+Will it be acceptable to export blk_queue_enter()? I can't think of
+other way to retrieve the`nsock` reference at the entry of recv_work().
+
+Thanks,
+Kuai
+
+> 
+> Kuai
+> 
+>>
+>>
+>> Thanks,
+>> Ming
+>>
+>> .
+>>
+> 
+> .
+> 
 
