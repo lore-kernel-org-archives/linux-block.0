@@ -2,110 +2,211 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EEFFC4167B
-	for <linux-block@archiver.kernel.org>; Tue, 31 Oct 2023 02:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A02DC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 31 Oct 2023 02:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbjJaCCF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Oct 2023 22:02:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52842 "EHLO
+        id S230436AbjJaCrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Oct 2023 22:47:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjJaCCE (ORCPT
+        with ESMTP id S230409AbjJaCrM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Oct 2023 22:02:04 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1874DD;
-        Mon, 30 Oct 2023 19:02:01 -0700 (PDT)
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SKD0M5Zjrz4f3mWP;
-        Tue, 31 Oct 2023 10:01:55 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-        by mail.maildlp.com (Postfix) with ESMTP id D51831A0173;
-        Tue, 31 Oct 2023 10:01:57 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAnt9YUYEBldjmoEQ--.61295S3;
-        Tue, 31 Oct 2023 10:01:57 +0800 (CST)
-Subject: Re: [PATCH v4 0/3] Support disabling fair tag sharing
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20231023203643.3209592-1-bvanassche@acm.org>
- <ZTcr3AHr9l4sHRO2@fedora> <5d37f5ed-130a-4e75-b9a7-f77aeb4c7c89@acm.org>
- <ZThwdPaeAFmhp58L@fedora> <faf6f9e4-e1fe-4934-8fdf-84383f51e740@acm.org>
- <ZTmm0kNdN2Eka6V6@fedora> <1e53e562-bec2-4261-a704-88d2a64111d3@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a6575723-4903-d098-6be0-722635db1339@huaweicloud.com>
-Date:   Tue, 31 Oct 2023 10:01:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 30 Oct 2023 22:47:12 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AB1D9F;
+        Mon, 30 Oct 2023 19:47:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698720430; x=1730256430;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=APU+txMIAmRxP33gXggiCb+jHbwCxGhqfZhP1z0AjZk=;
+  b=SOyUaVqSh1oQ32agvGfj89FQqepG+ByzdyapvOpHcyfFe4iYGlu5+bEO
+   kdFBK0Hf+17kLUbhSQEdwMEpT4bPTBaldiRhUzkgTBrhQvWyZh62a45A0
+   byrsXmSGxqAqnDdOnzi6oHVNud0gQeDtMkiDGfjrUgf/R1pjspM09QzT0
+   jkVmpAmolx83svM2StSfF7wllywNLZCEYATpSMH1oDiDqQbRQ+5V/0kKg
+   qlnAaa8RkFPeb4r4mT2FpU3DRvEWjS2QOdVRnWuEZqpEpCEMO8AJ05bFL
+   MGdMLvc6jje8ZXV2QGWcjaDvnTU6WJiyZ/Flui+IKsbOxYFjoG8brBCrg
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="367546695"
+X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
+   d="scan'208";a="367546695"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 19:47:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="1091852520"
+X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
+   d="scan'208";a="1091852520"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 30 Oct 2023 19:47:06 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qxemW-000Dln-20;
+        Tue, 31 Oct 2023 02:47:04 +0000
+Date:   Tue, 31 Oct 2023 10:46:25 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, axboe@kernel.dk, hch@lst.de,
+        joshi.k@samsung.com, martin.petersen@oracle.com,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
+Message-ID: <202310311041.38ISTxlo-lkp@intel.com>
+References: <20231027181929.2589937-2-kbusch@meta.com>
 MIME-Version: 1.0
-In-Reply-To: <1e53e562-bec2-4261-a704-88d2a64111d3@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAnt9YUYEBldjmoEQ--.61295S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4rZF43WryrGF4DJrWrKrg_yoW8XrW8pr
-        W7WF4DKan5ZanFkw4vy3y7XryrJ3yrG3y7Jryftryj9ws8G3ySyr4jqan09FWYkrs5Aw1q
-        v3W8Jw1Dur4qvFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
-        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231027181929.2589937-2-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi Keith,
 
-在 2023/10/27 0:29, Bart Van Assche 写道:
-> If blk_mq_get_tag() can't allocate a tag, and if multiple threads are
-> waiting for a tag, the thread that called blk_mq_get_tag() first is
-> granted the first tag that is released. I think this guarantees fairness
-> if all requests have a similar latency. There will be some unfairness if
-> there are significant differences in latency per logical unit, e.g.
-> because all requests sent to one logical unit are small and because all
-> requests sent to another logical unit are large. Whether or not this
-> matters depends on the use case.
+kernel test robot noticed the following build errors:
 
-I'm afraid that is not correct, fairness can't be guranteed at all, not
-even with just one scsi disk. This is because there are 8 wait queues in
-sbitmap, and threads are waiting in roundrobin mode, and each time
-wake_batch tags are released, wake_batch threads of one wait queue will
-be woke up, regardless that some threads can't grab tag after woken up,
-what's worse, thoese thread will be added to the tail of waitqueue
-again.
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.6 next-20231030]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-In the case that high io pressure under a slow disk, this behaviour will
-cause that io tail latency will be quite bad compared to sq from old
-kernel.
+url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/block-bio-integrity-directly-map-user-buffers/20231028-022107
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20231027181929.2589937-2-kbusch%40meta.com
+patch subject: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
+config: mips-allmodconfig (https://download.01.org/0day-ci/archive/20231031/202310311041.38ISTxlo-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231031/202310311041.38ISTxlo-lkp@intel.com/reproduce)
 
-AFAIC, disable tag sharing will definitely case some regresion, for
-example, one disk will high io pressure, and another disk only issure
-one IO at a time, disable tag sharing can improve brandwith of fist
-disk, however, for the latter disk, IO latency will definitely be much
-worse.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310311041.38ISTxlo-lkp@intel.com/
 
-Thanks,
-Kuai
+All errors (new ones prefixed by >>):
 
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> 
-> .
-> 
+   block/bio-integrity.c: In function 'bio_integrity_map_user':
+>> block/bio-integrity.c:294:72: error: passing argument 6 of 'iov_iter_extract_pages' from incompatible pointer type [-Werror=incompatible-pointer-types]
+     294 |         bytes = iov_iter_extract_pages(&iter, &pages, len, nr_vecs, 0, &offs);
+         |                                                                        ^~~~~
+         |                                                                        |
+         |                                                                        long unsigned int *
+   In file included from include/linux/bio.h:11,
+                    from include/linux/blkdev.h:17,
+                    from include/linux/blk-mq.h:5,
+                    from include/linux/blk-integrity.h:5,
+                    from block/bio-integrity.c:9:
+   include/linux/uio.h:400:40: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
+     400 |                                size_t *offset0);
+         |                                ~~~~~~~~^~~~~~~
+   cc1: some warnings being treated as errors
 
+
+vim +/iov_iter_extract_pages +294 block/bio-integrity.c
+
+   257	
+   258	int bio_integrity_map_user(struct bio *bio, void __user *ubuf, unsigned int len,
+   259				   u32 seed)
+   260	{
+   261		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+   262		unsigned long offs, align = q->dma_pad_mask | queue_dma_alignment(q);
+   263		int ret, direction, nr_vecs, i, j, folios = 0;
+   264		struct bio_vec stack_vec[UIO_FASTIOV];
+   265		struct bio_vec bv, *bvec = stack_vec;
+   266		struct page *stack_pages[UIO_FASTIOV];
+   267		struct page **pages = stack_pages;
+   268		struct bio_integrity_payload *bip;
+   269		struct iov_iter iter;
+   270		struct bvec_iter bi;
+   271		u32 bytes;
+   272	
+   273		if (bio_integrity(bio))
+   274			return -EINVAL;
+   275		if (len >> SECTOR_SHIFT > queue_max_hw_sectors(q))
+   276			return -E2BIG;
+   277	
+   278		if (bio_data_dir(bio) == READ)
+   279			direction = ITER_DEST;
+   280		else
+   281			direction = ITER_SOURCE;
+   282	
+   283		iov_iter_ubuf(&iter, direction, ubuf, len);
+   284		nr_vecs = iov_iter_npages(&iter, BIO_MAX_VECS + 1);
+   285		if (nr_vecs > BIO_MAX_VECS)
+   286			return -E2BIG;
+   287		if (nr_vecs > UIO_FASTIOV) {
+   288			bvec = kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
+   289			if (!bvec)
+   290				return -ENOMEM;
+   291			pages = NULL;
+   292		}
+   293	
+ > 294		bytes = iov_iter_extract_pages(&iter, &pages, len, nr_vecs, 0, &offs);
+   295		if (unlikely(bytes < 0)) {
+   296			ret =  bytes;
+   297			goto free_bvec;
+   298		}
+   299	
+   300		for (i = 0; i < nr_vecs; i = j) {
+   301			size_t size = min_t(size_t, bytes, PAGE_SIZE - offs);
+   302			struct folio *folio = page_folio(pages[i]);
+   303	
+   304			bytes -= size;
+   305			for (j = i + 1; j < nr_vecs; j++) {
+   306				size_t next = min_t(size_t, PAGE_SIZE, bytes);
+   307	
+   308				if (page_folio(pages[j]) != folio ||
+   309				    pages[j] != pages[j - 1] + 1)
+   310					break;
+   311				unpin_user_page(pages[j]);
+   312				size += next;
+   313				bytes -= next;
+   314			}
+   315	
+   316			bvec_set_page(&bvec[folios], pages[i], size, offs);
+   317			offs = 0;
+   318			folios++;
+   319		}
+   320	
+   321		if (pages != stack_pages)
+   322			kvfree(pages);
+   323	
+   324		if (folios > queue_max_integrity_segments(q) ||
+   325		    !iov_iter_is_aligned(&iter, align, align)) {
+   326			ret = bio_integrity_copy_user(bio, bvec, folios, len,
+   327						      direction, seed);
+   328			if (ret)
+   329				goto release_pages;
+   330			return 0;
+   331		}
+   332	
+   333		bip = bio_integrity_alloc(bio, GFP_KERNEL, folios);
+   334		if (IS_ERR(bip)) {
+   335			ret = PTR_ERR(bip);
+   336			goto release_pages;
+   337		}
+   338	
+   339		memcpy(bip->bip_vec, bvec, folios * sizeof(*bvec));
+   340		if (bvec != stack_vec)
+   341			kfree(bvec);
+   342	
+   343		bip->bip_flags |= BIP_INTEGRITY_USER;
+   344		bip->copy_vec = NULL;
+   345		return 0;
+   346	
+   347	release_pages:
+   348		bi.bi_size = len;
+   349		for_each_bvec(bv, bvec, bi, bi)
+   350			unpin_user_page(bv.bv_page);
+   351	free_bvec:
+   352		if (bvec != stack_vec)
+   353			kfree(bvec);
+   354		return ret;
+   355	}
+   356	EXPORT_SYMBOL_GPL(bio_integrity_map_user);
+   357	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
