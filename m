@@ -2,99 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B62EFC04E83
-	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 17:43:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2E39C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 18:28:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344596AbjKARnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Nov 2023 13:43:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58050 "EHLO
+        id S232095AbjKAS26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Nov 2023 14:28:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233394AbjKARni (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 13:43:38 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CFC115;
-        Wed,  1 Nov 2023 10:43:33 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B881A21A41;
-        Wed,  1 Nov 2023 17:43:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1698860606; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BsxXilB8VtCWD9uJ48g6IisnMmSxhnqquY6XcPZlAKQ=;
-        b=qfnzs8DT7yNoCyRCiEfgwweelCcCNnhDKYjy65J8od5FjaRZYtuQ+qQJhVUCDKTN3Ky0kS
-        UhI8vabTpxc8luwHCzWIUJCnps+IwZP9QtTy5BDSSldLovGbrXcHaGu3Kf97dp+LDqjFD2
-        D4mtr1ewM2NojGSIJlu+zDox8YodfSM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1698860606;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BsxXilB8VtCWD9uJ48g6IisnMmSxhnqquY6XcPZlAKQ=;
-        b=qNX80e5RN09U7lmTJyabsszy6iJuhCmAGejuFXQWPv9qncGkn6WSRUk3YoTtlkdm5lnPIT
-        ozEvR31D4EutLUCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A9C821348D;
-        Wed,  1 Nov 2023 17:43:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id d8FuKT6OQmUuYQAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 01 Nov 2023 17:43:26 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id E3E89A076D; Wed,  1 Nov 2023 18:43:25 +0100 (CET)
-From:   Jan Kara <jack@suse.cz>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kees Cook <keescook@google.com>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        <linux-xfs@vger.kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 5/7] fs: Block writes to mounted block devices
-Date:   Wed,  1 Nov 2023 18:43:10 +0100
-Message-Id: <20231101174325.10596-5-jack@suse.cz>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20231101173542.23597-1-jack@suse.cz>
-References: <20231101173542.23597-1-jack@suse.cz>
+        with ESMTP id S233554AbjKAS24 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 14:28:56 -0400
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BED2102
+        for <linux-block@vger.kernel.org>; Wed,  1 Nov 2023 11:28:11 -0700 (PDT)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-66d0ea3e5b8so925496d6.0
+        for <linux-block@vger.kernel.org>; Wed, 01 Nov 2023 11:28:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698863290; x=1699468090;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nbraHScpAjzoS0M8nDOOEKlaOP4qg6lROvG1DxdhQQU=;
+        b=rTLPltALxuBeyPRcNVAWWOkYjq8FdiL4OzPjIsjNuQlpvzMVk8z5wyWmbYPeydgzmK
+         ExIzaPdv0pm5MMAT2X27ekWJfeDIia8zDAtSn/ip7r0jAsiMxIPfZBpS5evTxVawBEeu
+         MoH0N3Tg3ycg/zrXBpT0WphgEzmm2pNjWAv7N4N0vOrUmGXlhqeUZSCw3QG/ZvcRHqfp
+         gp2igPKcFBTikyWGht/mmWbyRYTIh7XGzadRO4Cu/wPApH9T0zfzkh4g/cpC/i9iYHq5
+         7V7rW772wJL6mTkeTSyLhy6h9wZL9bRUf2BwfUqHk3swYeMUjfpqMYC78m2ML8oP7lo4
+         oNjg==
+X-Gm-Message-State: AOJu0YyBk3aNYGkiPblwpv1UOflLt5Mbh2cnch2JGtAqB/Kd96FMX/O0
+        U6ZzIOD7UUvNLUHmz2dsWaGB
+X-Google-Smtp-Source: AGHT+IFuYhqolGh05xqnNdfZAmwuJH7T5XnlR7OKwXvDKM+T8xuftXsfTTR03//wtu+lZk4QjEuEJw==
+X-Received: by 2002:a05:6214:dc7:b0:66d:2ae0:44cc with SMTP id 7-20020a0562140dc700b0066d2ae044ccmr24754552qvt.21.1698863290336;
+        Wed, 01 Nov 2023 11:28:10 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id c5-20020a05620a134500b0076f1d8b1c2dsm1663939qkl.12.2023.11.01.11.28.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Nov 2023 11:28:09 -0700 (PDT)
+Date:   Wed, 1 Nov 2023 14:28:08 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Matthew Sakai <msakai@redhat.com>
+Cc:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: [PATCH v4 00/39] dm vdo: add the dm-vdo deduplication and
+ compression DM target
+Message-ID: <ZUKYuHcLu3syvvYG@redhat.com>
+References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=744; i=jack@suse.cz; h=from:subject; bh=T/eItSVb7GcAYjznkgJHNYn7HD+3ITlTRTvdImRwJ2E=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlQo4ubiwBwif8qp1536oKopFx3GfrPsJ5t7c/7aOj 1jG1waqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZUKOLgAKCRCcnaoHP2RA2TkYCA DrJ56qaR1IQHLAf07UimuEs8suyyRufEgDz9zttWEJ7ZIIN0LmxsFinrw7ZJWHbbV/DrKpB0oeX/Uh xE8r6AHulGkMbasTJNABoZDxovW6HqZ8QEWh+1/RdG5p6NloxvvMCdDHILjDQwJtQN6eDfdGuAVjSI q3WTHOfnkh6x6cpuQWEUwTLQWm8FBAOb2sKa3PQaN2Qnus+ukMGqF0JZhX9JpkO46S9ielqaiW3ZUi xuyR4j/7LyNTtjxEDWuQwZT62dkwA3JgaNu6tr1+Gvc1svvBjzwVgf/8pldrHC3dC5i+lmG53BCZTx wzY85qVmI3fqOg587aQp0FyMKTd0oh
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ask block layer to block writes to block devices mounted by filesystems.
+On Thu, Oct 26 2023 at  5:40P -0400,
+Matthew Sakai <msakai@redhat.com> wrote:
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/blkdev.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> The dm-vdo target provides inline deduplication, compression, zero-block
+> elimination, and thin provisioning. A dm-vdo target can be backed by up to
+> 256TB of storage, and can present a logical size of up to 4PB. This target
+> was originally developed at Permabit Technology Corp. starting in 2009. It
+> was first released in 2013 and has been used in production environments
+> ever since. It was made open-source in 2017 after Permabit was acquired by
+> Red Hat.
+> 
+> Because deduplication rates fall drastically as the block size increases, a
+> vdo target has a maximum block size of 4KB. However, it can achieve
+> deduplication rates of 254:1, i.e. up to 254 copies of a given 4KB block
+> can reference a single 4KB of actual storage. It can achieve compression
+> rates of 14:1. All zero blocks consume no storage at all.
+> 
+> https://github.com/dm-vdo/dm-linux contains the most recent dm-vdo updates.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 0e0c0186aa32..9f6c3373f9fc 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1494,7 +1494,8 @@ extern const struct blk_holder_ops fs_holder_ops;
-  * as stored in sb->s_flags.
-  */
- #define sb_open_mode(flags) \
--	(BLK_OPEN_READ | (((flags) & SB_RDONLY) ? 0 : BLK_OPEN_WRITE))
-+	(BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES | \
-+	 (((flags) & SB_RDONLY) ? 0 : BLK_OPEN_WRITE))
- 
- struct bdev_handle {
- 	struct block_device *bdev;
--- 
-2.35.3
+I've rebased linux-dm.git's dm-vdo branch to reflect this v4 baseline
+(rebased on dm-6.7).
 
+And the dm-vdo-wip branch was rebased accordingly ontop of the dm-vdo
+branch.
+
+Mike
