@@ -2,150 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7EDC4167B
-	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 16:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4705C4167D
+	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 16:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233227AbjKAQU0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Nov 2023 12:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34130 "EHLO
+        id S231669AbjKAQp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Nov 2023 12:45:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231233AbjKAQUZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 12:20:25 -0400
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41CD3F7
-        for <linux-block@vger.kernel.org>; Wed,  1 Nov 2023 09:19:37 -0700 (PDT)
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-66d0c777bf0so47073646d6.3
-        for <linux-block@vger.kernel.org>; Wed, 01 Nov 2023 09:19:37 -0700 (PDT)
+        with ESMTP id S231233AbjKAQp4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 12:45:56 -0400
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E765110C;
+        Wed,  1 Nov 2023 09:45:53 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6b709048f32so51007b3a.0;
+        Wed, 01 Nov 2023 09:45:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698855576; x=1699460376;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1698857153; x=1699461953;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PQtTpppYeU9AiypuUG+j2PUMePFfB94rnMKwVfmVaMc=;
-        b=PAEY2ky98dKlGvLgszGaIUhw76aAtl0onizKGuiNnLs4nxa6zo9reVml6bCbI+Y5iU
-         1D3KdlTnFxtXVsJ/SQxt4k8ZdnIljX9wQTnhPIP5Qba3k2SIw2iEoeL961d4J1MftMwE
-         JPFQMA7JsiYKGpktGAvX9Bh344kKrArm7wgIFfPaf1U/J9sm8qNJQ1DYUxM/7/PuKlJt
-         VEYWu6Q0HkUHfoup2wpRTLHGQCOF6H8Jk4ZgzmUEzDxUDSb2BlyXyYWO2dy0sCj4uAYS
-         9OXr7TjSRdEywKjhzzPRyFIru+80Fv3Rh3dp4iN91tZN8xMX6QpObKWMrqX26FX6qZz7
-         Iu8w==
-X-Gm-Message-State: AOJu0Yxcev62UVk8eQANhaWRmL7RQf2JMdmNAV8JBNr+D/VYfOLJGUPw
-        VVp+qLPMWLnuD/AZ+2OKJ475
-X-Google-Smtp-Source: AGHT+IHqr9/GGjbi2gSbzfcHIoxu0l/hcaUpr0DYzQPsXWnTrsUr+fnlf4uomSKcSePYC1EN9IIkQQ==
-X-Received: by 2002:ad4:596d:0:b0:655:d82d:2fd0 with SMTP id eq13-20020ad4596d000000b00655d82d2fd0mr15069845qvb.21.1698855576378;
-        Wed, 01 Nov 2023 09:19:36 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id lg18-20020a056214549200b0065cfec43097sm1601112qvb.39.2023.11.01.09.19.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Nov 2023 09:19:36 -0700 (PDT)
-Date:   Wed, 1 Nov 2023 12:19:34 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>,
-        Christian Loehle <christian.loehle@arm.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Justin Stitt <justinstitt@google.com>
-Subject: [git pull] device mapper changes for 6.7
-Message-ID: <ZUJ6lh4bDU/KqKBc@redhat.com>
+        bh=HShWGtQKfpCm3R1g2YQJwks+runHVlSK4U2xQP7+rJw=;
+        b=CyMgr99UDmCjxc57wsi7Kho1KUL1nMkhtYk/FuNZnNyBAW2txrnJuXuWOmzLt5afIW
+         MC/K1am0PDUDPkOJEAGNVr/vbC1RLA6b9bYbSZHidguqRZ/CP0S7Bni3ZMB/PQApUHgQ
+         qmNU6JG10D4zu4wBKOMaPC5QRfqQTJDNkdQKYQN+aYeHWr7M8IIbE0ePC1id61a/rNhS
+         oNcHPdmFQ7u7WONZSsjiR46u+gsEEtkGTYZmbZn4OmKoqkDPC4HP6r9gtYcZ8EkOXUhv
+         1b6PWgJFaHPdW/3APAFQide9YVgnnaU+5t2EzbrsD9yUJLq0HMf4qw9JizWViOCND7xR
+         cK+w==
+X-Gm-Message-State: AOJu0YyGXxs71QXZxJ4vK1wJL1dfpRxnJBPzJDaup3kWGXFxOkSUWsf0
+        uZWXFVmVweyICPkNM+FSXHk=
+X-Google-Smtp-Source: AGHT+IEvWUmiw62j9GKtgIQhaMTq2wosTr2Yb141pNyQ3mQMR8cKVHrMgBkkuosP22aFkuyRN3ZYpg==
+X-Received: by 2002:a05:6a20:1614:b0:17b:62ae:a8aa with SMTP id l20-20020a056a20161400b0017b62aea8aamr15776276pzj.6.1698857153253;
+        Wed, 01 Nov 2023 09:45:53 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:2312:f48f:8e12:6623? ([2620:15c:211:201:2312:f48f:8e12:6623])
+        by smtp.gmail.com with ESMTPSA id c9-20020a639609000000b005891f3af36asm108341pge.87.2023.11.01.09.45.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Nov 2023 09:45:52 -0700 (PDT)
+Message-ID: <c06b2624-b05b-48d4-840d-beb208aa33dc@acm.org>
+Date:   Wed, 1 Nov 2023 09:45:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: (2) [PATCH v3 01/14] fs: Move enum rw_hint into a new header file
+Content-Language: en-US
+To:     daejun7.park@samsung.com, KANCHAN JOSHI <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>, Jan Kara <jack@suse.cz>,
+        Christian Brauner <brauner@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jeff Layton <jlayton@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Seonghun Kim <seonghun-sui.kim@samsung.com>,
+        Jorn Lee <lunar.lee@samsung.com>,
+        Sung-Jun Park <sungjun07.park@samsung.com>,
+        Hyunji Jeon <hyunji.jeon@samsung.com>,
+        Dongwoo Kim <dongwoo7565.kim@samsung.com>,
+        Seongcheol Hong <sc01.hong@samsung.com>,
+        Jaeheon Lee <jaeheon7.lee@samsung.com>,
+        Wonjong Song <wj3.song@samsung.com>,
+        JinHwan Park <jh.i.park@samsung.com>,
+        Yonggil Song <yonggil.song@samsung.com>,
+        Soonyoung Kim <overmars.kim@samsung.com>,
+        Shinwoo Park <sw_kr.park@samsung.com>,
+        Seokhwan Kim <sukka.kim@samsung.com>
+References: <9b0990ec-a3c9-48c0-b312-8c07c727e326@acm.org>
+ <20231017204739.3409052-1-bvanassche@acm.org>
+ <20231017204739.3409052-2-bvanassche@acm.org>
+ <b3058ce6-e297-b4c3-71d4-4b76f76439ba@samsung.com>
+ <CGME20231017204823epcas5p2798d17757d381aaf7ad4dd235f3f0da3@epcms2p1>
+ <20231101063910epcms2p18f991db15958f246fa1654f2d412e176@epcms2p1>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231101063910epcms2p18f991db15958f246fa1654f2d412e176@epcms2p1>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 10/31/23 23:39, Daejun Park wrote:
+>> On 10/30/23 04:11, Kanchan Joshi wrote:
+>>> On 10/18/2023 2:17 AM, Bart Van Assche wrote:
+>> Thanks for having taken a look at this patch series. Jens asked for data
+>> that shows that this patch series improves performance. Is this
+>> something Samsung can help with?
+> 
+> We analyzed the NAND block erase counter with and without stream separation
+> through a long-term workload in F2FS.
+> The analysis showed that the erase counter is reduced by approximately 40%
+> with stream seperation.
+> Long-term workload is a scenario where erase and write are repeated by
+> stream after performing precondition fill for each temperature of F2FS.
 
-The following changes since commit 3da5d2de92387a8322965c7fb1365f7cae690e5a:
+Hi Daejun,
 
-  MAINTAINERS: update the dm-devel mailing list (2023-10-06 19:05:57 -0400)
+Thank you for having shared this data. This is very helpful. Since I'm
+not familiar with the erase counter: does the above data perhaps mean
+that write amplification is reduced by 40% in the workload that has been
+examined?
 
-are available in the Git repository at:
+Thanks,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.7/dm-changes
+Bart.
 
-for you to fetch changes up to 9793c269da6cd339757de6ba5b2c8681b54c99af:
-
-  dm crypt: account large pages in cc->n_allocated_pages (2023-10-31 14:25:06 -0400)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Update DM core to directly call the map function for both the linear
-  and stripe targets; which are provided by DM core.
-
-- Various updates to use new safer string functions.
-
-- Update DM core to respect REQ_NOWAIT flag in normal bios so that
-  memory allocations are always attempted with GFP_NOWAIT.
-
-- Add Mikulas Patocka to MAINTAINERS as a DM maintainer!
-
-- Improve DM delay target's handling of short delays (< 50ms) by using
-  a kthread to check expiration of IOs rather than timers and a wq.
-
-- Update the DM error target so that it works with zoned storage. This
-  helps xfstests to provide proper IO error handling coverage when
-  testing a filesystem with native zoned storage support.
-
-- Update both DM crypt and integrity targets to improve performance by
-  using crypto_shash_digest() rather than init+update+final sequence.
-
-- Fix DM crypt target by backfilling missing memory allocation
-  accounting for compound pages.
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmVCeG8ACgkQxSPxCi2d
-A1oXAAgAnT0mb1psEwDhKiJG26bUeJDJHIaNTPPw4UpCvKEWU7lTxzJUmthnwLZI
-D+JnkrenAfGppdsFkHh1ogTBz8r60aeBTY31SUoCUVS/clwHxRstLCkSE2655an3
-WNgrGItta5BRtcgTMxU7bmqVOD4Xyw704L7BK5CM4zKBQuXJtkegylALhdXvYSjs
-mvHWoPczFW6Rv79CkF0uTkon7Ji041BvKVjbp+fYQf9Pul5d6S1v4Jrvlo2EqblU
-6OM75OosNgziQhdw7faVOgFCVkQfLkEeYsJ47dBOjpC3+sbyKENbC4r+ZmkCZGyI
-uJERswpmAkW7pp+Ab6sqG582DXvPvA==
-=PPwQ
------END PGP SIGNATURE-----
-
-----------------------------------------------------------------
-Christian Loehle (1):
-      dm delay: for short delays, use kthread instead of timers and wq
-
-Damien Le Moal (1):
-      dm error: Add support for zoned block devices
-
-Eric Biggers (2):
-      dm crypt: use crypto_shash_digest() in crypt_iv_tcw_whitening()
-      dm integrity: use crypto_shash_digest() in sb_mac()
-
-Justin Stitt (4):
-      dm cache metadata: replace deprecated strncpy with strscpy
-      dm crypt: replace open-coded kmemdup_nul
-      dm ioctl: replace deprecated strncpy with strscpy_pad
-      dm log userspace: replace deprecated strncpy with strscpy
-
-Mike Snitzer (3):
-      dm: enhance alloc_multiple_bios() to be more versatile
-      dm: respect REQ_NOWAIT flag in normal bios issued to DM
-      MAINTAINERS: add Mikulas Patocka as a DM maintainer
-
-Mikulas Patocka (3):
-      dm: shortcut the calls to linear_map and stripe_map
-      dm: make __send_duplicate_bios return unsigned int
-      dm crypt: account large pages in cc->n_allocated_pages
-
- MAINTAINERS                        |   1 +
- drivers/md/dm-cache-metadata.c     |   6 +-
- drivers/md/dm-crypt.c              |  26 ++++----
- drivers/md/dm-delay.c              | 103 ++++++++++++++++++++++++++-----
- drivers/md/dm-integrity.c          |  30 +++------
- drivers/md/dm-ioctl.c              |   4 +-
- drivers/md/dm-linear.c             |   2 +-
- drivers/md/dm-log-userspace-base.c |   2 +-
- drivers/md/dm-stripe.c             |   2 +-
- drivers/md/dm-table.c              |  23 ++++++-
- drivers/md/dm-target.c             | 106 +++++++++++++++++++++++++++++++-
- drivers/md/dm.c                    | 121 ++++++++++++++++++++++---------------
- drivers/md/dm.h                    |   2 +
- 13 files changed, 321 insertions(+), 107 deletions(-)
