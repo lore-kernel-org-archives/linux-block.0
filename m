@@ -2,80 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2E39C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 18:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 864BAC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 19:01:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232095AbjKAS26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Nov 2023 14:28:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44202 "EHLO
+        id S232353AbjKATBp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Nov 2023 15:01:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233554AbjKAS24 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 14:28:56 -0400
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BED2102
-        for <linux-block@vger.kernel.org>; Wed,  1 Nov 2023 11:28:11 -0700 (PDT)
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-66d0ea3e5b8so925496d6.0
-        for <linux-block@vger.kernel.org>; Wed, 01 Nov 2023 11:28:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698863290; x=1699468090;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nbraHScpAjzoS0M8nDOOEKlaOP4qg6lROvG1DxdhQQU=;
-        b=rTLPltALxuBeyPRcNVAWWOkYjq8FdiL4OzPjIsjNuQlpvzMVk8z5wyWmbYPeydgzmK
-         ExIzaPdv0pm5MMAT2X27ekWJfeDIia8zDAtSn/ip7r0jAsiMxIPfZBpS5evTxVawBEeu
-         MoH0N3Tg3ycg/zrXBpT0WphgEzmm2pNjWAv7N4N0vOrUmGXlhqeUZSCw3QG/ZvcRHqfp
-         gp2igPKcFBTikyWGht/mmWbyRYTIh7XGzadRO4Cu/wPApH9T0zfzkh4g/cpC/i9iYHq5
-         7V7rW772wJL6mTkeTSyLhy6h9wZL9bRUf2BwfUqHk3swYeMUjfpqMYC78m2ML8oP7lo4
-         oNjg==
-X-Gm-Message-State: AOJu0YyBk3aNYGkiPblwpv1UOflLt5Mbh2cnch2JGtAqB/Kd96FMX/O0
-        U6ZzIOD7UUvNLUHmz2dsWaGB
-X-Google-Smtp-Source: AGHT+IFuYhqolGh05xqnNdfZAmwuJH7T5XnlR7OKwXvDKM+T8xuftXsfTTR03//wtu+lZk4QjEuEJw==
-X-Received: by 2002:a05:6214:dc7:b0:66d:2ae0:44cc with SMTP id 7-20020a0562140dc700b0066d2ae044ccmr24754552qvt.21.1698863290336;
-        Wed, 01 Nov 2023 11:28:10 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id c5-20020a05620a134500b0076f1d8b1c2dsm1663939qkl.12.2023.11.01.11.28.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Nov 2023 11:28:09 -0700 (PDT)
-Date:   Wed, 1 Nov 2023 14:28:08 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Matthew Sakai <msakai@redhat.com>
-Cc:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
-Subject: Re: [PATCH v4 00/39] dm vdo: add the dm-vdo deduplication and
- compression DM target
-Message-ID: <ZUKYuHcLu3syvvYG@redhat.com>
-References: <20231026214136.1067410-1-msakai@redhat.com>
+        with ESMTP id S232442AbjKATBo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 15:01:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BD1111
+        for <linux-block@vger.kernel.org>; Wed,  1 Nov 2023 12:00:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698865252;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VV/0JSb4ahQ+qDeA+yAiFldg8WZK/uiwiHB5Saqdh+M=;
+        b=eVb3SqtycPicPIbjJWK7qPaVChlm37/xecJj2dsBN/LGu7+5chYtjgvCmBT1qvNyKcogNe
+        Lw8ejgJbOTw1Y7Vg5jhoMEpiVyP4PFNo1bmJuTY9iFRfJEeFEGjXi2Ys0n4hfz2g8a5PM/
+        Ia8wXu8bYuoOnsx0Ck7I7lefTsQd1rk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-590-Y8YF_Nq8N7W0wYIgKZ9icA-1; Wed, 01 Nov 2023 15:00:48 -0400
+X-MC-Unique: Y8YF_Nq8N7W0wYIgKZ9icA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F0CB98314FA;
+        Wed,  1 Nov 2023 19:00:47 +0000 (UTC)
+Received: from bfoster (unknown [10.22.16.88])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 17CA410F52;
+        Wed,  1 Nov 2023 19:00:47 +0000 (UTC)
+Date:   Wed, 1 Nov 2023 15:01:22 -0400
+From:   Brian Foster <bfoster@redhat.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kees Cook <keescook@google.com>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        linux-xfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        Kent Overstreet <kent.overstreet@linux.dev>,
+        linux-bcachefs@vger.kernel.org
+Subject: Re: [PATCH 1/7] bcachefs: Convert to bdev_open_by_path()
+Message-ID: <ZUKggpzckTAKkyMl@bfoster>
+References: <20231101173542.23597-1-jack@suse.cz>
+ <20231101174325.10596-1-jack@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
+In-Reply-To: <20231101174325.10596-1-jack@suse.cz>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 26 2023 at  5:40P -0400,
-Matthew Sakai <msakai@redhat.com> wrote:
-
-> The dm-vdo target provides inline deduplication, compression, zero-block
-> elimination, and thin provisioning. A dm-vdo target can be backed by up to
-> 256TB of storage, and can present a logical size of up to 4PB. This target
-> was originally developed at Permabit Technology Corp. starting in 2009. It
-> was first released in 2013 and has been used in production environments
-> ever since. It was made open-source in 2017 after Permabit was acquired by
-> Red Hat.
+On Wed, Nov 01, 2023 at 06:43:06PM +0100, Jan Kara wrote:
+> Convert bcachefs to use bdev_open_by_path() and pass the handle around.
 > 
-> Because deduplication rates fall drastically as the block size increases, a
-> vdo target has a maximum block size of 4KB. However, it can achieve
-> deduplication rates of 254:1, i.e. up to 254 copies of a given 4KB block
-> can reference a single 4KB of actual storage. It can achieve compression
-> rates of 14:1. All zero blocks consume no storage at all.
+> CC: Kent Overstreet <kent.overstreet@linux.dev>
+> CC: Brian Foster <bfoster@redhat.com>
+> CC: linux-bcachefs@vger.kernel.org
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  fs/bcachefs/super-io.c    | 19 ++++++++++---------
+>  fs/bcachefs/super_types.h |  1 +
+>  2 files changed, 11 insertions(+), 9 deletions(-)
 > 
-> https://github.com/dm-vdo/dm-linux contains the most recent dm-vdo updates.
+> diff --git a/fs/bcachefs/super-io.c b/fs/bcachefs/super-io.c
+> index 332d41e1c0a3..01a32c41a540 100644
+> --- a/fs/bcachefs/super-io.c
+> +++ b/fs/bcachefs/super-io.c
+...
+> @@ -685,21 +685,22 @@ int bch2_read_super(const char *path, struct bch_opts *opts,
+>  	if (!opt_get(*opts, nochanges))
+>  		sb->mode |= BLK_OPEN_WRITE;
+>  
+> -	sb->bdev = blkdev_get_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> -	if (IS_ERR(sb->bdev) &&
+> -	    PTR_ERR(sb->bdev) == -EACCES &&
+> +	sb->bdev_handle = bdev_open_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> +	if (IS_ERR(sb->bdev_handle) &&
+> +	    PTR_ERR(sb->bdev_handle) == -EACCES &&
+>  	    opt_get(*opts, read_only)) {
+>  		sb->mode &= ~BLK_OPEN_WRITE;
+>  
+> -		sb->bdev = blkdev_get_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> -		if (!IS_ERR(sb->bdev))
+> +		sb->bdev_handle = bdev_open_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> +		if (!IS_ERR(sb->bdev_handle))
+>  			opt_set(*opts, nochanges, true);
+>  	}
+>  
+> -	if (IS_ERR(sb->bdev)) {
+> -		ret = PTR_ERR(sb->bdev);
+> +	if (IS_ERR(sb->bdev_handle)) {
+> +		ret = PTR_ERR(sb->bdev_handle);
+>  		goto out;
+>  	}
+> +	sb->bdev = sb->bdev_handle->bdev;
+>  
+>  	ret = bch2_sb_realloc(sb, 0);
+>  	if (ret) {
 
-I've rebased linux-dm.git's dm-vdo branch to reflect this v4 baseline
-(rebased on dm-6.7).
+Hi Jan,
 
-And the dm-vdo-wip branch was rebased accordingly ontop of the dm-vdo
-branch.
+This all seems reasonable to me, but should bcachefs use sb_open_mode()
+somewhere in here to involve use of the restrict writes flag in the
+first place? It looks like bcachefs sort of open codes bits of
+mount_bdev() so it isn't clear the flag would be used anywhere...
 
-Mike
+Brian
+
+> diff --git a/fs/bcachefs/super_types.h b/fs/bcachefs/super_types.h
+> index 78d6138db62d..b77d8897c9fa 100644
+> --- a/fs/bcachefs/super_types.h
+> +++ b/fs/bcachefs/super_types.h
+> @@ -4,6 +4,7 @@
+>  
+>  struct bch_sb_handle {
+>  	struct bch_sb		*sb;
+> +	struct bdev_handle	*bdev_handle;
+>  	struct block_device	*bdev;
+>  	struct bio		*bio;
+>  	void			*holder;
+> -- 
+> 2.35.3
+> 
+
