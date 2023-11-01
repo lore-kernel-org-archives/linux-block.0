@@ -2,308 +2,199 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CDFC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 03:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E08C4167B
+	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 04:09:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232080AbjKAD3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Oct 2023 23:29:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40108 "EHLO
+        id S236157AbjKAEJv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Nov 2023 00:09:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231924AbjKAD3k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Oct 2023 23:29:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED73A4
-        for <linux-block@vger.kernel.org>; Tue, 31 Oct 2023 20:28:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698809331;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1ROLyTgdor1Iiugtvfld4vt9YK71fvxPlw4+vew+w8E=;
-        b=dsc1Hfs6rZxmsxjFjsxsnrVxmDbgqC+dAztzD5zv5LMMYo2GAcGdK7P6dBx1iNwv6C0Udv
-        V2WjvmNaVAfKx3lHZnWXzmViZYEH4BF9Ssya43MxBerIYzRsoY0uAdcqTs9EuronysGFPd
-        07YvXhEFw2xcq6Kefn8S+Vq1tARG1Go=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-106-OrLX-g7TNT2E7CU7F61L9A-1; Tue, 31 Oct 2023 23:28:40 -0400
-X-MC-Unique: OrLX-g7TNT2E7CU7F61L9A-1
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-49aa4091659so2291956e0c.3
-        for <linux-block@vger.kernel.org>; Tue, 31 Oct 2023 20:28:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698809319; x=1699414119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1ROLyTgdor1Iiugtvfld4vt9YK71fvxPlw4+vew+w8E=;
-        b=m/p7UlnjSMvSVf3eBE7YzFm+wJDjDs4oUuBQ+HcVmx6m0fEuCKmQ+3D9CPwR4N/bvt
-         t2zTBmvP/H3CSSrkyV2lxzcdZlUI63OL7Bbe7k5fN26ELTyGrvUAg9SrRPM4Ozs5B9Iy
-         kdwjM4BR6p4u1+c2JDsXnuIax32o7BEwtdQpWQvqXp2WZJWiomYI9HdZLeOvMRjS3zQE
-         XongrSmUoVckXufvkoVS889AqzmYzvuSc7K0jCm+IciljsZPQtIRbCAaGpY9wc2F0/ct
-         nBao3u74TD7EWHnF3O2KjLclJEiZ8YtTn8m0R4C75DSo9hk+8hNJq4kkMWVNUCf08EWW
-         03Bg==
-X-Gm-Message-State: AOJu0YxtcLSnDUPC8j0lpaMcDp6WV7FbvGdIBkUkDJCXWOdsMuDsfgDk
-        L8mWtAUbb0zg2r5b6PSjlesywAH5+gG5BNkvBppLI/bweRBnH4CpgAfikq+DP1K2SgKO1TzrZHr
-        UFLhfcmkAOptuFdaOG3eYh9tYs3BWn1dou6pxGlnx/X9s0UreWEVsWQs=
-X-Received: by 2002:a1f:2f86:0:b0:4a0:6fd4:4333 with SMTP id v128-20020a1f2f86000000b004a06fd44333mr13479040vkv.13.1698809319049;
-        Tue, 31 Oct 2023 20:28:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEg/Ea/sJxYHMeUDEtXzBROGVxeSw8LuMoqsVxdxR6bzs3C9+oupqZ/5ATGTsJWoZgSbPWmb9Ctxbi07GhAcE=
-X-Received: by 2002:a1f:2f86:0:b0:4a0:6fd4:4333 with SMTP id
- v128-20020a1f2f86000000b004a06fd44333mr13479034vkv.13.1698809318784; Tue, 31
- Oct 2023 20:28:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAGVVp+VTPpuD5BditV_frdgbW5zJFkCqMe-JqZhRBkrRQGHsUg@mail.gmail.com>
- <86a416e5-8738-6d4a-094f-9d2e763f7092@huaweicloud.com> <CAGVVp+V+W1W1NPPGDM7rTkgKuxPcw44d9XNy3_97ekmeoQ9xLQ@mail.gmail.com>
- <36082a7d-e49f-6fac-6715-8220226f45e1@huaweicloud.com>
-In-Reply-To: <36082a7d-e49f-6fac-6715-8220226f45e1@huaweicloud.com>
-From:   Changhui Zhong <czhong@redhat.com>
-Date:   Wed, 1 Nov 2023 11:28:27 +0800
-Message-ID: <CAGVVp+WDxQ8W8THDkx1XrQKmeV=-6YgnhH+UWF_2iLgTMGfssw@mail.gmail.com>
-Subject: Re: [bug report] RIP: 0010:throtl_trim_slice+0xc6/0x320 caused kernel panic
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Linux Block Devices <linux-block@vger.kernel.org>,
-        "yukuai (C)" <yukuai3@huawei.com>, Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S233077AbjKAEJu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 00:09:50 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD6FDDF;
+        Tue, 31 Oct 2023 21:09:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1698811784; x=1730347784;
+  h=from:to:subject:date:message-id:content-id:
+   content-transfer-encoding:mime-version;
+  bh=5WgMviH4BcJ4UlWkS9Ei4+No1NDgff3MmSG/UenmKLA=;
+  b=FAs+YIhs/vRzK/YCmrZ1fXRZUtp3PNWV/ZL7e4Nfzwr4YNcwiw4OfX+T
+   jPXxzoQaEQkt+QNsqRx6q34WjJNrxXvsWcNtplVjbPkWJFmVwSRusXrwu
+   shs2Db1QmpnBUJCA6Hvfl0mKaMWAtYjUigqj6s3W7Un3k4YRKob9EVhQP
+   nxG3Kn3b7eSKm6lBU4deWEHF3AmZcboDFvmJFNFN+dhlKUdd+UvdyzleL
+   xGFaykTya+WX2eZOpvXYV4CYM3Z4zw0oqlBCGLooX14UIMd1BVEMRVuN/
+   6VDpEfmck9qZ0ULLknQRHnNQoKqc4rDxTD8flSNqgsmRbDxGweT29odv+
+   w==;
+X-CSE-ConnectionGUID: +WGJ7+pJSBSEtgzAlYKXRQ==
+X-CSE-MsgGUID: 3yxtEuRDSJ+E5yHUesxGdg==
+X-IronPort-AV: E=Sophos;i="6.03,267,1694707200"; 
+   d="scan'208";a="1095226"
+Received: from mail-dm6nam11lp2169.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.169])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Nov 2023 12:09:42 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RNLUHxFL5fJz0vtUftrl995OYofACvn8BCeZtDZ2dQR5OkYJADyCswXDgzltM1fk0Ti5vUcC3T2Dc7RiFH+GWRRWgxKhxJ71fqRvmguM/oD7ZGt3WUpikr3AJFbcV3Hi8VOSJDHsDXJSDzb+aqrIFIDtW5WlZG4T8kZd56f5zTNmafcf0jos1lFl3w+KDuoR8xLo5JhKiMO/A0d33xrMe4VEzlR/XCD1pvRgSRitkzPKJ2pZtdrPLfKGzu/JGHh80x5cpOT6SZM52EHchXpfBBdOt3wgTuXo9pjeVAVC5ZkJr7l7GnfodfezziW9UvxY0jJXyXeouPHY0qxMy48S7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pfx0hXZeSWu+Uqvbs6TrZsy9cJhGCHfUgrulaPn2iKQ=;
+ b=EHr9FpwWireE2i7xdYI5EqJ0WhMULs8n6yxJYTak4iiCaaqVn51sCZWEyya4qnNtZTAD57LoFce95H659RFqoa2X9xtup46iwJqQxOIM3xhgkdzSELep5XgvnQucXyxda8NtgT761fmZnkLgfkffAPovMycvb1bm/NikTiGGC4Ab/bCU10PTZv1FC56dkIh85dozEBIGAZb0y9046/GkX9I2UHfnkjEzC8MilgKl1Bku+BUBedd9pu3xp5mu0vR0q/yRyAtev+TBaPsn1y8rTfB9acDHV4rM8vCeOoVwjCRBhcwpFjFuLQaijRe3/gdFrpAtYltVVBrOALHbofgnDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pfx0hXZeSWu+Uqvbs6TrZsy9cJhGCHfUgrulaPn2iKQ=;
+ b=LMyw2gloKw9va1ydvVvlxQk6OttqIh+6H61PJdWoNDoMUM4TvTdjZndGa84koia/btvfAmzvVv811WX/su1Q3J3e80TbOrfKtDOtMDY/7LID+7lntBKl5x51P4eMTHPj9cTh+k/3ojfMFcOuEAr3FDDzZbtBr6IHUoX9off5O/w=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SJ0PR04MB8514.namprd04.prod.outlook.com (2603:10b6:a03:4e6::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.22; Wed, 1 Nov
+ 2023 04:09:39 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::2256:4ad2:cd2b:dc9e]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::2256:4ad2:cd2b:dc9e%3]) with mapi id 15.20.6954.019; Wed, 1 Nov 2023
+ 04:09:38 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: blktests failures with v6.6
+Thread-Topic: blktests failures with v6.6
+Thread-Index: AQHaDHk7/Y1dbpXpUkmaEvYMjkxaWw==
+Date:   Wed, 1 Nov 2023 04:09:38 +0000
+Message-ID: <6qycihftrxsdvuvpsvmkbe2swy5u2isrtu6jiyf3khzusdzilc@34kda7iutwdq>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB8514:EE_
+x-ms-office365-filtering-correlation-id: e8584477-b580-420e-1724-08dbda905dde
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ocYP7tuSrMV0n63mygGTtJ9U7J+QQvRG6RCXYNt8ByCEDpRiew7GlFL36y4DijbOLPJkITIpopz6IwGp+UXMT3ZHNOkcPQQ2XE32tjd9z7mK/VQN3RghE6z7JAPlLdIO6xHd3CBk83dU42Zedy6L0BzLAxGcVYqUghFJ6xuyhwkdkq978ZOiu0iHuZ+yUnm1/fq7/nKImP+1AO2/o9yBNfaFqjHhMyiSaw3R3cyJj6cq0ydlMJwFji91EaVFV3u1p4jBpYSJMNMzzsAOFtAn7VU8KNWVCJE8Zjw8KwC4rEpIddL+f0eolo3POIeUkhfDbqmzjWruhLX7NoMZaKDzkfehC1ZZHsja3Y70AoYXH005gvMOnoIkHOlbhWHAJ4AElepkBk/WYPqa/0nx9VJuD/+JaCVUYt2Ae1uH6MM0qY7mKLPY+lOlTGd3w+/J0i7qe5Q9pZx5iSxuv/hDOdApe9tSd8VTKBASL1R5tkBrr8UFQPDQLm/yPpfnq70mlxHSFFyQOy4e69tzdfWEfZSix73ZV8A5HfFO5SGDegfPsLGAVfkMrnq9VD/m8lYrrOkK/roXWfu+upPSuVfNezmjEuexMdaI4gbolLWzSqV4lVkEPFRdXCOoFe1ilUCQMlYla91ktTns9dCc2oGccAu76II0AhXCBexBuv4LjtoVgx8JVUJdFV3xoFOyBvMsjZnB
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(39860400002)(346002)(396003)(136003)(376002)(230273577357003)(230173577357003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(26005)(6506007)(71200400001)(38100700002)(82960400001)(38070700009)(33716001)(122000001)(86362001)(83380400001)(9686003)(6512007)(316002)(41300700001)(64756008)(66476007)(66446008)(66946007)(44832011)(66556008)(6486002)(5660300002)(2906002)(76116006)(110136005)(91956017)(8676002)(478600001)(966005)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PC3af2y7i9l+DnkiZhNUfCOYancBfs26aIYxvhC3GSP38Tjeko5yc0/WQDZC?=
+ =?us-ascii?Q?xhqOpT5U0siYZ0XDPYunguCcgaZsbYFAm66gpDpWhJ9EY7pA6v5oWmz87yJF?=
+ =?us-ascii?Q?mMAofm4SaXppTByQbtXvfyfTHPPnIuKdQFh6hXS0sa39HLDA5FG6+eb8VO+d?=
+ =?us-ascii?Q?I+3TY73bFiH9N0lnuTSfYdecWkixgtbiJP3nti54cxfnXFpRLOyxtezkMS2e?=
+ =?us-ascii?Q?3u0ZDBOkk96IhGoLc2+gfOxYsSqOfQVxBGduXdKrK2z7J6tC78dpwKw48JZv?=
+ =?us-ascii?Q?hQI3ZCyi7DyOvm1fcqP4OV1WMLWWPL2IHstbsSsiYji656MMwdmcYQKPdI7W?=
+ =?us-ascii?Q?hJ4DhMQ76FFwRjGKtt1HZG++hUVPMzlWOOsfKjWEGLIuLpxzfRmJWbyxZ6Ef?=
+ =?us-ascii?Q?kurFRXJlCX0zslziwwvoN5lIJMKt/TnaRThxdMezh4hBH/M1SEF0RHbI7j1T?=
+ =?us-ascii?Q?r0TbQ+096M+lkpzR0ovpOz7wOV8AJCHrt/4e6EmKJJJ/f+YGMIABZaCz6YMy?=
+ =?us-ascii?Q?V/7drvdiSQ3DvaJs54NxtiBgkL5OhnK6UmwBeZzblYLg8Nc0C915xjdkW0Kh?=
+ =?us-ascii?Q?hMZq0UZp4+4TJWD3znaS9dbLJ9Ds80feEcVjNc4mG4ejCJiKJnoyT/gJcSyi?=
+ =?us-ascii?Q?+WAHoNstroxhWDtoD0mQFM3dXLihtYqD6H5NuAoTlilcB4b+YsJlMNbVgaFx?=
+ =?us-ascii?Q?5LN9E5vg78XLfhkJ3BobWYbxV2IHwCtkgIU4MIs1rxhMdblR4zL9KwqU4+bx?=
+ =?us-ascii?Q?6Radzm2zOxnaCk/8WAPCo8McUmRaL9acTh9qxreawmBSOJHTZVyVvcGBIvaF?=
+ =?us-ascii?Q?VMhKbr5/FkyBA+ADggihmSM4x4Hwyul5oXHrdNtYyyfCAoUvz17Szo85vqcV?=
+ =?us-ascii?Q?7ZPA2G9ah4UnLpBPBmXyS7i1Q3Zpt1FBO6am8EXOJe7bnO/3LyL2lAIByrpA?=
+ =?us-ascii?Q?zWpY3AMrTdfEWfGmP/1wHTpYEtCM+lGhRBx+nA3rPgy+xlK62YySIgAodyUj?=
+ =?us-ascii?Q?5WQ24MlBdJKxCdsNR3y/W3qhkqRyFZsk98/bdZOzK3MjswCusMjF0TlLwR66?=
+ =?us-ascii?Q?8uyZKUStML1b7eVsgPIRCwPoYFZct9p2q7YYHv+AVL4kOSv7IebOm9WX8RiK?=
+ =?us-ascii?Q?oq8gfnO1ruwxIi1x2u6nH05C4f4YuqpjprX12AvYUc1ATG1W6e1HGYhPER6g?=
+ =?us-ascii?Q?Gve6eVBhb+ujR3KGwzyh6CT8CeTShsQeWyo317pmH6eSBjBNOrqCuEfmi4AD?=
+ =?us-ascii?Q?+yHNUDEwvp6WXdcaXM20ivS8ZLh9GgDRiv8A+fjEZzsgJR+z3TrPv9UI8EM6?=
+ =?us-ascii?Q?6gEodLGzHlda/unzd5uO8ZWB09yHE7gVJZNc8Rf1IWI9wYJTsG9XzLEbXLHo?=
+ =?us-ascii?Q?DCGIU6w/e9q162X9QxO5eytfkwM/+O0bfSKQ7TmBMoPCA2djbZt0VcJofGec?=
+ =?us-ascii?Q?7QAEH+hMG1oJ5PnwXi5IYniChav1ziX70kgro0eVK7zpVR/rpyFUxWfPIgBQ?=
+ =?us-ascii?Q?z3oHQRbTzAGLaMlS6mB71FAx9g8h5EopLwIDO+JwMR2vCXVTNjJGWMcCNrzc?=
+ =?us-ascii?Q?hyGd5GuSBtv86rMc/jNlK3EoQRnD2SXbABJlvQCBGi9O0mhmtoRZvMa2hbM3?=
+ =?us-ascii?Q?cRwUDdnN+Jm5Rr5JXYiqiK0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A1C943B30AD71C4DBA01A9A319AEA696@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: NgB3f9KgmcjQhV8wGiddncWDAwahT72AIFJqyDPwFwiAu5n6NaQvVRwELpqeODxPvoh1bjPM5lddZPEIX7/lKLbQatfUZZ4SrKRRKcZ3VNX6jT3mRW7/xGXkPASGuCC8aptw9w9fCsYnGuxuZKbVgRZUJM9fe8RTU8Mwzm5188px9/qQm0pVu3ijt705qAdNtcsZXCo14m5uzaDruDdKb9PK6RS8a5S1CKTT19dolgCauPBrpryGjOZiPLdFmHd4wgmwNlWX3o5eefbEoK1frNVylfU3Tx2S9WgmSXLkmtSPAy9YN7Hbf138U4lrVGONZT/2nXtrFXcPYP4H9MYLo2iS4ETt5TMx4zyCR41v1ACh2ayyvaMK179ecUKdU3DIqv8DCaH8YG7CE7Q+NMSLKjN8L24R2mNp9HNFaLXBqxdaaglTKvNpEYK6W6dX3RR1m6RdJxw0R6zNYCWeUuoJaH632O5q9AiO7x8U8NG1HOCGhI82OJiA3fDRa+cajzBtgx2vR1s1d/aD0g8lPcTwspgnDXPpSU8bCJpdIJT/fo4zCbNDbmn2lf26+fsGuc77iZFXZxkJrzpkBpxxz4lfgCLsJKlCYFeVkGNDUkgPtYrdJ0vLeDByobaAGYoQFjgIky/rJuruKsrYLSo4FUUgWGwWNykuOK7XQ/oe+MMRFR4xbifGFUidEztoHKYStmzqbA3012QSW7DPvFLkvGfWKOuw9KL4v+1frYF1QGhoGJ7NBgZJEeeWjOhUfoLNlPPhv0N6MWxCYkUMFIoExHiG+9u7dw42A9glyTWpYyiqDH68Lb5cP5M1PbD4eG7XYE09J+OoGxORRK0a4eY+dHcg+Q==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e8584477-b580-420e-1724-08dbda905dde
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2023 04:09:38.7594
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rEz3mSifRNlaFKtps0zkFt3/0yE9/Vn+04foL6aLkOJQH11wFO37jvooJJbB96pw+msTsx0jGTrT05oEXMD3zG7Hh/kLfZjKyUIRdNSub/A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB8514
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Yu , Ming
+Hi all,
 
-I check again and confirmed that the patch has been merged into the
-latest master branch, and re-ran the test=EF=BC=8Cthis issue can no longer =
-be
-triggered
+I ran the latest blktests (git hash: 3f75e6241f6b) with v6.6 kernel, and ob=
+seved
+four failures below. They are all known for months.
 
-Thanks you=EF=BC=81
+As for the two other failures observed with v6.6-rc1 kernel [1], they are n=
+o
+longer observed with v6.6 kernel. Good.
 
-On Tue, Oct 31, 2023 at 8:30=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
->
-> Hi,
->
-> =E5=9C=A8 2023/10/31 18:28, Changhui Zhong =E5=86=99=E9=81=93:
-> > Hi=EF=BC=8CYu Kuai
-> >
-> > the "master" branch I use, already contain the patch you provide, but
-> > I  still can triggered this issue
-> >
-> > Thanks,
-> >
-> >
-> > On Tue, Oct 31, 2023 at 11:29=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.c=
-om> wrote:
-> >>
-> >> Hi,
-> >>
-> >> =E5=9C=A8 2023/10/31 11:08, Changhui Zhong =E5=86=99=E9=81=93:
-> >>> Hello,
-> >>>
-> >>> triggered below issue with branch 'master',please help check,
-> >>>
-> >>> INFO: HEAD of cloned kernel
-> >>> commit 888cf78c29e223fd808682f477c18cf8f61ad995
->
-> It's right latest master contain the fix patch, but this commit doesn't
-> contain it, can you please check this?
->
-> Thanks,
-> Kuai
->
-> >>> Merge: 09a4a03c073b 6e6c6d6bc6c9
-> >>> Author: Linus Torvalds <torvalds@linux-foundation.org>
-> >>> Date:   Fri Oct 27 05:43:05 2023 -1000
-> >>>
-> >>>       Merge tag 'iommu-fix-v6.6-rc7' of
-> >>> git://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu
-> >>>
-> >>>       Pull iommu fix from Joerg Roedel:
-> >>>
-> >>>        - Fix boot regression for Sapphire Rapids with Intel VT-d driv=
-er
-> >>>
-> >>>       * tag 'iommu-fix-v6.6-rc7' of
-> >>> git://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu:
-> >>>         iommu: Avoid unnecessary cache invalidations
-> >>>
-> >>> steps:
-> >>> echo "+cpuset +cpu +io" > /sys/fs/cgroup/cgroup.subtree_control
-> >>> mkdir /sys/fs/cgroup/test
-> >>> MAJ=3D$(ls -l /dev/"$disk" | awk -F ',' '{print $1}' | awk -F ' ' '{p=
-rint $NF}')
-> >>> MIN=3D$(ls -l /dev/"$disk" | awk -F ',' '{print $2}' | awk -F ' ' '{p=
-rint $1}')
-> >>> echo "$MAJ:$MIN wbps=3D1024" > /sys/fs/cgroup/test/io.max
-> >>> echo $$ > /sys/fs/cgroup/test/cgroup.procs
-> >>> dd if=3D/dev/zero of=3D/dev/$disk bs=3D10k count=3D1 oflag=3Ddirect &
-> >>> dd if=3D/dev/zero of=3D/dev/$disk bs=3D10k count=3D1 oflag=3Ddirect &
-> >>> wait
-> >>>
-> >>> console log:
-> >>> [ 6502.907379] divide error: 0000 [#1] PREEMPT SMP NOPTI
-> >> This is already fixed by:
-> >>
-> >> https://lore.kernel.org/all/20231020223617.2739774-1-khazhy@google.com=
-/
-> >>
-> >> Thanks,
-> >> Kuai
-> >>> [ 6502.912447] CPU: 6 PID: 0 Comm: swapper/6 Not tainted 6.6.0-rc7+ #=
-1
-> >>> [ 6502.918711] Hardware name: Dell Inc. PowerEdge R650xs/0PPTY2, BIOS
-> >>> 1.4.4 10/07/2021
-> >>> [ 6502.926364] RIP: 0010:throtl_trim_slice+0xc6/0x320
-> >>> [ 6502.931156] Code: 00 00 48 89 e8 48 f7 f1 48 29 d5 74 9f 40 0f b6
-> >>> f6 48 89 df 89 34 24 e8 f8 f5 ff ff 8b 34 24 b9 e8 03 00 00 48 89 df
-> >>> 48 f7 e5 <48> f7 f1 49 03 85 f8 01 00 00 49 89 c7 e8 78 e0 ff ff ba f=
-f
-> >>> ff ff
-> >>> [ 6502.949902] RSP: 0018:ffa00000006ccdc0 EFLAGS: 00010887
-> >>> [ 6502.955128] RAX: ffffffffffffd8f0 RBX: ff110001061aa000 RCX: 00000=
-000000003e8
-> >>> [ 6502.962260] RDX: 000000000000270f RSI: 0000000000000001 RDI: ff110=
-001061aa000
-> >>> [ 6502.969394] RBP: 0000000000002710 R08: ffffffffffffffff R09: ff110=
-0010fa74818
-> >>> [ 6502.976527] R10: ff110001061aa010 R11: ff1100010fa74830 R12: 00000=
-00000000001
-> >>> [ 6502.983660] R13: ff110001061aa008 R14: 0000000000000001 R15: 00000=
-00000000021
-> >>> [ 6502.990793] FS:  0000000000000000(0000) GS:ff1100046fd80000(0000)
-> >>> knlGS:0000000000000000
-> >>> [ 6502.998879] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>> [ 6503.004624] CR2: 000055d60b15b000 CR3: 00000001dce20005 CR4: 00000=
-00000771ee0
-> >>> [ 6503.011757] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000=
-00000000000
-> >>> [ 6503.018891] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000=
-00000000400
-> >>> [ 6503.026023] PKRU: 55555554
-> >>> [ 6503.028735] Call Trace:
-> >>> [ 6503.031187]  <IRQ>
-> >>> [ 6503.033207]  ? die+0x33/0x90
-> >>> [ 6503.036093]  ? do_trap+0xe0/0x110
-> >>> [ 6503.039413]  ? throtl_trim_slice+0xc6/0x320
-> >>> [ 6503.043599]  ? do_error_trap+0x65/0x80
-> >>> [ 6503.047351]  ? throtl_trim_slice+0xc6/0x320
-> >>> [ 6503.051538]  ? exc_divide_error+0x36/0x50
-> >>> [ 6503.055549]  ? throtl_trim_slice+0xc6/0x320
-> >>> [ 6503.059735]  ? asm_exc_divide_error+0x16/0x20
-> >>> [ 6503.064098]  ? throtl_trim_slice+0xc6/0x320
-> >>> [ 6503.068281]  tg_dispatch_one_bio+0xf0/0x1e0
-> >>> [ 6503.072469]  throtl_pending_timer_fn+0x1e5/0x510
-> >>> [ 6503.077086]  ? __pfx_throtl_pending_timer_fn+0x10/0x10
-> >>> [ 6503.082226]  ? __pfx_throtl_pending_timer_fn+0x10/0x10
-> >>> [ 6503.087365]  call_timer_fn+0x24/0x130
-> >>> [ 6503.091034]  __run_timers.part.0+0x1ee/0x280
-> >>> [ 6503.095304]  ? __hrtimer_run_queues+0x121/0x2b0
-> >>> [ 6503.099839]  ? sched_clock+0xc/0x30
-> >>> [ 6503.103329]  run_timer_softirq+0x26/0x50
-> >>> [ 6503.107256]  __do_softirq+0xc8/0x2ab
-> >>> [ 6503.110834]  __irq_exit_rcu+0xa1/0xc0
-> >>> [ 6503.114501]  sysvec_apic_timer_interrupt+0x72/0x90
-> >>> [ 6503.119295]  </IRQ>
-> >>> [ 6503.121400]  <TASK>
-> >>> [ 6503.123507]  asm_sysvec_apic_timer_interrupt+0x16/0x20
-> >>> [ 6503.128646] RIP: 0010:cpuidle_enter_state+0xc2/0x420
-> >>> [ 6503.133611] Code: 00 e8 22 cf 4e ff e8 4d f4 ff ff 8b 53 04 49 89
-> >>> c5 0f 1f 44 00 00 31 ff e8 0b a8 4d ff 45 84 ff 0f 85 3a 02 00 00 fb
-> >>> 45 85 f6 <0f> 88 6e 01 00 00 49 63 d6 4c 2b 2c 24 48 8d 04 52 48 8d 0=
-4
-> >>> 82 49
-> >>> [ 6503.152357] RSP: 0018:ffa00000001ebe80 EFLAGS: 00000206
-> >>> [ 6503.157582] RAX: ff1100046fdb2100 RBX: ff1100046fdbc7e0 RCX: 00000=
-0000000001f
-> >>> [ 6503.164707] RDX: 0000000000000006 RSI: 000000003d1877c2 RDI: 00000=
-00000000000
-> >>> [ 6503.171842] RBP: 0000000000000003 R08: 000005ea137b9428 R09: 00000=
-00000000000
-> >>> [ 6503.178972] R10: 00000000000003dc R11: ff1100046fdb0be4 R12: fffff=
-fffbe2b1900
-> >>> [ 6503.186104] R13: 000005ea137b9428 R14: 0000000000000003 R15: 00000=
-00000000000
-> >>> [ 6503.193232]  cpuidle_enter+0x29/0x40
-> >>> [ 6503.196811]  cpuidle_idle_call+0xfa/0x160
-> >>> [ 6503.200822]  do_idle+0x7b/0xe0
-> >>> [ 6503.203882]  cpu_startup_entry+0x26/0x30
-> >>> [ 6503.207808]  start_secondary+0x115/0x140
-> >>> [ 6503.211735]  secondary_startup_64_no_verify+0x17d/0x18b
-> >>> [ 6503.216961]  </TASK>
-> >>> [ 6503.219154] Modules linked in: binfmt_misc dm_crypt raid10 raid1
-> >>> raid0 dm_raid raid456 async_raid6_recov async_memcpy async_pq
-> >>> async_xor xor async_tx raid6_pq loop nf_tables nfnetlink tls
-> >>> rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscach=
-e
-> >>> netfs rfkill sunrpc ipmi_ssif vfat fat intel_rapl_msr
-> >>> intel_rapl_common intel_uncore_frequency intel_uncore_frequency_commo=
-n
-> >>> i10nm_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp
-> >>> coretemp kvm_intel kvm mgag200 irqbypass rapl iTCO_wdt i2c_algo_bit
-> >>> acpi_ipmi drm_shmem_helper iTCO_vendor_support dax_hmem intel_cstate
-> >>> ipmi_si cxl_acpi drm_kms_helper mei_me dell_smbios i2c_i801
-> >>> ipmi_devintf isst_if_mbox_pci isst_if_mmio dcdbas cxl_core
-> >>> intel_uncore dell_wmi_descriptor wmi_bmof pcspkr mei isst_if_common
-> >>> intel_pch_thermal intel_vsec i2c_smbus ipmi_msghandler
-> >>> acpi_power_meter drm fuse xfs libcrc32c sd_mod t10_pi sg ahci libahci
-> >>> crct10dif_pclmul crc32_pclmul crc32c_intel libata tg3
-> >>> ghash_clmulni_intel wmi dm_mirror dm_region_hash dm_log dm_mod
-> >>> [ 6503.219202]  [last unloaded: scsi_debug]
-> >>> [ 6503.311377] ---[ end trace 0000000000000000 ]---
-> >>> [ 6503.346804] RIP: 0010:throtl_trim_slice+0xc6/0x320
-> >>> [ 6503.351597] Code: 00 00 48 89 e8 48 f7 f1 48 29 d5 74 9f 40 0f b6
-> >>> f6 48 89 df 89 34 24 e8 f8 f5 ff ff 8b 34 24 b9 e8 03 00 00 48 89 df
-> >>> 48 f7 e5 <48> f7 f1 49 03 85 f8 01 00 00 49 89 c7 e8 78 e0 ff ff ba f=
-f
-> >>> ff ff
-> >>> [ 6503.370344] RSP: 0018:ffa00000006ccdc0 EFLAGS: 00010887
-> >>> [ 6503.375569] RAX: ffffffffffffd8f0 RBX: ff110001061aa000 RCX: 00000=
-000000003e8
-> >>> [ 6503.382703] RDX: 000000000000270f RSI: 0000000000000001 RDI: ff110=
-001061aa000
-> >>> [ 6503.389836] RBP: 0000000000002710 R08: ffffffffffffffff R09: ff110=
-0010fa74818
-> >>> [ 6503.396969] R10: ff110001061aa010 R11: ff1100010fa74830 R12: 00000=
-00000000001
-> >>> [ 6503.404100] R13: ff110001061aa008 R14: 0000000000000001 R15: 00000=
-00000000021
-> >>> [ 6503.411235] FS:  0000000000000000(0000) GS:ff1100046fd80000(0000)
-> >>> knlGS:0000000000000000
-> >>> [ 6503.419320] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>> [ 6503.425067] CR2: 000055d60b15b000 CR3: 00000001dce20005 CR4: 00000=
-00000771ee0
-> >>> [ 6503.432199] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000=
-00000000000
-> >>> [ 6503.439332] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000=
-00000000400
-> >>> [ 6503.446463] PKRU: 55555554
-> >>> [ 6503.449176] Kernel panic - not syncing: Fatal exception in interru=
-pt
-> >>> [ 6503.455610] Kernel Offset: disabled
-> >>> [ 6503.488281] ---[ end Kernel panic - not syncing: Fatal exception i=
-n
-> >>> interrupt ]---
-> >>>
-> >>> Thanks,
-> >>>
-> >>> .
-> >>>
-> >>
-> >
-> > .
-> >
->
+[1] https://lore.kernel.org/linux-block/u4g3jh6dnowouthos3tdex2pflzo3hat55e=
+5dc4j6pul3a3uov@y2axtbiura2q/
 
+List of failures
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+#1: block/011
+#2: nvme/003 (fabrics transport)
+#3: nvme/* (fc transport)
+#4: srp/002, 011 (rdma_rxe driver)
 
---=20
+Failure description
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Changhui  Zhong
+#1: block/011
 
-Quality Engineer,Kernel QE
+   The test case fails with NVME devices due to lockdep WARNING "possible
+   circular locking dependency detected". Reported in Sep/2022 [2]. In LSF
+   2023, it was noted that this failure should be fixed.
 
-Red Hat
+   Also, it was found recently that this test case still causes failure of
+   following tests. Fix work is ongoing [3].
 
-Red Hat Beijing - Raycom
+   [2] https://lore.kernel.org/linux-block/20220930001943.zdbvolc3gkekfmcv@=
+shindev/
+   [3] https://github.com/kawasaki/blktests/commit/f540cbb0eeb66e2c76a88efb=
+e65a2b59d55630fd
 
+#2: nvme/003 (fabrics transport)
+
+   When nvme test group is run with trtype=3Drdma or tcp, the test case fai=
+ls
+   due to lockdep WARNING "possible circular locking dependency detected".
+   Reported in May/2023. Fix discussions were held [4][5].
+
+   [4] https://lore.kernel.org/linux-nvme/20230511150321.103172-1-bvanassch=
+e@acm.org/
+   [5] https://lore.kernel.org/linux-nvme/5cb63b10-72ab-4b7c-7574-48583ea8f=
+fd1@grimberg.me/
+
+#3: nvme/* (fc transport)
+
+   With trtype=3Dfc configuration, test run on nvme test group hangs. Danie=
+l is
+   driving fix work.
+
+#4: srp/002, 011 (rdma_rxe driver)
+
+   Test process hang is observed occasionally. Reported to the relevant mai=
+ling
+   lists in Aug/2023 [6]. Blktests was modified to change default driver fr=
+om
+   rdma_rxe to siw to avoid impacts on blktests users. Root cause is not ye=
+t
+   understood. Bob and Bart have spent time to chase it down (Thank you).
+
+   [6] https://lore.kernel.org/linux-rdma/18a3ae8c-145b-4c7f-a8f5-67840feeb=
+98c@acm.org/T/#mee9882c2cfd0cfff33caa04e75418576f4c7a789=
