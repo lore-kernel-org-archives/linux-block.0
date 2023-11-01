@@ -2,199 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E08C4167B
-	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 04:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 903AFC4167B
+	for <linux-block@archiver.kernel.org>; Wed,  1 Nov 2023 06:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236157AbjKAEJv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Nov 2023 00:09:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39852 "EHLO
+        id S234462AbjKAGkY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Nov 2023 02:40:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233077AbjKAEJu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 00:09:50 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD6FDDF;
-        Tue, 31 Oct 2023 21:09:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1698811784; x=1730347784;
-  h=from:to:subject:date:message-id:content-id:
-   content-transfer-encoding:mime-version;
-  bh=5WgMviH4BcJ4UlWkS9Ei4+No1NDgff3MmSG/UenmKLA=;
-  b=FAs+YIhs/vRzK/YCmrZ1fXRZUtp3PNWV/ZL7e4Nfzwr4YNcwiw4OfX+T
-   jPXxzoQaEQkt+QNsqRx6q34WjJNrxXvsWcNtplVjbPkWJFmVwSRusXrwu
-   shs2Db1QmpnBUJCA6Hvfl0mKaMWAtYjUigqj6s3W7Un3k4YRKob9EVhQP
-   nxG3Kn3b7eSKm6lBU4deWEHF3AmZcboDFvmJFNFN+dhlKUdd+UvdyzleL
-   xGFaykTya+WX2eZOpvXYV4CYM3Z4zw0oqlBCGLooX14UIMd1BVEMRVuN/
-   6VDpEfmck9qZ0ULLknQRHnNQoKqc4rDxTD8flSNqgsmRbDxGweT29odv+
-   w==;
-X-CSE-ConnectionGUID: +WGJ7+pJSBSEtgzAlYKXRQ==
-X-CSE-MsgGUID: 3yxtEuRDSJ+E5yHUesxGdg==
-X-IronPort-AV: E=Sophos;i="6.03,267,1694707200"; 
-   d="scan'208";a="1095226"
-Received: from mail-dm6nam11lp2169.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.169])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Nov 2023 12:09:42 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RNLUHxFL5fJz0vtUftrl995OYofACvn8BCeZtDZ2dQR5OkYJADyCswXDgzltM1fk0Ti5vUcC3T2Dc7RiFH+GWRRWgxKhxJ71fqRvmguM/oD7ZGt3WUpikr3AJFbcV3Hi8VOSJDHsDXJSDzb+aqrIFIDtW5WlZG4T8kZd56f5zTNmafcf0jos1lFl3w+KDuoR8xLo5JhKiMO/A0d33xrMe4VEzlR/XCD1pvRgSRitkzPKJ2pZtdrPLfKGzu/JGHh80x5cpOT6SZM52EHchXpfBBdOt3wgTuXo9pjeVAVC5ZkJr7l7GnfodfezziW9UvxY0jJXyXeouPHY0qxMy48S7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pfx0hXZeSWu+Uqvbs6TrZsy9cJhGCHfUgrulaPn2iKQ=;
- b=EHr9FpwWireE2i7xdYI5EqJ0WhMULs8n6yxJYTak4iiCaaqVn51sCZWEyya4qnNtZTAD57LoFce95H659RFqoa2X9xtup46iwJqQxOIM3xhgkdzSELep5XgvnQucXyxda8NtgT761fmZnkLgfkffAPovMycvb1bm/NikTiGGC4Ab/bCU10PTZv1FC56dkIh85dozEBIGAZb0y9046/GkX9I2UHfnkjEzC8MilgKl1Bku+BUBedd9pu3xp5mu0vR0q/yRyAtev+TBaPsn1y8rTfB9acDHV4rM8vCeOoVwjCRBhcwpFjFuLQaijRe3/gdFrpAtYltVVBrOALHbofgnDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pfx0hXZeSWu+Uqvbs6TrZsy9cJhGCHfUgrulaPn2iKQ=;
- b=LMyw2gloKw9va1ydvVvlxQk6OttqIh+6H61PJdWoNDoMUM4TvTdjZndGa84koia/btvfAmzvVv811WX/su1Q3J3e80TbOrfKtDOtMDY/7LID+7lntBKl5x51P4eMTHPj9cTh+k/3ojfMFcOuEAr3FDDzZbtBr6IHUoX9off5O/w=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SJ0PR04MB8514.namprd04.prod.outlook.com (2603:10b6:a03:4e6::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.22; Wed, 1 Nov
- 2023 04:09:39 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::2256:4ad2:cd2b:dc9e]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::2256:4ad2:cd2b:dc9e%3]) with mapi id 15.20.6954.019; Wed, 1 Nov 2023
- 04:09:38 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: blktests failures with v6.6
-Thread-Topic: blktests failures with v6.6
-Thread-Index: AQHaDHk7/Y1dbpXpUkmaEvYMjkxaWw==
-Date:   Wed, 1 Nov 2023 04:09:38 +0000
-Message-ID: <6qycihftrxsdvuvpsvmkbe2swy5u2isrtu6jiyf3khzusdzilc@34kda7iutwdq>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB8514:EE_
-x-ms-office365-filtering-correlation-id: e8584477-b580-420e-1724-08dbda905dde
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ocYP7tuSrMV0n63mygGTtJ9U7J+QQvRG6RCXYNt8ByCEDpRiew7GlFL36y4DijbOLPJkITIpopz6IwGp+UXMT3ZHNOkcPQQ2XE32tjd9z7mK/VQN3RghE6z7JAPlLdIO6xHd3CBk83dU42Zedy6L0BzLAxGcVYqUghFJ6xuyhwkdkq978ZOiu0iHuZ+yUnm1/fq7/nKImP+1AO2/o9yBNfaFqjHhMyiSaw3R3cyJj6cq0ydlMJwFji91EaVFV3u1p4jBpYSJMNMzzsAOFtAn7VU8KNWVCJE8Zjw8KwC4rEpIddL+f0eolo3POIeUkhfDbqmzjWruhLX7NoMZaKDzkfehC1ZZHsja3Y70AoYXH005gvMOnoIkHOlbhWHAJ4AElepkBk/WYPqa/0nx9VJuD/+JaCVUYt2Ae1uH6MM0qY7mKLPY+lOlTGd3w+/J0i7qe5Q9pZx5iSxuv/hDOdApe9tSd8VTKBASL1R5tkBrr8UFQPDQLm/yPpfnq70mlxHSFFyQOy4e69tzdfWEfZSix73ZV8A5HfFO5SGDegfPsLGAVfkMrnq9VD/m8lYrrOkK/roXWfu+upPSuVfNezmjEuexMdaI4gbolLWzSqV4lVkEPFRdXCOoFe1ilUCQMlYla91ktTns9dCc2oGccAu76II0AhXCBexBuv4LjtoVgx8JVUJdFV3xoFOyBvMsjZnB
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(39860400002)(346002)(396003)(136003)(376002)(230273577357003)(230173577357003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(26005)(6506007)(71200400001)(38100700002)(82960400001)(38070700009)(33716001)(122000001)(86362001)(83380400001)(9686003)(6512007)(316002)(41300700001)(64756008)(66476007)(66446008)(66946007)(44832011)(66556008)(6486002)(5660300002)(2906002)(76116006)(110136005)(91956017)(8676002)(478600001)(966005)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PC3af2y7i9l+DnkiZhNUfCOYancBfs26aIYxvhC3GSP38Tjeko5yc0/WQDZC?=
- =?us-ascii?Q?xhqOpT5U0siYZ0XDPYunguCcgaZsbYFAm66gpDpWhJ9EY7pA6v5oWmz87yJF?=
- =?us-ascii?Q?mMAofm4SaXppTByQbtXvfyfTHPPnIuKdQFh6hXS0sa39HLDA5FG6+eb8VO+d?=
- =?us-ascii?Q?I+3TY73bFiH9N0lnuTSfYdecWkixgtbiJP3nti54cxfnXFpRLOyxtezkMS2e?=
- =?us-ascii?Q?3u0ZDBOkk96IhGoLc2+gfOxYsSqOfQVxBGduXdKrK2z7J6tC78dpwKw48JZv?=
- =?us-ascii?Q?hQI3ZCyi7DyOvm1fcqP4OV1WMLWWPL2IHstbsSsiYji656MMwdmcYQKPdI7W?=
- =?us-ascii?Q?hJ4DhMQ76FFwRjGKtt1HZG++hUVPMzlWOOsfKjWEGLIuLpxzfRmJWbyxZ6Ef?=
- =?us-ascii?Q?kurFRXJlCX0zslziwwvoN5lIJMKt/TnaRThxdMezh4hBH/M1SEF0RHbI7j1T?=
- =?us-ascii?Q?r0TbQ+096M+lkpzR0ovpOz7wOV8AJCHrt/4e6EmKJJJ/f+YGMIABZaCz6YMy?=
- =?us-ascii?Q?V/7drvdiSQ3DvaJs54NxtiBgkL5OhnK6UmwBeZzblYLg8Nc0C915xjdkW0Kh?=
- =?us-ascii?Q?hMZq0UZp4+4TJWD3znaS9dbLJ9Ds80feEcVjNc4mG4ejCJiKJnoyT/gJcSyi?=
- =?us-ascii?Q?+WAHoNstroxhWDtoD0mQFM3dXLihtYqD6H5NuAoTlilcB4b+YsJlMNbVgaFx?=
- =?us-ascii?Q?5LN9E5vg78XLfhkJ3BobWYbxV2IHwCtkgIU4MIs1rxhMdblR4zL9KwqU4+bx?=
- =?us-ascii?Q?6Radzm2zOxnaCk/8WAPCo8McUmRaL9acTh9qxreawmBSOJHTZVyVvcGBIvaF?=
- =?us-ascii?Q?VMhKbr5/FkyBA+ADggihmSM4x4Hwyul5oXHrdNtYyyfCAoUvz17Szo85vqcV?=
- =?us-ascii?Q?7ZPA2G9ah4UnLpBPBmXyS7i1Q3Zpt1FBO6am8EXOJe7bnO/3LyL2lAIByrpA?=
- =?us-ascii?Q?zWpY3AMrTdfEWfGmP/1wHTpYEtCM+lGhRBx+nA3rPgy+xlK62YySIgAodyUj?=
- =?us-ascii?Q?5WQ24MlBdJKxCdsNR3y/W3qhkqRyFZsk98/bdZOzK3MjswCusMjF0TlLwR66?=
- =?us-ascii?Q?8uyZKUStML1b7eVsgPIRCwPoYFZct9p2q7YYHv+AVL4kOSv7IebOm9WX8RiK?=
- =?us-ascii?Q?oq8gfnO1ruwxIi1x2u6nH05C4f4YuqpjprX12AvYUc1ATG1W6e1HGYhPER6g?=
- =?us-ascii?Q?Gve6eVBhb+ujR3KGwzyh6CT8CeTShsQeWyo317pmH6eSBjBNOrqCuEfmi4AD?=
- =?us-ascii?Q?+yHNUDEwvp6WXdcaXM20ivS8ZLh9GgDRiv8A+fjEZzsgJR+z3TrPv9UI8EM6?=
- =?us-ascii?Q?6gEodLGzHlda/unzd5uO8ZWB09yHE7gVJZNc8Rf1IWI9wYJTsG9XzLEbXLHo?=
- =?us-ascii?Q?DCGIU6w/e9q162X9QxO5eytfkwM/+O0bfSKQ7TmBMoPCA2djbZt0VcJofGec?=
- =?us-ascii?Q?7QAEH+hMG1oJ5PnwXi5IYniChav1ziX70kgro0eVK7zpVR/rpyFUxWfPIgBQ?=
- =?us-ascii?Q?z3oHQRbTzAGLaMlS6mB71FAx9g8h5EopLwIDO+JwMR2vCXVTNjJGWMcCNrzc?=
- =?us-ascii?Q?hyGd5GuSBtv86rMc/jNlK3EoQRnD2SXbABJlvQCBGi9O0mhmtoRZvMa2hbM3?=
- =?us-ascii?Q?cRwUDdnN+Jm5Rr5JXYiqiK0=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <A1C943B30AD71C4DBA01A9A319AEA696@namprd04.prod.outlook.com>
+        with ESMTP id S234308AbjKAGkX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 02:40:23 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB590F7
+        for <linux-block@vger.kernel.org>; Tue, 31 Oct 2023 23:40:15 -0700 (PDT)
+Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20231101064012epoutp0280e0fd05d06bafcf685b70981519e6a3~TbIdJ_Tn61533215332epoutp02o
+        for <linux-block@vger.kernel.org>; Wed,  1 Nov 2023 06:40:12 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20231101064012epoutp0280e0fd05d06bafcf685b70981519e6a3~TbIdJ_Tn61533215332epoutp02o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1698820812;
+        bh=8yNlhLTEKwXnXCWRDcTizx48AgBy5iolZ54MBLaU7ro=;
+        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+        b=BA2e/S9O7YcCRFFBtoXgbtRa79BwI6/+wSGe9DfXXTCvKUmGghg10S8IfM4YsCg9Q
+         lTjD2YBe1dRRELOyXYXDgKMZJKC4kvNA4aR7zP/FDPf1k9BBXBHCg8BjqXbscb6tGe
+         ibvdvI1A3a8NU5UxrJDZMRlc1hkhtSGGAaSePhWQ=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+        20231101064011epcas2p20469e45892158fcd62133878954443d1~TbIcMEZza3083630836epcas2p21;
+        Wed,  1 Nov 2023 06:40:11 +0000 (GMT)
+Received: from epsmges2p2.samsung.com (unknown [182.195.36.97]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4SKy6z0lxjz4x9QF; Wed,  1 Nov
+        2023 06:40:11 +0000 (GMT)
+X-AuditID: b6c32a46-fcdfd70000002596-f8-6541f2ca8ce7
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        64.E1.09622.AC2F1456; Wed,  1 Nov 2023 15:40:10 +0900 (KST)
+Mime-Version: 1.0
+Subject: RE:(2) [PATCH v3 01/14] fs: Move enum rw_hint into a new header
+ file
+Reply-To: daejun7.park@samsung.com
+Sender: Daejun Park <daejun7.park@samsung.com>
+From:   Daejun Park <daejun7.park@samsung.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        KANCHAN JOSHI <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Jan Kara <jack@suse.cz>,
+        Christian Brauner <brauner@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jeff Layton <jlayton@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Seonghun Kim <seonghun-sui.kim@samsung.com>,
+        Jorn Lee <lunar.lee@samsung.com>,
+        Sung-Jun Park <sungjun07.park@samsung.com>,
+        Hyunji Jeon <hyunji.jeon@samsung.com>,
+        Dongwoo Kim <dongwoo7565.kim@samsung.com>,
+        Seongcheol Hong <sc01.hong@samsung.com>,
+        Jaeheon Lee <jaeheon7.lee@samsung.com>,
+        Wonjong Song <wj3.song@samsung.com>,
+        JinHwan Park <jh.i.park@samsung.com>,
+        Yonggil Song <yonggil.song@samsung.com>,
+        Soonyoung Kim <overmars.kim@samsung.com>,
+        Shinwoo Park <sw_kr.park@samsung.com>,
+        Seokhwan Kim <sukka.kim@samsung.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <9b0990ec-a3c9-48c0-b312-8c07c727e326@acm.org>
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20231101063910epcms2p18f991db15958f246fa1654f2d412e176@epcms2p1>
+Date:   Wed, 01 Nov 2023 15:39:10 +0900
+X-CMS-MailID: 20231101063910epcms2p18f991db15958f246fa1654f2d412e176
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: NgB3f9KgmcjQhV8wGiddncWDAwahT72AIFJqyDPwFwiAu5n6NaQvVRwELpqeODxPvoh1bjPM5lddZPEIX7/lKLbQatfUZZ4SrKRRKcZ3VNX6jT3mRW7/xGXkPASGuCC8aptw9w9fCsYnGuxuZKbVgRZUJM9fe8RTU8Mwzm5188px9/qQm0pVu3ijt705qAdNtcsZXCo14m5uzaDruDdKb9PK6RS8a5S1CKTT19dolgCauPBrpryGjOZiPLdFmHd4wgmwNlWX3o5eefbEoK1frNVylfU3Tx2S9WgmSXLkmtSPAy9YN7Hbf138U4lrVGONZT/2nXtrFXcPYP4H9MYLo2iS4ETt5TMx4zyCR41v1ACh2ayyvaMK179ecUKdU3DIqv8DCaH8YG7CE7Q+NMSLKjN8L24R2mNp9HNFaLXBqxdaaglTKvNpEYK6W6dX3RR1m6RdJxw0R6zNYCWeUuoJaH632O5q9AiO7x8U8NG1HOCGhI82OJiA3fDRa+cajzBtgx2vR1s1d/aD0g8lPcTwspgnDXPpSU8bCJpdIJT/fo4zCbNDbmn2lf26+fsGuc77iZFXZxkJrzpkBpxxz4lfgCLsJKlCYFeVkGNDUkgPtYrdJ0vLeDByobaAGYoQFjgIky/rJuruKsrYLSo4FUUgWGwWNykuOK7XQ/oe+MMRFR4xbifGFUidEztoHKYStmzqbA3012QSW7DPvFLkvGfWKOuw9KL4v+1frYF1QGhoGJ7NBgZJEeeWjOhUfoLNlPPhv0N6MWxCYkUMFIoExHiG+9u7dw42A9glyTWpYyiqDH68Lb5cP5M1PbD4eG7XYE09J+OoGxORRK0a4eY+dHcg+Q==
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8584477-b580-420e-1724-08dbda905dde
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2023 04:09:38.7594
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rEz3mSifRNlaFKtps0zkFt3/0yE9/Vn+04foL6aLkOJQH11wFO37jvooJJbB96pw+msTsx0jGTrT05oEXMD3zG7Hh/kLfZjKyUIRdNSub/A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB8514
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+X-Brightmail-Tracker: H4sIAAAAAAAAA22TeUzTZxjH/R20BVf4yfkOEyg/NzZkhZZAeT0YGB12wW0kbjGSRezgN0B6
+        pcdQRpbiMRCQw42xVJBjhJaCMCpiPXCuHBUGYYugAeVYhHHZcBgzCFTW0jL3x/775JPv8z55
+        njcPA3NX030ZaWIFJRMLhCTNBW/rCILs3uUDFKfEsA/Org7RYMNoEQ3Odywj8IfFVQz+VtqP
+        wo3RaRTOGoOgbuIY1Oj6nGB9QxcKy/tVKLxmWkPhlbJzKJxsVmPwp76dsOhVDg5X63R02LVh
+        psH2kWB4t70Hh/mPDTTYo53Bocb0CoUT68/ocOWyHM71CuH8ih/U5VYg8GJZIw4XXtbicMBi
+        coK5eRYMlg50ojEB/IeDcfxb6lE6/2G/kq/XXaTx7wyraPylqRGcX9iqQ/h9VZ10/gu9Hz/n
+        fj7K10+a0fjtCen7UylBMiVjUeIkSXKaOCWKjDuaeDAxgsfhsrl7YCTJEgtEVBR56Eg8OzZN
+        aN0OyfpKIFRaVbxALidD398vkygVFCtVIldEkZQ0WSiNlIbIBSK5UpwSIqYUe7kcTliENXgy
+        PbX2+RIuHfA5/eSXK6gKGffOQ5wZgAgH9eZWzMbuhAEBrdcS8hAGg0nsABaDh017EJ+AAu23
+        NHuEBM1/qOl2HwJG/mxEbEwj3gNlD8Y3vSchAnX969YnXRgYYXAGtxZ7MHsvJvgxZwq3805w
+        U3Njs9iZ2AcaB/Nodv8uWKm75Mh7geEGM32LF7orETt7ggtj/Y7MDjCxesfh3wRPKvSOvARs
+        DGocnAXa7l91cCh4lNuC22f8CLzoPmnTOPE2MGZnozYNiENgtPeoTWNEMKirnsdsGiOCQPPt
+        UHtiF+gcwe0JV5DbYaFvzadqWftfNlydRO0cCJpWm9FiZJf69ZrV/+mlft2rCsF0iDcllYtS
+        KHmYNOzfj02SiPTI5pHsjjUg35sXQ4wIykCMCGBgpCezIyKGcmcmC85kUjJJokwppORGJMI6
+        ZAnm65UksV6ZWJHIDd/DCefxuJFhEZxI0oc5dqEi2Z1IESiodIqSUrKtOpTh7KtC256Rdw/4
+        H4+2ZJ9L8Q5Y8dh2uVVabKpuY7+VeT7y62DXPNn4EQ37d/lMyN9Z5QWzbuZ14yy3rVQbKJ17
+        48xC3EBNqqKBoS80X9cW97SsH+aEZt32Cj8b4Oo2tf1BTXSJZW3tAz+Wpf5EU/W9AzfaGUXv
+        aGGm2anKnCAecznLOy+eerlNk7FcHt3Uf7MjzH/p6brpM0HSJf/8ZZ6PqfrX6SFBbeDw9Rm1
+        6OOyFWPCca+nMcGnfg5I0DpNfPj5F6czeoeCg/7KKPtUyeJNfOOsYsKke91d3z163FRpnj/B
+        bJ+ufH7MLYoz30UOxNb2FLL1xF7qVMGXdD9N0+EaFi0XiOZIXJ4q4O7GZHLBP9RnK3atBAAA
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231017204823epcas5p2798d17757d381aaf7ad4dd235f3f0da3
+References: <9b0990ec-a3c9-48c0-b312-8c07c727e326@acm.org>
+        <20231017204739.3409052-1-bvanassche@acm.org>
+        <20231017204739.3409052-2-bvanassche@acm.org>
+        <b3058ce6-e297-b4c3-71d4-4b76f76439ba@samsung.com>
+        <CGME20231017204823epcas5p2798d17757d381aaf7ad4dd235f3f0da3@epcms2p1>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+Hi Bart,
 
-I ran the latest blktests (git hash: 3f75e6241f6b) with v6.6 kernel, and ob=
-seved
-four failures below. They are all known for months.
-
-As for the two other failures observed with v6.6-rc1 kernel [1], they are n=
-o
-longer observed with v6.6 kernel. Good.
-
-[1] https://lore.kernel.org/linux-block/u4g3jh6dnowouthos3tdex2pflzo3hat55e=
-5dc4j6pul3a3uov@y2axtbiura2q/
-
-List of failures
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-#1: block/011
-#2: nvme/003 (fabrics transport)
-#3: nvme/* (fc transport)
-#4: srp/002, 011 (rdma_rxe driver)
-
-Failure description
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-#1: block/011
-
-   The test case fails with NVME devices due to lockdep WARNING "possible
-   circular locking dependency detected". Reported in Sep/2022 [2]. In LSF
-   2023, it was noted that this failure should be fixed.
-
-   Also, it was found recently that this test case still causes failure of
-   following tests. Fix work is ongoing [3].
-
-   [2] https://lore.kernel.org/linux-block/20220930001943.zdbvolc3gkekfmcv@=
-shindev/
-   [3] https://github.com/kawasaki/blktests/commit/f540cbb0eeb66e2c76a88efb=
-e65a2b59d55630fd
-
-#2: nvme/003 (fabrics transport)
-
-   When nvme test group is run with trtype=3Drdma or tcp, the test case fai=
-ls
-   due to lockdep WARNING "possible circular locking dependency detected".
-   Reported in May/2023. Fix discussions were held [4][5].
-
-   [4] https://lore.kernel.org/linux-nvme/20230511150321.103172-1-bvanassch=
-e@acm.org/
-   [5] https://lore.kernel.org/linux-nvme/5cb63b10-72ab-4b7c-7574-48583ea8f=
-fd1@grimberg.me/
-
-#3: nvme/* (fc transport)
-
-   With trtype=3Dfc configuration, test run on nvme test group hangs. Danie=
-l is
-   driving fix work.
-
-#4: srp/002, 011 (rdma_rxe driver)
-
-   Test process hang is observed occasionally. Reported to the relevant mai=
-ling
-   lists in Aug/2023 [6]. Blktests was modified to change default driver fr=
-om
-   rdma_rxe to siw to avoid impacts on blktests users. Root cause is not ye=
-t
-   understood. Bob and Bart have spent time to chase it down (Thank you).
-
-   [6] https://lore.kernel.org/linux-rdma/18a3ae8c-145b-4c7f-a8f5-67840feeb=
-98c@acm.org/T/#mee9882c2cfd0cfff33caa04e75418576f4c7a789=
+>On 10/30/23 04:11, Kanchan Joshi wrote:
+>> On 10/18/2023 2:17 AM, Bart Van Assche wrote:
+>>> +/* Block storage write lifetime hint values. */
+>>> +enum rw_hint =7B
+>>> +=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20WRITE_LIFE_NOT_SET=C2=A0=20=C2=A0=
+=20=C2=A0=20=C2=A0=20=3D=200,=20/*=20RWH_WRITE_LIFE_NOT_SET=20*/=0D=0A>>>=
+=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20WRITE_LIFE_NONE=C2=A0=20=C2=A0=20=
+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=3D=201,=20/*=20RWH_W=
+RITE_LIFE_NONE=20*/=0D=0A>>>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20WRITE_L=
+IFE_SHORT=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=3D=202,=20/*=20RWH_WRITE_LIFE=
+_SHORT=20*/=0D=0A>>>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20WRITE_LIFE_MEDI=
+UM=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=3D=203,=20/*=20RWH_WRITE_LIFE_MEDIUM=
+=20*/=0D=0A>>>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20WRITE_LIFE_LONG=C2=A0=
+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=3D=204,=
+=20/*=20RWH_WRITE_LIFE_LONG=20*/=0D=0A>>>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=
+=A0=20WRITE_LIFE_EXTREME=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=3D=205,=20/*=
+=20RWH_WRITE_LIFE_EXTREME=20*/=0D=0A>>>=20+=7D=20__packed;=0D=0A>>>=20+=0D=
+=0A>>>=20+static_assert(sizeof(enum=20rw_hint)=20=3D=3D=201);=0D=0A>>=C2=A0=
+=0D=0A>>=20Does=20it=20make=20sense=20to=20do=20away=20with=20these,=20and=
+=20have=20temperature-neutral=0D=0A>>=20names=20instead=20e.g.,=20WRITE_LIF=
+E_1,=20WRITE_LIFE_2?=0D=0A>>=C2=A0=0D=0A>>=20With=20the=20current=20choice:=
+=0D=0A>>=20-=20If=20the=20count=20goes=20up=20(beyond=205=20hints),=20infra=
+=20can=20scale=20fine=20but=20these=0D=0A>>=20names=20do=20not.=20Imagine=
+=20ULTRA_EXTREME=20after=20EXTREME.=0D=0A>>=20-=20Applications=20or=20in-ke=
+rnel=20users=20can=20specify=20LONG=20hint=20with=20data=20that=0D=0A>>=20a=
+ctually=20has=20a=20SHORT=20lifetime.=20Nothing=20really=20ensures=20that=
+=20LONG=20is=0D=0A>>=20really=20LONG.=0D=0A>>=C2=A0=0D=0A>>=20Temperature-n=
+eutral=20names=20seem=20more=20generic/scalable=20and=20do=20not=20present=
+=0D=0A>>=20the=20unnecessary=20need=20to=20be=20accurate=20with=20relative=
+=20temperatures.=0D=0A>=0D=0A>Thanks=20for=20having=20taken=20a=20look=20at=
+=20this=20patch=20series.=20Jens=20asked=20for=20data=0D=0A>that=20shows=20=
+that=20this=20patch=20series=20improves=20performance.=20Is=20this=0D=0A>so=
+mething=20Samsung=20can=20help=20with?=0D=0A=0D=0AWe=20analyzed=20the=20NAN=
+D=20block=20erase=20counter=20with=20and=20without=20stream=20separation=0D=
+=0Athrough=20a=20long-term=20workload=20in=20F2FS.=0D=0AThe=20analysis=20sh=
+owed=20that=20the=20erase=20counter=20is=20reduced=20by=20approximately=204=
+0%=20=0D=0Awith=20stream=20seperation.=0D=0ALong-term=20workload=20is=20a=
+=20scenario=20where=20erase=20and=20write=20are=20repeated=20by=0D=0Astream=
+=20after=20performing=20precondition=20fill=20for=20each=20temperature=20of=
+=20F2FS.=0D=0A=0D=0AThanks,=0D=0A=0D=0ADaejun.=0D=0A=0D=0A>=0D=0A>Thanks,=
+=0D=0A>=0D=0A>Bart.=0D=0A>=0D=0A>=C2=A0=0D=0A>=C2=A0
