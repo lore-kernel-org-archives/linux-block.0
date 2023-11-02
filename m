@@ -2,109 +2,143 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2100DC4167D
-	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 01:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3132C4167B
+	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 02:54:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346990AbjKBBQs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Nov 2023 21:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53480 "EHLO
+        id S1346851AbjKBCyB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Nov 2023 22:54:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346996AbjKBBQr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 21:16:47 -0400
-X-Greylist: delayed 429 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 01 Nov 2023 18:16:41 PDT
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE9F9FD
-        for <linux-block@vger.kernel.org>; Wed,  1 Nov 2023 18:16:41 -0700 (PDT)
-Date:   Wed, 1 Nov 2023 21:09:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1698887368;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NMFkICBeVzAfEfILGEd/mAVjEIeT8Er8QtywEIlpFzc=;
-        b=hbk10m3jal5wz6cHkr843gxi21/L5oC86suIGP4xHWk6wjd9Q9BBD/4jqU+F1uKindgEg+
-        uUaZteBzjHwS8eHiA6rBfGDhMIU8kxzJJQIrL+igTSo0TA4gFyllRRaaCAdPCq7DFJ3jwd
-        qU8G78bpFfLR4fHyM+8+4qzx+0I7JmA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Brian Foster <bfoster@redhat.com>
-Cc:     Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kees Cook <keescook@google.com>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        linux-xfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
-        linux-bcachefs@vger.kernel.org
-Subject: Re: [PATCH 1/7] bcachefs: Convert to bdev_open_by_path()
-Message-ID: <20231102010924.pac3ag4mp6hebsif@moria.home.lan>
-References: <20231101173542.23597-1-jack@suse.cz>
- <20231101174325.10596-1-jack@suse.cz>
- <ZUKggpzckTAKkyMl@bfoster>
+        with ESMTP id S1344988AbjKBCyA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2023 22:54:00 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C11783;
+        Wed,  1 Nov 2023 19:53:58 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 667CDC433C8;
+        Thu,  2 Nov 2023 02:53:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698893638;
+        bh=wliHaT5QZ1Qs4h9Kv8Vuq1EXR4VPMNO+swxxXK8pI2A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FfiWaHNmBnE4equDJohmlgDCUHDNxb07hGZrmQSJtpEocMDWmBGeYTWi2AZTw8j8h
+         NslJuVUJtCuyBJkDvRLuGYAYKOdBrpifUrauH0wAUfCnGHgY5nRjO74BQtAoCHX7oq
+         8c0boVj8sUYAyMM+kMTkDsevR6ASozZAe1vYQZSIcmQHc8lKxI2Vuw9dKVkTD0GPBE
+         K9AsmgwOIg4Ttn7fUk8WTXbtIMTD+hZsRvDr8Q2IPXHvdNiMw9DzMWj4EVjeqWpcav
+         za5v37/pFaQIPeY9rXzJrksMI5npYJ9oBAC1ZQehmisokLzIKHF0IU8IIFwyK+VyPe
+         nMAKYfTw6ee6Q==
+Date:   Wed, 1 Nov 2023 19:53:55 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [PATCH RFC v11 15/19] fsverity: consume builtin signature via
+ LSM hook
+Message-ID: <20231102025355.GA1498@sol.localdomain>
+References: <1696457386-3010-16-git-send-email-wufan@linux.microsoft.com>
+ <6efb7a80ba0eb3e02b3ae7a5c0a210f3.paul@paul-moore.com>
+ <CAHC9VhQJkcb-k+o+NvVn7crrMMZqpBcZpnEbKBT+eZg4Ocjqhw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZUKggpzckTAKkyMl@bfoster>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHC9VhQJkcb-k+o+NvVn7crrMMZqpBcZpnEbKBT+eZg4Ocjqhw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 01, 2023 at 03:01:22PM -0400, Brian Foster wrote:
-> On Wed, Nov 01, 2023 at 06:43:06PM +0100, Jan Kara wrote:
-> > Convert bcachefs to use bdev_open_by_path() and pass the handle around.
-> > 
-> > CC: Kent Overstreet <kent.overstreet@linux.dev>
-> > CC: Brian Foster <bfoster@redhat.com>
-> > CC: linux-bcachefs@vger.kernel.org
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >  fs/bcachefs/super-io.c    | 19 ++++++++++---------
-> >  fs/bcachefs/super_types.h |  1 +
-> >  2 files changed, 11 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/fs/bcachefs/super-io.c b/fs/bcachefs/super-io.c
-> > index 332d41e1c0a3..01a32c41a540 100644
-> > --- a/fs/bcachefs/super-io.c
-> > +++ b/fs/bcachefs/super-io.c
-> ...
-> > @@ -685,21 +685,22 @@ int bch2_read_super(const char *path, struct bch_opts *opts,
-> >  	if (!opt_get(*opts, nochanges))
-> >  		sb->mode |= BLK_OPEN_WRITE;
-> >  
-> > -	sb->bdev = blkdev_get_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
-> > -	if (IS_ERR(sb->bdev) &&
-> > -	    PTR_ERR(sb->bdev) == -EACCES &&
-> > +	sb->bdev_handle = bdev_open_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
-> > +	if (IS_ERR(sb->bdev_handle) &&
-> > +	    PTR_ERR(sb->bdev_handle) == -EACCES &&
-> >  	    opt_get(*opts, read_only)) {
-> >  		sb->mode &= ~BLK_OPEN_WRITE;
-> >  
-> > -		sb->bdev = blkdev_get_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
-> > -		if (!IS_ERR(sb->bdev))
-> > +		sb->bdev_handle = bdev_open_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
-> > +		if (!IS_ERR(sb->bdev_handle))
-> >  			opt_set(*opts, nochanges, true);
-> >  	}
-> >  
-> > -	if (IS_ERR(sb->bdev)) {
-> > -		ret = PTR_ERR(sb->bdev);
-> > +	if (IS_ERR(sb->bdev_handle)) {
-> > +		ret = PTR_ERR(sb->bdev_handle);
-> >  		goto out;
-> >  	}
-> > +	sb->bdev = sb->bdev_handle->bdev;
-> >  
-> >  	ret = bch2_sb_realloc(sb, 0);
-> >  	if (ret) {
+On Wed, Nov 01, 2023 at 08:40:06PM -0400, Paul Moore wrote:
+> On Mon, Oct 23, 2023 at 11:52 PM Paul Moore <paul@paul-moore.com> wrote:
+> > On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+> > >
+> > > fsverity represents a mechanism to support both integrity and
+> > > authenticity protection of a file, supporting both signed and unsigned
+> > > digests.
+> > >
+> > > An LSM which controls access to a resource based on authenticity and
+> > > integrity of said resource, can then use this data to make an informed
+> > > decision on the authorization (provided by the LSM's policy) of said
+> > > claim.
+> > >
+> > > This effectively allows the extension of a policy enforcement layer in
+> > > LSM for fsverity, allowing for more granular control of how a
+> > > particular authenticity claim can be used. For example, "all (built-in)
+> > > signed fsverity files should be allowed to execute, but only these
+> > > hashes are allowed to be loaded as kernel modules".
+> > >
+> > > This enforcement must be done in kernel space, as a userspace only
+> > > solution would fail a simple litmus test: Download a self-contained
+> > > malicious binary that never touches the userspace stack. This
+> > > binary would still be able to execute.
+> > >
+> > > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > > ---
+> > > v1-v6:
+> > >   + Not present
+> > >
+> > > v7:
+> > >   Introduced
+> > >
+> > > v8:
+> > >   + Split fs/verity/ changes and security/ changes into separate patches
+> > >   + Change signature of fsverity_create_info to accept non-const inode
+> > >   + Change signature of fsverity_verify_signature to accept non-const inode
+> > >   + Don't cast-away const from inode.
+> > >   + Digest functionality dropped in favor of:
+> > >     ("fs-verity: define a function to return the integrity protected
+> > >       file digest")
+> > >   + Reworded commit description and title to match changes.
+> > >   + Fix a bug wherein no LSM implements the particular fsverity @name
+> > >     (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
+> > >
+> > > v9:
+> > >   + No changes
+> > >
+> > > v10:
+> > >   + Rename the signature blob key
+> > >   + Cleanup redundant code
+> > >   + Make the hook call depends on CONFIG_FS_VERITY_BUILTIN_SIGNATURES
+> > >
+> > > v11:
+> > >   + No changes
+> > > ---
+> > >  fs/verity/fsverity_private.h |  2 +-
+> > >  fs/verity/open.c             | 26 +++++++++++++++++++++++++-
+> > >  include/linux/fsverity.h     |  2 ++
+> > >  3 files changed, 28 insertions(+), 2 deletions(-)
+> >
+> > We need an ACK from some VFS folks on this.
 > 
-> Hi Jan,
+> Eric and/or Ted, can we get either an ACK or some feedback on this patch?
 > 
-> This all seems reasonable to me, but should bcachefs use sb_open_mode()
-> somewhere in here to involve use of the restrict writes flag in the
-> first place? It looks like bcachefs sort of open codes bits of
-> mount_bdev() so it isn't clear the flag would be used anywhere...
+> For reference, the full patchset can be found on lore at the link below:
+> 
+> https://lore.kernel.org/linux-security-module/1696457386-3010-1-git-send-email-wufan@linux.microsoft.com/
 
-Yeah, but that should be a separate patch :)
+Well, technically I already gave some (minor) feedback on this exact patch, and
+it's not yet been addressed:
+https://lore.kernel.org/linux-security-module/20231005022707.GA1688@quark.localdomain/
+
+Of course, it would also be nice if the commit message mentioned what the patch
+actually does.
+
+At a higher level, I've said before, I'm not super happy about the use of
+fsverity builtin signatures growing.  (For some of the reasons why, see the
+guidance in the fsverity documentation at
+https://docs.kernel.org/filesystems/fsverity.html#built-in-signature-verification)
+That being said, if the people who are doing the broader review of IPE believe
+this is how its fsverity integration should work, I can live with that; I don't
+intend to block the IPE patchset if enough people want it to be merged.  I've
+really been hoping to see engagement with the people involved in IMA, as IPE
+basically duplicates/replaces IMA.  But I haven't seen that, so maybe things
+need to move on without them.
+
+- Eric
