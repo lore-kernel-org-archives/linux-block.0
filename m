@@ -2,101 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A7BC4332F
-	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 12:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D61CC41535
+	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 14:02:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347222AbjKBMsY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Nov 2023 08:48:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48542 "EHLO
+        id S1376649AbjKBOCn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Nov 2023 10:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345965AbjKBMsX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 08:48:23 -0400
+        with ESMTP id S230024AbjKBOCn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 10:02:43 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00E012F;
-        Thu,  2 Nov 2023 05:48:20 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5862C433C9;
-        Thu,  2 Nov 2023 12:48:19 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F0E83;
+        Thu,  2 Nov 2023 07:02:40 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55B93C433C9;
+        Thu,  2 Nov 2023 14:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698929300;
-        bh=6xeGbI1L+DfUU9h5pLLEoRq/boiO9OMP2yYIoh7hJ5I=;
-        h=From:To:Cc:Subject:Date:From;
-        b=O1jJwRfjZruxvUj0hqU9Y6g/JHMxGzSFXyKuDtSiTkl5uO2K/T8mc8cJfC2HE10CL
-         9S1wFbm92AJPptjq5Nu35AHGU/AUiqx1MstMHyp0TAiZG+dO6g+Ey2EnBJGPT/Ko4v
-         sGyu4v9lWaYhm1Bc0D5RqkUWg5xFhwTBLTWMgb1UHXr1+Z/dCAlTz2QS+umODv2TKS
-         b0g6rS3KovF9ytieekI+cgGqWHVsrOVY5QhkUicDxaNKUK3zK+DNs+QXUceKFgXOZD
-         z+FW7pRJcQFz/2f5pOGgyOK9vGDpRCurMpTkLIgg6TMQGZOF/HLlnUw/8Cjq4Vylqm
-         h74Wn0BteriEw==
-User-agent: mu4e 1.8.10; emacs 27.1
-From:   Chandan Babu R <chandanbabu@kernel.org>
-To:     brauner@kernel.org
-Cc:     viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        djwong@kernel.org, linux-xfs@vger.kernel.org,
-        dchinner@fromorbit.com
-Subject: [BUG REPORT] next-20231102: generic/311 fails on XFS with external log
-Date:   Thu, 02 Nov 2023 18:06:10 +0530
-Message-ID: <87bkccnwxc.fsf@debian-BULLSEYE-live-builder-AMD64>
+        s=k20201202; t=1698933759;
+        bh=fgOZjn0WdFzXtcn8lGgDLoPHzxr8QdP2NR/ys5t0Tbc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SX4WtNKm5pDj9w492ahqKstWDnWh6M4sJIDEesfWnzHG+qb9Q4yNf6O/VTmBrzQ+B
+         J+lN6pLndYpPJ2///jW3lO8ULdP1cvkId8z0QLLU9SCD1Vn3MCh+blaB22zqDAiR/o
+         XR4l+VlEP7zQokYYie6zAycHpAphfEalcKMzDRGBY7DIFdzBxEoSIM1JcGC8CJxbij
+         F9Ali9mUj5nbbM9wS1hvCdR6/H4SvGkafHYkIN0s4b7pqOGcZS/Zcm6+PYMZJDJNev
+         2MmTfCZEAoTWDPXuEvghazEUvKAcFhgHBcECGGT8wd3jtYaMQqEyBmgULjji+2X7SU
+         nEdY57VcxKcNQ==
+Date:   Thu, 2 Nov 2023 08:02:34 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Hannes Reinecke <hare@suse.de>, Ming Lei <tom.leiming@gmail.com>,
+        Marek =?us-ascii?Q?Marczykowski-G'orecki?= 
+        <marmarek@invisiblethingslab.com>, Jan Kara <jack@suse.cz>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@suse.com>, stable@vger.kernel.org,
+        regressions@lists.linux.dev, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: Intermittent storage (dm-crypt?) freeze - regression 6.4->6.5
+Message-ID: <ZUOr-vp0yRkLyvyi@kbusch-mbp.dhcp.thefacebook.com>
+References: <ZT/e/EaBIkJEgevQ@mail-itl>
+ <98aefaa9-1ac-a0e4-fb9a-89ded456750@redhat.com>
+ <ZUB5HFeK3eHeI8UH@mail-itl>
+ <20231031140136.25bio5wajc5pmdtl@quack3>
+ <ZUEgWA5P8MFbyeBN@mail-itl>
+ <CACVXFVOEWDyzasS7DWDvLOhC3Hr6qOn5ks3HLX+fbRYCxYv26w@mail.gmail.com>
+ <ZUG0gcRhUlFm57qN@mail-itl>
+ <ZUHE52SznRaZQxnG@fedora>
+ <ab02413f-4bf2-4d92-baf7-62fbd106f5df@suse.de>
+ <ZUI1GSSL4vdsFVHq@fedora>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZUI1GSSL4vdsFVHq@fedora>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Wed, Nov 01, 2023 at 07:23:05PM +0800, Ming Lei wrote:
+> On Wed, Nov 01, 2023 at 11:15:02AM +0100, Hannes Reinecke wrote:
+> > > nvme_queue_rq() on the above request.
+> > > 
+> > And that is something I've been wondering (for quite some time now):
+> > What _is_ the appropriate error handling for -ENOMEM?
+> 
+> It is just my guess.
+> 
+> Actually it shouldn't fail since the sgl allocation is backed with
+> memory pool, but there is also dma pool allocation and dma mapping.
+> 
+> > At this time, we assume it to be a retryable error and re-run the queue
+> > in the hope that things will sort itself out.
+> 
+> It should not be hard to figure out why nvme_queue_rq() can't move on.
 
-generic/311 consistently fails when executing on a kernel built from
-next-20231102.
+There's only a few reasons nvme_queue_rq would return BLK_STS_RESOURCE
+for a typical read/write command:
 
-The following is the fstests config file that was used during testing.
+  DMA mapping error
+  Can't allocate SGL from mempool
+  Can't allocate PRP from dma_pool
+  Controller stuck in resetting state
 
-export FSTYP=xfs
-
-export TEST_DEV=/dev/loop0
-export TEST_DIR=/mnt/test
-export TEST_LOGDEV=/dev/loop2
-
-export SCRATCH_DEV=/dev/loop1
-export SCRATCH_MNT=/mnt/scratch
-export SCRATCH_LOGDEV=/dev/loop3
-
-export USE_EXTERNAL=yes
-
-export MKFS_OPTIONS="-f -m crc=1,reflink=1,rmapbt=1, -i sparse=1 -lsize=1g"
-
-
-The following is the contents obtained from 311.out.bad.
-
-QA output created by 311
-Running test 1 buffered, normal suspend
-Random seed is 1
-ee6103415276cde95544b11b2675f132
-device-mapper: suspend ioctl on flakey-logtest  failed: Device or resource busy
-Command failed.
-failed to suspend flakey-logtest
-
-
-Git bisect revealed the following to be the first bad commit,
-
-abcb2b94cce4fb7a8f84278e8da4d726837439d1
-Author:     Christian Brauner <brauner@kernel.org>
-AuthorDate: Wed Sep 27 15:21:16 2023 +0200
-Commit:     Christian Brauner <brauner@kernel.org>
-CommitDate: Sat Oct 28 13:29:24 2023 +0200
-
-bdev: implement freeze and thaw holder operations
-
-The old method of implementing block device freeze and thaw operations
-required us to rely on get_active_super() to walk the list of all
-superblocks on the system to find any superblock that might use the
-block device. This is wasteful and not very pleasant overall.
-
-Now that we can finally go straight from block device to owning
-superblock things become way simpler.
-
-Link: https://lore.kernel.org/r/20231024-vfs-super-freeze-v2-5-599c19f4faac@kernel.org
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Christian Brauner <brauner@kernel.org>
-
---
-Chandan
+We should always be able to get at least one allocation from the memory
+pools, so I think the only one the driver doesn't have a way to
+guarantee eventual forward progress are the DMA mapping error
+conditions. Is there some other limit that the driver needs to consider
+when configuring it's largest supported transfers?
