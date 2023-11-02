@@ -2,151 +2,504 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92AEAC4167B
-	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 20:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01810C41535
+	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 22:40:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbjKBUtC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Nov 2023 16:49:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59504 "EHLO
+        id S234452AbjKBWkx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Nov 2023 18:40:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjKBUtC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 16:49:02 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C42188
-        for <linux-block@vger.kernel.org>; Thu,  2 Nov 2023 13:48:59 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cc938f9612so6216335ad.1
-        for <linux-block@vger.kernel.org>; Thu, 02 Nov 2023 13:48:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1698958139; x=1699562939; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nPlOQs4H3ojv1i5CDb/ZZoP+yLZogQLFBQAjO2TQLUE=;
-        b=o/YCnKX1u8C0Z+1hwL705zfGU4AeLkcMPv+pp+POddh4meeWltMnDnMAEWpxpA2mOK
-         YLMq2cFxCe9cIt66Xbc9XIEwenryooypNsCE8tJuGcqinNPuoVSPHUeMyQRa7B/5PVGE
-         q6ICS2eZL4KeUTFXc6AWjWGySGmGMXmyrvtQ3mgY9snUKu8qzZFDId4UBoB8DREkQqW0
-         6V24HKn9rHg8r2ElkKHWNex6RbAC65qZLRYGm42jQx3dVNIuIcZSiDhOPs9wF8XcICy9
-         xwXeyQq2sYUV471MMMc+DfKL17R6qKnhcZ6C6o1cMiLos8RWu+t5noZjQtIBQZVOmsZb
-         XfTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698958139; x=1699562939;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nPlOQs4H3ojv1i5CDb/ZZoP+yLZogQLFBQAjO2TQLUE=;
-        b=W+t+AjmLm9/0E3c5royoG3J0B3h5IaHEFKk1ZsyX2zTWcCchGPq/sq/wZPVgDVlwKC
-         wfgvEHEO0AZT5RhnPwk7+n7niSFIBgioMuB4eCQqu/26Ed08puNHfhrDwVYlDULqPMyr
-         KR2b3n/Zp4aV8/hXlK3jKH+JqulmTlCNAd1D2ubcSVy36XkT0H0GtgooQcNKZ4mg+CRu
-         foLSaDrkXsFCjGMJCTm4H0SkYnJl6+JpE9jb2+zugbTp+gXBPAH8tdtd++/RC5d8o5DQ
-         G4DWYUI5+aFacdtkPq6kLrvl8X/x1zyYFqFkRc/RxszlNlSvp1H2H+U7IYKIgmAaXubj
-         Usog==
-X-Gm-Message-State: AOJu0YzK3fkqVKzDMNfo3yWZx+qAknHr/wS7/bWIfT552ANQK44VRF/E
-        kBHtYVWYG33fjNRCtrbe4mGBkg==
-X-Google-Smtp-Source: AGHT+IE4Ajg7Dp58olVWG7i7o6t8cg/BphJAwnryFXtyTOEQ2IJedsUYfu/uVRiRP1oFGswlizAu3w==
-X-Received: by 2002:a17:903:32c3:b0:1cc:453f:517b with SMTP id i3-20020a17090332c300b001cc453f517bmr13717854plr.0.1698958138903;
-        Thu, 02 Nov 2023 13:48:58 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
-        by smtp.gmail.com with ESMTPSA id f19-20020a170902e99300b001c61afa7009sm136641plb.114.2023.11.02.13.48.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 13:48:58 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qyecZ-007Nln-0P;
-        Fri, 03 Nov 2023 07:48:55 +1100
-Date:   Fri, 3 Nov 2023 07:48:55 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     Chandan Babu R <chandanbabu@kernel.org>, Jan Kara <jack@suse.cz>,
-        "Darrick J. Wong" <djwong@kernel.org>, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        dchinner@fromorbit.com, Christoph Hellwig <hch@lst.de>
-Subject: Re: [BUG REPORT] next-20231102: generic/311 fails on XFS with
- external log
-Message-ID: <ZUQLN7UBlK6MQoK3@dread.disaster.area>
-References: <87bkccnwxc.fsf@debian-BULLSEYE-live-builder-AMD64>
- <20231102-teich-absender-47a27e86e78f@brauner>
+        with ESMTP id S234752AbjKBWkv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 18:40:51 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D041519D;
+        Thu,  2 Nov 2023 15:40:45 -0700 (PDT)
+Received: from [10.137.106.151] (unknown [131.107.159.23])
+        by linux.microsoft.com (Postfix) with ESMTPSA id EC72A20B74C0;
+        Thu,  2 Nov 2023 15:40:44 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EC72A20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1698964845;
+        bh=Tpi7d61woAHCsETT1wQdN/nd1eB0jEwpOpE522d45fA=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=qTtOPVQiv0mrH1aShUW4Whtbdh/traifRf2kZ+oShm9ThBMi86/qZtbZy4ryzQ/FA
+         3w4VTazf8oWkwia+tvX9eS6/xuWFab7jK1G1MCl1kTZW3L+I7UHOVyiisndhsK4ZEb
+         Y8XC/x8ACWhdS2R0lfkmTnljtvDoQ1+9+AEsRj3o=
+Message-ID: <60ab9d6a-6814-4612-9dc4-1b83f44336fe@linux.microsoft.com>
+Date:   Thu, 2 Nov 2023 15:40:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231102-teich-absender-47a27e86e78f@brauner>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v11 14/19] ipe: add support for dm-verity as a trust
+ provider
+Content-Language: en-US
+To:     Paul Moore <paul@paul-moore.com>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
+        agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
+Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1696457386-3010-15-git-send-email-wufan@linux.microsoft.com>
+ <a864ebd8815e2e5822a61178e8a3da2c.paul@paul-moore.com>
+From:   Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <a864ebd8815e2e5822a61178e8a3da2c.paul@paul-moore.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 02, 2023 at 03:54:48PM +0100, Christian Brauner wrote:
-> On Thu, Nov 02, 2023 at 06:06:10PM +0530, Chandan Babu R wrote:
-> > Hi,
-> > 
-> > generic/311 consistently fails when executing on a kernel built from
-> > next-20231102.
-> > 
-> > The following is the fstests config file that was used during testing.
-> > 
-> > export FSTYP=xfs
-> > 
-> > export TEST_DEV=/dev/loop0
-> > export TEST_DIR=/mnt/test
-> > export TEST_LOGDEV=/dev/loop2
-> > 
-> > export SCRATCH_DEV=/dev/loop1
-> > export SCRATCH_MNT=/mnt/scratch
-> > export SCRATCH_LOGDEV=/dev/loop3
-> 
-> Thanks for the report. So dm flakey sets up:
-> 
-> /dev/dm-0 over /dev/loop0
-> /dev/dm-1 over /dev/loop2
-> 
-> and then we mount an xfs filesystem with:
-> 
-> /dev/loop2 as logdev and /dev/loop0 as the main device.
-> 
-> So on current kernels what happens is that if you freeze the main
-> device you end up:
-> 
-> bdev_freeze(dm-0)
-> -> get_super(dm-0) # finds xfs sb
->    -> freeze_super(sb)
-> 
-> if you also freeze the log device afterwards via:
-> 
-> bdev_freeze(dm-1)
-> -> get_super(dm-1) # doesn't find xfs sb because freezing only works for
->                    # main device
-> 
-> What's currently in -next allows you to roughly do the following:
-> 
-> bdev_freeze(dm-0)
-> -> fs_bdev_freeze(dm-0->sb)
->    -> freeze_super(dm-0->sb) # returns 0
-> 
-> bdev_freeze(dm-1)
-> -> fs_bdev_freeze(dm-1->sb)
->    -> freeze_super(dm-1->sb) # returns -EBUSY
-> 
-> So you'll see EBUSY because the superblock was already frozen when the
-> main block device was frozen. I was somewhat expecting that we may run
-> into such issues.
-> 
-> I think we just need to figure out what we want to do in cases the
-> superblock is frozen via multiple devices. It would probably be correct
-> to keep it frozen as long as any of the devices is frozen?
 
-So this series removed the blockdev freeze nesting code that dm
-suspend/resume functionality used (i.e. it allowed concurrent bdev
-freeze/thaw works and leaves the bdev frozen until the last thaw
-occurs). Removing bd_fsfreeze_count essentially removed this nesting
-ability.
 
-IMO, bdev_freeze() should still nest freeze/thaw across all devices
-in the filesystem like it used to on the main device. This implies
-that freeze_super() needs to know that it is being called from
-bdev_freeze() and needs a freeze counter to allow concurrent bdev
-freezes and only thaw the fs when the last freeze goes away....
+On 10/23/2023 8:52 PM, Paul Moore wrote:
+> On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+>>
+>> Allows author of IPE policy to indicate trust for a singular dm-verity
+>> volume, identified by roothash, through "dmverity_roothash" and all
+>> signed dm-verity volumes, through "dmverity_signature".
+>>
+>> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+>> ---
+...
+>>   security/ipe/Kconfig         |  18 +++++
+>>   security/ipe/Makefile        |   1 +
+>>   security/ipe/audit.c         |  31 +++++++-
+>>   security/ipe/digest.c        | 142 +++++++++++++++++++++++++++++++++++
+>>   security/ipe/digest.h        |  26 +++++++
+>>   security/ipe/eval.c          | 101 ++++++++++++++++++++++++-
+>>   security/ipe/eval.h          |  13 ++++
+>>   security/ipe/hooks.c         |  51 +++++++++++++
+>>   security/ipe/hooks.h         |   8 ++
+>>   security/ipe/ipe.c           |  15 ++++
+>>   security/ipe/ipe.h           |   4 +
+>>   security/ipe/policy.h        |   3 +
+>>   security/ipe/policy_parser.c |  24 +++++-
+>>   13 files changed, 433 insertions(+), 4 deletions(-)
+>>   create mode 100644 security/ipe/digest.c
+>>   create mode 100644 security/ipe/digest.h
+> 
+> ...
+> 
+>> diff --git a/security/ipe/audit.c b/security/ipe/audit.c
+>> index 0dd5f10c318f..b5c58655ac74 100644
+>> --- a/security/ipe/audit.c
+>> +++ b/security/ipe/audit.c
+>> @@ -13,6 +13,7 @@
+>>   #include "hooks.h"
+>>   #include "policy.h"
+>>   #include "audit.h"
+>> +#include "digest.h"
+>>   
+>>   #define ACTSTR(x) ((x) == IPE_ACTION_ALLOW ? "ALLOW" : "DENY")
+>>   
+>> @@ -40,8 +41,29 @@ static const char *const audit_op_names[__IPE_OP_MAX] = {
+>>   static const char *const audit_prop_names[__IPE_PROP_MAX] = {
+>>   	"boot_verified=FALSE",
+>>   	"boot_verified=TRUE",
+>> +#ifdef CONFIG_IPE_PROP_DM_VERITY
+>> +	"dmverity_roothash=",
+>> +	"dmverity_signature=FALSE",
+>> +	"dmverity_signature=TRUE",
+>> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+>>   };
+>>   
+>> +#ifdef CONFIG_IPE_PROP_DM_VERITY
+>> +/**
+>> + * audit_dmv_roothash - audit a roothash of a dmverity volume.
+>> + * @ab: Supplies a pointer to the audit_buffer to append to.
+>> + * @r: Supplies a pointer to the digest structure.
+>> + */
+>> +static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
+>> +{
+>> +	ipe_digest_audit(ab, rh);
+>> +}
+>> +#else
+>> +static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
+>> +{
+>> +}
+>> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+> 
+> Since the "dmverity_roothash=" field name is going to be written to
+> the audit record regardless of CONFIG_IPE_PROP_DM_VERITY we should
+> ensure that it has a value of "?" instead of nothing.  To fix that
+> I would suggest something like this:
+> 
+>    #else
+>    static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
+>    {
+>      audit_log_format(ab, "?");
+>    }
+>    #endif /* CONFIG_IPE_PROP_DM_VERITY */
+> 
+>>   /**
+>>    * audit_rule - audit an IPE policy rule approximation.
+>>    * @ab: Supplies a pointer to the audit_buffer to append to.
+>> @@ -53,8 +75,13 @@ static void audit_rule(struct audit_buffer *ab, const struct ipe_rule *r)
+>>   
+>>   	audit_log_format(ab, "rule=\"op=%s ", audit_op_names[r->op]);
+>>   
+>> -	list_for_each_entry(ptr, &r->props, next)
+>> -		audit_log_format(ab, "%s ", audit_prop_names[ptr->type]);
+>> +	list_for_each_entry(ptr, &r->props, next) {
+>> +		audit_log_format(ab, "%s", audit_prop_names[ptr->type]);
+>> +		if (ptr->type == IPE_PROP_DMV_ROOTHASH)
+>> +			audit_dmv_roothash(ab, ptr->value);
+> 
+> If you wanted to avoid the roothash change above, you could change the
+> code here so it didn't always write "dmverity_roothash=" into the audit
+> record.
+> 
+Yes this sounds more reasonable to me, I will change this part to a 
+switch case statement to avoid unnessary logging.
 
-Cheers,
+>> +		audit_log_format(ab, " ");
+>> +	}
+>>   
+>>   	audit_log_format(ab, "action=%s\"", ACTSTR(r->action));
+>>   }
+>> diff --git a/security/ipe/digest.c b/security/ipe/digest.c
+>> new file mode 100644
+>> index 000000000000..7a42ca71880c
+>> --- /dev/null
+>> +++ b/security/ipe/digest.c
+>> @@ -0,0 +1,142 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) Microsoft Corporation. All rights reserved.
+>> + */
+>> +
+>> +#include "digest.h"
+>> +
+>> +/**
+>> + * ipe_digest_parse - parse a digest in IPE's policy.
+>> + * @valstr: Supplies the string parsed from the policy.
+>> + * @value: Supplies a pointer to be populated with the result.
+>> + *
+>> + * Digests in IPE are defined in a standard way:
+>> + *	<alg_name>:<hex>
+>> + *
+>> + * Use this function to create a property to parse the digest
+>> + * consistently. The parsed digest will be saved in @value in IPE's
+>> + * policy.
+>> + *
+>> + * Return:
+>> + * * 0	- OK
+>> + * * !0	- Error
+>> + */
+>> +int ipe_digest_parse(const char *valstr, void **value)
+> 
+> Why is @value void?  You should make it a digest_info type or simply
+> skip the second parameter and return a digest_info pointer.
+>
+Yes it should better just return a digest_info type pointer. I will 
+update this part.
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+>> +{
+>> +	char *sep, *raw_digest;
+>> +	size_t raw_digest_len;
+>> +	int rc = 0;
+>> +	u8 *digest = NULL;
+>> +	struct digest_info *info = NULL;
+>> +
+>> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
+>> +	if (!info)
+>> +		return -ENOMEM;
+>> +
+>> +	sep = strchr(valstr, ':');
+>> +	if (!sep) {
+>> +		rc = -EBADMSG;
+>> +		goto err;
+>> +	}
+>> +
+>> +	info->alg = kstrndup(valstr, sep - valstr, GFP_KERNEL);
+>> +	if (!info->alg) {
+>> +		rc = -ENOMEM;
+>> +		goto err;
+>> +	}
+>> +
+>> +	raw_digest = sep + 1;
+>> +	raw_digest_len = strlen(raw_digest);
+>> +	info->raw_digest = kstrndup(raw_digest, raw_digest_len, GFP_KERNEL);
+> 
+> Since you're running a strlen() over @raw_digest, you might as well
+> just use kstrdup() instead of kstrndup().
+>
+Thanks I will update this part.
+
+>> +	if (!info->raw_digest) {
+>> +		rc = -ENOMEM;
+>> +		goto err_free_alg;
+>> +	}
+>> +
+>> +	info->digest_len = (raw_digest_len + 1) / 2;
+>> +	digest = kzalloc(info->digest_len, GFP_KERNEL);
+>> +	if (!digest) {
+>> +		rc = -ENOMEM;
+>> +		goto err_free_raw;
+>> +	}
+>> +
+>> +	rc = hex2bin(digest, raw_digest, info->digest_len);
+>> +	if (rc < 0) {
+>> +		rc = -EINVAL;
+>> +		goto err_free_raw;
+>> +	}
+>> +
+>> +	info->digest = digest;
+>> +	*value = info;
+>> +	return 0;
+>> +
+>> +err_free_raw:
+>> +	kfree(info->raw_digest);
+>> +err_free_alg:
+>> +	kfree(info->alg);
+>> +err:
+>> +	kfree(digest);
+>> +	kfree(info);
+>> +	return rc;
+>> +}
+>> +
+>> +/**
+>> + * ipe_digest_eval - evaluate an IPE digest against another digest.
+>> + * @expect: Supplies the policy-provided digest value.
+>> + * @digest: Supplies the digest to compare against the policy digest value.
+>> + * @digest_len: The length of @digest.
+>> + * @alg: Supplies the name of the algorithm used to calculated @digest.
+>> + *
+>> + * Return:
+>> + * * true	- digests match
+>> + * * false	- digests do not match
+>> + */
+>> +bool ipe_digest_eval(const void *expect, const u8 *digest, size_t digest_len,
+>> +		     const char *alg)
+> 
+> Similar to the above, why not make the @expect parameter a digest_info
+> type?  Also, why not pass a second digest_info parameter instead of
+> a separate @digest, @digest_len, and @alg?
+> 
+The digest_info was inteneded to be used for policy only, which also 
+contains a raw string of digest in the policy that can be used during 
+audit. After second thought I start to think the raw_digest seems 
+unnecessary and I can refactor them all to use digest_info instead.
+
+>> +{
+>> +	const struct digest_info *info = (struct digest_info *)expect;
+>> +
+>> +	return (digest_len == info->digest_len) && !strcmp(alg, info->alg) &&
+>> +	       (!memcmp(info->digest, digest, info->digest_len));
+>> +}
+>> +
+>> +/**
+>> + * ipe_digest_free - free an IPE digest.
+>> + * @value: Supplies a pointer the policy-provided digest value to free.
+>> + */
+>> +void ipe_digest_free(void **value)
+> 
+> Another digest_info parameter/type issue.
+> 
+>> +{
+>> +	struct digest_info *info = (struct digest_info *)(*value);
+>> +
+>> +	if (IS_ERR_OR_NULL(info))
+>> +		return;
+>> +
+>> +	kfree(info->alg);
+>> +	kfree(info->raw_digest);
+>> +	kfree(info->digest);
+>> +	kfree(info);
+>> +}
+>> +
+>> +/**
+>> + * ipe_digest_audit - audit a digest that was sourced from IPE's policy.
+>> + * @ab: Supplies the audit_buffer to append the formatted result.
+>> + * @val: Supplies a pointer to source the audit record from.
+>> + *
+>> + * Digests in IPE are defined in a standard way:
+>> + *	<alg_name>:<hex>
+>> + *
+>> + * Use this function to create a property to audit the digest
+>> + * consistently.
+>> + *
+>> + * Return:
+>> + * 0 - OK
+>> + * !0 - Error
+>> + */
+>> +void ipe_digest_audit(struct audit_buffer *ab, const void *val)
+> 
+> Another digest_info parameter/type issue.
+> 
+>> +{
+>> +	const struct digest_info *info = (struct digest_info *)val;
+>> +
+>> +	audit_log_untrustedstring(ab, info->alg);
+>> +	audit_log_format(ab, ":");
+>> +	audit_log_untrustedstring(ab, info->raw_digest);
+>> +}
+> 
+> ...
+> 
+>> diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+>> index 78c54ff1fdd3..82ad48d7aa3d 100644
+>> --- a/security/ipe/eval.c
+>> +++ b/security/ipe/eval.c
+>> @@ -69,15 +88,89 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
+>>   		    const struct file *file,
+>>   		    enum ipe_op_type op)
+>>   {
+>> +	struct inode *ino = NULL;
+>> +
+>>   	if (op == IPE_OP_EXEC && file)
+>>   		pin_sb(FILE_SUPERBLOCK(file));
+>>   
+>>   	ctx->file = file;
+>>   	ctx->op = op;
+>>   
+>> -	if (file)
+>> +	if (file) {
+>>   		ctx->from_init_sb = from_pinned(FILE_SUPERBLOCK(file));
+>> +		ino = d_real_inode(file->f_path.dentry);
+>> +		build_ipe_bdev_ctx(ctx, ino);
+> 
+> You don't need @ino.
+> 
+>    build_ipe_bdev_ctx(ctx, d_real_inode(file->f_path.dentry));
+> 
+This variable will make sense in the fsverity patch, I do agree it 
+doesn't make sense for this one. Will remove it.
+
+>> +	}
+>> +}
+>> +
+>> +#ifdef CONFIG_IPE_PROP_DM_VERITY
+>> +/**
+>> + * evaluate_dmv_roothash - Evaluate @ctx against a dmv roothash property.
+>> + * @ctx: Supplies a pointer to the context being evaluated.
+>> + * @p: Supplies a pointer to the property being evaluated.
+>> + *
+>> + * Return:
+>> + * * true	- The current @ctx match the @p
+>> + * * false	- The current @ctx doesn't match the @p
+>> + */
+>> +static bool evaluate_dmv_roothash(const struct ipe_eval_ctx *const ctx,
+>> +				  struct ipe_prop *p)
+>> +{
+>> +	return !!ctx->ipe_bdev &&
+>> +	       ipe_digest_eval(p->value,
+>> +			       ctx->ipe_bdev->digest,
+>> +			       ctx->ipe_bdev->digest_len,
+>> +			       ctx->ipe_bdev->digest_algo);
+> 
+> Building on my comments above in ipe_digest_eval(), if you convert it
+> to use digest_info structs this is simplified:
+> 
+>    ipe_digest_eval(p->vlaue, ctx->ipe_bdev)
+> 
+Yep but the seucrity blob also contains signature information. I will 
+make it like ipe_digest_eval(p->vlaue, ctx->ipe_bdev->dmv_digest_info)
+
+>> +}
+>> +
+>> +/**
+>> + * evaluate_dmv_sig_false: Analyze @ctx against a dmv sig false property.
+>> + * @ctx: Supplies a pointer to the context being evaluated.
+>> + * @p: Supplies a pointer to the property being evaluated.
+>> + *
+>> + * Return:
+>> + * * true	- The current @ctx match the @p
+>> + * * false	- The current @ctx doesn't match the @p
+>> + */
+>> +static bool evaluate_dmv_sig_false(const struct ipe_eval_ctx *const ctx,
+>> +				   struct ipe_prop *p)
+>> +{
+>> +	return !ctx->ipe_bdev || (!ctx->ipe_bdev->dm_verity_signed);
+>> +}
+>> +
+>> +/**
+>> + * evaluate_dmv_sig_true: Analyze @ctx against a dmv sig true property.
+>> + * @ctx: Supplies a pointer to the context being evaluated.
+>> + * @p: Supplies a pointer to the property being evaluated.
+>> + *
+>> + * Return:
+>> + * * true	- The current @ctx match the @p
+>> + * * false	- The current @ctx doesn't match the @p
+>> + */
+>> +static bool evaluate_dmv_sig_true(const struct ipe_eval_ctx *const ctx,
+>> +				  struct ipe_prop *p)
+>> +{
+>> +	return ctx->ipe_bdev && (!!ctx->ipe_bdev->dm_verity_signed);
+>> +}
+> 
+> Do you need both evaluate_dmv_sig_true() and evaluate_dmv_sig_false()?
+> If yes, you should make one call the other and return the inverse to
+> help ensure there are no oddities.
+>
+Yes this code is redundant. I also found the ipe_prop *p variable is 
+necssary. Will clean them up in the next version.
+
+>> diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
+>> index e9386762a597..8b8031e66f36 100644
+>> --- a/security/ipe/hooks.c
+>> +++ b/security/ipe/hooks.c
+>> @@ -193,3 +196,51 @@ void ipe_sb_free_security(struct super_block *mnt_sb)
+>>   {
+>>   	ipe_invalidate_pinned_sb(mnt_sb);
+>>   }
+>> +
+>> +#ifdef CONFIG_IPE_PROP_DM_VERITY
+>> +/**
+>> + * ipe_bdev_free_security - free IPE's LSM blob of block_devices.
+>> + * @bdev: Supplies a pointer to a block_device that contains the structure
+>> + *	  to free.
+>> + */
+>> +void ipe_bdev_free_security(struct block_device *bdev)
+>> +{
+>> +	struct ipe_bdev *blob = ipe_bdev(bdev);
+>> +
+>> +	kfree(blob->digest);
+>> +	kfree(blob->digest_algo);
+>> +}
+>> +
+>> +/**
+>> + * ipe_bdev_setsecurity - save data from a bdev to IPE's LSM blob.
+>> + * @bdev: Supplies a pointer to a block_device that contains the LSM blob.
+>> + * @key: Supplies the string key that uniquely identifies the value.
+>> + * @value: Supplies the value to store.
+>> + * @len: The length of @value.
+>> + */
+>> +int ipe_bdev_setsecurity(struct block_device *bdev, const char *key,
+>> +			 const void *value, size_t len)
+>> +{
+>> +	struct ipe_bdev *blob = ipe_bdev(bdev);
+>> +
+>> +	if (!strcmp(key, DM_VERITY_ROOTHASH_SEC_NAME)) {
+>> +		const struct dm_verity_digest *digest = value;
+>> +
+>> +		blob->digest = kmemdup(digest->digest, digest->digest_len, GFP_KERNEL);
+>> +		if (!blob->digest)
+>> +			return -ENOMEM;
+>> +
+>> +		blob->digest_algo = kstrdup_const(digest->algo, GFP_KERNEL);
+>> +		if (!blob->digest_algo)
+>> +			return -ENOMEM;
+> 
+> You need to cleanup @blob on error so you don't leak ipe_bdev::digest.
+>
+Thanks for catching that. I will fix this.
+
+-Fan
+>> +		blob->digest_len = digest->digest_len;
+>> +		return 0;
+>> +	} else if (!strcmp(key, DM_VERITY_SIGNATURE_SEC_NAME)) {
+>> +		blob->dm_verity_signed = true;
+>> +		return 0;
+>> +	}
+>> +
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+> 
+> --
+> paul-moore.com
