@@ -2,92 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D61CC41535
-	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 14:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F70DC4167B
+	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 14:54:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376649AbjKBOCn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Nov 2023 10:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52222 "EHLO
+        id S232873AbjKBOy5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Nov 2023 10:54:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbjKBOCn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 10:02:43 -0400
+        with ESMTP id S229549AbjKBOy4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 10:54:56 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F0E83;
-        Thu,  2 Nov 2023 07:02:40 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55B93C433C9;
-        Thu,  2 Nov 2023 14:02:38 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D7A13A;
+        Thu,  2 Nov 2023 07:54:54 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C746C433C7;
+        Thu,  2 Nov 2023 14:54:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698933759;
-        bh=fgOZjn0WdFzXtcn8lGgDLoPHzxr8QdP2NR/ys5t0Tbc=;
+        s=k20201202; t=1698936893;
+        bh=BJTFD/V8NhF9xL2Vb2JI1wzz0obRMSgyun4+k7Ugw9Y=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SX4WtNKm5pDj9w492ahqKstWDnWh6M4sJIDEesfWnzHG+qb9Q4yNf6O/VTmBrzQ+B
-         J+lN6pLndYpPJ2///jW3lO8ULdP1cvkId8z0QLLU9SCD1Vn3MCh+blaB22zqDAiR/o
-         XR4l+VlEP7zQokYYie6zAycHpAphfEalcKMzDRGBY7DIFdzBxEoSIM1JcGC8CJxbij
-         F9Ali9mUj5nbbM9wS1hvCdR6/H4SvGkafHYkIN0s4b7pqOGcZS/Zcm6+PYMZJDJNev
-         2MmTfCZEAoTWDPXuEvghazEUvKAcFhgHBcECGGT8wd3jtYaMQqEyBmgULjji+2X7SU
-         nEdY57VcxKcNQ==
-Date:   Thu, 2 Nov 2023 08:02:34 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Ming Lei <tom.leiming@gmail.com>,
-        Marek =?us-ascii?Q?Marczykowski-G'orecki?= 
-        <marmarek@invisiblethingslab.com>, Jan Kara <jack@suse.cz>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Hocko <mhocko@suse.com>, stable@vger.kernel.org,
-        regressions@lists.linux.dev, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: Intermittent storage (dm-crypt?) freeze - regression 6.4->6.5
-Message-ID: <ZUOr-vp0yRkLyvyi@kbusch-mbp.dhcp.thefacebook.com>
-References: <ZT/e/EaBIkJEgevQ@mail-itl>
- <98aefaa9-1ac-a0e4-fb9a-89ded456750@redhat.com>
- <ZUB5HFeK3eHeI8UH@mail-itl>
- <20231031140136.25bio5wajc5pmdtl@quack3>
- <ZUEgWA5P8MFbyeBN@mail-itl>
- <CACVXFVOEWDyzasS7DWDvLOhC3Hr6qOn5ks3HLX+fbRYCxYv26w@mail.gmail.com>
- <ZUG0gcRhUlFm57qN@mail-itl>
- <ZUHE52SznRaZQxnG@fedora>
- <ab02413f-4bf2-4d92-baf7-62fbd106f5df@suse.de>
- <ZUI1GSSL4vdsFVHq@fedora>
+        b=mS0qn/iBxKZEKvGGrtnVqbeXoKkNJRh2yX+sjN9sp80EPCvEYbFaQJfaCMKEdHZ+1
+         /eVzZ6+rIhVkuedaouV9kmdWnlIc6RtzmvHhbMo81QuRbZfYjYOB1Q4tp2BATbjZSr
+         9ll8LVHjc+8hUhcpJZjOqCRtf7t60o891zB3PpcWsZzGxeQbts68ySyE3ghCoU9V1o
+         qpjNuDyDuvTarMA8beLpXWEZCNYFxm5FUo2lLGzus8Pt6X27M3MM0z0Rk1bAmjVSs0
+         h6NQNekzzERttZHnIIzjRc4H+bK2fhUPbE0RGxNI83ST1NiqFwfVWunvI34pSdS/Gh
+         QTiOf36cX8mWQ==
+Date:   Thu, 2 Nov 2023 15:54:48 +0100
+From:   Christian Brauner <brauner@kernel.org>
+To:     Chandan Babu R <chandanbabu@kernel.org>, Jan Kara <jack@suse.cz>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Cc:     viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        djwong@kernel.org, linux-xfs@vger.kernel.org,
+        dchinner@fromorbit.com, Christoph Hellwig <hch@lst.de>
+Subject: Re: [BUG REPORT] next-20231102: generic/311 fails on XFS with
+ external log
+Message-ID: <20231102-teich-absender-47a27e86e78f@brauner>
+References: <87bkccnwxc.fsf@debian-BULLSEYE-live-builder-AMD64>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZUI1GSSL4vdsFVHq@fedora>
+In-Reply-To: <87bkccnwxc.fsf@debian-BULLSEYE-live-builder-AMD64>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 01, 2023 at 07:23:05PM +0800, Ming Lei wrote:
-> On Wed, Nov 01, 2023 at 11:15:02AM +0100, Hannes Reinecke wrote:
-> > > nvme_queue_rq() on the above request.
-> > > 
-> > And that is something I've been wondering (for quite some time now):
-> > What _is_ the appropriate error handling for -ENOMEM?
+On Thu, Nov 02, 2023 at 06:06:10PM +0530, Chandan Babu R wrote:
+> Hi,
 > 
-> It is just my guess.
+> generic/311 consistently fails when executing on a kernel built from
+> next-20231102.
 > 
-> Actually it shouldn't fail since the sgl allocation is backed with
-> memory pool, but there is also dma pool allocation and dma mapping.
+> The following is the fstests config file that was used during testing.
 > 
-> > At this time, we assume it to be a retryable error and re-run the queue
-> > in the hope that things will sort itself out.
+> export FSTYP=xfs
 > 
-> It should not be hard to figure out why nvme_queue_rq() can't move on.
+> export TEST_DEV=/dev/loop0
+> export TEST_DIR=/mnt/test
+> export TEST_LOGDEV=/dev/loop2
+> 
+> export SCRATCH_DEV=/dev/loop1
+> export SCRATCH_MNT=/mnt/scratch
+> export SCRATCH_LOGDEV=/dev/loop3
 
-There's only a few reasons nvme_queue_rq would return BLK_STS_RESOURCE
-for a typical read/write command:
+Thanks for the report. So dm flakey sets up:
 
-  DMA mapping error
-  Can't allocate SGL from mempool
-  Can't allocate PRP from dma_pool
-  Controller stuck in resetting state
+/dev/dm-0 over /dev/loop0
+/dev/dm-1 over /dev/loop2
 
-We should always be able to get at least one allocation from the memory
-pools, so I think the only one the driver doesn't have a way to
-guarantee eventual forward progress are the DMA mapping error
-conditions. Is there some other limit that the driver needs to consider
-when configuring it's largest supported transfers?
+and then we mount an xfs filesystem with:
+
+/dev/loop2 as logdev and /dev/loop0 as the main device.
+
+So on current kernels what happens is that if you freeze the main
+device you end up:
+
+bdev_freeze(dm-0)
+-> get_super(dm-0) # finds xfs sb
+   -> freeze_super(sb)
+
+if you also freeze the log device afterwards via:
+
+bdev_freeze(dm-1)
+-> get_super(dm-1) # doesn't find xfs sb because freezing only works for
+                   # main device
+
+What's currently in -next allows you to roughly do the following:
+
+bdev_freeze(dm-0)
+-> fs_bdev_freeze(dm-0->sb)
+   -> freeze_super(dm-0->sb) # returns 0
+
+bdev_freeze(dm-1)
+-> fs_bdev_freeze(dm-1->sb)
+   -> freeze_super(dm-1->sb) # returns -EBUSY
+
+So you'll see EBUSY because the superblock was already frozen when the
+main block device was frozen. I was somewhat expecting that we may run
+into such issues.
+
+I think we just need to figure out what we want to do in cases the
+superblock is frozen via multiple devices. It would probably be correct
+to keep it frozen as long as any of the devices is frozen?
