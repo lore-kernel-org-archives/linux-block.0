@@ -2,155 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85873C4167D
-	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 07:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C63B0C4167D
+	for <linux-block@archiver.kernel.org>; Thu,  2 Nov 2023 09:55:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234262AbjKBHdJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Nov 2023 03:33:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37210 "EHLO
+        id S1345932AbjKBJz7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Nov 2023 05:55:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbjKBHdI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 03:33:08 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B3E7DB
-        for <linux-block@vger.kernel.org>; Thu,  2 Nov 2023 00:33:03 -0700 (PDT)
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20231102073258epoutp029a80729b57fff7e7e67c2343c8707430~Tvf0DU5Eo0040900409epoutp02B
-        for <linux-block@vger.kernel.org>; Thu,  2 Nov 2023 07:32:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20231102073258epoutp029a80729b57fff7e7e67c2343c8707430~Tvf0DU5Eo0040900409epoutp02B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1698910378;
-        bh=2uq5roYA4bWfG77dHMjfTPvdeRh/sgiL6PttJPkNnY4=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=VfdSPl8rmfkcmAu1Wn6KwAv47s+nj0C9jx+u17LMq2+RRDnxpgqmLMbDk0/dGZ68M
-         iNefLHOSGEvbZF9KE3++m6Bcc/P+pmEr2jeqhD9ifz4o1etHHUM07itstuvfub6GJJ
-         X9hgcLMUa0w4d3eou192oyPE1zdosw2Px4KnEEzE=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
-        20231102073257epcas2p3a697640ebe49bc897c2b1220d8bd8d6a~TvfzLGdGt2967329673epcas2p3E;
-        Thu,  2 Nov 2023 07:32:57 +0000 (GMT)
-Received: from epsmges2p4.samsung.com (unknown [182.195.36.102]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4SLbFP29hlz4x9QB; Thu,  2 Nov
-        2023 07:32:57 +0000 (GMT)
-X-AuditID: b6c32a48-1d26ea8000002587-47-654350a991a5
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4A.E8.09607.9A053456; Thu,  2 Nov 2023 16:32:57 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE:(2) (2) [PATCH v3 01/14] fs: Move enum rw_hint into a new header
- file
-Reply-To: daejun7.park@samsung.com
-Sender: Daejun Park <daejun7.park@samsung.com>
-From:   Daejun Park <daejun7.park@samsung.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Daejun Park <daejun7.park@samsung.com>,
-        KANCHAN JOSHI <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Avri Altman <Avri.Altman@wdc.com>,
-        Bean Huo <huobean@gmail.com>, Jan Kara <jack@suse.cz>,
-        Christian Brauner <brauner@kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jeff Layton <jlayton@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Seonghun Kim <seonghun-sui.kim@samsung.com>,
-        Jorn Lee <lunar.lee@samsung.com>,
-        Sung-Jun Park <sungjun07.park@samsung.com>,
-        Hyunji Jeon <hyunji.jeon@samsung.com>,
-        Dongwoo Kim <dongwoo7565.kim@samsung.com>,
-        Seongcheol Hong <sc01.hong@samsung.com>,
-        Jaeheon Lee <jaeheon7.lee@samsung.com>,
-        Wonjong Song <wj3.song@samsung.com>,
-        JinHwan Park <jh.i.park@samsung.com>,
-        Yonggil Song <yonggil.song@samsung.com>,
-        Soonyoung Kim <overmars.kim@samsung.com>,
-        Shinwoo Park <sw_kr.park@samsung.com>,
-        Seokhwan Kim <sukka.kim@samsung.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <c06b2624-b05b-48d4-840d-beb208aa33dc@acm.org>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20231102073155epcms2p3d1e288b7b81e213fbb32ecc0cc48e094@epcms2p3>
-Date:   Thu, 02 Nov 2023 16:31:55 +0900
-X-CMS-MailID: 20231102073155epcms2p3d1e288b7b81e213fbb32ecc0cc48e094
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA22Tf1DTdRjH7/uDbcCNvg60D3AQzrSAgI0b7IMBqVB9C0jKs0zPYMe+B8TY
-        1jYIjWqXR/wMxGvNRvxKDmSIE4RFosjPwGInBtiBQZBwiDRBMI6dDtrYyP7ov9fzvvfzPPc8
-        zz0MjFVO92CkihWUTCwQsWlOuL7Hlx9QHx9FcYwqZzhvGqXBhokSGlzoWUbgN0smDP6iMqBw
-        Y2IOhfPdvlA79R6s0w46wPqGPhR+Z1CisLH/MQrL1KdQOKPTYPDcoCcsWc/FoalWS4d9G0Ya
-        vDbuD69eu4HDwt/aaPDG+Xs4rOtfR+HUk7t0uHZGDu//LIILa95Qm1eOwHz1BRwu/l2Dw5vm
-        fgeYV2DGoOpmL7pvJzk8EkP+qJmgk8OGDLJZm08j28eUNPLh7DhOFrdoEXKwqpdOrjR7k7md
-        hSjZPGNE452PpoWnUAIhJfOhxEkSYao4OYIdcyghKiEklMMN4IZBPttHLEinItjRsfEBr6WK
-        LNth+2QKRBkWKV4gl7ODIsNlkgwF5ZMikSsi2JRUKJLypYFyQbo8Q5wcKKYUe7kcTnCIxZiY
-        lvLlwJCDdNkl60yuka5EclwKEEcGIHhg+voKWoA4MVhEGwIerVVbAgaDSWwD5jZXq8eVOASG
-        DGbcyiyCDXS3NHSbHgjGpy8gVqYRLwH1wB90ax03Qo0A0+IqzRpgRLEjyKvW4LZuTHA2d9bO
-        nuCHutbNbEfiZXBp4Ve6TX8RrNV+hdl4OxhrMNK3ePGnSsTGbiBn0mD3bANTpna77g7ulDfb
-        /RKwMVJn52yg76ywcxC4ndeE24aMA6vGE1YZJ3aD2nKd3RINKgv1myUxwh/UVi9gVjtG+ALd
-        lSArAmIX6B3HbQ4XkNdjpm8NqGx6/L/cVjGD2ngPuGjSoaeRXZqni9b8p5fmaa8qBNMiOyip
-        PD2ZkgdLef/eNkmS3oxs/okf2YaUGZcCuxGUgXQjgIGx3Zg9IfsoFlMoOHGSkkkSZBkiSt6N
-        hFimLMU8tidJLI8mViRweWEcXmgolx8cwuGzn2VO5pQLWUSyQEGlUZSUkm3loQxHDyWa+Zef
-        dJSjmBOudJxa3evM0D+IzkQjKn11RU4ftOw2lDBPu66g6HRr6ZhvUeSlgS8+rTrSl/XZyEGv
-        lvDQD5X3rgq8ij+pL2otfWdilL+kDNJzJ3auZidGvitQnY/VT3oe66555Zku1YHRu1nrTp6X
-        ec+7tGmiVE269Z4/v66m3qx/eMD7rPmk+q3kY9mke2Fj19s7hhPfaPy8LubwwY7VrsLS45cX
-        FjrLjsSF1YhCb2FHWf4fua78/vpcbFjfcX/TC4fjmMJHT8ZHF6+/agyOH8q/30HtcW/3Kt3f
-        PMt7Tm24OH/l+zvu59KHpEtesw+iids+7wfS1ipE6fxq9se69f3fmljLbFyeIuD6YTK54B98
-        LwIWsAQAAA==
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231017204823epcas5p2798d17757d381aaf7ad4dd235f3f0da3
-References: <c06b2624-b05b-48d4-840d-beb208aa33dc@acm.org>
-        <9b0990ec-a3c9-48c0-b312-8c07c727e326@acm.org>
-        <20231017204739.3409052-1-bvanassche@acm.org>
-        <20231017204739.3409052-2-bvanassche@acm.org>
-        <b3058ce6-e297-b4c3-71d4-4b76f76439ba@samsung.com>
-        <20231101063910epcms2p18f991db15958f246fa1654f2d412e176@epcms2p1>
-        <CGME20231017204823epcas5p2798d17757d381aaf7ad4dd235f3f0da3@epcms2p3>
+        with ESMTP id S1345937AbjKBJz6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 05:55:58 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F47813E;
+        Thu,  2 Nov 2023 02:55:52 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D752F21878;
+        Thu,  2 Nov 2023 09:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1698918950; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=T5pRlUTGfYRuroKFEMEmJ57hIq3rhMsknidCix2gKl0=;
+        b=qutiQvaGsOQab0v2di7F+0A+4UnE3dlg1s6Dc8JWqH82ej9F/Hscve/EuDIIa9YGfCeh5D
+        g0zoi/ItgT+6HSryTvGRO4kSMrPZnTGeu6CX4/NAzyUULW0QjxoyATW2kYdWghdm546x0q
+        E8dx9htPDLSjzAXbZjaWb6ICvTui8BI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1698918950;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=T5pRlUTGfYRuroKFEMEmJ57hIq3rhMsknidCix2gKl0=;
+        b=UQreemB+E0uLx6UT+sZKc/0hHY0LMusZa0aq/V9EuW9VGPv+CBxgXLrad9ABB5R6QZEBhv
+        l5G+GZ++ekve+qBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BE12E138EC;
+        Thu,  2 Nov 2023 09:55:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id A59fLiZyQ2UoeAAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 02 Nov 2023 09:55:50 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 36F76A06E3; Thu,  2 Nov 2023 10:55:50 +0100 (CET)
+Date:   Thu, 2 Nov 2023 10:55:50 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Brian Foster <bfoster@redhat.com>
+Cc:     Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kees Cook <keescook@google.com>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        linux-xfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        Kent Overstreet <kent.overstreet@linux.dev>,
+        linux-bcachefs@vger.kernel.org
+Subject: Re: [PATCH 1/7] bcachefs: Convert to bdev_open_by_path()
+Message-ID: <20231102095550.5hofpgzwbzx4ewqx@quack3>
+References: <20231101173542.23597-1-jack@suse.cz>
+ <20231101174325.10596-1-jack@suse.cz>
+ <ZUKggpzckTAKkyMl@bfoster>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZUKggpzckTAKkyMl@bfoster>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bart,
+Hi Brian,
 
->On 10/31/23 23:39, Daejun Park wrote:
->>> On 10/30/23 04:11, Kanchan Joshi wrote:
->>>> On 10/18/2023 2:17 AM, Bart Van Assche wrote:
->>> Thanks for having taken a look at this patch series. Jens asked for dat=
-a
->>> that shows that this patch series improves performance. Is this
->>> something Samsung can help with?
->>=C2=A0=0D=0A>>=20We=20analyzed=20the=20NAND=20block=20erase=20counter=20w=
-ith=20and=20without=20stream=20separation=0D=0A>>=20through=20a=20long-term=
-=20workload=20in=20F2FS.=0D=0A>>=20The=20analysis=20showed=20that=20the=20e=
-rase=20counter=20is=20reduced=20by=20approximately=2040%=0D=0A>>=20with=20s=
-tream=20seperation.=0D=0A>>=20Long-term=20workload=20is=20a=20scenario=20wh=
-ere=20erase=20and=20write=20are=20repeated=20by=0D=0A>>=20stream=20after=20=
-performing=20precondition=20fill=20for=20each=20temperature=20of=20F2FS.=0D=
-=0A>=0D=0A>Hi=20Daejun,=0D=0A>=0D=0A>Thank=20you=20for=20having=20shared=20=
-this=20data.=20This=20is=20very=20helpful.=20Since=20I'm=0D=0A>not=20famili=
-ar=20with=20the=20erase=20counter:=20does=20the=20above=20data=20perhaps=20=
-mean=0D=0A>that=20write=20amplification=20is=20reduced=20by=2040%=20in=20th=
-e=20workload=20that=20has=20been=0D=0A>examined?=0D=0A=0D=0AWAF=20is=20not=
-=20only=20caused=20by=20GC.=20It=20is=20also=20caused=20by=20other=20reason=
-s.=0D=0ADuring=20device=20GC,=20the=20valid=20pages=20in=20the=20victim=20b=
-lock=20are=20migrated,=20and=20a=0D=0Alower=20erase=20counter=20means=20tha=
-t=20the=20effective=20GC=20is=20performed=20by=20selecting=0D=0Aa=20victim=
-=20block=20with=20a=20small=20number=20of=20invalid=20pages.=0D=0AThus,=20i=
-t=20can=20be=20said=20that=20the=20WAF=20can=20be=20decreased=20about=2040%=
-=20by=20selecting=0D=0Afewer=20victim=20blocks=20during=20device=20GC.=0D=
-=0A=0D=0AThanks,=0D=0A=0D=0ADaejun=0D=0A=0D=0A>=0D=0A>Thanks,=0D=0A>=0D=0A>=
-Bart.=0D=0A
+On Wed 01-11-23 15:01:22, Brian Foster wrote:
+> On Wed, Nov 01, 2023 at 06:43:06PM +0100, Jan Kara wrote:
+> > Convert bcachefs to use bdev_open_by_path() and pass the handle around.
+> > 
+> > CC: Kent Overstreet <kent.overstreet@linux.dev>
+> > CC: Brian Foster <bfoster@redhat.com>
+> > CC: linux-bcachefs@vger.kernel.org
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
+> >  fs/bcachefs/super-io.c    | 19 ++++++++++---------
+> >  fs/bcachefs/super_types.h |  1 +
+> >  2 files changed, 11 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/fs/bcachefs/super-io.c b/fs/bcachefs/super-io.c
+> > index 332d41e1c0a3..01a32c41a540 100644
+> > --- a/fs/bcachefs/super-io.c
+> > +++ b/fs/bcachefs/super-io.c
+> ...
+> > @@ -685,21 +685,22 @@ int bch2_read_super(const char *path, struct bch_opts *opts,
+> >  	if (!opt_get(*opts, nochanges))
+> >  		sb->mode |= BLK_OPEN_WRITE;
+> >  
+> > -	sb->bdev = blkdev_get_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> > -	if (IS_ERR(sb->bdev) &&
+> > -	    PTR_ERR(sb->bdev) == -EACCES &&
+> > +	sb->bdev_handle = bdev_open_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> > +	if (IS_ERR(sb->bdev_handle) &&
+> > +	    PTR_ERR(sb->bdev_handle) == -EACCES &&
+> >  	    opt_get(*opts, read_only)) {
+> >  		sb->mode &= ~BLK_OPEN_WRITE;
+> >  
+> > -		sb->bdev = blkdev_get_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> > -		if (!IS_ERR(sb->bdev))
+> > +		sb->bdev_handle = bdev_open_by_path(path, sb->mode, sb->holder, &bch2_sb_handle_bdev_ops);
+> > +		if (!IS_ERR(sb->bdev_handle))
+> >  			opt_set(*opts, nochanges, true);
+> >  	}
+> >  
+> > -	if (IS_ERR(sb->bdev)) {
+> > -		ret = PTR_ERR(sb->bdev);
+> > +	if (IS_ERR(sb->bdev_handle)) {
+> > +		ret = PTR_ERR(sb->bdev_handle);
+> >  		goto out;
+> >  	}
+> > +	sb->bdev = sb->bdev_handle->bdev;
+> >  
+> >  	ret = bch2_sb_realloc(sb, 0);
+> >  	if (ret) {
+> 
+> This all seems reasonable to me, but should bcachefs use sb_open_mode()
+> somewhere in here to involve use of the restrict writes flag in the
+> first place? It looks like bcachefs sort of open codes bits of
+> mount_bdev() so it isn't clear the flag would be used anywhere...
+
+Yes, so AFAICS bcachefs will not get the write restriction from the changes
+in the generic code. Using sb_open_mode() in bcachefs would fix that but
+given the 'noexcl' and 'nochanges' mount options it will not be completely
+seamless anyway. I guess once the generic changes are in, bcachefs can
+decide how exactly it wants to set the BLK_OPEN_RESTRICT_WRITES flag. Or if
+you already have an opinion, we can just add the patch to this series.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
