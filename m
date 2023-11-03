@@ -2,88 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D466C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 02:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F2AC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 03:30:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229447AbjKCCSj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Nov 2023 22:18:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34686 "EHLO
+        id S229802AbjKCDai (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Nov 2023 23:30:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbjKCCSi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 22:18:38 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ECFA1B2;
-        Thu,  2 Nov 2023 19:18:35 -0700 (PDT)
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SM4D20MhMz4f3kFj;
-        Fri,  3 Nov 2023 10:18:26 +0800 (CST)
+        with ESMTP id S229570AbjKCDah (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 23:30:37 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC2919E;
+        Thu,  2 Nov 2023 20:30:33 -0700 (PDT)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SM5q64rhTz4f3n6G;
+        Fri,  3 Nov 2023 11:30:26 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-        by mail.maildlp.com (Postfix) with ESMTP id 4B8101A016E;
-        Fri,  3 Nov 2023 10:18:32 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgD3gtJ3WERlzdy+Eg--.64019S4;
-        Fri, 03 Nov 2023 10:18:32 +0800 (CST)
-From:   Li Lingfeng <lilingfeng@huaweicloud.com>
-To:     josef@toxicpanda.com
+        by mail.maildlp.com (Postfix) with ESMTP id 3FF501A0176;
+        Fri,  3 Nov 2023 11:30:30 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAnt9ZUaURlM4vDEg--.56230S3;
+        Fri, 03 Nov 2023 11:30:30 +0800 (CST)
+Subject: Re: [PATCH] nbd: fix uaf in nbd_open
+To:     Li Lingfeng <lilingfeng@huaweicloud.com>, josef@toxicpanda.com
 Cc:     linux-kernel@vger.kernel.org, hch@lst.de,
         linux-block@vger.kernel.org, nbd@other.debian.org, axboe@kernel.dk,
         chaitanya.kulkarni@wdc.com, yukuai1@huaweicloud.com,
         houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        lilingfeng@huaweicloud.com, lilingfeng3@huawei.com
-Subject: [PATCH] nbd: fix uaf in nbd_open
-Date:   Fri,  3 Nov 2023 18:13:34 +0800
-Message-Id: <20231103101334.1750094-1-lilingfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        lilingfeng3@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20231103101334.1750094-1-lilingfeng@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <07045515-6668-19bc-def8-45fb0e9fe2ed@huaweicloud.com>
+Date:   Fri, 3 Nov 2023 11:30:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20231103101334.1750094-1-lilingfeng@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3gtJ3WERlzdy+Eg--.64019S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xw4DtrW3uFy3WrW8Xw18Krg_yoWDJFg_C3
-        48Awn2qr4Fkry8Cr4jyF1DZrW5tw1FqF4rCw1Sqas3Zay7Xas3GF4xZrW5A3yDGFy7Ga47
-        ZF1Yqr43Ar4xXjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbakFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M28lY4IEw2IIxx
-        k0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK
-        6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7
-        xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-        FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr
-        0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
-        x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
-        IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
-        MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
-        WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj
-        6rWUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-        IYCTnIWIevJa73UjIFyTuYvjTRM_M-UUUUU
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+X-CM-TRANSID: gCh0CgAnt9ZUaURlM4vDEg--.56230S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF4fKw17Jr47uw4fCry7Awb_yoW8GrW3pF
+        Z8GF1qk3y8Wr43Ka1xJw17ZF1rXw1UW348uFnru3sI9F9xKr9I9r48GF95WFn8tr47Arsr
+        XFWqqw18Z3Z7CrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Lingfeng <lilingfeng3@huawei.com>
+Hi,
 
-Commit 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and
-blk_cleanup_disk") cleans up disk by blk_cleanup_disk() and it won't set
-disk->private_data as NULL as before. UAF may be triggered in nbd_open()
-if someone tries to open nbd device right after nbd_put() since refcount
-of nbd device is zero and private_data is not NULL.
+ÔÚ 2023/11/03 18:13, Li Lingfeng Ð´µÀ:
+> From: Li Lingfeng <lilingfeng3@huawei.com>
+> 
+> Commit 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and
+> blk_cleanup_disk") cleans up disk by blk_cleanup_disk() and it won't set
+> disk->private_data as NULL as before. UAF may be triggered in nbd_open()
+> if someone tries to open nbd device right after nbd_put() since refcount
+> of nbd device is zero and private_data is not NULL.
+> 
+Do you mean that nbd_open concurrent with nbd_dev_remove?
 
-Fixes: 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and blk_cleanup_disk")
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
- drivers/block/nbd.c | 1 +
- 1 file changed, 1 insertion(+)
+nbd_open		nbd_dev_remove
+			 del_gendisk
+			 kfree(nbd)
+  mutex_lock
+  nbd = disk->private_data
+  -> UAF
+  refcount_inc_not_zero
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 800f131222fc..aab93b836e84 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -250,6 +250,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 	struct gendisk *disk = nbd->disk;
- 
- 	del_gendisk(disk);
-+	disk->private_data = NULL;
- 	put_disk(disk);
- 	blk_mq_free_tag_set(&nbd->tag_set);
- 
--- 
-2.31.1
+Looks like it's possible, but you should use READ/WRITE_ONCE() here,
+because disk->pravate_data can be accessed concurrently.
+
+Thanks,
+Kuai
+
+> Fixes: 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and blk_cleanup_disk")
+> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+> ---
+>   drivers/block/nbd.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 800f131222fc..aab93b836e84 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -250,6 +250,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
+>   	struct gendisk *disk = nbd->disk;
+>   
+>   	del_gendisk(disk);
+> +	disk->private_data = NULL;
+>   	put_disk(disk);
+>   	blk_mq_free_tag_set(&nbd->tag_set);
+>   
+> 
 
