@@ -2,110 +2,160 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F2AC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 03:30:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5CEC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 05:10:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjKCDai (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Nov 2023 23:30:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58538 "EHLO
+        id S229497AbjKCFKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Nov 2023 01:10:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbjKCDah (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2023 23:30:37 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC2919E;
-        Thu,  2 Nov 2023 20:30:33 -0700 (PDT)
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SM5q64rhTz4f3n6G;
-        Fri,  3 Nov 2023 11:30:26 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-        by mail.maildlp.com (Postfix) with ESMTP id 3FF501A0176;
-        Fri,  3 Nov 2023 11:30:30 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAnt9ZUaURlM4vDEg--.56230S3;
-        Fri, 03 Nov 2023 11:30:30 +0800 (CST)
-Subject: Re: [PATCH] nbd: fix uaf in nbd_open
-To:     Li Lingfeng <lilingfeng@huaweicloud.com>, josef@toxicpanda.com
-Cc:     linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-block@vger.kernel.org, nbd@other.debian.org, axboe@kernel.dk,
-        chaitanya.kulkarni@wdc.com, yukuai1@huaweicloud.com,
-        houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        lilingfeng3@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20231103101334.1750094-1-lilingfeng@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <07045515-6668-19bc-def8-45fb0e9fe2ed@huaweicloud.com>
-Date:   Fri, 3 Nov 2023 11:30:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20231103101334.1750094-1-lilingfeng@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+        with ESMTP id S229436AbjKCFKN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Nov 2023 01:10:13 -0400
+Received: from outbound-ip191a.ess.barracuda.com (outbound-ip191a.ess.barracuda.com [209.222.82.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC0A1A7
+        for <linux-block@vger.kernel.org>; Thu,  2 Nov 2023 22:10:07 -0700 (PDT)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100]) by mx-outbound8-226.us-east-2a.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Fri, 03 Nov 2023 05:09:59 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fFfLVCJofEv6tNFWB6WP+tj10783++XYkOnCUCnnrd1y8B89uZNmOBLn8XgZLzuTEyQN/ardgKLyB4654qgzYF6c5ElOSW+9RTHOTNc4YZi4UBVrSNi4PJRz/qhaXiTPsu7nV2+XwodwoQQ2Q9ovVcl/0cxxHweAFgP7ObHSrbJYfKXvUEihzGU/5J6GYae6M/cCUBMoRjZrkvE1DG5oQvqVO4UkUb9yMYyD55bXF8RSO2RRoU5N/+dUpBVYiTnnhynTwdJAacrTMg11IK+gqdPgCndfcn9r/OEkC4UW6YYmBCB0bZaEH/t62+hSE+hAxc8lApwKF73sPsqH5IvyMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EhyhobByy3czDRChRUdmXoPp3UaAxTOpm3dJHErmyag=;
+ b=ZWwp3iA2hh/OvEFqTfMkrta8Fg8j1RypsViS0tZwU+kNki0pbf5MT2Zia++Vq8q3O6K7sUYtJ7soLNA3ryYymJq+rZcK3trmvzc0VNNNRq+dcjPafijBCtGyYjIBwWqw0o+ExwT8iGSqsjD8WBcZvX5iSv6mkSsRFnp6DDjRbbsiosRt0mZK+mcqHOovJEHphfsJuFweFs0oaUCeY8hbM8FgPsIatRjGKqUUxA2NpC+fv9cKCPLu7dm8kXue/9a1REnmq0EqqHGT+YMcJlyRPjDgAxOMXAtLAQ+OQa1eOKwgfJKnzKzCk4YNRbQ9pLraIVtkvIIMImXeXYh6GBI7UA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=ddn.com; dmarc=pass action=none header.from=ddn.com; dkim=pass
+ header.d=ddn.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ddn.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EhyhobByy3czDRChRUdmXoPp3UaAxTOpm3dJHErmyag=;
+ b=dxLm70s4D3f9vXwWYpEwj9y4fuLsZIKnebqzPAJb9EczrgTddNER+UHMlpD9eq14dM0qtecDg4jDG+u/c55wsrrm5Q1gXlA8SdYO9v3EpaAgNN5kxnavIKkvaDGTfIbhzBbWPbYQMhs6TlCF69Kx5K+4wkDXCLMuB4t0NVf+Tjs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=ddn.com;
+Received: from DS7PR19MB5711.namprd19.prod.outlook.com (2603:10b6:8:72::19) by
+ DS7PR19MB5901.namprd19.prod.outlook.com (2603:10b6:8:7c::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6954.21; Fri, 3 Nov 2023 05:09:56 +0000
+Received: from DS7PR19MB5711.namprd19.prod.outlook.com
+ ([fe80::d7a0:ac28:9211:7962]) by DS7PR19MB5711.namprd19.prod.outlook.com
+ ([fe80::d7a0:ac28:9211:7962%7]) with mapi id 15.20.6954.019; Fri, 3 Nov 2023
+ 05:09:55 +0000
+From:   Li Dongyang <dongyangli@ddn.com>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     hch@lst.de, adilger.kernel@dilger.ca
+Subject: [PATCH] mm: folio_wait_stable() should check for bdev
+Date:   Fri,  3 Nov 2023 16:09:49 +1100
+Message-ID: <20231103050949.480892-1-dongyangli@ddn.com>
+X-Mailer: git-send-email 2.42.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAnt9ZUaURlM4vDEg--.56230S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF4fKw17Jr47uw4fCry7Awb_yoW8GrW3pF
-        Z8GF1qk3y8Wr43Ka1xJw17ZF1rXw1UW348uFnru3sI9F9xKr9I9r48GF95WFn8tr47Arsr
-        XFWqqw18Z3Z7CrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
+X-ClientProxiedBy: SY4P282CA0007.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:a0::17) To DS7PR19MB5711.namprd19.prod.outlook.com
+ (2603:10b6:8:72::19)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR19MB5711:EE_|DS7PR19MB5901:EE_
+X-MS-Office365-Filtering-Correlation-Id: fad7d9c9-8e43-4c58-03e0-08dbdc2b1df1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tRew/5Q6lmUoVGLBWmUM8mJw47Q+7g9o5N+RVc7taVhXOtGdefNjHcH77YnA61qYSXLW6ek3wyVD8dCfTwkPxO4lubayXzmbwokGd70HoFaoeeVU2Dj8degUtF/YctRYE7s8HTjYsFUd7YCpGy2XbRyQ0XoW0RoFQ+WRU3WcLrxWlHJCrCWmLY17HWWZvq32I/TJQLEmdBgNDKqQEEyLweR6Ku0QMIGJPaCXH8nONGn/CdJllqawQrkccd4z+VcuSGlNoo/L1MY8ZXUnd7epweHOAevi0Y7Epr+XEGX87VIA6+talqJtgejghDSL51/nZK6Grp5UP8gX4Lhn4cIxf/V0pJXAL34d5F3/4mP51cT3S3gm2mKYvvVL9L1vUDQ9RQi2SkXxOL8FfOxbv1O/jIaEG779hBo/jGIo/UdP3gMTZMtzvpa2PZKGogfMjgJrirUVm88CiCKOqNrk8m4/OrNPq/MaElFuNclQyO6NFAUzdDz59pgmUEvr8FjEg+5HbAkK0jD+B8WX14L5XTFzA5r9mdEokBA4HhhChC6B9dTKTv86KszhjCqm3SehId3j
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR19MB5711.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(376002)(136003)(39850400004)(396003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(6512007)(26005)(2616005)(55236004)(478600001)(6666004)(2906002)(83380400001)(5660300002)(6506007)(41300700001)(66946007)(6486002)(66556008)(66476007)(4326008)(8676002)(316002)(8936002)(1076003)(36756003)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XiI2nZaRFQ6QiDs0k1pfRKGIE6StlLboBrjNNXY29eZ4O36ec2BjczXR61ab?=
+ =?us-ascii?Q?Il5xJLqsHC96A9iIBCvXfLZnnSqaPF8nqFZyLwVFPzK0z9TfNyezjv055KKd?=
+ =?us-ascii?Q?y3szj5eKnjW+BS9NBZ4xww+nvTPUcdRwMK3/vAj6MW4TxZI1+VYKSEyXNcxF?=
+ =?us-ascii?Q?aLF8KTh2ZfdTNsMFzDx/pWQDX2znjW56Xyx4Ns0TUn8JimQ/bAdbbDS6AGoS?=
+ =?us-ascii?Q?Tr/fn4r2ErYdAAyDjeESxPazmUYPdI1VLW7zCfAViPRqThomUxNhPkT4mNsv?=
+ =?us-ascii?Q?Wvs1ff7grCN/dhUhPNV+5kZ+1ApRau5kLksZf2g28yqRr87xZEIJn92K+Ssf?=
+ =?us-ascii?Q?xHXBny5oUMoqEQC6LY6v6T/6mBvtPHa0my3+UuzxW0hV3y+j6gRMhzDgrgUH?=
+ =?us-ascii?Q?IBHswxdkW614PhimZ0Q+qgbfLMqxtQ7W99dlLAyz9ZBeQ7xQWvEKTlP+Rl1H?=
+ =?us-ascii?Q?Ablvg/VK9FzGuKuNODQDG/S2kZZJUyYGcSvi7z+QX23A6cv/ZkiqF6vszFXX?=
+ =?us-ascii?Q?K6o8120vXfkfmf63M59xLBKI3knazcRVfFl287NdzmdEmEvuSyGRrsiSmWvH?=
+ =?us-ascii?Q?0BDeJNQptiJGi0aUCcb4cMMD/6xG8ESSSF2N3lHV5/mrmpbewVQ1k8Zhu4JD?=
+ =?us-ascii?Q?1jtDXhuEGaJkWoMHRcKC8I2m/HdU8/259OzzYVd/vjOV9Yf+RidhVE+IsXn5?=
+ =?us-ascii?Q?8w7i5qei/hF26uL9cQ42ZvZ6kjtqq5wrBZYoTIOFxXNcJD5F+FQ7C7kM1U/x?=
+ =?us-ascii?Q?/d/kf/S7UNYrpMwmwDMaDRrldjj6SQgiWVH5sdSP4TeScxiUC006el4EndQv?=
+ =?us-ascii?Q?m6+2O4hZsQz5AjO8MfgA3hp4hVV67l9Q2dPqaEWcS0CJHcUtLa71bI3MKtji?=
+ =?us-ascii?Q?5PiHqlDCBxDbvLUEcDVfhMnsRb5rvOO202QiQzqYGGXjFRJtaDwu8GCtPqQo?=
+ =?us-ascii?Q?lxEqathdooFcNK6IvDozo19HdGopIEWhPVHZFz+pkuhfb3ndtsOq1KCRqHA4?=
+ =?us-ascii?Q?IFtGwT25zsZkGw0TpEuEJFistBRERzOaz8jejTVELTqgePggml1N4RjtVAat?=
+ =?us-ascii?Q?H95vgdCaIefom4quE8LvJpt48x1ttOXC0DCkwK/mumJQeQH3NphByPfAKY2S?=
+ =?us-ascii?Q?lNeRmJeUHSDjiDRD6jRqY5agDOJdnrF6+UrZyz7+FYdWottbc4IEXk6o/6eK?=
+ =?us-ascii?Q?7z6zsiMi3QYZ3g2Kj9FQlVFayIhmr1sWetCk7jkidgF3EDRK2NnYE1p2nR4J?=
+ =?us-ascii?Q?Y4pRa/WN//1FBYjHWA+epjffGp0E3cv/G7yUswtleZ2KvrfCAvO9gvzm7dJ2?=
+ =?us-ascii?Q?dZR0ZZwnd35FM9qzyotCtEwxBfqRt9r22fOJDEG9kbfGL8cARGA3FMf1ja4C?=
+ =?us-ascii?Q?Rm5YF79R1DEgkEgmKsYZAitM/Yt4wAZv17W8IRzJ3UUkRDqUfTL9EwKLJY0i?=
+ =?us-ascii?Q?sJ2j1JP4HiL20iuqOpHazXWOV6Z8fx0xl2q5BU9ZFg5RepqQPOfcL4G1Hags?=
+ =?us-ascii?Q?xZBNq8F+wgpI1zqPxdLuYrP1C3urG1rRiEhm1Z9NhaHdMLsF888uWN1nxIQ+?=
+ =?us-ascii?Q?4KjcE7OzIpoudEXBCb4=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: MaeLRKLVKVytWvIbzPJN6GpD1g9ukdXUmw1N2OjPNSQDTqPBOfghqoCV9UiqMQZrIRUyZJhBLeSrKkyW48R3tIumzpgc/kbSp9/E6+TFptDYzSvEzEiEIaiz2LCtHfFtPuv47YNoDC73ZWviOPbaZC6Dlk8UpdTG57vBx1w0Wk+ZcHjPHb4nkpiNNC3lcb8DISJAjGk88seFsYA2XgHR93ATtVE4mwJtwKk4MPZ9KlwcDze7XiyfGM49MDI3EXdt9bfZbyvmwZfQjnWYPb+Kpn74YH4LcTgcISuAZiU2ZXDWpM2IiHWe2+7rVEVMzprD8ANeLKd3u3QjkE4Cwm5QVcywmEBuMIEMlPXdZ4OlUPEH+GHrIFXjvLPHILTVc1+IxVyvu9PHmRmSCwl4AmvXNjXDnW1BdtmwHMpGqX52mGpHjrDmySvLdCFgl8DRIs0/+zSiCQYpOEHHvBIsSHsbVM/0ugVYskW+yYis2hcXtyMSlz1YKB7q0BE/r/FaYH3S9HKHj97zrJL0dcMDcVOC3IPKN4MxtOO6Reet84KeY9nbsVFU/cLNzUs57KiqhPWhqshJTqKR3ubwTDntizjkkxaJWa17iDh9OlX+IiIfEKPwueX1BO6hSRlcR8uZGf2Uvzc9lwm0wiDyFdNTBFZL5UIUKq1/1tcDQdZL11lmq6r1UHqtgSIUDFDmJF7EHrdxS5VlXd/469gxwm3qE7WNWBx+i5CxCRHgAUEzSDEKrneXkFkaLkGqMbPdnMJltXx+4rSnTJ6S8MAwVqbDgRgxjJq5lIA+lqJdiyztxYztrXx98tepqHUNngGnMMRHGDN/wYCtCjsSukmrCrKYajYxgQ==
+X-OriginatorOrg: ddn.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fad7d9c9-8e43-4c58-03e0-08dbdc2b1df1
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR19MB5711.namprd19.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2023 05:09:55.2457
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 753b6e26-6fd3-43e6-8248-3f1735d59bb4
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: twyMsQv5yM9JbDXGWavqaiGPpHxO5vYjPTLM+U0z4lp1XwRSTVrs4xgx0snp56Ge
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR19MB5901
+X-BESS-ID: 1698988199-102274-12492-105637-1
+X-BESS-VER: 2019.1_20231024.1900
+X-BESS-Apparent-Source-IP: 104.47.58.100
+X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKVobGRsZAVgZQ0NzEPDnRLDUl2c
+        jQOC01NSnNzNzcMsUiNcksNc3cwDBFqTYWAI8ofQhBAAAA
+X-BESS-Outbound-Spam-Score: 0.00
+X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.251874 [from 
+        cloudscan10-148.us-east-2a.ess.aws.cudaops.com]
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------
+        0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
+X-BESS-Outbound-Spam-Status: SCORE=0.00 using account:ESS124931 scores of KILL_LEVEL=7.0 tests=BSF_BESS_OUTBOUND
+X-BESS-BRTS-Status: 1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+folio_wait_stable() now checks SB_I_STABLE_WRITES
+flag on the superblock instead of backing_dev_info,
+this could trigger a false block integrity error when
+doing buffered write directly to the block device,
+as folio_wait_stable() is a noop for bdev and the
+content could be modified during writeback.
 
-ÔÚ 2023/11/03 18:13, Li Lingfeng Ð´µÀ:
-> From: Li Lingfeng <lilingfeng3@huawei.com>
-> 
-> Commit 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and
-> blk_cleanup_disk") cleans up disk by blk_cleanup_disk() and it won't set
-> disk->private_data as NULL as before. UAF may be triggered in nbd_open()
-> if someone tries to open nbd device right after nbd_put() since refcount
-> of nbd device is zero and private_data is not NULL.
-> 
-Do you mean that nbd_open concurrent with nbd_dev_remove?
+Check if the folio's superblock is bdev and wait for
+writeback if the backing device requires stables_writes.
 
-nbd_open		nbd_dev_remove
-			 del_gendisk
-			 kfree(nbd)
-  mutex_lock
-  nbd = disk->private_data
-  -> UAF
-  refcount_inc_not_zero
+Fixes: 1cb039f3dc16 ("bdi: replace BDI_CAP_STABLE_WRITES with a queue and a sb flag")
+Signed-off-by: Li Dongyang <dongyangli@ddn.com>
+---
+This patch supersedes the previous
+block: add SB_I_STABLE_WRITES to bdev sb flag
+---
+---
+ mm/page-writeback.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Looks like it's possible, but you should use READ/WRITE_ONCE() here,
-because disk->pravate_data can be accessed concurrently.
-
-Thanks,
-Kuai
-
-> Fixes: 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and blk_cleanup_disk")
-> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
-> ---
->   drivers/block/nbd.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 800f131222fc..aab93b836e84 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -250,6 +250,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
->   	struct gendisk *disk = nbd->disk;
->   
->   	del_gendisk(disk);
-> +	disk->private_data = NULL;
->   	put_disk(disk);
->   	blk_mq_free_tag_set(&nbd->tag_set);
->   
-> 
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index b8d3d7040a50..a236f93347a1 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -3110,7 +3110,11 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable);
+  */
+ void folio_wait_stable(struct folio *folio)
+ {
+-	if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
++	struct inode *inode = folio_inode(folio);
++
++	if (inode->i_sb->s_iflags & SB_I_STABLE_WRITES ||
++	    (sb_is_blkdev_sb(inode->i_sb) &&
++	     bdev_stable_writes(I_BDEV(inode))))
+ 		folio_wait_writeback(folio);
+ }
+ EXPORT_SYMBOL_GPL(folio_wait_stable);
+-- 
+2.42.0
 
