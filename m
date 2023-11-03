@@ -2,238 +2,193 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2231C4167B
-	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 16:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61148C4167D
+	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 22:15:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234339AbjKCQV7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Nov 2023 12:21:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50746 "EHLO
+        id S230392AbjKCWP7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Nov 2023 18:15:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230121AbjKCQV7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Nov 2023 12:21:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E374CA
-        for <linux-block@vger.kernel.org>; Fri,  3 Nov 2023 09:21:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1699028472;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cNgudPCc13D4/tjUOv7XPhTpnXTcLS65Xsn8KNXaBsc=;
-        b=FEY8/S/ezQ2gqLle70SneHmHCM4mdELWBIvqij3LrsiHm///3ED9MqYeT8KJd7ufwALQQn
-        ekjJiEmycd3nUzuMV5WmkQ9767YRyv9LYTx4ArsIaToU+ASaRQVapp+N45/LGKTcbvd5MB
-        jzvV11ozhwviKvQaVstwM0ZhnmMTqLo=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-362-qTo86_hcP5C2SOhjH-WgDg-1; Fri,
- 03 Nov 2023 12:21:07 -0400
-X-MC-Unique: qTo86_hcP5C2SOhjH-WgDg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 77B522932483;
-        Fri,  3 Nov 2023 16:21:05 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A91BC2026D4C;
-        Fri,  3 Nov 2023 16:20:56 +0000 (UTC)
-Date:   Sat, 4 Nov 2023 00:20:51 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ed Tsai =?utf-8?B?KOiUoeWul+i7kik=?= <Ed.Tsai@mediatek.com>
-Cc:     "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-        "angelogioacchino.delregno@collabora.com" 
-        <angelogioacchino.delregno@collabora.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Will Shiu =?utf-8?B?KOioseaBreeRnCk=?= <Will.Shiu@mediatek.com>,
-        Peter Wang =?utf-8?B?KOeOi+S/oeWPiyk=?= 
-        <peter.wang@mediatek.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Alice Chao =?utf-8?B?KOi2meePruWdhyk=?= 
-        <Alice.Chao@mediatek.com>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Casper Li =?utf-8?B?KOadjuS4reamrik=?= <casper.li@mediatek.com>,
-        Chun-Hung Wu =?utf-8?B?KOW3q+mnv+Wujyk=?= 
-        <Chun-hung.Wu@mediatek.com>,
-        Powen Kao =?utf-8?B?KOmrmOS8r+aWhyk=?= <Powen.Kao@mediatek.com>,
-        Naomi Chu =?utf-8?B?KOacseipoOeUsCk=?= <Naomi.Chu@mediatek.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Stanley Chu =?utf-8?B?KOacseWOn+mZnik=?= 
-        <stanley.chu@mediatek.com>, ming.lei@redhat.com
-Subject: Re: [PATCH 1/1] block: Check the queue limit before bio submitting
-Message-ID: <ZUUd48QF/TEGFzPy@fedora>
-References: <20231025092255.27930-1-ed.tsai@mediatek.com>
- <64db8f5406571c2f89b70f852eb411320201abe6.camel@mediatek.com>
+        with ESMTP id S230360AbjKCWP6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Nov 2023 18:15:58 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05931D65
+        for <linux-block@vger.kernel.org>; Fri,  3 Nov 2023 15:15:54 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-d9a58f5f33dso2618458276.1
+        for <linux-block@vger.kernel.org>; Fri, 03 Nov 2023 15:15:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1699049754; x=1699654554; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ccOCsVenhg7pWMdO3laccrRAXnIeEc+431O9cttQg7I=;
+        b=OSnCDqWeIzqFkJFw0JIMR4iLA9VyIF68FFXdAw+eGAIls0bJjIfQUjFgl7Mu5OND0n
+         ze9cemaWQR9ZxDT/Fl+OdqLmAu5G9O5j84Om6Lw5LN0ZMofsh/nMhQIiHfthEsT6ibYz
+         DIURQuH4QCQvWsZV7xlUsJZuuPGMiGvFhj8/ij0GLSTfAhQPMb7RVsp+TjHhfVsxyQOO
+         tssqLGNYXQuAWaAM+llRNLXnhL3bJhrG6LHgL38yjLzDR8h9/MJP5SNXyqBn+UtMTmz/
+         wui6bugClKmc7ovx0bOofRHLio3pU0bCip+7ODGAJQfvbhIkPXNnI2ZjPrznR12mCV/W
+         ZJ5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699049754; x=1699654554;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ccOCsVenhg7pWMdO3laccrRAXnIeEc+431O9cttQg7I=;
+        b=nZgnLAyMh51B5jFDmZjel0ZXG1ts7a6mJMZG4w5RjK3HNJw/vuWdXa93q6aPgehkR0
+         e6y9Sjw97Ea+fkl7KEn3WkDkQ1NcY8MVwXK/uad6ZoJeuwhuR6QpBAEtP25Umn7uJh1x
+         wCT+Hh/0If/EGiqivOLcRSir1CrfcRkRRL1+cYaY/n2rthMNz8vDpGAZaU45Sp2N5LXN
+         ykGwXQOTEmg/bq1yU7ZLzbGzBZB0AOYWz0p11z/kxn69JxNeNtqCWJPyKFqaqHbuVGyb
+         pQ9KHrXv3TMpQ/RVCWNA3/9RvxyDwdtA60NvQU5qJTS5PeIK85bdmukICbtT/K3ueUAl
+         jZNQ==
+X-Gm-Message-State: AOJu0Ywd64h4znQGBt6mhs6wvDmu7WLazXb54Ql1xNuRWdnoWvY4HZ1p
+        isI2/+1/LF1ZdaU93kdpyvQ8OkzaTU+o2xgM3WAk
+X-Google-Smtp-Source: AGHT+IFXMOMQ73ZCAvSg6LD6VZpXmYTcSO6q5zw8IRAbMI+vp7J9LIJ0t0H+f7n6Vr/G+r+30PRzXEL4q0W7UTYfaRI=
+X-Received: by 2002:a25:7652:0:b0:d9c:c79:ca1c with SMTP id
+ r79-20020a257652000000b00d9c0c79ca1cmr23470882ybc.55.1699049754011; Fri, 03
+ Nov 2023 15:15:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <64db8f5406571c2f89b70f852eb411320201abe6.camel@mediatek.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+References: <1696457386-3010-6-git-send-email-wufan@linux.microsoft.com>
+ <c53599e9d278fc55be30e3bac9411328.paul@paul-moore.com> <616a6fd7-47b1-4b46-af23-46f9b1a3eedf@linux.microsoft.com>
+ <CAHC9VhScdtqJeUTTUQVk4D70tTLz4TgU_aRTMRnHa0OARyubaw@mail.gmail.com> <c40cd6a6-5c32-4e72-8831-f87ee0a09324@linux.microsoft.com>
+In-Reply-To: <c40cd6a6-5c32-4e72-8831-f87ee0a09324@linux.microsoft.com>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Fri, 3 Nov 2023 18:15:42 -0400
+Message-ID: <CAHC9VhR9scT7V7dvN5zhAYdExORB9arWaR7Gbix1AUtAMDPHcg@mail.gmail.com>
+Subject: Re: [PATCH RFC v11 5/19] ipe: introduce 'boot_verified' as a trust provider
+To:     Fan Wu <wufan@linux.microsoft.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 01, 2023 at 02:23:26AM +0000, Ed Tsai (蔡宗軒) wrote:
-> On Wed, 2023-10-25 at 17:22 +0800, ed.tsai@mediatek.com wrote:
-> > From: Ed Tsai <ed.tsai@mediatek.com>
-> > 
-> > Referring to commit 07173c3ec276 ("block: enable multipage bvecs"),
-> > each bio_vec now holds more than one page, potentially exceeding
-> > 1MB in size and causing alignment issues with the queue limit.
-> > 
-> > In a sequential read/write scenario, the file system maximizes the
-> > bio's capacity before submitting. However, misalignment with the
-> > queue limit can result in the bio being split into smaller I/O
-> > operations.
-> > 
-> > For instance, assuming the maximum I/O size is set to 512KB and the
-> > memory is highly fragmented, resulting in each bio containing only
-> > one 2-pages bio_vec (i.e., bi_size = 1028KB). This would cause the
-> > bio to be split into two 512KB portions and one 4KB portion. As a
-> > result, the originally expected continuous large I/O operations are
-> > interspersed with many small I/O operations.
-> > 
-> > To address this issue, this patch adds a check for the max_sectors
-> > before submitting the bio. This allows the upper layers to
-> > proactively
-> > detect and handle alignment issues.
-> > 
-> > I performed the Antutu V10 Storage Test on a UFS 4.0 device, which
-> > resulted in a significant improvement in the Sequential test:
-> > 
-> > Sequential Read (average of 5 rounds):
-> > Original: 3033.7 MB/sec
-> > Patched: 3520.9 MB/sec
-> > 
-> > Sequential Write (average of 5 rounds):
-> > Original: 2225.4 MB/sec
-> > Patched: 2800.3 MB/sec
-> > 
-> > Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
-> > ---
-> >  block/bio.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/block/bio.c b/block/bio.c
-> > index 816d412c06e9..a4a1f775b9ea 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -1227,6 +1227,7 @@ static int __bio_iov_iter_get_pages(struct bio
-> > *bio, struct iov_iter *iter)
-> >  	iov_iter_extraction_t extraction_flags = 0;
-> >  	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-> >  	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
-> > +	struct queue_limits *lim = &bdev_get_queue(bio->bi_bdev)-
-> > >limits;
-> >  	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
-> >  	struct page **pages = (struct page **)bv;
-> >  	ssize_t size, left;
-> > @@ -1275,6 +1276,11 @@ static int __bio_iov_iter_get_pages(struct bio
-> > *bio, struct iov_iter *iter)
-> >  		struct page *page = pages[i];
-> >  
-> >  		len = min_t(size_t, PAGE_SIZE - offset, left);
-> > +		if (bio->bi_iter.bi_size + len >
-> > +		    lim->max_sectors << SECTOR_SHIFT) {
-> > +			ret = left;
-> > +			break;
-> > +		}
-> >  		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
-> >  			ret = bio_iov_add_zone_append_page(bio, page,
-> > len,
-> >  					offset);
-> > -- 
-> > 2.18.0
-> > 
-> 
-> 
-> Hi Jens,
-> 
-> Just to clarify any potential confusion, I would like to provide
-> further details based on the assumed scenario mentioned above.
-> 
-> When the upper layer continuously sends 1028KB full-sized bios for
-> sequential reads, the Block Layer sees the following sequence:
-> 	submit bio: size = 1028KB, start LBA = n
-> 	submit bio: size = 1028KB, start LBA = n + 1028KB 
-> 	submit bio: size = 1028KB, start LBA = n + 2056KB
-> 	...
-> 
-> However, due to the queue limit restricting the I/O size to a maximum
-> of 512KB, the Block Layer splits into the following sequence:
-> 	submit bio: size = 512KB, start LBA = n
-> 	submit bio: size = 512KB, start LBA = n +  512KB
-> 	submit bio: size =   4KB, start LBA = n + 1024KB	
-> 	submit bio: size = 512KB, start LBA = n + 1028KB
-> 	submit bio: size = 512KB, start LBA = n + 1540KB
-> 	submit bio: size =   4KB, start LBA = n + 2052KB
-> 	submit bio: size = 512KB, start LBA = n + 2056KB
-> 	submit bio: size = 512KB, start LBA = n + 2568KB
-> 	submit bio: size =   4KB, start LBA = n + 3080KB
-> 	...
-> 	
-> The original expectation was for the storage to receive large,
-> contiguous requests. However, due to non-alignment, many small I/O
-> requests are generated. This problem is easily visible because the
-> user pages passed in are often allocated by the buddy system as order 0
-> pages during page faults, resulting in highly non-contiguous memory.
+On Thu, Nov 2, 2023 at 6:46=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> w=
+rote:
+> On 10/26/2023 3:12 PM, Paul Moore wrote:
+> > On Thu, Oct 26, 2023 at 5:33=E2=80=AFPM Fan Wu <wufan@linux.microsoft.c=
+om> wrote:
+> >> On 10/23/2023 8:52 PM, Paul Moore wrote:
+> >>> On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+> >>>>
+> >>>> IPE is designed to provide system level trust guarantees, this usual=
+ly
+> >>>> implies that trust starts from bootup with a hardware root of trust,
+> >>>> which validates the bootloader. After this, the bootloader verifies =
+the
+> >>>> kernel and the initramfs.
+> >>>>
+> >>>> As there's no currently supported integrity method for initramfs, an=
+d
+> >>>> it's typically already verified by the bootloader, introduce a prope=
+rty
+> >>>> that causes the first superblock to have an execution to be "pinned"=
+,
+> >>>> which is typically initramfs.
+> >>>>
+> >>>> When the "pinned" device is unmounted, it will be "unpinned" and
+> >>>> `boot_verified` property will always evaluate to false afterward.
+> >>>>
+> >>>> We use a pointer with a spin_lock to "pin" the device instead of rcu
+> >>>> because rcu synchronization may sleep, which is not allowed when
+> >>>> unmounting a device.
+> >>>>
+> >>>> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> >>>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> >> ...
+> >>>> ---
+> >>>>    security/ipe/eval.c          | 72 +++++++++++++++++++++++++++++++=
+++++-
+> >>>>    security/ipe/eval.h          |  2 +
+> >>>>    security/ipe/hooks.c         | 12 ++++++
+> >>>>    security/ipe/hooks.h         |  2 +
+> >>>>    security/ipe/ipe.c           |  1 +
+> >>>>    security/ipe/policy.h        |  2 +
+> >>>>    security/ipe/policy_parser.c | 35 +++++++++++++++++-
+> >>>>    7 files changed, 124 insertions(+), 2 deletions(-)
 
-If order 0 page is added to bio, the multipage bvec becomes nop
-basically(256bvec holds 256 pages), then how can it make a difference
-for you?
+...
 
-> 
-> As observed in the Antutu Sequential Read test below, it is similar to
-> the description above where the splitting caused by the queue limit
-> leaves small requests sandwiched in between:
-> 
-> block_bio_queue: 8,32 R 86925864 + 2144 [Thread-51]
-> block_split: 8,32 R 86925864 / 86926888 [Thread-51]
-> block_split: 8,32 R 86926888 / 86927912 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86925864 + 1024 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86926888 + 1024 [Thread-51]
-> block_bio_queue: 8,32 R 86928008 + 2144 [Thread-51]
-> block_split: 8,32 R 86928008 / 86929032 [Thread-51]
-> block_split: 8,32 R 86929032 / 86930056 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86928008 + 1024 [Thread-51]
-> block_rq_issue: 8,32 R 49152 () 86927912 + 96 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86929032 + 1024 [Thread-51]
-> block_bio_queue: 8,32 R 86930152 + 2112 [Thread-51]
-> block_split: 8,32 R 86930152 / 86931176 [Thread-51]
-> block_split: 8,32 R 86931176 / 86932200 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86930152 + 1024 [Thread-51]
-> block_rq_issue: 8,32 R 49152 () 86930056 + 96 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86931176 + 1024 [Thread-51]
-> block_bio_queue: 8,32 R 86932264 + 2096 [Thread-51]
-> block_split: 8,32 R 86932264 / 86933288 [Thread-51]
-> block_split: 8,32 R 86933288 / 86934312 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86932264 + 1024 [Thread-51]
-> block_rq_issue: 8,32 R 32768 () 86932200 + 64 [Thread-51]
-> block_rq_issue: 8,32 R 524288 () 86933288 + 1024 [Thread-51]
-> 
-> I simply prevents non-aligned situations in bio_iov_iter_get_pages.
+> >>>> +/**
+> >>>> + * from_pinned - Determine whether @sb is the pinned super_block.
+> >>>> + * @sb: Supplies a super_block to check against the pinned super_bl=
+ock.
+> >>>> + *
+> >>>> + * Return:
+> >>>> + * * true   - @sb is the pinned super_block
+> >>>> + * * false  - @sb is not the pinned super_block
+> >>>> + */
+> >>>> +static bool from_pinned(const struct super_block *sb)
+> >>>> +{
+> >>>> +    bool rv;
+> >>>> +
+> >>>> +    if (!sb)
+> >>>> +            return false;
+> >>>> +    spin_lock(&pin_lock);
+> >>>> +    rv =3D !IS_ERR_OR_NULL(pinned_sb) && pinned_sb =3D=3D sb;
+> >>>> +    spin_unlock(&pin_lock);
+> >>>
+> >>> It's okay for an initial version, but I still think you need to get
+> >>> away from this spinlock in from_pinned() as quickly as possible.
+> >>> Maybe I'm wrong, but this looks like a major source of lock contentio=
+n.
+> >>>
+> >>> I understand the issue around RCU and the potential for matching on
+> >>> a reused buffer/address, but if you modified IPE to have its own LSM
+> >>> security blob in super_block::security you could mark the superblock
+> >>> when it was mounted and do a lockless lookup here in from_pinned().
+> >>
+> >> Thank you for the suggestion. After some testing, I discovered that
+> >> switching to RCU to pin the super block and using a security blob to
+> >> mark a pinned super block works. This approach do avoid many spinlock
+> >> operations. I'll incorporate these changes in the next version of the =
+patch.
+> >
+> > I probably wasn't as clear as I should have been, I was thinking of
+> > doing away with the @pinned_sb global variable entirely, as well as
+> > its associated lock problems and simply marking the initramfs/initrd
+> > superblock when it was mounted.  I will admit that I haven't fully
+> > thought about all the implementation details, but I think you could
+> > leverage the security_sb_mount() hook to set a flag in IPE's
+> > superblock metadata when the initramfs was mounted.
+>
+> I wasn't able to find a way to let LSM pin initramfs/initrd during mount
+> time ...
 
-But there is still 4KB IO left if you limit max bio size is 512KB,
-then how does this 4KB IO finally go in case of 1028KB IO?
+I haven't had to look at the kernel init code in a while, and I don't
+recall ever looking at the initramfs code, but I spent some time
+digging through the code and I wonder if it would be possible to mark
+the initramfs superblock in wait_for_initramfs() via a new LSM hook
+using @current->fs->root.mnt->mnt_sb?  Although I'm not completely
+sure that it's populated.  Have you already looked at an approach like
+this?
 
-> Besides making the upper layer application aware of the queue limit, I
-> would appreciate any other directions or suggestions you may have.
+> But I think we could replace the global variable with a flag
+> variable ipe_sb_state so we could use atomic operation to only mark one
+> drive as pinned without any lock. The code will be like:
+>
+> static void pin_sb(const struct super_block *sb)
+> {
+>         if (!sb)
+>                 return;
+>
+>         if (!test_and_set_bit_lock(IPE_SB_PINNED, &ipe_sb_state)) {
+>                 ipe_sb(sb)->pinned =3D true;
+>         }
+> }
+>
+> Would this sound better?
+>
+> -Fan
 
-The problem is related with IO size from application.
-
-If you send unaligned IO, you can't avoid the last IO with small size, no
-matter if block layer bio split is involved or not. Your patch just lets
-__bio_iov_iter_get_pages split the bio, and you still have 4KB left
-finally when application submits 1028KB, right?
-
-Then I don't understand why your patch improves sequential IO
-performance.
-
-Thanks,
-Ming
-
+--=20
+paul-moore.com
