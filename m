@@ -2,71 +2,220 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC876C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 08:15:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43625C4167D
+	for <linux-block@archiver.kernel.org>; Fri,  3 Nov 2023 08:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235418AbjKCIPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Nov 2023 04:15:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54204 "EHLO
+        id S1346512AbjKCIgC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Nov 2023 04:36:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235380AbjKCIPn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Nov 2023 04:15:43 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67694112;
-        Fri,  3 Nov 2023 01:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=nc5z+fIoiWRGbEoDiN5kVtNuvPICZUxfahsCp834BCE=; b=spe+jzZxRfB+62sO4nxQ7USAMJ
-        KB3DzJHdXAqWy0Bqmlc10+CfnEqeb5o4VoFldf6wjTXKFQEas6t0+lM1EN+JdM/lPR6YmyN3J2Xvw
-        YzMqIXLn7bODzLtd6179CZtAu1NZxGugvde5j6oUbCE35B0iyaLE6eOtySF7vg62m1xA1XKddUBFO
-        I4sR+AprZH89LFNNtDjnd4Rv6HqPNShyL8vy7FMXwBX2tggzjMZanz58uK+qkGrnJ76lwOp8L+Hgm
-        NQPQS4GGSpOBlu2oC8GA4FF30J0ujRlZxQSA5ZvB/174tj3k7BQ/vHZ7elTMnlg3LXNLi855HZSB8
-        oYVKlt3Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qypL3-00AxfM-33;
-        Fri, 03 Nov 2023 08:15:33 +0000
-Date:   Fri, 3 Nov 2023 01:15:33 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ed Tsai =?utf-8?B?KOiUoeWul+i7kik=?= <Ed.Tsai@mediatek.com>
-Cc:     "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-        "angelogioacchino.delregno@collabora.com" 
-        <angelogioacchino.delregno@collabora.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Will Shiu =?utf-8?B?KOioseaBreeRnCk=?= <Will.Shiu@mediatek.com>,
-        Peter Wang =?utf-8?B?KOeOi+S/oeWPiyk=?= 
-        <peter.wang@mediatek.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Alice Chao =?utf-8?B?KOi2meePruWdhyk=?= 
-        <Alice.Chao@mediatek.com>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Casper Li =?utf-8?B?KOadjuS4reamrik=?= <casper.li@mediatek.com>,
-        Chun-Hung Wu =?utf-8?B?KOW3q+mnv+Wujyk=?= 
-        <Chun-hung.Wu@mediatek.com>,
-        Powen Kao =?utf-8?B?KOmrmOS8r+aWhyk=?= <Powen.Kao@mediatek.com>,
-        Naomi Chu =?utf-8?B?KOacseipoOeUsCk=?= <Naomi.Chu@mediatek.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Stanley Chu =?utf-8?B?KOacseWOn+mZnik=?= 
-        <stanley.chu@mediatek.com>
-Subject: Re: [PATCH 1/1] block: Check the queue limit before bio submitting
-Message-ID: <ZUSsJbcSPSR52J2l@infradead.org>
-References: <20231025092255.27930-1-ed.tsai@mediatek.com>
- <64db8f5406571c2f89b70f852eb411320201abe6.camel@mediatek.com>
+        with ESMTP id S1346327AbjKCIgB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Nov 2023 04:36:01 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 006F1D4F;
+        Fri,  3 Nov 2023 01:35:58 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58EE4C433C9;
+        Fri,  3 Nov 2023 08:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1699000558;
+        bh=bL3/XR0afbcOcBlFvRELYzuinqi5DuIrCTttoQfkQTE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=srOSwTMchEyswcXZbZFADfX+zKTF0hyn8QDqaxrfaPD/+WcyntiKLEuyt/TAtRjGU
+         iLjngPQQIzbnVXA/BCGQ667f2791VWrrz+F9qGgn4dQNZu9YeShjZ3duNIvUCU0L0Y
+         cAXHRfaomEC11pMUf6aRoqgmw5Kb+diTl8GvLmKaU+xU7zF1+xrfDLdBQU7gXKBapj
+         aDL2ujI9XsjyGjtbrDXNycezH5QyVho4wdGmpdxHSlRDT1eVGC051TSEp3ud94YwN0
+         7lKNqoiZtpGkHmPQO4iIOCzUCe6OhiSqoWMig8bqTHZ4xcg+/aRGTn6xNCE+4opTqT
+         amF3e1BGfCr3A==
+Date:   Fri, 3 Nov 2023 09:35:53 +0100
+From:   Christian Brauner <brauner@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Chandan Babu R <chandanbabu@kernel.org>, Jan Kara <jack@suse.cz>,
+        "Darrick J. Wong" <djwong@kernel.org>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        dchinner@fromorbit.com
+Subject: Re: [BUG REPORT] next-20231102: generic/311 fails on XFS with
+ external log
+Message-ID: <20231103-igelstachel-signal-2503859a730a@brauner>
+References: <87bkccnwxc.fsf@debian-BULLSEYE-live-builder-AMD64>
+ <20231102-teich-absender-47a27e86e78f@brauner>
+ <20231103081405.GC16854@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <64db8f5406571c2f89b70f852eb411320201abe6.camel@mediatek.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20231103081405.GC16854@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-You need to look into the splitting code to see why the splits are
-suboptimal for your device.  We can't limit the upper bio size as
-we have code relying on it not having arbitrary limits.
+On Fri, Nov 03, 2023 at 09:14:05AM +0100, Christoph Hellwig wrote:
+> On Thu, Nov 02, 2023 at 03:54:48PM +0100, Christian Brauner wrote:
+> > So you'll see EBUSY because the superblock was already frozen when the
+> > main block device was frozen. I was somewhat expecting that we may run
+> > into such issues.
+> > 
+> > I think we just need to figure out what we want to do in cases the
+> > superblock is frozen via multiple devices. It would probably be correct
+> > to keep it frozen as long as any of the devices is frozen?
+> 
+> As dave pointed out I think we need to bring back / keep the freeze
+> count.
+
+The freeze count never want away. IOW, for each block device we still
+have bd_fsfreeze_count otherwise we couldn't nest per-block device. What
+we need is a freeze counter in sb_writers so we can nest superblock
+freezes. IOW, we need to count the number of block devices that
+requested/caused the superblock to be frozen. I think we're all in
+agreement though. All of our suggestions should be the same.
+I'm currently testing:
+
+From c1849037227e5801f0b5e8acfa05aa5d90f4c9e4 Mon Sep 17 00:00:00 2001
+From: Christian Brauner <brauner@kernel.org>
+Date: Fri, 3 Nov 2023 08:38:49 +0100
+Subject: [PATCH] [DRAFT] fs: handle freezing from multiple devices
+
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+ fs/super.c         | 44 +++++++++++++++++++++++++++++++++++++++-----
+ include/linux/fs.h |  2 ++
+ 2 files changed, 41 insertions(+), 5 deletions(-)
+
+diff --git a/fs/super.c b/fs/super.c
+index 176c55abd9de..882c79366c70 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1476,9 +1476,11 @@ static int fs_bdev_freeze(struct block_device *bdev)
+ 		return -EINVAL;
+ 
+ 	if (sb->s_op->freeze_super)
+-		error = sb->s_op->freeze_super(sb, FREEZE_HOLDER_USERSPACE);
++		error = sb->s_op->freeze_super(sb,
++				FREEZE_HOLDER_BLOCK | FREEZE_HOLDER_USERSPACE);
+ 	else
+-		error = freeze_super(sb, FREEZE_HOLDER_USERSPACE);
++		error = freeze_super(sb,
++				FREEZE_HOLDER_BLOCK | FREEZE_HOLDER_USERSPACE);
+ 	if (!error)
+ 		error = sync_blockdev(bdev);
+ 	deactivate_super(sb);
+@@ -1497,9 +1499,11 @@ static int fs_bdev_thaw(struct block_device *bdev)
+ 		return -EINVAL;
+ 
+ 	if (sb->s_op->thaw_super)
+-		error = sb->s_op->thaw_super(sb, FREEZE_HOLDER_USERSPACE);
++		error = sb->s_op->thaw_super(sb,
++				FREEZE_HOLDER_BLOCK | FREEZE_HOLDER_USERSPACE);
+ 	else
+-		error = thaw_super(sb, FREEZE_HOLDER_USERSPACE);
++		error = thaw_super(sb,
++				FREEZE_HOLDER_BLOCK | FREEZE_HOLDER_USERSPACE);
+ 	deactivate_super(sb);
+ 	return error;
+ }
+@@ -1923,6 +1927,7 @@ static int wait_for_partially_frozen(struct super_block *sb)
+  * @who should be:
+  * * %FREEZE_HOLDER_USERSPACE if userspace wants to freeze the fs;
+  * * %FREEZE_HOLDER_KERNEL if the kernel wants to freeze the fs.
++ * * %FREEZE_HOLDER_BLOCK if freeze originated from the block layer.
+  *
+  * The @who argument distinguishes between the kernel and userspace trying to
+  * freeze the filesystem.  Although there cannot be multiple kernel freezes or
+@@ -1958,18 +1963,33 @@ static int wait_for_partially_frozen(struct super_block *sb)
+ int freeze_super(struct super_block *sb, enum freeze_holder who)
+ {
+ 	int ret;
++	bool bdev_initiated;
+ 
+ 	if (!super_lock_excl(sb)) {
+ 		WARN_ON_ONCE("Dying superblock while freezing!");
+ 		return -EINVAL;
+ 	}
+ 	atomic_inc(&sb->s_active);
++	bdev_initiated = (who & FREEZE_HOLDER_BLOCK);
++	who &= ~FREEZE_HOLDER_BLOCK;
+ 
+ retry:
+ 	if (sb->s_writers.frozen == SB_FREEZE_COMPLETE) {
++		ret = -EBUSY;
++
++		/*
++		 * This is a freeze request from another block device
++		 * associated with the same superblock.
++		 */
++		if (bdev_initiated) {
++			sb->s_writers.bdev_count++;
++			pr_info("Freeze initiated from %d block devices\n", sb->s_writers.bdev_count);
++			ret = 0;
++		}
++
+ 		if (sb->s_writers.freeze_holders & who) {
+ 			deactivate_locked_super(sb);
+-			return -EBUSY;
++			return ret;
+ 		}
+ 
+ 		WARN_ON(sb->s_writers.freeze_holders == 0);
+@@ -2002,6 +2022,8 @@ int freeze_super(struct super_block *sb, enum freeze_holder who)
+ 		/* Nothing to do really... */
+ 		sb->s_writers.freeze_holders |= who;
+ 		sb->s_writers.frozen = SB_FREEZE_COMPLETE;
++		if (bdev_initiated)
++			sb->s_writers.bdev_count++;
+ 		wake_up_var(&sb->s_writers.frozen);
+ 		super_unlock_excl(sb);
+ 		return 0;
+@@ -2052,6 +2074,8 @@ int freeze_super(struct super_block *sb, enum freeze_holder who)
+ 	 */
+ 	sb->s_writers.freeze_holders |= who;
+ 	sb->s_writers.frozen = SB_FREEZE_COMPLETE;
++	if (bdev_initiated)
++		sb->s_writers.bdev_count++;
+ 	wake_up_var(&sb->s_writers.frozen);
+ 	lockdep_sb_freeze_release(sb);
+ 	super_unlock_excl(sb);
+@@ -2068,12 +2092,22 @@ EXPORT_SYMBOL(freeze_super);
+ static int thaw_super_locked(struct super_block *sb, enum freeze_holder who)
+ {
+ 	int error = -EINVAL;
++	bool bdev_initiated = (who & FREEZE_HOLDER_BLOCK);
++	who &= ~FREEZE_HOLDER_BLOCK;
+ 
+ 	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE)
+ 		goto out_unlock;
+ 	if (!(sb->s_writers.freeze_holders & who))
+ 		goto out_unlock;
+ 
++	if (bdev_initiated)
++		sb->s_writers.bdev_count--;
++	if (sb->s_writers.bdev_count) {
++		pr_info("Filesystems held frozen by %d block devices\n", sb->s_writers.bdev_count);
++		error = 0;
++		goto out_unlock;
++	}
++
+ 	/*
+ 	 * Freeze is shared with someone else.  Release our hold and drop the
+ 	 * active ref that freeze_super assigned to the freezer.
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 63ff88d20e46..edc9c071c199 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1186,6 +1186,7 @@ enum {
+ struct sb_writers {
+ 	unsigned short			frozen;		/* Is sb frozen? */
+ 	unsigned short			freeze_holders;	/* Who froze fs? */
++	int				bdev_count;
+ 	struct percpu_rw_semaphore	rw_sem[SB_FREEZE_LEVELS];
+ };
+ 
+@@ -2054,6 +2055,7 @@ extern loff_t vfs_dedupe_file_range_one(struct file *src_file, loff_t src_pos,
+ enum freeze_holder {
+ 	FREEZE_HOLDER_KERNEL	= (1U << 0),
+ 	FREEZE_HOLDER_USERSPACE	= (1U << 1),
++	FREEZE_HOLDER_BLOCK	= (1U << 2),
+ };
+ 
+ struct super_operations {
+-- 
+2.34.1
 
