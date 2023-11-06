@@ -2,59 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A38FDC4167B
-	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 15:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D910BC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 20:03:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbjKFP5h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Nov 2023 10:57:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57410 "EHLO
+        id S232893AbjKFUDg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Nov 2023 15:03:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjKFP5g (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2023 10:57:36 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C21EB107;
-        Mon,  6 Nov 2023 07:57:33 -0800 (PST)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05E95C433C7;
-        Mon,  6 Nov 2023 15:57:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1699286253;
-        bh=XakOiVEMQ571wvcS5zGAhlpsZauOUa29Y5gHDvsw+qk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tVeB/a8uodkCX0j62lt47x2YG8Bv4xgWfFh3B93YWDE3uZR/1+H5DvLu8B36rQoqM
-         eNGiPC/TAgJ1tevx7Ou2o9LuR9c6uRcm6gByg+upuaeD3XOqHyUaXKpHrij/buYQ9G
-         sirzNOITl2dbJUuqg5dFqbSgPbRAKgQxRzXxcGkNpNFfPAuaSl8NXeVhkbuquyl/+i
-         Yk9Fuatfq1iHVqmf10evgxHZ0+Fnk6MKb437dy8PKln7pcoOH/jh+HLETNkJ3QE1OD
-         T673p/8RTDKUS3FGNkDPIoQY+rZzadZlSJF3kb+DbVBq1kOrv/xvnSjnYohAl5WCpm
-         N2YMd6Q7b12+Q==
-Date:   Mon, 6 Nov 2023 16:57:27 +0100
-From:   Christian Brauner <brauner@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kees Cook <keescook@google.com>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        linux-xfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH 3/7] block: Add config option to not allow writing to
- mounted devices
-Message-ID: <20231106-mieten-wildnis-6cb767d234eb@brauner>
-References: <20231101173542.23597-1-jack@suse.cz>
- <20231101174325.10596-3-jack@suse.cz>
- <20231106-einladen-macht-30a9ad957294@brauner>
- <20231106151826.wxjw6ullsx6mhmov@quack3>
+        with ESMTP id S232455AbjKFUDf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2023 15:03:35 -0500
+X-Greylist: delayed 540 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 06 Nov 2023 12:03:32 PST
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [IPv6:2001:41d0:203:375::b3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F10D47
+        for <linux-block@vger.kernel.org>; Mon,  6 Nov 2023 12:03:32 -0800 (PST)
+Message-ID: <d10cdf1d-4a67-48df-b389-3a51f60e9431@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1699300471;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=vU+9mLKaBt/9PJ4s/VTap23H3EjIRGGrzaVjKta+G/s=;
+        b=xpCJ1ElKH72f9/zGJuXVlwvCzM3N90Yye4IigCBUUFw0Glb8AM0AmVBD5Y/9aGSVXPOGdG
+        haJI+msf6/4p9LW156nfi/eW4Yg8aUOo7H6BvjnykClnGgXvbGsme+B79lfQU05+IpEk31
+        onMDf3PLaoP5YdCGA9mwkmkRTQsuMI4=
+Date:   Mon, 6 Nov 2023 22:54:28 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231106151826.wxjw6ullsx6mhmov@quack3>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Vasily Averin <vasily.averin@linux.dev>
+Subject: [PATCH] zram: unsafe zram_get_element call in zram_read_page()
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Minchan Kim <minchan@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        zhouxianrong <zhouxianrong@huawei.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > Let's hope that this can become the default one day.
-> 
-> Yes, I'd hope as well but we need some tooling work (util-linux, e2fsprogs)
-> before that can happen.
+Taken lock is required to access the content of zram entry.
 
-Yeah, absolutely. I'm moderately confident we'll have fairly quick
-adoption of this though.
+Fixes: 8e19d540d107 ("zram: extend zero pages to same element pages")
+Signed-off-by: Vasily Averin <vasily.averin@linux.dev>
+---
+ drivers/block/zram/zram_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index d77d3664ca08..9ac3d4e51d26 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1362,14 +1362,14 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
+ 		ret = zram_read_from_zspool(zram, page, index);
+ 		zram_slot_unlock(zram, index);
+ 	} else {
++		unsigned long entry = zram_get_element(zram, index);
+ 		/*
+ 		 * The slot should be unlocked before reading from the backing
+ 		 * device.
+ 		 */
+ 		zram_slot_unlock(zram, index);
+ 
+-		ret = read_from_bdev(zram, page, zram_get_element(zram, index),
+-				     parent);
++		ret = read_from_bdev(zram, page, entry, parent);
+ 	}
+ 
+ 	/* Should NEVER happen. Return bio error if it does. */
+-- 
+2.34.1
+
