@@ -2,109 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA349C4332F
-	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 00:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5761AC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 00:36:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229715AbjKFAep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Nov 2023 19:34:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
+        id S229740AbjKFAgd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Nov 2023 19:36:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjKFAeo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Nov 2023 19:34:44 -0500
+        with ESMTP id S229671AbjKFAgc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Nov 2023 19:36:32 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1206BC0
-        for <linux-block@vger.kernel.org>; Sun,  5 Nov 2023 16:34:00 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E15E5D8
+        for <linux-block@vger.kernel.org>; Sun,  5 Nov 2023 16:35:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1699230840;
+        s=mimecast20190719; t=1699230940;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MdyE9OGU+VbT072flSIg2v5D5HKxsWBL8J2WzZYAR4M=;
-        b=cI5pJMIL3VRxnnHB+09vGkePYUHpDX+omJpiE1nZBiof+Fo35kxrG2fp/kcgcwtX0UzF4k
-        JjgA56AQrnlgj3mNecc2U1LvJbYIoz5hNeqBhEbHDJwrtwnMYzrv0JS9f+vgbLAzRA6GNC
-        CET7n2vvMu9x+ilLgLDd5YsTPB1unqg=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8eT3U74GpkOTCZjOOX54dVXuB1WEnj3oz32bBLUbX3Y=;
+        b=ZsmjSVZnCnPHAkRWM4GH6UYbXXQHDU7NvrWnNSy8DhmVawvRxeDLTkPfrHS5OW8F2QlmBt
+        JdmcQ97MpzKNvYwXAfJ2YUldw6oo66hDU0AWlpZWAckewmj4fO4nuDckwRt80X+DgVThXc
+        qNuOq4n28I/HKFst4M/MaSOMfScourU=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-142-1agQ4pa7P-mZ63R3Fylqcw-1; Sun, 05 Nov 2023 19:33:58 -0500
-X-MC-Unique: 1agQ4pa7P-mZ63R3Fylqcw-1
+ us-mta-228-AszTItinOlun3pXQ2XsaDQ-1; Sun, 05 Nov 2023 19:35:38 -0500
+X-MC-Unique: AszTItinOlun3pXQ2XsaDQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 14AAA185A780;
-        Mon,  6 Nov 2023 00:33:58 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BBDD02166B26;
-        Mon,  6 Nov 2023 00:33:55 +0000 (UTC)
-Date:   Mon, 6 Nov 2023 08:33:51 +0800
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 693D6811E7E;
+        Mon,  6 Nov 2023 00:35:38 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 93B1F2166B26;
+        Mon,  6 Nov 2023 00:35:37 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Akinobu Mita <akinobu.mita@gmail.com>
-Cc:     linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com
-Subject: Re: [PATCH blktests] src/miniublk: fix logical block size setting
-Message-ID: <ZUg0b/iv5ie2D7AU@fedora>
-References: <20231104121742.178081-1-akinobu.mita@gmail.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH blktests] ublk/rc: prefer to rublk over miniublk
+Date:   Mon,  6 Nov 2023 08:35:23 +0800
+Message-ID: <20231106003523.1923694-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231104121742.178081-1-akinobu.mita@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 04, 2023 at 09:17:42PM +0900, Akinobu Mita wrote:
-> The miniublk always sets the logical block size to 512 bytes when setting
-> a regular file-backed loop target.
-> A test fails if the regular file is on a filesystem built on a block
-> device with a logical block size of 4KB.
-> 
-> $ cd blktests
-> $ modprobe -r scsi_debug
-> $ modprobe scsi_debug sector_size=4096 dev_size_mb=2048
-> $ mkfs.ext4 /dev/sdX
-> $ mount /dev/sdX results/
-> $ ./check ublk/003
-> 
-> The logical block size of the ublk block device is set to 512 bytes,
-> so a request that is not 4KB aligned may occur, and the miniublk will
-> attempt to process it with direct IO and fail.
-> 
-> The original ublk program already fixed this problem by determining
-> the logical block size to set based on the block device to which the
-> target regular file belongs.
-> 
-> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-> ---
->  src/miniublk.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/src/miniublk.c b/src/miniublk.c
-> index 1c97668..565aa60 100644
-> --- a/src/miniublk.c
-> +++ b/src/miniublk.c
-> @@ -1440,6 +1440,8 @@ static int ublk_loop_tgt_init(struct ublk_dev *dev)
->  		p.basic.physical_bs_shift = ilog2(pbs);
->  	} else if (S_ISREG(st.st_mode)) {
->  		bytes = st.st_size;
-> +		p.basic.logical_bs_shift = ilog2(st.st_blksize);
-> +		p.basic.physical_bs_shift = ilog2(st.st_blksize);
->  	} else {
->  		bytes = 0;
->  	}
-> @@ -1512,6 +1514,8 @@ static int ublk_loop_tgt_recover(struct ublk_dev *dev)
->  			return -1;
->  	} else if (S_ISREG(st.st_mode)) {
->  		bytes = st.st_size;
-> +		bs = st.st_blksize;
-> +		pbs = st.st_blksize;
->  	} else {
->  		bytes = 0;
+Add one wrapper script for using rublk to run ublk tests, and prefer
+to rublk because it is well implemented and more reliable.
 
-Looks fine,
+This way has been run for months in rublk's github CI test.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+https://github.com/ming1/rublk
 
-Thanks,
-Ming
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ README.md            |  1 +
+ src/rublk_wrapper.sh | 31 +++++++++++++++++++++++++++++++
+ tests/ublk/rc        |  6 +++++-
+ 3 files changed, 37 insertions(+), 1 deletion(-)
+ create mode 100755 src/rublk_wrapper.sh
+
+diff --git a/README.md b/README.md
+index b6445d6..313a3cc 100644
+--- a/README.md
++++ b/README.md
+@@ -26,6 +26,7 @@ Some tests require the following:
+ - multipath-tools (Debian, openSUSE, Arch Linux) or device-mapper-multipath
+   (Fedora)
+ - dmsetup (Debian) or device-mapper (Fedora, openSUSE, Arch Linux)
++- rublk (`cargo install --version=0.1.2 rublk`) for ublk test
+ 
+ Build blktests with `make`. Optionally, install it to a known location with
+ `make install` (`/usr/local/blktests` by default, but this can be changed by
+diff --git a/src/rublk_wrapper.sh b/src/rublk_wrapper.sh
+new file mode 100755
+index 0000000..803743e
+--- /dev/null
++++ b/src/rublk_wrapper.sh
+@@ -0,0 +1,31 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2023 Ming Lei <ming.lei@redhat.com>
++#
++# rublk wrapper for adapting miniublk's command line
++
++PARA=""
++ACT=$1
++for arg in $@; do
++	if [ "$arg" = "-t" ]; then
++		continue
++	fi
++
++	if [ "$ACT" = "recover" ]; then
++		if [ "$arg" = "loop" ] || [ "$arg" = "null" ]; then
++			continue;
++		fi
++
++		if [ -f "$arg" ]; then
++			continue
++		fi
++
++		if [ "$arg" = "-f" ]; then
++			continue
++		fi
++		PARA+=" $arg"
++	else
++		PARA+=" $arg"
++	fi
++done
++rublk $PARA
+diff --git a/tests/ublk/rc b/tests/ublk/rc
+index c553296..5fbf861 100644
+--- a/tests/ublk/rc
++++ b/tests/ublk/rc
+@@ -14,4 +14,8 @@ group_requires() {
+ 	_have_fio
+ }
+ 
+-export UBLK_PROG="src/miniublk"
++if which rublk > /dev/null 2>&1; then
++	export UBLK_PROG="src/rublk_wrapper.sh"
++else
++	export UBLK_PROG="src/miniublk"
++fi
+-- 
+2.41.0
 
