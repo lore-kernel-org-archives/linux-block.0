@@ -2,151 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FE9C4332F
-	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 04:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1750EC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 05:48:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230145AbjKFEyj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Nov 2023 23:54:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45562 "EHLO
+        id S230252AbjKFFsS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Nov 2023 00:48:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229485AbjKFEyi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Nov 2023 23:54:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBCDEE1
-        for <linux-block@vger.kernel.org>; Sun,  5 Nov 2023 20:53:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1699246430;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J0xxS0GcTpI1/DgZckR1OrAQOwxzwiXZ07noMlU8lfM=;
-        b=DG2nr6Ntanwx1ZoiOOYsQ7WaLrU2CrlnqUOcBMvkcpoBVWarTugb0Uhn6zJq3oK7EtXvmk
-        qejNyEniEhRTBSbgVg8FIjfWhX1Ebg8d27mmPYgEqaTwun58ieq+KAi6EtnaU2Qq8PW/+F
-        ERxpXksXZWYasrdqnCaRjXb0CKpcZPY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-88-u2guWhx7NOmnhhSHkQuB-w-1; Sun,
- 05 Nov 2023 23:53:45 -0500
-X-MC-Unique: u2guWhx7NOmnhhSHkQuB-w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CBCEB380628F;
-        Mon,  6 Nov 2023 04:53:44 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F11372166B26;
-        Mon,  6 Nov 2023 04:53:35 +0000 (UTC)
-Date:   Mon, 6 Nov 2023 12:53:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ed Tsai =?utf-8?B?KOiUoeWul+i7kik=?= <Ed.Tsai@mediatek.com>
-Cc:     Will Shiu =?utf-8?B?KOioseaBreeRnCk=?= <Will.Shiu@mediatek.com>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Peter Wang =?utf-8?B?KOeOi+S/oeWPiyk=?= 
-        <peter.wang@mediatek.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Alice Chao =?utf-8?B?KOi2meePruWdhyk=?= 
-        <Alice.Chao@mediatek.com>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Casper Li =?utf-8?B?KOadjuS4reamrik=?= <casper.li@mediatek.com>,
-        Chun-Hung Wu =?utf-8?B?KOW3q+mnv+Wujyk=?= 
-        <Chun-hung.Wu@mediatek.com>,
-        Powen Kao =?utf-8?B?KOmrmOS8r+aWhyk=?= <Powen.Kao@mediatek.com>,
-        Naomi Chu =?utf-8?B?KOacseipoOeUsCk=?= <Naomi.Chu@mediatek.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Stanley Chu =?utf-8?B?KOacseWOn+mZnik=?= 
-        <stanley.chu@mediatek.com>,
-        "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-        "angelogioacchino.delregno@collabora.com" 
-        <angelogioacchino.delregno@collabora.com>, ming.lei@redhat.com
-Subject: Re: [PATCH 1/1] block: Check the queue limit before bio submitting
-Message-ID: <ZUhxS9JMyPK+v6Ec@fedora>
-References: <20231025092255.27930-1-ed.tsai@mediatek.com>
- <64db8f5406571c2f89b70f852eb411320201abe6.camel@mediatek.com>
- <ZUUd48QF/TEGFzPy@fedora>
- <cf09a768d0e116bfaf01a1592a7ae95a10b4c2cf.camel@mediatek.com>
- <ZUW96Ha5GoJePD8Y@fedora>
- <2bc847a83849973b7658145f2efdda86cc47e3d5.camel@mediatek.com>
- <5ecedad658bf28abf9bbeeb70dcac09b4b404cf5.camel@mediatek.com>
+        with ESMTP id S229485AbjKFFsR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2023 00:48:17 -0500
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6292EBB
+        for <linux-block@vger.kernel.org>; Sun,  5 Nov 2023 21:48:13 -0800 (PST)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20231106054808epoutp04ef45ccaec11f25d6020953118ac1e82b~U8pbD_QNl1826218262epoutp04n
+        for <linux-block@vger.kernel.org>; Mon,  6 Nov 2023 05:48:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20231106054808epoutp04ef45ccaec11f25d6020953118ac1e82b~U8pbD_QNl1826218262epoutp04n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1699249688;
+        bh=G1I5/h3as3Zgjflvnpl7j5kSS4UnoRuSL1e3zT94Rxg=;
+        h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+        b=lGU/JfruwXZWr0czeO3cIW1o8LajTzFGJfjn4BtYaJeylHgGEqvAcSaQFMijo5qg3
+         uNCmARdCpWxXv5n+Gqb+V9dRjz65oIfPeJYNDf/nihfcZt7R9Uwm53B7RZCRnSYaFQ
+         ivKluNEyoZEmE19t5yXgMSN/gEmvfqRegRur3SdY=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20231106054808epcas5p361f1803c6f6460da849c5b02cc9391fb~U8pawaNtr2040220402epcas5p39;
+        Mon,  6 Nov 2023 05:48:08 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.175]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4SP0kZ4SyVz4x9Q1; Mon,  6 Nov
+        2023 05:48:06 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        27.C9.08567.61E78456; Mon,  6 Nov 2023 14:48:06 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20231106054805epcas5p23a2d645e7da22902172c9bb03c614d7c~U8pYUh1Ap3040530405epcas5p2u;
+        Mon,  6 Nov 2023 05:48:05 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20231106054805epsmtrp2c5aa10fe72b5c2a3b8b94de1cda4f926~U8pYTED221488914889epsmtrp2g;
+        Mon,  6 Nov 2023 05:48:05 +0000 (GMT)
+X-AuditID: b6c32a44-3abff70000002177-f2-65487e162391
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        E5.67.08755.51E78456; Mon,  6 Nov 2023 14:48:05 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20231106054804epsmtip1b3c3f71a9af090653eea195ad91e6d49~U8pXEHGQ_1185011850epsmtip1U;
+        Mon,  6 Nov 2023 05:48:04 +0000 (GMT)
+Message-ID: <40ac82f5-ce1b-6f49-3609-1aff496ae241@samsung.com>
+Date:   Mon, 6 Nov 2023 11:18:03 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5ecedad658bf28abf9bbeeb70dcac09b4b404cf5.camel@mediatek.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+        Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
+Content-Language: en-US
+To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
+        Keith Busch <kbusch@kernel.org>
+From:   Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20231027181929.2589937-2-kbusch@meta.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrMJsWRmVeSWpSXmKPExsWy7bCmhq5YnUeqwcdfihar7/azWaxcfZTJ
+        4l3rORaLSYeuMVqcubqQxWLvLW2L+cueslssP/6PyYHD4/LZUo9NqzrZPDYvqffYfbOBzePc
+        xQqPj09vsXh83iQXwB6VbZORmpiSWqSQmpecn5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtq
+        q+TiE6DrlpkDdJGSQlliTilQKCCxuFhJ386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9d
+        Ly+1xMrQwMDIFKgwITtj3jHDgna+ivktvxgbGN9ydTFyckgImEhMmbmODcQWEtjNKHHjdkQX
+        IxeQ/YlRYtrNE6wQzjdGiYdzzjLCdJxavgUqsZdR4tHrD0wQzltGia/7ljKDVPEK2EmsvL6Y
+        BcRmEVCRuP9pJitEXFDi5MwnYHFRgSSJX1fngE0VFvCSuN34HayGWUBc4taT+UwgtohAlUTf
+        tJ9sEPE4iaVHZgDN5+BgE9CUuDC5FCTMKWAu8eP0DqgSeYntb+cwQxw6lUNi+tkKCNtF4sXU
+        Y2wQtrDEq+Nb2CFsKYnP7/ZCxZMlLs08xwRhl0g83nMQyraXaD3VD7aWGWjt+l36EKv4JHp/
+        P2ECCUsI8Ep0tAlBVCtK3Jv0lBXCFpd4OGMJlO0h8fjhVTZISG1nlOg4PY15AqPCLKRAmYXk
+        +VlIvpmFsHkBI8sqRsnUguLc9NRk0wLDvNRyeGwn5+duYgSnVi2XHYw35v/TO8TIxMF4iFGC
+        g1lJhPevvUeqEG9KYmVValF+fFFpTmrxIUZTYOxMZJYSTc4HJve8knhDE0sDEzMzMxNLYzND
+        JXHe161zU4QE0hNLUrNTUwtSi2D6mDg4pRqYinqfJW7P3xCu0az6KKVdRCZA6SfX+Sni7Rea
+        gt1tfrEt3mI5Zc/9ny4ma4vCL4ZUt7CYhWty627uf1A2T01qb8ZPce6fS7RT7mnJCEnqvHXV
+        6uHcbDIncfVij7zf4tcOCyd+/Pao/9DLGMOdbCtf3BBNktX/K1O7pfOAzCvlHO0jcuUX81tX
+        28yp0BITiH/zb981pUSNnQbazRFrem0+e01/qHXW0EYgjlv8kOvFv9FSNrk6if+O1PYq3GOZ
+        y5Jwb+vaP44fHPaw7dzOtoA9kWGx0sZQ32VO7+cYMBbcj/+ZkOFWfzX0SUb1r/Zlm4Trj4k+
+        M9rcdGWi0voX72zD/dRO773/RKJOPeRk8EYlluKMREMt5qLiRABkHF+lNgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgkeLIzCtJLcpLzFFi42LZdlhJTle0ziPV4O4qXYvVd/vZLFauPspk
+        8a71HIvFpEPXGC3OXF3IYrH3lrbF/GVP2S2WH//H5MDhcflsqcemVZ1sHpuX1HvsvtnA5nHu
+        YoXHx6e3WDw+b5ILYI/isklJzcksSy3St0vgyph3zLCgna9ifssvxgbGt1xdjJwcEgImEqeW
+        b2EFsYUEdjNKzP1WBhEXl2i+9oMdwhaWWPnvOZDNBVTzmlHi8N5DjCAJXgE7iZXXF7OA2CwC
+        KhL3P81khYgLSpyc+QQsLiqQJLHnfiMTiC0s4CVxu/E7WA0z0IJbT+aDxUUEqiT2/zjLBBGP
+        k/h/CaQeZNl2RollF04AORwcbAKaEhcml4LUcAqYS/w4vYMNot5MomtrFyOELS+x/e0c5gmM
+        QrOQnDELybpZSFpmIWlZwMiyilEytaA4Nz232LDAMC+1XK84Mbe4NC9dLzk/dxMjOJK0NHcw
+        bl/1Qe8QIxMH4yFGCQ5mJRHev/YeqUK8KYmVValF+fFFpTmpxYcYpTlYlMR5xV/0pggJpCeW
+        pGanphakFsFkmTg4pRqYFNbeO/hJ+PY7FSd+VmfLxkOLUxqXrbj6Of6XUfe806fbPLw9SxQO
+        l6SpPDn16GZoxgez3242m6f2fzn+4WqgF6/Dgan3ji9262xouhfjFJE8QyMgINjUU2lG5K6N
+        W7p8DNreR+fFys52D9j77ttyE/NtKpclOQw/yfV3GIg9ZVSZvGK5vufFu6lbHdW21xkVBtzq
+        bl46zbpq+975pe2mZ39MXrmlPHehyrG+t18eq03yMGBRfqQgH9FkI7g2dGeO++NrBncvMBqw
+        vnl+LdLyX8DFm+auOTeY5XboGL7IP3Czea3kyo03uDezujVmhR10mLkj2OyC14a55yI2l4c8
+        9QwPeJweEaFyK3657GMhJZbijERDLeai4kQA+bf61xMDAAA=
+X-CMS-MailID: 20231106054805epcas5p23a2d645e7da22902172c9bb03c614d7c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231027182010epcas5p36bcf271f93f821055206b2e04b3019a6
+References: <20231027181929.2589937-1-kbusch@meta.com>
+        <CGME20231027182010epcas5p36bcf271f93f821055206b2e04b3019a6@epcas5p3.samsung.com>
+        <20231027181929.2589937-2-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 06, 2023 at 01:40:12AM +0000, Ed Tsai (蔡宗軒) wrote:
-> On Mon, 2023-11-06 at 09:33 +0800, Ed Tsai wrote:
-> > On Sat, 2023-11-04 at 11:43 +0800, Ming Lei wrote:
+On 10/27/2023 11:49 PM, Keith Busch wrote:
+> +int bio_integrity_map_user(struct bio *bio, void __user *ubuf, unsigned int len,
+> +			   u32 seed)
+> +{
+> +	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+> +	unsigned long offs, align = q->dma_pad_mask | queue_dma_alignment(q);
+> +	int ret, direction, nr_vecs, i, j, folios = 0;
+> +	struct bio_vec stack_vec[UIO_FASTIOV];
+> +	struct bio_vec bv, *bvec = stack_vec;
+> +	struct page *stack_pages[UIO_FASTIOV];
+> +	struct page **pages = stack_pages;
+> +	struct bio_integrity_payload *bip;
+> +	struct iov_iter iter;
+> +	struct bvec_iter bi;
+> +	u32 bytes;
+> +
+> +	if (bio_integrity(bio))
+> +		return -EINVAL;
+> +	if (len >> SECTOR_SHIFT > queue_max_hw_sectors(q))
+> +		return -E2BIG;
+> +
+> +	if (bio_data_dir(bio) == READ)
+> +		direction = ITER_DEST;
+> +	else
+> +		direction = ITER_SOURCE;
+> +
+> +	iov_iter_ubuf(&iter, direction, ubuf, len);
+> +	nr_vecs = iov_iter_npages(&iter, BIO_MAX_VECS + 1);
+> +	if (nr_vecs > BIO_MAX_VECS)
+> +		return -E2BIG;
+> +	if (nr_vecs > UIO_FASTIOV) {
+> +		bvec = kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
+> +		if (!bvec)
+> +			return -ENOMEM;
+> +		pages = NULL;
+> +	}
+> +
+> +	bytes = iov_iter_extract_pages(&iter, &pages, len, nr_vecs, 0, &offs);
+> +	if (unlikely(bytes < 0)) {
+> +		ret =  bytes;
+> +		goto free_bvec;
+> +	}
+> +
+> +	for (i = 0; i < nr_vecs; i = j) {
+> +		size_t size = min_t(size_t, bytes, PAGE_SIZE - offs);
+> +		struct folio *folio = page_folio(pages[i]);
+> +
+> +		bytes -= size;
+> +		for (j = i + 1; j < nr_vecs; j++) {
+> +			size_t next = min_t(size_t, PAGE_SIZE, bytes);
+> +
+> +			if (page_folio(pages[j]) != folio ||
+> +			    pages[j] != pages[j - 1] + 1)
+> +				break;
+> +			unpin_user_page(pages[j]);
 
-...
-
-> Sorry for missing out on my dd command. Here it is:
-> dd if=/data/test_file of=/dev/null bs=64m count=1 iflag=direct
-
-OK, thanks for the sharing.
-
-I understand the issue now, but not sure if it is one good idea to check
-queue limit in __bio_iov_iter_get_pages():
-
-1) bio->bi_bdev may not be set
-
-2) what matters is actually bio's alignment, and bio size still can
-be big enough
-
-So I cooked one patch, and it should address your issue:
-
-
-diff --git a/block/bio.c b/block/bio.c
-index 816d412c06e9..7d982e74c65d 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1266,6 +1266,24 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 		size -= trim;
- 	}
- 
-+	/*
-+	 * Try to make bio aligned with 128KB if there are pages left so we
-+	 * can avoid small bio in case of big chunk sequential IO
-+	 */
-+	if (iov_iter_count(iter)) {
-+		unsigned curr_size = (bio->bi_iter.bi_size + size) &
-+			~((128U << 10) - 1);
-+		if (curr_size <= bio->bi_iter.bi_size) {
-+			ret = left = size;
-+			goto revert;
-+		} else {
-+			curr_size -= bio->bi_iter.bi_size;
-+			ret = size - curr_size;
-+			iov_iter_revert(iter, ret);
-+			size = curr_size;
-+		}
-+	}
-+
- 	if (unlikely(!size)) {
- 		ret = -EFAULT;
- 		goto out;
-@@ -1285,7 +1303,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 
- 		offset = 0;
- 	}
--
-+revert:
- 	iov_iter_revert(iter, left);
- out:
- 	while (i < nr_pages)
-
-
-
-
-Thanks,
-Ming
-
+Is this unpin correct here?
