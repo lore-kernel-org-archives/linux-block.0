@@ -2,69 +2,220 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB59FC4332F
-	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 15:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89273C4167D
+	for <linux-block@archiver.kernel.org>; Mon,  6 Nov 2023 15:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231861AbjKFPDB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Nov 2023 10:03:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54478 "EHLO
+        id S229974AbjKFPSd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Nov 2023 10:18:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbjKFPDA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2023 10:03:00 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 922D7B7
-        for <linux-block@vger.kernel.org>; Mon,  6 Nov 2023 07:02:58 -0800 (PST)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8A33C433C8;
-        Mon,  6 Nov 2023 15:02:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1699282978;
-        bh=mdnasKN++L7iH5e6EPZzJn9sOH6/oy4ZkzaDKp72Z4A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IU6+zLStHSVytMX6tJg1kzHdIVLIwVf+659Kn3Bsd27AgQ6bgN0FVk0a/m6EtZgir
-         Z7eL6fs21SfS2wj7A6a6altos0BNWVgUgcCZRa8aHcVTQYF4Bbq4iRjOJc6bFj2ihW
-         FuVegkxQSDOLaFhZA/IBYcLnobbcGy8CjPxGJTS6MNlWRxjWVivIfhba1bw+WSLktq
-         46O/PPGqCzA8gipo5PV7570BE8sGSGWdSScplcVIt5UJ8TkH0eNJkNSebLVuMw9AoO
-         fi5tsJpjgTHOqo9oowhWEnX6SwKhDD0VaFzkpj/Ye4ZzvwI6KgnRihNVPEb1+49Ngo
-         APyeIf7R+RqZg==
-Date:   Mon, 6 Nov 2023 08:02:55 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
-        axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
-Subject: Re: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
-Message-ID: <ZUkAH258Ts0caQ5W@kbusch-mbp.dhcp.thefacebook.com>
-References: <20231027181929.2589937-1-kbusch@meta.com>
- <CGME20231027182010epcas5p36bcf271f93f821055206b2e04b3019a6@epcas5p3.samsung.com>
- <20231027181929.2589937-2-kbusch@meta.com>
- <40ac82f5-ce1b-6f49-3609-1aff496ae241@samsung.com>
+        with ESMTP id S229839AbjKFPSc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2023 10:18:32 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 260CBF3;
+        Mon,  6 Nov 2023 07:18:29 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 60BEA1FF9A;
+        Mon,  6 Nov 2023 15:18:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1699283907; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3EiBnCxtqYOZ3wNMkJly8DGIq5dz+B7Xw3NhuZueafc=;
+        b=3DY0nPuBkXf62i+NVMOQCamLUXEGrAFFa+i1Cbq5VzCmqFwh5K+XjKoER/uMRO3iQBinFe
+        S8tpv5GGxKnSkA9ErvzrL1k2YkC/G16O6VpBIjxgGMJCIz1g3qqueM+8vJ5YWDefGJUJum
+        QTBY2MuMSJ44HHorwQbwwtqS2gp1sGA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1699283907;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3EiBnCxtqYOZ3wNMkJly8DGIq5dz+B7Xw3NhuZueafc=;
+        b=m5i70PJqwNPaDymbcW1gwafQPRPLLYytyMRgfxeRp1vWV3rb1lU3ZENZ3FPaD6yWircvCi
+        FW9paSfyw/n1t+DQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 527EC138E5;
+        Mon,  6 Nov 2023 15:18:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id me0cFMMDSWXgJAAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 06 Nov 2023 15:18:27 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id B6320A07BE; Mon,  6 Nov 2023 16:18:26 +0100 (CET)
+Date:   Mon, 6 Nov 2023 16:18:26 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kees Cook <keescook@google.com>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        linux-xfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: [PATCH 3/7] block: Add config option to not allow writing to
+ mounted devices
+Message-ID: <20231106151826.wxjw6ullsx6mhmov@quack3>
+References: <20231101173542.23597-1-jack@suse.cz>
+ <20231101174325.10596-3-jack@suse.cz>
+ <20231106-einladen-macht-30a9ad957294@brauner>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <40ac82f5-ce1b-6f49-3609-1aff496ae241@samsung.com>
+In-Reply-To: <20231106-einladen-macht-30a9ad957294@brauner>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 06, 2023 at 11:18:03AM +0530, Kanchan Joshi wrote:
-> On 10/27/2023 11:49 PM, Keith Busch wrote:
-> > +	for (i = 0; i < nr_vecs; i = j) {
-> > +		size_t size = min_t(size_t, bytes, PAGE_SIZE - offs);
-> > +		struct folio *folio = page_folio(pages[i]);
-> > +
-> > +		bytes -= size;
-> > +		for (j = i + 1; j < nr_vecs; j++) {
-> > +			size_t next = min_t(size_t, PAGE_SIZE, bytes);
-> > +
-> > +			if (page_folio(pages[j]) != folio ||
-> > +			    pages[j] != pages[j - 1] + 1)
-> > +				break;
-> > +			unpin_user_page(pages[j]);
+On Mon 06-11-23 15:47:54, Christian Brauner wrote:
+> On Wed, Nov 01, 2023 at 06:43:08PM +0100, Jan Kara wrote:
+> > Writing to mounted devices is dangerous and can lead to filesystem
+> > corruption as well as crashes. Furthermore syzbot comes with more and
+> > more involved examples how to corrupt block device under a mounted
+> > filesystem leading to kernel crashes and reports we can do nothing
+> > about. Add tracking of writers to each block device and a kernel cmdline
+> > argument which controls whether other writeable opens to block devices
+> > open with BLK_OPEN_RESTRICT_WRITES flag are allowed. We will make
+> > filesystems use this flag for used devices.
+> > 
+> > Note that this effectively only prevents modification of the particular
+> > block device's page cache by other writers. The actual device content
+> > can still be modified by other means - e.g. by issuing direct scsi
+> > commands, by doing writes through devices lower in the storage stack
+> > (e.g. in case loop devices, DM, or MD are involved) etc. But blocking
+> > direct modifications of the block device page cache is enough to give
+> > filesystems a chance to perform data validation when loading data from
+> > the underlying storage and thus prevent kernel crashes.
+> > 
+> > Syzbot can use this cmdline argument option to avoid uninteresting
+> > crashes. Also users whose userspace setup does not need writing to
+> > mounted block devices can set this option for hardening.
+> > 
+> > Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd9@linaro.org
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
 > 
-> Is this unpin correct here?
+> A few minor tweaks I would do in-tree. Please see below.
+> I know it's mostly stylistic that's why I would do it so there's no
+> resend dance for non-technical reasons.
 
-Should be. The pages are bound to the folio, so this doesn't really
-unpin the user page. It just drops a reference, and the folio holds the
-final reference to the contiguous pages, which is released on
-completion. You can find the same idea in io_uring/rscs.c,
-io_sqe_buffer_register().
+Whatever works best for you. I agree with the changes but please see my
+comments below for some fixes.
+
+> >  block/Kconfig             | 20 +++++++++++++
+> >  block/bdev.c              | 62 ++++++++++++++++++++++++++++++++++++++-
+> >  include/linux/blk_types.h |  1 +
+> >  include/linux/blkdev.h    |  2 ++
+> >  4 files changed, 84 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block/Kconfig b/block/Kconfig
+> > index f1364d1c0d93..ca04b657e058 100644
+> > --- a/block/Kconfig
+> > +++ b/block/Kconfig
+> > @@ -78,6 +78,26 @@ config BLK_DEV_INTEGRITY_T10
+> >  	select CRC_T10DIF
+> >  	select CRC64_ROCKSOFT
+> >  
+> > +config BLK_DEV_WRITE_MOUNTED
+> > +	bool "Allow writing to mounted block devices"
+> > +	default y
+> 
+> Let's hope that this can become the default one day.
+
+Yes, I'd hope as well but we need some tooling work (util-linux, e2fsprogs)
+before that can happen.
+
+> > +static void bdev_unblock_writes(struct block_device *bdev)
+> > +{
+> > +	bdev->bd_writers = 0;
+> > +}
+> > +
+> > +static bool blkdev_open_compatible(struct block_device *bdev, blk_mode_t mode)
+> 
+> I would like to mirror our may_{open,create}() routines here and call
+> this:
+> 
+>     bdev_may_open()
+> 
+> This is a well-known vfs pattern and also easy to understand for block
+> devs as well.
+
+Sure.
+
+> > @@ -800,12 +834,21 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+> >  		goto abort_claiming;
+> >  	if (!try_module_get(disk->fops->owner))
+> >  		goto abort_claiming;
+> > +	ret = -EBUSY;
+> > +	if (!blkdev_open_compatible(bdev, mode))
+> > +		goto abort_claiming;
+> >  	if (bdev_is_partition(bdev))
+> >  		ret = blkdev_get_part(bdev, mode);
+> >  	else
+> >  		ret = blkdev_get_whole(bdev, mode);
+> >  	if (ret)
+> >  		goto put_module;
+> > +	if (!bdev_allow_write_mounted) {
+> > +		if (mode & BLK_OPEN_RESTRICT_WRITES)
+> > +			bdev_block_writes(bdev);
+> > +		else if (mode & BLK_OPEN_WRITE)
+> > +			bdev->bd_writers++;
+> > +	}
+> 
+> I would like to move this to a tiny helper for clarity:
+> 
+> static void bdev_claim_write_access(struct block_device *bdev)
+> {
+>         if (!bdev_allow_write_mounted)
+
+This should be the other way around.
+
+>                 return;
+> 
+>         /* Claim exclusive or shared write access to the block device. */
+>         if (mode & BLK_OPEN_RESTRICT_WRITES)
+>                 bdev_block_writes(bdev);
+>         else if (mode & BLK_OPEN_WRITE)
+>                 bdev->bd_writers++;
+> }
+> 
+> >  	if (holder) {
+> >  		bd_finish_claiming(bdev, holder, hops);
+> >  
+> > @@ -901,6 +944,14 @@ void bdev_release(struct bdev_handle *handle)
+> >  		sync_blockdev(bdev);
+> >  
+> >  	mutex_lock(&disk->open_mutex);
+> > +	if (!bdev_allow_write_mounted) {
+> > +		/* The exclusive opener was blocking writes? Unblock them. */
+> > +		if (handle->mode & BLK_OPEN_RESTRICT_WRITES)
+> > +			bdev_unblock_writes(bdev);
+> > +		else if (handle->mode & BLK_OPEN_WRITE)
+> > +			bdev->bd_writers--;
+> > +	}
+> 
+> static void bdev_yield_write_access(struct block_device *bdev)
+> {
+>         if (!bdev_allow_write_mounted)
+
+And this as well.
+
+>                 return;
+> 
+>         /* Yield exclusive or shared write access. */
+>         if (handle->mode & BLK_OPEN_RESTRICT_WRITES)
+>                 bdev_unblock_writes(bdev);
+>         else if (handle->mode & BLK_OPEN_WRITE)
+>                 bdev->bd_writers--;
+> }
+
+								Honza
+ 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
