@@ -1,54 +1,57 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E41C14F94
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 10:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11512328D5
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 15:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZaP34jUM"
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9660511F
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 02:40:47 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6c39ad730aaso2122575b3a.0
-        for <linux-block@vger.kernel.org>; Tue, 07 Nov 2023 02:40:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="FmC6ZS3r"
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2297AB3
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 07:05:24 -0800 (PST)
+Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-66d87554434so40143116d6.2
+        for <linux-block@vger.kernel.org>; Tue, 07 Nov 2023 07:05:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1699353647; x=1699958447; darn=vger.kernel.org;
+        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1699369523; x=1699974323; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E5bVgAnBrPKuuIv1GsX1T/ElEDbYt5f55yZ06zTuk7U=;
-        b=ZaP34jUMScv4Rb96HwxndhamdxgfJMy7TSX4GbeERQHgUTm9nrBxcY9RdfdRV4v10J
-         NWDSoN7BAaZK+BoBUtWr6P5Xo7z0c1VG2Plvx6y8MCnkOv1F3/tpi2w+6QleXcvDcd0j
-         2tPA6gTqWIbaeC6hhjiisRHBnhLLmVcMwR4/8=
+        bh=zQkRUxp/qdG+mcqyz+AwKHOCtNKbDsz1x2+FtX/ZT2k=;
+        b=FmC6ZS3rgh2v3az8ahjpxsKchW6HZObnAuKA2JeZa4bog5qXX5tFMmpgI8t1LiwkDe
+         DRXE0nXZvginlZttYn7W2E1j59g0ia2XHw9IFhDNZ1ct++Z6fKbGpWDAq+tgi2NL++Lk
+         1JTU8Mo6+saijEM+P/iYjewovJ0bwpDgHV2iv1sXHtge9C80Fsqnw8rh5/Mi4M+PO9t3
+         rDxp7VAnhbSilvtL5Ka5BE4f9t3T3J5/qfdz7ZP7oFip3tOMmnT+rpnIPXaFxWNwvQKY
+         sbKkHTnDdiMLcd1YzFtt3zdATwyKmjgB8Z1YJKUCCQz6IBtpSNCdVfqHIlTCPpbVk631
+         XRPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699353647; x=1699958447;
+        d=1e100.net; s=20230601; t=1699369523; x=1699974323;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E5bVgAnBrPKuuIv1GsX1T/ElEDbYt5f55yZ06zTuk7U=;
-        b=PxfkFiVSa/Xj46QW5wVxhU0s/WQ/lAmOzlpc5XOo0GccNG/C3bs5lDWzY64d6r19be
-         CQJH3ovIPn998UZyHFkrmKGhtU/cU46mSsRj+1exClQtnJKayo7oIARiKDIjEyj/4DmP
-         d9Iw6m96KKGUtoIjEcWyFrsy/DBDAUyTmGJfvpkNiaLgI+OB8m6cxmjp7BJl7NfuKwqz
-         5AbAlNZN8Ji/RW6K4yHt5uhviu6rngfQgWOYgrY90lHg+SesI22SonZNQmzRFKOQnAup
-         NPzXWrZhczW1MJcx+YL6K/WUs1h41N5JOEUwK/hHxBHzhCluIcK/4UMhPAeWSycRJ6s7
-         fmMg==
-X-Gm-Message-State: AOJu0Yy+o9lBoaf5V1Hqmef16gChyfMYu12bihRubLN/BCzxFsunCHqR
-	7POIqsDFdH0P6QxfyRD3X5WKl8nkEJbRepAfgxQ=
-X-Google-Smtp-Source: AGHT+IFbRLUT4lyHV82+MYXOzHcl1oHrGFAtsDfQLUUvqeVDjzywe/ntyfH8P+tltWOAAe1E+vLoPQ==
-X-Received: by 2002:a05:6a00:24d6:b0:68e:2478:d6c9 with SMTP id d22-20020a056a0024d600b0068e2478d6c9mr29983222pfv.2.1699353646837;
-        Tue, 07 Nov 2023 02:40:46 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:2fe:d436:c346:6fcf])
-        by smtp.gmail.com with ESMTPSA id fm26-20020a056a002f9a00b00694fee1011asm6906299pfb.208.2023.11.07.02.40.44
+        bh=zQkRUxp/qdG+mcqyz+AwKHOCtNKbDsz1x2+FtX/ZT2k=;
+        b=AKHy4FDttEZFnwOMPs1pKBqCaBbj0Xsmi8Lu9vHYA2Pb9Q2I7nxn9v1dDjn3hjjfxb
+         dkuS2h2K2O5IL/iPxe4Q2L1E05b7LiJRgQeoIQKYV3rntm/56QOX2Fd5gOzmOmNDaXXw
+         FNgE1mp7ApDu2kljPFwK8JcQwUVWA022y/IUeW2aLp0PRcMc59MfygCZQiNaICHO1q31
+         UOz3XpGIq6xigMBF29Wvn7T6ptff60bWo8vUaXNv+5moZXkZnEum8WioD8mBa7qgH23Y
+         srqS0G2crSHHzO/D+Ijngi9BVGsoyCzyqIl4IfTb5HDPKmkxWtavqS5TMf0+5eKM8mgU
+         DLbw==
+X-Gm-Message-State: AOJu0YwWa1uUKo0sqdpa6CBkwJqgqYmqJoD0cMFNJTvPQs2HtT0P4yn8
+	OGOhQTlkyyPIY2yAJ0sSzWurCw==
+X-Google-Smtp-Source: AGHT+IEabMSzZhzNJnvV8OfKHuh5oG/MF4IuVEHRT7Fo18Mvt+izrWP08VqFjmSyWeotreAUOrkDnA==
+X-Received: by 2002:a05:6214:2465:b0:66d:145b:4591 with SMTP id im5-20020a056214246500b0066d145b4591mr44234443qvb.27.1699369523061;
+        Tue, 07 Nov 2023 07:05:23 -0800 (PST)
+Received: from localhost (cpe-76-182-20-124.nc.res.rr.com. [76.182.20.124])
+        by smtp.gmail.com with ESMTPSA id ev20-20020a0562140a9400b0066cfbe4e0f4sm4414806qvb.26.2023.11.07.07.05.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 02:40:46 -0800 (PST)
-Date: Tue, 7 Nov 2023 19:40:41 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Minchan Kim <minchan@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Vasily Averin <vasily.averin@linux.dev>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH] zram: unsafe zram_get_element call in zram_read_page()
-Message-ID: <20231107104041.GC11577@google.com>
-References: <d10cdf1d-4a67-48df-b389-3a51f60e9431@linux.dev>
- <20231107073911.GB11577@google.com>
+        Tue, 07 Nov 2023 07:05:22 -0800 (PST)
+Date: Tue, 7 Nov 2023 10:05:20 -0500
+From: Josef Bacik <josef@toxicpanda.com>
+To: Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc: linux-kernel@vger.kernel.org, hch@lst.de, linux-block@vger.kernel.org,
+	nbd@other.debian.org, axboe@kernel.dk, chaitanya.kulkarni@wdc.com,
+	yukuai1@huaweicloud.com, houtao1@huawei.com, yi.zhang@huawei.com,
+	yangerkun@huawei.com, lilingfeng3@huawei.com
+Subject: Re: [PATCH v2] nbd: fix uaf in nbd_open
+Message-ID: <20231107150520.GA3913709@perftesting>
+References: <20231107103435.2074904-1-lilingfeng@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,62 +60,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231107073911.GB11577@google.com>
+In-Reply-To: <20231107103435.2074904-1-lilingfeng@huaweicloud.com>
 
-On (23/11/07 16:39), Sergey Senozhatsky wrote:
-> On (23/11/06 22:54), Vasily Averin wrote:
-> > @@ -1362,14 +1362,14 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
-> >  		ret = zram_read_from_zspool(zram, page, index);
-> >  		zram_slot_unlock(zram, index);
-> >  	} else {
-> > +		unsigned long entry = zram_get_element(zram, index);
-> >  		/*
-> >  		 * The slot should be unlocked before reading from the backing
-> >  		 * device.
-> >  		 */
-> >  		zram_slot_unlock(zram, index);
-> >  
-> > -		ret = read_from_bdev(zram, page, zram_get_element(zram, index),
-> > -				     parent);
-> > +		ret = read_from_bdev(zram, page, entry, parent);
+On Tue, Nov 07, 2023 at 06:34:35PM +0800, Li Lingfeng wrote:
+> From: Li Lingfeng <lilingfeng3@huawei.com>
 > 
-> Hmmm,
-> We may want to do more here. Basically, we probably need to re-confirm
-> after read_from_bdev() that the entry at index still has ZRAM_WB set
-> and, if so, that it points to the same blk_idx. IOW, check that it has
-> not been free-ed and re-used under us.
+> Commit 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and
+> blk_cleanup_disk") cleans up disk by blk_cleanup_disk() and it won't set
+> disk->private_data as NULL as before. UAF may be triggered in nbd_open()
+> if someone tries to open nbd device right after nbd_put() since nbd has
+> been free in nbd_dev_remove().
 > 
-> Minchan, what do you think? Is that scenario possible?
+> Fix this by implementing ->free_disk and free private data in it.
+> 
+> Fixes: 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and blk_cleanup_disk")
+> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
 
-Basically
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
----
+Thanks,
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index f5e3756fc21a..2d69f6efcee3 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1364,14 +1364,21 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
- 		ret = zram_read_from_zspool(zram, page, index);
- 		zram_slot_unlock(zram, index);
- 	} else {
-+		unsigned long idx = zram_get_element(zram, index);
- 		/*
- 		 * The slot should be unlocked before reading from the backing
- 		 * device.
- 		 */
- 		zram_slot_unlock(zram, index);
- 
--		ret = read_from_bdev(zram, page, zram_get_element(zram, index),
--				     parent);
-+		ret = read_from_bdev(zram, page, idx, parent);
-+		if (ret == 0) {
-+			zram_slot_lock(zram, index);
-+			if (!zram_test_flag(zram, index, ZRAM_WB) ||
-+			    idx != zram_get_element(zram, index))
-+				ret = -EINVAL;
-+			zram_slot_unlock(zram, index);
-+		}
- 	}
- 
- 	/* Should NEVER happen. Return bio error if it does. */
+Josef
