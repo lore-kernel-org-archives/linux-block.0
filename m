@@ -1,85 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8A410A03;
-	Tue,  7 Nov 2023 09:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JCF2Lwkw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F8CAC433C7;
-	Tue,  7 Nov 2023 09:28:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699349342;
-	bh=6F92KsEvl6Q3W8UeFrDyhAjrbfGwTucvC1s6TlZV99E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JCF2LwkwU+V6Vbs3ok3wxatKrPGJdwisB6myZW64xlkKnBv3JUwcKhPCLhTI0ivBK
-	 cDDbKq3MLrxwhOkgyIiGmg0kT6yjbrRom3NpZayZPaMnAGNRILOFHL7SJWHKcVHeQ3
-	 LHSxq4KUhVNe17ZgoxmnTJwC9xgpCjUJ9cYjLwnnZsTxOICZEad2dtGmLt7NqMSK0d
-	 /RFQmFYBX/GcnQsrmUXv3RIa98S7cOxD4A6HL119IXPQ6H7sgpldjOoPEtp6xClJtx
-	 T+FR8byvG83LJnJRNfgmfiuyVsXB+U4rDjSU57AqRCQEaaB8NXN8njIjaVO9b20sJD
-	 nnO/W2VeuC2Yw==
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	syzkaller <syzkaller@googlegroups.com>,
-	Alexander Popov <alex.popov@linux.com>,
-	linux-xfs@vger.kernel.org,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Brian Foster <bfoster@redhat.com>,
-	linux-bcachefs@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 1/7] bcachefs: Convert to bdev_open_by_path()
-Date: Tue,  7 Nov 2023 10:28:53 +0100
-Message-Id: <20231107-zugegangen-darlegen-b22727c25ede@brauner>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231101174325.10596-1-jack@suse.cz>
-References: <20231101173542.23597-1-jack@suse.cz> <20231101174325.10596-1-jack@suse.cz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B6E12E4B
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 09:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942C410A;
+	Tue,  7 Nov 2023 01:44:57 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SPjxK1NmSz4f3l78;
+	Tue,  7 Nov 2023 17:44:53 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 37E621A0175;
+	Tue,  7 Nov 2023 17:44:54 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBXWhAUB0plLuQVAQ--.51858S3;
+	Tue, 07 Nov 2023 17:44:54 +0800 (CST)
+Subject: Re: [PATCH] blk-core: use pr_warn_ratelimited() in bio_check_ro()
+To: "yebin (H)" <yebin10@huawei.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ hch@lst.de, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, Ming Lei <ming.lei@redhat.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20231107111247.2157820-1-yukuai1@huaweicloud.com>
+ <6549B3FC.1010700@huawei.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <43db8d24-aa70-3902-cee6-2879f8e8ff5e@huaweicloud.com>
+Date: Tue, 7 Nov 2023 17:44:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1515; i=brauner@kernel.org; h=from:subject:message-id; bh=6F92KsEvl6Q3W8UeFrDyhAjrbfGwTucvC1s6TlZV99E=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaR6MbudbDjxdvW129aXNasCZ6p1uL3fab/OaplGSbfUg02z mqPDO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACayPZPhr1ia578K/gnz1sVXz3Y1n7 887ZhSm+bXPXc7m7wD3rIvD2T4pxNcGjvpve6DjQZl2gW2Hx9bVF++uVZeXE91oe6M4wvZGAA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+In-Reply-To: <6549B3FC.1010700@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBXWhAUB0plLuQVAQ--.51858S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFWDtry8Cr15Ww4UAFW7XFb_yoW8Cw48pr
+	s7KF1rCrWj9r1kua1UJF17JFyrKF4UJw48Ar1UZF15tr45Gryjgr1xXr1vgF48tr4xWr4U
+	XF10yry3ZF1UAFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Wed, 1 Nov 2023 18:43:06 +0100, Jan Kara wrote:
-> Convert bcachefs to use bdev_open_by_path() and pass the handle around.
+Hi,
+
+在 2023/11/07 11:50, yebin (H) 写道:
 > 
 > 
+> On 2023/11/7 19:12, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> If one of the underlying disks of raid or dm is set to read-only, then
+>> each io will generate new log, which will cause message storm. This
+>> environment is indeed problematic, however we can't make sure our
+>> naive custormer won't do this, hence use pr_warn_ratelimited() to
+>> prevent message storm in this case.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/blk-core.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 9d51e9894ece..fdf25b8d6e78 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -501,8 +501,8 @@ static inline void bio_check_ro(struct bio *bio)
+>>       if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
+>>           if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+>>               return;
+>> -        pr_warn("Trying to write to read-only block-device %pg\n",
+>> -            bio->bi_bdev);
+>> +        pr_warn_ratelimited("Trying to write to read-only 
+>> block-device %pg\n",
+>> +                    bio->bi_bdev);
+> Acctually, before commit  57e95e4670d1 ("block: fix and cleanup 
+> bio_check_ro") , there's only print warning once.
+> I wrote a patch earlier, set GD_ROWR_WARNED flag for disk after emit 
+> warning. You can look at the patch in the
+> attachment, Is it possible to solve your problem.
 
-Applied to the vfs.super branch of the vfs/vfs.git tree.
-Patches in the vfs.super branch should appear in linux-next soon.
+Yes, this can work, other than that I think the flag should be in
+block_device instead of gendisk.
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+However, I'm not sure which is better for now, hope Christoph or Ming
+or anyone can give some advise.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+Thanks,
+Kuai
+>>           /* Older lvm-tools actually trigger this */
+>>       }
+>>   }
+> 
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.super
-
-[1/7] bcachefs: Convert to bdev_open_by_path()
-      https://git.kernel.org/vfs/vfs/c/8e897399352c
-[2/7] block: Remove blkdev_get_by_*() functions
-      https://git.kernel.org/vfs/vfs/c/1dc2789bf2d9
-[3/7] block: Add config option to not allow writing to mounted devices
-      https://git.kernel.org/vfs/vfs/c/708e8ecda49e
-[4/7] btrfs: Do not restrict writes to btrfs devices
-      https://git.kernel.org/vfs/vfs/c/b6b2f4843264
-[5/7] fs: Block writes to mounted block devices
-      https://git.kernel.org/vfs/vfs/c/48ce483465bb
-[6/7] xfs: Block writes to log device
-      https://git.kernel.org/vfs/vfs/c/dae1e956882c
-[7/7] ext4: Block writes to journal device
-      https://git.kernel.org/vfs/vfs/c/a8a97da12393
