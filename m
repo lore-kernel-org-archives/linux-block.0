@@ -1,234 +1,169 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9180E6126
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 03:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IuYIcNrL"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C5ED47
-	for <linux-block@vger.kernel.org>; Mon,  6 Nov 2023 19:49:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699328960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y9FCMlk2IkrIEzQB8L9xTTGDJXhqSvTWTL0IDXr95cA=;
-	b=IuYIcNrLlUZSo/Asb4z+ApP+JT0LaOjzuZVe7oY/91WqLfu9qKDowRltkUHG/76AYIho0s
-	oI1dzII8i+4JmREzAXx5U+zJliG0hgndj4C+f3PpLLSL41T9NpDrVu0gFvWIQ3NPqyYOnY
-	XEh/wRBhmK1zGSMUsicz4zEKe7fRD+A=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-H3pkEELXNwqDhxmZ4mCm1w-1; Mon, 06 Nov 2023 22:48:58 -0500
-X-MC-Unique: H3pkEELXNwqDhxmZ4mCm1w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7C1F185A781;
-	Tue,  7 Nov 2023 03:48:57 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 18CD240C6EB9;
-	Tue,  7 Nov 2023 03:48:48 +0000 (UTC)
-Date: Tue, 7 Nov 2023 11:48:44 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Ed Tsai =?utf-8?B?KOiUoeWul+i7kik=?= <Ed.Tsai@mediatek.com>
-Cc: Will Shiu =?utf-8?B?KOioseaBreeRnCk=?= <Will.Shiu@mediatek.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	Peter Wang =?utf-8?B?KOeOi+S/oeWPiyk=?= <peter.wang@mediatek.com>,
-	Alice Chao =?utf-8?B?KOi2meePruWdhyk=?= <Alice.Chao@mediatek.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	wsd_upstream <wsd_upstream@mediatek.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	Casper Li =?utf-8?B?KOadjuS4reamrik=?= <casper.li@mediatek.com>,
-	Chun-Hung Wu =?utf-8?B?KOW3q+mnv+Wujyk=?= <Chun-hung.Wu@mediatek.com>,
-	Powen Kao =?utf-8?B?KOmrmOS8r+aWhyk=?= <Powen.Kao@mediatek.com>,
-	Naomi Chu =?utf-8?B?KOacseipoOeUsCk=?= <Naomi.Chu@mediatek.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Stanley Chu =?utf-8?B?KOacseWOn+mZnik=?= <stanley.chu@mediatek.com>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>,
-	ming.lei@redhat.com
-Subject: Re: [PATCH 1/1] block: Check the queue limit before bio submitting
-Message-ID: <ZUmznGeKhJKnE7wx@fedora>
-References: <20231025092255.27930-1-ed.tsai@mediatek.com>
- <64db8f5406571c2f89b70f852eb411320201abe6.camel@mediatek.com>
- <ZUUd48QF/TEGFzPy@fedora>
- <cf09a768d0e116bfaf01a1592a7ae95a10b4c2cf.camel@mediatek.com>
- <ZUW96Ha5GoJePD8Y@fedora>
- <2bc847a83849973b7658145f2efdda86cc47e3d5.camel@mediatek.com>
- <5ecedad658bf28abf9bbeeb70dcac09b4b404cf5.camel@mediatek.com>
- <ZUhxS9JMyPK+v6Ec@fedora>
- <ZUjT11xUNM7u/UjV@fedora>
- <fb568e7a1020ef6d2d22f3f0771034b1dc699fb9.camel@mediatek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AED63A6
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 03:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124C1D47;
+	Mon,  6 Nov 2023 19:50:46 -0800 (PST)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.56])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SPZ131gsNz1P7w1;
+	Tue,  7 Nov 2023 11:47:35 +0800 (CST)
+Received: from [10.174.178.185] (10.174.178.185) by
+ canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 7 Nov 2023 11:50:41 +0800
+Subject: Re: [PATCH] blk-core: use pr_warn_ratelimited() in bio_check_ro()
+To: Yu Kuai <yukuai1@huaweicloud.com>, <hch@lst.de>, <axboe@kernel.dk>
+References: <20231107111247.2157820-1-yukuai1@huaweicloud.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yukuai3@huawei.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>
+From: "yebin (H)" <yebin10@huawei.com>
+Message-ID: <6549B3FC.1010700@huawei.com>
+Date: Tue, 7 Nov 2023 11:50:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fb568e7a1020ef6d2d22f3f0771034b1dc699fb9.camel@mediatek.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+In-Reply-To: <20231107111247.2157820-1-yukuai1@huaweicloud.com>
+Content-Type: multipart/mixed;
+	boundary="------------020702050505000504040008"
+X-Originating-IP: [10.174.178.185]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
 
-On Tue, Nov 07, 2023 at 02:53:20AM +0000, Ed Tsai (蔡宗軒) wrote:
-> On Mon, 2023-11-06 at 19:54 +0800, Ming Lei wrote:
-> >  On Mon, Nov 06, 2023 at 12:53:31PM +0800, Ming Lei wrote:
-> > > On Mon, Nov 06, 2023 at 01:40:12AM +0000, Ed Tsai (蔡宗軒) wrote:
-> > > > On Mon, 2023-11-06 at 09:33 +0800, Ed Tsai wrote:
-> > > > > On Sat, 2023-11-04 at 11:43 +0800, Ming Lei wrote:
-> > > 
-> > > ...
-> > > 
-> > > > Sorry for missing out on my dd command. Here it is:
-> > > > dd if=/data/test_file of=/dev/null bs=64m count=1 iflag=direct
-> > > 
-> > > OK, thanks for the sharing.
-> > > 
-> > > I understand the issue now, but not sure if it is one good idea to
-> > check
-> > > queue limit in __bio_iov_iter_get_pages():
-> > > 
-> > > 1) bio->bi_bdev may not be set
-> > > 
-> > > 2) what matters is actually bio's alignment, and bio size still can
-> > > be big enough
-> > > 
-> > > So I cooked one patch, and it should address your issue:
-> > 
-> > The following one fixes several bugs, and is verified to be capable
-> > of
-> > making big & aligned bios, feel free to run your test against this
-> > one:
-> > 
-> >  block/bio.c | 28 +++++++++++++++++++++++++++-
-> >  1 file changed, 27 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/bio.c b/block/bio.c
-> > index 816d412c06e9..80b36ce57510 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -1211,6 +1211,7 @@ static int bio_iov_add_zone_append_page(struct
-> > bio *bio, struct page *page,
-> >  }
-> >  
-> >  #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) /
-> > sizeof(struct page *))
-> > +#define BIO_CHUNK_SIZE(256U << 10)
-> >  
-> >  /**
-> >   * __bio_iov_iter_get_pages - pin user or kernel pages and add them
-> > to a bio
-> > @@ -1266,6 +1267,31 @@ static int __bio_iov_iter_get_pages(struct bio
-> > *bio, struct iov_iter *iter)
-> >  size -= trim;
-> >  }
-> >  
-> > +/*
-> > + * Try to make bio aligned with 128KB if it isn't the last one, so
-> > + * we can avoid small bio in case of big chunk sequential IO because
-> > + * of bio split and multipage bvec.
-> > + *
-> > + * If nothing is added to this bio, simply allow unaligned since we
-> > + * have chance to add more bytes
-> > + */
-> > +if (iov_iter_count(iter) && bio->bi_iter.bi_size) {
-> > +unsigned int aligned_size = (bio->bi_iter.bi_size + size) &
-> > +~(BIO_CHUNK_SIZE - 1);
-> > +
-> > +if (aligned_size <= bio->bi_iter.bi_size) {
-> > +/* stop to add page if this bio can't keep aligned */
-> > +if (!(bio->bi_iter.bi_size & (BIO_CHUNK_SIZE - 1))) {
-> > +ret = left = size;
-> > +goto revert;
-> > +}
-> > +} else {
-> > +aligned_size -= bio->bi_iter.bi_size;
-> > +iov_iter_revert(iter, size - aligned_size);
-> > +size = aligned_size;
-> > +}
-> > +}
-> > +
-> >  if (unlikely(!size)) {
-> >  ret = -EFAULT;
-> >  goto out;
-> > @@ -1285,7 +1311,7 @@ static int __bio_iov_iter_get_pages(struct bio
-> > *bio, struct iov_iter *iter)
-> >  
-> >  offset = 0;
-> >  }
-> > -
-> > +revert:
-> >  iov_iter_revert(iter, left);
-> >  out:
-> >  while (i < nr_pages)
-> > -- 
-> > 2.41.0
-> > 
-> > 
-> > 
-> > Thanks, 
-> > Ming
-> > 
-> 
-> The latest patch you provided with 256 alignment does help alleviate
-> the severity of fragmentation. However, the actual aligned size may
-> vary depending on the device. Using a fixed and universal size of 128
-> or 256KB only provides partial relief from fragmentation.
-> 
-> I performed a dd direct I/O read of 64MB with your patch, and although
-> most of the bios were aligned, there were still cases of missalignment
-> to the device limit (e.g., 512MB for my device), as shown below:
-
-512MB is really big, and actually you have reached 3520MB in READ by
-limiting max bio size to 1MB in your original patch.
-
-Just be curious what is the data if you change to align with max sectors
-against my last patch? which can try to maximize & align bio.
-
-> 
-> dd [000] ..... 392.976830: block_bio_queue: 254,52 R 2997760 + 3584
-> dd [000] ..... 392.979940: block_bio_queue: 254,52 R 3001344 + 3584
-> dd [000] ..... 392.983235: block_bio_queue: 254,52 R 3004928 + 3584
-> dd [000] ..... 392.986468: block_bio_queue: 254,52 R 3008512 + 3584
-
-Yeah, I thought that 128KB should be fine for usual hardware, but
-looks not good enough.
-
-> 
-> Comparing the results of the Antutu Sequential test to the previous
-> data, it is indeed an improvement, but still a slight difference with
-> limiting the bio size to max_sectors:
-> 
-> Sequential Read (average of 5 rounds):
-> Original: 3033.7 MB/sec
-> Limited to max_sectors: 3520.9 MB/sec
-> Aligned 256KB: 3471.5 MB/sec
-> 
-> Sequential Write (average of 5 rounds):
-> Original: 2225.4 MB/sec
-> Limited to max_sectors: 2800.3 MB/sec
-> Aligned 256KB: 2618.1 MB/sec
-
-Thanks for sharing the data.
-
-> 
-> What if we limit the bio size only for those who have set the
-> max_sectors?
-
-I think it may be doable, but need more smart approach for avoiding
-extra cost of iov_iter_revert(), and one way is to add bio_shrink()
-(or bio_revert()) to run the alignment just once.
-
-I will think further and write a new patch if it is doable.
+--------------020702050505000504040008
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
-Thanks,
-Ming
+On 2023/11/7 19:12, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+>
+> If one of the underlying disks of raid or dm is set to read-only, then
+> each io will generate new log, which will cause message storm. This
+> environment is indeed problematic, however we can't make sure our
+> naive custormer won't do this, hence use pr_warn_ratelimited() to
+> prevent message storm in this case.
+>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/blk-core.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 9d51e9894ece..fdf25b8d6e78 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -501,8 +501,8 @@ static inline void bio_check_ro(struct bio *bio)
+>   	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
+>   		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+>   			return;
+> -		pr_warn("Trying to write to read-only block-device %pg\n",
+> -			bio->bi_bdev);
+> +		pr_warn_ratelimited("Trying to write to read-only block-device %pg\n",
+> +				    bio->bi_bdev);
+Acctually, before commit  57e95e4670d1 ("block: fix and cleanup 
+bio_check_ro") , there's only print warning once.
+I wrote a patch earlier, set GD_ROWR_WARNED flag for disk after emit 
+warning. You can look at the patch in the
+attachment, Is it possible to solve your problem.
+>   		/* Older lvm-tools actually trigger this */
+>   	}
+>   }
 
+
+--------------020702050505000504040008
+Content-Type: text/x-patch;
+	name="0001-block-only-print-warning-once-when-write-to-readonly.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename*0="0001-block-only-print-warning-once-when-write-to-readonly.pa";
+	filename*1="tch"
+
+From 82b7dd41eb447e9fdd3d7c5d5e3a002a9f284d82 Mon Sep 17 00:00:00 2001
+From: Ye Bin <yebin10@huawei.com>
+Date: Wed, 9 Aug 2023 16:11:39 +0800
+Subject: [PATCH] block: only print warning once when write to readonly bdev
+
+After commit 57e95e4670d1 there will print warning unconditionally.As a result,
+alarm logs are flooded.
+To solve above issue, introduce GD_ROWR_WARNED state for every partition to
+record if warning has been printed.
+
+Fixes: 57e95e4670d1 ("block: fix and cleanup bio_check_ro")
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ block/blk-core.c       | 3 +++
+ block/genhd.c          | 1 +
+ block/ioctl.c          | 6 +++++-
+ include/linux/blkdev.h | 1 +
+ 4 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9d51e9894ece..69d9757a013a 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -501,6 +501,9 @@ static inline void bio_check_ro(struct bio *bio)
+ 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
+ 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+ 			return;
++		if (test_and_set_bit(GD_ROWR_WARNED,
++				     &bio->bi_bdev->bd_disk->state))
++			return;
+ 		pr_warn("Trying to write to read-only block-device %pg\n",
+ 			bio->bi_bdev);
+ 		/* Older lvm-tools actually trigger this */
+diff --git a/block/genhd.c b/block/genhd.c
+index c9d06f72c587..c05d2cd4a87b 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1455,6 +1455,7 @@ void set_disk_ro(struct gendisk *disk, bool read_only)
+ 		if (!test_and_clear_bit(GD_READ_ONLY, &disk->state))
+ 			return;
+ 	}
++	clear_bit(GD_ROWR_WARNED, &disk->state);
+ 	set_disk_ro_uevent(disk, read_only);
+ }
+ EXPORT_SYMBOL(set_disk_ro);
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4160f4e6bd5b..a2158c5e8e3e 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -394,7 +394,11 @@ static int blkdev_roset(struct block_device *bdev, unsigned cmd,
+ 		if (ret)
+ 			return ret;
+ 	}
+-	bdev->bd_read_only = n;
++	if (!bdev->bd_read_only != !n) {
++		bdev->bd_read_only = n;
++		clear_bit(GD_ROWR_WARNED, &bdev->bd_disk->state);
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 51fa7ffdee83..832f7f81e46c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -157,6 +157,7 @@ struct gendisk {
+ #define GD_ADDED			4
+ #define GD_SUPPRESS_PART_SCAN		5
+ #define GD_OWNS_QUEUE			6
++#define GD_ROWR_WARNED			7
+ 
+ 	struct mutex open_mutex;	/* open/close mutex */
+ 	unsigned open_partitions;	/* number of open partitions */
+-- 
+2.31.1
+
+
+--------------020702050505000504040008--
