@@ -1,76 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F203931A8F;
-	Tue,  7 Nov 2023 15:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61716DF72
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 15:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2oU4we7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7336C433C8;
-	Tue,  7 Nov 2023 15:08:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699369690;
-	bh=fqc1lydE+oFHnV5LoqF+kS/QVJ3sj84z6KacrNEic+Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z2oU4we7TN18y1wBppFM0eVBJ/UT3jFlag1LTqKMKR5TBS6xVSuXqnN1kPozseGK7
-	 pEEo2Eg0YXFL0PriNqrDKvrdmyusIKmUYBiAeH1+H3kWPWmOQDyJ4RX+O4TmT3JUfA
-	 PDHbK6IPy3xr0eLM+0MICYVWeeO49VbaT5qS9GDXOyC9KsDGDBX9ZQQXb82ZQm/fO4
-	 kLMraOt6+jIuSBBddnJoaiqLDB7ncJPHUenTLHvMl3UhkmePGYKPGG6gIAyLmbTvVc
-	 Ob4hNb3A5MyrLjaCoE1+xho7t9Idd1G14D0hrlT3OFKY5PBhqIMT2Bi487Bii4td+a
-	 lw4g0BYQmfLIg==
-Date: Tue, 7 Nov 2023 08:08:07 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
-	axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
-Subject: Re: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
-Message-ID: <ZUpS150ojGIJ-bkP@kbusch-mbp.dhcp.thefacebook.com>
-References: <20231027181929.2589937-1-kbusch@meta.com>
- <CGME20231027182010epcas5p36bcf271f93f821055206b2e04b3019a6@epcas5p3.samsung.com>
- <20231027181929.2589937-2-kbusch@meta.com>
- <40ac82f5-ce1b-6f49-3609-1aff496ae241@samsung.com>
- <ZUkAH258Ts0caQ5W@kbusch-mbp.dhcp.thefacebook.com>
- <1067f03f-e89b-4fc8-58bb-0b83b6c5c91d@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nk02B5Fp"
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71EF128B6
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 07:15:34 -0800 (PST)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77773d3246aso25357585a.1
+        for <linux-block@vger.kernel.org>; Tue, 07 Nov 2023 07:15:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1699370134; x=1699974934; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dSo2uHzA475zg1anJM/RFwUnIs9F8vQ48D/x02K64wM=;
+        b=Nk02B5Fp7jtkBtCEjeJc0gW6rHkaAcJurdgMAU5EHi08tQkHoNl8yLhjRsuz5wZ1zr
+         ZLWvXuYWkzGDIdoc7BmdikAKtNjMwEjJeEJyZUm0NtXGdllFoYxKqW1F3FP0CL5+GmLN
+         UMF1brx+luBkREGTkRJ22fSx2b8tSJwztJKrobbTjTS2JodKwENlM8G/gqQRCI9LM9/S
+         3duTO5rGaI+94Zw9FCbURYgbDq9sUmDahq1rIpG/mi4gs/c6FWm96BoHokmOgBY1JL85
+         d0x0lETHHH27XG8YA3HWY99suL4BXwSUzKhmZdKaITUsefoixTWqbPTOaFQmDTemz2RQ
+         IYVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699370134; x=1699974934;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dSo2uHzA475zg1anJM/RFwUnIs9F8vQ48D/x02K64wM=;
+        b=NzgCA2/1eRdRSjE/fRWGIYNwZoPFfuqS5nr2InsPhpSqZ1ghBPihvU0GKN/dZ5qlFj
+         jwgrb+IHXzijTHwMkh6UKZIcA4UNgs6ipoItoRC3EUlX7KME1eKJs+Fj739EurYlopCy
+         utxmmW7auQPzYhnRBywZvjnbhq5JYPQ67YwghFI/uzWvNjKhZ1D5YL/GDWJRK8MuUE/+
+         EgZ1wuE51FA8z5neN+iYSreyMNdvG44dfTw6Xa7G/+Q8xqUjGV9TQPeS2KuFk4YG4v3e
+         ATWNriBm5UeiClFKBGF9C/HgR22yWudp6T0ktXuvX4EtSvA1Yt7qcvwa/nrnOfXlbT3x
+         vtjw==
+X-Gm-Message-State: AOJu0YwDYHtpocOnYFZHBsfIQymrsgXBOyOIyA5zWeVxqxiW4k5LafAd
+	d9h9sWB4DE4MLXuTS+9gKrRYJA==
+X-Google-Smtp-Source: AGHT+IGJa06jbPvLPTKkjguuvMggjPIeEu5QTDeqHbmw67+dg1/UxbCzkpBE+F8xjlTqdqK//qjGhQ==
+X-Received: by 2002:a05:620a:19a1:b0:778:8ae9:2247 with SMTP id bm33-20020a05620a19a100b007788ae92247mr39219338qkb.5.1699370134013;
+        Tue, 07 Nov 2023 07:15:34 -0800 (PST)
+Received: from [127.0.0.1] ([2620:10d:c091:400::5:f968])
+        by smtp.gmail.com with ESMTPSA id v19-20020ae9e313000000b007759a81d88esm4215667qkf.50.2023.11.07.07.15.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 07:15:33 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: josef@toxicpanda.com, Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc: linux-kernel@vger.kernel.org, hch@lst.de, linux-block@vger.kernel.org, 
+ nbd@other.debian.org, chaitanya.kulkarni@wdc.com, yukuai1@huaweicloud.com, 
+ houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com, 
+ lilingfeng3@huawei.com
+In-Reply-To: <20231107103435.2074904-1-lilingfeng@huaweicloud.com>
+References: <20231107103435.2074904-1-lilingfeng@huaweicloud.com>
+Subject: Re: [PATCH v2] nbd: fix uaf in nbd_open
+Message-Id: <169937013187.545643.6485076095455389311.b4-ty@kernel.dk>
+Date: Tue, 07 Nov 2023 08:15:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1067f03f-e89b-4fc8-58bb-0b83b6c5c91d@samsung.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-26615
 
-On Tue, Nov 07, 2023 at 03:55:14PM +0530, Kanchan Joshi wrote:
-> On 11/6/2023 8:32 PM, Keith Busch wrote:
-> > On Mon, Nov 06, 2023 at 11:18:03AM +0530, Kanchan Joshi wrote:
-> >> On 10/27/2023 11:49 PM, Keith Busch wrote:
-> >>> +	for (i = 0; i < nr_vecs; i = j) {
-> >>> +		size_t size = min_t(size_t, bytes, PAGE_SIZE - offs);
-> >>> +		struct folio *folio = page_folio(pages[i]);
-> >>> +
-> >>> +		bytes -= size;
-> >>> +		for (j = i + 1; j < nr_vecs; j++) {
-> >>> +			size_t next = min_t(size_t, PAGE_SIZE, bytes);
-> >>> +
-> >>> +			if (page_folio(pages[j]) != folio ||
-> >>> +			    pages[j] != pages[j - 1] + 1)
-> >>> +				break;
-> >>> +			unpin_user_page(pages[j]);
-> >>
-> >> Is this unpin correct here?
-> > 
-> > Should be. The pages are bound to the folio, so this doesn't really
-> > unpin the user page. It just drops a reference, and the folio holds the
-> > final reference to the contiguous pages, which is released on
-> > completion. 
+
+On Tue, 07 Nov 2023 18:34:35 +0800, Li Lingfeng wrote:
+> Commit 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and
+> blk_cleanup_disk") cleans up disk by blk_cleanup_disk() and it won't set
+> disk->private_data as NULL as before. UAF may be triggered in nbd_open()
+> if someone tries to open nbd device right after nbd_put() since nbd has
+> been free in nbd_dev_remove().
 > 
-> But the completion is still going to see multiple pages and not one 
-> (folio). The bip_for_each_vec loop is going to drop the reference again.
-> I suspect it is not folio-aware.
+> Fix this by implementing ->free_disk and free private data in it.
+> 
+> [...]
 
-The completion unpins once per bvec, not individual pages. The setup
-creates multipage bvecs with only one pin remaining per bvec for all of
-the bvec's pages. If a page can't be merged into the current bvec, then
-that page is not unpinned and becomes the first page of to the next
-bvec.
+Applied, thanks!
+
+[1/1] nbd: fix uaf in nbd_open
+      commit: 327462725b0f759f093788dfbcb2f1fd132f956b
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
