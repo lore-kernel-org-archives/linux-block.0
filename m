@@ -1,143 +1,137 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112CD12E40
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 10:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFBE12E67
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 10:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bEO6nd0w"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B09B10A
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 02:01:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699351309;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lOOzVOZOsr8b8ekJ9HOherZxUE3aEEPAis2UCqVhs0g=;
-	b=bEO6nd0wJVcHTPWi9CeoYJ6hV8oAWhwM9DcbzbH0OwStwzgqbx2FK8DT4zvJ2vwpmrCr4x
-	804aQgU9tjpb24eBBnDQNRKSYulrRvtgX96RU2vH0B3zkY5FTLV9JKEIGTxZErvYP2R+yq
-	5KhiOZAzmd6Zh5O/8fd8TAY15ECMxdU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-308-hPBFCb9RMFOY4PVN3HOqDw-1; Tue, 07 Nov 2023 05:01:47 -0500
-X-MC-Unique: hPBFCb9RMFOY4PVN3HOqDw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A038F185A7A2;
-	Tue,  7 Nov 2023 10:01:47 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 93940492BE8;
-	Tue,  7 Nov 2023 10:01:46 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Ed Tsai <ed.tsai@mediatek.com>
-Subject: [PATCH] block: try to make aligned bio in case of big chunk IO
-Date: Tue,  7 Nov 2023 18:01:40 +0800
-Message-ID: <20231107100140.2084870-1-ming.lei@redhat.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="C/lZpXEj"
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D740F116
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 02:25:22 -0800 (PST)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20231107102520epoutp02a6fe8df44914fd3c5f68600cee55c9d2~VUEu8UpJT2212222122epoutp02O
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 10:25:20 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20231107102520epoutp02a6fe8df44914fd3c5f68600cee55c9d2~VUEu8UpJT2212222122epoutp02O
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1699352720;
+	bh=l9+nqALNvgS2e3VhhHqIFbejhxk5Xtdy+ePOfXRPj9E=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=C/lZpXEju96c8HUOnmqqyDUwdqP/Jfh6taz2Xp37LfB34YqNRu329Y8jtDvjEKL7W
+	 rJXQNegxhdskJD3PU62iqRpeIcjg2NyJu4w21zef1CkNphSYLwm/zPRwQlajgfU3xx
+	 vTSeGPI0J2drz4MRNA537YAlMnYX1WozrkKzwvZ0=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20231107102520epcas5p4e2b6305bdf694794affcc9d3f005a516~VUEunhQcC1558915589epcas5p4B;
+	Tue,  7 Nov 2023 10:25:20 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4SPkqx1g9Rz4x9Q1; Tue,  7 Nov
+	2023 10:25:17 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	CB.4B.19369.D801A456; Tue,  7 Nov 2023 19:25:17 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20231107102516epcas5p4eba405b7fe0ab3deb5286c36ef4e44d3~VUErbRGiD0520905209epcas5p47;
+	Tue,  7 Nov 2023 10:25:16 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20231107102516epsmtrp1e04180ed0999c0306e3ed9c2fc9fe77c~VUEraZ9Fx2891428914epsmtrp19;
+	Tue,  7 Nov 2023 10:25:16 +0000 (GMT)
+X-AuditID: b6c32a50-9e1ff70000004ba9-a6-654a108db3ff
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	6C.67.08817.C801A456; Tue,  7 Nov 2023 19:25:16 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20231107102515epsmtip1341bef91daf5aa842339591f871cd878~VUEqN5hZ_3269332693epsmtip16;
+	Tue,  7 Nov 2023 10:25:15 +0000 (GMT)
+Message-ID: <1067f03f-e89b-4fc8-58bb-0b83b6c5c91d@samsung.com>
+Date: Tue, 7 Nov 2023 15:55:14 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
+Content-Language: en-US
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org, axboe@kernel.dk,
+	hch@lst.de, martin.petersen@oracle.com
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <ZUkAH258Ts0caQ5W@kbusch-mbp.dhcp.thefacebook.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKJsWRmVeSWpSXmKPExsWy7bCmhm6vgFeqwZRZbBar7/azWaxcfZTJ
+	4l3rORaLSYeuMVqcubqQxWLvLW2L+cueslssP/6PyYHD4/LZUo9NqzrZPDYvqffYfbOBzePc
+	xQqPj09vsXh83iQXwB6VbZORmpiSWqSQmpecn5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtq
+	q+TiE6DrlpkDdJGSQlliTilQKCCxuFhJ386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9d
+	Ly+1xMrQwMDIFKgwITvj6eWqgh6Oiukv+hgbGOexdTFyckgImEhsW3KdsYuRi0NIYA+jxJ6/
+	75khnE+MEp8fXWeHcL4xSlxfuoYJpuX57O9sEIm9jBLHNtxlB0kICbxllFjwzAnE5hWwk2h4
+	1ga2g0VARWL+rNnsEHFBiZMzn7CA2KICSRK/rs5hBLGFBbwkbjd+ZwWxmQXEJW49mQ+2TERA
+	WeLu/JmsIMuYBbYySmx4NReomYODTUBT4sLkUpAaTgF7icebHzJB9MpLbH87hxni0JkcEscX
+	OULYLhJn162G+llY4tXxLewQtpTEy/42KDtZ4tLMc1BPlkg83nMQyraXaD3Vzwyylhlo7fpd
+	+hCr+CR6fz9hAglLCPBKdLQJQVQrStyb9JQVwhaXeDhjCZTtIfH44VVosC1kkrj7YT3zBEaF
+	WUihMgvJ97OQfDMLYfMCRpZVjFKpBcW56anJpgWGunmp5fD4Ts7P3cQITq9aATsYV2/4q3eI
+	kYmD8RCjBAezkgjvX3uPVCHelMTKqtSi/Pii0pzU4kOMpsD4mcgsJZqcD0zweSXxhiaWBiZm
+	ZmYmlsZmhkrivK9b56YICaQnlqRmp6YWpBbB9DFxcEo1MAV27v0p8mVXwW6BWynfjFacEzfb
+	q6/Qpm/UoKUqquzJneEh2ax11mB+7EZR+bD8hWynrvO0+fCc/bij2Fn9xgFBo+QZ+9a4bv81
+	T62ha93/4pDlGYH+pqVs+qeeeDEuzOpzKdBOaJsqcOn84+v3fV0kds7w9p2Qet79Zl7vYlEd
+	D441PsvW8vFe2jf9wA1xNuENDo6aIoxnTmwQOB5+2OtNmNCUfQYrGeSb83bbrBTKDLrkvFbf
+	RkkyOktD9Enlolla6hys+9ODtFYeyxKUDTvxNv2vo/yks9XfuHv/Fxf+/XDnKIemwRPeIrEn
+	OYfkjSJ0pPZcf+PJ/aBcfsLL17+mLW6VZY51it86/98UJZbijERDLeai4kQAwgBfczgEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpikeLIzCtJLcpLzFFi42LZdlhJTrdHwCvV4F2fnsXqu/1sFitXH2Wy
+	eNd6jsVi0qFrjBZnri5ksdh7S9ti/rKn7BbLj/9jcuDwuHy21GPTqk42j81L6j1232xg8zh3
+	scLj49NbLB6fN8kFsEdx2aSk5mSWpRbp2yVwZTy9XFXQw1Ex/UUfYwPjPLYuRk4OCQETieez
+	vwPZXBxCArsZJa583c4OkRCXaL72A8oWllj57zk7RNFrRolTP1YwgyR4BewkGp61gU1iEVCR
+	mD9rNjtEXFDi5MwnLCC2qECSxJ77jUwgtrCAl8Ttxu+sIDYz0IJbT+aDxUUElCXuzp/JCrKA
+	WWAro8TyU3tZILYtZJJ4+vsG0FQODjYBTYkLk0tBGjgF7CUeb37IBDHITKJraxcjhC0vsf3t
+	HOYJjEKzkNwxC8m+WUhaZiFpWcDIsopRMrWgODc9t9iwwCgvtVyvODG3uDQvXS85P3cTIzia
+	tLR2MO5Z9UHvECMTB+MhRgkOZiUR3r/2HqlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeb+97k0R
+	EkhPLEnNTk0tSC2CyTJxcEo1MF1WervL/n/F56Oij8LEijR0n8/VuH+W/993rYLT68VPcWhP
+	KriXwK+6+tbihw42XA6aiZW6WjO9TnBbxM66r8GY5/ZV0++Kvwbv7Zq2tJMzXv5P1P75I/2U
+	zD49r8dO+d0emVFHFpvLF7cZbDNSrft5+U9RK3f0/aMeRVoZS04qCDT7r8++F+NcvSxpd/Hd
+	/AQW9TYztrTfXytzGc2MPT8tqRPZUzHX3yF45rndK04Hzkor3BiQ/D2iZtnFQk+/ue/C5oUX
+	tq+JP8dVfOTD4ptvE34alui9fqjmIK/yP1OQVZnV7aODZLOTwOXtq3h2vNk7V5GXc2LV5LOF
+	1fvOuDv5CJqHz5nY4WS47vpDJZbijERDLeai4kQAPrjlkhUDAAA=
+X-CMS-MailID: 20231107102516epcas5p4eba405b7fe0ab3deb5286c36ef4e44d3
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231027182010epcas5p36bcf271f93f821055206b2e04b3019a6
+References: <20231027181929.2589937-1-kbusch@meta.com>
+	<CGME20231027182010epcas5p36bcf271f93f821055206b2e04b3019a6@epcas5p3.samsung.com>
+	<20231027181929.2589937-2-kbusch@meta.com>
+	<40ac82f5-ce1b-6f49-3609-1aff496ae241@samsung.com>
+	<ZUkAH258Ts0caQ5W@kbusch-mbp.dhcp.thefacebook.com>
 
-In case of big chunk sequential IO, bio's size is often not aligned with
-this queue's max request size because of multipage bvec, then small sized
-bio can be made by bio split, so try to align bio with max io size if
-it isn't the last one.
+On 11/6/2023 8:32 PM, Keith Busch wrote:
+> On Mon, Nov 06, 2023 at 11:18:03AM +0530, Kanchan Joshi wrote:
+>> On 10/27/2023 11:49 PM, Keith Busch wrote:
+>>> +	for (i = 0; i < nr_vecs; i = j) {
+>>> +		size_t size = min_t(size_t, bytes, PAGE_SIZE - offs);
+>>> +		struct folio *folio = page_folio(pages[i]);
+>>> +
+>>> +		bytes -= size;
+>>> +		for (j = i + 1; j < nr_vecs; j++) {
+>>> +			size_t next = min_t(size_t, PAGE_SIZE, bytes);
+>>> +
+>>> +			if (page_folio(pages[j]) != folio ||
+>>> +			    pages[j] != pages[j - 1] + 1)
+>>> +				break;
+>>> +			unpin_user_page(pages[j]);
+>>
+>> Is this unpin correct here?
+> 
+> Should be. The pages are bound to the folio, so this doesn't really
+> unpin the user page. It just drops a reference, and the folio holds the
+> final reference to the contiguous pages, which is released on
+> completion. 
 
-Ed Tsai reported this way improves 64MB read/write by > 15%~25% in
-Antutu V10 Storage Test.
-
-Reported-by: Ed Tsai <ed.tsai@mediatek.com>
-Closes: https://lore.kernel.org/linux-block/20231025092255.27930-1-ed.tsai@mediatek.com/
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index 816d412c06e9..749b6283dab9 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1294,6 +1294,47 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	return ret;
- }
- 
-+/* should only be called before submission */
-+static void bio_shrink(struct bio *bio, unsigned bytes)
-+{
-+	unsigned int size = bio->bi_iter.bi_size;
-+	int idx;
-+
-+	if (bytes >= size)
-+		return;
-+
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+
-+	idx = bio->bi_vcnt - 1;
-+	bio->bi_iter.bi_size -= bytes;
-+	while (bytes > 0) {
-+		struct bio_vec *bv = &bio->bi_io_vec[idx];
-+		unsigned int len = min_t(unsigned, bv->bv_len, bytes);
-+
-+		bytes -= len;
-+		bv->bv_len -= len;
-+		if (!bv->bv_len) {
-+			bio_release_page(bio, bv->bv_page);
-+			idx--;
-+		}
-+	}
-+	WARN_ON_ONCE(idx < 0);
-+	bio->bi_vcnt = idx + 1;
-+}
-+
-+static unsigned bio_align_with_io_size(struct bio *bio)
-+{
-+	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-+	unsigned int size = bio->bi_iter.bi_size;
-+	unsigned int trim = size & ((queue_max_sectors(q) << 9) - 1);
-+
-+	if (trim && trim != size) {
-+		bio_shrink(bio, trim);
-+		return trim;
-+	}
-+	return 0;
-+}
-+
- /**
-  * bio_iov_iter_get_pages - add user or kernel pages to a bio
-  * @bio: bio to add pages to
-@@ -1333,6 +1374,22 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 		ret = __bio_iov_iter_get_pages(bio, iter);
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
- 
-+
-+	/*
-+	 * If we still have data and bio is full, this bio size may not be
-+	 * aligned with max io size, small bio can be caused by split, try
-+	 * to avoid this situation by aligning bio with max io size.
-+	 *
-+	 * Big chunk of sequential IO workload can benefit from this way.
-+	 */
-+	if (!ret && iov_iter_count(iter) && bio->bi_bdev &&
-+			bio_op(bio) != REQ_OP_ZONE_APPEND) {
-+		unsigned trim = bio_align_with_io_size(bio);
-+
-+		if (trim)
-+			iov_iter_revert(iter, trim);
-+	}
-+
- 	return bio->bi_vcnt ? 0 : ret;
- }
- EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
--- 
-2.41.0
-
+But the completion is still going to see multiple pages and not one 
+(folio). The bip_for_each_vec loop is going to drop the reference again.
+I suspect it is not folio-aware.
