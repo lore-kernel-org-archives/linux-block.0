@@ -1,70 +1,156 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF958D2E0
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 07:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aER4jRTv"
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70CF410D5
-	for <linux-block@vger.kernel.org>; Mon,  6 Nov 2023 23:23:41 -0800 (PST)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5af6c445e9eso63226887b3.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Nov 2023 23:23:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1699341820; x=1699946620; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OWNGndg7wx7UsmLs5D+Rq7iYTC+ge2DYU9RXrsS94No=;
-        b=aER4jRTvNq1DiEPODWXkjaHRDaYlsm/IbQsKYfxeD8SQJ/74Lyd8VvZkSRx3BN4VX1
-         ME/yDikGKqE7Co5rMVu+6krJNdqAuXm9CBZssKsWnnIRsPs+ieranJZee5cuuiWpu9B+
-         VRKR3bIdF4sXYRgjhnyUFKFEhtZHZdidJtXtI=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B0DCA43
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 07:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E604311F
+	for <linux-block@vger.kernel.org>; Mon,  6 Nov 2023 23:29:24 -0800 (PST)
+Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-1ef4782ef93so6564813fac.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Nov 2023 23:29:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699341820; x=1699946620;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OWNGndg7wx7UsmLs5D+Rq7iYTC+ge2DYU9RXrsS94No=;
-        b=gQXLFiM6qicZk90d/bdhzYKoTG4h+W+eWLi4/EhzDtkKzhR9wFzz6rs0M22wa7VAqU
-         r1HB5YcWJepzWC8hs+3KySI3w7FeWAeFChXpN+/YYkjz2KCDbbQ052jS5mUXo4QOXFl6
-         w4ngJvdb5guLeGCvHlKpvVX/wksvDfKrELY7mTtPk6U4532+G0fEWxkGRwy4Wz5uFckm
-         2dc0vMONGPmq2C45ulZCuivsKPoS3BtWUo+q66XmeHKicHEQkdht80XBTjcxP0ro2NOt
-         1sd90lrIdYmN6Ryd81KY06xP6l8ZspOsbkMoNvrXw0RN5oJOvp3amtsNUdIUBNm8RAhZ
-         scJA==
-X-Gm-Message-State: AOJu0YzLFkCcA4M/P+1J/s8uTAnkbD3xIOdX4AferrLgb5gsyGMz1z3l
-	wbtP09LApr5wbOf+Os4KmM9SF4cQ+nNGy2aMvmc=
-X-Google-Smtp-Source: AGHT+IEF1P8WPg9mrCIYC35ojAXg98l7Ku77fGg3/ZA9CByuTMWybwPkdQXraU0BM0N0EwyTIrFmpQ==
-X-Received: by 2002:a25:f828:0:b0:d9a:3d72:bfab with SMTP id u40-20020a25f828000000b00d9a3d72bfabmr27321209ybd.40.1699341820257;
-        Mon, 06 Nov 2023 23:23:40 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:7d66:31e7:94a6:e6a9])
-        by smtp.gmail.com with ESMTPSA id k125-20020a632483000000b005bd3f34b10dsm825837pgk.24.2023.11.06.23.23.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 23:23:39 -0800 (PST)
-Date: Tue, 7 Nov 2023 16:23:35 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Vasily Averin <vasily.averin@linux.dev>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Minchan Kim <minchan@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-block@vger.kernel.org
-Subject: Re: zram: zram_free_page calls in zram_meta_free
-Message-ID: <20231107072335.GA11577@google.com>
-References: <ebd87e1e-f941-498a-870e-15743ca3fb1f@linux.dev>
+        d=1e100.net; s=20230601; t=1699342164; x=1699946964;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HeECuXLy1/FZ3TqugxSjzkKsMd+c/4X0kfQ+/Wm88O0=;
+        b=VuXuFLGlQ/g0jwW2A22gVEVkzYcvdRBe/Z9kDUy6rg9L8tbg4vAG8dcE1QKqSoE4e4
+         WKhNMeV/GDQy/AeyzyNKCkivTb7BKIQ8LD1u7hdzSbCYrvOPaauZzwseTjvK0w4xWbpf
+         Us9EU1gVVFq6nZ2P5j2TxZE8TQ1Fz/KZH7HB310kdrxxuwEMv7u1zvz9/MykOp3cyWQW
+         wP9GpfiAWu6vEAy7xEV0zee5UZLEVKMIi2IKdslAh0WsRlWJslo0S/MC+I5/DwCVTm7u
+         RFCYVLpon6YJmKcPzS1JQHArXghsttiodB44KzqSzeD92sTuLubPW09zxjMuDhVL6HCG
+         adBw==
+X-Gm-Message-State: AOJu0Yy34avPoXC9+1Kp8aCMiV5/RTRAwiva3ci8/mSGZYRvT2I/o1Em
+	bgnnbuiHFLLrNubwBnr53Wlr+gY0eqEeNLYaIdVtj3wanOXv
+X-Google-Smtp-Source: AGHT+IGFGrtsZMT80JbUEI9e9oKjhDqDVPNgmyiTKNdWuwyrgji4fT40PECRjphM9bWrUqVnH+dbayYerBIOuOFd2hGPCqurXkn9
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ebd87e1e-f941-498a-870e-15743ca3fb1f@linux.dev>
+X-Received: by 2002:a05:6870:6c17:b0:1ef:afd3:813f with SMTP id
+ na23-20020a0568706c1700b001efafd3813fmr857739oab.5.1699342164320; Mon, 06 Nov
+ 2023 23:29:24 -0800 (PST)
+Date: Mon, 06 Nov 2023 23:29:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000e6aac06098aee0c@google.com>
+Subject: [syzbot] [block?] WARNING in blk_mq_start_request
+From: syzbot <syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On (23/11/06 23:42), Vasily Averin wrote:
-> The only place where content of zram entry is accessed and even changed without taken zran lock is
-> zram_free_page() calls from zram_meta_free().
-> 
-> It does not look like problem because zram should not have any users at this point,
-> however I still do not understand why this is required?
+Hello,
 
-It's simply pointless. Reset is performed under write init_lock,
-which is an upper level per-device lock.
+syzbot found the following issue on:
+
+HEAD commit:    4652b8e4f3ff Merge tag '6.7-rc-ksmbd-server-fixes' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=117a6ebb680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5316ad879647e3c5
+dashboard link: https://syzkaller.appspot.com/bug?extid=fcc47ba2476570cbbeb0
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13489af3680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=145c7d07680000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-4652b8e4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9c5be65b1bc8/vmlinux-4652b8e4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8799a4da0be5/bzImage-4652b8e4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
+
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffff489c59c
+R13: 00007ffff489c5b0 R14: 00007ffff489c5f0 R15: 0000000000000003
+ </TASK>
+------------[ cut here ]------------
+WARNING: CPU: 3 PID: 5178 at block/blk-mq.c:1258 blk_mq_start_request+0x643/0x780 block/blk-mq.c:1258
+Modules linked in:
+CPU: 3 PID: 5178 Comm: syz-executor268 Not tainted 6.6.0-syzkaller-10396-g4652b8e4f3ff #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:blk_mq_start_request+0x643/0x780 block/blk-mq.c:1258
+Code: 00 00 fc ff df 48 8d 7d 10 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 2f 01 00 00 48 89 df ff 55 10 e9 64 fc ff ff e8 1d 9c 44 fd <0f> 0b e9 f6 fa ff ff e8 11 9c 44 fd 0f 0b e9 06 fa ff ff e8 05 9c
+RSP: 0018:ffffc900035ef298 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff888018539e00 RCX: ffffffff8442db37
+RDX: ffff888030114f00 RSI: ffffffff8442e043 RDI: 0000000000000005
+RBP: ffff888018539e94 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: ffff888106a33350
+R13: 0000000000000001 R14: ffff888018539f1d R15: ffff888018539f20
+FS:  0000555555f00480(0000) GS:ffff88806b900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000555555f00788 CR3: 000000002238a000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ null_queue_rq+0x2e2/0x7a0 drivers/block/null_blk/main.c:1727
+ __blk_mq_issue_directly+0xe3/0x270 block/blk-mq.c:2578
+ blk_mq_request_issue_directly+0x120/0x190 block/blk-mq.c:2663
+ blk_mq_plug_issue_direct+0x19e/0x670 block/blk-mq.c:2684
+ blk_mq_flush_plug_list.part.0+0x16b6/0x1e90 block/blk-mq.c:2793
+ blk_mq_flush_plug_list+0x62/0x80 block/blk-mq.c:2770
+ __blk_flush_plug+0x2c0/0x430 block/blk-core.c:1142
+ blk_finish_plug block/blk-core.c:1166 [inline]
+ blk_finish_plug+0x54/0xa0 block/blk-core.c:1163
+ read_pages+0x69b/0xdb0 mm/readahead.c:183
+ page_cache_ra_unbounded+0x457/0x5e0 mm/readahead.c:269
+ do_page_cache_ra mm/readahead.c:299 [inline]
+ page_cache_ra_order+0x72b/0xa80 mm/readahead.c:546
+ ondemand_readahead+0x493/0x1130 mm/readahead.c:668
+ page_cache_sync_ra+0x174/0x1d0 mm/readahead.c:695
+ page_cache_sync_readahead.constprop.0+0xb2/0xf0 include/linux/pagemap.h:1293
+ cramfs_blkdev_read fs/cramfs/inode.c:218 [inline]
+ cramfs_read+0x33f/0xae0 fs/cramfs/inode.c:278
+ cramfs_read_super+0xbd/0x9b0 fs/cramfs/inode.c:522
+ cramfs_blkdev_fill_super+0x116/0x2f0 fs/cramfs/inode.c:622
+ get_tree_bdev+0x3b5/0x650 fs/super.c:1595
+ cramfs_get_tree fs/cramfs/inode.c:958 [inline]
+ cramfs_get_tree+0x40/0x50 fs/cramfs/inode.c:948
+ vfs_get_tree+0x8c/0x370 fs/super.c:1768
+ do_new_mount fs/namespace.c:3337 [inline]
+ path_mount+0x1492/0x1ed0 fs/namespace.c:3664
+ do_mount fs/namespace.c:3677 [inline]
+ __do_sys_mount fs/namespace.c:3886 [inline]
+ __se_sys_mount fs/namespace.c:3863 [inline]
+ __x64_sys_mount+0x293/0x310 fs/namespace.c:3863
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7feca35df9f9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 a1 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffff489c548 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 00007ffff489c550 RCX: 00007feca35df9f9
+RDX: 0000000020000040 RSI: 00000000200000c0 RDI: 0000000020000000
+RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000000003134
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffff489c59c
+R13: 00007ffff489c5b0 R14: 00007ffff489c5f0 R15: 0000000000000003
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
