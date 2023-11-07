@@ -1,59 +1,57 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61716DF72
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 15:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D7A31590
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 15:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nk02B5Fp"
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71EF128B6
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 07:15:34 -0800 (PST)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77773d3246aso25357585a.1
-        for <linux-block@vger.kernel.org>; Tue, 07 Nov 2023 07:15:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ue1+wLQ2"
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 393E03111A
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 07:15:37 -0800 (PST)
+Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-671188b2d44so13735456d6.0
+        for <linux-block@vger.kernel.org>; Tue, 07 Nov 2023 07:15:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1699370134; x=1699974934; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1699370136; x=1699974936; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dSo2uHzA475zg1anJM/RFwUnIs9F8vQ48D/x02K64wM=;
-        b=Nk02B5Fp7jtkBtCEjeJc0gW6rHkaAcJurdgMAU5EHi08tQkHoNl8yLhjRsuz5wZ1zr
-         ZLWvXuYWkzGDIdoc7BmdikAKtNjMwEjJeEJyZUm0NtXGdllFoYxKqW1F3FP0CL5+GmLN
-         UMF1brx+luBkREGTkRJ22fSx2b8tSJwztJKrobbTjTS2JodKwENlM8G/gqQRCI9LM9/S
-         3duTO5rGaI+94Zw9FCbURYgbDq9sUmDahq1rIpG/mi4gs/c6FWm96BoHokmOgBY1JL85
-         d0x0lETHHH27XG8YA3HWY99suL4BXwSUzKhmZdKaITUsefoixTWqbPTOaFQmDTemz2RQ
-         IYVQ==
+        bh=gg4S+iVhN0rUMVVADxU0vILU9b9jVJPj9okuexhI30g=;
+        b=ue1+wLQ2GbPHyHRQinwZxkazEkLaj8CFlWrc0G/M19QVkSVDhAYprNB9gv6jktR20Z
+         ShAShNLjp6U0JYTa+oOuMCH1ghh70b7Yc1d/wK3r+wyKjSVcpixqwmCCj9R81BDELWr5
+         Gl/Y8NTdUfcy42T7Yl/e4gKHKhQNbWTgIYYTHxLlJ+GIB5TMB/8jCq3F38/mz2LU2hYG
+         ed5SPhbsqJt3JiTtqCEAKn3kDR6kkBlNoCo68ISDV1Io01x4WuKvdvCXNEE2trGNoIzp
+         kUlTKGEtJoqCEYQEbNDQg8QFXbaCBnHRLspUQJtHcRfuhkLEEkUxj0n0P9oImrEMNWUd
+         uwuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699370134; x=1699974934;
+        d=1e100.net; s=20230601; t=1699370136; x=1699974936;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dSo2uHzA475zg1anJM/RFwUnIs9F8vQ48D/x02K64wM=;
-        b=NzgCA2/1eRdRSjE/fRWGIYNwZoPFfuqS5nr2InsPhpSqZ1ghBPihvU0GKN/dZ5qlFj
-         jwgrb+IHXzijTHwMkh6UKZIcA4UNgs6ipoItoRC3EUlX7KME1eKJs+Fj739EurYlopCy
-         utxmmW7auQPzYhnRBywZvjnbhq5JYPQ67YwghFI/uzWvNjKhZ1D5YL/GDWJRK8MuUE/+
-         EgZ1wuE51FA8z5neN+iYSreyMNdvG44dfTw6Xa7G/+Q8xqUjGV9TQPeS2KuFk4YG4v3e
-         ATWNriBm5UeiClFKBGF9C/HgR22yWudp6T0ktXuvX4EtSvA1Yt7qcvwa/nrnOfXlbT3x
-         vtjw==
-X-Gm-Message-State: AOJu0YwDYHtpocOnYFZHBsfIQymrsgXBOyOIyA5zWeVxqxiW4k5LafAd
-	d9h9sWB4DE4MLXuTS+9gKrRYJA==
-X-Google-Smtp-Source: AGHT+IGJa06jbPvLPTKkjguuvMggjPIeEu5QTDeqHbmw67+dg1/UxbCzkpBE+F8xjlTqdqK//qjGhQ==
-X-Received: by 2002:a05:620a:19a1:b0:778:8ae9:2247 with SMTP id bm33-20020a05620a19a100b007788ae92247mr39219338qkb.5.1699370134013;
-        Tue, 07 Nov 2023 07:15:34 -0800 (PST)
+        bh=gg4S+iVhN0rUMVVADxU0vILU9b9jVJPj9okuexhI30g=;
+        b=V6JZc3otUg1QgI15IqWRXZXyQ+Oe4YP+2bQjTK0G70NOCH7+Cdmu3DSXJjA9h1v6lg
+         EF8O90ia1lfVkuAfbv6nRmtufg2Fl9cKQXEkfYvbftwYvLFOY8bHM7H49xX6z4Sf2IG3
+         Cmun4eipGY+wIyqJ57BQ3vBfElLp68ysfRSFy4Ra/XBADagSdxqNHV6kc89GHw7nJ2Tj
+         Cdp/TOcXLuu9LZbfPrw8C58xE5xtTfukgsvQV0aQ0Z3gFlg4wPDAfyWR3DmxRNrj6GTx
+         XiJcxLZBuw/wFm0Pal3JCyVh9U7/FFFZ5mpYlFL3qHXkoyQgL03uO8o5a+Tj1FF5rZxb
+         m9zg==
+X-Gm-Message-State: AOJu0YwTb6QLF+lbu1pPo75VQ0mpAMTMdw86gfiCmzXgXb6fSuHyCIBL
+	wWp83gl71zzgc5xEibe791YEuw==
+X-Google-Smtp-Source: AGHT+IHDuUKEORbj6lEnJjXGuGurwm6i9VyeFSTXBHFrMNOF5jjb4rAbhSi5DROMGeR+2/gsXs8Zyw==
+X-Received: by 2002:a05:6214:2b98:b0:65d:486:25c6 with SMTP id kr24-20020a0562142b9800b0065d048625c6mr33120510qvb.3.1699370135987;
+        Tue, 07 Nov 2023 07:15:35 -0800 (PST)
 Received: from [127.0.0.1] ([2620:10d:c091:400::5:f968])
-        by smtp.gmail.com with ESMTPSA id v19-20020ae9e313000000b007759a81d88esm4215667qkf.50.2023.11.07.07.15.31
+        by smtp.gmail.com with ESMTPSA id v19-20020ae9e313000000b007759a81d88esm4215667qkf.50.2023.11.07.07.15.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 07:15:33 -0800 (PST)
+        Tue, 07 Nov 2023 07:15:35 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: josef@toxicpanda.com, Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: linux-kernel@vger.kernel.org, hch@lst.de, linux-block@vger.kernel.org, 
- nbd@other.debian.org, chaitanya.kulkarni@wdc.com, yukuai1@huaweicloud.com, 
- houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com, 
- lilingfeng3@huawei.com
-In-Reply-To: <20231107103435.2074904-1-lilingfeng@huaweicloud.com>
-References: <20231107103435.2074904-1-lilingfeng@huaweicloud.com>
-Subject: Re: [PATCH v2] nbd: fix uaf in nbd_open
-Message-Id: <169937013187.545643.6485076095455389311.b4-ty@kernel.dk>
-Date: Tue, 07 Nov 2023 08:15:31 -0700
+To: hch@lst.de, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20231107111247.2157820-1-yukuai1@huaweicloud.com>
+References: <20231107111247.2157820-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH] blk-core: use pr_warn_ratelimited() in bio_check_ro()
+Message-Id: <169937013415.545643.10559344267374227650.b4-ty@kernel.dk>
+Date: Tue, 07 Nov 2023 08:15:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,21 +63,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.13-dev-26615
 
 
-On Tue, 07 Nov 2023 18:34:35 +0800, Li Lingfeng wrote:
-> Commit 4af5f2e03013 ("nbd: use blk_mq_alloc_disk and
-> blk_cleanup_disk") cleans up disk by blk_cleanup_disk() and it won't set
-> disk->private_data as NULL as before. UAF may be triggered in nbd_open()
-> if someone tries to open nbd device right after nbd_put() since nbd has
-> been free in nbd_dev_remove().
+On Tue, 07 Nov 2023 19:12:47 +0800, Yu Kuai wrote:
+> If one of the underlying disks of raid or dm is set to read-only, then
+> each io will generate new log, which will cause message storm. This
+> environment is indeed problematic, however we can't make sure our
+> naive custormer won't do this, hence use pr_warn_ratelimited() to
+> prevent message storm in this case.
 > 
-> Fix this by implementing ->free_disk and free private data in it.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] nbd: fix uaf in nbd_open
-      commit: 327462725b0f759f093788dfbcb2f1fd132f956b
+[1/1] blk-core: use pr_warn_ratelimited() in bio_check_ro()
+      commit: 1b0a151c10a6d823f033023b9fdd9af72a89591b
 
 Best regards,
 -- 
