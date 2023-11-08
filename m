@@ -1,44 +1,68 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376B8DDC2
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 09:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAF21095F;
+	Wed,  8 Nov 2023 10:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PVrf6U/E"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FDE1B1
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 01:08:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699434490;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bHDawh8TcffRw8jNLFsmTf7XWpj9YVQC6Fj3ofPE7uo=;
-	b=PVrf6U/EDbBwqILbTuWmEtftrIaLJVIpfzcGMLDYspi/e2WdmCX2mu9FIQWi6753yJS+wT
-	8v8qeZ2UMhZIAN0HSe6kYcYritUGtAkywwjhAZDMYQWlsYK3wfICRFf9+k3NF2OH8EzTWJ
-	oqpr9KiAyqppEQmtVl9sPhIkzFRo2Wg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-108-yM-zH7uBOu6hATO1bi78yg-1; Wed,
- 08 Nov 2023 04:08:06 -0500
-X-MC-Unique: yM-zH7uBOu6hATO1bi78yg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2Iz6USKq";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="nf4FVuiC"
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F451723;
+	Wed,  8 Nov 2023 02:10:16 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10EDC38143A2;
-	Wed,  8 Nov 2023 09:08:06 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F376E25C1;
-	Wed,  8 Nov 2023 09:08:03 +0000 (UTC)
-Date: Wed, 8 Nov 2023 17:07:59 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] ublk/rc: prefer to rublk over miniublk
-Message-ID: <ZUtP76DdikBTiBLs@fedora>
-References: <20231106003523.1923694-1-ming.lei@redhat.com>
- <snthk6n6lo6767rjxj7xeevgbebxjqzxhwouacqr3335l4xat3@hv4zaukbl6dy>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 98BEE21954;
+	Wed,  8 Nov 2023 10:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1699438215; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PA9sqEeboC7whR130nl0EbzEaZqeDorxcklkHqfQ4h8=;
+	b=2Iz6USKqni61NRdIuziCAfulicKzRRghwXKI8I100BXv9/5Jl/pTJt7mxfw3T+I8ZRpxOF
+	NVB63t+GdphtxpHmsoii3fxVJm1VRewiHmf2XlAsUFtCoeHTnwi2uovVWUPt4Z8mjosPJs
+	2jS6ERtZ/W8U4N+vzp8peIseujORy+g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1699438215;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PA9sqEeboC7whR130nl0EbzEaZqeDorxcklkHqfQ4h8=;
+	b=nf4FVuiC8Q6sfSZPI+vB0VwAPk9NSLgBR8yWLl6yzhEc4uc+K0WvrGzCWWnifHvrySE7GI
+	+vitVfmVpnstuEAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 89A01133F5;
+	Wed,  8 Nov 2023 10:10:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id fROPIYdeS2UDZgAAMHmgww
+	(envelope-from <jack@suse.cz>); Wed, 08 Nov 2023 10:10:15 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 2435FA07C0; Wed,  8 Nov 2023 11:10:15 +0100 (CET)
+Date: Wed, 8 Nov 2023 11:10:15 +0100
+From: Jan Kara <jack@suse.cz>
+To: Aleksandr Nogikh <nogikh@google.com>
+Cc: Jan Kara <jack@suse.cz>, Eric Biggers <ebiggers@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
+	Ted Tso <tytso@mit.edu>, syzkaller <syzkaller@googlegroups.com>,
+	Alexander Popov <alex.popov@linux.com>, linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
+ mounted devices
+Message-ID: <20231108101015.hj3w6a7sq5x7x2s4@quack3>
+References: <20230704122727.17096-1-jack@suse.cz>
+ <20230704125702.23180-1-jack@suse.cz>
+ <20230822053523.GA8949@sol.localdomain>
+ <20230822101154.7udsf4tdwtns2prj@quack3>
+ <CANp29Y6uBuSzLXuCMGzVNZjT+xFqV4dtWKWb7GR7Opx__Diuzg@mail.gmail.com>
+ <20231024111015.k4sbjpw5fa46k6il@quack3>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,66 +71,35 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <snthk6n6lo6767rjxj7xeevgbebxjqzxhwouacqr3335l4xat3@hv4zaukbl6dy>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+In-Reply-To: <20231024111015.k4sbjpw5fa46k6il@quack3>
 
-Hi Shinichiro,
+Hi!
 
-On Tue, Nov 07, 2023 at 05:28:59AM +0000, Shinichiro Kawasaki wrote:
-> On Nov 06, 2023 / 08:35, Ming Lei wrote:
-> > Add one wrapper script for using rublk to run ublk tests, and prefer
-> > to rublk because it is well implemented and more reliable.
+On Tue 24-10-23 13:10:15, Jan Kara wrote:
+> On Thu 19-10-23 11:16:55, Aleksandr Nogikh wrote:
+> > Thank you for the series!
 > > 
-> > This way has been run for months in rublk's github CI test.
+> > Have you already had a chance to push an updated version of it?
+> > I tried to search LKML, but didn't find anything.
 > > 
-> > https://github.com/ming1/rublk
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > Or did you decide to put it off until later?
 > 
-> Hi Ming, it sounds good to shift from miniublk to rublk to reduce maintenance
-> work of src/miniublk. I tried the patch, and found a couple of points to
-> improve.
-> 
-> 1) The issue that Akinobu addressed with the commit 880fb6afff2e is observed
->    with rublk. I did the command lines below which were noted in his commit:
-> 
->     $ modprobe -r scsi_debug
->     $ modprobe scsi_debug sector_size=4096 dev_size_mb=2048
->     $ mkfs.ext4 /dev/sdX
->     $ mount /dev/sdX results/
->     $ ./check ublk/003
-> 
->   Then I observed the failure:
-> 
-> ublk/003 (test mounting block device exported by ublk)       [failed]
->     runtime  0.529s  ...  0.465s
->     --- tests/ublk/003.out      2023-09-05 10:05:11.292889193 +0900
->     +++ /home/shin/Blktests/blktests/results/nodev/ublk/003.out.bad     2023-11-07 14:18:44.966654288 +0900
->     @@ -1,2 +1,3 @@
->      Running ublk/003
->     +got , should be ext4
->      Test complete
-> 
->   So I guess rublk needs a similar fix as Akinobu did for miniublk.
+> So there is preliminary series sitting in VFS tree that changes how block
+> devices are open. There are some conflicts with btrfs tree and bcachefs
+> merge that complicate all this (plus there was quite some churn in VFS
+> itself due to changing rules how block devices are open) so I didn't push
+> out the series that actually forbids opening of mounted block devices
+> because that would cause a "merge from hell" issues. I plan to push out the
+> remaining patches once the merge window closes and all the dependencies are
+> hopefully in a stable state. Maybe I can push out the series earlier based
+> on linux-next so that people can have a look at the current state.
 
-Indeed, rublk-loop just takes default 512B as block size, and will fix
-it in v0.1.3, which also supports to specify logical/physical block size
-from command line, and I will add one test case in blktests later.
+So patches are now in VFS tree [1] so they should be in linux-next as well.
+You should be able to start using the config option for syzbot runs :)
 
-> 
-> 
-> 2) I ran shellcheck for src/rublk_wrapper.sh and observed two meesages:
-> 
->     src/rublk_wrapper.sh:10:12: error: Double quote array expansions to avoid re-splitting elements. [SC2068]
->     src/rublk_wrapper.sh:32:7: note: Double quote to prevent globbing and word splitting. [SC2086]
-> 
-> I suggest to apply changes below to make the script a bit more robust.
+								Honza
 
-Good catch, thanks for the improvement, and I will integrate it into
-next version.
-
-
-
-Thanks,
-Ming
-
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/log/?h=vfs.super
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
