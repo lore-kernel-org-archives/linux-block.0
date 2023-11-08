@@ -1,89 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81219315AB;
-	Wed,  8 Nov 2023 17:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1405A358B2
+	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 18:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdg0tia1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C447BC433C8;
-	Wed,  8 Nov 2023 17:19:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699463980;
-	bh=8WcnBJph0nMP59ZVY5tLRagWAAWuVVxQRfQlzNm6mRI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fdg0tia1FBXF/KLhUIKMag4zrdSAYyQ+HQSZVYM9Qv4uAR0Cx5ol1WoZiqYgcBWU8
-	 eDSTN0qYHoVkwsZc8Bh25K2gzGUP/GumjOZ20y15Ig3SK1Efz4SYck8IL5+g7qnxki
-	 aPFDxwJ22kM6hNCuwVWQAZQANymORWWF9dXjnVP75M9G6ypqVqgfqadlWYWe1tWwpf
-	 NAnlHre/NYaEQOCTpP7cD5B741VlO6PnAfmMWK1OAwPWfOjRyIkkPnQPjznhfsSqsh
-	 VE2ZkGBNis9L333ci426+aYSN9nxn1ZY7mxZPUT5/7ij+9VX2e+5ycGLRl80odVeiY
-	 T4d+3Q9R0y1kA==
-Date: Wed, 8 Nov 2023 10:19:37 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
-	axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
-Subject: Re: [PATCHv2 1/4] block: bio-integrity: directly map user buffers
-Message-ID: <ZUvDKbe87fhYajcT@kbusch-mbp.dhcp.thefacebook.com>
-References: <20231027181929.2589937-1-kbusch@meta.com>
- <CGME20231027182010epcas5p36bcf271f93f821055206b2e04b3019a6@epcas5p3.samsung.com>
- <20231027181929.2589937-2-kbusch@meta.com>
- <40ac82f5-ce1b-6f49-3609-1aff496ae241@samsung.com>
- <ZUkAH258Ts0caQ5W@kbusch-mbp.dhcp.thefacebook.com>
- <1067f03f-e89b-4fc8-58bb-0b83b6c5c91d@samsung.com>
- <ZUpS150ojGIJ-bkP@kbusch-mbp.dhcp.thefacebook.com>
- <3e14f4c8-482d-df2c-f802-ebc74bd12664@samsung.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EGw67X5M"
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E7A31FFF
+	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 10:25:11 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1cc209561c3so11275ad.0
+        for <linux-block@vger.kernel.org>; Wed, 08 Nov 2023 10:25:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699467911; x=1700072711; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PC/6qhrPU03mDp/kTli/yNT2tn8rEseETDX1nC6wox8=;
+        b=EGw67X5MiD6H3JBdSATKzNavOXwLP4i2t9tP/rOF5jYHsTYK0TirhnySq5O27YAixd
+         YkjPoeOUmDoVuAGBXAw44EXOxP6lqc8WdQP0T8eSK1EppWGFOXr5GwHJqxjNx8GDDTGm
+         JyuuCpYj7cFUhU959QXI4CgWER/fw/KwdlB4DUr4qxD7clzsUXPATvVrFoLqyTEAEGmo
+         gxluJGGAOHKvg9+u+5y87KTE5uy0Hw+DoB2WsuAAi5YMa5/WNJpuPLqF2e0dINjOPCYQ
+         3yPgHLh8k4lqsMKYJWhf4v1CQx34kB26jrUgU7vBTYNGB4JCYm8YMtGmFUxnRgVCGb6M
+         3R1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699467911; x=1700072711;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PC/6qhrPU03mDp/kTli/yNT2tn8rEseETDX1nC6wox8=;
+        b=UdRoAjZ+LR93rad2Fj0JLUPWmZySGBw/XdwHQfpyVAkLPBKdYRKOhGe6/UNbd7UJ/6
+         m4stcsF+A2WPedtMdR8lbQ/TVk/4hNHfawG4Z7BOL4gYZPk2sWD0TTRVxZLTd4KtL76P
+         waWSRsM/IVZr+u9UsXmHtOhJHRzRFJPUvT/yDAfiOjUUjczpFAAoyPF+wrI1hXbF86dy
+         nt/aRWtJMW5rVfGtR0OeUrd8/MTQ4g4FIcMqIfDSRIEoe7Gt6jGOV3vIj7PHYTn7V6L0
+         osRx7NWtZAzjZSePoY4S1U7UK8Ee9VQk385xLoVcZJkSsg/Medi/OpcDUPwlXSDNwlhy
+         7B5Q==
+X-Gm-Message-State: AOJu0Ywxg3v4mOb2cMfyKnI077GBn8hoIQ9BLpTq/1/zAlgGWU/OFwYh
+	bOlOAYlaQpq6PqjeEwas+xS3zxEuG/hFeVMVhacllQ==
+X-Google-Smtp-Source: AGHT+IHxrKjsunYtwCVlQDJt85desOtieZLQtrnV8TYRwbsiFMuy8DBOb0CrFp15j+2/TxH5dCjYOFdEPQBtv0jPj4Y=
+X-Received: by 2002:a17:902:d4cc:b0:1c9:b5cf:6a78 with SMTP id
+ o12-20020a170902d4cc00b001c9b5cf6a78mr8503plg.27.1699467910689; Wed, 08 Nov
+ 2023 10:25:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3e14f4c8-482d-df2c-f802-ebc74bd12664@samsung.com>
+References: <20230704122727.17096-1-jack@suse.cz> <20230704125702.23180-1-jack@suse.cz>
+ <20230822053523.GA8949@sol.localdomain> <20230822101154.7udsf4tdwtns2prj@quack3>
+ <CANp29Y6uBuSzLXuCMGzVNZjT+xFqV4dtWKWb7GR7Opx__Diuzg@mail.gmail.com>
+ <20231024111015.k4sbjpw5fa46k6il@quack3> <20231108101015.hj3w6a7sq5x7x2s4@quack3>
+In-Reply-To: <20231108101015.hj3w6a7sq5x7x2s4@quack3>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Wed, 8 Nov 2023 10:24:59 -0800
+Message-ID: <CANp29Y7DuDDkVBwsU_xhBSAug7q7vTsrS6jogF61CYEi85jGcw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
+ mounted devices
+To: Jan Kara <jack@suse.cz>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>, 
+	Christian Brauner <brauner@kernel.org>, Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>, 
+	Ted Tso <tytso@mit.edu>, syzkaller <syzkaller@googlegroups.com>, 
+	Alexander Popov <alex.popov@linux.com>, linux-xfs@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 08, 2023 at 05:45:19PM +0530, Kanchan Joshi wrote:
-> On 11/7/2023 8:38 PM, Keith Busch wrote:
-> > On Tue, Nov 07, 2023 at 03:55:14PM +0530, Kanchan Joshi wrote:
-> >> On 11/6/2023 8:32 PM, Keith Busch wrote:
-> >>> On Mon, Nov 06, 2023 at 11:18:03AM +0530, Kanchan Joshi wrote:
-> >>>> On 10/27/2023 11:49 PM, Keith Busch wrote:
-> >>>>> +	for (i = 0; i < nr_vecs; i = j) {
-> >>>>> +		size_t size = min_t(size_t, bytes, PAGE_SIZE - offs);
-> >>>>> +		struct folio *folio = page_folio(pages[i]);
-> >>>>> +
-> >>>>> +		bytes -= size;
-> >>>>> +		for (j = i + 1; j < nr_vecs; j++) {
-> >>>>> +			size_t next = min_t(size_t, PAGE_SIZE, bytes);
-> >>>>> +
-> >>>>> +			if (page_folio(pages[j]) != folio ||
-> >>>>> +			    pages[j] != pages[j - 1] + 1)
-> >>>>> +				break;
-> >>>>> +			unpin_user_page(pages[j]);
-> >>>>
-> >>>> Is this unpin correct here?
-> >>>
-> >>> Should be. The pages are bound to the folio, so this doesn't really
-> >>> unpin the user page. It just drops a reference, and the folio holds the
-> >>> final reference to the contiguous pages, which is released on
-> >>> completion.
-> >>
-> >> But the completion is still going to see multiple pages and not one
-> >> (folio). The bip_for_each_vec loop is going to drop the reference again.
-> >> I suspect it is not folio-aware.
-> > 
-> > The completion unpins once per bvec, not individual pages. The setup
-> > creates multipage bvecs with only one pin remaining per bvec for all of
-> > the bvec's pages. If a page can't be merged into the current bvec, then
-> > that page is not unpinned and becomes the first page of to the next
-> > bvec.
-> > 
-> 
-> Here is a test program [2] that creates this scenario.
-> Single 8KB+16b read on a 4KB+8b formatted namespace. It prepares 
-> meta-buffer out of a huge-page in a way that it spans two regular 4K pages.
-> With this, I see more unpins than expected.
+Hi!
 
-I understand now. The bip_for_each_bvec is using single page vector
-iterators. Will fix it up for next time.
+Thanks for letting me know!
+
+I've sent a PR with new syzbot configs:
+https://github.com/google/syzkaller/pull/4324
+
+--=20
+Aleksandr
+
+On Wed, Nov 8, 2023 at 2:10=E2=80=AFAM Jan Kara <jack@suse.cz> wrote:
+>
+> Hi!
+>
+> On Tue 24-10-23 13:10:15, Jan Kara wrote:
+> > On Thu 19-10-23 11:16:55, Aleksandr Nogikh wrote:
+> > > Thank you for the series!
+> > >
+> > > Have you already had a chance to push an updated version of it?
+> > > I tried to search LKML, but didn't find anything.
+> > >
+> > > Or did you decide to put it off until later?
+> >
+> > So there is preliminary series sitting in VFS tree that changes how blo=
+ck
+> > devices are open. There are some conflicts with btrfs tree and bcachefs
+> > merge that complicate all this (plus there was quite some churn in VFS
+> > itself due to changing rules how block devices are open) so I didn't pu=
+sh
+> > out the series that actually forbids opening of mounted block devices
+> > because that would cause a "merge from hell" issues. I plan to push out=
+ the
+> > remaining patches once the merge window closes and all the dependencies=
+ are
+> > hopefully in a stable state. Maybe I can push out the series earlier ba=
+sed
+> > on linux-next so that people can have a look at the current state.
+>
+> So patches are now in VFS tree [1] so they should be in linux-next as wel=
+l.
+> You should be able to start using the config option for syzbot runs :)
+>
+>                                                                 Honza
+>
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/log/?h=3D=
+vfs.super
+> --
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
