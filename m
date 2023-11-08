@@ -1,56 +1,56 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D6553A6
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 06:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4017F2CA8
+	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 06:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZZiRpdU2"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VjUDFeAg"
 Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E70861A5
-	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 22:47:57 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF1331A7
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 22:47:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1699426078; x=1730962078;
+  t=1699426076; x=1730962076;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9P7VeZSXy3Mm8PWse3SUibjGbadadqfb5RfNV3flLyw=;
-  b=ZZiRpdU2s/NVqRXnwhHJdZj13n20Mrrn+Y6oAutki8CPtGGBsy7iqkPy
-   uJUKAw9teeDeCE7FvNiSZApxrDlf9BEbhRo0Dne9iSi9qS+blPO2KgU4c
-   S9B6FkL4Oj1oqpFfRRMRx65wj2FRD+/8eflBi+vwp80uIE0hnRp54mTAj
-   HR8G0U7wlvqHnxKpbUAK5xxS7m4/qg5zBB4CI57Jul2Cv/5/NRwkmwzul
-   MAbmv8bVBc54BiTqud/JO61Saori1KXRi/FsEli0kV5ggyF6BVppldb9O
-   AiIMgds9YwkpzoccYUrojUUfWWXqRxTBMFmAGz4xo/brMnX3jvrAioPIt
-   A==;
-X-CSE-ConnectionGUID: MrrmMIYQTlOQgQGaFJCNvg==
-X-CSE-MsgGUID: E+sDUdc7SuK4RlOt3RblPQ==
+  bh=Xj2THKMmrJYzY/PlXat29h9g1cM5TKiU1HV8EABrK2U=;
+  b=VjUDFeAgxD3rC6HnoMJMnRjfxys+EYZ+hZdicjDzf3nsyZpwg61m3Sdy
+   cI+9OId9mwnm/9JZSiAgZW1ho/21fqwvPZdbLRnF6WqzGsnfCvXw+whUY
+   7OxTIufxzepDb66IZBgekWez6Sj/+Qp0hcR++xHMd/nFedCut5fkvnBzf
+   ssu8qTS3rtTQkJWcg93xbjcyXp7ERpDX3s5cOOMGQ2uuHRZUBcFBWaugx
+   TGVAT4N+16Zv9w3gRqZpZ4+1HYk47ySpNtljCsLldAsZXGvcZs6R7+RIN
+   UBn4J/dD0kw1GqOI963SxvXXiXIXNk/+8yix1KOFcbqgbRDTHTkYaG309
+   g==;
+X-CSE-ConnectionGUID: in/F216xTyGRarLw59iBYA==
+X-CSE-MsgGUID: SaP7RNViSD2D9bHmg/uiww==
 X-IronPort-AV: E=Sophos;i="6.03,285,1694707200"; 
-   d="scan'208";a="1616008"
+   d="scan'208";a="1616006"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2023 14:47:57 +0800
-IronPort-SDR: 8I7pexfyZtkHgEmvuabra3v9qvmRi0ZvuQVNzTdbS8RIYzP8gyUjYWxVClBt0Q0p8KkbC4/Y2K
- DluOhDCjSR1S4qmVDe5DwbcVxR4CR6eK+UJ9t6qZjwKn54IGmpKWbWePqgKkWOf3NlTluBUQG+
- ZwZdbpax/vzrnDmJ9poMAuxvdgIAbpu5fcp/vc6JsrngNo2VvlatdbfOUhIPcnima0w/r5YTdZ
- R1adTAz4m+wQbAEUaY+KX2yaNgnvD1TNW+5SaIazk8ymQHjlvk6kaZqYxxTNjJexiMT5qZuHC3
- cq8=
+  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2023 14:47:56 +0800
+IronPort-SDR: TRwu/DRNMD5SDfQZjNMxLOIbvHqKl6ggemmXejWfktJolALF3zK4QxBJI7+T9mCWWGDM/nhKzE
+ 8c+8PD9gyt+zIcq4NRGMIIJFg6KSoKhMYG1MkofZcRtrrMXpldTNZcc02xjAtsp6h99JwMVGFR
+ lokkVz9Z0ObbX4gXhAsA2+VpIdt7pKRBZi1Oa5d+B5mRUu6gNftHAenFgmKeSoNcqnFCa3hgvW
+ HmASCUbah/rmST7nbJuMQ46xH/o+kP3Ir9dGBlu5I/leyakoC00wL/pxTsWN5EIDWmh7rmabKN
+ Uhk=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2023 21:53:52 -0800
-IronPort-SDR: r6xzVcNoPcKT6vnMNluwe0x1fG2OU3SsBOnq3ZePBjxMGSyhqZUNoZevgLhiE9houLSTuvTDQ2
- Is4CLmkn2UdvvXsDr89If8cSm9Ed1GhWNRkWUDjzrhMpZFORkJP8gwlp5Vbie1D+bXBcLWyeM+
- GWTdUdfQ8T3fklKpzaWpiA3sLct5oZ4UaWjRqGkkUkMFWvd0zjxYbsTxmTPuyPov5RbJJT7UG7
- l38CIgCYvomZbniEgNNz8yc1RVcw5f27EJX/if4L0WPX9o/WxLrw4N5Iot48WPOF2Dn4FJR/1A
- 9+s=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2023 21:53:51 -0800
+IronPort-SDR: MLUpi5QYDKWlxYH7/bGMhGB5QrvQfrACA/QX6UkaCJKbzj+wEKE9A1IVOYVIZ8m0aS7NgdxkLY
+ eJyVxsJsWuvR9EISXxJ26OF84DgCLUNy88RDEtuTOM2BoKziwzwXdyaUC9P1mpwNvki4omBBBB
+ ZfjOU/kEoRFlnILxU4sPwyVLiGssxgqKd4d5BTUgCXR+RCwysrhSoHQ6c9cUnW/a0o/ij+mNPw
+ kPhW5ifVVjul/Qs91bqsTGCFbQ96F9Gp0NrOfKfVA5Jl4V9lOvvj4sedrG8o8/MPWopnYgNVBv
+ riw=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
-  by uls-op-cesaip01.wdc.com with ESMTP; 07 Nov 2023 22:47:57 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 07 Nov 2023 22:47:56 -0800
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
 Cc: Hannes Reinecke <hare@suse.de>,
 	Daniel Wagner <dwagern@suse.de>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 2/2] nvme: do not print subsystem NQN to stdout
-Date: Wed,  8 Nov 2023 15:47:53 +0900
-Message-ID: <20231108064753.1932632-3-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 1/2] nvme: do not print UUID to log files
+Date: Wed,  8 Nov 2023 15:47:52 +0900
+Message-ID: <20231108064753.1932632-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231108064753.1932632-1-shinichiro.kawasaki@wdc.com>
 References: <20231108064753.1932632-1-shinichiro.kawasaki@wdc.com>
@@ -64,457 +64,596 @@ Content-Transfer-Encoding: 8bit
 
 From: Hannes Reinecke <hare@suse.de>
 
-The subsystem NQN might be changed from the default value, but
-that shouldn't cause the tests to fail. So don't register the
-subsystem NQN in the 'out' files to avoid a false positive.
+The UUID/wwid of a namespace might be assigned externally, so
+we shouldn't register it in the 'out' files.
+The current checks for UUID/wwid are just there to ensure that
+if a UUID is present is should match the wwid setting.
+So rather add a function _check_uuid() which does exactly that
+and don't register the actual UUID in the 'out' files.
 
+[Shin'ichiro: added check against def_subsys_uuid in _check_uuid()]
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/nvme/003.out | 1 -
- tests/nvme/004.out | 1 -
- tests/nvme/008.out | 1 -
- tests/nvme/009.out | 1 -
- tests/nvme/010.out | 1 -
- tests/nvme/011.out | 1 -
- tests/nvme/012.out | 1 -
- tests/nvme/013.out | 1 -
- tests/nvme/014.out | 1 -
- tests/nvme/015.out | 1 -
- tests/nvme/018.out | 1 -
- tests/nvme/019.out | 1 -
- tests/nvme/020.out | 1 -
- tests/nvme/021     | 2 +-
- tests/nvme/022     | 2 +-
- tests/nvme/023     | 2 +-
- tests/nvme/024     | 2 +-
- tests/nvme/025     | 2 +-
- tests/nvme/026     | 2 +-
- tests/nvme/027     | 2 +-
- tests/nvme/028     | 2 +-
- tests/nvme/029     | 2 +-
- tests/nvme/031     | 2 +-
- tests/nvme/033.out | 1 -
- tests/nvme/034.out | 1 -
- tests/nvme/035.out | 1 -
- tests/nvme/036.out | 1 -
- tests/nvme/037     | 2 +-
- tests/nvme/041.out | 2 --
- tests/nvme/042.out | 7 -------
- tests/nvme/043.out | 8 --------
- tests/nvme/044.out | 4 ----
- tests/nvme/045.out | 1 -
- tests/nvme/047     | 4 ++--
- tests/nvme/048.out | 1 -
- tests/nvme/rc      | 2 +-
- 36 files changed, 14 insertions(+), 54 deletions(-)
+ tests/nvme/004     |  3 +--
+ tests/nvme/004.out |  2 --
+ tests/nvme/008     |  3 +--
+ tests/nvme/008.out |  2 --
+ tests/nvme/009     |  3 +--
+ tests/nvme/009.out |  2 --
+ tests/nvme/010     |  3 +--
+ tests/nvme/010.out |  2 --
+ tests/nvme/011     |  3 +--
+ tests/nvme/011.out |  2 --
+ tests/nvme/012     |  3 +--
+ tests/nvme/012.out |  2 --
+ tests/nvme/013     |  3 +--
+ tests/nvme/013.out |  2 --
+ tests/nvme/014     |  3 +--
+ tests/nvme/014.out |  2 --
+ tests/nvme/015     |  3 +--
+ tests/nvme/015.out |  2 --
+ tests/nvme/018     |  3 +--
+ tests/nvme/018.out |  2 --
+ tests/nvme/019     |  3 +--
+ tests/nvme/019.out |  2 --
+ tests/nvme/020     |  3 +--
+ tests/nvme/020.out |  2 --
+ tests/nvme/021     |  3 +--
+ tests/nvme/021.out |  2 --
+ tests/nvme/022     |  3 +--
+ tests/nvme/022.out |  2 --
+ tests/nvme/023     |  3 +--
+ tests/nvme/023.out |  2 --
+ tests/nvme/024     |  3 +--
+ tests/nvme/024.out |  2 --
+ tests/nvme/025     |  3 +--
+ tests/nvme/025.out |  2 --
+ tests/nvme/026     |  3 +--
+ tests/nvme/026.out |  2 --
+ tests/nvme/027     |  3 +--
+ tests/nvme/027.out |  2 --
+ tests/nvme/028     |  3 +--
+ tests/nvme/028.out |  2 --
+ tests/nvme/029     |  3 +--
+ tests/nvme/029.out |  2 --
+ tests/nvme/rc      | 24 ++++++++++++++++++++++++
+ 43 files changed, 45 insertions(+), 84 deletions(-)
 
-diff --git a/tests/nvme/003.out b/tests/nvme/003.out
-index beb3561..01b2756 100644
---- a/tests/nvme/003.out
-+++ b/tests/nvme/003.out
-@@ -1,3 +1,2 @@
- Running nvme/003
--NQN:nqn.2014-08.org.nvmexpress.discovery disconnected 1 controller(s)
- Test complete
+diff --git a/tests/nvme/004 b/tests/nvme/004
+index 31af873..cc5310e 100755
+--- a/tests/nvme/004
++++ b/tests/nvme/004
+@@ -29,8 +29,7 @@ test() {
+ 
+ 	local nvmedev
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	_nvme_disconnect_subsys ${def_subsysnqn}
+ 
 diff --git a/tests/nvme/004.out b/tests/nvme/004.out
-index 2559905..1a4e8e4 100644
+index 51f6052..2559905 100644
 --- a/tests/nvme/004.out
 +++ b/tests/nvme/004.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/004
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/008 b/tests/nvme/008
+index f4b45b2..6ff3362 100755
+--- a/tests/nvme/008
++++ b/tests/nvme/008
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	_nvme_disconnect_subsys "${def_subsysnqn}"
+ 
 diff --git a/tests/nvme/008.out b/tests/nvme/008.out
-index 62342e7..5661be6 100644
+index b05b46d..62342e7 100644
 --- a/tests/nvme/008.out
 +++ b/tests/nvme/008.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/008
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/009 b/tests/nvme/009
+index 905de03..4ea0063 100755
+--- a/tests/nvme/009
++++ b/tests/nvme/009
+@@ -26,8 +26,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	_nvme_disconnect_subsys "${def_subsysnqn}"
+ 
 diff --git a/tests/nvme/009.out b/tests/nvme/009.out
-index 853663f..f379f7f 100644
+index 7fd27ff..853663f 100644
 --- a/tests/nvme/009.out
 +++ b/tests/nvme/009.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/009
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/010 b/tests/nvme/010
+index e782a9b..5ed6cb5 100755
+--- a/tests/nvme/010
++++ b/tests/nvme/010
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	_run_fio_verify_io --size="${nvme_img_size}" \
+ 		--filename="/dev/${nvmedev}n1"
 diff --git a/tests/nvme/010.out b/tests/nvme/010.out
-index 90468f5..2241818 100644
+index 788ea96..90468f5 100644
 --- a/tests/nvme/010.out
 +++ b/tests/nvme/010.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/010
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/011 b/tests/nvme/011
+index 56658f4..f9150e0 100755
+--- a/tests/nvme/011
++++ b/tests/nvme/011
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	_run_fio_verify_io --size="${nvme_img_size}" \
+ 		--filename="/dev/${nvmedev}n1"
 diff --git a/tests/nvme/011.out b/tests/nvme/011.out
-index a780def..9822451 100644
+index ab29fa2..a780def 100644
 --- a/tests/nvme/011.out
 +++ b/tests/nvme/011.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/011
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/012 b/tests/nvme/012
+index 6072eed..c5e0eb9 100755
+--- a/tests/nvme/012
++++ b/tests/nvme/012
+@@ -31,8 +31,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	_xfs_run_fio_verify_io "/dev/${nvmedev}n1"
+ 
 diff --git a/tests/nvme/012.out b/tests/nvme/012.out
-index ec4bea8..1a0c53e 100644
+index 581e686..ec4bea8 100644
 --- a/tests/nvme/012.out
 +++ b/tests/nvme/012.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/012
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/013 b/tests/nvme/013
+index 60441ca..3ec280f 100755
+--- a/tests/nvme/013
++++ b/tests/nvme/013
+@@ -30,8 +30,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	_xfs_run_fio_verify_io "/dev/${nvmedev}n1"
+ 
 diff --git a/tests/nvme/013.out b/tests/nvme/013.out
-index 10b78ec..ffa7625 100644
+index f7285a9..10b78ec 100644
 --- a/tests/nvme/013.out
 +++ b/tests/nvme/013.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/013
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/014 b/tests/nvme/014
+index d49e8f3..31bfeb7 100755
+--- a/tests/nvme/014
++++ b/tests/nvme/014
+@@ -30,8 +30,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	size="$(blockdev --getsize64 "/dev/${nvmedev}n1")"
+ 	bs="$(blockdev --getbsz "/dev/${nvmedev}n1")"
 diff --git a/tests/nvme/014.out b/tests/nvme/014.out
-index c431864..5d1a517 100644
+index 0285826..c431864 100644
 --- a/tests/nvme/014.out
 +++ b/tests/nvme/014.out
-@@ -1,4 +1,3 @@
+@@ -1,6 +1,4 @@
  Running nvme/014
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
  NVMe Flush: success
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/015 b/tests/nvme/015
+index 0813bcf..4315ffa 100755
+--- a/tests/nvme/015
++++ b/tests/nvme/015
+@@ -30,8 +30,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	size="$(blockdev --getsize64 "/dev/${nvmedev}n1")"
+ 	bs="$(blockdev --getbsz "/dev/${nvmedev}n1")"
 diff --git a/tests/nvme/015.out b/tests/nvme/015.out
-index 829cf40..0c521bd 100644
+index 23763f1..829cf40 100644
 --- a/tests/nvme/015.out
 +++ b/tests/nvme/015.out
-@@ -1,4 +1,3 @@
+@@ -1,6 +1,4 @@
  Running nvme/015
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
  NVMe Flush: success
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/018 b/tests/nvme/018
+index 00531cf..e901730 100755
+--- a/tests/nvme/018
++++ b/tests/nvme/018
+@@ -28,8 +28,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	local sectors
+ 	local bs
 diff --git a/tests/nvme/018.out b/tests/nvme/018.out
-index 6b0e814..8e098d9 100644
+index 68a0194..6b0e814 100644
 --- a/tests/nvme/018.out
 +++ b/tests/nvme/018.out
-@@ -1,3 +1,2 @@
+@@ -1,5 +1,3 @@
  Running nvme/018
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/019 b/tests/nvme/019
+index 15e98c4..a1035ff 100755
+--- a/tests/nvme/019
++++ b/tests/nvme/019
+@@ -29,8 +29,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	nvme dsm "/dev/${nvmedev}" -n 1 -d -s "${sblk_range}" -b "${nblk_range}"
+ 
 diff --git a/tests/nvme/019.out b/tests/nvme/019.out
-index a52325f..9e98455 100644
+index 3e649a4..a52325f 100644
 --- a/tests/nvme/019.out
 +++ b/tests/nvme/019.out
-@@ -1,4 +1,3 @@
+@@ -1,6 +1,4 @@
  Running nvme/019
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
  NVMe DSM: success
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
+diff --git a/tests/nvme/020 b/tests/nvme/020
+index 59c1179..ba3f4c8 100755
+--- a/tests/nvme/020
++++ b/tests/nvme/020
+@@ -28,8 +28,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	nvme dsm "/dev/${nvmedev}" -n 1 -d -s "${sblk_range}" -b "${nblk_range}"
+ 
 diff --git a/tests/nvme/020.out b/tests/nvme/020.out
-index 9e293ab..9e2e214 100644
+index 113c177..9e293ab 100644
 --- a/tests/nvme/020.out
 +++ b/tests/nvme/020.out
-@@ -1,4 +1,3 @@
+@@ -1,6 +1,4 @@
  Running nvme/020
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
  NVMe DSM: success
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+ NQN:blktests-subsystem-1 disconnected 1 controller(s)
  Test complete
 diff --git a/tests/nvme/021 b/tests/nvme/021
-index 7dc6a41..82a4634 100755
+index 2277fe5..7dc6a41 100755
 --- a/tests/nvme/021
 +++ b/tests/nvme/021
-@@ -33,7 +33,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	if ! nvme list 2>> "$FULL" | grep -q "${nvmedev}n1"; then
  		echo "ERROR: device not listed"
- 	fi
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/021.out b/tests/nvme/021.out
+index b6b1a7c..c86ee74 100644
+--- a/tests/nvme/021.out
++++ b/tests/nvme/021.out
+@@ -1,4 +1,2 @@
+ Running nvme/021
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/022 b/tests/nvme/022
-index c70fbba..adef181 100755
+index a74eba3..c70fbba 100755
 --- a/tests/nvme/022
 +++ b/tests/nvme/022
-@@ -33,7 +33,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	if ! nvme reset "/dev/${nvmedev}" >> "$FULL" 2>&1; then
  		echo "ERROR: reset failed"
- 	fi
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/022.out b/tests/nvme/022.out
+index 1d393db..dace761 100644
+--- a/tests/nvme/022.out
++++ b/tests/nvme/022.out
+@@ -1,4 +1,2 @@
+ Running nvme/022
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/023 b/tests/nvme/023
-index 4e4d838..00ea3bc 100755
+index c8d1e46..4e4d838 100755
 --- a/tests/nvme/023
 +++ b/tests/nvme/023
-@@ -33,7 +33,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	if ! nvme smart-log "/dev/${nvmedev}" -n 1 >> "$FULL" 2>&1; then
  		echo "ERROR: smart-log bdev-ns failed"
- 	fi
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/023.out b/tests/nvme/023.out
+index 47c99ca..aa5d290 100644
+--- a/tests/nvme/023.out
++++ b/tests/nvme/023.out
+@@ -1,4 +1,2 @@
+ Running nvme/023
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/024 b/tests/nvme/024
-index 2535a9a..0c4fb6b 100755
+index d21bcce..2535a9a 100755
 --- a/tests/nvme/024
 +++ b/tests/nvme/024
-@@ -32,7 +32,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
  	if ! nvme smart-log "/dev/${nvmedev}" -n 1 >> "$FULL" 2>&1; then
  		echo "ERROR: smart-log file-ns failed"
- 	fi
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/024.out b/tests/nvme/024.out
+index 0b1a350..76c3e29 100644
+--- a/tests/nvme/024.out
++++ b/tests/nvme/024.out
+@@ -1,4 +1,2 @@
+ Running nvme/024
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/025 b/tests/nvme/025
-index 46f6197..5b4fbf6 100755
+index 5912e5d..46f6197 100755
 --- a/tests/nvme/025
 +++ b/tests/nvme/025
-@@ -33,7 +33,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	if ! nvme effects-log "/dev/${nvmedev}" >> "$FULL" 2>&1; then
  		echo "ERROR: effects-log failed"
- 	fi
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/025.out b/tests/nvme/025.out
+index f15ff2f..66d646e 100644
+--- a/tests/nvme/025.out
++++ b/tests/nvme/025.out
+@@ -1,4 +1,2 @@
+ Running nvme/025
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/026 b/tests/nvme/026
-index 5a7d992..9017ade 100755
+index b6bc779..5a7d992 100755
 --- a/tests/nvme/026
 +++ b/tests/nvme/026
-@@ -33,7 +33,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	if ! nvme ns-descs "/dev/${nvmedev}" -n 1 >> "$FULL" 2>&1; then
  		echo "ERROR: ns-desc failed"
- 	fi
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/026.out b/tests/nvme/026.out
+index c934cac..69a05de 100644
+--- a/tests/nvme/026.out
++++ b/tests/nvme/026.out
+@@ -1,4 +1,2 @@
+ Running nvme/026
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/027 b/tests/nvme/027
-index 82b77a9..1a576a8 100755
+index 3993fb5..82b77a9 100755
 --- a/tests/nvme/027
 +++ b/tests/nvme/027
-@@ -33,7 +33,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	if ! nvme ns-rescan "/dev/${nvmedev}" >> "$FULL" 2>&1; then
  		echo "ERROR: ns-rescan failed"
- 	fi
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/027.out b/tests/nvme/027.out
+index 5c6ed26..621a404 100644
+--- a/tests/nvme/027.out
++++ b/tests/nvme/027.out
+@@ -1,4 +1,2 @@
+ Running nvme/027
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/028 b/tests/nvme/028
-index 0b49e20..874c1da 100755
+index e522381..0b49e20 100755
 --- a/tests/nvme/028
 +++ b/tests/nvme/028
-@@ -33,7 +33,7 @@ test() {
+@@ -27,8 +27,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
+ 
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
+ 
+ 	if ! nvme list-subsys 2>> "$FULL" | grep -q "${nvme_trtype}"; then
  		echo "ERROR: list-subsys"
- 	fi
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
+diff --git a/tests/nvme/028.out b/tests/nvme/028.out
+index 536067f..7cfd2d3 100644
+--- a/tests/nvme/028.out
++++ b/tests/nvme/028.out
+@@ -1,4 +1,2 @@
+ Running nvme/028
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+ Test complete
 diff --git a/tests/nvme/029 b/tests/nvme/029
-index caed0f7..7c68d7f 100755
+index bbc4814..caed0f7 100755
 --- a/tests/nvme/029
 +++ b/tests/nvme/029
-@@ -70,7 +70,7 @@ test() {
- 	test_user_io "$dev" 511 1023 > "$FULL" 2>&1 || echo FAIL
- 	test_user_io "$dev" 511 1025 > "$FULL" 2>&1 || echo FAIL
+@@ -60,8 +60,7 @@ test() {
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
  
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
+ 	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+-	cat "/sys/block/${nvmedev}n1/uuid"
+-	cat "/sys/block/${nvmedev}n1/wwid"
++	_check_uuid "${nvmedev}"
  
- 	_nvmet_target_cleanup
- 
-diff --git a/tests/nvme/031 b/tests/nvme/031
-index ed5f196..a5c3808 100755
---- a/tests/nvme/031
-+++ b/tests/nvme/031
-@@ -44,7 +44,7 @@ test() {
- 		_add_nvmet_subsys_to_port "${port}" "${subsys}$i"
- 		_create_nvmet_host "${subsys}$i" "${def_hostnqn}"
- 		_nvme_connect_subsys "${nvme_trtype}" "${subsys}$i"
--		_nvme_disconnect_subsys "${subsys}$i" >> "${FULL}" 2>&1
-+		_nvme_disconnect_subsys "${subsys}$i"
- 		_remove_nvmet_subsystem_from_port "${port}" "${subsys}$i"
- 		_remove_nvmet_subsystem "${subsys}$i"
- 		_remove_nvmet_host "${def_hostnqn}"
-diff --git a/tests/nvme/033.out b/tests/nvme/033.out
-index eb508be..9648c73 100644
---- a/tests/nvme/033.out
-+++ b/tests/nvme/033.out
-@@ -1,3 +1,2 @@
- Running nvme/033
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/034.out b/tests/nvme/034.out
-index 0a7bd2f..5c851b4 100644
---- a/tests/nvme/034.out
-+++ b/tests/nvme/034.out
-@@ -1,3 +1,2 @@
- Running nvme/034
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/035.out b/tests/nvme/035.out
-index a602713..455110c 100644
---- a/tests/nvme/035.out
-+++ b/tests/nvme/035.out
-@@ -1,3 +1,2 @@
- Running nvme/035
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/036.out b/tests/nvme/036.out
-index d294f86..58676b1 100644
---- a/tests/nvme/036.out
-+++ b/tests/nvme/036.out
-@@ -1,3 +1,2 @@
- Running nvme/036
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/037 b/tests/nvme/037
-index a2815b3..b1ebe1e 100755
---- a/tests/nvme/037
-+++ b/tests/nvme/037
-@@ -26,7 +26,7 @@ test_device() {
- 		nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" \
- 				"${subsys}${i}")
- 
--		_nvme_disconnect_subsys "${subsys}${i}" >>"${FULL}" 2>&1
-+		_nvme_disconnect_subsys "${subsys}${i}"
- 		_nvmet_passthru_target_cleanup "${subsys}${i}"
- 	done
- 
-diff --git a/tests/nvme/041.out b/tests/nvme/041.out
-index efee74c..1204173 100644
---- a/tests/nvme/041.out
-+++ b/tests/nvme/041.out
-@@ -1,6 +1,4 @@
- Running nvme/041
- Test unauthenticated connection (should fail)
--NQN:blktests-subsystem-1 disconnected 0 controller(s)
- Test authenticated connection
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/042.out b/tests/nvme/042.out
-index 7d3d21a..1c3fc61 100644
---- a/tests/nvme/042.out
-+++ b/tests/nvme/042.out
-@@ -1,16 +1,9 @@
- Running nvme/042
- Testing hmac 0
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing hmac 1
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing hmac 2
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing hmac 3
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing key length 32
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing key length 48
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing key length 64
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/043.out b/tests/nvme/043.out
-index 7419f91..f3f55a4 100644
---- a/tests/nvme/043.out
-+++ b/tests/nvme/043.out
-@@ -1,18 +1,10 @@
- Running nvme/043
- Testing hash hmac(sha256)
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing hash hmac(sha384)
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing hash hmac(sha512)
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing DH group ffdhe2048
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing DH group ffdhe3072
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing DH group ffdhe4096
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing DH group ffdhe6144
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Testing DH group ffdhe8192
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/044.out b/tests/nvme/044.out
-index 53fdbe1..00bdcdb 100644
---- a/tests/nvme/044.out
-+++ b/tests/nvme/044.out
-@@ -1,10 +1,6 @@
- Running nvme/044
- Test host authentication
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test invalid ctrl authentication (should fail)
--NQN:blktests-subsystem-1 disconnected 0 controller(s)
- Test valid ctrl authentication
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test invalid ctrl key (should fail)
--NQN:blktests-subsystem-1 disconnected 0 controller(s)
- Test complete
-diff --git a/tests/nvme/045.out b/tests/nvme/045.out
-index 48f7e6b..565c563 100644
---- a/tests/nvme/045.out
-+++ b/tests/nvme/045.out
-@@ -8,5 +8,4 @@ Change DH group to ffdhe8192
- Re-authenticate with changed DH group
- Change hash to hmac(sha512)
- Re-authenticate with changed hash
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
-diff --git a/tests/nvme/047 b/tests/nvme/047
-index 94d7d50..f5fb9f2 100755
---- a/tests/nvme/047
-+++ b/tests/nvme/047
-@@ -35,7 +35,7 @@ test() {
- 	rand_io_size="$(_nvme_calc_rand_io_size 4M)"
- 	_run_fio_rand_io --filename="/dev/${nvmedev}n1" --size="${rand_io_size}"
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
- 		--nr-write-queues 1 \
-@@ -43,7 +43,7 @@ test() {
- 
- 	_run_fio_rand_io --filename="/dev/${nvmedev}n1" --size="${rand_io_size}"
- 
--	_nvme_disconnect_subsys "${def_subsysnqn}" >> "$FULL" 2>&1
-+	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
- 
-diff --git a/tests/nvme/048.out b/tests/nvme/048.out
-index 7f986ef..65ffa47 100644
---- a/tests/nvme/048.out
-+++ b/tests/nvme/048.out
-@@ -1,3 +1,2 @@
- Running nvme/048
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
+ 	local dev="/dev/${nvmedev}n1"
+ 	test_user_io "$dev" 1 512 > "$FULL" 2>&1 || echo FAIL
+diff --git a/tests/nvme/029.out b/tests/nvme/029.out
+index 0021003..745f142 100644
+--- a/tests/nvme/029.out
++++ b/tests/nvme/029.out
+@@ -1,4 +1,2 @@
+ Running nvme/029
+-91fdba0d-f87b-4c25-b80f-db7be1418b9e
+-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
  Test complete
 diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 4452274..7c6c303 100644
+index 1cff522..4452274 100644
 --- a/tests/nvme/rc
 +++ b/tests/nvme/rc
-@@ -430,7 +430,7 @@ _nvme_disconnect_ctrl() {
- _nvme_disconnect_subsys() {
- 	local subsysnqn="$1"
- 
--	nvme disconnect -n "${subsysnqn}"
-+	nvme disconnect -n "${subsysnqn}" >> "$FULL" 2>&1
+@@ -959,6 +959,30 @@ _check_genctr() {
+ 	echo "${genctr}"
  }
  
- _nvme_connect_subsys() {
++_check_uuid() {
++	local nvmedev=$1
++	local nr_nsid=0
++
++	for ns in "/sys/block/${nvmedev}n"* ; do
++		[ -e "${ns}/wwid" ] || continue
++		nr_nsid=$((nr_nsid + 1))
++		[ -e "${ns}/uuid" ] || continue
++		uuid=$(cat "${ns}/uuid")
++		wwid=$(cat "${ns}/wwid")
++		if [ "${uuid}" != "${wwid#uuid.}" ]; then
++			echo "UUID ${uuid} mismatch (wwid ${wwid})"
++			return 1
++		elif [ "${uuid}" != "${def_subsys_uuid}" ]; then
++			echo "UUID ${uuid} mismatch with ${def_subsys_uuid})"
++			return 1
++		fi
++	done
++	if [ $nr_nsid -eq 0 ] ; then
++		echo "No namespaces found"
++		return 1
++	fi
++}
++
+ declare -A NS_DEV_FAULT_INJECT_SAVE
+ declare -A CTRL_DEV_FAULT_INJECT_SAVE
+ 
 -- 
 2.41.0
 
