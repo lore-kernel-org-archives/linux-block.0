@@ -1,53 +1,54 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB76CA6C
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 06:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D7ED266
+	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 07:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ceBZNOaY"
-Received: from out203-205-221-192.mail.qq.com (out203-205-221-192.mail.qq.com [203.205.221.192])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9701989;
-	Tue,  7 Nov 2023 22:59:45 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Q+GdpZz0"
+X-Greylist: delayed 157 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Nov 2023 23:07:08 PST
+Received: from out203-205-221-242.mail.qq.com (out203-205-221-242.mail.qq.com [203.205.221.242])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448E410D3;
+	Tue,  7 Nov 2023 23:07:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1699426782; bh=jwb1s6BdmK/eBLbgQTraLTMZRylWtwUjWZChOl9ziE0=;
+	t=1699427226; bh=6QRXC/jRCK6v3iW6/MujzifYFAs4A/s8xRoN+wE/wAA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ceBZNOaYKFcdW85aMz675MAweR+sKZFtsLbgdnStA7QPIqwrltu+/Rh0gx6Avm2Ua
-	 +2T2bGAq8FKlJ8knk7vgTnwDdIp6klPwSVloDM9+1A17MmDivplifm/Og8tS+8Yw9j
-	 j+mXS6g6pi4eo9hJ3LR8qoN578S/u2+F0v6k8gHI=
+	b=Q+GdpZz0u7guWlMzmz0/Vqa+APcrDweDBKGFFAeJwkLmL++9ePVjAmjIcVsCGI6ff
+	 MI67smGEXYuFHyRFychvQHvs+tw5l3Icyni7GPnYwLTM7qlpU+gt6aki6hoiqyyjXP
+	 yTVdo1XIc95KloHF+1QHXNeq7Ak9YJUwr7LGg5to=
 Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
-	id EE7AE8A2; Wed, 08 Nov 2023 14:59:39 +0800
-X-QQ-mid: xmsmtpt1699426779t7xjzjoo0
-Message-ID: <tencent_6E1A9EAE1BB04B3A1B592506BAEABB313308@qq.com>
-X-QQ-XMAILINFO: OW5M9fEmm+WRH3xryyrai3s7qa0iRol32PfZBYEBMOQnrm7zZNGnz77lFag3cq
-	 BWQpTZCiZGxv/Ld7TqpZTLSJca8vRD3fTclJoM99K308NtToQ/TKnR9AU6vj41N2UbL1i2yK6Da5
-	 E7B7TWTBBbrb4SzMPk/shV/tJL5TAaUG/i0qkqWiz+ACT/d6ZjyuR/hJUU0WMwZkWSRVcs80fTBB
-	 ZygS/DORRY/1mxn7vA5KckVtE7SYwy6ZlQxviuYt+FaZMYtSMBAg7F3OrW96XzKQQfXTmeUg2yaf
-	 +NFpyYFIRiTjoFcn6RfAEdThPdwUfX7DTiAUeT91zyzt+oMFyKTnl02gHn91mDraNh7Co3lYlk8P
-	 WwOCTSuEIEmmW2/MIBiZ7WEgIjLJS1FLzoTu/Zs/q6ajOvzb7J+pwO5AOOGyT2Hh3Laky1FH33bz
-	 SEL0iC1gtnycAKe2IYStYIvfy8Mv3o/zADFZOAhiwfj5VOjmA/RvMCQcToZEPxhELBc/3eP7hls1
-	 vvoyL4jXKuQ9asZGanevmX1wteknFb98beXnOcd7kqtAEyp5h5TVzWdjj42kH5z+h6TCRnu3T/QL
-	 0Bt8+rvI9HS6xFM9JXnbvrUIOXs0UED96nCSNjm+klgsPeJNwU4VPWKtQbjxKNRVIo3r45gUEEyo
-	 k6ZoT6Rq9SfsRsDhN5B9QZjWjrez0st75frGnWeo1uVNub3tFJjB/Th2lgYW9J4HoeiVqEa2sQ4B
-	 YKHCf26XAPmPTUJP4q274cbP3PjgvjD0kexKZ2OAIlZK6Z7D8T3shb4vwl0EfSlkeJIJ3b6sQiS6
-	 40lQfJplsT/06vc9nk0drEuIBtNBnFjJ37kGw+Py4mQ6/KP8yg+Sac4NGDrwZupKoDj+QXrinOBo
-	 7Q5HAiq0XOvsgUZcp5h01xjrKHenmF9gSWZPi8kY+2W4OlXuzmKCG5tWGIYAILGCNVR9iWVnfbnU
-	 8mHY/uiJJBnLNPtAfygY8FkHfnb3rcoSdqqDAxfH1Ws7aH5UfSsg==
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+	by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
+	id 1C33AEA0; Wed, 08 Nov 2023 15:07:03 +0800
+X-QQ-mid: xmsmtpt1699427223trgln31s4
+Message-ID: <tencent_75EE2562BAB7BB5A337A9E2F1B054B421B08@qq.com>
+X-QQ-XMAILINFO: NQR8mRxMnur9R6IjZziZUrfQR6jw3DJCNAZtAQIhtA+WwfNQJQEmzmip1PmYVv
+	 mZhHQMmkVFlswb4oa+HEXOJ1yucc7j8e0/53LwyH80KqTiPAHS+ZX1B5aBirfc9lIayAYFRul+zo
+	 B1Q/DeqIy/Or82EJpthSN7Pm2ODhctWu8Yv/fgbKtdL/tUc3SOh9tz+tdqbFTBE6+w593LqTejoV
+	 YE/CV0nFivjfUT3l/lM7Q0XlrzJw98H4M4rw7IlttCliuUNz5YXBjHTN8lKjXVD119swvWcB93gR
+	 HUAlf47W6CgHEIAUXRcxikRl+ZddnEul8ZulH1Vl1yNIpriUgp6qfhfasxHHog602QopehW/7zn1
+	 YXK4eZewtYkNdGEb3cTJHr54OKERIXZ+vL0LgI5Q3L8Zx367BJcj1T2y0orQ7Y3PsZf2R/s1PnCk
+	 QRRnncbCHIQ5RhleSi1znKONVuSQ+fHT0NDWjmvSAIgr8OA25ixLWeJ5C/4z/l5ryhWCo33cUdgh
+	 NTm/2jUA0kaly0kZilLdlxUemvZPD/1fVV+yged/nn/PgBg57WwN2okZ0zpSngrSzs6q7TE7rKEz
+	 P2wqU192TinhBCp/+sNLyBmD2rpfKOj6kKAyNPM860PxMEVVi3+PVOlevs2JQUB4Z36GlYPRCS0b
+	 J5L/v2xy11qovnyuFhgNd8Bci8XpflTalGtbf0GjTHaSSVl4Kr2sDH9P0Od+MaYP1XwNFmkSfxzZ
+	 aaon1bnVrrexEG2dbr6ZXqXYp0DoHGyfg2KB8P17jbp8V6eTy38Zq5lcSONWqx21vxWLWjD/0sR3
+	 kd4f9zfQDvJ/pjBzIy24BOtYrsPCdk3oMPBQJ3rM/HoX0YeHNTc4kssktuwhLUqB5YtctPKsuvMi
+	 960qPVpWM7YC1PWAjRiXAkhKBpbbFAh/0OtS+dHOxk6jVhmO9MEJprMUAEqmUfU23hj6hRx+DUEC
+	 UxpAPVr8b1VitZJy7Fog==
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
 From: Edward Adam Davis <eadavis@qq.com>
-To: bvanassche@acm.org
+To: chaitanyak@nvidia.com
 Cc: axboe@kernel.dk,
 	eadavis@qq.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com,
 	syzkaller-bugs@googlegroups.com
-Subject: [PATCH V2] blk-mq: fix warning in blk_mq_start_request
-Date: Wed,  8 Nov 2023 14:59:40 +0800
-X-OQ-MSGID: <20231108065939.1489316-2-eadavis@qq.com>
+Subject: Re: [PATCH] null_blk: fix warning in blk_mq_start_request
+Date: Wed,  8 Nov 2023 15:07:04 +0800
+X-OQ-MSGID: <20231108070703.1503741-2-eadavis@qq.com>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <25a94b23-b42b-49fc-a1c8-3e635f536aae@acm.org>
-References: <25a94b23-b42b-49fc-a1c8-3e635f536aae@acm.org>
+In-Reply-To: <c2eee1f6-c060-4fd3-b161-2ce98a778b89@nvidia.com>
+References: <c2eee1f6-c060-4fd3-b161-2ce98a778b89@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,27 +57,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Before call queue_rq(), initialize rq->state to MQ_RQ_IDLE.
+On Wed, 8 Nov 2023 06:40:38 +0000 Chaitanya Kulkarni wrote:
+>> Before call blk_mq_start_request() in null_queue_rq(), initialize rq->state to
+>> MQ_RQ_IDLE.
+>>
+>> Reported-and-tested-by: syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
+>> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+>> ---
+>
+>do you have the actual report from syzkaller ?
+you mean these?
+https://lore.kernel.org/all/0000000000006510b406099a92ea@google.com/
+https://lore.kernel.org/all/000000000000f0db9606099e70a1@google.com/
 
-Reported-and-tested-by: syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- block/blk-mq.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e2d11183f62e..26f2921cbc50 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2575,6 +2575,8 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	 * Any other error (busy), just add it to our list as we
- 	 * previously would have done.
- 	 */
-+	if (READ_ONCE(rq->state))
-+		WRITE_ONCE(rq->state, MQ_RQ_IDLE);
- 	ret = q->mq_ops->queue_rq(hctx, &bd);
- 	switch (ret) {
- 	case BLK_STS_OK:
--- 
-2.25.1
+edward
 
