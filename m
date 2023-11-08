@@ -1,134 +1,135 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355646AAD
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 06:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B75D2CA6
+	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 06:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Zt02oOUM"
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F6A185;
-	Tue,  7 Nov 2023 22:40:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cfCC2Ai5JOpv9V6ACYLmnbjXztjxn0VMKR8tlhulxVWt1x7G7E21TiMSdHAJfW/rLjHH8u7kThwe2omTMavir2fuZ+Vf3fKfQudkjirDVoXp/UBfId9+W/oeJU49jfmBKkRU4HG7C7SyggEZi7zIof+lSKjzJZwffoZ/ixse74lxtXxMtMNrZABPRtj0wKn6j0lWgggRMmKejj4PuSj5hj6sZ2guokebMXEbBXuXY9jvCII+3f42f5V/L+LoC8FjL+gaRBV3yOwMfQANiexGgi3+q/hnr1JhBgx5k9CUzf1mSbw21zF9CkVO9jHIIlAJzAHzDB1ilus+NzRijXQ+7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vw5X6Zj6LXOVgS6TrDRtGJePdq6Kt700Hd24ubzIb3I=;
- b=jUnjdmSa9/T3Y+wG29nmT9B4kZ/cLosUZmMUuYvHgQHLa+gv8dZ+Uw5RsY+SHZJD61XugttLCxhoUpi3cezCO8dM2PHyLX76dT2rdXTTSB3YWqtyab8mV4Ml6/5e6NWHywuNAfC88b2pzeFkX40BSvPwgNsoZxso/VL3EKzBFTSZ/5pEH5Y00+Lw85cm7jSl/ijjUzzcovnQFmiCO+pXW+ObmeA3FlYr4c5YoaECN8ffD1Q38WFfeWGQLfclmfPOF+y75mtaSWECert+r8l9hHn8zukHBlaNXvOHqfuuZg8Tr3nKLrVIynqllBlzFhr5vSBAxTsgWBwuHHt0Pg2CeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vw5X6Zj6LXOVgS6TrDRtGJePdq6Kt700Hd24ubzIb3I=;
- b=Zt02oOUMTFb7TD8UbkPevAt2/fcTdszu+PENA/+Si6cEC95buYhkYKqLQBNfE3vgp/eltCzPrUPTHNquCrR01zkkvumatwpXAXiMLeARE8tDlcOPHquircnipEaDyptbzAq7i9KsMxtrrJ91ae8GQsXCqcgvUW+jkxLxVq64mCFTO73AvW8qRVDFCYZGCPtCsrz5nmWrJt0oDx5lQPMwOAyTSV7v5dkCFwTm1ytNjL8FPoyX/R2Y0b8m1Zb/VLUYCl62AVl9s/kfPJgxqJVnv/Z7tOHpUsxujKRnTbS2lSD6tOpmf+BNI47sGMEh7LtFg4qI5sHmu5dBwpZE+E7eNA==
-Received: from CYXPR12MB9386.namprd12.prod.outlook.com (2603:10b6:930:de::20)
- by DM6PR12MB4385.namprd12.prod.outlook.com (2603:10b6:5:2a6::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.29; Wed, 8 Nov
- 2023 06:40:38 +0000
-Received: from CYXPR12MB9386.namprd12.prod.outlook.com
- ([fe80::78d0:a51c:4795:9f64]) by CYXPR12MB9386.namprd12.prod.outlook.com
- ([fe80::78d0:a51c:4795:9f64%4]) with mapi id 15.20.6954.028; Wed, 8 Nov 2023
- 06:40:38 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Edward Adam Davis <eadavis@qq.com>,
-	"syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com"
-	<syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com>
-CC: "axboe@kernel.dk" <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "syzkaller-bugs@googlegroups.com"
-	<syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH] null_blk: fix warning in blk_mq_start_request
-Thread-Topic: [PATCH] null_blk: fix warning in blk_mq_start_request
-Thread-Index: AQHaEe758r95S8dmJEebn2yZ4dl9U7Bv+RuA
-Date: Wed, 8 Nov 2023 06:40:38 +0000
-Message-ID: <c2eee1f6-c060-4fd3-b161-2ce98a778b89@nvidia.com>
-References: <0000000000000e6aac06098aee0c@google.com>
- <tencent_03A5938DE6921DDDE9DD921956CFAD0DE007@qq.com>
-In-Reply-To: <tencent_03A5938DE6921DDDE9DD921956CFAD0DE007@qq.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYXPR12MB9386:EE_|DM6PR12MB4385:EE_
-x-ms-office365-filtering-correlation-id: 488f1681-6b8a-4acf-8d33-08dbe0259e7f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 8hGZZpVUj2gBot0sCyAeymHIHudb7hs3lZ6Y/2wAF46pKN97x12ecJL8M/9cu9etFYJiMr5aN4JQK6L4xtZ7d2fmXD9BI7RGZPl404AkhMEl+oTxIQNK9g2Z1KTOf8kbbvgWBdg99qNYXJwtMiemZcocas7i78iz/oow7nFpKGr2mrhLBOLDFXd6Aumin2g7nbjL0T3d0Vg0teNri/OjI9G9vZJH9PJtR69QU2ddkWoncyLciScfzD5Hir/NptunaFwSd6uFj7yULJrGnydzFAg6ot/LKlaeIFonNa0APYzxKLKIgFJ61wiTUKE2zt18+r5QDSBcUTrX5m91x7mDCNCXpjEdCYi26hFjOa9Th8NXjdi8Qc3whICgBbrdn3EEF/ssrp/1/0kBg41Kb80BY4EynTP/7xwXkYiAZAbo+pcq1fpbOPUW0ai3iLhQqyrZ5rpA/fyccHnmAvMjvqC9n0Bpyv62JBW7zuPYK23+hkvJlz2ATGHLOrLgk2R5AT0FdDQfqUaOM4udtTG2l731obHv+jyA59IPkgRwdLgGt9k7fgc5Ltf9BdknIKnCmqj0umPLlCwrx4bHmobz4E6+rS1n5nWHL/ZdsW1+89oVsgnYm7/wuofwdh4ru2MQWpM6oPATWYtdTJ90e2uhkBjbN0LPJcBAjg+ZRC3xv1WSpnrrvdxCY9sQt8JeIy5X8Otr
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYXPR12MB9386.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(376002)(366004)(396003)(136003)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(122000001)(2616005)(6512007)(31696002)(6486002)(478600001)(36756003)(110136005)(66446008)(64756008)(66476007)(54906003)(66946007)(66556008)(76116006)(316002)(91956017)(38070700009)(53546011)(6506007)(71200400001)(8676002)(4326008)(8936002)(2906002)(38100700002)(4744005)(41300700001)(5660300002)(86362001)(83380400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?cHplUTBMZlhXUWc0dTN2YmtrN2pSWHZvTUQrWlVKUy9EMmdUaE1KTCt4RVIx?=
- =?utf-8?B?Y1lnZmlvTExlRXJqT3hWclRmM09zMjBmcThoSk11bnlKejNIeitjTVd5MHR0?=
- =?utf-8?B?bWp3K2RlVGloZFVkN2x6VTR4QmN2bkZkSndqMmJnUHVvQjg5OUQ3eGVmRzdk?=
- =?utf-8?B?QUlQVXU2VVRkeVZ3N3IzUGE5dTkzb3M3K1ZYZ3BOQUNNbEhGcXdoTUx4K01k?=
- =?utf-8?B?aEFJNTkzNU8vditnZDhmY214aXVvdldNQXFhSEQ5UGpQU083Qk9teGhIUjN1?=
- =?utf-8?B?UW1pTnRPQnZTRHZFcndyeEtrTzlnY1BCR0xMYjZvQ3duZS9Fc3B0KzU5cXJ5?=
- =?utf-8?B?UmdmbHc2R1JCR0IxdTVuK21KaGZmSzZ3RXZQS2lBeDV0aElMenZ5Q2RvNmp2?=
- =?utf-8?B?OVhmSVB0cENBTStzZEZ3QnZkYmdTUkpQMEU5UksxdFJHZ0hYTnRGUTdTcjBx?=
- =?utf-8?B?ZzhCRXFza2pDTHJVZ2VCSEFRTEwwU2RISG1BTGk1QXFYbS9tWmJqYjFFNThR?=
- =?utf-8?B?czIvUm5Qc1FWdDVLd3J3d25rOVRYQWgzaFlxbitGckVHVS84UFZGOS9USTg0?=
- =?utf-8?B?V0pNWUJGaUplRWpLM0N0WUh2b1BYekw1bk1WV1ArdnhJVTZ6aWNXVGgxQ1p6?=
- =?utf-8?B?cWZSYUQwZ0M4RWZRa1V6U0srQU5NYWQzOStSWXBtVithd2dKcHYvdHMybmQ3?=
- =?utf-8?B?YlhyS2l3TWFjeGtFZTZaanZnbmxxd29YemYraFZqejYyWWJDQTZiUHI0THRw?=
- =?utf-8?B?aXBEenUrbmt2SHhZaWx1OFgxR3B4S1pRb05MdGxneUFiWjkrUTArVS9XR0w1?=
- =?utf-8?B?UGthM1N2ajVSNldtM2xFQjFLTStsZUt1bWU3NE04OUdrQUI0MzN4bW05UGFy?=
- =?utf-8?B?TEtPSVh0RHA0ZnVKU1cxR1c5c2l1R1dhTUJWSFBFR1U0cUdIWHh0SnNLVVhZ?=
- =?utf-8?B?NERGQVQ5RkhNcU5YaGUwamRucUNBOXl0dWVHVnVKY3lkck5SanJsVld2R05F?=
- =?utf-8?B?dFlHdGRXUjJjUXlILzM2T0NrcWwvTGZxR0d3cUo2OXFxdEVmMFVTdUgyd2JY?=
- =?utf-8?B?NDM0ZHJISGVmY0Z2Zk5UN0pHcGlwWDVIMnIrdi9hbzlhMUNrMnkyR2ZPaHFn?=
- =?utf-8?B?dXBiUnJ6c3pGZE9ob0xrd1NxRUVEL2tCZ1NvUVNtdnhWUUlGQnNxbTE3eThr?=
- =?utf-8?B?dlgyWklZbHJHWG5pZ1hZOHpiZ3Q0R1FleG94cmJNdVF2UC80dExEbHZwbktD?=
- =?utf-8?B?MHFtaThUeEd4QitrNlJmaWNZMUxaRk9mN2hEbjBEVWNlbUk0OHowKzE2Z3JW?=
- =?utf-8?B?UmJ3dmdwK25nazk0MisxdFFJZjc0ZVhFd1lNMzVjUG9udm9SQkh1SThRTFBD?=
- =?utf-8?B?MDRQaHRoeW95d2VuNHBSSGZsUGRPZlRCYVJDbEZtRTV1ZnhEUGhCRklsTlBN?=
- =?utf-8?B?ekN4NG1zU0hmbjNzc1lzNGd1UjF2RDNZbUpyL3dqT0JRdjc5cndQcytEdE5N?=
- =?utf-8?B?WXpYQno1OFZRNWlMUzYzeDZ1cE4xN1lGY2VTRngwZkVqVjhSZHloUVBUTm5z?=
- =?utf-8?B?RVB5VTNHMGtDYy9ZTVpDYkZVeXFocTBJMzNyTTFCcVZ2MmwvcXZBTFVGcnhH?=
- =?utf-8?B?SG1HYjBTQlBTaWgyclJqa01oR2M3aisxSG95RG1TdWJPMEwyNDFyY0JhZ2xT?=
- =?utf-8?B?emFsVkN2c0dxdCs0MlhOMWVwR2NXY1h5cW8rYXdidUNZa2FjcUdCd1FoaFBF?=
- =?utf-8?B?WENxOUc1QmMwa3IzUzZoc1lNT3FicGdHWlBVbStua0pEd2RidlpZSDhtNzNM?=
- =?utf-8?B?N1ZBbW02RVNjK2R0bGpVU2RKRDlQNEFvY2Rhb3pUeEFMS3NMR3YxUVNweTlS?=
- =?utf-8?B?OFhOZ1NGUDhDRlFpcFFqT1JieU9wbkdJS2NjNkdvUUFneGU3MDdHc21vU0hs?=
- =?utf-8?B?M2tYeCs3NGthWFJuSFh6U0dDbnZrWDJOeUNUdmFQZEtQcVFMd0tJbUQxclZJ?=
- =?utf-8?B?T3dEL3RSNmtyaWJmZ1NRNWZiUFhsdEJTSHhIK29obVJlNjVVOSszOVUyRm1l?=
- =?utf-8?B?YW82N1JHcVBxUVlpa3F4ZEFOVU5PWnloRDg0Ti9Gb0tWSERaRnBWUWNVQkJQ?=
- =?utf-8?B?d01MK0gybitDM1pmc0tZbDd3YVpxaWVVOU1RS3VXRDRYWjhtYmx6bzhleTR0?=
- =?utf-8?Q?i01DZX3x7E4ineGbNUkiVp3Rw0qx16I7YyFbQ2mWr88c?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3BB948CD40829B4E9BDEACE4C3792B03@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YV2ucJK1"
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08ED28F
+	for <linux-block@vger.kernel.org>; Tue,  7 Nov 2023 22:47:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1699426076; x=1730962076;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AuLEQId7sKW9FEIAlwUYpzGQPwGNoby4mB8sQwyNPIY=;
+  b=YV2ucJK10LBndJvdkp8LUNOH1VayHftl+r0ZljelkYo6J6N7QXUqgv45
+   qRP+Vtpg2jTrFEyG6LFPZG/spd3VVZtBS6PyoNr721vo4j/Y38/fLFrHQ
+   VBk40SvyJkfdkvatZWp8tEEalPXXzg/mx0Py96ZcC8GGlvKrBlIsfftWP
+   UObmIu150B46Iat83A960wKZH7PUGFG+7Gclz9tq4e51e4OXlAbQjbTjg
+   5TiUkFYUbeN7Zd+8mf1pqH3TvT5w26zF3dqe/vjVGdIJLmpMYvaiBBT87
+   /yzuXkhWcxb2VeumAVGSvHUN4c1UFIYcdzdQl0GgRYaqEzS1u2Qs7vUaV
+   A==;
+X-CSE-ConnectionGUID: fY72M88uR8mwDuJkb2aaTQ==
+X-CSE-MsgGUID: IG4G3+MiQueq8RplRG6Gfg==
+X-IronPort-AV: E=Sophos;i="6.03,285,1694707200"; 
+   d="scan'208";a="1616002"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2023 14:47:55 +0800
+IronPort-SDR: l4jYJm69BKkT7qIbDFpqaD2bUDBQ9Ml/rUWDrFacUfyLLUuefQW3VWm7T1QLZm9eqcCrBnbepD
+ FDM403atTJpgfU7hF4Zyf6dZIhclylgU3c4qfVyvViJizFyT5Aocr4X0/I2iXYjBbkt4YnshS1
+ a993JM2618kaVEZJuXnlKptt7YC3Y/2OvmLx9NJblAeXnKsXHxQM3yA2O5Qg7LH0SogQ6Z4FCc
+ USGJDIKvIZ1pG69ZFbxN6oxlLWLQCU+pU1DPON1Lz3bqLEYyUC9oZprMoUKD6msfn9H5z50Lq6
+ ztw=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2023 21:53:50 -0800
+IronPort-SDR: 0fmUHDIK2utaiN/GvvQNaqUEXgo6Y94hM6jLmRgIsZ+BEqSHkM+O6PWzQW4yhxjQVgiBHd8O0F
+ 1kpOch6J0nLKnBgoAW22IzpTu+4OqkpnlaZr9OAiADWG4sqiGRfNtBb6NHFL68LLfIHF5tzCBW
+ 1YRTCuqCXt8EqzlCNAXDF/oE7rwyLnsvdjkG2zDEkPfqvNrSuTyQml7nV993etwyH8+TdYWkjR
+ kr0X5F7vyb9EEzAaRt2SU1c/GGP7xsbWOf3A5jqU2NZ8FWkJ6A+m8pHeS+oqpXjJ5jrxakY7i0
+ 8jE=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
+  by uls-op-cesaip01.wdc.com with ESMTP; 07 Nov 2023 22:47:54 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Cc: Hannes Reinecke <hare@suse.de>,
+	Daniel Wagner <dwagern@suse.de>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 0/2] nvme: Allow for pre-defined UUID and subsystem NQN
+Date: Wed,  8 Nov 2023 15:47:51 +0900
+Message-ID: <20231108064753.1932632-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYXPR12MB9386.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 488f1681-6b8a-4acf-8d33-08dbe0259e7f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2023 06:40:38.0137
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LEN+oBtLSe5iXZEB51dER6SftfMlTlVhQKOgn8NZ166IfhceEON2llb5dQLn+Lhe2uL8jgr/NcEAoyZSHp78ZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4385
+Content-Transfer-Encoding: 8bit
 
-T24gMTEvNy8yMDIzIDY6NDYgUE0sIEVkd2FyZCBBZGFtIERhdmlzIHdyb3RlOg0KPiBCZWZvcmUg
-Y2FsbCBibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGluIG51bGxfcXVldWVfcnEoKSwgaW5pdGlhbGl6
-ZSBycS0+c3RhdGUgdG8NCj4gTVFfUlFfSURMRS4NCj4gDQo+IFJlcG9ydGVkLWFuZC10ZXN0ZWQt
-Ynk6IHN5emJvdCtmY2M0N2JhMjQ3NjU3MGNiYmViMEBzeXprYWxsZXIuYXBwc3BvdG1haWwuY29t
-DQo+IFNpZ25lZC1vZmYtYnk6IEVkd2FyZCBBZGFtIERhdmlzIDxlYWRhdmlzQHFxLmNvbT4NCj4g
-LS0tDQoNCmRvIHlvdSBoYXZlIHRoZSBhY3R1YWwgcmVwb3J0IGZyb20gc3l6a2FsbGVyID8NCg0K
-LWNrDQoNCg0K
+In the discussion to run nvme test group with real RDMA hardware, Hannes pointed
+out that pre-defined UUID and subsystem NQN will be obstacles. To address them,
+he created two patches in a PR [1]. I post the patches here for review by linux-
+nvme and linux-block members.
+
+[1] https://github.com/osandov/blktests/pull/127
+
+Hannes Reinecke (2):
+  nvme: do not print UUID to log files
+  nvme: do not print subsystem NQN to stdout
+
+ tests/nvme/003.out |  1 -
+ tests/nvme/004     |  3 +--
+ tests/nvme/004.out |  3 ---
+ tests/nvme/008     |  3 +--
+ tests/nvme/008.out |  3 ---
+ tests/nvme/009     |  3 +--
+ tests/nvme/009.out |  3 ---
+ tests/nvme/010     |  3 +--
+ tests/nvme/010.out |  3 ---
+ tests/nvme/011     |  3 +--
+ tests/nvme/011.out |  3 ---
+ tests/nvme/012     |  3 +--
+ tests/nvme/012.out |  3 ---
+ tests/nvme/013     |  3 +--
+ tests/nvme/013.out |  3 ---
+ tests/nvme/014     |  3 +--
+ tests/nvme/014.out |  3 ---
+ tests/nvme/015     |  3 +--
+ tests/nvme/015.out |  3 ---
+ tests/nvme/018     |  3 +--
+ tests/nvme/018.out |  3 ---
+ tests/nvme/019     |  3 +--
+ tests/nvme/019.out |  3 ---
+ tests/nvme/020     |  3 +--
+ tests/nvme/020.out |  3 ---
+ tests/nvme/021     |  5 ++---
+ tests/nvme/021.out |  2 --
+ tests/nvme/022     |  5 ++---
+ tests/nvme/022.out |  2 --
+ tests/nvme/023     |  5 ++---
+ tests/nvme/023.out |  2 --
+ tests/nvme/024     |  5 ++---
+ tests/nvme/024.out |  2 --
+ tests/nvme/025     |  5 ++---
+ tests/nvme/025.out |  2 --
+ tests/nvme/026     |  5 ++---
+ tests/nvme/026.out |  2 --
+ tests/nvme/027     |  5 ++---
+ tests/nvme/027.out |  2 --
+ tests/nvme/028     |  5 ++---
+ tests/nvme/028.out |  2 --
+ tests/nvme/029     |  5 ++---
+ tests/nvme/029.out |  2 --
+ tests/nvme/031     |  2 +-
+ tests/nvme/033.out |  1 -
+ tests/nvme/034.out |  1 -
+ tests/nvme/035.out |  1 -
+ tests/nvme/036.out |  1 -
+ tests/nvme/037     |  2 +-
+ tests/nvme/041.out |  2 --
+ tests/nvme/042.out |  7 -------
+ tests/nvme/043.out |  8 --------
+ tests/nvme/044.out |  4 ----
+ tests/nvme/045.out |  1 -
+ tests/nvme/047     |  4 ++--
+ tests/nvme/048.out |  1 -
+ tests/nvme/rc      | 26 +++++++++++++++++++++++++-
+ 57 files changed, 59 insertions(+), 138 deletions(-)
+
+-- 
+2.41.0
+
