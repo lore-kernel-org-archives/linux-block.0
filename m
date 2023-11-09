@@ -1,165 +1,263 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D0A4C8F
-	for <linux-block@vger.kernel.org>; Thu,  9 Nov 2023 02:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02E9DF6A
+	for <linux-block@vger.kernel.org>; Thu,  9 Nov 2023 07:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hFYjm1Pg"
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 625A625BC
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 18:51:27 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id 3f1490d57ef6-da2b9211dc0so418325276.3
-        for <linux-block@vger.kernel.org>; Wed, 08 Nov 2023 18:51:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699498286; x=1700103086; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KT6Cay0LN4XhYV9VHywOzWodCz2FB/Zo1Ej6c/2BK1Y=;
-        b=hFYjm1Pg4ZY3/V5ddu4QBVpYddXZA0rjeKzOt8gx34f1hHAPXmuDLNAQegzZCc95Wn
-         m671RLNAt4c6FvCpsaYy4xA7j0cATnrfCv6Y/ZaSlPjXX1S+QtU8uTsoku/SG9BUFXO6
-         zpXfvZftkD9wR5c2vNFNpzo/r11zwaDKdUNLP+kT9xmYJpSwK897tdj/E58tG3o9dPAE
-         cNAMrQBqjWAU3dyeaUnZW0W1XbAsODNRlmbNYwx9BIKn6k/gNtQxZj0JG5tNtURZxcob
-         9W3RACdC/WzvSAW3/wpSssiwUSoIFtA2QfPoBdpORz2hchaAMx68Y8j9kxZ6XzTMAGf4
-         FnXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699498286; x=1700103086;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KT6Cay0LN4XhYV9VHywOzWodCz2FB/Zo1Ej6c/2BK1Y=;
-        b=QByLgg5zrkqFfMDsFoUw5Wml5agCsNjd+SsN46qS0dBAfMBdzWZZjIDu2ol/s6C8Qc
-         dEDZ8vZ3mFD9VCXykkX5p+7bR89vO/bJpBPUul9U9nk6JcASppSky5w1spyxk9Eu6iNK
-         EuwHcD6ke7gRKJsseHShIpq/3fE2Q7lN/lKaFhBDbH2f5IyNzVAoDUXd9ZhAoEV4sLBP
-         O233FyNP86GBUXs0WUc4M1V1I9q1O9xTypGDp/vfrD4lYAP9Fm7B4pHn92qZJUt7Pe2k
-         XK0ubkzq0Doa5ISTNqeNSYinfvy8q9HxPFJfTIBUeBKrkOsU8edyzTbNP3BIFQ8GjNFJ
-         88/w==
-X-Gm-Message-State: AOJu0YxiNAVCC9RSUOFCjuRxIsCdb5Pao3m1UFR1dmC+bg1cNELiNWQI
-	lzO4cvRcLiPC1Za9q14TjVKq8xt3ehbWh4Z2vrf1xyqaEw/V7g==
-X-Google-Smtp-Source: AGHT+IE82npBKqpXJrvHmrDgaJNXHDyEMD0g/gJo1Bg52xnmaNLl1nQrXnth061WoRaOv+h+uTR3HeFs6IAxWiuv+qo=
-X-Received: by 2002:a25:b10:0:b0:d9a:ba4b:44ab with SMTP id
- 16-20020a250b10000000b00d9aba4b44abmr3524597ybl.61.1699498286347; Wed, 08 Nov
- 2023 18:51:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pC+MYQ0q"
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12B42271F
+	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 23:30:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=3TbkP6dPgG5rg1ywx3LROqX2NH5sWqW+beHjo4sUY+8=; b=pC+MYQ0q8CtnIJnrToXKam9cwQ
+	R9vFpPVWTQQFk9swJiA+B8rzHL+QXMA7JSq1zprZUeSSEg8/CarNDW73Co3Avg8qVI31U3KgBBQSv
+	QvsPCyKqId5woXXyYf57TsTkbhlKk5JNdpI8tWzu7MyS/tI5ZTEhJZcmp01mblizOzB/rJ7zYVG0I
+	SVfslDuV9YPTtOUhQ+S6tXrPDFbaB2K8DZKMXM6Icgdo1kCWIId4QRibmHvmKEEjzeDzj1hgk0P2W
+	AsH7w8qQ7zqC4piEEjJkvOJl0TbCLS077fC7CRwRM0Gfv/Mi5CasmSLquLqQHdRDYLj0kHLiJ3fEG
+	E/rLt6bA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1r0zUQ-005VSI-0I;
+	Thu, 09 Nov 2023 07:30:10 +0000
+Date: Wed, 8 Nov 2023 23:30:10 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Yi Zhang <yi.zhang@redhat.com>
+Subject: Re: [PATCH] blk-mq: make sure active queue usage is held for
+ bio_integrity_prep()
+Message-ID: <ZUyKggKLWnaZMRr7@infradead.org>
+References: <20231108080504.2144952-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CACoNggz0HC9pr5Q7jPWPWQoCvNhKmaj=qEifwZbzzCe8pNSEzA@mail.gmail.com>
- <CAEzrpqf5f4VwQWE_TZrwh-6LCNO+NXa53jRwMXaq9TBipidBuw@mail.gmail.com>
- <CACoNggx7ibJU6xWMn817vgi-HphwoHO1yxzBgiK9mAo9mh58nQ@mail.gmail.com>
- <CAEzrpqcUy3Ptrqz1p94NaLJWwte2BjF0OWX1Dy4os9mU=Jdz8Q@mail.gmail.com>
- <1ac905d4-d7d3-47aa-a289-580f5e2d9491@kernel.dk> <CACoNggza4F-2soCcLV+u7wmsUuKQubcNjDg4jhgKjQms_Ne10w@mail.gmail.com>
- <9870c433-d7d8-439c-95a4-f73ecfd5c47d@kernel.dk>
-In-Reply-To: <9870c433-d7d8-439c-95a4-f73ecfd5c47d@kernel.dk>
-From: Hyeonjun Ahn <guswns0863@gmail.com>
-Date: Thu, 9 Nov 2023 11:51:13 +0900
-Message-ID: <CACoNggxJiTfTd3BCNbQfySbW=D4jmCPe832cZO1XLhc0=r9C9w@mail.gmail.com>
-Subject: Re: Out of Memory in nbd_add_socket
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <josef@toxicpanda.com>, syzkaller@googlegroups.com, 
-	linux-block@vger.kernel.org
-Content-Type: multipart/mixed; boundary="000000000000a78bec0609af473a"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231108080504.2144952-1-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
---000000000000a78bec0609af473a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> +++ b/block/blk-mq.c
+> @@ -2858,11 +2858,8 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+>  	};
+>  	struct request *rq;
+>  
+> -	if (unlikely(bio_queue_enter(bio)))
+> -		return NULL;
+> -
+>  	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
+> -		goto queue_exit;
+> +		return NULL;
+>  
+>  	rq_qos_throttle(q, bio);
 
-From dcca9cecaa77cf362e694031de080540f55d6daf Mon Sep 17 00:00:00 2001
-From: Hyeonjun Ahn <guswns0863@gmail.com>
-Date: Thu, 9 Nov 2023 11:41:02 +0900
-Subject: [PATCH] nbd: limit the number of connections per config
+For clarity splitting this out might be a bit more readable.
 
-Add max_connections to prevent out-of-memory in nbd_add_socket.
+> +static inline struct request *blk_mq_cached_req(const struct request_queue *q,
+> +		const struct blk_plug *plug)
+> +{
+> +	if (plug) {
+> +		struct request *rq = rq_list_peek(&plug->cached_rq);
+> +
+> +		if (rq && rq->q == q)
+> +			return rq;
+> +	}
+> +	return NULL;
+> +}
 
-Signed-off-by: Hyeonjun Ahn <guswns0863@gmail.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Not sure this helper adds much value over just open coding it.
+
+> +/* return true if this bio needs to handle by allocating new request */
+> +static inline bool blk_mq_try_cached_rq(struct request *rq,
+>  		struct blk_plug *plug, struct bio **bio, unsigned int nsegs)
+
+The polarity here is a bit weird, I'd expect a true return if the
+request can be used and a naming implying that.
+
+> +	rq = blk_mq_cached_req(q, plug);
+> +	if (rq) {
+> +		/* cached request held queue usage counter */
+> +		if (!bio_integrity_prep(bio))
+> +			return;
+> +
+> +		need_alloc = blk_mq_try_cached_rq(rq, plug, &bio, nr_segs);
+>  		if (!bio)
+>  			return;
+
+If you take the blk_mq_attempt_bio_merge merge out of the helper,
+the calling convention becomes much saner.
+
+> +			/* cached request held queue usage counter */
+> +			percpu_ref_get(&q->q_usage_counter);
+
+I don't think we can just do the percpu_ref_get here.  While getting
+the counter obviosuly can't fail, we still need to do the queue
+pm only check.
+
+Below is the untested version of how I'd do this that I hacked while
+reviewing it:
+
 ---
- drivers/block/nbd.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+commit 1134ce39504c30a9804ed8147027e66bf7d3157e
+Author: Ming Lei <ming.lei@redhat.com>
+Date:   Wed Nov 8 16:05:04 2023 +0800
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 800f131222fc..69f7fe0d07d6 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -162,6 +162,7 @@ static struct dentry *nbd_dbg_dir;
- static unsigned int nbds_max =3D 16;
- static int max_part =3D 16;
- static int part_shift;
-+static unsigned long max_connections =3D PAGE_SIZE / sizeof(struct nbd_soc=
-k *);
+    blk-mq: make sure active queue usage is held for bio_integrity_prep()
+    
+    blk_integrity_unregister() can come if queue usage counter isn't held
+    for one bio with integrity prepared, so this request may be completed with
+    calling profile->complete_fn, then kernel panic.
+    
+    Another constraint is that bio_integrity_prep() needs to be called
+    before bio merge.
+    
+    Fix the issue by:
+    
+    - call bio_integrity_prep() with one queue usage counter grabbed reliably
+    
+    - call bio_integrity_prep() before bio merge
+    
+    Fixes: 900e080752025f00 ("block: move queue enter logic into blk_mq_submit_bio()")
+    Reported-by: Yi Zhang <yi.zhang@redhat.com>
+    Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
- static int nbd_dev_dbg_init(struct nbd_device *nbd);
- static void nbd_dev_dbg_close(struct nbd_device *nbd);
-@@ -1117,6 +1118,13 @@ static int nbd_add_socket(struct nbd_device
-*nbd, unsigned long arg,
-        /* Arg will be cast to int, check it to avoid overflow */
-        if (arg > INT_MAX)
-                return -EINVAL;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e2d11183f62e37..b758dc8ed10957 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2858,11 +2858,8 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ 	};
+ 	struct request *rq;
+ 
+-	if (unlikely(bio_queue_enter(bio)))
+-		return NULL;
+-
+ 	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
+-		goto queue_exit;
++		return NULL;
+ 
+ 	rq_qos_throttle(q, bio);
+ 
+@@ -2878,35 +2875,24 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ 	rq_qos_cleanup(q, bio);
+ 	if (bio->bi_opf & REQ_NOWAIT)
+ 		bio_wouldblock_error(bio);
+-queue_exit:
+-	blk_queue_exit(q);
+ 	return NULL;
+ }
+ 
+-static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+-		struct blk_plug *plug, struct bio **bio, unsigned int nsegs)
++/* return true if this @rq can be used for @bio */
++static bool blk_mq_can_use_cached_rq(struct request *rq, struct blk_plug *plug,
++		struct bio *bio)
+ {
+-	struct request *rq;
+-	enum hctx_type type, hctx_type;
++	struct request_queue *q = rq->q;
++	enum hctx_type type = blk_mq_get_hctx_type(bio->bi_opf);
++	enum hctx_type hctx_type = rq->mq_hctx->type;
+ 
+-	if (!plug)
+-		return NULL;
+-	rq = rq_list_peek(&plug->cached_rq);
+-	if (!rq || rq->q != q)
+-		return NULL;
++	WARN_ON_ONCE(rq_list_peek(&plug->cached_rq) != rq);
+ 
+-	if (blk_mq_attempt_bio_merge(q, *bio, nsegs)) {
+-		*bio = NULL;
+-		return NULL;
+-	}
+-
+-	type = blk_mq_get_hctx_type((*bio)->bi_opf);
+-	hctx_type = rq->mq_hctx->type;
+ 	if (type != hctx_type &&
+ 	    !(type == HCTX_TYPE_READ && hctx_type == HCTX_TYPE_DEFAULT))
+-		return NULL;
+-	if (op_is_flush(rq->cmd_flags) != op_is_flush((*bio)->bi_opf))
+-		return NULL;
++		return false;
++	if (op_is_flush(rq->cmd_flags) != op_is_flush(bio->bi_opf))
++		return false;
+ 
+ 	/*
+ 	 * If any qos ->throttle() end up blocking, we will have flushed the
+@@ -2914,12 +2900,12 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+ 	 * before we throttle.
+ 	 */
+ 	plug->cached_rq = rq_list_next(rq);
+-	rq_qos_throttle(q, *bio);
++	rq_qos_throttle(q, bio);
+ 
+ 	blk_mq_rq_time_init(rq, 0);
+-	rq->cmd_flags = (*bio)->bi_opf;
++	rq->cmd_flags = bio->bi_opf;
+ 	INIT_LIST_HEAD(&rq->queuelist);
+-	return rq;
++	return true;
+ }
+ 
+ static void bio_set_ioprio(struct bio *bio)
+@@ -2949,7 +2935,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	struct blk_plug *plug = blk_mq_plug(bio);
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+ 	struct blk_mq_hw_ctx *hctx;
+-	struct request *rq;
++	struct request *rq = NULL;
+ 	unsigned int nr_segs = 1;
+ 	blk_status_t ret;
+ 
+@@ -2960,20 +2946,39 @@ void blk_mq_submit_bio(struct bio *bio)
+ 			return;
+ 	}
+ 
+-	if (!bio_integrity_prep(bio))
+-		return;
+-
+ 	bio_set_ioprio(bio);
+ 
+-	rq = blk_mq_get_cached_request(q, plug, &bio, nr_segs);
+-	if (!rq) {
+-		if (!bio)
++	if (plug) {
++		rq = rq_list_peek(&plug->cached_rq);
++		if (rq && rq->q != q)
++			rq = NULL;
++	}
++	if (rq) {
++		/* rq already holds a q_usage_counter reference */
++		if (!bio_integrity_prep(bio))
+ 			return;
+-		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
+-		if (unlikely(!rq))
++		if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
++			return;
 +
-+       if (config->num_connections >=3D max_connections) {
-+               dev_err(disk_to_dev(nbd->disk),
-+                       "Number of socket connections exceeded limit.\n");
-+               return -ENOMEM;
-+       }
++		if (blk_mq_can_use_cached_rq(rq, plug, bio))
++			goto done;
 +
-        sock =3D nbd_get_socket(nbd, arg, &err);
-        if (!sock)
-                return err;
---=20
-2.34.1
-
-
-2023=EB=85=84 11=EC=9B=94 9=EC=9D=BC (=EB=AA=A9) =EC=98=A4=EC=A0=84 12:34, =
-Jens Axboe <axboe@kernel.dk>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> On 11/7/23 9:30 PM, Hyeonjun Ahn wrote:
-> > Thanks for your reviews.
-> > Below is the modified patch.
->
-> Please send it with a CC to linux-block, as that is the proper list.
-> You'll need to ensure it's just plain text, looks like it's html right
-> now.
->
-> And also add a proper commit message.
->
-> --
-> Jens Axboe
->
-
---000000000000a78bec0609af473a
-Content-Type: application/octet-stream; 
-	name="0001-nbd-limit-the-number-of-connections-per-config.patch"
-Content-Disposition: attachment; 
-	filename="0001-nbd-limit-the-number-of-connections-per-config.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_loql7n900>
-X-Attachment-Id: f_loql7n900
-
-RnJvbSBkY2NhOWNlY2FhNzdjZjM2MmU2OTQwMzFkZTA4MDU0MGY1NWQ2ZGFmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBIeWVvbmp1biBBaG4gPGd1c3duczA4NjNAZ21haWwuY29tPgpE
-YXRlOiBUaHUsIDkgTm92IDIwMjMgMTE6NDE6MDIgKzA5MDAKU3ViamVjdDogW1BBVENIXSBuYmQ6
-IGxpbWl0IHRoZSBudW1iZXIgb2YgY29ubmVjdGlvbnMgcGVyIGNvbmZpZwoKQWRkIG1heF9jb25u
-ZWN0aW9ucyB0byBwcmV2ZW50IG91dC1vZi1tZW1vcnkgaW4gbmJkX2FkZF9zb2NrZXQuCgpTaWdu
-ZWQtb2ZmLWJ5OiBIeWVvbmp1biBBaG4gPGd1c3duczA4NjNAZ21haWwuY29tPgpSZXZpZXdlZC1i
-eTogSm9zZWYgQmFjaWsgPGpvc2VmQHRveGljcGFuZGEuY29tPgpSZXZpZXdlZC1ieTogSmVucyBB
-eGJvZSA8YXhib2VAa2VybmVsLmRrPgotLS0KIGRyaXZlcnMvYmxvY2svbmJkLmMgfCA4ICsrKysr
-KysrCiAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZHJpdmVy
-cy9ibG9jay9uYmQuYyBiL2RyaXZlcnMvYmxvY2svbmJkLmMKaW5kZXggODAwZjEzMTIyMmZjLi42
-OWY3ZmUwZDA3ZDYgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvYmxvY2svbmJkLmMKKysrIGIvZHJpdmVy
-cy9ibG9jay9uYmQuYwpAQCAtMTYyLDYgKzE2Miw3IEBAIHN0YXRpYyBzdHJ1Y3QgZGVudHJ5ICpu
-YmRfZGJnX2RpcjsKIHN0YXRpYyB1bnNpZ25lZCBpbnQgbmJkc19tYXggPSAxNjsKIHN0YXRpYyBp
-bnQgbWF4X3BhcnQgPSAxNjsKIHN0YXRpYyBpbnQgcGFydF9zaGlmdDsKK3N0YXRpYyB1bnNpZ25l
-ZCBsb25nIG1heF9jb25uZWN0aW9ucyA9IFBBR0VfU0laRSAvIHNpemVvZihzdHJ1Y3QgbmJkX3Nv
-Y2sgKik7CiAKIHN0YXRpYyBpbnQgbmJkX2Rldl9kYmdfaW5pdChzdHJ1Y3QgbmJkX2RldmljZSAq
-bmJkKTsKIHN0YXRpYyB2b2lkIG5iZF9kZXZfZGJnX2Nsb3NlKHN0cnVjdCBuYmRfZGV2aWNlICpu
-YmQpOwpAQCAtMTExNyw2ICsxMTE4LDEzIEBAIHN0YXRpYyBpbnQgbmJkX2FkZF9zb2NrZXQoc3Ry
-dWN0IG5iZF9kZXZpY2UgKm5iZCwgdW5zaWduZWQgbG9uZyBhcmcsCiAJLyogQXJnIHdpbGwgYmUg
-Y2FzdCB0byBpbnQsIGNoZWNrIGl0IHRvIGF2b2lkIG92ZXJmbG93ICovCiAJaWYgKGFyZyA+IElO
-VF9NQVgpCiAJCXJldHVybiAtRUlOVkFMOworCisJaWYgKGNvbmZpZy0+bnVtX2Nvbm5lY3Rpb25z
-ID49IG1heF9jb25uZWN0aW9ucykgeworCQlkZXZfZXJyKGRpc2tfdG9fZGV2KG5iZC0+ZGlzayks
-CisJCQkiTnVtYmVyIG9mIHNvY2tldCBjb25uZWN0aW9ucyBleGNlZWRlZCBsaW1pdC5cbiIpOwor
-CQlyZXR1cm4gLUVOT01FTTsKKwl9CisKIAlzb2NrID0gbmJkX2dldF9zb2NrZXQobmJkLCBhcmcs
-ICZlcnIpOwogCWlmICghc29jaykKIAkJcmV0dXJuIGVycjsKLS0gCjIuMzQuMQoK
---000000000000a78bec0609af473a--
++		percpu_ref_get(&q->q_usage_counter);
++	} else {
++		if (unlikely(bio_queue_enter(bio)))
++			return;
++
++		if (!bio_integrity_prep(bio))
+ 			return;
+ 	}
+ 
++	rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
++	if (unlikely(!rq)) {
++		blk_queue_exit(q);
++		return;
++	}
++
++done:
+ 	trace_block_getrq(bio);
+ 
+ 	rq_qos_track(q, rq, bio);
