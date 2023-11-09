@@ -1,222 +1,104 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2F2374DC
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 23:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9902EECD
+	for <linux-block@vger.kernel.org>; Thu,  9 Nov 2023 01:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W58Ao0GK"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43A942593
-	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 15:22:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699485728;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Iisi6DbH7leSMTPS5QSbebGo05RQHm1AIPo2FdZhuPk=;
-	b=W58Ao0GKqCXhbPTbAhK63MYZzmwkWKmlNST5z8O/IGi0mcDfINCoJlgtwTztsmrwJ/k+9z
-	zXyO+bTUFynFcqGfJQ9y6pepZIygGiYY6fvOh9UcI2rXkeplzzQr+Lim9YnPuMfEiqRRm0
-	co+toSVqroTMG5wAtEDqk7o7Yb2G2e4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-34-jMTeVYTtOpC8UDkKlVeHVQ-1; Wed,
- 08 Nov 2023 18:22:04 -0500
-X-MC-Unique: jMTeVYTtOpC8UDkKlVeHVQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4C4B1C05EA6;
-	Wed,  8 Nov 2023 23:22:00 +0000 (UTC)
-Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A55752166B26;
-	Wed,  8 Nov 2023 23:22:00 +0000 (UTC)
-Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-	id 6A5193003C; Wed,  8 Nov 2023 18:22:00 -0500 (EST)
-From: Matthew Sakai <msakai@redhat.com>
-To: dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org
-Cc: Mike Snitzer <snitzer@kernel.org>,
-	Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH] dm vdo: add "funnel-" filename prefix to funnel-queue based sources
-Date: Wed,  8 Nov 2023 18:22:00 -0500
-Message-Id: <20231108232200.1881711-1-msakai@redhat.com>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ZCrQUONZ"
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF1F2684
+	for <linux-block@vger.kernel.org>; Wed,  8 Nov 2023 17:27:55 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-5a9bc2ec556so256084a12.0
+        for <linux-block@vger.kernel.org>; Wed, 08 Nov 2023 17:27:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1699493274; x=1700098074; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=baE0QkFBkm69A7/KmX1olgrrF0ZpXIH/VwZM7lqHCgE=;
+        b=ZCrQUONZsHpgXvLGz/mqgU7RcGxD62OqPfkTNYc0SgirTf8jFhLFNNGPQnGqbdlkLa
+         p5Vhsvo6Rs/n2TQl3LDLyOES7IRJKvWmnQM00MVIFvIcVNjbiW9rIxWZLc/LqJynCaVS
+         //JFNOeOUh8fJ5Pja+mA+NZUZSd2NJhi8I46HMzjrewGnuktkoplO3/zZvotF67OxMcS
+         HpPjQmluKQ0qkp7UdlhX36B+FaV3vVwN4YFVJbHn9oGcnITFD/2yLHyoy6Hp0q4PfCyg
+         JKamdfjvgDSShhhKJ+TH/Gbbglyuj7xbFmWqdBY0f/PsOmAO7EMaAARaCsTUEb/O3oXU
+         uXqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699493274; x=1700098074;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=baE0QkFBkm69A7/KmX1olgrrF0ZpXIH/VwZM7lqHCgE=;
+        b=R+/ds4ukSpyXOORU1kiq0Lm4U+hkKolPgUmfIboU+GpeZWuwbjTAYlds3Gw54Jg4dz
+         xYcYIcEK+k2v/YiK5hadoPhqnYiGsuSmm6eYjCgS1o4BV+kylt2stYusFTKGlJ3hEqSf
+         WsKygYxRycGL29UsvrVKLwBf+wLZZWzBQT975fDy++JiwjcCnEv/qaz0xW34NYgEiTQa
+         PV//sg70U3V7eK/mBMZxliS/zlR8c7d3oW91WLl3UoGFlg+hri9ocqEWWwJY3FiXIPRX
+         hs1f9yAQ9WKLT3ORdNxUUBNo4OdqrvfaDEFJ7fBazIwT0MI4aYkKOcRaPltZO6bYMD5m
+         SoXw==
+X-Gm-Message-State: AOJu0YxIP9RqG7/S9xArARd8atZRHwSnQhV39HxOS359ls2OzFHa1Xki
+	shbgDPkoJyrk0s5f2hOxvu/A8OluboaJW7s6tkk=
+X-Google-Smtp-Source: AGHT+IEhHoFq6CLb7HH93zopsT2C4lI5MytKERcJeOPmAxoF8kXhwdjHE1xz8CmSnC38AVszTgVYjg==
+X-Received: by 2002:a05:6a20:728a:b0:14c:a53c:498c with SMTP id o10-20020a056a20728a00b0014ca53c498cmr3942526pzk.10.1699493274506;
+        Wed, 08 Nov 2023 17:27:54 -0800 (PST)
+Received: from ?IPV6:2409:8a28:e60:6e40:6:afb5:b160:8513? ([2409:8a28:e60:6e40:6:afb5:b160:8513])
+        by smtp.gmail.com with ESMTPSA id n11-20020a170902e54b00b001cc3f9b70e9sm2288783plf.220.2023.11.08.17.27.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Nov 2023 17:27:53 -0800 (PST)
+Message-ID: <7ed9f6f9-d309-4d30-9b3b-c465cfa48a52@bytedance.com>
+Date: Thu, 9 Nov 2023 09:27:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [block?] WARNING in blk_mq_start_request
+To: syzbot <syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com>,
+ axboe@kernel.dk, bvanassche@acm.org, chaitanyak@nvidia.com, eadavis@qq.com,
+ hch@infradead.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ming.lei@redhat.com,
+ syzkaller-bugs@googlegroups.com
+References: <00000000000077ca930609aa9f86@google.com>
+Content-Language: en-US
+From: Chengming Zhou <zhouchengming@bytedance.com>
+In-Reply-To: <00000000000077ca930609aa9f86@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Mike Snitzer <snitzer@kernel.org>
+On 2023/11/9 05:18, syzbot wrote:
+> syzbot has bisected this issue to:
+> 
+> commit d78bfa1346ab1fe04d20aa45a0678d1fc866f37c
+> Author: Chengming Zhou <zhouchengming@bytedance.com>
+> Date:   Wed Sep 13 15:16:16 2023 +0000
+> 
+>     block/null_blk: add queue_rqs() support
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=106414a8e80000
+> start commit:   13d88ac54ddd Merge tag 'vfs-6.7.fsid' of git://git.kernel...
+> git tree:       upstream
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=126414a8e80000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=146414a8e80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=beb32a598fd79db9
+> dashboard link: https://syzkaller.appspot.com/bug?extid=fcc47ba2476570cbbeb0
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1465bb08e80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13e7881f680000
+> 
+> Reported-by: syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
+> Fixes: d78bfa1346ab ("block/null_blk: add queue_rqs() support")
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-Reviewed-by: Chung Chung <cchung@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@kernel.org>
-Signed-off-by: Matthew Sakai <msakai@redhat.com>
----
- drivers/md/dm-vdo/dump.c                                     | 2 +-
- drivers/md/dm-vdo/flush.h                                    | 2 +-
- drivers/md/dm-vdo/{request-queue.c => funnel-requestqueue.c} | 2 +-
- drivers/md/dm-vdo/{request-queue.h => funnel-requestqueue.h} | 0
- drivers/md/dm-vdo/{work-queue.c => funnel-workqueue.c}       | 2 +-
- drivers/md/dm-vdo/{work-queue.h => funnel-workqueue.h}       | 0
- drivers/md/dm-vdo/index-session.c                            | 2 +-
- drivers/md/dm-vdo/index.c                                    | 2 +-
- drivers/md/dm-vdo/vdo.c                                      | 2 +-
- drivers/md/dm-vdo/vdo.h                                      | 2 +-
- 10 files changed, 8 insertions(+), 8 deletions(-)
- rename drivers/md/dm-vdo/{request-queue.c => funnel-requestqueue.c} (99%)
- rename drivers/md/dm-vdo/{request-queue.h => funnel-requestqueue.h} (100%)
- rename drivers/md/dm-vdo/{work-queue.c => funnel-workqueue.c} (99%)
- rename drivers/md/dm-vdo/{work-queue.h => funnel-workqueue.h} (100%)
+CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION is enabled in the kernel config,
+so null_queue_rq() will return BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE
+for some requests, which have been marked as IN_FLIGHT status.
 
-diff --git a/drivers/md/dm-vdo/dump.c b/drivers/md/dm-vdo/dump.c
-index d50db3f7a14d..97b1bdfa3574 100644
---- a/drivers/md/dm-vdo/dump.c
-+++ b/drivers/md/dm-vdo/dump.c
-@@ -13,11 +13,11 @@
- #include "constants.h"
- #include "data-vio.h"
- #include "dedupe.h"
-+#include "funnel-workqueue.h"
- #include "io-submitter.h"
- #include "logger.h"
- #include "types.h"
- #include "vdo.h"
--#include "work-queue.h"
- 
- enum dump_options {
- 	/* Work queues */
-diff --git a/drivers/md/dm-vdo/flush.h b/drivers/md/dm-vdo/flush.h
-index f36231c493c5..4d40908462bb 100644
---- a/drivers/md/dm-vdo/flush.h
-+++ b/drivers/md/dm-vdo/flush.h
-@@ -6,10 +6,10 @@
- #ifndef VDO_FLUSH_H
- #define VDO_FLUSH_H
- 
-+#include "funnel-workqueue.h"
- #include "types.h"
- #include "vio.h"
- #include "wait-queue.h"
--#include "work-queue.h"
- 
- /* A marker for tracking which journal entries are affected by a flush request. */
- struct vdo_flush {
-diff --git a/drivers/md/dm-vdo/request-queue.c b/drivers/md/dm-vdo/funnel-requestqueue.c
-similarity index 99%
-rename from drivers/md/dm-vdo/request-queue.c
-rename to drivers/md/dm-vdo/funnel-requestqueue.c
-index 1c60b09027a8..18ac5ee6cded 100644
---- a/drivers/md/dm-vdo/request-queue.c
-+++ b/drivers/md/dm-vdo/funnel-requestqueue.c
-@@ -3,7 +3,7 @@
-  * Copyright 2023 Red Hat
-  */
- 
--#include "request-queue.h"
-+#include "funnel-requestqueue.h"
- 
- #include <linux/atomic.h>
- #include <linux/compiler.h>
-diff --git a/drivers/md/dm-vdo/request-queue.h b/drivers/md/dm-vdo/funnel-requestqueue.h
-similarity index 100%
-rename from drivers/md/dm-vdo/request-queue.h
-rename to drivers/md/dm-vdo/funnel-requestqueue.h
-diff --git a/drivers/md/dm-vdo/work-queue.c b/drivers/md/dm-vdo/funnel-workqueue.c
-similarity index 99%
-rename from drivers/md/dm-vdo/work-queue.c
-rename to drivers/md/dm-vdo/funnel-workqueue.c
-index 6adf07fc74e1..119f813ea4cb 100644
---- a/drivers/md/dm-vdo/work-queue.c
-+++ b/drivers/md/dm-vdo/funnel-workqueue.c
-@@ -3,7 +3,7 @@
-  * Copyright 2023 Red Hat
-  */
- 
--#include "work-queue.h"
-+#include "funnel-workqueue.h"
- 
- #include <linux/atomic.h>
- #include <linux/cache.h>
-diff --git a/drivers/md/dm-vdo/work-queue.h b/drivers/md/dm-vdo/funnel-workqueue.h
-similarity index 100%
-rename from drivers/md/dm-vdo/work-queue.h
-rename to drivers/md/dm-vdo/funnel-workqueue.h
-diff --git a/drivers/md/dm-vdo/index-session.c b/drivers/md/dm-vdo/index-session.c
-index 052ba093fbf1..5c14b0917c4d 100644
---- a/drivers/md/dm-vdo/index-session.c
-+++ b/drivers/md/dm-vdo/index-session.c
-@@ -7,11 +7,11 @@
- 
- #include <linux/atomic.h>
- 
-+#include "funnel-requestqueue.h"
- #include "index.h"
- #include "index-layout.h"
- #include "logger.h"
- #include "memory-alloc.h"
--#include "request-queue.h"
- #include "time-utils.h"
- 
- /*
-diff --git a/drivers/md/dm-vdo/index.c b/drivers/md/dm-vdo/index.c
-index e8859cee2b93..89ed4c0251f2 100644
---- a/drivers/md/dm-vdo/index.c
-+++ b/drivers/md/dm-vdo/index.c
-@@ -6,10 +6,10 @@
- 
- #include "index.h"
- 
-+#include "funnel-requestqueue.h"
- #include "hash-utils.h"
- #include "logger.h"
- #include "memory-alloc.h"
--#include "request-queue.h"
- #include "sparse-cache.h"
- 
- static const u64 NO_LAST_SAVE = U64_MAX;
-diff --git a/drivers/md/dm-vdo/vdo.c b/drivers/md/dm-vdo/vdo.c
-index 72cbe6921893..5089a53516f8 100644
---- a/drivers/md/dm-vdo/vdo.c
-+++ b/drivers/md/dm-vdo/vdo.c
-@@ -48,6 +48,7 @@
- #include "data-vio.h"
- #include "dedupe.h"
- #include "encodings.h"
-+#include "funnel-workqueue.h"
- #include "io-submitter.h"
- #include "logical-zone.h"
- #include "packer.h"
-@@ -58,7 +59,6 @@
- #include "statistics.h"
- #include "status-codes.h"
- #include "vio.h"
--#include "work-queue.h"
- 
- 
- enum { PARANOID_THREAD_CONSISTENCY_CHECKS = 0 };
-diff --git a/drivers/md/dm-vdo/vdo.h b/drivers/md/dm-vdo/vdo.h
-index a2caf54221c8..af540bce72da 100644
---- a/drivers/md/dm-vdo/vdo.h
-+++ b/drivers/md/dm-vdo/vdo.h
-@@ -16,13 +16,13 @@
- 
- #include "admin-state.h"
- #include "encodings.h"
-+#include "funnel-workqueue.h"
- #include "packer.h"
- #include "physical-zone.h"
- #include "statistics.h"
- #include "thread-registry.h"
- #include "types.h"
- #include "uds.h"
--#include "work-queue.h"
- 
- enum notifier_state {
- 	/** Notifications are allowed but not in progress */
--- 
-2.40.0
+Then null_queue_rqs() put these requests in the rqlist and return back,
+blk-mq will try to queue them individually once again, caused the warning
+"WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE)" in blk_mq_start_request().
 
+So handling of return value of null_queue_rq() in null_queue_rqs() is wrong,
+maybe we should __blk_mq_requeue_request() for these requests, before
+adding them in the rqlist?
+
+Thanks!
