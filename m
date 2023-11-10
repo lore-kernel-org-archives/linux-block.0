@@ -1,157 +1,179 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D1C19BB9
-	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 13:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14131DA43
+	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 16:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEDFZyYA"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DD637AEA
-	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 05:44:10 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c665Uomn"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887083B924
+	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 08:03:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699623849;
+	s=mimecast20190719; t=1699632227;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DnjW46Abv0ej124limqrwWwe0lfQZ5JkYvMeGFC1Tqc=;
-	b=KEDFZyYAcoVhr5TU2L7S7bq0hmWxZ1QtmBsqVqAALyxIcUf7pPnUXzVty9L4IJEfbCtdlF
-	Zv5aP2p2DtHGA+VDeJ0ADtZi5X1IYtA+BI8KOlGvEU5/R+TXBakTqW/GX4xXeOLnUaC881
-	gmVDD9m2tESadZ6aSXRb+g5TpBK5tW0=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7LLLmKlkTqdbQdg/nQJ6XhAMm0kN7EMtZc4aqahAzZY=;
+	b=c665UomnlSpiZM0++geoKZmlmNaFKq3wg+cLVLGmEAfE140hP5e/AXdSwrRHXkuEh9YMpF
+	41lOyDaArfvWnrwuco4rMkzHhfzw/TILCP8N53yr5n1W/zHYiYLJrbgxvqCnQ5cfaARI+3
+	SVlXIrHYXsriyjl0Q/ao8gofGaqNkWM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-rar2-X2nMu-kISOW1m5VrQ-1; Fri, 10 Nov 2023 08:44:08 -0500
-X-MC-Unique: rar2-X2nMu-kISOW1m5VrQ-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-282dcfbcc0aso2170996a91.3
-        for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 05:44:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699623847; x=1700228647;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DnjW46Abv0ej124limqrwWwe0lfQZ5JkYvMeGFC1Tqc=;
-        b=PqE9CxNeEy6Zlc46KYN2yTmjP+ZpIVNe6UkjvOxhxv5+5aJruCG2M8qO8Fsq8TBcct
-         DCsj0puYLS65IOzajU49/wwAjyh/7uyvyYJ5wuFzJPh4jZ/NW2FYJ3prrT8kuOcoV8Ah
-         x55c0eIpA1wOBcR1W7GrktD2g4FYuKzGbOkbiC1PEzxuDQqzPrxwPSkvQ/ueHSmAokeq
-         RpBqFfzMWqksvwy31tzCR0Di37WaIWtcekUPxQ0iCLdalOYwzf5vZ27XN4eewJjHtQmb
-         VKJ0+WhXM8ptwrKdRMfVIfKYYeSweFAQ5ioanbltE0F6Mhm+FURv4Iz7ULMnpEcjVW+7
-         64Jg==
-X-Gm-Message-State: AOJu0YycCfEojF4qEFkWj0lJnFhN5rTzMNBb8hP08K3Kkg/WxUG3qVcw
-	wcG6uWASeacYGuoj489YjiffTtlCKar1FKXxHQO8jYyQncmEjV8DXH3cmHaHQ6aSRqAKoaNdPPN
-	X7eote5F2Iszd/10c9UZJPP0fUqy3M73qBHnVjd8=
-X-Received: by 2002:a17:90b:224f:b0:280:2c16:2186 with SMTP id hk15-20020a17090b224f00b002802c162186mr5009640pjb.30.1699623847051;
-        Fri, 10 Nov 2023 05:44:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFwGDKgTGsCWIuxpPtl3GMkMC2r0R+YMM3Xh/h0luoEWAAEtgkR451YJ/4Zt5QgiQCYMvTKuLukHgtujEsvAao=
-X-Received: by 2002:a17:90b:224f:b0:280:2c16:2186 with SMTP id
- hk15-20020a17090b224f00b002802c162186mr5009622pjb.30.1699623846740; Fri, 10
- Nov 2023 05:44:06 -0800 (PST)
+ us-mta-139-UzdHz-rJN-C_1u5cphBx7g-1; Fri, 10 Nov 2023 11:03:41 -0500
+X-MC-Unique: UzdHz-rJN-C_1u5cphBx7g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF577185A786;
+	Fri, 10 Nov 2023 16:03:40 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.5])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B54240C6EB9;
+	Fri, 10 Nov 2023 16:03:32 +0000 (UTC)
+Date: Sat, 11 Nov 2023 00:03:26 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: ed.tsai@mediatek.com
+Cc: hch@lst.de, Jens Axboe <axboe@kernel.dk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	wsd_upstream@mediatek.com, chun-hung.wu@mediatek.com,
+	casper.li@mediatek.com, will.shiu@mediatek.com,
+	light.hsieh@mediatek.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, ming.lei@redhat.com
+Subject: Re: [PATCH v2] block: limit the extract size to align queue limit
+Message-ID: <ZU5UTqnV4En0XBPB@fedora>
+References: <20231110051950.21972-1-ed.tsai@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHj4cs8yZ4-BXqTK4W0UsPpmc2ctCD=_mYiwuAuvcmgS3+KJ8g@mail.gmail.com>
- <CAHj4cs8vqrePA-TE_GGNAZLG3iqZBq9L1GkanA4A0wRF_TXDeA@mail.gmail.com>
-In-Reply-To: <CAHj4cs8vqrePA-TE_GGNAZLG3iqZBq9L1GkanA4A0wRF_TXDeA@mail.gmail.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Fri, 10 Nov 2023 21:43:55 +0800
-Message-ID: <CAHj4cs9HvFCB4XKwu_jtkV1HDVE_dY7XKOZ_aJrGS8tA8ROLRA@mail.gmail.com>
-Subject: Re: [bug report][bisected] nvme authentication setup failed observed
- during blktests nvme/041 nvme/042 nvme/043
-To: Hannes Reinecke <hare@suse.de>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, linux-block <linux-block@vger.kernel.org>, 
-	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>, Keith Busch <kbusch@kernel.org>, 
-	Maurizio Lombardi <mlombard@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231110051950.21972-1-ed.tsai@mediatek.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Hi Hannes
+On Fri, Nov 10, 2023 at 01:19:49PM +0800, ed.tsai@mediatek.com wrote:
+> From: Ed Tsai <ed.tsai@mediatek.com>
+> 
+> When an application performs a large IO, it fills and submits multiple
+> full bios to the block layer. Referring to commit 07173c3ec276
+> ("block: enable multipage bvecs"), the full bio size is no longer fixed
+> at 1MB but can vary based on the physical memory layout.
+> 
+> The size of the full bio no longer aligns with the maximum IO size of
+> the queue. Therefore, in a 64MB read, you may see many unaligned bios
+> being submitted.
+> 
+> Executing the command to perform a 64MB read:
+> 
+> 	dd if=/data/test_file of=/dev/null bs=64m count=1 iflag=direct
+> 
+> It demonstrates the submission of numerous unaligned bios:
+> 
+> 	block_bio_queue: 254,52 R 2933336 + 2136
+> 	block_bio_queue: 254,52 R 2935472 + 2152
+> 	block_bio_queue: 254,52 R 2937624 + 2128
+> 	block_bio_queue: 254,52 R 2939752 + 2160
+> 
+> This patch limits the number of extract pages to ensure that we submit
+> the bio once we fill enough pages, preventing the block layer from
+> spliting small I/Os in between.
+> 
+> I performed the Antutu V10 Storage Test on a UFS 4.0 device, which
+> resulted in a significant improvement in the Sequential test:
+> 
+> Sequential Read (average of 5 rounds):
+> Original: 3033.7 MB/sec
+> Patched: 3520.9 MB/sec
+> 
+> Sequential Write (average of 5 rounds):
+> Original: 2225.4 MB/sec
+> Patched: 2800.3 MB/sec
+> 
+> Link: https://lore.kernel.org/linux-arm-kernel/20231025092255.27930-1-ed.tsai@mediatek.com/
+> Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
+> 
+> ---
+>  block/bio.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 816d412c06e9..8d3a112e68da 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1227,8 +1227,10 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  	iov_iter_extraction_t extraction_flags = 0;
+>  	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
+>  	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
+> +	struct block_device *bdev = bio->bi_bdev;
+>  	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+>  	struct page **pages = (struct page **)bv;
+> +	ssize_t max_extract = UINT_MAX - bio->bi_iter.bi_size;
+>  	ssize_t size, left;
+>  	unsigned len, i = 0;
+>  	size_t offset;
+> @@ -1242,7 +1244,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+>  	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+>  
+> -	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
+> +	if (bdev && blk_queue_pci_p2pdma(bdev->bd_disk->queue))
+>  		extraction_flags |= ITER_ALLOW_P2PDMA;
+>  
+>  	/*
+> @@ -1252,16 +1254,21 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  	 * result to ensure the bio's total size is correct. The remainder of
+>  	 * the iov data will be picked up in the next bio iteration.
+>  	 */
+> -	size = iov_iter_extract_pages(iter, &pages,
+> -				      UINT_MAX - bio->bi_iter.bi_size,
+> +	if (bdev && bio_op(bio) != REQ_OP_ZONE_APPEND) {
+> +		unsigned int max = queue_max_bytes(bdev_get_queue(bdev));
+> +
+> +		max_extract = bio->bi_iter.bi_size ?
+> +			max - bio->bi_iter.bi_size & (max - 1) : max;
+> +	}
+> +	size = iov_iter_extract_pages(iter, &pages, max_extract,
+>  				      nr_pages, extraction_flags, &offset);
 
-The issue still can be reproduced on the latest linux-block/for-next,
-do you have a chance to check it, thanks.
+The above is just what I did in the 'slow path' of patch v2[1], and it can't work
+well for every extracting pages which is usually slow, and batching
+extracting pages should be done always, such as:
 
-On Thu, Oct 19, 2023 at 3:16=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wrot=
-e:
->
-> Hi Hanns
->
-> Bisect shows it was introduced with this commit.
->
-> commit d680063482885c15d68e958212c3d6ad40a510dd (HEAD)
-> Author: Hannes Reinecke <hare@suse.de>
-> Date:   Thu Oct 12 14:22:48 2023 +0200
->
->     nvme: rework NVME_AUTH Kconfig selection
->
->     Having a single Kconfig symbol NVME_AUTH conflates the selection
->     of the authentication functions from nvme/common and nvme/host,
->     causing kbuild robot to complain when building the nvme target
->     only. So introduce a Kconfig symbol NVME_HOST_AUTH for the nvme
->     host bits and use NVME_AUTH for the common functions only.
->     And move the CRYPTO selection into nvme/common to make it
->     easier to read.
->
-> On Wed, Oct 18, 2023 at 2:57=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wr=
-ote:
-> >
-> > Hello
-> > Just found the blktests nvme/041 nvme/042 nvme/043[2] failed on the
-> > latest linux-block/for-next[1],
-> > from the log I can see it was due to authentication setup failed,
-> > please help check it, thanks.
-> >
-> > [1]
-> > https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/l=
-og/?h=3Dfor-next
-> > e3db512c4ab6 (HEAD -> for-next, origin/for-next) Merge branch
-> > 'for-6.7/block' into for-next
-> >
-> > [2]
-> > # ./check nvme/041
-> > nvme/041 (Create authenticated connections)                  [failed]
-> >     runtime  3.274s  ...  3.980s
-> >     --- tests/nvme/041.out      2023-10-17 08:02:17.046653814 -0400
-> >     +++ /root/blktests/results/nodev/nvme/041.out.bad   2023-10-18
-> > 02:50:03.496539083 -0400
-> >     @@ -2,5 +2,5 @@
-> >      Test unauthenticated connection (should fail)
-> >      NQN:blktests-subsystem-1 disconnected 0 controller(s)
-> >      Test authenticated connection
-> >     -NQN:blktests-subsystem-1 disconnected 1 controller(s)
-> >     +NQN:blktests-subsystem-1 disconnected 0 controller(s)
-> >      Test complete
-> >
-> > # dmesg
-> > [ 2701.636964] loop: module loaded
-> > [ 2702.074262] run blktests nvme/041 at 2023-10-18 02:49:59
-> > [ 2702.302067] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-> > [ 2702.447496] nvmet: creating nvm controller 1 for subsystem
-> > blktests-subsystem-1 for NQN
-> > nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
-> > with DH-HMAC-CHAP.
-> > [ 2702.447707] nvme nvme0: qid 0: authentication setup failed
-> > [ 2704.099618] nvmet: creating nvm controller 1 for subsystem
-> > blktests-subsystem-1 for NQN
-> > nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
-> > with DH-HMAC-CHAP.
-> > [ 2704.099688] nvme nvme0: qid 0: authentication setup failed
-> >
-> >
-> > --
-> > Best Regards,
-> >   Yi Zhang
->
->
->
-> --
-> Best Regards,
->   Yi Zhang
+1) build one ublk disk(suppose it is /dev/ublkb0) with max sectors of 32k:
+
+- rublk add null --io-buf-size=16384 -q 2	[2]
+
+2) run 64KB IO
+
+fio --direct=1 --size=230G --bsrange=64k-64k --runtime=20 --numjobs=2 --ioengine=libaio \
+	--iodepth=64 --iodepth_batch_submit=64 --iodepth_batch_complete_min=64 --group_reporting=1 \
+	--filename=/dev/ublkb0 --name=/dev/ublkb0-test-randread --rw=randread
+
+In my local VM, read BW is dropped to 3709MB/s from 20GB/s in the above
+fio test with this patch.
+
+The point is that:
+
+1) bio size alignment is only needed in case of multiple bios
+
+2) bio size alignment is needed only when the current bio is approaching
+to become FULL
+
+3) with multiple bvec, it is hard to know how many pages can be held
+in bvecs beforehand
+
+In short, running every alignment is much less efficient.
 
 
+[1] https://lore.kernel.org/linux-block/202311100354.HYfqOQ7o-lkp@intel.com/T/#u
+[2] install rublk via `cargo install --version=^0.1 rublk` and
+CONFIG_BLK_DEV_UBLK is required
 
---=20
-Best Regards,
-  Yi Zhang
+Thanks, 
+Ming
 
