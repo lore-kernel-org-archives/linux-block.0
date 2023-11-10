@@ -1,190 +1,157 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF1612B75
-	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 11:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D1C19BB9
+	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 13:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TPIwepSF"
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FF62AD34;
-	Fri, 10 Nov 2023 03:00:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699614014; x=1731150014;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MiCyv/x6x7GRWVTPYnX8fRfSIKJ4fUfhhPf+IF7d+s8=;
-  b=TPIwepSFIhgEXHpBIg3cx4ULHnxjSBbm8UtE74P6rrJGML0MItcMHtnF
-   FXWl4ppL28T1zF2vmSGDv/RebaKOk4j+JhbJAnWPf3e95/5V744whNQFo
-   o8oQT8PvIF+hWTXZjwrO8F9aoH4wY/1JmVWMbH5eophugn1wd7ASz2Y3j
-   WsCioaHzcFPKpjio8cJ6xb0OmzdGDAZOWPKcKXuI90w7/IqL5ty7F+TsR
-   5ljZ2Slyk1MhuPdT3oxt48ojWaCOrCr0eDoNKY5Q8mY5gZfKT4LWDZIrW
-   MGdlbc7gut4tbOin2tw5sSARC0ylctkPNUL4UANbolAhEHxt8cvfy7A+T
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="389029012"
-X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
-   d="scan'208";a="389029012"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 03:00:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="854367833"
-X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
-   d="scan'208";a="854367833"
-Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 10 Nov 2023 03:00:09 -0800
-Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r1PF9-0009YM-36;
-	Fri, 10 Nov 2023 11:00:07 +0000
-Date: Fri, 10 Nov 2023 18:59:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: ed.tsai@mediatek.com, ming.lei@redhat.com, hch@lst.de,
-	Jens Axboe <axboe@kernel.dk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: oe-kbuild-all@lists.linux.dev, wsd_upstream@mediatek.com,
-	chun-hung.wu@mediatek.com, casper.li@mediatek.com,
-	will.shiu@mediatek.com, light.hsieh@mediatek.com,
-	Ed Tsai <ed.tsai@mediatek.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v2] block: limit the extract size to align queue limit
-Message-ID: <202311101853.9N398fyj-lkp@intel.com>
-References: <20231110051950.21972-1-ed.tsai@mediatek.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEDFZyYA"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DD637AEA
+	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 05:44:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699623849;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DnjW46Abv0ej124limqrwWwe0lfQZ5JkYvMeGFC1Tqc=;
+	b=KEDFZyYAcoVhr5TU2L7S7bq0hmWxZ1QtmBsqVqAALyxIcUf7pPnUXzVty9L4IJEfbCtdlF
+	Zv5aP2p2DtHGA+VDeJ0ADtZi5X1IYtA+BI8KOlGvEU5/R+TXBakTqW/GX4xXeOLnUaC881
+	gmVDD9m2tESadZ6aSXRb+g5TpBK5tW0=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-246-rar2-X2nMu-kISOW1m5VrQ-1; Fri, 10 Nov 2023 08:44:08 -0500
+X-MC-Unique: rar2-X2nMu-kISOW1m5VrQ-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-282dcfbcc0aso2170996a91.3
+        for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 05:44:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699623847; x=1700228647;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DnjW46Abv0ej124limqrwWwe0lfQZ5JkYvMeGFC1Tqc=;
+        b=PqE9CxNeEy6Zlc46KYN2yTmjP+ZpIVNe6UkjvOxhxv5+5aJruCG2M8qO8Fsq8TBcct
+         DCsj0puYLS65IOzajU49/wwAjyh/7uyvyYJ5wuFzJPh4jZ/NW2FYJ3prrT8kuOcoV8Ah
+         x55c0eIpA1wOBcR1W7GrktD2g4FYuKzGbOkbiC1PEzxuDQqzPrxwPSkvQ/ueHSmAokeq
+         RpBqFfzMWqksvwy31tzCR0Di37WaIWtcekUPxQ0iCLdalOYwzf5vZ27XN4eewJjHtQmb
+         VKJ0+WhXM8ptwrKdRMfVIfKYYeSweFAQ5ioanbltE0F6Mhm+FURv4Iz7ULMnpEcjVW+7
+         64Jg==
+X-Gm-Message-State: AOJu0YycCfEojF4qEFkWj0lJnFhN5rTzMNBb8hP08K3Kkg/WxUG3qVcw
+	wcG6uWASeacYGuoj489YjiffTtlCKar1FKXxHQO8jYyQncmEjV8DXH3cmHaHQ6aSRqAKoaNdPPN
+	X7eote5F2Iszd/10c9UZJPP0fUqy3M73qBHnVjd8=
+X-Received: by 2002:a17:90b:224f:b0:280:2c16:2186 with SMTP id hk15-20020a17090b224f00b002802c162186mr5009640pjb.30.1699623847051;
+        Fri, 10 Nov 2023 05:44:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFwGDKgTGsCWIuxpPtl3GMkMC2r0R+YMM3Xh/h0luoEWAAEtgkR451YJ/4Zt5QgiQCYMvTKuLukHgtujEsvAao=
+X-Received: by 2002:a17:90b:224f:b0:280:2c16:2186 with SMTP id
+ hk15-20020a17090b224f00b002802c162186mr5009622pjb.30.1699623846740; Fri, 10
+ Nov 2023 05:44:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231110051950.21972-1-ed.tsai@mediatek.com>
+References: <CAHj4cs8yZ4-BXqTK4W0UsPpmc2ctCD=_mYiwuAuvcmgS3+KJ8g@mail.gmail.com>
+ <CAHj4cs8vqrePA-TE_GGNAZLG3iqZBq9L1GkanA4A0wRF_TXDeA@mail.gmail.com>
+In-Reply-To: <CAHj4cs8vqrePA-TE_GGNAZLG3iqZBq9L1GkanA4A0wRF_TXDeA@mail.gmail.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Fri, 10 Nov 2023 21:43:55 +0800
+Message-ID: <CAHj4cs9HvFCB4XKwu_jtkV1HDVE_dY7XKOZ_aJrGS8tA8ROLRA@mail.gmail.com>
+Subject: Re: [bug report][bisected] nvme authentication setup failed observed
+ during blktests nvme/041 nvme/042 nvme/043
+To: Hannes Reinecke <hare@suse.de>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, linux-block <linux-block@vger.kernel.org>, 
+	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>, Keith Busch <kbusch@kernel.org>, 
+	Maurizio Lombardi <mlombard@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Hannes
 
-kernel test robot noticed the following build warnings:
+The issue still can be reproduced on the latest linux-block/for-next,
+do you have a chance to check it, thanks.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on hch-configfs/for-next linus/master v6.6 next-20231110]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Thu, Oct 19, 2023 at 3:16=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wrot=
+e:
+>
+> Hi Hanns
+>
+> Bisect shows it was introduced with this commit.
+>
+> commit d680063482885c15d68e958212c3d6ad40a510dd (HEAD)
+> Author: Hannes Reinecke <hare@suse.de>
+> Date:   Thu Oct 12 14:22:48 2023 +0200
+>
+>     nvme: rework NVME_AUTH Kconfig selection
+>
+>     Having a single Kconfig symbol NVME_AUTH conflates the selection
+>     of the authentication functions from nvme/common and nvme/host,
+>     causing kbuild robot to complain when building the nvme target
+>     only. So introduce a Kconfig symbol NVME_HOST_AUTH for the nvme
+>     host bits and use NVME_AUTH for the common functions only.
+>     And move the CRYPTO selection into nvme/common to make it
+>     easier to read.
+>
+> On Wed, Oct 18, 2023 at 2:57=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wr=
+ote:
+> >
+> > Hello
+> > Just found the blktests nvme/041 nvme/042 nvme/043[2] failed on the
+> > latest linux-block/for-next[1],
+> > from the log I can see it was due to authentication setup failed,
+> > please help check it, thanks.
+> >
+> > [1]
+> > https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/l=
+og/?h=3Dfor-next
+> > e3db512c4ab6 (HEAD -> for-next, origin/for-next) Merge branch
+> > 'for-6.7/block' into for-next
+> >
+> > [2]
+> > # ./check nvme/041
+> > nvme/041 (Create authenticated connections)                  [failed]
+> >     runtime  3.274s  ...  3.980s
+> >     --- tests/nvme/041.out      2023-10-17 08:02:17.046653814 -0400
+> >     +++ /root/blktests/results/nodev/nvme/041.out.bad   2023-10-18
+> > 02:50:03.496539083 -0400
+> >     @@ -2,5 +2,5 @@
+> >      Test unauthenticated connection (should fail)
+> >      NQN:blktests-subsystem-1 disconnected 0 controller(s)
+> >      Test authenticated connection
+> >     -NQN:blktests-subsystem-1 disconnected 1 controller(s)
+> >     +NQN:blktests-subsystem-1 disconnected 0 controller(s)
+> >      Test complete
+> >
+> > # dmesg
+> > [ 2701.636964] loop: module loaded
+> > [ 2702.074262] run blktests nvme/041 at 2023-10-18 02:49:59
+> > [ 2702.302067] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+> > [ 2702.447496] nvmet: creating nvm controller 1 for subsystem
+> > blktests-subsystem-1 for NQN
+> > nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> > with DH-HMAC-CHAP.
+> > [ 2702.447707] nvme nvme0: qid 0: authentication setup failed
+> > [ 2704.099618] nvmet: creating nvm controller 1 for subsystem
+> > blktests-subsystem-1 for NQN
+> > nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> > with DH-HMAC-CHAP.
+> > [ 2704.099688] nvme nvme0: qid 0: authentication setup failed
+> >
+> >
+> > --
+> > Best Regards,
+> >   Yi Zhang
+>
+>
+>
+> --
+> Best Regards,
+>   Yi Zhang
 
-url:    https://github.com/intel-lab-lkp/linux/commits/ed-tsai-mediatek-com/block-limit-the-extract-size-to-align-queue-limit/20231110-142205
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20231110051950.21972-1-ed.tsai%40mediatek.com
-patch subject: [PATCH v2] block: limit the extract size to align queue limit
-config: arc-randconfig-002-20231110 (https://download.01.org/0day-ci/archive/20231110/202311101853.9N398fyj-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231110/202311101853.9N398fyj-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311101853.9N398fyj-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   block/bio.c: In function '__bio_iov_iter_get_pages':
->> block/bio.c:1261:29: warning: suggest parentheses around '-' in operand of '&' [-Wparentheses]
-    1261 |                         max - bio->bi_iter.bi_size & (max - 1) : max;
-         |                         ~~~~^~~~~~~~~~~~~~~~~~~~~~
 
 
-vim +1261 block/bio.c
+--=20
+Best Regards,
+  Yi Zhang
 
-  1214	
-  1215	/**
-  1216	 * __bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-  1217	 * @bio: bio to add pages to
-  1218	 * @iter: iov iterator describing the region to be mapped
-  1219	 *
-  1220	 * Extracts pages from *iter and appends them to @bio's bvec array.  The pages
-  1221	 * will have to be cleaned up in the way indicated by the BIO_PAGE_PINNED flag.
-  1222	 * For a multi-segment *iter, this function only adds pages from the next
-  1223	 * non-empty segment of the iov iterator.
-  1224	 */
-  1225	static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-  1226	{
-  1227		iov_iter_extraction_t extraction_flags = 0;
-  1228		unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-  1229		unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
-  1230		struct block_device *bdev = bio->bi_bdev;
-  1231		struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
-  1232		struct page **pages = (struct page **)bv;
-  1233		ssize_t max_extract = UINT_MAX - bio->bi_iter.bi_size;
-  1234		ssize_t size, left;
-  1235		unsigned len, i = 0;
-  1236		size_t offset;
-  1237		int ret = 0;
-  1238	
-  1239		/*
-  1240		 * Move page array up in the allocated memory for the bio vecs as far as
-  1241		 * possible so that we can start filling biovecs from the beginning
-  1242		 * without overwriting the temporary page array.
-  1243		 */
-  1244		BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
-  1245		pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
-  1246	
-  1247		if (bdev && blk_queue_pci_p2pdma(bdev->bd_disk->queue))
-  1248			extraction_flags |= ITER_ALLOW_P2PDMA;
-  1249	
-  1250		/*
-  1251		 * Each segment in the iov is required to be a block size multiple.
-  1252		 * However, we may not be able to get the entire segment if it spans
-  1253		 * more pages than bi_max_vecs allows, so we have to ALIGN_DOWN the
-  1254		 * result to ensure the bio's total size is correct. The remainder of
-  1255		 * the iov data will be picked up in the next bio iteration.
-  1256		 */
-  1257		if (bdev && bio_op(bio) != REQ_OP_ZONE_APPEND) {
-  1258			unsigned int max = queue_max_bytes(bdev_get_queue(bdev));
-  1259	
-  1260			max_extract = bio->bi_iter.bi_size ?
-> 1261				max - bio->bi_iter.bi_size & (max - 1) : max;
-  1262		}
-  1263		size = iov_iter_extract_pages(iter, &pages, max_extract,
-  1264					      nr_pages, extraction_flags, &offset);
-  1265		if (unlikely(size <= 0))
-  1266			return size ? size : -EFAULT;
-  1267	
-  1268		nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
-  1269	
-  1270		if (bdev) {
-  1271			size_t trim = size & (bdev_logical_block_size(bdev) - 1);
-  1272			iov_iter_revert(iter, trim);
-  1273			size -= trim;
-  1274		}
-  1275	
-  1276		if (unlikely(!size)) {
-  1277			ret = -EFAULT;
-  1278			goto out;
-  1279		}
-  1280	
-  1281		for (left = size, i = 0; left > 0; left -= len, i++) {
-  1282			struct page *page = pages[i];
-  1283	
-  1284			len = min_t(size_t, PAGE_SIZE - offset, left);
-  1285			if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
-  1286				ret = bio_iov_add_zone_append_page(bio, page, len,
-  1287						offset);
-  1288				if (ret)
-  1289					break;
-  1290			} else
-  1291				bio_iov_add_page(bio, page, len, offset);
-  1292	
-  1293			offset = 0;
-  1294		}
-  1295	
-  1296		iov_iter_revert(iter, left);
-  1297	out:
-  1298		while (i < nr_pages)
-  1299			bio_release_page(bio, pages[i++]);
-  1300	
-  1301		return ret;
-  1302	}
-  1303	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
