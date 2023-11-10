@@ -1,80 +1,179 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633E3643
-	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 01:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABBE944A4
-	for <linux-block@vger.kernel.org>; Thu,  9 Nov 2023 17:22:22 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SRLdz2y8kz4f3kjf
-	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 09:22:15 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id BAD5F1A016D
-	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 09:22:17 +0800 (CST)
-Received: from [10.174.179.247] (unknown [10.174.179.247])
-	by APP2 (Coremail) with SMTP id Syh0CgA3jkzGhU1l0VoYAg--.6725S3;
-	Fri, 10 Nov 2023 09:22:17 +0800 (CST)
-Message-ID: <c1955b5b-4980-55dd-a1b7-54c19831d9d2@huaweicloud.com>
-Date: Fri, 10 Nov 2023 09:22:14 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D4B7E6
+	for <linux-block@vger.kernel.org>; Fri, 10 Nov 2023 01:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAi1zoi8"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C36E44A6
+	for <linux-block@vger.kernel.org>; Thu,  9 Nov 2023 17:28:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699579688;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zC+u4Re2AoTUGpqWOoMx+tYjldUA5tL8xtOql2ozAF4=;
+	b=DAi1zoi87U8FcgZJMhOo+zBn24JSNDBZ+PHPj7/ZXfws/r2TT8g8haIKDJJLzBoY7Ejedb
+	K648eop1OlG4zZfS1Rd/rQ9oghCpJ6opaDV8c/Bjz2o/83aekNdWDkkBeMT6y70vaR0zfb
+	VLNsWBl166V5GGtEr1daFsPYYW6gbwU=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-tpyZBr9kOAepI6GO2rmmTQ-1; Thu, 09 Nov 2023 20:28:05 -0500
+X-MC-Unique: tpyZBr9kOAepI6GO2rmmTQ-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1ef4f8d26d2so1368725fac.3
+        for <linux-block@vger.kernel.org>; Thu, 09 Nov 2023 17:28:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699579685; x=1700184485;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zC+u4Re2AoTUGpqWOoMx+tYjldUA5tL8xtOql2ozAF4=;
+        b=pnv3Bec4zWG4xn7qHe3RKF6XPeb7ZoS5fxadh0jcU0xDW8gbH6FEnhWH69TGOEK3/u
+         HzaKCQnL+ciwMdsddKyYm0NHWVUp8O6tgtwMFSyD6QQ0iWXHAZYzpPBaa+ll3FdmgEOq
+         RYQpzFctAxz+rMTJ7cST+MJbuQU2p4Sdd5d+/mbY/xxP4QfCIz7ZLpHUnw02KOi9Srjz
+         YtIw1eBD2PoNcrdzd/BXZ7Z0kFTCZWei09Fw1yiSK2ZKBa9tfb7lCcBLWxJFzw0i4TLQ
+         PWp2dgeMrGKnUXyQpbCA4GVOpixY7hnF/OX/vib4NzzRL54TMRXDdDGc8qKZCGU5kp8r
+         TsHw==
+X-Gm-Message-State: AOJu0YxHaP5cyPQGRbJGIe2ua7gqlomA58ONCvIEyV1hJkxX2T0md3Uu
+	+JrOt1/04cMY9OzLJsW2lKGfBKDbtxbHk/nwy51jQCmx/PKhod6YA7Xnl5a8IE6WBFllmx5T/Bc
+	B0bdSoxj0XXUUzJLWIj/pQ1i/IRgLPI74uhs8Vv0=
+X-Received: by 2002:a05:6870:1314:b0:1ea:d76b:1457 with SMTP id 20-20020a056870131400b001ead76b1457mr6624728oab.7.1699579685237;
+        Thu, 09 Nov 2023 17:28:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGY6J8ZouDEA5qQMJiaMxmBZIrQRVPu28NAIQ+CGdUvmcYPLrHluYLqjgbiUv9YwzmkiYQWWU0SJT6gXHqvqxY=
+X-Received: by 2002:a05:6870:1314:b0:1ea:d76b:1457 with SMTP id
+ 20-20020a056870131400b001ead76b1457mr6624714oab.7.1699579684985; Thu, 09 Nov
+ 2023 17:28:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v3 0/4] brd discard patches
-To: Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Zdenek Kabelac <zkabelac@redhat.com>,
- Christoph Hellwig <hch@infradead.org>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>, linux-block@vger.kernel.org,
- dm-devel@redhat.com
-References: <2dacc73-854-e71c-1746-99b017401c9a@redhat.com>
-From: Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <2dacc73-854-e71c-1746-99b017401c9a@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgA3jkzGhU1l0VoYAg--.6725S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY27kC6x804xWl14x267AKxVW8JVW5JwAF
-	c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-	0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-	wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-	x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY
-	6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr
-	0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxG
-	rwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
-	VjvjDU0xZFpf9x07UCXd8UUUUU=
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+References: <20231110010139.3901150-1-sarthakkukreti@chromium.org> <20231110010139.3901150-5-sarthakkukreti@chromium.org>
+In-Reply-To: <20231110010139.3901150-5-sarthakkukreti@chromium.org>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Fri, 10 Nov 2023 09:27:48 +0800
+Message-ID: <CAHj4cs9pS0hgWBpz9bzoJBGwh1iK+0Nuzc5RmJNyZOR5s-7oLw@mail.gmail.com>
+Subject: Re: [PATCH] loop/010: Add test for mode 0 fallocate() on loop devices
+To: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>, 
+	"Darrick J . Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>, Dave Chinner <david@fromorbit.com>, 
+	Brian Foster <bfoster@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-friendly ping...
+On Fri, Nov 10, 2023 at 9:02=E2=80=AFAM Sarthak Kukreti
+<sarthakkukreti@chromium.org> wrote:
+>
+> A recent patch series[1] adds support for calling fallocate() in mode 0
 
-在 2023/8/10 18:07, Mikulas Patocka 写道:
-> Hi
-> 
-> Here I'm submitting the ramdisk discard patches for the next merge window.
-> If you want to make some more changes, please let me now.
-> 
-> Changes since version 2:
-> There are no functional changes, I only moved the switch statement
-> conversion to a separate patch, so that it's easier to review.
-> 
-> Patch 1: introduce a switch statement in brd_submit_bio
-> Patch 2: extend the rcu regions to cover read and write
-> Patch 3: enable discard
-> Patch 4: implement write zeroes
-> 
-> Mikulas
-> 
+The patch link is missing in this patch.
 
--- 
-Thanks,
-Nan
+> on block devices. This test adds a basic sanity test for loopback devices
+> setup on a sparse file and validates that writes to the loopback device
+> succeed, even when the underlying filesystem runs out of space.
+>
+> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> ---
+>  tests/loop/010     | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/loop/010.out |  2 ++
+>  2 files changed, 62 insertions(+)
+>  create mode 100644 tests/loop/010
+>  create mode 100644 tests/loop/010.out
+>
+> diff --git a/tests/loop/010 b/tests/loop/010
+> new file mode 100644
+> index 0000000..091be5e
+> --- /dev/null
+> +++ b/tests/loop/010
+> @@ -0,0 +1,60 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2023 Google LLC.
+> +# Author: sarthakkukret@google.com (Sarthak Kukreti)
+> +#
+> +# Test if fallocate() on a loopback device provisions space on the under=
+lying
+> +# filesystem and writes on the loop device succeed, even if the lower
+> +# filesystem is filled up.
+> +
+> +. tests/loop/rc
+> +
+> +DESCRIPTION=3D"Loop device fallocate() space provisioning"
+> +QUICK=3D1
+> +
+> +requires() {
+> +       _have_program mkfs.ext4
+> +}
+> +
+> +test() {
+> +       echo "Running ${TEST_NAME}"
+> +
+> +       local mount_dir=3D"$TMPDIR/mnt"
+> +       mkdir -p ${mount_dir}
+> +
+> +       local image_file=3D"$TMPDIR/img"
+> +       truncate -s 1G "${image_file}"
+> +
+> +       local loop_device
+> +       loop_device=3D"$(losetup -P -f --show "${image_file}")"
+> +
+> +       mkfs.ext4 ${loop_device} &> /dev/null
+> +       mount -t ext4 ${loop_device} ${mount_dir}
+> +
+> +       local provisioned_file=3D"${mount_dir}/provisioned"
+> +       truncate -s 200M "${provisioned_file}"
+> +
+> +       local provisioned_loop_device
+> +       provisioned_loop_device=3D"$(losetup -P -f --show "${provisioned_=
+file}")"
+> +
+> +       # Provision space for the file: without provisioning support, thi=
+s fails
+> +       # with EOPNOTSUPP.
+> +       fallocate -l 200M "${provisioned_loop_device}"
+> +
+> +       # Fill the filesystem, this command will error out with ENOSPC.
+> +       local fs_fill_file=3D"${mount_dir}/fill"
+> +       dd if=3D/dev/zero of=3D"${fs_fill_file}" bs=3D1M count=3D1024 sta=
+tus=3Dnone &>/dev/null
+> +       sync
+> +
+> +       # Write to provisioned loop device, ensure that it does not run i=
+nto ENOSPC.
+> +       dd if=3D/dev/zero of=3D"${provisioned_loop_device}" bs=3D1M count=
+=3D200 status=3Dnone
+> +       sync
+> +
+> +       # Cleanup.
+> +       losetup --detach "${provisioned_loop_device}"
+> +       umount "${mount_dir}"
+> +       losetup --detach "${loop_device}"
+> +       rm "${image_file}"
+> +
+> +       echo "Test complete"
+> +}
+> \ No newline at end of file
+> diff --git a/tests/loop/010.out b/tests/loop/010.out
+> new file mode 100644
+> index 0000000..068c489
+> --- /dev/null
+> +++ b/tests/loop/010.out
+> @@ -0,0 +1,2 @@
+> +Running loop/009
+> +Test complete
+> --
+> 2.42.0.758.gaed0368e0e-goog
+>
+>
+
+
+--=20
+Best Regards,
+  Yi Zhang
 
