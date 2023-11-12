@@ -1,22 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370E68BE5;
-	Sun, 12 Nov 2023 13:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D98B8BF8;
+	Sun, 12 Nov 2023 13:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LroTkZMb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1992AC433C7;
-	Sun, 12 Nov 2023 13:23:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fuh2Nr59"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08AADC43391;
+	Sun, 12 Nov 2023 13:23:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699795414;
+	s=k20201202; t=1699795436;
 	bh=O8b5Mv2kgEGjlHcHU81A4qAHsu0M6DVJuc5PbVs4Wlk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LroTkZMbFoxi70KlzyTGueMTObvMl7OK2zG/MSc0JQqluiVkWkK5ewJXYnPD3bxvJ
-	 ph1ASU9NjbxkMrF6pFbkwlN43tiTc9B3XNuOeCTMG47nakynGTgAu9QrU38Mk/EDK+
-	 /Z2I5BRerdcGf1NT0nN3wCunWRCn7JokVmD/WNU1gvnAW4S5oQ0Y3BTk1L/Smy567o
-	 VX1AeZhNuPFYg8ghRgWyfTtkFMtA0eAO4niaWNrduIj/ZmhSIZPzC/8gGG66jQzsVQ
-	 /YOXg0IDnZcw+6lJTvyiA4B9G1yWSWBMUjYPXlJvNxtzZAHgAsPDIdV6jxcZsI9JKZ
-	 4Rq5CazRt/2tA==
+	b=Fuh2Nr59ERbToE6mZa7exnP5smA6uW/x7lzMFP5q2MPjobMJbW64EC1PKKG+TkjZx
+	 zJtJiEwfbNesTUkLp+gWSeVVc1P1CyKWrWlm/7aOnMzJ+vBnh9BpDlo/uDS5iaCPuf
+	 A5RT7HrHs5tMO2puW5uHRoIPXJWzecyxlrWG3etXi/jhQiLwga3g3+TfNNcW45gdZQ
+	 uBP1sSmlPVoIiYaGdBDG0p/UzcfdJ3qs4JsHfn120YyaaOUm6NAU2o4QU6I4hWIK6I
+	 Tl2oeJdR4V8hEBa4DLnd5wG+GOOZ4Gks1WZkWloQWf+pKToHuMH6O9QXZmi44F8LJa
+	 6yPWtRbVkFmKA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -27,12 +27,12 @@ Cc: zhenwei pi <pizhenwei@bytedance.com>,
 	axboe@kernel.dk,
 	virtualization@lists.linux.dev,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 5/7] virtio-blk: fix implicit overflow on virtio_max_dma_size
-Date: Sun, 12 Nov 2023 08:23:14 -0500
-Message-ID: <20231112132323.174148-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.5 5/7] virtio-blk: fix implicit overflow on virtio_max_dma_size
+Date: Sun, 12 Nov 2023 08:23:37 -0500
+Message-ID: <20231112132347.174334-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231112132323.174148-1-sashal@kernel.org>
-References: <20231112132323.174148-1-sashal@kernel.org>
+In-Reply-To: <20231112132347.174334-1-sashal@kernel.org>
+References: <20231112132347.174334-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.1
+X-stable-base: Linux 6.5.11
 Content-Transfer-Encoding: 8bit
 
 From: zhenwei pi <pizhenwei@bytedance.com>
