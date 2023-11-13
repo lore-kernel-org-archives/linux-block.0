@@ -1,102 +1,72 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF932377B
-	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 21:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SWNKusEi"
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A405D5F
-	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 13:27:03 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5446c9f3a77so7634320a12.0
-        for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 13:27:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1699910822; x=1700515622; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mttVMjujBnJtfA9qmPOIHfeRm+JAOLtRVgarlviBSVY=;
-        b=SWNKusEikZ1DnrYVHQ0hQIr0P5xQ6d7ccHuOGHJIjnhbSRJxEpYKgjbrhrwOYU93Tz
-         UXeeIK82VcqmypH86NZdLRny5x+n3RkaXs9A0Q8zejFkSAWi3wON91+UFgN0drxH7dZS
-         L1I8W1/dkxAmQBmo2KMtchZsfVIPIaVscjoQs=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DABF3E461
+	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 23:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9479519E;
+	Mon, 13 Nov 2023 15:57:40 -0800 (PST)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so3998660a12.1;
+        Mon, 13 Nov 2023 15:57:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699910822; x=1700515622;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mttVMjujBnJtfA9qmPOIHfeRm+JAOLtRVgarlviBSVY=;
-        b=VPHz0z24wGyGhGf9Hr1ew40owSlhQ6/y4TJwEd37x83C6ABmpJ5ogbrAj75uZq3r2i
-         sij4Yed+GBO2e5tmo6fVhYJbbw6+2vXDutWDEVdy7BJUPZSUO9jCMics88CUgUfa2q4L
-         nyrKe7Ly8RqI0CxdihIw6YbvkVdupEA6w7iWtLPPndqSbhnTTN9uLKhURZq+C2qNWOAF
-         MINRYFdpEr0GjraFmw9OXETzMELZVeVwjN/6o7mZadDz7zJx8LKUoTi7w/1tR3BO9g87
-         oaHzG2PBgd3WcxbiP0oS1qEbBrS0SSCSShaMuqtapti2sVzV2KHgryFbLs67j0Wh30PE
-         rksg==
-X-Gm-Message-State: AOJu0YyVoQsWh6AVIRAxcshbKF9J4qk6XhsZdYzJBOPDhudnQ75BoEZe
-	HhiTaeVpihw2/s6ZDoVat9IVH1KfKm9UpgyPLR7tBQ==
-X-Google-Smtp-Source: AGHT+IGoL4C64VRkqMMt2Ko2g8gaFMw8YCcpuwoNcjFqFlvPZKJTDjJL2Bgl7LbSUmzZ0cB+I9TezFzC6HBD0IZ7Sjs=
-X-Received: by 2002:a17:906:dfca:b0:9e4:67d9:438 with SMTP id
- jt10-20020a170906dfca00b009e467d90438mr5397879ejc.56.1699910821965; Mon, 13
- Nov 2023 13:27:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699919860; x=1700524660;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2O33Z20Hw5m9jWPSsRRvDoAMyIPjKTQaup/hA8pvVwg=;
+        b=rQzftL3T3jXjBlwlBEdQwrraDjCYgUR7plDSi6DH5jUJRjUDtvGNIt8au6aR2oZho4
+         E5pDrByXLDc0Uj9e8QRSmqmSmtGCfqD1kM5fdHR04QunTjS3zGhQS/Gwozaer+sOnY68
+         q7kOIsWSytpcgUr38fGR91P2qn2j5ZfItvKPu19vM8vfU6q6uN4HNWSHJV4HhVVHKXws
+         wQlqbdVAuvTIo9dbLdI5uWZjPoBVeiyPNl48BIiYkj/iMXzA6pwXn5/8RamECrwfw1jg
+         SQPY4Gc6pCoFT3DfQ/v3XOtqk3X3jr+qqwVbWeDrzh4ORUcqx9fd6iqhF3Yvcy9rfkei
+         DbVg==
+X-Gm-Message-State: AOJu0YzC2uhvltaviwnhdkM/Q5Zy/ocLiUoOevkgARFDkjntb129AeIh
+	I9MtcMFKD2NXXwdptUA2gIw1iGhoW4M=
+X-Google-Smtp-Source: AGHT+IHuHxh5mqX7RqLGEoVItvxSJ0QEO1HWwHcQdsilEu8FzLk6SzflzOyi+wzsLftN0NQJT9fDDg==
+X-Received: by 2002:a05:6a20:8408:b0:186:736f:7798 with SMTP id c8-20020a056a20840800b00186736f7798mr5840594pzd.11.1699919859795;
+        Mon, 13 Nov 2023 15:57:39 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:7575:f839:a613:3f5b? ([2620:0:1000:8411:7575:f839:a613:3f5b])
+        by smtp.gmail.com with ESMTPSA id x14-20020aa784ce000000b006b97d5cbb7csm143897pfn.60.2023.11.13.15.57.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Nov 2023 15:57:39 -0800 (PST)
+Message-ID: <3f2c2d33-2e5d-4c7b-80ea-e76885981dfb@acm.org>
+Date: Mon, 13 Nov 2023 15:57:38 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231110010139.3901150-1-sarthakkukreti@chromium.org> <ZU7RVKJIzm8ExGGH@dread.disaster.area>
-In-Reply-To: <ZU7RVKJIzm8ExGGH@dread.disaster.area>
-From: Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date: Mon, 13 Nov 2023 13:26:51 -0800
-Message-ID: <CAG9=OMPFEV9He+ggq2mcLULnUZ2jm8fGU=4ca8kBoWtvqYcGVg@mail.gmail.com>
-Subject: Re: [PATCH v9 0/3] [PATCH v9 0/3] Introduce provisioning primitives
-To: Dave Chinner <david@fromorbit.com>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>, 
-	"Darrick J . Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>, Brian Foster <bfoster@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [External] Re: [syzbot] [block?] WARNING in blk_mq_start_request
+Content-Language: en-US
+To: Chengming Zhou <zhouchengming@bytedance.com>,
+ syzbot <syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com>,
+ axboe@kernel.dk, chaitanyak@nvidia.com, eadavis@qq.com, hch@infradead.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
+References: <00000000000077ca930609aa9f86@google.com>
+ <7ed9f6f9-d309-4d30-9b3b-c465cfa48a52@bytedance.com>
+ <f4a6ff9e-d631-42c4-a5e1-87e767771488@acm.org>
+ <d9f1ee3b-c303-44af-ba30-b52137fc29cb@bytedance.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <d9f1ee3b-c303-44af-ba30-b52137fc29cb@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 10, 2023 at 4:56=E2=80=AFPM Dave Chinner <david@fromorbit.com> =
-wrote:
->
-> On Thu, Nov 09, 2023 at 05:01:35PM -0800, Sarthak Kukreti wrote:
-> > Hi,
-> >
-> > This patch series is version 9 of the patch series to introduce
-> > block-level provisioning mechanism (original [1]), which is useful for
-> > provisioning space across thinly provisioned storage architectures (loo=
-p
-> > devices backed by sparse files, dm-thin devices, virtio-blk). This
-> > series has minimal changes over v8[2], with a couple of patches dropped
-> > (suggested by Dave).
-> >
-> > This patch series is rebased from the linux-dm/dm-6.5-provision-support
-> > [3] on to (a12deb44f973 Merge tag 'input-for-v6.7-rc0' ...). The final
-> > patch in the series is a blktest (suggested by Dave in 4) which was use=
-d
-> > to test out the provisioning flow for loop devices on sparse files on a=
-n
-> > ext4 filesystem.
->
-> What happened to the XFS patch I sent to support provisioning for
-> fallocate() operations through XFS?
->
-Apologies, I missed out on mentioning that the XFS patches work well
-with loop devices.
+On 11/13/23 07:05, Chengming Zhou wrote:
+> Ok, I reviewed the code of virtio_queue_rqs(), found the main difference
+> is that request won't fail after blk_mq_start_request().
+> 
+> But in null_blk case, the request will fail after blk_mq_start_request(),
+> return BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE. If we return these rqs
+> back to the block layer core, they will be queued individually once again.
+> So caused the warning.
 
-I might have misunderstood: were those patches only for sanity testing
-or would you prefer that I send those out as a part of this series? I
-can whip up a quick v10 if so!
+I think it is safe to move the blk_mq_start_request() call under the if-block
+that decides whether or not to requeue a request in null_queue_rq()
 
-Cheers
+Thanks,
 
-Sarthak
-
-
-> Cheers,
->
-> Dave.
-> --
-> Dave Chinner
-> david@fromorbit.com
+Bart.
