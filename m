@@ -1,216 +1,237 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4116848D
-	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 03:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a85dKOUM"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62146109
-	for <linux-block@vger.kernel.org>; Sun, 12 Nov 2023 19:52:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699847564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nUxaAsVn1WBRgqyLk6C526VXC2Rw+tJpikfG2xr9e4c=;
-	b=a85dKOUM4Du/m/JIDm+wKycq9itp3gOB1MYUAUyOjEL4cxJU5ryGuPWwffO+/7+SYqiqUX
-	k+Qp+R51raOV1EDNkO+O3zIjj12gJJxm5+6TD0pVNbf1+AeFDYanU/Q6WT9SfuajKofRxc
-	Av3BF2GGIn61Rvti8qMLoQFJA9nWjeQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-WnGZq4H5NliE5XT10ZFWEg-1; Sun, 12 Nov 2023 22:52:41 -0500
-X-MC-Unique: WnGZq4H5NliE5XT10ZFWEg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 70CE0101A52D;
-	Mon, 13 Nov 2023 03:52:41 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.6])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5D00A2166B26;
-	Mon, 13 Nov 2023 03:52:39 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2] blk-mq: make sure active queue usage is held for bio_integrity_prep()
-Date: Mon, 13 Nov 2023 11:52:31 +0800
-Message-ID: <20231113035231.2708053-1-ming.lei@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC9E11C9E
+	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 06:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B7D1719;
+	Sun, 12 Nov 2023 22:09:03 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4STJsN2lfpz4f3nTL;
+	Mon, 13 Nov 2023 14:08:56 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 51DB61A0173;
+	Mon, 13 Nov 2023 14:09:00 +0800 (CST)
+Received: from [10.174.179.155] (unknown [10.174.179.155])
+	by APP1 (Coremail) with SMTP id cCh0CgDHyhB6vVFlzoEpAw--.29047S3;
+	Mon, 13 Nov 2023 14:09:00 +0800 (CST)
+Message-ID: <39d49e80-3a41-a312-7406-8892d940dd19@huaweicloud.com>
+Date: Mon, 13 Nov 2023 14:08:58 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
+ Thunderbird/104.0
+Subject: Re: [PATCH -next] block: don't allow a disk link holder to its
+ ancestor
+To: hch@lst.de, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yukuai1@huaweicloud.com, houtao1@huawei.com, yi.zhang@huawei.com,
+ lilingfeng3@huawei.com, yangerkun <yangerkun@huawei.com>
+References: <20230425075558.3450970-1-lilingfeng@huaweicloud.com>
+ <d568537c-b0eb-bd97-9930-ee0eff8088d9@huaweicloud.com>
+From: Li Lingfeng <lilingfeng@huaweicloud.com>
+In-Reply-To: <d568537c-b0eb-bd97-9930-ee0eff8088d9@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+X-CM-TRANSID:cCh0CgDHyhB6vVFlzoEpAw--.29047S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxtF45Kr45CryxGFWDWrWfXwb_yoW3JFyDpF
+	n5tFWUXryUurn7Wr47tw4UZFy5Jw18X3WkJrn7tFy2yrW7Jr4q9r17XrnFgF15JrWxKr17
+	tF1UWrnxZF1xGrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+	UUU
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-From: Christoph Hellwig <hch@infradead.org>
+Ping again
 
-blk_integrity_unregister() can come if queue usage counter isn't held
-for one bio with integrity prepared, so this request may be completed with
-calling profile->complete_fn, then kernel panic.
+Thanks
 
-Another constraint is that bio_integrity_prep() needs to be called
-before bio merge.
-
-Fix the issue by:
-
-- call bio_integrity_prep() with one queue usage counter grabbed reliably
-
-- call bio_integrity_prep() before bio merge
-
-Fixes: 900e080752025f00 ("block: move queue enter logic into blk_mq_submit_bio()")
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- remove blk_mq_cached_req()
-	- move blk_mq_attempt_bio_merge() out of blk_mq_can_use_cached_rq(),
-	  so that &bio isn't needed any more for blk_mq_can_use_cached_rq()
-	- all are suggested from Christoph
-
- block/blk-mq.c | 75 +++++++++++++++++++++++++-------------------------
- 1 file changed, 38 insertions(+), 37 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e2d11183f62e..900c1be1fee1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2858,11 +2858,8 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 	};
- 	struct request *rq;
- 
--	if (unlikely(bio_queue_enter(bio)))
--		return NULL;
--
- 	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
--		goto queue_exit;
-+		return NULL;
- 
- 	rq_qos_throttle(q, bio);
- 
-@@ -2878,35 +2875,23 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 	rq_qos_cleanup(q, bio);
- 	if (bio->bi_opf & REQ_NOWAIT)
- 		bio_wouldblock_error(bio);
--queue_exit:
--	blk_queue_exit(q);
- 	return NULL;
- }
- 
--static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
--		struct blk_plug *plug, struct bio **bio, unsigned int nsegs)
-+/* return true if this @rq can be used for @bio */
-+static bool blk_mq_can_use_cached_rq(struct request *rq, struct blk_plug *plug,
-+		struct bio *bio)
- {
--	struct request *rq;
--	enum hctx_type type, hctx_type;
-+	enum hctx_type type = blk_mq_get_hctx_type(bio->bi_opf);
-+	enum hctx_type hctx_type = rq->mq_hctx->type;
- 
--	if (!plug)
--		return NULL;
--	rq = rq_list_peek(&plug->cached_rq);
--	if (!rq || rq->q != q)
--		return NULL;
-+	WARN_ON_ONCE(rq_list_peek(&plug->cached_rq) != rq);
- 
--	if (blk_mq_attempt_bio_merge(q, *bio, nsegs)) {
--		*bio = NULL;
--		return NULL;
--	}
--
--	type = blk_mq_get_hctx_type((*bio)->bi_opf);
--	hctx_type = rq->mq_hctx->type;
- 	if (type != hctx_type &&
- 	    !(type == HCTX_TYPE_READ && hctx_type == HCTX_TYPE_DEFAULT))
--		return NULL;
--	if (op_is_flush(rq->cmd_flags) != op_is_flush((*bio)->bi_opf))
--		return NULL;
-+		return false;
-+	if (op_is_flush(rq->cmd_flags) != op_is_flush(bio->bi_opf))
-+		return false;
- 
- 	/*
- 	 * If any qos ->throttle() end up blocking, we will have flushed the
-@@ -2914,12 +2899,12 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	 * before we throttle.
- 	 */
- 	plug->cached_rq = rq_list_next(rq);
--	rq_qos_throttle(q, *bio);
-+	rq_qos_throttle(rq->q, bio);
- 
- 	blk_mq_rq_time_init(rq, 0);
--	rq->cmd_flags = (*bio)->bi_opf;
-+	rq->cmd_flags = bio->bi_opf;
- 	INIT_LIST_HEAD(&rq->queuelist);
--	return rq;
-+	return true;
- }
- 
- static void bio_set_ioprio(struct bio *bio)
-@@ -2949,7 +2934,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	struct blk_plug *plug = blk_mq_plug(bio);
- 	const int is_sync = op_is_sync(bio->bi_opf);
- 	struct blk_mq_hw_ctx *hctx;
--	struct request *rq;
-+	struct request *rq = NULL;
- 	unsigned int nr_segs = 1;
- 	blk_status_t ret;
- 
-@@ -2960,20 +2945,36 @@ void blk_mq_submit_bio(struct bio *bio)
- 			return;
- 	}
- 
--	if (!bio_integrity_prep(bio))
--		return;
--
- 	bio_set_ioprio(bio);
- 
--	rq = blk_mq_get_cached_request(q, plug, &bio, nr_segs);
--	if (!rq) {
--		if (!bio)
-+	if (plug) {
-+		rq = rq_list_peek(&plug->cached_rq);
-+		if (rq && rq->q != q)
-+			rq = NULL;
-+	}
-+	if (rq) {
-+		if (!bio_integrity_prep(bio))
- 			return;
--		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
--		if (unlikely(!rq))
-+		if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
- 			return;
-+		if (blk_mq_can_use_cached_rq(rq, plug, bio))
-+			goto done;
-+		percpu_ref_get(&q->q_usage_counter);
-+	} else {
-+		if (unlikely(bio_queue_enter(bio)))
-+			return;
-+		if (!bio_integrity_prep(bio))
-+			goto fail;
-+	}
-+
-+	rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
-+	if (unlikely(!rq)) {
-+fail:
-+		blk_queue_exit(q);
-+		return;
- 	}
- 
-+done:
- 	trace_block_getrq(bio);
- 
- 	rq_qos_track(q, rq, bio);
--- 
-2.41.0
+在 2023/10/8 9:14, Li Lingfeng 写道:
+> Friendly ping ...
+>
+> Thanks
+>
+> 在 2023/4/25 15:55, Li Lingfeng 写道:
+>> From: Li Lingfeng <lilingfeng3@huawei.com>
+>>
+>> Previously commit 077a4033541f ("block: don't allow a disk link holder
+>> to itself") prevent user from reloading dm with itself. However, user
+>> can reload dm with its ancestor which will trigger dead loop and result
+>> in oom.
+>>
+>> Test procedures:
+>> 1) dmsetup create test --table "0 20971520 linear /dev/sdd 0"
+>> 2) dmsetup create test1 --table "0 20971520 linear /dev/sdd 20971520"
+>> 3) dmsetup suspend test
+>> 4) dmsetup reload test --table "0 2048 linear /dev/mapper/test1 0"
+>> 5) dmsetup resume test
+>> 6) dmsetup suspend test1
+>> 7) dmsetup reload test1 --table "0 2048 linear /dev/mapper/test 0"
+>> 8) dmsetup resume test1
+>>
+>> Dead loop:
+>> [  229.681231] Call Trace:
+>> [  229.681232]  dm_dax_supported+0x5b/0xa0
+>> [  229.681233]  dax_supported+0x28/0x50
+>> [  229.681234]  device_not_dax_capable+0x45/0x70
+>> [  229.681235]  ? realloc_argv+0xa0/0xa0
+>> [  229.681236]  linear_iterate_devices+0x25/0x30
+>> [  229.681237]  dm_table_supports_dax+0x42/0xd0
+>> [  229.681238]  dm_dax_supported+0x5b/0xa0
+>> [  229.681238]  dax_supported+0x28/0x50
+>> [  229.681239]  device_not_dax_capable+0x45/0x70
+>>                  ......(a lot of same lines)
+>> [  229.681423]  ? realloc_argv+0xa0/0xa0
+>> [  229.681424]  linear_iterate_devices+0x25/0x30
+>> [  229.681425]  dm_table_supports_dax+0x42/0xd0
+>> [  229.681426]  dm
+>> [  229.681428] Lost 437 message(s)!
+>> [  229.825588] ---[ end trace 0f2a9db839ed5b56 ]---
+>>
+>> OOM:
+>> [  189.270011] Call Trace:
+>> [  189.270274]  <TASK>
+>> [  189.270511]  dump_stack_lvl+0xc1/0x170
+>> [  189.270899]  dump_stack+0x14/0x20
+>> [  189.271222]  dump_header+0x5a/0x710
+>> [  189.271590]  oom_kill_process+0x16b/0x500
+>> [  189.272018]  out_of_memory+0x333/0xad0
+>> [  189.272453]  __alloc_pages_slowpath.constprop.0+0x18b4/0x1c40
+>> [  189.273130]  ? find_held_lock+0x33/0xf0
+>> [  189.273637]  __alloc_pages+0x598/0x660
+>> [  189.274106]  alloc_pages+0x95/0x240
+>> [  189.274482]  folio_alloc+0x1f/0x60
+>> [  189.274835]  filemap_alloc_folio+0x223/0x350
+>> [  189.275348]  __filemap_get_folio+0x21e/0x770
+>> [  189.275916]  filemap_fault+0x72d/0xdc0
+>> [  189.276454]  __do_fault+0x41/0x360
+>> [  189.276820]  do_fault+0x263/0x8f0
+>> [  189.277175]  __handle_mm_fault+0x9af/0x1b20
+>> [  189.277810]  handle_mm_fault+0x128/0x570
+>> [  189.278243]  do_user_addr_fault+0x2af/0xea0
+>> [  189.278733]  exc_page_fault+0x73/0x340
+>> [  189.279133]  asm_exc_page_fault+0x22/0x30
+>> [  189.279523] RIP: 0033:0x561e82ac67f0
+>>
+>> Forbidding a disk to create link to its ancestor can solve the problem.
+>> What's more, limit device depth to prevent recursive overflow.
+>>
+>> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+>> ---
+>>   block/holder.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 42 insertions(+)
+>>
+>> diff --git a/block/holder.c b/block/holder.c
+>> index 37d18c13d958..6a8571b7d9c5 100644
+>> --- a/block/holder.c
+>> +++ b/block/holder.c
+>> @@ -2,9 +2,13 @@
+>>   #include <linux/blkdev.h>
+>>   #include <linux/slab.h>
+>>   +#define DEVICE_DEPTH 5
+>> +static DEFINE_MUTEX(slave_bdevs_lock);
+>> +
+>>   struct bd_holder_disk {
+>>       struct list_head    list;
+>>       struct kobject        *holder_dir;
+>> +    struct gendisk        *slave_disk;
+>>       int            refcnt;
+>>   };
+>>   @@ -29,6 +33,32 @@ static void del_symlink(struct kobject *from, 
+>> struct kobject *to)
+>>       sysfs_remove_link(from, kobject_name(to));
+>>   }
+>>   +static struct gendisk *iterate_slave_disk(struct gendisk *disk,
+>> +                       struct gendisk *target, int depth)
+>> +{
+>> +    struct bd_holder_disk *holder;
+>> +    struct gendisk *iter_slave;
+>> +
+>> +    if (!depth)
+>> +        return target;
+>> +
+>> +    if (list_empty_careful(&disk->slave_bdevs))
+>> +        return NULL;
+>> +
+>> +    depth--;
+>> +    list_for_each_entry(holder, &disk->slave_bdevs, list) {
+>> +        if (holder->slave_disk == target)
+>> +            return target;
+>> +
+>> +        iter_slave = iterate_slave_disk(holder->slave_disk, target, 
+>> depth);
+>> +        if (iter_slave)
+>> +            return iter_slave;
+>> +
+>> +        cond_resched();
+>> +    }
+>> +    return NULL;
+>> +}
+>> +
+>>   /**
+>>    * bd_link_disk_holder - create symlinks between holding disk and 
+>> slave bdev
+>>    * @bdev: the claimed slave bdev
+>> @@ -62,6 +92,13 @@ int bd_link_disk_holder(struct block_device *bdev, 
+>> struct gendisk *disk)
+>>       struct bd_holder_disk *holder;
+>>       int ret = 0;
+>>   +    mutex_lock(&slave_bdevs_lock);
+>> +    if (iterate_slave_disk(bdev->bd_disk, disk, DEVICE_DEPTH)) {
+>> +        mutex_unlock(&slave_bdevs_lock);
+>> +        return -EINVAL;
+>> +    }
+>> +    mutex_unlock(&slave_bdevs_lock);
+>> +
+>>       if (WARN_ON_ONCE(!disk->slave_dir))
+>>           return -EINVAL;
+>>   @@ -81,6 +118,7 @@ int bd_link_disk_holder(struct block_device 
+>> *bdev, struct gendisk *disk)
+>>       mutex_unlock(&bdev->bd_disk->open_mutex);
+>>         mutex_lock(&disk->open_mutex);
+>> +    mutex_lock(&slave_bdevs_lock);
+>>       WARN_ON_ONCE(!bdev->bd_holder);
+>>         holder = bd_find_holder_disk(bdev, disk);
+>> @@ -106,8 +144,10 @@ int bd_link_disk_holder(struct block_device 
+>> *bdev, struct gendisk *disk)
+>>       ret = add_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
+>>       if (ret)
+>>           goto out_del_symlink;
+>> +    holder->slave_disk = bdev->bd_disk;
+>>       list_add(&holder->list, &disk->slave_bdevs);
+>>   +    mutex_unlock(&slave_bdevs_lock);
+>>       mutex_unlock(&disk->open_mutex);
+>>       return 0;
+>>   @@ -141,6 +181,7 @@ void bd_unlink_disk_holder(struct block_device 
+>> *bdev, struct gendisk *disk)
+>>           return;
+>>         mutex_lock(&disk->open_mutex);
+>> +    mutex_lock(&slave_bdevs_lock);
+>>       holder = bd_find_holder_disk(bdev, disk);
+>>       if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
+>>           del_symlink(disk->slave_dir, bdev_kobj(bdev));
+>> @@ -149,6 +190,7 @@ void bd_unlink_disk_holder(struct block_device 
+>> *bdev, struct gendisk *disk)
+>>           list_del_init(&holder->list);
+>>           kfree(holder);
+>>       }
+>> +    mutex_unlock(&slave_bdevs_lock);
+>>       mutex_unlock(&disk->open_mutex);
+>>   }
+>>   EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
 
