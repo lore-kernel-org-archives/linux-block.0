@@ -1,146 +1,312 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DDF125A8
-	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 06:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B911C6AE
+	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 11:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jAqp4SS8";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="U3oeBNOA"
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70803171C
-	for <linux-block@vger.kernel.org>; Sun, 12 Nov 2023 22:09:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1699855765; x=1731391765;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=W1qVycjvkI03ExRJwvh9RuT9PaKmMkD47x/G+oFhLjs=;
-  b=jAqp4SS8xQRpEO7l4tbPLaJFuBZ+FIBUfBGEi4VIE0wTlhU8OVjDuwTl
-   ZWH3km5nivlt9cyrEKeoD+dgjYY7OeCrkXUj2KdnxhSC8rMNyCxUpzmvM
-   VLHBGFau77xWIJj+tqk3NHzqWLUNPlS255gs3d4pKR9dU57aDOEESyghx
-   O6ibF6KBfQcnjLQwTEAvBGiLmwl8srQCBZJHS33RG7iG9+sUQe866MAxK
-   qVYFSsggnB1Li7q/W+OGVXaqPT0XAkgQtK8SI3zRe31PIw+5UWDfTic3r
-   /DWvTZ6SG2Izu+bMC1S1tF9G/Su1crbvBIM2E9yLgtjO395OvzHkQtvqx
-   A==;
-X-CSE-ConnectionGUID: anyoWxOrQROBZ5p/ntC0wQ==
-X-CSE-MsgGUID: UyZmK6zbQs6FilZNPjGSzQ==
-X-IronPort-AV: E=Sophos;i="6.03,298,1694707200"; 
-   d="scan'208";a="2137823"
-Received: from mail-co1nam11lp2168.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.168])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Nov 2023 14:09:25 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WloITL6idXsIq5tH0gHizK347TjWGR2K293+OsytBBWrS366XA8cc9nJrY+g8IjUyZ8YCjEHN6R4D2qR64p08sWmw/jk/BctdHC6fv9/RCqzj9/FrdJStWftNTbYmtYztoOBT5GsZd3Ar22S1QyiDtITx/pwzYEH/CSBx41NSb2f0KuKVoP9DkXWSvla5NwhUiElFvge3DVJXTbHYhLYqnzzk3FGvSBe8W7FWlRGawImHvq6CsS/sd8681DBKId4XWNOTu02HbfNFL4+krFqgoWYC5uqfEpH1QMqDfTu55NcNBcMJGEJeXGwPbonRSAHmOzRTXK147VeP20VTV6z7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W1qVycjvkI03ExRJwvh9RuT9PaKmMkD47x/G+oFhLjs=;
- b=MCxMMVjo/ccLlLhgAR7gtEU4KnywyS2fvK90PgRvAx/L4mq1FtzDjWUdFfSjaYUolg0ZG8a06oIyN36QpHJ6CMknjvOR1sdJuZh2n15vGoSTD9vLW7v/l+PouChXGWH6M27AhffZqpWz9/dQbmKs3fLH2F2QbJ5NLr6IQBmlJlFLTG7rHvBcwFqGHpI21Ahi3YDGcFxxdxcW6X5mpfXpHNpyJzK06+kzLBf8WJJIQxQpbOJq2EukaoXwfWhp8plNxPMGZiDM8I9TxVgneVvdqBLPbjFGSHQ6Z8LFNaZQ+v+fPgcDIh3o9lxglpMYzch7XqOX7vTVHae+dp0O5gAl7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W1qVycjvkI03ExRJwvh9RuT9PaKmMkD47x/G+oFhLjs=;
- b=U3oeBNOAdA2IZW+qNdaV1oll2XxlhxG/Nxt5IBwGqOgw7Pp2SEXcSoI8Bhz6OYAyYPonP1valeR4LQIPxM+cjg41DPt7qss8gs+JXroCp7tinr3t1g4ZGBKYna7DGMort+gBA88QCCNnBT0YpbiIzmHym+zRb17GX8SkNSZUVN0=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- PH0PR04MB7494.namprd04.prod.outlook.com (2603:10b6:510:5b::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6977.29; Mon, 13 Nov 2023 06:09:22 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::2256:4ad2:cd2b:dc9e]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::2256:4ad2:cd2b:dc9e%3]) with mapi id 15.20.6977.029; Mon, 13 Nov 2023
- 06:09:22 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Ming Lei <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH V2] ublk/rc: prefer to rublk over miniublk
-Thread-Topic: [PATCH V2] ublk/rc: prefer to rublk over miniublk
-Thread-Index: AQHaFJQ9OEbye11tP0e7RfipD8PyTrB3xqmA
-Date: Mon, 13 Nov 2023 06:09:21 +0000
-Message-ID: <7vokrcsmv353xhvvz4azktzlggibkzat6yb5o3povazinfg6kp@dm7dbmn3haqj>
-References: <20231111114253.2665981-1-ming.lei@redhat.com>
-In-Reply-To: <20231111114253.2665981-1-ming.lei@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH0PR04MB7494:EE_
-x-ms-office365-filtering-correlation-id: 5034cb46-73d1-4a40-b891-08dbe40f1450
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- h3oBoM9021opQM8fme9z1R6i/I8ugEaNagIP4TebTzBtvOFDknOApmyZXf0BFZyhu9MKPKYU45WbLxtCqNdJaZglFSFQRKlmFwnyqSHZnc1jsexV5Ezr4NS0EX9xoB72sBLIBz3QbnEsaXKAXbYNwKXeGrKCPNpwoFrbyyWHU/7X9efjszOmhfgjS50oRrHV1Ch4IB0uyYtx4MAwvy+e+XU8SomAeL96sGYxb/9j6IBnp5a3l3Vq4rCCyDCOVeOxTBqRCloON/g1TZejat416nLc/KqrOw4um/axOGNJHpqtlb6SbpRWyUWS/bA07pBpyTV/32+LMZ1WARiTwOgG72IpU7ZZAqDc7rntl9toJ7z0hYBT9tLTJIQ0UzR96iBE9hECOjKSgluYuH05rRK7Fwi5somOX1N8snuOmPcI7M0qLGbY1XL8tyk/xY3b3oeI2Uw03p5p0+yy950RCXut8hAnzVBPz6nm8BX9o9cEit5R7+KhHJoE10S3EQRORkr9ODsvzr6vbJHt19X67Nm+UN/CjCu6rMDsO6pORrX17OaqIFNlFcP3Cf/Nr0NZhtt9q9PLhmpFQzeOCg71SgHJcQv/pmTr2vb0MB/n/HiOXUk=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(376002)(346002)(39860400002)(136003)(396003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(38070700009)(2906002)(4744005)(44832011)(71200400001)(5660300002)(86362001)(41300700001)(33716001)(26005)(82960400001)(91956017)(64756008)(66446008)(66556008)(66946007)(76116006)(66476007)(6916009)(9686003)(6512007)(316002)(38100700002)(966005)(478600001)(122000001)(6486002)(6506007)(8676002)(4326008)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?T67r2d9YR8/GIZm3CdnPn8NCjtPzFc5SMvRPZz+bWBsbDHlR7fM5SFErfjWG?=
- =?us-ascii?Q?ApkuTHxlaDCX09E0xGnDDOSQtK4Y2HvuRjCSBmUvpjUIMiHtVtl6bA6TPg8z?=
- =?us-ascii?Q?utFscC3KME5fbk9W6cFcLkiyPc+pVL8wsmHnzHL7So0xfdEB76M4TQJK0k/l?=
- =?us-ascii?Q?IonU7JbbAMRNsBDZSRSEHawmQSraw+B0jP+AA35rJ3aB8q+CsJz1tzQQtJr4?=
- =?us-ascii?Q?u8ToOFIPTuZGfmoNOMNMxpI5O51e6Vihie2D+yOOD1PHDtCCB0jKIQtK2637?=
- =?us-ascii?Q?dk0bvlkE6BSeJ03JzLayCiO60Sk+60+kbwXJoKR1Y5a2dorXpDsdtivZROig?=
- =?us-ascii?Q?erW5fDliTqaIe3WA4pmnTbnQVCErow6Hm7R4J7Jc0BUomt52Gbk8JDTdIE8t?=
- =?us-ascii?Q?hDAprAMqPe1x1nO1W2kdP3p6GXuhSzDoEpTf0vT+ZM6V2AfNGlA0h24GG4OI?=
- =?us-ascii?Q?DRoAWMD2DNh8TGqbFvUyKcyWV9zgN3wIBQT5UR4kw0qessf9DJDakLy9X9HF?=
- =?us-ascii?Q?nB2Zu0z7o9QE1AV5qRwbCR2hNojhWZ4JvNWG/rm5uBc7ejiohOU9jTMIYoP1?=
- =?us-ascii?Q?yPzc8ClLxqeGIyITlfunskPkj/DstlOlHKLAGUCasGua/6xWSko5f9T60IwQ?=
- =?us-ascii?Q?e5AtH8OO6sMnRbd53fM3B5WSZHqLMdiLGeaCepMDN6sFfd+tGJX4lPQiIUD9?=
- =?us-ascii?Q?oZsPU2EKgA2afrIvTjBfDBpyqBi6siqskIBtQY3BjcAOgJ/6W2qGWWP9oYuG?=
- =?us-ascii?Q?h5oFiDuwniXLG4+ovC/JtZjPfgKlvuMNtgsaL/XsHl5lZ8793AHqOgTi12zG?=
- =?us-ascii?Q?xljXwefkIUVqpIvVFQ552eMfqf/6BGC9TBoBBrdRv7wo9bYc+NAHH6vnlS5O?=
- =?us-ascii?Q?VPBY26tAu+xxhxMvhDum7H+ebO8VW3elmka+UZ/U5dPFG8d79sRc8BKkvjMD?=
- =?us-ascii?Q?zdc0B2AVtE5K8pMmkYBtqRl1zNq8V0sro7QCCxVx0h2r5Qu82uNvhMBN6sJS?=
- =?us-ascii?Q?NeqKSHXRxV1zKGprMN/gY1PWzPxjTsl/lYyuV6J+WL5parJsA+O6xyhq9dRq?=
- =?us-ascii?Q?Vr1xyjEfc3cH2T4XVN2BGtVK1CKyaa/iOL5NQtB18caGK7S8EAad9e4vaIw5?=
- =?us-ascii?Q?XVBTzBB8p4jNqoRipCk9/G9GOk3UN+RsplKRTy8mePuThr1zFB8D49GkadN7?=
- =?us-ascii?Q?UfTmqSScfwtraQJD+buXtJlOp2nJ1+skEjzbnRnkmgEAlbSuCOWkmSvTrIBC?=
- =?us-ascii?Q?GIjrFg6yghF5cBU/+8+gTyUy8x5DQVC6c7J+qEQT6fYXTEgnraom4Tt3/S3D?=
- =?us-ascii?Q?2hRvZeJ+yKWNs2c3+AWTdtFf+hc+fZrRo5UK7OUSSHwsyrD/isROx9qUPHXx?=
- =?us-ascii?Q?F7qmxy7f+pAcihq5kJCHAlrdwH1q1x+EZm4T79eTYPLDvWJ0Mv5yT35phWkJ?=
- =?us-ascii?Q?yNV27HhWQOxml/apHvXUWSvW4LjNyfee+YJGCK5wu+Om87N11hrJPIcFKy7m?=
- =?us-ascii?Q?5Yd8rFZsg73vR198nAcja8hDUSPZPW3+9y/eq+a9u4Jlgu7UbDRMw9cO0+VA?=
- =?us-ascii?Q?TlQHngQYfAlZrmdm2B/ngnXH9EZS+FfKuDBk3NdMnRlOaQxhMHl6cOk5DZsy?=
- =?us-ascii?Q?br5mPR6PAi5oq4ZW7nkmGm0=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <B3BDCF100C129F48BA9FDF253CBEF070@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GDt53it2"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DECCB
+	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 03:01:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699873294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FD/xvv1yK4vg5L5HBEnqw1gbn2ej7nJdUQPgpJCrM/k=;
+	b=GDt53it2Zd0Y4e/eyiYEKEBt3EaLEeCPvbGomAt1lBoywJd0m2vJ5HED52qmiL/HZ5/S+W
+	vxxhHOb0SfkCRzFw5XZRAPZURuBQeZUDQwpW8PCnKzNiqG2ZlggwZMqOEmN4MZVxHOZU1V
+	0Drjx4CMfdc3HPNeTDr2SvCHqL+HNcw=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-84-CEz5C61gN_CSaAZ74pF4aw-1; Mon, 13 Nov 2023 06:01:32 -0500
+X-MC-Unique: CEz5C61gN_CSaAZ74pF4aw-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2806501f8efso5467750a91.2
+        for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 03:01:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699873291; x=1700478091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FD/xvv1yK4vg5L5HBEnqw1gbn2ej7nJdUQPgpJCrM/k=;
+        b=I41srEqF8yN4u325nZVX+ONTbruxEHgVHSksz+GtnHdPvTFRPW9XKIg+O6BScViAM9
+         Th3x6M0dMSZg8z1cR7kTYopqugW+QN+vVKMMkoipRgZVJ1vwsL44OvjInmZfZRBaa6E5
+         0Yywm3wd21oAZaItqC5kLFdvNw+/67NSgLrc188dWh5S/Y9n/kVd81pp9DMbfEnFfi8s
+         n/7ImZRt8o1MxwUOkqjKWbK3eifvyxKsWRZqIexotvztLP/B5UEDi39uEPtA+Qrzx+HV
+         /5x2HSv7iP0o6NvhXtOHAgw5oWo18ss66BmiXb5e24uUvj+rQkLeN3i8BcnRtoK6S0Mg
+         /w5w==
+X-Gm-Message-State: AOJu0YzJH6XWQwQEUyBV/37VXwLaz8OmNv7Ll1/wQkq5f64O1Bl3sapf
+	NgWQlgq1ir6ExB+RpE5kJJ15FeWh7ItEB8N85/6DwWXMhVLlwIYU4T/MKpFgW9S0OcaoomupgjZ
+	m3jYzAnyafjf3clSS8pvlXOJ8jj1CuarmJpeZU+fZv/8RDMtxBc3Z
+X-Received: by 2002:a17:90a:9109:b0:280:3911:ae02 with SMTP id k9-20020a17090a910900b002803911ae02mr6914475pjo.16.1699873291443;
+        Mon, 13 Nov 2023 03:01:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF8E/QYvBDLijbcOm0bJQeNU0GzPimhSz7rfGHrQcB5BleXFARyXM7iscHx3Hi3PHWaGLRuG0CXGjdpwj2/5X0=
+X-Received: by 2002:a17:90a:9109:b0:280:3911:ae02 with SMTP id
+ k9-20020a17090a910900b002803911ae02mr6914451pjo.16.1699873291082; Mon, 13 Nov
+ 2023 03:01:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	PetGXZvnt1SjZam8xZMN67NwcwSt0wso4mocPaO8kXFsvU6hoH3y+Y3VJAkkIrFIBCBvmziAuWdc7kw6QUtOeJCytWUfX30RWppUPCHrBaW7u6uaob/bJ7PNCs+V0JsnHvTGvHEcuPnGcJFrhF0wky5b1uI+ec9iS4/HhTfx/VfDfpbh9aDCISsWDYUbTlQKTypj8C0PXKgArR0jlaof4eMrApyIfXJAp0ciAZySGBrtUquj+iZp3qmflt6chiw6q77sKVBPbqPuoUhOOaqFhjXUiBJMnjZZhGFqVW35JfRCl4i5ZA2oiWvpCVsI5HhAxsqeKe6v65KBa4WPja0mCNODskF3iwwl5zVUeXjYUb4odChAWSPp6W5ToHlBfj5ur/0euZND8n5HvwrBmcCnQkhNp+ZNe8z/B6YE3D128B+H7dUx4aaTKmq8DJ9IwPwwZrqONURqbwMF10DW+2ZfUd8Fox9TS1zkJRdBJpulXGGIuyjc/HLZOIIYsVQB1WV4ITY6j1o3AvWZH05gkZspWWT6aKDShRzAmcv312fDZIn+m1ihRmZtu4513ONwAGLz7VYyF/0t6qwzY/VEzOJVG+CqlVJUvfem78RYSVoy2oGghx+r8vmgzN5vH2L6FgsPinE2ehcFQWrqd19FyT3q5gV+38DyJLLGVcwV8oMDmpEyHzRdARVDl68o09x0AcSIIj+a17lWz7sFhCJgCQDo5Zse2JuzEBU/AWLJHhM0nQFfa8fEEqH2bVyQ0lKUEfyIh/cfsqiB/ENS8e35qABH6F6e2ptSI1eb54EBLpb6Y/I189+iMeVAF5g01Oc63nx1
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5034cb46-73d1-4a40-b891-08dbe40f1450
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2023 06:09:21.9300
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8Z0iC8Uo9RHMxQItvRITxFdlmjj+PBVekPhxX7+M+gjOWe8ls3CswVLRDWUYrqu4fz/pfXIh6x5OQv7/Eq+DlJD5s5Wqanv30dZ2rITB0w0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7494
+References: <20231113035231.2708053-1-ming.lei@redhat.com>
+In-Reply-To: <20231113035231.2708053-1-ming.lei@redhat.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Mon, 13 Nov 2023 19:01:19 +0800
+Message-ID: <CAHj4cs8QJPdi3jsaArnJ0FbF58NLbDKms7rBgn4Rgpx+CBbOfQ@mail.gmail.com>
+Subject: Re: [PATCH V2] blk-mq: make sure active queue usage is held for bio_integrity_prep()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Christoph Hellwig <hch@infradead.org>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Nov 11, 2023 / 19:42, Ming Lei wrote:
-> Add one wrapper script for using rublk to run ublk tests, and prefer
-> to rublk because it is well implemented and more reliable.
->=20
-> This way has been run for months in rublk's github CI test.
->=20
-> https://github.com/ming1/rublk
->=20
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+
+Confirmed the below issue was fixed by this patch.
+
+[  444.752629] nvme nvme0: rescanning namespaces.
+[  445.371750] nvme nvme0: resetting controller
+[  445.410255] nvme nvme0: Shutdown timeout set to 10 seconds
+[  445.418789] nvme nvme0: 12/0/0 default/read/poll queues
+[  445.464627] nvme nvme0: rescanning namespaces.
+[  446.059207] BUG: kernel NULL pointer dereference, address: 0000000000000=
+018
+[  446.066982] #PF: supervisor read access in kernel mode
+[  446.072718] #PF: error_code(0x0000) - not-present page
+[  446.078452] PGD 0 P4D 0
+[  446.081278] Oops: 0000 [#1] PREEMPT SMP PTI
+[  446.085947] CPU: 2 PID: 0 Comm: swapper/2 Kdump: loaded Not tainted
+6.6.0-rc3+ #1
+[  446.094292] Hardware name: Dell Inc. PowerEdge R730xd/=C9=B2?Pow, BIOS
+2.16.0 07/20/2022
+[  446.102934] RIP: 0010:blk_mq_end_request_batch+0xa7/0x4d0
+[  446.108972] Code: 10 0f 1f 44 00 00 48 85 db 74 71 8b 45 18 a9 00
+00 01 00 74 1e 84 c0 75 1a 48 8b 45 00 44 89 fe 48 89 ef 48 8b 80 b8
+00 00 00 <48> 8b 40 18 e8 00 4a 6d 00 44 89 fe 48 89 ef e8 45 de ff ff
+eb 05
+[  446.129929] RSP: 0018:ffffc90000384e60 EFLAGS: 00010046
+[  446.135760] RAX: 0000000000000000 RBX: ffff8881050afa80 RCX: 00000000000=
+00018
+[  446.143724] RDX: 000003c493936c90 RSI: 0000000000001000 RDI: ffff888120d=
+10000
+[  446.151688] RBP: ffff888120d10000 R08: 0000000000000000 R09: 00000000000=
+00000
+[  446.159652] R10: 0000000000000000 R11: 0000000116ca1000 R12: ffffc900003=
+84f38
+[  446.167615] R13: 0000000000000000 R14: 0000000000000000 R15: 00000000000=
+01000
+[  446.175578] FS:  0000000000000000(0000) GS:ffff888277c40000(0000)
+knlGS:0000000000000000
+[  446.184609] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  446.191020] CR2: 0000000000000018 CR3: 0000000355e20001 CR4: 00000000001=
+706e0
+[  446.198982] Call Trace:
+[  446.201712]  <IRQ>
+[  446.203954]  ? __die+0x20/0x70
+[  446.207368]  ? page_fault_oops+0x76/0x170
+[  446.211847]  ? kernelmode_fixup_or_oops+0x84/0x110
+[  446.217188]  ? exc_page_fault+0x65/0x150
+[  446.221571]  ? asm_exc_page_fault+0x22/0x30
+[  446.226246]  ? blk_mq_end_request_batch+0xa7/0x4d0
+[  446.231601]  nvme_irq+0x7f/0x90 [nvme]
+[  446.235799]  ? __pfx_nvme_pci_complete_batch+0x10/0x10 [nvme]
+[  446.242222]  __handle_irq_event_percpu+0x46/0x190
+[  446.247478]  handle_irq_event+0x34/0x70
+[  446.251762]  handle_edge_irq+0x87/0x220
+[  446.256045]  __common_interrupt+0x3d/0xb0
+[  446.260525]  ? irqtime_account_irq+0x3c/0xb0
+[  446.265292]  common_interrupt+0x7b/0xa0
+[  446.269574]  </IRQ>
+[  446.271912]  <TASK>
+[  446.274251]  asm_common_interrupt+0x22/0x40
+
+
+On Mon, Nov 13, 2023 at 11:52=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> From: Christoph Hellwig <hch@infradead.org>
+>
+> blk_integrity_unregister() can come if queue usage counter isn't held
+> for one bio with integrity prepared, so this request may be completed wit=
+h
+> calling profile->complete_fn, then kernel panic.
+>
+> Another constraint is that bio_integrity_prep() needs to be called
+> before bio merge.
+>
+> Fix the issue by:
+>
+> - call bio_integrity_prep() with one queue usage counter grabbed reliably
+>
+> - call bio_integrity_prep() before bio merge
+>
+> Fixes: 900e080752025f00 ("block: move queue enter logic into blk_mq_submi=
+t_bio()")
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+>         - remove blk_mq_cached_req()
+>         - move blk_mq_attempt_bio_merge() out of blk_mq_can_use_cached_rq=
+(),
+>           so that &bio isn't needed any more for blk_mq_can_use_cached_rq=
+()
+>         - all are suggested from Christoph
+>
+>  block/blk-mq.c | 75 +++++++++++++++++++++++++-------------------------
+>  1 file changed, 38 insertions(+), 37 deletions(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e2d11183f62e..900c1be1fee1 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2858,11 +2858,8 @@ static struct request *blk_mq_get_new_requests(str=
+uct request_queue *q,
+>         };
+>         struct request *rq;
+>
+> -       if (unlikely(bio_queue_enter(bio)))
+> -               return NULL;
+> -
+>         if (blk_mq_attempt_bio_merge(q, bio, nsegs))
+> -               goto queue_exit;
+> +               return NULL;
+>
+>         rq_qos_throttle(q, bio);
+>
+> @@ -2878,35 +2875,23 @@ static struct request *blk_mq_get_new_requests(st=
+ruct request_queue *q,
+>         rq_qos_cleanup(q, bio);
+>         if (bio->bi_opf & REQ_NOWAIT)
+>                 bio_wouldblock_error(bio);
+> -queue_exit:
+> -       blk_queue_exit(q);
+>         return NULL;
+>  }
+>
+> -static inline struct request *blk_mq_get_cached_request(struct request_q=
+ueue *q,
+> -               struct blk_plug *plug, struct bio **bio, unsigned int nse=
+gs)
+> +/* return true if this @rq can be used for @bio */
+> +static bool blk_mq_can_use_cached_rq(struct request *rq, struct blk_plug=
+ *plug,
+> +               struct bio *bio)
+>  {
+> -       struct request *rq;
+> -       enum hctx_type type, hctx_type;
+> +       enum hctx_type type =3D blk_mq_get_hctx_type(bio->bi_opf);
+> +       enum hctx_type hctx_type =3D rq->mq_hctx->type;
+>
+> -       if (!plug)
+> -               return NULL;
+> -       rq =3D rq_list_peek(&plug->cached_rq);
+> -       if (!rq || rq->q !=3D q)
+> -               return NULL;
+> +       WARN_ON_ONCE(rq_list_peek(&plug->cached_rq) !=3D rq);
+>
+> -       if (blk_mq_attempt_bio_merge(q, *bio, nsegs)) {
+> -               *bio =3D NULL;
+> -               return NULL;
+> -       }
+> -
+> -       type =3D blk_mq_get_hctx_type((*bio)->bi_opf);
+> -       hctx_type =3D rq->mq_hctx->type;
+>         if (type !=3D hctx_type &&
+>             !(type =3D=3D HCTX_TYPE_READ && hctx_type =3D=3D HCTX_TYPE_DE=
+FAULT))
+> -               return NULL;
+> -       if (op_is_flush(rq->cmd_flags) !=3D op_is_flush((*bio)->bi_opf))
+> -               return NULL;
+> +               return false;
+> +       if (op_is_flush(rq->cmd_flags) !=3D op_is_flush(bio->bi_opf))
+> +               return false;
+>
+>         /*
+>          * If any qos ->throttle() end up blocking, we will have flushed =
+the
+> @@ -2914,12 +2899,12 @@ static inline struct request *blk_mq_get_cached_r=
+equest(struct request_queue *q,
+>          * before we throttle.
+>          */
+>         plug->cached_rq =3D rq_list_next(rq);
+> -       rq_qos_throttle(q, *bio);
+> +       rq_qos_throttle(rq->q, bio);
+>
+>         blk_mq_rq_time_init(rq, 0);
+> -       rq->cmd_flags =3D (*bio)->bi_opf;
+> +       rq->cmd_flags =3D bio->bi_opf;
+>         INIT_LIST_HEAD(&rq->queuelist);
+> -       return rq;
+> +       return true;
+>  }
+>
+>  static void bio_set_ioprio(struct bio *bio)
+> @@ -2949,7 +2934,7 @@ void blk_mq_submit_bio(struct bio *bio)
+>         struct blk_plug *plug =3D blk_mq_plug(bio);
+>         const int is_sync =3D op_is_sync(bio->bi_opf);
+>         struct blk_mq_hw_ctx *hctx;
+> -       struct request *rq;
+> +       struct request *rq =3D NULL;
+>         unsigned int nr_segs =3D 1;
+>         blk_status_t ret;
+>
+> @@ -2960,20 +2945,36 @@ void blk_mq_submit_bio(struct bio *bio)
+>                         return;
+>         }
+>
+> -       if (!bio_integrity_prep(bio))
+> -               return;
+> -
+>         bio_set_ioprio(bio);
+>
+> -       rq =3D blk_mq_get_cached_request(q, plug, &bio, nr_segs);
+> -       if (!rq) {
+> -               if (!bio)
+> +       if (plug) {
+> +               rq =3D rq_list_peek(&plug->cached_rq);
+> +               if (rq && rq->q !=3D q)
+> +                       rq =3D NULL;
+> +       }
+> +       if (rq) {
+> +               if (!bio_integrity_prep(bio))
+>                         return;
+> -               rq =3D blk_mq_get_new_requests(q, plug, bio, nr_segs);
+> -               if (unlikely(!rq))
+> +               if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
+>                         return;
+> +               if (blk_mq_can_use_cached_rq(rq, plug, bio))
+> +                       goto done;
+> +               percpu_ref_get(&q->q_usage_counter);
+> +       } else {
+> +               if (unlikely(bio_queue_enter(bio)))
+> +                       return;
+> +               if (!bio_integrity_prep(bio))
+> +                       goto fail;
+> +       }
+> +
+> +       rq =3D blk_mq_get_new_requests(q, plug, bio, nr_segs);
+> +       if (unlikely(!rq)) {
+> +fail:
+> +               blk_queue_exit(q);
+> +               return;
+>         }
+>
+> +done:
+>         trace_block_getrq(bio);
+>
+>         rq_qos_track(q, rq, bio);
+> --
+> 2.41.0
+>
 
-I've applied this to the blktests master branch. Thanks!=
+
+--
+Best Regards,
+  Yi Zhang
+
