@@ -1,72 +1,77 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DABF3E461
-	for <linux-block@vger.kernel.org>; Mon, 13 Nov 2023 23:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9479519E;
-	Mon, 13 Nov 2023 15:57:40 -0800 (PST)
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so3998660a12.1;
-        Mon, 13 Nov 2023 15:57:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC9A6101;
+	Tue, 14 Nov 2023 01:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iOIWy/rS"
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F5BD45;
+	Mon, 13 Nov 2023 17:58:07 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c7c7544c78so57128361fa.2;
+        Mon, 13 Nov 2023 17:58:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699927084; x=1700531884; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8fqNNt5CJDoqCiL1Q4B3/x2//+Oyq8c8Q1YRIA7KRwE=;
+        b=iOIWy/rSDhTERb4k2cE9uBonIdmnNymf1vQNlrFXVBgDKtEXokP0mSpf7fH+TOWDXl
+         D0MqH2RuGNbsfdiV0GOFYroaVAZW1ESxxVhZiUgTB0nSFU5Cd1w7lcfGCcr4cikd19Ho
+         RQ5sZw0s9XGQBeWN4/I+7IKoD/SqmdGFma54TckiUr4kiOeUaUG9Xtvs9f1Yr7p7mtI7
+         YK1VJ45USKAvxUQeQFLpTvo/ndW1NMtIXGSatzJpUe/N8cxZp7n56155iYtAJxB20ZsN
+         vc6qvgewteozvc5Yvouyse6sMY/2TC3ECmeT/7InebX3UHGfgPjQBLsoq3P9TT7zOunN
+         FFwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699919860; x=1700524660;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2O33Z20Hw5m9jWPSsRRvDoAMyIPjKTQaup/hA8pvVwg=;
-        b=rQzftL3T3jXjBlwlBEdQwrraDjCYgUR7plDSi6DH5jUJRjUDtvGNIt8au6aR2oZho4
-         E5pDrByXLDc0Uj9e8QRSmqmSmtGCfqD1kM5fdHR04QunTjS3zGhQS/Gwozaer+sOnY68
-         q7kOIsWSytpcgUr38fGR91P2qn2j5ZfItvKPu19vM8vfU6q6uN4HNWSHJV4HhVVHKXws
-         wQlqbdVAuvTIo9dbLdI5uWZjPoBVeiyPNl48BIiYkj/iMXzA6pwXn5/8RamECrwfw1jg
-         SQPY4Gc6pCoFT3DfQ/v3XOtqk3X3jr+qqwVbWeDrzh4ORUcqx9fd6iqhF3Yvcy9rfkei
-         DbVg==
-X-Gm-Message-State: AOJu0YzC2uhvltaviwnhdkM/Q5Zy/ocLiUoOevkgARFDkjntb129AeIh
-	I9MtcMFKD2NXXwdptUA2gIw1iGhoW4M=
-X-Google-Smtp-Source: AGHT+IHuHxh5mqX7RqLGEoVItvxSJ0QEO1HWwHcQdsilEu8FzLk6SzflzOyi+wzsLftN0NQJT9fDDg==
-X-Received: by 2002:a05:6a20:8408:b0:186:736f:7798 with SMTP id c8-20020a056a20840800b00186736f7798mr5840594pzd.11.1699919859795;
-        Mon, 13 Nov 2023 15:57:39 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:7575:f839:a613:3f5b? ([2620:0:1000:8411:7575:f839:a613:3f5b])
-        by smtp.gmail.com with ESMTPSA id x14-20020aa784ce000000b006b97d5cbb7csm143897pfn.60.2023.11.13.15.57.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Nov 2023 15:57:39 -0800 (PST)
-Message-ID: <3f2c2d33-2e5d-4c7b-80ea-e76885981dfb@acm.org>
-Date: Mon, 13 Nov 2023 15:57:38 -0800
+        d=1e100.net; s=20230601; t=1699927084; x=1700531884;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8fqNNt5CJDoqCiL1Q4B3/x2//+Oyq8c8Q1YRIA7KRwE=;
+        b=dOv2og+TEkrNlBZPY7piTTItEG4UbABXSsLS9LwBjL0jAiSTmtj58tXVLvsdNnUKA7
+         VupsU+sOB+YpEAwSN5gw9CAFK+Z3YiT9zOXMX8eT3odC3WcKTEN7soiTFIv4Sxu/6nWe
+         jpzWWApJmP1VvZOm8eLWpe+mkDGXb8CYMMrYsZVBnDXL/m1GdKfFl0fALvJJc7DBSdwY
+         Fwgw4W0VxcOPwkAHCJSdHHSzUtMrpli/YkA4ONymmnKk/eP3rLpd3VWjprcNRyKHZYKc
+         atKKJW//Uep5Uusyaocj1bgIiYwyP9JKe9e8UR5lsb1FUfct7PfuN/UaMiwXTxHUBceS
+         NpeQ==
+X-Gm-Message-State: AOJu0YxUCr/hLOah6jN96dKRfS8mBbk3aBwTNzTNxthAJukpSIcrNZRL
+	9LZGtdGgUALWH02EyQkX3R8nKz+C5wCE/seQyla60e4619s=
+X-Google-Smtp-Source: AGHT+IFeqzKbIVemR5UzTQZkpXG7+seLjHzDrlyjfBw5pTiyO5KDiBL6r4WCMrRnSDMHy9lpK83WFiuutJ0Aev9nihc=
+X-Received: by 2002:a05:651c:2204:b0:2c5:7afd:75a1 with SMTP id
+ y4-20020a05651c220400b002c57afd75a1mr714966ljq.44.1699927084329; Mon, 13 Nov
+ 2023 17:58:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [syzbot] [block?] WARNING in blk_mq_start_request
-Content-Language: en-US
-To: Chengming Zhou <zhouchengming@bytedance.com>,
- syzbot <syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com>,
- axboe@kernel.dk, chaitanyak@nvidia.com, eadavis@qq.com, hch@infradead.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
-References: <00000000000077ca930609aa9f86@google.com>
- <7ed9f6f9-d309-4d30-9b3b-c465cfa48a52@bytedance.com>
- <f4a6ff9e-d631-42c4-a5e1-87e767771488@acm.org>
- <d9f1ee3b-c303-44af-ba30-b52137fc29cb@bytedance.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <d9f1ee3b-c303-44af-ba30-b52137fc29cb@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Ming Lin <minggr@gmail.com>
+Date: Mon, 13 Nov 2023 17:57:52 -0800
+Message-ID: <CAF1ivSY-V+afUxfH7SDyM9vG991u7EoDCteL1y5jurnKSzQ3YA@mail.gmail.com>
+Subject: Performance Difference between ext4 and Raw Block Device Access with buffer_io
+To: linux-block@vger.kernel.org, 
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/13/23 07:05, Chengming Zhou wrote:
-> Ok, I reviewed the code of virtio_queue_rqs(), found the main difference
-> is that request won't fail after blk_mq_start_request().
-> 
-> But in null_blk case, the request will fail after blk_mq_start_request(),
-> return BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE. If we return these rqs
-> back to the block layer core, they will be queued individually once again.
-> So caused the warning.
+Hi,
 
-I think it is safe to move the blk_mq_start_request() call under the if-block
-that decides whether or not to requeue a request in null_queue_rq()
+We are currently conducting performance tests on an application that
+involves writing/reading data to/from ext4 or a raw block device.
+Specifically, for raw block device access, we have implemented a
+simple "userspace filesystem" directly on top of it.
+
+All write/read operations are being tested using buffer_io. However,
+we have observed that the ext4+buffer_io performance significantly
+outperforms raw_block_device+buffer_io:
+
+ext4: write 18G/s, read 40G/s
+raw block device: write 18G/s, read 21G/s
+
+We are exploring potential reasons for this difference. One hypothesis
+is related to the page cache radix tree being per inode. Could it be
+that, for the raw_block_device, there is only one radix tree, leading
+to increased lock contention during write/read buffer_io operations?
+
+Your insights on this matter would be greatly appreciated.
 
 Thanks,
-
-Bart.
+Ming
