@@ -1,123 +1,161 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A4E3EA66
-	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 14:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8F13BB2A
+	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 15:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hNDgUHtd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HBXAnH0/"
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B568B8
-	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 06:59:32 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86779194
+	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 07:50:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700060371;
+	s=mimecast20190719; t=1700063399;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hgSFAqsrrIeyfcEV4+4kyzG8JlxNH43PSFwHbBsH0s4=;
-	b=hNDgUHtdgMRm5fSninJwt3iSPNq15h7BOTOy3U4lI60He4nOE0NhuTjR6KzItrob457Rgv
-	vIify6UuSSp+2fw65z6fcsWwRQGZSVrOh37s14HeHDjMk87BHuVNYoVXPo91WYOQyo+Z92
-	jQIz3cUCulWRwdotzA8IOSo74xugEJc=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+63cPdnCPLjbKCS5/t308GAcV4bDVpzj1bwgDRa790U=;
+	b=HBXAnH0/QlzWXNmPHnqaCMTielLa+IMg+W+Ghw4rM7JUg90gylFV9aaUh9vfbcSAlQSK4V
+	Ukb3N5J+XCz8zUhWDMQL12cM2eeNf2SRa6yMtGBFVp5OiPC6RIl//0TzFIw+zGC87Bfiwx
+	LgiN/SMemNky6xdgvCAedDXI9pW34Vg=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-533-NqVnE2VQNm60TzLstO6QCg-1; Wed, 15 Nov 2023 09:59:29 -0500
-X-MC-Unique: NqVnE2VQNm60TzLstO6QCg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-61-UGIGDn_hM6CdQuAGtRNCPw-1; Wed, 15 Nov 2023 10:49:54 -0500
+X-MC-Unique: UGIGDn_hM6CdQuAGtRNCPw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF10E85A58A;
-	Wed, 15 Nov 2023 14:59:28 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id ADF1336EE;
-	Wed, 15 Nov 2023 14:59:25 +0000 (UTC)
-Date: Wed, 15 Nov 2023 22:59:20 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc: Ming Lin <minggr@gmail.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Linux FS Devel <linux-fsdevel@vger.kernel.org>
-Subject: Re: Performance Difference between ext4 and Raw Block Device Access
- with buffer_io
-Message-ID: <ZVTcyKbHTasef1Py@fedora>
-References: <CAF1ivSY-V+afUxfH7SDyM9vG991u7EoDCteL1y5jurnKSzQ3YA@mail.gmail.com>
- <ZVSNIClnCnmay8e6@fedora>
- <ZVTTh/LdexBD7BdE@x1-carbon>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86A62101A550;
+	Wed, 15 Nov 2023 15:49:53 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.16])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3EC981121306;
+	Wed, 15 Nov 2023 15:49:51 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>,
+	David Laight <David.Laight@ACULAB.COM>,
+	Matthew Wilcox <willy@infradead.org>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/10] iov_iter: kunit: Cleanup, abstraction and more tests
+Date: Wed, 15 Nov 2023 15:49:36 +0000
+Message-ID: <20231115154946.3933808-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZVTTh/LdexBD7BdE@x1-carbon>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Wed, Nov 15, 2023 at 02:20:02PM +0000, Niklas Cassel wrote:
-> On Wed, Nov 15, 2023 at 05:19:28PM +0800, Ming Lei wrote:
-> > On Mon, Nov 13, 2023 at 05:57:52PM -0800, Ming Lin wrote:
-> > > Hi,
-> > > 
-> > > We are currently conducting performance tests on an application that
-> > > involves writing/reading data to/from ext4 or a raw block device.
-> > > Specifically, for raw block device access, we have implemented a
-> > > simple "userspace filesystem" directly on top of it.
-> > > 
-> > > All write/read operations are being tested using buffer_io. However,
-> > > we have observed that the ext4+buffer_io performance significantly
-> > > outperforms raw_block_device+buffer_io:
-> > > 
-> > > ext4: write 18G/s, read 40G/s
-> > > raw block device: write 18G/s, read 21G/s
-> > 
-> > Can you share your exact test case?
-> > 
-> > I tried the following fio test on both ext4 over nvme and raw nvme, and the
-> > result is the opposite: raw block device throughput is 2X ext4, and it
-> > can be observed in both VM and read hardware.
-> > 
-> > 1) raw NVMe
-> > 
-> > fio --direct=0 --size=128G --bs=64k --runtime=20 --numjobs=8 --ioengine=psync \
-> >     --group_reporting=1 --filename=/dev/nvme0n1 --name=test-read --rw=read
-> > 
-> > 2) ext4
-> > 
-> > fio --size=1G --time_based --bs=4k --runtime=20 --numjobs=8 \
-> > 	--ioengine=psync --directory=$DIR --group_reporting=1 \
-> > 	--unlink=0 --direct=0 --fsync=0 --name=f1 --stonewall --rw=read
-> 
-> Hello Ming,
-> 
-> 1) uses bs=64k, 2) uses bs=4k, was this intentional?
+Hi Christian,
 
-It is a typo, actually both two are taking bs=64k.
+Can you take this through the filesystem tree?
 
-> 
-> 2) uses stonewall, but 1) doesn't, was this intentional?
+These patches make some changes to the kunit tests previously added for
+iov_iter testing, in particular adding testing of UBUF/IOVEC iterators and
+some benchmarking:
 
-To be honest, both are run from different existed two scripts,
-just run again by adding --stonewall to raw block test, not see
-difference.
+ (1) Clean up a couple of checkpatch style complaints.
 
-> 
-> For fairness, you might want to use the same size (1G vs 128G).
+ (2) Consolidate some repeated bits of code into helper functions and use
+     the same struct to represent straight offset/address ranges and
+     partial page lists.
 
-For fs test, each io job creates one file and run IO against each file,
-but there is only one 'file' in raw block test, and all 8 jobs run
-IO on same block device.
+ (3) Add a function to set up a userspace VM, attach the VM to the kunit
+     testing thread, create an anonymous file, stuff some pages into the
+     file and map the file into the VM to act as a buffer that can be used
+     with UBUF/IOVEC iterators.
 
-So just start one quick randread test, similar gap can be observed
-too compared with read test.
+     I map an anonymous file with pages attached rather than using MAP_ANON
+     so that I can check the pages obtained from iov_iter_extract_pages()
+     without worrying about them changing due to swap, migrate, etc..
 
-> 
-> And perhaps clear the page cache before each fio invocation:
-> # echo 1 > /proc/sys/vm/drop_caches
+     [?] Is this the best way to do things?  Mirroring execve, it requires
+     a number of extra core symbols to be exported.  Should this be done in
+     the core code?
 
-Yes, it is always done before running the two buffered IO tests.
+ (4) Add tests for copying into and out of UBUF and IOVEC iterators.
 
+ (5) Add tests for extracting pages from UBUF and IOVEC iterators.
 
-thanks,
-Ming
+ (6) Add tests to benchmark copying 256MiB to UBUF, IOVEC, KVEC, BVEC and
+     XARRAY iterators.
+
+ (7) Add a test to bencmark copying 256MiB from an xarray that gets decanted
+     into 256-page BVEC iterators to model batching from the pagecache.
+
+ (8) Add a test to benchmark copying 256MiB through dynamically allocated
+     256-page bvecs to simulate bio construction.
+
+Example benchmarks output:
+
+	iov_kunit_benchmark_ubuf: avg 4474 uS, stddev 1340 uS
+	iov_kunit_benchmark_iovec: avg 6619 uS, stddev 23 uS
+	iov_kunit_benchmark_kvec: avg 2672 uS, stddev 14 uS
+	iov_kunit_benchmark_bvec: avg 3189 uS, stddev 19 uS
+	iov_kunit_benchmark_bvec_split: avg 3403 uS, stddev 8 uS
+	iov_kunit_benchmark_xarray: avg 3709 uS, stddev 7 uS
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-kunit
+
+David
+
+Changes
+=======
+ver #3)
+ - #include <linux/personality.h> to get READ_IMPLIES_EXEC.
+ - Add a test to benchmark decanting an xarray into bio_vecs.
+
+ver #2)
+ - Use MAP_ANON to make the user buffer if we don't want a list of pages.
+ - KUNIT_ASSERT_NOT_ERR_OR_NULL() doesn't like __user pointers as the
+   condition, so cast.
+ - Make the UBUF benchmark loop, doing an iterator per page so that the
+   overhead from the iterator code is not negligible.
+ - Make the KVEC benchmark use an iovec per page so that the iteration is
+   not not negligible.
+ - Switch the benchmarking to use copy_from_iter() so that only a single
+   page is needed in the userspace buffer (as it can be shared R/O), not
+   256MiB's worth.
+
+Link: https://lore.kernel.org/r/20230914221526.3153402-1-dhowells@redhat.com/ # v1
+Link: https://lore.kernel.org/r/20230920130400.203330-1-dhowells@redhat.com/ # v2
+Link: https://lore.kernel.org/r/20230922113038.1135236-1-dhowells@redhat.com/ # v3
+
+David Howells (10):
+  iov_iter: Fix some checkpatch complaints in kunit tests
+  iov_iter: Consolidate some of the repeated code into helpers
+  iov_iter: Consolidate the test vector struct in the kunit tests
+  iov_iter: Consolidate bvec pattern checking
+  iov_iter: Create a function to prepare userspace VM for UBUF/IOVEC
+    tests
+  iov_iter: Add copy kunit tests for ITER_UBUF and ITER_IOVEC
+  iov_iter: Add extract kunit tests for ITER_UBUF and ITER_IOVEC
+  iov_iter: Add benchmarking kunit tests
+  iov_iter: Add kunit to benchmark decanting of xarray to bvec
+  iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
+
+ arch/s390/kernel/vdso.c |    1 +
+ fs/anon_inodes.c        |    1 +
+ kernel/fork.c           |    2 +
+ lib/kunit_iov_iter.c    | 1317 +++++++++++++++++++++++++++++++++------
+ mm/mmap.c               |    1 +
+ mm/util.c               |    3 +
+ 6 files changed, 1139 insertions(+), 186 deletions(-)
 
