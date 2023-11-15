@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3BE3A8E3;
-	Wed, 15 Nov 2023 19:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483323DB91;
+	Wed, 15 Nov 2023 19:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fihlKgXE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 497CCC433C8;
-	Wed, 15 Nov 2023 19:20:28 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="GRhkWicR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9714C433C8;
+	Wed, 15 Nov 2023 19:32:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1700076028;
-	bh=7GvDjbrBYuvBeOH1VCT+fEyeorrB5EkUWZH5ZtG3HCo=;
+	s=korg; t=1700076726;
+	bh=/SprfMK39MSgjFMiw1J9eLDIGszjDz0qV1aULbNTrEw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fihlKgXE8eSg+5RUCCKLZwtDTeJGwsIF1D0fz35V80A3VHTo0BBbdA/JXD+fTEVz0
-	 3dhe+ET5t5/6MNrFi6OQ7KPYXVP+fhY2xN6k4h6AdL0orLeMN81+dtKAEdmhL3h33H
-	 kqRU8cTzpGAgfRAzR0ZRNajRaTcwtCuPGIHxb9ds=
+	b=GRhkWicRGHlhuy4qerN5tCddLAbW7XCL3Rh6aA0CvBnGPkqW/07ma0VOUUjSFyySy
+	 MjXtleRf43suihpbvBPSO/V+3IZQAIzxeNnIx1+AJI4SIUlCooE3KtEo7n4l5lqk/3
+	 DkBCYKGsDBe3aCI+DPvm8BF52g1ROoLegiG7CZXk=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -38,12 +38,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-mm@kvack.org,
 	Christian Brauner <brauner@kernel.org>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.5 006/550] iov_iter, x86: Be consistent about the __user tag on copy_mc_to_user()
-Date: Wed, 15 Nov 2023 14:09:50 -0500
-Message-ID: <20231115191601.155531580@linuxfoundation.org>
+Subject: [PATCH 6.6 006/603] iov_iter, x86: Be consistent about the __user tag on copy_mc_to_user()
+Date: Wed, 15 Nov 2023 14:09:11 -0500
+Message-ID: <20231115191613.572325746@linuxfoundation.org>
 X-Mailer: git-send-email 2.42.1
-In-Reply-To: <20231115191600.708733204@linuxfoundation.org>
-References: <20231115191600.708733204@linuxfoundation.org>
+In-Reply-To: <20231115191613.097702445@linuxfoundation.org>
+References: <20231115191613.097702445@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.5-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
