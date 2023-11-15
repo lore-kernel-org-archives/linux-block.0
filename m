@@ -1,77 +1,147 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EDA392;
-	Wed, 15 Nov 2023 10:19:49 -0800 (PST)
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1cc3bb32b5dso63044415ad.3;
-        Wed, 15 Nov 2023 10:19:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700072389; x=1700677189;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xu9O9Nln1wU6y4juhkOBPBC3HRW1CFO00oTOdXu/JNQ=;
-        b=LmsiijdW8TGu0r+Ie6+VsGnmbHOWYEsp4gW3rRFlftRY1QuuUfZMCRCUC/QxdmiAvw
-         I+Y4OkIqbRQEwexT0/Q3UmhyJH5hR/Dyl2xtmjBuNvyE1BKHqQICPkM7sATc+iFj2if5
-         4dvaa7PyeTTpj/QFny0rJ1c62bqsD49UdhBNMwCphkQDdQQT7plBSceJ1jQgK7v3EyWU
-         1G1qRgxocquq/nh2TFlGP+EvvzFEYlnN1D7z30XN/S5O3d9vrZKmSiHQ2r6mHQEJ8M5Q
-         KFtD4OpBDroJt0dfixpN5DRfhNft04i9pl19pvDqp8NYmooBuFzjhuskfNTtGU1iT3BD
-         NiYA==
-X-Gm-Message-State: AOJu0YwUs2TFF8Z9fueb1rl7Q/jSz5McBmuCrr0F+dFOLf+CaFp3O/OX
-	ZAZDLS4Im7rGOagnzThIAls=
-X-Google-Smtp-Source: AGHT+IGs8YzooTgz6hrSHIo9UVMZhw1YJkPM3x3d7opMUtrNVmXLibid4Z/xmGE5xsQc/J7oKJJ0/Q==
-X-Received: by 2002:a17:902:f707:b0:1cc:6e8f:c14e with SMTP id h7-20020a170902f70700b001cc6e8fc14emr7892380plo.15.1700072388660;
-        Wed, 15 Nov 2023 10:19:48 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:56f1:2160:3a2a:2645? ([2620:0:1000:8411:56f1:2160:3a2a:2645])
-        by smtp.gmail.com with ESMTPSA id ju10-20020a170903428a00b001c59f23a3fesm7509476plb.251.2023.11.15.10.19.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Nov 2023 10:19:47 -0800 (PST)
-Message-ID: <d706f265-f991-45c0-a551-34ecdee55f7c@acm.org>
-Date: Wed, 15 Nov 2023 10:19:45 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3BE3A8E3;
+	Wed, 15 Nov 2023 19:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fihlKgXE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 497CCC433C8;
+	Wed, 15 Nov 2023 19:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1700076028;
+	bh=7GvDjbrBYuvBeOH1VCT+fEyeorrB5EkUWZH5ZtG3HCo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fihlKgXE8eSg+5RUCCKLZwtDTeJGwsIF1D0fz35V80A3VHTo0BBbdA/JXD+fTEVz0
+	 3dhe+ET5t5/6MNrFi6OQ7KPYXVP+fhY2xN6k4h6AdL0orLeMN81+dtKAEdmhL3h33H
+	 kqRU8cTzpGAgfRAzR0ZRNajRaTcwtCuPGIHxb9ds=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	David Laight <David.Laight@ACULAB.COM>,
+	x86@kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	Christian Brauner <brauner@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.5 006/550] iov_iter, x86: Be consistent about the __user tag on copy_mc_to_user()
+Date: Wed, 15 Nov 2023 14:09:50 -0500
+Message-ID: <20231115191601.155531580@linuxfoundation.org>
+X-Mailer: git-send-email 2.42.1
+In-Reply-To: <20231115191600.708733204@linuxfoundation.org>
+References: <20231115191600.708733204@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/3] scsi: core: Support disabling fair tag sharing
-Content-Language: en-US
-To: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
- Keith Busch <kbusch@kernel.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Ed Tsai <ed.tsai@mediatek.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20231114180426.1184601-1-bvanassche@acm.org>
- <20231114180426.1184601-3-bvanassche@acm.org>
- <80dee412-2fda-6a23-0b62-08f87bd7e607@huaweicloud.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <80dee412-2fda-6a23-0b62-08f87bd7e607@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 11/14/23 23:24, Yu Kuai wrote:
-> 在 2023/11/15 2:04, Bart Van Assche 写道:
->> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
->> index d7f51b84f3c7..872f87001374 100644
->> --- a/drivers/scsi/hosts.c
->> +++ b/drivers/scsi/hosts.c
->> @@ -442,6 +442,7 @@ struct Scsi_Host *scsi_host_alloc(const struct scsi_host_template *sht, int priv
->>       shost->no_write_same = sht->no_write_same;
->>       shost->host_tagset = sht->host_tagset;
->>       shost->queuecommand_may_block = sht->queuecommand_may_block;
->> +    shost->disable_fair_tag_sharing = sht->disable_fair_tag_sharing;
-> 
-> Can we also consider to disable fair tag sharing by default for the
-> driver that total driver tags is less than a threshold?
-I don't want to do this because such a change could disable fair tag
-sharing for drivers that support both SSDs and hard disks being associated
-with a single SCSI host.
+6.5-stable review patch.  If anyone has any objections, please let me know.
 
-Thanks,
+------------------
 
-Bart.
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit 066baf92bed934c9fb4bcee97a193f47aa63431c ]
+
+copy_mc_to_user() has the destination marked __user on powerpc, but not on
+x86; the latter results in a sparse warning in lib/iov_iter.c.
+
+Fix this by applying the tag on x86 too.
+
+Fixes: ec6347bb4339 ("x86, powerpc: Rename memcpy_mcsafe() to copy_mc_to_{user, kernel}()")
+Signed-off-by: David Howells <dhowells@redhat.com>
+Link: https://lore.kernel.org/r/20230925120309.1731676-3-dhowells@redhat.com
+cc: Dan Williams <dan.j.williams@intel.com>
+cc: Thomas Gleixner <tglx@linutronix.de>
+cc: Ingo Molnar <mingo@redhat.com>
+cc: Borislav Petkov <bp@alien8.de>
+cc: Dave Hansen <dave.hansen@linux.intel.com>
+cc: "H. Peter Anvin" <hpa@zytor.com>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Christian Brauner <christian@brauner.io>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: David Laight <David.Laight@ACULAB.COM>
+cc: x86@kernel.org
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/include/asm/uaccess.h | 2 +-
+ arch/x86/lib/copy_mc.c         | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/include/asm/uaccess.h b/arch/x86/include/asm/uaccess.h
+index 8bae40a662827..5c367c1290c35 100644
+--- a/arch/x86/include/asm/uaccess.h
++++ b/arch/x86/include/asm/uaccess.h
+@@ -496,7 +496,7 @@ copy_mc_to_kernel(void *to, const void *from, unsigned len);
+ #define copy_mc_to_kernel copy_mc_to_kernel
+ 
+ unsigned long __must_check
+-copy_mc_to_user(void *to, const void *from, unsigned len);
++copy_mc_to_user(void __user *to, const void *from, unsigned len);
+ #endif
+ 
+ /*
+diff --git a/arch/x86/lib/copy_mc.c b/arch/x86/lib/copy_mc.c
+index 80efd45a77617..6e8b7e600def5 100644
+--- a/arch/x86/lib/copy_mc.c
++++ b/arch/x86/lib/copy_mc.c
+@@ -70,23 +70,23 @@ unsigned long __must_check copy_mc_to_kernel(void *dst, const void *src, unsigne
+ }
+ EXPORT_SYMBOL_GPL(copy_mc_to_kernel);
+ 
+-unsigned long __must_check copy_mc_to_user(void *dst, const void *src, unsigned len)
++unsigned long __must_check copy_mc_to_user(void __user *dst, const void *src, unsigned len)
+ {
+ 	unsigned long ret;
+ 
+ 	if (copy_mc_fragile_enabled) {
+ 		__uaccess_begin();
+-		ret = copy_mc_fragile(dst, src, len);
++		ret = copy_mc_fragile((__force void *)dst, src, len);
+ 		__uaccess_end();
+ 		return ret;
+ 	}
+ 
+ 	if (static_cpu_has(X86_FEATURE_ERMS)) {
+ 		__uaccess_begin();
+-		ret = copy_mc_enhanced_fast_string(dst, src, len);
++		ret = copy_mc_enhanced_fast_string((__force void *)dst, src, len);
+ 		__uaccess_end();
+ 		return ret;
+ 	}
+ 
+-	return copy_user_generic(dst, src, len);
++	return copy_user_generic((__force void *)dst, src, len);
+ }
+-- 
+2.42.0
+
+
+
