@@ -1,186 +1,145 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79D64404
-	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 05:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Zl03/FYT";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PZrbibKS"
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 422868E
-	for <linux-block@vger.kernel.org>; Tue, 14 Nov 2023 21:59:41 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 58FA51F8B2;
-	Wed, 15 Nov 2023 05:59:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1700027979; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lNWv+nw1kbaPMMXMwpczXjda+khlOHXRaVbeZzfEFgY=;
-	b=Zl03/FYT31wzXArw7s8s63QELOnyOVHZJbVdfGGSKZGDNck1AXSmSbkcJytOkj4OEZlHb3
-	dUQA2xhdgDw6uakSsfeazvJqCA8My405zC/yo+RlknDckQSHN1PuRyPM+w7UHrVPvvJ640
-	HuSGxCvV/9MselthSDOQuuJAv6L+J1A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1700027979;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lNWv+nw1kbaPMMXMwpczXjda+khlOHXRaVbeZzfEFgY=;
-	b=PZrbibKSDCkzd8GlL06BDwtsYS3hnvlFgYoAFZHPDb1GuUibXuKF2NJvZdeestk6+vtHOK
-	K3rw7l1Bdd6shXDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2BFD713592;
-	Wed, 15 Nov 2023 05:59:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id s2L2CEteVGX4SgAAMHmgww
-	(envelope-from <hare@suse.de>); Wed, 15 Nov 2023 05:59:39 +0000
-Message-ID: <447d68cc-91d1-4d17-aec6-0105d3b188c5@suse.de>
-Date: Wed, 15 Nov 2023 06:59:38 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A96FBE9
+	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 07:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3D68E;
+	Tue, 14 Nov 2023 23:24:38 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SVZRj2N7lz4f3jY4;
+	Wed, 15 Nov 2023 15:24:33 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id B589B1A0181;
+	Wed, 15 Nov 2023 15:24:34 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBXWhAxclRl3TDlAw--.642S3;
+	Wed, 15 Nov 2023 15:24:34 +0800 (CST)
+Subject: Re: [PATCH v5 2/3] scsi: core: Support disabling fair tag sharing
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+ Keith Busch <kbusch@kernel.org>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ Yu Kuai <yukuai1@huaweicloud.com>, Ed Tsai <ed.tsai@mediatek.com>,
+ "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20231114180426.1184601-1-bvanassche@acm.org>
+ <20231114180426.1184601-3-bvanassche@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <80dee412-2fda-6a23-0b62-08f87bd7e607@huaweicloud.com>
+Date: Wed, 15 Nov 2023 15:24:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests 2/2] nvme/{041,042,043,044,045}: require kernel
- config NVME_HOST_AUTH
-Content-Language: en-US
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc: Yi Zhang <yi.zhang@redhat.com>
-References: <20231115055220.2656965-1-shinichiro.kawasaki@wdc.com>
- <20231115055220.2656965-3-shinichiro.kawasaki@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20231115055220.2656965-3-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20231114180426.1184601-3-bvanassche@acm.org>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -7.09
-X-Spamd-Result: default: False [-7.09 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 RCPT_COUNT_THREE(0.00)[4];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-3.00)[-1.000];
-	 BAYES_HAM(-3.00)[100.00%];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-1.00)[-1.000];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
+X-CM-TRANSID:cCh0CgBXWhAxclRl3TDlAw--.642S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCr4UJrWDCF17Cw1Duw1kuFg_yoW5ArW8pF
+	Z3tw12kw48Jw409anFgF15uFyFga9rGryjga47Wa4rua98tayvgws8Ca45XFWfWrZ7GwnF
+	qF4qqry5CF1xJ37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
+	Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 11/15/23 06:52, Shin'ichiro Kawasaki wrote:
-> The kernel commit d68006348288 ("nvme: rework NVME_AUTH Kconfig
-> selection") in v6.7-rc1 introduced a new kernel config option
-> NVME_HOST_AUTH. The nvme test cases from 041 to 045 fail when the option
-> is disabled. Check the requirement of the test cases.
+Hi,
+
+ÔÚ 2023/11/15 2:04, Bart Van Assche Ð´µÀ:
+> Allow SCSI drivers to disable the block layer fair tag sharing algorithm.
 > 
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Link: https://lore.kernel.org/linux-nvme/CAHj4cs_Lprbh1zWsJ2yT6+qhNoqjrGDrBgx+XOYvU9SLpmLTtw@mail.gmail.com/
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Cc: Yu Kuai <yukuai1@huaweicloud.com>
+> Cc: Ed Tsai <ed.tsai@mediatek.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->   tests/nvme/041 | 1 +
->   tests/nvme/042 | 1 +
->   tests/nvme/043 | 1 +
->   tests/nvme/044 | 1 +
->   tests/nvme/045 | 1 +
->   5 files changed, 5 insertions(+)
+>   drivers/scsi/hosts.c     | 1 +
+>   drivers/scsi/scsi_lib.c  | 2 ++
+>   include/scsi/scsi_host.h | 6 ++++++
+>   3 files changed, 9 insertions(+)
 > 
-> diff --git a/tests/nvme/041 b/tests/nvme/041
-> index d23f10a..a7a5b38 100755
-> --- a/tests/nvme/041
-> +++ b/tests/nvme/041
-> @@ -14,6 +14,7 @@ requires() {
->   	_have_loop
->   	_have_kernel_option NVME_AUTH
->   	_have_kernel_option NVME_TARGET_AUTH
-> +	_kver_gt_or_eq 6 7 && _have_kernel_option NVME_HOST_AUTH
->   	_require_nvme_trtype_is_fabrics
->   	_require_nvme_cli_auth
->   }
-> diff --git a/tests/nvme/042 b/tests/nvme/042
-> index 9fda681..50d56d6 100755
-> --- a/tests/nvme/042
-> +++ b/tests/nvme/042
-> @@ -14,6 +14,7 @@ requires() {
->   	_have_loop
->   	_have_kernel_option NVME_AUTH
->   	_have_kernel_option NVME_TARGET_AUTH
-> +	_kver_gt_or_eq 6 7 && _have_kernel_option NVME_HOST_AUTH
->   	_require_nvme_trtype_is_fabrics
->   	_require_nvme_cli_auth
->   }
-> diff --git a/tests/nvme/043 b/tests/nvme/043
-> index c6a0aa0..b5f10bc 100755
-> --- a/tests/nvme/043
-> +++ b/tests/nvme/043
-> @@ -14,6 +14,7 @@ requires() {
->   	_have_loop
->   	_have_kernel_option NVME_AUTH
->   	_have_kernel_option NVME_TARGET_AUTH
-> +	_kver_gt_or_eq 6 7 && _have_kernel_option NVME_HOST_AUTH
->   	_require_nvme_trtype_is_fabrics
->   	_require_nvme_cli_auth
->   	_have_driver dh_generic
-> diff --git a/tests/nvme/044 b/tests/nvme/044
-> index 7bd43f3..06e17d1 100755
-> --- a/tests/nvme/044
-> +++ b/tests/nvme/044
-> @@ -14,6 +14,7 @@ requires() {
->   	_have_loop
->   	_have_kernel_option NVME_AUTH
->   	_have_kernel_option NVME_TARGET_AUTH
-> +	_kver_gt_or_eq 6 7 && _have_kernel_option NVME_HOST_AUTH
->   	_require_nvme_trtype_is_fabrics
->   	_require_nvme_cli_auth
->   	_have_driver dh_generic
-> diff --git a/tests/nvme/045 b/tests/nvme/045
-> index 1eb1032..126060c 100755
-> --- a/tests/nvme/045
-> +++ b/tests/nvme/045
-> @@ -15,6 +15,7 @@ requires() {
->   	_have_loop
->   	_have_kernel_option NVME_AUTH
->   	_have_kernel_option NVME_TARGET_AUTH
-> +	_kver_gt_or_eq 6 7 && _have_kernel_option NVME_HOST_AUTH
->   	_require_nvme_trtype_is_fabrics
->   	_require_nvme_cli_auth
->   	_have_driver dh_generic
+> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+> index d7f51b84f3c7..872f87001374 100644
+> --- a/drivers/scsi/hosts.c
+> +++ b/drivers/scsi/hosts.c
+> @@ -442,6 +442,7 @@ struct Scsi_Host *scsi_host_alloc(const struct scsi_host_template *sht, int priv
+>   	shost->no_write_same = sht->no_write_same;
+>   	shost->host_tagset = sht->host_tagset;
+>   	shost->queuecommand_may_block = sht->queuecommand_may_block;
+> +	shost->disable_fair_tag_sharing = sht->disable_fair_tag_sharing;
 
-Why do we need to check for the kernel version?
-Any kernel not having the NVME_HOST_AUTH config symbol clearly will
-have it unset, no?
-I'd rather update _have_kernel_option to handle the case where
-a config symbol is not present, treating it as unset.
-That way we can drop the dependency on the kernel version (which, btw, 
-is kinda pointless for the development branches anyway).
+Can we also consider to disable fair tag sharing by default for the
+driver that total driver tags is less than a threshold?
 
-Cheers,
+Thanks,
+Kuai
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 NÃ¼rnberg
-HRB 36809 (AG NÃ¼rnberg), GeschÃ¤ftsfÃ¼hrer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+>   
+>   	if (shost_eh_deadline == -1 || !sht->eh_host_reset_handler)
+>   		shost->eh_deadline = -1;
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index cf3864f72093..291fbfacf542 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1984,6 +1984,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+>   		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
+>   	if (shost->queuecommand_may_block)
+>   		tag_set->flags |= BLK_MQ_F_BLOCKING;
+> +	if (shost->disable_fair_tag_sharing)
+> +		tag_set->flags |= BLK_MQ_F_DISABLE_FAIR_TAG_SHARING;
+>   	tag_set->driver_data = shost;
+>   	if (shost->host_tagset)
+>   		tag_set->flags |= BLK_MQ_F_TAG_HCTX_SHARED;
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index 3b907fc2ef08..04238ae9e22c 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -464,6 +464,9 @@ struct scsi_host_template {
+>   	/* The queuecommand callback may block. See also BLK_MQ_F_BLOCKING. */
+>   	unsigned queuecommand_may_block:1;
+>   
+> +	/* See also BLK_MQ_F_DISABLE_FAIR_TAG_SHARING. */
+> +	unsigned disable_fair_tag_sharing:1;
+> +
+>   	/*
+>   	 * Countdown for host blocking with no commands outstanding.
+>   	 */
+> @@ -662,6 +665,9 @@ struct Scsi_Host {
+>   	/* The queuecommand callback may block. See also BLK_MQ_F_BLOCKING. */
+>   	unsigned queuecommand_may_block:1;
+>   
+> +	/* See also BLK_MQ_F_DISABLE_FAIR_TAG_SHARING. */
+> +	unsigned disable_fair_tag_sharing:1;
+> +
+>   	/* Host responded with short (<36 bytes) INQUIRY result */
+>   	unsigned short_inquiry:1;
+>   
+> 
+> 
+> .
+> 
 
