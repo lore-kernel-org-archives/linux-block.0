@@ -1,241 +1,168 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98CB33061;
-	Tue, 14 Nov 2023 21:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1B52109;
-	Tue, 14 Nov 2023 13:42:27 -0800 (PST)
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1cc3bb4c307so48187445ad.0;
-        Tue, 14 Nov 2023 13:42:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699998147; x=1700602947;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZiiTqERusltuBxYIi/ClOpwEZbVLD7eJX5Gmub51sRg=;
-        b=dCSSsrtJ6Lz/sBeVGCQy/piym9/WVbaG0LShUnqylasRacwGwZ/OSAuX1djme68hzF
-         eB83dlDHqkz+kcVh+Uueqe5OVkcQryYE/3i7YGfg/FNO6mbN3yDDJ3ClLyGQIKzmqCP1
-         LjtmSYzkkbj7070LCh5mW68xH8bI8+t5Zxr/XlTBKvjWcdzd/WiVtdPqZ6UJQ/kdDASx
-         5cWHx3uwYwmYUG2kYhJMlEfVZAb6Yh0gIf6n8OhTU6Q2tpdyzDWQIGjrEQ2iZHu4Fqzn
-         CKsbCJOS6bFI6L7RfhYQ76/LWQiFn8Vanb+zVN3hrbqc1F9gSAK3oHelX5JygzaDLSWD
-         nqJw==
-X-Gm-Message-State: AOJu0YxwokJXdIo4/Gi3ybEOmh0nXDaLz8DEiL4l+k8GQW7MXychXmfg
-	tuZGraV5IBt10kcA5NcQa8jEfVo6KPU=
-X-Google-Smtp-Source: AGHT+IGao25r2c6G5yJf0HAD5Co267EBzny25Wd6pDSGOK3iOtqoL1pplU4/X+7kPuI3WBXzCsXx/g==
-X-Received: by 2002:a17:902:d548:b0:1cc:c857:14a0 with SMTP id z8-20020a170902d54800b001ccc85714a0mr3971053plf.3.1699998147318;
-        Tue, 14 Nov 2023 13:42:27 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:2278:ad72:cefb:4d49])
-        by smtp.gmail.com with ESMTPSA id o16-20020a170902d4d000b001c3267ae317sm6133926plg.165.2023.11.14.13.42.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 13:42:26 -0800 (PST)
-From: Bart Van Assche <bvanassche@acm.org>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Daejun Park <daejun7.park@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Douglas Gilbert <dgilbert@interlog.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH v4 15/15] scsi_debug: Maintain write statistics per group number
-Date: Tue, 14 Nov 2023 13:41:10 -0800
-Message-ID: <20231114214132.1486867-16-bvanassche@acm.org>
-X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
-In-Reply-To: <20231114214132.1486867-1-bvanassche@acm.org>
-References: <20231114214132.1486867-1-bvanassche@acm.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2A0635
+	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 01:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J4sJaV7a";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="C+o0PNcR"
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA1998
+	for <linux-block@vger.kernel.org>; Tue, 14 Nov 2023 17:44:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1700012693; x=1731548693;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=oWhnDZhaPbZ5Fy3fkX2aVnHR7z7TIR5Fsc2zp/tlnQs=;
+  b=J4sJaV7alPxf9I9L/66qDG06IjJHRH3ob0hDYdNYqNoP2f8Sh5LQtfrA
+   mI5cvksn8J37rUR/mp2eGmL0DRefU9ExeQQnf9NABXU3v6LuTs3zLvWP3
+   FY/bsa/K78OkZKqWRH/e9LnZKz/cSRmIoO+sQetBJMqtBblfZuh/yRJiL
+   9sfHvFJD+OgfWwkYvoIhr3MZxYSIXflw8zPilJLtA+ZV3oeJyIXUR4Jhm
+   sgJa5WlZSm8mmfduvdmjvIrsKKS+oYOD7xaXzbAsIOY3wZlFc6abXyySD
+   3MiNwP5vkDRBZ6KnksxfvFOv+HXTKPPHV6YNkVXv0HFMWKuEAvxbSBSH/
+   Q==;
+X-CSE-ConnectionGUID: dIwDKLLAQQmla+xlsjk0Mg==
+X-CSE-MsgGUID: bJ09DpKhQO2JejA2ArcHVw==
+X-IronPort-AV: E=Sophos;i="6.03,303,1694707200"; 
+   d="scan'208";a="2313654"
+Received: from mail-mw2nam10lp2100.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.100])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Nov 2023 09:44:48 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RxAiPenpT+yVTWBDOv6OZFoWGhbCgpYTvE32krrwSIKgLJPBDnVrfTWQ/y13+JXB+rQblDXo3sg14TVavNRDM1m393WJYB5lUzBj/46iAUXl6mVhMBVKYWGJuzioXqE8B/FAIwaHlMza0rJurM+FvmmCeDjiSwux2+Q1mEHmPN+6EshDHAQEhf88if5NXev0r7+ovTLdt6wj484Hidnrxp3MYnD3LIx7B7yas2OFWYaLgzA8uXl0vsiLnhMYhUVn8YcAAAkBt6H8hW24WzGwPkiUH2v5XDzz1qd9CXOFE9qnd8FjiLF5Q80OEu5hVhmId8fsrf0HHoGLK3bgd/d62g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dNLPkYkTQYeaa3gDeF52qFGVfsmGEob8s3TtacXA/8I=;
+ b=OG9ZHC2LKhX6ncHD8GWGVZa6ZBkiIRO8jTCad/LPnUXpT7gKs/mxhmEArG+blXxSab+zBhH1+DwiwXDB0EFSFzbH7csjMQb8iMAavW/0jbQcWQ56Z1FWzYixbwxNtoxK1rM8hPyvlK7/xnaPXnqHVaUcalGfqxOiaHDAJ+Ezvdzf/lv+K1zjjHAgeBQyq7XFzKpWVFzVVS6RCtYhMEXJIpxV1/LSeP9soQH+GdSc7J1p+UUYHNZ+ena5B+vZVmzm0vaP0W9/liHOCog/QRAdIQaPVutIdePYRFA6kxwoBJFYyET0ERCNetWEgUiSGNsHoLqvL2Vb6SQQEh+nAWLxnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dNLPkYkTQYeaa3gDeF52qFGVfsmGEob8s3TtacXA/8I=;
+ b=C+o0PNcRvi5/yvODGKZUlOHlvnlUn3L4lFGauHQnb1ZLPyUr2toW7LvoL43Kt+Nj/CvJ3lmb1h5hYsAoPQDfry4rbfVWY0go72zVLJN9+UhY47i1G+R/g7Hqey8wVen1PLQJteUx4cYpONZLiMiAgumPGgv/EeF9dbAa4R+v9W0=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SA2PR04MB7737.namprd04.prod.outlook.com (2603:10b6:806:14d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.18; Wed, 15 Nov
+ 2023 01:44:47 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::2256:4ad2:cd2b:dc9e]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::2256:4ad2:cd2b:dc9e%3]) with mapi id 15.20.6977.029; Wed, 15 Nov 2023
+ 01:44:47 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Chris Leech <cleech@redhat.com>
+CC: Yi Zhang <yi.zhang@redhat.com>, Hannes Reinecke <hare@suse.de>,
+	linux-block <linux-block@vger.kernel.org>, "open list:NVM EXPRESS DRIVER"
+	<linux-nvme@lists.infradead.org>, Keith Busch <kbusch@kernel.org>, Maurizio
+ Lombardi <mlombard@redhat.com>
+Subject: Re: [bug report][bisected] nvme authentication setup failed observed
+ during blktests nvme/041 nvme/042 nvme/043
+Thread-Topic: [bug report][bisected] nvme authentication setup failed observed
+ during blktests nvme/041 nvme/042 nvme/043
+Thread-Index: AQHaAlwxFhZ7Pq3sFUae9Ji10PFKObB4sTcAgAIUnQA=
+Date: Wed, 15 Nov 2023 01:44:46 +0000
+Message-ID: <hzbl2cjkzrmjmqdp75tio4aqe5s2fr2fsff4vcqpwbi3cs6676@gs5hsnskbf2j>
+References:
+ <CAHj4cs8yZ4-BXqTK4W0UsPpmc2ctCD=_mYiwuAuvcmgS3+KJ8g@mail.gmail.com>
+ <CAHj4cs8vqrePA-TE_GGNAZLG3iqZBq9L1GkanA4A0wRF_TXDeA@mail.gmail.com>
+ <ZVJjtOGpulFV61ii@rhel-developer-toolbox>
+In-Reply-To: <ZVJjtOGpulFV61ii@rhel-developer-toolbox>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SA2PR04MB7737:EE_
+x-ms-office365-filtering-correlation-id: 3729c028-8b35-470e-05f7-08dbe57c72ed
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 1FGAmV39y78C5sytbpcglmmLhog/M7F+b8tIx4JSjfcJa0amjOjLuTFnoQka8DYCm6jer273VRcufWzXG2/wLMFj6csVcXrJouMR4hjKXyKTSawM7oFB1AwsRuRO3UEyTyOwQFVd3KED61xX5nsn3e6j3X2CaVuj0pD143y1uspSO0/rR3mxtlt+3ro1xy12As+hpqvwvsqIU4oDfHEXJQhabDJWJ6FIEo2TC9edq2Ns0hv9dgWmJ+lkMkjLt3/Inx8EJ12Et5G/CBpofk/axoXkuC/MJRqmmSeGY2HwsZI53wNDjldbsa8oP+yd7RT9aAiILXg0xKI4m0m74ud+xPmbPborTzpm/m7LDnhAg0LZZU3Rw/XvhC894AE7ESSro9sz6t+lTVjKS78sIzLaaxXtCPY4zZrfP+T23SzDSMTvZvwUKfP3FbPDNaZhElFuAHtd2Y1Y++G0vLuWiB65WdZlhHFX8ecVE/an8erPNbEGX1shiosLyuNfq9/v2Fg7kUCjdRT3b0J4FtxY9XchbG0CwBsjCdoSyjTrtHW3jZutL2p5zz8CzHaLNi6P6v2PCDiqXrb9eKFqwzZ/yR2fzizocDmn6XxFIHV5EQwcB6Q=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(39860400002)(396003)(376002)(136003)(346002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(38070700009)(38100700002)(83380400001)(33716001)(54906003)(64756008)(66946007)(8676002)(4326008)(76116006)(8936002)(4744005)(66446008)(66556008)(66476007)(122000001)(41300700001)(82960400001)(26005)(6512007)(9686003)(6506007)(478600001)(6486002)(966005)(2906002)(44832011)(6916009)(316002)(86362001)(91956017)(71200400001)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Ht7gWLKZqzIRk1EPYt/P1UZV4yUDm0Ok+PUvd69OmKDXx09sK9Orqt3Le4e/?=
+ =?us-ascii?Q?tKz8HWAuctIicL5njbGnrxoKimDLQ4Bp5VWGIaQQ+xeIjTUIuVDQ9taSq9/H?=
+ =?us-ascii?Q?aAhLVh3ETsqu54yb/cmwgLV3dIeArdvc/TDnsAP075tx1Bxq8td42IaeBn9O?=
+ =?us-ascii?Q?EGOGkyquBiyeTxhy9QKoIs1mqcb9m3k411NnWfeTMbNZXfItox5oUO1AvA61?=
+ =?us-ascii?Q?wYaOii2xj0PwtB+GhpsU/JxsGNJAXdUkMWgYrzmsPzkxuabJdG6wERAlle0c?=
+ =?us-ascii?Q?SUWDSt66wHJ8bse8qoY1gdANyyIzL70c06BGhRCm0tzQSDZkLuojVzGlBrCe?=
+ =?us-ascii?Q?1B4w0AZwNLaay6m+BUjQlbPhobmURAMgaYeawLVTHB4uTwzN17YkPBjf0X1N?=
+ =?us-ascii?Q?VEfE3n59r2DbiUcyI3eYduIEkQxVeUvl9FRbjM5KKBTtzsw6ROBlK+ovX7Js?=
+ =?us-ascii?Q?hHgUJIUM0rZXkXR0K5coH2WJ9I02mdvyW9ymnWBxd4UeagRh5oLKXOwMA0k6?=
+ =?us-ascii?Q?ki5v8Ye2H1/LR36Df9bbp5uP+L0dt4Y8uv6t6rMtNGhxY/Mj6yGoNX7FtVtr?=
+ =?us-ascii?Q?sxHDyVU4YWJ5cl4nuYPq6tRgf4cjloB35AAUstySi05deqGm1p4AVEMCHbmQ?=
+ =?us-ascii?Q?i/8fu0eGZq6wGOudsfuztwun/PK0iKkkTp9s7wTNOxiEdbg96wAxks5zEJAo?=
+ =?us-ascii?Q?2wkq7DlB4pnkqpkkX4uSYdSm/2JCSBBWB80kVPsbZOVqPrYhorO1mSLUaMtW?=
+ =?us-ascii?Q?A5LUqXyUPmJ4OKQyMa9xppvAGT+R5/TNyVz+4/kpt3AzdMo2oHm6H4ny4i03?=
+ =?us-ascii?Q?IZw3uvwoVNAmg1mwgJgaRlUBaK8qZnbG98JyEnfbR5k68xW4Gu6Fv/ZuJyDp?=
+ =?us-ascii?Q?pQ7b4PkgL5KKCwqP5wtlI2AvllHxn4CWDjP2iQfyOJqNECF8srFT5NMBnMb7?=
+ =?us-ascii?Q?XfdoWEhJTuVWSMMbcsUhCP029RjWmD5e3/eL6Bjq2+HRFMUikRAsrxUW3X5L?=
+ =?us-ascii?Q?vi/TXqD3MIvcAJUGAPUulvlM98qGPeaJBqbb1p2cTB5qlusOF9we+osnFQb7?=
+ =?us-ascii?Q?iIbPFSG8u66qkmw7sJZ0BwePleFOnOo1Vp4VRxXXR/rXbStKevy8GPL0O04T?=
+ =?us-ascii?Q?6ISZ3hVlAQ+5V5UB342Lyzu/+5DMyyNHACMxzaZbkZvibT+cxiMLodtjENeF?=
+ =?us-ascii?Q?Q2Cci77XLw6Jaa7uutQgUWSd843x2d3u1V+w564ghnqNNaMGKIRpepjH5wXW?=
+ =?us-ascii?Q?CPf3QfiIEUcCC1GNmiPWQUuca7rxK9m61Ljy+5/i/CiExHGfAh5JAm1nzFQf?=
+ =?us-ascii?Q?+dhHySq3C6Vt6RBPuw+FLi7SD/ydNJF4TDrT2oeVy/ch1ZALRWFrUKjc4Npb?=
+ =?us-ascii?Q?yQVHT07mVljbktvIYCXwdgTr6ldz91uryOrDbWHW7YoLoFXRP6vQ5cEczx9O?=
+ =?us-ascii?Q?fDP9DWgPrIGfuwuTBT5lnqlL0faC8fo1yv0SkwYxMN1pS/goBUJxZJ3NS00O?=
+ =?us-ascii?Q?hvmfN+jsh4g5wI3RhQwhcMLQkEr+n4pO2CwnfJeAncOKjqEV8vwCaf7i+AJn?=
+ =?us-ascii?Q?boOaEE7VzZA+21e0/r0cToy2FqQbpHruWh9yqJe6AXiout1e7wu1LIcZqAEk?=
+ =?us-ascii?Q?hne9Ytj7u/v5budX1RieJsY=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <B8021EA47463D64694BDC71739D3308A@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	RPVqt5BDEi0Xv6nKK2AC75XKkRFoxSz9j2dxG4NHkvHzMjAjZ1DzVbX7CRzEEPgiHqXQ9o0Kp2UhBNHhNJVExM0Jhr1XQSOz0c+4XJqnSTf1L02SG8oX7kPnrGM8PgUNEtkxnknxhAKBXEqTjXIS08GgNO2/1nNp4xeP5R2RHuaEG/L3TMc36RXOgCM7W4oOXzAVOmPS/IpKR693gxmKa32aA7053ds7JhzhmLahaHbqZbUwxrcFekVSkBd5TnRL6p6zmxB2KbaDHetG4ROAOmGfmUQWYMsFFmSDV3U5CrNQt1x5LEns2EwRdpXWZ0U++hsV+GIdkzhIM6sCThP8/1ZY7WtIWn3491WwRaGyTZfeYuLZUNt8l28yzV4Jrh5J7uFPN5XEvQ7IxTtnpOOli1ZGPZ6J/LI7Izt21+SCpDl2V5Fg6Z4GSoRcuE/D83gWPrOKLsHMvbOldsR93JKr7JZxiGEXQiwxxPKOUq8I84GXNii8BwixHxT9Se2AKLIQleiMkW3N2znMxB2UILAnzTHekZ+VyBUhyzYZ9/g4EEoe6CAiPaY3R/BMCBfdyonj0RX4xoa+fXDYmWf6mE6nBUkQvQn6CpWuztYRQXgpkLf4EjX7wCqbTIBcq5J529TJpl/EktmML1zoMR+w3dJYqFpAnb7OtdsiTADCNoLaRhKnW6xUSblO07dA82bqaoBuuvbdheGQF/TmGLe6bo+2cJscZ0LiU6JaPkISFQtJs/H6uyTIyI5snsM+Ql8vCXWYgZojJbBrmaJTjdRAKVh/DcRvb8zQ0O2zQNXd04DJ3SOzHzaTjpL9nTsHiv/AeCY9E8FbILgLWIiRlnKq963hSGwj4HhjC+s6wHsYHg+LgW6fFFvLxQB0Wu2SN3ZTZOKADRhTFNgUVjaHhs9iiwGqdLk4hVZV24nncjHzY3jPLK0=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3729c028-8b35-470e-05f7-08dbe57c72ed
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2023 01:44:46.9567
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2l3u2eaKgKaYStp/C/gZRmoAP6IR8YnCYf7UHxMTF66Hw2shzDztYRXZtdE5zrtXm0z7eqm8vreCzM/By0QEb1cnO6ced6+kPYtOqbSTHuo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7737
 
-Track per GROUP NUMBER how many write commands have been processed. Make
-this information available in sysfs. Reset these statistics if any data
-is written into the sysfs attribute.
+On Nov 13, 2023 / 09:58, Chris Leech wrote:
+> Hi Yi Zhang,
+>=20
+> Where is your kernel configuration coming from?  If it's carried forward
+> from an older kernel, it may have the NVME_AUTH symbol set but not
+> NVME_HOST_AUTH.  That would now just enabled the shared host/target core
+> auth code, but not the host support.  I think updating your kernel
+> config to include NVME_HOST_AUTH will fix this.
 
-Note: SCSI devices should only interpret the information in the GROUP
-NUMBER field as a stream identifier if the ST_ENBLE bit has been set to
-one. This patch follows a simpler approach: count the number of writes
-per GROUP NUMBER whether or not the group number represents a stream
-identifier.
+Hi, Yi, Chris,
 
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/scsi/scsi_debug.c | 51 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 47 insertions(+), 4 deletions(-)
+I observed the same failure using kernel version v6.7-rc1. In my environmen=
+t,
+five test cases failed from nvme/041 to nvme/045. I enabled NVME_HOST_AUTH =
+and
+confirmed the failures go away.
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index daf64844d6cb..47cc3da39076 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -898,6 +898,8 @@ static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
- static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
- static int poll_queues; /* iouring iopoll interface.*/
- 
-+static atomic_long_t writes_by_group_number[64];
-+
- static char sdebug_proc_name[] = MY_NAME;
- static const char *my_name = MY_NAME;
- 
-@@ -3351,7 +3353,8 @@ static inline struct sdeb_store_info *devip2sip(struct sdebug_dev_info *devip,
- 
- /* Returns number of bytes copied or -1 if error. */
- static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
--			    u32 sg_skip, u64 lba, u32 num, bool do_write)
-+			    u32 sg_skip, u64 lba, u32 num, bool do_write,
-+			    u8 group_number)
- {
- 	int ret;
- 	u64 block, rest = 0;
-@@ -3370,6 +3373,10 @@ static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
- 		return 0;
- 	if (scp->sc_data_direction != dir)
- 		return -1;
-+
-+	if (do_write && group_number < ARRAY_SIZE(writes_by_group_number))
-+		atomic_long_inc(&writes_by_group_number[group_number]);
-+
- 	fsp = sip->storep;
- 
- 	block = do_div(lba, sdebug_store_sectors);
-@@ -3743,7 +3750,7 @@ static int resp_read_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, false);
-+	ret = do_device_access(sip, scp, 0, lba, num, false, 0);
- 	sdeb_read_unlock(sip);
- 	if (unlikely(ret == -1))
- 		return DID_ERROR << 16;
-@@ -3928,6 +3935,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- {
- 	bool check_prot;
- 	u32 num;
-+	u8 group = 0;
- 	u32 ei_lba;
- 	int ret;
- 	u64 lba;
-@@ -3939,11 +3947,13 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be64(cmd + 2);
- 		num = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case WRITE_10:
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x3f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = true;
- 		break;
-@@ -3958,15 +3968,18 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
- 		num = get_unaligned_be32(cmd + 6);
-+		group = cmd[6] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case 0x53:	/* XDWRITEREAD(10) */
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x1f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = false;
- 		break;
- 	default:	/* assume WRITE(32) */
-+		group = cmd[6] & 0x3f;
- 		lba = get_unaligned_be64(cmd + 12);
- 		ei_lba = get_unaligned_be32(cmd + 20);
- 		num = get_unaligned_be32(cmd + 28);
-@@ -4021,7 +4034,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, true);
-+	ret = do_device_access(sip, scp, 0, lba, num, true, group);
- 	if (unlikely(scsi_debug_lbp()))
- 		map_region(sip, lba, num);
- 	/* If ZBC zone then bump its write pointer */
-@@ -4073,12 +4086,14 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 	u32 lb_size = sdebug_sector_size;
- 	u32 ei_lba;
- 	u64 lba;
-+	u8 group;
- 	int ret, res;
- 	bool is_16;
- 	static const u32 lrd_size = 32; /* + parameter list header size */
- 
- 	if (cmd[0] == VARIABLE_LENGTH_CMD) {
- 		is_16 = false;
-+		group = cmd[6] & 0x3f;
- 		wrprotect = (cmd[10] >> 5) & 0x7;
- 		lbdof = get_unaligned_be16(cmd + 12);
- 		num_lrd = get_unaligned_be16(cmd + 16);
-@@ -4089,6 +4104,7 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 		lbdof = get_unaligned_be16(cmd + 4);
- 		num_lrd = get_unaligned_be16(cmd + 8);
- 		bt_len = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		if (unlikely(have_dif_prot)) {
- 			if (sdebug_dif == T10_PI_TYPE2_PROTECTION &&
- 			    wrprotect) {
-@@ -4177,7 +4193,8 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 			}
- 		}
- 
--		ret = do_device_access(sip, scp, sg_off, lba, num, true);
-+		ret = do_device_access(sip, scp, sg_off, lba, num, true,
-+				       group);
- 		/* If ZBC zone then bump its write pointer */
- 		if (sdebug_dev_is_zoned(devip))
- 			zbc_inc_wp(devip, lba, num);
-@@ -7264,6 +7281,31 @@ static ssize_t tur_ms_to_ready_show(struct device_driver *ddp, char *buf)
- }
- static DRIVER_ATTR_RO(tur_ms_to_ready);
- 
-+static ssize_t group_number_stats_show(struct device_driver *ddp, char *buf)
-+{
-+	char *p = buf, *end = buf + PAGE_SIZE;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		p += scnprintf(p, end - p, "%d %ld\n", i,
-+			       atomic_long_read(&writes_by_group_number[i]));
-+
-+	return p - buf;
-+}
-+
-+static ssize_t group_number_stats_store(struct device_driver *ddp,
-+					const char *buf,
-+				  size_t count)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		atomic_long_set(&writes_by_group_number[i], 0);
-+
-+	return 0;
-+}
-+static DRIVER_ATTR_RW(group_number_stats);
-+
- /* Note: The following array creates attribute files in the
-    /sys/bus/pseudo/drivers/scsi_debug directory. The advantage of these
-    files (over those found in the /sys/module/scsi_debug/parameters
-@@ -7310,6 +7352,7 @@ static struct attribute *sdebug_drv_attrs[] = {
- 	&driver_attr_cdb_len.attr,
- 	&driver_attr_tur_ms_to_ready.attr,
- 	&driver_attr_zbc.attr,
-+	&driver_attr_group_number_stats.attr,
- 	NULL,
- };
- ATTRIBUTE_GROUPS(sdebug_drv);
+My understanding is that the test cases newly require NVME_HOST_AUTH since
+kernel v6.7. Now I'm preparing blktests patches to check that requirement [=
+1].
+Will post them after some more confirmations.
+
+[1] https://github.com/kawasaki/blktests/commit/e0d9d4c8b981e291baf25c61798=
+02278cd726521=
