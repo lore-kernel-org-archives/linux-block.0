@@ -1,199 +1,99 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE78B4419
-	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 08:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93A653AA
+	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 09:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aL9ePSvl";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rDFkQHnZ"
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82577DF
-	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 00:20:30 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THXZivWi"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8C3DFE
+	for <linux-block@vger.kernel.org>; Wed, 15 Nov 2023 01:19:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700039980;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PcNgWQ8ygzMvds1M1LN5SC3pyZyIqQga43z/omNaXOM=;
+	b=THXZivWiKbExTnn88LVj9MoKgnfb/Nyc2EjcSB/WZM8PfjNUAENJIx2kz1PIVyyO9FV531
+	XL7MuQDvlFz3O/fUem+StzdhDu8YYd5ZxykmloFFSMDOiCgYJXAkPH4Ixcrtbb1pGW8XR4
+	FC4VQqNlsupzBu63u4LsedSdBn4gWWc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-249-u9R57BHvPmycv6zpbz_K2g-1; Wed,
+ 15 Nov 2023 04:19:37 -0500
+X-MC-Unique: u9R57BHvPmycv6zpbz_K2g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 31C241F8B2;
-	Wed, 15 Nov 2023 08:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1700036429; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2XpCbkyLYeBKuEVBivN5OPh7kqWMuPysm684/WUKUiA=;
-	b=aL9ePSvlQGrl2znx6pIIcCPdiiBTajZ0lYkx3mE7xumVrLY2so91T5QtT3cj7kjhPczoE3
-	VOxdfHSzoOM40pfOfdSSYwgSds8wkMWXUHZDgR4HeoX8L7zECMdJYS8cwHH40Srg+TE5K8
-	dtxAY1PSPF6YQtdhGt5pcyiubeaTlBY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1700036429;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2XpCbkyLYeBKuEVBivN5OPh7kqWMuPysm684/WUKUiA=;
-	b=rDFkQHnZQeiqJGfRIAdFaaHxdf6S9BgI17HoIM65UoEtpxIBhKhETR4Ityd6PRgGB6gnCC
-	i3b7UCyeVCgmkeBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 25AEA13592;
-	Wed, 15 Nov 2023 08:20:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id 1xC4CE1/VGUzDAAAMHmgww
-	(envelope-from <hare@suse.de>); Wed, 15 Nov 2023 08:20:29 +0000
-Message-ID: <ebf8d5ed-1fe6-4962-a363-5b11cd01bd70@suse.de>
-Date: Wed, 15 Nov 2023 09:20:28 +0100
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A87A91C05EB4;
+	Wed, 15 Nov 2023 09:19:36 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.10])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 812812166B27;
+	Wed, 15 Nov 2023 09:19:33 +0000 (UTC)
+Date: Wed, 15 Nov 2023 17:19:28 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Ming Lin <minggr@gmail.com>
+Cc: linux-block@vger.kernel.org,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>, ming.lei@redhat.com
+Subject: Re: Performance Difference between ext4 and Raw Block Device Access
+ with buffer_io
+Message-ID: <ZVSNIClnCnmay8e6@fedora>
+References: <CAF1ivSY-V+afUxfH7SDyM9vG991u7EoDCteL1y5jurnKSzQ3YA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests 2/2] nvme/{041,042,043,044,045}: require kernel
- config NVME_HOST_AUTH
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Yi Zhang <yi.zhang@redhat.com>
-References: <20231115055220.2656965-1-shinichiro.kawasaki@wdc.com>
- <20231115055220.2656965-3-shinichiro.kawasaki@wdc.com>
- <447d68cc-91d1-4d17-aec6-0105d3b188c5@suse.de>
- <xikiwdcssvdc2dvozscny73e7pxcdf7b7qx7oys34ote4cv4qo@3msll2uqsz7y>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-Autocrypt: addr=hare@suse.de; keydata=
- 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
- YwtooKEemPj2lg==
-In-Reply-To: <xikiwdcssvdc2dvozscny73e7pxcdf7b7qx7oys34ote4cv4qo@3msll2uqsz7y>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -7.09
-X-Spamd-Result: default: False [-7.09 / 50.00];
-	 ARC_NA(0.00)[];
-	 TO_DN_EQ_ADDR_SOME(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 RCPT_COUNT_THREE(0.00)[4];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 NEURAL_HAM_LONG(-3.00)[-1.000];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-1.00)[-1.000];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAF1ivSY-V+afUxfH7SDyM9vG991u7EoDCteL1y5jurnKSzQ3YA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On 11/15/23 08:46, Shinichiro Kawasaki wrote:
-> On Nov 15, 2023 / 06:59, Hannes Reinecke wrote:
-> [...]
->>> diff --git a/tests/nvme/045 b/tests/nvme/045
->>> index 1eb1032..126060c 100755
->>> --- a/tests/nvme/045
->>> +++ b/tests/nvme/045
->>> @@ -15,6 +15,7 @@ requires() {
->>>    	_have_loop
->>>    	_have_kernel_option NVME_AUTH
->>>    	_have_kernel_option NVME_TARGET_AUTH
->>> +	_kver_gt_or_eq 6 7 && _have_kernel_option NVME_HOST_AUTH
->>>    	_require_nvme_trtype_is_fabrics
->>>    	_require_nvme_cli_auth
->>>    	_have_driver dh_generic
->>
->> Why do we need to check for the kernel version?
->> Any kernel not having the NVME_HOST_AUTH config symbol clearly will
->> have it unset, no?
->> I'd rather update _have_kernel_option to handle the case where
->> a config symbol is not present, treating it as unset.
+On Mon, Nov 13, 2023 at 05:57:52PM -0800, Ming Lin wrote:
+> Hi,
 > 
-> At this point, _have_kernel_option() already handles NVME_HOST_AUTH as unset
-> when the kernel does not have the config symbol.
+> We are currently conducting performance tests on an application that
+> involves writing/reading data to/from ext4 or a raw block device.
+> Specifically, for raw block device access, we have implemented a
+> simple "userspace filesystem" directly on top of it.
 > 
->> That way we can drop the dependency on the kernel version (which, btw, is
->> kinda pointless for the development branches anyway).
+> All write/read operations are being tested using buffer_io. However,
+> we have observed that the ext4+buffer_io performance significantly
+> outperforms raw_block_device+buffer_io:
 > 
-> For the newer kernel, the test cases require NVME_HOST_AUTH is set. In other
-> words, the test cases are skipped when NVME_HOST_AUTH is unset. If we follow
-> your idea and drop the kernel version dependncy, the test cases will be skipped
-> on older kernels which do not have NVME_HOST_AUTH symbol. I wanted to allow
-> running the test cases on older kernels, then added the kernel version check.
-> 
-> I agree that kernel version dependency is not the best. As another solution,
-> I considered introducing a helper function _kernel_option_exists() which
-> checks if one of strings "# CONFIG_NVME_HOST_AUTH is not set" or
-> "# CONFIG_NVME_HOST_AUTH=[ym]" exists in kernel config files. With this, we
-> can do as follows:
-> 
->    _kernel_option_exists NVME_HOST_AUTH && _have_kernel_option NVME_HOST_AUTH
-> 
-> This assumes that one of the strings always exists in kernel configs. I was not
-> sure about the assumption, then chose the way to check kernel version. (Any
-> advice on this assumption will be appreciated...)
+> ext4: write 18G/s, read 40G/s
+> raw block device: write 18G/s, read 21G/s
 
-None of this is really a good solution. Probably we should strive to 
-make nvme-cli handling this situation correctly; after all, it would 
-know if the fabrics option is supported or not.
-Daniel?
+Can you share your exact test case?
 
-Cheers,
+I tried the following fio test on both ext4 over nvme and raw nvme, and the
+result is the opposite: raw block device throughput is 2X ext4, and it
+can be observed in both VM and read hardware.
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
-Managing Directors: I. Totev, A. Myers, A. McDonald, M. B. Moerman
-(HRB 36809, AG Nürnberg)
+1) raw NVMe
+
+fio --direct=0 --size=128G --bs=64k --runtime=20 --numjobs=8 --ioengine=psync \
+    --group_reporting=1 --filename=/dev/nvme0n1 --name=test-read --rw=read
+
+2) ext4
+
+fio --size=1G --time_based --bs=4k --runtime=20 --numjobs=8 \
+	--ioengine=psync --directory=$DIR --group_reporting=1 \
+	--unlink=0 --direct=0 --fsync=0 --name=f1 --stonewall --rw=read
+
+
+> 
+> We are exploring potential reasons for this difference. One hypothesis
+> is related to the page cache radix tree being per inode. Could it be
+> that, for the raw_block_device, there is only one radix tree, leading
+> to increased lock contention during write/read buffer_io operations?
+
+'perf record/report' should show the hot spot if lock contention is the
+reason.
+
+
+Thanks,
+Ming
 
