@@ -1,90 +1,88 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Zys3Kkmv"
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52247A5
-	for <linux-block@vger.kernel.org>; Fri, 17 Nov 2023 09:41:30 -0800 (PST)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5c875ee4f10so1013847b3.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Nov 2023 09:41:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XAfiWi46"
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 003F2A5
+	for <linux-block@vger.kernel.org>; Fri, 17 Nov 2023 09:49:22 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5c875ee4f10so1027717b3.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Nov 2023 09:49:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700242889; x=1700847689; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700243361; x=1700848161; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7o5RiwTiZDbmnN/G5s/3XrAwumQYnGu6WAncHTvtS9I=;
-        b=Zys3KkmvcNzUDaCLQXGfMFSzY46oQ5vS/grJaYU+PAI4wD/As038Eq3saygszbOBSl
-         gzlYwAKd2vGEdNVVPTffSX6X8x8LaDDwWqUHn3r4D2NBaFmXfHIlflZVdOXUeS2GbXi7
-         jNeTpVLYLLwodWrmoBG2EN+kW4QA8LbWpKjIIVQBbV4Q3t5K+w4M/QmE7yUWEmtcLDGw
-         6inzBAjORfoCLkT3wCcRZuZqt1LO6lPA3NbwoU+T0bh3J6dHjLCO61GlvZDBtog4PCTt
-         YHxjE7RpHWL88H79wdOsg3Sekns18+isAkUTUqYZYfv2hOX6jX/RyQbv37Z3H+OYFcLS
-         V8tA==
+        bh=Yam8G6FwKOwI0HHQbkBX8TJUGIUkTiuJbTuOE94zk5s=;
+        b=XAfiWi463V3iU20ukaVnQYsLLWiBJ/WPdpRN4+mrgUSvfOm680l47SYubynNpcuvpw
+         2s0ApTocaP/3iDbHlV9KwTSTp/RR14upHDdvmDPzcnlVYZs/P2M6PQg69odPY5i5i/ky
+         3meP54W2ujrbMculXlNwUSJ8n3Nzf2wXPdnLMwK4M5KyZcJsPV9IOjgl4I7Cvjen+siZ
+         zXA2Oag9M2lmUTQaRGYA8KiI6M6W1Qz6S80bNwZN0NdaK4R4pmLUmQ3152n9ej/hFbMx
+         PfJbbxnb/QfuFkfw6jCJs+2abPWdZM1Yo6WFASK87ehOWd1t82K+4LYrKTPwLfP8EIK2
+         ON7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700242889; x=1700847689;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7o5RiwTiZDbmnN/G5s/3XrAwumQYnGu6WAncHTvtS9I=;
-        b=kAl5ruIv4hMt7et38z1x7Msk6GF9VRvP/F6oBIxZtVpq4vqsTC9c1YiXWJjZtrvADf
-         Dh3n2CuaIaGclJdvVB9+NvBp4zar59jVdPQcwUO+nbHm0YtwihpkGpqGK4agWY7DbW3D
-         vpISTBBRqa5ImUZXNRChecY+NT1KN37MDDNG1ulqjzFhIub8VHJz8+Gt+Lh0xpr6cCux
-         Giyq+TbBZJkBRhOlm+KfYWM37xF8Py/ECwAHdogHzAiYR7+L8nc1pj1Yd+Qk33+wz9JI
-         gM61NTInH42rTSoHomGfMyc8Qlj3k8RIBu2QbPsz//3clBK356WFkMyt/3aQsnEzVdD+
-         gxqQ==
-X-Gm-Message-State: AOJu0YzXLyvO+2F8tTBbR51EVXcDi5ue5IBWUeB2k/pl3RGpFohAN7/O
-	pJdAc3Hf5J1nuJg0+LhBD+Rh8rI0sxp3oDiYrwmFMw==
-X-Google-Smtp-Source: AGHT+IGccYUjmCZjoVWDXey9DDIojv2fwJ9nKUksJKa1ZzOG8SwKjZOYjU73sXl6sxJD2uw+Je0dPQ==
-X-Received: by 2002:a05:690c:2d84:b0:5ad:4d0c:475a with SMTP id er4-20020a05690c2d8400b005ad4d0c475amr252230ywb.4.1700242889237;
-        Fri, 17 Nov 2023 09:41:29 -0800 (PST)
-Received: from [172.16.1.212] ([65.207.165.42])
-        by smtp.gmail.com with ESMTPSA id a124-20020a818a82000000b00598d67585d7sm596106ywg.117.2023.11.17.09.41.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 09:41:28 -0800 (PST)
-Message-ID: <3b2b5978-3c83-42c7-94c2-e44018ac8fb5@kernel.dk>
-Date: Fri, 17 Nov 2023 10:41:28 -0700
+        d=1e100.net; s=20230601; t=1700243361; x=1700848161;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Yam8G6FwKOwI0HHQbkBX8TJUGIUkTiuJbTuOE94zk5s=;
+        b=OUl/luTWUvfpH8PjZpjWwytJ/yYYhpfHkZ/IYhrYK5mD5FaWnD0Im2cHCZpNwZ1gZT
+         8jRB9dL7jMDKYi2JwU7hghmi2/hQkLZg/IG0SQHR7NzHH3D/ZxcfFZvAikm9eJRNFPJO
+         U6puUGFi9On2c1ElOa0f2ypwzvWxIAkO7tJ4D6Zwha0pe/9NxlYjQ1uLx0yO7+b+QVqR
+         zixi7V4BdLuiRriAjEO3zipVhcDmNxrrkVMYjAOMptZtF1GYKQGRiPHH6lXCPp0vWN9n
+         ntO0RZpZ7ukI50/CN44YrJrp5Yd0d6Kpxd9ugdCeYT5V8mEzKQ+rMSoC2XJIWOGfPDVO
+         kl1w==
+X-Gm-Message-State: AOJu0YxJ6ioBGcOGfmCsBzXzKBS8hk859rZyrZWftuI7faoG4gBJmEe3
+	n8slsVlpIKLmBsXfRNYaC4jwmBkbD7hwvIZtUKdbPw==
+X-Google-Smtp-Source: AGHT+IGmTZOY1+ZP5gJweNT3w6oYvGf/CWL+wMEc43o1f3i6SFUl6aMTs03Lp52HAuV1NomQvn7D0Q==
+X-Received: by 2002:a81:9a8e:0:b0:5a7:af72:cb55 with SMTP id r136-20020a819a8e000000b005a7af72cb55mr326326ywg.2.1700243361593;
+        Fri, 17 Nov 2023 09:49:21 -0800 (PST)
+Received: from [127.0.0.1] ([65.199.232.106])
+        by smtp.gmail.com with ESMTPSA id i133-20020a81548b000000b005a206896d62sm602031ywb.111.2023.11.17.09.49.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Nov 2023 09:49:21 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>
+In-Reply-To: <20231117023527.3188627-1-ming.lei@redhat.com>
+References: <20231117023527.3188627-1-ming.lei@redhat.com>
+Subject: Re: [PATCH 0/3] blk-cgroup: three small fixes
+Message-Id: <170024336093.765610.12724227238108173300.b4-ty@kernel.dk>
+Date: Fri, 17 Nov 2023 10:49:20 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 6.7-rc2
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-
-Hi Linus,
-
-Just a single fix from Christoph/Ming, fixing a case where integrity IO
-could be called without havint an appropriate queue reference.
-
-Please pull!
+X-Mailer: b4 0.13-dev-26615
 
 
-The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa86:
+On Fri, 17 Nov 2023 10:35:21 +0800, Ming Lei wrote:
+> The first 2 fixes lockdep warnings.
+> 
+> The last one tries to deactivate policy after blkgs are destroyed.
+> 
+> 
+> Ming Lei (3):
+>   blk-throttle: fix lockdep warning of "cgroup_mutex or RCU read lock
+>     required!"
+>   blk-cgroup: avoid to warn !rcu_read_lock_held() in blkg_lookup()
+>   blk-cgroup: bypass blkcg_deactivate_policy after destroying
+> 
+> [...]
 
-  Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
+Applied, thanks!
 
-are available in the Git repository at:
+[1/3] blk-throttle: fix lockdep warning of "cgroup_mutex or RCU read lock required!"
+      commit: 27b13e209ddca5979847a1b57890e0372c1edcee
+[2/3] blk-cgroup: avoid to warn !rcu_read_lock_held() in blkg_lookup()
+      commit: 35a99d6557cacbc177314735342f77a2dda41872
+[3/3] blk-cgroup: bypass blkcg_deactivate_policy after destroying
+      commit: e63a57303599b17290cd8bc48e6f20b24289a8bc
 
-  git://git.kernel.dk/linux.git tags/block-6.7-2023-11-17
-
-for you to fetch changes up to b0077e269f6c152e807fdac90b58caf012cdbaab:
-
-  blk-mq: make sure active queue usage is held for bio_integrity_prep() (2023-11-13 08:52:52 -0700)
-
-----------------------------------------------------------------
-block-6.7-2023-11-17
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      blk-mq: make sure active queue usage is held for bio_integrity_prep()
-
- block/blk-mq.c | 75 +++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 38 insertions(+), 37 deletions(-)
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
