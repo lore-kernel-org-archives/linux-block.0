@@ -1,41 +1,41 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLhsFnXw"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B9C1A7
-	for <linux-block@vger.kernel.org>; Thu, 16 Nov 2023 18:35:42 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XelEM4Gz"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907CD1A8
+	for <linux-block@vger.kernel.org>; Thu, 16 Nov 2023 18:35:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700188542;
+	s=mimecast20190719; t=1700188543;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cnu94bt0MVWaB8kuTWdRTfqGixU4G3fj3vPZ0hUAjyg=;
-	b=RLhsFnXwNb52cXijRD2a0hnSwaM14rAnw1Z2sl00dAqfyOvTYxJhtvZf/UpzBUH2otb0PI
-	Wls59LX7MYsfD4f6K6AIjhHX7IMG+EI0jqMP9uQIK7k110IZlQIkyWYIaRA3EX3qCiijNH
-	ibD24JMmlcbWya66O+V26Rq3JZvSbQg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-616-ZUgE46LdP8qOxn-JeoFYdA-1; Thu,
- 16 Nov 2023 21:35:38 -0500
-X-MC-Unique: ZUgE46LdP8qOxn-JeoFYdA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	bh=AUTiqpX1o50fYZ0p27BQ7eV/xDbJcwy477C1lJ4HW/M=;
+	b=XelEM4GzPf9YbxQY/Nyy9+kWudrEcPu49tShYuKHDYzRD5N4ew1Nicz3oB11qUj0OSnU77
+	TKAKh4RQjeRVM39BRxVyWEX8IyOy7RaQzMfMxmV6NUhzLpxUpHgFX/557Ze1O3GYotbMLD
+	W/yiN2Jb2MEabDgyc9brj3ahtr0Da0s=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-99-MIp8NyNROHSjLxV-E5v1-Q-1; Thu, 16 Nov 2023 21:35:42 -0500
+X-MC-Unique: MIp8NyNROHSjLxV-E5v1-Q-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 312293C00203;
-	Fri, 17 Nov 2023 02:35:38 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE5B685A59D;
+	Fri, 17 Nov 2023 02:35:41 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 67AC42026D4C;
-	Fri, 17 Nov 2023 02:35:37 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1E9A2492BFD;
+	Fri, 17 Nov 2023 02:35:40 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Tejun Heo <tj@kernel.org>,
 	Ming Lei <ming.lei@redhat.com>,
 	Changhui Zhong <czhong@redhat.com>
-Subject: [PATCH 1/3] blk-throttle: fix lockdep warning of "cgroup_mutex or RCU read lock required!"
-Date: Fri, 17 Nov 2023 10:35:22 +0800
-Message-ID: <20231117023527.3188627-2-ming.lei@redhat.com>
+Subject: [PATCH 2/3] blk-cgroup: avoid to warn !rcu_read_lock_held() in blkg_lookup()
+Date: Fri, 17 Nov 2023 10:35:23 +0800
+Message-ID: <20231117023527.3188627-3-ming.lei@redhat.com>
 In-Reply-To: <20231117023527.3188627-1-ming.lei@redhat.com>
 References: <20231117023527.3188627-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -45,41 +45,35 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Inside blkg_for_each_descendant_pre(), both
-css_for_each_descendant_pre() and blkg_lookup() requires RCU read lock,
-and either cgroup_assert_mutex_or_rcu_locked() or rcu_read_lock_held()
-is called.
+So far, all callers either holds spin lock or rcu read explicitly, and
+most of the caller has added WARN_ON_ONCE(!rcu_read_lock_held()) or
+lockdep_assert_held(&disk->queue->queue_lock).
 
-Fix the warning by adding rcu read lock.
+Remove WARN_ON_ONCE(!rcu_read_lock_held()) from blkg_lookup() for
+killing the false positive warning from blkg_conf_prep().
 
 Reported-by: Changhui Zhong <czhong@redhat.com>
+Fixes: 83462a6c971c ("blkcg: Drop unnecessary RCU read [un]locks from blkg_conf_prep/finish()")
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-throttle.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-cgroup.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 38a881cf97d0..050f8ac6fcb1 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1314,6 +1314,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 		   tg_bps_limit(tg, READ), tg_bps_limit(tg, WRITE),
- 		   tg_iops_limit(tg, READ), tg_iops_limit(tg, WRITE));
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index 624c03c8fe64..fd482439afbc 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -249,8 +249,6 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
+ {
+ 	struct blkcg_gq *blkg;
  
-+	rcu_read_lock();
- 	/*
- 	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
- 	 * considered to have rules if either the tg itself or any of its
-@@ -1341,6 +1342,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 		this_tg->latency_target = max(this_tg->latency_target,
- 				parent_tg->latency_target);
- 	}
-+	rcu_read_unlock();
+-	WARN_ON_ONCE(!rcu_read_lock_held());
+-
+ 	if (blkcg == &blkcg_root)
+ 		return q->root_blkg;
  
- 	/*
- 	 * We're already holding queue_lock and know @tg is valid.  Let's
 -- 
 2.41.0
 
