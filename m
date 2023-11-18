@@ -1,98 +1,115 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC194A0
-	for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 08:04:54 -0800 (PST)
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-66d87554434so3806696d6.2
-        for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 08:04:54 -0800 (PST)
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620C9C0;
+	Sat, 18 Nov 2023 08:19:01 -0800 (PST)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6cb66fbc63dso146030b3a.0;
+        Sat, 18 Nov 2023 08:19:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700323494; x=1700928294;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1700324341; x=1700929141;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vmjNlhzCWiV/pzFdRSQr2WSe8u2j+LeFg7yCMUNFqRE=;
-        b=MjK/JFRuzRqxXPNGST2LOSc0KIncK04SyHoEAV0QnhHYqf9AjGVio+1DWWFNPnhYoz
-         WBfzSyedYkllALK0VOwJwxFoxvxgsJK4wlWc7JhaFEadev42/d2KXXvFGda41sil3fGw
-         4U84ssqasL4WePO4rXRNl3rCUNAjA7upx3drlzJPiOJYr+64aAmfYLVKGb3lIfmpxLuH
-         Irk4jmuYXjE0ftFuD3PwxYdCyfW0ty3o4kjRUg+sDlOzcAFjNXsQwCNvf6bUOfEfrRtI
-         Lc9rhgzmJyOBrLL37gPm96PITZ88fp1jY3X3Fhk3zSHcVKQRbjuQMOumYTMYb/8hRj6r
-         D18Q==
-X-Gm-Message-State: AOJu0YyDZqJt4pauqBiD/Rg4oAHR9QWdq/l/i/lgDjhqGM7Ua4Iyzdkg
-	TiSHhR3DvZ3ZAd3NNdbSVqF1
-X-Google-Smtp-Source: AGHT+IHoMsxWUn1iD0Xd/zCyDj/ZPuUai94lBqedMc6QyFk8vrxeIJoi/joIbcuY195VKmFWQ8t7Jw==
-X-Received: by 2002:a05:6214:e4b:b0:671:e02a:8bf6 with SMTP id o11-20020a0562140e4b00b00671e02a8bf6mr2761078qvc.34.1700323494092;
-        Sat, 18 Nov 2023 08:04:54 -0800 (PST)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id f10-20020ad4558a000000b006655cc8f872sm1478315qvx.99.2023.11.18.08.04.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Nov 2023 08:04:53 -0800 (PST)
-Date: Sat, 18 Nov 2023 11:04:52 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	Alasdair G Kergon <agk@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: [git pull] device mapper fixes for 6.7-rc2
-Message-ID: <ZVjgpLACW4/0NkBB@redhat.com>
+        bh=JpJ9j3Rgf+MmL1x+LnpZ5rIj3NB2ZwiexLJ0+/VPyNs=;
+        b=P6n9omzfO12+8okx3P3bDXbxiVhDTWKX4GGDeFE3W6UixUyNq4IxYXFm65lO/0p3up
+         fMQLJHMPMoJvoGchJN1cj1DTtwp9mJ6Cg4a6KVAPKkIwGsvZQYNshRez39deO5iu1DJE
+         Gj1cSzVdB39fedxcQ4h0bjxjnMXL5maLuciDf0uV2hWW0PFUUYuHHOW6x/sTU4ZzNgw3
+         WN+NmT6RDqx9M8Xmljx5MP/hYNIfqKsJ7REKFUfPk5tl+wSZnz6xcDqkp63SAhuZvm/r
+         VrBsDV/J9Dk0X51Ez5iPq4IgKl9kY/kqsGD7elYhc45thEM4A1nhRxOyrgz+nTMONzGG
+         XWhA==
+X-Gm-Message-State: AOJu0YyaUeMNukiAYy4UIP2R5t53tcvkprlBsRet8zdqVxCkgPQwQSdg
+	D818gJtCelE+SLuJk+O/hXgNu8K6KdnDAg==
+X-Google-Smtp-Source: AGHT+IF6DbzE+IGBVmgkkIXDBMasM05P7fXL7OHqGPwzqI5VVbby0wYg1pwoRaacJDugZHa97idotg==
+X-Received: by 2002:a05:6a20:4326:b0:187:e3a5:b35d with SMTP id h38-20020a056a20432600b00187e3a5b35dmr3138014pzk.13.1700324340672;
+        Sat, 18 Nov 2023 08:19:00 -0800 (PST)
+Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
+        by smtp.gmail.com with ESMTPSA id b9-20020a056a000a8900b006c7c6ae3755sm3179469pfl.80.2023.11.18.08.18.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 Nov 2023 08:19:00 -0800 (PST)
+Message-ID: <792fc3d8-6834-48f8-9737-f1531459d245@acm.org>
+Date: Sat, 18 Nov 2023 08:18:46 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/34] biops: add atomig find_bit() operations
+Content-Language: en-US
+To: Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, "H. Peter Anvin" <hpa@zytor.com>,
+ "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+ Akinobu Mita <akinobu.mita@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Andersson <andersson@kernel.org>, Borislav Petkov <bp@alien8.de>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Christian Brauner <brauner@kernel.org>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>,
+ Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Gregory Greenman <gregory.greenman@intel.com>,
+ Hans Verkuil <hverkuil@xs4all.nl>, Hans de Goede <hdegoede@redhat.com>,
+ Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+ Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>,
+ Kalle Valo <kvalo@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
+ Karsten Keil <isdn@linux-pingi.de>, Kees Cook <keescook@chromium.org>,
+ Leon Romanovsky <leon@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <monstr@monstr.eu>,
+ Nicholas Piggin <npiggin@gmail.com>, Oliver Neukum <oneukum@suse.com>,
+ Paolo Abeni <pabeni@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ping-Ke Shih <pkshih@realtek.com>,
+ Rich Felker <dalias@libc.org>, Rob Herring <robh@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw Gruszka <stf_xl@wp.pl>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Valentin Schneider <vschneid@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ Will Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org,
+ ath10k@lists.infradead.org, dmaengine@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+ linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-net-drivers@amd.com, linux-pci@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-sh@vger.kernel.org, linux-sound@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Cc: Jan Kara <jack@suse.cz>, Mirsad Todorovac
+ <mirsad.todorovac@alu.unizg.hr>, Matthew Wilcox <willy@infradead.org>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+ Alexey Klimov <klimov.linux@gmail.com>
+References: <20231118155105.25678-1-yury.norov@gmail.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231118155105.25678-1-yury.norov@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 11/18/23 07:50, Yury Norov wrote:
+> Add helpers around test_and_{set,clear}_bit() that allow to search for
+> clear or set bits and flip them atomically.
 
-The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa86:
+There is a typo in the subject: shouldn't "atomig" be changed
+into "atomic"?
 
-  Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
+Thanks,
 
-are available in the Git repository at:
+Bart.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.7/dm-fixes
-
-for you to fetch changes up to 13648e04a9b831b3dfa5cf3887dfa6cf8fe5fe69:
-
-  dm-crypt: start allocating with MAX_ORDER (2023-11-17 14:41:15 -0500)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Various fixes for the DM delay target to address regressions
-  introduced during the 6.7 merge.
-
-- Fixes to both DM bufio and the verity target for no-sleep mode, to
-  address sleeping while atomic issues.
-
-- Update DM crypt target in response to the treewide change that made
-  MAX_ORDER inclusive.
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmVY35gACgkQxSPxCi2d
-A1pt/gf+NVN/3N0BMYlc/L129+QCIreDH/PuhoxVxMLrhZ8oERw7XkgGIu5JoR1C
-Sec5OWJWV0+AZ3kSeW8WBoFFGDdfTYQTId2R3mF3a+34mpAvjTMqnvGkA1GrixCt
-xvj2cQjQkBWwwbikAkHZOUoK3UEPFurk/a7oXTAl43kZaV6gWHEAY/bxet9Wuc7+
-NWN6xEg7sHhdVgJYltGkOl8Pf9y3zPDUT8SqFT0J7dPEGytNHscozDdRJiLmvoS6
-g4WkMkrg87Ude7g0/l7hCM9b3ElamtMsZtyy43cvaKp3UrwFiAzFMCprEl4TS5Br
-LNhuwegIBWMVCklRiTDG+uHnbMxKZg==
-=9Lfg
------END PGP SIGNATURE-----
-
-----------------------------------------------------------------
-Mikulas Patocka (6):
-      dm-delay: fix a race between delay_presuspend and delay_bio
-      dm-delay: fix bugs introduced by kthread mode
-      dm-delay: avoid duplicate logic
-      dm-bufio: fix no-sleep mode
-      dm-verity: don't use blocking calls from tasklets
-      dm-crypt: start allocating with MAX_ORDER
-
- drivers/md/dm-bufio.c         |  87 ++++++++++++++++++++++----------
- drivers/md/dm-crypt.c         |   2 +-
- drivers/md/dm-delay.c         | 112 ++++++++++++++++++++----------------------
- drivers/md/dm-verity-fec.c    |   4 +-
- drivers/md/dm-verity-target.c |  23 ++++-----
- drivers/md/dm-verity.h        |   2 +-
- 6 files changed, 130 insertions(+), 100 deletions(-)
