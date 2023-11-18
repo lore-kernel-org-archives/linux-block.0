@@ -1,135 +1,136 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27744182;
-	Sat, 18 Nov 2023 11:06:30 -0800 (PST)
-Received: from [192.168.1.103] (31.173.87.19) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 18 Nov
- 2023 22:06:15 +0300
-Subject: Re: [PATCH 00/34] biops: add atomig find_bit() operations
-To: Bart Van Assche <bvanassche@acm.org>, Yury Norov <yury.norov@gmail.com>,
-	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "H.
- Peter Anvin" <hpa@zytor.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>, "Md. Haris Iqbal"
-	<haris.iqbal@ionos.com>, Akinobu Mita <akinobu.mita@gmail.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Bjorn Andersson <andersson@kernel.org>, Borislav
- Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>, Christian Brauner
-	<brauner@kernel.org>, Damien Le Moal <damien.lemoal@opensource.wdc.com>, Dave
- Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>,
-	Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>,
-	Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gregory Greenman
-	<gregory.greenman@intel.com>, Hans Verkuil <hverkuil@xs4all.nl>, Hans de
- Goede <hdegoede@redhat.com>, Hugh Dickins <hughd@google.com>, Ingo Molnar
-	<mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela
-	<perex@perex.cz>, Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe
-	<axboe@kernel.dk>, Jiri Pirko <jiri@resnulli.us>, Jiri Slaby
-	<jirislaby@kernel.org>, Kalle Valo <kvalo@kernel.org>, Karsten Graul
-	<kgraul@linux.ibm.com>, Karsten Keil <isdn@linux-pingi.de>, Kees Cook
-	<keescook@chromium.org>, Leon Romanovsky <leon@kernel.org>, Mark Rutland
-	<mark.rutland@arm.com>, Martin Habets <habetsm.xilinx@gmail.com>, Mauro
- Carvalho Chehab <mchehab@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
-	Michal Simek <monstr@monstr.eu>, Nicholas Piggin <npiggin@gmail.com>, Oliver
- Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ping-Ke Shih
-	<pkshih@realtek.com>, Rich Felker <dalias@libc.org>, Rob Herring
-	<robh@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Sathya Prakash
- Veerichetty <sathya.prakash@broadcom.com>, Sean Christopherson
-	<seanjc@google.com>, Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw
- Gruszka <stf_xl@wp.pl>, Steven Rostedt <rostedt@goodmis.org>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, Thomas Gleixner
-	<tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, Vitaly
- Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>, Will
- Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>,
-	<GR-QLogic-Storage-Upstream@marvell.com>, <alsa-devel@alsa-project.org>,
-	<ath10k@lists.infradead.org>, <dmaengine@vger.kernel.org>,
-	<iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-arm-msm@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <linux-m68k@lists.linux-m68k.org>,
-	<linux-media@vger.kernel.org>, <linux-mips@vger.kernel.org>,
-	<linux-net-drivers@amd.com>, <linux-pci@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<linux-scsi@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-	<linux-sh@vger.kernel.org>, <linux-sound@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <mpi3mr-linuxdrv.pdl@broadcom.com>,
-	<netdev@vger.kernel.org>, <sparclinux@vger.kernel.org>, <x86@kernel.org>
-CC: Jan Kara <jack@suse.cz>, Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>, Rasmus Villemoes
-	<linux@rasmusvillemoes.dk>, Andy Shevchenko
-	<andriy.shevchenko@linux.intel.com>, Maxim Kuvyrkov
-	<maxim.kuvyrkov@linaro.org>, Alexey Klimov <klimov.linux@gmail.com>
-References: <20231118155105.25678-1-yury.norov@gmail.com>
- <792fc3d8-6834-48f8-9737-f1531459d245@acm.org>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <cb01a8af-d62b-27b4-f6fc-d1f3fbf676ee@omp.ru>
-Date: Sat, 18 Nov 2023 22:06:14 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="bFrnQCer"
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B05E1
+	for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 11:14:46 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-50aa2abfcfcso1836381e87.3
+        for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 11:14:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1700334884; x=1700939684; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=R5xCKG+dPMG8F3WMME/kbqVh8kLHwHJKzVbHpwM9FHU=;
+        b=bFrnQCertaoEUejQwPDoOCZ/bi7c3SNJtAlGQ00YYK9RXUgclsZhSI2De76KYJEu05
+         yy73xJifOp5iRS71LJ9ZG0TGm6LWDf1EF3bjg597H7KdZf4rwbFvErvIIDP64yumfxDv
+         yrZk4eeTp+OdhlzQT8tC0e+c3/U5XYAHR/mv0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700334884; x=1700939684;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R5xCKG+dPMG8F3WMME/kbqVh8kLHwHJKzVbHpwM9FHU=;
+        b=u4y1RKAf8HnvVsXgi8btkCLDQSwApCAnEqqPCXNlFmKup9N1HzL5MK+GqDRBq44uJS
+         IYwsychhJYvL/s2Zqnb+t9TymC+vqrrVD/sP+yREH1vv2qdT5i+bGnXOP8OXxAv5Gp7S
+         +BBcxE6m1LPjbkripxgxIUJFDpJ16whSMygywhcfGUxICfcXygeeD7PkkD+6oXyUPAJh
+         2JV2uXCq5P4s54w/5hjrm4fKAuVLIHxoYvnHMPK3THZyFkFbSIxIFSecYe0/xS3n1AXo
+         1zyfuhinARnWUZU65R2jy7xr6H1dV6mX1yUhgzgf5nptwyodEikSyRgk+Sps7J9dhQPO
+         B04w==
+X-Gm-Message-State: AOJu0YyRT8OkF6ZgCux8Yqu7B0Mid2w0H+QWA7IZRRbrynZwfexxg9WF
+	SDjauzLcvISXBZW1vj3+JnbPVJrEEMWL2ZAEOjhduA==
+X-Google-Smtp-Source: AGHT+IGLLecanfdYx41S8L07FU1tBSy52/KPOqC9JHOO7EsdG9DwCCWa0XGQYuFL8+PJfed4zktzVw==
+X-Received: by 2002:ac2:5337:0:b0:508:11f5:8953 with SMTP id f23-20020ac25337000000b0050811f58953mr2104169lfh.26.1700334883857;
+        Sat, 18 Nov 2023 11:14:43 -0800 (PST)
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com. [209.85.208.46])
+        by smtp.gmail.com with ESMTPSA id lz2-20020a170906fb0200b0099d798a6bb5sm2155601ejb.67.2023.11.18.11.14.43
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 Nov 2023 11:14:43 -0800 (PST)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-54394328f65so4244204a12.3
+        for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 11:14:43 -0800 (PST)
+X-Received: by 2002:a05:6402:64f:b0:543:7e9b:5cc9 with SMTP id
+ u15-20020a056402064f00b005437e9b5cc9mr2096703edx.31.1700334882947; Sat, 18
+ Nov 2023 11:14:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <792fc3d8-6834-48f8-9737-f1531459d245@acm.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.87.19]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/18/2023 18:50:09
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181454 [Nov 18 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_arrow_text}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.87.19 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.87.19 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.87.19
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/18/2023 18:54:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/18/2023 3:15:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <ZVjgpLACW4/0NkBB@redhat.com> <CAHk-=wjV2S7xBcH2BGuDgfKcg3fjWwk5k74nq89SviMkH-YsJQ@mail.gmail.com>
+In-Reply-To: <CAHk-=wjV2S7xBcH2BGuDgfKcg3fjWwk5k74nq89SviMkH-YsJQ@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 18 Nov 2023 11:14:25 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
+Message-ID: <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
+Subject: Re: [git pull] device mapper fixes for 6.7-rc2
+To: Mike Snitzer <snitzer@kernel.org>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+	Alasdair G Kergon <agk@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, 
+	Mikulas Patocka <mpatocka@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/18/23 7:18 PM, Bart Van Assche wrote:
-[...]
->> Add helpers around test_and_{set,clear}_bit() that allow to search for
->> clear or set bits and flip them atomically.
-> 
-> There is a typo in the subject: shouldn't "atomig" be changed
-> into "atomic"?
+On Sat, 18 Nov 2023 at 10:33, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> What are the alleged "number of bugs all over the kernel" that the old
+> MAX_ORDER definition had? In light of the other "MAX" definitions I
+> found from a second of grepping, I really think the argument for that
+> was just wrong.
 
-   And "biops" to "bitops"? :-)
+Bah. I looked at the commits leading up to it, and I really think that
+"if that's the fallout from 24 years of history, then it wasn't a huge
+deal".
 
-> Thanks,
-> 
-> Bart.
+Compared to the inevitable problems that the semantic change will
+cause for backports (and already caused for this merge window), I
+still think this was all likely a mistake.
 
-MBR, Sergey
+In fact, the biggest takeaway from those patches is that we probably
+should have introduced some kind of "this is the max _size_ you can
+allocate", because a few of them were related to that particular
+calculation.
+
+The floppy driver example is actually a good example, in that that is
+*exactly* what it wanted, but it had been just done wrong as
+
+  #define MAX_LEN (1UL << MAX_ORDER << PAGE_SHIFT)
+
+and variations of that is what half the fixes were..
+
+IOW, I really think we should just have added a
+
+  #define MAX_GFP_SIZE (1UL << (PAGE_SHIFT+MAX_ORDER-1))
+
+and the rest were basically all just the trivial off-by-one things.
+
+The __iommu_dma_alloc_pages() code is just so odd that any MAX_ORDER
+issues are more about "WTH is this code doing" And the "fix" is just
+more of the same.
+
+The *whole* point of having the max for a power-of-two thing is that
+you can do things like
+
+        mask = (1<<MAX)-1;
+
+and that's exactly what the iommu code was trying to do. Except for
+some *unfathomable* reason the iommu code did
+
+        order_mask &= (2U << MAX_ORDER) - 1;
+
+and honestly, you can't blame MAX_ORDER for the confusion. What a
+strange off-by-one. MAX_ORDER was *literally* designed to be easy for
+this case, and people screwed it up.
+
+And no, it's *not* because "inclusive is more intuitive". As
+mentioned, this whole "it's past the end* is the common case for MAX
+values in the mm, for exactly these kinds of reasons. I already
+listted several other cases.
+
+The reason there were 9 bugs is because MAX_ORDER is an old thing, and
+testing doesn't catch it because nobody triggers the max case. The
+crazy iommu code goes back to 2016, for example.
+
+That
+
+    84 files changed, 223 insertions(+), 253 deletions(-)
+
+really seems bogus for the 9 fixes that had accumulated in this area
+in the last 24 years.
+
+Oh well. Now we have places with 'MAX_ORDER + 1' instead of 'MAX_ORDER
+- 1'. I'm not seeing that it's a win, and I do think "semantic change
+after 24 years" is a loss and is going to cause problems.
+
+               Linus
