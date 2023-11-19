@@ -1,142 +1,162 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA9619BAD
+	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 23:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aVcGvwwa"
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B71C2
-	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 07:21:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700407302; x=1731943302;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GnI2ehbx0BkNTQXA+HiQpvK0fRAFd/MFz1r0HnZbmDU=;
-  b=aVcGvwwaa/wJfM6x61fPW1BsGtpx9JWJeEzgIT3l0ViOzPIxc8q0WKVh
-   05QykTlHTE0tM0eg1BSvKamNUSaeNmI+uTBM2NYkXhTvS3XL/k1rfrne7
-   tWV9ZUJWYCX2r0a2UGgeWs6MiV0nGGSjj+7XU8Ih2ZcroQGUCAcgCQ5wJ
-   sPUkKNWj23PwIFMuw7mlM3yUfRDxBBXHF84Ls4SHNwHQCE0RPZhkxe0OD
-   EWv6g7kYFP+nP9fysyHrsVfWy8X2Qfmldk+ZAlxy/V0z6f1AWUZWN/n+N
-   aWWsyKbABMNVvFFAFFyoQMOxAIXx0ueurB4vpe3Ihb1XK2LVMj4jm4E6+
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10899"; a="371680602"
-X-IronPort-AV: E=Sophos;i="6.04,210,1695711600"; 
-   d="scan'208";a="371680602"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2023 07:21:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10899"; a="716000084"
-X-IronPort-AV: E=Sophos;i="6.04,210,1695711600"; 
-   d="scan'208";a="716000084"
-Received: from kvehmane-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.249.44.109])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2023 07:21:39 -0800
-Received: by box.shutemov.name (Postfix, from userid 1000)
-	id DEA1510A33C; Sun, 19 Nov 2023 18:21:36 +0300 (+03)
-Date: Sun, 19 Nov 2023 18:21:36 +0300
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Mike Snitzer <snitzer@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Andrew Morton <akpm@linux-foundation.org>, dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: [git pull] device mapper fixes for 6.7-rc2
-Message-ID: <20231119152136.ntnl3sfulo4tgbw3@box.shutemov.name>
-References: <ZVjgpLACW4/0NkBB@redhat.com>
- <CAHk-=wjV2S7xBcH2BGuDgfKcg3fjWwk5k74nq89SviMkH-YsJQ@mail.gmail.com>
- <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kDwsPdbI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6F24C433C8;
+	Sun, 19 Nov 2023 23:29:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700436579;
+	bh=L0gZfWbFJNB5A1+APx2Mb6++m61UV1JX2ge42wd7A+4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kDwsPdbIemdGe7pfShARdu3v6yI79NMF8J1zD9DXGKMBikfFICN8Y+X52v7nMix1p
+	 ySnusm7XkifQJnmbFmzMyRtYoT0VvMdYMoyHkndLx/Hhe6muqIDR/SNQMNg4pyChZu
+	 JPM4LFbyk6z+frZDzWrePjv+U5tr5WCdTaykXCDtNSyaI3uzvxxnkE8gVoufLGLA1J
+	 vB5mAivpVZOjGbvltP0r34rPuxSwEQo1fdTMJdZRp7p6xnuttqa4+OVMEm2FWNCHkT
+	 ViE1y6KWCl8ZM3m43ebT4gXuAJehdvnIS/y77hK/c7wzp8VhPA6UkSqYMcozJeZuXY
+	 7lu2IRwTCkvfw==
+Message-ID: <3d8d04d5-80d8-4eee-9899-d9fe197dd203@kernel.org>
+Date: Mon, 20 Nov 2023 08:29:34 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 01/19] block: Introduce more member variables related
+ to zone write locking
+To: Bart Van Assche <bvanassche@acm.org>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20231114211804.1449162-1-bvanassche@acm.org>
+ <20231114211804.1449162-2-bvanassche@acm.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20231114211804.1449162-2-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Nov 18, 2023 at 11:14:25AM -0800, Linus Torvalds wrote:
-> On Sat, 18 Nov 2023 at 10:33, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > What are the alleged "number of bugs all over the kernel" that the old
-> > MAX_ORDER definition had? In light of the other "MAX" definitions I
-> > found from a second of grepping, I really think the argument for that
-> > was just wrong.
+On 11/15/23 06:16, Bart Van Assche wrote:
+> Many but not all storage controllers require serialization of zoned writes.
+> Introduce two new request queue limit member variables related to write
+> serialization. 'driver_preserves_write_order' allows block drivers to
+> indicate that the order of write commands is preserved and hence that
+> serialization of writes per zone is not required. 'use_zone_write_lock' is
+> set by disk_set_zoned() if and only if the block device has zones and if
+> the block driver does not preserve the order of write requests.
 > 
-> Bah. I looked at the commits leading up to it, and I really think that
-> "if that's the fallout from 24 years of history, then it wasn't a huge
-> deal".
+> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-settings.c   | 15 +++++++++++++++
+>  block/blk-zoned.c      |  1 +
+>  include/linux/blkdev.h | 10 ++++++++++
+>  3 files changed, 26 insertions(+)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 0046b447268f..4c776c08f190 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -56,6 +56,8 @@ void blk_set_default_limits(struct queue_limits *lim)
+>  	lim->alignment_offset = 0;
+>  	lim->io_opt = 0;
+>  	lim->misaligned = 0;
+> +	lim->driver_preserves_write_order = false;
+> +	lim->use_zone_write_lock = false;
+>  	lim->zoned = BLK_ZONED_NONE;
+>  	lim->zone_write_granularity = 0;
+>  	lim->dma_alignment = 511;
+> @@ -82,6 +84,8 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>  	lim->max_dev_sectors = UINT_MAX;
+>  	lim->max_write_zeroes_sectors = UINT_MAX;
+>  	lim->max_zone_append_sectors = UINT_MAX;
+> +	/* Request-based stacking drivers do not reorder requests. */
 
-That's part that hit upstream and never got caught. I personally spend
-some time debugging due MAX_ORDER-1 thing.
+Rereading this patch, I do not think this statement is correct. I seriously
+doubt that multipath will preserve write command order in all cases...
 
-> Compared to the inevitable problems that the semantic change will
-> cause for backports (and already caused for this merge window), I
-> still think this was all likely a mistake.
+> +	lim->driver_preserves_write_order = true;
 
-I think the mistake I made is leaving the name the same. Just renaming it
-to MAX_PAGE_ORDER or something would give a heads up to not-yet-upstream
-code.
+... so it is likely much safer to set the default to "false" as that is the
+default for all requests in general.
 
-> In fact, the biggest takeaway from those patches is that we probably
-> should have introduced some kind of "this is the max _size_ you can
-> allocate", because a few of them were related to that particular
-> calculation.
-> 
-> The floppy driver example is actually a good example, in that that is
-> *exactly* what it wanted, but it had been just done wrong as
-> 
->   #define MAX_LEN (1UL << MAX_ORDER << PAGE_SHIFT)
-> 
-> and variations of that is what half the fixes were..
-> 
-> IOW, I really think we should just have added a
-> 
->   #define MAX_GFP_SIZE (1UL << (PAGE_SHIFT+MAX_ORDER-1))
-> 
-> and the rest were basically all just the trivial off-by-one things.
-> 
-> The __iommu_dma_alloc_pages() code is just so odd that any MAX_ORDER
-> issues are more about "WTH is this code doing" And the "fix" is just
-> more of the same.
-> 
-> The *whole* point of having the max for a power-of-two thing is that
-> you can do things like
-> 
->         mask = (1<<MAX)-1;
-> 
-> and that's exactly what the iommu code was trying to do. Except for
-> some *unfathomable* reason the iommu code did
-> 
->         order_mask &= (2U << MAX_ORDER) - 1;
-> 
-> and honestly, you can't blame MAX_ORDER for the confusion. What a
-> strange off-by-one. MAX_ORDER was *literally* designed to be easy for
-> this case, and people screwed it up.
+>  }
+>  EXPORT_SYMBOL(blk_set_stacking_limits);
+>  
+> @@ -685,6 +689,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>  						   b->max_secure_erase_sectors);
+>  	t->zone_write_granularity = max(t->zone_write_granularity,
+>  					b->zone_write_granularity);
+> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
+> +		b->driver_preserves_write_order;
+> +	t->use_zone_write_lock = t->use_zone_write_lock ||
+> +		b->use_zone_write_lock;
 
-Agreed.
+Very minor nit: splitting the line after the equal would make this more readable.
 
-> And no, it's *not* because "inclusive is more intuitive". As
-> mentioned, this whole "it's past the end* is the common case for MAX
-> values in the mm, for exactly these kinds of reasons. I already
-> listted several other cases.
-> 
-> The reason there were 9 bugs is because MAX_ORDER is an old thing, and
-> testing doesn't catch it because nobody triggers the max case. The
-> crazy iommu code goes back to 2016, for example.
-> 
-> That
-> 
->     84 files changed, 223 insertions(+), 253 deletions(-)
-> 
-> really seems bogus for the 9 fixes that had accumulated in this area
-> in the last 24 years.
-> 
-> Oh well. Now we have places with 'MAX_ORDER + 1' instead of 'MAX_ORDER
-> - 1'. I'm not seeing that it's a win, and I do think "semantic change
-> after 24 years" is a loss and is going to cause problems.
-
-I think it worth introducing NR_ORDERS for MAX_ORDER + 1 to define how
-many page orders page allocator supports. Sounds good?
+>  	t->zoned = max(t->zoned, b->zoned);
+>  	return ret;
+>  }
+> @@ -949,6 +957,13 @@ void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
+>  	}
+>  
+>  	q->limits.zoned = model;
+> +	/*
+> +	 * Use the zone write lock only for zoned block devices and only if
+> +	 * the block driver does not preserve the order of write commands.
+> +	 */
+> +	q->limits.use_zone_write_lock = model != BLK_ZONED_NONE &&
+> +		!q->limits.driver_preserves_write_order;
+> +
+>  	if (model != BLK_ZONED_NONE) {
+>  		/*
+>  		 * Set the zone write granularity to the device logical block
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 619ee41a51cc..112620985bff 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -631,6 +631,7 @@ void disk_clear_zone_settings(struct gendisk *disk)
+>  	q->limits.chunk_sectors = 0;
+>  	q->limits.zone_write_granularity = 0;
+>  	q->limits.max_zone_append_sectors = 0;
+> +	q->limits.use_zone_write_lock = false;
+>  
+>  	blk_mq_unfreeze_queue(q);
+>  }
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 51fa7ffdee83..2d452f5a36c8 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -316,6 +316,16 @@ struct queue_limits {
+>  	unsigned char		misaligned;
+>  	unsigned char		discard_misaligned;
+>  	unsigned char		raid_partial_stripes_expensive;
+> +	/*
+> +	 * Whether or not the block driver preserves the order of write
+> +	 * requests. Set by the block driver.
+> +	 */
+> +	bool			driver_preserves_write_order;
+> +	/*
+> +	 * Whether or not zone write locking should be used. Set by
+> +	 * disk_set_zoned().
+> +	 */
+> +	bool			use_zone_write_lock;
+>  	enum blk_zoned_model	zoned;
+>  
+>  	/*
 
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Damien Le Moal
+Western Digital Research
+
