@@ -1,136 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="bFrnQCer"
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B05E1
-	for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 11:14:46 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-50aa2abfcfcso1836381e87.3
-        for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 11:14:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1700334884; x=1700939684; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=R5xCKG+dPMG8F3WMME/kbqVh8kLHwHJKzVbHpwM9FHU=;
-        b=bFrnQCertaoEUejQwPDoOCZ/bi7c3SNJtAlGQ00YYK9RXUgclsZhSI2De76KYJEu05
-         yy73xJifOp5iRS71LJ9ZG0TGm6LWDf1EF3bjg597H7KdZf4rwbFvErvIIDP64yumfxDv
-         yrZk4eeTp+OdhlzQT8tC0e+c3/U5XYAHR/mv0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700334884; x=1700939684;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R5xCKG+dPMG8F3WMME/kbqVh8kLHwHJKzVbHpwM9FHU=;
-        b=u4y1RKAf8HnvVsXgi8btkCLDQSwApCAnEqqPCXNlFmKup9N1HzL5MK+GqDRBq44uJS
-         IYwsychhJYvL/s2Zqnb+t9TymC+vqrrVD/sP+yREH1vv2qdT5i+bGnXOP8OXxAv5Gp7S
-         +BBcxE6m1LPjbkripxgxIUJFDpJ16whSMygywhcfGUxICfcXygeeD7PkkD+6oXyUPAJh
-         2JV2uXCq5P4s54w/5hjrm4fKAuVLIHxoYvnHMPK3THZyFkFbSIxIFSecYe0/xS3n1AXo
-         1zyfuhinARnWUZU65R2jy7xr6H1dV6mX1yUhgzgf5nptwyodEikSyRgk+Sps7J9dhQPO
-         B04w==
-X-Gm-Message-State: AOJu0YyRT8OkF6ZgCux8Yqu7B0Mid2w0H+QWA7IZRRbrynZwfexxg9WF
-	SDjauzLcvISXBZW1vj3+JnbPVJrEEMWL2ZAEOjhduA==
-X-Google-Smtp-Source: AGHT+IGLLecanfdYx41S8L07FU1tBSy52/KPOqC9JHOO7EsdG9DwCCWa0XGQYuFL8+PJfed4zktzVw==
-X-Received: by 2002:ac2:5337:0:b0:508:11f5:8953 with SMTP id f23-20020ac25337000000b0050811f58953mr2104169lfh.26.1700334883857;
-        Sat, 18 Nov 2023 11:14:43 -0800 (PST)
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com. [209.85.208.46])
-        by smtp.gmail.com with ESMTPSA id lz2-20020a170906fb0200b0099d798a6bb5sm2155601ejb.67.2023.11.18.11.14.43
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Nov 2023 11:14:43 -0800 (PST)
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-54394328f65so4244204a12.3
-        for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 11:14:43 -0800 (PST)
-X-Received: by 2002:a05:6402:64f:b0:543:7e9b:5cc9 with SMTP id
- u15-20020a056402064f00b005437e9b5cc9mr2096703edx.31.1700334882947; Sat, 18
- Nov 2023 11:14:42 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=email.heliumtrades.com header.i=@email.heliumtrades.com header.b="apoIWLd6"
+X-Greylist: delayed 302 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 18 Nov 2023 19:44:54 PST
+Received: from so254-35.mailgun.net (so254-35.mailgun.net [198.61.254.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B8B2E6
+	for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 19:44:54 -0800 (PST)
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed;
+ d=email.heliumtrades.com; q=dns/txt; s=pic; t=1700365493; x=1700372693;
+ h=Content-Type: Content-Transfer-Encoding: Message-Id: To: To: From: From:
+ Subject: Subject: Mime-Version: Date: Sender: Sender;
+ bh=a/cMnUcQICU/RNfvkgM4G1+EcP3XtdkqfZ640LB0gPI=;
+ b=apoIWLd6JJWCaj0yhd9Pnr2nvrIEbjQxR5N57UrwgQWjoEz9ZfLulj8w6TZdQX81hNROtNnq8p0bnTqo200bYA99x2A+olBwUv2/Oo9ESsBArPKZIh15PTRwtzVdR8hwoA978pIjGzd2EPdxlr4mnNMB2DL7UWjsxGibBoHkuU0=
+X-Mailgun-Sending-Ip: 198.61.254.35
+X-Mailgun-Sid: WyI2YTE5ZSIsImxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZyIsImYwMTUzOCJd
+Received: from <unknown> (<unknown> []) by 703e2ead9e73 with HTTP id
+ 65598387b689723cfc631170; Sun, 19 Nov 2023 03:39:51 GMT
+Sender: contact@email.heliumtrades.com
+Date: Sun, 19 Nov 2023 03:39:51 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <ZVjgpLACW4/0NkBB@redhat.com> <CAHk-=wjV2S7xBcH2BGuDgfKcg3fjWwk5k74nq89SviMkH-YsJQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wjV2S7xBcH2BGuDgfKcg3fjWwk5k74nq89SviMkH-YsJQ@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 18 Nov 2023 11:14:25 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
-Message-ID: <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
-Subject: Re: [git pull] device mapper fixes for 6.7-rc2
-To: Mike Snitzer <snitzer@kernel.org>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
-	Alasdair G Kergon <agk@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, 
-	Mikulas Patocka <mpatocka@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Subject: =?UTF-8?q?Sail_the_News_Ocean_with_Helium's_Guidance_=F0=9F=A7=AD?=
+From: Helium Trades <contact@email.heliumtrades.com>
+To: linux-block@vger.kernel.org
+Message-Id: <20231119033951.43b33cb5b76a5274@email.heliumtrades.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 
-On Sat, 18 Nov 2023 at 10:33, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> What are the alleged "number of bugs all over the kernel" that the old
-> MAX_ORDER definition had? In light of the other "MAX" definitions I
-> found from a second of grepping, I really think the argument for that
-> was just wrong.
+Discover a smarter news experience tailored for depth, not just clicks. Wel=
+come to Helium.
 
-Bah. I looked at the commits leading up to it, and I really think that
-"if that's the fallout from 24 years of history, then it wasn't a huge
-deal".
+Why Helium Stands Out:
 
-Compared to the inevitable problems that the semantic change will
-cause for backports (and already caused for this merge window), I
-still think this was all likely a mistake.
+    =F0=9F=8C=8D 38,285+ Sources: AI-curated summaries and bias analysis. N=
+o ads. Pure insights.
 
-In fact, the biggest takeaway from those patches is that we probably
-should have introduced some kind of "this is the max _size_ you can
-allocate", because a few of them were related to that particular
-calculation.
+    =F0=9F=A4=96 Depth Over Hype: Skip the news frenzy. Our AI brings clari=
+ty and varied perspectives.
 
-The floppy driver example is actually a good example, in that that is
-*exactly* what it wanted, but it had been just done wrong as
+    =F0=9F=A7=A0 Broaden Your View: Experience diverse sources in one seaml=
+ess feed.
 
-  #define MAX_LEN (1UL << MAX_ORDER << PAGE_SHIFT)
+    =F0=9F=93=88 Adaptive Forecasts: Helium refines predictions for sharper=
+ insights with each use.
 
-and variations of that is what half the fixes were..
+Rise above the noise. With Helium, it's about enlightenment over entertainm=
+ent.
 
-IOW, I really think we should just have added a
+=F0=9F=91=89 Experience Helium Now: https://HeliumTrades.com/news/
 
-  #define MAX_GFP_SIZE (1UL << (PAGE_SHIFT+MAX_ORDER-1))
+Warm regards,
 
-and the rest were basically all just the trivial off-by-one things.
-
-The __iommu_dma_alloc_pages() code is just so odd that any MAX_ORDER
-issues are more about "WTH is this code doing" And the "fix" is just
-more of the same.
-
-The *whole* point of having the max for a power-of-two thing is that
-you can do things like
-
-        mask = (1<<MAX)-1;
-
-and that's exactly what the iommu code was trying to do. Except for
-some *unfathomable* reason the iommu code did
-
-        order_mask &= (2U << MAX_ORDER) - 1;
-
-and honestly, you can't blame MAX_ORDER for the confusion. What a
-strange off-by-one. MAX_ORDER was *literally* designed to be easy for
-this case, and people screwed it up.
-
-And no, it's *not* because "inclusive is more intuitive". As
-mentioned, this whole "it's past the end* is the common case for MAX
-values in the mm, for exactly these kinds of reasons. I already
-listted several other cases.
-
-The reason there were 9 bugs is because MAX_ORDER is an old thing, and
-testing doesn't catch it because nobody triggers the max case. The
-crazy iommu code goes back to 2016, for example.
-
-That
-
-    84 files changed, 223 insertions(+), 253 deletions(-)
-
-really seems bogus for the 9 fixes that had accumulated in this area
-in the last 24 years.
-
-Oh well. Now we have places with 'MAX_ORDER + 1' instead of 'MAX_ORDER
-- 1'. I'm not seeing that it's a win, and I do think "semantic change
-after 24 years" is a loss and is going to cause problems.
-
-               Linus
+Helium Trades
+https://HeliumTrades.com/news/
