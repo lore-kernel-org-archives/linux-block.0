@@ -1,57 +1,77 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=email.heliumtrades.com header.i=@email.heliumtrades.com header.b="apoIWLd6"
-X-Greylist: delayed 302 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 18 Nov 2023 19:44:54 PST
-Received: from so254-35.mailgun.net (so254-35.mailgun.net [198.61.254.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B8B2E6
-	for <linux-block@vger.kernel.org>; Sat, 18 Nov 2023 19:44:54 -0800 (PST)
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed;
- d=email.heliumtrades.com; q=dns/txt; s=pic; t=1700365493; x=1700372693;
- h=Content-Type: Content-Transfer-Encoding: Message-Id: To: To: From: From:
- Subject: Subject: Mime-Version: Date: Sender: Sender;
- bh=a/cMnUcQICU/RNfvkgM4G1+EcP3XtdkqfZ640LB0gPI=;
- b=apoIWLd6JJWCaj0yhd9Pnr2nvrIEbjQxR5N57UrwgQWjoEz9ZfLulj8w6TZdQX81hNROtNnq8p0bnTqo200bYA99x2A+olBwUv2/Oo9ESsBArPKZIh15PTRwtzVdR8hwoA978pIjGzd2EPdxlr4mnNMB2DL7UWjsxGibBoHkuU0=
-X-Mailgun-Sending-Ip: 198.61.254.35
-X-Mailgun-Sid: WyI2YTE5ZSIsImxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZyIsImYwMTUzOCJd
-Received: from <unknown> (<unknown> []) by 703e2ead9e73 with HTTP id
- 65598387b689723cfc631170; Sun, 19 Nov 2023 03:39:51 GMT
-Sender: contact@email.heliumtrades.com
-Date: Sun, 19 Nov 2023 03:39:51 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHwdj/4I"
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89EFCC2
+	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 06:57:49 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id e9e14a558f8ab-359c22c44d6so15123225ab.2
+        for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 06:57:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700405869; x=1701010669; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kNxZEYGSdawbODTSP5FuV6b8pxNHzlA5xFxinNYLGVc=;
+        b=LHwdj/4IY7K0dxubkk13wGKJDyKGQpsnjdl4bs8o3r6ikDzYQ2nq6ObIKrVcaCReF2
+         gyqeYUNAbhN+VzWh/GnnnEk6Ik9nREj/cF9mxCBGF1ApHGlFP3dcvlBBi7Bd+Lr7H/TH
+         WszSwKaHlDDp24+KeaizO+mAq8s+hRdoxljKHoW8zCfZutRgp4DpojTJR2jfbrSuvNxC
+         y4qMh2joaVNKWWnDWvnuCMMHxYmFB0j297vFbn8WKHnfSXzIkRI6x3s8s/MF6q4qiiko
+         m4DFF6VOUbUw5H4WxrOvzxdYy9vF2QlSXL6gAAXUvCAjS0QmJnI3xV0dS3W8JR+Ice33
+         zg7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700405869; x=1701010669;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kNxZEYGSdawbODTSP5FuV6b8pxNHzlA5xFxinNYLGVc=;
+        b=mpzvS9SENe+RDZwn7abCvLLDdIOgoUXxdcfQg2G5udk/Y/5GReUR9CyPPwCxpSAJeB
+         s9G4xg/iI1jbMgzuH8H5+Tw3dRB2ViddKJK1gHcvf8Jgth6mmcZGv/8kGn4PRUjHangS
+         DUcgvn3Gz+Vyxy2/ITDE4PZrkO3z4ShraI4Lka1AJff4rJmRD1k0pv5ujkyfIw9DU44i
+         JoVyIMgO2iBR7AKkNP5aJHsmRVE9lOouRYAyytLMyFaB4GPQBm1tw3fScQOevkJnNMK/
+         /s9pKq2LWH9SrBxj/JDt5iPQcf5qbBBi6FX9uZVLDRK7v5XagtktK1pa4jiSAH925dkD
+         kt1w==
+X-Gm-Message-State: AOJu0YwicFWJxu66eA96l8es1sB9+vFajE2hyqdx3H9FtkmZN72v/d58
+	0Db0sfD2zckP2V7bC6nAxDU=
+X-Google-Smtp-Source: AGHT+IGmQ5CaxeSx7CsDLbDuRIlq5MkTys7Wg2O+DWYgAy+Kgo5NF3owtCL8d1eHutf5jCkvSVeb+A==
+X-Received: by 2002:a92:6a08:0:b0:35a:ff35:b471 with SMTP id f8-20020a926a08000000b0035aff35b471mr1965582ilc.14.1700405868662;
+        Sun, 19 Nov 2023 06:57:48 -0800 (PST)
+Received: from localhost (dhcp-72-253-202-210.hawaiiantel.net. [72.253.202.210])
+        by smtp.gmail.com with ESMTPSA id s14-20020a056a00178e00b006cb7bdbc3besm1165697pfg.17.2023.11.19.06.57.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Nov 2023 06:57:48 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Sun, 19 Nov 2023 04:57:46 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] blk-cgroup: bypass blkcg_deactivate_policy after
+ destroying
+Message-ID: <ZVoiaucRAsPkN6FQ@slm.duckdns.org>
+References: <20231117023527.3188627-1-ming.lei@redhat.com>
+ <20231117023527.3188627-4-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: =?UTF-8?q?Sail_the_News_Ocean_with_Helium's_Guidance_=F0=9F=A7=AD?=
-From: Helium Trades <contact@email.heliumtrades.com>
-To: linux-block@vger.kernel.org
-Message-Id: <20231119033951.43b33cb5b76a5274@email.heliumtrades.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117023527.3188627-4-ming.lei@redhat.com>
 
-Discover a smarter news experience tailored for depth, not just clicks. Wel=
-come to Helium.
+Hello, Ming.
 
-Why Helium Stands Out:
+On Fri, Nov 17, 2023 at 10:35:24AM +0800, Ming Lei wrote:
+> blkcg_deactivate_policy() can be called after blkg_destroy_all()
+> returns, and it isn't necessary since blkg_destroy_all has covered
+> policy deactivation.
 
-    =F0=9F=8C=8D 38,285+ Sources: AI-curated summaries and bias analysis. N=
-o ads. Pure insights.
+Does this actually affect anything? This would matter iff a policy is
+deactivated for the queue between blkg_destroy_all() and the rest of the
+queue destruction, right? That's a really small window against very rare
+operations. The patch is already in and I'm not necessarily against the
+change but I'm curious what the motivation is.
 
-    =F0=9F=A4=96 Depth Over Hype: Skip the news frenzy. Our AI brings clari=
-ty and varied perspectives.
+Thanks.
 
-    =F0=9F=A7=A0 Broaden Your View: Experience diverse sources in one seaml=
-ess feed.
-
-    =F0=9F=93=88 Adaptive Forecasts: Helium refines predictions for sharper=
- insights with each use.
-
-Rise above the noise. With Helium, it's about enlightenment over entertainm=
-ent.
-
-=F0=9F=91=89 Experience Helium Now: https://HeliumTrades.com/news/
-
-Warm regards,
-
-Helium Trades
-https://HeliumTrades.com/news/
+-- 
+tejun
