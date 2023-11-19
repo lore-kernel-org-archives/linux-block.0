@@ -1,53 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHwdj/4I"
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89EFCC2
-	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 06:57:49 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id e9e14a558f8ab-359c22c44d6so15123225ab.2
-        for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 06:57:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700405869; x=1701010669; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kNxZEYGSdawbODTSP5FuV6b8pxNHzlA5xFxinNYLGVc=;
-        b=LHwdj/4IY7K0dxubkk13wGKJDyKGQpsnjdl4bs8o3r6ikDzYQ2nq6ObIKrVcaCReF2
-         gyqeYUNAbhN+VzWh/GnnnEk6Ik9nREj/cF9mxCBGF1ApHGlFP3dcvlBBi7Bd+Lr7H/TH
-         WszSwKaHlDDp24+KeaizO+mAq8s+hRdoxljKHoW8zCfZutRgp4DpojTJR2jfbrSuvNxC
-         y4qMh2joaVNKWWnDWvnuCMMHxYmFB0j297vFbn8WKHnfSXzIkRI6x3s8s/MF6q4qiiko
-         m4DFF6VOUbUw5H4WxrOvzxdYy9vF2QlSXL6gAAXUvCAjS0QmJnI3xV0dS3W8JR+Ice33
-         zg7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700405869; x=1701010669;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kNxZEYGSdawbODTSP5FuV6b8pxNHzlA5xFxinNYLGVc=;
-        b=mpzvS9SENe+RDZwn7abCvLLDdIOgoUXxdcfQg2G5udk/Y/5GReUR9CyPPwCxpSAJeB
-         s9G4xg/iI1jbMgzuH8H5+Tw3dRB2ViddKJK1gHcvf8Jgth6mmcZGv/8kGn4PRUjHangS
-         DUcgvn3Gz+Vyxy2/ITDE4PZrkO3z4ShraI4Lka1AJff4rJmRD1k0pv5ujkyfIw9DU44i
-         JoVyIMgO2iBR7AKkNP5aJHsmRVE9lOouRYAyytLMyFaB4GPQBm1tw3fScQOevkJnNMK/
-         /s9pKq2LWH9SrBxj/JDt5iPQcf5qbBBi6FX9uZVLDRK7v5XagtktK1pa4jiSAH925dkD
-         kt1w==
-X-Gm-Message-State: AOJu0YwicFWJxu66eA96l8es1sB9+vFajE2hyqdx3H9FtkmZN72v/d58
-	0Db0sfD2zckP2V7bC6nAxDU=
-X-Google-Smtp-Source: AGHT+IGmQ5CaxeSx7CsDLbDuRIlq5MkTys7Wg2O+DWYgAy+Kgo5NF3owtCL8d1eHutf5jCkvSVeb+A==
-X-Received: by 2002:a92:6a08:0:b0:35a:ff35:b471 with SMTP id f8-20020a926a08000000b0035aff35b471mr1965582ilc.14.1700405868662;
-        Sun, 19 Nov 2023 06:57:48 -0800 (PST)
-Received: from localhost (dhcp-72-253-202-210.hawaiiantel.net. [72.253.202.210])
-        by smtp.gmail.com with ESMTPSA id s14-20020a056a00178e00b006cb7bdbc3besm1165697pfg.17.2023.11.19.06.57.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 06:57:48 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Sun, 19 Nov 2023 04:57:46 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] blk-cgroup: bypass blkcg_deactivate_policy after
- destroying
-Message-ID: <ZVoiaucRAsPkN6FQ@slm.duckdns.org>
-References: <20231117023527.3188627-1-ming.lei@redhat.com>
- <20231117023527.3188627-4-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aVcGvwwa"
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B71C2
+	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 07:21:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700407302; x=1731943302;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GnI2ehbx0BkNTQXA+HiQpvK0fRAFd/MFz1r0HnZbmDU=;
+  b=aVcGvwwaa/wJfM6x61fPW1BsGtpx9JWJeEzgIT3l0ViOzPIxc8q0WKVh
+   05QykTlHTE0tM0eg1BSvKamNUSaeNmI+uTBM2NYkXhTvS3XL/k1rfrne7
+   tWV9ZUJWYCX2r0a2UGgeWs6MiV0nGGSjj+7XU8Ih2ZcroQGUCAcgCQ5wJ
+   sPUkKNWj23PwIFMuw7mlM3yUfRDxBBXHF84Ls4SHNwHQCE0RPZhkxe0OD
+   EWv6g7kYFP+nP9fysyHrsVfWy8X2Qfmldk+ZAlxy/V0z6f1AWUZWN/n+N
+   aWWsyKbABMNVvFFAFFyoQMOxAIXx0ueurB4vpe3Ihb1XK2LVMj4jm4E6+
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10899"; a="371680602"
+X-IronPort-AV: E=Sophos;i="6.04,210,1695711600"; 
+   d="scan'208";a="371680602"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2023 07:21:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10899"; a="716000084"
+X-IronPort-AV: E=Sophos;i="6.04,210,1695711600"; 
+   d="scan'208";a="716000084"
+Received: from kvehmane-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.249.44.109])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2023 07:21:39 -0800
+Received: by box.shutemov.name (Postfix, from userid 1000)
+	id DEA1510A33C; Sun, 19 Nov 2023 18:21:36 +0300 (+03)
+Date: Sun, 19 Nov 2023 18:21:36 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Mike Snitzer <snitzer@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Andrew Morton <akpm@linux-foundation.org>, dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: [git pull] device mapper fixes for 6.7-rc2
+Message-ID: <20231119152136.ntnl3sfulo4tgbw3@box.shutemov.name>
+References: <ZVjgpLACW4/0NkBB@redhat.com>
+ <CAHk-=wjV2S7xBcH2BGuDgfKcg3fjWwk5k74nq89SviMkH-YsJQ@mail.gmail.com>
+ <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,22 +51,92 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231117023527.3188627-4-ming.lei@redhat.com>
+In-Reply-To: <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
 
-Hello, Ming.
+On Sat, Nov 18, 2023 at 11:14:25AM -0800, Linus Torvalds wrote:
+> On Sat, 18 Nov 2023 at 10:33, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > What are the alleged "number of bugs all over the kernel" that the old
+> > MAX_ORDER definition had? In light of the other "MAX" definitions I
+> > found from a second of grepping, I really think the argument for that
+> > was just wrong.
+> 
+> Bah. I looked at the commits leading up to it, and I really think that
+> "if that's the fallout from 24 years of history, then it wasn't a huge
+> deal".
 
-On Fri, Nov 17, 2023 at 10:35:24AM +0800, Ming Lei wrote:
-> blkcg_deactivate_policy() can be called after blkg_destroy_all()
-> returns, and it isn't necessary since blkg_destroy_all has covered
-> policy deactivation.
+That's part that hit upstream and never got caught. I personally spend
+some time debugging due MAX_ORDER-1 thing.
 
-Does this actually affect anything? This would matter iff a policy is
-deactivated for the queue between blkg_destroy_all() and the rest of the
-queue destruction, right? That's a really small window against very rare
-operations. The patch is already in and I'm not necessarily against the
-change but I'm curious what the motivation is.
+> Compared to the inevitable problems that the semantic change will
+> cause for backports (and already caused for this merge window), I
+> still think this was all likely a mistake.
 
-Thanks.
+I think the mistake I made is leaving the name the same. Just renaming it
+to MAX_PAGE_ORDER or something would give a heads up to not-yet-upstream
+code.
+
+> In fact, the biggest takeaway from those patches is that we probably
+> should have introduced some kind of "this is the max _size_ you can
+> allocate", because a few of them were related to that particular
+> calculation.
+> 
+> The floppy driver example is actually a good example, in that that is
+> *exactly* what it wanted, but it had been just done wrong as
+> 
+>   #define MAX_LEN (1UL << MAX_ORDER << PAGE_SHIFT)
+> 
+> and variations of that is what half the fixes were..
+> 
+> IOW, I really think we should just have added a
+> 
+>   #define MAX_GFP_SIZE (1UL << (PAGE_SHIFT+MAX_ORDER-1))
+> 
+> and the rest were basically all just the trivial off-by-one things.
+> 
+> The __iommu_dma_alloc_pages() code is just so odd that any MAX_ORDER
+> issues are more about "WTH is this code doing" And the "fix" is just
+> more of the same.
+> 
+> The *whole* point of having the max for a power-of-two thing is that
+> you can do things like
+> 
+>         mask = (1<<MAX)-1;
+> 
+> and that's exactly what the iommu code was trying to do. Except for
+> some *unfathomable* reason the iommu code did
+> 
+>         order_mask &= (2U << MAX_ORDER) - 1;
+> 
+> and honestly, you can't blame MAX_ORDER for the confusion. What a
+> strange off-by-one. MAX_ORDER was *literally* designed to be easy for
+> this case, and people screwed it up.
+
+Agreed.
+
+> And no, it's *not* because "inclusive is more intuitive". As
+> mentioned, this whole "it's past the end* is the common case for MAX
+> values in the mm, for exactly these kinds of reasons. I already
+> listted several other cases.
+> 
+> The reason there were 9 bugs is because MAX_ORDER is an old thing, and
+> testing doesn't catch it because nobody triggers the max case. The
+> crazy iommu code goes back to 2016, for example.
+> 
+> That
+> 
+>     84 files changed, 223 insertions(+), 253 deletions(-)
+> 
+> really seems bogus for the 9 fixes that had accumulated in this area
+> in the last 24 years.
+> 
+> Oh well. Now we have places with 'MAX_ORDER + 1' instead of 'MAX_ORDER
+> - 1'. I'm not seeing that it's a win, and I do think "semantic change
+> after 24 years" is a loss and is going to cause problems.
+
+I think it worth introducing NR_ORDERS for MAX_ORDER + 1 to define how
+many page orders page allocator supports. Sounds good?
 
 -- 
-tejun
+  Kiryl Shutsemau / Kirill A. Shutemov
