@@ -1,101 +1,113 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410D8CF;
-	Mon, 20 Nov 2023 15:58:57 -0800 (PST)
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-280351c32afso3989210a91.1;
-        Mon, 20 Nov 2023 15:58:57 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y5licVVA"
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B109E
+	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 16:00:00 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-a0039ea30e0so143778866b.2
+        for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 16:00:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1700524799; x=1701129599; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hvy2CV8CQ1z8xyF0eqyyieG0M3+ja1/tOprJQEZU3U0=;
+        b=Y5licVVAyPYKD/k20MMZkSMbBgiQ++7QRIuNqG+xiuB0SnUHTKl3SoFGXT9oOR1BFC
+         6te8qwB6pW5OllpzSlBA9GOtTqW+jpPSILGsKwRrY8KLEvYpVbUVFoqRZkoGqV7rnhFC
+         aZyf/bNkojtKE+Jy9BzgucSosPFunWOnts5Jg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700524736; x=1701129536;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/40zxP6irGy1o9ycOvbKwOnVPv8rOKZ+3Lyg8ZQ0JM4=;
-        b=n2yw1FH6eIaatLnRDTlLg2cNJBtrmjnmgkMo41rfcieyZYRmKp1D6WPnM17Wl+RYFy
-         SaFkWh3pVjz8Zx6BijcU65gPx6zf3sRN1rwWVgRiAWndxvmMbEhpRlhyk7ane++IaQ9H
-         s8CTWyfIXZ76cwl/in7dqQsDBbK+eVICFlnCKPoqMr9pPbYY8LFGl6sy8bl2hJPBNKBq
-         NpnV9P6N0+kpJgiS2SPGPdRvjENIIoCvbZE4sJ3Xmk68Q3BGxE/kqHJE30EL+hXsLuL2
-         YHsZr50DdcGgrdwlHSGLQ2TXqFmltjUTU2MjsRttdzRGl6u8V0KMiTB/HOJl/zsOfQ/Y
-         +Bxg==
-X-Gm-Message-State: AOJu0YwcC/fFKprj7IJAFN7eySt+1KyBtEdmB8TtE3dvmxhM6g0fE9uf
-	dkHCu1s1PCLtyZbbUnZXg5BGsIfpG6g=
-X-Google-Smtp-Source: AGHT+IEEOfP6hsU+Y4ehUMpL18m/V+1IC+iMrLsKkC6HcENAVxf2jJPLAqeQ1o6ZHblo5JhkoteOsA==
-X-Received: by 2002:a17:903:11d1:b0:1b8:90bd:d157 with SMTP id q17-20020a17090311d100b001b890bdd157mr11914249plh.26.1700524736522;
-        Mon, 20 Nov 2023 15:58:56 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id je7-20020a170903264700b001ce669e4662sm5156650plb.61.2023.11.20.15.58.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 15:58:56 -0800 (PST)
-Message-ID: <a4233f10-56c7-4d57-8875-f29efe815627@acm.org>
-Date: Mon, 20 Nov 2023 15:58:52 -0800
+        d=1e100.net; s=20230601; t=1700524799; x=1701129599;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hvy2CV8CQ1z8xyF0eqyyieG0M3+ja1/tOprJQEZU3U0=;
+        b=wUF5L0XqnguSTH0hB9bJCi1icdJnxn2H210Fjr+h5UXR3hkDPynjNaf9KsKS8/RlEg
+         iYTcK/Om8lzCjoAxah3LnrwIoREvEMRjHNg3vFu/NzklQ9lbApgs4d5zr5b50kkAimmZ
+         hmSLQ9TQ7jQWKoZuAhCjziDDrrg4hTBGm7SbJi0jwPGMgyCrI+H5zAEDwD3qpjFGeOQm
+         IVIYIQaoFaUrGL3oGLzEGTaDUCnGkKyi1VZpUSJJjKsc1Xk5J3wKZvwSio0pcDII20Xe
+         3akKgPJtv9GWFLHCW2frSP7eo9WGORdMPpAafZozbA5H8eMt5fqlFW28kVANjVF3CERc
+         pKrg==
+X-Gm-Message-State: AOJu0YzDH7QGot7bsvWZOrIhwwu35GirdFMshDjcowTk7fUTSzSP5ftO
+	8Aa4VTOD+4zqj8AkHUxfDbW9nBBrfiVL8lUlSzLAKw7Z/MuelZO3
+X-Google-Smtp-Source: AGHT+IGS/DMjLcVARh7/W+3Xwjr7CBqtoFkp2YHIj8I+RchJwxdGIbnk77jU2LOk1Rw8ir/jKvddnwjVTa6iwN+tqTI=
+X-Received: by 2002:a17:906:5904:b0:9be:e90:5016 with SMTP id
+ h4-20020a170906590400b009be0e905016mr6390836ejq.24.1700524799291; Mon, 20 Nov
+ 2023 15:59:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 01/19] block: Introduce more member variables related
- to zone write locking
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
- Ming Lei <ming.lei@redhat.com>
-References: <20231114211804.1449162-1-bvanassche@acm.org>
- <20231114211804.1449162-2-bvanassche@acm.org>
- <3d8d04d5-80d8-4eee-9899-d9fe197dd203@kernel.org>
- <0d60bde5-018d-4850-8870-092b472463a6@acm.org>
- <c789e381-f0c4-4c61-bbc7-069a834841c9@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <c789e381-f0c4-4c61-bbc7-069a834841c9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231110010139.3901150-1-sarthakkukreti@chromium.org>
+ <ZU7RVKJIzm8ExGGH@dread.disaster.area> <CAG9=OMPFEV9He+ggq2mcLULnUZ2jm8fGU=4ca8kBoWtvqYcGVg@mail.gmail.com>
+ <ZVvCsPelezZesshx@dread.disaster.area>
+In-Reply-To: <ZVvCsPelezZesshx@dread.disaster.area>
+From: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date: Mon, 20 Nov 2023 15:59:48 -0800
+Message-ID: <CAG9=OMMar0shTijQfehFSktir2vsvRkvH8t69gREzVyLKyPH4A@mail.gmail.com>
+Subject: Re: [PATCH v9 0/3] [PATCH v9 0/3] Introduce provisioning primitives
+To: Dave Chinner <david@fromorbit.com>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>, 
+	"Darrick J . Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>, Brian Foster <bfoster@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/20/23 15:02, Damien Le Moal wrote:
-> On 11/21/23 05:44, Bart Van Assche wrote:
->> How about applying this (untested) patch on top of this patch series?
->>
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index 4c776c08f190..aba1972e9767 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -84,8 +84,6 @@ void blk_set_stacking_limits(struct queue_limits *lim)
->>    	lim->max_dev_sectors = UINT_MAX;
->>    	lim->max_write_zeroes_sectors = UINT_MAX;
->>    	lim->max_zone_append_sectors = UINT_MAX;
->> -	/* Request-based stacking drivers do not reorder requests. */
->> -	lim->driver_preserves_write_order = true;
->>    }
->>    EXPORT_SYMBOL(blk_set_stacking_limits);
->>
->> diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
->> index 2d3e186ca87e..cb9abe4bd065 100644
->> --- a/drivers/md/dm-linear.c
->> +++ b/drivers/md/dm-linear.c
->> @@ -147,6 +147,11 @@ static int linear_report_zones(struct dm_target *ti,
->>    #define linear_report_zones NULL
->>    #endif
->>
->> +static void linear_io_hints(struct dm_target *ti, struct queue_limits *limits)
->> +{
->> +	limits->driver_preserves_write_order = true;
->> +}
-> 
-> Hmm, but does dm-linear preserve write order ? I am not convinced. And what
-> about dm-flakey, dm-error and dm-crypt ? All of these also support zoned
-> devices. I do not think that we can say that any of these preserve write order.
+On Mon, Nov 20, 2023 at 12:33=E2=80=AFPM Dave Chinner <david@fromorbit.com>=
+ wrote:
+>
+> On Mon, Nov 13, 2023 at 01:26:51PM -0800, Sarthak Kukreti wrote:
+> > On Fri, Nov 10, 2023 at 4:56=E2=80=AFPM Dave Chinner <david@fromorbit.c=
+om> wrote:
+> > >
+> > > On Thu, Nov 09, 2023 at 05:01:35PM -0800, Sarthak Kukreti wrote:
+> > > > Hi,
+> > > >
+> > > > This patch series is version 9 of the patch series to introduce
+> > > > block-level provisioning mechanism (original [1]), which is useful =
+for
+> > > > provisioning space across thinly provisioned storage architectures =
+(loop
+> > > > devices backed by sparse files, dm-thin devices, virtio-blk). This
+> > > > series has minimal changes over v8[2], with a couple of patches dro=
+pped
+> > > > (suggested by Dave).
+> > > >
+> > > > This patch series is rebased from the linux-dm/dm-6.5-provision-sup=
+port
+> > > > [3] on to (a12deb44f973 Merge tag 'input-for-v6.7-rc0' ...). The fi=
+nal
+> > > > patch in the series is a blktest (suggested by Dave in 4) which was=
+ used
+> > > > to test out the provisioning flow for loop devices on sparse files =
+on an
+> > > > ext4 filesystem.
+> > >
+> > > What happened to the XFS patch I sent to support provisioning for
+> > > fallocate() operations through XFS?
+> > >
+> > Apologies, I missed out on mentioning that the XFS patches work well
+> > with loop devices.
+> >
+> > I might have misunderstood: were those patches only for sanity testing
+> > or would you prefer that I send those out as a part of this series? I
+> > can whip up a quick v10 if so!
+>
+> I was implying that if you are going to be adding support to random
+> block devices for people to actually test out, then you should be
+> adding support to filesystems and writing new -fstests- to ensure
+> that loop devices are actually provisioning blocks at exactly the
+> locations that correspond to the physical file extents the
+> filesystem provisioned, too.
+>
 
-Hi Damien,
+Fair enough, let me work on an additional fstests patch to validate that.
 
-I propose to keep any changes for files in the drivers/md/ directory for
-later. This patch series is already big enough. Additionally, I don't
-need the dm changes myself since Android does does not use dm-linear nor
-dm-verity to access a zoned logical unit. All we need to know right now
-is that the approach of this patch series can be extended to dm drivers.
+Best
+Sarthak
 
-Thanks,
-
-Bart.
-
+> -Dave.
+> --
+> Dave Chinner
+> david@fromorbit.com
