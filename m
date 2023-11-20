@@ -1,205 +1,288 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="svAUjuKO";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="uu0VxRN7"
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE57186;
-	Sun, 19 Nov 2023 21:44:45 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out2.suse.de (Postfix) with ESMTP id E57BD1F7AB;
-	Mon, 20 Nov 2023 05:44:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1700459084; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+1ZQnkFo8012v8eZitW0g/5EI8k5yTKn/qCr9xz6TNE=;
-	b=svAUjuKOMOCU64iWK5vbG00xG37Z2Nzsta+tkcfRbxJfSlkYLBSe6eLARGH48qL+SAhRyV
-	8CjdBPWiw0WIuH3c/BpRKNTFNRtgQ7LLwia+2CS/3hVQc8A2627hKvPdv0LSfsej/J2kvu
-	vGEERYnNiaYZtpfH8jaCHGzB6tMMeVo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1700459084;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+1ZQnkFo8012v8eZitW0g/5EI8k5yTKn/qCr9xz6TNE=;
-	b=uu0VxRN7kPyevfv2Ko9lZzXO71muiKosJwE32r0rXdw/iTETuVG9mak3oVZ4WbGKwAVLsp
-	yLKk7YDHIGvZYbBw==
-Received: from localhost.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
-	by relay2.suse.de (Postfix) with ESMTP id E88F22CFAB;
-	Mon, 20 Nov 2023 05:26:22 +0000 (UTC)
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	Mingzhe Zou <mingzhe.zou@easystack.cn>,
-	stable@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 07/10] bcache: fixup multi-threaded bch_sectors_dirty_init() wake-up race
-Date: Mon, 20 Nov 2023 13:25:00 +0800
-Message-Id: <20231120052503.6122-8-colyli@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20231120052503.6122-1-colyli@suse.de>
-References: <20231120052503.6122-1-colyli@suse.de>
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F3BD7;
+	Sun, 19 Nov 2023 22:38:05 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SYd9g6TGrz4f3l2b;
+	Mon, 20 Nov 2023 14:37:59 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 756041A01A1;
+	Mon, 20 Nov 2023 14:38:01 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDX2hDH_lpllk+vBQ--.13752S3;
+	Mon, 20 Nov 2023 14:38:01 +0800 (CST)
+Subject: Re: [PATCH 1/2] block: introduce new field flags in block_device
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
+ <20231120093847.2228127-2-yukuai1@huaweicloud.com> <ZVrLvcIhlnQl7xAb@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9fc5e82f-9106-e3f9-4f06-d2d79e8e99a8@huaweicloud.com>
+Date: Mon, 20 Nov 2023 14:37:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <ZVrLvcIhlnQl7xAb@fedora>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Bar: +++++++++++++++++++++++++++
-Authentication-Results: smtp-out2.suse.de;
-	dkim=none;
-	dmarc=none;
-	spf=softfail (smtp-out2.suse.de: 149.44.160.134 is neither permitted nor denied by domain of colyli@suse.de) smtp.mailfrom=colyli@suse.de
-X-Rspamd-Server: rspamd2
-X-Spamd-Result: default: False [27.09 / 50.00];
-	 ARC_NA(0.00)[];
-	 BAYES_SPAM(5.10)[99.99%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 R_MISSING_CHARSET(2.50)[];
-	 NEURAL_SPAM_SHORT(3.00)[1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DMARC_NA(1.20)[suse.de];
-	 BROKEN_CONTENT_TYPE(1.50)[];
-	 R_SPF_SOFTFAIL(4.60)[~all:c];
-	 RCPT_COUNT_FIVE(0.00)[6];
-	 TO_MATCH_ENVRCPT_SOME(0.00)[];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 MX_GOOD(-0.01)[];
-	 NEURAL_SPAM_LONG(3.50)[1.000];
-	 MID_CONTAINS_FROM(1.00)[];
-	 RWL_MAILSPIKE_GOOD(-1.00)[149.44.160.134:from];
-	 VIOLATED_DIRECT_SPF(3.50)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_NO_TLS_LAST(0.10)[];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 R_DKIM_NA(2.20)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 GREYLIST(0.00)[pass,meta]
-X-Spam-Score: 27.09
-X-Rspamd-Queue-Id: E57BD1F7AB
-X-Spam: Yes
+X-CM-TRANSID:cCh0CgDX2hDH_lpllk+vBQ--.13752S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3GFyUWF4fXw4UGw17ZF15CFg_yoW3ur48pF
+	WkKayYkayUWr4xWa1kK3W3XF40gw40kr18G3y3Ca4SyFZ8trnagF1kGry5Aa92yrW8CFWx
+	XF1DuFZ8Ary2gFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
+	UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Mingzhe Zou <mingzhe.zou@easystack.cn>
+Hi,
 
-We get a kernel crash about "unable to handle kernel paging request":
+ÔÚ 2023/11/20 11:00, Ming Lei Ð´µÀ:
+> On Mon, Nov 20, 2023 at 05:38:46PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> There are multiple switches in struct block_device, use seperate bool
+>> fields for them is not gracefully. Add a new field flags and replace
+>> swithes to a bit, there are no functional changes, and preapre to add
+>> a new switch in the next patch.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/bdev.c              | 15 ++++++++-------
+>>   block/blk-core.c          |  7 ++++---
+>>   block/genhd.c             |  8 +++++---
+>>   block/ioctl.c             |  2 +-
+>>   include/linux/blk_types.h | 12 ++++++------
+>>   include/linux/blkdev.h    |  5 +++--
+>>   6 files changed, 27 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/block/bdev.c b/block/bdev.c
+>> index fc8d28d77495..cb849bcf61ae 100644
+>> --- a/block/bdev.c
+>> +++ b/block/bdev.c
+>> @@ -408,10 +408,10 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+>>   	bdev->bd_partno = partno;
+>>   	bdev->bd_inode = inode;
+>>   	bdev->bd_queue = disk->queue;
+>> -	if (partno)
+>> -		bdev->bd_has_submit_bio = disk->part0->bd_has_submit_bio;
+>> +	if (partno && test_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags))
+>> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+>>   	else
+>> -		bdev->bd_has_submit_bio = false;
+>> +		clear_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+>>   	bdev->bd_stats = alloc_percpu(struct disk_stats);
+>>   	if (!bdev->bd_stats) {
+>>   		iput(inode);
+>> @@ -612,7 +612,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+>>   		bdev->bd_holder = NULL;
+>>   		bdev->bd_holder_ops = NULL;
+>>   		mutex_unlock(&bdev->bd_holder_lock);
+>> -		if (bdev->bd_write_holder)
+>> +		if (test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags))
+>>   			unblock = true;
+>>   	}
+>>   	if (!whole->bd_holders)
+>> @@ -625,7 +625,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+>>   	 */
+>>   	if (unblock) {
+>>   		disk_unblock_events(bdev->bd_disk);
+>> -		bdev->bd_write_holder = false;
+>> +		clear_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
+>>   	}
+>>   }
+>>   
+>> @@ -878,9 +878,10 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+>>   		 * writeable reference is too fragile given the way @mode is
+>>   		 * used in blkdev_get/put().
+>>   		 */
+>> -		if ((mode & BLK_OPEN_WRITE) && !bdev->bd_write_holder &&
+>> +		if ((mode & BLK_OPEN_WRITE) &&
+>> +		    !test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags) &&
+>>   		    (disk->event_flags & DISK_EVENT_FLAG_BLOCK_ON_EXCL_WRITE)) {
+>> -			bdev->bd_write_holder = true;
+>> +			set_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
+>>   			unblock_events = false;
+>>   		}
+>>   	}
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index fdf25b8d6e78..577a693165d8 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -482,7 +482,8 @@ __setup("fail_make_request=", setup_fail_make_request);
+>>   
+>>   bool should_fail_request(struct block_device *part, unsigned int bytes)
+>>   {
+>> -	return part->bd_make_it_fail && should_fail(&fail_make_request, bytes);
+>> +	return test_bit(BD_FLAG_MAKE_IT_FAIL, &part->flags) &&
+>> +		should_fail(&fail_make_request, bytes);
+>>   }
+>>   
+>>   static int __init fail_make_request_debugfs(void)
+>> @@ -595,7 +596,7 @@ static void __submit_bio(struct bio *bio)
+>>   	if (unlikely(!blk_crypto_bio_prep(&bio)))
+>>   		return;
+>>   
+>> -	if (!bio->bi_bdev->bd_has_submit_bio) {
+>> +	if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags)) {
+>>   		blk_mq_submit_bio(bio);
+>>   	} else if (likely(bio_queue_enter(bio) == 0)) {
+>>   		struct gendisk *disk = bio->bi_bdev->bd_disk;
+>> @@ -703,7 +704,7 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+>>   	 */
+>>   	if (current->bio_list)
+>>   		bio_list_add(&current->bio_list[0], bio);
+>> -	else if (!bio->bi_bdev->bd_has_submit_bio)
+>> +	else if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags))
+>>   		__submit_bio_noacct_mq(bio);
+>>   	else
+>>   		__submit_bio_noacct(bio);
+>> diff --git a/block/genhd.c b/block/genhd.c
+>> index c9d06f72c587..026f4c6d5b7e 100644
+>> --- a/block/genhd.c
+>> +++ b/block/genhd.c
+>> @@ -413,7 +413,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>>   	elevator_init_mq(disk->queue);
+>>   
+>>   	/* Mark bdev as having a submit_bio, if needed */
+>> -	disk->part0->bd_has_submit_bio = disk->fops->submit_bio != NULL;
+>> +	if (disk->fops->submit_bio)
+>> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags);
+>>   
+>>   	/*
+>>   	 * If the driver provides an explicit major number it also must provide
+>> @@ -1062,7 +1063,8 @@ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
+>>   ssize_t part_fail_show(struct device *dev,
+>>   		       struct device_attribute *attr, char *buf)
+>>   {
+>> -	return sprintf(buf, "%d\n", dev_to_bdev(dev)->bd_make_it_fail);
+>> +	return sprintf(buf, "%d\n",
+>> +		       test_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags));
+>>   }
+>>   
+>>   ssize_t part_fail_store(struct device *dev,
+>> @@ -1072,7 +1074,7 @@ ssize_t part_fail_store(struct device *dev,
+>>   	int i;
+>>   
+>>   	if (count > 0 && sscanf(buf, "%d", &i) > 0)
+>> -		dev_to_bdev(dev)->bd_make_it_fail = i;
+>> +		set_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags);
+>>   
+>>   	return count;
+>>   }
+>> diff --git a/block/ioctl.c b/block/ioctl.c
+>> index 4160f4e6bd5b..a548c718a5fb 100644
+>> --- a/block/ioctl.c
+>> +++ b/block/ioctl.c
+>> @@ -394,7 +394,7 @@ static int blkdev_roset(struct block_device *bdev, unsigned cmd,
+>>   		if (ret)
+>>   			return ret;
+>>   	}
+>> -	bdev->bd_read_only = n;
+>> +	set_bit(BD_FLAG_READ_ONLY, &bdev->flags);
+>>   	return 0;
+>>   }
+>>   
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index 52e264d5a830..95bd26c62655 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -37,17 +37,20 @@ struct bio_crypt_ctx;
+>>   #define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+>>   #define SECTOR_MASK		(PAGE_SECTORS - 1)
+>>   
+>> +#define BD_FLAG_READ_ONLY	0 /* read-only-policy */
+>> +#define BD_FLAG_WRITE_HOLDER	1
+>> +#define BD_FLAG_HAS_SUBMIT_BIO	2
+>> +#define BD_FLAG_MAKE_IT_FAIL	3
+>> +
+>>   struct block_device {
+>>   	sector_t		bd_start_sect;
+>>   	sector_t		bd_nr_sectors;
+>>   	struct gendisk *	bd_disk;
+>>   	struct request_queue *	bd_queue;
+>>   	struct disk_stats __percpu *bd_stats;
+>> +	unsigned long		flags;
+>>   	unsigned long		bd_stamp;
+>> -	bool			bd_read_only;	/* read-only policy */
+>>   	u8			bd_partno;
+>> -	bool			bd_write_holder;
+>> -	bool			bd_has_submit_bio;
+> 
+> The idea looks good, but not necessary to add new 8 bytes, and you may
+> put all these flags and `bd_partno` into single 'unsigned long', and add
+> helpers to retrieve part no, since there are not many ->bd_partno
+> references.
 
-```dmesg
-[368033.032005] BUG: unable to handle kernel paging request at ffffffffad9ae4b5
-[368033.032007] PGD fc3a0d067 P4D fc3a0d067 PUD fc3a0e063 PMD 8000000fc38000e1
-[368033.032012] Oops: 0003 [#1] SMP PTI
-[368033.032015] CPU: 23 PID: 55090 Comm: bch_dirtcnt[0] Kdump: loaded Tainted: G           OE    --------- -  - 4.18.0-147.5.1.es8_24.x86_64 #1
-[368033.032017] Hardware name: Tsinghua Tongfang THTF Chaoqiang Server/072T6D, BIOS 2.4.3 01/17/2017
-[368033.032027] RIP: 0010:native_queued_spin_lock_slowpath+0x183/0x1d0
-[368033.032029] Code: 8b 02 48 85 c0 74 f6 48 89 c1 eb d0 c1 e9 12 83 e0
-03 83 e9 01 48 c1 e0 05 48 63 c9 48 05 c0 3d 02 00 48 03 04 cd 60 68 93
-ad <48> 89 10 8b 42 08 85 c0 75 09 f3 90 8b 42 08 85 c0 74 f7 48 8b 02
-[368033.032031] RSP: 0018:ffffbb48852abe00 EFLAGS: 00010082
-[368033.032032] RAX: ffffffffad9ae4b5 RBX: 0000000000000246 RCX: 0000000000003bf3
-[368033.032033] RDX: ffff97b0ff8e3dc0 RSI: 0000000000600000 RDI: ffffbb4884743c68
-[368033.032034] RBP: 0000000000000001 R08: 0000000000000000 R09: 000007ffffffffff
-[368033.032035] R10: ffffbb486bb01000 R11: 0000000000000001 R12: ffffffffc068da70
-[368033.032036] R13: 0000000000000003 R14: 0000000000000000 R15: 0000000000000000
-[368033.032038] FS:  0000000000000000(0000) GS:ffff97b0ff8c0000(0000) knlGS:0000000000000000
-[368033.032039] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[368033.032040] CR2: ffffffffad9ae4b5 CR3: 0000000fc3a0a002 CR4: 00000000003626e0
-[368033.032042] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[368033.032043] bcache: bch_cached_dev_attach() Caching rbd479 as bcache462 on set 8cff3c36-4a76-4242-afaa-7630206bc70b
-[368033.032045] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[368033.032046] Call Trace:
-[368033.032054]  _raw_spin_lock_irqsave+0x32/0x40
-[368033.032061]  __wake_up_common_lock+0x63/0xc0
-[368033.032073]  ? bch_ptr_invalid+0x10/0x10 [bcache]
-[368033.033502]  bch_dirty_init_thread+0x14c/0x160 [bcache]
-[368033.033511]  ? read_dirty_submit+0x60/0x60 [bcache]
-[368033.033516]  kthread+0x112/0x130
-[368033.033520]  ? kthread_flush_work_fn+0x10/0x10
-[368033.034505]  ret_from_fork+0x35/0x40
-```
+Yes, it make sense.
 
-The crash occurred when call wake_up(&state->wait), and then we want
-to look at the value in the state. However, bch_sectors_dirty_init()
-is not found in the stack of any task. Since state is allocated on
-the stack, we guess that bch_sectors_dirty_init() has exited, causing
-bch_dirty_init_thread() to be unable to handle kernel paging request.
+By the way, take a look at component of block_device, I think they can
+be reorganized to save some space, in this case, new 8 bytes won't make
+this struct bigger, in fact, total size will be shrinked by 8 types
+after following changes:
 
-In order to verify this idea, we added some printing information during
-wake_up(&state->wait). We find that "wake up" is printed twice, however
-we only expect the last thread to wake up once.
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 95bd26c62655..c94242a9ad92 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -50,7 +50,6 @@ struct block_device {
+         struct disk_stats __percpu *bd_stats;
+         unsigned long           flags;
+         unsigned long           bd_stamp;
+-       u8                      bd_partno;
+         dev_t                   bd_dev;
+         atomic_t                bd_openers;
+         spinlock_t              bd_size_lock; /* for bd_inode->i_size 
+updates */
+@@ -60,13 +59,14 @@ struct block_device {
+         const struct blk_holder_ops *bd_holder_ops;
+         struct mutex            bd_holder_lock;
+         int                     bd_holders;
++       u8                      bd_partno;
+         struct kobject          *bd_holder_dir;
 
-```dmesg
-[  994.641004] alcache: bch_dirty_init_thread() wake up
-[  994.641018] alcache: bch_dirty_init_thread() wake up
-[  994.641523] alcache: bch_sectors_dirty_init() init exit
-```
+-       atomic_t                bd_fsfreeze_count; /* number of freeze 
+requests */
+         struct mutex            bd_fsfreeze_mutex; /* serialize 
+freeze/thaw */
++       atomic_t                bd_fsfreeze_count; /* number of freeze 
+requests */
 
-There is a race. If bch_sectors_dirty_init() exits after the first wake
-up, the second wake up will trigger this bug("unable to handle kernel
-paging request").
+-       struct partition_meta_info *bd_meta_info;
+         int                     bd_writers;
++       struct partition_meta_info *bd_meta_info;
+         /*
+          * keep this out-of-line as it's both big and not needed in the 
+fast
+          * path
 
-Proceed as follows:
 
-bch_sectors_dirty_init
-    kthread_run ==============> bch_dirty_init_thread(bch_dirtcnt[0])
-            ...                         ...
-    atomic_inc(&state.started)          ...
-            ...                         ...
-    atomic_read(&state.enough)          ...
-            ...                 atomic_set(&state->enough, 1)
-    kthread_run ======================================================> bch_dirty_init_thread(bch_dirtcnt[1])
-            ...                 atomic_dec_and_test(&state->started)            ...
-    atomic_inc(&state.started)          ...                                     ...
-            ...                 wake_up(&state->wait)                           ...
-    atomic_read(&state.enough)                                          atomic_dec_and_test(&state->started)
-            ...                                                                 ...
-    wait_event(state.wait, atomic_read(&state.started) == 0)                    ...
-    return                                                                      ...
-                                                                        wake_up(&state->wait)
+Please let me know what you think.
 
-We believe it is very common to wake up twice if there is no dirty, but
-crash is an extremely low probability event. It's hard for us to reproduce
-this issue. We attached and detached continuously for a week, with a total
-of more than one million attaches and only one crash.
+Thanks,
+Kuai
 
-Putting atomic_inc(&state.started) before kthread_run() can avoid waking
-up twice.
-
-Fixes: b144e45fc576 ("bcache: make bch_sectors_dirty_init() to be multithreaded")
-Signed-off-by: Mingzhe Zou <mingzhe.zou@easystack.cn>
-Cc: stable@vger.kernel.org
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/writeback.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index a1d760916246..3accfdaee6b1 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -1025,17 +1025,18 @@ void bch_sectors_dirty_init(struct bcache_device *d)
- 		if (atomic_read(&state.enough))
- 			break;
- 
-+		atomic_inc(&state.started);
- 		state.infos[i].state = &state;
- 		state.infos[i].thread =
- 			kthread_run(bch_dirty_init_thread, &state.infos[i],
- 				    "bch_dirtcnt[%d]", i);
- 		if (IS_ERR(state.infos[i].thread)) {
- 			pr_err("fails to run thread bch_dirty_init[%d]\n", i);
-+			atomic_dec(&state.started);
- 			for (--i; i >= 0; i--)
- 				kthread_stop(state.infos[i].thread);
- 			goto out;
- 		}
--		atomic_inc(&state.started);
- 	}
- 
- out:
--- 
-2.35.3
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
 
