@@ -1,142 +1,287 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jAUMeZUy";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="stuygqFy"
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053D5B5
-	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 23:48:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1700466531; x=1732002531;
-  h=from:to:subject:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version;
-  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-  b=jAUMeZUyVNslh8c2JArMlrBeUHl1MYpVhBRkzbcs/G8PR8mh5xG+2wCe
-   LkDmG59iMnhTtoD4elK/klq019cwKhPVEXl2P5OKbrg4hrait7nq/+fxg
-   jaOxS4EBYVUzFluH+DEOV00jJ5Ig7/FroyqOVSdw1fpTwC6x7aphIzJPn
-   rn25r2tC5RCiJvFfCDTUBkOEVe35AlpNlJzhFQcCQqD9h49NLQfzk0AeN
-   2Rxc6QXWEXlCLHsaPz1ddWhF+CyA/pNDtYQbiw8fPRZo3Ty5qKg2GMREq
-   vrISlQ1BOQ69DNtmod51dyRUaN1rpUIazb/j0dumqjZhopFC4dDTYPYoW
-   g==;
-X-CSE-ConnectionGUID: 1HLWuhILTaOGUBN8DAt/yw==
-X-CSE-MsgGUID: MNY4a5CzQj2arIoBBkUCUw==
-X-IronPort-AV: E=Sophos;i="6.04,213,1695657600"; 
-   d="scan'208";a="2910360"
-Received: from mail-dm6nam12lp2169.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.169])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2023 15:48:50 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cLaVTutToQdtndlHsiknhyhDRQ67M8tFdEvJa5YnHtFsdS1WcWgwpbl/PoeC0dkDV+3ZeHNH74+jIX6u781kqYxClGBNjuspMUMi944PHGNAo6Va7Tw0hqt0+tPDEikWhKScYtFS3bj/aICuglXhP+TnvXKVZ/+NUqKfjvxeQM3Apuc9YuLaZM/kVowhuAoJn2UMMsTAXtx6F1XvYvrpWF+wzOTpAvQPSKOP3fIC+4m9CVx2idPMwRqdwXTBmnDwoqmhBPQADDG0ELb8gu2Nx40bwFa7koCywj83Qy/QwY1BkkbcAA7xY3fR8OKb7Fjf09yyrWlivZM/SerDe/4ABA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=TcpdsNdlSr3oTma1N0mjyUQ4skjbjKczUZxWq4K9SGlFjcPCEZ9tlaECQK4NhP59f50S/S/5tH4ioz0zZEYjw0enyQU8DJlUx4xV95+vCDCQOa0/FCj1ag/qt8oGKmC9BZ0fo4wxc6qheN20bYA6AvBHtoxrhPW86i5qxKFikZ1fuL+JZW99NDIytNvvyFW1fT0X7FVFjj1dpbpaDDM4hKeeG3b0v8tlV8iNe9mSmteoFv3JrkXDem/VSQTR1irmQP0HC77t2e/AY+OYGY1mnxTdjKX7I+v4eNNIts3iWJzDlAJMOvhFCronMNcnnIzcwZhwDi3fDXTlDzXB1A/qfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=stuygqFy+PqiYrqDW8lYgB328yeIoZmQKVTFWet9PqWPzQYVmSmbXmk/bKBs/1Mt62AVVDgokonvFhChzzfOoY6I2zMlEfNLGKy3SGe9BYjKtNF1NGk39wMR4c95uOk+WJzX2ETRyIXj/L2VaQo6P/DvOD8ws3c8VU1Y6bqX2Oc=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by DM6PR04MB6444.namprd04.prod.outlook.com (2603:10b6:5:1e3::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Mon, 20 Nov
- 2023 07:48:48 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ec9e:a2db:eb04:2cf9]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ec9e:a2db:eb04:2cf9%4]) with mapi id 15.20.7002.026; Mon, 20 Nov 2023
- 07:48:48 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: Remove blk_set_runtime_active()
-Thread-Topic: [PATCH] block: Remove blk_set_runtime_active()
-Thread-Index: AQHaG4AT+QX52vuaVkW4z4DLAeJpuLCC1PyA
-Date: Mon, 20 Nov 2023 07:48:48 +0000
-Message-ID: <3dc5d0f7-91d1-44c4-8933-3d7be296a781@wdc.com>
-References: <20231120070611.33951-1-dlemoal@kernel.org>
-In-Reply-To: <20231120070611.33951-1-dlemoal@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|DM6PR04MB6444:EE_
-x-ms-office365-filtering-correlation-id: 47632074-ce34-4c4e-5899-08dbe99d217e
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- kx8npy7VKPC+M0UHGftIQ4MTLGHMEI42rIVgUSER4jqbE/4JE/lf/feLHq7SA8Z0WI193T3dKcHBjgSKEX7LNUpgH+l4glDMIoXPuWueMJe/oYPAbFYty44Ro6xEHJJQbygEyh0U/XoNt0PFyWgntgU4UDj+GYFhSyxQ3+4VicqBilBRf2AoVD9KEZx9tR8FGJwjs8/OKGDrczjgZHXr2XUdMvs0Sx6ouRReApVtBBmaENbLoKUS+4R357vIfd8rGwjXa+DzDD3mRu8TKbvaE3A3mEaJUhzKuYq9s5vH6ekjGsSRTcMWkSbVSXepnxkAvci4ckVNKuAQou2ZTyksW/d+mV5k7pUgfR8viJ/s+2Vy9RqmSvwIdouLx80ugqgqgpReieroswpUdZoc3W3QtXOM1EIq7CjPmywn66ykRsdUbxpdYl5L5Inwl7XKS7Yb7m6PngzKqIVUjFcqVTzCDgfMgCYe491m87MXS/RcBvYDioDd69JXOaLRYtNMVcjnO6O0KhAKm7ZRCa4SE4S4iVMGDmlybxSoecI+OXfet3YyNwSFGRvpDoQ8iumajtt5AOCs/gTVm2mvPF2z8bNznJfVYjnu4WqZhglneuVVIRDhFjLDaLs8ICLVaEseunlh2h7zKLKvZXyBazDmx384BbLGDy1EuTc6s8J+Zb9MxO09wm8A+jVFePRXybzkIEOx
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(346002)(136003)(366004)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(31686004)(26005)(4270600006)(6512007)(38100700002)(76116006)(66556008)(64756008)(66946007)(66476007)(66446008)(8676002)(91956017)(110136005)(316002)(8936002)(6486002)(122000001)(6506007)(82960400001)(2616005)(478600001)(71200400001)(31696002)(5660300002)(19618925003)(558084003)(41300700001)(86362001)(36756003)(2906002)(38070700009)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WHVER1pQTU5IQS8welEyS0pwdXl1RzQrbzFnRlljK2xYMlJzeHRweGFtckxm?=
- =?utf-8?B?L25tMXJVay9MTjM1VTFQZ1BVN2RkTFVZTEdKbVUvNlJsdjZJNGU5SngvRnBD?=
- =?utf-8?B?NStoalNSNSt0LzRaQjA2dC9CTXVoeVZTVTd3WGJDc3d1cWM3ZEU5RHJrczg4?=
- =?utf-8?B?TEV2Qlp0SjY5T0dpZkM4eTU2YjBSS0krM1VuaWxlUllOTlB6SmpDcmd2NkhU?=
- =?utf-8?B?QmVtczdjaW1Rd0NiWWZUT2FJMGVjSGhFSTgvU0o2YzJMMXlFalF0ZHNUdWdp?=
- =?utf-8?B?OWRnU1FHSkVkYll6WEMvT1pudWtadkpRZXFsdWtZRjNlbkZkMVpMaXFnc0Jv?=
- =?utf-8?B?R3l4VHFBSzR4aHo4YzBndmZudkx6KzUrUW5MeUQ5dDVNU1J2aTdMZkNVa2tM?=
- =?utf-8?B?TGgxM0tPOWpST0FhTUlFTjkvZWVDcHd5VWRHclR6ZVY1UWVoeExEUko3bE14?=
- =?utf-8?B?QXNYOWdQV2hrR290N2dSVXpuaDRGeHAxUXZmVFIwZTNkVktNOHRtYmtaM3Rj?=
- =?utf-8?B?NGZYMUxvaXc2Zy9aODJXR3pTTGRFYzA3ZUEwaU5sLy9JbWM5Q0V4UkVIUlYy?=
- =?utf-8?B?YnNCRVlQSlczUW5jUnJ0SmEwWHdlNi9lM2xWYzVrWXRwbjZjbjNPZE9Vd2R4?=
- =?utf-8?B?dlo4anVOMlEvUmxpb1NYWnVqcFRsZ1AyRjlVaEtLS3N5bmZ2cVM2UklLNmtx?=
- =?utf-8?B?QzlJK2xKMTNocGh0dDNYbkFZNXYxVHFiTFJwVGJqeXowYndHc0NqSEY2Wi9w?=
- =?utf-8?B?NUtOa1F3cmJySS9hWHlXRlhrenk0V0xyTjJ3ZUVXSVEwZjBGWHJ5UHU3d1Vz?=
- =?utf-8?B?OVpqdjI4Y3Q0VkhkZElya3hpbFJJWlFpbXpERElXZS9JY1VTdWFUSTBJNkJ1?=
- =?utf-8?B?TTlmRG5Ba3V1NlEyRW9JUXl2N2VoWU9jZG1PS3F0L3hYbDZZSityOTFmTFB0?=
- =?utf-8?B?N2JyeEM0c1ZXckVBTFdOZTBrOHhwNCszcVZ6R0FpdDdPMnErdWY3cEhUcDZ5?=
- =?utf-8?B?VlN5Z1dtY1Zwb3ZLL1UxaWpRR1A4clE4RTUwSkc0UUZIVE91WTV0bjJvT1NI?=
- =?utf-8?B?WXdmNEhUNGVHK0tYSk13c250Wkh1UG9vaFgrTDl6VkRWSjRQQ1hNODkyUUR5?=
- =?utf-8?B?R29jb2ltUkdNWitzS2pKOStBT2hpQTVHcFlZOTUycUZYejdCSlhscVgxV1A1?=
- =?utf-8?B?QXNyL3FVaVFDTlZEK0pKOXBhdlluTnRxSzFkZEhUNnZ0TnAzc20raVdaQUpJ?=
- =?utf-8?B?RXl0OTZJWS9QMEg3cXIyQmhQb0NMT2hvNTRqOTVseUJEZysyenVmRGt2a3NF?=
- =?utf-8?B?OEpKMy9SQXZYZVFLYW5EelBjMWNmc1Zva2c5ZGJKb1g2b0xCYXRnRzBrNjhR?=
- =?utf-8?B?UnpaYVkrYVlMYkR4UjlWOWhaaWtzQVB5RWJpUHVwNUIwNkFYbmlzZ0xQOTRl?=
- =?utf-8?B?YWpYclRZYjNCRWdLUzRWdGxhM2VjNFhkcG1Cbk9yWDJkd0t4Qmg5RWFGYkdu?=
- =?utf-8?B?bUx6Qjg2TTJ1RXhxdEtoNFY3WTFzMEJ6ZmFYNUJkdUNXMkJxU05SQ1hjQnU0?=
- =?utf-8?B?eGN1OGRtajdGMTlwZkhvdDVzQUtCS2Z0MHpocENEWjNnTmZWM2hhQjBRR0RO?=
- =?utf-8?B?UDlwMHBWV2ZzRzRqamNEMWhwSEpjL0JVRVY4SlpIZnhwRXY5QWIvT1VtRDdn?=
- =?utf-8?B?V1NTZzkvdUZUbzdUN1FPRFd4M1ppSnp1N0ZWLzZzYW1KdTBXVzB1cFRkYmND?=
- =?utf-8?B?UmtFdWFHdmx0SzFaTWUvcDNRS3g1R20vVG0wWDRrYUVIUVJua1ZxK0dkUXo4?=
- =?utf-8?B?VkM2ZjFTNVU0cXpETXBRNFlzNnlodkR4dWkwWnl1a2lTdk9SMDRoa09yU1RQ?=
- =?utf-8?B?d3BKMFJFQUZrZjhIdDkxcjNhelUyWnBuNllXS2ZWeXJydFZqNUdqMXg4T0p3?=
- =?utf-8?B?Q2VXaUFWSm1tK2dYVnI3dEFpd2o3VmpiNTI4Q1I0b0ZxVWJLc1dWcW93dWlC?=
- =?utf-8?B?cG0vTXczZW5OTVo2d3ZqNjhZaFY4anY4Q05XZS9LTVFGVUFva0R2MWV1STg1?=
- =?utf-8?B?U2NhQUJjRTdVSFNlSk9FYkx3U2RSb1B5T1NjM0lQNW9TeE1WRlFDL2RCaHpD?=
- =?utf-8?B?d0txSmtEam9aM1o3czA4Wll3UlRhRWFiZVYxNjl0M01UN2toUEdZOERQZnlZ?=
- =?utf-8?B?S1E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F8140167CD62D44A9C5D57428BFFC898@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D245EB4;
+	Mon, 20 Nov 2023 00:01:08 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SYg1V6YqSz4f3kpL;
+	Mon, 20 Nov 2023 16:01:02 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 8CC4F1A01A1;
+	Mon, 20 Nov 2023 16:01:05 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDX2xE_EltlRKK0BQ--.24819S3;
+	Mon, 20 Nov 2023 16:01:05 +0800 (CST)
+Subject: Re: [PATCH 1/2] block: introduce new field flags in block_device
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
+ <20231120093847.2228127-2-yukuai1@huaweicloud.com> <ZVrLvcIhlnQl7xAb@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <c34b325e-d45b-c0e5-f495-7429e24a9d6b@huaweicloud.com>
+Date: Mon, 20 Nov 2023 16:01:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	i+wYlPuOaCPWLPt9dnYQ6U+Hh9FejJyzP4Qt7ELc0GVZZEF4ird6rmR0cR0QmLXjZaA5c8oWnJHfj9jsWCgqHWdJq39U2FXXtvg2APBIx+AWFxlUqut/o7epssqygmn7vf/v3VphGW6qInYGmQyj5vDFzcxgsUFDvDkoZ8S/qTBdNHoP+IkStK+P0j/OS2q/ddyACbp+7QbDIjPlVsGGHlmY+Z82q8n/HgiQuxHCom6oT4Op2tEs2tPzMKIx6jXcrBwLT4LVdQ2nmjnAqEny6BT5tpcn9BwfX+InzgfxDQ3d8RiyudLc1Y4rvIKkTv30YIsa1vCUphSzr8yUoGItE6BLw9YGsL51ZWJdFbSWEzqvkmbKGLeNjr0I73/q9hgOEycCKkubCv+4MaDtqAFD7HJVjF8wQ/xehm7zto5npk9kCt7+/h2F8HJNQ+/M3qP5RUTREmb5l05lv8qF1tsBWiQuajgULEBrLDnOMRSRFYux+U/GJyT1n8xURB7fhdyD8zPmMckm0IfM9hKwJc4FMeWEDNaT4fZabjt94V9THt/rGdU7QFvv32KGaKXhTFptcaOXd5vVh2ky8vvsyhZLlY8DlLD+D37HwanwqIsVpNlstnO4QG8fm1qcOxdbrW1Miep59xuS+MVcFxYiGlcLcEn2IjdcYSUwdS9EpPz2tYnC1//i7/HI0m3huhawneTbcpZLgjV15Tdbf6LlU4bdboOSh6l/FG5tcXDKMYYSP1kMAvvft5bSkUhpSfpkONU8GyYD/cQamLcuKU2cX6BCrQYxcZIGbHwatgbgQcbKVxCGzW4bRWePRvTL3pumYlZZs46yq+t6Bzvb/uNixjGnYA==
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47632074-ce34-4c4e-5899-08dbe99d217e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2023 07:48:48.3849
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: d6l9yzIG3A4NJ0h3e/h/jR+R3ICFuKPjkeZ1fvHEPxmf59JeQYUPsHgX64AjpSB8aMkaJjplzE7/5LOyNxqmAilLaF8pLZf0RzfN5lZyAdQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6444
+In-Reply-To: <ZVrLvcIhlnQl7xAb@fedora>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDX2xE_EltlRKK0BQ--.24819S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3GFyUWF4fXw4UGw17ZF15CFg_yoW3ZFWUpF
+	WkKa4YkayUWr4xWan7K3W3XF40qw40kr1xG3y3C34IyFZ8trn3WF1kGryYya97ArW8CFW7
+	XF1DuFZ8Ary2ga7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
+	DUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
-dW1zaGlybkB3ZGMuY29tPg0K
+Hi,
+
+ÔÚ 2023/11/20 11:00, Ming Lei Ð´µÀ:
+> On Mon, Nov 20, 2023 at 05:38:46PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> There are multiple switches in struct block_device, use seperate bool
+>> fields for them is not gracefully. Add a new field flags and replace
+>> swithes to a bit, there are no functional changes, and preapre to add
+>> a new switch in the next patch.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/bdev.c              | 15 ++++++++-------
+>>   block/blk-core.c          |  7 ++++---
+>>   block/genhd.c             |  8 +++++---
+>>   block/ioctl.c             |  2 +-
+>>   include/linux/blk_types.h | 12 ++++++------
+>>   include/linux/blkdev.h    |  5 +++--
+>>   6 files changed, 27 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/block/bdev.c b/block/bdev.c
+>> index fc8d28d77495..cb849bcf61ae 100644
+>> --- a/block/bdev.c
+>> +++ b/block/bdev.c
+>> @@ -408,10 +408,10 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+>>   	bdev->bd_partno = partno;
+>>   	bdev->bd_inode = inode;
+>>   	bdev->bd_queue = disk->queue;
+>> -	if (partno)
+>> -		bdev->bd_has_submit_bio = disk->part0->bd_has_submit_bio;
+>> +	if (partno && test_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags))
+>> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+>>   	else
+>> -		bdev->bd_has_submit_bio = false;
+>> +		clear_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+>>   	bdev->bd_stats = alloc_percpu(struct disk_stats);
+>>   	if (!bdev->bd_stats) {
+>>   		iput(inode);
+>> @@ -612,7 +612,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+>>   		bdev->bd_holder = NULL;
+>>   		bdev->bd_holder_ops = NULL;
+>>   		mutex_unlock(&bdev->bd_holder_lock);
+>> -		if (bdev->bd_write_holder)
+>> +		if (test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags))
+>>   			unblock = true;
+>>   	}
+>>   	if (!whole->bd_holders)
+>> @@ -625,7 +625,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+>>   	 */
+>>   	if (unblock) {
+>>   		disk_unblock_events(bdev->bd_disk);
+>> -		bdev->bd_write_holder = false;
+>> +		clear_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
+>>   	}
+>>   }
+>>   
+>> @@ -878,9 +878,10 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+>>   		 * writeable reference is too fragile given the way @mode is
+>>   		 * used in blkdev_get/put().
+>>   		 */
+>> -		if ((mode & BLK_OPEN_WRITE) && !bdev->bd_write_holder &&
+>> +		if ((mode & BLK_OPEN_WRITE) &&
+>> +		    !test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags) &&
+>>   		    (disk->event_flags & DISK_EVENT_FLAG_BLOCK_ON_EXCL_WRITE)) {
+>> -			bdev->bd_write_holder = true;
+>> +			set_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
+>>   			unblock_events = false;
+>>   		}
+>>   	}
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index fdf25b8d6e78..577a693165d8 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -482,7 +482,8 @@ __setup("fail_make_request=", setup_fail_make_request);
+>>   
+>>   bool should_fail_request(struct block_device *part, unsigned int bytes)
+>>   {
+>> -	return part->bd_make_it_fail && should_fail(&fail_make_request, bytes);
+>> +	return test_bit(BD_FLAG_MAKE_IT_FAIL, &part->flags) &&
+>> +		should_fail(&fail_make_request, bytes);
+>>   }
+>>   
+>>   static int __init fail_make_request_debugfs(void)
+>> @@ -595,7 +596,7 @@ static void __submit_bio(struct bio *bio)
+>>   	if (unlikely(!blk_crypto_bio_prep(&bio)))
+>>   		return;
+>>   
+>> -	if (!bio->bi_bdev->bd_has_submit_bio) {
+>> +	if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags)) {
+>>   		blk_mq_submit_bio(bio);
+>>   	} else if (likely(bio_queue_enter(bio) == 0)) {
+>>   		struct gendisk *disk = bio->bi_bdev->bd_disk;
+>> @@ -703,7 +704,7 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+>>   	 */
+>>   	if (current->bio_list)
+>>   		bio_list_add(&current->bio_list[0], bio);
+>> -	else if (!bio->bi_bdev->bd_has_submit_bio)
+>> +	else if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags))
+>>   		__submit_bio_noacct_mq(bio);
+>>   	else
+>>   		__submit_bio_noacct(bio);
+>> diff --git a/block/genhd.c b/block/genhd.c
+>> index c9d06f72c587..026f4c6d5b7e 100644
+>> --- a/block/genhd.c
+>> +++ b/block/genhd.c
+>> @@ -413,7 +413,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>>   	elevator_init_mq(disk->queue);
+>>   
+>>   	/* Mark bdev as having a submit_bio, if needed */
+>> -	disk->part0->bd_has_submit_bio = disk->fops->submit_bio != NULL;
+>> +	if (disk->fops->submit_bio)
+>> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags);
+>>   
+>>   	/*
+>>   	 * If the driver provides an explicit major number it also must provide
+>> @@ -1062,7 +1063,8 @@ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
+>>   ssize_t part_fail_show(struct device *dev,
+>>   		       struct device_attribute *attr, char *buf)
+>>   {
+>> -	return sprintf(buf, "%d\n", dev_to_bdev(dev)->bd_make_it_fail);
+>> +	return sprintf(buf, "%d\n",
+>> +		       test_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags));
+>>   }
+>>   
+>>   ssize_t part_fail_store(struct device *dev,
+>> @@ -1072,7 +1074,7 @@ ssize_t part_fail_store(struct device *dev,
+>>   	int i;
+>>   
+>>   	if (count > 0 && sscanf(buf, "%d", &i) > 0)
+>> -		dev_to_bdev(dev)->bd_make_it_fail = i;
+>> +		set_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags);
+>>   
+>>   	return count;
+>>   }
+>> diff --git a/block/ioctl.c b/block/ioctl.c
+>> index 4160f4e6bd5b..a548c718a5fb 100644
+>> --- a/block/ioctl.c
+>> +++ b/block/ioctl.c
+>> @@ -394,7 +394,7 @@ static int blkdev_roset(struct block_device *bdev, unsigned cmd,
+>>   		if (ret)
+>>   			return ret;
+>>   	}
+>> -	bdev->bd_read_only = n;
+>> +	set_bit(BD_FLAG_READ_ONLY, &bdev->flags);
+>>   	return 0;
+>>   }
+>>   
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index 52e264d5a830..95bd26c62655 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -37,17 +37,20 @@ struct bio_crypt_ctx;
+>>   #define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+>>   #define SECTOR_MASK		(PAGE_SECTORS - 1)
+>>   
+>> +#define BD_FLAG_READ_ONLY	0 /* read-only-policy */
+>> +#define BD_FLAG_WRITE_HOLDER	1
+>> +#define BD_FLAG_HAS_SUBMIT_BIO	2
+>> +#define BD_FLAG_MAKE_IT_FAIL	3
+>> +
+>>   struct block_device {
+>>   	sector_t		bd_start_sect;
+>>   	sector_t		bd_nr_sectors;
+>>   	struct gendisk *	bd_disk;
+>>   	struct request_queue *	bd_queue;
+>>   	struct disk_stats __percpu *bd_stats;
+>> +	unsigned long		flags;
+>>   	unsigned long		bd_stamp;
+>> -	bool			bd_read_only;	/* read-only policy */
+>>   	u8			bd_partno;
+>> -	bool			bd_write_holder;
+>> -	bool			bd_has_submit_bio;
+> 
+> The idea looks good, but not necessary to add new 8 bytes, and you may
+> put all these flags and `bd_partno` into single 'unsigned long', and add
+> helpers to retrieve part no, since there are not many ->bd_partno
+> references.
+
+Hi, I'm not quite sure which is the best way to implement this, anyway,
+I come up with following implementation, can you please take a look
+before I send a new version?
+
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 52e264d5a830..4e29774b14fd 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -37,6 +37,12 @@ struct bio_crypt_ctx;
+  #define PAGE_SECTORS           (1 << PAGE_SECTORS_SHIFT)
+  #define SECTOR_MASK            (PAGE_SECTORS - 1)
+
++#define BD_FLAG_READ_ONLY      0 /* read-only-policy */
++#define BD_FLAG_WRITE_HOLDER   1
++#define BD_FLAG_HAS_SUBMIT_BIO 2
++#define BD_FLAG_MAKE_IT_FAIL   3
++#define BD_FLAGS_MAX           16
++
+  struct block_device {
+         sector_t                bd_start_sect;
+         sector_t                bd_nr_sectors;
+@@ -44,10 +50,20 @@ struct block_device {
+         struct request_queue *  bd_queue;
+         struct disk_stats __percpu *bd_stats;
+         unsigned long           bd_stamp;
+-       bool                    bd_read_only;   /* read-only policy */
+-       u8                      bd_partno;
+-       bool                    bd_write_holder;
+-       bool                    bd_has_submit_bio;
++
++       /*
++        * In order to keep both flags and bd_partno in the first cacheline,
++        * first 16 bits are used for flags.
++        */
++       union {
++               unsigned long   flags;
++               struct {
++#ifdef __LITTLE_ENDIAN
++                       u16     __flags;
++#endif
++                       u8      bd_partno;
++               };
++       };
+
+Thanks,
+Kuai
+
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
+
