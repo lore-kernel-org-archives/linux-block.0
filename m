@@ -1,53 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F09085
-	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 09:21:29 -0800 (PST)
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6cb9dd2ab56so990158b3a.3
-        for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 09:21:29 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DNKri3ku"
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 427ED10E
+	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 09:26:47 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id ca18e2360f4ac-7a950f1451fso41583639f.1
+        for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 09:26:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700501206; x=1701106006; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tLplbkX4hamk2/U979duLSHoKAJgGQpD3zAJN5ozOdo=;
+        b=DNKri3ku+dJECWj90+CHp0VJbN/kKVtrNOv4KIhYeFzFgTvl75i4pKTXXxQ3hrEURn
+         URK/Uh42tO9bwuZUdGmVwJEQxJOZK8vALgN7V7q/0RGsAdOYC84xGiKrcHYQppFuV6aw
+         2WPXYYF78wFACwjHUq0iA5zwjZ0RaLNppV6Q5sk1qOvtQyVbpGiqct7gKicRpTXaGp0s
+         prhp2KEisrb74T1LYgii+P25oYtFw+CJ1n8wRCIJZcgPLqD69k9w0GI2Pi4S1hoI6oFp
+         377rFnLhj/nLyuPQ5oX5iu8eItSvq+Vx7QndoYTk0EWQ/l9LE7xOIjrN0DlPlaM4Kcag
+         5T3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700500889; x=1701105689;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pCf9jjTNvwpSJT5BEahXjobWcV7v+Af/RffepxH+UA8=;
-        b=VavE6KlDiiSBpewCFQ/8/uqDqpegY7s8E8JFc5d2Usk/P1wAWRPSxsEGb1duyByGsS
-         I7I97pM9DyDHUOfKRzSWiISykOCZE0OC4dr9cokMjezstTRHDKSGpElOd8hnpXvbXpRV
-         Po45KcJkPrFogJiubugzJ+B6j6Sefo2NQmhcQNwpa1H7ulB2yHk+otAhxuWL4FteQKjp
-         O4UFFKQFQ0AihuS2dFf5T53pTWRSoN42lJbNibhReY5NbHaT370kcUPl708HPW9jqK6b
-         29+QmHdqqKsSRW7iAzIAxiyOkSnuunudsnwktmDehAicI1Yf2f1H+/JYbhtS/2ET5w6M
-         yNig==
-X-Gm-Message-State: AOJu0YxI/Rd1Htr4/+NiDky/a106pVyAkSq9/dwnpmDtIArzHv8Gb/8M
-	cbUwob6bEgY2XhtylLN+eqNwF6QathA=
-X-Google-Smtp-Source: AGHT+IHMcWskXxbSBQ7RsUiIbRXJx8L1ez/0/zdtd2WOl2ChF37WL9UmasA8A2rzBQCXmq8g1samSA==
-X-Received: by 2002:a05:6a00:21c5:b0:6be:265:1bf5 with SMTP id t5-20020a056a0021c500b006be02651bf5mr7002374pfj.24.1700500888575;
-        Mon, 20 Nov 2023 09:21:28 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:1f10:3e70:e99:93ed? ([2620:0:1000:8411:1f10:3e70:e99:93ed])
-        by smtp.gmail.com with ESMTPSA id p17-20020a056a000b5100b006889511ab14sm6354895pfo.37.2023.11.20.09.21.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 09:21:28 -0800 (PST)
-Message-ID: <481a7f31-2e1d-4999-aeaa-1a0825216ed7@acm.org>
-Date: Mon, 20 Nov 2023 09:21:26 -0800
+        d=1e100.net; s=20230601; t=1700501206; x=1701106006;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tLplbkX4hamk2/U979duLSHoKAJgGQpD3zAJN5ozOdo=;
+        b=BBZflg9Da8Yxe5zpl8KbZzY+QHe0vcyomK7GjM+hze/ILuD+XDHaEcDSfxZBkACZPM
+         U6qo7c4NaYby/Fxj6wy5jeMAdt+IiOYmXmrpBe6R2EqvtSh0TIpdr8yYYCTuOXhPciM1
+         Ne3UhHTR3cdIC0vGdwnCUUPcpDF9H/xwvqJfnB3ohhkbLl5bCLQopavzl5/y40V8nfkd
+         V1y+gHa97NQSqG+2u9wC6sbSZNnXNRXI83q1KhaJOgHQbLz8zsfvFMSK88kIgKZXwhRj
+         qU7xQsUgs2JHmxOVN6fysalEpVJak4VPDTxPWTbokx2v4E+9o2A7jk10ZUcAxZxw3sYv
+         vP/A==
+X-Gm-Message-State: AOJu0YwQ4PkVfxyg4We1ZE6ywnrVsaPUTmi15YufnKIKObA/3xmCyqZ/
+	VVizkWXtIm4TWRvpkSEQvjHL05bBoqleh8d/o3EF+w==
+X-Google-Smtp-Source: AGHT+IExOduYUJggrgepkZiLBwHdzp7V7CseQW2nIbXnAER9Wp44OHqHvcwUIaCJvCbUKkC5UOgYtg==
+X-Received: by 2002:a05:6e02:3893:b0:34f:a4f0:4fc4 with SMTP id cn19-20020a056e02389300b0034fa4f04fc4mr8352180ilb.2.1700501206527;
+        Mon, 20 Nov 2023 09:26:46 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id r7-20020a02c847000000b0046455c93317sm143008jao.92.2023.11.20.09.26.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 09:26:46 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20231120070611.33951-1-dlemoal@kernel.org>
+References: <20231120070611.33951-1-dlemoal@kernel.org>
+Subject: Re: [PATCH] block: Remove blk_set_runtime_active()
+Message-Id: <170050120595.99906.13245631313110981729.b4-ty@kernel.dk>
+Date: Mon, 20 Nov 2023 10:26:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Remove blk_set_runtime_active()
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-References: <20231120070611.33951-1-dlemoal@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231120070611.33951-1-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-26615
 
-On 11/19/23 23:06, Damien Le Moal wrote:
+
+On Mon, 20 Nov 2023 16:06:11 +0900, Damien Le Moal wrote:
 > The function blk_set_runtime_active() is called only from
 > blk_post_runtime_resume(), so there is no need for that function to be
 > exported. Open-code this function directly in blk_post_runtime_resume()
 > and remove it.
+> 
+> 
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Applied, thanks!
+
+[1/1] block: Remove blk_set_runtime_active()
+      commit: c96b8175522a2c52e297ee0a49827a668f95e1e8
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
