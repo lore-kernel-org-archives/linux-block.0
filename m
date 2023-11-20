@@ -1,30 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9CC133;
-	Sun, 19 Nov 2023 17:44:49 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SYVgG0z64z4f3lDV;
-	Mon, 20 Nov 2023 09:44:42 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 4D7371A0173;
-	Mon, 20 Nov 2023 09:44:46 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgA3iA4LulplbmCcBQ--.47132S6;
-	Mon, 20 Nov 2023 09:44:46 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH 2/2] block: warn once for each partition in bio_check_ro()
-Date: Mon, 20 Nov 2023 17:38:47 +0800
-Message-Id: <20231120093847.2228127-3-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
-References: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="o0ZAtkhx"
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6E513A
+	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 18:49:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1700448574; x=1731984574;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EJjx07eaa3eOPS2MmLCRFA0098DB9H/f5+N2JcKQMLo=;
+  b=o0ZAtkhxAksmCbbP3I/svrhexkSPBd9hDLdnjOKZHV6cbYMfY58tUMHN
+   VsEoX9Yih07de2ffkS5g4t7QGuYF2qXbC1MczRjju/sphdnlpnKJRYIpt
+   DJBU5qBcE98trU6SHZTBgAjqKf3lqsfX00kuM7moObd1bZYtO59YwRWGQ
+   SV/8cfE+1dP9h7tu8+ZCeFlaAt3b+lgbos/myF+TT6QdtnbZXugxs6KnD
+   j8mYaJriSMtuVAE3ZPtsa/ZbvI/QEI7KU/Hz90FaiB+Uo7Lm+BErAbmnt
+   9aDUgxQlbWmwbF0I1pIkXmcPpDV5DoEF+9uBB0sJXfqL/Bgy1SykKcIkh
+   w==;
+X-CSE-ConnectionGUID: X9m5X8LXQ9aAbzI9kCDvVg==
+X-CSE-MsgGUID: QWEx3uLCTOiVPo6HC5X9CA==
+X-IronPort-AV: E=Sophos;i="6.04,212,1695657600"; 
+   d="scan'208";a="2825571"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2023 10:49:33 +0800
+IronPort-SDR: 07S6t6SkyyiM/aeebjh/gVJJOIJHScAXigAuwxcqyPjaLq4Pu3iCYWTDsLpE65Bv0v9QJToTbB
+ 9T0zCilOqfu5ksKCoA+UtV93bWHDCADvT+V11zQUlmdlTwsN7+XCRNAkUncFZrcPyZtpJ1M0bh
+ 8QuSqwn7jbp8JQ2R+lsFCuxtvDB3b96DFtGGzyf4IUJuaTmow60ZiDHS45pCUGNeaXo3BN1pZq
+ yBQtbKgR1nJc3v66zYlNMOPRDACJUuYFBzYkzYz+Odm12tdcsPwaOTCeT6QNUlyWJ0OdXtLeTT
+ AOw=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Nov 2023 17:55:14 -0800
+IronPort-SDR: wnUDoEhcIpZYbVJ9SHvH8Lg0lW3RA+bgddTHpZO5ooRQ1nVtFbemp0FXh5NkNksHOWIq4egR7/
+ NCUOXD2DTray/rFGM2rQ4DL9r5e3o9f93e0M1HjGJ56aHqBRHkcL0lPegBHpOJf0VBbtN1ccoa
+ fUhOpAOhZVo3yBwBL/vKPvKp4kdUA7o1V+cF6RRXXmdcp2vi45mp9x2OghPtdDmPV+KZFEjB5R
+ FkXrPjI3cqpMJM4JkFaFvpo8IKkzbPUicF4Mm8uD79I/I/GpSu5YGuOyvsKTcQ18BZnwrX7gzF
+ 3AM=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2023 18:49:32 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Cc: Yi Zhang <yi.zhang@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Daniel Wagner <dwagern@suse.de>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 0/1] nvme: require kernel config NVME_HOST_AUTH
+Date: Mon, 20 Nov 2023 11:49:30 +0900
+Message-ID: <20231120024931.3076984-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,77 +55,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgA3iA4LulplbmCcBQ--.47132S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF1kXr15WF4xJF47ZrWDJwb_yoW8Ar1rpF
-	9IgFyrCryjgrW7uan7GF13Aa4rGa1kCry5JrWfZw4FyFy3Kwn2q3Wvgry5Jr48uF4SkrW3
-	Xr1jkrWkCryDWrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-	8IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK
-	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
-	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
-	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4
-	xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v2
-	6r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6I
-	AqYI8I648v4I1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r
-	1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
-	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTR
-	QNVDUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-Spam-Level: **
 
-From: Yu Kuai <yukuai3@huawei.com>
+Yi Zhang reported test cases for nvme authentication feature fail with
+linux-block/for-next kernel [1]. I observed the failures with kernel v6.7-rc1.
+Chris Leech pointed out that the test cases require kernel config option
+NVME_HOST_AUTH. This fix patch modifies the test cases to ensure the
+requirement. I added a Reviewed-by tag by Daneil per record on GitHub [2].
 
-Commit 1b0a151c10a6 ("blk-core: use pr_warn_ratelimited() in
-bio_check_ro()") fix message storm by limit the rate, however, there
-will still be lots of message in the long term. Fix it better by warn
-once for each partition.
+[1] https://lore.kernel.org/linux-block/CAHj4cs8yZ4-BXqTK4W0UsPpmc2ctCD=_mYiwuAuvcmgS3+KJ8g@mail.gmail.com/
+[2] https://github.com/kawasaki/blktests/commit/81110ce8056f16716d09774e6f237ea0393579e1
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-core.c          | 14 +++++++++++---
- include/linux/blk_types.h |  1 +
- 2 files changed, 12 insertions(+), 3 deletions(-)
+Changes from v1:
+* Refer nvme-fabrics sysfs attribute to not rely on kernel version
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 577a693165d8..ccfc80d0302d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -502,9 +502,17 @@ static inline void bio_check_ro(struct bio *bio)
- 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
- 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
- 			return;
--		pr_warn_ratelimited("Trying to write to read-only block-device %pg\n",
--				    bio->bi_bdev);
--		/* Older lvm-tools actually trigger this */
-+
-+		if (test_bit(BD_FLAG_RO_WARNED, &bio->bi_bdev->flags) ||
-+		    test_and_set_bit(BD_FLAG_RO_WARNED, &bio->bi_bdev->flags))
-+			return;
-+
-+		/*
-+		 * Use ioctl to set underlying disk of raid/dm to read-only
-+		 * will trigger this.
-+		 */
-+		pr_warn("Trying to write to read-only block-device %pg\n",
-+			bio->bi_bdev);
- 	}
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 95bd26c62655..99d32c841c0d 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -41,6 +41,7 @@ struct bio_crypt_ctx;
- #define BD_FLAG_WRITE_HOLDER	1
- #define BD_FLAG_HAS_SUBMIT_BIO	2
- #define BD_FLAG_MAKE_IT_FAIL	3
-+#define BD_FLAG_RO_WARNED	4
- 
- struct block_device {
- 	sector_t		bd_start_sect;
+Shin'ichiro Kawasaki (1):
+  nvme/{041,042,043,044,045}: check dhchap_ctrl_secret support by
+    nvme-fabrics
+
+ tests/nvme/041 |  1 +
+ tests/nvme/042 |  1 +
+ tests/nvme/043 |  1 +
+ tests/nvme/044 |  1 +
+ tests/nvme/045 |  1 +
+ tests/nvme/rc  | 16 ++++++++++++++++
+ 6 files changed, 21 insertions(+)
+
 -- 
-2.39.2
+2.41.0
 
