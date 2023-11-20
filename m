@@ -1,115 +1,142 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Vl6AE+Jp"
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 952DAB9
-	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 23:37:05 -0800 (PST)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20231120073703epoutp01ec198b9041c6c4a8ec085bb16b870292~ZRKg6gARx0394603946epoutp01P
-	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 07:37:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20231120073703epoutp01ec198b9041c6c4a8ec085bb16b870292~ZRKg6gARx0394603946epoutp01P
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1700465823;
-	bh=kf6A6gxsjK4BnYZeEdWs1d41PoIm5/kxJrnoBK73RyU=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=Vl6AE+JpcI+RF+D2M3O7GolQhGXfwFcDGaP9UobE8QRU5pZgRkZCyXe6uWFXn8FT7
-	 Iks0LKuKfUIwGaGVdGKtDgDPluDAh54JRMy3OtfK6PzU3kmRHm8nwQRSXBIEj7z1pm
-	 WVBP1Ygtg9BuekmSOeo9H3SDYv63UO9AO7CJSH4c=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20231120073703epcas5p2f64a5e0dd7f3605a0bb265352de0e358~ZRKggHp_m1114011140epcas5p2B;
-	Mon, 20 Nov 2023 07:37:03 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4SYfTn2Y4Tz4x9Q5; Mon, 20 Nov
-	2023 07:37:01 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	26.98.19369.B9C0B556; Mon, 20 Nov 2023 16:36:59 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20231120073659epcas5p169986d215d40a3cbe1620cb3b192629e~ZRKdJcyBF1056810568epcas5p1z;
-	Mon, 20 Nov 2023 07:36:59 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20231120073659epsmtrp2a03ee795da059d1fb74f46e08b1100d4~ZRKdIYR-52627226272epsmtrp25;
-	Mon, 20 Nov 2023 07:36:59 +0000 (GMT)
-X-AuditID: b6c32a50-2ae3ca8000004ba9-36-655b0c9b7315
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	44.54.08817.B9C0B556; Mon, 20 Nov 2023 16:36:59 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20231120073657epsmtip1a4e36c86d071fecbf4818d69dfe19384~ZRKbP3OS93017030170epsmtip1N;
-	Mon, 20 Nov 2023 07:36:57 +0000 (GMT)
-Message-ID: <da181fff-59af-b9fd-dd18-781b5ec13cd7@samsung.com>
-Date: Mon, 20 Nov 2023 13:06:56 +0530
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jAUMeZUy";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="stuygqFy"
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053D5B5
+	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 23:48:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1700466531; x=1732002531;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version;
+  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+  b=jAUMeZUyVNslh8c2JArMlrBeUHl1MYpVhBRkzbcs/G8PR8mh5xG+2wCe
+   LkDmG59iMnhTtoD4elK/klq019cwKhPVEXl2P5OKbrg4hrait7nq/+fxg
+   jaOxS4EBYVUzFluH+DEOV00jJ5Ig7/FroyqOVSdw1fpTwC6x7aphIzJPn
+   rn25r2tC5RCiJvFfCDTUBkOEVe35AlpNlJzhFQcCQqD9h49NLQfzk0AeN
+   2Rxc6QXWEXlCLHsaPz1ddWhF+CyA/pNDtYQbiw8fPRZo3Ty5qKg2GMREq
+   vrISlQ1BOQ69DNtmod51dyRUaN1rpUIazb/j0dumqjZhopFC4dDTYPYoW
+   g==;
+X-CSE-ConnectionGUID: 1HLWuhILTaOGUBN8DAt/yw==
+X-CSE-MsgGUID: MNY4a5CzQj2arIoBBkUCUw==
+X-IronPort-AV: E=Sophos;i="6.04,213,1695657600"; 
+   d="scan'208";a="2910360"
+Received: from mail-dm6nam12lp2169.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.169])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2023 15:48:50 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cLaVTutToQdtndlHsiknhyhDRQ67M8tFdEvJa5YnHtFsdS1WcWgwpbl/PoeC0dkDV+3ZeHNH74+jIX6u781kqYxClGBNjuspMUMi944PHGNAo6Va7Tw0hqt0+tPDEikWhKScYtFS3bj/aICuglXhP+TnvXKVZ/+NUqKfjvxeQM3Apuc9YuLaZM/kVowhuAoJn2UMMsTAXtx6F1XvYvrpWF+wzOTpAvQPSKOP3fIC+4m9CVx2idPMwRqdwXTBmnDwoqmhBPQADDG0ELb8gu2Nx40bwFa7koCywj83Qy/QwY1BkkbcAA7xY3fR8OKb7Fjf09yyrWlivZM/SerDe/4ABA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+ b=TcpdsNdlSr3oTma1N0mjyUQ4skjbjKczUZxWq4K9SGlFjcPCEZ9tlaECQK4NhP59f50S/S/5tH4ioz0zZEYjw0enyQU8DJlUx4xV95+vCDCQOa0/FCj1ag/qt8oGKmC9BZ0fo4wxc6qheN20bYA6AvBHtoxrhPW86i5qxKFikZ1fuL+JZW99NDIytNvvyFW1fT0X7FVFjj1dpbpaDDM4hKeeG3b0v8tlV8iNe9mSmteoFv3JrkXDem/VSQTR1irmQP0HC77t2e/AY+OYGY1mnxTdjKX7I+v4eNNIts3iWJzDlAJMOvhFCronMNcnnIzcwZhwDi3fDXTlDzXB1A/qfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+ b=stuygqFy+PqiYrqDW8lYgB328yeIoZmQKVTFWet9PqWPzQYVmSmbXmk/bKBs/1Mt62AVVDgokonvFhChzzfOoY6I2zMlEfNLGKy3SGe9BYjKtNF1NGk39wMR4c95uOk+WJzX2ETRyIXj/L2VaQo6P/DvOD8ws3c8VU1Y6bqX2Oc=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by DM6PR04MB6444.namprd04.prod.outlook.com (2603:10b6:5:1e3::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Mon, 20 Nov
+ 2023 07:48:48 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ec9e:a2db:eb04:2cf9]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ec9e:a2db:eb04:2cf9%4]) with mapi id 15.20.7002.026; Mon, 20 Nov 2023
+ 07:48:48 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: Remove blk_set_runtime_active()
+Thread-Topic: [PATCH] block: Remove blk_set_runtime_active()
+Thread-Index: AQHaG4AT+QX52vuaVkW4z4DLAeJpuLCC1PyA
+Date: Mon, 20 Nov 2023 07:48:48 +0000
+Message-ID: <3dc5d0f7-91d1-44c4-8933-3d7be296a781@wdc.com>
+References: <20231120070611.33951-1-dlemoal@kernel.org>
+In-Reply-To: <20231120070611.33951-1-dlemoal@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|DM6PR04MB6444:EE_
+x-ms-office365-filtering-correlation-id: 47632074-ce34-4c4e-5899-08dbe99d217e
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ kx8npy7VKPC+M0UHGftIQ4MTLGHMEI42rIVgUSER4jqbE/4JE/lf/feLHq7SA8Z0WI193T3dKcHBjgSKEX7LNUpgH+l4glDMIoXPuWueMJe/oYPAbFYty44Ro6xEHJJQbygEyh0U/XoNt0PFyWgntgU4UDj+GYFhSyxQ3+4VicqBilBRf2AoVD9KEZx9tR8FGJwjs8/OKGDrczjgZHXr2XUdMvs0Sx6ouRReApVtBBmaENbLoKUS+4R357vIfd8rGwjXa+DzDD3mRu8TKbvaE3A3mEaJUhzKuYq9s5vH6ekjGsSRTcMWkSbVSXepnxkAvci4ckVNKuAQou2ZTyksW/d+mV5k7pUgfR8viJ/s+2Vy9RqmSvwIdouLx80ugqgqgpReieroswpUdZoc3W3QtXOM1EIq7CjPmywn66ykRsdUbxpdYl5L5Inwl7XKS7Yb7m6PngzKqIVUjFcqVTzCDgfMgCYe491m87MXS/RcBvYDioDd69JXOaLRYtNMVcjnO6O0KhAKm7ZRCa4SE4S4iVMGDmlybxSoecI+OXfet3YyNwSFGRvpDoQ8iumajtt5AOCs/gTVm2mvPF2z8bNznJfVYjnu4WqZhglneuVVIRDhFjLDaLs8ICLVaEseunlh2h7zKLKvZXyBazDmx384BbLGDy1EuTc6s8J+Zb9MxO09wm8A+jVFePRXybzkIEOx
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(346002)(136003)(366004)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(31686004)(26005)(4270600006)(6512007)(38100700002)(76116006)(66556008)(64756008)(66946007)(66476007)(66446008)(8676002)(91956017)(110136005)(316002)(8936002)(6486002)(122000001)(6506007)(82960400001)(2616005)(478600001)(71200400001)(31696002)(5660300002)(19618925003)(558084003)(41300700001)(86362001)(36756003)(2906002)(38070700009)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WHVER1pQTU5IQS8welEyS0pwdXl1RzQrbzFnRlljK2xYMlJzeHRweGFtckxm?=
+ =?utf-8?B?L25tMXJVay9MTjM1VTFQZ1BVN2RkTFVZTEdKbVUvNlJsdjZJNGU5SngvRnBD?=
+ =?utf-8?B?NStoalNSNSt0LzRaQjA2dC9CTXVoeVZTVTd3WGJDc3d1cWM3ZEU5RHJrczg4?=
+ =?utf-8?B?TEV2Qlp0SjY5T0dpZkM4eTU2YjBSS0krM1VuaWxlUllOTlB6SmpDcmd2NkhU?=
+ =?utf-8?B?QmVtczdjaW1Rd0NiWWZUT2FJMGVjSGhFSTgvU0o2YzJMMXlFalF0ZHNUdWdp?=
+ =?utf-8?B?OWRnU1FHSkVkYll6WEMvT1pudWtadkpRZXFsdWtZRjNlbkZkMVpMaXFnc0Jv?=
+ =?utf-8?B?R3l4VHFBSzR4aHo4YzBndmZudkx6KzUrUW5MeUQ5dDVNU1J2aTdMZkNVa2tM?=
+ =?utf-8?B?TGgxM0tPOWpST0FhTUlFTjkvZWVDcHd5VWRHclR6ZVY1UWVoeExEUko3bE14?=
+ =?utf-8?B?QXNYOWdQV2hrR290N2dSVXpuaDRGeHAxUXZmVFIwZTNkVktNOHRtYmtaM3Rj?=
+ =?utf-8?B?NGZYMUxvaXc2Zy9aODJXR3pTTGRFYzA3ZUEwaU5sLy9JbWM5Q0V4UkVIUlYy?=
+ =?utf-8?B?YnNCRVlQSlczUW5jUnJ0SmEwWHdlNi9lM2xWYzVrWXRwbjZjbjNPZE9Vd2R4?=
+ =?utf-8?B?dlo4anVOMlEvUmxpb1NYWnVqcFRsZ1AyRjlVaEtLS3N5bmZ2cVM2UklLNmtx?=
+ =?utf-8?B?QzlJK2xKMTNocGh0dDNYbkFZNXYxVHFiTFJwVGJqeXowYndHc0NqSEY2Wi9w?=
+ =?utf-8?B?NUtOa1F3cmJySS9hWHlXRlhrenk0V0xyTjJ3ZUVXSVEwZjBGWHJ5UHU3d1Vz?=
+ =?utf-8?B?OVpqdjI4Y3Q0VkhkZElya3hpbFJJWlFpbXpERElXZS9JY1VTdWFUSTBJNkJ1?=
+ =?utf-8?B?TTlmRG5Ba3V1NlEyRW9JUXl2N2VoWU9jZG1PS3F0L3hYbDZZSityOTFmTFB0?=
+ =?utf-8?B?N2JyeEM0c1ZXckVBTFdOZTBrOHhwNCszcVZ6R0FpdDdPMnErdWY3cEhUcDZ5?=
+ =?utf-8?B?VlN5Z1dtY1Zwb3ZLL1UxaWpRR1A4clE4RTUwSkc0UUZIVE91WTV0bjJvT1NI?=
+ =?utf-8?B?WXdmNEhUNGVHK0tYSk13c250Wkh1UG9vaFgrTDl6VkRWSjRQQ1hNODkyUUR5?=
+ =?utf-8?B?R29jb2ltUkdNWitzS2pKOStBT2hpQTVHcFlZOTUycUZYejdCSlhscVgxV1A1?=
+ =?utf-8?B?QXNyL3FVaVFDTlZEK0pKOXBhdlluTnRxSzFkZEhUNnZ0TnAzc20raVdaQUpJ?=
+ =?utf-8?B?RXl0OTZJWS9QMEg3cXIyQmhQb0NMT2hvNTRqOTVseUJEZysyenVmRGt2a3NF?=
+ =?utf-8?B?OEpKMy9SQXZYZVFLYW5EelBjMWNmc1Zva2c5ZGJKb1g2b0xCYXRnRzBrNjhR?=
+ =?utf-8?B?UnpaYVkrYVlMYkR4UjlWOWhaaWtzQVB5RWJpUHVwNUIwNkFYbmlzZ0xQOTRl?=
+ =?utf-8?B?YWpYclRZYjNCRWdLUzRWdGxhM2VjNFhkcG1Cbk9yWDJkd0t4Qmg5RWFGYkdu?=
+ =?utf-8?B?bUx6Qjg2TTJ1RXhxdEtoNFY3WTFzMEJ6ZmFYNUJkdUNXMkJxU05SQ1hjQnU0?=
+ =?utf-8?B?eGN1OGRtajdGMTlwZkhvdDVzQUtCS2Z0MHpocENEWjNnTmZWM2hhQjBRR0RO?=
+ =?utf-8?B?UDlwMHBWV2ZzRzRqamNEMWhwSEpjL0JVRVY4SlpIZnhwRXY5QWIvT1VtRDdn?=
+ =?utf-8?B?V1NTZzkvdUZUbzdUN1FPRFd4M1ppSnp1N0ZWLzZzYW1KdTBXVzB1cFRkYmND?=
+ =?utf-8?B?UmtFdWFHdmx0SzFaTWUvcDNRS3g1R20vVG0wWDRrYUVIUVJua1ZxK0dkUXo4?=
+ =?utf-8?B?VkM2ZjFTNVU0cXpETXBRNFlzNnlodkR4dWkwWnl1a2lTdk9SMDRoa09yU1RQ?=
+ =?utf-8?B?d3BKMFJFQUZrZjhIdDkxcjNhelUyWnBuNllXS2ZWeXJydFZqNUdqMXg4T0p3?=
+ =?utf-8?B?Q2VXaUFWSm1tK2dYVnI3dEFpd2o3VmpiNTI4Q1I0b0ZxVWJLc1dWcW93dWlC?=
+ =?utf-8?B?cG0vTXczZW5OTVo2d3ZqNjhZaFY4anY4Q05XZS9LTVFGVUFva0R2MWV1STg1?=
+ =?utf-8?B?U2NhQUJjRTdVSFNlSk9FYkx3U2RSb1B5T1NjM0lQNW9TeE1WRlFDL2RCaHpD?=
+ =?utf-8?B?d0txSmtEam9aM1o3czA4Wll3UlRhRWFiZVYxNjl0M01UN2toUEdZOERQZnlZ?=
+ =?utf-8?B?S1E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F8140167CD62D44A9C5D57428BFFC898@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH v4 05/15] fs/f2fs: Restore data lifetime support
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Christoph
-	Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>, Jaegeuk Kim
-	<jaegeuk@kernel.org>, Avri Altman <avri.altman@wdc.com>, Chao Yu
-	<chao@kernel.org>, Jonathan Corbet <corbet@lwn.net>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20231114214132.1486867-6-bvanassche@acm.org>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEJsWRmVeSWpSXmKPExsWy7bCmpu5snuhUg9dLLCxe/rzKZrH6bj+b
-	xbQPP5ktTk89y2Tx5EA7o8WqB+EWK1cfBfLWz2K22HtL22LP3pMsFt3Xd7BZLD/+j8mBx+Py
-	FW+Py2dLPTat6mTz2H2zgc1jcd9kVo+PT2+xePRtWcXo8XmTnEf7gW6mAM6obJuM1MSU1CKF
-	1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtzJYW8xNxUWyUXnwBdt8wcoHuVFMoSc0qBQgGJxcVK
-	+nY2RfmlJakKGfnFJbZKqQUpOQUmBXrFibnFpXnpenmpJVaGBgZGpkCFCdkZHc8b2AueMlZM
-	njyTrYFxG2MXIyeHhICJxJmZ91hAbCGBPYwSD3tlIexPjBIfblZ2MXIB2d8YJQ5+WMYG03C+
-	5yUzRGIvo8StT8dZIZy3jBL3LsxiAqniFbCTeHdwH9gKFgFViQ/7XkLFBSVOznwCtk5UIEni
-	19U5QDUcHMICLhK79xuDhJkFxCVuPZkPVi4iECfROusVI8h8ZoFTTBK3JmwDq2cT0JS4MLkU
-	xOQUsJJ4+EMColVeYvvbOWC3SQic4JBYdvcd1NEuEm/fHGKCsIUlXh3fwg5hS0l8frcXqiZZ
-	4tLMc1A1JRKP9xyEsu0lWk/1M4PsYgZau36XPsQuPone30+YQMISArwSHW1CENWKEvcmPWWF
-	sMUlHs5YAmV7SJw42McID7ZTP5axTWBUmIUUKLOQfD8LyTuzEDYvYGRZxSiVWlCcm56abFpg
-	qJuXWg6P7uT83E2M4MSsFbCDcfWGv3qHGJk4GA8xSnAwK4nwfhOKSBXiTUmsrEotyo8vKs1J
-	LT7EaAqMnonMUqLJ+cDckFcSb2hiaWBiZmZmYmlsZqgkzvu6dW6KkEB6YklqdmpqQWoRTB8T
-	B6dUA5Nk5O/j2Ycajs6t/B9yLU00erZB+9fpE18eUpX+u7I7XENg6bmqNNFu3nqDN9IBL38F
-	SfL8LSltPvZQdNXdrI3Fjku75FzabYyO/Xy71+LQzMUM9vwmjsu+/PzdK3Lhonaim5nY+ju/
-	D5VynJr/wf/TMtnfyyL9Ui6xX3iSrnw2+FSuXNKifdMup4r5LzQL+vpG2olZIlahktmRwTL0
-	aFDeatN9uzr21dyzFP6wV2qn+y/zfQ/kjk1KMKt/bRmR6KdltGqVE0MpyxyOZKOJr+UfL61Z
-	GV+/Wuthtobcj5c1PVmTdISsAhSuckwXvtrfN/tz5cXEMIur6+v+t4fPEb9+znfhojOXNmR8
-	CMlimqnEUpyRaKjFXFScCADcKTKXVQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprPIsWRmVeSWpSXmKPExsWy7bCSnO5snuhUg3nPZCxe/rzKZrH6bj+b
-	xbQPP5ktTk89y2Tx5EA7o8WqB+EWK1cfBfLWz2K22HtL22LP3pMsFt3Xd7BZLD/+j8mBx+Py
-	FW+Py2dLPTat6mTz2H2zgc1jcd9kVo+PT2+xePRtWcXo8XmTnEf7gW6mAM4oLpuU1JzMstQi
-	fbsEroyO5w3sBU8ZKyZPnsnWwLiNsYuRk0NCwETifM9L5i5GLg4hgd2MErefvWeHSIhLNF/7
-	AWULS6z895wdoug1o8SyDy/ZQBK8AnYS7w7uA5vEIqAq8WHfSyaIuKDEyZlPWEBsUYEkiT33
-	G4HiHBzCAi4Su/cbg4SZgebfejIfrFxEIE7i8P4bYPOZBU4xScy6NZUVYtleRonlxx6zgzSz
-	CWhKXJhcCmJyClhJPPwhATHHTKJraxcjhC0vsf3tHOYJjEKzkFwxC8m6WUhaZiFpWcDIsopR
-	MrWgODc9t9iwwCgvtVyvODG3uDQvXS85P3cTIzgOtbR2MO5Z9UHvECMTB+MhRgkOZiUR3m9C
-	EalCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeb+97k0REkhPLEnNTk0tSC2CyTJxcEo1MK1v6vM/
-	7+TocO7D6uRs/74PjKdW/9kcx39k9ocn/V3bjO4b5sm29WkGqdtkPXGIYf74c/2Jh/WvGKSD
-	mNhV2m8VvC3e4bf0tGzolef327ONn01nuyDz5tlRZa9Ek++3G7xd3EsfZ2QnS5x9ZLzJz61A
-	UkJLRvWemyBnge2aD0d+ZPks/+PxT+y6dUtwUMjdy48UNDrZtmju/jpNUG1WTN3+7QtcvuWs
-	eXvDXvrGrEc7PS+GP5pUHHFi39raBb6RnzZz8Sv+Vmp5abQ7f8HJfT5TxC6fv73l3B6HRF67
-	2g8C+qsMngd1PY56rKQs+nhXftIM9k1Hb1nFO4bXrk3jvna22Oxb31+eK6JFByM3+imxFGck
-	GmoxFxUnAgDYMigaMgMAAA==
-X-CMS-MailID: 20231120073659epcas5p169986d215d40a3cbe1620cb3b192629e
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231114214215epcas5p43476e8ccba9bfccc87dac59bcb5a5e62
-References: <20231114214132.1486867-1-bvanassche@acm.org>
-	<CGME20231114214215epcas5p43476e8ccba9bfccc87dac59bcb5a5e62@epcas5p4.samsung.com>
-	<20231114214132.1486867-6-bvanassche@acm.org>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	i+wYlPuOaCPWLPt9dnYQ6U+Hh9FejJyzP4Qt7ELc0GVZZEF4ird6rmR0cR0QmLXjZaA5c8oWnJHfj9jsWCgqHWdJq39U2FXXtvg2APBIx+AWFxlUqut/o7epssqygmn7vf/v3VphGW6qInYGmQyj5vDFzcxgsUFDvDkoZ8S/qTBdNHoP+IkStK+P0j/OS2q/ddyACbp+7QbDIjPlVsGGHlmY+Z82q8n/HgiQuxHCom6oT4Op2tEs2tPzMKIx6jXcrBwLT4LVdQ2nmjnAqEny6BT5tpcn9BwfX+InzgfxDQ3d8RiyudLc1Y4rvIKkTv30YIsa1vCUphSzr8yUoGItE6BLw9YGsL51ZWJdFbSWEzqvkmbKGLeNjr0I73/q9hgOEycCKkubCv+4MaDtqAFD7HJVjF8wQ/xehm7zto5npk9kCt7+/h2F8HJNQ+/M3qP5RUTREmb5l05lv8qF1tsBWiQuajgULEBrLDnOMRSRFYux+U/GJyT1n8xURB7fhdyD8zPmMckm0IfM9hKwJc4FMeWEDNaT4fZabjt94V9THt/rGdU7QFvv32KGaKXhTFptcaOXd5vVh2ky8vvsyhZLlY8DlLD+D37HwanwqIsVpNlstnO4QG8fm1qcOxdbrW1Miep59xuS+MVcFxYiGlcLcEn2IjdcYSUwdS9EpPz2tYnC1//i7/HI0m3huhawneTbcpZLgjV15Tdbf6LlU4bdboOSh6l/FG5tcXDKMYYSP1kMAvvft5bSkUhpSfpkONU8GyYD/cQamLcuKU2cX6BCrQYxcZIGbHwatgbgQcbKVxCGzW4bRWePRvTL3pumYlZZs46yq+t6Bzvb/uNixjGnYA==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47632074-ce34-4c4e-5899-08dbe99d217e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2023 07:48:48.3849
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: d6l9yzIG3A4NJ0h3e/h/jR+R3ICFuKPjkeZ1fvHEPxmf59JeQYUPsHgX64AjpSB8aMkaJjplzE7/5LOyNxqmAilLaF8pLZf0RzfN5lZyAdQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6444
 
-On 11/15/2023 3:11 AM, Bart Van Assche wrote:
-> +2) whint_mode=user-based. F2FS tries to pass down hints given by
-> +users.
-
-It does not pass down fcntl/inode based hints.
-So I wonder how users give the hints in this case?
+TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
+dW1zaGlybkB3ZGMuY29tPg0K
