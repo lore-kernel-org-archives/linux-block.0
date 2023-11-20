@@ -1,228 +1,142 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpN11CnU"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F0B129
-	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 19:00:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700449228;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pvG4sWih"
+X-Greylist: delayed 326 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 19 Nov 2023 19:31:32 PST
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [IPv6:2001:41d0:203:375::af])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89C3DD4F
+	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 19:31:32 -0800 (PST)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700450765;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JD5G7gpzYJCSZQRnbZtXTnc+nrjfnoT5XsqNqXuFgsc=;
-	b=hpN11CnUO/jnwmNonAluTwwZ4hiubq/W7CHND+DyqkXCoyFE7AJGHswLOBRCZ8DZyLGLUb
-	Bb1e56dRy0AKUQ1KzMb5VLrQwKoE4m5l72xms0D44GLRtBqhsviDZxOz0VH3i13Z4OSeZV
-	fuc3xD1qIYv9DdNqGFsofhW6V8xcm4Q=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-357-Axu3AlJiNWeDTk41m91PaQ-1; Sun, 19 Nov 2023 22:00:24 -0500
-X-MC-Unique: Axu3AlJiNWeDTk41m91PaQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB23380F82E;
-	Mon, 20 Nov 2023 03:00:23 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.8])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 74AC540C6EB9;
-	Mon, 20 Nov 2023 03:00:18 +0000 (UTC)
-Date: Mon, 20 Nov 2023 11:00:13 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH 1/2] block: introduce new field flags in block_device
-Message-ID: <ZVrLvcIhlnQl7xAb@fedora>
-References: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
- <20231120093847.2228127-2-yukuai1@huaweicloud.com>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+VymdBzRpvTEsF3r3W4saDJpuCxv1e2XIK11MThN86Y=;
+	b=pvG4sWihLLOWQMeNrUGbVMCed1GK0wWLXgmev8oACdRLvYJ9DrEtcOasNYh/uvpz30av7j
+	SiJkIS6g1AogyFxYNF7I/CeOikgUGuenfDgWlW3eAkihvSm7YZzVkmULdjNBHHGv51t20q
+	5HtQQxdyGLQggrjxxvz+42ayVBPy3fA=
+From: chengming.zhou@linux.dev
+To: axboe@kernel.dk,
+	bvanassche@acm.org
+Cc: kch@nvidia.com,
+	damien.lemoal@opensource.wdc.com,
+	ming.lei@redhat.com,
+	zhouchengming@bytedance.com,
+	justinstitt@google.com,
+	shinichiro.kawasaki@wdc.com,
+	akinobu.mita@gmail.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chengming.zhou@linux.dev,
+	syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
+Subject: [PATCH] block/null_blk: Fix double blk_mq_start_request() warning
+Date: Mon, 20 Nov 2023 03:25:21 +0000
+Message-Id: <20231120032521.1012037-1-chengming.zhou@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120093847.2228127-2-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Nov 20, 2023 at 05:38:46PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> There are multiple switches in struct block_device, use seperate bool
-> fields for them is not gracefully. Add a new field flags and replace
-> swithes to a bit, there are no functional changes, and preapre to add
-> a new switch in the next patch.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/bdev.c              | 15 ++++++++-------
->  block/blk-core.c          |  7 ++++---
->  block/genhd.c             |  8 +++++---
->  block/ioctl.c             |  2 +-
->  include/linux/blk_types.h | 12 ++++++------
->  include/linux/blkdev.h    |  5 +++--
->  6 files changed, 27 insertions(+), 22 deletions(-)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index fc8d28d77495..cb849bcf61ae 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -408,10 +408,10 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
->  	bdev->bd_partno = partno;
->  	bdev->bd_inode = inode;
->  	bdev->bd_queue = disk->queue;
-> -	if (partno)
-> -		bdev->bd_has_submit_bio = disk->part0->bd_has_submit_bio;
-> +	if (partno && test_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags))
-> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
->  	else
-> -		bdev->bd_has_submit_bio = false;
-> +		clear_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
->  	bdev->bd_stats = alloc_percpu(struct disk_stats);
->  	if (!bdev->bd_stats) {
->  		iput(inode);
-> @@ -612,7 +612,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
->  		bdev->bd_holder = NULL;
->  		bdev->bd_holder_ops = NULL;
->  		mutex_unlock(&bdev->bd_holder_lock);
-> -		if (bdev->bd_write_holder)
-> +		if (test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags))
->  			unblock = true;
->  	}
->  	if (!whole->bd_holders)
-> @@ -625,7 +625,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
->  	 */
->  	if (unblock) {
->  		disk_unblock_events(bdev->bd_disk);
-> -		bdev->bd_write_holder = false;
-> +		clear_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
->  	}
->  }
->  
-> @@ -878,9 +878,10 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
->  		 * writeable reference is too fragile given the way @mode is
->  		 * used in blkdev_get/put().
->  		 */
-> -		if ((mode & BLK_OPEN_WRITE) && !bdev->bd_write_holder &&
-> +		if ((mode & BLK_OPEN_WRITE) &&
-> +		    !test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags) &&
->  		    (disk->event_flags & DISK_EVENT_FLAG_BLOCK_ON_EXCL_WRITE)) {
-> -			bdev->bd_write_holder = true;
-> +			set_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
->  			unblock_events = false;
->  		}
->  	}
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index fdf25b8d6e78..577a693165d8 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -482,7 +482,8 @@ __setup("fail_make_request=", setup_fail_make_request);
->  
->  bool should_fail_request(struct block_device *part, unsigned int bytes)
->  {
-> -	return part->bd_make_it_fail && should_fail(&fail_make_request, bytes);
-> +	return test_bit(BD_FLAG_MAKE_IT_FAIL, &part->flags) &&
-> +		should_fail(&fail_make_request, bytes);
->  }
->  
->  static int __init fail_make_request_debugfs(void)
-> @@ -595,7 +596,7 @@ static void __submit_bio(struct bio *bio)
->  	if (unlikely(!blk_crypto_bio_prep(&bio)))
->  		return;
->  
-> -	if (!bio->bi_bdev->bd_has_submit_bio) {
-> +	if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags)) {
->  		blk_mq_submit_bio(bio);
->  	} else if (likely(bio_queue_enter(bio) == 0)) {
->  		struct gendisk *disk = bio->bi_bdev->bd_disk;
-> @@ -703,7 +704,7 @@ void submit_bio_noacct_nocheck(struct bio *bio)
->  	 */
->  	if (current->bio_list)
->  		bio_list_add(&current->bio_list[0], bio);
-> -	else if (!bio->bi_bdev->bd_has_submit_bio)
-> +	else if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags))
->  		__submit_bio_noacct_mq(bio);
->  	else
->  		__submit_bio_noacct(bio);
-> diff --git a/block/genhd.c b/block/genhd.c
-> index c9d06f72c587..026f4c6d5b7e 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -413,7 +413,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
->  	elevator_init_mq(disk->queue);
->  
->  	/* Mark bdev as having a submit_bio, if needed */
-> -	disk->part0->bd_has_submit_bio = disk->fops->submit_bio != NULL;
-> +	if (disk->fops->submit_bio)
-> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags);
->  
->  	/*
->  	 * If the driver provides an explicit major number it also must provide
-> @@ -1062,7 +1063,8 @@ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
->  ssize_t part_fail_show(struct device *dev,
->  		       struct device_attribute *attr, char *buf)
->  {
-> -	return sprintf(buf, "%d\n", dev_to_bdev(dev)->bd_make_it_fail);
-> +	return sprintf(buf, "%d\n",
-> +		       test_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags));
->  }
->  
->  ssize_t part_fail_store(struct device *dev,
-> @@ -1072,7 +1074,7 @@ ssize_t part_fail_store(struct device *dev,
->  	int i;
->  
->  	if (count > 0 && sscanf(buf, "%d", &i) > 0)
-> -		dev_to_bdev(dev)->bd_make_it_fail = i;
-> +		set_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags);
->  
->  	return count;
->  }
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 4160f4e6bd5b..a548c718a5fb 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -394,7 +394,7 @@ static int blkdev_roset(struct block_device *bdev, unsigned cmd,
->  		if (ret)
->  			return ret;
->  	}
-> -	bdev->bd_read_only = n;
-> +	set_bit(BD_FLAG_READ_ONLY, &bdev->flags);
->  	return 0;
->  }
->  
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 52e264d5a830..95bd26c62655 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -37,17 +37,20 @@ struct bio_crypt_ctx;
->  #define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
->  #define SECTOR_MASK		(PAGE_SECTORS - 1)
->  
-> +#define BD_FLAG_READ_ONLY	0 /* read-only-policy */
-> +#define BD_FLAG_WRITE_HOLDER	1
-> +#define BD_FLAG_HAS_SUBMIT_BIO	2
-> +#define BD_FLAG_MAKE_IT_FAIL	3
-> +
->  struct block_device {
->  	sector_t		bd_start_sect;
->  	sector_t		bd_nr_sectors;
->  	struct gendisk *	bd_disk;
->  	struct request_queue *	bd_queue;
->  	struct disk_stats __percpu *bd_stats;
-> +	unsigned long		flags;
->  	unsigned long		bd_stamp;
-> -	bool			bd_read_only;	/* read-only policy */
->  	u8			bd_partno;
-> -	bool			bd_write_holder;
-> -	bool			bd_has_submit_bio;
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-The idea looks good, but not necessary to add new 8 bytes, and you may
-put all these flags and `bd_partno` into single 'unsigned long', and add
-helpers to retrieve part no, since there are not many ->bd_partno
-references.
+When CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION is enabled, null_queue_rq()
+would return BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE for the request,
+which has been marked as MQ_RQ_IN_FLIGHT by blk_mq_start_request().
 
-Thanks,
-Ming
+Then null_queue_rqs() put these requests in the rqlist, return back to
+the block layer core, which would try to queue them individually again,
+so the warning in blk_mq_start_request() triggered.
+
+Fix it by splitting the null_queue_rq() into two parts: the first is the
+preparation of request, the second is the handling of request. We put
+the blk_mq_start_request() after the preparation part, which may fail
+and return back to the block layer core.
+
+The throttling also belongs to the preparation part, so move it before
+blk_mq_start_request(). And change the return type of null_handle_cmd()
+to void, since it always return BLK_STS_OK now.
+
+Reported-by: syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/0000000000000e6aac06098aee0c@google.com/
+Fixes: d78bfa1346ab ("block/null_blk: add queue_rqs() support")
+Suggested-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ drivers/block/null_blk/main.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 22a3cf7f32e2..3021d58ca51c 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1464,19 +1464,13 @@ blk_status_t null_process_cmd(struct nullb_cmd *cmd, enum req_op op,
+ 	return BLK_STS_OK;
+ }
+ 
+-static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
+-				    sector_t nr_sectors, enum req_op op)
++static void null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
++			    sector_t nr_sectors, enum req_op op)
+ {
+ 	struct nullb_device *dev = cmd->nq->dev;
+ 	struct nullb *nullb = dev->nullb;
+ 	blk_status_t sts;
+ 
+-	if (test_bit(NULLB_DEV_FL_THROTTLED, &dev->flags)) {
+-		sts = null_handle_throttled(cmd);
+-		if (sts != BLK_STS_OK)
+-			return sts;
+-	}
+-
+ 	if (op == REQ_OP_FLUSH) {
+ 		cmd->error = errno_to_blk_status(null_handle_flush(nullb));
+ 		goto out;
+@@ -1493,7 +1487,6 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
+ 
+ out:
+ 	nullb_complete_cmd(cmd);
+-	return BLK_STS_OK;
+ }
+ 
+ static enum hrtimer_restart nullb_bwtimer_fn(struct hrtimer *timer)
+@@ -1724,8 +1717,6 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	cmd->fake_timeout = should_timeout_request(rq) ||
+ 		blk_should_fake_timeout(rq->q);
+ 
+-	blk_mq_start_request(rq);
+-
+ 	if (should_requeue_request(rq)) {
+ 		/*
+ 		 * Alternate between hitting the core BUSY path, and the
+@@ -1738,6 +1729,15 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		return BLK_STS_OK;
+ 	}
+ 
++	if (test_bit(NULLB_DEV_FL_THROTTLED, &nq->dev->flags)) {
++		blk_status_t sts = null_handle_throttled(cmd);
++
++		if (sts != BLK_STS_OK)
++			return sts;
++	}
++
++	blk_mq_start_request(rq);
++
+ 	if (is_poll) {
+ 		spin_lock(&nq->poll_lock);
+ 		list_add_tail(&rq->queuelist, &nq->poll_list);
+@@ -1747,7 +1747,8 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (cmd->fake_timeout)
+ 		return BLK_STS_OK;
+ 
+-	return null_handle_cmd(cmd, sector, nr_sectors, req_op(rq));
++	null_handle_cmd(cmd, sector, nr_sectors, req_op(rq));
++	return BLK_STS_OK;
+ }
+ 
+ static void null_queue_rqs(struct request **rqlist)
+-- 
+2.40.1
 
