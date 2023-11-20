@@ -1,98 +1,135 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF7E3A8D2
+	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 23:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Mh+x1TjC"
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F19D2
-	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 14:41:59 -0800 (PST)
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 3AKMSZpm013394
-	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 14:41:58 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=2MEE7cRzsGfeMnNn2eY3zHEqVKk2sJ/zEGUF3QOFPSY=;
- b=Mh+x1TjC4FIzMOsljvj5+lsZG7R5Oek5Hvraj8UoFwSakqsXDb0iy1BGI8oenTp3cZ6t
- F3zTqIFm/IgFz6ArVt777R7CwIIqqow8PwozK+/XCZTiVh6U6MqlyHs/kY0wrriKyrs8
- b5EvbL5rC3/XPV9GgQrzbT2LxP2EOeviPU+4CO9mTFCMyDhUxpZxFNsgk0VdbbE3ulH3
- wlEAeJ7LD/QifQWO/Jzuk2Icc5SFR+LZ+NtFTBUMaa9My5BMSQYorcXP8AZyNxyxL1nu
- T2UhDOeY77MOCp4NYFhfOIESGOx4ZpQ2i0nckJiJ1FKeDNaqYY1lD/FKn0g0LniC/Nwd fg== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by m0001303.ppops.net (PPS) with ESMTPS id 3ugbt1ac0d-11
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 14:41:58 -0800
-Received: from twshared32169.15.frc2.facebook.com (2620:10d:c085:108::8) by
- mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 20 Nov 2023 14:41:12 -0800
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-	id 0653321F1B1B4; Mon, 20 Nov 2023 14:40:59 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <io-uring@vger.kernel.org>
-CC: <axboe@kernel.dk>, <hch@lst.de>, <joshi.k@samsung.com>,
-        <martin.petersen@oracle.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 5/5] io_uring: remove uring_cmd cookie
-Date: Mon, 20 Nov 2023 14:40:58 -0800
-Message-ID: <20231120224058.2750705-6-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231120224058.2750705-1-kbusch@meta.com>
-References: <20231120224058.2750705-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kko+Iv5h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC345C433C9;
+	Mon, 20 Nov 2023 23:02:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700521354;
+	bh=FrDMoJdlxK52/94+zVyE2hI7unP1VqBVCXrEm9LXIWs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kko+Iv5hW5ipjxGCXB91bSuqb3p77WbMww/J7ibq0UuFBP95NgW+VvnocPiimNirN
+	 axtOMLVVh+MD55m7bEoFvQPj7IYO/bY50weo3FCs7U7fTo8k8Ua01iPwvdDP6FNItH
+	 mHZCJRo7+cGjkDXBqNT0KSzn2etb9VgeMORrBQBXQRatxLr+BtP07s3MbA5epiugjS
+	 d43VbL0YKQYVr1XKG27y/p2UIWs3mTEF/aXzakPSdKHcCZ3qx5IWdLchBmwJYzB090
+	 fF+ONRayaii1rzbsDf8cyW02Sk6h9E/Ax7ytS9rm4OjYVPl1EMJv/YYjlCNbIss3pP
+	 a5OCARCHEpFig==
+Message-ID: <c789e381-f0c4-4c61-bbc7-069a834841c9@kernel.org>
+Date: Tue, 21 Nov 2023 08:02:32 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: lAlkWt81_dlmKCEY_KY5atnRBM_k0s3J
-X-Proofpoint-ORIG-GUID: lAlkWt81_dlmKCEY_KY5atnRBM_k0s3J
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-20_22,2023-11-20_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 01/19] block: Introduce more member variables related
+ to zone write locking
+Content-Language: en-US
+To: Bart Van Assche <bvanassche@acm.org>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20231114211804.1449162-1-bvanassche@acm.org>
+ <20231114211804.1449162-2-bvanassche@acm.org>
+ <3d8d04d5-80d8-4eee-9899-d9fe197dd203@kernel.org>
+ <0d60bde5-018d-4850-8870-092b472463a6@acm.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <0d60bde5-018d-4850-8870-092b472463a6@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+On 11/21/23 05:44, Bart Van Assche wrote:
+> On 11/19/23 15:29, Damien Le Moal wrote:
+>> On 11/15/23 06:16, Bart Van Assche wrote:
+>>> @@ -82,6 +84,8 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>>>   	lim->max_dev_sectors = UINT_MAX;
+>>>   	lim->max_write_zeroes_sectors = UINT_MAX;
+>>>   	lim->max_zone_append_sectors = UINT_MAX;
+>>> +	/* Request-based stacking drivers do not reorder requests. */
+>>
+>> Rereading this patch, I do not think this statement is correct. I seriously
+>> doubt that multipath will preserve write command order in all cases...
+>>
+>>> +	lim->driver_preserves_write_order = true;
+>>
+>> ... so it is likely much safer to set the default to "false" as that is the
+>> default for all requests in general.
+> 
+> How about applying this (untested) patch on top of this patch series?
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 4c776c08f190..aba1972e9767 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -84,8 +84,6 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>   	lim->max_dev_sectors = UINT_MAX;
+>   	lim->max_write_zeroes_sectors = UINT_MAX;
+>   	lim->max_zone_append_sectors = UINT_MAX;
+> -	/* Request-based stacking drivers do not reorder requests. */
+> -	lim->driver_preserves_write_order = true;
+>   }
+>   EXPORT_SYMBOL(blk_set_stacking_limits);
+> 
+> diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+> index 2d3e186ca87e..cb9abe4bd065 100644
+> --- a/drivers/md/dm-linear.c
+> +++ b/drivers/md/dm-linear.c
+> @@ -147,6 +147,11 @@ static int linear_report_zones(struct dm_target *ti,
+>   #define linear_report_zones NULL
+>   #endif
+> 
+> +static void linear_io_hints(struct dm_target *ti, struct queue_limits *limits)
+> +{
+> +	limits->driver_preserves_write_order = true;
+> +}
 
-No more users of this field.
+Hmm, but does dm-linear preserve write order ? I am not convinced. And what
+about dm-flakey, dm-error and dm-crypt ? All of these also support zoned
+devices. I do not think that we can say that any of these preserve write order.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- include/linux/io_uring.h | 8 ++------
- io_uring/uring_cmd.c     | 1 -
- 2 files changed, 2 insertions(+), 7 deletions(-)
+> +
+>   static int linear_iterate_devices(struct dm_target *ti,
+>   				  iterate_devices_callout_fn fn, void *data)
+>   {
+> @@ -208,6 +213,7 @@ static struct target_type linear_target = {
+>   	.map    = linear_map,
+>   	.status = linear_status,
+>   	.prepare_ioctl = linear_prepare_ioctl,
+> +	.io_hints = linear_io_hints,
+>   	.iterate_devices = linear_iterate_devices,
+>   	.direct_access = linear_dax_direct_access,
+>   	.dax_zero_page_range = linear_dax_zero_page_range,
+> 
+>>> @@ -685,6 +689,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>>>   						   b->max_secure_erase_sectors);
+>>>   	t->zone_write_granularity = max(t->zone_write_granularity,
+>>>   					b->zone_write_granularity);
+>>> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
+>>> +		b->driver_preserves_write_order;
+>>> +	t->use_zone_write_lock = t->use_zone_write_lock ||
+>>> +		b->use_zone_write_lock;
+>>
+>> Very minor nit: splitting the line after the equal would make this more readable.
+> 
+> Hmm ... I have often seen other reviewers asking to maximize the use of each
+> source code line as much as reasonably possible.
 
-diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-index fe23bf88f86fa..9e6ce6d4ab51f 100644
---- a/include/linux/io_uring.h
-+++ b/include/linux/io_uring.h
-@@ -32,12 +32,8 @@ enum io_uring_cmd_flags {
- struct io_uring_cmd {
- 	struct file	*file;
- 	const struct io_uring_sqe *sqe;
--	union {
--		/* callback to defer completions to task context */
--		void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
--		/* used for polled completion */
--		void *cookie;
--	};
-+	/* callback to defer completions to task context */
-+	void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
- 	u32		cmd_op;
- 	u32		flags;
- 	u8		pdu[32]; /* available inline for free use */
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index acbc2924ecd21..b39ec25c36bc3 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -182,7 +182,6 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int i=
-ssue_flags)
- 			return -EOPNOTSUPP;
- 		issue_flags |=3D IO_URING_F_IOPOLL;
- 		req->iopoll_completed =3D 0;
--		WRITE_ONCE(ioucmd->cookie, NULL);
- 	}
-=20
- 	ret =3D file->f_op->uring_cmd(ioucmd, issue_flags);
---=20
-2.34.1
+As I said, very minor nit :) Feel free to ignore.
+
+> 
+> Thanks,
+> 
+> Bart.
+> 
+
+-- 
+Damien Le Moal
+Western Digital Research
 
