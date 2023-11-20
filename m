@@ -1,142 +1,177 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YIs030SK"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 484D49F
-	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 00:36:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700469389;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=CBLqoMyIVireLlLreZE4y9YWUgoFtH3j+ZLwtIAR6bY=;
-	b=YIs030SK3QC8Hn6B+ok90I0iRJ4bIqvGJSrLITEzxGC8zFacbY+l4nif3v1iPOSBVY6ona
-	0MyJc5rwcgWKyCdSl8uZ310b1a8jvO5I9LQl2QkCgzz7hoBh25WGIgoBN6gPH94LQdz2oD
-	lv3V0GIAdltHdmp8ceE+glMBJYAtqIU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-461-W8IigMUsOXuqc3NP8N005A-1; Mon,
- 20 Nov 2023 03:36:23 -0500
-X-MC-Unique: W8IigMUsOXuqc3NP8N005A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="R27o59xo";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BIm2QExY"
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E48AED;
+	Mon, 20 Nov 2023 02:45:17 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 90AA53C0E657;
-	Mon, 20 Nov 2023 08:36:22 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8BDEA40C6EB9;
-	Mon, 20 Nov 2023 08:36:21 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Keith Busch <kbusch@kernel.org>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Guangwu Zhang <guazhang@redhat.com>,
-	Chengming Zhou <zhouchengming@bytedance.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH V4 resend] lib/group_cpus.c: avoid to acquire cpu hotplug lock in group_cpus_evenly
-Date: Mon, 20 Nov 2023 16:35:59 +0800
-Message-ID: <20231120083559.285174-1-ming.lei@redhat.com>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D60A2218E3;
+	Mon, 20 Nov 2023 10:45:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1700477115; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=TZOjEP6t4zXFrEXqFznh4zfDrR0FVYyRbvUTAVYWx30=;
+	b=R27o59xoRrhH1rqWE86NsSfjvliVY66Nd0nlzxhHaygJJhgGBI8BuDQAYtDLAkZ2YcS7U0
+	OkSmbdb7Djbwfpxf/eh0tKClyRAHd6iPJ2wwYcqb3Sie+bLh7sIIe5HBa+1bkdGaOLV9ri
+	5SU54kwhxY+XmvANmsrG6b926FUfvfY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1700477115;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=TZOjEP6t4zXFrEXqFznh4zfDrR0FVYyRbvUTAVYWx30=;
+	b=BIm2QExYI7Z8lQE8RqZyCmK76Oy05lv8Y0saDbKiDgT6QwqVSWrS0/nE3f4QWU00hFiX+q
+	Q1zCTF/d2wuX+bBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 96099134AD;
+	Mon, 20 Nov 2023 10:45:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id xDfMIbs4W2VyHgAAMHmgww
+	(envelope-from <hare@suse.de>); Mon, 20 Nov 2023 10:45:15 +0000
+Message-ID: <f0ac497e-e599-4892-94f7-469660cb5f84@suse.de>
+Date: Mon, 20 Nov 2023 11:45:14 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: introduce new field flags in block_device
+To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+References: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
+ <20231120093847.2228127-2-yukuai1@huaweicloud.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+Autocrypt: addr=hare@suse.de; keydata=
+ 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
+ YwtooKEemPj2lg==
+In-Reply-To: <20231120093847.2228127-2-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Score: 4.19
+X-Spamd-Result: default: False [4.19 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 REPLY(-4.00)[];
+	 BAYES_SPAM(5.10)[100.00%];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 NEURAL_SPAM_LONG(3.38)[0.965];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_COUNT_TWO(0.00)[2];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
 
-group_cpus_evenly() could be part of storage driver's error handler,
-such as nvme driver, when may happen during CPU hotplug, in which
-storage queue has to drain its pending IOs because all CPUs associated
-with the queue are offline and the queue is becoming inactive. And
-handling IO needs error handler to provide forward progress.
+On 11/20/23 10:38, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> There are multiple switches in struct block_device, use seperate bool
+> fields for them is not gracefully. Add a new field flags and replace
+> swithes to a bit, there are no functional changes, and preapre to add
+> a new switch in the next patch.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/bdev.c              | 15 ++++++++-------
+>   block/blk-core.c          |  7 ++++---
+>   block/genhd.c             |  8 +++++---
+>   block/ioctl.c             |  2 +-
+>   include/linux/blk_types.h | 12 ++++++------
+>   include/linux/blkdev.h    |  5 +++--
+>   6 files changed, 27 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/bdev.c b/block/bdev.c
+> index fc8d28d77495..cb849bcf61ae 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -408,10 +408,10 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+>   	bdev->bd_partno = partno;
+>   	bdev->bd_inode = inode;
+>   	bdev->bd_queue = disk->queue;
+> -	if (partno)
+> -		bdev->bd_has_submit_bio = disk->part0->bd_has_submit_bio;
+> +	if (partno && test_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags))
+> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+>   	else
+> -		bdev->bd_has_submit_bio = false;
+> +		clear_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+>   	bdev->bd_stats = alloc_percpu(struct disk_stats);
+>   	if (!bdev->bd_stats) {
+>   		iput(inode);
 
-Then dead lock is caused:
+Couldn't you achieve the very same result by using 
+'READ_ONCE()/WRITE_ONCE()' and keep the structure as-is?
 
-1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
-handler is waiting for inflight IO
+Cheers,
 
-2) error handler is waiting for CPU hotplug lock
-
-3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
-error handling can't provide forward progress.
-
-Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
-in which two stage spreads are taken: 1) the 1st stage is over all present
-CPUs; 2) the end stage is over all other CPUs.
-
-Turns out the two stage spread just needs consistent 'cpu_present_mask', and
-remove the CPU hotplug lock by storing it into one local cache. This way
-doesn't change correctness, because all CPUs are still covered.
-
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Tested-by: Guangwu Zhang <guazhang@redhat.com>
-Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- lib/group_cpus.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index aa3f6815bb12..ee272c4cefcc 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -366,13 +366,25 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 	if (!masks)
- 		goto fail_node_to_cpumask;
- 
--	/* Stabilize the cpumasks */
--	cpus_read_lock();
- 	build_node_to_cpumask(node_to_cpumask);
- 
-+	/*
-+	 * Make a local cache of 'cpu_present_mask', so the two stages
-+	 * spread can observe consistent 'cpu_present_mask' without holding
-+	 * cpu hotplug lock, then we can reduce deadlock risk with cpu
-+	 * hotplug code.
-+	 *
-+	 * Here CPU hotplug may happen when reading `cpu_present_mask`, and
-+	 * we can live with the case because it only affects that hotplug
-+	 * CPU is handled in the 1st or 2nd stage, and either way is correct
-+	 * from API user viewpoint since 2-stage spread is sort of
-+	 * optimization.
-+	 */
-+	cpumask_copy(npresmsk, data_race(cpu_present_mask));
-+
- 	/* grouping present CPUs first */
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
--				  cpu_present_mask, nmsk, masks);
-+				  npresmsk, nmsk, masks);
- 	if (ret < 0)
- 		goto fail_build_affinity;
- 	nr_present = ret;
-@@ -387,15 +399,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 		curgrp = 0;
- 	else
- 		curgrp = nr_present;
--	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
-+	cpumask_andnot(npresmsk, cpu_possible_mask, npresmsk);
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
- 				  npresmsk, nmsk, masks);
- 	if (ret >= 0)
- 		nr_others = ret;
- 
-  fail_build_affinity:
--	cpus_read_unlock();
--
- 	if (ret >= 0)
- 		WARN_ON(nr_present + nr_others < numgrps);
- 
--- 
-2.41.0
+Hannes--
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
+Managing Directors: I. Totev, A. McDonald, W. Knoblich
+(HRB 36809, AG Nürnberg)
 
