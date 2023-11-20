@@ -1,39 +1,51 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821CF1BDF0;
-	Mon, 20 Nov 2023 14:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSzhxryf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61DF0C433C8;
-	Mon, 20 Nov 2023 14:07:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700489266;
-	bh=S8qMgQ1EMUfvTUZrcDS8da/H/870w/2xeU9rsXS2ds4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QSzhxryfS07MGtiYgKdA/KgvpJFBhySuqf49RrifpV8CtbmOpbCqJtDW4keAuKtJx
-	 LpDr9JK6X7KHjMgFRsVyEn8IlsR+g0I90s7hNYxWqpp62eBumzAksnIMk/hZQV7Bhh
-	 QRK+W/EQZTn8vzEb+USqMO98d1bKoOR5eeTho2jxFKHUTniP9QIEKL3YtPn9F/TQuR
-	 fe/9oDTbrvwxGOKtGSzoz4CUhTteSf4cEpqXQsTlBGSO/r1wqBDQ56iWFpWvyCJPPA
-	 1QysZD+ofQfaDMKoO2uD3CmW2hQYBkIkYSvkbIDE6AyUCz50ZGz+tnsWnw6EWtABuT
-	 L+1f87OfP8/JQ==
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: add and use a per-mapping stable writes flag v2
-Date: Mon, 20 Nov 2023 15:07:01 +0100
-Message-ID: <20231120-unnachahmlich-dachwohnung-c5d469db965a@brauner>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231025141020.192413-1-hch@lst.de>
-References: <20231025141020.192413-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ononwLHh"
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE34F4
+	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 08:18:14 -0800 (PST)
+Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-35aa362abb1so3430235ab.1
+        for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 08:18:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700497093; x=1701101893; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J12cYkOScUy5xSSf3mgekEtSW0rko94tb57vwGqSmO8=;
+        b=ononwLHhvIBhdEoTKNRnx9jNviugI9CTbYEPJ2zDysx/c7H3LSNlMiBMInFMlK+Pc8
+         nWLAvCVwR/55T+cKxwURnChu8Ztn25O2bWG6wwoTZV6JkT6uJOWLP+WnzWZia1LtMN57
+         mT/bnCcvCGuIL6tuh2S5Uq4y3yLRHoA+ty7DKWEz0IGLzjrCRiUSTfLC7ioxH1SC1UAY
+         yBuxWUAI0MVPboolwyulKWPSJOecLy48Jyd5qrM5ly0zX9oOmolqZTClbGzadQKX3zFv
+         itXV/6vZucAbplmE7hYbF3bdQWWX+x3MgWdZtecIlR1XpxNL3Z8ylj34tqjH3pbJmSUa
+         Qw2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700497093; x=1701101893;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J12cYkOScUy5xSSf3mgekEtSW0rko94tb57vwGqSmO8=;
+        b=KDdq/tv9Hy1WpJEUJNyAqjVevXZ10HiD+FWl1Z4n9ZkJg1YQif/N8wANpDGYcH4oAX
+         //qc1GXGM5m/SfZACKEVU/mqGmw0w4GLENLHDJrHwJyMIVixxheAw78Hhk+COnrSYEJY
+         sd/UO+mvALxGTEbSEBXdufk43krQ0KbINDZlGuWypPm6cXWja7lvwA8CHHtva682VrEU
+         Fh69/IO9w14PgFQC6Lg1jnlPdxiljnrgRjAsJ/972dYdVPkCp/LjXsztAzaAfqhUk1xG
+         gtVZym1BaTDuDyYEUcnHN47cNo654Vre8t0w4aO5DjknVfVUgO3Md/+wzh7yF+k0fp/o
+         8oaw==
+X-Gm-Message-State: AOJu0Yxj0lvQkZDeMrbBYkBumuQ11R59Ijmxkie2j6hDpEFNERQCCN0N
+	F8/WD75D0CpPl4iJn6UlzQZodA30Blp4bHkLk63Dfw==
+X-Google-Smtp-Source: AGHT+IGk4Nm+ppiSvIPBdsyw1do8SbEPnzHzotfzbuC8o5V3Mv2fiBpR0pOKV0gBFrt95nzKaSLIng==
+X-Received: by 2002:a05:6e02:3611:b0:34f:b824:5844 with SMTP id ci17-20020a056e02361100b0034fb8245844mr6508689ilb.3.1700497093517;
+        Mon, 20 Nov 2023 08:18:13 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id w13-20020a92ad0d000000b0035af9da22b1sm1521725ilh.43.2023.11.20.08.18.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 08:18:12 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Coly Li <colyli@suse.de>
+Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+In-Reply-To: <20231120052503.6122-1-colyli@suse.de>
+References: <20231120052503.6122-1-colyli@suse.de>
+Subject: Re: [PATCH 00/10] bcache-next 20231120
+Message-Id: <170049709206.66373.14314097595716560727.b4-ty@kernel.dk>
+Date: Mon, 20 Nov 2023 09:18:12 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,47 +53,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1718; i=brauner@kernel.org; h=from:subject:message-id; bh=tN1Ke32NvKBFArsZFJBbxJjPjUX5X5jdMMtUAgN7p5o=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaRGZ7DM95vs8sLQd/3VZRPV5T0b3xQwPI6ZmF/bEWoWu JvV58mpjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgImENzIyLJxlsur5rnRrCXXB T6INaxU2H9/qxxd+dPJ22Ted+mqsvYwM11+13XPNeLT4z6JtD3Tmy7p+P5XRz8WyuTrRraj7h4o pHwA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-26615
 
-On Wed, 25 Oct 2023 16:10:16 +0200, Christoph Hellwig wrote:
-> A while ago Ilya pointer out that since commit 1cb039f3dc16 ("bdi:
-> replace BDI_CAP_STABLE_WRITES with a queue and a sb flag"), the stable
-> write flag on the queue wasn't used for writes to the block devices
-> nodes any more, and willy suggested fixing this by adding a stable write
-> flags on each address_space.  This series implements this fix, and also
-> fixes the stable write flag when the XFS RT device requires it, but the
-> main device doesn't (which is probably more a theoretical than a
-> practical problem).
+
+On Mon, 20 Nov 2023 13:24:53 +0800, Coly Li wrote:
+> Here are recent bcache patches tested by me on Linux v6.7-rc1 and can be
+> applied on branch block-6.7 of linux-block tree.
+> 
+> In this series, Colin provids useful code cleanup, some small and still
+> important fixes are contributed from Mingzhe, Rand. Also there are some
+> fixes and a code comments patch from me.
 > 
 > [...]
 
-Ok, I've picked this up now. Let me know if this needs to go through
-someone else.
+Applied, thanks!
 
----
+[01/10] bcache: avoid oversize memory allocation by small stripe_size
+        commit: baf8fb7e0e5ec54ea0839f0c534f2cdcd79bea9c
+[02/10] bcache: check return value from btree_node_alloc_replacement()
+        commit: 777967e7e9f6f5f3e153abffb562bffaf4430d26
+[03/10] bcache: remove redundant assignment to variable cur_idx
+        commit: be93825f0e6428c2d3f03a6e4d447dc48d33d7ff
+[04/10] bcache: prevent potential division by zero error
+        commit: 2c7f497ac274a14330208b18f6f734000868ebf9
+[05/10] bcache: fixup init dirty data errors
+        commit: 7cc47e64d3d69786a2711a4767e26b26ba63d7ed
+[06/10] bcache: fixup lock c->root error
+        commit: e34820f984512b433ee1fc291417e60c47d56727
+[07/10] bcache: fixup multi-threaded bch_sectors_dirty_init() wake-up race
+        commit: 2faac25d7958c4761bb8cec54adb79f806783ad6
+[08/10] bcache: replace a mistaken IS_ERR() by IS_ERR_OR_NULL() in btree_gc_coalesce()
+        commit: f72f4312d4388376fc8a1f6cf37cb21a0d41758b
+[09/10] bcache: add code comments for bch_btree_node_get() and __bch_btree_node_alloc()
+        commit: 31f5b956a197d4ec25c8a07cb3a2ab69d0c0b82f
+[10/10] bcache: avoid NULL checking to c->root in run_cache_set()
+        commit: 3eba5e0b2422aec3c9e79822029599961fdcab97
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Best regards,
+-- 
+Jens Axboe
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[1/4] filemap: add a per-mapping stable writes flag
-      https://git.kernel.org/vfs/vfs/c/cb293ec9f897
-[2/4] block: update the stable_writes flag in bdev_add
-      https://git.kernel.org/vfs/vfs/c/743958a2f50b
-[3/4] xfs: clean up FS_XFLAG_REALTIME handling in xfs_ioctl_setattr_xflags
-      https://git.kernel.org/vfs/vfs/c/f04f350d39eb
-[4/4] xfs: respect the stable writes flag on the RT device
-      https://git.kernel.org/vfs/vfs/c/60fc2887c158
