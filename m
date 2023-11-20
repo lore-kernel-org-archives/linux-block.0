@@ -1,177 +1,272 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="R27o59xo";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BIm2QExY"
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E48AED;
-	Mon, 20 Nov 2023 02:45:17 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D60A2218E3;
-	Mon, 20 Nov 2023 10:45:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1700477115; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B6po07Bx"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0A2F2
+	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 04:39:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700483962;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=TZOjEP6t4zXFrEXqFznh4zfDrR0FVYyRbvUTAVYWx30=;
-	b=R27o59xoRrhH1rqWE86NsSfjvliVY66Nd0nlzxhHaygJJhgGBI8BuDQAYtDLAkZ2YcS7U0
-	OkSmbdb7Djbwfpxf/eh0tKClyRAHd6iPJ2wwYcqb3Sie+bLh7sIIe5HBa+1bkdGaOLV9ri
-	5SU54kwhxY+XmvANmsrG6b926FUfvfY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1700477115;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=TZOjEP6t4zXFrEXqFznh4zfDrR0FVYyRbvUTAVYWx30=;
-	b=BIm2QExYI7Z8lQE8RqZyCmK76Oy05lv8Y0saDbKiDgT6QwqVSWrS0/nE3f4QWU00hFiX+q
-	Q1zCTF/d2wuX+bBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	 in-reply-to:in-reply-to:references:references;
+	bh=25JxRKuBMJpO9V9N0Gg2C2PnT6C1VtlanQGl+PSsE2E=;
+	b=B6po07Bxy/FnjaGckQDjRGolyT9yMCihUrDuKKATpStpc8cOUbLcCSxnHZPA3dDIWkA7I+
+	Rc0qy9TC2jrePEWLs92zux/EpTCFDUTdDjkTijZ3Ru3VpG7u9gDoPXc6vb3o+kPNkDZNWy
+	C23A+KQWsBuWHnb3Rd3C1Rf5emSiGFA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-Xr011ExdNau65_88f3L_Lw-1; Mon, 20 Nov 2023 07:39:19 -0500
+X-MC-Unique: Xr011ExdNau65_88f3L_Lw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 96099134AD;
-	Mon, 20 Nov 2023 10:45:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id xDfMIbs4W2VyHgAAMHmgww
-	(envelope-from <hare@suse.de>); Mon, 20 Nov 2023 10:45:15 +0000
-Message-ID: <f0ac497e-e599-4892-94f7-469660cb5f84@suse.de>
-Date: Mon, 20 Nov 2023 11:45:14 +0100
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2209F811E86;
+	Mon, 20 Nov 2023 12:39:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.7])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D35E2026D4C;
+	Mon, 20 Nov 2023 12:39:13 +0000 (UTC)
+Date: Mon, 20 Nov 2023 20:39:08 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 1/2] block: introduce new field flags in block_device
+Message-ID: <ZVtTbCxpIXTn5ZdT@fedora>
+References: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
+ <20231120093847.2228127-2-yukuai1@huaweicloud.com>
+ <ZVrLvcIhlnQl7xAb@fedora>
+ <c34b325e-d45b-c0e5-f495-7429e24a9d6b@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: introduce new field flags in block_device
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-References: <20231120093847.2228127-1-yukuai1@huaweicloud.com>
- <20231120093847.2228127-2-yukuai1@huaweicloud.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-Autocrypt: addr=hare@suse.de; keydata=
- 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
- YwtooKEemPj2lg==
-In-Reply-To: <20231120093847.2228127-2-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Score: 4.19
-X-Spamd-Result: default: False [4.19 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 REPLY(-4.00)[];
-	 BAYES_SPAM(5.10)[100.00%];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 NEURAL_SPAM_LONG(3.38)[0.965];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
+In-Reply-To: <c34b325e-d45b-c0e5-f495-7429e24a9d6b@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On 11/20/23 10:38, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Mon, Nov 20, 2023 at 04:01:03PM +0800, Yu Kuai wrote:
+> Hi,
 > 
-> There are multiple switches in struct block_device, use seperate bool
-> fields for them is not gracefully. Add a new field flags and replace
-> swithes to a bit, there are no functional changes, and preapre to add
-> a new switch in the next patch.
+> 在 2023/11/20 11:00, Ming Lei 写道:
+> > On Mon, Nov 20, 2023 at 05:38:46PM +0800, Yu Kuai wrote:
+> > > From: Yu Kuai <yukuai3@huawei.com>
+> > > 
+> > > There are multiple switches in struct block_device, use seperate bool
+> > > fields for them is not gracefully. Add a new field flags and replace
+> > > swithes to a bit, there are no functional changes, and preapre to add
+> > > a new switch in the next patch.
+> > > 
+> > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > > ---
+> > >   block/bdev.c              | 15 ++++++++-------
+> > >   block/blk-core.c          |  7 ++++---
+> > >   block/genhd.c             |  8 +++++---
+> > >   block/ioctl.c             |  2 +-
+> > >   include/linux/blk_types.h | 12 ++++++------
+> > >   include/linux/blkdev.h    |  5 +++--
+> > >   6 files changed, 27 insertions(+), 22 deletions(-)
+> > > 
+> > > diff --git a/block/bdev.c b/block/bdev.c
+> > > index fc8d28d77495..cb849bcf61ae 100644
+> > > --- a/block/bdev.c
+> > > +++ b/block/bdev.c
+> > > @@ -408,10 +408,10 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+> > >   	bdev->bd_partno = partno;
+> > >   	bdev->bd_inode = inode;
+> > >   	bdev->bd_queue = disk->queue;
+> > > -	if (partno)
+> > > -		bdev->bd_has_submit_bio = disk->part0->bd_has_submit_bio;
+> > > +	if (partno && test_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags))
+> > > +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+> > >   	else
+> > > -		bdev->bd_has_submit_bio = false;
+> > > +		clear_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
+> > >   	bdev->bd_stats = alloc_percpu(struct disk_stats);
+> > >   	if (!bdev->bd_stats) {
+> > >   		iput(inode);
+> > > @@ -612,7 +612,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+> > >   		bdev->bd_holder = NULL;
+> > >   		bdev->bd_holder_ops = NULL;
+> > >   		mutex_unlock(&bdev->bd_holder_lock);
+> > > -		if (bdev->bd_write_holder)
+> > > +		if (test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags))
+> > >   			unblock = true;
+> > >   	}
+> > >   	if (!whole->bd_holders)
+> > > @@ -625,7 +625,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+> > >   	 */
+> > >   	if (unblock) {
+> > >   		disk_unblock_events(bdev->bd_disk);
+> > > -		bdev->bd_write_holder = false;
+> > > +		clear_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
+> > >   	}
+> > >   }
+> > > @@ -878,9 +878,10 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+> > >   		 * writeable reference is too fragile given the way @mode is
+> > >   		 * used in blkdev_get/put().
+> > >   		 */
+> > > -		if ((mode & BLK_OPEN_WRITE) && !bdev->bd_write_holder &&
+> > > +		if ((mode & BLK_OPEN_WRITE) &&
+> > > +		    !test_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags) &&
+> > >   		    (disk->event_flags & DISK_EVENT_FLAG_BLOCK_ON_EXCL_WRITE)) {
+> > > -			bdev->bd_write_holder = true;
+> > > +			set_bit(BD_FLAG_WRITE_HOLDER, &bdev->flags);
+> > >   			unblock_events = false;
+> > >   		}
+> > >   	}
+> > > diff --git a/block/blk-core.c b/block/blk-core.c
+> > > index fdf25b8d6e78..577a693165d8 100644
+> > > --- a/block/blk-core.c
+> > > +++ b/block/blk-core.c
+> > > @@ -482,7 +482,8 @@ __setup("fail_make_request=", setup_fail_make_request);
+> > >   bool should_fail_request(struct block_device *part, unsigned int bytes)
+> > >   {
+> > > -	return part->bd_make_it_fail && should_fail(&fail_make_request, bytes);
+> > > +	return test_bit(BD_FLAG_MAKE_IT_FAIL, &part->flags) &&
+> > > +		should_fail(&fail_make_request, bytes);
+> > >   }
+> > >   static int __init fail_make_request_debugfs(void)
+> > > @@ -595,7 +596,7 @@ static void __submit_bio(struct bio *bio)
+> > >   	if (unlikely(!blk_crypto_bio_prep(&bio)))
+> > >   		return;
+> > > -	if (!bio->bi_bdev->bd_has_submit_bio) {
+> > > +	if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags)) {
+> > >   		blk_mq_submit_bio(bio);
+> > >   	} else if (likely(bio_queue_enter(bio) == 0)) {
+> > >   		struct gendisk *disk = bio->bi_bdev->bd_disk;
+> > > @@ -703,7 +704,7 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+> > >   	 */
+> > >   	if (current->bio_list)
+> > >   		bio_list_add(&current->bio_list[0], bio);
+> > > -	else if (!bio->bi_bdev->bd_has_submit_bio)
+> > > +	else if (!test_bit(BD_FLAG_HAS_SUBMIT_BIO, &bio->bi_bdev->flags))
+> > >   		__submit_bio_noacct_mq(bio);
+> > >   	else
+> > >   		__submit_bio_noacct(bio);
+> > > diff --git a/block/genhd.c b/block/genhd.c
+> > > index c9d06f72c587..026f4c6d5b7e 100644
+> > > --- a/block/genhd.c
+> > > +++ b/block/genhd.c
+> > > @@ -413,7 +413,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+> > >   	elevator_init_mq(disk->queue);
+> > >   	/* Mark bdev as having a submit_bio, if needed */
+> > > -	disk->part0->bd_has_submit_bio = disk->fops->submit_bio != NULL;
+> > > +	if (disk->fops->submit_bio)
+> > > +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags);
+> > >   	/*
+> > >   	 * If the driver provides an explicit major number it also must provide
+> > > @@ -1062,7 +1063,8 @@ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
+> > >   ssize_t part_fail_show(struct device *dev,
+> > >   		       struct device_attribute *attr, char *buf)
+> > >   {
+> > > -	return sprintf(buf, "%d\n", dev_to_bdev(dev)->bd_make_it_fail);
+> > > +	return sprintf(buf, "%d\n",
+> > > +		       test_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags));
+> > >   }
+> > >   ssize_t part_fail_store(struct device *dev,
+> > > @@ -1072,7 +1074,7 @@ ssize_t part_fail_store(struct device *dev,
+> > >   	int i;
+> > >   	if (count > 0 && sscanf(buf, "%d", &i) > 0)
+> > > -		dev_to_bdev(dev)->bd_make_it_fail = i;
+> > > +		set_bit(BD_FLAG_MAKE_IT_FAIL, &dev_to_bdev(dev)->flags);
+> > >   	return count;
+> > >   }
+> > > diff --git a/block/ioctl.c b/block/ioctl.c
+> > > index 4160f4e6bd5b..a548c718a5fb 100644
+> > > --- a/block/ioctl.c
+> > > +++ b/block/ioctl.c
+> > > @@ -394,7 +394,7 @@ static int blkdev_roset(struct block_device *bdev, unsigned cmd,
+> > >   		if (ret)
+> > >   			return ret;
+> > >   	}
+> > > -	bdev->bd_read_only = n;
+> > > +	set_bit(BD_FLAG_READ_ONLY, &bdev->flags);
+> > >   	return 0;
+> > >   }
+> > > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> > > index 52e264d5a830..95bd26c62655 100644
+> > > --- a/include/linux/blk_types.h
+> > > +++ b/include/linux/blk_types.h
+> > > @@ -37,17 +37,20 @@ struct bio_crypt_ctx;
+> > >   #define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+> > >   #define SECTOR_MASK		(PAGE_SECTORS - 1)
+> > > +#define BD_FLAG_READ_ONLY	0 /* read-only-policy */
+> > > +#define BD_FLAG_WRITE_HOLDER	1
+> > > +#define BD_FLAG_HAS_SUBMIT_BIO	2
+> > > +#define BD_FLAG_MAKE_IT_FAIL	3
+> > > +
+> > >   struct block_device {
+> > >   	sector_t		bd_start_sect;
+> > >   	sector_t		bd_nr_sectors;
+> > >   	struct gendisk *	bd_disk;
+> > >   	struct request_queue *	bd_queue;
+> > >   	struct disk_stats __percpu *bd_stats;
+> > > +	unsigned long		flags;
+> > >   	unsigned long		bd_stamp;
+> > > -	bool			bd_read_only;	/* read-only policy */
+> > >   	u8			bd_partno;
+> > > -	bool			bd_write_holder;
+> > > -	bool			bd_has_submit_bio;
+> > 
+> > The idea looks good, but not necessary to add new 8 bytes, and you may
+> > put all these flags and `bd_partno` into single 'unsigned long', and add
+> > helpers to retrieve part no, since there are not many ->bd_partno
+> > references.
 > 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   block/bdev.c              | 15 ++++++++-------
->   block/blk-core.c          |  7 ++++---
->   block/genhd.c             |  8 +++++---
->   block/ioctl.c             |  2 +-
->   include/linux/blk_types.h | 12 ++++++------
->   include/linux/blkdev.h    |  5 +++--
->   6 files changed, 27 insertions(+), 22 deletions(-)
+> Hi, I'm not quite sure which is the best way to implement this, anyway,
+> I come up with following implementation, can you please take a look
+> before I send a new version?
 > 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index fc8d28d77495..cb849bcf61ae 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -408,10 +408,10 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
->   	bdev->bd_partno = partno;
->   	bdev->bd_inode = inode;
->   	bdev->bd_queue = disk->queue;
-> -	if (partno)
-> -		bdev->bd_has_submit_bio = disk->part0->bd_has_submit_bio;
-> +	if (partno && test_bit(BD_FLAG_HAS_SUBMIT_BIO, &disk->part0->flags))
-> +		set_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
->   	else
-> -		bdev->bd_has_submit_bio = false;
-> +		clear_bit(BD_FLAG_HAS_SUBMIT_BIO, &bdev->flags);
->   	bdev->bd_stats = alloc_percpu(struct disk_stats);
->   	if (!bdev->bd_stats) {
->   		iput(inode);
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 52e264d5a830..4e29774b14fd 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -37,6 +37,12 @@ struct bio_crypt_ctx;
+>  #define PAGE_SECTORS           (1 << PAGE_SECTORS_SHIFT)
+>  #define SECTOR_MASK            (PAGE_SECTORS - 1)
+> 
+> +#define BD_FLAG_READ_ONLY      0 /* read-only-policy */
+> +#define BD_FLAG_WRITE_HOLDER   1
+> +#define BD_FLAG_HAS_SUBMIT_BIO 2
+> +#define BD_FLAG_MAKE_IT_FAIL   3
+> +#define BD_FLAGS_MAX           16
+> +
+>  struct block_device {
+>         sector_t                bd_start_sect;
+>         sector_t                bd_nr_sectors;
+> @@ -44,10 +50,20 @@ struct block_device {
+>         struct request_queue *  bd_queue;
+>         struct disk_stats __percpu *bd_stats;
+>         unsigned long           bd_stamp;
+> -       bool                    bd_read_only;   /* read-only policy */
+> -       u8                      bd_partno;
+> -       bool                    bd_write_holder;
+> -       bool                    bd_has_submit_bio;
+> +
+> +       /*
+> +        * In order to keep both flags and bd_partno in the first cacheline,
+> +        * first 16 bits are used for flags.
+> +        */
+> +       union {
+> +               unsigned long   flags;
+> +               struct {
+> +#ifdef __LITTLE_ENDIAN
+> +                       u16     __flags;
+> +#endif
+> +                       u8      bd_partno;
+> +               };
+> +       };
 
-Couldn't you achieve the very same result by using 
-'READ_ONCE()/WRITE_ONCE()' and keep the structure as-is?
+You can follow the similar pattern of bio->bi_opf.
 
-Cheers,
 
-Hannes--
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
-Managing Directors: I. Totev, A. McDonald, W. Knoblich
-(HRB 36809, AG Nürnberg)
+Thanks,
+Ming
 
