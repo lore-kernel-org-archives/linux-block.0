@@ -1,127 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D668ACC;
-	Mon, 20 Nov 2023 12:44:44 -0800 (PST)
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1cf669b711fso6596825ad.2;
-        Mon, 20 Nov 2023 12:44:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700513084; x=1701117884;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t/+vZLSn8Zi0TmWbz/4mk8iNsQN+ForoQPmwsvN/7rE=;
-        b=Auq45UKp3WREfWbLSBIPAR1mujidbiil3QeKGET9vipjdPb2V8spymQ2b4gSGuJL+K
-         cMKHHYCAl6Jlgxn7hw8DAatfCjr7yLZK3gvkoy+Ihn7qUAk5DgbKcZUZdLbBagQYG5DB
-         NYOkArJyc5Nn15CalZ8FYvXfjeGZzkIA/4+SwCxp/D5F3mQxDTlKByQxn/9EZw7/jDVY
-         TAggaDDnkH9t8IU/dPFwse8ZX8m0YTo+ioKp6CAnOHa/EF9i0mfLMjcHd1AGRjJIXRnw
-         G33Ez8SWmBHOmDghodItP7CPtC6oGed8B019Jdh3PFlhwBYv7D5BbEwHerBUVb5pce4e
-         GnyA==
-X-Gm-Message-State: AOJu0YzIyvK2RKpkjqwYfsC7VlarPrXxLdclasOkMRGx2Nin5vHL1RS9
-	pJ4tYC+/LpO1NULmtn6Ha1I=
-X-Google-Smtp-Source: AGHT+IFEaWE8qQ+OaE8496miXI47DPFPJEqW9A0WrnQ118bR05MWDwRH2Q7EO/RAc6zbgHtex1Kw9g==
-X-Received: by 2002:a17:903:2448:b0:1cc:42ec:9b96 with SMTP id l8-20020a170903244800b001cc42ec9b96mr8596700pls.45.1700513084114;
-        Mon, 20 Nov 2023 12:44:44 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:bb61:2ac8:4d61:2b3d? ([2620:0:1000:8411:bb61:2ac8:4d61:2b3d])
-        by smtp.gmail.com with ESMTPSA id jd22-20020a170903261600b001ce160421aesm6516853plb.200.2023.11.20.12.44.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 12:44:43 -0800 (PST)
-Message-ID: <0d60bde5-018d-4850-8870-092b472463a6@acm.org>
-Date: Mon, 20 Nov 2023 12:44:41 -0800
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YgeXtbHk"
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E85DC7
+	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 14:17:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700518661; x=1732054661;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IgtBxKHW4oLrKQdICG6wrPvdLby5TOM5jLHTx1Jq5Dk=;
+  b=YgeXtbHkelPKSlBvH5vBgCbKDxkiK6jg6SEpNaC4amef6t7Q60wILJGT
+   Lf+vF8i+n0Iumvv1kF3LiTQztwfsrgw1fDBG636Lxu4j1CmcuyzuH4LRu
+   +832jdNLUDF/Waayz5cqwNTJuTA3y14bH66pKRPhmIUwAG1r8XL4rOfIv
+   aLaKITSYPhjhBmQesHWP5ZH2aub1xYZw7d2wnh8SxChWA5ACCtpKG/dlO
+   Oy2/7PbseWaQrq2JKrQVUqYJx33HjjeX2WSLz5SPz5Zd/0TaUfCd4daVn
+   6AzPd9r9JSYLHgH9A/M6DRGsPCPncogmbIwZD3a4Yj2a0Ac5H7bL8O5d4
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="10389087"
+X-IronPort-AV: E=Sophos;i="6.04,214,1695711600"; 
+   d="scan'208";a="10389087"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 14:17:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="759906249"
+X-IronPort-AV: E=Sophos;i="6.04,214,1695711600"; 
+   d="scan'208";a="759906249"
+Received: from nmalinin-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.57.201])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 14:17:38 -0800
+Received: by box.shutemov.name (Postfix, from userid 1000)
+	id 5976710A36E; Tue, 21 Nov 2023 01:17:35 +0300 (+03)
+Date: Tue, 21 Nov 2023 01:17:35 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>, dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: [git pull] device mapper fixes for 6.7-rc2
+Message-ID: <20231120221735.k6iyr5t5wdlgpxui@box.shutemov.name>
+References: <ZVjgpLACW4/0NkBB@redhat.com>
+ <CAHk-=wjV2S7xBcH2BGuDgfKcg3fjWwk5k74nq89SviMkH-YsJQ@mail.gmail.com>
+ <CAHk-=wjCXvFme97sxix_zDfq4-oNRv7fNp+YzWEuUGH-gihA-g@mail.gmail.com>
+ <20231119152136.ntnl3sfulo4tgbw3@box.shutemov.name>
+ <20231120133145.y7ghl64bqfpeqtwd@box.shutemov.name>
+ <CAHk-=wgarn2DnvMsZVfm+vDHyUXk7qGMbZHw+mxYvnc8i+SvKw@mail.gmail.com>
+ <20231120094048.1acfb380c90be326b7b3f614@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 01/19] block: Introduce more member variables related
- to zone write locking
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
- Ming Lei <ming.lei@redhat.com>
-References: <20231114211804.1449162-1-bvanassche@acm.org>
- <20231114211804.1449162-2-bvanassche@acm.org>
- <3d8d04d5-80d8-4eee-9899-d9fe197dd203@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <3d8d04d5-80d8-4eee-9899-d9fe197dd203@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120094048.1acfb380c90be326b7b3f614@linux-foundation.org>
 
-On 11/19/23 15:29, Damien Le Moal wrote:
-> On 11/15/23 06:16, Bart Van Assche wrote:
->> @@ -82,6 +84,8 @@ void blk_set_stacking_limits(struct queue_limits *lim)
->>   	lim->max_dev_sectors = UINT_MAX;
->>   	lim->max_write_zeroes_sectors = UINT_MAX;
->>   	lim->max_zone_append_sectors = UINT_MAX;
->> +	/* Request-based stacking drivers do not reorder requests. */
+On Mon, Nov 20, 2023 at 09:40:48AM -0800, Andrew Morton wrote:
+> On Mon, 20 Nov 2023 09:36:46 -0800 Linus Torvalds <torvalds@linux-foundation.org> wrote:
 > 
-> Rereading this patch, I do not think this statement is correct. I seriously
-> doubt that multipath will preserve write command order in all cases...
+> > On Mon, 20 Nov 2023 at 05:31, Kirill A. Shutemov
+> > <kirill.shutemov@linux.intel.com> wrote:
+> > >
+> > > NR_ORDERS defines the number of page orders supported by the page
+> > > allocator, ranging from 0 to MAX_ORDER, MAX_ORDER + 1 in total.
+> > >
+> > > NR_ORDERS assists in defining arrays of page orders and allows for more
+> > > natural iteration over them.
+> > 
+> > Well, the thing is, I really think we need to rename or remove
+> > "MAX_ORDER" entirely.
+> > 
+> > Because as-is, that #define now has completely different meaning than
+> > it used to have for 24 years. Which is not only confusing to people
+> > who might just remember the old semantics, it's a problem for
+> > backporting (and for merging stuff, but that is a fairly temporary
+> > pain and _maybe_ this one-time device mapper thing was the only time
+> > it will ever happen)
+> > 
 > 
->> +	lim->driver_preserves_write_order = true;
-> 
-> ... so it is likely much safer to set the default to "false" as that is the
-> default for all requests in general.
+> Yes please.  MAX_ORDER was always a poor name - it implies that it's
+> inclusive.  Renaming it to NR_ORDERS makes it clearer that the usual
+> and expected "up to but not including" semantics apply.
 
-How about applying this (untested) patch on top of this patch series?
+I personally would prefer to have both value for different use cases.
+What about MAX_PAGE_ORDER and NR_PAGE_ORDERS?
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 4c776c08f190..aba1972e9767 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -84,8 +84,6 @@ void blk_set_stacking_limits(struct queue_limits *lim)
-  	lim->max_dev_sectors = UINT_MAX;
-  	lim->max_write_zeroes_sectors = UINT_MAX;
-  	lim->max_zone_append_sectors = UINT_MAX;
--	/* Request-based stacking drivers do not reorder requests. */
--	lim->driver_preserves_write_order = true;
-  }
-  EXPORT_SYMBOL(blk_set_stacking_limits);
+If it is okay, I will prepare patches.
 
-diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-index 2d3e186ca87e..cb9abe4bd065 100644
---- a/drivers/md/dm-linear.c
-+++ b/drivers/md/dm-linear.c
-@@ -147,6 +147,11 @@ static int linear_report_zones(struct dm_target *ti,
-  #define linear_report_zones NULL
-  #endif
-
-+static void linear_io_hints(struct dm_target *ti, struct queue_limits *limits)
-+{
-+	limits->driver_preserves_write_order = true;
-+}
-+
-  static int linear_iterate_devices(struct dm_target *ti,
-  				  iterate_devices_callout_fn fn, void *data)
-  {
-@@ -208,6 +213,7 @@ static struct target_type linear_target = {
-  	.map    = linear_map,
-  	.status = linear_status,
-  	.prepare_ioctl = linear_prepare_ioctl,
-+	.io_hints = linear_io_hints,
-  	.iterate_devices = linear_iterate_devices,
-  	.direct_access = linear_dax_direct_access,
-  	.dax_zero_page_range = linear_dax_zero_page_range,
-
->> @@ -685,6 +689,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>   						   b->max_secure_erase_sectors);
->>   	t->zone_write_granularity = max(t->zone_write_granularity,
->>   					b->zone_write_granularity);
->> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
->> +		b->driver_preserves_write_order;
->> +	t->use_zone_write_lock = t->use_zone_write_lock ||
->> +		b->use_zone_write_lock;
-> 
-> Very minor nit: splitting the line after the equal would make this more readable.
-
-Hmm ... I have often seen other reviewers asking to maximize the use of each
-source code line as much as reasonably possible.
-
-Thanks,
-
-Bart.
-
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
