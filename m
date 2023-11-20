@@ -1,108 +1,127 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="XWaspkYY"
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A73CD
-	for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 12:33:56 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6bd0e1b1890so3836971b3a.3
-        for <linux-block@vger.kernel.org>; Mon, 20 Nov 2023 12:33:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1700512435; x=1701117235; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=evAEpm60eEP3dXV5IIqup+kGHQJCYdmk5kN5UrPqUqI=;
-        b=XWaspkYYw44E33EzKaGnJUsIVM+Ss5R+yYkkZi0c9hwh1WD0cLRFNTtHoIbN9iv1Em
-         6XBfwne5kehR8C8byBlNCobcSlPrqAmgG3OGf628BLtRoDNubaDRu7NyVC87/JFxVkOe
-         sdxy8YKauDLBnAe1+J2REJsCWB1gNQJrRVieIX0RICJrEDA1tHgwBgHa+czTDzSz0lpE
-         405jzexLvDQq7cwBVKzqRRr42f6mQzxeOij9p7nwS2sjxsh8dD2MjwMscWqK+2mcEcTn
-         O3e3PjIDi6KdIS5gALCZ/YT3FsWhfv8mCu7NSAs3rnMAWuRp0KQggidp/k61xS0aWezK
-         csTA==
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D668ACC;
+	Mon, 20 Nov 2023 12:44:44 -0800 (PST)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1cf669b711fso6596825ad.2;
+        Mon, 20 Nov 2023 12:44:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700512435; x=1701117235;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1700513084; x=1701117884;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=evAEpm60eEP3dXV5IIqup+kGHQJCYdmk5kN5UrPqUqI=;
-        b=eI/of6m/dEt3muBlid9iD5nV+st/OtImtc0MmTPOtQkKwtoH+k5Qr4Ve3xhCZsIW6Z
-         hsdeNW3gQvx/btbvt76g7Dt3qHseGyj2lMb3691vlBAlpQfbX+9qEyPehVtQY7Ufp5Tb
-         29KF0wAaPUef22cVqz4Df5/ny/x7GhW0NzsDD17GpMlRxA8vn9uEZLuEMSgwn0cp2bOy
-         7iB9P2akiZXN+f5utDe7d+iM9BVqawnHQeVEYQtWlov2chhzeGTKomMyevbN8nqzgNYS
-         9upFxyWS7qzh1YNn5cnUIzso2XF6h2x5vlFTiMsNOYzh/uFfbt7KkjhQo2Dv8wG5dyjp
-         3a2g==
-X-Gm-Message-State: AOJu0Yx70DdnapFr4MfcCHgj/aoo6o/2aEU65iEmo00A7U4XXn5azYD5
-	T8i0lIOWJsTcVP/bSB0VvxcbPw==
-X-Google-Smtp-Source: AGHT+IEUIW0UoDRHG7vGbEKmmcfumQAR5wXy6IpLvsSKoDwysXkoX+X9La6bv+9CGvmyGf8BTbi2pQ==
-X-Received: by 2002:a05:6a20:c188:b0:187:9392:cfdd with SMTP id bg8-20020a056a20c18800b001879392cfddmr7866906pzb.24.1700512435511;
-        Mon, 20 Nov 2023 12:33:55 -0800 (PST)
-Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
-        by smtp.gmail.com with ESMTPSA id k81-20020a628454000000b00688965c5227sm6783104pfd.120.2023.11.20.12.33.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 12:33:54 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1r5Axs-00FH1P-0e;
-	Tue, 21 Nov 2023 07:33:52 +1100
-Date: Tue, 21 Nov 2023 07:33:52 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Brian Foster <bfoster@redhat.com>
-Subject: Re: [PATCH v9 0/3] [PATCH v9 0/3] Introduce provisioning primitives
-Message-ID: <ZVvCsPelezZesshx@dread.disaster.area>
-References: <20231110010139.3901150-1-sarthakkukreti@chromium.org>
- <ZU7RVKJIzm8ExGGH@dread.disaster.area>
- <CAG9=OMPFEV9He+ggq2mcLULnUZ2jm8fGU=4ca8kBoWtvqYcGVg@mail.gmail.com>
+        bh=t/+vZLSn8Zi0TmWbz/4mk8iNsQN+ForoQPmwsvN/7rE=;
+        b=Auq45UKp3WREfWbLSBIPAR1mujidbiil3QeKGET9vipjdPb2V8spymQ2b4gSGuJL+K
+         cMKHHYCAl6Jlgxn7hw8DAatfCjr7yLZK3gvkoy+Ihn7qUAk5DgbKcZUZdLbBagQYG5DB
+         NYOkArJyc5Nn15CalZ8FYvXfjeGZzkIA/4+SwCxp/D5F3mQxDTlKByQxn/9EZw7/jDVY
+         TAggaDDnkH9t8IU/dPFwse8ZX8m0YTo+ioKp6CAnOHa/EF9i0mfLMjcHd1AGRjJIXRnw
+         G33Ez8SWmBHOmDghodItP7CPtC6oGed8B019Jdh3PFlhwBYv7D5BbEwHerBUVb5pce4e
+         GnyA==
+X-Gm-Message-State: AOJu0YzIyvK2RKpkjqwYfsC7VlarPrXxLdclasOkMRGx2Nin5vHL1RS9
+	pJ4tYC+/LpO1NULmtn6Ha1I=
+X-Google-Smtp-Source: AGHT+IFEaWE8qQ+OaE8496miXI47DPFPJEqW9A0WrnQ118bR05MWDwRH2Q7EO/RAc6zbgHtex1Kw9g==
+X-Received: by 2002:a17:903:2448:b0:1cc:42ec:9b96 with SMTP id l8-20020a170903244800b001cc42ec9b96mr8596700pls.45.1700513084114;
+        Mon, 20 Nov 2023 12:44:44 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:bb61:2ac8:4d61:2b3d? ([2620:0:1000:8411:bb61:2ac8:4d61:2b3d])
+        by smtp.gmail.com with ESMTPSA id jd22-20020a170903261600b001ce160421aesm6516853plb.200.2023.11.20.12.44.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Nov 2023 12:44:43 -0800 (PST)
+Message-ID: <0d60bde5-018d-4850-8870-092b472463a6@acm.org>
+Date: Mon, 20 Nov 2023 12:44:41 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG9=OMPFEV9He+ggq2mcLULnUZ2jm8fGU=4ca8kBoWtvqYcGVg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 01/19] block: Introduce more member variables related
+ to zone write locking
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20231114211804.1449162-1-bvanassche@acm.org>
+ <20231114211804.1449162-2-bvanassche@acm.org>
+ <3d8d04d5-80d8-4eee-9899-d9fe197dd203@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <3d8d04d5-80d8-4eee-9899-d9fe197dd203@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 13, 2023 at 01:26:51PM -0800, Sarthak Kukreti wrote:
-> On Fri, Nov 10, 2023 at 4:56 PM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Thu, Nov 09, 2023 at 05:01:35PM -0800, Sarthak Kukreti wrote:
-> > > Hi,
-> > >
-> > > This patch series is version 9 of the patch series to introduce
-> > > block-level provisioning mechanism (original [1]), which is useful for
-> > > provisioning space across thinly provisioned storage architectures (loop
-> > > devices backed by sparse files, dm-thin devices, virtio-blk). This
-> > > series has minimal changes over v8[2], with a couple of patches dropped
-> > > (suggested by Dave).
-> > >
-> > > This patch series is rebased from the linux-dm/dm-6.5-provision-support
-> > > [3] on to (a12deb44f973 Merge tag 'input-for-v6.7-rc0' ...). The final
-> > > patch in the series is a blktest (suggested by Dave in 4) which was used
-> > > to test out the provisioning flow for loop devices on sparse files on an
-> > > ext4 filesystem.
-> >
-> > What happened to the XFS patch I sent to support provisioning for
-> > fallocate() operations through XFS?
-> >
-> Apologies, I missed out on mentioning that the XFS patches work well
-> with loop devices.
+On 11/19/23 15:29, Damien Le Moal wrote:
+> On 11/15/23 06:16, Bart Van Assche wrote:
+>> @@ -82,6 +84,8 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>>   	lim->max_dev_sectors = UINT_MAX;
+>>   	lim->max_write_zeroes_sectors = UINT_MAX;
+>>   	lim->max_zone_append_sectors = UINT_MAX;
+>> +	/* Request-based stacking drivers do not reorder requests. */
 > 
-> I might have misunderstood: were those patches only for sanity testing
-> or would you prefer that I send those out as a part of this series? I
-> can whip up a quick v10 if so!
+> Rereading this patch, I do not think this statement is correct. I seriously
+> doubt that multipath will preserve write command order in all cases...
+> 
+>> +	lim->driver_preserves_write_order = true;
+> 
+> ... so it is likely much safer to set the default to "false" as that is the
+> default for all requests in general.
 
-I was implying that if you are going to be adding support to random
-block devices for people to actually test out, then you should be
-adding support to filesystems and writing new -fstests- to ensure
-that loop devices are actually provisioning blocks at exactly the
-locations that correspond to the physical file extents the
-filesystem provisioned, too.
+How about applying this (untested) patch on top of this patch series?
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 4c776c08f190..aba1972e9767 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -84,8 +84,6 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+  	lim->max_dev_sectors = UINT_MAX;
+  	lim->max_write_zeroes_sectors = UINT_MAX;
+  	lim->max_zone_append_sectors = UINT_MAX;
+-	/* Request-based stacking drivers do not reorder requests. */
+-	lim->driver_preserves_write_order = true;
+  }
+  EXPORT_SYMBOL(blk_set_stacking_limits);
+
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 2d3e186ca87e..cb9abe4bd065 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -147,6 +147,11 @@ static int linear_report_zones(struct dm_target *ti,
+  #define linear_report_zones NULL
+  #endif
+
++static void linear_io_hints(struct dm_target *ti, struct queue_limits *limits)
++{
++	limits->driver_preserves_write_order = true;
++}
++
+  static int linear_iterate_devices(struct dm_target *ti,
+  				  iterate_devices_callout_fn fn, void *data)
+  {
+@@ -208,6 +213,7 @@ static struct target_type linear_target = {
+  	.map    = linear_map,
+  	.status = linear_status,
+  	.prepare_ioctl = linear_prepare_ioctl,
++	.io_hints = linear_io_hints,
+  	.iterate_devices = linear_iterate_devices,
+  	.direct_access = linear_dax_direct_access,
+  	.dax_zero_page_range = linear_dax_zero_page_range,
+
+>> @@ -685,6 +689,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>>   						   b->max_secure_erase_sectors);
+>>   	t->zone_write_granularity = max(t->zone_write_granularity,
+>>   					b->zone_write_granularity);
+>> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
+>> +		b->driver_preserves_write_order;
+>> +	t->use_zone_write_lock = t->use_zone_write_lock ||
+>> +		b->use_zone_write_lock;
+> 
+> Very minor nit: splitting the line after the equal would make this more readable.
+
+Hmm ... I have often seen other reviewers asking to maximize the use of each
+source code line as much as reasonably possible.
+
+Thanks,
+
+Bart.
+
