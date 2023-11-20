@@ -1,106 +1,87 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821CF1BDF0;
+	Mon, 20 Nov 2023 14:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CF0ScI1s"
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B3A10C0;
-	Mon, 20 Nov 2023 06:03:43 -0800 (PST)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKDMaJR022494;
-	Mon, 20 Nov 2023 14:03:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ayQvgFthRJNPJhY6OnvpeIv7utMhV9IsMNfSqwniqng=;
- b=CF0ScI1sI+S3fLP8hfsWERlOiURR+RTJDO5UbNXSKFbA3g3EdedndSYLIEsUQIotSkOx
- 3FSDVAE1unxRTnKZqynF8gy0uCg80I8wJyev3AllvYrRp7F5zxsk2lfymPSdjEwvXHpG
- 0KyQGFvvN9gotqziAKZ4z72+3jaxTxzBzdJ71bSq5tFUwb9kjMpkeuamtdV2wDxzWK+k
- lwimXGKMzzeWjyPFHxavg6lYM0XUNhuqAl5oZ3e99+npSqtWpxzrH1NgK/wpAAfbvjl1
- 7CcFtYHdqxSg4WPxIY9efjedAUv9MTokc8l8awDFE9XMlpP8TZTDJny5va4kxtZYDyHs Pg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ug89eh4t3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Nov 2023 14:03:41 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AKDRSh9003048;
-	Mon, 20 Nov 2023 14:03:40 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ug89eh4s8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Nov 2023 14:03:40 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKDPFo0010137;
-	Mon, 20 Nov 2023 14:03:39 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf8knhha7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Nov 2023 14:03:39 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AKE3cbK10224320
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 20 Nov 2023 14:03:38 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 23B8E58063;
-	Mon, 20 Nov 2023 14:03:38 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BC76A58057;
-	Mon, 20 Nov 2023 14:03:36 +0000 (GMT)
-Received: from [9.179.19.4] (unknown [9.179.19.4])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 20 Nov 2023 14:03:36 +0000 (GMT)
-Message-ID: <ffdd12e0-22fa-d8b8-9862-c440d9cedf59@linux.ibm.com>
-Date: Mon, 20 Nov 2023 15:03:36 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSzhxryf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61DF0C433C8;
+	Mon, 20 Nov 2023 14:07:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700489266;
+	bh=S8qMgQ1EMUfvTUZrcDS8da/H/870w/2xeU9rsXS2ds4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QSzhxryfS07MGtiYgKdA/KgvpJFBhySuqf49RrifpV8CtbmOpbCqJtDW4keAuKtJx
+	 LpDr9JK6X7KHjMgFRsVyEn8IlsR+g0I90s7hNYxWqpp62eBumzAksnIMk/hZQV7Bhh
+	 QRK+W/EQZTn8vzEb+USqMO98d1bKoOR5eeTho2jxFKHUTniP9QIEKL3YtPn9F/TQuR
+	 fe/9oDTbrvwxGOKtGSzoz4CUhTteSf4cEpqXQsTlBGSO/r1wqBDQ56iWFpWvyCJPPA
+	 1QysZD+ofQfaDMKoO2uD3CmW2hQYBkIkYSvkbIDE6AyUCz50ZGz+tnsWnw6EWtABuT
+	 L+1f87OfP8/JQ==
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: Re: add and use a per-mapping stable writes flag v2
+Date: Mon, 20 Nov 2023 15:07:01 +0100
+Message-ID: <20231120-unnachahmlich-dachwohnung-c5d469db965a@brauner>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231025141020.192413-1-hch@lst.de>
+References: <20231025141020.192413-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 0/2] s390/dasd: fix kernel panic with statistics
-From: Stefan Haberland <sth@linux.ibm.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Muhammad Muzammil <m.muzzammilashraf@gmail.com>
-References: <20231025132437.1223363-1-sth@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <20231025132437.1223363-1-sth@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1718; i=brauner@kernel.org; h=from:subject:message-id; bh=tN1Ke32NvKBFArsZFJBbxJjPjUX5X5jdMMtUAgN7p5o=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaRGZ7DM95vs8sLQd/3VZRPV5T0b3xQwPI6ZmF/bEWoWu JvV58mpjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgImENzIyLJxlsur5rnRrCXXB T6INaxU2H9/qxxd+dPJ22Ted+mqsvYwM11+13XPNeLT4z6JtD3Tmy7p+P5XRz8WyuTrRraj7h4o pHwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: slNPZYT41be9aMYSsNoPGjTNYh6FXW4M
-X-Proofpoint-ORIG-GUID: 3o09iHnDC8TKI-a6AqaV_9jlfmpnBkM_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-20_13,2023-11-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=870 phishscore=0
- spamscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
- mlxscore=0 bulkscore=0 suspectscore=0 clxscore=1011 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311200097
 
-Am 25.10.23 um 15:24 schrieb Stefan Haberland:
-> Hi Jens,
->
-> please apply the following patch for the upcomming merge window that
-> fixes a kernel panic that can be triggered by using dasd statistics.
-> Also there is a typo fix for a comment.
->
-> Thanks.
->
-> Jan Höppner (1):
->    s390/dasd: protect device queue against concurrent access
->
-> Muhammad Muzammil (1):
->    s390/dasd: resolve spelling mistake
->
->   drivers/s390/block/dasd.c     | 24 +++++++++++++-----------
->   drivers/s390/block/dasd_int.h |  2 +-
->   2 files changed, 14 insertions(+), 12 deletions(-)
->
+On Wed, 25 Oct 2023 16:10:16 +0200, Christoph Hellwig wrote:
+> A while ago Ilya pointer out that since commit 1cb039f3dc16 ("bdi:
+> replace BDI_CAP_STABLE_WRITES with a queue and a sb flag"), the stable
+> write flag on the queue wasn't used for writes to the block devices
+> nodes any more, and willy suggested fixing this by adding a stable write
+> flags on each address_space.  This series implements this fix, and also
+> fixes the stable write flag when the XFS RT device requires it, but the
+> main device doesn't (which is probably more a theoretical than a
+> practical problem).
+> 
+> [...]
 
-Hi Jens,
+Ok, I've picked this up now. Let me know if this needs to go through
+someone else.
 
-polite ping.
+---
+
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/4] filemap: add a per-mapping stable writes flag
+      https://git.kernel.org/vfs/vfs/c/cb293ec9f897
+[2/4] block: update the stable_writes flag in bdev_add
+      https://git.kernel.org/vfs/vfs/c/743958a2f50b
+[3/4] xfs: clean up FS_XFLAG_REALTIME handling in xfs_ioctl_setattr_xflags
+      https://git.kernel.org/vfs/vfs/c/f04f350d39eb
+[4/4] xfs: respect the stable writes flag on the RT device
+      https://git.kernel.org/vfs/vfs/c/60fc2887c158
