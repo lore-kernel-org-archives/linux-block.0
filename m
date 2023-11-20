@@ -1,142 +1,124 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pvG4sWih"
-X-Greylist: delayed 326 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 19 Nov 2023 19:31:32 PST
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [IPv6:2001:41d0:203:375::af])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89C3DD4F
-	for <linux-block@vger.kernel.org>; Sun, 19 Nov 2023 19:31:32 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700450765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lOfw8hEm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jNAOs/lA"
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5653E3;
+	Sun, 19 Nov 2023 21:26:08 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+	by smtp-out1.suse.de (Postfix) with ESMTP id 3C2EF218E4;
+	Mon, 20 Nov 2023 05:26:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1700457967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=+VymdBzRpvTEsF3r3W4saDJpuCxv1e2XIK11MThN86Y=;
-	b=pvG4sWihLLOWQMeNrUGbVMCed1GK0wWLXgmev8oACdRLvYJ9DrEtcOasNYh/uvpz30av7j
-	SiJkIS6g1AogyFxYNF7I/CeOikgUGuenfDgWlW3eAkihvSm7YZzVkmULdjNBHHGv51t20q
-	5HtQQxdyGLQggrjxxvz+42ayVBPy3fA=
-From: chengming.zhou@linux.dev
-To: axboe@kernel.dk,
-	bvanassche@acm.org
-Cc: kch@nvidia.com,
-	damien.lemoal@opensource.wdc.com,
-	ming.lei@redhat.com,
-	zhouchengming@bytedance.com,
-	justinstitt@google.com,
-	shinichiro.kawasaki@wdc.com,
-	akinobu.mita@gmail.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chengming.zhou@linux.dev,
-	syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
-Subject: [PATCH] block/null_blk: Fix double blk_mq_start_request() warning
-Date: Mon, 20 Nov 2023 03:25:21 +0000
-Message-Id: <20231120032521.1012037-1-chengming.zhou@linux.dev>
+	bh=7Qm6yCo0+3GAlOA66zHG1XQF6Yyycd87rE/chkMHYVk=;
+	b=lOfw8hEmw2f3HKcfBp60ch4jLHwR442E4McKYaBqtEC3vVP26N9IuXn0IrVv6iKVuHCzTD
+	1mNfgYaK2HYJxhZ0H73DOG4ke5MV+p3ySDceFjWN8UhZLL1QnQ1mPhtmBmLO23J7OZGO8p
+	OpGuTbJb4SDokflcLGKjig7QKe6CtXU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1700457967;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7Qm6yCo0+3GAlOA66zHG1XQF6Yyycd87rE/chkMHYVk=;
+	b=jNAOs/lA7dxqXT6S3oVhS1peoKQ9vl5wjfB53BwSpIIyOu1WUtIc6wEwEDRZKwjvfzsxwC
+	yMeSVHUsqfR7y/AQ==
+Received: from localhost.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
+	by relay2.suse.de (Postfix) with ESMTP id E52832C90E;
+	Mon, 20 Nov 2023 05:26:05 +0000 (UTC)
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 00/10] bcache-next 20231120
+Date: Mon, 20 Nov 2023 13:24:53 +0800
+Message-Id: <20231120052503.6122-1-colyli@suse.de>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Spamd-Bar: +++++++++++++++++
+Authentication-Results: smtp-out1.suse.de;
+	dkim=none;
+	dmarc=none;
+	spf=softfail (smtp-out1.suse.de: 149.44.160.134 is neither permitted nor denied by domain of colyli@suse.de) smtp.mailfrom=colyli@suse.de
+X-Rspamd-Server: rspamd2
+X-Spamd-Result: default: False [17.99 / 50.00];
+	 ARC_NA(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 TO_DN_SOME(0.00)[];
+	 NEURAL_SPAM_SHORT(3.00)[1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 DMARC_NA(1.20)[suse.de];
+	 R_SPF_SOFTFAIL(4.60)[~all:c];
+	 TO_MATCH_ENVRCPT_SOME(0.00)[];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 MX_GOOD(-0.01)[];
+	 NEURAL_SPAM_LONG(3.50)[1.000];
+	 MID_CONTAINS_FROM(1.00)[];
+	 RWL_MAILSPIKE_GOOD(-1.00)[149.44.160.134:from];
+	 VIOLATED_DIRECT_SPF(3.50)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_NO_TLS_LAST(0.10)[];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 R_DKIM_NA(2.20)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_COUNT_TWO(0.00)[2]
+X-Spam-Score: 17.99
+X-Rspamd-Queue-Id: 3C2EF218E4
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+Hi Jens,
 
-When CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION is enabled, null_queue_rq()
-would return BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE for the request,
-which has been marked as MQ_RQ_IN_FLIGHT by blk_mq_start_request().
+Here are recent bcache patches tested by me on Linux v6.7-rc1 and can be
+applied on branch block-6.7 of linux-block tree. 
 
-Then null_queue_rqs() put these requests in the rqlist, return back to
-the block layer core, which would try to queue them individually again,
-so the warning in blk_mq_start_request() triggered.
+In this series, Colin provids useful code cleanup, some small and still
+important fixes are contributed from Mingzhe, Rand. Also there are some
+fixes and a code comments patch from me.
 
-Fix it by splitting the null_queue_rq() into two parts: the first is the
-preparation of request, the second is the handling of request. We put
-the blk_mq_start_request() after the preparation part, which may fail
-and return back to the block layer core.
+When I fixed the issue found during testing, 6.7-rc1 was released. IMHO
+it still makes sense to have most of the fixes into 6.7. Please consider
+to take them in block-6.7 if it is possible.
 
-The throttling also belongs to the preparation part, so move it before
-blk_mq_start_request(). And change the return type of null_handle_cmd()
-to void, since it always return BLK_STS_OK now.
+Thanks in advance.
 
-Reported-by: syzbot+fcc47ba2476570cbbeb0@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/0000000000000e6aac06098aee0c@google.com/
-Fixes: d78bfa1346ab ("block/null_blk: add queue_rqs() support")
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+Coly Li
 ---
- drivers/block/null_blk/main.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 22a3cf7f32e2..3021d58ca51c 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1464,19 +1464,13 @@ blk_status_t null_process_cmd(struct nullb_cmd *cmd, enum req_op op,
- 	return BLK_STS_OK;
- }
- 
--static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
--				    sector_t nr_sectors, enum req_op op)
-+static void null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
-+			    sector_t nr_sectors, enum req_op op)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
- 	struct nullb *nullb = dev->nullb;
- 	blk_status_t sts;
- 
--	if (test_bit(NULLB_DEV_FL_THROTTLED, &dev->flags)) {
--		sts = null_handle_throttled(cmd);
--		if (sts != BLK_STS_OK)
--			return sts;
--	}
--
- 	if (op == REQ_OP_FLUSH) {
- 		cmd->error = errno_to_blk_status(null_handle_flush(nullb));
- 		goto out;
-@@ -1493,7 +1487,6 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
- 
- out:
- 	nullb_complete_cmd(cmd);
--	return BLK_STS_OK;
- }
- 
- static enum hrtimer_restart nullb_bwtimer_fn(struct hrtimer *timer)
-@@ -1724,8 +1717,6 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	cmd->fake_timeout = should_timeout_request(rq) ||
- 		blk_should_fake_timeout(rq->q);
- 
--	blk_mq_start_request(rq);
--
- 	if (should_requeue_request(rq)) {
- 		/*
- 		 * Alternate between hitting the core BUSY path, and the
-@@ -1738,6 +1729,15 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		return BLK_STS_OK;
- 	}
- 
-+	if (test_bit(NULLB_DEV_FL_THROTTLED, &nq->dev->flags)) {
-+		blk_status_t sts = null_handle_throttled(cmd);
-+
-+		if (sts != BLK_STS_OK)
-+			return sts;
-+	}
-+
-+	blk_mq_start_request(rq);
-+
- 	if (is_poll) {
- 		spin_lock(&nq->poll_lock);
- 		list_add_tail(&rq->queuelist, &nq->poll_list);
-@@ -1747,7 +1747,8 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (cmd->fake_timeout)
- 		return BLK_STS_OK;
- 
--	return null_handle_cmd(cmd, sector, nr_sectors, req_op(rq));
-+	null_handle_cmd(cmd, sector, nr_sectors, req_op(rq));
-+	return BLK_STS_OK;
- }
- 
- static void null_queue_rqs(struct request **rqlist)
+Colin Ian King (1):
+  bcache: remove redundant assignment to variable cur_idx
+
+Coly Li (5):
+  bcache: avoid oversize memory allocation by small stripe_size
+  bcache: check return value from btree_node_alloc_replacement()
+  bcache: replace a mistaken IS_ERR() by IS_ERR_OR_NULL() in
+    btree_gc_coalesce()
+  bcache: add code comments for bch_btree_node_get() and
+    __bch_btree_node_alloc()
+  bcache: avoid NULL checking to c->root in run_cache_set()
+
+Mingzhe Zou (3):
+  bcache: fixup init dirty data errors
+  bcache: fixup lock c->root error
+  bcache: fixup multi-threaded bch_sectors_dirty_init() wake-up race
+
+Rand Deeb (1):
+  bcache: prevent potential division by zero error
+
+ drivers/md/bcache/bcache.h    |  1 +
+ drivers/md/bcache/btree.c     | 11 ++++++++++-
+ drivers/md/bcache/super.c     |  4 +++-
+ drivers/md/bcache/sysfs.c     |  2 +-
+ drivers/md/bcache/writeback.c | 24 ++++++++++++++++++------
+ 5 files changed, 33 insertions(+), 9 deletions(-)
+
 -- 
-2.40.1
+2.35.3
 
