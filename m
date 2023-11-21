@@ -1,81 +1,95 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4Zwg5oV"
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B15C3CB;
-	Tue, 21 Nov 2023 08:10:57 -0800 (PST)
-Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-3b837d974ecso331195b6e.2;
-        Tue, 21 Nov 2023 08:10:57 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="eYH3/BYv"
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA19126
+	for <linux-block@vger.kernel.org>; Tue, 21 Nov 2023 09:47:17 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-a0064353af8so2380766b.0
+        for <linux-block@vger.kernel.org>; Tue, 21 Nov 2023 09:47:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700583057; x=1701187857; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y7pnqI74NKLkaXfyd8GQP0kyMyA4yNmTqJMM3pVvHaM=;
-        b=i4Zwg5oVJh2qf5b3g5CCwdkrGU21PECnkDQxHy2VoApP9NEMaLyDz7csVPcGBjd2CD
-         hdA2drpAGkYbncNMdcrbu1k54O4+9Ra8jAiyygU0Y9yhjH69OZkfANciHuYD9Ftz91Av
-         NWmBeaxSVAG6uddAgWmDjtINOP/DtUnlmLckqebi1N5k+4SnxZ+j59O1iORiYNWU6ncO
-         MhXQ62wzOiXNo64fPOTg1n1N7HQTb6jzph2FEPCbBHWoMvQ74mtO+aSN33kXroProfOH
-         goPWN9dKgPH2CzFvqPouUzUca5orbqVniOCtIwzdk/htFtdcgqYX6RLUdlhCnAytvvlj
-         +fwA==
+        d=linux-foundation.org; s=google; t=1700588835; x=1701193635; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GWpUH6i/TWiULkSXxy7JKYlrCmr9Zd67SZ1skaJHNkw=;
+        b=eYH3/BYvgxBxpe5ivQo2goPIrJ5wKDnTrGntaeaHqOJU2Sd0+Uwf3+AkWEef0Jrpcy
+         4ncYfIRa7YFaHFRe8op3JhFZPLyilCT/I2SW+56Zbs2+bT+tXg0ThkSXC97vYd58Os/y
+         W2TLY4Db0hCLBOi6GB1fNJk1hlRPnQqu/cGpA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700583057; x=1701187857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y7pnqI74NKLkaXfyd8GQP0kyMyA4yNmTqJMM3pVvHaM=;
-        b=UHNowg0WSEzm6Op3HdFR2iAtdLW42qrPmj2qZ4/zNpXFD5MdF0BRajKl5ipTyjeuez
-         07vtBtB/I7MyRDKawkOTFsojkB9PqZ1RJLjJbNXAnPkqgnlRE6tToqw1rLjxjmAUjW3E
-         7l29DxfbbNZLF/hY3YmxZLfBqRFwzNEzUQnmEFZDgKDewVstCJdpnt+FnUeCj+pnL4Kk
-         sd4NLXR4VT5J7pQRnXV2pWUtEGDrBRBpRDSVgAmzlkC600I1NQuKiC7d/fG4blgooLhF
-         cf0v/4L/ZMFAK9JE8C/lMqbn+tVDeWOXXjzzbxBd7iNuoOldCg0oodq5hUGjApX07ELG
-         Jasw==
-X-Gm-Message-State: AOJu0YwDco8TZ2L5hqYB0mhORsSXMHMHzzjYcdRz6Hb7G2SCR9jPbs7r
-	2dz5ew6ODbF7Ik1e5IgUQJTVD97m3KgM0lEBtQ==
-X-Google-Smtp-Source: AGHT+IFiRaCf/Q+x81UKnU4Wpey3wIOZJlFvG9RRGz5EHrrlf7aahHCnKG4nyEynHxf6qjGLknAONjzHifddupR97R0=
-X-Received: by 2002:a05:6359:d23:b0:16b:b8b1:f684 with SMTP id
- gp35-20020a0563590d2300b0016bb8b1f684mr9672260rwb.22.1700583056876; Tue, 21
- Nov 2023 08:10:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700588835; x=1701193635;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GWpUH6i/TWiULkSXxy7JKYlrCmr9Zd67SZ1skaJHNkw=;
+        b=eJ+Orsh2vQ4FWayRwsY8k9n7hGzrW/ZY8J+X6fpN2hTgNV7/h45Lf88HWcF0fTo/vE
+         N5FKYLOTNW8w2o7L11NpbpXjaSZtzIWiq88mJtCGMB7H4aLzp+q7oz30rzloMO9xbt1j
+         tQos9u/tkyijJzEnPsmyKM29bSsgIelLdUC5OLHYcAfVFz9t5c76T02GPLCM7XNk2uf0
+         3wqMXYDNyAAyyqEMsiXN9itFnZpTeq4r4ojPcKs2IT+dakZG/UoCimjxzGE7YWoKlndW
+         Osx7micic6GibvzuMaAAC1OS8ptqiiKldONksmMJTO10+19phqaT4ryCYxLatVXAaVaQ
+         FxMg==
+X-Gm-Message-State: AOJu0YysrcKJr/iYK9t1xjCT/bKsESjK+bZvy98iAlzGOonAJwhBoXgi
+	DPmUqD+gD1vMyeni/Ur1ksHgk2/6LY9JQfTStElmFg==
+X-Google-Smtp-Source: AGHT+IG/rs3btFnyiP8NQTKRzF02aDyhaeRaqb+SKz0acXfYBlJnezhGUwOu8YhqBBHRTSr2mJBOOQ==
+X-Received: by 2002:a17:906:33cb:b0:9b2:be5e:3674 with SMTP id w11-20020a17090633cb00b009b2be5e3674mr53284eja.36.1700588835592;
+        Tue, 21 Nov 2023 09:47:15 -0800 (PST)
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com. [209.85.208.42])
+        by smtp.gmail.com with ESMTPSA id lh25-20020a170906f8d900b009fd50aa6984sm3117052ejb.83.2023.11.21.09.47.14
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Nov 2023 09:47:14 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-547e7de7b6fso21030a12.0
+        for <linux-block@vger.kernel.org>; Tue, 21 Nov 2023 09:47:14 -0800 (PST)
+X-Received: by 2002:a50:ec8d:0:b0:545:27f5:3bd8 with SMTP id
+ e13-20020a50ec8d000000b0054527f53bd8mr33687edr.20.1700588834427; Tue, 21 Nov
+ 2023 09:47:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120224058.2750705-1-kbusch@meta.com> <20231120224058.2750705-3-kbusch@meta.com>
-In-Reply-To: <20231120224058.2750705-3-kbusch@meta.com>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Tue, 21 Nov 2023 21:40:20 +0530
-Message-ID: <CACzX3AvO2GSvwagd=PkxsG3uiKgT4vpiMzYA1RJOjEMQD=yN6A@mail.gmail.com>
-Subject: Re: [PATCHv3 2/5] block: bio-integrity: directly map user buffers
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	io-uring@vger.kernel.org, axboe@kernel.dk, hch@lst.de, joshi.k@samsung.com, 
-	martin.petersen@oracle.com, Keith Busch <kbusch@kernel.org>
+References: <20231120221735.k6iyr5t5wdlgpxui@box.shutemov.name> <20231121122712.31339-1-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20231121122712.31339-1-kirill.shutemov@linux.intel.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 21 Nov 2023 09:46:57 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiqu14v=RdTYZwF60gpBb0gYdN++u-e-jnqkjEm0m6UdA@mail.gmail.com>
+Message-ID: <CAHk-=wiqu14v=RdTYZwF60gpBb0gYdN++u-e-jnqkjEm0m6UdA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] mm, treewide: Introduce NR_PAGE_ORDERS
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: akpm@linux-foundation.org, agk@redhat.com, bmarzins@redhat.com, 
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org, mpatocka@redhat.com, 
+	mpe@ellerman.id.au, snitzer@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 21, 2023 at 4:11=E2=80=AFAM Keith Busch <kbusch@meta.com> wrote=
-:
+On Tue, 21 Nov 2023 at 04:27, Kirill A. Shutemov
+<kirill.shutemov@linux.intel.com> wrote:
 >
-> From: Keith Busch <kbusch@kernel.org>
+> NR_PAGE_ORDERS defines the number of page orders supported by the page
+> allocator, ranging from 0 to MAX_ORDER, MAX_ORDER + 1 in total.
 >
-> Passthrough commands that utilize metadata currently bounce the user
-> space buffer through the kernel. Add support for mapping user space
-> directly so that we can avoid this costly overhead. This is similiar to
+> NR_PAGE_ORDERS assists in defining arrays of page orders and allows for
+> more natural iteration over them.
 
-Nit: s/similiar/similar
+These two patches look much better to me, but I think you missed one area.
 
- >  /**
->   * bio_integrity_free - Free bio integrity payload
->   * @bio:       bio containing bip to be freed
-> @@ -105,6 +136,8 @@ void bio_integrity_free(struct bio *bio)
->
->         if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
->                 kfree(bvec_virt(bip->bip_vec));
-> +       else if (bip->bip_flags & BIP_INTEGRITY_USER)
-> +               bio_integrity_unmap_user(bip);;
+Most of the Kconfig changes by commit 23baf831a32c ("mm, treewide:
+redefine MAX_ORDER sanely") should also be basically reverted to use
+this new NR_PAGE_ORDERS.
 
-Nit: extra semicolon here
+IOW, I think the ARCH_FORCE_MAX_ORDER #defines etc should also be done
+in "number of page orders". I suspect from a documentation standpoint
+that also makes more sense in places, eg I think that right now your
+patch says
 
---
-Anuj Gupta
+                        amount of memory for normal system use. The maximum
+-                       possible value is MAX_ORDER/2.  Setting this parameter
++                       possible value is MAX_PAGE_ORDER/2.  Setting this
+
+and that's actually nonsensical, because it's NR_PAGE_ORDERS that was
+at least historically the boundary (and historically the one that was
+an even number that can be halved cleanly).
+
+So that kernel parameter should be in terms of NR_PAGE_ORDERS.
+
+But yes, I do think the naming now makes more sense, so other than
+that reaction I think these changes are good.
+
+                  Linus
