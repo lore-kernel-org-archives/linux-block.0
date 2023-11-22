@@ -1,87 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OM4AtmPh"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C383B18D
-	for <linux-block@vger.kernel.org>; Wed, 22 Nov 2023 00:19:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700641192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NIoITgQxtiObzPXLhbMbQ4g44rH9YUmiKgRrHrYsxWk=;
-	b=OM4AtmPhF7LHRyoMigzeAEW0WLeyCVJsZ01OFeSsXU/NNL5zXK+lT1eLSsZmZfgV+Bou9B
-	nhVNPiszVSmUAX+M5CUuLIjz+oYLJ/zl+KPlToaJAj/kYxJbE3u54MXwoTNCCtlsYuNr++
-	njqRlKxHY7t0c9C20DFP1+v3M1sPcH4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-542-Y8eM_pUwMYakn0zSjgAXzg-1; Wed,
- 22 Nov 2023 03:19:50 -0500
-X-MC-Unique: Y8eM_pUwMYakn0zSjgAXzg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1B1A93C10146;
-	Wed, 22 Nov 2023 08:19:50 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.3])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BBCBC1596F;
-	Wed, 22 Nov 2023 08:19:45 +0000 (UTC)
-Date: Wed, 22 Nov 2023 16:19:40 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH v3 2/3] block: introduce new field bd_flags in
- block_device
-Message-ID: <ZV25nGGMYQuyclK6@fedora>
-References: <20231122103103.1104589-1-yukuai1@huaweicloud.com>
- <20231122103103.1104589-3-yukuai1@huaweicloud.com>
- <ZV2tuLCH2cPXxQ30@infradead.org>
- <ZV2xlDgkLpPeUhHN@fedora>
- <ZV2zbTPTZ0qC2F1U@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A811C2B1;
+	Wed, 22 Nov 2023 09:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hYCC8VS2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11C32C433C9;
+	Wed, 22 Nov 2023 09:53:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700646792;
+	bh=mhumkheBD35RQHMrgpMEPnFJrlXDHufqaBwB+qfy/40=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hYCC8VS2FKMmTfS917Xx6BMgYmPnr+FyurJudNbHnrUOSnbqvenmY6ZbiFi/KyZN9
+	 uNUNSQSnUQSGtxre8Opynkl+LWiE/fPSUesZZsypkRXhDgq7eyeaX8qNsI4rXitiec
+	 v2i4V0udTy+uVH1xN0Tysw+8q8Ai4Buyo4BKPU4w6Ml7mGz+tqKp9fkm5MKSEQVjSX
+	 ZFpc2ciLj3iTsjCvakVpqRZSFf4codJIloPLvuRM7wERFL+YQcAkdl5GoOm73mO3c+
+	 GCIw05rGRlE5imeEBjlMxEpmVycb7B+wvuh7H4BOAy6E/ensLI3VK09+wKYrQFVcHe
+	 Y5tnyoRjGbRMA==
+Message-ID: <416b349c-384e-42e8-ac1e-480b236cc210@kernel.org>
+Date: Wed, 22 Nov 2023 10:53:03 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZV2zbTPTZ0qC2F1U@infradead.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 12/12] dt-bindings: crypto: ice: document the hwkm
+ property
+Content-Language: en-US
+To: Gaurav Kashyap <quic_gaurkash@quicinc.com>, linux-scsi@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, ebiggers@google.com,
+ neil.armstrong@linaro.org, srinivas.kandagatla@linaro.org
+Cc: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
+ quic_psodagud@quicinc.com, abel.vesa@linaro.org, quic_spuppala@quicinc.com,
+ kernel@quicinc.com
+References: <20231122053817.3401748-1-quic_gaurkash@quicinc.com>
+ <20231122053817.3401748-13-quic_gaurkash@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20231122053817.3401748-13-quic_gaurkash@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 21, 2023 at 11:53:17PM -0800, Christoph Hellwig wrote:
-> On Wed, Nov 22, 2023 at 03:45:24PM +0800, Ming Lei wrote:
-> > All the existed 'bool' flags are not atomic RW, so I think it isn't
-> > necessary to define 'bd_flags' as 'unsigned long' for replacing them.
+On 22/11/2023 06:38, Gaurav Kashyap wrote:
+> Add documentation for the ice-use-hwkm property in
+> qcom ice.
 > 
-> So because the old code wasn't correct we'll never bother?  The new
-> flag and the new placement certainly make this more critical as well.
+> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 
-Can you explain why the old code was wrong?
+Another day, another same comments:
+https://lore.kernel.org/all/6e435e84-fea9-4f74-8977-d589cbc31ded@kernel.org/
 
-1) ->bd_read_only and ->bd_make_it_fail
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
 
-- set from userspace interface(ioctl or sysfs)
-- check in IO code path
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time, thus I will skip this patch entirely till you follow
+the process allowing the patch to be tested.
 
-so changing it into atomic bit doesn't make difference from user
-viewpoint.
+Please kindly resend and include all necessary To/Cc entries.
 
-2) ->bd_write_holder
-
-disk->open_mutex is held for read & write this flag
-
-3) ->bd_has_submit_bio
-
-This flag is setup as oneshot before adding disk, and check in FS io code
-path.
-
-Of course, defining it as 'unsigned long' can extend its future usage, but
-it depends on the atomic requirement of each flag itself.
-
-
-Thanks, 
-Ming
+Best regards,
+Krzysztof
 
