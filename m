@@ -1,79 +1,82 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="cQnXxjcA"
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E432B1B5
-	for <linux-block@vger.kernel.org>; Wed, 22 Nov 2023 06:52:26 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c8790474d5so54183811fa.2
-        for <linux-block@vger.kernel.org>; Wed, 22 Nov 2023 06:52:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ilSqag2I"
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14BC92;
+	Wed, 22 Nov 2023 08:02:48 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-5440f25dcc7so9833480a12.0;
+        Wed, 22 Nov 2023 08:02:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1700664745; x=1701269545; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MqW0w8dJWEORWP66TgrclqI7GjFRrqwdDgyNGoDP6Hw=;
-        b=cQnXxjcAqp15wAhDPAkyyoTFW5NVrqzeZUC6NkpLNaV/WYDE8WmibErj2VCFLrwv6v
-         QesyO3Y3jy9811ANYe9cJMvqf2FMjR+LnyDr8Vuhfr/ZHGdWMqVtDMrgDbMWcKYj28/A
-         t/i4LaX+OHJrVkW8Mt/31gBnzA2GlPSnLJ6ckcvmo3Fqq//KgxmwwWF50/M0W02OA+k6
-         Txe0AYIO9cKL6fayS+su1DCmChS4ScDzBtIAZmU60mG1JvqmN6u+lNbpiGXpnBqZ36tN
-         0tTIvdUxB8EqBAMxXSmEG+hGxTNA2hVUhGgyep4phYdHvqLIruHq5g6oT/ZmyJfQ6Evp
-         dDJg==
+        d=gmail.com; s=20230601; t=1700668967; x=1701273767; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UB34EB9M6UMsx2R8XCgx/zxjlGb/btxWH/jNh3ZU3M4=;
+        b=ilSqag2I5kjPaXMJ518XGqrOU7COvc5r14vi5hyUhiNYaI+0ZsMHRAE/nmI3TYDz3Z
+         Zu5bllogKpujgl2zfdJzjjN4JfkXO03RPPjkg0zfv0ZTdE5Ti9M+aXSY7AV3y6xU8wpk
+         tiOFPjuSyG1FLfx7mgHC+jf1M1xh4+RksAXv/PdMY3ZVsGJ0dGB/1t28t08iwEMaBMd5
+         atmQTJyFVdgPOO4ieteEIZ2II/JUXjr8MveesyIq8sO9JbHIZ/v3joHJpvV1zcwgzmtL
+         lZa+nmO1YmCQUisGwG19wxoJyeneKKsrCB9DQx/B6idOA7cNJgiP43+QmnW0cCfKIgJw
+         DHQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700664745; x=1701269545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MqW0w8dJWEORWP66TgrclqI7GjFRrqwdDgyNGoDP6Hw=;
-        b=d4Ab6AyYxz2JCBjwKlmDb/anWUO+eggCIPPYmj0bO9PmPsRddTtcgw94bwUBJsM9Pm
-         464eDSAYKuYtpIXP/PHILHpSYmngiUJVv0WRU+sZJvgGzkQbsrDX27cnj2M6mllbQSYU
-         LCHwXXgMZhzie3Kkrw0E1tJc3JPJRTVi9IAN1ffxX+xTWje0Au6/rJhjx/ZvBfrvHtZ8
-         HZ9vxRsNZgG495NL0IF0UI8k6fwhqC3jkiDpyoSjRsx4k77Jgt7DRmnrunPmZP4IGy4i
-         yuQgLM+mjIEhdjGLDfr3cV/HNUfFBQb6cr2Cyw1m9SS3t+x6h5TH0FjvHki/zx3QKcmQ
-         np3g==
-X-Gm-Message-State: AOJu0YwpWVIsd2ZM0Djnqo4W3Utof5VoMJzr12LtoghcyiHg72/CCvk+
-	8lU2qoJH+aRUDHD4hMsgFeCnAtoDfIk/Iqtpf/NDR1Q3oWjmsSVq
-X-Google-Smtp-Source: AGHT+IEAoliXOg6ylfuGfCmbV33pTvm6hon3p8mcY2Vo50msh4Y0grfzyzizPLxw7PjnO91B47tBBF/5O0pyq1ZXjRA=
-X-Received: by 2002:a05:651c:154b:b0:2c5:844:9e75 with SMTP id
- y11-20020a05651c154b00b002c508449e75mr2512487ljp.8.1700664745048; Wed, 22 Nov
- 2023 06:52:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700668967; x=1701273767;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UB34EB9M6UMsx2R8XCgx/zxjlGb/btxWH/jNh3ZU3M4=;
+        b=LQ3B8ZVUq5UxyincqlLUlglnn8qN2px9c8aFOWElSQT59Z2j0ioPnCfVsxFYgrYL0U
+         Dzz+vSPWAEc2kyGwcV5L5d3X0cOOEfYGNO2Me7LgJC7YORkcw+m/u04+xc5eCwIYgGFr
+         2AKRY8o/dJxqD4TNCxBZv6ZljRZ+OWcjktA8XLIk65rhQPK7ql8CqT9gzPgEtIZAFXci
+         Nkzrrwk1fXPD8I1wDPGOZucZVis/kNP0GsCF9Hc6bmec5YDYjQa5RsIQbwGnewpgVTZG
+         shxk4xF681BlNIB9IycwaBvJP1s7JkzZN8blu/BcHg0N4KAuROWonAhXZyWzCd6KJtKY
+         9tkw==
+X-Gm-Message-State: AOJu0Ywtq9W8u451CKUzgbVABpTIjmij8Om/1GsUfdmfhGNuD5/4EQNi
+	6tuOj0jAdhjRRj402LmiJfU6CqaqMxI=
+X-Google-Smtp-Source: AGHT+IFh1lljozdV8hU3OSeKjudz8yozp6RaWTGBP1F22lsuIyPoqEjYNJGXZbKNLdZhd5ZDI2eVEA==
+X-Received: by 2002:a17:906:1094:b0:9e6:18fe:7447 with SMTP id u20-20020a170906109400b009e618fe7447mr1760757eju.9.1700668966712;
+        Wed, 22 Nov 2023 08:02:46 -0800 (PST)
+Received: from 127.com ([2620:10d:c092:600::2:fba6])
+        by smtp.gmail.com with ESMTPSA id x26-20020a1709065ada00b009fd04a1a1dfsm4541805ejs.40.2023.11.22.08.02.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 08:02:46 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	asml.silence@gmail.com,
+	linux-block@vger.kernel.org,
+	ming.lei@redhat.com,
+	joshi.k@samsung.com
+Subject: [PATCH 0/3] clean up io_uring cmd header structure
+Date: Wed, 22 Nov 2023 16:01:08 +0000
+Message-ID: <cover.1700668641.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231115163749.715614-1-haris.iqbal@ionos.com>
-In-Reply-To: <20231115163749.715614-1-haris.iqbal@ionos.com>
-From: Haris Iqbal <haris.iqbal@ionos.com>
-Date: Wed, 22 Nov 2023 15:52:14 +0100
-Message-ID: <CAJpMwyh-24qFt4U1L2Ki270oWis-GUBLRQVC+Lf4cG7EumkpPw@mail.gmail.com>
-Subject: Re: [PATCH for-next 0/2] Misc patches for RNBD
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org, 
-	jinpu.wang@ionos.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 15, 2023 at 5:37=E2=80=AFPM Md Haris Iqbal <haris.iqbal@ionos.c=
-om> wrote:
->
-> Hi Jens,
->
-> Please consider to include following changes to the next merge window.
->
-> Santosh Pradhan (1):
->   block/rnbd: add support for REQ_OP_WRITE_ZEROES
->
-> Supriti Singh (1):
->   block/rnbd: use %pe to print errors
->
->  drivers/block/rnbd/rnbd-clt.c   | 13 ++++++++-----
->  drivers/block/rnbd/rnbd-proto.h | 14 ++++++++++----
->  drivers/block/rnbd/rnbd-srv.c   | 25 +++++++++++++------------
->  3 files changed, 31 insertions(+), 21 deletions(-)
->
-> --
-> 2.25.1
+Looking at the zc rfc, and how we tend to stuff everything into
+linux/io_uring, start splitting the file before it becomes even more
+monstrous.
 
-Gentle ping.
+Pavel Begunkov (3):
+  io_uring: split out cmd api into a separate header
+  io_uring/cmd: inline io_uring_cmd_do_in_task_lazy
+  io_uring/cmd: inline io_uring_cmd_get_task
 
->
+ drivers/block/ublk_drv.c       |  2 +-
+ drivers/nvme/host/ioctl.c      |  2 +-
+ include/linux/io_uring.h       | 89 +---------------------------------
+ include/linux/io_uring/cmd.h   | 82 +++++++++++++++++++++++++++++++
+ include/linux/io_uring_types.h | 31 ++++++++++++
+ io_uring/io_uring.c            |  1 +
+ io_uring/io_uring.h            | 10 ----
+ io_uring/rw.c                  |  2 +-
+ io_uring/uring_cmd.c           | 15 +-----
+ 9 files changed, 119 insertions(+), 115 deletions(-)
+ create mode 100644 include/linux/io_uring/cmd.h
+
+-- 
+2.42.1
+
