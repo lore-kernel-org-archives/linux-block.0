@@ -1,27 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE8CED47;
-	Tue, 21 Nov 2023 22:15:41 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SZrZs6wVpz4f3lfG;
-	Wed, 22 Nov 2023 14:15:33 +0800 (CST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C261AA;
+	Tue, 21 Nov 2023 23:06:28 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SZsjS6J3Yz4f3n5j;
+	Wed, 22 Nov 2023 15:06:20 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 380AE1A01EA;
-	Wed, 22 Nov 2023 14:15:38 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 21F791A0407;
+	Wed, 22 Nov 2023 15:06:25 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgDX2hCInF1lPDVqBg--.43558S3;
-	Wed, 22 Nov 2023 14:15:38 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgBXWhBvqF1lEnxtBg--.47979S3;
+	Wed, 22 Nov 2023 15:06:24 +0800 (CST)
 Subject: Re: [PATCH v3 2/3] block: introduce new field bd_flags in
  block_device
-To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+To: Michael Kelley <mhklinux@outlook.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
+ "yangerkun@huawei.com" <yangerkun@huawei.com>,
  "yukuai (C)" <yukuai3@huawei.com>
 References: <20231122103103.1104589-1-yukuai1@huaweicloud.com>
- <20231122103103.1104589-3-yukuai1@huaweicloud.com> <ZV11zTuF7AX9eIIE@fedora>
+ <20231122103103.1104589-3-yukuai1@huaweicloud.com>
+ <SN6PR02MB41574D8169D62EBFAE90427CD4BAA@SN6PR02MB4157.namprd02.prod.outlook.com>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c651426b-86ca-a646-87f7-0ced6cad19fe@huaweicloud.com>
-Date: Wed, 22 Nov 2023 14:15:36 +0800
+Message-ID: <09210f85-8a34-1ae8-59ec-55fefe7ba81a@huaweicloud.com>
+Date: Wed, 22 Nov 2023 15:06:23 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 Precedence: bulk
@@ -30,16 +35,16 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZV11zTuF7AX9eIIE@fedora>
+In-Reply-To: <SN6PR02MB41574D8169D62EBFAE90427CD4BAA@SN6PR02MB4157.namprd02.prod.outlook.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDX2hCInF1lPDVqBg--.43558S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3Gw43Zw1xGF47WFy3Zr45Awb_yoW3Zw4rpF
-	WkJFWYyrWUGr1fWa1Iqa13JFnagw40yr18C3y3C34jyrZ0yrn7WF1kJr1j9a929rW8CFWx
-	ZF1DuFW3Cryjka7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:cCh0CgBXWhBvqF1lEnxtBg--.47979S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3GryDWFyUJr1DtrW7Ar1DKFg_yoWDGr4UpF
+	WkJFWYk3yUGr1fWa1Iqa13J3ZYgw40yr18C3y3C342yrZ0yr1vgF1kGryj9as3urW8CFW7
+	ZF1UuFW3Cryj9a7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
 	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
 	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
 	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
@@ -47,16 +52,15 @@ X-Coremail-Antispam: 1UD129KBjvJXoW3Gw43Zw1xGF47WFy3Zr45Awb_yoW3Zw4rpF
 	IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
 	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
 	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-	Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
-	UUUUU==
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
+	DUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 Hi,
 
-在 2023/11/22 11:30, Ming Lei 写道:
-> On Wed, Nov 22, 2023 at 06:31:02PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
+在 2023/11/22 11:52, Michael Kelley 写道:
+> From: Yu Kuai <yukuai1@huaweicloud.com> Sent: Wednesday, November 22, 2023 2:31 AM
 >>
 >> There are multiple switches in struct block_device, use separate bool
 >> fields for them is not gracefully. Add a new field bd_flags and replace
@@ -80,7 +84,8 @@ Hi,
 >> index e4cfb7adb645..10f524a7416c 100644
 >> --- a/block/bdev.c
 >> +++ b/block/bdev.c
->> @@ -402,10 +402,10 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+>> @@ -402,10 +402,10 @@ struct block_device *bdev_alloc(struct gendisk
+>> *disk, u8 partno)
 >>   	bdev->bd_partno = partno;
 >>   	bdev->bd_inode = inode;
 >>   	bdev->bd_queue = disk->queue;
@@ -111,8 +116,9 @@ Hi,
 >> +		bdev_clear_flag(bdev, BD_FLAG_WRITE_HOLDER);
 >>   	}
 >>   }
->>   
->> @@ -805,9 +805,10 @@ struct block_device *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+>>
+>> @@ -805,9 +805,10 @@ struct block_device *blkdev_get_by_dev(dev_t dev,
+>> blk_mode_t mode, void *holder,
 >>   		 * writeable reference is too fragile given the way @mode is
 >>   		 * used in blkdev_get/put().
 >>   		 */
@@ -129,20 +135,21 @@ Hi,
 >> index fdf25b8d6e78..f9f8b12ba626 100644
 >> --- a/block/blk-core.c
 >> +++ b/block/blk-core.c
->> @@ -482,7 +482,8 @@ __setup("fail_make_request=", setup_fail_make_request);
->>   
+>> @@ -482,7 +482,8 @@ __setup("fail_make_request=",
+>> setup_fail_make_request);
+>>
 >>   bool should_fail_request(struct block_device *part, unsigned int bytes)
 >>   {
 >> -	return part->bd_make_it_fail && should_fail(&fail_make_request, bytes);
 >> +	return bdev_flagged(part, BD_FLAG_MAKE_IT_FAIL) &&
 >> +		should_fail(&fail_make_request, bytes);
 >>   }
->>   
+>>
 >>   static int __init fail_make_request_debugfs(void)
 >> @@ -595,7 +596,7 @@ static void __submit_bio(struct bio *bio)
 >>   	if (unlikely(!blk_crypto_bio_prep(&bio)))
 >>   		return;
->>   
+>>
 >> -	if (!bio->bi_bdev->bd_has_submit_bio) {
 >> +	if (!bdev_flagged(bio->bi_bdev, BD_FLAG_HAS_SUBMIT_BIO)) {
 >>   		blk_mq_submit_bio(bio);
@@ -161,14 +168,15 @@ Hi,
 >> index c9d06f72c587..57f96c0c8da0 100644
 >> --- a/block/genhd.c
 >> +++ b/block/genhd.c
->> @@ -413,7 +413,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>> @@ -413,7 +413,8 @@ int __must_check device_add_disk(struct device
+>> *parent, struct gendisk *disk,
 >>   	elevator_init_mq(disk->queue);
->>   
+>>
 >>   	/* Mark bdev as having a submit_bio, if needed */
 >> -	disk->part0->bd_has_submit_bio = disk->fops->submit_bio != NULL;
 >> +	if (disk->fops->submit_bio)
 >> +		bdev_set_flag(disk->part0, BD_FLAG_HAS_SUBMIT_BIO);
->>   
+>>
 >>   	/*
 >>   	 * If the driver provides an explicit major number it also must provide
 >> @@ -1062,7 +1063,8 @@ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
@@ -179,12 +187,12 @@ Hi,
 >> +	return sprintf(buf, "%d\n",
 >> +		       bdev_flagged(dev_to_bdev(dev), BD_FLAG_MAKE_IT_FAIL));
 >>   }
->>   
+>>
 >>   ssize_t part_fail_store(struct device *dev,
 >> @@ -1071,8 +1073,13 @@ ssize_t part_fail_store(struct device *dev,
 >>   {
 >>   	int i;
->>   
+>>
 >> -	if (count > 0 && sscanf(buf, "%d", &i) > 0)
 >> -		dev_to_bdev(dev)->bd_make_it_fail = i;
 >> +	if (count > 0 && sscanf(buf, "%d", &i) > 0) {
@@ -194,7 +202,7 @@ Hi,
 >> +			bdev_set_flag(dev_to_bdev(dev), BD_FLAG_MAKE_IT_FAIL);
 >> +
 >> +	}
->>   
+>>
 >>   	return count;
 >>   }
 >> diff --git a/block/ioctl.c b/block/ioctl.c
@@ -213,7 +221,7 @@ Hi,
 >> +		bdev_set_flag(bdev, BD_FLAG_READ_ONLY);
 >>   	return 0;
 >>   }
->>   
+>>
 >> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
 >> index f7d40692dd94..de652045111b 100644
 >> --- a/include/linux/blk_types.h
@@ -221,7 +229,7 @@ Hi,
 >> @@ -37,6 +37,11 @@ struct bio_crypt_ctx;
 >>   #define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
 >>   #define SECTOR_MASK		(PAGE_SECTORS - 1)
->>   
+>>
 >> +#define BD_FLAG_READ_ONLY	0 /* read-only-policy */
 >> +#define BD_FLAG_WRITE_HOLDER	1
 >> +#define BD_FLAG_HAS_SUBMIT_BIO	2
@@ -241,10 +249,10 @@ Hi,
 >> -	bool			bd_has_submit_bio;
 >>   	dev_t			bd_dev;
 >>   	struct inode		*bd_inode;	/* will die */
->>   
+>>
 >> @@ -67,9 +70,6 @@ struct block_device {
 >>   	struct super_block	*bd_fsfreeze_sb;
->>   
+>>
 >>   	struct partition_meta_info *bd_meta_info;
 >> -#ifdef CONFIG_FAIL_MAKE_REQUEST
 >> -	bool			bd_make_it_fail;
@@ -255,7 +263,7 @@ Hi,
 >> @@ -86,6 +86,21 @@ struct block_device {
 >>   #define bdev_kobj(_bdev) \
 >>   	(&((_bdev)->bd_device.kobj))
->>   
+>>
 >> +static inline bool bdev_flagged(struct block_device *bdev, unsigned int bit)
 >> +{
 >> +	return bdev->bd_flags & (1U << bit);
@@ -271,18 +279,56 @@ Hi,
 >> +	bdev->bd_flags &= ~(1U << bit);
 >> +}
 > 
-> 'U' becomes incorrect after .bd_flags is changed to 'unsigned short'.
+> It seems like there's atomicity problem with this approach.  In the above
+> code, setting and clearing a bd_flag is *not* atomic with respect to
+> setting/clearing some other bd_flag.  For example, setting/clearing
+> BD_FLAG_MAKE_IT_FAIL via the /sys interface could race with
+> setting/clearing BD_FLAG_READ_ONLY via an ioctl, and one of the
+> two changes could be lost.  This problem wouldn't happen when
+> each flag was a separate field.  Admittedly, the likelihood of a
+> problem with BD_FLAG_MAKE_IT_FAIL is extremely low, but
+> conceptually the lack of atomicity is still wrong.  There might
+> be a similar problem with BD_FLAG_WRITE_HOLDER, but I
+> didn't investigate thoroughly.
 
-Currently, bi_flags is unsigned short, and this is the same as
-bio_set/clear_flag(), will this behaviour cause any problems?
+Thanks for the explanation, however, currently bio->bi_opf,
+bio->bi_flags and req->rq_flags, and I can't understand now how do they
+prevent to change bit concurrently? I'm probably missing something...
 
 Thanks,
 Kuai
 
 > 
+> Michael
 > 
-> Thanks,
-> Ming
+>> +
+>>   /*
+>>    * Block error status values.  See block/blk-core:blk_errors for the details.
+>>    * Alpha cannot write a byte atomically, so we need to use 32-bit value.
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 51fa7ffdee83..fc1d55ef5107 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -741,13 +741,14 @@ void disk_uevent(struct gendisk *disk, enum
+>> kobject_action action);
+>>
+>>   static inline int get_disk_ro(struct gendisk *disk)
+>>   {
+>> -	return disk->part0->bd_read_only ||
+>> +	return bdev_flagged(disk->part0, BD_FLAG_READ_ONLY) ||
+>>   		test_bit(GD_READ_ONLY, &disk->state);
+>>   }
+>>
+>>   static inline int bdev_read_only(struct block_device *bdev)
+>>   {
+>> -	return bdev->bd_read_only || get_disk_ro(bdev->bd_disk);
+>> +	return bdev_flagged(bdev, BD_FLAG_READ_ONLY) ||
+>> +		get_disk_ro(bdev->bd_disk);
+>>   }
+>>
+>>   bool set_capacity_and_notify(struct gendisk *disk, sector_t size);
+>> --
+>> 2.39.2
 > 
 > .
 > 
