@@ -1,42 +1,43 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ilSqag2I"
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14BC92;
-	Wed, 22 Nov 2023 08:02:48 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-5440f25dcc7so9833480a12.0;
-        Wed, 22 Nov 2023 08:02:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ktaoQ/Ou"
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3EB31BF;
+	Wed, 22 Nov 2023 08:02:50 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-a00b01955acso410310066b.1;
+        Wed, 22 Nov 2023 08:02:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700668967; x=1701273767; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UB34EB9M6UMsx2R8XCgx/zxjlGb/btxWH/jNh3ZU3M4=;
-        b=ilSqag2I5kjPaXMJ518XGqrOU7COvc5r14vi5hyUhiNYaI+0ZsMHRAE/nmI3TYDz3Z
-         Zu5bllogKpujgl2zfdJzjjN4JfkXO03RPPjkg0zfv0ZTdE5Ti9M+aXSY7AV3y6xU8wpk
-         tiOFPjuSyG1FLfx7mgHC+jf1M1xh4+RksAXv/PdMY3ZVsGJ0dGB/1t28t08iwEMaBMd5
-         atmQTJyFVdgPOO4ieteEIZ2II/JUXjr8MveesyIq8sO9JbHIZ/v3joHJpvV1zcwgzmtL
-         lZa+nmO1YmCQUisGwG19wxoJyeneKKsrCB9DQx/B6idOA7cNJgiP43+QmnW0cCfKIgJw
-         DHQg==
+        d=gmail.com; s=20230601; t=1700668968; x=1701273768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YiiLGrpZSDIC4Qc1OGZlXR+FMZWiJkQTWTZS1aN/KEA=;
+        b=ktaoQ/OuKb7W/v9ZY8ffw8Ns2sJbglUnzqGnCtkscifLEe7UIQ0uP/YWcj4QrPmxfF
+         VMOt/3WBi2WfKJcOTfC6EHpcVFZnRHWVFR1uC/zX6LFWfDr1JNLZdcqsJrro2I5ZlVkl
+         76s2jtNAwcr5F0pPCuf9My10yqAY8C75ttS4J4N6jU4bBNQunrXLsvVOXAAPKXbLBsf2
+         qsWZZ7hXI+2q2HPVpFICY+SrW86in3ALxM8Ci9iqKdJ+oI7NwcQ5ntXjbzABEGsnbxlF
+         5+jVHQCDIuTf7pwfpSwmRVkYxBGZYBJQlR7lysif5DU67oZ55cK/8TC13jA/EqZwIAzy
+         UHJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700668967; x=1701273767;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UB34EB9M6UMsx2R8XCgx/zxjlGb/btxWH/jNh3ZU3M4=;
-        b=LQ3B8ZVUq5UxyincqlLUlglnn8qN2px9c8aFOWElSQT59Z2j0ioPnCfVsxFYgrYL0U
-         Dzz+vSPWAEc2kyGwcV5L5d3X0cOOEfYGNO2Me7LgJC7YORkcw+m/u04+xc5eCwIYgGFr
-         2AKRY8o/dJxqD4TNCxBZv6ZljRZ+OWcjktA8XLIk65rhQPK7ql8CqT9gzPgEtIZAFXci
-         Nkzrrwk1fXPD8I1wDPGOZucZVis/kNP0GsCF9Hc6bmec5YDYjQa5RsIQbwGnewpgVTZG
-         shxk4xF681BlNIB9IycwaBvJP1s7JkzZN8blu/BcHg0N4KAuROWonAhXZyWzCd6KJtKY
-         9tkw==
-X-Gm-Message-State: AOJu0Ywtq9W8u451CKUzgbVABpTIjmij8Om/1GsUfdmfhGNuD5/4EQNi
-	6tuOj0jAdhjRRj402LmiJfU6CqaqMxI=
-X-Google-Smtp-Source: AGHT+IFh1lljozdV8hU3OSeKjudz8yozp6RaWTGBP1F22lsuIyPoqEjYNJGXZbKNLdZhd5ZDI2eVEA==
-X-Received: by 2002:a17:906:1094:b0:9e6:18fe:7447 with SMTP id u20-20020a170906109400b009e618fe7447mr1760757eju.9.1700668966712;
-        Wed, 22 Nov 2023 08:02:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700668968; x=1701273768;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YiiLGrpZSDIC4Qc1OGZlXR+FMZWiJkQTWTZS1aN/KEA=;
+        b=D88TwKv+Kc8RonWBwCLCl98lkyLT/QaJIB/87kn7bWUkGY49JBQdsCv/OkZlLq/G+b
+         B+yA6jfKTIoHcjge/mWYnJxJ1ur9+5oydw8Or7mSX6ENpWwhurOK9mTuWVEFi33TFKrR
+         8qUqPKsvwDhpAgaJuAiT6rXH8W/Se+Z7xWQYPNP686r8f8UgoBDdX3TQQFPvScAI+qiI
+         6QwEKnkKusLM8QYmHJB3yY5CwJxKV1Fi7IsflhdEfPbxjVhRoppS19rwMqtAO9BXm2Ry
+         kKEWNQ7Ot9sV19mIb6EQNHgK5KRtFjbPhTsxlD+Ts1cGuTFPHuDtwND8zHGNmv5LUIjb
+         3kKg==
+X-Gm-Message-State: AOJu0YwvelUrvyryjtDxFZ+2fCpcCx3NdkH2uppLLACg2WR1iizQxQZ3
+	GvBYNiy1+XZq/rijOg3twLoHa9Ys+AY=
+X-Google-Smtp-Source: AGHT+IGFH0tW3t94HXFAM07g1SB+FjrzNCWiCzSDz1uOZHDp0U0s9sHudsY7p7+bVKYZydXprueerA==
+X-Received: by 2002:a17:907:cbc9:b0:a00:1c9a:a472 with SMTP id vk9-20020a170907cbc900b00a001c9aa472mr2730748ejc.7.1700668968118;
+        Wed, 22 Nov 2023 08:02:48 -0800 (PST)
 Received: from 127.com ([2620:10d:c092:600::2:fba6])
-        by smtp.gmail.com with ESMTPSA id x26-20020a1709065ada00b009fd04a1a1dfsm4541805ejs.40.2023.11.22.08.02.46
+        by smtp.gmail.com with ESMTPSA id x26-20020a1709065ada00b009fd04a1a1dfsm4541805ejs.40.2023.11.22.08.02.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 08:02:46 -0800 (PST)
+        Wed, 22 Nov 2023 08:02:47 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: io-uring@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>,
@@ -44,10 +45,12 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	ming.lei@redhat.com,
 	joshi.k@samsung.com
-Subject: [PATCH 0/3] clean up io_uring cmd header structure
-Date: Wed, 22 Nov 2023 16:01:08 +0000
-Message-ID: <cover.1700668641.git.asml.silence@gmail.com>
+Subject: [PATCH 2/3] io_uring/cmd: inline io_uring_cmd_do_in_task_lazy
+Date: Wed, 22 Nov 2023 16:01:10 +0000
+Message-ID: <9af6ade1052b26c69a1d12dad3fa5d05126578b3.1700668641.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.42.1
+In-Reply-To: <cover.1700668641.git.asml.silence@gmail.com>
+References: <cover.1700668641.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,27 +59,132 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Looking at the zc rfc, and how we tend to stuff everything into
-linux/io_uring, start splitting the file before it becomes even more
-monstrous.
+Now as we can easily include io_uring_types.h, move IOU_F_TWQ_LAZY_WAKE
+and inline io_uring_cmd_do_in_task_lazy().
 
-Pavel Begunkov (3):
-  io_uring: split out cmd api into a separate header
-  io_uring/cmd: inline io_uring_cmd_do_in_task_lazy
-  io_uring/cmd: inline io_uring_cmd_get_task
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ include/linux/io_uring/cmd.h   | 31 ++++++++++++++++---------------
+ include/linux/io_uring_types.h | 11 +++++++++++
+ io_uring/io_uring.h            | 10 ----------
+ io_uring/uring_cmd.c           |  7 -------
+ 4 files changed, 27 insertions(+), 32 deletions(-)
 
- drivers/block/ublk_drv.c       |  2 +-
- drivers/nvme/host/ioctl.c      |  2 +-
- include/linux/io_uring.h       | 89 +---------------------------------
- include/linux/io_uring/cmd.h   | 82 +++++++++++++++++++++++++++++++
- include/linux/io_uring_types.h | 31 ++++++++++++
- io_uring/io_uring.c            |  1 +
- io_uring/io_uring.h            | 10 ----
- io_uring/rw.c                  |  2 +-
- io_uring/uring_cmd.c           | 15 +-----
- 9 files changed, 119 insertions(+), 115 deletions(-)
- create mode 100644 include/linux/io_uring/cmd.h
-
+diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
+index 62fcfaf6fcc9..ee9b3bc3a4af 100644
+--- a/include/linux/io_uring/cmd.h
++++ b/include/linux/io_uring/cmd.h
+@@ -36,15 +36,6 @@ void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2,
+ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+ 			    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+ 			    unsigned flags);
+-/* users should follow semantics of IOU_F_TWQ_LAZY_WAKE */
+-void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned));
+-
+-static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+-{
+-	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
+-}
+ 
+ void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+ 		unsigned int issue_flags);
+@@ -60,12 +51,9 @@ static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+ 		ssize_t ret2, unsigned issue_flags)
+ {
+ }
+-static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+-{
+-}
+-static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
++static inline void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
++			    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
++			    unsigned flags)
+ {
+ }
+ static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+@@ -78,4 +66,17 @@ static inline struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd
+ }
+ #endif
+ 
++/* users must follow the IOU_F_TWQ_LAZY_WAKE semantics */
++static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
++			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
++{
++	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
++}
++
++static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
++			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
++{
++	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
++}
++
+ #endif /* _LINUX_IO_URING_CMD_H */
+diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+index 0bcecb734af3..8ff4642dc6e3 100644
+--- a/include/linux/io_uring_types.h
++++ b/include/linux/io_uring_types.h
+@@ -7,6 +7,17 @@
+ #include <linux/llist.h>
+ #include <uapi/linux/io_uring.h>
+ 
++enum {
++	/*
++	 * A hint to not wake right away but delay until there are enough of
++	 * tw's queued to match the number of CQEs the task is waiting for.
++	 *
++	 * Must not be used wirh requests generating more than one CQE.
++	 * It's also ignored unless IORING_SETUP_DEFER_TASKRUN is set.
++	 */
++	IOU_F_TWQ_LAZY_WAKE			= 1,
++};
++
+ enum io_uring_cmd_flags {
+ 	IO_URING_F_COMPLETE_DEFER	= 1,
+ 	IO_URING_F_UNLOCKED		= 2,
+diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
+index dc6d779b452b..48ffdb156f73 100644
+--- a/io_uring/io_uring.h
++++ b/io_uring/io_uring.h
+@@ -15,16 +15,6 @@
+ #include <trace/events/io_uring.h>
+ #endif
+ 
+-enum {
+-	/*
+-	 * A hint to not wake right away but delay until there are enough of
+-	 * tw's queued to match the number of CQEs the task is waiting for.
+-	 *
+-	 * Must not be used wirh requests generating more than one CQE.
+-	 * It's also ignored unless IORING_SETUP_DEFER_TASKRUN is set.
+-	 */
+-	IOU_F_TWQ_LAZY_WAKE			= 1,
+-};
+ 
+ enum {
+ 	IOU_OK			= 0,
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index 4ed0c66e3aae..94e9de1c24aa 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -78,13 +78,6 @@ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+ }
+ EXPORT_SYMBOL_GPL(__io_uring_cmd_do_in_task);
+ 
+-void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+-{
+-	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
+-}
+-EXPORT_SYMBOL_GPL(io_uring_cmd_do_in_task_lazy);
+-
+ static inline void io_req_set_cqe32_extra(struct io_kiocb *req,
+ 					  u64 extra1, u64 extra2)
+ {
 -- 
 2.42.1
 
