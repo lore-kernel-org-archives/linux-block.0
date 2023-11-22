@@ -1,57 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8691381;
-	Wed, 22 Nov 2023 00:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LnNvymB2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B154C433C8;
-	Wed, 22 Nov 2023 00:54:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700614480;
-	bh=u2D2TK5J9yvcZIFrTPk8qSx9G+KhwoNjbJNTBr4Lkm8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LnNvymB2+kFeYw9PdwPmHqlZJWw8A2qXUFP4zLECwZkcPKbNdYe2viMbaBUgdoBLj
-	 2PbFFJCDiU7Ng3BTcJ4hiYkL9NHW49VzRIIIDhN96Tm3gCIW+NDlFc2Er6uvtz5bNo
-	 o0Muvl6uLG71Vy3Jb48E1Ucj4IBIypByRxDp2RkAb82rkC5GD4Jmbwg0gPCPZU+Qy4
-	 GdFRVK5oKtEifttXGP4kakNdTeADEZFGHDKktttjYMJ47lMlhY0iQ2dOoNJsvlDqgG
-	 0aB5JRzS3sllQJEt1O3pe26LCkFObz6+/hhsndRRNEZ+Ah3Vr7tsGRiuBiwnf9OYam
-	 ijupJ5VcaTanQ==
-Date: Tue, 21 Nov 2023 17:54:36 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
-	axboe@kernel.dk, hch@lst.de, joshi.k@samsung.com,
-	martin.petersen@oracle.com
-Subject: Re: [PATCHv3 1/5] bvec: introduce multi-page bvec iterating
-Message-ID: <ZV1RTKkKUkNybFuk@kbusch-mbp.dhcp.thefacebook.com>
-References: <20231120224058.2750705-1-kbusch@meta.com>
- <20231120224058.2750705-2-kbusch@meta.com>
- <ZVxsLYj9oH+j3RQ8@fedora>
- <ZVzRmQ66yRDJWMiZ@kbusch-mbp>
- <ZV1OxMPsJYq7Tyaw@fedora>
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED011AC;
+	Tue, 21 Nov 2023 18:37:11 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SZlkm3Sz2z4f3lg7;
+	Wed, 22 Nov 2023 10:37:04 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id B4CDA1A0484;
+	Wed, 22 Nov 2023 10:37:08 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgBXWhBSaV1lNClcBg--.32716S4;
+	Wed, 22 Nov 2023 10:37:08 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: ming.lei@redhat.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH v3 0/3] block: warn once for each partition in bio_check_ro()
+Date: Wed, 22 Nov 2023 18:31:00 +0800
+Message-Id: <20231122103103.1104589-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZV1OxMPsJYq7Tyaw@fedora>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBXWhBSaV1lNClcBg--.32716S4
+X-Coremail-Antispam: 1UD129KBjvdXoW7GFW7WFWDtr4DKw4xury5XFb_yoWfKwb_CF
+	yvkayfWr48Xa95CFWIyF15XrW09r4Iyr1UJFyDJrs7Xr17XF1DtrZrJ3y7WFsxWF47Cwn8
+	JF18urW8Xr1IgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbxkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M28lY4IEw2IIxx
+	k0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK
+	6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7
+	xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
+	x2IErcIFxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi
+	Pl1DUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Wed, Nov 22, 2023 at 08:43:48AM +0800, Ming Lei wrote:
-> 
-> And you can open-code it in bio_integrity_unmap_user():
-> 
-> for (i = 0; i < bip->bip_vcnt; i++) {
-> 	struct bio_vec *v = &bip->bip_vec[i];
-> 
-> 	...
-> }
+From: Yu Kuai <yukuai3@huawei.com>
 
-That works for me. io_uring/rsrc.c does similar too, which I referenced
-when implementing this. I thought the macro might help make this
-optimisation more reachable for future use, but I don't need to
-introduce that with only the one user here.
+Changes in v3:
+ - add patch 1 from Ming, swap bd_inode layout with bd_openers and
+ bd_size_lock;
+ - change bd_flags from u32 to u16 in patch 2, prevent to affect layout of
+ other fields;
+
+Changes in v2:
+ - don't use test/set_bit() for new field, because unsigned long will
+ cause that some field can't be placed in the first cacheline(64 bytes),
+ use unsigned int for new field and test/set/clear it like 'bio->bi_flags'.
+
+Ming Lei (1):
+  block: move .bd_inode into 1st cacheline of block_device
+
+Yu Kuai (2):
+  block: introduce new field bd_flags in block_device
+  block: warn once for each partition in bio_check_ro()
+
+ block/bdev.c              | 15 ++++++++-------
+ block/blk-core.c          | 21 +++++++++++++++------
+ block/genhd.c             | 15 +++++++++++----
+ block/ioctl.c             |  6 +++++-
+ include/linux/blk_types.h | 31 ++++++++++++++++++++++++-------
+ include/linux/blkdev.h    |  5 +++--
+ 6 files changed, 66 insertions(+), 27 deletions(-)
+
+-- 
+2.39.2
+
