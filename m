@@ -1,306 +1,365 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABB3ED48;
-	Wed, 22 Nov 2023 22:29:14 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SbSr44Tfkz4f3k5r;
-	Thu, 23 Nov 2023 14:29:08 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 599AE1A045C;
-	Thu, 23 Nov 2023 14:29:11 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgDX2xE18V5lzFjHBg--.1826S3;
-	Thu, 23 Nov 2023 14:29:11 +0800 (CST)
-Subject: Re: [PATCH v5 2/3] scsi: core: Support disabling fair tag sharing
-To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
- Keith Busch <kbusch@kernel.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Ed Tsai <ed.tsai@mediatek.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20231114180426.1184601-1-bvanassche@acm.org>
- <20231114180426.1184601-3-bvanassche@acm.org>
- <80dee412-2fda-6a23-0b62-08f87bd7e607@huaweicloud.com>
- <d706f265-f991-45c0-a551-34ecdee55f7c@acm.org>
- <d1e94a08-f28e-ddd9-5bda-7fee28b87f31@huaweicloud.com>
- <ef7de6b5-2ed3-469e-bb01-4eacda62cd6a@acm.org>
- <e5e8e995-c38b-7b23-a0a9-5b2f285164c8@huaweicloud.com>
- <5dd7b7f7-bcae-4769-b6c8-ac0da8e69c93@acm.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <1b380cbf-40e9-6ba6-62da-d3aad94809d0@huaweicloud.com>
-Date: Thu, 23 Nov 2023 14:29:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E+4PiOro"
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FDB9B9;
+	Thu, 23 Nov 2023 03:17:56 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c87903d314so9598111fa.1;
+        Thu, 23 Nov 2023 03:17:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700738275; x=1701343075; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xDWCb13i2Xqk5Lu2xg2VMmlaPURyczdB2TczHpewQdY=;
+        b=E+4PiOroJAO467yYLlS2h3rkyVh4JPlrBRzQHkBbDZC1Xla0edBtUA8NnKJTLAQNbB
+         p8yGxM505voyuZEjJCJTnQCcLr0sBNTtqSlpIYVPi3x2bdb8fDVoWLcpmz9hpPhM+wN9
+         hKPm5xDZ/eXuNGSzxAlv/9qX2RXvea6nn9KSon9n8BDOZ5v0d9ClgcB5NacDlBYz6mbX
+         w6iHwg3ZoSi/q7loAUteX2IxTx0LdM60xi+K8gJp0+a7GyWy8wbUb6AdcTERSBMKiI7r
+         rLrFTJg/5b+jGKHSGtk6m2mifb5Qi6XPzX6nJ1qv/3pcj2xSja02oh+oCkV//IGU2uYd
+         zbWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700738275; x=1701343075;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xDWCb13i2Xqk5Lu2xg2VMmlaPURyczdB2TczHpewQdY=;
+        b=SPOscyJPC4lrUxGyLJ2INL2ma9QtZJZIEfP9Xe5+nKaX0mw+xJ6KaMPJsL1D0faIZo
+         wyPhh1xRJ5lOpe7b2mu+b/A78VdzpiQRZfm5TndmR3+TD8yFvxz5ePJwqOtSQh87QioY
+         NWtSh2cnvT8s6R9vxCijhHfjuEe94pkOEo4ibgvcx2T79XB5L5+FlN18nI/86KWxuVvl
+         kz1p2ofK8E2RMtrIlLkHNrmjg1QB2Skrx6BV6vRhinh8aatIKT4jssgfEVOax0XFazYN
+         k0A0hwUF4Nz1r3Kh4QwA4nJ0MYYvSlILwpOsfD88FPdElVWzA4F93dtkXl21OcvP0zOp
+         cbNQ==
+X-Gm-Message-State: AOJu0Yxy9hBZxYfg0/tPcveO/a8koDo9gRFuyI+RYUq/NFDYvCBwk0as
+	pSjkyV5EyKAdR/dy046MPK9kEw8ucvI=
+X-Google-Smtp-Source: AGHT+IFdINifXb6PzesvFjPCVh4KHe4pAkoD5GpW/04BFz0JaYKZBH3fGF2zY9twj4TRqf0u7lrM3w==
+X-Received: by 2002:a2e:8e68:0:b0:2c6:f3fd:7f0 with SMTP id t8-20020a2e8e68000000b002c6f3fd07f0mr2985542ljk.19.1700738274443;
+        Thu, 23 Nov 2023 03:17:54 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.140.145])
+        by smtp.gmail.com with ESMTPSA id hg15-20020a05600c538f00b0040849ce7116sm2307863wmb.43.2023.11.23.03.17.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Nov 2023 03:17:54 -0800 (PST)
+Message-ID: <c204c03a-785d-4872-a8c8-58d0cdc708d6@gmail.com>
+Date: Thu, 23 Nov 2023 11:16:33 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5dd7b7f7-bcae-4769-b6c8-ac0da8e69c93@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDX2xE18V5lzFjHBg--.1826S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxuFW3CFWUJFW7GFy3JF43KFg_yoWfCFy7pF
-	4ktFWUWry8tr1kXF4UGr1UXFy7Xr1UGw1UJr1xXa45Jr4Utr12qr18XryjgF18Jr4kGr4U
-	Jr4UXrs8Zry7Xr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] io_uring: split out cmd api into a separate header
+To: Ming Lei <ming.lei@redhat.com>
+Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, joshi.k@samsung.com
+References: <cover.1700668641.git.asml.silence@gmail.com>
+ <547e56560b97cd66f00bfc5b53db24f2fa1a8852.1700668641.git.asml.silence@gmail.com>
+ <ZV67ozp4yizgWYYg@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZV67ozp4yizgWYYg@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
-
-在 2023/11/22 3:32, Bart Van Assche 写道:
-> On 11/20/23 17:35, Yu Kuai wrote:
->> I'm not sure that change just one queue instead of all queues using the
->> same tag_set won't case any regression, for example,
->> BLK_MQ_F_TAG_QUEUE_SHARED is not cleared, and other queues are still
->> sharing tags fairly while this queue doesn't.
+On 11/23/23 02:40, Ming Lei wrote:
+> On Wed, Nov 22, 2023 at 04:01:09PM +0000, Pavel Begunkov wrote:
+>> linux/io_uring.h is slowly becoming a rubbish bin where we put
+>> anything exposed to other subsystems. For instance, the task exit
+>> hooks and io_uring cmd infra are completely orthogonal and don't need
+>> each other's definitions. Start cleaning it up by splitting out all
+>> command bits into a new header file.
 >>
->> Perhaps can we add a helper similiar to __blk_mq_update_nr_hw_queues
->> to update all queues using the same tag_set?
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>   drivers/block/ublk_drv.c       |  2 +-
+>>   drivers/nvme/host/ioctl.c      |  2 +-
+>>   include/linux/io_uring.h       | 89 +---------------------------------
+>>   include/linux/io_uring/cmd.h   | 81 +++++++++++++++++++++++++++++++
+>>   include/linux/io_uring_types.h | 20 ++++++++
+>>   io_uring/io_uring.c            |  1 +
+>>   io_uring/rw.c                  |  2 +-
+>>   io_uring/uring_cmd.c           |  2 +-
+>>   8 files changed, 107 insertions(+), 92 deletions(-)
+>>   create mode 100644 include/linux/io_uring/cmd.h
+>>
+>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+>> index 83600b45e12a..909377068a87 100644
+>> --- a/drivers/block/ublk_drv.c
+>> +++ b/drivers/block/ublk_drv.c
+>> @@ -36,7 +36,7 @@
+>>   #include <linux/sched/mm.h>
+>>   #include <linux/uaccess.h>
+>>   #include <linux/cdev.h>
+>> -#include <linux/io_uring.h>
+>> +#include <linux/io_uring/cmd.h>
+>>   #include <linux/blk-mq.h>
+>>   #include <linux/delay.h>
+>>   #include <linux/mm.h>
+>> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+>> index 529b9954d2b8..6864a6eeee93 100644
+>> --- a/drivers/nvme/host/ioctl.c
+>> +++ b/drivers/nvme/host/ioctl.c
+>> @@ -5,7 +5,7 @@
+>>    */
+>>   #include <linux/ptrace.h>	/* for force_successful_syscall_return */
+>>   #include <linux/nvme_ioctl.h>
+>> -#include <linux/io_uring.h>
+>> +#include <linux/io_uring/cmd.h>
+>>   #include "nvme.h"
+>>   
+>>   enum {
+>> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+>> index aefb73eeeebf..d8fc93492dc5 100644
+>> --- a/include/linux/io_uring.h
+>> +++ b/include/linux/io_uring.h
+>> @@ -6,71 +6,13 @@
+>>   #include <linux/xarray.h>
+>>   #include <uapi/linux/io_uring.h>
+>>   
+>> -enum io_uring_cmd_flags {
+>> -	IO_URING_F_COMPLETE_DEFER	= 1,
+>> -	IO_URING_F_UNLOCKED		= 2,
+>> -	/* the request is executed from poll, it should not be freed */
+>> -	IO_URING_F_MULTISHOT		= 4,
+>> -	/* executed by io-wq */
+>> -	IO_URING_F_IOWQ			= 8,
+>> -	/* int's last bit, sign checks are usually faster than a bit test */
+>> -	IO_URING_F_NONBLOCK		= INT_MIN,
+>> -
+>> -	/* ctx state flags, for URING_CMD */
+>> -	IO_URING_F_SQE128		= (1 << 8),
+>> -	IO_URING_F_CQE32		= (1 << 9),
+>> -	IO_URING_F_IOPOLL		= (1 << 10),
+>> -
+>> -	/* set when uring wants to cancel a previously issued command */
+>> -	IO_URING_F_CANCEL		= (1 << 11),
+>> -	IO_URING_F_COMPAT		= (1 << 12),
+>> -};
+>> -
+>> -/* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
+>> -#define IORING_URING_CMD_CANCELABLE	(1U << 30)
+>> -#define IORING_URING_CMD_POLLED		(1U << 31)
+>> -
+>> -struct io_uring_cmd {
+>> -	struct file	*file;
+>> -	const struct io_uring_sqe *sqe;
+>> -	union {
+>> -		/* callback to defer completions to task context */
+>> -		void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
+>> -		/* used for polled completion */
+>> -		void *cookie;
+>> -	};
+>> -	u32		cmd_op;
+>> -	u32		flags;
+>> -	u8		pdu[32]; /* available inline for free use */
+>> -};
+>> -
+>> -static inline const void *io_uring_sqe_cmd(const struct io_uring_sqe *sqe)
+>> -{
+>> -	return sqe->cmd;
+>> -}
+>> -
+>>   #if defined(CONFIG_IO_URING)
+>> -int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+>> -			      struct iov_iter *iter, void *ioucmd);
+>> -void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2,
+>> -			unsigned issue_flags);
+>>   struct sock *io_uring_get_socket(struct file *file);
+>>   void __io_uring_cancel(bool cancel_all);
+>>   void __io_uring_free(struct task_struct *tsk);
+>>   void io_uring_unreg_ringfd(void);
+>>   const char *io_uring_get_opcode(u8 opcode);
+>> -void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+>> -			    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+>> -			    unsigned flags);
+>> -/* users should follow semantics of IOU_F_TWQ_LAZY_WAKE */
+>> -void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+>> -			void (*task_work_cb)(struct io_uring_cmd *, unsigned));
+>> -
+>> -static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>> -			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>> -{
+>> -	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
+>> -}
+>> +int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags);
+>>   
+>>   static inline void io_uring_files_cancel(void)
+>>   {
+>> @@ -89,28 +31,7 @@ static inline void io_uring_free(struct task_struct *tsk)
+>>   	if (tsk->io_uring)
+>>   		__io_uring_free(tsk);
+>>   }
+>> -int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags);
+>> -void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+>> -		unsigned int issue_flags);
+>> -struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd);
+>>   #else
+>> -static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+>> -			      struct iov_iter *iter, void *ioucmd)
+>> -{
+>> -	return -EOPNOTSUPP;
+>> -}
+>> -static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+>> -		ssize_t ret2, unsigned issue_flags)
+>> -{
+>> -}
+>> -static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>> -			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>> -{
+>> -}
+>> -static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+>> -			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>> -{
+>> -}
+>>   static inline struct sock *io_uring_get_socket(struct file *file)
+>>   {
+>>   	return NULL;
+>> @@ -133,14 +54,6 @@ static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
+>>   {
+>>   	return -EOPNOTSUPP;
+>>   }
+>> -static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+>> -		unsigned int issue_flags)
+>> -{
+>> -}
+>> -static inline struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd)
+>> -{
+>> -	return NULL;
+>> -}
+>>   #endif
+>>   
+>>   #endif
+>> diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
+>> new file mode 100644
+>> index 000000000000..62fcfaf6fcc9
+>> --- /dev/null
+>> +++ b/include/linux/io_uring/cmd.h
+>> @@ -0,0 +1,81 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+>> +#ifndef _LINUX_IO_URING_CMD_H
+>> +#define _LINUX_IO_URING_CMD_H
+>> +
+>> +#include <uapi/linux/io_uring.h>
+>> +#include <linux/io_uring_types.h>
+>> +
+>> +/* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
+>> +#define IORING_URING_CMD_CANCELABLE	(1U << 30)
+>> +#define IORING_URING_CMD_POLLED		(1U << 31)
+>> +
+>> +struct io_uring_cmd {
+>> +	struct file	*file;
+>> +	const struct io_uring_sqe *sqe;
+>> +	union {
+>> +		/* callback to defer completions to task context */
+>> +		void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
+>> +		/* used for polled completion */
+>> +		void *cookie;
+>> +	};
+>> +	u32		cmd_op;
+>> +	u32		flags;
+>> +	u8		pdu[32]; /* available inline for free use */
+>> +};
+>> +
+>> +static inline const void *io_uring_sqe_cmd(const struct io_uring_sqe *sqe)
+>> +{
+>> +	return sqe->cmd;
+>> +}
+>> +
+>> +#if defined(CONFIG_IO_URING)
+>> +int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+>> +			      struct iov_iter *iter, void *ioucmd);
+>> +void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2,
+>> +			unsigned issue_flags);
+>> +void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+>> +			    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+>> +			    unsigned flags);
+>> +/* users should follow semantics of IOU_F_TWQ_LAZY_WAKE */
+>> +void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+>> +			void (*task_work_cb)(struct io_uring_cmd *, unsigned));
+>> +
+>> +static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>> +			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>> +{
+>> +	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
+>> +}
+>> +
+>> +void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+>> +		unsigned int issue_flags);
+>> +struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd);
+>> +
+>> +#else
+>> +static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+>> +			      struct iov_iter *iter, void *ioucmd)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+>> +		ssize_t ret2, unsigned issue_flags)
+>> +{
+>> +}
+>> +static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>> +			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>> +{
+>> +}
+>> +static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+>> +			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>> +{
+>> +}
+>> +static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+>> +		unsigned int issue_flags)
+>> +{
+>> +}
+>> +static inline struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd)
+>> +{
+>> +	return NULL;
+>> +}
+>> +#endif
+>> +
+>> +#endif /* _LINUX_IO_URING_CMD_H */
+>> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+>> index d3009d56af0b..0bcecb734af3 100644
+>> --- a/include/linux/io_uring_types.h
+>> +++ b/include/linux/io_uring_types.h
+>> @@ -7,6 +7,26 @@
+>>   #include <linux/llist.h>
+>>   #include <uapi/linux/io_uring.h>
+>>   
+>> +enum io_uring_cmd_flags {
+>> +	IO_URING_F_COMPLETE_DEFER	= 1,
+>> +	IO_URING_F_UNLOCKED		= 2,
+>> +	/* the request is executed from poll, it should not be freed */
+>> +	IO_URING_F_MULTISHOT		= 4,
+>> +	/* executed by io-wq */
+>> +	IO_URING_F_IOWQ			= 8,
+>> +	/* int's last bit, sign checks are usually faster than a bit test */
+>> +	IO_URING_F_NONBLOCK		= INT_MIN,
+>> +
+>> +	/* ctx state flags, for URING_CMD */
+>> +	IO_URING_F_SQE128		= (1 << 8),
+>> +	IO_URING_F_CQE32		= (1 << 9),
+>> +	IO_URING_F_IOPOLL		= (1 << 10),
+>> +
+>> +	/* set when uring wants to cancel a previously issued command */
+>> +	IO_URING_F_CANCEL		= (1 << 11),
+>> +	IO_URING_F_COMPAT		= (1 << 12),
+>> +};
 > 
-> Hi Kuai,
+> I am wondering why you don't move io_uring_cmd_flags into
+> io_uring/cmd.h? And many above flags are used by driver now.
 > 
-> How about the patch below?
+> But most definitions in io_uring_types.h are actually io_uring
+> internal stuff.
 
-Thanks for the patch!
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-block 
-> b/Documentation/ABI/stable/sysfs-block
-> index 1fe9a553c37b..7b66eb938882 100644
-> --- a/Documentation/ABI/stable/sysfs-block
-> +++ b/Documentation/ABI/stable/sysfs-block
-> @@ -269,6 +269,19 @@ Description:
->           specific passthrough mechanisms.
-> 
-> 
-> +What:        /sys/block/<disk>/queue/fair_sharing
-> +Date:        November 2023
-> +Contact:    linux-block@vger.kernel.org
-> +Description:
-> +        [RW] If hardware queues are shared across request queues, by
-> +        default the request tags are distributed evenly across the
-> +        active request queues. If the total number of tags is low and
-> +        if the workload differs per request queue this approach may
-> +        reduce throughput. This sysfs attribute controls whether or not
-> +        the fair tag sharing algorithm is enabled. 1 means enabled
-> +        while 0 means disabled.
-> +
-> +
->   What:        /sys/block/<disk>/queue/fua
->   Date:        May 2018
->   Contact:    linux-block@vger.kernel.org
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 5cbeb9344f2f..f41408103106 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -198,6 +198,7 @@ static const char *const hctx_flag_name[] = {
->       HCTX_FLAG_NAME(NO_SCHED),
->       HCTX_FLAG_NAME(STACKING),
->       HCTX_FLAG_NAME(TAG_HCTX_SHARED),
-> +    HCTX_FLAG_NAME(DISABLE_FAIR_TAG_SHARING),
->   };
->   #undef HCTX_FLAG_NAME
-> 
-> diff --git a/block/blk-mq.h b/block/blk-mq.h
-> index f75a9ecfebde..eda6bd0611ea 100644
-> --- a/block/blk-mq.h
-> +++ b/block/blk-mq.h
-> @@ -416,7 +416,8 @@ static inline bool hctx_may_queue(struct 
-> blk_mq_hw_ctx *hctx,
->   {
->       unsigned int depth, users;
-> 
-> -    if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
-> +    if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) ||
-> +        (hctx->flags & BLK_MQ_F_DISABLE_FAIR_TAG_SHARING))
->           return true;
-> 
->       /*
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 0b2d04766324..0009450dc8cf 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -24,6 +24,7 @@ struct queue_sysfs_entry {
->       struct attribute attr;
->       ssize_t (*show)(struct request_queue *, char *);
->       ssize_t (*store)(struct request_queue *, const char *, size_t);
-> +    bool no_sysfs_mutex;
->   };
-> 
->   static ssize_t
-> @@ -473,6 +474,55 @@ static ssize_t queue_dax_show(struct request_queue 
-> *q, char *page)
->       return queue_var_show(blk_queue_dax(q), page);
->   }
-> 
-> +static ssize_t queue_fair_sharing_show(struct request_queue *q, char 
-> *page)
-> +{
-> +    struct blk_mq_hw_ctx *hctx;
-> +    unsigned long i;
-> +    bool fair_sharing = true;
-> +
-> +    /* Serialize against blk_mq_realloc_hw_ctxs() */
-> +    mutex_lock(&q->sysfs_lock);
-> +    queue_for_each_hw_ctx(q, hctx, i)
-> +        if (hctx->flags & BLK_MQ_F_DISABLE_FAIR_TAG_SHARING)
-> +            fair_sharing = false;
-> +    mutex_unlock(&q->sysfs_lock);
-> +
-> +    return sysfs_emit(page, "%u\n", fair_sharing);
-> +}
-> +
-> +static ssize_t queue_fair_sharing_store(struct request_queue *q,
-> +                    const char *page, size_t count)
-> +{
-> +    const unsigned int DFTS_BIT = 
-> ilog2(BLK_MQ_F_DISABLE_FAIR_TAG_SHARING);
-> +    struct blk_mq_tag_set *set = q->tag_set;
-> +    struct blk_mq_hw_ctx *hctx;
-> +    unsigned long i;
-> +    int res;
-> +    bool val;
-> +
-> +    res = kstrtobool(page, &val);
-> +    if (res < 0)
-> +        return res;
-> +
-> +    mutex_lock(&set->tag_list_lock);
-> +    clear_bit(DFTS_BIT, &set->flags);
-> +    list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> +        /* Serialize against blk_mq_realloc_hw_ctxs() */
+That's because these are io_uring internal execution state flags,
+on top of which someone started to pile up cmd flags, not the
+other way around. No clue why it was named io_uring_cmd_flags.
+iow, the first 5 flags are widely used internally, moving them
+would force us to add cmd.h includes into all io_uring internals.
 
-If set/clear bit concurrent with test bit from io path, will there be
-problem? Why don't freeze these queues?
-> +        mutex_lock(&q->sysfs_lock);
-> +        if (val) {
-> +            queue_for_each_hw_ctx(q, hctx, i)
-> +                clear_bit(DFTS_BIT, &hctx->flags);
-> +        } else {
-> +            queue_for_each_hw_ctx(q, hctx, i)
-> +                set_bit(DFTS_BIT, &hctx->flags);
-> +        }
-> +        mutex_unlock(&q->sysfs_lock);
-> +    }
-> +    mutex_unlock(&set->tag_list_lock);
-> +
-> +    return count;
-> +}
-> +
->   #define QUEUE_RO_ENTRY(_prefix, _name)            \
->   static struct queue_sysfs_entry _prefix##_entry = {    \
->       .attr    = { .name = _name, .mode = 0444 },    \
-> @@ -486,6 +536,14 @@ static struct queue_sysfs_entry _prefix##_entry = 
-> {    \
->       .store    = _prefix##_store,            \
->   };
-> 
-> +#define QUEUE_RW_ENTRY_NO_SYSFS_MUTEX(_prefix, _name)       \
-> +    static struct queue_sysfs_entry _prefix##_entry = { \
-> +        .attr = { .name = _name, .mode = 0644 },    \
-> +        .show = _prefix##_show,                     \
-> +        .store = _prefix##_store,                   \
-> +        .no_sysfs_mutex = true,                     \
-> +    };
-> +
+We could split the enum in half, but that would be more ugly
+as there are still packed into a single unsigned. And we can
+also get rid of IO_URING_F_SQE128 and others by checking
+ctx flags directly (with a helper), it'd be way better than
+having a cmd copy of specific flags.
 
-This actually change all the queues from the same tagset, can we add
-this new entry to /sys/class/scsi_host/hostx/xxx ?
-
-Thanks,
-Kuai
-
->   QUEUE_RW_ENTRY(queue_requests, "nr_requests");
->   QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
->   QUEUE_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
-> @@ -542,6 +600,7 @@ QUEUE_RW_ENTRY(queue_nonrot, "rotational");
->   QUEUE_RW_ENTRY(queue_iostats, "iostats");
->   QUEUE_RW_ENTRY(queue_random, "add_random");
->   QUEUE_RW_ENTRY(queue_stable_writes, "stable_writes");
-> +QUEUE_RW_ENTRY_NO_SYSFS_MUTEX(queue_fair_sharing, "fair_sharing");
-> 
->   #ifdef CONFIG_BLK_WBT
->   static ssize_t queue_var_store64(s64 *var, const char *page)
-> @@ -666,6 +725,7 @@ static struct attribute *blk_mq_queue_attrs[] = {
->       &elv_iosched_entry.attr,
->       &queue_rq_affinity_entry.attr,
->       &queue_io_timeout_entry.attr,
-> +    &queue_fair_sharing_entry.attr,
->   #ifdef CONFIG_BLK_WBT
->       &queue_wb_lat_entry.attr,
->   #endif
-> @@ -723,6 +783,10 @@ queue_attr_show(struct kobject *kobj, struct 
-> attribute *attr, char *page)
-> 
->       if (!entry->show)
->           return -EIO;
-> +
-> +    if (entry->no_sysfs_mutex)
-> +        return entry->show(q, page);
-> +
->       mutex_lock(&q->sysfs_lock);
->       res = entry->show(q, page);
->       mutex_unlock(&q->sysfs_lock);
-> @@ -741,6 +805,9 @@ queue_attr_store(struct kobject *kobj, struct 
-> attribute *attr,
->       if (!entry->store)
->           return -EIO;
-> 
-> +    if (entry->no_sysfs_mutex)
-> +        return entry->store(q, page, length);
-> +
->       mutex_lock(&q->sysfs_lock);
->       res = entry->store(q, page, length);
->       mutex_unlock(&q->sysfs_lock);
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 1ab3081c82ed..aadb74aa23a3 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -503,7 +503,7 @@ struct blk_mq_tag_set {
->       unsigned int        cmd_size;
->       int            numa_node;
->       unsigned int        timeout;
-> -    unsigned int        flags;
-> +    unsigned long        flags;
->       void            *driver_data;
-> 
->       struct blk_mq_tags    **tags;
-> @@ -662,7 +662,8 @@ enum {
->        * or shared hwqs instead of 'mq-deadline'.
->        */
->       BLK_MQ_F_NO_SCHED_BY_DEFAULT    = 1 << 7,
-> -    BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
-> +    BLK_MQ_F_DISABLE_FAIR_TAG_SHARING = 1 << 8,
-> +    BLK_MQ_F_ALLOC_POLICY_START_BIT = 16,
->       BLK_MQ_F_ALLOC_POLICY_BITS = 1,
-> 
->       BLK_MQ_S_STOPPED    = 0,
-> 
-> 
-> 
-> .
-> 
-
+-- 
+Pavel Begunkov
