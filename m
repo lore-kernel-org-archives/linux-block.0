@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D8v0d3QM"
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3C618B
-	for <linux-block@vger.kernel.org>; Thu, 23 Nov 2023 11:54:35 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1cf876eab03so2491525ad.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Nov 2023 11:54:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nwRgB9Hu"
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB4AED41
+	for <linux-block@vger.kernel.org>; Thu, 23 Nov 2023 12:07:19 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so227470a12.0
+        for <linux-block@vger.kernel.org>; Thu, 23 Nov 2023 12:07:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700769275; x=1701374075; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2+UrJ5L4FGzkh9gcWGq4Fn7Csiw9PuwxzJSs3tcPR9k=;
-        b=D8v0d3QMZlKE6rlgyrHzcimZsiP2qxTrS0g99IF5t+hqfnhARpJrFRHoi8s8r9bxg9
-         R7KSwsEqs35ytyLNLxcTsFAeIwgMAdoZQbFb5xxxLBTvfN/MEubApigy3SKwrlddwN6h
-         QZUOmkz1bVylJA/pPGp31G5kf5Q5338PjVIScPfxVZfirxlTK3JmoQ4fDe29l2wPYPnZ
-         CRXUOYnu3UK/QJ1zFMyKgaXESIec/DVHXdF7yMzVV9p0EPnS3KXTX1uQmkHUBWMrikvt
-         jOV7bbSVid068UUhCAvYL2TgVqB7+wIfi/qxG4VQ4UPNwETHE8Jq1xEpQNzmJVcjMqAy
-         X8iQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700770039; x=1701374839; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GfdEJhC271cbxBv+hBWLsnJluLmtEoy4VrNVAQBJi3M=;
+        b=nwRgB9Hu6ARcpp0B1prx9lra8cd4mdRRO61xCIgWucAyhNZ5ohwyO3Rh/uLw2ee1Yh
+         kTh7BB0gPKf+bU2kSKAIZUXp+omZ/19EyDRpEC0CXBpA4mCvFmEeZdWyX3Y4ZotH+zBX
+         xpNvUzSUbw753OAevCnfhf+f1K1yGWlF+deztCviHk2iT6GoEt7AiX9AnMWzU0tmdY/n
+         c0YtY7qnkplR7fBM2D9NLijhn6EihXs+HvqZ3NEP1RbOWb1RcA98PiO3X6pFy/QDsXRy
+         FOlPylqMrZecX54JA7K0+tqt6URzTVCEtpz0ZDmyxIoEWEbmv+hnFsiNqyfFm35tpAy4
+         lA3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700769275; x=1701374075;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2+UrJ5L4FGzkh9gcWGq4Fn7Csiw9PuwxzJSs3tcPR9k=;
-        b=c5emknAKxr3nGqU7poPl22kz5gdxj4KQwCICMrirS6q7JXU7BpKUo1Ag/R6V3sP7lo
-         IqGzKyUvGLrMESufu+4uO5i7hFiha2pqhgmoG4LAP6plOplUKkrWrMn6YAYW1LhO6YR2
-         ar28G/yxhHRtutbM98DeEXOjpl3EWJGQukEqNawJ8FMXBysXaqowXKeK+rAM94S/DacS
-         WfLkpcnPEyb+A/1cDQc1Cph7twigDY5leQEgGTZdPvvqFMLVPrlmzbjOHkfD7K+uMf3u
-         AFGI4YLTDNkkX/g7myy0fpsDTuEyHA3q7TTAQQd9kvumER93Xby94rv3wx6lpwk9VdW9
-         4G5Q==
-X-Gm-Message-State: AOJu0YxkuD76KOrtGlYZHfC1rhOHWS3QSmNIBURfU4HquibctH/5srNF
-	gn/h1UiW6ZRUKk3e5g5EjrjjIufEZ7goYm1lUhyyvg==
-X-Google-Smtp-Source: AGHT+IHed0yz5FaK5xG13dfWUBgMK0tEcPdI8733vHO3Uq4AkgEyIka00fgSbRDyr7NMcnK8j48tVA==
-X-Received: by 2002:a17:902:9f96:b0:1cc:27fa:1fb7 with SMTP id g22-20020a1709029f9600b001cc27fa1fb7mr471533plq.5.1700769275121;
-        Thu, 23 Nov 2023 11:54:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700770039; x=1701374839;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GfdEJhC271cbxBv+hBWLsnJluLmtEoy4VrNVAQBJi3M=;
+        b=p0KyK3Xlh0SpBRD8tAw8AsRfegsqCheP/WED2Y2xVPpCg6Z8XngoW05fKRDbOOUcBD
+         tDSl1wXeLnrTF+2WCQOlraaPp7MTZS3CVAvrc3iRvSyeL84Pwl8ACkJpPDjU7buQzP6j
+         rKuRPNzwExb4SLwC+8ikAK4p3lKzXhuZeqCjLsJizHP0gvIGA4ld6z9x50G/sJj9sbnO
+         fndPpDSWW3T0ChtcKvUDB35p+gOg3ZKJkV/PyszZZXSWuJHo3Nw0bIMmY2+8Vwu/+2u3
+         eefjBXU8S8L650/3tF7qHFQYqmUCDhv8jJ2aYw7bIDAqw8qQkRoaUxbmWFAfevSGFR5I
+         PeDw==
+X-Gm-Message-State: AOJu0Yy4XfsQj6gUXL0lzTC7mppEyGxlKpBmuZKlrs1WrDpDGOMHvmfi
+	T78NP4Nu1t/t95VBeOsiL44p2g==
+X-Google-Smtp-Source: AGHT+IFTPpjmAoO7mHCMyiVLaGERGVqV1dK3Csr5qLeS/yTiBNffUyx600lOHnpSMIXQpFRjyGMQWw==
+X-Received: by 2002:a05:6a20:e11a:b0:185:a0eb:8574 with SMTP id kr26-20020a056a20e11a00b00185a0eb8574mr910592pzb.5.1700770039066;
+        Thu, 23 Nov 2023 12:07:19 -0800 (PST)
 Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id 2-20020a170902c14200b001c755810f89sm1714017plj.181.2023.11.23.11.54.34
+        by smtp.gmail.com with ESMTPSA id az22-20020a17090b029600b00280a2275e4bsm1937779pjb.27.2023.11.23.12.07.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Nov 2023 11:54:34 -0800 (PST)
-Message-ID: <78b52c5b-91f5-4c1b-b89c-c942e880ac4d@kernel.dk>
-Date: Thu, 23 Nov 2023 12:54:33 -0700
+        Thu, 23 Nov 2023 12:07:18 -0800 (PST)
+Message-ID: <9184cfff-0b2a-4b74-a5aa-4a1357003a41@kernel.dk>
+Date: Thu, 23 Nov 2023 13:07:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,149 +47,48 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: skip QUEUE_FLAG_STATS and rq-qos for passthrough
+ io
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+To: Christoph Hellwig <hch@lst.de>, "kundan.kumar" <kundan.kumar@samsung.com>
+Cc: kbusch@kernel.org, linux-block@vger.kernel.org,
+ Kanchan Joshi <joshi.k@samsung.com>
+References: <CGME20231123103102epcas5p2aee268735dc9e0c357e6d3b98d16fe21@epcas5p2.samsung.com>
+ <20231123102431.6804-1-kundan.kumar@samsung.com>
+ <20231123153007.GA3853@lst.de>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.7-rc3
+In-Reply-To: <20231123153007.GA3853@lst.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 11/23/23 8:30 AM, Christoph Hellwig wrote:
+> On Thu, Nov 23, 2023 at 03:54:31PM +0530, kundan.kumar wrote:
+>> -	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+>> +	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)
+>> +			&& !blk_rq_is_passthrough(rq)) {
+> 
+> && goes on the starting line in the kernel code style.
+> 
+> The rest looks good, but that stats overhead seems pretty horrible..
 
-A bit bigger than usual at this time, but nothing really earth
-shattering in this pull request.
+It is, but at least it's better than what it used to be. Here's an
+example from my box, you can pretty easily tell when iostats got enabled
+while it was running:
 
-- NVMe pull request via Keith
-	- TCP TLS fixes (Hannes)
-	- Authentifaction fixes (Mark, Hannes)
-	- Properly terminate target names (Christoph)
-
-- MD pull request via Song, fixing a raid5 corruption issue
-
-- Disentanglement of the dependency mess in nvme introduced with the tls
-  additions. Now it should actually build on all configs (Arnd)
-
-- Series of bcache fixes (Coly)
-
-- Removal of a dead helper (Damien)
-
-- s390 dasd fix (Muhammad, Jan)
-
-- lockdep blk-cgroup fixes (Ming)
-
-Please pull!
-
-
-The following changes since commit b0077e269f6c152e807fdac90b58caf012cdbaab:
-
-  blk-mq: make sure active queue usage is held for bio_integrity_prep() (2023-11-13 08:52:52 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.7-2023-11-23
-
-for you to fetch changes up to 0e6c4fe782e683ff55a27fbb10e9c6b5c241533b:
-
-  nvme: tcp: fix compile-time checks for TLS mode (2023-11-22 18:41:14 -0700)
-
-----------------------------------------------------------------
-block-6.7-2023-11-23
-
-----------------------------------------------------------------
-Arnd Bergmann (3):
-      nvme: target: fix nvme_keyring_id() references
-      nvme: target: fix Kconfig select statements
-      nvme: tcp: fix compile-time checks for TLS mode
-
-Chengming Zhou (1):
-      block/null_blk: Fix double blk_mq_start_request() warning
-
-Christoph Hellwig (1):
-      nvmet: nul-terminate the NQNs passed in the connect command
-
-Colin Ian King (1):
-      bcache: remove redundant assignment to variable cur_idx
-
-Coly Li (5):
-      bcache: avoid oversize memory allocation by small stripe_size
-      bcache: check return value from btree_node_alloc_replacement()
-      bcache: replace a mistaken IS_ERR() by IS_ERR_OR_NULL() in btree_gc_coalesce()
-      bcache: add code comments for bch_btree_node_get() and __bch_btree_node_alloc()
-      bcache: avoid NULL checking to c->root in run_cache_set()
-
-Damien Le Moal (1):
-      block: Remove blk_set_runtime_active()
-
-Hannes Reinecke (5):
-      nvme-tcp: only evaluate 'tls' option if TLS is selected
-      nvme: catch errors from nvme_configure_metadata()
-      nvme: blank out authentication fabrics options if not configured
-      nvmet-tcp: always initialize tls_handshake_tmo_work
-      nvme: move nvme_stop_keep_alive() back to original position
-
-Jan Höppner (1):
-      s390/dasd: protect device queue against concurrent access
-
-Jens Axboe (2):
-      Merge tag 'md-fixes-20231120' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.7
-      Merge tag 'nvme-6.7-2023-11-22' of git://git.infradead.org/nvme into block-6.7
-
-Li Nan (4):
-      nbd: fold nbd config initialization into nbd_alloc_config()
-      nbd: factor out a helper to get nbd_config without holding 'config_lock'
-      nbd: fix null-ptr-dereference while accessing 'nbd->config'
-      nbd: pass nbd_sock to nbd_read_reply() instead of index
-
-Mark O'Donovan (2):
-      nvme-auth: unlock mutex in one place only
-      nvme-auth: set explanation code for failure2 msgs
-
-Ming Lei (3):
-      blk-throttle: fix lockdep warning of "cgroup_mutex or RCU read lock required!"
-      blk-cgroup: avoid to warn !rcu_read_lock_held() in blkg_lookup()
-      blk-cgroup: bypass blkcg_deactivate_policy after destroying
-
-Mingzhe Zou (3):
-      bcache: fixup init dirty data errors
-      bcache: fixup lock c->root error
-      bcache: fixup multi-threaded bch_sectors_dirty_init() wake-up race
-
-Muhammad Muzammil (1):
-      s390/dasd: resolve spelling mistake
-
-Rand Deeb (1):
-      bcache: prevent potential division by zero error
-
-Song Liu (1):
-      md: fix bi_status reporting in md_end_clone_io
-
- block/blk-cgroup.c                |  13 +++++
- block/blk-cgroup.h                |   2 -
- block/blk-pm.c                    |  33 ++---------
- block/blk-throttle.c              |   2 +
- drivers/block/nbd.c               | 117 ++++++++++++++++++++++++--------------
- drivers/block/null_blk/main.c     |  25 ++++----
- drivers/md/bcache/bcache.h        |   1 +
- drivers/md/bcache/btree.c         |  11 +++-
- drivers/md/bcache/super.c         |   4 +-
- drivers/md/bcache/sysfs.c         |   2 +-
- drivers/md/bcache/writeback.c     |  24 ++++++--
- drivers/md/md.c                   |   3 +-
- drivers/nvme/host/auth.c          |   5 +-
- drivers/nvme/host/core.c          |  21 ++++---
- drivers/nvme/host/fabrics.c       |   2 +
- drivers/nvme/host/fc.c            |  19 +++----
- drivers/nvme/host/rdma.c          |   1 +
- drivers/nvme/host/tcp.c           |  32 +++++------
- drivers/nvme/target/Kconfig       |   4 +-
- drivers/nvme/target/configfs.c    |   2 +-
- drivers/nvme/target/fabrics-cmd.c |   4 ++
- drivers/nvme/target/tcp.c         |   4 +-
- drivers/s390/block/dasd.c         |  24 ++++----
- drivers/s390/block/dasd_int.h     |   2 +-
- include/linux/blk-pm.h            |   1 -
- 25 files changed, 210 insertions(+), 148 deletions(-)
+[...]
+submitter=22, tid=645761, file=/dev/nvme22n1, node=6
+submitter=23, tid=645762, file=/dev/nvme23n1, node=6
+polled=1, fixedbufs=1/0, register_files=1, buffered=0, QD=128
+Engine=io_uring, sq_ring=128, cq_ring=128
+IOPS=119.09M, BW=58.15GiB/s, IOS/call=31/31
+IOPS=122.03M, BW=59.59GiB/s, IOS/call=31/31
+IOPS=122.01M, BW=59.58GiB/s, IOS/call=31/32
+IOPS=122.02M, BW=59.58GiB/s, IOS/call=31/32
+IOPS=122.02M, BW=59.58GiB/s, IOS/call=31/31
+IOPS=112.72M, BW=55.04GiB/s, IOS/call=31/31
+IOPS=108.43M, BW=52.94GiB/s, IOS/call=31/32
+IOPS=108.46M, BW=52.96GiB/s, IOS/call=32/31
+IOPS=108.58M, BW=53.02GiB/s, IOS/call=31/31
 
 -- 
 Jens Axboe
