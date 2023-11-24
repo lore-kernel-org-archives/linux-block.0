@@ -1,19 +1,18 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HQLKbHPj"
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97550199A
-	for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 08:20:31 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="awVu52Qj"
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [IPv6:2001:41d0:1004:224b::ac])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7785F1987
+	for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 08:38:46 -0800 (PST)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700841909;
+	t=1700843924;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5yGW+7zC7kl+eEIUhoSp3TXjUTFyRBrnT16mbCZw/Uk=;
-	b=HQLKbHPjG5ECRX3W2QDUsBCOVgOd4zNCuHfcIt73YpGytD2dwouao5IYeV1HGmFHYs1AgF
-	BfFqDeoybgM1Excty5fp0fBgzf+Hikw9ySRxFeccUON0VIoABOKMK6vYDwcoolLMOYnZMJ
-	COMNmajOOBR72yHoy7i9ELgNscr7gJg=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9n3c1WXBz4lxlyB6dBEMGNuqryUbttK1iJefoc3GvV0=;
+	b=awVu52QjYKGgV59gtGX6w+uob8Sf+Z9bQueGweDtwWKfmujzGiifQchrJyjvDCtBK26n/v
+	A0ISUbqxb9ljS66W3FlEBv9YZ6nC5f+CqeoDyMxoHdIXUDrLYSqeg+5eLCeHPX0sFrM12I
+	9H4zlSCYeApr1QQTboSbw+32SQNrMEw=
 From: Sergei Shtepa <sergei.shtepa@linux.dev>
 To: axboe@kernel.dk,
 	hch@infradead.org,
@@ -23,39 +22,18 @@ Cc: mingo@redhat.com,
 	peterz@infradead.org,
 	juri.lelli@redhat.com,
 	vincent.guittot@linaro.org,
-	dietmar.eggemann@arm.com,
-	rostedt@goodmis.org,
-	bsegall@google.com,
 	mgorman@suse.de,
-	bristot@redhat.com,
 	vschneid@redhat.com,
 	viro@zeniv.linux.org.uk,
 	brauner@kernel.org,
-	gregkh@linuxfoundation.org,
-	arnd@arndb.de,
-	christian.koenig@amd.com,
-	yi.l.liu@intel.com,
-	jirislaby@kernel.org,
-	stfrench@microsoft.com,
-	jpanis@baylibre.com,
-	jgg@ziepe.ca,
-	contact@emersion.fr,
-	dchinner@redhat.com,
-	jack@suse.cz,
-	linux@weissschuh.net,
-	min15.li@samsung.com,
-	dlemoal@kernel.org,
 	linux-block@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
-	Sergei Shtepa <sergei.shtepa@veeam.com>,
-	Donald Buczek <buczek@molgen.mpg.de>
-Subject: [PATCH v6 04/11] blksnap: header file of the module interface
-Date: Fri, 24 Nov 2023 17:04:52 +0100
-Message-Id: <20231124160459.26227-5-sergei.shtepa@linux.dev>
-In-Reply-To: <20231124160459.26227-1-sergei.shtepa@linux.dev>
-References: <20231124160459.26227-1-sergei.shtepa@linux.dev>
+	Sergei Shtepa <sergei.shtepa@veeam.com>
+Subject: [PATCH v6 00/11] blksnap - block devices snapshots module
+Date: Fri, 24 Nov 2023 17:38:25 +0100
+Message-Id: <20231124163836.27256-1-sergei.shtepa@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,438 +45,222 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Sergei Shtepa <sergei.shtepa@veeam.com>
 
-The header file contains a set of declarations, structures and control
-requests (ioctl) that allows to manage the module from the user space.
+Hi all.
 
-Co-developed-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Christoph Hellwig <hch@infradead.org>
-Tested-by: Donald Buczek <buczek@molgen.mpg.de>
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
+I am happy to offer an improved version of the Block Devices Snapshots
+Module. It allows creating non-persistent snapshots of any block devices.
+The main purpose of such snapshots is to provide backups of block devices.
+See more in Documentation/block/blksnap.rst.
+
+The Block Device Filtering Mechanism is added to the block layer. This
+allows attaching and detaching block device filters to the block layer.
+Filters allow extending the functionality of the block layer. See more
+in Documentation/block/blkfilter.rst.
+
+The tool, library and tests for working with blksnap can be found on github.
+Link: https://github.com/veeam/blksnap/tree/stable-v2.0
+From the documentation, it is possible to learn how to manage the module
+using the library and console tool.
+
+In the new version, the method of saving snapshot difference has been
+changed. Why this should have been done, Dave Chinner <david@fromorbit.com>
+described in detail in the comments to the previous version.
+Link: https://lore.kernel.org/lkml/20230612135228.10702-1-sergei.shtepa@veeam.com/T/#mfe9b8f46833011deea4b24714212230ac38db978
+
+The module is incompatible with features hardware inline encryption and
+data integrity. Thanks to Eric Biggers <ebiggers@kernel.org>.
+Link: https://lore.kernel.org/lkml/20230612135228.10702-1-sergei.shtepa@veeam.com/T/#m3f13e580876bff1d283eb2a79d1ecdef3b98cc42
+Unfortunately, I didn't have a chance to check it, since I don't have such
+equipment.
+
+And it is impossible to determine the presence of a blk-crypto-fallback at
+the block layer filter level. The filter receives already encrypted data.
+The original device continues to work without problems, but the data in
+the snapshot is encrypted. Perhaps they can be decrypted if specify the
+correct key when mounting the file system for snapshot image.
+
+Tested on amd64 and ppc64le with a page size of 64KiB and a storage block
+size of 4KiB.
+
+Based on LK v6.7-rc2.
+Compatible with branch 'for-next'.
+link: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git 
+
+v6 changes:
+- The difference storage has been changed.
+  In the previous version, the file was created only to reserve sector
+  ranges on a block device. The data was stored directly to the block
+  device in these sector ranges. Now saving and reading data is done using
+  'VFS' using vfs_iter_write() and vfs_iter_read() functions. This allows
+  not to depend on the filesystem and use, for example, tmpfs. Using an
+  unnamed temporary file allows hiding it from other processes and
+  automatically release it when the snapshot is closed.
+  However, now the module does not allow adding a block device to the
+  snapshot on which the difference storage is located. There is no way to
+  ensure the immutability of file metadata when writing data to a file.
+  This means that the metadata of the filesystem may change, which may
+  cause damage to the snapshot.
+- _IOW and _IOR were mixed up - fixed. 
+- Protection against the use of the snapshots for block devices with
+  hardware inline encryption and data integrity was implemented.
+  Compatibility with them was not planned and has not been tested at the
+  moment.
+
+v5 changes:
+- Rebase for "kernel/git/axboe/linux-block.git" branch "for-6.5/block".
+  Link: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-6.5/block
+
+v4 changes:
+- Structures for describing the state of chunks are allocated dynamically.
+  This reduces memory consumption, since the struct chunk is allocated only
+  for those blocks for which the snapshot image state differs from the
+  original block device.
+- The algorithm for calculating the chunk size depending on the size of the
+  block device has been changed. For large block devices, it is now
+  possible to allocate a larger number of chunks, and their size is smaller.
+- For block devices, a 'filter' file has been added to /sys/block/<device>.
+  It displays the name of the filter that is attached to the block device.
+- Fixed a problem with the lack of protection against re-adding a block
+  device to a snapshot.
+- Fixed a bug in the algorithm of allocating the next bio for a chunk.
+  This problem was occurred on large disks, for which a chunk consists of
+  at least two bio.
+- The ownership mechanism of the diff_area structure has been changed.
+  This fixed the error of prematurely releasing the diff_area structure
+  when destroying the snapshot.
+- Documentation corrected.
+- The Sparse analyzer is passed.
+- Use __u64 type instead pointers in UAPI.
+
+v3 changes:
+- New block device I/O controls BLKFILTER_ATTACH and BLKFILTER_DETACH allow
+  to attach and detach filters.
+- New block device I/O control BLKFILTER_CTL allow sending command to
+  attached block device filter.
+- The copy-on-write algorithm for processing I/O units has been optimized
+  and has become asynchronous.
+- The snapshot image reading algorithm has been optimized and has become
+  asynchronous.
+- Optimized the finite state machine for processing chunks.
+- Fixed a tracking block size calculation bug.
+
+v2 changes:
+- Added documentation for Block Device Filtering Mechanism.
+- Added documentation for Block Devices Snapshots Module (blksnap).
+- The MAINTAINERS file has been updated.
+- Optimized queue code for snapshot images.
+- Fixed comments, log messages and code for better readability.
+
+v1 changes:
+- Forgotten "static" declarations have been added.
+- The text of the comments has been corrected.
+- It is possible to connect only one filter, since there are no others in
+  upstream.
+- Do not have additional locks for attach/detach filter.
+- blksnap.h moved to include/uapi/.
+- #pragma once and commented code removed.
+- uuid_t removed from user API.
+- Removed default values for module parameters from the configuration file.
+- The debugging code for tracking memory leaks has been removed.
+- Simplified Makefile.
+- Optimized work with large memory buffers, CBT tables are now in virtual
+  memory.
+- The allocation code of minor numbers has been optimized.
+- The implementation of the snapshot image block device has been
+  simplified, now it is a bio-based block device.
+- Removed initialization of global variables with null values.
+- only one bio is used to copy one chunk.
+- Checked on ppc64le.
+
+
+Sergei Shtepa (11):
+  documentation: Block Device Filtering Mechanism
+  block: Block Device Filtering Mechanism
+  documentation: Block Devices Snapshots Module
+  blksnap: header file of the module interface
+  blksnap: module management interface functions
+  blksnap: handling and tracking I/O units
+  blksnap: difference storage and chunk
+  blksnap: event queue from the difference storage
+  blksnap: snapshot and snapshot image block device
+  blksnap: Kconfig and Makefile
+  blksnap: prevents using devices with data integrity or inline
+    encryption
+
+ Documentation/block/blkfilter.rst             |  66 ++
+ Documentation/block/blksnap.rst               | 352 +++++++++
+ Documentation/block/index.rst                 |   2 +
  .../userspace-api/ioctl/ioctl-number.rst      |   1 +
- MAINTAINERS                                   |   1 +
- include/uapi/linux/blksnap.h                  | 388 ++++++++++++++++++
- 3 files changed, 390 insertions(+)
+ MAINTAINERS                                   |  17 +
+ block/Makefile                                |   3 +-
+ block/bdev.c                                  |   2 +
+ block/blk-core.c                              |  35 +-
+ block/blk-filter.c                            | 238 +++++++
+ block/blk.h                                   |  11 +
+ block/genhd.c                                 |  10 +
+ block/ioctl.c                                 |   7 +
+ block/partitions/core.c                       |   9 +
+ drivers/block/Kconfig                         |   2 +
+ drivers/block/Makefile                        |   2 +
+ drivers/block/blksnap/Kconfig                 |  31 +
+ drivers/block/blksnap/Makefile                |  15 +
+ drivers/block/blksnap/cbt_map.c               | 228 ++++++
+ drivers/block/blksnap/cbt_map.h               |  90 +++
+ drivers/block/blksnap/chunk.c                 | 667 ++++++++++++++++++
+ drivers/block/blksnap/chunk.h                 | 142 ++++
+ drivers/block/blksnap/diff_area.c             | 601 ++++++++++++++++
+ drivers/block/blksnap/diff_area.h             | 175 +++++
+ drivers/block/blksnap/diff_buffer.c           | 115 +++
+ drivers/block/blksnap/diff_buffer.h           |  37 +
+ drivers/block/blksnap/diff_storage.c          | 291 ++++++++
+ drivers/block/blksnap/diff_storage.h          | 104 +++
+ drivers/block/blksnap/event_queue.c           |  81 +++
+ drivers/block/blksnap/event_queue.h           |  64 ++
+ drivers/block/blksnap/main.c                  | 475 +++++++++++++
+ drivers/block/blksnap/params.h                |  16 +
+ drivers/block/blksnap/snapimage.c             | 134 ++++
+ drivers/block/blksnap/snapimage.h             |  10 +
+ drivers/block/blksnap/snapshot.c              | 457 ++++++++++++
+ drivers/block/blksnap/snapshot.h              |  64 ++
+ drivers/block/blksnap/tracker.c               | 358 ++++++++++
+ drivers/block/blksnap/tracker.h               |  78 ++
+ include/linux/blk-filter.h                    |  51 ++
+ include/linux/blk_types.h                     |   1 +
+ include/linux/blkdev.h                        |   1 +
+ include/linux/sched.h                         |   1 +
+ include/uapi/linux/blk-filter.h               |  35 +
+ include/uapi/linux/blksnap.h                  | 388 ++++++++++
+ include/uapi/linux/fs.h                       |   3 +
+ 44 files changed, 5468 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/block/blkfilter.rst
+ create mode 100644 Documentation/block/blksnap.rst
+ create mode 100644 block/blk-filter.c
+ create mode 100644 drivers/block/blksnap/Kconfig
+ create mode 100644 drivers/block/blksnap/Makefile
+ create mode 100644 drivers/block/blksnap/cbt_map.c
+ create mode 100644 drivers/block/blksnap/cbt_map.h
+ create mode 100644 drivers/block/blksnap/chunk.c
+ create mode 100644 drivers/block/blksnap/chunk.h
+ create mode 100644 drivers/block/blksnap/diff_area.c
+ create mode 100644 drivers/block/blksnap/diff_area.h
+ create mode 100644 drivers/block/blksnap/diff_buffer.c
+ create mode 100644 drivers/block/blksnap/diff_buffer.h
+ create mode 100644 drivers/block/blksnap/diff_storage.c
+ create mode 100644 drivers/block/blksnap/diff_storage.h
+ create mode 100644 drivers/block/blksnap/event_queue.c
+ create mode 100644 drivers/block/blksnap/event_queue.h
+ create mode 100644 drivers/block/blksnap/main.c
+ create mode 100644 drivers/block/blksnap/params.h
+ create mode 100644 drivers/block/blksnap/snapimage.c
+ create mode 100644 drivers/block/blksnap/snapimage.h
+ create mode 100644 drivers/block/blksnap/snapshot.c
+ create mode 100644 drivers/block/blksnap/snapshot.h
+ create mode 100644 drivers/block/blksnap/tracker.c
+ create mode 100644 drivers/block/blksnap/tracker.h
+ create mode 100644 include/linux/blk-filter.h
+ create mode 100644 include/uapi/linux/blk-filter.h
  create mode 100644 include/uapi/linux/blksnap.h
 
-diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-index 4ea5b837399a..81acae1b1859 100644
---- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -203,6 +203,7 @@ Code  Seq#    Include File                                           Comments
- 'V'   C0     linux/ivtvfb.h                                          conflict!
- 'V'   C0     linux/ivtv.h                                            conflict!
- 'V'   C0     media/si4713.h                                          conflict!
-+'V'   00-1F  uapi/linux/blksnap.h                                    conflict!
- 'W'   00-1F  linux/watchdog.h                                        conflict!
- 'W'   00-1F  linux/wanrouter.h                                       conflict! (pre 3.9)
- 'W'   00-3F  sound/asound.h                                          conflict!
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9c81e4c83139..9770c4d4b15d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3598,6 +3598,7 @@ M:	Sergei Shtepa <sergei.shtepa@veeam.com>
- L:	linux-block@vger.kernel.org
- S:	Supported
- F:	Documentation/block/blksnap.rst
-+F:	include/uapi/linux/blksnap.h
- 
- BLOCK LAYER
- M:	Jens Axboe <axboe@kernel.dk>
-diff --git a/include/uapi/linux/blksnap.h b/include/uapi/linux/blksnap.h
-new file mode 100644
-index 000000000000..be1474f2025c
---- /dev/null
-+++ b/include/uapi/linux/blksnap.h
-@@ -0,0 +1,388 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/* Copyright (C) 2023 Veeam Software Group GmbH */
-+#ifndef _UAPI_LINUX_BLKSNAP_H
-+#define _UAPI_LINUX_BLKSNAP_H
-+
-+#include <linux/types.h>
-+
-+#define BLKSNAP_CTL "blksnap-control"
-+#define BLKSNAP_IMAGE_NAME "blksnap-image"
-+#define BLKSNAP 'V'
-+
-+/**
-+ * DOC: Block device filter interface.
-+ *
-+ * Control commands that are transmitted through the block device filter
-+ * interface.
-+ */
-+
-+/**
-+ * enum blkfilter_ctl_blksnap - List of commands for BLKFILTER_CTL ioctl
-+ *
-+ * @blkfilter_ctl_blksnap_cbtinfo:
-+ *	Get CBT information.
-+ *	The result of executing the command is a &struct blksnap_cbtinfo.
-+ *	Return 0 if succeeded, negative errno otherwise.
-+ * @blkfilter_ctl_blksnap_cbtmap:
-+ *	Read the CBT map.
-+ *	The option passes the &struct blksnap_cbtmap.
-+ *	The size of the table can be quite large. Thus, the table is read in
-+ *	a loop, in each cycle of which the next offset is set to
-+ *	&blksnap_tracker_read_cbt_bitmap.offset.
-+ *	Return a count of bytes read if succeeded, negative errno otherwise.
-+ * @blkfilter_ctl_blksnap_cbtdirty:
-+ *	Set dirty blocks in the CBT map.
-+ *	The option passes the &struct blksnap_cbtdirty.
-+ *	There are cases when some blocks need to be marked as changed.
-+ *	This ioctl allows to do this.
-+ *	Return 0 if succeeded, negative errno otherwise.
-+ * @blkfilter_ctl_blksnap_snapshotadd:
-+ *	Add device to snapshot.
-+ *	The option passes the &struct blksnap_snapshotadd.
-+ *	Return 0 if succeeded, negative errno otherwise.
-+ * @blkfilter_ctl_blksnap_snapshotinfo:
-+ *	Get information about snapshot.
-+ *	The result of executing the command is a &struct blksnap_snapshotinfo.
-+ *	Return 0 if succeeded, negative errno otherwise.
-+ */
-+enum blkfilter_ctl_blksnap {
-+	blkfilter_ctl_blksnap_cbtinfo,
-+	blkfilter_ctl_blksnap_cbtmap,
-+	blkfilter_ctl_blksnap_cbtdirty,
-+	blkfilter_ctl_blksnap_snapshotadd,
-+	blkfilter_ctl_blksnap_snapshotinfo,
-+};
-+
-+#ifndef UUID_SIZE
-+#define UUID_SIZE 16
-+#endif
-+
-+/**
-+ * struct blksnap_uuid - Unique 16-byte identifier.
-+ *
-+ * @b:
-+ *	An array of 16 bytes.
-+ */
-+struct blksnap_uuid {
-+	__u8 b[UUID_SIZE];
-+};
-+
-+/**
-+ * struct blksnap_cbtinfo - Result for the command
-+ *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_cbtinfo.
-+ *
-+ * @device_capacity:
-+ *	Device capacity in bytes.
-+ * @block_size:
-+ *	Block size in bytes.
-+ * @block_count:
-+ *	Number of blocks.
-+ * @generation_id:
-+ *	Unique identifier of change tracking generation.
-+ * @changes_number:
-+ *	Current changes number.
-+ */
-+struct blksnap_cbtinfo {
-+	__u64 device_capacity;
-+	__u32 block_size;
-+	__u32 block_count;
-+	struct blksnap_uuid generation_id;
-+	__u8 changes_number;
-+};
-+
-+/**
-+ * struct blksnap_cbtmap - Option for the command
-+ *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_cbtmap.
-+ *
-+ * @offset:
-+ *	Offset from the beginning of the CBT bitmap in bytes.
-+ * @length:
-+ *	Size of @buff in bytes.
-+ * @buffer:
-+ *	Pointer to the buffer for output.
-+ */
-+struct blksnap_cbtmap {
-+	__u32 offset;
-+	__u32 length;
-+	__u64 buffer;
-+};
-+
-+/**
-+ * struct blksnap_sectors - Description of the block device region.
-+ *
-+ * @offset:
-+ *	Offset from the beginning of the disk in sectors.
-+ * @count:
-+ *	Count of sectors.
-+ */
-+struct blksnap_sectors {
-+	__u64 offset;
-+	__u64 count;
-+};
-+
-+/**
-+ * struct blksnap_cbtdirty - Option for the command
-+ *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_cbtdirty.
-+ *
-+ * @count:
-+ *	Count of elements in the @dirty_sectors.
-+ * @dirty_sectors:
-+ *	Pointer to the array of &struct blksnap_sectors.
-+ */
-+struct blksnap_cbtdirty {
-+	__u32 count;
-+	__u64 dirty_sectors;
-+};
-+
-+/**
-+ * struct blksnap_snapshotadd - Option for the command
-+ *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_snapshotadd.
-+ *
-+ * @id:
-+ *	ID of the snapshot to which the block device should be added.
-+ */
-+struct blksnap_snapshotadd {
-+	struct blksnap_uuid id;
-+};
-+
-+#define IMAGE_DISK_NAME_LEN 32
-+
-+/**
-+ * struct blksnap_snapshotinfo - Result for the command
-+ *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_snapshotinfo.
-+ *
-+ * @error_code:
-+ *	Zero if there were no errors while holding the snapshot.
-+ *	The error code -ENOSPC means that while holding the snapshot, a snapshot
-+ *	overflow situation has occurred. Other error codes mean other reasons
-+ *	for failure.
-+ *	The error code is reset when the device is added to a new snapshot.
-+ * @image:
-+ *	If the snapshot was taken, it stores the block device name of the
-+ *	image, or empty string otherwise.
-+ */
-+struct blksnap_snapshotinfo {
-+	__s32 error_code;
-+	__u8 image[IMAGE_DISK_NAME_LEN];
-+};
-+
-+/**
-+ * DOC: Interface for managing snapshots
-+ *
-+ * Control commands that are transmitted through the blksnap module interface.
-+ */
-+enum blksnap_ioctl {
-+	blksnap_ioctl_version,
-+	blksnap_ioctl_snapshot_create,
-+	blksnap_ioctl_snapshot_destroy,
-+	blksnap_ioctl_snapshot_take,
-+	blksnap_ioctl_snapshot_collect,
-+	blksnap_ioctl_snapshot_wait_event,
-+};
-+
-+/**
-+ * struct blksnap_version - Module version.
-+ *
-+ * @major:
-+ *	Version major part.
-+ * @minor:
-+ *	Version minor part.
-+ * @revision:
-+ *	Revision number.
-+ * @build:
-+ *	Build number. Should be zero.
-+ */
-+struct blksnap_version {
-+	__u16 major;
-+	__u16 minor;
-+	__u16 revision;
-+	__u16 build;
-+};
-+
-+/**
-+ * define IOCTL_BLKSNAP_VERSION - Get module version.
-+ *
-+ * The version may increase when the API changes. But linking the user space
-+ * behavior to the version code does not seem to be a good idea.
-+ * To ensure backward compatibility, API changes should be made by adding new
-+ * ioctl without changing the behavior of existing ones. The version should be
-+ * used for logs.
-+ *
-+ * Return: 0 if succeeded, negative errno otherwise.
-+ */
-+#define IOCTL_BLKSNAP_VERSION							\
-+	_IOR(BLKSNAP, blksnap_ioctl_version, struct blksnap_version)
-+
-+/**
-+ * struct blksnap_snapshot_create - Argument for the
-+ *	&IOCTL_BLKSNAP_SNAPSHOT_CREATE control.
-+ *
-+ * @diff_storage_limit_sect:
-+ *	The maximum allowed difference storage size in sectors.
-+ * @diff_storage_fd:
-+ *	The difference storage file descriptor.
-+ * @id:
-+ *	Generated new snapshot ID.
-+ */
-+struct blksnap_snapshot_create {
-+	__u64 diff_storage_limit_sect;
-+	__u32 diff_storage_fd;
-+	struct blksnap_uuid id;
-+};
-+
-+/**
-+ * define IOCTL_BLKSNAP_SNAPSHOT_CREATE - Create snapshot.
-+ *
-+ * Creates a snapshot structure and initializes the difference storage.
-+ * A snapshot is created for several block devices at once. Several snapshots
-+ * can be created at the same time, but with the condition that one block
-+ * device can only be included in one snapshot.
-+ *
-+ * The difference storage can be dynamically increase as it fills up.
-+ * The file is increased in portions, the size of which is determined by the
-+ * module parameter &diff_storage_minimum. Each time the amount of free space
-+ * in the difference storage is reduced to the half of &diff_storage_minimum,
-+ * the file is expanded by a portion, until it reaches the allowable limit
-+ * &diff_storage_limit_sect.
-+ *
-+ * Return: 0 if succeeded, negative errno otherwise.
-+ */
-+#define IOCTL_BLKSNAP_SNAPSHOT_CREATE						\
-+	_IOWR(BLKSNAP, blksnap_ioctl_snapshot_create,				\
-+	     struct blksnap_snapshot_create)
-+
-+/**
-+ * define IOCTL_BLKSNAP_SNAPSHOT_DESTROY - Release and destroy the snapshot.
-+ *
-+ * Destroys snapshot with &blksnap_snapshot_destroy.id. This leads to the
-+ * deletion of all block device images of the snapshot. The difference storage
-+ * is being released. But the change tracker keeps tracking.
-+ *
-+ * Return: 0 if succeeded, negative errno otherwise.
-+ */
-+#define IOCTL_BLKSNAP_SNAPSHOT_DESTROY						\
-+	_IOW(BLKSNAP, blksnap_ioctl_snapshot_destroy,				\
-+	     struct blksnap_uuid)
-+
-+/**
-+ * define IOCTL_BLKSNAP_SNAPSHOT_TAKE - Take snapshot.
-+ *
-+ * Creates snapshot images of block devices and switches change trackers tables.
-+ * The snapshot must be created before this call, and the areas of block
-+ * devices should be added to the difference storage.
-+ *
-+ * Return: 0 if succeeded, negative errno otherwise.
-+ */
-+#define IOCTL_BLKSNAP_SNAPSHOT_TAKE						\
-+	_IOW(BLKSNAP, blksnap_ioctl_snapshot_take,				\
-+	     struct blksnap_uuid)
-+
-+/**
-+ * struct blksnap_snapshot_collect - Argument for the
-+ *	&IOCTL_BLKSNAP_SNAPSHOT_COLLECT control.
-+ *
-+ * @count:
-+ *	Size of &blksnap_snapshot_collect.ids in the number of 16-byte UUID.
-+ * @ids:
-+ *	Pointer to the array of struct blksnap_uuid for output.
-+ */
-+struct blksnap_snapshot_collect {
-+	__u32 count;
-+	__u64 ids;
-+};
-+
-+/**
-+ * define IOCTL_BLKSNAP_SNAPSHOT_COLLECT - Get collection of created snapshots.
-+ *
-+ * Multiple snapshots can be created at the same time. This allows for one
-+ * system to create backups for different data with a independent schedules.
-+ *
-+ * If in &blksnap_snapshot_collect.count is less than required to store the
-+ * &blksnap_snapshot_collect.ids, the array is not filled, and the ioctl
-+ * returns the required count for &blksnap_snapshot_collect.ids.
-+ *
-+ * So, it is recommended to call the ioctl twice. The first call with an null
-+ * pointer &blksnap_snapshot_collect.ids and a zero value in
-+ * &blksnap_snapshot_collect.count. It will set the required array size in
-+ * &blksnap_snapshot_collect.count. The second call with a pointer
-+ * &blksnap_snapshot_collect.ids to an array of the required size will allow to
-+ * get collection of active snapshots.
-+ *
-+ * Return: 0 if succeeded, -ENODATA if there is not enough space in the array
-+ * to store collection of active snapshots, or negative errno otherwise.
-+ */
-+#define IOCTL_BLKSNAP_SNAPSHOT_COLLECT						\
-+	_IOR(BLKSNAP, blksnap_ioctl_snapshot_collect,				\
-+	     struct blksnap_snapshot_collect)
-+
-+/**
-+ * enum blksnap_event_codes - Variants of event codes.
-+ *
-+ * @blksnap_event_code_corrupted:
-+ *	Snapshot image is corrupted event.
-+ *	If a chunk could not be allocated when trying to save data to the
-+ *	difference storage, this event is generated. However, this does not mean
-+ *	that the backup process was interrupted with an error. If the snapshot
-+ *	image has been read to the end by this time, the backup process is
-+ *	considered successful.
-+ */
-+enum blksnap_event_codes {
-+	blksnap_event_code_corrupted,
-+};
-+
-+/**
-+ * struct blksnap_snapshot_event - Argument for the
-+ *	&IOCTL_BLKSNAP_SNAPSHOT_WAIT_EVENT control.
-+ *
-+ * @id:
-+ *	Snapshot ID.
-+ * @timeout_ms:
-+ *	Timeout for waiting in milliseconds.
-+ * @time_label:
-+ *	Timestamp of the received event.
-+ * @code:
-+ *	Code of the received event &enum blksnap_event_codes.
-+ * @data:
-+ *	The received event body.
-+ */
-+struct blksnap_snapshot_event {
-+	struct blksnap_uuid id;
-+	__u32 timeout_ms;
-+	__u32 code;
-+	__s64 time_label;
-+	__u8 data[4096 - 32];
-+};
-+
-+/**
-+ * define IOCTL_BLKSNAP_SNAPSHOT_WAIT_EVENT - Wait and get the event from the
-+ *	snapshot.
-+ *
-+ * While holding the snapshot, the kernel module can transmit information about
-+ * changes in its state in the form of events to the user level.
-+ * It is very important to receive these events as quickly as possible, so the
-+ * user's thread is in the state of interruptible sleep.
-+ *
-+ * Return: 0 if succeeded, negative errno otherwise.
-+ */
-+#define IOCTL_BLKSNAP_SNAPSHOT_WAIT_EVENT					\
-+	_IOR(BLKSNAP, blksnap_ioctl_snapshot_wait_event,			\
-+	     struct blksnap_snapshot_event)
-+
-+/**
-+ * struct blksnap_event_corrupted - Data for the
-+ *	&blksnap_event_code_corrupted event.
-+ *
-+ * @dev_id_mj:
-+ *	Major part of original device ID.
-+ * @dev_id_mn:
-+ *	Minor part of original device ID.
-+ * @err_code:
-+ *	Error code.
-+ */
-+struct blksnap_event_corrupted {
-+	__u32 dev_id_mj;
-+	__u32 dev_id_mn;
-+	__s32 err_code;
-+};
-+
-+#endif /* _UAPI_LINUX_BLKSNAP_H */
 -- 
 2.20.1
 
