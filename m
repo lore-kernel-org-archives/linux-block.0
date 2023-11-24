@@ -1,79 +1,71 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HAUFzsZI"
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA0810E7
-	for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 09:03:39 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-2809748bdb0so458112a91.0
-        for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 09:03:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700845418; x=1701450218; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EttzaI0nhO53eCepTQDlN4y1aR++7e9+n9jNRJSBAnI=;
-        b=HAUFzsZI2Mbe//QMJ9qZ0qOduLtiU/G5Cayf5GCyLZzSHg+4BLErpmMjIIEI5taAZo
-         MGKdFuGcfeBo7Z5iWgp53OgvLpXbMrUMnvMDwANX8U2CrMdOHn1D9RVYLygzOhAHridc
-         Wtk7iQVdMP1a6pPikuye1fi97oFJ28nCaroqmrT0IiU3Jbb2g5FbzSmFbWOXPFvUx6On
-         d98ejXcJqvtec5E/st5pg7SM36ftePSwvQc4U3DVU+2ErlFq5HqKKFXT5kSirD6r+Vn7
-         FFPUnYkc6PXc8rnMjlie3AeTVV1iMCrs6nZ7mSeD8iKwsVxFxql8Gd8pclFTchp6lHXG
-         rGzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700845418; x=1701450218;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EttzaI0nhO53eCepTQDlN4y1aR++7e9+n9jNRJSBAnI=;
-        b=TfMNtwbO3r6oa6E5/TAqbBAnM9OIQylIzo/4pIUL/IgJXn6X/BmAswhMdyLanATRi4
-         Ztfr3s2YSREnaU5NUv1X0fwB23AU3LAVj/yhRLjdxtyWR9AETy63qEl04XFzDxuoAtOy
-         YWtSKrXIcVzHudmXa3IpulFzykgMwkRQ2dLanRC10Wp8QvZ794eUMF0f7lV8699zUDyH
-         87dUER4+WrBoBsP6UcRu5wsh/uVKEpvlUS+hOL+2niHpE2W6A0sYJ7EuHfnkN/k25Mvm
-         SQ52XlkxAgSXc8ONRoTlPo0jktifVSykqDh8yPEWrNJdeYqyihiTibGsYDddr2d7YGsm
-         2rGg==
-X-Gm-Message-State: AOJu0YyeoNc+fvePXy0iElxJYTVAztzwK6etMrY1Sh9KD1lduH1pqrq3
-	uBiIvL0+Pn+BgdeMfIpksDjXbg==
-X-Google-Smtp-Source: AGHT+IGjjL47Qg76W6NQQX8rc0L7riURgvwZXOQh1P8ZYDi+tPV1SXHJVTouJXnyPT02+qTwWoeFJA==
-X-Received: by 2002:a17:90a:7408:b0:285:6f2b:4e82 with SMTP id a8-20020a17090a740800b002856f2b4e82mr3395923pjg.1.1700845418428;
-        Fri, 24 Nov 2023 09:03:38 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id k2-20020a17090a590200b0028571e2a759sm2616351pji.48.2023.11.24.09.03.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 09:03:37 -0800 (PST)
-Message-ID: <7a54a166-56fd-4d6c-a5bf-792aa58a8fe5@kernel.dk>
-Date: Fri, 24 Nov 2023 10:03:36 -0700
+	dkim=pass (2048-bit key) header.d=veeam.com header.i=@veeam.com header.b="fCG8Pel2"
+X-Greylist: delayed 360 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 24 Nov 2023 09:18:34 PST
+Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1BF41718;
+	Fri, 24 Nov 2023 09:18:34 -0800 (PST)
+Received: from mail.veeam.com (prgmbx02.amust.local [172.24.128.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.veeam.com (Postfix) with ESMTPS id B83DB400A9;
+	Fri, 24 Nov 2023 12:12:32 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+	s=mx1-2022; t=1700845952;
+	bh=nrXhCkGTaOqUdOGnrTj2EvYUPyfJBBoTTlxHnvJ4qkw=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+	b=fCG8Pel2PwaEyTHJHhbrJ0SfLKowU22VKykGLlxSR6NQdNzJA5sL4w/E5cFF94vVY
+	 v9ZuIdlcX1EJUZC5rIHuWdtRAhukNlb5fgjLQIT1I0WgRUtwL93U6bM6bCUE9wgNMV
+	 vsj3+S4oelmJfCqbUFfS7hn667QdD5BmgLQTJDRvE97dN0O2wbOVxZ5rxHDe28P7JX
+	 UjWqPsWiJdACzOWykzv23bew4SLG58IucRTBH321om/y3XxfQ4krFcPEg+JOXtY8e1
+	 9tTVWJUpSxWvudNXVorn2H79jCWVcrXxUHlxVCykAGYElm4xmJbeLLhKAqh9LRjH7D
+	 9WmiacGijFckw==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx02.amust.local
+ (172.24.128.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.27; Fri, 24 Nov
+ 2023 18:12:31 +0100
+Message-ID: <14d5d31e-0dbe-8d04-91a6-82a886f8e92a@veeam.com>
+Date: Fri, 24 Nov 2023 18:12:25 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
 Subject: Re: [PATCH v6 00/11] blksnap - block devices snapshots module
 Content-Language: en-US
-To: Sergei Shtepa <sergei.shtepa@linux.dev>, hch@infradead.org,
- corbet@lwn.net, snitzer@kernel.org
-Cc: mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- viro@zeniv.linux.org.uk, brauner@kernel.org, linux-block@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Sergei Shtepa <sergei.shtepa@veeam.com>
+To: Jens Axboe <axboe@kernel.dk>, Sergei Shtepa <sergei.shtepa@linux.dev>,
+	"hch@infradead.org" <hch@infradead.org>, "corbet@lwn.net" <corbet@lwn.net>,
+	"snitzer@kernel.org" <snitzer@kernel.org>
+CC: "mingo@redhat.com" <mingo@redhat.com>, "peterz@infradead.org"
+	<peterz@infradead.org>, "juri.lelli@redhat.com" <juri.lelli@redhat.com>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "brauner@kernel.org"
+	<brauner@kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>
 References: <20231124165933.27580-1-sergei.shtepa@linux.dev>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231124165933.27580-1-sergei.shtepa@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+ <7a54a166-56fd-4d6c-a5bf-792aa58a8fe5@kernel.dk>
+From: Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <7a54a166-56fd-4d6c-a5bf-792aa58a8fe5@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29F44B155A637662
+X-Veeam-MMEX: True
 
-On 11/24/23 9:59 AM, Sergei Shtepa wrote:
-> From: Sergei Shtepa <sergei.shtepa@veeam.com>
-> 
-> Hi all.
-> 
-> I am happy to offer an improved version of the Block Devices Snapshots
-> Module. It allows creating non-persistent snapshots of any block devices.
-> The main purpose of such snapshots is to provide backups of block devices.
-> See more in Documentation/block/blksnap.rst.
+I'm very sorry.
 
-Please stop posting the same version, this is the third one of the
-morning. What's going on?
+Script get_maintainer.pl returns a very large list.
+I get "Error: too many recipients from 86.49.140.21"
+when trying to send an email from the smtp.migadu.com.
 
--- 
-Jens Axboe
+But it seems that for the third time it was possible to send
+a whole set of patches.
 
+I'm sorry for the inconvenience.
+Sending patches by mail gives me pain...
+It seems that I have already gone through all the rakes,
+but there are new ones.
