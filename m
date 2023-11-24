@@ -1,131 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YS/3MDkQ"
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53E41BD6
-	for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 09:00:30 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700845228;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QWk7YTMvB3DTfZc9sNUwNxdg+CAbRo1hOQbqO2wSQ6A=;
-	b=YS/3MDkQDJLZ1KOe1iNDAZDteB/JflqObZ/sxnSGYirEVXMmWDGjQitpPoxMWbwITRRGcK
-	lCaiEJ8jACRUkhE5INGw8DLQ17uYGYUcBA+kCBAPjM3CKQX83iJY0AdVDX5aUYv45OjLes
-	yYiDU6Zy3ApLCGmeU0KMq1smX6MXIK4=
-From: Sergei Shtepa <sergei.shtepa@linux.dev>
-To: axboe@kernel.dk,
-	hch@infradead.org,
-	corbet@lwn.net,
-	snitzer@kernel.org
-Cc: mingo@redhat.com,
-	peterz@infradead.org,
-	juri.lelli@redhat.com,
-	viro@zeniv.linux.org.uk,
-	brauner@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Sergei Shtepa <sergei.shtepa@veeam.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v6 11/11] blksnap: prevents using devices with data integrity or inline encryption
-Date: Fri, 24 Nov 2023 17:59:33 +0100
-Message-Id: <20231124165933.27580-12-sergei.shtepa@linux.dev>
-In-Reply-To: <20231124165933.27580-1-sergei.shtepa@linux.dev>
-References: <20231124165933.27580-1-sergei.shtepa@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HAUFzsZI"
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA0810E7
+	for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 09:03:39 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-2809748bdb0so458112a91.0
+        for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 09:03:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700845418; x=1701450218; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EttzaI0nhO53eCepTQDlN4y1aR++7e9+n9jNRJSBAnI=;
+        b=HAUFzsZI2Mbe//QMJ9qZ0qOduLtiU/G5Cayf5GCyLZzSHg+4BLErpmMjIIEI5taAZo
+         MGKdFuGcfeBo7Z5iWgp53OgvLpXbMrUMnvMDwANX8U2CrMdOHn1D9RVYLygzOhAHridc
+         Wtk7iQVdMP1a6pPikuye1fi97oFJ28nCaroqmrT0IiU3Jbb2g5FbzSmFbWOXPFvUx6On
+         d98ejXcJqvtec5E/st5pg7SM36ftePSwvQc4U3DVU+2ErlFq5HqKKFXT5kSirD6r+Vn7
+         FFPUnYkc6PXc8rnMjlie3AeTVV1iMCrs6nZ7mSeD8iKwsVxFxql8Gd8pclFTchp6lHXG
+         rGzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700845418; x=1701450218;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EttzaI0nhO53eCepTQDlN4y1aR++7e9+n9jNRJSBAnI=;
+        b=TfMNtwbO3r6oa6E5/TAqbBAnM9OIQylIzo/4pIUL/IgJXn6X/BmAswhMdyLanATRi4
+         Ztfr3s2YSREnaU5NUv1X0fwB23AU3LAVj/yhRLjdxtyWR9AETy63qEl04XFzDxuoAtOy
+         YWtSKrXIcVzHudmXa3IpulFzykgMwkRQ2dLanRC10Wp8QvZ794eUMF0f7lV8699zUDyH
+         87dUER4+WrBoBsP6UcRu5wsh/uVKEpvlUS+hOL+2niHpE2W6A0sYJ7EuHfnkN/k25Mvm
+         SQ52XlkxAgSXc8ONRoTlPo0jktifVSykqDh8yPEWrNJdeYqyihiTibGsYDddr2d7YGsm
+         2rGg==
+X-Gm-Message-State: AOJu0YyeoNc+fvePXy0iElxJYTVAztzwK6etMrY1Sh9KD1lduH1pqrq3
+	uBiIvL0+Pn+BgdeMfIpksDjXbg==
+X-Google-Smtp-Source: AGHT+IGjjL47Qg76W6NQQX8rc0L7riURgvwZXOQh1P8ZYDi+tPV1SXHJVTouJXnyPT02+qTwWoeFJA==
+X-Received: by 2002:a17:90a:7408:b0:285:6f2b:4e82 with SMTP id a8-20020a17090a740800b002856f2b4e82mr3395923pjg.1.1700845418428;
+        Fri, 24 Nov 2023 09:03:38 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id k2-20020a17090a590200b0028571e2a759sm2616351pji.48.2023.11.24.09.03.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Nov 2023 09:03:37 -0800 (PST)
+Message-ID: <7a54a166-56fd-4d6c-a5bf-792aa58a8fe5@kernel.dk>
+Date: Fri, 24 Nov 2023 10:03:36 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 00/11] blksnap - block devices snapshots module
+Content-Language: en-US
+To: Sergei Shtepa <sergei.shtepa@linux.dev>, hch@infradead.org,
+ corbet@lwn.net, snitzer@kernel.org
+Cc: mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, linux-block@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Sergei Shtepa <sergei.shtepa@veeam.com>
+References: <20231124165933.27580-1-sergei.shtepa@linux.dev>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231124165933.27580-1-sergei.shtepa@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Sergei Shtepa <sergei.shtepa@veeam.com>
+On 11/24/23 9:59 AM, Sergei Shtepa wrote:
+> From: Sergei Shtepa <sergei.shtepa@veeam.com>
+> 
+> Hi all.
+> 
+> I am happy to offer an improved version of the Block Devices Snapshots
+> Module. It allows creating non-persistent snapshots of any block devices.
+> The main purpose of such snapshots is to provide backups of block devices.
+> See more in Documentation/block/blksnap.rst.
 
-There is an opinion that the use of the blksnap module may violate the
-security of encrypted data. The difference storage file may be located
-on an unreliable disk or even network storage. To implement secure
-compatibility with hardware inline encrypted devices will require
-discussion of algorithms and restrictions. For example, a restriction
-on the location of the difference storage only in virtual memory might
-help. Currently, there is no need for compatibility of the blksnap
-module and hardware inline encryption.
+Please stop posting the same version, this is the third one of the
+morning. What's going on?
 
-I see no obstacles to ensuring the compatibility of the blksnap module
-and block devices with data integrity. However, this functionality was
-not planned or tested. Perhaps in the future this compatibility can be
-implemented.
-
-Theoretically possible that the block device was added to the snapshot
-before crypto_profile and integrity.profile were initialized.
-Checking the values of bi_crypt_context and bi_integrity ensures that
-the blksnap will not perform any actions with I/O units with which it
-is not compatible.
-
-Reported-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
- drivers/block/blksnap/snapshot.c | 17 +++++++++++++++++
- drivers/block/blksnap/tracker.c  | 14 ++++++++++++++
- 2 files changed, 31 insertions(+)
-
-diff --git a/drivers/block/blksnap/snapshot.c b/drivers/block/blksnap/snapshot.c
-index 21d94f12b5fc..a7675fdcf359 100644
---- a/drivers/block/blksnap/snapshot.c
-+++ b/drivers/block/blksnap/snapshot.c
-@@ -149,6 +149,23 @@ int snapshot_add_device(const uuid_t *id, struct tracker *tracker)
- 	int ret = 0;
- 	struct snapshot *snapshot = NULL;
- 
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
-+	if (tracker->orig_bdev->bd_disk->queue->integrity.profile) {
-+		pr_err("Blksnap is not compatible with data integrity\n");
-+		ret = -EPERM;
-+		goto out_up;
-+	} else
-+		pr_debug("Data integrity not found\n");
-+#endif
-+
-+#ifdef CONFIG_BLK_INLINE_ENCRYPTION
-+	if (tracker->orig_bdev->bd_disk->queue->crypto_profile) {
-+		pr_err("Blksnap is not compatible with hardware inline encryption\n");
-+		ret = -EPERM;
-+		goto out_up;
-+	} else
-+		pr_debug("Inline encryption not found\n");
-+#endif
- 	snapshot = snapshot_get_by_id(id);
- 	if (!snapshot)
- 		return -ESRCH;
-diff --git a/drivers/block/blksnap/tracker.c b/drivers/block/blksnap/tracker.c
-index 2b8978a2f42e..b38ead9afa69 100644
---- a/drivers/block/blksnap/tracker.c
-+++ b/drivers/block/blksnap/tracker.c
-@@ -57,6 +57,20 @@ static bool tracker_submit_bio(struct bio *bio)
- 	if (diff_area_is_corrupted(tracker->diff_area))
- 		return false;
- 
-+#ifdef CONFIG_BLK_INLINE_ENCRYPTION
-+	if (bio->bi_crypt_context) {
-+		pr_err_once("Hardware inline encryption is not supported\n");
-+		diff_area_set_corrupted(tracker->diff_area, -EPERM);
-+		return false;
-+	}
-+#endif
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
-+	if (bio->bi_integrity) {
-+		pr_err_once("Data integrity is not supported\n");
-+		diff_area_set_corrupted(tracker->diff_area, -EPERM);
-+		return false;
-+	}
-+#endif
- 	return diff_area_cow(bio, tracker->diff_area, &copy_iter);
- }
- 
 -- 
-2.20.1
+Jens Axboe
 
