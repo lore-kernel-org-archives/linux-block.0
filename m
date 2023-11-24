@@ -1,106 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A694404
-	for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 05:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pvjVf3eA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66C6BC433C8;
-	Fri, 24 Nov 2023 05:53:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700805235;
-	bh=ooIeM9zrPd8Y6XlkSVUl/UIr5uogzou+iMHiysRXOmI=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=pvjVf3eA1p3rHJkqINuxxR4IP8hMbx8P8QVIV4YR5N39wRw0FTq/1AIz+cwLh6EGB
-	 ANTyDwmH+VuKddT+AhnSljiU34hUSmDg6/GDU90UM9//u6Tef8D+mXOQAi9iIPlECd
-	 Twigc69OQSiyOCn0IJTl+eecOz2jhA7qTJvTw7VAlT0oIaSsDg/1PpzT9uTHQOHhRb
-	 5SAV8k/uq2OWe+WImgPiNt8NrzeUNJ+W4rTEDMxzq0M1bCLzAaNq7DzNaRS/Wurpr5
-	 jP1y1RbaTtVZlmxZ32TFV7dbXEC6X4mVInKw9S/43DQRztmPPEqALBZQQt4jdZ4pcD
-	 lnZcpVeSVRrzw==
-Message-ID: <160ecdfc-cb58-47fe-b9ce-fd126acc10fe@kernel.org>
-Date: Fri, 24 Nov 2023 14:53:52 +0900
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="C4KxAwoG"
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8196B19B4
+	for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 01:50:41 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c51682fddeso28398131fa.1
+        for <linux-block@vger.kernel.org>; Fri, 24 Nov 2023 01:50:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1700819440; x=1701424240; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oycrzPlryteHqP+ElQj2mM/HX5+6hH0VS5w+GwDvoHw=;
+        b=C4KxAwoG3EYLB1F2yilsrJ4N+VYJ5GlCX7rhV/YWQwFOZikN3lrSrQZ0WvzOdN+DCg
+         zzrSlUy63IRiMoRR0iMJOkGbbVraf3HlpkRcQ/zgKDTwbjmfPte4QJlt5xFuA+cTMQmQ
+         r2P0K4EOqZFAnhispTYWl7dOYzcEBRP3105YTmc1ocJHF5lCuqL4I0f9a3wUUbdnmTJi
+         9HDX/GAneZPTMVo7mdw/SProKn/rKnFmYa0GdFbn/rFRcbUoBaKA7hQCh41jv6YYnVeT
+         uxHwfJcwnHAfFemstjkt+TJfu17Pbb+tEiFqnpFagnsr7AtyNTc+sLiaZJPeoPUUTtqS
+         sm3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700819440; x=1701424240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oycrzPlryteHqP+ElQj2mM/HX5+6hH0VS5w+GwDvoHw=;
+        b=Cjed93qjZ2i0AHqRYyoMeWIubYB6PrIKm4C5E56RxkHBhDFQGqnpP40cTjBbFwcXzV
+         72HkI2uNuxCASJ+q3DzxlVsAnFeDddss8bl/iARZBliGyaVclozmtffNq6vi/HZNI0L2
+         yJgn8V6o2FFBnlWd+6kyy01tCo4rTQ8k+83EXl9yxPmrfYxRT5kNmsrc+GgsM6YiOzjX
+         mx4HnH1KAh8a61/NMML/33BNn0fLeQEX9SS9X8nz28lNmw4yWcFv6TLstDucU9fbRIjV
+         yYI/6xzavnuGFwhJCofzAiDlY3RT6Sh/NnuwH6uw4d3l2MGTTgunlW8vdh0p5qSQ/RjO
+         uHwA==
+X-Gm-Message-State: AOJu0YxdI+JdYiV2+DuIly9BcrWB6j+VcQ1n+xSZPhaF5zpYXFi2N0QO
+	r2SAV/74bLnIyXSezmd5LtnGzsB6oDzGGhEq4/Q9Bw==
+X-Google-Smtp-Source: AGHT+IHnDI55prnztH3exNR9D+eAXjhSPFI3q8QWqk6B5r/7NhN6I9QZpIqm4kdl3M2bfWkpTRdtuV9JCAHOIeibMAE=
+X-Received: by 2002:a05:651c:3cf:b0:2c8:80bf:977b with SMTP id
+ f15-20020a05651c03cf00b002c880bf977bmr1984441ljp.24.1700819439512; Fri, 24
+ Nov 2023 01:50:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] block: ioprio: Fix ioprio_check_cap() validation logic
-To: Wei Gao <wegao@suse.com>, axboe@kernel.dk, hare@suse.de, hch@lst.de,
- niklas.cassel@wdc.com, martin.petersen@oracle.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231124030525.31426-1-wegao@suse.com>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20231124030525.31426-1-wegao@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231115163749.715614-1-haris.iqbal@ionos.com>
+ <CAJpMwyh-24qFt4U1L2Ki270oWis-GUBLRQVC+Lf4cG7EumkpPw@mail.gmail.com>
+ <a27b66a6-7d3b-42f4-b25f-1dffc0d33a83@kernel.dk> <ecc3f0f6-4d9a-47d1-8fdc-e517a8c7bf14@kernel.dk>
+In-Reply-To: <ecc3f0f6-4d9a-47d1-8fdc-e517a8c7bf14@kernel.dk>
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Fri, 24 Nov 2023 10:50:28 +0100
+Message-ID: <CAJpMwyjskJDaswJpLtEa+8KHA9qrW0B6BQKSLYwP4gZYa_X_5w@mail.gmail.com>
+Subject: Re: [PATCH for-next 0/2] Misc patches for RNBD
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, hch@infradead.org, sagi@grimberg.me, 
+	bvanassche@acm.org, jinpu.wang@ionos.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/24/23 12:05, Wei Gao wrote:
-> The current logic "if (level >= IOPRIO_NR_LEVELS)" can not be reached since
-> level value get from IOPRIO_PRIO_LEVEL ONLY extract lower 3-bits of ioprio.
-> (IOPRIO_NR_LEVELS=8)
-> 
-> So this trigger LTP test case ioprio_set03 failed, the test case expect
-> error when set IOPRIO_CLASS_BE prio 8, in current implementation level
-> value will be 0 and obviously can not return error.
-> 
-> Fixes: eca2040972b4 ("scsi: block: ioprio: Clean up interface definition")
+On Thu, Nov 23, 2023 at 9:48=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 11/23/23 1:47 PM, Jens Axboe wrote:
+> > On 11/22/23 7:52 AM, Haris Iqbal wrote:
+> >> On Wed, Nov 15, 2023 at 5:37?PM Md Haris Iqbal <haris.iqbal@ionos.com>=
+ wrote:
+> >>>
+> >>> Hi Jens,
+> >>>
+> >>> Please consider to include following changes to the next merge window=
+.
+> >>>
+> >>> Santosh Pradhan (1):
+> >>>   block/rnbd: add support for REQ_OP_WRITE_ZEROES
+> >>>
+> >>> Supriti Singh (1):
+> >>>   block/rnbd: use %pe to print errors
+> >>>
+> >>>  drivers/block/rnbd/rnbd-clt.c   | 13 ++++++++-----
+> >>>  drivers/block/rnbd/rnbd-proto.h | 14 ++++++++++----
+> >>>  drivers/block/rnbd/rnbd-srv.c   | 25 +++++++++++++------------
+> >>>  3 files changed, 31 insertions(+), 21 deletions(-)
+> >>>
+> >>> --
+> >>> 2.25.1
+> >>
+> >> Gentle ping.
+> >
+> > I'll queue them up now, but won't get pushed out post -rc3 to avoid too
+> > many conflicts on the block side.
+>
+> Well maybe resend them first, patch 2 doesn't even apply to the current
+> branch.
 
-No. Please see below.
+Sure.. Will resend. Thanks
 
-> Signed-off-by: Wei Gao <wegao@suse.com>
-> ---
->  block/ioprio.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/ioprio.c b/block/ioprio.c
-> index b5a942519a79..f83029208f2a 100644
-> --- a/block/ioprio.c
-> +++ b/block/ioprio.c
-> @@ -33,7 +33,7 @@
->  int ioprio_check_cap(int ioprio)
->  {
->  	int class = IOPRIO_PRIO_CLASS(ioprio);
-> -	int level = IOPRIO_PRIO_LEVEL(ioprio);
-> +	int data = IOPRIO_PRIO_DATA(ioprio);
->  
->  	switch (class) {
->  		case IOPRIO_CLASS_RT:
-> @@ -49,13 +49,13 @@ int ioprio_check_cap(int ioprio)
->  			fallthrough;
->  			/* rt has prio field too */
->  		case IOPRIO_CLASS_BE:
-> -			if (level >= IOPRIO_NR_LEVELS)
-> +			if (data >= IOPRIO_NR_LEVELS || data < 0)
-
-This is incorrect: data is the combination of level AND hints, so that value can
-be larger than or equal to 8 with the level still being valid. Hard NACK on this.
-
-The issue with LTP test case has been fixed in LTP and by changing the ioprio.h
-header file. See commit 01584c1e2337 ("scsi: block: Improve ioprio value
-validity checks") which introduces IOPRIO_BAD_VALUE() macro for that.
-
-And for ltp, the commits are:
-6b7f448fe392 ("ioprio: Use IOPRIO_PRIO_NUM to check prio range")
-7c84fa710f75 ("ioprio: use ioprio.h kernel header if it exists")
-
-So please update your setup, including your install of kernel user API header files.
-
->  				return -EINVAL;
->  			break;
->  		case IOPRIO_CLASS_IDLE:
->  			break;
->  		case IOPRIO_CLASS_NONE:
-> -			if (level)
-> +			if (data)
->  				return -EINVAL;
->  			break;
->  		case IOPRIO_CLASS_INVALID:
-
--- 
-Damien Le Moal
-Western Digital Research
-
+>
+> --
+> Jens Axboe
+>
+>
