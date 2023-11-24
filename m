@@ -1,175 +1,117 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OSeRq3tg"
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2066.outbound.protection.outlook.com [40.107.104.66])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B100C198D;
-	Fri, 24 Nov 2023 06:05:47 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ch5wpzDevh/3XldD/rYUAmvgRPRsheRQYvWYX0kUKL9k9CmGyLvg3KTu9sOrHtASDZ/+Bylb+cLpGh5WU9RK2c+kgr0NnjKAr9sQ//LSJxs4cST67xnb0oqSlcQLdNRD6ydJELAAKFJrsV0NWmueQAHlNG0fDniqzHKmZ/n22gt1PqBhLjKa08BHUmOmfuJL0jyCDTIL7xjXB+0urBYiMqen/X1KJXl89s+x8Wh1l+PYB7b8BRC7wpZeKyQhTBKL33NbxBSe0BcGl4BnAxALVDkrQN/flzjYXTok9dUsID1S8zqp55de7qv8fKFktCMuG7PA+jhIXFqXZZMhCc2T6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N+nQAjGg01tLbVFfALJExQwr1vo6BbA70/slS9161vM=;
- b=aTzFhTzB413Vg4Z1WwdsfCAqgm8tBQv8g2yTMYYNzJSdVAW3sd6ZQHRyMKRa/jvbwkMDSNb3cObt2qZc/CWssr8Oad0qICSKNFSQEK2uKlc4KmxTOaPWB8UPYUshKOu0ZkjDnrPBh9u3rrGFu4eV0vW12A7fuoTstJGmQSHmCcx2WMnZgVhQFBZOc2f53qjTZLUfD0DBmlDmtWWZ4PgeRKNf8aGankXGVLbmjkXUy8wcea8nmLzjMlt6Ri3bY9Ql6tAf8BCLxu/qNsELVFHhoYl4sKMBuXfEOvvKH56EZaqIeWYdtrnBl7NUIUFP+CQKY0GDgNiBugQt/Zz+OIHJMw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N+nQAjGg01tLbVFfALJExQwr1vo6BbA70/slS9161vM=;
- b=OSeRq3tg+KaFuKNkQop9tXoB5IjYOQrnDuOLxdOBFkBSFW40nXPsL5yKEDzOL6PmOA7ruSwLvb+ALRusMIFbe6ih4efA3LvuIL935efBT7KnsRD0q90Qzex+BlfQzLc141xyLepnwrgIfJXIdb7qIADn3RyFOWoARiwHIYO6+3l0SMtm6sO6K5cgZdg/+6As4IsLjr6m4zD0Q2eJIa6RG0wi3fRiH43YmoS7rWif1yyjaiPziyfxmYkfeyhSTUOoDaVLfHBnwiakpewsG8MnFhubs41FHazNREZ2RmiqMqZ9asVPmZ5oxyDTwBsEC/HDndIe6WY0JA3esABq8OBRfw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from AS8PR04MB8199.eurprd04.prod.outlook.com (2603:10a6:20b:3f6::21)
- by DU2PR04MB9131.eurprd04.prod.outlook.com (2603:10a6:10:2f6::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.14; Fri, 24 Nov
- 2023 14:05:44 +0000
-Received: from AS8PR04MB8199.eurprd04.prod.outlook.com
- ([fe80::9d39:5718:5401:764d]) by AS8PR04MB8199.eurprd04.prod.outlook.com
- ([fe80::9d39:5718:5401:764d%5]) with mapi id 15.20.7046.012; Fri, 24 Nov 2023
- 14:05:44 +0000
-Date: Fri, 24 Nov 2023 09:05:37 -0500
-From: Wei Gao <wegao@suse.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: axboe@kernel.dk, hare@suse.de, hch@lst.de, niklas.cassel@wdc.com,
-	martin.petersen@oracle.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] block: ioprio: Fix ioprio_check_cap() validation logic
-Message-ID: <ZWCtsVw9cHhmkPf9@wegao>
-References: <20231124030525.31426-1-wegao@suse.com>
- <160ecdfc-cb58-47fe-b9ce-fd126acc10fe@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <160ecdfc-cb58-47fe-b9ce-fd126acc10fe@kernel.org>
-X-ClientProxiedBy: FR0P281CA0097.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a9::10) To AS8PR04MB8199.eurprd04.prod.outlook.com
- (2603:10a6:20b:3f6::21)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HQZp5LgA"
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100241735;
+	Fri, 24 Nov 2023 07:23:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700839435; x=1732375435;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CS7YuWfYA9yy3IYn3cxyi1vQx5XwqiX4ba5CyfDQodI=;
+  b=HQZp5LgAIj0DPl6dnTaSVUytciQ6LAwn+kSFq1o8qbIAOuw2VqRsh9Vw
+   qOPtzvZyeGr6oIpOfpJaxhYJCzI2XbE3kY6flj1RJ8FucnJlIDuSa+5n5
+   AytTeJKmzHgpi0zmcyZQJAIEARUBQt+IwAtOHDOLOKMUoLI7bDtSsy8ne
+   d7V5UADvzfqjx/8+ArFfjo7K7ld5+hPrejs8roJeY+bIH5Us9lKTkV1D+
+   Qf1w6cCYsafwhYB/uHLuHterLnlQ7q/opzhmMdRP+RamLMzzNSnijOrtJ
+   WKQvJLipbWtTBgQEHPv1BmVs7oSI3zyAB7BRxMHT0Uf5YtAUllSvmJg+c
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10904"; a="456781772"
+X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
+   d="scan'208";a="456781772"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2023 07:23:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10904"; a="1014935600"
+X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
+   d="scan'208";a="1014935600"
+Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 24 Nov 2023 07:23:52 -0800
+Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r6Y22-0002wf-0M;
+	Fri, 24 Nov 2023 15:23:50 +0000
+Date: Fri, 24 Nov 2023 23:23:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, asml.silence@gmail.com,
+	linux-block@vger.kernel.org, ming.lei@redhat.com,
+	joshi.k@samsung.com
+Subject: Re: [PATCH 1/3] io_uring: split out cmd api into a separate header
+Message-ID: <202311241614.Z6qymw0W-lkp@intel.com>
+References: <547e56560b97cd66f00bfc5b53db24f2fa1a8852.1700668641.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8199:EE_|DU2PR04MB9131:EE_
-X-MS-Office365-Filtering-Correlation-Id: 63cfce9d-aeb1-46b8-9597-08dbecf672ff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qi5dmV7DqFlectZRX21C1MiGYnTaAjAPFzw+W9p7U1HJTu/UaC0WumZkJruXxddBwVRx4eV/DlKo9nxf+fKkKT3/rcYilbDDJFYAD7AYRX5Z+mT2WMBPZtiJKJzapJEIkEjr2QFrUMbFKIdPvhKwClMFwTHFCuPBm735012m86j8lQgArQzuel4Mf046k+oj382ME8TZ7EV7NcxaDeuAuWpK3Mg+DfSpMqOFyvlMOQvc0bFKRd3breSuNTVKU47tvgn7YMkNcDkPuvU4pCuzg3uxTQxqcRtKKXl8dSe48LQ+7Hvk9Ba2dIQQ10OzLL4Z6pi6WA4TMo8BsK31WjIi77SwHLjSUeJW9Nna7tdz0V4yWquNn8b8caImg2A+xKN03ChrMWVK8u4rdrxhF8jllTddhnDXBOhrJnrX7EYcVlW3lJw6fTcm0IWHDNr7R71JpcrMrm90XSfDWfXxR4456HtpyeGYwE/2yiJD/Jjhcv0EAA+0Q+egx1Cj9hGUfUCASgo/+Q5VA9RZmCdOxnz3bhtAVZt9pSn0fptn/kHtaHWwohoor6CowUo1/61oZTax
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8199.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(396003)(136003)(346002)(366004)(376002)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(26005)(66946007)(6916009)(66476007)(66556008)(38100700002)(86362001)(6486002)(83380400001)(9686003)(6512007)(6666004)(53546011)(6506007)(478600001)(33716001)(2906002)(8676002)(316002)(8936002)(4326008)(5660300002)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?TyjHbfQ93uvpinIX2OZOO4nF49XiRSCy/R3O1ZI7ChWiPu7HeNQG9cZIed1k?=
- =?us-ascii?Q?nXJI50I0l1OmsdmpSTFpn+ovs6la9gkCSqRAaHuO/a7SvpwUtwZNYqPHzYsP?=
- =?us-ascii?Q?m5L0NXp5nqlHzF603z+FGelciSS70wUjy//LX08SF7H5RSL5/xSbQU08kVAA?=
- =?us-ascii?Q?YjdrzZyQfeVeFvebbUOUmNly8Hk0cNsOt/ptyCDewiQ+c3FeKqOrUyyqUJaZ?=
- =?us-ascii?Q?PgnjL4R+ENgfeyoL11rYTSe4EF1JiDBtKJnv/Xry9JuBeFlfO//O5c2Chc2b?=
- =?us-ascii?Q?JdZn+WQRbq3KVBmUEYPLZeU4sYLGlgmjplnYqfXsH57he6f7yW9eLHhxsvs5?=
- =?us-ascii?Q?5Axw4C9FZFdMGECHlpVTx4T41N4iKvYwinxOZQ2lssHxtB41OZN83oFvPgTW?=
- =?us-ascii?Q?ozq6rjseRhi6UIGuao11hyOFOHq2wyHCG5mBWo1tVx74o049yPaiXui8CUMv?=
- =?us-ascii?Q?eK/A9kj8eS1tDmb0p0KVt5j/fIhpIHsgUj4iIx/Yfwvif+uS08s2Hv/eJiI+?=
- =?us-ascii?Q?KbXOot3j5j3555+XxvKVneMjyZFRw4auruRfFBbX1hcOoRVcUL1CCtRSDQ7X?=
- =?us-ascii?Q?5vm1aDXsSmnwJCkwhEXhG5/WvBwaoaBnUcgUuCLVyfwuEpurIa0S3Xy1aUGg?=
- =?us-ascii?Q?LoHfZnZuER+VhoONSp0zosKxOiBDbw902x397hQo9m6s5lU7u2ZJ851dVCzS?=
- =?us-ascii?Q?g5EXDT6Iq8egMCiTLLF4kvMLfd1hXVJ4cNYI+jqwSUoyONwu46Dy25VreP5y?=
- =?us-ascii?Q?Y40RMN80WjIt7jbuVGxPct36JAZsCb8B++H3Edw1ru+daL1JCqUfZ6+39ZNP?=
- =?us-ascii?Q?H3KTku2ebBiIwUjplD3Fqhwon+1F0RsiGEZu/QA0YbujgfJISjSYzIjBkUZm?=
- =?us-ascii?Q?Dgu2qs1KAdaHIsSOaBXbfwwvrZmQBTIXp5EArTTLVOvuDpVXFN/j4Y7doAMK?=
- =?us-ascii?Q?VEJnOXcULofkuyU/d/fZpBYWa2v8WQmQLg61tNqwTj6xRRYuGeBxgMUr9wEi?=
- =?us-ascii?Q?y8QMtDOkTzlUL8/3xRWEZha8E4p1zgltjV/dVSr5kYrkxInEtLCZFsh1iyqK?=
- =?us-ascii?Q?iBFshx8P/oqgBdMP190M6f/BWbv2k+bAwSdv2R++0hxpoGm4Hq4h6oFH32at?=
- =?us-ascii?Q?yyAai9/ATdP2SSYDI/J11fRnw2f8+j92Vfr3NPKFoILRqrNfx0kOPCo6Ih2d?=
- =?us-ascii?Q?PTBRpP96OrKipezZK1N2tYH7Heq28JI/H76VPTrG89sihyLrHOKggcXjLA3V?=
- =?us-ascii?Q?pd11tm5Mp6CRZG0woJk8XzmSIT7yAWbY6bbTCSKerDI2efiGzesUMJRg6ETJ?=
- =?us-ascii?Q?t4+wSS6wrty8ZnAizRH6BQcACX2ceCeoIKNomY98ZOMQILbD8eh4BgdkVwet?=
- =?us-ascii?Q?7gqkKllbT8quE5k430QHYTmEZyR3WdtXXfp8O1QN2kLoPFrCWTZnigB2s2L7?=
- =?us-ascii?Q?gwpzGQbd7DQ/8UPzF50fHZ1zFg0AiWNhnTWGXlBW/HtHkriKaURqrBXRN5Ol?=
- =?us-ascii?Q?gyEWWoMlg6x/C7lvbd3T4NzfZuFka5e0k3dYsCl9v91AGwTN5Dv2nBryEftx?=
- =?us-ascii?Q?D8vvywn+12JpdFRJUPM=3D?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63cfce9d-aeb1-46b8-9597-08dbecf672ff
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8199.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 14:05:44.3770
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ptTzZK/AjxDpVWl8WasgOYgtvhV5uW+e6VpJftVJnXd1bM534e3LXhTr9eq/Lu6E
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB9131
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <547e56560b97cd66f00bfc5b53db24f2fa1a8852.1700668641.git.asml.silence@gmail.com>
 
-On Fri, Nov 24, 2023 at 02:53:52PM +0900, Damien Le Moal wrote:
-> On 11/24/23 12:05, Wei Gao wrote:
-> > The current logic "if (level >= IOPRIO_NR_LEVELS)" can not be reached since
-> > level value get from IOPRIO_PRIO_LEVEL ONLY extract lower 3-bits of ioprio.
-> > (IOPRIO_NR_LEVELS=8)
-> > 
-> > So this trigger LTP test case ioprio_set03 failed, the test case expect
-> > error when set IOPRIO_CLASS_BE prio 8, in current implementation level
-> > value will be 0 and obviously can not return error.
-> > 
-> > Fixes: eca2040972b4 ("scsi: block: ioprio: Clean up interface definition")
-> 
-> No. Please see below.
-> 
-> > Signed-off-by: Wei Gao <wegao@suse.com>
-> > ---
-> >  block/ioprio.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/block/ioprio.c b/block/ioprio.c
-> > index b5a942519a79..f83029208f2a 100644
-> > --- a/block/ioprio.c
-> > +++ b/block/ioprio.c
-> > @@ -33,7 +33,7 @@
-> >  int ioprio_check_cap(int ioprio)
-> >  {
-> >  	int class = IOPRIO_PRIO_CLASS(ioprio);
-> > -	int level = IOPRIO_PRIO_LEVEL(ioprio);
-> > +	int data = IOPRIO_PRIO_DATA(ioprio);
-> >  
-> >  	switch (class) {
-> >  		case IOPRIO_CLASS_RT:
-> > @@ -49,13 +49,13 @@ int ioprio_check_cap(int ioprio)
-> >  			fallthrough;
-> >  			/* rt has prio field too */
-> >  		case IOPRIO_CLASS_BE:
-> > -			if (level >= IOPRIO_NR_LEVELS)
-> > +			if (data >= IOPRIO_NR_LEVELS || data < 0)
-> 
-> This is incorrect: data is the combination of level AND hints, so that value can
-> be larger than or equal to 8 with the level still being valid. Hard NACK on this.
-> 
-> The issue with LTP test case has been fixed in LTP and by changing the ioprio.h
-> header file. See commit 01584c1e2337 ("scsi: block: Improve ioprio value
-> validity checks") which introduces IOPRIO_BAD_VALUE() macro for that.
-> 
-> And for ltp, the commits are:
-> 6b7f448fe392 ("ioprio: Use IOPRIO_PRIO_NUM to check prio range")
-> 7c84fa710f75 ("ioprio: use ioprio.h kernel header if it exists")
-> 
-> So please update your setup, including your install of kernel user API header files.
-> 
+Hi Pavel,
 
-Thanks a lot for your quick feedback and detail explaination, if i am guess correctly, 
-my test kernel include eca2040972b4 ("scsi: block: ioprio: Clean up interface definition") but 
-not include 01584c1e2337 ("scsi: block: Improve ioprio value validity checks") by coincidence.
+kernel test robot noticed the following build errors:
 
-> >  				return -EINVAL;
-> >  			break;
-> >  		case IOPRIO_CLASS_IDLE:
-> >  			break;
-> >  		case IOPRIO_CLASS_NONE:
-> > -			if (level)
-> > +			if (data)
-> >  				return -EINVAL;
-> >  			break;
-> >  		case IOPRIO_CLASS_INVALID:
-> 
-> -- 
-> Damien Le Moal
-> Western Digital Research
-> 
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.7-rc2 next-20231124]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Pavel-Begunkov/io_uring-split-out-cmd-api-into-a-separate-header/20231123-001742
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/547e56560b97cd66f00bfc5b53db24f2fa1a8852.1700668641.git.asml.silence%40gmail.com
+patch subject: [PATCH 1/3] io_uring: split out cmd api into a separate header
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20231124/202311241614.Z6qymw0W-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231124/202311241614.Z6qymw0W-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311241614.Z6qymw0W-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> security/selinux/hooks.c:6940:28: error: incomplete definition of type 'struct io_uring_cmd'
+           struct file *file = ioucmd->file;
+                               ~~~~~~^
+   include/linux/fs.h:1913:8: note: forward declaration of 'struct io_uring_cmd'
+   struct io_uring_cmd;
+          ^
+   1 error generated.
+
+
+vim +6940 security/selinux/hooks.c
+
+f4d653dcaa4e40 Paul Moore      2022-08-10  6929  
+f4d653dcaa4e40 Paul Moore      2022-08-10  6930  /**
+f4d653dcaa4e40 Paul Moore      2022-08-10  6931   * selinux_uring_cmd - check if IORING_OP_URING_CMD is allowed
+f4d653dcaa4e40 Paul Moore      2022-08-10  6932   * @ioucmd: the io_uring command structure
+f4d653dcaa4e40 Paul Moore      2022-08-10  6933   *
+f4d653dcaa4e40 Paul Moore      2022-08-10  6934   * Check to see if the current domain is allowed to execute an
+f4d653dcaa4e40 Paul Moore      2022-08-10  6935   * IORING_OP_URING_CMD against the device/file specified in @ioucmd.
+f4d653dcaa4e40 Paul Moore      2022-08-10  6936   *
+f4d653dcaa4e40 Paul Moore      2022-08-10  6937   */
+f4d653dcaa4e40 Paul Moore      2022-08-10  6938  static int selinux_uring_cmd(struct io_uring_cmd *ioucmd)
+f4d653dcaa4e40 Paul Moore      2022-08-10  6939  {
+f4d653dcaa4e40 Paul Moore      2022-08-10 @6940  	struct file *file = ioucmd->file;
+f4d653dcaa4e40 Paul Moore      2022-08-10  6941  	struct inode *inode = file_inode(file);
+f4d653dcaa4e40 Paul Moore      2022-08-10  6942  	struct inode_security_struct *isec = selinux_inode(inode);
+f4d653dcaa4e40 Paul Moore      2022-08-10  6943  	struct common_audit_data ad;
+f4d653dcaa4e40 Paul Moore      2022-08-10  6944  
+f4d653dcaa4e40 Paul Moore      2022-08-10  6945  	ad.type = LSM_AUDIT_DATA_FILE;
+f4d653dcaa4e40 Paul Moore      2022-08-10  6946  	ad.u.file = file;
+f4d653dcaa4e40 Paul Moore      2022-08-10  6947  
+e67b79850fcc4e Stephen Smalley 2023-03-09  6948  	return avc_has_perm(current_sid(), isec->sid,
+f4d653dcaa4e40 Paul Moore      2022-08-10  6949  			    SECCLASS_IO_URING, IO_URING__CMD, &ad);
+f4d653dcaa4e40 Paul Moore      2022-08-10  6950  }
+740b03414b20e7 Paul Moore      2021-02-23  6951  #endif /* CONFIG_IO_URING */
+740b03414b20e7 Paul Moore      2021-02-23  6952  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
