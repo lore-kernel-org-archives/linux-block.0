@@ -1,79 +1,88 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VBHzK5H2"
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F3EA7
-	for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:12:35 -0800 (PST)
-Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-35cfd975a53so299615ab.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:12:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701101554; x=1701706354; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XrhvBbCxr121d2mKtvut38TnQp1wJ7S3En+rnDUx+1o=;
-        b=VBHzK5H2KKM6QKfu9ak6DbBDW40lW78WsTufDJwGqbRK0gz1mtNF/YZPk8Kx7AFpnV
-         SYKuoCzYENXjRjPVxD5gL6FKwoQlcoLrGGGKU4HOO8V1VsOPBme/Bv2U8Z9BHMFOiShQ
-         745KsIjCe/iAjHAYs7E7ggCbGblQqy7RFW5n3bldnHlSpXZbLa9R4DPxqU9J+nv06g0X
-         b8D0r6JC92lqvV6cYpSAXxehW6l9JtRNYi7+cd4thmDfgoK0XMboQzCG5T5eD81Rghyj
-         3AgZQGxXEt4OBVcUXcucDK03IWYPdYf+CarfXRCxnTkjjGn3Ih7AhFBcI0DL90IBbVoe
-         ntGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701101554; x=1701706354;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XrhvBbCxr121d2mKtvut38TnQp1wJ7S3En+rnDUx+1o=;
-        b=TBE0tVsdvLszDl10JRnXwIVS32k0V1yK5nI+CmMrO7hKK1Vu3GzFqD06+A13ttInk/
-         /sZ/Po5Ov6PQUrPsYxwcmcxxliTZaAzHb56CJrWeaeRNs4WQRP3r9nrO1l3g4o2ytZWQ
-         3rLfCZqg+Z+zPlMzY/I7+HcJfXzf2CD4BDiuClcN2Bw+s67byK2mAfpNz8DJIGndVC6B
-         kfsRfXrn0R4i2iR8hSWuADhdkOQjFsJKeRU8uAGNEZqWGFstg1ZcONoBlYd8fGjfCiAH
-         Y/HUB69XxUfEG986YTk+5d0NWmLpHx4zTbw2TuAy/Avk5ak8EQ2pALby+/0vNwxlmpFL
-         Ehzg==
-X-Gm-Message-State: AOJu0Ywx36JDM+gA0M7vRVoVl1gfa1dBYIMK14KHF1nJJMGrdXJghR3s
-	Rkiy8lqKC8t3L8SGS2i6u8mJB1/CLCvzPuPpulLV0g==
-X-Google-Smtp-Source: AGHT+IFE7iz00XvIprkF+j8FMEBdgrnnRWjsA5sUyEHm77c7oUeUpzq8y64FJ/Pwsm/D1fxfiB6LHA==
-X-Received: by 2002:a05:6e02:1bc5:b0:35c:7b32:2423 with SMTP id x5-20020a056e021bc500b0035c7b322423mr10481125ilv.0.1701101554020;
-        Mon, 27 Nov 2023 08:12:34 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id r15-20020a92c5af000000b0035ca20fc741sm1338589ilt.70.2023.11.27.08.12.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 08:12:32 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, dlemoal@kernel.org
-In-Reply-To: <20231127072002.1332685-1-hch@lst.de>
-References: <20231127072002.1332685-1-hch@lst.de>
-Subject: Re: [PATCH] block: move a few definitions out of
- CONFIG_BLK_DEV_ZONED
-Message-Id: <170110155216.44993.13539411658277892269.b4-ty@kernel.dk>
-Date: Mon, 27 Nov 2023 09:12:32 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3w8bJekj"
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80128D4B;
+	Mon, 27 Nov 2023 08:33:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=N2zDXv8N842SdWeP1QfvmzEvIcEsyQplx8msSV1RBzc=; b=3w8bJekjauD14xkhiSXsSeP1yp
+	9N3b2DKZZPdBt27xj1DIEE7RXLXZrvHxDKR2sRYD21pNAAIJ3vl1ZCKZ4NFvv5G6xjzqey6N1n0KK
+	ZrI0nakNUBsMEbW2Q4e4j1NRh5OeO1tyxIFUhlV8EaqwcQbah9MgH17+QPadh0DqL/pm4sqZ5f/vV
+	IH1EMWIP6up9ybGx4dw0MvcLdLRClPIEOMfWizJpOcO8WEMAVnlOuY5kgUVe2HK2Xt75AhDq2qkmf
+	jzAFQBFfr3qP/5tAASIdgOPBH9JmPj2A8s0x9fJ50RYVccYl2K4OsZZ71u82sMqjEZ1B5f5BIa6y8
+	Lia9qiAg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1r7eXO-0030D4-22;
+	Mon, 27 Nov 2023 16:32:46 +0000
+Date: Mon, 27 Nov 2023 08:32:46 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Christoph Hellwig <hch@infradead.org>, ming.lei@redhat.com,
+	axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de,
+	kent.overstreet@gmail.com, joern@lazybastard.org,
+	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+	sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com,
+	gor@linux.ibm.com, agordeev@linux.ibm.com, jejb@linux.ibm.com,
+	martin.petersen@oracle.com, clm@fb.com, josef@toxicpanda.com,
+	dsterba@suse.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	nico@fluxnic.net, xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
+	adilger.kernel@dilger.ca, agruenba@redhat.com, jack@suse.com,
+	konishi.ryusuke@gmail.com, dchinner@redhat.com,
+	linux@weissschuh.net, min15.li@samsung.com, dlemoal@kernel.org,
+	willy@infradead.org, akpm@linux-foundation.org, hare@suse.de,
+	p.raghav@samsung.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-nilfs@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH block/for-next v2 01/16] block: add a new helper to get
+ inode from block_device
+Message-ID: <ZWTErvnMf7HiO1Wj@infradead.org>
+References: <20231127062116.2355129-1-yukuai1@huaweicloud.com>
+ <20231127062116.2355129-2-yukuai1@huaweicloud.com>
+ <ZWRDeQ4K8BiYnV+X@infradead.org>
+ <6acdeece-7163-3219-95e2-827e54eadd0c@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-26615
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6acdeece-7163-3219-95e2-827e54eadd0c@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+
+On Mon, Nov 27, 2023 at 09:07:22PM +0800, Yu Kuai wrote:
+> 1) Is't okay to add a new helper to pass in bdev for following apis?
 
 
-On Mon, 27 Nov 2023 08:20:02 +0100, Christoph Hellwig wrote:
-> Allow using a few symbols with IS_ENABLED instead of #idef by moving
-> the declarations out of #idef CONFIG_BLK_DEV_ZONED, and move
-> bdev_nr_zones into the remaining  #idef CONFIG_BLK_DEV_ZONED, #else
-> block below.
+For some we already have them (e.g. bdev_nr_bytes to read the bdev)
+size, for some we need to add them.  The big thing that seems to
+stick out is page cache API, and I think that is where we need to
+define maintainable APIs for file systems and others to use the
+block device page cache.  Probably only in folio versions and not
+pages once if we're touching the code anyay
+
+> 2) For the file fs/buffer.c, there are some special usage like
+> following that I don't think it's good to add a helper:
 > 
+> spin_lock(&bd_inode->i_mapping->private_lock);
 > 
+> Is't okay to move following apis from fs/buffer.c directly to
+> block/bdev.c?
+> 
+> __find_get_block
+> bdev_getblk
 
-Applied, thanks!
-
-[1/1] block: move a few definitions out of CONFIG_BLK_DEV_ZONED
-      commit: 668bfeeabb5e402e3b36992f7859c284cc6e594d
-
-Best regards,
--- 
-Jens Axboe
-
-
+I'm not sure moving is a good idea, but we might end up the
+some kind of low-level access from buffer.c, be that special
+helpers, a separate header or something else.  Let's sort out
+the rest of the kernel first.
 
