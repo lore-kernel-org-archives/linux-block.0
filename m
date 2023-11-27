@@ -1,18 +1,25 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F2B13D;
-	Sun, 26 Nov 2023 22:59:31 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB62270C;
+	Sun, 26 Nov 2023 23:08:36 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 968A268AFE; Mon, 27 Nov 2023 07:59:28 +0100 (CET)
-Date: Mon, 27 Nov 2023 07:59:28 +0100
-From: "hch@lst.de" <hch@lst.de>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
-Subject: Re: Merging raw block device writes
-Message-ID: <20231127065928.GA27811@lst.de>
-References: <SN6PR02MB41575884C4898B59615B496AD4BFA@SN6PR02MB4157.namprd02.prod.outlook.com>
+	id 8BA01227A87; Mon, 27 Nov 2023 08:08:31 +0100 (CET)
+Date: Mon, 27 Nov 2023 08:08:30 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Daejun Park <daejun7.park@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, Jan Kara <jack@suse.cz>,
+	Christian Brauner <brauner@kernel.org>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH v4 01/15] fs: Rename the kernel-internal data lifetime
+ constants
+Message-ID: <20231127070830.GA27870@lst.de>
+References: <20231114214132.1486867-1-bvanassche@acm.org> <20231114214132.1486867-2-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -21,22 +28,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR02MB41575884C4898B59615B496AD4BFA@SN6PR02MB4157.namprd02.prod.outlook.com>
+In-Reply-To: <20231114214132.1486867-2-bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sat, Nov 25, 2023 at 05:38:28PM +0000, Michael Kelley wrote:
-> Hyper-V guests and the Azure cloud have a particular interest here
-> because Hyper-V guests uses SCSI as the standard interface to virtual
-> disks.  Azure cloud disks can be throttled to a limited number of IOPS,
-> so the number of in-flights I/Os can be relatively high, and
-> merging can be beneficial to staying within the throttle
-> limits.  Of the flip side, this problem hasn't generated complaints
-> over the last 18 months that I'm aware of, though that may be more
-> because commercial distros haven't been running 5.16 or later kernels
-> until relatively recently.
+On Tue, Nov 14, 2023 at 01:40:56PM -0800, Bart Van Assche wrote:
+> -	case WRITE_LIFE_SHORT:
+> +	case WRITE_LIFE_2:
+>  		return CURSEG_HOT_DATA;
+> -	case WRITE_LIFE_EXTREME:
+> +	case WRITE_LIFE_5:
+>  		return CURSEG_COLD_DATA;
+>  	default:
+>  		return CURSEG_WARM_DATA;
 
-I think the more important thing is that if you care about reducing
-the number of I/Os you probably should use an I/O scheduler.  Reducing
-the number of I/Os without an I/O scheduler isn't (and I'll argue
-shouldn't) be a concern for the non I/O scheduler.
+A WRITE_LIFE_2 constant is strictly more confusing than just using 2,
+so this patch makes no sense whatsoever.
+
+More importantly these constant have been around forever, so we'd better
+have a really good argument for changing them.
 
