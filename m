@@ -1,101 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KWspGncb"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HmhTUB6B"
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D39C1A5
-	for <linux-block@vger.kernel.org>; Sun, 26 Nov 2023 23:20:07 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1092712D;
+	Sun, 26 Nov 2023 23:22:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=9GPxLlAAbAn5ecuFIoNe2gon1TvpEZ33fBcyS7Qycvg=; b=KWspGncbwp6oomqHelwwUWdCqW
-	/MfYb4sKnAs/r/sNhGXnsRUHEglBdnIN05pqbkNOnN8LEGd4rhx3//RCW3wSY5g+p+l5abQznmQsm
-	aZDO9T95K7FDTUVje3l6B0QFTzTc+YNaxiVLj6SONYTzVC6LZQjYcJ7QnNOIn6PNB+l/DniYIm6mR
-	UJYlIDwR5pCdvl2A6NSRMJ3m5NnsXwuGpdPBW45tE++1q8+IR4x59TMwDBfoPeFwFed1Q8YLEFiLt
-	rWtjyVqYVBHVa1+Ukwwz7yVOnTdk2iemmIjeLk9HZ/QS6Ahiyg5UcrNlcxYS6vnjGfrkFJUE20BwH
-	argA0O2g==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r7VuY-001hyK-05;
-	Mon, 27 Nov 2023 07:20:06 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dlemoal@kernel.org
-Subject: [PATCH] block: move a few definitions out of CONFIG_BLK_DEV_ZONED
-Date: Mon, 27 Nov 2023 08:20:02 +0100
-Message-Id: <20231127072002.1332685-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=bbFcmB19INmvUTx5j+M9jRyJXBnU+PmCLplmYes7xKg=; b=HmhTUB6Bgh7OnZuv3MNiTVnfXC
+	c22YIG8T5br8hsKMu41mjZ9/cx++C8wVTWDYSvUAH36xMkip5/yiTG260lY2rrIM/r+C0G+isp9uF
+	etkeNOURS8fQD6aPmSdyzSSGKWF+pTqcC1ZGT7oZVvUTVk9QpHYUf0FBUrJw19CADdPVngmSrijuO
+	IOMUdcJcEkdHTqMAdFx1L+mfGJd3fWDG081TsGYrqYpe4ADrF5w0LuzxW+1HqJjso+aXzjyCht+N2
+	tYj8ta2d171C20L5JBM/BAzza5S6Fp5sV5ukto8ZE9jI63+MJW0c2xIdTP/sw0+cxDdqp7qdN9Sak
+	f2DjTQ3g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1r7Vvt-001iAl-0W;
+	Mon, 27 Nov 2023 07:21:29 +0000
+Date: Sun, 26 Nov 2023 23:21:29 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: hch@infradead.org, ming.lei@redhat.com, axboe@kernel.dk,
+	roger.pau@citrix.com, colyli@suse.de, kent.overstreet@gmail.com,
+	joern@lazybastard.org, miquel.raynal@bootlin.com, richard@nod.at,
+	vigneshr@ti.com, sth@linux.ibm.com, hoeppner@linux.ibm.com,
+	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+	jejb@linux.ibm.com, martin.petersen@oracle.com, clm@fb.com,
+	josef@toxicpanda.com, dsterba@suse.com, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, nico@fluxnic.net, xiang@kernel.org,
+	chao@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
+	agruenba@redhat.com, jack@suse.com, konishi.ryusuke@gmail.com,
+	dchinner@redhat.com, linux@weissschuh.net, min15.li@samsung.com,
+	yukuai3@huawei.com, dlemoal@kernel.org, willy@infradead.org,
+	akpm@linux-foundation.org, hare@suse.de, p.raghav@samsung.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+	gfs2@lists.linux.dev, linux-nilfs@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH block/for-next v2 01/16] block: add a new helper to get
+ inode from block_device
+Message-ID: <ZWRDeQ4K8BiYnV+X@infradead.org>
+References: <20231127062116.2355129-1-yukuai1@huaweicloud.com>
+ <20231127062116.2355129-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231127062116.2355129-2-yukuai1@huaweicloud.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Allow using a few symbols with IS_ENABLED instead of #idef by moving
-the declarations out of #idef CONFIG_BLK_DEV_ZONED, and move
-bdev_nr_zones into the remaining  #idef CONFIG_BLK_DEV_ZONED, #else
-block below.
+On Mon, Nov 27, 2023 at 02:21:01PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> block_devcie is allocated from bdev_alloc() by bdev_alloc_inode(), and
+> currently block_device contains a pointer that point to the address of
+> inode, while such inode is allocated together:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 51fa7ffdee83b4..17c0a7d0d319eb 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -331,22 +331,13 @@ typedef int (*report_zones_cb)(struct blk_zone *zone, unsigned int idx,
- 
- void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model);
- 
--#ifdef CONFIG_BLK_DEV_ZONED
- #define BLK_ALL_ZONES  ((unsigned int)-1)
- int blkdev_report_zones(struct block_device *bdev, sector_t sector,
--			unsigned int nr_zones, report_zones_cb cb, void *data);
--unsigned int bdev_nr_zones(struct block_device *bdev);
--extern int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
--			    sector_t sectors, sector_t nr_sectors,
--			    gfp_t gfp_mask);
-+		unsigned int nr_zones, report_zones_cb cb, void *data);
-+int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
-+		sector_t sectors, sector_t nr_sectors, gfp_t gfp_mask);
- int blk_revalidate_disk_zones(struct gendisk *disk,
--			      void (*update_driver_data)(struct gendisk *disk));
--#else /* CONFIG_BLK_DEV_ZONED */
--static inline unsigned int bdev_nr_zones(struct block_device *bdev)
--{
--	return 0;
--}
--#endif /* CONFIG_BLK_DEV_ZONED */
-+		void (*update_driver_data)(struct gendisk *disk));
- 
- /*
-  * Independent access ranges: struct blk_independent_access_range describes
-@@ -643,6 +634,8 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
- }
- 
- #ifdef CONFIG_BLK_DEV_ZONED
-+unsigned int bdev_nr_zones(struct block_device *bdev);
-+
- static inline unsigned int disk_nr_zones(struct gendisk *disk)
- {
- 	return blk_queue_is_zoned(disk->queue) ? disk->nr_zones : 0;
-@@ -687,6 +680,11 @@ static inline unsigned int bdev_max_active_zones(struct block_device *bdev)
- }
- 
- #else /* CONFIG_BLK_DEV_ZONED */
-+static inline unsigned int bdev_nr_zones(struct block_device *bdev)
-+{
-+	return 0;
-+}
-+
- static inline unsigned int disk_nr_zones(struct gendisk *disk)
- {
- 	return 0;
--- 
-2.39.2
-
+This is going the wrong way.  Nothing outside of core block layer code
+should ever directly use the bdev inode.  We've been rather sloppy
+and added a lot of direct reference to it, but they really need to
+go away and be replaced with well defined high level operation on
+struct block_device.  Once that is done we can remove the bd_inode
+pointer, but replacing it with something that pokes even more deeply
+into bdev internals is a bad idea.
