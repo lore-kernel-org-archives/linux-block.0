@@ -1,47 +1,18 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DL1ZcP/K"
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B0E133
-	for <linux-block@vger.kernel.org>; Sun, 26 Nov 2023 22:50:04 -0800 (PST)
-Date: Mon, 27 Nov 2023 01:49:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701067801;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HkjYQiNIVrfX2OBhuLTiiwzS64/a/ylKVqG71mkDtoA=;
-	b=DL1ZcP/KviDDoXIKv0QIFRLZT2BpMmMrebGvWHdGh9aTKtxpmaDswg71Y2nAKp49rM9zFi
-	oCfHCq5KhNQGYzCFdxPL2IiRC5e4TQlt44fRgVAiZlc1g3fzyjxEcQWPI04lYpzGeBzudu
-	z+mDuhqyi808TBjcj4dzEHnQIZ2UEX0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@infradead.org, ming.lei@redhat.com, axboe@kernel.dk,
-	roger.pau@citrix.com, colyli@suse.de, kent.overstreet@gmail.com,
-	joern@lazybastard.org, miquel.raynal@bootlin.com, richard@nod.at,
-	vigneshr@ti.com, sth@linux.ibm.com, hoeppner@linux.ibm.com,
-	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, clm@fb.com,
-	josef@toxicpanda.com, dsterba@suse.com, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, nico@fluxnic.net, xiang@kernel.org,
-	chao@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-	agruenba@redhat.com, jack@suse.com, konishi.ryusuke@gmail.com,
-	dchinner@redhat.com, linux@weissschuh.net, min15.li@samsung.com,
-	yukuai3@huawei.com, dlemoal@kernel.org, willy@infradead.org,
-	akpm@linux-foundation.org, hare@suse.de, p.raghav@samsung.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-bcachefs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	gfs2@lists.linux.dev, linux-nilfs@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH block/for-next v2 07/16] bcachefs: use new helper to get
- inode from block_device
-Message-ID: <20231127064953.uo7bf2o62nroyjxs@moria.home.lan>
-References: <20231127062116.2355129-1-yukuai1@huaweicloud.com>
- <20231127062116.2355129-8-yukuai1@huaweicloud.com>
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F2B13D;
+	Sun, 26 Nov 2023 22:59:31 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 968A268AFE; Mon, 27 Nov 2023 07:59:28 +0100 (CET)
+Date: Mon, 27 Nov 2023 07:59:28 +0100
+From: "hch@lst.de" <hch@lst.de>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+Subject: Re: Merging raw block device writes
+Message-ID: <20231127065928.GA27811@lst.de>
+References: <SN6PR02MB41575884C4898B59615B496AD4BFA@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,36 +21,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231127062116.2355129-8-yukuai1@huaweicloud.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <SN6PR02MB41575884C4898B59615B496AD4BFA@SN6PR02MB4157.namprd02.prod.outlook.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Nov 27, 2023 at 02:21:07PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Which is more efficiency, and also prepare to remove the field
-> 'bd_inode' from block_device.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+On Sat, Nov 25, 2023 at 05:38:28PM +0000, Michael Kelley wrote:
+> Hyper-V guests and the Azure cloud have a particular interest here
+> because Hyper-V guests uses SCSI as the standard interface to virtual
+> disks.  Azure cloud disks can be throttled to a limited number of IOPS,
+> so the number of in-flights I/Os can be relatively high, and
+> merging can be beneficial to staying within the throttle
+> limits.  Of the flip side, this problem hasn't generated complaints
+> over the last 18 months that I'm aware of, though that may be more
+> because commercial distros haven't been running 5.16 or later kernels
+> until relatively recently.
 
-Acked-by: Kent Overstreet <kent.overstreet@linux.dev>
+I think the more important thing is that if you care about reducing
+the number of I/Os you probably should use an I/O scheduler.  Reducing
+the number of I/Os without an I/O scheduler isn't (and I'll argue
+shouldn't) be a concern for the non I/O scheduler.
 
-> ---
->  fs/bcachefs/util.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/bcachefs/util.h b/fs/bcachefs/util.h
-> index 2984b57b2958..fe7ccb3a3517 100644
-> --- a/fs/bcachefs/util.h
-> +++ b/fs/bcachefs/util.h
-> @@ -518,7 +518,7 @@ int bch2_bio_alloc_pages(struct bio *, size_t, gfp_t);
->  
->  static inline sector_t bdev_sectors(struct block_device *bdev)
->  {
-> -	return bdev->bd_inode->i_size >> 9;
-> +	return bdev_inode(bdev)->i_size >> 9;
->  }
->  
->  #define closure_bio_submit(bio, cl)					\
-> -- 
-> 2.39.2
-> 
