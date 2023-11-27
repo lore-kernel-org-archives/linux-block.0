@@ -1,52 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CID5huK8"
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFB2099
-	for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:12:32 -0800 (PST)
-Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-35ca48d48f1so1719595ab.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:12:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VBHzK5H2"
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F3EA7
+	for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:12:35 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-35cfd975a53so299615ab.1
+        for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:12:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701101552; x=1701706352; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701101554; x=1701706354; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vH3unxJnscdPbFAxrxsGSOPFQuL0T9rOWrjcesq2Y9k=;
-        b=CID5huK8m4ADNGB3CfUuSY0pSCJwsncqManZmQW2Zjcy/YvLbSy+CgioBe9NZWArGy
-         UrFeCSThUX17XbdySqVHKqBkfG2MM3bgCTcznkUpe1+i8HLYTGF20wVnBGrZ20EbgEjv
-         HXMiNluLgDW7vGCu1eQQckWBfuNmCQLhHIJDx0i+MXd5bafjxs5sRWo68Vh2K7f7VNV8
-         S666RHdeLYUeQeGTjLXZWMj4+rfGq+1Xgh8U+l8o04PFUo5ww8+REhunzi0t1hmq2fm8
-         iEifvLz9BoPdRY7Zk/Uc29e7kBWhfU9voUx4mIPCpyRVMpAKANlzTmCEdiCiOhICnwju
-         VMyw==
+        bh=XrhvBbCxr121d2mKtvut38TnQp1wJ7S3En+rnDUx+1o=;
+        b=VBHzK5H2KKM6QKfu9ak6DbBDW40lW78WsTufDJwGqbRK0gz1mtNF/YZPk8Kx7AFpnV
+         SYKuoCzYENXjRjPVxD5gL6FKwoQlcoLrGGGKU4HOO8V1VsOPBme/Bv2U8Z9BHMFOiShQ
+         745KsIjCe/iAjHAYs7E7ggCbGblQqy7RFW5n3bldnHlSpXZbLa9R4DPxqU9J+nv06g0X
+         b8D0r6JC92lqvV6cYpSAXxehW6l9JtRNYi7+cd4thmDfgoK0XMboQzCG5T5eD81Rghyj
+         3AgZQGxXEt4OBVcUXcucDK03IWYPdYf+CarfXRCxnTkjjGn3Ih7AhFBcI0DL90IBbVoe
+         ntGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701101552; x=1701706352;
+        d=1e100.net; s=20230601; t=1701101554; x=1701706354;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vH3unxJnscdPbFAxrxsGSOPFQuL0T9rOWrjcesq2Y9k=;
-        b=wqfOEbe3jErOFkyvZs8gZptn+/4qcLXnED1ypbnWM+Yx/ROtRfEZxdu88oiVdjsqgz
-         uZ0heQEMM3mUuhp8HvCd0fBG78WIJRisBNoY66+6Aq9yB++Owd/adZxGfYPkZJn+n2Sj
-         +OdHj11Iwg9EtGWb14u/p9bgxzbKmxEd/bPEaYxN0j+NEBeLwcwNTEFL1WfP7UhC7HEI
-         uGDrUwfO500dN7rePJZT/z+MUKb/owQEmIfPFBFXDJiDsdiSjtXXZQw+CTT2FFE+m+di
-         79GpTm5V3RwEFyp1ZYCto6r8IYiRk1UQ/mO/h+2DS6dYVqfbGGFnjr7gZ2q+SLrBU45y
-         I4IA==
-X-Gm-Message-State: AOJu0Yzp4ICb1FP2RiSkSYZV6nVVjr4UnVK6xlmaFaIDPZAj0aiBwDkx
-	5REf6tr6iS5lodh0uOHCcMULagCuzzOICVhU7uw09A==
-X-Google-Smtp-Source: AGHT+IGUC8NZpvcFieBnje6P2+05mMJTdK+m/bH/WxOycB7jOsHgkjyxZxCqOxaIhJts/oI+5Gve5g==
-X-Received: by 2002:a92:db4d:0:b0:35c:f484:e3f with SMTP id w13-20020a92db4d000000b0035cf4840e3fmr1349311ilq.3.1701101552005;
-        Mon, 27 Nov 2023 08:12:32 -0800 (PST)
+        bh=XrhvBbCxr121d2mKtvut38TnQp1wJ7S3En+rnDUx+1o=;
+        b=TBE0tVsdvLszDl10JRnXwIVS32k0V1yK5nI+CmMrO7hKK1Vu3GzFqD06+A13ttInk/
+         /sZ/Po5Ov6PQUrPsYxwcmcxxliTZaAzHb56CJrWeaeRNs4WQRP3r9nrO1l3g4o2ytZWQ
+         3rLfCZqg+Z+zPlMzY/I7+HcJfXzf2CD4BDiuClcN2Bw+s67byK2mAfpNz8DJIGndVC6B
+         kfsRfXrn0R4i2iR8hSWuADhdkOQjFsJKeRU8uAGNEZqWGFstg1ZcONoBlYd8fGjfCiAH
+         Y/HUB69XxUfEG986YTk+5d0NWmLpHx4zTbw2TuAy/Avk5ak8EQ2pALby+/0vNwxlmpFL
+         Ehzg==
+X-Gm-Message-State: AOJu0Ywx36JDM+gA0M7vRVoVl1gfa1dBYIMK14KHF1nJJMGrdXJghR3s
+	Rkiy8lqKC8t3L8SGS2i6u8mJB1/CLCvzPuPpulLV0g==
+X-Google-Smtp-Source: AGHT+IFE7iz00XvIprkF+j8FMEBdgrnnRWjsA5sUyEHm77c7oUeUpzq8y64FJ/Pwsm/D1fxfiB6LHA==
+X-Received: by 2002:a05:6e02:1bc5:b0:35c:7b32:2423 with SMTP id x5-20020a056e021bc500b0035c7b322423mr10481125ilv.0.1701101554020;
+        Mon, 27 Nov 2023 08:12:34 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id r15-20020a92c5af000000b0035ca20fc741sm1338589ilt.70.2023.11.27.08.12.30
+        by smtp.gmail.com with ESMTPSA id r15-20020a92c5af000000b0035ca20fc741sm1338589ilt.70.2023.11.27.08.12.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 08:12:30 -0800 (PST)
+        Mon, 27 Nov 2023 08:12:32 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Md Haris Iqbal <haris.iqbal@ionos.com>
-Cc: hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org, 
- jinpu.wang@ionos.com
-In-Reply-To: <20231124213422.113449-1-haris.iqbal@ionos.com>
-References: <20231124213422.113449-1-haris.iqbal@ionos.com>
-Subject: Re: [PATCH v2 for-next 0/2] Misc patches for RNBD
-Message-Id: <170110155044.44993.6212477642918597729.b4-ty@kernel.dk>
-Date: Mon, 27 Nov 2023 09:12:30 -0700
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, dlemoal@kernel.org
+In-Reply-To: <20231127072002.1332685-1-hch@lst.de>
+References: <20231127072002.1332685-1-hch@lst.de>
+Subject: Re: [PATCH] block: move a few definitions out of
+ CONFIG_BLK_DEV_ZONED
+Message-Id: <170110155216.44993.13539411658277892269.b4-ty@kernel.dk>
+Date: Mon, 27 Nov 2023 09:12:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,23 +58,18 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.13-dev-26615
 
 
-On Fri, 24 Nov 2023 22:34:20 +0100, Md Haris Iqbal wrote:
-> Please consider to include following changes to the next merge window.
+On Mon, 27 Nov 2023 08:20:02 +0100, Christoph Hellwig wrote:
+> Allow using a few symbols with IS_ENABLED instead of #idef by moving
+> the declarations out of #idef CONFIG_BLK_DEV_ZONED, and move
+> bdev_nr_zones into the remaining  #idef CONFIG_BLK_DEV_ZONED, #else
+> block below.
 > 
-> Changes in v2:
-> 	Rebased
 > 
-> Santosh Pradhan (1):
->   block/rnbd: add support for REQ_OP_WRITE_ZEROES
-> 
-> [...]
 
 Applied, thanks!
 
-[1/2] block/rnbd: add support for REQ_OP_WRITE_ZEROES
-      commit: fadf3dffe54fe10e0d86232f0a7576eccc04d537
-[2/2] block/rnbd: use %pe to print errors
-      commit: 70d85bec8f4c0d003db505bf35a3ec87bb1f627f
+[1/1] block: move a few definitions out of CONFIG_BLK_DEV_ZONED
+      commit: 668bfeeabb5e402e3b36992f7859c284cc6e594d
 
 Best regards,
 -- 
