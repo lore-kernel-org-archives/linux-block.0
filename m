@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13E8D5D;
-	Mon, 27 Nov 2023 11:00:29 -0800 (PST)
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5be30d543c4so3235804a12.2;
-        Mon, 27 Nov 2023 11:00:29 -0800 (PST)
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3DC1B4;
+	Mon, 27 Nov 2023 11:35:51 -0800 (PST)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6cbe6d514cdso3676523b3a.1;
+        Mon, 27 Nov 2023 11:35:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701111629; x=1701716429;
+        d=1e100.net; s=20230601; t=1701113750; x=1701718550;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eF2GAnwCh5Wl+Gbs8aDczVuuiH/00RAFmCz4QwFQh9Q=;
-        b=AmNzsn3H1Zu9ZWWEW0TCY1TDJAhsIpaaP4NKzSQuZtb+0mY51le+qWDMPYb1AgnY3v
-         gCQ63q0fCkBQu9cglCXiUqzbMGSPvQpOcfsar9LVbF0qTRhE+96TR8yWMpMf0wSmSBTT
-         Tu/1SyndsMG+SbshNcb+AlmSZNkuX5eFRh2hc1+oW4lh6FH4ZbggWqJ+2mwfMx0u9ZQn
-         MKPqNDD9ixzU5g+jP08efljeTTJ1qRVZvTZ5Y4hPMmajBtqKaLRXUQcYfDOyOWV8a3G8
-         dGDqQOT/rZGr8qmS6M+QMzHYun8pJ+HlTcT7ejNOsg0OU9G4dVltL8CkdQlNypxNQlQ0
-         m+Kw==
-X-Gm-Message-State: AOJu0Yx7JoUQNG0C50FctRpl2QYGudhLnKE3AgDchlenxjI/QinoKjFE
-	WYWMajBkj2LwTyDcqwra5Mg=
-X-Google-Smtp-Source: AGHT+IFKgEY8d51UqToBG4tJWu9dmlT0UGoTXo4O4PcHe/ONPOxFBj02ypg61y1wM7FhoDCaZPDbBQ==
-X-Received: by 2002:a05:6a20:a129:b0:18c:ba47:74e7 with SMTP id q41-20020a056a20a12900b0018cba4774e7mr2389404pzk.52.1701111628967;
-        Mon, 27 Nov 2023 11:00:28 -0800 (PST)
+        bh=l65xiZa5Zlgpg9GJQ4HILx5uG5sfJyEkxP1hRRGfpG8=;
+        b=r5RtZ8vWkhheNrAqc93Y5ialR/WV4Ea7nyddQ+hrpX+aKbdvnnDLYKEEIlr7JuyY75
+         KQ2+nuWC9lAb2ioV6US4v3C1di3+oyGWjuBnymBr2Hnl+aJrJu3GeumyYzBKlDtsqKRv
+         LpsCYMWWrFcSnkyNfVJx8PCOp9lpkLAaCEk+0rCNjfJ9iYpPav2xvCk5tWFealK+kvWS
+         IRjow5zc8qQQMnDzYb1HgOrPXqBZQynZzsJjTlflWmaPFqDU+kJ8Q37ZlErjKpyPK7MC
+         ZgfI3DCMYXduj/XOVmfaVSN1C7sWNIHMSw+cp3Kjc0IpZHzbtowrA/fytEiVvLA6LoKg
+         5cPg==
+X-Gm-Message-State: AOJu0YyxqqS49JkD4c1Anpm6qXBX/y/dnBD+4vTYONYGr1Q38/jw5w4u
+	4Gv7A5kmjshPKwPVTCQOBeQ=
+X-Google-Smtp-Source: AGHT+IFbSHyTUNE0OorjeJLsHDvy1ugTcNLJdJ/t+hAQimdgdh4kOi+s550JvIZtxMrc/SHoxZZoRA==
+X-Received: by 2002:a05:6a00:3988:b0:68e:2f6e:b4c0 with SMTP id fi8-20020a056a00398800b0068e2f6eb4c0mr13409383pfb.28.1701113750302;
+        Mon, 27 Nov 2023 11:35:50 -0800 (PST)
 Received: from ?IPV6:2620:0:1000:8411:c7c5:cabf:7030:2d30? ([2620:0:1000:8411:c7c5:cabf:7030:2d30])
-        by smtp.gmail.com with ESMTPSA id s1-20020a62e701000000b006c1221bc58bsm7442392pfh.115.2023.11.27.11.00.27
+        by smtp.gmail.com with ESMTPSA id fh20-20020a056a00391400b006bb5ff51177sm7540123pfb.194.2023.11.27.11.35.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Nov 2023 11:00:28 -0800 (PST)
-Message-ID: <eadc84c5-5f73-499a-8c3e-eb5bfbc67ed1@acm.org>
-Date: Mon, 27 Nov 2023 11:00:26 -0800
+        Mon, 27 Nov 2023 11:35:49 -0800 (PST)
+Message-ID: <a9748872-0608-4ab9-8986-a82eff17ca9f@acm.org>
+Date: Mon, 27 Nov 2023 11:35:48 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,37 +34,56 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/15] fs: Rename the kernel-internal data lifetime
- constants
+Subject: Re: [PATCH v15 00/19] Improve write performance for zoned UFS devices
 Content-Language: en-US
 To: Christoph Hellwig <hch@lst.de>
 Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
  linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Daejun Park <daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
- Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
- Alexander Viro <viro@zeniv.linux.org.uk>
-References: <20231114214132.1486867-1-bvanassche@acm.org>
- <20231114214132.1486867-2-bvanassche@acm.org> <20231127070830.GA27870@lst.de>
+ Jens Axboe <axboe@kernel.dk>
+References: <20231114211804.1449162-1-bvanassche@acm.org>
+ <20231127070939.GB27870@lst.de>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231127070830.GA27870@lst.de>
+In-Reply-To: <20231127070939.GB27870@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/26/23 23:08, Christoph Hellwig wrote:
-> More importantly these constant have been around forever, so we'd better
-> have a really good argument for changing them.
+On 11/26/23 23:09, Christoph Hellwig wrote:
+> I still think it is a very bad idea to add this amount of complexity to
+> the SCSI code, for a model that can't work for the general case and
+> diverges from the established NVMe model.
 
 Hi Christoph,
 
-I will drop this patch.
+Here is some additional background information:
+* UFS vendors prefer the SCSI command set because they combine it with the
+   M-PHY transport layer. This combination is more power efficient than NVMe
+   over PCIe. According to the information I have available power consumption
+   in the M-PHY hibernation state is lower than in the PCIe L2 state. I have
+   not yet heard about any attempts to combine the NVMe command set with the
+   M-PHY transport layer. Even if this would be possible, it would fragment
+   the mobile storage market. This would increase the price of mobile storage
+   devices which is undesirable.
+* I think that the "established NVMe model" in your email refers to the NVMe
+   zone append command. As you know there is no zone append in the SCSI ZBC
+   standard.
+* Using the software implementation of REQ_OP_ZONE_APPEND in drivers/scsi/sd_zbc.c
+   is not an option. REQ_OP_ZONE_APPEND commands are serialized by that
+   implementation. This serialization is unavoidable because a SCSI device
+   may respond with a unit attention condition to any SCSI command. Hence,
+   even if REQ_OP_ZONE_APPEND commands are submitted in order, these may be
+   executed out-of-order. We do not want any serialization of SCSI commands
+   because this has a significant negative performance impact on IOPS for UFS
+   devices. The latest UFS devices support more than 300 K IOPS.
+* Serialization in the I/O scheduler of zoned writes also reduces IOPS more
+   than what is acceptable.
 
-As you know the NVMe and SCSI specifications use the numeric range 0..63 for
-the data lifetime so there is a gap between the values supported by the
-F_[GS]ET_RW_HINT fcntls and the data lifetime values accepted by widely used
-storage devices. Do you think that it should be possible for user space
-applications to specify the full range (0..63)?
+Hence the approach of this patch series to support pipelining of zoned writes
+even if no I/O scheduler has been configured.
+
+I think the amount of complexity introduced by this patch series in the SCSI
+core is reasonable. No new states are introduced in the SCSI core. A single
+call to a function that reorders pending SCSI commands is introduced in the
+SCSI error handler (scsi_call_prepare_resubmit()).
 
 Thanks,
 
