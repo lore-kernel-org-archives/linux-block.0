@@ -1,88 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3w8bJekj"
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80128D4B;
-	Mon, 27 Nov 2023 08:33:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=N2zDXv8N842SdWeP1QfvmzEvIcEsyQplx8msSV1RBzc=; b=3w8bJekjauD14xkhiSXsSeP1yp
-	9N3b2DKZZPdBt27xj1DIEE7RXLXZrvHxDKR2sRYD21pNAAIJ3vl1ZCKZ4NFvv5G6xjzqey6N1n0KK
-	ZrI0nakNUBsMEbW2Q4e4j1NRh5OeO1tyxIFUhlV8EaqwcQbah9MgH17+QPadh0DqL/pm4sqZ5f/vV
-	IH1EMWIP6up9ybGx4dw0MvcLdLRClPIEOMfWizJpOcO8WEMAVnlOuY5kgUVe2HK2Xt75AhDq2qkmf
-	jzAFQBFfr3qP/5tAASIdgOPBH9JmPj2A8s0x9fJ50RYVccYl2K4OsZZ71u82sMqjEZ1B5f5BIa6y8
-	Lia9qiAg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1r7eXO-0030D4-22;
-	Mon, 27 Nov 2023 16:32:46 +0000
-Date: Mon, 27 Nov 2023 08:32:46 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@infradead.org>, ming.lei@redhat.com,
-	axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de,
-	kent.overstreet@gmail.com, joern@lazybastard.org,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com,
-	gor@linux.ibm.com, agordeev@linux.ibm.com, jejb@linux.ibm.com,
-	martin.petersen@oracle.com, clm@fb.com, josef@toxicpanda.com,
-	dsterba@suse.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	nico@fluxnic.net, xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-	adilger.kernel@dilger.ca, agruenba@redhat.com, jack@suse.com,
-	konishi.ryusuke@gmail.com, dchinner@redhat.com,
-	linux@weissschuh.net, min15.li@samsung.com, dlemoal@kernel.org,
-	willy@infradead.org, akpm@linux-foundation.org, hare@suse.de,
-	p.raghav@samsung.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
-	linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-nilfs@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH block/for-next v2 01/16] block: add a new helper to get
- inode from block_device
-Message-ID: <ZWTErvnMf7HiO1Wj@infradead.org>
-References: <20231127062116.2355129-1-yukuai1@huaweicloud.com>
- <20231127062116.2355129-2-yukuai1@huaweicloud.com>
- <ZWRDeQ4K8BiYnV+X@infradead.org>
- <6acdeece-7163-3219-95e2-827e54eadd0c@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8nCdzQ8"
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4051189
+	for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:49:53 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6c33ab26dddso3424177b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Nov 2023 08:49:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701103793; x=1701708593; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tZa3+EBPmr3IlMEtKh+TLvpIfzmfFEGfUJ7ow8nZ+Jo=;
+        b=C8nCdzQ8nq+TLL+jpw6AqDwK8CpdPUZt5AhFBnjr8f5044pTjIJj5FesW5kdGX0/hu
+         zU2zJLzBKTsfIA2Q7zjRv6DL3ACQj+2HNk9R3IsvuaL9kdUlFfBy47GAgGXGXQvjgW60
+         iL7OxN185eAnzU1v+mUgeMmc7ZlaXWo0O8WzP67+MdeLzEETzqBuR9/D+kgsmViM1LkX
+         gD20yNXmAcr/SpYs0tjIgBO5q9L6D9qaZ8PqSx4Ed69M4ffrKz1rU6j3830CLrmdKs4c
+         4UhB/9zWkbP9QTFKffVbCT1XMQ/kAJubFVHffgWPM1KERQpJalZoGZ7UTG0V2XDvus2X
+         C7+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701103793; x=1701708593;
+        h=content-transfer-encoding:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tZa3+EBPmr3IlMEtKh+TLvpIfzmfFEGfUJ7ow8nZ+Jo=;
+        b=TZBES4TIwhbqoXdKE1s7B1tqJIXyEdPQwinAgA4RQozdg3G2zVbzCs0Tl9LR9lV1ee
+         PYFgLdNyp684aUvzph17wC1AMkboZ99gZRoExSIzNdWAHC8wjej01hp3TJ67xsMImtMh
+         rEU8drh/wBMSensKMjuKViEia/djnKwAW5SKzPAZodYMOlPwld6SbtsqE6okYA+mGbX+
+         /q1xQVcfwSmk0pTzG0X/VmZ+rCfGcEzR2if0IYc7P8nFjXt5zX5ojPj/Hv3vEsuyAzCs
+         9ijz4fzBN/J9TG2x+vji9ncKeTjVz0jYuo2MUMlPEHr8M5J4QA01e93I4cqr9Hytorqb
+         sb+A==
+X-Gm-Message-State: AOJu0Yx9hpXLEBehtGDtd5uWyXS8nHC7szXb/sywi994SJmdC3iaMWUx
+	qw01PeJAPetbzvp+4vh5UK+rFTyVhQI=
+X-Google-Smtp-Source: AGHT+IHvf5SNYUXLK8gqHl5fBUDx2idvcFYtS4QoaVi89Hfe06/3GHUBZaKgd5V1OIhQBxcnBiWGgQ==
+X-Received: by 2002:a05:6a00:1797:b0:6cb:d28f:d91e with SMTP id s23-20020a056a00179700b006cbd28fd91emr12995395pfg.25.1701103793028;
+        Mon, 27 Nov 2023 08:49:53 -0800 (PST)
+Received: from DESKTOP-6F6Q0LF (static-host119-30-85-97.link.net.pk. [119.30.85.97])
+        by smtp.gmail.com with ESMTPSA id k12-20020a6568cc000000b005bdf596164fsm6802603pgt.94.2023.11.27.08.49.51
+        for <linux-block@vger.kernel.org>
+        (version=TLS1 cipher=ECDHE-ECDSA-AES128-SHA bits=128/128);
+        Mon, 27 Nov 2023 08:49:52 -0800 (PST)
+Message-ID: <6564c8b0.650a0220.ce0eb.efbd@mx.google.com>
+Date: Mon, 27 Nov 2023 08:49:52 -0800 (PST)
+X-Google-Original-Date: 27 Nov 2023 11:49:50 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: alvaroenoch632@gmail.com
+To: linux-block@vger.kernel.org
+Subject: Building Estimates
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6acdeece-7163-3219-95e2-827e54eadd0c@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Level: ***
 
-On Mon, Nov 27, 2023 at 09:07:22PM +0800, Yu Kuai wrote:
-> 1) Is't okay to add a new helper to pass in bdev for following apis?
-
-
-For some we already have them (e.g. bdev_nr_bytes to read the bdev)
-size, for some we need to add them.  The big thing that seems to
-stick out is page cache API, and I think that is where we need to
-define maintainable APIs for file systems and others to use the
-block device page cache.  Probably only in folio versions and not
-pages once if we're touching the code anyay
-
-> 2) For the file fs/buffer.c, there are some special usage like
-> following that I don't think it's good to add a helper:
-> 
-> spin_lock(&bd_inode->i_mapping->private_lock);
-> 
-> Is't okay to move following apis from fs/buffer.c directly to
-> block/bdev.c?
-> 
-> __find_get_block
-> bdev_getblk
-
-I'm not sure moving is a good idea, but we might end up the
-some kind of low-level access from buffer.c, be that special
-helpers, a separate header or something else.  Let's sort out
-the rest of the kernel first.
+Hi,=0D=0A=0D=0AWe provide estimation & quantities takeoff service=
+s. We are providing 98-100 accuracy in our estimates and take-off=
+s. Please tell us if you need any estimating services regarding y=
+our projects.=0D=0A=0D=0ASend over the plans and mention the exac=
+t scope of work and shortly we will get back with a proposal on w=
+hich our charges and turnaround time will be mentioned=0D=0A=0D=0A=
+You may ask for sample estimates and take-offs. Thanks.=0D=0A=0D=0A=
+Kind Regards=0D=0AAlvaro Enoch			=0D=0ADreamland Estimation, LLC
 
