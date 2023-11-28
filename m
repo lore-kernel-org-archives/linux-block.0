@@ -1,88 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139BD42A9F;
-	Tue, 28 Nov 2023 21:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZB0kq2Aq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C61AAC433C7;
-	Tue, 28 Nov 2023 21:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701205823;
-	bh=tU9f6DT2W4nxeMj/TXZs4n8BgSihvgJc+kQy9yEDCAY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZB0kq2Aq2U9v13f/oegVmU4gHNMAuVdUzXMeUFcDK7dKx/T3fjnaFEmYsQILswxf9
-	 s+EPvTiSWTbZogFnbs8ef+RPicZjqQZIVvdZj/sHTF76PloqEjZpMbsFtH8JbrQFm9
-	 BDrcI5C403DHAAuhyy+rcG6ONY+JI2ask3vxwxHyI/H9q/rbljR49+PNCqa52zudrq
-	 58PNRW7V+cZlRiGMkY/CLPmE4NjXv/RQ+VndHaNgyETltllgGxXoYevBkEMXPwYTdK
-	 VqemzSS3Erkpb15ex4AZfS+y4ww3pu37muegZ11nYg6le42nIcKZdb0lafHnOVo9+T
-	 E0/SqWc011lfw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Changhui Zhong <czhong@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	tj@kernel.org,
-	josef@toxicpanda.com,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 1/7] blk-throttle: fix lockdep warning of "cgroup_mutex or RCU read lock required!"
-Date: Tue, 28 Nov 2023 16:10:11 -0500
-Message-ID: <20231128211018.877548-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DD698;
+	Tue, 28 Nov 2023 13:49:39 -0800 (PST)
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7b06844971dso194626339f.2;
+        Tue, 28 Nov 2023 13:49:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701208179; x=1701812979;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FEzKKhTYua94jLSZ7tvDRFVLHmrcI2BlEiHde8UAL64=;
+        b=mmwN7KdMVSYYANCbzjG8p2jSfQD1AemKgW4s+gOhnp4Ynl0pv9fxYZxmQlz0OD7jm0
+         RENU91J/NQqtd+MM1dYROZMJ/t34gIjfNRm7TldsOqkS40/paz467C6+tQ+SjfN2g+1h
+         0YFSXChuyqg+70xNadFJOVf8wpGHw+VSO7uMTOCESVp8N5ZjPMurDoA9GlyNtRqDsntf
+         BxkpoJfhqBZsExYcPGyug4wTtZ0hrByGPHNlDuMBzGgUNueglJg9OXJISW0sUkKkn3FL
+         rX4GotYEyXFTY4XMn70VF0Hr0G/KPOXZ2/ddljJYu/YlzaEcGOjCCbZYn5GBmTPjuOLK
+         XuSg==
+X-Gm-Message-State: AOJu0Yzq5MXDFIyTp/ZNc+Zw73HffjEFYYdQImwhnvuDXmrQ4bb935kn
+	Q0CPebXE8AoLch9H9bwAMY8=
+X-Google-Smtp-Source: AGHT+IFwp2G39lgv/dnL+G6BONJ+4fNXQRMfSWj5N9YRUwEChms0xiTI59QLzVIpKqd93g1g3yhuNA==
+X-Received: by 2002:a05:6e02:1945:b0:35c:81ed:878f with SMTP id x5-20020a056e02194500b0035c81ed878fmr14381104ilu.11.1701208178934;
+        Tue, 28 Nov 2023 13:49:38 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:1f8e:127f:6051:78b3? ([2620:0:1000:8411:1f8e:127f:6051:78b3])
+        by smtp.gmail.com with ESMTPSA id o10-20020a056a001b4a00b006cb6e83bf7fsm9372394pfv.192.2023.11.28.13.49.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Nov 2023 13:49:38 -0800 (PST)
+Message-ID: <e83ae04f-2d13-4869-9254-b66eded26be4@acm.org>
+Date: Tue, 28 Nov 2023 13:49:37 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.14.331
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v15 19/19] scsi: ufs: Inform the block layer about write
+ ordering
+To: Can Guo <quic_cang@quicinc.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ "Bao D . Nguyen" <quic_nguyenb@quicinc.com>,
+ Avri Altman <avri.altman@wdc.com>, "James E.J. Bottomley"
+ <jejb@linux.ibm.com>, Stanley Chu <stanley.chu@mediatek.com>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Asutosh Das <quic_asutoshd@quicinc.com>, Peter Wang
+ <peter.wang@mediatek.com>, Bean Huo <beanhuo@micron.com>,
+ Arthur Simchaev <Arthur.Simchaev@wdc.com>
+References: <20231114211804.1449162-1-bvanassche@acm.org>
+ <20231114211804.1449162-20-bvanassche@acm.org>
+ <ea3b4046-2fe8-4fac-b170-9298f2266cda@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <ea3b4046-2fe8-4fac-b170-9298f2266cda@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Ming Lei <ming.lei@redhat.com>
+On 11/27/23 17:45, Can Guo wrote:
+> I got some time testing these changes on SM8650 with MCQ enabled. I
+> found that with these changes in place (with AH8 disabled). Even we
+> can make sure UFS driver does not re-order requests in MCQ mode, the
+> reorder is still happening while running FIO and can be seen from
+> ftrace logs.
 
-[ Upstream commit 27b13e209ddca5979847a1b57890e0372c1edcee ]
+Hi Can,
 
-Inside blkg_for_each_descendant_pre(), both
-css_for_each_descendant_pre() and blkg_lookup() requires RCU read lock,
-and either cgroup_assert_mutex_or_rcu_locked() or rcu_read_lock_held()
-is called.
+Thank you for having taken the time to run this test and also for having
+shared your findings. I have not yet had the chance to test this patch
+series myself on an MCQ test setup. I will try to locate such a test
+setup and test this patch series on an MCQ setup.
 
-Fix the warning by adding rcu read lock.
+Thanks,
 
-Reported-by: Changhui Zhong <czhong@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20231117023527.3188627-2-ming.lei@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-throttle.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index fcbbe2e45a2bb..e52a9632993a7 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1391,6 +1391,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 		   tg_bps_limit(tg, READ), tg_bps_limit(tg, WRITE),
- 		   tg_iops_limit(tg, READ), tg_iops_limit(tg, WRITE));
- 
-+	rcu_read_lock();
- 	/*
- 	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
- 	 * considered to have rules if either the tg itself or any of its
-@@ -1418,6 +1419,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 		this_tg->latency_target = max(this_tg->latency_target,
- 				parent_tg->latency_target);
- 	}
-+	rcu_read_unlock();
- 
- 	/*
- 	 * We're already holding queue_lock and know @tg is valid.  Let's
--- 
-2.42.0
+Bart.
 
