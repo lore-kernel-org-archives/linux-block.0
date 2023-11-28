@@ -1,76 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B0A19B0
-	for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 11:40:29 -0800 (PST)
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6cb74a527ceso4792713b3a.2
-        for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 11:40:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701200428; x=1701805228;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H5Jsm+KgM+O1nqdc6mUTRe4NwFRWRH/HKvh3Ynd75y4=;
-        b=cW03e0thxTAuMiODf3QgvuTGc6FPUZO6Op3q0qvVK0zPO0+NvaUXi8mHTT5KBboPeS
-         tzFeNK8w8SI3Fbc/ozbg/Rj0rAcaz1YRJL6TokuvAo0gaTHFLjBu56OaJ17Gra9d1WKN
-         2/aXBqI18yErPimDaecq5djNLUBpnSsyveBhdnuDnxy7ONzcJyw77QIU4x/C94zeg49b
-         TpI672voUCKVzSL331eT0/E1xXVEN91upI8py+3minXQXfXiNeBZtfpPFtBUIl7U9E+i
-         2cRv6/rpleGJWWytdEcyFiaR27rXe5RMC9/KEFlm16t0g+69V2VDCmeo/ppJSHMHEEz7
-         Az8Q==
-X-Gm-Message-State: AOJu0YyD08tGO4iRej5CGXYIKIX5HHl/WRsIN2rQKnL7drcFihlvTzXd
-	xVGbaRgI/2CZ+257QdE+lt4=
-X-Google-Smtp-Source: AGHT+IFGB4v8BeEgAT0en3rMDTxLEEaZUmtNoqNzj1P638II5V8NzAy5n3NBUIWFj3l97e1Sh/pGrQ==
-X-Received: by 2002:a05:6a00:1953:b0:6c8:705f:4090 with SMTP id s19-20020a056a00195300b006c8705f4090mr16405036pfk.30.1701200428012;
-        Tue, 28 Nov 2023 11:40:28 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:1f8e:127f:6051:78b3])
-        by smtp.gmail.com with ESMTPSA id t43-20020aa78fab000000b006c9c0705b5csm9219368pfs.48.2023.11.28.11.40.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 11:40:27 -0800 (PST)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH] block: Document the role of the two attribute groups
-Date: Tue, 28 Nov 2023 11:40:19 -0800
-Message-ID: <20231128194019.72762-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97E742A99;
+	Tue, 28 Nov 2023 21:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="igFjAcK9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57823C433CD;
+	Tue, 28 Nov 2023 21:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701205589;
+	bh=jHQHIXl0xO48jebk8B97gUWZa/J0o18AtfcAttsPF/U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=igFjAcK9jtQjQnibaCpVEgTd5X+X9x7e2Fg66+3navsjU78CJAisPDUI5N7WtdDLL
+	 BsDpxodO/hi1fagToM0bS4fM/XyBZV417P5qmxM0tcoNLNa67rMJgWS2v6qVey+E/c
+	 mrYVdnn544SgwOzOA5lGUcEg2tr9jsi47lMLCYKRma6ja/pzlD3ttZUS1dAAIZk3jN
+	 hjTmcqqrLrJsETlh7uwX4X9PFmxmLFmllboNtjbudGpVNmc2fOLMrsgulhcf0HKSBD
+	 p6P0uUEucqD9EYuQQ5KWY700ZSvF0xr63kbNWh4R3IlnBZ7yIphsWS7wBpmaiMcS6y
+	 QOCkqXmFpfdXg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Changhui Zhong <czhong@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 05/40] blk-throttle: fix lockdep warning of "cgroup_mutex or RCU read lock required!"
+Date: Tue, 28 Nov 2023 16:05:11 -0500
+Message-ID: <20231128210615.875085-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231128210615.875085-1-sashal@kernel.org>
+References: <20231128210615.875085-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.3
 Content-Transfer-Encoding: 8bit
 
-It is nontrivial to derive the role of the two attribute groups in source
-file block/blk-sysfs.c. Hence add a comment that explains their roles. See
-also commit 6d85ebf95c44 ("blk-sysfs: add a new attr_group for blk_mq").
+From: Ming Lei <ming.lei@redhat.com>
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Yu Kuai <yukuai3@huawei.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+[ Upstream commit 27b13e209ddca5979847a1b57890e0372c1edcee ]
+
+Inside blkg_for_each_descendant_pre(), both
+css_for_each_descendant_pre() and blkg_lookup() requires RCU read lock,
+and either cgroup_assert_mutex_or_rcu_locked() or rcu_read_lock_held()
+is called.
+
+Fix the warning by adding rcu read lock.
+
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20231117023527.3188627-2-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-sysfs.c | 2 ++
+ block/blk-throttle.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 63e481262336..0b2d04766324 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -615,6 +615,7 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
- QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
- #endif
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 13e4377a8b286..16f5766620a41 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1320,6 +1320,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
+ 		   tg_bps_limit(tg, READ), tg_bps_limit(tg, WRITE),
+ 		   tg_iops_limit(tg, READ), tg_iops_limit(tg, WRITE));
  
-+/* Common attributes for bio-based and request-based queues. */
- static struct attribute *queue_attrs[] = {
- 	&queue_ra_entry.attr,
- 	&queue_max_hw_sectors_entry.attr,
-@@ -659,6 +660,7 @@ static struct attribute *queue_attrs[] = {
- 	NULL,
- };
++	rcu_read_lock();
+ 	/*
+ 	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
+ 	 * considered to have rules if either the tg itself or any of its
+@@ -1347,6 +1348,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
+ 		this_tg->latency_target = max(this_tg->latency_target,
+ 				parent_tg->latency_target);
+ 	}
++	rcu_read_unlock();
  
-+/* Request-based queue attributes that are not relevant for bio-based queues. */
- static struct attribute *blk_mq_queue_attrs[] = {
- 	&queue_requests_entry.attr,
- 	&elv_iosched_entry.attr,
+ 	/*
+ 	 * We're already holding queue_lock and know @tg is valid.  Let's
+-- 
+2.42.0
+
