@@ -1,19 +1,23 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5D9518F;
-	Tue, 28 Nov 2023 05:00:03 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F58D1;
+	Tue, 28 Nov 2023 05:56:25 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 52971227A87; Tue, 28 Nov 2023 14:00:01 +0100 (CET)
-Date: Tue, 28 Nov 2023 14:00:00 +0100
+	id E6897227A87; Tue, 28 Nov 2023 14:56:19 +0100 (CET)
+Date: Tue, 28 Nov 2023 14:56:19 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk,
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
+	sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
+	djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	chandan.babu@oracle.com, dchinner@redhat.com,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH v4 2/2] block: warn once for each partition in
- bio_check_ro()
-Message-ID: <20231128130000.GB7984@lst.de>
-References: <20231128123027.971610-1-yukuai1@huaweicloud.com> <20231128123027.971610-3-yukuai1@huaweicloud.com>
+	linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH 17/21] fs: xfs: iomap atomic write support
+Message-ID: <20231128135619.GA12202@lst.de>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com> <20230929102726.2985188-18-john.g.garry@oracle.com> <20231109152615.GB1521@lst.de> <a50a16ca-d4b9-a4d8-4230-833d82752bd2@oracle.com> <c78bcca7-8f09-41c7-adf0-03b42cde70d6@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -22,21 +26,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231128123027.971610-3-yukuai1@huaweicloud.com>
+In-Reply-To: <c78bcca7-8f09-41c7-adf0-03b42cde70d6@oracle.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Nov 28, 2023 at 08:30:27PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Commit 1b0a151c10a6 ("blk-core: use pr_warn_ratelimited() in
-> bio_check_ro()") fix message storm by limit the rate, however, there
-> will still be lots of message in the long term. Fix it better by warn
-> once for each partition.
+On Tue, Nov 28, 2023 at 08:56:37AM +0000, John Garry wrote:
+> Are you suggesting some sort of hybrid between the atomic write series you 
+> had a few years ago and this solution?
 
-The new field is in the same dword alignment as bd_make_it_fail and
-could in theory corrupt it, at least on alpha.  I guess we're fine,
-because if you enable CONFIG_FAIL_MAKE_REQUEST on alpha you're asking
-for this.  I still hope we can clean up these non-atomic bools and
-replace them with bitops soon.
+Very roughly, yes.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+> To me that would be continuing with the following:
+> - per-IO RWF_ATOMIC (and not O_ATOMIC semantics of nothing is written until 
+> some data sync)
+
+Yes.
+
+> - writes must be a power-of-two and at a naturally-aligned offset
+
+Where offset is offset in the file?  It would not require it.  You
+probably want to do it for optimal performance, but requiring it
+feeels rather limited.
+
+> - relying on atomic write HW support always
+
+And I think that's where we have different opinions.  I think the hw
+offload is a nice optimization and we should use it wherever we can.
+But building the entire userspace API around it feels like a mistake.
+
+> BTW, we also have rtvol support which does not use forcealign as it already 
+> can guarantee alignment, but still does rely on the same principle of 
+> requiring alignment - would you want CoW support there also?
+
+Upstream doesn't have out of place write support for the RT subvolume
+yet.  But Darrick has a series for it and we're actively working on
+upstreaming it.
