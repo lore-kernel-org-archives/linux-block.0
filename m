@@ -1,352 +1,104 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="mi8pGqQj"
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6B585
-	for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 14:28:17 -0800 (PST)
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ASLBWeR004321
-	for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 14:28:16 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=PxbgotqlGCxcrBU94lycmI1HXSfuZutz1KUGtphi19w=;
- b=mi8pGqQj2iFTFlcKxbwasWP+8O8oI13Nwn4DhBbmBw6o4D8Ko1hb1UUbOMY8JDs3E2AQ
- ZoyV7ngPftn1oNKOyBuH0haa/BhmGAeGlkUVXJtbI55xjhUIUE58+2W7lX17e+eBKCWL
- vxtolFuJn+YokWuj6ki7VbewyzN5RSeTYRXVnWnCce2tTV7QmYWlcTxAo9gLEQRpyfVx
- bBamWHvViAp7huBiihY/lETl42pz5f+3PlnMf8oPcJLPQHpDFtJ15mC351dT6kXLuINf
- CSDLHYzwaR8BLMIrJKU6LC6iFg07QO9mxp8srVF5Y4ZjvIrFBMztUOhRO+oSrvWM1+sQ Xg== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3unjktb1xs-20
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 14:28:16 -0800
-Received: from twshared15991.38.frc1.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c085:21d::8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 28 Nov 2023 14:28:07 -0800
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-	id 548232252F0C3; Tue, 28 Nov 2023 14:27:53 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <io-uring@vger.kernel.org>
-CC: <axboe@kernel.dk>, <hch@lst.de>, <joshi.k@samsung.com>,
-        <martin.petersen@oracle.com>, <ming.lei@redhat.com>,
-        Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCHv4 1/4] block: bio-integrity: directly map user buffers
-Date: Tue, 28 Nov 2023 14:27:49 -0800
-Message-ID: <20231128222752.1767344-2-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231128222752.1767344-1-kbusch@meta.com>
-References: <20231128222752.1767344-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5DRzk8r"
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8721A5;
+	Tue, 28 Nov 2023 15:47:28 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6b20577ef7bso5344191b3a.3;
+        Tue, 28 Nov 2023 15:47:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701215248; x=1701820048; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MoJTdvnUva0vOEP8D6/hcODd/TZNf7EsXrddDwBiX0Q=;
+        b=E5DRzk8rGW/Pbws90gavOxsed/CK8SD6UkI6S+T267cUqL96rS6LQNcVZV89n57xkq
+         wQ8onMppPsHwbZmM2QbmxUN2Acv1mjGi5BwA45KGpHTafUrwiqVYzMOCyLASGuVzZ5sZ
+         cWtfOf1EcH0yIiaAV3uiulNtdqRM2QU4ixxNfD8DtUSgT4teW/p65JIZ1p3cSDBAIW8I
+         oSbqvMneA7X66b1W0EE3WJj/ueyn+kUw1D8AOaTJ2LGDC/PdWbplY+LFuY/mntOiq1VS
+         3U5t8w0PsAxvE/XcsuMq1m3/FAQ+aBNOot6Xmhs1bxBImdySS4mEg2ADBpl6MC6fHTlJ
+         Bbbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701215248; x=1701820048;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MoJTdvnUva0vOEP8D6/hcODd/TZNf7EsXrddDwBiX0Q=;
+        b=nqZffRfLYvARz3cOgyV2ArbhNFj/A103taq5RFdGYu+8IXG2mqtpYDEHcgPpNpEJz6
+         PIGLWi+cbWlLRdiy0J58kbGBPv2a8oQyHc8E3L2CovtCC2BQRRmh+csAysgaPKfxCZvd
+         ATdCMnlKzR3k7daJ/3bEGaQ0vvqt6nRM7cXSSiBe05x/Ws26NTuC63mSEeQJDjurvaCO
+         qT6T6udl/wiY5r40BcMf/vT+EGgEzG+mrQuI0YLXfaFEs9ZVVjxvhHhnafHn20D/bWQH
+         ODdjXG6PYvXs/i8XKUrgiXJ1NTHoVf5RLzorv1LnFcT065gZ52uvmljZp+KzDaOy+g06
+         lAKA==
+X-Gm-Message-State: AOJu0YxqEol1aBzSAJPC3jvNj2yMfVDI1uL+YiLlg2H1V/w2nQH3D9JN
+	KVTYwWHCxdtqIuIngl38AeKbEPdLdEVYeQ==
+X-Google-Smtp-Source: AGHT+IG0ToBag8VkYoAH8p7bmSYPEOYkke5pJZNFz0uaMrE6AdCr1IG7P+8YPR2dMp9dwjbggk5bbg==
+X-Received: by 2002:a05:6a00:1d01:b0:6be:4228:698b with SMTP id a1-20020a056a001d0100b006be4228698bmr19323394pfx.20.1701215247817;
+        Tue, 28 Nov 2023 15:47:27 -0800 (PST)
+Received: from [192.168.0.106] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id l65-20020a639144000000b005c2130fd8d7sm10038106pge.91.2023.11.28.15.47.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Nov 2023 15:47:27 -0800 (PST)
+Message-ID: <562a2442-d098-4972-baa1-5a843e06b180@gmail.com>
+Date: Wed, 29 Nov 2023 06:47:20 +0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: Xj5cIiTF_Cv_EsxICWdYWVBKAv2HAF2S
-X-Proofpoint-ORIG-GUID: Xj5cIiTF_Cv_EsxICWdYWVBKAv2HAF2S
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-28_24,2023-11-27_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Block Devices <linux-block@vger.kernel.org>,
+ Linux RAID <linux-raid@vger.kernel.org>,
+ Linux bcachefs <linux-bcachefs@vger.kernel.org>
+Cc: Coly Li <colyli@suse.de>, Xiao Ni <xni@redhat.com>,
+ Geliang Tang <geliang.tang@suse.com>, Jens Axboe <axboe@kernel.dk>,
+ Song Liu <song@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>,
+ Janpieter Sollie <janpieter.sollie@edpnet.be>
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Fwd: block/badblocks.c warning in 6.7-rc2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+Hi,
 
-Passthrough commands that utilize metadata currently need to bounce the
-user space buffer through the kernel. Add support for mapping user space
-directly so that we can avoid this costly overhead. This is similar to
-how the normal bio data payload utilizes user addresses with
-bio_map_user_iov().
+I notice a regression report that is rather well-handled on Bugzilla [1].
+Quoting from it:
 
-If the user address can't directly be used for reason, like too many
-segments or address unalignement, fallback to a copy of the user vec
-while keeping the user address pinned for the IO duration so that it
-can safely be copied on completion in any process context.
+> 
+> when booting from 6.7-rc2, compiled with clang, I get this warning on one of my 3 bcachefs volumes:
+> WARNING: CPU: 3 PID: 712 at block/badblocks.c:1284 badblocks_check (block/badblocks.c:1284) 
+> The reason why isn't clear, but the stack trace points to an error in md error handling.
+> This bug didn't happen in 6.6
+> there are 3 commits in 6.7-rc2 which may cause them,
+> in attachment:
+> - decoded stacktrace of dmesg
+> - kernel .config
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/bio-integrity.c | 203 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/bio.h   |   9 ++
- 2 files changed, 212 insertions(+)
+The culprit author then replied:
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index ec8ac8cf6e1b9..60dfc0ecf2cf0 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -91,6 +91,44 @@ struct bio_integrity_payload *bio_integrity_alloc(stru=
-ct bio *bio,
- }
- EXPORT_SYMBOL(bio_integrity_alloc);
-=20
-+static void bio_integrity_uncopy_user(struct bio_integrity_payload *bip,
-+				      bool dirty)
-+{
-+	unsigned short nr_vecs =3D --bip->bip_max_vcnt;
-+	struct bio_vec *copy =3D &bip->bip_vec[1];
-+	void *buf =3D bvec_virt(bip->bip_vec);
-+
-+	if (dirty) {
-+		size_t bytes =3D bip->bip_iter.bi_size;
-+		struct iov_iter iter;
-+		int ret;
-+
-+		iov_iter_bvec(&iter, ITER_DEST, copy, nr_vecs, bytes);
-+		ret =3D copy_to_iter(buf, bytes, &iter);
-+		WARN_ON_ONCE(ret !=3D bytes);
-+	}
-+
-+	memmove(bip->bip_vec, copy, nr_vecs * sizeof(*copy));
-+	kfree(buf);
-+}
-+
-+static void bio_integrity_unpin_bvec(struct bio_vec *bv, int nr_vecs)
-+{
-+	int i;
-+
-+	for (i =3D 0; i < nr_vecs; i++)
-+		unpin_user_page(bv[i].bv_page);
-+}
-+
-+static void bio_integrity_unmap_user(struct bio_integrity_payload *bip)
-+{
-+	bool dirty =3D bio_data_dir(bip->bip_bio) =3D=3D READ;
-+
-+	if (bip->bip_flags & BIP_COPY_USER)
-+		bio_integrity_uncopy_user(bip, dirty);
-+	bio_integrity_unpin_bvec(bip->bip_vec, bip->bip_max_vcnt);
-+}
-+
- /**
-  * bio_integrity_free - Free bio integrity payload
-  * @bio:	bio containing bip to be freed
-@@ -105,6 +143,8 @@ void bio_integrity_free(struct bio *bio)
-=20
- 	if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
- 		kfree(bvec_virt(bip->bip_vec));
-+	else if (bip->bip_flags & BIP_INTEGRITY_USER)
-+		bio_integrity_unmap_user(bip);
-=20
- 	__bio_integrity_free(bs, bip);
- 	bio->bi_integrity =3D NULL;
-@@ -160,6 +200,169 @@ int bio_integrity_add_page(struct bio *bio, struct =
-page *page,
- }
- EXPORT_SYMBOL(bio_integrity_add_page);
-=20
-+static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec=
-,
-+				   int nr_vecs, unsigned int len,
-+				   unsigned int direction, u32 seed)
-+{
-+	struct bio_integrity_payload *bip;
-+	struct iov_iter iter;
-+	void *buf;
-+	int ret;
-+
-+	buf =3D kmalloc(len, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	if (direction =3D=3D ITER_SOURCE) {
-+		iov_iter_bvec(&iter, direction, bvec, nr_vecs, len);
-+		if (!copy_from_iter_full(buf, len, &iter)) {
-+			ret =3D -EFAULT;
-+			goto free_buf;
-+		}
-+	} else {
-+		memset(buf, 0, len);
-+	}
-+
-+	/*
-+	 * We need just one vec for this bip, but we also need to preserve the
-+	 * original bvec and the number of vecs in it for completion handling
-+	 */
-+	bip =3D bio_integrity_alloc(bio, GFP_KERNEL, nr_vecs + 1);
-+	if (IS_ERR(bip)) {
-+		ret =3D PTR_ERR(bip);
-+		goto free_buf;
-+	}
-+
-+	ret =3D bio_integrity_add_page(bio, virt_to_page(buf), len,
-+				     offset_in_page(buf));
-+	if (ret !=3D len) {
-+		ret =3D -ENOMEM;
-+		goto free_bip;
-+	}
-+
-+	memcpy(&bip->bip_vec[1], bvec, nr_vecs * sizeof(*bvec));
-+	bip->bip_flags |=3D BIP_INTEGRITY_USER | BIP_COPY_USER;
-+	bip->bip_iter.bi_sector =3D seed;
-+	return 0;
-+free_bip:
-+	bio_integrity_free(bio);
-+free_buf:
-+	kfree(buf);
-+	return ret;
-+}
-+
-+static int bio_integrity_init_user(struct bio *bio, struct bio_vec *bvec=
-,
-+				   int nr_vecs, unsigned int len, u32 seed)
-+{
-+	struct bio_integrity_payload *bip;
-+
-+	bip =3D bio_integrity_alloc(bio, GFP_KERNEL, nr_vecs);
-+	if (IS_ERR(bip))
-+		return PTR_ERR(bip);
-+
-+	memcpy(bip->bip_vec, bvec, nr_vecs * sizeof(*bvec));
-+	bip->bip_flags |=3D BIP_INTEGRITY_USER;
-+	bip->bip_iter.bi_sector =3D seed;
-+	bip->bip_iter.bi_size =3D len;
-+	return 0;
-+}
-+
-+static unsigned int bvec_from_pages(struct bio_vec *bvec, struct page **=
-pages,
-+				    int nr_vecs, ssize_t bytes, ssize_t offset)
-+{
-+	unsigned int nr_bvecs =3D 0;
-+	int i, j;
-+
-+	for (i =3D 0; i < nr_vecs; i =3D j) {
-+		size_t size =3D min_t(size_t, bytes, PAGE_SIZE - offset);
-+		struct folio *folio =3D page_folio(pages[i]);
-+
-+		bytes -=3D size;
-+		for (j =3D i + 1; j < nr_vecs; j++) {
-+			size_t next =3D min_t(size_t, PAGE_SIZE, bytes);
-+
-+			if (page_folio(pages[j]) !=3D folio ||
-+			    pages[j] !=3D pages[j - 1] + 1)
-+				break;
-+			unpin_user_page(pages[j]);
-+			size +=3D next;
-+			bytes -=3D next;
-+		}
-+
-+		bvec_set_page(&bvec[nr_bvecs], pages[i], size, offset);
-+		offset =3D 0;
-+		nr_bvecs++;
-+	}
-+
-+	return nr_bvecs;
-+}
-+
-+int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t b=
-ytes,
-+			   u32 seed)
-+{
-+	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
-+	unsigned int align =3D q->dma_pad_mask | queue_dma_alignment(q);
-+	struct page *stack_pages[UIO_FASTIOV], **pages =3D stack_pages;
-+	struct bio_vec stack_vec[UIO_FASTIOV], *bvec =3D stack_vec;
-+	unsigned int direction, nr_bvecs;
-+	struct iov_iter iter;
-+	int ret, nr_vecs;
-+	size_t offset;
-+	bool copy;
-+
-+	if (bio_integrity(bio))
-+		return -EINVAL;
-+	if (bytes >> SECTOR_SHIFT > queue_max_hw_sectors(q))
-+		return -E2BIG;
-+
-+	if (bio_data_dir(bio) =3D=3D READ)
-+		direction =3D ITER_DEST;
-+	else
-+		direction =3D ITER_SOURCE;
-+
-+	iov_iter_ubuf(&iter, direction, ubuf, bytes);
-+	nr_vecs =3D iov_iter_npages(&iter, BIO_MAX_VECS + 1);
-+	if (nr_vecs > BIO_MAX_VECS)
-+		return -E2BIG;
-+	if (nr_vecs > UIO_FASTIOV) {
-+		bvec =3D kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
-+		if (!bvec)
-+			return -ENOMEM;
-+		pages =3D NULL;
-+	}
-+
-+	copy =3D !iov_iter_is_aligned(&iter, align, align);
-+	ret =3D iov_iter_extract_pages(&iter, &pages, bytes, nr_vecs, 0, &offse=
-t);
-+	if (unlikely(ret < 0))
-+		goto free_bvec;
-+
-+	nr_bvecs =3D bvec_from_pages(bvec, pages, nr_vecs, bytes, offset);
-+	if (pages !=3D stack_pages)
-+		kvfree(pages);
-+	if (nr_bvecs > queue_max_integrity_segments(q))
-+		copy =3D true;
-+
-+	if (copy)
-+		ret =3D bio_integrity_copy_user(bio, bvec, nr_bvecs, bytes,
-+					      direction, seed);
-+	else
-+		ret =3D bio_integrity_init_user(bio, bvec, nr_bvecs, bytes, seed);
-+	if (ret)
-+		goto release_pages;
-+	if (bvec !=3D stack_vec)
-+		kfree(bvec);
-+
-+	return 0;
-+
-+release_pages:
-+	bio_integrity_unpin_bvec(bvec, nr_bvecs);
-+free_bvec:
-+	if (bvec !=3D stack_vec)
-+		kfree(bvec);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(bio_integrity_map_user);
-+
- /**
-  * bio_integrity_process - Process integrity metadata for a bio
-  * @bio:	bio to generate/verify integrity metadata for
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 41d417ee13499..ec4db73e5f4ec 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -324,6 +324,8 @@ enum bip_flags {
- 	BIP_CTRL_NOCHECK	=3D 1 << 2, /* disable HBA integrity checking */
- 	BIP_DISK_NOCHECK	=3D 1 << 3, /* disable disk integrity checking */
- 	BIP_IP_CHECKSUM		=3D 1 << 4, /* IP checksum */
-+	BIP_INTEGRITY_USER	=3D 1 << 5, /* Integrity payload is user address */
-+	BIP_COPY_USER		=3D 1 << 6, /* Kernel bounce buffer in use */
- };
-=20
- /*
-@@ -718,6 +720,7 @@ static inline bool bioset_initialized(struct bio_set =
-*bs)
- 	for_each_bio(_bio)						\
- 		bip_for_each_vec(_bvl, _bio->bi_integrity, _iter)
-=20
-+int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t l=
-en, u32 seed);
- extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, g=
-fp_t, unsigned int);
- extern int bio_integrity_add_page(struct bio *, struct page *, unsigned =
-int, unsigned int);
- extern bool bio_integrity_prep(struct bio *);
-@@ -789,6 +792,12 @@ static inline int bio_integrity_add_page(struct bio =
-*bio, struct page *page,
- 	return 0;
- }
-=20
-+static inline int bio_integrity_map_user(struct bio *bio, void __user *u=
-buf,
-+					 ssize_t len, u32 seed)
-+{
-+	return -EINVAL;
-+}
-+
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
-=20
- /*
---=20
-2.34.1
+> The warning is from this line of code in _badblocks_check(),
+> 1284         WARN_ON(bb->shift < 0 || sectors == 0);
+> 
+> It means the caller sent an invalid range to check. From the oops information,
+> "RDX: 0000000000000000" means parameter 'sectors' is 0.
+> 
+> So the question is, why does md raid code send a 0-length range for badblocks check? Is this behavior on purpose, or improper?
+> ...
+> IMHO, it doesn't make sense for caller to check a zero-length LBA range. The warning works as expect to detect improper call to badblocks_check().
 
+See Bugzilla for the full thread and attached decoded dmesg and kernel config.
+
+Anyway, I'm adding this regression to regzbot:
+
+#regzbot introduced: 3ea3354cb9f03e https://bugzilla.kernel.org/show_bug.cgi?id=218184
+#regzbot title: badblocks_check regression (md error handling) on bcachefs volume
+
+Thanks.
+
+[1]: https://bugzilla.kernel.org/show_bug.cgi?id=218184
+
+-- 
+An old man doll... just what I always wanted! - Clara
