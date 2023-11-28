@@ -1,82 +1,152 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="zxF6+s0S"
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D249C4;
-	Mon, 27 Nov 2023 21:48:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=piX6sU8uUfRdM3HI4C5o5RtKyEk7LebUsWmX5nAnS9s=; b=zxF6+s0SCn2mTM1F5sDGatwdiD
-	r+J5EdNg/JbVc8/TEwBGrSiUOrPltOv0SB5DHqEzye3x5UYQ3y43F+9CYP+YH9zZju4MAnIxN7jLr
-	52H6aTiRg9m6ogsTbJ455qxXjn6rKf3EheShZA+8TlQ0nbft+l3Lre4a0bU7FkEs+H18O/xb4HfZ2
-	DcIkdp3IB1Vc74yjq/SGmA7ZBc/H0ChYb2skCnNlw+1loprwzCvOOZXqJXWMJW983aVx/FvifwWE8
-	GXy6mVkavESjy4cQk0Ees741WqX1/u5t1i6oo5VnA69qG8fgQUNZnB/k4V2ZDGbJGb/SxQnB+AlVf
-	iSo+n9HA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1r7qxI-004BPZ-2N;
-	Tue, 28 Nov 2023 05:48:20 +0000
-Date: Mon, 27 Nov 2023 21:48:20 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@infradead.org>, ming.lei@redhat.com,
-	axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de,
-	kent.overstreet@gmail.com, joern@lazybastard.org,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com,
-	gor@linux.ibm.com, agordeev@linux.ibm.com, jejb@linux.ibm.com,
-	martin.petersen@oracle.com, clm@fb.com, josef@toxicpanda.com,
-	dsterba@suse.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	nico@fluxnic.net, xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-	adilger.kernel@dilger.ca, agruenba@redhat.com, jack@suse.com,
-	konishi.ryusuke@gmail.com, dchinner@redhat.com,
-	linux@weissschuh.net, min15.li@samsung.com, dlemoal@kernel.org,
-	willy@infradead.org, akpm@linux-foundation.org, hare@suse.de,
-	p.raghav@samsung.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
-	linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-nilfs@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH block/for-next v2 01/16] block: add a new helper to get
- inode from block_device
-Message-ID: <ZWV/JBxrrGXzY0gr@infradead.org>
-References: <20231127062116.2355129-1-yukuai1@huaweicloud.com>
- <20231127062116.2355129-2-yukuai1@huaweicloud.com>
- <ZWRDeQ4K8BiYnV+X@infradead.org>
- <6acdeece-7163-3219-95e2-827e54eadd0c@huaweicloud.com>
- <ZWTErvnMf7HiO1Wj@infradead.org>
- <bc64da80-e9bd-84cb-f173-876623303131@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EdDDejVk"
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BD1A7
+	for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 00:51:46 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6c3363a2b93so4873089b3a.3
+        for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 00:51:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1701161506; x=1701766306; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=94o0KeTip+rCuWEfzJrNX+wyBtGRxjUM9HxWnyozCLQ=;
+        b=EdDDejVkitTTn3TNYxlOyxzk+/prfGd9Tcn/blxm0vuFnAZiEVgpqtXKNvgxjiPzmD
+         lFpmubm7s7hGjTiWFVUlDyx2kalCLHc1yeO6PNI27eoKjGQXy5PYR4Dk1QgoOxzlhGfy
+         Mcqj1b+L/WFUgLiqTp7Bbl8+xRXNrdjUw1xOY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701161506; x=1701766306;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=94o0KeTip+rCuWEfzJrNX+wyBtGRxjUM9HxWnyozCLQ=;
+        b=H7dk3hRHf85d1aD8TBHoit7f9g8xLpAWC3TnovXjT4V1KRAoYE6/PZsUJUULua43FT
+         hqfCD94A/uLZQ+N4cxST72gofcnuRv6Ctr+BGj2eO/B3ZPWuv68KgvUj04ZPgr5Mexkq
+         /RoCGYdEBcZ8wdU3H4oxwh/ikVFtGxZYcMcwjvsZqFBXCj2M/o1+QpX4YSQbOaQu16lQ
+         5SCItVbfPx6cbuikCLr5N0U8qw5HwN8A8a2hwZ3Ht8QzOrRxffIenfoazYJhF50O/CUE
+         WgkoCroOe1m5oBFmv75P4DA0cE76Fz2UpTSw01bnhdBTlF+YopoQfQXbRBNrxasJORgO
+         q8sQ==
+X-Gm-Message-State: AOJu0YwI9bFRN3om6QaX3/+UHqREKGzB3/yf8hz3ajE44BjX07tuxIEF
+	xwEdYH/MFn4dxARqirkyg6PS4g==
+X-Google-Smtp-Source: AGHT+IHMKshrmRNnMzzg4/8dNzoZKqap30uAvyxMhlZKsne9AVXAU18u328Z/i26C5Jup7cgG+5V8w==
+X-Received: by 2002:a05:6a21:3392:b0:18c:ba47:74ea with SMTP id yy18-20020a056a21339200b0018cba4774eamr4337244pzb.31.1701161505865;
+        Tue, 28 Nov 2023 00:51:45 -0800 (PST)
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:3bea:3548:1aab:8181])
+        by smtp.gmail.com with ESMTPSA id f7-20020aa782c7000000b006cb537b09f0sm8447794pfn.199.2023.11.28.00.51.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 00:51:45 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH] zram: Use kmap_local_page()
+Date: Tue, 28 Nov 2023 17:22:07 +0900
+Message-ID: <20231128083845.848008-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc64da80-e9bd-84cb-f173-876623303131@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 28, 2023 at 09:35:56AM +0800, Yu Kuai wrote:
-> Thanks for the advice! In case I'm understanding correctly, do you mean
-> that all other fs/drivers that is using pages versions can safely switch
-> to folio versions now?
+Use kmap_local_page() instead of kmap_atomic() which has been
+deprecated.
 
-If you never allocate a high-order folio pages are identical to folios.
-So yes, we can do folio based interfaces only, and also use that as
-an opportunity to convert over the callers.
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ drivers/block/zram/zram_drv.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-> By the way, my orginal idea was trying to add a new field 'bd_flags'
-> in block_devcie, and then add a new bit so that bio_check_ro() will
-> only warn once for each partition. Now that this patchset will be quite
-> complex, I'll add a new bool field 'bd_ro_warned' to fix the above
-> problem first, and then add 'bd_flags' once this patchset is done.
-
-Yes, please do a minimal version if you can find space where the
-rmw cycles don't cause damage to neighbouring fields.  Or just leave
-the current set of warnings in if it's too hard.
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index f6b286e7f310..2b1d82473be8 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1321,9 +1321,9 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+ 		void *mem;
+ 
+ 		value = handle ? zram_get_element(zram, index) : 0;
+-		mem = kmap_atomic(page);
++		mem = kmap_local_page(page);
+ 		zram_fill_page(mem, PAGE_SIZE, value);
+-		kunmap_atomic(mem);
++		kunmap_local(mem);
+ 		return 0;
+ 	}
+ 
+@@ -1336,14 +1336,14 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+ 
+ 	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
+ 	if (size == PAGE_SIZE) {
+-		dst = kmap_atomic(page);
++		dst = kmap_local_page(page);
+ 		memcpy(dst, src, PAGE_SIZE);
+-		kunmap_atomic(dst);
++		kunmap_local(dst);
+ 		ret = 0;
+ 	} else {
+-		dst = kmap_atomic(page);
++		dst = kmap_local_page(page);
+ 		ret = zcomp_decompress(zstrm, src, size, dst);
+-		kunmap_atomic(dst);
++		kunmap_local(dst);
+ 		zcomp_stream_put(zram->comps[prio]);
+ 	}
+ 	zs_unmap_object(zram->mem_pool, handle);
+@@ -1416,21 +1416,21 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 	unsigned long element = 0;
+ 	enum zram_pageflags flags = 0;
+ 
+-	mem = kmap_atomic(page);
++	mem = kmap_local_page(page);
+ 	if (page_same_filled(mem, &element)) {
+-		kunmap_atomic(mem);
++		kunmap_local(mem);
+ 		/* Free memory associated with this sector now. */
+ 		flags = ZRAM_SAME;
+ 		atomic64_inc(&zram->stats.same_pages);
+ 		goto out;
+ 	}
+-	kunmap_atomic(mem);
++	kunmap_local(mem);
+ 
+ compress_again:
+ 	zstrm = zcomp_stream_get(zram->comps[ZRAM_PRIMARY_COMP]);
+-	src = kmap_atomic(page);
++	src = kmap_local_page(page);
+ 	ret = zcomp_compress(zstrm, src, &comp_len);
+-	kunmap_atomic(src);
++	kunmap_local(src);
+ 
+ 	if (unlikely(ret)) {
+ 		zcomp_stream_put(zram->comps[ZRAM_PRIMARY_COMP]);
+@@ -1494,10 +1494,10 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 
+ 	src = zstrm->buffer;
+ 	if (comp_len == PAGE_SIZE)
+-		src = kmap_atomic(page);
++		src = kmap_local_page(page);
+ 	memcpy(dst, src, comp_len);
+ 	if (comp_len == PAGE_SIZE)
+-		kunmap_atomic(src);
++		kunmap_local(src);
+ 
+ 	zcomp_stream_put(zram->comps[ZRAM_PRIMARY_COMP]);
+ 	zs_unmap_object(zram->mem_pool, handle);
+@@ -1614,9 +1614,9 @@ static int zram_recompress(struct zram *zram, u32 index, struct page *page,
+ 
+ 		num_recomps++;
+ 		zstrm = zcomp_stream_get(zram->comps[prio]);
+-		src = kmap_atomic(page);
++		src = kmap_local_page(page);
+ 		ret = zcomp_compress(zstrm, src, &comp_len_new);
+-		kunmap_atomic(src);
++		kunmap_local(src);
+ 
+ 		if (ret) {
+ 			zcomp_stream_put(zram->comps[prio]);
+-- 
+2.43.0.rc1.413.gea7ed67945-goog
 
