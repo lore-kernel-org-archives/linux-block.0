@@ -1,93 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XDONWV8N"
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 451E31BB
-	for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 03:00:22 -0800 (PST)
-Message-ID: <6cabaa42-c366-4928-8294-ad261dae0043@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701169221;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yvcyg4szTb7G/K461C+40gz8EkgFmlMmQb3ja5PYzBA=;
-	b=XDONWV8NJC+c5v7IbeGMStXtx1LoYSM5QxxpY48OJsae5eo2InuIzp1RXvU0yd/DZgtNyU
-	/VzjNlWo4AUClHh0KCXt6HcVI1dqQr+3/kR42NmS/Yg3qI4nUE9chbSfCzU8Gyzn9wy2ik
-	1PDd1dt5thYDxIQXcnKc4EtCZ/Fupt4=
-Date: Tue, 28 Nov 2023 12:00:17 +0100
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1A4D56;
+	Tue, 28 Nov 2023 04:31:15 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SfhdT2rlNz4f3jHc;
+	Tue, 28 Nov 2023 20:31:09 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 4B8191A08B8;
+	Tue, 28 Nov 2023 20:31:11 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgA3iA6J3WVlx1KyCA--.18580S4;
+	Tue, 28 Nov 2023 20:31:07 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: hch@lst.de,
+	ming.lei@redhat.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH v4 0/2] block: warn once for each partition in bio_check_ro()
+Date: Tue, 28 Nov 2023 20:30:25 +0800
+Message-Id: <20231128123027.971610-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 11/11] blksnap: prevents using devices with data
- integrity or inline encryption
-Content-Language: en-US
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- viro@zeniv.linux.org.uk, brauner@kernel.org, linux-block@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Sergei Shtepa <sergei.shtepa@veeam.com>
-References: <20231124165933.27580-1-sergei.shtepa@linux.dev>
- <20231124165933.27580-12-sergei.shtepa@linux.dev>
- <20231127224719.GD1463@sol.localdomain>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sergei Shtepa <sergei.shtepa@linux.dev>
-In-Reply-To: <20231127224719.GD1463@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgA3iA6J3WVlx1KyCA--.18580S4
+X-Coremail-Antispam: 1UD129KBjvdXoW7XF1kKFWrXF1xuw45AF1xAFb_yoWfCrc_ua
+	9Yk3yIgwnxXan5CFWIyF45XrWI9r4xGw4UXFyDtr47XryrXFs0qFZrCry7uws8GFsxC3s3
+	AF47u3y8Xr12gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbzxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+From: Yu Kuai <yukuai3@huawei.com>
 
+Changes in v4:
+ - remove the patch to add 'bd_flags', and add a new field 'bool
+ bd_ro_warned' in patch 2. 'bd_flags' will be added once 'bd_inode' is
+ removed from other thread.
 
-On 11/27/23 23:47, Eric Biggers wrote:
-> On Fri, Nov 24, 2023 at 05:59:33PM +0100, Sergei Shtepa wrote:
->> There is an opinion that the use of the blksnap module may violate the
->> security of encrypted data. The difference storage file may be located
->> on an unreliable disk or even network storage. 
-> I think this misses the point slightly.  The main problem is that blksnap writes
-> data in plaintext that is supposed to be encrypted, as indicated by the bio
-> having an encryption context.  That's just what it does, at least based on the
-> last patchset; it's not just "an opinion".  See
-> https://lore.kernel.org/linux-block/20a5802d-424d-588a-c497-1d1236c52880@veeam.com/
+Changes in v3:
+ - add patch 1 from Ming, swap bd_inode layout with bd_openers and
+ bd_size_lock;
+ - change bd_flags from u32 to u16 in patch 2, prevent to affect layout of
+ other fields;
 
-Thanks Eric. Perhaps I formulated the thought inaccurately. The point is that
-blksnap should not be compatible with blk-crypto. Changes in version 6 do not
-allow to take a snapshot with a device on which the encryption context is
-detected. Additionally, protection is implemented in the bio handling code.
-For bio with bi_crypt_context, the COW algorithm is not executed.
-> 
->> +#ifdef CONFIG_BLK_INLINE_ENCRYPTION
->> +	if (bio->bi_crypt_context) {
->> +		pr_err_once("Hardware inline encryption is not supported\n");
->> +		diff_area_set_corrupted(tracker->diff_area, -EPERM);
->> +		return false;
->> +	}
->> +#endif
-> The error message for ->bi_crypt_context being set should say
-> "Inline encryption", not "Hardware inline encryption".  The submitter of the bio
-> may have intended to use blk-crypto-fallback.
+Changes in v2:
+ - don't use test/set_bit() for new field, because unsigned long will
+ cause that some field can't be placed in the first cacheline(64 bytes),
+ use unsigned int for new field and test/set/clear it like 'bio->bi_flags'.
 
-I was looking at the blk-crypto-fallback code. I tested the work in this case.
-Encryption is performed before the bio gets to the block layer. So, the filter
-receives cloned bios with already encrypted data. Therefore, the text of the
-message is correct.
+Ming Lei (1):
+  block: move .bd_inode into 1st cacheline of block_device
 
-But I haven't tested the code on a device where hardware inline encryption is
-available. I would be glad if anyone could help with this.
-> 
-> Anyway, this patch is better than ignoring the problem.  It's worth noting,
-> though, that this patch does not prevent blksnap from being set up on a block
-> device on which blk-crypto-fallback is already being used (or will be used).
-> When that happens, I/O will suddenly start failing.  For usability reasons,
-> ideally that would be prevented somehow.
+Yu Kuai (1):
+  block: warn once for each partition in bio_check_ro()
 
-I didn't observe any failures during testing. It's just that the snapshot
-image shows files with encrypted names and data. Backup in this case is
-useless. Unfortunately, there is no way to detect a blk-crypto-fallback on
-the block device filter level.
+ block/blk-core.c          | 14 +++++++++++---
+ include/linux/blk_types.h |  4 +++-
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-Maybe my tests aren't enough. The next step I think would be great to add
-new tests to xfstests.
+-- 
+2.39.2
+
