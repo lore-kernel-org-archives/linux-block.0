@@ -1,32 +1,45 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DD698;
-	Tue, 28 Nov 2023 13:49:39 -0800 (PST)
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7b06844971dso194626339f.2;
-        Tue, 28 Nov 2023 13:49:39 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WSLa365g"
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96CA01A3
+	for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 13:59:48 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-35cd93add9fso3182505ab.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Nov 2023 13:59:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701208788; x=1701813588; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IqXh8h2TE9EqBfbi7m4c/BFMHO+IwfCong5cfxOFR/E=;
+        b=WSLa365g2mqIEi0is0kQkWMUvC6BvhaaanbR5cVI6iHQI2DxvYhylWKRi691idP4ZK
+         eYwMn84ysqp2ewUzffB4B3ZA+fQ7dQnbeDUMV3yeZiBzIH//KahTeV7vbzTLNDLiOLcJ
+         0A0rS3cgR0O2dpSQimDzdnvBBJEKfuyIyoQ1prfGsuU3Rt2pN2ZowsoIT53uqZzi5qRF
+         w7rUx8rbIijbqY+rTDdK+OQ8f4+0BI0W9c7RYucrQWYpVajb08IdQaK0hxhSVk7FbiUW
+         11DQJ4l0JY2itQhHM0wxVnSv+HIqRlrcQ60DZmgs1VGmXMEY4lNour3XGjlwsQQq8vQD
+         qeIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701208179; x=1701812979;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1701208788; x=1701813588;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FEzKKhTYua94jLSZ7tvDRFVLHmrcI2BlEiHde8UAL64=;
-        b=mmwN7KdMVSYYANCbzjG8p2jSfQD1AemKgW4s+gOhnp4Ynl0pv9fxYZxmQlz0OD7jm0
-         RENU91J/NQqtd+MM1dYROZMJ/t34gIjfNRm7TldsOqkS40/paz467C6+tQ+SjfN2g+1h
-         0YFSXChuyqg+70xNadFJOVf8wpGHw+VSO7uMTOCESVp8N5ZjPMurDoA9GlyNtRqDsntf
-         BxkpoJfhqBZsExYcPGyug4wTtZ0hrByGPHNlDuMBzGgUNueglJg9OXJISW0sUkKkn3FL
-         rX4GotYEyXFTY4XMn70VF0Hr0G/KPOXZ2/ddljJYu/YlzaEcGOjCCbZYn5GBmTPjuOLK
-         XuSg==
-X-Gm-Message-State: AOJu0Yzq5MXDFIyTp/ZNc+Zw73HffjEFYYdQImwhnvuDXmrQ4bb935kn
-	Q0CPebXE8AoLch9H9bwAMY8=
-X-Google-Smtp-Source: AGHT+IFwp2G39lgv/dnL+G6BONJ+4fNXQRMfSWj5N9YRUwEChms0xiTI59QLzVIpKqd93g1g3yhuNA==
-X-Received: by 2002:a05:6e02:1945:b0:35c:81ed:878f with SMTP id x5-20020a056e02194500b0035c81ed878fmr14381104ilu.11.1701208178934;
-        Tue, 28 Nov 2023 13:49:38 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:1f8e:127f:6051:78b3? ([2620:0:1000:8411:1f8e:127f:6051:78b3])
-        by smtp.gmail.com with ESMTPSA id o10-20020a056a001b4a00b006cb6e83bf7fsm9372394pfv.192.2023.11.28.13.49.37
+        bh=IqXh8h2TE9EqBfbi7m4c/BFMHO+IwfCong5cfxOFR/E=;
+        b=QQ9NP0MpvYjDAmSdYif0fdR9HoEz0IDuYZ7sCxztNm1sBeoX7PpT5N3QuV00h7oeHo
+         Z8ahMPRiH3xrhxE/hQQgM8DXmcrN9z10RDMiQ4OwzPzkylmWd3deX3d85c1PSnHppuW2
+         ydNPijVNFzQRY7G2y+nZ9zdjHo24i63D5bgBDgxqJQfKBMUpI1MB0jURFSZLhWuYo4h+
+         CYZ8fC+2ZWMlmpA5wkbM9z7oYeh+i7ZOUIQwqn1g3YRp/5HNCdOxuSy7yXHoXww/R2bM
+         ac0VfBriiUJtpNo0jSj13iM4zZPwkU6hemACVcd3vDylfibTJt8LIaZZk7kQI+L8uGe5
+         Mdbw==
+X-Gm-Message-State: AOJu0Yynb+P+ZLscuOa31QdyYsGLss6/zOEjLzKkQdnO6n9rECEVgoa/
+	yhNr7XESa57fhvq27bz6jRdgVA==
+X-Google-Smtp-Source: AGHT+IEVso2zBXyIILDyd1NKHjfwFmHQZ9RyRGvd8AQMvztNKwPP6rHt1yS8h8/sfYKGkxCFjt9tKg==
+X-Received: by 2002:a92:c84b:0:b0:35c:baec:750c with SMTP id b11-20020a92c84b000000b0035cbaec750cmr8318971ilq.1.1701208787912;
+        Tue, 28 Nov 2023 13:59:47 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id p15-20020a62ab0f000000b00694ebe2b0d4sm9483791pff.191.2023.11.28.13.59.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 13:49:38 -0800 (PST)
-Message-ID: <e83ae04f-2d13-4869-9254-b66eded26be4@acm.org>
-Date: Tue, 28 Nov 2023 13:49:37 -0800
+        Tue, 28 Nov 2023 13:59:47 -0800 (PST)
+Message-ID: <66be0c42-2514-436b-bbef-3bd9ab123594@kernel.dk>
+Date: Tue, 28 Nov 2023 14:59:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,43 +47,61 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v15 19/19] scsi: ufs: Inform the block layer about write
- ordering
-To: Can Guo <quic_cang@quicinc.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- "Bao D . Nguyen" <quic_nguyenb@quicinc.com>,
- Avri Altman <avri.altman@wdc.com>, "James E.J. Bottomley"
- <jejb@linux.ibm.com>, Stanley Chu <stanley.chu@mediatek.com>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Asutosh Das <quic_asutoshd@quicinc.com>, Peter Wang
- <peter.wang@mediatek.com>, Bean Huo <beanhuo@micron.com>,
- Arthur Simchaev <Arthur.Simchaev@wdc.com>
-References: <20231114211804.1449162-1-bvanassche@acm.org>
- <20231114211804.1449162-20-bvanassche@acm.org>
- <ea3b4046-2fe8-4fac-b170-9298f2266cda@quicinc.com>
+Subject: Re: Merging raw block device writes
 Content-Language: en-US
-In-Reply-To: <ea3b4046-2fe8-4fac-b170-9298f2266cda@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Michael Kelley <mhklinux@outlook.com>, "hch@lst.de" <hch@lst.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+References: <SN6PR02MB41575884C4898B59615B496AD4BFA@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20231127065928.GA27811@lst.de>
+ <f2735bdc-1234-4477-a579-90bafa7ae4ea@kernel.dk>
+ <SN6PR02MB41578DD2B7A1F25336B0224BD4BCA@SN6PR02MB4157.namprd02.prod.outlook.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <SN6PR02MB41578DD2B7A1F25336B0224BD4BCA@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/27/23 17:45, Can Guo wrote:
-> I got some time testing these changes on SM8650 with MCQ enabled. I
-> found that with these changes in place (with AH8 disabled). Even we
-> can make sure UFS driver does not re-order requests in MCQ mode, the
-> reorder is still happening while running FIO and can be seen from
-> ftrace logs.
+On 11/28/23 12:29 PM, Michael Kelley wrote:
+> From: Jens Axboe <axboe@kernel.dk> Sent: Monday, November 27, 2023 8:10 AM
+>>
+>> On 11/26/23 11:59 PM, hch@lst.de wrote:
+>>> On Sat, Nov 25, 2023 at 05:38:28PM +0000, Michael Kelley wrote:
+>>>> Hyper-V guests and the Azure cloud have a particular interest here
+>>>> because Hyper-V guests uses SCSI as the standard interface to virtual
+>>>> disks.  Azure cloud disks can be throttled to a limited number of IOPS,
+>>>> so the number of in-flights I/Os can be relatively high, and
+>>>> merging can be beneficial to staying within the throttle
+>>>> limits.  Of the flip side, this problem hasn't generated complaints
+>>>> over the last 18 months that I'm aware of, though that may be more
+>>>> because commercial distros haven't been running 5.16 or later kernels
+>>>> until relatively recently.
+>>>
+>>> I think the more important thing is that if you care about reducing
+>>> the number of I/Os you probably should use an I/O scheduler.  Reducing
+>>> the number of I/Os without an I/O scheduler isn't (and I'll argue
+>>> shouldn't) be a concern for the non I/O scheduler.
+>>
+>> Yep fully agree.
+>>
+> 
+> OK.  But there *is* intentional functionality in blk-mq to do merging
+> even when there's no I/O scheduler.  If that functionality breaks, is
+> that considered a bug and regression?  The functionality only affects
+> performance and not correctness, so maybe it's a bit of a gray area.
+> 
+> It's all working again as of 6.5, so the only potential code action is to
+> backport Christoph's commit to stable releases. But it still seems like
+> there should be an explicit statement about what to expect going forward.
+> Should the code for doing merging with no I/O scheduler be removed, or
+> at least put on the deprecation path?
 
-Hi Can,
+It's mostly a "you get what you get" thing. If we can do merging cheap
+or for free, then we do that above the IO scheduler. It'd be great to
+have some tests for this to ensure we don't regress, unknowingly.
 
-Thank you for having taken the time to run this test and also for having
-shared your findings. I have not yet had the chance to test this patch
-series myself on an MCQ test setup. I will try to locate such a test
-setup and test this patch series on an MCQ setup.
+But in general, if you want guaranteed good merging, then an IO
+scheduler is the right choice.
 
-Thanks,
-
-Bart.
+-- 
+Jens Axboe
 
