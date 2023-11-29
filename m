@@ -1,104 +1,69 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5DRzk8r"
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8721A5;
-	Tue, 28 Nov 2023 15:47:28 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6b20577ef7bso5344191b3a.3;
-        Tue, 28 Nov 2023 15:47:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNwv7jRI"
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6605198D;
+	Tue, 28 Nov 2023 16:01:34 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6cd97c135e8so2157231b3a.0;
+        Tue, 28 Nov 2023 16:01:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701215248; x=1701820048; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MoJTdvnUva0vOEP8D6/hcODd/TZNf7EsXrddDwBiX0Q=;
-        b=E5DRzk8rGW/Pbws90gavOxsed/CK8SD6UkI6S+T267cUqL96rS6LQNcVZV89n57xkq
-         wQ8onMppPsHwbZmM2QbmxUN2Acv1mjGi5BwA45KGpHTafUrwiqVYzMOCyLASGuVzZ5sZ
-         cWtfOf1EcH0yIiaAV3uiulNtdqRM2QU4ixxNfD8DtUSgT4teW/p65JIZ1p3cSDBAIW8I
-         oSbqvMneA7X66b1W0EE3WJj/ueyn+kUw1D8AOaTJ2LGDC/PdWbplY+LFuY/mntOiq1VS
-         3U5t8w0PsAxvE/XcsuMq1m3/FAQ+aBNOot6Xmhs1bxBImdySS4mEg2ADBpl6MC6fHTlJ
-         Bbbw==
+        d=gmail.com; s=20230601; t=1701216094; x=1701820894; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CfAthndQOUsLyhwyhNqOrHqgkV99kYZqSodLMH4soJY=;
+        b=KNwv7jRIBMeJwXwqBci1Cp4o7U7OUFu/p4BEXtpdJmLb48H1/JefDmoBdWJA8P1As6
+         cw2FnVlFtovtbbJQt4npVbQ9N2mCi3PV/FElIfFNXJOG4WAnnWDpxq7mHF40TPn6Hn+I
+         VjzoRMnpBghNFSRxx3uG3FfVXzW3QlvFpxBCOC1FHjqDBtMsT3fTpZdorDLsn86zuXT8
+         KK3Ip02p8Wlw1KPOmJtBRFoacnX+0hVqON2m8Y/zMy5ILYXEIRWgZamqCQE8HCK+yyqN
+         S3VfrWhK7egRegvMmx1I7LNPVwbp+EubKzGAyM7/S//2nmv6URRiALn3OfYuN6ZVh7ZP
+         bIZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701215248; x=1701820048;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MoJTdvnUva0vOEP8D6/hcODd/TZNf7EsXrddDwBiX0Q=;
-        b=nqZffRfLYvARz3cOgyV2ArbhNFj/A103taq5RFdGYu+8IXG2mqtpYDEHcgPpNpEJz6
-         PIGLWi+cbWlLRdiy0J58kbGBPv2a8oQyHc8E3L2CovtCC2BQRRmh+csAysgaPKfxCZvd
-         ATdCMnlKzR3k7daJ/3bEGaQ0vvqt6nRM7cXSSiBe05x/Ws26NTuC63mSEeQJDjurvaCO
-         qT6T6udl/wiY5r40BcMf/vT+EGgEzG+mrQuI0YLXfaFEs9ZVVjxvhHhnafHn20D/bWQH
-         ODdjXG6PYvXs/i8XKUrgiXJ1NTHoVf5RLzorv1LnFcT065gZ52uvmljZp+KzDaOy+g06
-         lAKA==
-X-Gm-Message-State: AOJu0YxqEol1aBzSAJPC3jvNj2yMfVDI1uL+YiLlg2H1V/w2nQH3D9JN
-	KVTYwWHCxdtqIuIngl38AeKbEPdLdEVYeQ==
-X-Google-Smtp-Source: AGHT+IG0ToBag8VkYoAH8p7bmSYPEOYkke5pJZNFz0uaMrE6AdCr1IG7P+8YPR2dMp9dwjbggk5bbg==
-X-Received: by 2002:a05:6a00:1d01:b0:6be:4228:698b with SMTP id a1-20020a056a001d0100b006be4228698bmr19323394pfx.20.1701215247817;
-        Tue, 28 Nov 2023 15:47:27 -0800 (PST)
-Received: from [192.168.0.106] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id l65-20020a639144000000b005c2130fd8d7sm10038106pge.91.2023.11.28.15.47.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 15:47:27 -0800 (PST)
-Message-ID: <562a2442-d098-4972-baa1-5a843e06b180@gmail.com>
-Date: Wed, 29 Nov 2023 06:47:20 +0700
+        d=1e100.net; s=20230601; t=1701216094; x=1701820894;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CfAthndQOUsLyhwyhNqOrHqgkV99kYZqSodLMH4soJY=;
+        b=YZGUVYgE9rul7BcTUD+KYslnswM7GxlR6ANyjcX08tuPJVaBtXPmUPYoJXKtqKc3vX
+         4iBDOAgby2eiM/8pIWg94Cj+CuNdYiNPN0dG4T2YCAtENtgULUOf4b8vvYVCyeW2sQ8n
+         Fn++6l7Fls0XvjUHgGFSZ+dNwFXmcMPaZplVHGm/Yh9gkgcSpmfhTmkBNN2ciJSEd6zZ
+         DGFV152rz72Kt3L5XgjaWMv/He7L21Eix9BMr0g1DxoKD6Hv9an/ORHjXOrPFuygaqKw
+         cOfUIJvMGhg8xFW7no0vlB3sqJJIpVyD9ENkI4Lf0ViPwlnchUTw+p4S5gJ+MVhPJLyc
+         7Odg==
+X-Gm-Message-State: AOJu0Yy7Rm6mYZwo8G1fyq23gTR8bpCUeB/WJUrtmXCRRCr1LZo7xyqH
+	pG1ZXHr6zqD0EYXluphh3dU=
+X-Google-Smtp-Source: AGHT+IG/dFzo3MqKKbmx14o+jvcSHc2Qq74jjY1Ok5XP+dY64ErqjX9OqfHPkqBlzUh6ePnOuyJevA==
+X-Received: by 2002:a05:6a20:428b:b0:18c:ae67:c202 with SMTP id o11-20020a056a20428b00b0018cae67c202mr8744798pzj.37.1701216094154;
+        Tue, 28 Nov 2023 16:01:34 -0800 (PST)
+Received: from google.com ([2620:0:1000:8411:8fd0:78d2:c604:3ac8])
+        by smtp.gmail.com with ESMTPSA id t8-20020a1709027fc800b001cfca7b8ee7sm5047038plb.99.2023.11.28.16.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 16:01:33 -0800 (PST)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date: Tue, 28 Nov 2023 16:01:31 -0800
+From: Minchan Kim <minchan@kernel.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] zram: Use kmap_local_page()
+Message-ID: <ZWZ_W3tkw9tBqdvE@google.com>
+References: <20231128083845.848008-1-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Block Devices <linux-block@vger.kernel.org>,
- Linux RAID <linux-raid@vger.kernel.org>,
- Linux bcachefs <linux-bcachefs@vger.kernel.org>
-Cc: Coly Li <colyli@suse.de>, Xiao Ni <xni@redhat.com>,
- Geliang Tang <geliang.tang@suse.com>, Jens Axboe <axboe@kernel.dk>,
- Song Liu <song@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>,
- Janpieter Sollie <janpieter.sollie@edpnet.be>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: Fwd: block/badblocks.c warning in 6.7-rc2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231128083845.848008-1-senozhatsky@chromium.org>
 
-Hi,
-
-I notice a regression report that is rather well-handled on Bugzilla [1].
-Quoting from it:
-
+On Tue, Nov 28, 2023 at 05:22:07PM +0900, Sergey Senozhatsky wrote:
+> Use kmap_local_page() instead of kmap_atomic() which has been
+> deprecated.
 > 
-> when booting from 6.7-rc2, compiled with clang, I get this warning on one of my 3 bcachefs volumes:
-> WARNING: CPU: 3 PID: 712 at block/badblocks.c:1284 badblocks_check (block/badblocks.c:1284) 
-> The reason why isn't clear, but the stack trace points to an error in md error handling.
-> This bug didn't happen in 6.6
-> there are 3 commits in 6.7-rc2 which may cause them,
-> in attachment:
-> - decoded stacktrace of dmesg
-> - kernel .config
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Acked-by: Minchan Kim <minchan@kernel.org>
 
-The culprit author then replied:
-
-> The warning is from this line of code in _badblocks_check(),
-> 1284         WARN_ON(bb->shift < 0 || sectors == 0);
-> 
-> It means the caller sent an invalid range to check. From the oops information,
-> "RDX: 0000000000000000" means parameter 'sectors' is 0.
-> 
-> So the question is, why does md raid code send a 0-length range for badblocks check? Is this behavior on purpose, or improper?
-> ...
-> IMHO, it doesn't make sense for caller to check a zero-length LBA range. The warning works as expect to detect improper call to badblocks_check().
-
-See Bugzilla for the full thread and attached decoded dmesg and kernel config.
-
-Anyway, I'm adding this regression to regzbot:
-
-#regzbot introduced: 3ea3354cb9f03e https://bugzilla.kernel.org/show_bug.cgi?id=218184
-#regzbot title: badblocks_check regression (md error handling) on bcachefs volume
+I didn't know that the kmap_atomic was deprecated.
 
 Thanks.
-
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=218184
-
--- 
-An old man doll... just what I always wanted! - Clara
