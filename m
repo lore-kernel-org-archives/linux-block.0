@@ -1,78 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QH/PX5K2"
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369CABC
-	for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 09:19:11 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-35d374bebe3so277185ab.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 09:19:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701278350; x=1701883150; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rX+wtYtPta3oXeWCwEJEOmP+qDKR6E6aDd9h5WouQEk=;
-        b=QH/PX5K2WJbulKUe0+46ieUY13DC0UxgLF7eNqHs6X8mCmbvo0sQqaJNqWSZ6MuZxo
-         nFuJz6QyWyQ/eaY4mLH5BDpz1eW1zRKIvxwdEMRUTMtoMs/903gwFCBp2dCZIObRBsUC
-         7jIjNNxgWNz/9+VadYzOauk0KCuPcIQCCFIMgOSrMqHLIyD6RYMT9Dr5or/P23ZE/3Bx
-         0dNraD0B98hZJR8byvnl7NRAsRujTmmsYWdvfarkZBEyK/gSmXdkmNv0jO6h1lgr55gr
-         dzd0F3y32b7Us/NIlUIfkx83QRJs9bgVqUfnXkLwj2qIfdxon4jNM+sFJqwbYyN3qbdI
-         O95g==
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB2AE98
+	for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 09:59:17 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6cdd584591eso8669b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 09:59:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701278350; x=1701883150;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rX+wtYtPta3oXeWCwEJEOmP+qDKR6E6aDd9h5WouQEk=;
-        b=jqvTjXdAraBLDxuNJbUn6DjPSr9oRZQhRwHTeOdsXQaCNf+LwdGNJ7VodWuHafGBXL
-         z74uit1JJ+qo1nRmtzJKAySsWaW+EYGbd+1hWfMTZGqQCY9ducJioAqzDF1AX/dDBHgU
-         +2IsVFE7sMqDVEW1v2S6CIBuXH4VGZ7acz1rcHyHmdw1WFPxkZYH8PojTml89GfvXwpV
-         a8QfAKA2khZTbQwPVKiTpot8b6Am9yjrxWChXFeqhDqZHe9UHhYsr258l32OkD+OAJP+
-         kGBiUbPbXgKlygtqN/qe0AfGRx92oCD5zPElqAhajQCBgOs2B2nz3ZxX54Ht3Kua2Rmp
-         l+iw==
-X-Gm-Message-State: AOJu0Yy1fbg+32bz98Sxn0MTfuFtR8MA/QXec/u2QKrbNtNSpSqjzGup
-	aKUG1qj8J4FIkAAAx4LrqscMPg==
-X-Google-Smtp-Source: AGHT+IGKUW5Kf5huYpcBd0ZkiaHfeXwUhgWt2RwVk9YnqKAfChmcj3HeKB0ZKX9TXF6XTFoZB4nxEg==
-X-Received: by 2002:a05:6e02:1191:b0:35d:2269:a220 with SMTP id y17-20020a056e02119100b0035d2269a220mr4226591ili.0.1701278350450;
-        Wed, 29 Nov 2023 09:19:10 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id d15-20020a056e021c4f00b0035d249ed77csm867320ilg.35.2023.11.29.09.19.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 09:19:09 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
- Yu Kuai <yukuai3@huawei.com>
-In-Reply-To: <20231128194019.72762-1-bvanassche@acm.org>
-References: <20231128194019.72762-1-bvanassche@acm.org>
-Subject: Re: [PATCH] block: Document the role of the two attribute groups
-Message-Id: <170127834975.396633.6682647687149583957.b4-ty@kernel.dk>
-Date: Wed, 29 Nov 2023 10:19:09 -0700
+        d=1e100.net; s=20230601; t=1701280757; x=1701885557;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/vkTaXniaGAvSm21emczN5ehpTFqbiqfFzWpTtQjBgg=;
+        b=kWJb9m5xDdrTHo0MpqtjgyJAjSqHy8i+eyej9TgVeb1SMeso+1hHgBp8gC6Yk4UXRl
+         BrIlDez1oOe+h6eK4JnHRThq5vDhfcpYYEXGZj7/KElQV1lwRSuKhTK35F5AKeTmIOAG
+         srTrXSwb4CeSyniOolCsXgJPyFnchPgM3KClnisxzo8YJSSJgaXhP5oxBIkJhOj/i1gj
+         kkFqXbPuyZ8MeorwroLSEvqNQviLHZd/jova0E3zmASS9qeX/tV3Puh7W8SceeIcMQBM
+         71NeB4lfDt6XCdA6DBXl4S7GdOwgBMvF86GeZZkWCwI7d3rYI1MB8zLLmH07or1PxpMY
+         yAog==
+X-Gm-Message-State: AOJu0YwjfJhjYOO663nkI8q7JRGTSHyzCMslvS5hXInM8t/8AgQPN09c
+	O9ePK3TRwT1+AyhMfWiezzSNUYlLFus=
+X-Google-Smtp-Source: AGHT+IEq2ZLZthbCzJAVqPdMDUA4mNPBrjuPJ4xVKFSYt1ftxldOOnINnZeCFIJdE9SWQFnQLeUM9Q==
+X-Received: by 2002:a05:6a20:c906:b0:187:a4df:4e57 with SMTP id gx6-20020a056a20c90600b00187a4df4e57mr18909548pzb.20.1701280757127;
+        Wed, 29 Nov 2023 09:59:17 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:af8d:714d:9855:3f9d? ([2620:0:1000:8411:af8d:714d:9855:3f9d])
+        by smtp.gmail.com with ESMTPSA id 18-20020aa79252000000b006cbb56d4e58sm11087381pfp.65.2023.11.29.09.59.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Nov 2023 09:59:16 -0800 (PST)
+Message-ID: <18ee474f-80fd-4a46-a8f2-0cc213618a43@acm.org>
+Date: Wed, 29 Nov 2023 09:59:15 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests] loop/009: require --option of udevadm control
+ command
+Content-Language: en-US
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org
+Cc: Alyssa Ross <hi@alyssa.is>
+References: <20231129113616.663934-1-shinichiro.kawasaki@wdc.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231129113616.663934-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-7edf1
 
-
-On Tue, 28 Nov 2023 11:40:19 -0800, Bart Van Assche wrote:
-> It is nontrivial to derive the role of the two attribute groups in source
-> file block/blk-sysfs.c. Hence add a comment that explains their roles. See
-> also commit 6d85ebf95c44 ("blk-sysfs: add a new attr_group for blk_mq").
+On 11/29/23 03:36, Shin'ichiro Kawasaki wrote:
+> The test case loop/009 calls udevadm control command with --ping option.
+> When systemd version is prior to 241, udevadm control command does not
+> support the option, and the test case fails. Check availability of the
+> option to avoid the failure.
 > 
+> Link: https://github.com/osandov/blktests/issues/129
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> ---
+>   tests/loop/009 | 6 ++++++
+>   1 file changed, 6 insertions(+)
 > 
+> diff --git a/tests/loop/009 b/tests/loop/009
+> index 2b7a042..5c14758 100755
+> --- a/tests/loop/009
+> +++ b/tests/loop/009
+> @@ -10,6 +10,12 @@ DESCRIPTION="check that LOOP_CONFIGURE sends uevents for partitions"
+>   
+>   QUICK=1
+>   
+> +requires() {
+> +	if ! udevadm control --ping > /dev/null 2>&1; then
+> +		SKIP_REASONS+=("udevadm control does not support --ping option")
+> +	fi
+> +}
+> +
+>   test() {
+>   	echo "Running ${TEST_NAME}"
+>   
 
-Applied, thanks!
+Hmm ... why "> /dev/null 2>&1" instead of the shorter ">&/dev/null"?
 
-[1/1] block: Document the role of the two attribute groups
-      commit: 3649ff0a0b152b5f00e8f56a5ce0da0945aae278
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+Bart.
