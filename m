@@ -1,69 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNwv7jRI"
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6605198D;
-	Tue, 28 Nov 2023 16:01:34 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6cd97c135e8so2157231b3a.0;
-        Tue, 28 Nov 2023 16:01:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701216094; x=1701820894; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CfAthndQOUsLyhwyhNqOrHqgkV99kYZqSodLMH4soJY=;
-        b=KNwv7jRIBMeJwXwqBci1Cp4o7U7OUFu/p4BEXtpdJmLb48H1/JefDmoBdWJA8P1As6
-         cw2FnVlFtovtbbJQt4npVbQ9N2mCi3PV/FElIfFNXJOG4WAnnWDpxq7mHF40TPn6Hn+I
-         VjzoRMnpBghNFSRxx3uG3FfVXzW3QlvFpxBCOC1FHjqDBtMsT3fTpZdorDLsn86zuXT8
-         KK3Ip02p8Wlw1KPOmJtBRFoacnX+0hVqON2m8Y/zMy5ILYXEIRWgZamqCQE8HCK+yyqN
-         S3VfrWhK7egRegvMmx1I7LNPVwbp+EubKzGAyM7/S//2nmv6URRiALn3OfYuN6ZVh7ZP
-         bIZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701216094; x=1701820894;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CfAthndQOUsLyhwyhNqOrHqgkV99kYZqSodLMH4soJY=;
-        b=YZGUVYgE9rul7BcTUD+KYslnswM7GxlR6ANyjcX08tuPJVaBtXPmUPYoJXKtqKc3vX
-         4iBDOAgby2eiM/8pIWg94Cj+CuNdYiNPN0dG4T2YCAtENtgULUOf4b8vvYVCyeW2sQ8n
-         Fn++6l7Fls0XvjUHgGFSZ+dNwFXmcMPaZplVHGm/Yh9gkgcSpmfhTmkBNN2ciJSEd6zZ
-         DGFV152rz72Kt3L5XgjaWMv/He7L21Eix9BMr0g1DxoKD6Hv9an/ORHjXOrPFuygaqKw
-         cOfUIJvMGhg8xFW7no0vlB3sqJJIpVyD9ENkI4Lf0ViPwlnchUTw+p4S5gJ+MVhPJLyc
-         7Odg==
-X-Gm-Message-State: AOJu0Yy7Rm6mYZwo8G1fyq23gTR8bpCUeB/WJUrtmXCRRCr1LZo7xyqH
-	pG1ZXHr6zqD0EYXluphh3dU=
-X-Google-Smtp-Source: AGHT+IG/dFzo3MqKKbmx14o+jvcSHc2Qq74jjY1Ok5XP+dY64ErqjX9OqfHPkqBlzUh6ePnOuyJevA==
-X-Received: by 2002:a05:6a20:428b:b0:18c:ae67:c202 with SMTP id o11-20020a056a20428b00b0018cae67c202mr8744798pzj.37.1701216094154;
-        Tue, 28 Nov 2023 16:01:34 -0800 (PST)
-Received: from google.com ([2620:0:1000:8411:8fd0:78d2:c604:3ac8])
-        by smtp.gmail.com with ESMTPSA id t8-20020a1709027fc800b001cfca7b8ee7sm5047038plb.99.2023.11.28.16.01.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 16:01:33 -0800 (PST)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date: Tue, 28 Nov 2023 16:01:31 -0800
-From: Minchan Kim <minchan@kernel.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: Use kmap_local_page()
-Message-ID: <ZWZ_W3tkw9tBqdvE@google.com>
-References: <20231128083845.848008-1-senozhatsky@chromium.org>
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A450D93;
+	Tue, 28 Nov 2023 17:14:02 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Sg1Yd12V3z4f3jXn;
+	Wed, 29 Nov 2023 09:13:57 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 1289E1A09AB;
+	Wed, 29 Nov 2023 09:13:59 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBXWhBVkGZlMWfjCA--.3057S3;
+	Wed, 29 Nov 2023 09:13:58 +0800 (CST)
+Subject: Re: [PATCH v4 2/2] block: warn once for each partition in
+ bio_check_ro()
+To: Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: ming.lei@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20231128123027.971610-1-yukuai1@huaweicloud.com>
+ <20231128123027.971610-3-yukuai1@huaweicloud.com>
+ <20231128130000.GB7984@lst.de>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9a6805fd-90ab-62cb-3b7d-d8124faf4f24@huaweicloud.com>
+Date: Wed, 29 Nov 2023 09:13:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231128083845.848008-1-senozhatsky@chromium.org>
+In-Reply-To: <20231128130000.GB7984@lst.de>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBXWhBVkGZlMWfjCA--.3057S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7GrykCrW5KF43Cw48Kw45Wrg_yoW3uFcEqa
+	s8Krn7C393Zas7Ka1UKFnIvFZ7Gw4rWrykX3y2qFs7JFW8Xr97tFs3WwnI9F4rJr4vqw42
+	vaykZ3yUX39agjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
+	r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
+	U==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, Nov 28, 2023 at 05:22:07PM +0900, Sergey Senozhatsky wrote:
-> Use kmap_local_page() instead of kmap_atomic() which has been
-> deprecated.
+Hi,
+
+ÔÚ 2023/11/28 21:00, Christoph Hellwig Ð´µÀ:
+> On Tue, Nov 28, 2023 at 08:30:27PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Commit 1b0a151c10a6 ("blk-core: use pr_warn_ratelimited() in
+>> bio_check_ro()") fix message storm by limit the rate, however, there
+>> will still be lots of message in the long term. Fix it better by warn
+>> once for each partition.
 > 
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Acked-by: Minchan Kim <minchan@kernel.org>
+> The new field is in the same dword alignment as bd_make_it_fail and
+> could in theory corrupt it, at least on alpha.  I guess we're fine,
+> because if you enable CONFIG_FAIL_MAKE_REQUEST on alpha you're asking
+> for this.  I still hope we can clean up these non-atomic bools and
+> replace them with bitops soon.
 
-I didn't know that the kmap_atomic was deprecated.
+Yes, I'm working on this, and thanks for the review!
 
-Thanks.
+Kuai
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> .
+> 
+
