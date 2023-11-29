@@ -1,78 +1,80 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fr2h/lp3"
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1782AF
-	for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 04:54:25 -0800 (PST)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATCqAad004815;
-	Wed, 29 Nov 2023 12:54:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=m6futr9fpBaphSfrMKTs7g+YqH+aeZ+D5alkCw7+gQY=;
- b=fr2h/lp3+qm4OCsNDmZ7cOAAGrWdUYkDHnFnGoOyZCrN3t+3SL38GPf550rq4p3xvvi0
- fo2E+0neSIcv9qgP6IpJCy2I+jW/11q0iUr/TqeglGhNmu/JUXtHTX3ecEi1L1vh5SGz
- 6fme5XzgO7rirSIXmU94NCSSSFYGRNFfs6gSSSFTzdDvBrCjODkAKbYnlR0MYfy6m6PJ
- MInrxjBqOS44MJ8DBXDj9TFjZ+R5LNq1Q6qEhuiHmUD/CREdqIxLI5UVSgBhRFuDPavd
- nkKSlh3VdGpMmvEEWcKEwdrIptjtdTDd7o/eucRY2alwlGeHc7V4Hjl+S40r/6TodM6e KQ== 
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up5pbg2h1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 12:54:22 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATB48FV018092;
-	Wed, 29 Nov 2023 12:54:21 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukv8nq7s6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 12:54:21 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3ATCsJBp17695348
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Nov 2023 12:54:19 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 78D252004B;
-	Wed, 29 Nov 2023 12:54:19 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D431F20043;
-	Wed, 29 Nov 2023 12:54:18 +0000 (GMT)
-Received: from [9.109.253.209] (unknown [9.109.253.209])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 29 Nov 2023 12:54:18 +0000 (GMT)
-Message-ID: <a31aa0a8-06b5-42a9-8306-7dadee5c5fcb@linux.ibm.com>
-Date: Wed, 29 Nov 2023 18:24:18 +0530
-User-Agent: Mozilla Thunderbird
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="hVm1G0Qb";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EkU5HiM6"
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5774510E4
+	for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 05:25:45 -0800 (PST)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id EB0ED3200B9E;
+	Wed, 29 Nov 2023 08:25:41 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Wed, 29 Nov 2023 08:25:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm3; t=1701264341; x=1701350741; bh=lD
+	4Mj6HG3GJEvukoHp1v6pteGLKfRcK2BW2YvFth6Es=; b=hVm1G0Qbmibvon9FcJ
+	vBRHlh+0ACW07M+z8m5dhaJE4/0xhab/XdFbnLGi/UNpgdZin9XZyhCZAW0kKKrS
+	cPGOivz2l4WJyqtqcVpyzfX7Qs08dUnsMf2UupqfGkcjBU2ts2ogaXq20a9tzx63
+	kEjoqZHtceueYB2/31VWGs+QUO58YbAPXn0ZBn/EDiOeIkZF6T5QGg/cx2cjGnoO
+	96IDuPKLrFPUPRYxxbNKmF+vTSjyxstpUe4beA+sx1dAtZoG9bWuASttog3IP8wW
+	RAcfduTJIPqhKPfnxB86IyzdC/Z5f/O8+WbIiVMYBGIp8F5GZmQwwhc4LhzDnqdj
+	SN/w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1701264341; x=1701350741; bh=lD4Mj6HG3GJEv
+	ukoHp1v6pteGLKfRcK2BW2YvFth6Es=; b=EkU5HiM6DUprb+5HI83BEYr1Dnwnr
+	s63DRbEAY4jlY8bjh6QQjySSMdD5jph/pH64IzNRfWnkUHEX5y015Ubrgi2f7gjk
+	uLNfkxUJSBWMluc6QaK86NPykkZcWtCYEhCKO3ql/3c9UioatCmrWvdYaMVT+ZwX
+	YTVs+kSxOSwwRdYMUzfN2DnUYh1wsbHJ1l8DtQETn0gIrpPvw8Nco+Koxu+tqeQ7
+	ks3K1azT1sqdSU1izBJ+xJS4APLwPBAkIZO6L1jvToUqrWKmYhtC3flYTiwgXxt/
+	cA5KEVl3X6eb8BABqruBTi0aA5qNyk52jf98KRYabUty8nGuUBnq0kzDg==
+X-ME-Sender: <xms:1TtnZfY8mfU961xuhV7RokBBjWGvqhcM9XCcntg6NiuXgBJizuwN4w>
+    <xme:1TtnZeYUwg2yjSPoUIydOSdO2YAJukX16DljmAqqJGfLFgcEWDIl8xzlRembtaIst
+    i4xJYvVabE4sj499A>
+X-ME-Received: <xmr:1TtnZR_i0enzCb6dYeFkXTibCPeegIarTpIdBLot9rkPCtj7_decBnAmcBXJuzheOE9rEXQoyLRbke7NCikLuQx3vcDk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeihedghedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvvefujghffffkgggtsehgtderredttddtnecuhfhrohhmpeetlhihshhs
+    rgcutfhoshhsuceohhhisegrlhihshhsrgdrihhsqeenucggtffrrghtthgvrhhnpeehhf
+    dtffeuteeiffekjefggeegteekudeifeejueeiffdttdefvdfgveehtedukeenucffohhm
+    rghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhephhhisegrlhihshhsrgdrihhs
+X-ME-Proxy: <xmx:1TtnZVqN_Lrfq0wcaLhvtVG_tyfV9br8WpnYpfv4XSiTY8y4GsLj_w>
+    <xmx:1TtnZarPwhvaARCjKyR5qQbtH2t9GDUD-nfDwlwrKsK4Jxh53kOgpA>
+    <xmx:1TtnZbTDIzYpNYlDIdCLcJnRoO3xGchpfOOiGcGGPWMgDTFuGnJ3tA>
+    <xmx:1TtnZRSER5dKzRk2iJ6eiJg_Wo2aZUsgdf7h8FDdlpSkP-YFcr0vUw>
+Feedback-ID: i12284293:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 29 Nov 2023 08:25:40 -0500 (EST)
+Received: by mbp.qyliss.net (Postfix, from userid 1000)
+	id D739661F2; Wed, 29 Nov 2023 14:25:38 +0100 (CET)
+From: Alyssa Ross <hi@alyssa.is>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org
 Subject: Re: [PATCH blktests] loop/009: require --option of udevadm control
  command
-Content-Language: en-GB
-To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-Cc: Alyssa Ross <hi@alyssa.is>
-References: <20231129113616.663934-1-shinichiro.kawasaki@wdc.com>
-From: Disha Goel <disgoel@linux.ibm.com>
 In-Reply-To: <20231129113616.663934-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eHuNeoBnTZ6S3wRKPXerMX9oRwVmt43X
-X-Proofpoint-ORIG-GUID: eHuNeoBnTZ6S3wRKPXerMX9oRwVmt43X
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+References: <20231129113616.663934-1-shinichiro.kawasaki@wdc.com>
+Date: Wed, 29 Nov 2023 14:25:08 +0100
+Message-ID: <87wmu0vgi3.fsf@alyssa.is>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-29_09,2023-11-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- adultscore=0 bulkscore=0 clxscore=1011 malwarescore=0 lowpriorityscore=0
- suspectscore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311290097
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 
-On 29/11/23 5:06 pm, Shin'ichiro Kawasaki wrote:
+--=-=-=
+Content-Type: text/plain
+
+Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com> writes:
 
 > The test case loop/009 calls udevadm control command with --ping option.
 > When systemd version is prior to 241, udevadm control command does not
@@ -82,35 +84,25 @@ On 29/11/23 5:06 pm, Shin'ichiro Kawasaki wrote:
 > Link: https://github.com/osandov/blktests/issues/129
 > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-Thanks for the fix patch. I have tested on Power10 machine, loop/009 test skips with patch applied.
+Reviewed-by: Alyssa Ross <hi@alyssa.is>
 
-# ./check loop/009
-loop/009 (check that LOOP_CONFIGURE sends uevents for partitions) [not run]
-runtime  0.481s  ...
-udevadm control does not support --ping option
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-Feel free to add:
-Reported-by and Tested-by: Disha Goel <disgoel@linux.ibm.com>
-
-> ---
->   tests/loop/009 | 6 ++++++
->   1 file changed, 6 insertions(+)
->
-> diff --git a/tests/loop/009 b/tests/loop/009
-> index 2b7a042..5c14758 100755
-> --- a/tests/loop/009
-> +++ b/tests/loop/009
-> @@ -10,6 +10,12 @@ DESCRIPTION="check that LOOP_CONFIGURE sends uevents for partitions"
->   
->   QUICK=1
->   
-> +requires() {
-> +	if ! udevadm control --ping > /dev/null 2>&1; then
-> +		SKIP_REASONS+=("udevadm control does not support --ping option")
-> +	fi
-> +}
-> +
->   test() {
->   	echo "Running ${TEST_NAME}"
->   
+iQIzBAEBCAAdFiEEH9wgcxqlHM/ARR3h+dvtSFmyccAFAmVnO7QACgkQ+dvtSFmy
+ccAmuA/6Azh2cNV5ZC9YRgoMlWwefCsPZgfwdxMlFfrarCrRivaOUY7QJvn7LKzx
+7wFrhAT+D2lkyVlDR/72KLD3RSR/IYLuXe+0oMrGjm3GQuFWDI9V25PjpWe/dO5y
+xTAQ7Ri31vai9Hk+F96gf6yEJFStmJPWM+tQW/xY2QU7zLPMNm5nU5moFyd8mEiR
+Z/vNNuW4OO5xl4QDGa6JIVL4uz9XYw8Kgq0MCb3I3r1yghrpV+IMD7TKK5kDAGsq
+uGqllMkCS3L6WHUjEmt9+B2rCZ8nfm/sgEDwRHMS+wYezsOlrBYtKPwhqJIc7sSw
+vmTAi406coIC9lg97SEh58gkYK/d4hMT7grKlIWC5nJ6JGVZgdN0D6Eap1zKxF8m
+JpRgustSIibJ2PZ1l031qiDH8wfv1TOzkDCP98BQs8hhUAH/6UOz8aKibSfUheRa
+2iaNGlRN/6n9xZPEZ20h0v/m6jqzrT8xWDDPGR29TrIQUz3UOnEFNm87T1T5dX4e
+rfIHG3SLrtquq1ZxVGPPgeQkyFQale43JLP0+D0PzY8jmqncnBMJ2+llztcVkd1U
+DkLVUYffcKscE4vSvwSS0NphG4KXtSOluhX06AOUVFqjDUDCQTIDEibMR67xTjzc
+0F7CilDquFO6ecTfvPZ3Ez4N+441gO8DubfpyjHfMrWtkPyyDd0=
+=Y2zj
+-----END PGP SIGNATURE-----
+--=-=-=--
