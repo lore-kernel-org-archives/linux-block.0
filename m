@@ -1,233 +1,168 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA7F198;
-	Wed, 29 Nov 2023 17:33:54 -0800 (PST)
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6cdcef8b400so467387b3a.1;
-        Wed, 29 Nov 2023 17:33:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701308033; x=1701912833;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VO2APHX5Y1ZuvGQDWFcsGuWp91fbUyR5eRl/Zk7oIZw=;
-        b=mqCt2g57QA/94IuTFHpYanalw0acrLL9nld/0SkG8bkKZD4Sdvcq8d/n7CT6Z/PakG
-         Zia5aU01Hw/YA3Ij+6wQhds6srecBxAIU+yG42SfOl0wQN+GvSgCxjrTxI5ggRl3blxP
-         Vq9rUJnmMBmL6a2toeyGtAIJ88HTQIeIcUvLI/Fovk9O5B5X3FmtyifDCAW2XjOw0Fn7
-         7L5iaYpPohSlUeV2pwNhVmrPUBbqa7+E25SqrgoEEUOPyZJ92g00r7IVLS51D66JcttB
-         O7Kc+PRmdDd1xLmNK5iu/UWlvBSS7KqkQeG1/MLrbI2Nco+8IFZMTF+zUbMm6FDtvzhY
-         oiKw==
-X-Gm-Message-State: AOJu0YzX1SZ0BhD01ec1VMfG5+9GBQSQvcht2uY98RW0LzNJkmtpUFNz
-	ZCibdmHyi7xqO+ZylT7uQWI=
-X-Google-Smtp-Source: AGHT+IGCtwO9slEOkiMAkvbM+PGSw6qcjIDpIZyO8DaMqgEtygnTku0yl6OsOSk1QG9N6OdiowXPOw==
-X-Received: by 2002:a05:6a20:7d8f:b0:18c:8ff1:f0b with SMTP id v15-20020a056a207d8f00b0018c8ff10f0bmr13599599pzj.56.1701308033506;
-        Wed, 29 Nov 2023 17:33:53 -0800 (PST)
-Received: from bvanassche-glaptop2.roam.corp.google.com (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id g4-20020a17090ace8400b00277560ecd5dsm2021936pju.46.2023.11.29.17.33.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 17:33:53 -0800 (PST)
-From: Bart Van Assche <bvanassche@acm.org>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Daejun Park <daejun7.park@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Douglas Gilbert <dgilbert@interlog.com>
-Subject: [PATCH v5 17/17] scsi_debug: Maintain write statistics per group number
-Date: Wed, 29 Nov 2023 17:33:22 -0800
-Message-ID: <20231130013322.175290-18-bvanassche@acm.org>
-X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-In-Reply-To: <20231130013322.175290-1-bvanassche@acm.org>
-References: <20231130013322.175290-1-bvanassche@acm.org>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J24qJXnc";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="yQfqAEog"
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB61CC
+	for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 18:54:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1701312876; x=1732848876;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=NoiFpq/ubZbE9zOEuqrSU+kvXVf0y7qpvtgr1KVeCfo=;
+  b=J24qJXncePrgAwXHMhxe60TFx3E6CVHP/7iQ+tYaZHeTxNhX2aVq9ymm
+   x0Cb00REASn1WOJAyZaa646A+9Pslnyqxbsuml5f5Iw3bTl8tt6WROBsH
+   PQXPH/an2rSHf6xAPA4Vv14BWYyU0pW80fT2uRfMhf1DJi2bGHb4WJc0S
+   ImKvJfLowNiwG+BzJYnraI6MOAULhNmYiQuhaQmfsw7src9f/WRQGL+Aj
+   +caeNOj+jWMujt5SlpDkVd7454Kz87jfKvh5MCyGG92WXZHxF1vuqM1bT
+   3CfZ7ghQktae5Onl8d9NED5J9ypRUvziUA3WdjZwAVa3bwu23kit2LSnG
+   A==;
+X-CSE-ConnectionGUID: 2JI/+wzgRBq+px/+DPKPug==
+X-CSE-MsgGUID: S1iafCLFSW2Yu0pIpHwcDw==
+X-IronPort-AV: E=Sophos;i="6.04,237,1695657600"; 
+   d="scan'208";a="3627910"
+Received: from mail-mw2nam10lp2101.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.101])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Nov 2023 10:54:36 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UPmKPCGzqgFpXP3pR2+woJRtmALNSXQkaSN+rgRpvEsLQnjNf6WIPh3jkuNWhjbtWBt4PZOtU4uyAkVqJYBaqyDD186uppqEeC4OEQzfDEEFFJJmP4YMWlCshoZGjmTsk1aE/9r5eA7ceG9fNKBx4MhDIiUiEHmx02wMqMSvscmNpvyihalLsPS58oZHtj3cBUbl4/w8qk8IUkIQscgIt0k6+d/fDYdW91F3+rvaDjB9Y95zgkCf/CQVfmrvpAvKqXy31F7H72rWhJO5Dzn8TxRco/39LRMH04O1kYT8ThgwSG7ZiyEQy30MZ88UOF2HOWEGotZzYTxVJbZZpfhhFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZKEjaJRzwR42ije4LZBru90TqS/rNisL02C0++WLoTI=;
+ b=Qc8BOu6oin7SNTVA68Eg5ImdNm8oOJKjGTbJqoqHAAYkpwNy77PNBN21fyPjMo5GAxxObc2JhijjO/VdxKrxNlo71lWwkyosDD8n3RT0djzbEx7W6wQQiEPfLY/frisw+aXSgmPBfKvjlt3BUlGxl+4/drtS2gKI/+9jBWpR9BKNt3aa0ty9eQR8qLh/KHW639gxYMJCw1N6lMF5bzpH8OvY21KhY7m8QV6Zdk+745AX0UaWvaC6leEZK3SPZAKT8enq4naYWVM9NtzFxjaZITSeSMJqxW7SVP9zG4u7EUAzt7rHBgRFklGD2qxXa6frRAwMyzbTtKjpDJfr8HysqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZKEjaJRzwR42ije4LZBru90TqS/rNisL02C0++WLoTI=;
+ b=yQfqAEogepPcLnaX8uRPtcme6CpEJSXG2DGh7nlFc2+pa5sGLN+Y0j1esL4SA2dlz1nGzU47/0c4pJeIFLSTbOsLYMeOpndIvd77JLk32Toaa9XIVYpTGwWOwngOqvnoJNgjATeet11H3mGkOA/5nmaG9IeZ490GXCIKo3p8/20=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BY1PR04MB8654.namprd04.prod.outlook.com (2603:10b6:a03:52f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Thu, 30 Nov
+ 2023 02:54:33 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::81a9:5f87:e955:16b4]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::81a9:5f87:e955:16b4%3]) with mapi id 15.20.7046.015; Thu, 30 Nov 2023
+ 02:54:33 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Bart Van Assche <bvanassche@acm.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Alyssa Ross
+	<hi@alyssa.is>
+Subject: Re: [PATCH blktests] loop/009: require --option of udevadm control
+ command
+Thread-Topic: [PATCH blktests] loop/009: require --option of udevadm control
+ command
+Thread-Index: AQHaIrhIty9CQNVYYUa7IJZLjIom5rCRlheAgACVj4A=
+Date: Thu, 30 Nov 2023 02:54:33 +0000
+Message-ID: <fvjbzyfocfruiwlkpxa3uykui4urt4kyvmuvs5nevqiftu336l@we53jtpd54pc>
+References: <20231129113616.663934-1-shinichiro.kawasaki@wdc.com>
+ <18ee474f-80fd-4a46-a8f2-0cc213618a43@acm.org>
+In-Reply-To: <18ee474f-80fd-4a46-a8f2-0cc213618a43@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BY1PR04MB8654:EE_
+x-ms-office365-filtering-correlation-id: a7877139-8bb8-4a30-028c-08dbf14faea8
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ vHgaljibia7VXuQx+unEB8LMF1RhmynL/qw7c2hdpF+orTrU5YkDeJ/+dU0WAaHsTnQ/+B0S6Hn2dbJLsfvNCHg43YVOvD2uP97YN/jY9SvhflReRIFgkRt88+StQS7I8SWs3gU4uhyWDLwmRyk/i1Rlj9qjI6f+DuVYvG06g/1Wj2m7tNx/yFcl7YRj3WjaZ/WqhsUyz37zsHqWiMbe6V88kykqJnZVfQZZ/wcUhEPeIeCmLGffJ70cUn11fHR1tFT+TkwIWMEIF4NPVUI/HMp/OkO5p2GJa82qoXD7fUdNq9J/8AFaEXp17Uhs3iFsIKmnJmVUxEqwwJf5LEEp99wU1v2tKsFrIdSZbbJcBclb4aFylFH6D38J2S46pbTPyj2gXrJJ1pGLpBLjDx02H40x3THnMh3ZSr4CtN2D/g1O+7KOUGl9TwSBYAZsFw9OGcDvD/clrrgHvZV1HKK+ZyiPKRI/7ThWm4zxKRilQQSUYfAKoiI0U+1Hy7yiB3dANhYRpwtV0vmeslvvsL1NtX5ZnKRrEIbLQbKoX7jhlqMisP3LanvwVi03meQFlEBMPeaNYMXxDtcVTa7cy/9GCyZea7noZTeORnlT2dewUcy0zgZBdwntceRvTbz2M2s7Ab7xO6OtrCahBfLSQQHVyg==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(136003)(39860400002)(376002)(366004)(346002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(26005)(9686003)(6512007)(41300700001)(83380400001)(202311291699003)(44832011)(66946007)(66476007)(33716001)(66556008)(64756008)(66446008)(6916009)(76116006)(91956017)(316002)(5660300002)(82960400001)(122000001)(54906003)(8936002)(4326008)(86362001)(8676002)(71200400001)(38070700009)(53546011)(6506007)(2906002)(478600001)(6486002)(966005)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?k3920EEyvkHJ+H4ckQF6vSdOqvrVd4G9HxISjSZKtdHs0NmMM6af+g/ZU6uI?=
+ =?us-ascii?Q?8TGIYc4RtvZcKuSgtoASUYBUKTrAanL/DGCTZ2fTO1RwTOHvhG4OfrrfD8nU?=
+ =?us-ascii?Q?xiZREQgsGbP19ftkwLA8+R2YEvvC0ahPk7J23e4RmubROVwlywoBbE7VNBAB?=
+ =?us-ascii?Q?nf+wXeFmWz7eCb8PCXJkeqb7ZH0JN/lQUSXk0ClaO6EXUOopEfFEKQXpyt5i?=
+ =?us-ascii?Q?0marfVZk+D2+jnluWfgl2sPk/iMMAYQVu2CjrWnTNFxnXFPWygDqde5sqbhU?=
+ =?us-ascii?Q?G5TCo0aTLtMTG6idtMc1FTvig0tP8YnmrbCJkm2YrKy2eeykDnuw30dSGqIE?=
+ =?us-ascii?Q?kQLNS5UIz69rr2jJUWT6Uzfsr6F7dCF/+j/wwWYiPbQrSIX6J2RP7/9k/Owu?=
+ =?us-ascii?Q?EluLaRR4/bTrADOUmnAVmlYzT44ITwsKS4gLDd6OGUttoYLOnjj3kG2ErILR?=
+ =?us-ascii?Q?jUKORhuMtZ7HTn2D//y0BHH4SoTOz+RENq2OLzJ+wuRNvEfLZX9zG+rodS7I?=
+ =?us-ascii?Q?rDrVo5HesYHJzGeHRrX4Uwz71CWVoXN25+iBMb1k6GhmQbBI79TdfqvRSxjF?=
+ =?us-ascii?Q?n7Jbbij7POHLpRpNYFBCK2ZLYaUWeb8LgTGl0kTizccCqTtqoPebbZvC1PY8?=
+ =?us-ascii?Q?viE+g1CIaSytDRdOYoBoFHqf+XKXOtpxLdIKl1xiaFHvprw0guAdl6Z7qvQ7?=
+ =?us-ascii?Q?zpdp+GIkY23B+wL8MWErXUvAS8LW7VokC70lXdm5ROiG7+gkAV4SHvVpZa2p?=
+ =?us-ascii?Q?4OfPPcAWzNpNth+LbPEfDZcndwyjfkNORV/BusVwr19+Jje08BhO0XVnQ5Mb?=
+ =?us-ascii?Q?L+uauIlIzi/FsWRBwBide/JejDe3uo2QNs7eGwc+KuKJKkSyoPHg7Dsw3dll?=
+ =?us-ascii?Q?xpdvk9aOy4Uap994f/dBzv/pqY5cMLFBbEkx0SMdpuBUKa4QbhuZmH4Mp+Jc?=
+ =?us-ascii?Q?IbhhfTaZ7K0BNIcP/ErDIzX5j5h5kIbWy0a7TAd3Tkqr+TP4q2omCPjAVoeg?=
+ =?us-ascii?Q?Eo39uoL8ACkY6S8Z5uhTQOk3dsM0of3P/lHClOdKGpImuPUjpHqw2l19vTFP?=
+ =?us-ascii?Q?kazhQxBBotQ6eEiSYF0x5wh9iVxPMmLIMbx/WqpRsksGO7YipsuSVpPJCUMS?=
+ =?us-ascii?Q?ZTl3YKpax42lN9WVnmXWjVFbz0OTG4d6/56R1+qVVzWbiipGk5cnZHnknNx5?=
+ =?us-ascii?Q?gWQoydT5JufaGaovrkZd/xOO1loaI7xMKrrP68Htf+Ae5tbtPTON15mAMM7G?=
+ =?us-ascii?Q?rsiTRhc2Qu8WHgWGXv+54pOnCSmNJvj6nWCR8r0igd4aAfOMIAOYLNZT/J+W?=
+ =?us-ascii?Q?aiekCTS0XKI/O/NIj0+pWWkQs18FfaTwxj3pyTGrv7qdqqxBypMl2zCBTCDr?=
+ =?us-ascii?Q?UcxTzvr5Ii/X4yZTzTZHKsUYer54dg4pVxukLyjI2PgGl8hHXUx4x7WMeITW?=
+ =?us-ascii?Q?S2wsGjBXEmqEot7OrLZpU/OwrVe+wAz0GovI581BKXebJyR3D+xSm36IzL8g?=
+ =?us-ascii?Q?rMmnk/IjlqKtshuNkCd9nfW4EubVNTJ4ci6kzkNxrBdCJ2mVkcZZAwBERM6C?=
+ =?us-ascii?Q?EoS0q84/HaztdrIMZiJ5VGiaEN7QiEy/lFBPDoM1wVqzgi7LJg5rWTtzRTBe?=
+ =?us-ascii?Q?jizC7UBILCasE+WYZhhvXk0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <675A8DB7F1D5A746990C7558C24287D9@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	6dHaqbApl+WCX1YiFQwj4/Wiw2EJnATPmuS02o9koPVdNll5/EqiT2ERRYMzHcXLJq/As9dFFXoAlZAl6Cb89cpa32bwfMgOek4Cu3bi61E0UjBmFi9otGUEUL4sRJJ1A2wcXbxRmUj20wNf7BwnG6MpWu4gO9RQ1E/HkQu4Mu87m/vA+M2oxGL4reQ5JNa6LA3VwIeHZ3CpxHmuCTIadR+cPM6f9Dpldy9nw/+hIrb4VouT9DQApBG81203LIFkMrvb1YZYXfnd07SZjeDc9llr+D2lDV04PzG97fXoKRhLw1NdmDHxCSDZCzM5tW+vsFCl7LioB0/PLAXriGFj7hg2agA2lV92MdxMY4sMDzfIMwzUpm40h+8Bu8wraSR6Z5w3r+9Bv1cxqyGwDEoDMBHADFUMSb3hQtkEKKoFYp31rDidvNgM+/E3dYqCMHykQOiW2BU6bIO66tQIGYYMX+eK9p3UQ7b43JIM12dL269DzIGoOOsoNOU4nTDPAhK3LyIynExBfhFhU2hpv7eJseohh70Xw2EKnnLMZ3iNu13LT6pV5JzsOqNC6M7vym7W89kXwqmWyvt5pZu3gpVOEwNK5bYIhvHA/bwW6ffrlkDUfwHer4IL0pbd2fEYUPGMRhmxONkvnZgqF/JHNci/xj7uxzddJyr3IihJBYmgzmLAyacVAgaj/xYICMqwaE8SYUHMyp9bXrnO94VUsP3/JL0VlsnwslPXl4u/B4U72aDTy38DIIA6QAAWjuS8jAsmW5VFgpX0yonnjVAn/8elE9Pst+gGGzuxANBJ3m7O5v+OPun8j5RcG+CBvyEX1LiX5nyfZZ187WGtuhqFx2qdlQ==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7877139-8bb8-4a30-028c-08dbf14faea8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2023 02:54:33.7476
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ZZ02IqPqwCVV4FSwt4ONGxwifg9s4DuR5QbHLqG9qjd3f8BDK3BkssKesYsUWstW/I12phsEPL42hDQmjNRqYBbgq7XPANoy3RWJrlwpzbc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR04MB8654
 
-Track per GROUP NUMBER how many write commands have been processed. Make
-this information available in sysfs. Reset these statistics if any data
-is written into the sysfs attribute.
+On Nov 29, 2023 / 09:59, Bart Van Assche wrote:
+> On 11/29/23 03:36, Shin'ichiro Kawasaki wrote:
+> > The test case loop/009 calls udevadm control command with --ping option=
+.
+> > When systemd version is prior to 241, udevadm control command does not
+> > support the option, and the test case fails. Check availability of the
+> > option to avoid the failure.
+> >=20
+> > Link: https://github.com/osandov/blktests/issues/129
+> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> > ---
+> >   tests/loop/009 | 6 ++++++
+> >   1 file changed, 6 insertions(+)
+> >=20
+> > diff --git a/tests/loop/009 b/tests/loop/009
+> > index 2b7a042..5c14758 100755
+> > --- a/tests/loop/009
+> > +++ b/tests/loop/009
+> > @@ -10,6 +10,12 @@ DESCRIPTION=3D"check that LOOP_CONFIGURE sends ueven=
+ts for partitions"
+> >   QUICK=3D1
+> > +requires() {
+> > +	if ! udevadm control --ping > /dev/null 2>&1; then
+> > +		SKIP_REASONS+=3D("udevadm control does not support --ping option")
+> > +	fi
+> > +}
+> > +
+> >   test() {
+> >   	echo "Running ${TEST_NAME}"
+>=20
+> Hmm ... why "> /dev/null 2>&1" instead of the shorter ">&/dev/null"?
 
-Note: SCSI devices should only interpret the information in the GROUP
-NUMBER field as a stream identifier if the ST_ENBLE bit has been set to
-one. This patch follows a simpler approach: count the number of writes
-per GROUP NUMBER whether or not the group number represents a stream
-identifier.
-
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/scsi/scsi_debug.c | 49 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 45 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 16091e2913d5..e8cbfc118a24 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -898,6 +898,8 @@ static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
- static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
- static int poll_queues; /* iouring iopoll interface.*/
- 
-+static atomic_long_t writes_by_group_number[64];
-+
- static char sdebug_proc_name[] = MY_NAME;
- static const char *my_name = MY_NAME;
- 
-@@ -3346,7 +3348,8 @@ static inline struct sdeb_store_info *devip2sip(struct sdebug_dev_info *devip,
- 
- /* Returns number of bytes copied or -1 if error. */
- static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
--			    u32 sg_skip, u64 lba, u32 num, bool do_write)
-+			    u32 sg_skip, u64 lba, u32 num, bool do_write,
-+			    u8 group_number)
- {
- 	int ret;
- 	u64 block, rest = 0;
-@@ -3365,6 +3368,10 @@ static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
- 		return 0;
- 	if (scp->sc_data_direction != dir)
- 		return -1;
-+
-+	if (do_write && group_number < ARRAY_SIZE(writes_by_group_number))
-+		atomic_long_inc(&writes_by_group_number[group_number]);
-+
- 	fsp = sip->storep;
- 
- 	block = do_div(lba, sdebug_store_sectors);
-@@ -3738,7 +3745,7 @@ static int resp_read_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, false);
-+	ret = do_device_access(sip, scp, 0, lba, num, false, 0);
- 	sdeb_read_unlock(sip);
- 	if (unlikely(ret == -1))
- 		return DID_ERROR << 16;
-@@ -3923,6 +3930,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- {
- 	bool check_prot;
- 	u32 num;
-+	u8 group = 0;
- 	u32 ei_lba;
- 	int ret;
- 	u64 lba;
-@@ -3934,11 +3942,13 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be64(cmd + 2);
- 		num = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case WRITE_10:
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x3f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = true;
- 		break;
-@@ -3953,15 +3963,18 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
- 		num = get_unaligned_be32(cmd + 6);
-+		group = cmd[6] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case 0x53:	/* XDWRITEREAD(10) */
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x1f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = false;
- 		break;
- 	default:	/* assume WRITE(32) */
-+		group = cmd[6] & 0x3f;
- 		lba = get_unaligned_be64(cmd + 12);
- 		ei_lba = get_unaligned_be32(cmd + 20);
- 		num = get_unaligned_be32(cmd + 28);
-@@ -4016,7 +4029,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, true);
-+	ret = do_device_access(sip, scp, 0, lba, num, true, group);
- 	if (unlikely(scsi_debug_lbp()))
- 		map_region(sip, lba, num);
- 	/* If ZBC zone then bump its write pointer */
-@@ -4068,12 +4081,14 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 	u32 lb_size = sdebug_sector_size;
- 	u32 ei_lba;
- 	u64 lba;
-+	u8 group;
- 	int ret, res;
- 	bool is_16;
- 	static const u32 lrd_size = 32; /* + parameter list header size */
- 
- 	if (cmd[0] == VARIABLE_LENGTH_CMD) {
- 		is_16 = false;
-+		group = cmd[6] & 0x3f;
- 		wrprotect = (cmd[10] >> 5) & 0x7;
- 		lbdof = get_unaligned_be16(cmd + 12);
- 		num_lrd = get_unaligned_be16(cmd + 16);
-@@ -4084,6 +4099,7 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 		lbdof = get_unaligned_be16(cmd + 4);
- 		num_lrd = get_unaligned_be16(cmd + 8);
- 		bt_len = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		if (unlikely(have_dif_prot)) {
- 			if (sdebug_dif == T10_PI_TYPE2_PROTECTION &&
- 			    wrprotect) {
-@@ -4172,7 +4188,7 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 			}
- 		}
- 
--		ret = do_device_access(sip, scp, sg_off, lba, num, true);
-+		ret = do_device_access(sip, scp, sg_off, lba, num, true, group);
- 		/* If ZBC zone then bump its write pointer */
- 		if (sdebug_dev_is_zoned(devip))
- 			zbc_inc_wp(devip, lba, num);
-@@ -7259,6 +7275,30 @@ static ssize_t tur_ms_to_ready_show(struct device_driver *ddp, char *buf)
- }
- static DRIVER_ATTR_RO(tur_ms_to_ready);
- 
-+static ssize_t group_number_stats_show(struct device_driver *ddp, char *buf)
-+{
-+	char *p = buf, *end = buf + PAGE_SIZE;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		p += scnprintf(p, end - p, "%d %ld\n", i,
-+			       atomic_long_read(&writes_by_group_number[i]));
-+
-+	return p - buf;
-+}
-+
-+static ssize_t group_number_stats_store(struct device_driver *ddp,
-+					const char *buf, size_t count)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		atomic_long_set(&writes_by_group_number[i], 0);
-+
-+	return count;
-+}
-+static DRIVER_ATTR_RW(group_number_stats);
-+
- /* Note: The following array creates attribute files in the
-    /sys/bus/pseudo/drivers/scsi_debug directory. The advantage of these
-    files (over those found in the /sys/module/scsi_debug/parameters
-@@ -7305,6 +7345,7 @@ static struct attribute *sdebug_drv_attrs[] = {
- 	&driver_attr_cdb_len.attr,
- 	&driver_attr_tur_ms_to_ready.attr,
- 	&driver_attr_zbc.attr,
-+	&driver_attr_group_number_stats.attr,
- 	NULL,
- };
- ATTRIBUTE_GROUPS(sdebug_drv);
+No reason :) I will fold in the shorter one to the commit. Thanks.=
