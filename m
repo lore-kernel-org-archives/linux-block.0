@@ -1,92 +1,151 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S09AF+O8"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F821A3
-	for <linux-block@vger.kernel.org>; Wed, 29 Nov 2023 16:16:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701303396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YQqpuGsZIItErENZLmCBFPntp1ZyTZMptB60KCMJ3Oo=;
-	b=S09AF+O8sX6mvWDA4BVVOS3STrxO3UKbp+cDHRmmgItXUpDFmvHmmlaf9eINW81Hqbrykh
-	3iM1vAQeouM7L84VDz2elE/TXfp9QWXdFSedd6+KiKUjKhRQCV9ZwnWmyPu9NEbsDxlX5P
-	i0Yl8446lcAgss5fD8QO/MSoF1AiGvU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-479-IKpE6fieOauYI4Awx4BZPw-1; Wed,
- 29 Nov 2023 19:16:32 -0500
-X-MC-Unique: IKpE6fieOauYI4Awx4BZPw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 64EE31C05AE1;
-	Thu, 30 Nov 2023 00:16:32 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F3EA5112130A;
-	Thu, 30 Nov 2023 00:16:28 +0000 (UTC)
-Date: Thu, 30 Nov 2023 08:16:24 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: "Raphael S. Carvalho" <raphaelsc@scylladb.com>
-Cc: guazhang@redhat.com, hch@lst.de, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: About 'nvme-pci: fix DMA direction of unmapping integrity data'
-Message-ID: <ZWfUWPsJ7AAOzqHR@fedora>
-References: <CAKhLTr2PjPnNDccbc8OMy3fSc_U1Dk7GS+UWLUkj0zWwzcp4zw@mail.gmail.com>
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4785198;
+	Wed, 29 Nov 2023 17:33:31 -0800 (PST)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5c2b7ec93bbso370919a12.2;
+        Wed, 29 Nov 2023 17:33:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701308011; x=1701912811;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kDwp3WaBXHek3yls+ewc1h8qGWJkJUcufep7oMLO/Xg=;
+        b=dlo/FhnZqPDiW5V/uasdMvMf0FK9eBAfH8HRlqALgI0hMjUrt59g70ZOsmnayA8lSE
+         mH7FV90SQwgBd0iGWssZtBFXgzDiwdXKtULBv/5PIl+hRS5WiNdS05mIStJjWXqMRAn5
+         iCASOE4t/IqpNQyY2j7zophMlU93ttSPmG7ZnNQRjJQ2DEmXdkS2Qo8tbZhTfLSFUxVw
+         lLv9dfymUguNl0UejCTywE+eG6LZie72ueIXFpX7H8bCxUOaGNe+X6AwX8tit0kTl5gP
+         0UauguNh1xmqJzRXRE8KNiwfcUdzZvtQWfUKN0qx65rsYitoHxAk6y3WhjJlEIjFI8tN
+         6NMQ==
+X-Gm-Message-State: AOJu0YxFow3jM+PF5MO4o5DQv+BxfFvr4+4ccy047oKfLgR62eSIaQ+G
+	QcKSMPR6PdU+ET02zbaw4JY=
+X-Google-Smtp-Source: AGHT+IGF22o1y1U+uKNTJ1FhKUNpjzhaUNA3Www79e7gS4POwdBnt6PucfdiAe1q9e/v/W/MOJS+YQ==
+X-Received: by 2002:a05:6a21:339e:b0:18c:fa0a:d484 with SMTP id yy30-20020a056a21339e00b0018cfa0ad484mr6274421pzb.42.1701308010844;
+        Wed, 29 Nov 2023 17:33:30 -0800 (PST)
+Received: from bvanassche-glaptop2.roam.corp.google.com (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
+        by smtp.gmail.com with ESMTPSA id g4-20020a17090ace8400b00277560ecd5dsm2021936pju.46.2023.11.29.17.33.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 17:33:30 -0800 (PST)
+From: Bart Van Assche <bvanassche@acm.org>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Daejun Park <daejun7.park@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v5 00/17] Pass data lifetime information to SCSI disk devices
+Date: Wed, 29 Nov 2023 17:33:05 -0800
+Message-ID: <20231130013322.175290-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKhLTr2PjPnNDccbc8OMy3fSc_U1Dk7GS+UWLUkj0zWwzcp4zw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 11:56:50AM -0300, Raphael S. Carvalho wrote:
-> I am observing a problem where disk writes are apparently being
-> misdirected. File system metadata ends up in file data range for
-> example.
+Hi Martin,
 
-Please raise one report in linux-block or linux-nvme if you are asking
-for help, and include the following info:
+UFS vendors need the data lifetime information to achieve good performance.
+Providing data lifetime information to UFS devices can result in up to 40%
+lower write amplification. Hence this patch series that adds support in F2FS
+and also in the block layer for data lifetime information. The SCSI disk (sd)
+driver is modified such that it passes write hint information to SCSI devices
+via the GROUP NUMBER field.
 
-1) kernel release version
+Please consider this patch series for the next merge window.
 
-2) related drivers or device, nvme or scsi, or dm/md, and how to setup
-the device
+Thank you,
 
-3) filesystem
+Bart.
 
-4) exact reproduction steps
+Changes compared to v4:
+ - Dropped the patch that renames the WRITE_LIFE_* constants.
+ - Added a fix for an argument check in fcntl_rw_hint().
+ - Reordered the patches that restore data lifetime support.
+ - Included a fix for data lifetime support for buffered I/O to raw block
+   devices.
 
-5) expected result
+Changes compared to v3:
+ - Renamed the data lifetime constants (WRITE_LIFE_*).
+ - Fixed a checkpatch complaint by changing "unsigned" into "unsigned int".
+ - Rebased this patch series on top of kernel v6.7-rc1.
+ 
+Changes compared to v2:
+ - Instead of storing data lifetime information in bi_ioprio, introduce the
+   new struct bio member bi_lifetime and also the struct request member
+   'lifetime'.
+ - Removed the bio_set_data_lifetime() and bio_get_data_lifetime() functions
+   and replaced these with direct assignments.
+ - Dropped all changes related to I/O priority.
+ - Improved patch descriptions.
 
-6) actual result, such as how you conclude that WRITE is misdirected
+Changes compared to v1:
+ - Use six bits from the ioprio field for data lifetime information. The
+   bio->bi_write_hint / req->write_hint / iocb->ki_hint members that were
+   introduced in v1 have been removed again.
+ - The F_GET_FILE_RW_HINT and F_SET_FILE_RW_HINT fcntls have been removed.
+ - In the SCSI disk (sd) driver, query the stream status and check the PERM bit.
+ - The GET STREAM STATUS command has been implemented in the scsi_debug driver.
 
-BTW, is it similar with the following one?
 
-https://bugzilla.kernel.org/show_bug.cgi?id=218158
+Bart Van Assche (17):
+  fs: Fix rw_hint validation
+  fs: Move enum rw_hint into a new header file
+  fs/f2fs: Restore the whint_mode mount option
+  fs: Restore F_[GS]ET_FILE_RW_HINT support
+  fs: Restore kiocb.ki_hint
+  block: Restore the per-bio/request data lifetime fields
+  block: Propagate write hints to the block device inode
+  scsi: core: Query the Block Limits Extension VPD page
+  scsi_proto: Add structures and constants related to I/O groups and
+    streams
+  sd: Translate data lifetime information
+  scsi_debug: Reduce code duplication
+  scsi_debug: Support the block limits extension VPD page
+  scsi_debug: Rework page code error handling
+  scsi_debug: Rework subpage code error handling
+  scsi_debug: Implement the IO Advice Hints Grouping mode page
+  scsi_debug: Implement GET STREAM STATUS
+  scsi_debug: Maintain write statistics per group number
 
-> 
-> I am not completely certain about the problem "nvme-pci: fix DMA
-> direction of unmapping integrity data" is trying to fix, could you
-> please describe a bit more what the problem is?
-
-dma_unmap_page() should use DMA_TO_DEVICE or DMA_FROM_DEVICE, instead
-of block request dir(READ or WRITE), and the issue is actually one
-dma-debug warning.
-
-And block request buffer or IO direction isn't supposed to change in its
-lifetime, and dma-debug code check if page map & unmap direction is same.
-
-> 
-> Can it cause silent data corruption?
-
-No.
-
-Thanks,
-Ming
+ Documentation/filesystems/f2fs.rst |  70 ++++++++
+ block/bio.c                        |   2 +
+ block/blk-crypto-fallback.c        |   1 +
+ block/blk-merge.c                  |   8 +
+ block/blk-mq.c                     |   2 +
+ block/bounce.c                     |   1 +
+ block/fops.c                       |  14 ++
+ drivers/scsi/scsi.c                |   2 +
+ drivers/scsi/scsi_debug.c          | 247 +++++++++++++++++++++--------
+ drivers/scsi/scsi_sysfs.c          |  10 ++
+ drivers/scsi/sd.c                  | 111 ++++++++++++-
+ drivers/scsi/sd.h                  |   3 +
+ fs/aio.c                           |   1 +
+ fs/buffer.c                        |  12 +-
+ fs/direct-io.c                     |   2 +
+ fs/f2fs/data.c                     |   2 +
+ fs/f2fs/f2fs.h                     |  10 ++
+ fs/f2fs/file.c                     |   6 +
+ fs/f2fs/segment.c                  |  95 +++++++++++
+ fs/f2fs/super.c                    |  32 +++-
+ fs/fcntl.c                         |  34 +++-
+ fs/inode.c                         |   1 +
+ fs/iomap/buffered-io.c             |   2 +
+ fs/iomap/direct-io.c               |   1 +
+ fs/mpage.c                         |   1 +
+ fs/open.c                          |   1 +
+ include/linux/blk-mq.h             |   2 +
+ include/linux/blk_types.h          |   2 +
+ include/linux/fs.h                 |  29 ++--
+ include/linux/rw_hint.h            |  20 +++
+ include/scsi/scsi_device.h         |   1 +
+ include/scsi/scsi_proto.h          |  75 +++++++++
+ include/trace/events/f2fs.h        |   5 +-
+ io_uring/rw.c                      |   1 +
+ 34 files changed, 711 insertions(+), 95 deletions(-)
+ create mode 100644 include/linux/rw_hint.h
 
