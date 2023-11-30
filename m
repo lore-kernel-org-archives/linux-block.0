@@ -1,155 +1,204 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZqBLLreS"
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D861FD4;
-	Thu, 30 Nov 2023 05:53:57 -0800 (PST)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AUCrWA3025556;
-	Thu, 30 Nov 2023 13:53:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=+KBImv1Kwt2AH4T96+jehckjTlPaL/qSymwuwqCxsAg=;
- b=ZqBLLreSH5NBgrAzh6GPuF4HceTE702NAOA9srBr+eWV7KlJXhG2VYp5UJIm5oy1bxu4
- FqdXTgFGJ5tYRmWp28M9cU6jzpPZIkCJptLE/nlDIr1xIyj5ucxwwgIChr6bx68/kgNu
- GWaY3DOwHfxSRMbF4DPBrfeMnIgN/gRbaEXv4/gCMm2rSrCxPwWiJV7VNb2t7IwtI78s
- 3pA8ZuxN8BCKJJjjMpSjtUeDokCOhXO4YG0nkOjXSchbiHmVgDs7efrBrsxKfLehHRof
- xyEjbfNfhk6pbsvkUPf98R9zxDe5JHLoNzOChT5S0UwLDbJ2e1HVNnqils2vBpK5QpZ6 qg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uptsv9vpp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Nov 2023 13:53:51 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AUDVmVJ027422;
-	Thu, 30 Nov 2023 13:53:51 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uptsv9vp4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Nov 2023 13:53:50 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AUDn0vH022631;
-	Thu, 30 Nov 2023 13:53:50 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukv8nxdjq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Nov 2023 13:53:49 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AUDrkVb63701370
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 30 Nov 2023 13:53:48 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9695820043;
-	Thu, 30 Nov 2023 13:53:46 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0E3A120040;
-	Thu, 30 Nov 2023 13:53:44 +0000 (GMT)
-Received: from li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com.com (unknown [9.43.76.38])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 30 Nov 2023 13:53:43 +0000 (GMT)
-From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
-To: linux-ext4@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>
-Cc: Ritesh Harjani <ritesh.list@gmail.com>, linux-kernel@vger.kernel.org,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        John Garry <john.g.garry@oracle.com>, dchinner@redhat.com
-Subject: [RFC 7/7] ext4: Support atomic write for statx
-Date: Thu, 30 Nov 2023 19:23:16 +0530
-Message-Id: <e299f66d5b8f77c8e17970868d83fa1ff7655faa.1701339358.git.ojaswin@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <cover.1701339358.git.ojaswin@linux.ibm.com>
-References: <cover.1701339358.git.ojaswin@linux.ibm.com>
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9963ED48
+	for <linux-block@vger.kernel.org>; Thu, 30 Nov 2023 07:02:34 -0800 (PST)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2856e578c3cso1477530a91.1
+        for <linux-block@vger.kernel.org>; Thu, 30 Nov 2023 07:02:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701356554; x=1701961354;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uJHMFIyYjAL7AEL+dr1tttga0DRsMqWEt4uvthy3kgc=;
+        b=uS0SGt4jzGcFQQABesSGwDH1csoHM5YutCCMm96IAYc3ARRNhYxvNo0bbzn3mmYbOC
+         WekkPxI12eaul/RnL1nkPzK3jt75cIMLQNwV5DXCu4qLwYZanoS1vufctlqa/Lal1MCc
+         qR0PKnGgmDcH3eQKOUIXQcodfHLm0+wvKf87OTsq1aTgibHW0gKi1rTIYTc4QwQQzTV6
+         AcfoyC/Vnd0CUpCpl3cuX4PRZ2UOUc90lH1PRS53XkwPaCe+ECAUr6ncGHdSmO8M4u2L
+         HW1RW2FTq1OSj5+HAIT6Dpr4mhqXp2Tdl1ga94JfByyeXgYFJ9B/hglc1JsX8ELlhrve
+         XG0A==
+X-Gm-Message-State: AOJu0YwemaZLNCNSvkDycp9oipggllTESnpsOy6H/oYiTEA4LbP5b2/8
+	dCakU2i+hH98ItXTxuiB1FZ95nLAlaTvmTxBAnmWdxmXIKrr
+X-Google-Smtp-Source: AGHT+IGvw7xZCq6NXj7DK4v8/J1xvB8xotxdNkMEnzouXzBGfsF6dRAHfnRP0foE7R3X+joDwGlTt1gf01QygVP5Agqxu93AVO3u
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -KeN6sr_sn17w2SrVL9t35CbXj7Q8qNh
-X-Proofpoint-ORIG-GUID: MXWF82-sNdeumF3xiLVzTrUYOn44tg3T
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-30_12,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- suspectscore=0 mlxlogscore=999 impostorscore=0 adultscore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311300102
+X-Received: by 2002:a17:90a:d710:b0:285:db18:2400 with SMTP id
+ y16-20020a17090ad71000b00285db182400mr2301448pju.2.1701356553994; Thu, 30 Nov
+ 2023 07:02:33 -0800 (PST)
+Date: Thu, 30 Nov 2023 07:02:33 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000098af2060b5ff161@google.com>
+Subject: [syzbot] [block?] INFO: task hung in bdev_release
+From: syzbot <syzbot+4da851837827326a7cd4@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Support providing info on atomic write unit min and max for an inode.
+Hello,
 
-For simplicity, currently we limit the min at the FS block size, but a
-lower limit could be supported in future.
+syzbot found the following issue on:
 
-Signed-off-by: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+HEAD commit:    8c9660f65153 Add linux-next specific files for 20231124
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14c8a334e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ca1e8655505e280
+dashboard link: https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=119809d0e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13930542e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/345ed4af3a0d/disk-8c9660f6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/191053c69d57/vmlinux-8c9660f6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/aac7ee5e55e0/bzImage-8c9660f6.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4da851837827326a7cd4@syzkaller.appspotmail.com
+
+INFO: task syz-executor136:5067 blocked for more than 143 seconds.
+      Not tainted 6.7.0-rc2-next-20231124-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor136 state:D stack:26736 pid:5067  tgid:5066  ppid:5064   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5399 [inline]
+ __schedule+0xf15/0x5c00 kernel/sched/core.c:6726
+ __schedule_loop kernel/sched/core.c:6801 [inline]
+ schedule+0xe7/0x270 kernel/sched/core.c:6816
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6873
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x5b4/0x9c0 kernel/locking/mutex.c:747
+ bdev_release+0xcd/0xa90 block/bdev.c:967
+ blkdev_release+0x37/0x50 block/fops.c:616
+ __fput+0x270/0xbb0 fs/file_table.c:394
+ task_work_run+0x14c/0x240 kernel/task_work.c:180
+ ptrace_notify+0x10a/0x130 kernel/signal.c:2390
+ ptrace_report_syscall include/linux/ptrace.h:411 [inline]
+ ptrace_report_syscall_exit include/linux/ptrace.h:473 [inline]
+ syscall_exit_work kernel/entry/common.c:251 [inline]
+ syscall_exit_to_user_mode_prepare+0x122/0x230 kernel/entry/common.c:278
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
+ syscall_exit_to_user_mode+0xe/0x60 kernel/entry/common.c:296
+ do_syscall_64+0x4d/0x110 arch/x86/entry/common.c:88
+ entry_SYSCALL_64_after_hwframe+0x62/0x6a
+RIP: 0033:0x7f7015ea8479
+RSP: 002b:00007f7015e66218 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: 0000000000000000 RBX: 00007f7015f2f328 RCX: 00007f7015ea8479
+RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000005
+RBP: 00007f7015f2f320 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f7015f2f32c
+R13: 00007f7015efc18c R14: 64626e2f7665642f R15: 00000000ffffff43
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/29:
+ #0: ffffffff8cfacf60 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
+ #0: ffffffff8cfacf60 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
+ #0: ffffffff8cfacf60 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6613
+2 locks held by getty/4817:
+ #0: ffff88802ae300a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
+ #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc4/0x1490 drivers/tty/n_tty.c:2201
+1 lock held by udevd/5057:
+ #0: ffff888143bbf4c8 (&disk->open_mutex){+.+.}-{3:3}, at: bdev_open_by_dev+0x27c/0xed0 block/bdev.c:857
+1 lock held by syz-executor136/5067:
+ #0: ffff888143bbf4c8 (&disk->open_mutex){+.+.}-{3:3}, at: bdev_release+0xcd/0xa90 block/bdev.c:967
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 PID: 29 Comm: khungtaskd Not tainted 6.7.0-rc2-next-20231124-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x277/0x390 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x299/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
+ watchdog+0xf86/0x1210 kernel/hung_task.c:379
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 59 Comm: kworker/u4:4 Not tainted 6.7.0-rc2-next-20231124-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Workqueue: events_unbound toggle_allocation_gate
+RIP: 0010:arch_static_branch arch/x86/include/asm/jump_label.h:27 [inline]
+RIP: 0010:static_key_false include/linux/jump_label.h:207 [inline]
+RIP: 0010:native_write_msr arch/x86/include/asm/msr.h:147 [inline]
+RIP: 0010:wrmsrl arch/x86/include/asm/msr.h:262 [inline]
+RIP: 0010:native_x2apic_icr_write arch/x86/include/asm/apic.h:216 [inline]
+RIP: 0010:__x2apic_send_IPI_dest arch/x86/kernel/apic/x2apic_phys.c:113 [inline]
+RIP: 0010:x2apic_send_IPI+0x96/0xe0 arch/x86/kernel/apic/x2apic_phys.c:50
+Code: 8b 13 0f ae f0 0f ae e8 b9 00 04 00 00 41 83 fc 02 44 89 e0 48 0f 44 c1 48 c1 e2 20 b9 30 08 00 00 48 09 d0 48 c1 ea 20 0f 30 <66> 90 5b 5d 41 5c c3 5b 31 d2 48 89 c6 bf 30 08 00 00 5d 41 5c e9
+RSP: 0018:ffffc900015a7900 EFLAGS: 00000202
+RAX: 00000001000000fb RBX: ffff8880b9921a2c RCX: 0000000000000830
+RDX: 0000000000000001 RSI: 00000000000000fb RDI: ffffffff8ca75a68
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000006 R12: 00000000000000fb
+R13: 000000000003bccc R14: 0000000000000001 R15: ffff8880b983d8c0
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055750a5bb680 CR3: 000000000cd78000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ arch_send_call_function_single_ipi arch/x86/include/asm/smp.h:101 [inline]
+ send_call_function_single_ipi kernel/smp.c:117 [inline]
+ smp_call_function_many_cond+0x12ef/0x1570 kernel/smp.c:837
+ on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1023
+ on_each_cpu include/linux/smp.h:71 [inline]
+ text_poke_sync arch/x86/kernel/alternative.c:2008 [inline]
+ text_poke_bp_batch+0x655/0x750 arch/x86/kernel/alternative.c:2218
+ text_poke_flush arch/x86/kernel/alternative.c:2409 [inline]
+ text_poke_flush arch/x86/kernel/alternative.c:2406 [inline]
+ text_poke_finish+0x30/0x40 arch/x86/kernel/alternative.c:2416
+ arch_jump_label_transform_apply+0x1c/0x30 arch/x86/kernel/jump_label.c:146
+ jump_label_update+0x1d7/0x400 kernel/jump_label.c:829
+ static_key_enable_cpuslocked+0x1b7/0x270 kernel/jump_label.c:205
+ static_key_enable+0x1a/0x20 kernel/jump_label.c:218
+ toggle_allocation_gate mm/kfence/core.c:830 [inline]
+ toggle_allocation_gate+0xf4/0x250 mm/kfence/core.c:822
+ process_one_work+0x8a4/0x15f0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x8b6/0x1290 kernel/workqueue.c:2787
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.905 msecs
+
+
 ---
- fs/ext4/inode.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index d185ec54ffa3..c8f974d0f113 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -5621,6 +5621,7 @@ int ext4_getattr(struct mnt_idmap *idmap, const struct path *path,
- 	struct ext4_inode *raw_inode;
- 	struct ext4_inode_info *ei = EXT4_I(inode);
- 	unsigned int flags;
-+	struct block_device *bdev = inode->i_sb->s_bdev;
- 
- 	if ((request_mask & STATX_BTIME) &&
- 	    EXT4_FITS_IN_INODE(raw_inode, ei, i_crtime)) {
-@@ -5639,8 +5640,6 @@ int ext4_getattr(struct mnt_idmap *idmap, const struct path *path,
- 
- 		stat->result_mask |= STATX_DIOALIGN;
- 		if (dio_align == 1) {
--			struct block_device *bdev = inode->i_sb->s_bdev;
--
- 			/* iomap defaults */
- 			stat->dio_mem_align = bdev_dma_alignment(bdev) + 1;
- 			stat->dio_offset_align = bdev_logical_block_size(bdev);
-@@ -5650,6 +5649,41 @@ int ext4_getattr(struct mnt_idmap *idmap, const struct path *path,
- 		}
- 	}
- 
-+	if ((request_mask & STATX_WRITE_ATOMIC)) {
-+		unsigned int awumin, awumax;
-+		unsigned int blocksize = 1 << inode->i_blkbits;
-+
-+		awumin = queue_atomic_write_unit_min_bytes(bdev->bd_queue);
-+		awumax = queue_atomic_write_unit_max_bytes(bdev->bd_queue);
-+
-+		if (!(ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS)) ||
-+		    EXT4_SB(inode->i_sb)->s_cluster_ratio > 1) {
-+			/*
-+			 * Currently not supported for non extent files or
-+			 * with bigalloc
-+			 */
-+			stat->atomic_write_unit_min = 0;
-+			stat->atomic_write_unit_max = 0;
-+		} else if (awumin && awumax) {
-+			/*
-+			 * For now we support atomic writes which are
-+			 * at least block size bytes. If that exceeds the
-+			 * max atomic unit, then don't advertise support
-+			 */
-+			stat->atomic_write_unit_min = max(awumin, blocksize);
-+
-+			if (awumax < stat->atomic_write_unit_min) {
-+				stat->atomic_write_unit_min = 0;
-+				stat->atomic_write_unit_max = 0;
-+			} else {
-+				stat->atomic_write_unit_max = awumax;
-+				stat->attributes |= STATX_ATTR_WRITE_ATOMIC;
-+			}
-+		}
-+		stat->attributes_mask |= STATX_ATTR_WRITE_ATOMIC;
-+		stat->result_mask |= STATX_WRITE_ATOMIC;
-+	}
-+
- 	flags = ei->i_flags & EXT4_FL_USER_VISIBLE;
- 	if (flags & EXT4_APPEND_FL)
- 		stat->attributes |= STATX_ATTR_APPEND;
--- 
-2.39.3
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
