@@ -1,94 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8982ED54;
-	Thu, 30 Nov 2023 11:31:58 -0800 (PST)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6cdcd790f42so1338349b3a.3;
-        Thu, 30 Nov 2023 11:31:58 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="Km8JtMfx"
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54628133
+	for <linux-block@vger.kernel.org>; Thu, 30 Nov 2023 13:10:42 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-2839b922c18so1314595a91.1
+        for <linux-block@vger.kernel.org>; Thu, 30 Nov 2023 13:10:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1701378642; x=1701983442; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/sRx+Jqf97+NiQ/oo0AK9REAGsSB677imx6VDbBDBPw=;
+        b=Km8JtMfxfwYvu/zeg3TFokOr+llQNUz+H/GxvxsWAjDYt6PU9iTzC3WZJB+Eg6vEIL
+         c+cuwZ8N2sWDTlLFDZ0NxE5/6n5bblotEgAAIJnZCVlZgy9UvrLgdJZutICxmSYcfRZE
+         /sjNFxIc6pe4opf/Gco5ASXmorfGBnTXgYIplE3q4/CD7H1bUdxHQwOfYi0BXuD6tDWa
+         KJccNMN8sC6fF+xJn0nb2Ti9a7GFt4ZgEncVQsRNMu/eNWaYVZ+0OunZcoB+wP3r5ky3
+         PmgxZVn4Df9AAEFh5pa/Uhs7QemtKkWTcOzbad4Bi+kjdU9Ntq18I+TqrbL3WYAAIi0v
+         xBYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701372718; x=1701977518;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=10WDQOMbLhwr6X7mmZ2uFxLynqBDtNMaAveAhuigAVA=;
-        b=KSRLqBTI3UTMg5dFuzVGqf8XG7yD/U1tRkvkqws3aCnIYJ3mSnAVAnWDOZ1hQkTwQi
-         2tpqjjZDOgz9R0hSw+vgqnDwt5a6jBAUAv1m+oAmcurykC1C/HJ4WDUS8xGGamlEaoEC
-         3Pmzs7VkB71WcEJ0WHAaMlBN21v9Ly/erGJ+YAGHeIf+SAmbzEFt5SvARcjh7s7kiMr6
-         Tf5wm/TSGvAMJUZPakp6XYotd/6Szi3doKtanCMQDYMkjmMeYLo6qyoUsU37J4kX81wE
-         NSukJbVk/iKRPwUJNOCUBeb6VyWXVs3lLQ9tcnbIuZfBsccCo4awP36g9nLMf6pSMU0n
-         9lhQ==
-X-Gm-Message-State: AOJu0Ywf0irzUJbNSPXy5mGi2jj7SmUiwBqWNp/jf2s1ZB8NNPm5jFqi
-	jKIgImRCQS8nSv6OX1atVHBtpv9EeTY=
-X-Google-Smtp-Source: AGHT+IGUDVQtLXtXVTHcyYfbMADFBjfcpSbUp4Gwbjn7IWLspKOkJWzQerfbCR4mDOIMmJNdkXJOJg==
-X-Received: by 2002:a05:6a20:3d85:b0:187:dd5f:93b6 with SMTP id s5-20020a056a203d8500b00187dd5f93b6mr24017855pzi.43.1701372717894;
-        Thu, 30 Nov 2023 11:31:57 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:8572:6fe3:eaf0:3b9d])
-        by smtp.gmail.com with ESMTPSA id m127-20020a632685000000b005c606b44405sm1635365pgm.67.2023.11.30.11.31.56
+        d=1e100.net; s=20230601; t=1701378642; x=1701983442;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/sRx+Jqf97+NiQ/oo0AK9REAGsSB677imx6VDbBDBPw=;
+        b=mFJzc+ySLwiee4DuHeTu2HNx6Mt25p67lckr9lyhdHdyCpKqBY6YzzIb+6Yc8EMLrY
+         CvNhzmEiRQJz+R9lTS+X8avfaID1i/n9r7eeZ9wpk6Ua+4PnKGJQuTqZygmcok4Vo3wX
+         eE7iCeBMdrJ2t9dpmUoK6gdNDeA5fng1782+y7D21sh6Y6uooWVryU9kS4IklkCpZyqI
+         thkzk8ov+0IlKdeBvWJqXxPGLER3nASLg2ZtXRv+g7Q1jdE7eLNlW9iTL1q9/s8oA1fH
+         Nbdn57GHgYg/ZuAzH/6+8d9XIRt2H4IVlxokDy3C+REStbaDy+sfvz6Gi5SHJ663UDgF
+         U26Q==
+X-Gm-Message-State: AOJu0YwfDt06scaVmjV+K0BEA4itKWDwZD04byvVyozDvfQGfHTzI+Rb
+	kNG+/bAdpDJdavre9YY8dNuF7g==
+X-Google-Smtp-Source: AGHT+IGvDV12X2Cf2tSiZBcr9G1HEkwxlH7M0D5faUl77dI7BTBzZ5FwmwUTmMZr0vZ2RffJE7o8oQ==
+X-Received: by 2002:a17:90b:4b86:b0:286:3074:c632 with SMTP id lr6-20020a17090b4b8600b002863074c632mr4500797pjb.22.1701378641794;
+        Thu, 30 Nov 2023 13:10:41 -0800 (PST)
+Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
+        by smtp.gmail.com with ESMTPSA id kh14-20020a17090b34ce00b002859a1d9fb7sm1768396pjb.2.2023.11.30.13.10.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 11:31:57 -0800 (PST)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Avri Altman <avri.altman@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Yu Kuai <yukuai1@huaweicloud.com>,
-	Ed Tsai <ed.tsai@mediatek.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Stanley Jhu <chu.stanley@gmail.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Can Guo <quic_cang@quicinc.com>,
-	Asutosh Das <quic_asutoshd@quicinc.com>,
-	"Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-	Peter Wang <peter.wang@mediatek.com>,
-	Bean Huo <beanhuo@micron.com>,
-	Arthur Simchaev <Arthur.Simchaev@wdc.com>
-Subject: [PATCH v6 4/4] scsi: ufs: Disable fair tag sharing
-Date: Thu, 30 Nov 2023 11:31:31 -0800
-Message-ID: <20231130193139.880955-5-bvanassche@acm.org>
-X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-In-Reply-To: <20231130193139.880955-1-bvanassche@acm.org>
-References: <20231130193139.880955-1-bvanassche@acm.org>
+        Thu, 30 Nov 2023 13:10:41 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1r8oIw-0027MJ-1v;
+	Fri, 01 Dec 2023 08:10:38 +1100
+Date: Fri, 1 Dec 2023 08:10:38 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+Cc: linux-ext4@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	"Darrick J . Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	John Garry <john.g.garry@oracle.com>, dchinner@redhat.com
+Subject: Re: [RFC 1/7] iomap: Don't fall back to buffered write if the write
+ is atomic
+Message-ID: <ZWj6Tt1zKUL4WPGr@dread.disaster.area>
+References: <cover.1701339358.git.ojaswin@linux.ibm.com>
+ <09ec4c88b565c85dee91eccf6e894a0c047d9e69.1701339358.git.ojaswin@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09ec4c88b565c85dee91eccf6e894a0c047d9e69.1701339358.git.ojaswin@linux.ibm.com>
 
-Disable the block layer fair tag sharing algorithm because it
-significantly reduces performance of UFS devices with a maximum queue
-depth of 32.
+On Thu, Nov 30, 2023 at 07:23:09PM +0530, Ojaswin Mujoo wrote:
+> Currently, iomap only supports atomic writes for direct IOs and there is
+> no guarantees that a buffered IO will be atomic. Hence, if the user has
+> explicitly requested the direct write to be atomic and there's a
+> failure, return -EIO instead of falling back to buffered IO.
+> 
+> Signed-off-by: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+> ---
+>  fs/iomap/direct-io.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 6ef25e26f1a1..3e7cd9bc8f4d 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -662,7 +662,13 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+>  			if (ret != -EAGAIN) {
+>  				trace_iomap_dio_invalidate_fail(inode, iomi.pos,
+>  								iomi.len);
+> -				ret = -ENOTBLK;
+> +				/*
+> +				 * if this write was supposed to be atomic,
+> +				 * return the err rather than trying to fall
+> +				 * back to buffered IO.
+> +				 */
+> +				if (!atomic_write)
+> +					ret = -ENOTBLK;
 
-Reviewed-by: Avri Altman <avri.altman@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Ed Tsai <ed.tsai@mediatek.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/ufs/core/ufshcd.c | 1 +
- 1 file changed, 1 insertion(+)
+This belongs in the caller when it receives an -ENOTBLK from
+iomap_dio_rw(). The iomap code is saying "this IO cannot be done
+with direct IO" by returning this value, and then the caller can
+make the determination of whether to run a buffered IO or not.
 
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index 8b1031fb0a44..a2219cbb9720 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -8973,6 +8973,7 @@ static const struct scsi_host_template ufshcd_driver_template = {
- 	.max_host_blocked	= 1,
- 	.track_queue_depth	= 1,
- 	.skip_settle_delay	= 1,
-+	.disable_fair_tag_sharing = 1,
- 	.sdev_groups		= ufshcd_driver_groups,
- 	.rpm_autosuspend_delay	= RPM_AUTOSUSPEND_DELAY_MS,
- };
+For example, a filesystem might still be able to perform an atomic
+IO via a COW-based buffered IO slow path. Sure, ext4 can't do this,
+but the above patch would prevent filesystems that could from being
+able to implement such a fallback....
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
