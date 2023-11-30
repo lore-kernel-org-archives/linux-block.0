@@ -1,337 +1,161 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KCnvIpPh"
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2070.outbound.protection.outlook.com [40.107.223.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F6710F1;
-	Wed, 29 Nov 2023 23:02:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LnV+Obvi";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="c+AGlNqb"
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 298979A;
+	Thu, 30 Nov 2023 04:21:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1701346912; x=1732882912;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=kHcZXIZWJWz+PinDfpIIyPEEO5nbujZZXRgKDhziyNw=;
+  b=LnV+ObviwGAeOUEYxB42s2RL/VzigVQS6S4LpHh1iq5glJKjcbYq0y6v
+   dnvck/ANm4RUuICAaMEMnOy6XMVTDSdGaCgh9MnE164L2cIEVWo+eVq9X
+   ESk5gqscyM/E6gL6TK56symXm9LFs7w4ji0xjC4NwJao9x3qklYBrpyeX
+   M1/f+2YlrsxkO7aCBvqDsnRnQx3ozr5yqW880fR+f6111gLvrXgmwNt9S
+   3KxGKfDR0lTnu0skE+0CIuIS7O7/Gt181HDAQ7QET2w9Mm4liXw+MsZ7y
+   RhUnKu4KfcEhQJuthD9bgdMHnTqnMzPMo6cLkFyyeylFVp70vbrd4dy/S
+   w==;
+X-CSE-ConnectionGUID: FJ2V5hPySvq1zPFMA3eIOQ==
+X-CSE-MsgGUID: NkrQY2g/TZaqSvACv/N/Pw==
+X-IronPort-AV: E=Sophos;i="6.04,239,1695657600"; 
+   d="scan'208";a="3663141"
+Received: from mail-co1nam11lp2169.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.169])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Nov 2023 20:21:51 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IR+2x4cgGy9JrHzc7m+qHBg2EW6ed/UjNJpf9BxQ4WFega6ffMTDt5WrNYCsy9+e1KiipG8lk/TVGAX8oG8RahmNDZjWlh3s13NZay041DlcfdnKdLYkYpJCCziPG6aUqm5fY+GHKzjy97WvdZ4DTTme4odiSg7cXAd37JWMBrW+bTzFQCqmAtjP0kfFsffK4qXW4ulZ5ZYxhZSE17H0dCVJSXnw4HsrdZifGE+rlWWoXejGjN2R/TXaabsCtOvZgYWsG/iQXbWP+YKQymYuBhkD91gV3+Xhsgi9ruwVDLa1EBJBCYp0T+JPt48YQCXFOiy4rzxvoa0ncZ+FOcy5fQ==
+ b=ZRKk8txiHmp5otQoouFsGfD3OVHMxlwvkG4xrm/zOW8lFzudiyAIHAThHQszjpX42jHOmnlW32d0iCv7giKzfWs/49q+Ox87nx+3obqsbxlcMt/j1cl1QJ2VgESQq8FPPcvQGSfSFRX6z64mo/uj+iW4m1XuQT+zEyOyHAnbWu0OEDd7emrffJoFnheyqEmL2ebbd2rh4VmiPab4zThoROTaylADeuOxsd7OUCUX9q/DLOr45+JTnCEq+bi8t64us3AejkZbcLe92STsmgM+4o8PJgB7Fv/6TrxNDrvPgyA/MKfCUkrAkq+5MJnYXgysFpFQHsG14ngz5s7L/F8ENw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LK3IwY+tYpt0nNR7jQ/wuEds0lfJ9yxkjpomecQ5hIA=;
- b=l0+0PgRe37SOhkPFngJAcsJajJZoGOwL9YU0mPXcZOCVKYbmsKDmhWEVEsKpjT1u3asBiwvaNPAb+xv65hVzOO50y9JHkiCyebg7UZKJ9MDCpBt5PD+CE2l5hW0pCK/cKPjUW60TXq960yOAYf1goXFQSiwhpIZcgZL2kMR95tIe7St2q6vrPfT1lmiCXU/iLrYwWJxXH4N/ME/j544aHHQHEAnDhnXmUF1yJ7Fpt6JGHYdaV4UgxOBbY64JmLVuglrbObh1BII9SGyI0ivNana8RLFYDbKAtUhyQM0TOkTYASBtzZL0EvLnS3Vu4AgjmHRMrEQgBQnb0cmmPiaEWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=kHcZXIZWJWz+PinDfpIIyPEEO5nbujZZXRgKDhziyNw=;
+ b=TtEQMckAp/WZ0Em0yX5AO2gP6dTRKW7s768Exrv4N/ADLr4nM7WiQjZcQb9YTDuXtjoX5E73oxEUKJaI/PgpOfflodPhGmdr/lbOp0jS3qMYRNWQysqTlXz3GyeGRpezzys6i7XPk6EpiqYAGxN2hzZJ0pxbNaWdDRQGU5fmYFv9Sz4oA6N1ejEH5FhlkI7X4XCoV4RbcxYlLFtESFHbKuJMQHXP2/86SIX2vo5Q3caa575ib2z9JIfuy5FM910X1mUklHauOqd5puzKcnBO20S49HOwtURHfs+twDyOXFY3Aqy8SmyMhaNf6HRFHEc24dRy0yTKDsGtPmrPcoWt9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LK3IwY+tYpt0nNR7jQ/wuEds0lfJ9yxkjpomecQ5hIA=;
- b=KCnvIpPhqLxZ6cxoKQnWASadi+dwoBJhHqqubg+fYTqGzENw/JQI2nE3WYaWELm8xWC1CW3waF2Ds9HEBLjEZZPY7soy+LeCNb4yAaWY84cEiS4sGKT0nzKfYCGQKypoOJkuNk2Tr5w6kP7U/fsDCrP6YGROD2wVv6QZUahwpDdacUzHKKqUD4PK536CbYpzAhyBzfmuE547OOPYB4BugRVmSVFf7QvM1l/ytx5PYrbTsayzmy1H7/0xiByUtazDmF8553V8DSXh8GI+8HOkKiOjP87urqYRiXT/x5tj05DHgTFO4qnrrXxKLOg73dVHxQsxym/fqqomqc7L8uMX5Q==
-Received: from BN9PR03CA0229.namprd03.prod.outlook.com (2603:10b6:408:f8::24)
- by SA1PR12MB8985.namprd12.prod.outlook.com (2603:10b6:806:377::18) with
+ bh=kHcZXIZWJWz+PinDfpIIyPEEO5nbujZZXRgKDhziyNw=;
+ b=c+AGlNqbn4TS4ADbkULxiArv37awqbNICCbgD9OPPPfr9O/1eRBQbb3Wkq0j0miVA/nY8brtI6Q1k8QWjbYBUT58ZA+KYhZZ3KPejhCnx0/aHh2WRNO1vjp98I2F7lFG6wr41wWXfwQ4M3vC817T8v5I8f8lKBYQBPRAjm2XXuo=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by CO6PR04MB8409.namprd04.prod.outlook.com (2603:10b6:303:140::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Thu, 30 Nov
- 2023 07:02:05 +0000
-Received: from SA2PEPF0000150A.namprd04.prod.outlook.com
- (2603:10b6:408:f8:cafe::7e) by BN9PR03CA0229.outlook.office365.com
- (2603:10b6:408:f8::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23 via Frontend
- Transport; Thu, 30 Nov 2023 07:02:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF0000150A.mail.protection.outlook.com (10.167.242.42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7046.17 via Frontend Transport; Thu, 30 Nov 2023 07:02:05 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 29 Nov
- 2023 23:01:52 -0800
-Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 29 Nov
- 2023 23:01:51 -0800
-From: Chaitanya Kulkarni <kch@nvidia.com>
-To: <virtualization@lists.linux.dev>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <mst@redhat.com>, <hch@lst.de>, <jasowang@redhat.com>,
-	<pbonzini@redhat.com>, <stefanha@redhat.com>, <xuanzhuo@linux.alibaba.com>,
-	<axboe@kernel.dk>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [RFC PATCH 1/1] virtio-blk: process block layer timedout request
-Date: Wed, 29 Nov 2023 23:01:33 -0800
-Message-ID: <20231130070133.8059-2-kch@nvidia.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20231130070133.8059-1-kch@nvidia.com>
-References: <20231130070133.8059-1-kch@nvidia.com>
+ 2023 12:21:49 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::8ea3:9333:a633:c161]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::8ea3:9333:a633:c161%6]) with mapi id 15.20.7046.024; Thu, 30 Nov 2023
+ 12:21:48 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Bart Van Assche <bvanassche@acm.org>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Daejun Park
+	<daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, Avri Altman
+	<Avri.Altman@wdc.com>
+Subject: Re: [PATCH v5 08/17] scsi: core: Query the Block Limits Extension VPD
+ page
+Thread-Topic: [PATCH v5 08/17] scsi: core: Query the Block Limits Extension
+ VPD page
+Thread-Index: AQHaIy1oBhIMvKhfkkiyr60v0i4KYrCSyTiA
+Date: Thu, 30 Nov 2023 12:21:48 +0000
+Message-ID: <19d99e61-9424-47e4-a70f-7664905615bc@wdc.com>
+References: <20231130013322.175290-1-bvanassche@acm.org>
+ <20231130013322.175290-9-bvanassche@acm.org>
+In-Reply-To: <20231130013322.175290-9-bvanassche@acm.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|CO6PR04MB8409:EE_
+x-ms-office365-filtering-correlation-id: c00efec9-80fe-4d8f-78f6-08dbf19eed2b
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ LeErKDLnlwNl39rQ5Z7eYLSralVNkvijUc3eWNpgeb7TH1rmkCkv01U/ZYOC+TUb149ZgJD4mW4N4QkC9cQIwH7sl4/F1frhnuoOXMrCdCLLHMq/A6Ks3AtxOEn9ejjXzMSSI1bcSskgiIw/tWlDPwqtUfg5m3+gjf2DPvSR6F/rosUGDyAZx/cJSCuuavOZMn+5RdYwq4g1XM3umuMcjBYL6nzsgWERtXKR/ge1XLMd8iG6AkOPGROkmDSnxH87rhGO1waOKoNecZQIrHWe/QTbcXg4IcAahUN4fj+5Sy2HqEhu1+61iYJOWWbdHr/eBaaIcVxIaOeWDWxzCD6+mvCeANPOJVxPaDGaIbpS5yDYDqyvTiW605ZuWMtAy9UroWhf3O5U9o2km5hEuxRnaoNOpxsl34Avg378aGM8PYN7t/d2t+WBO/z77/ELa4/z1vEo1E/PSSbQZ/Nb+3cLJIoNttdy1aZ6ddQ19r55U+BkzrqndQT/hoOm/k1DIJyd6/DgbH5af/ioGoFyJyHhl7fEx+wDfgnA/h088vrVl8lTj4MTwqUbxoa1+xQow+scZFQLCHb7m79Pj8Z66VV4tu2O7MDukNXSwoNDCgTODpGgU1962eVkmcW8DyP0UcKYGM1MRDV0OpVR8isbuVUWMDNdTiKShJmEIj1WfClL6r23c2ldb4+yWQrShGLa+FSJNAuFE/aADajdGC9HC++wjGsXKecIyEcDP+kmVztH3ls=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(366004)(376002)(346002)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(2616005)(26005)(71200400001)(6506007)(6512007)(53546011)(83380400001)(5660300002)(4744005)(2906002)(41300700001)(478600001)(6486002)(110136005)(4326008)(8676002)(8936002)(66476007)(66556008)(66946007)(76116006)(64756008)(54906003)(316002)(91956017)(66446008)(82960400001)(122000001)(86362001)(31696002)(38100700002)(38070700009)(36756003)(202311291699003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?dWFtSkp0QkxDOXZPMXRJYk9oZHJRck9odXJJTFh4S2NNUDRFL25YUDEzbldj?=
+ =?utf-8?B?ajlTdFJOUFhMbHpxMWRoamtUSXRsRUdPVzZ6RlJrSzRkZjlrVENGbzI4d2FV?=
+ =?utf-8?B?SGxwMkVGN2RzUkFtRmlQUzA1S1A4S1gzZVFsd1RmZ1NRVlB1bjdlRnROWEN0?=
+ =?utf-8?B?Z3NUR3VVUzRaamI1QXUzdWV0M2E3ZEpTNWU5dGxCVlh2WTRldTlaMTRuVWhx?=
+ =?utf-8?B?bUlLaEVmUStwelpEdWpRVVhaK2FKckN5b0duZXBIOW1xalRlYWY5QVJoRk1E?=
+ =?utf-8?B?dm5Eb1lJakszdmY3QW9hdmdTazc2VDdaWDRPZ3lHcU1TZXM2U3JOQXI2T1BJ?=
+ =?utf-8?B?OXIvVjNrN3daQUFPcFczbjk5ZEJsZXhnaFdpSFBTVHpBN3NVaUg3Y3pYZEdN?=
+ =?utf-8?B?N0cydkd6Z1BBb3I2bkdRS1ZkcjhoV3VUcnFXMWtiakNwMjYrdjl5ZExVYXdx?=
+ =?utf-8?B?QXFMU1VGVGtBOHFUL1k4a0pFaWkzUlZ4d2ZhZTdYMitnZjNWcWR2NGZXbW1C?=
+ =?utf-8?B?OWhQbitteDJEYytNU3BEOWZ0cmxYTkQ5ZnRSc1Z3YjB5Qm1BakFQbWtCRTNX?=
+ =?utf-8?B?K2VUMElSR043c1A0b2I3ZnV1Um91YWd4MVNNMGtHWDIzaFZWOThiRjZqNEpa?=
+ =?utf-8?B?OEx5MWx3QVRQd2FZS2FJNGZPUis5UHVtVk5FU0lTdVgzdzJlRjdEMWhlbEZY?=
+ =?utf-8?B?S2VnNFNSd2NockJQMHpGZXhxRXRlS3VZN2NTbVF1Wm4vQ3B3SzBZbVZtTTZD?=
+ =?utf-8?B?Qk1nQ3htcVphMXdPV2k4b1MwTnVFRmRFbW15UXNUMVR6Ym5Mc1ZneWQ3eVo4?=
+ =?utf-8?B?YjF2Qm8xSWF2RytsWXlNSTMra0NGSDVHL0ZNU3ZNc0FBd29acU1wdUhJSHl3?=
+ =?utf-8?B?MTN3bndUenluZlk1Q2s3QWphUmQ4YVRiWHdtT3g5dFQvQldoQXp5MTl3U3po?=
+ =?utf-8?B?OWtBd3FhNGRPZ3c4UUVzUFNzRFQ3eWZXYWtiV2VsNVI3d1hwU2Z0M1FoUlFy?=
+ =?utf-8?B?a2h3RVBPT3hOc25pVS9YTTg0dVpxQThxWHExbmNuNEN2a2JlTHlLNSsrZDhp?=
+ =?utf-8?B?NHJMWWV1ZXVJVzRCZnFFcnFZeWVGTkdyN0k0WVRmbjZpK2p5b3RFNzBBN0t4?=
+ =?utf-8?B?SHdsUG13b3g4Ukg0TFJZVm5yRWJMVlpyL3Q1bk1RYWE5UmhvVUViYU0wQUtS?=
+ =?utf-8?B?Nk5JVCtjNUJpV3pCVmVadkxXWHF4bzl1bFNoU3BSU2JLaFh1LzJhTXFDMVBY?=
+ =?utf-8?B?bjBvRXJ5WGhWd1IzUnZaYnVqM002VTMvUjBqaFgvRXZjRWtIcVdqd21LV3M3?=
+ =?utf-8?B?VGFUWUZ3aU9IM0g5cGZPZlVrNVpFcG8rNlpkSGlLbXZDMFhRY3lWMjZjUjg1?=
+ =?utf-8?B?SyszMFBzM2tjMWM3c255TDZBKzlwTTRnOTJYVStubUNoTWo3VkY4Z2dCYi91?=
+ =?utf-8?B?SmxOWTczeDg0bVRQU2VENzJHcTdGeG83KzQyNjdweGVQTXVtTDh1Y3pqOCsw?=
+ =?utf-8?B?RWx3T3FFdU9COWZ2MmJ5L3JEb3ZVZ0pDMzFZQ3hHSXRLamFiQkRjUy9RakZx?=
+ =?utf-8?B?U1VxTmRhb1N0SVliamdpbDVraVFWVWxIdkcrcys1UWx2ZU9FRGpIYUZpVDND?=
+ =?utf-8?B?SkhRTFV1NFpPazNXc0piZ09aYU1VM1FoYkJja254dm91MUdmTjZsRG1nNGgx?=
+ =?utf-8?B?QTlpaUdNUXIvZkZTMVFKWGpxUXNjZ0tiZkFodk43ZVlUa0RocG5TbTRsSUlW?=
+ =?utf-8?B?c2tQRnJLMnBFb2l2b1M5SUZPT1pxSTl6MXpFTkJEWnRsaVdsdzNlcVVQc2or?=
+ =?utf-8?B?cFoweFo3MDNEaU5YVjFlMmwrS2NLTEJaWGd5c0tzazBBRTU0V2ZsYUY3YkNZ?=
+ =?utf-8?B?ODd1Z2hBcFhNeThoRXlRZVNSOTZ5YkxieHVDUlZpZDBsODJFNml1bEY5a1ZV?=
+ =?utf-8?B?YzdoZ2dNZ3RkTzI4WWs3M1dPOFVNZDNzcmR6Y1V2S1FNeCsrSzRNNy9UVHdu?=
+ =?utf-8?B?bHVQTEpubFFFaVZDUW11cmFqMXhIVEhTUitYdVFvMzdCMUROenZGN2RoNHBk?=
+ =?utf-8?B?QzVUYXY4UXMvOW5OWFdkMVBCTHIwZ0RlOExrNnVYdyt5QzdXRUdQYWdtYXcr?=
+ =?utf-8?B?eitmQkVRMWZwZ1p2d2hqMHA4YzlmYUtiL2FaUStFMmVBbW1FMVlrMlBhRnZh?=
+ =?utf-8?B?NGc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1A1B27EBDF9A794AB0BF92EA73BAE006@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF0000150A:EE_|SA1PR12MB8985:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2acd1a97-1971-4327-17af-08dbf17242d5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	FfffZ2tnn6+xMIDR5l9MVHTzhjt6Vp9ApSO+wvXiR0AcvEUd9Nt8wxMRcmUEaGGOTL+MkDn9P80hbrU9Ay2GKJUF1LKwz8zXsoWb5XrofZeCrg53VLoQ2HIJWCknHvuzK5AHxwUTZpq9vsD/cnqXgtM99iN+aCho64erqpUTI1ze0wvSCc84um8u3UvTpyCqGAsU/wCczGhdLgeR6qzPWe5M6sz5QJIFpu0Q85ZiEjclUrOhdOAMnc6PUafL5iE/0wbV1JMgT6RCJ0FYb4J0PJWJaw3/fRnlXolpa/8HNcXKaI0xKORfGq6rGylEHJkM0cNtJ1vcRMOaEqfp0egldx4SKeo/N7RMTLHBP7GOqT2IHkYPZmyV6RDMKc4RCOd/tB3uzk0fljmc90Uxd1+3mY2VJIQ4tC0v8AzT/7zl8Wr2BEohdyAClnbvMOaJ74rkFBT8/kMg18qLshUIwTFcQWrnxG/HoBLeiY6Y6AAcZHahwWiPf+oNctkWQBBNedpMwJi5rXk5i17nL1e0+iSELtAXd69LpgLBAcN27Z0HR+hxkRfbabE91gzRyY+1FfUUgwX8N5F8JoO8xL4PaqGM64Tvq1qwh6LOrlpBuug2HLmXa/H+vxJrq001+j7+sacOLFMYd0dTccEtTIvq0Wo5O+jFBncQpGDLQbFCo3C+ZM2OXj4umt+WA4UiuIm6JyztjHmCwMTgHZm9Ll93BklFUTyWgSe6avVsDyH28cFJ0My5XFOgqXz+nPxHXBIDeDFRrLuXL2JK8b+ur8FgL6HmRf3i3+zElDursN9N6HRQ+S0=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(346002)(136003)(39860400002)(230922051799003)(64100799003)(186009)(82310400011)(451199024)(1800799012)(40470700004)(46966006)(36840700001)(40480700001)(66899024)(40460700003)(202311291699003)(70586007)(70206006)(54906003)(7636003)(356005)(82740400003)(36756003)(36860700001)(47076005)(426003)(83380400001)(107886003)(1076003)(336012)(26005)(2616005)(6666004)(7696005)(2906002)(110136005)(316002)(16526019)(478600001)(5660300002)(8676002)(4326008)(41300700001)(7416002)(8936002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 07:02:05.1478
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	QADpamWyXRTgZs1+12uBUO4T2xG3yw7yFOGuBA3hUT3R8/NtQu9m4NeHP1Mugh/71eQGV6HJeHGQeY4AR8ZCQP0ytHPd7Tt9K9oxQRlXfmwsLeeG/chvj4lXAvOfjwAj4K8gWe6LShvy3of0PUvd9T+G17wFRnbu1IxHYxSfUdzlwq/heDes1oJFumAkIAVsZ/94AsS+aS4CT1fNfptRMIgu+d8ZmK0J6wPYb6se/BX2c9DyZHwO7UBlYaHxUrlzjrP5rvHfKP6SbfZMlb/O/m6FLe1YtMnOTYychjLG8xniXiQx415+8sQ8iB/1PZpCozqIN/QOwh7twHuP8FIZneP4waZ5cCnYfV6W5WBImFeIyFYqXHDunoxbhhDCxMiFHfCsZQpg2Rjudb3RoHI6I+n9Igz3WxjGWP9ABo1gKVunzOCedSDiDWg7+sdreVdXAka/a9CzWUyeLhBnWNZPSn2qxqf1qiDqp5VneYzV/M4Ean6BwKwJyZhPYVdkCUtb4Mc4BXe6y8szRTVh8QIY/83QIGNFro0jMzlJxPxdkSaYLs9mBjMQXShHmF0HHAEmSNKnlU+wzMQchdo1FTEeNPP74eodh8DxTtxpUIIcT7xalgItp3VLBg4HCijUbXw3NywacuNRj333PYDsE8XXwuStzd//25VCnWHm1hTebHqeA9s3ReAMpfDvzxP2BiESgaunbcpHOYjvGT7+sfGcTXk3rCmuKpVZWeNwxHbmLKxubfMqe709oAqft7Vtj2LTfsYQOALADFiG5uS4jPIP4jlAgbrv5knhA1JuexnyIDfxUpFV4JpkjzJQusc2fKwviQM7/GCzP3THFj0nPKlWrceV8GUV2VN2wDtpx97nVQizMS1k5pIw2/cSmpQj1vhj77alBXUiiFQVj5/ojkR4lKAZ39sAXy/xJPcws68auFE=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c00efec9-80fe-4d8f-78f6-08dbf19eed2b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2023 12:21:48.9065
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2acd1a97-1971-4327-17af-08dbf17242d5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF0000150A.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8985
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IFKl69OHqdWgWiChS1NOLpxyvEKQwoKovm9P790FsG4lPnZqmgYQFOT2MBw6VkU7CV1oTPtrhZDsJSGu+jaWzLaLWNZooSw3LyXL0hrqYTk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB8409
 
-Improve block layer request handling by implementing a timeout handler.
-Current implementation assums that request will never timeout and will
-be completed by underlaying transport. However, this assumption can
-cause issues under heavy load especially when dealing with different
-subsystems and real hardware.
-
-To solve this, add a block layer request timeout handler that will
-complete timed-out requests in the same context if the virtio device
-has a VIRTIO_CONFIG_S_DRIVER_OK status. If the device has any other
-status, we'll stop the block layer request queue and proceed with the
-teardown sequence, allowing applications waiting for I/O to exit
-gracefully with appropriate error.
-
-Also, add two new module parameters that allows user to specify the
-I/O timeout for the tagset when allocating the disk and a teardown limit
-for the timed out requeets before we initiate device teardown from the
-timeout handler. These changes will improve the stability and
-reliability of our system under request timeout scenario.
-
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- drivers/block/virtio_blk.c      | 122 ++++++++++++++++++++++++++++++++
- include/uapi/linux/virtio_blk.h |   1 +
- 2 files changed, 123 insertions(+)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 4689ac2e0c0e..da26c2bf933b 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -16,6 +16,7 @@
- #include <linux/blk-mq-virtio.h>
- #include <linux/numa.h>
- #include <linux/vmalloc.h>
-+#include <linux/xarray.h>
- #include <uapi/linux/virtio_ring.h>
- 
- #define PART_BITS 4
-@@ -31,6 +32,15 @@
- #define VIRTIO_BLK_INLINE_SG_CNT	2
- #endif
- 
-+static unsigned int io_timeout = 20;
-+module_param(io_timeout, uint, 0644);
-+MODULE_PARM_DESC(io_timeout, "timeout in seconds for I/O requests. Default:20");
-+
-+static unsigned int timeout_teardown_limit = 2;
-+module_param(timeout_teardown_limit, uint, 0644);
-+MODULE_PARM_DESC(timeout_teardown_limit,
-+		"request timeout teardown limit for stable dev. Default:2");
-+
- static unsigned int num_request_queues;
- module_param(num_request_queues, uint, 0644);
- MODULE_PARM_DESC(num_request_queues,
-@@ -84,6 +94,20 @@ struct virtio_blk {
- 
- 	/* For zoned device */
- 	unsigned int zone_sectors;
-+
-+	/*
-+	 * Block layer Request timeout teardown limit when device is in the
-+	 * stable state, i.e. it has VIRTIO_CONFIG_S_DRIVER_OK value for its
-+	 * config status. Once this limit is reached issue
-+	 * virtblk_teardown_work to teardown the device in the block lyaer
-+	 * request timeout callback.
-+	 */
-+	atomic_t rq_timeout_count;
-+	/* avoid tear down race between remove and teardown work */
-+	struct mutex teardown_mutex;
-+	/* tear down work to be scheduled from block layer request handler */
-+	struct work_struct teardown_work;
-+
- };
- 
- struct virtblk_req {
-@@ -117,6 +141,8 @@ static inline blk_status_t virtblk_result(u8 status)
- 	case VIRTIO_BLK_S_OK:
- 		return BLK_STS_OK;
- 	case VIRTIO_BLK_S_UNSUPP:
-+	case VIRTIO_BLK_S_TIMEOUT:
-+		return BLK_STS_TIMEOUT;
- 		return BLK_STS_NOTSUPP;
- 	case VIRTIO_BLK_S_ZONE_OPEN_RESOURCE:
- 		return BLK_STS_ZONE_OPEN_RESOURCE;
-@@ -926,6 +952,7 @@ static void virtblk_free_disk(struct gendisk *disk)
- 	struct virtio_blk *vblk = disk->private_data;
- 
- 	ida_free(&vd_index_ida, vblk->index);
-+	mutex_destroy(&vblk->teardown_mutex);
- 	mutex_destroy(&vblk->vdev_mutex);
- 	kfree(vblk);
- }
-@@ -1287,6 +1314,86 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 	return found;
- }
- 
-+static bool virtblk_cancel_request(struct request *rq, void *data)
-+{
-+	struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
-+
-+	vbr->in_hdr.status = VIRTIO_BLK_S_TIMEOUT;
-+	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
-+		blk_mq_complete_request(rq);
-+
-+	return true;
-+}
-+
-+static void virtblk_teardown_work(struct work_struct *w)
-+{
-+	struct virtio_blk *vblk =
-+		container_of(w, struct virtio_blk, teardown_work);
-+	struct request_queue *q = vblk->disk->queue;
-+	struct virtio_device *vdev = vblk->vdev;
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long idx;
-+
-+	mutex_lock(&vblk->teardown_mutex);
-+	if (!vblk->vdev)
-+		goto unlock;
-+
-+	blk_mq_quiesce_queue(q);
-+
-+	/* Process any outstanding request from device. */
-+	xa_for_each(&q->hctx_table, idx, hctx)
-+		virtblk_poll(hctx, NULL);
-+
-+	blk_sync_queue(q);
-+	blk_mq_tagset_busy_iter(&vblk->tag_set, virtblk_cancel_request, vblk);
-+	blk_mq_tagset_wait_completed_request(&vblk->tag_set);
-+
-+	/*
-+	 * Unblock any pending dispatch I/Os before we destroy device. From
-+	 * del_gendisk() -> __blk_mark_disk_dead(disk) will set GD_DEAD flag,
-+	 * that will make sure any new I/O from bio_queue_enter() to fail.
-+	 */
-+	blk_mq_unquiesce_queue(q);
-+	del_gendisk(vblk->disk);
-+	blk_mq_free_tag_set(&vblk->tag_set);
-+
-+	mutex_lock(&vblk->vdev_mutex);
-+	flush_work(&vblk->config_work);
-+
-+	virtio_reset_device(vdev);
-+
-+	vblk->vdev = NULL;
-+
-+	vdev->config->del_vqs(vdev);
-+	kfree(vblk->vqs);
-+
-+	mutex_unlock(&vblk->vdev_mutex);
-+
-+	put_disk(vblk->disk);
-+
-+unlock:
-+	mutex_unlock(&vblk->teardown_mutex);
-+}
-+
-+static enum blk_eh_timer_return virtblk_timeout(struct request *req)
-+{
-+	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
-+	struct virtio_device *vdev = vblk->vdev;
-+	bool ok = vdev->config->get_status(vdev) & VIRTIO_CONFIG_S_DRIVER_OK;
-+
-+	if ((atomic_dec_return(&vblk->rq_timeout_count) != 0) && ok) {
-+		virtblk_cancel_request(req, NULL);
-+		return BLK_EH_DONE;
-+	}
-+
-+	dev_err(&vdev->dev, "%s:%s initiating teardown\n", __func__,
-+		vblk->disk->disk_name);
-+
-+	queue_work(virtblk_wq, &vblk->teardown_work);
-+
-+	return BLK_EH_RESET_TIMER;
-+}
-+
- static const struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
- 	.queue_rqs	= virtio_queue_rqs,
-@@ -1294,6 +1401,7 @@ static const struct blk_mq_ops virtio_mq_ops = {
- 	.complete	= virtblk_request_done,
- 	.map_queues	= virtblk_map_queues,
- 	.poll		= virtblk_poll,
-+	.timeout	= virtblk_timeout,
- };
- 
- static unsigned int virtblk_queue_depth;
-@@ -1365,6 +1473,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
- 	vblk->tag_set.ops = &virtio_mq_ops;
- 	vblk->tag_set.queue_depth = queue_depth;
-+	vblk->tag_set.timeout = io_timeout * HZ;
- 	vblk->tag_set.numa_node = NUMA_NO_NODE;
- 	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
- 	vblk->tag_set.cmd_size =
-@@ -1387,6 +1496,10 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	}
- 	q = vblk->disk->queue;
- 
-+	mutex_init(&vblk->teardown_mutex);
-+	INIT_WORK(&vblk->teardown_work, virtblk_teardown_work);
-+	atomic_set(&vblk->rq_timeout_count, timeout_teardown_limit);
-+
- 	virtblk_name_format("vd", index, vblk->disk->disk_name, DISK_NAME_LEN);
- 
- 	vblk->disk->major = major;
-@@ -1598,6 +1711,12 @@ static void virtblk_remove(struct virtio_device *vdev)
- {
- 	struct virtio_blk *vblk = vdev->priv;
- 
-+	mutex_lock(&vblk->teardown_mutex);
-+
-+	/* we did the cleanup in the timeout handler */
-+	if (!vblk->vdev)
-+		goto unlock;
-+
- 	/* Make sure no work handler is accessing the device. */
- 	flush_work(&vblk->config_work);
- 
-@@ -1618,6 +1737,9 @@ static void virtblk_remove(struct virtio_device *vdev)
- 	mutex_unlock(&vblk->vdev_mutex);
- 
- 	put_disk(vblk->disk);
-+
-+unlock:
-+	mutex_unlock(&vblk->teardown_mutex);
- }
- 
- #ifdef CONFIG_PM_SLEEP
-diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-index 3744e4da1b2a..ed864195ab26 100644
---- a/include/uapi/linux/virtio_blk.h
-+++ b/include/uapi/linux/virtio_blk.h
-@@ -317,6 +317,7 @@ struct virtio_scsi_inhdr {
- #define VIRTIO_BLK_S_OK		0
- #define VIRTIO_BLK_S_IOERR	1
- #define VIRTIO_BLK_S_UNSUPP	2
-+#define VIRTIO_BLK_S_TIMEOUT	3
- 
- /* Error codes that are specific to zoned block devices */
- #define VIRTIO_BLK_S_ZONE_INVALID_CMD     3
--- 
-2.40.0
-
+T24gMzAuMTEuMjMgMDI6MzQsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gZGlmZiAtLWdpdCBh
+L2RyaXZlcnMvc2NzaS9zZC5oIGIvZHJpdmVycy9zY3NpL3NkLmgNCj4gaW5kZXggNDA5ZGRhNTM1
+MGQxLi5lNDUzOTEyMmYyYTIgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvc2NzaS9zZC5oDQo+ICsr
+KyBiL2RyaXZlcnMvc2NzaS9zZC5oDQo+IEBAIC0xNTEsNiArMTUxLDcgQEAgc3RydWN0IHNjc2lf
+ZGlzayB7DQo+ICAgCXVuc2lnbmVkCXVyc3dyeiA6IDE7DQo+ICAgCXVuc2lnbmVkCXNlY3VyaXR5
+IDogMTsNCj4gICAJdW5zaWduZWQJaWdub3JlX21lZGl1bV9hY2Nlc3NfZXJyb3JzIDogMTsNCj4g
+Kwlib29sCQlyc2NzIDogMTsgLyogcmVkdWNlZCBzdHJlYW0gY29udHJvbCBzdXBwb3J0ICovDQoN
+CkhpIEJhcnQsDQoNClN0dXBpZCBxdWVzdGlvbiwgZGlkIHlvdSBpbnRlbnRpb25hbGx5IGRvIGEg
+Ym9vbGVhbiBiaXRmaWxlZD8gSSdtIGp1c3QgDQphc2tpbmcgYXMgSSd2ZSBuZXZlciBzZWVuIHNv
+bWV0aGluZyBsaWtlIHRoaXMgYmVmb3JlIGFuZCBpdCBkb2Vzbid0IG1ha2UgDQp0byBtdWNoIHNl
+bnNlIHRvIG1lIGVpdGhlci4NCg0KVGhhbmtzLA0KCUpvaGFubmVzDQoNCg==
