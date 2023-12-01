@@ -1,53 +1,50 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WaFXCE2L"
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A18C1A8
-	for <linux-block@vger.kernel.org>; Fri,  1 Dec 2023 07:28:28 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-285b88b9917so2095140a91.1
-        for <linux-block@vger.kernel.org>; Fri, 01 Dec 2023 07:28:28 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d+rb3WJH"
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B085510F9
+	for <linux-block@vger.kernel.org>; Fri,  1 Dec 2023 07:40:02 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6cda22140f2so2152384b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 01 Dec 2023 07:40:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1701444508; x=1702049308; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1701445202; x=1702050002; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FTQGEo0Gq1nAGsQuhkH/fxmAkBokmUii6biJ9HXJbEc=;
-        b=WaFXCE2LN8j4vCk/fzP4+F6EMxM0eIttL+9WHmAN0PIFs9yxzyHN1Hqg4rkrBHa+iW
-         A/RW16uq4FZ2xaw5WW6p154GCLcUGTYU034FEkdbPf4cK3w1tjhkZ5e7h6WvL4JYFaVu
-         Dr898dOkgfUODKq8+cMKrvTmPqP+ElJAb6kWg=
+        bh=G9oaS+0gU261k2uWs6spLStzxvx1k70fRoFnE2M4u0w=;
+        b=d+rb3WJHGym2pFkD/wN2sbhxQOBcbW1qBemgTnA61+mLn46/Gti4Nkr0o6a0Xi4S5Y
+         ACsq3Lmq0BTUQQTjLAkCfAClmWtgVI7ULrvcBgwR5gB2+4vK88RZ8ex13zgaH5SQIfg7
+         mOXBJwvyshDYy0tRqBfhqgLQRYp7GFTwejWbE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701444508; x=1702049308;
+        d=1e100.net; s=20230601; t=1701445202; x=1702050002;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FTQGEo0Gq1nAGsQuhkH/fxmAkBokmUii6biJ9HXJbEc=;
-        b=nvhF4ARhKEmdPcH2FaVx5Q96bo4egB8xPiYyCZiJx+gsjZXrgaR3NuotW08uDmLLX8
-         2yTjdOpQbi1sQkZYUTrfodunNlymfSIk8kd7RvzBsve8hf837h79/Yk3GUOlWgPnD6pT
-         qzmY6YhYr5BCDshNQZ9gc8RBONtPH2/NzaWO3xXSRb6cyax6vAVmR3UFAB8l/80Kn78q
-         CtJzFbfhBoDe4EM86pVGEySAzAPPZscfhT09EU8v047KbGBFMVUbeXcF2NUX4fTg2gEp
-         ckVhHh9wJ4dx1nka9l7WKkqdzhGa4jpBXdz40iEs9fwS7/8ax+cQjji2Ra0R9YsUcY8V
-         GJfw==
-X-Gm-Message-State: AOJu0YxxfohQhrzm+4faCplff/aPOxu66rKrrczJ4EC26sRS62cA8dJn
-	m1T/3ill4iZPyvN5OKIeJ/Du0g==
-X-Google-Smtp-Source: AGHT+IGyzIRPsoTkJUx2/cJ2/b+BFFvAkGivUhdUfjYH+m/ZgroTLcGiGQCB8NPG+GM90Z9kn3Px5A==
-X-Received: by 2002:a17:90b:1c07:b0:285:a179:7218 with SMTP id oc7-20020a17090b1c0700b00285a1797218mr22275548pjb.9.1701444507773;
-        Fri, 01 Dec 2023 07:28:27 -0800 (PST)
+        bh=G9oaS+0gU261k2uWs6spLStzxvx1k70fRoFnE2M4u0w=;
+        b=grng3yvWIpK2dy+YbU2dapMTt9TGL932e77RN2wW3l8PkJ1AvKG+8XFrEfufwelL73
+         rTSeXow0nuL3uLqZujYHRXqoDLDO+hW9oUcSvu8uRimlvcovzAmOaqhtErJWlYW0San/
+         CKvVFglfDaidpLSikIHalLczxAzUgG9zAkecNzANI9FgxLLEAvx6W+RMijfW1GuG4uCa
+         qQHJVx4SMjP+/vPncgyFt8PVujfKhW3U8/SFMv01FDZuLxFQUhlOi/TazcFLFA3rgbpo
+         BuBKm3em3wwtwUfP+q+tB142kxrQ6oaAWzd60rXSmjsyxw6CHnjKvx9jUyy3mvo9XrNF
+         J2iA==
+X-Gm-Message-State: AOJu0YzEI70sYjgNLfzBABXAAieLbI9WrDKf9XrriZ5+iGCbQHMbVaI0
+	bg7O4Svp1nvJhbtavtrluARmdw==
+X-Google-Smtp-Source: AGHT+IGhQn5UrTUK1szrIeIHpzJcwNpeIds1j1OPt871QrmLHqC1ZmzkZIOjVP/UYeskS09TpMTlnQ==
+X-Received: by 2002:a05:6a20:918e:b0:18b:8dfa:8895 with SMTP id v14-20020a056a20918e00b0018b8dfa8895mr31246058pzd.17.1701445202091;
+        Fri, 01 Dec 2023 07:40:02 -0800 (PST)
 Received: from google.com (KD124209171220.ppp-bb.dion.ne.jp. [124.209.171.220])
-        by smtp.gmail.com with ESMTPSA id ck11-20020a17090afe0b00b0028593e9eaadsm1433594pjb.31.2023.12.01.07.28.24
+        by smtp.gmail.com with ESMTPSA id z16-20020aa79e50000000b006c69820065bsm3238369pfq.176.2023.12.01.07.39.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 07:28:27 -0800 (PST)
-Date: Sat, 2 Dec 2023 00:28:22 +0900
+        Fri, 01 Dec 2023 07:40:01 -0800 (PST)
+Date: Sat, 2 Dec 2023 00:39:56 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>, Dongyun Liu <dongyun.liu3@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org,
+To: Dongyun Liu <dongyun.liu3@gmail.com>
+Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk,
 	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
 	lincheng.yang@transsion.com, jiajun.ling@transsion.com,
 	ldys2014@foxmail.com, Dongyun Liu <dongyun.liu@transsion.com>
 Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
  bitmap memory in backing_dev_store
-Message-ID: <20231201152822.GA404241@google.com>
+Message-ID: <20231201153956.GB404241@google.com>
 References: <20231130152047.200169-1-dongyun.liu@transsion.com>
- <feb0a163-c1d3-4087-96dc-f64d0dde235b@kernel.dk>
- <3af0752f-0534-43c4-913f-4d4df8c8501b@gmail.com>
- <b26ab8d0-c719-4bf6-b909-26f4c014574b@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,32 +53,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b26ab8d0-c719-4bf6-b909-26f4c014574b@kernel.dk>
+In-Reply-To: <20231130152047.200169-1-dongyun.liu@transsion.com>
 
-On (23/12/01 07:19), Jens Axboe wrote:
-> >> IOW, you have a slew of GFP_KERNEL allocations in there, and you
-> >> probably just patched the largest one. But the core issue remains.
-> >>
-> >> The whole handling of backing_dev_store() looks pretty broken.
-> >>
-> > 
-> > Indeed, this patch only solves the biggest problem and does not
-> > fundamentally solve it, because there are many processes for holding
-> > zram->init_lock before allocation memory in backing_dev_store that
-> > need to be fully modified, and I did not consider it thoroughly.
-> > Obviously, a larger and better patch is needed to eliminate this risk,
-> > but it is currently not necessary.
-> 
-> You agree that it doesn't fix the issue, it just happens to fix the one
-> that you hit. And then you jump to the conclusion that this is all
-> that's needed to fix it. Ehm, confused?
+On (23/11/30 23:20), Dongyun Liu wrote:
+> INFO: task init:331 blocked for more than 120 seconds.  "echo 0 >
+> /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:init   state:D stack:    0 pid:    1 ppid:     0 flags:0x04000000
+> Call trace:
+>   __switch_to+0x244/0x4e4
+>   __schedule+0x5bc/0xc48
+>   schedule+0x80/0x164
+>   rwsem_down_read_slowpath+0x4fc/0xf9c
+>   __down_read+0x140/0x188
+>   down_read+0x14/0x24
+>   try_wakeup_wbd_thread+0x78/0x1ec [zram]
+>   __zram_bvec_write+0x720/0x878 [zram]
+>   zram_bvec_rw+0xa8/0x234 [zram]
+>   zram_submit_bio+0x16c/0x268 [zram]
+>   submit_bio_noacct+0x128/0x3c8
+>   submit_bio+0x1cc/0x3d0
+>   __swap_writepage+0x5c4/0xd4c
+>   swap_writepage+0x130/0x158
+>   pageout+0x1f4/0x478
+>   shrink_page_list+0x9b4/0x1eb8
+>   shrink_inactive_list+0x2f4/0xaa8
+>   shrink_lruvec+0x184/0x340
+>   shrink_node_memcgs+0x84/0x3a0
+>   shrink_node+0x2c4/0x6c4
+>   shrink_zones+0x16c/0x29c
+>   do_try_to_free_pages+0xe4/0x2b4
+>   try_to_free_pages+0x388/0x7b4
+>   __alloc_pages_direct_reclaim+0x88/0x278
+>   __alloc_pages_slowpath+0x4ec/0xf6c
+>   __alloc_pages_nodemask+0x1f4/0x3dc
+>   kmalloc_order+0x54/0x338
+>   kmalloc_order_trace+0x34/0x1bc
+>   __kmalloc+0x5e8/0x9c0
+>   kvmalloc_node+0xa8/0x264
+>   backing_dev_store+0x1a4/0x818 [zram]
+>   dev_attr_store+0x38/0x8c
+>   sysfs_kf_write+0x64/0xc4
 
-Yeah.
-
-zram is very sensitive to memory - zsmalloc pool needs physical pages
-(allocated on demand) to keep data written to zram. zram probably simply
-should not be used on systems under such heavy memory pressure. Throwing
-GPF_ATOMICs at zram isn't going to fix anything.
-
-Jens, you said that zram's backing device handling is broken. Got a minute
-to elaborate?
+Hmm, I'm not really following this backtrace. Backing device
+configuration is only possible on un-initialized zram device.
+If it's uninitialized, then why is it being used for swapout
+later in the call stack?
