@@ -1,37 +1,55 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34903194
-	for <linux-block@vger.kernel.org>; Fri,  1 Dec 2023 10:18:51 -0800 (PST)
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-423dba21f1aso13100391cf.1
-        for <linux-block@vger.kernel.org>; Fri, 01 Dec 2023 10:18:51 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TYqZAYcj"
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC40A1A4;
+	Fri,  1 Dec 2023 10:41:41 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1ce3084c2d1so7550845ad.3;
+        Fri, 01 Dec 2023 10:41:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701456101; x=1702060901; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rTk3l7fJ0YyK9LiTzqj/CkwfO59coSl4jyO6pTu6AKo=;
+        b=TYqZAYcjpYU8wDgpEpigmwJgOj0Fq0BxuT2fJy+4PWDx+3RTRGZrEYUh4YsxDtZQz6
+         +ZFd5ZkGl0BbNjD+ypRFlBl5bFvYX+oobtRq2ae1hTd0tycpaaef4jGcP3q/f5GiqzqW
+         Zs/vE4cFfVA8Ixs3iA/G1e6n1rteI3wI9anmiulU8G8bmSwIkR8m+kdYKdron/2xwVmC
+         AkQd3V6LWE4AI+QnIkyw7u7z18+osTQUFjvCCMlMvKY0H7abC4v0+BHBDVqN3cT2ViSW
+         Ivdz/cqoaR7k+nVAho3LkyRfB8avQK19Wibg0v1u3ZeRGFf9YgQ1UGytUA5uduJytJgK
+         haZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701454730; x=1702059530;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gw1s8OwBOFau4DTTIbfvWAMkH6j53iHIsgYJgD8NB4E=;
-        b=wrS3KOmRiAEtCyobg+dfUvip9KnFMONOcyEv+A+5hYFvC7+dXGkMNRFvjI2tQuEfPN
-         ncgnktiliYHeullfh798VBhqpPaRnHG0a+OjWfTIsmOqW+ppqZLxMnyZKJbe0nyqEFuy
-         p3CWvZ7QClYJ8XRFM7BftU59sGrtwDwRq2w0PxvGSrbhIHU/dTJnzDB/Kw0GKiHhaxiE
-         7DlCDg78r1s2bWLM56X+kLkfzJTnV3xoddRQrFoIR4JIEJQl8bGOCQ2ZGfkq0jiSI3u5
-         fm88tCgBG0zD31hpKm8kzdVPHadANfLwMpFBe4tkyx0SNTRBACJhQwBGT9S2ipW8S0Mu
-         TfsQ==
-X-Gm-Message-State: AOJu0Yw9w9WCOtToKCSSwmQ5fCR9kfWb1j2Mq64fsgAbskK+cq25ve03
-	RsJw4HC8lNDJDR0dOpRPvt2Angf8QKIeIh/WOQ==
-X-Google-Smtp-Source: AGHT+IFfC1J4GajOpkujBfQtoLuov3Wdmf+LAOECf4lApqlZkdRh1g/YzzszFzOcOqGzORNm7z1EjA==
-X-Received: by 2002:ac8:590d:0:b0:417:b55d:dfa0 with SMTP id 13-20020ac8590d000000b00417b55ddfa0mr30300367qty.0.1701454730183;
-        Fri, 01 Dec 2023 10:18:50 -0800 (PST)
-Received: from localhost ([62.182.99.157])
-        by smtp.gmail.com with ESMTPSA id s6-20020ac87586000000b004181a8a3e2dsm1697242qtq.41.2023.12.01.10.18.49
+        d=1e100.net; s=20230601; t=1701456101; x=1702060901;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rTk3l7fJ0YyK9LiTzqj/CkwfO59coSl4jyO6pTu6AKo=;
+        b=DeqDHFvPnCZLKuGVZcpfm3zrqZBT6lW2WVaqSPMFQ5TKqScbA2WxkbBLAzCbvdF8Ks
+         LMsg/6d0bPHjf6tpT2YVXsgNDvYuHi7KTXYUIoq7Nta8Q/VinfCHTnjqcbg7aU2wN8M1
+         UDaULOI0cITKhS0bCht/g5h9WZ6B+NEUThW+oOBEkq38jcBkJgfQTwYNXBFDffc+4zaE
+         MYdy5hrXbteQdr3J3rcp2eo/KsqMlSN0mWfZ6CjhjeJOXNVRBlr+nAd5QBik09+q0eJq
+         fbm3NswGNl8WKwVFz1h62T8O4BUuBbJVyy2lt6IN6SM5jkxt5A4SGdWV/UahwytoI+Sj
+         sruw==
+X-Gm-Message-State: AOJu0Ywf873hPUu5aPesoEC8FYjlBGCh2sUldySRcTik7KW7+x2uIqZW
+	4Ox0xfXcnCRKftxupaJw0T8=
+X-Google-Smtp-Source: AGHT+IH8uuVyy0xQcI2Dtm+XIq2vpPWkRjB/VzMHGSFrcGn5ya/+GGU7blbsl0Q+mlj6sB8F5MeXPQ==
+X-Received: by 2002:a17:903:183:b0:1cf:6590:70 with SMTP id z3-20020a170903018300b001cf65900070mr32676849plg.23.1701456101173;
+        Fri, 01 Dec 2023 10:41:41 -0800 (PST)
+Received: from google.com ([2620:0:1000:8411:affa:609d:2701:8e46])
+        by smtp.gmail.com with ESMTPSA id x12-20020a170902ea8c00b001c736b0037fsm1855643plb.231.2023.12.01.10.41.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 10:18:49 -0800 (PST)
-Date: Fri, 1 Dec 2023 13:18:48 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	Alasdair G Kergon <agk@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>, Wu Bo <bo.wu@vivo.com>
-Subject: [git pull] device mapper fixes for 6.7-rc4
-Message-ID: <ZWojiLENEOmcKFCo@redhat.com>
+        Fri, 01 Dec 2023 10:41:40 -0800 (PST)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date: Fri, 1 Dec 2023 10:41:38 -0800
+From: Minchan Kim <minchan@kernel.org>
+To: Dongyun Liu <dongyun.liu3@gmail.com>
+Cc: senozhatsky@chromium.org, axboe@kernel.dk, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, lincheng.yang@transsion.com,
+	jiajun.ling@transsion.com, ldys2014@foxmail.com,
+	Dongyun Liu <dongyun.liu@transsion.com>
+Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
+ bitmap memory in backing_dev_store
+Message-ID: <ZWoo4tbvN99LH7Fs@google.com>
+References: <20231130152047.200169-1-dongyun.liu@transsion.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,55 +58,100 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20231130152047.200169-1-dongyun.liu@transsion.com>
 
-Hi Linus,
+On Thu, Nov 30, 2023 at 11:20:47PM +0800, Dongyun Liu wrote:
+> We encountered a deadlock issue when using zram on kernel version 5.10.
+> The reason is that the backing_dev_store will first hold the
+> zram->init_lock, and then it will allocate memory with kvmalloc_node. At
+> this moment, the system may be in a state of memory shortage, so it will
+> enter the memory swapping process. In zram_bvec_write, we will trigger
+> our own thread to move data from zram to the backing device to free up
+> more available memory, which is the work done in the
+> try_wakeup_zram_wbd. In this function, zram->init_lock will be acquired
+> again to read zram->bd_wb_limit, which causes a deadlock as follow call
+> trace.
 
-The following changes since commit 2cc14f52aeb78ce3f29677c2de1f06c0e91471ab:
+Isn't it your custom feature instead of upstream?
 
-  Linux 6.7-rc3 (2023-11-26 19:59:33 -0800)
+> 
+> The latest version of Linux does not have the bug, but a potential risk
+> in future.If we try to acquire zram->init_lock again in the zram process
+> (for example, when we need to read zram->bd_wb_limit), there is a risk
+> of deadlock. The bug is quite elusive, and it only appears with low
 
-are available in the Git repository at:
+It would be very helpful if you show how the zram in the upstream could
+cause the deadlock instead of your custom feature.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/dm-6.7/dm-fixes-2
-
-for you to fetch changes up to 41e05548fa6b069a2b895cf4c7bd9ad618b21e2f:
-
-  dm-flakey: start allocating with MAX_ORDER (2023-11-29 15:47:55 -0500)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Fix DM verity target's FEC support to always initialize IO before it
-  frees it.  Also fix alignment of struct dm_verity_fec_io within the
-  per-bio-data.
-
-- Fix DM verity target to not FEC failed readahead IO.
-
-- Update DM flakey target to use MAX_ORDER rather than MAX_ORDER - 1.
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmVqIjwACgkQxSPxCi2d
-A1pcwAgA00/Fln0p84cD3wFKauC61RALx5awoS0S2obAN+JY9yLs3xl1XDm92HyI
-9giOXofHVKIlOQW6qASfZoCNGvtKPCVoKZF9KXKCqpK8wyKpuuG+yTPVeSsOK/fw
-pKcPp3FyXsu+9FXH3oO9xauLPOiGDC7BfIcHFQITHzT7qwMxQcPQ1HwfVwjrWIjG
-lgIQToiSZokBKBWXKyo63SMVkwWhlTdrfG1CJrc0UC9/f6DBMS0RTYJqmNJ3V8ak
-i0QyQdGZxc9TFuZe/G+Oq381z+X42iRDlluVU3ClMQTyoemQRcySi98CjRLruu7x
-1H79s8ZIaJc/4mkxlJUQingL+dmuGA==
-=Av5r
------END PGP SIGNATURE-----
-
-----------------------------------------------------------------
-Mikulas Patocka (2):
-      dm-verity: align struct dm_verity_fec_io properly
-      dm-flakey: start allocating with MAX_ORDER
-
-Wu Bo (2):
-      dm verity: initialize fec io before freeing it
-      dm verity: don't perform FEC for failed readahead IO
-
- drivers/md/dm-flakey.c        | 2 +-
- drivers/md/dm-verity-fec.c    | 3 ++-
- drivers/md/dm-verity-target.c | 7 +++++--
- drivers/md/dm-verity.h        | 6 ------
- 4 files changed, 8 insertions(+), 10 deletions(-)
+> probability after conducting a week-long stress test using 50 devices.
+> Therefore, I suggest passing the GFP_ATOMIC flag to allocate memory in
+> the backing_dev_store, to avoid similar issues we encountered. Please
+> consider it, Thank you.
+> 
+> INFO: task init:331 blocked for more than 120 seconds.  "echo 0 >
+> /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:init   state:D stack:    0 pid:    1 ppid:     0 flags:0x04000000
+> Call trace:
+>   __switch_to+0x244/0x4e4
+>   __schedule+0x5bc/0xc48
+>   schedule+0x80/0x164
+>   rwsem_down_read_slowpath+0x4fc/0xf9c
+>   __down_read+0x140/0x188
+>   down_read+0x14/0x24
+>   try_wakeup_wbd_thread+0x78/0x1ec [zram]
+>   __zram_bvec_write+0x720/0x878 [zram]
+>   zram_bvec_rw+0xa8/0x234 [zram]
+>   zram_submit_bio+0x16c/0x268 [zram]
+>   submit_bio_noacct+0x128/0x3c8
+>   submit_bio+0x1cc/0x3d0
+>   __swap_writepage+0x5c4/0xd4c
+>   swap_writepage+0x130/0x158
+>   pageout+0x1f4/0x478
+>   shrink_page_list+0x9b4/0x1eb8
+>   shrink_inactive_list+0x2f4/0xaa8
+>   shrink_lruvec+0x184/0x340
+>   shrink_node_memcgs+0x84/0x3a0
+>   shrink_node+0x2c4/0x6c4
+>   shrink_zones+0x16c/0x29c
+>   do_try_to_free_pages+0xe4/0x2b4
+>   try_to_free_pages+0x388/0x7b4
+>   __alloc_pages_direct_reclaim+0x88/0x278
+>   __alloc_pages_slowpath+0x4ec/0xf6c
+>   __alloc_pages_nodemask+0x1f4/0x3dc
+>   kmalloc_order+0x54/0x338
+>   kmalloc_order_trace+0x34/0x1bc
+>   __kmalloc+0x5e8/0x9c0
+>   kvmalloc_node+0xa8/0x264
+>   backing_dev_store+0x1a4/0x818 [zram]
+>   dev_attr_store+0x38/0x8c
+>   sysfs_kf_write+0x64/0xc4
+>   kernfs_fop_write_iter+0x168/0x2ac
+>   vfs_write+0x300/0x37c
+>   ksys_write+0x7c/0xf0
+>   __arm64_sys_write+0x20/0x30
+>   el0_svc_common+0xd4/0x270
+>   el0_svc+0x28/0x98
+>   el0_sync_handler+0x8c/0xf0
+>   el0_sync+0x1b4/0x1c0
+> 
+> Signed-off-by: Dongyun Liu <dongyun.liu@transsion.com>
+> ---
+>  drivers/block/zram/zram_drv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index d77d3664ca08..ee6c22c50e09 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -514,7 +514,7 @@ static ssize_t backing_dev_store(struct device *dev,
+>  
+>  	nr_pages = i_size_read(inode) >> PAGE_SHIFT;
+>  	bitmap_sz = BITS_TO_LONGS(nr_pages) * sizeof(long);
+> -	bitmap = kvzalloc(bitmap_sz, GFP_KERNEL);
+> +	bitmap = kmalloc(bitmap_sz, GFP_ATOMIC);
+>  	if (!bitmap) {
+>  		err = -ENOMEM;
+>  		goto out;
+> -- 
+> 2.25.1
+> 
