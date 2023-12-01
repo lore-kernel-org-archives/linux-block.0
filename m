@@ -1,31 +1,45 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88B5FD5C;
-	Thu, 30 Nov 2023 17:46:39 -0800 (PST)
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1cfcc9b3b5cso530525ad.0;
-        Thu, 30 Nov 2023 17:46:39 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aHwUUq/a"
+Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351E1171B;
+	Thu, 30 Nov 2023 22:51:42 -0800 (PST)
+Received: by mail-oo1-xc42.google.com with SMTP id 006d021491bc7-58cf894544cso992315eaf.3;
+        Thu, 30 Nov 2023 22:51:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701413501; x=1702018301; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5jmob8Yu3ll9DCzld16GfmggolTJuN4mewUYzS+X43o=;
+        b=aHwUUq/a2vta3nlepR6XOLQBWsv09y+WzIBvzreAlNNXVasqLc803q74ZyNPPLWWkY
+         yBkhhzQt3BCiOF/2eJIDx8jWobvokdn6mb0Z1tVMIygcXyXibeDyjbLaerwlw2tUEKmr
+         kUm/87VgPWhBy+b2fIll9n7wpyfeO2JPXx3teJ9lcJHIwZmZE5p8fZBamz4ujurf6EqD
+         yYLqQmb/wWhFyIDHstud70ZHmOS1XTXeCpmRmQC6/2UuXmFVEmgMTcWPm0jXCF/IbqXE
+         AU6k3TltZo1cBumVaJ2gT2PCtMmkI1K73Hg6DAdU9FVZeNdwnxG+0eJLPPjdv9sXWLWM
+         B6kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701395199; x=1701999999;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y5c41QMpOuncUjmqfedNCVrAjDlB3HJLJPB7WrpfBAI=;
-        b=MYPuhvbU+X2hIRyJ5gxRJc1C1faFsiza44mkYXJrqDG9mm/3pUw8wgaSluwsPG+le4
-         07Gn0aGxNgJ5+jFhE3kbOcoo4EqL0xAhDIP7FNgaLaGae32hkVURPfMcoGPS6kfUiJvd
-         AmIGD6dsQfxiChsvPXDoHzNXlFV9RWHQo+RHaGfib4Enjtp520sfifG8gd0C844aIw7H
-         o5+u66rlm6o79yiROAfglqFu4Zu8AlgWG1RWZ+gKpyfCpm5rE8vht4baK+RDSfxYzU8T
-         5zhxg01K2zEM/HceOY4OefXgD3o6VWZPWALocxvbEqXKgnQJLaX70Ubospq9y4VIaZbm
-         gkcQ==
-X-Gm-Message-State: AOJu0YwfnzI/gXrmkBQqoX6SvzSuKbTyegqbMwJCscsv9pKxCND2WCZm
-	66gyW6xSYL2olAmh+z8RWII=
-X-Google-Smtp-Source: AGHT+IGM4qesWNbhDxKcV91xYXAhnvSBMMXbrT2KmmZvLK+u7Lw/S7xaenFCQ05C29xtExDybsW67Q==
-X-Received: by 2002:a17:902:b713:b0:1cf:a509:ab6b with SMTP id d19-20020a170902b71300b001cfa509ab6bmr24822604pls.67.1701395198702;
-        Thu, 30 Nov 2023 17:46:38 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id b1-20020a170902d50100b001cfad034756sm2058131plg.138.2023.11.30.17.46.36
+        d=1e100.net; s=20230601; t=1701413501; x=1702018301;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5jmob8Yu3ll9DCzld16GfmggolTJuN4mewUYzS+X43o=;
+        b=OF7JhqKj4kVm/n7610KUbWitUynbvFBFX4eZjcpDYy8trGpkNEwceccuklSATzRBeE
+         SdtPAMjX8gsg/OHsLI4hSegkbH43FrP3JONnYL7iasnFHj8bE6ZxE+iW54kOzUPM/2Hd
+         Ajyfd+kp7Vlqb4T1Oqs5J6OqYnUo+nUvfRoLbjsVgxM35zJdsryPgN6pdJHH7X4BdtN8
+         48ZI8i9rYfWYwSSCoOt0/fcHE9j3/UoQjr2UZjibxBNgV/KFtpit6J+kRRT6Af9Z3RC2
+         aMupC4Cuz6OXrkB3uOqt1wt2xWcgcOPC3v69ctZhXU0U67ZSVlxxA+mUFWVbeO0zb1H9
+         9iow==
+X-Gm-Message-State: AOJu0YxlJszCyoaZZPPBNiIbDI7O0uu838jbj8iOpw4hvMCekBfkVuPw
+	RYE8NP7SEB3RLxF2CpLbtMY=
+X-Google-Smtp-Source: AGHT+IGXnJn92DPfn/23tvUdSM36vhr5UHs+tjR58VeaUP7vdyCL9XNbonyWSW4j/THC1/OCjPwD1g==
+X-Received: by 2002:a05:6359:150a:b0:170:73d:fce9 with SMTP id jt10-20020a056359150a00b00170073dfce9mr2478497rwb.16.1701413501306;
+        Thu, 30 Nov 2023 22:51:41 -0800 (PST)
+Received: from [10.153.223.34] ([103.40.76.4])
+        by smtp.gmail.com with ESMTPSA id i19-20020a63e453000000b005c1ce3c960bsm2328771pgk.50.2023.11.30.22.51.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Nov 2023 17:46:37 -0800 (PST)
-Message-ID: <7764d824-4b47-486b-9da0-cb779779739a@acm.org>
-Date: Thu, 30 Nov 2023 17:46:35 -0800
+        Thu, 30 Nov 2023 22:51:41 -0800 (PST)
+Message-ID: <3af0752f-0534-43c4-913f-4d4df8c8501b@gmail.com>
+Date: Fri, 1 Dec 2023 14:51:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,79 +47,69 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/17] scsi_proto: Add structures and constants related
- to I/O groups and streams
-Content-Language: en-US
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Daejun Park <daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>
-References: <20231130013322.175290-1-bvanassche@acm.org>
- <20231130013322.175290-10-bvanassche@acm.org>
- <35f9ad75-785c-4724-b28e-a093212bc480@wdc.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <35f9ad75-785c-4724-b28e-a093212bc480@wdc.com>
+Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
+ bitmap memory in backing_dev_store
+To: Jens Axboe <axboe@kernel.dk>, minchan@kernel.org, senozhatsky@chromium.org
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ lincheng.yang@transsion.com, jiajun.ling@transsion.com,
+ ldys2014@foxmail.com, Dongyun Liu <dongyun.liu@transsion.com>
+References: <20231130152047.200169-1-dongyun.liu@transsion.com>
+ <feb0a163-c1d3-4087-96dc-f64d0dde235b@kernel.dk>
+From: Dongyun Liu <dongyun.liu3@gmail.com>
+In-Reply-To: <feb0a163-c1d3-4087-96dc-f64d0dde235b@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/30/23 05:19, Johannes Thumshirn wrote:
-> On 30.11.23 02:34, Bart Van Assche wrote:
->> +/* SBC-5 IO advice hints group descriptor */
->> +struct scsi_io_group_descriptor {
->> +#if defined(__BIG_ENDIAN)
->> +	u8 io_advice_hints_mode: 2;
->> +	u8 reserved1: 3;
->> +	u8 st_enble: 1;
->> +	u8 cs_enble: 1;
->> +	u8 ic_enable: 1;
->> +#elif defined(__LITTLE_ENDIAN)
->> +	u8 ic_enable: 1;
->> +	u8 cs_enble: 1;
->> +	u8 st_enble: 1;
->> +	u8 reserved1: 3;
->> +	u8 io_advice_hints_mode: 2;
->> +#else
->> +#error
->> +#endif
->> +	u8 reserved2[3];
->> +	/* Logical block markup descriptor */
->> +#if defined(__BIG_ENDIAN)
->> +	u8 acdlu: 1;
->> +	u8 reserved3: 1;
->> +	u8 rlbsr: 2;
->> +	u8 lbm_descriptor_type: 4;
->> +#elif defined(__LITTLE_ENDIAN)
->> +	u8 lbm_descriptor_type: 4;
->> +	u8 rlbsr: 2;
->> +	u8 reserved3: 1;
->> +	u8 acdlu: 1;
->> +#else
->> +#error
->> +#endif
->> +	u8 params[2];
->> +	u8 reserved4;
->> +	u8 reserved5[8];
->> +};
->> +
->> +static_assert(sizeof(struct scsi_io_group_descriptor) == 16);
+
+
+On 2023/11/30 23:37, Jens Axboe wrote:
+> On 11/30/23 8:20 AM, Dongyun Liu wrote:
+>> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+>> index d77d3664ca08..ee6c22c50e09 100644
+>> --- a/drivers/block/zram/zram_drv.c
+>> +++ b/drivers/block/zram/zram_drv.c
+>> @@ -514,7 +514,7 @@ static ssize_t backing_dev_store(struct device *dev,
+>>   
+>>   	nr_pages = i_size_read(inode) >> PAGE_SHIFT;
+>>   	bitmap_sz = BITS_TO_LONGS(nr_pages) * sizeof(long);
+>> -	bitmap = kvzalloc(bitmap_sz, GFP_KERNEL);
+>> +	bitmap = kmalloc(bitmap_sz, GFP_ATOMIC);
+>>   	if (!bitmap) {
+>>   		err = -ENOMEM;
+>>   		goto out;
 > 
-> Have you considered using GENMASK() and FILED_GET() for this? All the
-> ifdefs make the header rather ugly.
-Hi Johannes,
+> Outside of this moving from a zeroed alloc to one that does not, the
+> change looks woefully incomplete. Why does this allocation need to be
+> GFP_ATOMIC, and:
 
-When using bitfields, there are #ifdefs in the data structure
-definitions but it is easy to write code that accesses the bitfields.
-When using FIELD_GET(), the data structure definitions have no ifdefs
-but the code that reads bitfields becomes harder to verify. The code
-for setting bitfield values would have to use FIELD_PREP() and hence
-would become more complex. An example of code that sets bitfields is
-the definition of the gr_m_pg data structure in patch 15/17 of this
-series. It would become more complicated if FIELD_PREP() would have to
-be used in the definition of that data structure.
+By using GFP_ATOMIC, it indicates that the caller cannot reclaim or 
+sleep, although we can prevent the risk of  deadlock when acquiring the 
+zram->lock again in zram_bvec_write.
 
-Thanks,
+> 
+> 1) file_name = kmalloc(PATH_MAX, GFP_KERNEL); does not
 
-Bart.
+There is no zram->init_lock held here, so there is no need to use
+GFP_ATOMIC.
+
+> 2) filp_open() -> getname_kernel() -> __getname() does not
+> 3) filp_open() -> getname_kernel() does not
+> 4) bdev_open_by_dev() does not
+
+Missing the use of GFP_ATOMIC.
+
+> 
+> IOW, you have a slew of GFP_KERNEL allocations in there, and you
+> probably just patched the largest one. But the core issue remains.
+> 
+> The whole handling of backing_dev_store() looks pretty broken.
+> 
+
+Indeed, this patch only solves the biggest problem and does not
+fundamentally solve it, because there are many processes for holding
+zram->init_lock before allocation memory in backing_dev_store that need
+to be fully modified, and I did not consider it thoroughly. Obviously,
+a larger and better patch is needed to eliminate this risk, but it is 
+currently not necessary.
+
+Thank you for your kind and patient.
