@@ -1,54 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PqtBY3w0"
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19CBF10F3
-	for <linux-block@vger.kernel.org>; Fri,  1 Dec 2023 06:31:57 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1d03f03cda9so2888425ad.0
-        for <linux-block@vger.kernel.org>; Fri, 01 Dec 2023 06:31:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pV3PV+LR"
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B9EE10FF
+	for <linux-block@vger.kernel.org>; Fri,  1 Dec 2023 06:34:59 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6ce037af327so35478b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 01 Dec 2023 06:34:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701441116; x=1702045916; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701441299; x=1702046099; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zzHdrxbE+4IR0FivfBKMmGVbB7CluWJO99FUenfBkYg=;
-        b=PqtBY3w0tUezu3cxy7Th4rGbAp8BXR8YnYX/07POVHmqKl4HL13fXanUfYfLkigANX
-         i6PLQm16TZ9rCMbLQXg/0PZ3gQqUFlJHG1NYwZPYJnnWd5zeKxTGRAMm4WZqzaTePpfC
-         hBR7F3hbMJPydvX4SlTB/mjwcKV4BxrFZ+9wNMvF8/B0anZneBmIxSbeCQixI9eU6D06
-         hrOX69VTACfiWKOZ4H2cGDlAiWB/Wy8EoRm8UG0OqlF6WKirRyPse1ZKegvGBUXyIAww
-         zYVfZjbK1lG3y1fNvltarXgbnTOwbsiXDKQ2Fkct9W967K/nONrM1iQRyDnSzxvqQBL5
-         Pr0A==
+        bh=vbJpDoBB1YSZeZRKQ7gAVaLgs3+K+IIQdlIzl9D7qtw=;
+        b=pV3PV+LRCE+E3Io9zbp4kJAvW/W1gFNnkJ7mWNyIXVgSjRAKz7YE1aF3ZicTHZEZO4
+         U1UhWLh1lPD7Y7rPiF2nuPkOY+lZlK2lf84UR8jsbM8bkoecomBSGnf4XRNxqR8zBEm4
+         QvC6U+VZ+PnPqFYDEuKiwPwUpn6ZqN2HuyIWlGG0hqQ3ehWaqA9wyYarYeUri3u1wAjl
+         aBp3rqYKJgpbVsk0ln2BovGQ6OS8v1gL5I6e2JZT/wENkeiiDDIKE8ZelCTJQCAm1Zce
+         /217FTbzgmtKvycjBgWHx6ZINF0vwzsFx9AqdvNSBxsM9npBDbM0aEZGk2zdi7f8mt9A
+         ErSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701441116; x=1702045916;
+        d=1e100.net; s=20230601; t=1701441299; x=1702046099;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zzHdrxbE+4IR0FivfBKMmGVbB7CluWJO99FUenfBkYg=;
-        b=I2LYrdN+FtiHc1iWna672y2RIQzKDfdC/wN6vod1ICVvGaEuYbYEsYun0aC21li6MY
-         e0/bZrvYUq/tierKxvGo2GE42AzgLTKHz5PTlJjsXI5WK+3uaF2A95ibm0nXvFXBryXH
-         EuihR6kXePMfdjqN/T4PFyitLXJu4sWDZGfXYgCrQn11ps+Ody0bCoqs9Ew/pDSj9SiC
-         xO6IWFT5956CU57nht9VCfytgfB6JxDYU4bUNyItds+/8WDP4ZBVnaWmdlmHdkFnosUU
-         irLk/QR1zVYPz1cdMe7cmRZ1acEZEVVt3GwJAO8qpyJwJKesPnmFhC8Pfy/u2b/IIGf7
-         hIqA==
-X-Gm-Message-State: AOJu0YxMBwdnpI0v+Ois0N84pdpnDIwZ6aVOl6h1jtyZCJJMoOg/xsvb
-	i4vWx+LUHygJWGrzBCe6cioodw4kiyu80EPToyxh9Q==
-X-Google-Smtp-Source: AGHT+IGKQel0PYSJFGjry+wiXX7m7Vold0L6JC6m5MPRl+g1ZAm9RBt78CuRt/Y4CreptAfLTMnB4A==
-X-Received: by 2002:a17:902:8d8f:b0:1cf:b192:fab8 with SMTP id v15-20020a1709028d8f00b001cfb192fab8mr5528575plo.1.1701441115596;
-        Fri, 01 Dec 2023 06:31:55 -0800 (PST)
+        bh=vbJpDoBB1YSZeZRKQ7gAVaLgs3+K+IIQdlIzl9D7qtw=;
+        b=wka7tZWqWJh2bJzMVZA+PvEXOi1rZXaIYwjP4teLi3hHsPEbs7ni8pNm5Q/TTdGKxH
+         KKx+XPdX8O7MWTFmLkZmT6CfLj4R0tr8zWR/FnISv978tQTzpcLgCX2IuDWbZZOjtqXV
+         QgkNjyThENuhYYKB9TQWJEBbgxNcnmeSpLNYEkKIRz+bdQR4nXpdHpXX6bgxgoLKTcI9
+         +nu8DYy0nU8G/5XEiNKdYQmlwWtruGubQoIY+jIoJChCc9L58JMyY73nIPtBPnC0577T
+         K//23yxrrCXh0X1vHvytvFwA7Yc+ipvv8O91rRv9/4V26fRBzwK/1fhxsLmxCepkUaWW
+         5uyw==
+X-Gm-Message-State: AOJu0YyLnSdvA/nPDV1KhqnS/TaJdflyhPcu6x7SLQDBMnlta7GkdJxB
+	ADg/YbSVndC6lyism6XiS5MRPupQcn//EFaacsWKmA==
+X-Google-Smtp-Source: AGHT+IGPA+vjWMJV0lb3qP137t6y30XImSiVbKGf/9cHj2+7UGoB8WgATPlgYuBDINzy4sw58zgDiw==
+X-Received: by 2002:a05:6a21:3387:b0:18b:a1d7:a736 with SMTP id yy7-20020a056a21338700b0018ba1d7a736mr5637721pzb.6.1701441298816;
+        Fri, 01 Dec 2023 06:34:58 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id z14-20020a170903018e00b001bf8779e051sm3372390plg.289.2023.12.01.06.31.54
+        by smtp.gmail.com with ESMTPSA id u14-20020a63df0e000000b005b4b70738e5sm3161215pgg.8.2023.12.01.06.34.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 06:31:55 -0800 (PST)
+        Fri, 01 Dec 2023 06:34:58 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: kbusch@kernel.org, hch@lst.de, 
- "kundan.kumar" <kundan.kumar@samsung.com>
-Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20231123190331.7934-1-kundan.kumar@samsung.com>
-References: <CGME20231123191010epcas5p2b775f5b179ac02c3930d2274e3225d76@epcas5p2.samsung.com>
- <20231123190331.7934-1-kundan.kumar@samsung.com>
-Subject: Re: [PATCH v2] block: skip QUEUE_FLAG_STATS and rq-qos for
- passthrough io
-Message-Id: <170144111470.799269.3705701982033211015.b4-ty@kernel.dk>
-Date: Fri, 01 Dec 2023 07:31:54 -0700
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>, 
+ David Jeffery <djeffery@redhat.com>, John Pittman <jpittman@redhat.com>
+In-Reply-To: <20231201085605.577730-1-ming.lei@redhat.com>
+References: <20231201085605.577730-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] blk-mq: don't count completed flush data request as
+ inflight in case of quiesce
+Message-Id: <170144129765.800823.7707457820938578139.b4-ty@kernel.dk>
+Date: Fri, 01 Dec 2023 07:34:57 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,21 +59,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.13-dev-7edf1
 
 
-On Fri, 24 Nov 2023 00:33:31 +0530, kundan.kumar wrote:
-> Write-back throttling (WBT) enables QUEUE_FLAG_STATS on the request
-> queue. But WBT does not make sense for passthrough io, so skip
-> QUEUE_FLAG_STATS processing.
+On Fri, 01 Dec 2023 16:56:05 +0800, Ming Lei wrote:
+> Request queue quiesce may interrupt flush sequence, and the original request
+> may have been marked as COMPLETE, but can't get finished because of
+> queue quiesce.
 > 
-> Also skip rq_qos_issue/done for passthrough io.
-> 
-> Overall, the change gives ~11% hike in peak performance.
+> This way is fine from driver viewpoint, because flush sequence is block
+> layer concept, and it isn't related with driver.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: skip QUEUE_FLAG_STATS and rq-qos for passthrough io
-      commit: 6e2d4b77c252b6f6e47dadf1ceaeee4ebe97eff4
+[1/1] blk-mq: don't count completed flush data request as inflight in case of quiesce
+      commit: 0e4237ae8d159e3d28f3cd83146a46f576ffb586
 
 Best regards,
 -- 
