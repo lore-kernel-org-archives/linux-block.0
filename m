@@ -1,443 +1,201 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dslyD9q0"
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C03A13E
-	for <linux-block@vger.kernel.org>; Fri,  1 Dec 2023 04:12:03 -0800 (PST)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c9d2ca9a96so18554421fa.3
-        for <linux-block@vger.kernel.org>; Fri, 01 Dec 2023 04:12:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="m1ZZ1uz9";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="SrQoyHUa"
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4548E10F4;
+	Fri,  1 Dec 2023 04:52:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1701435167; x=1732971167;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Js0KFV3UKI97T0XaO5YnRpvRJDCqxmtCR3Owdrgfx2Y=;
+  b=m1ZZ1uz9hW41XCVWOvbmAqZ5HuDO9TU5eekzgqdvWeJlY+id+2CpeFaQ
+   pJM/rFMMTteAJz2CfARv2eb7XnU71PAJj0pfENXDIPSe8Iut24pRfXzrK
+   nTNyPWhyRwm9tLJExRZZre1opgH6FFkHf2nbRm9Fz5HaLIaoTzOudFaXZ
+   aj4QjUDbhsEIF0Vl1L2o7xQDrHWUdUycNEEm3lg5QU/K25cwemLrdi1Mm
+   5MDUASz6urRR8X1YdZWo0oJRkDgNBrRUzFVAizzNZrWSFvg7lQZFAND76
+   l9bPVu4ivSPGshVLJFZbaJ8pR7+NZ8cwMVVydSYvGsC9CM8kz1O/bV2ZS
+   Q==;
+X-CSE-ConnectionGUID: XzavS7iITo6fPxockaGJug==
+X-CSE-MsgGUID: TJh3f/4pTaGnaDmxkCpujA==
+X-IronPort-AV: E=Sophos;i="6.04,241,1695657600"; 
+   d="scan'208";a="3762746"
+Received: from mail-bn8nam12lp2169.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.169])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Dec 2023 20:52:44 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GfueiRXZVfNFjImJeq+aTKhv+K2gyAcM0rNr34MZ51xfPZDTzjMh261xUfc+ALH0jnRlIV2ZvTz2zjC/G0LktCSC5NlJTMOlXvKQx1p87ic9ZUYy7MAZB/yo7FcmcdHPp97e9rnhEyhlwivhe0vAcx/ZLR07mP37ALVCNvqQvMHqWPtybgTfWeGRxuGXcJlTD7jGCf5kJR9VKfmVPFX1+OI16CXGX4NiLkexLUUbyzvKvO3P7ZXWsHCzRMhZq5K71ZTCTAAEtcRhDnkS/tQ7p1eoLMsEiq1qHkpX1uC2ERCGw65/6fb38FGwwPU3hg8JnyHCWnEPGcqjZkEnWrPBRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Js0KFV3UKI97T0XaO5YnRpvRJDCqxmtCR3Owdrgfx2Y=;
+ b=clWFCrDL3tTjLhWwb0yCjjD5IBD0crFET8Dv95OIZgcw6QKz9nXp3K8JG4KaeT3mKxJ4jqwYuzwRv8Frb7dumJeYmMSILph6eDs04WWvR1qb7qPH+dnNSeDHHFkUAj9RahNwjxErvtxqNAHwRqTx8NTTx9LkNSx0c9b7fNY8uyr8Gu+IS9+Z4sHggX/rulZj2pXn1U0h4X1HGBh7en8RwIK9Lvq8XiBl1gnd/gCg/on71cak8TLNuh6QV5FvyOHntDuOzBHkWluCni3Qtt6uGFgGnlGW88n30U4w2cHsvS3lSw4/nhx3Ljm0IFvYnJGARZX2Yvb/7JCdXy//FVepew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701432722; x=1702037522; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=frL7+vwmHLpLNUaP06j5E6OidqEcDTdbymMcnf+va+w=;
-        b=dslyD9q0iDl2pTDb3S9uVKb5mxYaX09BLJZ4OdWfQacxNkzumoN6W0j0nu5uMpFcP5
-         eTuMNVIfb0SdkOydnLjOR4IseoyeNgLk3qL0PTn9PE3nHCRSt1dyUmCLTB78Vk+sXaWI
-         sdB4BRBpEjSmnZ3K1iyd6u8ngpNGb0LMcGBC51Ke/P74XDiEa7V3SpNux/Jbcomo4Xuh
-         EbWuD77xAxdiwUM/+Ga9uBnTT4KX5zcc23/LueeSNyh53rCCKgXYz0ewBm+xgAO9BVga
-         OpxAoFq6M0zFhrR8D9lvArMVgV2t0yfr1kmVwBYhgSssiMumKmR2gIUsjZ78KQDtREJa
-         Mc1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701432722; x=1702037522;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=frL7+vwmHLpLNUaP06j5E6OidqEcDTdbymMcnf+va+w=;
-        b=luYm2EeFezmHHAT+CAY7aFBTRQ2a/WejViwSbtQuSq9x2fMYmZlEvdqg3JK70jc4Ou
-         LkMWQBtGuBOvBXEZwNnBQx+/aU2xNurVpihYF0EtDAoxxvIDmhb+z7NX1ru8me/nK+Z5
-         n7gK1Viv5wEFelD1KgvE3mBckQPrAdQeMHvp/Jvy3UoH8vmDDtim82TxUIX+uW+/Kw6R
-         XmnFnVGCjGjneIPKQ0TxYQtjOAOsX1f6t+2XyRiEQsbZDVN3vsIpIyAUvcs111x52lPJ
-         x6zMyWZHjT0epnXinu5D++ui3GazV7gtIvGNSbo3xk+v+abh7OTvUZ6UmZQLWh4GA/q6
-         Q1Yw==
-X-Gm-Message-State: AOJu0YwZlrMUyu2miS6PB+GNRJQjV4zq9b9GUtk7N+DiYhHKennKkimY
-	Oy7OTx9Sy/09oeqOyj4YMwwQliH8qcLNCaC5Fdy2aXYf6kI=
-X-Google-Smtp-Source: AGHT+IGsyQDrtg/CSH2XLZ42xiEs0QRcc1wIlGkK83bB+bIvDUfFlYM3BPW/qUj4WOwkYJg3SjRDU56fltk5lvK4H1w=
-X-Received: by 2002:a2e:3511:0:b0:2c9:b69d:987d with SMTP id
- z17-20020a2e3511000000b002c9b69d987dmr734529ljz.3.1701432721360; Fri, 01 Dec
- 2023 04:12:01 -0800 (PST)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Js0KFV3UKI97T0XaO5YnRpvRJDCqxmtCR3Owdrgfx2Y=;
+ b=SrQoyHUanvxBGBeYkAPQieJvSJU/4Aqs/4wjmOFJxXX0jnjZioIfMEf4RiTiBhpIA2OWMhGb+RNvAEneC0JTsTZUWDoq4JsEs85wo1byoNOpA+yyJBXihl0QxG3Yall8u5i/der4MVVye5w42dn9aYuYBRwBBlDzRdIhRIWYFOA=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by BY5PR04MB6641.namprd04.prod.outlook.com (2603:10b6:a03:22b::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.27; Fri, 1 Dec
+ 2023 12:52:42 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::8ea3:9333:a633:c161]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::8ea3:9333:a633:c161%6]) with mapi id 15.20.7046.024; Fri, 1 Dec 2023
+ 12:52:42 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "Martin K .
+ Petersen" <martin.petersen@oracle.com>, Christoph Hellwig <hch@lst.de>, Ming
+ Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>, Damien Le Moal
+	<damien.lemoal@opensource.wdc.com>, Yu Kuai <yukuai1@huaweicloud.com>, Ed
+ Tsai <ed.tsai@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
+Thread-Topic: [PATCH v6 1/4] block: Make fair tag sharing configurable
+Thread-Index: AQHaI8PiMVKilih9yEiHNC40E6j3brCUYwKA
+Date: Fri, 1 Dec 2023 12:52:42 +0000
+Message-ID: <e728ac4b-bce4-4c2e-88bb-8874c73f0c8e@wdc.com>
+References: <20231130193139.880955-1-bvanassche@acm.org>
+ <20231130193139.880955-2-bvanassche@acm.org>
+In-Reply-To: <20231130193139.880955-2-bvanassche@acm.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|BY5PR04MB6641:EE_
+x-ms-office365-filtering-correlation-id: c09da225-645d-48af-59fd-08dbf26c682a
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Fe19Io4gtA3xVSuNcb4DPLATtlXuybXF0ffnsrTrZ279Og6Ys9xedDTEKZVNnThqen+MTavOX20PJJ0+hsSOgZkOAb52z3zhVqB+H98uVoql251BmHrWKX3mCK3+3jqIfrzmHBBKPYChPM0hiQ1KDcB/zlXKmBxJpGWRsvoFTAgEIhL0ALf/rNvJN49fgl5lvISYPDsJLIG7Q0uwhK+Rtwvjw9LISFOAlUKvlnwZIWat4FgA/lF/zu4TBZ8vOHylMUfaJ4sdEgwwJ61rAR3/AILz8NxTk8u87C+gadpUWfuHO67gASZWdHZc3NGLzeQyKvvfAkn87tKSOasod+//2JWbW6pSEv2MQFGKVZi7ur2LWDGu2ElRatsY9bC+rviHxXRdpi2rK+MUz9/+cwJ/mqWaoWIrWX/dA3TTSalPq3dyliM5NbFDHc9qiej4SqkT71WRSjtDXzDDCYLjkiJmOgL76BVzSz02tVS6k0VYS51LSW4//FB2/KIJujueG41EnNONOILkQzLPUqTTKq0xshC0jT+CEAuyIC/rxtLNuNmSzXM7CrLhxAWPdYDO8aSAL3zZ6DBBvkyl6lZmAwpVEhDLU5DiYSislA2WHiNkhM5kdA5Kn7GgTAz7eHKE/IluUWXtoQbBwd+XsEcKcP/5xeKDhPqHPwWnhYTXj4wdR7MSdWzgwErBMEwOXxJNkpK0
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(346002)(366004)(39860400002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(83380400001)(38100700002)(122000001)(82960400001)(38070700009)(86362001)(31696002)(36756003)(110136005)(76116006)(66946007)(91956017)(4326008)(8676002)(8936002)(54906003)(316002)(64756008)(66446008)(66556008)(66476007)(7416002)(5660300002)(2906002)(31686004)(6512007)(53546011)(2616005)(478600001)(6486002)(6506007)(26005)(71200400001)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?dnNjblRpM3d4MkpNeWN6Zkx1T1IrUi9RcmxhRS90RUp6QUVCNlNGQXpXODdV?=
+ =?utf-8?B?VzFwdGZ5Rkp1MjRuUHZHVnkwYjNlUmRKODZxckJxL2RVWTk1YnN1SHZ2R3NO?=
+ =?utf-8?B?NmlPQ3RuUDMxYSt6RlYvV1pNRnhYaWV3YmNwVVIyUzJnNWFtRExWa29xS3VQ?=
+ =?utf-8?B?dCtWSUdsNVMyTGwvRnM5VVVqUzJyU0ZBVmovaDdmY21CMklaRHZDQU1tbTJa?=
+ =?utf-8?B?SnM4Mmk0UHBVeDBDUklIbHRoTUpZRmU1SGsrN0Qzd2JZU05LbVFFeXhjODQv?=
+ =?utf-8?B?bGcweGo3V0hKbWtVMXZpdERpQk40ZUJUeWYzaFdreVFaM1IvUUlESzJYREJk?=
+ =?utf-8?B?eGJYY0RrM3Q0cENQck8vSVZYaW0zYzdVY0h5VVlWY1J2SnRZSCtiU29ybUFs?=
+ =?utf-8?B?Rlp1cHo2Z2hTUzRyNy9ZOU9udTZDTGlJM1hvQlNiT3h0L2N1b2plRlMyS2pj?=
+ =?utf-8?B?dU5wQy9vSStkWXlhU2pYVnVGWDNMUk5IWkFkWTVMaDNoNGVxWi8zLzYrUGM5?=
+ =?utf-8?B?OXRiWUdjRWZKYnV4YlVYOXhqaFB3ZUU5SW1GVGVJbGZhaThDQ1dMRjN4Y1c4?=
+ =?utf-8?B?ZEx2TmVsajk3SW1XSngwYW5EbkdKL3FTT3NoM3VnS2lmME1DdERGcFQ3a3NY?=
+ =?utf-8?B?YWprc29WV3dBRmRuaGk3L0tlbzNEd2tLaWhPYlhaTVp0Mm11YlI0SFE3WldT?=
+ =?utf-8?B?dVZBRklNK29oRFF0eWZ6R2ZJSHRnTm9FQVplK3pTSlV1UUdFSndyZDhWZ1lo?=
+ =?utf-8?B?RGFmV0NwUC94em91Sm9rUDRWZ2x3Rk9KOGxLbVVzb3MwZUx1WTVocWZZa3Vu?=
+ =?utf-8?B?UjROYXErWTRhRzk2SVFUeEIrYk5UYldnaUZYOThuY2Z6eUM5elRrMDJTWU9Z?=
+ =?utf-8?B?bkw2ZVB0aVY4ZTh6MStNbUdBZkdCTmJ0K2pESHo2ekh5ZG1OUTJjZkpJYnNX?=
+ =?utf-8?B?TnVTSEc5K3loaU5PeDJkS2F6bURoejB0RngyYUtGYkNkanpxU2p1L25pWTAr?=
+ =?utf-8?B?TmdodllLU0djZTJQWk1qNHR1eU5idXdDelF2dE9CQSsvMndZZGhHRXgzWHh2?=
+ =?utf-8?B?dHY2c1JvRDJNZldVVTY2cTNqTlFtNEZLVTZtSjlQaVVJbmNseVFwc294NUdZ?=
+ =?utf-8?B?UWdhSDNidmU3Nmt2aHd3ZUVkREJpZW8wL0RDc2NSTWxGUDR4eFZlS1hodDRi?=
+ =?utf-8?B?N0lJd1MzOGhtbktYNWtCZ2JGWXU5NnJEQzJkck1wVW9GbWpadnV4S29QU3lk?=
+ =?utf-8?B?YWlFZnRQdk03dlVScHlvVm1zOER5L0JiZWlmWWZkcm5DV3dQc2dKVnNJbUk4?=
+ =?utf-8?B?ZENnT2RsTUZiQnZ2VEpuRjhkQ1FlT0RYNEwvK29FWHRHTDRZWHFyVE1CMWhZ?=
+ =?utf-8?B?QVJnZk5oYTVjWHgyaEpZNmc1M3JPeVJ1K0hSLzhrV3ZVeExpUjcxUW5DZ0FE?=
+ =?utf-8?B?VE1HMG5PblF5T2Q0aTlIRlBES2Y3c3RFV2ZOMWg2R085VDI0Ymc1TFQxMTBH?=
+ =?utf-8?B?VUttUUh0MzlsZHNjblZvZjRacEpjNXZkbjRUUkN2c3g3T2puY2EvV096dWtw?=
+ =?utf-8?B?aElzVWMxUTliTzd1MHVxbEJKM2dSUkJ0aFcrdTkwTDZVNlc1MnlFRzNaaTFm?=
+ =?utf-8?B?Q1MrUFp5eCt0RWowL25pQkEvZFZwVHdaQVdmOFFwa3dkS211a3R5Vm9UK2Fo?=
+ =?utf-8?B?OG9rWE1aRHhXTEZXc1BOVnFNVWRvRDd6YzNLdE40WjdmRjlUMzk2UzRvc1Bz?=
+ =?utf-8?B?a3NiaUYrbGFPMXQ0N2owUFVubmg1UzhNWDVFWWk5MGRaU21HUHU2M3BmampG?=
+ =?utf-8?B?NGRadTFlTEo4S08zdVlwOGpHTFRtQ2xpRXBEK0xQUjg0a1VyNU1Pa0xhUWQy?=
+ =?utf-8?B?M1FlR0ExdjFoR0pVRzNNTVV0MlFNazB4OGV1djlvU1RVN09qMXhlK2kwbFNk?=
+ =?utf-8?B?ZXk2VGlVMjFCYlA0QUtqeExqRGUxR1daUHlSYlVPU2xBU2FOWTRSV25nR2tY?=
+ =?utf-8?B?SmN3cjRlS0tUTHNTZW5YNXdwb2tFcFVaclpnNTVsaU4rc2RrK1RxWUwwL2xS?=
+ =?utf-8?B?R281ZVRFZzlQNERqNFB4QVVKRG1rQWFEMmlXZWVFUUJ0SFN1UjdsZUhTa2xQ?=
+ =?utf-8?B?SUhwUkxCQjZrTkNOb3JoazJ3dW04YVh0ZmUvY0huMnN5SWQvMzhYd1JLSkNT?=
+ =?utf-8?B?aUE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5897F2748E287C49B72C49633B0FACD1@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20231123103102epcas5p2aee268735dc9e0c357e6d3b98d16fe21@epcas5p2.samsung.com>
- <20231123102431.6804-1-kundan.kumar@samsung.com> <20231123153007.GA3853@lst.de>
- <85be66ad-0203-6f81-8be0-1190842c9273@samsung.com> <37d9ca26-2ec2-4c51-8d33-a736f54ef93f@kernel.dk>
- <fba18f05-ae51-4d46-932a-5f4f9d2aab07@kernel.dk> <CALYkqXp36aJbu+2PgHQhSaXh38zTtcnVza+pexqJyDEDaq=V7Q@mail.gmail.com>
-In-Reply-To: <CALYkqXp36aJbu+2PgHQhSaXh38zTtcnVza+pexqJyDEDaq=V7Q@mail.gmail.com>
-From: Kundan Kumar <kundanthebest@gmail.com>
-Date: Fri, 1 Dec 2023 17:41:49 +0530
-Message-ID: <CALYkqXp+Hsa6qGsPzrGDR-SXPXSOoWWsved6p8cWb-_CjSayeA@mail.gmail.com>
-Subject: Re: [PATCH] block: skip QUEUE_FLAG_STATS and rq-qos for passthrough io
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>, 
-	"kundan.kumar" <kundan.kumar@samsung.com>, kbusch@kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	=?utf-8?B?THByaFZJR1d1VDJMMlg0WXNmSVp2V0tRNklPWkhRRFRta05jaUdhdkRTYVlV?=
+ =?utf-8?B?YTV1RytYTWVyNjM5U09PUURhOEM1OVhjcmw0MkNaSlNYUUhDQW1iZkE5TjZs?=
+ =?utf-8?B?dG1qOVpYQ0xvRE91TitQWlhWVWJqUVdNMTRpUEF6UlNUdmxFYlFwazJ4dFp2?=
+ =?utf-8?B?UEdwbWkxdnloMS96cDJraTExOC9hRUZpRkJlcjNCa1N2bVh2b0E2d0FsWkpL?=
+ =?utf-8?B?QVoyOFpNRy9nVE9iOEhIN3J5Rlk1VmJsbEF1UG5IWVBWVExpTjEwcnNsWUMy?=
+ =?utf-8?B?WTQxRVFXUGRrUEtBeUR1UjQ5ZTFYbHA5MGJ4Z3F4UDVsdGI1dUU3M1IvdlFX?=
+ =?utf-8?B?NXppVFhUTlJFdWQ5N0F6MWZPVXdvaExBeDc0U2d2M1FGbHJTQ0dnNTdHVTZh?=
+ =?utf-8?B?bXRLQlRLZzVtSXFoaWZjMFpGQjMya0M5Z0M4YmJsMTRiSkkxdFMxVGpYTC8x?=
+ =?utf-8?B?V0V1cU1GTytMRGtzOHpWSUpjcEhnWXhRTkhBc1hVNndxdDZES2ZNY3JSV3hB?=
+ =?utf-8?B?b1RxSlVzRXFMS2pZcnZYVWlNZmp1VWRrMzhpRW1BbnhhZnJkTnl2djJpMlZJ?=
+ =?utf-8?B?MUNzRkp5VktxODA0bG5wM1RFdzltODRERGk4bUpsa2FCT0xzZ2laa2lDbDdB?=
+ =?utf-8?B?WjdFMHIra2djalpoa29VSkdNNVJtQTlnam1MOGFWRWFTdnkwWjdCQnltSS9l?=
+ =?utf-8?B?STU0cU9UTU1aSSsyalEzc2tZMTVTRUdZa3pERWtJUDhyOTlaMWxnTTRDQVVV?=
+ =?utf-8?B?SjZzK0laN29oRFc2czdKK2hhVmVmcVlwUCtWL1luRVJUTTJoV1VrdEs1Q2lp?=
+ =?utf-8?B?K0Z1L093NTRndHVSR2VucVpBWmNlcEcvY3lUSy9zWHpub3hBZ2JVVUNaM1da?=
+ =?utf-8?B?NDZ6QitiTWhpaEkyNnZDdkFXU2RBN1V4c3hEbFlMNkdBOFVMcVdJZ0xXUWN5?=
+ =?utf-8?B?RHdHc1NVVUUrbWZGeStJWTZMdHY5MktqNUE1YzlKY1luQlF5ZS9senpTVTQ0?=
+ =?utf-8?B?THM0NEJTWHd0NjlpUXRwRzFoSnNybnhSQ1VXSk1Zek5uMXAxZUx6RjBrTUd2?=
+ =?utf-8?B?cytkZUk0WlU1T0ZpY0JrM2ZzOGhlbzFzUnMra0YySHRNR2FiL2Uwak44NFMz?=
+ =?utf-8?B?b0N6UzI1azRtV0syVnl1VkRmbjE4cUl5VWZXSGNZbEF6QWNTRFpuNmtVd3Fo?=
+ =?utf-8?B?b05qR1VzazI0RFBkSHQ4T2w5RXVwbDdYQWFwWXdZQXVldE84c1huUEhyK0Yv?=
+ =?utf-8?B?NFQ2UHZpeTVSbFRFYzZJQ1dYamNDRnhJczFIMG5ZOExtaFVYZ2s3MXNadFhR?=
+ =?utf-8?B?MTJSUmxQK1pSS3hOVFFrQW1NSXBIVlhIem83U3I0NzFoRmFWSjhTazA3ZmpQ?=
+ =?utf-8?B?S1R1YnpvanZIcGNoT0ZEenZaY1A2VENkbWE5Ym44WDNnTHpNVEM3bFloVTRq?=
+ =?utf-8?B?N085c2xQRTU1UFc0TEtjMFcxa1lYbEFKeHdUdmdBPT0=?=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c09da225-645d-48af-59fd-08dbf26c682a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Dec 2023 12:52:42.0899
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SA2jiKpwIcwuO3I8i8o/Q9j2X+wgWFo4BXPwPk4O2D6x+ArcrQzVupk5zVYRweQEZvC9+ae+e57TPyJNacComAc3XyqYlenQ20n6eupn0EU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6641
 
-On Fri, Nov 24, 2023 at 4:58=E2=80=AFPM Kundan Kumar <kundanthebest@gmail.c=
-om> wrote:
->
-> On Fri, Nov 24, 2023 at 2:07=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrot=
-e:
-> >
-> > On 11/23/23 1:19 PM, Jens Axboe wrote:
-> > > On 11/23/23 11:12 AM, Kanchan Joshi wrote:
-> > >> On 11/23/2023 9:00 PM, Christoph Hellwig wrote:
-> > >>> The rest looks good, but that stats overhead seems pretty horrible.=
-.
-> > >>
-> > >> On my setup
-> > >> Before[1]: 7.06M
-> > >> After[2]: 8.29M
-> > >>
-> > >> [1]
-> > >> # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 -n=
-2
-> > >> -u1 -r4 /dev/ng0n1 /dev/ng1n1
-> > >> submitter=3D0, tid=3D2076, file=3D/dev/ng0n1, node=3D-1
-> > >> submitter=3D1, tid=3D2077, file=3D/dev/ng1n1, node=3D-1
-> > >> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D=
-256
-> > >> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
-> > >> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D=
-256
-> > >> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
-> > >> IOPS=3D6.95M, BW=3D3.39GiB/s, IOS/call=3D32/31
-> > >> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/32
-> > >> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/31
-> > >> Exiting on timeout
-> > >> Maximum IOPS=3D7.06M
-> > >>
-> > >> [2]
-> > >>   # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 =
--n2
-> > >> -u1 -r4 /dev/ng0n1 /dev/ng1n1
-> > >> submitter=3D0, tid=3D2123, file=3D/dev/ng0n1, node=3D-1
-> > >> submitter=3D1, tid=3D2124, file=3D/dev/ng1n1, node=3D-1
-> > >> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D=
-256
-> > >> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
-> > >> IOPS=3D8.27M, BW=3D4.04GiB/s, IOS/call=3D32/31
-> > >> IOPS=3D8.29M, BW=3D4.05GiB/s, IOS/call=3D32/31
-> > >> IOPS=3D8.29M, BW=3D4.05GiB/s, IOS/call=3D31/31
-> > >> Exiting on timeout
-> > >> Maximum IOPS=3D8.29M
-> > >
-> > > It's all really down to how expensive getting the current time is on
-> > > your box, some will be better and some worse
-> > >
-> > > One idea that has been bounced around in the past is to have a
-> > > blk_ktime_get_ns() and have it be something ala:
-> > >
-> > > u64 blk_ktime_get_ns(void)
-> > > {
-> > >       struct blk_plug *plug =3D current->plug;
-> > >
-> > >       if (!plug)
-> > >               return ktime_get_ns();
-> > >
-> > >       if (!plug->ktime_valid)
-> > >               plug->ktime =3D ktime_get_ns();
-> > >
-> > >       return plug->ktime;
-> > > }
-> > >
-> > > in freestyle form, with the idea being that we don't care granularity=
- to
-> > > the extent that we'd need a new stamp every time.
-> > >
-> > > If the task is scheduled out, the plug is flushed anyway, which shoul=
-d
-> > > invalidate the stamp. For preemption this isn't true iirc, so we'd ne=
-ed
-> > > some kind of blk_flush_plug_ts() or something for that case to
-> > > invalidate it.
-> > >
-> > > Hopefully this could then also get away from passing in a cached valu=
-e
-> > > that we do in various spots, exactly because all of this time stampin=
-g
-> > > is expensive. It's also a bit of a game of whack-a-mole, as users get
-> > > added and distro kernels tend to turn on basically everything anyway.
-> >
-> > Did a quick'n dirty (see below), which recoups half of the lost
-> > performance for me. And my kernel deliberately doesn't enable all of th=
-e
-> > gunk in block/ that slows everything down, I suspect it'll be a bigger
-> > win for you percentage wise:
-> >
-> > IOPS=3D121.42M, BW=3D59.29GiB/s, IOS/call=3D31/31
-> > IOPS=3D121.47M, BW=3D59.31GiB/s, IOS/call=3D32/32
-> > IOPS=3D121.44M, BW=3D59.30GiB/s, IOS/call=3D31/31
-> > IOPS=3D121.47M, BW=3D59.31GiB/s, IOS/call=3D31/31
-> > IOPS=3D121.45M, BW=3D59.30GiB/s, IOS/call=3D32/32
-> > IOPS=3D119.95M, BW=3D58.57GiB/s, IOS/call=3D31/32
-> > IOPS=3D115.30M, BW=3D56.30GiB/s, IOS/call=3D32/31
-> > IOPS=3D115.38M, BW=3D56.34GiB/s, IOS/call=3D32/32
-> > IOPS=3D115.35M, BW=3D56.32GiB/s, IOS/call=3D32/32
-> >
-> >
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index fdf25b8d6e78..6e74af442b94 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -1055,6 +1055,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug,=
- unsigned short nr_ios)
-> >         plug->rq_count =3D 0;
-> >         plug->multiple_queues =3D false;
-> >         plug->has_elevator =3D false;
-> > +       plug->cur_ktime =3D 0;
-> >         INIT_LIST_HEAD(&plug->cb_list);
-> >
-> >         /*
-> > diff --git a/block/blk-flush.c b/block/blk-flush.c
-> > index 3f4d41952ef2..e4e9f7eed346 100644
-> > --- a/block/blk-flush.c
-> > +++ b/block/blk-flush.c
-> > @@ -143,7 +143,7 @@ static void blk_account_io_flush(struct request *rq=
-)
-> >         part_stat_lock();
-> >         part_stat_inc(part, ios[STAT_FLUSH]);
-> >         part_stat_add(part, nsecs[STAT_FLUSH],
-> > -                     ktime_get_ns() - rq->start_time_ns);
-> > +                     blk_ktime_get_ns() - rq->start_time_ns);
-> >         part_stat_unlock();
-> >  }
-> >
-> > diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> > index 089fcb9cfce3..d06cea625462 100644
-> > --- a/block/blk-iocost.c
-> > +++ b/block/blk-iocost.c
-> > @@ -829,7 +829,7 @@ static int ioc_autop_idx(struct ioc *ioc, struct ge=
-ndisk *disk)
-> >
-> >         /* step up/down based on the vrate */
-> >         vrate_pct =3D div64_u64(ioc->vtime_base_rate * 100, VTIME_PER_U=
-SEC);
-> > -       now_ns =3D ktime_get_ns();
-> > +       now_ns =3D blk_ktime_get_ns();
-> >
-> >         if (p->too_fast_vrate_pct && p->too_fast_vrate_pct <=3D vrate_p=
-ct) {
-> >                 if (!ioc->autop_too_fast_at)
-> > @@ -1044,7 +1044,7 @@ static void ioc_now(struct ioc *ioc, struct ioc_n=
-ow *now)
-> >         unsigned seq;
-> >         u64 vrate;
-> >
-> > -       now->now_ns =3D ktime_get();
-> > +       now->now_ns =3D blk_ktime_get();
-> >         now->now =3D ktime_to_us(now->now_ns);
-> >         vrate =3D atomic64_read(&ioc->vtime_rate);
-> >
-> > @@ -2810,7 +2810,7 @@ static void ioc_rqos_done(struct rq_qos *rqos, st=
-ruct request *rq)
-> >                 return;
-> >         }
-> >
-> > -       on_q_ns =3D ktime_get_ns() - rq->alloc_time_ns;
-> > +       on_q_ns =3D blk_ktime_get_ns() - rq->alloc_time_ns;
-> >         rq_wait_ns =3D rq->start_time_ns - rq->alloc_time_ns;
-> >         size_nsec =3D div64_u64(calc_size_vtime_cost(rq, ioc), VTIME_PE=
-R_NSEC);
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 900c1be1fee1..9c96dee9e584 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -323,7 +323,7 @@ void blk_rq_init(struct request_queue *q, struct re=
-quest *rq)
-> >         RB_CLEAR_NODE(&rq->rb_node);
-> >         rq->tag =3D BLK_MQ_NO_TAG;
-> >         rq->internal_tag =3D BLK_MQ_NO_TAG;
-> > -       rq->start_time_ns =3D ktime_get_ns();
-> > +       rq->start_time_ns =3D blk_ktime_get_ns();
-> >         rq->part =3D NULL;
-> >         blk_crypto_rq_set_defaults(rq);
-> >  }
-> > @@ -333,7 +333,7 @@ EXPORT_SYMBOL(blk_rq_init);
-> >  static inline void blk_mq_rq_time_init(struct request *rq, u64 alloc_t=
-ime_ns)
-> >  {
-> >         if (blk_mq_need_time_stamp(rq))
-> > -               rq->start_time_ns =3D ktime_get_ns();
-> > +               rq->start_time_ns =3D blk_ktime_get_ns();
-> >         else
-> >                 rq->start_time_ns =3D 0;
-> >
-> > @@ -444,7 +444,7 @@ static struct request *__blk_mq_alloc_requests(stru=
-ct blk_mq_alloc_data *data)
-> >
-> >         /* alloc_time includes depth and tag waits */
-> >         if (blk_queue_rq_alloc_time(q))
-> > -               alloc_time_ns =3D ktime_get_ns();
-> > +               alloc_time_ns =3D blk_ktime_get_ns();
-> >
-> >         if (data->cmd_flags & REQ_NOWAIT)
-> >                 data->flags |=3D BLK_MQ_REQ_NOWAIT;
-> > @@ -629,7 +629,7 @@ struct request *blk_mq_alloc_request_hctx(struct re=
-quest_queue *q,
-> >
-> >         /* alloc_time includes depth and tag waits */
-> >         if (blk_queue_rq_alloc_time(q))
-> > -               alloc_time_ns =3D ktime_get_ns();
-> > +               alloc_time_ns =3D blk_ktime_get_ns();
-> >
-> >         /*
-> >          * If the tag allocator sleeps we could get an allocation for a
-> > @@ -1037,7 +1037,7 @@ static inline void __blk_mq_end_request_acct(stru=
-ct request *rq, u64 now)
-> >  inline void __blk_mq_end_request(struct request *rq, blk_status_t erro=
-r)
-> >  {
-> >         if (blk_mq_need_time_stamp(rq))
-> > -               __blk_mq_end_request_acct(rq, ktime_get_ns());
-> > +               __blk_mq_end_request_acct(rq, blk_ktime_get_ns());
-> >
-> >         blk_mq_finish_request(rq);
-> >
-> > @@ -1080,7 +1080,7 @@ void blk_mq_end_request_batch(struct io_comp_batc=
-h *iob)
-> >         u64 now =3D 0;
-> >
-> >         if (iob->need_ts)
-> > -               now =3D ktime_get_ns();
-> > +               now =3D blk_ktime_get_ns();
-> >
-> >         while ((rq =3D rq_list_pop(&iob->req_list)) !=3D NULL) {
-> >                 prefetch(rq->bio);
-> > @@ -1249,7 +1249,7 @@ void blk_mq_start_request(struct request *rq)
-> >         trace_block_rq_issue(rq);
-> >
-> >         if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
-> > -               rq->io_start_time_ns =3D ktime_get_ns();
-> > +               rq->io_start_time_ns =3D blk_ktime_get_ns();
-> >                 rq->stats_sectors =3D blk_rq_sectors(rq);
-> >                 rq->rq_flags |=3D RQF_STATS;
-> >                 rq_qos_issue(q, rq);
-> > @@ -3066,7 +3066,7 @@ blk_status_t blk_insert_cloned_request(struct req=
-uest *rq)
-> >         blk_mq_run_dispatch_ops(q,
-> >                         ret =3D blk_mq_request_issue_directly(rq, true)=
-);
-> >         if (ret)
-> > -               blk_account_io_done(rq, ktime_get_ns());
-> > +               blk_account_io_done(rq, blk_ktime_get_ns());
-> >         return ret;
-> >  }
-> >  EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
-> > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> > index 13e4377a8b28..5919919ba1c3 100644
-> > --- a/block/blk-throttle.c
-> > +++ b/block/blk-throttle.c
-> > @@ -1813,7 +1813,7 @@ static bool throtl_tg_is_idle(struct throtl_grp *=
-tg)
-> >         time =3D min_t(unsigned long, MAX_IDLE_TIME, 4 * tg->idletime_t=
-hreshold);
-> >         ret =3D tg->latency_target =3D=3D DFL_LATENCY_TARGET ||
-> >               tg->idletime_threshold =3D=3D DFL_IDLE_THRESHOLD ||
-> > -             (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
-> > +             (blk_ktime_get_ns() >> 10) - tg->last_finish_time > time =
-||
-> >               tg->avg_idletime > tg->idletime_threshold ||
-> >               (tg->latency_target && tg->bio_cnt &&
-> >                 tg->bad_bio_cnt * 5 < tg->bio_cnt);
-> > @@ -2058,7 +2058,7 @@ static void blk_throtl_update_idletime(struct thr=
-otl_grp *tg)
-> >         if (last_finish_time =3D=3D 0)
-> >                 return;
-> >
-> > -       now =3D ktime_get_ns() >> 10;
-> > +       now =3D blk_ktime_get_ns() >> 10;
-> >         if (now <=3D last_finish_time ||
-> >             last_finish_time =3D=3D tg->checked_last_finish_time)
-> >                 return;
-> > @@ -2325,7 +2325,7 @@ void blk_throtl_bio_endio(struct bio *bio)
-> >         if (!tg->td->limit_valid[LIMIT_LOW])
-> >                 return;
-> >
-> > -       finish_time_ns =3D ktime_get_ns();
-> > +       finish_time_ns =3D blk_ktime_get_ns();
-> >         tg->last_finish_time =3D finish_time_ns >> 10;
-> >
-> >         start_time =3D bio_issue_time(&bio->bi_issue) >> 10;
-> > diff --git a/block/blk.h b/block/blk.h
-> > index 08a358bc0919..4f081a00e644 100644
-> > --- a/block/blk.h
-> > +++ b/block/blk.h
-> > @@ -518,4 +518,17 @@ static inline int req_ref_read(struct request *req=
-)
-> >         return atomic_read(&req->ref);
-> >  }
-> >
-> > +static inline u64 blk_ktime_get_ns(void)
-> > +{
-> > +       struct blk_plug *plug =3D current->plug;
-> > +
-> > +       if (!plug)
-> > +               return ktime_get_ns();
-> > +       if (!(plug->cur_ktime & 1ULL)) {
-> > +               plug->cur_ktime =3D ktime_get_ns();
-> > +               plug->cur_ktime |=3D 1ULL;
-> > +       }
-> > +       return plug->cur_ktime;
-> > +}
-> > +
-> >  #endif /* BLK_INTERNAL_H */
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index 51fa7ffdee83..081830279f70 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -972,6 +972,9 @@ struct blk_plug {
-> >         bool multiple_queues;
-> >         bool has_elevator;
-> >
-> > +       /* bit0 set if valid */
-> > +       u64 cur_ktime;
-> > +
-> >         struct list_head cb_list; /* md requires an unplug callback */
-> >  };
-> >
-> >
-> > --
-> > Jens Axboe
-> >
-> >
->
-> Hi Jens,
->
-> This is what I see with your changes on my setup.
->
-> Before[1]: 7.06M
-> After[2]: 7.52M
->
-> [1]
-> # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 -n2 \
-> -u1 -r4 /dev/ng0n1 /dev/ng1n1
-> submitter=3D0, tid=3D2076, file=3D/dev/ng0n1, node=3D-1
-> submitter=3D1, tid=3D2077, file=3D/dev/ng1n1, node=3D-1
-> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D256
-> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
-> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D256
-> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
-> IOPS=3D6.95M, BW=3D3.39GiB/s, IOS/call=3D32/31
-> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/32
-> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/31
-> Exiting on timeout
-> Maximum IOPS=3D7.06M
->
-> [2]
-> # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 -n2 \
-> -u1 -r4 /dev/ng0n1 /dev/ng1n1
-> submitter=3D0, tid=3D2204, file=3D/dev/ng0n1, node=3D-1
-> submitter=3D1, tid=3D2205, file=3D/dev/ng1n1, node=3D-1
-> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D256
-> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
-> IOPS=3D7.40M, BW=3D3.62GiB/s, IOS/call=3D32/31
-> IOPS=3D7.51M, BW=3D3.67GiB/s, IOS/call=3D32/31
-> IOPS=3D7.52M, BW=3D3.67GiB/s, IOS/call=3D32/32
-> Exiting on timeout
-> Maximum IOPS=3D7.52M
->
-> The original patch avoids processing throttle stats and wbt_issue/done
-> stats for passthrough-io path.
->
-> Improvement with original-patch :
-> 7.06M -> 8.29M
->
-> It seems that both the optimizations are different. The original patch is=
- about
-> "completely disabling stats for passthrough-io" and your changes
-> optimize getting the
-> current time which would improve performance for everyone.
->
-> I think both of them are independent.
->
-> --
-> Kundan Kumar
-
-Any feedback on this ?
---
-Kundan Kumart
+T24gMzAuMTEuMjMgMjA6MzEsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gK3ZvaWQgYmxrX21x
+X3VwZGF0ZV9mYWlyX3NoYXJpbmcoc3RydWN0IGJsa19tcV90YWdfc2V0ICpzZXQsIGJvb2wgZW5h
+YmxlKQ0KPiArew0KPiArCWNvbnN0IHVuc2lnbmVkIGludCBERlRTX0JJVCA9IGlsb2cyKEJMS19N
+UV9GX0RJU0FCTEVfRkFJUl9UQUdfU0hBUklORyk7DQo+ICsJc3RydWN0IGJsa19tcV9od19jdHgg
+KmhjdHg7DQo+ICsJc3RydWN0IHJlcXVlc3RfcXVldWUgKnE7DQo+ICsJdW5zaWduZWQgbG9uZyBp
+Ow0KPiArDQo+ICsJLyoNCj4gKwkgKiBTZXJpYWxpemUgYWdhaW5zdCBibGtfbXFfdXBkYXRlX25y
+X2h3X3F1ZXVlcygpIGFuZA0KPiArCSAqIGJsa19tcV9yZWFsbG9jX2h3X2N0eHMoKS4NCj4gKwkg
+Ki8NCj4gKwltdXRleF9sb2NrKCZzZXQtPnRhZ19saXN0X2xvY2spOw0KPiArCWxpc3RfZm9yX2Vh
+Y2hfZW50cnkocSwgJnNldC0+dGFnX2xpc3QsIHRhZ19zZXRfbGlzdCkNCj4gKwkJYmxrX21xX2Zy
+ZWV6ZV9xdWV1ZShxKTsNCj4gKwlhc3NpZ25fYml0KERGVFNfQklULCAmc2V0LT5mbGFncywgIWVu
+YWJsZSk7DQo+ICsJbGlzdF9mb3JfZWFjaF9lbnRyeShxLCAmc2V0LT50YWdfbGlzdCwgdGFnX3Nl
+dF9saXN0KQ0KPiArCQlxdWV1ZV9mb3JfZWFjaF9od19jdHgocSwgaGN0eCwgaSkNCj4gKwkJCWFz
+c2lnbl9iaXQoREZUU19CSVQsICZoY3R4LT5mbGFncywgIWVuYWJsZSk7DQo+ICsJbGlzdF9mb3Jf
+ZWFjaF9lbnRyeShxLCAmc2V0LT50YWdfbGlzdCwgdGFnX3NldF9saXN0KQ0KPiArCQlibGtfbXFf
+dW5mcmVlemVfcXVldWUocSk7DQo+ICsJbXV0ZXhfdW5sb2NrKCZzZXQtPnRhZ19saXN0X2xvY2sp
+Ow0KDQpIaSBCYXJ0LA0KDQpUaGUgYWJvdmUgY29kZSBhZGRzIGEgM3JkIHVzZXIgKGF0IGxlYXN0
+KSBvZiB0aGUgZm9sbG93aW5nIHBhdHRlcm4gdG8gDQp0aGUga2VybmVsOg0KDQoJbGlzdF9mb3Jf
+ZWFjaF9lbnRyeShxLCAmc2V0LT50YWdfbGlzdCwgdGFnX3NldF9saXN0KQ0KCQlibGtfbXFfZnJl
+ZXplX3F1ZXVlKHEpOw0KDQoJLyogZG8gc3R1ZmYgKi8NCg0KCWxpc3RfZm9yX2VhY2hfZW50cnko
+cSwgJnNldC0+dGFnX2xpc3QsIHRhZ19zZXRfbGlzdCkNCgkJYmxrX21xX3VuZnJlZXplX3F1ZXVl
+KHEpOw0KDQpXb3VsZCBpdCBtYXliZSBiZSBiZW5lZmljaWFsIGlmIHdlJ2QgaW50cm9kdWNlIGZ1
+bmN0aW9ucyBmb3IgdGhpcywgbGlrZToNCg0Kc3RhdGljIGlubGluZSB2b2lkIGJsa19tcV9mcmVl
+emVfdGFnX3NldChzdHJ1Y3QgYmxrX21xX3RhZ19zZXQgKnNldCkNCnsNCglsb2NrZGVwX2Fzc2Vy
+dF9oZWxkKCZzZXQtPnRhZ19saXN0X2xvY2spOw0KDQoJbGlzdF9mb3JfZWFjaF9lbnRyeShxLCAm
+c2V0LT50YWdfbGlzdCwgdGFnX3NldF9saXN0KQ0KCQlibGtfbXFfZnJlZXplX3F1ZXVlKHEpOw0K
+fQ0KDQpzdGF0aWMgaW5saW5lIHZvaWQgYmxrX21xX3VuZnJlZXplX3RhZ19zZXQoc3RydWN0IGJs
+a19tcV90YWdfc2V0ICpzZXQpDQp7DQoJbG9ja2RlcF9hc3NlcnRfaGVsZCgmc2V0LT50YWdfbGlz
+dF9sb2NrKTsNCg0KCWxpc3RfZm9yX2VhY2hfZW50cnkocSwgJnNldC0+dGFnX2xpc3QsIHRhZ19z
+ZXRfbGlzdCkNCgkJYmxrX21xX3VuZnJlZXplX3F1ZXVlKHEpOw0KfQ0K
