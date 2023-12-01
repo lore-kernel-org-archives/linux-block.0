@@ -1,89 +1,193 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="azGIg95T"
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D1CA10DE
-	for <linux-block@vger.kernel.org>; Thu, 30 Nov 2023 15:09:27 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6cdd2aeaa24so267851b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 30 Nov 2023 15:09:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CZ5WmVb6"
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3002B171D;
+	Thu, 30 Nov 2023 16:59:32 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2c9d4740e1cso12074731fa.1;
+        Thu, 30 Nov 2023 16:59:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701385766; x=1701990566; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1701392370; x=1701997170; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WmpnCqUtuoxHHvkEl3B5MTEZYjPTnTR+G4KhZG9sw9Q=;
-        b=azGIg95T8DT5YlRh40XmtRd4RMEQHF1NlqeK5L6qqqKxZ/V49sS/8wZFnuJuBGygRw
-         xSe9RvnI787ksQ8455sJPxTqb2zACV55jAYcDgo8OsgYAu852AA9pCqpzX9Xg44+GK6a
-         /++Bi4zyGWyf0sjnUqq3/g6luTya2FP0Hnczm1Kci4YVZXED3YRhjyqH6nk4QMkrxM6M
-         qjg6kgfHJcab3iYu0cQUCbst7bF6b/mDC31VAAj8HLXHyxBz4NrVH23AHFPnOYWVFsmE
-         llJRFPVPaF6muX/vU+hhiMNnzbBnV+Wkg8D1dlF3ZHaxClMIhsF5FtAr7KMTHAFz2NtH
-         J4nA==
+        bh=QmhVSg59KnuTjEpkqtsVamEUiD5Q79qxS4NrNhYjt80=;
+        b=CZ5WmVb62J6aZEAHXVY1ikaAD8eaFaKbc/4H+vST/9XGDPzCeNGb/aChpx+YPWfHDC
+         Xj0+EAZ3uKwe3GvQjcJjCqzbbe1+MiZZhPMyW0g9CjbDMWRSE7NO0G+BykDvysvJKIVE
+         91iwAC/2PCz4MgTmzc6JsJQTmftnF/DRBMUmOJW7z7tqPXA15MUcehd9RAzvHi1uPqby
+         PmPfFGkbxZi8pZJM3qypt5Z8bixDY1QvxkN78aRchjxwuHrzJqjT7s2oMBMfTirBeu7c
+         dh55yUms4PecAnoBGoTM8zE0jZDaUyAD+uBa3+bo8H3HuVBtU8uC5rVhW8WzZ7LuWXhF
+         e4FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701385766; x=1701990566;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1701392370; x=1701997170;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WmpnCqUtuoxHHvkEl3B5MTEZYjPTnTR+G4KhZG9sw9Q=;
-        b=uE3lY4lpR+zkIxURZpuV4S5oce9JB9f6f1Mk6aZRwbTonHz9kJE5SXq/yax2ERXmYd
-         vZuakmhqZsd4ERQDemZQpbWsn01S5L6mdv6Mq3ZvH6RMEXL7Wa+Qk0G5kzJ3XlWY+RVX
-         g1OwnFzj0bSzJV4N3Qi//OeIk+EkoqLKmEFTss1wTLvkXLg6Blc1JmHy5kMAiPub39pc
-         XRBWpNj+jxnCjSld0iHa2DEx+H0qBCu/j4nb8lSzYMIbzNNIPn0d0QfhNnwGsM45aZvD
-         uI5o5eqIEViDtDa8rtINzs9AXTR7FTjYQ1H0pZo4PE5T944/BNcqbJAWeNRz4rLBN/bV
-         F04A==
-X-Gm-Message-State: AOJu0YzmjVI4xKUZXrYuR//qlLe3h/gxA2PiTIiYmpuBwQoE7GXgK1V8
-	P0/LOBbfTmOu7bzaY37Ea5NB70uNbmmTrz4sb5Z7Cg==
-X-Google-Smtp-Source: AGHT+IFKPPF8r3m5BMDX5DFNv0M2Ii6euwt49/3tWDuQf1TJfXsX7mSig2AEFjsW0Ceh/6TAPaPTMA==
-X-Received: by 2002:a05:6a20:8f05:b0:18c:6148:6a7b with SMTP id b5-20020a056a208f0500b0018c61486a7bmr20428611pzk.0.1701385766268;
-        Thu, 30 Nov 2023 15:09:26 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id 3-20020a17090a000300b002850eb8b6dcsm2010297pja.44.2023.11.30.15.09.25
+        bh=QmhVSg59KnuTjEpkqtsVamEUiD5Q79qxS4NrNhYjt80=;
+        b=kmQ6IJOLXvRw3EJsMV0mDldnQww+sYl0cwwJkBo1QvY9fPPe8c8zf9nDqPn4+FhpA/
+         vVJcTeZg/5YqUJmJZOlQSz7OaXCgrloIZ1bol9JDnD7zYlFOJiYU8YCwjkLxu18s1mtV
+         1d3JRm4XIw7KfjssT3wAh5YzTUPJAF/G6qFF7+xqC6zrrfMKQV5wV6nRtKXytkZPVcQq
+         zGnzWKa3Dxis/jYi5Ie3498Z4Jub7Pb1SseRACkx5VaTXGYOBtmOBthQkvE0eRGG81ck
+         w+benhP6kOH/OcM70P78HPpU4BaDybXzVRdZy4g1u8qDya0qKYNurGC9f/oFXZqabo3L
+         XLJA==
+X-Gm-Message-State: AOJu0Yw6maDPCGuXt4CbFe+w+BTcR0W5E0Adwl85AztYFsHZUeai61Ac
+	3ndGbMy+fUlspIOxGFgn15ZXDv+YkDY=
+X-Google-Smtp-Source: AGHT+IFhwTksU6dn/WHUnR2RoFhnlXair9hraJjUZcVNlXwb44nFIKJF0plmfx4cVZ1n9AGHLTjlrg==
+X-Received: by 2002:a2e:360a:0:b0:2c9:dae6:4446 with SMTP id d10-20020a2e360a000000b002c9dae64446mr78866lja.200.1701392369793;
+        Thu, 30 Nov 2023 16:59:29 -0800 (PST)
+Received: from 127.0.0.1localhost ([185.69.145.191])
+        by smtp.gmail.com with ESMTPSA id ks19-20020a170906f85300b00a11b2677acbsm1250511ejb.163.2023.11.30.16.59.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 15:09:25 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- io-uring@vger.kernel.org, Keith Busch <kbusch@meta.com>
-Cc: hch@lst.de, joshi.k@samsung.com, martin.petersen@oracle.com, 
- ming.lei@redhat.com, Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20231130215309.2923568-1-kbusch@meta.com>
-References: <20231130215309.2923568-1-kbusch@meta.com>
-Subject: Re: [PATCHv5 0/4] block integrity: directly map user space
- addresses
-Message-Id: <170138576512.699292.6762410631511683338.b4-ty@kernel.dk>
-Date: Thu, 30 Nov 2023 16:09:25 -0700
+        Thu, 30 Nov 2023 16:59:29 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	asml.silence@gmail.com,
+	linux-block@vger.kernel.org,
+	ming.lei@redhat.com,
+	joshi.k@samsung.com,
+	linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org,
+	Paul Moore <paul@paul-moore.com>
+Subject: [PATCH v2 2/3] io_uring/cmd: inline io_uring_cmd_do_in_task_lazy
+Date: Fri,  1 Dec 2023 00:57:36 +0000
+Message-ID: <2ec9fb31dd192d1c5cf26d0a2dec5657d88a8e48.1701391955.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1701391955.git.asml.silence@gmail.com>
+References: <cover.1701391955.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-7edf1
+Content-Transfer-Encoding: 8bit
 
+Now as we can easily include io_uring_types.h, move IOU_F_TWQ_LAZY_WAKE
+and inline io_uring_cmd_do_in_task_lazy().
 
-On Thu, 30 Nov 2023 13:53:05 -0800, Keith Busch wrote:
-> Handling passthrough metadata ("integrity") today introduces overhead
-> and complications that we can avoid if we just map user space addresses
-> directly. This patch series implements that, falling back to a kernel
-> bounce buffer if necessary.
-> 
-> v4->v5:
-> 
-> [...]
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ include/linux/io_uring/cmd.h   | 31 ++++++++++++++++---------------
+ include/linux/io_uring_types.h | 11 +++++++++++
+ io_uring/io_uring.h            | 10 ----------
+ io_uring/uring_cmd.c           |  7 -------
+ 4 files changed, 27 insertions(+), 32 deletions(-)
 
-Applied, thanks!
-
-[1/4] block: bio-integrity: directly map user buffers
-      commit: 5a0584b2c714a219296d97d9f4307ffe53c18937
-[2/4] nvme: use bio_integrity_map_user
-      commit: aec0ff70f016fdf7b4ba52e34d682a185dd8dd74
-[3/4] iouring: remove IORING_URING_CMD_POLLED
-      commit: f8243a30dc179ac197bd8315bdf9d55d3d7792c3
-[4/4] io_uring: remove uring_cmd cookie
-      commit: fb62c0c9b04265539851734ae35cf3f10651a8dd
-
-Best regards,
+diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
+index 62fcfaf6fcc9..ee9b3bc3a4af 100644
+--- a/include/linux/io_uring/cmd.h
++++ b/include/linux/io_uring/cmd.h
+@@ -36,15 +36,6 @@ void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2,
+ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+ 			    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+ 			    unsigned flags);
+-/* users should follow semantics of IOU_F_TWQ_LAZY_WAKE */
+-void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned));
+-
+-static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+-{
+-	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
+-}
+ 
+ void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+ 		unsigned int issue_flags);
+@@ -60,12 +51,9 @@ static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+ 		ssize_t ret2, unsigned issue_flags)
+ {
+ }
+-static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+-{
+-}
+-static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
++static inline void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
++			    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
++			    unsigned flags)
+ {
+ }
+ static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+@@ -78,4 +66,17 @@ static inline struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd
+ }
+ #endif
+ 
++/* users must follow the IOU_F_TWQ_LAZY_WAKE semantics */
++static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
++			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
++{
++	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
++}
++
++static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
++			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
++{
++	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
++}
++
+ #endif /* _LINUX_IO_URING_CMD_H */
+diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+index 0bcecb734af3..8ff4642dc6e3 100644
+--- a/include/linux/io_uring_types.h
++++ b/include/linux/io_uring_types.h
+@@ -7,6 +7,17 @@
+ #include <linux/llist.h>
+ #include <uapi/linux/io_uring.h>
+ 
++enum {
++	/*
++	 * A hint to not wake right away but delay until there are enough of
++	 * tw's queued to match the number of CQEs the task is waiting for.
++	 *
++	 * Must not be used wirh requests generating more than one CQE.
++	 * It's also ignored unless IORING_SETUP_DEFER_TASKRUN is set.
++	 */
++	IOU_F_TWQ_LAZY_WAKE			= 1,
++};
++
+ enum io_uring_cmd_flags {
+ 	IO_URING_F_COMPLETE_DEFER	= 1,
+ 	IO_URING_F_UNLOCKED		= 2,
+diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
+index dc6d779b452b..48ffdb156f73 100644
+--- a/io_uring/io_uring.h
++++ b/io_uring/io_uring.h
+@@ -15,16 +15,6 @@
+ #include <trace/events/io_uring.h>
+ #endif
+ 
+-enum {
+-	/*
+-	 * A hint to not wake right away but delay until there are enough of
+-	 * tw's queued to match the number of CQEs the task is waiting for.
+-	 *
+-	 * Must not be used wirh requests generating more than one CQE.
+-	 * It's also ignored unless IORING_SETUP_DEFER_TASKRUN is set.
+-	 */
+-	IOU_F_TWQ_LAZY_WAKE			= 1,
+-};
+ 
+ enum {
+ 	IOU_OK			= 0,
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index 4ed0c66e3aae..94e9de1c24aa 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -78,13 +78,6 @@ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+ }
+ EXPORT_SYMBOL_GPL(__io_uring_cmd_do_in_task);
+ 
+-void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+-{
+-	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
+-}
+-EXPORT_SYMBOL_GPL(io_uring_cmd_do_in_task_lazy);
+-
+ static inline void io_req_set_cqe32_extra(struct io_kiocb *req,
+ 					  u64 extra1, u64 extra2)
+ {
 -- 
-Jens Axboe
-
-
+2.43.0
 
