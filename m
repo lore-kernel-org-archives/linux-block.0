@@ -1,118 +1,103 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E7DD99;
-	Fri,  1 Dec 2023 14:14:53 -0800 (PST)
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d069b1d127so4224935ad.0;
-        Fri, 01 Dec 2023 14:14:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701468893; x=1702073693;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QQqLfuL0yzwBHh3YArsTFlBmIfIaZRtpkmMP/b6bF+E=;
-        b=u49vD6DbiNq8gVccT1s4ajAZFRsHE511YTFTlO4PSyogR3BGAD/sB2vwJcv1ougF51
-         cHDMWXN8NbEi4fJ+QAkSN0LwD3Ji4GPVTUI5RiFuBW0qfL0MJNv5WbuiCsFWJJWRUY7S
-         BHhlEzlladOzcA7TtVIP0vlhfVWQyBkiE6YQw1Ru9BEPYsDNkCgL1HialZv9+slWD4Ys
-         lw7IeOeEMxIytfuj+tfD/ld1UdeoPSpB80Ks5cwWJa3HdoHI+M21/B0iYBDlAjD1vasJ
-         tSNInwluNRk1QQn/iWcLXFZFDsr2sT5be+brDPdEp6z7dsshyFEJDpxP8q/RmY+7Dvc7
-         NU8g==
-X-Gm-Message-State: AOJu0YzQsJlecqDSIA4YrYP+hvhEqxC1BmIgkq1w1VO20HY+7H3ZpeR3
-	deXMEdKJ+7lIqhGr0zgLGe4OkdFs6mI7EA==
-X-Google-Smtp-Source: AGHT+IHPmgHat07EwFnXbdWuHASQXDxVzsIvbOPDwMTc36CSanYp8dGaLqv8KkouleS3pxjDnaPU5Q==
-X-Received: by 2002:a17:902:f54a:b0:1d0:6ffd:f1f3 with SMTP id h10-20020a170902f54a00b001d06ffdf1f3mr147712plf.73.1701468892853;
-        Fri, 01 Dec 2023 14:14:52 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id l7-20020a170902f68700b001cc2ebd2c2csm1112660plg.256.2023.12.01.14.14.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:14:51 -0800 (PST)
-Message-ID: <22a70cc4-2150-4296-84d5-f0bf6617613a@acm.org>
-Date: Fri, 1 Dec 2023 14:14:49 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D80619D4;
+	Fri,  1 Dec 2023 22:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLl2RC+R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1941C433C7;
+	Fri,  1 Dec 2023 22:49:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701470984;
+	bh=B+2oZDNTaCrSceXjfLUiK5YOjMozykyK9t8qkbIJACk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hLl2RC+RvTDwWGr8BLm+z0E+yZCFlkLNHX6kJT40SgT9IOpPZJefzw15YNsEQcRV/
+	 21e8EXUDcbA3VD28Ksw4uhDMLljE/+42KJrGkGjBrtnFSBIY79v5NECG3Vn5s1EKeP
+	 C9lEBQtzRXRtCpJszYIA/0QQvCiF49l4IxUYiJx/8L/PfTxBQ9H5UBzsAmQcmJS+V5
+	 o2SQNKTXLWYO5xz6SjNtMGdsyP19dnvXCcbBEcVik7BZ+oRhZSOMk93IVeP0olc3U3
+	 aCCrPqIK/dbb2LOd/oGc3UjQUhj5yB7NjnhQ3dDSpXPxe6p1Iq10V6qoxFdhnJ12VB
+	 oELDlxtiIxlgw==
+Date: Fri, 1 Dec 2023 15:49:40 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
+	axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
+	ming.lei@redhat.com
+Subject: Re: [PATCHv5 0/4] block integrity: directly map user space addresses
+Message-ID: <ZWpjBCF4KueqKlPN@kbusch-mbp>
+References: <CGME20231130215715epcas5p33208ca14e69a68402c04e5c743135e6c@epcas5p3.samsung.com>
+ <20231130215309.2923568-1-kbusch@meta.com>
+ <e3c2d527-3927-7efe-a61f-ff7e5af95d83@samsung.com>
+ <ZWopLQWBIUGBad3z@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
-Content-Language: en-US
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
- Keith Busch <kbusch@kernel.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Yu Kuai <yukuai1@huaweicloud.com>, Ed Tsai <ed.tsai@mediatek.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-References: <20231130193139.880955-1-bvanassche@acm.org>
- <20231130193139.880955-2-bvanassche@acm.org>
- <e728ac4b-bce4-4c2e-88bb-8874c73f0c8e@wdc.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <e728ac4b-bce4-4c2e-88bb-8874c73f0c8e@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZWopLQWBIUGBad3z@kbusch-mbp>
 
-On 12/1/23 04:52, Johannes Thumshirn wrote:
-> On 30.11.23 20:31, Bart Van Assche wrote:
->> +void blk_mq_update_fair_sharing(struct blk_mq_tag_set *set, bool enable)
->> +{
->> +	const unsigned int DFTS_BIT = ilog2(BLK_MQ_F_DISABLE_FAIR_TAG_SHARING);
->> +	struct blk_mq_hw_ctx *hctx;
->> +	struct request_queue *q;
->> +	unsigned long i;
->> +
->> +	/*
->> +	 * Serialize against blk_mq_update_nr_hw_queues() and
->> +	 * blk_mq_realloc_hw_ctxs().
->> +	 */
->> +	mutex_lock(&set->tag_list_lock);
->> +	list_for_each_entry(q, &set->tag_list, tag_set_list)
->> +		blk_mq_freeze_queue(q);
->> +	assign_bit(DFTS_BIT, &set->flags, !enable);
->> +	list_for_each_entry(q, &set->tag_list, tag_set_list)
->> +		queue_for_each_hw_ctx(q, hctx, i)
->> +			assign_bit(DFTS_BIT, &hctx->flags, !enable);
->> +	list_for_each_entry(q, &set->tag_list, tag_set_list)
->> +		blk_mq_unfreeze_queue(q);
->> +	mutex_unlock(&set->tag_list_lock);
+On Fri, Dec 01, 2023 at 11:42:53AM -0700, Keith Busch wrote:
+> On Fri, Dec 01, 2023 at 04:13:45PM +0530, Kanchan Joshi wrote:
+> > On 12/1/2023 3:23 AM, Keith Busch wrote:
+> > > From: Keith Busch<kbusch@kernel.org>
+> > 
+> > This causes a regression (existed in previous version too).
+> > System freeze on issuing single read/write io that used to work fine 
+> > earlier:
+> > fio -iodepth=1 -rw=randread -ioengine=io_uring_cmd -cmd_type=nvme 
+> > -bs=4096 -numjobs=1 -size=4096 -filename=/dev/ng0n1 -md_per_io_size=8 
+> > -name=pt
+> > 
+> > This is because we pin one bvec during submission, but unpin 4 on 
+> > completion. bio_integrity_unpin_bvec() uses bip->bip_max_vcnt, which is 
+> > set to 4 (equal to BIO_INLINE_VECS) in this case.
+> > 
+> > To use bip_max_vcnt the way this series uses, we need below patch/fix:
 > 
-> Hi Bart,
-> 
-> The above code adds a 3rd user (at least) of the following pattern to
-> the kernel:
-> 
-> 	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> 		blk_mq_freeze_queue(q);
-> 
-> 	/* do stuff */
-> 
-> 	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> 		blk_mq_unfreeze_queue(q);
-> 
-> Would it maybe be beneficial if we'd introduce functions for this, like:
-> 
-> static inline void blk_mq_freeze_tag_set(struct blk_mq_tag_set *set)
-> {
-> 	lockdep_assert_held(&set->tag_list_lock);
-> 
-> 	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> 		blk_mq_freeze_queue(q);
-> }
-> 
-> static inline void blk_mq_unfreeze_tag_set(struct blk_mq_tag_set *set)
-> {
-> 	lockdep_assert_held(&set->tag_list_lock);
-> 
-> 	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> 		blk_mq_unfreeze_queue(q);
-> }
+> Thanks for the catch! Earlier versions of this series was capped by the
+> byte count rather than the max_vcnt value, so the inline condition
+> didn't matter before. I think your update looks good. I'll double check
+> what's going on with my custom tests to see why it didn't see this
+> problem.
 
-Hi Johannes,
+Got it: I was using ioctl instead of iouring. ioctl doesn't set
+REQ_ALLOC_CACHE, so we don't get a bio_set in bio_integrity_alloc(), and
+that makes inline_vecs set similiar to what your diff does.
 
-That sounds like a good idea to me. I will make this change.
+Jens already applied the latest series for the next merge. We can append
+this or fold atop, or back it out and we can rework it for another
+version. No rush; for your patch:
 
-Thanks,
+Reviewed-by: Keith Busch <kbusch@kernel.org>
 
-Bart.
+Thanks again!
+
+> > diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> > index 674a2c80454b..feef615e2c9c 100644
+> > --- a/block/bio-integrity.c
+> > +++ b/block/bio-integrity.c
+> > @@ -69,15 +69,15 @@ struct bio_integrity_payload 
+> > *bio_integrity_alloc(struct bio *bio,
+> > 
+> >          memset(bip, 0, sizeof(*bip));
+> > 
+> > +       /* always report as many vecs as asked explicitly, not inline 
+> > vecs */
+> > +       bip->bip_max_vcnt = nr_vecs;
+> >          if (nr_vecs > inline_vecs) {
+> > -               bip->bip_max_vcnt = nr_vecs;
+> >                  bip->bip_vec = bvec_alloc(&bs->bvec_integrity_pool,
+> >                                            &bip->bip_max_vcnt, gfp_mask);
+> >                  if (!bip->bip_vec)
+> >                          goto err;
+> >          } else {
+> >                  bip->bip_vec = bip->bip_inline_vecs;
+> > -               bip->bip_max_vcnt = inline_vecs;
+> >          }
+> > 
+> >          bip->bip_bio = bio;
+> 
