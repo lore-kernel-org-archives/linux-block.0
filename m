@@ -1,248 +1,443 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IS4KlHjW";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Icpxe3vd"
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D29196;
-	Fri,  1 Dec 2023 02:48:17 -0800 (PST)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1A7Y1b029643;
-	Fri, 1 Dec 2023 10:48:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=ZQQ8XnaRVbaM44nNzF5qemf1JgW/J/CLCUS2GHzVJho=;
- b=IS4KlHjWYcYOdP/RXRoGoulwh/Eodw3XFCPFJEClvlYyUy4VcRR1TeCAUY2Nqt5mosrr
- PVyOJX+KMU92GbcOeAYIZ01hs8LanpcNHNlwHg6c2DIIgWdKeFjC4xOz+WLYFNdV/FPd
- 5tkAzPXOWn6KBOaNphmBUNgHprtLbGRJuU7zCCyHx3Ukg2aUoxRKimdHIdD1B+F2LKyB
- 4APKWugEpRJjHdGs6mJVDEXpsqu9wykmvyoUG7pyotN0r+z3K7pxpaSdODEXff4LxMlW
- uRunwdntFcbXCXPcP8Oq7BrPAJaTgsATY+skr732ILRhtLeSwdDbLFniQlO3KqXY7MZX AQ== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3uqd62r3u3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 01 Dec 2023 10:48:07 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3B19tN73010249;
-	Fri, 1 Dec 2023 10:48:06 GMT
-Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam04lp2169.outbound.protection.outlook.com [104.47.73.169])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3uk7cj3x7a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 01 Dec 2023 10:48:06 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K3QWY5qzY2jirvgu87XQ7iy8JyqFqGeh2Dh6MS4T32iNHG3f4NZkpJEyIAHZp4l6VTEbHpQzNyGa+/J5MPNPCmxg2t+mQWxdQ2Fz4GnxOs/ZpwsIV8Y+l+XdsbTl+L/w4FkbaA9a9xC+DIHDOjTn5iWYoVgKzyPqahIAR6+zWhVjNWmUcrQ3Lo0zQYsR9RkR+5GcB37u9TKISn7FsZLuJUxsdlFKH5KSMRhkqJkThuJFlcvi/2hZWDeFd6Jh5ZDxpAsl7OFavRM96Lj8Fxn5KInqvhFhyhMqaaFdMakUI0PPgQsqlivIuOx7+2eR+yBqlsJBVfJ2rDmQp5y77Zl8Kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZQQ8XnaRVbaM44nNzF5qemf1JgW/J/CLCUS2GHzVJho=;
- b=lmSgMAg3VPDOdaQlBIkoQORjLxhSDHdrYXyafLgrXR+THTRx+dK4J95GqPI/50To16XnH6SO9gI5jBfgHVI17/IdevfGtdTuGYec6ssXv3nQWKQSE1IWWa/ewaAynQh5wAhsHHz/GQVnMFr7pX4zgcMOKZCPS2Aauh0IT3m4quJVwDdnDlz9jz+WeckbXkkUNfVjfyavXX25SyUrBa7Cw+b4aAs25TLEo0KkAHAJs3KGgHdSk70bbmJzjd8PdegxrtFjtgohaxm9pDY+aA1KOxz6qmy45lbeVQXg0SpK9BZ/fy/qqX6CbjtzBhvg1MSN+tdbZpZSl6Ezj9QCExiiIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dslyD9q0"
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C03A13E
+	for <linux-block@vger.kernel.org>; Fri,  1 Dec 2023 04:12:03 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c9d2ca9a96so18554421fa.3
+        for <linux-block@vger.kernel.org>; Fri, 01 Dec 2023 04:12:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZQQ8XnaRVbaM44nNzF5qemf1JgW/J/CLCUS2GHzVJho=;
- b=Icpxe3vdZYCXae8g+H8Fta+swgWVQB+XwwwHywgOJibr5gvPltz2er99Ueomw4fOjcHyHBySrNnT1NtarYe6/lg0GOfLbMXKEVdcfvha87aRVCE508EtbKMsHmF75p9FxmoVEFjJYXhIffjW6uvXfItaRUm/xkPONQDMEsEMaxM=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by IA1PR10MB6196.namprd10.prod.outlook.com (2603:10b6:208:3a4::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.27; Fri, 1 Dec
- 2023 10:48:03 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::102a:f31:30c6:3187]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::102a:f31:30c6:3187%4]) with mapi id 15.20.7046.027; Fri, 1 Dec 2023
- 10:48:03 +0000
-Message-ID: <cc43b1ba-e9ea-4ff1-b616-be3c11960eea@oracle.com>
-Date: Fri, 1 Dec 2023 10:47:59 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 5/7] block: export blkdev_atomic_write_valid() and refactor
- api
-Content-Language: en-US
-To: Ojaswin Mujoo <ojaswin@linux.ibm.com>, linux-ext4@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>
-Cc: Ritesh Harjani <ritesh.list@gmail.com>, linux-kernel@vger.kernel.org,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dchinner@redhat.com
-References: <cover.1701339358.git.ojaswin@linux.ibm.com>
- <b53609d0d4b97eb9355987ac5ec03d4e89293b43.1701339358.git.ojaswin@linux.ibm.com>
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <b53609d0d4b97eb9355987ac5ec03d4e89293b43.1701339358.git.ojaswin@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0322.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:390::16) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+        d=gmail.com; s=20230601; t=1701432722; x=1702037522; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=frL7+vwmHLpLNUaP06j5E6OidqEcDTdbymMcnf+va+w=;
+        b=dslyD9q0iDl2pTDb3S9uVKb5mxYaX09BLJZ4OdWfQacxNkzumoN6W0j0nu5uMpFcP5
+         eTuMNVIfb0SdkOydnLjOR4IseoyeNgLk3qL0PTn9PE3nHCRSt1dyUmCLTB78Vk+sXaWI
+         sdB4BRBpEjSmnZ3K1iyd6u8ngpNGb0LMcGBC51Ke/P74XDiEa7V3SpNux/Jbcomo4Xuh
+         EbWuD77xAxdiwUM/+Ga9uBnTT4KX5zcc23/LueeSNyh53rCCKgXYz0ewBm+xgAO9BVga
+         OpxAoFq6M0zFhrR8D9lvArMVgV2t0yfr1kmVwBYhgSssiMumKmR2gIUsjZ78KQDtREJa
+         Mc1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701432722; x=1702037522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=frL7+vwmHLpLNUaP06j5E6OidqEcDTdbymMcnf+va+w=;
+        b=luYm2EeFezmHHAT+CAY7aFBTRQ2a/WejViwSbtQuSq9x2fMYmZlEvdqg3JK70jc4Ou
+         LkMWQBtGuBOvBXEZwNnBQx+/aU2xNurVpihYF0EtDAoxxvIDmhb+z7NX1ru8me/nK+Z5
+         n7gK1Viv5wEFelD1KgvE3mBckQPrAdQeMHvp/Jvy3UoH8vmDDtim82TxUIX+uW+/Kw6R
+         XmnFnVGCjGjneIPKQ0TxYQtjOAOsX1f6t+2XyRiEQsbZDVN3vsIpIyAUvcs111x52lPJ
+         x6zMyWZHjT0epnXinu5D++ui3GazV7gtIvGNSbo3xk+v+abh7OTvUZ6UmZQLWh4GA/q6
+         Q1Yw==
+X-Gm-Message-State: AOJu0YwZlrMUyu2miS6PB+GNRJQjV4zq9b9GUtk7N+DiYhHKennKkimY
+	Oy7OTx9Sy/09oeqOyj4YMwwQliH8qcLNCaC5Fdy2aXYf6kI=
+X-Google-Smtp-Source: AGHT+IGsyQDrtg/CSH2XLZ42xiEs0QRcc1wIlGkK83bB+bIvDUfFlYM3BPW/qUj4WOwkYJg3SjRDU56fltk5lvK4H1w=
+X-Received: by 2002:a2e:3511:0:b0:2c9:b69d:987d with SMTP id
+ z17-20020a2e3511000000b002c9b69d987dmr734529ljz.3.1701432721360; Fri, 01 Dec
+ 2023 04:12:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|IA1PR10MB6196:EE_
-X-MS-Office365-Filtering-Correlation-Id: ead62a4b-79f2-47a9-5441-08dbf25afe8d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	NfS68uhGW5IeCYQ28Rxy9qWZfM9tRtSOn1xgl8EIbBJoXYKyIHEMCQtg+p2RRNleG+cX+1NG0NfgY8qfmsyGevCDUOVxpNxjckApxaReuK/5Rj11IDJtSJ+XTT0MG61PIEHE+VkZi+Ez2X9rEleiFX5r1flUDri+gNKAu47jqVMyJ3uy5A01F5Tf1vz2RlKvJepJvMj5VwQjR3tpCm0bdRoU8EAmvo/ZKYbhBUDtAA4mXmKa6uTYSsjVBj378a24aFTcJeTVz7hzdy03r/rZrZBvadG2byS8Bgrjm40WlJlFlBHidMWleHMwhn8VjTPjtLG5aB/BNHGheSSvdsoxbs9GptNn1mFoXFrAbjSNscRG74syBi1rIkmifNr4bP2RqFMvFa8vNGLFbEiTgTepyj4cWCBo5nDuE2Gk8/Fs3Wv+sBr0gdQJYNTl3tyg++QEOZfgmsQbvsEatG86KmP92Vbcca2Vb3Dy0pui7IajwLHNg0WkrCxN2Fle9KGXtvMjHmRNRU1QCKx6EBHdGymTBvevHfWbm9Jld+42Z+i/k5N6I4Xzh5qEeuoZi6KjjiZ2AiQojK4wlBdBAa28L8xd/rbxjFuWMdc3xdnd6YaeA3MQj11QEZYDkW26i2lSIv+cSWM4agyWVcnPBrtWr/LUIg==
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(39860400002)(376002)(396003)(136003)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(7416002)(5660300002)(2906002)(8676002)(4326008)(8936002)(66476007)(54906003)(316002)(66556008)(66946007)(110136005)(26005)(36916002)(41300700001)(6506007)(6666004)(6486002)(478600001)(6512007)(53546011)(31686004)(2616005)(83380400001)(38100700002)(31696002)(86362001)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?T1JPenZmSkU2OGQ1ZHRtVGVjRWRJL3JuUWI0OWlxZlo1UUgySTBmdnN4dEx4?=
- =?utf-8?B?MHNxejlJN1dVTGVxU3BGeUJTVTZKeForMldwbUVQVVB4dXN3Yk84RkpNbkNI?=
- =?utf-8?B?SkpBNGFFM2VtakZSL1NpOHNhOUhRWE5aZnBEckhBVEZ6UW5CVFRvWWhLRTR0?=
- =?utf-8?B?SGo1ODEzTDNEUkpLR0dEWGpLZG5GSzJHcGl5VXUvYnlvUXBhSGZzQU1UWDVy?=
- =?utf-8?B?NkhFUW43Y0I2K2xCeGVyQTZSNlZDc2h3UXpwZnpNdE9wOWp3UGFiaGhUUyth?=
- =?utf-8?B?N201RVpwMWZJMmtKcHNVanp4RGwrdHl2WGdka0czSUZJanBSTFQyV0UvREpa?=
- =?utf-8?B?ZjhPTldwVElpVmxmUHlPTlR1QUV3NVRQK0JZRGdQUnRsYTlOZXYwWHNTdHps?=
- =?utf-8?B?VjBJRndwVWU2dmlHL1dLSWh6dTBNQ1BNQlgzZTFLVjJBVU1sVFF0TTNtNkwx?=
- =?utf-8?B?RFZ5VE1MaXg4N293Q2pXcjFSTURLQXZrQmlkZCs0WjVwZklHQ2oweUtSdVVx?=
- =?utf-8?B?ajZnYXJVTkNlZEpDZ081MWcxWGFtY3FmeExSalhDNGpEQWpIaitHK1ZNWk1D?=
- =?utf-8?B?ODRTc1hOcWxUWWVhYWh0dnhYNUorei94R1hEam4vNmwzKzA3SkViaVB0aHBa?=
- =?utf-8?B?Ly9hVWV1NHBHSDZkL08xZXV2TTd2VHBoWFp4YW5WVnViM0QxcXhmVGhsT1FO?=
- =?utf-8?B?M1FZWTBjUVVPcjZoUHRncXdIWGxMRWFrc3BMZWFGMHYyV21GdnAwdzlQNGhk?=
- =?utf-8?B?QkRoOTdMN3pERmZXb05KNUNkaCtEMFFJODZWNnAvSkJyZEZ4SjhGc3FSTlcr?=
- =?utf-8?B?YkFxMjBsRjJSR0dhd0gvOWJNOVRLbXA4Sm1ubWdHclFmcllnRktJb2FmR3VB?=
- =?utf-8?B?ZzIxWHFSRkNyQXRXL09oSEh4d2pVY1ZMS2E4ek5qNndXbnlyc0hCVmxyMXFy?=
- =?utf-8?B?dUtKR000RE9udkNFSHYzdndxTDducTdUVFFtYkxMU2hJQmpWS01zeUxOUDQ1?=
- =?utf-8?B?Qk9KYUpLTGcyT2xZWUVycUZvUTFZMkhIN3l5bC9BeVhGZW42VGovbHVYeDN6?=
- =?utf-8?B?YTZMNmpZQko0enlVSC82M0k4Ung4dFFoa2lmOUp0RG1SNHlrZDJ6UlFWVE43?=
- =?utf-8?B?L21lRjRSMWxGdlZMNHVwSWFuSW10Y1dpSDVxaVAzVndkWFBYU3VMMzFHcHlP?=
- =?utf-8?B?aWw3ZVBKcis0TWZaVmRCTytnZ2hFVUVnSzJVNlBOM28wdEx0Vm4yaGttTmpY?=
- =?utf-8?B?dWhQMHc4ZmgrN3lMZ1hjam13dW40WC9EQWpVclNHdXlEMHQ5UFNXTmg0Uytn?=
- =?utf-8?B?Q3JMNHJhTitWallxeUp0M3ZETWJlRVozZnQ4MTFacGI0SCtCQXZvMWswZ0FD?=
- =?utf-8?B?a3paM3dTZGxTZFlZY0tJK3YzcDNnUWxsellBT1FCeUx2aVE1OTZON2htTE1W?=
- =?utf-8?B?ZWU4RTBsQi8xRms4S0ptdFhBK0hXWWVJYWxpNm52OU82Und2a3BZUG0xOFNS?=
- =?utf-8?B?dmMzUGkrcHBCMFhsNG5EcmNjZDVpdVFxeDZCdnZsdEZqeEF1VHRLR29tODhi?=
- =?utf-8?B?K2NDOVpwcTRYYnNmT0xiVlR5YVJueXRTRXhlSWFURXBtaFVTbkl0Yms0NmZv?=
- =?utf-8?B?ODU1MUV4d3RNdVV0TlViZWJqQjFUOW1NNUtybW8wM1F2ZksrMnEwVElMSk5r?=
- =?utf-8?B?czg0U1lDNmJ5dWFVVmdMVmhxaVZKOG1IaGNtd09JeWNIajR4MXEydEpkcUN1?=
- =?utf-8?B?ZzJLM0crVjJIL3FSU25ta0ZvTGFaditNZlc4RGJwYzdyMkp1Ykx1UTI1WFVv?=
- =?utf-8?B?c0ZDRjE4eWc2QVdPeGFvaDFsWmpqTXpGcklDVUt0cUg1R1VXUGJtUFpyS1RU?=
- =?utf-8?B?TzAwd1A2czJzSnh6WTB3YTNsblU3K29tL2hocklnbEIyRTVBV1pRNm5Ld1FR?=
- =?utf-8?B?TDh3VkZKT2FvSTAzc1FUcFlLaWwvLytYRFloMmZDSnlDQTErM1VGSHRtaFRK?=
- =?utf-8?B?TVBlbGJna2tMb1dtVy9yK3BaM25IN2duZTQ2TTRNZ1RybzVKQWZTbVVUaUJZ?=
- =?utf-8?B?MUtvem8rMWVzakZ6bFllUENreEIxbmNIVTZuY0tkL1dTVWFobmkzMnFodzFL?=
- =?utf-8?Q?RFw5ahPpnGmXMd6/JYSU1E45F?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	s0gauSjAv+TuE1LP27Yq5i5EhvMxD02Wzd+N4LVs9+QjXg1TAdqnTBcqcfvwQCYe3F09v9ftBvrwhZEBqYzhAhxgsDVJebuyJZLaS80kQjpy5thIIoMuNwiEbASTgR//MPKxGEgpiI2HjXBTZuoYMS8Lg8OyDLUfWMLCWjnnmmkMh8/uwvNG9wW2Qd9cnDucnajmcqLCdSpQ+jRWlztqLEhMd1sC9XRk0elf5/41IC34AMVuMGyeG/oBxRCJpG0D1j2xPYk0RX+Wh9SsT/R+2dy/rhQTpPP/mOnXoSxnL9CYxLuqMsOLqYWrZ7obDAD3Oqk9+0NJBQVoYE4XASb9KQpIfYNTLoTVDNjNYt/IvWT/bBfJtEuj0UddlFd8oOjvDwI1ymq2T22/KTUZcW8mX2aZDLrIiCcEQGnRrOfxMSBbxMqdFCvEA0x8dW7QEUVGcgtwAt67MZ3f0cshsFFUpE6W5fnj3Vx/yx0Rg/D7ETKjlvyHJnJDvenSi9O8e+g8gzY2Zw7Cb/8bFEALgdgkODk/ZxJ+f/l1QpYOwAbfbCcJzbLirSaYiK2L/OsnIM4kvvniZxPensv2T5twdWlnIsc5uyF31/Owp6Ga+dcW+PVkpVol4w2O88hBvGsVdcp90nJjBx500gnq8cYYdG4WcOEUmE+Qso5OeIBwFTUsdl4aOl9Q0BNNgXYInLZBI8dTFTYYNLcEp7K9Eflwdb5bd/vks343fMbf/guEEPZR4DRZzi0t9cjcwY6oJNaocuEnNbR3U2eslCZsf0QaIH8YLbQLh3y+ufqtYrYH3F8QAwLudCbA9PRVucpOPJ5kVwCaMp50F6GfM7tfHHqorK6ROX8PcnIe0++1QB+YYCZSfA4LWMn8hzz84tQOZtv1EGOSjMLDgbnwm+yYO3YC2wPwUlu4ErjRKFP0+1pub1/lJgk=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ead62a4b-79f2-47a9-5441-08dbf25afe8d
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 10:48:03.6775
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gpNc/usVKjPu2p2sNIJUO+GTowU9P45NuCb6Ytfzp8JNkQ3UhLwZ7plHv3oj03av4/8H8d+J/XO6tsf57rK2MQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB6196
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-01_08,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
- suspectscore=0 spamscore=0 mlxlogscore=999 mlxscore=0 phishscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312010070
-X-Proofpoint-GUID: BBkE411NJ55O7P00mMKsDuEy9fy05FOY
-X-Proofpoint-ORIG-GUID: BBkE411NJ55O7P00mMKsDuEy9fy05FOY
+References: <CGME20231123103102epcas5p2aee268735dc9e0c357e6d3b98d16fe21@epcas5p2.samsung.com>
+ <20231123102431.6804-1-kundan.kumar@samsung.com> <20231123153007.GA3853@lst.de>
+ <85be66ad-0203-6f81-8be0-1190842c9273@samsung.com> <37d9ca26-2ec2-4c51-8d33-a736f54ef93f@kernel.dk>
+ <fba18f05-ae51-4d46-932a-5f4f9d2aab07@kernel.dk> <CALYkqXp36aJbu+2PgHQhSaXh38zTtcnVza+pexqJyDEDaq=V7Q@mail.gmail.com>
+In-Reply-To: <CALYkqXp36aJbu+2PgHQhSaXh38zTtcnVza+pexqJyDEDaq=V7Q@mail.gmail.com>
+From: Kundan Kumar <kundanthebest@gmail.com>
+Date: Fri, 1 Dec 2023 17:41:49 +0530
+Message-ID: <CALYkqXp+Hsa6qGsPzrGDR-SXPXSOoWWsved6p8cWb-_CjSayeA@mail.gmail.com>
+Subject: Re: [PATCH] block: skip QUEUE_FLAG_STATS and rq-qos for passthrough io
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>, 
+	"kundan.kumar" <kundan.kumar@samsung.com>, kbusch@kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 30/11/2023 13:53, Ojaswin Mujoo wrote:
-> Export the blkdev_atomic_write_valid() function so that other filesystems
-> can call it as a part of validating the atomic write operation.
-> 
-> Further, refactor the api to accept a len argument instead of iov_iter to
-> make it easier to call from other places.
-> 
-> Signed-off-by: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+On Fri, Nov 24, 2023 at 4:58=E2=80=AFPM Kundan Kumar <kundanthebest@gmail.c=
+om> wrote:
+>
+> On Fri, Nov 24, 2023 at 2:07=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrot=
+e:
+> >
+> > On 11/23/23 1:19 PM, Jens Axboe wrote:
+> > > On 11/23/23 11:12 AM, Kanchan Joshi wrote:
+> > >> On 11/23/2023 9:00 PM, Christoph Hellwig wrote:
+> > >>> The rest looks good, but that stats overhead seems pretty horrible.=
+.
+> > >>
+> > >> On my setup
+> > >> Before[1]: 7.06M
+> > >> After[2]: 8.29M
+> > >>
+> > >> [1]
+> > >> # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 -n=
+2
+> > >> -u1 -r4 /dev/ng0n1 /dev/ng1n1
+> > >> submitter=3D0, tid=3D2076, file=3D/dev/ng0n1, node=3D-1
+> > >> submitter=3D1, tid=3D2077, file=3D/dev/ng1n1, node=3D-1
+> > >> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D=
+256
+> > >> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
+> > >> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D=
+256
+> > >> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
+> > >> IOPS=3D6.95M, BW=3D3.39GiB/s, IOS/call=3D32/31
+> > >> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/32
+> > >> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/31
+> > >> Exiting on timeout
+> > >> Maximum IOPS=3D7.06M
+> > >>
+> > >> [2]
+> > >>   # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 =
+-n2
+> > >> -u1 -r4 /dev/ng0n1 /dev/ng1n1
+> > >> submitter=3D0, tid=3D2123, file=3D/dev/ng0n1, node=3D-1
+> > >> submitter=3D1, tid=3D2124, file=3D/dev/ng1n1, node=3D-1
+> > >> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D=
+256
+> > >> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
+> > >> IOPS=3D8.27M, BW=3D4.04GiB/s, IOS/call=3D32/31
+> > >> IOPS=3D8.29M, BW=3D4.05GiB/s, IOS/call=3D32/31
+> > >> IOPS=3D8.29M, BW=3D4.05GiB/s, IOS/call=3D31/31
+> > >> Exiting on timeout
+> > >> Maximum IOPS=3D8.29M
+> > >
+> > > It's all really down to how expensive getting the current time is on
+> > > your box, some will be better and some worse
+> > >
+> > > One idea that has been bounced around in the past is to have a
+> > > blk_ktime_get_ns() and have it be something ala:
+> > >
+> > > u64 blk_ktime_get_ns(void)
+> > > {
+> > >       struct blk_plug *plug =3D current->plug;
+> > >
+> > >       if (!plug)
+> > >               return ktime_get_ns();
+> > >
+> > >       if (!plug->ktime_valid)
+> > >               plug->ktime =3D ktime_get_ns();
+> > >
+> > >       return plug->ktime;
+> > > }
+> > >
+> > > in freestyle form, with the idea being that we don't care granularity=
+ to
+> > > the extent that we'd need a new stamp every time.
+> > >
+> > > If the task is scheduled out, the plug is flushed anyway, which shoul=
+d
+> > > invalidate the stamp. For preemption this isn't true iirc, so we'd ne=
+ed
+> > > some kind of blk_flush_plug_ts() or something for that case to
+> > > invalidate it.
+> > >
+> > > Hopefully this could then also get away from passing in a cached valu=
+e
+> > > that we do in various spots, exactly because all of this time stampin=
+g
+> > > is expensive. It's also a bit of a game of whack-a-mole, as users get
+> > > added and distro kernels tend to turn on basically everything anyway.
+> >
+> > Did a quick'n dirty (see below), which recoups half of the lost
+> > performance for me. And my kernel deliberately doesn't enable all of th=
+e
+> > gunk in block/ that slows everything down, I suspect it'll be a bigger
+> > win for you percentage wise:
+> >
+> > IOPS=3D121.42M, BW=3D59.29GiB/s, IOS/call=3D31/31
+> > IOPS=3D121.47M, BW=3D59.31GiB/s, IOS/call=3D32/32
+> > IOPS=3D121.44M, BW=3D59.30GiB/s, IOS/call=3D31/31
+> > IOPS=3D121.47M, BW=3D59.31GiB/s, IOS/call=3D31/31
+> > IOPS=3D121.45M, BW=3D59.30GiB/s, IOS/call=3D32/32
+> > IOPS=3D119.95M, BW=3D58.57GiB/s, IOS/call=3D31/32
+> > IOPS=3D115.30M, BW=3D56.30GiB/s, IOS/call=3D32/31
+> > IOPS=3D115.38M, BW=3D56.34GiB/s, IOS/call=3D32/32
+> > IOPS=3D115.35M, BW=3D56.32GiB/s, IOS/call=3D32/32
+> >
+> >
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index fdf25b8d6e78..6e74af442b94 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -1055,6 +1055,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug,=
+ unsigned short nr_ios)
+> >         plug->rq_count =3D 0;
+> >         plug->multiple_queues =3D false;
+> >         plug->has_elevator =3D false;
+> > +       plug->cur_ktime =3D 0;
+> >         INIT_LIST_HEAD(&plug->cb_list);
+> >
+> >         /*
+> > diff --git a/block/blk-flush.c b/block/blk-flush.c
+> > index 3f4d41952ef2..e4e9f7eed346 100644
+> > --- a/block/blk-flush.c
+> > +++ b/block/blk-flush.c
+> > @@ -143,7 +143,7 @@ static void blk_account_io_flush(struct request *rq=
+)
+> >         part_stat_lock();
+> >         part_stat_inc(part, ios[STAT_FLUSH]);
+> >         part_stat_add(part, nsecs[STAT_FLUSH],
+> > -                     ktime_get_ns() - rq->start_time_ns);
+> > +                     blk_ktime_get_ns() - rq->start_time_ns);
+> >         part_stat_unlock();
+> >  }
+> >
+> > diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> > index 089fcb9cfce3..d06cea625462 100644
+> > --- a/block/blk-iocost.c
+> > +++ b/block/blk-iocost.c
+> > @@ -829,7 +829,7 @@ static int ioc_autop_idx(struct ioc *ioc, struct ge=
+ndisk *disk)
+> >
+> >         /* step up/down based on the vrate */
+> >         vrate_pct =3D div64_u64(ioc->vtime_base_rate * 100, VTIME_PER_U=
+SEC);
+> > -       now_ns =3D ktime_get_ns();
+> > +       now_ns =3D blk_ktime_get_ns();
+> >
+> >         if (p->too_fast_vrate_pct && p->too_fast_vrate_pct <=3D vrate_p=
+ct) {
+> >                 if (!ioc->autop_too_fast_at)
+> > @@ -1044,7 +1044,7 @@ static void ioc_now(struct ioc *ioc, struct ioc_n=
+ow *now)
+> >         unsigned seq;
+> >         u64 vrate;
+> >
+> > -       now->now_ns =3D ktime_get();
+> > +       now->now_ns =3D blk_ktime_get();
+> >         now->now =3D ktime_to_us(now->now_ns);
+> >         vrate =3D atomic64_read(&ioc->vtime_rate);
+> >
+> > @@ -2810,7 +2810,7 @@ static void ioc_rqos_done(struct rq_qos *rqos, st=
+ruct request *rq)
+> >                 return;
+> >         }
+> >
+> > -       on_q_ns =3D ktime_get_ns() - rq->alloc_time_ns;
+> > +       on_q_ns =3D blk_ktime_get_ns() - rq->alloc_time_ns;
+> >         rq_wait_ns =3D rq->start_time_ns - rq->alloc_time_ns;
+> >         size_nsec =3D div64_u64(calc_size_vtime_cost(rq, ioc), VTIME_PE=
+R_NSEC);
+> >
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 900c1be1fee1..9c96dee9e584 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -323,7 +323,7 @@ void blk_rq_init(struct request_queue *q, struct re=
+quest *rq)
+> >         RB_CLEAR_NODE(&rq->rb_node);
+> >         rq->tag =3D BLK_MQ_NO_TAG;
+> >         rq->internal_tag =3D BLK_MQ_NO_TAG;
+> > -       rq->start_time_ns =3D ktime_get_ns();
+> > +       rq->start_time_ns =3D blk_ktime_get_ns();
+> >         rq->part =3D NULL;
+> >         blk_crypto_rq_set_defaults(rq);
+> >  }
+> > @@ -333,7 +333,7 @@ EXPORT_SYMBOL(blk_rq_init);
+> >  static inline void blk_mq_rq_time_init(struct request *rq, u64 alloc_t=
+ime_ns)
+> >  {
+> >         if (blk_mq_need_time_stamp(rq))
+> > -               rq->start_time_ns =3D ktime_get_ns();
+> > +               rq->start_time_ns =3D blk_ktime_get_ns();
+> >         else
+> >                 rq->start_time_ns =3D 0;
+> >
+> > @@ -444,7 +444,7 @@ static struct request *__blk_mq_alloc_requests(stru=
+ct blk_mq_alloc_data *data)
+> >
+> >         /* alloc_time includes depth and tag waits */
+> >         if (blk_queue_rq_alloc_time(q))
+> > -               alloc_time_ns =3D ktime_get_ns();
+> > +               alloc_time_ns =3D blk_ktime_get_ns();
+> >
+> >         if (data->cmd_flags & REQ_NOWAIT)
+> >                 data->flags |=3D BLK_MQ_REQ_NOWAIT;
+> > @@ -629,7 +629,7 @@ struct request *blk_mq_alloc_request_hctx(struct re=
+quest_queue *q,
+> >
+> >         /* alloc_time includes depth and tag waits */
+> >         if (blk_queue_rq_alloc_time(q))
+> > -               alloc_time_ns =3D ktime_get_ns();
+> > +               alloc_time_ns =3D blk_ktime_get_ns();
+> >
+> >         /*
+> >          * If the tag allocator sleeps we could get an allocation for a
+> > @@ -1037,7 +1037,7 @@ static inline void __blk_mq_end_request_acct(stru=
+ct request *rq, u64 now)
+> >  inline void __blk_mq_end_request(struct request *rq, blk_status_t erro=
+r)
+> >  {
+> >         if (blk_mq_need_time_stamp(rq))
+> > -               __blk_mq_end_request_acct(rq, ktime_get_ns());
+> > +               __blk_mq_end_request_acct(rq, blk_ktime_get_ns());
+> >
+> >         blk_mq_finish_request(rq);
+> >
+> > @@ -1080,7 +1080,7 @@ void blk_mq_end_request_batch(struct io_comp_batc=
+h *iob)
+> >         u64 now =3D 0;
+> >
+> >         if (iob->need_ts)
+> > -               now =3D ktime_get_ns();
+> > +               now =3D blk_ktime_get_ns();
+> >
+> >         while ((rq =3D rq_list_pop(&iob->req_list)) !=3D NULL) {
+> >                 prefetch(rq->bio);
+> > @@ -1249,7 +1249,7 @@ void blk_mq_start_request(struct request *rq)
+> >         trace_block_rq_issue(rq);
+> >
+> >         if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+> > -               rq->io_start_time_ns =3D ktime_get_ns();
+> > +               rq->io_start_time_ns =3D blk_ktime_get_ns();
+> >                 rq->stats_sectors =3D blk_rq_sectors(rq);
+> >                 rq->rq_flags |=3D RQF_STATS;
+> >                 rq_qos_issue(q, rq);
+> > @@ -3066,7 +3066,7 @@ blk_status_t blk_insert_cloned_request(struct req=
+uest *rq)
+> >         blk_mq_run_dispatch_ops(q,
+> >                         ret =3D blk_mq_request_issue_directly(rq, true)=
+);
+> >         if (ret)
+> > -               blk_account_io_done(rq, ktime_get_ns());
+> > +               blk_account_io_done(rq, blk_ktime_get_ns());
+> >         return ret;
+> >  }
+> >  EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
+> > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> > index 13e4377a8b28..5919919ba1c3 100644
+> > --- a/block/blk-throttle.c
+> > +++ b/block/blk-throttle.c
+> > @@ -1813,7 +1813,7 @@ static bool throtl_tg_is_idle(struct throtl_grp *=
+tg)
+> >         time =3D min_t(unsigned long, MAX_IDLE_TIME, 4 * tg->idletime_t=
+hreshold);
+> >         ret =3D tg->latency_target =3D=3D DFL_LATENCY_TARGET ||
+> >               tg->idletime_threshold =3D=3D DFL_IDLE_THRESHOLD ||
+> > -             (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
+> > +             (blk_ktime_get_ns() >> 10) - tg->last_finish_time > time =
+||
+> >               tg->avg_idletime > tg->idletime_threshold ||
+> >               (tg->latency_target && tg->bio_cnt &&
+> >                 tg->bad_bio_cnt * 5 < tg->bio_cnt);
+> > @@ -2058,7 +2058,7 @@ static void blk_throtl_update_idletime(struct thr=
+otl_grp *tg)
+> >         if (last_finish_time =3D=3D 0)
+> >                 return;
+> >
+> > -       now =3D ktime_get_ns() >> 10;
+> > +       now =3D blk_ktime_get_ns() >> 10;
+> >         if (now <=3D last_finish_time ||
+> >             last_finish_time =3D=3D tg->checked_last_finish_time)
+> >                 return;
+> > @@ -2325,7 +2325,7 @@ void blk_throtl_bio_endio(struct bio *bio)
+> >         if (!tg->td->limit_valid[LIMIT_LOW])
+> >                 return;
+> >
+> > -       finish_time_ns =3D ktime_get_ns();
+> > +       finish_time_ns =3D blk_ktime_get_ns();
+> >         tg->last_finish_time =3D finish_time_ns >> 10;
+> >
+> >         start_time =3D bio_issue_time(&bio->bi_issue) >> 10;
+> > diff --git a/block/blk.h b/block/blk.h
+> > index 08a358bc0919..4f081a00e644 100644
+> > --- a/block/blk.h
+> > +++ b/block/blk.h
+> > @@ -518,4 +518,17 @@ static inline int req_ref_read(struct request *req=
+)
+> >         return atomic_read(&req->ref);
+> >  }
+> >
+> > +static inline u64 blk_ktime_get_ns(void)
+> > +{
+> > +       struct blk_plug *plug =3D current->plug;
+> > +
+> > +       if (!plug)
+> > +               return ktime_get_ns();
+> > +       if (!(plug->cur_ktime & 1ULL)) {
+> > +               plug->cur_ktime =3D ktime_get_ns();
+> > +               plug->cur_ktime |=3D 1ULL;
+> > +       }
+> > +       return plug->cur_ktime;
+> > +}
+> > +
+> >  #endif /* BLK_INTERNAL_H */
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index 51fa7ffdee83..081830279f70 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -972,6 +972,9 @@ struct blk_plug {
+> >         bool multiple_queues;
+> >         bool has_elevator;
+> >
+> > +       /* bit0 set if valid */
+> > +       u64 cur_ktime;
+> > +
+> >         struct list_head cb_list; /* md requires an unplug callback */
+> >  };
+> >
+> >
+> > --
+> > Jens Axboe
+> >
+> >
+>
+> Hi Jens,
+>
+> This is what I see with your changes on my setup.
+>
+> Before[1]: 7.06M
+> After[2]: 7.52M
+>
+> [1]
+> # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 -n2 \
+> -u1 -r4 /dev/ng0n1 /dev/ng1n1
+> submitter=3D0, tid=3D2076, file=3D/dev/ng0n1, node=3D-1
+> submitter=3D1, tid=3D2077, file=3D/dev/ng1n1, node=3D-1
+> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D256
+> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
+> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D256
+> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
+> IOPS=3D6.95M, BW=3D3.39GiB/s, IOS/call=3D32/31
+> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/32
+> IOPS=3D7.06M, BW=3D3.45GiB/s, IOS/call=3D32/31
+> Exiting on timeout
+> Maximum IOPS=3D7.06M
+>
+> [2]
+> # taskset -c 2,3 t/io_uring -b512 -d256 -c32 -s32 -p1 -F1 -B1 -O0 -n2 \
+> -u1 -r4 /dev/ng0n1 /dev/ng1n1
+> submitter=3D0, tid=3D2204, file=3D/dev/ng0n1, node=3D-1
+> submitter=3D1, tid=3D2205, file=3D/dev/ng1n1, node=3D-1
+> polled=3D1, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D256
+> Engine=3Dio_uring, sq_ring=3D256, cq_ring=3D256
+> IOPS=3D7.40M, BW=3D3.62GiB/s, IOS/call=3D32/31
+> IOPS=3D7.51M, BW=3D3.67GiB/s, IOS/call=3D32/31
+> IOPS=3D7.52M, BW=3D3.67GiB/s, IOS/call=3D32/32
+> Exiting on timeout
+> Maximum IOPS=3D7.52M
+>
+> The original patch avoids processing throttle stats and wbt_issue/done
+> stats for passthrough-io path.
+>
+> Improvement with original-patch :
+> 7.06M -> 8.29M
+>
+> It seems that both the optimizations are different. The original patch is=
+ about
+> "completely disabling stats for passthrough-io" and your changes
+> optimize getting the
+> current time which would improve performance for everyone.
+>
+> I think both of them are independent.
+>
+> --
+> Kundan Kumar
 
-I was actually thinking of moving this functionality to vfs and maybe 
-also calling earlier in write path, as the code is really common to 
-blkdev and FSes.
-
-However, Christoph Hellwig was not so happy about current interface with 
-power-of-2 requirement et al, so I was going to wait until that 
-discussion is concluded before deciding.
-
-Thanks,
-John
-
-> ---
->   block/fops.c           | 18 ++++++++++--------
->   include/linux/blkdev.h |  2 ++
->   2 files changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/fops.c b/block/fops.c
-> index 516669ad69e5..5dae95c49720 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -41,8 +41,7 @@ static bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
->   		!bdev_iter_is_aligned(bdev, iter);
->   }
->   
-> -static bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos,
-> -			      struct iov_iter *iter)
-> +bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos, size_t len)
->   {
->   	unsigned int atomic_write_unit_min_bytes =
->   			queue_atomic_write_unit_min_bytes(bdev_get_queue(bdev));
-> @@ -53,16 +52,17 @@ static bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos,
->   		return false;
->   	if (pos % atomic_write_unit_min_bytes)
->   		return false;
-> -	if (iov_iter_count(iter) % atomic_write_unit_min_bytes)
-> +	if (len % atomic_write_unit_min_bytes)
->   		return false;
-> -	if (!is_power_of_2(iov_iter_count(iter)))
-> +	if (!is_power_of_2(len))
->   		return false;
-> -	if (iov_iter_count(iter) > atomic_write_unit_max_bytes)
-> +	if (len > atomic_write_unit_max_bytes)
->   		return false;
-> -	if (pos % iov_iter_count(iter))
-> +	if (pos % len)
->   		return false;
->   	return true;
->   }
-> +EXPORT_SYMBOL_GPL(blkdev_atomic_write_valid);
->   
->   #define DIO_INLINE_BIO_VECS 4
->   
-> @@ -81,7 +81,8 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
->   	if (blkdev_dio_unaligned(bdev, pos, iter))
->   		return -EINVAL;
->   
-> -	if (atomic_write && !blkdev_atomic_write_valid(bdev, pos, iter))
-> +	if (atomic_write &&
-> +	    !blkdev_atomic_write_valid(bdev, pos, iov_iter_count(iter)))
->   		return -EINVAL;
->   
->   	if (nr_pages <= DIO_INLINE_BIO_VECS)
-> @@ -348,7 +349,8 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
->   	if (blkdev_dio_unaligned(bdev, pos, iter))
->   		return -EINVAL;
->   
-> -	if (atomic_write && !blkdev_atomic_write_valid(bdev, pos, iter))
-> +	if (atomic_write &&
-> +	    !blkdev_atomic_write_valid(bdev, pos, iov_iter_count(iter)))
->   		return -EINVAL;
->   
->   	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index f70988083734..5a3124fc191f 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1566,6 +1566,8 @@ static inline int early_lookup_bdev(const char *pathname, dev_t *dev)
->   int freeze_bdev(struct block_device *bdev);
->   int thaw_bdev(struct block_device *bdev);
->   
-> +bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos, size_t len);
-> +
->   struct io_comp_batch {
->   	struct request *req_list;
->   	bool need_ts;
-
+Any feedback on this ?
+--
+Kundan Kumart
