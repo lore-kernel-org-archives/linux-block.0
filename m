@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dxC8V38i"
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE62FA
-	for <linux-block@vger.kernel.org>; Sat,  2 Dec 2023 06:58:34 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1d072f50a44so1745245ad.0
-        for <linux-block@vger.kernel.org>; Sat, 02 Dec 2023 06:58:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fm5lcZhT"
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EBAFD;
+	Sat,  2 Dec 2023 07:50:35 -0800 (PST)
+Received: by mail-pf1-x442.google.com with SMTP id d2e1a72fcca58-6cdfb721824so1339924b3a.3;
+        Sat, 02 Dec 2023 07:50:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701529113; x=1702133913; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XW1UgdrkcqxXWOvmhkp24/Qp8+IcQ4Iq6pEPuTKK3Ww=;
-        b=dxC8V38imb/+a0etNuQIX8U5esj6IwLxktmTJ5n1nFq0V0pM8VA98Js8x5QqvKzutE
-         V3Nca2wBqvuArDsfcyZ8MEPWDgnLGlTd633Xuo8Vk4QghRf4Ym/t2PAN8s/Gx1IrxWVr
-         zV1zt7dZddU5KTAgRxDMYqONCKGPV4ySlRFvLgaoxZOLPYFfFnUI63tGffru8lUIS0J7
-         m2d/LO1DGKxUn4NrTOgtsX39yeKgisZ6zXB30bFVc56kI/44RFfl29IPQcdke2XnckxI
-         n30ea8CA0iK2i9mUqvlr6VHYbVajrO0YExHhQfgC0Bb7LHcmxuBaTNR4kdEkNa8u1lTj
-         DI1w==
+        d=gmail.com; s=20230601; t=1701532235; x=1702137035; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fd5HOuEegKoTJGiz25FDlEzvosdY/OfidE22UbIBrzQ=;
+        b=Fm5lcZhTdsoVQApZyhfZwDtR3gciTdMbEJuOB4iL0e4iAuyXdwC5hQGoGruwQcMIb0
+         Hl/+BAsws9gdG0XGZ9bJCndjXppu1raCT3k1nNIUxr7+mKs17d3O1IhNHoeImOH7/Fgz
+         E1mIWp0G5Bstru+LhtXYv1rfeN8fr91kv2NwOYofYBMave9YIdPwbiBfDgBtYIZmDRUu
+         +P2uGXSmJ7BtbdfMntC0v2cqqrNKjcf/N8OOS0w+M4SbdjQ3tFwMV98wgZim/JiRtZqS
+         Ghv4qPhGoG9yZHnNU39Z39xM/BrICHCtywucTwK1kxA6/PLciHAFXM31HqhNKsHqlkP1
+         Y6Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701529113; x=1702133913;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XW1UgdrkcqxXWOvmhkp24/Qp8+IcQ4Iq6pEPuTKK3Ww=;
-        b=RHl++OFDTF6oUsUDOH40jAzFMBMpVw70UKaFYz++ynfHjZ14NQHII+aNjWkG1137ip
-         nVDIGWJDTqtA2Dhh5rjMwQBKDPdgum4eDw5Fgh63vWe5pDPyUFMAsQl/krpvIriOFYiF
-         zSJmBkVyMA9cWw9uBKmtROT0CKBM8b0/DcdarGpxuWi0tv4M9ED5Rfn5JYXbdeaQ2N/r
-         X4TCWPQTHGwQghSAZdBQnVhn+gRXLzzRiFSFHxtPhrPi+xH4MMULE+SXiYFk/v1vUMPX
-         izlOnjnMzbUcezSuBIod9dAnNvc/f2Y1HwDgzRRxLRwZqIizX1V9bfxZqQ8S1BIPS5w9
-         7dOQ==
-X-Gm-Message-State: AOJu0YwD9gKbzAsqsiOVnLLsnfpdYpMUHSCQQbZ99wzq7QzB93eR2meg
-	XvjSsJ05/DCRUkxNG5YCOJ/PDw==
-X-Google-Smtp-Source: AGHT+IEdYA1zBSx0/GweJouqcxEpYNoCqs4MttA1Lpvc82tGgIMit/GYbebWL74MRUmEp33KNYAP4g==
-X-Received: by 2002:a05:6a20:72a3:b0:18b:fece:ff60 with SMTP id o35-20020a056a2072a300b0018bfeceff60mr31298181pzk.1.1701529113460;
-        Sat, 02 Dec 2023 06:58:33 -0800 (PST)
-Received: from [10.0.0.185] (50-255-6-74-static.hfc.comcastbusiness.net. [50.255.6.74])
-        by smtp.gmail.com with ESMTPSA id s5-20020a17090aad8500b002853349e490sm6784095pjq.34.2023.12.02.06.58.32
+        d=1e100.net; s=20230601; t=1701532235; x=1702137035;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Fd5HOuEegKoTJGiz25FDlEzvosdY/OfidE22UbIBrzQ=;
+        b=mm6zDVVqKYcBFF7DMjZCOc2YB7ybCOBcu3PM/xM99WEp9O/+RfOsAtTw/JusPrhZG+
+         FbdlZA/eYizZvTy5+Wzgpo9fRHdbCfKgyb/j8XlHuUyQYLMmtJXHFh5IuWfkMkcT8T4u
+         6XvDbOdRPQu26nqiAJY35ETIEBB4slewe5fhi+bi7/YzLxAhtslc8qlvR1gMhYtteQ5p
+         f4E9sAv5Y0Vj4FZCdGftGOEVtACSl3V6w7cYaOoxae+siEM+zrB13Kx8drlHdsvq29W7
+         wEZGVRLoLJl09OFON4cFzZ1BhY7STWR3WBQr7PQQ28J6ph9XbMUZ0CP0OARWeJ61SDYM
+         0ODg==
+X-Gm-Message-State: AOJu0Ywo4gkS6+2tPjl5KkTJj6aG3VngBjVc9bEkI7G5NW4q+U3ZSOj6
+	ax0IPnjAZPQ6bOd2qJYZwM0=
+X-Google-Smtp-Source: AGHT+IFca1WmCGAfcW1bSAACpzBFXnNuSg9Klfi0NOCvHOUB03AUvHSg1kGTOaKuuzymF5BvIl00zg==
+X-Received: by 2002:a05:6a00:c8e:b0:6ce:2732:1df9 with SMTP id a14-20020a056a000c8e00b006ce27321df9mr586818pfv.51.1701532235352;
+        Sat, 02 Dec 2023 07:50:35 -0800 (PST)
+Received: from [10.164.73.138] ([103.136.251.90])
+        by smtp.gmail.com with ESMTPSA id z24-20020a62d118000000b0069346777241sm5079977pfg.97.2023.12.02.07.50.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Dec 2023 06:58:32 -0800 (PST)
-Message-ID: <f04ad3dd-05a1-4cef-b837-9c51a18fdc7c@kernel.dk>
-Date: Sat, 2 Dec 2023 07:58:31 -0700
+        Sat, 02 Dec 2023 07:50:35 -0800 (PST)
+Message-ID: <b49d6a29-e3a3-4b6b-8892-8ded319b2619@gmail.com>
+Date: Sat, 2 Dec 2023 23:50:28 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,46 +47,68 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv5 0/4] block integrity: directly map user space addresses
-Content-Language: en-US
-To: Kanchan Joshi <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, io-uring@vger.kernel.org, hch@lst.de,
- martin.petersen@oracle.com, ming.lei@redhat.com
-References: <CGME20231130215715epcas5p33208ca14e69a68402c04e5c743135e6c@epcas5p3.samsung.com>
- <20231130215309.2923568-1-kbusch@meta.com>
- <e3c2d527-3927-7efe-a61f-ff7e5af95d83@samsung.com>
- <ZWopLQWBIUGBad3z@kbusch-mbp> <ZWpjBCF4KueqKlPN@kbusch-mbp>
- <ac5e99c6-7297-4c56-8f3c-98755c58092b@kernel.dk>
- <2fe7b3e3-3481-3a67-88f8-13e47ceba545@samsung.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <2fe7b3e3-3481-3a67-88f8-13e47ceba545@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
+ bitmap memory in backing_dev_store
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, lincheng.yang@transsion.com,
+ jiajun.ling@transsion.com, ldys2014@foxmail.com,
+ Dongyun Liu <dongyun.liu@transsion.com>
+References: <20231130152047.200169-1-dongyun.liu@transsion.com>
+ <20231201153956.GB404241@google.com>
+From: Dongyun Liu <dongyun.liu3@gmail.com>
+In-Reply-To: <20231201153956.GB404241@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/1/23 7:04 PM, Kanchan Joshi wrote:
-> On 12/2/2023 7:01 AM, Jens Axboe wrote:
->>> Jens already applied the latest series for the next merge. We can append
->>> this or fold atop, or back it out and we can rework it for another
->>> version. No rush; for your patch:
->> I folded this into the original to avoid the breakage, even if it wasn't
->> a huge concern for this particular issue. But it's close enough to
->> merging, figured we may as well do that rather than have a fixup patch.
->>
->> Please check the end result, both for-next and for-6.8/block are updated
->> now.
+
+
+On 2023/12/1 23:39, Sergey Senozhatsky wrote:
+> On (23/11/30 23:20), Dongyun Liu wrote:
+>> INFO: task init:331 blocked for more than 120 seconds.  "echo 0 >
+>> /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+>> task:init   state:D stack:    0 pid:    1 ppid:     0 flags:0x04000000
+>> Call trace:
+>>    __switch_to+0x244/0x4e4
+>>    __schedule+0x5bc/0xc48
+>>    schedule+0x80/0x164
+>>    rwsem_down_read_slowpath+0x4fc/0xf9c
+>>    __down_read+0x140/0x188
+>>    down_read+0x14/0x24
+>>    try_wakeup_wbd_thread+0x78/0x1ec [zram]
+>>    __zram_bvec_write+0x720/0x878 [zram]
+>>    zram_bvec_rw+0xa8/0x234 [zram]
+>>    zram_submit_bio+0x16c/0x268 [zram]
+>>    submit_bio_noacct+0x128/0x3c8
+>>    submit_bio+0x1cc/0x3d0
+>>    __swap_writepage+0x5c4/0xd4c
+>>    swap_writepage+0x130/0x158
+>>    pageout+0x1f4/0x478
+>>    shrink_page_list+0x9b4/0x1eb8
+>>    shrink_inactive_list+0x2f4/0xaa8
+>>    shrink_lruvec+0x184/0x340
+>>    shrink_node_memcgs+0x84/0x3a0
+>>    shrink_node+0x2c4/0x6c4
+>>    shrink_zones+0x16c/0x29c
+>>    do_try_to_free_pages+0xe4/0x2b4
+>>    try_to_free_pages+0x388/0x7b4
+>>    __alloc_pages_direct_reclaim+0x88/0x278
+>>    __alloc_pages_slowpath+0x4ec/0xf6c
+>>    __alloc_pages_nodemask+0x1f4/0x3dc
+>>    kmalloc_order+0x54/0x338
+>>    kmalloc_order_trace+0x34/0x1bc
+>>    __kmalloc+0x5e8/0x9c0
+>>    kvmalloc_node+0xa8/0x264
+>>    backing_dev_store+0x1a4/0x818 [zram]
+>>    dev_attr_store+0x38/0x8c
+>>    sysfs_kf_write+0x64/0xc4
 > 
-> Looks good to me.
-> May not matter now, so a symbolic
-> Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+> Hmm, I'm not really following this backtrace. Backing device
+> configuration is only possible on un-initialized zram device.
+> If it's uninitialized, then why is it being used for swapout
+> later in the call stack?
 
-It still matters imho, because this thread is linked in the commit. So
-even for the cases where I don't amend a commit to insert reviewed-bu
-etc, I still think it's nice to have in the linked thread.
-
-Ditto for the fixup - it's referenced in the original commit, and the
-link will show you what that fixup was.
-
--- 
-Jens Axboe
+Uh, at this moment, zram has finished initializing and is
+working. The backing device is an optional zram-based feature.
+I think it can be created later.
 
