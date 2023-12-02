@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnX4pcZL"
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0FF7116;
-	Sat,  2 Dec 2023 05:54:43 -0800 (PST)
-Received: by mail-pg1-x544.google.com with SMTP id 41be03b00d2f7-5c239897895so1003914a12.2;
-        Sat, 02 Dec 2023 05:54:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dxC8V38i"
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE62FA
+	for <linux-block@vger.kernel.org>; Sat,  2 Dec 2023 06:58:34 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1d072f50a44so1745245ad.0
+        for <linux-block@vger.kernel.org>; Sat, 02 Dec 2023 06:58:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701525283; x=1702130083; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VQOH7+u4hLSIClzOMDwlaWGqqeGohEqTdqEdf5joqgg=;
-        b=bnX4pcZLjH0c/vRWKJau3lqSEGyCaig0Q3hfN3nagg/8kjjtVFm+RIN8uOmc7Y3efA
-         WbUne0nGsYsiwB6an7sWaegHhLTPosGdihsdENYlU1UzFSWW7W8UCcciQx5KPWVKjYan
-         U5VEeAPoFOICKvhjqbfnN1ywfsA1wbHODhnFTooYirsvZZ0MiveaAqtjkh3djzEYLFBe
-         bs6Pcy1qTPhl7VcUrYK1ECwc12IdOmOb7sPOJKSEY1GOltvD5DVjmsc9QqBx3X2nTTUY
-         1axWxuFa581oImCEl49FSeSzKaYyH7jbnHIWVm0mxVMHXVL5Yvi7UDclxeUxqdTuY0MT
-         MF4A==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701529113; x=1702133913; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XW1UgdrkcqxXWOvmhkp24/Qp8+IcQ4Iq6pEPuTKK3Ww=;
+        b=dxC8V38imb/+a0etNuQIX8U5esj6IwLxktmTJ5n1nFq0V0pM8VA98Js8x5QqvKzutE
+         V3Nca2wBqvuArDsfcyZ8MEPWDgnLGlTd633Xuo8Vk4QghRf4Ym/t2PAN8s/Gx1IrxWVr
+         zV1zt7dZddU5KTAgRxDMYqONCKGPV4ySlRFvLgaoxZOLPYFfFnUI63tGffru8lUIS0J7
+         m2d/LO1DGKxUn4NrTOgtsX39yeKgisZ6zXB30bFVc56kI/44RFfl29IPQcdke2XnckxI
+         n30ea8CA0iK2i9mUqvlr6VHYbVajrO0YExHhQfgC0Bb7LHcmxuBaTNR4kdEkNa8u1lTj
+         DI1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701525283; x=1702130083;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VQOH7+u4hLSIClzOMDwlaWGqqeGohEqTdqEdf5joqgg=;
-        b=B0qlJbnkHNSbPhlJLx/0ojMNTdgVOCegcA16D8NEuuKliyNAI89UFclxfLTfws4+vA
-         pHizNAXQYRZBYcpWJ++PL2lOS8armR5rmmKK5EBZUhYlZpgl6ARgT0dgdd9cv/r5ui0m
-         /og+HXH7Sa1IghL6JlDlw6q/sX6eQETh7ySEhVYFg6/GoUhUZ6FIoyJwD6XG/ohZ1M5t
-         XdeHTdZgIX/ZQCngiCcjikrVXNBFPplgbyf5bgzLYbHl5ICKXIabuFntzYR2O8qkqOjg
-         iHEq1n/X9wX3cYkI3/yX9kTCmPhs2ivOTICXy+VnWxWH7LgmmoZieDEnDm8QXMy0fR9A
-         1K6g==
-X-Gm-Message-State: AOJu0YzRMnYAeh5TfeMBxrmJIGw24oCnqvHbI6AgNBF4T76LOjYkWnr4
-	N7YYaQyTCWiqelbIaHDFOWc=
-X-Google-Smtp-Source: AGHT+IEj2DG9Hm84ZVY6USHcVo81v0BBinW2Guovnk3wv+TBurcs2sIYSmNUS8OM+W5VOmg5jAXIzg==
-X-Received: by 2002:a17:90a:8a87:b0:285:b67b:f435 with SMTP id x7-20020a17090a8a8700b00285b67bf435mr349463pjn.41.1701525283332;
-        Sat, 02 Dec 2023 05:54:43 -0800 (PST)
-Received: from [10.164.172.236] ([182.255.33.153])
-        by smtp.gmail.com with ESMTPSA id gd10-20020a17090b0fca00b0028066f3c373sm6628990pjb.17.2023.12.02.05.54.40
+        d=1e100.net; s=20230601; t=1701529113; x=1702133913;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XW1UgdrkcqxXWOvmhkp24/Qp8+IcQ4Iq6pEPuTKK3Ww=;
+        b=RHl++OFDTF6oUsUDOH40jAzFMBMpVw70UKaFYz++ynfHjZ14NQHII+aNjWkG1137ip
+         nVDIGWJDTqtA2Dhh5rjMwQBKDPdgum4eDw5Fgh63vWe5pDPyUFMAsQl/krpvIriOFYiF
+         zSJmBkVyMA9cWw9uBKmtROT0CKBM8b0/DcdarGpxuWi0tv4M9ED5Rfn5JYXbdeaQ2N/r
+         X4TCWPQTHGwQghSAZdBQnVhn+gRXLzzRiFSFHxtPhrPi+xH4MMULE+SXiYFk/v1vUMPX
+         izlOnjnMzbUcezSuBIod9dAnNvc/f2Y1HwDgzRRxLRwZqIizX1V9bfxZqQ8S1BIPS5w9
+         7dOQ==
+X-Gm-Message-State: AOJu0YwD9gKbzAsqsiOVnLLsnfpdYpMUHSCQQbZ99wzq7QzB93eR2meg
+	XvjSsJ05/DCRUkxNG5YCOJ/PDw==
+X-Google-Smtp-Source: AGHT+IEdYA1zBSx0/GweJouqcxEpYNoCqs4MttA1Lpvc82tGgIMit/GYbebWL74MRUmEp33KNYAP4g==
+X-Received: by 2002:a05:6a20:72a3:b0:18b:fece:ff60 with SMTP id o35-20020a056a2072a300b0018bfeceff60mr31298181pzk.1.1701529113460;
+        Sat, 02 Dec 2023 06:58:33 -0800 (PST)
+Received: from [10.0.0.185] (50-255-6-74-static.hfc.comcastbusiness.net. [50.255.6.74])
+        by smtp.gmail.com with ESMTPSA id s5-20020a17090aad8500b002853349e490sm6784095pjq.34.2023.12.02.06.58.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Dec 2023 05:54:43 -0800 (PST)
-Message-ID: <4b43d22d-f50c-4cb1-85a1-6eab468304f4@gmail.com>
-Date: Sat, 2 Dec 2023 21:54:38 +0800
+        Sat, 02 Dec 2023 06:58:32 -0800 (PST)
+Message-ID: <f04ad3dd-05a1-4cef-b837-9c51a18fdc7c@kernel.dk>
+Date: Sat, 2 Dec 2023 07:58:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,86 +47,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
- bitmap memory in backing_dev_store
-To: Jens Axboe <axboe@kernel.dk>, minchan@kernel.org, senozhatsky@chromium.org
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- lincheng.yang@transsion.com, jiajun.ling@transsion.com,
- ldys2014@foxmail.com, Dongyun Liu <dongyun.liu@transsion.com>
-References: <20231130152047.200169-1-dongyun.liu@transsion.com>
- <feb0a163-c1d3-4087-96dc-f64d0dde235b@kernel.dk>
- <3af0752f-0534-43c4-913f-4d4df8c8501b@gmail.com>
- <b26ab8d0-c719-4bf6-b909-26f4c014574b@kernel.dk>
-From: Dongyun Liu <dongyun.liu3@gmail.com>
-In-Reply-To: <b26ab8d0-c719-4bf6-b909-26f4c014574b@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCHv5 0/4] block integrity: directly map user space addresses
+Content-Language: en-US
+To: Kanchan Joshi <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, io-uring@vger.kernel.org, hch@lst.de,
+ martin.petersen@oracle.com, ming.lei@redhat.com
+References: <CGME20231130215715epcas5p33208ca14e69a68402c04e5c743135e6c@epcas5p3.samsung.com>
+ <20231130215309.2923568-1-kbusch@meta.com>
+ <e3c2d527-3927-7efe-a61f-ff7e5af95d83@samsung.com>
+ <ZWopLQWBIUGBad3z@kbusch-mbp> <ZWpjBCF4KueqKlPN@kbusch-mbp>
+ <ac5e99c6-7297-4c56-8f3c-98755c58092b@kernel.dk>
+ <2fe7b3e3-3481-3a67-88f8-13e47ceba545@samsung.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <2fe7b3e3-3481-3a67-88f8-13e47ceba545@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+On 12/1/23 7:04 PM, Kanchan Joshi wrote:
+> On 12/2/2023 7:01 AM, Jens Axboe wrote:
+>>> Jens already applied the latest series for the next merge. We can append
+>>> this or fold atop, or back it out and we can rework it for another
+>>> version. No rush; for your patch:
+>> I folded this into the original to avoid the breakage, even if it wasn't
+>> a huge concern for this particular issue. But it's close enough to
+>> merging, figured we may as well do that rather than have a fixup patch.
+>>
+>> Please check the end result, both for-next and for-6.8/block are updated
+>> now.
+> 
+> Looks good to me.
+> May not matter now, so a symbolic
+> Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
+It still matters imho, because this thread is linked in the commit. So
+even for the cases where I don't amend a commit to insert reviewed-bu
+etc, I still think it's nice to have in the linked thread.
 
-On 2023/12/1 22:19, Jens Axboe wrote:
-> On 11/30/23 11:51 PM, Dongyun Liu wrote:
->>
->>
->> On 2023/11/30 23:37, Jens Axboe wrote:
->>> On 11/30/23 8:20 AM, Dongyun Liu wrote:
->>>> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
->>>> index d77d3664ca08..ee6c22c50e09 100644
->>>> --- a/drivers/block/zram/zram_drv.c
->>>> +++ b/drivers/block/zram/zram_drv.c
->>>> @@ -514,7 +514,7 @@ static ssize_t backing_dev_store(struct device *dev,
->>>>          nr_pages = i_size_read(inode) >> PAGE_SHIFT;
->>>>        bitmap_sz = BITS_TO_LONGS(nr_pages) * sizeof(long);
->>>> -    bitmap = kvzalloc(bitmap_sz, GFP_KERNEL);
->>>> +    bitmap = kmalloc(bitmap_sz, GFP_ATOMIC);
->>>>        if (!bitmap) {
->>>>            err = -ENOMEM;
->>>>            goto out;
->>>
->>> Outside of this moving from a zeroed alloc to one that does not, the
->>> change looks woefully incomplete. Why does this allocation need to be
->>> GFP_ATOMIC, and:
->>
->> By using GFP_ATOMIC, it indicates that the caller cannot reclaim or
->> sleep, although we can prevent the risk of  deadlock when acquiring
->> the zram->lock again in zram_bvec_write.
-> 
-> Yes, I am very much aware of how gfp allocation flags work and how why
-> it's broken. It was a rhetorical question as to why you think you could
-> get away with just fixing one of them.
-> 
->>> 1) file_name = kmalloc(PATH_MAX, GFP_KERNEL); does not
->>
->> There is no zram->init_lock held here, so there is no need to use
->> GFP_ATOMIC.
-> 
-> True
-> 
->>> 2) filp_open() -> getname_kernel() -> __getname() does not
->>> 3) filp_open() -> getname_kernel() does not
->>> 4) bdev_open_by_dev() does not
->>
->> Missing the use of GFP_ATOMIC.
-> 
-> Indeed!
-> 
->>> IOW, you have a slew of GFP_KERNEL allocations in there, and you
->>> probably just patched the largest one. But the core issue remains.
->>>
->>> The whole handling of backing_dev_store() looks pretty broken.
->>>
->>
->> Indeed, this patch only solves the biggest problem and does not
->> fundamentally solve it, because there are many processes for holding
->> zram->init_lock before allocation memory in backing_dev_store that
->> need to be fully modified, and I did not consider it thoroughly.
->> Obviously, a larger and better patch is needed to eliminate this risk,
->> but it is currently not necessary.
-> 
-> You agree that it doesn't fix the issue, it just happens to fix the one
-> that you hit. And then you jump to the conclusion that this is all
-> that's needed to fix it. Ehm, confused?
-> 
+Ditto for the fixup - it's referenced in the original commit, and the
+link will show you what that fixup was.
 
-Hi, Jens, Maybe there's something wrong with my expression. You can 
-think of it this way: I agree with you that it doesn't fix the issue.
+-- 
+Jens Axboe
+
