@@ -1,136 +1,86 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxHULYRU"
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BECEEA;
-	Sun,  3 Dec 2023 06:45:50 -0800 (PST)
-Received: by mail-pg1-x541.google.com with SMTP id 41be03b00d2f7-5c66988c2eeso548396a12.1;
-        Sun, 03 Dec 2023 06:45:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mVOzcIvV"
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A62AED
+	for <linux-block@vger.kernel.org>; Sun,  3 Dec 2023 07:22:22 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2867ea3abedso216838a91.1
+        for <linux-block@vger.kernel.org>; Sun, 03 Dec 2023 07:22:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701614750; x=1702219550; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701616942; x=1702221742; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7YPDtBol5mTdex48RDvw2MgClI62P90f/ucRE3RfG9E=;
-        b=JxHULYRUbzFYxWRxScD0fQL11/EZ5SA5CzlhbgEBRJvuqEh5NtYd2ETyuVZqgs7Y1E
-         P5oMUdkdxmGn/oitD6qBjWE2tFtBXHFH6SBeOffsJ4Mh6+cM4TcRxO5fC+YwO0DxkzYI
-         xUhgIONamR6qUvDu19dpp0dycBdOoIQeF8ISn4TRNRy4FWKBWjboK6uOBT2yOUUh9k3w
-         5VLCJgrKMwAmse96hxdA4/dd/05pa9HvKtMBjqzVnsYhUu0RhBKxxhGS2P+4w+H/UrG0
-         OEywheMBjn/iSpAjCPswncyO+5nsJROvWzAgaOaZb02/9vNye5Ar10Wc+F1wsjsqkfgu
-         dCOw==
+        bh=qRJ/T4VcXg2PrnX953egP1xy8Q6JFZ3ojEvgYTkSknQ=;
+        b=mVOzcIvV1osJu7KCFTwVkCBx/gHviq0zMeU3zTPAVF9F3uo5Ku/fY8WRrhvQ7C9Wox
+         hv5Hp7zvZEEGmmB8Z2RWyZkxzMf21PLxJjp1OCnSKE4zdJnMYZBP19Svi0xP1CoQF47p
+         Gl/hjYQ+qptZMmDzfwfXWsCj7u8ttAdT+4YhIenmZaXwMsjddF+jhsGo0AgRCqXgbpuG
+         gHbu+o7c/KNaXNh+tdJGmqA2q5PeRwmAK8MSpXQoalew3j8dtXkNPqojdDHMebYhFC1z
+         nlL3w2vaAc00q7g7d9oigwbMY0/K0mR5yDyLg02kgzS7lnpkIyRPWhS87CSGlZQ2aBgB
+         kheQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701614750; x=1702219550;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7YPDtBol5mTdex48RDvw2MgClI62P90f/ucRE3RfG9E=;
-        b=CpCS3DYlWlGRuHMRkYjQgeOEAVUioqPXAuIqbZ4pxzAaIi8KcPeCHHzHh38kZRHvKd
-         rHyUQSBX73NEhf3Yo/yZeXR90TWUZlg2YTvmC0mUWpcNOf4jRlIq2oFGq+4uD2g6s6Pi
-         H50jA9GOddbJwkICUVz0i5rjt1rq45WFrHgSy/uxZaBb40ehyjM1I0bYy+2WVpBq9zMZ
-         4OWnZy635fVT3wUByfS6nHjImaXMTATNeTPetNEXdjeXitags0WyCqoRtjUP3Bs//8Nf
-         coJ6ycsxeMPudkkBb/hG78J07A+CfTRrTCKwjFtAkuiNHxgBUXPp2gIxxHsnzhcP1hXa
-         IVfw==
-X-Gm-Message-State: AOJu0YzFEe4k/8cqC87UyYypp6IqCZHRlfSbokozJJpEKEuC9A4fRsZj
-	tCS8iF+DbsmUaejmkXWsiVs=
-X-Google-Smtp-Source: AGHT+IEJANqY4Xp8fAQVoeeyC1yFkErhk51ofEdkfAqyY1JOIOgTR3Hh9jyn2UczaD8zzD+f8lxVOA==
-X-Received: by 2002:a17:90a:195d:b0:285:a118:3431 with SMTP id 29-20020a17090a195d00b00285a1183431mr3235429pjh.8.1701614749833;
-        Sun, 03 Dec 2023 06:45:49 -0800 (PST)
-Received: from [10.153.223.34] ([103.40.76.4])
-        by smtp.gmail.com with ESMTPSA id w6-20020a170902d3c600b001d082ed4670sm1734986plb.49.2023.12.03.06.45.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 Dec 2023 06:45:49 -0800 (PST)
-Message-ID: <90e0e6ca-da7c-44c4-b1be-3de19a887c5d@gmail.com>
-Date: Sun, 3 Dec 2023 22:45:44 +0800
+        d=1e100.net; s=20230601; t=1701616942; x=1702221742;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qRJ/T4VcXg2PrnX953egP1xy8Q6JFZ3ojEvgYTkSknQ=;
+        b=G3hrtMTIP5BQJChSrERlUo8x5P8FOBuinCPP/ZUp0rqr5fbM4TWCRLrgaMRZ/coB87
+         po1fX1f8YtpQO7cKVX0B07/TPtW1YU9TeN51Y/DHjGsB0mk4edLoExDMHJoU1h1OEYgQ
+         D9YFkPnHaoQ96mDFifMvn56iVE7RFhwN0ZLoYWzNkoSZaaLst81lMlNUMrjIm7YqImWI
+         oExsFSBepdGPVqgxDEv/1cSdBNaFFbDOXdEuzcGTTwJsyarWBA+iMDDyXhQ86tRn4Qsu
+         JHdVSyeVYzLb/p6tDbDNCSOc3WWh1t4BOdRemCnfRUKN0UWFsGl0j5hvk7SuJXW5FXWm
+         Xs3Q==
+X-Gm-Message-State: AOJu0Yxkdb7gDQGTKBXgMFLzslWGbl3euQZtlrsTJ7dQnA04GbubcLkI
+	Yr9kFTqlvR1n4dX+KlN967jJnw==
+X-Google-Smtp-Source: AGHT+IF1l9xtUh9/r3aR9wOxWNIDw/EK0jgfdjjKFaDX8tWRew3/P+NV80+88zsVWbs8QOvLJoNbMg==
+X-Received: by 2002:a05:6a00:3904:b0:68e:2fd4:288a with SMTP id fh4-20020a056a00390400b0068e2fd4288amr36562020pfb.3.1701616941832;
+        Sun, 03 Dec 2023 07:22:21 -0800 (PST)
+Received: from [127.0.0.1] (50-255-6-74-static.hfc.comcastbusiness.net. [50.255.6.74])
+        by smtp.gmail.com with ESMTPSA id p19-20020a637f53000000b005c66a7d70fdsm2111854pgn.61.2023.12.03.07.22.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Dec 2023 07:22:21 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, joshi.k@samsung.com, 
+ linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
+ Paul Moore <paul@paul-moore.com>
+In-Reply-To: <cover.1701391955.git.asml.silence@gmail.com>
+References: <cover.1701391955.git.asml.silence@gmail.com>
+Subject: Re: [PATCH v2 0/3] clean up io_uring cmd header structure
+Message-Id: <170161694061.938645.776262768452153331.b4-ty@kernel.dk>
+Date: Sun, 03 Dec 2023 08:22:20 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
- bitmap memory in backing_dev_store
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, lincheng.yang@transsion.com,
- jiajun.ling@transsion.com, ldys2014@foxmail.com,
- Dongyun Liu <dongyun.liu@transsion.com>
-References: <20231130152047.200169-1-dongyun.liu@transsion.com>
- <20231201153956.GB404241@google.com>
- <b49d6a29-e3a3-4b6b-8892-8ded319b2619@gmail.com>
- <20231203012326.GE404241@google.com>
-From: Dongyun Liu <dongyun.liu3@gmail.com>
-In-Reply-To: <20231203012326.GE404241@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-7edf1
 
 
-
-On 2023/12/3 9:23, Sergey Senozhatsky wrote:
-> On (23/12/02 23:50), Dongyun Liu wrote:
->> On 2023/12/1 23:39, Sergey Senozhatsky wrote:
->>> On (23/11/30 23:20), Dongyun Liu wrote:
->>>> INFO: task init:331 blocked for more than 120 seconds.  "echo 0 >
->>>> /proc/sys/kernel/hung_task_timeout_secs" disables this message.
->>>> task:init   state:D stack:    0 pid:    1 ppid:     0 flags:0x04000000
->>>> Call trace:
->>>>     __switch_to+0x244/0x4e4
->>>>     __schedule+0x5bc/0xc48
->>>>     schedule+0x80/0x164
->>>>     rwsem_down_read_slowpath+0x4fc/0xf9c
->>>>     __down_read+0x140/0x188
->>>>     down_read+0x14/0x24
->>>>     try_wakeup_wbd_thread+0x78/0x1ec [zram]
->>>>     __zram_bvec_write+0x720/0x878 [zram]
->>>>     zram_bvec_rw+0xa8/0x234 [zram]
->>>>     zram_submit_bio+0x16c/0x268 [zram]
->>>>     submit_bio_noacct+0x128/0x3c8
->>>>     submit_bio+0x1cc/0x3d0
->>>>     __swap_writepage+0x5c4/0xd4c
->>>>     swap_writepage+0x130/0x158
->>>>     pageout+0x1f4/0x478
->>>>     shrink_page_list+0x9b4/0x1eb8
->>>>     shrink_inactive_list+0x2f4/0xaa8
->>>>     shrink_lruvec+0x184/0x340
->>>>     shrink_node_memcgs+0x84/0x3a0
->>>>     shrink_node+0x2c4/0x6c4
->>>>     shrink_zones+0x16c/0x29c
->>>>     do_try_to_free_pages+0xe4/0x2b4
->>>>     try_to_free_pages+0x388/0x7b4
->>>>     __alloc_pages_direct_reclaim+0x88/0x278
->>>>     __alloc_pages_slowpath+0x4ec/0xf6c
->>>>     __alloc_pages_nodemask+0x1f4/0x3dc
->>>>     kmalloc_order+0x54/0x338
->>>>     kmalloc_order_trace+0x34/0x1bc
->>>>     __kmalloc+0x5e8/0x9c0
->>>>     kvmalloc_node+0xa8/0x264
->>>>     backing_dev_store+0x1a4/0x818 [zram]
->>>>     dev_attr_store+0x38/0x8c
->>>>     sysfs_kf_write+0x64/0xc4
->>>
->>> Hmm, I'm not really following this backtrace. Backing device
->>> configuration is only possible on un-initialized zram device.
->>> If it's uninitialized, then why is it being used for swapout
->>> later in the call stack?
->>
->> Uh, at this moment, zram has finished initializing and is
->> working. The backing device is an optional zram-based feature.
->> I think it can be created later.
+On Fri, 01 Dec 2023 00:57:34 +0000, Pavel Begunkov wrote:
+> Looking at the zc rfc, and how we tend to stuff everything into
+> linux/io_uring, start splitting the file before it becomes even more
+> monstrous.
 > 
-> backing_dev_store() can't be called on an initialized device,
-> that's what init_done() at the very beginning of backing_dev_store()
-> is supposed to ensure:
+> V2: fix up includes for security/
+>     Add new files to MAINTAINERS
 > 
+> [...]
 
-We have modified the logic here to allow backing_dev_store() to be 
-called multiple times. That's why the call trace comes in. On the other 
-hand, I realized that I should show the upstream's call stack instead
-of my custom feature next time. Thank you for your toleration.
+Applied, thanks!
 
-> ...
-> 	down_write(&zram->init_lock);
-> 	if (init_done(zram)) {
-> 		pr_info("Can't setup backing device for initialized device\n");
-> 		err = -EBUSY;
-> 		goto out;
-> 	}
-> ...
+[1/3] io_uring: split out cmd api into a separate header
+      (no commit info)
+[2/3] io_uring/cmd: inline io_uring_cmd_do_in_task_lazy
+      (no commit info)
+[3/3] io_uring/cmd: inline io_uring_cmd_get_task
+      (no commit info)
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
