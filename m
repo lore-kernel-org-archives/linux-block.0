@@ -1,122 +1,218 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DJMTVqnd"
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096C1C1
-	for <linux-block@vger.kernel.org>; Sat,  2 Dec 2023 17:23:33 -0800 (PST)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3b2e330033fso1530372b6e.3
-        for <linux-block@vger.kernel.org>; Sat, 02 Dec 2023 17:23:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1701566612; x=1702171412; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b0SBtkIv3cee5FCWIhTFG7QQThNZLcxG9WCJ+X1Q6Kk=;
-        b=DJMTVqndOCUNIhMrzdK1D1JRLuZj7IwtgGfCZSbwrFKPHhxTWvhuI2eAQIa/TfcWwr
-         sx5N/fb1qQqAxKbtgJ9h3Z8gVJV/yf9GBRPeBlTTysYB1nnhmwys2BwwdRuhO124Mq6k
-         FdNOUv4A1Ypsg+5ZkAFm4V/K6IjolxR8ng+og=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701566612; x=1702171412;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b0SBtkIv3cee5FCWIhTFG7QQThNZLcxG9WCJ+X1Q6Kk=;
-        b=Dpv0lIoGJWqxb4KUGUFoHyspFi1eNdXnKN2J8FdoQBmZ0ID90uUuEuFGnvVMwQmMCV
-         p2gVcHSKl4z/Pnri9/P9ifrHM9lhKPqHW4yn8bAn9qpH8sMLDHWe+Grx7uEDFWvBJWbE
-         ipcrJ6+zj2Msf6A4bNEs4h0P/E5vJSFu+uFRr3oDTGDeF0kgzRYAglFr3zVSjQLmAM/N
-         mijavgJW+DTxWdyG9249ps4yLKYCBBsp0hdctnvNCZb5Q2mYTh7h2mPiUF58hsjG16Wa
-         xHlntWhRrkfj9reX97GK6uZRK3ovsUIISj16u3VPNDef8px2H45+iiqjtygWngoV9nIb
-         5Olw==
-X-Gm-Message-State: AOJu0YwErp9lH7o34BBWLrkNtst8jN6tDzmCwktBbiZn/RuKc0/ePAKU
-	J8TbeRemWLwlBYQlyYbnxSC7Mg==
-X-Google-Smtp-Source: AGHT+IHC2toBcuBeNWxKismMtpL/a3/skNmR//TaMD8W8MvvGnoM4nk06NkJjkuCi3orZjPAv1p3zA==
-X-Received: by 2002:a05:6808:2e95:b0:3a9:9bb6:811 with SMTP id gt21-20020a0568082e9500b003a99bb60811mr2822958oib.57.1701566612331;
-        Sat, 02 Dec 2023 17:23:32 -0800 (PST)
-Received: from google.com (KD124209171220.ppp-bb.dion.ne.jp. [124.209.171.220])
-        by smtp.gmail.com with ESMTPSA id z123-20020a636581000000b005b458aa0541sm5208325pgb.15.2023.12.02.17.23.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Dec 2023 17:23:31 -0800 (PST)
-Date: Sun, 3 Dec 2023 10:23:26 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Dongyun Liu <dongyun.liu3@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org,
-	axboe@kernel.dk, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, lincheng.yang@transsion.com,
-	jiajun.ling@transsion.com, ldys2014@foxmail.com,
-	Dongyun Liu <dongyun.liu@transsion.com>
-Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
- bitmap memory in backing_dev_store
-Message-ID: <20231203012326.GE404241@google.com>
-References: <20231130152047.200169-1-dongyun.liu@transsion.com>
- <20231201153956.GB404241@google.com>
- <b49d6a29-e3a3-4b6b-8892-8ded319b2619@gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FWFozFK3"
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B5FDC4;
+	Sun,  3 Dec 2023 03:51:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701604286; x=1733140286;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=rv22i3N0Lo7E8wSslL/gLw+DgEldu+5iD48dSwHC1Ww=;
+  b=FWFozFK3s+DN40lQ0f5PuFp9pQ7gVb0CUGQEgR/wbKplrQdeEwcpfNUk
+   osGHVdUuXtNh2F8m3SDsgdb2Hd6hWigMPuN1C+Bu6k9olp1BT2puqkiD2
+   s40/N8XX7bGBzI2HkVu17ab30OnJmfSIUlzeQXUJyuEnavWKHqcNw+BKD
+   w+6Xds8STsDpWFw4mwpGBJaL6hFNOfVmrBw63/Gqf1GjjB0TJz8qlsFo1
+   U00MbQSjY/wOQW/CaxgMU3ltz5TD69+8YpEKHPwe7NgDnBmFOwy/L574/
+   lXCTwf8dBOepu+7ij6hyfWGxq4uMOHHIzp39h5ZB6HJUS0QBeA4qfzv0v
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10912"; a="682405"
+X-IronPort-AV: E=Sophos;i="6.04,247,1695711600"; 
+   d="scan'208";a="682405"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2023 03:51:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10912"; a="893700744"
+X-IronPort-AV: E=Sophos;i="6.04,247,1695711600"; 
+   d="scan'208";a="893700744"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Dec 2023 03:51:24 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Sun, 3 Dec 2023 03:51:24 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Sun, 3 Dec 2023 03:51:24 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Sun, 3 Dec 2023 03:51:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MRIyf3k8ClPylbgnoxhbNL4Uxs9uWmfGFefii9ZINYg6aY0HrybAiakr+pSdFp1EajKT/l8Sw+GjSOPXM9VAx/0GkoPVGHs8FdvzNPEb8+0BU484/oDHbQBagPJp3HLK1ceWsCaluJj8MtXG4zhSkAxB5Nel10hNCVh7F+5a/skumKC3llPoHQm7m7OdrYAVgNPe13nfyhpztTnE6wdjHCnoadJn1T/NoVcRMHLoQZD4A7vbrfxn0xz7r/TVndhPhXr2PlNscGRyMw5uMD5PskK2maQHwK0/FLfPbAbA8QbkGHBwXZUGKr06AhOiHEnbdhgkqXqxRdhynUZUaE5TjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YUEfeWIhgYPzotkvAL8Z4o2JnXf735kakhAcyaASlPs=;
+ b=l1WkDEEHyMI5aArGwoI+ZIRM7pBuEUybMQFV0w2/rpsqsCPKFONsSq+qFvfydWFz2VKq7UxE6Gm7g2Qawm3UzEF+NpW+IxarlRXL0KmTt6MasGEP12vt+pIvIMUUh2g2+DSkqTUOZk3sL3IgZVEshOchAYLvOE9DJ4XaNIVavf2Mu75y1jNEj/s9HsBp10xKekjYWn6UIGWh/KMGlF0h589lHFM2S+hyXXkXT0TaN0tU7poi62nLQnvU832hKRqBdyXmtjGM0gvyeDJib31eJJrfmb9gXdt3lY24VDQFKkyqp+8PwnNfLkb/Be9MiftTuymZWvEL8qU8GPIMhtZJYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4839.namprd11.prod.outlook.com (2603:10b6:510:42::18)
+ by SA1PR11MB6784.namprd11.prod.outlook.com (2603:10b6:806:24c::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.32; Sun, 3 Dec
+ 2023 11:51:23 +0000
+Received: from PH0PR11MB4839.namprd11.prod.outlook.com
+ ([fe80::25c4:9c11:c628:1283]) by PH0PR11MB4839.namprd11.prod.outlook.com
+ ([fe80::25c4:9c11:c628:1283%4]) with mapi id 15.20.7046.032; Sun, 3 Dec 2023
+ 11:51:22 +0000
+Date: Sun, 3 Dec 2023 19:45:30 +0800
+From: Pengfei Xu <pengfei.xu@intel.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+CC: Yu Kuai <yukuai1@huaweicloud.com>, Edward Adam Davis <eadavis@qq.com>,
+	"syzbot+ed812ed461471ab17a0c@syzkaller.appspotmail.com"
+	<syzbot+ed812ed461471ab17a0c@syzkaller.appspotmail.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "dvyukov@google.com" <dvyukov@google.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"mhiramat@kernel.org" <mhiramat@kernel.org>,
+	"syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>, "yukuai
+ (C)" <yukuai3@huawei.com>, <andreyknvl@google.com>, <balbi@kernel.org>,
+	<heng.su@intel.com>
+Subject: Re: [PATCH next] trace/blktrace: fix task hung in blk_trace_ioctl
+Message-ID: <ZWxqWjwPft3sG12Y@xpf.sh.intel.com>
+References: <00000000000047eb7e060b652d9a@google.com>
+ <tencent_6537E04AAC74F976B567603CEB377A96FA09@qq.com>
+ <5116cbb4-2c85-2459-5499-56c95bb42d16@huaweicloud.com>
+ <20231202170743.7557e7b5@rorschach.local.home>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231202170743.7557e7b5@rorschach.local.home>
+X-ClientProxiedBy: SG2PR04CA0176.apcprd04.prod.outlook.com
+ (2603:1096:4:14::14) To PH0PR11MB4839.namprd11.prod.outlook.com
+ (2603:10b6:510:42::18)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b49d6a29-e3a3-4b6b-8892-8ded319b2619@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4839:EE_|SA1PR11MB6784:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4baadd5-704d-4334-ebc4-08dbf3f62bbd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zm+PHYbCi8iKdYYKOSFoWcdqnZpKV+4XBC6V9PVWGFpp1yWluIaH7qJ6oSVbk1FcSYxePr8OIs+ejEaTG2kdSIqpjElqFd6azxQqBtfEJzS6RvgtvWPuBvcTp97BV+n/BCpE/gsAyWTbfQT3vUWAC8q1dYWd6L1XWpoTu+VoyqkQ7WzZXb5VzubDhWM4u90MfhUcNI6xYK0k0QSEgPwLjQm1IHRJkRONSB/DsrAl2VH4GiiZfvsjCQIURkHumZu3MZv7+0ke+0fgpbiTKSdY0B6/Xy2gqcAPjWVuKDURt1cbfI+/b/7gSplOQ9kjdSq4/UYAV6QZOe2MxZYxsCtR2uYB+psRVTxxR0ES2TxEe6/aTyfxH+iv6DgQe5L8vwOafjuE2M/gQZ3y/YHbD3KoOjWUxD1SQiKPV3Fm7puWqrqxCQrdvzit1xRTYyJqJrtMMVh4VchoWkmJK5PQ6dJOb1s5IZeLtR7Odja9xOR8nVMLJz8y6jFT33B0CV6B0oXr6Y2Kzo0E2VaGRGGeFkN1TSAXYwQ9wjh0Al8jBLBiF4s=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4839.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(366004)(39860400002)(346002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(6486002)(2906002)(478600001)(86362001)(966005)(6666004)(4326008)(54906003)(316002)(8676002)(8936002)(107886003)(6506007)(53546011)(6512007)(83380400001)(26005)(7416002)(5660300002)(6916009)(66476007)(66556008)(66946007)(44832011)(38100700002)(82960400001)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OE80QXZpR2lPanJlT3NLRHZBV3dJYjRwM0Y5b2NPN2N5ZDQ1VnlscXVkVDRE?=
+ =?utf-8?B?L0Z3U1d4bU1EWmlWSnFLdlUwSVl4cnNLQmM2WHRYVS8yUkNJUmdqb1BlVm5X?=
+ =?utf-8?B?Nm0rdDJwNlA4UXVzb0E0MVJVR2d3UFZyTy95OEpCUitvZUQ0YWRUcnYrUFpk?=
+ =?utf-8?B?RDJ4QVhRcC9GS3crYW1SU0REUWhUdkVTT2dWTUFpWmR0QjB1YVpwVURCK2pz?=
+ =?utf-8?B?bFFvVFZRQ3lvc1VNVndwRFVrYTNJdkpEbTNFZ0V1ZURJNTV4K0lXTjYwV2Zh?=
+ =?utf-8?B?QlE3Uzg5OEYvaFNucjR4ZkdFQVNWa2JueU16Q1kxTExEbHNhWkExOFA5L0FF?=
+ =?utf-8?B?SGdHRWF5ZWhEbDllR3NCbTN0MzBOQ29iMUlTSzJUY2JLOHFGOTUwZlVrNmN0?=
+ =?utf-8?B?UVZ5QnlxWHR6ZnFvZW93N3E5ck11WHdUQUg2QStNS0tYWHBoUkVnaDJlRWcv?=
+ =?utf-8?B?em1OSjlRbU9ISnZwWDdHYUJEdWR2WForV25rOFVBRzFJK2NDZDR4T20wTXZC?=
+ =?utf-8?B?SzVaSkp6c1lVU2g1RmZ0UFVNeFcyaHNjS2x6OVY0cHZOTVRwclZtK3hRQlJX?=
+ =?utf-8?B?TFlJNEVYQndKa2ZUS3FVU0N6L1ZNNzJ3dVpZOXA2QUc1dm1heWpCS2FXSVhF?=
+ =?utf-8?B?ZWxUeVBzWUJzSmV5QS9LUzZqOUJiMGNnMkJseDZnRERzQkRrTGhRNUE4RFFx?=
+ =?utf-8?B?VlVnOFFrZXFPYWpoWXduQVdjczlFYjVjRkRaOG1kbzdLNnRhOENkQXJ0M0Zu?=
+ =?utf-8?B?OGxLcHhabVB6MTUyN1JySGdiN0hZWXpLYjIyVStZbXRGSlhWQWg5WVhWVjYy?=
+ =?utf-8?B?aHVJWGIyMkFUUXZqQzltQTRETm9STFhIcmpCTEZ3V0UybWVMeUdXL2p6VjZI?=
+ =?utf-8?B?VlBHVHpwYzJmbTRBdkNDVDFLQjltc2J6c2JQdlVLcURQaENEekwvaElxL0tK?=
+ =?utf-8?B?WDZOL1E4WVp3WVZKZEwyY2k5TGZOandjSVdySFZxWFFlNnBmcVM4MUIrQWtQ?=
+ =?utf-8?B?MjZyZXIwRHkwemwxdXRPaXJ5M0Z2UmpwSmYyb1NuemYrVXgxK29pVG5ISmZF?=
+ =?utf-8?B?V3ZSSFV3MGVudDhBRmNJbnF0Zlo5cnU2TU9QSmh2SVNkV3RoUURBYjJhRkY2?=
+ =?utf-8?B?V1B0Ty96b2JRUWNhMW5yMi9oNnFueW92K3YzRURFSm1wY0dIUjJud0Q0Y0dU?=
+ =?utf-8?B?YW5yYXJyN1JSc2h4RGdxRiswMlNDbEF5ZndxdjFUK2tSYkVkQWJQSGxLeXdI?=
+ =?utf-8?B?WTFabFlHUEwwNVZmNXIvN0JqaFJZayt2T1JJTmF3UlZna2licFFaUDVrN3Nu?=
+ =?utf-8?B?OXZZS1FqNXRsQ0hKNGdacHZHYWdQSXdHb2hHbTM1cHVVWkZXZXFjV2kvTXRv?=
+ =?utf-8?B?L3lBYU5hOG5kNDh0Z25oVXlmRnRwNU1qbzlrVUI5SFpSckszUzRQSXpoR0Vh?=
+ =?utf-8?B?REEyNm9OdzczZllqWW9VSlJLL1hSVE45T0ZSRy9MVHRrekFjN0RjWmw2SnRF?=
+ =?utf-8?B?c0IyWTY1bWhyaWtiNXRlVlZFb1NuVjVaZEZjQVo0bHhyWGIvRGtGVE80TUlL?=
+ =?utf-8?B?WDNsbFlQMTdnekM2WUJoYkRFeEJpL3kraDljdkJCeTV5Smx3SDFEcFVFbGhR?=
+ =?utf-8?B?eWtMc1hJY09rNlgyOU13dlZNRmJxNDVtdldLdENWenpxRVJERjdSUTRyQWNs?=
+ =?utf-8?B?b2xiZXdaRkF0TWg3UmZJb29PWEdtOHBKQTBSeTkzdXd5U1F2Q2ZKZHdrZlpU?=
+ =?utf-8?B?ckRMUHNIMUxVWnFpRzhWc0dnMjZPNGdBaktXWGhIZDR0RDc4cXN5T1ljZi93?=
+ =?utf-8?B?d2VCMnRlbG0vaFpsb1NOR05kV2RRMExDTkQ1TUtWRUVibUZEYU03Z2ZFT0Rk?=
+ =?utf-8?B?WFRQTEJieDM4UlpOK0tnTGwzZjY0MXZzSU53OEFBamdJVFNHNldQWHFLRVZl?=
+ =?utf-8?B?S0lUeEtqTmhmWnRXYktISnVPcWhyZnJjdis1WkFkM04zWVNtdWxFbGVnNEI0?=
+ =?utf-8?B?ZmtoMGNGRjdzbW1xUFc1Q3ROelpNNUtkZzc0bG5keDhuR0NaWnJPd3h0eGM0?=
+ =?utf-8?B?TzFaRS9Ud3ZLa0djMXB0cWZ6VnlYNjllTi94T3phRFBMOWczTXB1TjU5cUpm?=
+ =?utf-8?Q?T/Wpu2x8ku9entqi3rStACbLT?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4baadd5-704d-4334-ebc4-08dbf3f62bbd
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4839.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2023 11:51:22.6258
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kppsK8hNX+aN7v8TxIzCakECyEkw9f77ut+h+Sos/dPeECirm4I9oPIDbajp2iKtkCb9z4mdwCHAPO/ARsvJTA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6784
+X-OriginatorOrg: intel.com
 
-On (23/12/02 23:50), Dongyun Liu wrote:
-> On 2023/12/1 23:39, Sergey Senozhatsky wrote:
-> > On (23/11/30 23:20), Dongyun Liu wrote:
-> > > INFO: task init:331 blocked for more than 120 seconds.  "echo 0 >
-> > > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > > task:init   state:D stack:    0 pid:    1 ppid:     0 flags:0x04000000
-> > > Call trace:
-> > >    __switch_to+0x244/0x4e4
-> > >    __schedule+0x5bc/0xc48
-> > >    schedule+0x80/0x164
-> > >    rwsem_down_read_slowpath+0x4fc/0xf9c
-> > >    __down_read+0x140/0x188
-> > >    down_read+0x14/0x24
-> > >    try_wakeup_wbd_thread+0x78/0x1ec [zram]
-> > >    __zram_bvec_write+0x720/0x878 [zram]
-> > >    zram_bvec_rw+0xa8/0x234 [zram]
-> > >    zram_submit_bio+0x16c/0x268 [zram]
-> > >    submit_bio_noacct+0x128/0x3c8
-> > >    submit_bio+0x1cc/0x3d0
-> > >    __swap_writepage+0x5c4/0xd4c
-> > >    swap_writepage+0x130/0x158
-> > >    pageout+0x1f4/0x478
-> > >    shrink_page_list+0x9b4/0x1eb8
-> > >    shrink_inactive_list+0x2f4/0xaa8
-> > >    shrink_lruvec+0x184/0x340
-> > >    shrink_node_memcgs+0x84/0x3a0
-> > >    shrink_node+0x2c4/0x6c4
-> > >    shrink_zones+0x16c/0x29c
-> > >    do_try_to_free_pages+0xe4/0x2b4
-> > >    try_to_free_pages+0x388/0x7b4
-> > >    __alloc_pages_direct_reclaim+0x88/0x278
-> > >    __alloc_pages_slowpath+0x4ec/0xf6c
-> > >    __alloc_pages_nodemask+0x1f4/0x3dc
-> > >    kmalloc_order+0x54/0x338
-> > >    kmalloc_order_trace+0x34/0x1bc
-> > >    __kmalloc+0x5e8/0x9c0
-> > >    kvmalloc_node+0xa8/0x264
-> > >    backing_dev_store+0x1a4/0x818 [zram]
-> > >    dev_attr_store+0x38/0x8c
-> > >    sysfs_kf_write+0x64/0xc4
-> > 
-> > Hmm, I'm not really following this backtrace. Backing device
-> > configuration is only possible on un-initialized zram device.
-> > If it's uninitialized, then why is it being used for swapout
-> > later in the call stack?
+Hi,
+
+On 2023-12-03 at 06:07:43 +0800, Steven Rostedt wrote:
+> On Sat, 2 Dec 2023 17:19:25 +0800
+> Yu Kuai <yukuai1@huaweicloud.com> wrote:
 > 
-> Uh, at this moment, zram has finished initializing and is
-> working. The backing device is an optional zram-based feature.
-> I think it can be created later.
+> > Hi,
+> > 
+> > 在 2023/12/02 17:01, Edward Adam Davis 写道:
+> > > The reproducer involves running test programs on multiple processors separately,
+> > > in order to enter blkdev_ioctl() and ultimately reach blk_trace_ioctl() through
+> > > two different paths, triggering an AA deadlock.
+> > > 
+> > > 	CPU0						CPU1
+> > > 	---						---
+> > > 	mutex_lock(&q->debugfs_mutex)			mutex_lock(&q->debugfs_mutex)
+> > > 	mutex_lock(&q->debugfs_mutex)			mutex_lock(&q->debugfs_mutex)
+> > > 
+> > > 
+> > > The first path:
+> > > blkdev_ioctl()->
+> > > 	blk_trace_ioctl()->
+> > > 		mutex_lock(&q->debugfs_mutex)
+> > > 
+> > > The second path:
+> > > blkdev_ioctl()->				
+> > > 	blkdev_common_ioctl()->
+> > > 		blk_trace_ioctl()->
+> > > 			mutex_lock(&q->debugfs_mutex)  
+> > I still don't understand how this AA deadlock is triggered, does the
+> > 'debugfs_mutex' already held before calling blk_trace_ioctl()?
+> 
+> Right, I don't see where the mutex is taken twice. You don't need two
+> paths for an AA lock, you only need one.
+> 
+> > 
+> > > 
+> > > The solution I have proposed is to exit blk_trace_ioctl() to avoid AA locks if
+> > > a task has already obtained debugfs_mutex.
+> > > 
+> > > Fixes: 0d345996e4cb ("x86/kernel: increase kcov coverage under arch/x86/kernel folder")
+> 
+> How does it fix the above? I don't see how the above is even related to this.
 
-backing_dev_store() can't be called on an initialized device,
-that's what init_done() at the very beginning of backing_dev_store()
-is supposed to ensure:
+I bisected this issue and the following fix information is more accurate:
+"
+Fixes: f2c2e717642c ("usb: gadget: add raw-gadget interface")
+"
 
-...
-	down_write(&zram->init_lock);
-	if (init_done(zram)) {
-		pr_info("Can't setup backing device for initialized device\n");
-		err = -EBUSY;
-		goto out;
-	}
-...
+All the bisected info is in link: https://github.com/xupengfe/syzkaller_logs/tree/main/231203_140738_blk_trace_ioctl
+
+Acked-by: Pengfei Xu <pengfei.xu@intel.com>
+
+Thanks!
+
+> 
+> -- Steve
+> 
+> > > Reported-and-tested-by: syzbot+ed812ed461471ab17a0c@syzkaller.appspotmail.com
+> > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > > ---
+> > >   kernel/trace/blktrace.c | 3 ++-
+> > >   1 file changed, 2 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
