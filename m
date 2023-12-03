@@ -1,42 +1,42 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iLtAl8R/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aAL9etim"
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C42101
-	for <linux-block@vger.kernel.org>; Sun,  3 Dec 2023 05:45:46 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A039FE
+	for <linux-block@vger.kernel.org>; Sun,  3 Dec 2023 05:47:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701611145;
+	s=mimecast20190719; t=1701611239;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kfhCG1IvV1CGYP/X56tZVstBaEZXadDb3GV0BKEnzfc=;
-	b=iLtAl8R/bQbd3tDLao8x7gQcPWoHZh+TOPyrc7Ip7juK4Qyqfhvvp+CJbxYL5JkiJHrwf0
-	HgerrpbyeFVMqprwJxvURr/OnqfcAjjOTHaLvCdNw/dJUMkgVGISpv4H7jK1sDs1H3mAX9
-	GtZRlErygj5G7lNTGjczPukR9kEBs54=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-459-XBxcx_AAOeKs96EAlSyfxQ-1; Sun, 03 Dec 2023 08:45:41 -0500
-X-MC-Unique: XBxcx_AAOeKs96EAlSyfxQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	bh=G6n4gkU3N/v7q0hGMcejn7WVq9Ifmgc/fzDPpTHt67c=;
+	b=aAL9etimFsfQyEb/BUP0wsYf4vV39dCGCh83e8N8yogDyJhVt6+AbwZWf9uPsh3YP6VIAG
+	Z7pHVM4XiqtzfkdxIA9CvUN+oXRuHYpVQuq/C6bPSlOpJ5WbUUMeZHgN5e4qgV3u+WhZRw
+	M5a2wm6qZ6V5J1SUceJrNTqmrNcJiqc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-D6NomQRIM4udpeJ_0kqM3g-1; Sun,
+ 03 Dec 2023 08:47:13 -0500
+X-MC-Unique: D6NomQRIM4udpeJ_0kqM3g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 508D8185A781;
-	Sun,  3 Dec 2023 13:45:41 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6FDE72810D54;
+	Sun,  3 Dec 2023 13:47:13 +0000 (UTC)
 Received: from fedora (unknown [10.72.120.3])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E1DD2166B26;
-	Sun,  3 Dec 2023 13:45:35 +0000 (UTC)
-Date: Sun, 3 Dec 2023 21:45:30 +0800
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AAD772026D4C;
+	Sun,  3 Dec 2023 13:47:08 +0000 (UTC)
+Date: Sun, 3 Dec 2023 21:47:03 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Pavel Begunkov <asml.silence@gmail.com>
 Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org, joshi.k@samsung.com,
 	linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
 	Paul Moore <paul@paul-moore.com>
-Subject: Re: [PATCH v2 1/3] io_uring: split out cmd api into a separate header
-Message-ID: <ZWyGepj+F8JgGjmh@fedora>
+Subject: Re: [PATCH v2 2/3] io_uring/cmd: inline io_uring_cmd_do_in_task_lazy
+Message-ID: <ZWyG19/yZxT1Anqd@fedora>
 References: <cover.1701391955.git.asml.silence@gmail.com>
- <7ec50bae6e21f371d3850796e716917fc141225a.1701391955.git.asml.silence@gmail.com>
+ <2ec9fb31dd192d1c5cf26d0a2dec5657d88a8e48.1701391955.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,19 +45,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7ec50bae6e21f371d3850796e716917fc141225a.1701391955.git.asml.silence@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+In-Reply-To: <2ec9fb31dd192d1c5cf26d0a2dec5657d88a8e48.1701391955.git.asml.silence@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Fri, Dec 01, 2023 at 12:57:35AM +0000, Pavel Begunkov wrote:
-> linux/io_uring.h is slowly becoming a rubbish bin where we put
-> anything exposed to other subsystems. For instance, the task exit
-> hooks and io_uring cmd infra are completely orthogonal and don't need
-> each other's definitions. Start cleaning it up by splitting out all
-> command bits into a new header file.
+On Fri, Dec 01, 2023 at 12:57:36AM +0000, Pavel Begunkov wrote:
+> Now as we can easily include io_uring_types.h, move IOU_F_TWQ_LAZY_WAKE
+> and inline io_uring_cmd_do_in_task_lazy().
 > 
 > Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-
-Looks fine,
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
