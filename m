@@ -1,33 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4579B381D2;
-	Mon,  4 Dec 2023 20:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB0235EE5;
+	Mon,  4 Dec 2023 20:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XQfHhGBa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E55A9C433CC;
-	Mon,  4 Dec 2023 20:34:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAOMjfBK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E247C433CD;
+	Mon,  4 Dec 2023 20:34:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701722052;
-	bh=PGvdhsaMBMYO+a/7wVrzlPR3gLeQ5lkgOcpsQ7exj7E=;
+	s=k20201202; t=1701722098;
+	bh=utnA4ZmxMlETtUMbXwSY4jNxpOOsInsvF7s/KcfzNhE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XQfHhGBatVYZl/v4UUhTuuVQvPlpOvQbG7YyiahZTa1JrLQKpvZ6YX/6tMO0yhi1l
-	 su5RwV5DxpOhXEv3C/r8Untse3WtPMkak7ETFvaE/rdPDfeTtaMfd7E4fDJK6EKhHx
-	 RnHdeqXoBAPdu99vAyvrBi4FAoFVrw/lmEZj2NrZ7W6VrALbmVtWM2OlkrKd91ieAt
-	 HW4ZlwaqrcxE0fNWIJOOnhqzy7PTKncMEfPSDXzF1GIHUt7hNtMnkOhbFjnc8PzwjM
-	 yjfNGimMAd89GD7e1GBOBAZUp86jaSRHKcJFSPfYwGR94huK1aOboGlwNPIQZ+E2wn
-	 01Dt0u3yVUVEg==
+	b=dAOMjfBKK4fws254udE6FcHWyUyRRcLqNhri20RAc5Q6CtXX3dmf/wHdplAZZ02S/
+	 GfTRcaRH6MhqcY5xqe0rET6cZPUgLY2tPoT85ZQVMc0oYkuzTgfTag85/Jy7/yrAJ1
+	 QzWqZ7hVno2t1csZQB9hwjIBUPsEQYAt8jwmeD/sKwygptESF1dqn5acJdHd3N090K
+	 5ea2/7cge4/2RjvA39F6GdkyVRApIeevDTh6WCOBa9HJnvCr8AvH9Bc4D1UUJaA9Ln
+	 sV7Ag1Y0lApYbm32qTZHrQTimU+G33HL49Tcr4sDOmI3BrtMfBFtQ7y8aZsQXNGr7H
+	 D9HWhHKYSztSA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Yu Kuai <yukuai3@huawei.com>,
-	Christoph Hellwig <hch@lst.de>,
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	David Jeffery <djeffery@redhat.com>,
+	John Pittman <jpittman@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 22/32] block: warn once for each partition in bio_check_ro()
-Date: Mon,  4 Dec 2023 15:32:42 -0500
-Message-ID: <20231204203317.2092321-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 31/32] blk-mq: don't count completed flush data request as inflight in case of quiesce
+Date: Mon,  4 Dec 2023 15:32:51 -0500
+Message-ID: <20231204203317.2092321-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231204203317.2092321-1-sashal@kernel.org>
 References: <20231204203317.2092321-1-sashal@kernel.org>
@@ -42,62 +44,67 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.4
 Content-Transfer-Encoding: 8bit
 
-From: Yu Kuai <yukuai3@huawei.com>
+From: Ming Lei <ming.lei@redhat.com>
 
-[ Upstream commit 67d995e069535c32829f5d368d919063492cec6e ]
+[ Upstream commit 0e4237ae8d159e3d28f3cd83146a46f576ffb586 ]
 
-Commit 1b0a151c10a6 ("blk-core: use pr_warn_ratelimited() in
-bio_check_ro()") fix message storm by limit the rate, however, there
-will still be lots of message in the long term. Fix it better by warn
-once for each partition.
+Request queue quiesce may interrupt flush sequence, and the original request
+may have been marked as COMPLETE, but can't get finished because of
+queue quiesce.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20231128123027.971610-3-yukuai1@huaweicloud.com
+This way is fine from driver viewpoint, because flush sequence is block
+layer concept, and it isn't related with driver.
+
+However, driver(such as dm-rq) can call blk_mq_queue_inflight() to count &
+drain inflight requests, then the wait & drain never gets done because
+the completed & not-finished flush request is counted as inflight.
+
+Fix this issue by not counting completed flush data request as inflight in
+case of quiesce.
+
+Cc: Mike Snitzer <snitzer@kernel.org>
+Cc: David Jeffery <djeffery@redhat.com>
+Cc: John Pittman <jpittman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20231201085605.577730-1-ming.lei@redhat.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-core.c          | 14 +++++++++++---
- include/linux/blk_types.h |  1 +
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fdf25b8d6e784..2eca76ccf4ee0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -501,9 +501,17 @@ static inline void bio_check_ro(struct bio *bio)
- 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
- 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
- 			return;
--		pr_warn_ratelimited("Trying to write to read-only block-device %pg\n",
--				    bio->bi_bdev);
--		/* Older lvm-tools actually trigger this */
-+
-+		if (bio->bi_bdev->bd_ro_warned)
-+			return;
-+
-+		bio->bi_bdev->bd_ro_warned = true;
-+		/*
-+		 * Use ioctl to set underlying disk of raid/dm to read-only
-+		 * will trigger this.
-+		 */
-+		pr_warn("Trying to write to read-only block-device %pg\n",
-+			bio->bi_bdev);
- 	}
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6ab7f360ff2ac..20ecd0ab616f7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1511,14 +1511,26 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q,
  }
+ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
  
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d5c5e59ddbd25..92c8997b19381 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -69,6 +69,7 @@ struct block_device {
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	bool			bd_make_it_fail;
- #endif
-+	bool			bd_ro_warned;
++static bool blk_is_flush_data_rq(struct request *rq)
++{
++	return (rq->rq_flags & RQF_FLUSH_SEQ) && !is_flush_rq(rq);
++}
++
+ static bool blk_mq_rq_inflight(struct request *rq, void *priv)
+ {
  	/*
- 	 * keep this out-of-line as it's both big and not needed in the fast
- 	 * path
+ 	 * If we find a request that isn't idle we know the queue is busy
+ 	 * as it's checked in the iter.
+ 	 * Return false to stop the iteration.
++	 *
++	 * In case of queue quiesce, if one flush data request is completed,
++	 * don't count it as inflight given the flush sequence is suspended,
++	 * and the original flush data request is invisible to driver, just
++	 * like other pending requests because of quiesce
+ 	 */
+-	if (blk_mq_request_started(rq)) {
++	if (blk_mq_request_started(rq) && !(blk_queue_quiesced(rq->q) &&
++				blk_is_flush_data_rq(rq) &&
++				blk_mq_request_completed(rq))) {
+ 		bool *busy = priv;
+ 
+ 		*busy = true;
 -- 
 2.42.0
 
