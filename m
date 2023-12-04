@@ -1,186 +1,126 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="p6BnC6BT";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="rRfuwwmE"
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2a07:de40:b251:101:10:150:64:2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1584D2;
-	Mon,  4 Dec 2023 10:26:15 -0800 (PST)
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 129681FE65;
-	Mon,  4 Dec 2023 18:26:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1701714373; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ONuLqtXtJkgprRpS4BZ7hiMbFehCE+Bu6DodZsigLIk=;
-	b=p6BnC6BTug7Xu69WbnF4r5Wbt+TFKrrRyfn7ABQr1fpL5xBr6PDbW9wNt7LAoALRT6c7r7
-	dvmtlccTuNq3UJG183OVWyXHl0pU9aZDZGZ3JDcOlrSE1RonUzrz3hWL32cYx9+3Zjj+Xl
-	IQQeIcx3U8MDxOQJntdDg2hbMrm+Cbk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1701714373;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ONuLqtXtJkgprRpS4BZ7hiMbFehCE+Bu6DodZsigLIk=;
-	b=rRfuwwmE7JEywJ3AIf4KFjHbhQpy01UZRhkcCYt6dah1H93/zp+FipJmRXlRfE0jV6wkLs
-	UQYV6OcMd7j5GxBQ==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id F0251139E2;
-	Mon,  4 Dec 2023 18:26:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id cwdaOsQZbmUXXAAAn2gu4w
-	(envelope-from <jack@suse.cz>); Mon, 04 Dec 2023 18:26:12 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 99C87A07DB; Mon,  4 Dec 2023 19:26:12 +0100 (CET)
-Date: Mon, 4 Dec 2023 19:26:12 +0100
-From: Jan Kara <jack@suse.cz>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>, Ming Lei <ming.lei@redhat.com>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Chengming Zhou <zhouchengming@bytedance.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [PATCH v2 24/35] block: null_blk: fix opencoded
- find_and_set_bit() in get_tag()
-Message-ID: <20231204182612.kms2dbxsupesborq@quack3>
-References: <20231203192422.539300-1-yury.norov@gmail.com>
- <20231203193307.542794-1-yury.norov@gmail.com>
- <20231203193307.542794-23-yury.norov@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RW4NtGgg"
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AA86CA
+	for <linux-block@vger.kernel.org>; Mon,  4 Dec 2023 10:41:02 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id e9e14a558f8ab-35d559a71d8so2986825ab.1
+        for <linux-block@vger.kernel.org>; Mon, 04 Dec 2023 10:41:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701715261; x=1702320061; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8nF/2go7Oh+X36EEMP+OJQ3WMJQXuy7RxDAu7l6pxwI=;
+        b=RW4NtGggQhTrYZK1Qmc1d7zjjg5dEmVgaCD4soCV4Mvw7euO4WY6i6Qk+4dKfK2Rxy
+         z/hn93scfymepBPSqhCTdv38L9X1m46DxWENw51nUTf7eJdL85kZZUoK+34aT34MIkRl
+         vok1BDPx/c1Mx4VeDoNMSG/EMgfMikG7RFLNW7NWOMB6Q+Egcys6R9/4em9kUTbplSkv
+         LsDZYabo8pR6Q4RatjhBsuOiyi8zJ5R64tnmMXhVpUxGCkBIE0RzpTGXEf77FXSiB2sf
+         HxNkl3hIPRKUvIIETKcxebNYhsxmzve9jTMpL69LCiA+O26NxRMmw/kZIFgZ5uRelEen
+         oY3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701715261; x=1702320061;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8nF/2go7Oh+X36EEMP+OJQ3WMJQXuy7RxDAu7l6pxwI=;
+        b=f73pqreJobEMqLBR5ZHe+MUZ6OQZTt94IHKlo4zgKn9jyEB8BSxI2C8Q1K6rGSdAwV
+         UixDN8NuA32sLsVxZ1RBMOf7pvhMioxqCvVazBP+QVbmfgJWhC7g0KFrhEKz35Yr+Aeb
+         vWE3ebFrjpT5u60KmM3rwQWxIHFf5m+yjVYj4ottu0pNW4bF98YU0HwMXNXU3jL17lAz
+         nuKyBanKA5EK8moAsxrGBqqUH7VDrpm+m3gBCzc8ihbRvI7Z8u/WkuvHQfOM6CsbTWQL
+         Emd3PvtCQZTggx6x3IJaZ7cCknw59ZXgbZkhV/mtcFT5NSiukiduz2MpGwCeaN524jFI
+         TbTg==
+X-Gm-Message-State: AOJu0YzyBQHZR0p5IGAHsXKTFLVJU6XxLIgKwfRRtwM0dlPcYH+fSq1g
+	W+ED0txMDojKUDyDG+Cf8T+FLQ==
+X-Google-Smtp-Source: AGHT+IFwnXzSZ6zMUt3RFVhl4mWAcRHCUZgHbMqGp/IAkapXbe/q1AgrqU1/KeEhU/TQrREsFzf9Jg==
+X-Received: by 2002:a6b:660f:0:b0:7b3:58c4:b894 with SMTP id a15-20020a6b660f000000b007b358c4b894mr30267653ioc.1.1701715261426;
+        Mon, 04 Dec 2023 10:41:01 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id fn20-20020a056638641400b0045812e7b8bbsm2621977jab.25.2023.12.04.10.41.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Dec 2023 10:41:00 -0800 (PST)
+Message-ID: <f5ba61c7-aae8-407c-90e9-4d6d9316d33d@kernel.dk>
+Date: Mon, 4 Dec 2023 11:40:59 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231203193307.542794-23-yury.norov@gmail.com>
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Score: 6.00
-X-Spamd-Result: default: False [6.00 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_SPAM(5.10)[100.00%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 RCPT_COUNT_TWELVE(0.00)[21];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.com:email];
-	 FREEMAIL_TO(0.00)[gmail.com];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 FREEMAIL_CC(0.00)[vger.kernel.org,kernel.dk,opensource.wdc.com,nvidia.com,redhat.com,wdc.com,bytedance.com,samsung.com,gmail.com,suse.cz,alu.unizg.hr,infradead.org,rasmusvillemoes.dk,linux.intel.com,linaro.org,acm.org,omp.ru];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[]
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 03/35] lib/sbitmap; make __sbitmap_get_word() using
+ find_and_set_bit()
+Content-Language: en-US
+To: Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org
+Cc: Jan Kara <jack@suse.cz>, Mirsad Todorovac
+ <mirsad.todorovac@alu.unizg.hr>, Matthew Wilcox <willy@infradead.org>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+ Alexey Klimov <klimov.linux@gmail.com>, Bart Van Assche
+ <bvanassche@acm.org>, Sergey Shtylyov <s.shtylyov@omp.ru>
+References: <20231203192422.539300-1-yury.norov@gmail.com>
+ <20231203193307.542794-1-yury.norov@gmail.com>
+ <20231203193307.542794-2-yury.norov@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231203193307.542794-2-yury.norov@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun 03-12-23 11:32:56, Yury Norov wrote:
-> get_tag() opencodes find_and_set_bit(). Switch the code to use the
-> dedicated function, and get rid of get_tag entirely.
-> 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-
-Looks good to me. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  drivers/block/null_blk/main.c | 41 +++++++++++------------------------
->  1 file changed, 13 insertions(+), 28 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 3021d58ca51c..671dbb9ab928 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -760,19 +760,6 @@ static void put_tag(struct nullb_queue *nq, unsigned int tag)
->  		wake_up(&nq->wait);
+On 12/3/23 12:32 PM, Yury Norov wrote:
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index d0a5081dfd12..b21aebd07fd6 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -133,38 +133,11 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
 >  }
+>  EXPORT_SYMBOL_GPL(sbitmap_resize);
 >  
-> -static unsigned int get_tag(struct nullb_queue *nq)
-> -{
-> -	unsigned int tag;
-> -
-> -	do {
-> -		tag = find_first_zero_bit(nq->tag_map, nq->queue_depth);
-> -		if (tag >= nq->queue_depth)
-> -			return -1U;
-> -	} while (test_and_set_bit_lock(tag, nq->tag_map));
-> -
-> -	return tag;
-> -}
-> -
->  static void free_cmd(struct nullb_cmd *cmd)
+> -static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+> +static inline int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+>  			      unsigned int hint, bool wrap)
 >  {
->  	put_tag(cmd->nq, cmd->tag);
-> @@ -782,24 +769,22 @@ static enum hrtimer_restart null_cmd_timer_expired(struct hrtimer *timer);
->  
->  static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
->  {
-> +	unsigned int tag = find_and_set_bit_lock(nq->tag_map, nq->queue_depth);
->  	struct nullb_cmd *cmd;
-> -	unsigned int tag;
+> -	int nr;
 > -
-> -	tag = get_tag(nq);
-> -	if (tag != -1U) {
-> -		cmd = &nq->cmds[tag];
-> -		cmd->tag = tag;
-> -		cmd->error = BLK_STS_OK;
-> -		cmd->nq = nq;
-> -		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
-> -			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
-> -				     HRTIMER_MODE_REL);
-> -			cmd->timer.function = null_cmd_timer_expired;
+> -	/* don't wrap if starting from 0 */
+> -	wrap = wrap && hint;
+> -
+> -	while (1) {
+> -		nr = find_next_zero_bit(word, depth, hint);
+> -		if (unlikely(nr >= depth)) {
+> -			/*
+> -			 * We started with an offset, and we didn't reset the
+> -			 * offset to 0 in a failure case, so start from 0 to
+> -			 * exhaust the map.
+> -			 */
+> -			if (hint && wrap) {
+> -				hint = 0;
+> -				continue;
+> -			}
+> -			return -1;
 > -		}
-> -		return cmd;
-> +
-> +	if (tag >= nq->queue_depth)
-> +		return NULL;
-> +
-> +	cmd = &nq->cmds[tag];
-> +	cmd->tag = tag;
-> +	cmd->error = BLK_STS_OK;
-> +	cmd->nq = nq;
-> +	if (nq->dev->irqmode == NULL_IRQ_TIMER) {
-> +		hrtimer_init(&cmd->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-> +		cmd->timer.function = null_cmd_timer_expired;
->  	}
->  
-> -	return NULL;
-> +	return cmd;
+> -
+> -		if (!test_and_set_bit_lock(nr, word))
+> -			break;
+> -
+> -		hint = nr + 1;
+> -		if (hint >= depth - 1)
+> -			hint = 0;
+> -	}
+> -
+> -	return nr;
+> +	return wrap ? find_and_set_bit_wrap_lock(word, depth, hint) :
+> +			find_and_set_next_bit_lock(word, depth, hint);
 >  }
->  
->  static struct nullb_cmd *alloc_cmd(struct nullb_queue *nq, struct bio *bio)
-> -- 
-> 2.40.1
-> 
+
+Please make this:
+
+	if (wrap)
+		return find_and_set_bit_wrap_lock(word, depth, hint) :
+	return find_and_set_next_bit_lock(word, depth, hint);
+
+so this is a lot more readable.
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
