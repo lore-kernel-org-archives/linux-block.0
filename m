@@ -1,22 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB0235EE5;
-	Mon,  4 Dec 2023 20:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C07D35F11;
+	Mon,  4 Dec 2023 20:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAOMjfBK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E247C433CD;
-	Mon,  4 Dec 2023 20:34:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7UD9dQL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AFB2C433C7;
+	Mon,  4 Dec 2023 20:36:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701722098;
-	bh=utnA4ZmxMlETtUMbXwSY4jNxpOOsInsvF7s/KcfzNhE=;
+	s=k20201202; t=1701722163;
+	bh=3y3YqCVMnsG3auYpUY8Eb53hLQpKBGMLIYn0DAFsWEQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dAOMjfBKK4fws254udE6FcHWyUyRRcLqNhri20RAc5Q6CtXX3dmf/wHdplAZZ02S/
-	 GfTRcaRH6MhqcY5xqe0rET6cZPUgLY2tPoT85ZQVMc0oYkuzTgfTag85/Jy7/yrAJ1
-	 QzWqZ7hVno2t1csZQB9hwjIBUPsEQYAt8jwmeD/sKwygptESF1dqn5acJdHd3N090K
-	 5ea2/7cge4/2RjvA39F6GdkyVRApIeevDTh6WCOBa9HJnvCr8AvH9Bc4D1UUJaA9Ln
-	 sV7Ag1Y0lApYbm32qTZHrQTimU+G33HL49Tcr4sDOmI3BrtMfBFtQ7y8aZsQXNGr7H
-	 D9HWhHKYSztSA==
+	b=X7UD9dQLKHmfU2Ft5Qez3Alb8/Z8hR6xq4Bk652mbYJOyYq+tsoM+rStXemG2sp1X
+	 6BKfwvdnhDvvNfmsdUzYHW3pph2pWI6eQJZlcb/KIp0uZi8DHavY/NsveMOk8qmykl
+	 XJIZeQpt8WFq9HQTRvBXnj1+DvMaQ6NQfVpU3Emq2Wo9g69f8+mVXJp54tdo6S4xed
+	 buT6nMLDh3ZaoCwRVKsguyBx+/DEjEN6Ou4WJpwcjTz9S1naRbY4g7CejrLZpLggSD
+	 DBiyNGtvhNzT4owAdJyBr5HyF3HKDHi5eTS9DTiNPdZmIRrairk7G9AuBzNzkf2wN8
+	 ZNKdd8S+UehuA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -27,12 +27,12 @@ Cc: Ming Lei <ming.lei@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 31/32] blk-mq: don't count completed flush data request as inflight in case of quiesce
-Date: Mon,  4 Dec 2023 15:32:51 -0500
-Message-ID: <20231204203317.2092321-31-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 16/17] blk-mq: don't count completed flush data request as inflight in case of quiesce
+Date: Mon,  4 Dec 2023 15:35:01 -0500
+Message-ID: <20231204203514.2093855-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231204203317.2092321-1-sashal@kernel.org>
-References: <20231204203317.2092321-1-sashal@kernel.org>
+In-Reply-To: <20231204203514.2093855-1-sashal@kernel.org>
+References: <20231204203514.2093855-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.4
+X-stable-base: Linux 6.1.65
 Content-Transfer-Encoding: 8bit
 
 From: Ming Lei <ming.lei@redhat.com>
@@ -74,10 +74,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6ab7f360ff2ac..20ecd0ab616f7 100644
+index 100fb0c3114f8..70fc5fd27a5d9 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1511,14 +1511,26 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q,
+@@ -1500,14 +1500,26 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q,
  }
  EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
  
