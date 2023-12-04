@@ -1,60 +1,121 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B503BDF;
-	Mon,  4 Dec 2023 05:45:15 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 4613D68B05; Mon,  4 Dec 2023 14:45:10 +0100 (CET)
-Date: Mon, 4 Dec 2023 14:45:09 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
-	sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
-	djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	chandan.babu@oracle.com, dchinner@redhat.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-api@vger.kernel.org
-Subject: Re: [PATCH 17/21] fs: xfs: iomap atomic write support
-Message-ID: <20231204134509.GA25834@lst.de>
-References: <20230929102726.2985188-1-john.g.garry@oracle.com> <20230929102726.2985188-18-john.g.garry@oracle.com> <20231109152615.GB1521@lst.de> <a50a16ca-d4b9-a4d8-4230-833d82752bd2@oracle.com> <c78bcca7-8f09-41c7-adf0-03b42cde70d6@oracle.com> <20231128135619.GA12202@lst.de> <e4fb6875-e552-45aa-b193-58f15d9a786c@oracle.com>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVz6AdDW"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD1D2DF
+	for <linux-block@vger.kernel.org>; Mon,  4 Dec 2023 06:07:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701698871;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Cx/FH2glJNRXLr0W/z9kDPTOMXxVSYaSs/fbwHr60CU=;
+	b=GVz6AdDWT8xLhIm+sP2xf3G6udN5KzR3I7WpaUFW08vveq8fo0E1a8wjR+1uMHpu4DFKpf
+	b8wYmsuXz37JkKwW8tkZStZsIF3sUUcx5swlO4FlIv4k1SaDz76w3u1om8XE6fRpywYV6d
+	ybVzqOsYmQ8F7BZda/LZOD/+jtOafcU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-111-5-9Omnj8Ommtyb9aUDUfLw-1; Mon, 04 Dec 2023 09:07:46 -0500
+X-MC-Unique: 5-9Omnj8Ommtyb9aUDUfLw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D5CD862CA7;
+	Mon,  4 Dec 2023 14:07:45 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.49])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E21311C060AE;
+	Mon,  4 Dec 2023 14:07:44 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	virtualization@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Suwan Kim <suwan.kim027@gmail.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH] virtio_blk: fix snprintf truncation compiler warning
+Date: Mon,  4 Dec 2023 09:07:43 -0500
+Message-ID: <20231204140743.1487843-1-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4fb6875-e552-45aa-b193-58f15d9a786c@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On Tue, Nov 28, 2023 at 05:42:10PM +0000, John Garry wrote:
-> ok, fine, it would not be required for XFS with CoW. Some concerns still:
-> a. device atomic write boundary, if any
-> b. other FSes which do not have CoW support. ext4 is already being used for 
-> "atomic writes" in the field - see dubious amazon torn-write prevention.
+Commit 4e0400525691 ("virtio-blk: support polling I/O") triggers the
+following gcc 13 W=1 warnings:
 
-What is the 'dubious amazon torn-write prevention'?
+drivers/block/virtio_blk.c: In function ‘init_vq’:
+drivers/block/virtio_blk.c:1077:68: warning: ‘%d’ directive output may be truncated writing between 1 and 11 bytes into a region of size 7 [-Wformat-truncation=]
+ 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
+      |                                                                    ^~
+drivers/block/virtio_blk.c:1077:58: note: directive argument in the range [-2147483648, 65534]
+ 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
+      |                                                          ^~~~~~~~~~~~~
+drivers/block/virtio_blk.c:1077:17: note: ‘snprintf’ output between 11 and 21 bytes into a destination of size 16
+ 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-> About b., we could add the pow-of-2 and file offset alignment requirement 
-> for other FSes, but then need to add some method to advertise that 
-> restriction.
+This is a false positive because the lower bound -2147483648 is
+incorrect. The true range of i is [0, num_vqs - 1] where 0 < num_vqs <
+65536.
 
-We really need a better way to communicate I/O limitations anyway.
-Something like XFS_IOC_DIOINFO on steroids.
+The code mixes int, unsigned short, and unsigned int types in addition
+to using "%d" for an unsigned value. Use unsigned short and "%u"
+consistently to solve the compiler warning.
 
-> Sure, but to me it is a concern that we have 2x paths to make robust a. 
-> offload via hw, which may involve CoW b. no HW support, i.e. CoW always
+Cc: Suwan Kim <suwan.kim027@gmail.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202312041509.DIyvEt9h-lkp@intel.com/
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ drivers/block/virtio_blk.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Relying just on the hardware seems very limited, especially as there is
-plenty of hardware that won't guarantee anything larger than 4k, and
-plenty of NVMe hardware without has some other small limit like 32k
-because it doesn't support multiple atomicy mode.
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index d53d6aa8ee69..47556d8ccc32 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -1019,12 +1019,12 @@ static void virtblk_config_changed(struct virtio_device *vdev)
+ static int init_vq(struct virtio_blk *vblk)
+ {
+ 	int err;
+-	int i;
++	unsigned short i;
+ 	vq_callback_t **callbacks;
+ 	const char **names;
+ 	struct virtqueue **vqs;
+ 	unsigned short num_vqs;
+-	unsigned int num_poll_vqs;
++	unsigned short num_poll_vqs;
+ 	struct virtio_device *vdev = vblk->vdev;
+ 	struct irq_affinity desc = { 0, };
+ 
+@@ -1068,13 +1068,13 @@ static int init_vq(struct virtio_blk *vblk)
+ 
+ 	for (i = 0; i < num_vqs - num_poll_vqs; i++) {
+ 		callbacks[i] = virtblk_done;
+-		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%d", i);
++		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%u", i);
+ 		names[i] = vblk->vqs[i].name;
+ 	}
+ 
+ 	for (; i < num_vqs; i++) {
+ 		callbacks[i] = NULL;
+-		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
++		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%u", i);
+ 		names[i] = vblk->vqs[i].name;
+ 	}
+ 
+-- 
+2.43.0
 
-> And for no HW support, if we don't follow the O_ATOMIC model of committing 
-> nothing until a SYNC is issued, would we allocate, write, and later free a 
-> new extent for each write, right?
-
-Yes. Then again if you do data journalling you do that anyway, and as
-one little project I'm doing right now shows that data journling is
-often the fastest thing we can do for very small writes.
