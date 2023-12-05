@@ -1,110 +1,126 @@
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F9119F
-	for <linux-block@vger.kernel.org>; Tue,  5 Dec 2023 05:51:56 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-315-RudkEP8NNOKGvji7MwR1Vg-1; Tue, 05 Dec 2023 13:51:53 +0000
-X-MC-Unique: RudkEP8NNOKGvji7MwR1Vg-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 5 Dec
- 2023 13:51:39 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Tue, 5 Dec 2023 13:51:39 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Stefan Hajnoczi' <stefanha@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>
-CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, Jason Wang <jasowang@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jens Axboe
-	<axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Suwan Kim
-	<suwan.kim027@gmail.com>, kernel test robot <lkp@intel.com>
-Subject: RE: [PATCH] virtio_blk: fix snprintf truncation compiler warning
-Thread-Topic: [PATCH] virtio_blk: fix snprintf truncation compiler warning
-Thread-Index: AQHaJrs9NwtZ5IUyyEqvz6e+TUwc/LCatUxg
-Date: Tue, 5 Dec 2023 13:51:39 +0000
-Message-ID: <1c1d57ba13c2497f99e5e0a9c5954667@AcuMS.aculab.com>
-References: <20231204140743.1487843-1-stefanha@redhat.com>
-In-Reply-To: <20231204140743.1487843-1-stefanha@redhat.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i87Ts5v0"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47E112C
+	for <linux-block@vger.kernel.org>; Tue,  5 Dec 2023 05:59:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701784769;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=79PD3d2kumFOy7A9eRn22aWg7Y9KfDQNCF0FEIsFKv8=;
+	b=i87Ts5v0n585Lx8w+bu/oRlhSS8PgIMDqoN+NFKoRakjsJRgd2QZEdV+LZstimDzahbhNk
+	XIEXhHWeITd5ZGD/P6ZPyHaSbp8xdSGX26UHcRNJdEw0AYeP6/PwFvJgtvz0E0nHFPp1Pc
+	o5aIvwzLt6RYs/bb9zLO9O0UNNtrCOk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-80-uCsCU4nHN_ezAkIn8k7hWw-1; Tue, 05 Dec 2023 08:59:24 -0500
+X-MC-Unique: uCsCU4nHN_ezAkIn8k7hWw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E090885A58C;
+	Tue,  5 Dec 2023 13:59:22 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.3])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A5A8492BC7;
+	Tue,  5 Dec 2023 13:59:12 +0000 (UTC)
+Date: Tue, 5 Dec 2023 21:59:08 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
+	sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
+	djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	chandan.babu@oracle.com, dchinner@redhat.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH 17/21] fs: xfs: iomap atomic write support
+Message-ID: <ZW8srC5hTWOGF5ts@fedora>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com>
+ <20230929102726.2985188-18-john.g.garry@oracle.com>
+ <20231109152615.GB1521@lst.de>
+ <a50a16ca-d4b9-a4d8-4230-833d82752bd2@oracle.com>
+ <c78bcca7-8f09-41c7-adf0-03b42cde70d6@oracle.com>
+ <20231128135619.GA12202@lst.de>
+ <e4fb6875-e552-45aa-b193-58f15d9a786c@oracle.com>
+ <20231204134509.GA25834@lst.de>
+ <a87d48a7-f2a8-40ae-8d9b-e4534ccc29b1@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a87d48a7-f2a8-40ae-8d9b-e4534ccc29b1@oracle.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-RnJvbTogU3RlZmFuIEhham5vY3ppDQo+IFNlbnQ6IDA0IERlY2VtYmVyIDIwMjMgMTQ6MDgNCj4g
-DQo+IENvbW1pdCA0ZTA0MDA1MjU2OTEgKCJ2aXJ0aW8tYmxrOiBzdXBwb3J0IHBvbGxpbmcgSS9P
-IikgdHJpZ2dlcnMgdGhlDQo+IGZvbGxvd2luZyBnY2MgMTMgVz0xIHdhcm5pbmdzOg0KPiANCj4g
-ZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmM6IEluIGZ1bmN0aW9uIOKAmGluaXRfdnHigJk6DQo+
-IGRyaXZlcnMvYmxvY2svdmlydGlvX2Jsay5jOjEwNzc6Njg6IHdhcm5pbmc6IOKAmCVk4oCZIGRp
-cmVjdGl2ZSBvdXRwdXQgbWF5IGJlIHRydW5jYXRlZCB3cml0aW5nIGJldHdlZW4gMQ0KPiBhbmQg
-MTEgYnl0ZXMgaW50byBhIHJlZ2lvbiBvZiBzaXplIDcgWy1XZm9ybWF0LXRydW5jYXRpb249XQ0K
-PiAgMTA3NyB8ICAgICAgICAgICAgICAgICBzbnByaW50Zih2YmxrLT52cXNbaV0ubmFtZSwgVlFf
-TkFNRV9MRU4sICJyZXFfcG9sbC4lZCIsIGkpOw0KPiAgICAgICB8ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefg0KPiBk
-cml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYzoxMDc3OjU4OiBub3RlOiBkaXJlY3RpdmUgYXJndW1l
-bnQgaW4gdGhlIHJhbmdlIFstMjE0NzQ4MzY0OCwgNjU1MzRdDQo+ICAxMDc3IHwgICAgICAgICAg
-ICAgICAgIHNucHJpbnRmKHZibGstPnZxc1tpXS5uYW1lLCBWUV9OQU1FX0xFTiwgInJlcV9wb2xs
-LiVkIiwgaSk7DQo+ICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fg0KPiBkcml2ZXJzL2Jsb2NrL3ZpcnRp
-b19ibGsuYzoxMDc3OjE3OiBub3RlOiDigJhzbnByaW50ZuKAmSBvdXRwdXQgYmV0d2VlbiAxMSBh
-bmQgMjEgYnl0ZXMgaW50byBhIGRlc3RpbmF0aW9uDQo+IG9mIHNpemUgMTYNCj4gIDEwNzcgfCAg
-ICAgICAgICAgICAgICAgc25wcmludGYodmJsay0+dnFzW2ldLm5hbWUsIFZRX05BTUVfTEVOLCAi
-cmVxX3BvbGwuJWQiLCBpKTsNCj4gICAgICAgfCAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KPiANCj4gVGhp
-cyBpcyBhIGZhbHNlIHBvc2l0aXZlIGJlY2F1c2UgdGhlIGxvd2VyIGJvdW5kIC0yMTQ3NDgzNjQ4
-IGlzDQo+IGluY29ycmVjdC4gVGhlIHRydWUgcmFuZ2Ugb2YgaSBpcyBbMCwgbnVtX3ZxcyAtIDFd
-IHdoZXJlIDAgPCBudW1fdnFzIDwNCj4gNjU1MzYuDQo+IA0KPiBUaGUgY29kZSBtaXhlcyBpbnQs
-IHVuc2lnbmVkIHNob3J0LCBhbmQgdW5zaWduZWQgaW50IHR5cGVzIGluIGFkZGl0aW9uDQo+IHRv
-IHVzaW5nICIlZCIgZm9yIGFuIHVuc2lnbmVkIHZhbHVlLiBVc2UgdW5zaWduZWQgc2hvcnQgYW5k
-ICIldSINCj4gY29uc2lzdGVudGx5IHRvIHNvbHZlIHRoZSBjb21waWxlciB3YXJuaW5nLg0KPiAN
-Cj4gQ2M6IFN1d2FuIEtpbSA8c3V3YW4ua2ltMDI3QGdtYWlsLmNvbT4NCj4gUmVwb3J0ZWQtYnk6
-IGtlcm5lbCB0ZXN0IHJvYm90IDxsa3BAaW50ZWwuY29tPg0KPiBDbG9zZXM6IGh0dHBzOi8vbG9y
-ZS5rZXJuZWwub3JnL29lLWtidWlsZC1hbGwvMjAyMzEyMDQxNTA5LkRJeXZFdDloLWxrcEBpbnRl
-bC5jb20vDQo+IFNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0
-LmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYyB8IDggKysrKy0tLS0N
-Cj4gIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+IA0K
-PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMgYi9kcml2ZXJzL2Jsb2Nr
-L3ZpcnRpb19ibGsuYw0KPiBpbmRleCBkNTNkNmFhOGVlNjkuLjQ3NTU2ZDhjY2MzMiAxMDA2NDQN
-Cj4gLS0tIGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMNCj4gKysrIGIvZHJpdmVycy9ibG9j
-ay92aXJ0aW9fYmxrLmMNCj4gQEAgLTEwMTksMTIgKzEwMTksMTIgQEAgc3RhdGljIHZvaWQgdmly
-dGJsa19jb25maWdfY2hhbmdlZChzdHJ1Y3QgdmlydGlvX2RldmljZSAqdmRldikNCj4gIHN0YXRp
-YyBpbnQgaW5pdF92cShzdHJ1Y3QgdmlydGlvX2JsayAqdmJsaykNCj4gIHsNCj4gIAlpbnQgZXJy
-Ow0KPiAtCWludCBpOw0KPiArCXVuc2lnbmVkIHNob3J0IGk7DQo+ICAJdnFfY2FsbGJhY2tfdCAq
-KmNhbGxiYWNrczsNCj4gIAljb25zdCBjaGFyICoqbmFtZXM7DQo+ICAJc3RydWN0IHZpcnRxdWV1
-ZSAqKnZxczsNCj4gIAl1bnNpZ25lZCBzaG9ydCBudW1fdnFzOw0KPiAtCXVuc2lnbmVkIGludCBu
-dW1fcG9sbF92cXM7DQo+ICsJdW5zaWduZWQgc2hvcnQgbnVtX3BvbGxfdnFzOw0KPiAgCXN0cnVj
-dCB2aXJ0aW9fZGV2aWNlICp2ZGV2ID0gdmJsay0+dmRldjsNCj4gIAlzdHJ1Y3QgaXJxX2FmZmlu
-aXR5IGRlc2MgPSB7IDAsIH07DQo+IA0KPiBAQCAtMTA2OCwxMyArMTA2OCwxMyBAQCBzdGF0aWMg
-aW50IGluaXRfdnEoc3RydWN0IHZpcnRpb19ibGsgKnZibGspDQo+IA0KPiAgCWZvciAoaSA9IDA7
-IGkgPCBudW1fdnFzIC0gbnVtX3BvbGxfdnFzOyBpKyspIHsNCg0KVWdnIGRvaW5nIGFyaXRobWV0
-aWMgb24gY2hhci9zaG9ydCBpcyBsaWtlbHkgdG8gZ2VuZXJhdGUgaG9ycmlkDQpjb2RlIChlc3Bl
-Y2lhbGx5IG9uIG5vbi14ODYpLg0KSGludCwgdGhlcmUgd2lsbCBiZSBleHBsaWNpdCBtYXNraW5n
-IGFuZC9vciBzaWduL3plcm8gZXh0ZW5zaW9uLg0KDQpFdmVuIHRoZSBhcnJheSBpbmRleCBtaWdo
-dCBhZGQgZXh0cmEgY29kZSAoYWx0aG91Z2ggdGhlcmUnbGwgYmUNCmFuIGV4cGxpY2l0IHNpZ24g
-ZXh0ZW5kIHRvIDY0Yml0IHdpdGggdGhlIGN1cnJlbnQgY29kZSkuDQoNClRoZXJlIHJlYWxseSBv
-dWdodCB0byBiZSBhIGJldHRlciB3YXkgdG8gbWFrZSBnY2MgU1RGVS4NCg0KSW4gdGhpcyBjYXNl
-ICd1bnNpZ25lZCBpbnQgaScgbWlnaHQgYmUgZW5vdWdoIHNpbmNlIGdjYyBzZWVtcw0KdG8gaGF2
-ZSBhIHNtYWxsIGVub3VnaCB1cHBlciBib3VuZC4NCg0KCURhdmlkDQoNCg0KPiAgCQljYWxsYmFj
-a3NbaV0gPSB2aXJ0YmxrX2RvbmU7DQo+IC0JCXNucHJpbnRmKHZibGstPnZxc1tpXS5uYW1lLCBW
-UV9OQU1FX0xFTiwgInJlcS4lZCIsIGkpOw0KPiArCQlzbnByaW50Zih2YmxrLT52cXNbaV0ubmFt
-ZSwgVlFfTkFNRV9MRU4sICJyZXEuJXUiLCBpKTsNCj4gIAkJbmFtZXNbaV0gPSB2YmxrLT52cXNb
-aV0ubmFtZTsNCj4gIAl9DQo+IA0KPiAgCWZvciAoOyBpIDwgbnVtX3ZxczsgaSsrKSB7DQo+ICAJ
-CWNhbGxiYWNrc1tpXSA9IE5VTEw7DQo+IC0JCXNucHJpbnRmKHZibGstPnZxc1tpXS5uYW1lLCBW
-UV9OQU1FX0xFTiwgInJlcV9wb2xsLiVkIiwgaSk7DQo+ICsJCXNucHJpbnRmKHZibGstPnZxc1tp
-XS5uYW1lLCBWUV9OQU1FX0xFTiwgInJlcV9wb2xsLiV1IiwgaSk7DQo+ICAJCW5hbWVzW2ldID0g
-dmJsay0+dnFzW2ldLm5hbWU7DQo+ICAJfQ0KPiANCj4gLS0NCj4gMi40My4wDQoNCi0NClJlZ2lz
-dGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24g
-S2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+On Mon, Dec 04, 2023 at 03:19:15PM +0000, John Garry wrote:
+> On 04/12/2023 13:45, Christoph Hellwig wrote:
+> > On Tue, Nov 28, 2023 at 05:42:10PM +0000, John Garry wrote:
+> > > ok, fine, it would not be required for XFS with CoW. Some concerns still:
+> > > a. device atomic write boundary, if any
+> > > b. other FSes which do not have CoW support. ext4 is already being used for
+> > > "atomic writes" in the field - see dubious amazon torn-write prevention.
+> > 
+> > What is the 'dubious amazon torn-write prevention'?
+> 
+> https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/storage-twp.html
+> 
+> AFAICS, this is without any kernel changes, so no guarantee of unwanted
+> splitting or merging of bios.
+> 
+> Anyway, there will still be !CoW FSes which people want to support.
+> 
+> > 
+> > > About b., we could add the pow-of-2 and file offset alignment requirement
+> > > for other FSes, but then need to add some method to advertise that
+> > > restriction.
+> > 
+> > We really need a better way to communicate I/O limitations anyway.
+> > Something like XFS_IOC_DIOINFO on steroids.
+> > 
+> > > Sure, but to me it is a concern that we have 2x paths to make robust a.
+> > > offload via hw, which may involve CoW b. no HW support, i.e. CoW always
+> > 
+> > Relying just on the hardware seems very limited, especially as there is
+> > plenty of hardware that won't guarantee anything larger than 4k, and
+> > plenty of NVMe hardware without has some other small limit like 32k
+> > because it doesn't support multiple atomicy mode.
+> 
+> So what would you propose as the next step? Would it to be first achieve
+> atomic write support for XFS with HW support + CoW to ensure contiguous
+> extents (and without XFS forcealign)?
+> 
+> > 
+> > > And for no HW support, if we don't follow the O_ATOMIC model of committing
+> > > nothing until a SYNC is issued, would we allocate, write, and later free a
+> > > new extent for each write, right?
+> > 
+> > Yes. Then again if you do data journalling you do that anyway, and as
+> > one little project I'm doing right now shows that data journling is
+> > often the fastest thing we can do for very small writes.
+> 
+> Ignoring FSes, then how is this supposed to work for block devices? We just
+> always need HW support, right?
+
+Looks the HW support could be minimized, just like what Google and Amazon did,
+16KB physical block size with proper queue limit setting.
+
+Now seems it is easy to make such device with ublk-loop by:
+
+- use one backing disk with 16KB/32KB/.. physical block size
+- expose proper physical bs & chunk_sectors & max sectors queue limit
+
+Then any 16KB aligned direct WRITE with N*16KB length(N in [1, 8] with 256
+chunk_sectors) can be atomic-write.
+
+
+
+Thanks,
+Ming
 
