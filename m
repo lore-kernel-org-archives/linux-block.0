@@ -1,86 +1,100 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED7085;
-	Mon,  4 Dec 2023 19:15:25 -0800 (PST)
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5bdb0be3591so3007216a12.2;
-        Mon, 04 Dec 2023 19:15:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701746125; x=1702350925;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a8T1GuM6HKEiuHh3tNrm/tVV4M4n9vSsl27RmV9NUNo=;
-        b=uuxIyDl+ORWFblYw9htyGWdHi+tSBKgR1J+Amz+Nod15rWmSIYiLdRzRhUwJ6FkqUT
-         3LTVAxcPu5Uyq9tJC2fNYsQWDPyFAk7gl5oJKBouLoxy6iSp6TVA1dOzVYj13YOQEi0w
-         aEoCxYsTcJVvwUHLktBprd2Mm0R5SUoKfaQk4B7jSxDB+OILC6z8yNmWKHjj3yW5UkwS
-         zfOjICbpWd5GOEMo8wgdPMQu69gke0OJa0O+WnxRy9H/UzHMPV72ZDZ3UeB3ggT1cKSh
-         hIroAkaLuxZiBifVKOzXMGHJ3EM/ICNdmbMYv4H7FnM3SC77C80AgVIWDVAPBSarlVu7
-         6kAw==
-X-Gm-Message-State: AOJu0YwgE4frzySOWu04cC9Y4Fvb1zGkB5HS3ZHBcEywSi8Cf2QzQGPI
-	LxAh67xUg/Rvgq940GvukeA=
-X-Google-Smtp-Source: AGHT+IGcrTvR89vMTz2d+3PEPxrNySoDH+6OFOJt5/lkiilLXly+Js6dQfGHHqEQ88rNw3ympUh4bw==
-X-Received: by 2002:a05:6a20:7f83:b0:18f:97c:8a30 with SMTP id d3-20020a056a207f8300b0018f097c8a30mr6043130pzj.91.1701746124760;
-        Mon, 04 Dec 2023 19:15:24 -0800 (PST)
-Received: from [172.20.2.177] ([173.197.90.226])
-        by smtp.gmail.com with ESMTPSA id 20-20020a17090a005400b0028652f98978sm7675173pjb.8.2023.12.04.19.15.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Dec 2023 19:15:24 -0800 (PST)
-Message-ID: <3a878745-a667-47ad-ac87-867a9bb8bd34@acm.org>
-Date: Mon, 4 Dec 2023 19:15:19 -0800
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="ULAuEAIm"
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31C89CD
+	for <linux-block@vger.kernel.org>; Mon,  4 Dec 2023 20:58:36 -0800 (PST)
+Received: from cwcc.thunk.org (pool-173-48-111-98.bstnma.fios.verizon.net [173.48.111.98])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 3B54tdZl016948
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 4 Dec 2023 23:55:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1701752144; bh=xY31OtXpm6KSv94nmxlfIijYjDNR0HuHd+Om4l/DRL4=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=ULAuEAImbbRp/EKwZ7vqMIWXT6OjmvjIgkTgGyD2NyabpELmR3xt1M7Wv5tFphTNy
+	 XiZVg+kRB4tu3DD9cFnL521xALsq037uudWRmRUK7vkgoYcEoqgB+Htr4GUEL0xIyy
+	 LNPjeRK8WI4kaZRcQ+8btulffIuW+dUqWHrMOgabNvPzMOdbmgmh9p5eHW3WRVb/ep
+	 Yi7dzwjk72n8SsYenWwqy0BIa468+PEZe3uAIMnixXE8eMy6TAzFNehDAUg68SjnCk
+	 /52qTNwdL2JoY1vDMEizYdaR4Y9c40vZA++hZxVi6HpdiFL1SvlEc/7gPguBe1Lv+1
+	 /K1ac43DNI/4Q==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id 626A415C02E0; Mon,  4 Dec 2023 23:55:39 -0500 (EST)
+Date: Mon, 4 Dec 2023 23:55:39 -0500
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
+        sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+        chandan.babu@oracle.com, dchinner@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, jbongio@google.com,
+        linux-api@vger.kernel.org
+Subject: Re: [PATCH 17/21] fs: xfs: iomap atomic write support
+Message-ID: <20231205045539.GH509422@mit.edu>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com>
+ <20230929102726.2985188-18-john.g.garry@oracle.com>
+ <20231109152615.GB1521@lst.de>
+ <a50a16ca-d4b9-a4d8-4230-833d82752bd2@oracle.com>
+ <c78bcca7-8f09-41c7-adf0-03b42cde70d6@oracle.com>
+ <20231128135619.GA12202@lst.de>
+ <e4fb6875-e552-45aa-b193-58f15d9a786c@oracle.com>
+ <20231204134509.GA25834@lst.de>
+ <a87d48a7-f2a8-40ae-8d9b-e4534ccc29b1@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 0/6] Disable fair tag sharing for UFS devices
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>
-References: <20231130193139.880955-1-bvanassche@acm.org>
- <20231204075252.GA29579@lst.de>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231204075252.GA29579@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a87d48a7-f2a8-40ae-8d9b-e4534ccc29b1@oracle.com>
 
-On 12/3/23 23:52, Christoph Hellwig wrote:
-> On Thu, Nov 30, 2023 at 11:31:27AM -0800, Bart Van Assche wrote:
->> The fair tag sharing algorithm reduces performance for UFS devices
->> significantly. This is because UFS devices have multiple logical units, a
->> limited queue depth (32 for UFS 3.1 devices), because it happens often that
->> multiple logical units are accessed and also because it takes time to
->> give tags back after activity on a request queue has stopped. This patch series
->> restores UFS device performance to that of the legacy block layer by disabling
->> fair tag sharing for UFS devices.
+On Mon, Dec 04, 2023 at 03:19:15PM +0000, John Garry wrote:
+> > 
+> > What is the 'dubious amazon torn-write prevention'?
 > 
-> I feel like a broken record:
+> https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/storage-twp.html
 > 
-> fair tag sharing exists for a reason.  Opting out of it for a specific
-> driver does not make any sense.  Either you can make a good argument
-> why you don't want it at all, or for specific configurations you
-> can clearly explain, or you make it work faster.  A "treat my driver
-> special" flag is never acceptable.
+> AFAICS, this is without any kernel changes, so no guarantee of unwanted
+> splitting or merging of bios.
 
-Hi Christoph,
+Well, more than one company has audited the kernel paths, and it turns
+out that for selected Kernel versions, after doing desk-check
+verification of the relevant kernel baths, as well as experimental
+verification via testing to try to find torn writes in the kernel, we
+can make it safe for specific kernel versions which might be used in
+hosted MySQL instances where we control the kernel, the mysql server,
+and the emulated block device (and we know the database is doing
+Direct I/O writes --- this won't work for PostgreSQL).  I gave a talk
+about this at Google I/O Next '18, five years ago[1].
 
-Feedback that helps improving a patch series is always welcome.
+[1] https://www.youtube.com/watch?v=gIeuiGg-_iw
 
-Here is how I see fair tag sharing:
-* Users probably want to configure minimum and maximum bandwidth or IOPS
-   values instead of an equal number of tags per request queue. I assume
-   that the fair tag sharing algorithm assigns an equal number of tags to
-   each request queue since the run-time cost of the latter algorithm is
-   much lower than the run-time cost of the previous algorithms.
-* Any algorithm that is more sophisticated than the current fair tag
-   sharing algorithm would have a higher runtime cost. We don't want to
-   increase the cost of command processing in the block layer core.
+Given the performance gains (see the talk (see the comparison of the
+at time 19:31 and at 29:57) --- it's quite compelling. 
 
-Hence my proposal to disable the fair tag sharing algorithm if it's not
-needed. I don't see a good alternative to this approach.
+Of course, I wouldn't recommend this approach for a naive sysadmin,
+since most database adminsitrators won't know how to audit kernel code
+(see the discussion at time 35:10 of the video), and reverify the
+entire software stack before every kernel upgrade.  The challenge is
+how to do this safely.
 
-Thanks,
+The fact remains that both Amazon's EBS and Google's Persistent Disk
+products are implemented in such a way that writes will not be torn
+below the virtual machine, and the guarantees are in fact quite a bit
+stronger than what we will probably end up advertising via NVMe and/or
+SCSI.  It wouldn't surprise me if this is the case (or could be made
+to be the case) For Oracle Cloud as well.
 
-Bart.
+The question is how to make this guarantee so that the kernel knows
+when various cloud-provided block devicse do provide these greater
+guarantees, and then how to make it be an architected feature, as
+opposed to a happy implementation detail that has to be verified at
+every kernel upgrade.
+
+Cheers,
+
+						- Ted
