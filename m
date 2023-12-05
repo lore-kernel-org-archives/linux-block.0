@@ -1,153 +1,110 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C9A4A0;
-	Tue,  5 Dec 2023 04:57:48 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Sl0tr1Plpz4f3lCn;
-	Tue,  5 Dec 2023 20:57:40 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id DCA8D1A0B90;
-	Tue,  5 Dec 2023 20:57:44 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgA3iA5HHm9l7uI9Cw--.19151S4;
-	Tue, 05 Dec 2023 20:57:44 +0800 (CST)
-From: Li Lingfeng <lilingfeng@huaweicloud.com>
-To: josef@toxicpanda.com
-Cc: linux-kernel@vger.kernel.org,
-	hch@lst.de,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	axboe@kernel.dk,
-	chaitanya.kulkarni@wdc.com,
-	yukuai1@huaweicloud.com,
-	houtao1@huawei.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	lilingfeng@huaweicloud.com,
-	lilingfeng3@huawei.com
-Subject: [PATCH -next v2] nbd: get config_lock before sock_shutdown
-Date: Tue,  5 Dec 2023 20:56:41 +0800
-Message-Id: <20231205125641.1913393-1-lilingfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F9119F
+	for <linux-block@vger.kernel.org>; Tue,  5 Dec 2023 05:51:56 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-315-RudkEP8NNOKGvji7MwR1Vg-1; Tue, 05 Dec 2023 13:51:53 +0000
+X-MC-Unique: RudkEP8NNOKGvji7MwR1Vg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 5 Dec
+ 2023 13:51:39 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 5 Dec 2023 13:51:39 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Stefan Hajnoczi' <stefanha@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>
+CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "virtualization@lists.linux.dev"
+	<virtualization@lists.linux.dev>, Jason Wang <jasowang@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Suwan Kim
+	<suwan.kim027@gmail.com>, kernel test robot <lkp@intel.com>
+Subject: RE: [PATCH] virtio_blk: fix snprintf truncation compiler warning
+Thread-Topic: [PATCH] virtio_blk: fix snprintf truncation compiler warning
+Thread-Index: AQHaJrs9NwtZ5IUyyEqvz6e+TUwc/LCatUxg
+Date: Tue, 5 Dec 2023 13:51:39 +0000
+Message-ID: <1c1d57ba13c2497f99e5e0a9c5954667@AcuMS.aculab.com>
+References: <20231204140743.1487843-1-stefanha@redhat.com>
+In-Reply-To: <20231204140743.1487843-1-stefanha@redhat.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgA3iA5HHm9l7uI9Cw--.19151S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxWry3XF15CrWDZF4rtr48Xrb_yoW5Xw4rpF
-	43CFs8Gr45X3WSga9xJ34xWry5G3saga17Gry7u3WSvrZ7CrWxurn5KFy3Cr1DJr9xXF45
-	XFyFgFnYya98JrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267
-	AKxVWUXVWUAwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r4j6FyU
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUkrcfUUUUU=
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-From: Zhong Jinghua <zhongjinghua@huawei.com>
-
-Config->socks in sock_shutdown may trigger a UAF problem.
-The reason is that sock_shutdown does not hold the config_lock,
-so that nbd_ioctl can release config->socks at this time.
-
-T0: NBD_DO_IT
-T1: NBD_SET_SOCK
-
-T0						T1
-
-nbd_ioctl
-  mutex_lock(&nbd->config_lock)
-  // get lock
-  __nbd_ioctl
-	nbd_start_device_ioctl
-	  nbd_start_device
-	  mutex_unlock(&nbd->config_lock)
-	  // relase lock
-	  wait_event_interruptible
-	  (kill, enter sock_shutdown)
-	  sock_shutdown
-					nbd_ioctl
-					  mutex_lock(&nbd->config_lock)
-					  // get lock
-					  __nbd_ioctl
-					    nbd_add_socket
-					      krealloc
-						kfree(p)
-					        //config->socks is NULL
-	    nbd_sock *nsock = config->socks // error
-
-Fix it by moving config_lock up before sock_shutdown.
-
-Link: https://lore.kernel.org/all/ab998dda-80ba-7d8b-0cae-36665826deb5@huaweicloud.com/
-Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
-v1->v2:
-  Make comment more detailed.
-
- drivers/block/nbd.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 855fdf5c3b4e..7a044b4726b4 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -92,6 +92,11 @@ struct nbd_config {
- 	unsigned long runtime_flags;
- 	u64 dead_conn_timeout;
- 
-+	/*
-+	 * Anyone who tries to get config->socks needs to be
-+	 * protected by config_lock since it may be released
-+	 * by krealloc in nbd_add_socket.
-+	 */
- 	struct nbd_sock **socks;
- 	int num_connections;
- 	atomic_t live_connections;
-@@ -876,6 +881,10 @@ static void recv_work(struct work_struct *work)
- 	nbd_mark_nsock_dead(nbd, nsock, 1);
- 	mutex_unlock(&nsock->tx_lock);
- 
-+	/*
-+	 * recv_work will not get config_lock here if recv_workq is flushed
-+	 * in ioctl since nbd_open is holding config_refs.
-+	 */
- 	nbd_config_put(nbd);
- 	atomic_dec(&config->recv_threads);
- 	wake_up(&config->recv_wq);
-@@ -1417,13 +1426,21 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd)
- 	mutex_unlock(&nbd->config_lock);
- 	ret = wait_event_interruptible(config->recv_wq,
- 					 atomic_read(&config->recv_threads) == 0);
-+
-+	/*
-+	 * Get config_lock before sock_shutdown to prevent UAF since nbd_add_socket
-+	 * may release config->socks concurrently.
-+	 *
-+	 * config_lock can be got before flush_workqueue since recv_work will not
-+	 * get it in the current scenario.
-+	 */
-+	mutex_lock(&nbd->config_lock);
- 	if (ret) {
- 		sock_shutdown(nbd);
- 		nbd_clear_que(nbd);
- 	}
- 
- 	flush_workqueue(nbd->recv_workq);
--	mutex_lock(&nbd->config_lock);
- 	nbd_bdev_reset(nbd);
- 	/* user requested, ignore socket errors */
- 	if (test_bit(NBD_RT_DISCONNECT_REQUESTED, &config->runtime_flags))
--- 
-2.39.2
+RnJvbTogU3RlZmFuIEhham5vY3ppDQo+IFNlbnQ6IDA0IERlY2VtYmVyIDIwMjMgMTQ6MDgNCj4g
+DQo+IENvbW1pdCA0ZTA0MDA1MjU2OTEgKCJ2aXJ0aW8tYmxrOiBzdXBwb3J0IHBvbGxpbmcgSS9P
+IikgdHJpZ2dlcnMgdGhlDQo+IGZvbGxvd2luZyBnY2MgMTMgVz0xIHdhcm5pbmdzOg0KPiANCj4g
+ZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmM6IEluIGZ1bmN0aW9uIOKAmGluaXRfdnHigJk6DQo+
+IGRyaXZlcnMvYmxvY2svdmlydGlvX2Jsay5jOjEwNzc6Njg6IHdhcm5pbmc6IOKAmCVk4oCZIGRp
+cmVjdGl2ZSBvdXRwdXQgbWF5IGJlIHRydW5jYXRlZCB3cml0aW5nIGJldHdlZW4gMQ0KPiBhbmQg
+MTEgYnl0ZXMgaW50byBhIHJlZ2lvbiBvZiBzaXplIDcgWy1XZm9ybWF0LXRydW5jYXRpb249XQ0K
+PiAgMTA3NyB8ICAgICAgICAgICAgICAgICBzbnByaW50Zih2YmxrLT52cXNbaV0ubmFtZSwgVlFf
+TkFNRV9MRU4sICJyZXFfcG9sbC4lZCIsIGkpOw0KPiAgICAgICB8ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefg0KPiBk
+cml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYzoxMDc3OjU4OiBub3RlOiBkaXJlY3RpdmUgYXJndW1l
+bnQgaW4gdGhlIHJhbmdlIFstMjE0NzQ4MzY0OCwgNjU1MzRdDQo+ICAxMDc3IHwgICAgICAgICAg
+ICAgICAgIHNucHJpbnRmKHZibGstPnZxc1tpXS5uYW1lLCBWUV9OQU1FX0xFTiwgInJlcV9wb2xs
+LiVkIiwgaSk7DQo+ICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fg0KPiBkcml2ZXJzL2Jsb2NrL3ZpcnRp
+b19ibGsuYzoxMDc3OjE3OiBub3RlOiDigJhzbnByaW50ZuKAmSBvdXRwdXQgYmV0d2VlbiAxMSBh
+bmQgMjEgYnl0ZXMgaW50byBhIGRlc3RpbmF0aW9uDQo+IG9mIHNpemUgMTYNCj4gIDEwNzcgfCAg
+ICAgICAgICAgICAgICAgc25wcmludGYodmJsay0+dnFzW2ldLm5hbWUsIFZRX05BTUVfTEVOLCAi
+cmVxX3BvbGwuJWQiLCBpKTsNCj4gICAgICAgfCAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KPiANCj4gVGhp
+cyBpcyBhIGZhbHNlIHBvc2l0aXZlIGJlY2F1c2UgdGhlIGxvd2VyIGJvdW5kIC0yMTQ3NDgzNjQ4
+IGlzDQo+IGluY29ycmVjdC4gVGhlIHRydWUgcmFuZ2Ugb2YgaSBpcyBbMCwgbnVtX3ZxcyAtIDFd
+IHdoZXJlIDAgPCBudW1fdnFzIDwNCj4gNjU1MzYuDQo+IA0KPiBUaGUgY29kZSBtaXhlcyBpbnQs
+IHVuc2lnbmVkIHNob3J0LCBhbmQgdW5zaWduZWQgaW50IHR5cGVzIGluIGFkZGl0aW9uDQo+IHRv
+IHVzaW5nICIlZCIgZm9yIGFuIHVuc2lnbmVkIHZhbHVlLiBVc2UgdW5zaWduZWQgc2hvcnQgYW5k
+ICIldSINCj4gY29uc2lzdGVudGx5IHRvIHNvbHZlIHRoZSBjb21waWxlciB3YXJuaW5nLg0KPiAN
+Cj4gQ2M6IFN1d2FuIEtpbSA8c3V3YW4ua2ltMDI3QGdtYWlsLmNvbT4NCj4gUmVwb3J0ZWQtYnk6
+IGtlcm5lbCB0ZXN0IHJvYm90IDxsa3BAaW50ZWwuY29tPg0KPiBDbG9zZXM6IGh0dHBzOi8vbG9y
+ZS5rZXJuZWwub3JnL29lLWtidWlsZC1hbGwvMjAyMzEyMDQxNTA5LkRJeXZFdDloLWxrcEBpbnRl
+bC5jb20vDQo+IFNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0
+LmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYyB8IDggKysrKy0tLS0N
+Cj4gIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+IA0K
+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMgYi9kcml2ZXJzL2Jsb2Nr
+L3ZpcnRpb19ibGsuYw0KPiBpbmRleCBkNTNkNmFhOGVlNjkuLjQ3NTU2ZDhjY2MzMiAxMDA2NDQN
+Cj4gLS0tIGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMNCj4gKysrIGIvZHJpdmVycy9ibG9j
+ay92aXJ0aW9fYmxrLmMNCj4gQEAgLTEwMTksMTIgKzEwMTksMTIgQEAgc3RhdGljIHZvaWQgdmly
+dGJsa19jb25maWdfY2hhbmdlZChzdHJ1Y3QgdmlydGlvX2RldmljZSAqdmRldikNCj4gIHN0YXRp
+YyBpbnQgaW5pdF92cShzdHJ1Y3QgdmlydGlvX2JsayAqdmJsaykNCj4gIHsNCj4gIAlpbnQgZXJy
+Ow0KPiAtCWludCBpOw0KPiArCXVuc2lnbmVkIHNob3J0IGk7DQo+ICAJdnFfY2FsbGJhY2tfdCAq
+KmNhbGxiYWNrczsNCj4gIAljb25zdCBjaGFyICoqbmFtZXM7DQo+ICAJc3RydWN0IHZpcnRxdWV1
+ZSAqKnZxczsNCj4gIAl1bnNpZ25lZCBzaG9ydCBudW1fdnFzOw0KPiAtCXVuc2lnbmVkIGludCBu
+dW1fcG9sbF92cXM7DQo+ICsJdW5zaWduZWQgc2hvcnQgbnVtX3BvbGxfdnFzOw0KPiAgCXN0cnVj
+dCB2aXJ0aW9fZGV2aWNlICp2ZGV2ID0gdmJsay0+dmRldjsNCj4gIAlzdHJ1Y3QgaXJxX2FmZmlu
+aXR5IGRlc2MgPSB7IDAsIH07DQo+IA0KPiBAQCAtMTA2OCwxMyArMTA2OCwxMyBAQCBzdGF0aWMg
+aW50IGluaXRfdnEoc3RydWN0IHZpcnRpb19ibGsgKnZibGspDQo+IA0KPiAgCWZvciAoaSA9IDA7
+IGkgPCBudW1fdnFzIC0gbnVtX3BvbGxfdnFzOyBpKyspIHsNCg0KVWdnIGRvaW5nIGFyaXRobWV0
+aWMgb24gY2hhci9zaG9ydCBpcyBsaWtlbHkgdG8gZ2VuZXJhdGUgaG9ycmlkDQpjb2RlIChlc3Bl
+Y2lhbGx5IG9uIG5vbi14ODYpLg0KSGludCwgdGhlcmUgd2lsbCBiZSBleHBsaWNpdCBtYXNraW5n
+IGFuZC9vciBzaWduL3plcm8gZXh0ZW5zaW9uLg0KDQpFdmVuIHRoZSBhcnJheSBpbmRleCBtaWdo
+dCBhZGQgZXh0cmEgY29kZSAoYWx0aG91Z2ggdGhlcmUnbGwgYmUNCmFuIGV4cGxpY2l0IHNpZ24g
+ZXh0ZW5kIHRvIDY0Yml0IHdpdGggdGhlIGN1cnJlbnQgY29kZSkuDQoNClRoZXJlIHJlYWxseSBv
+dWdodCB0byBiZSBhIGJldHRlciB3YXkgdG8gbWFrZSBnY2MgU1RGVS4NCg0KSW4gdGhpcyBjYXNl
+ICd1bnNpZ25lZCBpbnQgaScgbWlnaHQgYmUgZW5vdWdoIHNpbmNlIGdjYyBzZWVtcw0KdG8gaGF2
+ZSBhIHNtYWxsIGVub3VnaCB1cHBlciBib3VuZC4NCg0KCURhdmlkDQoNCg0KPiAgCQljYWxsYmFj
+a3NbaV0gPSB2aXJ0YmxrX2RvbmU7DQo+IC0JCXNucHJpbnRmKHZibGstPnZxc1tpXS5uYW1lLCBW
+UV9OQU1FX0xFTiwgInJlcS4lZCIsIGkpOw0KPiArCQlzbnByaW50Zih2YmxrLT52cXNbaV0ubmFt
+ZSwgVlFfTkFNRV9MRU4sICJyZXEuJXUiLCBpKTsNCj4gIAkJbmFtZXNbaV0gPSB2YmxrLT52cXNb
+aV0ubmFtZTsNCj4gIAl9DQo+IA0KPiAgCWZvciAoOyBpIDwgbnVtX3ZxczsgaSsrKSB7DQo+ICAJ
+CWNhbGxiYWNrc1tpXSA9IE5VTEw7DQo+IC0JCXNucHJpbnRmKHZibGstPnZxc1tpXS5uYW1lLCBW
+UV9OQU1FX0xFTiwgInJlcV9wb2xsLiVkIiwgaSk7DQo+ICsJCXNucHJpbnRmKHZibGstPnZxc1tp
+XS5uYW1lLCBWUV9OQU1FX0xFTiwgInJlcV9wb2xsLiV1IiwgaSk7DQo+ICAJCW5hbWVzW2ldID0g
+dmJsay0+dnFzW2ldLm5hbWU7DQo+ICAJfQ0KPiANCj4gLS0NCj4gMi40My4wDQoNCi0NClJlZ2lz
+dGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24g
+S2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
