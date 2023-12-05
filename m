@@ -1,98 +1,138 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="csJtwRRL"
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08FEA7
-	for <linux-block@vger.kernel.org>; Mon,  4 Dec 2023 17:03:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701738188; x=1733274188;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rrSUkEEkMK4RtsHwwJOywZRKkiACbCwtIz2jJBU80pM=;
-  b=csJtwRRLUdv2fqoY/ynrmvVtspmZeMDpT2o082qQAxBemlWLS4aE2nks
-   yGfHqRx+mHTnMAKfhS2Jn2HmgXRL0JOt62yKHee6pr/PbPIfqnqTAdzg6
-   iPkg66U3ZzWLrCbQv06PcRhmx9HnO/awJWb27zmjB57tj2r+6u1aFgme7
-   c1w+YnOjbTim0WbH8JPn12jnvzqAp3jO+S1WnLKM5QELtRiLtlBu46UXn
-   1O/eAUE/VxSCjrUyMlg7sSspfUhQxHVhVu3C0w3N09/+AG/FMgYvrDcyF
-   5mUgb3FN82sThMK6QjjMLoaXOAZl9j966ilPxgqgtwjzBWnMEppJhG3BF
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="373266981"
-X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="373266981"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 17:03:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="861572414"
-X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="861572414"
-Received: from abijaz-mobl2.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.61.240])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 17:03:06 -0800
-Received: by box.shutemov.name (Postfix, from userid 1000)
-	id 46D6110A437; Tue,  5 Dec 2023 04:03:03 +0300 (+03)
-Date: Tue, 5 Dec 2023 04:03:03 +0300
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: akpm@linux-foundation.org, agk@redhat.com, bmarzins@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	mpatocka@redhat.com, mpe@ellerman.id.au, snitzer@kernel.org
-Subject: Re: [PATCH 1/2] mm, treewide: Introduce NR_PAGE_ORDERS
-Message-ID: <20231205010303.tpt6wjicnvfopcmn@box.shutemov.name>
-References: <20231120221735.k6iyr5t5wdlgpxui@box.shutemov.name>
- <20231121122712.31339-1-kirill.shutemov@linux.intel.com>
- <CAHk-=wiqu14v=RdTYZwF60gpBb0gYdN++u-e-jnqkjEm0m6UdA@mail.gmail.com>
- <20231122123413.y54fmmk65qoxarzg@box.shutemov.name>
+X-Greylist: delayed 69 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 04 Dec 2023 17:05:22 PST
+Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D83A5
+	for <linux-block@vger.kernel.org>; Mon,  4 Dec 2023 17:05:22 -0800 (PST)
+Received: from 210.104.33.70 (nsr.re.kr)
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
+	by mail.nsr.re.kr with SMTP; Tue, 05 Dec 2023 10:03:54 +0900
+X-Sender: letrehee@nsr.re.kr
+Received: from 192.168.155.188 ([192.168.155.188])
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 438;
+          Tue, 5 Dec 2023 10:03:49 +0900 (KST)
+From: Dongsoo Lee <letrehee@nsr.re.kr>
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Dongsoo Lee <letrhee@nsr.re.kr>
+Subject: [PATCH v6 4/5] fscrypt: Add LEA-256-XTS, LEA-256-CTS support
+Date: Tue,  5 Dec 2023 01:03:28 +0000
+Message-Id: <20231205010329.21996-5-letrehee@nsr.re.kr>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231205010329.21996-1-letrehee@nsr.re.kr>
+References: <20231205010329.21996-1-letrehee@nsr.re.kr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231122123413.y54fmmk65qoxarzg@box.shutemov.name>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 22, 2023 at 03:34:13PM +0300, Kirill A. Shutemov wrote:
-> On Tue, Nov 21, 2023 at 09:46:57AM -0800, Linus Torvalds wrote:
-> > On Tue, 21 Nov 2023 at 04:27, Kirill A. Shutemov
-> > <kirill.shutemov@linux.intel.com> wrote:
-> > >
-> > > NR_PAGE_ORDERS defines the number of page orders supported by the page
-> > > allocator, ranging from 0 to MAX_ORDER, MAX_ORDER + 1 in total.
-> > >
-> > > NR_PAGE_ORDERS assists in defining arrays of page orders and allows for
-> > > more natural iteration over them.
-> > 
-> > These two patches look much better to me, but I think you missed one area.
-> > 
-> > Most of the Kconfig changes by commit 23baf831a32c ("mm, treewide:
-> > redefine MAX_ORDER sanely") should also be basically reverted to use
-> > this new NR_PAGE_ORDERS.
-> 
-> I am not convinced.
-> 
-> Some architectures make this option user-visible and, in my view, user
-> cares more about the largest page size buddy allocator can provide than
-> size of the array inside the allocator.
-> 
-> > IOW, I think the ARCH_FORCE_MAX_ORDER #defines etc should also be done
-> > in "number of page orders". I suspect from a documentation standpoint
-> > that also makes more sense in places, eg I think that right now your
-> > patch says
-> > 
-> >                         amount of memory for normal system use. The maximum
-> > -                       possible value is MAX_ORDER/2.  Setting this parameter
-> > +                       possible value is MAX_PAGE_ORDER/2.  Setting this
-> > 
-> > and that's actually nonsensical, because it's NR_PAGE_ORDERS that was
-> > at least historically the boundary (and historically the one that was
-> > an even number that can be halved cleanly).
-> 
-> Maybe historically (I didn't check), but not now. It is all over the
-> place. And it more even in MAX_PAGE_ORDER terms than in NR_PAGE_ORDERS:
-> 
-> ...
+From: Dongsoo Lee <letrhee@nsr.re.kr>
 
-Ping?
+It uses LEA-256-XTS for file encryption and LEA-256-CTS-CBC for
+filename encryption. Includes constant changes as the number of
+supported ciphers increases.
 
+Signed-off-by: Dongsoo Lee <letrhee@nsr.re.kr>
+---
+ fs/crypto/fscrypt_private.h        |  2 +-
+ fs/crypto/keysetup.c               | 15 +++++++++++++++
+ fs/crypto/policy.c                 |  4 ++++
+ include/uapi/linux/fscrypt.h       |  4 +++-
+ tools/include/uapi/linux/fscrypt.h |  4 +++-
+ 5 files changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+index 1892356cf924..1f0502999804 100644
+--- a/fs/crypto/fscrypt_private.h
++++ b/fs/crypto/fscrypt_private.h
+@@ -31,7 +31,7 @@
+ #define FSCRYPT_CONTEXT_V2	2
+ 
+ /* Keep this in sync with include/uapi/linux/fscrypt.h */
+-#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_AES_256_HCTR2
++#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_LEA_256_CTS
+ 
+ struct fscrypt_context_v1 {
+ 	u8 version; /* FSCRYPT_CONTEXT_V1 */
+diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
+index d71f7c799e79..f8b0116e43a3 100644
+--- a/fs/crypto/keysetup.c
++++ b/fs/crypto/keysetup.c
+@@ -74,6 +74,21 @@ struct fscrypt_mode fscrypt_modes[] = {
+ 		.security_strength = 32,
+ 		.ivsize = 32,
+ 	},
++	[FSCRYPT_MODE_LEA_256_XTS] = {
++		.friendly_name = "LEA-256-XTS",
++		.cipher_str = "xts(lea)",
++		.keysize = 64,
++		.security_strength = 32,
++		.ivsize = 16,
++		.blk_crypto_mode = BLK_ENCRYPTION_MODE_LEA_256_XTS,
++	},
++	[FSCRYPT_MODE_LEA_256_CTS] = {
++		.friendly_name = "LEA-256-CTS-CBC",
++		.cipher_str = "cts(cbc(lea))",
++		.keysize = 32,
++		.security_strength = 32,
++		.ivsize = 16,
++	},
+ };
+ 
+ static DEFINE_MUTEX(fscrypt_mode_key_setup_mutex);
+diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
+index 701259991277..b9bb175a11c7 100644
+--- a/fs/crypto/policy.c
++++ b/fs/crypto/policy.c
+@@ -94,6 +94,10 @@ static bool fscrypt_valid_enc_modes_v2(u32 contents_mode, u32 filenames_mode)
+ 	    filenames_mode == FSCRYPT_MODE_SM4_CTS)
+ 		return true;
+ 
++	if (contents_mode == FSCRYPT_MODE_LEA_256_XTS &&
++	    filenames_mode == FSCRYPT_MODE_LEA_256_CTS)
++		return true;
++
+ 	return fscrypt_valid_enc_modes_v1(contents_mode, filenames_mode);
+ }
+ 
+diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
+index 7a8f4c290187..c3c5a04f85c8 100644
+--- a/include/uapi/linux/fscrypt.h
++++ b/include/uapi/linux/fscrypt.h
+@@ -30,7 +30,9 @@
+ #define FSCRYPT_MODE_SM4_CTS			8
+ #define FSCRYPT_MODE_ADIANTUM			9
+ #define FSCRYPT_MODE_AES_256_HCTR2		10
+-/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
++#define FSCRYPT_MODE_LEA_256_XTS		11
++#define FSCRYPT_MODE_LEA_256_CTS		12
++/* If adding a mode number > 12, update FSCRYPT_MODE_MAX in fscrypt_private.h */
+ 
+ /*
+  * Legacy policy version; ad-hoc KDF and no key verification.
+diff --git a/tools/include/uapi/linux/fscrypt.h b/tools/include/uapi/linux/fscrypt.h
+index fd1fb0d5389d..df3c8af98210 100644
+--- a/tools/include/uapi/linux/fscrypt.h
++++ b/tools/include/uapi/linux/fscrypt.h
+@@ -30,7 +30,9 @@
+ #define FSCRYPT_MODE_SM4_CTS			8
+ #define FSCRYPT_MODE_ADIANTUM			9
+ #define FSCRYPT_MODE_AES_256_HCTR2		10
+-/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
++#define FSCRYPT_MODE_LEA_256_XTS		11
++#define FSCRYPT_MODE_LEA_256_CTS		12
++/* If adding a mode number > 12, update FSCRYPT_MODE_MAX in fscrypt_private.h */
+ 
+ /*
+  * Legacy policy version; ad-hoc KDF and no key verification.
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.40.1
