@@ -1,45 +1,31 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="EWTqBpey"
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93B1B6
-	for <linux-block@vger.kernel.org>; Mon,  4 Dec 2023 18:39:40 -0800 (PST)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3b9ba82d8ccso693541b6e.1
-        for <linux-block@vger.kernel.org>; Mon, 04 Dec 2023 18:39:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1701743980; x=1702348780; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H3tOJXY8IizW0u24gL21FfDp3aMmLoVYHrrK5m++rGY=;
-        b=EWTqBpeysG0Ffixnn6IDwVLVP7ZaTePIuc5EXLJvsOZRHSMM359zyD4v8jR1M7w3JY
-         Moi6RWYqRJJt1g+k6Tlz8ebdPZWpbdBFeqSIbo5oi/KgO0nuEDUprrwQqOSVdhpC8fql
-         EtrvCB+JUHTb3ilteiMCFEw5Rh5LWPnXSzAdFi4uQjLDDSyrVvHtIZe+tORknzn3ufPP
-         Vxvk3JgGjBQQw06h4fy/FzfdsvV7S28HrwizqtI8zZ2Ebd6kEm/AXnBsyhKkZpNCh95c
-         iP+AqfsmbPjTlsh039M8uITBQo5f1wf11Blivzl7iSqFrIENSIV8RDVPj1w9rBQ8Bhdg
-         T+eg==
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED7085;
+	Mon,  4 Dec 2023 19:15:25 -0800 (PST)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5bdb0be3591so3007216a12.2;
+        Mon, 04 Dec 2023 19:15:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701743980; x=1702348780;
+        d=1e100.net; s=20230601; t=1701746125; x=1702350925;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H3tOJXY8IizW0u24gL21FfDp3aMmLoVYHrrK5m++rGY=;
-        b=L34+r1ddRsdyCHsWsmNdUSPImPg2u0hgSNyXFfGzkK2BWhHTUdaWyPb8FRnTt0sY6H
-         g9a21hxDqjOEe8RJwABb4foXdbOCjmLBsKYQmlDyl2RwRslFwK3wM05Mwog0OwVbySxT
-         2FO584XWqAECfi945gf+chL7u+B+lFOQahAIwNduUQDVKizt/42d4vIF7vZzApsyKiQR
-         J+6rTupwOmc3HTKxWJ93NOo9mairPYepe+O0biuW73J0ETIx67mEAt1rqpD4OISDeRCe
-         jurmJHGU2yrVmFVKtQx1C6afbxIhekdmbYsHTfeFHOXCEIay4gAliFje4utrkDYdiKVi
-         a4SQ==
-X-Gm-Message-State: AOJu0YwmdVcA3wYJMYO45azlXHHAiEZvPkH5xPycxwBXvlRMp2lkE9SX
-	FvwFT0EbLcQtq+ts104oWwRIOA==
-X-Google-Smtp-Source: AGHT+IF6wyUzi1d6qZQ9qidrICNEvSECadlo+kwhV9QQutoYLrx7Xql9+XRRN62a5erALuknzEMtBA==
-X-Received: by 2002:a05:6808:1204:b0:3b8:b063:505f with SMTP id a4-20020a056808120400b003b8b063505fmr6332590oil.96.1701743980087;
-        Mon, 04 Dec 2023 18:39:40 -0800 (PST)
-Received: from [10.255.170.18] ([139.177.225.246])
-        by smtp.gmail.com with ESMTPSA id bm10-20020a056a00320a00b006cbafd6996csm8319731pfb.123.2023.12.04.18.39.33
+        bh=a8T1GuM6HKEiuHh3tNrm/tVV4M4n9vSsl27RmV9NUNo=;
+        b=uuxIyDl+ORWFblYw9htyGWdHi+tSBKgR1J+Amz+Nod15rWmSIYiLdRzRhUwJ6FkqUT
+         3LTVAxcPu5Uyq9tJC2fNYsQWDPyFAk7gl5oJKBouLoxy6iSp6TVA1dOzVYj13YOQEi0w
+         aEoCxYsTcJVvwUHLktBprd2Mm0R5SUoKfaQk4B7jSxDB+OILC6z8yNmWKHjj3yW5UkwS
+         zfOjICbpWd5GOEMo8wgdPMQu69gke0OJa0O+WnxRy9H/UzHMPV72ZDZ3UeB3ggT1cKSh
+         hIroAkaLuxZiBifVKOzXMGHJ3EM/ICNdmbMYv4H7FnM3SC77C80AgVIWDVAPBSarlVu7
+         6kAw==
+X-Gm-Message-State: AOJu0YwgE4frzySOWu04cC9Y4Fvb1zGkB5HS3ZHBcEywSi8Cf2QzQGPI
+	LxAh67xUg/Rvgq940GvukeA=
+X-Google-Smtp-Source: AGHT+IGcrTvR89vMTz2d+3PEPxrNySoDH+6OFOJt5/lkiilLXly+Js6dQfGHHqEQ88rNw3ympUh4bw==
+X-Received: by 2002:a05:6a20:7f83:b0:18f:97c:8a30 with SMTP id d3-20020a056a207f8300b0018f097c8a30mr6043130pzj.91.1701746124760;
+        Mon, 04 Dec 2023 19:15:24 -0800 (PST)
+Received: from [172.20.2.177] ([173.197.90.226])
+        by smtp.gmail.com with ESMTPSA id 20-20020a17090a005400b0028652f98978sm7675173pjb.8.2023.12.04.19.15.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Dec 2023 18:39:39 -0800 (PST)
-Message-ID: <ef07f915-e598-402e-bb2b-011bb0aebd7f@bytedance.com>
-Date: Tue, 5 Dec 2023 10:39:29 +0800
+        Mon, 04 Dec 2023 19:15:24 -0800 (PST)
+Message-ID: <3a878745-a667-47ad-ac87-867a9bb8bd34@acm.org>
+Date: Mon, 4 Dec 2023 19:15:19 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,105 +33,54 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 24/35] block: null_blk: fix opencoded
- find_and_set_bit() in get_tag()
+Subject: Re: [PATCH v6 0/6] Disable fair tag sharing for UFS devices
 Content-Language: en-US
-To: Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Chaitanya Kulkarni <kch@nvidia.com>, Ming Lei <ming.lei@redhat.com>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- Nitesh Shetty <nj.shetty@samsung.com>, Akinobu Mita
- <akinobu.mita@gmail.com>, Shin'ichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>, linux-block@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>, Mirsad Todorovac
- <mirsad.todorovac@alu.unizg.hr>, Matthew Wilcox <willy@infradead.org>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
- Alexey Klimov <klimov.linux@gmail.com>, Bart Van Assche
- <bvanassche@acm.org>, Sergey Shtylyov <s.shtylyov@omp.ru>
-References: <20231203192422.539300-1-yury.norov@gmail.com>
- <20231203193307.542794-1-yury.norov@gmail.com>
- <20231203193307.542794-23-yury.norov@gmail.com>
-From: Chengming Zhou <zhouchengming@bytedance.com>
-In-Reply-To: <20231203193307.542794-23-yury.norov@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, "Martin K . Petersen"
+ <martin.petersen@oracle.com>
+References: <20231130193139.880955-1-bvanassche@acm.org>
+ <20231204075252.GA29579@lst.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231204075252.GA29579@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2023/12/4 03:32, Yury Norov wrote:
-> get_tag() opencodes find_and_set_bit(). Switch the code to use the
-> dedicated function, and get rid of get_tag entirely.
+On 12/3/23 23:52, Christoph Hellwig wrote:
+> On Thu, Nov 30, 2023 at 11:31:27AM -0800, Bart Van Assche wrote:
+>> The fair tag sharing algorithm reduces performance for UFS devices
+>> significantly. This is because UFS devices have multiple logical units, a
+>> limited queue depth (32 for UFS 3.1 devices), because it happens often that
+>> multiple logical units are accessed and also because it takes time to
+>> give tags back after activity on a request queue has stopped. This patch series
+>> restores UFS device performance to that of the legacy block layer by disabling
+>> fair tag sharing for UFS devices.
 > 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-
-Looks good to me!
-
-Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
-
-> ---
->  drivers/block/null_blk/main.c | 41 +++++++++++------------------------
->  1 file changed, 13 insertions(+), 28 deletions(-)
+> I feel like a broken record:
 > 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 3021d58ca51c..671dbb9ab928 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -760,19 +760,6 @@ static void put_tag(struct nullb_queue *nq, unsigned int tag)
->  		wake_up(&nq->wait);
->  }
->  
-> -static unsigned int get_tag(struct nullb_queue *nq)
-> -{
-> -	unsigned int tag;
-> -
-> -	do {
-> -		tag = find_first_zero_bit(nq->tag_map, nq->queue_depth);
-> -		if (tag >= nq->queue_depth)
-> -			return -1U;
-> -	} while (test_and_set_bit_lock(tag, nq->tag_map));
-> -
-> -	return tag;
-> -}
-> -
->  static void free_cmd(struct nullb_cmd *cmd)
->  {
->  	put_tag(cmd->nq, cmd->tag);
-> @@ -782,24 +769,22 @@ static enum hrtimer_restart null_cmd_timer_expired(struct hrtimer *timer);
->  
->  static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
->  {
-> +	unsigned int tag = find_and_set_bit_lock(nq->tag_map, nq->queue_depth);
->  	struct nullb_cmd *cmd;
-> -	unsigned int tag;
-> -
-> -	tag = get_tag(nq);
-> -	if (tag != -1U) {
-> -		cmd = &nq->cmds[tag];
-> -		cmd->tag = tag;
-> -		cmd->error = BLK_STS_OK;
-> -		cmd->nq = nq;
-> -		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
-> -			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
-> -				     HRTIMER_MODE_REL);
-> -			cmd->timer.function = null_cmd_timer_expired;
-> -		}
-> -		return cmd;
-> +
-> +	if (tag >= nq->queue_depth)
-> +		return NULL;
-> +
-> +	cmd = &nq->cmds[tag];
-> +	cmd->tag = tag;
-> +	cmd->error = BLK_STS_OK;
-> +	cmd->nq = nq;
-> +	if (nq->dev->irqmode == NULL_IRQ_TIMER) {
-> +		hrtimer_init(&cmd->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-> +		cmd->timer.function = null_cmd_timer_expired;
->  	}
->  
-> -	return NULL;
-> +	return cmd;
->  }
->  
->  static struct nullb_cmd *alloc_cmd(struct nullb_queue *nq, struct bio *bio)
+> fair tag sharing exists for a reason.  Opting out of it for a specific
+> driver does not make any sense.  Either you can make a good argument
+> why you don't want it at all, or for specific configurations you
+> can clearly explain, or you make it work faster.  A "treat my driver
+> special" flag is never acceptable.
+
+Hi Christoph,
+
+Feedback that helps improving a patch series is always welcome.
+
+Here is how I see fair tag sharing:
+* Users probably want to configure minimum and maximum bandwidth or IOPS
+   values instead of an equal number of tags per request queue. I assume
+   that the fair tag sharing algorithm assigns an equal number of tags to
+   each request queue since the run-time cost of the latter algorithm is
+   much lower than the run-time cost of the previous algorithms.
+* Any algorithm that is more sophisticated than the current fair tag
+   sharing algorithm would have a higher runtime cost. We don't want to
+   increase the cost of command processing in the block layer core.
+
+Hence my proposal to disable the fair tag sharing algorithm if it's not
+needed. I don't see a good alternative to this approach.
+
+Thanks,
+
+Bart.
