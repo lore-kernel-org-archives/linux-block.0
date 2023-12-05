@@ -1,110 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C07D35F11;
-	Mon,  4 Dec 2023 20:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7UD9dQL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AFB2C433C7;
-	Mon,  4 Dec 2023 20:36:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701722163;
-	bh=3y3YqCVMnsG3auYpUY8Eb53hLQpKBGMLIYn0DAFsWEQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X7UD9dQLKHmfU2Ft5Qez3Alb8/Z8hR6xq4Bk652mbYJOyYq+tsoM+rStXemG2sp1X
-	 6BKfwvdnhDvvNfmsdUzYHW3pph2pWI6eQJZlcb/KIp0uZi8DHavY/NsveMOk8qmykl
-	 XJIZeQpt8WFq9HQTRvBXnj1+DvMaQ6NQfVpU3Emq2Wo9g69f8+mVXJp54tdo6S4xed
-	 buT6nMLDh3ZaoCwRVKsguyBx+/DEjEN6Ou4WJpwcjTz9S1naRbY4g7CejrLZpLggSD
-	 DBiyNGtvhNzT4owAdJyBr5HyF3HKDHi5eTS9DTiNPdZmIRrairk7G9AuBzNzkf2wN8
-	 ZNKdd8S+UehuA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	David Jeffery <djeffery@redhat.com>,
-	John Pittman <jpittman@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 16/17] blk-mq: don't count completed flush data request as inflight in case of quiesce
-Date: Mon,  4 Dec 2023 15:35:01 -0500
-Message-ID: <20231204203514.2093855-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231204203514.2093855-1-sashal@kernel.org>
-References: <20231204203514.2093855-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="csJtwRRL"
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08FEA7
+	for <linux-block@vger.kernel.org>; Mon,  4 Dec 2023 17:03:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701738188; x=1733274188;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rrSUkEEkMK4RtsHwwJOywZRKkiACbCwtIz2jJBU80pM=;
+  b=csJtwRRLUdv2fqoY/ynrmvVtspmZeMDpT2o082qQAxBemlWLS4aE2nks
+   yGfHqRx+mHTnMAKfhS2Jn2HmgXRL0JOt62yKHee6pr/PbPIfqnqTAdzg6
+   iPkg66U3ZzWLrCbQv06PcRhmx9HnO/awJWb27zmjB57tj2r+6u1aFgme7
+   c1w+YnOjbTim0WbH8JPn12jnvzqAp3jO+S1WnLKM5QELtRiLtlBu46UXn
+   1O/eAUE/VxSCjrUyMlg7sSspfUhQxHVhVu3C0w3N09/+AG/FMgYvrDcyF
+   5mUgb3FN82sThMK6QjjMLoaXOAZl9j966ilPxgqgtwjzBWnMEppJhG3BF
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="373266981"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="373266981"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 17:03:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="861572414"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="861572414"
+Received: from abijaz-mobl2.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.61.240])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 17:03:06 -0800
+Received: by box.shutemov.name (Postfix, from userid 1000)
+	id 46D6110A437; Tue,  5 Dec 2023 04:03:03 +0300 (+03)
+Date: Tue, 5 Dec 2023 04:03:03 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: akpm@linux-foundation.org, agk@redhat.com, bmarzins@redhat.com,
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	mpatocka@redhat.com, mpe@ellerman.id.au, snitzer@kernel.org
+Subject: Re: [PATCH 1/2] mm, treewide: Introduce NR_PAGE_ORDERS
+Message-ID: <20231205010303.tpt6wjicnvfopcmn@box.shutemov.name>
+References: <20231120221735.k6iyr5t5wdlgpxui@box.shutemov.name>
+ <20231121122712.31339-1-kirill.shutemov@linux.intel.com>
+ <CAHk-=wiqu14v=RdTYZwF60gpBb0gYdN++u-e-jnqkjEm0m6UdA@mail.gmail.com>
+ <20231122123413.y54fmmk65qoxarzg@box.shutemov.name>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.65
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231122123413.y54fmmk65qoxarzg@box.shutemov.name>
 
-From: Ming Lei <ming.lei@redhat.com>
+On Wed, Nov 22, 2023 at 03:34:13PM +0300, Kirill A. Shutemov wrote:
+> On Tue, Nov 21, 2023 at 09:46:57AM -0800, Linus Torvalds wrote:
+> > On Tue, 21 Nov 2023 at 04:27, Kirill A. Shutemov
+> > <kirill.shutemov@linux.intel.com> wrote:
+> > >
+> > > NR_PAGE_ORDERS defines the number of page orders supported by the page
+> > > allocator, ranging from 0 to MAX_ORDER, MAX_ORDER + 1 in total.
+> > >
+> > > NR_PAGE_ORDERS assists in defining arrays of page orders and allows for
+> > > more natural iteration over them.
+> > 
+> > These two patches look much better to me, but I think you missed one area.
+> > 
+> > Most of the Kconfig changes by commit 23baf831a32c ("mm, treewide:
+> > redefine MAX_ORDER sanely") should also be basically reverted to use
+> > this new NR_PAGE_ORDERS.
+> 
+> I am not convinced.
+> 
+> Some architectures make this option user-visible and, in my view, user
+> cares more about the largest page size buddy allocator can provide than
+> size of the array inside the allocator.
+> 
+> > IOW, I think the ARCH_FORCE_MAX_ORDER #defines etc should also be done
+> > in "number of page orders". I suspect from a documentation standpoint
+> > that also makes more sense in places, eg I think that right now your
+> > patch says
+> > 
+> >                         amount of memory for normal system use. The maximum
+> > -                       possible value is MAX_ORDER/2.  Setting this parameter
+> > +                       possible value is MAX_PAGE_ORDER/2.  Setting this
+> > 
+> > and that's actually nonsensical, because it's NR_PAGE_ORDERS that was
+> > at least historically the boundary (and historically the one that was
+> > an even number that can be halved cleanly).
+> 
+> Maybe historically (I didn't check), but not now. It is all over the
+> place. And it more even in MAX_PAGE_ORDER terms than in NR_PAGE_ORDERS:
+> 
+> ...
 
-[ Upstream commit 0e4237ae8d159e3d28f3cd83146a46f576ffb586 ]
+Ping?
 
-Request queue quiesce may interrupt flush sequence, and the original request
-may have been marked as COMPLETE, but can't get finished because of
-queue quiesce.
-
-This way is fine from driver viewpoint, because flush sequence is block
-layer concept, and it isn't related with driver.
-
-However, driver(such as dm-rq) can call blk_mq_queue_inflight() to count &
-drain inflight requests, then the wait & drain never gets done because
-the completed & not-finished flush request is counted as inflight.
-
-Fix this issue by not counting completed flush data request as inflight in
-case of quiesce.
-
-Cc: Mike Snitzer <snitzer@kernel.org>
-Cc: David Jeffery <djeffery@redhat.com>
-Cc: John Pittman <jpittman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20231201085605.577730-1-ming.lei@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 100fb0c3114f8..70fc5fd27a5d9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1500,14 +1500,26 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q,
- }
- EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
- 
-+static bool blk_is_flush_data_rq(struct request *rq)
-+{
-+	return (rq->rq_flags & RQF_FLUSH_SEQ) && !is_flush_rq(rq);
-+}
-+
- static bool blk_mq_rq_inflight(struct request *rq, void *priv)
- {
- 	/*
- 	 * If we find a request that isn't idle we know the queue is busy
- 	 * as it's checked in the iter.
- 	 * Return false to stop the iteration.
-+	 *
-+	 * In case of queue quiesce, if one flush data request is completed,
-+	 * don't count it as inflight given the flush sequence is suspended,
-+	 * and the original flush data request is invisible to driver, just
-+	 * like other pending requests because of quiesce
- 	 */
--	if (blk_mq_request_started(rq)) {
-+	if (blk_mq_request_started(rq) && !(blk_queue_quiesced(rq->q) &&
-+				blk_is_flush_data_rq(rq) &&
-+				blk_mq_request_completed(rq))) {
- 		bool *busy = priv;
- 
- 		*busy = true;
 -- 
-2.42.0
-
+  Kiryl Shutsemau / Kirill A. Shutemov
