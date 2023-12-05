@@ -1,138 +1,173 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f8z3MVPz"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E936CA
-	for <linux-block@vger.kernel.org>; Tue,  5 Dec 2023 06:19:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701785955;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=g2FwUnRexMbJ1eWu7b0mx103R9bklO0D/KfjDegM/pc=;
-	b=f8z3MVPzcadHKsovB8rhvB1xhFVf/ed7Z3Hb6UV7MesbWRCtZDDCMcJx+IjdJCWf0LXeU4
-	XD8Mll60wA/LL9uaOvkmTZZMR1AUjpPLwPkbQUYvaHAY41nhhAlVLdAYQ2VqszXRdc8emw
-	QSIoVM+CaEM19KdNxhMQe119UGrTrR0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-692-Hw2K6gyFNtS8WtP7wZHbSQ-1; Tue,
- 05 Dec 2023 09:18:43 -0500
-X-MC-Unique: Hw2K6gyFNtS8WtP7wZHbSQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9218638130AC;
-	Tue,  5 Dec 2023 14:18:42 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.85])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 117495B7C;
-	Tue,  5 Dec 2023 14:18:41 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: David.Laight@aculab.com,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	linux-block@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jason Wang <jasowang@redhat.com>,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Suwan Kim <suwan.kim027@gmail.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v2] virtio_blk: fix snprintf truncation compiler warning
-Date: Tue,  5 Dec 2023 09:18:40 -0500
-Message-ID: <20231205141840.1854409-1-stefanha@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrHxK9dg"
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6F0B9;
+	Tue,  5 Dec 2023 06:19:37 -0800 (PST)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1fb40253680so1242506fac.0;
+        Tue, 05 Dec 2023 06:19:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701785977; x=1702390777; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kcdWCGeTNWPKv5Volp7VVK1y/yfIdhFJ0eCugNnIkp0=;
+        b=nrHxK9dgwblbkHtBfRLDZQVR0FfZmMlX90PCaBRVEqCrZG2898hTIILPuyKZyEKBxU
+         +tCFn1ZVnTNSsvSPq5r8733iPLecPvnzlYUcv4+7eBJJrHWrQZ3vrmBfbuCk/ZK8d9ie
+         j/JezZIna3xfNSmlDdtyRak7z5ygEY3AmgBAZCgugJPbd0DkYyyu3UAr7/2pbgrQNC/Z
+         yO9hugxqrX7Ao46ES/QEPaoApRKJQWHz6gnidfhSBvRyMeprMVH83QzdrU+bLj828fPQ
+         RDd3RcfCEIcLwTlab3Vu0YcpZDAesxcRyuHDVR6skM814WP3k5zkheHdEtruuiPCf/4d
+         VyAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701785977; x=1702390777;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kcdWCGeTNWPKv5Volp7VVK1y/yfIdhFJ0eCugNnIkp0=;
+        b=IYBdY/Vmu9Q8VzG+BzqPYY3meOE/Zh0g8WlsROEvoeFk+aqqg77CC7AUwhfAuHrbkZ
+         +nMhfOpwJm+0hGW4L+dB1Da16BAYtw7SY907SCDWjhcvqbIlE679lsi7nkM9UIUUpO3k
+         8rRYFOU2ylKu7Cj5sMWEF/CTqQSVWDibY2sjfi6MmjrlqcJGlPdmFyOELOfY1Sc9DEdl
+         FeZuNzctxUM9U4N3e8oxTtVR/mjc1DoIWvI9BYugRshhHKqyzZwsQ5w+LjP6miNvCbTt
+         QEKxZ+JyN26w27kGM2CUFXZXTKoSQItjxNO/JvnYr4hk7O/A5kBQrSyRYhKPcUAKyYI0
+         INqw==
+X-Gm-Message-State: AOJu0Yxx2nvqbh9rl1lPFSENmsEdy90qNYG9pCXvBoX0QEFH3Q+6e0Ju
+	R1hunfKH0xM6xUOHpbQOVY//v1kIKXbXZuA57/s=
+X-Google-Smtp-Source: AGHT+IGKHbTXlOimAxgVOe6WFunYwRxPJpYDvHgcXklUon6LpkHVYjQBVIWohh7Zlbzds0qqX49jUwUnfcnGWNC/Ufw=
+X-Received: by 2002:a05:6871:e40b:b0:1fb:75a:c441 with SMTP id
+ py11-20020a056871e40b00b001fb075ac441mr5934960oac.106.1701785976925; Tue, 05
+ Dec 2023 06:19:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+References: <20231204140743.1487843-1-stefanha@redhat.com> <1c1d57ba13c2497f99e5e0a9c5954667@AcuMS.aculab.com>
+In-Reply-To: <1c1d57ba13c2497f99e5e0a9c5954667@AcuMS.aculab.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 5 Dec 2023 09:19:24 -0500
+Message-ID: <CAJSP0QUkb936K7kzW7-4bFSCbvcfFW0QJ9v=8yT6voAwkdBQRQ@mail.gmail.com>
+Subject: Re: [PATCH] virtio_blk: fix snprintf truncation compiler warning
+To: David Laight <David.Laight@aculab.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, Jason Wang <jasowang@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Suwan Kim <suwan.kim027@gmail.com>, kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit 4e0400525691 ("virtio-blk: support polling I/O") triggers the
-following gcc 13 W=1 warnings:
+On Tue, 5 Dec 2023 at 08:54, David Laight <David.Laight@aculab.com> wrote:
+>
+> From: Stefan Hajnoczi
+> > Sent: 04 December 2023 14:08
+> >
+> > Commit 4e0400525691 ("virtio-blk: support polling I/O") triggers the
+> > following gcc 13 W=3D1 warnings:
+> >
+> > drivers/block/virtio_blk.c: In function =E2=80=98init_vq=E2=80=99:
+> > drivers/block/virtio_blk.c:1077:68: warning: =E2=80=98%d=E2=80=99 direc=
+tive output may be truncated writing between 1
+> > and 11 bytes into a region of size 7 [-Wformat-truncation=3D]
+> >  1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_p=
+oll.%d", i);
+> >       |                                                                =
+    ^~
+> > drivers/block/virtio_blk.c:1077:58: note: directive argument in the ran=
+ge [-2147483648, 65534]
+> >  1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_p=
+oll.%d", i);
+> >       |                                                          ^~~~~~=
+~~~~~~~
+> > drivers/block/virtio_blk.c:1077:17: note: =E2=80=98snprintf=E2=80=99 ou=
+tput between 11 and 21 bytes into a destination
+> > of size 16
+> >  1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_p=
+oll.%d", i);
+> >       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~~~
+> >
+> > This is a false positive because the lower bound -2147483648 is
+> > incorrect. The true range of i is [0, num_vqs - 1] where 0 < num_vqs <
+> > 65536.
+> >
+> > The code mixes int, unsigned short, and unsigned int types in addition
+> > to using "%d" for an unsigned value. Use unsigned short and "%u"
+> > consistently to solve the compiler warning.
+> >
+> > Cc: Suwan Kim <suwan.kim027@gmail.com>
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes: https://lore.kernel.org/oe-kbuild-all/202312041509.DIyvEt9h-lkp=
+@intel.com/
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  drivers/block/virtio_blk.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index d53d6aa8ee69..47556d8ccc32 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -1019,12 +1019,12 @@ static void virtblk_config_changed(struct virti=
+o_device *vdev)
+> >  static int init_vq(struct virtio_blk *vblk)
+> >  {
+> >       int err;
+> > -     int i;
+> > +     unsigned short i;
+> >       vq_callback_t **callbacks;
+> >       const char **names;
+> >       struct virtqueue **vqs;
+> >       unsigned short num_vqs;
+> > -     unsigned int num_poll_vqs;
+> > +     unsigned short num_poll_vqs;
+> >       struct virtio_device *vdev =3D vblk->vdev;
+> >       struct irq_affinity desc =3D { 0, };
+> >
+> > @@ -1068,13 +1068,13 @@ static int init_vq(struct virtio_blk *vblk)
+> >
+> >       for (i =3D 0; i < num_vqs - num_poll_vqs; i++) {
+>
+> Ugg doing arithmetic on char/short is likely to generate horrid
+> code (especially on non-x86).
+> Hint, there will be explicit masking and/or sign/zero extension.
+>
+> Even the array index might add extra code (although there'll be
+> an explicit sign extend to 64bit with the current code).
+>
+> There really ought to be a better way to make gcc STFU.
+>
+> In this case 'unsigned int i' might be enough since gcc seems
+> to have a small enough upper bound.
 
-drivers/block/virtio_blk.c: In function ‘init_vq’:
-drivers/block/virtio_blk.c:1077:68: warning: ‘%d’ directive output may be truncated writing between 1 and 11 bytes into a region of size 7 [-Wformat-truncation=]
- 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-      |                                                                    ^~
-drivers/block/virtio_blk.c:1077:58: note: directive argument in the range [-2147483648, 65534]
- 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-      |                                                          ^~~~~~~~~~~~~
-drivers/block/virtio_blk.c:1077:17: note: ‘snprintf’ output between 11 and 21 bytes into a destination of size 16
- 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Sounds good, I'll send a v2 that uses unsigned int. The core virtio
+code uses unsigned int for virtqueue indices too.
 
-This is a false positive because the lower bound -2147483648 is
-incorrect. The true range of i is [0, num_vqs - 1] where 0 < num_vqs <
-65536.
+Stefan
 
-The code mixes int, unsigned short, and unsigned int types in addition
-to using "%d" for an unsigned value. The only place where a 16-bit value
-is needed is during the config space access. Use unsigned int and "%u"
-consistently to solve the compiler warning and clean up the code.
-
-Cc: Suwan Kim <suwan.kim027@gmail.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202312041509.DIyvEt9h-lkp@intel.com/
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- drivers/block/virtio_blk.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-v2:
-- Use unsigned int instead of unsigned short [David]
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index d53d6aa8ee69..dc69a40fbf08 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -1019,20 +1019,23 @@ static void virtblk_config_changed(struct virtio_device *vdev)
- static int init_vq(struct virtio_blk *vblk)
- {
- 	int err;
--	int i;
-+	unsigned int i;
- 	vq_callback_t **callbacks;
- 	const char **names;
- 	struct virtqueue **vqs;
--	unsigned short num_vqs;
-+	unsigned int num_vqs;
- 	unsigned int num_poll_vqs;
- 	struct virtio_device *vdev = vblk->vdev;
- 	struct irq_affinity desc = { 0, };
-+	u16 num_vqs_u16;
- 
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
- 				   struct virtio_blk_config, num_queues,
--				   &num_vqs);
-+				   &num_vqs_u16);
- 	if (err)
- 		num_vqs = 1;
-+	else
-+		num_vqs = num_vqs_u16;
- 
- 	if (!err && !num_vqs) {
- 		dev_err(&vdev->dev, "MQ advertised but zero queues reported\n");
-@@ -1068,13 +1071,13 @@ static int init_vq(struct virtio_blk *vblk)
- 
- 	for (i = 0; i < num_vqs - num_poll_vqs; i++) {
- 		callbacks[i] = virtblk_done;
--		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%d", i);
-+		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%u", i);
- 		names[i] = vblk->vqs[i].name;
- 	}
- 
- 	for (; i < num_vqs; i++) {
- 		callbacks[i] = NULL;
--		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-+		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%u", i);
- 		names[i] = vblk->vqs[i].name;
- 	}
- 
--- 
-2.43.0
-
+>
+>         David
+>
+>
+> >               callbacks[i] =3D virtblk_done;
+> > -             snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%d", i);
+> > +             snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%u", i);
+> >               names[i] =3D vblk->vqs[i].name;
+> >       }
+> >
+> >       for (; i < num_vqs; i++) {
+> >               callbacks[i] =3D NULL;
+> > -             snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i=
+);
+> > +             snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%u", i=
+);
+> >               names[i] =3D vblk->vqs[i].name;
+> >       }
+> >
+> > --
+> > 2.43.0
+>
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1=
+ 1PT, UK
+> Registration No: 1397386 (Wales)
