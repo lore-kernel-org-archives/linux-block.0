@@ -1,24 +1,31 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4596AA1
-	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 02:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sxYnD7a+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 469D0C433C8;
-	Wed,  6 Dec 2023 02:42:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701830541;
-	bh=O+zDl8lYB6kezcIvc28IrzA5YrULhL6467+WAAqJxxU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sxYnD7a+9NQvuoV9MGm3tZk3f+E8NCdXkYrHSbxQ7fjQUa41dXDJsnVJ8X+MvWP8v
-	 LeBlS8aEGJZWvaEWbStcMX0bKr6LAWG8ijQsE+/TwU4JaCWwA4PRF1uGFrdRqn8FFm
-	 Gktg8kGyFMSGFgLN057tPWuQ4xtQ3Rw6fSYcavrPkT3tfdu4cUGRfgMOrOwS3xCLCy
-	 kXEA1e89kx2nMYj50gYK0Q8ejGTq3NiOHhBzz4xDXxz8KNxwBquVEilNWZ1iMmfGmn
-	 6GRmxXNx/b1hn9s5pmhBDGmScMBJiYHrhAHSPPezo7E+l3jX8Dmv2/HVotcj+neIxK
-	 3Y3YXAAL1UOnw==
-Message-ID: <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
-Date: Wed, 6 Dec 2023 11:42:16 +0900
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6870C6
+	for <linux-block@vger.kernel.org>; Tue,  5 Dec 2023 19:24:22 -0800 (PST)
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3b9b8522d91so1729438b6e.0
+        for <linux-block@vger.kernel.org>; Tue, 05 Dec 2023 19:24:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701833062; x=1702437862;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jOmfNEl/HqgeH6GFWbZvKZ5Kav6LFVfBo6JMRZLHXAw=;
+        b=oz4PBdzSxzzBQv4By5egysTxahxchgLEWwb18Zr+X7ZHMVZIuBLu2vaSqFj41L7SRs
+         KPAwOrlClFNmaU85wT1LWMrhgeW7e3J7ayHafF3EtQrj2KHRnGoOdYYP1i7mzfpwFPfB
+         JPvAuVJBY49Dh1O0/DWhpjRi0VA4kIGenZth4kM1PNK8ppXrLt8B+N0mGX6JlETAQals
+         7scrC7nJBdW2cC46qH6mn8Bsw3JvaAEjRGXVq22jYntfXVGc4PH4SSoJwFJo10ojpIIf
+         ZfpNxJyUm34s0sn4Eot7ixtDnB8DQE3IMol2ahJ89K4ka0qDivj+IFaD1XarmLML2BsM
+         pjVw==
+X-Gm-Message-State: AOJu0YwPFHtHXjjRDvfERCBO/WVSULlqvLwKZY6ACv0+X0AlyuIFlG3T
+	Ov1fRjWF2TBoTUMZEiyhc8btJC/VfEI=
+X-Google-Smtp-Source: AGHT+IEyZATv8spuuQ4PAln88TT6H9i71Ilc/V5+ITB36UFc0guXtVENkdXB9hx1wUf7GcAJR5TQOA==
+X-Received: by 2002:a05:6808:23c3:b0:3ae:16b6:6338 with SMTP id bq3-20020a05680823c300b003ae16b66338mr437097oib.3.1701833061631;
+        Tue, 05 Dec 2023 19:24:21 -0800 (PST)
+Received: from [172.20.2.177] (rrcs-173-197-90-226.west.biz.rr.com. [173.197.90.226])
+        by smtp.gmail.com with ESMTPSA id w2-20020aa78582000000b006ce6ba06a29sm2098689pfn.128.2023.12.05.19.24.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Dec 2023 19:24:21 -0800 (PST)
+Message-ID: <5ab6bc79-eedd-4fc1-b104-a9960d5651aa@acm.org>
+Date: Tue, 5 Dec 2023 17:24:19 -1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -29,136 +36,78 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
  certain cases
 Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
  Jaegeuk Kim <jaegeuk@kernel.org>
 References: <20231205053213.522772-1-bvanassche@acm.org>
  <20231205053213.522772-4-bvanassche@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20231205053213.522772-4-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
+ <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/5/23 14:32, Bart Van Assche wrote:
-> Fix the following two issues:
-> - Even with prio_aging_expire set to zero, I/O priorities still affect the
->   request order.
-> - Assigning I/O priorities with the ioprio cgroup policy breaks zoned
->   storage support in the mq-deadline scheduler.
 
-Can you provide more details ? E.g. an example of a setup that breaks ordering ?
-
-> This patch fixes both issues by disabling I/O prioritization for these
-> two cases.
-
-... when prio_aging_expire is set to 0. Right ? Otherwise, the sentence above
-reads as if you are disabling IO priority for zoned devices...
-
-Also,
-
+On 12/5/23 16:42, Damien Le Moal wrote:
+> On 12/5/23 14:32, Bart Van Assche wrote:
+>> Fix the following two issues:
+>> - Even with prio_aging_expire set to zero, I/O priorities still affect the
+>>    request order.
+>> - Assigning I/O priorities with the ioprio cgroup policy breaks zoned
+>>    storage support in the mq-deadline scheduler.
 > 
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/mq-deadline.c | 22 ++++++++++++----------
->  1 file changed, 12 insertions(+), 10 deletions(-)
+> Can you provide more details ? E.g. an example of a setup that breaks ordering ?
+
+Regarding prio_aging_expire that is set to zero: a third party Android
+developer reported that request prioritization in
+mq-deadline is not compatible with MMC devices
+(https://android-review.googlesource.com/c/kernel/common/+/2836235).
+
+Regarding zoned storage and I/O priorities: we are working on modifying
+Android such that foreground apps have a higher I/O priority than
+background apps. As one can see in
+https://android-review.googlesource.com/c/platform/system/core/+/2768906, 
+we plan to use the ioprio cgroup policy to implement this. We noticed 
+that this CL breaks zoned storage support if the mq-deadline I/O 
+scheduler has been selected. I think that this should be solved in the
+mq-deadline I/O
+scheduler and also that ignoring I/O priorities for zoned writes that
+must be submitted in order is a good solution. Respecting the I/O
+priority for writes would require to make significant changes in the
+layer that submits the zoned writes (F2FS): it would require that that
+layer is modified such that it adds writes from foreground apps to the
+log before those of background apps.
+
+>> -static u8 dd_rq_ioclass(struct request *rq)
+>> +static u8 dd_rq_ioclass(struct deadline_data *dd, struct request *rq)
+>>   {
+>> -	return IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
+>> +	return dd->prio_aging_expire ? IOPRIO_PRIO_CLASS(req_get_ioprio(rq)) :
+>> +				       IOPRIO_CLASS_NONE;
 > 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index fe5da2ade953..6781cef0109e 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -123,14 +123,16 @@ deadline_rb_root(struct dd_per_prio *per_prio, struct request *rq)
->   * Returns the I/O priority class (IOPRIO_CLASS_*) that has been assigned to a
->   * request.
->   */
-> -static u8 dd_rq_ioclass(struct request *rq)
-> +static u8 dd_rq_ioclass(struct deadline_data *dd, struct request *rq)
->  {
-> -	return IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
-> +	return dd->prio_aging_expire ? IOPRIO_PRIO_CLASS(req_get_ioprio(rq)) :
-> +				       IOPRIO_CLASS_NONE;
+> I personally would prefer the simpler:
+> 
+> 	if (!dd->prio_aging_expire)
+> 		return IOPRIO_CLASS_NONE;
+> 	return IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
+> 
+>>   }
+>>   
+>> -static u8 dd_bio_ioclass(struct bio *bio)
+>> +static u8 dd_bio_ioclass(struct deadline_data *dd, struct bio *bio)
+>>   {
+>> -	return IOPRIO_PRIO_CLASS(bio->bi_ioprio);
+>> +	return dd->prio_aging_expire ? IOPRIO_PRIO_CLASS(bio->bi_ioprio) :
+>> +				       IOPRIO_CLASS_NONE;
+> 
+> Same comment as above.
 
-I personally would prefer the simpler:
+I will make the proposed changes.
+> What about the call to dd_dispatch_prio_aged_requests() in
+> dd_dispatch_request() ? Shouldn't that call be skipped if prio_aging_expire is 0 ?
 
-	if (!dd->prio_aging_expire)
-		return IOPRIO_CLASS_NONE;
-	return IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
+That sounds like a useful optimization to me. I will look into this.
 
->  }
->  
-> -static u8 dd_bio_ioclass(struct bio *bio)
-> +static u8 dd_bio_ioclass(struct deadline_data *dd, struct bio *bio)
->  {
-> -	return IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +	return dd->prio_aging_expire ? IOPRIO_PRIO_CLASS(bio->bi_ioprio) :
-> +				       IOPRIO_CLASS_NONE;
+Thanks,
 
-Same comment as above.
-
->  }
->  
->  /*
-> @@ -233,7 +235,7 @@ static void dd_request_merged(struct request_queue *q, struct request *req,
->  			      enum elv_merge type)
->  {
->  	struct deadline_data *dd = q->elevator->elevator_data;
-> -	const u8 ioprio_class = dd_rq_ioclass(req);
-> +	const u8 ioprio_class = dd_rq_ioclass(dd, req);
->  	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
->  	struct dd_per_prio *per_prio = &dd->per_prio[prio];
->  
-> @@ -253,7 +255,7 @@ static void dd_merged_requests(struct request_queue *q, struct request *req,
->  			       struct request *next)
->  {
->  	struct deadline_data *dd = q->elevator->elevator_data;
-> -	const u8 ioprio_class = dd_rq_ioclass(next);
-> +	const u8 ioprio_class = dd_rq_ioclass(dd, next);
->  	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
->  
->  	lockdep_assert_held(&dd->lock);
-> @@ -550,7 +552,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
->  	dd->batching++;
->  	deadline_move_request(dd, per_prio, rq);
->  done:
-> -	ioprio_class = dd_rq_ioclass(rq);
-> +	ioprio_class = dd_rq_ioclass(dd, rq);
->  	prio = ioprio_class_to_prio[ioprio_class];
->  	dd->per_prio[prio].latest_pos[data_dir] = blk_rq_pos(rq);
->  	dd->per_prio[prio].stats.dispatched++;
-> @@ -749,7 +751,7 @@ static int dd_request_merge(struct request_queue *q, struct request **rq,
->  			    struct bio *bio)
->  {
->  	struct deadline_data *dd = q->elevator->elevator_data;
-> -	const u8 ioprio_class = dd_bio_ioclass(bio);
-> +	const u8 ioprio_class = dd_bio_ioclass(dd, bio);
->  	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
->  	struct dd_per_prio *per_prio = &dd->per_prio[prio];
->  	sector_t sector = bio_end_sector(bio);
-> @@ -814,7 +816,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  	 */
->  	blk_req_zone_write_unlock(rq);
->  
-> -	prio = ioprio_class_to_prio[dd_rq_ioclass(rq)];
-> +	prio = ioprio_class_to_prio[dd_rq_ioclass(dd, rq)];
->  	per_prio = &dd->per_prio[prio];
->  	if (!rq->elv.priv[0]) {
->  		per_prio->stats.inserted++;
-> @@ -923,7 +925,7 @@ static void dd_finish_request(struct request *rq)
->  {
->  	struct request_queue *q = rq->q;
->  	struct deadline_data *dd = q->elevator->elevator_data;
-> -	const u8 ioprio_class = dd_rq_ioclass(rq);
-> +	const u8 ioprio_class = dd_rq_ioclass(dd, rq);
->  	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
->  	struct dd_per_prio *per_prio = &dd->per_prio[prio];
-
-What about the call to dd_dispatch_prio_aged_requests() in
-dd_dispatch_request() ? Shouldn't that call be skipped if prio_aging_expire is 0 ?
-
->  
-
--- 
-Damien Le Moal
-Western Digital Research
-
+Bart.
