@@ -1,76 +1,200 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hhRbaenX"
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4AF69E;
-	Tue,  5 Dec 2023 23:22:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=qmCAsGLsB31X5J4lJ2nHtJS8+MwGW1F5WEYO0jIziI0=; b=hhRbaenXZsjRyFtp5oCl7ZLapp
-	PGbBHBMazopo9x7zLycOLomgyozjMFDmXz0mBlHcwPG5BI6SfQiEYs2RFIxTkHszoMBIB5fp7RvF5
-	vaqpcOeQKcUjsuqauqy5BsIY31xjg/0sVfUccDbi5kKXOZc7fS1d0vbSOWjK1ECcJERDPQIM6Icyq
-	pZ82Y80XxVZAy+fiqCF56whvlLXWz/53NURq30p1NEOux+n0cJVqd1itpsG6+3wl1H+zQ95RNHzGZ
-	8Wbn2E17f06JWnxiq2s6y4vOb2NT9ha36DJvWW/HkrWz3MeH9YEasxDh/aL/9GmJ56G3rYqKjOoGL
-	m/NxJEIQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rAmDz-009HyE-2v;
-	Wed, 06 Dec 2023 07:21:39 +0000
-Date: Tue, 5 Dec 2023 23:21:39 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-	roger.pau@citrix.com, colyli@suse.de, kent.overstreet@gmail.com,
-	joern@lazybastard.org, miquel.raynal@bootlin.com, richard@nod.at,
-	vigneshr@ti.com, sth@linux.ibm.com, hoeppner@linux.ibm.com,
-	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, clm@fb.com,
-	josef@toxicpanda.com, dsterba@suse.com, nico@fluxnic.net,
-	xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-	adilger.kernel@dilger.ca, agruenba@redhat.com, jack@suse.com,
-	konishi.ryusuke@gmail.com, willy@infradead.org,
-	akpm@linux-foundation.org, hare@suse.de, p.raghav@samsung.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-bcachefs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-nilfs@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH -next RFC 02/14] xen/blkback: use bdev api in
- xen_update_blkif_status()
-Message-ID: <ZXAhA0WUXoF5YEq4@infradead.org>
-References: <20231205123728.1866699-1-yukuai1@huaweicloud.com>
- <20231205123728.1866699-3-yukuai1@huaweicloud.com>
- <ZXAMwBD8pd48qwX/@infradead.org>
- <783b5515-db42-c77f-62ab-050f7cc8ef5e@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="pTHTUN0X"
+Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 984EAA4;
+	Wed,  6 Dec 2023 01:33:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=JHwqXr5lmTTFavjO2MRnjUVkAwGDsqxx6+HTWHYckfQ=;
+  b=pTHTUN0XE8cdSBsBPYg5P1ZMrM1wFfMfZCra70OcnrxHCVCPq4MyzkTU
+   f0GNd6iyKwZbTkIHBfc4UHlw34vYa3Qh5JJ0lD9dj16LuCo3Aagop7f+r
+   H1V4W+H7qaRzUwcrLdTA93XOmqHh4gvtALQrBqTP89jmIUfRX6ikMh0JV
+   g=;
+Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.04,254,1695679200"; 
+   d="scan'208";a="140569376"
+Received: from dt-lawall.paris.inria.fr ([128.93.67.65])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 10:33:53 +0100
+Date: Wed, 6 Dec 2023 10:33:54 +0100 (CET)
+From: Julia Lawall <julia.lawall@inria.fr>
+To: Dongyun Liu <dongyun.liu3@gmail.com>, minchan@kernel.org, 
+    senozhatsky@chromium.org, axboe@kernel.dk
+cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+    lincheng.yang@transsion.com, jiajun.ling@transsion.com, 
+    ldys2014@foxmail.com, Dongyun Liu <dongyun.liu@transsion.com>
+Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
+ bitmap memory in backing_dev_store (fwd)
+Message-ID: <8bb6e568-1c79-6410-5893-781621b71331@inria.fr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <783b5515-db42-c77f-62ab-050f7cc8ef5e@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
 
-On Wed, Dec 06, 2023 at 02:56:05PM +0800, Yu Kuai wrote:
-> > > -	invalidate_inode_pages2(
-> > > -			blkif->vbd.bdev_handle->bdev->bd_inode->i_mapping);
-> > > +	invalidate_bdev(blkif->vbd.bdev_handle->bdev);
-> > 
-> > blkbak is a bdev exported.   I don't think it should ever call
-> > invalidate_inode_pages2, through a wrapper or not.
-> 
-> I'm not sure about this. I'm not familiar with xen/blkback, but I saw
-> that xen-blkback will open a bdev from xen_vbd_create(), hence this
-> looks like a dm/md for me, hence it sounds reasonable to sync +
-> invalidate the opened bdev while initialization. Please kindly correct
-> me if I'm wrong.
+Hello,
 
-I guess we have enough precedence for this, so the switchover here
-isn't wrong.  But all this invalidating of the bdev cache seems to
-be asking for trouble.
+The warning is because kvfree is used to free memory that was allocated
+using kmalloc; kfree would be fine.  But I think that the only way you can
+get to out is with bitmap being NULL, so there is no need to free it at
+all.
 
+Furthermore, it could be safer in the long term to use different labels
+for the different amounts of things that need to be freed, as done in most
+other kernel code, rather than using a single label "out".
+
+thanks,
+julia
+
+---------- Forwarded message ----------
+Date: Wed, 6 Dec 2023 16:08:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: oe-kbuild@lists.linux.dev
+Cc: lkp@intel.com, Julia Lawall <julia.lawall@inria.fr>
+Subject: Re: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate
+    bitmap memory in backing_dev_store
+
+BCC: lkp@intel.com
+CC: oe-kbuild-all@lists.linux.dev
+In-Reply-To: <20231130152047.200169-1-dongyun.liu@transsion.com>
+References: <20231130152047.200169-1-dongyun.liu@transsion.com>
+TO: Dongyun Liu <dongyun.liu3@gmail.com>
+TO: minchan@kernel.org
+TO: senozhatsky@chromium.org
+TO: axboe@kernel.dk
+CC: linux-kernel@vger.kernel.org
+CC: linux-block@vger.kernel.org
+CC: lincheng.yang@transsion.com
+CC: jiajun.ling@transsion.com
+CC: ldys2014@foxmail.com
+CC: Dongyun Liu <dongyun.liu@transsion.com>
+
+Hi Dongyun,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.7-rc4 next-20231206]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Dongyun-Liu/zram-Using-GFP_ATOMIC-instead-of-GFP_KERNEL-to-allocate-bitmap-memory-in-backing_dev_store/20231130-233042
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20231130152047.200169-1-dongyun.liu%40transsion.com
+patch subject: [PATCH] zram: Using GFP_ATOMIC instead of GFP_KERNEL to allocate bitmap memory in backing_dev_store
+:::::: branch date: 6 days ago
+:::::: commit date: 6 days ago
+config: i386-randconfig-051-20231201 (https://download.01.org/0day-ci/archive/20231206/202312061559.CDXHSGIQ-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20231206/202312061559.CDXHSGIQ-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Julia Lawall <julia.lawall@inria.fr>
+| Closes: https://lore.kernel.org/r/202312061559.CDXHSGIQ-lkp@intel.com/
+
+cocci warnings: (new ones prefixed by >>)
+>> drivers/block/zram/zram_drv.c:536:14-15: WARNING kmalloc is used to allocate this memory at line 517
+
+vim +536 drivers/block/zram/zram_drv.c
+
+013bf95a83ec76 Minchan Kim       2017-09-06  459
+013bf95a83ec76 Minchan Kim       2017-09-06  460  static ssize_t backing_dev_store(struct device *dev,
+013bf95a83ec76 Minchan Kim       2017-09-06  461  		struct device_attribute *attr, const char *buf, size_t len)
+013bf95a83ec76 Minchan Kim       2017-09-06  462  {
+013bf95a83ec76 Minchan Kim       2017-09-06  463  	char *file_name;
+c8bd134a4bddaf Peter Kalauskas   2018-08-21  464  	size_t sz;
+013bf95a83ec76 Minchan Kim       2017-09-06  465  	struct file *backing_dev = NULL;
+013bf95a83ec76 Minchan Kim       2017-09-06  466  	struct inode *inode;
+013bf95a83ec76 Minchan Kim       2017-09-06  467  	struct address_space *mapping;
+ee763e2143e79f Christoph Hellwig 2020-11-16  468  	unsigned int bitmap_sz;
+1363d4662a0d28 Minchan Kim       2017-09-06  469  	unsigned long nr_pages, *bitmap = NULL;
+eed993a0910338 Jan Kara          2023-09-27  470  	struct bdev_handle *bdev_handle = NULL;
+013bf95a83ec76 Minchan Kim       2017-09-06  471  	int err;
+013bf95a83ec76 Minchan Kim       2017-09-06  472  	struct zram *zram = dev_to_zram(dev);
+013bf95a83ec76 Minchan Kim       2017-09-06  473
+013bf95a83ec76 Minchan Kim       2017-09-06  474  	file_name = kmalloc(PATH_MAX, GFP_KERNEL);
+013bf95a83ec76 Minchan Kim       2017-09-06  475  	if (!file_name)
+013bf95a83ec76 Minchan Kim       2017-09-06  476  		return -ENOMEM;
+013bf95a83ec76 Minchan Kim       2017-09-06  477
+013bf95a83ec76 Minchan Kim       2017-09-06  478  	down_write(&zram->init_lock);
+013bf95a83ec76 Minchan Kim       2017-09-06  479  	if (init_done(zram)) {
+013bf95a83ec76 Minchan Kim       2017-09-06  480  		pr_info("Can't setup backing device for initialized device\n");
+013bf95a83ec76 Minchan Kim       2017-09-06  481  		err = -EBUSY;
+013bf95a83ec76 Minchan Kim       2017-09-06  482  		goto out;
+013bf95a83ec76 Minchan Kim       2017-09-06  483  	}
+013bf95a83ec76 Minchan Kim       2017-09-06  484
+e55e1b4831563e Wolfram Sang      2022-08-18  485  	strscpy(file_name, buf, PATH_MAX);
+c8bd134a4bddaf Peter Kalauskas   2018-08-21  486  	/* ignore trailing newline */
+c8bd134a4bddaf Peter Kalauskas   2018-08-21  487  	sz = strlen(file_name);
+c8bd134a4bddaf Peter Kalauskas   2018-08-21  488  	if (sz > 0 && file_name[sz - 1] == '\n')
+c8bd134a4bddaf Peter Kalauskas   2018-08-21  489  		file_name[sz - 1] = 0x00;
+013bf95a83ec76 Minchan Kim       2017-09-06  490
+013bf95a83ec76 Minchan Kim       2017-09-06  491  	backing_dev = filp_open(file_name, O_RDWR|O_LARGEFILE, 0);
+013bf95a83ec76 Minchan Kim       2017-09-06  492  	if (IS_ERR(backing_dev)) {
+013bf95a83ec76 Minchan Kim       2017-09-06  493  		err = PTR_ERR(backing_dev);
+013bf95a83ec76 Minchan Kim       2017-09-06  494  		backing_dev = NULL;
+013bf95a83ec76 Minchan Kim       2017-09-06  495  		goto out;
+013bf95a83ec76 Minchan Kim       2017-09-06  496  	}
+013bf95a83ec76 Minchan Kim       2017-09-06  497
+013bf95a83ec76 Minchan Kim       2017-09-06  498  	mapping = backing_dev->f_mapping;
+013bf95a83ec76 Minchan Kim       2017-09-06  499  	inode = mapping->host;
+013bf95a83ec76 Minchan Kim       2017-09-06  500
+013bf95a83ec76 Minchan Kim       2017-09-06  501  	/* Support only block device in this moment */
+013bf95a83ec76 Minchan Kim       2017-09-06  502  	if (!S_ISBLK(inode->i_mode)) {
+013bf95a83ec76 Minchan Kim       2017-09-06  503  		err = -ENOTBLK;
+013bf95a83ec76 Minchan Kim       2017-09-06  504  		goto out;
+013bf95a83ec76 Minchan Kim       2017-09-06  505  	}
+013bf95a83ec76 Minchan Kim       2017-09-06  506
+eed993a0910338 Jan Kara          2023-09-27  507  	bdev_handle = bdev_open_by_dev(inode->i_rdev,
+eed993a0910338 Jan Kara          2023-09-27  508  				BLK_OPEN_READ | BLK_OPEN_WRITE, zram, NULL);
+eed993a0910338 Jan Kara          2023-09-27  509  	if (IS_ERR(bdev_handle)) {
+eed993a0910338 Jan Kara          2023-09-27  510  		err = PTR_ERR(bdev_handle);
+eed993a0910338 Jan Kara          2023-09-27  511  		bdev_handle = NULL;
+013bf95a83ec76 Minchan Kim       2017-09-06  512  		goto out;
+5547932dc67a48 Minchan Kim       2018-12-28  513  	}
+013bf95a83ec76 Minchan Kim       2017-09-06  514
+1363d4662a0d28 Minchan Kim       2017-09-06  515  	nr_pages = i_size_read(inode) >> PAGE_SHIFT;
+1363d4662a0d28 Minchan Kim       2017-09-06  516  	bitmap_sz = BITS_TO_LONGS(nr_pages) * sizeof(long);
+e51f2361fc7fd9 Dongyun Liu       2023-11-30 @517  	bitmap = kmalloc(bitmap_sz, GFP_ATOMIC);
+1363d4662a0d28 Minchan Kim       2017-09-06  518  	if (!bitmap) {
+1363d4662a0d28 Minchan Kim       2017-09-06  519  		err = -ENOMEM;
+1363d4662a0d28 Minchan Kim       2017-09-06  520  		goto out;
+1363d4662a0d28 Minchan Kim       2017-09-06  521  	}
+1363d4662a0d28 Minchan Kim       2017-09-06  522
+013bf95a83ec76 Minchan Kim       2017-09-06  523  	reset_bdev(zram);
+013bf95a83ec76 Minchan Kim       2017-09-06  524
+eed993a0910338 Jan Kara          2023-09-27  525  	zram->bdev_handle = bdev_handle;
+013bf95a83ec76 Minchan Kim       2017-09-06  526  	zram->backing_dev = backing_dev;
+1363d4662a0d28 Minchan Kim       2017-09-06  527  	zram->bitmap = bitmap;
+1363d4662a0d28 Minchan Kim       2017-09-06  528  	zram->nr_pages = nr_pages;
+013bf95a83ec76 Minchan Kim       2017-09-06  529  	up_write(&zram->init_lock);
+013bf95a83ec76 Minchan Kim       2017-09-06  530
+013bf95a83ec76 Minchan Kim       2017-09-06  531  	pr_info("setup backing device %s\n", file_name);
+013bf95a83ec76 Minchan Kim       2017-09-06  532  	kfree(file_name);
+013bf95a83ec76 Minchan Kim       2017-09-06  533
+013bf95a83ec76 Minchan Kim       2017-09-06  534  	return len;
+013bf95a83ec76 Minchan Kim       2017-09-06  535  out:
+1363d4662a0d28 Minchan Kim       2017-09-06 @536  	kvfree(bitmap);
+1363d4662a0d28 Minchan Kim       2017-09-06  537
+eed993a0910338 Jan Kara          2023-09-27  538  	if (bdev_handle)
+eed993a0910338 Jan Kara          2023-09-27  539  		bdev_release(bdev_handle);
+013bf95a83ec76 Minchan Kim       2017-09-06  540
+013bf95a83ec76 Minchan Kim       2017-09-06  541  	if (backing_dev)
+013bf95a83ec76 Minchan Kim       2017-09-06  542  		filp_close(backing_dev, NULL);
+013bf95a83ec76 Minchan Kim       2017-09-06  543
+013bf95a83ec76 Minchan Kim       2017-09-06  544  	up_write(&zram->init_lock);
+013bf95a83ec76 Minchan Kim       2017-09-06  545
+013bf95a83ec76 Minchan Kim       2017-09-06  546  	kfree(file_name);
+013bf95a83ec76 Minchan Kim       2017-09-06  547
+013bf95a83ec76 Minchan Kim       2017-09-06  548  	return err;
+013bf95a83ec76 Minchan Kim       2017-09-06  549  }
+013bf95a83ec76 Minchan Kim       2017-09-06  550
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
