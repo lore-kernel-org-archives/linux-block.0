@@ -1,151 +1,110 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KefWzfEZ"
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE8010A;
-	Wed,  6 Dec 2023 03:25:02 -0800 (PST)
-Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-58d06bfadf8so4708762eaf.1;
-        Wed, 06 Dec 2023 03:25:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701861901; x=1702466701; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rw9FJ5pKqgGHmlfm8Mu7G/JM0STLt1ZI15B6GB2xzN0=;
-        b=KefWzfEZDI+q1E5sZly1+fGxIijB5xXASVCju6GDO2C0Nb0VSiFzKeVAN/oULeM2yH
-         w6uM2KQfcYYGlIqxbGKLYh2/THsYbaKU2Qv7wf7lwftpsrkfbBKp5MX824f2MzT6Hdg7
-         73fs1HoUqSd8amTcgK+kTSQG5QtbOS9tafo1btulOLqft5mqywMsXW2aCB3TFOjoKdFG
-         hgsHQq0mF1T/eWP6vvMI2TkOtryMt9B0rE/1JknlN8+PwCHh8XqYaGslXBIvaV+UmNSV
-         n/yo26+GuRd4Q0+MoBbreBgPbo4H/GNgBqLl8W28BPbNt6Sk/VobjgjSSd8f81weJGg9
-         8naA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701861901; x=1702466701;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Rw9FJ5pKqgGHmlfm8Mu7G/JM0STLt1ZI15B6GB2xzN0=;
-        b=jILxuW/HRE9IuuNqp4nw9Qk8nTjVLT8sdX1QjqJUkk1YlR10P+Pvah27kQk9RFfo+q
-         DpbJTq2wBM8GI5aICQM3KRNuOJfMfql+wIx4OO9YvgIN0dOi0NfNlQvIp+2ejtJFAX1q
-         DNJJby+lsTKXOs8YJmxnzjIN88EH29y+kry6eSbMlx0U4X8KIuyOf7zqudVYJWyAdf1x
-         XaqkN4A+tFbpFMRriSG28NyDb92FCWM8nQJnckzlFlG8zvfKRHo0QjVg7BVlnp5NHy3b
-         YjNCmmqaSmFMWMBJOvsusa8tUoCH/8imqmXjXGcbHin4mXJA0j4WhbIDchXHuZ3VR1YL
-         0G3g==
-X-Gm-Message-State: AOJu0Yz9D9IrSr2gGkNwXOt0WXXh9IkTjSH5kuhPZfr8nH7lCI98J7xP
-	AAdaAeGzICH16vpswjieFWabAaZd9WQ=
-X-Google-Smtp-Source: AGHT+IHARwrPmtaWDD4rwd7bVkjMfXibPvL9x7/c7EGiTpOhdGC5+pIU7YF9i5FQlA13gkrlUbNKsw==
-X-Received: by 2002:a05:6358:7247:b0:16e:12c:16ad with SMTP id i7-20020a056358724700b0016e012c16admr1331233rwa.8.1701861901408;
-        Wed, 06 Dec 2023 03:25:01 -0800 (PST)
-Received: from ubuntu.. ([117.18.48.102])
-        by smtp.gmail.com with ESMTPSA id d17-20020a656b91000000b005c2420fb198sm9459912pgw.37.2023.12.06.03.24.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 03:25:01 -0800 (PST)
-From: Hongyu Jin <hongyu.jin.cn@gmail.com>
-To: hongyu.jin.cn@gmail.com,
-	axboe@kernel.dk
-Cc: zhiguo.niu@unisoc.com,
-	ke.wang@unisoc.com,
-	yibin.ding@unisoc.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] block: Optimize bio io priority setting
-Date: Wed,  6 Dec 2023 19:24:38 +0800
-Message-Id: <20231206112438.9430-1-hongyu.jin.cn@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ojDk7+bv"
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6017B5;
+	Wed,  6 Dec 2023 06:59:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=s+7kV2NOaPEBmhFkJpDv/pC5Llv4VXEE9i8fdKbvmjw=; b=ojDk7+bvhmkVaj86d9uPvOhQaz
+	kbAJJlz3eiFA7yxHtxf02BCaqsNM5pS9C8k5lXRoPly3/N/e0u5QADIgtZKFOwGOJtwsI5ZzSsYPS
+	PKyktYqelsFB3E+G8W+4/yQSFmaQ2jHSWEigX57CwcwQszQ0bDoxOOqdU2sc0+ZoE3Ff1wwcpqslV
+	VWLgXJnu2MrDZGBo0sVLqXRdAvGI+d1WdlsXWEVkM0crARzZz5+nD3AR2Avd8/g6eRde0hkW/FoXX
+	agEz57imZpOlmdW73T5pzua0TfxBEP/xRZ/WXwPlD7/tpJRN5cqF7OvXJrtIdGRYW6omWvwYwBXvA
+	OJr6nVaw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1rAtMN-002zkJ-Nc; Wed, 06 Dec 2023 14:58:47 +0000
+Date: Wed, 6 Dec 2023 14:58:47 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de,
+	kent.overstreet@gmail.com, joern@lazybastard.org,
+	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+	sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com,
+	gor@linux.ibm.com, agordeev@linux.ibm.com, jejb@linux.ibm.com,
+	martin.petersen@oracle.com, clm@fb.com, josef@toxicpanda.com,
+	dsterba@suse.com, nico@fluxnic.net, xiang@kernel.org,
+	chao@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
+	agruenba@redhat.com, jack@suse.com, konishi.ryusuke@gmail.com,
+	akpm@linux-foundation.org, hare@suse.de, p.raghav@samsung.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-nilfs@vger.kernel.org, yukuai3@huawei.com,
+	yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH -next RFC 01/14] block: add some bdev apis
+Message-ID: <ZXCMJ9skAAgPm4z3@casper.infradead.org>
+References: <20231205123728.1866699-1-yukuai1@huaweicloud.com>
+ <20231205123728.1866699-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205123728.1866699-2-yukuai1@huaweicloud.com>
 
-From: Hongyu Jin <hongyu.jin@unisoc.com>
+On Tue, Dec 05, 2023 at 08:37:15PM +0800, Yu Kuai wrote:
+> +struct folio *bdev_read_folio(struct block_device *bdev, pgoff_t index)
+> +{
+> +	return read_mapping_folio(bdev->bd_inode->i_mapping, index, NULL);
+> +}
+> +EXPORT_SYMBOL_GPL(bdev_read_folio);
 
-Current call bio_set_ioprio() for each cloned bio and splited bio,
-and the io priority can't be passed to module that implement
-struct gendisk::fops::submit_bio.
+I'm coming to the opinion that 'index' is the wrong parameter here.
+Looking through all the callers of bdev_read_folio() in this patchset,
+they all have a position in bytes, and they all convert it to
+index for this call.  The API should probably be:
 
-Move bio_set_ioprio() into submit_bio(), only call bio_set_ioprio()
-once set the priority of origin bio, cloned and splited bio
-auto inherit the priority of origin bio in clone process.
+struct folio *bdev_read_folio(struct block_device *bdev, loff_t pos)
+{
+	return read_mapping_folio(bdev->bd_inode->i_mapping,
+			pos / PAGE_SIZE, NULL);
+}
 
-Co-developed-by: Yibin Ding <yibin.ding@unisoc.com>
-Signed-off-by: Yibin Ding <yibin.ding@unisoc.com>
-Signed-off-by: Hongyu Jin <hongyu.jin@unisoc.com>
----
- block/blk-core.c | 10 ++++++++++
- block/blk-mq.c   | 11 -----------
- 2 files changed, 10 insertions(+), 11 deletions(-)
+... and at some point, we'll get round to converting read_mapping_folio()
+to take its argument in loff_t.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fdf25b8d6e78..68158c327aea 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -49,6 +49,7 @@
- #include "blk-pm.h"
- #include "blk-cgroup.h"
- #include "blk-throttle.h"
-+#include "blk-ioprio.h"
- 
- struct dentry *blk_debugfs_root;
- 
-@@ -809,6 +810,14 @@ void submit_bio_noacct(struct bio *bio)
- }
- EXPORT_SYMBOL(submit_bio_noacct);
- 
-+static void bio_set_ioprio(struct bio *bio)
-+{
-+	/* Nobody set ioprio so far? Initialize it based on task's nice value */
-+	if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) == IOPRIO_CLASS_NONE)
-+		bio->bi_ioprio = get_current_ioprio();
-+	blkcg_set_ioprio(bio);
-+}
-+
- /**
-  * submit_bio - submit a bio to the block device layer for I/O
-  * @bio: The &struct bio which describes the I/O
-@@ -831,6 +840,7 @@ void submit_bio(struct bio *bio)
- 		count_vm_events(PGPGOUT, bio_sectors(bio));
- 	}
- 
-+	bio_set_ioprio(bio);
- 	submit_bio_noacct(bio);
- }
- EXPORT_SYMBOL(submit_bio);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e2d11183f62e..a6e2609df9c9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -40,7 +40,6 @@
- #include "blk-stat.h"
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
--#include "blk-ioprio.h"
- 
- static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
- static DEFINE_PER_CPU(call_single_data_t, blk_cpu_csd);
-@@ -2922,14 +2921,6 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	return rq;
- }
- 
--static void bio_set_ioprio(struct bio *bio)
--{
--	/* Nobody set ioprio so far? Initialize it based on task's nice value */
--	if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) == IOPRIO_CLASS_NONE)
--		bio->bi_ioprio = get_current_ioprio();
--	blkcg_set_ioprio(bio);
--}
--
- /**
-  * blk_mq_submit_bio - Create and send a request to block device.
-  * @bio: Bio pointer.
-@@ -2963,8 +2954,6 @@ void blk_mq_submit_bio(struct bio *bio)
- 	if (!bio_integrity_prep(bio))
- 		return;
- 
--	bio_set_ioprio(bio);
--
- 	rq = blk_mq_get_cached_request(q, plug, &bio, nr_segs);
- 	if (!rq) {
- 		if (!bio)
--- 
-2.34.1
+Similiarly for these two APIs:
 
+> +struct folio *bdev_read_folio_gfp(struct block_device *bdev, pgoff_t index,
+> +				  gfp_t gfp)
+> +struct folio *bdev_get_folio(struct block_device *bdev, pgoff_t index)
+
+> +struct folio *bdev_find_or_create_folio(struct block_device *bdev,
+> +					pgoff_t index, gfp_t gfp)
+> +{
+> +	return __filemap_get_folio(bdev->bd_inode->i_mapping, index,
+> +				   FGP_LOCK | FGP_ACCESSED | FGP_CREAT, gfp);
+> +}
+> +EXPORT_SYMBOL_GPL(bdev_find_or_create_folio);
+
+This one probably shouldn't exist.  I've been converting callers of
+find_or_create_page() to call __filemap_get_folio; I suspect we
+should expose a __bdev_get_folio and have the callers use the FGP
+arguments directly, but I'm open to other opinions here.
+
+> +void bdev_sync_readahead(struct block_device *bdev, struct file_ra_state *ra,
+> +			 struct file *file, pgoff_t index,
+> +			 unsigned long req_count)
+> +{
+> +	struct file_ra_state tmp_ra = {};
+> +
+> +	if (!ra) {
+> +		ra = &tmp_ra;
+> +		file_ra_state_init(ra, bdev->bd_inode->i_mapping);
+> +	}
+> +	page_cache_sync_readahead(bdev->bd_inode->i_mapping, ra, file, index,
+> +				  req_count);
+> +}
+
+I think the caller should always be passing in a valid file_ra_state.
+It's only cramfs that doesn't have one, and it really should!
+Not entirely sure about the arguments here; part of me says "bytes",
+but this is weird enough to maybe take arguments in pages.
