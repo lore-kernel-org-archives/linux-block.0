@@ -1,81 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E082DF8E
-	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 23:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="OfyVzYnc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC32C433C7;
-	Wed,  6 Dec 2023 23:12:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1701904367;
-	bh=q0AAb5LsQDqYl5vBMK1bSmG4E29bCARdra+SeV0W4Q0=;
-	h=Date:From:To:Subject:In-Reply-To:References:From;
-	b=OfyVzYnc72UgxM0i9NwfjylRMNW9Ocbubs21NdcPhncJI2nB+iSzMiykfFSfL6PIK
-	 GW7+nhMSl2Ic54XMLLoBBqtqgICD74gNCnnUbCLKiNP31mir7Uav2qWblO2VlB8Hbm
-	 RmenOPVqi4HZF06nJS2fUMlhpWy8kjpbLeSOp/Jo=
-Date: Wed, 6 Dec 2023 15:12:46 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Ming Lei <ming.lei@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, Yi Zhang
- <yi.zhang@redhat.com>, Guangwu Zhang <guazhang@redhat.com>, Chengming Zhou
- <zhouchengming@bytedance.com>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH V4 resend] lib/group_cpus.c: avoid to acquire cpu
- hotplug lock in group_cpus_evenly
-Message-Id: <20231206151246.99bbf0f253b85f053bea9199@linux-foundation.org>
-In-Reply-To: <20231120120059.ef0614c2295b2102100cb56e@linux-foundation.org>
-References: <20231120083559.285174-1-ming.lei@redhat.com>
-	<20231120120059.ef0614c2295b2102100cb56e@linux-foundation.org>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X0mHgeuF"
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECC0793
+	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 15:27:30 -0800 (PST)
+Date: Wed, 6 Dec 2023 18:27:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701905247;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Djvwm+NPL6KXNphuoX3SYP1l8zLR8DawFWvuOOS0zcY=;
+	b=X0mHgeuFEdJN25R3pVyyRGOuJ8VMx7iU2WW7t+F0KYePQvt4qYYBFsx+oiB30InJZXQYiR
+	btTC1UZmAt3+VdslhVKsbF0WUdlttsW6WycQkW/qx7dvzmeoNieD0F6ujzLywIjHS9K+ly
+	cNfn1giO1n8FP5lH6ylGQY736QR3Jdc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Phillip Lougher <phillip@squashfs.org.uk>
+Subject: Re: [PATCH 1/3] block: Rework bio_for_each_segment_all()
+Message-ID: <20231206232724.hitl4u7ih7juzxev@moria.home.lan>
+References: <20231122232818.178256-1-kent.overstreet@linux.dev>
+ <20231206213424.rn7i42zoyo6zxufk@moria.home.lan>
+ <72bf57b0-b5fb-4309-8bfb-63a207a52df7@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <72bf57b0-b5fb-4309-8bfb-63a207a52df7@kernel.dk>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 20 Nov 2023 12:00:59 -0800 Andrew Morton <akpm@linux-foundation.org> wrote:
-
-> On Mon, 20 Nov 2023 16:35:59 +0800 Ming Lei <ming.lei@redhat.com> wrote:
+On Wed, Dec 06, 2023 at 03:40:38PM -0700, Jens Axboe wrote:
+> On 12/6/23 2:34 PM, Kent Overstreet wrote:
+> > On Wed, Nov 22, 2023 at 06:28:13PM -0500, Kent Overstreet wrote:
+> >> This patch reworks bio_for_each_segment_all() to be more inline with how
+> >> the other bio iterators work:
+> >>
+> >>  - bio_iter_all_peek() now returns a synthesized bio_vec; we don't stash
+> >>    one in the iterator and pass a pointer to it - bad. This way makes it
+> >>    clearer what's a constructed value vs. a reference to something
+> >>    pre-existing, and it also will help with cleaning up and
+> >>    consolidating code with bio_for_each_folio_all().
+> >>
+> >>  - We now provide bio_for_each_segment_all_continue(), for squashfs:
+> >>    this makes their code clearer.
+> > 
+> > Jens, can we _please_ get this series merged so bcachefs isn't reaching
+> > into bio/bvec internals?
 > 
-> > group_cpus_evenly() could be part of storage driver's error handler,
-> > such as nvme driver, when may happen during CPU hotplug, in which
-> > storage queue has to drain its pending IOs because all CPUs associated
-> > with the queue are offline and the queue is becoming inactive. And
-> > handling IO needs error handler to provide forward progress.
-> > 
-> > Then dead lock is caused:
-> > 
-> > 1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
-> > handler is waiting for inflight IO
-> > 
-> > 2) error handler is waiting for CPU hotplug lock
-> > 
-> > 3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
-> > error handling can't provide forward progress.
-> > 
-> > Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
-> > in which two stage spreads are taken: 1) the 1st stage is over all present
-> > CPUs; 2) the end stage is over all other CPUs.
-> > 
-> > Turns out the two stage spread just needs consistent 'cpu_present_mask', and
-> > remove the CPU hotplug lock by storing it into one local cache. This way
-> > doesn't change correctness, because all CPUs are still covered.
-> 
-> I'm not sure what is the intended merge path for this, but I can do lib/.
-> 
-> Do you think that a -stable backport is needed?  It sounds that way.
-> 
-> If so, are we able to identify a suitable Fixes: target?  That would
-> predate f7b3ea8cf72f3 ("genirq/affinity: Move group_cpus_evenly() into
-> lib/").  
+> Haven't gotten around to review it fully yet, and nobody else has either
+> fwiw. Would be nice with some reviews.
 
-No?  I think this predates 428e211641ed8 ("genirq/affinity: Replace
-deprecated CPU-hotplug functions." also.
-
-I'll slap a cc:stable on it and I'll let you and the -stable
-maintainers figure it out.
-
+Well, there was quite a bit of back and forth before, mainly over code
+size - which was addressed; and the only tricky parts were to squashfs
+which Phillip looked at and tested.
