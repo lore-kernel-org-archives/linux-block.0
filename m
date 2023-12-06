@@ -1,49 +1,27 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jhEd/dyd"
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA2FD44;
-	Wed,  6 Dec 2023 09:58:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Snap78XnwhxghrXH/x5DQQflOIE581aXjQMNJjr942g=; b=jhEd/dydrVcA4CqjenXKvBzOhR
-	81C86OaTSZvOMqak9GSj26Gk4YbmuiZYqP7Inoay495Qv5aZdhoCk8XtjbZygZ3zFO1MW8qKrFi2H
-	jyJUerjxpHvoYivz2Tw0Fom0GZl5ibZD6cI47f6RLNKkoLSSNt8ndPXabCTs9v50CaHUmh6n8EwdV
-	h3a11wO9KMQTDIeK5z9Ompws1FrJbStRk/+i8NoSwEjnMVM2d8/eYZK+A65e+FB9FyAW6cFULMbV3
-	D4ZCe0VCUv3C54OOIhpqqs0icRWLiCRtInXdBESqtPRpMCqUFSNmSUQ2owjCoBA1ulhjzpRpsIDuc
-	qR59KN6w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rAw9b-00AzA5-00;
-	Wed, 06 Dec 2023 17:57:47 +0000
-Date: Wed, 6 Dec 2023 09:57:46 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Theodore Ts'o <tytso@mit.edu>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
-	roger.pau@citrix.com, colyli@suse.de, kent.overstreet@gmail.com,
-	joern@lazybastard.org, miquel.raynal@bootlin.com, richard@nod.at,
-	vigneshr@ti.com, sth@linux.ibm.com, hoeppner@linux.ibm.com,
-	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, clm@fb.com,
-	josef@toxicpanda.com, dsterba@suse.com, nico@fluxnic.net,
-	xiang@kernel.org, chao@kernel.org, adilger.kernel@dilger.ca,
-	agruenba@redhat.com, jack@suse.com, konishi.ryusuke@gmail.com,
-	willy@infradead.org, akpm@linux-foundation.org, hare@suse.de,
-	p.raghav@samsung.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
-	linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	gfs2@lists.linux.dev, linux-nilfs@vger.kernel.org,
-	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH -next RFC 01/14] block: add some bdev apis
-Message-ID: <ZXC2Gg7NPWu9MULx@infradead.org>
-References: <20231205123728.1866699-1-yukuai1@huaweicloud.com>
- <20231205123728.1866699-2-yukuai1@huaweicloud.com>
- <ZXARKD0OmjLrvHmU@infradead.org>
- <20231206175038.GJ509422@mit.edu>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LTp9w+Pj"
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C349E18D
+	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 13:34:30 -0800 (PST)
+Date: Wed, 6 Dec 2023 16:34:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701898467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JfTfgeKvI5T6VMc/0k0zRS053aDBKMmp57C0Z7pwgG0=;
+	b=LTp9w+Pj3M8wkdwFgP7qAhkJL9B6PDheGDmTOpK4mSfcyT6RrrZBCjfJ/UoIcn5yN/OePQ
+	06yeokFgJzKrvhjJ8nEWD++Nv8fzU8rYPFRzs/jhlKUdwbGs/wk/ObaJmnGWa3PxkH+iWI
+	ihdfyXlXxO1cfSaXWtbpSscPyiHC8JQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Phillip Lougher <phillip@squashfs.org.uk>
+Subject: Re: [PATCH 1/3] block: Rework bio_for_each_segment_all()
+Message-ID: <20231206213424.rn7i42zoyo6zxufk@moria.home.lan>
+References: <20231122232818.178256-1-kent.overstreet@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,22 +30,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231206175038.GJ509422@mit.edu>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20231122232818.178256-1-kent.overstreet@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Dec 06, 2023 at 12:50:38PM -0500, Theodore Ts'o wrote:
-> This was added because pulling a mounted a USB thumb drive (or a HDD
-> drops off the SATA bus) while the file system is mounted and actively
-> in use, would result in a kernel OOPS.  If that's no longer true,
-> that's great, but it would be good to test to make sure this is the
-> case....
+On Wed, Nov 22, 2023 at 06:28:13PM -0500, Kent Overstreet wrote:
+> This patch reworks bio_for_each_segment_all() to be more inline with how
+> the other bio iterators work:
+> 
+>  - bio_iter_all_peek() now returns a synthesized bio_vec; we don't stash
+>    one in the iterator and pass a pointer to it - bad. This way makes it
+>    clearer what's a constructed value vs. a reference to something
+>    pre-existing, and it also will help with cleaning up and
+>    consolidating code with bio_for_each_folio_all().
+> 
+>  - We now provide bio_for_each_segment_all_continue(), for squashfs:
+>    this makes their code clearer.
 
-And, surprise, surprise - that didn't just affect ext4.  So I ended
-up fixing this properly in the block layer.
-
-> If we really want to remove it, I'd suggest doing this as a separate
-> commit, so that after we see syzbot reports, or users complaining
-> about kernel crashes, we can revert the removal if necessary.
-
-Yes, this should of course be separate, well documented commit.
-
+Jens, can we _please_ get this series merged so bcachefs isn't reaching
+into bio/bvec internals?
