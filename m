@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="C70rExER"
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F6010C7
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="SvdV/jF9"
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF88A10CE
 	for <linux-block@vger.kernel.org>; Tue,  5 Dec 2023 22:06:39 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-28655c04da3so435216a91.0
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1d0ccda19eeso9185925ad.1
         for <linux-block@vger.kernel.org>; Tue, 05 Dec 2023 22:06:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1701842798; x=1702447598; darn=vger.kernel.org;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1701842799; x=1702447599; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d5c67p4Iwxfk8EXvTyIdbVdxswTm1LVGC6Ng7PTwCNc=;
-        b=C70rExERCUDKVhuB49M3Fxl3WYE+P/JH2DBsrfx8UZ3Zc7HcBSZeAjtSnWWcPnKBRO
-         JU5QdqH8lm8KJj/SKiRtRYxuqRwPLlgWXZOEtOmeJSGfnYHiwFBqnF8HDkNvZ0/ZL+Tn
-         pdO0v2cOf8w54S8PVvmhaV3/QUZ194kwTJ3w+Wj4n9fjfkFMqL2nNsx2Oh/kSSpBfOY2
-         YBMRl+m+f89zvWy+Ct/kjoMG1z8l40Hgd4/esQe45t2Qf+FWpkPRl2MWRUugTMRVeDDw
-         jADnmoprU9tbUAdqmbPPAcsj66NQz9dkj709IhL3W/E1pZAXQa6Me7l0Exky/0YTR+WA
-         7U6Q==
+        bh=NnFiB1AOSnW5eXL0TXhVYgeL/vpsO/mdIcAfnCTORyA=;
+        b=SvdV/jF9qBeunUyMw46u+j5wYLGdMXjRoiGBMsjCKwtEQJP3jhHGWTferAhYSizaCV
+         fJpjzSUA1CkVJXuIsxI5iNPOAjJKKTL8dNF29vQGST2Xe+zzJorLUMyBenHkp9NtBc6Q
+         DxT4Z+GzKlg+CBoEsfYlvHEt+chxZlCMIqaJmhwhpIJczkV53LuHCPLxmYbtvvFhKVTz
+         JD/Gv3AJQDddoc64LIu5SNvVU/sIKB5W1FFkV2oPFQ/sKoLWVjTdrXdPRj5Bg9Vwz5wW
+         EoeG8oV/pGF4X9z1txW22KjLuaLzk3FWsSjTNfjrWMh413GY7xNEySyzFkhn1rcgz+a7
+         PAzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701842798; x=1702447598;
+        d=1e100.net; s=20230601; t=1701842799; x=1702447599;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=d5c67p4Iwxfk8EXvTyIdbVdxswTm1LVGC6Ng7PTwCNc=;
-        b=itOE++/pCwzkaXgecr2hpTj5XoYetcGp4y+u3quVQ5GLprRdqXAjWek4rI05epdrcL
-         mxowle7AA80bPqOPyX9zLqTbRRfEeOiF6jLoUWyqLFZ5UNIcrjsYzPJUcyigciAfJoTN
-         89e7GvPTLzSW0WagbFRSx2/wodjT5QORUgK0VGzePhJuH/YVtXSlPQqZOI12ddvAWsGv
-         R9nNXiure2SZxdBlQik3FvTDulAxIhrjk74YCErlf5cirWwLwqNcx5vcldhIccC5JuVY
-         5h3mUUMRsWRkn/xk8nYpCA8dtQ2u69rMUXeJExtxGqHtOonuSEOehJHwsoqyRyTpQCnP
-         1FQw==
-X-Gm-Message-State: AOJu0YxrQmNnyDPZOjM8myZHiKyWKdUJOZPpYbI+UVinupLqMw0L3QDN
-	MWOr4Lld1N2P+5anEiTnykjdfA==
-X-Google-Smtp-Source: AGHT+IFkKuykeoJVAudwwmFujiDHfPEHX1oc2kW4nogWIOsi4Zh1ZmlEITbhHDDGN4q70xM8zZRpIg==
-X-Received: by 2002:a17:90a:d917:b0:286:b01d:88a6 with SMTP id c23-20020a17090ad91700b00286b01d88a6mr2839698pjv.6.1701842798242;
+        bh=NnFiB1AOSnW5eXL0TXhVYgeL/vpsO/mdIcAfnCTORyA=;
+        b=lM1gBKYZ+KexOnG5+R1SxqN1X54ML1dQK3Ruyb2wtb643qnyq4lHoW6qWd0CQunyZl
+         7KZ/Q/9ISsT9uDkqfELwf9ywpdgm/lYc5IdSAfL7yiZw5Nty2O1TH/de6AaPnfwFPRdO
+         Ux2G010Ikm/ONT7KDcOaqU6+fUvAki3CoqVCnLxyfqBelzzkdwtryp9ciI/OCkZcJuhS
+         PWtArOP8mjCcCtY1Di1px2wNhE83IFPTJi0b9L42VmSCG3UcLH4vlKrHMiAY/T1dI3B0
+         BJ6/lqwd/qp8vWcDcadnZ/fMFZqWGcLWbISpCeaLhTGmOUGK73TnrpIjA7cS5eIJ+v1i
+         jz4g==
+X-Gm-Message-State: AOJu0YxSyJb8DHpHyeTxQabloeWjNhlVt3jwO+DN+HsxD3ADCb3V3fIM
+	ElCjNGDcTG2Lo7dzwXe/FldRQw==
+X-Google-Smtp-Source: AGHT+IHnOknw8OjWrnQAs5nfw1dZTQS0ZMfwHkjinURX0IvbbckhfMQRoU6wqY+9qjtNVe9wFLMfWg==
+X-Received: by 2002:a17:902:b28c:b0:1d0:6ffe:1e89 with SMTP id u12-20020a170902b28c00b001d06ffe1e89mr238281plr.108.1701842798702;
         Tue, 05 Dec 2023 22:06:38 -0800 (PST)
 Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
-        by smtp.gmail.com with ESMTPSA id m13-20020a17090a858d00b00286920600a9sm5350682pjn.32.2023.12.05.22.06.34
+        by smtp.gmail.com with ESMTPSA id i4-20020a17090332c400b001d071d58e85sm7382209plr.98.2023.12.05.22.06.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 05 Dec 2023 22:06:35 -0800 (PST)
 Received: from [192.168.253.23] (helo=devoid.disaster.area)
 	by dread.disaster.area with esmtp (Exim 4.96)
 	(envelope-from <dave@fromorbit.com>)
-	id 1rAl3I-004VP3-0n;
+	id 1rAl3H-004VOj-33;
 	Wed, 06 Dec 2023 17:06:31 +1100
 Received: from dave by devoid.disaster.area with local (Exim 4.97-RC0)
 	(envelope-from <dave@devoid.disaster.area>)
-	id 1rAl3H-0000000BrVa-3MP5;
+	id 1rAl3H-0000000BrVB-27ej;
 	Wed, 06 Dec 2023 17:06:31 +1100
 From: Dave Chinner <david@fromorbit.com>
 To: linux-fsdevel@vger.kernel.org
@@ -57,9 +57,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
 	selinux@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 08/11] vfs: inode cache conversion to hash-bl
-Date: Wed,  6 Dec 2023 17:05:37 +1100
-Message-ID: <20231206060629.2827226-9-david@fromorbit.com>
+Subject: [PATCH 03/11] vfs: Use dlock list for superblock's inode list
+Date: Wed,  6 Dec 2023 17:05:32 +1100
+Message-ID: <20231206060629.2827226-4-david@fromorbit.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231206060629.2827226-1-david@fromorbit.com>
 References: <20231206060629.2827226-1-david@fromorbit.com>
@@ -71,635 +71,655 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dave Chinner <dchinner@redhat.com>
+From: Waiman Long <longman@redhat.com>
 
-Scalability of the global inode_hash_lock really sucks for
-filesystems that use the vfs inode cache (i.e. everything but XFS).
+[dchinner: original commit message preserved]
 
-Profiles of a 32-way concurrent sharded directory walk (no contended
-directories) on a couple of different filesystems. All numbers from
-a 6.7-rc4 kernel.
+When many threads are trying to add or delete inode to or from
+a superblock's s_inodes list, spinlock contention on the list can
+become a performance bottleneck.
 
-Bcachefs:
+This patch changes the s_inodes field to become a dlock list which
+is a distributed set of lists with per-list spinlocks.  As a result,
+the following superblock inode list (sb->s_inodes) iteration functions
+in vfs are also being modified:
 
-  - 98.78% vfs_statx
-     - 97.74% filename_lookup
-	- 97.70% path_lookupat
-	   - 97.54% walk_component
-	      - 97.06% lookup_slow
-		 - 97.03% __lookup_slow
-		    - 96.21% bch2_lookup
-		       - 91.87% bch2_vfs_inode_get
-			  - 84.10% iget5_locked
-			     - 44.09% ilookup5
-				- 43.50% _raw_spin_lock
-				   - 43.49% do_raw_spin_lock
-					42.75% __pv_queued_spin_lock_slowpath
-			     - 39.06% inode_insert5
-				- 38.46% _raw_spin_lock
-				   - 38.46% do_raw_spin_lock
-					37.51% __pv_queued_spin_lock_slowpath
+ 1. iterate_bdevs()
+ 2. drop_pagecache_sb()
+ 3. evict_inodes()
+ 4. invalidate_inodes()
+ 5. fsnotify_unmount_inodes()
+ 6. add_dquot_ref()
+ 7. remove_dquot_ref()
 
-ext4:
+With an exit microbenchmark that creates a large number of threads,
+attachs many inodes to them in procfs and then exits. The runtimes of
+that microbenchmark with various number of threads before and after
+the patch on a 4-socket Intel E7-8867 v3 system (64 cores, 128 threads)
+on a 4.19-rc3 based kernel were as follows:
 
-  - 93.75% vfs_statx
-     - 92.39% filename_lookup
-	- 92.34% path_lookupat
-	   - 92.09% walk_component
-	      - 91.48% lookup_slow
-		 - 91.43% __lookup_slow
-		    - 90.18% ext4_lookup
-		       - 84.84% __ext4_iget
-			  - 83.67% iget_locked
-			     - 81.24% _raw_spin_lock
-				- 81.23% do_raw_spin_lock
-				   - 78.90% __pv_queued_spin_lock_slowpath
+  # of threads  Elapsed/Sys Time    Elapsed/Sys Time    Speedup
+                Unpatched Kernel     Patched Kernel
+  ------------  ----------------    ----------------    -------
+      1000      59.17s/123m09.8s    18.90s/24m44.5s      3.13
+      1200      73.20s/151m24.1s    27.54s/50m05.3s      2.66
+      1400     102.04s/212m00.9s    36.75s/68m26.7s      2.78
+      1600     131.13s/272m52.4s    50.16s/94m23.7s      2.61
 
+[dchinner: forward port, add new inode list traversals, etc]
+[dchinner: scalability results on current TOT XFS]
 
-Both bcachefs and ext4 demonstrate poor scaling at >=8 threads on
-concurrent lookup or create workloads.
+With 400k inodes per thread concurrent directory traversal workload,
+scalability improves at >=16 threads on 6.7-rc4 on XFS. We only test
+XFS here as it is the only filesystem that demonstrates sufficient
+internal scalability for the superblock inode list to be a
+scalability bottleneck.
 
-Hence convert the inode hash table to a RCU-aware hash-bl table just
-like the dentry cache. Note that we need to store a pointer to the
-hlist_bl_head the inode has been added to in the inode so that when
-it comes to unhash the inode we know what list to lock. We need to
-do this because, unlike the dentry cache, the hash value that is
-used to hash the inode is not generated from the inode itself. i.e.
-filesystems can provide this themselves so we have to either store
-the hashval or the hlist head pointer in the inode to be able to
-find the right list head for removal...
+Table contains test runtime in seconds; perfect scalability is
+demonstrated by the runtime staying constant as thread count goes up.
 
-Concurrent walk of 400k files per thread with varying thread count
-in seconds is as follows. Perfect scaling is an unchanged walk time
-as thread count increases.
+Threads		6.4-rc7		patched
+-------		-------		-------
+2		11.673		11.158
+4		 9.665		 9.444
+8		10.622		 9.275
+16		12.148		 9.508
+32		20.518		10.308
 
-		ext4			bcachefs
-threads		vanilla	 patched	vanilla	patched
-2		 7.923	  7.358		 8.003	 7.276
-4		 8.152	  7.530		 9.097	 8.506
-8		13.090	  7.871		11.752	10.015
-16		24.602	  9.540		24.614	13.989
-32		49.536	 19.314		49.179	25.982
+Unpatched kernel profile at 32 threads:
 
-The big wins here are at >= 8 threads, with both filesytsems now
-being limited by internal filesystem algorithms, not the VFS inode
-cache scalability.
+- 95.45% vfs_fstatat
+  - 95.00% vfs_statx
+     - 91.00% filename_lookup
+	- 90.90% path_lookupat
+	   - 90.40% walk_component
+	      - 89.05% lookup_slow
+		 - 88.95% __lookup_slow
+		    - 86.38% xfs_vn_lookup
+		       - 84.05% xfs_lookup
+			  - 78.82% xfs_iget
+			     - 72.58% xfs_setup_inode
+				- 72.54% inode_sb_list_add
+				   - 71.12% _raw_spin_lock
+				      - 71.09% do_raw_spin_lock
+					 - 68.85% __pv_queued_spin_lock_slowpath
 
-Ext4 contention moves to the buffer cache on directory block
-lookups:
+Patched kernel profile at 32 threads - the biggest single point of
+contention is now the dentry cache LRU via dput():
 
--   66.45%     0.44%  [kernel]              [k] __ext4_read_dirblock
-   - 66.01% __ext4_read_dirblock
-      - 66.01% ext4_bread
-         - ext4_getblk
-            - 64.77% bdev_getblk
-               - 64.69% __find_get_block
-                  - 63.01% _raw_spin_lock
-                     - 62.96% do_raw_spin_lock
-                          59.21% __pv_queued_spin_lock_slowpath
+-   21.59%     0.25%  [kernel]              [k] dput
+   - 21.34% dput
+      - 19.93% retain_dentry
+         - d_lru_add
+            - 19.82% list_lru_add
+               - 14.62% _raw_spin_lock
+                  - 14.47% do_raw_spin_lock
+                       10.89% __pv_queued_spin_lock_slowpath
+                 1.78% __list_add_valid_or_report
+               - 0.81% _raw_spin_unlock
+                  - do_raw_spin_unlock
+                       0.77% __raw_callee_save___pv_queued_spin_unlock
+      - 0.79% _raw_spin_unlock
+         - 0.78% do_raw_spin_unlock
+              0.67% __raw_callee_save___pv_queued_spin_unlock
 
-bcachefs contention moves to internal btree traversal locks.
-
- - 95.37% __lookup_slow
-    - 93.95% bch2_lookup
-       - 82.57% bch2_vfs_inode_get
-	  - 65.44% bch2_inode_find_by_inum_trans
-	     - 65.41% bch2_inode_peek_nowarn
-		- 64.60% bch2_btree_iter_peek_slot
-		   - 64.55% bch2_btree_path_traverse_one
-		      - bch2_btree_path_traverse_cached
-			 - 63.02% bch2_btree_path_traverse_cached_slowpath
-			    - 56.60% mutex_lock
-			       - 55.29% __mutex_lock_slowpath
-				  - 55.25% __mutex_lock
-				       50.29% osq_lock
-				       1.84% __raw_callee_save___kvm_vcpu_is_preempted
-				       0.54% mutex_spin_on_owner
-
+Signed-off-by: Waiman Long <longman@redhat.com>
 Signed-off-by: Dave Chinner <dchinner@redhat.com>
 ---
- fs/inode.c         | 200 ++++++++++++++++++++++++++++-----------------
- include/linux/fs.h |   9 +-
- 2 files changed, 132 insertions(+), 77 deletions(-)
+ block/bdev.c           | 24 ++++++++----------------
+ fs/drop_caches.c       |  9 ++++-----
+ fs/gfs2/ops_fstype.c   | 21 +++++++++++----------
+ fs/inode.c             | 37 ++++++++++++++++---------------------
+ fs/notify/fsnotify.c   | 12 ++++++------
+ fs/quota/dquot.c       | 22 ++++++----------------
+ fs/super.c             | 13 +++++++------
+ include/linux/fs.h     |  8 ++++----
+ security/landlock/fs.c | 25 ++++++-------------------
+ 9 files changed, 68 insertions(+), 103 deletions(-)
 
+diff --git a/block/bdev.c b/block/bdev.c
+index 750aec178b6a..07135fd6fda4 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -437,11 +437,11 @@ long nr_blockdev_pages(void)
+ {
+ 	struct inode *inode;
+ 	long ret = 0;
++	DEFINE_DLOCK_LIST_ITER(iter, &blockdev_superblock->s_inodes);
+ 
+-	spin_lock(&blockdev_superblock->s_inode_list_lock);
+-	list_for_each_entry(inode, &blockdev_superblock->s_inodes, i_sb_list)
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		ret += inode->i_mapping->nrpages;
+-	spin_unlock(&blockdev_superblock->s_inode_list_lock);
++	}
+ 
+ 	return ret;
+ }
+@@ -1032,9 +1032,9 @@ EXPORT_SYMBOL_GPL(bdev_mark_dead);
+ void sync_bdevs(bool wait)
+ {
+ 	struct inode *inode, *old_inode = NULL;
++	DEFINE_DLOCK_LIST_ITER(iter, &blockdev_superblock->s_inodes);
+ 
+-	spin_lock(&blockdev_superblock->s_inode_list_lock);
+-	list_for_each_entry(inode, &blockdev_superblock->s_inodes, i_sb_list) {
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		struct address_space *mapping = inode->i_mapping;
+ 		struct block_device *bdev;
+ 
+@@ -1046,15 +1046,8 @@ void sync_bdevs(bool wait)
+ 		}
+ 		__iget(inode);
+ 		spin_unlock(&inode->i_lock);
+-		spin_unlock(&blockdev_superblock->s_inode_list_lock);
+-		/*
+-		 * We hold a reference to 'inode' so it couldn't have been
+-		 * removed from s_inodes list while we dropped the
+-		 * s_inode_list_lock  We cannot iput the inode now as we can
+-		 * be holding the last reference and we cannot iput it under
+-		 * s_inode_list_lock. So we keep the reference and iput it
+-		 * later.
+-		 */
++		dlock_list_unlock(&iter);
++
+ 		iput(old_inode);
+ 		old_inode = inode;
+ 		bdev = I_BDEV(inode);
+@@ -1075,9 +1068,8 @@ void sync_bdevs(bool wait)
+ 		}
+ 		mutex_unlock(&bdev->bd_disk->open_mutex);
+ 
+-		spin_lock(&blockdev_superblock->s_inode_list_lock);
++		dlock_list_relock(&iter);
+ 	}
+-	spin_unlock(&blockdev_superblock->s_inode_list_lock);
+ 	iput(old_inode);
+ }
+ 
+diff --git a/fs/drop_caches.c b/fs/drop_caches.c
+index b9575957a7c2..3596d0a7c0da 100644
+--- a/fs/drop_caches.c
++++ b/fs/drop_caches.c
+@@ -19,9 +19,9 @@ int sysctl_drop_caches;
+ static void drop_pagecache_sb(struct super_block *sb, void *unused)
+ {
+ 	struct inode *inode, *toput_inode = NULL;
++	DEFINE_DLOCK_LIST_ITER(iter, &sb->s_inodes);
+ 
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		spin_lock(&inode->i_lock);
+ 		/*
+ 		 * We must skip inodes in unusual state. We may also skip
+@@ -35,16 +35,15 @@ static void drop_pagecache_sb(struct super_block *sb, void *unused)
+ 		}
+ 		__iget(inode);
+ 		spin_unlock(&inode->i_lock);
+-		spin_unlock(&sb->s_inode_list_lock);
++		dlock_list_unlock(&iter);
+ 
+ 		invalidate_mapping_pages(inode->i_mapping, 0, -1);
+ 		iput(toput_inode);
+ 		toput_inode = inode;
+ 
+ 		cond_resched();
+-		spin_lock(&sb->s_inode_list_lock);
++		dlock_list_relock(&iter);
+ 	}
+-	spin_unlock(&sb->s_inode_list_lock);
+ 	iput(toput_inode);
+ }
+ 
+diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
+index b108c5d26839..1105710482e7 100644
+--- a/fs/gfs2/ops_fstype.c
++++ b/fs/gfs2/ops_fstype.c
+@@ -1738,22 +1738,24 @@ static int gfs2_meta_init_fs_context(struct fs_context *fc)
+  * attempt will time out.  Since inodes are evicted sequentially, this can add
+  * up quickly.
+  *
+- * Function evict_inodes() tries to keep the s_inode_list_lock list locked over
+- * a long time, which prevents other inodes from being evicted concurrently.
+- * This precludes the cooperative behavior we are looking for.  This special
+- * version of evict_inodes() avoids that.
+- *
+  * Modeled after drop_pagecache_sb().
++ *
++ * XXX(dgc): this is particularly awful. With the dlist for inodes, concurrent
++ * access to the inode list can occur and evict_inodes() will drop the per-cpu
++ * list lock if the CPU needs rescheduling. Hence if this exists just because
++ * evict_inodes() holds the s_inode_list_lock for long periods preventing
++ * concurrent inode eviction work from being done, this can probably go away
++ * entirely now.
+  */
+ static void gfs2_evict_inodes(struct super_block *sb)
+ {
+ 	struct inode *inode, *toput_inode = NULL;
+ 	struct gfs2_sbd *sdp = sb->s_fs_info;
++	DEFINE_DLOCK_LIST_ITER(iter, &sb->s_inodes);
+ 
+ 	set_bit(SDF_EVICTING, &sdp->sd_flags);
+ 
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		spin_lock(&inode->i_lock);
+ 		if ((inode->i_state & (I_FREEING|I_WILL_FREE|I_NEW)) &&
+ 		    !need_resched()) {
+@@ -1762,15 +1764,14 @@ static void gfs2_evict_inodes(struct super_block *sb)
+ 		}
+ 		atomic_inc(&inode->i_count);
+ 		spin_unlock(&inode->i_lock);
+-		spin_unlock(&sb->s_inode_list_lock);
++		dlock_list_unlock(&iter);
+ 
+ 		iput(toput_inode);
+ 		toput_inode = inode;
+ 
+ 		cond_resched();
+-		spin_lock(&sb->s_inode_list_lock);
++		dlock_list_relock(&iter);
+ 	}
+-	spin_unlock(&sb->s_inode_list_lock);
+ 	iput(toput_inode);
+ }
+ 
 diff --git a/fs/inode.c b/fs/inode.c
-index fead81550cf4..3eb9c4e5b279 100644
+index 17c50a75514f..3426691fa305 100644
 --- a/fs/inode.c
 +++ b/fs/inode.c
-@@ -56,8 +56,7 @@
- 
- static unsigned int i_hash_mask __ro_after_init;
- static unsigned int i_hash_shift __ro_after_init;
--static struct hlist_head *inode_hashtable __ro_after_init;
--static __cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_hash_lock);
-+static struct hlist_bl_head *inode_hashtable __ro_after_init;
- 
- static unsigned long hash(struct super_block *sb, unsigned long hashval)
- {
-@@ -69,7 +68,7 @@ static unsigned long hash(struct super_block *sb, unsigned long hashval)
- 	return tmp & i_hash_mask;
- }
- 
--static inline struct hlist_head *i_hash_head(struct super_block *sb,
-+static inline struct hlist_bl_head *i_hash_head(struct super_block *sb,
- 		unsigned int hashval)
- {
- 	return inode_hashtable + hash(sb, hashval);
-@@ -434,7 +433,7 @@ EXPORT_SYMBOL(address_space_init_once);
- void inode_init_once(struct inode *inode)
- {
- 	memset(inode, 0, sizeof(*inode));
--	INIT_HLIST_NODE(&inode->i_hash);
-+	INIT_HLIST_BL_NODE(&inode->i_hash);
- 	INIT_LIST_HEAD(&inode->i_devices);
+@@ -30,7 +30,7 @@
+  *   inode->i_state, inode->i_hash, __iget(), inode->i_io_list
+  * Inode LRU list locks protect:
+  *   inode->i_sb->s_inode_lru, inode->i_lru
+- * inode->i_sb->s_inode_list_lock protects:
++ * inode->i_sb->s_inodes->head->lock protects:
+  *   inode->i_sb->s_inodes, inode->i_sb_list
+  * bdi->wb.list_lock protects:
+  *   bdi->wb.b_{dirty,io,more_io,dirty_time}, inode->i_io_list
+@@ -39,7 +39,7 @@
+  *
+  * Lock ordering:
+  *
+- * inode->i_sb->s_inode_list_lock
++ * inode->i_sb->s_inodes->head->lock
+  *   inode->i_lock
+  *     Inode LRU list locks
+  *
+@@ -47,7 +47,7 @@
+  *   inode->i_lock
+  *
+  * inode_hash_lock
+- *   inode->i_sb->s_inode_list_lock
++ *   inode->i_sb->s_inodes->head->lock
+  *   inode->i_lock
+  *
+  * iunique_lock
+@@ -423,7 +423,7 @@ void inode_init_once(struct inode *inode)
  	INIT_LIST_HEAD(&inode->i_io_list);
  	INIT_LIST_HEAD(&inode->i_wb_list);
-@@ -518,6 +517,17 @@ static inline void inode_sb_list_del(struct inode *inode)
- 		dlock_lists_del(&inode->i_sb_list);
+ 	INIT_LIST_HEAD(&inode->i_lru);
+-	INIT_LIST_HEAD(&inode->i_sb_list);
++	init_dlock_list_node(&inode->i_sb_list);
+ 	__address_space_init_once(&inode->i_data);
+ 	i_size_ordered_init(inode);
+ }
+@@ -492,19 +492,14 @@ static void inode_lru_list_del(struct inode *inode)
+  */
+ void inode_sb_list_add(struct inode *inode)
+ {
+-	spin_lock(&inode->i_sb->s_inode_list_lock);
+-	list_add(&inode->i_sb_list, &inode->i_sb->s_inodes);
+-	spin_unlock(&inode->i_sb->s_inode_list_lock);
++	dlock_lists_add(&inode->i_sb_list, &inode->i_sb->s_inodes);
+ }
+ EXPORT_SYMBOL_GPL(inode_sb_list_add);
+ 
+ static inline void inode_sb_list_del(struct inode *inode)
+ {
+-	if (!list_empty(&inode->i_sb_list)) {
+-		spin_lock(&inode->i_sb->s_inode_list_lock);
+-		list_del_init(&inode->i_sb_list);
+-		spin_unlock(&inode->i_sb->s_inode_list_lock);
+-	}
++	if (!list_empty(&inode->i_sb_list.list))
++		dlock_lists_del(&inode->i_sb_list);
  }
  
-+/*
-+ * Ensure that we store the hash head in the inode when we insert the inode into
-+ * the hlist_bl_head...
-+ */
-+static inline void
-+__insert_inode_hash_head(struct inode *inode, struct hlist_bl_head *b)
-+{
-+	hlist_bl_add_head_rcu(&inode->i_hash, b);
-+	inode->i_hash_head = b;
-+}
-+
- /**
-  *	__insert_inode_hash - hash an inode
-  *	@inode: unhashed inode
-@@ -528,13 +538,13 @@ static inline void inode_sb_list_del(struct inode *inode)
-  */
- void __insert_inode_hash(struct inode *inode, unsigned long hashval)
+ static unsigned long hash(struct super_block *sb, unsigned long hashval)
+@@ -713,11 +708,12 @@ static void dispose_list(struct list_head *head)
+ void evict_inodes(struct super_block *sb)
  {
--	struct hlist_head *b = inode_hashtable + hash(inode->i_sb, hashval);
-+	struct hlist_bl_head *b = i_hash_head(inode->i_sb, hashval);
- 
--	spin_lock(&inode_hash_lock);
-+	hlist_bl_lock(b);
- 	spin_lock(&inode->i_lock);
--	hlist_add_head_rcu(&inode->i_hash, b);
-+	__insert_inode_hash_head(inode, b);
- 	spin_unlock(&inode->i_lock);
--	spin_unlock(&inode_hash_lock);
-+	hlist_bl_unlock(b);
- }
- EXPORT_SYMBOL(__insert_inode_hash);
- 
-@@ -546,11 +556,44 @@ EXPORT_SYMBOL(__insert_inode_hash);
-  */
- void __remove_inode_hash(struct inode *inode)
- {
--	spin_lock(&inode_hash_lock);
--	spin_lock(&inode->i_lock);
--	hlist_del_init_rcu(&inode->i_hash);
--	spin_unlock(&inode->i_lock);
--	spin_unlock(&inode_hash_lock);
-+	struct hlist_bl_head *b = inode->i_hash_head;
-+
-+	/*
-+	 * There are some callers that come through here without synchronisation
-+	 * and potentially with multiple references to the inode. Hence we have
-+	 * to handle the case that we might race with a remove and insert to a
-+	 * different list. Coda, in particular, seems to have a userspace API
-+	 * that can directly trigger "unhash/rehash to different list" behaviour
-+	 * without any serialisation at all.
-+	 *
-+	 * Hence we have to handle the situation where the inode->i_hash_head
-+	 * might point to a different list than what we expect, indicating that
-+	 * we raced with another unhash and potentially a new insertion. This
-+	 * means we have to retest the head once we have everything locked up
-+	 * and loop again if it doesn't match.
-+	 */
-+	while (b) {
-+		hlist_bl_lock(b);
-+		spin_lock(&inode->i_lock);
-+		if (b != inode->i_hash_head) {
-+			hlist_bl_unlock(b);
-+			b = inode->i_hash_head;
-+			spin_unlock(&inode->i_lock);
-+			continue;
-+		}
-+		/*
-+		 * Need to set the pprev pointer to NULL after list removal so
-+		 * that both RCU traversals and hlist_bl_unhashed() work
-+		 * correctly at this point.
-+		 */
-+		hlist_bl_del_rcu(&inode->i_hash);
-+		inode->i_hash.pprev = NULL;
-+		inode->i_hash_head = NULL;
-+		spin_unlock(&inode->i_lock);
-+		hlist_bl_unlock(b);
-+		break;
-+	}
-+
- }
- EXPORT_SYMBOL(__remove_inode_hash);
- 
-@@ -886,26 +929,28 @@ long prune_icache_sb(struct super_block *sb, struct shrink_control *sc)
- 	return freed;
- }
- 
--static void __wait_on_freeing_inode(struct inode *inode);
-+static void __wait_on_freeing_inode(struct hlist_bl_head *b,
-+				struct inode *inode);
- /*
-  * Called with the inode lock held.
-  */
- static struct inode *find_inode(struct super_block *sb,
--				struct hlist_head *head,
-+				struct hlist_bl_head *b,
- 				int (*test)(struct inode *, void *),
- 				void *data)
- {
-+	struct hlist_bl_node *node;
- 	struct inode *inode = NULL;
- 
- repeat:
--	hlist_for_each_entry(inode, head, i_hash) {
-+	hlist_bl_for_each_entry(inode, node, b, i_hash) {
- 		if (inode->i_sb != sb)
- 			continue;
- 		if (!test(inode, data))
- 			continue;
- 		spin_lock(&inode->i_lock);
- 		if (inode->i_state & (I_FREEING|I_WILL_FREE)) {
--			__wait_on_freeing_inode(inode);
-+			__wait_on_freeing_inode(b, inode);
- 			goto repeat;
- 		}
- 		if (unlikely(inode->i_state & I_CREATING)) {
-@@ -924,19 +969,20 @@ static struct inode *find_inode(struct super_block *sb,
-  * iget_locked for details.
-  */
- static struct inode *find_inode_fast(struct super_block *sb,
--				struct hlist_head *head, unsigned long ino)
-+				struct hlist_bl_head *b, unsigned long ino)
- {
-+	struct hlist_bl_node *node;
- 	struct inode *inode = NULL;
- 
- repeat:
--	hlist_for_each_entry(inode, head, i_hash) {
-+	hlist_bl_for_each_entry(inode, node, b, i_hash) {
- 		if (inode->i_ino != ino)
- 			continue;
- 		if (inode->i_sb != sb)
- 			continue;
- 		spin_lock(&inode->i_lock);
- 		if (inode->i_state & (I_FREEING|I_WILL_FREE)) {
--			__wait_on_freeing_inode(inode);
-+			__wait_on_freeing_inode(b, inode);
- 			goto repeat;
- 		}
- 		if (unlikely(inode->i_state & I_CREATING)) {
-@@ -1186,25 +1232,25 @@ EXPORT_SYMBOL(unlock_two_nondirectories);
-  * return it locked, hashed, and with the I_NEW flag set. The file system gets
-  * to fill it in before unlocking it via unlock_new_inode().
-  *
-- * Note both @test and @set are called with the inode_hash_lock held, so can't
-- * sleep.
-+ * Note both @test and @set are called with the inode hash chain lock held,
-+ * so can't sleep.
-  */
- struct inode *inode_insert5(struct inode *inode, unsigned long hashval,
- 			    int (*test)(struct inode *, void *),
- 			    int (*set)(struct inode *, void *), void *data)
- {
--	struct hlist_head *head = i_hash_head(inode->i_sb, hashval);
-+	struct hlist_bl_head *b = i_hash_head(inode->i_sb, hashval);
- 	struct inode *old;
+ 	struct inode *inode;
++	struct dlock_list_iter iter;
+ 	LIST_HEAD(dispose);
  
  again:
--	spin_lock(&inode_hash_lock);
--	old = find_inode(inode->i_sb, head, test, data);
-+	hlist_bl_lock(b);
-+	old = find_inode(inode->i_sb, b, test, data);
- 	if (unlikely(old)) {
- 		/*
- 		 * Uhhuh, somebody else created the same inode under us.
- 		 * Use the old inode instead of the preallocated one.
- 		 */
--		spin_unlock(&inode_hash_lock);
-+		hlist_bl_unlock(b);
- 		if (IS_ERR(old))
- 			return NULL;
- 		wait_on_inode(old);
-@@ -1226,7 +1272,7 @@ struct inode *inode_insert5(struct inode *inode, unsigned long hashval,
- 	 */
- 	spin_lock(&inode->i_lock);
- 	inode->i_state |= I_NEW;
--	hlist_add_head_rcu(&inode->i_hash, head);
-+	__insert_inode_hash_head(inode, b);
- 	spin_unlock(&inode->i_lock);
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	init_dlock_list_iter(&iter, &sb->s_inodes);
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		if (atomic_read(&inode->i_count))
+ 			continue;
  
- 	/*
-@@ -1236,7 +1282,7 @@ struct inode *inode_insert5(struct inode *inode, unsigned long hashval,
- 	if (list_empty(&inode->i_sb_list.list))
+@@ -738,13 +734,12 @@ void evict_inodes(struct super_block *sb)
+ 		 * bit so we don't livelock.
+ 		 */
+ 		if (need_resched()) {
+-			spin_unlock(&sb->s_inode_list_lock);
++			dlock_list_unlock(&iter);
+ 			cond_resched();
+ 			dispose_list(&dispose);
+ 			goto again;
+ 		}
+ 	}
+-	spin_unlock(&sb->s_inode_list_lock);
+ 
+ 	dispose_list(&dispose);
+ }
+@@ -759,11 +754,12 @@ EXPORT_SYMBOL_GPL(evict_inodes);
+ void invalidate_inodes(struct super_block *sb)
+ {
+ 	struct inode *inode;
++	struct dlock_list_iter iter;
+ 	LIST_HEAD(dispose);
+ 
+ again:
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	init_dlock_list_iter(&iter, &sb->s_inodes);
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		spin_lock(&inode->i_lock);
+ 		if (inode->i_state & (I_NEW | I_FREEING | I_WILL_FREE)) {
+ 			spin_unlock(&inode->i_lock);
+@@ -779,13 +775,12 @@ void invalidate_inodes(struct super_block *sb)
+ 		spin_unlock(&inode->i_lock);
+ 		list_add(&inode->i_lru, &dispose);
+ 		if (need_resched()) {
+-			spin_unlock(&sb->s_inode_list_lock);
++			dlock_list_unlock(&iter);
+ 			cond_resched();
+ 			dispose_list(&dispose);
+ 			goto again;
+ 		}
+ 	}
+-	spin_unlock(&sb->s_inode_list_lock);
+ 
+ 	dispose_list(&dispose);
+ }
+@@ -1232,7 +1227,7 @@ struct inode *inode_insert5(struct inode *inode, unsigned long hashval,
+ 	 * Add inode to the sb list if it's not already. It has I_NEW at this
+ 	 * point, so it should be safe to test i_sb_list locklessly.
+ 	 */
+-	if (list_empty(&inode->i_sb_list))
++	if (list_empty(&inode->i_sb_list.list))
  		inode_sb_list_add(inode);
  unlock:
--	spin_unlock(&inode_hash_lock);
-+	hlist_bl_unlock(b);
- 
- 	return inode;
- }
-@@ -1297,12 +1343,12 @@ EXPORT_SYMBOL(iget5_locked);
+ 	spin_unlock(&inode_hash_lock);
+diff --git a/fs/notify/fsnotify.c b/fs/notify/fsnotify.c
+index 7974e91ffe13..15e3769e76f5 100644
+--- a/fs/notify/fsnotify.c
++++ b/fs/notify/fsnotify.c
+@@ -33,14 +33,15 @@ void __fsnotify_vfsmount_delete(struct vfsmount *mnt)
+  * @sb: superblock being unmounted.
+  *
+  * Called during unmount with no locks held, so needs to be safe against
+- * concurrent modifiers. We temporarily drop sb->s_inode_list_lock and CAN block.
++ * concurrent modifiers. We temporarily drop sb->s_inodes list lock and CAN
++ * block.
   */
- struct inode *iget_locked(struct super_block *sb, unsigned long ino)
+ static void fsnotify_unmount_inodes(struct super_block *sb)
  {
--	struct hlist_head *head = i_hash_head(sb, ino);
-+	struct hlist_bl_head *b = i_hash_head(sb, ino);
- 	struct inode *inode;
- again:
--	spin_lock(&inode_hash_lock);
--	inode = find_inode_fast(sb, head, ino);
--	spin_unlock(&inode_hash_lock);
-+	hlist_bl_lock(b);
-+	inode = find_inode_fast(sb, b, ino);
-+	hlist_bl_unlock(b);
- 	if (inode) {
- 		if (IS_ERR(inode))
- 			return NULL;
-@@ -1318,17 +1364,17 @@ struct inode *iget_locked(struct super_block *sb, unsigned long ino)
- 	if (inode) {
- 		struct inode *old;
+ 	struct inode *inode, *iput_inode = NULL;
++	DEFINE_DLOCK_LIST_ITER(iter, &sb->s_inodes);
  
--		spin_lock(&inode_hash_lock);
-+		hlist_bl_lock(b);
- 		/* We released the lock, so.. */
--		old = find_inode_fast(sb, head, ino);
-+		old = find_inode_fast(sb, b, ino);
- 		if (!old) {
- 			inode->i_ino = ino;
- 			spin_lock(&inode->i_lock);
- 			inode->i_state = I_NEW;
--			hlist_add_head_rcu(&inode->i_hash, head);
-+			__insert_inode_hash_head(inode, b);
- 			spin_unlock(&inode->i_lock);
- 			inode_sb_list_add(inode);
--			spin_unlock(&inode_hash_lock);
-+			hlist_bl_unlock(b);
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		/*
+ 		 * We cannot __iget() an inode in state I_FREEING,
+ 		 * I_WILL_FREE, or I_NEW which is fine because by that point
+@@ -68,7 +69,7 @@ static void fsnotify_unmount_inodes(struct super_block *sb)
  
- 			/* Return the locked inode with I_NEW set, the
- 			 * caller is responsible for filling in the contents
-@@ -1341,7 +1387,7 @@ struct inode *iget_locked(struct super_block *sb, unsigned long ino)
- 		 * us. Use the old inode instead of the one we just
- 		 * allocated.
- 		 */
--		spin_unlock(&inode_hash_lock);
-+		hlist_bl_unlock(b);
- 		destroy_inode(inode);
- 		if (IS_ERR(old))
- 			return NULL;
-@@ -1365,10 +1411,11 @@ EXPORT_SYMBOL(iget_locked);
-  */
- static int test_inode_iunique(struct super_block *sb, unsigned long ino)
- {
--	struct hlist_head *b = i_hash_head(sb, ino);
-+	struct hlist_bl_head *b = i_hash_head(sb, ino);
-+	struct hlist_bl_node *node;
- 	struct inode *inode;
+ 		__iget(inode);
+ 		spin_unlock(&inode->i_lock);
+-		spin_unlock(&sb->s_inode_list_lock);
++		dlock_list_unlock(&iter);
  
--	hlist_for_each_entry_rcu(inode, b, i_hash) {
-+	hlist_bl_for_each_entry_rcu(inode, node, b, i_hash) {
- 		if (inode->i_ino == ino && inode->i_sb == sb)
- 			return 0;
+ 		iput(iput_inode);
+ 
+@@ -80,9 +81,8 @@ static void fsnotify_unmount_inodes(struct super_block *sb)
+ 		iput_inode = inode;
+ 
+ 		cond_resched();
+-		spin_lock(&sb->s_inode_list_lock);
++		dlock_list_relock(&iter);
  	}
-@@ -1452,12 +1499,12 @@ EXPORT_SYMBOL(igrab);
- struct inode *ilookup5_nowait(struct super_block *sb, unsigned long hashval,
- 		int (*test)(struct inode *, void *), void *data)
- {
--	struct hlist_head *head = i_hash_head(sb, hashval);
-+	struct hlist_bl_head *b = i_hash_head(sb, hashval);
- 	struct inode *inode;
+-	spin_unlock(&sb->s_inode_list_lock);
  
--	spin_lock(&inode_hash_lock);
--	inode = find_inode(sb, head, test, data);
--	spin_unlock(&inode_hash_lock);
-+	hlist_bl_lock(b);
-+	inode = find_inode(sb, b, test, data);
-+	hlist_bl_unlock(b);
- 
- 	return IS_ERR(inode) ? NULL : inode;
+ 	iput(iput_inode);
  }
-@@ -1507,12 +1554,12 @@ EXPORT_SYMBOL(ilookup5);
-  */
- struct inode *ilookup(struct super_block *sb, unsigned long ino)
+diff --git a/fs/quota/dquot.c b/fs/quota/dquot.c
+index 58b5de081b57..e873dcbe6feb 100644
+--- a/fs/quota/dquot.c
++++ b/fs/quota/dquot.c
+@@ -1024,13 +1024,13 @@ static int dqinit_needed(struct inode *inode, int type)
+ static int add_dquot_ref(struct super_block *sb, int type)
  {
--	struct hlist_head *head = i_hash_head(sb, ino);
-+	struct hlist_bl_head *b = i_hash_head(sb, ino);
- 	struct inode *inode;
- again:
--	spin_lock(&inode_hash_lock);
--	inode = find_inode_fast(sb, head, ino);
--	spin_unlock(&inode_hash_lock);
-+	hlist_bl_lock(b);
-+	inode = find_inode_fast(sb, b, ino);
-+	hlist_bl_unlock(b);
+ 	struct inode *inode, *old_inode = NULL;
++	DEFINE_DLOCK_LIST_ITER(iter, &sb->s_inodes);
+ #ifdef CONFIG_QUOTA_DEBUG
+ 	int reserved = 0;
+ #endif
+ 	int err = 0;
  
- 	if (inode) {
- 		if (IS_ERR(inode))
-@@ -1556,12 +1603,13 @@ struct inode *find_inode_nowait(struct super_block *sb,
- 					     void *),
- 				void *data)
- {
--	struct hlist_head *head = i_hash_head(sb, hashval);
-+	struct hlist_bl_head *b = i_hash_head(sb, hashval);
-+	struct hlist_bl_node *node;
- 	struct inode *inode, *ret_inode = NULL;
- 	int mval;
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		spin_lock(&inode->i_lock);
+ 		if ((inode->i_state & (I_FREEING|I_WILL_FREE|I_NEW)) ||
+ 		    !atomic_read(&inode->i_writecount) ||
+@@ -1040,7 +1040,7 @@ static int add_dquot_ref(struct super_block *sb, int type)
+ 		}
+ 		__iget(inode);
+ 		spin_unlock(&inode->i_lock);
+-		spin_unlock(&sb->s_inode_list_lock);
++		dlock_list_unlock(&iter);
  
--	spin_lock(&inode_hash_lock);
--	hlist_for_each_entry(inode, head, i_hash) {
-+	hlist_bl_lock(b);
-+	hlist_bl_for_each_entry(inode, node, b, i_hash) {
- 		if (inode->i_sb != sb)
- 			continue;
- 		mval = match(inode, hashval, data);
-@@ -1572,7 +1620,7 @@ struct inode *find_inode_nowait(struct super_block *sb,
- 		goto out;
+ #ifdef CONFIG_QUOTA_DEBUG
+ 		if (unlikely(inode_get_rsv_space(inode) > 0))
+@@ -1053,19 +1053,10 @@ static int add_dquot_ref(struct super_block *sb, int type)
+ 			goto out;
+ 		}
+ 
+-		/*
+-		 * We hold a reference to 'inode' so it couldn't have been
+-		 * removed from s_inodes list while we dropped the
+-		 * s_inode_list_lock. We cannot iput the inode now as we can be
+-		 * holding the last reference and we cannot iput it under
+-		 * s_inode_list_lock. So we keep the reference and iput it
+-		 * later.
+-		 */
+ 		old_inode = inode;
+ 		cond_resched();
+-		spin_lock(&sb->s_inode_list_lock);
++		dlock_list_relock(&iter);
  	}
+-	spin_unlock(&sb->s_inode_list_lock);
+ 	iput(old_inode);
  out:
--	spin_unlock(&inode_hash_lock);
-+	hlist_bl_unlock(b);
- 	return ret_inode;
- }
- EXPORT_SYMBOL(find_inode_nowait);
-@@ -1601,13 +1649,14 @@ EXPORT_SYMBOL(find_inode_nowait);
- struct inode *find_inode_rcu(struct super_block *sb, unsigned long hashval,
- 			     int (*test)(struct inode *, void *), void *data)
+ #ifdef CONFIG_QUOTA_DEBUG
+@@ -1081,12 +1072,12 @@ static int add_dquot_ref(struct super_block *sb, int type)
+ static void remove_dquot_ref(struct super_block *sb, int type)
  {
--	struct hlist_head *head = i_hash_head(sb, hashval);
-+	struct hlist_bl_head *b = i_hash_head(sb, hashval);
-+	struct hlist_bl_node *node;
  	struct inode *inode;
++	DEFINE_DLOCK_LIST_ITER(iter, &sb->s_inodes);
+ #ifdef CONFIG_QUOTA_DEBUG
+ 	int reserved = 0;
+ #endif
  
- 	RCU_LOCKDEP_WARN(!rcu_read_lock_held(),
- 			 "suspicious find_inode_rcu() usage");
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		/*
+ 		 *  We have to scan also I_NEW inodes because they can already
+ 		 *  have quota pointer initialized. Luckily, we need to touch
+@@ -1108,7 +1099,6 @@ static void remove_dquot_ref(struct super_block *sb, int type)
+ 		}
+ 		spin_unlock(&dq_data_lock);
+ 	}
+-	spin_unlock(&sb->s_inode_list_lock);
+ #ifdef CONFIG_QUOTA_DEBUG
+ 	if (reserved) {
+ 		printk(KERN_WARNING "VFS (%s): Writes happened after quota"
+diff --git a/fs/super.c b/fs/super.c
+index 076392396e72..61c19e3f06d8 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -303,6 +303,7 @@ static void destroy_unused_super(struct super_block *s)
+ 	super_unlock_excl(s);
+ 	list_lru_destroy(&s->s_dentry_lru);
+ 	list_lru_destroy(&s->s_inode_lru);
++	free_dlock_list_heads(&s->s_inodes);
+ 	security_sb_free(s);
+ 	put_user_ns(s->s_user_ns);
+ 	kfree(s->s_subtype);
+@@ -367,8 +368,6 @@ static struct super_block *alloc_super(struct file_system_type *type, int flags,
+ 	INIT_HLIST_NODE(&s->s_instances);
+ 	INIT_HLIST_BL_HEAD(&s->s_roots);
+ 	mutex_init(&s->s_sync_lock);
+-	INIT_LIST_HEAD(&s->s_inodes);
+-	spin_lock_init(&s->s_inode_list_lock);
+ 	INIT_LIST_HEAD(&s->s_inodes_wb);
+ 	spin_lock_init(&s->s_inode_wblist_lock);
  
--	hlist_for_each_entry_rcu(inode, head, i_hash) {
-+	hlist_bl_for_each_entry_rcu(inode, node, b, i_hash) {
- 		if (inode->i_sb == sb &&
- 		    !(READ_ONCE(inode->i_state) & (I_FREEING | I_WILL_FREE)) &&
- 		    test(inode, data))
-@@ -1639,13 +1688,14 @@ EXPORT_SYMBOL(find_inode_rcu);
- struct inode *find_inode_by_ino_rcu(struct super_block *sb,
- 				    unsigned long ino)
- {
--	struct hlist_head *head = i_hash_head(sb, ino);
-+	struct hlist_bl_head *b = i_hash_head(sb, ino);
-+	struct hlist_bl_node *node;
- 	struct inode *inode;
+@@ -383,6 +382,9 @@ static struct super_block *alloc_super(struct file_system_type *type, int flags,
+ 	s->s_time_min = TIME64_MIN;
+ 	s->s_time_max = TIME64_MAX;
  
- 	RCU_LOCKDEP_WARN(!rcu_read_lock_held(),
- 			 "suspicious find_inode_by_ino_rcu() usage");
- 
--	hlist_for_each_entry_rcu(inode, head, i_hash) {
-+	hlist_bl_for_each_entry_rcu(inode, node, b, i_hash) {
- 		if (inode->i_ino == ino &&
- 		    inode->i_sb == sb &&
- 		    !(READ_ONCE(inode->i_state) & (I_FREEING | I_WILL_FREE)))
-@@ -1659,39 +1709,42 @@ int insert_inode_locked(struct inode *inode)
- {
- 	struct super_block *sb = inode->i_sb;
- 	ino_t ino = inode->i_ino;
--	struct hlist_head *head = i_hash_head(sb, ino);
-+	struct hlist_bl_head *b = i_hash_head(sb, ino);
- 
- 	while (1) {
--		struct inode *old = NULL;
--		spin_lock(&inode_hash_lock);
--		hlist_for_each_entry(old, head, i_hash) {
--			if (old->i_ino != ino)
-+		struct hlist_bl_node *node;
-+		struct inode *old = NULL, *t;
++	if (alloc_dlock_list_heads(&s->s_inodes))
++		goto fail;
 +
-+		hlist_bl_lock(b);
-+		hlist_bl_for_each_entry(t, node, b, i_hash) {
-+			if (t->i_ino != ino)
- 				continue;
--			if (old->i_sb != sb)
-+			if (t->i_sb != sb)
- 				continue;
--			spin_lock(&old->i_lock);
--			if (old->i_state & (I_FREEING|I_WILL_FREE)) {
--				spin_unlock(&old->i_lock);
-+			spin_lock(&t->i_lock);
-+			if (t->i_state & (I_FREEING|I_WILL_FREE)) {
-+				spin_unlock(&t->i_lock);
- 				continue;
+ 	s->s_shrink = shrinker_alloc(SHRINKER_NUMA_AWARE | SHRINKER_MEMCG_AWARE,
+ 				     "sb-%s", type->name);
+ 	if (!s->s_shrink)
+@@ -695,7 +697,7 @@ void generic_shutdown_super(struct super_block *sb)
+ 		if (sop->put_super)
+ 			sop->put_super(sb);
+ 
+-		if (CHECK_DATA_CORRUPTION(!list_empty(&sb->s_inodes),
++		if (CHECK_DATA_CORRUPTION(!dlock_lists_empty(&sb->s_inodes),
+ 				"VFS: Busy inodes after unmount of %s (%s)",
+ 				sb->s_id, sb->s_type->name)) {
+ 			/*
+@@ -704,14 +706,13 @@ void generic_shutdown_super(struct super_block *sb)
+ 			 * iput_final() or such crashes cleanly.
+ 			 */
+ 			struct inode *inode;
++			DEFINE_DLOCK_LIST_ITER(iter, &sb->s_inodes);
+ 
+-			spin_lock(&sb->s_inode_list_lock);
+-			list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++			dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 				inode->i_op = VFS_PTR_POISON;
+ 				inode->i_sb = VFS_PTR_POISON;
+ 				inode->i_mapping = VFS_PTR_POISON;
  			}
-+			old = t;
- 			break;
+-			spin_unlock(&sb->s_inode_list_lock);
  		}
- 		if (likely(!old)) {
- 			spin_lock(&inode->i_lock);
- 			inode->i_state |= I_NEW | I_CREATING;
--			hlist_add_head_rcu(&inode->i_hash, head);
-+			__insert_inode_hash_head(inode, b);
- 			spin_unlock(&inode->i_lock);
--			spin_unlock(&inode_hash_lock);
-+			hlist_bl_unlock(b);
- 			return 0;
- 		}
- 		if (unlikely(old->i_state & I_CREATING)) {
- 			spin_unlock(&old->i_lock);
--			spin_unlock(&inode_hash_lock);
-+			hlist_bl_unlock(b);
- 			return -EBUSY;
- 		}
- 		__iget(old);
- 		spin_unlock(&old->i_lock);
--		spin_unlock(&inode_hash_lock);
-+		hlist_bl_unlock(b);
- 		wait_on_inode(old);
- 		if (unlikely(!inode_unhashed(old))) {
- 			iput(old);
-@@ -2271,17 +2324,18 @@ EXPORT_SYMBOL(inode_needs_sync);
-  * wake_up_bit(&inode->i_state, __I_NEW) after removing from the hash list
-  * will DTRT.
-  */
--static void __wait_on_freeing_inode(struct inode *inode)
-+static void __wait_on_freeing_inode(struct hlist_bl_head *b,
-+				struct inode *inode)
- {
- 	wait_queue_head_t *wq;
- 	DEFINE_WAIT_BIT(wait, &inode->i_state, __I_NEW);
- 	wq = bit_waitqueue(&inode->i_state, __I_NEW);
- 	prepare_to_wait(wq, &wait.wq_entry, TASK_UNINTERRUPTIBLE);
- 	spin_unlock(&inode->i_lock);
--	spin_unlock(&inode_hash_lock);
-+	hlist_bl_unlock(b);
- 	schedule();
- 	finish_wait(wq, &wait.wq_entry);
--	spin_lock(&inode_hash_lock);
-+	hlist_bl_lock(b);
- }
- 
- static __initdata unsigned long ihash_entries;
-@@ -2307,7 +2361,7 @@ void __init inode_init_early(void)
- 
- 	inode_hashtable =
- 		alloc_large_system_hash("Inode-cache",
--					sizeof(struct hlist_head),
-+					sizeof(struct hlist_bl_head),
- 					ihash_entries,
- 					14,
- 					HASH_EARLY | HASH_ZERO,
-@@ -2333,7 +2387,7 @@ void __init inode_init(void)
- 
- 	inode_hashtable =
- 		alloc_large_system_hash("Inode-cache",
--					sizeof(struct hlist_head),
-+					sizeof(struct hlist_bl_head),
- 					ihash_entries,
- 					14,
- 					HASH_ZERO,
+ 	}
+ 	/*
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index bb35591733f1..0ef1b72340c7 100644
+index 98b7a7a8c42e..bb35591733f1 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -692,7 +692,8 @@ struct inode {
- 	unsigned long		dirtied_when;	/* jiffies of first dirtying */
- 	unsigned long		dirtied_time_when;
+@@ -43,6 +43,7 @@
+ #include <linux/cred.h>
+ #include <linux/mnt_idmapping.h>
+ #include <linux/slab.h>
++#include <linux/dlock-list.h>
  
--	struct hlist_node	i_hash;
-+	struct hlist_bl_node	i_hash;
-+	struct hlist_bl_head	*i_hash_head;
- 	struct list_head	i_io_list;	/* backing dev IO list */
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct bdi_writeback	*i_wb;		/* the associated cgroup wb */
-@@ -758,7 +759,7 @@ static inline unsigned int i_blocksize(const struct inode *node)
+ #include <asm/byteorder.h>
+ #include <uapi/linux/fs.h>
+@@ -702,7 +703,7 @@ struct inode {
+ 	u16			i_wb_frn_history;
+ #endif
+ 	struct list_head	i_lru;		/* inode LRU list */
+-	struct list_head	i_sb_list;
++	struct dlock_list_node	i_sb_list;
+ 	struct list_head	i_wb_list;	/* backing dev writeback list */
+ 	union {
+ 		struct hlist_head	i_dentry;
+@@ -1315,9 +1316,8 @@ struct super_block {
+ 	 */
+ 	int s_stack_depth;
  
- static inline int inode_unhashed(struct inode *inode)
+-	/* s_inode_list_lock protects s_inodes */
+-	spinlock_t		s_inode_list_lock ____cacheline_aligned_in_smp;
+-	struct list_head	s_inodes;	/* all inodes */
++	/* The internal per-list locks protect s_inodes */
++	struct dlock_list_heads s_inodes;	/* all inodes */
+ 
+ 	spinlock_t		s_inode_wblist_lock;
+ 	struct list_head	s_inodes_wb;	/* writeback inodes */
+diff --git a/security/landlock/fs.c b/security/landlock/fs.c
+index bc7c126deea2..4269d9938c09 100644
+--- a/security/landlock/fs.c
++++ b/security/landlock/fs.c
+@@ -844,12 +844,12 @@ static void hook_inode_free_security(struct inode *const inode)
+ static void hook_sb_delete(struct super_block *const sb)
  {
--	return hlist_unhashed(&inode->i_hash);
-+	return hlist_bl_unhashed(&inode->i_hash);
- }
+ 	struct inode *inode, *prev_inode = NULL;
++	DEFINE_DLOCK_LIST_ITER(iter, &sb->s_inodes);
  
- /*
-@@ -769,7 +770,7 @@ static inline int inode_unhashed(struct inode *inode)
-  */
- static inline void inode_fake_hash(struct inode *inode)
- {
--	hlist_add_fake(&inode->i_hash);
-+	hlist_bl_add_fake(&inode->i_hash);
- }
+ 	if (!landlock_initialized)
+ 		return;
  
- /*
-@@ -2946,7 +2947,7 @@ static inline void insert_inode_hash(struct inode *inode)
- extern void __remove_inode_hash(struct inode *);
- static inline void remove_inode_hash(struct inode *inode)
- {
--	if (!inode_unhashed(inode) && !hlist_fake(&inode->i_hash))
-+	if (!inode_unhashed(inode) && !hlist_bl_fake(&inode->i_hash))
- 		__remove_inode_hash(inode);
- }
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	dlist_for_each_entry(inode, &iter, i_sb_list) {
+ 		struct landlock_object *object;
  
+ 		/* Only handles referenced inodes. */
+@@ -883,6 +883,7 @@ static void hook_sb_delete(struct super_block *const sb)
+ 		/* Keeps a reference to this inode until the next loop walk. */
+ 		__iget(inode);
+ 		spin_unlock(&inode->i_lock);
++		dlock_list_unlock(&iter);
+ 
+ 		/*
+ 		 * If there is no concurrent release_inode() ongoing, then we
+@@ -917,25 +918,11 @@ static void hook_sb_delete(struct super_block *const sb)
+ 			rcu_read_unlock();
+ 		}
+ 
+-		if (prev_inode) {
+-			/*
+-			 * At this point, we still own the __iget() reference
+-			 * that we just set in this loop walk.  Therefore we
+-			 * can drop the list lock and know that the inode won't
+-			 * disappear from under us until the next loop walk.
+-			 */
+-			spin_unlock(&sb->s_inode_list_lock);
+-			/*
+-			 * We can now actually put the inode reference from the
+-			 * previous loop walk, which is not needed anymore.
+-			 */
+-			iput(prev_inode);
+-			cond_resched();
+-			spin_lock(&sb->s_inode_list_lock);
+-		}
++		iput(prev_inode);
+ 		prev_inode = inode;
++		cond_resched();
++		dlock_list_relock(&iter);
+ 	}
+-	spin_unlock(&sb->s_inode_list_lock);
+ 
+ 	/* Puts the inode reference from the last loop walk, if any. */
+ 	if (prev_inode)
 -- 
 2.42.0
 
