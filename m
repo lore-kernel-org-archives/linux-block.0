@@ -1,85 +1,133 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NP5RQzWn"
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C64ED59
-	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 14:40:41 -0800 (PST)
-Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-58dd5193db4so36777eaf.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Dec 2023 14:40:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="X/AC4GTb"
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AB8419A1
+	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 15:04:59 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-2868cf6cb82so313099a91.3
+        for <linux-block@vger.kernel.org>; Wed, 06 Dec 2023 15:04:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1701902440; x=1702507240; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OAg6IU+L83TOHlh/mEafNkn0GjjiO2CUCPVmGp0iqEA=;
-        b=NP5RQzWn0ihAsWAt6fgpB7YqZr/yKojAUjB22VALW2FEv1UY9M1NK6SkH4LrgeEmAb
-         2mr5N7fsv3jpoXJLCtbtCOZ+nLCD+GSSZ7dY/2U7+/oo8yiiSbOKwLWY0Adg8VuKNyCs
-         sQ6qzupiCWpdT4A4P94zEQjGdfeB8doun+CWQZ0951+hSPBfj16+UyamA2sNym1rAYeL
-         HezggGdmxN8nR6PmgINAB0PIIy03OLlKiTOiEttEoS0hs3tMvQ59xIhyzq8F8AUBwEo8
-         hxMSwE3f1RRscS6zO4ZU9SicJQPbF8xu1p+2efxTXxsAzsjVFYjybLxDWKAq7xOjKB1z
-         18RQ==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1701903899; x=1702508699; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HI6nSYbxQkTs8xlGNUbdTpMvMqVQhr8L/otXNNzVlQ4=;
+        b=X/AC4GTbE3uhVxgQIQxC1dZXACc/OGrorhCehU5kixCH34it2DuWkcVgoDdknM25Z+
+         VsE4BQEyDiPND6y6ZDxxTvlG4uwvnY20AkE7yvfyRejcIyhmcH64gllXifMdAhxSBckC
+         bqA+sDP0qzq2wBC+ucwwcQj6DrNfjzGLRJQAZfu5fEfgiaL3xieEul6oAmsg4c0WHF+W
+         FsxKhxYWtpfdT0v+jEcYmVjggvHHl08G0YD8h60idaFELR7qG4yDNBCMh4Sztf2COXrZ
+         4TFFn9dDy+4/ypxzScwYlG1sg08pCgaQAZhZ7n+BuljuE0ZR/INQMs2guKUic0A2prDz
+         A3BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701902440; x=1702507240;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1701903899; x=1702508699;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAg6IU+L83TOHlh/mEafNkn0GjjiO2CUCPVmGp0iqEA=;
-        b=aGVBxbkCEJOWk7zteRPNr+PWqS088i8Cpetk3F/ni/FOxDR7NVM1ry+SDBXmIerizY
-         uUMOsiXshCFyWPJ4eYAsJcOeWfyySzSrUoItn+0vkOBcOCqatNX152vPa0Sh8Mfh2m5k
-         k7LvoT6EAX4gBzqtnc1nMbtB66eXBntGEHyfaU8COvPaA69lX1JSECQX8pbnbzhBUwiA
-         twYR6ASEfr+0QQKYVeEZ9NCswM+9/+DeBQconUOn8vyGIKm+BmlxCVkwdGDDORpsAOKw
-         rlgjEalZNCIzKxpUZsPJARdUfrrfbKUg51R6uigGHojUWQOCduoH771SDDyMryVWcI7w
-         9f/Q==
-X-Gm-Message-State: AOJu0YwlauecIMtvkKXlrGJqsHuoy2LGIJd8jszILvc6nRSX+k8Nrc80
-	xLuI4WO3lEJ64xMUh6HjgESCuw==
-X-Google-Smtp-Source: AGHT+IHcdPtRZ/szsRDjMYTvx1WWuzfyrQ7nSkUukPv0HCce7J6rgvbMjcCwcsj8YShSR0JUyyH47g==
-X-Received: by 2002:a05:6358:5925:b0:16e:b5d:43ce with SMTP id g37-20020a056358592500b0016e0b5d43cemr3720343rwf.0.1701902440398;
-        Wed, 06 Dec 2023 14:40:40 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id ka42-20020a056a0093aa00b006ce9fb08502sm29767pfb.46.2023.12.06.14.40.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 14:40:39 -0800 (PST)
-Message-ID: <72bf57b0-b5fb-4309-8bfb-63a207a52df7@kernel.dk>
-Date: Wed, 6 Dec 2023 15:40:38 -0700
+        bh=HI6nSYbxQkTs8xlGNUbdTpMvMqVQhr8L/otXNNzVlQ4=;
+        b=ZYjHxQSceqCHE0yhY78l34lZ+H0kJzH53Q8n6qbtuQIbpByYxE06xrvIG0YNF4m89r
+         D6vRoDjgNC/1o2ee2uuEV+YBBpkUW2lu6k5az7eIwiqGc1npiQJflT3iMsmeFhL+axhq
+         qeUvNso+vDufbAR5DaVsaiNmiluvZ83QAvZuWzUEelqlQIBybZdkfd9xu3NBjxO7wuSp
+         puScEQQBF5+KhKAOo12KPF+bkdeqTL08vXmjDRBgwHhZ6g+HguEmCFRlQ8wCYbsmStpZ
+         4S6qQuMUUfmaIvehdwm0EmhDNZIAqHnUZzstoHxLZQFFAqJBUK/3lG1ZkbpCeynXuWF9
+         8T4g==
+X-Gm-Message-State: AOJu0YxMNRfTlfahD7v05lPCwEdGuXsAzbVD6dSHLeKPJiMvGBu21psK
+	Y41wwBDYUeg1rWvod0S/ccX3nQ==
+X-Google-Smtp-Source: AGHT+IGtV8O0jKV+PArM/vMQoTwS1VwmuVzmwzYgDqA70uTeS8V1FVVZ04FDi0IUF605HhQUM9Ny9w==
+X-Received: by 2002:a17:90a:dc13:b0:286:6cc0:b910 with SMTP id i19-20020a17090adc1300b002866cc0b910mr1289456pjv.71.1701903898922;
+        Wed, 06 Dec 2023 15:04:58 -0800 (PST)
+Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
+        by smtp.gmail.com with ESMTPSA id l4-20020a170902eb0400b001d0ca40157bsm326478plb.260.2023.12.06.15.04.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 15:04:58 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rB0wp-004p7R-2v;
+	Thu, 07 Dec 2023 10:04:55 +1100
+Date: Thu, 7 Dec 2023 10:04:55 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Paul Moore <paul@paul-moore.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-cachefs@redhat.com, dhowells@redhat.com, gfs2@lists.linux.dev,
+	dm-devel@lists.linux.dev, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/11] selinux: use dlist for isec inode list
+Message-ID: <ZXD+F5N/3PPSGTya@dread.disaster.area>
+References: <20231206060629.2827226-1-david@fromorbit.com>
+ <20231206060629.2827226-6-david@fromorbit.com>
+ <CAHC9VhTP3hRAkmp7wOKGrEzY5OXXJpnuofTG_+KdXDku18vkeA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] block: Rework bio_for_each_segment_all()
-Content-Language: en-US
-To: Kent Overstreet <kent.overstreet@linux.dev>,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>, Phillip Lougher <phillip@squashfs.org.uk>
-References: <20231122232818.178256-1-kent.overstreet@linux.dev>
- <20231206213424.rn7i42zoyo6zxufk@moria.home.lan>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231206213424.rn7i42zoyo6zxufk@moria.home.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHC9VhTP3hRAkmp7wOKGrEzY5OXXJpnuofTG_+KdXDku18vkeA@mail.gmail.com>
 
-On 12/6/23 2:34 PM, Kent Overstreet wrote:
-> On Wed, Nov 22, 2023 at 06:28:13PM -0500, Kent Overstreet wrote:
->> This patch reworks bio_for_each_segment_all() to be more inline with how
->> the other bio iterators work:
->>
->>  - bio_iter_all_peek() now returns a synthesized bio_vec; we don't stash
->>    one in the iterator and pass a pointer to it - bad. This way makes it
->>    clearer what's a constructed value vs. a reference to something
->>    pre-existing, and it also will help with cleaning up and
->>    consolidating code with bio_for_each_folio_all().
->>
->>  - We now provide bio_for_each_segment_all_continue(), for squashfs:
->>    this makes their code clearer.
+On Wed, Dec 06, 2023 at 04:52:42PM -0500, Paul Moore wrote:
+> On Wed, Dec 6, 2023 at 1:07 AM Dave Chinner <david@fromorbit.com> wrote:
+> >
+> > From: Dave Chinner <dchinner@redhat.com>
+> >
+> > Because it's a horrible point of lock contention under heavily
+> > concurrent directory traversals...
+> >
+> >   - 12.14% d_instantiate
+> >      - 12.06% security_d_instantiate
+> >         - 12.13% selinux_d_instantiate
+> >            - 12.16% inode_doinit_with_dentry
+> >               - 15.45% _raw_spin_lock
+> >                  - do_raw_spin_lock
+> >                       14.68% __pv_queued_spin_lock_slowpath
+> >
+> >
+> > Signed-off-by: Dave Chinner <dchinner@redhat.com>
+> > ---
+> >  include/linux/dlock-list.h        |  9 ++++
+> >  security/selinux/hooks.c          | 72 +++++++++++++++----------------
+> >  security/selinux/include/objsec.h |  6 +--
+> >  3 files changed, 47 insertions(+), 40 deletions(-)
 > 
-> Jens, can we _please_ get this series merged so bcachefs isn't reaching
-> into bio/bvec internals?
+> In the cover letter you talk about testing, but I didn't see any
+> mention of testing with SELinux enabled.  Given the lock contention
+> stats in the description above I'm going to assume you did test this
+> and pass along my ACK, but if you haven't tested the changes below
+> please do before sending this anywhere important.
 
-Haven't gotten around to review it fully yet, and nobody else has either
-fwiw. Would be nice with some reviews.
+AFAIA, I've been testing with selinux enabled - I'm trying to run
+these tests in an environment as close to typical production systems
+as possible and that means selinux needs to be enabled.
 
+As such, all the fstests and perf testing has been done with selinux
+in permissive mode using "-o context=system_u:object_r:root_t:s0" as
+the default context for the mount.
+
+I see this sort of thing in the profiles:
+
+- 87.13% path_lookupat
+   - 86.46% walk_component
+      - 84.20% lookup_slow
+	 - 84.05% __lookup_slow
+	    - 80.81% xfs_vn_lookup
+	       - 77.84% xfs_lookup
+....
+	       - 2.91% d_splice_alias
+		  - 1.52% security_d_instantiate
+		     - 1.50% selinux_d_instantiate
+			- 1.47% inode_doinit_with_dentry
+			   - 0.83% inode_doinit_use_xattr
+				0.52% __vfs_getxattr
+
+Which tells me that selinux is definitely doing -something- on every
+inode being instantiated, so I'm pretty sure the security and
+selinux paths are getting exercised...
+
+> Acked-by: Paul Moore <paul@paul-moore.com>
+
+Thanks!
+
+-Dave.
 -- 
-Jens Axboe
-
-
+Dave Chinner
+david@fromorbit.com
