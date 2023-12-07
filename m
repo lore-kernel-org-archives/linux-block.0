@@ -1,117 +1,108 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="MD/Bumpr"
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45074D44
-	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 23:20:47 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1d069b1d127so4291785ad.0
-        for <linux-block@vger.kernel.org>; Wed, 06 Dec 2023 23:20:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1701933647; x=1702538447; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j53nqNU7jMgvgRvYSWrD1Dh7t93e+rnrWj/PotqK0BA=;
-        b=MD/BumprF9xqKfB6752eRZ7GFq5+Z+EHobjhRN9QVvWTlCycgN+FjkZhwUstXhzhl7
-         yauWSk2aeLHice2vdJvlYjnZCwv9dMbyCdQV5Vyf+I0QXhn8JZjYMYph+PnXLu3BwuCf
-         wY9Q7hRq8DnzPdMcmc1KA3/dPjzau/dtue2TOAQMW89ITKqn9O1+DY8lXY7xnBnJch9x
-         29buCJZe1/nlC0vZkGyDbTxMQQdMKSRZ6hCDcnPg9cQGZFrBA5Alh3C6JSD9TaVy0kUV
-         pjgrKOBfHVkPJ8VauSuGxZSO7vYoQTwtvdRddF0x6YWI9VrcJLHbxMTTui7vYnRP0XZn
-         eOYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701933647; x=1702538447;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j53nqNU7jMgvgRvYSWrD1Dh7t93e+rnrWj/PotqK0BA=;
-        b=k3RH+/dObplA86ksb/1WE1HG0ObFPZXMWPHbsr0r0CIOAGehhzd5P3F0NtTxVGFpBA
-         +eTcpIZsHlU/vZXI5fBbR0tpXtxcHWJx2WQTtnG3drnCZgkQk2+N5XvBKcV04nutsCyA
-         D18QHUfEzuv2t1PRstRjmAL0/pHTpB+8je0w01Jvvkam6j9SDkymfUvi7uX5qk7OfuGR
-         aMiRwO+S/eoDSnUYpB+oRtGn1GrWdZ3cApKquE5Wl+EdzOUIqGhfH0F6tuWynfxTbKMA
-         cxmnPT1/zpMren+3cSewmR5TO41qiByun0SR++SLY7GN8RruHL2zzmTZ0ZLj95KobgBe
-         yf5g==
-X-Gm-Message-State: AOJu0Yzc/B9DJa+6dOJ1armzt96ZUEvSxoUSM4M1i3Ug9fyT8OWW2mEM
-	An0+voROVWl5ydl5dwT96l60uw==
-X-Google-Smtp-Source: AGHT+IEcHwrgZ609ib1Kc+VIk23LvoQqX7Hw9/y0DIrVmUjiSFR5zAD8EnbsROb67jMnfQsP0p39Qw==
-X-Received: by 2002:a17:903:2448:b0:1d0:9416:efec with SMTP id l8-20020a170903244800b001d09416efecmr2048898pls.74.1701933646273;
-        Wed, 06 Dec 2023 23:20:46 -0800 (PST)
-Received: from smtpclient.apple ([8.210.91.195])
-        by smtp.gmail.com with ESMTPSA id p14-20020a170902e74e00b001d04c097d32sm624915plf.270.2023.12.06.23.20.43
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Dec 2023 23:20:45 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wh70aY3q"
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239231AD;
+	Wed,  6 Dec 2023 23:27:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=7reiZj9zur86NcKW9Z3NM8dpV8YTIvvmOrGho5B9fuE=; b=Wh70aY3qfNq/eoknmeAT/td7Ks
+	XGIzQJ7jaItCrbqi+AmZKMTRKRIAR4ECsRA5Y8EqEes5jz2rlUgnfKFfGR2siHYX4XizKw5wrBZoM
+	z5WRGkPdgY4YpDl5gwV/37KUjmTDKnzFa0ApseBqX30n1XE2vrytLbwy61xTYS/bJgt/IJ53Z2FEM
+	qkZ2G5JXkh5W/16YdQAHECEtpMkUtevQ8x68/MmU/6QLJ2V0XswDpyNaeCTrOSxRe7YWKyDtCUnFh
+	CknUX3XcqQWxDMyi3AdKxKF7PCSzn2U5LaqK0RO0RKkx8PtdQKig/wmWuH7YY/aRm4ZhgScxnxksc
+	QIUvE3Xw==;
+Received: from [2001:4bb8:191:e7ca:4bf6:cea4:9bbf:8b02] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rB8mz-00C4xo-1S;
+	Thu, 07 Dec 2023 07:27:17 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Christian Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>,
+	Chandan Babu R <chandan.babu@oracle.com>,
+	Zhang Yi <yi.zhang@huaweicloud.com>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev
+Subject: [PATCH 01/14] iomap: clear the per-folio dirty bits on all writeback failures
+Date: Thu,  7 Dec 2023 08:26:57 +0100
+Message-Id: <20231207072710.176093-2-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231207072710.176093-1-hch@lst.de>
+References: <20231207072710.176093-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.100.2.1.4\))
-Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
-From: Li Feng <fengli@smartx.com>
-In-Reply-To: <9b963af6-0a3f-4957-9227-43673e70b720@nvidia.com>
-Date: Thu, 7 Dec 2023 15:21:44 +0800
-Cc: Jens Axboe <axboe@kernel.dk>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- "open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <ADCE81A1-D65A-41C4-A485-66E1B056B1CC@smartx.com>
-References: <20231207043118.118158-1-fengli@smartx.com>
- <9b963af6-0a3f-4957-9227-43673e70b720@nvidia.com>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-X-Mailer: Apple Mail (2.3774.100.2.1.4)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+write_cache_pages always clear the page dirty bit before calling into the
+file systems, and leaves folios with a writeback failure without the
+dirty bit after return.  We also clear the per-block writeback bits for
+writeback failures unless no I/O has submitted, which will leave the
+folio in an inconsistent state where it doesn't have the folio dirty,
+but one or more per-block dirty bits.  This seems to be due the place
+where the iomap_clear_range_dirty call was inserted into the existing
+not very clearly structured code when adding per-block dirty bit support
+and not actually intentional.  Switch to always clearing the dirty on
+writeback failure.
 
+Fixes: 4ce02c679722 ("iomap: Add per-block dirty state tracking to improve performance")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/iomap/buffered-io.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-> On Dec 7, 2023, at 14:53, Chaitanya Kulkarni <chaitanyak@nvidia.com> =
-wrote:
->=20
-> On 12/6/23 20:31, Li Feng wrote:
->> virtio-blk is generally used in cloud computing scenarios, where the
->> performance of virtual disks is very important. The mq-deadline =
-scheduler
->> has a big performance drop compared to none with single queue. In my =
-tests,
->> mq-deadline 4k readread iops were 270k compared to 450k for none. So =
-here
->> the default scheduler of virtio-blk is set to "none".
->>=20
->> Signed-off-by: Li Feng <fengli@smartx.com>
->> ---
->>=20
->=20
-> This patch looks good to me, however I'd update the commit log and add
-> performance numbers for the non-mq case also, just in-case to show =
-that we
-> are not breaking non-mq setup.
->=20
-> Being said that, in case we want to be future proof, we can also think =
-of
-> adding a module param so if someone comes with a scenario where =
-NO_SCHED is
-> not providing the performance then they can just use the module =
-parameter
-> instead of again editing the code, irrespective of that :-
->=20
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
->=20
-> -ck
-
-Hi ck,
-
-What I put above(450k vs 270k) is the data of single queue(non-mq). I =
-think
-we don=E2=80=99t need to add module parameters because the scheduler can =
-be modified
-through sysfs.
-
-Thanks.
-
->=20
->=20
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index f72df2babe561a..fc5c64712318aa 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -1843,16 +1843,10 @@ iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+ 	if (unlikely(error)) {
+ 		/*
+ 		 * Let the filesystem know what portion of the current page
+-		 * failed to map. If the page hasn't been added to ioend, it
+-		 * won't be affected by I/O completion and we must unlock it
+-		 * now.
++		 * failed to map.
+ 		 */
+ 		if (wpc->ops->discard_folio)
+ 			wpc->ops->discard_folio(folio, pos);
+-		if (!count) {
+-			folio_unlock(folio);
+-			goto done;
+-		}
+ 	}
+ 
+ 	/*
+@@ -1861,6 +1855,16 @@ iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+ 	 * all the dirty bits in the folio here.
+ 	 */
+ 	iomap_clear_range_dirty(folio, 0, folio_size(folio));
++
++	/*
++	 * If the page hasn't been added to the ioend, it won't be affected by
++	 * I/O completion and we must unlock it now.
++	 */
++	if (error && !count) {
++		folio_unlock(folio);
++		goto done;
++	}
++
+ 	folio_start_writeback(folio);
+ 	folio_unlock(folio);
+ 
+-- 
+2.39.2
 
