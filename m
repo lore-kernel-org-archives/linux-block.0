@@ -1,58 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="iNg3ojIL"
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15093D44
-	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 22:03:18 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6ce831cbba6so187446b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 06 Dec 2023 22:03:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="ZI+91xDc"
+Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E7AD4B
+	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 22:25:48 -0800 (PST)
+Received: by mail-oo1-xc2c.google.com with SMTP id 006d021491bc7-58d08497aa1so185085eaf.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Dec 2023 22:25:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1701928997; x=1702533797; darn=vger.kernel.org;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1701930348; x=1702535148; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pw2nLSqvqX2XEheC59D1y8xR9yWzVJ975ni9isQco04=;
-        b=iNg3ojILUH+npH7vCfbZrwNGYrBHYFdEGWzBdNo0xywLZ+puNN8h6eupGiCAyHIcaG
-         v8kmphKRSi2biLPMvItjVf/+rj76PPVRFDpMycUJgcTpFmzkSkLsduASw3LsK/fy9LnQ
-         pCmFap0wXcJ4TS1w+x8kQKqjTOq9TIGvVTEJuA3/ZwJ+CKZPjnw+R83C/wXn7Ifrc30j
-         uimqTo+p3GH3XLNmziVCiGwm86yhy1MZ/t/+UtJL4qRUGMk07fLasXeg3GG6K37Dbe36
-         1i64UjjOvlKArHuEFMgqbikgQ+e7K3of2cL+sdjUKUHkPXh5jUtPdpfgI+EtsWQiNeNY
-         oaxg==
+        bh=1Hc+mPiQaNeuf4gnfMuq7zF4MPfoPt0lbfiwHLrs3YI=;
+        b=ZI+91xDcsCBQXsuxqT372YrRlZLUkAUD8xQBVY1FfX4NzzN5POmyueEtbN6XBtggda
+         ewVkfPfThTDe7Wx6c8TeVn92MVnPR3feHLJOGWN7N9tqpUQd1+3Hu/LYMdEhCCC9DLXQ
+         UPLC0UN0VhtFvX6OQasz8RgZu/f8P3B7CrNukA4j8rjV/GoJ+GWcurtTU3NhYKDgEtSN
+         2Nez0rtPpgQtC7qbqzpINAmRNWNWJOJnc1uuAalIMJHPM2Lf3CWGnyj28lKBua64+VxJ
+         itvDqNFwthgHy7zuULkD8QLRIsEjVHsJvKJqmb5MV7DuAADO78p+zW7PZ3I3vJwqD+ej
+         QvCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701928997; x=1702533797;
+        d=1e100.net; s=20230601; t=1701930348; x=1702535148;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Pw2nLSqvqX2XEheC59D1y8xR9yWzVJ975ni9isQco04=;
-        b=Xu0K2kfkW3PZEVPQu9gGyHrqWWvIohAqCog+WBoY8w0ffEiCmfAcJ+kP+zhJeiZTaw
-         EO0Hs7kCLW72uv8hjG0vuQpO2B01Dz9kkxN4mWTqqwUmzoG9ioOsDiHSn5enEQqjQV4E
-         3/jvCnGS1JwxTi7/BTvoAxHcd1K46FBSwwJeqdtbHN1RVj7Le3sABfv8CN3vCMtmTGtq
-         5GrKkETFmmvwVRtFOhffEzhPUSEH/FKiPbTnuhIqXOXUQPQnB5Wr3TQ3kVnlF7iGIqVH
-         J0GRcBc304a8+1+1DyFaCysJxwEP2YipBo4IAiejlTo6C9LxeJyUH9Lk7uu254KbWvmY
-         GoaQ==
-X-Gm-Message-State: AOJu0YzoloLt7cRQx/MfB/0FWwbZLlCwBaaEvB0NcTYdrws4/M3uVOF5
-	uUuAABj4o88Ja7Ga8kgbW3ifQA==
-X-Google-Smtp-Source: AGHT+IFgd6UXrTBxn5Iid8zFZidrdE58MM/eMedRH7B3IU8UEspNZeFe4AO8VUuMn1n7T9+bA5Ox3w==
-X-Received: by 2002:a05:6a00:2195:b0:6ce:2d6d:24ac with SMTP id h21-20020a056a00219500b006ce2d6d24acmr2087457pfi.20.1701928997517;
-        Wed, 06 Dec 2023 22:03:17 -0800 (PST)
+        bh=1Hc+mPiQaNeuf4gnfMuq7zF4MPfoPt0lbfiwHLrs3YI=;
+        b=TW9Y2B8m4uTlgJAwwszHtN0XdttLDuBWzZulF15EdwsxrXtlwLD2sbEziQ7J2KJ7gF
+         z/h3GJeXnS92wWJ3bJ+XjhF4GM0hYQtraqH+qMlB5TBufWllZITuTip2DFPi9kfJJq0P
+         XH2phfjZ8f3ufyeB8eWgtFiHvoiZHyqLGI9GQmOwBOoB5Q7x+KZfnofN6blMA7DBCuAS
+         Yc0XZe3lyJTUiov9sqIORr6oBMTGa2BMsU+ZdVLQTc4UNpB8tuyZBIrKIpOpVjQMO7yD
+         LH3a4YljRTeX/gUNkmtWlXiadiCtgCNKY8HUop/zyT7DdCueRXo7bnRYF0wGuI6vkN++
+         HqGw==
+X-Gm-Message-State: AOJu0YxzL2ZwCh7rgIBxTQ7QGlHgRtr91MqbPc5DcE5TxbYVurXskdgH
+	KsU6480FOe2Gin3ObVsBSYHT+w==
+X-Google-Smtp-Source: AGHT+IFCsxUuAOQGHD1mRv24F9ZZmtsSUo1Bmn5R2cOtJ2AK5xAtSohfUoDVBtrWyaVLjbtNDCLDeA==
+X-Received: by 2002:a05:6359:2d96:b0:170:1e24:b827 with SMTP id rn22-20020a0563592d9600b001701e24b827mr2156432rwb.40.1701930347863;
+        Wed, 06 Dec 2023 22:25:47 -0800 (PST)
 Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
-        by smtp.gmail.com with ESMTPSA id g193-20020a636bca000000b005b7dd356f75sm435756pgc.32.2023.12.06.22.03.17
+        by smtp.gmail.com with ESMTPSA id o123-20020a62cd81000000b006cbafd6996csm550679pfg.123.2023.12.06.22.25.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 22:03:17 -0800 (PST)
+        Wed, 06 Dec 2023 22:25:47 -0800 (PST)
 Received: from dave by dread.disaster.area with local (Exim 4.96)
 	(envelope-from <david@fromorbit.com>)
-	id 1rB7Te-004xC7-2R;
-	Thu, 07 Dec 2023 17:03:14 +1100
-Date: Thu, 7 Dec 2023 17:03:14 +1100
+	id 1rB7pQ-004xdH-2k;
+	Thu, 07 Dec 2023 17:25:44 +1100
+Date: Thu, 7 Dec 2023 17:25:44 +1100
 From: Dave Chinner <david@fromorbit.com>
 To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-cachefs@redhat.com, dhowells@redhat.com, gfs2@lists.linux.dev,
-	dm-devel@lists.linux.dev, linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/11] vfs: inode cache conversion to hash-bl
-Message-ID: <ZXFgIlVDNqFvEADn@dread.disaster.area>
+Cc: Waiman Long <longman@redhat.com>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-cachefs@redhat.com,
+	dhowells@redhat.com, gfs2@lists.linux.dev, dm-devel@lists.linux.dev,
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 04/11] lib/dlock-list: Make sibling CPUs share the same
+ linked list
+Message-ID: <ZXFlaN8FCC8ryr/R@dread.disaster.area>
 References: <20231206060629.2827226-1-david@fromorbit.com>
- <20231206060629.2827226-9-david@fromorbit.com>
- <20231207045844.u26r5vn26gtmqwe5@moria.home.lan>
+ <20231206060629.2827226-5-david@fromorbit.com>
+ <20231207054259.gpx3cydlb6b7raax@moria.home.lan>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,39 +63,73 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231207045844.u26r5vn26gtmqwe5@moria.home.lan>
+In-Reply-To: <20231207054259.gpx3cydlb6b7raax@moria.home.lan>
 
-On Wed, Dec 06, 2023 at 11:58:44PM -0500, Kent Overstreet wrote:
-> On Wed, Dec 06, 2023 at 05:05:37PM +1100, Dave Chinner wrote:
-> > From: Dave Chinner <dchinner@redhat.com>
+On Thu, Dec 07, 2023 at 12:42:59AM -0500, Kent Overstreet wrote:
+> On Wed, Dec 06, 2023 at 05:05:33PM +1100, Dave Chinner wrote:
+> > From: Waiman Long <longman@redhat.com>
 > > 
-> > Scalability of the global inode_hash_lock really sucks for
-> > filesystems that use the vfs inode cache (i.e. everything but XFS).
+> > The dlock list needs one list for each of the CPUs available. However,
+> > for sibling CPUs, they are sharing the L2 and probably L1 caches
+> > too. As a result, there is not much to gain in term of avoiding
+> > cacheline contention while increasing the cacheline footprint of the
+> > L1/L2 caches as separate lists may need to be in the cache.
+> > 
+> > This patch makes all the sibling CPUs share the same list, thus
+> > reducing the number of lists that need to be maintained in each
+> > dlock list without having any noticeable impact on performance. It
+> > also improves dlock list iteration performance as fewer lists need
+> > to be iterated.
 > 
-> Ages ago, we talked about (and I attempted, but ended up swearing at
-> inode lifetime rules) - conversion to rhashtable instead, which I still
-> believe would be preferable since that code is fully lockless (and
-> resizeable, of course). But it turned out to be a much bigger project...
+> Seems Waiman was missed on the CC
 
-I don't think that the size of the has table is a big issue at the
-moment. We already have RCU lookups for the inode cache
-(find_inode_rcu() and find_inode_by_ino_rcu()) even before this
-patchset, so we don't need rhashtable for that.
+Oops, I knew I missed someone important....
 
-We still have to prevent duplicate inodes from being added to the cache
-due to racing inserts, so I think we still need some form of
-serialisation on the "lookup miss+insert" side. I've not thought
-about it further than that - the hash-bl removes the existing
-VFS contention points and the limitations move to
-filesystem internal algorithms once again.
+> it looks like there's some duplication of this with list_lru
+> functionality - similar list-sharded-by-node idea.
 
-So until the filesystems can scale to much larger thread counts and
-put the pressure back on the VFS inode cache scalability, I
-don't see any need to try to do anything more complex or smarter...
+For completely different reasons. The list_lru is aligned to the mm
+zone architecture which only partitions memory management accounting
+and scanning actions down into NUMA nodes. It's also a per-node
+ordered list (LRU), and it has intricate locking semantics that
+expose internal list locks to external isolation functions that can
+be called whilst a lock protected traversal is in progress.
 
-Cheers,
+Further, we have to consider that list-lru is tightly tied to
+memcgs.  For a single NUMA- and memcg- aware list-lru, there is
+actually nr_memcgs * nr_nodes LRUs per list. The memory footprint of
+a superblock list_lru gets quite gigantic when we start talking
+about machines with hundreds of nodes running tens of thousands of
+containers each with tens of superblocks.
 
-Dave.
+That's the biggest problem with using a more memory expensive
+structure for the list_lru - we're talking gigabytes of memory just
+for the superblock shrinker tracking structure overhead on large
+machines. This was one of the reasons why we haven't tried to make
+list_lrus any more fine-grained that it absolutely needs to be to
+provide acceptible scalability.
+
+> list_lru does the sharding by page_to_nid() of the item, which
+> saves a pointer and allows just using a list_head in the item.
+> OTOH, it's less granular than what dlock-list is doing?
+
+Sure, but there's a lot more to list_lrus than it being a "per-node
+list".  OTOH, dlock_list is really nothing more than a "per-cpu
+list"....
+
+> I think some attempt ought to be made to factor out the common
+> ideas hear; perhaps reworking list_lru to use this thing, and I
+> hope someone has looked at the page_nid idea vs. dlock_list using
+> the current core.
+
+I certainly have, and I haven't been able to justify the additional
+memory footprint of a dlock_list over the existing per-node lists.
+That may change given that XFS appears to be on the theshold of
+per-node list-lru lock breakdown at 64 threads, but there's a lot
+more to consider from a system perspective here than just
+inode/dentry cache scalability....
+
+-Dave.
 -- 
 Dave Chinner
 david@fromorbit.com
