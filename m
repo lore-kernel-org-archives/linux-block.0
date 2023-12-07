@@ -1,128 +1,182 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="SPwGi2pt"
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B0218D
-	for <linux-block@vger.kernel.org>; Wed,  6 Dec 2023 16:37:04 -0800 (PST)
-Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-dafe04717baso444566276.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Dec 2023 16:37:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCjvRBHK"
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BACD4B;
+	Wed,  6 Dec 2023 16:44:01 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6ce26a03d9eso126662b3a.0;
+        Wed, 06 Dec 2023 16:44:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1701909423; x=1702514223; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ku2sfUBBqRmjOusEjPPKSg3scPnZYVUEi+HsErMF7+A=;
-        b=SPwGi2ptt35RjW8bl6Bv3xg1CBoMWvUAhzx1qCZRYVa7VZCKadoKF/GnxnJRqH2j4s
-         wfQy9jtUvON7V9UMtzbf2vCyDrKW8xbfDFzbHr4DS+Cdw5g8VaBYJXJJB9q0VDAjbkQM
-         m5N3OYdKvUNzpkK0LHVKhEgiW3Ukdcv4vjNOunDGjJJAod/A+u22uJIp2LUdXxOXJn9j
-         s0FBXXoEVtSIRUwT4Gapu14HiW+ppghz+GeWt6cVuINXlBrSNi1FOZPGRvm6xCEJEqTj
-         KeWjzRYgaHQK4DJAVvrvts9I5a/QrQ7DZHbz2R5+P6K4QTjSM8TKesEoWhT2op4l6VG8
-         Pyqg==
+        d=gmail.com; s=20230601; t=1701909841; x=1702514641; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vyGPqsbyM+o/waC/snbt/Zuwaa3Q4YW9cnMRXpLc38I=;
+        b=hCjvRBHKhDEeZUbPUpl4/cjWOS7wPCYRJ8/ihKv1S/ehtQ4+Erzi7hFs5H5oQAx+vP
+         b5481IVk4jSFCC0J2smQLnIEDuqtGeH6NYCZjUUsBlVCpgJUN8jJWjYW69B6LRm+4Gpg
+         WkFTWGPM5Ocnob2/gR+G32yKvmVInveofisaRiW4J4eHULheN1wFyfgX9MGFSaimovT6
+         idxlepn4EjcKaB8Rl25W47SkMhPeMkBr6dmgNdHANwxy2LcJHFqcmGRO1Z5mjKNDDXtk
+         kgBZdxh6k/77Io0BtOwetfMtiiGuqs5d2sk8gSUqkOFw+BV33lZTYNB6CvadpCefT6vV
+         5kiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701909423; x=1702514223;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ku2sfUBBqRmjOusEjPPKSg3scPnZYVUEi+HsErMF7+A=;
-        b=U9O9+W5eO9Orgtf6wt3N7Dw5VYhyB1SoyBzFFG/RnCEUZnlqF712a+YGf4Y/Dt04+p
-         0xFoYfx2iBR+0ooWJZ/fxRM8ilFbf6LJ7G0NSsdoM/GPP8qTZUjK/o/vpvnMj1rjs2go
-         FH7sEeUAtDWJhv3DM8OZ8d5EjzIijqOhh4LHf7os803PoLTkxgOvHNysden4iYB0yXbi
-         3Y230QTxPC9Fb0FbagcDTwH9H8leb0dRF5MHXBzSe/QnobgMOjgBLKpV9MCiBbIRai1+
-         8vm1/uN1DKOUwkqq8amT4eH7Ln1LzDUCWGh/ZZMkShOIhYPCREsI3xD6ibaQ6+X+VfPX
-         H73Q==
-X-Gm-Message-State: AOJu0YxKlyZ4t0RI/tmgbIG8UgxO/L48cziADoGsqsGnDvJ5Ewk1PDc2
-	5RhfviRDC+/VEdxGnRcpPCBZMqtcB5TyO0PeBAimtasGGURX8YQ=
-X-Google-Smtp-Source: AGHT+IG1iYIFG177+3bvYtnhfemiCuwpFKgg3syUJq0tO2kQMOa+CZIi7OJOUpuM/HHKxu3GBd4bnBcpq+XxZYKLOIM=
-X-Received: by 2002:a25:7714:0:b0:db7:8141:e65b with SMTP id
- s20-20020a257714000000b00db78141e65bmr1716451ybc.64.1701909423446; Wed, 06
- Dec 2023 16:37:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701909841; x=1702514641;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vyGPqsbyM+o/waC/snbt/Zuwaa3Q4YW9cnMRXpLc38I=;
+        b=MmJ4bVYwDOSdRahdLWdWIeqOPgmJRoBSx1Z/xpvtdW1IfbglVNYE6DYj3APNO9YoJE
+         ekxlZToPPv03YKvN0i/CgzqoAVcQlEk4+Vq28xgZsPBo1YrYP1vWZ7nKXbuKsgaQNN2j
+         Fj/vWzItm3/rct9a7axRDbl8qT76CGdmo98eXRF9rNhvzBhFSfek/qrUpaMczc9CPGE5
+         tleQa9VEJLoCcnuPlK+9GG0R7mN0RHrCjQedVaEfL8ZppAjT9MUmw8WSRMgleZK6ejqv
+         PB+0N7bTGyZSlqItUiPAtxYu7+0Ab67DRVpDODksPBMsFtw/tlmDaD2zBTMX4EUIoiky
+         8zZA==
+X-Gm-Message-State: AOJu0Yx2mxEZLyYZnPX4eLK+mf3DNRKw235fd0eqFgsWvMUpHktb8jPQ
+	23Sjcny5LQoafGZxdjxI10WzEUi3YfQjSw==
+X-Google-Smtp-Source: AGHT+IEnwNUCMDTgXHQpgn/W2yuZcnEzZR3jkgKOSL28Lu5yXG+RTr5nf40kOUZcgJ4J0tto9yQozw==
+X-Received: by 2002:a05:6a00:b87:b0:6ce:6b7c:ba41 with SMTP id g7-20020a056a000b8700b006ce6b7cba41mr2046931pfj.64.1701909841025;
+        Wed, 06 Dec 2023 16:44:01 -0800 (PST)
+Received: from localhost ([216.228.127.130])
+        by smtp.gmail.com with ESMTPSA id c23-20020aa78817000000b006cbe1bb5e3asm114399pfo.138.2023.12.06.16.43.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 16:44:00 -0800 (PST)
+Date: Wed, 6 Dec 2023 16:41:44 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Yi Zhang <yi.zhang@redhat.com>, Guangwu Zhang <guazhang@redhat.com>,
+	Chengming Zhou <zhouchengming@bytedance.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH V4 resend] lib/group_cpus.c: avoid to acquire cpu hotplug
+ lock in group_cpus_evenly
+Message-ID: <ZXEUyH/38KeATuF4@yury-ThinkPad>
+References: <20231120083559.285174-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206060629.2827226-1-david@fromorbit.com> <20231206060629.2827226-6-david@fromorbit.com>
- <CAHC9VhTP3hRAkmp7wOKGrEzY5OXXJpnuofTG_+KdXDku18vkeA@mail.gmail.com> <ZXD+F5N/3PPSGTya@dread.disaster.area>
-In-Reply-To: <ZXD+F5N/3PPSGTya@dread.disaster.area>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 6 Dec 2023 19:36:52 -0500
-Message-ID: <CAHC9VhRNS=DvbL_sY5Vi+7twd3uV+WhACaaeJMsBUTYmhjxjVA@mail.gmail.com>
-Subject: Re: [PATCH 05/11] selinux: use dlist for isec inode list
-To: Dave Chinner <david@fromorbit.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-cachefs@redhat.com, dhowells@redhat.com, gfs2@lists.linux.dev, 
-	dm-devel@lists.linux.dev, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120083559.285174-1-ming.lei@redhat.com>
 
-On Wed, Dec 6, 2023 at 6:04=E2=80=AFPM Dave Chinner <david@fromorbit.com> w=
-rote:
-> On Wed, Dec 06, 2023 at 04:52:42PM -0500, Paul Moore wrote:
-> > On Wed, Dec 6, 2023 at 1:07=E2=80=AFAM Dave Chinner <david@fromorbit.co=
-m> wrote:
-> > >
-> > > From: Dave Chinner <dchinner@redhat.com>
-> > >
-> > > Because it's a horrible point of lock contention under heavily
-> > > concurrent directory traversals...
-> > >
-> > >   - 12.14% d_instantiate
-> > >      - 12.06% security_d_instantiate
-> > >         - 12.13% selinux_d_instantiate
-> > >            - 12.16% inode_doinit_with_dentry
-> > >               - 15.45% _raw_spin_lock
-> > >                  - do_raw_spin_lock
-> > >                       14.68% __pv_queued_spin_lock_slowpath
-> > >
-> > >
-> > > Signed-off-by: Dave Chinner <dchinner@redhat.com>
-> > > ---
-> > >  include/linux/dlock-list.h        |  9 ++++
-> > >  security/selinux/hooks.c          | 72 +++++++++++++++--------------=
---
-> > >  security/selinux/include/objsec.h |  6 +--
-> > >  3 files changed, 47 insertions(+), 40 deletions(-)
-> >
-> > In the cover letter you talk about testing, but I didn't see any
-> > mention of testing with SELinux enabled.  Given the lock contention
-> > stats in the description above I'm going to assume you did test this
-> > and pass along my ACK, but if you haven't tested the changes below
-> > please do before sending this anywhere important.
->
-> AFAIA, I've been testing with selinux enabled - I'm trying to run
-> these tests in an environment as close to typical production systems
-> as possible and that means selinux needs to be enabled.
->
-> As such, all the fstests and perf testing has been done with selinux
-> in permissive mode using "-o context=3Dsystem_u:object_r:root_t:s0" as
-> the default context for the mount.
->
-> I see this sort of thing in the profiles:
->
-> - 87.13% path_lookupat
->    - 86.46% walk_component
->       - 84.20% lookup_slow
->          - 84.05% __lookup_slow
->             - 80.81% xfs_vn_lookup
->                - 77.84% xfs_lookup
-> ....
->                - 2.91% d_splice_alias
->                   - 1.52% security_d_instantiate
->                      - 1.50% selinux_d_instantiate
->                         - 1.47% inode_doinit_with_dentry
->                            - 0.83% inode_doinit_use_xattr
->                                 0.52% __vfs_getxattr
->
-> Which tells me that selinux is definitely doing -something- on every
-> inode being instantiated, so I'm pretty sure the security and
-> selinux paths are getting exercised...
+Hi Ming,
 
-That's great, thanks for the confirmation.  FWIW, for these patches it
-doesn't really matter if the system is in enforcing or permissive
-mode, or what label you use, the important bit is that you've got a
-system with SELinux enabled in the kernel and you have a reasonable
-policy loaded.
+On Mon, Nov 20, 2023 at 04:35:59PM +0800, Ming Lei wrote:
+> group_cpus_evenly() could be part of storage driver's error handler,
+> such as nvme driver, when may happen during CPU hotplug, in which
+> storage queue has to drain its pending IOs because all CPUs associated
+> with the queue are offline and the queue is becoming inactive. And
+> handling IO needs error handler to provide forward progress.
+> 
+> Then dead lock is caused:
+> 
+> 1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
+> handler is waiting for inflight IO
+> 
+> 2) error handler is waiting for CPU hotplug lock
+> 
+> 3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
+> error handling can't provide forward progress.
+> 
+> Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
+> in which two stage spreads are taken: 1) the 1st stage is over all present
+> CPUs; 2) the end stage is over all other CPUs.
+> 
+> Turns out the two stage spread just needs consistent 'cpu_present_mask', and
+> remove the CPU hotplug lock by storing it into one local cache. This way
+> doesn't change correctness, because all CPUs are still covered.
+> 
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: linux-nvme@lists.infradead.org
+> Cc: linux-block@vger.kernel.org
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Reported-by: Guangwu Zhang <guazhang@redhat.com>
+> Tested-by: Guangwu Zhang <guazhang@redhat.com>
+> Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
+> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  lib/group_cpus.c | 22 ++++++++++++++++------
+>  1 file changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/lib/group_cpus.c b/lib/group_cpus.c
+> index aa3f6815bb12..ee272c4cefcc 100644
+> --- a/lib/group_cpus.c
+> +++ b/lib/group_cpus.c
+> @@ -366,13 +366,25 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+>  	if (!masks)
+>  		goto fail_node_to_cpumask;
+>  
+> -	/* Stabilize the cpumasks */
+> -	cpus_read_lock();
+>  	build_node_to_cpumask(node_to_cpumask);
+>  
+> +	/*
+> +	 * Make a local cache of 'cpu_present_mask', so the two stages
+> +	 * spread can observe consistent 'cpu_present_mask' without holding
+> +	 * cpu hotplug lock, then we can reduce deadlock risk with cpu
+> +	 * hotplug code.
+> +	 *
+> +	 * Here CPU hotplug may happen when reading `cpu_present_mask`, and
+> +	 * we can live with the case because it only affects that hotplug
+> +	 * CPU is handled in the 1st or 2nd stage, and either way is correct
+> +	 * from API user viewpoint since 2-stage spread is sort of
+> +	 * optimization.
+> +	 */
+> +	cpumask_copy(npresmsk, data_race(cpu_present_mask));
 
---=20
-paul-moore.com
+Now that you initialize the npresmsk explicitly, you can allocate it
+using alloc_cpumask_var().
+
+The same actually holds for nmsk too, and even before this patch. Maybe
+fix it in a separate prepending patch?
+
+> +
+>  	/* grouping present CPUs first */
+>  	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+> -				  cpu_present_mask, nmsk, masks);
+> +				  npresmsk, nmsk, masks);
+>  	if (ret < 0)
+>  		goto fail_build_affinity;
+>  	nr_present = ret;
+> @@ -387,15 +399,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+>  		curgrp = 0;
+>  	else
+>  		curgrp = nr_present;
+> -	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
+> +	cpumask_andnot(npresmsk, cpu_possible_mask, npresmsk);
+>  	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+>  				  npresmsk, nmsk, masks);
+
+The first thing the helper does is checking if nprepmask is empty.
+cpumask_andnot() returns false in that case. So, assuming that present
+cpumask in the previous call can't be empty, we can save few cycles if
+drop corresponding check in the helper and do like this:
+        
+	if (cpumask_andnot(npresmsk, cpu_possible_mask, npresmsk) == 0) {
+                nr_others = 0;
+                goto fail_build_affinity;
+        }
+
+  	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+  				  npresmsk, nmsk, masks);
+
+Although, it's not related to this patch directly. So, if you fix
+zalloc_cpumask_var(), the patch looks good to me.
+
+Reviewed-by: Yury Norov <yury.norov@gmail.com>
+
+>  	if (ret >= 0)
+>  		nr_others = ret;
+>  
+>   fail_build_affinity:
+> -	cpus_read_unlock();
+> -
+>  	if (ret >= 0)
+>  		WARN_ON(nr_present + nr_others < numgrps);
+>  
+> -- 
+> 2.41.0
+> 
