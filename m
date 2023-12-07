@@ -1,22 +1,22 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="C7D41x5B"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mI/U/5XK"
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F6A4173E;
-	Thu,  7 Dec 2023 00:23:06 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F25D9D4A;
+	Thu,  7 Dec 2023 00:36:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ZrFkvVjmgGqgbYVIpnx13kdaPXXAZZlJh+/DhftTK40=; b=C7D41x5BQlcgnROxpxe2FuMQCO
-	NqP32cw6wsk+h5AodZ+vpsjltQ6pmrzcfG9fsTeQ2/7TRT8Bzj5xc77Y5bFg+DjR7qRU4BOPRPsFO
-	pkL2rMBszmQcNNiHxSiyBd7BcmwkrLz8fTcQ70BCNs+/MBJT1BXbeFCGt5HqEcnwZ0IjOSs+81JB3
-	VOYJ6FlBerKIelhEG6tYS0WEmx05l4+3OPjzjoMAv8OUqmj4IiSqf3jBx/vMVf/2pJQJpyR2Ddq4c
-	NUVHcPDOAWcYwPUkWj1sll505OSjhGlzb7q0jKkBY8z/gY7yps4NCeQl69OOFfURPa1DmaIuYE9M7
-	lXuKNBKA==;
+	bh=u099gzjDXzJ4GHKJVOCEEgCI+HNpjyaO5+j80X95e2M=; b=mI/U/5XKN2ARAgTCnAZnGUNidm
+	llAtiKBODd6zoC4Hxgv9jXUJwfuZv9ii9kpYhc/luds3zKQ9WsoEy4/BBPf02mzaBFNhScotUAGHj
+	i9+vmqwFDUzJdnNBRLfZZpSY2+L0Rs3JvosSJsCKItFgmwtnn4tyR8c+IJxQ8ayqsNFHYmxaU0L0B
+	0k9Och0sMoDnUBHBNScqTNviA7lAEYLiI2b3zHTWbF+tDx2bPbpTfUjFSAXGTwGD0sNC4jiBTA8NE
+	Q+pS9cVMv5u14b8UjE37FoKM/7BmUwnoPYOcWXgyW0COzhdnIFcyBTesXOqiLufj7LwG8D/VhjBQc
+	3vITmcWQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rB9ev-00CCR5-0I;
-	Thu, 07 Dec 2023 08:23:01 +0000
-Date: Thu, 7 Dec 2023 00:23:01 -0800
+	id 1rB9rr-00CEn1-0o;
+	Thu, 07 Dec 2023 08:36:23 +0000
+Date: Thu, 7 Dec 2023 00:36:23 -0800
 From: Christoph Hellwig <hch@infradead.org>
 To: Sergei Shtepa <sergei.shtepa@linux.dev>
 Cc: axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org,
@@ -25,10 +25,10 @@ Cc: axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org,
 	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
 	Sergei Shtepa <sergei.shtepa@veeam.com>
-Subject: Re: [PATCH v6 06/11] blksnap: handling and tracking I/O units
-Message-ID: <ZXGA5f0/UqC/OHu6@infradead.org>
+Subject: Re: [PATCH v6 07/11] blksnap: difference storage and chunk
+Message-ID: <ZXGEB5M1+/2QMxqi@infradead.org>
 References: <20231124165933.27580-1-sergei.shtepa@linux.dev>
- <20231124165933.27580-7-sergei.shtepa@linux.dev>
+ <20231124165933.27580-8-sergei.shtepa@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,20 +37,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231124165933.27580-7-sergei.shtepa@linux.dev>
+In-Reply-To: <20231124165933.27580-8-sergei.shtepa@linux.dev>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+> +static inline bool unsupported_mode(const umode_t m)
+> +{
+> +	return (S_ISCHR(m) || S_ISFIFO(m) || S_ISSOCK(m));
+> +}
 > +
-> +static int (*const ctl_table[])(struct tracker *tracker,
-> +				__u8 __user *buf, __u32 *plen) = {
-> +	ctl_cbtinfo,
-> +	ctl_cbtmap,
-> +	ctl_cbtdirty,
-> +	ctl_snapshotadd,
-> +	ctl_snapshotinfo,
-> +};
+> +static inline bool unsupported_flags(const unsigned int flags)
+> +{
+> +	if (!(flags | O_RDWR)) {
+> +		pr_err("Read and write access is required\n");
+> +		return true;
+> +	}
+> +	if (!(flags | O_EXCL)) {
+> +		pr_err("Exclusive access is required\n");
+> +		return true;
+> +	}
 
-Please use a switch statement like the rest of the kernel.  Besides
-being simple to follow it also avoid having a speculation gadget
-on user controlled input.
+You probably want to positively check the allowed flags and types
+to be more future proof.  I'd also drop these very easy to trigger
+messages.
+
+> +	if (S_ISBLK(file_inode(file)->i_mode)) {
+
+Splitting the blk and regular file open path into separate helpers
+would improve readability a lot I think.
+
+> +		/*
+> +		 * The block device is opened non-exclusively.
+> +		 * It should be exclusive to open the file whose descriptor is
+> +		 * passed to the module.
+> +		 */
+> +		bdev = blkdev_get_by_dev(dev_id,
+> +					 BLK_OPEN_READ | BLK_OPEN_WRITE,
+> +					 NULL, NULL);
+
+Note that this will have some interesting interaction with the patches
+from Jan to optionally disallow any other write for exclusively opened
+block devices.  But given that right now we don't support using the
+original device as backing store, this probably should become an
+exclusive open anyway.
 
