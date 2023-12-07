@@ -1,122 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yr9DECGz"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4295AAC
-	for <linux-block@vger.kernel.org>; Thu,  7 Dec 2023 06:55:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701960939;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tFUwTkwUasQAuYCMcpY6aWYFjKBTvsfILYuExDUI9Xs=;
-	b=Yr9DECGznxnjc0TrfplfnWwAypOnfl0t3UaEapgvHFBxLFXjwdbClWW0ZSaU3b1/SfOj0S
-	knH1v6lk035WqfBuTR/963Qg2sZdAFgOQ3tgJkDTkfxRpUWANWLD/IvSkM8fDJVXdyctdm
-	dyzPjmvK4IBVY3yZrohiTgd1z0NHwhI=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-445-KF8f_IniNTuGesuYthoHlQ-1; Thu, 07 Dec 2023 09:55:38 -0500
-X-MC-Unique: KF8f_IniNTuGesuYthoHlQ-1
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-4647ae7147fso289805137.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Dec 2023 06:55:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701960937; x=1702565737;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tFUwTkwUasQAuYCMcpY6aWYFjKBTvsfILYuExDUI9Xs=;
-        b=kxPhhn+3pT3ArtsW0HK6Z8lTOCiX+DHz1yje4ZbEKkw7JRTsTJNxpEWBs1GPPgWD+u
-         AGJroMp6BI+7R207XbmY3lIpD0G1tKiPi/fsf59qnH7zCzLkZwaOYO6N01Ld95fM9LNV
-         vQ58eT+ZyEOmQeChNEZD1xeIaKRmvo34KSvMVdgLGYVUsKxzJy+WIme3UuqCgJcBuo5R
-         VE/CpcHbFuOOSMDU4XD2SPGzm/Bht0W27I1nFJ2FL17PH+tzjE953T0aM3qSD1Uik/VH
-         mmFAmUgRAgiBCvylxY5Ts/nImnP6gOrGYBZ5a5OOWa9Akh8aWfalm7j7tsbDjo1LWSkl
-         r9Mw==
-X-Gm-Message-State: AOJu0Yw+2/7jcl6yyLbJkUTM2OvBTgkxpD0SXlLcGBmPl0Gnt77kZxOC
-	hnny2bTVhKi5+Jbj9DVRn7lucgbjj9tReytoYPSAbQ5oS1ne9832+R9Vrm+eAjQOSIGpjT0aqMo
-	nXsxsgv+vQVQfzLV/aAqdhGk5TeI9Vp+nELEmZf0=
-X-Received: by 2002:a67:fb0e:0:b0:464:7c84:f2ce with SMTP id d14-20020a67fb0e000000b004647c84f2cemr2428522vsr.33.1701960937524;
-        Thu, 07 Dec 2023 06:55:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IExPh5/hFE8CE6pwdTcln4SPXa7YsxLmil/VdfPW34AuIerYiD738D5CYb9gwkY7cCXF4lnoAE2qa1q+zUlTFA=
-X-Received: by 2002:a67:fb0e:0:b0:464:7c84:f2ce with SMTP id
- d14-20020a67fb0e000000b004647c84f2cemr2428507vsr.33.1701960937193; Thu, 07
- Dec 2023 06:55:37 -0800 (PST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4031128;
+	Thu,  7 Dec 2023 07:03:15 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 04D90227A87; Thu,  7 Dec 2023 16:03:12 +0100 (CET)
+Date: Thu, 7 Dec 2023 16:03:11 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Zhang Yi <yi.zhang@huaweicloud.com>
+Cc: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>,
+	Chandan Babu R <chandan.babu@oracle.com>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev, Christian Brauner <brauner@kernel.org>,
+	linux-ext4@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH 13/14] iomap: map multiple blocks at a time
+Message-ID: <20231207150311.GA18830@lst.de>
+References: <20231207072710.176093-1-hch@lst.de> <20231207072710.176093-14-hch@lst.de> <4e4a86a0-5681-210f-0c94-263126967082@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231207043118.118158-1-fengli@smartx.com> <20231207145159.GB2147383@fedora>
-In-Reply-To: <20231207145159.GB2147383@fedora>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 7 Dec 2023 15:55:17 +0100
-Message-ID: <CABgObfYJUH0hF8QfNUAZS9ztR7LqeHGOXeTa0JO904svJw23_g@mail.gmail.com>
-Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Li Feng <fengli@smartx.com>, Jens Axboe <axboe@kernel.dk>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e4a86a0-5681-210f-0c94-263126967082@huaweicloud.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Dec 7, 2023 at 3:52=E2=80=AFPM Stefan Hajnoczi <stefanha@redhat.com=
-> wrote:
->
-> On Thu, Dec 07, 2023 at 12:31:05PM +0800, Li Feng wrote:
-> > virtio-blk is generally used in cloud computing scenarios, where the
-> > performance of virtual disks is very important. The mq-deadline schedul=
-er
-> > has a big performance drop compared to none with single queue. In my te=
-sts,
-> > mq-deadline 4k readread iops were 270k compared to 450k for none. So he=
-re
-> > the default scheduler of virtio-blk is set to "none".
-> >
-> > Signed-off-by: Li Feng <fengli@smartx.com>
-> > ---
-> >  drivers/block/virtio_blk.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> This seems similar to commit f8b12e513b95 ("virtio_blk: revert
-> QUEUE_FLAG_VIRT addition") where changing the default sounded good in
-> theory but exposed existing users to performance regressions. [...]
-> I don't want to be overly conservative. The virtio_blk driver has
-> undergone changes in this regard from the legacy block layer to blk-mq
-> (without an I/O scheduler) to blk-mq (mq-deadline).
+On Thu, Dec 07, 2023 at 09:39:44PM +0800, Zhang Yi wrote:
+> > +	do {
+> > +		unsigned map_len;
+> > +
+> > +		error = wpc->ops->map_blocks(wpc, inode, pos);
+> > +		if (error)
+> > +			break;
+> > +		trace_iomap_writepage_map(inode, &wpc->iomap);
+> > +
+> > +		map_len = min_t(u64, dirty_len,
+> > +			wpc->iomap.offset + wpc->iomap.length - pos);
+> > +		WARN_ON_ONCE(!folio->private && map_len < dirty_len);
+> 
+> While I was debugging this series on ext4, I would suggest try to add map_len
+> or dirty_len into this trace point could be more convenient.
 
-IIRC there were also regressions in both virtio-blk and virtio-scsi
-when switching from the legacy block layer to blk-mq. So perhaps I
-*am* a bit more conservative, but based on past experience, this patch
-seems not to be a great idea for practical use cases.
+That does seem useful, but it means we need to have an entirely new
+even class.  Can I offload this to you for inclusion in your ext4
+series? :)
 
-Paolo
+> > +		case IOMAP_HOLE:
+> > +			break;
+> 
+> BTW, I want to ask an unrelated question of this patch series. Do you
+> agree with me to add a IOMAP_DELAYED case and re-dirty folio here? The
+> background is that on ext4, jbd2 thread call ext4_normal_submit_inode_data_buffers()
+> submit data blocks in data=ordered mode, but it can only submit mapped
+> blocks, now we skip unmapped blocks and re-dirty folios in
+> ext4_do_writepages()->mpage_prepare_extent_to_map()->..->ext4_bio_write_folio().
+> So we have to inherit this logic when convert to iomap, I suppose ext4's
+> ->map_blocks() return IOMAP_DELALLOC for this case, and iomap do something
+> like:
+> 
+> +               case IOMAP_DELALLOC:
+> +                       iomap_set_range_dirty(folio, offset_in_folio(folio, pos),
+> +                                             map_len);
+> +                       folio_redirty_for_writepage(wbc, folio);
+> +                       break;
 
-> Performance changed
-> at each step and that wasn't a showstopper, so I think we could default
-> to 'none' without a lot of damage. Let's just get more data.
->
-> Stefan
->
-> >
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index d53d6aa8ee69..5183ec8e00be 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -1367,7 +1367,7 @@ static int virtblk_probe(struct virtio_device *vd=
-ev)
-> >       vblk->tag_set.ops =3D &virtio_mq_ops;
-> >       vblk->tag_set.queue_depth =3D queue_depth;
-> >       vblk->tag_set.numa_node =3D NUMA_NO_NODE;
-> > -     vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
-> > +     vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_SCHED=
-_BY_DEFAULT;
-> >       vblk->tag_set.cmd_size =3D
-> >               sizeof(struct virtblk_req) +
-> >               sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
-> > --
-> > 2.42.0
-> >
+I guess we could add it, but it feels pretty quirky to me, so it would at
+least need a very big comment.
+
+But I think Ted mentioned a while ago that dropping the classic
+data=ordered mode for ext4 might be a good idea eventually no that ext4
+can update the inode size at I/O completion time (Ted, correct me if
+I'm wrong).  If that's the case it might make sense to just drop the
+ordered mode instead of adding these quirks to iomap.
 
