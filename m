@@ -1,174 +1,130 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB7BA10CF;
-	Thu,  7 Dec 2023 05:39:49 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SmFkT1jFdz4f3jMB;
-	Thu,  7 Dec 2023 21:39:45 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 51BDC1A0960;
-	Thu,  7 Dec 2023 21:39:46 +0800 (CST)
-Received: from [10.174.176.34] (unknown [10.174.176.34])
-	by APP1 (Coremail) with SMTP id cCh0CgA3iA4gy3FlieX6Cw--.40476S3;
-	Thu, 07 Dec 2023 21:39:46 +0800 (CST)
-Subject: Re: [PATCH 13/14] iomap: map multiple blocks at a time
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Darrick J. Wong" <djwong@kernel.org>,
- Chandan Babu R <chandan.babu@oracle.com>,
- Ritesh Harjani <ritesh.list@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Andreas Gruenbacher <agruenba@redhat.com>,
- Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>,
- Johannes Thumshirn <jth@kernel.org>, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- gfs2@lists.linux.dev, Christian Brauner <brauner@kernel.org>,
- linux-ext4@vger.kernel.org
-References: <20231207072710.176093-1-hch@lst.de>
- <20231207072710.176093-14-hch@lst.de>
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-Message-ID: <4e4a86a0-5681-210f-0c94-263126967082@huaweicloud.com>
-Date: Thu, 7 Dec 2023 21:39:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZIsAWQkN"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175E3AC
+	for <linux-block@vger.kernel.org>; Thu,  7 Dec 2023 06:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701960733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V0xpo2ryVhd+3GXnE5ml+fwWQScftYbSzd+a1VvBh0k=;
+	b=ZIsAWQkN/r4V5myrrscFAcTKjf9MocjekZQs/veywNJyn7xA4y5RvKaRthA2nvjsydItUY
+	iFwzxXkpdaGaUO8Pf3nr+96NJlFHIdrOveifEuWg+14E1dNdGc9kHL15HAhVBn7Taul9+7
+	AQuGBaVJ6JcDf3v2ueJdT2RQ7uyEd+Q=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-592-2V5E8xUnMuWEVomgn9XDhg-1; Thu,
+ 07 Dec 2023 09:52:08 -0500
+X-MC-Unique: 2V5E8xUnMuWEVomgn9XDhg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DCC7E1C01724;
+	Thu,  7 Dec 2023 14:52:07 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 205F1492BE6;
+	Thu,  7 Dec 2023 14:52:06 +0000 (UTC)
+Date: Thu, 7 Dec 2023 09:51:59 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Li Feng <fengli@smartx.com>
+Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
+Message-ID: <20231207145159.GB2147383@fedora>
+References: <20231207043118.118158-1-fengli@smartx.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231207072710.176093-14-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:cCh0CgA3iA4gy3FlieX6Cw--.40476S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr1UJFWfAr18XFy7Cr4fGrg_yoW5Kr1fpr
-	yvkws8Crs8Jw47uFn3Aayqvr1Fkay8ZFWUtF13Ww43Zas8Jr1xKFy0g3WjvF45Gr9rGwna
-	qFWFkFykW3W7A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
-	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
-	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-	7IU1zuWJUUUUU==
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="jzahsJkBdAiW+nf1"
+Content-Disposition: inline
+In-Reply-To: <20231207043118.118158-1-fengli@smartx.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Hi, Christoph.
 
-On 2023/12/7 15:27, Christoph Hellwig wrote:
-> The ->map_blocks interface returns a valid range for writeback, but we
-> still call back into it for every block, which is a bit inefficient.
-> 
-> Change iomap_writepage_map to use the valid range in the map until the
-> end of the folio or the dirty range inside the folio instead of calling
-> back into every block.
-> 
-> Note that the range is not used over folio boundaries as we need to be
-> able to check the mapping sequence count under the folio lock.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+--jzahsJkBdAiW+nf1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Dec 07, 2023 at 12:31:05PM +0800, Li Feng wrote:
+> virtio-blk is generally used in cloud computing scenarios, where the
+> performance of virtual disks is very important. The mq-deadline scheduler
+> has a big performance drop compared to none with single queue. In my test=
+s,
+> mq-deadline 4k readread iops were 270k compared to 450k for none. So here
+> the default scheduler of virtio-blk is set to "none".
+>=20
+> Signed-off-by: Li Feng <fengli@smartx.com>
 > ---
->  fs/iomap/buffered-io.c | 116 ++++++++++++++++++++++++++++-------------
->  include/linux/iomap.h  |   7 +++
->  2 files changed, 88 insertions(+), 35 deletions(-)
-> 
-[..]
-> @@ -1738,29 +1775,41 @@ static int iomap_add_to_ioend(struct iomap_writepage_ctx *wpc,
->  
->  static int iomap_writepage_map_blocks(struct iomap_writepage_ctx *wpc,
->  		struct writeback_control *wbc, struct folio *folio,
-> -		struct inode *inode, u64 pos, unsigned *count)
-> +		struct inode *inode, u64 pos, unsigned dirty_len,
-> +		unsigned *count)
->  {
->  	int error;
->  
-> -	error = wpc->ops->map_blocks(wpc, inode, pos);
-> -	if (error)
-> -		goto fail;
-> -	trace_iomap_writepage_map(inode, &wpc->iomap);
-> -
-> -	switch (wpc->iomap.type) {
-> -	case IOMAP_INLINE:
-> -		WARN_ON_ONCE(1);
-> -		error = -EIO;
-> -		break;
-> -	case IOMAP_HOLE:
-> -		break;
-> -	default:
-> -		error = iomap_add_to_ioend(wpc, wbc, folio, inode, pos);
-> -		if (!error)
-> -			(*count)++;
-> -	}
-> +	do {
-> +		unsigned map_len;
-> +
-> +		error = wpc->ops->map_blocks(wpc, inode, pos);
-> +		if (error)
-> +			break;
-> +		trace_iomap_writepage_map(inode, &wpc->iomap);
-> +
-> +		map_len = min_t(u64, dirty_len,
-> +			wpc->iomap.offset + wpc->iomap.length - pos);
-> +		WARN_ON_ONCE(!folio->private && map_len < dirty_len);
+>  drivers/block/virtio_blk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-While I was debugging this series on ext4, I would suggest try to add map_len
-or dirty_len into this trace point could be more convenient.
+This seems similar to commit f8b12e513b95 ("virtio_blk: revert
+QUEUE_FLAG_VIRT addition") where changing the default sounded good in
+theory but exposed existing users to performance regressions.
 
-> +
-> +		switch (wpc->iomap.type) {
-> +		case IOMAP_INLINE:
-> +			WARN_ON_ONCE(1);
-> +			error = -EIO;
-> +			break;
-> +		case IOMAP_HOLE:
-> +			break;
+Christoph's suggestion back in 2009 was to introduce a flag in the
+virtio-blk hardware interface so that the device can provide a hint from
+the host side.
 
-BTW, I want to ask an unrelated question of this patch series. Do you
-agree with me to add a IOMAP_DELAYED case and re-dirty folio here? The
-background is that on ext4, jbd2 thread call ext4_normal_submit_inode_data_buffers()
-submit data blocks in data=ordered mode, but it can only submit mapped
-blocks, now we skip unmapped blocks and re-dirty folios in
-ext4_do_writepages()->mpage_prepare_extent_to_map()->..->ext4_bio_write_folio().
-So we have to inherit this logic when convert to iomap, I suppose ext4's
-->map_blocks() return IOMAP_DELALLOC for this case, and iomap do something
-like:
+Do you have more performance data aside from 4k randread? My suggestion
+would be for everyone with an interest to collect and share data so
+there's more evidence that this new default works well for a range of
+configurations.
 
-+               case IOMAP_DELALLOC:
-+                       iomap_set_range_dirty(folio, offset_in_folio(folio, pos),
-+                                             map_len);
-+                       folio_redirty_for_writepage(wbc, folio);
-+                       break;
+I don't want to be overly conservative. The virtio_blk driver has
+undergone changes in this regard from the legacy block layer to blk-mq
+(without an I/O scheduler) to blk-mq (mq-deadline). Performance changed
+at each step and that wasn't a showstopper, so I think we could default
+to 'none' without a lot of damage. Let's just get more data.
 
-Thanks,
-Yi.
+Stefan
 
-> +		default:
-> +			error = iomap_add_to_ioend(wpc, wbc, folio, inode, pos,
-> +					map_len);
-> +			if (!error)
-> +				(*count)++;
-> +			break;
-> +		}
-> +		dirty_len -= map_len;
-> +		pos += map_len;
-> +	} while (dirty_len && !error);
->  
-> -fail:
->  	/*
->  	 * We cannot cancel the ioend directly here on error.  We may have
->  	 * already set other pages under writeback and hence we have to run I/O
-> @@ -1827,7 +1876,7 @@ static bool iomap_writepage_handle_eof(struct folio *folio, struct inode *inode,
->  		 * beyond i_size.
->  		 */
->  		folio_zero_segment(folio, poff, folio_size(folio));
-> -		*end_pos = isize;
-> +		*end_pos = round_up(isize, i_blocksize(inode));
->  	}
->  
->  	return true;
+>=20
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index d53d6aa8ee69..5183ec8e00be 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -1367,7 +1367,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	vblk->tag_set.ops =3D &virtio_mq_ops;
+>  	vblk->tag_set.queue_depth =3D queue_depth;
+>  	vblk->tag_set.numa_node =3D NUMA_NO_NODE;
+> -	vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
+> +	vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_SCHED_BY_DE=
+FAULT;
+>  	vblk->tag_set.cmd_size =3D
+>  		sizeof(struct virtblk_req) +
+>  		sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
+> --=20
+> 2.42.0
+>=20
+
+--jzahsJkBdAiW+nf1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmVx3A8ACgkQnKSrs4Gr
+c8iW7Af/SwZCn/GpSj7j9V527PVV437hXYHQ04RyKzmI6js4NU3gfzqaV/hqy4O4
+LMD9gAUovQGx9OhvYRtCkpEw+gLhn51wwUxNYX77y3eaHGEyxb4btN0DetBu3LDp
+Rz4caz4YiFMxFcSB9yHt84Q/noT97Iy4lar3xNiy8OEOdleVKGhuv351zvwdMnJ5
+lBiP9yNaSUgapXJbD6nAmrt765aR3ByQInkS/kxjLURF4gFQKlx76kUcFlC7FquV
++Pwk1QQr1tT8vfKCzYm8YeDl8tNecPEm+N3gtnAbMv+1dAtnI+7b4P8K3+GPiE7d
+6Ze512aHSeonNEi6hUqQpiUb2ae2pw==
+=FsbK
+-----END PGP SIGNATURE-----
+
+--jzahsJkBdAiW+nf1--
 
