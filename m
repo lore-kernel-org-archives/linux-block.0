@@ -1,69 +1,76 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56E8171A;
-	Thu,  7 Dec 2023 15:40:33 -0800 (PST)
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5bcfc508d14so1282142a12.3;
-        Thu, 07 Dec 2023 15:40:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701992433; x=1702597233;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zKn1uN52FS2vEnu87exFjbGE3L6ww6nhW6mEF9xJpdY=;
-        b=j1W5HQ1c80Pxc9Th+TizmO5bggVGR0pT75QDA0ojDdFM60+wt0+nHUHC3SpO58zTKY
-         ZVYU2duGFJRE+glHbdKBvBnnCEAOc9Bg07h4naVF1IDol0Li+DU1Ylzkakl3xEdgg8xG
-         nKsiugV8xXmdGV5JvQnEm0SQMLbOzdPtabUZr7NW+LKMVbt1yGbJSm8TxOLL6ZlAixr1
-         xb7fRLXYL723NECXyARPgWgKYCxELZhMiOZWA5G7eSwT9Bg/jY7ejpN+Nu9jNzg4U0mh
-         P0QWGxgACm78yf/o9e+w/v91FWls6/BgpfASkkYVkadfPJcE3CFSsagVuh1vUfoBbJH/
-         waSg==
-X-Gm-Message-State: AOJu0YzDottJN6cWIarTD1WENCMhVvqHBJRwBLCJtnc//LSwnAmLVr20
-	etiVbpq5jwcUB67iiHZGwaw=
-X-Google-Smtp-Source: AGHT+IGpBzzBNpZQ7aLw12Lr3CLhxhN6qPoBqHO53fH5/5G3Jl/lE2mmAKCb7d+3+G+uU5xrduerRg==
-X-Received: by 2002:a05:6a20:a424:b0:18f:97c:977b with SMTP id z36-20020a056a20a42400b0018f097c977bmr2484338pzk.99.1701992432738;
-        Thu, 07 Dec 2023 15:40:32 -0800 (PST)
-Received: from [172.22.37.189] (076-081-102-005.biz.spectrum.com. [76.81.102.5])
-        by smtp.gmail.com with ESMTPSA id i4-20020a62c104000000b006ceba4953f6sm360063pfg.8.2023.12.07.15.40.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 15:40:32 -0800 (PST)
-Message-ID: <1e71a6bf-ac2f-41bc-8931-8b4fb7371118@acm.org>
-Date: Thu, 7 Dec 2023 13:40:29 -1000
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gqhWqtmp"
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2023E1720;
+	Thu,  7 Dec 2023 15:57:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=YO6MVl02oBiITEYrEywlC3LVDyTUqOlWipn5vN0fmhA=; b=gqhWqtmpvP9SALAF/Q1zmqoGHm
+	HxMwUKrMpAPGfReElYZa/S3TvjzUkkyxt10c7razZ5wU/hSxDRc3RN+qkzI4JtEhv37wXZd9YSbbS
+	jmePUN0WrspPoPUXkxLQOf7YyHxFy1OiHeXOzAdUxMBynWUHg342NjmGGP19/c1f9GAzvI+qJMQYw
+	n4937Xk5nGkIBOJPaceqsLyaBJkOgp/i2Yeaa/1eCg4UW6P61UajreLPS91lO2endUQfeifDbnTti
+	kRHruEUK3J0P+gpL56LlxdthWqnXJR3WCc6ztejMQz4wuBkPMZW5ovM7EQDeY0a9vMaw1w0ZXJUcU
+	e9k8dAbg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1rBOEp-004cCW-JH; Thu, 07 Dec 2023 23:57:03 +0000
+Date: Thu, 7 Dec 2023 23:57:03 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Hugh Dickins <hughd@google.com>, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] block: Remove special-casing of compound pages
+Message-ID: <ZXJbz2F6xi/ZGnsP@casper.infradead.org>
+References: <20230814144100.596749-1-willy@infradead.org>
+ <ZXJCxbAm1_V7lPnF@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/17] fs: Restore kiocb.ki_hint
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Daejun Park <daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>
-References: <20231130013322.175290-1-bvanassche@acm.org>
- <20231130013322.175290-6-bvanassche@acm.org> <20231207174633.GE31184@lst.de>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231207174633.GE31184@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXJCxbAm1_V7lPnF@kbusch-mbp>
 
-On 12/7/23 07:46, Christoph Hellwig wrote:
-> On Wed, Nov 29, 2023 at 05:33:10PM -0800, Bart Van Assche wrote:
->> Restore support for passing file and/or inode write hints to the code
->> that processes struct kiocb. This patch reverts commit 41d36a9f3e53
->> ("fs: remove kiocb.ki_hint").
+On Thu, Dec 07, 2023 at 03:10:13PM -0700, Keith Busch wrote:
+> On Mon, Aug 14, 2023 at 03:41:00PM +0100, Matthew Wilcox (Oracle) wrote:
+> >  void __bio_release_pages(struct bio *bio, bool mark_dirty)
+> >  {
+> > -	struct bvec_iter_all iter_all;
+> > -	struct bio_vec *bvec;
+> > +	struct folio_iter fi;
+> > +
+> > +	bio_for_each_folio_all(fi, bio) {
+> > +		struct page *page;
+> > +		size_t done = 0;
+> >  
+> > -	bio_for_each_segment_all(bvec, bio, iter_all) {
+> > -		if (mark_dirty && !PageCompound(bvec->bv_page))
+> > -			set_page_dirty_lock(bvec->bv_page);
+> > -		bio_release_page(bio, bvec->bv_page);
+> > +		if (mark_dirty) {
+> > +			folio_lock(fi.folio);
+> > +			folio_mark_dirty(fi.folio);
+> > +			folio_unlock(fi.folio);
+> > +		}
+> > +		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
+> > +		do {
+> > +			bio_release_page(bio, page++);
+> > +			done += PAGE_SIZE;
+> > +		} while (done < fi.length);
+> >  	}
+> >  }
 > 
-> Same comment as for the previous one.
+> Is it okay to release same-folio pages while creating the bio instead of
+> releasing all the pages at the completion? If so, the completion could
+> provide just the final bio_release_page() instead looping. I'm more
+> confirming if that's an appropriate way to use folios here.
 
-If kiocb.ki_hint is not restored, the kiocb users will have to use the
-kiocb ki_filp member to obtain the write hint information. In other
-words, iocb->ki_hint will have to be changed into
-file_inode(iocb->ki_filp)->i_write_hint. Is that what you want me to do?
-
-Thanks,
-
-Bart.
-
-
+For this patch, I'm just replicating the existing behaviour.  We can
+probably do much better.  Honestly, the whole thing is kind of grotesque
+and needs to be reformed ... but I think that's part of the physr project.
