@@ -1,9 +1,9 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F0C610FC;
-	Thu,  7 Dec 2023 09:42:46 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14C4122;
+	Thu,  7 Dec 2023 09:44:30 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7DDE0227A87; Thu,  7 Dec 2023 18:42:42 +0100 (CET)
-Date: Thu, 7 Dec 2023 18:42:42 +0100
+	id 74937227A87; Thu,  7 Dec 2023 18:44:27 +0100 (CET)
+Date: Thu, 7 Dec 2023 18:44:27 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
@@ -12,12 +12,11 @@ Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Daejun Park <daejun7.park@samsung.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH v5 01/17] fs: Fix rw_hint validation
-Message-ID: <20231207174242.GA31184@lst.de>
-References: <20231130013322.175290-1-bvanassche@acm.org> <20231130013322.175290-2-bvanassche@acm.org>
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v5 02/17] fs: Move enum rw_hint into a new header file
+Message-ID: <20231207174427.GB31184@lst.de>
+References: <20231130013322.175290-1-bvanassche@acm.org> <20231130013322.175290-3-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -26,17 +25,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231130013322.175290-2-bvanassche@acm.org>
+In-Reply-To: <20231130013322.175290-3-bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Nov 29, 2023 at 05:33:06PM -0800, Bart Van Assche wrote:
-> Reject values that are valid rw_hints after truncation but not before
-> truncation by passing an untruncated value to rw_hint_valid().
+On Wed, Nov 29, 2023 at 05:33:07PM -0800, Bart Van Assche wrote:
+> Move enum rw_hint into a new header file to prepare for using this data
+> type in the block layer. Add the attribute __packed to reduce the space
+> occupied by instances of this data type from four bytes to one byte.
+> Change the data type of i_write_hint from u8 into enum rw_hint. Change
+> the RWH_* constants into literal constants to prevent that
+> <uapi/linux/fcntl.h> would have to be included.
 
-Looks good:
+If we split the definitions we need a conversion function.  That
+might just have a bunch of BUILD_BUG_ON/static_asserts to check
+the values are the same and otherwise do nothing, but we can't really
+be sloppy here.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-
-Btw, having one helper for F_GET_RW_HINT and F_SET_RW_HINT looks
-pretty odd to me, it seems like the code would be cleaner if that
-was split into two helpers instead.
