@@ -1,84 +1,55 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274EF12E
-	for <linux-block@vger.kernel.org>; Fri,  8 Dec 2023 10:40:59 -0800 (PST)
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d0c4d84bf6so18609805ad.1
-        for <linux-block@vger.kernel.org>; Fri, 08 Dec 2023 10:40:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702060858; x=1702665658;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TvsGteVqkqV679LQCDjr9/8jq2E4Fr7HUCXpQ4D7aXI=;
-        b=GErpB52Q+aipvWXBrwTIkvK+Z7KgkAAWnwUYMbu7dOjFjcvSwsB7FmXApbk/aO8ERQ
-         dLm98E39npUUjABONM24rr4j1YguXASwwxyISwqCJ0x3s2NaokTY1vDB2T4l02kqF1KJ
-         CiltMPvsCEJLxtPErhxDi/ku8PotePrhB/TQ3CIP0yCJLch7IRru9/D1LYkJ2izOtBeU
-         XMYmWXgUjZJB7eTkghsM7qlq4SeLa/KAnPg/dtf/pcC0TeL9wr035NCE/t3hhdUL66VZ
-         nXmBIffXA18+BMa4rsDZMEza41M7nQFBaFaKZ1pmiqv72uLRi4W7wGV6wdhkgb0QuuUj
-         9CXA==
-X-Gm-Message-State: AOJu0Yz+5gD49ekf4stjnWGrhD3DxRaM+P5TPHA8IaG8b13ejFr98yDN
-	WH4JYu1dQ8ZC2RxSYmarmQU=
-X-Google-Smtp-Source: AGHT+IH0J+tytiXjJk3cuc7oJTX8nB/T9r3/i7Mb4ndColI2AO1XiYgigfyIKzZGAogM2BqYYZqQYQ==
-X-Received: by 2002:a17:902:704c:b0:1d0:6ffd:f222 with SMTP id h12-20020a170902704c00b001d06ffdf222mr496868plt.120.1702060858388;
-        Fri, 08 Dec 2023 10:40:58 -0800 (PST)
-Received: from [172.20.2.177] (rrcs-173-197-90-226.west.biz.rr.com. [173.197.90.226])
-        by smtp.gmail.com with ESMTPSA id a2-20020a170902ecc200b001d05fb4cf3csm2029118plh.62.2023.12.08.10.40.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Dec 2023 10:40:57 -0800 (PST)
-Message-ID: <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
-Date: Fri, 8 Dec 2023 08:40:54 -1000
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F1837D3E
+	for <linux-block@vger.kernel.org>; Fri,  8 Dec 2023 20:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KACjTvuo"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 378F4C433C7;
+	Fri,  8 Dec 2023 20:45:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702068327;
+	bh=f4pp2xStVt7D86FvvQ+g04YLTRN35jg2ZWG7h3JNpkI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=KACjTvuoHZa25peac6AfkApdaW66IGGuMbw0P3D4pmPaj5MFqA9RgVVhIJoOXGNqq
+	 WI0KA1cw0otomSWWCXATKQJa4jiWXc29mokb8RY85TFL4Y2U7jRrpqVNwqFWCqgC1J
+	 LbQ6uhXp4Uimz7VJ37GWZyfG3H2Bsr9E+NpryvdlNftUjo3daFMyjrCa6m35Qvmep5
+	 oVtRWEWUbTiN7V/ZMvocCmKa/ZdUgCvvW7g5QknkoFf+7+cCwV3S2FE8oIpmmnJ4S2
+	 PQC3T3Vhwg0a2l48rZf4brcA1xB3HVV0IvFjg4LAaqhaCmBJxz2xqCblcVk3+qDMrf
+	 cOcgTunq9YjVw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 25AC9DD4F1E;
+	Fri,  8 Dec 2023 20:45:27 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.7-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <10082935-2c7f-4f88-b318-b8543583987a@kernel.dk>
+References: <10082935-2c7f-4f88-b318-b8543583987a@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <10082935-2c7f-4f88-b318-b8543583987a@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.7-2023-12-08
+X-PR-Tracked-Commit-Id: c6d3ab9e76dc01011392cf8309f7e684b94ec464
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d71369dbe0c5c1217dc681d6871b7918b2996de6
+Message-Id: <170206832715.6831.10573900674815316451.pr-tracker-bot@kernel.org>
+Date: Fri, 08 Dec 2023 20:45:27 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
- certain cases
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20231205053213.522772-1-bvanassche@acm.org>
- <20231205053213.522772-4-bvanassche@acm.org>
- <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
- <4d506909-e063-4918-a9d3-e91bfa5a41a3@acm.org>
- <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 12/7/23 17:37, Damien Le Moal wrote:
-> On 12/8/23 09:03, Bart Van Assche wrote:
->> +static bool dd_use_io_priority(struct deadline_data *dd, enum req_op op)
->> +{
->> +	return dd->prio_aging_expire != 0 && !op_needs_zoned_write_locking(op);
->> +}
-> 
-> Hard NACK on this. The reason is that this will disable IO priority also for
-> sensible use cases that use libaio/io_uring with direct IOs, with an application
-> that does the right thing for writes, namely assigning the same priority for all
-> writes to a zone. There are some use cases like this in production.
-> 
-> I do understand that there is a problem when IO priorities come from cgroups and
-> the user go through a file system. But that should be handled by the file
-> system. That is, for f2fs, all writes going to the same zone should have the
-> same priority. Otherwise, priority inversion issues will lead to non sequential
-> write patterns.
-> 
-> Ideally, we should indeed have a generic solution for the cgroup case. But it
-> seems that for now, the simplest thing to do is to not allow priorities through
-> cgroups for writes to zoned devices, unless cgroups is made more intellignet
-> about it and manage bio priorities per zone to avoid priority inversion within a
-> zone.
+The pull request you sent on Fri, 8 Dec 2023 10:48:57 -0700:
 
-Hi Damien,
+> git://git.kernel.dk/linux.git tags/block-6.7-2023-12-08
 
-My understanding is that blkcg_set_ioprio() is called from inside submit_bio()
-and hence that the reported issue cannot be solved by modifying F2FS. How about
-modifying the blk-ioprio policy such that it ignores zoned writes?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d71369dbe0c5c1217dc681d6871b7918b2996de6
 
-Thanks,
+Thank you!
 
-Bart.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
