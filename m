@@ -1,45 +1,31 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ImhvOgH9"
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B7F0D54
-	for <linux-block@vger.kernel.org>; Fri,  8 Dec 2023 09:48:59 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-7b7117ca63eso6205839f.1
-        for <linux-block@vger.kernel.org>; Fri, 08 Dec 2023 09:48:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1702057738; x=1702662538; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QXcDADDwJhPsBsZgMsEmtu1xTvcSDMQwKEzXL7OTirE=;
-        b=ImhvOgH920hZABD4ZgVstOXQbwCARxbnxSHTxqA5v3LwVCTGfpAgidBEeoj7ihoLlq
-         noPoLURvHVckpZWVsZVMNC0TMFYV7K9eaVtX6e/1gRMeNRCG9x3LndGMetyEjwfL6JjJ
-         2O6pkumKdVfpNhfYlub+Lt90H0+1vgDnZ1Bkw7wmy7D/KbpIzNvwmlyfUfQ39Po++5NI
-         IOvXGAKRzsP9yY2inRu4WI3HIWy3VJQRIn2COvjC9GLW1VYHczmJLbvMwO0NHj3BjewJ
-         NzCfJ92yZYdfWaNozrb2sQP+ml8CjORDJFMspwlOC/XPs/iFjYsIilgNZKkl+aLuyzzU
-         3ZXg==
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274EF12E
+	for <linux-block@vger.kernel.org>; Fri,  8 Dec 2023 10:40:59 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d0c4d84bf6so18609805ad.1
+        for <linux-block@vger.kernel.org>; Fri, 08 Dec 2023 10:40:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702057738; x=1702662538;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QXcDADDwJhPsBsZgMsEmtu1xTvcSDMQwKEzXL7OTirE=;
-        b=d0ejqkC3iGoYKk10Wx5lMVEYaISGpg1macCf8gsrLZ9kgyRHQMBkqOQLs5KK16D3YO
-         0kjeZzU4TOVJUoz+ZNtokFZA6cBizHr8Tg8bdk7P3R717f7dDPmDBsNhPLe+4ib1iiqg
-         Sl9CqS8qwssI+BnwfFSa8u2EUgZrUjj5BtTyC00i0AW2saNg8Uk2H+DfR8Y5X9RZ9igj
-         wKNJpp9aNwufzIXb/1FP/5rJ+xdF0D3m329uAiWlXmGI+Z9kHZIMEFsahsm1EWflvsqF
-         +xko2suDsSF24RE4Zy4MGfTucFrK77KttWj1HPKA0Lw8PIJFi0+efZY9z2vruXA0WA8X
-         u7ig==
-X-Gm-Message-State: AOJu0YyhuMtUte0KY0OOWJfLjpPjTFe6SvIPHAZVuVWSoWdtRpAtQ6Mo
-	Ui7EKaxCWqqbWiXv9/pNZ1/VRD1+GhEhD1Zr/eZ57Q==
-X-Google-Smtp-Source: AGHT+IHXi4FeGELR3MyBDyiJj1iy9fDvId184BmnCL74mTBFNnHcSZsEifeb2LOWySCju5pS4n8jQw==
-X-Received: by 2002:a6b:e70c:0:b0:7b7:fe4:3dfa with SMTP id b12-20020a6be70c000000b007b70fe43dfamr1064790ioh.2.1702057738627;
-        Fri, 08 Dec 2023 09:48:58 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id l12-20020a02cd8c000000b0045458b7b4fcsm538082jap.171.2023.12.08.09.48.57
+        d=1e100.net; s=20230601; t=1702060858; x=1702665658;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TvsGteVqkqV679LQCDjr9/8jq2E4Fr7HUCXpQ4D7aXI=;
+        b=GErpB52Q+aipvWXBrwTIkvK+Z7KgkAAWnwUYMbu7dOjFjcvSwsB7FmXApbk/aO8ERQ
+         dLm98E39npUUjABONM24rr4j1YguXASwwxyISwqCJ0x3s2NaokTY1vDB2T4l02kqF1KJ
+         CiltMPvsCEJLxtPErhxDi/ku8PotePrhB/TQ3CIP0yCJLch7IRru9/D1LYkJ2izOtBeU
+         XMYmWXgUjZJB7eTkghsM7qlq4SeLa/KAnPg/dtf/pcC0TeL9wr035NCE/t3hhdUL66VZ
+         nXmBIffXA18+BMa4rsDZMEza41M7nQFBaFaKZ1pmiqv72uLRi4W7wGV6wdhkgb0QuuUj
+         9CXA==
+X-Gm-Message-State: AOJu0Yz+5gD49ekf4stjnWGrhD3DxRaM+P5TPHA8IaG8b13ejFr98yDN
+	WH4JYu1dQ8ZC2RxSYmarmQU=
+X-Google-Smtp-Source: AGHT+IH0J+tytiXjJk3cuc7oJTX8nB/T9r3/i7Mb4ndColI2AO1XiYgigfyIKzZGAogM2BqYYZqQYQ==
+X-Received: by 2002:a17:902:704c:b0:1d0:6ffd:f222 with SMTP id h12-20020a170902704c00b001d06ffdf222mr496868plt.120.1702060858388;
+        Fri, 08 Dec 2023 10:40:58 -0800 (PST)
+Received: from [172.20.2.177] (rrcs-173-197-90-226.west.biz.rr.com. [173.197.90.226])
+        by smtp.gmail.com with ESMTPSA id a2-20020a170902ecc200b001d05fb4cf3csm2029118plh.62.2023.12.08.10.40.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Dec 2023 09:48:57 -0800 (PST)
-Message-ID: <10082935-2c7f-4f88-b318-b8543583987a@kernel.dk>
-Date: Fri, 8 Dec 2023 10:48:57 -0700
+        Fri, 08 Dec 2023 10:40:57 -0800 (PST)
+Message-ID: <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
+Date: Fri, 8 Dec 2023 08:40:54 -1000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,95 +33,52 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.7-rc5
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
+ certain cases
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20231205053213.522772-1-bvanassche@acm.org>
+ <20231205053213.522772-4-bvanassche@acm.org>
+ <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
+ <4d506909-e063-4918-a9d3-e91bfa5a41a3@acm.org>
+ <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 12/7/23 17:37, Damien Le Moal wrote:
+> On 12/8/23 09:03, Bart Van Assche wrote:
+>> +static bool dd_use_io_priority(struct deadline_data *dd, enum req_op op)
+>> +{
+>> +	return dd->prio_aging_expire != 0 && !op_needs_zoned_write_locking(op);
+>> +}
+> 
+> Hard NACK on this. The reason is that this will disable IO priority also for
+> sensible use cases that use libaio/io_uring with direct IOs, with an application
+> that does the right thing for writes, namely assigning the same priority for all
+> writes to a zone. There are some use cases like this in production.
+> 
+> I do understand that there is a problem when IO priorities come from cgroups and
+> the user go through a file system. But that should be handled by the file
+> system. That is, for f2fs, all writes going to the same zone should have the
+> same priority. Otherwise, priority inversion issues will lead to non sequential
+> write patterns.
+> 
+> Ideally, we should indeed have a generic solution for the cgroup case. But it
+> seems that for now, the simplest thing to do is to not allow priorities through
+> cgroups for writes to zoned devices, unless cgroups is made more intellignet
+> about it and manage bio priorities per zone to avoid priority inversion within a
+> zone.
 
-Nothing major in here, just miscellanous fixes for MD and NVMe:
+Hi Damien,
 
-- NVMe pull request via Keith
-	- Proper nvme ctrl state setting (Keith)
-	- Passthrough command optimization (Keith)
-	- Spectre fix (Nitesh)
-	- Kconfig clarifications (Shin'ichiro)
-	- Frozen state deadlock fix (Bitao)
-	- Power setting quirk (Georg)
+My understanding is that blkcg_set_ioprio() is called from inside submit_bio()
+and hence that the reported issue cannot be solved by modifying F2FS. How about
+modifying the blk-ioprio policy such that it ignores zoned writes?
 
-- MD pull requests via Song
-	- 6.7 regresisons with recovery/sync (Yu)
-	- Reshape fix (David)
+Thanks,
 
-Please pull!
-
-
-The following changes since commit 8ad3ac92f0760fdd8537857ee1adfde849ab0268:
-
-  Merge tag 'nvme-6.7-2023-12-01' of git://git.infradead.org/nvme into block-6.7 (2023-12-01 09:09:16 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.7-2023-12-08
-
-for you to fetch changes up to c6d3ab9e76dc01011392cf8309f7e684b94ec464:
-
-  Merge tag 'md-fixes-20231207-1' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.7 (2023-12-07 12:15:18 -0700)
-
-----------------------------------------------------------------
-block-6.7-2023-12-08
-
-----------------------------------------------------------------
-Bitao Hu (1):
-      nvme: fix deadlock between reset and scan
-
-David Jeffery (1):
-      md/raid6: use valid sector values to determine if an I/O should wait on the reshape
-
-Georg Gottleuber (1):
-      nvme-pci: Add sleep quirk for Kingston drives
-
-Jens Axboe (4):
-      Merge tag 'md-fixes-20231201-1' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.7
-      Merge tag 'md-fixes-20231206' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.7
-      Merge tag 'nvme-6.7-2023-12-7' of git://git.infradead.org/nvme into block-6.7
-      Merge tag 'md-fixes-20231207-1' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.7
-
-Keith Busch (3):
-      nvme: introduce helper function to get ctrl state
-      nvme: ensure reset state check ordering
-      nvme-ioctl: move capable() admin check to the end
-
-Nitesh Shetty (1):
-      nvme: prevent potential spectre v1 gadget
-
-Shin'ichiro Kawasaki (1):
-      nvme: improve NVME_HOST_AUTH and NVME_TARGET_AUTH config descriptions
-
-Yu Kuai (4):
-      md: fix missing flush of sync_work
-      md: don't leave 'MD_RECOVERY_FROZEN' in error path of md_set_readonly()
-      md: fix stopping sync thread
-      md: split MD_RECOVERY_NEEDED out of mddev_resume
-
- drivers/md/md.c                | 144 ++++++++++++++++++++++-------------------
- drivers/md/raid5.c             |   4 +-
- drivers/nvme/host/Kconfig      |   5 +-
- drivers/nvme/host/core.c       |  52 +++++++++------
- drivers/nvme/host/fc.c         |   6 +-
- drivers/nvme/host/ioctl.c      |  21 +++---
- drivers/nvme/host/nvme.h       |  11 ++++
- drivers/nvme/host/pci.c        |  30 ++++++---
- drivers/nvme/host/rdma.c       |  23 ++++---
- drivers/nvme/host/tcp.c        |  27 +++++---
- drivers/nvme/target/Kconfig    |   5 +-
- drivers/nvme/target/configfs.c |   3 +
- 12 files changed, 197 insertions(+), 134 deletions(-)
-
--- 
-Jens Axboe
-
+Bart.
