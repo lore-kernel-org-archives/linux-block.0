@@ -1,206 +1,335 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="P6hMuT+b"
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B289E171D
-	for <linux-block@vger.kernel.org>; Thu,  7 Dec 2023 21:54:34 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1d0a7b72203so15558095ad.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Dec 2023 21:54:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1702014874; x=1702619674; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d0dJWd9G+sm5E3RRx4cYTh5/x5fCpyDFVWuNoswKM0k=;
-        b=P6hMuT+bMGaVO7WgUOyKaJvsPLFHrsxtvlBFuP/hmdQ9jiaCd83/Sz/tm7tMvJIVOX
-         +bbFcPhTWtx+Kb2b8B9n88XBNF8C5btadL38D5ErBzhXL+9E3srZ7LlJi2/s9Bo+LgKe
-         wb5rmLpVwX6YtbSrsI7ecLqvK4wiLurqORJylR0zsXFg+TsiXx8t51d59yqknlHlQKIF
-         dLwlWVOVD95Zf8jFeR0pldXKC+3TqGKXWhuuhVOFZm97yRQgimUcFBPAa/DzCBMqBAf7
-         MYjFqM/J7L2ma+apyLA7YQ+10NlVkx0yyLtwLIcxVERiMNCEBNnlIqRa1PJ586irRNKm
-         1Raw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702014874; x=1702619674;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d0dJWd9G+sm5E3RRx4cYTh5/x5fCpyDFVWuNoswKM0k=;
-        b=MHZBj9t6eJpGxu4rR2lVa22n5OkF3G1Fjor7WRa09iam/JTQxSR0UKbvg1Jo9lcS2b
-         rGkUtxClopvmktT248xKuP2FyNmOy4xOAmTKQ+bP9R8rwdoJ25eWtJa/+wkLopKBl91H
-         aqjI5z5JuJuGbEDkL5SjpjlE9RhYmJVOFzC2LQ42h61GFPQkqIHrrmQzrt4SlVX7wZOI
-         Wp5HqvKemhinneF8yKrBw4bPKli+wMasLFHJPNroG3MEoSpkSOiX8V40gJpJaa8WiieW
-         FQQaG1Hxph/sm4Y7gItg9jLdWtHSb8I7kfbOFCxFr8YYaWEIGxdwhR6k8+q+sM3Ij+vG
-         QG7Q==
-X-Gm-Message-State: AOJu0YxgLLuFPO6wLrxm/VL4a2ZnRua0fU9Sj7K3A1A+szQZchqgVmeI
-	AF40IqWcvidasLDB11dRwovQzw==
-X-Google-Smtp-Source: AGHT+IG/aBWwa8v3wyUG5zePLSh6SqSTaYGzLjkN7YAm5Eja/8NJYSXXBjxt3VFtC5jAU259MbuMeQ==
-X-Received: by 2002:a17:902:7887:b0:1d1:cdb2:a93c with SMTP id q7-20020a170902788700b001d1cdb2a93cmr3319986pll.130.1702014873548;
-        Thu, 07 Dec 2023 21:54:33 -0800 (PST)
-Received: from smtpclient.apple ([8.210.91.195])
-        by smtp.gmail.com with ESMTPSA id l7-20020a170903244700b001d0b0353a92sm784275pls.304.2023.12.07.21.54.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Dec 2023 21:54:33 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ez6GyVos"
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BF8D10FC;
+	Thu,  7 Dec 2023 22:10:57 -0800 (PST)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B868cT6005666;
+	Fri, 8 Dec 2023 06:10:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=pSU34edO5jTZ1OqNcCuhDDhJsjTwsC62IGDbIYgKSBM=;
+ b=ez6GyVos/5CZ67PsjkbaD5LERjC7yZ9K5LKqPNDdxZyJFa3lAkSAv6y2+yWcD90LA1Lx
+ ztv91waE6kDu22mx1J733KpTjeJAHUcAQpI7Ow6A/5X/+kKUwpfYjPvBMENQTOUImeiO
+ wCosvh4Rf8to8nv0Hz9X3cIBVzL+2ap5++H/3ffu6c8zvC/jrBjmZvSHuRRnKjF4Hh/+
+ U00UeMdbI6Jt7l5MC4NT/p7awDZOh7JPgIyCmrZMLU2ir+DhMwRSNMmrWkJBVH7xlFmb
+ g+yMdgECK7vsDmHN+Za8CGEtfZ70X+Mxhfg3ExfPdiAwjXBCF7lZae/0QTfaRr4PaWl/ 8A== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uuu1dr92b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Dec 2023 06:10:54 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B86As37028170
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 8 Dec 2023 06:10:54 GMT
+Received: from [10.216.14.21] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 7 Dec
+ 2023 22:06:54 -0800
+Message-ID: <f953ae3f-139e-432a-b6e9-1ce8b6ddeac9@quicinc.com>
+Date: Fri, 8 Dec 2023 11:36:50 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.100.2.1.4\))
-Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
-From: Li Feng <fengli@smartx.com>
-In-Reply-To: <ZXKTW7z3UH1kPvod@fedora>
-Date: Fri, 8 Dec 2023 13:55:30 +0800
-Cc: Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@kernel.dk>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- "open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <6CB024E3-337C-41F9-9DA1-B54B6E19F78E@smartx.com>
-References: <20231207043118.118158-1-fengli@smartx.com>
- <ZXJ4xNawrSRem2qe@fedora> <ZXKDFdzXN4xQAuBm@kbusch-mbp>
- <ZXKTW7z3UH1kPvod@fedora>
-To: Ming Lei <ming.lei@redhat.com>
-X-Mailer: Apple Mail (2.3774.100.2.1.4)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/12] soc: qcom: ice: add hwkm support in ice
+Content-Language: en-US
+To: Gaurav Kashyap <quic_gaurkash@quicinc.com>, <linux-scsi@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <ebiggers@google.com>,
+        <neil.armstrong@linaro.org>, <srinivas.kandagatla@linaro.org>
+CC: <linux-mmc@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <omprsing@qti.qualcomm.com>,
+        <quic_psodagud@quicinc.com>, <abel.vesa@linaro.org>,
+        <quic_spuppala@quicinc.com>, <kernel@quicinc.com>
+References: <20231122053817.3401748-1-quic_gaurkash@quicinc.com>
+ <20231122053817.3401748-4-quic_gaurkash@quicinc.com>
+From: Om Prakash Singh <quic_omprsing@quicinc.com>
+In-Reply-To: <20231122053817.3401748-4-quic_gaurkash@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: PQvvYijCUft1bHkZtJArAc-9o66WNbXV
+X-Proofpoint-ORIG-GUID: PQvvYijCUft1bHkZtJArAc-9o66WNbXV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-08_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ adultscore=0 clxscore=1011 bulkscore=0 mlxlogscore=999 phishscore=0
+ suspectscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312080047
 
 
-Hi,
 
-I have ran all io pattern on my another host.
-Notes:
-q1 means fio iodepth =3D 1
-j1 means fio num jobs =3D 1
+On 11/22/2023 11:08 AM, Gaurav Kashyap wrote:
+> Qualcomm's ICE (Inline Crypto Engine) contains a proprietary
+> key management hardware called Hardware Key Manager (HWKM).
+> This patch integrates HWKM support in ICE when it is
+> available. HWKM primarily provides hardware wrapped key support
+> where the ICE (storage) keys are not available in software and
+> protected in hardware.
+> 
+> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> ---
+>   drivers/soc/qcom/ice.c | 133 ++++++++++++++++++++++++++++++++++++++++-
+>   include/soc/qcom/ice.h |   1 +
+>   2 files changed, 133 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
+> index 6f941d32fffb..adf9cab848fa 100644
+> --- a/drivers/soc/qcom/ice.c
+> +++ b/drivers/soc/qcom/ice.c
+> @@ -26,6 +26,19 @@
+>   #define QCOM_ICE_REG_FUSE_SETTING		0x0010
+>   #define QCOM_ICE_REG_BIST_STATUS		0x0070
+>   #define QCOM_ICE_REG_ADVANCED_CONTROL		0x1000
+> +#define QCOM_ICE_REG_CONTROL			0x0
+> +/* QCOM ICE HWKM registers */
+> +#define QCOM_ICE_REG_HWKM_TZ_KM_CTL			0x1000
+> +#define QCOM_ICE_REG_HWKM_TZ_KM_STATUS			0x1004
+> +#define QCOM_ICE_REG_HWKM_BANK0_BANKN_IRQ_STATUS	0x2008
+> +#define QCOM_ICE_REG_HWKM_BANK0_BBAC_0			0x5000
+> +#define QCOM_ICE_REG_HWKM_BANK0_BBAC_1			0x5004
+> +#define QCOM_ICE_REG_HWKM_BANK0_BBAC_2			0x5008
+> +#define QCOM_ICE_REG_HWKM_BANK0_BBAC_3			0x500C
+> +#define QCOM_ICE_REG_HWKM_BANK0_BBAC_4			0x5010
+> +
+> +#define QCOM_ICE_HWKM_BIST_DONE_V1_VAL		0x11
+> +#define QCOM_ICE_HWKM_BIST_DONE_V2_VAL		0x287
+>   
+>   /* BIST ("built-in self-test") status flags */
+>   #define QCOM_ICE_BIST_STATUS_MASK		GENMASK(31, 28)
+> @@ -34,6 +47,9 @@
+>   #define QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK	0x2
+>   #define QCOM_ICE_FORCE_HW_KEY1_SETTING_MASK	0x4
+>   
+> +#define QCOM_ICE_HWKM_REG_OFFSET	0x8000
+> +#define HWKM_OFFSET(reg)		((reg) + QCOM_ICE_HWKM_REG_OFFSET)
+> +
+>   #define qcom_ice_writel(engine, val, reg)	\
+>   	writel((val), (engine)->base + (reg))
+>   
+> @@ -46,6 +62,9 @@ struct qcom_ice {
+>   	struct device_link *link;
+>   
+>   	struct clk *core_clk;
+> +	u8 hwkm_version;
+> +	bool use_hwkm;
 
-VCPU =3D 4, VMEM =3D 2GiB, fio using directio.
+we can rely on hwkm_version alone to determine if hwkm support is 
+available or not.
+if hwkm_version = 0 (default) consider hwkm is not enabled
 
-The results of most jobs are better than the deadline, and some are =
-lower than the deadline=E3=80=82
+> +	bool hwkm_init_complete;
+>   };
+>   
+>   static bool qcom_ice_check_supported(struct qcom_ice *ice)
+> @@ -63,8 +82,26 @@ static bool qcom_ice_check_supported(struct qcom_ice *ice)
+>   		return false;
+>   	}
+>   
+> +	if (major >= 4 || (major == 3 && minor == 2 && step >= 1))
+> +		ice->hwkm_version = 2;
+> +	else if (major == 3 && minor == 2)
+> +		ice->hwkm_version = 1;
+> +	else
+> +		ice->hwkm_version = 0;
+> +
+> +	if (ice->hwkm_version == 0)
+> +		ice->use_hwkm = false;
+> +
+hwkm version should pass from device-tree property instead of current 
+complex logic. This will be helpful in support future hwkm version also.
+ice->hwkm_version == 0, condition can be use for determining if hwkm is 
+enabled or not.
 
+>   	dev_info(dev, "Found QC Inline Crypto Engine (ICE) v%d.%d.%d\n",
+>   		 major, minor, step);
+> +	if (!ice->hwkm_version)
+> +		dev_info(dev, "QC ICE HWKM (Hardware Key Manager) not supported");
+> +	else
+> +		dev_info(dev, "QC ICE HWKM (Hardware Key Manager) version = %d",
+> +			 ice->hwkm_version);
+> +
+> +	if (!ice->use_hwkm)
+> +		dev_info(dev, "QC ICE HWKM (Hardware Key Manager) not used");
+>   
+>   	/* If fuses are blown, ICE might not work in the standard way. */
+>   	regval = qcom_ice_readl(ice, QCOM_ICE_REG_FUSE_SETTING);
+> @@ -113,10 +150,14 @@ static void qcom_ice_optimization_enable(struct qcom_ice *ice)
+>    * fails, so we needn't do it in software too, and (c) properly testing
+>    * storage encryption requires testing the full storage stack anyway,
+>    * and not relying on hardware-level self-tests.
+> + *
+> + * However, we still care about if HWKM BIST failed (when supported) as
+> + * important functionality would fail later, so disable hwkm on failure.
+>    */
+>   static int qcom_ice_wait_bist_status(struct qcom_ice *ice)
+>   {
+>   	u32 regval;
+> +	u32 bist_done_val;
+>   	int err;
+>   
+>   	err = readl_poll_timeout(ice->base + QCOM_ICE_REG_BIST_STATUS,
+> @@ -125,15 +166,95 @@ static int qcom_ice_wait_bist_status(struct qcom_ice *ice)
+>   	if (err)
+>   		dev_err(ice->dev, "Timed out waiting for ICE self-test to complete\n");
+>   
+> +	if (ice->use_hwkm) {
+> +		bist_done_val = (ice->hwkm_version == 1) ?
+> +				 QCOM_ICE_HWKM_BIST_DONE_V1_VAL :
+> +				 QCOM_ICE_HWKM_BIST_DONE_V2_VAL;
+> +		if (qcom_ice_readl(ice,
+> +				   HWKM_OFFSET(QCOM_ICE_REG_HWKM_TZ_KM_STATUS)) !=
+> +				   bist_done_val) {
+> +			dev_warn(ice->dev, "HWKM BIST error\n");
+> +			ice->use_hwkm = false;
+error is not passed to caller. if HWKM is enabled, and BIST failed, ICE 
+init also should be considered has failure.
 
-pattern                        |  iops(mq-deadline)    | iops(none)      =
- | diff
-:-                             | -:                    | -:              =
- | -:
-4k-randread-q1-j1              | 12325             |	 13356      	=
-|8.37%
-256k-randread-q1-j1            | 1865              |	 1883       	=
-|0.97%
-4k-randread-q128-j1            | 204739            |	 319066     	=
-|55.84%
-256k-randread-q128-j1          | 24257             |	 22851      	=
-|-5.80%
-4k-randwrite-q1-j1             | 9923              |	 10163      	=
-|2.42%
-256k-randwrite-q1-j1           | 2762              |	 2833       	=
-|2.57%
-4k-randwrite-q128-j1           | 137400            |	 152081     	=
-|10.68%
-256k-randwrite-q128-j1         | 9353              |	 9233       	=
-|-1.28%
-4k-read-q1-j1                  | 21499             |	 22223      	=
-|3.37%
-256k-read-q1-j1                | 1919              |	 1951       	=
-|1.67%
-4k-read-q128-j1                | 158806            |	 345269     	=
-|117.42%
-256k-read-q128-j1              | 18918             |	 23710      	=
-|25.33%
-4k-write-q1-j1                 | 10120             |	 10262      	=
-|1.40%
-256k-write-q1-j1               | 2779              |	 2744       	=
-|-1.26%
-4k-write-q128-j1               | 47576             |	 209236     	=
-|339.79%
-256k-write-q128-j1             | 9199              |	 9337       	=
-|1.50%
-4k-randread-q1-j2              | 24238             |	 25478      	=
-|5.12%
-256k-randread-q1-j2            | 3656              |	 3649       	=
-|-0.19%
-4k-randread-q128-j2            | 390090            |	 577300     	=
-|47.99%
-256k-randread-q128-j2          | 21992             |	 23437      	=
-|6.57%
-4k-randwrite-q1-j2             | 17096             |	 18112      	=
-|5.94%
-256k-randwrite-q1-j2           | 5188              |	 4914       	=
-|-5.28%
-4k-randwrite-q128-j2           | 143373            |	 140560     	=
-|-1.96%
-256k-randwrite-q128-j2         | 9423              |	 9314       	=
-|-1.16%
-4k-read-q1-j2                  | 36890             |	 31768      	=
-|-13.88%
-256k-read-q1-j2                | 3708              |	 4028       	=
-|8.63%
-4k-read-q128-j2                | 399500            |	 409857     	=
-|2.59%
-256k-read-q128-j2              | 19360             |	 21467      	=
-|10.88%
-4k-write-q1-j2                 | 17786             |	 18519      	=
-|4.12%
-256k-write-q1-j2               | 4756              |	 5035       	=
-|5.87%
-4k-write-q128-j2               | 175756            |	 159109     	=
-|-9.47%
-256k-write-q128-j2             | 9292              |	 9293       	=
-|0.01%
+Any reason considering it as warning only ?
+> +		}
+> +	}
+>   	return err;
+>   }
+>   
+> +static void qcom_ice_enable_standard_mode(struct qcom_ice *ice)
+> +{
+> +	u32 val = 0;
+> +
+> +	if (!ice->use_hwkm)
+> +		return;
+> +
+> +	/*
+> +	 * When ICE is in standard (hwkm) mode, it supports HW wrapped
+> +	 * keys, and when it is in legacy mode, it only supports standard
+> +	 * (non HW wrapped) keys.
+> +	 *
+> +	 * Put ICE in standard mode, ICE defaults to legacy mode.
+> +	 * Legacy mode - ICE HWKM slave not supported.
+> +	 * Standard mode - ICE HWKM slave supported.
+> +	 *
+> +	 * Depending on the version of HWKM, it is controlled by different
+> +	 * registers in ICE.
+> +	 */
+> +	if (ice->hwkm_version >= 2) {
 
-> On Dec 8, 2023, at 11:54, Ming Lei <ming.lei@redhat.com> wrote:
->=20
-> On Thu, Dec 07, 2023 at 07:44:37PM -0700, Keith Busch wrote:
->> On Fri, Dec 08, 2023 at 10:00:36AM +0800, Ming Lei wrote:
->>> On Thu, Dec 07, 2023 at 12:31:05PM +0800, Li Feng wrote:
->>>> virtio-blk is generally used in cloud computing scenarios, where =
-the
->>>> performance of virtual disks is very important. The mq-deadline =
-scheduler
->>>> has a big performance drop compared to none with single queue. In =
-my tests,
->>>> mq-deadline 4k readread iops were 270k compared to 450k for none. =
-So here
->>>> the default scheduler of virtio-blk is set to "none".
->>>=20
->>> The test result shows you may not test HDD. backing of virtio-blk.
->>>=20
->>> none can lose IO merge capability more or less, so probably =
-sequential IO perf
->>> drops in case of HDD backing.
->>=20
->> More of a curiosity, as I don't immediately even have an HDD to test
->> with! Isn't it more useful for the host providing the backing HDD use =
-an
->> appropriate IO scheduler? virtio-blk has similiarities with a =
-stacking
->> block driver, and we usually don't need to stack IO schedulers.
->=20
-> dm-rq actually uses IO scheduler at high layer, and early merge has =
-some
-> benefits:
->=20
-> 1) virtio-blk inflight requests are reduced, so less chance to =
-throttle
-> inside VM, meantime less IOs(bigger size) are handled by QEMU, and =
-submitted
-> to host side queue.
->=20
-> 2) early merge in VM is cheap than host side, since there can be more =
-block
-> IOs originated from different virtio-blk/scsi devices at the same time =
-and
-> all images can be stored in single disk, then these IOs become =
-interleaved in
-> host side queue, so sequential IO may become random or hard to merge.
->=20
-> As Jens mentioned, it needs actual test.
->=20
->=20
-> Thanks,
-> Ming
->=20
+hwkm_version version >= 2 is not exist. This programming instruction may 
+create problem in future.
 
+> +		val = qcom_ice_readl(ice, QCOM_ICE_REG_CONTROL);
+> +		val = val & 0xFFFFFFFE;
+> +		qcom_ice_writel(ice, val, QCOM_ICE_REG_CONTROL);
+> +	} else {
+> +		qcom_ice_writel(ice, 0x7,
+void using constant value like "0x7" in code use #define with meaningful 
+name that can indicate what operation is being performed.
+This comment is applicable for many places.
+> +				HWKM_OFFSET(QCOM_ICE_REG_HWKM_TZ_KM_CTL));
+> +	}
+> +}
+> +
+> +static void qcom_ice_hwkm_init(struct qcom_ice *ice)
+> +{
+> +	if (!ice->use_hwkm)
+> +		return;
+> +
+> +	/* Disable CRC checks. This HWKM feature is not used. */
+> +	qcom_ice_writel(ice, 0x6,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_TZ_KM_CTL));
+> +
+> +	/*
+> +	 * Give register bank of the HWKM slave access to read and modify
+> +	 * the keyslots in ICE HWKM slave. Without this, trustzone will not
+> +	 * be able to program keys into ICE.
+> +	 */
+> +	qcom_ice_writel(ice, 0xFFFFFFFF,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_0));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_1));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_2));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_3));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_4));
+> +
+> +	/* Clear HWKM response FIFO before doing anything */
+> +	qcom_ice_writel(ice, 0x8,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BANKN_IRQ_STATUS));
+> +}
+> +
+>   int qcom_ice_enable(struct qcom_ice *ice)
+>   {
+> +	int err;
+> +
+>   	qcom_ice_low_power_mode_enable(ice);
+>   	qcom_ice_optimization_enable(ice);
+>   
+> -	return qcom_ice_wait_bist_status(ice);
+> +	qcom_ice_enable_standard_mode(ice);
+> +
+> +	err = qcom_ice_wait_bist_status(ice);
+> +	if (err)
+> +		return err;
+> +
+> +	qcom_ice_hwkm_init(ice);
+new code added in this section is only application when hwkm is enabled.
+if (!ice->hwkm_version) {
+	qcom_ice_enable_standard_mode(ice);
+	qcom_ice_hwkm_init(ice);
+}
+> +
+> +	return err;
+>   }
+>   EXPORT_SYMBOL_GPL(qcom_ice_enable);
+>   
+> @@ -149,6 +270,8 @@ int qcom_ice_resume(struct qcom_ice *ice)
+>   		return err;
+>   	}
+>   
+> +	qcom_ice_enable_standard_mode(ice);
+> +	qcom_ice_hwkm_init(ice);
+>   	return qcom_ice_wait_bist_status(ice);
+>   }
+>   EXPORT_SYMBOL_GPL(qcom_ice_resume);
+> @@ -205,6 +328,12 @@ int qcom_ice_evict_key(struct qcom_ice *ice, int slot)
+>   }
+>   EXPORT_SYMBOL_GPL(qcom_ice_evict_key);
+>   
+> +bool qcom_ice_hwkm_supported(struct qcom_ice *ice)
+> +{
+> +	return ice->use_hwkm;
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_ice_hwkm_supported);
+> +
+>   static struct qcom_ice *qcom_ice_create(struct device *dev,
+>   					void __iomem *base)
+>   {
+> @@ -239,6 +368,8 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
+>   		engine->core_clk = devm_clk_get_enabled(dev, NULL);
+>   	if (IS_ERR(engine->core_clk))
+>   		return ERR_CAST(engine->core_clk);
+> +	engine->use_hwkm = of_property_read_bool(dev->of_node,
+> +						 "qcom,ice-use-hwkm");
+>   
+>   	if (!qcom_ice_check_supported(engine))
+>   		return ERR_PTR(-EOPNOTSUPP);
+> diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
+> index 9dd835dba2a7..1f52e82e3e1c 100644
+> --- a/include/soc/qcom/ice.h
+> +++ b/include/soc/qcom/ice.h
+> @@ -34,5 +34,6 @@ int qcom_ice_program_key(struct qcom_ice *ice,
+>   			 const struct blk_crypto_key *bkey,
+>   			 u8 data_unit_size, int slot);
+>   int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
+> +bool qcom_ice_hwkm_supported(struct qcom_ice *ice);
+>   struct qcom_ice *of_qcom_ice_get(struct device *dev);
+>   #endif /* __QCOM_ICE_H__ */
