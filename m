@@ -1,198 +1,121 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PL6ge/nj"
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC6A61723;
-	Thu,  7 Dec 2023 22:42:41 -0800 (PST)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B86KZ04011091;
-	Fri, 8 Dec 2023 06:42:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=KzzN6S733xQH5Xrq7RBS+FTw1kHcnk6Z6QkJm+rY9ks=;
- b=PL6ge/njeVWwOAdSJVduGkvZoSZ+8B6/JScVmURya1XzzZWJO3ycYRB14kThgv8Kj28V
- 0R4zSTP7peThZDiYo3wj/aR4eNVJqsFZGtS2DGwiaonBTcOKcEmrXJ+IwqJzsF1pqGAn
- p2S8J8QeXDI/yBQwt86bldNOJXF0PJEgZfj7XvrEyUG4nI2ftMfMR4JezWN/uwzIPNzp
- qyheIb48iI5YBR7ihT156ox4xvSkfctO8df1gAsVp0dum1+3CsbMpyjX/nI1wzfa8zM8
- VxtWwxEWHiwLJ9vCwUmATWRQs5r/0wPZiBfaZnM0DbD5raukLT0t6/g2/5S5JZ2kvQwD Ig== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uubd82rpc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Dec 2023 06:42:39 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B86gcZ8021524
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 8 Dec 2023 06:42:38 GMT
-Received: from [10.216.14.21] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 7 Dec
- 2023 22:38:49 -0800
-Message-ID: <30a12c5e-8336-43e8-9bca-1180e046af1e@quicinc.com>
-Date: Fri, 8 Dec 2023 12:08:45 +0530
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DCD1722;
+	Thu,  7 Dec 2023 23:34:02 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SmjYv0DVqz4f3lD7;
+	Fri,  8 Dec 2023 15:33:55 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id C775E1A09F4;
+	Fri,  8 Dec 2023 15:33:59 +0800 (CST)
+Received: from [10.174.176.34] (unknown [10.174.176.34])
+	by APP1 (Coremail) with SMTP id cCh0CgDHyhDlxnJlkc9ADA--.40165S3;
+	Fri, 08 Dec 2023 15:33:59 +0800 (CST)
+Subject: Re: [PATCH 13/14] iomap: map multiple blocks at a time
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Darrick J. Wong" <djwong@kernel.org>,
+ Chandan Babu R <chandan.babu@oracle.com>,
+ Ritesh Harjani <ritesh.list@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Andreas Gruenbacher <agruenba@redhat.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>,
+ Johannes Thumshirn <jth@kernel.org>, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ gfs2@lists.linux.dev, Christian Brauner <brauner@kernel.org>,
+ linux-ext4@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
+References: <20231207072710.176093-1-hch@lst.de>
+ <20231207072710.176093-14-hch@lst.de>
+ <4e4a86a0-5681-210f-0c94-263126967082@huaweicloud.com>
+ <20231207150311.GA18830@lst.de>
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+Message-ID: <d5f3979b-344a-bf01-8a45-49ae02b0bed0@huaweicloud.com>
+Date: Fri, 8 Dec 2023 15:33:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/12] qcom_scm: scm call for deriving a software
- secret
+In-Reply-To: <20231207150311.GA18830@lst.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To: Gaurav Kashyap <quic_gaurkash@quicinc.com>, <linux-scsi@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <ebiggers@google.com>,
-        <neil.armstrong@linaro.org>, <srinivas.kandagatla@linaro.org>
-CC: <linux-mmc@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-fscrypt@vger.kernel.org>, <omprsing@qti.qualcomm.com>,
-        <quic_psodagud@quicinc.com>, <abel.vesa@linaro.org>,
-        <quic_spuppala@quicinc.com>, <kernel@quicinc.com>
-References: <20231122053817.3401748-1-quic_gaurkash@quicinc.com>
- <20231122053817.3401748-3-quic_gaurkash@quicinc.com>
-From: Om Prakash Singh <quic_omprsing@quicinc.com>
-In-Reply-To: <20231122053817.3401748-3-quic_gaurkash@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: iP9lA8ykY04IaEM6H1mVekqFd9XzQWba
-X-Proofpoint-ORIG-GUID: iP9lA8ykY04IaEM6H1mVekqFd9XzQWba
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-08_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- suspectscore=0 mlxlogscore=845 impostorscore=0 phishscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 mlxscore=0 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312080052
+X-CM-TRANSID:cCh0CgDHyhDlxnJlkc9ADA--.40165S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7urW8tFW7JF1Dtw1DCrWxJFb_yoW8try8pF
+	WIganYkF1DJ34avrn7Za1UZr10yasxGF48t343tFy3Aa98Kr1S9F1xK3WjvFWY9rZrWr1S
+	vFW8t3s3XFnIyrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a
+	6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UZ18PUUUUU=
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
+On 2023/12/7 23:03, Christoph Hellwig wrote:
+> On Thu, Dec 07, 2023 at 09:39:44PM +0800, Zhang Yi wrote:
+>>> +	do {
+>>> +		unsigned map_len;
+>>> +
+>>> +		error = wpc->ops->map_blocks(wpc, inode, pos);
+>>> +		if (error)
+>>> +			break;
+>>> +		trace_iomap_writepage_map(inode, &wpc->iomap);
+>>> +
+>>> +		map_len = min_t(u64, dirty_len,
+>>> +			wpc->iomap.offset + wpc->iomap.length - pos);
+>>> +		WARN_ON_ONCE(!folio->private && map_len < dirty_len);
+>>
+>> While I was debugging this series on ext4, I would suggest try to add map_len
+>> or dirty_len into this trace point could be more convenient.
+> 
+> That does seem useful, but it means we need to have an entirely new
+> even class.  Can I offload this to you for inclusion in your ext4
+> series? :)
+> 
 
+Sure, I'm glad to do it.
 
-On 11/22/2023 11:08 AM, Gaurav Kashyap wrote:
-> Inline storage encryption requires deriving a sw secret from
-> the hardware wrapped keys. For non-wrapped keys, this can be
-> directly done as keys are in the clear.
+>>> +		case IOMAP_HOLE:
+>>> +			break;
+>>
+>> BTW, I want to ask an unrelated question of this patch series. Do you
+>> agree with me to add a IOMAP_DELAYED case and re-dirty folio here? The
+>> background is that on ext4, jbd2 thread call ext4_normal_submit_inode_data_buffers()
+>> submit data blocks in data=ordered mode, but it can only submit mapped
+>> blocks, now we skip unmapped blocks and re-dirty folios in
+>> ext4_do_writepages()->mpage_prepare_extent_to_map()->..->ext4_bio_write_folio().
+>> So we have to inherit this logic when convert to iomap, I suppose ext4's
+>> ->map_blocks() return IOMAP_DELALLOC for this case, and iomap do something
+>> like:
+>>
+>> +               case IOMAP_DELALLOC:
+>> +                       iomap_set_range_dirty(folio, offset_in_folio(folio, pos),
+>> +                                             map_len);
+>> +                       folio_redirty_for_writepage(wbc, folio);
+>> +                       break;
 > 
-> However, when keys are hardware wrapped, it can be unwrapped
-> by HWKM (Hardware Key Manager) which is accessible only from Qualcomm
-> Trustzone. Hence, it also makes sense that the software secret is also
-> derived there and returned to the linux kernel . This can be invoked by
-> using the crypto profile APIs provided by the block layer.
+> I guess we could add it, but it feels pretty quirky to me, so it would at
+> least need a very big comment.
 > 
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> ---
->   drivers/firmware/qcom/qcom_scm.c       | 71 ++++++++++++++++++++++++++
->   drivers/firmware/qcom/qcom_scm.h       |  1 +
->   include/linux/firmware/qcom/qcom_scm.h |  2 +
->   3 files changed, 74 insertions(+)
+> But I think Ted mentioned a while ago that dropping the classic
+> data=ordered mode for ext4 might be a good idea eventually no that ext4
+> can update the inode size at I/O completion time (Ted, correct me if
+> I'm wrong).  If that's the case it might make sense to just drop the
+> ordered mode instead of adding these quirks to iomap.
 > 
-> diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qcom_scm.c
-> index 520de9b5633a..6dfb913f3e33 100644
-> --- a/drivers/firmware/qcom/qcom_scm.c
-> +++ b/drivers/firmware/qcom/qcom_scm.c
-> @@ -1214,6 +1214,77 @@ int qcom_scm_ice_set_key(u32 index, const u8 *key, u32 key_size,
->   }
->   EXPORT_SYMBOL_GPL(qcom_scm_ice_set_key);
->   
-> +/**
-> + * qcom_scm_derive_sw_secret() - Derive software secret from wrapped key
-> + * @wkey: the hardware wrapped key inaccessible to software
-> + * @wkey_size: size of the wrapped key
-> + * @sw_secret: the secret to be derived which is exactly the secret size
-> + * @sw_secret_size: size of the sw_secret
-> + *
-> + * Derive a software secret from a hardware wrapped key for software crypto
-> + * operations.
-> + * For wrapped keys, the key needs to be unwrapped, in order to derive a
-> + * software secret, which can be done in the hardware from a secure execution
-> + * environment.
-> + *
-> + * For more information on sw secret, please refer to "Hardware-wrapped keys"
-> + * section of Documentation/block/inline-encryption.rst.
-> + *
-> + * Return: 0 on success; -errno on failure.
-> + */
-> +int qcom_scm_derive_sw_secret(const u8 *wkey, size_t wkey_size,
-> +			      u8 *sw_secret, size_t sw_secret_size)
-> +{
-> +	struct qcom_scm_desc desc = {
-> +		.svc = QCOM_SCM_SVC_ES,
-> +		.cmd =  QCOM_SCM_ES_DERIVE_SW_SECRET,
-> +		.arginfo = QCOM_SCM_ARGS(4, QCOM_SCM_RW,
-> +					 QCOM_SCM_VAL, QCOM_SCM_RW,
-> +					 QCOM_SCM_VAL),
-> +		.args[1] = wkey_size,
-> +		.args[3] = sw_secret_size,
-> +		.owner = ARM_SMCCC_OWNER_SIP,
-> +	};
-> +
-> +	void *wkey_buf, *secret_buf;
-> +	dma_addr_t wkey_phys, secret_phys;
-> +	int ret;
-> +
-> +	/*
-> +	 * Like qcom_scm_ice_set_key(), we use dma_alloc_coherent() to properly
-> +	 * get a physical address, while guaranteeing that we can zeroize the
-> +	 * key material later using memzero_explicit().
-> +	 */
-> +	wkey_buf = dma_alloc_coherent(__scm->dev, wkey_size, &wkey_phys, GFP_KERNEL);
-> +	if (!wkey_buf)
-> +		return -ENOMEM;
-> +	secret_buf = dma_alloc_coherent(__scm->dev, sw_secret_size, &secret_phys, GFP_KERNEL);
-> +	if (!secret_buf) {
-> +		ret = -ENOMEM;
-> +		goto err_free_wrapped;
-> +	}
-> +
-> +	memcpy(wkey_buf, wkey, wkey_size);
-> +	desc.args[0] = wkey_phys;
-> +	desc.args[2] = secret_phys;
-> +
-> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
-> +	if (!ret)
-> +		memcpy(sw_secret, secret_buf, sw_secret_size);
-> +
-> +	memzero_explicit(secret_buf, sw_secret_size);
-> +
-> +	dma_free_coherent(__scm->dev, sw_secret_size, secret_buf, secret_phys);
-> +
-> +err_free_wrapped:
-> +	memzero_explicit(wkey_buf, wkey_size);
-In error handling case the operation is being performed on unallocated 
-memory.
-> +
-> +	dma_free_coherent(__scm->dev, wkey_size, wkey_buf, wkey_phys);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(qcom_scm_derive_sw_secret);
-> +
->   /**
->    * qcom_scm_hdcp_available() - Check if secure environment supports HDCP.
->    *
-> diff --git a/drivers/firmware/qcom/qcom_scm.h b/drivers/firmware/qcom/qcom_scm.h
-> index 4532907e8489..c75456aa6ac5 100644
-> --- a/drivers/firmware/qcom/qcom_scm.h
-> +++ b/drivers/firmware/qcom/qcom_scm.h
-> @@ -121,6 +121,7 @@ int scm_legacy_call(struct device *dev, const struct qcom_scm_desc *desc,
->   #define QCOM_SCM_SVC_ES			0x10	/* Enterprise Security */
->   #define QCOM_SCM_ES_INVALIDATE_ICE_KEY	0x03
->   #define QCOM_SCM_ES_CONFIG_SET_ICE_KEY	0x04
-> +#define QCOM_SCM_ES_DERIVE_SW_SECRET	0x07
->   
->   #define QCOM_SCM_SVC_HDCP		0x11
->   #define QCOM_SCM_HDCP_INVOKE		0x01
-> diff --git a/include/linux/firmware/qcom/qcom_scm.h b/include/linux/firmware/qcom/qcom_scm.h
-> index ccaf28846054..c65f2d61492d 100644
-> --- a/include/linux/firmware/qcom/qcom_scm.h
-> +++ b/include/linux/firmware/qcom/qcom_scm.h
-> @@ -103,6 +103,8 @@ bool qcom_scm_ice_available(void);
->   int qcom_scm_ice_invalidate_key(u32 index);
->   int qcom_scm_ice_set_key(u32 index, const u8 *key, u32 key_size,
->   			 enum qcom_scm_ice_cipher cipher, u32 data_unit_size);
-> +int qcom_scm_derive_sw_secret(const u8 *wkey, size_t wkey_size,
-> +			      u8 *sw_secret, size_t sw_secret_size);
->   
->   bool qcom_scm_hdcp_available(void);
->   int qcom_scm_hdcp_req(struct qcom_scm_hdcp_req *req, u32 req_cnt, u32 *resp);
+
+Yeah, make sense, we could remove these quirks after ext4 drop
+data=ordered mode. For now, let me implement it according to this
+temporary method.
+
+Thanks,
+Yi.
+
