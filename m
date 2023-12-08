@@ -1,35 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D8F46B4;
-	Fri,  8 Dec 2023 03:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nOK+z3iH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BB41C433CC;
-	Fri,  8 Dec 2023 03:47:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702007230;
-	bh=94tchSDYuOJuR9WzLVdslB+vEjc/Lmq8PQ0nzq14wD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nOK+z3iH1TfEWmIaQGdwj4Ez+jByWLha5CQ8K1y0da1EscgZ3J4DolwFZwlerOanc
-	 VIaItoespH1Vt61wwCBiAE2hqrHcQpeH7P1C4/i3BSdvsB53ZLd9jnrh1Uv6J1seOU
-	 3H57qVAK5ACNwyfzSmcglVGyZls4gGVUCWlB5hIs/r0H+UfXXwxPw5hi70WyOAOQFe
-	 kPFZMkYLLBJgiGeCV4kQPyHzw1/zcwJbscMSMadla77ryHRW2zGTqZUHv4ABObd73k
-	 0BQfa7+hjNp/LT7t5HFLJPGqA8NGI9aeaeHfm4t0xUH3Jcc6r4FocAna1NXMAb0rMD
-	 h2SUVBAuRIVwQ==
-Date: Thu, 7 Dec 2023 19:51:46 -0800
-From: Bjorn Andersson <andersson@kernel.org>
-To: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Cc: linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	ebiggers@google.com, neil.armstrong@linaro.org, srinivas.kandagatla@linaro.org, 
-	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-	omprsing@qti.qualcomm.com, quic_psodagud@quicinc.com, abel.vesa@linaro.org, 
-	quic_spuppala@quicinc.com, kernel@quicinc.com
-Subject: Re: [PATCH v3 11/12] arm64: dts: qcom: sm8650: add hwkm support to
- ufs ice
-Message-ID: <blzia6asujby2xsfg2na6piwcgfkorodugebvflstjfexeyfvj@t5ifq3kxquhw>
-References: <20231122053817.3401748-1-quic_gaurkash@quicinc.com>
- <20231122053817.3401748-12-quic_gaurkash@quicinc.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PlUYyFtY"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6710D1706
+	for <linux-block@vger.kernel.org>; Thu,  7 Dec 2023 19:54:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702007660;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CMjgdK/2S1PdVSZgnJj0b95Jv4yCNX3anEehreiP6o4=;
+	b=PlUYyFtYFjnLvOGYxniGB8YKWnxODPXXIyiqk5M8sVjJrL2+GULp0ifHeyh9i7MJBPtZQo
+	uznRjLiqU0yIEj5+u3mroivt4Yd4mLxNT7KpVP/MhJJlhlUvJYiuWCRbS94t7pXNO7JZ+B
+	7zsmkuKNE62is4MZR2gmHdsZ56C4kIU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-455-v257SBM9Ou6VY-NkZGlbJw-1; Thu, 07 Dec 2023 22:54:14 -0500
+X-MC-Unique: v257SBM9Ou6VY-NkZGlbJw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1F0128057FD;
+	Fri,  8 Dec 2023 03:54:14 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.5])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 05A5C2166B35;
+	Fri,  8 Dec 2023 03:54:07 +0000 (UTC)
+Date: Fri, 8 Dec 2023 11:54:03 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Li Feng <fengli@smartx.com>, Jens Axboe <axboe@kernel.dk>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
+Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
+Message-ID: <ZXKTW7z3UH1kPvod@fedora>
+References: <20231207043118.118158-1-fengli@smartx.com>
+ <ZXJ4xNawrSRem2qe@fedora>
+ <ZXKDFdzXN4xQAuBm@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,40 +51,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231122053817.3401748-12-quic_gaurkash@quicinc.com>
+In-Reply-To: <ZXKDFdzXN4xQAuBm@kbusch-mbp>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Tue, Nov 21, 2023 at 09:38:16PM -0800, Gaurav Kashyap wrote:
-> The Inline Crypto Engine (ICE) for UFS supports the
-> Hardware Key Manager (hwkm) to securely manage storage
-> keys. Enable using this hardware on sm8650.
+On Thu, Dec 07, 2023 at 07:44:37PM -0700, Keith Busch wrote:
+> On Fri, Dec 08, 2023 at 10:00:36AM +0800, Ming Lei wrote:
+> > On Thu, Dec 07, 2023 at 12:31:05PM +0800, Li Feng wrote:
+> > > virtio-blk is generally used in cloud computing scenarios, where the
+> > > performance of virtual disks is very important. The mq-deadline scheduler
+> > > has a big performance drop compared to none with single queue. In my tests,
+> > > mq-deadline 4k readread iops were 270k compared to 450k for none. So here
+> > > the default scheduler of virtio-blk is set to "none".
+> > 
+> > The test result shows you may not test HDD. backing of virtio-blk.
+> > 
+> > none can lose IO merge capability more or less, so probably sequential IO perf
+> > drops in case of HDD backing.
+> 
+> More of a curiosity, as I don't immediately even have an HDD to test
+> with! Isn't it more useful for the host providing the backing HDD use an
+> appropriate IO scheduler? virtio-blk has similiarities with a stacking
+> block driver, and we usually don't need to stack IO schedulers.
 
-I'm unable to understand why the size of the reg changes based on this
-motivation.
+dm-rq actually uses IO scheduler at high layer, and early merge has some
+benefits:
 
-Regards,
-Bjorn
+1) virtio-blk inflight requests are reduced, so less chance to throttle
+inside VM, meantime less IOs(bigger size) are handled by QEMU, and submitted
+to host side queue.
 
-> 
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> ---
->  arch/arm64/boot/dts/qcom/sm8650.dtsi | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8650.dtsi b/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> index bbebe15437aa..b61066210e09 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> @@ -763,7 +763,8 @@ rng: rng@10c3000 {
->  		ice: crypto@1d88000 {
->  			compatible = "qcom,sm8650-inline-crypto-engine",
->  				     "qcom,inline-crypto-engine";
-> -			reg = <0 0x01d88000 0 0x8000>;
-> +			reg = <0 0x01d88000 0 0x10000>;
-> +			qcom,ice-use-hwkm;
->  
->  			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
->  		};
-> -- 
-> 2.25.1
-> 
-> 
+2) early merge in VM is cheap than host side, since there can be more block
+IOs originated from different virtio-blk/scsi devices at the same time and
+all images can be stored in single disk, then these IOs become interleaved in
+host side queue, so sequential IO may become random or hard to merge.
+
+As Jens mentioned, it needs actual test.
+
+
+Thanks,
+Ming
+
