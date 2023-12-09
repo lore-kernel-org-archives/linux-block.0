@@ -1,55 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F1837D3E
-	for <linux-block@vger.kernel.org>; Fri,  8 Dec 2023 20:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KACjTvuo"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 378F4C433C7;
-	Fri,  8 Dec 2023 20:45:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702068327;
-	bh=f4pp2xStVt7D86FvvQ+g04YLTRN35jg2ZWG7h3JNpkI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=KACjTvuoHZa25peac6AfkApdaW66IGGuMbw0P3D4pmPaj5MFqA9RgVVhIJoOXGNqq
-	 WI0KA1cw0otomSWWCXATKQJa4jiWXc29mokb8RY85TFL4Y2U7jRrpqVNwqFWCqgC1J
-	 LbQ6uhXp4Uimz7VJ37GWZyfG3H2Bsr9E+NpryvdlNftUjo3daFMyjrCa6m35Qvmep5
-	 oVtRWEWUbTiN7V/ZMvocCmKa/ZdUgCvvW7g5QknkoFf+7+cCwV3S2FE8oIpmmnJ4S2
-	 PQC3T3Vhwg0a2l48rZf4brcA1xB3HVV0IvFjg4LAaqhaCmBJxz2xqCblcVk3+qDMrf
-	 cOcgTunq9YjVw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 25AC9DD4F1E;
-	Fri,  8 Dec 2023 20:45:27 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.7-rc5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <10082935-2c7f-4f88-b318-b8543583987a@kernel.dk>
-References: <10082935-2c7f-4f88-b318-b8543583987a@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <10082935-2c7f-4f88-b318-b8543583987a@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.7-2023-12-08
-X-PR-Tracked-Commit-Id: c6d3ab9e76dc01011392cf8309f7e684b94ec464
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d71369dbe0c5c1217dc681d6871b7918b2996de6
-Message-Id: <170206832715.6831.10573900674815316451.pr-tracker-bot@kernel.org>
-Date: Fri, 08 Dec 2023 20:45:27 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TM/3vw7L"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 356201705
+	for <linux-block@vger.kernel.org>; Fri,  8 Dec 2023 18:27:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702088867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZAI0NuHLd7A7hcfMNmxQThYQE6RIisLpIwIrNRbX2Ig=;
+	b=TM/3vw7LdqkS30J0HG/6BPtj73pKZG8EN8PiV9EI8KCOV9YOYD43Db+D3O3T8w3ni+gdez
+	RiLSOQo40cnswvtW05O4aDGNEtLuP+TLXoL7UeYd76w4vuJ4r+GlDQhCsgIDbeDK0pTTfb
+	3eDlTODEMV5jh+cxPduoKLOyWhQzh5c=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-117-uIlvz8xnOAONWZ2y1JLgnw-1; Fri, 08 Dec 2023 21:27:43 -0500
+X-MC-Unique: uIlvz8xnOAONWZ2y1JLgnw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1757F805844;
+	Sat,  9 Dec 2023 02:27:43 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 773B4492BC6;
+	Sat,  9 Dec 2023 02:27:37 +0000 (UTC)
+Date: Sat, 9 Dec 2023 10:27:32 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
+	Guangwu Zhang <guazhang@redhat.com>,
+	Chengming Zhou <zhouchengming@bytedance.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH V4 resend] lib/group_cpus.c: avoid to acquire cpu hotplug
+ lock in group_cpus_evenly
+Message-ID: <ZXPQlIREBiX46trU@fedora>
+References: <20231120083559.285174-1-ming.lei@redhat.com>
+ <20231120120059.ef0614c2295b2102100cb56e@linux-foundation.org>
+ <20231206151246.99bbf0f253b85f053bea9199@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231206151246.99bbf0f253b85f053bea9199@linux-foundation.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-The pull request you sent on Fri, 8 Dec 2023 10:48:57 -0700:
+On Wed, Dec 06, 2023 at 03:12:46PM -0800, Andrew Morton wrote:
+> On Mon, 20 Nov 2023 12:00:59 -0800 Andrew Morton <akpm@linux-foundation.org> wrote:
+> 
+> > On Mon, 20 Nov 2023 16:35:59 +0800 Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> > > group_cpus_evenly() could be part of storage driver's error handler,
+> > > such as nvme driver, when may happen during CPU hotplug, in which
+> > > storage queue has to drain its pending IOs because all CPUs associated
+> > > with the queue are offline and the queue is becoming inactive. And
+> > > handling IO needs error handler to provide forward progress.
+> > > 
+> > > Then dead lock is caused:
+> > > 
+> > > 1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
+> > > handler is waiting for inflight IO
+> > > 
+> > > 2) error handler is waiting for CPU hotplug lock
+> > > 
+> > > 3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
+> > > error handling can't provide forward progress.
+> > > 
+> > > Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
+> > > in which two stage spreads are taken: 1) the 1st stage is over all present
+> > > CPUs; 2) the end stage is over all other CPUs.
+> > > 
+> > > Turns out the two stage spread just needs consistent 'cpu_present_mask', and
+> > > remove the CPU hotplug lock by storing it into one local cache. This way
+> > > doesn't change correctness, because all CPUs are still covered.
+> > 
+> > I'm not sure what is the intended merge path for this, but I can do lib/.
+> > 
+> > Do you think that a -stable backport is needed?  It sounds that way.
+> > 
+> > If so, are we able to identify a suitable Fixes: target?  That would
+> > predate f7b3ea8cf72f3 ("genirq/affinity: Move group_cpus_evenly() into
+> > lib/").  
+> 
+> No?  I think this predates 428e211641ed8 ("genirq/affinity: Replace
+> deprecated CPU-hotplug functions." also.
+> 
+> I'll slap a cc:stable on it and I'll let you and the -stable
+> maintainers figure it out.
 
-> git://git.kernel.dk/linux.git tags/block-6.7-2023-12-08
+The issue should be introduced since 3ee0ce2a54df ("genirq/affinity: Use get/put_online_cpus
+around cpumask operations") in v4.8, but the logic has been changed a lot, so
+may take some effort to backport to longterm stables.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d71369dbe0c5c1217dc681d6871b7918b2996de6
+The issue is reported from RH QA test, in which both cpu hotplug and
+nvme error recovering are triggered at same time, and easy to duplicate
+in QE lab, but may be hard to trigger in production environment.
 
-Thank you!
+Thanks, 
+Ming
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
