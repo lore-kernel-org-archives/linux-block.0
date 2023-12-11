@@ -1,378 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NIcPUt35"
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D161AD0;
-	Mon, 11 Dec 2023 13:43:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702330996; x=1733866996;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=BTizvhdPXR2BP6L8x0BBdEatPT+ym1i641aGFNAGnFE=;
-  b=NIcPUt35rw6ZpEOo5x21CqepPZJTgVVuV2TsYa6pw5OpMalsIpXaO81V
-   2q9Er08D63ZcD/vcAiz6tMlvpw/1e6FST1wH9EdSumvcgpzXOx5la5l6Q
-   z6Q+qJ36Xyf2+J3fEbtitsv63KK8exTwA5kWWHYgUCMZSUc4aJGJM1gkw
-   4TnTmK0imobFQ5gYxUDoyBoYCDJkBzmWoV9oN9NtnqLJG87nG+U4lG0nL
-   To68wIp+igO1APDtX+esjvv35ILJja/G6gvtgpE1a+Z6ol6BV3M/CcZGd
-   koIlljttUPNfnx5E2ZGfqwxC+/u+GoFg7d7H5CzhApNYb9bcqYXFcrbsz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="1862500"
-X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
-   d="scan'208";a="1862500"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 13:43:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="722964431"
-X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
-   d="scan'208";a="722964431"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 11 Dec 2023 13:43:04 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rCo3K-000IV9-0L;
-	Mon, 11 Dec 2023 21:43:02 +0000
-Date: Tue, 12 Dec 2023 05:42:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: linan666@huaweicloud.com, song@kernel.org, axboe@kernel.dk
-Cc: oe-kbuild-all@lists.linux.dev, linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linan666@huaweicloud.com, yukuai3@huawei.com, yi.zhang@huawei.com,
-	houtao1@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH 2/2] md: don't account sync_io if iostats of the disk is
- disabled
-Message-ID: <202312120536.VqOKGsPZ-lkp@intel.com>
-References: <20231211075614.1850003-3-linan666@huaweicloud.com>
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D619F
+	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 14:15:20 -0800 (PST)
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-35d72b72ff7so20063165ab.0
+        for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 14:15:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702332919; x=1702937719;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i+NbavSPkNYuuLKazhVu/hAbx07laMBmOoTQUM0p47w=;
+        b=mgXJKiSmKJ1MJ8mUnuy5dg1uq58qUKlU0eVfFSiN379R0hSB3E9ArMQoPgG3uKTPPq
+         VodfPMiCnAKLlRdbxWNFZXPhl7caQNRFlkeK2MsnFL1uiZRYfmEgTr+0jZkglkvWxK2c
+         pEugUv3q8lyqwQb+iq7UlMyFwSp8u2UTWtyDWtQmpavsz3hWDOvAgcwVlAIzqjEXXbVg
+         F9ZDzVjc+3/uRzUQzabJOraFdmn3NDj+jDHxEiCIBuOr12toMQHV1/Uiy63XpK4mHb3p
+         UDkXR6mU3XSXb5kI9OLvRWBi81bWr70/0jQVzgP8ThqlPV+KNIKK1RXsoaRH+Vfzvdul
+         sZ0Q==
+X-Gm-Message-State: AOJu0Yz7UIkF8auPcCsPdKb8H7h6e4QtnywNXxhs/6Drz2qPhat1hGHp
+	9DuVHy3+igw2A53qFgFaat5R
+X-Google-Smtp-Source: AGHT+IHNeSpFqavSvNI7EouqNAWIqxS4EtGj5taHoZVkMX4FUv92lNAhynaV9F2HmvIyMA8Vl+7bmw==
+X-Received: by 2002:a05:6e02:148c:b0:35c:9b2c:b9d1 with SMTP id n12-20020a056e02148c00b0035c9b2cb9d1mr5497877ilk.32.1702332919461;
+        Mon, 11 Dec 2023 14:15:19 -0800 (PST)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id z10-20020a0cfeca000000b0067a788e258bsm3671868qvs.133.2023.12.11.14.15.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 14:15:19 -0800 (PST)
+Date: Mon, 11 Dec 2023 17:15:18 -0500
+From: Mike Snitzer <snitzer@kernel.org>
+To: Hongyu Jin <hongyu.jin.cn@gmail.com>
+Cc: agk@redhat.com, mpatocka@redhat.com, axboe@kernel.dk,
+	ebiggers@kernel.org, zhiguo.niu@unisoc.com, ke.wang@unisoc.com,
+	yibin.ding@unisoc.com, hongyu.jin@unisoc.com,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 5/5] dm-crypt: Fix lost ioprio when queuing write bios
+Message-ID: <ZXeJ9jAKEQ31OXLP@redhat.com>
+References: <df68c38e-3e38-eaf1-5c32-66e43d68cae3@ewheeler.net>
+ <20231211090000.9578-1-hongyu.jin.cn@gmail.com>
+ <20231211090000.9578-6-hongyu.jin.cn@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231211075614.1850003-3-linan666@huaweicloud.com>
+In-Reply-To: <20231211090000.9578-6-hongyu.jin.cn@gmail.com>
 
-Hi,
+On Mon, Dec 11 2023 at  4:00P -0500,
+Hongyu Jin <hongyu.jin.cn@gmail.com> wrote:
 
-kernel test robot noticed the following build errors:
+> From: Hongyu Jin <hongyu.jin@unisoc.com>
+> 
+> The original submitting bio->bi_ioprio setting can be retained by
+> struct dm_crypt_io::base_bio, we set the original bio's ioprio to
+> the cloned bio for write.
+> 
+> Signed-off-by: Hongyu Jin <hongyu.jin@unisoc.com>
+> ---
+>  drivers/md/dm-crypt.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> index 6de107aff331..b67fec865f00 100644
+> --- a/drivers/md/dm-crypt.c
+> +++ b/drivers/md/dm-crypt.c
+> @@ -1683,6 +1683,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned int size)
+>  				 GFP_NOIO, &cc->bs);
+>  	clone->bi_private = io;
+>  	clone->bi_end_io = crypt_endio;
+> +	clone->bi_ioprio = bio_prio(io->base_bio);
 
-[auto build test ERROR on song-md/md-next]
-[also build test ERROR on axboe-block/for-next linus/master v6.7-rc5 next-20231211]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Weird use of bio_prio() wrapper given the assignment to
+clone->bi_ioprio.  I'd prefer:
+        clone->bi_ioprio = io->base_bio->bi_ioprio;
 
-url:    https://github.com/intel-lab-lkp/linux/commits/linan666-huaweicloud-com/md-Fix-overflow-in-is_mddev_idle/20231211-155833
-base:   git://git.kernel.org/pub/scm/linux/kernel/git/song/md.git md-next
-patch link:    https://lore.kernel.org/r/20231211075614.1850003-3-linan666%40huaweicloud.com
-patch subject: [PATCH 2/2] md: don't account sync_io if iostats of the disk is disabled
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20231212/202312120536.VqOKGsPZ-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231212/202312120536.VqOKGsPZ-lkp@intel.com/reproduce)
+Some additional info to be mindful of:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312120536.VqOKGsPZ-lkp@intel.com/
+This encryption bio has always been unique (ever since dm-crypt
+stopped using the block layer's methods for cloning with 2007's commit
+2f9941b6c55d7).
 
-All errors (new ones prefixed by >>):
+Prior to commit 2f9941b6c55d7, dm-crypt used to call __bio_clone() to
+make sure not to miss cloning other capabilities -- and __bio_clone()
+does exist again as of commit a0e8de798dd67 but it is private to bio.c
+(in service to bio_alloc_clone, etc).
 
-   In file included from include/linux/kernel.h:23,
-                    from include/linux/sched/mm.h:5,
-                    from drivers/md/md.c:40:
-   drivers/md/md.h: In function 'md_sync_acct_bio':
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:31: error: 'disk' undeclared (first use in this function)
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |                               ^~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
-   drivers/md/md.h:587:31: note: each undeclared identifier is reported only once for each function it appears in
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |                               ^~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:37: error: 'queue' undeclared (first use in this function); did you mean 'sigqueue'?
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |                                     ^~~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:51:23: note: in definition of macro 'bitop'
-      51 |           (uintptr_t)(addr) != (uintptr_t)NULL &&                       \
-         |                       ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:52:57: note: in definition of macro 'bitop'
-      52 |           __builtin_constant_p(*(const unsigned long *)(addr))) ?       \
-         |                                                         ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:53:24: note: in definition of macro 'bitop'
-      53 |          const##op(nr, addr) : op(nr, addr))
-         |                        ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:53:39: note: in definition of macro 'bitop'
-      53 |          const##op(nr, addr) : op(nr, addr))
-         |                                       ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
-   drivers/md/md.c: In function 'is_mddev_idle':
->> drivers/md/md.c:8517:43: error: stray '\342' in program
-    8517 |                 if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                           ^~~~~~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.c:8517:21: note: in expansion of macro 'blk_queue_io_stat'
-    8517 |                 if (blk_queue_io_stat(disk—>queue))
-         |                     ^~~~~~~~~~~~~~~~~
->> drivers/md/md.c:8517:45: error: 'queue' undeclared (first use in this function); did you mean 'sigqueue'?
-    8517 |                 if (blk_queue_io_stat(disk—>queue))
-         |                                             ^~~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.c:8517:21: note: in expansion of macro 'blk_queue_io_stat'
-    8517 |                 if (blk_queue_io_stat(disk—>queue))
-         |                     ^~~~~~~~~~~~~~~~~
->> drivers/md/md.c:8517:43: error: stray '\342' in program
-    8517 |                 if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                           ^~~~~~~~
-   include/linux/bitops.h:51:23: note: in definition of macro 'bitop'
-      51 |           (uintptr_t)(addr) != (uintptr_t)NULL &&                       \
-         |                       ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.c:8517:21: note: in expansion of macro 'blk_queue_io_stat'
-    8517 |                 if (blk_queue_io_stat(disk—>queue))
-         |                     ^~~~~~~~~~~~~~~~~
->> drivers/md/md.c:8517:43: error: stray '\342' in program
-    8517 |                 if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                           ^~~~~~~~
-   include/linux/bitops.h:52:57: note: in definition of macro 'bitop'
-      52 |           __builtin_constant_p(*(const unsigned long *)(addr))) ?       \
-         |                                                         ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.c:8517:21: note: in expansion of macro 'blk_queue_io_stat'
-    8517 |                 if (blk_queue_io_stat(disk—>queue))
-         |                     ^~~~~~~~~~~~~~~~~
->> drivers/md/md.c:8517:43: error: stray '\342' in program
-    8517 |                 if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                           ^~~~~~~~
-   include/linux/bitops.h:53:24: note: in definition of macro 'bitop'
-      53 |          const##op(nr, addr) : op(nr, addr))
-         |                        ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.c:8517:21: note: in expansion of macro 'blk_queue_io_stat'
-    8517 |                 if (blk_queue_io_stat(disk—>queue))
-         |                     ^~~~~~~~~~~~~~~~~
->> drivers/md/md.c:8517:43: error: stray '\342' in program
-    8517 |                 if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                           ^~~~~~~~
-   include/linux/bitops.h:53:39: note: in definition of macro 'bitop'
-      53 |          const##op(nr, addr) : op(nr, addr))
-         |                                       ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.c:8517:21: note: in expansion of macro 'blk_queue_io_stat'
-    8517 |                 if (blk_queue_io_stat(disk—>queue))
-         |                     ^~~~~~~~~~~~~~~~~
---
-   In file included from include/linux/thread_info.h:27,
-                    from arch/arm64/include/asm/preempt.h:6,
-                    from include/linux/preempt.h:79,
-                    from include/linux/spinlock.h:56,
-                    from include/linux/wait.h:9,
-                    from include/linux/wait_bit.h:8,
-                    from include/linux/fs.h:6,
-                    from include/linux/highmem.h:5,
-                    from include/linux/bvec.h:10,
-                    from include/linux/blk_types.h:10,
-                    from include/linux/blkdev.h:9,
-                    from drivers/md/md-bitmap.c:19:
-   drivers/md/md.h: In function 'md_sync_acct_bio':
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:31: error: 'disk' undeclared (first use in this function)
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |                               ^~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
-   drivers/md/md.h:587:31: note: each undeclared identifier is reported only once for each function it appears in
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |                               ^~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:37: error: 'queue' undeclared (first use in this function); did you mean 'sigqueue'?
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |                                     ^~~~~
-   include/linux/bitops.h:50:44: note: in definition of macro 'bitop'
-      50 |           __builtin_constant_p((uintptr_t)(addr) != (uintptr_t)NULL) && \
-         |                                            ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:51:23: note: in definition of macro 'bitop'
-      51 |           (uintptr_t)(addr) != (uintptr_t)NULL &&                       \
-         |                       ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:52:57: note: in definition of macro 'bitop'
-      52 |           __builtin_constant_p(*(const unsigned long *)(addr))) ?       \
-         |                                                         ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:53:24: note: in definition of macro 'bitop'
-      53 |          const##op(nr, addr) : op(nr, addr))
-         |                        ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
->> drivers/md/md.h:587:35: error: stray '\342' in program
-     587 |         if (blk_queue_io_stat(disk<U+2014>>queue))
-         |                                   ^~~~~~~~
-   include/linux/bitops.h:53:39: note: in definition of macro 'bitop'
-      53 |          const##op(nr, addr) : op(nr, addr))
-         |                                       ^~~~
-   include/linux/blkdev.h:567:33: note: in expansion of macro 'test_bit'
-     567 | #define blk_queue_io_stat(q)    test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-         |                                 ^~~~~~~~
-   drivers/md/md.h:587:13: note: in expansion of macro 'blk_queue_io_stat'
-     587 |         if (blk_queue_io_stat(disk—>queue))
-         |             ^~~~~~~~~~~~~~~~~
+My point: because we aren't using traditional bio cloning (due to not
+wanting to share the bio_vec) we also aren't transferring over the
+cgroup (via bio_clone_blkg_association), etc.
 
+That can be a secondary concern that you don't need to worry about
+(but it is something Mikulas and I need to look at closer).
 
-vim +/342 +587 drivers/md/md.h
-
-   584	
-   585	static inline void md_sync_acct_bio(struct bio *bio, unsigned long nr_sectors)
-   586	{
- > 587		if (blk_queue_io_stat(disk—>queue))
-   588			md_sync_acct(bio->bi_bdev, nr_sectors);
-   589	}
-   590	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Mike
