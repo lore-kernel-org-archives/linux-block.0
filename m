@@ -1,85 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2F61F616
-	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 07:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hx7hq/zf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9380CC433C8;
-	Mon, 11 Dec 2023 07:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702280456;
-	bh=p9sCy8CYyxRCV5qPL2EKIe6Bbg4xRQH2/n7ZX6C8dgc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hx7hq/zfaCXUgL4Glw5aEXn7trxSwaSgZfbU5niF7u2myHDeBLn82MHHEvNuFcQ4J
-	 JtM23BX7ZqCdbDuwxjvcdp8+Qln4O6yg7itiGo9VxNLd+yO9EDGEBRThEdCS6cmHKX
-	 2YqXc6D49e03X/tW237ShVIELxD1cx6JANzU6hma6+cnoG3MfHvHbwkEPBh73O7bj4
-	 Cwr3qczg73l2Iau9E7TCkwYg6nIVVUrKwsWPY9Kwj8Ur7LChXoS+i6B6zaezFBjDod
-	 42N0YG7YMuHvMLAXvhFchaN0mJ3ZSMySxZIhttcPurq1xWu7o+6hfazeZzhHB/r40k
-	 yAFMPPcU29QsQ==
-Message-ID: <deee82e3-ccc4-42d7-bb54-9f4d1cd886b0@kernel.org>
-Date: Mon, 11 Dec 2023 16:40:54 +0900
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5498100;
+	Sun, 10 Dec 2023 23:55:23 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SpYv76mm6z4f3lCw;
+	Mon, 11 Dec 2023 15:55:15 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id CFDE91A01DA;
+	Mon, 11 Dec 2023 15:55:20 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgCn9gxmwHZl7IlZDQ--.55587S4;
+	Mon, 11 Dec 2023 15:55:20 +0800 (CST)
+From: linan666@huaweicloud.com
+To: axboe@kernel.dk,
+	akpm@linux-foundation.org,
+	ming.lei@canonical.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linan666@huaweicloud.com,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	houtao1@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH] block: Set memalloc_noio to false on device_add_disk() error path
+Date: Mon, 11 Dec 2023 15:53:56 +0800
+Message-Id: <20231211075356.1839282-1-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
- certain cases
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20231205053213.522772-1-bvanassche@acm.org>
- <20231205053213.522772-4-bvanassche@acm.org>
- <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
- <4d506909-e063-4918-a9d3-e91bfa5a41a3@acm.org>
- <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
- <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgCn9gxmwHZl7IlZDQ--.55587S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKryUZw1Dtr13GF4kJFWUurg_yoWDXrX_Ca
+	yfZ3s5Wws5Ars3CrnxAF4rZr10yrW8tay29F95trs3W3Wagryj9as8WrnYyr9rW3W5Cr1Y
+	9r4vvFWjvr4xKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbTAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
+	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7M4kE6xkIj40Ew7xC0wCF04k20xvY0x0EwIxGrw
+	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
+	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
+	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxK
+	x2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+	AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUYuc_UUUUU
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On 12/9/23 03:40, Bart Van Assche wrote:
-> On 12/7/23 17:37, Damien Le Moal wrote:
->> On 12/8/23 09:03, Bart Van Assche wrote:
->>> +static bool dd_use_io_priority(struct deadline_data *dd, enum req_op op)
->>> +{
->>> +	return dd->prio_aging_expire != 0 && !op_needs_zoned_write_locking(op);
->>> +}
->>
->> Hard NACK on this. The reason is that this will disable IO priority also for
->> sensible use cases that use libaio/io_uring with direct IOs, with an application
->> that does the right thing for writes, namely assigning the same priority for all
->> writes to a zone. There are some use cases like this in production.
->>
->> I do understand that there is a problem when IO priorities come from cgroups and
->> the user go through a file system. But that should be handled by the file
->> system. That is, for f2fs, all writes going to the same zone should have the
->> same priority. Otherwise, priority inversion issues will lead to non sequential
->> write patterns.
->>
->> Ideally, we should indeed have a generic solution for the cgroup case. But it
->> seems that for now, the simplest thing to do is to not allow priorities through
->> cgroups for writes to zoned devices, unless cgroups is made more intellignet
->> about it and manage bio priorities per zone to avoid priority inversion within a
->> zone.
-> 
-> Hi Damien,
-> 
-> My understanding is that blkcg_set_ioprio() is called from inside submit_bio()
-> and hence that the reported issue cannot be solved by modifying F2FS. How about
-> modifying the blk-ioprio policy such that it ignores zoned writes?
+From: Li Nan <linan122@huawei.com>
 
-I do not see a better solution than that at the moment. So yes, let's do that.
-But please add a big comment in the code explaining why we ignore zoned writes.
+On the error path of device_add_disk(), device's memalloc_noio flag was
+set but not cleared. As the comment of pm_runtime_set_memalloc_noio(),
+"The function should be called between device_add() and device_del()".
+Clear this flag before device_del() now.
 
+Fixes: 25e823c8c37d ("block/genhd.c: apply pm_runtime_set_memalloc_noio on block devices")
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/genhd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/block/genhd.c b/block/genhd.c
+index c9d06f72c587..13db3a7943d8 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -542,6 +542,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 	kobject_put(disk->part0->bd_holder_dir);
+ out_del_block_link:
+ 	sysfs_remove_link(block_depr, dev_name(ddev));
++	pm_runtime_set_memalloc_noio(ddev, false);
+ out_device_del:
+ 	device_del(ddev);
+ out_free_ext_minor:
 -- 
-Damien Le Moal
-Western Digital Research
+2.39.2
 
