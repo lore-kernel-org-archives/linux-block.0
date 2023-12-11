@@ -1,79 +1,85 @@
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D31F2
-	for <linux-block@vger.kernel.org>; Sun, 10 Dec 2023 02:05:22 -0800 (PST)
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6d9dff164bdso4096373a34.2
-        for <linux-block@vger.kernel.org>; Sun, 10 Dec 2023 02:05:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702202722; x=1702807522;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+5Ov6gOP5qafTlwtL6KY6FUYWPsmlqsm0IaYlR/VX7w=;
-        b=a4fdTQuDBfFvZCYkRTemTwEstR7tYpVDTNujgu3YDn+MbwK3s0UeqK5ZZspzeDiOum
-         nNl5sDY1LmwBRhP1fkEaZXMN2E+jsfjOywDlHDIejvypynqq/WHEt2WxBUSmUZpFYtv3
-         87SvAo/uW+XVVS5KT7LKYQD79b9RdJ9IIvRiZGxed/XwmPNiabH0xvYrg/bfzQyfWuk4
-         VBPoNtA9T7lVi2hcg7EWHI46kD9pEM+lnkyPFGk+7IipElhXKP9FJBvEYPASFhQa9lmc
-         2G7TJ0PFfGJBmoBxw5t8btk5+SWctkuzsmC1BD+fTFhS4QvL5kOJaXtyL4JQPCepjWrH
-         jQIg==
-X-Gm-Message-State: AOJu0YyjmtTsgzIyLCXiAvdRL92/MLdXVXfd8rZfzt2YX3FcxfYDI/OW
-	ce3oK0JD7SlohSyT1yFGgSvX4ptoO6v+EDoMpr8nCjcf0X20KBw=
-X-Google-Smtp-Source: AGHT+IE7NBK3pcrOusjuyfBLSxHS+RHAVmquGLTyXKSRsbpLrkxw8JrwwpuygROIFcaSCou8+sDinHmstZWG/EImj7pCwGH7b8ex
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2F61F616
+	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 07:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hx7hq/zf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9380CC433C8;
+	Mon, 11 Dec 2023 07:40:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702280456;
+	bh=p9sCy8CYyxRCV5qPL2EKIe6Bbg4xRQH2/n7ZX6C8dgc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hx7hq/zfaCXUgL4Glw5aEXn7trxSwaSgZfbU5niF7u2myHDeBLn82MHHEvNuFcQ4J
+	 JtM23BX7ZqCdbDuwxjvcdp8+Qln4O6yg7itiGo9VxNLd+yO9EDGEBRThEdCS6cmHKX
+	 2YqXc6D49e03X/tW237ShVIELxD1cx6JANzU6hma6+cnoG3MfHvHbwkEPBh73O7bj4
+	 Cwr3qczg73l2Iau9E7TCkwYg6nIVVUrKwsWPY9Kwj8Ur7LChXoS+i6B6zaezFBjDod
+	 42N0YG7YMuHvMLAXvhFchaN0mJ3ZSMySxZIhttcPurq1xWu7o+6hfazeZzhHB/r40k
+	 yAFMPPcU29QsQ==
+Message-ID: <deee82e3-ccc4-42d7-bb54-9f4d1cd886b0@kernel.org>
+Date: Mon, 11 Dec 2023 16:40:54 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6830:3142:b0:6d9:d1ed:42ff with SMTP id
- c2-20020a056830314200b006d9d1ed42ffmr2612817ots.1.1702202721947; Sun, 10 Dec
- 2023 02:05:21 -0800 (PST)
-Date: Sun, 10 Dec 2023 02:05:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000093d6b3060c24f491@google.com>
-Subject: [syzbot] Monthly block report (Dec 2023)
-From: syzbot <syzbot+list49f56196a4b6cd4a6c14@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
+ certain cases
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20231205053213.522772-1-bvanassche@acm.org>
+ <20231205053213.522772-4-bvanassche@acm.org>
+ <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
+ <4d506909-e063-4918-a9d3-e91bfa5a41a3@acm.org>
+ <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
+ <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello block maintainers/developers,
+On 12/9/23 03:40, Bart Van Assche wrote:
+> On 12/7/23 17:37, Damien Le Moal wrote:
+>> On 12/8/23 09:03, Bart Van Assche wrote:
+>>> +static bool dd_use_io_priority(struct deadline_data *dd, enum req_op op)
+>>> +{
+>>> +	return dd->prio_aging_expire != 0 && !op_needs_zoned_write_locking(op);
+>>> +}
+>>
+>> Hard NACK on this. The reason is that this will disable IO priority also for
+>> sensible use cases that use libaio/io_uring with direct IOs, with an application
+>> that does the right thing for writes, namely assigning the same priority for all
+>> writes to a zone. There are some use cases like this in production.
+>>
+>> I do understand that there is a problem when IO priorities come from cgroups and
+>> the user go through a file system. But that should be handled by the file
+>> system. That is, for f2fs, all writes going to the same zone should have the
+>> same priority. Otherwise, priority inversion issues will lead to non sequential
+>> write patterns.
+>>
+>> Ideally, we should indeed have a generic solution for the cgroup case. But it
+>> seems that for now, the simplest thing to do is to not allow priorities through
+>> cgroups for writes to zoned devices, unless cgroups is made more intellignet
+>> about it and manage bio priorities per zone to avoid priority inversion within a
+>> zone.
+> 
+> Hi Damien,
+> 
+> My understanding is that blkcg_set_ioprio() is called from inside submit_bio()
+> and hence that the reported issue cannot be solved by modifying F2FS. How about
+> modifying the blk-ioprio policy such that it ignores zoned writes?
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+I do not see a better solution than that at the moment. So yes, let's do that.
+But please add a big comment in the code explaining why we ignore zoned writes.
 
-During the period, 7 new issues were detected and 1 were fixed.
-In total, 53 issues are still open and 88 have been fixed so far.
 
-Some of the still happening issues:
+-- 
+Damien Le Moal
+Western Digital Research
 
-Ref Crashes Repro Title
-<1> 2199    Yes   WARNING in blk_rq_map_user_iov
-                  https://syzkaller.appspot.com/bug?extid=a532b03fdfee2c137666
-<2> 463     Yes   INFO: task hung in blkdev_put (4)
-                  https://syzkaller.appspot.com/bug?extid=9a29d5e745bd7523c851
-<3> 125     Yes   INFO: task hung in blkdev_fallocate
-                  https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<4> 43      Yes   KASAN: use-after-free Read in __dev_queue_xmit (5)
-                  https://syzkaller.appspot.com/bug?extid=b7be9429f37d15205470
-<5> 34      Yes   INFO: task hung in nbd_add_socket (2)
-                  https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
-<6> 26      Yes   WARNING in blk_register_tracepoints
-                  https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
-<7> 9       Yes   INFO: task hung in bdev_release
-                  https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<8> 7       Yes   INFO: task hung in truncate_inode_pages
-                  https://syzkaller.appspot.com/bug?extid=bae3c73c7bf2fe3a740b
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
