@@ -1,22 +1,32 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8481498;
-	Mon, 11 Dec 2023 08:46:22 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id EB27F68B05; Mon, 11 Dec 2023 17:46:19 +0100 (CET)
-Date: Mon, 11 Dec 2023 17:46:19 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Daejun Park <daejun7.park@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v5 05/17] fs: Restore kiocb.ki_hint
-Message-ID: <20231211164619.GC25306@lst.de>
-References: <20231130013322.175290-1-bvanassche@acm.org> <20231130013322.175290-6-bvanassche@acm.org> <20231207174633.GE31184@lst.de> <1e71a6bf-ac2f-41bc-8931-8b4fb7371118@acm.org>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rJhP3hWg"
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A568E;
+	Mon, 11 Dec 2023 08:49:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=KGk0p455n9Qyqg3jYMqF3nY83oslNnD+prahsS3y2tg=; b=rJhP3hWgktnDzGJNYm2tJw4xI7
+	TDqg7sdHNEg15rTEfZGNJ8HQ0/9cuVFcZD0RzxDoqN9E3H2U4t2h0p0f1s6cuMj0fIbvlWFrtREe0
+	ScIHQItSJyoiH/7RD5UvqgRXQlE/MgoIQOaectiMLWiOerK2qa82ed1qeyDVR9n0vVZCTrL++gnZz
+	m5ay27K3W+82SGtrMP2rKybQGP6h0rhma6nk3TsKnrv+H7nMYlCUfsdrcqO7bD2gua1ZPaQs/eeDK
+	wqwZhkEnqXbYKWKF6nSJv+T2mKJTiFwscPwOeE1mh5EqSHSZPmOqHv13b5lJk2CaiSUwVq1Vs498I
+	lGQaaG8Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rCjT4-005xZv-26;
+	Mon, 11 Dec 2023 16:49:18 +0000
+Date: Mon, 11 Dec 2023 08:49:18 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: linan666@huaweicloud.com
+Cc: axboe@kernel.dk, akpm@linux-foundation.org, ming.lei@canonical.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
+	yangerkun@huawei.com
+Subject: Re: [PATCH] block: Set memalloc_noio to false on device_add_disk()
+ error path
+Message-ID: <ZXc9jphAnYnwPnwm@infradead.org>
+References: <20231211075356.1839282-1-linan666@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -25,15 +35,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1e71a6bf-ac2f-41bc-8931-8b4fb7371118@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20231211075356.1839282-1-linan666@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Dec 07, 2023 at 01:40:29PM -1000, Bart Van Assche wrote:
->> Same comment as for the previous one.
->
-> If kiocb.ki_hint is not restored, the kiocb users will have to use the
-> kiocb ki_filp member to obtain the write hint information. In other
-> words, iocb->ki_hint will have to be changed into
-> file_inode(iocb->ki_filp)->i_write_hint. Is that what you want me to do?
+On Mon, Dec 11, 2023 at 03:53:56PM +0800, linan666@huaweicloud.com wrote:
+> From: Li Nan <linan122@huawei.com>
+> 
+> On the error path of device_add_disk(), device's memalloc_noio flag was
+> set but not cleared. As the comment of pm_runtime_set_memalloc_noio(),
+> "The function should be called between device_add() and device_del()".
+> Clear this flag before device_del() now.
 
-Yes.
+Looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
