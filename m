@@ -1,72 +1,43 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BCDA44AA;
-	Mon, 11 Dec 2023 06:10:09 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SpkCZ5hzfz4f3kGD;
-	Mon, 11 Dec 2023 22:10:02 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 2F9511A08B0;
-	Mon, 11 Dec 2023 22:10:05 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgDnNw46GHdlJ7BxDQ--.34937S4;
-	Mon, 11 Dec 2023 22:10:04 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	roger.pau@citrix.com,
-	colyli@suse.de,
-	kent.overstreet@gmail.com,
-	joern@lazybastard.org,
-	miquel.raynal@bootlin.com,
-	richard@nod.at,
-	vigneshr@ti.com,
-	sth@linux.ibm.com,
-	hoeppner@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	jejb@linux.ibm.com,
-	martin.petersen@oracle.com,
-	clm@fb.com,
-	josef@toxicpanda.com,
-	dsterba@suse.com,
-	viro@zeniv.linux.org.uk,
-	brauner@kernel.org,
-	nico@fluxnic.net,
-	xiang@kernel.org,
-	chao@kernel.org,
-	tytso@mit.edu,
-	adilger.kernel@dilger.ca,
-	agruenba@redhat.com,
-	jack@suse.com,
-	konishi.ryusuke@gmail.com,
-	willy@infradead.org,
-	akpm@linux-foundation.org,
-	p.raghav@samsung.com,
-	hare@suse.de
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-bcache@vger.kernel.org,
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sm95cUOR"
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7EBDC;
+	Mon, 11 Dec 2023 07:12:41 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 86562E0010;
+	Mon, 11 Dec 2023 15:12:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1702307560;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oFE6C0z8xKaeOiZweTxKpiLysfvHtTDmjwGQsIGoKvY=;
+	b=Sm95cUORL9q+npJNEYxgVyXxreLziHzhozNYrvKqDq4fiV8Oo8G1fV1lSqxgzBpDmp0Zji
+	iDaBgZ8YljiOxQhZgGSo0MNcLS8bWk2gTpJ9FOH+oHXYBCevzl3ULB+8Gf6DGeEDXVU/K9
+	BuyBrCTzkOt1dAqmL5FvwvZW6U8wdBWuXwMAzL7rmy1gtXnAKvj6Ba37JOkGyCEoPQeQDc
+	3mT7oK3s90ZycJ4FIwSDeg4sQ1Yu7NrJnHnjju+zjuoCiN8PaOCcmreEmvaz3GmTmHXiNl
+	HV9XSwdkUB/Jggo926EdmdCEcR82GL049n4y0HwjvsJp/YTOEjXqVnoVoAhkxg==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Herve Codina <herve.codina@bootlin.com>,
 	linux-mtd@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org,
-	gfs2@lists.linux.dev,
-	linux-nilfs@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH RFC v2 for-6.8/block 18/18] ext4: use bdev apis
-Date: Mon, 11 Dec 2023 22:08:39 +0800
-Message-Id: <20231211140839.976021-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231211140552.973290-1-yukuai1@huaweicloud.com>
-References: <20231211140552.973290-1-yukuai1@huaweicloud.com>
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-efi@vger.kernel.org
+Subject: [RFC PATCH 0/6] Add GPT parser to MTD layer
+Date: Mon, 11 Dec 2023 16:12:36 +0100
+Message-ID: <20231211151244.289349-1-romain.gantois@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,93 +45,73 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDnNw46GHdlJ7BxDQ--.34937S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxAF47JryfCw48Xw1Duw48JFb_yoW5XF4fpa
-	43GFyDGr4Dury09wsrGFsrZa40kw18GFy3GryfZa42qrWaqrySkFykKF1xZF1UX3y8X348
-	XFyjkryxAr45CrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
-	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1q6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8Jr1l
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Cr1j6rxdMIIF0xvE42xK8VAvwI8IcIk0rVWUCVW8JwCI42IY6I8E87Iv67AKxVW8
-	JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26F4UJVW0obIYCTnIWIevJa73UjIFyTuYvjfUe_
-	MaUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-GND-Sasl: romain.gantois@bootlin.com
 
-From: Yu Kuai <yukuai3@huawei.com>
+Hello everyone,
 
-Avoid to access bd_inode directly, prepare to remove bd_inode from
-block_devcie.
+MTD devices were historically partitioned using fixed partitions schemes
+defined in the kernel device tree or on the cmdline. More recently, a bunch
+of dynamic parsers have been introduced, allowing partitioning information
+to be stored in-band. However, unlike disks, parsers for MTD devices do not
+support runtime discovery of the partition format. This format is instead
+named in the device-tree using a compatible string.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- fs/ext4/dir.c       | 6 ++----
- fs/ext4/ext4_jbd2.c | 6 +++---
- fs/ext4/super.c     | 3 +--
- 3 files changed, 6 insertions(+), 9 deletions(-)
+The GUID Partition Table is one of the most common ways of partitioning a
+block device. As of now, there is no support in the MTD layer for parsing
+GPT tables. Indeed, use cases for layouts like GPT on raw Flash devices are
+rare, and for good reason since these partitioning schemes are sensitive to
+bad blocks in strategic locations such as LBA 2.  Moreover, they do not
+allow proper wear-leveling to be performed on the full span of the device.
 
-diff --git a/fs/ext4/dir.c b/fs/ext4/dir.c
-index 3985f8c33f95..64e35eb6a324 100644
---- a/fs/ext4/dir.c
-+++ b/fs/ext4/dir.c
-@@ -191,10 +191,8 @@ static int ext4_readdir(struct file *file, struct dir_context *ctx)
- 			pgoff_t index = map.m_pblk >>
- 					(PAGE_SHIFT - inode->i_blkbits);
- 			if (!ra_has_index(&file->f_ra, index))
--				page_cache_sync_readahead(
--					sb->s_bdev->bd_inode->i_mapping,
--					&file->f_ra, file,
--					index, 1);
-+				bdev_sync_readahead(sb->s_bdev, &file->f_ra,
-+						    file, index, 1);
- 			file->f_ra.prev_pos = (loff_t)index << PAGE_SHIFT;
- 			bh = ext4_bread(NULL, inode, map.m_lblk, 0);
- 			if (IS_ERR(bh)) {
-diff --git a/fs/ext4/ext4_jbd2.c b/fs/ext4/ext4_jbd2.c
-index d1a2e6624401..c1bf3a00fad9 100644
---- a/fs/ext4/ext4_jbd2.c
-+++ b/fs/ext4/ext4_jbd2.c
-@@ -206,7 +206,6 @@ static void ext4_journal_abort_handle(const char *caller, unsigned int line,
- 
- static void ext4_check_bdev_write_error(struct super_block *sb)
- {
--	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
- 	struct ext4_sb_info *sbi = EXT4_SB(sb);
- 	int err;
- 
-@@ -216,9 +215,10 @@ static void ext4_check_bdev_write_error(struct super_block *sb)
- 	 * we could read old data from disk and write it out again, which
- 	 * may lead to on-disk filesystem inconsistency.
- 	 */
--	if (errseq_check(&mapping->wb_err, READ_ONCE(sbi->s_bdev_wb_err))) {
-+	if (bdev_wb_err_check(sb->s_bdev, READ_ONCE(sbi->s_bdev_wb_err))) {
- 		spin_lock(&sbi->s_bdev_wb_lock);
--		err = errseq_check_and_advance(&mapping->wb_err, &sbi->s_bdev_wb_err);
-+		err = bdev_wb_err_check_and_advance(sb->s_bdev,
-+						    &sbi->s_bdev_wb_err);
- 		spin_unlock(&sbi->s_bdev_wb_lock);
- 		if (err)
- 			ext4_error_err(sb, -err,
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 3b5e2b557488..96724cae622a 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -5544,8 +5544,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
- 	 * used to detect the metadata async write error.
- 	 */
- 	spin_lock_init(&sbi->s_bdev_wb_lock);
--	errseq_check_and_advance(&sb->s_bdev->bd_inode->i_mapping->wb_err,
--				 &sbi->s_bdev_wb_err);
-+	bdev_wb_err_check_and_advance(sb->s_bdev, &sbi->s_bdev_wb_err);
- 	EXT4_SB(sb)->s_mount_state |= EXT4_ORPHAN_FS;
- 	ext4_orphan_cleanup(sb, es);
- 	EXT4_SB(sb)->s_mount_state &= ~EXT4_ORPHAN_FS;
+However, allowing GPT to be used on MTD devices can be practical in some
+cases. In the context of an A/B OTA upgrade that can act on either NOR of
+eMMC devices, having the same partition table format for both kinds of
+devices can simplify the task of the update software.
+
+This series adds a fully working MTD GPT parser to the kernel. Use of the
+parser is restricted to NOR flash devices, since NAND flashes are too
+susceptible to bad blocks. To ensure coherence and code-reuse between
+subsystems, I've factored device-agnostic code from the block layer GPT
+parser and moved it to a new generic library in lib/gpt.c. No functional
+change is intended in the block layer parser.
+
+I understand that this can seem like a strange feature for MTD devices, but
+with the restriction to NOR devices, the partition table can be fairly
+reliable. Moreover, this addition fits nicely into the MTD parser model.
+Please tell me what you think.
+
+Best Regards,
+
+Romain
+
+Romain Gantois (6):
+  block: partitions: efi: Move efi.h header to include/linux/gpt.h
+  block: partitions: efi: Fix some style issues
+  block: partitions: efi: Separate out GPT-specific code
+  block: partitions: efi: Move GPT-specific code to a new library
+  drivers: mtd: introduce GPT parser for NOR flash devices
+  dt-bindings: mtd: add GPT partition bindings
+
+ .../bindings/mtd/partitions/gpt.yaml          |  41 ++
+ .../bindings/mtd/partitions/partitions.yaml   |   1 +
+ MAINTAINERS                                   |   4 +-
+ block/partitions/Kconfig                      |   2 +-
+ block/partitions/efi.c                        | 478 +++---------------
+ block/partitions/msdos.c                      |   2 +-
+ drivers/mtd/parsers/Kconfig                   |  10 +
+ drivers/mtd/parsers/Makefile                  |   1 +
+ drivers/mtd/parsers/gpt.c                     | 222 ++++++++
+ include/linux/efi.h                           |  18 +
+ block/partitions/efi.h => include/linux/gpt.h |  72 ++-
+ lib/Kconfig                                   |   3 +
+ lib/Makefile                                  |   3 +
+ lib/gpt.c                                     | 342 +++++++++++++
+ 14 files changed, 777 insertions(+), 422 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/mtd/partitions/gpt.yaml
+ create mode 100644 drivers/mtd/parsers/gpt.c
+ rename block/partitions/efi.h => include/linux/gpt.h (61%)
+ create mode 100644 lib/gpt.c
+
 -- 
-2.39.2
+2.43.0
 
