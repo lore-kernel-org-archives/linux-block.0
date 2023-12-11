@@ -1,178 +1,170 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ojnCA0HE"
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36219F;
-	Mon, 11 Dec 2023 02:57:43 -0800 (PST)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BBAcjic011590;
-	Mon, 11 Dec 2023 10:57:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=M1BWtUt0iko0Adg1ZOkNjmTGZ72097YAF9y4jIcKxGU=;
- b=ojnCA0HEGHQ9qrUscY1w6xO8r1ooEoc7j7AVYhWGo6ISun4rjqhl6uv3YU49EvYXryzS
- FlOIKr7WuGVwlXnQBVvMYnhtc8i28ZjbZaIDrseOd/NMRX/S75hjaFKjKMj+YggljZ3n
- QNeR15hIzHpiGAvrK+gu+QUKDQcAPl/Jwp8sKhWGnLSCXYO3r2E/Dv+bMHQ+bl3UzV9N
- uOqzK+47Sx4XeMq8oD+tzJpYe6jM/rI5/GokIvv7dOzk+Z4kwbdCmsDiohMOEdaK1XK1
- cmeSyS1+IMRLp1CUYUcAGv8pyGCiBiJmjXdM45fRChFnuB173q9vLvMhmFdne2nSfUpb Tw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ux0usre9u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 10:57:38 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BBAdt9m015254;
-	Mon, 11 Dec 2023 10:57:38 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ux0usre9h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 10:57:38 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BBAeHXD012585;
-	Mon, 11 Dec 2023 10:57:36 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw3jngtn3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 10:57:36 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BBAvYrf5505562
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Dec 2023 10:57:34 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CF3B620040;
-	Mon, 11 Dec 2023 10:57:34 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1B92220043;
-	Mon, 11 Dec 2023 10:57:33 +0000 (GMT)
-Received: from li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com (unknown [9.124.31.44])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 11 Dec 2023 10:57:32 +0000 (GMT)
-Date: Mon, 11 Dec 2023 16:27:30 +0530
-From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
-To: John Garry <john.g.garry@oracle.com>
-Cc: linux-ext4@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
-        Ritesh Harjani <ritesh.list@gmail.com>, linux-kernel@vger.kernel.org,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dchinner@redhat.com
-Subject: Re: [RFC 5/7] block: export blkdev_atomic_write_valid() and refactor
- api
-Message-ID: <ZXbrGvkJRIJmRtex@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
-References: <cover.1701339358.git.ojaswin@linux.ibm.com>
- <b53609d0d4b97eb9355987ac5ec03d4e89293b43.1701339358.git.ojaswin@linux.ibm.com>
- <cc43b1ba-e9ea-4ff1-b616-be3c11960eea@oracle.com>
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D714C3F;
+	Mon, 11 Dec 2023 06:07:22 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Spk8N3TFDz4f3kG7;
+	Mon, 11 Dec 2023 22:07:16 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id D84331A060E;
+	Mon, 11 Dec 2023 22:07:18 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgDn6xGTF3dlDYFxDQ--.28013S4;
+	Mon, 11 Dec 2023 22:07:17 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	roger.pau@citrix.com,
+	colyli@suse.de,
+	kent.overstreet@gmail.com,
+	joern@lazybastard.org,
+	miquel.raynal@bootlin.com,
+	richard@nod.at,
+	vigneshr@ti.com,
+	sth@linux.ibm.com,
+	hoeppner@linux.ibm.com,
+	hca@linux.ibm.com,
+	gor@linux.ibm.com,
+	agordeev@linux.ibm.com,
+	jejb@linux.ibm.com,
+	martin.petersen@oracle.com,
+	clm@fb.com,
+	josef@toxicpanda.com,
+	dsterba@suse.com,
+	viro@zeniv.linux.org.uk,
+	brauner@kernel.org,
+	nico@fluxnic.net,
+	xiang@kernel.org,
+	chao@kernel.org,
+	tytso@mit.edu,
+	adilger.kernel@dilger.ca,
+	agruenba@redhat.com,
+	jack@suse.com,
+	konishi.ryusuke@gmail.com,
+	willy@infradead.org,
+	akpm@linux-foundation.org,
+	p.raghav@samsung.com,
+	hare@suse.de
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-bcache@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-bcachefs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org,
+	gfs2@lists.linux.dev,
+	linux-nilfs@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH RFC v2 for-6.8/block 00/18] block: don't access bd_inode directly from other modules
+Date: Mon, 11 Dec 2023 22:05:34 +0800
+Message-Id: <20231211140552.973290-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cc43b1ba-e9ea-4ff1-b616-be3c11960eea@oracle.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2qSPiO9EIfi0hMR8TWZ7coYjvt_2Rxt6
-X-Proofpoint-GUID: wdXyzKPFaRaC5ZtASZOrE_sXJCXo-opo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-11_04,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=856
- priorityscore=1501 suspectscore=0 phishscore=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 clxscore=1015 malwarescore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312110087
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDn6xGTF3dlDYFxDQ--.28013S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxXr48Ww4Utw47JFWDWFW7Arb_yoW5XFWfpr
+	13KF4fGr1UWryxZaya9a17tw1rG3WkGayUWFnIy34rZFW5AryfZrWktF1rJa4kXryxXr4k
+	Xw17JryrKr1jgaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26rWY6r4U
+	JwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AK
+	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+	fUojjgUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Fri, Dec 01, 2023 at 10:47:59AM +0000, John Garry wrote:
-> On 30/11/2023 13:53, Ojaswin Mujoo wrote:
-> > Export the blkdev_atomic_write_valid() function so that other filesystems
-> > can call it as a part of validating the atomic write operation.
-> > 
-> > Further, refactor the api to accept a len argument instead of iov_iter to
-> > make it easier to call from other places.
-> > 
-> > Signed-off-by: Ojaswin Mujoo <ojaswin@linux.ibm.com>
-> 
-> I was actually thinking of moving this functionality to vfs and maybe also
-> calling earlier in write path, as the code is really common to blkdev and
-> FSes.
+From: Yu Kuai <yukuai3@huawei.com>
 
-This makes sense. The code to make sure the underlying device
-will be able to support this atomic write can be moved higher up in vfs.
-And then each fs can do extra fs-specific checks in their code.
+Changes in v2:
+ - remove some bdev apis that is not necessary;
+ - pass in offset for bdev_read_folio() and __bdev_get_folio();
+ - remove bdev_gfp_constraint() and add a new helper in fs/buffer.c to
+ prevent access bd_indoe() directly from mapping_gfp_constraint() in
+ ext4.(patch 15, 16);
+ - remove block_device_ejected() from ext4.
 
-> 
-> However, Christoph Hellwig was not so happy about current interface with
-> power-of-2 requirement et al, so I was going to wait until that discussion
-> is concluded before deciding.
+Noted that following is not changed yet since v1:
+- Chirstoph suggested to remove invalidate_inode_pages2() from
+xen_update_blkif_status(), however, this sync_bdev() + invalidate_bdev()
+is used from many modules, and I'll leave this for later if we want to
+kill all of them.
+- Matthew suggested that pass in valid file_ra_state for cramfs,
+however, I don't see an easy way to do this for cramfs_lookup() and
+cramfs_read_super().
 
-Got it, I'll leave this bit to you then :) 
+Patch 1 add some bdev apis, then follow up patches will use these apis
+to avoid access bd_inode directly, and hopefully the field bd_inode can
+be removed eventually(after figure out a way for fs/buffer.c).
 
-> 
-> Thanks,
-> John
-> 
-> > ---
-> >   block/fops.c           | 18 ++++++++++--------
-> >   include/linux/blkdev.h |  2 ++
-> >   2 files changed, 12 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/block/fops.c b/block/fops.c
-> > index 516669ad69e5..5dae95c49720 100644
-> > --- a/block/fops.c
-> > +++ b/block/fops.c
-> > @@ -41,8 +41,7 @@ static bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
-> >   		!bdev_iter_is_aligned(bdev, iter);
-> >   }
-> > -static bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos,
-> > -			      struct iov_iter *iter)
-> > +bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos, size_t len)
-> >   {
-> >   	unsigned int atomic_write_unit_min_bytes =
-> >   			queue_atomic_write_unit_min_bytes(bdev_get_queue(bdev));
-> > @@ -53,16 +52,17 @@ static bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos,
-> >   		return false;
-> >   	if (pos % atomic_write_unit_min_bytes)
-> >   		return false;
-> > -	if (iov_iter_count(iter) % atomic_write_unit_min_bytes)
-> > +	if (len % atomic_write_unit_min_bytes)
-> >   		return false;
-> > -	if (!is_power_of_2(iov_iter_count(iter)))
-> > +	if (!is_power_of_2(len))
-> >   		return false;
-> > -	if (iov_iter_count(iter) > atomic_write_unit_max_bytes)
-> > +	if (len > atomic_write_unit_max_bytes)
-> >   		return false;
-> > -	if (pos % iov_iter_count(iter))
-> > +	if (pos % len)
-> >   		return false;
-> >   	return true;
-> >   }
-> > +EXPORT_SYMBOL_GPL(blkdev_atomic_write_valid);
-> >   #define DIO_INLINE_BIO_VECS 4
-> > @@ -81,7 +81,8 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
-> >   	if (blkdev_dio_unaligned(bdev, pos, iter))
-> >   		return -EINVAL;
-> > -	if (atomic_write && !blkdev_atomic_write_valid(bdev, pos, iter))
-> > +	if (atomic_write &&
-> > +	    !blkdev_atomic_write_valid(bdev, pos, iov_iter_count(iter)))
-> >   		return -EINVAL;
-> >   	if (nr_pages <= DIO_INLINE_BIO_VECS)
-> > @@ -348,7 +349,8 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
-> >   	if (blkdev_dio_unaligned(bdev, pos, iter))
-> >   		return -EINVAL;
-> > -	if (atomic_write && !blkdev_atomic_write_valid(bdev, pos, iter))
-> > +	if (atomic_write &&
-> > +	    !blkdev_atomic_write_valid(bdev, pos, iov_iter_count(iter)))
-> >   		return -EINVAL;
-> >   	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index f70988083734..5a3124fc191f 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -1566,6 +1566,8 @@ static inline int early_lookup_bdev(const char *pathname, dev_t *dev)
-> >   int freeze_bdev(struct block_device *bdev);
-> >   int thaw_bdev(struct block_device *bdev);
-> > +bool blkdev_atomic_write_valid(struct block_device *bdev, loff_t pos, size_t len);
-> > +
-> >   struct io_comp_batch {
-> >   	struct request *req_list;
-> >   	bool need_ts;
-> 
+Yu Kuai (18):
+  block: add some bdev apis
+  xen/blkback: use bdev api in xen_update_blkif_status()
+  bcache: use bdev api in read_super()
+  mtd: block2mtd: use bdev apis
+  s390/dasd: use bdev api in dasd_format()
+  scsicam: use bdev api in scsi_bios_ptable()
+  bcachefs: remove dead function bdev_sectors()
+  bio: export bio_add_folio_nofail()
+  btrfs: use bdev apis
+  cramfs: use bdev apis in cramfs_blkdev_read()
+  erofs: use bdev api
+  gfs2: use bdev api
+  nilfs2: use bdev api in nilfs_attach_log_writer()
+  jbd2: use bdev apis
+  buffer: add a new helper to read sb block
+  ext4: use new helper to read sb block
+  ext4: remove block_device_ejected()
+  ext4: use bdev apis
+
+ block/bdev.c                       | 70 ++++++++++++++++++++++++++
+ block/bio.c                        |  1 +
+ block/blk.h                        |  2 -
+ drivers/block/xen-blkback/xenbus.c |  3 +-
+ drivers/md/bcache/super.c          | 11 ++--
+ drivers/mtd/devices/block2mtd.c    | 81 +++++++++++++-----------------
+ drivers/s390/block/dasd_ioctl.c    |  5 +-
+ drivers/scsi/scsicam.c             |  4 +-
+ fs/bcachefs/util.h                 |  5 --
+ fs/btrfs/disk-io.c                 | 71 ++++++++++++--------------
+ fs/btrfs/volumes.c                 | 17 +++----
+ fs/btrfs/zoned.c                   | 15 +++---
+ fs/buffer.c                        | 68 +++++++++++++++++--------
+ fs/cramfs/inode.c                  | 36 +++++--------
+ fs/erofs/data.c                    | 18 ++++---
+ fs/erofs/internal.h                |  2 +
+ fs/ext4/dir.c                      |  6 +--
+ fs/ext4/ext4.h                     | 13 -----
+ fs/ext4/ext4_jbd2.c                |  6 +--
+ fs/ext4/inode.c                    |  8 +--
+ fs/ext4/super.c                    | 66 ++++--------------------
+ fs/ext4/symlink.c                  |  2 +-
+ fs/gfs2/glock.c                    |  2 +-
+ fs/gfs2/ops_fstype.c               |  2 +-
+ fs/jbd2/journal.c                  |  3 +-
+ fs/jbd2/recovery.c                 |  6 +--
+ fs/nilfs2/segment.c                |  2 +-
+ include/linux/blkdev.h             | 17 +++++++
+ include/linux/buffer_head.h        | 18 ++++++-
+ 29 files changed, 301 insertions(+), 259 deletions(-)
+
+-- 
+2.39.2
+
