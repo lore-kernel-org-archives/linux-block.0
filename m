@@ -1,96 +1,79 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D619F
-	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 14:15:20 -0800 (PST)
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-35d72b72ff7so20063165ab.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 14:15:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702332919; x=1702937719;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i+NbavSPkNYuuLKazhVu/hAbx07laMBmOoTQUM0p47w=;
-        b=mgXJKiSmKJ1MJ8mUnuy5dg1uq58qUKlU0eVfFSiN379R0hSB3E9ArMQoPgG3uKTPPq
-         VodfPMiCnAKLlRdbxWNFZXPhl7caQNRFlkeK2MsnFL1uiZRYfmEgTr+0jZkglkvWxK2c
-         pEugUv3q8lyqwQb+iq7UlMyFwSp8u2UTWtyDWtQmpavsz3hWDOvAgcwVlAIzqjEXXbVg
-         F9ZDzVjc+3/uRzUQzabJOraFdmn3NDj+jDHxEiCIBuOr12toMQHV1/Uiy63XpK4mHb3p
-         UDkXR6mU3XSXb5kI9OLvRWBi81bWr70/0jQVzgP8ThqlPV+KNIKK1RXsoaRH+Vfzvdul
-         sZ0Q==
-X-Gm-Message-State: AOJu0Yz7UIkF8auPcCsPdKb8H7h6e4QtnywNXxhs/6Drz2qPhat1hGHp
-	9DuVHy3+igw2A53qFgFaat5R
-X-Google-Smtp-Source: AGHT+IHNeSpFqavSvNI7EouqNAWIqxS4EtGj5taHoZVkMX4FUv92lNAhynaV9F2HmvIyMA8Vl+7bmw==
-X-Received: by 2002:a05:6e02:148c:b0:35c:9b2c:b9d1 with SMTP id n12-20020a056e02148c00b0035c9b2cb9d1mr5497877ilk.32.1702332919461;
-        Mon, 11 Dec 2023 14:15:19 -0800 (PST)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id z10-20020a0cfeca000000b0067a788e258bsm3671868qvs.133.2023.12.11.14.15.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 14:15:19 -0800 (PST)
-Date: Mon, 11 Dec 2023 17:15:18 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Hongyu Jin <hongyu.jin.cn@gmail.com>
-Cc: agk@redhat.com, mpatocka@redhat.com, axboe@kernel.dk,
-	ebiggers@kernel.org, zhiguo.niu@unisoc.com, ke.wang@unisoc.com,
-	yibin.ding@unisoc.com, hongyu.jin@unisoc.com,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] dm-crypt: Fix lost ioprio when queuing write bios
-Message-ID: <ZXeJ9jAKEQ31OXLP@redhat.com>
-References: <df68c38e-3e38-eaf1-5c32-66e43d68cae3@ewheeler.net>
- <20231211090000.9578-1-hongyu.jin.cn@gmail.com>
- <20231211090000.9578-6-hongyu.jin.cn@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF72EBE
+	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 22:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GM0XvZQe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24E38C433C7;
+	Mon, 11 Dec 2023 22:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702334405;
+	bh=mUQS84jmgcSnSlqsDNICBQvOVxeORuWBskPxpUFd+Yg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GM0XvZQeeH/pBAxk1Q9+bUCZsHr+MCIUFYqN25xYCP7wNN3r7vAzGJLfso9D7mzrK
+	 Vz8kynl0FxeWKES52fCvPHCxmQOEB4SO+ZMEPZtjPPaDKSTT12gTwhkRoCU/zyCVR6
+	 BKlSpSOhwb1CVmtXVDXEaI8K5QX11CkdGY7m0dmfQDwqGT3SItARSOVADJiEKEgLEp
+	 AHWRN0QRVRZ92PCR3SeemBvKF5YAMcxqD0pvR39o+QQ5a5j4TymyZYl0MKldmPl0tv
+	 lDXcHGZ/qrlDWFIMRafiAINhgPTx95QGWyAtpbTtFMLTdT23mhUpl6NJLA7FR1Ecvs
+	 pMy7YHPzikeAQ==
+Message-ID: <177773fd-c8ed-4822-9344-3058e820ddf0@kernel.org>
+Date: Tue, 12 Dec 2023 07:40:02 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231211090000.9578-6-hongyu.jin.cn@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
+ certain cases
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20231205053213.522772-1-bvanassche@acm.org>
+ <20231205053213.522772-4-bvanassche@acm.org> <20231211165720.GC26039@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20231211165720.GC26039@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11 2023 at  4:00P -0500,
-Hongyu Jin <hongyu.jin.cn@gmail.com> wrote:
-
-> From: Hongyu Jin <hongyu.jin@unisoc.com>
+On 12/12/23 01:57, Christoph Hellwig wrote:
+> On Mon, Dec 04, 2023 at 09:32:13PM -0800, Bart Van Assche wrote:
+>> Fix the following two issues:
+>> - Even with prio_aging_expire set to zero, I/O priorities still affect the
+>>   request order.
+>> - Assigning I/O priorities with the ioprio cgroup policy breaks zoned
+>>   storage support in the mq-deadline scheduler.
 > 
-> The original submitting bio->bi_ioprio setting can be retained by
-> struct dm_crypt_io::base_bio, we set the original bio's ioprio to
-> the cloned bio for write.
-> 
-> Signed-off-by: Hongyu Jin <hongyu.jin@unisoc.com>
-> ---
->  drivers/md/dm-crypt.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index 6de107aff331..b67fec865f00 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -1683,6 +1683,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned int size)
->  				 GFP_NOIO, &cc->bs);
->  	clone->bi_private = io;
->  	clone->bi_end_io = crypt_endio;
-> +	clone->bi_ioprio = bio_prio(io->base_bio);
+> Not it doesn't, how would it?  Or do you mean your f2fs hacks where you
+> assume there is some order kept?  You really need to get rid of them
+> and make sure f2fs doesn't care about reordering by writing the
+> metadata that records the data location only at I/O completion time.
+> Not only does that make zoned I/O trivially right, it also fixes the
+> stale data exposures you are almost guaranteed to have even on
+> conventional devices without that.
 
-Weird use of bio_prio() wrapper given the assignment to
-clone->bi_ioprio.  I'd prefer:
-        clone->bi_ioprio = io->base_bio->bi_ioprio;
+Priority CGroups can mess things up I think. If you have 2 processes belonging
+to different CGs with different priorities and:
+1) The processes do raw block device accesses and write to the same zone,
+synchronized to get the WP correctly
+2) The processes are writing different files and the FS decides to place the
+block for the files in the same zone
 
-Some additional info to be mindful of:
+Case (1) is clearly "the user is doing very stupid things" and for that case,
+the user definitely deserve seeing his writes failing. But case (2) is perfectly
+legit I think. That is the one that needs to be addressed. The choices I see
+are: every file system supporting zone writes need to be priority CG aware when
+writing files, or we ignore priority CG when writing.
 
-This encryption bio has always been unique (ever since dm-crypt
-stopped using the block layer's methods for cloning with 2007's commit
-2f9941b6c55d7).
+The latter is I think better than the former as CGs can change without the FS
+being aware (as far as I know), and such support would need to be implemented
+for all FSes that support zone writing using regular writes (f2fs and zonefs).
 
-Prior to commit 2f9941b6c55d7, dm-crypt used to call __bio_clone() to
-make sure not to miss cloning other capabilities -- and __bio_clone()
-does exist again as of commit a0e8de798dd67 but it is private to bio.c
-(in service to bio_alloc_clone, etc).
+-- 
+Damien Le Moal
+Western Digital Research
 
-My point: because we aren't using traditional bio cloning (due to not
-wanting to share the bio_vec) we also aren't transferring over the
-cgroup (via bio_clone_blkg_association), etc.
-
-That can be a secondary concern that you don't need to worry about
-(but it is something Mikulas and I need to look at closer).
-
-Mike
