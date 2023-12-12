@@ -1,142 +1,131 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409A4B5
-	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 16:11:50 -0800 (PST)
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ceb93fb381so3535849b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 16:11:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702339910; x=1702944710;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BCMseI9UB8yOPpsjJ/R2TZ7S1vtSuhjjwpdtycZS6UM=;
-        b=Gpx6qrABYZiI5Izw93RAoTR1Tfxrk8J594AqmjewHjtH8YRDa/mNp77t+TcNyDHkiR
-         zLZnrMD51Zv/JAsvbhFsEZaTJX0H6esUcdAzmaTMd2Nw8WvLbn4jVZ/uDsIGlb7v4zwv
-         +0zesCUr7IAzmBAAGoMK2tLd/ZpusDGSJiK4HhFfnJJ4VKzFmO7KhZL3Jhod2zYwL+YT
-         37+LcyaZfS8cjwfZk2ZP6TtwdJpNewiSV+ki2Drn0ZcH3U1yhupuyD/cM3mGbTKJDbe9
-         4Z4TuhZvxDLUxEgyM4lr8R9GeWE0L7iLT9uARCmZZb3ymxXMi89lL8EmFGVImQ16ZFzs
-         i22Q==
-X-Gm-Message-State: AOJu0YzVYCCVbJ5wWwjOBmATlSjds1MdyI961tCkI8jM9w4lyL3D6TdV
-	9WYzzrDKBAS2S7NC8LRkGS5wY4sGj/Q=
-X-Google-Smtp-Source: AGHT+IG1NomgD5pA7rjmnrGVx79sEk8MTQxwbfiIosgy2utm/wYhtbuu7FjesezCJ4qzciTQzRwY0w==
-X-Received: by 2002:a05:6a00:181f:b0:6ce:4587:4d7b with SMTP id y31-20020a056a00181f00b006ce45874d7bmr7858289pfa.24.1702339909172;
-        Mon, 11 Dec 2023 16:11:49 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:3431:681a:6403:d100? ([2620:0:1000:8411:3431:681a:6403:d100])
-        by smtp.gmail.com with ESMTPSA id c12-20020aa7880c000000b006ce7ff254b9sm6890318pfo.68.2023.12.11.16.11.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:11:48 -0800 (PST)
-Message-ID: <d660cc31-a5be-47f2-9fdf-ba4bf5106226@acm.org>
-Date: Mon, 11 Dec 2023 16:11:47 -0800
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b="j8DHAwuP"
+Received: from bee.birch.relay.mailchannels.net (bee.birch.relay.mailchannels.net [23.83.209.14])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87CFFA6;
+	Mon, 11 Dec 2023 16:44:20 -0800 (PST)
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id EC0F97A3326;
+	Tue, 12 Dec 2023 00:44:19 +0000 (UTC)
+Received: from pdx1-sub0-mail-a241.dreamhost.com (unknown [127.0.0.6])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 648F07A33C0;
+	Tue, 12 Dec 2023 00:44:19 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1702341859; a=rsa-sha256;
+	cv=none;
+	b=WfVG4SSwRyXeEqf06z6ACiV5ytZmhy8gZItJKq1SZZNPSqMWTNLZdEpGnj2IikrokX+bOp
+	s0up7pk6JlFMqOnKYaniYfFQnOs+leFOHCCEDk54VR3YsTcWxoZFJfIzT3/Sg+p5tRMJve
+	FAkH7Z/Drgnw00iC6KLa4BWv9dTNC92K1hPkCmIVKK6IblntrLG+aYl6HIa+0hxylA1i96
+	AY2P9rpTlSFSMXuwqcJXCCo7cxAdGWOg++zjOi7Sj4QAc8kwCIxttfMsEAZ8HtGaFc9OO6
+	Mt90yxfTUwD3uOeIumnJMvaoTwLhOP8a8Jc2A4MYiiR0yKGLTEXckL9nH2lNRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1702341859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=mF/Vo4/Bjp0KnZuQHVj8rbwp5yFhrkFsYdhlOMyaCbg=;
+	b=Wh5Khxytvukjt8QWDslzHoUND4LTPJ5D7neQ9e14wl4E2ZVZ3qCm7MSWLKYWWGNegy4pay
+	JLp7H03isdxZ/p+VLUsMW4aIGgNM3eprQDR3i+F9kgZdgXb97wipEXH4dv2TeTreZQDE6k
+	umNftFkcSeiG3/jOFDp4m3Mcc4BjtdE+X9ATFZZVHSNGecchJYLZzeso/NnQ3nbCY0En0M
+	6t7OIgJcvFjV77ZB56zRGhfBjGZ4vv8O+9PN9Dw4/5o+3rRA9mBYBOfD7XUTfQNvzHWKaz
+	j1vsMLhwqvyiVrHd3yqfVSoQYi1rNANrlmZh1L3fbnJ9N4QO/lYGfwCMuZOu2w==
+ARC-Authentication-Results: i=1;
+	rspamd-5749745b69-czvrl;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
+X-MailChannels-Auth-Id: dreamhost
+X-Desert-Fumbling: 2d7025c1535d992e_1702341859740_305295213
+X-MC-Loop-Signature: 1702341859740:2844852777
+X-MC-Ingress-Time: 1702341859740
+Received: from pdx1-sub0-mail-a241.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.127.58.202 (trex/6.9.2);
+	Tue, 12 Dec 2023 00:44:19 +0000
+Received: from offworld (unknown [172.56.169.115])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dave@stgolabs.net)
+	by pdx1-sub0-mail-a241.dreamhost.com (Postfix) with ESMTPSA id 4Sq0HK3kd3zqM;
+	Mon, 11 Dec 2023 16:44:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
+	s=dreamhost; t=1702341854;
+	bh=mF/Vo4/Bjp0KnZuQHVj8rbwp5yFhrkFsYdhlOMyaCbg=;
+	h=Date:From:To:Cc:Subject:Content-Type;
+	b=j8DHAwuPoFxHqrqS+yeA0YQa9yNrbyRSTaNAJFkQE+UqKgg1Q1MsLd7CWm9jceUYN
+	 O8TQS51/TEiDQPKOLg71Hp9nYqh0ifF3wfMDAagn35iH5p5GbMj/pYh9H9jz0Xrdsz
+	 JHTaD4I7dFMfUgq9MBq4LlpcqToB57JIanyIuk8epPFGbOFLw/pps//E8v5oHKBJ8p
+	 MLgoxBSpI4k1oN28wH7TTbumPC5iczULbNMObYAfuN5s4/3AGJmTeMx4h/wU8hC2Tv
+	 hDB6PQCnIwUoX5SSmZ8H3qKfsuQedvUE0rCtSjIeUr2eLQNy+xtauPd0rM2ylxPwxJ
+	 WsCD0D5XkTN0A==
+Date: Mon, 11 Dec 2023 16:43:58 -0800
+From: Davidlohr Bueso <dave@stgolabs.net>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Jens Axboe <axboe@kernel.dk>, Ard Biesheuvel <ardb@kernel.org>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Herve Codina <herve.codina@bootlin.com>, 
+	linux-mtd@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-efi@vger.kernel.org
+Subject: Re: [RFC PATCH 0/6] Add GPT parser to MTD layer
+Message-ID: <cykfpuff32nuq3t27vd5tv463cx32phri473fjnrruvom5dk5u@uao5e3ml73ai>
+References: <20231211151244.289349-1-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block/blk-ioprio: Skip zoned writes that are not append
- operations
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20231211231451.1452979-1-bvanassche@acm.org>
- <19eaaa5b-e4b7-41aa-b5a2-7d5a89927a91@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <19eaaa5b-e4b7-41aa-b5a2-7d5a89927a91@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231211151244.289349-1-romain.gantois@bootlin.com>
+User-Agent: NeoMutt/20231103
 
-On 12/11/23 15:31, Damien Le Moal wrote:
-> On 12/12/23 08:14, Bart Van Assche wrote:
->> +	/*
->> +	 * If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
->> +	 * originate from different cgroups that could result in different
->> +	 * priorities being assigned to these operations. Do not modify the I/O
->> +	 * priority of these write operations to prevent that these would be
->> +	 * executed in the wrong order when using the mq-deadline I/O
->> +	 * scheduler.
->> +	 */
->> +	if (bdev_op_is_zoned_write(bio->bi_bdev, bio_op(bio)))
-> 
-> Ideally, we want the bio equivalent of blk_rq_is_seq_zoned_write() here so that
-> writes to conventional zones are not affected (these can be reordered).
-  How about the patch below?
+On Mon, 11 Dec 2023, Romain Gantois wrote:
+
+>Hello everyone,
+>
+>MTD devices were historically partitioned using fixed partitions schemes
+>defined in the kernel device tree or on the cmdline. More recently, a bunch
+>of dynamic parsers have been introduced, allowing partitioning information
+>to be stored in-band. However, unlike disks, parsers for MTD devices do not
+>support runtime discovery of the partition format. This format is instead
+>named in the device-tree using a compatible string.
+>
+>The GUID Partition Table is one of the most common ways of partitioning a
+>block device. As of now, there is no support in the MTD layer for parsing
+>GPT tables. Indeed, use cases for layouts like GPT on raw Flash devices are
+>rare, and for good reason since these partitioning schemes are sensitive to
+>bad blocks in strategic locations such as LBA 2.  Moreover, they do not
+>allow proper wear-leveling to be performed on the full span of the device.
+>
+>However, allowing GPT to be used on MTD devices can be practical in some
+>cases. In the context of an A/B OTA upgrade that can act on either NOR of
+>eMMC devices, having the same partition table format for both kinds of
+>devices can simplify the task of the update software.
+>
+>This series adds a fully working MTD GPT parser to the kernel. Use of the
+>parser is restricted to NOR flash devices, since NAND flashes are too
+>susceptible to bad blocks. To ensure coherence and code-reuse between
+>subsystems, I've factored device-agnostic code from the block layer GPT
+>parser and moved it to a new generic library in lib/gpt.c. No functional
+>change is intended in the block layer parser.
+>
+>I understand that this can seem like a strange feature for MTD devices, but
+>with the restriction to NOR devices, the partition table can be fairly
+>reliable. Moreover, this addition fits nicely into the MTD parser model.
+>Please tell me what you think.
+
+I am not a fan of this. The usecase seems very hacky and ad-hoc to justify
+decoupling from the block layer, not to mention move complexity out of
+userspace and into the kernel (new parser) for something that is already
+being done/worked around. Also, what other user would consume this new gpt
+lib abstraction in the future? I don't think it is worth it.
 
 Thanks,
-
-Bart.
-
-
-[PATCH] block/blk-ioprio: Skip zoned writes that are not append operations
-
-If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
-originate from different cgroups that could result in different priorities
-being assigned to these operations. Do not modify the I/O priority of
-these write operations to prevent them from being executed in the wrong
-order when using the mq-deadline I/O scheduler.
-
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
-  block/blk-ioprio.c     | 11 +++++++++++
-  include/linux/blk-mq.h | 17 +++++++++++++++++
-  2 files changed, 28 insertions(+)
-
-diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-index 4051fada01f1..96b46d34e3d6 100644
---- a/block/blk-ioprio.c
-+++ b/block/blk-ioprio.c
-@@ -192,6 +192,17 @@ void blkcg_set_ioprio(struct bio *bio)
-  	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
-  		return;
-
-+	/*
-+	 * If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
-+	 * originate from different cgroups that could result in different
-+	 * priorities being assigned to these operations. Do not modify the I/O
-+	 * priority of these write operations to prevent that these would be
-+	 * executed in the wrong order when using the mq-deadline I/O
-+	 * scheduler.
-+	 */
-+	if (blk_bio_is_seq_zoned_write(bio))
-+		return;
-+
-  	if (blkcg->prio_policy == POLICY_PROMOTE_TO_RT ||
-  	    blkcg->prio_policy == POLICY_NONE_TO_RT) {
-  		/*
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 1ab3081c82ed..90907d9001c0 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -1149,6 +1149,18 @@ static inline unsigned int blk_rq_zone_no(struct request *rq)
-  	return disk_zone_no(rq->q->disk, blk_rq_pos(rq));
-  }
-
-+/**
-+ * blk_bio_is_seq_zoned_write() - Check if @bio requires write serialization.
-+ * @bio: Bio to examine.
-+ *
-+ * Note: REQ_OP_ZONE_APPEND bios do not require serialization.
-+ */
-+static inline bool blk_bio_is_seq_zoned_write(struct bio *bio)
-+{
-+	return op_needs_zoned_write_locking(bio_op(bio)) &&
-+		disk_zone_is_seq(bio->bi_disk, bio.bi_iter.bi_sector);
-+}
-+
-  static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
-  {
-  	return disk_zone_is_seq(rq->q->disk, blk_rq_pos(rq));
-@@ -1196,6 +1208,11 @@ static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
-  	return !blk_req_zone_is_write_locked(rq);
-  }
-  #else /* CONFIG_BLK_DEV_ZONED */
-+static inline bool blk_bio_is_seq_zoned_write(struct bio *bio)
-+{
-+	return false;
-+}
-+
-  static inline bool blk_rq_is_seq_zoned_write(struct request *rq)
-  {
-  	return false;
-
+Davidlohr
