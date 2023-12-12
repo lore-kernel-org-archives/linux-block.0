@@ -1,24 +1,31 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E87156474
-	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 23:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="glzyQQ6a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A840DC433C8;
-	Mon, 11 Dec 2023 23:31:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702337481;
-	bh=DgbCvgyHK/s3+736W6JdynWX2EfKxLlFQUfizpxJbHk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=glzyQQ6azQmy+DYaY70N/Q8CDnNJxba7n3Om+3fFJ0ZfBWMfRovrWLjjfot1WUDSw
-	 /HUluiYDSrRu78+CyxFW9dQL0f+UkvBJCdRnTzZzclj8AMtoNv01HW3XjBsMfgNdy0
-	 pX4pNET3N0FiJVd9nEY6FJJEWK+TI4TwDv8zCmXw+v2XQByNwTiZyp2IEcGhElvutb
-	 AF6a78QSAiaVSTR814atnS7tQRz2VEy6QGtog4G3w+0GzLrYqlQHV9dl1OY7YIi+5B
-	 LLdu3EdYiu2ZoF0wPS1rNo9acd2v1LFPLEqQpOD3W/wOEzvqU4vAax1ltBdM043Gl4
-	 AkBcAVDsNpDvA==
-Message-ID: <19eaaa5b-e4b7-41aa-b5a2-7d5a89927a91@kernel.org>
-Date: Tue, 12 Dec 2023 08:31:19 +0900
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409A4B5
+	for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 16:11:50 -0800 (PST)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ceb93fb381so3535849b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 11 Dec 2023 16:11:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702339910; x=1702944710;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BCMseI9UB8yOPpsjJ/R2TZ7S1vtSuhjjwpdtycZS6UM=;
+        b=Gpx6qrABYZiI5Izw93RAoTR1Tfxrk8J594AqmjewHjtH8YRDa/mNp77t+TcNyDHkiR
+         zLZnrMD51Zv/JAsvbhFsEZaTJX0H6esUcdAzmaTMd2Nw8WvLbn4jVZ/uDsIGlb7v4zwv
+         +0zesCUr7IAzmBAAGoMK2tLd/ZpusDGSJiK4HhFfnJJ4VKzFmO7KhZL3Jhod2zYwL+YT
+         37+LcyaZfS8cjwfZk2ZP6TtwdJpNewiSV+ki2Drn0ZcH3U1yhupuyD/cM3mGbTKJDbe9
+         4Z4TuhZvxDLUxEgyM4lr8R9GeWE0L7iLT9uARCmZZb3ymxXMi89lL8EmFGVImQ16ZFzs
+         i22Q==
+X-Gm-Message-State: AOJu0YzVYCCVbJ5wWwjOBmATlSjds1MdyI961tCkI8jM9w4lyL3D6TdV
+	9WYzzrDKBAS2S7NC8LRkGS5wY4sGj/Q=
+X-Google-Smtp-Source: AGHT+IG1NomgD5pA7rjmnrGVx79sEk8MTQxwbfiIosgy2utm/wYhtbuu7FjesezCJ4qzciTQzRwY0w==
+X-Received: by 2002:a05:6a00:181f:b0:6ce:4587:4d7b with SMTP id y31-20020a056a00181f00b006ce45874d7bmr7858289pfa.24.1702339909172;
+        Mon, 11 Dec 2023 16:11:49 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:3431:681a:6403:d100? ([2620:0:1000:8411:3431:681a:6403:d100])
+        by smtp.gmail.com with ESMTPSA id c12-20020aa7880c000000b006ce7ff254b9sm6890318pfo.68.2023.12.11.16.11.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Dec 2023 16:11:48 -0800 (PST)
+Message-ID: <d660cc31-a5be-47f2-9fdf-ba4bf5106226@acm.org>
+Date: Mon, 11 Dec 2023 16:11:47 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -29,61 +36,107 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] block/blk-ioprio: Skip zoned writes that are not append
  operations
 Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
 References: <20231211231451.1452979-1-bvanassche@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20231211231451.1452979-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
+ <19eaaa5b-e4b7-41aa-b5a2-7d5a89927a91@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <19eaaa5b-e4b7-41aa-b5a2-7d5a89927a91@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/12/23 08:14, Bart Van Assche wrote:
-> If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
-> originate from different cgroups that could result in different
-> priorities being assigned to these operations. Do not modify the I/O
-> priority of these write operations to prevent that these would be
-> executed in the wrong order when using the mq-deadline I/O
-
-...to prevent them from being executed in the wrong...
-
-> scheduler.
+On 12/11/23 15:31, Damien Le Moal wrote:
+> On 12/12/23 08:14, Bart Van Assche wrote:
+>> +	/*
+>> +	 * If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
+>> +	 * originate from different cgroups that could result in different
+>> +	 * priorities being assigned to these operations. Do not modify the I/O
+>> +	 * priority of these write operations to prevent that these would be
+>> +	 * executed in the wrong order when using the mq-deadline I/O
+>> +	 * scheduler.
+>> +	 */
+>> +	if (bdev_op_is_zoned_write(bio->bi_bdev, bio_op(bio)))
 > 
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/blk-ioprio.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-> index 4051fada01f1..09ce083a0e3a 100644
-> --- a/block/blk-ioprio.c
-> +++ b/block/blk-ioprio.c
-> @@ -192,6 +192,17 @@ void blkcg_set_ioprio(struct bio *bio)
->  	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
->  		return;
->  
-> +	/*
-> +	 * If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
-> +	 * originate from different cgroups that could result in different
-> +	 * priorities being assigned to these operations. Do not modify the I/O
-> +	 * priority of these write operations to prevent that these would be
-> +	 * executed in the wrong order when using the mq-deadline I/O
-> +	 * scheduler.
-> +	 */
-> +	if (bdev_op_is_zoned_write(bio->bi_bdev, bio_op(bio)))
+> Ideally, we want the bio equivalent of blk_rq_is_seq_zoned_write() here so that
+> writes to conventional zones are not affected (these can be reordered).
+  How about the patch below?
 
-Ideally, we want the bio equivalent of blk_rq_is_seq_zoned_write() here so that
-writes to conventional zones are not affected (these can be reordered).
+Thanks,
 
-> +		return;
-> +
->  	if (blkcg->prio_policy == POLICY_PROMOTE_TO_RT ||
->  	    blkcg->prio_policy == POLICY_NONE_TO_RT) {
->  		/*
+Bart.
 
--- 
-Damien Le Moal
-Western Digital Research
+
+[PATCH] block/blk-ioprio: Skip zoned writes that are not append operations
+
+If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
+originate from different cgroups that could result in different priorities
+being assigned to these operations. Do not modify the I/O priority of
+these write operations to prevent them from being executed in the wrong
+order when using the mq-deadline I/O scheduler.
+
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+  block/blk-ioprio.c     | 11 +++++++++++
+  include/linux/blk-mq.h | 17 +++++++++++++++++
+  2 files changed, 28 insertions(+)
+
+diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+index 4051fada01f1..96b46d34e3d6 100644
+--- a/block/blk-ioprio.c
++++ b/block/blk-ioprio.c
+@@ -192,6 +192,17 @@ void blkcg_set_ioprio(struct bio *bio)
+  	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
+  		return;
+
++	/*
++	 * If REQ_OP_WRITE or REQ_OP_WRITE_ZEROES operations for the same zone
++	 * originate from different cgroups that could result in different
++	 * priorities being assigned to these operations. Do not modify the I/O
++	 * priority of these write operations to prevent that these would be
++	 * executed in the wrong order when using the mq-deadline I/O
++	 * scheduler.
++	 */
++	if (blk_bio_is_seq_zoned_write(bio))
++		return;
++
+  	if (blkcg->prio_policy == POLICY_PROMOTE_TO_RT ||
+  	    blkcg->prio_policy == POLICY_NONE_TO_RT) {
+  		/*
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 1ab3081c82ed..90907d9001c0 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -1149,6 +1149,18 @@ static inline unsigned int blk_rq_zone_no(struct request *rq)
+  	return disk_zone_no(rq->q->disk, blk_rq_pos(rq));
+  }
+
++/**
++ * blk_bio_is_seq_zoned_write() - Check if @bio requires write serialization.
++ * @bio: Bio to examine.
++ *
++ * Note: REQ_OP_ZONE_APPEND bios do not require serialization.
++ */
++static inline bool blk_bio_is_seq_zoned_write(struct bio *bio)
++{
++	return op_needs_zoned_write_locking(bio_op(bio)) &&
++		disk_zone_is_seq(bio->bi_disk, bio.bi_iter.bi_sector);
++}
++
+  static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
+  {
+  	return disk_zone_is_seq(rq->q->disk, blk_rq_pos(rq));
+@@ -1196,6 +1208,11 @@ static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
+  	return !blk_req_zone_is_write_locked(rq);
+  }
+  #else /* CONFIG_BLK_DEV_ZONED */
++static inline bool blk_bio_is_seq_zoned_write(struct bio *bio)
++{
++	return false;
++}
++
+  static inline bool blk_rq_is_seq_zoned_write(struct request *rq)
+  {
+  	return false;
 
