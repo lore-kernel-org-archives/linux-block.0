@@ -1,49 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mOu2oZ9P"
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB46D5;
-	Mon, 11 Dec 2023 18:27:59 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6d9e993d94dso2881092a34.0;
-        Mon, 11 Dec 2023 18:27:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ci6rj3Le"
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9629112A;
+	Mon, 11 Dec 2023 18:28:30 -0800 (PST)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-5e196c128fcso7854147b3.1;
+        Mon, 11 Dec 2023 18:28:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702348078; x=1702952878; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702348109; x=1702952909; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LuotiINhbKGxGGef8K7G7yCOze6MU0SeJK9/E0VqPZk=;
-        b=mOu2oZ9PdmyEQBvwYpbB4CxFhLPixosCG/9dqh1Cc/zIR24Fy9cxxE1bnhoq1S4HSH
-         2vlmhvyBtQA6tn2USXss6mEQeM9wt3l7Id3Tbu6029uRdoR/RA2glANWTWs/YjBv1Hrf
-         RO/Bq3AuywwoN+LCLd+t/kP5HmkKKJGtbX3R58KaCqjuMoNFp/yw9rDdjSIIHkKMPiFJ
-         ejqmZaLjmHXR4jE3vqghgoNj8WYXML9w9KOYHNlI/6E8PzshNsPZ6oKg7RLlSFj0GSaE
-         4DFw8w8uzqma1JnB04lU5hqrxYCQFneSE1bTt7mVJi7m4RNINMm7qpk/IDGJxwD7hexQ
-         o9wA==
+        bh=2naZtSkEf1NcPMGJshyYFtrlJjtShUpPX2HAHwMhtPE=;
+        b=Ci6rj3LeDWNP6MoXDX8OdHwssAKHiA07o9+ThUiV9mRJ2ptrlnOOvizX9gFhIu5cM0
+         BogueEGjBDU4xlPVfPPKRbK5h0cvkhDRK8IWomtbF5rowcNrfsS+53wBecVaOEGwzwmX
+         kGMOejEn2+CZXJqClQarnt9x/5TVta8PhiSgaHJGwOgAL6vLbbR3Rwjyps3rgFlQrGCu
+         mBGOJEt6tNHfq9ZTT2CLkk73UwEPSa+JZq/KeVKuom0sIHaI63W5QRgsyeZB7mlzS1Wc
+         bc4+a3gOzURBNi0r0qZb2qNbeDvLo+cnAajXF9ea0LOOyKEA7G4raEBBKvkDYxHIeq12
+         mfcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702348078; x=1702952878;
+        d=1e100.net; s=20230601; t=1702348109; x=1702952909;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LuotiINhbKGxGGef8K7G7yCOze6MU0SeJK9/E0VqPZk=;
-        b=hNOl2H/obmBkuHof2JdmjYHXOu7+BQ9EvpAl/06W62xhN8MKny6AmKD7YGffI7etC1
-         lpnA5K9w6xOx5pFZQ4V2x8SXsVHz4AnUc1PqpGqXBAMHqsNjZeWdAakpsccUVFS6qetv
-         QGZx0/w6+ZecW/OIU6oI9D8/rcx0DcqVsHuAfpg9LvHKbMxH2YhPTy6IolGN9wvyl2IN
-         zmwvaySq4eUxSEl6Qlo9AYisCF5BLRvQeAr9QbqK+QbmMmgJb67/gpBgIF/Z/5/Pr31q
-         lvR80DxVqOpy3nmrfOHDNZfxyIRpBrl6ovmdsXd/5sw8S7C1ssA5dyI9Vn4BfrNo3Viy
-         ZdIg==
-X-Gm-Message-State: AOJu0YyMGJIhoR/j94c6UT2TGKIBe06djo4hGnT1j80nujKkkwCefYEV
-	RRJemezSlojt0l0VbYAGfpuu5zgrB038Dw==
-X-Google-Smtp-Source: AGHT+IEHnCevx/zjXgMWzqImSiSNPCTlhUeZk/gNmGSenVJT/HCL0VqZAYmviFs6i1xsO2WZY35Fqw==
-X-Received: by 2002:a05:6830:16d9:b0:6d8:74e2:6f48 with SMTP id l25-20020a05683016d900b006d874e26f48mr4356891otr.68.1702348078162;
-        Mon, 11 Dec 2023 18:27:58 -0800 (PST)
+        bh=2naZtSkEf1NcPMGJshyYFtrlJjtShUpPX2HAHwMhtPE=;
+        b=Ev5hvb5GpU8kqSMlxq35m5Fz1ACYLooq5a+f89dvp8yob7iProO9NHqfWK7yMuBT/u
+         s6NWw3JxHV4+LbZY6oik2TCaw9z4JcXKtoWTSTBj7Zez+rALE1+Y8UM+tWqLi9H9bXrJ
+         VD5hFxRSqF8HBjje2Ql9IYO6CuFKvVj8AtRyaz4dcSZOs7fhn4DUtaBjHxSr33R3k1i6
+         nU5UHMFbyTGa4AOaEkn/GLFESPsHpxTy8sVOMOgGB15cZ6XSCgBjVhzw8Gj5WUOfHeL2
+         otdXLkMu/hDpwrEye3UcQ6X6HG1w4/TFIwLPT9v+Rerme4v/3BI/Lfh1LOCncpZTUViI
+         6Xrg==
+X-Gm-Message-State: AOJu0Yxj2QX7SBeEPaEMFrzdtGTlpnU0Lkq4n+vqISyeIsxjD/6V+GCq
+	siyEaZ3vcbq+ELYqgDDg9lpRS//J0EThpg==
+X-Google-Smtp-Source: AGHT+IHxxYi9tsUL3fhwiqrbBOybum3KQvBSBOcOUXQ+8eJIB4u5yqmLd2thUDPc/A7M1pqGLGdE4w==
+X-Received: by 2002:a81:8395:0:b0:5ca:4db5:6962 with SMTP id t143-20020a818395000000b005ca4db56962mr4232765ywf.46.1702348109282;
+        Mon, 11 Dec 2023 18:28:29 -0800 (PST)
 Received: from localhost ([2601:344:8301:57f0:38aa:1c88:df05:9b73])
-        by smtp.gmail.com with ESMTPSA id q1-20020a0de701000000b005cb1bf4d466sm3464287ywe.82.2023.12.11.18.27.56
+        by smtp.gmail.com with ESMTPSA id u13-20020a81a50d000000b005cc8b377fe9sm3395826ywg.121.2023.12.11.18.28.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 18:27:57 -0800 (PST)
+        Mon, 11 Dec 2023 18:28:28 -0800 (PST)
 From: Yury Norov <yury.norov@gmail.com>
 To: linux-kernel@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Chengming Zhou <zhouchengming@bytedance.com>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Yury Norov <yury.norov@gmail.com>,
 	linux-block@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Jan Kara <jack@suse.cz>,
+Cc: Jan Kara <jack@suse.cz>,
 	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
 	Matthew Wilcox <willy@infradead.org>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
@@ -52,9 +60,9 @@ Cc: Yury Norov <yury.norov@gmail.com>,
 	Alexey Klimov <klimov.linux@gmail.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH v3 03/35] lib/sbitmap; optimize __sbitmap_get_word() by using find_and_set_bit()
-Date: Mon, 11 Dec 2023 18:27:17 -0800
-Message-Id: <20231212022749.625238-4-yury.norov@gmail.com>
+Subject: [PATCH v3 24/35] block: null_blk: replace get_tag() with a generic find_and_set_bit_lock()
+Date: Mon, 11 Dec 2023 18:27:38 -0800
+Message-Id: <20231212022749.625238-25-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231212022749.625238-1-yury.norov@gmail.com>
 References: <20231212022749.625238-1-yury.norov@gmail.com>
@@ -66,87 +74,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-__sbitmap_get_word() opencodes either find_and_set_bit_wrap(), or
-find_and_set_next_bit() depending on wrap parameter. Simplify it by using
-atomic find_bit() API.
+get_tag() opencodes find_and_set_bit(). Simplify the code by getting
+rid of it.
 
-While here, simplify sbitmap_find_bit_in_word(), which calls it.
-
-CC: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
+Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- lib/sbitmap.c | 46 +++++++++-------------------------------------
- 1 file changed, 9 insertions(+), 37 deletions(-)
+ drivers/block/null_blk/main.c | 41 +++++++++++------------------------
+ 1 file changed, 13 insertions(+), 28 deletions(-)
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index d0a5081dfd12..8ecd830ba9e8 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -133,38 +133,13 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 3021d58ca51c..671dbb9ab928 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -760,19 +760,6 @@ static void put_tag(struct nullb_queue *nq, unsigned int tag)
+ 		wake_up(&nq->wait);
  }
- EXPORT_SYMBOL_GPL(sbitmap_resize);
  
--static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
-+static inline int __sbitmap_get_word(unsigned long *word, unsigned long depth,
- 			      unsigned int hint, bool wrap)
+-static unsigned int get_tag(struct nullb_queue *nq)
+-{
+-	unsigned int tag;
+-
+-	do {
+-		tag = find_first_zero_bit(nq->tag_map, nq->queue_depth);
+-		if (tag >= nq->queue_depth)
+-			return -1U;
+-	} while (test_and_set_bit_lock(tag, nq->tag_map));
+-
+-	return tag;
+-}
+-
+ static void free_cmd(struct nullb_cmd *cmd)
  {
--	int nr;
+ 	put_tag(cmd->nq, cmd->tag);
+@@ -782,24 +769,22 @@ static enum hrtimer_restart null_cmd_timer_expired(struct hrtimer *timer);
+ 
+ static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
+ {
++	unsigned int tag = find_and_set_bit_lock(nq->tag_map, nq->queue_depth);
+ 	struct nullb_cmd *cmd;
+-	unsigned int tag;
 -
--	/* don't wrap if starting from 0 */
--	wrap = wrap && hint;
--
--	while (1) {
--		nr = find_next_zero_bit(word, depth, hint);
--		if (unlikely(nr >= depth)) {
--			/*
--			 * We started with an offset, and we didn't reset the
--			 * offset to 0 in a failure case, so start from 0 to
--			 * exhaust the map.
--			 */
--			if (hint && wrap) {
--				hint = 0;
--				continue;
--			}
--			return -1;
+-	tag = get_tag(nq);
+-	if (tag != -1U) {
+-		cmd = &nq->cmds[tag];
+-		cmd->tag = tag;
+-		cmd->error = BLK_STS_OK;
+-		cmd->nq = nq;
+-		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
+-			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
+-				     HRTIMER_MODE_REL);
+-			cmd->timer.function = null_cmd_timer_expired;
 -		}
-+	if (wrap)
-+		return find_and_set_bit_wrap_lock(word, depth, hint);
+-		return cmd;
++
++	if (tag >= nq->queue_depth)
++		return NULL;
++
++	cmd = &nq->cmds[tag];
++	cmd->tag = tag;
++	cmd->error = BLK_STS_OK;
++	cmd->nq = nq;
++	if (nq->dev->irqmode == NULL_IRQ_TIMER) {
++		hrtimer_init(&cmd->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
++		cmd->timer.function = null_cmd_timer_expired;
+ 	}
  
--		if (!test_and_set_bit_lock(nr, word))
--			break;
--
--		hint = nr + 1;
--		if (hint >= depth - 1)
--			hint = 0;
--	}
--
--	return nr;
-+	return find_and_set_next_bit_lock(word, depth, hint);
+-	return NULL;
++	return cmd;
  }
  
- static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
-@@ -175,15 +150,12 @@ static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
- 	int nr;
- 
- 	do {
--		nr = __sbitmap_get_word(&map->word, depth,
--					alloc_hint, wrap);
--		if (nr != -1)
--			break;
--		if (!sbitmap_deferred_clear(map))
--			break;
--	} while (1);
-+		nr = __sbitmap_get_word(&map->word, depth, alloc_hint, wrap);
-+		if (nr < depth)
-+			return nr;
-+	} while (sbitmap_deferred_clear(map));
- 
--	return nr;
-+	return -1;
- }
- 
- static int sbitmap_find_bit(struct sbitmap *sb,
+ static struct nullb_cmd *alloc_cmd(struct nullb_queue *nq, struct bio *bio)
 -- 
 2.40.1
 
