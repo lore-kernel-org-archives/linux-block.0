@@ -1,24 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA8564CEB
-	for <linux-block@vger.kernel.org>; Tue, 12 Dec 2023 23:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B14064CDB
+	for <linux-block@vger.kernel.org>; Tue, 12 Dec 2023 23:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P5MzxtTX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 342E5C433C7;
-	Tue, 12 Dec 2023 23:44:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/mIeSE0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C673C433C8;
+	Tue, 12 Dec 2023 23:52:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702424692;
-	bh=q65ZP+jpQJnkXBQ8kpzhaXq8VqfcLBIaTlNAkDD0jPM=;
+	s=k20201202; t=1702425171;
+	bh=6Ivr7HMMblD3OuCf4443ntmLWy8jQLg/wF7X3+7fNWQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=P5MzxtTXyHsrxmWcLf0IC2O4zwt7cyscf+q/XNPat7mLiGq+5xKyVpIfuXNV50rUY
-	 jubDGzO4QxP71D1KWjZbU0fRg6la8b7YLCL4i6vdA49rlG5lRJ5PPrfWiys139qlRt
-	 pE364TwoaXCpa3TUyOZNSJYclDwA8f3U309lMdVN656V7pg/Drr7aJTVCWe4oOUOyp
-	 fWV72zdxkRh72FwesLHM1UVruG52jExDPK3Tjmjmdy1OABo1QqqhE+RjmxCs26rDT2
-	 YSM+xl4DL5Xk3IW0Ha8DyOEXNkXFyf2iaQYeZvheNnXExZAT8Ns70WoTDN0aAyCfRi
-	 k61nuiTKxmBHA==
-Message-ID: <8f807991-f478-4f71-9ce5-f39ba4a08c64@kernel.org>
-Date: Wed, 13 Dec 2023 08:44:49 +0900
+	b=P/mIeSE0xRJGM3dUM/hTmZ6Ylo18i4BRCBiqwRIo94mwRJs+kMllHJ77MG2FoiRh9
+	 mk/yEN5wQmXRfVoH5ix+xAnz2uohJa1RjioXKOe0+C0mx84y0s1sHeNn+cTsLgh+V7
+	 NbRDF0xrfuXShwAJ578EYgVzoOq6IRc0RsUZgeqKaExSrlpFNihI4WhcHSVvlrvYlH
+	 3IrbAkQ5kiFnYpXeEB1EAFC9LdQPXAgkdzoWfznf5XTEFLjC5pns9irYvZvXMT++dU
+	 ay5jk0+oZ54G3ThWI9uq50zgZtPpIbc0QB/wbUoz2Dzv8bKzIZ2tNHZYZ0WItyYg6s
+	 euNtbtpovuMQA==
+Message-ID: <95ecba8c-9a1a-49c9-92c8-f45580bc9f95@kernel.org>
+Date: Wed, 13 Dec 2023 08:52:49 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -28,54 +28,63 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
  certain cases
-To: Jaegeuk Kim <jaegeuk@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-References: <177773fd-c8ed-4822-9344-3058e820ddf0@kernel.org>
- <20231212154140.GB20933@lst.de>
- <42054848-2e8d-4856-b404-c042a4365097@acm.org>
- <20231212171846.GA28682@lst.de>
- <686cc853-96e2-4aa4-8f68-fdcc5cdabbba@acm.org>
- <20231212174802.GA30659@lst.de>
- <5b7be2e9-3691-409d-abff-f1fbf04cef7d@acm.org>
- <20231212181304.GA32666@lst.de>
- <19cd459e-d79e-4ecd-8ec8-778be0066e84@acm.org> <20231212182613.GA1216@lst.de>
- <ZXiual-UkUY4OWY2@google.com>
 Content-Language: en-US
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20231205053213.522772-1-bvanassche@acm.org>
+ <20231205053213.522772-4-bvanassche@acm.org>
+ <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
+ <4d506909-e063-4918-a9d3-e91bfa5a41a3@acm.org>
+ <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
+ <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
+ <deee82e3-ccc4-42d7-bb54-9f4d1cd886b0@kernel.org>
+ <8998e3cd-6bf1-4199-9e21-60fdfba37571@acm.org>
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <ZXiual-UkUY4OWY2@google.com>
+In-Reply-To: <8998e3cd-6bf1-4199-9e21-60fdfba37571@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/13/23 04:03, Jaegeuk Kim wrote:
-> On 12/12, Christoph Hellwig wrote:
->> On Tue, Dec 12, 2023 at 10:19:31AM -0800, Bart Van Assche wrote:
->>> "Fundamentally broken model" is your personal opinion. I don't know anyone
->>> else than you who considers zoned writes as a broken model.
+On 12/13/23 07:44, Bart Van Assche wrote:
+> On 12/10/23 23:40, Damien Le Moal wrote:
+>> On 12/9/23 03:40, Bart Van Assche wrote:
+>>> My understanding is that blkcg_set_ioprio() is called from inside submit_bio()
+>>> and hence that the reported issue cannot be solved by modifying F2FS. How about
+>>> modifying the blk-ioprio policy such that it ignores zoned writes?
 >>
->> No Bart, it is not.  Talk to Damien, talk to Martin, to Jens.  Or just
->> look at all the patches you're sending to the list that play a never
->> ending hac-a-mole trying to bandaid over reordering that should be
->> perfectly fine.  You're playing a long term losing game by trying to
->> prevent reordering that you can't win.
+>> I do not see a better solution than that at the moment. So yes, let's do that.
+>> But please add a big comment in the code explaining why we ignore zoned writes.
 > 
-> As one of users of zoned devices, I disagree this is a broken model, but even
-> better than the zone append model. When considering the filesystem performance,
-> it is essential to place the data per file to get better bandwidth. And for
-> NAND-based storage, filesystem is the right place to deal with the more efficient
-> garbage collecion based on the known data locations. That's why all the flash
-> storage vendors adopted it in the JEDEC. Agreed that zone append is nice, but
-> IMO, it's not practical for production.
+> Hi Damien,
+> 
+> We tested a patch for the blk-ioprio cgroup policy that makes it skip zoned writes.
+> We noticed that such a patch is not sufficient to prevent unaligned write errors
+> because some tasks have been assigned an I/O priority via the ionice command
+> (ioprio_set() system call). I think it would be wrong to skip the assignment of an
+> I/O priority for zoned writes in all code that can set an I/O priority. Since the
+> root cause of this issue is the inability of the mq-deadline I/O scheduler to
+> preserve the order for zoned writes with different I/O priorities, I think this
+> issue should be fixed in the mq-deadline I/O scheduler.
 
-The work on btrfs is a counter argument to this statement. The initial zone
-support based on regular writes was going nowhere as trying to maintain ordering
-was too complex and/or too invasive. Using zone append for the data path solved
-and simplified many things.
+Not necessarily. When the priority for an IO is set when a BIO is prepared, we
+know where that priority come from:
+1) The user kiocb through aio_reqprio
+2) The process ionice context
+3) priority cgroups
 
-I do think that zone append has a narrower use case spectrum for applications
-relying on the raw block device directly. But for file systems, it definitely is
-an easier to use writing model for zoned storage.
+We can disable (2) and (3) and leave (1) as is.
+
+Trying to solve this issue in mq-deadline would require keeping track of the io
+priority used for a write request that is issued to a zone and use that same
+priority for all following write requests for the same zone until there are no
+writes pending for that zone. Otherwise, you will get the priority inversion
+causing the reordering.
+
+But I think that doing all this without also causing priority inversion for the
+user, i.e. a high priority write request ends up waiting for a low priority one,
+will be challenging, to say the least.
+
 
 -- 
 Damien Le Moal
