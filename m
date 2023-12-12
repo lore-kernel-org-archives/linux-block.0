@@ -1,43 +1,43 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdY84KQr"
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39512210A;
-	Tue, 12 Dec 2023 03:12:21 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6cef51f7899so986206b3a.3;
-        Tue, 12 Dec 2023 03:12:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAvhWgQd"
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD962695;
+	Tue, 12 Dec 2023 03:12:30 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-5c701bd98f3so1055941a12.1;
+        Tue, 12 Dec 2023 03:12:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702379540; x=1702984340; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702379549; x=1702984349; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3C4XGNOSQh2qdBXT10pq8W1umCRdPJt9fc3zqaA6RvE=;
-        b=XdY84KQrG7tMDj4y7quSw+mtepqATxOJqGxGxKKOL30LIATSZqfVsPblM2NNgRSM+g
-         CIlSEcka139nTtkyUvqxBo90R5UBUYaczBHh9aqaikLhuhz09hvCSPsPpLQIPQCf5MNM
-         XxGvxpYfjmJBO8IPFS1FUmtN9As5vwq0IazsmD9GAz6Mergyq1Q0MHcYTEOSH2eGdnLM
-         80gK8F3qIr4zDC39KbGPYiPYCUmRj2iQs/cDlQi5WKAtzDmopAX7Mdx6mqUQ2xePo40a
-         Fwu49DAb9ETSubsk4sftfWI99DtldYVJK5w2BmhpYiD/xI+062ju2HPpTEvAUrvmodWg
-         aJ3A==
+        bh=vN+RlAGZeGH2zMVmYb6ghj5GDWJcjTyD9/i+J4cSzo8=;
+        b=EAvhWgQdAcKkYca7iH3EIeWNvw1BqsZ51l6UWqoLW9u0HmEwCSY04xLdWYx1Hrfkrr
+         zmeYu3itNjMAXRbt5L3R+j5KwjHuxKV9ZW166wmDknc5oL9b2nNLPi0tzcDs79SycgW0
+         q7yMcfgregHzDeVFPa3pqlXzzfpPowRx1ZXGISvM+IFy9g5mL7FuTIflN7OWB4HBp/rS
+         kZzO1Nwc4ZOtYuAO2PO2fB2C2/RkQowmU44+q43Q4MOZfFbranwEePe1yACFA5QQMIct
+         uYlLT4aA2c2sOn8vJauFRbnORotXTjYh3RbG5I9THGy9SLYY9E4Ve1hctG4ZCubnAcf5
+         TEYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702379540; x=1702984340;
+        d=1e100.net; s=20230601; t=1702379549; x=1702984349;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3C4XGNOSQh2qdBXT10pq8W1umCRdPJt9fc3zqaA6RvE=;
-        b=jsuENeoeRRAuUsdbw+7lOL3RcmBK1DXvObA4Zv+ody36+7zQjbsAGKhFlfy+GVagYE
-         q+tW0rAEjScA5vBrI/956ijYbYmKh3iPtpvj/5rek/w5NkpxHufoRXhkZ1vaIwij6Iax
-         p5r99xt1BVD1MMlSjsAy1jG94mi/xNr//I+VnU93wSz3B6oKzo6rKqG7xpxokdFNl2tJ
-         N360jdWHGRgtwiV92wlEy0wmNAPX4cIdUh6JfBoQPXNksO/wyL2cd9jJd/en6YNVvrEt
-         exvo/bujmAa7AIjcAI7J0/JY6pnoKyqb3Vgz3Yymj+QswH9C5m9peRLuogHb6FINgRkw
-         aSdw==
-X-Gm-Message-State: AOJu0Yzt4ienSBNpXCZpiog6j2TD6Xp90BT8BIpypgHDXyf6x5CIoIvG
-	fLxSLmnwDLc3AZpwLxXmugU=
-X-Google-Smtp-Source: AGHT+IH2Bn0L9xCh0Tvq4bOuPTmr0lgYXz5vcEeU0cMWIvfZTFc/5sRqby35e2TOr2XjIqb2AQ+L7w==
-X-Received: by 2002:a05:6a20:3d83:b0:190:7b07:b7c9 with SMTP id s3-20020a056a203d8300b001907b07b7c9mr2389253pzi.66.1702379540250;
-        Tue, 12 Dec 2023 03:12:20 -0800 (PST)
+        bh=vN+RlAGZeGH2zMVmYb6ghj5GDWJcjTyD9/i+J4cSzo8=;
+        b=TASBvnp+zxs/t/uaFCW09UKo+HcVvZhjTtKUum6TVgOdBEoM/n/APCcE0f4qhnPQZa
+         H+ADqVKdc/4nxOwV/0rNcZdsHKDGl9d0eOBpOWG471jMYXKbMDQ5Bp4np10s2aCeoJPl
+         FTskbzzqIl1Mfq3HQZiI+pdy738LiXFLjd6zCMhJnCsT70QDZ3juacCXzL7KmGcGRn4s
+         fp9XUkKWUKVOERXcAcz9y+9J7qWDQDxKcLiR2TE+2iNaMXfEoJMQvgLhzHWpfy2NI1oc
+         jHMHjwA8Wc3kIZBuerEsNp9GRkn0SFLms+TFscjDeQ1OMkmpvhHiJy0H8n+aiAv6bLOv
+         hjRA==
+X-Gm-Message-State: AOJu0YyU0nHUuzHWK+4GH7MeqeHyebrhZZdTWV/19NJL5WkdyIVqaQrn
+	3qkN643HYrS/9MhddWllDh0=
+X-Google-Smtp-Source: AGHT+IH8HknLDzaW0Q9TDSRdg3SQu4DIMs5eNiFa7zAa7YAtIDMAqdyYIiPkKRRbitlR1WMMmVqmNQ==
+X-Received: by 2002:a05:6a20:4287:b0:186:e53:b64b with SMTP id o7-20020a056a20428700b001860e53b64bmr3221043pzj.47.1702379549391;
+        Tue, 12 Dec 2023 03:12:29 -0800 (PST)
 Received: from ubuntu.. ([117.18.48.102])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902ee5500b001d0511c990csm8345453plo.237.2023.12.12.03.12.16
+        by smtp.gmail.com with ESMTPSA id 21-20020a170902ee5500b001d0511c990csm8345453plo.237.2023.12.12.03.12.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 03:12:19 -0800 (PST)
+        Tue, 12 Dec 2023 03:12:29 -0800 (PST)
 From: Hongyu Jin <hongyu.jin.cn@gmail.com>
 To: agk@redhat.com,
 	snitzer@kernel.org,
@@ -51,9 +51,9 @@ Cc: zhiguo.niu@unisoc.com,
 	linux-kernel@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	linux-block@vger.kernel.org
-Subject: [PATCH v4 2/5] dm: Support I/O priority for dm_io()
-Date: Tue, 12 Dec 2023 19:11:47 +0800
-Message-Id: <20231212111150.18155-3-hongyu.jin.cn@gmail.com>
+Subject: [PATCH v4 4/5] dm verity: Fix I/O priority lost when read FEC and hash
+Date: Tue, 12 Dec 2023 19:11:49 +0800
+Message-Id: <20231212111150.18155-5-hongyu.jin.cn@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231212111150.18155-1-hongyu.jin.cn@gmail.com>
 References: <ZXeJ9jAKEQ31OXLP@redhat.com>
@@ -68,200 +68,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Hongyu Jin <hongyu.jin@unisoc.com>
 
-Add ioprio field in struct dm_io_region, by this field
-specific I/O priority when call dm_io().
+To fix this problem, when read FEC and hash from disk, I/O priority are
+inconsistent with data block and blocked by other I/O with low I/O
+priority.
+
+Make I/O for FEC and hash has same I/O priority with original data I/O.
 
 Co-developed-by: Yibin Ding <yibin.ding@unisoc.com>
 Signed-off-by: Yibin Ding <yibin.ding@unisoc.com>
 Signed-off-by: Hongyu Jin <hongyu.jin@unisoc.com>
 ---
- drivers/md/dm-bufio.c           | 3 +++
- drivers/md/dm-integrity.c       | 5 +++++
- drivers/md/dm-io.c              | 1 +
- drivers/md/dm-log.c             | 1 +
- drivers/md/dm-raid1.c           | 2 ++
- drivers/md/dm-snap-persistent.c | 1 +
- drivers/md/dm-writecache.c      | 4 ++++
- include/linux/dm-io.h           | 2 ++
- 8 files changed, 19 insertions(+)
+ drivers/md/dm-verity-fec.c    | 3 ++-
+ drivers/md/dm-verity-target.c | 8 ++++++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
-index 62eb27639c9b..7f82262aed54 100644
---- a/drivers/md/dm-bufio.c
-+++ b/drivers/md/dm-bufio.c
-@@ -1269,6 +1269,7 @@ static void use_dmio(struct dm_buffer *b, enum req_op op, sector_t sector,
- 		.bdev = b->c->bdev,
- 		.sector = sector,
- 		.count = n_sectors,
-+		.ioprio = IOPRIO_DEFAULT,
- 	};
+diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
+index 715173cbf0ee..6a5a679e7e8a 100644
+--- a/drivers/md/dm-verity-fec.c
++++ b/drivers/md/dm-verity-fec.c
+@@ -209,6 +209,7 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
+ 	u8 *bbuf, *rs_block;
+ 	u8 want_digest[HASH_MAX_DIGESTSIZE];
+ 	unsigned int n, k;
++	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
  
- 	if (b->data_mode != DATA_MODE_VMALLOC) {
-@@ -2125,6 +2126,7 @@ int dm_bufio_issue_flush(struct dm_bufio_client *c)
- 		.bdev = c->bdev,
- 		.sector = 0,
- 		.count = 0,
-+		.ioprio = IOPRIO_DEFAULT,
- 	};
+ 	if (neras)
+ 		*neras = 0;
+@@ -247,7 +248,7 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
+ 			bufio = v->bufio;
+ 		}
  
- 	if (WARN_ON_ONCE(dm_bufio_in_request()))
-@@ -2149,6 +2151,7 @@ int dm_bufio_issue_discard(struct dm_bufio_client *c, sector_t block, sector_t c
- 		.bdev = c->bdev,
- 		.sector = block_to_sector(c, block),
- 		.count = block_to_sector(c, count),
-+		.ioprio = IOPRIO_DEFAULT,
- 	};
+-		bbuf = dm_bufio_read(bufio, block, &buf, IOPRIO_DEFAULT);
++		bbuf = dm_bufio_read(bufio, block, &buf, bio_prio(bio));
+ 		if (IS_ERR(bbuf)) {
+ 			DMWARN_LIMIT("%s: FEC %llu: read failed (%llu): %ld",
+ 				     v->data_dev->name,
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index 0038e168f3d7..8c911b6722ce 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -51,6 +51,7 @@ static DEFINE_STATIC_KEY_FALSE(use_tasklet_enabled);
+ struct dm_verity_prefetch_work {
+ 	struct work_struct work;
+ 	struct dm_verity *v;
++	unsigned short ioprio;
+ 	sector_t block;
+ 	unsigned int n_blocks;
+ };
+@@ -293,6 +294,7 @@ static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
+ 	int r;
+ 	sector_t hash_block;
+ 	unsigned int offset;
++	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
  
- 	if (WARN_ON_ONCE(dm_bufio_in_request()))
-diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-index e85c688fd91e..7cba183abdce 100644
---- a/drivers/md/dm-integrity.c
-+++ b/drivers/md/dm-integrity.c
-@@ -543,6 +543,7 @@ static int sync_rw_sb(struct dm_integrity_c *ic, blk_opf_t opf)
- 	io_loc.bdev = ic->meta_dev ? ic->meta_dev->bdev : ic->dev->bdev;
- 	io_loc.sector = ic->start;
- 	io_loc.count = SB_SECTORS;
-+	io_loc.ioprio = IOPRIO_DEFAULT;
+ 	verity_hash_at_level(v, block, level, &hash_block, &offset);
  
- 	if (op == REQ_OP_WRITE) {
- 		sb_set_version(ic);
-@@ -1070,6 +1071,7 @@ static void rw_journal_sectors(struct dm_integrity_c *ic, blk_opf_t opf,
- 	io_loc.bdev = ic->meta_dev ? ic->meta_dev->bdev : ic->dev->bdev;
- 	io_loc.sector = ic->start + SB_SECTORS + sector;
- 	io_loc.count = n_sectors;
-+	io_loc.ioprio = IOPRIO_DEFAULT;
+@@ -307,7 +309,7 @@ static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
+ 			return -EAGAIN;
+ 		}
+ 	} else
+-		data = dm_bufio_read(v->bufio, hash_block, &buf, IOPRIO_DEFAULT);
++		data = dm_bufio_read(v->bufio, hash_block, &buf, bio_prio(bio));
  
- 	r = dm_io(&io_req, 1, &io_loc, NULL);
- 	if (unlikely(r)) {
-@@ -1187,6 +1189,7 @@ static void copy_from_journal(struct dm_integrity_c *ic, unsigned int section, u
- 	io_loc.bdev = ic->dev->bdev;
- 	io_loc.sector = target;
- 	io_loc.count = n_sectors;
-+	io_loc.ioprio = IOPRIO_DEFAULT;
- 
- 	r = dm_io(&io_req, 1, &io_loc, NULL);
- 	if (unlikely(r)) {
-@@ -1515,6 +1518,7 @@ static void dm_integrity_flush_buffers(struct dm_integrity_c *ic, bool flush_dat
- 		fr.io_reg.bdev = ic->dev->bdev,
- 		fr.io_reg.sector = 0,
- 		fr.io_reg.count = 0,
-+		fr.io_reg.ioprio = IOPRIO_DEFAULT,
- 		fr.ic = ic;
- 		init_completion(&fr.comp);
- 		r = dm_io(&fr.io_req, 1, &fr.io_reg, NULL);
-@@ -2738,6 +2742,7 @@ static void integrity_recalc(struct work_struct *w)
- 	io_loc.bdev = ic->dev->bdev;
- 	io_loc.sector = get_data_sector(ic, area, offset);
- 	io_loc.count = n_sectors;
-+	io_loc.ioprio = IOPRIO_DEFAULT;
- 
- 	r = dm_io(&io_req, 1, &io_loc, NULL);
- 	if (unlikely(r)) {
-diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-index f053ce245814..b40f0a432981 100644
---- a/drivers/md/dm-io.c
-+++ b/drivers/md/dm-io.c
-@@ -354,6 +354,7 @@ static void do_region(const blk_opf_t opf, unsigned int region,
- 				       &io->client->bios);
- 		bio->bi_iter.bi_sector = where->sector + (where->count - remaining);
- 		bio->bi_end_io = endio;
-+		bio->bi_ioprio = where->ioprio;
- 		store_io_and_region_in_bio(bio, io, region);
- 
- 		if (op == REQ_OP_DISCARD || op == REQ_OP_WRITE_ZEROES) {
-diff --git a/drivers/md/dm-log.c b/drivers/md/dm-log.c
-index f9f84236dfcd..e0dacdcd94f1 100644
---- a/drivers/md/dm-log.c
-+++ b/drivers/md/dm-log.c
-@@ -309,6 +309,7 @@ static int flush_header(struct log_c *lc)
- 		.bdev = lc->header_location.bdev,
- 		.sector = 0,
- 		.count = 0,
-+		.ioprio = IOPRIO_DEFAULT,
- 	};
- 
- 	lc->io_req.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index ddcb2bc4a617..2de9b1377de3 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -275,6 +275,7 @@ static int mirror_flush(struct dm_target *ti)
- 		io[i].bdev = m->dev->bdev;
- 		io[i].sector = 0;
- 		io[i].count = 0;
-+		io[i].ioprio = IOPRIO_DEFAULT;
+ 	if (IS_ERR(data))
+ 		return PTR_ERR(data);
+@@ -717,7 +719,7 @@ static void verity_prefetch_io(struct work_struct *work)
+ 		}
+ no_prefetch_cluster:
+ 		dm_bufio_prefetch(v->bufio, hash_block_start,
+-				  hash_block_end - hash_block_start + 1, IOPRIO_DEFAULT);
++				  hash_block_end - hash_block_start + 1, pw->ioprio);
  	}
  
- 	error_bits = -1;
-@@ -475,6 +476,7 @@ static void map_region(struct dm_io_region *io, struct mirror *m,
- 	io->bdev = m->dev->bdev;
- 	io->sector = map_sector(m, bio);
- 	io->count = bio_sectors(bio);
-+	io->ioprio = bio_prio(bio);
+ 	kfree(pw);
+@@ -728,6 +730,7 @@ static void verity_submit_prefetch(struct dm_verity *v, struct dm_verity_io *io)
+ 	sector_t block = io->block;
+ 	unsigned int n_blocks = io->n_blocks;
+ 	struct dm_verity_prefetch_work *pw;
++	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
+ 
+ 	if (v->validated_blocks) {
+ 		while (n_blocks && test_bit(block, v->validated_blocks)) {
+@@ -751,6 +754,7 @@ static void verity_submit_prefetch(struct dm_verity *v, struct dm_verity_io *io)
+ 	pw->v = v;
+ 	pw->block = block;
+ 	pw->n_blocks = n_blocks;
++	pw->ioprio = bio_prio(bio);
+ 	queue_work(v->verify_wq, &pw->work);
  }
  
- static void hold_bio(struct mirror_set *ms, struct bio *bio)
-diff --git a/drivers/md/dm-snap-persistent.c b/drivers/md/dm-snap-persistent.c
-index 15649921f2a9..4aa70b71f1da 100644
---- a/drivers/md/dm-snap-persistent.c
-+++ b/drivers/md/dm-snap-persistent.c
-@@ -236,6 +236,7 @@ static int chunk_io(struct pstore *ps, void *area, chunk_t chunk, blk_opf_t opf,
- 		.bdev = dm_snap_cow(ps->store->snap)->bdev,
- 		.sector = ps->store->chunk_size * chunk,
- 		.count = ps->store->chunk_size,
-+		.ioprio = IOPRIO_DEFAULT,
- 	};
- 	struct dm_io_request io_req = {
- 		.bi_opf = opf,
-diff --git a/drivers/md/dm-writecache.c b/drivers/md/dm-writecache.c
-index 074cb785eafc..135d1268246f 100644
---- a/drivers/md/dm-writecache.c
-+++ b/drivers/md/dm-writecache.c
-@@ -515,6 +515,7 @@ static void ssd_commit_flushed(struct dm_writecache *wc, bool wait_for_ios)
- 		region.bdev = wc->ssd_dev->bdev;
- 		region.sector = (sector_t)i * (BITMAP_GRANULARITY >> SECTOR_SHIFT);
- 		region.count = (sector_t)(j - i) * (BITMAP_GRANULARITY >> SECTOR_SHIFT);
-+		region.ioprio = IOPRIO_DEFAULT;
- 
- 		if (unlikely(region.sector >= wc->metadata_sectors))
- 			break;
-@@ -555,6 +556,7 @@ static void ssd_commit_superblock(struct dm_writecache *wc)
- 	region.bdev = wc->ssd_dev->bdev;
- 	region.sector = 0;
- 	region.count = max(4096U, wc->block_size) >> SECTOR_SHIFT;
-+	region.ioprio = IOPRIO_DEFAULT;
- 
- 	if (unlikely(region.sector + region.count > wc->metadata_sectors))
- 		region.count = wc->metadata_sectors - region.sector;
-@@ -590,6 +592,7 @@ static void writecache_disk_flush(struct dm_writecache *wc, struct dm_dev *dev)
- 	region.bdev = dev->bdev;
- 	region.sector = 0;
- 	region.count = 0;
-+	region.ioprio = IOPRIO_DEFAULT;
- 	req.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
- 	req.mem.type = DM_IO_KMEM;
- 	req.mem.ptr.addr = NULL;
-@@ -984,6 +987,7 @@ static int writecache_read_metadata(struct dm_writecache *wc, sector_t n_sectors
- 	region.bdev = wc->ssd_dev->bdev;
- 	region.sector = wc->start_sector;
- 	region.count = n_sectors;
-+	region.ioprio = IOPRIO_DEFAULT;
- 	req.bi_opf = REQ_OP_READ | REQ_SYNC;
- 	req.mem.type = DM_IO_VMA;
- 	req.mem.ptr.vma = (char *)wc->memory_map;
-diff --git a/include/linux/dm-io.h b/include/linux/dm-io.h
-index 7595142f3fc5..227ee6d77c70 100644
---- a/include/linux/dm-io.h
-+++ b/include/linux/dm-io.h
-@@ -20,6 +20,8 @@ struct dm_io_region {
- 	struct block_device *bdev;
- 	sector_t sector;
- 	sector_t count;		/* If this is zero the region is ignored. */
-+	/* Set it to IOPRIO_DEFAULT if you don't know what value to set */
-+	unsigned short ioprio;
- };
- 
- struct page_list {
 -- 
 2.34.1
 
