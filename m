@@ -1,86 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BeyLrSX1"
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5441F2
-	for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 07:20:17 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id ca18e2360f4ac-7b720eb0ba3so46165639f.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 07:20:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1702480817; x=1703085617; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H3PNM5zXBLheQcIjEpK8gOH2bim9GcY7Tuic8Z+UFE8=;
-        b=BeyLrSX1t2fusOTEW4Z/Jp9D0CCDHU/5SDqnfDRxmdZkzJQ0mn/o1i/wX+HUmqdywG
-         VoxYHcN2CatjZG3wIt7ZWexen18me0u46jcoqYURbUX9FKR3FUeSxjbpoO8NP8NzPZlk
-         +AMNbEEJcaFg225avSS5SzoJqGeb8ABcZYlZEEeXaQ1Y1sTAPlz+aaq68Qoofvpnloax
-         4VfPkN6kUNR0wbH7FaBXrUVQR8kBKzZEEKIEnlrZCBQvhRpRsgWQbvMVmwqaBBaQChBI
-         ZPN+m1bTosb1VXON0VGblAcjeXki4uMyTT7xpJN0YtJ96a5YM4N90o236tE8KuU/cRcG
-         AM1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702480817; x=1703085617;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H3PNM5zXBLheQcIjEpK8gOH2bim9GcY7Tuic8Z+UFE8=;
-        b=tFUeWOKopHwsP7f2OuqRPOWFSwaZz2W+dbZhKBFVze8Hv5oVYryp0miVgJyfx19EhH
-         P8bJsTCjk0GJu3kCUNpwaqSUfr84kQOoC3BbzvWQsq30It60z4zcpeSHtPtoKIvq0/0A
-         mYCuFOw92TuFqzAYFAdwkQakm+0HH5rzuOTdMQpWfbsyj5SQ1T6cOGB2W4nTHAlVoVo3
-         SEnDPz+4mi0eXzCPKv5FltfZqc5eaq27Y4FRiwWxG9MUS7H/oMLi/D4flVDTsnVUXJjK
-         PMA4AoyqxgZfFHgKu1NHDpckb2APQU6uFeiO8yFuD10PwoKtr5+TqJgivubnn0VYp+7e
-         YTlA==
-X-Gm-Message-State: AOJu0Yzr6AEs3VZccZEBz6WL5MVFUXNUrKcDOkjNAj01E+8i0AseHn1Y
-	zZfrZb7k0oyUheGI3/Yj+xZq3g==
-X-Google-Smtp-Source: AGHT+IGY0kHOkIzt6H+QWTL10izoHuOyMzxLzV+feo8HGgLLYqLqoUMAAYk3po1dYDle3iKyK7WuqQ==
-X-Received: by 2002:a05:6602:b90:b0:7b6:fe97:5242 with SMTP id fm16-20020a0566020b9000b007b6fe975242mr14827360iob.0.1702480815144;
-        Wed, 13 Dec 2023 07:20:15 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id gj1-20020a0566386a0100b00466601630f4sm2990491jab.174.2023.12.13.07.20.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 07:20:14 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: willy@infradead.org, hch@lst.de, dlemoal@kernel.org, 
- gregkh@linuxfoundation.org, Min Li <min15.li@samsung.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>
-In-Reply-To: <20230629142517.121241-1-min15.li@samsung.com>
-References: <CGME20230629062728epcas5p2bb48fea42a380039c0eb06c19a44aad1@epcas5p2.samsung.com>
- <20230629142517.121241-1-min15.li@samsung.com>
-Subject: Re: [PATCH v5] block: add check that partition length needs to be
- aligned with block size
-Message-Id: <170248081388.44340.415544465517225810.b4-ty@kernel.dk>
-Date: Wed, 13 Dec 2023 08:20:13 -0700
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B27A26AE;
+	Wed, 13 Dec 2023 07:44:16 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 3036768B05; Wed, 13 Dec 2023 16:44:09 +0100 (CET)
+Date: Wed, 13 Dec 2023 16:44:09 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
+	sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
+	djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	dchinner@redhat.com, jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+	ming.lei@redhat.com, jaswin@linux.ibm.com, bvanassche@acm.org
+Subject: Re: [PATCH v2 00/16] block atomic writes
+Message-ID: <20231213154409.GA7724@lst.de>
+References: <20231212110844.19698-1-john.g.garry@oracle.com> <20231212163246.GA24594@lst.de> <b8b0a9d7-88d2-45a9-877a-ecc5e0f1e645@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-7edf1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b8b0a9d7-88d2-45a9-877a-ecc5e0f1e645@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
+On Wed, Dec 13, 2023 at 09:32:06AM +0000, John Garry wrote:
+>>> - How to make API extensible for when we have no HW support? In that case,
+>>>    we would prob not have to follow rule of power-of-2 length et al.
+>>>    As a possible solution, maybe we can say that atomic writes are
+>>>    supported for the file via statx, but not set unit_min and max values,
+>>>    and this means that writes need to be just FS block aligned there.
+>> I don't think the power of two length is much of a problem to be
+>> honest, and if we every want to lift it we can still do that easily
+>> by adding a new flag or limit.
+>
+> ok, but it would be nice to have some idea on what that flag or limit 
+> change would be.
 
-On Thu, 29 Jun 2023 14:25:17 +0000, Min Li wrote:
-> Before calling add partition or resize partition, there is no check
-> on whether the length is aligned with the logical block size.
-> If the logical block size of the disk is larger than 512 bytes,
-> then the partition size maybe not the multiple of the logical block size,
-> and when the last sector is read, bio_truncate() will adjust the bio size,
-> resulting in an IO error if the size of the read command is smaller than
-> the logical block size.If integrity data is supported, this will also
-> result in a null pointer dereference when calling bio_integrity_free.
-> 
-> [...]
+That would require a concrete use case.  The simples thing for a file
+system that can or does log I/O it would simply be a flag waving all
+the alignment and size requirements.
 
-Applied, thanks!
+>> I suspect we need an on-disk flag that forces allocations to be
+>> aligned to the atomic write limit, in some ways similar how the
+>> XFS rt flag works.  You'd need to set it on an empty file, and all
+>> allocations after that are guaranteed to be properly aligned.
+>
+> Hmmm... so how is this different to the XFS forcealign feature?
 
-[1/1] block: add check that partition length needs to be aligned with block size
-      commit: 6f64f866aa1ae6975c95d805ed51d7e9433a0016
+Maybe not much.  But that's not what it is about - we need a common
+API for this and not some XFS internal flag.  So if this is something
+we could support in ext4 as well that would be a good step.  And for
+btrfs you'd probably want to support something like it in nocow mode
+if people care enough, or always support atomics and write out of
+place.
 
-Best regards,
--- 
-Jens Axboe
+> For XFS, I thought that your idea was to always CoW new extents for 
+> misaligned extents or writes which spanned multiple extents.
 
+Well, that is useful for two things:
 
+ - atomic writes on hardware that does not support it
+ - atomic writes for bufferd I/O
+ - supporting other sizes / alignments than the strict power of
+   two above.
 
+> Right, so we should limit atomic write queue limits to max_hw_sectors. But 
+> people can still tweak max_sectors, and I am inclined to say that 
+> atomic_write_unit_max et al should be (dynamically) limited to max_sectors 
+> also.
+
+Allowing people to tweak it seems to be asking for trouble.
+
+>> have that silly limit.  For NVMe that would require SGL support
+>> (and some driver changes I've been wanting to make for long where
+>> we always use SGLs for transfers larger than a single PRP if supported)
+>
+> If we could avoid dealing with a virt boundary, then that would be nice.
+>
+> Are there any patches yet for the change to always use SGLs for transfers 
+> larger than a single PRP?
+
+No.
+
+> On a related topic, I am not sure about how - or if we even should - 
+> enforce iovec PAGE-alignment or length; rather, the user could just be 
+> advised that iovecs must be PAGE-aligned and min PAGE length to achieve 
+> atomic_write_unit_max.
+
+Anything that just advices the user an it not clear cut and results in
+an error is data loss waiting to happen.  Even more so if it differs
+from device to device.
