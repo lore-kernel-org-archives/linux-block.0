@@ -1,84 +1,102 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C168AF2
-	for <linux-block@vger.kernel.org>; Tue, 12 Dec 2023 17:02:20 -0800 (PST)
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6cea0fd9b53so4037482b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 12 Dec 2023 17:02:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702429340; x=1703034140;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6AgxkDZe1sYPxHkKXBHiqEkCdxUVIAsai3q0sOwUAC8=;
-        b=wBDqp2q0TWB8QqJwmCZAvTNExbiiccl+6dXG/ad85eXQ0d03GNxxufQjDzPysZj2R/
-         wXPG4YhWPd+nKAW05Qg7eY0PYi6g043fQx5lZbtzim36Q0NbjE2YOaTXf6XCeq6UP2RA
-         K5SZNxpCgHaIYz1QCMLddO7cLeks8HZcW8wLY3xoO1R4xSczp0fV3o3ggNHD069eByZh
-         9OHzObjFOGQlzQBAHt8r3XK3Yit53HycR3rHdORrGNRe+xKgS2AObaP7dztLjAK3i62J
-         /Eklh7XdKZu50LfhbaierIPWzAg+1HEQYf/VYhfTtJK72i3Y9gdt8OGYzyhhRqHVN6z/
-         gi9A==
-X-Gm-Message-State: AOJu0YwonPFOTFbouIZqygxQw999kGG/kqNzypK9oGm5wMe2y8kl6PV8
-	dSnKkL3kfjVOFUTpxd4ZjX17x4deC1PG2w==
-X-Google-Smtp-Source: AGHT+IHUA9mfiZxcItP3OIlCSLPILoXWdI5Dnpup9Im6GdYa3uRBvmj+HiuphZTMe5KMZ8ZcaNzF7Q==
-X-Received: by 2002:a17:902:d2cd:b0:1d0:609e:f6dc with SMTP id n13-20020a170902d2cd00b001d0609ef6dcmr4644962plc.1.1702429339998;
-        Tue, 12 Dec 2023 17:02:19 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id w6-20020a170902d3c600b001d3491dcde4sm457964plb.223.2023.12.12.17.02.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Dec 2023 17:02:19 -0800 (PST)
-Message-ID: <3248683c-d2af-4f0c-b665-1aeff41e9d21@acm.org>
-Date: Tue, 12 Dec 2023 17:02:18 -0800
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F07FD91;
+	Tue, 12 Dec 2023 17:09:20 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Sqcnm2cdhz4f3jZH;
+	Wed, 13 Dec 2023 09:09:16 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 86FC11A098C;
+	Wed, 13 Dec 2023 09:09:17 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBntQs5BHllRkz5DQ--.6696S3;
+	Wed, 13 Dec 2023 09:09:16 +0800 (CST)
+Subject: Re: [PATCH RFC v2 for-6.8/block 01/18] block: add some bdev apis
+To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de,
+ kent.overstreet@gmail.com, joern@lazybastard.org, miquel.raynal@bootlin.com,
+ richard@nod.at, vigneshr@ti.com, sth@linux.ibm.com, hoeppner@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ jejb@linux.ibm.com, martin.petersen@oracle.com, clm@fb.com,
+ josef@toxicpanda.com, dsterba@suse.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, nico@fluxnic.net, xiang@kernel.org, chao@kernel.org,
+ tytso@mit.edu, adilger.kernel@dilger.ca, agruenba@redhat.com, jack@suse.com,
+ konishi.ryusuke@gmail.com, willy@infradead.org, akpm@linux-foundation.org,
+ p.raghav@samsung.com, hare@suse.de, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, gfs2@lists.linux.dev,
+ linux-nilfs@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20231211140552.973290-1-yukuai1@huaweicloud.com>
+ <20231211140552.973290-2-yukuai1@huaweicloud.com>
+ <ZXhdRhfr+JoWdhyj@infradead.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <893e2764-65a6-ef73-5ddf-95cd9f97cb19@huaweicloud.com>
+Date: Wed, 13 Dec 2023 09:09:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
- certain cases
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20231205053213.522772-1-bvanassche@acm.org>
- <20231205053213.522772-4-bvanassche@acm.org>
- <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
- <4d506909-e063-4918-a9d3-e91bfa5a41a3@acm.org>
- <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
- <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
- <deee82e3-ccc4-42d7-bb54-9f4d1cd886b0@kernel.org>
- <8998e3cd-6bf1-4199-9e21-60fdfba37571@acm.org>
- <95ecba8c-9a1a-49c9-92c8-f45580bc9f95@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <95ecba8c-9a1a-49c9-92c8-f45580bc9f95@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ZXhdRhfr+JoWdhyj@infradead.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBntQs5BHllRkz5DQ--.6696S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gw4fJw1rAF1UKF4fJrWDJwb_yoWfurcEqr
+	n7Cryv9w1jvws5Wr4UKFy5JrWrJFWYyr43Xay8ta4Iq3s8Xa18Ar92ka48uas8Ww47Z3ZI
+	9FsxuFy8uF4fujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbaxFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWrXVW8Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j
+	6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x0JUd8n5UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 12/12/23 13:52, Damien Le Moal wrote:
-> Trying to solve this issue in mq-deadline would require keeping track of the io
-> priority used for a write request that is issued to a zone and use that same
-> priority for all following write requests for the same zone until there are no
-> writes pending for that zone. Otherwise, you will get the priority inversion
-> causing the reordering.
+Hi,
+
+ÔÚ 2023/12/12 21:16, Christoph Hellwig Ð´µÀ:
+>> +void invalidate_bdev_range(struct block_device *bdev, pgoff_t start,
+>> +			   pgoff_t end)
+>> +{
+>> +	invalidate_mapping_pages(bdev->bd_inode->i_mapping, start, end);
+>> +}
+>> +EXPORT_SYMBOL_GPL(invalidate_bdev_range);
 > 
-> But I think that doing all this without also causing priority inversion for the
-> user, i.e. a high priority write request ends up waiting for a low priority one,
-> will be challenging, to say the least.
+> Can we have kerneldoc comments for the new helpers please?
 
-Hi Damien,
+Of course, will definitely do this in v3.
+> 
+>> +struct folio *__bdev_get_folio(struct block_device *bdev, loff_t pos,
+>> +			       fgf_t fgp_flags, gfp_t gfp)
+>> +{
+>> +	return __filemap_get_folio(bdev->bd_inode->i_mapping, pos >> PAGE_SHIFT,
+>> +				   fgp_flags, gfp);
+>> +}
+>> +EXPORT_SYMBOL_GPL(__bdev_get_folio);
+> 
+> It's a bit silly to have a __-prefixed API without a version that
+> doesn't have the prefix, so I'd prefer to drop it.  Unless willy has
+> a good argument for keeping it the same as the filemap API.
 
-How about the following algorithm?
-- If a zoned write refers to the start of a zone or no other writes for
-   the same zone occur in the RB-tree, use the I/O priority of the zoned
-   write.
-- If another write for the same zone occurs in the RB-tree, use the I/O
-   priority from that other write.
-
-While this algorithm does not guarantee that all zoned writes for a 
-single zone have the same I/O priority, it guarantees that the 
-mq-deadline I/O scheduler won't submit zoned writes in the wrong order 
-because of their I/O priority.
+Ok, I'll drop it if willy doesn't against this.
 
 Thanks,
-
-Bart.
+Kuai
+> 
+> .
+> 
 
