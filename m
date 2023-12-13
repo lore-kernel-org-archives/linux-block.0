@@ -1,143 +1,391 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="r64kdaJG"
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200C4AD;
-	Tue, 12 Dec 2023 22:42:43 -0800 (PST)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BD6RlAF022278;
-	Wed, 13 Dec 2023 06:42:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : content-type : in-reply-to :
- mime-version; s=pp1; bh=9GUj/Aho7/1TYDtk21H9qY+L2WM+l5YYCwXwZpStc8c=;
- b=r64kdaJG4nS+IPu+vyvPL88pPYTf4wOVarKYxhyEHuln+0bowUEpweWYEXFboKURLtQz
- zX+0XArNnkgTBQxDDil62guVrYrBBdwSz10iwj92JURSxYJ6w8q2SzlUw/vsjAPVtApf
- JrUt3ew+oX4Xck51K1DeX49Q3MS2s995pz2zoNYFX0HCshblY/6R68LoHVL5g0fDwP0y
- ClDkBpaudbhpaTySXhlMfgKukYdXIlvqSaldP8sK09kIgwfqhPLtguqj+opkJa9DlaIQ
- XSC5NxLrdDcV1R3aYZfJWs+Nh590BsYs0LqNBJST/XTbP1JpGL93H54JNSpqRv4EOp7a ig== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uy7c58c9s-1
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SeiNWAzM"
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E63DC;
+	Wed, 13 Dec 2023 00:11:37 -0800 (PST)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD5UX0D010227;
+	Wed, 13 Dec 2023 08:11:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=+ChEAqS33Z56IRd3N2DhM7q96imu5cTHGBUgzTDjZzM=; b=Se
+	iNWAzMnIrCbWkaTTuP0oa/90zfkiLLIEtcTgHivou9Qz2g+NKOu3PsmLcQbDMGug
+	rCUMU5BHh76lwr2q07Gg9lHunr5f+jumU+KW1J+0zMMFUXS2uIgEP+hzCJ9v5PoU
+	ASFtljsbtTF6Hn+il2HMBH/LZ6Oj3tYjCuyNsLODxYIC6kWj53zyL1RfrIEYUekL
+	MlOZ1gw3W0ggAKnpKUzBiRdu7Yh8HjD+0P7ySFY1fBTuxvn+0jDsxa4VDQAT0Jxw
+	xXwGyCoSwouLRP+y237AqOLq2A6OicSqUTAQebPMg8mN5s42kC+z7HUjxnKxJ4He
+	/CliYlxG0Tc9mHI4AtaQ==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uy4dhgn1r-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 06:42:25 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BD6T0Me025162;
-	Wed, 13 Dec 2023 06:42:24 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uy7c58c9b-1
+	Wed, 13 Dec 2023 08:11:32 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BD8BVf5013183
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 06:42:24 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BD5Q3YA013864;
-	Wed, 13 Dec 2023 06:42:23 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw5926bu9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 06:42:23 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BD6gLEi43188908
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 13 Dec 2023 06:42:22 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E13E120040;
-	Wed, 13 Dec 2023 06:42:21 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 42A8420043;
-	Wed, 13 Dec 2023 06:42:19 +0000 (GMT)
-Received: from li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com (unknown [9.43.51.82])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 13 Dec 2023 06:42:19 +0000 (GMT)
-Date: Wed, 13 Dec 2023 12:12:15 +0530
-From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
-To: John Garry <john.g.garry@oracle.com>
-Cc: linux-ext4@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
-        Ritesh Harjani <ritesh.list@gmail.com>, linux-kernel@vger.kernel.org,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dchinner@redhat.com
-Subject: Re: [RFC 0/7] ext4: Allocator changes for atomic write support with
- DIO
-Message-ID: <ZXlSR8CTXjkeKxwk@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
-References: <cover.1701339358.git.ojaswin@linux.ibm.com>
- <8c06c139-f994-442b-925e-e177ef2c5adb@oracle.com>
- <ZW3WZ6prrdsPc55Z@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
- <de90e79b-83f2-428f-bac6-0754708aa4a8@oracle.com>
- <ZXbqVs0TdoDcJ352@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXbqVs0TdoDcJ352@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vAkBMKIFJ8wO00RLRC6t6Gf6QM4RHrja
-X-Proofpoint-GUID: Zf8h5KpoaOoIeOwSSmnViO2i-V5AgsRi
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	Wed, 13 Dec 2023 08:11:31 GMT
+Received: from [10.214.66.81] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 13 Dec
+ 2023 00:11:24 -0800
+Message-ID: <4c0c6caa-c85c-d802-9383-501c92a53008@quicinc.com>
+Date: Wed, 13 Dec 2023 13:41:13 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 07/12] qcom_scm: scm call for create, prepare and
+ import keys
+To: Gaurav Kashyap <quic_gaurkash@quicinc.com>, <linux-scsi@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <ebiggers@google.com>,
+        <neil.armstrong@linaro.org>, <srinivas.kandagatla@linaro.org>
+CC: <linux-mmc@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <omprsing@qti.qualcomm.com>,
+        <quic_psodagud@quicinc.com>, <abel.vesa@linaro.org>,
+        <quic_spuppala@quicinc.com>, <kernel@quicinc.com>
+References: <20231122053817.3401748-1-quic_gaurkash@quicinc.com>
+ <20231122053817.3401748-8-quic_gaurkash@quicinc.com>
+Content-Language: en-US
+From: Mukesh Ojha <quic_mojha@quicinc.com>
+In-Reply-To: <20231122053817.3401748-8-quic_gaurkash@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: b36LWEngtMGOO-36NHtAclj3ULX_6LxR
+X-Proofpoint-GUID: b36LWEngtMGOO-36NHtAclj3ULX_6LxR
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-12_14,2023-12-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- mlxscore=0 priorityscore=1501 bulkscore=0 spamscore=0 malwarescore=0
- phishscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
- mlxlogscore=965 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312130047
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 spamscore=0 adultscore=0 mlxlogscore=999 malwarescore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 suspectscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2312130058
 
-On Mon, Dec 11, 2023 at 04:24:14PM +0530, Ojaswin Mujoo wrote:
-> > > > looks ok so far, then write 4KB at offset 0:
-> > > > 
-> > > > # /test-pwritev2 -a -d -p 0 -l 4096  /root/mnt/file
-> > > > file=/root/mnt/file write_size=4096 offset=0 o_flags=0x4002 wr_flags=0x24
-> > 
-> > ...
-> > 
-> > > > Please note that I tested on my own dev branch, which contains changes over
-> > > > [1], but I expect it would not make a difference for this test.
-> > > Hmm this should not ideally happen, can you please share your test
-> > > script with me if possible?
-> > 
-> > It's doing nothing special, just RWF_ATOMIC flag is set for DIO write:
-> > 
-> > https://github.com/johnpgarry/linux/blob/236870d48ecb19c1cf89dc439e188182a0524cd4/samples/vfs/test-pwritev2.c
+
+
+On 11/22/2023 11:08 AM, Gaurav Kashyap wrote:
+> Storage encryption has two IOCTLs for creating, importing
+> and preparing keys for encryption. For wrapped keys, these
+> IOCTLs need to interface with the secure environment, which
+> require these SCM calls.
 > 
-> Thanks for the script, will try to replicate this today and get back to
-> you.
+> generate_key: This is used to generate and return a longterm
+>                wrapped key. Trustzone achieves this by generating
+> 	      a key and then wrapping it using hwkm, returning
+> 	      a wrapped keyblob.
+> import_key:   The functionality is similar to generate, but here,
+>                a raw key is imported into hwkm and a longterm wrapped
+> 	      keyblob is returned.
+> prepare_key:  The longterm wrapped key from import or generate
+>                is made further secure by rewrapping it with a per-boot
+> 	      ephemeral wrapped key before installing it to the linux
+> 	      kernel for programming to ICE.
 > 
+> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 
-Hi John,
+[..]
+> ---
+>   drivers/firmware/qcom/qcom_scm.c       | 205 +++++++++++++++++++++++++
+>   drivers/firmware/qcom/qcom_scm.h       |   3 +
+>   include/linux/firmware/qcom/qcom_scm.h |   5 +
+>   3 files changed, 213 insertions(+)
+> 
+> diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qcom_scm.c
+> index 6dfb913f3e33..259b3c316019 100644
+> --- a/drivers/firmware/qcom/qcom_scm.c
+> +++ b/drivers/firmware/qcom/qcom_scm.c
+> @@ -1285,6 +1285,211 @@ int qcom_scm_derive_sw_secret(const u8 *wkey, size_t wkey_size,
+>   }
+>   EXPORT_SYMBOL(qcom_scm_derive_sw_secret);
+>   
+> +/**
+> + * qcom_scm_generate_ice_key() - Generate a wrapped key for encryption.
+> + * @lt_key: the wrapped key returned after key generation
+> + * @lt_key_size: size of the wrapped key to be returned.
+> + *
+> + * Qualcomm wrapped keys need to be generated in a trusted environment.
+> + * A generate key  IOCTL call is used to achieve this. These are longterm
 
-So I don't seem to be able to hit the warn on:
+nit: remove space after key
 
-$ touch mnt/testfile
-$ ./test-pwritev2 -a -d -p 0 -l 4096 mnt/testfile
+> + * in nature as they need to be generated and wrapped only once per
+> + * requirement.
+> + *
+> + * This SCM calls adds support for the create key IOCTL to interface
 
-	file=mnt/testfile write_size=4096 offset=0 o_flags=0x4002 wr_flags=0x24
-	main wrote 4096 bytes at offset 0
+Just starting with "Adds support... " would do.
 
-$ filefrag -v mnt/testfile
+> + * with the secure environment to generate and return a wrapped key..
+> + *
+> + * Return: 0 on success; -errno on failure.
+> + */
+> +int qcom_scm_generate_ice_key(u8 *lt_key, size_t lt_key_size)
+> +{
+> +	struct qcom_scm_desc desc = {
+> +		.svc = QCOM_SCM_SVC_ES,
+> +		.cmd =  QCOM_SCM_ES_GENERATE_ICE_KEY,
+> +		.arginfo = QCOM_SCM_ARGS(2, QCOM_SCM_RW,
+> +					 QCOM_SCM_VAL),
 
-	Filesystem type is: ef53
-	File size of testfile is 4096 (1 block of 4096 bytes)
-	ext:     logical_offset:        physical_offset: length:   expected: flags:
-		0:        0..       0:      32900..     32900:      1: last,eof
+Keep this in one line.
 
-$ ./test-pwritev2 -a -d -p 8192 -l 8192 mnt/testfile
+> +		.args[1] = lt_key_size,
+> +		.owner = ARM_SMCCC_OWNER_SIP,
+> +	};
+> +
+> +	void *lt_key_buf;
+> +	dma_addr_t lt_key_phys; > +	int ret;
 
-	file=mnt/testfile write_size=8192 offset=8192 o_flags=0x4002 wr_flags=0x24
-	main wrote 8192 bytes at offset 8192
+reverse x-mas tree is the everyone looks to be following..
 
-$ filefrag -v mnt/testfile
+dma_addr_t lt_key_phys;
+void *lt_key_buf;
+int ret;
 
-	Filesystem type is: ef53
-	File size of mnt/testfile is 16384 (4 blocks of 4096 bytes)
-	 ext:     logical_offset:        physical_offset: length:   expected: flags:
-		0:        0..       0:      32900..     32900:      1:
-		1:        2..       3:      33288..     33289:      2: 32902: last,eof
-	mnt/testfile: 2 extents found
+> +
+> +	/*
+> +	 * Like qcom_scm_ice_set_key(), we use dma_alloc_coherent() to properly
+> +	 * get a physical address, while guaranteeing that we can zeroize the
+> +	 * key material later using memzero_explicit().
+> +	 *
 
-Not sure why you are hitting the WARN_ON. The tree I used is:
+Extra *
 
-Latest ted/dev + your atomic patchset v1 + this patchset
+> +	 */
+> +	lt_key_buf = dma_alloc_coherent(__scm->dev, lt_key_size, &lt_key_phys, GFP_KERNEL);
+> +	if (!lt_key_buf)
+> +		return -ENOMEM;
+> +
+> +	desc.args[0] = lt_key_phys;
+> +
+> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
+> +	memcpy(lt_key, lt_key_buf, lt_key_size);
 
-Regards,
-ojaswin
+Do you really want to copy the key buf if the scm call fails ?
+
+> +
+> +	memzero_explicit(lt_key_buf, lt_key_size);
+> +
+> +	dma_free_coherent(__scm->dev, lt_key_size, lt_key_buf, lt_key_phys);
+> +
+> +	if (!ret)
+
+why this is here instead of just after qcom_scm_call() ?
+
+> +		return lt_key_size;
+
+You said, you will return 0 on success.
+
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_scm_generate_ice_key);
+> +
+> +/**
+> + * qcom_scm_prepare_ice_key() - Get per boot ephemeral wrapped key
+> + * @lt_key: the longterm wrapped key
+> + * @lt_key_size: size of the wrapped key
+> + * @eph_key: ephemeral wrapped key to be returned
+> + * @eph_key_size: size of the ephemeral wrapped key
+> + *
+> + * Qualcomm wrapped keys (longterm keys) are rewrapped with a per-boot
+> + * ephemeral key for added protection. These are ephemeral in nature as
+> + * they are valid only for that boot. A create key IOCTL is used to
+> + * achieve this. These are the keys that are installed into the kernel
+> + * to be then unwrapped and programmed into ICE.
+> + *
+> + * This SCM call adds support for the create key IOCTL to interface
+> + * with the secure environment to rewrap the wrapped key with an
+> + * ephemeral wrapping key.
+> + *
+> + * Return: 0 on success; -errno on failure.
+> + */
+> +int qcom_scm_prepare_ice_key(const u8 *lt_key, size_t lt_key_size,
+> +			     u8 *eph_key, size_t eph_key_size)
+> +{
+> +	struct qcom_scm_desc desc = {
+> +		.svc = QCOM_SCM_SVC_ES,
+> +		.cmd =  QCOM_SCM_ES_PREPARE_ICE_KEY,
+> +		.arginfo = QCOM_SCM_ARGS(4, QCOM_SCM_RO,
+> +					 QCOM_SCM_VAL, QCOM_SCM_RW,
+> +					 QCOM_SCM_VAL),
+> +		.args[1] = lt_key_size,
+> +		.args[3] = eph_key_size,
+> +		.owner = ARM_SMCCC_OWNER_SIP,
+> +	};
+> +
+> +	void *lt_key_buf, *eph_key_buf;
+> +	dma_addr_t lt_key_phys, eph_key_phys;
+> +	int ret;
+
+One variable and R-XMAS is the norm..
+> +
+> +	/*
+> +	 * Like qcom_scm_ice_set_key(), we use dma_alloc_coherent() to properly
+> +	 * get a physical address, while guaranteeing that we can zeroize the
+> +	 * key material later using memzero_explicit().
+> +	 *
+
+extra *
+
+> +	 */
+> +	lt_key_buf = dma_alloc_coherent(__scm->dev, lt_key_size, &lt_key_phys, GFP_KERNEL);
+> +	if (!lt_key_buf)
+> +		return -ENOMEM;
+> +	eph_key_buf = dma_alloc_coherent(__scm->dev, eph_key_size, &eph_key_phys, GFP_KERNEL);
+> +	if (!eph_key_buf) {
+> +		ret = -ENOMEM;
+> +		goto err_free_longterm;
+> +	}
+> +
+> +	memcpy(lt_key_buf, lt_key, lt_key_size);
+> +	desc.args[0] = lt_key_phys;
+> +	desc.args[2] = eph_key_phys;
+> +
+> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
+> +	if (!ret)
+> +		memcpy(eph_key, eph_key_buf, eph_key_size);
+> +
+> +	memzero_explicit(eph_key_buf, eph_key_size);
+> +
+> +	dma_free_coherent(__scm->dev, eph_key_size, eph_key_buf, eph_key_phys);
+> +
+> +err_free_longterm:
+> +	memzero_explicit(lt_key_buf, lt_key_size);
+> +
+> +	dma_free_coherent(__scm->dev, lt_key_size, lt_key_buf, lt_key_phys);
+> +
+> +	if (!ret)
+> +		return eph_key_size;
+
+you said, this will return 0 on success..
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_scm_prepare_ice_key);
+> +
+> +/**
+> + * qcom_scm_import_ice_key() - Import a wrapped key for encryption
+> + * @imp_key: the raw key that is imported
+> + * @imp_key_size: size of the key to be imported
+> + * @lt_key: the wrapped key to be returned
+> + * @lt_key_size: size of the wrapped key
+> + *
+> + * Conceptually, this is very similar to generate, the difference being,
+> + * here we want to import a raw key and return a longterm wrapped key
+> + * from it. The same create key IOCTL is used to achieve this.
+> + *
+> + * This SCM call adds support for the create key IOCTL to interface with
+> + * the secure environment to import a raw key and generate a longterm
+> + * wrapped key.
+> + *
+> + * Return: 0 on success; -errno on failure.
+> + */
+> +int qcom_scm_import_ice_key(const u8 *imp_key, size_t imp_key_size,
+> +			    u8 *lt_key, size_t lt_key_size)
+> +{
+> +	struct qcom_scm_desc desc = {
+> +		.svc = QCOM_SCM_SVC_ES,
+> +		.cmd =  QCOM_SCM_ES_IMPORT_ICE_KEY,
+> +		.arginfo = QCOM_SCM_ARGS(4, QCOM_SCM_RO,
+> +					 QCOM_SCM_VAL, QCOM_SCM_RW,
+> +					 QCOM_SCM_VAL),
+> +		.args[1] = imp_key_size,
+> +		.args[3] = lt_key_size,
+> +		.owner = ARM_SMCCC_OWNER_SIP,
+> +	};
+> +
+> +	void *imp_key_buf, *lt_key_buf;
+> +	dma_addr_t imp_key_phys, lt_key_phys;
+> +	int ret;
+> +	/*
+> +	 * Like qcom_scm_ice_set_key(), we use dma_alloc_coherent() to properly
+> +	 * get a physical address, while guaranteeing that we can zeroize the
+> +	 * key material later using memzero_explicit().
+> +	 *
+
+Extra  *
+
+> +	 */
+> +	imp_key_buf = dma_alloc_coherent(__scm->dev, imp_key_size, &imp_key_phys, GFP_KERNEL);
+> +	if (!imp_key_buf)
+> +		return -ENOMEM;
+> +	lt_key_buf = dma_alloc_coherent(__scm->dev, lt_key_size, &lt_key_phys, GFP_KERNEL);
+> +	if (!lt_key_buf) {
+> +		ret = -ENOMEM;
+> +		goto err_free_longterm;
+> +	}
+> +
+> +	memcpy(imp_key_buf, imp_key, imp_key_size);
+> +	desc.args[0] = imp_key_phys;
+> +	desc.args[2] = lt_key_phys;
+> +
+> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
+> +	if (!ret)
+> +		memcpy(lt_key, lt_key_buf, lt_key_size);
+> +
+> +	memzero_explicit(lt_key_buf, lt_key_size);
+> +
+
+Why there is unnecessary line gap everywhere between lines ?
+
+> +	dma_free_coherent(__scm->dev, lt_key_size, lt_key_buf, lt_key_phys);
+> +
+> +err_free_longterm:
+> +	memzero_explicit(imp_key_buf, imp_key_size);
+> +
+> +	dma_free_coherent(__scm->dev, imp_key_size, imp_key_buf, imp_key_phys);
+> +
+> +	if (!ret)
+> +		return lt_key_size;
+
+same as above comment on return value..
+
+-Mukesh
+
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_scm_import_ice_key);
+> +
+>   /**
+>    * qcom_scm_hdcp_available() - Check if secure environment supports HDCP.
+>    *
+> diff --git a/drivers/firmware/qcom/qcom_scm.h b/drivers/firmware/qcom/qcom_scm.h
+> index c75456aa6ac5..d89ab5446ba5 100644
+> --- a/drivers/firmware/qcom/qcom_scm.h
+> +++ b/drivers/firmware/qcom/qcom_scm.h
+> @@ -122,6 +122,9 @@ int scm_legacy_call(struct device *dev, const struct qcom_scm_desc *desc,
+>   #define QCOM_SCM_ES_INVALIDATE_ICE_KEY	0x03
+>   #define QCOM_SCM_ES_CONFIG_SET_ICE_KEY	0x04
+>   #define QCOM_SCM_ES_DERIVE_SW_SECRET	0x07
+> +#define QCOM_SCM_ES_GENERATE_ICE_KEY	0x08
+> +#define QCOM_SCM_ES_PREPARE_ICE_KEY	0x09
+> +#define QCOM_SCM_ES_IMPORT_ICE_KEY	0xA
+>   
+>   #define QCOM_SCM_SVC_HDCP		0x11
+>   #define QCOM_SCM_HDCP_INVOKE		0x01
+> diff --git a/include/linux/firmware/qcom/qcom_scm.h b/include/linux/firmware/qcom/qcom_scm.h
+> index c65f2d61492d..477aeec6255e 100644
+> --- a/include/linux/firmware/qcom/qcom_scm.h
+> +++ b/include/linux/firmware/qcom/qcom_scm.h
+> @@ -105,6 +105,11 @@ int qcom_scm_ice_set_key(u32 index, const u8 *key, u32 key_size,
+>   			 enum qcom_scm_ice_cipher cipher, u32 data_unit_size);
+>   int qcom_scm_derive_sw_secret(const u8 *wkey, size_t wkey_size,
+>   			      u8 *sw_secret, size_t sw_secret_size);
+> +int qcom_scm_generate_ice_key(u8 *lt_key, size_t lt_key_size);
+> +int qcom_scm_prepare_ice_key(const u8 *lt_key, size_t lt_key_size,
+> +			     u8 *eph_key, size_t eph_size);
+> +int qcom_scm_import_ice_key(const u8 *imp_key, size_t imp_size,
+> +			    u8 *lt_key, size_t lt_key_size);
+>   
+>   bool qcom_scm_hdcp_available(void);
+>   int qcom_scm_hdcp_req(struct qcom_scm_hdcp_req *req, u32 req_cnt, u32 *resp);
