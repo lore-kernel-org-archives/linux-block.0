@@ -1,132 +1,211 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19E081854
-	for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 22:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dPgFuNOF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AD1AC433C7;
-	Wed, 13 Dec 2023 22:55:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702508154;
-	bh=G1FxqJz+mw1ktBenK3BMXGSnbr7JEIq8NnrwF8Iw7Ss=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dPgFuNOFl8/orAdHe2B9eHNgRQdja5Zr2B/EollHAdSaW9ghoJjsKfE1cUw28FO15
-	 IB2RL65kS9/GLgMoIm+h2jZ18Cx4uFsYWsL5vQHKJ3y64aPEIQRgaupfqu5BN+U/X5
-	 sHXpPl/HjabSwaBSCuv6NhLg0WfEbObY8u2fYCyHCAyiXWYUzC0W/bGoUNCNc+JHqR
-	 e03p7/HWcsdS1zXN/BXMOXavZelkjMawwi7lWNeVkmhNJw8yb6qHkKPX7uSjggVkF9
-	 3HOzhQgmtWq35aOiHwSV0T2B6O1zkmP6GLvZFz1mAyj63cdCG51tWyOpXJekv3Amzb
-	 CjRUC8GzM2y4g==
-Message-ID: <5fc2fbe2-7ad5-439b-ab81-8abe92a37e35@kernel.org>
-Date: Thu, 14 Dec 2023 07:55:52 +0900
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Km7I83VX"
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE611706;
+	Wed, 13 Dec 2023 15:42:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702510922; x=1734046922;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=+5iDCU7DbwktxKyDlESN+UlNCEP1MxDBSSpuUEvbSJE=;
+  b=Km7I83VX4Tl6H+YnYyF0w2+VDM/zrv2EME6UuGe4GCsJGZNPutYfa2RX
+   4QvQ7xAogrJDnXXX7OeOuTVivO8fGkgoavS0zqyCbyIJlLlE/jkwdCSxl
+   jWUdZkLgUGGNw38Brl/WLln9e52o9C/979CtR/wKpr2df/pBJ3Vv/sz22
+   vFtMKhLbZDXOznhvFk+07ZZAbHsUzwOixV1Y602Qj57R+fcCEic5/lj4L
+   hO+/BGP9LEVt903ALjol9VD98YgRx00hSrh0xCu8xdT+rRtyLLfIdfBhf
+   CbCkxjqK0vmxw/9PjwvuVQzFKoxUnbZe/9W6CB9CXEA22WfKCeUIC8Abc
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="374547880"
+X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
+   d="scan'208";a="374547880"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 15:42:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
+   d="scan'208";a="17696317"
+Received: from wanghuan-mobl1.amr.corp.intel.com (HELO [10.212.178.119]) ([10.212.178.119])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 15:42:02 -0800
+Message-ID: <168860292b4594121b8fde42c01fefc27be19f55.camel@linux.intel.com>
+Subject: Re: [PATCH V3] blk-mq: don't schedule block kworker on isolated CPUs
+From: Tim Chen <tim.c.chen@linux.intel.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>, 
+ linux-kernel@vger.kernel.org, Juri Lelli <juri.lelli@redhat.com>, Andrew
+ Theurer <atheurer@redhat.com>, Joe Mario <jmario@redhat.com>, Sebastian Jug
+ <sejug@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, Bart Van
+ Assche <bvanassche@acm.org>
+Date: Wed, 13 Dec 2023 15:42:00 -0800
+In-Reply-To: <20231025025737.358756-1-ming.lei@redhat.com>
+References: <20231025025737.358756-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
- certain cases
-To: Jaegeuk Kim <jaegeuk@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>,
- Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <42054848-2e8d-4856-b404-c042a4365097@acm.org>
- <20231212171846.GA28682@lst.de>
- <686cc853-96e2-4aa4-8f68-fdcc5cdabbba@acm.org>
- <20231212174802.GA30659@lst.de>
- <5b7be2e9-3691-409d-abff-f1fbf04cef7d@acm.org>
- <20231212181304.GA32666@lst.de>
- <19cd459e-d79e-4ecd-8ec8-778be0066e84@acm.org> <20231212182613.GA1216@lst.de>
- <ZXiual-UkUY4OWY2@google.com>
- <8f807991-f478-4f71-9ce5-f39ba4a08c64@kernel.org>
- <ZXngh1tkV3NBpq9E@google.com>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <ZXngh1tkV3NBpq9E@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 12/14/23 01:49, Jaegeuk Kim wrote:
-> On 12/13, Damien Le Moal wrote:
->> On 12/13/23 04:03, Jaegeuk Kim wrote:
->>> On 12/12, Christoph Hellwig wrote:
->>>> On Tue, Dec 12, 2023 at 10:19:31AM -0800, Bart Van Assche wrote:
->>>>> "Fundamentally broken model" is your personal opinion. I don't know anyone
->>>>> else than you who considers zoned writes as a broken model.
->>>>
->>>> No Bart, it is not.  Talk to Damien, talk to Martin, to Jens.  Or just
->>>> look at all the patches you're sending to the list that play a never
->>>> ending hac-a-mole trying to bandaid over reordering that should be
->>>> perfectly fine.  You're playing a long term losing game by trying to
->>>> prevent reordering that you can't win.
->>>
->>> As one of users of zoned devices, I disagree this is a broken model, but even
->>> better than the zone append model. When considering the filesystem performance,
->>> it is essential to place the data per file to get better bandwidth. And for
->>> NAND-based storage, filesystem is the right place to deal with the more efficient
->>> garbage collecion based on the known data locations. That's why all the flash
->>> storage vendors adopted it in the JEDEC. Agreed that zone append is nice, but
->>> IMO, it's not practical for production.
->>
->> The work on btrfs is a counter argument to this statement. The initial zone
->> support based on regular writes was going nowhere as trying to maintain ordering
->> was too complex and/or too invasive. Using zone append for the data path solved
->> and simplified many things.
-> 
-> We're in supporting zoned writes, and we don't see huge problem of reordering
-> issues like you mention. I do agree there're pros and cons between the two, but
-> I believe using which one depends on user behaviors. If there's a user, why it
-> should be blocked? IOWs, why not just trying to support both?
+On Wed, 2023-10-25 at 10:57 +0800, Ming Lei wrote:
+> Kernel parameter of `isolcpus=3D` or 'nohz_full=3D' are used for isolatin=
+g CPUs
+> for specific task, and user often won't want block IO to disturb these CP=
+Us,
+Suggest breaking up this long sentence to make reading easier.
 
-We do support both... But:
-1) regular writes to zones is a user (= application) facing API. An application
-using a block device directly without an FS can directly drive the issuing of
-sequential writes to a zone. If there is an FS between the application and the
-device, the FS decides what to do (regular writes or zone append, and to which zone)
-2) Zone append cannot be directly issued by applications to block devices. I am
-working on restoring zone append writes in zonefs as an alternative to this
-limitation.
+for specific tasks.  Users do not want block I/O operations to disturb thes=
+e CPUS,
+> also long IO latency may be caused if blk-mq kworker is scheduled on thes=
+e
 
-Now, in the context of IO priorities, issuing sequential writes to the same zone
-with different priorities really is a silly thing to do. Even if done in the
-proper order, that would essentially mean that whoever does that (FS or
-application) is creating priority inversion issues for himself and thus negating
-any benefit one can achieve with IO priorities (that is, most of the time,
-lowering tail latency for a class of IOs).
+as long I/O latency could delay intended tasks if blk-mq kworker is schedul=
+ed on these=20
 
-As I mentioned before, for applications that use the zoned block device
-directly, I think we should just leave things as is, that is, let the writes
-fail if they are reordered due to a nonsensical IO priority setup. That is a
-nice way to warn the user that he/she is doing something silly.
+> isolated CPUs.
+>=20
+> Kernel workqueue only respects this limit for WQ_UNBOUND, for bound wq,
+> the responsibility should be on wq user.
+>=20
+> So don't not run block kworker on isolated CPUs by ruling out isolated CP=
+Us
+So don't run block kworker on isolated CPUs by removing isolated CPUs
 
-For the FS case, it is a little more difficult given that the user may have a
-sensible IO priority setup, e.g. assigning different IO priorities (cgroups,
-ioprio_set or ionice) to different processes accessing different files. For that
-case, if the FS decides to issue writes to these files to the same zone, then
-the problem occur. But back to the previous point: this is a silly thing to do
-when writes have to be sequential. That is priority inversion right there.
+> from hctx->cpumask. Meantime in cpuhp handler, use queue map to check if
+> all CPUs in this hw queue are offline, this way can avoid any cost in fas=
+t
+> IO code path.
+>=20
+> Cc: Juri Lelli <juri.lelli@redhat.com>
+> Cc: Andrew Theurer <atheurer@redhat.com>
+> Cc: Joe Mario <jmario@redhat.com>
+> Cc: Sebastian Jug <sejug@redhat.com>
+> Cc: Frederic Weisbecker <frederic@kernel.org>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>=20
+> V3:
+> 	- avoid to check invalid cpu as reported by Bart
+> 	- take current cpu(to be offline, not done yet) into account
+> 	- simplify blk_mq_hctx_has_online_cpu()
+>=20
+> V2:
+> 	- remove module parameter, meantime use queue map to check if
+> 	all cpus in one hctx are offline
+>=20
+>  block/blk-mq.c | 51 ++++++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 41 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e2d11183f62e..4556978ce71b 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -29,6 +29,7 @@
+>  #include <linux/prefetch.h>
+>  #include <linux/blk-crypto.h>
+>  #include <linux/part_stat.h>
+> +#include <linux/sched/isolation.h>
+> =20
+>  #include <trace/events/block.h>
+> =20
+> @@ -2158,7 +2159,11 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_c=
+tx *hctx)
+>  	bool tried =3D false;
+>  	int next_cpu =3D hctx->next_cpu;
+> =20
+> -	if (hctx->queue->nr_hw_queues =3D=3D 1)
+> +	/*
+> +	 * In case of single queue or no allowed CPU for scheduling
+> +	 * worker, don't bound our worker with any CPU
+> +	 */
+> +	if (hctx->queue->nr_hw_queues =3D=3D 1 || next_cpu >=3D nr_cpu_ids)
+>  		return WORK_CPU_UNBOUND;
+> =20
+>  	if (--hctx->next_cpu_batch <=3D 0) {
+> @@ -3459,14 +3464,30 @@ static bool blk_mq_hctx_has_requests(struct blk_m=
+q_hw_ctx *hctx)
+>  	return data.has_rq;
+>  }
+> =20
+> -static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
+> -		struct blk_mq_hw_ctx *hctx)
+> +static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
+> +		unsigned int this_cpu)
+>  {
+> -	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) !=3D cpu)
+> -		return false;
+> -	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
+> -		return false;
+> -	return true;
+> +	enum hctx_type type =3D hctx->type;
+> +	int cpu;
+> +
+> +	/*
+> +	 * hctx->cpumask has rule out isolated CPUs, but userspace still
+> +	 * might submit IOs on these isolated CPUs, so use queue map to
+> +	 * check if all CPUs mapped to this hctx are offline
+> +	 */
+> +	for_each_online_cpu(cpu) {
+> +		struct blk_mq_hw_ctx *h =3D blk_mq_map_queue_type(hctx->queue,
+> +				type, cpu);
+> +
+> +		if (h !=3D hctx)
+> +			continue;
+> +
+> +		/* this current CPU isn't put offline yet */
+> +		if (this_cpu !=3D cpu)
+> +			return true;
+> +	}
+> +
+> +	return false;
+>  }
+> =20
+>  static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_nod=
+e *node)
+> @@ -3474,8 +3495,7 @@ static int blk_mq_hctx_notify_offline(unsigned int =
+cpu, struct hlist_node *node)
+>  	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
+>  			struct blk_mq_hw_ctx, cpuhp_online);
+> =20
+> -	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
+> -	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
+> +	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
+>  		return 0;
+> =20
+>  	/*
+> @@ -3883,6 +3903,8 @@ static void blk_mq_map_swqueue(struct request_queue=
+ *q)
+>  	}
+> =20
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+> +		int cpu;
+> +
+>  		/*
+>  		 * If no software queues are mapped to this hardware queue,
+>  		 * disable it and free the request entries.
+> @@ -3909,6 +3931,15 @@ static void blk_mq_map_swqueue(struct request_queu=
+e *q)
+>  		 */
+>  		sbitmap_resize(&hctx->ctx_map, hctx->nr_ctx);
+> =20
+> +		/*
+> +		 * rule out isolated CPUs from hctx->cpumask for avoiding to
 
-The difficulty for an FS is, I think, that the FS cannot easily know the IO
-priority until the BIO for the write is issued... So that is the problem that
-needs fixing.
+s/for avoiding to run/to avoid running/
 
-Bart's proposed fix will, I think, address your issue. However, it will also
-hide IO priority setup problems to users accessing the block device directly.
-That I do not like. As I stated above, I think it is better to let writes fail
-in that case to signal the priority inversion. There are *a lot* of IO priority
-SMR HDD users out there. Literally millions of drives running with that, and not
-just for read operations. So please understand my concerns.
+> +		 * run wq worker on isolated CPU
+> +		 */
+> +		for_each_cpu(cpu, hctx->cpumask) {
+> +			if (cpu_is_isolated(cpu))
+> +				cpumask_clear_cpu(cpu, hctx->cpumask);
+> +		}
+> +
+>  		/*
+>  		 * Initialize batch roundrobin counts
+>  		 */
 
-A better solution may be to introduce a BIO flags that says "ignore IO
-priorities". f2fs can use that to avoid reordering writes to the same zone due
-to different IO priorities (again, *that* is the issue to fix in the first place
-I think, because that is simply silly to do, even with a regular HDD or SSD
-since that will break sequential write streams and thus impact performace,
-increase device-level GC/WAF etc).
+Thanks.
 
--- 
-Damien Le Moal
-Western Digital Research
-
+Tim
