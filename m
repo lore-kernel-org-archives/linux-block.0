@@ -1,144 +1,137 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="CWeXgfMl";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FXJlljIq";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ax1gwWUV";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="XSuX6j5+"
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2a07:de40:b251:101:10:150:64:2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA0DAF;
-	Wed, 13 Dec 2023 02:24:05 -0800 (PST)
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 75A591F38C;
-	Wed, 13 Dec 2023 10:24:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1702463043; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YFJ3A25nYfF7sKdr5SLQblvtW35pp9rQh+LbkrjDHEc=;
-	b=CWeXgfMlyj7ewzSjRqOXCA8cD5phO6tf++t4XQJrNRFQXaXktffT2jkSuOrhdbk7wAPmdA
-	dLP+Ot9mClmy/z74Yqru33RhwaOmvUbbc61X9youRWUdaAFfO1ibA6UofGLRDU0KkQVwIs
-	pAfuUzpUeY39v+yNumME2DFruzCouPA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1702463043;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YFJ3A25nYfF7sKdr5SLQblvtW35pp9rQh+LbkrjDHEc=;
-	b=FXJlljIqzm7cs9hQix5t8A7U2+jtPIagqmYVpCmNaM4DFMlr5Q6Z2qWBxAvbeusap8Y7Ra
-	w/Z0vjPuBqJsVBBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1702463042; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YFJ3A25nYfF7sKdr5SLQblvtW35pp9rQh+LbkrjDHEc=;
-	b=Ax1gwWUVycOHB/yQUkrU60Qn0tf8irN8tIBjt8ZmrKtwsY2XgLOMf3jaU13Ih+kNpEKmcN
-	X+kNIRNKZ6pB28G6sdp8Glo1q2lT8vb+MdgXnllGrspKQfn5b0hEvfnQl1F+A/tyi8lfa2
-	vaQl0W3NKur1ybKZz//1pILrorUbPS4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1702463042;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YFJ3A25nYfF7sKdr5SLQblvtW35pp9rQh+LbkrjDHEc=;
-	b=XSuX6j5+x76Kb/Ot/VdVeA6G21m6Bhy6XjAfYEKRH73ky+n7TrZxPhiEdRkKWwafXsqlpM
-	MqpnG2Q02d2mfaDQ==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 592D21391D;
-	Wed, 13 Dec 2023 10:24:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id TgOBFUKGeWXbcgAAn2gu4w
-	(envelope-from <jack@suse.cz>); Wed, 13 Dec 2023 10:24:02 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id BED2AA07E0; Wed, 13 Dec 2023 11:24:01 +0100 (CET)
-Date: Wed, 13 Dec 2023 11:24:01 +0100
-From: Jan Kara <jack@suse.cz>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-	ming.lei@redhat.com, jaswin@linux.ibm.com, bvanassche@acm.org,
-	Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Subject: Re: [PATCH v2 03/16] fs/bdev: Add atomic write support info to statx
-Message-ID: <20231213102401.epkxytqq7e5lskw2@quack3>
-References: <20231212110844.19698-1-john.g.garry@oracle.com>
- <20231212110844.19698-4-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/tRtV7Y"
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98051AC;
+	Wed, 13 Dec 2023 02:42:39 -0800 (PST)
+Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-7b701b75f36so262793839f.0;
+        Wed, 13 Dec 2023 02:42:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702464159; x=1703068959; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pZRgNeWGWtTYGNKv71Mh1jMa9BIytCfGLi7OUevxvzQ=;
+        b=l/tRtV7YnnGIlcsIMsWMd4M3rwMjGIGmgO/9YBWqgqaLqOh7skKoBfYBKxIeA/Io5M
+         jokg4zGCdGm5iC60gU0FQ3Hmrk41DC4Mnns+57syOLTFcS9D4Sul5eVhzpwErvQwyqGC
+         kW7LBd3XcUgfVGLutu36JxFhhCcYUwEhr4sEj+RA6eMtbqZONN4pPXBDXrrsm3oxcunM
+         ND1eBkM7yommF1xGK4j3CJRR1rLP/5GUGTqiz1wUsuaZK0Yz5RbedllzerPyzE8loKDV
+         kf5m4SQRwEP6PPFKrSwzRGgcDxwuqVQJVVIMm4JKyfvjW1DX25apQH6GAhzRlcBAoo0W
+         5ebw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702464159; x=1703068959;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pZRgNeWGWtTYGNKv71Mh1jMa9BIytCfGLi7OUevxvzQ=;
+        b=QZ5iA9G8GEptrloaPG8t6fwXzMLkuvZi7hCaFm8tJPsmyxNWvIiqHYiN1yCUm0M/dS
+         WQAIrVqYbYtoM8LFw+xSm0z8d3QQzjKlbnjtl3Mnt4FePpEYkCnugApZW00/dAUZQ7+h
+         7HHASoIWwpdpltCmtta8IVDqnHmhw5RLsmlLUVFGOwlfQCh3DU/q83Ky6pnz/1hT3Wx9
+         FUqO8guNPru9zNPdsM9DB2Om5kCKvGr516bQHY3zrlZYNZV6rQkQtoyt+HH+mduPFfAP
+         LIqmG2xt5po7EaI5F0Cj8a86GcymuYyTpwxhvv2fgpvN9PqIL68qn8e0cO0o3r6h53rN
+         QSLg==
+X-Gm-Message-State: AOJu0YzsquBce/DZO0mkxmYRohRTCm2Lo1I8+tO5DDvKXjh7ZuyFeslF
+	3tCAc4LRHR2ZzjEJU4jAt7s=
+X-Google-Smtp-Source: AGHT+IEWH+PnJ3icKszS+pZricy2BL/GswKpdR64jbTG7pNMSixmN2MzYyNxiFV8F2elcLQA5NAs5A==
+X-Received: by 2002:a5e:8e06:0:b0:7b7:51d1:ab82 with SMTP id a6-20020a5e8e06000000b007b751d1ab82mr4380003ion.30.1702464158900;
+        Wed, 13 Dec 2023 02:42:38 -0800 (PST)
+Received: from ubuntu.. ([117.18.48.102])
+        by smtp.gmail.com with ESMTPSA id c11-20020a6b4e0b000000b0078647b08ab0sm3058186iob.6.2023.12.13.02.42.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 02:42:38 -0800 (PST)
+From: Hongyu Jin <hongyu.jin.cn@gmail.com>
+To: agk@redhat.com,
+	snitzer@kernel.org,
+	mpatocka@redhat.com,
+	axboe@kernel.dk,
+	ebiggers@kernel.org
+Cc: zhiguo.niu@unisoc.com,
+	ke.wang@unisoc.com,
+	yibin.ding@unisoc.com,
+	hongyu.jin@unisoc.com,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org
+Subject: [PATCH v4 0/5] Fix I/O priority lost in device-mapper
+Date: Wed, 13 Dec 2023 18:42:11 +0800
+Message-Id: <20231213104216.27845-1-hongyu.jin.cn@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAMQnb4MQUJ0VnA5XO-enrXTJvHbo6FJCVPGszGaq-R34hfbeeg@mail.gmail.com>
+References: <CAMQnb4MQUJ0VnA5XO-enrXTJvHbo6FJCVPGszGaq-R34hfbeeg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231212110844.19698-4-john.g.garry@oracle.com>
-X-Spam-Level: 
-X-Spam-Score: -0.81
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -0.80
-X-Spamd-Result: default: False [-0.80 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_TWELVE(0.00)[24];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,oracle.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[43.37%]
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
-On Tue 12-12-23 11:08:31, John Garry wrote:
-> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> 
-> Extend statx system call to return additional info for atomic write support
-> support if the specified file is a block device.
-> 
-> Add initial support for a block device.
-> 
-> Signed-off-by: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
+From: Hongyu Jin <hongyu.jin@unisoc.com>
 
-Just some nits below.
+A high-priority task obtains data from the dm-verity device using the
+RT IO priority, during the verification, the IO reading FEC and hash
+by kworker loses the RT priority and is blocked by the low-priority IO.
+dm-crypt has the same problem in the process of writing data.
 
-> +#define BDEV_STATX_SUPPORTED_MSK (STATX_DIOALIGN | STATX_WRITE_ATOMIC)
-                                ^^^
-				I believe saving one letter here is not
-really beneficial so just spell out MASK here...
+This is because io_context and blkcg are missing.
 
->  /*
-> - * Handle STATX_DIOALIGN for block devices.
-> - *
-> - * Note that the inode passed to this is the inode of a block device node file,
-> - * not the block device's internal inode.  Therefore it is *not* valid to use
-> - * I_BDEV() here; the block device has to be looked up by i_rdev instead.
-> + * Handle STATX_{DIOALIGN, WRITE_ATOMIC} for block devices.
->   */
+Move bio_set_ioprio() into submit_bio():
+1. Only call bio_set_ioprio() once to set the priority of original bio,
+   the bio that cloned and splited from original bio will auto inherit
+   the priority of original bio in clone process.
 
-Please keep "Note ..." from the above comment (or you can move the note in
-front of blkdev_get_no_open() if you want).
+2. Make the IO priority of the original bio to be passed to dm,
+   and the dm target inherits the IO priority as needed.
 
-								Honza
+
+All changes are based on commit 9bacdd8996c7 ("Merge tag 'for-6.7-rc1-tag'
+of git://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux")
+on the master branch.
+
+
+Changes in v5:
+  - Rewrite patch 2, add ioprio parameter in dm_io();
+  - Modify dm_io() in patch 3 
+Changes in v4:
+  - Modify commit message by Suggestion
+  - Modify patch for dm-crypt
+Changes in v3:
+  - Split patch for device-mapper
+  - Add patch to fix dm-crypy I/O priority question
+  - Add block patch to review together
+  - Fix some error in v2 patch
+
+Changes in v2:
+  - Add ioprio field in struct dm_io_region
+  - Initial struct dm_io_region::ioprio to IOPRIO_DEFAULT
+  - Add two interface
+
+
+Hongyu Jin (5):
+  block: Fix bio IO priority setting
+  dm: Support I/O priority for dm_io()
+  dm-bufio: Support I/O priority
+  dm verity: Fix I/O priority lost when read FEC and hash
+  dm-crypt: Fix lost ioprio when queuing write bios
+
+ block/blk-core.c                              | 10 +++++
+ block/blk-mq.c                                | 11 ------
+ drivers/md/dm-bufio.c                         | 39 ++++++++++---------
+ drivers/md/dm-crypt.c                         |  1 +
+ drivers/md/dm-ebs-target.c                    |  8 ++--
+ drivers/md/dm-integrity.c                     | 12 +++---
+ drivers/md/dm-io.c                            | 23 ++++++-----
+ drivers/md/dm-kcopyd.c                        |  4 +-
+ drivers/md/dm-log.c                           |  4 +-
+ drivers/md/dm-raid1.c                         |  6 +--
+ drivers/md/dm-snap-persistent.c               |  8 ++--
+ drivers/md/dm-verity-fec.c                    |  5 ++-
+ drivers/md/dm-verity-target.c                 |  8 +++-
+ drivers/md/dm-writecache.c                    |  8 ++--
+ drivers/md/persistent-data/dm-block-manager.c |  6 +--
+ include/linux/dm-bufio.h                      |  5 +--
+ include/linux/dm-io.h                         |  3 +-
+ 17 files changed, 85 insertions(+), 76 deletions(-)
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.34.1
+
