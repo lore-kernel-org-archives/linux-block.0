@@ -1,40 +1,42 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E551D684
-	for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 16:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQUphc5b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE8D1C433C8;
-	Wed, 13 Dec 2023 16:49:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702486153;
-	bh=Kdku5Kk/He4SP0w3GJBoiu5bWOZ4QHD9VCETiaZp8+I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lQUphc5bl7YvzdCq8xLF1KpRG/WFEYoltQfcDaKdiHH2NwRpRHArl+D3aMDmEcvH6
-	 Xx+Q+YyZv8sxB1n6BOICsoou0lnoK7hmgCpXGSnzvuhrwjpGprOIpSCsgymywk0b2T
-	 TK10jtXDCpGJKzcY/xadn+LgEvaU/KrkhImSHkNN/CZJ7x4Nih9j/ux62KoiaaoKeL
-	 FD0JIREUQiTRAq+mGCwb5hCEfhrI+9EoiQHe9+nTR+yZCE/96OHkX4SYETNwE8+xI3
-	 lNBeyHYbTM2wC2Y70WqgP64PJGTEIaCa5XzrkXx9UMQBc9fqT7Gu+OlUgdv6pXdH5K
-	 S2g0F0NLFAREA==
-Date: Wed, 13 Dec 2023 08:49:11 -0800
-From: Jaegeuk Kim <jaegeuk@kernel.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
- certain cases
-Message-ID: <ZXngh1tkV3NBpq9E@google.com>
-References: <42054848-2e8d-4856-b404-c042a4365097@acm.org>
- <20231212171846.GA28682@lst.de>
- <686cc853-96e2-4aa4-8f68-fdcc5cdabbba@acm.org>
- <20231212174802.GA30659@lst.de>
- <5b7be2e9-3691-409d-abff-f1fbf04cef7d@acm.org>
- <20231212181304.GA32666@lst.de>
- <19cd459e-d79e-4ecd-8ec8-778be0066e84@acm.org>
- <20231212182613.GA1216@lst.de>
- <ZXiual-UkUY4OWY2@google.com>
- <8f807991-f478-4f71-9ce5-f39ba4a08c64@kernel.org>
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BB9AC
+	for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 08:58:26 -0800 (PST)
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-67adc37b797so45181876d6.1
+        for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 08:58:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702486705; x=1703091505;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fko4jEZO7IcAc5n2WrXVozicqYAVH+5PpOz25KhjD+M=;
+        b=P5mcvdwxJSW1PXZqGX8DDUKV2pBb4FblMYTPn1ueAMp0h6gghwLrUjAF5JIr7TmGgy
+         3W7I93EyCbrwVZa44vPwu51Rb7/zAYrZblDgbUNGSK5vVieCSE41RIe9SgmCZPc3jtmO
+         aD//sI60FsWTpnjsGLsUszj8WdxcYl8gBveGq82pN9hkgTwsCAOybu4/x7uSW7PFT6fy
+         ePeI1MfNFyiULMh4SXcI6+X3NIn8A3L9NruTKNyNHrJ8C3+r/2xSN6Ut9GSNbD/Pa2BF
+         ye2h37OASBitRZSGbyu4zm8225O/mDzCPVUZuki/o8tGNw5o/fRZOawjMaGcu+8CDhuZ
+         HOhw==
+X-Gm-Message-State: AOJu0YwFah9r7uXgou75y/t+ZP3T895zGYrNUdxZfRPeNCUPlgsNu6GD
+	v62Iizeb+nt1TksPYUDhPTUS
+X-Google-Smtp-Source: AGHT+IFvVkIflp9TiGbkJvpAu1da6qN2nmcyxFmltt+dcHVJ2+E3ImsBHyyCd+RBhaSCAT0Tc+H6Gg==
+X-Received: by 2002:ad4:5046:0:b0:67e:f3e3:8291 with SMTP id m6-20020ad45046000000b0067ef3e38291mr2273884qvq.12.1702486705405;
+        Wed, 13 Dec 2023 08:58:25 -0800 (PST)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id mi14-20020a056214558e00b0067a276fd8d5sm131380qvb.54.2023.12.13.08.58.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 08:58:24 -0800 (PST)
+Date: Wed, 13 Dec 2023 11:58:23 -0500
+From: Mike Snitzer <snitzer@kernel.org>
+To: Hongyu Jin <hongyu.jin.cn@gmail.com>
+Cc: agk@redhat.com, mpatocka@redhat.com, axboe@kernel.dk,
+	ebiggers@kernel.org, zhiguo.niu@unisoc.com, ke.wang@unisoc.com,
+	yibin.ding@unisoc.com, hongyu.jin@unisoc.com,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v5 1/5] block: Fix bio IO priority setting
+Message-ID: <ZXnir8x6127EW7Gp@redhat.com>
+References: <CAMQnb4MQUJ0VnA5XO-enrXTJvHbo6FJCVPGszGaq-R34hfbeeg@mail.gmail.com>
+ <20231213104216.27845-1-hongyu.jin.cn@gmail.com>
+ <20231213104216.27845-2-hongyu.jin.cn@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,44 +45,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8f807991-f478-4f71-9ce5-f39ba4a08c64@kernel.org>
+In-Reply-To: <20231213104216.27845-2-hongyu.jin.cn@gmail.com>
 
-On 12/13, Damien Le Moal wrote:
-> On 12/13/23 04:03, Jaegeuk Kim wrote:
-> > On 12/12, Christoph Hellwig wrote:
-> >> On Tue, Dec 12, 2023 at 10:19:31AM -0800, Bart Van Assche wrote:
-> >>> "Fundamentally broken model" is your personal opinion. I don't know anyone
-> >>> else than you who considers zoned writes as a broken model.
-> >>
-> >> No Bart, it is not.  Talk to Damien, talk to Martin, to Jens.  Or just
-> >> look at all the patches you're sending to the list that play a never
-> >> ending hac-a-mole trying to bandaid over reordering that should be
-> >> perfectly fine.  You're playing a long term losing game by trying to
-> >> prevent reordering that you can't win.
-> > 
-> > As one of users of zoned devices, I disagree this is a broken model, but even
-> > better than the zone append model. When considering the filesystem performance,
-> > it is essential to place the data per file to get better bandwidth. And for
-> > NAND-based storage, filesystem is the right place to deal with the more efficient
-> > garbage collecion based on the known data locations. That's why all the flash
-> > storage vendors adopted it in the JEDEC. Agreed that zone append is nice, but
-> > IMO, it's not practical for production.
-> 
-> The work on btrfs is a counter argument to this statement. The initial zone
-> support based on regular writes was going nowhere as trying to maintain ordering
-> was too complex and/or too invasive. Using zone append for the data path solved
-> and simplified many things.
+On Wed, Dec 13 2023 at  5:42P -0500,
+Hongyu Jin <hongyu.jin.cn@gmail.com> wrote:
 
-We're in supporting zoned writes, and we don't see huge problem of reordering
-issues like you mention. I do agree there're pros and cons between the two, but
-I believe using which one depends on user behaviors. If there's a user, why it
-should be blocked? IOWs, why not just trying to support both?
+> From: Hongyu Jin <hongyu.jin@unisoc.com>
+> 
+> Move bio_set_ioprio() into submit_bio():
+> 1. Only call bio_set_ioprio() once to set the priority of original bio,
+>    the bio that cloned and splited from original bio will auto inherit
+>    the priority of original bio in clone process.
+> 
+> 2. The IO priority can be passed to module that implement
+>    struct gendisk::fops::submit_bio, help resolve some
+>    of the IO priority loss issues.
+> 
+> This patch depends on commit 82b74cac2849 ("blk-ioprio: Convert from
+> rqos policy to direct call")
+> 
+> Fixes: a78418e6a04c ("block: Always initialize bio IO priority on submit")
+> 
+> Co-developed-by: Yibin Ding <yibin.ding@unisoc.com>
+> Signed-off-by: Yibin Ding <yibin.ding@unisoc.com>
+> Signed-off-by: Hongyu Jin <hongyu.jin@unisoc.com>
 
-> 
-> I do think that zone append has a narrower use case spectrum for applications
-> relying on the raw block device directly. But for file systems, it definitely is
-> an easier to use writing model for zoned storage.
-> 
-> -- 
-> Damien Le Moal
-> Western Digital Research
+Would be nice to get this block core fix upstream ASAP independent of
+your various DM changes.
+
+Please simplify this patch's header like was requested in review of v4:
+https://patchwork.kernel.org/project/dm-devel/patch/20231212111150.18155-2-hongyu.jin.cn@gmail.com/
