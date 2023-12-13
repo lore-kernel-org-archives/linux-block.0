@@ -1,88 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC62C2CC
-	for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 05:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNcNCk8F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A1E6C433C7;
-	Wed, 13 Dec 2023 05:29:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702445388;
-	bh=NlspXZxqnj6YNoLkeOXEj5v8PPGGI1CaVRVF59yiOoo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fNcNCk8FoXf0wtS0jh8imJgZAr/5pmTjJcGjN0hAvL2h2SGMOUUx6wqglZferjirv
-	 63v1ASLejwcc5Pi6QMnicQCAI6r3kvFiEy0gLv7ztJysAyPhCDjPYKkqCdT1+ekWP/
-	 V5KKZB41F19wHw3W2CzhcSCruiwDzzF7CxAnRWul97Ego0AcAus8ju1jK5+qoI4hO/
-	 xxU9Z3VNyO8kWCEk+wYtqIO0+RNl4q1Flz0UsGzbGlXwavG56PHO870GNoba6yKo2g
-	 IFThESKAQorZdlBZG1UDB0v5MUFCAz6++pIkowu91v3CK762ehudECTvnqxjfFfonu
-	 e3rONdNSVZqUQ==
-Message-ID: <b689319f-d168-4e6e-9ddc-a50a02459dc1@kernel.org>
-Date: Wed, 13 Dec 2023 14:29:45 +0900
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YjgO2RbA"
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7439F7;
+	Tue, 12 Dec 2023 22:00:14 -0800 (PST)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BD5gRtY009863;
+	Wed, 13 Dec 2023 06:00:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=TjaLeJnqTOAYTFIcON8BZhczgaQnsRt3YN92XTznSZU=;
+ b=YjgO2RbA7ZTb6qQQT9Pd1Q+4qL1RWzIMcPKn0H+8jxnep/6LUCUTPXHxQa0+bDeUC4Ze
+ ikyIq4TalgvhwJvH+1i/FTy7aUBKITv0bult90vOXDozybGR2s/itZ0xaHzpqpBsKEH6
+ 1InwZtbbNrbZ37b3dLDwe/kbM4j1pB/z+QcrhSAtdo+gwKy4MUINWpizEmSP2aFr5m0z
+ GdVzLl9435VoVvIxGfNyRLRqQ9SFFiRVVGAu1JfpjyuC8IKu8/qgp71CSRy6ojhZDzES
+ 4b3/EMZelNuTjdFYh8QK71zqt510twEc56E46O0HaKZhHoeRsUt8+soRUqv7fEsnnGiZ 3A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uy6pvrdvu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 06:00:08 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BD5qh9W003082;
+	Wed, 13 Dec 2023 06:00:07 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uy6pvrduc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 06:00:07 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BD4e9Ij004899;
+	Wed, 13 Dec 2023 06:00:06 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw4skeb1s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 06:00:06 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BD604pw44827110
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Dec 2023 06:00:04 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AA6D32004D;
+	Wed, 13 Dec 2023 06:00:04 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DAE5820043;
+	Wed, 13 Dec 2023 06:00:01 +0000 (GMT)
+Received: from li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com (unknown [9.43.51.82])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 13 Dec 2023 06:00:01 +0000 (GMT)
+Date: Wed, 13 Dec 2023 11:29:57 +0530
+From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-ext4@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
+        Ritesh Harjani <ritesh.list@gmail.com>, linux-kernel@vger.kernel.org,
+        "Darrick J . Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        dchinner@redhat.com
+Subject: Re: [RFC 0/7] ext4: Allocator changes for atomic write support with
+ DIO
+Message-ID: <ZXlIXWIqP9xipYzL@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
+References: <cover.1701339358.git.ojaswin@linux.ibm.com>
+ <8c06c139-f994-442b-925e-e177ef2c5adb@oracle.com>
+ <ZW3WZ6prrdsPc55Z@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
+ <de90e79b-83f2-428f-bac6-0754708aa4a8@oracle.com>
+ <ZXbqVs0TdoDcJ352@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com>
+ <c4cf3924-f67d-4f04-8460-054dbad70b93@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
- certain cases
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20231205053213.522772-1-bvanassche@acm.org>
- <20231205053213.522772-4-bvanassche@acm.org>
- <100ddd75-eef5-44e9-93ff-34e093b19ab7@kernel.org>
- <4d506909-e063-4918-a9d3-e91bfa5a41a3@acm.org>
- <37f3179a-9add-4ee6-9ae9-cf84c1584366@kernel.org>
- <e8d383c8-2274-4afa-9beb-a38c9f56127b@acm.org>
- <deee82e3-ccc4-42d7-bb54-9f4d1cd886b0@kernel.org>
- <8998e3cd-6bf1-4199-9e21-60fdfba37571@acm.org>
- <95ecba8c-9a1a-49c9-92c8-f45580bc9f95@kernel.org>
- <3248683c-d2af-4f0c-b665-1aeff41e9d21@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <3248683c-d2af-4f0c-b665-1aeff41e9d21@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c4cf3924-f67d-4f04-8460-054dbad70b93@oracle.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _8OkYYCLfW-dy6EZ47uB0qBsdgMdIFs4
+X-Proofpoint-ORIG-GUID: 7rrjuVr4GoM9eExABM89Fy3OpjTg-SS2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-12_14,2023-12-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=851 adultscore=0 spamscore=0
+ clxscore=1015 mlxscore=0 impostorscore=0 phishscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312130041
 
-On 12/13/23 10:02, Bart Van Assche wrote:
-> On 12/12/23 13:52, Damien Le Moal wrote:
->> Trying to solve this issue in mq-deadline would require keeping track of the io
->> priority used for a write request that is issued to a zone and use that same
->> priority for all following write requests for the same zone until there are no
->> writes pending for that zone. Otherwise, you will get the priority inversion
->> causing the reordering.
->>
->> But I think that doing all this without also causing priority inversion for the
->> user, i.e. a high priority write request ends up waiting for a low priority one,
->> will be challenging, to say the least.
+On Tue, Dec 12, 2023 at 07:46:51AM +0000, John Garry wrote:
+> On 11/12/2023 10:54, Ojaswin Mujoo wrote:
+> > > This seems a rather big drawback.
+> > So if I'm not wrong, we force the extent alignment as well as the size
+> > of the extent in xfs right.
 > 
-> Hi Damien,
+> For XFS in my v1 patchset, we only force alignment (but not size).
 > 
-> How about the following algorithm?
-> - If a zoned write refers to the start of a zone or no other writes for
->    the same zone occur in the RB-tree, use the I/O priority of the zoned
->    write.
-> - If another write for the same zone occurs in the RB-tree, use the I/O
->    priority from that other write.
+> It is assumed that the user will fallocate/dd the complete file before
+> issuing atomic writes, and we will have extent alignment and length as
+> required.
 > 
-> While this algorithm does not guarantee that all zoned writes for a 
-> single zone have the same I/O priority, it guarantees that the 
-> mq-deadline I/O scheduler won't submit zoned writes in the wrong order 
-> because of their I/O priority.
+> However - as we have seen with a trial user - it can create a problem if we
+> don't do that and we write 4K and then overwrite with a 16K atomic write to
+> a file, as 2x extents may be allocated for the complete 16K and it cannot be
+> issued as a single BIO.
 
-I guess this should work.
+So currently, if we don't fallocate beforehand in xfs and the user
+tries to do the 16k overwrite to an offset having a 4k extent, how are
+we handling it?
+
+Here ext4 will return an error indicating atomic write can't happen at
+this particular offset. The way I see it is if the user passes atomic
+flag to pwritev2 and we are unable to ensure atomicity for any reason we
+return error, which seems like a fair approach for a generic interface. 
 
 > 
-> Thanks,
+> > 
+> > We didn't want to overly restrict the users of atomic writes by
+> > forcing
+> > the extents to be of a certain alignment/size irrespective of the
+> > size
+> > of write. The design in this patchset provides this flexibility at
+> > the
+> > cost of some added precautions that the user should take (eg not
+> > doing
+> > an atomic write on a pre existing unaligned extent etc).
 > 
-> Bart.
-> 
+> Doesn't bigalloc already give you what you require here?
 
--- 
-Damien Le Moal
-Western Digital Research
+Yes, but its an mkfs time feature and it also applies to each an every
+file which might not be desirable for all use cases. 
 
+Regards,
+ojaswin
