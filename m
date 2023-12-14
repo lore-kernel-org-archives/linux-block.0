@@ -1,25 +1,41 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F8310E;
-	Thu, 14 Dec 2023 08:12:27 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8F71968AFE; Thu, 14 Dec 2023 17:12:23 +0100 (CET)
-Date: Thu, 14 Dec 2023 17:12:23 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
-	kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
-	martin.petersen@oracle.com, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-	jaswin@linux.ibm.com, bvanassche@acm.org,
-	Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH v2 01/16] block: Add atomic write operations to
- request_queue limits
-Message-ID: <20231214161223.GA12810@lst.de>
-References: <20231212110844.19698-1-john.g.garry@oracle.com> <20231212110844.19698-2-john.g.garry@oracle.com> <ZXkIEnQld577uHqu@fedora>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B5F4CE1C
+	for <linux-block@vger.kernel.org>; Thu, 14 Dec 2023 17:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LOnKHaOc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F40C1C433C7;
+	Thu, 14 Dec 2023 17:22:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702574573;
+	bh=qxlQtgc8WWiE15hT1ePlsBJhjOihSGL7iK+ugUPBjG0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LOnKHaOcUXofGGmRR0Vwe5loB1kWDOP+QMOHQSkjCuWU8XzYuIn6aJRsqDTRDNZsV
+	 bVWmQwWn7WNN7dHplI6CiX8JSsgKzXVrB3JVmqioyqYjKD5vuQRlVXVv/zGUJEuavG
+	 hxmIsAGFDfc0C11zTOsvkxmaStPtX0cv2eTIqdmsCuPWpmFi+01xZRZ2KsEerTN3uo
+	 Xl2QBvewigAfiaZO5/CcLDIzI5k/SMetsfhmUvOg7IgiMKe5ep5aGpBQR0I0MfvNMe
+	 EPX8Jwu0vLH/xr6MBrpMkulTg4XvParkHKTSEtkKoz+/NIxFlssJ1DAQYACHj70bBe
+	 N6ocQLjwJv94g==
+Date: Thu, 14 Dec 2023 09:22:51 -0800
+From: Jaegeuk Kim <jaegeuk@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
+ certain cases
+Message-ID: <ZXs563M66THrUw50@google.com>
+References: <686cc853-96e2-4aa4-8f68-fdcc5cdabbba@acm.org>
+ <20231212174802.GA30659@lst.de>
+ <5b7be2e9-3691-409d-abff-f1fbf04cef7d@acm.org>
+ <20231212181304.GA32666@lst.de>
+ <19cd459e-d79e-4ecd-8ec8-778be0066e84@acm.org>
+ <20231212182613.GA1216@lst.de>
+ <ZXiual-UkUY4OWY2@google.com>
+ <20231213155606.GA8748@lst.de>
+ <ZXnevBo4eIZEXbhK@google.com>
+ <20231214085729.GA9099@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -28,25 +44,82 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZXkIEnQld577uHqu@fedora>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20231214085729.GA9099@lst.de>
 
-On Wed, Dec 13, 2023 at 09:25:38AM +0800, Ming Lei wrote:
-
-<full quote deleted, please only quote what is relevant.
-
-
-> >  	lim->dma_alignment = 511;
-> > +	lim->atomic_write_unit_min_sectors = 0;
-> > +	lim->atomic_write_unit_max_sectors = 0;
-> > +	lim->atomic_write_max_sectors = 0;
-> > +	lim->atomic_write_boundary_sectors = 0;
+On 12/14, Christoph Hellwig wrote:
+> On Wed, Dec 13, 2023 at 08:41:32AM -0800, Jaegeuk Kim wrote:
+> > I don't have any
+> > concern to keep the same ioprio on writes, since handheld devices are mostly
+> > sensitive to reads. So, if you have other use-cases using zoned writes which
+> > require different ioprio on writes, I think you can suggest a knob to control
+> > it by users.
 > 
-> Can we move the four into single structure and setup them in single
-> API? Then cross-validation can be done in this API.
+> Get out of your little handheld world.  In Linux we need a generally usable
+> I/O stack, and any feature exposed by the kernel and will be used quite
+> differently than you imagine.
+> 
+> Just like people will add reordering to the I/O stack that's not there
+> right now (in addition to the ones your testing doesn't hit).  That
+> doensn't mean we should avoid them - you genereally get better performance
+> by not reordering without a good reason (like thotting), but especially
+> in error handling paths or resource constrained environment they will
+> hapen all over.  We've had this whole discussion with the I/O barriers
+> that did not work for exactly the same reasons.
+> 
+> > 
+> > > 
+> > > > it is essential to place the data per file to get better bandwidth. And for
+> > > > NAND-based storage, filesystem is the right place to deal with the more efficient
+> > > > garbage collecion based on the known data locations.
+> > > 
+> > > And that works perfectly fine match for zone append.
+> > 
+> > How that works, if the device gives random LBAs back to the adjacent data in
+> > a file? And, how to make the LBAs into the sequential ones back?
+> 
+> Why would your device pick random LBAs?  If you send a zone append to
+> zone it will be written at the write pointer, which is absolutely not
+> random.  All I/O written in a single write is going to be sequential,
+> so just like for all other devices doing large sequential writes is
+> important.  Multiple writes can get reordered, but if you havily hit
+> the same zone you'd get the same effect in the file system allocator
+> too.
 
-Please don't be arbitrarily different from all the other limits.  What
-we really should be doing is an API that updates all limits at the
-same time, and I actually have code for that, I'll just need to finish
-it.  I do not want to block this series for it, though.
+How can you guarantee the device does not give any random LBAs? What'd
+be the selling point of zone append to end users? Are you sure this can
+give the better write trhought forever? Have you considered how to
+implement this in device side such as FTL mapping overhead and garbage
+collection leading to tail latencies?
 
+My takeaway on the two approaches would be:
+                  zone_append        zone_write
+		  -----------        ----------
+LBA               from FTL           from filesystem
+FTL mapping       Page-map           Zone-map
+SRAM/DRAM needs   Large              Small
+FTL GC            Required           Not required
+Tail latencies    Exist              Not exisit
+GC Efficience     Worse              Better
+Longevity         As-is              Longer
+Discard cmd       Required           Not required
+Block complexity  Small              Large
+Failure cases     Less exist         Exist
+Fsck              Don't know         F2FS-TOOLS support
+Filesystem        BTRFS support(?)   F2FS support
+
+Given this, I took zone_write, especially for mobile devices, since we can
+recover the unaligned writes in the corner cases by fsck. And, most benefit
+would be getting rid of FTL mapping overhead which improves random read IOPs
+significantly due to the lack of SRAM in low-end storages. And, longer lifetime
+by mitigating garbage collection overhead is more important in mobile world.
+
+If there's any flag or knob that we can set, IMO, that'd be enough.
+
+> 
+> > Sorry, I needed to stop reading here, as you're totally biased. This is not
+> > the case in JEDEC, as Bart spent multiple years to synchronize the technical
+> > benefitcs that we've seen across UFS vendors as well as OEMs.
+> 
+> *lol*  There is no more fucked up corporate pressure standard committee
+> than the storage standards in JEDEC.  That's why not one actually takes
+> them seriously.
