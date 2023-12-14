@@ -1,132 +1,127 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="brU8mEhL"
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69FCB114;
-	Thu, 14 Dec 2023 02:34:14 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B26C3240008;
-	Thu, 14 Dec 2023 10:34:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702550052;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Poy56x//"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA22CF
+	for <linux-block@vger.kernel.org>; Thu, 14 Dec 2023 05:46:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702561586;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jugSzKA5RANlnPt+1c8lwCcp54ROkWZ7TeiH8CT7p/A=;
-	b=brU8mEhL7FkhQ9ky50byWcLBDM0D5qpw0kEMSokgUJptsEhuGASnYkJylJIguGZ6nO/q5J
-	FVbxguP1/E1tO9XDiuTLGfldOsfc1FU4ii0sRUurXO/55O7AXbGT89jWBc+J7WVxs2w79q
-	2QtfsWgH7gzMiZPFWmwUC1JzHH/bLPKnS+4d0kNRG1yZgoJqPzgqgQwkO4FXsqlo4xa/yl
-	jTYFvc/Sf9BuQTy8+ZkRNEvv0ynT3nNW18Y796+iQIBUbNCr+ZVPDtWI8HLD3zWC22fhb7
-	Z6myHK497Hh5VFtbSEr1R1E7GtDYKK4nPwYj7nf4pyOjEAD3W0B+Pa8LBbu5WA==
-Date: Thu, 14 Dec 2023 11:34:07 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Davidlohr Bueso <dave@stgolabs.net>
-Cc: Romain Gantois <romain.gantois@bootlin.com>, Richard Weinberger
- <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Ard Biesheuvel <ardb@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, Herve Codina
- <herve.codina@bootlin.com>, linux-mtd@lists.infradead.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-efi@vger.kernel.org
-Subject: Re: [RFC PATCH 0/6] Add GPT parser to MTD layer
-Message-ID: <20231214113407.484e24a5@xps-13>
-In-Reply-To: <cykfpuff32nuq3t27vd5tv463cx32phri473fjnrruvom5dk5u@uao5e3ml73ai>
-References: <20231211151244.289349-1-romain.gantois@bootlin.com>
- <cykfpuff32nuq3t27vd5tv463cx32phri473fjnrruvom5dk5u@uao5e3ml73ai>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=QMlqSzMLtoLhUA6/pSOLSiY6ne++uxerHVPAdydtEYo=;
+	b=Poy56x///SD5+Z/O5hMk4u8td/1gOAzgRWp5pDkqHhks2l7GXg9ydcqmZJi38vJEGo3ycF
+	p77311CSI+1Cp7IorxM7yhBAASlA9UmZvm0oGCbOu4h39Hbxbraar4+Cs6FMl105ClqhBo
+	rRAwVZ+MDK4ZPBkPkrgpsjkTN+GT8Ww=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-457-Yr6iln9QPreJK0NkIMKRvw-1; Thu,
+ 14 Dec 2023 08:46:21 -0500
+X-MC-Unique: Yr6iln9QPreJK0NkIMKRvw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 514D328040B2;
+	Thu, 14 Dec 2023 13:46:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.126])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 006DAC15968;
+	Thu, 14 Dec 2023 13:46:08 +0000 (UTC)
+Date: Thu, 14 Dec 2023 21:46:04 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+	kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
+	djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	dchinner@redhat.com, jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+	jaswin@linux.ibm.com, bvanassche@acm.org,
+	Himanshu Madhani <himanshu.madhani@oracle.com>, ming.lei@redhat.com
+Subject: Re: [PATCH v2 01/16] block: Add atomic write operations to
+ request_queue limits
+Message-ID: <ZXsHHA/GeO8PUeaA@fedora>
+References: <20231212110844.19698-1-john.g.garry@oracle.com>
+ <20231212110844.19698-2-john.g.garry@oracle.com>
+ <ZXkIEnQld577uHqu@fedora>
+ <36ee54b4-b8d5-4b3c-81a0-cc824b6ef68e@oracle.com>
+ <ZXmjdnIqGHILTfQN@fedora>
+ <yq1cyv9flkw.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <yq1cyv9flkw.fsf@ca-mkp.ca.oracle.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Hi Davidlohr,
+Hi Martin,
 
-dave@stgolabs.net wrote on Mon, 11 Dec 2023 16:43:58 -0800:
+On Wed, Dec 13, 2023 at 11:38:10PM -0500, Martin K. Petersen wrote:
+> 
+> Ming,
 
-> On Mon, 11 Dec 2023, Romain Gantois wrote:
->=20
-> >Hello everyone,
+On Thu, Dec 14, 2023 at 12:35 PM Martin K. Petersen <martin.petersen@oracle.com> wrote:
+>
+>
+> Hi Ming!
+>
+> >> +    lim->atomic_write_unit_min_sectors = 0;
+> >> +    lim->atomic_write_unit_max_sectors = 0;
+> >> +    lim->atomic_write_max_sectors = 0;
+> >> +    lim->atomic_write_boundary_sectors = 0;
 > >
-> >MTD devices were historically partitioned using fixed partitions schemes
-> >defined in the kernel device tree or on the cmdline. More recently, a bu=
-nch
-> >of dynamic parsers have been introduced, allowing partitioning informati=
-on
-> >to be stored in-band. However, unlike disks, parsers for MTD devices do =
-not
-> >support runtime discovery of the partition format. This format is instead
-> >named in the device-tree using a compatible string.
-> >
-> >The GUID Partition Table is one of the most common ways of partitioning a
-> >block device. As of now, there is no support in the MTD layer for parsing
-> >GPT tables. Indeed, use cases for layouts like GPT on raw Flash devices =
-are
-> >rare, and for good reason since these partitioning schemes are sensitive=
- to
-> >bad blocks in strategic locations such as LBA 2.  Moreover, they do not
-> >allow proper wear-leveling to be performed on the full span of the devic=
-e.
-> >
-> >However, allowing GPT to be used on MTD devices can be practical in some
-> >cases. In the context of an A/B OTA upgrade that can act on either NOR of
-> >eMMC devices, having the same partition table format for both kinds of
-> >devices can simplify the task of the update software.
-> >
-> >This series adds a fully working MTD GPT parser to the kernel. Use of the
-> >parser is restricted to NOR flash devices, since NAND flashes are too
-> >susceptible to bad blocks. To ensure coherence and code-reuse between
-> >subsystems, I've factored device-agnostic code from the block layer GPT
-> >parser and moved it to a new generic library in lib/gpt.c. No functional
-> >change is intended in the block layer parser.
-> >
-> >I understand that this can seem like a strange feature for MTD devices, =
-but
-> >with the restriction to NOR devices, the partition table can be fairly
-> >reliable. Moreover, this addition fits nicely into the MTD parser model.
-> >Please tell me what you think. =20
->=20
-> I am not a fan of this. The usecase seems very hacky and ad-hoc to justify
-> decoupling from the block layer,
+> > Can we move the four into single structure and setup them in single
+> > API? Then cross-validation can be done in this API.
+>
+> Why would we put them in a separate struct? We don't do that for any of
+> the other queue_limits.
 
-The use case indeed is a bit ad-hoc, as it is an OTA tool which makes
-it painful to handle two separate types of partitioning between blocks
-and mtd devices, so being able to parse a GPT on an mtd device would
-help a lot.
+All the four limits are for same purpose of supporting atomic-write, and
+there can many benefits to define single API to setup atomic parameters:
 
-> not to mention move complexity out of
-> userspace and into the kernel (new parser) for something that is already
-> being done/worked around.
+1) common logic can be put into single place, such as running
+cross-validation among them and setting up default value, and it is impossible
+to do that by the way in this patch
 
-This is the part I don't fully agree with. There is no added
-complexity, the parser exists and is kept untouched (apart from the
-cosmetic changes). For a long time mtd partitioning information was
-kept out of the storage (through fixed-partitions) but it's been quite
-some time since the need for more flexible approaches arised, so we do
-have "dynamic" partition parsers already and the one proposed by Romain
-looks very straightforward and is thus not a problem to me. It
-basically just extends the list of partition tables mtd devices know
-about with a very common and popular format.
+2) all limits are supposed to setup once by driver in same place, so
+doing them in single API actually simplifies driver and block layer, and
+API itself becomes less fragile
 
-To be honest I do not have a strong opinion on whether this should be
-merged or not but my reluctance is more about the mix of styles between
-'block' and 'mtd'. People shall not treat them similarly for a number
-of reasons, and this parser is an obvious step towards a more common
-handling, knowing that it's been exclusively used on blocks for
-decades.
+3) it is easier for trace or troubleshoot
 
-> Also, what other user would consume this new gpt
-> lib abstraction in the future? I don't think it is worth it.
+> 
+> > Relying on driver to provide sound value is absolutely bad design from
+> > API viewpoint.
+> 
+> All the other queue_limits are validated by the LLDs. It's challenging
+> to lift that validation to the block layer since the values reported are
+> heavily protocol-dependent and
 
-Well, again I don't feel like this is a problem, sharing code between
-two parties is already a win and the choice for a lib sounds rational
-to me. The question being, shall we do it/do we want to do it.
+After atomic limits are put into block layer, it becomes not driver
+specific any more, scsi and nvme are going to support it first, sooner
+or later, other drivers(dm & md, loop or ublk, ...) may try to support it.
+
+Also in theory, they are not protocol-dependent, usually physical block size is
+the minimized atomic-write unit, now John's patches are trying to support
+bigger atomic-write unit as scsi/nvme's protocol supports it, and the concept
+is actually common in disk. Similar in implementation level too, such as,
+for NAND flash based storage, I guess atomic-write should be supported by atomic
+update of FTL's LBA/PBA mapping.
+
+> thus information is lost if we do it somewhere else.
+
+Block layer is only focusing on common logic, such as the four limits
+added in request queue, which are consumed by block layer and related with
+other generic limits(physical block size, max IO size), and it won't be
+same with driver's internal validation.
+
 
 Thanks,
-Miqu=C3=A8l
+Ming
+
