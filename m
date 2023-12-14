@@ -1,211 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Km7I83VX"
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE611706;
-	Wed, 13 Dec 2023 15:42:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702510922; x=1734046922;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=+5iDCU7DbwktxKyDlESN+UlNCEP1MxDBSSpuUEvbSJE=;
-  b=Km7I83VX4Tl6H+YnYyF0w2+VDM/zrv2EME6UuGe4GCsJGZNPutYfa2RX
-   4QvQ7xAogrJDnXXX7OeOuTVivO8fGkgoavS0zqyCbyIJlLlE/jkwdCSxl
-   jWUdZkLgUGGNw38Brl/WLln9e52o9C/979CtR/wKpr2df/pBJ3Vv/sz22
-   vFtMKhLbZDXOznhvFk+07ZZAbHsUzwOixV1Y602Qj57R+fcCEic5/lj4L
-   hO+/BGP9LEVt903ALjol9VD98YgRx00hSrh0xCu8xdT+rRtyLLfIdfBhf
-   CbCkxjqK0vmxw/9PjwvuVQzFKoxUnbZe/9W6CB9CXEA22WfKCeUIC8Abc
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="374547880"
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="374547880"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 15:42:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="17696317"
-Received: from wanghuan-mobl1.amr.corp.intel.com (HELO [10.212.178.119]) ([10.212.178.119])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 15:42:02 -0800
-Message-ID: <168860292b4594121b8fde42c01fefc27be19f55.camel@linux.intel.com>
-Subject: Re: [PATCH V3] blk-mq: don't schedule block kworker on isolated CPUs
-From: Tim Chen <tim.c.chen@linux.intel.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>, 
- linux-kernel@vger.kernel.org, Juri Lelli <juri.lelli@redhat.com>, Andrew
- Theurer <atheurer@redhat.com>, Joe Mario <jmario@redhat.com>, Sebastian Jug
- <sejug@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, Bart Van
- Assche <bvanassche@acm.org>
-Date: Wed, 13 Dec 2023 15:42:00 -0800
-In-Reply-To: <20231025025737.358756-1-ming.lei@redhat.com>
-References: <20231025025737.358756-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81660A6
+	for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 16:08:08 -0800 (PST)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5bcfc508d14so6510502a12.3
+        for <linux-block@vger.kernel.org>; Wed, 13 Dec 2023 16:08:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702512488; x=1703117288;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Duqp3Dxd1KI5gc7RVyZhAPKMaKa3fsTC0IdPOz8SHg=;
+        b=Cgs5AGsZ2oBOZ8hz2772Bo/QAwRxoLKI5iweTgSAYrH5NQZwjEDWnM4EpMNNFyQOg1
+         0pTSVvOmmdlhmul38qOb/6wYRLnJzOIDSvXpuFdMHP+tfOe9gRgr9G5P0Lx947EVY/iB
+         L7AbazqWmSsEp3p0SuVUPd18G9KXzXrcZK0235FxNblRog55nC25vaqco5nZujQvmt+n
+         doCpProm37t21MRfEU96h5RBU/uV6sOIfnTPh4B4bnN4ozgLG5WTmZfTdHco825K0fyv
+         GTCED2X2/+EkTl38rbOpjAe7S87N+pMHjFcMk3sQ5RZ+l5uS60Ctcg+4XJ4uo9/H2mmf
+         Z98g==
+X-Gm-Message-State: AOJu0YxjXvfXs46IWUZrmKFTDqUwDd44zihkX2P6u0P/t+lIZ8qGmlFy
+	zc1gwTNpeO0TpaSQHynpKN8=
+X-Google-Smtp-Source: AGHT+IEo1oWm4MYCE8xgrj3lPAaSQrofktW5jb9IJuSzub0zdl6lwI8I9JhlyqTVLT/yMimree8gZg==
+X-Received: by 2002:a17:902:a3cd:b0:1d3:5a4f:2263 with SMTP id q13-20020a170902a3cd00b001d35a4f2263mr1148623plb.27.1702512487737;
+        Wed, 13 Dec 2023 16:08:07 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:5e10:9fd8:30da:e54c:ac33? ([2620:0:1000:5e10:9fd8:30da:e54c:ac33])
+        by smtp.gmail.com with ESMTPSA id t3-20020a170902e84300b001cc52ca2dfbsm11097472plg.120.2023.12.13.16.08.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 16:08:07 -0800 (PST)
+Message-ID: <697f5bc2-88ea-42f8-9175-fbc414271ea3@acm.org>
+Date: Wed, 13 Dec 2023 16:08:06 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
+ certain cases
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20231205053213.522772-1-bvanassche@acm.org>
+ <20231205053213.522772-4-bvanassche@acm.org> <20231211165720.GC26039@lst.de>
+ <177773fd-c8ed-4822-9344-3058e820ddf0@kernel.org>
+ <20231212154140.GB20933@lst.de>
+ <42054848-2e8d-4856-b404-c042a4365097@acm.org>
+ <20231212171846.GA28682@lst.de>
+ <686cc853-96e2-4aa4-8f68-fdcc5cdabbba@acm.org>
+ <20231212174802.GA30659@lst.de>
+ <5b7be2e9-3691-409d-abff-f1fbf04cef7d@acm.org>
+ <20231212181304.GA32666@lst.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231212181304.GA32666@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2023-10-25 at 10:57 +0800, Ming Lei wrote:
-> Kernel parameter of `isolcpus=3D` or 'nohz_full=3D' are used for isolatin=
-g CPUs
-> for specific task, and user often won't want block IO to disturb these CP=
-Us,
-Suggest breaking up this long sentence to make reading easier.
+On 12/12/23 10:13, Christoph Hellwig wrote:
+> If you want zoned devices to work you need something
+> like zone append [ ... ]
 
-for specific tasks.  Users do not want block I/O operations to disturb thes=
-e CPUS,
-> also long IO latency may be caused if blk-mq kworker is scheduled on thes=
-e
+If F2FS would submit REQ_OP_ZONE_APPEND operations, the only realistic
+approach in the short term would be that sd_zbc.c translates these
+operations into WRITE commands. Would it be acceptable to optimize
+sd_zbc.c such that it does not restrict the queue depth to one per zone
+if the storage device (UFS) preserves the command order per hardware
+queue?
 
-as long I/O latency could delay intended tasks if blk-mq kworker is schedul=
-ed on these=20
+Thanks,
 
-> isolated CPUs.
->=20
-> Kernel workqueue only respects this limit for WQ_UNBOUND, for bound wq,
-> the responsibility should be on wq user.
->=20
-> So don't not run block kworker on isolated CPUs by ruling out isolated CP=
-Us
-So don't run block kworker on isolated CPUs by removing isolated CPUs
+Bart.
 
-> from hctx->cpumask. Meantime in cpuhp handler, use queue map to check if
-> all CPUs in this hw queue are offline, this way can avoid any cost in fas=
-t
-> IO code path.
->=20
-> Cc: Juri Lelli <juri.lelli@redhat.com>
-> Cc: Andrew Theurer <atheurer@redhat.com>
-> Cc: Joe Mario <jmario@redhat.com>
-> Cc: Sebastian Jug <sejug@redhat.com>
-> Cc: Frederic Weisbecker <frederic@kernel.org>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->=20
-> V3:
-> 	- avoid to check invalid cpu as reported by Bart
-> 	- take current cpu(to be offline, not done yet) into account
-> 	- simplify blk_mq_hctx_has_online_cpu()
->=20
-> V2:
-> 	- remove module parameter, meantime use queue map to check if
-> 	all cpus in one hctx are offline
->=20
->  block/blk-mq.c | 51 ++++++++++++++++++++++++++++++++++++++++----------
->  1 file changed, 41 insertions(+), 10 deletions(-)
->=20
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index e2d11183f62e..4556978ce71b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -29,6 +29,7 @@
->  #include <linux/prefetch.h>
->  #include <linux/blk-crypto.h>
->  #include <linux/part_stat.h>
-> +#include <linux/sched/isolation.h>
-> =20
->  #include <trace/events/block.h>
-> =20
-> @@ -2158,7 +2159,11 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_c=
-tx *hctx)
->  	bool tried =3D false;
->  	int next_cpu =3D hctx->next_cpu;
-> =20
-> -	if (hctx->queue->nr_hw_queues =3D=3D 1)
-> +	/*
-> +	 * In case of single queue or no allowed CPU for scheduling
-> +	 * worker, don't bound our worker with any CPU
-> +	 */
-> +	if (hctx->queue->nr_hw_queues =3D=3D 1 || next_cpu >=3D nr_cpu_ids)
->  		return WORK_CPU_UNBOUND;
-> =20
->  	if (--hctx->next_cpu_batch <=3D 0) {
-> @@ -3459,14 +3464,30 @@ static bool blk_mq_hctx_has_requests(struct blk_m=
-q_hw_ctx *hctx)
->  	return data.has_rq;
->  }
-> =20
-> -static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
-> -		struct blk_mq_hw_ctx *hctx)
-> +static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
-> +		unsigned int this_cpu)
->  {
-> -	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) !=3D cpu)
-> -		return false;
-> -	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
-> -		return false;
-> -	return true;
-> +	enum hctx_type type =3D hctx->type;
-> +	int cpu;
-> +
-> +	/*
-> +	 * hctx->cpumask has rule out isolated CPUs, but userspace still
-> +	 * might submit IOs on these isolated CPUs, so use queue map to
-> +	 * check if all CPUs mapped to this hctx are offline
-> +	 */
-> +	for_each_online_cpu(cpu) {
-> +		struct blk_mq_hw_ctx *h =3D blk_mq_map_queue_type(hctx->queue,
-> +				type, cpu);
-> +
-> +		if (h !=3D hctx)
-> +			continue;
-> +
-> +		/* this current CPU isn't put offline yet */
-> +		if (this_cpu !=3D cpu)
-> +			return true;
-> +	}
-> +
-> +	return false;
->  }
-> =20
->  static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_nod=
-e *node)
-> @@ -3474,8 +3495,7 @@ static int blk_mq_hctx_notify_offline(unsigned int =
-cpu, struct hlist_node *node)
->  	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
->  			struct blk_mq_hw_ctx, cpuhp_online);
-> =20
-> -	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
-> -	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
-> +	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
->  		return 0;
-> =20
->  	/*
-> @@ -3883,6 +3903,8 @@ static void blk_mq_map_swqueue(struct request_queue=
- *q)
->  	}
-> =20
->  	queue_for_each_hw_ctx(q, hctx, i) {
-> +		int cpu;
-> +
->  		/*
->  		 * If no software queues are mapped to this hardware queue,
->  		 * disable it and free the request entries.
-> @@ -3909,6 +3931,15 @@ static void blk_mq_map_swqueue(struct request_queu=
-e *q)
->  		 */
->  		sbitmap_resize(&hctx->ctx_map, hctx->nr_ctx);
-> =20
-> +		/*
-> +		 * rule out isolated CPUs from hctx->cpumask for avoiding to
-
-s/for avoiding to run/to avoid running/
-
-> +		 * run wq worker on isolated CPU
-> +		 */
-> +		for_each_cpu(cpu, hctx->cpumask) {
-> +			if (cpu_is_isolated(cpu))
-> +				cpumask_clear_cpu(cpu, hctx->cpumask);
-> +		}
-> +
->  		/*
->  		 * Initialize batch roundrobin counts
->  		 */
-
-Thanks.
-
-Tim
