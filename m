@@ -1,24 +1,24 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240F2563A9;
-	Fri, 15 Dec 2023 20:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949605644D;
+	Fri, 15 Dec 2023 20:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Saw/rk8l"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gFuvhDYv"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description;
-	bh=GmcNLU65oEAUUTl/mxQRoWVPOO4x8pF5TdUbIDSNX5c=; b=Saw/rk8lkRD8nFo7Bh7EUFPxjw
-	WO26ofxnYr81jYZybxOB70gglbMpOnZFsJVnFizakWiQcRw/HEgJFNEmuPzSWzH/8Dy3IKd9Ah3Qq
-	DexWB7ilEHGsFh3uZGQYPH2j68QaBalphRoeG1Vrj667xIeY8ELFPlv1JxQwYlHfcs1Z87QmOeQ+R
-	E9CW7vPxXkPnS5bruR45c8QiDwofHAWp/I/TJO3quc+yAqBhvx+5hnN9RkKYNWOKpoap19iGNZrv2
-	VlpZMTFkrk29dDtnxhzENmg1QIlQG29VPtq6Lwhz3E0vB3QqkGzax1mLCweWyzmJNxgf4n+LfSDOB
-	kEOisUaA==;
+	bh=jtQJbz4fdyRVv5uL17Tn1fQYq5bZueXqglZgma3TBl8=; b=gFuvhDYvigMOyd9cgE5NRHYGMP
+	JXw9GfbWWxR/6/N7DMulUTX+25ifhwz3zoyE0lzX7H9OfJYCNg/MFDdY2MaFng+trp0U3o+gQBSx3
+	8C5KaPgv1m/g3oZI+7UCdOI97RLBceH7asFFwM1ltU+xJV/gQlbCZuCKhTnKmdVzUNHtkvoZs1egf
+	mpT5f56FHW51GIvbnhKxjwc9jnQVUWJE91EHvZ66wUeoxcvcgINVM3y85oKEZegnrtAzP3d07jUBO
+	kiQ53iw4H/NDc5AGQWsFnkidijsaDL1EIBmVDdIUIGGK9wbBfziTFxK9L+YOU7apsGq6OiRL9mwts
+	wddReUhw==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rEEOV-0038it-IW; Fri, 15 Dec 2023 20:02:47 +0000
+	id 1rEEOW-0038jQ-38; Fri, 15 Dec 2023 20:02:48 +0000
 From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
@@ -26,9 +26,9 @@ Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 07/14] hfs: Really remove hfs_writepage
-Date: Fri, 15 Dec 2023 20:02:38 +0000
-Message-Id: <20231215200245.748418-8-willy@infradead.org>
+Subject: [PATCH 11/14] sysv: Remove writepage implementation
+Date: Fri, 15 Dec 2023 20:02:42 +0000
+Message-Id: <20231215200245.748418-12-willy@infradead.org>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20231215200245.748418-1-willy@infradead.org>
 References: <20231215200245.748418-1-willy@infradead.org>
@@ -40,41 +40,49 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The earlier commit to remove hfs_writepage only removed it from
-one of the aops.  Remove it from the btree_aops as well.
+If the filesystem implements migrate_folio and writepages, there is
+no need for a writepage implementation.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- fs/hfs/inode.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ fs/sysv/itree.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/fs/hfs/inode.c b/fs/hfs/inode.c
-index a7bc4690a780..8c34798a0715 100644
---- a/fs/hfs/inode.c
-+++ b/fs/hfs/inode.c
-@@ -29,11 +29,6 @@ static const struct inode_operations hfs_file_inode_operations;
+diff --git a/fs/sysv/itree.c b/fs/sysv/itree.c
+index 725981474e5f..410ab2a44d2f 100644
+--- a/fs/sysv/itree.c
++++ b/fs/sysv/itree.c
+@@ -8,6 +8,7 @@
  
- #define HFS_VALID_MODE_BITS  (S_IFREG | S_IFDIR | S_IRWXUGO)
+ #include <linux/buffer_head.h>
+ #include <linux/mount.h>
++#include <linux/mpage.h>
+ #include <linux/string.h>
+ #include "sysv.h"
  
--static int hfs_writepage(struct page *page, struct writeback_control *wbc)
--{
--	return block_write_full_page(page, hfs_get_block, wbc);
--}
--
- static int hfs_read_folio(struct file *file, struct folio *folio)
+@@ -456,9 +457,10 @@ int sysv_getattr(struct mnt_idmap *idmap, const struct path *path,
+ 	return 0;
+ }
+ 
+-static int sysv_writepage(struct page *page, struct writeback_control *wbc)
++static int sysv_writepages(struct address_space *mapping,
++		struct writeback_control *wbc)
  {
- 	return block_read_full_folio(folio, hfs_get_block);
-@@ -162,9 +157,10 @@ const struct address_space_operations hfs_btree_aops = {
- 	.dirty_folio	= block_dirty_folio,
+-	return block_write_full_page(page,get_block,wbc);
++	return mpage_writepages(mapping, wbc, get_block);
+ }
+ 
+ static int sysv_read_folio(struct file *file, struct folio *folio)
+@@ -503,8 +505,9 @@ const struct address_space_operations sysv_aops = {
+ 	.dirty_folio = block_dirty_folio,
  	.invalidate_folio = block_invalidate_folio,
- 	.read_folio	= hfs_read_folio,
--	.writepage	= hfs_writepage,
-+	.writepages	= hfs_writepages,
- 	.write_begin	= hfs_write_begin,
- 	.write_end	= generic_write_end,
-+	.migrate_folio	= buffer_migrate_folio,
- 	.bmap		= hfs_bmap,
- 	.release_folio	= hfs_release_folio,
+ 	.read_folio = sysv_read_folio,
+-	.writepage = sysv_writepage,
++	.writepages = sysv_writepages,
+ 	.write_begin = sysv_write_begin,
+ 	.write_end = generic_write_end,
++	.migrate_folio = buffer_migrate_folio,
+ 	.bmap = sysv_bmap
  };
 -- 
 2.42.0
