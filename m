@@ -1,53 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC6319BDD;
-	Fri, 15 Dec 2023 10:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E152C25561;
+	Fri, 15 Dec 2023 11:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZ6m6fb9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F50C433CA;
-	Fri, 15 Dec 2023 10:19:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702635554;
-	bh=1I04KCvKIIKJsGUHXpkctM4Gpr7k/ATJ2YN1VolgB0s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jZ6m6fb9EaYiGIoBIclk4x5LEwOzFg2z/ijLCECN+Zr5C6GdmmnYqVuZ9mrMY84az
-	 waqtmFlcC5kJSNfNmp4m6XIwaKWMEAJkT5yimNhUW55KRCVfW48QK8wrblO6NlGcoG
-	 PvB8nPktYp5LnL1yBEiqTNaSnKjDCRIGVaPjAvJ/HZYf9XU3BoorH6lqSJ4oFxWG2p
-	 yXz4QCKW0O5rR8EU4D52y7dkWsLZNaGAQFCcAZJnMa6N7i8SBLH28uIx2w7L1WdWCu
-	 dMrncoeIUuKYTbRNfPWuH0A0qo02JlfxdScduF/sYXu1eWSAo/Pvzc/4Dl+olxzHZl
-	 PyN/QcKoEkJxA==
-Date: Fri, 15 Dec 2023 11:19:07 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Daejun Park <daejun7.park@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Dave Chinner <dchinner@redhat.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v6 05/20] fs: Restore F_[GS]ET_FILE_RW_HINT support
-Message-ID: <20231215-ersatzlos-geheuer-85504a401e08@brauner>
-References: <20231214204119.3670625-1-bvanassche@acm.org>
- <20231214204119.3670625-6-bvanassche@acm.org>
- <20231215072255.GD18575@lst.de>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T4GIXifE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702641068; x=1734177068;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=fWtDRVeoSimGVB8lb7ll2lE4znrOoEonyfKQ2IcOzjY=;
+  b=T4GIXifE7+8ZraaMV6AjdhxvFnSUyaRVd0XnLQOVjfcpH1h2Bz7JFlxJ
+   TvV/mmuWCQ7Pc8vAL++DaRnpOn6P7UsRpzo7E1Fd6M4xnYtpiEuJWMAXy
+   I/Hoh9Z6Y4lUS6aXKA9NhDehlYbV4JbC4FuO/KYg7Rhf7DPzpszw3memw
+   D9cM6st+Kw6rs0v0+NKZnCVRt4LPLJv4DlO0vXipfk2E6KTO5woYEcuqB
+   f0nyduJiqTYxzjmNzvcGds+J8T78TwV0JCTpFiTVYOilMbysaz+x0HZ23
+   hNNnlWEZfrQjIb9UKpSk3ISERVtcwFlczO+AnfYv3ay2RG9Ta4bgoixKp
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="2086234"
+X-IronPort-AV: E=Sophos;i="6.04,278,1695711600"; 
+   d="scan'208";a="2086234"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 03:51:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="808943836"
+X-IronPort-AV: E=Sophos;i="6.04,278,1695711600"; 
+   d="scan'208";a="808943836"
+Received: from mtkaczyk-mobl.ger.corp.intel.com (HELO localhost) ([10.249.145.7])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 03:51:04 -0800
+Date: Fri, 15 Dec 2023 12:50:59 +0100
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+To: Song Liu <song@kernel.org>
+Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/3] md: Remove deprecated flavors
+Message-ID: <20231215125059.00006270@linux.intel.com>
+In-Reply-To: <20231214222107.2016042-1-song@kernel.org>
+References: <20231214222107.2016042-1-song@kernel.org>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231215072255.GD18575@lst.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 15, 2023 at 08:22:55AM +0100, Christoph Hellwig wrote:
-> NAK, we should not bloat struct file without a reason.
+On Thu, 14 Dec 2023 14:21:04 -0800
+Song Liu <song@kernel.org> wrote:
 
-Worth noting, that we would've gained 32bit in the fmode_t expansion and
-another 32bit in here. So 64bit in one cycle...
+> Linear, multipath, and faulty have been marked as deprecated for 2.5 years.
+> Let's remove them.
+> 
+> Thanks,
+> Song
+
+Hi Song,
+Great idea!
+
+Please note that there are mdadm tests for those levels. I can approve it only
+when mdadm clean-up is merged. Our tests must pass continuously.
+
+It is a nice code complexity improvement so let me know if you would
+like to get my help with mdadm patches.
+
+Thanks,
+Mariusz
