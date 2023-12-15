@@ -1,91 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445DA374E6;
-	Fri, 15 Dec 2023 15:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC1B563A4;
+	Fri, 15 Dec 2023 20:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YyLP0V55"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B31BAC433C8;
-	Fri, 15 Dec 2023 15:38:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702654687;
-	bh=x62x6NYP9yRE2oI6l70jSejMRfQlxBsF7W56q+aZzXM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=YyLP0V550r0J42MzYaM+fh9x16QkiLirDBV+ev3nM/dMxEM/tIWeNgdP7VGaHY4re
-	 vmZCe/MyyH0dKzHE0E7OZY2g4o4Ji1S5AicP+zGMUyX+5wI+3yF18jCzic9tCLWqg8
-	 iMVfC3C6zh8ezJCk4aqyYWMIXax6ZQdGyciyHmPUBQXQUV/REjmzZto0pMHp7RCMOB
-	 y4Y3w07lmwo3Dn26huf0KFTtaTgddlbFxXJ2seImYkE49cpAmzMSp7SImkFGfWc9T+
-	 ewGuAdursxUAtZxw5NmaEKo/sXifX7I8+XQYXcjieCTn2yEtp+5fWhRxrsQWwDc804
-	 XfD9S6wmSDA5Q==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-50bf8843a6fso736859e87.0;
-        Fri, 15 Dec 2023 07:38:07 -0800 (PST)
-X-Gm-Message-State: AOJu0Yx7MU5SKSvGjpy43nmB1sHRBukz+7Gb9NeaYlZHxv63snGBMEbK
-	B04aT2bxgRlJ55x8WhNKLynz2xBJKIF2S0XNS9k=
-X-Google-Smtp-Source: AGHT+IF2o19iSjuma7z1rViUr4sWABiy6wlRLdIwp5Tpkbtge9DERt9+zTTFZPwV1qlJD1XBSN92MPB6o6otz7AUm6Y=
-X-Received: by 2002:a19:8c47:0:b0:50b:ca4c:fedd with SMTP id
- i7-20020a198c47000000b0050bca4cfeddmr5404455lfj.31.1702654685913; Fri, 15 Dec
- 2023 07:38:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="miy2KdKg"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-Type:Content-ID:Content-Description;
+	bh=eU+CKpTDHM2zoWr8Iu/6jTnTrmbE2V5dKmSdec4HmWI=; b=miy2KdKgA4utgsHuGUGwTLx0dz
+	Acc625FaWDqz6kjwPvC6mTFGbM6or6mvD1tKGRypzGaSjQSazNrvrtT4smUCkPtOXXGU3z1hLrrPP
+	XoRkZw5GUsiSIqEPKdGqy0b5sHNInqMxIQWNsM9HA8zI29JppKdLqhtbIE4PtbiUkolYkvm6Bs+/l
+	/qhImewSf4uXpReKXXZz3p+/nn4XNoxsG6FvVGRc6egVPJR+rGlLAcA2JCW9Lkcul9/ckefuFRyd0
+	fznqPAnejnkNGuvVfmTxuzv3tUHyXAg1oeyqyj4wPJVLQyLntLzU2Rm3/JgNpkjawemq6+nSsoAGD
+	BprBoiuQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1rEEOU-0038i6-UQ; Fri, 15 Dec 2023 20:02:46 +0000
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christoph Hellwig <hch@lst.de>,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 01/14] fs: Remove clean_page_buffers()
+Date: Fri, 15 Dec 2023 20:02:32 +0000
+Message-Id: <20231215200245.748418-2-willy@infradead.org>
+X-Mailer: git-send-email 2.37.1
+In-Reply-To: <20231215200245.748418-1-willy@infradead.org>
+References: <20231215200245.748418-1-willy@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214222107.2016042-1-song@kernel.org> <20231215125059.00006270@linux.intel.com>
-In-Reply-To: <20231215125059.00006270@linux.intel.com>
-From: Song Liu <song@kernel.org>
-Date: Fri, 15 Dec 2023 07:37:54 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW6GZnufqFseLvgpMrrX6qRXodX1n89vEbbC-FqTjsWPDg@mail.gmail.com>
-Message-ID: <CAPhsuW6GZnufqFseLvgpMrrX6qRXodX1n89vEbbC-FqTjsWPDg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] md: Remove deprecated flavors
-To: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
-Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Mariusz,
+This function has been unused since the removal of bdev_write_page().
 
-On Fri, Dec 15, 2023 at 3:51=E2=80=AFAM Mariusz Tkaczyk
-<mariusz.tkaczyk@linux.intel.com> wrote:
->
-> On Thu, 14 Dec 2023 14:21:04 -0800
-> Song Liu <song@kernel.org> wrote:
->
-> > Linear, multipath, and faulty have been marked as deprecated for 2.5 ye=
-ars.
-> > Let's remove them.
-> >
-> > Thanks,
-> > Song
->
-> Hi Song,
-> Great idea!
->
-> Please note that there are mdadm tests for those levels. I can approve it=
- only
-> when mdadm clean-up is merged. Our tests must pass continuously.
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ fs/mpage.c                  | 10 ----------
+ include/linux/buffer_head.h |  1 -
+ 2 files changed, 11 deletions(-)
 
-Is the continuous test result available publicly?
+diff --git a/fs/mpage.c b/fs/mpage.c
+index ffb064ed9d04..63bf99856024 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -455,16 +455,6 @@ static void clean_buffers(struct page *page, unsigned first_unmapped)
+ 		try_to_free_buffers(page_folio(page));
+ }
+ 
+-/*
+- * For situations where we want to clean all buffers attached to a page.
+- * We don't need to calculate how many buffers are attached to the page,
+- * we just need to specify a number larger than the maximum number of buffers.
+- */
+-void clean_page_buffers(struct page *page)
+-{
+-	clean_buffers(page, ~0U);
+-}
+-
+ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
+ 		      void *data)
+ {
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 5f23ee599889..94f6161eb45e 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -270,7 +270,6 @@ int generic_write_end(struct file *, struct address_space *,
+ 				loff_t, unsigned, unsigned,
+ 				struct page *, void *);
+ void folio_zero_new_buffers(struct folio *folio, size_t from, size_t to);
+-void clean_page_buffers(struct page *page);
+ int cont_write_begin(struct file *, struct address_space *, loff_t,
+ 			unsigned, struct page **, void **,
+ 			get_block_t *, loff_t *);
+-- 
+2.42.0
 
->
-> It is a nice code complexity improvement so let me know if you would
-> like to get my help with mdadm patches.
-
-On my local tests with mdadm, I need to make changes to the following
-tests:
-
-00linear...
-00names...
-00raid0...
-00readonly...
-02lineargrow...
-03r0assem...
-04r0update...
-04update-metadata...
-
-The changes are all straightforward (just remove things related to
-linear/multipath/faulty).
-
-Thanks,
-Song
