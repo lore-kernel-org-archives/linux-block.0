@@ -1,105 +1,192 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1144650;
-	Fri, 15 Dec 2023 01:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SrsPX0QrRz4f3lVV;
-	Fri, 15 Dec 2023 09:41:04 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 16F811A0554;
-	Fri, 15 Dec 2023 09:41:09 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgD3Rg2yrntlPtG0Dg--.46759S6;
-	Fri, 15 Dec 2023 09:41:08 +0800 (CST)
-From: linan666@huaweicloud.com
-To: song@kernel.org,
-	axboe@kernel.dk
-Cc: linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linan666@huaweicloud.com,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	houtao1@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH v2 2/2] md: don't account sync_io if iostats of the disk is disabled
-Date: Fri, 15 Dec 2023 09:39:31 +0800
-Message-Id: <20231215013931.3329455-3-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231215013931.3329455-1-linan666@huaweicloud.com>
-References: <20231215013931.3329455-1-linan666@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E437EA
+	for <linux-block@vger.kernel.org>; Fri, 15 Dec 2023 02:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axcgIukN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 763B0C433C7;
+	Fri, 15 Dec 2023 02:03:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702605793;
+	bh=m8svtA8/B5TYh/FkDKhxdr5n4FtqdlfJ89HvBTDBQuU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=axcgIukNQ4Yvjlwt9UUUtTwbL9FSB0itnCcYkFm1DeLfxmGWfnxFZRqz6qASGQy9D
+	 e/Hyk7a1izNvkNLmJAS9xAyKEIL03fBmvRLMFxa6iBoTTPqa41wf9+zTy3lBRO4B69
+	 QZ8PQtVnyM4M6GZHpnn3vRfPFkl3O5xM5QOmPcMKB+MmqbStW7EWqxopL92yhT68Y9
+	 zspoOORMvHiSlWOBV01P2O8n4+zxKLUDaEcrlOu1drNbzjU78azREaF0SuMOq1sRv+
+	 m6L1OJsORXY+6DW18c+L5qFiu0R2dkjF/9l2LoWebwAkp9EQ4T5xGBIcgw+LMfr9zf
+	 th8ScCktWBQaA==
+Date: Thu, 14 Dec 2023 18:03:11 -0800
+From: Jaegeuk Kim <jaegeuk@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
+ certain cases
+Message-ID: <ZXuz36STuYajyccm@google.com>
+References: <5b7be2e9-3691-409d-abff-f1fbf04cef7d@acm.org>
+ <20231212181304.GA32666@lst.de>
+ <19cd459e-d79e-4ecd-8ec8-778be0066e84@acm.org>
+ <20231212182613.GA1216@lst.de>
+ <ZXiual-UkUY4OWY2@google.com>
+ <20231213155606.GA8748@lst.de>
+ <ZXnevBo4eIZEXbhK@google.com>
+ <20231214085729.GA9099@lst.de>
+ <ZXs563M66THrUw50@google.com>
+ <168ed2f4-cf58-4ee9-bfbb-449f06f7348d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3Rg2yrntlPtG0Dg--.46759S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFWxKF4kKr1xuF18try7Jrb_yoW8Gw1fpa
-	ykAFyayryjqrW5u3WUX34Dua4rW3srKFW7ArW3A393ZFy3Jr9xKryrXayqqryDWFyrWFWa
-	va4DGFZ8ua10yr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmK14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAa
-	c4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzV
-	Aqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S
-	6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxw
-	ACI402YVCY1x02628vn2kIc2xKxwAKzVCY07xG64k0F24l42xK82IYc2Ij64vIr41l4I8I
-	3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxV
-	WUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAF
-	wI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcI
-	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j
-	6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU1xhLUUUUU
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <168ed2f4-cf58-4ee9-bfbb-449f06f7348d@kernel.org>
 
-From: Li Nan <linan122@huawei.com>
+On 12/15, Damien Le Moal wrote:
+> On 12/15/23 02:22, Jaegeuk Kim wrote:
+> > On 12/14, Christoph Hellwig wrote:
+> >> On Wed, Dec 13, 2023 at 08:41:32AM -0800, Jaegeuk Kim wrote:
+> >>> I don't have any
+> >>> concern to keep the same ioprio on writes, since handheld devices are mostly
+> >>> sensitive to reads. So, if you have other use-cases using zoned writes which
+> >>> require different ioprio on writes, I think you can suggest a knob to control
+> >>> it by users.
+> >>
+> >> Get out of your little handheld world.  In Linux we need a generally usable
+> >> I/O stack, and any feature exposed by the kernel and will be used quite
+> >> differently than you imagine.
+> >>
+> >> Just like people will add reordering to the I/O stack that's not there
+> >> right now (in addition to the ones your testing doesn't hit).  That
+> >> doensn't mean we should avoid them - you genereally get better performance
+> >> by not reordering without a good reason (like thotting), but especially
+> >> in error handling paths or resource constrained environment they will
+> >> hapen all over.  We've had this whole discussion with the I/O barriers
+> >> that did not work for exactly the same reasons.
+> >>
+> >>>
+> >>>>
+> >>>>> it is essential to place the data per file to get better bandwidth. And for
+> >>>>> NAND-based storage, filesystem is the right place to deal with the more efficient
+> >>>>> garbage collecion based on the known data locations.
+> >>>>
+> >>>> And that works perfectly fine match for zone append.
+> >>>
+> >>> How that works, if the device gives random LBAs back to the adjacent data in
+> >>> a file? And, how to make the LBAs into the sequential ones back?
+> >>
+> >> Why would your device pick random LBAs?  If you send a zone append to
+> >> zone it will be written at the write pointer, which is absolutely not
+> >> random.  All I/O written in a single write is going to be sequential,
+> >> so just like for all other devices doing large sequential writes is
+> >> important.  Multiple writes can get reordered, but if you havily hit
+> >> the same zone you'd get the same effect in the file system allocator
+> >> too.
+> > 
+> > How can you guarantee the device does not give any random LBAs? What'd> be the selling point of zone append to end users? Are you sure this can
+> > give the better write trhought forever? Have you considered how to
+> > implement this in device side such as FTL mapping overhead and garbage
+> > collection leading to tail latencies?
+> 
+> Answers to all your questions, in order:
+> 
+> 1) Asking this is to me similar to asking how can one guarantee that the device
+> gives back the data that was written... You are asking for guarantees that the
+> device is not buggy. By definition, zone append will return the writen start LBA
+> within the zone that the zone append command specified. And that start LBA will
+> always be equal to the zone write pointer value when the device started
+> executing the zone append command.
+> 
+> 2) When there is an FS, the user cannot know if the FS is using zone append or
+> not, so the user should not care at all. If by "user" you mean "the file
+> system", then it is a design decision. We already pointed out that generally
+> speaking, zone append will be easier to use because it does not have ordering
+> constraints.
+> 
+> 3) Yes, because the writes are always sequential, which is the least expensive
+> pattern for the device internal as that only triggers minimal internal activity
+> on the FTL, GC, weir leveling etc, at least for a decently designed device.
+> 
+> 4) See above. If the device interface forces the device user to always write
+> sequentially, as mandated by a zoned device, then FTL, GC and weir leveling is
+> minimized. The actual device internal GC that may or may not happen completely
+> depend on how the device maps zones to flash super blocks. If the mapping is
+> 1:1, then GC will be nearly non-existent. If the mapping is not 1:1, then GC
+> overhead may exist. The discussion should then be about the design choices of
+> the device. The fact that the host chose zone append will not in anyway make
+> things worse for the device. Even with regular writes the host must write
+> sequentially, same as what zone append achieves (potentially a lot more easily).
+> 
+> > My takeaway on the two approaches would be:
+> >                   zone_append        zone_write
+> > 		  -----------        ----------
+> > LBA               from FTL           from filesystem
+> > FTL mapping       Page-map           Zone-map
+> 
+> Not sure what you mean here. zone append always returns an LBA from within the
+> zone specified by the LBA in the command CDB. So mapping is still per zone. zone
+> append is *NOT* a random write command. Zone append automatically implements
+> sequential writing within a zone for the user. In the case of regular writes,
+> the user must fully control sentimentality. In both cases the write pattern *is*
+> sequential.
 
-If iostats is disabled, disk_stats will not be updated and
-part_stat_read_accum() only returns a constant value. In this case,
-continuing to count sync_io and to check is_mddev_idle() is no longer
-meaningful.
+Okay, it seems there's first disconnect here, which fails to explain all the
+below gaps. Do you think the device supporting zone_append keeps LBAs inline
+with PBAs within a zone? E.g., LBA#n guarantees to map to PBA#n in a zone.
+If LBA order is exactly matching to the PBA order all the time, the mapping
+granularity is zone. Otherwise, it should be page.
 
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- drivers/md/md.h | 3 ++-
- drivers/md/md.c | 4 ++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 1a4f976951c1..75f5c5d04e71 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -589,7 +589,8 @@ static inline void md_sync_acct(struct block_device *bdev, unsigned long nr_sect
- 
- static inline void md_sync_acct_bio(struct bio *bio, unsigned long nr_sectors)
- {
--	md_sync_acct(bio->bi_bdev, nr_sectors);
-+	if (blk_queue_io_stat(bio->bi_bdev->bd_disk->queue))
-+		md_sync_acct(bio->bi_bdev, nr_sectors);
- }
- 
- struct md_personality
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 1d71b2a9af03..18bbceb0ffd6 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -8502,6 +8502,10 @@ static int is_mddev_idle(struct mddev *mddev, int init)
- 	rcu_read_lock();
- 	rdev_for_each_rcu(rdev, mddev) {
- 		struct gendisk *disk = rdev->bdev->bd_disk;
-+
-+		if (blk_queue_io_stat(mddev->queue))
-+			continue;
-+
- 		curr_events =
- 			(long long)part_stat_read_accum(disk->part0, sectors) -
- 			      atomic64_read(&disk->sync_io);
--- 
-2.39.2
-
+> 
+> > SRAM/DRAM needs   Large              Small
+> 
+> There are no differences in this area because the FTL is the same for both. No
+> changes, nothing special for zone append.
+> 
+> > FTL GC            Required           Not required
+> 
+> Incorrect. See above. That depends on the device mapping of zones to flash
+> superblocks. And GC requirements are the same for both because the write pattern
+> is identical: it is sequential within each zone being written. The user still
+> controls which zone it wants to write. Zone append is not a magic command that
+> chooses a target zone automatically.
+> 
+> > Tail latencies    Exist              Not exisit
+> 
+> Incorrect. They are the same and because of the lack of ordering requirement
+> with zone append, if anything, zone append can give better latency.
+> 
+> > GC Efficience     Worse              Better
+> 
+> Nope. See above. Same.
+> 
+> > Longevity         As-is              Longer
+> > Discard cmd       Required           Not required
+> 
+> There is no discard with zone devices. Only zone reset. So both are "not
+> required" here.
+> 
+> > Block complexity  Small              Large
+> > Failure cases     Less exist         Exist
+> > Fsck              Don't know         F2FS-TOOLS support
+> > Filesystem        BTRFS support(?)   F2FS support
+> 
+> Yes, btrfs data path uses zone append.
+> 
+> > 
+> > Given this, I took zone_write, especially for mobile devices, since we can
+> > recover the unaligned writes in the corner cases by fsck. And, most benefit
+> > would be getting rid of FTL mapping overhead which improves random read IOPs
+> > significantly due to the lack of SRAM in low-end storages. And, longer lifetime
+> > by mitigating garbage collection overhead is more important in mobile world.
+> 
+> As mentioned, GC is not an issue, or rather, GC depends on how the device is
+> designed, not on which type of write command the host uses. Writes are always
+> sequential for both types !
+> 
+> 
+> -- 
+> Damien Le Moal
+> Western Digital Research
