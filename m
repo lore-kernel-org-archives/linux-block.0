@@ -1,24 +1,24 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240AC563A7;
-	Fri, 15 Dec 2023 20:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A01563B5;
+	Fri, 15 Dec 2023 20:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o+JIP3Od"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eCGDYeSt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description;
-	bh=iWuo/17AnVV2eL2F0kRsj8EINE9372h1+vI87BJPV7s=; b=o+JIP3Odm8bEnfQ/co0ItO1vUz
-	FRCFZFMMWJh39c2OJ4pHnnRSXol2eGTQzvKBUoVSfB20fwKFrZA3wKsqZsr2YHyafQXYFUXMn1rHH
-	cOBIOb2YY6Hj+KAdXak5LJb73NiqYrROPbU2EToKFYA674ZKv5LZ6kwO7ouX7viF9OkbnbswbwXrC
-	TBz9oRgmsR+zHSkSbjXKk0DrWRe1fpVRuNRq5Xko8CZ/QKM1AnM7qXh2R85fsPkqeqmLjEAMlH9yx
-	LyW4Nkj0nwO+PgXBVY42quKEd4SYEgBXDxoM1aAg713iRRDworTk/HNRX5qmCjzEQVeuu7roWSeKk
-	+wect5ww==;
+	bh=SCryoIsThT1F2D/n8Lhi4Jv7COeVsife5aCkou7x9Bc=; b=eCGDYeSt9PCLn0V6USNBSuUOiJ
+	9tz1Ngb/YuMDZJR/S7oHDoEQrlMShjf4X5PlnYMHT5HcK4ItcnpGMiAPGEV4WgYvdI8Bpti/NRbq8
+	7wPzUAwjW4ddyf+o2Vm5X3E5mp13Jh2td2CMVnN+0VgHizYSYCchr1GOB2zNxTWCsGjSgILGUAGs/
+	/QWg32SkO8XGYsYotHsjxH9zfe/I33oXv9Dpym9mAqYZ2wdLZqLvy1a19zcWIXmhFrw9DHtncKD/2
+	q/v8t0mby8FoaMV10K0hzLdxXPl1YtOvbJncVj6PrZYZW9NNpJ9myN7pEwQsnHnM8LeD6+wVFns/a
+	ulHDJMeQ==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rEEOV-0038im-ER; Fri, 15 Dec 2023 20:02:47 +0000
+	id 1rEEOV-0038jK-Va; Fri, 15 Dec 2023 20:02:48 +0000
 From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
@@ -26,9 +26,9 @@ Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 06/14] bfs: Remove writepage implementation
-Date: Fri, 15 Dec 2023 20:02:37 +0000
-Message-Id: <20231215200245.748418-7-willy@infradead.org>
+Subject: [PATCH 10/14] ocfs2: Remove writepage implementation
+Date: Fri, 15 Dec 2023 20:02:41 +0000
+Message-Id: <20231215200245.748418-11-willy@infradead.org>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20231215200245.748418-1-willy@infradead.org>
 References: <20231215200245.748418-1-willy@infradead.org>
@@ -45,46 +45,63 @@ no need for a writepage implementation.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- fs/bfs/file.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ fs/ocfs2/aops.c        | 15 ++++++---------
+ fs/ocfs2/ocfs2_trace.h |  2 --
+ 2 files changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/fs/bfs/file.c b/fs/bfs/file.c
-index adc2230079c6..a778411574a9 100644
---- a/fs/bfs/file.c
-+++ b/fs/bfs/file.c
-@@ -11,6 +11,7 @@
+diff --git a/fs/ocfs2/aops.c b/fs/ocfs2/aops.c
+index 795997806326..b82185075de7 100644
+--- a/fs/ocfs2/aops.c
++++ b/fs/ocfs2/aops.c
+@@ -389,21 +389,18 @@ static void ocfs2_readahead(struct readahead_control *rac)
+ /* Note: Because we don't support holes, our allocation has
+  * already happened (allocation writes zeros to the file data)
+  * so we don't have to worry about ordered writes in
+- * ocfs2_writepage.
++ * ocfs2_writepages.
+  *
+- * ->writepage is called during the process of invalidating the page cache
++ * ->writepages is called during the process of invalidating the page cache
+  * during blocked lock processing.  It can't block on any cluster locks
+  * to during block mapping.  It's relying on the fact that the block
+  * mapping can't have disappeared under the dirty pages that it is
+  * being asked to write back.
   */
- 
- #include <linux/fs.h>
-+#include <linux/mpage.h>
- #include <linux/buffer_head.h>
- #include "bfs.h"
- 
-@@ -150,9 +151,10 @@ static int bfs_get_block(struct inode *inode, sector_t block,
- 	return err;
- }
- 
--static int bfs_writepage(struct page *page, struct writeback_control *wbc)
-+static int bfs_writepages(struct address_space *mapping,
+-static int ocfs2_writepage(struct page *page, struct writeback_control *wbc)
++static int ocfs2_writepages(struct address_space *mapping,
 +		struct writeback_control *wbc)
  {
--	return block_write_full_page(page, bfs_get_block, wbc);
-+	return mpage_writepages(mapping, wbc, bfs_get_block);
+-	trace_ocfs2_writepage(
+-		(unsigned long long)OCFS2_I(page->mapping->host)->ip_blkno,
+-		page->index);
+-
+-	return block_write_full_page(page, ocfs2_get_block, wbc);
++	return mpage_writepages(mapping, wbc, ocfs2_get_block);
  }
  
- static int bfs_read_folio(struct file *file, struct folio *folio)
-@@ -190,9 +192,10 @@ const struct address_space_operations bfs_aops = {
- 	.dirty_folio	= block_dirty_folio,
- 	.invalidate_folio = block_invalidate_folio,
- 	.read_folio	= bfs_read_folio,
--	.writepage	= bfs_writepage,
-+	.writepages	= bfs_writepages,
- 	.write_begin	= bfs_write_begin,
- 	.write_end	= generic_write_end,
-+	.migrate_folio	= buffer_migrate_folio,
- 	.bmap		= bfs_bmap,
- };
+ /* Taken from ext3. We don't necessarily need the full blown
+@@ -2471,7 +2468,7 @@ const struct address_space_operations ocfs2_aops = {
+ 	.dirty_folio		= block_dirty_folio,
+ 	.read_folio		= ocfs2_read_folio,
+ 	.readahead		= ocfs2_readahead,
+-	.writepage		= ocfs2_writepage,
++	.writepages		= ocfs2_writepages,
+ 	.write_begin		= ocfs2_write_begin,
+ 	.write_end		= ocfs2_write_end,
+ 	.bmap			= ocfs2_bmap,
+diff --git a/fs/ocfs2/ocfs2_trace.h b/fs/ocfs2/ocfs2_trace.h
+index ac4fd1d5b128..9898c11bdfa1 100644
+--- a/fs/ocfs2/ocfs2_trace.h
++++ b/fs/ocfs2/ocfs2_trace.h
+@@ -1157,8 +1157,6 @@ DEFINE_OCFS2_ULL_ULL_EVENT(ocfs2_get_block_end);
  
+ DEFINE_OCFS2_ULL_ULL_EVENT(ocfs2_readpage);
+ 
+-DEFINE_OCFS2_ULL_ULL_EVENT(ocfs2_writepage);
+-
+ DEFINE_OCFS2_ULL_ULL_EVENT(ocfs2_bmap);
+ 
+ TRACE_EVENT(ocfs2_try_to_write_inline_data,
 -- 
 2.42.0
 
