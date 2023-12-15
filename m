@@ -1,24 +1,24 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E685D56778;
-	Fri, 15 Dec 2023 20:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240F2563A9;
+	Fri, 15 Dec 2023 20:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KWXxx/CL"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Saw/rk8l"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description;
-	bh=yOUu3Oa9oop0gFCwHzPJjrXW9AuzoUvkVlbRlf+EeEk=; b=KWXxx/CL90Q2i3AE4nF0/mc+Ao
-	yCvtsrMjiAytmy+AXKn93CDYgqxfFKBdhap8lWBk+1BZ/PAX+jE6QGRo7HLonPxjSSKnqLeDR1M8R
-	tmxLyCmpYj7r/Y4DqQAFj2eekjVysrtUiydLRxXpNh5jv/FS1M0Xfi+jgvBRLcU5NUUvqmP48AP+O
-	LunUCVkXMfq9oHMZ7oCXnribKfi5dluuUKM/LSqY8E75FU5ODSWTwGVluoj4Lz0BXBAHTVrn+Sr8A
-	kkmLXpZJcaO8FiS4j82bUdzrpcYdJftLdmG8fz2Lfq9BaJUMnYuPcpx8KA3BAdVxm9b4qLhVhxUjN
-	yfHnqccQ==;
+	bh=GmcNLU65oEAUUTl/mxQRoWVPOO4x8pF5TdUbIDSNX5c=; b=Saw/rk8lkRD8nFo7Bh7EUFPxjw
+	WO26ofxnYr81jYZybxOB70gglbMpOnZFsJVnFizakWiQcRw/HEgJFNEmuPzSWzH/8Dy3IKd9Ah3Qq
+	DexWB7ilEHGsFh3uZGQYPH2j68QaBalphRoeG1Vrj667xIeY8ELFPlv1JxQwYlHfcs1Z87QmOeQ+R
+	E9CW7vPxXkPnS5bruR45c8QiDwofHAWp/I/TJO3quc+yAqBhvx+5hnN9RkKYNWOKpoap19iGNZrv2
+	VlpZMTFkrk29dDtnxhzENmg1QIlQG29VPtq6Lwhz3E0vB3QqkGzax1mLCweWyzmJNxgf4n+LfSDOB
+	kEOisUaA==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rEEOW-0038jt-Jx; Fri, 15 Dec 2023 20:02:48 +0000
+	id 1rEEOV-0038it-IW; Fri, 15 Dec 2023 20:02:47 +0000
 From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
@@ -26,9 +26,9 @@ Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 14/14] fs: Remove the bh_end_io argument from __block_write_full_folio
-Date: Fri, 15 Dec 2023 20:02:45 +0000
-Message-Id: <20231215200245.748418-15-willy@infradead.org>
+Subject: [PATCH 07/14] hfs: Really remove hfs_writepage
+Date: Fri, 15 Dec 2023 20:02:38 +0000
+Message-Id: <20231215200245.748418-8-willy@infradead.org>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20231215200245.748418-1-willy@infradead.org>
 References: <20231215200245.748418-1-willy@infradead.org>
@@ -40,128 +40,42 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-All callers are passing end_buffer_async_write as this argument, so we
-can hardcode references to it within __block_write_full_folio().
-That lets us make end_buffer_async_write() static.
+The earlier commit to remove hfs_writepage only removed it from
+one of the aops.  Remove it from the btree_aops as well.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- fs/buffer.c                 | 22 ++++++++++------------
- fs/gfs2/aops.c              |  2 +-
- include/linux/buffer_head.h |  4 +---
- 3 files changed, 12 insertions(+), 16 deletions(-)
+ fs/hfs/inode.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 2e69f0ddca37..d5ce6b29c893 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -372,10 +372,10 @@ static void end_buffer_async_read_io(struct buffer_head *bh, int uptodate)
- }
+diff --git a/fs/hfs/inode.c b/fs/hfs/inode.c
+index a7bc4690a780..8c34798a0715 100644
+--- a/fs/hfs/inode.c
++++ b/fs/hfs/inode.c
+@@ -29,11 +29,6 @@ static const struct inode_operations hfs_file_inode_operations;
  
- /*
-- * Completion handler for block_write_full_folio() - pages which are unlocked
-- * during I/O, and which have PageWriteback cleared upon I/O completion.
-+ * Completion handler for block_write_full_folio() - folios which are unlocked
-+ * during I/O, and which have the writeback flag cleared upon I/O completion.
-  */
--void end_buffer_async_write(struct buffer_head *bh, int uptodate)
-+static void end_buffer_async_write(struct buffer_head *bh, int uptodate)
+ #define HFS_VALID_MODE_BITS  (S_IFREG | S_IFDIR | S_IRWXUGO)
+ 
+-static int hfs_writepage(struct page *page, struct writeback_control *wbc)
+-{
+-	return block_write_full_page(page, hfs_get_block, wbc);
+-}
+-
+ static int hfs_read_folio(struct file *file, struct folio *folio)
  {
- 	unsigned long flags;
- 	struct buffer_head *first;
-@@ -415,7 +415,6 @@ void end_buffer_async_write(struct buffer_head *bh, int uptodate)
- 	spin_unlock_irqrestore(&first->b_uptodate_lock, flags);
- 	return;
- }
--EXPORT_SYMBOL(end_buffer_async_write);
- 
- /*
-  * If a page's buffers are under async readin (end_buffer_async_read
-@@ -1787,8 +1786,7 @@ static struct buffer_head *folio_create_buffers(struct folio *folio,
-  * causes the writes to be flagged as synchronous writes.
-  */
- int __block_write_full_folio(struct inode *inode, struct folio *folio,
--			get_block_t *get_block, struct writeback_control *wbc,
--			bh_end_io_t *handler)
-+			get_block_t *get_block, struct writeback_control *wbc)
- {
- 	int err;
- 	sector_t block;
-@@ -1867,7 +1865,8 @@ int __block_write_full_folio(struct inode *inode, struct folio *folio,
- 			continue;
- 		}
- 		if (test_clear_buffer_dirty(bh)) {
--			mark_buffer_async_write_endio(bh, handler);
-+			mark_buffer_async_write_endio(bh,
-+				end_buffer_async_write);
- 		} else {
- 			unlock_buffer(bh);
- 		}
-@@ -1920,7 +1919,8 @@ int __block_write_full_folio(struct inode *inode, struct folio *folio,
- 		if (buffer_mapped(bh) && buffer_dirty(bh) &&
- 		    !buffer_delay(bh)) {
- 			lock_buffer(bh);
--			mark_buffer_async_write_endio(bh, handler);
-+			mark_buffer_async_write_endio(bh,
-+				end_buffer_async_write);
- 		} else {
- 			/*
- 			 * The buffer may have been set dirty during
-@@ -2704,8 +2704,7 @@ int block_write_full_folio(struct folio *folio, struct writeback_control *wbc,
- 
- 	/* Is the folio fully inside i_size? */
- 	if (folio_pos(folio) + folio_size(folio) <= i_size)
--		return __block_write_full_folio(inode, folio, get_block, wbc,
--					       end_buffer_async_write);
-+		return __block_write_full_folio(inode, folio, get_block, wbc);
- 
- 	/* Is the folio fully outside i_size? (truncate in progress) */
- 	if (folio_pos(folio) >= i_size) {
-@@ -2722,8 +2721,7 @@ int block_write_full_folio(struct folio *folio, struct writeback_control *wbc,
- 	 */
- 	folio_zero_segment(folio, offset_in_folio(folio, i_size),
- 			folio_size(folio));
--	return __block_write_full_folio(inode, folio, get_block, wbc,
--			end_buffer_async_write);
-+	return __block_write_full_folio(inode, folio, get_block, wbc);
- }
- 
- sector_t generic_block_bmap(struct address_space *mapping, sector_t block,
-diff --git a/fs/gfs2/aops.c b/fs/gfs2/aops.c
-index f986cd032b76..9914d7f54f7d 100644
---- a/fs/gfs2/aops.c
-+++ b/fs/gfs2/aops.c
-@@ -108,7 +108,7 @@ static int gfs2_write_jdata_folio(struct folio *folio,
- 				folio_size(folio));
- 
- 	return __block_write_full_folio(inode, folio, gfs2_get_block_noalloc,
--			wbc, end_buffer_async_write);
-+			wbc);
- }
- 
- /**
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index 396b2adf24bf..d78454a4dd1f 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -205,7 +205,6 @@ struct buffer_head *create_empty_buffers(struct folio *folio,
- 		unsigned long blocksize, unsigned long b_state);
- void end_buffer_read_sync(struct buffer_head *bh, int uptodate);
- void end_buffer_write_sync(struct buffer_head *bh, int uptodate);
--void end_buffer_async_write(struct buffer_head *bh, int uptodate);
- 
- /* Things to do with buffers at mapping->private_list */
- void mark_buffer_dirty_inode(struct buffer_head *bh, struct inode *inode);
-@@ -255,8 +254,7 @@ void block_invalidate_folio(struct folio *folio, size_t offset, size_t length);
- int block_write_full_folio(struct folio *folio, struct writeback_control *wbc,
- 		void *get_block);
- int __block_write_full_folio(struct inode *inode, struct folio *folio,
--			get_block_t *get_block, struct writeback_control *wbc,
--			bh_end_io_t *handler);
-+		get_block_t *get_block, struct writeback_control *wbc);
- int block_read_full_folio(struct folio *, get_block_t *);
- bool block_is_partially_uptodate(struct folio *, size_t from, size_t count);
- int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
+ 	return block_read_full_folio(folio, hfs_get_block);
+@@ -162,9 +157,10 @@ const struct address_space_operations hfs_btree_aops = {
+ 	.dirty_folio	= block_dirty_folio,
+ 	.invalidate_folio = block_invalidate_folio,
+ 	.read_folio	= hfs_read_folio,
+-	.writepage	= hfs_writepage,
++	.writepages	= hfs_writepages,
+ 	.write_begin	= hfs_write_begin,
+ 	.write_end	= generic_write_end,
++	.migrate_folio	= buffer_migrate_folio,
+ 	.bmap		= hfs_bmap,
+ 	.release_folio	= hfs_release_folio,
+ };
 -- 
 2.42.0
 
