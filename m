@@ -1,490 +1,186 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F067066AB4;
-	Thu, 14 Dec 2023 22:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3326381
+	for <linux-block@vger.kernel.org>; Fri, 15 Dec 2023 01:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N6P1wIES"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA425C433C7;
-	Thu, 14 Dec 2023 22:22:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZqmZXC+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1F53C433C8;
+	Fri, 15 Dec 2023 01:12:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702592524;
-	bh=XjcNC16Nyvaxi746s6pMS8kVZJFhhzEmZ1vgtDAy6Dg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N6P1wIESzFs2X6OPnIf12wLEuCncs9d6ybZuorOHrjfMG5XWl5WNoL39lLSMclz81
-	 NQLQqDBJh1BgZWDoUk7RcWCTZiomUv2081yfcRHAHJYXM88HF9Uj01y2guH/k8MjxA
-	 R4LgRj3mwJCWbuTaT9XNElcRtTVfDIhihJK2SyVh/7tesRpyduG6SPMjI4VMS2gDNL
-	 jn6gueKBa2FS4PTO1g+7l3hx8oDX6SeDP+RvMcLYFl3hmMs2u84fTdBK+A/w6GVW9y
-	 hz7yQI+DamHOxcW6XSU3x2uTDbLzY+niWqtlvGn6KWUk54T7e5bNsUkpf4hLATkcOK
-	 ZDhip303NZM5w==
-From: Song Liu <song@kernel.org>
-To: linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Song Liu <song@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Neil Brown <neilb@suse.de>,
-	Guoqing Jiang <guoqing.jiang@linux.dev>,
-	Mateusz Grzonka <mateusz.grzonka@intel.com>,
-	Jes Sorensen <jes@trained-monkey.org>
-Subject: [PATCH 3/3] md: Remove deprecated CONFIG_MD_FAULTY
-Date: Thu, 14 Dec 2023 14:21:07 -0800
-Message-Id: <20231214222107.2016042-4-song@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231214222107.2016042-1-song@kernel.org>
-References: <20231214222107.2016042-1-song@kernel.org>
+	s=k20201202; t=1702602751;
+	bh=+hLKxCa2jd16DkEj3MqN/F6Mq4Tok3K1MFItPFB9OfY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nZqmZXC+amM4u1alOvZv5tPPZaowAMHRkmHGWAi5+f9SLFfg10SfxwsEGiOdJeXfZ
+	 OmN+NAzC5zZWyrOtVW4nBzvOMMOCpAHl+1bgi+yZrCG2S/M7pfDILcxm9hyS03PZWR
+	 AtEiZ7v5AS8WmM5laCFCu3GnVLnhVlYEJ/TQeOz+mhpxmaYXngqbpqx2H3ZMyhL5Rw
+	 VnZOfOTfc00iWlhZNTiPpIOuxc/ySIqWC085BwzLyjfCYz0wnIDjxAOYAuAF2ouhrE
+	 cM2EGdVx9+z6wpr21BzElhpLYkbc5BCvTwjwRUJ1CSiAE2dIxPvJxWpWLFGzqR7n0O
+	 flH1O+sDB1Oew==
+Message-ID: <168ed2f4-cf58-4ee9-bfbb-449f06f7348d@kernel.org>
+Date: Fri, 15 Dec 2023 10:12:28 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block/mq-deadline: Disable I/O prioritization in
+ certain cases
+To: Jaegeuk Kim <jaegeuk@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+References: <686cc853-96e2-4aa4-8f68-fdcc5cdabbba@acm.org>
+ <20231212174802.GA30659@lst.de>
+ <5b7be2e9-3691-409d-abff-f1fbf04cef7d@acm.org>
+ <20231212181304.GA32666@lst.de>
+ <19cd459e-d79e-4ecd-8ec8-778be0066e84@acm.org> <20231212182613.GA1216@lst.de>
+ <ZXiual-UkUY4OWY2@google.com> <20231213155606.GA8748@lst.de>
+ <ZXnevBo4eIZEXbhK@google.com> <20231214085729.GA9099@lst.de>
+ <ZXs563M66THrUw50@google.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ZXs563M66THrUw50@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-md-faulty has been marked as deprecated for 2.5 years. Remove it.
+On 12/15/23 02:22, Jaegeuk Kim wrote:
+> On 12/14, Christoph Hellwig wrote:
+>> On Wed, Dec 13, 2023 at 08:41:32AM -0800, Jaegeuk Kim wrote:
+>>> I don't have any
+>>> concern to keep the same ioprio on writes, since handheld devices are mostly
+>>> sensitive to reads. So, if you have other use-cases using zoned writes which
+>>> require different ioprio on writes, I think you can suggest a knob to control
+>>> it by users.
+>>
+>> Get out of your little handheld world.  In Linux we need a generally usable
+>> I/O stack, and any feature exposed by the kernel and will be used quite
+>> differently than you imagine.
+>>
+>> Just like people will add reordering to the I/O stack that's not there
+>> right now (in addition to the ones your testing doesn't hit).  That
+>> doensn't mean we should avoid them - you genereally get better performance
+>> by not reordering without a good reason (like thotting), but especially
+>> in error handling paths or resource constrained environment they will
+>> hapen all over.  We've had this whole discussion with the I/O barriers
+>> that did not work for exactly the same reasons.
+>>
+>>>
+>>>>
+>>>>> it is essential to place the data per file to get better bandwidth. And for
+>>>>> NAND-based storage, filesystem is the right place to deal with the more efficient
+>>>>> garbage collecion based on the known data locations.
+>>>>
+>>>> And that works perfectly fine match for zone append.
+>>>
+>>> How that works, if the device gives random LBAs back to the adjacent data in
+>>> a file? And, how to make the LBAs into the sequential ones back?
+>>
+>> Why would your device pick random LBAs?  If you send a zone append to
+>> zone it will be written at the write pointer, which is absolutely not
+>> random.  All I/O written in a single write is going to be sequential,
+>> so just like for all other devices doing large sequential writes is
+>> important.  Multiple writes can get reordered, but if you havily hit
+>> the same zone you'd get the same effect in the file system allocator
+>> too.
+> 
+> How can you guarantee the device does not give any random LBAs? What'd> be the selling point of zone append to end users? Are you sure this can
+> give the better write trhought forever? Have you considered how to
+> implement this in device side such as FTL mapping overhead and garbage
+> collection leading to tail latencies?
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Neil Brown <neilb@suse.de>
-Cc: Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc: Mateusz Grzonka <mateusz.grzonka@intel.com>
-Cc: Jes Sorensen <jes@trained-monkey.org>
-Signed-off-by: Song Liu <song@kernel.org>
----
- drivers/md/Kconfig             |  10 -
- drivers/md/Makefile            |   2 -
- drivers/md/md-faulty.c         | 365 ---------------------------------
- include/uapi/linux/raid/md_u.h |   3 -
- 4 files changed, 380 deletions(-)
- delete mode 100644 drivers/md/md-faulty.c
+Answers to all your questions, in order:
 
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index de4f47fe5a03..f6dc2acdf1ed 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -159,16 +159,6 @@ config MD_RAID456
- 
- 	  If unsure, say Y.
- 
--config MD_FAULTY
--	tristate "Faulty test module for MD (deprecated)"
--	depends on BLK_DEV_MD
--	help
--	  The "faulty" module allows for a block device that occasionally returns
--	  read or write errors.  It is useful for testing.
--
--	  In unsure, say N.
--
--
- config MD_CLUSTER
- 	tristate "Cluster Support for MD"
- 	depends on BLK_DEV_MD
-diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-index 6287c73399e7..027d7cfeca3f 100644
---- a/drivers/md/Makefile
-+++ b/drivers/md/Makefile
-@@ -29,7 +29,6 @@ dm-zoned-y	+= dm-zoned-target.o dm-zoned-metadata.o dm-zoned-reclaim.o
- 
- md-mod-y	+= md.o md-bitmap.o
- raid456-y	+= raid5.o raid5-cache.o raid5-ppl.o
--faulty-y	+= md-faulty.o
- 
- # Note: link order is important.  All raid personalities
- # and must come before md.o, as they each initialise
-@@ -40,7 +39,6 @@ obj-$(CONFIG_MD_RAID0)		+= raid0.o
- obj-$(CONFIG_MD_RAID1)		+= raid1.o
- obj-$(CONFIG_MD_RAID10)		+= raid10.o
- obj-$(CONFIG_MD_RAID456)	+= raid456.o
--obj-$(CONFIG_MD_FAULTY)		+= faulty.o
- obj-$(CONFIG_MD_CLUSTER)	+= md-cluster.o
- obj-$(CONFIG_BCACHE)		+= bcache/
- obj-$(CONFIG_BLK_DEV_MD)	+= md-mod.o
-diff --git a/drivers/md/md-faulty.c b/drivers/md/md-faulty.c
-deleted file mode 100644
-index a039e8e20f55..000000000000
---- a/drivers/md/md-faulty.c
-+++ /dev/null
-@@ -1,365 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- * faulty.c : Multiple Devices driver for Linux
-- *
-- * Copyright (C) 2004 Neil Brown
-- *
-- * fautly-device-simulator personality for md
-- */
--
--
--/*
-- * The "faulty" personality causes some requests to fail.
-- *
-- * Possible failure modes are:
-- *   reads fail "randomly" but succeed on retry
-- *   writes fail "randomly" but succeed on retry
-- *   reads for some address fail and then persist until a write
-- *   reads for some address fail and then persist irrespective of write
-- *   writes for some address fail and persist
-- *   all writes fail
-- *
-- * Different modes can be active at a time, but only
-- * one can be set at array creation.  Others can be added later.
-- * A mode can be one-shot or recurrent with the recurrence being
-- * once in every N requests.
-- * The bottom 5 bits of the "layout" indicate the mode.  The
-- * remainder indicate a period, or 0 for one-shot.
-- *
-- * There is an implementation limit on the number of concurrently
-- * persisting-faulty blocks. When a new fault is requested that would
-- * exceed the limit, it is ignored.
-- * All current faults can be clear using a layout of "0".
-- *
-- * Requests are always sent to the device.  If they are to fail,
-- * we clone the bio and insert a new b_end_io into the chain.
-- */
--
--#define	WriteTransient	0
--#define	ReadTransient	1
--#define	WritePersistent	2
--#define	ReadPersistent	3
--#define	WriteAll	4 /* doesn't go to device */
--#define	ReadFixable	5
--#define	Modes	6
--
--#define	ClearErrors	31
--#define	ClearFaults	30
--
--#define AllPersist	100 /* internal use only */
--#define	NoPersist	101
--
--#define	ModeMask	0x1f
--#define	ModeShift	5
--
--#define MaxFault	50
--#include <linux/blkdev.h>
--#include <linux/module.h>
--#include <linux/raid/md_u.h>
--#include <linux/slab.h>
--#include "md.h"
--#include <linux/seq_file.h>
--
--
--static void faulty_fail(struct bio *bio)
--{
--	struct bio *b = bio->bi_private;
--
--	b->bi_iter.bi_size = bio->bi_iter.bi_size;
--	b->bi_iter.bi_sector = bio->bi_iter.bi_sector;
--
--	bio_put(bio);
--
--	bio_io_error(b);
--}
--
--struct faulty_conf {
--	int period[Modes];
--	atomic_t counters[Modes];
--	sector_t faults[MaxFault];
--	int	modes[MaxFault];
--	int nfaults;
--	struct md_rdev *rdev;
--};
--
--static int check_mode(struct faulty_conf *conf, int mode)
--{
--	if (conf->period[mode] == 0 &&
--	    atomic_read(&conf->counters[mode]) <= 0)
--		return 0; /* no failure, no decrement */
--
--
--	if (atomic_dec_and_test(&conf->counters[mode])) {
--		if (conf->period[mode])
--			atomic_set(&conf->counters[mode], conf->period[mode]);
--		return 1;
--	}
--	return 0;
--}
--
--static int check_sector(struct faulty_conf *conf, sector_t start, sector_t end, int dir)
--{
--	/* If we find a ReadFixable sector, we fix it ... */
--	int i;
--	for (i=0; i<conf->nfaults; i++)
--		if (conf->faults[i] >= start &&
--		    conf->faults[i] < end) {
--			/* found it ... */
--			switch (conf->modes[i] * 2 + dir) {
--			case WritePersistent*2+WRITE: return 1;
--			case ReadPersistent*2+READ: return 1;
--			case ReadFixable*2+READ: return 1;
--			case ReadFixable*2+WRITE:
--				conf->modes[i] = NoPersist;
--				return 0;
--			case AllPersist*2+READ:
--			case AllPersist*2+WRITE: return 1;
--			default:
--				return 0;
--			}
--		}
--	return 0;
--}
--
--static void add_sector(struct faulty_conf *conf, sector_t start, int mode)
--{
--	int i;
--	int n = conf->nfaults;
--	for (i=0; i<conf->nfaults; i++)
--		if (conf->faults[i] == start) {
--			switch(mode) {
--			case NoPersist: conf->modes[i] = mode; return;
--			case WritePersistent:
--				if (conf->modes[i] == ReadPersistent ||
--				    conf->modes[i] == ReadFixable)
--					conf->modes[i] = AllPersist;
--				else
--					conf->modes[i] = WritePersistent;
--				return;
--			case ReadPersistent:
--				if (conf->modes[i] == WritePersistent)
--					conf->modes[i] = AllPersist;
--				else
--					conf->modes[i] = ReadPersistent;
--				return;
--			case ReadFixable:
--				if (conf->modes[i] == WritePersistent ||
--				    conf->modes[i] == ReadPersistent)
--					conf->modes[i] = AllPersist;
--				else
--					conf->modes[i] = ReadFixable;
--				return;
--			}
--		} else if (conf->modes[i] == NoPersist)
--			n = i;
--
--	if (n >= MaxFault)
--		return;
--	conf->faults[n] = start;
--	conf->modes[n] = mode;
--	if (conf->nfaults == n)
--		conf->nfaults = n+1;
--}
--
--static bool faulty_make_request(struct mddev *mddev, struct bio *bio)
--{
--	struct faulty_conf *conf = mddev->private;
--	int failit = 0;
--
--	if (bio_data_dir(bio) == WRITE) {
--		/* write request */
--		if (atomic_read(&conf->counters[WriteAll])) {
--			/* special case - don't decrement, don't submit_bio_noacct,
--			 * just fail immediately
--			 */
--			bio_io_error(bio);
--			return true;
--		}
--
--		if (check_sector(conf, bio->bi_iter.bi_sector,
--				 bio_end_sector(bio), WRITE))
--			failit = 1;
--		if (check_mode(conf, WritePersistent)) {
--			add_sector(conf, bio->bi_iter.bi_sector,
--				   WritePersistent);
--			failit = 1;
--		}
--		if (check_mode(conf, WriteTransient))
--			failit = 1;
--	} else {
--		/* read request */
--		if (check_sector(conf, bio->bi_iter.bi_sector,
--				 bio_end_sector(bio), READ))
--			failit = 1;
--		if (check_mode(conf, ReadTransient))
--			failit = 1;
--		if (check_mode(conf, ReadPersistent)) {
--			add_sector(conf, bio->bi_iter.bi_sector,
--				   ReadPersistent);
--			failit = 1;
--		}
--		if (check_mode(conf, ReadFixable)) {
--			add_sector(conf, bio->bi_iter.bi_sector,
--				   ReadFixable);
--			failit = 1;
--		}
--	}
--
--	md_account_bio(mddev, &bio);
--	if (failit) {
--		struct bio *b = bio_alloc_clone(conf->rdev->bdev, bio, GFP_NOIO,
--						&mddev->bio_set);
--
--		b->bi_private = bio;
--		b->bi_end_io = faulty_fail;
--		bio = b;
--	} else
--		bio_set_dev(bio, conf->rdev->bdev);
--
--	submit_bio_noacct(bio);
--	return true;
--}
--
--static void faulty_status(struct seq_file *seq, struct mddev *mddev)
--{
--	struct faulty_conf *conf = mddev->private;
--	int n;
--
--	if ((n=atomic_read(&conf->counters[WriteTransient])) != 0)
--		seq_printf(seq, " WriteTransient=%d(%d)",
--			   n, conf->period[WriteTransient]);
--
--	if ((n=atomic_read(&conf->counters[ReadTransient])) != 0)
--		seq_printf(seq, " ReadTransient=%d(%d)",
--			   n, conf->period[ReadTransient]);
--
--	if ((n=atomic_read(&conf->counters[WritePersistent])) != 0)
--		seq_printf(seq, " WritePersistent=%d(%d)",
--			   n, conf->period[WritePersistent]);
--
--	if ((n=atomic_read(&conf->counters[ReadPersistent])) != 0)
--		seq_printf(seq, " ReadPersistent=%d(%d)",
--			   n, conf->period[ReadPersistent]);
--
--
--	if ((n=atomic_read(&conf->counters[ReadFixable])) != 0)
--		seq_printf(seq, " ReadFixable=%d(%d)",
--			   n, conf->period[ReadFixable]);
--
--	if ((n=atomic_read(&conf->counters[WriteAll])) != 0)
--		seq_printf(seq, " WriteAll");
--
--	seq_printf(seq, " nfaults=%d", conf->nfaults);
--}
--
--
--static int faulty_reshape(struct mddev *mddev)
--{
--	int mode = mddev->new_layout & ModeMask;
--	int count = mddev->new_layout >> ModeShift;
--	struct faulty_conf *conf = mddev->private;
--
--	if (mddev->new_layout < 0)
--		return 0;
--
--	/* new layout */
--	if (mode == ClearFaults)
--		conf->nfaults = 0;
--	else if (mode == ClearErrors) {
--		int i;
--		for (i=0 ; i < Modes ; i++) {
--			conf->period[i] = 0;
--			atomic_set(&conf->counters[i], 0);
--		}
--	} else if (mode < Modes) {
--		conf->period[mode] = count;
--		if (!count) count++;
--		atomic_set(&conf->counters[mode], count);
--	} else
--		return -EINVAL;
--	mddev->new_layout = -1;
--	mddev->layout = -1; /* makes sure further changes come through */
--	return 0;
--}
--
--static sector_t faulty_size(struct mddev *mddev, sector_t sectors, int raid_disks)
--{
--	WARN_ONCE(raid_disks,
--		  "%s does not support generic reshape\n", __func__);
--
--	if (sectors == 0)
--		return mddev->dev_sectors;
--
--	return sectors;
--}
--
--static int faulty_run(struct mddev *mddev)
--{
--	struct md_rdev *rdev;
--	int i;
--	struct faulty_conf *conf;
--
--	if (md_check_no_bitmap(mddev))
--		return -EINVAL;
--
--	conf = kmalloc(sizeof(*conf), GFP_KERNEL);
--	if (!conf)
--		return -ENOMEM;
--
--	for (i=0; i<Modes; i++) {
--		atomic_set(&conf->counters[i], 0);
--		conf->period[i] = 0;
--	}
--	conf->nfaults = 0;
--
--	rdev_for_each(rdev, mddev) {
--		conf->rdev = rdev;
--		disk_stack_limits(mddev->gendisk, rdev->bdev,
--				  rdev->data_offset << 9);
--	}
--
--	md_set_array_sectors(mddev, faulty_size(mddev, 0, 0));
--	mddev->private = conf;
--
--	faulty_reshape(mddev);
--
--	return 0;
--}
--
--static void faulty_free(struct mddev *mddev, void *priv)
--{
--	struct faulty_conf *conf = priv;
--
--	kfree(conf);
--}
--
--static struct md_personality faulty_personality =
--{
--	.name		= "faulty",
--	.level		= LEVEL_FAULTY,
--	.owner		= THIS_MODULE,
--	.make_request	= faulty_make_request,
--	.run		= faulty_run,
--	.free		= faulty_free,
--	.status		= faulty_status,
--	.check_reshape	= faulty_reshape,
--	.size		= faulty_size,
--};
--
--static int __init raid_init(void)
--{
--	return register_md_personality(&faulty_personality);
--}
--
--static void raid_exit(void)
--{
--	unregister_md_personality(&faulty_personality);
--}
--
--module_init(raid_init);
--module_exit(raid_exit);
--MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Fault injection personality for MD (deprecated)");
--MODULE_ALIAS("md-personality-10"); /* faulty */
--MODULE_ALIAS("md-faulty");
--MODULE_ALIAS("md-level--5");
-diff --git a/include/uapi/linux/raid/md_u.h b/include/uapi/linux/raid/md_u.h
-index b44bbc356643..7be89a4906e7 100644
---- a/include/uapi/linux/raid/md_u.h
-+++ b/include/uapi/linux/raid/md_u.h
-@@ -103,9 +103,6 @@ typedef struct mdu_array_info_s {
- 
- } mdu_array_info_t;
- 
--/* non-obvious values for 'level' */
--#define	LEVEL_FAULTY		(-5)
--
- /* we need a value for 'no level specified' and 0
-  * means 'raid0', so we need something else.  This is
-  * for internal use only
+1) Asking this is to me similar to asking how can one guarantee that the device
+gives back the data that was written... You are asking for guarantees that the
+device is not buggy. By definition, zone append will return the writen start LBA
+within the zone that the zone append command specified. And that start LBA will
+always be equal to the zone write pointer value when the device started
+executing the zone append command.
+
+2) When there is an FS, the user cannot know if the FS is using zone append or
+not, so the user should not care at all. If by "user" you mean "the file
+system", then it is a design decision. We already pointed out that generally
+speaking, zone append will be easier to use because it does not have ordering
+constraints.
+
+3) Yes, because the writes are always sequential, which is the least expensive
+pattern for the device internal as that only triggers minimal internal activity
+on the FTL, GC, weir leveling etc, at least for a decently designed device.
+
+4) See above. If the device interface forces the device user to always write
+sequentially, as mandated by a zoned device, then FTL, GC and weir leveling is
+minimized. The actual device internal GC that may or may not happen completely
+depend on how the device maps zones to flash super blocks. If the mapping is
+1:1, then GC will be nearly non-existent. If the mapping is not 1:1, then GC
+overhead may exist. The discussion should then be about the design choices of
+the device. The fact that the host chose zone append will not in anyway make
+things worse for the device. Even with regular writes the host must write
+sequentially, same as what zone append achieves (potentially a lot more easily).
+
+> My takeaway on the two approaches would be:
+>                   zone_append        zone_write
+> 		  -----------        ----------
+> LBA               from FTL           from filesystem
+> FTL mapping       Page-map           Zone-map
+
+Not sure what you mean here. zone append always returns an LBA from within the
+zone specified by the LBA in the command CDB. So mapping is still per zone. zone
+append is *NOT* a random write command. Zone append automatically implements
+sequential writing within a zone for the user. In the case of regular writes,
+the user must fully control sentimentality. In both cases the write pattern *is*
+sequential.
+
+> SRAM/DRAM needs   Large              Small
+
+There are no differences in this area because the FTL is the same for both. No
+changes, nothing special for zone append.
+
+> FTL GC            Required           Not required
+
+Incorrect. See above. That depends on the device mapping of zones to flash
+superblocks. And GC requirements are the same for both because the write pattern
+is identical: it is sequential within each zone being written. The user still
+controls which zone it wants to write. Zone append is not a magic command that
+chooses a target zone automatically.
+
+> Tail latencies    Exist              Not exisit
+
+Incorrect. They are the same and because of the lack of ordering requirement
+with zone append, if anything, zone append can give better latency.
+
+> GC Efficience     Worse              Better
+
+Nope. See above. Same.
+
+> Longevity         As-is              Longer
+> Discard cmd       Required           Not required
+
+There is no discard with zone devices. Only zone reset. So both are "not
+required" here.
+
+> Block complexity  Small              Large
+> Failure cases     Less exist         Exist
+> Fsck              Don't know         F2FS-TOOLS support
+> Filesystem        BTRFS support(?)   F2FS support
+
+Yes, btrfs data path uses zone append.
+
+> 
+> Given this, I took zone_write, especially for mobile devices, since we can
+> recover the unaligned writes in the corner cases by fsck. And, most benefit
+> would be getting rid of FTL mapping overhead which improves random read IOPs
+> significantly due to the lack of SRAM in low-end storages. And, longer lifetime
+> by mitigating garbage collection overhead is more important in mobile world.
+
+As mentioned, GC is not an issue, or rather, GC depends on how the device is
+designed, not on which type of write command the host uses. Writes are always
+sequential for both types !
+
+
 -- 
-2.34.1
+Damien Le Moal
+Western Digital Research
 
