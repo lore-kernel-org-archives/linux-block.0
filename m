@@ -1,164 +1,115 @@
-Received: from smtp.smtpout.orange.fr (smtp-29.smtpout.orange.fr [80.12.242.29])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F2330344
-	for <linux-block@vger.kernel.org>; Sat, 16 Dec 2023 13:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D094E3172E;
+	Sat, 16 Dec 2023 18:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="dUmPu60U"
-Received: from pop-os.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id EUC8rL1Hz45wtEUC8rBRUA; Sat, 16 Dec 2023 13:55:05 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1702731305;
-	bh=Fa9yeiiOVaCIdEktKvlcN06YmNgKcMNBNVzgkivBQlM=;
-	h=From:To:Cc:Subject:Date;
-	b=dUmPu60UhSREhpVkcpZzDVQ689zSfTU3NlsfqjtfvupSWZEOVLUDCpxKto0CSkdCS
-	 5Nnz1O4jZqfqJyS7xA65N7xp1/kmUYljw3x+tt45Q+MXE5cg9EsqdE9dgDSxhtWDXR
-	 5ppLEBsLOB+DvYlZOVH7klV4W/NwDXWvYLa0by1VEYun4K9rtAN1nBgZwQPFtY2Y8Q
-	 5RExd/d6mlgz104tZhfylYj2bgUpalB5Vc4RRgn1wUZ7H3/1NZYhjrRX5EdgAR2Ejd
-	 fw1JpwvUDvlszECy2petjXjIxYPQY4hb9TJES0C/R4AbPDK6PRLg1/a0xsKLhE9R3H
-	 X/1OmkPCMQwqA==
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 16 Dec 2023 13:55:05 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Shaohua Li <shli@fb.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] blk-throttle: Fix some potential string truncation in tg_prfill_limit()
-Date: Sat, 16 Dec 2023 13:54:56 +0100
-Message-Id: <0461f1d69c84cf5a98ae57012856dace757d319e.1702731206.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i9jmdFDq"
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-db99bad7745so1435840276.0;
+        Sat, 16 Dec 2023 10:17:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702750627; x=1703355427; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VvRVmZz0fw4sy81ISwg0UmUCzFZE4mCNoPdzHScTDrI=;
+        b=i9jmdFDq3mTzHWblmX+MWiK35gxF0zci04EM4L8xa0yrvNP4n36bb7oC9vQ6EVYtD/
+         m32x9SvC/IbYgPChVnogpk8NURIwV7pP5pY64VpfC50sii0w5ol5Q4rKoBHmHVJ+uBmS
+         VJa8rg3di5KMchkhfrsJ1+O65TJgt899jT7bgn92j5QSEST3CYRDlG3uhBqiOT9esv8F
+         IoQRFvtMYKf+HQQOu/08H1sHjzfB+lMIVrEvj+THEvMwlIWkx37yFhhrcsOcX+OxZt3z
+         OkmddB26/t5PvN8hIDmlMtozDIftEyn8ch09SioLduoPrhfDJhIX4j7f3emBc3Mb1oAr
+         73OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702750627; x=1703355427;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VvRVmZz0fw4sy81ISwg0UmUCzFZE4mCNoPdzHScTDrI=;
+        b=tQ8m3/KXSgyZ96WxmFlTOHPKuJipYNkZ4VbmQlvQXlKMjRmshH8K70pRgThkm4ChkJ
+         w/d2QsSdqMqz/DnXhXvCzC8aAkrkn478vDuAzvYlqz1QxGd8aIpI8hfebU+rMnWEF2q7
+         d/ICGw+1/4/IqGo9fbjJphEP9U2CCfWt5epA3tit3/+ubb+cb+K8mYFWlRtUGEOaq1st
+         HRzKA5MqM7U6tTpkw4aog16xgTSl4jthhdyuQOkOk6EJ01eODEMCwH7fvKArVJU72V/2
+         sLdCAKb2G0moakYObLHMFmRiepF+JMEiIXnfWwSNAEocMGhMGTQy/pY/693rMOOKONqE
+         Sugw==
+X-Gm-Message-State: AOJu0YwIS81zT16VfbSm8rJvs2v4c2jw3IjJHRZH29HI6S5cTP7YVlYw
+	px147zSP69NAWf2RyFpdGRTQTmfFvBYCRH14+qw=
+X-Google-Smtp-Source: AGHT+IFn9alYrc6pyynJlC3AzJi9+jW7Hyc4Xh9rzrTv9HUyVpLWeYI0lwWtoeqlkhu4lV+c1wb6aazE7dSYi/iN6fw=
+X-Received: by 2002:a25:5f03:0:b0:dbc:1b67:e358 with SMTP id
+ t3-20020a255f03000000b00dbc1b67e358mr8995770ybb.95.1702750626697; Sat, 16 Dec
+ 2023 10:17:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20231206100253.13100-1-joshi.k@samsung.com> <CGME20231206101050epcas5p2c8233030bbf74cef0166c7dfc0f41be7@epcas5p2.samsung.com>
+ <20231206100253.13100-3-joshi.k@samsung.com> <ZXpWOaxCRoF7dFis@kbusch-mbp>
+In-Reply-To: <ZXpWOaxCRoF7dFis@kbusch-mbp>
+From: Nitesh Shetty <nitheshshetty@gmail.com>
+Date: Sat, 16 Dec 2023 23:46:55 +0530
+Message-ID: <CAOSviJ2U_yTgvx5SBPvkOg0nZ8wNxRCJyLWZ_zBnN74HcDFA1A@mail.gmail.com>
+Subject: Re: [PATCH v18 02/12] Add infrastructure for copy offload in block
+ and request layer.
+To: Keith Busch <kbusch@kernel.org>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>, 
+	Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, martin.petersen@oracle.com, 
+	linux-scsi@vger.kernel.org, anuj1072538@gmail.com, gost.dev@samsung.com, 
+	mcgrof@kernel.org, Nitesh Shetty <nj.shetty@samsung.com>, 
+	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When compiled with W=1, we get:
-  block/blk-throttle.c: In function ‘tg_prfill_limit’:
-  block/blk-throttle.c:1539:74: error: ‘snprintf’ output may be truncated before the last format character [-Werror=format-truncation=]
-   1539 |                         snprintf(idle_time, sizeof(idle_time), " idle=%lu",
-        |                                                                          ^
-  block/blk-throttle.c:1539:25: note: ‘snprintf’ output between 8 and 27 bytes into a destination of size 26
-   1539 |                         snprintf(idle_time, sizeof(idle_time), " idle=%lu",
-        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   1540 |                                 tg->idletime_threshold_conf);
-        |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  block/blk-throttle.c:1546:43: error: ‘%lu’ directive output may be truncated writing between 1 and 20 bytes into a region of size 17 [-Werror=format-truncation=]
-   1546 |                                 " latency=%lu", tg->latency_target_conf);
-        |                                           ^~~
-  block/blk-throttle.c:1546:33: note: directive argument in the range [0, 18446744073709551614]
-   1546 |                                 " latency=%lu", tg->latency_target_conf);
-        |                                 ^~~~~~~~~~~~~~
-  block/blk-throttle.c:1545:25: note: ‘snprintf’ output between 11 and 30 bytes into a destination of size 26
-   1545 |                         snprintf(latency_time, sizeof(latency_time),
-        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   1546 |                                 " latency=%lu", tg->latency_target_conf);
-        |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>On Thu, Dec 14, 2023 at 6:41=E2=80=AFAM Keith Busch <kbusch@kernel.org> w=
+rote:
+>>>
+>>> On Wed, Dec 06, 2023 at 03:32:34PM +0530, Kanchan Joshi wrote:
+>>> >  static inline bool bio_has_data(struct bio *bio)
+>>> >  {
+>>> > -     if (bio &&
+>>> > -         bio->bi_iter.bi_size &&
+>>> > -         bio_op(bio) !=3D REQ_OP_DISCARD &&
+>>> > -         bio_op(bio) !=3D REQ_OP_SECURE_ERASE &&
+>>> > -         bio_op(bio) !=3D REQ_OP_WRITE_ZEROES)
+>>> > +     if (bio && (bio_op(bio) =3D=3D REQ_OP_READ || bio_op(bio) =3D=
+=3D REQ_OP_WRITE))
+>>> >               return true;
+>>>
+>>> There are other ops besides READ and WRITE that have data, but this is
+>>> might be fine by the fact that other ops with data currently don't call
+>>> this function.
+>>>
+>>> > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>>> > index 7c2316c91cbd..bd821eaa7a02 100644
+>>> > --- a/include/linux/blk_types.h
+>>> > +++ b/include/linux/blk_types.h
+>>> > @@ -393,6 +393,10 @@ enum req_op {
+>>> >       /* reset all the zone present on the device */
+>>> >       REQ_OP_ZONE_RESET_ALL   =3D (__force blk_opf_t)17,
+>>> >
+>>> > +     /* copy offload dst and src operation */
+>>> > +     REQ_OP_COPY_SRC         =3D (__force blk_opf_t)19,
+>>>
+>>> Should this be an even numbered OP? The odd ones are for data
+>>> WRITEs.
 
-In order to fix it, remove all the intermediate buffers and write directly
-into the 'sf' seq_file.
+Our request opcode needs to be write based(even) so that while forming nvme=
+-tcp
+packets we send this as part of the nvme capsule.
 
-Fixes: ada75b6e5b2a ("blk-throttle: add interface to configure idle time threshold")
-Fixes: ec80991d6fc2 ("blk-throttle: add interface for per-cgroup target latency")
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- block/blk-throttle.c | 52 +++++++++++++++++++++++++-------------------
- 1 file changed, 30 insertions(+), 22 deletions(-)
+But now I think this design can be simplified as you suggested, if we align
+COPY_SRC to even and COPY_DST to odd. This requires us to change the design=
+ by
+sending dst bio first hence forming a write based request, followed by
+src bio's.
+Will send a follow up series next week fixing this.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 16f5766620a4..470a8a4ed68e 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1494,11 +1494,8 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- {
- 	struct throtl_grp *tg = pd_to_tg(pd);
- 	const char *dname = blkg_dev_name(pd->blkg);
--	char bufs[4][21] = { "max", "max", "max", "max" };
- 	u64 bps_dft;
- 	unsigned int iops_dft;
--	char idle_time[26] = "";
--	char latency_time[26] = "";
- 
- 	if (!dname)
- 		return 0;
-@@ -1520,35 +1517,46 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- 	      tg->latency_target_conf == DFL_LATENCY_TARGET)))
- 		return 0;
- 
-+	seq_printf(sf, "%s", dname);
-+
-+	seq_puts(sf, " rbps=");
- 	if (tg->bps_conf[READ][off] != U64_MAX)
--		snprintf(bufs[0], sizeof(bufs[0]), "%llu",
--			tg->bps_conf[READ][off]);
-+		seq_printf(sf, "%llu", tg->bps_conf[READ][off]);
-+	else
-+		seq_puts(sf, "max");
-+
-+	seq_puts(sf, " wbps=");
- 	if (tg->bps_conf[WRITE][off] != U64_MAX)
--		snprintf(bufs[1], sizeof(bufs[1]), "%llu",
--			tg->bps_conf[WRITE][off]);
-+		seq_printf(sf, "%llu", tg->bps_conf[WRITE][off]);
-+	else
-+		seq_puts(sf, "max");
-+
-+	seq_puts(sf, " riops=");
- 	if (tg->iops_conf[READ][off] != UINT_MAX)
--		snprintf(bufs[2], sizeof(bufs[2]), "%u",
--			tg->iops_conf[READ][off]);
-+		seq_printf(sf, "%u", tg->iops_conf[READ][off]);
-+	else
-+		seq_puts(sf, "max");
-+
-+	seq_puts(sf, " wiops=");
- 	if (tg->iops_conf[WRITE][off] != UINT_MAX)
--		snprintf(bufs[3], sizeof(bufs[3]), "%u",
--			tg->iops_conf[WRITE][off]);
-+		seq_printf(sf, "%u", tg->iops_conf[WRITE][off]);
-+	else
-+		seq_puts(sf, "max");
-+
- 	if (off == LIMIT_LOW) {
--		if (tg->idletime_threshold_conf == ULONG_MAX)
--			strcpy(idle_time, " idle=max");
-+		seq_puts(sf, " idle=");
-+		if (tg->idletime_threshold_conf != ULONG_MAX)
-+			seq_printf(sf, "%lu", tg->idletime_threshold_conf);
- 		else
--			snprintf(idle_time, sizeof(idle_time), " idle=%lu",
--				tg->idletime_threshold_conf);
-+			seq_puts(sf, "max");
- 
--		if (tg->latency_target_conf == ULONG_MAX)
--			strcpy(latency_time, " latency=max");
-+		seq_puts(sf, " latency=");
-+		if (tg->latency_target_conf != ULONG_MAX)
-+			seq_printf(sf, "%lu", tg->latency_target_conf);
- 		else
--			snprintf(latency_time, sizeof(latency_time),
--				" latency=%lu", tg->latency_target_conf);
-+			seq_puts(sf, "max");
- 	}
- 
--	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s%s%s\n",
--		   dname, bufs[0], bufs[1], bufs[2], bufs[3], idle_time,
--		   latency_time);
- 	return 0;
- }
- 
--- 
-2.34.1
-
+Thank you,
+Nitesh Shetty
