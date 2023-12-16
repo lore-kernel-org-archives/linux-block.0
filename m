@@ -1,115 +1,92 @@
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D094E3172E;
-	Sat, 16 Dec 2023 18:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F19A1E48F
+	for <linux-block@vger.kernel.org>; Sat, 16 Dec 2023 20:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i9jmdFDq"
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-db99bad7745so1435840276.0;
-        Sat, 16 Dec 2023 10:17:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="p7hZXBtq"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ce6f4d3dafso432818b3a.0
+        for <linux-block@vger.kernel.org>; Sat, 16 Dec 2023 12:51:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702750627; x=1703355427; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VvRVmZz0fw4sy81ISwg0UmUCzFZE4mCNoPdzHScTDrI=;
-        b=i9jmdFDq3mTzHWblmX+MWiK35gxF0zci04EM4L8xa0yrvNP4n36bb7oC9vQ6EVYtD/
-         m32x9SvC/IbYgPChVnogpk8NURIwV7pP5pY64VpfC50sii0w5ol5Q4rKoBHmHVJ+uBmS
-         VJa8rg3di5KMchkhfrsJ1+O65TJgt899jT7bgn92j5QSEST3CYRDlG3uhBqiOT9esv8F
-         IoQRFvtMYKf+HQQOu/08H1sHjzfB+lMIVrEvj+THEvMwlIWkx37yFhhrcsOcX+OxZt3z
-         OkmddB26/t5PvN8hIDmlMtozDIftEyn8ch09SioLduoPrhfDJhIX4j7f3emBc3Mb1oAr
-         73OA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1702759880; x=1703364680; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UUxs9NMgV2od0wAPMGRXIqwkmFJ7SC5aOaZmQ30f1bI=;
+        b=p7hZXBtqilk8a9Eo8gkmtxg0UZ6L2XB6ixBpI+aJs+DdnmyagfOqc+U1PcR/jbF8wD
+         hwmmXv4Fce6qUIPfdnisRTnBUM9uiZRiouUpRG5qeO3pXcARGNiseYpdC1dFr8LGsxhT
+         DR7LhPJgrKoLQucrfMXt57TbBGEZnmg1MssbFaiYDy86KoNXpNFcntGGZnlEPsO87XCR
+         bgpBUToqUfWjJLHXZ+MzxqMffQ45nO7Qh6kWtXugW9tahIBQSc5SHHx86pkDHilUQ2Aa
+         8J15zdChSGfWiNTRLM+p+zw90Pg8aHln/Q/hXj7K8q9hjAnMh1Wz+qGeWoXSwajPFlqh
+         PO2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702750627; x=1703355427;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VvRVmZz0fw4sy81ISwg0UmUCzFZE4mCNoPdzHScTDrI=;
-        b=tQ8m3/KXSgyZ96WxmFlTOHPKuJipYNkZ4VbmQlvQXlKMjRmshH8K70pRgThkm4ChkJ
-         w/d2QsSdqMqz/DnXhXvCzC8aAkrkn478vDuAzvYlqz1QxGd8aIpI8hfebU+rMnWEF2q7
-         d/ICGw+1/4/IqGo9fbjJphEP9U2CCfWt5epA3tit3/+ubb+cb+K8mYFWlRtUGEOaq1st
-         HRzKA5MqM7U6tTpkw4aog16xgTSl4jthhdyuQOkOk6EJ01eODEMCwH7fvKArVJU72V/2
-         sLdCAKb2G0moakYObLHMFmRiepF+JMEiIXnfWwSNAEocMGhMGTQy/pY/693rMOOKONqE
-         Sugw==
-X-Gm-Message-State: AOJu0YwIS81zT16VfbSm8rJvs2v4c2jw3IjJHRZH29HI6S5cTP7YVlYw
-	px147zSP69NAWf2RyFpdGRTQTmfFvBYCRH14+qw=
-X-Google-Smtp-Source: AGHT+IFn9alYrc6pyynJlC3AzJi9+jW7Hyc4Xh9rzrTv9HUyVpLWeYI0lwWtoeqlkhu4lV+c1wb6aazE7dSYi/iN6fw=
-X-Received: by 2002:a25:5f03:0:b0:dbc:1b67:e358 with SMTP id
- t3-20020a255f03000000b00dbc1b67e358mr8995770ybb.95.1702750626697; Sat, 16 Dec
- 2023 10:17:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702759880; x=1703364680;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UUxs9NMgV2od0wAPMGRXIqwkmFJ7SC5aOaZmQ30f1bI=;
+        b=Ec4dlNa37vX4HaOegUACPWA6KrH7MwkfmIwvCoDU0rCiU0kVhuIqQeDzIfbAcpwIvf
+         +09JKeQ1VuEqnTPG2GyaUji8MknfxzSaNfonP3nq1Nbm0RPApGSiS7+RmhHzscRkR1It
+         Z0iuJeN2zSItwNEjUC4pKrfJ80ExxlCb6+bIog/oUOg4yAHv/E4K04yL7hrMW+xp2wq6
+         c6gs/gVI+G7UdT1fEBya8xw9IcWJcH5PBl8nbKVjT1BeL/Huet82kHZfZVlIYy+/4cAo
+         793RwIeXSF9/GEXi51RNinq+jT904Xq/vwfNR/ynHtA5UxrE9fonX81J+uxpPQlVkcNe
+         +elw==
+X-Gm-Message-State: AOJu0YyY30pPne0gB/05UU2B4hLgKlWLBh3nu8KQ52ZBpVhU3rG4mfXj
+	uf0shN4OSfhLn/6fFFuMQ4ddRw==
+X-Google-Smtp-Source: AGHT+IFM41eA1W6KpzXbrZaSAx+vtqUc15fi/kSiO5Tuskzb7LXFKv1+yQZanPIuUHcpd55ejgIsVg==
+X-Received: by 2002:a05:6a00:460c:b0:6cd:dfff:19b6 with SMTP id ko12-20020a056a00460c00b006cddfff19b6mr29929295pfb.2.1702759879797;
+        Sat, 16 Dec 2023 12:51:19 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id x6-20020aa784c6000000b006bd26bdc909sm15575923pfn.72.2023.12.16.12.51.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 Dec 2023 12:51:18 -0800 (PST)
+Message-ID: <226bdceb-e981-4a76-8912-bb5ec819ab78@kernel.dk>
+Date: Sat, 16 Dec 2023 13:51:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206100253.13100-1-joshi.k@samsung.com> <CGME20231206101050epcas5p2c8233030bbf74cef0166c7dfc0f41be7@epcas5p2.samsung.com>
- <20231206100253.13100-3-joshi.k@samsung.com> <ZXpWOaxCRoF7dFis@kbusch-mbp>
-In-Reply-To: <ZXpWOaxCRoF7dFis@kbusch-mbp>
-From: Nitesh Shetty <nitheshshetty@gmail.com>
-Date: Sat, 16 Dec 2023 23:46:55 +0530
-Message-ID: <CAOSviJ2U_yTgvx5SBPvkOg0nZ8wNxRCJyLWZ_zBnN74HcDFA1A@mail.gmail.com>
-Subject: Re: [PATCH v18 02/12] Add infrastructure for copy offload in block
- and request layer.
-To: Keith Busch <kbusch@kernel.org>
-Cc: Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>, 
-	Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, martin.petersen@oracle.com, 
-	linux-scsi@vger.kernel.org, anuj1072538@gmail.com, gost.dev@samsung.com, 
-	mcgrof@kernel.org, Nitesh Shetty <nj.shetty@samsung.com>, 
-	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/14] Clean up the writeback paths
+Content-Language: en-US
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20231215200245.748418-1-willy@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231215200245.748418-1-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
->>On Thu, Dec 14, 2023 at 6:41=E2=80=AFAM Keith Busch <kbusch@kernel.org> w=
-rote:
->>>
->>> On Wed, Dec 06, 2023 at 03:32:34PM +0530, Kanchan Joshi wrote:
->>> >  static inline bool bio_has_data(struct bio *bio)
->>> >  {
->>> > -     if (bio &&
->>> > -         bio->bi_iter.bi_size &&
->>> > -         bio_op(bio) !=3D REQ_OP_DISCARD &&
->>> > -         bio_op(bio) !=3D REQ_OP_SECURE_ERASE &&
->>> > -         bio_op(bio) !=3D REQ_OP_WRITE_ZEROES)
->>> > +     if (bio && (bio_op(bio) =3D=3D REQ_OP_READ || bio_op(bio) =3D=
-=3D REQ_OP_WRITE))
->>> >               return true;
->>>
->>> There are other ops besides READ and WRITE that have data, but this is
->>> might be fine by the fact that other ops with data currently don't call
->>> this function.
->>>
->>> > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
->>> > index 7c2316c91cbd..bd821eaa7a02 100644
->>> > --- a/include/linux/blk_types.h
->>> > +++ b/include/linux/blk_types.h
->>> > @@ -393,6 +393,10 @@ enum req_op {
->>> >       /* reset all the zone present on the device */
->>> >       REQ_OP_ZONE_RESET_ALL   =3D (__force blk_opf_t)17,
->>> >
->>> > +     /* copy offload dst and src operation */
->>> > +     REQ_OP_COPY_SRC         =3D (__force blk_opf_t)19,
->>>
->>> Should this be an even numbered OP? The odd ones are for data
->>> WRITEs.
+On 12/15/23 1:02 PM, Matthew Wilcox (Oracle) wrote:
+> I don't think any of this conflicts with the writeback refactoring that
+> Christoph has kindly taken over from me, although we might want to redo
+> patch 13 on that infrastructure rather than using write_cache_pages().
+> That can be a later addition.
+> 
+> Most of these patches verge on the trivial, converting filesystems that
+> just use block_write_full_page() to use mpage_writepages().  But as we
+> saw with Christoph's earlier patchset, there can be some "interesting"
+> gotchas, and I clearly haven't tested the majority of filesystems I've
+> touched here.
+> 
+> Patches 3 & 4 get rid of a lot of stack usage on architectures with
+> larger page sizes; 1024 bytes on 64-bit systems with 64KiB pages.
+> It starts to open the door to larger folio sizes on all architectures,
+> but it's certainly not enough yet.
+> 
+> Patch 14 is kind of trivial, but it's nice to get that simplification in.
 
-Our request opcode needs to be write based(even) so that while forming nvme=
--tcp
-packets we send this as part of the nvme capsule.
+Series looks good to me:
 
-But now I think this design can be simplified as you suggested, if we align
-COPY_SRC to even and COPY_DST to odd. This requires us to change the design=
- by
-sending dst bio first hence forming a write based request, followed by
-src bio's.
-Will send a follow up series next week fixing this.
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-Thank you,
-Nitesh Shetty
+-- 
+Jens Axboe
+
+
