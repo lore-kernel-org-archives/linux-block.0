@@ -1,104 +1,60 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FAD14A83;
-	Sat, 16 Dec 2023 05:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PftWoVll"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=DRzD28PnFYkXAjvTslH+uCrYblRpF/G5LiUv3oBCMWs=; b=PftWoVllvpIbDKadTZVhY2eDGq
-	w79/fVfbaA5r3Jr9tL5NZVbgypqSjw5GFHuVwMuV/4rdTtFDYEIX8sRMFXpRXJ6b3XooC9ZoSXAev
-	YuzSPwdbp39dK41y74oo1qJUPxYjsRI71Xnl9sPAYVpa1vaoEeva2qqOhH0OtJVHu8VE+/pI6pZyb
-	RUEd5Id2I3+b3WZXWWAJiWZr3BzUjX0Ai6hC6OgrDoUrxZOtniZggBl7/zc3XBwPcopm/XbKNGDJS
-	Hd2JHQTRWbIdoHNIqn5/+4exygwxiRUtsebf2Lmt7syk7+gh6BvKD8Dn/Mq8+ouN1BEzL/kgXVI8+
-	GUrTd+nw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rENbu-007RNq-3X; Sat, 16 Dec 2023 05:53:14 +0000
-Date: Sat, 16 Dec 2023 05:53:14 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: syzbot <syzbot+8b23309d5788a79d3eea@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [block?] general protection fault in bio_first_folio
-Message-ID: <ZX07SsSqIQ2TYwEi@casper.infradead.org>
-References: <0000000000006c14cd060c99ac12@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5214112B95
+	for <linux-block@vger.kernel.org>; Sat, 16 Dec 2023 07:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7b7a772c238so136207839f.1
+        for <linux-block@vger.kernel.org>; Fri, 15 Dec 2023 23:01:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702710066; x=1703314866;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2symkoABZo9KBUb95detvKFvty4ZqZmJTKfJJWUeVe4=;
+        b=SuN6PZ0vdTZ0HWKmD94E1hXSdAjBanZ37l3bgxbVF0Nww83r5oPS6HBqktnG6kBGdn
+         xn7Zajz6HLkifQ9FWUNMKtb3iJeozRLj2jJolF6bYMVUksFio54CY/8eFp+a4k1V+1RW
+         bo6neeT3idqsWAYUAWutSZG9DfrEL9uwpdcJc5xZNOTsXzwiRpHipYelnLSifi5Z+xnf
+         /LCmBWQPC0kCfeRx3WzNR5wAaBYKPWhrwAbmEV9q77bW0git9k2LP3Q08VVirOcHfKbS
+         LzXoM3TsXhm/2hE9kalgi/IGFboQ8rEWhLsHkVyWtva7nU3CISIJbSH0b9m9rtfcTIbe
+         FYUA==
+X-Gm-Message-State: AOJu0Yyc4bakrYcVwibJPQHocgUJbvYZocJPyCd723dLCKSvMFrQXwB/
+	3b00hMrqufr4AFyLoPUv73HSCPaDR/fVzG5M7vygd+NLIVPF
+X-Google-Smtp-Source: AGHT+IFDTQZKM8MkHiZbvf0PQPwG878U6Op6VjeV1G7vEM2O82OXpfqWxu9PwWziMfQLTHa6denV+V1mAwM2FEohUxsiGZldDCox
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000006c14cd060c99ac12@google.com>
+X-Received: by 2002:a05:6638:1445:b0:469:2635:fd19 with SMTP id
+ l5-20020a056638144500b004692635fd19mr526208jad.0.1702710066544; Fri, 15 Dec
+ 2023 23:01:06 -0800 (PST)
+Date: Fri, 15 Dec 2023 23:01:06 -0800
+In-Reply-To: <ZX07SsSqIQ2TYwEi@casper.infradead.org>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ac07c2060c9b1453@google.com>
+Subject: Re: [syzbot] [block?] general protection fault in bio_first_folio
+From: syzbot <syzbot+8b23309d5788a79d3eea@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, willy@infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Dec 15, 2023 at 09:20:22PM -0800, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
+Hello,
 
-Good bot.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-> commit 1b151e2435fc3a9b10c8946c6aebe9f3e1938c55
-> Author: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Date:   Mon Aug 14 14:41:00 2023 +0000
-> 
->     block: Remove special-casing of compound pages
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=152f8a8ee80000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=172f8a8ee80000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=132f8a8ee80000
-> 
-> general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
-> KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+Reported-and-tested-by: syzbot+8b23309d5788a79d3eea@syzkaller.appspotmail.com
 
-I _think_ what's happened here is that __bio_release_pages() was called
-with a zero-length bio.
+Tested on:
 
-> CPU: 0 PID: 5059 Comm: syz-executor696 Not tainted 6.7.0-rc5-next-20231212-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-> RIP: 0010:_compound_head include/linux/page-flags.h:247 [inline]
-> RIP: 0010:bio_first_folio+0xcb/0x5c0 include/linux/bio.h:289
+commit:         abb240f7 Add linux-next specific files for 20231212
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13d005c6e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cc2485c21b49ddc4
+dashboard link: https://syzkaller.appspot.com/bug?extid=8b23309d5788a79d3eea
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=12d24771e80000
 
-... bio_first_folio() doesn't handle it well, whereas
-bio_for_each_segment_all() did.
-
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-
-#syz test git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next abb240f7a2bd
-
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index ec4db73e5f4e..1518f1201ddd 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -286,6 +286,11 @@ static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
- {
- 	struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
- 
-+	if (i >= bio->bi_vcnt) {
-+		fi->folio = NULL;
-+		return;
-+	}
-+
- 	fi->folio = page_folio(bvec->bv_page);
- 	fi->offset = bvec->bv_offset +
- 			PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
-@@ -303,10 +308,8 @@ static inline void bio_next_folio(struct folio_iter *fi, struct bio *bio)
- 		fi->offset = 0;
- 		fi->length = min(folio_size(fi->folio), fi->_seg_count);
- 		fi->_next = folio_next(fi->folio);
--	} else if (fi->_i + 1 < bio->bi_vcnt) {
--		bio_first_folio(fi, bio, fi->_i + 1);
- 	} else {
--		fi->folio = NULL;
-+		bio_first_folio(fi, bio, fi->_i + 1);
- 	}
- }
- 
+Note: testing is done by a robot and is best-effort only.
