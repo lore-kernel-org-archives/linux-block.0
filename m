@@ -1,129 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB9436E;
-	Sun, 17 Dec 2023 00:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BC01C17;
+	Sun, 17 Dec 2023 08:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QfOyjAO3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A96C433C7;
-	Sun, 17 Dec 2023 00:28:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702772905;
-	bh=h2sz8/dtn/sHq1qOGU4fOqWx6jU4GBXGdvx3X6TskjI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=QfOyjAO3Ynvi8JGe+6JpF0MRhhbQIQv/Qo5LgeXRZl0WxMIgHUssSGsFGEI6gu+r9
-	 19JkJv8KNXty2F/o1vusOVekAnH5KAFMMZlklb/C+wGZDzFDsp/pqyPcgt+V2T9flE
-	 0t5yidAH+hRIEDV2bkmshyiYabfuYMG/ID0UIX6pI2FKPytv2WDSZk+xZ9VO5+XuCl
-	 U4xv/cjlj+7N8jHI0KZOYJBdoFByvFzQLMDaXEbhIfNYYzXl4rg7bm7kotgj36JB9r
-	 HEaHpD6/BTLmVcYAvWFc/n9wSrztmosoZZAaSlS6O6tV4DHuZPFNZNhYEQ9ocARtsn
-	 IfpCPGasVbBVw==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ca1e6a94a4so21717051fa.0;
-        Sat, 16 Dec 2023 16:28:25 -0800 (PST)
-X-Gm-Message-State: AOJu0Yz9P0TWGZLbt2xPE6tW/9UhGTCNoMt3VGoXl4ca8+CT6Ig03A8E
-	Gp3nwg7Z8XvAk+aL/mMs4VgTZwpmZ9qwZjaz9Qg=
-X-Google-Smtp-Source: AGHT+IGEdZWD6qEzZOAoX3ZcDKN8EJFuv4Nn4W8FsCrhE7zJJ5BDgJwr3IKUz17DVeBG5rVGrsQWyfFF2rcVPqUqIbw=
-X-Received: by 2002:a2e:b74b:0:b0:2cc:2f4e:a146 with SMTP id
- k11-20020a2eb74b000000b002cc2f4ea146mr3510864ljo.53.1702772903626; Sat, 16
- Dec 2023 16:28:23 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="c8u6Ajyy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1702802246; bh=Cu0nA0cgoDEd9tG8+d+j50FSTxVeILTQkKFvK9DqtUM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=c8u6AjyyLwuw/cwAd//5d6Ts+Rokd2xosKplpbJeXFMed2SZYBabFSnHloObEStjM
+	 n+hc4Ob6rlcGpMzIbPEGOKJgwVcVEJ9pdsuBSHY+DSO/h76nyAsWPa2htoQsFvHckc
+	 ju7kEIjZw2eibsdLeWCN0JA8/ywc3PYyaFcDDZe0=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.215])
+	by newxmesmtplogicsvrszc5-2.qq.com (NewEsmtp) with SMTP
+	id 881A00AA; Sun, 17 Dec 2023 16:34:01 +0800
+X-QQ-mid: xmsmtpt1702802041tao8s72lf
+Message-ID: <tencent_AB577926C13364C3696965A3A2244B776605@qq.com>
+X-QQ-XMAILINFO: OKkKo7I1HxIe+6yMR1GxFSCIgL66rhyDgy4IYmyvPR/d+QQ8fRyhjEbRyYCdlN
+	 TLsxTG1YWgseAAebyOzN4p2aVvm+Qv9dUyHdR0JCMpVpRIHlFA1xovgq5IluZnIAQNc0E6XEiFaK
+	 l8j6+krtL9tqBLC1uvaySDUBML6aECEzLVx7YfiVCFTwdyVaQ+ufunlI4AJCECVpQ8deqdP4hm2X
+	 J3n3eJdNZLPlv6v8qyRqXBET4L7kiiCQtIGns6SLeUdeaZ/we84Iz3pl6gRggDxnJVDWLBrJNDbL
+	 SlVRLtXzVc146/CbTW//UljvPWqkffbQkq0/L7tq/zI/vQPXEFnJsL8e5TmhuYdpucT4xAj2ADSv
+	 K2l68VecFyGFGuX7KpRosQkPCKsnoNLa9ihuxtf1QjCgpnWbQyTFFWWXzdKiJZYnqiH7oyjZ+BTs
+	 Kre2VQBcpP3SGdOQK9jPSkUDiT8H5TGxXNDysokQdQoeS8VUwLv+rAw5rdyRlCZlzyWVr/kJuG2W
+	 SbHnPFFDnJKFMezBMwuEYsHLt+eNZ0mJBLot/+0vgETNP/7JfKGENVrnHGrfcudv5UfsljL7nY7g
+	 6mlrSi4otzU0xQadPwJFhqPP7VZ7LRe5COjxjt+UNyEgRhoUdFkmcvCgzrKEiMB6pvQ1C3SjWBQp
+	 IUhyRNb+GyJk1DsQqNHFnhB5Ykw2A0cOeHoOvq8vNIryL4d/3d+Hj88OScYcjUwZjaSPQzJf+ET6
+	 9+xjhPYRWMZfxBHO90ubXQlsjKzZIzJYvoUcTUdvtBuvoG4wfs5xPjm9dkWpsP4VTXLWNP/PD4MN
+	 t5VIJDmFGWktb8NXozZs1BBlR/4LNj+vWLI5q0c/XavmE2bu7m0xybUUxXxAf1G7SxiM0l5hNG0B
+	 Vq2koLZWtFwtFzsOkWa8JaLEUETK0LIQ4+RyPhbpf8PNXrWyFja5nwdCQpFjkEO0KnVY7skWdnsC
+	 RHbRJl5Mk=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+4da851837827326a7cd4@syzkaller.appspotmail.com
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH next] nbd: fix task hung in bdev_release
+Date: Sun, 17 Dec 2023 16:34:02 +0800
+X-OQ-MSGID: <20231217083401.4160650-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <000000000000098af2060b5ff161@google.com>
+References: <000000000000098af2060b5ff161@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231215013931.3329455-1-linan666@huaweicloud.com>
- <20231215013931.3329455-2-linan666@huaweicloud.com> <CAPhsuW6VTvXy3L9CUhTrSC3+_-_n9FDVrtdzQ7SWWkukoQg13Q@mail.gmail.com>
- <be8d9147-4f7f-2fab-da2a-bb4cde46fd12@huaweicloud.com>
-In-Reply-To: <be8d9147-4f7f-2fab-da2a-bb4cde46fd12@huaweicloud.com>
-From: Song Liu <song@kernel.org>
-Date: Sat, 16 Dec 2023 16:28:11 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW6kv7FRB_1NoheiDqvmLmongiJ-ty9mYRNvFw3yecE_Ug@mail.gmail.com>
-Message-ID: <CAPhsuW6kv7FRB_1NoheiDqvmLmongiJ-ty9mYRNvFw3yecE_Ug@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] md: Fix overflow in is_mddev_idle
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linan666@huaweicloud.com, axboe@kernel.dk, linux-raid@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 15, 2023 at 6:24=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
-[...]
-> >>   static inline void md_sync_acct_bio(struct bio *bio, unsigned long n=
-r_sectors)
-> >> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> >> index 3f8a21cd9233..d28b98adf457 100644
-> >> --- a/include/linux/blkdev.h
-> >> +++ b/include/linux/blkdev.h
-> >> @@ -170,7 +170,7 @@ struct gendisk {
-> >>          struct list_head slave_bdevs;
-> >>   #endif
-> >>          struct timer_rand_state *random;
-> >> -       atomic_t sync_io;               /* RAID */
-> >> +       atomic64_t sync_io;             /* RAID */
-> >>          struct disk_events *ev;
-> >
-> > As we are on this, I wonder whether we really need this.
-> > AFAICT, is_mddev_idle() is the only consumer of sync_io.
-> > We can probably do the same check in is_mddev_idle()
-> > without sync_io.
->
-> After reviewing some code, what I'm understand is following:
->
-> I think 'sync_io' is used to distinguish 'sync io' from raid(this can
-> from different raid, for example, different partition is used for
-> different array) and other io(any io, even it's not from raid). And
-> if there are any other IO, sync speed is limited to min, otherwise it's
-> limited to max.
->
-> If we want to keep this behaviour, I can't think of any other way for
-> now...
+If the nbd timeout value is not set before calling nbd_start_device_ioctl(),
+so the socket will be disabled disconnection, which will cause the timer to 
+only be reset and cause this 143 second timeout issue.
 
-Thanks for looking into this. To keep current behavior, we will need it
-in gendisk.
+The solution I have provided here is to set the default timeout value for nbd in
+nbd_start_device() to avoid problems from occurring.
 
-[...]
+Reported-and-tested-by: syzbot+4da851837827326a7cd4@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ drivers/block/nbd.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> >> @@ -8496,14 +8496,15 @@ static int is_mddev_idle(struct mddev *mddev, =
-int init)
-> >>   {
-> >>          struct md_rdev *rdev;
-> >>          int idle;
-> >> -       int curr_events;
-> >> +       long long curr_events;
-> >>
-> >>          idle =3D 1;
-> >>          rcu_read_lock();
-> >>          rdev_for_each_rcu(rdev, mddev) {
-> >>                  struct gendisk *disk =3D rdev->bdev->bd_disk;
-> >> -               curr_events =3D (int)part_stat_read_accum(disk->part0,=
- sectors) -
-> >> -                             atomic_read(&disk->sync_io);
-> >> +               curr_events =3D
-> >> +                       (long long)part_stat_read_accum(disk->part0, s=
-ectors) -
-> >> +                             atomic64_read(&disk->sync_io);
->
-> By the way, I don't think this overflow is problematic, assume that
-> sectors accumulate by 'A' and sync_io accumulate by 'B':
->
-> (setros + A) - (sync_io + B) -(sectors - sync_io) =3D (A - B)
->
-> Nomatter overflow or truncation happened of not in the abouve addition
-> and subtraction, the result is correct.
->
-> And even if io accounting is disabled, which means sectors and A is
-> always 0, the result will always be -B that is <=3D 0, hence
-> is_mddev_idle() will always return true, and sync_speed will be limited
-> to max in this case.
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b6414e1e645b..31656364d8a3 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1394,6 +1394,9 @@ static int nbd_start_device(struct nbd_device *nbd)
+ 	}
+ 	set_bit(NBD_RT_HAS_PID_FILE, &config->runtime_flags);
+ 
++	if (num_connections == 1 && !nbd->tag_set.timeout)
++		nbd->tag_set.timeout = HZ * 1024;
++
+ 	nbd_dev_dbg_init(nbd);
+ 	for (i = 0; i < num_connections; i++) {
+ 		struct recv_thread_args *args;
+-- 
+2.43.0
 
-We only use  this for idle or not check, the behavior is OK (I think).
-However, this logic is error prone.
-
-On 64-bit systems, there is a 4-byte hole behind sync_io. I think we can
-just use it for atomic64_t so that we don't have to worry about overflow.
-
-Thanks,
-Song
