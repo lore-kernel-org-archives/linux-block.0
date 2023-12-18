@@ -1,51 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEC73D56F;
-	Mon, 18 Dec 2023 16:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638AA42390;
+	Mon, 18 Dec 2023 16:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgMvrh7w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C376C433C7;
-	Mon, 18 Dec 2023 16:09:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hm+Ex8Zi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5C57C433C8;
+	Mon, 18 Dec 2023 16:12:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702915741;
-	bh=cOm2dIgu3pqKuuN+O7eq+QXxoJeltRgUhvRQY2vvd60=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cgMvrh7wxDkB+PTk/oxopzMiU0neWJLcw6xW0BEPyw2Ux5Yv+ET+Dhu2eTaI13THS
-	 q4+aMFO2T4HGD2aW445NfDowVb75FMwEf0s71hC6cMPpZ2cH2+KTbwDIqv9icCbvuc
-	 9cO7CS3U7fG0TzpeirO/dJ6WDj8DXmfV7R2rAssYvYjqkwNjvG9w4ZcdwHaXOTCKU8
-	 PTq1l5+HYyGHA7JdaIAqQ6b87JyNwfpMkITrgJwaUyA2zTU7bI9R4joVZ0fbi7TooD
-	 870OMXighFFLmkwQY1/ecTzNot9Mpv/Xy8HKT1YTYgqQ4r/HZ8N0GXGKGFC179jP6L
-	 2EFC/qsH8aZsA==
-Date: Mon, 18 Dec 2023 09:08:58 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: axboe@kernel.dk, tj@kernel.org, hch@lst.de, linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org, Kundan Kumar <kundan.kumar@samsung.com>
-Subject: Re: [PATCH] block: skip cgroups for passthrough io
-Message-ID: <ZYBumts89QyXjzCu@kbusch-mbp.dhcp.thefacebook.com>
-References: <CGME20231218153411epcas5p15bfb9e24856b5d719501c375e2bf3897@epcas5p1.samsung.com>
- <20231218152722.1768-1-joshi.k@samsung.com>
+	s=k20201202; t=1702915926;
+	bh=+gDFHiUihVO9YBtJ8DDjinIUtn2dVVzpQVgSxl0p0lI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Hm+Ex8ZiURA0F5paydO7ZLLIg3KNQQlTFBJ0mw6XFkJlZz0Z8GltQT//tsgdtVJ1f
+	 yWpOK5soe6FtNz61AaJ2UjDAqWhyxOueiT+NHqHVaoq70dxYXKKPsJkiXaFsVyB+SX
+	 ZgvpxEDJNhJ5T3zufg2R1EI7oentL9EQntXtrRU06IykKyA7ncUCEzcDAcBjNV+poM
+	 BdKuO8M8ksN7Ccx4qFpiiftObmtA+bfPndtmPzOECOLHk7h2zfjPsrvHXPh1UuhObB
+	 d6XcyLAUnPmuVblEKfXGpaXz0Or3kPqPMpYf5uYbC8FNLDEVSbdVIjiINhzVRsvuxr
+	 4wSmFWSM0Evhg==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-50e3845abdaso1611300e87.3;
+        Mon, 18 Dec 2023 08:12:06 -0800 (PST)
+X-Gm-Message-State: AOJu0YxxcHHlvyKkBDH3JYA6yB6ZPiJkCQo/tIsN1pqcRtYz3G9iWjy1
+	wJYa6HyoMRT1rAhs+60H2OfY4+B10W+ydZC2gsM=
+X-Google-Smtp-Source: AGHT+IFX38T/oiryJnVRtGF33LbC+xeoNQMiXNLbUmvcuvnSgPEGquuxe9tB7QSqJygcut2TdqNcVjLjBSpbpJMiM3o=
+X-Received: by 2002:ac2:4c42:0:b0:50e:ce9:b2f6 with SMTP id
+ o2-20020ac24c42000000b0050e0ce9b2f6mr6348086lfk.125.1702915925051; Mon, 18
+ Dec 2023 08:12:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218152722.1768-1-joshi.k@samsung.com>
+References: <20231214222107.2016042-1-song@kernel.org> <20231215125059.00006270@linux.intel.com>
+ <CAPhsuW6GZnufqFseLvgpMrrX6qRXodX1n89vEbbC-FqTjsWPDg@mail.gmail.com> <20231218093201.000020dd@linux.intel.com>
+In-Reply-To: <20231218093201.000020dd@linux.intel.com>
+From: Song Liu <song@kernel.org>
+Date: Mon, 18 Dec 2023 08:11:53 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW7w7WbWePpQd4aqnvXHwbdEJzw9efEP_r6tJwpeg0_qLw@mail.gmail.com>
+Message-ID: <CAPhsuW7w7WbWePpQd4aqnvXHwbdEJzw9efEP_r6tJwpeg0_qLw@mail.gmail.com>
+Subject: Re: [PATCH 0/3] md: Remove deprecated flavors
+To: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, Paul E Luse <paul.e.luse@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023 at 08:57:22PM +0530, Kanchan Joshi wrote:
-> From: Kundan Kumar <kundan.kumar@samsung.com>
-> 
-> Even if BLK_CGROUP is enabled, it does not work for passthrough io.
-> So skip setting up blkg for passthrough bio.
-> 
-> Reduced processing gives ~5% hike in peak-performance workload.
+Hi Mariusz,
 
-Looks good. Our passthrough commands still need to call bio_set_dev()
-for integrity data, so this is type of check is the easiest way to avoid
-the overhead.
+On Mon, Dec 18, 2023 at 12:32=E2=80=AFAM Mariusz Tkaczyk
+<mariusz.tkaczyk@linux.intel.com> wrote:
+>
+[...]
+> > >
+> > > Please note that there are mdadm tests for those levels. I can approv=
+e it
+> > > only when mdadm clean-up is merged. Our tests must pass continuously.
+> >
+> > Is the continuous test result available publicly?
+>
+> We are working on public CI (Paul owns it). On my side I'm not executing =
+all
+> tests, IMSM only. In this case it is obvious that mdadm tests will stop p=
+assing,
+> I don't need results to see that. We should keep both mdadm and md compat=
+ible.
+> We are continuously adding new MD regression tests to mdadm (at least Kua=
+i is
+> doing that) so we should also care about removing things.
+>
+> >
+> > >
+> > > It is a nice code complexity improvement so let me know if you would
+> > > like to get my help with mdadm patches.
+> >
+> > On my local tests with mdadm, I need to make changes to the following
+> > tests:
+> >
+> > 00linear...
+> > 00names...
+> > 00raid0...
+> > 00readonly...
+> > 02lineargrow...
+> > 03r0assem...
+> > 04r0update...
+> > 04update-metadata...
+> >
+> > The changes are all straightforward (just remove things related to
+> > linear/multipath/faulty).
+> >
+>
+> Please do not forgot remove dead code from mdadm. For example simple find
+> "multipath" (case insensitive) reefers me to multiple places with special
+> handling for this level. We need to remove it from code and documentation=
+.
+> Can you handle this too?
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
+I think this is a bigger discussion: will mdadm stop supporting these
+flavors on
+older kernels? Say, mdadm-5.0+ (or a different number) will not support
+multipath flavor on older kernels?
+
+>
+> Oh and last one, I can't find update for md man in your changes. Could yo=
+u
+> please remove those levels from md man?
+
+man side is easier. Once we know which major will have this set (6.8 or lat=
+er),
+we can update the man pages with the information.
+
+Thanks,
+Song
