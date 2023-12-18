@@ -1,105 +1,77 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205C37206D
-	for <linux-block@vger.kernel.org>; Mon, 18 Dec 2023 20:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="nY+BpKP5"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5c1f8b0c149so1457847a12.3
-        for <linux-block@vger.kernel.org>; Mon, 18 Dec 2023 12:50:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1702932620; x=1703537420; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3VYuhGNACrh4RxyK7vwhYZLcFzB1f10C6T9YQ9W4h0I=;
-        b=nY+BpKP5a7NV8lBnYEvh6u9ZeBnp/zbTuylqEjJNVDUQB0d1I4HvQmFJBIoeqXik18
-         H/bYy1bZGe85sLtmQ4JYggNYHT9ZzHGf+AfAFA2Qr+9nF4Q6pbMSeu9xekx9sbQ/gKag
-         hCco2a5m62y6x8EGd4Zs25pcpKIxBiwlUQwMiuGzcwXOOLuSBx8as+OEtQ2f2BP6H1GW
-         uKjoaD5KZTmuqJEYzKelEdy9WoWmgJdA/qCU5I6SVxCijtYbZ391gZrKfSoEdaiiI3ZU
-         BS5CZG/rHB6PTaxldUyy0OJiWZrU0IX9I5uQ33l3lkYUqxS7hOtf/8/0atu7ITVKVcAY
-         6ayQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F417A2D
+	for <linux-block@vger.kernel.org>; Mon, 18 Dec 2023 21:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6cea0fd9b53so1857268b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Dec 2023 13:14:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702932620; x=1703537420;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3VYuhGNACrh4RxyK7vwhYZLcFzB1f10C6T9YQ9W4h0I=;
-        b=fKpMVFlNLELy9AUtaJbI/Of/a4JoBBjza0YeuCtcIWC18uZJoQyvHjlgtQDuieEERV
-         Up9iXlXc6//V0YTJGaqLiSm6MF07K3MW941Rff2bUNONuBL2spbAKgA4Li4JBjy9UUr+
-         FZUMVltLeLUM+JB0rk10zpph3/8C31H6ALVCsGR9VM8qseAOjRVYSbfsKXdMZ/F+keVd
-         ZZ2Fjsr3CngWABpa7i0uLXfbI2mJalwhI+VsAZLSQsKsLDtjDMwLH3Pi9yvjv5Xkf2/4
-         HmFIrwRp/A8iyYWvJdG+hU9CWGBnGSESKFb3DgvSK7ZSmIfPwUPWjgzXuO7KZaXLttyn
-         SVhQ==
-X-Gm-Message-State: AOJu0YzpDvbgdq5eyxBLtlYDNAB1MofCU+fLAraw4Nfs8Y5EbA4gyz5V
-	h1ULO4UtkQ+OV2SE9HWJHgoWLQ==
-X-Google-Smtp-Source: AGHT+IEcehJB+ZsazS59hM/1fa/WGZjE8Vnyh7uwh2p3+WD/I5U+59Kjmr50pBpBUNXzLwVtu1jPKg==
-X-Received: by 2002:a17:90b:3b87:b0:28b:7643:e65c with SMTP id pc7-20020a17090b3b8700b0028b7643e65cmr1027749pjb.56.1702932620479;
-        Mon, 18 Dec 2023 12:50:20 -0800 (PST)
-Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
-        by smtp.gmail.com with ESMTPSA id jv14-20020a17090b31ce00b0028aecd6b29fsm10415331pjb.3.2023.12.18.12.50.19
+        d=1e100.net; s=20230601; t=1702934053; x=1703538853;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d6BizXNJusR0F6ATFmyg9rslBVNlEHOqo+rfJFs8w7U=;
+        b=E02pfBmHRSYloOK1xbXd8+m2r2dDTSn2z/Np4Z4KwXwFV4SosRcb+6B9j+9l5VEJDt
+         LAh7FPzEjTKGXiWFQNJcOMar2uuDkh9IR0q3o63o7QoDeMkf0DbuZVQ2nlPoCmsVryfC
+         kjGnc4zcqCAf6RGKv2GuSiFIztgVEto69ii1i5aGUteC6T8TvF3wQuIN82gHLnkLIVzp
+         AnQzG5KPy75QGBRy9Q2gIK9IjGcASVNP0Mf/3Dy5atIe4F8FzzC0raL0tOzqzE7PejNZ
+         wM5gMSIXseLTQTGhvr/vDq5yaDqQdfyqBdp2top2ZPaqYooTPcanRN37h5QH/P7vYM7w
+         Ad9g==
+X-Gm-Message-State: AOJu0YySWNK5C/GEMyhUcM2pBxQynuMmlE2VCzMyViMmeXtEWkpaq26F
+	/a248t+aH6Q2RMaOSXH8UYg=
+X-Google-Smtp-Source: AGHT+IHIxF15Z5rwW+Lz20CmGygeqKD0G3W1OnYXJA87KTUWFamoo7Te4tMgKgAqhlWAiHhp8PpMDA==
+X-Received: by 2002:a05:6a20:a891:b0:18f:97c:8271 with SMTP id ca17-20020a056a20a89100b0018f097c8271mr7550538pzb.123.1702934052647;
+        Mon, 18 Dec 2023 13:14:12 -0800 (PST)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:e67:7ba6:36a9:8cd5])
+        by smtp.gmail.com with ESMTPSA id c17-20020aa78811000000b006c320b9897fsm3371497pfo.126.2023.12.18.13.14.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 12:50:19 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1rFKZ5-00A8Va-2x;
-	Tue, 19 Dec 2023 07:50:15 +1100
-Date: Tue, 19 Dec 2023 07:50:15 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mon, 18 Dec 2023 13:14:12 -0800 (PST)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
-	Daejun Park <daejun7.park@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v7 05/19] block, fs: Restore the per-bio/request data
- lifetime fields
-Message-ID: <ZYCwh7RJ4EpXD+7X@dread.disaster.area>
-References: <20231218185705.2002516-1-bvanassche@acm.org>
- <20231218185705.2002516-6-bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v2 0/4] Improve I/O priority support in mq-deadline for zoned writes
+Date: Mon, 18 Dec 2023 13:13:38 -0800
+Message-ID: <20231218211342.2179689-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218185705.2002516-6-bvanassche@acm.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 18, 2023 at 10:56:28AM -0800, Bart Van Assche wrote:
-> Restore support for passing data lifetime information from filesystems to
-> block drivers. This patch reverts commit b179c98f7697 ("block: Remove
-> request.write_hint") and commit c75e707fe1aa ("block: remove the
-> per-bio/request write hint").
-> 
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Hi Jens,
 
-...
+This patch series prevents that the mq-deadline I/O scheduler submits zoned
+writes out of order if different writes for the same zone have different I/O
+priorities. Please consider these patches for the next merge window.
 
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index bcd3f8cf5ea4..97e20911b45f 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -380,6 +380,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
->  		fscrypt_set_bio_crypt_ctx(bio, inode, pos >> inode->i_blkbits,
->  					  GFP_KERNEL);
->  		bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
-> +		bio->bi_write_hint =
-> +			file_inode(dio->iocb->ki_filp)->i_write_hint;
+Thanks,
 
-We already have an inode pointer in this function (from
-iter->inode), so:
+Bart.
 
-		bio->bi_write_hint = inode->i_write_hint;
+Changes compared to v1:
+ - Changed the approach from ignoring the I/O priority of zoned writes to using
+   the I/O priority of pending zoned writes.
+ - Included two unit tests.
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Bart Van Assche (4):
+  block/mq-deadline: Rename dd_rq_ioclass() and change its return type
+  block/mq-deadline: Introduce dd_bio_ioclass()
+  block/mq-deadline: Introduce deadline_first_rq_past_pos()
+  block/mq-deadline: Prevent zoned write reordering due to I/O
+    prioritization
+
+ block/Kconfig.iosched    |   5 ++
+ block/mq-deadline.c      | 135 +++++++++++++++++++++++-------
+ block/mq-deadline_test.c | 175 +++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h   |  17 ++++
+ 4 files changed, 300 insertions(+), 32 deletions(-)
+ create mode 100644 block/mq-deadline_test.c
+
