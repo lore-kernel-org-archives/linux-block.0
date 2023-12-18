@@ -1,36 +1,58 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mail.nsr.re.kr (unknown [210.104.33.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1391863A3;
-	Mon, 18 Dec 2023 04:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 0680168BFE; Mon, 18 Dec 2023 05:31:13 +0100 (CET)
-Date: Mon, 18 Dec 2023 05:31:12 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 07/14] hfs: Really remove hfs_writepage
-Message-ID: <20231218043112.GB15579@lst.de>
-References: <20231215200245.748418-1-willy@infradead.org> <20231215200245.748418-8-willy@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4540179EE;
+	Mon, 18 Dec 2023 07:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nsr.re.kr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nsr.re.kr
+Received: from 210.104.33.70 (nsr.re.kr)
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
+	by mail.nsr.re.kr with SMTP; Mon, 18 Dec 2023 16:33:09 +0900
+X-Sender: letrhee@nsr.re.kr
+Received: from 192.168.155.188 ([192.168.155.188])
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 291;
+          Mon, 18 Dec 2023 16:33:05 +0900 (KST)
+From: Dongsoo Lee <letrhee@nsr.re.kr>
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>, 
+	"'David S. Miller'" <davem@davemloft.net>, 
+	'Jens Axboe' <axboe@kernel.dk>, 'Eric Biggers' <ebiggers@kernel.org>, 
+	"'Theodore Y. Ts'o'" <tytso@mit.edu>, 
+	'Jaegeuk Kim' <jaegeuk@kernel.org>, 
+	'Thomas Gleixner' <tglx@linutronix.de>, 
+	'Ingo Molnar' <mingo@redhat.com>, 'Borislav Petkov' <bp@alien8.de>, 
+	'Dave Hansen' <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"'H. Peter Anvin'" <hpa@zytor.com>, 
+	'Dongsoo Lee' <letrhee@nsr.re.kr>
+Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231205010329.21996-1-letrehee@nsr.re.kr>
+In-Reply-To: <20231205010329.21996-1-letrehee@nsr.re.kr>
+Subject: RE: [PATCH v6 0/5] crypto: LEA block cipher implementation
+Date: Mon, 18 Dec 2023 16:33:01 +0900
+Message-ID: <004701da3184$6e090560$4a1b1020$@nsr.re.kr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215200245.748418-8-willy@infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQKQdsWb5UD+xQlqqHr8cbxlcEv/nK9CGvZQ
+Content-Language: ko
 
-On Fri, Dec 15, 2023 at 08:02:38PM +0000, Matthew Wilcox (Oracle) wrote:
-> The earlier commit to remove hfs_writepage only removed it from
-> one of the aops.  Remove it from the btree_aops as well.
+(Resend mail because of an error)
+Hello,
 
-Looks good:
+I'm checking in on the status of the patch submitted to the Linux kernel =
+group. I understand the review process takes time, and we appreciate =
+your team's efforts.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+While awaiting review, is there anything specific we can do to enhance =
+the patch's acceptance chances? Your guidance would be greatly =
+appreciated.
+
+Thank you,
+Dongsoo Lee
