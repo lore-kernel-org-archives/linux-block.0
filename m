@@ -1,58 +1,121 @@
-Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4540179EE;
-	Mon, 18 Dec 2023 07:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nsr.re.kr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nsr.re.kr
-Received: from 210.104.33.70 (nsr.re.kr)
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-	by mail.nsr.re.kr with SMTP; Mon, 18 Dec 2023 16:33:09 +0900
-X-Sender: letrhee@nsr.re.kr
-Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 291;
-          Mon, 18 Dec 2023 16:33:05 +0900 (KST)
-From: Dongsoo Lee <letrhee@nsr.re.kr>
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>, 
-	"'David S. Miller'" <davem@davemloft.net>, 
-	'Jens Axboe' <axboe@kernel.dk>, 'Eric Biggers' <ebiggers@kernel.org>, 
-	"'Theodore Y. Ts'o'" <tytso@mit.edu>, 
-	'Jaegeuk Kim' <jaegeuk@kernel.org>, 
-	'Thomas Gleixner' <tglx@linutronix.de>, 
-	'Ingo Molnar' <mingo@redhat.com>, 'Borislav Petkov' <bp@alien8.de>, 
-	'Dave Hansen' <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"'H. Peter Anvin'" <hpa@zytor.com>, 
-	'Dongsoo Lee' <letrhee@nsr.re.kr>
-Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231205010329.21996-1-letrehee@nsr.re.kr>
-In-Reply-To: <20231205010329.21996-1-letrehee@nsr.re.kr>
-Subject: RE: [PATCH v6 0/5] crypto: LEA block cipher implementation
-Date: Mon, 18 Dec 2023 16:33:01 +0900
-Message-ID: <004701da3184$6e090560$4a1b1020$@nsr.re.kr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F20910A29;
+	Mon, 18 Dec 2023 08:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZURJpj5n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702888328; x=1734424328;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=t6/Sw1KsGXTBaJiPRn+9IUbFxEcnyk7++tLcplOnYZw=;
+  b=ZURJpj5nim8NNOWAaRNk2vBvhHR6f1Um0mnaG0arLuCLkpecQsd8qHD9
+   gcH1OohMoUHjDd3wysPUbb194/lixc1clvu3R0V+1lEQvS7jaE/yZiqBx
+   2WM1RrVoqgTtqj9f4mdp7zejBJFkT1u3+4STQiFLDQoOwVtXj8mzThyM3
+   0qvW4JmSBj8XRMmrBxtZoCyK48wXp7kEwEochQJ995vMA776hJj9NGQM3
+   kerIJyJ6Z1Art42WwMWY8rA6zZlt/1RTwCaIT21YKCPNBww3oYBt+aYua
+   O1fYbOvp4L9hk5pfrCBcbW6z1EHqLSQ4S3scAxBmvdZWTXGPJ4WD9XtUe
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="8834708"
+X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
+   d="scan'208";a="8834708"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 00:32:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="809732739"
+X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
+   d="scan'208";a="809732739"
+Received: from mtkaczyk-mobl.ger.corp.intel.com (HELO localhost) ([10.237.142.76])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 00:32:05 -0800
+Date: Mon, 18 Dec 2023 09:32:01 +0100
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+To: Song Liu <song@kernel.org>
+Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, Paul E Luse <paul.e.luse@linux.intel.com>
+Subject: Re: [PATCH 0/3] md: Remove deprecated flavors
+Message-ID: <20231218093201.000020dd@linux.intel.com>
+In-Reply-To: <CAPhsuW6GZnufqFseLvgpMrrX6qRXodX1n89vEbbC-FqTjsWPDg@mail.gmail.com>
+References: <20231214222107.2016042-1-song@kernel.org>
+	<20231215125059.00006270@linux.intel.com>
+	<CAPhsuW6GZnufqFseLvgpMrrX6qRXodX1n89vEbbC-FqTjsWPDg@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQKQdsWb5UD+xQlqqHr8cbxlcEv/nK9CGvZQ
-Content-Language: ko
 
-(Resend mail because of an error)
-Hello,
+On Fri, 15 Dec 2023 07:37:54 -0800
+Song Liu <song@kernel.org> wrote:
 
-I'm checking in on the status of the patch submitted to the Linux kernel =
-group. I understand the review process takes time, and we appreciate =
-your team's efforts.
+> Hi Mariusz,
+>=20
+> On Fri, Dec 15, 2023 at 3:51=E2=80=AFAM Mariusz Tkaczyk
+> <mariusz.tkaczyk@linux.intel.com> wrote:
+> >
+> > On Thu, 14 Dec 2023 14:21:04 -0800
+> > Song Liu <song@kernel.org> wrote:
+> > =20
+> > > Linear, multipath, and faulty have been marked as deprecated for 2.5
+> > > years. Let's remove them.
+> > >
+> > > Thanks,
+> > > Song =20
+> >
+> > Hi Song,
+> > Great idea!
+> >
+> > Please note that there are mdadm tests for those levels. I can approve =
+it
+> > only when mdadm clean-up is merged. Our tests must pass continuously. =
+=20
+>=20
+> Is the continuous test result available publicly?
 
-While awaiting review, is there anything specific we can do to enhance =
-the patch's acceptance chances? Your guidance would be greatly =
-appreciated.
+We are working on public CI (Paul owns it). On my side I'm not executing all
+tests, IMSM only. In this case it is obvious that mdadm tests will stop pas=
+sing,
+I don't need results to see that. We should keep both mdadm and md compatib=
+le.
+We are continuously adding new MD regression tests to mdadm (at least Kuai =
+is
+doing that) so we should also care about removing things.
 
-Thank you,
-Dongsoo Lee
+>=20
+> >
+> > It is a nice code complexity improvement so let me know if you would
+> > like to get my help with mdadm patches. =20
+>=20
+> On my local tests with mdadm, I need to make changes to the following
+> tests:
+>=20
+> 00linear...
+> 00names...
+> 00raid0...
+> 00readonly...
+> 02lineargrow...
+> 03r0assem...
+> 04r0update...
+> 04update-metadata...
+>=20
+> The changes are all straightforward (just remove things related to
+> linear/multipath/faulty).
+>=20
+
+Please do not forgot remove dead code from mdadm. For example simple find
+"multipath" (case insensitive) reefers me to multiple places with special
+handling for this level. We need to remove it from code and documentation.
+Can you handle this too?
+
+Oh and last one, I can't find update for md man in your changes. Could you
+please remove those levels from md man?
+
+Thanks,
+Mariusz
