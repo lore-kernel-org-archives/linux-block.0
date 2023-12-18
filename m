@@ -1,81 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA193D54C;
-	Mon, 18 Dec 2023 16:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEC73D56F;
+	Mon, 18 Dec 2023 16:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2ULm2DH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F595C433C9;
-	Mon, 18 Dec 2023 16:05:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgMvrh7w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C376C433C7;
+	Mon, 18 Dec 2023 16:09:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702915503;
-	bh=YKnvFnU90MLtOfW7ZUGVnLDGtzT+XNtezHnJjjlx3W4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=W2ULm2DHLvbKgwufoXz2eG7C0DCc2cZA5ADG1JYOZJkarrfvBCa7mIRPhjQhyfuFf
-	 GK+MUvYbyKACtve62uXxQoEDx6eAEzWGn1fsPbfjKQKx7F0cPvmzZydXNgg6P40sVg
-	 8j2jSJvnH912ldoUXzQMIiG+CNv1176HUTg8b0mTDlEuGGBnqOuo9MRUhkNMHAcYLF
-	 2xYJDcmpt9borp/yNzZJ5imcFBWNERprz91h0Kc5ac9+JllMuSCAzM0sy8H87t8Y4n
-	 rzPa4UmgFyRcWXNqLiVt2T9/1TlJiBqiZF63bO6R5rpdp/UInbcS5eCjVjt3ebE2G3
-	 28hySGJKpa+rA==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2cc3f5e7451so39120811fa.2;
-        Mon, 18 Dec 2023 08:05:03 -0800 (PST)
-X-Gm-Message-State: AOJu0YxnQZR3Bki2E3Xpj3IvMOXkkmO7iP2dYfHs0QlLSb7tjweVo7+G
-	DcErfH9v8d3Sjth8b2yaW1aSqJijT4W1DDh0ZX8=
-X-Google-Smtp-Source: AGHT+IF/1c2sVKIWhklkyKwxs+e/TlmjZyKZ44P+rlu8hMftsh8338VA9tYvJ1f4yipZyHIykWTNfiJ5aJO7SaPFQt4=
-X-Received: by 2002:a05:651c:506:b0:2cb:3ece:1235 with SMTP id
- o6-20020a05651c050600b002cb3ece1235mr6781953ljp.38.1702915501728; Mon, 18 Dec
- 2023 08:05:01 -0800 (PST)
+	s=k20201202; t=1702915741;
+	bh=cOm2dIgu3pqKuuN+O7eq+QXxoJeltRgUhvRQY2vvd60=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cgMvrh7wxDkB+PTk/oxopzMiU0neWJLcw6xW0BEPyw2Ux5Yv+ET+Dhu2eTaI13THS
+	 q4+aMFO2T4HGD2aW445NfDowVb75FMwEf0s71hC6cMPpZ2cH2+KTbwDIqv9icCbvuc
+	 9cO7CS3U7fG0TzpeirO/dJ6WDj8DXmfV7R2rAssYvYjqkwNjvG9w4ZcdwHaXOTCKU8
+	 PTq1l5+HYyGHA7JdaIAqQ6b87JyNwfpMkITrgJwaUyA2zTU7bI9R4joVZ0fbi7TooD
+	 870OMXighFFLmkwQY1/ecTzNot9Mpv/Xy8HKT1YTYgqQ4r/HZ8N0GXGKGFC179jP6L
+	 2EFC/qsH8aZsA==
+Date: Mon, 18 Dec 2023 09:08:58 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: axboe@kernel.dk, tj@kernel.org, hch@lst.de, linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org, Kundan Kumar <kundan.kumar@samsung.com>
+Subject: Re: [PATCH] block: skip cgroups for passthrough io
+Message-ID: <ZYBumts89QyXjzCu@kbusch-mbp.dhcp.thefacebook.com>
+References: <CGME20231218153411epcas5p15bfb9e24856b5d719501c375e2bf3897@epcas5p1.samsung.com>
+ <20231218152722.1768-1-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231215013931.3329455-1-linan666@huaweicloud.com>
- <20231215013931.3329455-2-linan666@huaweicloud.com> <CAPhsuW6VTvXy3L9CUhTrSC3+_-_n9FDVrtdzQ7SWWkukoQg13Q@mail.gmail.com>
- <be8d9147-4f7f-2fab-da2a-bb4cde46fd12@huaweicloud.com> <CAPhsuW6kv7FRB_1NoheiDqvmLmongiJ-ty9mYRNvFw3yecE_Ug@mail.gmail.com>
- <baf95bd0-0378-9b3a-9ab9-473baa35ebbc@huaweicloud.com>
-In-Reply-To: <baf95bd0-0378-9b3a-9ab9-473baa35ebbc@huaweicloud.com>
-From: Song Liu <song@kernel.org>
-Date: Mon, 18 Dec 2023 08:04:50 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW61yzkH5Tp0ku37DBjnQzT81yJUx0F4bag4xdq1rX5gsA@mail.gmail.com>
-Message-ID: <CAPhsuW61yzkH5Tp0ku37DBjnQzT81yJUx0F4bag4xdq1rX5gsA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] md: Fix overflow in is_mddev_idle
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linan666@huaweicloud.com, axboe@kernel.dk, linux-raid@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231218152722.1768-1-joshi.k@samsung.com>
 
-On Sun, Dec 17, 2023 at 5:39=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
->
-[...]
-> >
-> > We only use  this for idle or not check, the behavior is OK (I think).
-> > However, this logic is error prone.
-> >
-> > On 64-bit systems, there is a 4-byte hole behind sync_io. I think we ca=
-n
-> > just use it for atomic64_t so that we don't have to worry about overflo=
-w.
->
-> I'm not sure about this, because other than this ubsan warning, this
-> overflow doesn't have any impact on functionality to me.
+On Mon, Dec 18, 2023 at 08:57:22PM +0530, Kanchan Joshi wrote:
+> From: Kundan Kumar <kundan.kumar@samsung.com>
+> 
+> Even if BLK_CGROUP is enabled, it does not work for passthrough io.
+> So skip setting up blkg for passthrough bio.
+> 
+> Reduced processing gives ~5% hike in peak-performance workload.
 
-Fixing warnings for zero or low cost is always a good idea. It helps boost
-the signal when UBSAN (and other debug features) detects real issues.
+Looks good. Our passthrough commands still need to call bio_set_dev()
+for integrity data, so this is type of check is the easiest way to avoid
+the overhead.
 
-> If we care about this 'hole', there are lots of holes in gendisk, and
-> can be avoiled, for example, moving 'sync_io' near  to 'node_id'.
-
-The point was not "let's fill the hole", but "we can use atomic64_t
-without extra memory cost". In general, I don't think we care too
-much about holes in "struct gendisk".
-
-Does this make sense?
-
-Thanks,
-Song
+Reviewed-by: Keith Busch <kbusch@kernel.org>
