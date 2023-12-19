@@ -1,62 +1,46 @@
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA161C6B2;
-	Tue, 19 Dec 2023 14:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R771e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0Vyr60qx_1702995911;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0Vyr60qx_1702995911)
-          by smtp.aliyun-inc.com;
-          Tue, 19 Dec 2023 22:25:12 +0800
-From: Jingbo Xu <jefflexu@linux.alibaba.com>
-To: shr@devkernel.io,
-	akpm@linux-foundation.org
-Cc: linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	joseph.qi@linux.alibaba.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	willy@infradead.org
-Subject: [PATCH v3 2/2] mm: fix arithmetic for max_prop_frac when setting max_ratio
-Date: Tue, 19 Dec 2023 22:25:08 +0800
-Message-Id: <20231219142508.86265-3-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20231219142508.86265-1-jefflexu@linux.alibaba.com>
-References: <20231219142508.86265-1-jefflexu@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAC61C6AA;
+	Tue, 19 Dec 2023 15:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id D046C68BFE; Tue, 19 Dec 2023 16:17:59 +0100 (CET)
+Date: Tue, 19 Dec 2023 16:17:59 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>,
+	axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
+	jejb@linux.ibm.com, martin.petersen@oracle.com,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+	ming.lei@redhat.com, jaswin@linux.ibm.com, bvanassche@acm.org
+Subject: Re: [PATCH v2 00/16] block atomic writes
+Message-ID: <20231219151759.GA4468@lst.de>
+References: <20231212110844.19698-1-john.g.garry@oracle.com> <20231212163246.GA24594@lst.de> <b8b0a9d7-88d2-45a9-877a-ecc5e0f1e645@oracle.com> <20231213154409.GA7724@lst.de> <c729b03c-b1d1-4458-9983-113f8cd752cd@oracle.com> <20231219051456.GB3964019@frogsfrogsfrogs> <20231219052121.GA338@lst.de> <76c85021-dd9e-49e3-80e3-25a17c7ca455@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <76c85021-dd9e-49e3-80e3-25a17c7ca455@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Since now bdi->max_ratio is part per million, fix the wrong arithmetic
-for max_prop_frac when setting max_ratio.  Otherwise the miscalculated
-max_prop_frac will affect the incrementing of writeout completion count
-when max_ratio is not 100%.
+On Tue, Dec 19, 2023 at 12:41:37PM +0000, John Garry wrote:
+> How about something based on fcntl, like below? We will prob also require 
+> some per-FS flag for enabling atomic writes without HW support. That flag 
+> might be also useful for XFS for differentiating forcealign for atomic 
+> writes with just forcealign.
 
-Fixes: efc3e6ad53ea ("mm: split off __bdi_set_max_ratio() function")
-Signed-off-by: Jingbo Xu <jefflexu@linux.alibaba.com>
----
- mm/page-writeback.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I would have just exposed it through a user visible flag instead of
+adding yet another ioctl/fcntl opcode and yet another method.
 
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 2140382dd768..05e5c425b3ff 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -728,7 +728,8 @@ static int __bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ra
- 		ret = -EINVAL;
- 	} else {
- 		bdi->max_ratio = max_ratio;
--		bdi->max_prop_frac = (FPROP_FRAC_BASE * max_ratio) / 100;
-+		bdi->max_prop_frac = (FPROP_FRAC_BASE * max_ratio) /
-+						(100 * BDI_RATIO_SCALE);
- 	}
- 	spin_unlock_bh(&bdi_lock);
- 
--- 
-2.19.1.6.gb485710b
-
+And yes, for anything that doesn't always support atomic writes it would
+need to be persisted.
