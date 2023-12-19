@@ -1,135 +1,102 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405873D0BE
-	for <linux-block@vger.kernel.org>; Tue, 19 Dec 2023 17:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-58dd3528497so3396876eaf.3
-        for <linux-block@vger.kernel.org>; Tue, 19 Dec 2023 09:42:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703007757; x=1703612557;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OZ/Ctfez//36rxiAMzDY9eO5erWY+DJ5xRde7UPMFpo=;
-        b=puVSoxozmMISFoKcYJsX0eJ6NcNcSQGcBiFgngTSgPWaDcDVYMlvrP0LioUpvVAbu1
-         nPq7C8aZH0qjO4uiW6Qjom7BbdPxHoDzPdrRHsb4KAEm9sXuFPeU46eMXehsS1dvuZ0B
-         vKwft2B8qO9AZiYr2BKGUpJic0x6N2rnDZeinT23WnMiX7m/RhoDKKKO3HU1O+O2cPvL
-         jXfekV1Bf5gmEHpSADnLvy7bz9rLU53OzW9hjNhCNP5B697FWY+Ath+oUI4NSACPfiA5
-         6sRLEUq0jIaD2+u3x6zQyGlU6h9fqMomxLX/o3OGbta4kuvn/UcDNehHGctxxz9S4/1Z
-         otnA==
-X-Gm-Message-State: AOJu0YyAh0U3VElLNQ6yqovJPR+zZhY0+lW52Yl18xplTGaqGoraMhig
-	KSq/W3wHdaG1F0fsz8Qxs7uZSgs4v2g=
-X-Google-Smtp-Source: AGHT+IEODffAAuUR7rpjVrqAf+QLS9v4PPgl0Wn2IPkLdmfYO7MG512+fwCzYg6LD0HFNKQtTKo+3Q==
-X-Received: by 2002:a05:6870:2208:b0:203:6595:c115 with SMTP id i8-20020a056870220800b002036595c115mr9286043oaf.37.1703007757230;
-        Tue, 19 Dec 2023 09:42:37 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:2c02:6167:94c9:999b? ([2620:0:1000:8411:2c02:6167:94c9:999b])
-        by smtp.gmail.com with ESMTPSA id bs9-20020a632809000000b0059b2316be86sm19822601pgb.46.2023.12.19.09.42.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 09:42:36 -0800 (PST)
-Message-ID: <54a920d3-08e3-4810-806d-2961110d876d@acm.org>
-Date: Tue, 19 Dec 2023 09:42:35 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4503A37D04;
+	Tue, 19 Dec 2023 17:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=devkernel.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=devkernel.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=devkernel.io header.i=@devkernel.io header.b="dvjG3qMo";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LAjWUgxd"
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id 49FAA5C01CF;
+	Tue, 19 Dec 2023 12:56:34 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Tue, 19 Dec 2023 12:56:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=devkernel.io; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1703008594; x=1703094994; bh=WU2yvYz91b
+	oprhIP6+puBEddYZyA+Gt+AEiyct5l+lI=; b=dvjG3qMoNl9UGeyecEjJDCHnYd
+	2dJrM02zRpoAh3BwrJVyhz2biS2BZzRMgNxs8RIqCeWAn8tNXUgpWeaK5C3JTmA7
+	UwWTVY0DsYlUsYeZMzmFoE3mNUeFzz/+tAh24W8+hJmIa2ztb3mnyPQoV1Pm1cvW
+	S6urYKvOCjhmQ0VHnw9B6Gy5DqTGo1G+HkirihxPB3NfnBmIFVYLqDPt6nAVeOaB
+	A8At/HO3cCrycOp/dzTZ+npiPojsdDH7AhJviSHDKPaVBVDXuGbYBRTgZavzDdVV
+	v2NNVvu4qEKI7Q5lny4BrsDQ4nSz/nDghbNL4B3nkj+IgJMkYfVXdPSTN5kw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1703008594; x=1703094994; bh=WU2yvYz91boprhIP6+puBEddYZyA
+	+Gt+AEiyct5l+lI=; b=LAjWUgxdNQEEA7YL6h9fYC30mhGXTmWiOtzP1t+2r+ID
+	UGmiL9g+TTZ5TOTCGNN3+5Z1LjfX3a7nA74wBI5Ky2Ixjrg9dFQpWLektiv9LAan
+	+vLbv4VG6tmP4y4FJ+w9DngEKC3pMCMrtFgg/2/BD0rp6v8vs2CXTz6Gh7p/9v3o
+	fBfBxgifOZV6wN0yOl42+TY/UbGeUIpgHbLpnO/DH0e8yTVc6OorT8Y0Dvdh3eRt
+	oXV1eBl0oapZ/++1Iv7DGM2pDMYJtNUM3ZW6g8Goi0O2Zv8fheIlYgalZpefy1sg
+	j454hi3496+qrKuu22vg/bx9Kj9Xrds2w31MDq2Sdg==
+X-ME-Sender: <xms:UdmBZT2LPq5AQXeUJ76Rxm6x1wlt2QWpRHACFl0xFC8TyFK_NLrsAA>
+    <xme:UdmBZSEz7OsC6iDcp4JP4VbkaVdOOJBPCYj_CZSYZNNcR3ZmIOl9TeXb-gsC2hYPb
+    iHKdR-Io-Q-MafBqac>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvddutddguddtiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecunecujfgurhepofgfggfkjghffffhvfevufgtse
+    httdertderredtnecuhfhrohhmpedfufhtvghfrghnucftohgvshgthhdfuceoshhhrhes
+    uggvvhhkvghrnhgvlhdrihhoqeenucggtffrrghtthgvrhhnpeekheefvdetueetffffhe
+    ffhfdutddtkeejueffveeijedvgffhffehvefhgefggfenucffohhmrghinhepkhgvrhhn
+    vghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homhepshhhrhesuggvvhhkvghrnhgvlhdrihho
+X-ME-Proxy: <xmx:UdmBZT7DTWGge1FTeADib-vAWfZIfCHZSoYqQRA93BLmJoa9UIJyPw>
+    <xmx:UdmBZY1BkVGn3MSxcGtGo_zGWVh1q8M4n34Er-yqCx1xqfi4VwTPHg>
+    <xmx:UdmBZWFb_SsUJJahl5wZAHp9YbGeldtuzDBSftOA1FbvYqdlAGRajA>
+    <xmx:UtmBZTONf8rtXvgtasvmGC3CMDU6vFRWZJfVKdb-LgDLhIh7UpEOTg>
+Feedback-ID: i84614614:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 60A88B6008D; Tue, 19 Dec 2023 12:56:33 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1350-g1d0a93a8fb-fm-20231218.001-g1d0a93a8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/4] block/mq-deadline: Prevent zoned write reordering
- due to I/O prioritization
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Damien Le Moal <dlemoal@kernel.org>
-References: <20231218211342.2179689-1-bvanassche@acm.org>
- <20231218211342.2179689-5-bvanassche@acm.org> <20231219121010.GA21240@lst.de>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231219121010.GA21240@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-Id: <79e0cb77-ea6a-427f-af5e-c1762049ac89@app.fastmail.com>
+In-Reply-To: <20231219142508.86265-1-jefflexu@linux.alibaba.com>
+References: <20231219142508.86265-1-jefflexu@linux.alibaba.com>
+Date: Tue, 19 Dec 2023 09:56:12 -0800
+From: "Stefan Roesch" <shr@devkernel.io>
+To: "Jingbo Xu" <jefflexu@linux.alibaba.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ joseph.qi@linux.alibaba.com, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, willy@infradead.org
+Subject: Re: [PATCH v3 0/2] mm: fix arithmetic for bdi min_ratio and max_ratio
+Content-Type: text/plain
 
-On 12/19/23 04:10, Christoph Hellwig wrote:
-> On Mon, Dec 18, 2023 at 01:13:42PM -0800, Bart Van Assche wrote:
->> Assigning I/O priorities with the ioprio cgroup policy may cause
->> different I/O priorities to be assigned to write requests for the same
->> zone. Prevent that this causes unaligned write errors by adding zoned
->> writes for the same zone in the same priority queue as prior zoned
->> writes.
-> 
-> I still think this is fundamentally the wrong thing to do.  If you set
-> different priorities, you want I/O to be reordered, so ignoring that
-> is a bad thing.
+It would be good if the cover letter describes what this fixes.
 
-Hi Christoph,
-
-How about not setting the I/O priority of sequential zoned writes as in
-the (untested) patch below?
-
-Thanks,
-
-Bart.
-
-
-[PATCH] block: Do not set the I/O priority for sequential zoned writes
-
----
-  block/blk-mq.c         |  7 +++++++
-  include/linux/blk-mq.h | 17 +++++++++++++++++
-  2 files changed, 24 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c11c97afa0bc..668888103a47 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2922,6 +2922,13 @@ static bool blk_mq_can_use_cached_rq(struct request *rq, struct blk_plug *plug,
-
-  static void bio_set_ioprio(struct bio *bio)
-  {
-+	/*
-+	 * Do not set the I/O priority of sequential zoned write bios because
-+	 * this could lead to reordering and hence to unaligned write errors.
-+	 */
-+	if (blk_bio_is_seq_zoned_write(bio))
-+		return;
-+
-  	/* Nobody set ioprio so far? Initialize it based on task's nice value */
-  	if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) == IOPRIO_CLASS_NONE)
-  		bio->bi_ioprio = get_current_ioprio();
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 1ab3081c82ed..e7fa81170b7c 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -1149,6 +1149,18 @@ static inline unsigned int blk_rq_zone_no(struct request *rq)
-  	return disk_zone_no(rq->q->disk, blk_rq_pos(rq));
-  }
-
-+/**
-+ * blk_bio_is_seq_zoned_write() - Check if @bio requires write serialization.
-+ * @bio: Bio to examine.
-+ *
-+ * Note: REQ_OP_ZONE_APPEND bios do not require serialization.
-+ */
-+static inline bool blk_bio_is_seq_zoned_write(struct bio *bio)
-+{
-+	return disk_zone_is_seq(bio->bi_bdev->bd_disk, bio->bi_iter.bi_sector) &&
-+		op_needs_zoned_write_locking(bio_op(bio));
-+}
-+
-  static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
-  {
-  	return disk_zone_is_seq(rq->q->disk, blk_rq_pos(rq));
-@@ -1196,6 +1208,11 @@ static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
-  	return !blk_req_zone_is_write_locked(rq);
-  }
-  #else /* CONFIG_BLK_DEV_ZONED */
-+static inline bool blk_bio_is_seq_zoned_write(struct bio *bio)
-+{
-+	return false;
-+}
-+
-  static inline bool blk_rq_is_seq_zoned_write(struct request *rq)
-  {
-  	return false;
-
+On Tue, Dec 19, 2023, at 6:25 AM, Jingbo Xu wrote:
+> changes since v2:
+> - patch 2: drop div64_u64(), instead write it out mathematically
+>   (Matthew Wilcox)
+>
+> changes since v1:
+> - split the previous v1 patch into two separate patches with
+>   corresponding "Fixes" tag (Andrew Morton)
+> - patch 2: remove "UL" suffix for the "100" constant
+>
+> v1: 
+> https://lore.kernel.org/all/20231218031640.77983-1-jefflexu@linux.alibaba.com/
+> v2: 
+> https://lore.kernel.org/all/20231219024246.65654-1-jefflexu@linux.alibaba.com/
+>
+> Jingbo Xu (2):
+>   mm: fix arithmetic for bdi min_ratio
+>   mm: fix arithmetic for max_prop_frac when setting max_ratio
+>
+>  mm/page-writeback.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> -- 
+> 2.19.1.6.gb485710b
