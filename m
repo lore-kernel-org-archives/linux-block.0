@@ -1,85 +1,80 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7714410EF
-	for <linux-block@vger.kernel.org>; Tue, 19 Dec 2023 01:12:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE3E1381
+	for <linux-block@vger.kernel.org>; Tue, 19 Dec 2023 01:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Wg1P0xis"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28b93b04446so328255a91.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Dec 2023 17:12:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1702948354; x=1703553154; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FyD8HfWQyf6LfBl1NPEudbU6H1HSAZ5Pn+m4oHtEKJw=;
-        b=Wg1P0xishPnVdzKuwGifzDuMLmunfkLZUA6/WaSzuTbNBF/Ti4nm+saBAgUXHfTTn2
-         Ye59Ody1EOQP8hguHGTOdSz8hhlXQ9F5OwivN+58xvXxnUaxpJFZJKaibUXQDSUNOMKY
-         wIyq/4FoAFmRK7qiE1aw6AGVfhV6gsyOlrHHwmvx8WV2ubr+NuX0Ke/BeHaWOkbs31iQ
-         lLn8b5KF/KEvBEXB2f27fkBgJFeX/xQlK4rnos22rpD17C5QHyKukYBA415KYnHOR0ET
-         TZ1ITABCYm63qSX6Nst2RjJK6LBCJNSKABA5P4q7vj/N1qYAk3CdJC4dDqQl0r1xRAI+
-         pSFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702948354; x=1703553154;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FyD8HfWQyf6LfBl1NPEudbU6H1HSAZ5Pn+m4oHtEKJw=;
-        b=KvS9WgMqoaSCQ/8mNnuBohrVRm/4UAgQvHWrhlfZe7CEMV0/h/UHugorF2u/QomnCV
-         l5p3joSg7dAPo+OwHoVikfAxlIpnhUdiXfJtZMUL+1SMehd7iTAFJvTIEvPV7T0owpXo
-         6bn3znlfQ++7pEMWdzqviMq6A3dlPYCIDbEMitXVLO5B5o+7nK3FP4M5VRkjcPorHIhs
-         22BoMQeXqcTsYLvakDakz8FarMTSj3Ft/6R+8py7m28wCaE9zu8j+J0My04C9PQMd5mX
-         kshW5ALPepHGTqp/FycQDlwyrASa4RX2cr6Yo3TVaEKmfQWG2Xx0N8f2b9vwwYCCGbzn
-         OzYg==
-X-Gm-Message-State: AOJu0Yz3rNvSuc30KGzxPgNVJnGQ3Rhia8KiWKV4JDMKYZOwx3ckukZf
-	NU64qiZBInGLt0dEaqCTD32VyA==
-X-Google-Smtp-Source: AGHT+IHzTKkhe0cRVbbtQbsADxYsCKZfTSYLFLvAalrCz0C8TVbXqipR5Q215SljZARR92Emk8hj0A==
-X-Received: by 2002:a05:6a20:7d9c:b0:18f:c77b:9fdd with SMTP id v28-20020a056a207d9c00b0018fc77b9fddmr40522857pzj.1.1702948354510;
-        Mon, 18 Dec 2023 17:12:34 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id 10-20020a63114a000000b005cd821a01d4sm4330736pgr.28.2023.12.18.17.12.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Dec 2023 17:12:33 -0800 (PST)
-Message-ID: <6b3f9f28-1ddf-41dc-9f88-744cd9cd4b96@kernel.dk>
-Date: Mon, 18 Dec 2023 18:12:32 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6Ea/Bsp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702949322;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=f1IZOXG0KcNHQDnHikp/8+mkHes7qJwKHJJatOGHEcw=;
+	b=g6Ea/BspzVDzgam4lN0RecSGlbeazm0y5y940uiPKMMyJb87ZoBiG7lg8ZM5QtrFlW5r+n
+	cMO61pyqRlkxB4JWfv2GyEFtJFOCo2JZP7CLfWOVqcSgv/zD+GeZ8TGgEuGxrNDIJugHmh
+	iUJ8dJdAerBuiQqDqsc9n2kNpmdx3mU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-100-j0Ycpy2aM42QhcQBDRDqfg-1; Mon, 18 Dec 2023 20:28:39 -0500
+X-MC-Unique: j0Ycpy2aM42QhcQBDRDqfg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5FF8D86EB61;
+	Tue, 19 Dec 2023 01:28:39 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9D48F2166B33;
+	Tue, 19 Dec 2023 01:28:38 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Changhui Zhong <czhong@redhat.com>
+Subject: [PATCH] blk-cgroup: fix rcu lockdep warning in blkg_lookup()
+Date: Tue, 19 Dec 2023 09:28:33 +0800
+Message-ID: <20231219012833.2129540-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/19] Pass data lifetime information to SCSI disk
- devices
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Daejun Park <daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>
-References: <20231219000815.2739120-1-bvanassche@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231219000815.2739120-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On 12/18/23 5:07 PM, Bart Van Assche wrote:
-> Hi Martin,
-> 
-> UFS vendors need the data lifetime information to achieve good performance.
-> Providing data lifetime information to UFS devices can result in up to 40%
-> lower write amplification. Hence this patch series that adds support in F2FS
-> and also in the block layer for data lifetime information. The SCSI disk (sd)
-> driver is modified such that it passes write hint information to SCSI devices
-> via the GROUP NUMBER field.
-> 
-> Please consider this patch series for the next merge window.
+blkg_lookup() is called with either queue_lock or rcu read lock, so
+use rcu_dereference_check(lockdep_is_held(&q->queue_lock)) for
+retrieving 'blkg', which way models the check exactly for covering
+queue lock or rcu read lock.
 
-Bart, can you please stop reposting so quickly, it achieves the opposite
-of what I suspect you are looking for.
+Fix lockdep warning of "block/blk-cgroup.h:254 suspicious rcu_dereference_check() usage!"
+from blkg_lookup().
 
+Tested-by: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-cgroup.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index fd482439afbc..b927a4a0ad03 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -252,7 +252,8 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
+ 	if (blkcg == &blkcg_root)
+ 		return q->root_blkg;
+ 
+-	blkg = rcu_dereference(blkcg->blkg_hint);
++	blkg = rcu_dereference_check(blkcg->blkg_hint,
++			lockdep_is_held(&q->queue_lock));
+ 	if (blkg && blkg->q == q)
+ 		return blkg;
+ 
 -- 
-Jens Axboe
+2.42.0
 
