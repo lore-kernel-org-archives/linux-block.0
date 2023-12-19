@@ -1,66 +1,61 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50138472;
-	Tue, 19 Dec 2023 05:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 9A84268AFE; Tue, 19 Dec 2023 06:21:21 +0100 (CET)
-Date: Tue, 19 Dec 2023 06:21:21 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>,
-	axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-	ming.lei@redhat.com, jaswin@linux.ibm.com, bvanassche@acm.org
-Subject: Re: [PATCH v2 00/16] block atomic writes
-Message-ID: <20231219052121.GA338@lst.de>
-References: <20231212110844.19698-1-john.g.garry@oracle.com> <20231212163246.GA24594@lst.de> <b8b0a9d7-88d2-45a9-877a-ecc5e0f1e645@oracle.com> <20231213154409.GA7724@lst.de> <c729b03c-b1d1-4458-9983-113f8cd752cd@oracle.com> <20231219051456.GB3964019@frogsfrogsfrogs>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC16C123;
+	Tue, 19 Dec 2023 06:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0Vypj0Vc_1702965501;
+Received: from 30.221.145.29(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0Vypj0Vc_1702965501)
+          by smtp.aliyun-inc.com;
+          Tue, 19 Dec 2023 13:58:22 +0800
+Message-ID: <5460aaf1-44f6-475f-b980-cb9058cc1df4@linux.alibaba.com>
+Date: Tue, 19 Dec 2023 13:58:21 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219051456.GB3964019@frogsfrogsfrogs>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] mm: fix arithmetic for max_prop_frac when setting
+ max_ratio
+Content-Language: en-US
+To: Matthew Wilcox <willy@infradead.org>
+Cc: shr@devkernel.io, akpm@linux-foundation.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, joseph.qi@linux.alibaba.com,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20231219024246.65654-1-jefflexu@linux.alibaba.com>
+ <20231219024246.65654-3-jefflexu@linux.alibaba.com>
+ <ZYEWyn5g/jG/ixMk@casper.infradead.org>
+From: Jingbo Xu <jefflexu@linux.alibaba.com>
+In-Reply-To: <ZYEWyn5g/jG/ixMk@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 18, 2023 at 09:14:56PM -0800, Darrick J. Wong wrote:
-> /me stumbles back in with plenty of covidbrain to go around.
+
+
+On 12/19/23 12:06 PM, Matthew Wilcox wrote:
+> On Tue, Dec 19, 2023 at 10:42:46AM +0800, Jingbo Xu wrote:
+>>  	} else {
+>>  		bdi->max_ratio = max_ratio;
+>> -		bdi->max_prop_frac = (FPROP_FRAC_BASE * max_ratio) / 100;
+>> +		bdi->max_prop_frac = div64_u64(FPROP_FRAC_BASE * max_ratio,
+>> +					       100 * BDI_RATIO_SCALE);
+>>  	}
 > 
-> So ... Christoph, you're asking for a common API for
-> sysadmins/applications to signal to the filesystem that they want all
-> data allocations aligned to a given value, right?
+> Why use div64_u64 here?
 > 
-> e.g. if a nvme device advertises a capability for untorn writes between
-> $lbasize and 64k, then we need a way to set up each untorn-file with
-> some alignment between $lbasize and 64k?
-> 
-> or if cxl storage becomes not ung-dly expensive, then we'd want a way to
-> set up files with an alignment of 2M (x86) or 512M (arm64lol) to take
-> advantage of PMD mmap mappings?
+> FPROP_FRAC_BASE is an unsigned long.  max_ratio is an unsigned int, so
+> the numerator is an unsigned long.  BDI_RATIO_SCALE is 10,000, so the
+> numerator is an unsigned int.  There's no 64-bit arithmetic needed here.
 
-The most important point is to not mix these up.
+Yes, div64_u64() is actually not needed here. So it seems
 
-If we want to use a file for atomic writes I should tell the fs about
-it, and preferably in a way that does not require me to know about weird
-internal implementation details of every file system.  I really just
-want to use atomic writes.  Preferably I'd just start using them after
-asking for the limits.  But that's obviously not going to work for
-file systems that use the hardware offload and don't otherwise align
-to the limit (which would suck for very small files anyway :))
+bdi->max_prop_frac = FPROP_FRAC_BASE * max_ratio / 100 / BDI_RATIO_SCALE;
 
-So as a compromise I tell the file system before writing or otherwise
-adding any data [1] to file that I want to use atomic writes so that
-the fs can take the right decisions.
+is adequate?
 
-[1] reflinking data into a such marked file will be ... interesting.
-
+-- 
+Thanks,
+Jingbo
