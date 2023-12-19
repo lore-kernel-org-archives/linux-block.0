@@ -1,80 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE3E1381
-	for <linux-block@vger.kernel.org>; Tue, 19 Dec 2023 01:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6Ea/Bsp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702949322;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=f1IZOXG0KcNHQDnHikp/8+mkHes7qJwKHJJatOGHEcw=;
-	b=g6Ea/BspzVDzgam4lN0RecSGlbeazm0y5y940uiPKMMyJb87ZoBiG7lg8ZM5QtrFlW5r+n
-	cMO61pyqRlkxB4JWfv2GyEFtJFOCo2JZP7CLfWOVqcSgv/zD+GeZ8TGgEuGxrNDIJugHmh
-	iUJ8dJdAerBuiQqDqsc9n2kNpmdx3mU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-100-j0Ycpy2aM42QhcQBDRDqfg-1; Mon, 18 Dec 2023 20:28:39 -0500
-X-MC-Unique: j0Ycpy2aM42QhcQBDRDqfg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5FF8D86EB61;
-	Tue, 19 Dec 2023 01:28:39 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9D48F2166B33;
-	Tue, 19 Dec 2023 01:28:38 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Changhui Zhong <czhong@redhat.com>
-Subject: [PATCH] blk-cgroup: fix rcu lockdep warning in blkg_lookup()
-Date: Tue, 19 Dec 2023 09:28:33 +0800
-Message-ID: <20231219012833.2129540-1-ming.lei@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F3615C3;
+	Tue, 19 Dec 2023 01:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SvKBD1kdpz4f3jLZ;
+	Tue, 19 Dec 2023 09:39:48 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 652DD1A087A;
+	Tue, 19 Dec 2023 09:39:53 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDn6xFn9IBlFywiEA--.41035S3;
+	Tue, 19 Dec 2023 09:39:53 +0800 (CST)
+Subject: Re: [PATCH v2 1/2] md: Fix overflow in is_mddev_idle
+To: Song Liu <song@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linan666@huaweicloud.com, axboe@kernel.dk, linux-raid@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20231215013931.3329455-1-linan666@huaweicloud.com>
+ <20231215013931.3329455-2-linan666@huaweicloud.com>
+ <CAPhsuW6VTvXy3L9CUhTrSC3+_-_n9FDVrtdzQ7SWWkukoQg13Q@mail.gmail.com>
+ <be8d9147-4f7f-2fab-da2a-bb4cde46fd12@huaweicloud.com>
+ <CAPhsuW6kv7FRB_1NoheiDqvmLmongiJ-ty9mYRNvFw3yecE_Ug@mail.gmail.com>
+ <baf95bd0-0378-9b3a-9ab9-473baa35ebbc@huaweicloud.com>
+ <CAPhsuW61yzkH5Tp0ku37DBjnQzT81yJUx0F4bag4xdq1rX5gsA@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <8713b617-db39-113a-377f-f97e123dbf9b@huaweicloud.com>
+Date: Tue, 19 Dec 2023 09:39:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAPhsuW61yzkH5Tp0ku37DBjnQzT81yJUx0F4bag4xdq1rX5gsA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+X-CM-TRANSID:cCh0CgDn6xFn9IBlFywiEA--.41035S3
+X-Coremail-Antispam: 1UD129KBjvJXoWrKr1fXF4ktF43uF18GFW8Xrb_yoW8JF1DpF
+	Wav3Wjkrs8CF92y34ftwnrtr1rtw4UC3yrKFyFkr4xKr93W39xAFn7Kr1Y9r95Zws3uryY
+	v3yagFW3A34qk3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-blkg_lookup() is called with either queue_lock or rcu read lock, so
-use rcu_dereference_check(lockdep_is_held(&q->queue_lock)) for
-retrieving 'blkg', which way models the check exactly for covering
-queue lock or rcu read lock.
+Hi,
 
-Fix lockdep warning of "block/blk-cgroup.h:254 suspicious rcu_dereference_check() usage!"
-from blkg_lookup().
+在 2023/12/19 0:04, Song Liu 写道:
+> On Sun, Dec 17, 2023 at 5:39 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>
+> [...]
+>>>
+>>> We only use  this for idle or not check, the behavior is OK (I think).
+>>> However, this logic is error prone.
+>>>
+>>> On 64-bit systems, there is a 4-byte hole behind sync_io. I think we can
+>>> just use it for atomic64_t so that we don't have to worry about overflow.
+>>
+>> I'm not sure about this, because other than this ubsan warning, this
+>> overflow doesn't have any impact on functionality to me.
+> 
+> Fixing warnings for zero or low cost is always a good idea. It helps boost
+> the signal when UBSAN (and other debug features) detects real issues.
+> 
+>> If we care about this 'hole', there are lots of holes in gendisk, and
+>> can be avoiled, for example, moving 'sync_io' near  to 'node_id'.
+> 
+> The point was not "let's fill the hole", but "we can use atomic64_t
+> without extra memory cost". In general, I don't think we care too
+> much about holes in "struct gendisk".
+> 
+> Does this make sense?
 
-Tested-by: Changhui Zhong <czhong@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-cgroup.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Of course, I don't have strong preference on this. Because our syzkaller
+reported lots of UBSAN warnings, hence only fix real issues is how we do
+it. For upstream, I'm good at fix this warning with zero or low cost.
 
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index fd482439afbc..b927a4a0ad03 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -252,7 +252,8 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
- 	if (blkcg == &blkcg_root)
- 		return q->root_blkg;
- 
--	blkg = rcu_dereference(blkcg->blkg_hint);
-+	blkg = rcu_dereference_check(blkcg->blkg_hint,
-+			lockdep_is_held(&q->queue_lock));
- 	if (blkg && blkg->q == q)
- 		return blkg;
- 
--- 
-2.42.0
+Thanks,
+Kuai
+
+> 
+> Thanks,
+> Song
+> .
+> 
 
