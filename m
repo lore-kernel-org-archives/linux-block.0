@@ -1,104 +1,135 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205AE20DCE;
-	Wed, 20 Dec 2023 10:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C773E466;
+	Wed, 20 Dec 2023 15:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QtMbx3AE"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d3cfb1568eso21267125ad.1;
-        Wed, 20 Dec 2023 02:04:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703066658; x=1703671458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9HEt/Agnjbcv9DZ/M0GOa62SZcHFmpwSvE3fYxb9KVA=;
-        b=QtMbx3AENOISAfOlauZEfEURi2E2Xjxhscrc3OJVwydeJzFTDoyIZVubCwKJJC9mKg
-         2Y8t9r1pdMKWHiQfDvRZkoMV3oU7MfFA4gRP/RdnuKIX1HTlS1jjw1qadvzfePkodhBh
-         boPmiSeMQib/XOkHKP5iPFJveYrgutnOs5LSu7l/luVEi0l0iRbs4kqAN2e+SS0xF+XS
-         hsfMq0nDAZvgH8VKxhEugon+nBbT8j2Fw2RYLhHNNwv1t9daEUYAo4vsWtbV1g+dSdNn
-         OX4IP+Iwi/c6zxAqjZ2wysx1QoTg+4k+xHour0pQx0S+vexEJ4l85wQFdRTgpvn8R4NA
-         QDdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703066658; x=1703671458;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9HEt/Agnjbcv9DZ/M0GOa62SZcHFmpwSvE3fYxb9KVA=;
-        b=LNlrExYrh5WgQfHx7G/USbSlz7AM64+FgOJ5WaBNSt42z/jMmPxWRk9O+LU/XpFqNF
-         pwuElWg2anqTGFWSNPmLOMdduG8wDYUP952CS6pbyZGa6tzyd5ObM7WgSGzz6+PNpHh4
-         gkXr6mps9DKgRcc1/pKJPwvplHxV12M45iwkgcRx7uhlzYmceq6480nXSbH/yi4ule7J
-         XehYyIJQKMOghmAJHF4rYxyd3g3F+3QMCrc4PK7UgQsR8PFG+MfO0uqrfXqMKWlgCkHz
-         cBD1nxboFNjgNnq+74LsdMn3ZAMzF2H3O8y/RJw3oYPXnrPG2EZMYozn4gEQtUytRlHS
-         41kQ==
-X-Gm-Message-State: AOJu0Yxre3yRrBkFV9+88i3kWdDfhF19yw+DCAfj4GJQcx4rohrOefIj
-	JUSuVhfsSnuB4VjVznZ8aGI=
-X-Google-Smtp-Source: AGHT+IEbaFfYHbR6pC1D8QsJ2uRB5r/HvmJFeTQAJTPxOJxDG1Vafjsid5EASELuV3KYMogm+e4Yyw==
-X-Received: by 2002:a17:902:d4ca:b0:1d3:45c8:bc12 with SMTP id o10-20020a170902d4ca00b001d345c8bc12mr16994882plg.38.1703066658460;
-        Wed, 20 Dec 2023 02:04:18 -0800 (PST)
-Received: from ubuntu.. ([117.18.48.102])
-        by smtp.gmail.com with ESMTPSA id x3-20020a170902fe8300b001d3b7c5776asm5721619plm.160.2023.12.20.02.04.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 02:04:18 -0800 (PST)
-From: Hongyu Jin <hongyu.jin.cn@gmail.com>
-To: agk@redhat.com,
-	snitzer@kernel.org,
-	mpatocka@redhat.com,
-	axboe@kernel.dk,
-	ebiggers@kernel.org
-Cc: zhiguo.niu@unisoc.com,
-	ke.wang@unisoc.com,
-	yibin.ding@unisoc.com,
-	hongyu.jin@unisoc.com,
-	linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 5/5] dm-crypt: Fix lost ioprio when queuing write bios
-Date: Wed, 20 Dec 2023 18:03:33 +0800
-Message-Id: <20231220100333.107049-6-hongyu.jin.cn@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231220100333.107049-1-hongyu.jin.cn@gmail.com>
-References: <20231213104216.27845-6-hongyu.jin.cn@gmail.com>
- <20231220100333.107049-1-hongyu.jin.cn@gmail.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="k4BjIt91";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Qz/+RpKV";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="k4BjIt91";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Qz/+RpKV"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 62EC2220A2;
+	Wed, 20 Dec 2023 15:03:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1703084624; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RJLiR52BvcvBcu+7KNu8szcQ3tFu3Q6j8/rxFOU/t94=;
+	b=k4BjIt91dMGqCUXdnUgbU9v4Se8mgR8EH6CysXIqHTQHdyxN2nTrqERsK+jVpMcTYvl9hs
+	RyRJTuyo7xahE7bD7UdVHa/Z6ERng05LDisfxFr2xmujvB+wZU690tf21+0IhsFto+l4gG
+	MrbS7H4mNYcoiVX9pU0sqyn9khMcs7k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1703084624;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RJLiR52BvcvBcu+7KNu8szcQ3tFu3Q6j8/rxFOU/t94=;
+	b=Qz/+RpKVDddZZfiR1WmP96tRunhs+naG5uu1rOTw4wmXAGVjc1PhLawAyzPvoi4otkzsbH
+	E2+65rcv98sayRAw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1703084624; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RJLiR52BvcvBcu+7KNu8szcQ3tFu3Q6j8/rxFOU/t94=;
+	b=k4BjIt91dMGqCUXdnUgbU9v4Se8mgR8EH6CysXIqHTQHdyxN2nTrqERsK+jVpMcTYvl9hs
+	RyRJTuyo7xahE7bD7UdVHa/Z6ERng05LDisfxFr2xmujvB+wZU690tf21+0IhsFto+l4gG
+	MrbS7H4mNYcoiVX9pU0sqyn9khMcs7k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1703084624;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RJLiR52BvcvBcu+7KNu8szcQ3tFu3Q6j8/rxFOU/t94=;
+	b=Qz/+RpKVDddZZfiR1WmP96tRunhs+naG5uu1rOTw4wmXAGVjc1PhLawAyzPvoi4otkzsbH
+	E2+65rcv98sayRAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1B181136A5;
+	Wed, 20 Dec 2023 15:03:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 63A/A1ACg2VDKwAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 20 Dec 2023 15:03:44 +0000
+Message-ID: <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+Date: Wed, 20 Dec 2023 16:03:43 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: [LSF/MM/BPF TOPIC] Large block for I/O
+Content-Language: en-US
+To: lsf-pc@lists.linuxfoundation.org
+Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+ <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.50 / 50.00];
+	 ARC_NA(0.00)[];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-2.41)[97.32%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 RCPT_COUNT_FIVE(0.00)[5];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Score: -2.50
+X-Spam-Flag: NO
 
-From: Hongyu Jin <hongyu.jin@unisoc.com>
+Hi all,
 
-Since dm-crypt queues writes to a different kernel thread (workqueue),
-the bios will dispatch from tasks with different io_context->ioprio
-settings and blkcg than the submitting task, thus giving incorrect
-ioprio to the io scheduler.
+I would like to discuss
 
-Get the original io priority setting via struct dm_crypt_io::base_bio
-and set this priority to the bio for write.
+Large blocks for I/O
 
-Link: https://lore.kernel.org/dm-devel/alpine.LRH.2.11.1612141049250.13402@mail.ewheeler.net
+Since the presentation last year there has been quite some developments
+and improvements in some areas, but at the same time a lack of progress
+in other areas.
+In this presentation/discussion I would like to highlight the current
+state of affairs, existing pain points, and future directions of 
+development.
+It might be an idea to co-locate it with the MM folks as we do have
+quite some overlap with page-cache improvements and hugepage handling.
 
-Signed-off-by: Hongyu Jin <hongyu.jin@unisoc.com>
----
- drivers/md/dm-crypt.c | 1 +
- 1 file changed, 1 insertion(+)
+Cheers,
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 2ae8560b6a14..ba6e794f7871 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1683,6 +1683,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned int size)
- 				 GFP_NOIO, &cc->bs);
- 	clone->bi_private = io;
- 	clone->bi_end_io = crypt_endio;
-+	clone->bi_ioprio = io->base_bio->bi_ioprio;
- 
- 	remaining_size = size;
- 
+Hannes
 -- 
-2.34.1
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Ivo Totev, Andrew McDonald,
+Werner Knoblich
 
