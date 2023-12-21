@@ -1,35 +1,27 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804BCD2E1;
-	Thu, 21 Dec 2023 06:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RnIB+hTC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=fD9rBv6cYFApB69+XHlAtZrlbGuncMHSqv5l94QWf6g=; b=RnIB+hTCfFYivJfjgzh/O6mGDm
-	zIpmTF7TjXT23xGu+qzqiLCWOR5xhMdaHm7Hds4vTZ2popQRp6FWtu720gVUfgI+r3/gfwXDn9Rny
-	GEWfoWuJVzK1sMcYbgNTFXgi2ymamUeVJjB8l3f8bnrjfPa+t523+D/+DsWDwZdS1K1YnFZBMQ53w
-	QeWpOM6hc+pxYbpP5kWS27+VoJpz0CUYu/hI47Rp8A7F4KKAkXzHWgpnBVbq3TN+3DOw6WI1/h3ML
-	9sPHefdfV327ViMp9AbAOzSdEx9D4F77Wte8RlJPzwQNhnQUoSp3tYqpnmae+YuJnBaYA4o6UHFEa
-	+PSNPREw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rGCIb-001nwk-15;
-	Thu, 21 Dec 2023 06:12:49 +0000
-Date: Wed, 20 Dec 2023 22:12:49 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Song Liu <song@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-	axboe@kernel.dk, kent.overstreet@linux.dev,
-	janpieter.sollie@edpnet.be, colyli@suse.de, bagasdotme@gmail.com
-Subject: Re: [PATCH 1/2] block: Check REQ_OP_FLUSH in op_is_flush()
-Message-ID: <ZYPXYdBAdNoKXI8b@infradead.org>
-References: <20231221012715.3048221-1-song@kernel.org>
- <20231221012715.3048221-2-song@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC96BE49;
+	Thu, 21 Dec 2023 06:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 2ECBC68C4E; Thu, 21 Dec 2023 07:50:31 +0100 (CET)
+Date: Thu, 21 Dec 2023 07:50:31 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>,
+	axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
+	jejb@linux.ibm.com, martin.petersen@oracle.com,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+	ming.lei@redhat.com, jaswin@linux.ibm.com, bvanassche@acm.org
+Subject: Re: [PATCH v2 00/16] block atomic writes
+Message-ID: <20231221065031.GA25778@lst.de>
+References: <20231212110844.19698-1-john.g.garry@oracle.com> <20231212163246.GA24594@lst.de> <b8b0a9d7-88d2-45a9-877a-ecc5e0f1e645@oracle.com> <20231213154409.GA7724@lst.de> <c729b03c-b1d1-4458-9983-113f8cd752cd@oracle.com> <20231219051456.GB3964019@frogsfrogsfrogs> <20231219052121.GA338@lst.de> <76c85021-dd9e-49e3-80e3-25a17c7ca455@oracle.com> <20231219151759.GA4468@lst.de> <fff50006-ccd2-4944-ba32-84cbb2dbd1f4@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,19 +30,27 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231221012715.3048221-2-song@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <fff50006-ccd2-4944-ba32-84cbb2dbd1f4@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Dec 20, 2023 at 05:27:14PM -0800, Song Liu wrote:
-> Upper layer (fs, etc.) may issue flush with something like:
-> 
->   bio_reset(bio, bdev, REQ_OP_FLUSH);
->   bio->bi_end_io = xxx;
->   submit_bio(bio);
+On Tue, Dec 19, 2023 at 04:53:27PM +0000, John Garry wrote:
+> On 19/12/2023 15:17, Christoph Hellwig wrote:
+>> On Tue, Dec 19, 2023 at 12:41:37PM +0000, John Garry wrote:
+>>> How about something based on fcntl, like below? We will prob also require
+>>> some per-FS flag for enabling atomic writes without HW support. That flag
+>>> might be also useful for XFS for differentiating forcealign for atomic
+>>> writes with just forcealign.
+>> I would have just exposed it through a user visible flag instead of
+>> adding yet another ioctl/fcntl opcode and yet another method.
+>>
+>
+> Any specific type of flag?
+>
+> I would suggest a file attribute which we can set via chattr, but that is 
+> still using an ioctl and would require a new inode flag; but at least there 
+> is standard userspace support.
 
-No, they can't.  REQ_OP_FLUSH is currently only used by request
-based drivers and only generated by the flush state machine.
+I'd be fine with that, but we're kinda running out of flag there.
+That's why I suggested the FS_XFLAG_ instead, which basically works
+the same.
 
-(Not that I particularly like this wart, I'd much prefer file systems
-to submit a REQ_OP_FLUSH than an empty write with a preflush flag,
-but that's not a trivial change).
