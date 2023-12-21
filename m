@@ -1,104 +1,170 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2D96BB38;
-	Thu, 21 Dec 2023 10:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28C16A02A;
+	Thu, 21 Dec 2023 12:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ujt34dgO"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6d2350636d6so587299b3a.2;
-        Thu, 21 Dec 2023 02:32:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703154732; x=1703759532; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9HEt/Agnjbcv9DZ/M0GOa62SZcHFmpwSvE3fYxb9KVA=;
-        b=Ujt34dgOVFXSlXzQf7DIElxF27e/pA6+PQWiMlKTrdHCc5qrrEcvrg+QJBhGvUQ6z0
-         UFkrykxc8RCeLeQ8aTw2l+6kfv4ECzt/91s+qxaUxEj9zbZJreo91vHcigbfr6AvgPrH
-         WFes/JeLdGuZJ9k2Ia03r0ji8X4t6e8hT/lHKi52ql1BKs9fZtCJrYyDmNdA+xHWRyfD
-         CCxPm70FlKca8WcIEZaRMf+hqxVsB48lmqo9vsxew9vYfFpuRd6AxQqeeEbAuZiNkuyi
-         /mXC5d2CO1fgj2xIRhg0BSrtsz5gY4fjDdoeQdyzjGc/4wy1uLes3ffZlEWFWpMG/xOH
-         /+jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703154732; x=1703759532;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9HEt/Agnjbcv9DZ/M0GOa62SZcHFmpwSvE3fYxb9KVA=;
-        b=SmwlWCMOCM1KwS4igmIzZPL6LPvr26NFKp0sCYHu7Y+EgRYJTR9hAsOh/iKnAaJq3Z
-         u4Ifryanzj70yheNpRu08LZeSelfEkos/RUf/JXWO9oM8nRw9W5zcWE/dHYtS2j+F7wK
-         38BAPjwzaQn7AoH5iow/12EXR3QSOktqLf5i2hIV15eNh7C0Jbyp8CL5vNjKG9qE2+so
-         OF1rsA8rv+UhWHzDC5eLIERfer+5/dqC6vlYNV/zm0cDv+lOcwtiJF8m7IidMzvAigAV
-         jnSmHgiRNjRbpFk/7xWglXsmgAKfrfyeIYC49sDlQAS9gF+BpeZAS1kTy48UJ1DrOT2J
-         xN9g==
-X-Gm-Message-State: AOJu0YyQg8UYybH2Jjf3AP/tRij5B43w7jmM6KObizr+Q2k9v8TLnSTD
-	q2uT63vrZElTA2YNxJ24+C4=
-X-Google-Smtp-Source: AGHT+IH5t7uT/SldRyiqK6cSmkG5jDgNvZum1nVCrHGQGX9hUk4auA9koTf/m4gNz1e+uGzeX9pI8A==
-X-Received: by 2002:aa7:9d1b:0:b0:6d9:6712:f9ed with SMTP id k27-20020aa79d1b000000b006d96712f9edmr1727220pfp.7.1703154732417;
-        Thu, 21 Dec 2023 02:32:12 -0800 (PST)
-Received: from ubuntu.. ([117.18.48.102])
-        by smtp.gmail.com with ESMTPSA id a25-20020a634d19000000b005c6617b52e6sm1274539pgb.5.2023.12.21.02.32.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 02:32:12 -0800 (PST)
-From: Hongyu Jin <hongyu.jin.cn@gmail.com>
-To: agk@redhat.com,
-	snitzer@kernel.org,
-	mpatocka@redhat.com,
-	axboe@kernel.dk,
-	ebiggers@kernel.org
-Cc: zhiguo.niu@unisoc.com,
-	ke.wang@unisoc.com,
-	yibin.ding@unisoc.com,
-	hongyu.jin@unisoc.com,
-	linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [PATCH v7 5/5] dm-crypt: Fix lost ioprio when queuing write bios
-Date: Thu, 21 Dec 2023 18:31:39 +0800
-Message-Id: <20231221103139.15699-6-hongyu.jin.cn@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231221103139.15699-1-hongyu.jin.cn@gmail.com>
-References: <20231220100333.107049-6-hongyu.jin.cn@gmail.com>
- <20231221103139.15699-1-hongyu.jin.cn@gmail.com>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pUDhVOiE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hzTwR5PX";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pUDhVOiE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hzTwR5PX"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B09D91FDAA;
+	Thu, 21 Dec 2023 12:11:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1703160670; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J+TyKykGlPVi1TiMaCKYzUe9Yh1Gu/kCcG/smM9DkYo=;
+	b=pUDhVOiEd5zLszVe8ECaSa3ymfOk9bQCI97dUgxxgcf6D8Wmj4PoHuqXUwiEiq00br12S0
+	D2Gf1Zo7C2/e7r1g7zglKHX1oyaVlmy/DLtPbKqTr0+zHreqGgJVRpjcHH+SSuS9HhUiRM
+	mXQbxcRYE3LnxwLRKG6ztmQDVgS1G18=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1703160670;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J+TyKykGlPVi1TiMaCKYzUe9Yh1Gu/kCcG/smM9DkYo=;
+	b=hzTwR5PXHZWTh5Wt3yjvB6dz8ugCKv2WGNijPFdBwhy0VBlFaBJLLSRWohuBcX1g8OLlqL
+	q/PPCzwG1hqhQ2BA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1703160670; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J+TyKykGlPVi1TiMaCKYzUe9Yh1Gu/kCcG/smM9DkYo=;
+	b=pUDhVOiEd5zLszVe8ECaSa3ymfOk9bQCI97dUgxxgcf6D8Wmj4PoHuqXUwiEiq00br12S0
+	D2Gf1Zo7C2/e7r1g7zglKHX1oyaVlmy/DLtPbKqTr0+zHreqGgJVRpjcHH+SSuS9HhUiRM
+	mXQbxcRYE3LnxwLRKG6ztmQDVgS1G18=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1703160670;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J+TyKykGlPVi1TiMaCKYzUe9Yh1Gu/kCcG/smM9DkYo=;
+	b=hzTwR5PXHZWTh5Wt3yjvB6dz8ugCKv2WGNijPFdBwhy0VBlFaBJLLSRWohuBcX1g8OLlqL
+	q/PPCzwG1hqhQ2BA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9AB7B13AB5;
+	Thu, 21 Dec 2023 12:11:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id NWrBJV4rhGW9aQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 21 Dec 2023 12:11:10 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 36197A07E3; Thu, 21 Dec 2023 13:11:02 +0100 (CET)
+Date: Thu, 21 Dec 2023 13:11:02 +0100
+From: Jan Kara <jack@suse.cz>
+To: Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc: Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	Kees Cook <keescook@google.com>,
+	syzkaller <syzkaller@googlegroups.com>,
+	Alexander Popov <alex.popov@linux.com>, linux-xfs@vger.kernel.org,
+	Dmitry Vyukov <dvyukov@google.com>,
+	yangerkun <yangerkun@huawei.com>, "yukuai (C)" <yukuai3@huawei.com>,
+	"zhangyi (F)" <yi.zhang@huawei.com>
+Subject: Re: [PATCH 3/7] block: Add config option to not allow writing to
+ mounted devices
+Message-ID: <20231221121102.2pfp3cyzmsf2xmls@quack3>
+References: <20231101173542.23597-1-jack@suse.cz>
+ <20231101174325.10596-3-jack@suse.cz>
+ <64fdffaa-9a8f-df34-42e7-ccca81e95c3c@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64fdffaa-9a8f-df34-42e7-ccca81e95c3c@huaweicloud.com>
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -3.80
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCPT_COUNT_TWELVE(0.00)[15];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Spam-Flag: NO
 
-From: Hongyu Jin <hongyu.jin@unisoc.com>
+On Wed 20-12-23 11:26:38, Li Lingfeng wrote:
+> > @@ -773,6 +803,10 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+> >   	if (ret)
+> >   		goto free_handle;
+> > +	/* Blocking writes requires exclusive opener */
+> > +	if (mode & BLK_OPEN_RESTRICT_WRITES && !holder)
+> > +		return ERR_PTR(-EINVAL);
+> > +
+> >   	bdev = blkdev_get_no_open(dev);
+> >   	if (!bdev) {
+> >   		ret = -ENXIO;
+> > @@ -800,12 +834,21 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+> >   		goto abort_claiming;
+> >   	if (!try_module_get(disk->fops->owner))
+> >   		goto abort_claiming;
+> > +	ret = -EBUSY;
+> > +	if (!blkdev_open_compatible(bdev, mode))
+> > +		goto abort_claiming;
+> >   	if (bdev_is_partition(bdev))
+> >   		ret = blkdev_get_part(bdev, mode);
+> >   	else
+> >   		ret = blkdev_get_whole(bdev, mode);
+> >   	if (ret)
+> >   		goto put_module;
+> > +	if (!bdev_allow_write_mounted) {
+> > +		if (mode & BLK_OPEN_RESTRICT_WRITES)
+> > +			bdev_block_writes(bdev);
+> 
+> When a partition device is mounted, I think maybe it's better to block
+> writes on the whole device at same time.
+> 
+> Allowing the whole device to be opened for writing when mounting a partition
+> device, did you have any special considerations before?
 
-Since dm-crypt queues writes to a different kernel thread (workqueue),
-the bios will dispatch from tasks with different io_context->ioprio
-settings and blkcg than the submitting task, thus giving incorrect
-ioprio to the io scheduler.
+Yes, we were considering this. But the truth is that:
 
-Get the original io priority setting via struct dm_crypt_io::base_bio
-and set this priority to the bio for write.
+a) It is *very* hard to stop all the possibilities of corrupting data on
+the device - e.g. with device mapper / loop device / malicious partition
+table you can construct many block devices pointing to the same storage,
+you can use e.g. SG_IO to corrupt on disk data etc. So special-casing
+partitions is providing little additional benefit.
 
-Link: https://lore.kernel.org/dm-devel/alpine.LRH.2.11.1612141049250.13402@mail.ewheeler.net
+b) It is difficult to then correctly handle valid cases of multiple
+writeably mounted partitions on the same device - you'd need to track used
+block numbers for each device which gets difficult in presence of device
+mapper etc.
 
-Signed-off-by: Hongyu Jin <hongyu.jin@unisoc.com>
----
- drivers/md/dm-crypt.c | 1 +
- 1 file changed, 1 insertion(+)
+c) To stop filesystem crashes, it is enough to stop modifications of buffer
+cache of that one block device. Because filesystems have to validate data
+they are loading into buffer cache anyway to handle faulty device, fs
+corruption etc.
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 2ae8560b6a14..ba6e794f7871 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1683,6 +1683,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned int size)
- 				 GFP_NOIO, &cc->bs);
- 	clone->bi_private = io;
- 	clone->bi_end_io = crypt_endio;
-+	clone->bi_ioprio = io->base_bio->bi_ioprio;
- 
- 	remaining_size = size;
- 
+								Honza
 -- 
-2.34.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
