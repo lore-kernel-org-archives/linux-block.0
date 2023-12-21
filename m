@@ -1,55 +1,77 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89039487A9;
-	Wed, 20 Dec 2023 20:13:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839AD3C02;
+	Thu, 21 Dec 2023 01:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jghUCq4x"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A3D4C433CB;
-	Wed, 20 Dec 2023 20:13:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ze0Un40F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D18A4C433C8;
+	Thu, 21 Dec 2023 01:27:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703103192;
-	bh=WbGwXAvqGOP3h5/gLrPtlOOHkYDGIuqOGejmanazRmQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=jghUCq4x0NBdKgUd0NQLG7pvf+8ZoZsHcg3I6/Lmah/N1vANh5OhCH6yZ/W1ZB91Z
-	 qfz4xMI5Snhw3+oxB+FiJ74++TngmDNMSM1gWSZOu305P1VqBSsFVEhSW0RPMgL2wn
-	 5VSsVpdCCC5om9z8t3LukbSm2Kj05lQjkc6Qtleo7hS/q7VGBslg+bF3OCa5OeUBdu
-	 ECLh4bWOjJe9mv66pChP8FVMUm5NNvV5cIWYX5Fn6aJpofOaZN9NDplmr1VMmz3Yih
-	 wmnNmVWDlAtS/V+P/dVe6FlPBELGAGJPfflUw+xznsQjMbKHedUGgPVKWcj9QjJ32i
-	 UMw8c+EX6oA0A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4362ED8C985;
-	Wed, 20 Dec 2023 20:13:12 +0000 (UTC)
-Subject: Re: [git pull] device mapper fixes for 6.7-rc7
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <ZYHo0kWJ/abSbCRF@redhat.com>
-References: <ZYHo0kWJ/abSbCRF@redhat.com>
-X-PR-Tracked-List-Id: <dm-devel.lists.linux.dev>
-X-PR-Tracked-Message-Id: <ZYHo0kWJ/abSbCRF@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/dm-6.7/dm-fixes-3
-X-PR-Tracked-Commit-Id: 5d6f447b07d5432686ba69183af6e96ac58069c9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0a7a93d96d124bf252430090b15feb4239bcf752
-Message-Id: <170310319227.16038.12458478712789685201.pr-tracker-bot@kernel.org>
-Date: Wed, 20 Dec 2023 20:13:12 +0000
-To: Mike Snitzer <snitzer@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, dm-devel@lists.linux.dev, linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, Yu Kuai <yukuai3@huawei.com>
+	s=k20201202; t=1703122056;
+	bh=zyNhx7wdd5QSxYbJW/D9WAj4JzwNhV3UubRpnGHAwEU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ze0Un40FSza+ewR/HyaGPiBMv8UBYmJ+Jk2aJgKxKQEpUlyMsiy9IEMZ5RizMBpBg
+	 AnuPQbbQDMRO/ZyHmhS79PYvQNjphw3sifS/kuCR49JubPqltXZczqoBq4KEMGYV/q
+	 qoqxLHwNveCOCKgho2jzwFun/0XZFRYTzlVZeOMbHyNw/WamNOCcnE1f1int2MT00t
+	 WmeNVFPAZk3uQWkcZirI190O6bxjMWYTEhlEUNdQ4FsAFwgQljxOXjtoCdQvgfNLrM
+	 8x7AQPL11d0xYQOVq9GrQVMiNlOXPUay0QhRp6arEXtF6z2+SEVHpBYSVlgAyTAB6q
+	 3mrMM8sa6yrEA==
+From: Song Liu <song@kernel.org>
+To: linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Cc: axboe@kernel.dk,
+	kent.overstreet@linux.dev,
+	janpieter.sollie@edpnet.be,
+	colyli@suse.de,
+	bagasdotme@gmail.com,
+	Song Liu <song@kernel.org>
+Subject: [PATCH 0/2] block, md: Better handle REQ_OP_FLUSH
+Date: Wed, 20 Dec 2023 17:27:13 -0800
+Message-Id: <20231221012715.3048221-1-song@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Tue, 19 Dec 2023 14:02:42 -0500:
+A recent bug report [1] shows md is handling a flush from bcachefs as read:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/dm-6.7/dm-fixes-3
+bch2_journal_write=>
+  submit_bio=>
+    ...
+    md_handle_request =>
+      raid5_make_request =>
+        chunk_aligned_read =>
+          raid5_read_one_chunk =>
+	    ...
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0a7a93d96d124bf252430090b15feb4239bcf752
+It appears md code only checks REQ_PREFLUSH for flush requests, which
+doesn't cover all cases. OTOH, op_is_flush() doesn't check REQ_OP_FLUSH
+either.
 
-Thank you!
+Fix this by:
+1) Check REQ_PREFLUSH in op_is_flush();
+2) Use op_is_flush() in md code.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+Song
+
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=218184
+
+Song Liu (2):
+  block: Check REQ_OP_FLUSH in op_is_flush()
+  md: Use op_is_flush() to check flush bio
+
+ drivers/md/raid0.c        | 2 +-
+ drivers/md/raid1.c        | 2 +-
+ drivers/md/raid10.c       | 2 +-
+ drivers/md/raid5.c        | 2 +-
+ include/linux/blk_types.h | 3 ++-
+ 5 files changed, 6 insertions(+), 5 deletions(-)
+
+--
+2.34.1
