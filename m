@@ -1,101 +1,125 @@
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5165B53A1C
-	for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 15:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8526519F
+	for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 19:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rmTXVivq"
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5cdbc42f5efso93001a12.0
-        for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 07:25:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703172300; x=1703777100; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OYQveJ1jD0cKNQUKWDB7XgI9CAkh4jcQs70cKoBqfeQ=;
-        b=rmTXVivqslGhjDAsYD1CLMJZCL6LdK6aIfq0P5Q9+z0GrcOhffKkkaeCul9lfGQtzx
-         +MIT2pcbe2P68x3RXa1eJBx74l12NSUTz8G3FD84ihxD7TgceXx6XTkfl1PSIpftfND6
-         +/EOOUPHrWeQRiS/LFnQ84Af55/HPbnbTrzxsy1S3MisyVaAu3t6ECibeFCEwm3UGzKF
-         1WTOB7tP/7cVQDI2VN59N0Z4KpLet9iP+26l5m7pO8Y9pgsAZ/Fu9X8QAXNYZ4CUrEdY
-         EAo+St03dYDftLxFzyYTTgcsxpKIMCyU+ofjf7rgn9QVjU8romz1IMfB3MDsMvaioFp3
-         K0hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703172300; x=1703777100;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OYQveJ1jD0cKNQUKWDB7XgI9CAkh4jcQs70cKoBqfeQ=;
-        b=mswBb/7yNsVJBTm+1j1OCpMLOwUeq3tfFnM0PXcCsSu1z9mqg3KW2g4N0UDMvaUMhq
-         qLoVTSpU7Ai7SVX6mmiI1czD5mvHqln0mTAAAPfA5y8rWA0Qeh5o0UwUoktEYmn3l3iF
-         BnDWFhS9F3ZkAy+SLs9lJ9NqRPKDoRSeklUBQD/noOcGICRxdsTI83mhvHeCY2eTWQym
-         8Q0hBc4Q9f1+K2rdz1dpI/iDrFzXfsv1YosT/ctyGhN7tfHa2jiGGAx0I23L8o0S/kuL
-         1dghb8ABB1IwjeivNlxRUACYjMS/yEd6GyQwA1YOKm7Z0in2DOn4IGF0eE5BLmw/MbHh
-         oEKQ==
-X-Gm-Message-State: AOJu0YyVdGWM3hAntUzc2rCM6VhGb1Tn0Dc5Rgl8E1l3QXpAO4Po4XQ1
-	Wx87qYGVdzfZoeVjeN3SNuZ4eQ==
-X-Google-Smtp-Source: AGHT+IHHJCfGBT3Rs2txpxdbm1HOAQZb3RyKuDFU91acoYMz23YhzN9NSNdno2Q30INfofwDvrCO/w==
-X-Received: by 2002:a05:6a20:f3a6:b0:194:957a:2247 with SMTP id qr38-20020a056a20f3a600b00194957a2247mr8931593pzb.0.1703172300566;
-        Thu, 21 Dec 2023 07:25:00 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id k24-20020a170902ba9800b001acae9734c0sm1747110pls.266.2023.12.21.07.24.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 07:25:00 -0800 (PST)
-Message-ID: <b84b6321-137b-4783-9e76-c644bdb0e01b@kernel.dk>
-Date: Thu, 21 Dec 2023 08:24:58 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ovewfNVW"
+Date: Thu, 21 Dec 2023 14:19:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1703186373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=an/cZCCqS5zxJSkNET76Ye0giZrXilZyvowEVOx+MQY=;
+	b=ovewfNVWzTJ5/+VPMNm+np7pe6MWmkpAxMXribZGBxjpwXaPzz+UFxHbSv0KEBJG4G1WNi
+	gOhO7sGPK7aPok4opifF0c7udDOMy0jCuXG/qjrv3QouBS3gZCws6aYI1pfcxxDr1M2VpE
+	xSJPRz9kGBeMgSSE0eOOxZu+Gi0k8oM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Ed Tsai =?utf-8?B?KOiUoeWul+i7kik=?= <Ed.Tsai@mediatek.com>
+Cc: "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"colyli@suse.de" <colyli@suse.de>,
+	"song@kernel.org" <song@kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+	"janpieter.sollie@edpnet.be" <janpieter.sollie@edpnet.be>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] block, md: Better handle REQ_OP_FLUSH
+Message-ID: <20231221191930.fubcmftjkec42wsc@moria.home.lan>
+References: <20231221012715.3048221-1-song@kernel.org>
+ <9dfc7e93f49f5b3595985ce6ed60e4c08cf05a4c.camel@mediatek.com>
+ <20231221053016.72cqcfg46vxwohcj@moria.home.lan>
+ <fb146972062ea1547eaa809817237f7c546a9e88.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: skip start/end time stamping for passthrough IO
-Content-Language: en-US
-To: Kundan Kumar <kundan.kumar@samsung.com>, kbusch@kernel.org, hch@lst.de
-Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-References: <CGME20231221111858epcas5p46c3bf66f33df8652d2da966b3ecbfa60@epcas5p4.samsung.com>
- <20231221111221.4237-1-kundan.kumar@samsung.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231221111221.4237-1-kundan.kumar@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fb146972062ea1547eaa809817237f7c546a9e88.camel@mediatek.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 12/21/23 4:12 AM, Kundan Kumar wrote:
-> This patch will avoid start/end time stamping for passthrough IO.
-> This helps to improve IO performance by ~7%
+On Thu, Dec 21, 2023 at 07:56:45AM +0000, Ed Tsai (蔡宗軒) wrote:
+> On Thu, 2023-12-21 at 00:30 -0500, Kent Overstreet wrote:
+> >  On Thu, Dec 21, 2023 at 03:36:40AM +0000, Ed Tsai (蔡宗軒) wrote:
+> > > On Wed, 2023-12-20 at 17:27 -0800, Song Liu wrote:
+> > > > you have verified the sender or the content.
+> > > >  A recent bug report [1] shows md is handling a flush from
+> > bcachefs
+> > > > as read:
+> > > > 
+> > > > bch2_journal_write=>
+> > > >   submit_bio=>
+> > > >     ...
+> > > >     md_handle_request =>
+> > > >       raid5_make_request =>
+> > > >         chunk_aligned_read =>
+> > > >           raid5_read_one_chunk =>
+> > > >     ...
+> > > > 
+> > > > It appears md code only checks REQ_PREFLUSH for flush requests,
+> > which
+> > > > doesn't cover all cases. OTOH, op_is_flush() doesn't check
+> > > > REQ_OP_FLUSH
+> > > > either.
+> > > > 
+> > > > Fix this by:
+> > > > 1) Check REQ_PREFLUSH in op_is_flush();
+> > > > 2) Use op_is_flush() in md code.
+> > > > 
+> > > > Thanks,
+> > > > Song
+> > > > 
+> > > > [1] 
+> > > > 
+> > https://urldefense.com/v3/__https://bugzilla.kernel.org/show_bug.cgi?id=218184__;!!CTRNKA9wMg0ARbw!gQbjtS_f5d3Du2prpIT8zUM4mkZf7qDleyaAuEfG8j5tMrDvw7cfJUB04VWl0uVAL4BJ4YWbVopp$
+> > > > 
+> > > 
+> > > REQ_OP_FLUSH is only used by the block layer's flush code, and the
+> > > filesystem should use REQ_PREFLUSH with an empty write bio.
+> > > 
+> > > If we want upper layer to be able to directly send REQ_OP_FLUSH
+> > bio,
+> > > then we should retrieve all REQ_PREFLUSH to confirm. At least for
+> > now,
+> > > it seems that REQ_OP_FLUSH without REQ_PREFLUSH in
+> > `blk_flush_policy`
+> > > will directly return 0 and no flush operation will be sent to the
+> > > driver.
+> > 
+> > If that's the case, then it should be documented and there should be
+> > a
+> > WARN_ON() in generic_make_request().
+> 
+> Please refer to the writeback_cache_control.rst. Use an empty write bio
+> with the REQ_PREFLUSH flag for an explicit flush, or as commonly
+> practiced by most filesystems, use blkdev_issue_flush for a pure flush.
 
-This commit message needs to explain why we don't need to do
-timestamping for passthrough, rather than just say what the win is.
+That's not a substitute for a proper comment in the code.
 
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 1ab3081c82ed..04617494db7e 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -830,7 +830,8 @@ void blk_mq_end_request_batch(struct io_comp_batch *ib);
->   */
->  static inline bool blk_mq_need_time_stamp(struct request *rq)
->  {
-> -	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED));
-> +	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED) &&
-> +		!blk_rq_is_passthrough(rq));
->  }
->  
->  static inline bool blk_mq_is_reserved_rq(struct request *rq)
+> 
+> > 
+> > Also, glancing at blk_types.h, we have the req_op and req_flag_bits
+> > both
+> > using (__force blk_opf_t), but using the same bit range - what the
+> > hell?
+> > That's seriously broken...
+> 
+> No, read the comment before req_op. We do not need to use the entire 32
+> bits to represent OP; only 8 bits for OP, while the remaning 24 bits is
+> used for FLAG.
 
-I feel like this would be cleaner with a bit of separation:
+No, this is just broken; it's using the same bitwise enum for two
+different enums.
 
-static inline bool blk_mq_need_time_stamp(struct request *rq)
-{
-	/* comment on why passthrough is excempt */
-	if (blk_rq_is_passthrough(rq))
-		return false;
-	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED));
-}
-
-or something like that.
-
--- 
-Jens Axboe
-
+bitwise exists for a reason - C enums are not natively type safe, and
+mixing up enums/bitflags and using them in the wrong context is a
+serious source of bugs. If it would be incorrect to or the two different
+flags together, you can't use the same bitwise type.
