@@ -1,62 +1,94 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E869CAD51
-	for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 05:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A939477
+	for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 05:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R4/sIwAt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=woJEwd47saaGmSFPNVomhlIxKHfl8FKXd64XSDyXrFk=; b=R4/sIwAtJ93Yiv8/aD8qJuWeML
-	mNAiWJfCyOYTo2mq2l8CvCaNoh5BzgU2C3dOupWfa5XOQ4cMhCDmZrh/JmYc5k7G25/yAalROJeth
-	asGeTZ3Dag7wECIUqQBE1zI56zlcmCYTxttH1yKaPGwRyUiIrVdKqm5Y/zlwJNeU2CSre6fEaey56
-	ymA4CpC8Ns86jSfpmYxpdofoNdyi4F5Q7/PbOclHD7NVVz9vpGoNcTF/XKgmZqiSvpma7tOzZ3W06
-	mOekIjWi6NS5oznumnB7dWKwHXsAY8xd5ueEbYsoQ1ArftcMc0bsxr/vaUmn52BKAIr3jxAwUnQ1j
-	+yPO4mAg==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rGBbS-001kBF-2F;
-	Thu, 21 Dec 2023 05:28:15 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH] block: export disk_clear_zoned
-Date: Thu, 21 Dec 2023 06:28:14 +0100
-Message-Id: <20231221052815.1063146-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kRhdb6F3"
+Date: Thu, 21 Dec 2023 00:30:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1703136619;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3X2Kz2GJCI5v3h5PevwcewBKZ/aw39cvbj+ixcFBpQs=;
+	b=kRhdb6F3QCIo1RU1bDvmnzBFQCHzmFoFzKqWLNqVISIfXMYCTJJVyA48acsD/Yge4a0fTl
+	tCSNktFIPmrdLzvTNxefr7NveEsHT8KYn/UomP00iUPC+xR5cwM0EoaTu/X9qoxEbeK2XY
+	T3IzLN1VvZALPZTG3b+27lPiOPCiMxI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Ed Tsai =?utf-8?B?KOiUoeWul+i7kik=?= <Ed.Tsai@mediatek.com>
+Cc: "song@kernel.org" <song@kernel.org>,
+	"bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+	"colyli@suse.de" <colyli@suse.de>,
+	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"janpieter.sollie@edpnet.be" <janpieter.sollie@edpnet.be>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] block, md: Better handle REQ_OP_FLUSH
+Message-ID: <20231221053016.72cqcfg46vxwohcj@moria.home.lan>
+References: <20231221012715.3048221-1-song@kernel.org>
+ <9dfc7e93f49f5b3595985ce6ed60e4c08cf05a4c.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <9dfc7e93f49f5b3595985ce6ed60e4c08cf05a4c.camel@mediatek.com>
+X-Migadu-Flow: FLOW_OUT
 
-disk_clear_zoned can be called from a modular block driver like sd, so
-export it.
+On Thu, Dec 21, 2023 at 03:36:40AM +0000, Ed Tsai (蔡宗軒) wrote:
+> On Wed, 2023-12-20 at 17:27 -0800, Song Liu wrote:
+> >  	 
+> > External email : Please do not click links or open attachments until
+> > you have verified the sender or the content.
+> >  A recent bug report [1] shows md is handling a flush from bcachefs
+> > as read:
+> > 
+> > bch2_journal_write=>
+> >   submit_bio=>
+> >     ...
+> >     md_handle_request =>
+> >       raid5_make_request =>
+> >         chunk_aligned_read =>
+> >           raid5_read_one_chunk =>
+> > 	    ...
+> > 
+> > It appears md code only checks REQ_PREFLUSH for flush requests, which
+> > doesn't cover all cases. OTOH, op_is_flush() doesn't check
+> > REQ_OP_FLUSH
+> > either.
+> > 
+> > Fix this by:
+> > 1) Check REQ_PREFLUSH in op_is_flush();
+> > 2) Use op_is_flush() in md code.
+> > 
+> > Thanks,
+> > Song
+> > 
+> > [1] 
+> > https://urldefense.com/v3/__https://bugzilla.kernel.org/show_bug.cgi?id=218184__;!!CTRNKA9wMg0ARbw!gQbjtS_f5d3Du2prpIT8zUM4mkZf7qDleyaAuEfG8j5tMrDvw7cfJUB04VWl0uVAL4BJ4YWbVopp$
+> > 
+> 
+> REQ_OP_FLUSH is only used by the block layer's flush code, and the
+> filesystem should use REQ_PREFLUSH with an empty write bio.
+> 
+> If we want upper layer to be able to directly send REQ_OP_FLUSH bio,
+> then we should retrieve all REQ_PREFLUSH to confirm. At least for now,
+> it seems that REQ_OP_FLUSH without REQ_PREFLUSH in `blk_flush_policy`
+> will directly return 0 and no flush operation will be sent to the
+> driver.
 
-Fixes: d73e93b4dfab ("block: simplify disk_set_zoned")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-zoned.c | 1 +
- 1 file changed, 1 insertion(+)
+If that's the case, then it should be documented and there should be a
+WARN_ON() in generic_make_request().
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 580a58e53efd77..c59d44ee6b236e 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -635,3 +635,4 @@ void disk_clear_zoned(struct gendisk *disk)
- 
- 	blk_mq_unfreeze_queue(q);
- }
-+EXPORT_SYMBOL_GPL(disk_clear_zoned);
--- 
-2.39.2
-
+Also, glancing at blk_types.h, we have the req_op and req_flag_bits both
+using (__force blk_opf_t), but using the same bit range - what the hell?
+That's seriously broken...
