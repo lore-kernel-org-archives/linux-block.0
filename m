@@ -1,61 +1,111 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE51576918;
-	Thu, 21 Dec 2023 21:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883E27762C;
+	Thu, 21 Dec 2023 21:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5cd68a0de49so903726a12.2;
-        Thu, 21 Dec 2023 13:00:50 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eK+FQoFU"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-28bc870c540so1001754a91.2;
+        Thu, 21 Dec 2023 13:42:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703194964; x=1703799764; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BXPgr2T6k2cqQM51LPyd+8bHsl0/1iqBgZw3ozm4OmM=;
+        b=eK+FQoFUPU8P0LDUwnlXlF0RVzLlKDDKunolM4fz5VpgQ/NqC8MgWwM3N3/7tfxhTI
+         ImqosN4pbZ0Yq/yw+TE+sYYhdRfDYQlMnNXLcDI+h2bmFUa3EuRkOHICCNKUxmWUAZAb
+         Nqt/WTXJ9xiVnQzpGYY/mFoPX3I4ia4OGC75sqObfvyhqW9yJMxGwpboSrQBIcf4NGEy
+         /m8vNXdGm2WvgrRTJpc6mlU2b1Dv2fTM6dgo9gTrtwhgOSmCRG/l8z6mjAXfgnt8RbSg
+         riC0zVBqtBk6Hum/npER+Rd0+B3YpgqLHGVX9dKt4GPuX56Sh03GoBi4l7iDGE9nVuig
+         6kmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703192450; x=1703797250;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1703194964; x=1703799764;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=83E5t9dvCQdMsdpEN4iZfGFzunUB9ar9iR0gwlKCl6s=;
-        b=pbyiIzMypj5C5D84PYIgTS/4/RQNycXF1BBoPqv7wm+X1le27Sn3abblEVAxuXJd7b
-         thDX0HK2iU2lLXj1MRJMpcwkyxbgbJ0FVKY4jQC83IuKmWAirwr0fq+s9prQ+AdnxMmi
-         r7NhjYU6W9Fy1bSDbKYAy08N+DEt20HI+AVaPxZQYKlvtZO1gPr07XReOFO9mwhIOrvB
-         s7u5C6cY/LhmaTn0R1V6ELUPnj0HQTwKz2wdbpQ6CRxZot0UODvhMMMg/Mnl4g5U9Y1B
-         l5hxliCBcryrhTYqgh9WG1gvGBh1flS8p3mslgd6OYrrn0gMUa4fr6Iglhalw3aROxAE
-         brVg==
-X-Gm-Message-State: AOJu0YySCEx5Bt1QZF+eKY4VOP7ehROZOyqwNKiWadwUj+lvqPzqri8a
-	GVIds8ZUG0g+01KCtjXzu5uo72lDt64=
-X-Google-Smtp-Source: AGHT+IF6Vyr0+ziV5cTfXGCs1VR1owc+gfKItvvVoK6ZO695dJGMuR7qbeQcDNpP33NW80EtO6hkjw==
-X-Received: by 2002:a17:90a:de05:b0:286:6cc0:cabd with SMTP id m5-20020a17090ade0500b002866cc0cabdmr351341pjv.52.1703192449904;
-        Thu, 21 Dec 2023 13:00:49 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:d9ff:baa2:bd58:437a? ([2620:0:1000:8411:d9ff:baa2:bd58:437a])
-        by smtp.gmail.com with ESMTPSA id j15-20020a17090a840f00b0028bad9b220fsm2196949pjn.37.2023.12.21.13.00.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 13:00:48 -0800 (PST)
-Message-ID: <8db6e3f4-c830-49e2-98c6-530c515eaad3@acm.org>
-Date: Thu, 21 Dec 2023 13:00:47 -0800
+        bh=BXPgr2T6k2cqQM51LPyd+8bHsl0/1iqBgZw3ozm4OmM=;
+        b=MHvax+rZu4w2Z9ClboKbkMG3RMTMHtrKhLIchLKjXdVm/OKX9UMLIMK/IzT+o0Dw7l
+         1B+nKuvPHozQz8fwhOgs4VG3JdG79z0gpwDTIalN/jJ30wwNc8n2OUsiwKg0MeGUSR2v
+         ZJFwCvzOtwm6zTsxIThhNnLmtUugKx3xr6SICYUXbKw7ehs2ViC5CDkIyDKgmgcBLnEL
+         5Jzf4MbgBntSNGjqeINWspKWaHOT/zBPgCO88RZhHjm34CbAq40FdB3/gdzTis9CBohh
+         qU9TBeinDE5Y44UO6q8kAw91gzXUVYrCvnMjJbMDkKs4H7njC2CN+SkKPYbHdouLYf06
+         g4OQ==
+X-Gm-Message-State: AOJu0Yyo92sO2XeNyz2nL7qpNiLwXPmjigKRb4WX6iYQ+5XeWrB3bunm
+	uf/dLw89G0JjTCQfN6yyvN0=
+X-Google-Smtp-Source: AGHT+IFXgwvw7NCQiXUJrDPOJqYvUyH5h3zVjuOWbcYEagdQHOCFWNaI2Vs852k/Nvm2+CpNQB64dg==
+X-Received: by 2002:a17:90a:cc05:b0:28b:e25a:9c25 with SMTP id b5-20020a17090acc0500b0028be25a9c25mr376993pju.10.1703194963716;
+        Thu, 21 Dec 2023 13:42:43 -0800 (PST)
+Received: from localhost ([121.167.227.144])
+        by smtp.gmail.com with ESMTPSA id ei8-20020a17090ae54800b0028bd9f88576sm2262757pjb.26.2023.12.21.13.42.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 13:42:43 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 22 Dec 2023 06:42:40 +0900
+From: Tejun Heo <tj@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	Shaohua Li <shli@fb.com>, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] blk-throttle: Fix some potential string truncation in
+ tg_prfill_limit()
+Message-ID: <ZYSxUPan9qPNE5Bk@mtj.duckdns.org>
+References: <0461f1d69c84cf5a98ae57012856dace757d319e.1702731206.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
-Content-Language: en-US
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linuxfoundation.org,
- linux-mm@kvack.org, linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
- <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
- <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
- <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
- <ZYSjJdF1wyqeCFhU@casper.infradead.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ZYSjJdF1wyqeCFhU@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0461f1d69c84cf5a98ae57012856dace757d319e.1702731206.git.christophe.jaillet@wanadoo.fr>
 
-On 12/21/23 12:42, Matthew Wilcox wrote:
-> So if you want to talk about the downsides, show up and talk about them.
+On Sat, Dec 16, 2023 at 01:54:56PM +0100, Christophe JAILLET wrote:
+> When compiled with W=1, we get:
+>   block/blk-throttle.c: In function ‘tg_prfill_limit’:
+>   block/blk-throttle.c:1539:74: error: ‘snprintf’ output may be truncated before the last format character [-Werror=format-truncation=]
+>    1539 |                         snprintf(idle_time, sizeof(idle_time), " idle=%lu",
+>         |                                                                          ^
+>   block/blk-throttle.c:1539:25: note: ‘snprintf’ output between 8 and 27 bytes into a destination of size 26
+>    1539 |                         snprintf(idle_time, sizeof(idle_time), " idle=%lu",
+>         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    1540 |                                 tg->idletime_threshold_conf);
+>         |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   block/blk-throttle.c:1546:43: error: ‘%lu’ directive output may be truncated writing between 1 and 20 bytes into a region of size 17 [-Werror=format-truncation=]
+>    1546 |                                 " latency=%lu", tg->latency_target_conf);
+>         |                                           ^~~
+>   block/blk-throttle.c:1546:33: note: directive argument in the range [0, 18446744073709551614]
+>    1546 |                                 " latency=%lu", tg->latency_target_conf);
+>         |                                 ^~~~~~~~~~~~~~
+>   block/blk-throttle.c:1545:25: note: ‘snprintf’ output between 11 and 30 bytes into a destination of size 26
+>    1545 |                         snprintf(latency_time, sizeof(latency_time),
+>         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    1546 |                                 " latency=%lu", tg->latency_target_conf);
+>         |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> In order to fix it, remove all the intermediate buffers and write directly
+> into the 'sf' seq_file.
+> 
+> Fixes: ada75b6e5b2a ("blk-throttle: add interface to configure idle time threshold")
+> Fixes: ec80991d6fc2 ("blk-throttle: add interface for per-cgroup target latency")
 
-If I receive an invitation for the LSF/MM/BPF summit I will show up :-)
+I'm not sure Fixes tags are necessary here given that this isn't something
+we'd hit in practice.
 
-Bart.
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+
+Looks fine to me, so:
+
+  Acked-by: Tejun Heo <tj@kernel.org>
+
+But, can you please briefly explain how you tested the patch?
+
+Thanks.
+
+-- 
+tejun
