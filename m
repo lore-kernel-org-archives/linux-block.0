@@ -1,108 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF3810F7;
-	Thu, 21 Dec 2023 01:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6Y59PIz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA854C433C8;
-	Thu, 21 Dec 2023 01:27:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703122066;
-	bh=TgGPuVNkTVJBeSz3CRaPkkdMlpGg5Rk9X00t8GA+alA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m6Y59PIzrQL9Z77+QxgwL5oEqEYnx319xp9JfZGLSmHW4Z0MLWhU7Rf04o+iGj3cE
-	 H9CoS2DyJQiPnjrQUwV8+6P54TZfHnPZoaroclJUJd8PzxER1/hzHlK7ELS8KWGjpI
-	 PGIvieGnxqkEWNUgRuOotmV2k6u0lsrEXA3xZ/EjEU2zmBZMfGl0YYp+4dugGeogvt
-	 mcuwrFMRtrYs+ODbnvLdxToDAmWVRgBDuRandzZCIE375g8tT8FxGmTrK4/fyXoObj
-	 BomfI59SDqkxN7TswJ/707ohii0F7Y27EORZ8smrmE5Lr7Gn9o7PSV+4wUBWuUW55a
-	 xcKzJrWtq8imQ==
-From: Song Liu <song@kernel.org>
-To: linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Cc: axboe@kernel.dk,
-	kent.overstreet@linux.dev,
-	janpieter.sollie@edpnet.be,
-	colyli@suse.de,
-	bagasdotme@gmail.com,
-	Song Liu <song@kernel.org>
-Subject: [PATCH 2/2] md: Use op_is_flush() to check flush bio
-Date: Wed, 20 Dec 2023 17:27:15 -0800
-Message-Id: <20231221012715.3048221-3-song@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D698F52;
+	Thu, 21 Dec 2023 03:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 7b55f3bcf43a41c4aec9b6ba6e278ec2-20231221
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.33,REQID:ada57bc5-8679-49e8-bb38-eba6e84ae9bd,IP:15,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:35
+X-CID-INFO: VERSION:1.1.33,REQID:ada57bc5-8679-49e8-bb38-eba6e84ae9bd,IP:15,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:35
+X-CID-META: VersionHash:364b77b,CLOUDID:c4e40082-8d4f-477b-89d2-1e3bdbef96d1,B
+	ulkID:231221110100PRPDICKD,BulkQuantity:0,Recheck:0,SF:66|24|72|19|44|102,
+	TC:nil,Content:0,EDM:5,IP:-2,URL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL
+	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_ULN,TF_CID_SPAM_SNR,TF_CID_SPAM_FSD
+X-UUID: 7b55f3bcf43a41c4aec9b6ba6e278ec2-20231221
+Received: from node4.com.cn [(39.156.73.12)] by mailgw
+	(envelope-from <liyouhong@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1660399244; Thu, 21 Dec 2023 11:00:58 +0800
+Received: from node4.com.cn (localhost [127.0.0.1])
+	by node4.com.cn (NSMail) with SMTP id D699016001CD7;
+	Thu, 21 Dec 2023 11:00:57 +0800 (CST)
+X-ns-mid: postfix-6583AA69-6562031
+Received: from localhost.localdomain (unknown [172.20.185.164])
+	by node4.com.cn (NSMail) with ESMTPA id 5302416001CD7;
+	Thu, 21 Dec 2023 03:00:57 +0000 (UTC)
+From: YouHong Li <liyouhong@kylinos.cn>
+To: jgross@suse.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	liyouhong <liyouhong@kylinos.cn>,
+	k2ci <kernel-bot@kylinos.cn>
+Subject: [PATCH] drivers/block/xen-blkback/common.h: Fix spelling typo in comment
+Date: Thu, 21 Dec 2023 11:00:14 +0800
+Message-Id: <20231221030014.1319663-1-liyouhong@kylinos.cn>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231221012715.3048221-1-song@kernel.org>
-References: <20231221012715.3048221-1-song@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-op_is_flush() covers different ways to request flush. Use it instead of
-simply checking against REQ_PREFLUSH.
+From: liyouhong <liyouhong@kylinos.cn>
 
-Signed-off-by: Song Liu <song@kernel.org>
----
- drivers/md/raid0.c  | 2 +-
- drivers/md/raid1.c  | 2 +-
- drivers/md/raid10.c | 2 +-
- drivers/md/raid5.c  | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+Fix spelling typo in comment.
 
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index c50a7abda744..20283dc5208a 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -592,7 +592,7 @@ static bool raid0_make_request(struct mddev *mddev, struct bio *bio)
- 	unsigned chunk_sects;
- 	unsigned sectors;
- 
--	if (unlikely(bio->bi_opf & REQ_PREFLUSH)
-+	if (unlikely(op_is_flush(bio->bi_opf))
- 	    && md_flush_request(mddev, bio))
- 		return true;
- 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index aaa434f0c175..5c1dadd7fbb6 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1581,7 +1581,7 @@ static bool raid1_make_request(struct mddev *mddev, struct bio *bio)
- {
- 	sector_t sectors;
- 
--	if (unlikely(bio->bi_opf & REQ_PREFLUSH)
-+	if (unlikely(op_is_flush(bio->bi_opf))
- 	    && md_flush_request(mddev, bio))
- 		return true;
- 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 7412066ea22c..5c6e0a8635f2 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -1857,7 +1857,7 @@ static bool raid10_make_request(struct mddev *mddev, struct bio *bio)
- 	int chunk_sects = chunk_mask + 1;
- 	int sectors = bio_sectors(bio);
- 
--	if (unlikely(bio->bi_opf & REQ_PREFLUSH)
-+	if (unlikely(op_is_flush(bio->bi_opf))
- 	    && md_flush_request(mddev, bio))
- 		return true;
- 
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index e57deb1c6138..1bcf96b490a7 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -6070,7 +6070,7 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
- 	enum stripe_result res;
- 	int s, stripe_cnt;
- 
--	if (unlikely(bi->bi_opf & REQ_PREFLUSH)) {
-+	if (unlikely(op_is_flush(bi->bi_opf))) {
- 		int ret = log_handle_flush_request(conf, bi);
- 
- 		if (ret == 0)
--- 
+Reported-by: k2ci <kernel-bot@kylinos.cn>
+Signed-off-by: liyouhong <liyouhong@kylinos.cn>
+
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkba=
+ck/common.h
+index 40f67bfc052d..c64253d3bb40 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -132,7 +132,7 @@ struct blkif_x86_32_request {
+ struct blkif_x86_64_request_rw {
+ 	uint8_t        nr_segments;  /* number of segments                   */
+ 	blkif_vdev_t   handle;       /* only for read/write requests         */
+-	uint32_t       _pad1;        /* offsetof(blkif_reqest..,u.rw.id)=3D=3D8=
+  */
++	uint32_t       _pad1;        /* offsetof(blkif_request..,u.rw.id)=3D=3D=
+8  */
+ 	uint64_t       id;
+ 	blkif_sector_t sector_number;/* start sector idx on disk (r/w only)  */
+ 	struct blkif_request_segment seg[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+--=20
 2.34.1
 
