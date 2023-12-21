@@ -1,125 +1,78 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8526519F
-	for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 19:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ovewfNVW"
-Date: Thu, 21 Dec 2023 14:19:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703186373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=an/cZCCqS5zxJSkNET76Ye0giZrXilZyvowEVOx+MQY=;
-	b=ovewfNVWzTJ5/+VPMNm+np7pe6MWmkpAxMXribZGBxjpwXaPzz+UFxHbSv0KEBJG4G1WNi
-	gOhO7sGPK7aPok4opifF0c7udDOMy0jCuXG/qjrv3QouBS3gZCws6aYI1pfcxxDr1M2VpE
-	xSJPRz9kGBeMgSSE0eOOxZu+Gi0k8oM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Ed Tsai =?utf-8?B?KOiUoeWul+i7kik=?= <Ed.Tsai@mediatek.com>
-Cc: "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-	"colyli@suse.de" <colyli@suse.de>,
-	"song@kernel.org" <song@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-	"janpieter.sollie@edpnet.be" <janpieter.sollie@edpnet.be>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH 0/2] block, md: Better handle REQ_OP_FLUSH
-Message-ID: <20231221191930.fubcmftjkec42wsc@moria.home.lan>
-References: <20231221012715.3048221-1-song@kernel.org>
- <9dfc7e93f49f5b3595985ce6ed60e4c08cf05a4c.camel@mediatek.com>
- <20231221053016.72cqcfg46vxwohcj@moria.home.lan>
- <fb146972062ea1547eaa809817237f7c546a9e88.camel@mediatek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4BF768FE;
+	Thu, 21 Dec 2023 20:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d307cf18fdso8663535ad.3;
+        Thu, 21 Dec 2023 12:33:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703190790; x=1703795590;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/7KbnN33cEMU1ra8cl0k5N0j8jcZeZqi4GJ0MVOhJUc=;
+        b=kGYxG1o2byY4AyIkpBkmSt/GS2tsrxOYktk0pke3Ra4MCB+fMF+efX4UjQxtVwjRG0
+         JYAgs2G46X9PiV8F4PhYfN+Tn5ksi3gRx7/IpbIouyceIYMmvJ7a+w1/7OARN8PAATKp
+         0BaFOpgmF2xU+05ynmVFJjRO+WaX+zPr/wshLPfu7/Fplu8Fh9OBs+jT9pnTjsn0Qpby
+         0ynzOqKic6xkImwyI9aChTvmdv0m0i7C36r+6zhvnOwVwWWNrHgz7v6O0gXVIjjHgtrW
+         NFMeCm77sugeF0fvjR/XLN9dKvmdCIKOc9UY4YTavAmiWO9KxQPKy9/FADQE5dd2h9bk
+         LLkg==
+X-Gm-Message-State: AOJu0YwzzH3M2G46gIFRjSsDZgn0eqPQYvc6yDmBL2XZeby3mM/DRNTi
+	mWvFcrPC3pt/79Z2kaTTHWFjo66GV6s=
+X-Google-Smtp-Source: AGHT+IEuLC9+wqhPPyf5+htFMuDuga2BsWAd+xWyMzex6dtSWq5jWA+ph6hyRpScpzzQ0l6JSfYajw==
+X-Received: by 2002:a17:902:ecce:b0:1d2:e521:dd72 with SMTP id a14-20020a170902ecce00b001d2e521dd72mr230098plh.109.1703190790351;
+        Thu, 21 Dec 2023 12:33:10 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:d9ff:baa2:bd58:437a? ([2620:0:1000:8411:d9ff:baa2:bd58:437a])
+        by smtp.gmail.com with ESMTPSA id z3-20020a170903018300b001cfa718039bsm2045190plg.216.2023.12.21.12.33.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Dec 2023 12:33:09 -0800 (PST)
+Message-ID: <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
+Date: Thu, 21 Dec 2023 12:33:08 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fb146972062ea1547eaa809817237f7c546a9e88.camel@mediatek.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
+Content-Language: en-US
+To: Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linuxfoundation.org
+Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+ <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+ <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 21, 2023 at 07:56:45AM +0000, Ed Tsai (蔡宗軒) wrote:
-> On Thu, 2023-12-21 at 00:30 -0500, Kent Overstreet wrote:
-> >  On Thu, Dec 21, 2023 at 03:36:40AM +0000, Ed Tsai (蔡宗軒) wrote:
-> > > On Wed, 2023-12-20 at 17:27 -0800, Song Liu wrote:
-> > > > you have verified the sender or the content.
-> > > >  A recent bug report [1] shows md is handling a flush from
-> > bcachefs
-> > > > as read:
-> > > > 
-> > > > bch2_journal_write=>
-> > > >   submit_bio=>
-> > > >     ...
-> > > >     md_handle_request =>
-> > > >       raid5_make_request =>
-> > > >         chunk_aligned_read =>
-> > > >           raid5_read_one_chunk =>
-> > > >     ...
-> > > > 
-> > > > It appears md code only checks REQ_PREFLUSH for flush requests,
-> > which
-> > > > doesn't cover all cases. OTOH, op_is_flush() doesn't check
-> > > > REQ_OP_FLUSH
-> > > > either.
-> > > > 
-> > > > Fix this by:
-> > > > 1) Check REQ_PREFLUSH in op_is_flush();
-> > > > 2) Use op_is_flush() in md code.
-> > > > 
-> > > > Thanks,
-> > > > Song
-> > > > 
-> > > > [1] 
-> > > > 
-> > https://urldefense.com/v3/__https://bugzilla.kernel.org/show_bug.cgi?id=218184__;!!CTRNKA9wMg0ARbw!gQbjtS_f5d3Du2prpIT8zUM4mkZf7qDleyaAuEfG8j5tMrDvw7cfJUB04VWl0uVAL4BJ4YWbVopp$
-> > > > 
-> > > 
-> > > REQ_OP_FLUSH is only used by the block layer's flush code, and the
-> > > filesystem should use REQ_PREFLUSH with an empty write bio.
-> > > 
-> > > If we want upper layer to be able to directly send REQ_OP_FLUSH
-> > bio,
-> > > then we should retrieve all REQ_PREFLUSH to confirm. At least for
-> > now,
-> > > it seems that REQ_OP_FLUSH without REQ_PREFLUSH in
-> > `blk_flush_policy`
-> > > will directly return 0 and no flush operation will be sent to the
-> > > driver.
-> > 
-> > If that's the case, then it should be documented and there should be
-> > a
-> > WARN_ON() in generic_make_request().
+On 12/20/23 07:03, Hannes Reinecke wrote:
+> I would like to discuss
 > 
-> Please refer to the writeback_cache_control.rst. Use an empty write bio
-> with the REQ_PREFLUSH flag for an explicit flush, or as commonly
-> practiced by most filesystems, use blkdev_issue_flush for a pure flush.
-
-That's not a substitute for a proper comment in the code.
-
+> Large blocks for I/O
 > 
-> > 
-> > Also, glancing at blk_types.h, we have the req_op and req_flag_bits
-> > both
-> > using (__force blk_opf_t), but using the same bit range - what the
-> > hell?
-> > That's seriously broken...
-> 
-> No, read the comment before req_op. We do not need to use the entire 32
-> bits to represent OP; only 8 bits for OP, while the remaning 24 bits is
-> used for FLAG.
+> Since the presentation last year there has been quite some developments
+> and improvements in some areas, but at the same time a lack of progress
+> in other areas.
+> In this presentation/discussion I would like to highlight the current
+> state of affairs, existing pain points, and future directions of development.
+> It might be an idea to co-locate it with the MM folks as we do have
+> quite some overlap with page-cache improvements and hugepage handling.
 
-No, this is just broken; it's using the same bitwise enum for two
-different enums.
+Hi Hannes,
 
-bitwise exists for a reason - C enums are not natively type safe, and
-mixing up enums/bitflags and using them in the wrong context is a
-serious source of bugs. If it would be incorrect to or the two different
-flags together, you can't use the same bitwise type.
+I'm interested in this topic. But I'm wondering whether the disadvantages of
+large blocks will be covered? Some NAND storage vendors are less than
+enthusiast about increasing the logical block size beyond 4 KiB because it
+increases the size of many writes to the device and hence increases write
+amplification.
+
+Thanks,
+
+Bart.
+
