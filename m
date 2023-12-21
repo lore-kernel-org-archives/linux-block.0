@@ -1,128 +1,194 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D51A697A5
-	for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 13:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2D6745E9;
+	Thu, 21 Dec 2023 13:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="RknqFI9n"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20231221130139epoutp03d821cc9ae8176de3a65ab2710c5bc369~i2lxwOA6p1365513655epoutp03D
-	for <linux-block@vger.kernel.org>; Thu, 21 Dec 2023 13:01:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20231221130139epoutp03d821cc9ae8176de3a65ab2710c5bc369~i2lxwOA6p1365513655epoutp03D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1703163699;
-	bh=PpnlORNR0D4uCtNQd1bbOOWyPJnGQzA/ditmPACE5wE=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=RknqFI9nLJtGJYI/LAIF4eChc3UaM5gUtooyXspWdZEhurw17T7m0lSrb5wjmVDlQ
-	 mA/1kmtYxGJICkQjW9j+BXx6tmeAj7P06jwzCIpS6SjxtEQ0DfDHpRU27UpVKVCFlV
-	 CuXBxILm408KeyvImUYBHVMW4ePWHQZwCqMJTCEg=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20231221130139epcas5p2aa94ddd4d53646cb0efabbe23508ba3b~i2lxavJqs0750607506epcas5p2R;
-	Thu, 21 Dec 2023 13:01:39 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.182]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4SwrD12q8Xz4x9Pt; Thu, 21 Dec
-	2023 13:01:37 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	BA.66.09634.03734856; Thu, 21 Dec 2023 22:01:36 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20231221111858epcas5p46c3bf66f33df8652d2da966b3ecbfa60~i1MHWoPL60261302613epcas5p4O;
-	Thu, 21 Dec 2023 11:18:58 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20231221111858epsmtrp1a518a6716d63997965b748925070783a~i1MHWC9sq1883118831epsmtrp1b;
-	Thu, 21 Dec 2023 11:18:58 +0000 (GMT)
-X-AuditID: b6c32a49-159fd700000025a2-b6-65843730eaf6
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	51.2C.08755.12F14856; Thu, 21 Dec 2023 20:18:57 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20231221111857epsmtip18f664a9fc348222ede1be4a3af7576a9~i1MGW1xzm3105531055epsmtip1_;
-	Thu, 21 Dec 2023 11:18:56 +0000 (GMT)
-From: Kundan Kumar <kundan.kumar@samsung.com>
-To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de
-Cc: linux-block@vger.kernel.org, Kundan Kumar <kundan.kumar@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH] block: skip start/end time stamping for passthrough IO
-Date: Thu, 21 Dec 2023 16:42:21 +0530
-Message-Id: <20231221111221.4237-1-kundan.kumar@samsung.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lesyGREF";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="vbe7YFlt"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BLDGE49016831;
+	Thu, 21 Dec 2023 13:18:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=LcHtzEAVqU+7oUc4zyPgfvoHAJOf1ieY9UqAAVov8zo=;
+ b=lesyGREFYPtKt7LM7eeqEU8aXjM/HOrekIrc9qJj+8+/GXhGZDRGvlR2y2R6JJLwZhQW
+ gJBYGgzrJR0acGreRX+RJN5gHP90q8qJJAUj52/ZQMdAP5tz4TwyUA8moJvBjtHBATaN
+ q3rKUmBKkAwDaRQBDrdpN0DIp54jEEMH81I6XTSEEvCyU7e7F435rUgQCFRHQUCTp4Xt
+ RDzA9yM2pGttpd4eJprq0BQ/0LsLvIg1bsW18EUpPZkqYOzY75Dfu9SqVoEeRwiuWiNE
+ hGbfOU6tigNaMfRIJ+mhQYqo2vwlDAiGyzThb3CgJeIoqbtICZWOm6A0/rwUZC/hfRll ag== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3v499qh8nd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Dec 2023 13:18:42 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3BLCFaj4025087;
+	Thu, 21 Dec 2023 13:18:41 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3v12bgydhc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Dec 2023 13:18:41 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hIcZAHZTz/aQ0flAPS7kuum12Dj9pNn+Ay7ZzF+oo1EYK2Rr0HgPomDIhw++h/TVFDzYaLXCI4qlkU4yzDurBoMcACKMOkUhWB0MBf762/TvhDLoRaTmuH18nNDODGvtBBYKIRdLO51+eqBPN3rqElo1tqJM25OUd1pyymWt8i+tT0E9s8D2Ou92GVk026QwlfkjhnILsQFybZGccwWZdWrKR2PXJgh6G2y/PG251IJuhO5mZJl0mx2G6aKnh1yGOmu/3UJ0oYaDxjY/fq5NHMKXkHRSf3mP7h12STwWyvRw735sUHoaJH8fvhBxGkwqMKPMuUP9+uUAwc1ViNE7PQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LcHtzEAVqU+7oUc4zyPgfvoHAJOf1ieY9UqAAVov8zo=;
+ b=izF63HDY/2ybe+n2PPs18NrUgCB6jK1qLnWHEtl9KdGOpQrQMzsCCTpuRgtsI7cUbEQBeV5vhyOEWl3lz8zghHq2LaXDKlcCKyLW2Z1klMIe+OAEtHR3IrZcwKuG1+DIVwd+aC1OC9QzhPIpF3PKWhnpbR2GLPJqr1bGTLlRzBJjSAbqwxCrTTRbXZsWJr0dMXDlja+Tu+r7oQtBKJkXLwTU7+EGdWlgBaVx+/l/+oG1YvAXpUI4cNserU8GnUN8BUYVH56po4cnyGmbUV0ZCXDhLmTUNV/NfjxXYXFy4OXndHUfFmxBil5k6P3RhnGzSlzpWqrp3RGWie4Lu1qkMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LcHtzEAVqU+7oUc4zyPgfvoHAJOf1ieY9UqAAVov8zo=;
+ b=vbe7YFltkaElLVqe4Saw8CXxYp6Wg0ZA1HVVb80vwnyPSeBKBv4K6BC/iqjbw5vsFhoaAuOBnWcbCG/UrLqFmtVEz7N2fTxi/9nQ8clgpV7lxwwQ+Z3Gq1ficejQp9Cti9hmueupvH4mnPK5wYt0z3xgU4aHZ5xBGqDp1tcS1lw=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by DS0PR10MB6246.namprd10.prod.outlook.com (2603:10b6:8:d2::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.18; Thu, 21 Dec
+ 2023 13:18:38 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::102a:f31:30c6:3187]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::102a:f31:30c6:3187%4]) with mapi id 15.20.7113.019; Thu, 21 Dec 2023
+ 13:18:38 +0000
+Message-ID: <9bee0c1c-e657-4201-beb2-f8163bc945c6@oracle.com>
+Date: Thu, 21 Dec 2023 13:18:33 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/16] block atomic writes
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, axboe@kernel.dk, kbusch@kernel.org,
+        sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+        jack@suse.cz, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+        ming.lei@redhat.com, jaswin@linux.ibm.com, bvanassche@acm.org
+References: <c729b03c-b1d1-4458-9983-113f8cd752cd@oracle.com>
+ <20231219051456.GB3964019@frogsfrogsfrogs> <20231219052121.GA338@lst.de>
+ <76c85021-dd9e-49e3-80e3-25a17c7ca455@oracle.com>
+ <20231219151759.GA4468@lst.de>
+ <fff50006-ccd2-4944-ba32-84cbb2dbd1f4@oracle.com>
+ <20231221065031.GA25778@lst.de>
+ <b60e39ce-04bf-4ff9-8879-d9e0cf5d84bd@oracle.com>
+ <20231221121925.GB17956@lst.de>
+ <df2b6c6e-6415-489d-be19-7e2217f79098@oracle.com>
+ <20231221125713.GA24013@lst.de>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20231221125713.GA24013@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO6P123CA0046.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:310::8) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNKsWRmVeSWpSXmKPExsWy7bCmlq6BeUuqwb1Tehar7/azWaxcfZTJ
-	4uj/t2wWkw5dY7TY+uUrq8XeW9oObB6Xz5Z6bFrVyeax+2YDm0ffllWMHp83yQWwRmXbZKQm
-	pqQWKaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE6Lpl5gDtV1IoS8wpBQoF
-	JBYXK+nb2RTll5akKmTkF5fYKqUWpOQUmBToFSfmFpfmpevlpZZYGRoYGJkCFSZkZ6xf8Z+p
-	4CtbxYm5X9kbGN+ydjFyckgImEgsmfSdHcQWEtjNKHF8Yn4XIxeQ/YlR4uvSH8wQzjdGiTe/
-	VrPBdKxu62CCSOxllOh+8h2q6jOjxMQjb4EyHBxsAroSP5pCQRpEBIwkdv59DdbMLJAv8ejp
-	dDBbWMBd4vHdJWCrWQRUJTY/3MsIYvMK2Eh8WfcM6jx5iZmXIM7jFRCUODnzCQvEHHmJ5q2z
-	wfZKCBxil9i8cDUzRIOLxKpd16FsYYlXx7ewQ9hSEi/726DsbIlDjRuYIOwSiZ1HGqDi9hKt
-	p/qZQe5nFtCUWL9LHyIsKzH11DomiL18Er2/n0C18krsmAdjq0nMeTeVBcKWkVh4aQZU3ENi
-	999lLJDgjZW42/KeZQKj/Cwk78xC8s4shM0LGJlXMUqmFhTnpqcWmxYY5qWWw+M1OT93EyM4
-	FWp57mC8++CD3iFGJg7GQ4wSHMxKIrz5Oi2pQrwpiZVVqUX58UWlOanFhxhNgWE8kVlKNDkf
-	mIzzSuINTSwNTMzMzEwsjc0MlcR5X7fOTRESSE8sSc1OTS1ILYLpY+LglGpgYnmfK30qyMzQ
-	1uhv/wtLy4c6JfdeT550LV+s+dFx5VXGn075zey1iDtp7hQw97b/MZOf6TfefJwhJRDDY77/
-	2Ep12/WZt/Lsb+sEVM1K/PAuy1FM47BhmkXgxd0X2CQ+WSSwtUe2yNV1n2OaOTMqk+PfJ74r
-	DLEyM2/2zLPTZzh4YvZXtZo5N2vlYnr1+B9c+MpyeWGbz1lu/2Pywc/f7j/IdGUyu+3vh1OS
-	BfTXV3uyNB7dz7Qj86OIluWsp9fuK9rOZ7ifXvdkXl/9feU4C6Xm+wuOKQpM3HXtdGjOyicr
-	zjy8Vh3w+KXFaos/tmIar157Se4Q/dMs/f279ETZuGlrGZ67beE/zftVt7skSomlOCPRUIu5
-	qDgRAG8iwg0OBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGLMWRmVeSWpSXmKPExsWy7bCSnK6ifEuqwdetNhar7/azWaxcfZTJ
-	4uj/t2wWkw5dY7TY+uUrq8XeW9oObB6Xz5Z6bFrVyeax+2YDm0ffllWMHp83yQWwRnHZpKTm
-	ZJalFunbJXBlrF/xn6ngK1vFiblf2RsY37J2MXJySAiYSKxu62DqYuTiEBLYzSjx7NQpRoiE
-	jMTuuzuhioQlVv57zg5R9JFR4u/5GUBFHBxsAroSP5pCQWpEBMwk9p/byAwSZhYolPizSRQk
-	LCzgLvH47hJ2EJtFQFVi88O9YON5BWwkvqx7BjVeXmLmpe/sEHFBiZMzn7CA2MxA8eats5kn
-	MPLNQpKahSS1gJFpFaNkakFxbnpusWGBYV5quV5xYm5xaV66XnJ+7iZGcFBqae5g3L7qg94h
-	RiYOxkOMEhzMSiK8ezubUoV4UxIrq1KL8uOLSnNSiw8xSnOwKInzir/oTRESSE8sSc1OTS1I
-	LYLJMnFwSjUwbZ43f9l1Rx7e3UY7RA6r5v92ZNA7WW7TmtCr92vWZb02pQcv+BbFz365b3bu
-	unndvMeeK8svuTyRq+vGnVsLvQ6a9Gzuni9fMuFR8Cnp+5I/l64K5PsWPKdGuEFSQzWtQtmf
-	LbL4d268zbRZFy5z7+1Jb/V99WXeFMnybPdHn7LLb6xue2wyOeP22+VH7t85/PaByMrmwO+/
-	PC0j1AIifnlNPFWn6pzj++XF67nennM1Y1Zcv9LO4LkgVm1NxJ4O7lM6883l1qQzWCwqkKpl
-	LXoumLrs+/FPrlu8Uxd8aO+ZF65a98jo26TSCs16u8nWVaK3nVJf5gq9uxKUt8qZ31f7jd42
-	yQC7sLyfTGxOSizFGYmGWsxFxYkAJC87c7kCAAA=
-X-CMS-MailID: 20231221111858epcas5p46c3bf66f33df8652d2da966b3ecbfa60
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231221111858epcas5p46c3bf66f33df8652d2da966b3ecbfa60
-References: <CGME20231221111858epcas5p46c3bf66f33df8652d2da966b3ecbfa60@epcas5p4.samsung.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|DS0PR10MB6246:EE_
+X-MS-Office365-Filtering-Correlation-Id: dda84357-558d-4175-8d1e-08dc02275818
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	AaqW3claCCkXDKKiwhcUS0wZ3ykyp32UbyczAeqbyiszzW0cKhw4cG5BIfSs3E8rzmj+NtJiM9gKx3e9hnxs7MHHXwFWEK6NTsxmNsqH+VT+F2CvlDgOd+ITh6NV/KJ/6BG5KQykfkG9q03Fcf1dUalHiVl+HIc0lhZkqQMDEExLR/wo6dCvuC5UI4bfZWb1ngMhQE+ONuAPl9rDdmJovQkuDgee/dtOuwvHbdi3RdkDJjyfguaNg8FD1Z6nHOVQpElzAjjTEufkUuMzERYRTSuy11p665K/vr63A4ZACyVQm6m/soZ/rvi2L4yvLNZbrSQ72APBFDEBMomMP54yVR75MvBz9+jifoW4Pn1uLP4DATA6siECDggLcmRi/0jwWflP4R9LDBlvdsJRyDPRMzVu1gLHTiKwe2Z3AHNzX9fpIe46+iusChHRPAt7U9IolHI6TIuFga5Ndi8QLlrFz7HqVcj5h111Vy6tHXgNxWsTgJFvxjdv2J6uL5M79eLMzTNbQ2stsRoUCyiYOoHFi7YUmCoVbH2lYDhmPD5SYuoFOaq2Z//9e4pMOK7mBvxqZ2oaQHbPEZEZ10BsxvCZI/ZYKOyUEUO8pkZId0r3zaY99pKtYOzQJ7uFeMdnxrz82FO0e6LZYTvxOCBCp5UG/A==
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(136003)(376002)(346002)(39860400002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(6512007)(6506007)(2906002)(4326008)(8676002)(8936002)(6666004)(26005)(53546011)(36916002)(83380400001)(316002)(66556008)(66946007)(6916009)(66476007)(5660300002)(7416002)(38100700002)(31686004)(2616005)(478600001)(6486002)(31696002)(36756003)(41300700001)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?emFjbHRQWi83OE1aNGk3dWZuUVZORDRjUmNSUWVvUWs1THVGVFZ6d1RBbVF2?=
+ =?utf-8?B?MGJTbG92WmF3MzFvUkFSNHdvUUJzQS9RcXpiT1RqQk1KT2E3UGFxVUtVcDB4?=
+ =?utf-8?B?bHA3QUtLMEIwVXNBTWZ2dHJIK3g1eXAyQjQ5RFloQmdXQlNJQ0tqRVlDZ05F?=
+ =?utf-8?B?LzZxRGJXSklqQVQvMFhUbWdqVC9OVU84TDVwQnlhM01kNS9IRkRkRGYxTlNH?=
+ =?utf-8?B?UUowQUthN21kY2lsZWtCN2VIejJnNHY2ZS9IL0FmUGxheXBLTHlVNVlDUDRq?=
+ =?utf-8?B?MlBmaTZnRWE2dHMyTTdXazNJUThJbVd6bVVoTHViVUdTbWd2dnJpUlZXR2ZI?=
+ =?utf-8?B?Q3puNHpQOGJKa3lYZ0NGM3hndHFnTldudlRxY2NNWW9vQTJkR28yU0U5OXJn?=
+ =?utf-8?B?K0JyajJhTzhhemYyRzRCalNYM2k1aW9RUHJhNmhDVkJ3ZVkxUU5TWitKT3dZ?=
+ =?utf-8?B?S01nODl3a0hpaXFpRmhLMCtsaGtRN0JkbEZUUjRrdnVaR3Z6NWxXUytTZkRY?=
+ =?utf-8?B?d0hMUzdSMmpNTTJNbXJ2M09QV24wc1BrcGRpbTMrc0tIVnNHdisrWUVNTXl3?=
+ =?utf-8?B?QnV4Ym9WNm5yQTJGRFFBQ3o5R1BuQzdydGZGZCt0S0ZXVWZMa0oyQVkvR3Iy?=
+ =?utf-8?B?eVhBVjRHZDQ2YmkyK1FUSjJRNkRQbzlVVjRzRkpoc1pCUnVYeGNtVFlkTjBI?=
+ =?utf-8?B?MDlkYksyN2RrUFlBV1hZOWM3b29zY0tZdUR0dkx0ZG5zcXZPVzZnOHZpcXpK?=
+ =?utf-8?B?bHJxWGJ5RW9yNDQrdTMrdjlSZTY2WU1IVUU4ZXJRSWt4bmMvUUM1V1RxUUJy?=
+ =?utf-8?B?RGh4ajVac25sSG5BL3lkK0ZlVi9DYm9wQzJIcDQwNFFrWGk5QjZaSk1EcTV3?=
+ =?utf-8?B?bUJpVzhxN29ZcDVMUHVYOUJPbFBvalRRS1hhcUx1bFhZM1NueENMOVdZcGc0?=
+ =?utf-8?B?b0N4RjJneHJVdjZ6blN6eHdSMzlicGcybm8ycmFqOUpJRU1mTTdFanhrSklN?=
+ =?utf-8?B?UnJTd3dFU3JVWEhrazhYdWN6NlVzSTROWEZxQnV0MzVvWWFnT1c0dUdEYmRk?=
+ =?utf-8?B?dTc2c3FZTW9JSmEzVDB1Mnhmd3NiRkFOSWhmOUJJN2c1MU9wZG1yTFVmM1Z0?=
+ =?utf-8?B?YXVwSVk2RzRZTzUweEdwbjZxYWMydkJPZjA0NUdrWTNGeGdMMHRVZ0RDTFQ2?=
+ =?utf-8?B?ZmRYNEJ3YzI5VUVTUFZydUw5TUxLZkgrZkg0QmpDd1BpMW4wUFFlY1U0ejR0?=
+ =?utf-8?B?a0VWZEpyaW5WMkgyTENXRVoxczQrRVhIRWMxRklZTFNSKzJMVndYTktSQjh3?=
+ =?utf-8?B?aElycCtWci9MUEZhSFZLT2FDTG5mNXM0SGpCUHovV2JBbFlUNTNvVVhmMHkr?=
+ =?utf-8?B?NDBpcDJhcnl5c2pCaXl4MkV5c3hHV29oRURYQTZNQWM0K3I5U0lxNGF2c0ZG?=
+ =?utf-8?B?SkJlb09kQ0E0U1ZoVDV5bm5VM0NnRFNDMjczTHNYWE1vakh6MTA1bXVaN2ha?=
+ =?utf-8?B?V0V6Yzc2N1hZUTJScnArZEp6dW00UDRSOHIwdHdERnN2ZE5yQ1hKdWptd0Nl?=
+ =?utf-8?B?WFU4Vkd6ZzAvRmVrRHBRTERXSk8zZXpWK2ZzMUdRVEJIMm4veVA0eE9mc0F4?=
+ =?utf-8?B?OFhQaFRxekJyMkxPUnpGck5XOFBBVDNwaUVGN2VsaTJMWTd3NDQremZKamxm?=
+ =?utf-8?B?TWFMM21Ubk1CeVg3blB0RXVMRnltcVhPc0tXVjVWdFZGaXQ2VjZTelE5V0NX?=
+ =?utf-8?B?U0QvTXgrem9TVEtEL1Y1VXVyZzNwUXBtcTRad3l5ZGZKYm9WNWlFNENXVy9k?=
+ =?utf-8?B?ZmdTTDhhL2RQOFBGZWNxODd4NW54c0dvZUdSbWVDOG1XYm5TK0g1enpTZ2Q2?=
+ =?utf-8?B?dUxUZW5KSWZGYk15NmwxWVBkREZoUGFlbE9CYWw4ZkdRKzJIQko5dThodDZH?=
+ =?utf-8?B?WFdyL1RRM2ZlZWpaMkRYTWpuSGtnOVA3c1RadlZqbGhwRXdKb3lET1o3ZEM0?=
+ =?utf-8?B?TkdWOWw0YjM4TXhoRDZPZ2RFS2lNMWs3dTRFTHYxcklYQTNoS3BQMHBZQkNZ?=
+ =?utf-8?B?a3RGcmRiVXU1Y1lQTk82ZjBwazI4R1dGMnZLTE5mNUkrdGZQZWpTcm8xbEF2?=
+ =?utf-8?B?SjJsODA4QVFxblZka0xUVmlDSTRPcXp3TVBIbGp5TGdvNUpCS0tFUkdzeVFq?=
+ =?utf-8?B?MEE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	Up6Ds5TTE+FJHYhpPdBUP1X6wyWNf/esVst+7jKYtGDDrwuOxmU+cWiNIYRBN9+krrGgvXAT0Im2JwWz/v3PSc1qhDrVC3K/r9M3xQeQ5mEGhQCFQYIdhL3dVbBQDq3+rGrarZWO8mli09LxSCX7E40fVbXpuNJ2hzphkq70Hdqa0zBvGhVQszQYKEbLxprSzBtBmARWHSQl+bUUTFU0CL2MHYWLx3YUPnHBW29WPJEhHcq1QfRU/sTS1p78dx9yDjV7shDLjuLhA/NpQTHWe+okGwoQCXO17dyRDS62bnUIH5qdyicy73Ye1gVyyH2vRTuFTwFno9tcOonUJKmWFc0sQMHUamP94ZxvkRP2bsZoh8YvSd0sLJMn3dlAME9NS7OoamgK6HCzt3ZkwLEezc+3hznDY7d0cVMX0h2vCyP54UmR46mnDkU7iBpCbxcLb4FYzsjeRgmZ/wTAl5bC5L9UwVFxuB1ahQf6DQ1C2GZHYgQmGeLIXcoeJcnoEAmU6uWe1J9TJay9Jx5HxnUmjkBNoxTZ+nKpqGZUeC2n8VSZ3clno9SuafmHxCuWXdMpQM4Q6zm5ZCQeKbHGEaYxVJZAFcZGzXe0esO8mJGvWVY=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dda84357-558d-4175-8d1e-08dc02275818
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2023 13:18:38.6686
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: U0iCrBJ+QWaWywveqLgeOq5wmLWPJSjkaNSPek0PSTahHTJAY9GxnDdot2/vWLTbY8MGFQqwrF7Oub0lxrJ5MA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6246
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-21_06,2023-12-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 spamscore=0
+ adultscore=0 phishscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312210100
+X-Proofpoint-GUID: 852sVdY6CQIeQAg3irpOpOhphX0TDl5Y
+X-Proofpoint-ORIG-GUID: 852sVdY6CQIeQAg3irpOpOhphX0TDl5Y
 
-This patch will avoid start/end time stamping for passthrough IO.
-This helps to improve IO performance by ~7%
+On 21/12/2023 12:57, Christoph Hellwig wrote:
+> On Thu, Dec 21, 2023 at 12:48:24PM +0000, John Garry wrote:
+>>>> - ubuf / iovecs need to be PAGE-aligned
+>>>> - each iovec needs to be length of multiple of atomic_write_unit_min. If
+>>>> total length > PAGE_SIZE, each iovec also needs to be a multiple of
+>>>> PAGE_SIZE.
+>>>>
+>>>> I'd rather something simpler. Maybe it's ok.
+>>> If we decided to not support atomic writes on anything setting a virt
+>>> boundary we don't have to care about the alignment of each vector,
+>>
+>> ok, I think that alignment is not so important, but we still need to
+>> consider a minimum length per iovec, such that we will always be able to
+>> fit a write of length atomic_write_unit_max in a bio.
+> 
+> I don't think you man a minim length per iovec for that, but a maximum
+> number of iovecs instead. 
 
-Signed-off-by: Kundan Kumar <kundan.kumar@samsung.com>
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
----
- include/linux/blk-mq.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+That would make sense, but I was thinking that if the request queue has 
+a limit on segments then we would need to specify a iovec min length.
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 1ab3081c82ed..04617494db7e 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -830,7 +830,8 @@ void blk_mq_end_request_batch(struct io_comp_batch *ib);
-  */
- static inline bool blk_mq_need_time_stamp(struct request *rq)
- {
--	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED));
-+	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED) &&
-+		!blk_rq_is_passthrough(rq));
- }
- 
- static inline bool blk_mq_is_reserved_rq(struct request *rq)
--- 
-2.25.1
+> For SGL-capable devices that would be
+> BIO_MAX_VECS, otherwise 1.
 
+ok, but we would need to advertise that or whatever segment limit. A 
+statx field just for that seems a bit inefficient in terms of space.
