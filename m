@@ -1,45 +1,96 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from forward100c.mail.yandex.net (forward100c.mail.yandex.net [178.154.239.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FD873197;
-	Thu, 21 Dec 2023 13:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 4CDFA68B05; Thu, 21 Dec 2023 14:22:36 +0100 (CET)
-Date: Thu, 21 Dec 2023 14:22:36 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>,
-	axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-	ming.lei@redhat.com, jaswin@linux.ibm.com, bvanassche@acm.org
-Subject: Re: [PATCH v2 00/16] block atomic writes
-Message-ID: <20231221132236.GB26817@lst.de>
-References: <20231219052121.GA338@lst.de> <76c85021-dd9e-49e3-80e3-25a17c7ca455@oracle.com> <20231219151759.GA4468@lst.de> <fff50006-ccd2-4944-ba32-84cbb2dbd1f4@oracle.com> <20231221065031.GA25778@lst.de> <b60e39ce-04bf-4ff9-8879-d9e0cf5d84bd@oracle.com> <20231221121925.GB17956@lst.de> <df2b6c6e-6415-489d-be19-7e2217f79098@oracle.com> <20231221125713.GA24013@lst.de> <9bee0c1c-e657-4201-beb2-f8163bc945c6@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91D577633;
+	Thu, 21 Dec 2023 13:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Q4OBW8h8"
+Received: from mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:68e:0:640:54ba:0])
+	by forward100c.mail.yandex.net (Yandex) with ESMTP id 2D670608F3;
+	Thu, 21 Dec 2023 16:40:38 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id beOFl31j0uQ0-OhojHdo2;
+	Thu, 21 Dec 2023 16:40:37 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1703166037; bh=WPPhPspNeSh3G2SSCHs6rFMEoU9LBDX//e9rfPrwgdk=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=Q4OBW8h8cLgRt1rCjmo/cply8P6AkRRnTwJVZNTwDQGaxUMryq+tkR0q1zRCqGD5s
+	 YgwoDGrCgzCrIQnlQxg4DHTXKZPCXcVHdNYL9ykadaImMaBZMR2S98eJH8oa28Cy93
+	 qsZVDdDLAvLH6bRTWt6kn0IK6Ye9o5BmKEKnyL7A=
+Authentication-Results: mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: Dongsheng Yang <dongsheng.yang@easystack.cn>,
+	ceph-devel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] rbd: use check_sub_overflow() to limit the number of snapshots
+Date: Thu, 21 Dec 2023 16:39:17 +0300
+Message-ID: <20231221133928.49824-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9bee0c1c-e657-4201-beb2-f8163bc945c6@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 21, 2023 at 01:18:33PM +0000, John Garry wrote:
->> For SGL-capable devices that would be
->> BIO_MAX_VECS, otherwise 1.
->
-> ok, but we would need to advertise that or whatever segment limit. A statx 
-> field just for that seems a bit inefficient in terms of space.
+When compiling with clang-18 and W=1, I've noticed the following
+warning:
 
-I'd rather not hard code BIO_MAX_VECS in the ABI, which suggest we
-want to export is as a field.  Network file systems also might have
-their own limits for one reason or another.
+drivers/block/rbd.c:6093:17: warning: result of comparison of constant
+2305843009213693948 with expression of type 'u32' (aka 'unsigned int')
+is always false [-Wtautological-constant-out-of-range-compare]
+ 6093 |         if (snap_count > (SIZE_MAX - sizeof (struct ceph_snap_context))
+      |             ~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 6094 |                                  / sizeof (u64)) {
+      |                                  ~~~~~~~~~~~~~~
+
+Since the plain check with '>' makes sense only if U32_MAX == SIZE_MAX
+which is not true for the 64-bit kernel, prefer 'check_sub_overflow()'
+in 'rbd_dev_v2_snap_context()' and 'rbd_dev_ondisk_valid()' as well.
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ drivers/block/rbd.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index a999b698b131..ef8e6fbc9a79 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -933,7 +933,7 @@ static bool rbd_image_format_valid(u32 image_format)
+ 
+ static bool rbd_dev_ondisk_valid(struct rbd_image_header_ondisk *ondisk)
+ {
+-	size_t size;
++	size_t size, result;
+ 	u32 snap_count;
+ 
+ 	/* The header has to start with the magic rbd header text */
+@@ -956,7 +956,7 @@ static bool rbd_dev_ondisk_valid(struct rbd_image_header_ondisk *ondisk)
+ 	 */
+ 	snap_count = le32_to_cpu(ondisk->snap_count);
+ 	size = SIZE_MAX - sizeof (struct ceph_snap_context);
+-	if (snap_count > size / sizeof (__le64))
++	if (check_sub_overflow(size / sizeof(__le64), snap_count, &result))
+ 		return false;
+ 
+ 	/*
+@@ -6090,8 +6090,8 @@ static int rbd_dev_v2_snap_context(struct rbd_device *rbd_dev,
+ 	 * make sure the computed size of the snapshot context we
+ 	 * allocate is representable in a size_t.
+ 	 */
+-	if (snap_count > (SIZE_MAX - sizeof (struct ceph_snap_context))
+-				 / sizeof (u64)) {
++	if (check_sub_overflow((SIZE_MAX - sizeof(struct ceph_snap_context))
++			       / sizeof(u64), snap_count, &size)) {
+ 		ret = -EINVAL;
+ 		goto out;
+ 	}
+-- 
+2.43.0
+
