@@ -1,57 +1,116 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2725390;
-	Fri, 22 Dec 2023 05:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DCE6FC2;
+	Fri, 22 Dec 2023 06:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1ioA52TK"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G0sodgLJ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Ehc4XtP4Bj0BvCjkQ22XyePVUvM6sFI9MypjiGFf6p4=; b=1ioA52TKDFyEux+guT8Y7dRYn9
-	y3Vag6l50pcyopHv+6YxSnjOWaWSP+HpKqUUX3zxOPtGHAWR9iW7mKrtm87QZiniZzu++ghUe8kt0
-	pENneWiaWnqT1q2tG8cS8o4qGA6dEw+dZxkUSzshr6eAxw0rdR9DeO2W8RUCpwoTX6nd4XMoSn1Wc
-	s6Jppvp/eADozCa7HzU2v3QnK/yUQkM5wc/MSS6J+kh+9BXLeukFrjQhCpG11iAsfsNzFLedtiWlK
-	tcZONDQYLlCn7iIR2eWSTrGIiKOq7peRJ9Dp7GbQfYTB0sW6j2gfltkyOfLRHXsCmfd3fZbuprVJh
-	uQ2yQ2xQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rGYE7-0050F9-2x;
-	Fri, 22 Dec 2023 05:37:39 +0000
-Date: Thu, 21 Dec 2023 21:37:39 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>,
-	lsf-pc@lists.linuxfoundation.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
-Message-ID: <ZYUgo0a51nCgjLNZ@infradead.org>
-References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
- <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
- <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
- <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
- <ZYUbB3brQ0K3rP97@casper.infradead.org>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=H/1i8yuFGfbcX5ybZ7dpr8kd0kCwVEfZQgnUatjDRZI=; b=G0sodgLJjLbicjRPugj4eCiRke
+	R8ULCFUCOnRiBQ0XzWSu8Yi7tAHPo5iqBuUpmnYz5zTSvru9CDket87q7V5pIGfWtcGzdCq+2/9Z2
+	5/xYrjR/URe1mC6KY/UAiGBQJK2h0DsUqGx3wvJAiCBCOtAbVFD9HZV6j44n87rOCtUBGlb/KKsWy
+	xuNcYBXTf8nBWu54K9cUec/L0RofketFiNrnHkAhLTo4BtxHARW1SsGu/6k7rYhJNo3xTHSjRbZHN
+	8Jl58mYONiXMfP+vR22oggIYZSD8qHXoBZUeG3VetknuNU5f+vT7RZIyRYRGHc1ALdpieB98Dg7Cw
+	TXsJZFpg==;
+Received: from [50.53.46.231] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rGYsI-0053dC-0D;
+	Fri, 22 Dec 2023 06:19:10 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	drbd-dev@lists.linbit.com,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH] drbd: actlog: fix kernel-doc warnings and spelling
+Date: Thu, 21 Dec 2023 22:19:08 -0800
+Message-ID: <20231222061909.8791-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZYUbB3brQ0K3rP97@casper.infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 22, 2023 at 05:13:43AM +0000, Matthew Wilcox wrote:
-> It clearly solves a problem (and the one I think it's solving is the
-> size of the FTL map).  But I can't see why we should stop working on it,
-> just because not all drive manufacturers want to support it.
+Fix all kernel-doc warnings in drbd_actlog.c:
 
-I don't think it is drive vendors.  It is is the SSD divisions which
-all pretty much love it (for certain use cases) vs the UFS/eMMC
-divisions which tends to often be fearful and less knowledgeable (to
-say it nicely) no matter what vendor you're talking to.
+drbd_actlog.c:963: warning: No description found for return value of 'drbd_rs_begin_io'
+drbd_actlog.c:1015: warning: Function parameter or member 'peer_device' not described in 'drbd_try_rs_begin_io'
+drbd_actlog.c:1015: warning: Excess function parameter 'device' description in 'drbd_try_rs_begin_io'
+drbd_actlog.c:1015: warning: No description found for return value of 'drbd_try_rs_begin_io'
+drbd_actlog.c:1197: warning: No description found for return value of 'drbd_rs_del_all'
 
+Fix one spelling error (s/ore/or/).
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Cc: drbd-dev@lists.linbit.com
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+---
+ drivers/block/drbd/drbd_actlog.c |   16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff -- a/drivers/block/drbd/drbd_actlog.c b/drivers/block/drbd/drbd_actlog.c
+--- a/drivers/block/drbd/drbd_actlog.c
++++ b/drivers/block/drbd/drbd_actlog.c
+@@ -838,8 +838,8 @@ static bool plausible_request_size(int s
+ }
+ 
+ /* clear the bit corresponding to the piece of storage in question:
+- * size byte of data starting from sector.  Only clear a bits of the affected
+- * one ore more _aligned_ BM_BLOCK_SIZE blocks.
++ * size byte of data starting from sector.  Only clear bits of the affected
++ * one or more _aligned_ BM_BLOCK_SIZE blocks.
+  *
+  * called by worker on C_SYNC_TARGET and receiver on SyncSource.
+  *
+@@ -957,7 +957,9 @@ static int _is_in_al(struct drbd_device
+  * @device:	DRBD device.
+  * @sector:	The sector number.
+  *
+- * This functions sleeps on al_wait. Returns 0 on success, -EINTR if interrupted.
++ * This functions sleeps on al_wait.
++ *
++ * Returns: %0 on success, -EINTR if interrupted.
+  */
+ int drbd_rs_begin_io(struct drbd_device *device, sector_t sector)
+ {
+@@ -1004,11 +1006,13 @@ retry:
+ 
+ /**
+  * drbd_try_rs_begin_io() - Gets an extent in the resync LRU cache, does not sleep
+- * @device:	DRBD device.
++ * @peer_device: DRBD device.
+  * @sector:	The sector number.
+  *
+  * Gets an extent in the resync LRU cache, sets it to BME_NO_WRITES, then
+- * tries to set it to BME_LOCKED. Returns 0 upon success, and -EAGAIN
++ * tries to set it to BME_LOCKED.
++ *
++ * Returns: %0 upon success, and -EAGAIN
+  * if there is still application IO going on in this area.
+  */
+ int drbd_try_rs_begin_io(struct drbd_peer_device *peer_device, sector_t sector)
+@@ -1190,7 +1194,7 @@ void drbd_rs_cancel_all(struct drbd_devi
+  * drbd_rs_del_all() - Gracefully remove all extents from the resync LRU
+  * @device:	DRBD device.
+  *
+- * Returns 0 upon success, -EAGAIN if at least one reference count was
++ * Returns: %0 upon success, -EAGAIN if at least one reference count was
+  * not zero.
+  */
+ int drbd_rs_del_all(struct drbd_device *device)
