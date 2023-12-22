@@ -1,88 +1,121 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CEF1CA9F
-	for <linux-block@vger.kernel.org>; Fri, 22 Dec 2023 14:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993411C28C;
+	Fri, 22 Dec 2023 14:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jSx+jrgr"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-58962bf3f89so320179a12.0
-        for <linux-block@vger.kernel.org>; Fri, 22 Dec 2023 06:18:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fm47u5fN"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-59451ae06c2so82015eaf.0;
+        Fri, 22 Dec 2023 06:24:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703254723; x=1703859523; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1703255044; x=1703859844; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8A1glk9zKLbiBtT4KFCCjRYLUlE9xUXR3enmqVpuLXQ=;
-        b=jSx+jrgrRBLiFkDkr+VNswXXg3e9UWC1gfzosIv61c31nWhz6byvcQRJ+mx3AZHTwM
-         4J6s+7FXY7lYcGq+hHCqNntkaCsZ/C9tpcub1+ULXwCxkdhIoWubjDxH/5NScP+Yl6kE
-         5jKpeYakcn421iZ2CegfxE2zJc97FvJ0y2pCdG0a2UstXLTckIgFynMHeewR9zybbBNv
-         jM3aPX/t+4kQlK89NZdlu7nMtqeZF875TlsVIBex/qoj0dfbN+tVIONmd+uKir7pTQZI
-         iQIa7OvWUeuYOVRaKaHcQjcBVW0GYrKy6N04rAUd7ZOi0hG0dh/xPHBGlqodJUbeaYH5
-         kcCQ==
+        bh=8c4WNZaijmXKRlLKX7pGpzvJMEyW9eqKDX/0mcKSiOc=;
+        b=Fm47u5fN3kETrQw3CQ1FPJ30hK64w/2m7NvVksOQA05aSB64YDL9731NFDMgUf691f
+         nzyWEooSvRpqdCQArBD61rg1Q7Nrtg9aH0XD8h/6X6p84Yy7BrxEXIyB3ef2gOp006Fr
+         gIhD5moaWJ6ArBR8zjRcpYf3AzkrZQ392t221Xo0hdna7a30qYVhBxX417gwI3tcBpg1
+         DPpzwDrXUyFJhcWmqifABQ+YYoME0fwjia3LRI6yWllMdAXJtK2ryaGLk69EVdhQHOvd
+         rB1zg58RBbRmIg89UJPLwN8EaJI0ZVL6MMl6+Jz2DvfrO+sa5no81eWOyeeAJJErcjg9
+         yUlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703254723; x=1703859523;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1703255044; x=1703859844;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8A1glk9zKLbiBtT4KFCCjRYLUlE9xUXR3enmqVpuLXQ=;
-        b=qBcrsZBtmgXc5aeLvB30H/UVd5dZY2HulPeg/wpzhvz/xVb21TuG5mHZPNdIJfy4pB
-         m96irflNMP8gMn+u3dk52WuYcvcBKjpr3lcsgQyKevdhw3f9TI3Ua2Gx0vppnLA2mms0
-         Mh6DRSMFTY+tdguNvHI1rCKxvhyBTXBYbbnWIVJShvXex03nlBVMlXjN0y8GGD8pSSa5
-         7FYnjlqZITX2XQe+nxpHe/7smXhHRafsW9nZDifsuQdCUT97ic5Uilr4/5+8odzYsuQ3
-         IxagnPvxxt95s66EwQtSFfuslORYBMT5oGN0Sgq1n3c8/TUthIzsskr269baoKaLBB3+
-         8mQg==
-X-Gm-Message-State: AOJu0YyzmMcOYCAEgbLQUjTi4xfQGzYKxZjXZ+Jk2vaVcNKj6ZPbmXYQ
-	fyot7Zmk4Y8xbzp6qTM2ZMTqK8JB5Z3c9sIjCmRAstet1+174g==
-X-Google-Smtp-Source: AGHT+IEXHhpBdYu7BG4iQynwg6T9KXzttfdwH9ZhmEUK/VNC9mBrZ2I1QMoe3R581uVguT4YpbBIhA==
-X-Received: by 2002:a05:6a21:99a6:b0:195:3ad3:b6c3 with SMTP id ve38-20020a056a2199a600b001953ad3b6c3mr1632140pzb.5.1703254723215;
-        Fri, 22 Dec 2023 06:18:43 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id e16-20020aa78c50000000b006d9345189b1sm3498980pfd.36.2023.12.22.06.18.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 06:18:42 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>, 
- Lars Ellenberg <lars.ellenberg@linbit.com>, 
- =?utf-8?q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>, 
- drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-In-Reply-To: <20231222061909.8791-1-rdunlap@infradead.org>
-References: <20231222061909.8791-1-rdunlap@infradead.org>
-Subject: Re: [PATCH] drbd: actlog: fix kernel-doc warnings and spelling
-Message-Id: <170325472218.1024948.10134238740797741096.b4-ty@kernel.dk>
-Date: Fri, 22 Dec 2023 07:18:42 -0700
+        bh=8c4WNZaijmXKRlLKX7pGpzvJMEyW9eqKDX/0mcKSiOc=;
+        b=l2Ob1AYFcnlpn/hHIcMS/ai16Op9Q+FPvE282eoD1/0kWljKhhgwwXnzGZvRZLghlx
+         JLCCnasWMLdEsdGe+I3P2Mvy6bl2AH1IDvdkNB4Z6bHljgqDqanyhxKIaTJ2dzIY9SdI
+         d9fTNPyZbtXl0OIVeGdTuLEFrFc09Q5EUxT6G9xuksF+/ZgplElroCU9722kzBEbWiUA
+         4ltmP63z0Lf8tIg1iHgr5Cn027uu5xFMx3i+BAbpYW7078zatAMIEYCdRvFd6WbmjA66
+         m3HWSQE1ubYp/ZlrX3kIOmvat4KkhlW5xWYvX/amg2XK1NP0rt8CTclKrnuaBtZboPM8
+         pT2A==
+X-Gm-Message-State: AOJu0Yy764L8jptVHl+HfANdVfjuXZYvpK7UaqwhGuW26bZ6539TlGRM
+	synIzL2d+is9hw0qMk1tpR+ZNeawneMEPN4VkucTOKmQq8A=
+X-Google-Smtp-Source: AGHT+IEmqFpr/BUReg0EvSg0e2Xig/tGMZW4bwrLVZSvf72XejZHbDjwoagPCaBJO2sXox3hGKEofjbaxKyhCNGCa14=
+X-Received: by 2002:a05:6820:627:b0:594:1143:6903 with SMTP id
+ e39-20020a056820062700b0059411436903mr1182628oow.13.1703255044413; Fri, 22
+ Dec 2023 06:24:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-7edf1
+References: <20231221133928.49824-1-dmantipov@yandex.ru>
+In-Reply-To: <20231221133928.49824-1-dmantipov@yandex.ru>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Fri, 22 Dec 2023 15:23:52 +0100
+Message-ID: <CAOi1vP9wHBG_g7mxZ4NoM5Y6b_xW-fRF6iUcvC_W3UcF3FbESA@mail.gmail.com>
+Subject: Re: [PATCH] rbd: use check_sub_overflow() to limit the number of snapshots
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Dongsheng Yang <dongsheng.yang@easystack.cn>, ceph-devel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Dec 21, 2023 at 2:40=E2=80=AFPM Dmitry Antipov <dmantipov@yandex.ru=
+> wrote:
+>
+> When compiling with clang-18 and W=3D1, I've noticed the following
+> warning:
+>
+> drivers/block/rbd.c:6093:17: warning: result of comparison of constant
+> 2305843009213693948 with expression of type 'u32' (aka 'unsigned int')
+> is always false [-Wtautological-constant-out-of-range-compare]
+>  6093 |         if (snap_count > (SIZE_MAX - sizeof (struct ceph_snap_con=
+text))
+>       |             ~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~
+>  6094 |                                  / sizeof (u64)) {
+>       |                                  ~~~~~~~~~~~~~~
+>
+> Since the plain check with '>' makes sense only if U32_MAX =3D=3D SIZE_MA=
+X
+> which is not true for the 64-bit kernel, prefer 'check_sub_overflow()'
+> in 'rbd_dev_v2_snap_context()' and 'rbd_dev_ondisk_valid()' as well.
+>
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> ---
+>  drivers/block/rbd.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> index a999b698b131..ef8e6fbc9a79 100644
+> --- a/drivers/block/rbd.c
+> +++ b/drivers/block/rbd.c
+> @@ -933,7 +933,7 @@ static bool rbd_image_format_valid(u32 image_format)
+>
+>  static bool rbd_dev_ondisk_valid(struct rbd_image_header_ondisk *ondisk)
+>  {
+> -       size_t size;
+> +       size_t size, result;
+>         u32 snap_count;
+>
+>         /* The header has to start with the magic rbd header text */
+> @@ -956,7 +956,7 @@ static bool rbd_dev_ondisk_valid(struct rbd_image_hea=
+der_ondisk *ondisk)
+>          */
+>         snap_count =3D le32_to_cpu(ondisk->snap_count);
+>         size =3D SIZE_MAX - sizeof (struct ceph_snap_context);
+> -       if (snap_count > size / sizeof (__le64))
+> +       if (check_sub_overflow(size / sizeof(__le64), snap_count, &result=
+))
 
-On Thu, 21 Dec 2023 22:19:08 -0800, Randy Dunlap wrote:
-> Fix all kernel-doc warnings in drbd_actlog.c:
-> 
-> drbd_actlog.c:963: warning: No description found for return value of 'drbd_rs_begin_io'
-> drbd_actlog.c:1015: warning: Function parameter or member 'peer_device' not described in 'drbd_try_rs_begin_io'
-> drbd_actlog.c:1015: warning: Excess function parameter 'device' description in 'drbd_try_rs_begin_io'
-> drbd_actlog.c:1015: warning: No description found for return value of 'drbd_try_rs_begin_io'
-> drbd_actlog.c:1197: warning: No description found for return value of 'drbd_rs_del_all'
-> 
-> [...]
+Hi Dmitry,
 
-Applied, thanks!
+There is a limit on the number of snapshots:
 
-[1/1] drbd: actlog: fix kernel-doc warnings and spelling
-      commit: 8aabc11c8f4e0a57661a07f985ddc8a626ef9148
+#define RBD_MAX_SNAP_COUNT      510     /* allows max snapc to fit in 4KB *=
+/
 
-Best regards,
--- 
-Jens Axboe
+It's not direct, but it's a hard limit, at least in the current
+implementation.  Let's just replace these with direct comparisons for
+RBD_MAX_SNAP_COUNT.
 
+Thanks,
 
-
+                Ilya
