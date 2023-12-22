@@ -1,111 +1,60 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883E27762C;
-	Thu, 21 Dec 2023 21:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D61BA3B;
+	Fri, 22 Dec 2023 05:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eK+FQoFU"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-28bc870c540so1001754a91.2;
-        Thu, 21 Dec 2023 13:42:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703194964; x=1703799764; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BXPgr2T6k2cqQM51LPyd+8bHsl0/1iqBgZw3ozm4OmM=;
-        b=eK+FQoFUPU8P0LDUwnlXlF0RVzLlKDDKunolM4fz5VpgQ/NqC8MgWwM3N3/7tfxhTI
-         ImqosN4pbZ0Yq/yw+TE+sYYhdRfDYQlMnNXLcDI+h2bmFUa3EuRkOHICCNKUxmWUAZAb
-         Nqt/WTXJ9xiVnQzpGYY/mFoPX3I4ia4OGC75sqObfvyhqW9yJMxGwpboSrQBIcf4NGEy
-         /m8vNXdGm2WvgrRTJpc6mlU2b1Dv2fTM6dgo9gTrtwhgOSmCRG/l8z6mjAXfgnt8RbSg
-         riC0zVBqtBk6Hum/npER+Rd0+B3YpgqLHGVX9dKt4GPuX56Sh03GoBi4l7iDGE9nVuig
-         6kmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703194964; x=1703799764;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BXPgr2T6k2cqQM51LPyd+8bHsl0/1iqBgZw3ozm4OmM=;
-        b=MHvax+rZu4w2Z9ClboKbkMG3RMTMHtrKhLIchLKjXdVm/OKX9UMLIMK/IzT+o0Dw7l
-         1B+nKuvPHozQz8fwhOgs4VG3JdG79z0gpwDTIalN/jJ30wwNc8n2OUsiwKg0MeGUSR2v
-         ZJFwCvzOtwm6zTsxIThhNnLmtUugKx3xr6SICYUXbKw7ehs2ViC5CDkIyDKgmgcBLnEL
-         5Jzf4MbgBntSNGjqeINWspKWaHOT/zBPgCO88RZhHjm34CbAq40FdB3/gdzTis9CBohh
-         qU9TBeinDE5Y44UO6q8kAw91gzXUVYrCvnMjJbMDkKs4H7njC2CN+SkKPYbHdouLYf06
-         g4OQ==
-X-Gm-Message-State: AOJu0Yyo92sO2XeNyz2nL7qpNiLwXPmjigKRb4WX6iYQ+5XeWrB3bunm
-	uf/dLw89G0JjTCQfN6yyvN0=
-X-Google-Smtp-Source: AGHT+IFXgwvw7NCQiXUJrDPOJqYvUyH5h3zVjuOWbcYEagdQHOCFWNaI2Vs852k/Nvm2+CpNQB64dg==
-X-Received: by 2002:a17:90a:cc05:b0:28b:e25a:9c25 with SMTP id b5-20020a17090acc0500b0028be25a9c25mr376993pju.10.1703194963716;
-        Thu, 21 Dec 2023 13:42:43 -0800 (PST)
-Received: from localhost ([121.167.227.144])
-        by smtp.gmail.com with ESMTPSA id ei8-20020a17090ae54800b0028bd9f88576sm2262757pjb.26.2023.12.21.13.42.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 13:42:43 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 22 Dec 2023 06:42:40 +0900
-From: Tejun Heo <tj@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	Shaohua Li <shli@fb.com>, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-throttle: Fix some potential string truncation in
- tg_prfill_limit()
-Message-ID: <ZYSxUPan9qPNE5Bk@mtj.duckdns.org>
-References: <0461f1d69c84cf5a98ae57012856dace757d319e.1702731206.git.christophe.jaillet@wanadoo.fr>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hY7Vxbzm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=MET1rK6m4uSg+pjKk7i8yy4yXYItUii1yK0ipiQ0oPE=; b=hY7Vxbzmk9qmUN6cH/EMWdCR2P
+	pGB6/uGNKF7lRHEsFWIGJUgpY5ux3h3+nFE+ccluYdShmcskgMMK+1Hxb6kvq1SpQeBGk2PwfPrF3
+	qrBsZSMN4M91HaTfCCWR5lfbtOlUrB2UowjRk/wc+uimfdIZgpipa9SUQUyeDY9CrX9EbdVRhcrSO
+	WwVCIJ8mIm8arMQhADoCq3a2wyOAmEFXnoDtaRmykQSuJF4KBhOnUCRJHU9tJSNt4nKTHRSJazhDq
+	R3VndL0DEAnugtkuDfRIY8X43SM7Cx4ZmqKpOiyBC6D93lcKuuST+iYbbFYlpOvrdaKfFenMFBiBT
+	kHasqCrw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rGXmi-004wKg-3A;
+	Fri, 22 Dec 2023 05:09:20 +0000
+Date: Thu, 21 Dec 2023 21:09:20 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linuxfoundation.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
+Message-ID: <ZYUaAMrdzveBuroa@infradead.org>
+References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+ <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+ <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+ <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0461f1d69c84cf5a98ae57012856dace757d319e.1702731206.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Sat, Dec 16, 2023 at 01:54:56PM +0100, Christophe JAILLET wrote:
-> When compiled with W=1, we get:
->   block/blk-throttle.c: In function ‘tg_prfill_limit’:
->   block/blk-throttle.c:1539:74: error: ‘snprintf’ output may be truncated before the last format character [-Werror=format-truncation=]
->    1539 |                         snprintf(idle_time, sizeof(idle_time), " idle=%lu",
->         |                                                                          ^
->   block/blk-throttle.c:1539:25: note: ‘snprintf’ output between 8 and 27 bytes into a destination of size 26
->    1539 |                         snprintf(idle_time, sizeof(idle_time), " idle=%lu",
->         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    1540 |                                 tg->idletime_threshold_conf);
->         |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   block/blk-throttle.c:1546:43: error: ‘%lu’ directive output may be truncated writing between 1 and 20 bytes into a region of size 17 [-Werror=format-truncation=]
->    1546 |                                 " latency=%lu", tg->latency_target_conf);
->         |                                           ^~~
->   block/blk-throttle.c:1546:33: note: directive argument in the range [0, 18446744073709551614]
->    1546 |                                 " latency=%lu", tg->latency_target_conf);
->         |                                 ^~~~~~~~~~~~~~
->   block/blk-throttle.c:1545:25: note: ‘snprintf’ output between 11 and 30 bytes into a destination of size 26
->    1545 |                         snprintf(latency_time, sizeof(latency_time),
->         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    1546 |                                 " latency=%lu", tg->latency_target_conf);
->         |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> In order to fix it, remove all the intermediate buffers and write directly
-> into the 'sf' seq_file.
-> 
-> Fixes: ada75b6e5b2a ("blk-throttle: add interface to configure idle time threshold")
-> Fixes: ec80991d6fc2 ("blk-throttle: add interface for per-cgroup target latency")
+On Thu, Dec 21, 2023 at 12:33:08PM -0800, Bart Van Assche wrote:
+> I'm interested in this topic. But I'm wondering whether the disadvantages of
+> large blocks will be covered? Some NAND storage vendors are less than
+> enthusiast about increasing the logical block size beyond 4 KiB because it
+> increases the size of many writes to the device and hence increases write
+> amplification.
 
-I'm not sure Fixes tags are necessary here given that this isn't something
-we'd hit in practice.
+Then they should not increase the logical block size for the products
+where they worry about it.  It's not like larger blocks are a feature
+the Linux wants, it's want that makes hardware vendors life easier and
+is thus pushed by them.  Of course it doesn't make sense for every
+product line, but it's not like Linux is going to stop supporting
+512 byte or 4k blocks.
 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-
-Looks fine to me, so:
-
-  Acked-by: Tejun Heo <tj@kernel.org>
-
-But, can you please briefly explain how you tested the patch?
-
-Thanks.
-
--- 
-tejun
