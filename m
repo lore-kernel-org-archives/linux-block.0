@@ -1,73 +1,55 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D025F9453;
-	Sat, 23 Dec 2023 03:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Sxqf141ycz4f3jHl;
-	Sat, 23 Dec 2023 11:39:05 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 6B9A71A08E7;
-	Sat, 23 Dec 2023 11:39:08 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgD3Rg1aVoZl1dePEQ--.1070S4;
-	Sat, 23 Dec 2023 11:39:08 +0800 (CST)
-From: linan666@huaweicloud.com
-To: song@kernel.org,
-	axboe@kernel.dk
-Cc: linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linan666@huaweicloud.com,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	houtao1@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH v3 0/2] md: fix is_mddev_idle()
-Date: Sat, 23 Dec 2023 11:37:01 +0800
-Message-Id: <20231223033703.2949831-1-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37646110
+	for <linux-block@vger.kernel.org>; Sat, 23 Dec 2023 03:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAiY2dBj"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A74FCC433C7;
+	Sat, 23 Dec 2023 03:46:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703303170;
+	bh=Y+at13BL+/xYbQPH12QbGdipF6DP3KRJa+LEuIaU4MM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=lAiY2dBjpnvOWTZtNLQUa4IyW0pXo5XE4oMa/Wddc7vXN4mPcmRbjgiLVMwaX0NWg
+	 UNxrWuXYpvBe6uRFGMTJSqo7c1F01jQnUDyWiP/oCgKGxKmEsxXvcpEPLIFd0Na4Ek
+	 VVrFbvGhFUtXYVdRhaPLef0hkrPLXMj9u4R2IRTtxXv48hBby0joCKxecQxxcE57PS
+	 4AZwZMHlyEMH+LR/hjNZFaJemGMIAXFBPhhaqtDJ1O0p5x7jKfErNMP6ucnFGAyBAH
+	 GBnTlR7/RGHS7oHSWLaBvxFyNiTWkHQyK3WwUEDmtdrtWdRhmXsedPCLgU4DAxNF1C
+	 nZKT+iBEZCU5Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 944B7DD4EE0;
+	Sat, 23 Dec 2023 03:46:10 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.7-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <075bc8fd-e296-4b0e-bb4a-d69bcf7d4ba0@kernel.dk>
+References: <075bc8fd-e296-4b0e-bb4a-d69bcf7d4ba0@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <075bc8fd-e296-4b0e-bb4a-d69bcf7d4ba0@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.7-2023-12-22
+X-PR-Tracked-Commit-Id: 13d822bf1cba78612b22a65b91cd6d4d443b6254
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5254c0cbc92d2a08e75443bdb914f1c4839cdf5a
+Message-Id: <170330317060.32157.15829737919095740951.pr-tracker-bot@kernel.org>
+Date: Sat, 23 Dec 2023 03:46:10 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3Rg1aVoZl1dePEQ--.1070S4
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYJ7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-	Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvE
-	ncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I
-	8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I2
-	1c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7M4kE6xkIj40Ew7xC0w
-	CF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j
-	6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64
-	vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_
-	Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIx
-	AIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUYuc_UUUUU
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-From: Li Nan <linan122@huawei.com>
+The pull request you sent on Fri, 22 Dec 2023 16:20:05 -0700:
 
-Changes in v3:
- - patch 2, move check from md_sync_acct_bio() to to md_sync_acct().
-   Fix the check in is_mddev_idle().
+> git://git.kernel.dk/linux.git tags/block-6.7-2023-12-22
 
-Li Nan (2):
-  md: Fix overflow in is_mddev_idle
-  md: don't account sync_io if iostats of the disk is disabled
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5254c0cbc92d2a08e75443bdb914f1c4839cdf5a
 
- drivers/md/md.h        |  5 +++--
- include/linux/blkdev.h |  2 +-
- drivers/md/md.c        | 11 ++++++++---
- 3 files changed, 12 insertions(+), 6 deletions(-)
+Thank you!
 
 -- 
-2.39.2
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
