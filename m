@@ -1,55 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37646110
-	for <linux-block@vger.kernel.org>; Sat, 23 Dec 2023 03:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAiY2dBj"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A74FCC433C7;
-	Sat, 23 Dec 2023 03:46:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703303170;
-	bh=Y+at13BL+/xYbQPH12QbGdipF6DP3KRJa+LEuIaU4MM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=lAiY2dBjpnvOWTZtNLQUa4IyW0pXo5XE4oMa/Wddc7vXN4mPcmRbjgiLVMwaX0NWg
-	 UNxrWuXYpvBe6uRFGMTJSqo7c1F01jQnUDyWiP/oCgKGxKmEsxXvcpEPLIFd0Na4Ek
-	 VVrFbvGhFUtXYVdRhaPLef0hkrPLXMj9u4R2IRTtxXv48hBby0joCKxecQxxcE57PS
-	 4AZwZMHlyEMH+LR/hjNZFaJemGMIAXFBPhhaqtDJ1O0p5x7jKfErNMP6ucnFGAyBAH
-	 GBnTlR7/RGHS7oHSWLaBvxFyNiTWkHQyK3WwUEDmtdrtWdRhmXsedPCLgU4DAxNF1C
-	 nZKT+iBEZCU5Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 944B7DD4EE0;
-	Sat, 23 Dec 2023 03:46:10 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.7-rc7
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <075bc8fd-e296-4b0e-bb4a-d69bcf7d4ba0@kernel.dk>
-References: <075bc8fd-e296-4b0e-bb4a-d69bcf7d4ba0@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <075bc8fd-e296-4b0e-bb4a-d69bcf7d4ba0@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.7-2023-12-22
-X-PR-Tracked-Commit-Id: 13d822bf1cba78612b22a65b91cd6d4d443b6254
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 5254c0cbc92d2a08e75443bdb914f1c4839cdf5a
-Message-Id: <170330317060.32157.15829737919095740951.pr-tracker-bot@kernel.org>
-Date: Sat, 23 Dec 2023 03:46:10 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC4A28F7;
+	Sat, 23 Dec 2023 06:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SxvfC0bmFz4f3kFV;
+	Sat, 23 Dec 2023 14:39:31 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id EBE8B1A09F1;
+	Sat, 23 Dec 2023 14:39:33 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgCXmhCjgIZlBfyaEQ--.4053S4;
+	Sat, 23 Dec 2023 14:39:33 +0800 (CST)
+From: linan666@huaweicloud.com
+To: axboe@kernel.dk,
+	geliang.tang@suse.com,
+	xni@redhat.com,
+	colyli@suse.de
+Cc: ira.weiny@intel.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linan666@huaweicloud.com,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	houtao1@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH 0/4] badblocks: bugfix and cleanup of _badblocks_check()
+Date: Sat, 23 Dec 2023 14:37:24 +0800
+Message-Id: <20231223063728.3229446-1-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgCXmhCjgIZlBfyaEQ--.4053S4
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYJ7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2js
+	IEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAa
+	Y2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4
+	A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F
+	5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMx
+	AIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_
+	Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwI
+	xGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWx
+	JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42
+	IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYuc_UUUUU
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-The pull request you sent on Fri, 22 Dec 2023 16:20:05 -0700:
+From: Li Nan <linan122@huawei.com>
 
-> git://git.kernel.dk/linux.git tags/block-6.7-2023-12-22
+Li Nan (4):
+  badblocks: goto out if find any unacked badblocks in
+    _badblocks_check()
+  badblocks: optimize _badblocks_check()
+  badblocks: fix slab-out-of-bounds in _badblocks_check()
+  badblocks: clean up prev_badblocks()
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/5254c0cbc92d2a08e75443bdb914f1c4839cdf5a
-
-Thank you!
+ block/badblocks.c | 48 +++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.39.2
+
