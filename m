@@ -1,19 +1,19 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC4A28F7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBDD15BD;
 	Sat, 23 Dec 2023 06:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SxvfC0bmFz4f3kFV;
-	Sat, 23 Dec 2023 14:39:31 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SxvfD0Bzkz4f3kFm;
+	Sat, 23 Dec 2023 14:39:32 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id EBE8B1A09F1;
-	Sat, 23 Dec 2023 14:39:33 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id DEC731A0997;
+	Sat, 23 Dec 2023 14:39:34 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgCXmhCjgIZlBfyaEQ--.4053S4;
-	Sat, 23 Dec 2023 14:39:33 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgCXmhCjgIZlBfyaEQ--.4053S6;
+	Sat, 23 Dec 2023 14:39:34 +0800 (CST)
 From: linan666@huaweicloud.com
 To: axboe@kernel.dk,
 	geliang.tang@suse.com,
@@ -27,47 +27,97 @@ Cc: ira.weiny@intel.com,
 	yi.zhang@huawei.com,
 	houtao1@huawei.com,
 	yangerkun@huawei.com
-Subject: [PATCH 0/4] badblocks: bugfix and cleanup of _badblocks_check()
-Date: Sat, 23 Dec 2023 14:37:24 +0800
-Message-Id: <20231223063728.3229446-1-linan666@huaweicloud.com>
+Subject: [PATCH 2/4] badblocks: optimize _badblocks_check()
+Date: Sat, 23 Dec 2023 14:37:26 +0800
+Message-Id: <20231223063728.3229446-3-linan666@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231223063728.3229446-1-linan666@huaweicloud.com>
+References: <20231223063728.3229446-1-linan666@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgCXmhCjgIZlBfyaEQ--.4053S4
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYJ7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2js
-	IEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAa
-	Y2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4
-	A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F
-	5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMx
-	AIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_
-	Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwI
-	xGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWx
-	JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42
-	IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYuc_UUUUU
+X-CM-TRANSID:cCh0CgCXmhCjgIZlBfyaEQ--.4053S6
+X-Coremail-Antispam: 1UD129KBjvJXoWxJrWktw1UtrWDCFy7trWrXwb_yoW8WrWDpr
+	nxX34SgryqgF1UX3W8Z3ZrJr1ruw13tF4UKay7Jrn8KryIyw1xK3W0qryYyFyj9FyfJrnI
+	qa15uryrZFyxGa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmC14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
+	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vY
+	z4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c
+	02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE
+	4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4
+	IIrI8v6xkF7I0E8cxan2IY04v7M4kE6xkIj40Ew7xC0wCF04k20xvY0x0EwIxGrwCFx2Iq
+	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
+	106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
+	xVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7
+	xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_
+	Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUvAp5UUUUU=
 X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
 From: Li Nan <linan122@huawei.com>
 
-Li Nan (4):
-  badblocks: goto out if find any unacked badblocks in
-    _badblocks_check()
-  badblocks: optimize _badblocks_check()
-  badblocks: fix slab-out-of-bounds in _badblocks_check()
-  badblocks: clean up prev_badblocks()
+Check badblocks_empty earlier, and goto out if check range starts after
+all badblocks or badblocks is empty since no badblocks intersect with
+check range.
 
- block/badblocks.c | 48 +++++++++++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+Clean up redundant check '(prev + 1) < bb->count'. If it is true, it
+will enter the earlier branch.
 
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/badblocks.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/block/badblocks.c b/block/badblocks.c
+index ebf17a54851a..054d05b93641 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -1296,6 +1296,11 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+ retry:
+ 	seq = read_seqbegin(&bb->lock);
+ 
++	if (badblocks_empty(bb)) {
++		len = sectors;
++		goto out;
++	}
++
+ 	p = bb->page;
+ 	acked_badblocks = 0;
+ 
+@@ -1303,17 +1308,12 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+ 	bad.start = s;
+ 	bad.len = sectors;
+ 
+-	if (badblocks_empty(bb)) {
+-		len = sectors;
+-		goto update_sectors;
+-	}
+-
+ 	prev = prev_badblocks(bb, &bad, hint);
+ 
+ 	/* start after all badblocks */
+ 	if ((prev + 1) >= bb->count && !overlap_front(bb, prev, &bad)) {
+ 		len = sectors;
+-		goto update_sectors;
++		goto out;
+ 	}
+ 
+ 	if (overlap_front(bb, prev, &bad)) {
+@@ -1339,7 +1339,7 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+ 	}
+ 
+ 	/* Not front overlap, but behind overlap */
+-	if ((prev + 1) < bb->count && overlap_behind(bb, &bad, prev + 1)) {
++	if (overlap_behind(bb, &bad, prev + 1)) {
+ 		len = BB_OFFSET(p[prev + 1]) - bad.start;
+ 		hint = prev + 1;
+ 		goto update_sectors;
 -- 
 2.39.2
 
