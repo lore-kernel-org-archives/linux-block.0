@@ -1,157 +1,91 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B37B10E8;
-	Sun, 24 Dec 2023 00:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24530651
+	for <linux-block@vger.kernel.org>; Sun, 24 Dec 2023 01:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AilYrcRY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VQjviSH5";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AilYrcRY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VQjviSH5"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7751021CD8;
-	Sun, 24 Dec 2023 00:32:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1703377976; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M/d6jhLWIAoafyZMIbU7FyHZ5o1LeCN0mHS2QimSYDY=;
-	b=AilYrcRYOHo7HnTp96YKlhRGRte5ApMzUN3rk0J07PpvmQJS6FCNQbZX5/LM4IHAluVZbN
-	+aMtqA5cT9nvlc0rbiGf5yJFgFpSFUKh6N8xRx7tiXF8hL8X48H8GS+aELVzc5z0GzbA0S
-	xTcdi/uxxOCZZIoG/jvENsl0qEpC11Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1703377976;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M/d6jhLWIAoafyZMIbU7FyHZ5o1LeCN0mHS2QimSYDY=;
-	b=VQjviSH5KURZfCachlhBP+FqWv7iT9CFthS4cjmyk4lhTliGNFrbx4SdVPqlWSWOxioGKQ
-	LO57/xCdKxGfYpAw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1703377976; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M/d6jhLWIAoafyZMIbU7FyHZ5o1LeCN0mHS2QimSYDY=;
-	b=AilYrcRYOHo7HnTp96YKlhRGRte5ApMzUN3rk0J07PpvmQJS6FCNQbZX5/LM4IHAluVZbN
-	+aMtqA5cT9nvlc0rbiGf5yJFgFpSFUKh6N8xRx7tiXF8hL8X48H8GS+aELVzc5z0GzbA0S
-	xTcdi/uxxOCZZIoG/jvENsl0qEpC11Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1703377976;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M/d6jhLWIAoafyZMIbU7FyHZ5o1LeCN0mHS2QimSYDY=;
-	b=VQjviSH5KURZfCachlhBP+FqWv7iT9CFthS4cjmyk4lhTliGNFrbx4SdVPqlWSWOxioGKQ
-	LO57/xCdKxGfYpAw==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id AF25D13902;
-	Sun, 24 Dec 2023 00:32:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id MRmtFzR8h2X6fgAAn2gu4w
-	(envelope-from <colyli@suse.de>); Sun, 24 Dec 2023 00:32:52 +0000
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Gd6ece58"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5cdf90e5cdeso393725a12.1
+        for <linux-block@vger.kernel.org>; Sat, 23 Dec 2023 17:38:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703381908; x=1703986708; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e4PCt0BUJxtEtgmlWQFvEAznyF7V0hSV/duRlgdufCo=;
+        b=Gd6ece58tBCOaqajBFkBPCiZNOwKE6XX0S/O4JyRd18eSQmW8UcA8nYnqWBqSG2Nv2
+         MXxE/0o3b3yh4qV93XBzi9v9ZnOrsj4igGrUu9Tbq60zheJ2w8D1SEhv3R7hNtU5LICS
+         biXa1G6bobXSEcgUAfCfo/DZDvtPAppGSQTkDSqcWWccVwpKCovU8cwUTTPluIRm6oup
+         9nvidfNLI1wbNO3lEIX9nElvMT+V0H3C4jP63UxW5NNV2WApX5ao3MaJvTjqaZzO2RRh
+         OZyUEM8Nw0Hbyzaztwb3uxsDGTgIoh/fLYQWyJu9YRZQ2AsUZkXoN2iao19GOKutYvTe
+         YrcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703381908; x=1703986708;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e4PCt0BUJxtEtgmlWQFvEAznyF7V0hSV/duRlgdufCo=;
+        b=gW/9UQj3IXBMaax6vnxDmfzyMfFz/AtA6ReXdShdiodOTmApvgxWE8iGDqMumW5ram
+         SZdTxEgcKAIJ5RKIqJFBRlRr3d5NE760MSCs39yA22Uo/ShONOANm9NdntU08N53nfsu
+         V6lVOwCzz/WQU64HyGic9BbIUXVQTcy12XJXAbx8S0zWfeT+9iPLxaKH4tN/Dzz/8aSl
+         s72nKzrjTDigs/ASQaAuOCRVGh2mYh9iC7YNbYRD38ijkiCPdrV+KLK6Lvt7bzHkWmtn
+         eecFFdSEdvHChW1muAXYwKngnLGI2HrsQ/kVkQFXfRhY65Ut1eOj0xT43UT7SqaEY/Xs
+         BcDw==
+X-Gm-Message-State: AOJu0YzI6RQhkYYApYSOsAuNyP02yqS9458kMwK7W8UJ9Dw8ZKw61d0U
+	Zs6+B1/RU2xE5c4uRX61Z1yeKnGTlVdBow==
+X-Google-Smtp-Source: AGHT+IGBrvgr5pgQQNrjr2yKzG+YadtnLw/TgftQcaHqh3uqbZcrmAcVRJmdd3rzGx3sugWBSLqC2w==
+X-Received: by 2002:a05:6a00:1824:b0:6d8:f420:da04 with SMTP id y36-20020a056a00182400b006d8f420da04mr7534114pfa.0.1703381908143;
+        Sat, 23 Dec 2023 17:38:28 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id f30-20020aa79d9e000000b006d9ae6fe867sm692086pfq.110.2023.12.23.17.38.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Dec 2023 17:38:27 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Coly Li <colyli@suse.de>
+Cc: nvdimm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Geliang Tang <geliang.tang@suse.com>, Hannes Reinecke <hare@suse.de>, 
+ NeilBrown <neilb@suse.de>, Vishal L Verma <vishal.l.verma@intel.com>, 
+ Xiao Ni <xni@redhat.com>
+In-Reply-To: <20231224002820.20234-1-colyli@suse.de>
+References: <20231224002820.20234-1-colyli@suse.de>
+Subject: Re: [PATCH] badblocks: avoid checking invalid range in
+ badblocks_check()
+Message-Id: <170338190635.1172668.12689831383588478650.b4-ty@kernel.dk>
+Date: Sat, 23 Dec 2023 18:38:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
-Subject: Re: [PATCH] badblocks: avoid checking invalid range in
- badblocks_check()
-From: Coly Li <colyli@suse.de>
-In-Reply-To: <20231224002820.20234-1-colyli@suse.de>
-Date: Sun, 24 Dec 2023 08:32:35 +0800
-Cc: nvdimm@lists.linux.dev,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Block Devices <linux-block@vger.kernel.org>,
- Ira Weiny <ira.weiny@intel.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Geliang Tang <geliang.tang@suse.com>,
- Hannes Reinecke <hare@suse.de>,
- NeilBrown <neilb@suse.de>,
- Vishal L Verma <vishal.l.verma@intel.com>,
- Xiao Ni <xni@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A110805F-3448-4A87-AE70-F94A394EA826@suse.de>
-References: <20231224002820.20234-1-colyli@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3774.300.61.1.2)
-X-Spam-Level: 
-X-Spam-Level: 
-X-Spamd-Result: default: False [-0.47 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-0.87)[85.65%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 MV_CASE(0.50)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 RCPT_COUNT_SEVEN(0.00)[11];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,suse.com:email,kernel.dk:email,suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Score: -0.47
-X-Spam-Flag: NO
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-7edf1
 
 
-
-> 2023=E5=B9=B412=E6=9C=8824=E6=97=A5 08:28=EF=BC=8CColy Li =
-<colyli@suse.de> =E5=86=99=E9=81=93=EF=BC=9A
->=20
+On Sun, 24 Dec 2023 08:28:20 +0800, Coly Li wrote:
 > If prev_badblocks() returns '-1', it means no valid badblocks record
 > before the checking range. It doesn't make sense to check whether
 > the input checking range is overlapped with the non-existed invalid
 > front range.
->=20
-> This patch checkes whether 'prev >=3D 0' is true before calling
+> 
+> This patch checkes whether 'prev >= 0' is true before calling
 > overlap_front(), to void such invalid operations.
->=20
-> Fixes: 3ea3354cb9f0 ("badblocks: improve badblocks_check() for =
-multiple ranges handling")
-> Reported-and-tested-by: Ira Weiny <ira.weiny@intel.com>
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Link: =
-https://lore.kernel.org/nvdimm/3035e75a-9be0-4bc3-8d4a-6e52c207f277@leemhu=
-is.info/
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Geliang Tang <geliang.tang@suse.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: NeilBrown <neilb@suse.de>
-> Cc: Vishal L Verma <vishal.l.verma@intel.com>
-> Cc: Xiao Ni <xni@redhat.com>
-> ---
-> block/badblocks.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> [...]
 
-Hi Jens,
+Applied, thanks!
 
-Is it possible to take this fix into 6.7 still? Thanks in advance.
+[1/1] badblocks: avoid checking invalid range in badblocks_check()
+      commit: 146e843f6b09271233c021b1677e561b7dc16303
 
-Coly Li
+Best regards,
+-- 
+Jens Axboe
 
 
-[snipped]
 
