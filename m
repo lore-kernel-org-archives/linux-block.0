@@ -1,74 +1,80 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248354F5E3
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 16:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00664F89F
+	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 16:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yLETI7l4"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7bad333144eso15868439f.1
-        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 08:27:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q7Ec9gN5"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7baf436cdf7so4420039f.0
+        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 08:28:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703608078; x=1704212878; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xOMGLbsQ9RzM9b4GH1sZi3XCxnyOtKMyWm93wPrQ9NQ=;
-        b=yLETI7l4PsCDRf5Kn58dk884r6RxFXdB6JdQwSDmbPwtHCnPXR6qtJHbJlz05xStRT
-         /1aU/boBhS0nS1Oc1ZCkVH60u2Yxr4WK5b74wQChUeBbC9rxXIUaHRsOamnDFnbP0PVZ
-         I1SxokhleyqbeyKyrXcLfV1cEOToa+uT3eKMYGnKFTaW4Lg7GQin9ZJQYxhpyBldnL+I
-         uPUyK4jfNTy8ypegxFkDXDe9vWiWcs2YfgJvIrPYg+Vl/XH4FfSG2r0KJtc4oQutk39k
-         0mHK6XfHTfkcItmD/ei9SbXtvCEutER63O4etdtDociYvbeyfxeMaXx6Si86uDhHpXPb
-         BjVA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703608129; x=1704212929; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t2gV8/cpPy2T5tIPvkQnnjmxZIQ9RGgRvZoWZsYkLO4=;
+        b=Q7Ec9gN5Lx1aenuJSSKq5zCnn0roYS/ZBrh9Qp+v73+jSzD0bY8IVbD3qmxgVEknvP
+         XpVM1lJeuyV4yKXUSiha1QJjnpqMr+LsyVGGvsgVvjH5cYU8NfAg0itmNldiyPuJyyZn
+         9/ED3y189ZdqfgwE5XnjFuSbUJrTCE5eBCcx5SSEn9ogfNxw3JNUeaUInwH6qX2Bdsul
+         gr5zB7amfJICbMgjaA31SZdPOir/pbY0XN9lKnTzdNC+lHMwx60DEK9hnl7+Thc4b6Q9
+         cReVB1ERImupmvQAmBIn65ucCL5GXuS2Xqdq/95SbfZwdG5NXdRqP0nTqzZCrpbDRW77
+         kRGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703608078; x=1704212878;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xOMGLbsQ9RzM9b4GH1sZi3XCxnyOtKMyWm93wPrQ9NQ=;
-        b=QNHcx1786uR9kYkEcrWr/O7de7vsKbTc0hyiSvHuTns+1hvjPeJeAb+ZZBC//C+ztz
-         ggdc1bhAsZ2YcmFeaqhyfsdeX7O+W6N+9vlhd+R7GI0a2cAaGPHiFs+CkSxwflOxQKbD
-         YpJLlOTgKzn2GYw9MUs5u5Ktr0BpV5TZXP8yVWdr+uzblVM2uPHacvGvrPkJPFUf/YKp
-         Q3PMCL7FVwzWWfk3Te4ks0b7TKF8tZ4MUASpJDZG/mQUpd6hdgbbUvZfZQYhoE7/wGp4
-         IEjTM+ykra5KMdTEYTAJLa7zgQoGgS6AeWI8E5+qRkAGBACO37zMskm8e9DfMkTZlRE4
-         hVdw==
-X-Gm-Message-State: AOJu0YzvhbowwUkujq+cfd2+nlg1Xe43vcnKlUzhcoJB1PS6ZiCGyS3/
-	Sc/sS0tNqmruGP/cMj/eZsfSmwdZPRhFhQ==
-X-Google-Smtp-Source: AGHT+IEgyg08vkH3r2LNXz77+SvWCKLe1kl8w+wmTxYI0Q2Y3xIjVmbHXTPWx58lZLUgNU4waXN8yQ==
-X-Received: by 2002:a6b:6a04:0:b0:7ba:ccbb:7515 with SMTP id x4-20020a6b6a04000000b007baccbb7515mr4749377iog.2.1703608078311;
-        Tue, 26 Dec 2023 08:27:58 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id x6-20020a056638034600b0046b6f096e3bsm3092448jap.134.2023.12.26.08.27.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Dec 2023 08:27:57 -0800 (PST)
-Message-ID: <4a9913bb-41b0-43c2-b7b7-22472e954a12@kernel.dk>
-Date: Tue, 26 Dec 2023 09:27:57 -0700
+        d=1e100.net; s=20230601; t=1703608129; x=1704212929;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t2gV8/cpPy2T5tIPvkQnnjmxZIQ9RGgRvZoWZsYkLO4=;
+        b=jhSJdD6jU5Xrxzy9WXyBp1ZFi15I2oimtKzri7QsSSr7Ds5k9ksdBioAmcIh6zY6xT
+         w4AH0GwlPQy77eKdZay+cu2IaZv8TfdfFV28DE6G+7ev/qYtGqmL0IPJynqot/2H7coI
+         RnyMN1V7Xj8DLPVjaDQo6sTC00jUk4Uy0enBeOInorlr0CdAyplAPJ43eKgNr7uJVVLC
+         +8FLrpfpCsUCmovUiuktAkVHxRydhNP+Rv6ZkAzu3YEVhOA+ufhBxUawwnq0k747zafE
+         owc8c3RE7wMamio35GSESN9p3E/6KFniAJGIZjlHp9UDUJc8uNdAm+VXNq5EcPstIq97
+         NpFA==
+X-Gm-Message-State: AOJu0Yw4AKFY7bXWx7WQ+msEl1BYWGQ75yg0BE3TH4IHNT27HYtVSVkh
+	PpbbCxI8lQCdTv0l7s9ebJw/zJOcHFyyDwKHwo1yFLJoDR6jaA==
+X-Google-Smtp-Source: AGHT+IGnZOPQd96/25whfypNRQeQKddn0WJRLE9uQdAgjZvVt8+q0cR/zuqGvQ1Y+xmUhMz/M3pdZA==
+X-Received: by 2002:a6b:3e46:0:b0:7ba:90e2:2b1 with SMTP id l67-20020a6b3e46000000b007ba90e202b1mr10878422ioa.0.1703608129440;
+        Tue, 26 Dec 2023 08:28:49 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id i17-20020a02b691000000b0046d18e358b3sm1607879jam.63.2023.12.26.08.28.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Dec 2023 08:28:48 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20231226081524.180289-1-hch@lst.de>
+References: <20231226081524.180289-1-hch@lst.de>
+Subject: Re: [PATCH] block: renumber QUEUE_FLAG_HW_WC
+Message-Id: <170360812853.1227834.7306705322769980126.b4-ty@kernel.dk>
+Date: Tue, 26 Dec 2023 09:28:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix a memory leak in bdev_open_by_dev()
-Content-Language: en-US
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <8eaec334781e695810aaa383b55de00ca4ab1352.1703439383.git.christophe.jaillet@wanadoo.fr>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <8eaec334781e695810aaa383b55de00ca4ab1352.1703439383.git.christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-7edf1
 
-On 12/24/23 10:36 AM, Christophe JAILLET wrote:
-> If we early exit here, 'handle' needs to be freed, or some memory leaks.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+On Tue, 26 Dec 2023 08:15:24 +0000, Christoph Hellwig wrote:
+> For the QUEUE_FLAG_HW_WC to actually work, it needs to have a separate
+> number from QUEUE_FLAG_FUA, doh.
+> 
+> 
 
+Applied, thanks!
+
+[1/1] block: renumber QUEUE_FLAG_HW_WC
+      (no commit info)
+
+Best regards,
 -- 
 Jens Axboe
+
 
 
