@@ -1,55 +1,55 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2C74F8A3
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 16:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6268C4F89F
+	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 16:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="X6D4l90h"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-36016c6e19eso78695ab.1
-        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 08:28:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="18ryiROH"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7ba9356f562so30672939f.1
+        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 08:28:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703608130; x=1704212930; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703608132; x=1704212932; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OTpKLeikOxvCLN4rFxqGbc8Hn9jtGXezRCP/6OMWxRw=;
-        b=X6D4l90hKybxiMkxFu4e35yiPlwp7gRYz7y/aPx6YpStAUQt7egHhtcpTOU+ZS482u
-         3u+mIJSGgBdnI3+Ndp6bo9/vqBocFIjw9Kd2BFiAS2ARq5gtqTC/MZNc/N752N75D4MP
-         9TSjjruR17DpPk+/Jg4hn9y/bwuLd+/poSe86tvzyK/+VBe7CfcC8IL4p4uXgQHJouoY
-         S3P912mhMxHA/Ln6uXoG3mNAMWq5Pbt5FFDyyoaV2uwLVbOW7cISX8C4KIbiYlOqAqxZ
-         JQHqumsLTTMejPaMeedcNkdEqZ/SK9C0/dobYWfZZKNlT4Ss0LL2MgX8XesXczCKHwEl
-         WY8g==
+        bh=OqKULS0YMcmuvyLedxribgSRf7vDbW80hT925dXaTP4=;
+        b=18ryiROHKRNYI9byU9Lt9QYcmMxUQZqtwpqEeSwn5khgD9Nn47vwa6jtBvi2JBl7c/
+         rDH6dXcXo0hPsMsrzSLh7op9rw1SF1rRUSSDlhflCYHBwiGsY7BdU0YEmVDAu6ZlnHmn
+         TPz3tQwFg4D5YA5Cw0YW4w8uR6cJZcYtExs/iYxwSEg267nYBXTm20gUxyRdUlLCCBIM
+         qNHeQehw31LBoWhhB49LWQnlH8y+FHkTKB2XtRLa4FJZ+053NqWq67F3UI4DfCKAKvXw
+         JeOLgEa6M4ioj/et0w4bohHkZ/NM0se5J63Ol0zMQ/c279hPmmijcputkCJPtNwuUnYr
+         31Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703608130; x=1704212930;
+        d=1e100.net; s=20230601; t=1703608132; x=1704212932;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OTpKLeikOxvCLN4rFxqGbc8Hn9jtGXezRCP/6OMWxRw=;
-        b=GtDlwPWN4Oz5HC2HcBTkGAX5VaJ3UZUqJV2zkAnacsxTOh2Ya/PhUJ6Q8peFWBdweg
-         1o+U4L4U2HeYI9MpohSckOdvH4K7PKjBT1qGlLvvrzyUn5KHMT3RXpGAtIcePf1J7EDJ
-         XVG5Mxp4vb9Q+4EvFQ2oh0742cmJ+YOZx/IBSAz6nFnnvTDzl/PUndS+sjlnDi9XLM/I
-         Oxm9w1C2SaohR3z/KurBMhSOGBMV1w5Q/Q7WsaNT7s3w++FP3jaWkDQPRxIghG/14INN
-         V3dElNNJWbHkiMyewzNdXnkXkMw9lV7mabuURYTY0YQXIMZdJPhGCPydRqiquJGwWq+y
-         CnGg==
-X-Gm-Message-State: AOJu0YxQ1LX5E24kNqUSa+wcNKJ0JDqCfm51IeeIiO/SBSCvE6z1Rjxc
-	6Qqa1f6HIyt/cgrHpVJvgGbbQ15lsdK98pY/IRptEG9oHnFAIA==
-X-Google-Smtp-Source: AGHT+IFf+Ngg2DnolKIiGT4XbN43U4CtNke0ZBBMVnNL1EzmrKiPt2YEY8TG+TucrYW9O+u740vrZQ==
-X-Received: by 2002:a05:6602:1606:b0:7ba:c23b:8d63 with SMTP id x6-20020a056602160600b007bac23b8d63mr7096462iow.0.1703608130746;
-        Tue, 26 Dec 2023 08:28:50 -0800 (PST)
+        bh=OqKULS0YMcmuvyLedxribgSRf7vDbW80hT925dXaTP4=;
+        b=ijNqFf+eHnaPWsigi/Kd9fEan1Fiv3XuHtUoAfBab0Ks10jBSNXPHH8WX6+wr9kf/6
+         MF3V4JF3RxFfSzqUPMG/xWGj44AeSbh5KOnpJVto8Se6KQAZtjJ1t16cqrtUenLlZ6q0
+         4cI4oPmleO49OfhLEjn1kj5bNwcNS9JpBzqxkn0IEvhoQp05yQwig3cCRZzVMfvfLs9j
+         7bZj5kHYddFlRfampPRNg72wi3vRn3iFYEUXI2lvP/oRHf9d7YLCsDhk/PNY9yp3dgDh
+         7lHFtUNxIOOc5Ta5MQdndaCZRS51FEJklc6NjVVLXbzFpAN4hELgh14FANOMgFSigdoK
+         z46g==
+X-Gm-Message-State: AOJu0YyZzKL3JoluS14VgeALPcEAh7V+gyCIMvxdKnjYcoa1P88PIhLA
+	dbrGXW59NysWvZCr+8bOckdAh4xL/k0JSOsoS9APC8VZc2dFOQ==
+X-Google-Smtp-Source: AGHT+IGEYfzUbf77j1iWWMZaGN2zvec/K39Uhj/twPD3wgHr5O9JMQVELLZT5iuAXWiGpFj4JofV3w==
+X-Received: by 2002:a05:6602:179e:b0:7ba:c855:9cf7 with SMTP id y30-20020a056602179e00b007bac8559cf7mr4939800iox.2.1703608132137;
+        Tue, 26 Dec 2023 08:28:52 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id i17-20020a02b691000000b0046d18e358b3sm1607879jam.63.2023.12.26.08.28.49
+        by smtp.gmail.com with ESMTPSA id i17-20020a02b691000000b0046d18e358b3sm1607879jam.63.2023.12.26.08.28.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 08:28:49 -0800 (PST)
+        Tue, 26 Dec 2023 08:28:50 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: Christoph Hellwig <hch@lst.de>
 Cc: linux-block@vger.kernel.org
-In-Reply-To: <20231221070538.1112446-1-hch@lst.de>
-References: <20231221070538.1112446-1-hch@lst.de>
-Subject: Re: [PATCH] block: reject invalid operation in submit_bio_noacct
-Message-Id: <170360812950.1227834.5021588083175023177.b4-ty@kernel.dk>
-Date: Tue, 26 Dec 2023 09:28:49 -0700
+In-Reply-To: <20231226090747.204969-1-hch@lst.de>
+References: <20231226090747.204969-1-hch@lst.de>
+Subject: Re: [PATCH] blk-wbt: remove the separate write cache tracking
+Message-Id: <170360813078.1227834.4016532820153740695.b4-ty@kernel.dk>
+Date: Tue, 26 Dec 2023 09:28:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,21 +61,16 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.13-dev-7edf1
 
 
-On Thu, 21 Dec 2023 08:05:38 +0100, Christoph Hellwig wrote:
-> submit_bio_noacct allows completely invalid operations, or operations
-> that are not supported in the bio path.  Extent the existing switch
-> statement to rejcect all invalid types.
+On Tue, 26 Dec 2023 09:07:47 +0000, Christoph Hellwig wrote:
+> Use the queue wide write back cache tracking insted of duplicating the
+> value in strut rq_wb.
 > 
-> Move the code point for REQ_OP_ZONE_APPEND so that it's not right in the
-> middle of the zone management operations and the switch statement can
-> follow the numerical order of the operations.
 > 
-> [...]
 
 Applied, thanks!
 
-[1/1] block: reject invalid operation in submit_bio_noacct
-      commit: 1c042f8d4bc342b7985b1de3d76836f1a1083b65
+[1/1] blk-wbt: remove the separate write cache tracking
+      commit: 5d13243820c457edf54a1fd848141ce7eb092671
 
 Best regards,
 -- 
