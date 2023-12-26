@@ -1,97 +1,83 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74354E607
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 12:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251554F209
+	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 15:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="ZrdwpR8p"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5532b45c286so5166433a12.0
-        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 04:14:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1703592865; x=1704197665; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QgFlNYVpTW4/LSUdsscecibsDCHhy6INDSaJkTsHmeY=;
-        b=ZrdwpR8pCEzJiWHU8sTBieDw1/Waa5zyVylr6tla2Bg7waa/jfJPm8rkMEAho/C9ge
-         9s1AXglsnV9076g69kdoDpn/Sf8aJiovCvSGhUxZBklbkFKK8bL5/wdgPAdYKDupdNay
-         x/tR4OJpQFuCYhmS/ywqgeBgO/+MluSD6XsQYgFD1sT30dPUMn4o0O08hKUnQJNiOcFO
-         Lb+cvRvJXFmrvmIX57zOV+mKqWcCsXRrAoCH4sCuK82xMDasQ14na/XKx4pUMg9eG71e
-         h5A3bfcKOABv/emGpgqBR1eIrNVjHNGosGDIGfP06Fz1O8YfPWlD1I0qgDA/RcX10Ip9
-         EAyw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJUcXDWt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703605140;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wV/f9f0in7gn4gktkxuOHq7lnBTOjC718N9fK7Gr2Iw=;
+	b=NJUcXDWtzZk/5joPmmoSG3Jg4IEqRHrVKvwHAxbynLmkJ0YLqZeYYecp84BI6m7CFR+fTu
+	m4YW8w1OUnP9gQWWz9yj/cGXhB9gziG8m5ZQ7gxqf39MjemDnkJQU+PP22zabu9qrareix
+	7XrgLpPvBp6AUngKLvkaLZ6BXztY0dU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-106-OLiCCwXVOK-A2kvbi5JQ8Q-1; Tue, 26 Dec 2023 10:38:58 -0500
+X-MC-Unique: OLiCCwXVOK-A2kvbi5JQ8Q-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40d1ffbc3b8so44543125e9.0
+        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 07:38:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703592865; x=1704197665;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QgFlNYVpTW4/LSUdsscecibsDCHhy6INDSaJkTsHmeY=;
-        b=BmSEelfT0d3dZha5szqg2Sy9rkZoGk3UHLd6BXbRsvnPO18xLCEZxHxWZPBdI119T+
-         T+4vZaF9TQ5jM65lrYh+MhTpyYSxUQPZwHH9zbOivcgX8mK7QrVXO6ps07KaXuRI/mZA
-         Mm0ObsLD7zKJ2QAez1FtnTHlwiBiuL1XrHcLufPVBAEtLAnbTUJbyS46je4G5jN008ZK
-         OwZxQNLmc1QOiWusHhZ6lRW/e+rnARrIGaSp+a31OQtLsxQlaPPgojXedUeOtvh8B14y
-         Vnn12hRtqcdrvN4/hyW1PDeNPwPctHpoe15dqeL59QCLnrj0OyoLbLDDVavubp37Oxdv
-         LBqA==
-X-Gm-Message-State: AOJu0Yx9w3lpQY3kPe73sBucrA874aByZBfXDw6zrgFyp631EkCr5sbK
-	T4pEqZ2U/EnuEpinICNdn6DCZS6wdAI9IzTLDed6ewTGi0VZ4A==
-X-Google-Smtp-Source: AGHT+IHxzCgO2oCLfPXnR4/Me1mMAqfQos7RB3BFSZ2u3yzZCPtF4kJmY71gWFuDLOAwlb8zPxryR79r59mCSy96caI=
-X-Received: by 2002:a17:907:1b12:b0:a26:ebc6:eb7e with SMTP id
- mp18-20020a1709071b1200b00a26ebc6eb7emr965572ejc.194.1703592864489; Tue, 26
- Dec 2023 04:14:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703605137; x=1704209937;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wV/f9f0in7gn4gktkxuOHq7lnBTOjC718N9fK7Gr2Iw=;
+        b=GhA+auXAIa/cG8wAgkYzRcqToSv2Q8L4U7ynznIcFCwCRyxa7DvI9nAOzmsr9t3WJJ
+         Rv0A5M4S3h4jzbjr1+TXKll09BgywUllAW8CaD5yZgPaibJJq8JQ857/HzDvKOr15vXN
+         fnKPcL1zcsUNkwZyt8lJVn3hyk7JiFUkUyfRbDlYf+okntyquFzV6zyc8ZyVJY4mkIi5
+         Q/vx+TSALAuyliOf74lW0zYHWzg3OhjNNTDdDrb3HTDt9q+Ddg/6S15QoSAbPyS1jXlf
+         kdNS/4iLyibFqsxGiwjskd2yCqjk1p7KpEj/zz7zoqye2ZPRNDsJSTvCCwbh5mG4Epsc
+         r64A==
+X-Gm-Message-State: AOJu0YyBZA5BligQ3GdzYiyDn0lCXHDh5FBy9/+hnOWEtYzbsOgrx7gL
+	M0K0g3YdV6B8IS/Hgso7MkqZ67GZnZbkNnGZyZinVyJ1jvOVTBSsawb0NMp0qo7J1TfrAKXtMLk
+	D1tEELWnU12N5tkmc9EdfS8MUWlWvG7g=
+X-Received: by 2002:a05:600c:5405:b0:40d:2d25:b8ee with SMTP id he5-20020a05600c540500b0040d2d25b8eemr2051619wmb.171.1703605137302;
+        Tue, 26 Dec 2023 07:38:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF95K6/sVk5zmbFYd7DofTvHL9+lGHyoYvlXR0NoGkiR28DSEG18rrqgMucy+nDqg7Ulg/sXg==
+X-Received: by 2002:a05:600c:5405:b0:40d:2d25:b8ee with SMTP id he5-20020a05600c540500b0040d2d25b8eemr2051613wmb.171.1703605136846;
+        Tue, 26 Dec 2023 07:38:56 -0800 (PST)
+Received: from redhat.com ([2.55.177.189])
+        by smtp.gmail.com with ESMTPSA id l20-20020a05600c4f1400b003feae747ff2sm14254261wmq.35.2023.12.26.07.38.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Dec 2023 07:38:56 -0800 (PST)
+Date: Tue, 26 Dec 2023 10:38:52 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Li Feng <fengli@smartx.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
+Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
+Message-ID: <20231226103743-mutt-send-email-mst@kernel.org>
+References: <20231207043118.118158-1-fengli@smartx.com>
+ <20231225092010-mutt-send-email-mst@kernel.org>
+ <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231207043118.118158-1-fengli@smartx.com> <20231225092010-mutt-send-email-mst@kernel.org>
- <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com> <20231226040342-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231226040342-mutt-send-email-mst@kernel.org>
-From: Li Feng <fengli@smartx.com>
-Date: Tue, 26 Dec 2023 20:14:13 +0800
-Message-ID: <CAHckoCyBxHd6Lc8UPh_3urSHz_eDj6jrm+c80+wKBmypzjvz+A@mail.gmail.com>
-Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com>
 
-On Tue, Dec 26, 2023 at 5:05=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Tue, Dec 26, 2023 at 05:01:40PM +0800, Li Feng wrote:
-> > Hi MST and paolo,
-> >
-> > mq-deadline is good for slow media, and none is good for high-speed med=
-ia.
-> > It depends on how the community views this issue. When virtio-blk adopt=
-s
-> > multi-queue,it automatically changes from deadline to none, which is no=
-t
-> > uniform here.
->
-> It's not virtio-blk changing though, it's linux doing that, right?
-> Is virtio-blk special somehow?
->
-Yes, it=E2=80=99s the common code path.
+On Tue, Dec 26, 2023 at 05:01:40PM +0800, Li Feng wrote:
+> I don't have ideas right now to answer Christoph/Paolo's question.
 
-Each block driver has a chance to set the default none scheduler, like loop=
-,
-it has set the none as the default scheduler.
+Paolo did some testing on this thread and posted some concerns.
+Do you disagree with his analysis?
 
-https://lkml.kernel.org/stable/20230809103647.895397540@linuxfoundation.org=
-/
+-- 
+MST
 
-> > I don't have ideas right now to answer Christoph/Paolo's question.
-> >
-> > Thanks,
-> > Li
->
-> --
-> MST
->
