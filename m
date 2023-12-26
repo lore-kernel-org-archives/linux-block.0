@@ -1,83 +1,97 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523A54D133;
-	Tue, 26 Dec 2023 09:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 6c4deba695604a0e99eafb52b5725d95-20231226
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:580ffc04-c4f4-499e-b578-3fe4318405e1,IP:15,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:0
-X-CID-INFO: VERSION:1.1.35,REQID:580ffc04-c4f4-499e-b578-3fe4318405e1,IP:15,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:0
-X-CID-META: VersionHash:5d391d7,CLOUDID:c68e958d-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:231226175732QO6M93J7,BulkQuantity:0,Recheck:0,SF:66|24|17|19|44|102,
-	TC:nil,Content:0,EDM:-3,IP:-2,URL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_ULN,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,
-	TF_CID_SPAM_FSI
-X-UUID: 6c4deba695604a0e99eafb52b5725d95-20231226
-Received: from node4.com.cn [(39.156.73.12)] by mailgw
-	(envelope-from <liyouhong@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 657365931; Tue, 26 Dec 2023 17:57:30 +0800
-Received: from node4.com.cn (localhost [127.0.0.1])
-	by node4.com.cn (NSMail) with SMTP id C95C716001CD6;
-	Tue, 26 Dec 2023 17:57:29 +0800 (CST)
-X-ns-mid: postfix-658AA389-675146153
-Received: from localhost.localdomain (unknown [172.20.185.164])
-	by node4.com.cn (NSMail) with ESMTPA id 31A6616001CD6;
-	Tue, 26 Dec 2023 09:57:29 +0000 (UTC)
-From: YouHong Li <liyouhong@kylinos.cn>
-To: jgross@suse.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	liyouhong <liyouhong@kylinos.cn>,
-	k2ci <kernel-bot@kylinos.cn>
-Subject: [PATCH v2] drivers/block/xen-blkback/common.h: Fix spelling typo in comment
-Date: Tue, 26 Dec 2023 17:57:01 +0800
-Message-Id: <20231226095701.172080-1-liyouhong@kylinos.cn>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74354E607
+	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 12:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="ZrdwpR8p"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5532b45c286so5166433a12.0
+        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 04:14:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1703592865; x=1704197665; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QgFlNYVpTW4/LSUdsscecibsDCHhy6INDSaJkTsHmeY=;
+        b=ZrdwpR8pCEzJiWHU8sTBieDw1/Waa5zyVylr6tla2Bg7waa/jfJPm8rkMEAho/C9ge
+         9s1AXglsnV9076g69kdoDpn/Sf8aJiovCvSGhUxZBklbkFKK8bL5/wdgPAdYKDupdNay
+         x/tR4OJpQFuCYhmS/ywqgeBgO/+MluSD6XsQYgFD1sT30dPUMn4o0O08hKUnQJNiOcFO
+         Lb+cvRvJXFmrvmIX57zOV+mKqWcCsXRrAoCH4sCuK82xMDasQ14na/XKx4pUMg9eG71e
+         h5A3bfcKOABv/emGpgqBR1eIrNVjHNGosGDIGfP06Fz1O8YfPWlD1I0qgDA/RcX10Ip9
+         EAyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703592865; x=1704197665;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QgFlNYVpTW4/LSUdsscecibsDCHhy6INDSaJkTsHmeY=;
+        b=BmSEelfT0d3dZha5szqg2Sy9rkZoGk3UHLd6BXbRsvnPO18xLCEZxHxWZPBdI119T+
+         T+4vZaF9TQ5jM65lrYh+MhTpyYSxUQPZwHH9zbOivcgX8mK7QrVXO6ps07KaXuRI/mZA
+         Mm0ObsLD7zKJ2QAez1FtnTHlwiBiuL1XrHcLufPVBAEtLAnbTUJbyS46je4G5jN008ZK
+         OwZxQNLmc1QOiWusHhZ6lRW/e+rnARrIGaSp+a31OQtLsxQlaPPgojXedUeOtvh8B14y
+         Vnn12hRtqcdrvN4/hyW1PDeNPwPctHpoe15dqeL59QCLnrj0OyoLbLDDVavubp37Oxdv
+         LBqA==
+X-Gm-Message-State: AOJu0Yx9w3lpQY3kPe73sBucrA874aByZBfXDw6zrgFyp631EkCr5sbK
+	T4pEqZ2U/EnuEpinICNdn6DCZS6wdAI9IzTLDed6ewTGi0VZ4A==
+X-Google-Smtp-Source: AGHT+IHxzCgO2oCLfPXnR4/Me1mMAqfQos7RB3BFSZ2u3yzZCPtF4kJmY71gWFuDLOAwlb8zPxryR79r59mCSy96caI=
+X-Received: by 2002:a17:907:1b12:b0:a26:ebc6:eb7e with SMTP id
+ mp18-20020a1709071b1200b00a26ebc6eb7emr965572ejc.194.1703592864489; Tue, 26
+ Dec 2023 04:14:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231207043118.118158-1-fengli@smartx.com> <20231225092010-mutt-send-email-mst@kernel.org>
+ <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com> <20231226040342-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231226040342-mutt-send-email-mst@kernel.org>
+From: Li Feng <fengli@smartx.com>
+Date: Tue, 26 Dec 2023 20:14:13 +0800
+Message-ID: <CAHckoCyBxHd6Lc8UPh_3urSHz_eDj6jrm+c80+wKBmypzjvz+A@mail.gmail.com>
+Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-From: liyouhong <liyouhong@kylinos.cn>
+On Tue, Dec 26, 2023 at 5:05=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Tue, Dec 26, 2023 at 05:01:40PM +0800, Li Feng wrote:
+> > Hi MST and paolo,
+> >
+> > mq-deadline is good for slow media, and none is good for high-speed med=
+ia.
+> > It depends on how the community views this issue. When virtio-blk adopt=
+s
+> > multi-queue,it automatically changes from deadline to none, which is no=
+t
+> > uniform here.
+>
+> It's not virtio-blk changing though, it's linux doing that, right?
+> Is virtio-blk special somehow?
+>
+Yes, it=E2=80=99s the common code path.
 
-Fix spelling typo in comment.
+Each block driver has a chance to set the default none scheduler, like loop=
+,
+it has set the none as the default scheduler.
 
-Reported-by: k2ci <kernel-bot@kylinos.cn>
-Signed-off-by: liyouhong <liyouhong@kylinos.cn>
+https://lkml.kernel.org/stable/20230809103647.895397540@linuxfoundation.org=
+/
 
----
-v1->v2:
-	*keep the "*/" aligned with the ones above and below.
----
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkba=
-ck/common.h
-index a3eeccf3ac5f..3296a6ec8d75 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -133,7 +133,7 @@ struct blkif_x86_32_request {
- struct blkif_x86_64_request_rw {
- 	uint8_t        nr_segments;  /* number of segments                   */
- 	blkif_vdev_t   handle;       /* only for read/write requests         */
--	uint32_t       _pad1;        /* offsetof(blkif_reqest..,u.rw.id)=3D=3D8=
-  */
-+	uint32_t       _pad1;        /* offsetof(blkif_request..,u.rw.id)=3D=3D=
-8 */
- 	uint64_t       id;
- 	blkif_sector_t sector_number;/* start sector idx on disk (r/w only)  */
- 	struct blkif_request_segment seg[BLKIF_MAX_SEGMENTS_PER_REQUEST];
---=20
-2.34.1
-
+> > I don't have ideas right now to answer Christoph/Paolo's question.
+> >
+> > Thanks,
+> > Li
+>
+> --
+> MST
+>
