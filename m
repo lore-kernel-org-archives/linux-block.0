@@ -1,83 +1,77 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251554F209
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 15:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CB04F5E3
+	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 16:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJUcXDWt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703605140;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wV/f9f0in7gn4gktkxuOHq7lnBTOjC718N9fK7Gr2Iw=;
-	b=NJUcXDWtzZk/5joPmmoSG3Jg4IEqRHrVKvwHAxbynLmkJ0YLqZeYYecp84BI6m7CFR+fTu
-	m4YW8w1OUnP9gQWWz9yj/cGXhB9gziG8m5ZQ7gxqf39MjemDnkJQU+PP22zabu9qrareix
-	7XrgLpPvBp6AUngKLvkaLZ6BXztY0dU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-106-OLiCCwXVOK-A2kvbi5JQ8Q-1; Tue, 26 Dec 2023 10:38:58 -0500
-X-MC-Unique: OLiCCwXVOK-A2kvbi5JQ8Q-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40d1ffbc3b8so44543125e9.0
-        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 07:38:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ghqB0x+L"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-36016c6e19eso76945ab.1
+        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 08:26:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703608009; x=1704212809; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PYBuKnpQkH9S/hjSv/mU6K+URhY5X8bmBi0FAgcMnAk=;
+        b=ghqB0x+LtX+vobcPERrFC8EWPgbkcOce4mJqo/6o85A/loYgUU3N+DuK71Zq08QpX1
+         f9vMzNpGjKlqts+TKrqgLntvuoF1tqtIDJz3yNtL2S3maIHMxbDqop7Xdr/fS/np/C5I
+         HF6f9ZTLdmBkE+dQ86fyhrGsisW130et+BYQD+MQIaXZNU3gr90eT4hSpbvrT6k5/Hle
+         GswWtUmN/HUMBnkNa8reHxLAr2Br4zEsANqrmaOI/atd3MXVaWEzZEsGWzIly9CK9qsO
+         omb0iRP03kgc4gqGEBaVMt9aUhJH1C3O8DBMu5Ut8b3cpL3CStZmPf5Ms/iehXa/OqOE
+         vv8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703605137; x=1704209937;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wV/f9f0in7gn4gktkxuOHq7lnBTOjC718N9fK7Gr2Iw=;
-        b=GhA+auXAIa/cG8wAgkYzRcqToSv2Q8L4U7ynznIcFCwCRyxa7DvI9nAOzmsr9t3WJJ
-         Rv0A5M4S3h4jzbjr1+TXKll09BgywUllAW8CaD5yZgPaibJJq8JQ857/HzDvKOr15vXN
-         fnKPcL1zcsUNkwZyt8lJVn3hyk7JiFUkUyfRbDlYf+okntyquFzV6zyc8ZyVJY4mkIi5
-         Q/vx+TSALAuyliOf74lW0zYHWzg3OhjNNTDdDrb3HTDt9q+Ddg/6S15QoSAbPyS1jXlf
-         kdNS/4iLyibFqsxGiwjskd2yCqjk1p7KpEj/zz7zoqye2ZPRNDsJSTvCCwbh5mG4Epsc
-         r64A==
-X-Gm-Message-State: AOJu0YyBZA5BligQ3GdzYiyDn0lCXHDh5FBy9/+hnOWEtYzbsOgrx7gL
-	M0K0g3YdV6B8IS/Hgso7MkqZ67GZnZbkNnGZyZinVyJ1jvOVTBSsawb0NMp0qo7J1TfrAKXtMLk
-	D1tEELWnU12N5tkmc9EdfS8MUWlWvG7g=
-X-Received: by 2002:a05:600c:5405:b0:40d:2d25:b8ee with SMTP id he5-20020a05600c540500b0040d2d25b8eemr2051619wmb.171.1703605137302;
-        Tue, 26 Dec 2023 07:38:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF95K6/sVk5zmbFYd7DofTvHL9+lGHyoYvlXR0NoGkiR28DSEG18rrqgMucy+nDqg7Ulg/sXg==
-X-Received: by 2002:a05:600c:5405:b0:40d:2d25:b8ee with SMTP id he5-20020a05600c540500b0040d2d25b8eemr2051613wmb.171.1703605136846;
-        Tue, 26 Dec 2023 07:38:56 -0800 (PST)
-Received: from redhat.com ([2.55.177.189])
-        by smtp.gmail.com with ESMTPSA id l20-20020a05600c4f1400b003feae747ff2sm14254261wmq.35.2023.12.26.07.38.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 07:38:56 -0800 (PST)
-Date: Tue, 26 Dec 2023 10:38:52 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Li Feng <fengli@smartx.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
-Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
-Message-ID: <20231226103743-mutt-send-email-mst@kernel.org>
-References: <20231207043118.118158-1-fengli@smartx.com>
- <20231225092010-mutt-send-email-mst@kernel.org>
- <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com>
+        d=1e100.net; s=20230601; t=1703608009; x=1704212809;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PYBuKnpQkH9S/hjSv/mU6K+URhY5X8bmBi0FAgcMnAk=;
+        b=aJ0yC7hqDauEpggSCyrHj3S9rIXaIKoKiMwpiYc26rfJQ0vHU5zf95FYjxRDm4IWyB
+         NpKcMcXPMB9xbQbb+yF+Avliwy3yUFB/0qBuEGMeK6hCEADhlhqtgGm4KkngrTHUUlpN
+         7ECVsPYl36MFCVPuaQr53N+raWCSUdnno8AbA7G4DYyTb8tra/d2I123r+4uNv3eyEDS
+         EU5j/2LSl+BX70vjPixeQi0On0eggHcy9xVS2gvxn4drZkAtUWV9GEAf+jsWw7K5l5rL
+         HW1nHsuKZzjvgxsROrMKEv1fg20Yqn8PvNsJzDsdAZSJvOCT63b3Z6l+V4O+nV9U9/Fm
+         fz+g==
+X-Gm-Message-State: AOJu0Yx3nWObbgH09qou/eqY4OBEvgWhrZgOY53QdDpGTsMa+uaKfvcR
+	7ApK6jXY6Y6FtW8teAsP2HSbH65wMGGyBHegCdS0WE/qHPfFJg==
+X-Google-Smtp-Source: AGHT+IHwnpXhmw0ChFG23nvexkHwJUOxfGcMISgAlNvfCYT8lKp7pNS4KSinPftdZdYDROvo4EPixw==
+X-Received: by 2002:a6b:ef0b:0:b0:7ba:86a8:fb76 with SMTP id k11-20020a6bef0b000000b007ba86a8fb76mr10710477ioh.1.1703608008842;
+        Tue, 26 Dec 2023 08:26:48 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id x6-20020a056638034600b0046b6f096e3bsm3092448jap.134.2023.12.26.08.26.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Dec 2023 08:26:47 -0800 (PST)
+Message-ID: <45e78bb4-3170-42e8-9c2c-514313da7109@kernel.dk>
+Date: Tue, 26 Dec 2023 09:26:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: renumber QUEUE_FLAG_HW_WC
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+References: <20231226081524.180289-1-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231226081524.180289-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 26, 2023 at 05:01:40PM +0800, Li Feng wrote:
-> I don't have ideas right now to answer Christoph/Paolo's question.
+On 12/26/23 1:15 AM, Christoph Hellwig wrote:
+> For the QUEUE_FLAG_HW_WC to actually work, it needs to have a separate
+> number from QUEUE_FLAG_FUA, doh.
+> 
+> Fixes: ebed8639d51b ("block: don't allow enabling a cache on devices that don't support it")
 
-Paolo did some testing on this thread and posted some concerns.
-Do you disagree with his analysis?
+Not sure where that is from? Fixed it up to:
+
+Fixes: 43c9835b144c ("block: don't allow enabling a cache on devices that don't support it")
 
 -- 
-MST
+Jens Axboe
+
 
