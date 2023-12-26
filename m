@@ -1,78 +1,64 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3A21847;
-	Tue, 26 Dec 2023 02:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3bb7376957eso3259539b6e.1;
-        Mon, 25 Dec 2023 18:22:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703557365; x=1704162165;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p0ye6VTF0bjOBBw4Oo5vJi04g00aoIv0iinplRLlxEY=;
-        b=VhqVieZdY9WITAVpE3iNJRV5z0X4Powa9+xB/+9OA9QUKB+xTYFiVPuUnV4BPPzcZk
-         SdCe2B7SamPL9IfOzkD7T25zglfNqdG801XdPZLahJrjfdl+HQY8EOTGzSrimmBzOA3t
-         fd0v2KFBeuLyI5SG/IrCBuHc5WImkc8Wjo3KDvsf+7gADCgxwficf2y+qpPcEGZAAByg
-         A9LrebqWJNlrjof+UA4FoptrtuZwgYOQAKsgVKBq9sJ/VaN1/0Rab16xHnkGz7qLduzv
-         392R39kGK70CYL0a8/HgsVcJcPaiA3mHZKAP9ODsQq0H2kg5ytvVvpT2cJb4xZieA+/r
-         IRgQ==
-X-Gm-Message-State: AOJu0YyIqq/z/difUXEc8aUPR+PCQkQaWDc6Y6rmfv1CsIQEmmAqPSGw
-	xXsnuefR3ChTYvT+nx4JDvc=
-X-Google-Smtp-Source: AGHT+IGLP4ZGwUl5RZbmP0PftsjmntPMXXdWjtpN55kgwsW2mN2AemTL0C5F/x7k3R8jYsPQGOMVgQ==
-X-Received: by 2002:a05:6808:1288:b0:3ba:9d:9b54 with SMTP id a8-20020a056808128800b003ba009d9b54mr8304818oiw.14.1703557364799;
-        Mon, 25 Dec 2023 18:22:44 -0800 (PST)
-Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
-        by smtp.gmail.com with ESMTPSA id u1-20020a056a00124100b006cecaff9e29sm8593323pfi.128.2023.12.25.18.22.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Dec 2023 18:22:44 -0800 (PST)
-Message-ID: <42aab0dc-802d-4dd8-9733-20ca2c92ccca@acm.org>
-Date: Mon, 25 Dec 2023 18:22:42 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EB34C63C
+	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 08:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hbJIMTaz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=16a1QMLCSLeNkLrTYtgXf5Aexq2eFrQIG1M6WMeKF2c=; b=hbJIMTazqlhI08nE7RYCJC2dH+
+	06/fHfK6xrHsrDfhzY/l8U+b2r8PCgHXq6aYugm92N+QxDdch1YHZGIInkl0EQoHPqmHupi3nAlWT
+	5Zn6wtgakLyP3ouMmgVf45cIvWkdhygrzn+SNutzLzjHzLSL0yKi5lp7+0vbQ4lnq8/IM/6i+YenI
+	2h/VfVBtfa/BgY8ILWxgA1C2VJC4rkd2OdMm6nMNwYuob6HAsVUU5QwC1f1EC5ogLA6EARYpQ0SSu
+	mxD1kXWR4BFGmFaIbbNsEKtWafhUg9m6ennSG9xxzB4Ht9VYsa6sdQtxprYOfv9d1x0Kk7viopExo
+	wyuJm20w==;
+Received: from 213-147-167-40.nat.highway.webapn.at ([213.147.167.40] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rI2b3-00BtJ4-2I;
+	Tue, 26 Dec 2023 08:15:30 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH] block: renumber QUEUE_FLAG_HW_WC
+Date: Tue, 26 Dec 2023 08:15:24 +0000
+Message-Id: <20231226081524.180289-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
-Content-Language: en-US
-To: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
- Keith Busch <kbusch@kernel.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Ed Tsai <ed.tsai@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20231130193139.880955-1-bvanassche@acm.org>
- <20231130193139.880955-2-bvanassche@acm.org>
- <58f50403-fcc9-ec11-f52b-f11ced3d2652@huaweicloud.com>
- <8372f2d0-b695-4af4-90e6-e35b86e3b844@acm.org>
- <c1658336-f48e-5688-f0c2-f325fd5696c3@huaweicloud.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <c1658336-f48e-5688-f0c2-f325fd5696c3@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 12/25/23 04:51, Yu Kuai wrote:
-> Are you still intrested in this patchset? I really want this switch in
-> our product as well.
-> 
-> If so, how do you think about following changes, a new field in
-> blk_mq_tag_set will make synchronization much easier.
+For the QUEUE_FLAG_HW_WC to actually work, it needs to have a separate
+number from QUEUE_FLAG_FUA, doh.
 
-Hi Kuai,
+Fixes: ebed8639d51b ("block: don't allow enabling a cache on devices that don't support it")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blkdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for the reminder. I plan to continue working on this patch
-series in January 2024 (after the merge window has closed).
-
-I will take a closer look at the patch in your email.
-
-Thanks,
-
-Bart.
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bc236e77d85e1c..ce1ab712552e3c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -521,7 +521,7 @@ struct request_queue {
+ #define QUEUE_FLAG_ADD_RANDOM	10	/* Contributes to random pool */
+ #define QUEUE_FLAG_SYNCHRONOUS	11	/* always completes in submit context */
+ #define QUEUE_FLAG_SAME_FORCE	12	/* force complete on same CPU */
+-#define QUEUE_FLAG_HW_WC	18	/* Write back caching supported */
++#define QUEUE_FLAG_HW_WC	13	/* Write back caching supported */
+ #define QUEUE_FLAG_INIT_DONE	14	/* queue is initialized */
+ #define QUEUE_FLAG_STABLE_WRITES 15	/* don't modify blks until WB is done */
+ #define QUEUE_FLAG_POLL		16	/* IO polling enabled if set */
+-- 
+2.39.2
 
