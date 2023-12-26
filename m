@@ -1,87 +1,83 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B85C4D102
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 09:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SzqTJ2jJdz4f3l1N
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 17:38:28 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id BEA271A0B32
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 17:38:33 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBHSQ8Xn4pl8EezEg--.60657S3;
-	Tue, 26 Dec 2023 17:38:33 +0800 (CST)
-Subject: Re: [PATCH 1/2] loop: remove a pointless blk_queue_max_hw_sectors
- call
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20231226091405.206166-1-hch@lst.de>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a4c16b17-258c-3d49-ae44-241e95a14e4f@huaweicloud.com>
-Date: Tue, 26 Dec 2023 17:38:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523A54D133;
+	Tue, 26 Dec 2023 09:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 6c4deba695604a0e99eafb52b5725d95-20231226
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:580ffc04-c4f4-499e-b578-3fe4318405e1,IP:15,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:0
+X-CID-INFO: VERSION:1.1.35,REQID:580ffc04-c4f4-499e-b578-3fe4318405e1,IP:15,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:0
+X-CID-META: VersionHash:5d391d7,CLOUDID:c68e958d-e2c0-40b0-a8fe-7c7e47299109,B
+	ulkID:231226175732QO6M93J7,BulkQuantity:0,Recheck:0,SF:66|24|17|19|44|102,
+	TC:nil,Content:0,EDM:-3,IP:-2,URL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_ULN,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,
+	TF_CID_SPAM_FSI
+X-UUID: 6c4deba695604a0e99eafb52b5725d95-20231226
+Received: from node4.com.cn [(39.156.73.12)] by mailgw
+	(envelope-from <liyouhong@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 657365931; Tue, 26 Dec 2023 17:57:30 +0800
+Received: from node4.com.cn (localhost [127.0.0.1])
+	by node4.com.cn (NSMail) with SMTP id C95C716001CD6;
+	Tue, 26 Dec 2023 17:57:29 +0800 (CST)
+X-ns-mid: postfix-658AA389-675146153
+Received: from localhost.localdomain (unknown [172.20.185.164])
+	by node4.com.cn (NSMail) with ESMTPA id 31A6616001CD6;
+	Tue, 26 Dec 2023 09:57:29 +0000 (UTC)
+From: YouHong Li <liyouhong@kylinos.cn>
+To: jgross@suse.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	liyouhong <liyouhong@kylinos.cn>,
+	k2ci <kernel-bot@kylinos.cn>
+Subject: [PATCH v2] drivers/block/xen-blkback/common.h: Fix spelling typo in comment
+Date: Tue, 26 Dec 2023 17:57:01 +0800
+Message-Id: <20231226095701.172080-1-liyouhong@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231226091405.206166-1-hch@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHSQ8Xn4pl8EezEg--.60657S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xr47Kw4kWryfGFW5Zw1fWFg_yoWftFg_C3
-	45uF1IvFZ5CF9Y9a9rKF45Xr92kFyxXr97Jry2qFZ7KFyaqa43JF1jqr1rAFn8ZF12kF9Y
-	ya47Xr9xKwnYqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbzAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-	wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-	I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-	k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-	1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUzsqWUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+From: liyouhong <liyouhong@kylinos.cn>
 
-ÔÚ 2023/12/26 17:14, Christoph Hellwig Ð´µÀ:
-> BLK_DEF_MAX_SECTORS is (as the name implies) already the default.
+Fix spelling typo in comment.
 
-Looks like this not true. From blk_set_default_limits():
+Reported-by: k2ci <kernel-bot@kylinos.cn>
+Signed-off-by: liyouhong <liyouhong@kylinos.cn>
 
-lim->max_sectors = lim->max_hw_sectors = BLK_SAFE_MAX_SECTORS;
-
-So, the default is not BLK_DEF_MAX_SECTORS. Or am I missing something?
-
-Thanks,
-Kuai
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/block/loop.c | 2 --
->   1 file changed, 2 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 5bc2b4fcfa772d..371a318e691d02 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2038,8 +2038,6 @@ static int loop_add(int i)
->   	}
->   	lo->lo_queue = lo->lo_disk->queue;
->   
-> -	blk_queue_max_hw_sectors(lo->lo_queue, BLK_DEF_MAX_SECTORS);
-> -
->   	/*
->   	 * By default, we do buffer IO, so it doesn't make sense to enable
->   	 * merge because the I/O submitted to backing file is handled page by
-> 
+---
+v1->v2:
+	*keep the "*/" aligned with the ones above and below.
+---
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkba=
+ck/common.h
+index a3eeccf3ac5f..3296a6ec8d75 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -133,7 +133,7 @@ struct blkif_x86_32_request {
+ struct blkif_x86_64_request_rw {
+ 	uint8_t        nr_segments;  /* number of segments                   */
+ 	blkif_vdev_t   handle;       /* only for read/write requests         */
+-	uint32_t       _pad1;        /* offsetof(blkif_reqest..,u.rw.id)=3D=3D8=
+  */
++	uint32_t       _pad1;        /* offsetof(blkif_request..,u.rw.id)=3D=3D=
+8 */
+ 	uint64_t       id;
+ 	blkif_sector_t sector_number;/* start sector idx on disk (r/w only)  */
+ 	struct blkif_request_segment seg[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+--=20
+2.34.1
 
