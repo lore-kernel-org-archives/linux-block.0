@@ -1,93 +1,133 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C134CDFD
-	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 09:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CAA4CDF9
+	for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 09:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQoIPNSy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703581512;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ve1uqTx9MMoZ3Gc+pAWDljbgIT4AroaD+W2YAl66BV4=;
-	b=hQoIPNSym1esmDzn4+UXlQfyk+4S76/Fq+cUoCbl4A2Hymwk+kUAd3b/S7yRK38VWV2rYz
-	3J21YioKHd67ECnkHPR+4Qf+8t7Ly5KYLJ8KMR+y+B1YVjGeJcceyW7pUAmJrtV2PoKB/r
-	ZqMmhheJZRv76Z7tgObavilyZcx5KFY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-126-vZ_YedPSNaibCOKTqajLBQ-1; Tue, 26 Dec 2023 04:05:10 -0500
-X-MC-Unique: vZ_YedPSNaibCOKTqajLBQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3368698efbdso2757391f8f.0
-        for <linux-block@vger.kernel.org>; Tue, 26 Dec 2023 01:05:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703581509; x=1704186309;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ve1uqTx9MMoZ3Gc+pAWDljbgIT4AroaD+W2YAl66BV4=;
-        b=W0nRmXG38K6+tAhmQJNXG557wXYsU4Ljnzf+ok/DwhQUucg9qozyScZN6fijYjSkAu
-         Z2FDmr40RWU4J8L7+BWBYDapwyDQycZP+sOUkiZqmdx8OTf+8kYLqgq38IGgWzDvWsvZ
-         Q0vKlAatmP0XdyPbqeb9noUGjWPRlyK7KXd3j8Gnnw2ErlHCTSG2wXVSUmRq7gXKrEHU
-         HNAzxqWnKE87+jmFYnBTm3VsLVf9kZDCEqVCMlQmDP/T/3+I3q5mlMrwJZTnaU4Vghe6
-         v6fuxEjBWgIJIKRxZ7ORb0bV8/BgU6fPSKb5e9mYmPqGQuarKWHdCEN70P+6MzOKbdkm
-         UjhQ==
-X-Gm-Message-State: AOJu0YzgWzOUd/H2uGRsueU4+80byGN4qpZs3BpIs1PoJyRZCGCpFCCF
-	vkzVxQhcUY4dWtBDh5ZmxScZeMJcMJ0BZfm/SrOw2w0xTbNYiiN/IhDNVQ59tj4S+0Yu73sV30Y
-	SVCb6XswgRtTx5G3xYY4Rif2HZh1b3gk=
-X-Received: by 2002:a5d:4590:0:b0:336:6895:f5fb with SMTP id p16-20020a5d4590000000b003366895f5fbmr3586475wrq.75.1703581509105;
-        Tue, 26 Dec 2023 01:05:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHLiMWpmfAgwDwhbbW5uVJ8j6cbfhcNo+n6TStySwWGpppm3cK94RSMZ4VKjncgbKZYFbBFBA==
-X-Received: by 2002:a5d:4590:0:b0:336:6895:f5fb with SMTP id p16-20020a5d4590000000b003366895f5fbmr3586459wrq.75.1703581508742;
-        Tue, 26 Dec 2023 01:05:08 -0800 (PST)
-Received: from redhat.com ([2.55.177.189])
-        by smtp.gmail.com with ESMTPSA id df15-20020a5d5b8f000000b00336c43b366fsm3580935wrb.12.2023.12.26.01.05.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 01:05:08 -0800 (PST)
-Date: Tue, 26 Dec 2023 04:05:04 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Li Feng <fengli@smartx.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"open list:VIRTIO BLOCK AND SCSI DRIVERS" <virtualization@lists.linux.dev>
-Subject: Re: [PATCH] virtio_blk: set the default scheduler to none
-Message-ID: <20231226040342-mutt-send-email-mst@kernel.org>
-References: <20231207043118.118158-1-fengli@smartx.com>
- <20231225092010-mutt-send-email-mst@kernel.org>
- <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vgQe7CY/"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=5i2urZ2P9zhbfl1LD5nmN5CxWc7QuMjdfU2d30kNESY=; b=vgQe7CY/u/PdFIS8Lz9oAdLSi6
+	KeZf3Fs5WIqwwSmZASSgEkbQ9tOtzEdve1KQDjww8SQFQeVf/WTj54jWHXBxPor3XC4pErMnB310z
+	iXJ2RcnBMPLypeCqdXpeHaw7erP8d3rzKVHaPFLxA+IcKK0TZQi12CuxXcTnTneHAFj4arK8IJjlP
+	Zz/+51CdZ2+jRUrEqGo58sMQyuefkVYBMo5kk5ZBQ9p4Y6johAonaWbiIoi+7Sli8AFrYv/odeCXH
+	wNF5kIy2VNI5E8rcjoXT6soz6P/6LUPbd2t2bC3vD+BfujQ2FdQlfBIcIaFue0JwmkZGmpRd4jjmh
+	Y0UGSg2w==;
+Received: from [89.144.222.247] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rI3Pj-00BxZ3-2Q;
+	Tue, 26 Dec 2023 09:07:53 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH] blk-wbt: remove the separate write cache tracking
+Date: Tue, 26 Dec 2023 09:07:47 +0000
+Message-Id: <20231226090747.204969-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AB23804D-FF38-47B8-ADC6-C0A19B7083CC@smartx.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Dec 26, 2023 at 05:01:40PM +0800, Li Feng wrote:
-> Hi MST and paolo,
-> 
-> mq-deadline is good for slow media, and none is good for high-speed media. 
-> It depends on how the community views this issue. When virtio-blk adopts
-> multi-queue,it automatically changes from deadline to none, which is not
-> uniform here.
+Use the queue wide write back cache tracking insted of duplicating the
+value in strut rq_wb.
 
-It's not virtio-blk changing though, it's linux doing that, right?
-Is virtio-blk special somehow?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-settings.c |  2 --
+ block/blk-wbt.c      | 13 ++-----------
+ block/blk-wbt.h      |  5 -----
+ 3 files changed, 2 insertions(+), 18 deletions(-)
 
-> I don't have ideas right now to answer Christoph/Paolo's question.
-> 
-> Thanks,
-> Li
-
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index bb94a3d471f4fb..33b3f767b81e24 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -837,8 +837,6 @@ void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
+ 		blk_queue_flag_set(QUEUE_FLAG_FUA, q);
+ 	else
+ 		blk_queue_flag_clear(QUEUE_FLAG_FUA, q);
+-
+-	wbt_set_write_cache(q, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
+ }
+ EXPORT_SYMBOL_GPL(blk_queue_write_cache);
+ 
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 0bb613139becbb..5ba3cd574eacbd 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -84,8 +84,6 @@ struct rq_wb {
+ 	u64 sync_issue;
+ 	void *sync_cookie;
+ 
+-	unsigned int wc;
+-
+ 	unsigned long last_issue;		/* last non-throttled issue */
+ 	unsigned long last_comp;		/* last non-throttled comp */
+ 	unsigned long min_lat_nsec;
+@@ -207,7 +205,8 @@ static void wbt_rqw_done(struct rq_wb *rwb, struct rq_wait *rqw,
+ 	 */
+ 	if (wb_acct & WBT_DISCARD)
+ 		limit = rwb->wb_background;
+-	else if (rwb->wc && !wb_recent_wait(rwb))
++	else if (test_bit(QUEUE_FLAG_WC, &rwb->rqos.disk->queue->queue_flags) &&
++	         !wb_recent_wait(rwb))
+ 		limit = 0;
+ 	else
+ 		limit = rwb->wb_normal;
+@@ -699,13 +698,6 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
+ 	}
+ }
+ 
+-void wbt_set_write_cache(struct request_queue *q, bool write_cache_on)
+-{
+-	struct rq_qos *rqos = wbt_rq_qos(q);
+-	if (rqos)
+-		RQWB(rqos)->wc = write_cache_on;
+-}
+-
+ /*
+  * Enable wbt if defaults are configured that way
+  */
+@@ -918,7 +910,6 @@ int wbt_init(struct gendisk *disk)
+ 	rwb->last_comp = rwb->last_issue = jiffies;
+ 	rwb->win_nsec = RWB_WINDOW_NSEC;
+ 	rwb->enable_state = WBT_STATE_ON_DEFAULT;
+-	rwb->wc = test_bit(QUEUE_FLAG_WC, &q->queue_flags);
+ 	rwb->rq_depth.default_depth = RWB_DEF_DEPTH;
+ 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
+ 	rwb->rq_depth.queue_depth = blk_queue_depth(q);
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index 8a029e138f7ace..e5fc653b9b76f6 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -12,8 +12,6 @@ u64 wbt_get_min_lat(struct request_queue *q);
+ void wbt_set_min_lat(struct request_queue *q, u64 val);
+ bool wbt_disabled(struct request_queue *);
+ 
+-void wbt_set_write_cache(struct request_queue *, bool);
+-
+ u64 wbt_default_latency_nsec(struct request_queue *);
+ 
+ #else
+@@ -24,9 +22,6 @@ static inline void wbt_disable_default(struct gendisk *disk)
+ static inline void wbt_enable_default(struct gendisk *disk)
+ {
+ }
+-static inline void wbt_set_write_cache(struct request_queue *q, bool wc)
+-{
+-}
+ 
+ #endif /* CONFIG_BLK_WBT */
+ 
 -- 
-MST
+2.39.2
 
