@@ -1,67 +1,81 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25FC45BFE;
-	Wed, 27 Dec 2023 16:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5cd8667c59eso3990625a12.2;
-        Wed, 27 Dec 2023 08:25:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F764652F
+	for <linux-block@vger.kernel.org>; Wed, 27 Dec 2023 17:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YCZRxbd8"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7bb06f56fe9so13838639f.0
+        for <linux-block@vger.kernel.org>; Wed, 27 Dec 2023 09:46:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703699209; x=1704304009; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G44FG++ekV5iX1pSW4POvtFdtozNN1kjQKw9JfkA4ZQ=;
+        b=YCZRxbd8J+iH7faUY3m7FmwaauFPuk5ViMkGTK3Mvwwj57ugq5N/1IB+3rrGJVHMVT
+         Ni0vsDmvSrXs0LxQ7E3d80BMDs48IUdaZI3quFFWuWW6Mm3m+B85/GZfFLoEDbdEX0RW
+         gZtzDeZBUTNcKoZyaSSeD0itrQ9EzDnobGdG8pF197CsxbKKDPgxF1VPUJ2V8YDuBYmC
+         jAnX5duXr81q0kas9zB9whgVvQCpD3hOvFlHMEgMqKxFRWI2KpTBDISOo8fm5CXH5Zze
+         bzLmxR4aljnkLL59yjCWySdlMQUW9SDsPG1hxV9U9huaA7pZWo9yZmdhSE1L7M6+aCyh
+         qiqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703694344; x=1704299144;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0PE/DGxKJhbVAIXggezPl80ntLg4MQz3qOXEinxT3MQ=;
-        b=abXivxEDFIs3dNKGPmYb+/VsjFBrhDlcCbH+ejyujhJzxdBVPmJ+PT8BRU+ujiqAur
-         E1NzksvclTuV86JBId84m+nRahNxRakw8Qj20BVU9pkiN77Rl/aafE7IoQ3eaplglgD0
-         edOD3uKaWXGtntjvHUNMDRibWP7SeCDMeTjz2+hw/HanzThEvAa89HlJqKoJllH2L+8C
-         vnxFNmY3VDLnr5l1xbESpB68mDNXIdsgcXy4/+TnEQZmx7Ty+0gBHjdAD5q8+8YaNxCs
-         GMJH5fN5bFKKeJj8iRSK7TWPIgmCTUOcLGSuMeSH/VYn6yKlQ9SY5SDvGgo1dtIvoeWH
-         UO0w==
-X-Gm-Message-State: AOJu0Yye6eji3Zn2zAMXdouB94dlWdEcp1mgyUsVbWhcIq7dLY5pFDIy
-	TnK1SxArlXyHySuJwOVIqxQ=
-X-Google-Smtp-Source: AGHT+IH/zOwNn75wpOY+KOiDM+na3AfqciidrM3SLh6/wTidYd/xK5Sq6/igVjj6fouqBLfRDPXL8A==
-X-Received: by 2002:a05:6a20:993:b0:193:fdb7:f48f with SMTP id e19-20020a056a20099300b00193fdb7f48fmr8394414pzb.30.1703694343908;
-        Wed, 27 Dec 2023 08:25:43 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id x23-20020a056a00189700b006d9a6953f08sm7707913pfh.103.2023.12.27.08.25.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Dec 2023 08:25:42 -0800 (PST)
-Message-ID: <ce26426f-5de3-4cc9-9c6e-f5409b17c147@acm.org>
-Date: Wed, 27 Dec 2023 08:25:41 -0800
+        d=1e100.net; s=20230601; t=1703699210; x=1704304010;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G44FG++ekV5iX1pSW4POvtFdtozNN1kjQKw9JfkA4ZQ=;
+        b=bxuk6NPO3c7CTWtb5iLTAPDLq+uSCYjbZScOuKn9NnYkui82jwyHrTyESmhiJ3bfQb
+         1TKeaEGqKE1Ce0jtZ72dqK9r5rmXD03IHWoRTCAWXxF66CDngqOHqwu+gWTzbe5HwnYp
+         shADArVvJVAG2Hs1anb6YcCP6vm6vNZsb0b2dENNzNDvaxx/eRMVyn0lrFg7opu3GCcK
+         UzcIKiKYK7lsWa48MoFwAxhcrmy90VIGDYJ9iA7zXxUXdOkDUb3Ph8HOAw9Pr0PYB47T
+         KM3sll5WiZJXlQJ0u7EuSQfAGMowmDHm+7xseRPGg8llo7xNfxI+nhK4xDnqT+2Fbs5s
+         mbKw==
+X-Gm-Message-State: AOJu0YytaxzT+cYAaZ9GEPxKeEalifTb1DB/gISXTymfz5jKQnc5PfIL
+	RBJDNCoqLXfOdgfzWAaYAjyDK7lXpgavFTsprX0JxP62uJWvAg==
+X-Google-Smtp-Source: AGHT+IFT86Dsful/cV6hJ6TIbCCJQ82u2NaW6V0q12ZfPQ/UumpkOsttKbozybjOnJOuaVqv2+cbaQ==
+X-Received: by 2002:a6b:6a04:0:b0:7ba:ccbb:7515 with SMTP id x4-20020a6b6a04000000b007baccbb7515mr7799724iog.2.1703699209752;
+        Wed, 27 Dec 2023 09:46:49 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id bb34-20020a0566383b2200b0046b4e38a630sm3829433jab.109.2023.12.27.09.46.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Dec 2023 09:46:49 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20231227082020.249427-1-hch@lst.de>
+References: <20231227082020.249427-1-hch@lst.de>
+Subject: Re: [PATCH, resend] loop: don't update discard limits from
+ loop_set_status
+Message-Id: <170369920866.1390332.7216026835799570205.b4-ty@kernel.dk>
+Date: Wed, 27 Dec 2023 10:46:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/19] Pass data lifetime information to SCSI disk
- devices
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Daejun Park <daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>
-References: <20231219000815.2739120-1-bvanassche@acm.org>
- <6b3f9f28-1ddf-41dc-9f88-744cd9cd4b96@kernel.dk>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <6b3f9f28-1ddf-41dc-9f88-744cd9cd4b96@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-7edf1
 
-On 12/18/23 17:12, Jens Axboe wrote:
-> Bart, can you please stop reposting so quickly, it achieves the opposite
-> of what I suspect you are looking for.
 
-Got it. I will repost less frequently.
+On Wed, 27 Dec 2023 08:20:20 +0000, Christoph Hellwig wrote:
+> loop_set_status doesn't change anything relevant to the discard and
+> write_zeroes setting, so don't bother calling loop_config_discard.
+> 
+> 
 
-Jens, can you please help with reviewing patches 5 and 6 of this series?
-I think that's what most important right now to help this patch series
-to make progress.
+Applied, thanks!
 
-Thank you,
+[1/1] loop: don't update discard limits from loop_set_status
+      commit: 34c7db44b4edccda315edcf02b9669aa173e090b
 
-Bart.
+Best regards,
+-- 
+Jens Axboe
+
+
+
