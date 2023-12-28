@@ -1,38 +1,47 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908406131;
-	Thu, 28 Dec 2023 07:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D05694401;
+	Thu, 28 Dec 2023 07:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RbOlatFh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sIUUno5s"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=44RD+jZ6DX4O8SC8COa74HVFOT+lGHCy7Syx/jSjYPc=; b=RbOlatFhVuiRr6iNXXxcTrrVaw
-	ffZjFv7WcGYSquyQygRjai6B6JXCXhgurG5ZKILEiJt+Jab99W2G0CKY2gPh3rW7yNwgZrhJJP5M2
-	woz6bYRdTEKdb3RKu18vXYYFO0T6WzcD5ocJWjqt++DKphILrC2DYJCY7Tk+hgHvBqaL9xPuoYrWy
-	AUieUJNteSFCpqwNQuayGtoNF1iktSN8Va6/e41qhlxsDV/gHhLteT6SIX/6TPBBC1klN0iVba9+r
-	PlgGx4QFLpPiW28ImXb18GkAdrIXx9JH1XUXm7EhZ9FSCg6aulgTvvwimg/TZKz3qpzWKExOqVqTG
-	NtpRt0dA==;
+	bh=yBEmKZVlehpTfMsqJcs5UrNKZT7aMOCpSurlpZlFZsk=; b=sIUUno5s3ItA0BiHZh1mp4seJb
+	FmI2ePJmNtv2r8PSBvIL1KHUuJ42E75ZE/2/Q6/Nl826tMfpbyNEyRYkVRgpVmATvwdObOknGKjM/
+	/RBJZIFMyY+sk39NISUwuPsK7yRXnlMH+l+u5sh+cMQbvZcs9Q52YKHlVRnP5Xp43mLkGlqdgjGok
+	b6CpuM6P/HEdvcBMV4aW0D0oA7uJ3Lb/wDPdirDwTXJ3gWYTDzNQjyIoOin+FUQ3KwsQZKJfJP1Ut
+	CSGvByXXdI230c4HlDDykOLsTLoTzUs/orkn1slOE6iCVlBipVBwuPuO/3sxYlBU5AH0qNoEI9UE9
+	9EDTx7vg==;
 Received: from 213-147-167-209.nat.highway.webapn.at ([213.147.167.209] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rIlBO-00GMhU-0V;
-	Thu, 28 Dec 2023 07:51:59 +0000
+	id 1rIlFE-00GMqW-1v;
+	Thu, 28 Dec 2023 07:55:57 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>,
+Cc: Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Coly Li <colyli@suse.de>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	linux-um@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 2/2] block: remove disk_clear_zoned
-Date: Thu, 28 Dec 2023 07:51:41 +0000
-Message-Id: <20231228075141.362560-3-hch@lst.de>
+	nbd@other.debian.org,
+	linux-bcache@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: [PATCH 1/9] block: remove two comments in bio_split_discard
+Date: Thu, 28 Dec 2023 07:55:37 +0000
+Message-Id: <20231228075545.362768-2-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231228075141.362560-1-hch@lst.de>
-References: <20231228075141.362560-1-hch@lst.de>
+In-Reply-To: <20231228075545.362768-1-hch@lst.de>
+References: <20231228075545.362768-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,56 +51,38 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-disk_clear_zoned is unused now that the last warts of the host-aware
-model support in sd are gone.
+A zero discard_granularity is not treated the same as a single-block one,
+and not having any segments after taking alignment is perfectly fine
+and does not need a warning.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-zoned.c      | 21 ---------------------
- include/linux/blkdev.h |  1 -
- 2 files changed, 22 deletions(-)
+ block/blk-merge.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index c59d44ee6b236e..623879d875a43f 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -615,24 +615,3 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_revalidate_disk_zones);
--
--void disk_clear_zoned(struct gendisk *disk)
--{
--	struct request_queue *q = disk->queue;
--
--	blk_mq_freeze_queue(q);
--
--	q->limits.zoned = false;
--	disk_free_zone_bitmaps(disk);
--	blk_queue_flag_clear(QUEUE_FLAG_ZONE_RESETALL, q);
--	q->required_elevator_features &= ~ELEVATOR_F_ZBD_SEQ_WRITE;
--	disk->nr_zones = 0;
--	disk->max_open_zones = 0;
--	disk->max_active_zones = 0;
--	q->limits.chunk_sectors = 0;
--	q->limits.zone_write_granularity = 0;
--	q->limits.max_zone_append_sectors = 0;
--
--	blk_mq_unfreeze_queue(q);
--}
--EXPORT_SYMBOL_GPL(disk_clear_zoned);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9f9fbc22c4b037..de944baddd6036 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -318,7 +318,6 @@ typedef int (*report_zones_cb)(struct blk_zone *zone, unsigned int idx,
- 			       void *data);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 65e75efa9bd366..2d470cf2173e29 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -115,17 +115,13 @@ static struct bio *bio_split_discard(struct bio *bio,
  
- void disk_set_zoned(struct gendisk *disk);
--void disk_clear_zoned(struct gendisk *disk);
+ 	*nsegs = 1;
  
- #define BLK_ALL_ZONES  ((unsigned int)-1)
- int blkdev_report_zones(struct block_device *bdev, sector_t sector,
+-	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+ 	granularity = max(lim->discard_granularity >> 9, 1U);
+ 
+ 	max_discard_sectors =
+ 		min(lim->max_discard_sectors, bio_allowed_max_sectors(lim));
+ 	max_discard_sectors -= max_discard_sectors % granularity;
+-
+-	if (unlikely(!max_discard_sectors)) {
+-		/* XXX: warn */
++	if (unlikely(!max_discard_sectors))
+ 		return NULL;
+-	}
+ 
+ 	if (bio_sectors(bio) <= max_discard_sectors)
+ 		return NULL;
 -- 
 2.39.2
 
