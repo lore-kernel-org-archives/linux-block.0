@@ -1,116 +1,96 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA42125AD
-	for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 15:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94346125B5
+	for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 15:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="M+2T/wGS"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7bb06f56fe9so36726639f.0
-        for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 07:44:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PFRiW16s"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d48a8ed85bso4238125ad.0
+        for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 07:57:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703864675; x=1704469475; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703865439; x=1704470239; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yQjXtcB6Oq3k74ay/cs5vR/HD/xg6rvyoXPDzdeumLU=;
-        b=M+2T/wGSQyR+xOT6bEIjpUQ7BX8U8lUUT/v1A1LORP9HJsxTMQ/3JNXb2zWkAp93Im
-         v/+Z2OtRH2f2bZ6Zqr57bqRc3+zDX4WvJ1kVTx6PohPIDpf904MbkFPPGvqJut37njrT
-         xXTPc/Pvlflq78TaaXnb0LGKKS0eXniSMMwCQRR30qW5LvKhGf7HsEr3ymKuQ32INjsU
-         EAgyPjIofSEkCw3iliOn/ktT5D1jGPzyD9XjQvMF2aMfiQcr3w5zau1OLVoSuwpQbW/z
-         iBHlnFL1p3OM/O5iyxpJFLhXYKMIZpi5LRa/MJVGu+8paByFfebwGsmY2lRaTKwV4O+E
-         vrkQ==
+        bh=Be72KkDVCIIDTFwt9sz6alSufM7NA5Er9iysI7Bzf0c=;
+        b=PFRiW16s88Sb3m5O8sq8BPBUChMVY6h8bm/2We5JkntUROY35o9kbDyUYYAJcC4rvR
+         9rqm6LE6k/aa7/fZApUb3OUCFNtb/hz1WrK4tEYe24rLu+T+jfDQ+4OHWzydKoHmg/4j
+         nl2Sz4Ixdu18wTMNYmFxTe0JjT0ZhZpeE2VesktQVnU8pjhmEmkx8nY1x0yHAKuw9YoM
+         veEAUjtfXW15f39ExONGNLZsAO9Sk/KmypsSkmvhvd3uho0Luwwi8BFIlXCmBGkFLDjB
+         0YHI085Yo9IRT5tl+tJHSzNnTHNywixMa/p3l7m1HKw9ukyHRyU1cHX1qWOYj61FoYD+
+         BXyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703864675; x=1704469475;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yQjXtcB6Oq3k74ay/cs5vR/HD/xg6rvyoXPDzdeumLU=;
-        b=QvJiEHg3aHOusFU20uoImX1JI6QOtpTT9py4Yjz7HELEWL58CQ0T4ySq0Cn6zBIoh9
-         xJibm+mnCp5RzSaDnMQvzE58RFBsQ8qWwzQ4TxTv5aOXBPHcpEadAhXVIOstu0MKQU9F
-         jIU3vd43aK48PQVe6uP8POCKmZML1sRjUlE2saq7fYIaOR8GPJQuMCt61HNxw9mXcSHP
-         LFZRzWQWRTMImdNbwPvDkY25FreKu7u7LzKB7TxIcVnfYD0qe1c8feTdLqDFjGTyNz2u
-         x+Ia+9fMbz/Tio3khg+K0RKgNySWfm9IbyzxQwyZdQSFOzDWoc9KBAAAOKe0OAYs4dxe
-         UwLg==
-X-Gm-Message-State: AOJu0YwczPiYRAmiR18MfqNJhjlrQGeWnHeDKt+GS7iHzGrjFgdUtpzH
-	fb+dH09VcQ1qQwfVMJu3ahLpGCcn3GN5nQ==
-X-Google-Smtp-Source: AGHT+IHAm0ro/JYGZ86leiXTCWBYht33pHhUQxq1wRsVw6jMpELsHFapyFrv/5iAU4fxQiP4l1Rgag==
-X-Received: by 2002:a05:6e02:1d13:b0:35f:da7a:3797 with SMTP id i19-20020a056e021d1300b0035fda7a3797mr22028997ila.1.1703864675229;
-        Fri, 29 Dec 2023 07:44:35 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id z11-20020a634c0b000000b005ce6b79ab6asm1526889pga.82.2023.12.29.07.44.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Dec 2023 07:44:34 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Richard Weinberger <richard@nod.at>, 
- Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
- Josef Bacik <josef@toxicpanda.com>, Minchan Kim <minchan@kernel.org>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, Coly Li <colyli@suse.de>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, linux-um@lists.infradead.org, 
- linux-block@vger.kernel.org, nbd@other.debian.org, 
- linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org
-In-Reply-To: <20231228075545.362768-1-hch@lst.de>
-References: <20231228075545.362768-1-hch@lst.de>
-Subject: Re: provide a sane discard_granularity default
-Message-Id: <170386467352.1470147.12182761923584971917.b4-ty@kernel.dk>
-Date: Fri, 29 Dec 2023 08:44:33 -0700
+        d=1e100.net; s=20230601; t=1703865439; x=1704470239;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Be72KkDVCIIDTFwt9sz6alSufM7NA5Er9iysI7Bzf0c=;
+        b=AzuQcm/O3OJcNJ6TA9pf67tBlYeLU67CYowEsiJKnBHJJlk4cAS/CWnmbBkbYVM5+P
+         rORvMscOJPuZcslLFREiZLi0iEIKnJgQY6gF2bgQZuSRvCuXYQMo+1NqPI3zzz97R1jA
+         5TtizS7OXPMh0jNQF3Cfld8pyBDPJlX2gE126rXW+omoNwvg61qUAGoEry/05McAS/fA
+         QfxsZj4geycVHPQRA1wR2fYdetDR67sD2J7/WfvlQtbDt1dpmtHqb3nDGus1E+kvNcvs
+         76utdV2QoR7pUEF1l7vBoohrxlXV7FKAwWzHLrd58ilXk/EXcgFHdTR0vYLOqL2fSLgs
+         2uEw==
+X-Gm-Message-State: AOJu0YyLZ+AsYABS0AETyVXZa+8WjmJ2xKcbzLAGsoZzRGM/uY0L6+PJ
+	F39unZArHLNJqLTMOWuOgb3Wy3io5mGkODNpCoCmFHIlzbP/zw==
+X-Google-Smtp-Source: AGHT+IEGBwnvW5ke5kJrQ8NVGWcyIJIL7ZjCVIoeVUgzAZMbaHf72w/PviPs+FFngBdW9M/dd42H0w==
+X-Received: by 2002:a17:902:f68e:b0:1d3:e001:5953 with SMTP id l14-20020a170902f68e00b001d3e0015953mr22391936plg.5.1703865438885;
+        Fri, 29 Dec 2023 07:57:18 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id x7-20020a170902ec8700b001d08e08003esm15881510plg.174.2023.12.29.07.57.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Dec 2023 07:57:18 -0800 (PST)
+Message-ID: <7ecffd8c-8fc0-424d-9936-b02a5957e0a3@kernel.dk>
+Date: Fri, 29 Dec 2023 08:57:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.7-rc8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-7edf1
+
+Hi Linus,
+
+Fix for a badly numbered flag, and a regression fix for the badblocks
+updates from this merge window. Please pull!
 
 
-On Thu, 28 Dec 2023 07:55:36 +0000, Christoph Hellwig wrote:
-> this series defaults the discard_granularity to the sector size as
-> that is a very logical default for devices that have no further
-> restrictions.  This removes the need for trivial drivers to set
-> a discard granularity and cleans up the interface.
-> 
-> Diffstat:
->  arch/um/drivers/ubd_kern.c    |    1 -
->  block/blk-merge.c             |    6 +-----
->  block/blk-settings.c          |    5 ++++-
->  drivers/block/nbd.c           |    6 +-----
->  drivers/block/null_blk/main.c |    1 -
->  drivers/block/zram/zram_drv.c |    1 -
->  drivers/md/bcache/super.c     |    1 -
->  drivers/mtd/mtd_blkdevs.c     |    4 +---
->  8 files changed, 7 insertions(+), 18 deletions(-)
-> 
-> [...]
+The following changes since commit 13d822bf1cba78612b22a65b91cd6d4d443b6254:
 
-Applied, thanks!
+  Merge tag 'nvme-6.7-2023-12-21' of git://git.infradead.org/nvme into block-6.7 (2023-12-21 14:32:35 -0700)
 
-[1/9] block: remove two comments in bio_split_discard
-      commit: 928a5dd3a849dc6d8298835bdcb25c360d41bccb
-[2/9] bcache: discard_granularity should not be smaller than a sector
-      commit: 5e7169e7f7c0989304dbe8467a1d703d614c64db
-[3/9] block: default the discard granularity to sector size
-      commit: 3c407dc723bbf914f3744b0c2bb82265b411a50c
-[4/9] ubd: use the default discard granularity
-      commit: 599d9d4eab7c3d5dc6f1e0f8f052fee9eaa54e50
-[5/9] nbd: use the default discard granularity
-      commit: 1e2ab2e8a98c9e0629b5b8bff8ee6f2cb3e8daac
-[6/9] null_blk: use the default discard granularity
-      commit: 724325477f8a48ce1defc2a49998bbc19fe85c88
-[7/9] zram: use the default discard granularity
-      commit: 3753039def5d0d1c43af847b507ba9b782db183a
-[8/9] bcache: use the default discard granularity
-      commit: 105c1a5f6ccef7f52f9e76664407ef96218272eb
-[9/9] mtd_blkdevs: use the default discard granularity
-      commit: 31e4fac930814f2f92eb6ebac9c4d4e3b09f7aaf
+are available in the Git repository at:
 
-Best regards,
+  git://git.kernel.dk/linux.git tags/block-6.7-2023-12-29
+
+for you to fetch changes up to 02d374f3418df577c850f0cd45c3da9245ead547:
+
+  block: renumber QUEUE_FLAG_HW_WC (2023-12-26 09:25:58 -0700)
+
+----------------------------------------------------------------
+block-6.7-2023-12-29
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      block: renumber QUEUE_FLAG_HW_WC
+
+Coly Li (1):
+      badblocks: avoid checking invalid range in badblocks_check()
+
+ block/badblocks.c      | 6 ++++--
+ include/linux/blkdev.h | 2 +-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
 -- 
 Jens Axboe
-
-
 
