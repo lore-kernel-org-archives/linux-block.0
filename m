@@ -1,89 +1,73 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388C812B66
-	for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 16:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F5312E4E
+	for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 19:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kUlbguWY"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d3b84173feso14636725ad.1
-        for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 08:52:50 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="MHXTAXZ4"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a26fa294e56so384972466b.0
+        for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 11:46:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703868770; x=1704473570; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vSNSWnuaXWoD96pZfJRvHlzqw6OfFPh5yR+M67iO49I=;
-        b=kUlbguWY7v2RnOcvb+MFg5wRvScaqr2iM03/jLZEbjgvZUaKLThvjZxUJVc2tn4p0p
-         yOmeayFWrHFI1lXFExP44SIkYBvGc4TtYQ30GAAyq7ZPNAffa76JqBh2EO00jWoCEj6E
-         95O7ML3RFmVvlT02OY+S6GYYiN6hsXbOtkUsAwCp/3A0TvV/u9P3FYD9UDZNGKf+yEJX
-         a69KEMd+kP6Wg9SQYr1XwjKDttPC5YlvR0BtWk1OM+BxqE3cYlr3mJluNpbkawIrGOcf
-         TTSj+AFzbpSnusYVdqPS8AUrjalwm7DwQgxq1XACcq2hM6rL2sPZyAtPSogeuHU/8bBb
-         o0DA==
+        d=linux-foundation.org; s=google; t=1703879174; x=1704483974; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BxVw//0XmDBBzDSX3dVy7HjMF2XF0QvFm4eu66iyHsE=;
+        b=MHXTAXZ4geHOw23ip6+HwqTzbthWXXELvGQ5OAGXwhhjW3nLVwHnSzR9PRcpav2Rc0
+         EtHA4plGozZxaWNVt09jx2CE8FQUlWiCWUgnXWExE4ET1QbckPK+Xuirel8TVe7it7Ag
+         qFXCTItTUWf8L5uFfRneyDBI0yp5ui6rSqKuM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703868770; x=1704473570;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vSNSWnuaXWoD96pZfJRvHlzqw6OfFPh5yR+M67iO49I=;
-        b=e4dZQudKOYxUV/8R2aVWqxlF5gO8+5Yy9FXXWfZwceSad40zEWi2AMmcHdNpcsvYTo
-         8gqCWwYoQDzsOyqcullLVaocYa7/cC97f0ZVdKm7MFgHnU512zCZ8vNBLUFtAt9VJXPj
-         c5LRPFtgWqxp4/sImr5lzjXJazMhZUX5UtSYcqv6JUOx0qqIAUvYnX56QbU2VeoO3yec
-         RlDWHs7yub3Fy8Ty1tdgMM1MWTXZNPwEHT2nFBXPROZN5x1RMZkAkWKB3rOhOOWZ2AVL
-         i/ZD/5UoeykMcRB/GPMfkKC/oYyNQAnIFsTfL478UD1T2jIiGF8UdL6Sp43SL+LpEvEO
-         Jd4Q==
-X-Gm-Message-State: AOJu0Yz6orAcloEuotXCXbBuVh5VLXEO15jKbpYV0Pm9kVCOiBslroLy
-	sLRPYNkjHh6Eb2u8SQqP9DTuOHRsTrfYMO4ybYbqnpRX80c0aA==
-X-Google-Smtp-Source: AGHT+IGiSo6gfL6F95WOAnfesLOgRyGsedXwl+rlko3RNnUsSMwbXGkaPtrt/okfz5sK3yB1/MkqyQ==
-X-Received: by 2002:a17:902:ea06:b0:1d3:f36a:9d21 with SMTP id s6-20020a170902ea0600b001d3f36a9d21mr25302192plg.4.1703868770057;
-        Fri, 29 Dec 2023 08:52:50 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id jj4-20020a170903048400b001d3cb4e3302sm15220806plb.214.2023.12.29.08.52.48
+        d=1e100.net; s=20230601; t=1703879174; x=1704483974;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BxVw//0XmDBBzDSX3dVy7HjMF2XF0QvFm4eu66iyHsE=;
+        b=JdE7XhqnrlgUcnz9lBYatTCBMK4xpbxxBogRKysZG5r6huUfJjLliVcREzlgeiIZQf
+         powkkmn382y2ALvSzdR+XMTb4q3kYwgm+XMi7mMw9eDf65ggkO59gTZ1FfEkS5U4RMgt
+         ur3A3Cnle51uYmFSikHtxB7s4M2cYvC5Wsia7NNNBWwI3k8qjRWTVOesSmS6rOEvfb9k
+         0w0c98dJ/Afzo8ab+oUh5EtgBkwWN21xbCjm3RZF8OMfoWfznPOBGsj1JswP634mDEO6
+         lL9B/tLjqZHm0wIZTrqurS7HqSMwMR8Q2+OfnKGkqa32/XyHdvsF9T3ytvvbEIQHW1jU
+         9DbA==
+X-Gm-Message-State: AOJu0Yy4Vy3SIqiPJ71441XIM4mAdnmkeus7z7/u7DAtrGQykE6OgYSF
+	BvjGsr+1MRFhkvUW3x3ZcVNadTd0Uuo6jLZkbpdsX6Mb8/03Sp8K
+X-Google-Smtp-Source: AGHT+IG+g8BR3i/VosdrahHa4gYpyyTouzsninmexmylpDlBtiqjaYqPw+uefiIVlli61MsC2TD9Hg==
+X-Received: by 2002:a17:906:253:b0:a23:5a0a:7725 with SMTP id 19-20020a170906025300b00a235a0a7725mr5425803ejl.91.1703879173997;
+        Fri, 29 Dec 2023 11:46:13 -0800 (PST)
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
+        by smtp.gmail.com with ESMTPSA id ef5-20020a17090697c500b00a269597d173sm8640661ejb.135.2023.12.29.11.46.13
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Dec 2023 08:52:49 -0800 (PST)
-Message-ID: <f1f002e9-8010-4b74-9da8-2551be97fa6f@kernel.dk>
-Date: Fri, 29 Dec 2023 09:52:47 -0700
+        Fri, 29 Dec 2023 11:46:13 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-54c79968ffbso7527649a12.3
+        for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 11:46:13 -0800 (PST)
+X-Received: by 2002:a17:906:184:b0:a1f:aca1:6bc with SMTP id
+ 4-20020a170906018400b00a1faca106bcmr5384379ejb.100.1703879173062; Fri, 29 Dec
+ 2023 11:46:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] drivers/block/null_blk: Switch from radix tree api to
- xarrays
-Content-Language: en-US
-To: Gautam Menghani <gautam@linux.ibm.com>, kch@nvidia.com,
- ming.lei@redhat.com, damien.lemoal@opensource.wdc.com,
- zhouchengming@bytedance.com, nj.shetty@samsung.com, akinobu.mita@gmail.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- riteshh@linux.ibm.com
-References: <20231229164155.73541-1-gautam@linux.ibm.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231229164155.73541-1-gautam@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <7ecffd8c-8fc0-424d-9936-b02a5957e0a3@kernel.dk>
+In-Reply-To: <7ecffd8c-8fc0-424d-9936-b02a5957e0a3@kernel.dk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 29 Dec 2023 11:45:55 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiZt=323ca+Fp6rUNHHzPn65krYx=pZ5REbdxuUeRGfdQ@mail.gmail.com>
+Message-ID: <CAHk-=wiZt=323ca+Fp6rUNHHzPn65krYx=pZ5REbdxuUeRGfdQ@mail.gmail.com>
+Subject: Re: [GIT PULL] Block fixes for 6.7-rc8
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/29/23 9:41 AM, Gautam Menghani wrote:
-> Convert the null_blk driver to use the xarray API instead of radix tree 
-> API.
-> 
-> Testing:
-> Used blktests test suite (block and zbd suites) to test the current 
-> null_blk driver and null_blk driver with this patch applied. The tests 
-> results in both the instances were the same.
+On Fri, 29 Dec 2023 at 07:57, Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Christoph Hellwig (1):
+>       block: renumber QUEUE_FLAG_HW_WC
 
-What's the purpose of the change?
+Lol. How the heck did that even happen? What an odd typo. Admittedly
+'8' and '3' can look a bit similar if you squint and have bad
+eyesight, but still...
 
-One thing that always annoys me slightly with xarray is the implied
-locking. So now you're grabbing two locks rather than just utilizing the
-lock that was already held. I think a better transformation would be to
-first change the locking to be closer to the lookup and deletion, and
-then convert to xarray and now being able to drop that other lock. Just
-doing a blind conversion like this without potentially understanding the
-details of it is not a good idea, imho.
-
--- 
-Jens Axboe
-
+          Linus
