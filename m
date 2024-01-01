@@ -1,80 +1,125 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C693714F61
-	for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 23:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481598F4E;
+	Mon,  1 Jan 2024 17:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VdhpRJya"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-28bae84fc2eso1331010a91.1
-        for <linux-block@vger.kernel.org>; Fri, 29 Dec 2023 15:16:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KAT8ku4r"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d427518d52so45140015ad.0;
+        Mon, 01 Jan 2024 09:53:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703891817; x=1704496617; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rHjuYhnakk0zIc7pPlGsNQv2zuEmQiuEbwY7MUfZxMc=;
-        b=VdhpRJyahCrZ7HVky4qXdm0IdQxSwlA1mX+mF7M+vYNYiBCVxPutl1ZTvIOOt7/R6t
-         kjDC1NUEbjFlcfoNu4Cqa7N2rk1Dkhp+8S0O+cEkvJyWcs3skkcizQZawf3Kw+cnu2Pm
-         6Zo9EF3k+/p29xjv1gnnxP6OVhOHDov6Z2KpdHnpC+suUuSshrBw7wlwS5sgcbaP45lX
-         52m8WeGG+ju4XT2hig93WVusOTl7ExtRwOHXr+mZhxzfgEirQ9B8eiWHtqgRc16J4TwN
-         HzqUt4OfHDP7qp2ZwPGQdek4d2jn0dX5Pb9RDRju1mq/WJchGVajr7D+uooK3Pb1n8BQ
-         b8uA==
+        d=gmail.com; s=20230601; t=1704131603; x=1704736403; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=P2BWNvYBepeLwb8q83GJwuE1J0b0OLLscBDVehSnTxA=;
+        b=KAT8ku4ryMcRo8eQWCGlD3bN1k2R1Oe8LMgkn5lSHiJfG9koKVKv3vSTTHqMTFNbJJ
+         YXvA1PWJLPNObbaMyI2YjxIKJVKczSlVhlX6NuNSDjj+bg/ywDzcg3dF3j8d8KLkB28U
+         d47D+Ue5M4RpB5rRA7Un1vVnluGOZNp4pT7K/42/k2SngQsFlDEzgPYOIr4pu/5JDitz
+         LXopRIGEU1uaPA8r2z7z9nnbHCFgsu8uqv1yZbMzrQHdLVuHuAO/6MbvbJOFrOt8Ueyg
+         XMB2NnvXdsObz7i6owBaj3iqj90NX0olDWlqS5cmyny2TDnffatiLni71I1c0bsy2dJG
+         oOyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703891817; x=1704496617;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rHjuYhnakk0zIc7pPlGsNQv2zuEmQiuEbwY7MUfZxMc=;
-        b=I7qKVDY0iTNUi/N0f6QCzEygO79ZnG0OOQk83ZkLlj0kycNUdbHBwrWerhhaTwUpPK
-         QG/cpXi8uu/ni9ovn8jkt9p1ggzrTvovYvjZICY1bvpdHXzyO1ixT/6+sWcA+gW94PHY
-         Aq8sewgJ6N38mHV7Jwd+yfMY99lQrZL+DHGcF//KJ5SXTqdw2CQ7HpBRkkInGDlMfAAq
-         3NeulG9s08dCNfUjBun1dwgArAj3c+haVrqziqcYWiwi+tv5hPfLT9BIlHi7Qv5/Z1Ab
-         I1EjQTFReXNR+f31OwiAyfT1xSLWt599VQYyTZM1qAQvhMYgZPtrpS51+ukKKyA4duWf
-         7btw==
-X-Gm-Message-State: AOJu0YwmfB99huoj9OzLmPllDhGS9qUTRpIHLwZ8xavoduZeNY7MJE63
-	w6QM8QP4kjthxYFidiEMteBuorAq3y40WA==
-X-Google-Smtp-Source: AGHT+IHKehadvZona/UAjIOBIM0zu+bA9KxgzpLaoWb0I6w2QAijKkrazwlloHBjxcV4nY28p6jYtA==
-X-Received: by 2002:a17:902:b68c:b0:1d4:9769:b468 with SMTP id c12-20020a170902b68c00b001d49769b468mr4825408pls.4.1703891816759;
-        Fri, 29 Dec 2023 15:16:56 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id a19-20020a170902ee9300b001cfb14a09a4sm16235677pld.126.2023.12.29.15.16.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Dec 2023 15:16:55 -0800 (PST)
-Message-ID: <f2de6069-6126-4e38-96ad-70873b2de2f7@kernel.dk>
-Date: Fri, 29 Dec 2023 16:16:54 -0700
+        d=1e100.net; s=20230601; t=1704131603; x=1704736403;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P2BWNvYBepeLwb8q83GJwuE1J0b0OLLscBDVehSnTxA=;
+        b=G18cjzNZBsds87iQGubrBP/BbAy2Ce0VgJrTXAz3VfJ20Vn50PpgIhStI2u82zyDcC
+         EZ+lFkc26ZFO3/VGuZ0T3+ERvF0RMEj5Cf++WcnlOIxLMdqooFYTtp2ASX7zZ+4yZE+N
+         +M835gM8bIXM/1adfZggW1JS3IYePK6qXk56mvYbKLgspZxnge8EcPt3MjJ2b4V/uDx4
+         TsCK/aukiO/QMyngfBS/ZskdnJwr8L5JJcMBuRH4CXAocgTzw2N8nod2V8hlQhEIUa+z
+         qbhV8F3wQwvq5saLGX2un/gv4LnpIjWb4m1GBIKAhU0j4ipL6AYBnjHVHdvmQWl/vizX
+         Yt+g==
+X-Gm-Message-State: AOJu0YyOgyDRNtD94Vm7KaFtsFr+BYLQeMHCSpfvP5rqFku7Tuwx+Uen
+	qiRjZ3B+fdlOmqUHIXO0zro=
+X-Google-Smtp-Source: AGHT+IG+5A3KCbkUups7IoOdYOFwSobipBI/piCU/mQUi+kjTuXEP6dOoXqMdpw/27xVJZ7NXtQhfw==
+X-Received: by 2002:a17:903:2652:b0:1d4:b66b:b48f with SMTP id je18-20020a170903265200b001d4b66bb48fmr2421015plb.19.1704131603339;
+        Mon, 01 Jan 2024 09:53:23 -0800 (PST)
+Received: from localhost.localdomain (45.78.55.121.16clouds.com. [45.78.55.121])
+        by smtp.gmail.com with ESMTPSA id z3-20020a170902ee0300b001d3561680aasm20325367plb.82.2024.01.01.09.53.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jan 2024 09:53:23 -0800 (PST)
+From: Guoxin Pu <pugokushin@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Guoxin Pu <pugokushin@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] block: fix length of strscpy()
+Date: Tue,  2 Jan 2024 01:50:52 +0800
+Message-ID: <20240101175051.38479-2-pugokushin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] Block fixes for 6.7-rc8
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <7ecffd8c-8fc0-424d-9936-b02a5957e0a3@kernel.dk>
- <CAHk-=wiZt=323ca+Fp6rUNHHzPn65krYx=pZ5REbdxuUeRGfdQ@mail.gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAHk-=wiZt=323ca+Fp6rUNHHzPn65krYx=pZ5REbdxuUeRGfdQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/29/23 12:45 PM, Linus Torvalds wrote:
-> On Fri, 29 Dec 2023 at 07:57, Jens Axboe <axboe@kernel.dk> wrote:
->>
->> Christoph Hellwig (1):
->>       block: renumber QUEUE_FLAG_HW_WC
-> 
-> Lol. How the heck did that even happen? What an odd typo. Admittedly
-> '8' and '3' can look a bit similar if you squint and have bad
-> eyesight, but still...
+In commit 146afeb235ccec10c17ad8ea26327c0c79dbd968 ("block: use strscpy()
+to instead of strncpy()") , the length that should now represent the length
+of the string with the terminating NULL was not updated alongside the
+change.
 
-Christoph is not as young as he once was ;-)
+This has caused blkdevparts= definition on kernel cmdline to be not
+correctly recognized and partitions not correctly initialized, breaking any
+device relying on such partitions to boot, on stable releases since 6.6
 
+This patch fixes the lengths to contain the terminating NULL.
+
+Cc: stable@vger.kernel.org # 6.6.x
+Signed-off-by: Guoxin Pu <pugokushin@gmail.com>
+---
+ block/partitions/cmdline.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
+index c03bc105e575..c2aac5f4ab82 100644
+--- a/block/partitions/cmdline.c
++++ b/block/partitions/cmdline.c
+@@ -79,8 +79,8 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
+ 			goto fail;
+ 		}
+ 
+-		length = min_t(int, next - partdef,
+-			       sizeof(new_subpart->name) - 1);
++		length = min_t(int, next - partdef + 1,
++			       sizeof(new_subpart->name));
+ 		strscpy(new_subpart->name, partdef, length);
+ 
+ 		partdef = ++next;
+@@ -138,7 +138,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
+ 		goto fail;
+ 	}
+ 
+-	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
++	length = min_t(int, next - bdevdef + 1, sizeof(newparts->name));
+ 	strscpy(newparts->name, bdevdef, length);
+ 	newparts->nr_subparts = 0;
+ 
+@@ -148,8 +148,8 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
+ 		bdevdef = next;
+ 		next = strchr(bdevdef, ',');
+ 
+-		length = (!next) ? (sizeof(buf) - 1) :
+-			min_t(int, next - bdevdef, sizeof(buf) - 1);
++		length = (!next) ? sizeof(buf) :
++			min_t(int, next - bdevdef + 1, sizeof(buf));
+ 
+ 		strscpy(buf, bdevdef, length);
+ 
+@@ -262,7 +262,7 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
+ 
+ 	info = &state->parts[slot].info;
+ 
+-	label_min = min_t(int, sizeof(info->volname) - 1,
++	label_min = min_t(int, sizeof(info->volname),
+ 			  sizeof(subpart->name));
+ 	strscpy(info->volname, subpart->name, label_min);
+ 
 -- 
-Jens Axboe
-
+2.43.0
 
