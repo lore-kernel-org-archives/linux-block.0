@@ -1,80 +1,123 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C9638F
-	for <linux-block@vger.kernel.org>; Tue,  2 Jan 2024 01:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA17A15C5;
+	Tue,  2 Jan 2024 02:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jBkzpQnE"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6dc36e501e1so2042832a34.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Jan 2024 17:15:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZNrJ+sdD"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3bbbdf0b859so4679864b6e.3;
+        Mon, 01 Jan 2024 18:31:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1704158150; x=1704762950; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AiGwSYUXI9fxcYVwvEl26RBkMK69KBi7r4UwJQYgdE4=;
-        b=jBkzpQnExLpXDqhM2pYHoDe9Usm1Xl2Z0BJJkMf9Bdp2yf3WjZDoTLWNfyb/ETj5ac
-         yA+VMXeBGEl2GXXVW5J1JBdcl7qUrTk7FGrI5AtaYNywz7NWu7QPsa+P/JaDMbbm24Z9
-         5SjYjjUxm0127Kfr5vsSbAMyh1UP+cs97muus=
+        d=gmail.com; s=20230601; t=1704162691; x=1704767491; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vu2esYXgdHq52zmfKNEvoanAaZ8qTAO/U+OEWvx+QPo=;
+        b=ZNrJ+sdDbGfmVMs0BQmcGf++cCIXP6phJtmT8rAZfl/suQvSvrn4+bZ3g2GsBiM27r
+         9Jlbc+b5Z7vV4Zof7NdiRSEnolo6w1VXzZ9o+zzJu+WRUhFR+Ki6FxZEpyd57hpAa9d7
+         /pMJZa/IwwrQjtjQ8AG0wDOHdtenYJkYWvqRh7duWi/HrJAN69xI7VoKb6Iu+iUp//CI
+         6+TOWxrp/aAGYdP0QR3s6NAXJHb6RH5DTNyxqx/IfDfxm5CACo6zGyUXhMTDL2ykNkrg
+         BytHZsfnYGlW7S6AKjVwIdx4L4DBQzK/fIUyYiy4ZKXyUvEYdccvD8Vdir9rv+mvxUZC
+         F4+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704158150; x=1704762950;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AiGwSYUXI9fxcYVwvEl26RBkMK69KBi7r4UwJQYgdE4=;
-        b=BHoK8xtlFNeW8LqFgjiMfX+xnlri/e5VIxLfiEBmw3kGjJkIvc/DVUjX83ZxnrLDhp
-         hwJqDnjQYV+R4qtnpsX7ug/AUtpp0udnhh7Ab5ynBiUVb+mH5Gmfs08qzSVWKJcbqqJd
-         +ik4scnu9yAjwE/933XAvzTNl8dsrGrmSiNd5Jb6fD8XFTRc3HYIbKsTiaQg5gdYLfuw
-         LT3XEsE94leDM8KOgh3ZEJBQK1yxy3lYd9qLV0yub/x320F3vKhTIjyAEzt42Gm++RqN
-         rw4yKH2kU+u3ZmKAPQCpzZwh3YORB3FE1wW7NjDIIq4w9TwL1C/Uor+Nay3W/hSJOmyW
-         H7Jg==
-X-Gm-Message-State: AOJu0YzHc2l29yhwJg/tX2604jSIR+STLIYp45HriecNB/HDmNb7nCVV
-	sWldwCIusBL9qkF8HfYG4Cc+CW/lIinY
-X-Google-Smtp-Source: AGHT+IH9S0eoxCJzaBceLRCqYyMLMz41Ex8ouKxN6Dp7H2vys3Lzl953E5tC2NyCU5dsGbkan5tlDA==
-X-Received: by 2002:a05:6871:8983:b0:204:5246:eda6 with SMTP id tj3-20020a056871898300b002045246eda6mr19443277oab.69.1704158150228;
-        Mon, 01 Jan 2024 17:15:50 -0800 (PST)
-Received: from google.com (KD124209171220.ppp-bb.dion.ne.jp. [124.209.171.220])
-        by smtp.gmail.com with ESMTPSA id si6-20020a17090b528600b0028b5812c477sm25447407pjb.35.2024.01.01.17.15.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jan 2024 17:15:49 -0800 (PST)
-Date: Tue, 2 Jan 2024 10:15:43 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Coly Li <colyli@suse.de>, Miquel Raynal <miquel.raynal@bootlin.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, nbd@other.debian.org,
-	linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org
-Subject: Re: [PATCH 7/9] zram: use the default discard granularity
-Message-ID: <20240102011543.GA21409@google.com>
-References: <20231228075545.362768-1-hch@lst.de>
- <20231228075545.362768-8-hch@lst.de>
+        d=1e100.net; s=20230601; t=1704162691; x=1704767491;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vu2esYXgdHq52zmfKNEvoanAaZ8qTAO/U+OEWvx+QPo=;
+        b=jVVHIIY8Eb5YvkD0tdTwDYQT114DX8VX3FUVK/8eJjqJaJgsynlZ8mX7ZZSe3KzZ3o
+         UjSYLDlCCorBwRPm9Fqoz/0DPvvhzPQxi+tVRWUvFmk5bkE+iwgm28VA269NPckO6UIe
+         ggr76ADv8tF3DUmOeANvfISfWht87c/YUapvYN503hY6j/EU0qrrVagsgql9+xbI69w/
+         6k9q5ToZWlUBwfqzsR3vuQL9ErgVie05NhJZLTJtA8Af0IbxQtQSNR4EZh8p5CXN7Lqs
+         TqQ8bk+gEf7LL9TWm8naHM7nAp+Y7ONCTxtOQC9kMQInlMSheZSVogOTmAhcXm9SFAV7
+         Z3gg==
+X-Gm-Message-State: AOJu0YyZjMQwGif5sO2kgWUappTl5w5rHJWAohwCLviVhT4CT4o9wGkN
+	DuE4uV2YA0LWHjcwHWaRoXUJLcNpAoxGZXBB
+X-Google-Smtp-Source: AGHT+IFVcWUV+oJlKFMyrgY+TtuHciGctK97wf+lCgROzQR7SdbRi3GQR1kpLNorMyeyf4ysVVJgZQ==
+X-Received: by 2002:a05:6808:bc4:b0:3bc:1479:9a94 with SMTP id o4-20020a0568080bc400b003bc14799a94mr1195241oik.56.1704162691677;
+        Mon, 01 Jan 2024 18:31:31 -0800 (PST)
+Received: from [192.168.7.25] (45.78.55.121.16clouds.com. [45.78.55.121])
+        by smtp.gmail.com with ESMTPSA id q7-20020aa79827000000b006d9a94a03a8sm15830384pfl.77.2024.01.01.18.31.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Jan 2024 18:31:31 -0800 (PST)
+Message-ID: <c7e29d85-277d-46ae-87ae-bb77dd423652@gmail.com>
+Date: Tue, 2 Jan 2024 10:31:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231228075545.362768-8-hch@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: fix length of strscpy()
+Content-Language: en-US
+To: David Laight <David.Laight@ACULAB.COM>, "axboe@kernel.dk"
+ <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
+References: <20240101175051.38479-2-pugokushin@gmail.com>
+ <ed0b9dd45fca4f6e910a9e1ffa756180@AcuMS.aculab.com>
+From: Guoxin Pu <pugokushin@gmail.com>
+In-Reply-To: <ed0b9dd45fca4f6e910a9e1ffa756180@AcuMS.aculab.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On (23/12/28 07:55), Christoph Hellwig wrote:
-> 
-> The discard granularity now defaults to a single sector, so don't set
-> that value explicitly
+Thank you for the review. Sorry if this is the duplicated reply, as I 
+didn't configure my mail client to send text-only message and the 
+previous mail was rejected by the list.
 
-Hmm, but sector size != PAGE_SIZE
+On 02/01/2024 05:47, David Laight wrote:
+>> @@ -79,8 +79,8 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
+>>   			goto fail;
+>>   		}
+>>
+>> -		length = min_t(int, next - partdef,
+>> -			       sizeof(new_subpart->name) - 1);
+>> +		length = min_t(int, next - partdef + 1,
+>> +			       sizeof(new_subpart->name));
+>>   		strscpy(new_subpart->name, partdef, length);
+> Shouldn't that be a memcpy() with the original length?
+> Since it looks as though there is something equivalent to:
+> 		next = strchr(partdef, ',');
+> just above?
+> Maybe with:
+> 		new_subpart->name[length] = '\0';
+> if the target isn't zero filled (which the strncpy() probably
+> relied on.)
 
-[..]
+Yes that would be better. But since I'm fixing the issue caused by the 
+mentioned commit, which was an accepted change to use strscpy instead of 
+strncpy and seems a part of a series of changes to do that, I think 
+there might be a reason the maintainers preferred strscpy over strncpy 
+over memcpy? Otherwise we could just revert that commit and keep using 
+the original strncpy + setting NULL method, and then potentially swap 
+strncpy with memcpy.
 
-> @@ -2227,7 +2227,6 @@ static int zram_add(void)
->  					ZRAM_LOGICAL_BLOCK_SIZE);
->  	blk_queue_io_min(zram->disk->queue, PAGE_SIZE);
->  	blk_queue_io_opt(zram->disk->queue, PAGE_SIZE);
-> -	zram->disk->queue->limits.discard_granularity = PAGE_SIZE;
+On 02/01/2024 05:47, David Laight wrote:
+
+ > Same
+
+Same.
+
+On 02/01/2024 05:47, David Laight wrote:
+>> @@ -262,7 +262,7 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
+>>
+>>   	info = &state->parts[slot].info;
+>>
+>> -	label_min = min_t(int, sizeof(info->volname) - 1,
+>> +	label_min = min_t(int, sizeof(info->volname),
+>>   			  sizeof(subpart->name));
+>>   	strscpy(info->volname, subpart->name, label_min);
+> WTF?
+> That only makes any sense if subpart->name might not be '\0'
+> terminated - which strncpy() would have handled fine (with the -1).
+> Otherwise what is wrong with:
+> 	strscpy(info->volname, subpart->name, sizeof (info->volname));
+>
+> 	David
+
+Yes, there is no need to calculate label_min here. We could remove int 
+label_min altogether in this function and use a single line of strscpy.
