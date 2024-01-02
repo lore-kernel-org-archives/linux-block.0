@@ -1,136 +1,103 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766D646A3;
-	Tue,  2 Jan 2024 02:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964422101
+	for <linux-block@vger.kernel.org>; Tue,  2 Jan 2024 07:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dgcb7+aA"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d45f182fa2so42783265ad.3;
-        Mon, 01 Jan 2024 18:42:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704163327; x=1704768127; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IfOHaDOQFWCjFE5eYECAufdGX/M8ENRMe8BdoJQwdrM=;
-        b=dgcb7+aAMoauuTzvh8Nau8kLSePNZJYoHi3AkeNl8se+Cw6TIjRVVaKMoFNAnEMEuL
-         PElVf5uImFZ3ErbOc7D1VzSEmOyedcATKhRxmy1moWexiM2+EZ/I1MUDACj4j+OHj1fx
-         +YGgZRJdtX1Tn7vbXwjfR54z+OlfD9Qu8pjpC4ZBvxGZZZMI1yySTM47cGqcXBKt/TD3
-         LmCpOMDE72qQQfxPpkRdMEd2Y0WS3EZhutpB4M9c/gUn1kVzZyYrQ/Mx9QUgcGW0sBiB
-         rmEJYmaYpwH2f8okSsAEym46Jf+Vk+ZxKZUU4mqjLGmijiG1w/V8q56B+WPHOXXN5rIs
-         WWsA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B33JKf3y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704181104;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=20j0482Fdaq4UWw24yM7rJf98orkusLkXiPgQ9lpD0o=;
+	b=B33JKf3ykbTdo+g6WKlm48hudv17JTcp3IZfQ3IlzKyX39z+kVwW9QFv6lH/5vNQqgB97W
+	R94vGAynf9+ncZZMXUMf82H2Zk2nkzG85WAwyxMyrZQCuPhP5MbYlfPjmWduAVXvXTgozE
+	lzyW+Vrk5Us20rRvwIQG6kW8soLtNYc=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-380-1MUGYWmLMHqB_3Zf5GDwYw-1; Tue, 02 Jan 2024 02:38:23 -0500
+X-MC-Unique: 1MUGYWmLMHqB_3Zf5GDwYw-1
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7ccffc4bef4so234377241.1
+        for <linux-block@vger.kernel.org>; Mon, 01 Jan 2024 23:38:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704163327; x=1704768127;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IfOHaDOQFWCjFE5eYECAufdGX/M8ENRMe8BdoJQwdrM=;
-        b=iBTA1d4dtLHmjOoieydFu3kXxgtEM52T3CGJVfjf2U96IrSLtApZ2hXYkdzkgMR0kf
-         uxQwBSjtCcyDULVVxTNaUijyWccx2415UP+uGch2KX1QiR8QGdSGdkvvf6GlqcGBpadP
-         mqhpVYKVB0yg9y0RRtGSY2+mSN9QcMthhV8SJouy1bJ5UgMeBIfWUAhvbgJRevcXeeAh
-         OB21wlxf/liCgQtrVo8cWI92LbAbClWufbWneoU1/mvO7rNlaL8/5U0nnmhzOWfzlqMf
-         7f1K+VYgFP4iDFdu6Mm6xjF+hz371DvEWtvEbK7Gvq9BPCov4VTh25NQpUde5Ken2N5l
-         0b9w==
-X-Gm-Message-State: AOJu0YxEupkK/OaBmbGGDSAMvAaKgRQx3qb+XvleIEu8cOv7UeYNkjhD
-	DAamdKKhsw0CZMLzUN1M/d4=
-X-Google-Smtp-Source: AGHT+IGBlPFEg45SFGKot3B9Qmhip+YFNIfepomX4SLuIrjxOfMELCEVoF3xRzLbgD7feppLDqQifw==
-X-Received: by 2002:a17:902:e88d:b0:1d4:be70:21c0 with SMTP id w13-20020a170902e88d00b001d4be7021c0mr2015443plg.16.1704163326602;
-        Mon, 01 Jan 2024 18:42:06 -0800 (PST)
-Received: from localhost.localdomain (45.78.55.121.16clouds.com. [45.78.55.121])
-        by smtp.gmail.com with ESMTPSA id a4-20020a170902ecc400b001d1d1ef8be5sm20895643plh.173.2024.01.01.18.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jan 2024 18:42:06 -0800 (PST)
-From: Guoxin Pu <pugokushin@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Guoxin Pu <pugokushin@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] block: fix length of strscpy()
-Date: Tue,  2 Jan 2024 10:41:15 +0800
-Message-ID: <20240102024115.4395-1-pugokushin@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1704181102; x=1704785902;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=20j0482Fdaq4UWw24yM7rJf98orkusLkXiPgQ9lpD0o=;
+        b=HAbYCboHkhiY+u7RLO5rGMo8UKnApOqCTmGZ9IDXXN1uKQkppyj0uXRUqP8IfJkSSx
+         zL5vcYk+SMiA18yz9MbSkWWGWdDHQfv6q13XXe+s6qv0BZM0E9UcZd5k8oqtXH61AjNk
+         erPFYDdZ6NhNh73VclJvUIyb0eZL6HXuVM+nGeyrdsNADvR4mN/mkiCv/h4fRJyJDXkq
+         c2s/T/sXji9bok4eD0xG+bRDkSaCXcTG/661NYrsiojHBt5c7Wh4/Zlj0O+4/cAP9MJm
+         wJEUSRa/LuHxPGHzQ+lo2EU9k6vrl8IffJ4eTzgxRwImMa/WJwdFc1/aypjQtd6vkvmj
+         U38g==
+X-Gm-Message-State: AOJu0YzP0gg+b7FQAfMGW6qY1ZKLXluyDbz7th68Vnoi20QzNNO0ZzUy
+	+MjrCvHKYwwmgb848TxYRYUyvM9aFToVqdSTMOgjCVstZ7ddwKnbXp5NWrrBEG0WNFj/U8AThtY
+	gzGfehHyB0tMAquVkknv0l2A0qKDa1uYCJCdfxy4PU8qpSKg=
+X-Received: by 2002:a05:6102:2ca:b0:467:4e1d:e42a with SMTP id h10-20020a05610202ca00b004674e1de42amr6286012vsh.2.1704181102574;
+        Mon, 01 Jan 2024 23:38:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHfWjpO89uZT/3U/sOkXjQXK1yh9L3iB40D7oIyXpX3ix8A/CPovysEh7QlAJpnuuiC247op4TvgYC5WlhV088=
+X-Received: by 2002:a05:6102:2ca:b0:467:4e1d:e42a with SMTP id
+ h10-20020a05610202ca00b004674e1de42amr6286005vsh.2.1704181102312; Mon, 01 Jan
+ 2024 23:38:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231219012833.2129540-1-ming.lei@redhat.com>
+In-Reply-To: <20231219012833.2129540-1-ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Tue, 2 Jan 2024 15:38:10 +0800
+Message-ID: <CAFj5m9KQ=cvODNGP_vcqtRT=EzbncUqe_vHbqUPsvYEu6d_PZw@mail.gmail.com>
+Subject: Re: [PATCH] blk-cgroup: fix rcu lockdep warning in blkg_lookup()
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Changhui Zhong <czhong@redhat.com>, tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In commit 146afeb235ccec10c17ad8ea26327c0c79dbd968 ("block: use strscpy()
-to instead of strncpy()") , the length that should now represent the length
-of the string with the terminating NULL was not updated alongside the
-change.
+On Tue, Dec 19, 2023 at 9:28=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> blkg_lookup() is called with either queue_lock or rcu read lock, so
+> use rcu_dereference_check(lockdep_is_held(&q->queue_lock)) for
+> retrieving 'blkg', which way models the check exactly for covering
+> queue lock or rcu read lock.
+>
+> Fix lockdep warning of "block/blk-cgroup.h:254 suspicious rcu_dereference=
+_check() usage!"
+> from blkg_lookup().
+>
+> Tested-by: Changhui Zhong <czhong@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-cgroup.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+> index fd482439afbc..b927a4a0ad03 100644
+> --- a/block/blk-cgroup.h
+> +++ b/block/blk-cgroup.h
+> @@ -252,7 +252,8 @@ static inline struct blkcg_gq *blkg_lookup(struct blk=
+cg *blkcg,
+>         if (blkcg =3D=3D &blkcg_root)
+>                 return q->root_blkg;
+>
+> -       blkg =3D rcu_dereference(blkcg->blkg_hint);
+> +       blkg =3D rcu_dereference_check(blkcg->blkg_hint,
+> +                       lockdep_is_held(&q->queue_lock));
+>         if (blkg && blkg->q =3D=3D q)
+>                 return blkg;
 
-This has caused blkdevparts= definition on kernel cmdline to be not
-correctly recognized and partitions not correctly initialized, breaking any
-device relying on such partitions to boot, on stable releases since 6.6
+Hello,
 
-This patch fixes the lengths to contain the terminating NULL.
+Ping...
 
-Fixes: 146afeb235cc ("block: use strscpy() to instead of strncpy()")
-Cc: stable@vger.kernel.org # 6.6.x
-Signed-off-by: Guoxin Pu <pugokushin@gmail.com>
----
- block/partitions/cmdline.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-index c03bc105e575..4657704c3e37 100644
---- a/block/partitions/cmdline.c
-+++ b/block/partitions/cmdline.c
-@@ -79,8 +79,8 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
- 			goto fail;
- 		}
- 
--		length = min_t(int, next - partdef,
--			       sizeof(new_subpart->name) - 1);
-+		length = min_t(int, next - partdef + 1,
-+			       sizeof(new_subpart->name));
- 		strscpy(new_subpart->name, partdef, length);
- 
- 		partdef = ++next;
-@@ -138,7 +138,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
- 		goto fail;
- 	}
- 
--	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
-+	length = min_t(int, next - bdevdef + 1, sizeof(newparts->name));
- 	strscpy(newparts->name, bdevdef, length);
- 	newparts->nr_subparts = 0;
- 
-@@ -148,8 +148,8 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
- 		bdevdef = next;
- 		next = strchr(bdevdef, ',');
- 
--		length = (!next) ? (sizeof(buf) - 1) :
--			min_t(int, next - bdevdef, sizeof(buf) - 1);
-+		length = (!next) ? sizeof(buf) :
-+			min_t(int, next - bdevdef + 1, sizeof(buf));
- 
- 		strscpy(buf, bdevdef, length);
- 
-@@ -250,7 +250,6 @@ static struct cmdline_parts *bdev_parts;
- static int add_part(int slot, struct cmdline_subpart *subpart,
- 		struct parsed_partitions *state)
- {
--	int label_min;
- 	struct partition_meta_info *info;
- 	char tmp[sizeof(info->volname) + 4];
- 
-@@ -262,9 +261,7 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
- 
- 	info = &state->parts[slot].info;
- 
--	label_min = min_t(int, sizeof(info->volname) - 1,
--			  sizeof(subpart->name));
--	strscpy(info->volname, subpart->name, label_min);
-+	strscpy(info->volname, subpart->name, sizeof(info->volname));
- 
- 	snprintf(tmp, sizeof(tmp), "(%s)", info->volname);
- 	strlcat(state->pp_buf, tmp, PAGE_SIZE);
--- 
-2.43.0
+Thanks,
 
