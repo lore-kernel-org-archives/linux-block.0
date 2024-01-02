@@ -1,114 +1,93 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290D1DF5D
-	for <linux-block@vger.kernel.org>; Tue,  2 Jan 2024 11:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300FF14A82
+	for <linux-block@vger.kernel.org>; Tue,  2 Jan 2024 15:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VH+54gRH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704194858;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8vuEl5bzYPdLQYuJiYuL6XpRByqC5g17VVYTw6M5DGc=;
-	b=VH+54gRH8XiWa/7uGUMDm9tl0nndOa9rgdlDoXSB+lqDck64uNfUrKXENDTvtcJwHv5fDN
-	VUpa38Dxo2gM5/M9TCekR4UURZVy8B+FP8DKz9ipH9kORTBmTt4OUQGT+EYwoITG4MC4Rn
-	mIEmynP0u5CG4//g3HhU8kXgcuTzkIQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-664-0bm9yJXqNR-C9CPMWquM2g-1; Tue, 02 Jan 2024 06:27:33 -0500
-X-MC-Unique: 0bm9yJXqNR-C9CPMWquM2g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 189F08057FC;
-	Tue,  2 Jan 2024 11:27:33 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.40])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id ACF9D2166B31;
-	Tue,  2 Jan 2024 11:27:29 +0000 (UTC)
-Date: Tue, 2 Jan 2024 19:27:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Changhui Zhong <czhong@redhat.com>,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] blk-cgroup: fix rcu lockdep warning in blkg_lookup()
-Message-ID: <ZZPzHZsSa0g0PzDg@fedora>
-References: <20231219012833.2129540-1-ming.lei@redhat.com>
- <d067baba-e718-76c1-807f-feb169bd0e71@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="g+7V6rb3"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bb06f56fe9so67769739f.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Jan 2024 07:40:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704210040; x=1704814840; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yW0MzlHZomB+YZkCH4YUGFwdNBjbNMVw3h7xePuFXBw=;
+        b=g+7V6rb325AFmpTlqSiVivdwOPOxWNLVGaKNgSHKHel/AJSnOsAHM/KPm/gIzpAKuw
+         7laqVF+hsZt3L+E8ttCOG+8QXdmXyPsseaAS+vCjOUkoVw22tIdAtLuDreRAnGMKtHNS
+         rX1hK38+R2H2Y4lwoqqujXQMenHMoNT5/ntTkSSkE5BwYByOLs5IEEhHNV7idpG2EC/+
+         yKJo2RxIH8XnkK0ROAbUeoZfHr3TE9PJL36i/1K9pQkxG0GHMhOQm59+AIGp2nDgZpV6
+         8ra9DcpGgqZy+GMJV8cbTBagUO5YB1nEA4zsa/9laxV0l/upQzFm0SekXkdD2VJm6TTL
+         9gGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704210040; x=1704814840;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yW0MzlHZomB+YZkCH4YUGFwdNBjbNMVw3h7xePuFXBw=;
+        b=hm9Nf67WtfKLSyvbbjSwf0/92nW6Tpd7AaBz5PetwuI9DHM9IJUZRWWbIV/0ZHVl3S
+         LBnBHvEILyz/uVtvN9bFdqrbH86gT9NCZ1HeHx6HvZt87Rwow7HbZYcdhES0xM1lc3mi
+         Ak0WrX5tAyddugVmPPsaaRC9JC9fK5bjHVP7jdw1P34wKy1ANMDg8p3c86+nFzf5oJPm
+         Kt+kUR+PDSMU55au8S99OY9xADUqbXCiIvYbQkfEgb9+DZbJI6p2IQuJr9+LE+CsUsPZ
+         coMRR1XmgDFD7zU3fvw5v+UwR+TKTa66sUiEZZNjQn5UevhskGuD7T6wETmTxVhE1638
+         i5IQ==
+X-Gm-Message-State: AOJu0YwAXxWC2Xo5yYrlbkbPHZoxH7gNfR19LwyTzKSOXKVCVqjZ3TQG
+	Z1iHW5BRQ8s69uD+R6Hqi1Rbi+gCQXIAfg==
+X-Google-Smtp-Source: AGHT+IEwoDpWa3DPCL2q3LLo73FXUxeDnS1RhrchV5t+VIVuVtSvXaa44wpnDuL6ftiaSS1FPUs3jg==
+X-Received: by 2002:a05:6e02:20c5:b0:35f:ff56:c40a with SMTP id 5-20020a056e0220c500b0035fff56c40amr22286643ilq.0.1704210039707;
+        Tue, 02 Jan 2024 07:40:39 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id f12-20020a056e020b4c00b0036002c8127asm5354004ilu.5.2024.01.02.07.40.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 07:40:39 -0800 (PST)
+Message-ID: <400dbdbf-e99e-4747-94db-54fb6674fdd5@kernel.dk>
+Date: Tue, 2 Jan 2024 08:40:36 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d067baba-e718-76c1-807f-feb169bd0e71@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 7/9] zram: use the default discard granularity
+Content-Language: en-US
+To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Christoph Hellwig <hch@lst.de>
+Cc: Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Josef Bacik <josef@toxicpanda.com>, Minchan Kim <minchan@kernel.org>,
+ Coly Li <colyli@suse.de>, Miquel Raynal <miquel.raynal@bootlin.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>, linux-um@lists.infradead.org,
+ linux-block@vger.kernel.org, nbd@other.debian.org,
+ linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org
+References: <20231228075545.362768-1-hch@lst.de>
+ <20231228075545.362768-8-hch@lst.de> <20240102011543.GA21409@google.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240102011543.GA21409@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 02, 2024 at 06:32:13PM +0800, Yu Kuai wrote:
-> Hi,
+On 1/1/24 6:15 PM, Sergey Senozhatsky wrote:
+> On (23/12/28 07:55), Christoph Hellwig wrote:
+>>
+>> The discard granularity now defaults to a single sector, so don't set
+>> that value explicitly
 > 
-> 在 2023/12/19 9:28, Ming Lei 写道:
-> > blkg_lookup() is called with either queue_lock or rcu read lock, so
-> > use rcu_dereference_check(lockdep_is_held(&q->queue_lock)) for
-> > retrieving 'blkg', which way models the check exactly for covering
-> > queue lock or rcu read lock.
-> > 
-> > Fix lockdep warning of "block/blk-cgroup.h:254 suspicious rcu_dereference_check() usage!"
-> > from blkg_lookup().
-> > 
-> > Tested-by: Changhui Zhong <czhong@redhat.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   block/blk-cgroup.h | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-> > index fd482439afbc..b927a4a0ad03 100644
-> > --- a/block/blk-cgroup.h
-> > +++ b/block/blk-cgroup.h
-> > @@ -252,7 +252,8 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
-> >   	if (blkcg == &blkcg_root)
-> >   		return q->root_blkg;
-> > -	blkg = rcu_dereference(blkcg->blkg_hint);
-> > +	blkg = rcu_dereference_check(blkcg->blkg_hint,
-> > +			lockdep_is_held(&q->queue_lock));
+> Hmm, but sector size != PAGE_SIZE
 > 
-> This patch itself is correct, and in fact this is a false positive
-> warning.
-
-Yeah, it is, but we always teach lockdep to not trigger warning,
-
+> [..]
 > 
-> I noticed that commit 83462a6c971c ("blkcg: Drop unnecessary RCU read
-> [un]locks from blkg_conf_prep/finish()") drop rcu_read_lock/unlock()
-> because 'queue_lock' is held. This is correct, however you add this back
-> for tg_conf_updated() later in commit 27b13e209ddc ("blk-throttle: fix
-> lockdep warning of "cgroup_mutex or RCU read lock required!"") because
-> rcu_read_lock_held() from blkg_lookup() is triggered. And this patch is
-> again another use case cased by commit 83462a6c971c.
+>> @@ -2227,7 +2227,6 @@ static int zram_add(void)
+>>  					ZRAM_LOGICAL_BLOCK_SIZE);
+>>  	blk_queue_io_min(zram->disk->queue, PAGE_SIZE);
+>>  	blk_queue_io_opt(zram->disk->queue, PAGE_SIZE);
+>> -	zram->disk->queue->limits.discard_granularity = PAGE_SIZE;
 
-We should add:
+Yep, that does indeed look buggy.
 
-Fixes: 83462a6c971c ("blkcg: Drop unnecessary RCU read [un]locks from blkg_conf_prep/finish()")
+-- 
+Jens Axboe
 
-> 
-> I just wonder, with the respect of rcu implementation, is it possible to
-> add preemptible() check directly in rcu_read_lock_held() to bypass all
-> this kind of false positive warning?
-
-It isn't related with rcu_read_lock_held(), and the check is done in
-RCU_LOCKDEP_WARN(). rcu_dereference_check() does cover this situation,
-and no need to invent wheel for avoiding the warning.
-
-Thanks,
-Ming
 
