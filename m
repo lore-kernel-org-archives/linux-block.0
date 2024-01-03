@@ -1,134 +1,270 @@
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986F818EA5
-	for <linux-block@vger.kernel.org>; Wed,  3 Jan 2024 11:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72D819442;
+	Wed,  3 Jan 2024 12:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iwYDQyI1"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1704282589; x=1735818589;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SUIOoFCll9V0/pcZKF+SuiSn1hTLxp15utr/HahGGus=;
-  b=iwYDQyI1l4fS9Kg463s3ZHlkk/JRfNQl6MBgMrpQXCX8KUj8CFUZvbu5
-   4HXzcPg9fhjv4usILvwxT62GUDZH9urJSNIe9E7UkLqZ8C/M7fGSJhw+y
-   tr2FKuNpINIHN+pILlPlhjAYvguNtxKTLTDWWrtTXkJ+dzhz3+RW3nJdZ
-   l9Y+q3xmZ2OL7pbHe7ZBN28QT/PxDd6QO0X8ZaFYKr3Tb+yQS5Ile54ar
-   3IgA/VCJSrrGlVjAJb0pYzFsWIairpvUEqLBQjGv+He66UH+aclWuK07p
-   vjoC/C6ysMhYBi2XjAQpS0eem5JCEj5R4v1nApUx8doHqy/ppgWvqupln
-   w==;
-X-CSE-ConnectionGUID: 8/RNxH32RAO9IbsQTEVyYw==
-X-CSE-MsgGUID: lp8gzJl3TWKdnD0/QlG8dQ==
-X-IronPort-AV: E=Sophos;i="6.04,327,1695657600"; 
-   d="scan'208";a="6081460"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jan 2024 19:49:47 +0800
-IronPort-SDR: haKak8ZGYS+osQsxb1OhpBh2JtZ3u5XMndHh8In97JB5G7AMXb3dmem++DsUnYyjw7ftPLnJx0
- NHVEZqNQ+JsQ==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Jan 2024 03:00:12 -0800
-IronPort-SDR: 6J4qXR2+slyMX9jVXNNBsqOmicIjKdk+fPaaclaFeXfEjrRdZI5Dclwdx8w8oihZWrTwoCb1Ak
- qV3HibxLNV5A==
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 03 Jan 2024 03:49:42 -0800
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 2/2] block/031: allow to run with built-in null_blk driver
-Date: Wed,  3 Jan 2024 20:49:40 +0900
-Message-ID: <20240103114940.3000366-3-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240103114940.3000366-1-shinichiro.kawasaki@wdc.com>
-References: <20240103114940.3000366-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYgpstkR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91619C433C7;
+	Wed,  3 Jan 2024 12:55:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704286528;
+	bh=SpzdVkvU80u/Zx2kHKteHWnu5YYrYN4EsSSqYxA33HA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=QYgpstkRJhm6koyb/plpwB9iKPWWaV/SWoiDVA9UV9CbLNdEGuj/GuzW6WRUnyXsG
+	 9ZFm0FjuRazwzD4+jc5M1jVtYG2t9dlH/NTuC9IOKfMVpZfChPanpLsnHfgnZMiy88
+	 yxJcW2nVW6u3ysxfdDNefMQCWTbR3HYJ4ZrT/YVRuuQp0FbDQargygArzVHSc1Qi7G
+	 fh6boicF8VN8Z90uuQXKEJYYnzmBc1nrrwd9Aj4s2/Eq8wXAQksQRDq8MAwu/D74yB
+	 NB7UeLWgJvBLWFjQryiDqZ52w5mO4t33e4aKMdkg87W3pC/vn+XZ/sobL6nadc0wFq
+	 Cqbr22aC1dzkQ==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH RFC 00/34] Open block devices as files & a bd_inode
+ proposal
+Date: Wed, 03 Jan 2024 13:54:58 +0100
+Message-Id: <20240103-vfs-bdev-file-v1-0-6c8ee55fb6ef@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACNZlWUC/x3MQQrCMBCF4auUWTuSpELFreABuhUXk2ZiB0KUD
+ ASh9O6OLv8H79tAuQkrXIYNGndReVULfxhgWak+GSVZQ3Dh5LwbsWfFmLhjlsLogzsnmsY0MYF
+ 93o2zfP7eHebbFR42RlLG2Kgu648y4UilwL5/AUqqPY5+AAAA
+To: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+ Jens Axboe <axboe@kernel.dk>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org, 
+ linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>
+X-Mailer: b4 0.13-dev-4e032
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10217; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=SpzdVkvU80u/Zx2kHKteHWnu5YYrYN4EsSSqYxA33HA=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaROjbT2T7k5vUpmbaybdukJebOfkj4f1T8dMb/57eXX2
+ ffl+u9f7ChlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZhI/iyG/2GX73jqHvU+9GVP
+ i4LN/bNNilfXlob23uYxEM18If3SYSkjw6+O7ZLP7DeKFB8Pn3EwMUtapWjJvKK6ZI6ouac3HvG
+ 5ygkA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-The test case block/031 sets null_blk parameter shared_tag_bitmap=1 for
-testing. The parameter has been set as a module parameter then null_blk
-driver must be loadable. However, null_blk allows to set
-shared_tag_bitmap as a configfs parameter since the kernel commit
-7012eef520cb ("null_blk: add configfs variables for 2 options"). Then
-the test case now can be run with built-in null_blk driver by specifying
-shared_tag_bitmap through configfs.
+Hey Christoph,
+Hey Jan,
+Hey Jens,
 
-Modify the test case for that purpose. Refer null_blk feature list and
-check if shared_tag_bitmap can be specified through configfs. If so,
-specify the parameter as an option of _configure_null_blk and set it
-through configfs. If not, check in requires() that shared_tag_bitmap can
-be specified as a module parameter. Then call _init_null_blk() in test()
-and specify shared_tag_bitmap=1 at null_blk module load.
+I've been toying with this idea in between changing diapers essentially
+and I've taken it far enough that I'd like some general input before
+going further and massaging out any corner cases I might've missed.
 
-Also change null_blk device name from nullb0 to nullb1 since the default
-null_blk device name nullb0 is not usable with built-in null_blk driver.
+I wanted to see whether we can make struct bdev_handle completely
+private to the block layer in the next cycle and unexport low-level
+helpers such as bdev_release() - formerly blkdev_put() - completely.
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+And afaict, we can actually get that to work. Simply put instead of
+doing this bdev_open_by_*() dance where we return a struct block_device
+we can just make bdev_file_open_by_*() return a struct file. Opening and
+closing a block device from setup_bdev_super() and in all other places
+just becomes equivalent to opening and closing a file.
+
+This has held up in xfstests and in blktests so far and it seems stable
+and clean. The equivalence of opening and closing block devices to
+regular files is a win in and of itself imho. Added to that is the
+ability to hide away all of the the details of struct bdev_handle and
+various other low-level helpers.
+
+So for that reason alone I think we should do it. All places were we
+currently stash a bdev_handle we just stash a file and use accessors
+such as F_BDEV() akin to I_BDEV() to get to the block device.
+
+While I was doing that I realized that this is also a way for us to get
+rid of bd_inode in fs/buffer.c though I don't think that's a requirement
+for this change to be worth it.
+
+Basically we simply record a struct file for the block device in struct
+buffer_head and in struct iomap. That works without a problem afaict.
+All filesystems will have a struct file handle to the block device so we
+can trivially get access to it in nearly all places. The only exception
+is for the block/fops.c layer itself where we obviously don't have a
+struct file for the inode. So if we can solve that problem we can kill
+bd_inode access and simply rely on file->f_mapping->host there as well.
+IOW, just export and use bdev_file_inode() everywhere in fs/buffer.c
+
+I only roughly drafted that bd_inode removal in fs/buffer.c. I think
+this would work but I'd like to hear your thoughts on this. But again, I
+don't think that's a requirement for that change to be worth it.
+
+The patch series is barebones with really tiny commit messages because
+I'd like to get early input. The core patches are:
+
+bdev: open block device as files
+
+In that patch the order between allocating a file and opening a bdev
+handle are still reversed that's all fully cleaned up after all users of
+bdev_handle are ported to rely on files. So the final form is:
+
+bdev: rework bdev_open_by_dev()
+
+and I think that looks fairly nice.
+
+I've added a few additional illustrational patches for future work on
+top:
+
+* port ext4 to only rely on sb->s_f_bdev instead of sb->s_bdev
+* port ext4 to never touch bdev->bd_inode and just rely on bdev_file_inode()
+* remove bdev->bd_inode access from fs/buffer.c and just rely on bdev_file_inode()
+
+I haven't though about potential corner cases yet too much but the file
+stuff should actually be doable.
+
+Thanks!
+Christian
+
 ---
- tests/block/031 | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+Christian Brauner (34):
+      bdev: open block device as files
+      block/ioctl: port blkdev_bszset() to file
+      block/genhd: port disk_scan_partitions() to file
+      md: port block device access to file
+      swap: port block device usage to file
+      power: port block device access to file
+      xfs: port block device access to files
+      drbd: port block device access to file
+      pktcdvd: port block device access to file
+      rnbd: port block device access to file
+      xen: port block device access to file
+      zram: port block device access to file
+      bcache: port block device access to files
+      block2mtd: port device access to files
+      nvme: port block device access to file
+      s390: port block device access to file
+      target: port block device access to file
+      bcachefs: port block device access to file
+      btrfs: port device access to file
+      erofs: port device access to file
+      ext4: port block device access to file
+      f2fs: port block device access to files
+      jfs: port block device access to file
+      nfs: port block device access to files
+      ocfs2: port block device access to file
+      reiserfs: port block device access to file
+      bdev: remove bdev_open_by_path()
+      bdev: make bdev_release() private to block layer
+      bdev: make struct bdev_handle private to the block layer
+      bdev: rework bdev_open_by_dev()
+      ext4: rely on sb->f_bdev only
+      block: expose bdev_file_inode()
+      ext4: use bdev_file_inode()
+      [DRAFT] buffer: port block device access to files and get rid of bd_inode access
 
-diff --git a/tests/block/031 b/tests/block/031
-index d253af8..61a3502 100755
---- a/tests/block/031
-+++ b/tests/block/031
-@@ -11,30 +11,41 @@ DESCRIPTION="do IO on null-blk with a host tag set"
- TIMED=1
- 
- requires() {
--	_have_fio && _have_null_blk && _have_module_param null_blk shared_tag_bitmap
-+	_have_fio
-+	_have_null_blk
-+	if ! _have_null_blk_feature shared_tag_bitmap; then
-+		_have_module_param null_blk shared_tag_bitmap
-+	fi
- }
- 
- test() {
- 	local fio_status bs=512
-+	local -a opts=(nullb1 completion_nsec=0 blocksize="$bs" size=1 \
-+			      submit_queues="$(nproc)" memory_backed=1)
- 
- 	: "${TIMEOUT:=30}"
--	if ! _init_null_blk nr_devices=0 shared_tag_bitmap=1; then
--		echo "Loading null_blk failed"
--		return 1
-+	if _have_null_blk_feature shared_tag_bitmap; then
-+		opts+=(shared_tag_bitmap=1)
-+	else
-+		# Old kernel requires shared_tag_bitmap as a module parameter
-+		# instead of configfs parameter.
-+		if ! _init_null_blk shared_tag_bitmap=1; then
-+			echo "Loading null_blk failed"
-+			return 1
-+		fi
- 	fi
--	if ! _configure_null_blk nullb0 completion_nsec=0 blocksize=$bs size=1\
--	     submit_queues="$(nproc)" memory_backed=1 power=1; then
-+	if ! _configure_null_blk "${opts[@]}" power=1; then
- 		echo "Configuring null_blk failed"
- 		return 1
- 	fi
- 	fio --verify=md5 --rw=randwrite --bs=$bs --loops=$((10**6)) \
- 		--iodepth=64 --group_reporting --sync=1 --direct=1 \
- 		--ioengine=libaio --runtime="${TIMEOUT}" --thread \
--		--name=block-031 --filename=/dev/nullb0 \
-+		--name=block-031 --filename=/dev/nullb1 \
- 		--output="${RESULTS_DIR}/block/fio-output-031.txt" \
- 		>>"$FULL"
- 	fio_status=$?
--	rmdir /sys/kernel/config/nullb/nullb0
-+	rmdir /sys/kernel/config/nullb/nullb1
- 	_exit_null_blk
- 	case $fio_status in
- 		0) echo "Passed";;
--- 
-2.43.0
+ block/bdev.c                        | 220 +++++++++++++++++++++++-------------
+ block/blk.h                         |  10 ++
+ block/fops.c                        |  40 +++----
+ block/genhd.c                       |  12 +-
+ block/ioctl.c                       |   9 +-
+ drivers/block/drbd/drbd_int.h       |   4 +-
+ drivers/block/drbd/drbd_nl.c        |  58 +++++-----
+ drivers/block/pktcdvd.c             |  68 +++++------
+ drivers/block/rnbd/rnbd-srv.c       |  26 ++---
+ drivers/block/rnbd/rnbd-srv.h       |   2 +-
+ drivers/block/xen-blkback/blkback.c |   4 +-
+ drivers/block/xen-blkback/common.h  |   4 +-
+ drivers/block/xen-blkback/xenbus.c  |  36 +++---
+ drivers/block/zram/zram_drv.c       |  26 ++---
+ drivers/block/zram/zram_drv.h       |   2 +-
+ drivers/md/bcache/bcache.h          |   4 +-
+ drivers/md/bcache/super.c           |  74 ++++++------
+ drivers/md/dm.c                     |  23 ++--
+ drivers/md/md-bitmap.c              |   1 +
+ drivers/md/md.c                     |  12 +-
+ drivers/md/md.h                     |   2 +-
+ drivers/mtd/devices/block2mtd.c     |  42 +++----
+ drivers/nvme/target/io-cmd-bdev.c   |  16 +--
+ drivers/nvme/target/nvmet.h         |   2 +-
+ drivers/s390/block/dasd.c           |  10 +-
+ drivers/s390/block/dasd_genhd.c     |  36 +++---
+ drivers/s390/block/dasd_int.h       |   2 +-
+ drivers/s390/block/dasd_ioctl.c     |   2 +-
+ drivers/target/target_core_iblock.c |  18 +--
+ drivers/target/target_core_iblock.h |   2 +-
+ drivers/target/target_core_pscsi.c  |  22 ++--
+ drivers/target/target_core_pscsi.h  |   2 +-
+ fs/affs/file.c                      |   1 +
+ fs/bcachefs/super-io.c              |  20 ++--
+ fs/bcachefs/super_types.h           |   2 +-
+ fs/btrfs/dev-replace.c              |  14 +--
+ fs/btrfs/inode.c                    |   1 +
+ fs/btrfs/ioctl.c                    |  16 +--
+ fs/btrfs/volumes.c                  |  92 +++++++--------
+ fs/btrfs/volumes.h                  |   4 +-
+ fs/buffer.c                         |  69 +++++------
+ fs/cramfs/inode.c                   |   2 +-
+ fs/direct-io.c                      |   2 +-
+ fs/erofs/data.c                     |  13 ++-
+ fs/erofs/internal.h                 |   3 +-
+ fs/erofs/super.c                    |  16 +--
+ fs/erofs/zmap.c                     |   1 +
+ fs/ext2/inode.c                     |   8 +-
+ fs/ext4/dir.c                       |   2 +-
+ fs/ext4/ext4.h                      |   2 +-
+ fs/ext4/ext4_jbd2.c                 |   2 +-
+ fs/ext4/fast_commit.c               |   2 +-
+ fs/ext4/fsmap.c                     |   8 +-
+ fs/ext4/inode.c                     |   6 +-
+ fs/ext4/super.c                     |  88 +++++++--------
+ fs/f2fs/data.c                      |   6 +-
+ fs/f2fs/f2fs.h                      |   3 +-
+ fs/f2fs/super.c                     |  12 +-
+ fs/fuse/dax.c                       |   1 +
+ fs/gfs2/aops.c                      |   1 +
+ fs/gfs2/bmap.c                      |   1 +
+ fs/hpfs/file.c                      |   1 +
+ fs/jbd2/commit.c                    |   1 +
+ fs/jbd2/journal.c                   |  26 +++--
+ fs/jbd2/recovery.c                  |   6 +-
+ fs/jbd2/revoke.c                    |  10 +-
+ fs/jbd2/transaction.c               |   1 +
+ fs/jfs/jfs_logmgr.c                 |  26 ++---
+ fs/jfs/jfs_logmgr.h                 |   2 +-
+ fs/jfs/jfs_mount.c                  |   2 +-
+ fs/mpage.c                          |   5 +-
+ fs/nfs/blocklayout/blocklayout.h    |   2 +-
+ fs/nfs/blocklayout/dev.c            |  68 +++++------
+ fs/nilfs2/btnode.c                  |   2 +
+ fs/nilfs2/gcinode.c                 |   1 +
+ fs/nilfs2/mdt.c                     |   1 +
+ fs/nilfs2/page.c                    |   2 +
+ fs/nilfs2/recovery.c                |  20 ++--
+ fs/nilfs2/the_nilfs.c               |   1 +
+ fs/ntfs/aops.c                      |   3 +
+ fs/ntfs/file.c                      |   1 +
+ fs/ntfs/mft.c                       |   2 +
+ fs/ntfs3/fsntfs.c                   |   8 +-
+ fs/ntfs3/inode.c                    |   1 +
+ fs/ntfs3/super.c                    |   2 +-
+ fs/ocfs2/cluster/heartbeat.c        |  32 +++---
+ fs/ocfs2/journal.c                  |   2 +-
+ fs/reiserfs/journal.c               |  44 ++++----
+ fs/reiserfs/procfs.c                |   2 +-
+ fs/reiserfs/reiserfs.h              |   8 +-
+ fs/reiserfs/tail_conversion.c       |   1 +
+ fs/romfs/super.c                    |   2 +-
+ fs/super.c                          |  18 +--
+ fs/xfs/xfs_buf.c                    |  10 +-
+ fs/xfs/xfs_buf.h                    |   4 +-
+ fs/xfs/xfs_iomap.c                  |   7 +-
+ fs/xfs/xfs_super.c                  |  43 ++++---
+ fs/zonefs/file.c                    |   2 +
+ include/linux/blkdev.h              |  18 +--
+ include/linux/buffer_head.h         |  45 ++++----
+ include/linux/device-mapper.h       |   2 +-
+ include/linux/fs.h                  |   4 +-
+ include/linux/iomap.h               |   1 +
+ include/linux/jbd2.h                |   6 +-
+ include/linux/pktcdvd.h             |   4 +-
+ include/linux/swap.h                |   2 +-
+ kernel/power/swap.c                 |  28 ++---
+ mm/swapfile.c                       |  22 ++--
+ 108 files changed, 908 insertions(+), 782 deletions(-)
+---
+base-commit: aee755dd02191d5669860f38e28ec93d8f0a4e70
+change-id: 20240103-vfs-bdev-file-1208da73d7ea
 
