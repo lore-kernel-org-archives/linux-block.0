@@ -1,113 +1,171 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A69F171CA;
-	Wed,  3 Jan 2024 03:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4T4ZcT2BqHz4f3nTT;
-	Wed,  3 Jan 2024 11:16:09 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id EC08D1A017F;
-	Wed,  3 Jan 2024 11:16:14 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgD3Rg1+0ZRl7G6DFQ--.7113S3;
-	Wed, 03 Jan 2024 11:16:14 +0800 (CST)
-Subject: Re: [PATCH v3 2/2] md: don't account sync_io if iostats of the disk
- is disabled
-To: linan666@huaweicloud.com, song@kernel.org, axboe@kernel.dk
-Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, yi.zhang@huawei.com, houtao1@huawei.com,
- yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20231223033703.2949831-1-linan666@huaweicloud.com>
- <20231223033703.2949831-3-linan666@huaweicloud.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e2305cc4-dc3e-7693-9b61-33896c1b7a37@huaweicloud.com>
-Date: Wed, 3 Jan 2024 11:16:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C552154BA
+	for <linux-block@vger.kernel.org>; Wed,  3 Jan 2024 04:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cc5WUt/C"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704254578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yNiVBcSgnS7YDhIhezexv4UQ/o2XjO1B9pVBfER0O5A=;
+	b=cc5WUt/CUX5QKLBw0/sLTIYDr0Q2WaVnvAqZzAgaiRYAqYheN7N1kCDDWSDy18RnLuToay
+	Rwi+95y0RvueCyTatIM3uj2prvaKMujrQy8kSM0B1gBgs1+47Pu1mjLXQaxEpbgODHYT5j
+	fp5HxABdksVxyhxdnjM+i+O7hKRP0Gg=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-345-s2T-O5voO0qFpYZX1FTeFA-1; Tue,
+ 02 Jan 2024 23:02:54 -0500
+X-MC-Unique: s2T-O5voO0qFpYZX1FTeFA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 801381C05134;
+	Wed,  3 Jan 2024 04:02:53 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.42])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D4E8351E3;
+	Wed,  3 Jan 2024 04:02:47 +0000 (UTC)
+Date: Wed, 3 Jan 2024 12:02:43 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: bvanassche@acm.org, hch@lst.de, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+	ming.lei@redhat.com
+Subject: Re: [PATCH -next RFC] block: support to account io_ticks precisely
+Message-ID: <ZZTcYyveSE6Sl0Dl@fedora>
+References: <20231205093743.1823351-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231223033703.2949831-3-linan666@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3Rg1+0ZRl7G6DFQ--.7113S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF1xCFyDtry8tryxJrW7XFb_yoW8Cr1xpa
-	ykAF9ak34UXr45WasrZ34UCa4rWw17tFW0yrW7C34fXFy3tr9xGF4Sga90qF1vgFWrWFWa
-	qw1jvFs09a10vrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv
-	67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
-	uYvjxUOyCJDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205093743.1823351-1-yukuai1@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-
-
-ÔÚ 2023/12/23 11:37, linan666@huaweicloud.com Ð´µÀ:
-> From: Li Nan <linan122@huawei.com>
+On Tue, Dec 05, 2023 at 05:37:43PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> If iostats is disabled, disk_stats will not be updated and
-> part_stat_read_accum() only returns a constant value. In this case,
-> continuing to count sync_io and to check is_mddev_idle() is no longer
-> meaningful.
+> Currently, io_ticks is accounted based on sampling, specifically
+> update_io_ticks() will always account io_ticks by 1 jiffies from
+> bdev_start_io_acct()/blk_account_io_start(), and the result can be
+> inaccurate, for example(HZ is 250):
 > 
-> Signed-off-by: Li Nan <linan122@huawei.com>
+> Test script:
+> fio -filename=/dev/sda -bs=4k -rw=write -direct=1 -name=test -thinktime=4ms
+> 
+> Test result: util is about 90%, while the disk is really idle.
+> 
+> In order to account io_ticks precisely, update_io_ticks() must know if
+> there are IO inflight already, and this requires overhead slightly,
+> hence precise io accounting is disabled by default, and user can enable
+> it through sysfs entry.
+
+Yeah, the trouble is from commit 5b18b5a73760 ("block: delete part_round_stats and
+switch to less precise counting"), and real reason is that IO inflight
+info is too expensive to maintain in fast path, and RH have got several customer
+complaint in this area too.
+
+> 
+> Noted that for rq-based devcie, part_stat_local_inc/dec() and
+> part_in_flight() is used to track inflight instead of iterating tags,
+> which is not supposed to be used in fast path because 'tags->lock' is
+> grabbed in blk_mq_find_and_get_req().
+
+You can iterate over static requests via BT_TAG_ITER_STATIC_RQS, then
+tags->lock can be bypassed, but new helper is needed.
+
+But given it is only run once for each tick, I guess percpu counting
+might be fine too even in case of big machine.
+
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 > ---
->   drivers/md/md.h | 3 ++-
->   drivers/md/md.c | 4 ++++
->   2 files changed, 6 insertions(+), 1 deletion(-)
+>  Documentation/ABI/stable/sysfs-block |  8 ++++--
+>  block/blk-core.c                     | 17 ++++++++----
+>  block/blk-mq.c                       | 18 ++++++++++---
+>  block/blk-sysfs.c                    | 40 ++++++++++++++++++++++++++--
+>  block/blk.h                          |  4 ++-
+>  block/genhd.c                        |  6 ++---
+>  include/linux/blk-mq.h               |  1 +
+>  include/linux/blkdev.h               |  3 +++
+>  8 files changed, 80 insertions(+), 17 deletions(-)
 > 
-> diff --git a/drivers/md/md.h b/drivers/md/md.h
-> index 1a4f976951c1..e2d03a7a858c 100644
-> --- a/drivers/md/md.h
-> +++ b/drivers/md/md.h
-> @@ -584,7 +584,8 @@ extern void mddev_unlock(struct mddev *mddev);
->   
->   static inline void md_sync_acct(struct block_device *bdev, unsigned long nr_sectors)
->   {
-> -	atomic64_add(nr_sectors, &bdev->bd_disk->sync_io);
-> +	if (blk_queue_io_stat(bdev->bd_disk->queue))
-> +		atomic64_add(nr_sectors, &bdev->bd_disk->sync_io);
->   }
->   
->   static inline void md_sync_acct_bio(struct bio *bio, unsigned long nr_sectors)
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index a6829ea5b560..b56614eae8dc 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -8502,6 +8502,10 @@ static int is_mddev_idle(struct mddev *mddev, int init)
->   	rcu_read_lock();
->   	rdev_for_each_rcu(rdev, mddev) {
->   		struct gendisk *disk = rdev->bdev->bd_disk;
-> +
-> +		if (!blk_queue_io_stat(disk->queue))
-> +			continue;
+> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+> index 1fe9a553c37b..e5fedecf7bdf 100644
+> --- a/Documentation/ABI/stable/sysfs-block
+> +++ b/Documentation/ABI/stable/sysfs-block
+> @@ -358,8 +358,12 @@ What:		/sys/block/<disk>/queue/iostats
+>  Date:		January 2009
+>  Contact:	linux-block@vger.kernel.org
+>  Description:
+> -		[RW] This file is used to control (on/off) the iostats
+> -		accounting of the disk.
+> +		[RW] This file is used to control the iostats accounting of the
+> +		disk. If this value is 0, iostats accounting is disabled; If
+> +		this value is 1, iostats accounting is enabled, but io_ticks is
+> +		accounted by sampling and the result is not accurate; If this
+> +		value is 2, iostats accounting is enabled and io_ticks is
+> +		accounted precisely, but there will be slightly overhead.
 
-Consider that the queue flag can be set/cleared through sysfs, let's
-keep set rdev->last_events in the case 'init'. To prevent a false
-positive(althrough highly unlikely) if iostat is enabled during
-md_do_sync().
+IMO, this approach looks fine.
+
+>  
+>  
+>  What:		/sys/block/<disk>/queue/logical_block_size
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index fdf25b8d6e78..405883d606cd 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -935,14 +935,20 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+>  }
+>  EXPORT_SYMBOL_GPL(iocb_bio_iopoll);
+>  
+> -void update_io_ticks(struct block_device *part, unsigned long now, bool end)
+> +void update_io_ticks(struct block_device *part, unsigned long now, bool end,
+> +		     bool precise)
+>  {
+>  	unsigned long stamp;
+>  again:
+>  	stamp = READ_ONCE(part->bd_stamp);
+> -	if (unlikely(time_after(now, stamp))) {
+> -		if (likely(try_cmpxchg(&part->bd_stamp, &stamp, now)))
+> +	if (unlikely(time_after(now, stamp)) &&
+> +	    likely(try_cmpxchg(&part->bd_stamp, &stamp, now))) {
+> +		if (precise) {
+> +			if (end || part_in_flight(part))
+> +				__part_stat_add(part, io_ticks, now - stamp);
+
+Strictly speaking, `end` isn't need any more, but it can be thought
+as one optimization, given part_in_flight() is supposed to be non-zero
+in case of account_done.
+
+> +		} else {
+>  			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
+> +		}
+>  	}
+>  	if (part->bd_partno) {
+>  		part = bdev_whole(part);
+> @@ -954,7 +960,8 @@ unsigned long bdev_start_io_acct(struct block_device *bdev, enum req_op op,
+>  				 unsigned long start_time)
+>  {
+>  	part_stat_lock();
+> -	update_io_ticks(bdev, start_time, false);
+> +	update_io_ticks(bdev, start_time, false,
+> +			blk_queue_precise_io_stat(bdev->bd_queue));
+
+blk_queue_precise_io_stat() can be moved into update_io_ticks()
+directly, and it should be fine given it is just done once in each
+tick.
 
 Thanks,
-Kuai
-
-> +
->   		curr_events =
->   			(long long)part_stat_read_accum(disk->part0, sectors) -
->   			atomic64_read(&disk->sync_io);
-> 
+Ming
 
