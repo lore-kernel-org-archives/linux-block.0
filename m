@@ -1,32 +1,57 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A032C698;
-	Thu,  4 Jan 2024 21:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32012C850;
+	Thu,  4 Jan 2024 21:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ty799Qn8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=p5F8u3xrKU8ESZxmcg8jQ8IAjNp1yE/fjU1J5AXQvGQ=; b=ty799Qn8Fd+rytCk14M0ZVq25I
-	YiBoR7XxLbFmlNS85l+O0gooTrHaDk5fhLePvNU0dGp4e1aMmTnss9STQyHl1VejW4/57v7YeIMBT
-	ZP9rfvynFQ/IN6FqUpfPmxtyPBqFFxwyJMh/iOFqQYxJdTTEz1eSljsz03RUgd9NPFc9D695RfHwk
-	+08zzTszFt8/e9TS1tjVeg0a9Dg7clSrdazeYNx0BSMUnh50XbIuN4hkn2wwogAacauBJO2ucG1rP
-	JnlzoMgHsQUMwe3gYgnlXHjcmHCDNYpPswNwzduYNn/s2OLszGXp84YD0ABSGA9UbbP+tu1yvCFeQ
-	WLAfi1sQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rLV5Y-00G1t1-Vo; Thu, 04 Jan 2024 21:17:17 +0000
-Date: Thu, 4 Jan 2024 21:17:16 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
-Message-ID: <ZZcgXI46AinlcBDP@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbdfzHOn"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6d98ce84e18so699872b3a.3;
+        Thu, 04 Jan 2024 13:57:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704405472; x=1705010272; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=egHS+o8XmTRrz6Xl0CS5lT3RaLGscP5yKRKwuMkxu20=;
+        b=HbdfzHOnhF0SMEdkzTVBeEXZYBShqGFA2EvcJsHC5I2GBP8NOoEmw7LMqh5J2Tm7sN
+         bFq4nAnj1954lAd3RBLpaGr0SkoEGd6vJ+C60iubG4y7Dy6B+vDeX0IjxtnNRbafzxaT
+         42e2O2k8hhnIY5TVwfUSwqg7p7aTgbevlNLny9JHfYBm52PZJE9rSW7jiU42IBpcPMqU
+         TiFImo0u6LJJwIabpvQ3MFQ2LNjLin2JcUJLnbCf7So1XbuEc9miHE+J36to5qLeMmop
+         KOrVIwtsdANdLx4dZDlrA+3KGJr8OH1fd22bu+4v8Pvh5928f061OZJuKJowXWhogbhi
+         4stA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704405472; x=1705010272;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=egHS+o8XmTRrz6Xl0CS5lT3RaLGscP5yKRKwuMkxu20=;
+        b=UCysPV11bhEiUTREuHNKPOqlqdFdzGR/FBApNsozduwF53u3TFJCArkgHO9rEYcwbY
+         f0frQE45cPkIF+yDALSxbGru15gcdLVRTlnTwnidD9h3jFk6eft1APfaAopf373ayoHV
+         5kv++4AezIZMLhF9lNyOgP89lQnMg4Zlqqu83NTljPQtOgwdSyxTs5o7RsGDtpeGkljv
+         dGA+21S6OV/eEjwjwe/msN5WZ36Aj/abkGF8gMYzPG6QWAuswZk41nIpLq7KpNxJFjTI
+         qN+YYwOLPb/GLNXAqkyK1M3PXDg7VHXsRPVYUVeznIfiKjvvxcFYqcvUwonJeVF4m/IY
+         rv+Q==
+X-Gm-Message-State: AOJu0YxEbJlfDsFougeV/sRTn7HEbnut7OHo0ZjiexFboWW0h28NvUl/
+	OrtuXuqbQbPw35yMG0mPfYc=
+X-Google-Smtp-Source: AGHT+IFjNZNufWHFTZQUVgsfqz2Mj/lvykqlgUgeQzS16YBpxT0iO7eliCi/lNUAkH396cD4SlGf3w==
+X-Received: by 2002:a05:6a00:1949:b0:6da:e0a:9b19 with SMTP id s9-20020a056a00194900b006da0e0a9b19mr1332223pfk.63.1704405472083;
+        Thu, 04 Jan 2024 13:57:52 -0800 (PST)
+Received: from localhost (dhcp-72-253-202-210.hawaiiantel.net. [72.253.202.210])
+        by smtp.gmail.com with ESMTPSA id y14-20020aa79e0e000000b006da04f1b884sm128318pfq.105.2024.01.04.13.57.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jan 2024 13:57:51 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Thu, 4 Jan 2024 11:57:50 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Daniel Vacek <neelx@redhat.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-cgroup: clean up after commit f1c006f1c685
+Message-ID: <ZZcp3nKecqfxxH4Z@mtj.duckdns.org>
+References: <20240104180031.148148-1-neelx@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,47 +60,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240104180031.148148-1-neelx@redhat.com>
 
-This is primarily a _FILESYSTEM_ track topic.  All the work has already
-been done on the MM side; the FS people need to do their part.  It could
-be a joint session, but I'm not sure there's much for the MM people
-to say.
+On Thu, Jan 04, 2024 at 07:00:30PM +0100, Daniel Vacek wrote:
+> Commit f1c006f1c685 moved deletion of the list blkg->q_node
+> from blkg_destroy() to blkg_free_workfn(). Clean up the now
+> useless variable.
+> 
+> Signed-off-by: Daniel Vacek <neelx@redhat.com>
 
-There are situations where we need to allocate memory, but cannot call
-into the filesystem to free memory.  Generally this is because we're
-holding a lock or we've started a transaction, and attempting to write
-out dirty folios to reclaim memory would result in a deadlock.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-The old way to solve this problem is to specify GFP_NOFS when allocating
-memory.  This conveys little information about what is being protected
-against, and so it is hard to know when it might be safe to remove.
-It's also a reflex -- many filesystem authors use GFP_NOFS by default
-even when they could use GFP_KERNEL because there's no risk of deadlock.
+Thanks.
 
-The new way is to use the scoped APIs -- memalloc_nofs_save() and
-memalloc_nofs_restore().  These should be called when we start a
-transaction or take a lock that would cause a GFP_KERNEL allocation to
-deadlock.  Then just use GFP_KERNEL as normal.  The memory allocators
-can see the nofs situation is in effect and will not call back into
-the filesystem.
-
-This results in better code within your filesystem as you don't need to
-pass around gfp flags as much, and can lead to better performance from
-the memory allocators as GFP_NOFS will not be used unnecessarily.
-
-The memalloc_nofs APIs were introduced in May 2017, but we still have
-over 1000 uses of GFP_NOFS in fs/ today (and 200 outside fs/, which is
-really sad).  This session is for filesystem developers to talk about
-what they need to do to fix up their own filesystem, or share stories
-about how they made their filesystem better by adopting the new APIs.
-
-My interest in this is that I'd like to get rid of the FGP_NOFS flag.
-It'd also be good to get rid of the __GFP_FS flag since there's always
-demand for more GFP flags.  I have a git branch with some work in this
-area, so there's a certain amount of conference-driven development going
-on here too.
-
-We could mutatis mutandi for GFP_NOIO, memalloc_noio_save/restore,
-__GFP_IO, etc, so maybe the block people are also interested.  I haven't
-looked into that in any detail though.  I guess we'll see what interest
-this topic gains.
+-- 
+tejun
