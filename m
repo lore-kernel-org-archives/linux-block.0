@@ -1,84 +1,81 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5240C28DBA
-	for <linux-block@vger.kernel.org>; Thu,  4 Jan 2024 18:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A032C698;
+	Thu,  4 Jan 2024 21:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HhV5+oLb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704391243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eu5YlIQJDTB29F9zBZ6QeUpQq4Hsfh0LpNOdwuB2ABY=;
-	b=HhV5+oLbl0j4JuQEoioxCW8CQV08LR9oEMWgmmWssjc2fSPgSwk1ZMSjUDi7ApzLu1nQEo
-	RmiRLhZCWj4+vgZTOWPRfLSlMSY+Ye1ODVQMrdCrNtq8WccgSv2UkiJm8yCNuTybJlnlaf
-	7IEHqYrT4EsFkD1InV06TvciLnU5lCQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-dDr8HvIjMzSUfG-Lahkm_w-1; Thu,
- 04 Jan 2024 13:00:38 -0500
-X-MC-Unique: dDr8HvIjMzSUfG-Lahkm_w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E32323806739;
-	Thu,  4 Jan 2024 18:00:37 +0000 (UTC)
-Received: from metal.redhat.com (unknown [10.45.224.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5E0661121306;
-	Thu,  4 Jan 2024 18:00:36 +0000 (UTC)
-From: Daniel Vacek <neelx@redhat.com>
-To: Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Daniel Vacek <neelx@redhat.com>,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-cgroup: clean up after commit f1c006f1c685
-Date: Thu,  4 Jan 2024 19:00:30 +0100
-Message-ID: <20240104180031.148148-1-neelx@redhat.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ty799Qn8"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=p5F8u3xrKU8ESZxmcg8jQ8IAjNp1yE/fjU1J5AXQvGQ=; b=ty799Qn8Fd+rytCk14M0ZVq25I
+	YiBoR7XxLbFmlNS85l+O0gooTrHaDk5fhLePvNU0dGp4e1aMmTnss9STQyHl1VejW4/57v7YeIMBT
+	ZP9rfvynFQ/IN6FqUpfPmxtyPBqFFxwyJMh/iOFqQYxJdTTEz1eSljsz03RUgd9NPFc9D695RfHwk
+	+08zzTszFt8/e9TS1tjVeg0a9Dg7clSrdazeYNx0BSMUnh50XbIuN4hkn2wwogAacauBJO2ucG1rP
+	JnlzoMgHsQUMwe3gYgnlXHjcmHCDNYpPswNwzduYNn/s2OLszGXp84YD0ABSGA9UbbP+tu1yvCFeQ
+	WLAfi1sQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1rLV5Y-00G1t1-Vo; Thu, 04 Jan 2024 21:17:17 +0000
+Date: Thu, 4 Jan 2024 21:17:16 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: lsf-pc@lists.linux-foundation.org
+Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
+Message-ID: <ZZcgXI46AinlcBDP@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Commit f1c006f1c685 moved deletion of the list blkg->q_node
-from blkg_destroy() to blkg_free_workfn(). Clean up the now
-useless variable.
+This is primarily a _FILESYSTEM_ track topic.  All the work has already
+been done on the MM side; the FS people need to do their part.  It could
+be a joint session, but I'm not sure there's much for the MM people
+to say.
 
-Signed-off-by: Daniel Vacek <neelx@redhat.com>
----
- block/blk-cgroup.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+There are situations where we need to allocate memory, but cannot call
+into the filesystem to free memory.  Generally this is because we're
+holding a lock or we've started a transaction, and attempting to write
+out dirty folios to reclaim memory would result in a deadlock.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 4b48c2c440981..2f39bd7cb6db5 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -575,13 +575,13 @@ static void blkg_destroy(struct blkcg_gq *blkg)
- static void blkg_destroy_all(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
--	struct blkcg_gq *blkg, *n;
-+	struct blkcg_gq *blkg;
- 	int count = BLKG_DESTROY_BATCH_SIZE;
- 	int i;
- 
- restart:
- 	spin_lock_irq(&q->queue_lock);
--	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
-+	list_for_each_entry(blkg, &q->blkg_list, q_node) {
- 		struct blkcg *blkcg = blkg->blkcg;
- 
- 		if (hlist_unhashed(&blkg->blkcg_node))
--- 
-2.43.0
+The old way to solve this problem is to specify GFP_NOFS when allocating
+memory.  This conveys little information about what is being protected
+against, and so it is hard to know when it might be safe to remove.
+It's also a reflex -- many filesystem authors use GFP_NOFS by default
+even when they could use GFP_KERNEL because there's no risk of deadlock.
 
+The new way is to use the scoped APIs -- memalloc_nofs_save() and
+memalloc_nofs_restore().  These should be called when we start a
+transaction or take a lock that would cause a GFP_KERNEL allocation to
+deadlock.  Then just use GFP_KERNEL as normal.  The memory allocators
+can see the nofs situation is in effect and will not call back into
+the filesystem.
+
+This results in better code within your filesystem as you don't need to
+pass around gfp flags as much, and can lead to better performance from
+the memory allocators as GFP_NOFS will not be used unnecessarily.
+
+The memalloc_nofs APIs were introduced in May 2017, but we still have
+over 1000 uses of GFP_NOFS in fs/ today (and 200 outside fs/, which is
+really sad).  This session is for filesystem developers to talk about
+what they need to do to fix up their own filesystem, or share stories
+about how they made their filesystem better by adopting the new APIs.
+
+My interest in this is that I'd like to get rid of the FGP_NOFS flag.
+It'd also be good to get rid of the __GFP_FS flag since there's always
+demand for more GFP flags.  I have a git branch with some work in this
+area, so there's a certain amount of conference-driven development going
+on here too.
+
+We could mutatis mutandi for GFP_NOIO, memalloc_noio_save/restore,
+__GFP_IO, etc, so maybe the block people are also interested.  I haven't
+looked into that in any detail though.  I guess we'll see what interest
+this topic gains.
