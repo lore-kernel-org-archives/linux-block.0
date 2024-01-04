@@ -1,57 +1,55 @@
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CD92D025
-	for <linux-block@vger.kernel.org>; Thu,  4 Jan 2024 23:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3392D05E
+	for <linux-block@vger.kernel.org>; Thu,  4 Jan 2024 23:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="s4rGAajc"
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5cdf90e5cdeso195885a12.1
-        for <linux-block@vger.kernel.org>; Thu, 04 Jan 2024 15:10:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mEC5prSz"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so164962a12.0
+        for <linux-block@vger.kernel.org>; Thu, 04 Jan 2024 15:10:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704409854; x=1705014654; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704409856; x=1705014656; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FtWKzPW+VggNnhjhkGvk6PwM7eD4b5VfXbjsvAZRsdg=;
-        b=s4rGAajcagvdXTON4ibcIgMX5X4+HrGDFzDU7jr6tbabSPoI2Y4gU9qScJW079OaT+
-         DQegsilY6JcWxrgiAC3fK65hPrDtRZYBMvalGiB1bRhiS10k3jbHne4qFP7/OBopYy3j
-         cCrPEPCvWofbhqxGQWW7eGqphbpnbu0154m+ClbdJH2+mhDNIWy22n0K6L9grF0MJHa3
-         6cJL93mzELrlmtUJ2Ht8wdmkkAOn+6OUhyufBN9/+3YIwslyOrTmEnOlVqEKukFpqpDG
-         eCp+nAPiUwtKgmCleR72xNpKOVN4N88XviFvhpw3miS3T0qEip13NXQ5O8mjjbCx5W7g
-         bUOQ==
+        bh=CV9sBgewrM1essYp9cr5t+TDKLcXvUh196SO4iTd4XM=;
+        b=mEC5prSzEcwcUxUrAkZ6slUIrYbVLr1YDQtU6iAiBxjSAcwDzaJ3ygOvOlcvgdhbs3
+         o6UfRt7saqTfhpxsLsjo3Mupy4e+BeqtKMq1el86A0HzTyVqgO7NEksSJUhuGw8TPwpx
+         LzBJnPsJ6uU94DjfyaAaQ6x21BpbYgvJhMuueFnxYCWUxDybpbWpEi5RO1OgoDWjBJ64
+         h0MVne6bT33v3QqRlvF/hdA3jC6wsdSAn6rW9iYDUdsSlUqqlDSXmHoQXmlV5E3hHhN8
+         us1v4uSRC0ERkqeeveUT8IRGYobAWdxyUKmPRgnXj8arMQPHeUINOtV+AGY0B9MFIqBa
+         93PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704409854; x=1705014654;
+        d=1e100.net; s=20230601; t=1704409856; x=1705014656;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FtWKzPW+VggNnhjhkGvk6PwM7eD4b5VfXbjsvAZRsdg=;
-        b=vg21FsLLyDWOIy6alBn7qzHg3hrHaj6scTTekCi2QVrpX65wHrsD10rRoWVzWhmVPG
-         1G/MB45/DHDbw85sgIZXfRkuG9nDSq/t/7k5KJSyHiudhAmcWiwXlGoyPKU35syl2UrE
-         clcfqqKWSMy48AJgNikke3d1fJ07QWchqO5+0fZcZoJGUSkIzZDzja77Qx/38DffiwJ3
-         s/izlZ6YJQM/otb19vep7NxhFPDXo5BAYO0pt8daaz4q604RcvnjzuqxwcHVZk5pjXKd
-         z6xkO9t99/4g2YPfUy+KaumBYDLCZHVMsSwDLnCqY606bB+aIizirO7F3QxzrlTz+k8Z
-         k36A==
-X-Gm-Message-State: AOJu0Yx5h81J24NeewULOODWpYHpEhfiBrZQoUEYAxBEV1sqbyGSapfV
-	azZ+waRmzicWCfNT3QNbnJNqiUt23VEGOQ==
-X-Google-Smtp-Source: AGHT+IGU1glSIcKnbi9+C3kDPTLq7P1ixYqypmQFGI+x4/dzZR5aGRIoxmn66PhikKYpDvkjio+XDg==
-X-Received: by 2002:a05:6a21:339d:b0:197:1c10:aa3 with SMTP id yy29-20020a056a21339d00b001971c100aa3mr2816239pzb.2.1704409853904;
-        Thu, 04 Jan 2024 15:10:53 -0800 (PST)
+        bh=CV9sBgewrM1essYp9cr5t+TDKLcXvUh196SO4iTd4XM=;
+        b=jJ3HPqKJ4A/HgxiqwVTbJcIbcBuvE78UK8rH3nH3JWVEFSi6uXXIrkv9AUyOlI5nQL
+         zZtIt6a30FYxECWphBwJ0PUyYD2ONs0EmIeF5OJVfhYs58B9NdLh9yEJna14SOJjBgGO
+         hdEX/iMCs/reCVaUP2liYr18JAoxCsHF20PxP5pmEVM7XF1p7YVR4nwIzezBSa1jJWIh
+         PlzBq+8vwCYn8xQfH70Faxm/E88Fj0ywVwI5x36GtP5SP2A2oszhoeLxyLnvDWHppGeV
+         PEps+8+lgogF6g+Uhoy0QwfpULtg/c5v4GLlc0RvSu5FsTl1/41cF4RnKnjerxPyNUX/
+         zGbA==
+X-Gm-Message-State: AOJu0YwUHNmG/1NhQLDHePfMVcSIUMslr35qnUjm+3unkqdj6Z6wWQto
+	46SDYxifFO64NDGAcY1RGIZ/tyNE2mF32Q==
+X-Google-Smtp-Source: AGHT+IGSlyuRXt2WyHS0bl5EMx9PV2pHPItk7wvVG+81gZ87DGoNE5KH2fl4t7vkCBg9Z8YNX9eeaQ==
+X-Received: by 2002:a05:6a00:3a14:b0:6d9:383b:d91a with SMTP id fj20-20020a056a003a1400b006d9383bd91amr2570809pfb.1.1704409855663;
+        Thu, 04 Jan 2024 15:10:55 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id lo2-20020a056a003d0200b006d9bdc0f765sm179484pfb.53.2024.01.04.15.10.52
+        by smtp.gmail.com with ESMTPSA id lo2-20020a056a003d0200b006d9bdc0f765sm179484pfb.53.2024.01.04.15.10.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 15:10:53 -0800 (PST)
+        Thu, 04 Jan 2024 15:10:54 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
- Daniel Vacek <neelx@redhat.com>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20240104180031.148148-1-neelx@redhat.com>
-References: <20240104180031.148148-1-neelx@redhat.com>
-Subject: Re: [PATCH] blk-cgroup: clean up after commit f1c006f1c685
-Message-Id: <170440985277.724469.7162918731895817738.b4-ty@kernel.dk>
-Date: Thu, 04 Jan 2024 16:10:52 -0700
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
+In-Reply-To: <20231219012833.2129540-1-ming.lei@redhat.com>
+References: <20231219012833.2129540-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] blk-cgroup: fix rcu lockdep warning in blkg_lookup()
+Message-Id: <170440985407.724469.13796728189031441181.b4-ty@kernel.dk>
+Date: Thu, 04 Jan 2024 16:10:54 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,17 +61,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.13-dev-f0463
 
 
-On Thu, 04 Jan 2024 19:00:30 +0100, Daniel Vacek wrote:
-> Commit f1c006f1c685 moved deletion of the list blkg->q_node
-> from blkg_destroy() to blkg_free_workfn(). Clean up the now
-> useless variable.
+On Tue, 19 Dec 2023 09:28:33 +0800, Ming Lei wrote:
+> blkg_lookup() is called with either queue_lock or rcu read lock, so
+> use rcu_dereference_check(lockdep_is_held(&q->queue_lock)) for
+> retrieving 'blkg', which way models the check exactly for covering
+> queue lock or rcu read lock.
 > 
+> Fix lockdep warning of "block/blk-cgroup.h:254 suspicious rcu_dereference_check() usage!"
+> from blkg_lookup().
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] blk-cgroup: clean up after commit f1c006f1c685
-      commit: fab4c16c527e24c804efa4992b3cf40438c9b227
+[1/1] blk-cgroup: fix rcu lockdep warning in blkg_lookup()
+      commit: 393cd8ffd832f23eec3a105553eff622e8198918
 
 Best regards,
 -- 
