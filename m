@@ -1,85 +1,78 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E3A2C850
-	for <linux-block@vger.kernel.org>; Thu,  4 Jan 2024 22:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D002D041
+	for <linux-block@vger.kernel.org>; Thu,  4 Jan 2024 23:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EjWK8FCD"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6da4a923b1bso680533b3a.2
-        for <linux-block@vger.kernel.org>; Thu, 04 Jan 2024 14:04:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dXzU8xE1"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7bb5be6742fso13969639f.1
+        for <linux-block@vger.kernel.org>; Thu, 04 Jan 2024 15:06:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704405882; x=1705010682; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704409608; x=1705014408; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZIh3Z66IIGfEBP4Az5+AV2rLKwPcu328Lc09vd7c9xw=;
-        b=EjWK8FCDIa8T+mk/75X7LCz5dzyFmNLRlh1dk2AzFCtCGW4+tKkL/0XhA0sMRByagu
-         3Se9hyYM5WLEdHs7S6AMQYgyg4JXrGioVr5A/3tA5cZcw77KQP19N5VqCUjzlrdif2Hq
-         AvNzQjiTWPkQ9MryNsf7rob9pdN2P0lsAc4rXUuVKTmtzLaERJQO9fzClhJlp44u78ov
-         p2TwxndeXTq3II12O4r2lmF9EbL8qhoR77Ea3aQzqv6zLX/So+tMJNUnofxD/NNncBlJ
-         V4EMFDdpUYUIk3zgYQfgWYfp0lCgAj5kCFWyepCO6ZMimgDuRew5b0xB3N/Db+eBtkU8
-         yPJA==
+        bh=b3dqk0Ff5KxkGnHBKa5j/udiyY23Ohwl6jdUCl4DaB4=;
+        b=dXzU8xE1lqQl2K7qBNp3a3sUpSqmuTJxjsd4bnp3v497vyejefnaPCwiohBtsBc/0f
+         FKWeuorH/FAvl5raJJYxDNmer4qPEFy2AV6asWQm+8kSLhQd6WXxCsw8tDboeKaHz7jT
+         A0p2zzkqyZW3j5Dktq5cHhtZ0nrEpOe1cGZDtaAUsqffDykLlILtJ5a4WOr3AKvvdiId
+         dBx1NWOhTFBO6WHzD4rJlDEKdKNhWWTEsnbQWKKYrYd5XjTmhREOmqo/kHaZsJCw13OB
+         pmDkJubfmaPu+BMU32t7bz4J3XdVTp1F0DBRe6g6GFU6QmJqDuWphshDVGmNuZ+Yurbk
+         gzrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704405882; x=1705010682;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
+        d=1e100.net; s=20230601; t=1704409608; x=1705014408;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZIh3Z66IIGfEBP4Az5+AV2rLKwPcu328Lc09vd7c9xw=;
-        b=KowMV8Plcfu4KJ7DiltIA6c5kYGVdsMD2vLJiiVatgwRpepVMTK1GwW1CnMoyqYmof
-         +9MyBbBYwHiZwY8/OSXjeJGJEp6qzR3jtXE7wxbJt7EW3XyVj5cs1cjtW4Mzw/oVGiNw
-         T4puvkRk4cE7D48RQrd+DcnY5nqyhcpbibnFViIZcQqaA8vpP6770AmKqYq2ReBU2bNd
-         K+GzFTOVkkUTHt2TPIZNZ4poHtRFlpn6cxM80x1FfiJrcVzqTy82wZDqXiC68QK6iPuL
-         r5qpxGcGVkGrRllArP1xFgJW/HfHmdJeFLdoZtIZxc5vihaOotd/pIp6iLChgd8OXpui
-         tFpQ==
-X-Gm-Message-State: AOJu0YyTygJjtC1e5mEbSs/l3RBwj6QK9MY1CNqIj9iFdw0+ucCQXYM3
-	CTa2HvbSrUWnpmM9DxwjGkuHlyrsfcM=
-X-Google-Smtp-Source: AGHT+IFzJr41XrgJOxPcE6Hg9hW7uRqo7wPS97MJGtR9RzF+Dk94BmWzwKhwIGlbfFo5tH7dprncTA==
-X-Received: by 2002:a05:6a00:396:b0:6da:491f:152 with SMTP id y22-20020a056a00039600b006da491f0152mr900292pfs.1.1704405881673;
-        Thu, 04 Jan 2024 14:04:41 -0800 (PST)
-Received: from localhost (dhcp-72-253-202-210.hawaiiantel.net. [72.253.202.210])
-        by smtp.gmail.com with ESMTPSA id p9-20020a056a000b4900b006d9b35b2602sm137392pfo.3.2024.01.04.14.04.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 14:04:41 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 4 Jan 2024 12:04:39 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH] blk-cgroup: fix rcu lockdep warning in blkg_lookup()
-Message-ID: <ZZcrd1SdTj2CTqIq@mtj.duckdns.org>
-References: <20231219012833.2129540-1-ming.lei@redhat.com>
- <CAFj5m9KQ=cvODNGP_vcqtRT=EzbncUqe_vHbqUPsvYEu6d_PZw@mail.gmail.com>
+        bh=b3dqk0Ff5KxkGnHBKa5j/udiyY23Ohwl6jdUCl4DaB4=;
+        b=WJAHZ6hAskQuWrOBaiYGZRyGJDOgFX4zQU9dUq1MnX1xvhI0/+xSBYp4BF90//ABao
+         PHIZxqCSmhWrrVvWqljsiomwD+t/iyqLRAKwg8x2uYbs8tdXchJfw7wTkH/xaAaWfVZk
+         w7KoA/iqeGC3JXvk6u8P6FIuc3gty/7x9RYuEo6CfMv2yxUHcdDL7LCG1jEleJOvhH0b
+         6cUeeCdIipFiA9onnvTgVkBSJTXz2cFChNSOLrwUJg4VkttDUnY/1oXHhssXqjS7bFLE
+         HKRKmbF6Qmi0jWLLU8i6L8b1+Vd1YaEHKpw90U95Lq3tbE3jc3PAJMyVHQUKCQfle6fi
+         jeag==
+X-Gm-Message-State: AOJu0YxzFebHb+Ha4TEtbFr6tNqhKo0hikIO5szaOTFHTu0OOpMGxqTv
+	fTbMnY26mtK0Pu1zjfIGQ6fhDciBaTjM4A==
+X-Google-Smtp-Source: AGHT+IGgccmdncGNoX+25kh9DYA4Gbp7Q5ZjvFowunHoL6hvtLSnc3FlWD4tNyBMo/lEb+prYIa2fA==
+X-Received: by 2002:a92:c56a:0:b0:35f:b1d8:433f with SMTP id b10-20020a92c56a000000b0035fb1d8433fmr2502382ilj.3.1704409608642;
+        Thu, 04 Jan 2024 15:06:48 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id b1-20020a63eb41000000b005aa800c149bsm199646pgk.39.2024.01.04.15.06.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jan 2024 15:06:47 -0800 (PST)
+Message-ID: <3de0c147-0a6e-47ad-90dd-cc624da6200b@kernel.dk>
+Date: Thu, 4 Jan 2024 16:06:46 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFj5m9KQ=cvODNGP_vcqtRT=EzbncUqe_vHbqUPsvYEu6d_PZw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-cgroup: clean up after commit f1c006f1c685
+Content-Language: en-US
+To: Daniel Vacek <neelx@redhat.com>, Tejun Heo <tj@kernel.org>,
+ Josef Bacik <josef@toxicpanda.com>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240104180031.148148-1-neelx@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240104180031.148148-1-neelx@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 02, 2024 at 03:38:10PM +0800, Ming Lei wrote:
-> On Tue, Dec 19, 2023 at 9:28 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > blkg_lookup() is called with either queue_lock or rcu read lock, so
-> > use rcu_dereference_check(lockdep_is_held(&q->queue_lock)) for
-> > retrieving 'blkg', which way models the check exactly for covering
-> > queue lock or rcu read lock.
-> >
-> > Fix lockdep warning of "block/blk-cgroup.h:254 suspicious rcu_dereference_check() usage!"
-> > from blkg_lookup().
-> >
-> > Tested-by: Changhui Zhong <czhong@redhat.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On 1/4/24 11:00 AM, Daniel Vacek wrote:
+> Commit f1c006f1c685 moved deletion of the list blkg->q_node
+> from blkg_destroy() to blkg_free_workfn(). Clean up the now
+> useless variable.
 
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
+I'll fix up your commit this time, but please take a look at
+your title and tell me if you think it's a good one? Not
+very descriptive, is it.
 
 -- 
-tejun
+Jens Axboe
+
+
