@@ -1,128 +1,122 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6390B24B51
-	for <linux-block@vger.kernel.org>; Fri,  5 Jan 2024 10:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="zxslvjPl"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ccec119587so16889111fa.0
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2024 02:13:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1704449597; x=1705054397; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pb8qWmhccm9eam1IG6/mzCzwkOR/9EGblOaiwee7lpg=;
-        b=zxslvjPlfpEGbydppSZROS4yK9PFl/WyX0EkqitzSpEcuqQb8fYGxbXasU+SmJn1pu
-         0rPIL9a/hYppQy3+SCQxYBeiVGlAc3JL1eedwa67OMwVfBMaVIy3o3uKsgEgGeEP8kJZ
-         kDn2XrRhEN2+Eivt+R0/pv4yd14Nd+zm0VYzJ+azJfd5mihiXZd39vQIswvudDwVnOJx
-         EsFuAaKGE7JOBYkQFdkSHqF2xzf/nbrccglUuZSt7MJZ6bigKmsDSgBIign0NlmGiquB
-         ywd+7flGkHvnkBNzwbiGNmVhsMywddOpoSzOjIwikHTTf7CbonOyKzB3Er+rJ8DWZVWL
-         G6nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704449597; x=1705054397;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pb8qWmhccm9eam1IG6/mzCzwkOR/9EGblOaiwee7lpg=;
-        b=cad2b4ntFofGA6mf70KXb1QizT3eBH8pchxszN13zK8WurFwTDJLOg/PvDfC6VLA8Z
-         IJ5Px/EGLYLlQSgHwZ+GQ0Dly2cYorefqWHG4ZFRBp8nfWZMpnSqzp9ke2ZeWa2bfiKN
-         a4JcpwW5KyZpkIGmS80EDp9HLsGmMmIp+t1VDnHgt8vBpiWpwsBzCVX7IIpIN9p6XKTO
-         z3Kxej0+XTq7fMDscHGxgqoTdgIlbc1cofN/UoBnfdUcYoFYo75pWWmfC7cI8c2z+HM3
-         iY5jrk765eS2EpV0vKLTm0KYLTxBAeMoNGtOq0Zgx7w7KpHJxT2iINernh8UdR0mjAH1
-         Y9Hw==
-X-Gm-Message-State: AOJu0Yzu0uq9u7pLMZrTrQVpgszq/ZmM53RhN+wusgWFN+6F+9YB5kJf
-	YguV8xAsRmA5C1UcXD3Fr5r+SoXD6mWDzg==
-X-Google-Smtp-Source: AGHT+IERFwtvcyoPP3L+QB9SFl8+7lNrV2k0KLfbM/7+3R7xK9hX+EDB4G+sBp41ebG01fKH0Phabg==
-X-Received: by 2002:a2e:be93:0:b0:2cd:1d5d:322e with SMTP id a19-20020a2ebe93000000b002cd1d5d322emr1306524ljr.10.1704449597179;
-        Fri, 05 Jan 2024 02:13:17 -0800 (PST)
-Received: from smtpclient.apple ([2a00:1370:81a4:169c:3983:bdeb:5f19:e2e9])
-        by smtp.gmail.com with ESMTPSA id n23-20020a2e82d7000000b002ccb9f5ffcasm262090ljh.93.2024.01.05.02.13.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jan 2024 02:13:16 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8D82C69D;
+	Fri,  5 Jan 2024 10:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4T5zmt5sT4z4f3jpr;
+	Fri,  5 Jan 2024 18:13:18 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 9DEFE1A0AD2;
+	Fri,  5 Jan 2024 18:13:20 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDXJg0_1pdliqpcFg--.48265S3;
+	Fri, 05 Jan 2024 18:13:20 +0800 (CST)
+Subject: Re: [PATCH for-6.8/block RFC v2] block: support to account io_ticks
+ precisely
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240103071515.2477311-1-yukuai1@huaweicloud.com>
+ <ZZduPrwMrwOLQiU7@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <0a7aa14b-2ceb-2551-3600-cac7f9370360@huaweicloud.com>
+Date: Fri, 5 Jan 2024 18:13:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.4\))
-Subject: Re: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-In-Reply-To: <ZZcgXI46AinlcBDP@casper.infradead.org>
-Date: Fri, 5 Jan 2024 13:13:11 +0300
-Cc: lsf-pc@lists.linux-foundation.org,
- Linux FS Devel <linux-fsdevel@vger.kernel.org>,
- linux-mm@kvack.org,
- linux-block@vger.kernel.org,
- linux-ide@vger.kernel.org,
- linux-scsi@vger.kernel.org,
- linux-nvme@lists.infradead.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <2EEB5F76-1D68-4B17-82B6-4A459D91E4BF@dubeyko.com>
-References: <ZZcgXI46AinlcBDP@casper.infradead.org>
-To: Matthew Wilcox <willy@infradead.org>
-X-Mailer: Apple Mail (2.3696.120.41.1.4)
+MIME-Version: 1.0
+In-Reply-To: <ZZduPrwMrwOLQiU7@fedora>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDXJg0_1pdliqpcFg--.48265S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFyDJry7GF4kur1UuF1Dtrb_yoW8uFWkpF
+	Wjk3WDKw1kXr18CF4DA3WxGas2grZ5Cw45Zr4fGry7Zr1jqrWfAr4xtrWF9F92vFs7Aw1I
+	93W8uF4DAw1UZrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
+	nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi, Ming!
 
+ÔÚ 2024/01/05 10:49, Ming Lei Ð´µÀ:
+> On Wed, Jan 03, 2024 at 03:15:15PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Currently, io_ticks is accounted based on sampling, specifically
+>> update_io_ticks() will always account io_ticks by 1 jiffies from
+>> bdev_start_io_acct()/blk_account_io_start(), and the result can be
+>> inaccurate, for example(HZ is 250):
+>>
+>> Test script:
+>> fio -filename=/dev/sda -bs=4k -rw=write -direct=1 -name=test -thinktime=4ms
+>>
+>> Test result: util is about 90%, while the disk is really idle.
+>>
+>> In order to account io_ticks precisely, update_io_ticks() must know if
+>> there are IO inflight already, and this requires overhead slightly,
+>> hence precise io accounting is disabled by default, and user can enable
+>> it through sysfs entry.
+>>
+>> Noted that for rq-based devcie, part_stat_local_inc/dec() and
+>> part_in_flight() is used to track inflight instead of iterating tags,
+>> which is not supposed to be used in fast path because 'tags->lock' is
+>> grabbed in blk_mq_find_and_get_req().
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>> Changes in v2:
+>>   - remove the new parameter for update_io_ticks();
+>>   - simplify update_io_ticks();
+>>   - use swith in queue_iostats_store();
+>>   - add missing part_stat_local_dec() in blk_account_io_merge_request()
+> 
+> Looks fine,
+> 
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-> On Jan 5, 2024, at 12:17 AM, Matthew Wilcox <willy@infradead.org> =
-wrote:
->=20
-> This is primarily a _FILESYSTEM_ track topic.  All the work has =
-already
-> been done on the MM side; the FS people need to do their part.  It =
-could
-> be a joint session, but I'm not sure there's much for the MM people
-> to say.
->=20
-> There are situations where we need to allocate memory, but cannot call
-> into the filesystem to free memory.  Generally this is because we're
-> holding a lock or we've started a transaction, and attempting to write
-> out dirty folios to reclaim memory would result in a deadlock.
->=20
-> The old way to solve this problem is to specify GFP_NOFS when =
-allocating
-> memory.  This conveys little information about what is being protected
-> against, and so it is hard to know when it might be safe to remove.
-> It's also a reflex -- many filesystem authors use GFP_NOFS by default
-> even when they could use GFP_KERNEL because there's no risk of =
-deadlock.
->=20
-> The new way is to use the scoped APIs -- memalloc_nofs_save() and
-> memalloc_nofs_restore().  These should be called when we start a
-> transaction or take a lock that would cause a GFP_KERNEL allocation to
-> deadlock.  Then just use GFP_KERNEL as normal.  The memory allocators
-> can see the nofs situation is in effect and will not call back into
-> the filesystem.
->=20
-> This results in better code within your filesystem as you don't need =
-to
-> pass around gfp flags as much, and can lead to better performance from
-> the memory allocators as GFP_NOFS will not be used unnecessarily.
->=20
-> The memalloc_nofs APIs were introduced in May 2017, but we still have
-> over 1000 uses of GFP_NOFS in fs/ today (and 200 outside fs/, which is
-> really sad).  This session is for filesystem developers to talk about
-> what they need to do to fix up their own filesystem, or share stories
-> about how they made their filesystem better by adopting the new APIs.
->=20
+Thanks for the review, however, I made a mistake while "simplify
+update_io_ticks()" that first IO will still account by 1 jiffies even if
+precise iostat is enabled:
 
-Many file systems are still heavily using GFP_NOFS for kmalloc and
-kmem_cache_alloc family methods even if  memalloc_nofs_save() and
-memalloc_nofs_restore() pair is used too. But I can see that GFP_NOFS
-is used in radix_tree_preload(), bio_alloc(), posix_acl_clone(),
-sb_issue_zeroout, sb_issue_discard(), alloc_inode_sb(), =
-blkdev_issue_zeroout(),
-blkdev_issue_secure_erase(), blkdev_zone_mgmt(), etc.
++       if (unlikely(time_after(now, stamp)) &&
++           likely(try_cmpxchg(&part->bd_stamp, &stamp, now))) {
++               if (end || (blk_queue_precise_io_stat(part->bd_queue) &&
++                           part_in_flight(part)))
++                       __part_stat_add(part, io_ticks, now - stamp);
++               else
+-> here, should be else if (!blk_queue_precise_io_stat(part->bd_queue))
++                       __part_stat_add(part, io_ticks, 1);
 
-Would it be safe to switch on =
-memalloc_nofs_save()/memalloc_nofs_restore() for
-all possible cases? Any potential issues or downsides?
+Alough this is RFC, my apologize for sending this version without fully
+test the functionally. I'll send a formal version soon.
 
 Thanks,
-Slava.
+Kuai
+
+> 
+> 
+> thanks,
+> Ming
+> 
+> .
+> 
 
