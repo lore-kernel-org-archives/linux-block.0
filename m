@@ -1,86 +1,92 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1889E2D61E
-	for <linux-block@vger.kernel.org>; Thu,  4 Jan 2024 23:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C0120E6
+	for <linux-block@vger.kernel.org>; Fri,  5 Jan 2024 02:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JdEeKHis"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d410fce119so1879135ad.1
-        for <linux-block@vger.kernel.org>; Thu, 04 Jan 2024 15:10:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704409857; x=1705014657; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KRATUcam2DsKzgw19J8wJ+c2TYQe0YbaTJEl3/WnLC0=;
-        b=JdEeKHis3xk2cQIIagub5j2RUebBdCyaF2V8zWoeYIZwzbpWGD83SFa27b9MPKbyDb
-         CA8rGjhc1KJkoG+h3cQkyyJ1aRvyR1TKfgJ33ivbs0Le1sTfOxJpjvpbehokFEB6lv65
-         gRatr80IVSslehGYSdj/n/VEVmn0z4Ar+F0H0QT8gAVZ5kXgeU4Mnx1yhJCLvLAlAcwi
-         uuKQRhbRHDEir2xfgfkmRJ6QKQ94YblE9qblFYggn7uB5eDeXOIcWjoAOQb/xO8QNazq
-         DyHHjZR444wx6dv2/KOnRIXX7rsLi5EAfvotBkAws0VgdpX6V4kgQEzsu/QQ43jmkJJ+
-         cW6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704409857; x=1705014657;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KRATUcam2DsKzgw19J8wJ+c2TYQe0YbaTJEl3/WnLC0=;
-        b=asl3N+r0B9lsGL/k7D3oQlF1D1uF+oDaa7f9ej4BbEy0QA3hhrLTN4/i26bK85SfKf
-         +7R1nqz+Ce8CqwQCRnFUK0i4qULCdWdyP+dxMbRSY6BTdTN8tDy9t+0yN4aCY0O4Xuch
-         4qBj2x+RK6ceaUPEnNWVAaKakyfSraMpyFTzGx2eqJ6I/B3V6cSyMDQAX1o9+iu/ga1g
-         XvmON0C+NkS9K7jasGWmmSdmUrW0CoMxmhSlDCmqqhu62rssfp0ni0UFWojrDipvwS/o
-         OPJCnhyofaoB6Up8pjuRWVYkA319elDzTOhGlUClbIqhbrzQZ0OgCVC6c4EQnx7xSPYh
-         jc2w==
-X-Gm-Message-State: AOJu0Yz+IF0pX5urUlBBABt4wawJBKKDvWiYdoze8yZ//3r705BWTXsm
-	r36/Gpr1yxyssioU0q2c9ls9WIzAgz0G+r8CO350WLILWX3UTA==
-X-Google-Smtp-Source: AGHT+IGorl9bAvLp72x4XJJpPTrI40bt9+r0/TDSYg4iITJ+Fvwng5Di1+1+UdUTZ+I8+TPzWx2DvQ==
-X-Received: by 2002:a05:6a20:1048:b0:196:d709:4cfc with SMTP id gt8-20020a056a20104800b00196d7094cfcmr1974527pzc.6.1704409857342;
-        Thu, 04 Jan 2024 15:10:57 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id lo2-20020a056a003d0200b006d9bdc0f765sm179484pfb.53.2024.01.04.15.10.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 15:10:56 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: jgross@suse.com, YouHong Li <liyouhong@kylinos.cn>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- k2ci <kernel-bot@kylinos.cn>
-In-Reply-To: <20231226095701.172080-1-liyouhong@kylinos.cn>
-References: <20231226095701.172080-1-liyouhong@kylinos.cn>
-Subject: Re: [PATCH v2] drivers/block/xen-blkback/common.h: Fix spelling
- typo in comment
-Message-Id: <170440985586.724469.11218716472152091154.b4-ty@kernel.dk>
-Date: Thu, 04 Jan 2024 16:10:55 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AryWWq7Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704422987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8kHYrItYGiAQsYKD5ffJYn6ZPwoCN+6n7GbgnD9P3fo=;
+	b=AryWWq7ZKRYBT53mkIG52ApbaIoEv5rTM/tCCcEoJFNzOMf/nb8Yi9B9sc1EZdvBeee7lh
+	F3ELl4lfZwglc4kkXSzfqyHRjtZTsvXDDBk/DS8Tjj8/C+LaUeCzjB6ZQNn8E29EcYQESD
+	Z0w6THbOO6a4aG3+/xhvFbxKhVFyc4s=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-_laBTFaEPmOb3xHH_6Ruxg-1; Thu, 04 Jan 2024 21:49:43 -0500
+X-MC-Unique: _laBTFaEPmOb3xHH_6Ruxg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 38F7783BA82;
+	Fri,  5 Jan 2024 02:49:43 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.136])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 992CD3C25;
+	Fri,  5 Jan 2024 02:49:38 +0000 (UTC)
+Date: Fri, 5 Jan 2024 10:49:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH for-6.8/block RFC v2] block: support to account io_ticks
+ precisely
+Message-ID: <ZZduPrwMrwOLQiU7@fedora>
+References: <20240103071515.2477311-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-f0463
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240103071515.2477311-1-yukuai1@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-
-On Tue, 26 Dec 2023 17:57:01 +0800, YouHong Li wrote:
-> Fix spelling typo in comment.
+On Wed, Jan 03, 2024 at 03:15:15PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> Reported-by: k2ci <kernel-bot@kylinos.cn>
-> Signed-off-by: liyouhong <liyouhong@kylinos.cn>
-> Reviewed-by: Juergen Gross <jgross@suse.com>
-> Link: https://lore.kernel.org/r/20231226095701.172080-1-liyouhong@kylinos.cn
+> Currently, io_ticks is accounted based on sampling, specifically
+> update_io_ticks() will always account io_ticks by 1 jiffies from
+> bdev_start_io_acct()/blk_account_io_start(), and the result can be
+> inaccurate, for example(HZ is 250):
 > 
-> [...]
+> Test script:
+> fio -filename=/dev/sda -bs=4k -rw=write -direct=1 -name=test -thinktime=4ms
+> 
+> Test result: util is about 90%, while the disk is really idle.
+> 
+> In order to account io_ticks precisely, update_io_ticks() must know if
+> there are IO inflight already, and this requires overhead slightly,
+> hence precise io accounting is disabled by default, and user can enable
+> it through sysfs entry.
+> 
+> Noted that for rq-based devcie, part_stat_local_inc/dec() and
+> part_in_flight() is used to track inflight instead of iterating tags,
+> which is not supposed to be used in fast path because 'tags->lock' is
+> grabbed in blk_mq_find_and_get_req().
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+> Changes in v2:
+>  - remove the new parameter for update_io_ticks();
+>  - simplify update_io_ticks();
+>  - use swith in queue_iostats_store();
+>  - add missing part_stat_local_dec() in blk_account_io_merge_request()
 
-Applied, thanks!
+Looks fine,
 
-[1/1] drivers/block/xen-blkback/common.h: Fix spelling typo in comment
-      commit: e3d7581cb13b3f2a415e5cd92769b7f4b7d14ed0
-
-Best regards,
--- 
-Jens Axboe
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 
+thanks,
+Ming
 
