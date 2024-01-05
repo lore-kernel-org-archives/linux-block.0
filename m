@@ -1,92 +1,84 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C0120E6
-	for <linux-block@vger.kernel.org>; Fri,  5 Jan 2024 02:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AryWWq7Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704422987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8kHYrItYGiAQsYKD5ffJYn6ZPwoCN+6n7GbgnD9P3fo=;
-	b=AryWWq7ZKRYBT53mkIG52ApbaIoEv5rTM/tCCcEoJFNzOMf/nb8Yi9B9sc1EZdvBeee7lh
-	F3ELl4lfZwglc4kkXSzfqyHRjtZTsvXDDBk/DS8Tjj8/C+LaUeCzjB6ZQNn8E29EcYQESD
-	Z0w6THbOO6a4aG3+/xhvFbxKhVFyc4s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-_laBTFaEPmOb3xHH_6Ruxg-1; Thu, 04 Jan 2024 21:49:43 -0500
-X-MC-Unique: _laBTFaEPmOb3xHH_6Ruxg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 38F7783BA82;
-	Fri,  5 Jan 2024 02:49:43 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.136])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 992CD3C25;
-	Fri,  5 Jan 2024 02:49:38 +0000 (UTC)
-Date: Fri, 5 Jan 2024 10:49:34 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH for-6.8/block RFC v2] block: support to account io_ticks
- precisely
-Message-ID: <ZZduPrwMrwOLQiU7@fedora>
-References: <20240103071515.2477311-1-yukuai1@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CAE5228;
+	Fri,  5 Jan 2024 04:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R881e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=49;SR=0;TI=SMTPD_---0VzzUQHt_1704429833;
+Received: from 30.222.33.160(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0VzzUQHt_1704429833)
+          by smtp.aliyun-inc.com;
+          Fri, 05 Jan 2024 12:43:56 +0800
+Message-ID: <a2c7910c-4c2f-4290-a895-1c4255b2ee62@linux.alibaba.com>
+Date: Fri, 5 Jan 2024 12:43:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240103071515.2477311-1-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
-
-On Wed, Jan 03, 2024 at 03:15:15PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Currently, io_ticks is accounted based on sampling, specifically
-> update_io_ticks() will always account io_ticks by 1 jiffies from
-> bdev_start_io_acct()/blk_account_io_start(), and the result can be
-> inaccurate, for example(HZ is 250):
-> 
-> Test script:
-> fio -filename=/dev/sda -bs=4k -rw=write -direct=1 -name=test -thinktime=4ms
-> 
-> Test result: util is about 90%, while the disk is really idle.
-> 
-> In order to account io_ticks precisely, update_io_ticks() must know if
-> there are IO inflight already, and this requires overhead slightly,
-> hence precise io accounting is disabled by default, and user can enable
-> it through sysfs entry.
-> 
-> Noted that for rq-based devcie, part_stat_local_inc/dec() and
-> part_in_flight() is used to track inflight instead of iterating tags,
-> which is not supposed to be used in fast path because 'tags->lock' is
-> grabbed in blk_mq_find_and_get_req().
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
-> Changes in v2:
->  - remove the new parameter for update_io_ticks();
->  - simplify update_io_ticks();
->  - use swith in queue_iostats_store();
->  - add missing part_stat_local_dec() in blk_account_io_merge_request()
-
-Looks fine,
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 for-6.8/block 11/17] erofs: use bdev api
+To: Yu Kuai <yukuai1@huaweicloud.com>, Jan Kara <jack@suse.cz>
+Cc: axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de,
+ kent.overstreet@gmail.com, joern@lazybastard.org, miquel.raynal@bootlin.com,
+ richard@nod.at, vigneshr@ti.com, sth@linux.ibm.com, hoeppner@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ jejb@linux.ibm.com, martin.petersen@oracle.com, clm@fb.com,
+ josef@toxicpanda.com, dsterba@suse.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, nico@fluxnic.net, xiang@kernel.org, chao@kernel.org,
+ tytso@mit.edu, adilger.kernel@dilger.ca, jack@suse.com,
+ konishi.ryusuke@gmail.com, willy@infradead.org, akpm@linux-foundation.org,
+ hare@suse.de, p.raghav@samsung.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20231221085712.1766333-1-yukuai1@huaweicloud.com>
+ <20231221085826.1768395-1-yukuai1@huaweicloud.com>
+ <20240104120207.ig7tfc3mgckwkp2n@quack3>
+ <7f868579-f993-aaa1-b7d7-eccbe0b0173c@huaweicloud.com>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <7f868579-f993-aaa1-b7d7-eccbe0b0173c@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-thanks,
-Ming
 
+On 2024/1/4 20:32, Yu Kuai wrote:
+> Hi, Jan!
+> 
+> 在 2024/01/04 20:02, Jan Kara 写道:
+>> On Thu 21-12-23 16:58:26, Yu Kuai wrote:
+>>> From: Yu Kuai <yukuai3@huawei.com>
+>>>
+>>> Avoid to access bd_inode directly, prepare to remove bd_inode from
+>>> block_device.
+>>>
+>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>
+>> I'm not erofs maintainer but IMO this is quite ugly and grows erofs_buf
+>> unnecessarily. I'd rather store 'sb' pointer in erofs_buf and then do the
+>> right thing in erofs_bread() which is the only place that seems to care
+>> about the erofs_is_fscache_mode() distinction... Also blkszbits is then
+>> trivially sb->s_blocksize_bits so it would all seem much more
+>> straightforward.
+> 
+> Thanks for your suggestion, I'll follow this unless Gao Xiang has other
+> suggestions.
+
+Yes, that would be better, I'm fine with that.  Yet in the future we
+may support a seperate large dirblocksize more than block size, but
+we could revisit later.
+
+Thanks,
+Gao Xiang
+
+> 
+> Kuai
+>>
+>>                                 Honza
+>>
