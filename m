@@ -1,69 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9199312B69
-	for <linux-block@vger.kernel.org>; Sun,  7 Jan 2024 07:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NjgJX/X1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93D09C433C8;
-	Sun,  7 Jan 2024 07:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704612134;
-	bh=AczaJteAuUYqJT6WdtMvTQGegUGBq3FdlwuD0OVS0sM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NjgJX/X1PLsNZ6PqovYGqwOZSWrMmyaYkhmbLLkeP+xUnDZSe1WOT5+beD782d4ZD
-	 ZGm1VWb7YUk/CEM/gip5hSu72wMhpkNkxDO9rQJ/q9YCPJVwXaBoKxCx0tAQT9JaZJ
-	 Bf16wQQK8ACCmM3nDc77uRtg/dzYu5lP51Q2nZGTjZQrfKVWLa5nxCNxg5o660sS/x
-	 J2A7VXWzDFtKRLNdtHLTEXJ7t5uXOC7I5R5EbQ2fwKI0ChiDJ4MCKw5MYMe2koPSkR
-	 pwA9Y6lqrnzfBQu3Iw2OtA+lWcGKw233SQbrr/GVYVNuVVRD7YpRP0XdUukF46+WaN
-	 w7dqCPrtkjxRg==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] block: Treat sequential write preferred zone type as invalid
-Date: Sun,  7 Jan 2024 16:22:12 +0900
-Message-ID: <20240107072212.1071080-1-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07A112B70;
+	Sun,  7 Jan 2024 08:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1rMOpW-0004Wt-AP; Sun, 07 Jan 2024 09:48:26 +0100
+Message-ID: <9a2884bf-8ab4-4f42-8ebc-bfc92aafdfb5@leemhuis.info>
+Date: Sun, 7 Jan 2024 09:48:25 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Bug in commit aa511ff8218b ("badblocks: switch to the improved
+ badblock handling
+Content-Language: en-US, de-DE
+From: "Linux regression tracking #update (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+To: Linux kernel regressions list <regressions@lists.linux.dev>
+Cc: linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Linux regressions mailing list <regressions@lists.linux.dev>
+References: <6585d5fda5183_9f731294b9@iweiny-mobl.notmuch>
+ <3035e75a-9be0-4bc3-8d4a-6e52c207f277@leemhuis.info>
+In-Reply-To: <3035e75a-9be0-4bc3-8d4a-6e52c207f277@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1704617309;6eed9177;
+X-HE-SMSGID: 1rMOpW-0004Wt-AP
 
-With the removal of the support for host-aware zoned devices,
-blk_revalidate_zone_cb() should never see the zone type
-BLK_ZONE_TYPE_SEQWRITE_PREF (sequential write preffered zones). Treat
-this zone type as being invalid.
+On 23.12.23 09:35, Linux regression tracking #adding (Thorsten Leemhuis)
+wrote:
+> On 22.12.23 19:31, Ira Weiny wrote:
+>> Coly,
+>>
+>> Yesterday I noticed that a few of our nvdimm tests were failing.  I bisected
+>> the problem to the following commit.
+>>
+>> aa511ff8218b ("badblocks: switch to the improved badblock handling code") 
+>>
+>> Reverting this patch fixed our tests.
+>
+> #regzbot ^introduced aa511ff8218b
 
-Fixes: 7437bb73f087 ("block: remove support for the host aware zone model")
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- block/blk-zoned.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+#regzbot introduced 3ea3354cb9f0
+#regzbot fix: 146e843f6b0927
+#regzbot ignore-activity
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index c59d44ee6b23..48252d9e3b0d 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -498,7 +498,6 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
- 		set_bit(idx, args->conv_zones_bitmap);
- 		break;
- 	case BLK_ZONE_TYPE_SEQWRITE_REQ:
--	case BLK_ZONE_TYPE_SEQWRITE_PREF:
- 		if (!args->seq_zones_wlock) {
- 			args->seq_zones_wlock =
- 				blk_alloc_zone_bitmap(q->node, args->nr_zones);
-@@ -506,6 +505,7 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
- 				return -ENOMEM;
- 		}
- 		break;
-+	case BLK_ZONE_TYPE_SEQWRITE_PREF:
- 	default:
- 		pr_warn("%s: Invalid zone type 0x%x at sectors %llu\n",
- 			disk->disk_name, (int)zone->type, zone->start);
--- 
-2.43.0
-
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
