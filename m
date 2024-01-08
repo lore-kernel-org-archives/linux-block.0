@@ -1,134 +1,64 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1ACBE62;
-	Mon,  8 Jan 2024 08:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424B925750;
+	Mon,  8 Jan 2024 11:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gjtroc7V";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ZyC521+Z";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gjtroc7V";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ZyC521+Z"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B0B4D21D87;
-	Mon,  8 Jan 2024 08:48:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1704703736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qEwqV+ltyzeGoI9hWS3Jhxf5JPsR3jL/UCvFbsl3Bgo=;
-	b=gjtroc7VOXuX0doLemNGz20m7dfVck27UZVSsl6BOWG5U0Ln4+svMOQGC6hp38AojXELCl
-	LzehW+aKv8ouHdnFsi+q+igrUCMwVkRmSHwoCRxTxus30sGijpXjqPt6reTRNZ7qBcMAnS
-	tJjcAyH04HvODokVKkzqwnqbdh6pdFc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1704703736;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qEwqV+ltyzeGoI9hWS3Jhxf5JPsR3jL/UCvFbsl3Bgo=;
-	b=ZyC521+ZvVDKLx+WAq/ZO3p7Muw2JJZ0ukI7GdQMs4qzrodRdp9IB9bb/Qm/d1wlcQx2RD
-	TdUiz1RNJ6jJWxCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1704703736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qEwqV+ltyzeGoI9hWS3Jhxf5JPsR3jL/UCvFbsl3Bgo=;
-	b=gjtroc7VOXuX0doLemNGz20m7dfVck27UZVSsl6BOWG5U0Ln4+svMOQGC6hp38AojXELCl
-	LzehW+aKv8ouHdnFsi+q+igrUCMwVkRmSHwoCRxTxus30sGijpXjqPt6reTRNZ7qBcMAnS
-	tJjcAyH04HvODokVKkzqwnqbdh6pdFc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1704703736;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qEwqV+ltyzeGoI9hWS3Jhxf5JPsR3jL/UCvFbsl3Bgo=;
-	b=ZyC521+ZvVDKLx+WAq/ZO3p7Muw2JJZ0ukI7GdQMs4qzrodRdp9IB9bb/Qm/d1wlcQx2RD
-	TdUiz1RNJ6jJWxCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 698F71392C;
-	Mon,  8 Jan 2024 08:48:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WEvxFfi2m2VtBAAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 08 Jan 2024 08:48:56 +0000
-Message-ID: <61c61a9c-2543-4c27-987f-1ccfd133ca5d@suse.de>
-Date: Mon, 8 Jan 2024 09:48:56 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCg2/2lR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3506C433C9;
+	Mon,  8 Jan 2024 11:34:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704713646;
+	bh=CLnYAtBRHdjo0Zg362aLZMLin+3s39VP07FYq7cQ8k0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HCg2/2lRND+/Gv8bD3MUPHzssTJXloprgf4cms+J68fH/8pwuy2nUYxeMLVdn2/Cg
+	 4leuP7GdcrWUquF4nFR0hV12wkLlGHmHhefKHo5GcejB6ZDFKG8nYrzYMhe1LjL6Ge
+	 7FGc7aEYuBgnt+OqYip0cLSYB8IzJOarCjMOvsKcI9ydA1irB5dND3oWVOXTRNYPhm
+	 pHVKZduukyoorOGLW7qgLs3O2rjuT1Ii9W4Eszm0os4IBscjfbvBSHw5A+eiN6w/9x
+	 dkxQ3Ui8QrS7XRz2hH75sGc6Y66sDm8SdrVMKiTqGwMxP0hCzfp7x3bJDtOPraair+
+	 hqIVGHvVW0EqA==
+Date: Mon, 8 Jan 2024 12:34:02 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH RFC 01/34] bdev: open block device as files
+Message-ID: <20240108-haltmachen-fallpauschalen-67eb3941c1cd@brauner>
+References: <20240103-vfs-bdev-file-v1-0-6c8ee55fb6ef@kernel.org>
+ <20240103-vfs-bdev-file-v1-1-6c8ee55fb6ef@kernel.org>
+ <ZZuKLRpFr9pVZ2pa@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: remove disk_clear_zoned
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org
-References: <20231228075141.362560-1-hch@lst.de>
- <20231228075141.362560-3-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20231228075141.362560-3-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spamd-Result: default: False [-1.82 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-0.53)[80.54%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 RCPT_COUNT_FIVE(0.00)[6];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -1.82
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZZuKLRpFr9pVZ2pa@dread.disaster.area>
 
-On 12/28/23 08:51, Christoph Hellwig wrote:
-> disk_clear_zoned is unused now that the last warts of the host-aware
-> model support in sd are gone.
+On Mon, Jan 08, 2024 at 04:37:49PM +1100, Dave Chinner wrote:
+> On Wed, Jan 03, 2024 at 01:54:59PM +0100, Christian Brauner wrote:
+> > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> > ---
+> > diff --git a/include/linux/fs.h b/include/linux/fs.h
+> > index 8e0d77f9464e..b0a5e94e8c3a 100644
+> > --- a/include/linux/fs.h
+> > +++ b/include/linux/fs.h
+> > @@ -1227,8 +1227,8 @@ struct super_block {
+> >  #endif
+> >  	struct hlist_bl_head	s_roots;	/* alternate root dentries for NFS */
+> >  	struct list_head	s_mounts;	/* list of mounts; _not_ for fs use */
+> > -	struct block_device	*s_bdev;
+> > -	struct bdev_handle	*s_bdev_handle;
+> > +	struct block_device	*s_bdev;	/* can go away once we use an accessor for @s_f_bdev */
+> > +	struct file		*s_f_bdev;
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/blk-zoned.c      | 21 ---------------------
->   include/linux/blkdev.h |  1 -
->   2 files changed, 22 deletions(-)
+> 	struct file		*s_bdev_file;
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Because then the reader knows exactly what the object type
+> and what it refers to is when they read "sb->s_bdev_file" in the
+> code.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Ivo Totev, Andrew McDonald,
-Werner Knoblich
-
+Fair!
