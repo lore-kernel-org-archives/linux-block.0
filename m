@@ -1,122 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DBB405EA;
-	Mon,  8 Jan 2024 12:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5436A4C624
+	for <linux-block@vger.kernel.org>; Mon,  8 Jan 2024 15:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p9AfNFur"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A78DC433C7;
-	Mon,  8 Jan 2024 12:28:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704716906;
-	bh=DIRZMWKXKKAnLBsFnFzwOy/7jeFqFxs2HaaS1MGyc68=;
-	h=From:To:Cc:Subject:Date:From;
-	b=p9AfNFur0i0oRt+xSkPpYUSYN3HVcK5zIbO52U2404MlddnK59eKp5pzSwMgoZQjV
-	 iiWAkdP9hRzKDwZ+oX03pjQ2WEW4JDTQ58to4nUistaO/JC41KVEkKT3fCbZ2mE3z4
-	 EEwIX015ijGZCdzhyfJhXhbN4Rcj+HX6y/EG0uQnCouVpFrw9WbOOLP/UAMxF+IhQ3
-	 I4jmVw6NsG2nXP2TKgxJK2N3TIkY3yzGnqRNuE6k8Wie7P3xp6h46V99s1V/7Hg3gW
-	 UIghNzUIegAgYwDI7K5oCae9Q+MdacE2KkprM2PYUY92DJizNi1yr+L6GeXfe5bT47
-	 JK/G19yDNG4AQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
-	Suwan Kim <suwan.kim027@gmail.com>,
-	kernel test robot <lkp@intel.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	jasowang@redhat.com,
-	axboe@kernel.dk,
-	virtualization@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 1/5] virtio_blk: fix snprintf truncation compiler warning
-Date: Mon,  8 Jan 2024 07:28:12 -0500
-Message-ID: <20240108122823.2090312-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XstsQf/e"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7ba9356f562so19533139f.1
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2024 07:26:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704727607; x=1705332407; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jKBszmdO+GFMl2fHINscvTxwqYrGI6Zn86c3J1Yhu2w=;
+        b=XstsQf/e/AK3K3YYQ7/RdeeOce/DDT0IzrckK+djVFhSSVZ7Phzkq31wIYjUU688R0
+         sGHPuP0fOi4pGW39wjJVnhKpRZhThLXl5F1N59UL0rCGexSKVPWe5HZQx2Np6Pji4IOa
+         JcmJbq0E//OGAgBq1gd4KxF7OiHxbHfffADooPJ2iebHd6C0VAyjtElEwwbBYwrL+eca
+         m2KHhDLC7/ZN8sMkoqfASnZUDPSkyipZdlUj4SOdRJUy5s3gMqKoPLCiELFmGI8S7ibO
+         8taAT0BbLwQW+XLLxaXifRwED3IxDrG/nkj+uuiN+Kb7O4g9KoxFFXZqGpoJ+c5ZDy0s
+         hfSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704727607; x=1705332407;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jKBszmdO+GFMl2fHINscvTxwqYrGI6Zn86c3J1Yhu2w=;
+        b=i8h8K1KQN9XntLWwyCIq7nRP1N/eWo8fDPkxysajWZ/6uUgtdTrxDdjYbCRtoKleJ/
+         rvst5RcxBOcJMFnjyENiCC4q2hxEnDmpTHg3KIaMKHfgCyjc1L9IZ6Tcn187vIrGvH+E
+         aI4iQhpaUKJd/oG/6ItwNkoN2HSOVk/0P5Aw92K2NY14OH6FEpJsh+Zv/cNRrHhNR62+
+         PXCm3B3yRWqxHxEjDnV6i5YW9wVLX4PZ08HeCLJvtfBVRTF9Ph/BwAW2ngKOUyb57HUL
+         4G4jkEZpJ7Etj1HZ+o0/FlTOKxA3B5z/7ZM2KR183D6UVgd6Lq8epGMWzDn5eGX/gSFw
+         E8NA==
+X-Gm-Message-State: AOJu0Yx/SjDd1lzW/j4LeL1K2w0AzlE3mV1GY3X3g0RitoThS9UVbPR0
+	ZOKcNqkJ1KoVIbCynbduiU5HWC2Y0w8ICw==
+X-Google-Smtp-Source: AGHT+IGdW9CJgcvJ2Uthw69BnC49HL+xr8afbYNDsiCuyMlQghag6fjOJBvE4n2UC5gZBoA6TG5KjQ==
+X-Received: by 2002:a05:6602:4f42:b0:7bc:2c5:4f6a with SMTP id gm2-20020a0566024f4200b007bc02c54f6amr5641129iob.1.1704727606891;
+        Mon, 08 Jan 2024 07:26:46 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id bp15-20020a056638440f00b0046d6b3edd2asm9666jab.132.2024.01.08.07.26.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 07:26:46 -0800 (PST)
+Message-ID: <1a4f6e1e-9981-4e2d-bacf-3e387addfa47@kernel.dk>
+Date: Mon, 8 Jan 2024 08:26:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: remove another host aware model leftover
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org
+References: <20231228075141.362560-1-hch@lst.de>
+ <20240108082452.GA4517@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240108082452.GA4517@lst.de>
 Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.71
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+On 1/8/24 1:24 AM, Christoph Hellwig wrote:
+> Jens, Martin,
+> 
+> can you take a look at this?  It would be great to finish the zone
+> aware removal fully with this for 6.8.  Thanks!
 
-[ Upstream commit b8e0792449928943c15d1af9f63816911d139267 ]
+Looks fine to me and I can queue it up. I'll do so preemptively, Martin
+let me know if you have concerns and I can drop it from top-of-tree.
 
-Commit 4e0400525691 ("virtio-blk: support polling I/O") triggers the
-following gcc 13 W=1 warnings:
-
-drivers/block/virtio_blk.c: In function ‘init_vq’:
-drivers/block/virtio_blk.c:1077:68: warning: ‘%d’ directive output may be truncated writing between 1 and 11 bytes into a region of size 7 [-Wformat-truncation=]
- 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-      |                                                                    ^~
-drivers/block/virtio_blk.c:1077:58: note: directive argument in the range [-2147483648, 65534]
- 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-      |                                                          ^~~~~~~~~~~~~
-drivers/block/virtio_blk.c:1077:17: note: ‘snprintf’ output between 11 and 21 bytes into a destination of size 16
- 1077 |                 snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This is a false positive because the lower bound -2147483648 is
-incorrect. The true range of i is [0, num_vqs - 1] where 0 < num_vqs <
-65536.
-
-The code mixes int, unsigned short, and unsigned int types in addition
-to using "%d" for an unsigned value. Use unsigned short and "%u"
-consistently to solve the compiler warning.
-
-Cc: Suwan Kim <suwan.kim027@gmail.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202312041509.DIyvEt9h-lkp@intel.com/
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20231204140743.1487843-1-stefanha@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/virtio_blk.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index efa5535a8e1d8..3124837aa406f 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -609,12 +609,12 @@ static void virtblk_config_changed(struct virtio_device *vdev)
- static int init_vq(struct virtio_blk *vblk)
- {
- 	int err;
--	int i;
-+	unsigned short i;
- 	vq_callback_t **callbacks;
- 	const char **names;
- 	struct virtqueue **vqs;
- 	unsigned short num_vqs;
--	unsigned int num_poll_vqs;
-+	unsigned short num_poll_vqs;
- 	struct virtio_device *vdev = vblk->vdev;
- 	struct irq_affinity desc = { 0, };
- 
-@@ -658,13 +658,13 @@ static int init_vq(struct virtio_blk *vblk)
- 
- 	for (i = 0; i < num_vqs - num_poll_vqs; i++) {
- 		callbacks[i] = virtblk_done;
--		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%d", i);
-+		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%u", i);
- 		names[i] = vblk->vqs[i].name;
- 	}
- 
- 	for (; i < num_vqs; i++) {
- 		callbacks[i] = NULL;
--		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-+		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%u", i);
- 		names[i] = vblk->vqs[i].name;
- 	}
- 
 -- 
-2.43.0
+Jens Axboe
 
