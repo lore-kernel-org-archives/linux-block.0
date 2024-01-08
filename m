@@ -1,164 +1,415 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FEB52F97;
-	Mon,  8 Jan 2024 16:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AAA53E25
+	for <linux-block@vger.kernel.org>; Mon,  8 Jan 2024 17:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mPQtXjTT";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="gNZc+4F4"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 408GJRdL028440;
-	Mon, 8 Jan 2024 16:27:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2023-11-20;
- bh=SiT02Ou1KYUwG9/kWHZ8pbPkC/bUc6WqZMW1BRBS5zU=;
- b=mPQtXjTTyGSy2z01w3tNrpUZf1sqzbdD7JaiXd3GLxc2irpIAxUPQ+IQRoOe8H4mmP+X
- 72W2KzVFfMiRdlZ2FLUzvOlyR3XMrGNqi9eRJWvrymlP+nRC5+PPjTckuJ94yTJpVjFM
- foFLldIVeFTxQMg3Cu/x1gYpp1+Lw+M8LCAy0LEPdW3xjUY9VDE3EfzMaL0tWXrp5ZzR
- F0h3dPBgg4ftW9R4wZWRysyDI1HdhkHHJpIGo5GKtri7oNg3AsV0no8a1pi6JpEQ+q1b
- yyQKOdBz0y5nn1SBkiFoME49Iur4q0moMYtW2usnmnYqPKe0QMv97yUKS28QTV0DmIdo lQ== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vgmf9r0vh-10
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Jan 2024 16:27:59 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 408G3DoO006738;
-	Mon, 8 Jan 2024 16:14:42 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vfur2cxe3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Jan 2024 16:14:42 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mGe7Ksbo4Jdwld4sXx0xYcgEsm9QzEE5B4S9T2zHRKsBebHTH53b9dNfcZ4lVQyfYc5LrU/zPJuCoCLadHEkKezlB04okg+Gx31mkD8TQ+zghAPdU7bZM5BJG6BDpqhqhE9k/opJ/wK2SJmFJqLSmiElArsrQpoXv1Z1Py6cwa4+5FrdzkFAFdd8EfG/gQbWGGrSzJRVMgCVyvoLJKjG4tLzGuzLGb6YXk090Yc8O34TSimgdts7Q2LGFnZ8g9n+CQvCdxTub1yetvwiHAzGdb2MH3khuWZEvrKPnrtrkxOwngcYrJiHqT290NWR6gYOKyxhatnNQvAkA3ZALu9tsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SiT02Ou1KYUwG9/kWHZ8pbPkC/bUc6WqZMW1BRBS5zU=;
- b=k3Dz0mi2P+ndrsDXNm9JkCb1WinUUVxC9fumRBwuZmyGtwpA+8maG29uZXXdU4rRIok92hrWKeS993hOiSviAOOfQwCWItECFkGiTt1Gkdwie2Myq3XMuUIl8gizrtEsbwkAgqMKEtVjlQwQYSEQBjjNUOa5MNBgRoZi0FdBUMWtmWbBqonxj4Gl7Sn19WAt+yXzgTHqnvnoNnhw+vqZpuMpqovEjNQYTJNFZ1xDoTGVd7IS+gmzoGuCVdA0oXtjO33+VXDF9bdiIKJGvT/qq54LKiTZjSm9wZHchNOVgPeOVzu4qvutmRGH1svfor8rj1BOvXjFVY8CeaII+uodFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qkByflE0"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso19430839f.1
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2024 09:02:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SiT02Ou1KYUwG9/kWHZ8pbPkC/bUc6WqZMW1BRBS5zU=;
- b=gNZc+4F4BCbBEhX0caXvzXxHURPyBAHt99pWPLbpTX0DNtIyP/w9iN8+GY2Dtiep8zz0ZsIaD6TnSgRn/dNDbmaPCHgV+p2pCthGKPjo5XIVz9IV9czd0MmHIrVU2WLNWwc+832UiPNq90a+qnsr1SHWtxzKC6VAxXTQqPdPww8=
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by BL3PR10MB6019.namprd10.prod.outlook.com (2603:10b6:208:3b2::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Mon, 8 Jan
- 2024 16:14:40 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::2b0c:62b3:f9a9:5972]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::2b0c:62b3:f9a9:5972%4]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
- 16:14:39 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen"
- <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: remove another host aware model leftover
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq134v7951a.fsf@ca-mkp.ca.oracle.com>
-References: <20231228075141.362560-1-hch@lst.de>
-	<20240108082452.GA4517@lst.de>
-	<1a4f6e1e-9981-4e2d-bacf-3e387addfa47@kernel.dk>
-Date: Mon, 08 Jan 2024 11:14:37 -0500
-In-Reply-To: <1a4f6e1e-9981-4e2d-bacf-3e387addfa47@kernel.dk> (Jens Axboe's
-	message of "Mon, 8 Jan 2024 08:26:45 -0700")
-Content-Type: text/plain
-X-ClientProxiedBy: PH0PR07CA0005.namprd07.prod.outlook.com
- (2603:10b6:510:5::10) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704733350; x=1705338150; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z76ej7ezgI0+24nGJKvNsZCzKoe3vlz3j8RyXEEq/LA=;
+        b=qkByflE0GOKgeJkUdAyCXtFe8b0Xr9p0JFgG0rUCC0nJAxOqOQIb8bRi77hAXIVST7
+         tR3R+/cPD/6X1gbavE7YB6B0AY5C31gdX6r3vqdI/vnpKosa/qqFvF8Gm7qP2zJPQfUp
+         PtUvoKl9qT6Uv3iXeM60x+9aFhJwbm/JkaBa9y/dJtVX0VlU2dyIDFf3btnhN58IgGSw
+         0Du+QVhq2FbwiGtwz0qjTBiq5uw28MLqWghN9qD731BYTBzh5EiOwUhyt9QuIggmv8gF
+         R5FSytKiMrlqn9iFDKYQO1PlALhRRP7zYD1WNJaLCeLgbYcRPlNN2wZ0sUzkY3s58NTH
+         SGJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704733350; x=1705338150;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=z76ej7ezgI0+24nGJKvNsZCzKoe3vlz3j8RyXEEq/LA=;
+        b=TAc4O0A91ZnREzP+e5Jonm3f0FY/M6zApQS1NaeiQxDpYyRX1UwLrLjx5tKkKfaR71
+         tudzqP0ueGxEqrEW2Pvqk0MLm/EdDUdY0sOP8DldAD+5k8WzNrP7kHtEJPyAZnZHIIa/
+         TrzBfXyPRQ/FVMWo/XCGHZLmk11CdlpcLJWqRmBVcMpMVqIDSt/bsdazL2m4qEm7SNgY
+         Lf0sj/HTtos+VRR7GdPI6cNdd2hpMKQEUfpZIvMVHrLh1/B4xdM6+r9YfPytT/8FGu2l
+         rWldzZXizkF+j8HKyct3yC2ncJmhe0cKQCrMEQij0/m2Gf/HRhASPOLwR5lLrFNgeCsX
+         gtyA==
+X-Gm-Message-State: AOJu0YwSBYn6JrtmAAhg9Jl06Yg6gQwdWfo6GJNRaFSbKYgQS4bbCPmK
+	dS35edMXCWwQvW+hwdU+SKyHE+WcHr+DGNK0hQIPFdTHHCbhJQ==
+X-Google-Smtp-Source: AGHT+IHZsozHTBHoJKxKZ+zyEB632792G3dOfZOlIbXtoWZzOi67Am3IURMai1lV10V+wPUvqVMQWw==
+X-Received: by 2002:a5d:804a:0:b0:7bc:207d:5178 with SMTP id b10-20020a5d804a000000b007bc207d5178mr6786279ior.2.1704733349620;
+        Mon, 08 Jan 2024 09:02:29 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 12-20020a5ea50c000000b007bc3ebacf3esm22712iog.46.2024.01.08.09.02.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 09:02:29 -0800 (PST)
+Message-ID: <2bc9c8de-b2a1-43f7-9aa0-a6ec425a1ce6@kernel.dk>
+Date: Mon, 8 Jan 2024 10:02:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|BL3PR10MB6019:EE_
-X-MS-Office365-Filtering-Correlation-Id: 611ae79e-a4e3-479e-2ae7-08dc1064ea43
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	xHWWKxHafawZqjHUae1caA8jc4SzLw+Tysr+r32/C2OmBAAguDdG9S9tWauyEpX3peGO2wJH9C9ASOAwOfs/+WhiZwfIvMX14CvpVrecjKXcF1S5adFa5kBM0lAA6ca40wbclt9+niMvGeicGJjx2K0iyKe8Ma93q8jDsxuPuLvP16HmPzegRtQgRUEhAeAcqg3+cduf7X267ZaaT5OinBskQa0KUVz9mmCa5sHAfAKZITf0L8/iU87NKA8uKLcRf8qqs1Qq5mSsnBRKn6iDmW3Wyx43RWzMrB8h/c6bo5S8oY8caybg23bMwqvIYNW6+n9FWF8hkAhsSYTskYH+WEmK5Xc6uc9Csnx1g3grnE7us6QuIF75s6dAlBRoJDtbSA1HNeBExPihTgZ1zLlOsmxE1NzYlfca2nUVhQeeNcZ3yGPD5R4ODP8/uuFdJA3EE0RVNYzMHTr1c0I+R5AcRUmsjsmAccGFNApcWXJpv5nCL3awG+zWRlaFakhAU2C/sKt03rGGEGHJSGc4CCQBGK7MGCamP+6wSXipB6g0QH//eUolx8fDb4OvQvxo125z
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(136003)(39860400002)(376002)(346002)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(38100700002)(2906002)(4744005)(5660300002)(86362001)(41300700001)(54906003)(316002)(8676002)(8936002)(6486002)(66946007)(66556008)(66476007)(26005)(6916009)(478600001)(6512007)(6506007)(83380400001)(36916002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?c1pSERu79qe67dDSSKWWU/J4nfTazGlzNxg7ZPAN9JJCmi0oj1obbcA0ZSTM?=
- =?us-ascii?Q?DMdhd7skDhYht0+PkaivXooJ3WCtcrl9ILsgVVd0VjA1frDlkXEnwKuwhu0X?=
- =?us-ascii?Q?UurViNPyj3/2TrpN9Oo4I89maQWooCv0b+Pjr3vO1+IeRnI9LBm1ScjDukTz?=
- =?us-ascii?Q?aPXxweAV6QemLskcAGSOrytmQ4geYAgNNygcvQ/rPil6RTYqHueBPhYdPWAk?=
- =?us-ascii?Q?ycXr+wksClHV55ilPgGyEtzv2FUNTNOA9uhZ8OzWNt72UAELhKo273ysF22H?=
- =?us-ascii?Q?457N1BwdiGeEDLeN0UxxrlfeT8uR4oqHuPfgcQNFIomtBQKKugndnF/rOaeg?=
- =?us-ascii?Q?zKNwZnrBTqtpL8g0SvWy4iuBZtA3wEIS6a6bPWTtv5DVgJnsWAmBu2p3Mpoz?=
- =?us-ascii?Q?gmPvEPm+1ce4FaDn+Y0KEsdLJfoCVb1LQDBjo0CNQEm4V1/4XXECOXXxFj0w?=
- =?us-ascii?Q?dIWNJG00QnycBRU0hzr8v6IUBRcscKJvYwcFg8h0nfbQABc6WYTJRJOIWOkr?=
- =?us-ascii?Q?QRg65kS8gdvZwon5IftIlvXoWEXSt0kRTlQ5yP1p28o5QnMUrpzcjvrScUfO?=
- =?us-ascii?Q?IHF0dPd+O4yr4eX1wuhKdvALA+DBUnX1TOkZjwiqLg9iXDymyY6sma3zYmLh?=
- =?us-ascii?Q?cxA5/f7KknT6ibyIp+9lumBOTunGOZAFTca2yuxMa9P7ZdY8jmUGIX9DkQqT?=
- =?us-ascii?Q?d3bAATL3t915j1qm9pR9FijJxmWcsIxfdwdZCyPHS6gkqQfFvfRALDx5MZP5?=
- =?us-ascii?Q?uBdFG6okFEeLrE4e3chrYsl6lj/5F8xjhk/ym2yU1qa1Fbe5iHzJU7gY3/SF?=
- =?us-ascii?Q?qcRdOX7fhvj8Usdto0hhMqmsUkCs6FG4z2uvku0Ap5/6XbutQ4bxri3FiNjS?=
- =?us-ascii?Q?YwsGHLUc/vdXbGLqEELXPeKzfi5BhdkobgkkWpyhJxDV+y4mgKP6Vzs1o1K9?=
- =?us-ascii?Q?oW1sbI8zykcA/0OTKk5SJwSEWAeQZwEa+rx6aa5sfyco98W1vo9rAABUM5FS?=
- =?us-ascii?Q?G4Xwd3KzPdDBzR4B5Bu64fmbMaiKeSX5VqICDlXXWQ0HT92M90EVn4T/6JFq?=
- =?us-ascii?Q?fBi9O0qhHbZQCi+Yu8thtDrGUWt00KATu6IavwZ2e8krZ9EGBZUCbBR+S1DP?=
- =?us-ascii?Q?1W+b/Q/2P3Jvo1dtQTTOeuzakVw9hqdk1+DeImYfhI5nezoDZNkpWKioKyxQ?=
- =?us-ascii?Q?9rctIMVyKDkzZmGcfWffXlXXok63NCPfgnXLJdgVBd19eP4wY76rZR7fgzrb?=
- =?us-ascii?Q?UkWEWkCKtam+SytBixjJvX33WL0jXpMxfczJJrZuxvB9kyBJ2NnMmcd9WgVC?=
- =?us-ascii?Q?a1Xy88x4+buZf5l/vY3n78qySWmoda2K4vFqpSDdcN9Opo9Da7lzo1+LnE/U?=
- =?us-ascii?Q?kzjQVhhBsMU8U+A2WL1JzFWAtGh5PVouuz18AT5Bl6MrZqQboDqVIQun+Wu3?=
- =?us-ascii?Q?qs7Omdu/WJvTciQI/pn8cmnF2OqEAhFCaogQXn3RZdTdEu5Dkc+4NfAJTUf8?=
- =?us-ascii?Q?rPxeeLU1R9ZIPhbB1VjujXPtAnbwvexSLR13gUMUz7Xcc6WpvrE6MZbhZNYh?=
- =?us-ascii?Q?zm1Ck5lDX1hszdiwj7/xOI3jgz1kxE64HuR9gLLmqDuW0JxoSBeQDD9cwq4j?=
- =?us-ascii?Q?Vw=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	F+zz/yqAItcegs479j3c1tv9mw7jycx69Dr4al5nq1YKBV8D/26fmP8haW7q7+zwbaUUD4fr/X4fC+WY0v4MgArkgYRoJjZXQHQ3JzDSh6h5Xy5CnKsfOIUFWEuA4Q0a2rKzU1a5nq+flhtwDRR1GSJV8lT7Nu94LH25dlBcmpG5q4RfhY05j2BO+D1N2hn3T0N9ROKms074BDQZebsL50GVM8MlSosTeHqtZA6MG/xCA8o+wRIH5d7s0ZDXaW0e4QlQrBgdnwDT2BCoLEwJ4gsXlv2VmS1P/B7aFlvekXhuWbhdK0/hxvTVONu33esI7cjbWCm2caW6J0BODLQybc17Gmk64B/5vEZMwMwfFsOtTvsVzU6yu5C3S2vGd7UykU6YkxwHWPbsjZM3XiGl2oYXKREI3+gos5ZOsiJiT1CBZbDpmXgOZYMpGubsfkjNfcRUmX55NTQK/RPhTaXYjiRtGUU21keVZmU73UOMsv41bx9ohxGy6I//W/7MpQPaiVcdyj3H67lux4xhYt1SdepFGb9tEFSQu61xXM7blzUX5VtOO3Q+GrBtbUu5/n4UUSuS16ssTzCL6mje8lNGySHW3ZC4aRZmAIMdntv5ziQ=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 611ae79e-a4e3-479e-2ae7-08dc1064ea43
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 16:14:39.4513
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HZhjbErpdUqod6u0MIPCgq9HQ/VAI5y8AXMhDmhwCLF1QuXPO745KKQMDkHDdLOCRyeLoZXWBwIKc8m1npKCOW3hogXvDWhBaxaxUR5DkrY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR10MB6019
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-08_06,2024-01-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 spamscore=0
- adultscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401080138
-X-Proofpoint-ORIG-GUID: fobyApqPexGFSf8V-PWzHbmFtqlEtAdF
-X-Proofpoint-GUID: fobyApqPexGFSf8V-PWzHbmFtqlEtAdF
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block changes for 6.8-rc1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hi Linus,
+
+Here are the block changes for the 6.8 merge window. Pretty quiet round
+this time around. This pull request contains:
+
+- NVMe updates via Keith:
+	- nvme fabrics spec updates (Guixin, Max)
+	- nvme target udpates (Guixin, Evan)
+	- nvme attribute refactoring (Daniel)
+	- nvme-fc numa fix (Keith)
+
+- MD updates via Song:
+	- Fix/Cleanup RCU usage from conf->disks[i].rdev (Yu Kuai)
+	- Fix raid5 hang issue (Junxiao Bi)
+	- Add Yu Kuai as Reviewer of the md subsystem
+	- Remove deprecated flavors (Song Liu)
+	- raid1 read error check support (Li Nan)
+	- Better handle events off-by-1 case (Alex Lyakas)
+
+- Efficiency improvements for passthrough (Kundan)
+
+- Support for mapping integrity data directly (Keith)
+
+- Zoned write fix (Damien)
+
+- rnbd fixes (Kees, Santosh, Supriti)
+
+- Default to a sane discard size granularity (Christoph)
+
+- Make the default max transfer size naming less confusing (Christoph)
+
+- Remove support for deprecated host aware zoned model (Christoph)
+
+- Misc fixes (me, Li, Matthew, Min, Ming, Randy, liyouhong, Daniel,
+  Bart, Christoph)
+
+This will throw a merge conflict in drivers/nvme/host/core.c due to some
+later-than-rc3 fixes in your branch. The resolution is just to use the
+HEAD part, but note that 'ns' is now called 'head'. I'm including my
+resolution at the end of this email.
+
+Please pull!
 
 
-Jens,
+The following changes since commit 2cc14f52aeb78ce3f29677c2de1f06c0e91471ab:
 
->> can you take a look at this? It would be great to finish the zone
->> aware removal fully with this for 6.8. Thanks!
->
-> Looks fine to me and I can queue it up. I'll do so preemptively,
-> Martin let me know if you have concerns and I can drop it from
-> top-of-tree.
+  Linux 6.7-rc3 (2023-11-26 19:59:33 -0800)
 
-It was addressed to you so I assumed you'd be picking it up. Looks good
-to me.
+are available in the Git repository at:
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+  git://git.kernel.dk/linux.git tags/for-6.8/block-2024-01-08
+
+for you to fetch changes up to 587371ed783b046f22ba7a5e1cc9a19ae35123b4:
+
+  block: Treat sequential write preferred zone type as invalid (2024-01-08 08:34:24 -0700)
+
+----------------------------------------------------------------
+for-6.8/block-2024-01-08
+
+----------------------------------------------------------------
+Alex Lyakas (1):
+      md: Whenassemble the array, consult the superblock of the freshest device
+
+Bart Van Assche (1):
+      block: Use pr_info() instead of printk(KERN_INFO ...)
+
+Christoph Hellwig (27):
+      block: move a few definitions out of CONFIG_BLK_DEV_ZONED
+      block: prevent an integer overflow in bvec_try_merge_hw_page
+      block: support adding less than len in bio_add_hw_page
+      virtio_blk: cleanup zoned device probing
+      virtio_blk: remove the broken zone revalidation support
+      block: remove support for the host aware zone model
+      block: simplify disk_set_zoned
+      sd: only call disk_clear_zoned when needed
+      block: reject invalid operation in submit_bio_noacct
+      blk-wbt: remove the separate write cache tracking
+      loop: don't update discard limits from loop_set_status
+      null_blk: don't cap max_hw_sectors to BLK_DEF_MAX_SECTORS
+      aoe: don't abuse BLK_DEF_MAX_SECTORS
+      loop: don't abuse BLK_DEF_MAX_SECTORS
+      block: rename and document BLK_DEF_MAX_SECTORS
+      block: remove two comments in bio_split_discard
+      bcache: discard_granularity should not be smaller than a sector
+      block: default the discard granularity to sector size
+      ubd: use the default discard granularity
+      nbd: use the default discard granularity
+      null_blk: use the default discard granularity
+      zram: use the default discard granularity
+      bcache: use the default discard granularity
+      mtd_blkdevs: use the default discard granularity
+      block: floor the discard granularity to the physical block size
+      sd: remove the !ZBC && blk_queue_is_zoned case in sd_read_block_characteristics
+      block: remove disk_clear_zoned
+
+Damien Le Moal (1):
+      block: Treat sequential write preferred zone type as invalid
+
+Daniel Vacek (1):
+      blk-cgroup: don't use removal safe list iterators
+
+Daniel Wagner (6):
+      nvme: move ns id info to struct nvme_ns_head
+      nvme: refactor ns info helpers
+      nvme: refactor ns info setup function
+      nvme: rename ns attribute group
+      nvme: add csi, ms and nuse to sysfs
+      nvme: repack struct nvme_ns_head
+
+Evan Burgess (1):
+      nvmet: configfs: use ctrl->instance to track passthru subsystems
+
+Gou Hao (1):
+      md/raid1: remove unnecessary null checking
+
+Guixin Liu (4):
+      nvme: introduce nvme_check_ctrl_fabric_info helper
+      nvme-fabrics: check ioccsz and iorcsz
+      nvmet: allow identical cntlid_min and cntlid_max settings
+      nvmet: remove cntlid_min and cntlid_max check in nvmet_alloc_ctrl
+
+Jens Axboe (5):
+      Merge tag 'md-next-20231208' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-6.8/block
+      block: improve struct request_queue layout
+      Merge tag 'md-next-20231219' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-6.8/block
+      block: export disk_clear_zoned()
+      Merge tag 'nvme-6.8-2023-12-21' of git://git.infradead.org/nvme into for-6.8/block
+
+Junxiao Bi (2):
+      md: bypass block throttle for superblock update
+      Revert "md/raid5: Wait for MD_SB_CHANGE_PENDING in raid5d"
+
+Kees Cook (1):
+      block/rnbd-srv: Check for unlikely string overflow
+
+Keith Busch (5):
+      block: bio-integrity: directly map user buffers
+      nvme: use bio_integrity_map_user
+      iouring: remove IORING_URING_CMD_POLLED
+      io_uring: remove uring_cmd cookie
+      nvme-fc: set numa_node after nvme_init_ctrl
+
+Kundan Kumar (3):
+      block: skip QUEUE_FLAG_STATS and rq-qos for passthrough io
+      block: skip cgroups for passthrough io
+      block: skip start/end time stamping for passthrough IO
+
+Li Nan (4):
+      block: Set memalloc_noio to false on device_add_disk() error path
+      md: factor out a helper exceed_read_errors() to check read_errors
+      md/raid1: support read error check
+      block: add check of 'minors' and 'first_minor' in device_add_disk()
+
+Matthew Wilcox (Oracle) (1):
+      block: Remove special-casing of compound pages
+
+Max Gurtovoy (1):
+      nvme-fabrics: don't check discovery ioccsz/iorcsz
+
+Min Li (1):
+      block: add check that partition length needs to be aligned with block size
+
+Ming Lei (1):
+      blk-cgroup: fix rcu lockdep warning in blkg_lookup()
+
+Randy Dunlap (1):
+      drbd: actlog: fix kernel-doc warnings and spelling
+
+Santosh Pradhan (1):
+      block/rnbd: add support for REQ_OP_WRITE_ZEROES
+
+Song Liu (5):
+      Merge branch 'md-next-rcu-cleanup' into md-next
+      MAINTAINERS: SOFTWARE RAID: Add Yu Kuai as Reviewer
+      md: Remove deprecated CONFIG_MD_LINEAR
+      md: Remove deprecated CONFIG_MD_MULTIPATH
+      md: Remove deprecated CONFIG_MD_FAULTY
+
+Supriti Singh (1):
+      block/rnbd: use %pe to print errors
+
+Yu Kuai (6):
+      md: remove flag RemoveSynchronized
+      md/raid10: remove rcu protection to access rdev from conf
+      md/raid1: remove rcu protection to access rdev from conf
+      md/raid5: remove rcu protection to access rdev from conf
+      md/md-multipath: remove rcu protection to access rdev from conf
+      md: synchronize flush io with array reconfiguration
+
+liyouhong (1):
+      drivers/block/xen-blkback/common.h: Fix spelling typo in comment
+
+ MAINTAINERS                        |   1 +
+ arch/um/drivers/ubd_kern.c         |   1 -
+ block/bio-integrity.c              | 218 ++++++++++++++++-
+ block/bio.c                        |  53 +++--
+ block/blk-cgroup.c                 |   7 +-
+ block/blk-cgroup.h                 |   3 +-
+ block/blk-core.c                   |  26 +-
+ block/blk-merge.c                  |   6 +-
+ block/blk-mq.c                     |   3 +-
+ block/blk-rq-qos.h                 |   2 +-
+ block/blk-settings.c               | 107 ++-------
+ block/blk-sysfs.c                  |  11 +-
+ block/blk-wbt.c                    |  13 +-
+ block/blk-wbt.h                    |   5 -
+ block/blk-zoned.c                  |  21 +-
+ block/blk.h                        |   2 -
+ block/genhd.c                      |   5 +-
+ block/ioctl.c                      |  11 +-
+ block/partitions/core.c            |  12 +-
+ drivers/block/aoe/aoeblk.c         |   3 +-
+ drivers/block/drbd/drbd_actlog.c   |  16 +-
+ drivers/block/loop.c               |   5 +-
+ drivers/block/nbd.c                |   6 +-
+ drivers/block/null_blk/main.c      |  13 +-
+ drivers/block/null_blk/zoned.c     |   2 +-
+ drivers/block/rnbd/rnbd-clt.c      |  13 +-
+ drivers/block/rnbd/rnbd-proto.h    |  14 +-
+ drivers/block/rnbd/rnbd-srv.c      |  44 ++--
+ drivers/block/ublk_drv.c           |   2 +-
+ drivers/block/virtio_blk.c         |  78 ++----
+ drivers/block/xen-blkback/common.h |   2 +-
+ drivers/block/zram/zram_drv.c      |   1 -
+ drivers/md/Kconfig                 |  34 ---
+ drivers/md/Makefile                |  10 +-
+ drivers/md/bcache/super.c          |   1 -
+ drivers/md/dm-kcopyd.c             |   2 +-
+ drivers/md/dm-table.c              |  45 ++--
+ drivers/md/dm-zoned-metadata.c     |   7 +-
+ drivers/md/dm-zoned-target.c       |   4 +-
+ drivers/md/md-autodetect.c         |   8 +-
+ drivers/md/md-faulty.c             | 365 ----------------------------
+ drivers/md/md-linear.c             | 318 -------------------------
+ drivers/md/md-multipath.c          | 471 -------------------------------------
+ drivers/md/md.c                    | 305 ++++++++++++------------
+ drivers/md/md.h                    |   5 -
+ drivers/md/raid1-10.c              |  54 +++++
+ drivers/md/raid1.c                 |  91 +++----
+ drivers/md/raid10.c                | 271 +++++----------------
+ drivers/md/raid5-cache.c           |  11 +-
+ drivers/md/raid5-ppl.c             |  16 +-
+ drivers/md/raid5.c                 | 203 +++++-----------
+ drivers/md/raid5.h                 |   4 +-
+ drivers/mtd/mtd_blkdevs.c          |   4 +-
+ drivers/nvme/host/core.c           | 224 ++++++++++--------
+ drivers/nvme/host/fc.c             |   6 +-
+ drivers/nvme/host/ioctl.c          | 205 +++-------------
+ drivers/nvme/host/multipath.c      |   2 +-
+ drivers/nvme/host/nvme.h           |  44 ++--
+ drivers/nvme/host/rdma.c           |   4 +-
+ drivers/nvme/host/sysfs.c          |  99 +++++++-
+ drivers/nvme/host/zns.c            |  37 +--
+ drivers/nvme/target/configfs.c     |   4 +-
+ drivers/nvme/target/core.c         |   3 -
+ drivers/nvme/target/passthru.c     |   4 +-
+ drivers/scsi/scsi_debug.c          |  27 +--
+ drivers/scsi/sd.c                  |  49 ++--
+ drivers/scsi/sd_zbc.c              |  16 +-
+ fs/btrfs/zoned.c                   |  23 +-
+ fs/btrfs/zoned.h                   |   2 +-
+ fs/f2fs/data.c                     |   2 +-
+ fs/f2fs/super.c                    |  17 +-
+ include/linux/bio.h                |   9 +
+ include/linux/blk-mq.h             |   6 +
+ include/linux/blk_types.h          |   8 +-
+ include/linux/blkdev.h             | 159 ++++++-------
+ include/linux/io_uring.h           |   9 +-
+ include/uapi/linux/raid/md_p.h     |   8 +-
+ include/uapi/linux/raid/md_u.h     |  11 +-
+ io_uring/uring_cmd.c               |   1 -
+ 79 files changed, 1254 insertions(+), 2660 deletions(-)
+ delete mode 100644 drivers/md/md-faulty.c
+ delete mode 100644 drivers/md/md-linear.c
+ delete mode 100644 drivers/md/md-multipath.c
+
+
+commit e91cbc6ff26c06c9d3eb261f8ba5b66fff92f74f
+Merge: 0dd3ee311255 587371ed783b
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Mon Jan 8 09:20:02 2024 -0700
+
+    Merge branch 'for-6.8/block' into linus-merge-6.8
+    
+    * for-6.8/block: (78 commits)
+      block: Treat sequential write preferred zone type as invalid
+      block: remove disk_clear_zoned
+      sd: remove the !ZBC && blk_queue_is_zoned case in sd_read_block_characteristics
+      drivers/block/xen-blkback/common.h: Fix spelling typo in comment
+      blk-cgroup: fix rcu lockdep warning in blkg_lookup()
+      blk-cgroup: don't use removal safe list iterators
+      block: floor the discard granularity to the physical block size
+      mtd_blkdevs: use the default discard granularity
+      bcache: use the default discard granularity
+      zram: use the default discard granularity
+      null_blk: use the default discard granularity
+      nbd: use the default discard granularity
+      ubd: use the default discard granularity
+      block: default the discard granularity to sector size
+      bcache: discard_granularity should not be smaller than a sector
+      block: remove two comments in bio_split_discard
+      block: rename and document BLK_DEF_MAX_SECTORS
+      loop: don't abuse BLK_DEF_MAX_SECTORS
+      aoe: don't abuse BLK_DEF_MAX_SECTORS
+      null_blk: don't cap max_hw_sectors to BLK_DEF_MAX_SECTORS
+      ...
+    
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+diff --cc drivers/nvme/host/core.c
+index 60f14019f981,d144d1acb09a..0af612387083
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@@ -1903,10 -1899,9 +1912,10 @@@ static void nvme_update_disk_info(struc
+  
+  	/*
+  	 * The block layer can't support LBA sizes larger than the page size
+ -	 * yet, so catch this early and don't allow block I/O.
+ +	 * or smaller than a sector size yet, so catch this early and don't
+ +	 * allow block I/O.
+  	 */
+- 	if (ns->lba_shift > PAGE_SHIFT || ns->lba_shift < SECTOR_SHIFT) {
+ -	if (head->lba_shift > PAGE_SHIFT) {
+++	if (head->lba_shift > PAGE_SHIFT || head->lba_shift < SECTOR_SHIFT) {
+  		capacity = 0;
+  		bs = (1 << 9);
+  	}
+@@@ -2043,19 -2038,13 +2052,20 @@@ static int nvme_update_ns_info_block(st
+  	if (ret)
+  		return ret;
+  
+ +	if (id->ncap == 0) {
+ +		/* namespace not allocated or attached */
+ +		info->is_removed = true;
+ +		ret = -ENODEV;
+ +		goto error;
+ +	}
+ +
+  	blk_mq_freeze_queue(ns->disk->queue);
+  	lbaf = nvme_lbaf_index(id->flbas);
+- 	ns->lba_shift = id->lbaf[lbaf].ds;
++ 	ns->head->lba_shift = id->lbaf[lbaf].ds;
++ 	ns->head->nuse = le64_to_cpu(id->nuse);
+  	nvme_set_queue_limits(ns->ctrl, ns->queue);
+  
+- 	ret = nvme_configure_metadata(ns, id);
++ 	ret = nvme_configure_metadata(ns->ctrl, ns->head, id);
+  	if (ret < 0) {
+  		blk_mq_unfreeze_queue(ns->disk->queue);
+  		goto out;
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens Axboe
+
