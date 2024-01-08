@@ -1,49 +1,35 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F47955E40
-	for <linux-block@vger.kernel.org>; Mon,  8 Jan 2024 19:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fNMP14m8"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-360412acf3fso1115875ab.0
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2024 11:27:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704742051; x=1705346851; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dp8RbIsL2tudoP6bPRYhCXV90X7vPN379OVYR5btXk0=;
-        b=fNMP14m8LhFYt6PT91Cq/Pts0O4a/zUiajwyBiNYxwsub97N/L56VY4+06lMDs0pOq
-         M9J9I1oDGHzHR5ZC9OcJuDZH24Jc660IH6wEGBK6Wmdqfsu/ED3Ngsnx7H+qcPON6ec+
-         MzG8OjFV7TTBScUehxw90WRubszfOI1iQQYuc9n3qDyVyKWo8kNu2tANguBGUo9zFHTc
-         cd8L5HFI00ecCWDAfeHaQgZVMFAC68k0sKxG/ebCL39G6la1NfzKorECXIwOdny9lg9L
-         esJHZ36abIFTdFB6xMsotyP6I5Er6eciyYCc1Hi9Y/EwbfaUXZjWB4zDeub+zO8tf9IR
-         THSQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D0155E60;
+	Mon,  8 Jan 2024 19:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5ce07cf1e5dso719611a12.2;
+        Mon, 08 Jan 2024 11:30:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704742051; x=1705346851;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1704742213; x=1705347013;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dp8RbIsL2tudoP6bPRYhCXV90X7vPN379OVYR5btXk0=;
-        b=YxXDwYhDtVE7kC1ArltuRj4DRQBJ2V0WolD1QFmfqVEBnntpHu+CROCHpQE0xzDSzH
-         6ZJEUPCn/VvaWTE41dHJPlD7wo2co9irZ2cLb95MRIGsH1bwcXSZmXUk815z5VdiW3+X
-         3pF3FEmoMRMHSG0S4lY/2nvl3LLv1nUFOkYFSAnSqjMDOudbyAx+pvSiUruAuvDePSwB
-         IbO6yPveixXTI57QWM3rT0ee0kokaeSEURCqrcIjha0n9Oyn4gGUdK0uIZMVNYve8Sfa
-         rfZCoroQvKgeVTqCw1CtUwBzVTFK+V7kD1e2r6mu/3F6JSXvfEaqwry9mlciGkNmHN5n
-         p0HA==
-X-Gm-Message-State: AOJu0YywIrncZAUuqW+6bo7vSj6x9ggteyCLk1jkcc/CNbpMGWa20LoP
-	fM9WOl7xN6gwIWPyeECkE3GCGcqxk/PoNQ==
-X-Google-Smtp-Source: AGHT+IEMg9RhGno/op7HM5cfHBNuNqxXVETZ/uM/ShC0hHH5s6DqY2zitOBukgT/VjGkDIbb8e8Bow==
-X-Received: by 2002:a6b:ea16:0:b0:7bc:25da:84cd with SMTP id m22-20020a6bea16000000b007bc25da84cdmr6929974ioc.0.1704742051361;
-        Mon, 08 Jan 2024 11:27:31 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id q21-20020a6b7115000000b007bc1e8a24fcsm89043iog.32.2024.01.08.11.27.30
+        bh=mPgSYdyg0vJbc0oY7GHDCNU+QLqplixDcaSjAanyb7k=;
+        b=WZRI4708CeZ7zM7TqvZ4zn2hdByPTljoRERTr6Gc/JJfYHDpK/+ZgxDd/DhuxV+lis
+         fEAeFOvHWyDb1STwGz2X4hR6rm7pytX8wcmEdUwrmRn1qs0DtXTqk+nNXz1ydIP50NIC
+         1/lJKph/9LeYyaVG8+nL8gPbLRYdZ/FNpJcLy/B/Ihy73tzihjT9aOv0T7pLFU2wYN7n
+         WSbq0Ms8q+4f8pjIYyuI6dHEdKfqFnBvXUIiXyZNOC4zVO63mZo+AUl66LK2d5Z77ZzB
+         9BjTuIFubR6ZLpgufugu9TO3kv8WjJ6BXe0DTzgUtz/yf1khRpC+tjxn1XXi9jJQrhXV
+         m2xg==
+X-Gm-Message-State: AOJu0YzOHjU87WXPUbGEkNIQne7uNhRJV0w7KWfqSr1Tf9htXC9dL4b1
+	d1/aR7mFnXr8QSGrcuSOPEY=
+X-Google-Smtp-Source: AGHT+IF9dFWPN1tQY/0ojsSkLwZINpIlgjvVcvpzzmGaFhbrOj0bf8qRtWX+L0MtV9ncMN2wK/MWEw==
+X-Received: by 2002:a05:6a20:a115:b0:199:31af:9207 with SMTP id q21-20020a056a20a11500b0019931af9207mr1834279pzk.52.1704742213013;
+        Mon, 08 Jan 2024 11:30:13 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:fe53:b285:ad53:95e0? ([2620:0:1000:8411:fe53:b285:ad53:95e0])
+        by smtp.gmail.com with ESMTPSA id s9-20020aa78d49000000b006d9b2d86bcasm233119pfe.46.2024.01.08.11.30.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jan 2024 11:27:30 -0800 (PST)
-Message-ID: <f691a3f5-7de1-43b7-bd64-3b224981a5de@kernel.dk>
-Date: Mon, 8 Jan 2024 12:27:30 -0700
+        Mon, 08 Jan 2024 11:30:12 -0800 (PST)
+Message-ID: <9b46c48f-d7c4-4ed3-a644-fba90850eab8@acm.org>
+Date: Mon, 8 Jan 2024 11:30:10 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,41 +37,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: move __get_task_ioprio() into header file
+Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
 Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-References: <20240108190113.1264200-1-axboe@kernel.dk>
- <20240108190113.1264200-2-axboe@kernel.dk>
- <a7c35161-45af-4f57-bedf-7a28674fb39f@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <a7c35161-45af-4f57-bedf-7a28674fb39f@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To: Christoph Hellwig <hch@infradead.org>,
+ Matthew Wilcox <willy@infradead.org>
+Cc: Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linuxfoundation.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+ <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+ <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+ <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
+ <ZYUbB3brQ0K3rP97@casper.infradead.org> <ZYUgo0a51nCgjLNZ@infradead.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZYUgo0a51nCgjLNZ@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/8/24 12:24 PM, Bart Van Assche wrote:
-> On 1/8/24 10:59, Jens Axboe wrote:
->> We call this once per IO, which can be millions of times per second.
->> Since nobody really uses io priorities, or at least it isn't very
->         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+On 12/21/23 21:37, Christoph Hellwig wrote:
+> On Fri, Dec 22, 2023 at 05:13:43AM +0000, Matthew Wilcox wrote:
+>> It clearly solves a problem (and the one I think it's solving is the
+>> size of the FTL map).  But I can't see why we should stop working on it,
+>> just because not all drive manufacturers want to support it.
 > 
-> We have plans to set an I/O priority for most Android processes in the
-> near future. According to what Damien wrote on linux-block, there is
-> probably a significant number of hard disks for which I/O priority is
-> configured.
+> I don't think it is drive vendors.  It is is the SSD divisions which
+> all pretty much love it (for certain use cases) vs the UFS/eMMC
+> divisions which tends to often be fearful and less knowledgeable (to
+> say it nicely) no matter what vendor you're talking to.
 
-The rates at which Android does IO means this won't really make any
-difference, should probably have qualified the statement with "nobody
-uses io priorities and does fast IO".
+Hi Christoph,
 
->> common, this is all wasted time and can amount to as much as 3% of
->> the total kernel time.
-> 
-> Anyway:
-> 
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+If there is a significant number of 4 KiB writes in a workload (e.g.
+filesystem metadata writes), and the logical block size is increased from
+4 KiB to 16 KiB, this will increase write amplification no matter how the
+SSD storage controller has been designed, isn't it? Is there perhaps
+something that I'm misunderstanding?
 
-Thanks!
+Thanks,
 
--- 
-Jens Axboe
+Bart.
+
 
