@@ -1,35 +1,35 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA243D574
-	for <linux-block@vger.kernel.org>; Tue,  9 Jan 2024 20:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5953DB81;
+	Tue,  9 Jan 2024 21:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d40eec5e12so27417705ad.1
-        for <linux-block@vger.kernel.org>; Tue, 09 Jan 2024 12:19:25 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d51ba18e1bso27622415ad.0;
+        Tue, 09 Jan 2024 13:31:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704831565; x=1705436365;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1704835913; x=1705440713;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a9kqU5X2TMS9hQrCMaHCADAVkV6CrsHjRbXVJ3WmO+I=;
-        b=STkNRkP2a0dOw0zVZTRmmFEdt5AGh/ORX3oyjRR/JmSX6KMuUmolhVwTpRrdkzzVtD
-         b4BQTge/6FeEj2Pv3eu5TBkMMq0NbJahtZZ26azhng5Ls0VR3KLFHL6Lhw1iiwFKKM9M
-         Z1Ge81M5dq0ha7TOV02ukYNSyylk9350NMjypJFS8t45dIYqDNdRq8DUV0XnqdrKBw85
-         YFX1BcYw2xlFpU9wEMsC+wMM02w14XZiFkMQJqlFTpNmSd9prP0B0xUlgzOImy4j6fiL
-         rraVxQSKp6mVuc95Lije/S/eBDi13FmcDJP63pZBppt5mkeGD+d2ABSmWM+Hzx8JlwYg
-         CeUQ==
-X-Gm-Message-State: AOJu0YzLca7fsARoKzbap9mmO5m0CpdCaL8nfT4G/Hg6cu4bLwgo+Mmq
-	NSV0XmoCyeEoq5ilwmlkdq+i178I+mg=
-X-Google-Smtp-Source: AGHT+IHFnyfQQGd7bVxX5X0iEX3OseX9y50TftnzRl1oVKk6/LlD5MIShieMgUX/yAuPz1F+k4fYlQ==
-X-Received: by 2002:a17:902:684f:b0:1d5:4dbf:6045 with SMTP id f15-20020a170902684f00b001d54dbf6045mr2148186pln.86.1704831564793;
-        Tue, 09 Jan 2024 12:19:24 -0800 (PST)
+        bh=k2HSg/AmhYZcGkcbY0eGgy1Bb+DyP7rKRWI4KTFYTp8=;
+        b=KIlrb/gppm4WFt5sD8lJ6PMMS3GqYh4iFk3CU5hXXDypbIjtyA3r6bfbDTpf2jc/YU
+         ihYOiV/QAbg6+5t64tAHsapBaTK2ORNq24Bpr8BQyuvKMDmBm7Y7U/KZenmoKBHKJ44r
+         BeGLB+SZHdFGTG/LuwqX/2jgcI81WrhaXw9e21BtpeWKCREaKIRxFE7/X7FFfDiv4cZd
+         C6/gQ6kFyI4jiV495euKgtQhNLAne+GWm6V4E/5IlZJKraJf9KGF84nexml7Poj5cutu
+         rnoMei4h86waThOLsxfMW4sOhp7YQLXQst3f151h5+GHbpBiDt/A9itL9R1hc8XG5PB8
+         0Jsg==
+X-Gm-Message-State: AOJu0YxwxfPcIeT5m9JAd9J2FCQDdZLncbccBXzW7KcUPATiB0hfAZVJ
+	O3LftVGWqOAdvsECGYzrGnM=
+X-Google-Smtp-Source: AGHT+IGgEoQ64du2K0/Q9WBgQuZMDtB5igrtdQVepbGX4TmcvhjuKUR8/XlFeDlu1Dyk5zxvLefSFw==
+X-Received: by 2002:a17:902:d50e:b0:1d3:ee1f:ce54 with SMTP id b14-20020a170902d50e00b001d3ee1fce54mr24664plg.89.1704835912946;
+        Tue, 09 Jan 2024 13:31:52 -0800 (PST)
 Received: from ?IPV6:2620:0:1000:8411:b76f:b657:4602:d182? ([2620:0:1000:8411:b76f:b657:4602:d182])
-        by smtp.gmail.com with ESMTPSA id u8-20020a17090341c800b001d53f81f894sm2181040ple.122.2024.01.09.12.19.24
+        by smtp.gmail.com with ESMTPSA id e2-20020a170902b78200b001d491db286fsm2245078pls.282.2024.01.09.13.31.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jan 2024 12:19:24 -0800 (PST)
-Message-ID: <4a6b2848-7792-4e11-9fc5-482b8e4e020b@acm.org>
-Date: Tue, 9 Jan 2024 12:19:23 -0800
+        Tue, 09 Jan 2024 13:31:52 -0800 (PST)
+Message-ID: <33213b76-07f2-4b75-9940-679ec8f06975@acm.org>
+Date: Tue, 9 Jan 2024 13:31:48 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,47 +37,38 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2 2/2] block/031: allow to run with built-in
- null_blk driver
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
+ expansion plan for the storage stack test framework
 Content-Language: en-US
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-References: <20240109104453.3764096-1-shinichiro.kawasaki@wdc.com>
- <20240109104453.3764096-3-shinichiro.kawasaki@wdc.com>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ "linux-fsdevel@vger.kernel.org >> linux-fsdevel"
+ <linux-fsdevel@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, "josef@toxicpanda.com"
+ <josef@toxicpanda.com>, Amir Goldstein <amir73il@gmail.com>,
+ =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+ Dan Williams <dan.j.williams@intel.com>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ "jack@suse.com" <jack@suse.com>, Ming Lei <ming.lei@redhat.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Theodore Ts'o <tytso@mit.edu>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ Daniel Wagner <dwagner@suse.de>
+References: <e5d8cd68-b3f2-4d7b-b323-b13d18199256@nvidia.com>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240109104453.3764096-3-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <e5d8cd68-b3f2-4d7b-b323-b13d18199256@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/9/24 02:44, Shin'ichiro Kawasaki wrote:
-> The test case block/031 sets null_blk parameter shared_tag_bitmap=1 for
-> testing.
-> The parameter has been set as a module parameter then null_blk
-> driver must be loadable.
+On 1/8/24 22:30, Chaitanya Kulkarni wrote:
+> 5. Potentially adding VM support in the blktests.
 
-It seems like the word "If" is missing from the start of the above sentence?
-
-> -	if ! _init_null_blk nr_devices=0 shared_tag_bitmap=1; then
-> -		echo "Loading null_blk failed"
-> -		return 1
-> +	if _have_null_blk_feature shared_tag_bitmap; then
-> +		opts+=(shared_tag_bitmap=1)
-> +	else
-> +		# Old kernel requires shared_tag_bitmap as a module parameter
-> +		# instead of configfs parameter.
-> +		if ! _init_null_blk shared_tag_bitmap=1; then
-> +			echo "Loading null_blk failed"
-> +			return 1
-> +		fi
->   	fi
-
-_have_null_blk_feature loads the null_blk kernel module as a side effect. The
-above code relies on that side effect. I think that _have_null_blk_feature either
-should unload the null_blk kernel module or that a comment should be added above
-the above if-statement that explains this side effect. Otherwise readers of this
-code will wonder why there is an _init_null_blk call in one branch of the
-if-statement and not in the other branch.
-
-Thanks,
+What is "VM support"? I'm running blktests in a VM all the time since
+this test suite was introduced.
 
 Bart.
