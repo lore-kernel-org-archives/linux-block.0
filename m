@@ -1,35 +1,35 @@
 Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279F23B789
-	for <linux-block@vger.kernel.org>; Tue,  9 Jan 2024 20:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA243D574
+	for <linux-block@vger.kernel.org>; Tue,  9 Jan 2024 20:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d3e2972f65so12279175ad.3
-        for <linux-block@vger.kernel.org>; Tue, 09 Jan 2024 12:14:55 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d40eec5e12so27417705ad.1
+        for <linux-block@vger.kernel.org>; Tue, 09 Jan 2024 12:19:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704831295; x=1705436095;
+        d=1e100.net; s=20230601; t=1704831565; x=1705436365;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b54ofTwPiDuht93+XALRgXaF7fCgTFqFpCE6v73Tio0=;
-        b=vY+UKTHXYwB3Z7w/04NgGvjOAW+dJMZqsIzCBFjz90aDyytHwZ0wNT1L/HeTD6qkWN
-         +8qH8shV1bmJDBEgjvqzqJYjJaJrw/IVUDfqCSEdjarERxPBbGqT8GGqyQ7iWnS7Taqc
-         luOwrNLI0p1sLdZ2BELFwcKUIAwwLMOSgaHWkfOPysUaivYMX3fmK9tRTsADFQpx6S86
-         jqkXygA2ctsM0uOyu+L+RjS+w7rS5vJZfrwlUm4ieaR22S+Ftj/480SEZ0oVO76nSzq3
-         mzW1qXJ5e10nQJhkf9pLYHKGGTlSwmnwewIj+sIeaw4Dfwfh6CUtD39mGhPHvHn4Mbxx
-         sT2w==
-X-Gm-Message-State: AOJu0YwYVm76GsXN7A61ZjOlfxCC29b2WRZbV/jegust0tupef5KE/Oy
-	sEs/j4oFFI3Y52NO12d2V3s=
-X-Google-Smtp-Source: AGHT+IGO1YfN7YI6nwPwzzZMw/s1shDHYELy2dp+DOXF2h9mH/VcAUMKOdHQDsSK3q25wmGBaunE2w==
-X-Received: by 2002:a17:902:ea04:b0:1d4:2066:68c with SMTP id s4-20020a170902ea0400b001d42066068cmr4141505plg.130.1704831295175;
-        Tue, 09 Jan 2024 12:14:55 -0800 (PST)
+        bh=a9kqU5X2TMS9hQrCMaHCADAVkV6CrsHjRbXVJ3WmO+I=;
+        b=STkNRkP2a0dOw0zVZTRmmFEdt5AGh/ORX3oyjRR/JmSX6KMuUmolhVwTpRrdkzzVtD
+         b4BQTge/6FeEj2Pv3eu5TBkMMq0NbJahtZZ26azhng5Ls0VR3KLFHL6Lhw1iiwFKKM9M
+         Z1Ge81M5dq0ha7TOV02ukYNSyylk9350NMjypJFS8t45dIYqDNdRq8DUV0XnqdrKBw85
+         YFX1BcYw2xlFpU9wEMsC+wMM02w14XZiFkMQJqlFTpNmSd9prP0B0xUlgzOImy4j6fiL
+         rraVxQSKp6mVuc95Lije/S/eBDi13FmcDJP63pZBppt5mkeGD+d2ABSmWM+Hzx8JlwYg
+         CeUQ==
+X-Gm-Message-State: AOJu0YzLca7fsARoKzbap9mmO5m0CpdCaL8nfT4G/Hg6cu4bLwgo+Mmq
+	NSV0XmoCyeEoq5ilwmlkdq+i178I+mg=
+X-Google-Smtp-Source: AGHT+IHFnyfQQGd7bVxX5X0iEX3OseX9y50TftnzRl1oVKk6/LlD5MIShieMgUX/yAuPz1F+k4fYlQ==
+X-Received: by 2002:a17:902:684f:b0:1d5:4dbf:6045 with SMTP id f15-20020a170902684f00b001d54dbf6045mr2148186pln.86.1704831564793;
+        Tue, 09 Jan 2024 12:19:24 -0800 (PST)
 Received: from ?IPV6:2620:0:1000:8411:b76f:b657:4602:d182? ([2620:0:1000:8411:b76f:b657:4602:d182])
-        by smtp.gmail.com with ESMTPSA id t16-20020a170902b21000b001d3aa7604c5sm2210087plr.0.2024.01.09.12.14.54
+        by smtp.gmail.com with ESMTPSA id u8-20020a17090341c800b001d53f81f894sm2181040ple.122.2024.01.09.12.19.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jan 2024 12:14:54 -0800 (PST)
-Message-ID: <89abe7cd-298b-4bd4-9a08-e183ffa7af44@acm.org>
-Date: Tue, 9 Jan 2024 12:14:53 -0800
+        Tue, 09 Jan 2024 12:19:24 -0800 (PST)
+Message-ID: <4a6b2848-7792-4e11-9fc5-482b8e4e020b@acm.org>
+Date: Tue, 9 Jan 2024 12:19:23 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,58 +37,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2 1/2] common/null_blk: introduce
- _have_null_blk_feature
+Subject: Re: [PATCH blktests v2 2/2] block/031: allow to run with built-in
+ null_blk driver
 Content-Language: en-US
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
  linux-block@vger.kernel.org
 References: <20240109104453.3764096-1-shinichiro.kawasaki@wdc.com>
- <20240109104453.3764096-2-shinichiro.kawasaki@wdc.com>
+ <20240109104453.3764096-3-shinichiro.kawasaki@wdc.com>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240109104453.3764096-2-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20240109104453.3764096-3-shinichiro.kawasaki@wdc.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 1/9/24 02:44, Shin'ichiro Kawasaki wrote:
-> Introduce a helper function _have_null_blk_feature which checks
-> /sys/kernel/config/features. It allows test cases to adapt to null_blk
-> feature support status.
-> 
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->   common/null_blk | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
-> 
-> diff --git a/common/null_blk b/common/null_blk
-> index 91b78d4..164125d 100644
-> --- a/common/null_blk
-> +++ b/common/null_blk
-> @@ -10,6 +10,21 @@ _have_null_blk() {
->   	_have_driver null_blk
->   }
->   
-> +_have_null_blk_feature() {
-> +	# Ensure that null_blk driver is built-in or loaded
-> +	if ! [[ -d /sys/module/null_blk ]]; then
-> +		if ! modprobe -q null_blk; then
+> The test case block/031 sets null_blk parameter shared_tag_bitmap=1 for
+> testing.
+> The parameter has been set as a module parameter then null_blk
+> driver must be loadable.
+
+It seems like the word "If" is missing from the start of the above sentence?
+
+> -	if ! _init_null_blk nr_devices=0 shared_tag_bitmap=1; then
+> -		echo "Loading null_blk failed"
+> -		return 1
+> +	if _have_null_blk_feature shared_tag_bitmap; then
+> +		opts+=(shared_tag_bitmap=1)
+> +	else
+> +		# Old kernel requires shared_tag_bitmap as a module parameter
+> +		# instead of configfs parameter.
+> +		if ! _init_null_blk shared_tag_bitmap=1; then
+> +			echo "Loading null_blk failed"
 > +			return 1
 > +		fi
-> +		if [[ ! "${MODULES_TO_UNLOAD[*]}" =~ null_blk ]]; then
-> +			MODULES_TO_UNLOAD+=(null_blk)
-> +		fi
-> +	fi
-> +
-> +	# Check that null_blk has the specified feature
-> +	grep -qe "$1" /sys/kernel/config/nullb/features
-> +}
-> +
->   _remove_null_blk_devices() {
->   	if [[ -d /sys/kernel/config/nullb ]]; then
->   		find /sys/kernel/config/nullb -mindepth 1 -maxdepth 1 \
+>   	fi
 
-Shouldn't _have_null_blk_feature() unload the null_blk kernel module if it
-loads that kernel module? That will allow to simplify the next patch in this
-series.
+_have_null_blk_feature loads the null_blk kernel module as a side effect. The
+above code relies on that side effect. I think that _have_null_blk_feature either
+should unload the null_blk kernel module or that a comment should be added above
+the above if-statement that explains this side effect. Otherwise readers of this
+code will wonder why there is an _init_null_blk call in one branch of the
+if-statement and not in the other branch.
 
 Thanks,
 
