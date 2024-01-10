@@ -1,93 +1,151 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EA91D683
-	for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 15:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098A33EA80
+	for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 15:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zxTEOKvd"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-360412acf3fso1733125ab.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 07:32:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cBy0GTpS";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="eefjF+ux"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1704901362; x=1736437362;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
+  b=cBy0GTpS/g3rq3zbeHmWgIQnE64wBgq3d0RPSWo0AkmHSjxAcQWbM+AP
+   S2is1UgGzCXirDgnyWTzdXeHnncEDSSjEV6UBeqV5Q4/91szpcl2Ko4HP
+   rQ+iMGvScFk3UJsmiohn877x4mja+3BbUwqv5nt1p98PhWvFw1jsAoPwc
+   Ha6LiD6ei3apI0Mb5cqzzIT90y5fRdKaxLV1njU7nRP8YCOjoJgf4IUDm
+   svOm+IzgLa3DhaDjOv2ABL6axQRQ/FmmZ6B4evHHVuT2Dsyjw0Ztwwxh7
+   ibUDoy3bIbBDxmCdA8/+zcrLPv1JHoxOcpqJeKCqymaPYtbhCyXU8wz58
+   g==;
+X-CSE-ConnectionGUID: ALjO3WohShq9C//HYFC8hA==
+X-CSE-MsgGUID: sMehY7ScRW6Up4FMgTUoMg==
+X-IronPort-AV: E=Sophos;i="6.04,184,1695657600"; 
+   d="scan'208";a="6583638"
+Received: from mail-bn8nam11lp2168.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.168])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2024 23:42:35 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kYGlqkGNMJWQhSVWztTrpU2miKz6F1tP3TrlqybjNONvbOBXjdOKkmVigbG4OzUrRPyi+Nv9Id9zR/rnK0c7YEqOG+WxxEy9Sl8Sj14SN99KrnMkJd0Ac8w55CqDht1d/QqD8XeH/Qaua9cFau8DTWnfVmLAJBU8ac0YEKc0mA2oTK1KjAQSyJmRdFtwk3edhQeXvBpHNxNkXOctzImVU4iAroBi/6SS2KxlfjEf/CpUQYhEM0U8AuUgDNebW4WpMmTCYl47SWFs7AKTfLlep3S+5MLnMb1MBmSsS1xjFVzVaYklG+LyCOZYn8HkF77RDQi2nCeL0V/+4D8R26p33Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
+ b=UpJmkbb99BTw7lJBnO2O5mpSSRNoqzj4Mc9Ebuukd6jGL5amMvR285uB1nwVobKV9e2QivMOuRy/QdG5NXTBjJUvuV5GwOxlMhP1HmXAQf4yhajScMI7zPN4kDblm8xF4qn61HpDcK3GE2jzFp1+tZaTirghMWDJhMbI/o6xC11kPUdx3FvB2GwvQg+J+8MdwpzkRd4Ik5ia5iOEtpCJWUHbqQxS6KPDaiSuHcTKh/KtpcisBSu5+j5+Rax2ukY+RzzIx3waekoB0F6uPifri0vk7eP+Y2tMkdm5QnDsGfhyZe5W87WHYnvkXbENAIeFrlhu5Pc3cjBoD5HBmgSIJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704900741; x=1705505541; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HG7PWoitXlaGNdhJUptnqdH5K92EdOT7uIVeUMjSfPA=;
-        b=zxTEOKvdi7MXZCQ1lEVc3XGcxDMU5gP47TXAUfuGrwniZbRYrWEyW8zOLNURjMo4l8
-         j3M+6Ogpmol1bzaK7x0cVQ00WBOy2ViXg2L3pdkWz6nJB/jsMorGnQKZCbjRAc0BbHgl
-         z3JW7QDlD/7Fi2wQAtZtcv3TnicQ3HII7UQdqKHeDUWT/ThPuoVMkcD04cTPfRVOI0c4
-         yTaCoQmukG2HgZtU1KOu9jmdNvt92rCDp40ZhZLBwbjFNZ8a/jpNMh4Y1+YX41DF1tY7
-         wc2HxMSKv48xZUYJYkG0/DGPkQsVlvf2LCLv924ewu12Srronwlk8UzglyTMCoJwuNvc
-         4ung==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704900741; x=1705505541;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HG7PWoitXlaGNdhJUptnqdH5K92EdOT7uIVeUMjSfPA=;
-        b=qrQwkKVVGvEMY+uhZDxw2S/43dA8LLgcHDgWaOI0JXPqjOrMyMKWASqeso0dzJDPKl
-         f+c16Qpa9EQ9ZvJ+qCd/8/H4E0+KYNkxxjYDdzhBdYYdFMlFarCDtyOvMQsgt+geoW6D
-         qA5D/RQ2PoA5P62Xe3s3qvJrApKvF5qcNzagY7TTMh6pgWLYzDmPiw13ihBldI5w1IdQ
-         T0lhCSi6nIH0UbYJHYifopBHQ8DfjuQZ/v0eNP1bVbqvEGl8S8fhGr8X0MUA6ZJXODw8
-         GJ+qTjBNby0v6H9RCgg+jfOWFNOzYDjF1DU/+S7iFSbra1mXbnMYXgYZNZgzMe007yL0
-         347g==
-X-Gm-Message-State: AOJu0YyLxV5g37LYM5xzC2sP2jH+tB5eQcwqeN5JcnKoE9dS1w2WaH5S
-	aKKg5mAUGiI/xyZEVb8JLyENnYsDOQYmZ29Hhx7nphs3mIC+dg==
-X-Google-Smtp-Source: AGHT+IH8MYpIwMww3DVkAo3fdCmPILr9wcBYPvYrBTQKXRMhYrqGmBd64QFHBttnMTFSghtTc+lGsw==
-X-Received: by 2002:a6b:e318:0:b0:7bc:2c5:4f6a with SMTP id u24-20020a6be318000000b007bc02c54f6amr2726098ioc.1.1704900740810;
-        Wed, 10 Jan 2024 07:32:20 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id gt11-20020a0566382dcb00b0046e258abce0sm1346012jab.117.2024.01.10.07.32.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 07:32:20 -0800 (PST)
-Message-ID: <06a7b6da-f3de-43cb-8ac5-bdd090a7d33b@kernel.dk>
-Date: Wed, 10 Jan 2024 08:32:19 -0700
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
+ b=eefjF+uxQqbY3Fe2rqEu3B5z+C0a2s1C6If/b5AvgtShrW5kuVWSrO2hKMTHWNoM18e4jTIa1QE3r3Ppz9T3qIR4Av70sfvFiMuENbQc3VveflNln6TdHngUxAe5GveqZBdENyLDIlaOewxtavdNn+vVR7l3UL1ZG21aOUoN1zk=
+Received: from SA0PR04MB7418.namprd04.prod.outlook.com (2603:10b6:806:e7::18)
+ by CO6PR04MB8410.namprd04.prod.outlook.com (2603:10b6:303:141::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Wed, 10 Jan
+ 2024 15:42:32 +0000
+Received: from SA0PR04MB7418.namprd04.prod.outlook.com
+ ([fe80::a8a:ec30:a6cf:8e1f]) by SA0PR04MB7418.namprd04.prod.outlook.com
+ ([fe80::a8a:ec30:a6cf:8e1f%5]) with mapi id 15.20.7159.020; Wed, 10 Jan 2024
+ 15:42:32 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>
+CC: Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH] block/iocost: silence warning on 'last_period'
+ potentially being unused
+Thread-Topic: [PATCH] block/iocost: silence warning on 'last_period'
+ potentially being unused
+Thread-Index: AQHaQ9pDh0SjWOeezkuy0KTzSfNxPrDTL4sA
+Date: Wed, 10 Jan 2024 15:42:32 +0000
+Message-ID: <4aac7886-b3f9-4db0-ba2d-c13cfd1d237a@wdc.com>
+References: <06a7b6da-f3de-43cb-8ac5-bdd090a7d33b@kernel.dk>
+In-Reply-To: <06a7b6da-f3de-43cb-8ac5-bdd090a7d33b@kernel.dk>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA0PR04MB7418:EE_|CO6PR04MB8410:EE_
+x-ms-office365-filtering-correlation-id: b52ae4ff-da3d-4d3d-9c4b-08dc11f2c2c3
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ xhGxYDWh+W8Eq3LqKhWSUXp9nuwiX+4ixOf8YXoBPLib2HiHSuLk+ZD9Nz8xmdFNU6ih4MR/tfeaPZrT/Ly6iOqg1b5TjAAQ2R5uzy5VGQnYDwtD3pmXfYyYaLYRVWYALODGVVNkAapMm1jFlIRt/F3AZPwSAzPGLKOFagsgNXrxSjPdYvC9L3rSy2iWXY2XBHWKCu+HOEPl4CUJj+IKzfSa380GMvrhWer8XlzyR8Lzvujol+1l91Hy3z9FbVI93pXt1UXKRB2iYyaC72pPmUrs+TELXriUhpDHcTaCpnRXeBLPJCA+yWbvD0q2E39K08nefyd4/KPafxuwMXp6pmPrYtFVnoQJ4BVNDGZ/oWqKgzj6PytcMgfPU/YIJOZgKDZ+DoFoC/NOdTM/HSqOG8kd+7li0lY/z1IpB0C4ROc9XoEBx5TjE15PNKfi1ic95IhaCX/Jlyelll/ABZ/HAERdsiAxHG+ghm6p2zI+ta0+HzwRnAclXvCwwuEOVFycGUn4BGB/RIn/ubkRPyPbr2AYEsTAwP0i5RCUVZGDdl8+vLvHAziMJckgScU4MXngKDNOOzC+grJ2aUyjN+RugmIxZQrrGRNKkVhwAcUDzvCC5fhZZ3Z0WWJaOxkuGJ13cjB/ztXibmL+XqK3O7Sey7D+5yOU88Ce8zIJEwnF2GewwqpcNhDQ/trnxIk7v6r2
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR04MB7418.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(366004)(39860400002)(346002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(4270600006)(2616005)(8936002)(8676002)(6512007)(6506007)(41300700001)(6486002)(86362001)(558084003)(31696002)(36756003)(38070700009)(4326008)(66946007)(316002)(2906002)(110136005)(19618925003)(64756008)(5660300002)(91956017)(76116006)(66446008)(66476007)(66556008)(478600001)(31686004)(82960400001)(71200400001)(122000001)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?TEJNRmgvRExjSXVaYXQzQ1d1SFlkTXNlS242enYzWEVkVlRCMG4rb1ZqTDNK?=
+ =?utf-8?B?Nnk2OUt0YldqVnlsWnlzczhGdUVZNC9NNndsR2lVeG5vNitBY3Zxa2lvbHRm?=
+ =?utf-8?B?R0lyVjhXTk1lN0V1dXJ0dHpRMTRXRmlTdTgwL1dNUFVnN0RxRnBWemxmenZN?=
+ =?utf-8?B?YUYxN2hRUEJ5Qm9aNUFRKzlQaTBGSEcrZE5LT2VLdGM4c1IyTEZmbW44VUh5?=
+ =?utf-8?B?SW4zeGlWaU1SRnRKdytZejljcDNLWkh4bmVvSHk2aStMaTgxOUFySDVXZXhx?=
+ =?utf-8?B?NVpsb0lCVmRqNWRmNTFlbElRWjJja2gweXZxRlJuZzJkZzdUQ2J5MjBKK2Nn?=
+ =?utf-8?B?eDZOOUM1blI5dWFzNkdmOVZFWGtCR0JEdW1zOVZlUzZuWHJRVWxDZ2FRZm1O?=
+ =?utf-8?B?Q1BOMkRpZ1NFUkpCUEZYUUtXbGxiY0VFdmp0eHc3cG8wVC9uWUxOOGZkQXAv?=
+ =?utf-8?B?eEJIMTEwbXgyUTZrSHRrTlNJY1p1QUFiYnJIN0VyRnIrNHducnVabjhLSUVM?=
+ =?utf-8?B?dFpneFZOZTNoTGhCUU5DY1NFK3RnUXByZm8wcFBBU2N3cjhoY0hQUWlPOXAx?=
+ =?utf-8?B?bVZ5Mk96bW9WSDRKWlY4YVFxN3ZkTktlT2VSQzVLRzVZa28yMWNPRkFjK3Yx?=
+ =?utf-8?B?RkJkVnppbXVMYW40SjVNRFVRN3lpbjlXd1FJaFEvUWx5MkpQWFZVSFB4OG9v?=
+ =?utf-8?B?VnFpeDEyVVFaeUZIVmVjZzdwR0R3N0dFVWFCRHA3dndUR01XQi9yTUVWaG9Y?=
+ =?utf-8?B?ajZJblhrSnlOc21tL0x4VGsrbWVLMlhxTlNQOU56bis1TmdCdkU3ZUlPNjdr?=
+ =?utf-8?B?MG9oR1B6MFNTQmVqanNlY3lqU3lxZUJ6Y0dlYzVnVTdJY0RmTUthMjdGa0lS?=
+ =?utf-8?B?d0hGL0wwbmNiRWNiZ2xWcm5lMWhockJCZmxVRFB1NUc5Y1lsYVJ0bVVJWWJa?=
+ =?utf-8?B?Y3Y5cE1UYmlVdUlFcGxSRG82ZjhvQXVqZFRWeHJIamMrdmN1WWp0WTdHakVU?=
+ =?utf-8?B?TWRYZkFIeTdHT1ptTTVHZ0d3Zi9DcmtvZWtiRXEvRWhBWmdjbDhlMitVMFhT?=
+ =?utf-8?B?UmJtZXA2Rk9PUFVYV2diQjVoQWZPdXhXbkR4cWRKK2p2MzVDUWRvLzdzemdV?=
+ =?utf-8?B?NWNBbnhFUm9iSkRwb2RLWHZ4bHlVdHhKdSs1bzdkcVZVdE1qQ1FsSUpGNUtB?=
+ =?utf-8?B?QVNYTVZyRDlvSWVGVW8xRlk5dkY0dUxvbEFKZjN5MDJyTDJkWEVoK1NLbzdp?=
+ =?utf-8?B?ZjZPTm1wNGpmYlhqbkJtcWw2QmNJR2RGbDlKMElqcDZhLzVDWVZZQ3B2OUZv?=
+ =?utf-8?B?dGNra1ZEenB5a2RkdTB6VGcyc0RORktmWUZhTHdpR0R0YnMrcFdVVWZFQzlH?=
+ =?utf-8?B?MTRqOFg0cm1IVHJQYlRXdDNwMTlEMzdHeDN5Mmx4UzNOT2Y4MVhlb09rZ0V0?=
+ =?utf-8?B?Z3ZKZTZ1SUNaTCtOL1lHNm1FNEZkOURJMXM3NFB5cVA2NUFZTm5SMFFhQUV4?=
+ =?utf-8?B?azJFNmFwL3VsNWFXNnp3TjFNNVpoZWRJbWN5NjZZOG0zN2IreGZ5MHNNVmUz?=
+ =?utf-8?B?L3dUclQ2MFZkVXN5SHZGVmRkSnlvem1LRmJnNU9aWE12aktqYjRWZ2dGS0ZJ?=
+ =?utf-8?B?N2ZjUGpLQVNNSDM0QWJSOUtWelQva21RY0ZTbDdSMlVyd1o3dW5DaVp1V3po?=
+ =?utf-8?B?aHNQQ3Z1YkxOeXlxREJQck5vMFFOSllna0NHZmgzZTdjaTBQNVlzeVNYOEZh?=
+ =?utf-8?B?R3VyUXNpd2dDZHNuUkRvNkVYaHc4c1FwRmVaMDlPZW54ODBCcEVzYXpTWjN6?=
+ =?utf-8?B?L3VDNFl1SGpCSXBuaVRnR0FzSm9zUE9BYjFEVmZ3cnR5Y0hyaXJHaVEvS1Fn?=
+ =?utf-8?B?b2huenUwQlc1YnhkaHFkMkJwUUlWVS91dkh2eTkyUmJkYXVVUW5FNWNFL1hs?=
+ =?utf-8?B?LzA0c1V6Nm95ZlJyMG5SUnpoR1lyMW15cm9WbzFEVGJnVEN5c0hjRFA0dEYx?=
+ =?utf-8?B?K2pUeFNRTDc5ckNPSi9mYks0RW43bXByZUVHRTlMeUFsOCtOOHgzbFZnM3dD?=
+ =?utf-8?B?d1VxaW82NUFuQXVKczZ5a2lQY1R5VTJDQjRoelI1a0YwbUFYNlJ5T3Q2QnVS?=
+ =?utf-8?B?UUtJTkFmbUNnVkh6amtuSFR1TlBhZElKQUovNXk3VHl2YkcwYmlMNWtUdURC?=
+ =?utf-8?B?SXo4aFR3SmRGZWI2R2dZTmZHMHRTRnA0Zm1FV3RTN0hvNjJ5b3FwaHpmeFhu?=
+ =?utf-8?B?Wm9lSjhQdTh4TkRmM1B6OERRR3FRPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2BF0A1D84D5F9449A7A723B16B1DD5C0@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block/iocost: silence warning on 'last_period' potentially
- being unused
-Cc: Tejun Heo <tj@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	Xv9Q/Ow+DSz9JDzAmGgL93osXerQL5Q4CxdIgL6MirpJnPqKn1FiCbBhYIaV8HSRuodJjYXdld7Wx03zq/IrLhkHKVhAvyWZHBsOpHn38hUl5vtsMdTJoTpSvEmdm2GlnzMwmDOftoQkDlhvVUjtaT3YknekHv1a2hHUikusEHuzVC2h7c2gKujtDPQZUTt0vRsBlTcKwnhcmd5yw1OR2V1hE9+EANa2IbMxfU0RxLnYZs9AdemZEZI6Gy+uo0B9C+k73sv/CLPg8mBJH5V2DdTXpHcFb6EDIamxcKjC3N5RKpTvzpjv8Jct0BGr28RIioVLMFR5KzGTuZXyJ79QTydB88IzwYPAaNCTYfEyG8nyef9H9K2PaRBvxTovQADdylYti6iRUQHfm9RNTYvBD1I1IoJ6qcMNr0sn7zfNkePqrssGG0lb0Z3BmVS1fJvuFg2uDM1AOEMxRKXqr8hMolLFrzRHZ1cQL1HcbEZ0aTE0hHhbW13UvjxUKhpbb8bWqytQzHagqb9Rc7P45hBuliblE5dTj6jrZGqqarWDDXVGvPgkgZwtPr+RegGal/22dDwVvs0tWuNuVCQXn7qBfT7VjfTcBR9e62XGIMAJPkt6tVySgNKHz+Sn46XRS4ME
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR04MB7418.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b52ae4ff-da3d-4d3d-9c4b-08dc11f2c2c3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2024 15:42:32.7053
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fCOujOumVqG3m1kYEUJbo9Gpshs4bEp9GWwspOmm2KbY9QAd32kJyzzNWrGIs9HQtLB+pI50d1FjVrJ+BWHTNhaC0EZQBd4T8AaiVk6i5tk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB8410
 
-If CONFIG_TRACEPOINTS isn't enabled, we assign this variable but then
-never use it. This can cause the compiler to complain about that:
-
-block/blk-iocost.c:1264:6: warning: variable 'last_period' set but not used [-Wunused-but-set-variable]
- 1264 |         u64 last_period, cur_period;
-      |             ^
-
-Rather than add ifdefs to guard this, just mark it __maybe_unused.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202401102335.GiWdeIo9-lkp@intel.com/
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 089fcb9cfce3..c8beec6d7df0 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1261,7 +1261,7 @@ static void weight_updated(struct ioc_gq *iocg, struct ioc_now *now)
- static bool iocg_activate(struct ioc_gq *iocg, struct ioc_now *now)
- {
- 	struct ioc *ioc = iocg->ioc;
--	u64 last_period, cur_period;
-+	u64 __maybe_unused last_period, cur_period;
- 	u64 vtime, vtarget;
- 	int i;
- 
--- 
-Jens Axboe
-
+UmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRodW1zaGlybiA8am9oYW5uZXMudGh1bXNoaXJuQHdkYy5j
+b20+DQo=
