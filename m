@@ -1,87 +1,83 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F384CDE8
-	for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 17:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FE54CDFD
+	for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 18:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-28c23a0df1eso2588100a91.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 09:50:17 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpPOn1su"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d3e416f303so17404745ad.0
+        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 10:08:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704910136; x=1705514936; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8LMnQx2W0/C0sZnAs2bu/EDFWZs/fAlz6/Q7ipTzQ6g=;
+        b=DpPOn1suS+BQ6qmklM1iyONOkWd06jahgizL24vhgsZOBJmJm4BCYulPY6WYPzCQVo
+         B450Pot/VHswFyqs/679HuLGQ0fc7XtZyNl8P587/J8NS9fACbCwL0wGf+1fu2WcgXuW
+         S4MpxpJPtIXZZ5bLRHAw+R3osMAg0Ni+X8eKD1tHRf5Vi53hVCJDV1WqrVlSmjyl8FLk
+         rkkUBBhPNRGisk+3WSLf3ZGV+yoYUjkySOH6YJxpIeA7OHxuHiQK305v+4j0IYdk0Jfg
+         MIS7po97dIsMa2q49/jndx6IZAC9pJcyL9eOMWGX4NTlVU4kSbGGW6hpSva2hKiKCu9/
+         7FKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704909017; x=1705513817;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MbDUPrnrTHsHGLPM9LfXIXV5BYask7+UrObhyUAggQE=;
-        b=twsOBvazY4Y+Tt7H8MelWR/JtDFqx6VMhw53UM/BfQDz4FJwHjIeHhKMJE6bdIWpsq
-         3FB5Czm+I7ZO675aXmkMXSu2ATNTQ6Uq0OxMyd3/pcwGFOpNo7+aAyLfcttTlcgrdbr9
-         f7aV4eurEJx669+GDIjFdyfZUgtKvYrW21/0Vq9oXLVEehIaygaF1s2VnFvWQk3cq7dc
-         ZfhEcaBdetPCvu51QJXWcExfeJI3U+Bbp8/Z9B4TyErvHnx9GsELjWNy4YuJwnk5tYxZ
-         gqS3NS+sgtpFELfZpL110Rm+Mc9Szd16RdqKJXSrQK4hjfFWb5S5M016ODvBM5J5vjwA
-         VXAg==
-X-Gm-Message-State: AOJu0Yze9CctST2w9hBavwa3H/Hi71onLtuAbE41BV2ZvBE8nqRsqNUY
-	N0YQDlqnSu938EsgMnX13sc=
-X-Google-Smtp-Source: AGHT+IHTiSBYPg3BlOYXn/1jhfIb2FZodQlZsOmcKrUS/SP9LiGAJmluo1iDhDsyDHTsJiALrVwl8A==
-X-Received: by 2002:a17:90a:1c96:b0:28d:35d:10da with SMTP id t22-20020a17090a1c9600b0028d035d10damr915195pjt.32.1704909016378;
-        Wed, 10 Jan 2024 09:50:16 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:b76f:b657:4602:d182? ([2620:0:1000:8411:b76f:b657:4602:d182])
-        by smtp.gmail.com with ESMTPSA id bb24-20020a17090b009800b0028c9d359011sm1842626pjb.32.2024.01.10.09.50.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 09:50:15 -0800 (PST)
-Message-ID: <f64d4219-5265-4cbf-b955-f72106f9e760@acm.org>
-Date: Wed, 10 Jan 2024 09:50:13 -0800
+        d=1e100.net; s=20230601; t=1704910136; x=1705514936;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8LMnQx2W0/C0sZnAs2bu/EDFWZs/fAlz6/Q7ipTzQ6g=;
+        b=ZXfUQ3LUwfo4OTFlhBZ/Y2M+T7NdP1Z4TUwRU4n6J008Dw8KQ73NQh7NX4vk/8eQoX
+         zdOATLue+SKsRmOwB9xnYroQJBQsz2p9K5dv7gTTk4Qd/vHgXlttCuS0ocKaK6hXpSug
+         xphhRJahaloSLplOUTax33zAPAknc3vYkC7DQfhDVHy4dQN/C42w3shAREkjBekB/ndo
+         Z7V2PNEqKHn90mYgfbKVVImzbwX3xO4pC6sw9mQ3lW05m75eZMagZgxJbLpKOYrUbS+s
+         ydca9wQkeUmu0/MfeUgE0eMmI58bo61RxK2Vti39J+7j110H/jOe8+tqEhfkLrExlT+S
+         zi5w==
+X-Gm-Message-State: AOJu0Yx7O6772LWRLhiVAjfBIN9ltrFb4aa93x+2yMQrKE2qd46Gu0yZ
+	kAqNYEl3dFv/yOKchkveJs8=
+X-Google-Smtp-Source: AGHT+IFLCzJucW0CW4fEwPQVu/BVknqTM5luvMhKi0bs/a0TdqDg8yVxDQrMNk0Fhe+FMsjPxwUH9w==
+X-Received: by 2002:a17:903:2342:b0:1d4:b6e9:9e42 with SMTP id c2-20020a170903234200b001d4b6e99e42mr1371629plh.21.1704910135635;
+        Wed, 10 Jan 2024 10:08:55 -0800 (PST)
+Received: from localhost (dhcp-72-253-202-210.hawaiiantel.net. [72.253.202.210])
+        by smtp.gmail.com with ESMTPSA id t10-20020a170902bc4a00b001d4c316e3dbsm3957961plz.114.2024.01.10.10.08.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jan 2024 10:08:54 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 10 Jan 2024 08:08:53 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block/iocost: silence warning on 'last_period'
+ potentially being unused
+Message-ID: <ZZ7dNfAZputj8DQH@slm.duckdns.org>
+References: <06a7b6da-f3de-43cb-8ac5-bdd090a7d33b@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2 2/2] block/031: allow to run with built-in
- null_blk driver
-Content-Language: en-US
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20240109104453.3764096-1-shinichiro.kawasaki@wdc.com>
- <20240109104453.3764096-3-shinichiro.kawasaki@wdc.com>
- <4a6b2848-7792-4e11-9fc5-482b8e4e020b@acm.org>
- <7auicy62muu22xsd3adbvrljq3guvbdzgkbafxva5du45jli3n@wo4f7f6ut5eb>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <7auicy62muu22xsd3adbvrljq3guvbdzgkbafxva5du45jli3n@wo4f7f6ut5eb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <06a7b6da-f3de-43cb-8ac5-bdd090a7d33b@kernel.dk>
 
-On 1/9/24 18:19, Shinichiro Kawasaki wrote:
-> On Jan 09, 2024 / 12:19, Bart Van Assche wrote:
->> On 1/9/24 02:44, Shin'ichiro Kawasaki wrote:
->>> The parameter has been set as a module parameter then null_blk
->>> driver must be loadable.
->>
->> It seems like the word "If" is missing from the start of the above sentence?
+On Wed, Jan 10, 2024 at 08:32:19AM -0700, Jens Axboe wrote:
+> If CONFIG_TRACEPOINTS isn't enabled, we assign this variable but then
+> never use it. This can cause the compiler to complain about that:
 > 
-> With this sentence, I wanted to describe current implmenetation fact. Before
-> applying this patch, shared_tag_bitmap=1 was set as a module parameter, not
-> through a configfs file. So I don't think "If" is missing.
-
-If I upload the sentence that I quoted to a free online grammar checker
-(https://quillbot.com/grammar-check) then it tells me that there is a
-grammatical issue with that sentence. That's why I asked whether a word is
-perhaps missing. I'm not trying to be pedantic - I raised my question because
-the above sentence is incomprehensible to me.
-
-> I think the inline comment above was not clear enough and caused the confusion.
-> How about to improve the comment as follows? I hope it explains why
-> _init_null_blk is called in the if-statement.
+> block/blk-iocost.c:1264:6: warning: variable 'last_period' set but not used [-Wunused-but-set-variable]
+>  1264 |         u64 last_period, cur_period;
+>       |             ^
 > 
->          # _configure_null_blk() sets null_blk parameters via configfs, while
-> 	# _init_null_blk() sets null_blk parameters as module parameters.
->          # Old kernel requires shared_tag_bitmap as a module parameter. In that
-> 	# case, call _init_null_blk() for shared_tag_bitmap.
+> Rather than add ifdefs to guard this, just mark it __maybe_unused.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202401102335.GiWdeIo9-lkp@intel.com/
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-That sounds better to me.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Thanks,
+Thanks.
 
-Bart.
-
-
+-- 
+tejun
