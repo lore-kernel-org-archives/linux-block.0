@@ -1,199 +1,163 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA5717E4
-	for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 02:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8093C32
+	for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 03:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="c0DEAdYs";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="d2DMiU9D"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1704853155; x=1736389155;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=fJMJJqytD15zaSvjFvYVR+evNWunxnqkIOu6vxcEhzw=;
-  b=c0DEAdYsB3X6PMoOSDphJxLNQcxuhtYaYkQQ4DaYrQcAghD8eG66pLFb
-   +QZc4hiIN8hT5rK7xC0rJOZIzCY/EakxmpKgJQG8IuSDpRD2Wc1Z2s1ta
-   KQy7rSuOIqPwwAoJIrEPx45H6V7NbJTayuSaCcH9c1iZbRjKWpH4IfLmv
-   68952aV5xpsg0rdTbHYVdyhKGzz+JpyoZwicP0DLYCEe0iCOZ3Tolhlce
-   2N2ixKNMjypAgZcV+tdqnb09OXLOZWMoYlsEd4nKz6f7LD8xe0XEnG42c
-   ubUAgbYz9JZ4nP83S3KPwfCng5P2KXg5ged02ygvZB3nPPwwjWyX42CnY
-   g==;
-X-CSE-ConnectionGUID: KDpfbM6iSRSua/r4YZ3BcA==
-X-CSE-MsgGUID: SNVTPFAZSLmDtO9pFvRqRA==
-X-IronPort-AV: E=Sophos;i="6.04,184,1695657600"; 
-   d="scan'208";a="6294365"
-Received: from mail-bn8nam12lp2169.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.169])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2024 10:19:10 +0800
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DAxY/1/N"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MJUs+AU55/3nvDKwAtw+D5h+B5QdhNlBE+Aq5RYtLUbBrkhjw74MxfLPdDSVHvcYIz5WQVcSr4CG8m+XC+zrThCbddUVvWW4ZBZOV+vBExEj9E39Txgbz8XNCa9oDcTqOztVFlzLekIAqwWGcLzY4cwjRfCYN67T+7YN7AM48eJo+9EgV6f31TdyqpvBvGGvgjDEgbqUZA1tkNc1GUVzbig3BzlxcUGdQq0BIeoV5YqHG46wB4juLsQ/Z4ELg4cpxClPshbSoy9rvG09CNIj2BqiGF0vgtns/SCBTffMcAN/QPV9VAgykc4+5Guemnqaj4yjgTGV0bDuekT/vmUVtw==
+ b=S8qAOBAdlgjbeCpGAN+pfg4DoQyacmfocrvRGCGC9qiFbjeYCKnvD07FiAYczEHioYPZ7MEh4RFm8ST/eZar5uClpt/X14RsfIx+PHobsdoT/890lg0hQqVsyalhv4qtvKIue6rNljahbJoLp5rnrzS0huYzAu+nSvR0PFOdJcuN0bwzd2QIpoJQZZcj/Pq3e4qP9r5Ir2E6CaF/SdA8fzaHosQoyQERUJS4qjv1DDHzos+oKmKtGut4d0O9TAZC8zepmMcJcyfF3uFd9OLtQwNmh8OW6ga/vscrPRp9KCo6b2owBf6XXg6g+0IV8BRQtbKa6uGc0L/TBZk4BYk8yQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jBh/Tam1uFaZcr2jbEz9oCoQMOVHc5TrY1f7d3f3pos=;
- b=i3LisGf5KoyfSzF43vj7I/rtSMyvfEeE8RwWmTCP3jpsnagmWCnh3q1NMmq15UU1rrhtSSgDzLTddh0XtJp/cMVTM+4aGD+Yyd0e/+higr9s2plzpgD2DtIM4XKwnWRf+nZ6Okis95hgJlGmgu8RkOGTPfpjAKcU5T3QcJ0y44mmFF5tF8+B+tI12ANsFVoh+Ns0INijCyPqHNnVWYALLzAstnR4sAnNXNw+10kMWIcCjuyOEBeEUngUe0nBGiLX3MpX7TdtlFycDJ0Dumv1/LHEp7vbDdkdgVRwyloqgs7cgMr42M4+y7BPDlATz0/uhS04XRybORqDv4ZHMhZ2wQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ bh=D4Pz3Fqe/f8M0e7nZwMmN/0I0cXmhH29hCVKHPPxdxY=;
+ b=aWjHioIZ8HD5e9HHM1ijTqPVoG7TXcjfUy1ZCWeJPz1bJ7Zlc5lIgAFjP/6mUdpirnfXoS6JL8oF80RiYT6ATuEEUEFT2TID2aregMIvJQeQxN7paYt24UW69TAmSYOmI7XjvbSKALOrcQw9jHqvkBPa4tx1d3MQdQi7lwwYy2UrGldYabbCzcbHMv8yKCfAz4xouaSmjFALlX4AYYMF8/mSCSUU1D5mQAHSOlsAnVQ9SH5loGucFABlhmVNVtL6EjfAXLh8zC6APHr920whtXra6yF/UbNMNs6Cb+MC6QkugMf2QZFg39zSF/n2OT2ZjJsWe6tRX5loeZa9cqFKKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jBh/Tam1uFaZcr2jbEz9oCoQMOVHc5TrY1f7d3f3pos=;
- b=d2DMiU9DtQVdhnkmBM+F0MK++cjIdzeyrRfaH5NxQvXkZp7CCJaCqmVRoO/1s1K45LUI473dkjznxb6JMCp1WbBxuHbMDQxWUuzJAM4Bcm7hd7zmWWW6mJ21OGr8/SsgpGuta7KyjhNbCJb2F7t07qp+slZFdwaNlKv2KPaohjE=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- PH0PR04MB7446.namprd04.prod.outlook.com (2603:10b6:510:18::17) with Microsoft
+ bh=D4Pz3Fqe/f8M0e7nZwMmN/0I0cXmhH29hCVKHPPxdxY=;
+ b=DAxY/1/N+5UfL4l1sdPNU5zR+jU3BaTrrN40sC9GL230U8H9TgKSZZr9TbySCKMfmLvCLjcCKnqZ3SucGdQgSWrvLpJtl/A2irfL7eEoQzWTwYu9Xx1nFNNpHFpQZVvrJ1MGgux/XKyEanV1MlTRqEFH/HCQvKV6/Z8PthiOKFrQux0hpJ6QDZohAEmvFMb5rj3IPAKriJAQA7XqDForw1A8FaT++88o7prfJvAXMC1WM5OzQmvuTzIhHO4P8EKweK5hAmw0Sj8BAinrda/fhobu7v3icvB7IcC2/r5ymLiM+78mALF/zEf83nwGrFOAUBL7Ndt6u7M58PJ4bybK3Q==
+Received: from SA9PR13CA0003.namprd13.prod.outlook.com (2603:10b6:806:21::8)
+ by IA1PR12MB6553.namprd12.prod.outlook.com (2603:10b6:208:3a3::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Wed, 10 Jan
+ 2024 03:58:24 +0000
+Received: from SN1PEPF0002BA4B.namprd03.prod.outlook.com
+ (2603:10b6:806:21:cafe::37) by SA9PR13CA0003.outlook.office365.com
+ (2603:10b6:806:21::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.15 via Frontend
+ Transport; Wed, 10 Jan 2024 03:58:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF0002BA4B.mail.protection.outlook.com (10.167.242.68) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7159.21; Wed, 10 Jan 2024 02:19:08 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::81a9:5f87:e955:16b4]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::81a9:5f87:e955:16b4%3]) with mapi id 15.20.7159.020; Wed, 10 Jan 2024
- 02:19:08 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Bart Van Assche <bvanassche@acm.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests v2 2/2] block/031: allow to run with built-in
- null_blk driver
-Thread-Topic: [PATCH blktests v2 2/2] block/031: allow to run with built-in
- null_blk driver
-Thread-Index: AQHaQujnpRNH2s3KN0GoD/i6keHycLDR7HKAgABkg4A=
-Date: Wed, 10 Jan 2024 02:19:08 +0000
-Message-ID: <7auicy62muu22xsd3adbvrljq3guvbdzgkbafxva5du45jli3n@wo4f7f6ut5eb>
-References: <20240109104453.3764096-1-shinichiro.kawasaki@wdc.com>
- <20240109104453.3764096-3-shinichiro.kawasaki@wdc.com>
- <4a6b2848-7792-4e11-9fc5-482b8e4e020b@acm.org>
-In-Reply-To: <4a6b2848-7792-4e11-9fc5-482b8e4e020b@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH0PR04MB7446:EE_
-x-ms-office365-filtering-correlation-id: 2699830f-5bb2-4323-b86f-08dc118286d6
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- f8R9N1NbBRj8WnX2YPlWNSn2CyOehcQ3yYj7UeNvq/jbreEYJmzjUTtUjH/E2FT2dd9++qmBWbcxeCe6F03kNxZLUkD/JonTw44rg9bNdEYVfeb58mNvpAwjPe1mVRzp95BossesyzfW2jhVp5jCxSwYk2TWn8oilJdsuItgUCWojxvHbjd9ARlmEAUf/BGxIqSaJ/9sljILepdWx4/FBWQBaR3MtEU0Jqxs8mpCdE3AWnbEvetw7+HUvolH+xlQZBbIkeKT6BWRfZMLVcRD1tgkJvtu02GODvCiPN0VQiHmeeSBe58K3xle2TzEvzcLw/LmguWGyizCv+yyAHKAtikeE9WlUr4Z5/aGTBVCXWCyUdOGvBESjgHAAV8OH7/BWuOKyjipVS4rDDXBXnI4qt9QblIMzxrDwi4O91xUqxcagv9bBS0rMfHdt4alhnpa/d8M9NBKnc9/Kz6mn5CVpZabR6k2G8J3qnu0C1l1AKLvCL2U6A16okzP3vBFKJ4w2lOFjc7p8YAyjvJv8oD9oWWFldlcxdG5SONex+rm8RLLl66krgy50TXFEqMp/ysb08zt5BulIV+sFu+V9Y34ZkD2Sb4oEozRAkp1BqwfhwXfKGafUpdxvrApQ4T6kwWl
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(376002)(396003)(366004)(39860400002)(346002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(53546011)(26005)(38100700002)(6512007)(9686003)(71200400001)(478600001)(6486002)(6506007)(83380400001)(64756008)(2906002)(66556008)(33716001)(5660300002)(4326008)(316002)(76116006)(8676002)(66476007)(44832011)(8936002)(66446008)(66946007)(38070700009)(91956017)(6916009)(122000001)(82960400001)(86362001)(41300700001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?uueWiu0cVMZzXFzm7GT+sWb9ge1DO8YrKNxe7crvnn+wrwxpQYBG28CGlgEX?=
- =?us-ascii?Q?A4pQWujM8366EqFbsO8S0fnUEy2jxSerSboq8xTs5CZ6H9gjLYt3I3V7u8xr?=
- =?us-ascii?Q?E0BcL8WZoFiOrp19zgCznrJf3bXJoQARQzNbhuVprBHflozsodY3SQAIVj9X?=
- =?us-ascii?Q?Puo9UEE+oyPbrgJrq/SR4/5t69KaD2Vk1DEtvtWATu6Ju+S/3JDTUqIbseCj?=
- =?us-ascii?Q?d0Q3ZDo/1WiNa9HUZathZ2/0GoWNmYgTUHD3jqIo7eE8VIGk1B5OR8oYAVRQ?=
- =?us-ascii?Q?MYjyPY3234MItUeZm7VNj4qdLcqKyz5Q/LH+pO91wJJessUkcYKiv9U3Aa3k?=
- =?us-ascii?Q?aakpJbGi4YwdZJfT0CkxhNrtdLvdtQJe8K9iutODk64lLD5x42EJkzuTwbFR?=
- =?us-ascii?Q?NjxmTMFAsOd1UCdK+v3DSv3+cIfgh5b/UgokG8mLwfJnSHmVXGorst0FHf1X?=
- =?us-ascii?Q?5KC87n0qeYfylnObeg/cTeodVkIZCxYbfXREZ9aEVCcD46CMSdMgx+6ZPYMb?=
- =?us-ascii?Q?aclvyUScxgjAQmV3TDXrfspVcMiPaHgUtNtdKUSNSxYt40shmHJKpgWlvKTf?=
- =?us-ascii?Q?AWGvNM0n+9f3MdzQdr0PuICxDxA/VkMgku2QO7JxzJJkJ2uJ22PGea1UrSwr?=
- =?us-ascii?Q?2+kucoPPUTT686/UpIO5Laf/gVoeiDqTcv1hWiSfwS0hLmxRu1hKNLC+MAdT?=
- =?us-ascii?Q?DLYbqyUtMHfmntTNXAb+BWZiUxYmGsiRFk92Zvz9UISY7GlJfb6xDvJHjvdo?=
- =?us-ascii?Q?cNq4ydOLUfkQWIGFCgZ/m8TseBFEAj53mNDuRbosqfX1PohIq61uNzBkCYQL?=
- =?us-ascii?Q?Bj2FURQ+f8GUzu25K+DUfS/K0cexjJtPMFdUPTu2DG7l0CS1rcDjgARRt2Im?=
- =?us-ascii?Q?EkKAELq5X0ekDIdZdreJmMCBqfjJAvST+qgM4Dw0m5hjqA6r1InnJQapLShK?=
- =?us-ascii?Q?xbQuBNQcYffwIbwzfw8mV/Zz4Jz237Dn1/MWFJOit4IHelz3e3e1xCcs5/8d?=
- =?us-ascii?Q?4cO3K/s4OtNyRU4fYJb7rUZTeO7QH/HBZCIypKVV7taqqiWyf8uITlcn0/EV?=
- =?us-ascii?Q?Jpplqmf3vMb+W2oJ8cMFQMn58NmJIcMZYMOkSErK0In8NVoG4Ie91PZoS9Ic?=
- =?us-ascii?Q?UAFuzzcZd9NUHyt+WOTy9baoaoVgc5YtYwQyWYdHaLNE1dxiBgTIxKj85BS4?=
- =?us-ascii?Q?vOrWxU+D4BVKCSyV7K4F484gqOUHeJKy5UBW49QYJ1sOYDT2CDFFlqIgAifu?=
- =?us-ascii?Q?y6xktljenLj78eEk0Uqbt4ji2uLwI9+HyuGnp4FeM04r4g8/hZams0AN+dCB?=
- =?us-ascii?Q?HAZOfwUxvioggJwMMeWZEQkRvI3OuC9l5MnqUYZubHRXQcF6sxweYBwQUiXf?=
- =?us-ascii?Q?wL1eWG3Fxvlk11Lv/wJTT9FwncwIovlIfS8If+M3HiFRs3nUrU2o+vDXYOL/?=
- =?us-ascii?Q?ogxvJULPMoKRLjeZVhUa37FM9xDKWxgYZrtfE1NSzC9T90ZFIxzvUXU9j4CG?=
- =?us-ascii?Q?Gkg/DRYs61bEDV+JGcsEK7Z0KLtLwSbpVuliiZ6fRo7JcLQcOhh9GSkH6f43?=
- =?us-ascii?Q?I30GrAxiPmWQ9oYrD+y/3Tixxj2cVsaT4yJz9+LrVFaCYDVgo/7ugvFJlkrq?=
- =?us-ascii?Q?6k7QtyuP/c+9UGyuhAdjsgo=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E754DF9D2BD5564AB889119E9BC1DEDD@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ 15.20.7181.14 via Frontend Transport; Wed, 10 Jan 2024 03:58:24 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 9 Jan 2024
+ 19:58:08 -0800
+Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 9 Jan 2024
+ 19:58:08 -0800
+From: Chaitanya Kulkarni <kch@nvidia.com>
+To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
+CC: <shinichiro.kawasaki@wdc.com>, Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH] nvme: add nvme pci timeout testcase
+Date: Tue, 9 Jan 2024 19:57:56 -0800
+Message-ID: <20240110035756.9537-1-kch@nvidia.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	CgqONZbBwhWc8DTE2Awkmy/KXUcI6lFDn+WhAi+Ck1AF2uQjk5crkgj8KRqH6vRuRNotnzwamPALum2oY68vw+lpc4sUP4ncNfcVopKwLXCPOWKbo+tLZ3EPBAiuyX1LgkFAksDr8IW71PJ2B49xucbFn5sACx7riVQhjrbyVmpTAiUGBSXlpdYvg/PeWa/mfH/nEWDoLKoYfhEgUd6M6a6nINnhfUwuftihcaLWyLF5fc5XzjaJh2ydruTbH+1TOTTvnqCse1ByKT/Yg2q15rgviiTcqBNLxnhxx2K9c6wB9NO1+AHx7d+2TGVW/pYlkA7iGA5P4qwOUilZoge8TTrysI3jvxjCLO+YuKEhY6TcYShPBFNnjaN70d4yCQhe1Ibl/1gH2TKeIdYXZR5Oni/qQyt4Gl75BFA4FlU4e0N32OEdX8C1YgEOyAx37QB0+Q8jueEouAYY4RxYG51AJ7f4qi85reAeGLqopInfCQ+ilxj3sLj5a6MkieQUKljjiuLi2Hg9yd2zp82yAmAjqUHlZzhG9AwGrwpDXf9RV3yIrNNlWTLEhgUsaEYbSyz3dfCsS0TL31GQl9XL2E31iALQk/CsPG8r8kmtZCKPyx5f1colQCSZzxN9DZ1v8l3z
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2699830f-5bb2-4323-b86f-08dc118286d6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2024 02:19:08.5092
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4B:EE_|IA1PR12MB6553:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0fc34064-f6b0-4c30-e60c-08dc119064af
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	8vWIwR81KAalc0yaTyeCRs+Y4JifPD+f/2T70rJaX0sARtNTtbQsJpN1jBNM5tNAMcUd5/Ng+2x77su6AY0Zu2lNMYccSRGcSRmuotVlJLtU1dD7f8RWluKDgVJr5CZuF9OBAkZAfykQtjy7SE+KzHAa1sBBTZsUCN3MCsR0oMx/CIaGxCi6SV1nHjHxRmqnJMRmH5M2Zg9jow2CBnD//ZR9J/ugZVsLlXq1p1fchzeUOH9wXwSvXFC5HyyBXZsezgbBqoP02is2oCV/zfLLZdwMqFUXPG79j14cVQiGvPseV2W4WU1j2XRyRPlLTWppTwnYa4wq2xliOwWoSaZB0KzPEuG9p35IbMFOYbCbxG6wIS3uqgzCrltQUnti4mTp+Ju8PeTKJNLQjvLXS/WQJlz4mdEFcrQ3o6i4abK9UPSUkbXK2tlfyknLkwGxw49G4AmJpSGMRjIVjTKD3qWrQ7+6Ci475P19f9ww1UGxq/aCEFWC51fwgzeUeEht0vlA/FY6cgcVwDvJsHkPdYZJxHR16U/HF4EdTguuNWMpfwPl/I1cgGSfzSCaW0ZxZ1kULhAsqnvIjazhOKKWFw1dBJ9532b5uDvH2d8dca0841JVo5pLOnpZIsebDXsbRHtrOaySXelemoMvJ8ptn/NDRc7Te01caMLJyQfpYuRJAFGA2jzIp547ZgWL4yzqsrmymWnJ7ykgsTBa8m67P4Hwt6ik9jI1vmZOlrJHFzzJiIhd+2NYJYxBOXr5o0LXvqwDcVraYaAp45XdpSmwC/CE3A==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(39860400002)(136003)(396003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(82310400011)(40470700004)(46966006)(36840700001)(40480700001)(40460700003)(83380400001)(70206006)(70586007)(41300700001)(36756003)(7636003)(356005)(54906003)(82740400003)(36860700001)(107886003)(47076005)(16526019)(1076003)(426003)(336012)(2616005)(26005)(5660300002)(2906002)(110136005)(316002)(7696005)(478600001)(6666004)(8936002)(4326008)(8676002)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2024 03:58:24.0573
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TugYEIEh3dVPSayhXOIR4t4G6dng9Hw6y4KAoGdsEPJpM0wuZywk7H4rKSbujZBp+k/eAZTHgTfpJAW/HDFDJ2YzVUvVT/jJyaWBtpX9k7c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7446
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fc34064-f6b0-4c30-e60c-08dc119064af
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA4B.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6553
 
-On Jan 09, 2024 / 12:19, Bart Van Assche wrote:
-> On 1/9/24 02:44, Shin'ichiro Kawasaki wrote:
-> > The test case block/031 sets null_blk parameter shared_tag_bitmap=3D1 f=
-or
-> > testing.
-> > The parameter has been set as a module parameter then null_blk
-> > driver must be loadable.
->=20
-> It seems like the word "If" is missing from the start of the above senten=
-ce?
+Trigger and test nvme-pci timeout with concurrent fio jobs.
 
-With this sentence, I wanted to describe current implmenetation fact. Befor=
-e
-applying this patch, shared_tag_bitmap=3D1 was set as a module parameter, n=
-ot
-through a configfs file. So I don't think "If" is missing.
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+---
+ tests/nvme/050     | 43 +++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/050.out |  2 ++
+ 2 files changed, 45 insertions(+)
+ create mode 100755 tests/nvme/050
+ create mode 100644 tests/nvme/050.out
 
->=20
-> > -	if ! _init_null_blk nr_devices=3D0 shared_tag_bitmap=3D1; then
-> > -		echo "Loading null_blk failed"
-> > -		return 1
-> > +	if _have_null_blk_feature shared_tag_bitmap; then
-> > +		opts+=3D(shared_tag_bitmap=3D1)
-> > +	else
-> > +		# Old kernel requires shared_tag_bitmap as a module parameter
-> > +		# instead of configfs parameter.
-> > +		if ! _init_null_blk shared_tag_bitmap=3D1; then
-> > +			echo "Loading null_blk failed"
-> > +			return 1
-> > +		fi
-> >   	fi
->=20
-> _have_null_blk_feature loads the null_blk kernel module as a side effect.=
- The
-> above code relies on that side effect.
+diff --git a/tests/nvme/050 b/tests/nvme/050
+new file mode 100755
+index 0000000..ba54bcd
+--- /dev/null
++++ b/tests/nvme/050
+@@ -0,0 +1,43 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Chaitanya Kulkarni.
++#
++# Test NVMe-PCI timeout with FIO jobs by triggering the nvme_timeout function.
++#
++
++. tests/nvme/rc
++
++DESCRIPTION="test nvme-pci timeout with fio jobs."
++
++requires() {
++	_require_nvme_trtype pci
++	_have_fio
++	_nvme_requires
++}
++
++test() {
++	local dev="/dev/nvme0n1"
++
++	echo "Running ${TEST_NAME}"
++
++	echo 1 > /sys/block/nvme0n1/io-timeout-fail
++
++	echo 99 > /sys/kernel/debug/fail_io_timeout/probability
++	echo 10 > /sys/kernel/debug/fail_io_timeout/interval
++	echo -1 > /sys/kernel/debug/fail_io_timeout/times
++	echo  0 > /sys/kernel/debug/fail_io_timeout/space
++	echo  1 > /sys/kernel/debug/fail_io_timeout/verbose
++
++	# shellcheck disable=SC2046
++	fio --bs=4k --rw=randread --norandommap --numjobs=$(nproc) \
++	    --name=reads --direct=1 --filename=${dev} --group_reporting \
++	    --time_based --runtime=1m 2>&1 | grep -q "Input/output error"
++
++	# shellcheck disable=SC2181
++	if [ $? -eq 0 ]; then
++		echo "Test complete"
++	else
++		echo "Test failed"
++	fi
++	modprobe -r nvme
++}
+diff --git a/tests/nvme/050.out b/tests/nvme/050.out
+new file mode 100644
+index 0000000..b78b05f
+--- /dev/null
++++ b/tests/nvme/050.out
+@@ -0,0 +1,2 @@
++Running nvme/050
++Test complete
+-- 
+2.40.0
 
-No. Regardless of the null_blk module load status, _init_null_blk() should =
-work
-in same manner. Actually _init_null_blk() unload null_blk (modprobe -r null=
-_blk)
-then load null_blk (modprobe null_blk).
-
-> I think that _have_null_blk_feature either
-> should unload the null_blk kernel module or that a comment should be adde=
-d above
-> the above if-statement that explains this side effect. Otherwise readers =
-of this
-> code will wonder why there is an _init_null_blk call in one branch of the
-> if-statement and not in the other branch.
-
-I think the inline comment above was not clear enough and caused the confus=
-ion.
-How about to improve the comment as follows? I hope it explains why
-_init_null_blk is called in the if-statement.
-
-        # _configure_null_blk() sets null_blk parameters via configfs, whil=
-e
-	# _init_null_blk() sets null_blk parameters as module parameters.
-        # Old kernel requires shared_tag_bitmap as a module parameter. In t=
-hat
-	# case, call _init_null_blk() for shared_tag_bitmap.
