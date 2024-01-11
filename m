@@ -1,73 +1,146 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB92D3BB29;
-	Thu, 11 Jan 2024 14:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 783DE68CFE; Thu, 11 Jan 2024 15:45:38 +0100 (CET)
-Date: Thu, 11 Jan 2024 15:45:37 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>,
-	Dave Chinner <david@fromorbit.com>, axboe@kernel.dk,
-	kbusch@kernel.org, sagi@grimberg.me, jejb@linux.ibm.com,
-	martin.petersen@oracle.com, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, dchinner@redhat.com, jack@suse.cz,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-scsi@vger.kernel.org, ming.lei@redhat.com, bvanassche@acm.org,
-	ojaswin@linux.ibm.com
-Subject: Re: [PATCH v2 00/16] block atomic writes
-Message-ID: <20240111144537.GA9295@lst.de>
-References: <76c85021-dd9e-49e3-80e3-25a17c7ca455@oracle.com> <20231219151759.GA4468@lst.de> <fff50006-ccd2-4944-ba32-84cbb2dbd1f4@oracle.com> <20231221065031.GA25778@lst.de> <73d03703-6c57-424a-80ea-965e636c34d6@oracle.com> <ZZ3Q4GPrKYo91NQ0@dread.disaster.area> <20240110091929.GA31003@lst.de> <20240111014056.GL722975@frogsfrogsfrogs> <20240111050257.GA4457@lst.de> <d5db2291-36b4-4b22-89f2-1d9e7d30f0f1@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8532E4F898
+	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 15:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFuKJNg8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704988500;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N2zkMhK+45qG/GcFjunTZZrztvgu3syuF871fW0x/3Y=;
+	b=MFuKJNg85wraKXFTkfsE7kv1ZuckhuB+rXxXOEEnp7fbPtW4orZWrNQ5yQ8U48Cqa6lxrd
+	VC7MIHTpe6NVXQbm3kKexJ/JXeAaAKZeJMsDqO+6RgJR7Mzu35DnHE7JBzprRdNQXL1uAp
+	7fwC/T/D8F0CQPfgo3TXoPgxDQ0g3Ok=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-S5zCa7FkNraoVV9QC4WrkQ-1; Thu,
+ 11 Jan 2024 10:54:59 -0500
+X-MC-Unique: S5zCa7FkNraoVV9QC4WrkQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 950671C106A3;
+	Thu, 11 Jan 2024 15:54:58 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.3])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0A2015012;
+	Thu, 11 Jan 2024 15:54:56 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: David Jeffery <djeffery@redhat.com>,
+	Gabriel Krisman Bertazi <krisman@suse.de>,
+	Jan Kara <jack@suse.cz>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Changhui Zhong <czhong@redhat.com>
+Subject: [PATCH] blk-mq: fix IO hang from sbitmap wakeup race
+Date: Thu, 11 Jan 2024 23:54:48 +0800
+Message-ID: <20240111155448.4097173-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d5db2291-36b4-4b22-89f2-1d9e7d30f0f1@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On Thu, Jan 11, 2024 at 09:55:36AM +0000, John Garry wrote:
-> On 11/01/2024 05:02, Christoph Hellwig wrote:
->> On Wed, Jan 10, 2024 at 05:40:56PM -0800, Darrick J. Wong wrote:
->>> struct statx statx;
->>> struct fsxattr fsxattr;
->>> int fd = open('/foofile', O_RDWR | O_DIRECT);
->
-> I'm assuming O_CREAT also.
+In blk_mq_mark_tag_wait(), __add_wait_queue() may be re-ordered
+with the following blk_mq_get_driver_tag() in case of getting driver
+tag failure.
 
-Yes.
+Then in __sbitmap_queue_wake_up(), waitqueue_active() may not observe
+the added waiter in blk_mq_mark_tag_wait() and wake up nothing, meantime
+blk_mq_mark_tag_wait() can't get driver tag successfully.
 
->> I think this still needs a check if the fs needs alignment for
->> atomic writes at all. i.e.
->>
->> struct statx statx;
->> struct fsxattr fsxattr;
->> int fd = open('/foofile', O_RDWR | O_DIRECT);
->>
->> ioctl(fd, FS_IOC_GETXATTR, &fsxattr);
->> statx(fd, "", AT_EMPTY_PATH, STATX_ALL | STATX_WRITE_ATOMIC, &statx);
->> if (statx.stx_atomic_write_unit_max < 16384) {
->> 	bailout();
->> }
->
-> How could this value be >= 16384 initially? Would it be from pre-configured 
-> FS alignment, like XFS RT extsize? Or is this from some special CoW-based 
-> atomic write support? Or FS block size of 16384?
+This issue can be reproduced by running the following test in loop, and
+fio hang can be observed in < 30min when running it on my test VM
+in laptop.
 
-Sorry, this check should not be here at all, we should only check it
-later.
+	modprobe -r scsi_debug
+	modprobe scsi_debug delay=0 dev_size_mb=4096 max_queue=1 host_max_queue=1 submit_queues=4
+	dev=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
+	fio --filename=/dev/"$dev" --direct=1 --rw=randrw --bs=4k --iodepth=1 \
+       		--runtime=100 --numjobs=40 --time_based --name=test \
+        	--ioengine=libaio
 
-> Incidentally, for consistency only setting FS_XFLAG_WRITE_ATOMIC will lead 
-> to FMODE_CAN_ATOMIC_WRITE being set. So until FS_XFLAG_WRITE_ATOMIC is set 
-> would it make sense to have statx return 0 for STATX_WRITE_ATOMIC. 
+Fix the issue by adding one explicit barrier in blk_mq_mark_tag_wait(), which
+is just fine in case of running out of tag.
 
-True.  We might need to report the limits even without that, though.
+Apply the same pattern in blk_mq_get_tag() which should have same risk.
+
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+BTW, Changhui is planning to upstream the test case to blktests.
+
+ block/blk-mq-tag.c | 19 +++++++++++++++++++
+ block/blk-mq.c     | 16 ++++++++++++++++
+ 2 files changed, 35 insertions(+)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index cc57e2dd9a0b..29f77cae8eb2 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -179,6 +179,25 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 
+ 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
+ 
++		/*
++		 * Add one explicit barrier since __blk_mq_get_tag() may not
++		 * imply barrier in case of failure.
++		 *
++		 * Order adding us to wait queue and the following allocating
++		 * tag in  __blk_mq_get_tag().
++		 *
++		 * The pair is the one implied in sbitmap_queue_wake_up()
++		 * which orders clearing sbitmap tag bits and
++		 * waitqueue_active() in __sbitmap_queue_wake_up(), since
++		 * waitqueue_active() is lockless
++		 *
++		 * Otherwise, re-order of adding wait queue and getting tag
++		 * may cause __sbitmap_queue_wake_up() to wake up nothing
++		 * because the waitqueue_active() may not observe us in wait
++		 * queue.
++		 */
++		smp_mb();
++
+ 		tag = __blk_mq_get_tag(data, bt);
+ 		if (tag != BLK_MQ_NO_TAG)
+ 			break;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index fb29ff5cc281..54545a4792bf 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1847,6 +1847,22 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
+ 	__add_wait_queue(wq, wait);
+ 
++	/*
++	 * Add one explicit barrier since blk_mq_get_driver_tag() may
++	 * not imply barrier in case of failure.
++	 *
++	 * Order adding us to wait queue and allocating driver tag.
++	 *
++	 * The pair is the one implied in sbitmap_queue_wake_up() which
++	 * orders clearing sbitmap tag bits and waitqueue_active() in
++	 * __sbitmap_queue_wake_up(), since waitqueue_active() is lockless
++	 *
++	 * Otherwise, re-order of adding wait queue and getting driver tag
++	 * may cause __sbitmap_queue_wake_up() to wake up nothing because
++	 * the waitqueue_active() may not observe us in wait queue.
++	 */
++	smp_mb();
++
+ 	/*
+ 	 * It's possible that a tag was freed in the window between the
+ 	 * allocation failure and adding the hardware queue to the wait
+-- 
+2.42.0
 
