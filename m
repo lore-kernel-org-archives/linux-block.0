@@ -1,55 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F8358ADB
-	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 22:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xw+6vryX"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0DDB8C433C7;
-	Thu, 11 Jan 2024 22:57:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705013879;
-	bh=5JntnIGHqXDR4IpvDuLSBaCL/Rm1+pOc1A7tV389yuE=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=Xw+6vryXZIGugSeE6xvGU9JgMOBOki0VTLpEWlisEGKlxstX2GL2VITYcwqBWlLUr
-	 JBOQZ0uAf9r06hTML44wvwcLBPYG55uOmNNLA0M/33SfgnyMURsRP4bS7yBGwI3YtB
-	 t+yr8atvlmgwtoaNj7dj+zQ+O1G4t9cDWBaOATajt+LHNFl0hSEPshQat/RJws1sje
-	 yIB2/Q+fOmrpF1cCJ91BMhB5TlBypPCjs/hgK6/SRSqpjyq8YG8clLrVBURKsH84zZ
-	 al54NG4Y65Nl1/l3+VNmMpfERQeJW4UAkKTPSLBVGdluKXz0aYZS/8tg2BDSHJMT02
-	 U3+P4rzB1o4HA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F08DCDFC698;
-	Thu, 11 Jan 2024 22:57:58 +0000 (UTC)
-Subject: Re: [GIT PULL] Block changes for 6.8-rc1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <2bc9c8de-b2a1-43f7-9aa0-a6ec425a1ce6@kernel.dk>
-References: <2bc9c8de-b2a1-43f7-9aa0-a6ec425a1ce6@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <2bc9c8de-b2a1-43f7-9aa0-a6ec425a1ce6@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/for-6.8/block-2024-01-08
-X-PR-Tracked-Commit-Id: 587371ed783b046f22ba7a5e1cc9a19ae35123b4
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 01d550f0fcc06c7292f79a6f1453aac122d1d2c8
-Message-Id: <170501387898.24643.16484960039408938031.pr-tracker-bot@kernel.org>
-Date: Thu, 11 Jan 2024 22:57:58 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F96A59B40;
+	Thu, 11 Jan 2024 23:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+Received: from meterpeter.fritz.box ([84.170.86.196]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MRCFw-1rl4nb1Rzg-00NCGL; Fri, 12 Jan 2024 00:15:43 +0100
+From: Christian Heusel <christian@heusel.eu>
+To: Jens Axboe <axboe@kernel.dk>,
+	Dave Chinner <dchinner@redhat.com>,
+	Jan Kara <jack@suse.cz>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Christian Brauner <brauner@kernel.org>,
+	Min Li <min15.li@samsung.com>,
+	Christian Heusel <christian@heusel.eu>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: dan.carpenter@linaro.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH] block: print symbolic error name instead of error code
+Date: Fri, 12 Jan 2024 00:15:18 +0100
+Message-ID: <20240111231521.1596838-1-christian@heusel.eu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:hRXS/pbCGGcWgW+YdsFtf7CISoZpfbLekLeh/9dCbsXEE+9Xmnt
+ 6y1MThGhnBIcgxOwTuF41kb4eXoDRY9XGjiBiz6RGFPYa/rB2ZDq4gczVKkFlweNG3FRwpZ
+ HlvHqv0w3OiCRtBc5IXiWh1OVDl6pV8olZr4v4y6TciQinC8GiKWlHuOwxOK1e1dIIuaKKZ
+ 9h1IGa9JE7asMxdQYJBhw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:YOEeGaZNxuM=;yLWzStPVr+/wfRyPQxeTyK3BP1T
+ ooVIDDk8C/vXNQviLslzRLDVLCO4fdbjW/F0pLyeqoO+5btQsRb7ZwGDAEbukrPC0sQ5cUe5/
+ +Rh2Db1kc/lAELadQlfadrICs7dt8emJ/uV0/pKNb0Pl0g9RGtJO0FK80uar4BCPnfY5dnpia
+ rlVcTvwvhhUsmS8pZZuXKPFjY0Nxpj7AkMkZSQz97F+h8rcUAwENSPGTIxk9qEbr/AkT3BieS
+ 0/jCE0ZP8QxzmurTOPdn8JEOP7wDbeg7QiAhzMg2j0NtlDWX+Qaf8Hr5mIjaC6W/E9px/2VJV
+ QKx6/tXxlrdP5YdNotHSKGB3YJbveYDxxncBdm2QJxZdeNofcjZi/q4WOrOwvC82m3egGwlwQ
+ hXkdmTFfoIXa1g20/skVHJEsr9+DE1WfcP6ui/EsXvD/7rOjiMtP809A0gb4h4VoVyo60VIRl
+ xr2PL2bkoc5vVrFpr7eIUsoOv6oayaX5pbt5S7HWpaxlDzIdfu1xNWcvpDZDNe4e9zFAFfdHB
+ YIhOHJXUoo44t45htTz318dagKOaemAHzy3a7uRV8pnFzP7UqDTpoGGp/EmrzyMv5IwUCzqba
+ jbQe/cxvd8pFNjjhcx00PspBnsQr6u47pKQXLY2VEBN1/B3/fHMmJnrV2HQrjHZhP4UM7W2Qr
+ oVfXvXrF+f+D/utrzSvKlIdm0SCYJg/EOx14NigDJkJ+spiE0qw9Vd651iyuzPGBAkwWnI8sx
+ Vzj675/uGMA+gVsN66zI0/zTB6vKA5zU8xEextRg4Y7pnncFkqr0fU3X++o5TmadVp8urE9MO
+ KyRWR1QPgOBa8tP6gLLZ5BLBBs0pCHjfxqZW9exW7IB0g7OYSMzZ/EJZoMuPIQsF5ye4SdN3c
+ T6QLJ3yLFqJmUJg==
 
-The pull request you sent on Mon, 8 Jan 2024 10:02:28 -0700:
+Utilize the %pe print specifier to get the symbolic error name as a
+string (i.e "-ENOMEM") in the log message instead of the error code to
+increase its readablility.
 
-> git://git.kernel.dk/linux.git tags/for-6.8/block-2024-01-08
+This change was suggested in
+https://lore.kernel.org/all/92972476-0b1f-4d0a-9951-af3fc8bc6e65@suswa.mountain/
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/01d550f0fcc06c7292f79a6f1453aac122d1d2c8
+Signed-off-by: Christian Heusel <christian@heusel.eu>
+---
+ block/partitions/core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thank you!
-
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index f47ffcfdfcec..932df4db76f1 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -570,8 +570,8 @@ static bool blk_add_partition(struct gendisk *disk,
+ 	part = add_partition(disk, p, from, size, state->parts[p].flags,
+ 			     &state->parts[p].info);
+ 	if (IS_ERR(part) && PTR_ERR(part) != -ENXIO) {
+-		printk(KERN_ERR " %s: p%d could not be added: %ld\n",
+-		       disk->disk_name, p, -PTR_ERR(part));
++		printk(KERN_ERR " %s: p%d could not be added: %pe\n",
++		       disk->disk_name, p, part);
+ 		return true;
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.43.0
+
