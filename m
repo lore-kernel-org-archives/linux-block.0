@@ -1,49 +1,49 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863004CB3C
-	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 16:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177265026D
+	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 16:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aa6w/dCV"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso47394839f.1
-        for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 08:16:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2ysZoSs0"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-360630beb7bso3836165ab.0
+        for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 08:17:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704989804; x=1705594604; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704989863; x=1705594663; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=SpO93iW41WoRi9/ZFyVouzDbg6XWa+4zXQ/9lXcVpow=;
-        b=aa6w/dCVXEq5ysUqUAcCfKlcvDTpsDlj8DE2nH6YLdzS/Gr2b0YnnUu9eN38v27ZcI
-         5YYqDpO3SwSR0smwtGWnQZaH8FJztl/pdjfPpVVkQn+Jkkj6niU41OtqXJJCm3RbG+Tm
-         flBmn5hTVHtK4Wss78o7owtTygT4cTDzQFsrZwo4IwqrbGHo8b30/pR6jExG7lQyisBC
-         f1r9LUp5YR5j4Duw2Ydv2nFKA1KbDQX7lmVje6F6qmBwwBS4Ayv5KsUQ/wlkfRBmnsvp
-         KaVWQ4Q6xIQEen1roexNK1Pumlf8cJPhJ4ruvvWQhXMoHUARxbvC11rrcfCNRmGc6KT6
-         sGBA==
+        bh=gGFCYeJ0KcfGjB9XZoOHmxzp6z5RsKlCVtTHrcyBPdA=;
+        b=2ysZoSs0BVIEozfwOxQSWMkzg8puxRrvxPEr3uTSUrDO9QovSfBor/6TDjRpQ4YVGJ
+         fhgCjeez60M/u066HGRFyKxqGa4uW3Gx8rcsrHRxRI7S0PCyqKvyOGaVmCHZD44BTyuu
+         l2vvimW6J9W9tweq1yiqGYAwQOK5QMuhD/YYLSfTf0Gn5iC9Go8idEChv3uRrxEsnIJd
+         QMPHN0Ieu52ok+6KlMiqRuQYQHK3KdZP4Ez/Fjr3++sP71+J6I9fW3zjYy9ChnLgiaPu
+         ZwD97K8DbUhD/d0uzXSbddp4iye0FjKiJmAICYsXZtH/An2GRKZChbLlbqXKTHC0kt/A
+         v16w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704989804; x=1705594604;
+        d=1e100.net; s=20230601; t=1704989863; x=1705594663;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SpO93iW41WoRi9/ZFyVouzDbg6XWa+4zXQ/9lXcVpow=;
-        b=BCwZA0mlwBIgcUdzGZ4TRUcgc4zdYNrjQUcSUgGlJrRDG+lqJDrI8OWVonaO3pmFBX
-         +MwEXmicWyaJFnXD+4e/Pyf37zohllK+L2CPeeEnmqDaRkAmUgxyWH0A9djXEJeQTp6p
-         yTuTAPFbJH10Zb4LbCscyjpB4WfE6pKUZGLFIUeRMrmjDjqvVSikCgvyc4WE5nqiOoxL
-         TMYGCj2UE/fMjtlg0dBCVAwsxlJjbbveatHQhgzcoKPY0MbvdRdOkheQBoM61VBQ0vzw
-         YW6a5x3LaEd0t4jz6ISMMlalU/tZIe9qUamlq2TF0odAhkkKu8BOAOP+sVR9OQEYeCkt
-         ssZA==
-X-Gm-Message-State: AOJu0YzukD35C7Dt4arxfWk3+pJ3P2X91h4lqwPY7gBfuiRfL4Dic0Ef
-	7yEy3TDustsXC6RRQhZWt/u1jhcfXH0ohg==
-X-Google-Smtp-Source: AGHT+IGDMIsLpff5kobKKGusoQRbtE2d+4gmf7jaC/sHI6Ljb7AWaaJb+rrtJNzJ4GMVhL+HZ7H6Nw==
-X-Received: by 2002:a6b:f415:0:b0:7bc:2603:575f with SMTP id i21-20020a6bf415000000b007bc2603575fmr2597809iog.0.1704989804533;
-        Thu, 11 Jan 2024 08:16:44 -0800 (PST)
+        bh=gGFCYeJ0KcfGjB9XZoOHmxzp6z5RsKlCVtTHrcyBPdA=;
+        b=KeOunIpviE2EnRbPwVZFqAOXbbH0B0yOaGH/ZgvktXDjylhJI3CBi83v5H5P0v276g
+         Vq7XqKghFMxe7W4EWsoARAIy3pPobUqHr1qHQ9s/O4b6YNwrZ+2seWQ5kNEH6Rlz9FM5
+         4Na2+2Mz7RFWlCfDgJyz7YuGwf+PSGKLtzvFSbpQstD+G/R9A9pSHXaaKPDu1qG+qH91
+         PBKsp9C4zKP0RNlXZC4agzryA8adogh8JwPkICRqa+4QLoUnbjILA7smjP8eUcKdFWNY
+         dpbpMQKRTAJ/oVluTcxXBeSSVGrfw33AS2m6LprrRhhTIuvhw/C9ulEVa3VnpNwD3kyh
+         2qRg==
+X-Gm-Message-State: AOJu0YzqlQrzvi7WXqX5L9boL4lxFrY7ChIK5M4EhmybOJe02dmduHro
+	z3j+KJpSNSoGKcNNY/eBJ2SBDcMkZCAtTQ==
+X-Google-Smtp-Source: AGHT+IFOBrwqRm4xfs66279Bp3qH/dzWmMwqpaTTaODyid9L5wXn6NjYTIzx499BE8Db7cNsuLYihw==
+X-Received: by 2002:a5e:df03:0:b0:7be:d855:4893 with SMTP id f3-20020a5edf03000000b007bed8554893mr2731277ioq.2.1704989863151;
+        Thu, 11 Jan 2024 08:17:43 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id eh3-20020a056638298300b0046e578ed0aasm224566jab.96.2024.01.11.08.16.43
+        by smtp.gmail.com with ESMTPSA id eh3-20020a056638298300b0046e578ed0aasm224566jab.96.2024.01.11.08.17.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 08:16:43 -0800 (PST)
-Message-ID: <ebfb6dc2-79e6-46a8-9dd6-7adfae0603f0@kernel.dk>
-Date: Thu, 11 Jan 2024 09:16:42 -0700
+        Thu, 11 Jan 2024 08:17:42 -0800 (PST)
+Message-ID: <d91cb6ee-50bd-4397-b82f-d34dfc135b4a@kernel.dk>
+Date: Thu, 11 Jan 2024 09:17:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,62 +51,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] block/integrity: flag the queue if it has an
- integrity profile
+Subject: Re: [PATCH 2/2] blk-mq: ensure a q_usage_counter reference is held
+ when splitting bios
 Content-Language: en-US
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, martin.petersen@oracle.com
-References: <20240111160226.1936351-1-axboe@kernel.dk>
- <20240111160226.1936351-3-axboe@kernel.dk> <ZaASADP4js2Oboqx@infradead.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+References: <20240111135705.2155518-1-hch@lst.de>
+ <20240111135705.2155518-3-hch@lst.de>
+ <d713fe1b-3eaa-4de4-99a6-5910247ffad5@kernel.dk>
+ <20240111161440.GA16626@lst.de>
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZaASADP4js2Oboqx@infradead.org>
+In-Reply-To: <20240111161440.GA16626@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/11/24 9:06 AM, Christoph Hellwig wrote:
-> On Thu, Jan 11, 2024 at 09:00:20AM -0700, Jens Axboe wrote:
->> Now that we don't set a dummy profile, if someone registers and actual
->> profile, flag the queue as such.
+On 1/11/24 9:14 AM, Christoph Hellwig wrote:
+> On Thu, Jan 11, 2024 at 09:12:23AM -0700, Jens Axboe wrote:
+>> On 1/11/24 6:57 AM, Christoph Hellwig wrote:
+>>> q_usage_counter is the only thing preventing us from the limits changing
+>>> under us in __bio_split_to_limits, but blk_mq_submit_bio doesn't hold it.
+>>>
+>>> Change __submit_bio to always acquire the q_usage_counter counter before
+>>> branching out into bio vs request based helper, and let blk_mq_submit_bio
+>>> tell it if it consumed the reference by handing it off to the request.
 >>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> ---
->>  block/blk-integrity.c  | 14 +++++++++-----
->>  include/linux/blkdev.h |  1 +
->>  2 files changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/block/blk-integrity.c b/block/blk-integrity.c
->> index a1ea1794c7c8..974af93de2da 100644
->> --- a/block/blk-integrity.c
->> +++ b/block/blk-integrity.c
->> @@ -339,22 +339,25 @@ const struct attribute_group blk_integrity_attr_group = {
->>   */
->>  void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template)
->>  {
->> -	struct blk_integrity *bi = &disk->queue->integrity;
->> +	struct request_queue *q = disk->queue;
->> +	struct blk_integrity *bi = &q->integrity;
->>  
->>  	bi->flags = BLK_INTEGRITY_VERIFY | BLK_INTEGRITY_GENERATE |
->>  		template->flags;
->>  	bi->interval_exp = template->interval_exp ? :
->> -		ilog2(queue_logical_block_size(disk->queue));
->> +		ilog2(queue_logical_block_size(q));
->>  	bi->profile = template->profile;
->> +	if (bi->profile)
->> +		blk_queue_flag_set(QUEUE_FLAG_INTG_PROFILE, q);
+>> This causes hangs for me on shutdown/reset:
 > 
-> Is this really so much better vs just checking for bi->profile
-> being non-NULL?
+>> which seems to indicate that a reference is being leaked. Haven't poked
+>> any further at it, I'll drop these two for now.
+> 
+> Can you send me your .config?
 
-Before we can check that, we have to load
-bio->bi_bdev->bd_disk->queue->integrity, and we have to call in to
-bio_integrity_prep() as well needlessly. We could do that in patch 3 and
-then we just need to load q->integrity->profile, and while queue_flags
-is certainly hot, it's probably not a huge deal to load that cacheline.
-I think if we do that, we stick integrity before limits.
+Don't think it's .config related, hit it on my test box and then in my
+vm as well. It's likely due to batched allocations, would be my guess.
+I can start/halt the vm fine with just a boot, but if I do:
 
-I can make that change, and then we can drop the flag.
+$ ~/git/fio/t/io_uring -p1 -d128 -b512 -s32 -c32 -F1 -B1 -R0 -X1 -P1 /dev/nvme0n1
+
+for just a brief moment, nvme0 will hang on shutdown.
 
 -- 
 Jens Axboe
+
 
