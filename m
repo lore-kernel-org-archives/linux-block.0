@@ -1,162 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DFB1366
-	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 01:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF19650;
+	Thu, 11 Jan 2024 01:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwkgIMCJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704936319;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3ESfjQ0jWiBunyG2uBniDMtDH4nMEu78Nkty9LDM7sw=;
-	b=MwkgIMCJVxai1XbfUYD5a0o6s8AvXaErFq28QnaFugBjcrZZRJaqjskaRi6gTLbSM/qgfN
-	bawCJjt9o6MICB/7gPlcNCrNmMHI98bcsWfrpEcbtldBkANmtJSJCvEQsB56/K+mRMiHN4
-	LR4wmaSEia4RSw+SbwsNkVHR3EDHGdk=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-oRCGED-PMq-VhYB_ZsUdJw-1; Wed, 10 Jan 2024 20:25:18 -0500
-X-MC-Unique: oRCGED-PMq-VhYB_ZsUdJw-1
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5cdba9861b1so2827512a12.1
-        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2024 17:25:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704936317; x=1705541117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ESfjQ0jWiBunyG2uBniDMtDH4nMEu78Nkty9LDM7sw=;
-        b=dfY2UnXsOcByRUw+vueq10VJHuykLwQBi5WlVj4xg5O3QOgsVk/mIrIL6Uepj8Kq8r
-         e/cjwjTC/Tqa7CH+VaKIKMp1OTbjiCicp3ufo7aI3JxaKatvI2LX3m/nEsSAB3+5C8uM
-         J2lf1sL14tH1yekZyPbthXbkgd9y7A07CiYf0pEKGDaK7DzostWCSYTwfc5Q2qycA/fp
-         pHtl8cVfJK1BUJSb1kSO3nw/ebudXDDJJEeAAQRb/ug8qF0a9bx/OPNWjUl53iIkNnjQ
-         o+o1yJJe4arc5e9llbwe4ut2veamzpE7XC0TsQKLXl8fFDpInkuR59Wbf83iGVEX2Cb4
-         1IIQ==
-X-Gm-Message-State: AOJu0YwI044E09DQO8P+mfHafVAr8f9ui7sA2QNFq2u3ADsX8pwnP4eg
-	0gaGYo31qTwJbqbQSGfxwtHr4h6NBYnFiwkyVnfoBxkUlfO4nl/BZkSsQWeGF38qJUJDVMuax+D
-	P9Gbx3ewp136MaOGykK8Q7U4JpG/nFpym5ogl8OjeYOZxDgA=
-X-Received: by 2002:a05:6a20:1449:b0:19a:4fac:3e52 with SMTP id a9-20020a056a20144900b0019a4fac3e52mr132619pzi.106.1704936316962;
-        Wed, 10 Jan 2024 17:25:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGtPYYA8HYaVG8BNNUf2wiSlku54LRcIV6lAA2JAekRYHR9QOTY0DX907K3pIDfg8Ow+RkrC0nHuhxF9OD5bYc=
-X-Received: by 2002:a05:6a20:1449:b0:19a:4fac:3e52 with SMTP id
- a9-20020a056a20144900b0019a4fac3e52mr132613pzi.106.1704936316678; Wed, 10 Jan
- 2024 17:25:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfDXvP+m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1D61C433F1;
+	Thu, 11 Jan 2024 01:40:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704937257;
+	bh=u51yyq5q6reKn5H0CqnJR7jUYlsGmLnDJKKy8teJDRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cfDXvP+m7491pQR0YUCkm0mTB2aBegWGodHoLZFFG4xnm1HYzXRQuH2gS9jmS4sxK
+	 4a1YcSnAQwsufJxQwNnVNUv8zlTNrN2c8FDL4SvgoPYxlV5HCtl48g/zf8dKFEZFKy
+	 s2oFPeyW0anIBYuwCbKWlfg0iILlMck90/uZ6HjK3pEsmr6x3ggHxQYlbGaZ+LM+u9
+	 Cdp1Me8dqv2fMqivWwzjoUve3j+IWy/LLnsB6hnY7qN7e4nycBAq9OtxqrOqUVgXsd
+	 pNUpTm723vIzDa8WcFdKrRTfElEbLc8gQRM3fqF3Cypry45w0MWn8V/GMykrc5s3y6
+	 6wFr/xhlj/0lw==
+Date: Wed, 10 Jan 2024 17:40:56 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Dave Chinner <david@fromorbit.com>,
+	John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+	kbusch@kernel.org, sagi@grimberg.me, jejb@linux.ibm.com,
+	martin.petersen@oracle.com, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, dchinner@redhat.com, jack@suse.cz,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-scsi@vger.kernel.org, ming.lei@redhat.com, bvanassche@acm.org,
+	ojaswin@linux.ibm.com
+Subject: Re: [PATCH v2 00/16] block atomic writes
+Message-ID: <20240111014056.GL722975@frogsfrogsfrogs>
+References: <c729b03c-b1d1-4458-9983-113f8cd752cd@oracle.com>
+ <20231219051456.GB3964019@frogsfrogsfrogs>
+ <20231219052121.GA338@lst.de>
+ <76c85021-dd9e-49e3-80e3-25a17c7ca455@oracle.com>
+ <20231219151759.GA4468@lst.de>
+ <fff50006-ccd2-4944-ba32-84cbb2dbd1f4@oracle.com>
+ <20231221065031.GA25778@lst.de>
+ <73d03703-6c57-424a-80ea-965e636c34d6@oracle.com>
+ <ZZ3Q4GPrKYo91NQ0@dread.disaster.area>
+ <20240110091929.GA31003@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240110035756.9537-1-kch@nvidia.com>
-In-Reply-To: <20240110035756.9537-1-kch@nvidia.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Thu, 11 Jan 2024 09:25:04 +0800
-Message-ID: <CAHj4cs__ObsuA_hXHeSRPwHy-uSc558sxQy-jD2J85gQEg4BXw@mail.gmail.com>
-Subject: Re: [PATCH] nvme: add nvme pci timeout testcase
-To: Chaitanya Kulkarni <kch@nvidia.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	shinichiro.kawasaki@wdc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240110091929.GA31003@lst.de>
 
-On Wed, Jan 10, 2024 at 11:58=E2=80=AFAM Chaitanya Kulkarni <kch@nvidia.com=
-> wrote:
->
-> Trigger and test nvme-pci timeout with concurrent fio jobs.
->
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->  tests/nvme/050     | 43 +++++++++++++++++++++++++++++++++++++++++++
->  tests/nvme/050.out |  2 ++
->  2 files changed, 45 insertions(+)
->  create mode 100755 tests/nvme/050
->  create mode 100644 tests/nvme/050.out
->
-> diff --git a/tests/nvme/050 b/tests/nvme/050
-> new file mode 100755
-> index 0000000..ba54bcd
-> --- /dev/null
-> +++ b/tests/nvme/050
-> @@ -0,0 +1,43 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2024 Chaitanya Kulkarni.
-> +#
-> +# Test NVMe-PCI timeout with FIO jobs by triggering the nvme_timeout fun=
-ction.
-> +#
-> +
-> +. tests/nvme/rc
+On Wed, Jan 10, 2024 at 10:19:29AM +0100, Christoph Hellwig wrote:
+> On Wed, Jan 10, 2024 at 10:04:00AM +1100, Dave Chinner wrote:
+> > Hence history teaches us that we should be designing the API around
+> > the generic filesystem function required (hard alignment of physical
+> > extent allocation), not the specific use case that requires that
+> > functionality.
+> 
+> I disagree.  The alignment requirement is an artefact of how you
+> implement atomic writes.  As the fs user I care that I can do atomic
+> writes on a file and need to query how big the writes can be and
+> what alignment is required.
+> 
+> The forcealign feature is a sensible fs side implementation of that
+> if using hardware based atomic writes with alignment requirements,
+> but it is a really lousy userspace API.
+> 
+> So with John's API proposal for XFS with hardware alignment based atomic
+> writes we could still use force align.
+> 
+> Requesting atomic writes for an inode will set the forcealign flag
+> and the extent size hint, and after that it'll report atomic write
+> capabilities.  Roughly the same implementation, but not an API
+> tied to an implementation detail.
 
-How about restricting this test to pci only? just like nvme/032 did.
-nvme_trtype=3Dpci
+Sounds good to me!  So to summarize, this is approximately what
+userspace programs would have to do something like this:
 
-> +
-> +DESCRIPTION=3D"test nvme-pci timeout with fio jobs."
-> +
-> +requires() {
-> +       _require_nvme_trtype pci
-> +       _have_fio
-> +       _nvme_requires
-> +}
+struct statx statx;
+struct fsxattr fsxattr;
+int fd = open('/foofile', O_RDWR | O_DIRECT);
 
-Check the test dev is nvme:
-device_requires() {
-        _require_test_dev_is_nvme
+ioctl(fd, FS_IOC_GETXATTR, &fsxattr);
+
+fsxattr.fsx_xflags |= FS_XFLAG_FORCEALIGN | FS_XFLAG_WRITE_ATOMIC;
+fsxattr.fsx_extsize = 16384; /* only for hardware no-tears writes */
+
+ioctl(fd, FS_IOC_SETXATTR, &fsxattr);
+
+statx(fd, "", AT_EMPTY_PATH, STATX_ALL | STATX_WRITE_ATOMIC, &statx);
+
+if (statx.stx_atomic_write_unit_max >= 16384) {
+	pwrite(fd, &iov, 1, 0, RWF_SYNC | RWF_ATOMIC);
+	printf("HAPPY DANCE\n");
 }
 
-> +
-> +test() {
+(Assume we bail out on errors.)
 
-Use test_device() here.
-
-> +       local dev=3D"/dev/nvme0n1"
-> +
-> +       echo "Running ${TEST_NAME}"
-> +
-> +       echo 1 > /sys/block/nvme0n1/io-timeout-fail
-> +
-> +       echo 99 > /sys/kernel/debug/fail_io_timeout/probability
-> +       echo 10 > /sys/kernel/debug/fail_io_timeout/interval
-> +       echo -1 > /sys/kernel/debug/fail_io_timeout/times
-> +       echo  0 > /sys/kernel/debug/fail_io_timeout/space
-> +       echo  1 > /sys/kernel/debug/fail_io_timeout/verbose
-> +
-> +       # shellcheck disable=3DSC2046
-> +       fio --bs=3D4k --rw=3Drandread --norandommap --numjobs=3D$(nproc) =
-\
-> +           --name=3Dreads --direct=3D1 --filename=3D${dev} --group_repor=
-ting \
-> +           --time_based --runtime=3D1m 2>&1 | grep -q "Input/output erro=
-r"
-> +
-> +       # shellcheck disable=3DSC2181
-> +       if [ $? -eq 0 ]; then
-> +               echo "Test complete"
-> +       else
-> +               echo "Test failed"
-> +       fi
-> +       modprobe -r nvme
-> +}
-> diff --git a/tests/nvme/050.out b/tests/nvme/050.out
-> new file mode 100644
-> index 0000000..b78b05f
-> --- /dev/null
-> +++ b/tests/nvme/050.out
-> @@ -0,0 +1,2 @@
-> +Running nvme/050
-> +Test complete
-> --
-> 2.40.0
->
->
-
-
---=20
-Best Regards,
-  Yi Zhang
-
+--D
