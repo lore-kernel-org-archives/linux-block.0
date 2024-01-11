@@ -1,78 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094AD58AAC
-	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 22:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F8358ADB
+	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 22:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FyfXVZCo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705011789;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2zfHUkRNp3fZPTZ3mOwSzA0d9Az8XbdXtc3kTjxtdsc=;
-	b=FyfXVZCowRf5sWwiDgJ+r7mANMtg/FRMOH2DltG/cOXM5xVLp9H/TwxPxMjxO2vXROdXHu
-	7P3C9zwR1OsnCmIcIzCVaNhHpv+Dv/313gMPDkitlBqfDpSIMkYrODEZmipP+S2nWmc5d7
-	KhH4fTec69kysmACK0wVCjC3sdSVs78=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-261-LPoPVscXMrKQVuaTJdnfFQ-1; Thu,
- 11 Jan 2024 17:23:06 -0500
-X-MC-Unique: LPoPVscXMrKQVuaTJdnfFQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 062E0283780F;
-	Thu, 11 Jan 2024 22:23:06 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.3])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 87E9B1121313;
-	Thu, 11 Jan 2024 22:23:03 +0000 (UTC)
-Date: Fri, 12 Jan 2024 06:22:59 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	ming.lei@redhat.com
-Subject: Re: [PATCH 2/2] blk-mq: ensure a q_usage_counter reference is held
- when splitting bios
-Message-ID: <ZaBqQ0jX6ovHITQo@fedora>
-References: <20240111135705.2155518-1-hch@lst.de>
- <20240111135705.2155518-3-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xw+6vryX"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0DDB8C433C7;
+	Thu, 11 Jan 2024 22:57:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705013879;
+	bh=5JntnIGHqXDR4IpvDuLSBaCL/Rm1+pOc1A7tV389yuE=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=Xw+6vryXZIGugSeE6xvGU9JgMOBOki0VTLpEWlisEGKlxstX2GL2VITYcwqBWlLUr
+	 JBOQZ0uAf9r06hTML44wvwcLBPYG55uOmNNLA0M/33SfgnyMURsRP4bS7yBGwI3YtB
+	 t+yr8atvlmgwtoaNj7dj+zQ+O1G4t9cDWBaOATajt+LHNFl0hSEPshQat/RJws1sje
+	 yIB2/Q+fOmrpF1cCJ91BMhB5TlBypPCjs/hgK6/SRSqpjyq8YG8clLrVBURKsH84zZ
+	 al54NG4Y65Nl1/l3+VNmMpfERQeJW4UAkKTPSLBVGdluKXz0aYZS/8tg2BDSHJMT02
+	 U3+P4rzB1o4HA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F08DCDFC698;
+	Thu, 11 Jan 2024 22:57:58 +0000 (UTC)
+Subject: Re: [GIT PULL] Block changes for 6.8-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <2bc9c8de-b2a1-43f7-9aa0-a6ec425a1ce6@kernel.dk>
+References: <2bc9c8de-b2a1-43f7-9aa0-a6ec425a1ce6@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <2bc9c8de-b2a1-43f7-9aa0-a6ec425a1ce6@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/for-6.8/block-2024-01-08
+X-PR-Tracked-Commit-Id: 587371ed783b046f22ba7a5e1cc9a19ae35123b4
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 01d550f0fcc06c7292f79a6f1453aac122d1d2c8
+Message-Id: <170501387898.24643.16484960039408938031.pr-tracker-bot@kernel.org>
+Date: Thu, 11 Jan 2024 22:57:58 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240111135705.2155518-3-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Thu, Jan 11, 2024 at 02:57:05PM +0100, Christoph Hellwig wrote:
-> q_usage_counter is the only thing preventing us from the limits changing
-> under us in __bio_split_to_limits, but blk_mq_submit_bio doesn't hold it.
+The pull request you sent on Mon, 8 Jan 2024 10:02:28 -0700:
 
-Can you share why the limits change matters wrt. split? If queue is
-live, both new and old one are supposed to work, such as, we don't
-freeze queue when changing `max_sectors_kb` via sysfs.
+> git://git.kernel.dk/linux.git tags/for-6.8/block-2024-01-08
 
-> 
-> Change __submit_bio to always acquire the q_usage_counter counter before
-> branching out into bio vs request based helper, and let blk_mq_submit_bio
-> tell it if it consumed the reference by handing it off to the request.
-> 
-> Fixes: 9d497e2941c3 ("block: don't protect submit_bio_checks by q_usage_counter")
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/01d550f0fcc06c7292f79a6f1453aac122d1d2c8
 
-The above tag looks wrong, the logic change is actually from commit
+Thank you!
 
-900e08075202 ("block: move queue enter logic into blk_mq_submit_bio()")
-
-And commit 9d497e2941c3 doesn't move q_usage_counter from
-blk_mq_submit_bio() or bio split.
-
-Thanks, 
-Ming
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
