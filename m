@@ -1,47 +1,53 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8532E4F898
-	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 15:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C9715AC4
+	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 16:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFuKJNg8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704988500;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=N2zkMhK+45qG/GcFjunTZZrztvgu3syuF871fW0x/3Y=;
-	b=MFuKJNg85wraKXFTkfsE7kv1ZuckhuB+rXxXOEEnp7fbPtW4orZWrNQ5yQ8U48Cqa6lxrd
-	VC7MIHTpe6NVXQbm3kKexJ/JXeAaAKZeJMsDqO+6RgJR7Mzu35DnHE7JBzprRdNQXL1uAp
-	7fwC/T/D8F0CQPfgo3TXoPgxDQ0g3Ok=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-S5zCa7FkNraoVV9QC4WrkQ-1; Thu,
- 11 Jan 2024 10:54:59 -0500
-X-MC-Unique: S5zCa7FkNraoVV9QC4WrkQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 950671C106A3;
-	Thu, 11 Jan 2024 15:54:58 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.3])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0A2015012;
-	Thu, 11 Jan 2024 15:54:56 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: David Jeffery <djeffery@redhat.com>,
-	Gabriel Krisman Bertazi <krisman@suse.de>,
-	Jan Kara <jack@suse.cz>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Changhui Zhong <czhong@redhat.com>
-Subject: [PATCH] blk-mq: fix IO hang from sbitmap wakeup race
-Date: Thu, 11 Jan 2024 23:54:48 +0800
-Message-ID: <20240111155448.4097173-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dm/jM6Bh"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-360412acf3fso2318745ab.0
+        for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 08:02:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1704988950; x=1705593750; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QoXkCz7VGH6mnW3+WIFfNlKJqrgl9Wm2MRG8xUPTDtA=;
+        b=dm/jM6BhyW2hEGEGuuZFKLifk9K7q6cWf3G8B51ZnKIwriN5rwBuFcyf2mEfVRBlKI
+         FAvYYsXh/wVN7tUt2bbm1Ku01tiOGpejb3w2CJzzEmLC+lstQ6qZ4BtVmP+Vn1hYvjz4
+         kBpdncXZlvRLISew2ZAI9SAcu1MuruWSNf/HbJZVdxeQTZep/ncfDHH6qjxXtjmHPet0
+         rBu/Qjnhf196pKw8UHqNFgnXLlXFYH/Rt8ZcqrWK4QcaFBn7TLNup8Cj6bSSXRB/392I
+         YIjd9wE84qsIp7aI1kYIlI88aR6/5+J/mUtcI6JeXU/3bwpjVTa/jr780v7S1t7TYgVq
+         gBow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704988950; x=1705593750;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QoXkCz7VGH6mnW3+WIFfNlKJqrgl9Wm2MRG8xUPTDtA=;
+        b=ebwyqv0golxFTX4QiBic2EW5KaDrO5aWg9QEWMG/d9fGo9NcDuIr22/5kXjlVh4uvN
+         Dc+U3rcdDhDLMIwDJWnjCzG0KE/9rsl/RhbZq6M5EUSUWd5yeXmP22UtgmZWheE0Pd/K
+         R5u9VhLHeS5eH7ASdqUgHphv4Qq8VD3vP5MFTizcxS0URC4c941aB3LuwF8iwoA3WcwT
+         k2prbCBXQMhWzw43dueIAFNGxwAqPwmDl1KYpIWE5jLHuFP20EUByQ31dxkVVlc1MYU0
+         eNU7Ht6f/DyXA86dfke3oU2AQFXG7PYDNcDTKdOr+EwdfKCAFG6F1zP4Z7SaeYCjTvX5
+         XdlA==
+X-Gm-Message-State: AOJu0YwoL3kzqvCNfIIbNuON/qCNDOolOSqAxpV3vtgw5k7hHd7QOHlL
+	hcq8jFYTgyNKKtaV493EZr3Ti4jSQLW3NR80WgEt+iuluAz2Zw==
+X-Google-Smtp-Source: AGHT+IHIxcq+J5oIDTRHnwE0bSCMnN5StS3WLqQNpCsW4xDu53HLmfl6F+ibemWcafXo7C+fvJA89A==
+X-Received: by 2002:a05:6e02:20e3:b0:35f:fa79:644 with SMTP id q3-20020a056e0220e300b0035ffa790644mr2734507ilv.3.1704988949563;
+        Thu, 11 Jan 2024 08:02:29 -0800 (PST)
+Received: from localhost.localdomain ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id cl15-20020a0566383d0f00b0046e564817c1sm285450jab.33.2024.01.11.08.02.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 08:02:28 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: martin.petersen@oracle.com
+Subject: [PATCHSET 0/3] Integrity cleanups and optimization
+Date: Thu, 11 Jan 2024 09:00:18 -0700
+Message-ID: <20240111160226.1936351-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,98 +55,21 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-In blk_mq_mark_tag_wait(), __add_wait_queue() may be re-ordered
-with the following blk_mq_get_driver_tag() in case of getting driver
-tag failure.
+Hi,
 
-Then in __sbitmap_queue_wake_up(), waitqueue_active() may not observe
-the added waiter in blk_mq_mark_tag_wait() and wake up nothing, meantime
-blk_mq_mark_tag_wait() can't get driver tag successfully.
+1 gets rid of the dummy nop profile, 2 marks the queue as having an
+actual profile, and 3 avoids calling into bio_integrity_prep() if we
+don't have a profile. This both reduces code (getting rid of the nop
+profile) and reduces the overhead of the standard setup of having
+integrity enabled in kconfig, yet not using a device with an integrity
+profile.
 
-This issue can be reproduced by running the following test in loop, and
-fio hang can be observed in < 30min when running it on my test VM
-in laptop.
+ block/blk-integrity.c  | 38 ++++++++++----------------------------
+ block/blk-mq.c         | 11 +++++++----
+ include/linux/blkdev.h |  1 +
+ 3 files changed, 18 insertions(+), 32 deletions(-)
 
-	modprobe -r scsi_debug
-	modprobe scsi_debug delay=0 dev_size_mb=4096 max_queue=1 host_max_queue=1 submit_queues=4
-	dev=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
-	fio --filename=/dev/"$dev" --direct=1 --rw=randrw --bs=4k --iodepth=1 \
-       		--runtime=100 --numjobs=40 --time_based --name=test \
-        	--ioengine=libaio
-
-Fix the issue by adding one explicit barrier in blk_mq_mark_tag_wait(), which
-is just fine in case of running out of tag.
-
-Apply the same pattern in blk_mq_get_tag() which should have same risk.
-
-Reported-by: Changhui Zhong <czhong@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-BTW, Changhui is planning to upstream the test case to blktests.
-
- block/blk-mq-tag.c | 19 +++++++++++++++++++
- block/blk-mq.c     | 16 ++++++++++++++++
- 2 files changed, 35 insertions(+)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index cc57e2dd9a0b..29f77cae8eb2 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -179,6 +179,25 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 
- 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
- 
-+		/*
-+		 * Add one explicit barrier since __blk_mq_get_tag() may not
-+		 * imply barrier in case of failure.
-+		 *
-+		 * Order adding us to wait queue and the following allocating
-+		 * tag in  __blk_mq_get_tag().
-+		 *
-+		 * The pair is the one implied in sbitmap_queue_wake_up()
-+		 * which orders clearing sbitmap tag bits and
-+		 * waitqueue_active() in __sbitmap_queue_wake_up(), since
-+		 * waitqueue_active() is lockless
-+		 *
-+		 * Otherwise, re-order of adding wait queue and getting tag
-+		 * may cause __sbitmap_queue_wake_up() to wake up nothing
-+		 * because the waitqueue_active() may not observe us in wait
-+		 * queue.
-+		 */
-+		smp_mb();
-+
- 		tag = __blk_mq_get_tag(data, bt);
- 		if (tag != BLK_MQ_NO_TAG)
- 			break;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index fb29ff5cc281..54545a4792bf 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1847,6 +1847,22 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
- 	__add_wait_queue(wq, wait);
- 
-+	/*
-+	 * Add one explicit barrier since blk_mq_get_driver_tag() may
-+	 * not imply barrier in case of failure.
-+	 *
-+	 * Order adding us to wait queue and allocating driver tag.
-+	 *
-+	 * The pair is the one implied in sbitmap_queue_wake_up() which
-+	 * orders clearing sbitmap tag bits and waitqueue_active() in
-+	 * __sbitmap_queue_wake_up(), since waitqueue_active() is lockless
-+	 *
-+	 * Otherwise, re-order of adding wait queue and getting driver tag
-+	 * may cause __sbitmap_queue_wake_up() to wake up nothing because
-+	 * the waitqueue_active() may not observe us in wait queue.
-+	 */
-+	smp_mb();
-+
- 	/*
- 	 * It's possible that a tag was freed in the window between the
- 	 * allocation failure and adding the hardware queue to the wait
 -- 
-2.42.0
+Jens Axboe
 
