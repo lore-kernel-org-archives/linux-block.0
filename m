@@ -1,315 +1,81 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F5715E8E
-	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 13:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328FE3C478
+	for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 13:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="0D8Du/mR"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40e6275e9beso911615e9.1
-        for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 05:04:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1704978256; x=1705583056; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TUK2zT0BPfdydNsT5EJn5ISOoo/X1IO0KyG0yLRREqg=;
-        b=0D8Du/mRMMnX8woI/jhgIOIO6kXrqNctCoMTiAhd+qWiD03E1FeQAu12HMjWPimMAR
-         WLgj4uikobeKBzy1FQYt99v5wFQEXn4QcTsIpUJOS6Nr7vTIkJDbQa0tbdlvO/ZS7Jtr
-         5lcQ6ivTQCQkToBmO0pReBo6luQnKoLmRZkKzoIDLfQ4kYwPqKCc4nHyLeJqnCNvtLsg
-         aZUXttQa3HS9YT/xxYX9970dTODZXdQqpiQQIVyx2wqHQf3r5V42JP3vDf6qjPFp/22v
-         JA5Y0PiAl5gpuVTkL1AuJMZmQcvH1EaL9kUVPAYndV7sVNSbgBfu4xFvmmP4Li6lKR2P
-         4Xaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704978256; x=1705583056;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TUK2zT0BPfdydNsT5EJn5ISOoo/X1IO0KyG0yLRREqg=;
-        b=A/TgI2r9Tc+Ro8aJPYVkduXAIk7KAELF+ENH5vJC1NOjl77Olahy8gasXCASpsNI4u
-         n1Sk5mx9bzWyy2OcV9aMK+HwuGGrQ1yhu3I6YBbs66HUS3grsxQ1FFOCKzVw9oZBU++M
-         Qwuh4VVAtpkvPHUBYvqHGfXfYuqLr4yhfq/sAXggazQGUwwPwvORjzdT2gi9D/YpAeex
-         v4UwLQx27QDBwD7Yt+KGReu5AdC12qcueZKXBu/olJndFI60ZArKi5mE58zZETeM++Ju
-         xMf/lEuyO9T/CXR0+qMmTDZmDQJYy8UBWqMdwoiceQLo3EKMje+EsJ6fVaO1jkxz2+W6
-         vJDw==
-X-Gm-Message-State: AOJu0YwGWGbCaBvn9C5PqQe2pgB0BmxAFsI8zXPVY06yznOKmx+ZNrKG
-	Q+nWrgX47fKkQuRdW89+h6mr3KWIr/Fv7Q==
-X-Google-Smtp-Source: AGHT+IFF9WMMBpGrWeM0BHAltriDJcHnFIQQ9fcUKOSAiJEE8dv3V03p30sSgqAaj2i4HbEA8OuF+A==
-X-Received: by 2002:a05:600c:1e84:b0:40e:6259:82e3 with SMTP id be4-20020a05600c1e8400b0040e625982e3mr165637wmb.56.1704978256036;
-        Thu, 11 Jan 2024 05:04:16 -0800 (PST)
-Received: from localhost ([165.225.194.217])
-        by smtp.gmail.com with ESMTPSA id o8-20020a05600c4fc800b0040e549c77a1sm5762576wmq.32.2024.01.11.05.04.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 05:04:15 -0800 (PST)
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <20230503090708.2524310-5-nmi@metaspace.dk>
- <-SiJ5paRDIUkH1WEWhGhEjhIgFbSo5PJAvac53bTnBZ5o41DR-kNWZEQBsnKeW1FRJh35siVFRrx54L0M6ebSzl0rzecgcDjqZFGRa9uypE=@proton.me>
-User-agent: mu4e 1.10.8; emacs 28.2.50
-From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith
- Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes
- Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
- rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew
- Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
- <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun
- Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org,
- gost.dev@samsung.com
-Subject: Re: [RFC PATCH 04/11] rust: block: introduce `kernel::block::bio`
- module
-Date: Thu, 11 Jan 2024 13:49:53 +0100
-In-reply-to: <-SiJ5paRDIUkH1WEWhGhEjhIgFbSo5PJAvac53bTnBZ5o41DR-kNWZEQBsnKeW1FRJh35siVFRrx54L0M6ebSzl0rzecgcDjqZFGRa9uypE=@proton.me>
-Message-ID: <87a5pcyqf8.fsf@metaspace.dk>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="leQX+Jvf"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=cloQDKaagUKu7ceMnYi2IROF/T7xvNgp8jO47XB8hu4=; b=leQX+JvfWPP2cGxb2pEcwKIlHc
+	2Q4Gabdih+0DvtmYXiD3uKEL2kZanBuAwC7Ot5puPzG549EC619t6czlgJZEN8DWabc4T3CwNBtCK
+	QPZCxt+8fQx6WLwX52IOuLh9yMhkQz2Zr4kpoR+ncdI0lof/AT4cz0CM+tyDdVMBVgyOhHIJtLbG2
+	KM6gFcojnOmWC2uK2ou8HTZLzHtmC9aG9007SSFeymCVMD/3owXQ1TYRyOGnZSE8aR0K3neS6E1zs
+	2qIqkmoBYJKqdNXPYooZikYWW3uT8jOvvaK90ca7QpYgG02tH0QDHikHz5XJk+HGeA3ubKv/YEBUW
+	enWts9cA==;
+Received: from [2001:4bb8:191:2f6b:63ff:a340:8ed1:7cd5] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rNvYX-000ETc-0T;
+	Thu, 11 Jan 2024 13:57:13 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/2] blk-mq: rename blk_mq_can_use_cached_rq
+Date: Thu, 11 Jan 2024 14:57:04 +0100
+Message-Id: <20240111135705.2155518-2-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240111135705.2155518-1-hch@lst.de>
+References: <20240111135705.2155518-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+blk_mq_can_use_cached_rq doesn't just check if we can use the request,
+but also performs the work to actually use it.  Remove the _can in the
+naming, and improve the comment describing the function.
 
-Benno Lossin <benno.lossin@proton.me> writes:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
->> +/// A wrapper around a `struct bio` pointer
->> +///
->> +/// # Invariants
->> +///
->> +/// First field must alwyas be a valid pointer to a valid `struct bio`.
->> +pub struct Bio<'a>(
->> +    NonNull<crate::bindings::bio>,
->> +    core::marker::PhantomData<&'a ()>,
->
-> Please make this a struct with named fields. Also this is rather a
-> `BioRef`, right? Why can't `&Bio` be used and `Bio` embeds
-> `bindings::bio`?
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index aa9a05fdd02377..a6731cacd0132c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2884,8 +2884,11 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ 	return NULL;
+ }
+ 
+-/* return true if this @rq can be used for @bio */
+-static bool blk_mq_can_use_cached_rq(struct request *rq, struct blk_plug *plug,
++/*
++ * Check if we can use the passed on request for submitting the passed in bio,
++ * and remove it from the request list if it can be used.
++ */
++static bool blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
+ 		struct bio *bio)
+ {
+ 	enum hctx_type type = blk_mq_get_hctx_type(bio->bi_opf);
+@@ -2963,7 +2966,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 			return;
+ 		if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
+ 			return;
+-		if (blk_mq_can_use_cached_rq(rq, plug, bio))
++		if (blk_mq_use_cached_rq(rq, plug, bio))
+ 			goto done;
+ 		percpu_ref_get(&q->q_usage_counter);
+ 	} else {
+-- 
+2.39.2
 
-Yes, it feels better with a &Bio reference, thanks.
-
->> +);
->> +
->> +impl<'a> Bio<'a> {
->> +    /// Returns an iterator over segments in this `Bio`. Does not consi=
-der
->> +    /// segments of other bios in this bio chain.
->> +    #[inline(always)]
->
-> Why are these `inline(always)`? The compiler should inline them
-> automatically?
-
-No, the compiler would not inline into modules without them. I'll check
-again if that is still the case.
-
->
->> +    pub fn segment_iter(&'a self) -> BioSegmentIterator<'a> {
->> +        BioSegmentIterator::new(self)
->> +    }
->> +
->> +    /// Get a pointer to the `bio_vec` off this bio
->> +    #[inline(always)]
->> +    fn io_vec(&self) -> *const bindings::bio_vec {
->> +        // SAFETY: By type invariant, get_raw() returns a valid pointer=
- to a
->> +        // valid `struct bio`
->> +        unsafe { (*self.get_raw()).bi_io_vec }
->> +    }
->> +
->> +    /// Return a copy of the `bvec_iter` for this `Bio`
->> +    #[inline(always)]
->> +    fn iter(&self) -> bindings::bvec_iter {
->
-> Why does this return the bindings iter? Maybe rename to `raw_iter`?
-
-Makes sense to rename it, thanks.
-
->> +        // SAFETY: self.0 is always a valid pointer
->> +        unsafe { (*self.get_raw()).bi_iter }
->> +    }
->> +
->> +    /// Get the next `Bio` in the chain
->> +    #[inline(always)]
->> +    fn next(&self) -> Option<Bio<'a>> {
->> +        // SAFETY: self.0 is always a valid pointer
->> +        let next =3D unsafe { (*self.get_raw()).bi_next };
->> +        Some(Self(NonNull::new(next)?, core::marker::PhantomData))
->
-> Missing `INVARIANT` explaining why `next` is valid or null. Also why not
-> use `Self::from_raw` here?
-
-Thanks, will change that.
-
->
->> +    }
->> +
->> +    /// Return the raw pointer of the wrapped `struct bio`
->> +    #[inline(always)]
->> +    fn get_raw(&self) -> *const bindings::bio {
->> +        self.0.as_ptr()
->> +    }
->> +
->> +    /// Create an instance of `Bio` from a raw pointer. Does check that=
- the
->> +    /// pointer is not null.
->> +    #[inline(always)]
->> +    pub(crate) unsafe fn from_raw(ptr: *mut bindings::bio) -> Option<Bi=
-o<'a>> {
->> +        Some(Self(NonNull::new(ptr)?, core::marker::PhantomData))
->> +    }
->> +}
->> +
->> +impl core::fmt::Display for Bio<'_> {
->> +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
->> +        write!(f, "Bio {:?}", self.0.as_ptr())
->
-> this will display as `Bio 0x7ff0654..` I think there should be some
-> symbol wrapping the pointer like `Bio(0x7ff0654)` or `Bio { ptr: 0x7ff065=
-4 }`.
->
-
-Sure =F0=9F=91=8D
-
->> +    }
->> +}
->> +
->> +/// An iterator over `Bio`
->> +pub struct BioIterator<'a> {
->> +    pub(crate) bio: Option<Bio<'a>>,
->> +}
->> +
->> +impl<'a> core::iter::Iterator for BioIterator<'a> {
->> +    type Item =3D Bio<'a>;
->> +
->> +    #[inline(always)]
->> +    fn next(&mut self) -> Option<Bio<'a>> {
->> +        if let Some(current) =3D self.bio.take() {
->> +            self.bio =3D current.next();
->> +            Some(current)
->> +        } else {
->> +            None
->> +        }
->
-> Can be rewritten as:
->     let current =3D self.bio.take()?;
->     self.bio =3D current.next();
->     Some(cur)
->
-
-Thanks =F0=9F=91=8D
-
->> +    }
->> +}
->> diff --git a/rust/kernel/block/bio/vec.rs b/rust/kernel/block/bio/vec.rs
->> new file mode 100644
->> index 000000000000..acd328a6fe54
->> --- /dev/null
->> +++ b/rust/kernel/block/bio/vec.rs
->> @@ -0,0 +1,181 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +//! Types for working with `struct bio_vec` IO vectors
->> +//!
->> +//! C header: [`include/linux/bvec.h`](../../include/linux/bvec.h)
->> +
->> +use super::Bio;
->> +use crate::error::Result;
->> +use crate::pages::Pages;
->> +use core::fmt;
->> +use core::mem::ManuallyDrop;
->> +
->> +#[inline(always)]
->> +fn mp_bvec_iter_offset(bvec: *const bindings::bio_vec, iter: &bindings:=
-:bvec_iter) -> u32 {
->> +    (unsafe { (*bvec_iter_bvec(bvec, iter)).bv_offset }) + iter.bi_bvec=
-_done
->> +}
->> +
->> +#[inline(always)]
->> +fn mp_bvec_iter_page(
->> +    bvec: *const bindings::bio_vec,
->> +    iter: &bindings::bvec_iter,
->> +) -> *mut bindings::page {
->> +    unsafe { (*bvec_iter_bvec(bvec, iter)).bv_page }
->> +}
->> +
->> +#[inline(always)]
->> +fn mp_bvec_iter_page_idx(bvec: *const bindings::bio_vec, iter: &binding=
-s::bvec_iter) -> usize {
->> +    (mp_bvec_iter_offset(bvec, iter) / crate::PAGE_SIZE) as usize
->> +}
->> +
->> +#[inline(always)]
->> +fn mp_bvec_iter_len(bvec: *const bindings::bio_vec, iter: &bindings::bv=
-ec_iter) -> u32 {
->> +    iter.bi_size
->> +        .min(unsafe { (*bvec_iter_bvec(bvec, iter)).bv_len } - iter.bi_=
-bvec_done)
->> +}
->> +
->> +#[inline(always)]
->> +fn bvec_iter_bvec(
->> +    bvec: *const bindings::bio_vec,
->> +    iter: &bindings::bvec_iter,
->> +) -> *const bindings::bio_vec {
->> +    unsafe { bvec.add(iter.bi_idx as usize) }
->> +}
->> +
->> +#[inline(always)]
->> +fn bvec_iter_page(
->> +    bvec: *const bindings::bio_vec,
->> +    iter: &bindings::bvec_iter,
->> +) -> *mut bindings::page {
->> +    unsafe { mp_bvec_iter_page(bvec, iter).add(mp_bvec_iter_page_idx(bv=
-ec, iter)) }
->> +}
->> +
->> +#[inline(always)]
->> +fn bvec_iter_len(bvec: *const bindings::bio_vec, iter: &bindings::bvec_=
-iter) -> u32 {
->> +    mp_bvec_iter_len(bvec, iter).min(crate::PAGE_SIZE - bvec_iter_offse=
-t(bvec, iter))
->> +}
->> +
->> +#[inline(always)]
->> +fn bvec_iter_offset(bvec: *const bindings::bio_vec, iter: &bindings::bv=
-ec_iter) -> u32 {
->> +    mp_bvec_iter_offset(bvec, iter) % crate::PAGE_SIZE
->> +}
->
-> Why are these functions:
-> - not marked as `unsafe`?
-> - undocumented,
-> - free functions.
->
-> Can't these be directly implemented on `Segment<'_>`? If not,
-> I think we should find some better way or make them `unsafe`.
-
-Yes, you are right. I will move them to `Segment` and document them
-better. They definitely need to be unsafe because they rely on C API
-contract that the iterator is not indexing out of bounds.
-
-[...]
-
->> +impl<'a> core::iter::Iterator for BioSegmentIterator<'a> {
->> +    type Item =3D Segment<'a>;
->> +
->> +    #[inline(always)]
->> +    fn next(&mut self) -> Option<Self::Item> {
->> +        if self.iter.bi_size =3D=3D 0 {
->> +            return None;
->> +        }
->> +
->> +        // Macro
->> +        // bio_vec =3D bio_iter_iovec(bio, self.iter)
->> +        // bio_vec =3D bvec_iter_bvec(bio.bi_io_vec, self.iter);
->
-> Weird comment?
-
-Yes, will fix, thanks.
-
-Thanks for the comments!
-
-BR Andreas
