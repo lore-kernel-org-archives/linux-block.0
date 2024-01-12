@@ -1,97 +1,93 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BD5FBF8;
-	Thu, 11 Jan 2024 23:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
-Received: from localhost ([84.170.86.196]) by mrelayeu.kundenserver.de
- (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1Mgf4k-1qwTNk0h3s-00h4Vm; Fri, 12 Jan 2024 00:56:08 +0100
-Date: Fri, 12 Jan 2024 00:56:06 +0100
-From: Christian Heusel <christian@heusel.eu>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Dave Chinner <dchinner@redhat.com>, 
-	Jan Kara <jack@suse.cz>, Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	Christian Brauner <brauner@kernel.org>, Min Li <min15.li@samsung.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org
-Subject: Re: Re: [PATCH] block: print symbolic error name instead of error
- code
-Message-ID: <rqf6ufzzvmrukcaulkhmfwtjon2jwhrb2liwwimtws5r3uqmux@k2p3tccnm4sm>
-References: <20240111231521.1596838-1-christian@heusel.eu>
- <ecf3adb2-596b-471b-8e35-b8f8124167f2@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55601A3F
+	for <linux-block@vger.kernel.org>; Fri, 12 Jan 2024 00:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PyOD8stm"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d5595997ffso7277645ad.1
+        for <linux-block@vger.kernel.org>; Thu, 11 Jan 2024 16:12:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705018330; x=1705623130; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7RDR8Pr11m33UGsfaCe6Ai28GS+cdafGrto8H86VV/I=;
+        b=PyOD8stmN/7L8sDSpudWErBJP9kf4r96jY3hg3sxtEi6tiVNA1vd6Xn9GjeKuqEAjV
+         L6tMtJg6OKEqY1o+dN4i2/EVjnZwf7abF3J0UZzwsxaRROHUJF+s5ItUreBww5IQurU6
+         9HnIuGOVGrfHR7EtLgrZ0k/GNjD0TXQGKnAYR/o0zT8RuqeIZ46EZuP5KqSv9+k8cv3y
+         Q2VGqkSJg8K140ux3JfvcQmHDuq1ZlQ0+y6iND382kOCNavIY1blQZbJdvEXlzvYDdzR
+         bDggueqFsgg5PEOz5cCewXFJBXtSyUYtqr/6z9n82ArqNWSSGkUUeXa1U9sKjynvSytm
+         3OtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705018330; x=1705623130;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7RDR8Pr11m33UGsfaCe6Ai28GS+cdafGrto8H86VV/I=;
+        b=SnFSkMHoT6r37BKJRkYEr6VVrGurnpxdwd0CHuxemFBpKF/9V3ddEDzSDYjo+Nu1RG
+         A18hTHH50m9ZG2Ulebj6aPHDmwM6+XdFtWfogiTNPwHbdcdU5tHTujhmgMSXQzW+25Ht
+         JjJJtvSms4VojFrdlzgYNv61qgWLZDp1b/sLLU9MJ5Gy3IDHWYVM9DG5AdBwEpP7iB1o
+         R4FCTo1l6gDYgNEpILOlxwbZX+Q/G66yACjQQmTxdAsCed3k+FOOQ5P53HZesLpjVwt2
+         cX5vpmzYTZj+aG7JJEnD3b6WPTinzt1HlzHZGNpP31DDrN+tdK3Ev8+lPpSf3JFTQEr8
+         grvQ==
+X-Gm-Message-State: AOJu0YyrjLMIEAd23CnALqrmqduFM+F8fDq+GbZsIl6QymffilAVaz4v
+	phnL5a8Ued7Xb7jJ9fXoKkjT1uAuLB/h6ZnyBkXJci5EOW9wng==
+X-Google-Smtp-Source: AGHT+IHxFW83UA3ocrNYi2vz/x8194P1s3mgzqGH0JNkfyYDo/VlofLsjt+2Gp01BY8atlQSLWp/Cw==
+X-Received: by 2002:a17:902:c194:b0:1d4:be1e:f197 with SMTP id d20-20020a170902c19400b001d4be1ef197mr247423pld.1.1705018330342;
+        Thu, 11 Jan 2024 16:12:10 -0800 (PST)
+Received: from ?IPV6:2620:10d:c085:21e8::153d? ([2620:10d:c090:400::4:1638])
+        by smtp.gmail.com with ESMTPSA id kw7-20020a170902f90700b001d4725c10f3sm1424866plb.10.2024.01.11.16.12.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Jan 2024 16:12:09 -0800 (PST)
+Message-ID: <13f86ddb-8d6f-49a5-80c8-72e2546b65f6@kernel.dk>
+Date: Thu, 11 Jan 2024 17:12:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="yarfvsbjhgg33kw3"
-Content-Disposition: inline
-In-Reply-To: <ecf3adb2-596b-471b-8e35-b8f8124167f2@kernel.org>
-X-Provags-ID: V03:K1:ZUj61C/DBmc+kOIpNqNL/soE/JLUVBGg1kTN3wxtwTJfGDpoll1
- EKGPxx1vsOCNlVdJ65aqnu0lct6/PR62ZZf/Frd1ox5arvXPxboF76At9KAXyoS+X1JkSTq
- 4GDe1W+hHCr/OhwAwy7xNE65snO+hHnYs14MzVQAT6Zj5+EDJDSGWDOJdKELZzHbAcpn28w
- HCY5WqrqkwFxxY7u6sukQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:0P7DSLV+OxI=;B47Sj56trwMinxQveS9f8LONo0m
- YcCPXgop/WJzA78DN7jg5XbclOd3zLjrApNH6MQhdCmFWZGIdZ2r7sFY9dVdG2j6F4rWqbkPC
- Aeu2Mn403WquqOKEu1cxJYdiqd5S4TkGIka6Mlre6Gv7qDhqD18SYZ9/C/6Ha/s2ju946wvVp
- xYwpbU9kGbruJwm5hf3YimRgJe/sqJ3rUZirNW5MiP9/20yKwYYrexj1BqMHDipRs5Gop76H8
- uFTJI9aQgql9TcZNEBVQbNvK+GuTRtnV6kg28zQZ4nlpOmi2ixO5GV/TaQ+ToxLHZmriAypZs
- Ue/lEmJn4VghIrHqdU9mEKEdN7HcVIuxH6h5nH3MO4Ra1rFfwGowF79y7/d+quPD+zHsaovQp
- LW2z8ThrlVbkvfFJnl77u9AAP1fLhWtvd3OtY1YQ8XZh3437Jp4Q9Eodc2akYY0P0qtqOdiD3
- qh8sjEfbNraEucXModX4NHbZ7w7dsU1wj4wf6Kb2ZCJpmRmY2lYfx94mUGn7j9B+knQk4dT4m
- eRiwQ/PSZiZ8clx2bodzhdVTVIm34lM4IrZaKrmGMPUbefTVGORT1AxXWyt95WGCxKfqD7PiL
- eciB5x7w7kXdq4A0RP6SPFu5ROu6fceUuOhSs6N+r24ZxFG3Rjuzci5S3HPIbKtINNMdN0N/b
- MF04A5himVCt8NmaGVV01W6uuyQwZWx8nc4hEBjUKOYuCFVi1KzmBhlVRyvHODFSDBFAGcvj9
- JQfUxNVo9+HwPuXP8Wqt/CXfH4PWQkoSvby1EyPjv8Q/EoIuXh/ISyfuTJha6zS3XGLdrXm7b
- 0Yv4iILvgKO0Z6yoqWU1zI1/WApBGJGgOnVIERk3r2fBw3Aoufx9Q37Kqx2v2Bdif7InjOBQ9
- grhZ+BF834TYoBQ==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: print symbolic error name instead of error code
+Content-Language: en-US
+To: Christian Heusel <christian@heusel.eu>,
+ Damien Le Moal <dlemoal@kernel.org>
+Cc: Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ Christian Brauner <brauner@kernel.org>, Min Li <min15.li@samsung.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org
+References: <20240111231521.1596838-1-christian@heusel.eu>
+ <ecf3adb2-596b-471b-8e35-b8f8124167f2@kernel.org>
+ <rqf6ufzzvmrukcaulkhmfwtjon2jwhrb2liwwimtws5r3uqmux@k2p3tccnm4sm>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <rqf6ufzzvmrukcaulkhmfwtjon2jwhrb2liwwimtws5r3uqmux@k2p3tccnm4sm>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+On 1/11/24 4:56 PM, Christian Heusel wrote:
+> On 24/01/12 08:37AM, Damien Le Moal wrote:
+>> On 1/12/24 08:15, Christian Heusel wrote:
+>>> -           printk(KERN_ERR " %s: p%d could not be added: %ld\n",
+>>> -                  disk->disk_name, p, -PTR_ERR(part));
+>>> +           printk(KERN_ERR " %s: p%d could not be added: %pe\n",
+>>> +                  disk->disk_name, p, part);
+>>
+>> pr_err() ?
+> 
+> If desired I can send a v2 containing another patch which refactors the
+> usages of printk into their respective pr_* aliases, but I wanted to
+> keep this consistent to the usages in rest of the file and do one change
+> at a time.
+
+Yes let's please keep that separate, not a huge fan of conversions of that
+anyway as it just causes backports or stable kernel issues.
+
+-- 
+Jens Axboe
 
 
---yarfvsbjhgg33kw3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On 24/01/12 08:37AM, Damien Le Moal wrote:
-> On 1/12/24 08:15, Christian Heusel wrote:
-> > -           printk(KERN_ERR " %s: p%d could not be added: %ld\n",
-> > -                  disk->disk_name, p, -PTR_ERR(part));
-> > +           printk(KERN_ERR " %s: p%d could not be added: %pe\n",
-> > +                  disk->disk_name, p, part);
->
-> pr_err() ?
-
-If desired I can send a v2 containing another patch which refactors the
-usages of printk into their respective pr_* aliases, but I wanted to
-keep this consistent to the usages in rest of the file and do one change
-at a time.
-
-Cheers,
-Chris
-
-
---yarfvsbjhgg33kw3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmWggBYACgkQwEfU8yi1
-JYW7BxAAtGYU/xIjCnok1HbUvBJdQMBxrK7pg9wVHvfwCRq/zyTItadRbaw2l5nC
-TXEl4z1Yzcvtu47AiGYwYWvc9D16ZWGHk3CtICEs8lZ+mWZs1kpw22MoUhS4zaov
-Fpv39OcP60eEp//6Ep8BbfA8VKbNI8iuH7fyLIpAy+t8X87iufpN111PcfNtedHK
-oVIBqEbV9xVTbOmdurj2nAhAmeecY2ON48WTmxLEtDmDzk+UI6+3SEYRfcBZfMU5
-ksSqs7hhXCzyk+yLyHrayq7j2mW9BKgRuNbJTYIPlNw8fzGCe0I6DkwisvgScj3A
-enZe8wbz+/GG0C29DaCp453BBa2Y+HbBewNUKBrIDvSq7MDKK0wlBaaLMdkIm+Oq
-ci7jhKka7ApXY+9J5ZKOWuyXwD30W0W9Ha3tkX+sp7TXKf6XT3pQisgRR6KdosKe
-3nJkNXj9m3oXeAP/XLutd2qCAsi033oYxL54PLgDKg54Q3TkMhgayWShOyznT4aG
-u+lkCUKMbqjXWXthnG+6hsFeeILSHUcoAOHh0LuZfrRz9MfVwRxGsOzB76XNUFti
-f9rzP+O7xbzSCAjBtsu18bZRFAfiOjP0v12GgmoA0GxN2BNa/aETEvMDbmiypNV3
-jQI17th5wbtTHqGWQ19d6egy9CerLh/3TujmqRNUPyC+uiAS4x4=
-=5Gas
------END PGP SIGNATURE-----
-
---yarfvsbjhgg33kw3--
