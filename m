@@ -1,88 +1,87 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5071F6A349
-	for <linux-block@vger.kernel.org>; Fri, 12 Jan 2024 15:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146FA6EB66
+	for <linux-block@vger.kernel.org>; Fri, 12 Jan 2024 15:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="zKBAK2OE"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4TBQjS18ptz9spj;
-	Fri, 12 Jan 2024 16:40:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1705074044;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DjVPjjjOC9+VfIQIJ1ZCZOkIJE5V+3KCLHNSv8iSUzM=;
-	b=zKBAK2OEqLzWPvOw5JB/dhK2JTaVuc25nJgUcgCQYSRZZ/biXbLqIpI+ECzQKHy0aF8yP+
-	p1my3UGhK29FORk4ewodR9ldGGBjZFZAb8b3mRJopsKsfI7R6DlDr1AMPBcMfgvlSK8mk6
-	rJpWCsO2VWw+wKpGUw3qdE9XN6J3wiaOaMYtLNicjYW4IS7ev4lTnWJKQCp2Zw4H4driOy
-	qlYweryOcYIvRu0iVRVR3hkNuKY5A/2/LzWCm+2HDK7EHTQBNCrQ8MABxC5OMZZhbjQ8Ux
-	7ZjxeJxfYC11GaFO46EH2EM5l2/+8AhisWxOc4SSiIuAH69f9BX4C7poS2AuxQ==
-Date: Fri, 12 Jan 2024 16:40:40 +0100
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, 
-	Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>, 
-	John Meneghini <jmeneghi@redhat.com>, linux-nvme@lists.infradead.org, hch@lst.de, 
-	Keith Busch <kbusch@kernel.org>, p.raghav@samsung.com, javier.gonz@samsung.com
-Subject: Re: [Report] blk-zoned/ZNS: non_power_of_2 of zone->len]
-Message-ID: <pvojitlhpwnxoc3zws5ufwsg2wnygirzobuuktbrcfv3b2zcyo@oevh6e2x3adx>
-References: <ZaCSOH7L+Nm6PvcN@fedora>
- <20503cd0-3a99-45bb-8374-40296a3cb92a@kernel.org>
- <ZaCyC5RIAcbkBYeL@fedora>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0LNjm4PU"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3606ff777a9so4102455ab.1
+        for <linux-block@vger.kernel.org>; Fri, 12 Jan 2024 07:49:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705074551; x=1705679351; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2M2ezCZGRfnmAxL/hY8nisbjoZxKUoYjhz2vkfYrIu4=;
+        b=0LNjm4PU9lH5K/JXGKZwaC1LoRHlE1yQ+b0Ds3VrHMXYRZtZDbIIsasTlyHFhmhAJC
+         +9DDZvhQzxbLcSGr2SyMz7GTiP2Z7Kdd4h6fnKcovASnTeDIokEdTwZdm+VONxtb3Xxf
+         2zxSv8raVMYOJiUM9JPkr1Jj6VsjtzTb8Q7Y0AcgpiF80lcNqaGf5H8SuR/Yk8KXVUOE
+         TEh0WdU950tWb4p3r48ekab6UKkRfKtDRkKuZtQAkcbjBpOEohegx571xS4DJois5OLU
+         wA/mWnX5zSmN/rzkX+bJT46ivT0uMpH1diGwxs7qrr/y6SGV/PkrBQNlqjI4ByKVG2Lv
+         /h+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705074551; x=1705679351;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2M2ezCZGRfnmAxL/hY8nisbjoZxKUoYjhz2vkfYrIu4=;
+        b=ZT+Ak6OJRhCEWsE9BQrC2r8ESrQvzsSjtI8TO9/z+XY3UFZamhVJefhH6WqbMRWGAk
+         N9EhP5NYsuQx/SGaGdCev/kSK3fGigenWMBuLVcL/xQlqmI6ChB7P8bSIoRoH54j8PER
+         SNGbhFufvAMM5/RgQYrWxp6MoXJz7dngmqQKeZggp0qM0w8sE3Pg+I6eGG20RfZ0UAYe
+         CG68Qo27dcR+CIGmif0sWsOGMcRbOyC4pynFysU2fnDdswcw4Ie5p0T/Qe9j3YZt1Gq0
+         MmrRJ8VPcLRmt8eWsXwS06pGDJ4HO3YQXtvMlZLGoGBePDaBkuyYp7Aqnrxt8mFWDAQK
+         pFtw==
+X-Gm-Message-State: AOJu0Yyg5VCVazLgd9j4k0zjoD2Xn4xkhddfIjpuQphVTVyedc0fKyLi
+	Ts7NetfsTJ+PNSKRSJThsn9Y4s00camxSiY+KnZCLbxzoAIH2Q==
+X-Google-Smtp-Source: AGHT+IE+PUBWKFhDNq7VuctZY9Z8FCMPFa07xX9QsvZp4BigHz2Zae4oUJiySCDTy/RqVUOAFKWehA==
+X-Received: by 2002:a05:6e02:1a2a:b0:35f:bc09:c56b with SMTP id g10-20020a056e021a2a00b0035fbc09c56bmr2458698ile.2.1705074551136;
+        Fri, 12 Jan 2024 07:49:11 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id j29-20020a056e02219d00b003600cf4d4c9sm987558ila.39.2024.01.12.07.49.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jan 2024 07:49:10 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: David Jeffery <djeffery@redhat.com>, 
+ Gabriel Krisman Bertazi <krisman@suse.de>, Jan Kara <jack@suse.cz>, 
+ Kemeng Shi <shikemeng@huaweicloud.com>, Changhui Zhong <czhong@redhat.com>
+In-Reply-To: <20240112122626.4181044-1-ming.lei@redhat.com>
+References: <20240112122626.4181044-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2] blk-mq: fix IO hang from sbitmap wakeup race
+Message-Id: <170507455034.2246885.5860299137041483473.b4-ty@kernel.dk>
+Date: Fri, 12 Jan 2024 08:49:10 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZaCyC5RIAcbkBYeL@fedora>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-Hi Ming,
 
-> > 
-> > It is the latter. There was a session at LSF/MM last year about this. I recall
-> > that the conclusion was that unless there is a strong user demand for non power
-> > of 2 zone size, we are not going to do anything about it. Because allowing
-> > non-power of 2 zone size has some serious consequences all over the place,
-> > including in FSes that natively support zoned devices. So relaxing that
-> > requirement is not trivial.
+On Fri, 12 Jan 2024 20:26:26 +0800, Ming Lei wrote:
+> In blk_mq_mark_tag_wait(), __add_wait_queue() may be re-ordered
+> with the following blk_mq_get_driver_tag() in case of getting driver
+> tag failure.
 > 
-> Just saw Bart's work on supporting non-power_of_2 zone len:
+> Then in __sbitmap_queue_wake_up(), waitqueue_active() may not observe
+> the added waiter in blk_mq_mark_tag_wait() and wake up nothing, meantime
+> blk_mq_mark_tag_wait() can't get driver tag successfully.
 > 
-> https://lore.kernel.org/linux-block/dc89c70e-4931-baaf-c450-6801c200c1d7@acm.org/
+> [...]
 
-As Bart said, I did most of the work in 2022.
+Applied, thanks!
 
-> 
-> IMO FS support might be another topic, cause FS isn't the only user,
-> also without block layer support, the device isn't usable, not mention FS.
-> 
+[1/1] blk-mq: fix IO hang from sbitmap wakeup race
+      commit: 5266caaf5660529e3da53004b8b7174cab6374ed
 
-I also added a small dm target in the series that converts a non-po2
-device to a po2 device to support existing FS without modifications
-until native support is added in them.
+Best regards,
+-- 
+Jens Axboe
 
-One of the main arguments against the support was the fragmentation it
-may cause in the FS world for zoned devices. Given that F2FS already
-supports non-po2 devices, it is only btrfs that will need some work to
-have native non-po2 support.
 
-> Since non-power2 zoned device does exists, I'd suggest Bart to restart the
-> work and let linux cover more zoned devices(include non-power 2 zone).
-> 
 
-I would be more than happy to provide my reviews if someone wants to do
-a respin on that series. IIRC, the changes to the block layer were not
-very intrusive.
-
---
-Pankaj
