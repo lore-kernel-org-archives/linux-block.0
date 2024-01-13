@@ -1,92 +1,133 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F03417C8D;
-	Fri, 12 Jan 2024 18:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-5e82f502a4cso58009917b3.0;
-        Fri, 12 Jan 2024 10:27:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342EC18B00
+	for <linux-block@vger.kernel.org>; Sat, 13 Jan 2024 02:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EJohBdcc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705111529;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=29rgx+fcdc+OGosBM+rz8Ay2WMsmo7j5/PhFnPhZLEY=;
+	b=EJohBdcccDSs0XMufuRHmLX4ANJK0ccg4gu4XDOXg+aGRhWZ8ibCee8C7Ro5RicBIy/Goe
+	t2m9jeREzqg5oXmC5uSr90oxIqMc2ZDPsMZK4IniIXBGS7Cn98yXw26MIUtbEpkFsAN8x3
+	uugqpt8t3fXMVtLGjlMMSWi0UkIljCc=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-NNb6w-rTNZiextS_sP3nVQ-1; Fri, 12 Jan 2024 21:05:27 -0500
+X-MC-Unique: NNb6w-rTNZiextS_sP3nVQ-1
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-467f038c918so719354137.0
+        for <linux-block@vger.kernel.org>; Fri, 12 Jan 2024 18:05:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705084073; x=1705688873;
+        d=1e100.net; s=20230601; t=1705111527; x=1705716327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0BJ2WZX4mtYqpwBUHJyyeiT7eNbqAuxy96Kww4r+LXQ=;
-        b=GUt+ndJf52R/+30jG/w/aJJQWnspE13Xmif7JivZcKju1OgdPNPR6z67cTCq25QSdt
-         ModJZ0DkkrgdwYdoFp1TgNr/UA5eNE0UO+7xobGkLJ9GdgrIgOwtF/jId4BCKcSK5tnN
-         6lpaooo0PVDHtBq+zL2AiMmSKM4Jwwls89kzZ8R2ifIDTq2jiABEZ3pcMvL5h9eTI1/j
-         8H9ico0Gz9lVtTALdPznGO6OpxFYGvX9P+CY/CBLYZqNSc6ReqmC+EPv2MIaNsHa0cyS
-         7RkcBiMpfVbDMTC3BRzfjV0zOTd783qPdKJyvP1dPuvbI0cZke0iDSxBL3CDKPFYeNTB
-         wmLA==
-X-Gm-Message-State: AOJu0YwxK1ryP39vJz+f5pAVQuqAprdcwZxz+pPrqk4g4bwPS/kSgmrG
-	JPm1FJktf49W38ucAMK0mtwB5Qv4ywRi5Q==
-X-Google-Smtp-Source: AGHT+IE9RoWp3i10xpf6g1epyIgWlK9Sn/awn4vi1jxOqmRmn2q4EuJbdULMc4brijGsWdtY0usgjQ==
-X-Received: by 2002:a0d:d5d1:0:b0:5fb:60db:86b0 with SMTP id x200-20020a0dd5d1000000b005fb60db86b0mr1390345ywd.19.1705084072947;
-        Fri, 12 Jan 2024 10:27:52 -0800 (PST)
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com. [209.85.128.181])
-        by smtp.gmail.com with ESMTPSA id v141-20020a814893000000b005fb420b14dcsm1422530ywa.108.2024.01.12.10.27.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jan 2024 10:27:52 -0800 (PST)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5e7467eb93aso58735757b3.1;
-        Fri, 12 Jan 2024 10:27:52 -0800 (PST)
-X-Received: by 2002:a25:d84f:0:b0:dbc:d3a5:d039 with SMTP id
- p76-20020a25d84f000000b00dbcd3a5d039mr779893ybg.32.1705084072167; Fri, 12 Jan
- 2024 10:27:52 -0800 (PST)
+        bh=29rgx+fcdc+OGosBM+rz8Ay2WMsmo7j5/PhFnPhZLEY=;
+        b=ZC/mKXzsixNOgBvrSHT4TtOgshFVpZEh8nhQiSryRrJjlu1YBruGHB0/R6+37H3KVr
+         pIjtGz23ClIcqg9EjN3u0/XQNxGhyROIEgYntF/8GAW3WFJhocDxy2PYgXd3KofYQ/1+
+         c7Qpu7XwHTyjKM/dAtUpgYqMZTW1t1cE9hV4uznHci+zGRSi/jnZGdRpVDhpF3jVH6ta
+         twgcY0lrSEyvcn3z444JWyFYyYrABRDO+5jPkjGWMphEQOTxZWdfQveeE7CM9JYkScBm
+         5tEXN+snSrFaDqil1sjgO0ikUEziKNIyrY56PNAk530BOEduOENxXPbwCgrCI06gNdT5
+         Hzow==
+X-Gm-Message-State: AOJu0Ywnpx4XNqQ5xaYgpvIoLmQwm9/Ti5AjkZpFOZI/y/lApF7q3JuT
+	/V6fajvwzN1sHWem8g7RKDc+EJsQLpqChsC92LZn1pdz0dVT4DjXEKgWAVxmYybOZn0SnAG24Y/
+	Ob+CqS9VZBnCrvDAek35RP7mZ/wx2G2ThCG/CurTZFud2Br+wdoVSPGtfJ5mD
+X-Received: by 2002:a05:6102:3f91:b0:468:e89:a42f with SMTP id o17-20020a0561023f9100b004680e89a42fmr3502386vsv.1.1705111526712;
+        Fri, 12 Jan 2024 18:05:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHJxsiSgFDNgZ/bDK3JcBbPi7WBTrGQtLjH1VQ6PQ3aUXkhUhbZCi8gnpVW6go5Ab7zPLlcw2JzQ0n1xK5ixr8=
+X-Received: by 2002:a05:6102:3f91:b0:468:e89:a42f with SMTP id
+ o17-20020a0561023f9100b004680e89a42fmr3502378vsv.1.1705111526354; Fri, 12 Jan
+ 2024 18:05:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214222107.2016042-1-song@kernel.org> <20231214222107.2016042-2-song@kernel.org>
- <CAMuHMdUtzhwHLa_DTtH00YsZ6t_CefZjZj6oS_mpckHDNXpYWw@mail.gmail.com>
- <CAPhsuW6KVN1c=dB1RXVQjygBevVcb_1qQJoLz3zA-qTVVmbCAw@mail.gmail.com> <20240112171010.GA18360@lst.de>
-In-Reply-To: <20240112171010.GA18360@lst.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 12 Jan 2024 19:27:40 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWvo5ggC31Ukd8+sLC1jyqcXw=T-tVDtwdLqRg87HwvCQ@mail.gmail.com>
-Message-ID: <CAMuHMdWvo5ggC31Ukd8+sLC1jyqcXw=T-tVDtwdLqRg87HwvCQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] md: Remove deprecated CONFIG_MD_LINEAR
-To: Christoph Hellwig <hch@lst.de>
-Cc: Song Liu <song@kernel.org>, linux-raid@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Neil Brown <neilb@suse.de>, Guoqing Jiang <guoqing.jiang@linux.dev>, 
-	Mateusz Grzonka <mateusz.grzonka@intel.com>, Jes Sorensen <jes@trained-monkey.org>
+References: <575be19c-01f4-4159-874b-d1e5dcbdc935@kernel.dk>
+In-Reply-To: <575be19c-01f4-4159-874b-d1e5dcbdc935@kernel.dk>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Sat, 13 Jan 2024 10:05:15 +0800
+Message-ID: <CAFj5m9LdX+Jf6pJTPWqCWvqqmQ5yVhBN71p8WH_1FwjhQ-HjnQ@mail.gmail.com>
+Subject: Re: [PATCH] block: ensure we hold a queue reference when using queue limits
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Christoph,
-
-On Fri, Jan 12, 2024 at 6:10=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
-e:
-> On Fri, Jan 12, 2024 at 09:08:04AM -0800, Song Liu wrote:
-> > Thanks for the heads-up. I honestly don't know about this use case.
-> > Where can I find/get more information about it?
+On Sat, Jan 13, 2024 at 12:15=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote=
+:
 >
-> What NAS uses md linear?
+> q_usage_counter is the only thing preventing us from the limits changing
+> under us in __bio_split_to_limits, but blk_mq_submit_bio doesn't hold
+> it while calling into it.
+>
+> Move the splitting inside the region where we know we've got a queue
+> reference. Ideally this could still remain a shared section of code, but
+> let's keep the fix simple and defer any refactoring here to later.
+>
+> Reported-by: Christoph Hellwig <hch@lst.de>
+> Fixes: 9d497e2941c3 ("block: don't protect submit_bio_checks by q_usage_c=
+ounter")
 
-No idea, I was just wondering....
-Lots of NASes sold support JBOD (yes, I know I should not use anything
-that lacks mirroring for data I care about ;-)
+The fixes tag is wrong, and it should be:
 
-> Either way you can always set up a dm-linear table to get at the
-> data.
+Fixes: 900e08075202 ("block: move queue enter logic into blk_mq_submit_bio(=
+)")
 
-If dm-linear offers the same functionality, I have no objection.
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>
+> ---
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f57b86d6de6a..e02c4b1af8c5 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2964,12 +2964,6 @@ void blk_mq_submit_bio(struct bio *bio)
+>         blk_status_t ret;
+>
+>         bio =3D blk_queue_bounce(bio, q);
+> -       if (bio_may_exceed_limits(bio, &q->limits)) {
+> -               bio =3D __bio_split_to_limits(bio, &q->limits, &nr_segs);
+> -               if (!bio)
+> -                       return;
+> -       }
+> -
+>         bio_set_ioprio(bio);
+>
+>         if (plug) {
+> @@ -2978,6 +2972,11 @@ void blk_mq_submit_bio(struct bio *bio)
+>                         rq =3D NULL;
+>         }
+>         if (rq) {
+> +               if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
+> +                       bio =3D __bio_split_to_limits(bio, &q->limits, &n=
+r_segs);
+> +                       if (!bio)
+> +                               return;
+> +               }
+>                 if (!bio_integrity_prep(bio))
+>                         return;
+>                 if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
+> @@ -2988,6 +2987,11 @@ void blk_mq_submit_bio(struct bio *bio)
+>         } else {
+>                 if (unlikely(bio_queue_enter(bio)))
+>                         return;
+> +               if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
+> +                       bio =3D __bio_split_to_limits(bio, &q->limits, &n=
+r_segs);
+> +                       if (!bio)
+> +                               goto fail;
+> +               }
 
-Note to self: learn about the difference between dm and md, finally...
+With "Fixes" tag fixed, the patch looks fine:
 
-Gr{oetje,eeting}s,
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
