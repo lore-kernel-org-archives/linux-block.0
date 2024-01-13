@@ -1,89 +1,234 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D321C20
-	for <linux-block@vger.kernel.org>; Sat, 13 Jan 2024 15:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="tZE80aJr"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d3b84173feso14281905ad.1
-        for <linux-block@vger.kernel.org>; Sat, 13 Jan 2024 07:38:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705160328; x=1705765128; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=a8aDzDJWkFT2sBdUPsb2TfPykxnhaEOsneoizTzP5Nk=;
-        b=tZE80aJrigvlgVTkWeb6depqJPONwkNFvApEAHpGeWjtw/BEPoSfmM4vKZi8QebJWM
-         B6ZpbqazgqRHA+gtYj1HnaVKJI5keMPe1nn+gV2exj4vZUGNyfbhoEHzp5VcKf6TICT9
-         //qncfIAniP3R8tx+vNEqM8aqV+LSren4C3Yky8XENd2vGYBhL7HcSTdzht43IK05kKw
-         V1shTGTYCv44TK5ejj5UHFFHAjP/0X0EPyq2anJghsmbDatOPGzaPq3ftMmSH6LPy4Mo
-         Clk3J3T1gA49HaE3iu+j7YKPC5pybTf7C3Qdf40FLFToOSWTJgfvW599F5J62RPAAQ1f
-         gD6A==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B6223A8
+	for <linux-block@vger.kernel.org>; Sat, 13 Jan 2024 16:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bf36117dfbso30496239f.3
+        for <linux-block@vger.kernel.org>; Sat, 13 Jan 2024 08:02:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705160328; x=1705765128;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a8aDzDJWkFT2sBdUPsb2TfPykxnhaEOsneoizTzP5Nk=;
-        b=vixTm4bLQzruaPK5yZ8SrEPvNh+jzIaxzWcZVh2xQcY3JuDbavB+u/K4VfR+7x0n+G
-         V5dMVQSzvoApGacJStHRIt0UeMmI0g40Ql9y97ZzrsaBIRzQUVnja/rSaDxGg0OCUgN/
-         JU0n2SmhhbJ3B3RBCsnfsbR+Of1KSGpD6xZgi9YIz3huqIwMz1GDArOj4dDtP1TQzltK
-         ACb1g3SzzeZiQFiOn9a6M+7CXBatIihjvn/RqiC5uyxZsMQs+lUPX6OerIWeEuJY3Hs+
-         BclihuUB1jwCYXbTumHG2kBQigbwU//pdVq+dJcAojDp1rijEodPkaz/hXRxvEg481z0
-         mMZA==
-X-Gm-Message-State: AOJu0Yxf+vYKtnAg/Y3sUl8TbP0jl2wdznzl0mvus7sFLakY3muk7dFz
-	raHEEmmUoqAkEscVZZGmyj7elpyLz8He1V0Rn/UMRFaPqsrghg==
-X-Google-Smtp-Source: AGHT+IFe57r7XYeWsVAH5timSKvySOpXmBayHgyKk6h9M3VU7bLmcuZJNuAcVteAl/jArx/4aKS8dA==
-X-Received: by 2002:a17:902:da85:b0:1d3:f36a:9d21 with SMTP id j5-20020a170902da8500b001d3f36a9d21mr5678540plx.4.1705160328445;
-        Sat, 13 Jan 2024 07:38:48 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id sh2-20020a17090b524200b0028dfdfc9a8esm4739940pjb.37.2024.01.13.07.38.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Jan 2024 07:38:47 -0800 (PST)
-Message-ID: <a860d844-7cc8-4a8b-ab34-49160ac4ac45@kernel.dk>
-Date: Sat, 13 Jan 2024 08:38:46 -0700
+        d=1e100.net; s=20230601; t=1705161747; x=1705766547;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I9VVLnGQHUIscpCdeOc8L7XQiGdtbk8HeZDlragMj1Y=;
+        b=sWeaOjx5tbHbcoIt9a+62ZotH26FjiwQLzbR2gJ38D5glBWsT4RNlx0Ybm18VKR/nI
+         d+2Ui+ZtsmSk37o+vQaEH/ze1sCvmCtluAreosZZL9JHP1RnNHNA4q5YsGkJuEJzuzOk
+         Ppcloj81zhHE0q9+3Bxv9Qy28UjG2ZcFY7JwH9rzfx8sVCAqNmUWRzf5cFF0cFUe2H1M
+         Tl1Pv3g6L2/93NtO9UNF4vSWv+MlrA+E/j852yzN0dbs+EyscliZtWJUMR/o5RrmENpv
+         bGUQSpWlm3n6q4sywB/7+IzR1ClghczJ62dyP5bW1JSFHjZgs74QL+HJCXuWEP65DDna
+         qZsA==
+X-Gm-Message-State: AOJu0YwPMRYsNaheg9t49Xyw20O5HO6G+RwQVZX+2O7nZ9XfYuEX6wKv
+	VnYvr3gpvKQxmPnT0nGXe4dyuAHIIoZ0Z2+b2xQ0i4/QAkb+
+X-Google-Smtp-Source: AGHT+IGzsHKnjrtVXRlBYuRlrMSRE3QAgW2j/3gTUJN5bT+OigJdkT2Upc4x+ZLBA0kS8eYVjFSinIIUMHKaqShW7SK1qZjRFj4b
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: ensure we hold a queue reference when using queue
- limits
-Content-Language: en-US
-To: Ming Lei <ming.lei@redhat.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>
-References: <575be19c-01f4-4159-874b-d1e5dcbdc935@kernel.dk>
- <CAFj5m9LdX+Jf6pJTPWqCWvqqmQ5yVhBN71p8WH_1FwjhQ-HjnQ@mail.gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAFj5m9LdX+Jf6pJTPWqCWvqqmQ5yVhBN71p8WH_1FwjhQ-HjnQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:130a:b0:46e:50ab:6a51 with SMTP id
+ r10-20020a056638130a00b0046e50ab6a51mr219138jad.2.1705161747411; Sat, 13 Jan
+ 2024 08:02:27 -0800 (PST)
+Date: Sat, 13 Jan 2024 08:02:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003d3747060ed5e859@google.com>
+Subject: [syzbot] [block?] KMSAN: kernel-infoleak in filemap_read
+From: syzbot <syzbot+905d785c4923bea2c1db@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/12/24 7:05 PM, Ming Lei wrote:
-> On Sat, Jan 13, 2024 at 12:15?AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> q_usage_counter is the only thing preventing us from the limits changing
->> under us in __bio_split_to_limits, but blk_mq_submit_bio doesn't hold
->> it while calling into it.
->>
->> Move the splitting inside the region where we know we've got a queue
->> reference. Ideally this could still remain a shared section of code, but
->> let's keep the fix simple and defer any refactoring here to later.
->>
->> Reported-by: Christoph Hellwig <hch@lst.de>
->> Fixes: 9d497e2941c3 ("block: don't protect submit_bio_checks by q_usage_counter")
-> 
-> The fixes tag is wrong, and it should be:
-> 
-> Fixes: 900e08075202 ("block: move queue enter logic into blk_mq_submit_bio()")
+Hello,
 
-You're right, I fixed it up.
+syzbot found the following issue on:
 
--- 
-Jens Axboe
+HEAD commit:    861deac3b092 Linux 6.7-rc7
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14d12f76e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e0c7078a6b901aa3
+dashboard link: https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15ef73d6e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15d27f76e80000
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0ea60ee8ed32/disk-861deac3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6d69fdc33021/vmlinux-861deac3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f0158750d452/bzImage-861deac3.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/52b4443ce279/mount_0.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+905d785c4923bea2c1db@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
+BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x364/0x2520 lib/iov_iter.c:186
+ instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+ copy_to_user_iter lib/iov_iter.c:24 [inline]
+ iterate_ubuf include/linux/iov_iter.h:29 [inline]
+ iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+ iterate_and_advance include/linux/iov_iter.h:271 [inline]
+ _copy_to_iter+0x364/0x2520 lib/iov_iter.c:186
+ copy_page_to_iter+0x419/0x870 lib/iov_iter.c:381
+ copy_folio_to_iter include/linux/uio.h:181 [inline]
+ filemap_read+0xc00/0x14d0 mm/filemap.c:2644
+ blkdev_read_iter+0x6c0/0x8e0 block/fops.c:742
+ call_read_iter include/linux/fs.h:2014 [inline]
+ new_sync_read fs/read_write.c:389 [inline]
+ vfs_read+0x8f6/0xe00 fs/read_write.c:470
+ ksys_read+0x20f/0x4c0 fs/read_write.c:613
+ __do_sys_read fs/read_write.c:623 [inline]
+ __se_sys_read fs/read_write.c:621 [inline]
+ __x64_sys_read+0x93/0xd0 fs/read_write.c:621
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ memcpy_to_iter lib/iov_iter.c:65 [inline]
+ iterate_bvec include/linux/iov_iter.h:122 [inline]
+ iterate_and_advance2 include/linux/iov_iter.h:249 [inline]
+ iterate_and_advance include/linux/iov_iter.h:271 [inline]
+ _copy_to_iter+0xe41/0x2520 lib/iov_iter.c:186
+ copy_page_to_iter+0x419/0x870 lib/iov_iter.c:381
+ shmem_file_read_iter+0xa0a/0x12b0 mm/shmem.c:2841
+ do_iter_read+0xd21/0x1380 fs/read_write.c:795
+ vfs_iter_read+0x8e/0xe0 fs/read_write.c:837
+ lo_read_simple drivers/block/loop.c:290 [inline]
+ do_req_filebacked drivers/block/loop.c:500 [inline]
+ loop_handle_cmd drivers/block/loop.c:1915 [inline]
+ loop_process_work+0x12e7/0x39d0 drivers/block/loop.c:1950
+ loop_rootcg_workfn+0x2b/0x30 drivers/block/loop.c:1981
+ process_one_work kernel/workqueue.c:2627 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2700
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2781
+ kthread+0x3ed/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Uninit was stored to memory at:
+ memcpy_from_iter lib/iov_iter.c:73 [inline]
+ iterate_bvec include/linux/iov_iter.h:122 [inline]
+ iterate_and_advance2 include/linux/iov_iter.h:249 [inline]
+ iterate_and_advance include/linux/iov_iter.h:271 [inline]
+ __copy_from_iter lib/iov_iter.c:268 [inline]
+ copy_page_from_iter_atomic+0x12f1/0x2b70 lib/iov_iter.c:500
+ generic_perform_write+0x4ae/0xc40 mm/filemap.c:3926
+ shmem_file_write_iter+0x2b5/0x2e0 mm/shmem.c:2895
+ do_iter_write+0xceb/0x1340 fs/read_write.c:860
+ vfs_iter_write+0x8e/0xe0 fs/read_write.c:901
+ lo_write_bvec drivers/block/loop.c:249 [inline]
+ lo_write_simple drivers/block/loop.c:271 [inline]
+ do_req_filebacked drivers/block/loop.c:495 [inline]
+ loop_handle_cmd drivers/block/loop.c:1915 [inline]
+ loop_process_work+0x20c3/0x39d0 drivers/block/loop.c:1950
+ loop_rootcg_workfn+0x2b/0x30 drivers/block/loop.c:1981
+ process_one_work kernel/workqueue.c:2627 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2700
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2781
+ kthread+0x3ed/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Uninit was stored to memory at:
+ memcpy_to_page include/linux/highmem.h:427 [inline]
+ hfsplus_bnode_write+0xee/0x2e0 fs/hfsplus/bnode.c:83
+ hfsplus_brec_insert+0xa9d/0x1400 fs/hfsplus/brec.c:133
+ hfsplus_create_cat+0x1309/0x1810 fs/hfsplus/catalog.c:308
+ hfsplus_link+0x7d8/0xbf0 fs/hfsplus/dir.c:342
+ vfs_link+0x936/0xb60 fs/namei.c:4588
+ do_linkat+0x6e1/0x1160 fs/namei.c:4659
+ __do_sys_link fs/namei.c:4693 [inline]
+ __se_sys_link fs/namei.c:4691 [inline]
+ __x64_sys_link+0xec/0x140 fs/namei.c:4691
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ hfsplus_cat_build_record fs/hfsplus/catalog.c:167 [inline]
+ hfsplus_create_cat+0x11d1/0x1810 fs/hfsplus/catalog.c:300
+ hfsplus_link+0x7d8/0xbf0 fs/hfsplus/dir.c:342
+ vfs_link+0x936/0xb60 fs/namei.c:4588
+ do_linkat+0x6e1/0x1160 fs/namei.c:4659
+ __do_sys_link fs/namei.c:4693 [inline]
+ __se_sys_link fs/namei.c:4691 [inline]
+ __x64_sys_link+0xec/0x140 fs/namei.c:4691
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was created at:
+ __alloc_pages+0x9a4/0xe00 mm/page_alloc.c:4591
+ alloc_pages_mpol+0x62b/0x9d0 mm/mempolicy.c:2133
+ alloc_pages+0x1be/0x1e0 mm/mempolicy.c:2204
+ alloc_slab_page mm/slub.c:1870 [inline]
+ allocate_slab mm/slub.c:2017 [inline]
+ new_slab+0x421/0x1570 mm/slub.c:2070
+ ___slab_alloc+0x13db/0x33d0 mm/slub.c:3223
+ __slab_alloc mm/slub.c:3322 [inline]
+ __slab_alloc_node mm/slub.c:3375 [inline]
+ slab_alloc_node mm/slub.c:3468 [inline]
+ slab_alloc mm/slub.c:3486 [inline]
+ __kmem_cache_alloc_lru mm/slub.c:3493 [inline]
+ kmem_cache_alloc_lru+0x552/0x970 mm/slub.c:3509
+ alloc_inode_sb include/linux/fs.h:2937 [inline]
+ hfsplus_alloc_inode+0x5a/0xc0 fs/hfsplus/super.c:627
+ alloc_inode+0x83/0x440 fs/inode.c:261
+ iget_locked+0x2dd/0xe80 fs/inode.c:1316
+ hfsplus_iget+0x59/0xaf0 fs/hfsplus/super.c:64
+ hfsplus_btree_open+0x13e/0x1d00 fs/hfsplus/btree.c:150
+ hfsplus_fill_super+0x1113/0x26f0 fs/hfsplus/super.c:473
+ mount_bdev+0x3d7/0x560 fs/super.c:1650
+ hfsplus_mount+0x4d/0x60 fs/hfsplus/super.c:641
+ legacy_get_tree+0x110/0x290 fs/fs_context.c:662
+ vfs_get_tree+0xa5/0x520 fs/super.c:1771
+ do_new_mount+0x68d/0x1550 fs/namespace.c:3337
+ path_mount+0x73d/0x1f20 fs/namespace.c:3664
+ do_mount fs/namespace.c:3677 [inline]
+ __do_sys_mount fs/namespace.c:3886 [inline]
+ __se_sys_mount+0x725/0x810 fs/namespace.c:3863
+ __x64_sys_mount+0xe4/0x140 fs/namespace.c:3863
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Bytes 3258-3261 of 4096 are uninitialized
+Memory access of size 4096 starts at ffff8881146b8000
+Data copied to user address 000055ff3929d058
+
+CPU: 1 PID: 5003 Comm: udevd Not tainted 6.7.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
