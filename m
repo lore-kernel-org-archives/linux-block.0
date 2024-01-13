@@ -1,133 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342EC18B00
-	for <linux-block@vger.kernel.org>; Sat, 13 Jan 2024 02:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F4312E52
+	for <linux-block@vger.kernel.org>; Sat, 13 Jan 2024 07:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EJohBdcc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705111529;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=29rgx+fcdc+OGosBM+rz8Ay2WMsmo7j5/PhFnPhZLEY=;
-	b=EJohBdcccDSs0XMufuRHmLX4ANJK0ccg4gu4XDOXg+aGRhWZ8ibCee8C7Ro5RicBIy/Goe
-	t2m9jeREzqg5oXmC5uSr90oxIqMc2ZDPsMZK4IniIXBGS7Cn98yXw26MIUtbEpkFsAN8x3
-	uugqpt8t3fXMVtLGjlMMSWi0UkIljCc=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-330-NNb6w-rTNZiextS_sP3nVQ-1; Fri, 12 Jan 2024 21:05:27 -0500
-X-MC-Unique: NNb6w-rTNZiextS_sP3nVQ-1
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-467f038c918so719354137.0
-        for <linux-block@vger.kernel.org>; Fri, 12 Jan 2024 18:05:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o289cWW8"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-680b1956ca4so45174516d6.3
+        for <linux-block@vger.kernel.org>; Fri, 12 Jan 2024 23:05:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705129519; x=1705734319; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GqUVJ8s7EGwnf8VW2qN30KaMR9GjPb0OJdm4xU8DVmE=;
+        b=o289cWW8aNxAKsdsbqumdVPwhE2vleIrcKu9YwaWzWJTXxR2BN30pi9gTTCPhvpw0E
+         QPp2eM+ppILjGs/huoeth7SKWJvGO+rNJstbSaFtqhzBrW916WDAFoLClStwpqw9C9l5
+         53/StuPRbHuIMoByk9mG+TG0B7MtTqo+BKqmQOoclDR1xdKmgoqXt2FMUcbl0cSqOWNf
+         iCi0XQbC8MU+MnTs+fKthnb5qkliqVMQJNDoVIXH4VHSETxIeszsYKZz1uQFY9IYGM4K
+         etJ3XFDvTPP1F+r1UPVjsUyBrhp2WUxj7NKMrUHJN53xpCKLmu119KZPtJWRAOuCGX10
+         n4cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705111527; x=1705716327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=29rgx+fcdc+OGosBM+rz8Ay2WMsmo7j5/PhFnPhZLEY=;
-        b=ZC/mKXzsixNOgBvrSHT4TtOgshFVpZEh8nhQiSryRrJjlu1YBruGHB0/R6+37H3KVr
-         pIjtGz23ClIcqg9EjN3u0/XQNxGhyROIEgYntF/8GAW3WFJhocDxy2PYgXd3KofYQ/1+
-         c7Qpu7XwHTyjKM/dAtUpgYqMZTW1t1cE9hV4uznHci+zGRSi/jnZGdRpVDhpF3jVH6ta
-         twgcY0lrSEyvcn3z444JWyFYyYrABRDO+5jPkjGWMphEQOTxZWdfQveeE7CM9JYkScBm
-         5tEXN+snSrFaDqil1sjgO0ikUEziKNIyrY56PNAk530BOEduOENxXPbwCgrCI06gNdT5
-         Hzow==
-X-Gm-Message-State: AOJu0Ywnpx4XNqQ5xaYgpvIoLmQwm9/Ti5AjkZpFOZI/y/lApF7q3JuT
-	/V6fajvwzN1sHWem8g7RKDc+EJsQLpqChsC92LZn1pdz0dVT4DjXEKgWAVxmYybOZn0SnAG24Y/
-	Ob+CqS9VZBnCrvDAek35RP7mZ/wx2G2ThCG/CurTZFud2Br+wdoVSPGtfJ5mD
-X-Received: by 2002:a05:6102:3f91:b0:468:e89:a42f with SMTP id o17-20020a0561023f9100b004680e89a42fmr3502386vsv.1.1705111526712;
-        Fri, 12 Jan 2024 18:05:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHJxsiSgFDNgZ/bDK3JcBbPi7WBTrGQtLjH1VQ6PQ3aUXkhUhbZCi8gnpVW6go5Ab7zPLlcw2JzQ0n1xK5ixr8=
-X-Received: by 2002:a05:6102:3f91:b0:468:e89:a42f with SMTP id
- o17-20020a0561023f9100b004680e89a42fmr3502378vsv.1.1705111526354; Fri, 12 Jan
- 2024 18:05:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705129519; x=1705734319;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GqUVJ8s7EGwnf8VW2qN30KaMR9GjPb0OJdm4xU8DVmE=;
+        b=MmJi37XGewb1SeAtPFFgFmlS0AXivmDMA82zVPySluTX3VbdXTcirRjM0WMtG/idyZ
+         Ic8Ro+1Bt51Sl+lIls/+BD/25Etb2qr9GUQnRiXbWCREDmZw7WYzp52AcPyl+2ptLJA6
+         MN2gwkY4oM3Hf1EuPBvuxFCPAiawmhbiuXJrF9Vded2Xz6nmSNWTPTkPPjH07LCZqmZ+
+         +nlz0lHb2dtYZ7SCM7xLOXBwiUFRJ6ONo3JniQfA4BYOBG1DgEwryihUjv3jNs359Bi3
+         BCLGPsAPiT7KF4RYRoy8qEssg53Hp19mq7GFv+FE8GgfT+28lXY0n7YH/94G2Ul3puc+
+         7ZUQ==
+X-Gm-Message-State: AOJu0YwdIjjcg8RUnjBKy2x7johGmEesETCatUy2amGc3ZhU9DDttkeA
+	lDaQp3WRBonTsySFF+o6PqB5XU6twB3pQ6hutYYVj+UX7bhAVA==
+X-Google-Smtp-Source: AGHT+IFc0y2uSmt7xB6X4CM/6iYzv7XLzqDXm1OMDLNeYk0eIgGxUlMEo1QaTfdT2BHiqR6aEvzb2Y8BVfmQGNWecLs=
+X-Received: by 2002:ad4:5be2:0:b0:681:3b95:cedd with SMTP id
+ k2-20020ad45be2000000b006813b95ceddmr2122750qvc.59.1705129519531; Fri, 12 Jan
+ 2024 23:05:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <575be19c-01f4-4159-874b-d1e5dcbdc935@kernel.dk>
-In-Reply-To: <575be19c-01f4-4159-874b-d1e5dcbdc935@kernel.dk>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 13 Jan 2024 10:05:15 +0800
-Message-ID: <CAFj5m9LdX+Jf6pJTPWqCWvqqmQ5yVhBN71p8WH_1FwjhQ-HjnQ@mail.gmail.com>
-Subject: Re: [PATCH] block: ensure we hold a queue reference when using queue limits
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>
+References: <CA+G9fYu1hB2OMf0EFrt_86OE=0Ug3y6nQd3=OZeEeM1jp3P92g@mail.gmail.com>
+ <11a31e09-2e11-43a4-8995-ae70c5bef8bf@kernel.org>
+In-Reply-To: <11a31e09-2e11-43a4-8995-ae70c5bef8bf@kernel.org>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Sat, 13 Jan 2024 12:35:08 +0530
+Message-ID: <CA+G9fYthC3qsH8ey=j3RvCr4-0zp1S3Ysr5QvY6SptorHpju1g@mail.gmail.com>
+Subject: Re: scsi: block: ioprio: Clean up interface definition -
+ ioprio_set03.c:40: TFAIL: ioprio_set IOPRIO_CLASS_BE prio 8 should not work
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block <linux-block@vger.kernel.org>, LTP List <ltp@lists.linux.it>, 
+	Linux Regressions <regressions@lists.linux.dev>, lkft-triage@lists.linaro.org, 
+	open list <linux-kernel@vger.kernel.org>, Anders Roxell <anders.roxell@linaro.org>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, chrubis <chrubis@suse.cz>, Petr Vorel <pvorel@suse.cz>, 
+	Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>, Niklas Cassel <niklas.cassel@wdc.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Jens Axboe <axboe@kernel.dk>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 13, 2024 at 12:15=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote=
-:
+On Fri, 12 Jan 2024 at 10:49, Damien Le Moal <dlemoal@kernel.org> wrote:
 >
-> q_usage_counter is the only thing preventing us from the limits changing
-> under us in __bio_split_to_limits, but blk_mq_submit_bio doesn't hold
-> it while calling into it.
+> On 1/12/24 14:15, Naresh Kamboju wrote:
+> > The LTP test 'iopri_set03' fails on all the devices.
+> > It fails on linux kernel >= v6.5. ( on Debian rootfs ).
+> > Test fail confirmed on LTP release 20230929 and 20230516.
+> >
+> > Test failed log:
+> > ------------
+> > tst_test.c:1690: TINFO: LTP version: 20230929
+> > tst_test.c:1574: TINFO: Timeout per run is 0h 05m 00s
+> > ioprio_set03.c:40: TFAIL: ioprio_set IOPRIO_CLASS_BE prio 8 should not work
+> > ioprio_set03.c:48: TINFO: tested illegal priority with class NONE
+> > ioprio_set03.c:51: TPASS: returned correct error for wrong prio: EINVAL (22)
+> >
+> > Investigation:
+> > ----------
+> > Bisecting this test between kernel v6.4 and v6.5 shows patch
+> > eca2040972b4 ("scsi: block: ioprio: Clean up interface definition")
+> > as the first faulty commit.
+> >
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 >
-> Move the splitting inside the region where we know we've got a queue
-> reference. Ideally this could still remain a shared section of code, but
-> let's keep the fix simple and defer any refactoring here to later.
->
-> Reported-by: Christoph Hellwig <hch@lst.de>
-> Fixes: 9d497e2941c3 ("block: don't protect submit_bio_checks by q_usage_c=
-ounter")
+> This is fixed in LTP. Please update your LTP setup to avoid this issue.
 
-The fixes tag is wrong, and it should be:
+Please point me to the fixed commit id.
 
-Fixes: 900e08075202 ("block: move queue enter logic into blk_mq_submit_bio(=
-)")
+I have the latest LTP release test results as ioprio_set03 has failed.
 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->
-> ---
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index f57b86d6de6a..e02c4b1af8c5 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2964,12 +2964,6 @@ void blk_mq_submit_bio(struct bio *bio)
->         blk_status_t ret;
->
->         bio =3D blk_queue_bounce(bio, q);
-> -       if (bio_may_exceed_limits(bio, &q->limits)) {
-> -               bio =3D __bio_split_to_limits(bio, &q->limits, &nr_segs);
-> -               if (!bio)
-> -                       return;
-> -       }
-> -
->         bio_set_ioprio(bio);
->
->         if (plug) {
-> @@ -2978,6 +2972,11 @@ void blk_mq_submit_bio(struct bio *bio)
->                         rq =3D NULL;
->         }
->         if (rq) {
-> +               if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
-> +                       bio =3D __bio_split_to_limits(bio, &q->limits, &n=
-r_segs);
-> +                       if (!bio)
-> +                               return;
-> +               }
->                 if (!bio_integrity_prep(bio))
->                         return;
->                 if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
-> @@ -2988,6 +2987,11 @@ void blk_mq_submit_bio(struct bio *bio)
->         } else {
->                 if (unlikely(bio_queue_enter(bio)))
->                         return;
-> +               if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
-> +                       bio =3D __bio_split_to_limits(bio, &q->limits, &n=
-r_segs);
-> +                       if (!bio)
-> +                               goto fail;
-> +               }
+ioprio_set03.c:40: TFAIL: ioprio_set IOPRIO_CLASS_BE prio 8 should not work
+LTP Version: 20230929-258-gec0a8f18b
+on Debian rootfs.
 
-With "Fixes" tag fixed, the patch looks fine:
+Links:
+ - https://qa-reports.linaro.org/lkft/ltp-master/build/v6.6.10_20230929-258-gec0a8f18b/testrun/22035919/suite/ltp-syscalls/test/ioprio_set03/history/
+ - https://qa-reports.linaro.org/lkft/ltp-master/build/v6.6.10_20230929-258-gec0a8f18b/testrun/22035919/suite/ltp-syscalls/test/ioprio_set03/details/
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
+- Naresh
