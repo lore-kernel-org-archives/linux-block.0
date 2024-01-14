@@ -1,93 +1,93 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090091841;
-	Sun, 14 Jan 2024 03:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TCLD94kCYz4f3jqH;
-	Sun, 14 Jan 2024 11:22:01 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id B58B81A0172;
-	Sun, 14 Jan 2024 11:22:03 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgDHlxBZU6NlRqIZAw--.23769S3;
-	Sun, 14 Jan 2024 11:22:03 +0800 (CST)
-Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
-To: Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Ed Tsai <ed.tsai@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20231130193139.880955-1-bvanassche@acm.org>
- <20231130193139.880955-2-bvanassche@acm.org>
- <58f50403-fcc9-ec11-f52b-f11ced3d2652@huaweicloud.com>
- <8372f2d0-b695-4af4-90e6-e35b86e3b844@acm.org>
- <c1658336-f48e-5688-f0c2-f325fd5696c3@huaweicloud.com>
- <1d3866af-ffca-4f97-914d-8084aca901ab@acm.org>
- <69b17db7-e9c9-df09-1022-ff7a9e5e04dd@huaweicloud.com>
- <20240112043915.GA5664@lst.de>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <2d83fcb3-06e6-4a7c-9bd7-b8018208b72f@huaweicloud.com>
-Date: Sun, 14 Jan 2024 11:22:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D801866
+	for <linux-block@vger.kernel.org>; Sun, 14 Jan 2024 08:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/ImXZoM"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40e636fd3d2so23166745e9.1
+        for <linux-block@vger.kernel.org>; Sun, 14 Jan 2024 00:25:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705220754; x=1705825554; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LsNiefaBBGi5hINiXLPmv25llqmRAL3p5gd3l/cqd8o=;
+        b=Z/ImXZoMkVA4gI/gSMsHEZlPz3d4EGNPXGGuiJR/JBBvEsEFGAduwEn4H1Q2Odp0Qf
+         kz2mc0K1FUnswToJgDDsbw14l0IMUxohUfdzOmaaQbWMsr/5MsrMorv+6lzroF1FpDSM
+         aLR+TSTefU11Czw4ijbWdLs89qjYcWV3TuXYdZbfSBYN35vWO8jS5nHLuSy9Tc9FMPPB
+         VQuPQGEDD5dOT8tXFJst/gBr1woLKng2cPYZO6sXL+DPk+xO4pYryrVRRfR2tsxpECO4
+         7p8QaBZ+2q+p7TyNTpH9swgOCpV17nZSWN5LclXVEzu6AsF+p5Ra6bZhNUwfpqUDxXmh
+         XNWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705220754; x=1705825554;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LsNiefaBBGi5hINiXLPmv25llqmRAL3p5gd3l/cqd8o=;
+        b=DDfqtIlk0SkJADm3rvkfVZUqwIx0jZxd10VHO0WKwBH+BZzy9aP0naFosoHMJsmFkY
+         rAL1Dvn7xOBwgSH1Gp5R5dPigRw/5+hQ32DvhsvSd5yzf8yC/cm25HFA98WluVQsMG6P
+         TzeNN2BprRypTAjM++0NFxru6J8O0w2f0XEVVCJM7EEQ43bOynGz14RsNFQ8OwWd61Qt
+         jzHn+wgOgYQmiehoJbhWWe447SmcOnL2gqWqbun4+BmVHv43yZBs96ZfH9IJ/bCXgHxi
+         L/a+d1hZzv/s2szb9Wk5PIf7neLPl4lCZzggegacE2568573qlLXOAWdDHj6CESVocI6
+         wUvQ==
+X-Gm-Message-State: AOJu0YyAbVxIwrqKK/K6+FB8ut3vbi7qY/M2R2heWku+ed5ys8NePjAx
+	PkRLBD5pAuNTrujPumrWhfA=
+X-Google-Smtp-Source: AGHT+IGECSWfZXK6MhMn5iXw19qJm94E+fvLrsHnlSANxc3fYhW8kt8SAe7/wgOs6pfLVZl1iuC8cg==
+X-Received: by 2002:a1c:4c09:0:b0:40e:6639:6708 with SMTP id z9-20020a1c4c09000000b0040e66396708mr1661739wmf.49.1705220753724;
+        Sun, 14 Jan 2024 00:25:53 -0800 (PST)
+Received: from vega.home ([2a00:23c8:1885:3701:6438:b7d0:8388:3e7f])
+        by smtp.gmail.com with ESMTPSA id g6-20020a05600c4ec600b0040e6b0a1bc1sm4955886wmq.12.2024.01.14.00.25.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jan 2024 00:25:53 -0800 (PST)
+From: Nicky Chorley <ndchorley@gmail.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Cc: Nicky Chorley <ndchorley@gmail.com>
+Subject: [PATCH] block: Fix some typos
+Date: Sun, 14 Jan 2024 08:25:32 +0000
+Message-Id: <20240114082532.10751-1-ndchorley@gmail.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240112043915.GA5664@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDHlxBZU6NlRqIZAw--.23769S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7XFWkCF1DCw4xCw4ftw1xAFb_yoW3WFbE9F
-	9YvFyI93srK3say3W7Wr4IyrZFgayYgayxJFy0qFWjk340qa43G3ykGryfZa47Gw4xtF1x
-	Kr95X34xtr47WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
-	04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyU
-	JwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUouWlDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+Correct some minor typos in blk-core.c.
 
-ÔÚ 2024/01/12 12:39, Christoph Hellwig Ð´µÀ:
-> On Fri, Jan 12, 2024 at 09:08:25AM +0800, Yu Kuai wrote:
->> Yes, I realized that, handle the new flag in blk_mq_allow_hctx() is
->> good, how about following chang?
-> 
-> Who would make that decision and on what grounds?
+Signed-off-by: Nicky Chorley <ndchorley@gmail.com>
+---
+ block/blk-core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-As you might noticed, Bart and I both met the performance problem in
-production due to fair tag sharing in the environment that total driver
-tags is not sufficient. Disable fair tag sharing is a straight way to
-fix the problem, of course this is not the ideal solution, but make tag
-sharing configurable and let drivers make the decision if they want to
-disable it really solve the dilemma, and won't have any influence
-outside the driver.
-
-I'll be good if you have other proposes.
-
-Thanks,
-Kuai
-
-> 
-> .
-> 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 11342af420d0..8fa002bf1017 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -839,7 +839,7 @@ EXPORT_SYMBOL(submit_bio_noacct);
+  *
+  * submit_bio() is used to submit I/O requests to block devices.  It is passed a
+  * fully set up &struct bio that describes the I/O that needs to be done.  The
+- * bio will be send to the device described by the bi_bdev field.
++ * bio will be sent to the device described by the bi_bdev field.
+  *
+  * The success/failure status of the request, along with notification of
+  * completion, is delivered asynchronously through the ->bi_end_io() callback
+@@ -934,8 +934,8 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+ 	 * point to a freshly allocated bio at this point.  If that happens
+ 	 * we have a few cases to consider:
+ 	 *
+-	 *  1) the bio is beeing initialized and bi_bdev is NULL.  We can just
+-	 *     simply nothing in this case
++	 *  1) the bio is being initialized and bi_bdev is NULL.  We can just
++	 *     do nothing in this case
+ 	 *  2) the bio points to a not poll enabled device.  bio_poll will catch
+ 	 *     this and return 0
+ 	 *  3) the bio points to a poll capable device, including but not
+-- 
+2.35.3
 
