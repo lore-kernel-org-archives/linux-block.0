@@ -1,38 +1,25 @@
-Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1172F23BC
-	for <linux-block@vger.kernel.org>; Sun, 14 Jan 2024 09:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="h4vzcQ2q"
-Received: from fedora.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id OwMXrDZZKBraWOwMYrneAT; Sun, 14 Jan 2024 10:01:02 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1705222862;
-	bh=y3+/aQ4vgOniKlgATVWb92D72XQcu/VbbHayVguyuRk=;
-	h=From:To:Cc:Subject:Date;
-	b=h4vzcQ2qZd99EaMkQ1rmDICJKBOtuszqY2QT5GC4vUGpzqg6qv+Cy+/nlwcYrpdBL
-	 +CcRL7hQ4ZXXHwNY1Kw1lXnd+dF2W7i5LgS98cZePgCUoCREDPZzz4VF/RBnksAf7N
-	 /ZPtTqd9OBtUe+/soZJQd9Q71wQkAwkFemaH0AtolzWo3rlCl90E4eRJa9CKvjxqXc
-	 w6n1TlL/xuP3xeKN0HdXPtQIjXNPkbw4JJK3CKAUW1O1cnhyg8VN3UonBCHyPTKgNU
-	 0G6KFqNpyxNelc9xWVGRLjyg0q716Th6zehyR8XIzDrFyLOHpoWq9bUSIFSZHZNzJG
-	 YiGWsU7Ar5kqg==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 14 Jan 2024 10:01:02 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31451FA3
+	for <linux-block@vger.kernel.org>; Sun, 14 Jan 2024 09:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=kanie@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0W-XgLn-_1705224371;
+Received: from localhost(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0W-XgLn-_1705224371)
+          by smtp.aliyun-inc.com;
+          Sun, 14 Jan 2024 17:26:17 +0800
+From: Guixin Liu <kanie@linux.alibaba.com>
+To: shinichiro.kawasaki@wdc.com
+Cc: hch@lst.de,
+	sagi@grimberg.me,
+	kch@nvidia.com,
+	chaitanyak@nvidia.com,
+	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH] null_blk: Remove usage of the deprecated ida_simple_xx() API
-Date: Sun, 14 Jan 2024 10:00:59 +0100
-Message-ID: <bf257b1078475a415cdc3344c6a750842946e367.1705222845.git.christophe.jaillet@wanadoo.fr>
+Subject: [PATCH blktests] test/nvme/050: test the reservation feature
+Date: Sun, 14 Jan 2024 17:26:11 +0800
+Message-ID: <20240114092611.69075-1-kanie@linux.alibaba.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -42,38 +29,225 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ida_alloc() and ida_free() should be preferred to the deprecated
-ida_simple_get() and ida_simple_remove().
+Test the reservation feature, includes register, acquire, release
+and report.
 
-This is less verbose.
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
 ---
- drivers/block/null_blk/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/nvme/050     |  67 ++++++++++++++++++++++++++
+ tests/nvme/050.out | 114 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/rc      |   3 ++
+ 3 files changed, 184 insertions(+)
+ create mode 100644 tests/nvme/050
+ create mode 100644 tests/nvme/050.out
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index b1271de64d36..293f24cc4122 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1825,7 +1825,7 @@ static void null_del_dev(struct nullb *nullb)
+diff --git a/tests/nvme/050 b/tests/nvme/050
+new file mode 100644
+index 0000000..a499f66
+--- /dev/null
++++ b/tests/nvme/050
+@@ -0,0 +1,67 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Guixin Liu
++# Copyright (C) 2024 Alibaba Group.
++#
++# Test the reservation
++#
++. tests/nvme/rc
++
++DESCRIPTION="test the reservation"
++QUICK=1
++
++requires() {
++	_nvme_requires
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	local nvmedev
++
++	_nvmet_target_setup --blkdev file
++
++	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}"
++
++	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
++
++	echo "Register"
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++	nvme resv-register "/dev/${nvmedev}n1" --nrkey=4 --rrega=0
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++
++	echo "Replace"
++	nvme resv-register "/dev/${nvmedev}n1" --crkey=4 --nrkey=5 --rrega=2
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++
++	echo "Unregister"
++	nvme resv-register "/dev/${nvmedev}n1" --crkey=5 --rrega=1
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++
++	echo "Acquire"
++	nvme resv-register "/dev/${nvmedev}n1" --nrkey=4 --rrega=0
++	nvme resv-acquire "/dev/${nvmedev}n1" --crkey=4 --rtype=1 --racqa=0
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++
++	echo "Preempt"
++	nvme resv-acquire "/dev/${nvmedev}n1" --crkey=4 --rtype=2 --racqa=1
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++
++	echo "Release"
++	nvme resv-release "/dev/${nvmedev}n1" --crkey=4 --rtype=2 --rrela=0
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++
++	echo "Clear"
++	nvme resv-register "/dev/${nvmedev}n1" --nrkey=4 --rrega=0
++	nvme resv-acquire "/dev/${nvmedev}n1" --crkey=4 --rtype=1 --racqa=0
++	nvme resv-report "/dev/${nvmedev}n1" --cdw11=1
++	nvme resv-release "/dev/${nvmedev}n1" --crkey=4 --rrela=1
++
++	_nvme_disconnect_subsys "${def_subsysnqn}"
++
++	_nvmet_target_cleanup
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/050.out b/tests/nvme/050.out
+new file mode 100644
+index 0000000..3be417d
+--- /dev/null
++++ b/tests/nvme/050.out
+@@ -0,0 +1,114 @@
++Running nvme/050
++Register
++
++NVME Reservation status:
++
++gen       : 0
++rtype     : 0
++regctl    : 0
++ptpls     : 0
++
++NVME Reservation  success
++
++NVME Reservation status:
++
++gen       : 1
++rtype     : 0
++regctl    : 1
++ptpls     : 0
++regctlext[0] :
++  cntlid     : 1
++  rcsts      : 0
++  rkey       : 4
++  hostid     : f1fb429f7f4856b0b351e6b8de349
++
++Replace
++NVME Reservation  success
++
++NVME Reservation status:
++
++gen       : 2
++rtype     : 0
++regctl    : 1
++ptpls     : 0
++regctlext[0] :
++  cntlid     : 1
++  rcsts      : 0
++  rkey       : 5
++  hostid     : f1fb429f7f4856b0b351e6b8de349
++
++Unregister
++NVME Reservation  success
++
++NVME Reservation status:
++
++gen       : 3
++rtype     : 0
++regctl    : 0
++ptpls     : 0
++
++Acquire
++NVME Reservation  success
++NVME Reservation Acquire success
++
++NVME Reservation status:
++
++gen       : 4
++rtype     : 1
++regctl    : 1
++ptpls     : 0
++regctlext[0] :
++  cntlid     : 1
++  rcsts      : 1
++  rkey       : 4
++  hostid     : f1fb429f7f4856b0b351e6b8de349
++
++Preempt
++NVME Reservation Acquire success
++
++NVME Reservation status:
++
++gen       : 5
++rtype     : 2
++regctl    : 1
++ptpls     : 0
++regctlext[0] :
++  cntlid     : 1
++  rcsts      : 1
++  rkey       : 4
++  hostid     : f1fb429f7f4856b0b351e6b8de349
++
++Release
++NVME Reservation Release success
++
++NVME Reservation status:
++
++gen       : 5
++rtype     : 0
++regctl    : 1
++ptpls     : 0
++regctlext[0] :
++  cntlid     : 1
++  rcsts      : 0
++  rkey       : 4
++  hostid     : f1fb429f7f4856b0b351e6b8de349
++
++Clear
++NVME Reservation  success
++NVME Reservation Acquire success
++
++NVME Reservation status:
++
++gen       : 6
++rtype     : 1
++regctl    : 1
++ptpls     : 0
++regctlext[0] :
++  cntlid     : 1
++  rcsts      : 1
++  rkey       : 4
++  hostid     : f1fb429f7f4856b0b351e6b8de349
++
++NVME Reservation Release success
++disconnected 1 controller(s)
++Test complete
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index b0ef1ee..8de59e2 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -670,6 +670,9 @@ _create_nvmet_ns() {
+ 	mkdir "${ns_path}"
+ 	printf "%s" "${blkdev}" > "${ns_path}/device_path"
+ 	printf "%s" "${uuid}" > "${ns_path}/device_uuid"
++	if [[ -f "${ns_path}/resv_enable" ]]; then
++		printf 1 > "${ns_path}/resv_enable"
++	fi
+ 	printf 1 > "${ns_path}/enable"
+ }
  
- 	dev = nullb->dev;
- 
--	ida_simple_remove(&nullb_indexes, nullb->index);
-+	ida_free(&nullb_indexes, nullb->index);
- 
- 	list_del_init(&nullb->list);
- 
-@@ -2159,7 +2159,7 @@ static int null_add_dev(struct nullb_device *dev)
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, nullb->q);
- 
- 	mutex_lock(&lock);
--	rv = ida_simple_get(&nullb_indexes, 0, 0, GFP_KERNEL);
-+	rv = ida_alloc(&nullb_indexes, GFP_KERNEL);
- 	if (rv < 0) {
- 		mutex_unlock(&lock);
- 		goto out_cleanup_zone;
 -- 
-2.43.0
+2.30.1 (Apple Git-130)
 
