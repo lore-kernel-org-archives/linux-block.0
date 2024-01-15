@@ -1,29 +1,60 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FC43C0B;
-	Mon, 15 Jan 2024 06:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TD2zV1ytXz4f3jM7;
-	Mon, 15 Jan 2024 14:58:30 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 514DC1A016E;
-	Mon, 15 Jan 2024 14:58:36 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-	by APP2 (Coremail) with SMTP id Syh0CgAHLA+a16RlEZuWAw--.48011S2;
-	Mon, 15 Jan 2024 14:58:36 +0800 (CST)
-From: Kemeng Shi <shikemeng@huaweicloud.com>
-To: axboe@kernel.dk,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE85881E
+	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 08:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="mrJr1WKx"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cd928a1d58so30467811fa.3
+        for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 00:46:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1705308412; x=1705913212; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=af0c4qw0ceHWmNUQwBLGyaQWzbBLs0yH9j68AMi/ymM=;
+        b=mrJr1WKxJ7BRhwXIMQlAIDZhNNwh6HPwY8oGKhaTMNgYoZQM8k3E6VV3EYGkWy9wsh
+         bg7vzl0vQ5NrFT34yRUsWKs1bSgktjeShsLP4sn7/SWXSuQ8EtYD5HkDQLgQzYSl3fCd
+         wUnCH4TU80jTvjKkUDDB+QbXafgneqkyNM9jCWvyG9pRjbY6utZivtaou320oYL99nzt
+         jOIRK8VKBvqVQQUd2NcMna7i4NtBYaX9/GbChAn4NvAw1SckAaQNLwch22Hg2pB1JTYc
+         7Jxyjw17LugKrNVoO7e4u8yQTOSolQChKBXLP+Yxih04UgfVLjllbITJOpikAODpx1Q0
+         nUug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705308412; x=1705913212;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=af0c4qw0ceHWmNUQwBLGyaQWzbBLs0yH9j68AMi/ymM=;
+        b=tix4KrCldnp98G7i74xxAvvx6eAps5VGC1b7vtpDC0sLg6yMwk/hmbCjtV7qA7cG11
+         RyMA9JprXgaPeKIk29n+jJxyLl8veC6htPijZ5Ku93NQF99vPPfBJo+3aDR4Pt8qdvnX
+         F1qb7nkdLus6XuIKaAxiLdNqJSxSy5Dzm12uQLrogyw+OFYImO1es6zeryTl4Bq2Xox9
+         82jfEEmcvEE0anmlt4bs3qqzqePUYOoh39FNRH0qQGgs5oGcYiaT902ZA8QaDxLDM1Wk
+         DhoKWR18Jny+6bnk2KVjNwJl5w7MMbrm9HUkrQCBoyL1CID3Ff3ZekKs9VGfs+scdPc+
+         1ThQ==
+X-Gm-Message-State: AOJu0Yz1JubWPlWTNLhp5VW23KQFqfLeZwuHRM4knoesrRNf8l4kl2UJ
+	aw0CE/r8sWf3M6tLkiiN5wpcWkIQnx0qaA==
+X-Google-Smtp-Source: AGHT+IGK8MH+CazDutDh5KhUA91iPm2QS3HgOT+gj3DZbv72Ccmc46G2CeN6HPpan13U+rWLqo9+kg==
+X-Received: by 2002:a05:6512:234e:b0:50e:6457:2bc2 with SMTP id p14-20020a056512234e00b0050e64572bc2mr3307332lfu.71.1705308411949;
+        Mon, 15 Jan 2024 00:46:51 -0800 (PST)
+Received: from system76-pc.. ([2a00:1370:81a4:169c:b283:d681:9baf:afcf])
+        by smtp.gmail.com with ESMTPSA id y22-20020a056512335600b0050eea9541casm970160lfd.44.2024.01.15.00.46.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 00:46:51 -0800 (PST)
+From: Viacheslav Dubeyko <slava@dubeyko.com>
+To: lsf-pc@lists.linux-foundation.org,
+	linux-fsdevel@vger.kernel.org,
+	javier.gonz@samsung.com
+Cc: a.manzanares@samsung.com,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: djeffery@redhat.com,
-	ming.lei@redhat.com
-Subject: [PATCH] sbitmap: remove stale comment in sbq_calc_wake_batch
-Date: Mon, 15 Jan 2024 22:56:26 +0800
-Message-Id: <20240115145626.665562-1-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
+	slava@dubeiko.com,
+	Viacheslav Dubeyko <slava@dubeyko.com>
+Subject: [LSF/MM/BPF TOPIC] : Flexible Data Placement (FDP) availability for kernel space file systems
+Date: Mon, 15 Jan 2024 11:46:31 +0300
+Message-Id: <20240115084631.152835-1-slava@dubeyko.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -31,49 +62,24 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgAHLA+a16RlEZuWAw--.48011S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7XF18JF4xXF4kCw17JFW8Zwb_yoWDXrcEkF
-	WvkF18Wa9xWFn7KF1rAr4avryjk3yUZa48AFWYqFy8JFyjv393JrWkurWYyFWruay2vry7
-	CrWxWF4xtr13ZjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb7AYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl8c
-	AvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq
-	3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gc
-	CE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxI
-	r21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87
-	Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IY
-	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
-	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF
-	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0x
-	vE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
-	jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU0miiDUUUUU==
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 
-After commit 106397376c036 ("sbitmap: fix batching wakeup"), we may wake
-up more than one queue for each batch. Just remove stale comment that
-we wake up only one queue for each batch.
+Hi Javier,
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
----
- lib/sbitmap.c | 5 -----
- 1 file changed, 5 deletions(-)
+Samsung introduced Flexible Data Placement (FDP) technology
+pretty recently. As far as I know, currently, this technology
+is available for user-space solutions only. I assume it will be
+good to have discussion how kernel-space file systems could
+work with SSDs that support FDP technology by employing
+FDP benefits.
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index d0a5081dfd12..92c6b1fd8989 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -388,11 +388,6 @@ static unsigned int sbq_calc_wake_batch(struct sbitmap_queue *sbq,
- 	unsigned int shallow_depth;
- 
- 	/*
--	 * For each batch, we wake up one queue. We need to make sure that our
--	 * batch size is small enough that the full depth of the bitmap,
--	 * potentially limited by a shallow depth, is enough to wake up all of
--	 * the queues.
--	 *
- 	 * Each full word of the bitmap has bits_per_word bits, and there might
- 	 * be a partial word. There are depth / bits_per_word full words and
- 	 * depth % bits_per_word bits left over. In bitwise arithmetic:
--- 
-2.30.0
+How soon FDP API will be available for kernel-space file systems?
+How kernel-space file systems can adopt FDP technology?
+How FDP technology can improve efficiency and reliability of
+kernel-space file system?
+Which new challenges FDP technology introduces for kernel-space
+file systems?
 
+Could we have such discussion leading from Samsung side?
+
+Thanks,
+Slava
