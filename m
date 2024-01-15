@@ -1,80 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FDF17577;
-	Mon, 15 Jan 2024 13:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A741517586
+	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 14:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q/EZjsy9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9F5AC433F1;
-	Mon, 15 Jan 2024 13:50:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705326656;
-	bh=BPKbcav8hKWyYniO8mP6S8bRiXKYHLnZvQiLfUnWJCE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q/EZjsy9OEGxpKnOuSUsPbLrTxrXFT+yOVg5M9WUaBOZw/s8FNAWV7u5iIDQdlhNn
-	 2Q6JiJ6YSLClAKQChialuCcfOhLwdp7oszZU1qO5+hAjSqdSElJSpMO32eBQ8JISPU
-	 uFQb000fKROVzqr1DqlVmVfSe+7U6P8LI+9vRZ/h1kcX7KGt5HslG2X4xUzzkS1j6Q
-	 fgO7W9vRPruy9LMBtFh6rY+xvpgqOrOfAdy4H6HjsbpLdIf55zchy7IPMujDsfoQjr
-	 PNbM+3IE+jnay2p/EyHp7fJ8Xle1sdWulkG3ZwFeT0JrNwzjyOtYOEMbg0caKIwJ8Y
-	 hlqv1zcSRFCtw==
-Date: Mon, 15 Jan 2024 13:50:51 +0000
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	syzbot <syzkaller@googlegroups.com>, stable@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
-	nbd@other.debian.org
-Subject: Re: [PATCH net] nbd: always initialize struct msghdr completely
-Message-ID: <20240115135051.GA432001@kernel.org>
-References: <20240112132657.647112-1-edumazet@google.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ny9clbc2"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5cdf90e5cdeso1242540a12.1
+        for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 06:23:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705328586; x=1705933386; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+LWZYg1IMV/uEgaqbKLmuusotYPIpfhO8Q0/VlMREB4=;
+        b=ny9clbc29nmRP6dPaCAaflI2SLW1B45bgBRLKmyvvHUGotk2CggQpH4QHDcgZvNkB1
+         tWo7s/ueK2p6LDMm9TZcAIDNFRVp6Cgb0QzU+uZD4oHwaq0mm59z27gowyBT1UCt6TF8
+         KP44TV9JKwysq26oEjFmT5nQgiuvrYW4te2B/HtmLO3lhIoAUMA0US3xMrYcyRmONDxl
+         afb8nPRI36V9WcdFkk8et3yLEEUd+WilhDHtTjk2uFV2JWxoqnjlqZ8mYiHk9+rL/Mxi
+         Q0kulr6V1lv3ddFcHLiYQZx1GnjygHrjnrL7IXxIHCFZtzd28EwQuKwOkZigmCScjU6W
+         mO7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705328586; x=1705933386;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+LWZYg1IMV/uEgaqbKLmuusotYPIpfhO8Q0/VlMREB4=;
+        b=TsrPiFzHiVFEVfQjQbUUoMExH667fE8TuQcIuKvt53wmSH2qt7nXF5MCGzPOOR3p05
+         XgfODh3bGt61jHcDg37ILOjcMZj7zhRBX6zFE8I9wBSkx45YVjAVjZefv74WRv+SjPY0
+         qaDsSkzA6m0Al8JI8/n0nM8+fJN1ta8NDYlA6q+UfapwLkZafZeYZzb+fC+Vz+4XG5ao
+         KHbg1THTZwos7zNsxjJEyaVU8/InvGYkGLxHxi0Db0XS9MTyCmbFNZTA7Kv5N6vR3O6r
+         DJVSzM44paZE2n9ZKpbdaJrq6ZSwX+jPYAdtX+CCDpz/f0M2gYqp4/83HSegZBCY0jBf
+         iZcg==
+X-Gm-Message-State: AOJu0YyFMA7U37+6OkNw28bilLuB/MKXIsMtHZft8JytJLGoHXCfH93p
+	1Qpu/fAvkW7eRODUOq69Xd77seAFV6O//Q==
+X-Google-Smtp-Source: AGHT+IF6vT5ts8E+SRYTAuiD26/PdrnGUdMM40hlex8LTcJwPLefiHrO2xrFLrO3zXEdkDNBQXB9Nw==
+X-Received: by 2002:a05:6a21:6da2:b0:19a:49c8:b9e6 with SMTP id wl34-20020a056a216da200b0019a49c8b9e6mr12242516pzb.0.1705328586531;
+        Mon, 15 Jan 2024 06:23:06 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id z4-20020a636504000000b005ceb4a6d72bsm7944298pgb.65.2024.01.15.06.23.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Jan 2024 06:23:05 -0800 (PST)
+Message-ID: <44a974c6-b552-4461-b3c7-801fed6d072d@kernel.dk>
+Date: Mon, 15 Jan 2024 07:23:04 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240112132657.647112-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Fix some typos
+Content-Language: en-US
+To: Nicky Chorley <ndchorley@gmail.com>, linux-block@vger.kernel.org
+References: <20240114082532.10751-1-ndchorley@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240114082532.10751-1-ndchorley@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 12, 2024 at 01:26:57PM +0000, Eric Dumazet wrote:
-> syzbot complains that msg->msg_get_inq value can be uninitialized [1]
-> 
-> struct msghdr got many new fields recently, we should always make
-> sure their values is zero by default.
-> 
-> [1]
->  BUG: KMSAN: uninit-value in tcp_recvmsg+0x686/0xac0 net/ipv4/tcp.c:2571
->   tcp_recvmsg+0x686/0xac0 net/ipv4/tcp.c:2571
->   inet_recvmsg+0x131/0x580 net/ipv4/af_inet.c:879
->   sock_recvmsg_nosec net/socket.c:1044 [inline]
->   sock_recvmsg+0x12b/0x1e0 net/socket.c:1066
->   __sock_xmit+0x236/0x5c0 drivers/block/nbd.c:538
->   nbd_read_reply drivers/block/nbd.c:732 [inline]
->   recv_work+0x262/0x3100 drivers/block/nbd.c:863
->   process_one_work kernel/workqueue.c:2627 [inline]
->   process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2700
->   worker_thread+0xf45/0x1490 kernel/workqueue.c:2781
->   kthread+0x3ed/0x540 kernel/kthread.c:388
->   ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
->   ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-> 
-> Local variable msg created at:
->   __sock_xmit+0x4c/0x5c0 drivers/block/nbd.c:513
->   nbd_read_reply drivers/block/nbd.c:732 [inline]
->   recv_work+0x262/0x3100 drivers/block/nbd.c:863
-> 
-> CPU: 1 PID: 7465 Comm: kworker/u5:1 Not tainted 6.7.0-rc7-syzkaller-00041-gf016f7547aee #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-> Workqueue: nbd5-recv recv_work
-> 
-> Fixes: f94fd25cb0aa ("tcp: pass back data left in socket after receive")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On 1/14/24 1:25 AM, Nicky Chorley wrote:
+> Correct some minor typos in blk-core.c.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Please don't send typo fixes by themselves. IMHO they are fine to do if
+you're in that area anyway, but if not, then they just cause unnecessary
+backporting pains.
 
-...
+An exception would be if the comment is completely wrong, then
+we surely should fix it. But if it's just a typo that doesn't impact the
+readers ability to understand it, then let's please just leave it alone.
+
+-- 
+Jens Axboe
 
