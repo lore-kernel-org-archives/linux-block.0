@@ -1,101 +1,51 @@
-Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2695A522B;
-	Mon, 15 Jan 2024 05:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nsr.re.kr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nsr.re.kr
-Received: from 210.104.33.70 (nsr.re.kr)
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-	by mail.nsr.re.kr with SMTP; Mon, 15 Jan 2024 14:17:49 +0900
-X-Sender: letrhee@nsr.re.kr
-Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 499;
-          Mon, 15 Jan 2024 14:17:43 +0900 (KST)
-From: Dongsoo Lee <letrhee@nsr.re.kr>
-To: 'David Laight' <David.Laight@ACULAB.COM>, 
-	'Herbert Xu' <herbert@gondor.apana.org.au>, 
-	"'David S. Miller'" <davem@davemloft.net>, 
-	'Jens Axboe' <axboe@kernel.dk>, 'Eric Biggers' <ebiggers@kernel.org>, 
-	"'Theodore Y. Ts'o'" <tytso@mit.edu>, 
-	'Jaegeuk Kim' <jaegeuk@kernel.org>, 
-	'Thomas Gleixner' <tglx@linutronix.de>, 
-	'Ingo Molnar' <mingo@redhat.com>, 'Borislav Petkov' <bp@alien8.de>, 
-	'Dave Hansen' <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"'H. Peter Anvin'" <hpa@zytor.com>
-Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240112022859.2384-1-letrhee@nsr.re.kr> <20240112022859.2384-6-letrhee@nsr.re.kr> <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
-In-Reply-To: <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
-Subject: RE: [PATCH v6 RESEND 5/5] crypto: LEA block cipher x86_64 optimization
-Date: Mon, 15 Jan 2024 14:17:43 +0900
-Message-ID: <000e01da4772$2b2c5360$8184fa20$@nsr.re.kr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33132566;
+	Mon, 15 Jan 2024 05:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 4C01A68AFE; Mon, 15 Jan 2024 06:59:41 +0100 (CET)
+Date: Mon, 15 Jan 2024 06:59:40 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Ed Tsai <ed.tsai@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
+Message-ID: <20240115055940.GA745@lst.de>
+References: <20231130193139.880955-1-bvanassche@acm.org> <20231130193139.880955-2-bvanassche@acm.org> <58f50403-fcc9-ec11-f52b-f11ced3d2652@huaweicloud.com> <8372f2d0-b695-4af4-90e6-e35b86e3b844@acm.org> <c1658336-f48e-5688-f0c2-f325fd5696c3@huaweicloud.com> <1d3866af-ffca-4f97-914d-8084aca901ab@acm.org> <69b17db7-e9c9-df09-1022-ff7a9e5e04dd@huaweicloud.com> <20240112043915.GA5664@lst.de> <2d83fcb3-06e6-4a7c-9bd7-b8018208b72f@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: ko
-Thread-Index: AQMGEr+nvC0x82l43QjPVTp1bc6i9wFH8CyOAqmBDhmuYzLfEA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d83fcb3-06e6-4a7c-9bd7-b8018208b72f@huaweicloud.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On  Fri, 12 Jan 2024 12:59:56 +0000, David Laight =
-<David.Laight@ACULAB.COM> wrote:
-> From: Dongsoo Lee
->> Sent: 12 January 2024 02:29
->>
->> For the x86_64 environment, we use AVX-512F/AVX2/SSE2 instructions.
->> Since LEA uses 128-bit blocks of four 32-bit integers, for =
-optimization,
->> SSE2 encrypts 4 blocks, AVX2 encrypts 4/8 blocks, and AVX-512F =
-encrypts
->> 4/8/16 blocks at a time.
->>
->> Our submission provides a optimized implementation of ECB, CBC
->> decryption, CTR, and XTS cipher operation modes on x86_64 CPUs
->> supporting.
->=20
-> Given you say in 0/0:
->=20
-> The LEA algorithm is a lightweight block cipher that processes data =
-blocks of 128-bits and has three different key lengths, each with a =
-different number of rounds:
->=20
-> Just how big is it ?
-> Doesn't look 'lightweight' to me.
->=20
-> 	David
->=20
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, =
-MK1 1PT, UK
-> Registration No: 1397386 (Wales)
->=20
+On Sun, Jan 14, 2024 at 11:22:01AM +0800, Yu Kuai wrote:
+> As you might noticed, Bart and I both met the performance problem in
+> production due to fair tag sharing in the environment that total driver
+> tags is not sufficient. Disable fair tag sharing is a straight way to
+> fix the problem, of course this is not the ideal solution, but make tag
+> sharing configurable and let drivers make the decision if they want to
+> disable it really solve the dilemma, and won't have any influence
+> outside the driver.
 
-Firstly, it's worth mentioning that LEA is an encryption algorithm =
-designed to ensure 128-bit security.
+How can the driver make any sensible decision here?  This really looks
+like a horrible band aid.  You'll need to figure out a way to make
+the fair sharing less costly or adaptic.  That might involve making it
+a little less fair, which is probably ok as long a the original goals
+are met.
 
-The LEA cipher provides a balance between code size and required memory, =
-allowing for trade-offs with performance. The implementation of LEA that =
-we have submitted is oriented towards achieving optimal performance.
-
-While it's difficult to compare to the most recent implementations of =
-cryptographic algorithms because the test is out of date, you can see =
-the results of a previous FELICS test [1] that implemented LEA for a =
-smaller code size.
-
-For example, a detailed example of skipping the key schedule to reduce =
-memory usage and minimize code size can be found in [2].
-
-Thank you for your interest.
-
-    Dongsoo Lee
-
-[1] https://www.cryptolux.org/index.php/FELICS#Results
-[2] =
-https://github.com/cryptolu/FELICS/blob/master/block_ciphers/source/ciphe=
-rs/LEA_128_128_v03/source/encrypt.c
