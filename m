@@ -1,135 +1,102 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF93F4E9
-	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 09:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TD6qC3m21z4f3kKV
-	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 17:51:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 9D7AF1A0E81
-	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 17:51:37 +0800 (CST)
-Received: from [10.174.178.129] (unknown [10.174.178.129])
-	by APP1 (Coremail) with SMTP id cCh0CgC3iBEoAKVlV36bAw--.37374S2;
-	Mon, 15 Jan 2024 17:51:37 +0800 (CST)
-Subject: Re: [RFC PATCH] sbitmap: fix batching wakeup
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, David Jeffery <djeffery@redhat.com>,
- Gabriel Krisman Bertazi <krisman@suse.de>,
- Chengming Zhou <zhouchengming@bytedance.com>, Jan Kara <jack@suse.cz>
-References: <20230721095715.232728-1-ming.lei@redhat.com>
-From: Kemeng Shi <shikemeng@huaweicloud.com>
-Message-ID: <8e1571ed-cc9d-c674-64e1-756c57526df0@huaweicloud.com>
-Date: Mon, 15 Jan 2024 17:51:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DF72575F
+	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 11:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ncnRx2eT"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dbed85ec5b5so6417988276.3
+        for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 03:21:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705317687; x=1705922487; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pHPJJ8rbw0jy6/SB1odAF/HAvsBPN4MhcDWdQ5crtqg=;
+        b=ncnRx2eTaPGjj+sZrYKmM/Hr98Qvrvt6GVkz4aBYVmnLxBeZEMfMyvlYAjyfbZRVSF
+         2xT42dceDJ8GpreC77Ottvgq2GkXBKg9Ht/4NfobL4tOmhETN8tiB8GQFc4KBXQhiuV9
+         z6S7xJDAID/HiEBChQXp2RRqwBlgeX9UQqE4N/CuE3mnilH9G4sVVKR/VoEJ2Rr/66fz
+         4V1GNlTYxg18fn2hMMcPXKI8zo1n7QjG7fC4evbJloAP20/P0PUIdlFh6lgcjRHgx4cB
+         r3YLvqCUsh721q3tObDDNadVzYiaSVpHLKOxrG5uT+Drb3eF9LhB8UIog93UXshv+llm
+         kBHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705317687; x=1705922487;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pHPJJ8rbw0jy6/SB1odAF/HAvsBPN4MhcDWdQ5crtqg=;
+        b=oJpjhvtgkHExiiyTt5L6s1z0rPlpIg+hzA51tNR9WFdFZbWtf4KHMN3EIxZPm4H2ph
+         gTumdH9i4nN1kgidF8+iNaOsqc9JuNjgvo0eoaZy6SSZmMXwN9WbhLFe3GA15+Zoktfv
+         K2BN+oOvL9jlQ2RvnBQuWy9SYlRl/ouwSCs8/12HNqSUlWujgj9uF+75uLB7G0KPYwSC
+         Zk+5e9AETtOumurvqsT7ZpRybkqE/kuQu0bmhZCJykZqoCqddEzHaDBalepqSZH/V0+s
+         w+TgtJzdCS8NacFZc5JgdP77Ux6FLoDRbg2ETaoOze2Qvd9XuMnT0MR9E0mppUv1MkYf
+         8ROw==
+X-Gm-Message-State: AOJu0Yy4n4nVpbFW9ALV0vnxACZE7HsHSoqbrm0hB0mM6mLS9vXjzDwP
+	ZzpcsQgJMGuzBtmgj8h1Ch8HX772viN7rpuhcsjnmyoETQeslQpVmWgHd+E7Vgs=
+X-Google-Smtp-Source: AGHT+IGOL0ZacS2Vv9hJ+pmc9qFRPH1uhFFEd/5d8YRhFSrlCkQ5oHYGr995yPkvaN9Ex2prB1ryrl1NYttEUS0gJuU=
+X-Received: by 2002:a25:734c:0:b0:dbd:9884:236e with SMTP id
+ o73-20020a25734c000000b00dbd9884236emr1912705ybc.93.1705317686911; Mon, 15
+ Jan 2024 03:21:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230721095715.232728-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:cCh0CgC3iBEoAKVlV36bAw--.37374S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxArWfWw43Kw4UZw1ktryUGFg_yoW5XF4fpr
-	429FnrCFsYqr42k397JryUZa4rKw4kGrZxKr1fta4Fkr45tr9aqr4fKFs0kFsxuFZ5Ca9x
-	AF4jg343Gw15Xa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-	xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+References: <20240112054449.GA6829@lst.de> <9eb0f18e-f3ce-497c-931d-339efee2190d@kernel.dk>
+In-Reply-To: <9eb0f18e-f3ce-497c-931d-339efee2190d@kernel.dk>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Mon, 15 Jan 2024 12:20:50 +0100
+Message-ID: <CAPDyKFpmEB9FGAmGAQNdEH+DtRtcCNnFszfv_ewihzUU9du+Xg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] blk-mq: ensure a q_usage_counter reference is held
+ when splitting bios
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+	Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
++ Arnd, Linus
 
+On Fri, 12 Jan 2024 at 15:22, Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 1/11/24 10:44 PM, Christoph Hellwig wrote:
+> > On Thu, Jan 11, 2024 at 01:06:43PM -0700, Jens Axboe wrote:
+> >> Something like this? Not super pretty with the duplication, but...
+> >> Should suffice for a fix, and then we can refactor it on top of that.
+> >> ioprio is inherited when cloning, so we don't need to do that post the
+> >> split.
+> >
+> > Yes, this could work.  It'll get worse with anything we need to do under
+> > q_usage_counter counter, though.  I mean, it is a perpcu_counter, which
+> > should be really light-weight compared to all the other stuff you do.
+> > I'd really love to see numbers that show it matters.
+>
+> Yep it is pretty cheap, but it's not free. Here's a test where we just
+> grab a ref and drop it, which should arguably be cheaper than doing a
+> ref at the top and dropping it at the bottom due to temporal locality:
+>
+>      5.01%     +0.86%  [kernel.vmlinux]  [k] blk_mq_submit_bio
+>
+> >> Should
+> >> be set at init time and then never change. And agree would be so nice to
+> >> kill that code...
+> >
+> > I wish we could see some more folks from the mmc maintainers to do
+> > proper scatterlist (or bio/request) kmap helpers.  The scsi drivers
+> > could easily piggy back on that or just be disabled for HIGHMEM configs.
+>
+> Maybe we just nudge them that way by making them depend on !HIGHMEM...
+>
+> --
+> Jens Axboe
+>
 
-on 7/21/2023 5:57 PM, Ming Lei wrote:
-> From: David Jeffery <djeffery@redhat.com>
-> 
-> Current code supposes that it is enough to provide forward progress by just
-> waking up one wait queue after one completion batch is done.
-> 
-> Unfortunately this way isn't enough, cause waiter can be added to
-> wait queue just after it is woken up.
-> 
-Sorry for missed this. The change looks good and makes code simpler. But the
-issue is not supposed to heppen in real world.
-> Follows one example(64 depth, wake_batch is 8)
-> 
-> 1) all 64 tags are active
-> 
-> 2) in each wait queue, there is only one single waiter
-> 
-> 3) each time one completion batch(8 completions) wakes up just one waiter in each wait
-> queue, then immediately one new sleeper is added to this wait queue
-> 
-> 4) after 64 completions, 8 waiters are wakeup, and there are still 8 waiters in each
-> wait queue>
-As we only wait when all tags are consumed (After sbitmap_prepare_to_wait,
-we will try sbitmap_queue_get before sleep), there will be 64 active tags again
-when any new sleeper is added. Then the menthioned issue should not exist.
-If there was no any gain with old way to wakeup, this looks good. Otherwise
-we may need to reconsider this.
-Wish this helps, thanks!
-> 5) after another 8 active tags are completed, only one waiter can be wakeup, and the other 7
-> can't be waken up anymore.
-> 
-> Turns out it isn't easy to fix this problem, so simply wakeup enough waiters for
-> single batch.
-> 
-> Cc: David Jeffery <djeffery@redhat.com>
-> Cc: Kemeng Shi <shikemeng@huaweicloud.com>
-> Cc: Gabriel Krisman Bertazi <krisman@suse.de>
-> Cc: Chengming Zhou <zhouchengming@bytedance.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  lib/sbitmap.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index eff4e42c425a..d0a5081dfd12 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -550,7 +550,7 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
->  
->  static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
->  {
-> -	int i, wake_index;
-> +	int i, wake_index, woken;
->  
->  	if (!atomic_read(&sbq->ws_active))
->  		return;
-> @@ -567,13 +567,12 @@ static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
->  		 */
->  		wake_index = sbq_index_inc(wake_index);
->  
-> -		/*
-> -		 * It is sufficient to wake up at least one waiter to
-> -		 * guarantee forward progress.
-> -		 */
-> -		if (waitqueue_active(&ws->wait) &&
-> -		    wake_up_nr(&ws->wait, nr))
-> -			break;
-> +		if (waitqueue_active(&ws->wait)) {
-> +			woken = wake_up_nr(&ws->wait, nr);
-> +			if (woken == nr)
-> +				break;
-> +			nr -= woken;
-> +		}
->  	}
->  
->  	if (wake_index != atomic_read(&sbq->wake_index))
-> 
+Not sure exactly what problem you are trying to solve here, but I am
+certainly happy to help, if I can.
 
+Can you perhaps point me to a couple of drivers that need to be converted?
+
+Kind regards
+Uffe
