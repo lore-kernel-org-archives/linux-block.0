@@ -1,169 +1,176 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD36028E3E;
-	Mon, 15 Jan 2024 11:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TD9Y54qVhz4f3kpH;
-	Mon, 15 Jan 2024 19:54:33 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 5984C1A0948;
-	Mon, 15 Jan 2024 19:54:37 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBXKBH7HKVlbDqkAw--.1828S3;
-	Mon, 15 Jan 2024 19:54:37 +0800 (CST)
-Subject: Re: [PATCH for-6.8/block] block: support to account io_ticks
- precisely
-To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240109071332.2216253-1-yukuai1@huaweicloud.com>
- <ZaUZH8v2i7YBklyc@fedora>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <bdbbaff8-bdb6-0416-b4f4-bbebb64fb1fc@huaweicloud.com>
-Date: Mon, 15 Jan 2024 19:54:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659AA2C68C
+	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 12:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C1RAle4o"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705320842;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type;
+	bh=eY9sAlKGBP15WtJLvXPjMLCZS+l6QaLo35obeFomqdM=;
+	b=C1RAle4olfOIAafJ4egeRo7iP5iBrPXMuQzRwwXRigbtaU2WWRUPNzN9l7E62qV99j9dji
+	y/sC9JWb94OAi5UNyADBUknNHjbc86B+FJ49MWLhINCAXxowDXwrFL+QFcuPwr+yYOmkGV
+	PGbgwNgbQ2/ALCOCHnKTlMfDl0yJmnc=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-360-znpBBSVqO_OERu2XCahEYw-1; Mon, 15 Jan 2024 07:14:00 -0500
+X-MC-Unique: znpBBSVqO_OERu2XCahEYw-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3bd5882b0bcso6256305b6e.2
+        for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 04:14:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705320840; x=1705925640;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eY9sAlKGBP15WtJLvXPjMLCZS+l6QaLo35obeFomqdM=;
+        b=OEMpV65kKgHoVaoO6YhsowEjTCZsGR6yfsaki0BRelpi1z2Cywixnvlh6cdUZXPj3U
+         kNWzUvgRUK9w7MkeeM2wg4G+c2a1+lMkDAdnfBLBygpjL0rCb/R+9ro548a2GaEW3nDk
+         bWlycictDvFnkDm3lKkBksfyy3wAteV0OIXl/dbs4umJK5Q12Z58FGKrWRJA7sp0wxbC
+         V5D3VDfHaV3IaPZa60rT2pfVb28WIjxQEoF0+az1lgAdUaUCRE5VAXDKmQLr0CSDfrMz
+         LMDxFUCrJniuwBm89htKEyCDxk5u7hckiIHlQoqiPNcgaFxIMXvKQEKcEcn+ODxpf+Y7
+         xRCA==
+X-Gm-Message-State: AOJu0Yz/3NTd1JuGXYfZ496ak7Sjk0tQOjDWcXQtSvRA8fMmXQ+Vztc5
+	JDtMekwjID6uIK3PUSX2hkkwUg17ONKkjKKf8Ube3DRokbMRTJYutf/qxSInQKluw2YP03Yy9+4
+	cioRqOkutxJ83Wdn7OcysaOrtvh8vDcIbOFfv3eOzZhW60sqw0LifPXBdJDrr
+X-Received: by 2002:a05:6808:9b0:b0:3bd:4d3c:ff9c with SMTP id e16-20020a05680809b000b003bd4d3cff9cmr5899450oig.116.1705320840039;
+        Mon, 15 Jan 2024 04:14:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFs8K3V2NJY0rd5ZWGCFYGPYrPQli0EaBE1JelHItthmZJmxbliNhX6GHA5fGuW2IbtQrk0kv2Lm3iC2eeg9p0=
+X-Received: by 2002:a05:6808:9b0:b0:3bd:4d3c:ff9c with SMTP id
+ e16-20020a05680809b000b003bd4d3cff9cmr5899442oig.116.1705320839720; Mon, 15
+ Jan 2024 04:13:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZaUZH8v2i7YBklyc@fedora>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBXKBH7HKVlbDqkAw--.1828S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGFWxCryDXr1xtFWrZrWxtFb_yoWrZrW8pr
-	y8G3ZxKFnaqFy7uFsFva17tF1xX395Cr45JrsxGryayr1DWr1fZrs2qrWF9FZ2vrZ2ya18
-	Zr18uFyUCw4j9a7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
-	04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+From: Allison Karlitskaya <allison.karlitskaya@redhat.com>
+Date: Mon, 15 Jan 2024 13:13:49 +0100
+Message-ID: <CAOYeF9VsmqKMcQjo1k6YkGNujwN-nzfxY17N3F-CMikE1tYp+w@mail.gmail.com>
+Subject: PROBLEM: BLKPG_DEL_PARTITION with GENHD_FL_NO_PART used to return
+ ENXIO, now returns EINVAL
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+hi,
 
-ÔÚ 2024/01/15 19:38, Ming Lei Ð´µÀ:
-> On Tue, Jan 09, 2024 at 03:13:32PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Currently, io_ticks is accounted based on sampling, specifically
->> update_io_ticks() will always account io_ticks by 1 jiffies from
->> bdev_start_io_acct()/blk_account_io_start(), and the result can be
->> inaccurate, for example(HZ is 250):
->>
->> Test script:
->> fio -filename=/dev/sda -bs=4k -rw=write -direct=1 -name=test -thinktime=4ms
->>
->> Test result: util is about 90%, while the disk is really idle.
-> 
-> Just be curious, what is result with this patch? 0%?
+[1.] One line summary of the problem:
+BLKPG_DEL_PARTITION on an empty loopback device used to return ENXIO
+but now returns EINVAL, breaking partprobe
 
-No, it's not 0%, this actually depends on how many IO really start from
-one jiffies and complete at the next jiffies. Given that the probability
-is related to IO latency, so the result should be relatively
-accurate(Around 10% in my environment). I think we can live with that
-unless we improve time precision from jiffies to ns.
-> 
->>
->> In order to account io_ticks precisely, update_io_ticks() must know if
->> there are IO inflight already, and this requires overhead slightly,
->> hence precise io accounting is disabled by default, and user can enable
->> it through sysfs entry.
->>
->> Noted that for rq-based devcie, part_stat_local_inc/dec() and
->> part_in_flight() is used to track inflight instead of iterating tags,
->> which is not supposed to be used in fast path because 'tags->lock' is
->> grabbed in blk_mq_find_and_get_req().
->>
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->> Changes from RFC v1:
->>   - remove the new parameter for update_io_ticks();
->>   - simplify update_io_ticks();
->>   - use swith in queue_iostats_store();
->>   - add missing part_stat_local_dec() in blk_account_io_merge_request();
->> Changes from RFC v2:
->>   - fix that precise is ignored for the first io in update_io_ticks();
->>
->>   Documentation/ABI/stable/sysfs-block |  8 ++++--
->>   block/blk-core.c                     | 10 +++++--
->>   block/blk-merge.c                    |  3 ++
->>   block/blk-mq-debugfs.c               |  2 ++
->>   block/blk-mq.c                       | 11 +++++++-
->>   block/blk-sysfs.c                    | 42 ++++++++++++++++++++++++++--
->>   block/blk.h                          |  1 +
->>   block/genhd.c                        |  2 +-
->>   include/linux/blk-mq.h               |  1 +
->>   include/linux/blkdev.h               |  3 ++
->>   10 files changed, 74 insertions(+), 9 deletions(-)
->>
->> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
->> index 1fe9a553c37b..79027bf2661a 100644
->> --- a/Documentation/ABI/stable/sysfs-block
->> +++ b/Documentation/ABI/stable/sysfs-block
->> @@ -358,8 +358,12 @@ What:		/sys/block/<disk>/queue/iostats
->>   Date:		January 2009
->>   Contact:	linux-block@vger.kernel.org
->>   Description:
->> -		[RW] This file is used to control (on/off) the iostats
->> -		accounting of the disk.
->> +		[RW] This file is used to control the iostats accounting of the
->> +		disk. If this value is 0, iostats accounting is disabled; If
->> +		this value is 1, iostats accounting is enabled, but io_ticks is
->> +		accounted by sampling and the result is not accurate; If this
->> +		value is 2, iostats accounting is enabled and io_ticks is
->> +		accounted precisely, but there will be slightly more overhead.
->>   
->>   
->>   What:		/sys/block/<disk>/queue/logical_block_size
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 9520ccab3050..c70dc311e3b7 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -954,11 +954,15 @@ EXPORT_SYMBOL_GPL(iocb_bio_iopoll);
->>   void update_io_ticks(struct block_device *part, unsigned long now, bool end)
->>   {
->>   	unsigned long stamp;
->> +	bool precise = blk_queue_precise_io_stat(part->bd_queue);
->>   again:
->>   	stamp = READ_ONCE(part->bd_stamp);
->> -	if (unlikely(time_after(now, stamp))) {
->> -		if (likely(try_cmpxchg(&part->bd_stamp, &stamp, now)))
->> -			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
->> +	if (unlikely(time_after(now, stamp)) &&
->> +	    likely(try_cmpxchg(&part->bd_stamp, &stamp, now))) {
->> +		if (end || (precise && part_in_flight(part)))
->> +			__part_stat_add(part, io_ticks, now - stamp);
->> +		else if (!precise)
->> +			__part_stat_add(part, io_ticks, 1);
-> 
-> It should be better or readable to move 'bool precise' into the above branch,
-> given we only need to read the flag once in each tick.
-> 
-> Otherwise, this patch looks fine.
+[2.] Full description of the problem/report:
+We recently caught this problem in our CI for Cockpit:
+https://github.com/cockpit-project/bots/pull/5793
 
-Thanks for your advice, will change that in next version.
+The summary is that if you do something like this:
 
-Kuai
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
+$ dd if=/dev/zero of=/tmp/foo bs=1M count=50
+$ partprobe $(losetup --find --show /tmp/foo)
+
+Then this will fail with the following error message:
+
+Error: Partition(s) 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64 on
+/dev/loop2 have been written, but we have been unable to inform the
+kernel of the change, probably because it/they are in use.  As a
+result, the old partition(s) will remain in use.  You should reboot
+now before making further changes.
+
+... when it used to be successful.  That's down to this syscall
+(called by partprobe) changing its behaviour between kernel versions:
+
+-ioctl(3, BLKPG, {op=BLKPG_DEL_PARTITION, flags=0, datalen=152,
+data={start=0, length=0, pno=1, devname="", volname=""}}) = -1 ENXIO
+(No such device or address)
++ioctl(3, BLKPG, {op=BLKPG_DEL_PARTITION, flags=0, datalen=152,
+data={start=0, length=0, pno=1, devname="", volname=""}}) = -1 EINVAL
+(Invalid argument)
+
+This is observed on Ubuntu jammy with partprobe from parted
+3.4-2build1.  I've confirmed that the original parted-3.4 download
+from https://ftp.gnu.org/gnu/parted/ is also impacted in the same way.
+
+[3.] Keywords:
+block, partition, BLKPG_DEL_PARTITION, loop device, EINVAL, ENXIO
+
+[4.] Kernel information:
+Linux ubuntu 5.15.0-94-generic #104-Ubuntu SMP Tue Jan 9 15:25:40 UTC
+2024 x86_64 x86_64 x86_64 GNU/Linux
+
+This is the version currently in jammy-proposed.  The likely culprit
+is this commit:
+
+  https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/jammy/commit/?id=49a502554e8aa853a0357f287121d4cdf4442a58
+
+which is also upstream as 1a721de8489fa559ff4471f73c58bb74ac5580d3.
+
+There has been discussion on linux-kernel before about this:
+https://marc.info/?l=linux-kernel&m=169753467305218&w=2
+
+but now we have a pretty clear case of "breaks userspace in the wild".
+
+[4.1.] Kernel version (from /proc/version):
+
+Linux version 5.15.0-94-generic (buildd@lcy02-amd64-096) (gcc (Ubuntu
+11.4.0-1ubuntu1~22.04) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38)
+#104-Ubuntu SMP Tue Jan 9 15:25:40 UTC 2024
+
+[4.2.] Kernel .config file:
+
+I pasted a copy here:
+
+https://paste.centos.org/view/8d6506bc
+
+but it won't be around for more than 24 hours.  It's just the config
+file present in /boot on the affected install.
+
+[5.] Most recent kernel version which did not have the bug:
+
+We last tested 5.15.0-91-generic and found it to be working with the
+previous behaviour (ie: returning ENXIO).
+
+[7.] A small shell script or example program which triggers the
+     problem (if possible)
+
+as above:
+
+$ dd if=/dev/zero of=/tmp/foo bs=1M count=50
+$ partprobe $(losetup --find --show /tmp/foo)
+
+[8.] Environment
+[8.1.] Software (add the output of the ver_linux script here)
+[8.2.] Processor information (from /proc/cpuinfo):
+[8.3.] Module information (from /proc/modules):
+[8.4.] Loaded driver and hardware information (/proc/ioports, /proc/iomem)
+[8.5.] PCI information ('lspci -vvv' as root)
+[8.6.] SCSI information (from /proc/scsi/scsi)
+[8.7.] Other information that might be relevant to the problem
+       (please look in /proc and include all information that you
+       think to be relevant):
+[X.] Other notes, patches, fixes, workarounds:
+
+
+I don't expect there would be anything relevant here, but feel free to
+ask.  It's a qemu x86_64 VM image running on my Intel laptop.  If you
+want to test this, check out
+
+   https://github.com/cockpit-project/bots/tree/image-refresh-ubuntu-2204-20240114-225118
+
+and run
+
+  ./vm-run -q ubuntu-2204
+
+at which point you should be presented with instructions about how to
+ssh to the machine.
+
+Thanks for the attention!
+
+Allison Karlitskaya
 
