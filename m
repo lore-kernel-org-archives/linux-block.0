@@ -1,64 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E5717587;
-	Mon, 15 Jan 2024 14:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F12B1758F
+	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 14:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lS9ObrKp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08F2C43394;
-	Mon, 15 Jan 2024 14:25:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705328703;
-	bh=5apflpn4fECSQ55zxglCTrqEv8mnTukoOngCiY3USUs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lS9ObrKpmxPfpvwOytLQF3ueQpYUdSMiGoXV+TOm+9WIqPvobEq3z0RygRJjxRp1G
-	 1d1SY89b180cHDuqg3hnk+zw1Vqhhvlmo1FN1pBriSDW5jH82XnFJPdUaNc9/K2mA5
-	 B43DSVtwInozWbGBqqbHCT/5HRGsQhFdRkOpYi6Tc2wuucxdmCYJ2edtidyv5U0rkk
-	 +C/MQz9+UVlKvyjwfyQX3DvKOw9MWRmfGBYVYbQIXASEGCW/Gcq4u7CvUdqIDUKu6I
-	 BHGLhoBbKYgdzh/J0eOYIl2VbgQd8mdHS6MCpKcKS/PacR7P/bumNMbMbD2CEKDstB
-	 mBZ2JS8MgfA0g==
-Date: Mon, 15 Jan 2024 15:24:58 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC 00/34] Open block devices as files & a bd_inode
- proposal
-Message-ID: <20240115-fluide-solvent-72c82ea973cc@brauner>
-References: <20240103-vfs-bdev-file-v1-0-6c8ee55fb6ef@kernel.org>
- <20240108162641.GA7842@lst.de>
- <20240109084627.p6nekbvq6wpiqq3x@quack3>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KoexH+w2"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6d9bd8adb9aso1236859b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 06:25:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705328725; x=1705933525; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BTyVfmz2hJiEVhEw5q632zLaT46LN9kFqtDeoZ21t38=;
+        b=KoexH+w2oSte6g5cT7KETen9CTcd7grY2LqVcfQlZwKJwsloGdDXVrgOuT+PX/8z3d
+         lDFTcUCucjEzcnt3E385WfVmT4SzFbLTU3Uh2nQlmhVg24xo7uHm9HCwXNFhmSVt16Q/
+         Ip9ovgLD6RKVEunXVKeYz9Pc0Bz8I9UkyT+iZqjcZHryeYmj/8lZx+Vn1MQAOeagkB1r
+         S7uAYVyv5yCukNdf5WTYKyc01EV/nRw07MAm3eK+9fB74bh3VtADF3pNwAvp10VIQu4k
+         uOHUQqttILKdjN6wgDX+e6n6JSegUUcFcuBg43t5JEqNj9MWcat21SmVRs3ABSftalfU
+         GU4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705328725; x=1705933525;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BTyVfmz2hJiEVhEw5q632zLaT46LN9kFqtDeoZ21t38=;
+        b=t0nRQTb7o3ZWdPJXdDp/UlrMaAE0UDDMB/54Za1Ajf0QHaHl97xnxIP/+OPtMkguj1
+         7/jAxXRlwrUv+AxHGTtCF81TQsjf4IGrd0SR6IxYdM4XPXFLLRI3REbh8/IhmhIr4ZAJ
+         qtnqVBvwnHsDzdb3JI/ENy7VY9f9h0rs02rV8Q2ohndqI8ZL5p/4kM7aCq5ZtyVDXYoX
+         M3BrHDEzxYccDnq4ZtAv1lFvHfVUFOSl7ifG+acTVW9uh3Hf4lM3SJC5/+0ECmn215V1
+         ultNli0MIuHgFHDlrezrx3Yl3XdwvF86bDSJ/3CeAYZ7u/qqGhNyu3qik3/MzqqJ9+6o
+         fuUg==
+X-Gm-Message-State: AOJu0Yw8XPmCfKVzhlZAUGqRhvDWZ2lSSQdOLPi6PL+u6nQvwAw3qnhG
+	A0LRjY1uOZNHY8iJ42bLdbUFeyOHXBzx7w==
+X-Google-Smtp-Source: AGHT+IEMmMZ+G6wxO5aJo2jFS6EC5M2q8MHX4wmy+6f5xjeOWbzyzNji9fVsN/f5iY+bMwQpNo1Ovg==
+X-Received: by 2002:a05:6a00:2d94:b0:6da:83a2:1d5e with SMTP id fb20-20020a056a002d9400b006da83a21d5emr13067220pfb.2.1705328724591;
+        Mon, 15 Jan 2024 06:25:24 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id j5-20020aa783c5000000b006d99f930607sm7895860pfn.140.2024.01.15.06.25.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Jan 2024 06:25:24 -0800 (PST)
+Message-ID: <603ce174-4307-4425-a597-60236c237fdc@kernel.dk>
+Date: Mon, 15 Jan 2024 07:25:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240109084627.p6nekbvq6wpiqq3x@quack3>
+User-Agent: Mozilla Thunderbird
+Subject: Re: PROBLEM: BLKPG_DEL_PARTITION with GENHD_FL_NO_PART used to return
+ ENXIO, now returns EINVAL
+Content-Language: en-US
+To: Karel Zak <kzak@redhat.com>,
+ Allison Karlitskaya <allison.karlitskaya@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <CAOYeF9VsmqKMcQjo1k6YkGNujwN-nzfxY17N3F-CMikE1tYp+w@mail.gmail.com>
+ <20240115125722.bwumutabu4itbrho@ws.net.home>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240115125722.bwumutabu4itbrho@ws.net.home>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 09, 2024 at 09:46:27AM +0100, Jan Kara wrote:
-> On Mon 08-01-24 17:26:41, Christoph Hellwig wrote:
-> > On Wed, Jan 03, 2024 at 01:54:58PM +0100, Christian Brauner wrote:
-> > > I wanted to see whether we can make struct bdev_handle completely
-> > > private to the block layer in the next cycle and unexport low-level
-> > > helpers such as bdev_release() - formerly blkdev_put() - completely.
-> > 
-> > I think we can actually kill bdev_handle entirely.  We can get the
-> > bdev from the bdev inode using I_BDEV already, so no need to store
-> > the bdev.  We don't need the mode field as we known an exlusive
-> > open is equivalent to having a holder.  So just store the older in
-> > file->private_data and the bdev_handle can be removed again.
+On 1/15/24 5:57 AM, Karel Zak wrote:
+> On Mon, Jan 15, 2024 at 01:13:49PM +0100, Allison Karlitskaya wrote:
+>> hi,
+>>
+>> [1.] One line summary of the problem:
+>> BLKPG_DEL_PARTITION on an empty loopback device used to return ENXIO
+>> but now returns EINVAL, breaking partprobe
 > 
-> Well, we also need the read-write mode of the handle in some places but that
-> could be stored in file->f_mode (not sure if it really gets stored there
-> in this patch set - still need to read the details) so in principle I agree
-> that bdev_handle should not be necessary.
+>  Note that partx from util-linux also assumes ENXIO, and this errno is
+>  interpreted as non-error ("ignore this partition").
 
-So I think I've found a way to not even use a new fmode flag for this.
-We can just use a set of file operations def_blk_fops_restricted to
-detect when a block device was opened with restricted write access.
-def_blk_fops isn't needed to check whether something is a block device
-IS_BLK() is enough for that. And def_blk_fops_restricted can be kept
-completely local to block/.
+Can someone send a patch for this?
+
+-- 
+Jens Axboe
+
+
