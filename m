@@ -1,88 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C5E15A5;
-	Mon, 15 Jan 2024 00:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B622A32
+	for <linux-block@vger.kernel.org>; Mon, 15 Jan 2024 02:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hlwrgbtr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520D1C433F1;
-	Mon, 15 Jan 2024 00:13:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705277595;
-	bh=9d8JNOymYGZ3/p+9qqiDWzbARwPOR0ThFsLa+omTDVE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HlwrgbtrQaMjHk6Rl1IBwvE+2sWuIYEn5he/RDz7dSWZhfu/UENTUW929466EuROU
-	 ior5hw4k52TxL8Vd87EW5a2iJgmNEZyPJjUeJDXTntdTbsmyE7/SdwiV9EIAoWldtM
-	 joQIkSN5rhwPYMbpNAK3l2gctjvZ8darjJfrPCu6ArKul1KdEfX0EljfJHR0GcDq8I
-	 uJ5sgUQkwp4kyuYVEfe5WbAbcBCxmlvvQ8OjSovamjWsXmvTtmOD1lEoXGgTETRAHf
-	 JWgsmDt9yubJJ1Y8LE/OL8dmm5WIdxR8Lpz2+GgASw13adcD8MlMMS4Jgj7HCSAQDl
-	 MmaVWl/5A75dQ==
-Message-ID: <b5c9a4d9-894c-4812-8dbf-e623cb1baad2@kernel.org>
-Date: Mon, 15 Jan 2024 09:13:11 +0900
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WhpEtCzP"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3bd81436a5dso49438b6e.0
+        for <linux-block@vger.kernel.org>; Sun, 14 Jan 2024 18:35:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1705286103; x=1705890903; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NGPrP85irDsGWFe70TUihAZuFbLk81immVZNahh9t4E=;
+        b=WhpEtCzPpEeSvXkUTLwOwv1V04MRh4v4V9jx6rGL6uiegvpqQwbc8Qs0RsXtRrgUTN
+         qRF51wwqJ+yGkitd5++rOxp+UuQCxjUXsVKG9ygcxvqTt+XSbNu5p6XVy5FxUSWbQDQF
+         /sXsSz0+L6vzpQug7iF62OGrGPhkGjs8k05hk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705286103; x=1705890903;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NGPrP85irDsGWFe70TUihAZuFbLk81immVZNahh9t4E=;
+        b=io8FE8D2avfu0sUZXBCBrGISlLlXPM3UqeFvb4mv2U1ERtNBBdaGzUcY8Mhu/kqjM2
+         SQBTpr8+hUxpHxvWMvDnesM+4fzttizR2Vit/JSFKICN3avotYfzeS7rHZ0OH762BHez
+         bVxHI25Rk+30VQpuVvO2OmKf0RTkEj2Ss+R/09kClivIdUrJCmUxw1Fk0MGIQeXemiTn
+         vUnOHCpeRyxrtQUWjUY6q7hNi5bl2hOIzy/MlV9nUuLPqJ66zU/bTVq+HVhmpuwOcNK7
+         gKPyQGpPQZeSG2mVQSSTZUzXimGxy9suCzyLeasRCpvCLDBysZ/x5ZaUL/TEi+5xa6Yu
+         1nUw==
+X-Gm-Message-State: AOJu0YxkEm1OmXwjFQapDTSkRwvK0FxlaB2cEvy1rICemflShCeDJVlu
+	tRBu75W7EOXTh0tXvo5MPN6S/8/5BV50
+X-Google-Smtp-Source: AGHT+IFRv0AmoFvgwlkkyp85zuO26TKlaEUoD5VXtzgftfHYB8FPUF8Ah1DQeJR85v80fBf0JBJ+HQ==
+X-Received: by 2002:a05:6808:11c5:b0:3bd:5b4d:3e30 with SMTP id p5-20020a05680811c500b003bd5b4d3e30mr5318468oiv.81.1705286103273;
+        Sun, 14 Jan 2024 18:35:03 -0800 (PST)
+Received: from google.com (KD124209171220.ppp-bb.dion.ne.jp. [124.209.171.220])
+        by smtp.gmail.com with ESMTPSA id b6-20020aa78106000000b006d9b31f670esm6840339pfi.143.2024.01.14.18.35.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jan 2024 18:35:02 -0800 (PST)
+Date: Mon, 15 Jan 2024 11:34:57 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Barry Song <21cnbao@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org,
+	axboe@kernel.dk, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, Barry Song <v-songbaohua@oppo.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] zram: easy the allocation of zcomp_strm's buffers with 2
+ pages
+Message-ID: <20240115023457.GA1504420@google.com>
+References: <20240103003011.211382-1-v-songbaohua@oppo.com>
+ <20240106013021.GA123449@google.com>
+ <CAGsJ_4xp7HFuYbDp3UjMqFKSuz2HJn+5JnJdB-PP_GmucQqOpg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: scsi: block: ioprio: Clean up interface definition -
- ioprio_set03.c:40: TFAIL: ioprio_set IOPRIO_CLASS_BE prio 8 should not work
-Content-Language: en-US
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: linux-block <linux-block@vger.kernel.org>, LTP List <ltp@lists.linux.it>,
- Linux Regressions <regressions@lists.linux.dev>,
- lkft-triage@lists.linaro.org, open list <linux-kernel@vger.kernel.org>,
- Anders Roxell <anders.roxell@linaro.org>,
- Dan Carpenter <dan.carpenter@linaro.org>, chrubis <chrubis@suse.cz>,
- Petr Vorel <pvorel@suse.cz>, Hannes Reinecke <hare@suse.de>,
- Christoph Hellwig <hch@lst.de>, Niklas Cassel <niklas.cassel@wdc.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Jens Axboe <axboe@kernel.dk>
-References: <CA+G9fYu1hB2OMf0EFrt_86OE=0Ug3y6nQd3=OZeEeM1jp3P92g@mail.gmail.com>
- <11a31e09-2e11-43a4-8995-ae70c5bef8bf@kernel.org>
- <CA+G9fYthC3qsH8ey=j3RvCr4-0zp1S3Ysr5QvY6SptorHpju1g@mail.gmail.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <CA+G9fYthC3qsH8ey=j3RvCr4-0zp1S3Ysr5QvY6SptorHpju1g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGsJ_4xp7HFuYbDp3UjMqFKSuz2HJn+5JnJdB-PP_GmucQqOpg@mail.gmail.com>
 
-On 1/13/24 16:05, Naresh Kamboju wrote:
-> On Fri, 12 Jan 2024 at 10:49, Damien Le Moal <dlemoal@kernel.org> wrote:
->>
->> On 1/12/24 14:15, Naresh Kamboju wrote:
->>> The LTP test 'iopri_set03' fails on all the devices.
->>> It fails on linux kernel >= v6.5. ( on Debian rootfs ).
->>> Test fail confirmed on LTP release 20230929 and 20230516.
->>>
->>> Test failed log:
->>> ------------
->>> tst_test.c:1690: TINFO: LTP version: 20230929
->>> tst_test.c:1574: TINFO: Timeout per run is 0h 05m 00s
->>> ioprio_set03.c:40: TFAIL: ioprio_set IOPRIO_CLASS_BE prio 8 should not work
->>> ioprio_set03.c:48: TINFO: tested illegal priority with class NONE
->>> ioprio_set03.c:51: TPASS: returned correct error for wrong prio: EINVAL (22)
->>>
->>> Investigation:
->>> ----------
->>> Bisecting this test between kernel v6.4 and v6.5 shows patch
->>> eca2040972b4 ("scsi: block: ioprio: Clean up interface definition")
->>> as the first faulty commit.
->>>
->>> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
->>
->> This is fixed in LTP. Please update your LTP setup to avoid this issue.
+On (24/01/06 15:38), Barry Song wrote:
+> On Sat, Jan 6, 2024 at 9:30 AM Sergey Senozhatsky
+> <senozhatsky@chromium.org> wrote:
+> >
+> > On (24/01/03 13:30), Barry Song wrote:
+> > > There is no need to keep zcomp_strm's buffers contiguous physically.
+> > > And rarely, 1-order allocation can fail while buddy is seriously
+> > > fragmented.
+> >
+> > Dunno. Some of these don't sound like convincing reasons, I'm afraid.
+> > We don't allocate compression streams all the time, we do it once
+> > per-CPU. And if the system is under such a terrible memory pressure
 > 
-> Please point me to the fixed commit id.
+> We actually do it many times actually because we free it while unplugging and
+> re-allocate it during hotplugging. this can happen quite often for systems like
+> Android using hotplug for power management.
 
-git log --author="Damien Le Moal"
+Okay, makes sense.
+Do you see these problems in real life? I don't recall any reports.
 
-And of course you need to make sure that you are compiling LTP against the
-kernel headers of the target test kernel.
+> > then one probably should not use zram at all, because zsmalloc needs
+> > pages for its pool.
+> 
+> In my humble opinion, 1-order allocation and 0-order allocation are different
+> things, 1-order is still more difficult though it is easier than
+> 2-order which was
+> a big pain causing allocation latency for tasks' kernel stacks and negatively
+> affecting user experience. it has now been replaced by vmalloc and makes
+> life easier :-)
 
+Sure.
 
--- 
-Damien Le Moal
-Western Digital Research
+> > I also wonder whether Android uses HW compression, in which case we
+> > may need to have physically contig pages. Not to mention TLB shootdowns
+> > that virt contig pages add to the picture.
+> 
+> I don't understand how HW compression and TLB shootdown are related as zRAM
+> is using a traditional comp API.
 
+Oh, those are not related. TLB shootdowns are what now will be added to
+all compressions/decompressions, so it's sort of extra cost.
+HW compression (which android may be doing?) is another story.
+
+Did you run any perf tests on zram w/ and w/o the patch?
+
+> We are always passing a virtual address, traditional HW drivers use their own
+> buffers to do DMA.
+> 
+> int crypto_comp_compress(struct crypto_comp *comp,
+> const u8 *src, unsigned int slen,
+> u8 *dst, unsigned int *dlen);
+> int crypto_comp_decompress(struct crypto_comp *comp,
+>   const u8 *src, unsigned int slen,
+>   u8 *dst, unsigned int *dlen);
+> 
+> In new acomp API, we are passing a sg - users' buffers to drivers directly,
+> sg_init_one(&input, src, entry->length);
+> sg_init_table(&output, 1);
+> sg_set_page(&output, page, PAGE_SIZE, 0);
+> acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length, dlen);
+> ret = crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req),
+> &acomp_ctx->wait);
+> 
+> but i agree one-nents sg might have some advantage in scompress case
+
+Right.
+
+> after we move
+> to new acomp APIs if we have this patch I sent recently [patch 3/3],
+> https://lore.kernel.org/linux-mm/20240103095006.608744-1-21cnbao@gmail.com/
+
+Nice.
