@@ -1,136 +1,144 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC3318C32
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 10:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25601A5B7;
+	Tue, 16 Jan 2024 11:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="T1WhdNZr"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240116104734epoutp04e4083e325d510454be1946afdd4ae310~qziICDLzB0304503045epoutp04K
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 10:47:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240116104734epoutp04e4083e325d510454be1946afdd4ae310~qziICDLzB0304503045epoutp04K
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1705402054;
-	bh=Bouy9Zbrzu+4299ES61BBENnvQictDHeWS7erE4RKPw=;
-	h=Date:Subject:To:From:In-Reply-To:References:From;
-	b=T1WhdNZrrfRPX5ZCAHXTQn8jbvesR3yJEaMe5i3PGOpSkMqxIzovT5u1QyYXC0kMs
-	 hmyluqifTMYOaeeaKu3rHzAfhDrkYqdc0AQCeWeiE32x5gNzUqrdNIm317i7gS7uWO
-	 Mp7+YLxoMEPOqvKjgmSJbo0Tx3BnWu2uuz1MeJmc=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20240116104733epcas5p46d905d33923e35b1cf7d4fc805fd55b3~qziHMTu6V2112321123epcas5p4T;
-	Tue, 16 Jan 2024 10:47:33 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4TDm1H49wRz4x9Px; Tue, 16 Jan
-	2024 10:47:31 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	8F.88.09672.3CE56A56; Tue, 16 Jan 2024 19:47:31 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240116104731epcas5p3c93afa0d7cae280f14b03a1a6c013021~qziE6wUad0439004390epcas5p3w;
-	Tue, 16 Jan 2024 10:47:31 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240116104731epsmtrp129a38164db8f899b6eff1f1ef4c3b906~qziE6OvUh3063330633epsmtrp1Z;
-	Tue, 16 Jan 2024 10:47:31 +0000 (GMT)
-X-AuditID: b6c32a4b-60bfd700000025c8-78-65a65ec32876
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	DE.A7.07368.2CE56A56; Tue, 16 Jan 2024 19:47:30 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240116104730epsmtip2f7a61493d6c79834c7bc6913b02c5c87~qziEO_ZCN0935109351epsmtip2b;
-	Tue, 16 Jan 2024 10:47:30 +0000 (GMT)
-Message-ID: <df7f0c37-fdb3-8a7e-435a-80336fe74e32@samsung.com>
-Date: Tue, 16 Jan 2024 16:17:29 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njZImTaL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31BB1C433F1;
+	Tue, 16 Jan 2024 11:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705402830;
+	bh=ka4ginUjS5CjHM0V8b8SOVIgogjHzG2IgkhfNwVc7Mk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=njZImTaLdGb3i9JS73leCK9eh65efGnlVfx/VydMfLkNv5haxpeZsJz542IqxYsAd
+	 bk0gnJZretKX1VoQYIliU5Z9a8SVRDJyb0fPuSXtVPAUuXQlmkrfW208s9DtVHKaqu
+	 oBs0HJCLs2LSHkpCGwpvXoKhbJSHLJ1k/+L+Tyo1s0G2fqEMt4wimAIFk1kKQfsAiF
+	 /t2suYFIZybiRQR0l0UALkir0ZAjgfbJaIrRjP42+hAQUdVHv05DZCdAwzV2+GySso
+	 hk0R/R31qg4CLn2XgwnQSj0W1Mys3DF3+LDZ49i3v4/Ue+LpznmxXib7T/rYR93IGP
+	 UWVPaWNx7TRKA==
+From: Christian Brauner <brauner@kernel.org>
+To: lsf-pc@lists.linux-foundation.org
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Matthew Wilcox <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>,
+	Christoph Hellwig <hch@infradead.org>
+Subject: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
+Date: Tue, 16 Jan 2024 11:50:32 +0100
+Message-ID: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH 2/2] block: cache current nsec time in struct blk_plug
-Content-Language: en-US
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, Jens Axboe
-	<axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <6f98b078-5378-4d6b-8089-76bc53de2894@wdc.com>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrLKsWRmVeSWpSXmKPExsWy7bCmpu7huGWpBrtXy1isvtvPZvG36x6T
-	xd5b2g7MHpfPlnp83iTn0X6gmymAOSrbJiM1MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DS
-	wlxJIS8xN9VWycUnQNctMwdojZJCWWJOKVAoILG4WEnfzqYov7QkVSEjv7jEVim1ICWnwKRA
-	rzgxt7g0L10vL7XEytDAwMgUqDAhO2Ph923sBdvZKya1iDUw/mDtYuTkkBAwkbi55ziQzcUh
-	JLCbUWLpkTdsIAkhgU+MEu+XO0MkvjFKLOn+zw7T8fz4LzaIxF5GiVUv2lkgnLeMEj/mzmMG
-	qeIVsJNoXdYC1sEioCpx7HwXC0RcUOLkzCdgtqhAksSvq3MYQWxhAS+JBT0zwW5iFhCXuPVk
-	PhPIUBGBSYwS2+bdA0pwcLAJaEpcmFwKUsMpYC2x8OZGZoh6eYntb+cwg9RLCJxil/h9fhYz
-	SL2EgItEY6McxNXCEq+Ob4H6QEriZX8blJ0scWnmOSYIu0Ti8Z6DULa9ROupfrAxzEBr1+/S
-	h1jFJ9H7+wkTxHReiY42IYhqRYl7k55CQ1Rc4uGMJVC2h0TvwefQ0J3JJHHi6znGCYzys5BC
-	YhaSj2ch+WYWwuYFjCyrGCVTC4pz01OLTQuM81LL4VGcnJ+7iRGc7rS8dzA+evBB7xAjEwfj
-	IUYJDmYlEV5/g2WpQrwpiZVVqUX58UWlOanFhxhNgVEykVlKNDkfmHDzSuINTSwNTMzMzEws
-	jc0MlcR5X7fOTRESSE8sSc1OTS1ILYLpY+LglGpgqn5VqORWznw3++HCpYtMgxxWpOi0KD3S
-	1bVWPn1hZ9dVX5WJx3c+mHp777+if4p1u8WawxkPfZiQELT9YdeeUOOWfQdEVC+ar7i3V04n
-	fDL3219akzecvD3rz4SfZuf87LMzTuqu1vf41Mq4VE90q7vPe5djtx+GLy99HqHm9uPMKfti
-	7xUmVlenL7Pzl2dOPniG++qsfAZHvvyDjdVLnk3LS7f/WTBjt8zkvJ8HeNgthe9JqFd/FVj8
-	ZYvaAZs7+1oau14orWhcPbE3ICna8FlhwdOLN/68sT0qzenBeniOyoQs4+b+hMm/X8yZai5b
-	X2lzXT2eU3O5hlz7snVL4+yc+ePYDh9xnKDCkb3GT4mlOCPRUIu5qDgRANeuahgABAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFLMWRmVeSWpSXmKPExsWy7bCSvO6huGWpBgfPmFmsvtvPZvG36x6T
-	xd5b2g7MHpfPlnp83iTn0X6gmymAOYrLJiU1J7MstUjfLoErY+H3bewF29krJrWINTD+YO1i
-	5OSQEDCReH78FxuILSSwm1Hi5CtniLi4RPO1H+wQtrDEyn/PgWwuoJrXjBILdl5jBknwCthJ
-	tC5rAStiEVCVOHa+iwUiLihxcuYTMFtUIEliz/1GJhBbWMBLYkHPTLDFzEALbj2ZzwQyVERg
-	EqPEksMfoTbMZJI4c+IvkMPBwSagKXFhcilIA6eAtcTCmxuZIZrNJLq2djFC2PIS29/OYZ7A
-	KDgLye5ZSHbMQtIyC0nLAkaWVYySqQXFuem5yYYFhnmp5XrFibnFpXnpesn5uZsYwcGtpbGD
-	8d78f3qHGJk4GA8xSnAwK4nw+hssSxXiTUmsrEotyo8vKs1JLT7EKM3BoiTOazhjdoqQQHpi
-	SWp2ampBahFMlomDU6qBSc/XhnXt3a3sBRe6vj27zTp937K/k5LvBe74xfeVb3Pd0qJ2976L
-	u7OmhE3gaGWcI9MutmRx4tUCxlXf+dIcVMNXfqyrnpzl31VSz1z61nCzePrfohWbzh+87+iS
-	ECP7TVtdTl85Z+uNigd86dfjhRwkm0Q+TJPfo9Jmy7DE7WTPLZVZ3v9Zqnzf+i3JXfWo4Zcf
-	892tVUaurU++tIjncYgVn5k7Ydqe/YZW70SzxG36GpsT+12bikXXhDZfMsld5bpN7vs3jkdn
-	wpZtf/xcvX3VW509+uJe78NlDizglGf/f7lSd/qqHbtX622ZutSswcrj5xWnfTszP/7c3Tb3
-	xPMAQ40ejRobEcbaLZPPKbEUZyQaajEXFScCAEJQ6ArdAgAA
-X-CMS-MailID: 20240116104731epcas5p3c93afa0d7cae280f14b03a1a6c013021
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77
-References: <20240115215840.54432-1-axboe@kernel.dk>
-	<CGME20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77@epcas5p1.samsung.com>
-	<20240115215840.54432-3-axboe@kernel.dk>
-	<ff4a6649-9f09-23fc-ad33-06deb4845590@samsung.com>
-	<6f98b078-5378-4d6b-8089-76bc53de2894@wdc.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4352; i=brauner@kernel.org; h=from:subject:message-id; bh=EZGa/THoxMnhCwXco+IB49hkRcRBCokvtP+wu+ae8TI=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQui6/iW+TkW1bY+nLiIYdrzh8e7+7m1EpZM4GVceKZa 8sXfT/9u6OUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAi6S0Mf4X/PtP+YNM6IYvH 8eqNoOLTTVszb3D5fp7MoH4wqqaO7SLD/yrh1jc7bf/qtzIvCHPh+Xq6gf/7hrsrVj+ZLmHxpcV jBwcA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On 1/16/2024 3:55 PM, Johannes Thumshirn wrote:
-> On 16.01.24 10:52, Kanchan Joshi wrote:
->>> +	if (!plug)
->>> +		return ktime_get_ns();
->>> +	if (!(plug->cur_ktime & 1ULL)) {
->>> +		plug->cur_ktime = ktime_get_ns();
->>> +		plug->cur_ktime |= 1ULL;
->>> +	}
->>> +	return plug->cur_ktime;
->>
->> I did not understand the relevance of 1ULL here.
->> If ktime_get_ns() returns even value, it will turn that into an odd
->> value before caching. And that value will be returned for the subsequent
->> calls.
->> But how is that better compared to just caching whatever ktime_get_ns()
->> returned.
->>
->>
-> 
-> IIUC it's an indicator if plug->cur_ktime has been set or not.
-> But I don't understand why we can't compare with 0?
+Hey,
 
-Yes, that's what I meant by 'just caching whatever ktime_get_ns() returned'.
-if (!plug->cur_ktime)
-	plug->cur_ktime = ktime_get_ns();
+I'm not sure this even needs a full LSFMM discussion but since I
+currently don't have time to work on the patch I may as well submit it.
 
-An indicator should not alter the return (unless there is a reason).
+Gnome recently got awared 1M Euro by the Sovereign Tech Fund (STF). The
+STF was created by the German government to fund public infrastructure:
 
+"The Sovereign Tech Fund supports the development, improvement and
+ maintenance of open digital infrastructure. Our goal is to sustainably
+ strengthen the open source ecosystem. We focus on security, resilience,
+ technological diversity, and the people behind the code." (cf. [1])
 
+Gnome has proposed various specific projects including integrating
+systemd-homed with Gnome. Systemd-homed provides various features and if
+you're interested in details then you might find it useful to read [2].
+It makes use of various new VFS and fs specific developments over the
+last years.
+
+One feature is encrypting the home directory via LUKS. An approriate
+image or device must contain a GPT partition table. Currently there's
+only one partition which is a LUKS2 volume. Inside that LUKS2 volume is
+a Linux filesystem. Currently supported are btrfs (see [4] though),
+ext4, and xfs.
+
+The following issue isn't specific to systemd-homed. Gnome wants to be
+able to support locking encrypted home directories. For example, when
+the laptop is suspended. To do this the luksSuspend command can be used.
+
+The luksSuspend call is nothing else than a device mapper ioctl to
+suspend the block device and it's owning superblock/filesystem. Which in
+turn is nothing but a freeze initiated from the block layer:
+
+dm_suspend()
+-> __dm_suspend()
+   -> lock_fs()
+      -> bdev_freeze()
+
+So when we say luksSuspend we really mean block layer initiated freeze.
+The overall goal or expectation of userspace is that after a luksSuspend
+call all sensitive material has been evicted from relevant caches to
+harden against various attacks. And luksSuspend does wipe the encryption
+key and suspend the block device. However, the encryption key can still
+be available clear-text in the page cache. To illustrate this problem
+more simply:
+
+truncate -s 500M /tmp/img
+echo password | cryptsetup luksFormat /tmp/img --force-password
+echo password | cryptsetup open /tmp/img test
+mkfs.xfs /dev/mapper/test
+mount /dev/mapper/test /mnt
+echo "secrets" > /mnt/data
+cryptsetup luksSuspend test
+cat /mnt/data
+
+This will still happily print the contents of /mnt/data even though the
+block device and the owning filesystem are frozen because the data is
+still in the page cache.
+
+To my knowledge, the only current way to get the contents of /mnt/data
+or the encryption key out of the page cache is via
+/proc/sys/vm/drop_caches which is a big hammer.
+
+My initial reaction is to give userspace an API to drop the page cache
+of a specific filesystem which may have additional uses. I initially had
+started drafting an ioctl() and then got swayed towards a
+posix_fadvise() flag. I found out that this was already proposed a few
+years ago but got rejected as it was suspected this might just be
+someone toying around without a real world use-case. I think this here
+might qualify as a real-world use-case.
+
+This may at least help securing users with a regular dm-crypt setup
+where dm-crypt is the top layer. Users that stack additional layers on
+top of dm-crypt may still leak plaintext of course if they introduce
+additional caching. But that's on them.
+
+Of course other ideas welcome.
+
+[1]: https://www.sovereigntechfund.de/en
+[2]: https://systemd.io/HOME_DIRECTORY
+[3]: https://lore.kernel.org/linux-btrfs/20230908-merklich-bebauen-11914a630db4@brauner/
+[4]: A bdev_freeze() call ideally does the following:
+
+     (1) Freeze the block device @bdev
+     (2) Find the owning superblock of the block device @bdev and freeze the
+         filesystem as well.
+
+     Especially (2) wasn't true for a long time. Filesystems would only be
+     able to freeze the filesystems on the main block device. For example, an
+     xfs filesystem using an external log device would not be able to be
+     frozen if the block layer request came via the external log device. This
+     is fixed since v6.8 for all filesystems using appropriate holder
+     operations.
+
+     Except for btrfs where block device initiated freezes don't work at all;
+     not even for the main block device. I've pointed this out months ago in [3].
+
+     Which is why we currently can't use btrfs with LUKS2 encryption as as
+     luksSuspend call will leave the filesystem unfrozen.
+[5]: https://gitlab.com/cryptsetup/cryptsetup/-/issues/855
+     https://gitlab.gnome.org/Teams/STF/homed/-/issues/23
