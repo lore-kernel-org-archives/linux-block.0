@@ -1,85 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2893167430;
-	Tue, 16 Jan 2024 20:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E47628DA1
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 20:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435438; cv=none; b=nHi0XoiaigDRb0SOBfr7sjeN+CQnAOsUzJtU+1kDBysQKwZTvhDNijIowmi5JMehMr8nKpbrCmAGwh/JihwHvg+AJQHMj/sL0ZLydsoBarkCaIamdDtNN6DS//hSAC8roJx2ziItCJw8XDSPLpdwh8TylvdjH8RfKh18fL8dIEA=
+	t=1705438566; cv=none; b=H9h2hE90jHBnApXWP6kz5IqyNcip375RkG59DaD5RA8r5Z2mGO21xDGmJPjeNCnqM3WpfSVHlRs2JEFeYi2rxSaoUVwevbMq7Mp3cWmWCoczg7fAYj6eA5xAlq+OovCHcSoYJBY074UmNKPX56KgIcfb/rWzkfwOXfcHRXbCn7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435438; c=relaxed/simple;
-	bh=sQuBLIJZ61zGZVQAbYy/TB3/42ntXDLxwmsaFHwIFmg=;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=rb2GMmszXr1GsvaN59mHZpG02puy4GUpq9hZlCKSybrq0GAJj6Hm4n6aXfwx4BR2ii5texQ/fsEBoXRG9JUs5Qy8c/YZqjQ3pBxgruNqjdP1LihcPea45Sj4EUq+6zQxtncbv5FLXpbwcBeOLTczCrF3rpf++rnztllvtFmSHnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZ3LrlhI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1705438566; c=relaxed/simple;
+	bh=qkJUyIiGo86M3vJLmeWZoSuCSRe8dbtkBlXcHSS3RgI=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=FATibBRc/pCIwsCsWF3IVMiyhi59Z8taGXSIOQJGSZ/aQTOftxW03lFGEOPtYDvFKjfI3zRXXcLwQM34dgy6DlCutQB7Hb4yBHWugfEKSe+pPmwkA3Yi1C1SdrPyD1BroNJracAL7q2U6YdWdRjsemAQsQB2f2mp7O+IgXm2JXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=KTiMy+kc; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZ3LrlhI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B79CC43390;
-	Tue, 16 Jan 2024 20:03:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435437;
-	bh=sQuBLIJZ61zGZVQAbYy/TB3/42ntXDLxwmsaFHwIFmg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EZ3LrlhIk+30wep91Vk3+ZR4qzplJo+fpR38jekRelx32jXFE/gA6vKBY20yu5xOS
-	 gzQR+GoQ9XCxMWGJRgUFa9XwZ53f5fYpp5QgjEYOcDnfyPiMsuSAfmFfk3VnkA9vB9
-	 EbNMURA3+FGUiJvFjWvfWdt9LG/Iglg5pkjk4N0CPv7gwxT0b71Jd7AATp8v1+IZtZ
-	 tToQC8ksip3cftILDWi2c5ehweVn0fhV+/o2KzOLPbJy0M+GrXJQnrg/gFrWWdN8is
-	 zUTwZiwT/EhBszOBEayDwxRYO7R0aNsymDgIilx4adLWxnjBYcP4sea4CdosQy50tE
-	 SPhR1jOUws48g==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 23/31] block: prevent an integer overflow in bvec_try_merge_hw_page
-Date: Tue, 16 Jan 2024 15:02:32 -0500
-Message-ID: <20240116200310.259340-23-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116200310.259340-1-sashal@kernel.org>
-References: <20240116200310.259340-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="KTiMy+kc"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d40eec5e12so87199005ad.1
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 12:56:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1705438564; x=1706043364; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R4ODcMiKnN9uc2CQEPWploNVotAW/sU5YV82cEbm6cw=;
+        b=KTiMy+kc8JM8fXcGwycKna1LSTL4do94MyhgRte9j54JnihFeB1IA0sO7I1owyyMTx
+         xaE+G752K7bgmoG4qavU3fZOI+hW74eNbuNT1ueZ8bVUe3FArp6BiEsrYzZLHQUA6P1k
+         Apo6rUKDDAkPt/GMi4cxlwuTXUxJSPWAIL+3z2LDDqDVU0R6A9o5UxJehJanaCncpAjA
+         4hpap9oWpHxkD51lQyNt4UECrCO/xR9Jr8j5yqWQ5lr6zUkWtXaFLO2UV/pSYowQsSFG
+         /+H0+IWMlrN47NstkWCeb+E8NMKZZhJsqJu/STzTPEao3E+UKHE7Ga7yokD8HdX6K2co
+         wWGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705438564; x=1706043364;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R4ODcMiKnN9uc2CQEPWploNVotAW/sU5YV82cEbm6cw=;
+        b=ARD+Vc3zgyrLNeXKP9rYjlA6h5xZBZvj5Zv403IqlzYPfDlTe+P7hpNh40wMVYKEMA
+         N6hjg7OK+jr2uEY85RWhLEaQw4a5HSsS9Ujvv7YP86VR1YHmsYeebQfTHI2bB2jwFt5Z
+         7u0weMTcdrx7X+erivoTHW1wvQC/Ti4KILUkhhqWkppH1dlODUO69O/uk8ZQhMTHsqUw
+         RpdGyf/iKkF6vjY5GOspot+pC8So3Q/hh2ymO6qvUO2MCesmUsb+38PtyPMy/eepxIRO
+         W1zpj4uNuJKwqH71Y1cfT9hsAThtW16X3ujs94hkUmBL+hBrCjWYqyL15NAJcOvUzVD0
+         rUsQ==
+X-Gm-Message-State: AOJu0YzMCojU9TENVgBgQMxGO83K/8z2o8InmhhDvKr0GB5NDD+Ua7zC
+	eP/wx5yKMTDFjpbeKEdM/eIurn0HuCDGRA==
+X-Google-Smtp-Source: AGHT+IFwoCp6EyOkXVbSZ/bZy3zGhRgZXj/tnkE3Ntm0JfGhaZXJ5mMWTPmLTDkXojp/i0RmI+gT9w==
+X-Received: by 2002:a17:903:1c4:b0:1d4:ca3d:742e with SMTP id e4-20020a17090301c400b001d4ca3d742emr10699298plh.67.1705438564540;
+        Tue, 16 Jan 2024 12:56:04 -0800 (PST)
+Received: from dread.disaster.area (pa49-180-249-6.pa.nsw.optusnet.com.au. [49.180.249.6])
+        by smtp.gmail.com with ESMTPSA id y15-20020a17090264cf00b001d5e734868esm1716838pli.241.2024.01.16.12.56.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 12:56:03 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rPqTZ-00BIHT-0N;
+	Wed, 17 Jan 2024 07:56:01 +1100
+Date: Wed, 17 Jan 2024 07:56:01 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
+Message-ID: <ZabtYQqakvxJVYjM@dread.disaster.area>
+References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.267
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
 
-From: Christoph Hellwig <hch@lst.de>
+On Tue, Jan 16, 2024 at 11:50:32AM +0100, Christian Brauner wrote:
+> Hey,
+> 
+> I'm not sure this even needs a full LSFMM discussion but since I
+> currently don't have time to work on the patch I may as well submit it.
+> 
+> Gnome recently got awared 1M Euro by the Sovereign Tech Fund (STF). The
+> STF was created by the German government to fund public infrastructure:
+> 
+> "The Sovereign Tech Fund supports the development, improvement and
+>  maintenance of open digital infrastructure. Our goal is to sustainably
+>  strengthen the open source ecosystem. We focus on security, resilience,
+>  technological diversity, and the people behind the code." (cf. [1])
+> 
+> Gnome has proposed various specific projects including integrating
+> systemd-homed with Gnome. Systemd-homed provides various features and if
+> you're interested in details then you might find it useful to read [2].
+> It makes use of various new VFS and fs specific developments over the
+> last years.
+> 
+> One feature is encrypting the home directory via LUKS. An approriate
+> image or device must contain a GPT partition table. Currently there's
+> only one partition which is a LUKS2 volume. Inside that LUKS2 volume is
+> a Linux filesystem. Currently supported are btrfs (see [4] though),
+> ext4, and xfs.
+> 
+> The following issue isn't specific to systemd-homed. Gnome wants to be
+> able to support locking encrypted home directories. For example, when
+> the laptop is suspended. To do this the luksSuspend command can be used.
+> 
+> The luksSuspend call is nothing else than a device mapper ioctl to
+> suspend the block device and it's owning superblock/filesystem. Which in
+> turn is nothing but a freeze initiated from the block layer:
+> 
+> dm_suspend()
+> -> __dm_suspend()
+>    -> lock_fs()
+>       -> bdev_freeze()
+> 
+> So when we say luksSuspend we really mean block layer initiated freeze.
+> The overall goal or expectation of userspace is that after a luksSuspend
+> call all sensitive material has been evicted from relevant caches to
+> harden against various attacks. And luksSuspend does wipe the encryption
+> key and suspend the block device. However, the encryption key can still
+> be available clear-text in the page cache.
 
-[ Upstream commit 3f034c374ad55773c12dd8f3c1607328e17c0072 ]
+The wiping of secrets is completely orthogonal to the freezing of
+the device and filesystem - the freeze does not need to occur to
+allow the encryption keys and decrypted data to be purged. They
+should not be conflated; purging needs to be a completely separate
+operation that can be run regardless of device/fs freeze status.
 
-Reordered a check to avoid a possible overflow when adding len to bv_len.
+FWIW, focussing on purging the page cache omits the fact that
+having access to the directory structure is a problem - one can
+still retrieve other user information that is stored in metadata
+(e.g. xattrs) that isn't part of the page cache. Even the directory
+structure that is cached in dentries could reveal secrets someone
+wants to keep hidden (e.g code names for operations/products).
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Link: https://lore.kernel.org/r/20231204173419.782378-2-hch@lst.de
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So if we want luksSuspend to actually protect user information when
+it runs, then it effectively needs to bring the filesystem right
+back to it's "just mounted" state where the only thing in memory is
+the root directory dentry and inode and nothing else.
 
-diff --git a/block/bio.c b/block/bio.c
-index 08dbdc32ceaa..17d64539819e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -710,7 +710,7 @@ static bool bio_try_merge_pc_page(struct request_queue *q, struct bio *bio,
- 
- 	if ((addr1 | mask) != (addr2 | mask))
- 		return false;
--	if (bv->bv_len + len > queue_max_segment_size(q))
-+	if (len > queue_max_segment_size(q) - bv->bv_len)
- 		return false;
- 	return __bio_try_merge_page(bio, page, len, offset, same_page);
- }
+And, of course, this is largely impossible to do because anything
+with an open file on the filesystem will prevent this robust cache
+purge from occurring....
+
+Which brings us back to "best effort" only, and at this point we
+already have drop-caches....
+
+Mind you, I do wonder if drop caches is fast enough for this sort of
+use case. It is single threaded, and if the filesystem/system has
+millions of cached inodes it can take minutes to run. Unmount has
+the same problem - purging large dentry/inode caches takes a *lot*
+of CPU time and these operations are single threaded.
+
+So it may not be practical in the luks context to purge caches e.g.
+suspending a laptop shouldn't take minutes. However laptops are
+getting to the hundreds of GB of RAM these days and so they can
+cache millions of inodes, so cache purge runtime is definitely a
+consideration here.
+
+-Dave.
 -- 
-2.43.0
-
+Dave Chinner
+david@fromorbit.com
