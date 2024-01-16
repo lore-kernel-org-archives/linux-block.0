@@ -1,30 +1,29 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A31A1C68D
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 16:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6C61C68D
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 16:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZHEHTIw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E230EC433C7;
-	Tue, 16 Jan 2024 16:13:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vCqh2kvE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2281C433C7;
+	Tue, 16 Jan 2024 16:15:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705421603;
-	bh=xoZFeHqQobIyWNDfnWjvip7s2dxbUjiFqEPf50SX6sU=;
+	s=k20201202; t=1705421749;
+	bh=+Uo21ImWV1sQ3ZZIKuu0BtbpmQmilWlkOp3ElTUJ0PA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SZHEHTIwGQs1ioKPRlEsKgckbf+95n+xTCaE//7kRpXKckYawJ9igHK73ZQoe99qj
-	 a9Hb0LSAyxgwHJ/2AWwHPSzgUJTYaMNjcB7Ze9eiOkcDlGL5wVsuXa76t4JT+VjdXN
-	 PHUVm6mlTOVUpZSmNMGgJFr8akILCc8j9Sf5q99rbLEw+mWypWh7sGm6fAxEW+Ulmz
-	 TynLF401mTRVKckVJCsx+eRCWBdzjJKu/uPxRLRZfwda0+MOW+Ta1Q2NquAa4IdKbJ
-	 DVulRZIumUTuLsnFvtpa3w/rBO13X/c+3prCkDbn2vPn3jos4mTvUGrgO40EWP8LwO
-	 en/6DNvWd6s2A==
-Date: Tue, 16 Jan 2024 09:13:20 -0700
+	b=vCqh2kvEhnkZylfJTMCZLW5Jw2KoYE9iPJc6fADpDj4mF+zQBnwFlwlhILJBXGwWr
+	 LSlGzKZJtn5LAdAFRMp261yXgYwT4XQXPEtT+CEF+iAEozuI+HC6b30O1w50amgTjS
+	 pMoexdeLlbVL3r7l+ET5ZpsHW8UeK1k7HvBKUaUc9P8JRyGC8JK05W7KPDzCqYdgKB
+	 +D/pf2/ZYJLbNgEjgzzJd/0BIQZGq7XqPCRtv004oHyfGHUf3gjrKC8HgnVJUgxPmj
+	 +bM5mPVjMLxqCSWyLd1G3+k1I3uJ+XJITX+FZswE9+JEQCjhBb54pVB7bqfxoI1rxv
+	 8Zk+95JypCUAQ==
+Date: Tue, 16 Jan 2024 09:15:47 -0700
 From: Keith Busch <kbusch@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: cache current nsec time in struct blk_plug
-Message-ID: <ZaarIH6-Elu2g3rL@kbusch-mbp.dhcp.thefacebook.com>
-References: <20240115215840.54432-1-axboe@kernel.dk>
- <20240115215840.54432-3-axboe@kernel.dk>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: bio-integrity: fix kcalloc() arguments order
+Message-ID: <Zaarswh89NBfpW8i@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240116143437.89060-1-dmantipov@yandex.ru>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,53 +32,26 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240115215840.54432-3-axboe@kernel.dk>
+In-Reply-To: <20240116143437.89060-1-dmantipov@yandex.ru>
 
-On Mon, Jan 15, 2024 at 02:53:55PM -0700, Jens Axboe wrote:
-> If the block plug gets flushed, eg on preempt or schedule out, then
-> we invalidate the cached clock.
+On Tue, Jan 16, 2024 at 05:34:31PM +0300, Dmitry Antipov wrote:
+> When compiling with gcc version 14.0.1 20240116 (experimental)
+> and W=1, I've noticed the following warning:
+> 
+> block/bio-integrity.c: In function 'bio_integrity_map_user':
+> block/bio-integrity.c:339:38: warning: 'kcalloc' sizes specified with 'sizeof'
+> in the earlier argument and not in the later argument [-Wcalloc-transposed-args]
+>   339 |                 bvec = kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
+>       |                                      ^
+> block/bio-integrity.c:339:38: note: earlier argument should specify number of
+> elements, later size of each element
+> 
+> Since 'n' and 'size' arguments of 'kcalloc()' are multiplied to
+> calculate the final size, their actual order doesn't affect the
+> result and so this is not a bug. But it's still worth to fix it.
+> 
+> Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
 
-There must be something implicitly happening that I am missing. Where is
-the 'cur_time' cached clock invalidated on a plug flush?
- 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 11342af420d0..cc4db4d92c75 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1073,6 +1073,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
->  	if (tsk->plug)
->  		return;
->  
-> +	plug->cur_ktime = 0;
->  	plug->mq_list = NULL;
->  	plug->cached_rq = NULL;
->  	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 2f9ceea0e23b..23c237b22071 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -942,6 +942,7 @@ struct blk_plug {
->  
->  	/* if ios_left is > 1, we can batch tag/rq allocations */
->  	struct request *cached_rq;
-> +	u64 cur_ktime;
->  	unsigned short nr_ios;
->  
->  	unsigned short rq_count;
-> @@ -977,7 +978,15 @@ long nr_blockdev_pages(void);
->  
->  static inline u64 blk_time_get_ns(void)
->  {
-> -	return ktime_get_ns();
-> +	struct blk_plug *plug = current->plug;
-> +
-> +	if (!plug)
-> +		return ktime_get_ns();
-> +	if (!(plug->cur_ktime & 1ULL)) {
-> +		plug->cur_ktime = ktime_get_ns();
-> +		plug->cur_ktime |= 1ULL;
-> +	}
-> +	return plug->cur_ktime;
->  }
->  #else /* CONFIG_BLOCK */
->  struct blk_plug {
+Looks good.
+
+Reviewed-by: Keith Busch <kbusch@kernel.org>
