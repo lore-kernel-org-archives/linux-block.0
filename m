@@ -1,168 +1,94 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8EC51CFA0
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 16:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5441C6B2
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 16:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705424317; cv=none; b=SsT0G+pUWbil2cMkdI2bMQC1gW4jFFmTLb6NJYsVESY4KFGlgp/HNF0hObBk8bWrSv+dzd2RLvgssS5Zsv+sUhYfllJVyaLyxJeyn8ZlL50qM3Suq6Qk6MxkOc0F8WIEsIMV6k1UyhNiUzCcH+xppdYjSSioNmWqBD8kvdXxzKg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705424317; c=relaxed/simple;
+	bh=KHvhReCv44/55dj9+ibrQQb071tGsg2pSA/QTfOa46g=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
+	 To:In-Reply-To:References:Subject:Message-Id:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-Mailer; b=l4N3hphwLyHX94LgIYZkMm+xvIEa27fimwbUQ8k5nD0qznEY4di4qJdikesZqQCQU+PjH4knaG61dQSzx2X0tKZ3lnp63dOM0wSELkNMbabk86JG+YBWx/Ej2FULfTs7A2qszJWMZ/n0Z/h6Du3kyD3KK5xs3f2lK8TcyRhUYAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JFUy9jg5
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="k5my/WeK"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7bb5be6742fso96697439f.1
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 08:58:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JFUy9jg5"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7bee01886baso44470539f.1
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 08:58:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705424307; x=1706029107; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hysg6RovOTmIXu4nuJHgKMsuZrXXJOpIaO3GwxVeu3A=;
-        b=k5my/WeKZU3f0nNY4egjB0PL0eZTjaER18DrBqUCeDOeJXiZqj46DU+HUT6yqx2FIE
-         rzMuj3mD1719hdSSDmoT4cXmyZn7FR8tj1NjNOXXiWo+WRMg/gm4j8UBI+P9ZYYehS7A
-         g9mmGHB/V4fk3ObEkkcsaaPGB5rG6ln9WrBYHRySBeHPXr8QUsSfl3+ZP8V85TPZxwJ5
-         Q2CD2swIp0F78DdDgUKFQBiNedNvZ/8fqT91rWiXuH0XYxKRTVmBHv2eqp0tH2dapGC5
-         za1WFLneXaUQ564XeTvI66cEMwvn1hrI4qALL5OnfWIH0Fnbdopw6qM2DDg/L8qbmaWQ
-         fJUQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705424315; x=1706029115; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KQVl3obLJONQe1N1K6IxWcX7SZKeA8D3RD0YmlI67xE=;
+        b=JFUy9jg5mhChRk6jZve+ubpLiu7BHtWk1FmFQjN5qj4TDMHw7YVMNYMJa4iINX+pTS
+         imJcNekaqBoNyWihRNVMaZq7ocBxHtal+eNityOcYYiG3Y//KGHLCXMeJuN2O5Vv7XoI
+         UA0TXL7JM+8oMZLBBhx3gNI1b4LtcDo0TlEYBqMB2omurWnR6efAeNS5wAxpKX8zP9PI
+         CBkuo1JmbutfYYHqr+yZWTLOoDZo5sG18DearxJLKyoEhu/Es0nPE5eBbGtByxhXtYIf
+         wydk3Y4zqICBTIhU1bXPtBSxj5A+QLFXl7OldV29ZFVzkanf1fA42XyaU+u8crVgl7MM
+         9Jfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705424307; x=1706029107;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1705424315; x=1706029115;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hysg6RovOTmIXu4nuJHgKMsuZrXXJOpIaO3GwxVeu3A=;
-        b=RmT8BOkzLGpUdnvuidmT2njYf//YBbTI2VjyqiBHBK/NVM3+7N/0oOj7T6r5fpv4tO
-         PQdVM6wOWcO9XIPerCEvkl01rlQYsHl9BdL1Ok5MRwCwzqkr+l2hjO23uOmny7/6Kzu5
-         S2Ztperj7892dlZw+7Y1o6nCzte9buHH9xHRxQ64MkJ5jHXdfP1IaEYF22ksyDDXpiYY
-         nf4maL1tV8TRx6bLfkVnw9k/wWZ18iIZQ33QAxEnRuj5NyHFjEruq8/YVtbFTfIrjRex
-         1MNurv8nXEb1lwiYW/XZZVYHWuymcGyPaX/GlPDJgZ2cejblF8sXVM5XIgLum6ikn+bf
-         vH3w==
-X-Gm-Message-State: AOJu0YxHpQOMIvFm82S8whYidY9S4qWntirMrQrhXySJHoULTrLj+5IL
-	pd/YCzzcpaLdM5AIV06g7ZPN+KsuntVOSKvnqMYqyeQT+St0gQ==
-X-Google-Smtp-Source: AGHT+IGULg84pADbJMSwXNynNquAyw5GlWcscj23xjlTdycAgOrsC8es4ZEikPhQVN4fGNfBHEq2kw==
-X-Received: by 2002:a6b:6a1a:0:b0:7bf:356b:7a96 with SMTP id x26-20020a6b6a1a000000b007bf356b7a96mr7320136iog.2.1705424306829;
-        Tue, 16 Jan 2024 08:58:26 -0800 (PST)
-Received: from localhost.localdomain ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id c14-20020a02a60e000000b0046ea43e4d0csm71744jam.168.2024.01.16.08.58.25
+        bh=KQVl3obLJONQe1N1K6IxWcX7SZKeA8D3RD0YmlI67xE=;
+        b=nCTLqTCgtHRAxV3iNV11Io5MngyVnukDrrNweDoXy3UOdYlPUh9k+gyal289EEim5i
+         xyw/DKbkzQMMXD6b5022RIzt87/DMdnZTwz2D6iRcCLqtICTaz+OnB68pPVZos85rY9I
+         zGpWX7UZWZHvsDElV0MuxNLihPr8vxwl5t7jpKVIyTgD9OOmyVwjbfyGyQHbX0nPsKtn
+         6RHI5TgJ1NfWBU5H/LM+lDUAtoU21OsHA+sXyzoXO6QREiPK0rYnTZ4Wu9pY/3/hKXLr
+         IFJp90TliLSV7qgE9FWHWnwfNCZWRZCG6U1r1w3YFOGN252gk1Tfl7pqFK9iQMbiHBmP
+         ZG+w==
+X-Gm-Message-State: AOJu0Yy+qYD40m2uvdZu6RtDp8dh8sAJZqxcriQHZg4vOtOR7b7fPddw
+	d3/lR87q55XfrK2bJ/PHGHIXY+YhGx37BA==
+X-Google-Smtp-Source: AGHT+IGSZL8yXjuYGteHQpIDJn2UMOHG9K0CIfXrzBTxca1is1XIeGlgLQILBL2LFe5HC3qbBvUQ9g==
+X-Received: by 2002:a6b:7e01:0:b0:7be:e328:5e3a with SMTP id i1-20020a6b7e01000000b007bee3285e3amr11401615iom.0.1705424315562;
+        Tue, 16 Jan 2024 08:58:35 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id r8-20020a056638100800b0046dfd35b042sm2995191jab.73.2024.01.16.08.58.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 08:58:25 -0800 (PST)
+        Tue, 16 Jan 2024 08:58:35 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: kbusch@kernel.org,
-	joshi.k@samsung.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/5] block: convert struct blk_plug callback list to hlists
-Date: Tue, 16 Jan 2024 09:54:26 -0700
-Message-ID: <20240116165814.236767-6-axboe@kernel.dk>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116165814.236767-1-axboe@kernel.dk>
-References: <20240116165814.236767-1-axboe@kernel.dk>
+To: tj@kernel.org, linux-block@vger.kernel.org, 
+ Nicky Chorley <ndchorley@gmail.com>
+In-Reply-To: <20240114191056.6992-1-ndchorley@gmail.com>
+References: <20240114191056.6992-1-ndchorley@gmail.com>
+Subject: Re: [PATCH] block: Correct a documentation comment in blk-cgroup.c
+Message-Id: <170542431492.238046.7293062052485358461.b4-ty@kernel.dk>
+Date: Tue, 16 Jan 2024 09:58:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-We currently use a doubly linked list, which means the head takes up
-16 bytes. As any iteration goes over the full list by first splicing it
-to an on-stack copy, we never need to remove members from the middle of
-the list.
 
-Convert it to an hlist instead, saving 8 bytes in the blk_plug structure.
-This also helps save 40 bytes of text in the core block code, tested on
-arm64.
+On Sun, 14 Jan 2024 19:10:56 +0000, Nicky Chorley wrote:
+> Commit 99e603874366
+> ("blk-cgroup: pass a gendisk to the blkg allocation helpers") changed
+> blkg_alloc() to take a struct gendisk instead of a struct request_queue,
+> but the documentation comment still referred to q.
+> 
+> So, update that comment to refer to disk instead and fix a typo.
+> 
+> [...]
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-core.c       | 26 ++++++++++++++------------
- include/linux/blkdev.h |  4 ++--
- 2 files changed, 16 insertions(+), 14 deletions(-)
+Applied, thanks!
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 902799f71a59..a487881fe2a6 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1080,7 +1080,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned char nr_ios)
- 	plug->rq_count = 0;
- 	plug->multiple_queues = false;
- 	plug->has_elevator = false;
--	INIT_LIST_HEAD(&plug->cb_list);
-+	INIT_HLIST_HEAD(&plug->cb_list);
- 
- 	/*
- 	 * Store ordering should not be needed here, since a potential
-@@ -1120,16 +1120,18 @@ EXPORT_SYMBOL(blk_start_plug);
- 
- static void flush_plug_callbacks(struct blk_plug *plug, bool from_schedule)
- {
--	LIST_HEAD(callbacks);
-+	HLIST_HEAD(callbacks);
- 
--	while (!list_empty(&plug->cb_list)) {
--		list_splice_init(&plug->cb_list, &callbacks);
-+	while (!hlist_empty(&plug->cb_list)) {
-+		struct hlist_node *entry, *tmp;
- 
--		while (!list_empty(&callbacks)) {
--			struct blk_plug_cb *cb = list_first_entry(&callbacks,
--							  struct blk_plug_cb,
--							  list);
--			list_del(&cb->list);
-+		hlist_move_list(&plug->cb_list, &callbacks);
-+
-+		hlist_for_each_safe(entry, tmp, &callbacks) {
-+			struct blk_plug_cb *cb;
-+
-+			cb = hlist_entry(entry, struct blk_plug_cb, list);
-+			hlist_del(&cb->list);
- 			cb->callback(cb, from_schedule);
- 		}
- 	}
-@@ -1144,7 +1146,7 @@ struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug, void *data,
- 	if (!plug)
- 		return NULL;
- 
--	list_for_each_entry(cb, &plug->cb_list, list)
-+	hlist_for_each_entry(cb, &plug->cb_list, list)
- 		if (cb->callback == unplug && cb->data == data)
- 			return cb;
- 
-@@ -1154,7 +1156,7 @@ struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug, void *data,
- 	if (cb) {
- 		cb->data = data;
- 		cb->callback = unplug;
--		list_add(&cb->list, &plug->cb_list);
-+		hlist_add_head(&cb->list, &plug->cb_list);
- 	}
- 	return cb;
- }
-@@ -1162,7 +1164,7 @@ EXPORT_SYMBOL(blk_check_plugged);
- 
- void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- {
--	if (!list_empty(&plug->cb_list))
-+	if (!hlist_empty(&plug->cb_list))
- 		flush_plug_callbacks(plug, from_schedule);
- 	blk_mq_flush_plug_list(plug, from_schedule);
- 	/*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5b17d0e460e4..f339f856e44f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -950,13 +950,13 @@ struct blk_plug {
- 	bool multiple_queues;
- 	bool has_elevator;
- 
--	struct list_head cb_list; /* md requires an unplug callback */
-+	struct hlist_head cb_list; /* md requires an unplug callback */
- };
- 
- struct blk_plug_cb;
- typedef void (*blk_plug_cb_fn)(struct blk_plug_cb *, bool);
- struct blk_plug_cb {
--	struct list_head list;
-+	struct hlist_node list;
- 	blk_plug_cb_fn callback;
- 	void *data;
- };
+[1/1] block: Correct a documentation comment in blk-cgroup.c
+      commit: 521277d12b5a75982d4f642d2ee22db8d7f986dd
+
+Best regards,
 -- 
-2.43.0
+Jens Axboe
+
+
 
