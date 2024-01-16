@@ -1,164 +1,100 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAE51BF23;
-	Tue, 16 Jan 2024 13:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TDqzb3cbZz4f3jJ2;
-	Tue, 16 Jan 2024 21:46:19 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 39D281A0A00;
-	Tue, 16 Jan 2024 21:46:23 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBnOBGtiKZlSqsRBA--.20499S3;
-	Tue, 16 Jan 2024 21:46:23 +0800 (CST)
-Subject: Re: PROBLEM: BLKPG_DEL_PARTITION with GENHD_FL_NO_PART used to return
- ENXIO, now returns EINVAL
-To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@infradead.org>,
- Allison Karlitskaya <allison.karlitskaya@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>
-References: <CAOYeF9VsmqKMcQjo1k6YkGNujwN-nzfxY17N3F-CMikE1tYp+w@mail.gmail.com>
- <ZaZesiKpbMEiiTrf@infradead.org>
- <210deda9-5439-244a-0ce2-af9dc8e5d7fe@huaweicloud.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <592625f7-36d7-02e0-2ee6-8211334aa0f9@huaweicloud.com>
-Date: Tue, 16 Jan 2024 21:46:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE2F17BCF
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 14:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uhZX1/Ah"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bee9f626caso48374539f.0
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 06:41:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705416089; x=1706020889; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AO1cGJ6yR5rhuGGsnNJ25N8iwi3HgScYUyOHxA7RNBc=;
+        b=uhZX1/AhV88opPWcP8TYkVidtBr+gZjcpcks0JdhqNaNYX9qUzBw+IEA7II0xPgGvg
+         fyaPH4Rr4OEeNOB4O1QK9MF2YEfblKj+zCWhyeN9Six+2yqRfmNndiwGPZIkSZRpB+L3
+         gUJYls7MMUZ0Q5FaAEJT3vxy5WKF8EUac1VyRmSZIkhRHEUiCLkEiSFsQO5cadA1vlo8
+         n29Jmy1ZqBHOeVRkVoO/DGg4GtIawW+tnFu9avdeZjBIz7v8Zb/O1oEO+aG8NvHb8BSp
+         iUyTDqDIKYqK39daXEcsDaKMBwjtVzsKOQ0D4vj15d9NBD68YBLSxsGmli+hy+ChVM+Q
+         Q4lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705416089; x=1706020889;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AO1cGJ6yR5rhuGGsnNJ25N8iwi3HgScYUyOHxA7RNBc=;
+        b=Y3NiJC+Py295CRw+CJyCBFCUEsWLgThyqM6M9aJM3bcwfnaBVN1zsw8S4nUZdR4aUz
+         QR2oa/Mcd9W20diTbPAlC/P07EQ12wPe1eBMeD6PZjTAgOcne+E96zqn/OmOfF+4XY/U
+         AcOAmZlgQXs/+SMUSwBCF3nKyOB2s8eN7uo9PB+clycaxc4+OuVYTCRSDgwIg9Am4HaX
+         YA5Zlha5DecDozYriNqfwgcDuTfggvFDMa8XFdQlppbwOe5LD1JNEleL/hZv6MuWOpVZ
+         xf40+SZe8ZFZODJt43OxV73o97A3LGUz41fWGwr5Y6N8drMLWiZZ2MGSaqUR1gc6ejJk
+         5PjA==
+X-Gm-Message-State: AOJu0YyHjo03IS9E5KsYsxTHU5OoBHvlqozaRySHxQ+k3hhCM0EHUEEL
+	4a9OTDFQGw5t0+iBn+gVN3LledcmqawWIA==
+X-Google-Smtp-Source: AGHT+IGEh6yRc5Pqp/2ull0BRDSZMtMmuQTOwd/w9S53EyIIKsQvqIoeVK2Ht/D6ruqzllzCYMQS1w==
+X-Received: by 2002:a6b:c845:0:b0:7bc:2603:575f with SMTP id y66-20020a6bc845000000b007bc2603575fmr13648184iof.0.1705416089580;
+        Tue, 16 Jan 2024 06:41:29 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id gm25-20020a0566382b9900b0046df77733acsm2953403jab.102.2024.01.16.06.41.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jan 2024 06:41:28 -0800 (PST)
+Message-ID: <4493b71b-4596-4117-950d-5fe8aa11975a@kernel.dk>
+Date: Tue, 16 Jan 2024 07:41:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <210deda9-5439-244a-0ce2-af9dc8e5d7fe@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBnOBGtiKZlSqsRBA--.20499S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxJw13XFyDCrWkKr48CrWkXrb_yoW5trWDpr
-	4vqrWUA3y5Grn3uFyUta17X34rGrnrtw18Jw18XF10vrW7ArnFqFy09ry09r4UXrZ7JFWf
-	XF10vryxZ3W7ArUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
-	DUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: add blk_time_get_ns() helper
+Content-Language: en-US
+To: Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240115215840.54432-1-axboe@kernel.dk>
+ <20240115215840.54432-2-axboe@kernel.dk>
+ <a67e7a44-5ac4-b18d-b0c8-b0a4b42e1224@huaweicloud.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <a67e7a44-5ac4-b18d-b0c8-b0a4b42e1224@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 1/15/24 11:42 PM, Yu Kuai wrote:
+> Hi,
+> 
+> ? 2024/01/16 5:53, Jens Axboe ??:
+>>   @@ -2810,7 +2810,7 @@ static void ioc_rqos_done(struct rq_qos *rqos, struct request *rq)
+>>           return;
+>>       }
+>>   -    on_q_ns = ktime_get_ns() - rq->alloc_time_ns;
+>> +    on_q_ns = blk_time_get_ns() - rq->alloc_time_ns;
+> 
+> Just notice that this is from io completion path, and the same as
+> blk_account_io_done(), where plug does not exist. Hence ktime_get_ns()
+> will still be called multiple times after patch 2.
+> 
+> Do you think will this worth to be optimized? For example, add a new
+> field in request so that each rq completion will only call
+> ktime_get_ns() once. Furthermore, we can optimize io_tices precision
+> from jiffies to ns.
 
-在 2024/01/16 21:23, Yu Kuai 写道:
-> Hi, Christoph
-> 
-> 在 2024/01/16 18:47, Christoph Hellwig 写道:
->> Hi Allison,
->>
->> please try this minimal fix.  I need to double check if we historically
->> returned ENXIO or EINVAL for adding / resizing partitions, which would
->> make things more complicated.  Or maybe you already have data for that
->> at hand?
->>
->> diff --git a/block/ioctl.c b/block/ioctl.c
->> index 9c73a763ef8838..f2028e39767821 100644
->> --- a/block/ioctl.c
->> +++ b/block/ioctl.c
->> @@ -21,7 +21,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
->>       sector_t start, length;
->>       if (disk->flags & GENHD_FL_NO_PART)
->> -        return -EINVAL;
->> +        return -ENXIO;
-> 
-> I think this might not be a proper fix, the reason if that before this
-> condition is added, -ENXIO is returned from bdev_del_partition(). And
-> there are also some other error number like -EACCES,-EFAULT following,
-> so this change will still make changes for user in other cases.
+Right, as mentioned this is just an issue side optimization, my intent
+is/was to convert all callers of ktime_get_ns() to use the internal one.
+The completion side will just not get any amortization of the frequency
+of time calls for now, but then it's prepared for that later on. That,
+to me, was nicer than doing selective conversions as then it's not clear
+if the two time sources could be compared.
 
-Please ignore the patch from last email. Sorry for the noise...
-bdev_resize_partition() will also return -ENXIO if partition does't
-exist. So the right patch should be following:
+It isn't complete yet, I just did the main components.
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 4160f4e6bd5b..ba8d44fa7e02 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -20,8 +20,6 @@ static int blkpg_do_ioctl(struct block_device *bdev,
-         struct blkpg_partition p;
-         long long start, length;
+Putting it in the request is one way, ideally we'd have completion
+batching via struct io_comp_batch for the completion side. At least that
+was my plan.
 
--       if (disk->flags & GENHD_FL_NO_PART)
--               return -EINVAL;
-         if (!capable(CAP_SYS_ADMIN))
-                 return -EACCES;
-         if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index f47ffcfdfcec..f14602022c5e 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -447,6 +447,11 @@ int bdev_add_partition(struct gendisk *disk, int 
-partno, sector_t start,
-                 goto out;
-         }
-
-+       if (disk->flags & GENHD_FL_NO_PART) {
-+               ret = -EINVAL;
-+               goto out;
-+       }
-+
-         if (partition_overlaps(disk, start, length, -1)) {
-                 ret = -EBUSY;
-                 goto out;
-
-Thanks,
-Kuai
-> 
-> How about following patch?
-> 
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 4160f4e6bd5b..ec012cf910dc 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -20,8 +20,6 @@ static int blkpg_do_ioctl(struct block_device *bdev,
->          struct blkpg_partition p;
->          long long start, length;
-> 
-> -       if (disk->flags & GENHD_FL_NO_PART)
-> -               return -EINVAL;
->          if (!capable(CAP_SYS_ADMIN))
->                  return -EACCES;
->          if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
-> @@ -38,6 +36,9 @@ static int blkpg_do_ioctl(struct block_device *bdev,
->          start = p.start >> SECTOR_SHIFT;
->          length = p.length >> SECTOR_SHIFT;
-> 
-> +       if (disk->flags & GENHD_FL_NO_PART)
-> +               return -EINVAL;
-> +
->          switch (op) {
->          case BLKPG_ADD_PARTITION:
->                  /* check if partition is aligned to blocksize */
-> 
-> Thanks,
-> Kuai
-> 
-> 
->>       if (!capable(CAP_SYS_ADMIN))
->>           return -EACCES;
->>       if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
->>
->> .
->>
-> 
-> .
-> 
+-- 
+Jens Axboe
 
