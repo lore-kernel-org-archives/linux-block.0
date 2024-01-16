@@ -1,80 +1,111 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746A71CA80
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 16:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323021CD2E
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 16:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705424301; cv=none; b=VWgXEG+fZHEtQHbJY95+mn5PEQg1ODeIybqD5o0iEAeaceOWNG1IfyavH4ljWchzC4gFI94orjbSTw8e8PNMMnIo8Tp1zamusB35wDjXatCuqrMHXCCqhZV0BKce7VUnujUGkbSPjDgKr+fS3SZT530uaPSgVfdj6FhFniPw6B4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705424301; c=relaxed/simple;
+	bh=gRLa62f2pSShzc7ZxqXJIfdpLq2AvaGwVU2grF7v5RA=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding; b=UaLR6lQP4NEEKAg37Mm+bsFhSaIGK15XVoj2uOvV6Mhvf/KYnWbcMFe8+QWi6cVaXqL2GQyOriRGhFWYAl8gJH43ANbSaGaOVc0RIrhoP+y90N3q8Vo0hBcl3EccVRrb3XrzCqIh6Vut7ruwhXUMRwDblOEkXVNyFN0blsxSF1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=oaLjtjQn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OGFeGQNd"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bee9f626caso49308939f.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 08:18:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="oaLjtjQn"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-36095e0601bso4076505ab.0
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 08:58:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705421887; x=1706026687; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IgCnhe//CqwXrORL5CxdgdvmaccHV7fgn8NA1YLhH4o=;
-        b=OGFeGQNdAfI+P8WewrPuhZpXpVj/MaavFFoIA5nhJRFADw6Z6yFKdtJDx3sy0/nI4R
-         3IZAa4QR1wcn+FmQRHStUVkE2EXyZXuxKX7En6cXGctgfD5evkncRACO8pOBG4UHOxmb
-         10x0qqRSMLWV839K5y+gdAWSNh1yfxqiZKUlpxfv/rTerVU/Fj5FOM42bEI+begukybq
-         4kf5v+6oX4kmCqKOEyANTwGYEB9E7yhB9eAwHnW9H53LOlmpJeJZzkw/RLYpTNC80VCs
-         HkyFbx7Pqf5biVQB1JfB8xKxNvZVrXB7qMiWXiW4XLXylR9kQIYEWu2Ukkg6qypa82ej
-         LNkg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705424298; x=1706029098; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pDf//gEwOmtmjZU7qzFLBNM4Nf4e87Z0wxn8Y0f3tsg=;
+        b=oaLjtjQn7pn07bmn0FWGO86sy6UxURCsNv/VqFCd3WyMt6xPcJAOpRgn/+DFV+z0ea
+         uSgLGo1+ss9DCHSXaop/6i1xPrX6otYAynqnSKwSw3hpCitKhdQ8sk7AzZLy9QUa3XDd
+         Uj/RTfWOwUe1N5gh212ebDEEvEfuEdRg1TMN/BFS99nUNCtJrtK8bCzPDew18Hzivdkf
+         +wAiyOGD0fBEJYVpUxJezwJFAGpgTq3fT4KrlupskZE9L1teFOYwXKoG3i193ETvBPam
+         B4EVkhDxlMBavy1K2NTHK3gR7TeUzMP6nTWURYCdsuw4B0YizvR7FHFpst9QHn4sMsKK
+         Grow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705421887; x=1706026687;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IgCnhe//CqwXrORL5CxdgdvmaccHV7fgn8NA1YLhH4o=;
-        b=upA/UEcCERPoFcVwLUE8wR1rVi9U10Fm05E3NDgZSmjGEH96NqU4pVn2VmUcgxOckH
-         U4RbiqBJ8A1ppAaQXgu2cIlppEo/HA7JDCZL0/kUBV1OY+RuV2x+OXIHdS4fqre6LnoH
-         lBSdMqb4SRYjvOohoz/56w8QF7ABfn7T6RG/juAuep7qESurK01ochfxd5LqHsyiqxOf
-         cfwK97f0RjDiIDgRK4qFjRf2/cn9iPsIxzzZQ2Zn0BipYfYjPThl4majX/HgMer7tUby
-         rUzPHW96Qb7yHh6uCAg8cRWRGT2n6a3oJOF7nJkpMAq1Dxb9bP+OY9MXu+nTReoal9jO
-         LHsQ==
-X-Gm-Message-State: AOJu0Yyw60FEifa2m2AnGyhwXJ/vPHWSO0vQVIqn1JLg4NqFCoOFQoka
-	eznE4qKf43OHNaIAJiMJmf2Vs3wpiwYlAw==
-X-Google-Smtp-Source: AGHT+IH/l33VNC5fOqMlpY5pAQRUar7dZtjbhrcCrZm7ErV6upBOOVdU8QOaVxtA5FmJcs0lXL1ccQ==
-X-Received: by 2002:a6b:c845:0:b0:7bc:2603:575f with SMTP id y66-20020a6bc845000000b007bc2603575fmr13945104iof.0.1705421887485;
-        Tue, 16 Jan 2024 08:18:07 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id q19-20020a02cf13000000b0046e9a5435a7sm457424jar.138.2024.01.16.08.18.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jan 2024 08:18:06 -0800 (PST)
-Message-ID: <977fd9a6-cba9-4c70-940c-9a5ce0caf189@kernel.dk>
-Date: Tue, 16 Jan 2024 09:18:06 -0700
+        d=1e100.net; s=20230601; t=1705424298; x=1706029098;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pDf//gEwOmtmjZU7qzFLBNM4Nf4e87Z0wxn8Y0f3tsg=;
+        b=uq/ax+SS2snU0Bqv1vHxi6nwMhn85Fy4H0RmxbPVW4caozqD0zKW3OuMBkEkVWtKoz
+         dbeOBq6NVlJpYvOscA53MeqB7UdQ0uipqgGM8foh8kOiJM8B1z6QqNZQmHHPwmgU64IH
+         2wZ0/rtOux59za893mhaYQMoCZNYm+OO8xX7H7SFNz/yZGDjgDoI/SsAiUOscRijXXF8
+         zDeaGudJ0TjKB5tu4EKxzQfkLS6p7WcPi7qCGc+G9OyW//o6+5DHEyQ4StLqg77mfJFl
+         I/NWbhIZrc6vPX6Js3Rty6wzc2O0vz3m5HfPbdfoZsagifA7Hm+e1xYYOMR/JJ4uImym
+         NmpA==
+X-Gm-Message-State: AOJu0Yx/YySDARFbkwBXkGonK/OmA/OC9tFQJ3XxUQPC8UeXItcEHCRR
+	d56yfmKfY1EenXCy+TYEs8F9JcCZFj5568VHb60mrw3zM5Fg1Q==
+X-Google-Smtp-Source: AGHT+IFii8BqVERC8fEaRd93IKBe0jWGjFrCPLnuRwMMafBtx20d+h5I6jK6jvG+yNJ5zKTVLaNtyQ==
+X-Received: by 2002:a05:6e02:1c2f:b0:360:702a:3f89 with SMTP id m15-20020a056e021c2f00b00360702a3f89mr13786223ilh.0.1705424297889;
+        Tue, 16 Jan 2024 08:58:17 -0800 (PST)
+Received: from localhost.localdomain ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id c14-20020a02a60e000000b0046ea43e4d0csm71744jam.168.2024.01.16.08.58.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 08:58:17 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: kbusch@kernel.org,
+	joshi.k@samsung.com
+Subject: [PATCHSET RFC v2 0/5] Cache issue side time querying
+Date: Tue, 16 Jan 2024 09:54:21 -0700
+Message-ID: <20240116165814.236767-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: cache current nsec time in struct blk_plug
-Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>
-Cc: linux-block@vger.kernel.org
-References: <20240115215840.54432-1-axboe@kernel.dk>
- <20240115215840.54432-3-axboe@kernel.dk>
- <ZaarIH6-Elu2g3rL@kbusch-mbp.dhcp.thefacebook.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZaarIH6-Elu2g3rL@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/16/24 9:13 AM, Keith Busch wrote:
-> On Mon, Jan 15, 2024 at 02:53:55PM -0700, Jens Axboe wrote:
->> If the block plug gets flushed, eg on preempt or schedule out, then
->> we invalidate the cached clock.
-> 
-> There must be something implicitly happening that I am missing. Where is
-> the 'cur_time' cached clock invalidated on a plug flush?
+Hi,
 
-It's not just yet, and it's also missing on preemption. I have those in
-my current tree. The current test doesn't hit any of these, so it didn't
-impact the testing.
+When I run my peak testing to see if we've regressed, my test script
+always does:
+
+	echo 0 > /sys/block/$DEV/queue/iostats
+	echo 2 > /sys/block/$DEV/queue/nomerges
+
+for each device being used. It's unfortunate that we need to disable
+iostats, but without doing that, I lose about 12% performance. The main
+reason for that is the time querying we need to do, when iostats are
+enabled. As it turns out, lots of other block code is quite trigger
+happy with querying time as well. We do have some nice batching in place
+which helps ammortize that, but it's not perfect.
+
+This trivial patchset simply caches the current time in struct blk_plug,
+on the premise that any issue side time querying can get adequate
+granularity through that. Nobody really needs nsec granularity on the
+timestamp.
+
+Results in patch 2, but tldr is a more than 9% improvement (108M -> 118M
+IOPS) for my test case, which doesn't even enable most of the costly
+block layer items that you'd typically find in a distro and which would
+further increase the number of issue side time calls. This brings iostats
+enabled _almost_ to the level of turning it off.
+
+v2:
+	- Fix typo in cover letter, the prep script obviously turns
+	  _off_ iostats normally
+	- Cover rest of block/* cases that use ktime_get_ns()
+	- Fix build error in block/blk-wbt.c
+	- Don't use the LSB to detect if the timestamp is valid or not,
+	  just accept we'll do double ktime_get_ns() if we happen to
+	  get 0 as a valid time.
+	- Invalidate timestamp on any schedule out condition
+	- Add two patches reclaiming the added space in blk_plug
+	- Update to current perf results
 
 -- 
 Jens Axboe
+
 
