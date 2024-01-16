@@ -1,165 +1,113 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E47628DA1
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 20:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3662A1F95B
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 21:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705438566; cv=none; b=H9h2hE90jHBnApXWP6kz5IqyNcip375RkG59DaD5RA8r5Z2mGO21xDGmJPjeNCnqM3WpfSVHlRs2JEFeYi2rxSaoUVwevbMq7Mp3cWmWCoczg7fAYj6eA5xAlq+OovCHcSoYJBY074UmNKPX56KgIcfb/rWzkfwOXfcHRXbCn7E=
+	t=1705439321; cv=none; b=hT7tQJD6+aoNJU+LtzqemcGtmG2TAlQf+nrlZw3OzFJg7OufcNjcTNuwk3WObZKyFu3dt+9ySKJ7m3HL2o7FUCnF5sSNCdHU9/bgvjCVXZ7QRMyA0OBO0L7Fvlzm/OLDrZLawqIRBxI/7ONFKxNgbPM/1rSJsHQt2TNd+lBHvAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705438566; c=relaxed/simple;
-	bh=qkJUyIiGo86M3vJLmeWZoSuCSRe8dbtkBlXcHSS3RgI=;
+	s=arc-20240116; t=1705439321; c=relaxed/simple;
+	bh=wjdhA9Wx/G9JI+UMvxCg1223sOIZUuC/gF+B08th0mQ=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=FATibBRc/pCIwsCsWF3IVMiyhi59Z8taGXSIOQJGSZ/aQTOftxW03lFGEOPtYDvFKjfI3zRXXcLwQM34dgy6DlCutQB7Hb4yBHWugfEKSe+pPmwkA3Yi1C1SdrPyD1BroNJracAL7q2U6YdWdRjsemAQsQB2f2mp7O+IgXm2JXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=KTiMy+kc; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 From:To:Cc:References:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=mgIbHS3OHezPzr9ae49eQ9OpASJoOR8wUX+cSg+ugEZv+a+nEc2yEJG0nuHog5gTNuppa5sS7ApZJRDqklxijwLoDb6D/e9ZiwhIeU0VAdZaO5DQ0jNcQR5bLRJvK/4cc0TZcYNebo0776pl+61fyE6DuqPP9myVlxWm3yXlGlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AvntdGYc; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="KTiMy+kc"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d40eec5e12so87199005ad.1
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 12:56:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AvntdGYc"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-360630beb7bso8140145ab.0
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 13:08:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1705438564; x=1706043364; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4ODcMiKnN9uc2CQEPWploNVotAW/sU5YV82cEbm6cw=;
-        b=KTiMy+kc8JM8fXcGwycKna1LSTL4do94MyhgRte9j54JnihFeB1IA0sO7I1owyyMTx
-         xaE+G752K7bgmoG4qavU3fZOI+hW74eNbuNT1ueZ8bVUe3FArp6BiEsrYzZLHQUA6P1k
-         Apo6rUKDDAkPt/GMi4cxlwuTXUxJSPWAIL+3z2LDDqDVU0R6A9o5UxJehJanaCncpAjA
-         4hpap9oWpHxkD51lQyNt4UECrCO/xR9Jr8j5yqWQ5lr6zUkWtXaFLO2UV/pSYowQsSFG
-         /+H0+IWMlrN47NstkWCeb+E8NMKZZhJsqJu/STzTPEao3E+UKHE7Ga7yokD8HdX6K2co
-         wWGA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705439317; x=1706044117; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vZ9UWgbz5tCJlrTfYrqTFQs+p6e2qJiObigyvDXwRj4=;
+        b=AvntdGYc5qwQKwVIpcjjdBYGPGt4NJ8yCsgZYWqBAQYAe9IC2tuUQ0AKe9j+wMvKxO
+         emrCF8qUsnq6lW/weTmgbY0FPknRKKz6y1ltcTMSdjCPXN9EERmD86wR652J/ePeOEYJ
+         OPt5HX2hbfs05kkAQ7kA37K+PpqviYcIBkSlZ/bN6zzCpmS30R9dexfiJ2MDnUEf37+O
+         csGA+KPdrnPmEHt2E1LfrGSqRBdCJDdhaklS6q5U87az73FXVzCM11A2KYy/VBCr9H94
+         1D7jZvArmNNM8gG7MjQd9maFv9AFmEbhghO+OesSTjVhe6zdxOJ3NftLCyElGKV0L8f4
+         F2dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705438564; x=1706043364;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R4ODcMiKnN9uc2CQEPWploNVotAW/sU5YV82cEbm6cw=;
-        b=ARD+Vc3zgyrLNeXKP9rYjlA6h5xZBZvj5Zv403IqlzYPfDlTe+P7hpNh40wMVYKEMA
-         N6hjg7OK+jr2uEY85RWhLEaQw4a5HSsS9Ujvv7YP86VR1YHmsYeebQfTHI2bB2jwFt5Z
-         7u0weMTcdrx7X+erivoTHW1wvQC/Ti4KILUkhhqWkppH1dlODUO69O/uk8ZQhMTHsqUw
-         RpdGyf/iKkF6vjY5GOspot+pC8So3Q/hh2ymO6qvUO2MCesmUsb+38PtyPMy/eepxIRO
-         W1zpj4uNuJKwqH71Y1cfT9hsAThtW16X3ujs94hkUmBL+hBrCjWYqyL15NAJcOvUzVD0
-         rUsQ==
-X-Gm-Message-State: AOJu0YzMCojU9TENVgBgQMxGO83K/8z2o8InmhhDvKr0GB5NDD+Ua7zC
-	eP/wx5yKMTDFjpbeKEdM/eIurn0HuCDGRA==
-X-Google-Smtp-Source: AGHT+IFwoCp6EyOkXVbSZ/bZy3zGhRgZXj/tnkE3Ntm0JfGhaZXJ5mMWTPmLTDkXojp/i0RmI+gT9w==
-X-Received: by 2002:a17:903:1c4:b0:1d4:ca3d:742e with SMTP id e4-20020a17090301c400b001d4ca3d742emr10699298plh.67.1705438564540;
-        Tue, 16 Jan 2024 12:56:04 -0800 (PST)
-Received: from dread.disaster.area (pa49-180-249-6.pa.nsw.optusnet.com.au. [49.180.249.6])
-        by smtp.gmail.com with ESMTPSA id y15-20020a17090264cf00b001d5e734868esm1716838pli.241.2024.01.16.12.56.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 12:56:03 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1rPqTZ-00BIHT-0N;
-	Wed, 17 Jan 2024 07:56:01 +1100
-Date: Wed, 17 Jan 2024 07:56:01 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
-Message-ID: <ZabtYQqakvxJVYjM@dread.disaster.area>
-References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+        d=1e100.net; s=20230601; t=1705439317; x=1706044117;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vZ9UWgbz5tCJlrTfYrqTFQs+p6e2qJiObigyvDXwRj4=;
+        b=kTSi2n43LSc39mLSwlXNXOXV9iFiH3JSVCRZYVPV1P9zDjbKkAt5trPj8Qvzn7Zqr/
+         W6t7Z/9KyPXixfPMlMC/W8M2ri1tlkzrppRYry0BOkMe9J3Q+xo6sj3e9eabJYNW67dj
+         GmoV8GGKVJvInyVHWC0m69DflFoQVBgJeEl5H8J5EtMcnlfgK36Q4eIk8c2PdzGeqK84
+         qhqhgSW+A7m5GCc64kFaVwjHl30NqYDvIxuMvSoiLvutpDnVYHVeoxmAZkHuYEYwnksr
+         ElNbYKU3BLZZ1Wf9pLXGiIxCTtQpBNLHf0j/buDoeSJCaHDmIV4MmLuBZXq7B48m2tdJ
+         0C6Q==
+X-Gm-Message-State: AOJu0Yzsp1d1zYeLfzFyIQnBol7ss/LvO3q0n/kEhYJDG2SHs9TZpkFp
+	x9sISs5jOhVTKBkpjU6vpE8Gzt2SAAy5ZBcBcKpklskE/3CUvQ==
+X-Google-Smtp-Source: AGHT+IFuMSETEf3UojmE80fEvZPV6DIevsJQqiObnggttGyrsKhWb5JzTtBba2sScLgCwKxWoxWwxQ==
+X-Received: by 2002:a05:6e02:1bcb:b0:360:968d:bf98 with SMTP id x11-20020a056e021bcb00b00360968dbf98mr14394120ilv.1.1705439317331;
+        Tue, 16 Jan 2024 13:08:37 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id bd10-20020a056e02300a00b0035f7f712c78sm3782819ilb.36.2024.01.16.13.08.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jan 2024 13:08:36 -0800 (PST)
+Message-ID: <a43fda39-cda6-4fa4-9c5a-2062b0ef19f8@kernel.dk>
+Date: Tue, 16 Jan 2024 14:08:36 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHSET RFC v2 0/5] Cache issue side time querying
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: kbusch@kernel.org, joshi.k@samsung.com
+References: <20240116165814.236767-1-axboe@kernel.dk>
+In-Reply-To: <20240116165814.236767-1-axboe@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 16, 2024 at 11:50:32AM +0100, Christian Brauner wrote:
-> Hey,
-> 
-> I'm not sure this even needs a full LSFMM discussion but since I
-> currently don't have time to work on the patch I may as well submit it.
-> 
-> Gnome recently got awared 1M Euro by the Sovereign Tech Fund (STF). The
-> STF was created by the German government to fund public infrastructure:
-> 
-> "The Sovereign Tech Fund supports the development, improvement and
->  maintenance of open digital infrastructure. Our goal is to sustainably
->  strengthen the open source ecosystem. We focus on security, resilience,
->  technological diversity, and the people behind the code." (cf. [1])
-> 
-> Gnome has proposed various specific projects including integrating
-> systemd-homed with Gnome. Systemd-homed provides various features and if
-> you're interested in details then you might find it useful to read [2].
-> It makes use of various new VFS and fs specific developments over the
-> last years.
-> 
-> One feature is encrypting the home directory via LUKS. An approriate
-> image or device must contain a GPT partition table. Currently there's
-> only one partition which is a LUKS2 volume. Inside that LUKS2 volume is
-> a Linux filesystem. Currently supported are btrfs (see [4] though),
-> ext4, and xfs.
-> 
-> The following issue isn't specific to systemd-homed. Gnome wants to be
-> able to support locking encrypted home directories. For example, when
-> the laptop is suspended. To do this the luksSuspend command can be used.
-> 
-> The luksSuspend call is nothing else than a device mapper ioctl to
-> suspend the block device and it's owning superblock/filesystem. Which in
-> turn is nothing but a freeze initiated from the block layer:
-> 
-> dm_suspend()
-> -> __dm_suspend()
->    -> lock_fs()
->       -> bdev_freeze()
-> 
-> So when we say luksSuspend we really mean block layer initiated freeze.
-> The overall goal or expectation of userspace is that after a luksSuspend
-> call all sensitive material has been evicted from relevant caches to
-> harden against various attacks. And luksSuspend does wipe the encryption
-> key and suspend the block device. However, the encryption key can still
-> be available clear-text in the page cache.
+On 1/16/24 9:54 AM, Jens Axboe wrote:
+> Results in patch 2, but tldr is a more than 9% improvement (108M -> 118M
+> IOPS) for my test case, which doesn't even enable most of the costly
+> block layer items that you'd typically find in a distro and which would
+> further increase the number of issue side time calls. This brings iostats
+> enabled _almost_ to the level of turning it off.
 
-The wiping of secrets is completely orthogonal to the freezing of
-the device and filesystem - the freeze does not need to occur to
-allow the encryption keys and decrypted data to be purged. They
-should not be conflated; purging needs to be a completely separate
-operation that can be run regardless of device/fs freeze status.
+Enabled the typical distro things (block cgroups, blk-wbt, iocost,
+iolatency) which all add considerable cost (and is an optimization
+project in itself) and this is the performance of the stock kernel with
+iostats enabled:
 
-FWIW, focussing on purging the page cache omits the fact that
-having access to the directory structure is a problem - one can
-still retrieve other user information that is stored in metadata
-(e.g. xattrs) that isn't part of the page cache. Even the directory
-structure that is cached in dentries could reveal secrets someone
-wants to keep hidden (e.g code names for operations/products).
+IOPS=91.01M, BW=44.44GiB/s, IOS/call=32/32
+IOPS=91.29M, BW=44.58GiB/s, IOS/call=31/32
+IOPS=91.27M, BW=44.57GiB/s, IOS/call=32/31
+IOPS=91.26M, BW=44.56GiB/s, IOS/call=32/31
+IOPS=91.38M, BW=44.62GiB/s, IOS/call=32/31
+IOPS=91.28M, BW=44.57GiB/s, IOS/call=32/32
 
-So if we want luksSuspend to actually protect user information when
-it runs, then it effectively needs to bring the filesystem right
-back to it's "just mounted" state where the only thing in memory is
-the root directory dentry and inode and nothing else.
+which is down from 122M for an optimized config and with iostats off.
+With this patchset applied (and one extra patch, missed a spot...), we
+now get:
 
-And, of course, this is largely impossible to do because anything
-with an open file on the filesystem will prevent this robust cache
-purge from occurring....
+IOPS=101.38M, BW=49.50GiB/s, IOS/call=32/32
+IOPS=101.31M, BW=49.47GiB/s, IOS/call=32/32
+IOPS=101.35M, BW=49.49GiB/s, IOS/call=31/31
+IOPS=101.44M, BW=49.53GiB/s, IOS/call=32/31
+IOPS=101.32M, BW=49.47GiB/s, IOS/call=32/32
+IOPS=101.14M, BW=49.38GiB/s, IOS/call=32/31
 
-Which brings us back to "best effort" only, and at this point we
-already have drop-caches....
+which is about a 10% improvement. Mostly ran this because I was curious,
+and while the above config changes do add more time stamping, it also
+adds additional overhead. In any case, 10% win for the distro config
+case is not bad at all.
 
-Mind you, I do wonder if drop caches is fast enough for this sort of
-use case. It is single threaded, and if the filesystem/system has
-millions of cached inodes it can take minutes to run. Unmount has
-the same problem - purging large dentry/inode caches takes a *lot*
-of CPU time and these operations are single threaded.
-
-So it may not be practical in the luks context to purge caches e.g.
-suspending a laptop shouldn't take minutes. However laptops are
-getting to the hundreds of GB of RAM these days and so they can
-cache millions of inodes, so cache purge runtime is definitely a
-consideration here.
-
--Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Jens Axboe
+
