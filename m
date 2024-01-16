@@ -1,150 +1,160 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11731134A0
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 09:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Bwg8wr5K"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240116095200epoutp03e2495706422434970615c75be752ec17~qyxneP4CL0264702647epoutp03H
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 09:52:00 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240116095200epoutp03e2495706422434970615c75be752ec17~qyxneP4CL0264702647epoutp03H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1705398720;
-	bh=oC8sfo8bga8IOkBztQXGlU14pAfv3VHLV1iyow+ZlNM=;
-	h=Date:Subject:To:From:In-Reply-To:References:From;
-	b=Bwg8wr5K2+jxE9MHQItjjqbGQkKInXwJZw0W3OMXZLlwPZyQLeSBntYXnxACQvf1i
-	 4JicEHLOGx2a8/Dzrc61O1FNv8IbMY4z1JA5d0py95x//bzFTfrrJlrGh60PJlaxRE
-	 +QcP6SX7vF/D8yF1xcdUjQWh7Ibl6hg0U6pz0o6E=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240116095200epcas5p238c5f263932e783042905671daf0ec1c~qyxnT20OP1589515895epcas5p2r;
-	Tue, 16 Jan 2024 09:52:00 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.179]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4TDknC0FtGz4x9Pw; Tue, 16 Jan
-	2024 09:51:59 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	BA.01.09672.CB156A56; Tue, 16 Jan 2024 18:51:56 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240116095156epcas5p2ebd6d454e36eee7d9f0683513342afca~qyxjHKOfB1589515895epcas5p2h;
-	Tue, 16 Jan 2024 09:51:56 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240116095156epsmtrp2773057c3902bf91dc021b8cdbf8d9c15~qyxjGosOB3195731957epsmtrp2r;
-	Tue, 16 Jan 2024 09:51:56 +0000 (GMT)
-X-AuditID: b6c32a4b-39fff700000025c8-14-65a651bcf78c
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	FA.1D.08755.CB156A56; Tue, 16 Jan 2024 18:51:56 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240116095155epsmtip2a9f66195212b59a8331167c15c8b5b5c~qyxibvrWU0837608376epsmtip2a;
-	Tue, 16 Jan 2024 09:51:55 +0000 (GMT)
-Message-ID: <ff4a6649-9f09-23fc-ad33-06deb4845590@samsung.com>
-Date: Tue, 16 Jan 2024 15:21:54 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9199154BA
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 09:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3618e0060d1so1272335ab.1
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 01:57:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705399038; x=1706003838;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MIQ1H8XFIGhOeVs72txcLATNzxwG63gY9YTuviyIhV4=;
+        b=cQt8SBdyp0860f+IhRj0QcVnzgLViBh6fnkT3J/z6hso/5MXqKGwsNgBUupGQapNZI
+         viA1jgdZJnvmDLGXnb5A3Og9+mr7EBvZx+VqLefPu8DVc57da4gvwORY6NXl77qLAXD9
+         jVUZhDLkVD8XowrarHybonavBSjAey5SsZ5TlrZ8PbHwT1dAvAsRp0YkvkjNas1/njGl
+         J4GRXnchrwLS3weihNMKTjAiIWwRTspbYKJDmrspbnUA8Z9TMjrKPwL0OSwX2CbXcSHi
+         2f03OayOrWGxXqmqlFYJ3uorDks3eDSmZLRZQo618JRwbOY5Cl3VafBfqlkwp3PXjnr5
+         F7ZA==
+X-Gm-Message-State: AOJu0YzbX5gw6lYkMmOnLhsJ95GYApoxRL7Y09EkcArubJe39bUJHZ2S
+	z/iiAo2ajNXgc0DnLcPkHd0u8wVES77QPtys8lvr48EgDJ/0
+X-Google-Smtp-Source: AGHT+IEB17ZpVF92Ai/oAD23Ju2qgLEQRDNt62m896t/qyX8HEG1WVlBHvhogwAOIEeIS2Kx/BGzacte4/btCE9qHQKpdQDbNfIX
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH 2/2] block: cache current nsec time in struct blk_plug
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20240115215840.54432-3-axboe@kernel.dk>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEKsWRmVeSWpSXmKPExsWy7bCmlu6ewGWpBt/uSVmsvtvPZrH3lrYD
-	k8fls6UenzfJBTBFZdtkpCampBYppOYl56dk5qXbKnkHxzvHm5oZGOoaWlqYKynkJeam2iq5
-	+AToumXmAA1XUihLzCkFCgUkFhcr6dvZFOWXlqQqZOQXl9gqpRak5BSYFOgVJ+YWl+al6+Wl
-	llgZGhgYmQIVJmRnNK5ZxlwwnaeibeYD9gbGG5xdjJwcEgImElsbHjJ1MXJxCAnsZpRY8bmX
-	DcL5xChxZ9VHqMw3RonFk9+ywLTsnP6dESKxl1Hiy/F3UFVvGSXObbjB2sXIwcErYCex7rcR
-	iMkioCqx7KI7SC+vgKDEyZlPwOaICiRJ/Lo6hxHEFhbwkljQM5MVxGYWEJe49WQ+E0iriICt
-	xPaVKSAmm4CmxIXJpSAVnAKmEhOXvGOEqJaX2P52DjPIARICh9glbrW/ZoQ400Xi35HtzBC2
-	sMSr41vYIWwpic/v9rJB2MkSl2aeY4KwSyQe7zkIZdtLtJ7qZwbZywy0d/0ufYhdfBK9v5+A
-	XSYhwCvR0SYEUa0ocW/SU1YIW1zi4YwlULaHRO/B56yQsNnMKLFu4XWWCYzys5ACYhaSh2ch
-	eWcWwuYFjCyrGCVTC4pz01OLTQuM81LL4TGcnJ+7iRGc2LS8dzA+evBB7xAjEwfjIUYJDmYl
-	EV5/g2WpQrwpiZVVqUX58UWlOanFhxhNgREykVlKNDkfmFrzSuINTSwNTMzMzEwsjc0MlcR5
-	X7fOTRESSE8sSc1OTS1ILYLpY+LglGpgSr6501MgUe7aTyNHvxCt1z5CJ2xMnyjd1IkK6gje
-	pOKxpKBvp/SrdEHGT9Z1Pxdv+5nD676Wn8X8IK/9vLSwU9Iz9RYYxxtHnClrUwt9EJVlma3V
-	uYRreojixAPfL3qYiGbP6rRsKxbn/bbYYNHi2QuN3xpuWS66w6n2y1Hb2sKIk+fPystNnsa2
-	rqUzpnSi3ZaJfAwSXId/8tx9alURNo93qmftyTStV1cCTl2a1qNprdL/JZ5vTvF2Xf/KEINV
-	JxRc5v0s+HD/ge3Zz6bl2oyzezwvTgxP+qyYd7ni1Gn54Pdb9ly32+J+7HOamOj0XwzLe+V5
-	Wk8Gej2fJsAmKfPDMeu736PaZ5whea5KLMUZiYZazEXFiQAJAacM9QMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHLMWRmVeSWpSXmKPExsWy7bCSvO6ewGWpBs0b2C1W3+1ns9h7S9uB
-	yePy2VKPz5vkApiiuGxSUnMyy1KL9O0SuDIa1yxjLpjOU9E28wF7A+MNzi5GTg4JAROJndO/
-	M3YxcnEICexmlJj1+hkjREJcovnaD3YIW1hi5b/n7BBFrxklZv/5xdLFyMHBK2Anse63EYjJ
-	IqAqseyiO0g5r4CgxMmZT1hAbFGBJIk99xuZQGxhAS+JBT0zWUFsZqDxt57MZwJpFRGwldi+
-	MgVi+mZGiVUvtoJNZxPQlLgwuRSknFPAVGLikneMEK1mEl1bu6BseYntb+cwT2AUnIVk8ywk
-	G2YhaZmFpGUBI8sqRsnUguLc9NxiwwLDvNRyveLE3OLSvHS95PzcTYzgINbS3MG4fdUHvUOM
-	TByMhxglOJiVRHj9DZalCvGmJFZWpRblxxeV5qQWH2KU5mBREucVf9GbIiSQnliSmp2aWpBa
-	BJNl4uCUamAy23jmT+/zDF7/rdMNpf+Yl4dtr/V+dOdAqXAH9zoBBgaXjZ3GVy2KNpk7nl+4
-	ZWHSh2qNhHfn58V/thRMy/82jb0qXS71dI92n/IyLqbqy+1adpEfymSVrAxW9yc5uDwKj9i5
-	qaKxelNBetzcCy+K2Q2O7ohcPne7Su38nwfums5PfO+xwlma67vYm59b8/fIJ7drhDiIJTy/
-	onzBS3Tqh80PTwWFHF3451lYgqLpAbcS9/+TCsW0+ZM1tm1h1fUpuS6vJTnhaInELJ2JF6Yv
-	ZbnyQtYigpGx+omzkOyhKw/fSW5PK3vd8+jpvzNccRv2yii+Nem//prtnsDPVCWNK8d8rXvi
-	7nbL9rhO/K3EUpyRaKjFXFScCABi1tVQ0QIAAA==
-X-CMS-MailID: 20240116095156epcas5p2ebd6d454e36eee7d9f0683513342afca
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77
-References: <20240115215840.54432-1-axboe@kernel.dk>
-	<CGME20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77@epcas5p1.samsung.com>
-	<20240115215840.54432-3-axboe@kernel.dk>
+X-Received: by 2002:a05:6e02:1e0c:b0:360:5cc5:8ded with SMTP id
+ g12-20020a056e021e0c00b003605cc58dedmr1017180ila.3.1705399037975; Tue, 16 Jan
+ 2024 01:57:17 -0800 (PST)
+Date: Tue, 16 Jan 2024 01:57:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000dbe2f2060f0d2781@google.com>
+Subject: [syzbot] [block?] BUG: unable to handle kernel NULL pointer
+ dereference in __bio_release_pages
+From: syzbot <syzbot+004c1e0fced2b4bc3dcc@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/16/2024 3:23 AM, Jens Axboe wrote:
+Hello,
 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 11342af420d0..cc4db4d92c75 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1073,6 +1073,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
->   	if (tsk->plug)
->   		return;
->   
-> +	plug->cur_ktime = 0;
->   	plug->mq_list = NULL;
->   	plug->cached_rq = NULL;
->   	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 2f9ceea0e23b..23c237b22071 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -942,6 +942,7 @@ struct blk_plug {
->   
->   	/* if ios_left is > 1, we can batch tag/rq allocations */
->   	struct request *cached_rq;
-> +	u64 cur_ktime;
->   	unsigned short nr_ios;
->   
->   	unsigned short rq_count;
-> @@ -977,7 +978,15 @@ long nr_blockdev_pages(void);
->   
->   static inline u64 blk_time_get_ns(void)
->   {
-> -	return ktime_get_ns();
-> +	struct blk_plug *plug = current->plug;
-> +
-> +	if (!plug)
-> +		return ktime_get_ns();
-> +	if (!(plug->cur_ktime & 1ULL)) {
-> +		plug->cur_ktime = ktime_get_ns();
-> +		plug->cur_ktime |= 1ULL;
-> +	}
-> +	return plug->cur_ktime;
+syzbot found the following issue on:
 
-I did not understand the relevance of 1ULL here.
-If ktime_get_ns() returns even value, it will turn that into an odd 
-value before caching. And that value will be returned for the subsequent 
-calls.
-But how is that better compared to just caching whatever ktime_get_ns() 
-returned.
+HEAD commit:    052d534373b7 Merge tag 'exfat-for-6.8-rc1' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17957913e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9603f9823d535d97
+dashboard link: https://syzkaller.appspot.com/bug?extid=004c1e0fced2b4bc3dcc
+compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13529733e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=166850dde80000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-052d5343.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/74cc52d4cc15/vmlinux-052d5343.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a2da7e6a234c/Image-052d5343.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+004c1e0fced2b4bc3dcc@syzkaller.appspotmail.com
+
+Unable to handle kernel paging request at virtual address dfff800000000001
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+Mem abort info:
+  ESR = 0x0000000096000005
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[dfff800000000001] address between user and kernel address ranges
+Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 1 PID: 3139 Comm: syz-executor303 Not tainted 6.7.0-syzkaller-09928-g052d534373b7 #0
+Hardware name: linux,dummy-virt (DT)
+pstate: 10000005 (nzcV daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : _compound_head include/linux/page-flags.h:247 [inline]
+pc : bio_first_folio include/linux/bio.h:289 [inline]
+pc : __bio_release_pages+0x100/0x73c block/bio.c:1153
+lr : bio_release_pages include/linux/bio.h:508 [inline]
+lr : blkdev_bio_end_io+0x2a0/0x3f0 block/fops.c:157
+sp : ffff800089a375e0
+x29: ffff800089a375e0 x28: 1fffe0000162e879 x27: ffff00000b1743c0
+x26: ffff00000b1743c8 x25: 000000000000000a x24: 1fffe000015a9e12
+x23: ffff00000ad4f094 x22: ffff00000f496600 x21: 1fffe0000162e87a
+x20: 0000000000000004 x19: 0000000000000000 x18: ffff00000b174432
+x17: ffff00000b174438 x16: ffff00000f948008 x15: 1fffe0000162e886
+x14: ffff00000b1743d4 x13: 00000000f1f1f1f1 x12: ffff6000015a9e13
+x11: 1fffe000015a9e12 x10: ffff6000015a9e12 x9 : dfff800000000000
+x8 : ffff00000b1743d4 x7 : 0000000041b58ab3 x6 : 1ffff00011346ed0
+x5 : ffff700011346ed0 x4 : 00000000f1f1f1f1 x3 : 000000000000f1f1
+x2 : 0000000000000001 x1 : dfff800000000000 x0 : 0000000000000008
+Call trace:
+ _compound_head include/linux/page-flags.h:247 [inline]
+ bio_first_folio include/linux/bio.h:289 [inline]
+ __bio_release_pages+0x100/0x73c block/bio.c:1153
+ bio_release_pages include/linux/bio.h:508 [inline]
+ blkdev_bio_end_io+0x2a0/0x3f0 block/fops.c:157
+ bio_endio+0x4a4/0x618 block/bio.c:1608
+ __blkdev_direct_IO block/fops.c:213 [inline]
+ blkdev_direct_IO.part.0+0xf08/0x13c0 block/fops.c:379
+ blkdev_direct_IO block/fops.c:370 [inline]
+ blkdev_direct_write block/fops.c:648 [inline]
+ blkdev_write_iter+0x430/0x91c block/fops.c:706
+ call_write_iter include/linux/fs.h:2085 [inline]
+ do_iter_readv_writev+0x194/0x298 fs/read_write.c:741
+ vfs_writev+0x244/0x684 fs/read_write.c:971
+ do_pwritev+0x15c/0x1e0 fs/read_write.c:1072
+ __do_sys_pwritev2 fs/read_write.c:1131 [inline]
+ __se_sys_pwritev2 fs/read_write.c:1122 [inline]
+ __arm64_sys_pwritev2+0xac/0x120 fs/read_write.c:1122
+ __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+ invoke_syscall+0x6c/0x258 arch/arm64/kernel/syscall.c:51
+ el0_svc_common.constprop.0+0xac/0x230 arch/arm64/kernel/syscall.c:136
+ do_el0_svc+0x40/0x58 arch/arm64/kernel/syscall.c:155
+ el0_svc+0x58/0x140 arch/arm64/kernel/entry-common.c:678
+ el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:696
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
+Code: d2d00001 f2fbffe1 91002260 d343fc02 (38e16841) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	d2d00001 	mov	x1, #0x800000000000        	// #140737488355328
+   4:	f2fbffe1 	movk	x1, #0xdfff, lsl #48
+   8:	91002260 	add	x0, x19, #0x8
+   c:	d343fc02 	lsr	x2, x0, #3
+* 10:	38e16841 	ldrsb	w1, [x2, x1] <-- trapping instruction
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
