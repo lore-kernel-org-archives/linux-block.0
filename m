@@ -1,155 +1,126 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2564D1B81D;
-	Tue, 16 Jan 2024 11:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9325D1BC3D
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 13:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0lV9GplD";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="yJ8JNLIB";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="A536vFk3";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="v+qwMeT1"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id EC0C71FB9B;
-	Tue, 16 Jan 2024 11:45:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705405520; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gxB4Ca+S"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705410194;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=83bL3UmsaprNcY7TPS07Y3PDh7YlqCXB9W2bN/Ht43U=;
-	b=0lV9GplD+mrgk/IJ/S2gaAtFzBSuKKrJ6visLA/+I3aGzYt64sq9xjwivvNiaMs6Xbrc4t
-	SYd+JuDz7KqNde53QcnysATItdd/NAaVS58RB3ENSjDrn4eI53ehE0mruRhjlaGJpl/TGS
-	ldZeELRDfl1QCfcmw29baR5dyvsQErI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705405520;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=83bL3UmsaprNcY7TPS07Y3PDh7YlqCXB9W2bN/Ht43U=;
-	b=yJ8JNLIBCs4W4fyuiZWd8Pa+fvn78mPygqgykOOZtsOdtFV/94D54u9+tFGKwWWLPLrfjU
-	Ysv42yoIhJcGSKAA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705405519; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=83bL3UmsaprNcY7TPS07Y3PDh7YlqCXB9W2bN/Ht43U=;
-	b=A536vFk3gnTNijO4YYz0DzRs4FvEYHjMCeg6LgSJjwjeFdPdf1Hlp6lbYe/7u3zpfS+fkg
-	EyBzQMgbK5HhMskOcPLhv/Sui+caIP+m1NKqVk01vNrm+hXkWgiOeuVm4yY2oIQdVTyzuS
-	2pEz990omojyzSv6wyIHJQQIz30L7Bo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705405519;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=83bL3UmsaprNcY7TPS07Y3PDh7YlqCXB9W2bN/Ht43U=;
-	b=v+qwMeT1ZH7wmyznf9FueLZTrIFbJTPEaZ4zJqJ2O5LskSHbcRUCryODHF74feC7IwgK8P
-	TXpdlPMd79iGEhAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D210A132FA;
-	Tue, 16 Jan 2024 11:45:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ix/7Mk9spmWWPgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 16 Jan 2024 11:45:19 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 6C3E8A0803; Tue, 16 Jan 2024 12:45:19 +0100 (CET)
-Date: Tue, 16 Jan 2024 12:45:19 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
-Message-ID: <20240116114519.jcktectmk2thgagw@quack3>
-References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+	bh=X0N5v3FGg9HV1O03dFWgRRmN/kV4JKXO0joKxDaXAWM=;
+	b=gxB4Ca+SOQQ//LOnCzNh5hrHnmDnp0JaPykBERbmGycv354thzVrSr2XjmF9XLhVP890Zs
+	nBkNNLm97/ktxzSfMrxG8C/0pltyGSqQ6nPSndi039BlFa1Paov0AXIXjqbad9sNoD8NkT
+	NGLjT0zcIb9YU7Tcpm9n6FOtcyPJ3ug=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-42-r0Oi2JTgNxC5K85-im9g1g-1; Tue, 16 Jan 2024 08:03:13 -0500
+X-MC-Unique: r0Oi2JTgNxC5K85-im9g1g-1
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-4b71f2aef96so2085175e0c.0
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 05:03:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705410193; x=1706014993;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X0N5v3FGg9HV1O03dFWgRRmN/kV4JKXO0joKxDaXAWM=;
+        b=DT2ita6kgZKVBRHpByt/x70NFaFZ0wpalODlqobzpY74ucOyNSS7I3zfXzG/uLnhVq
+         ZDZQ7pP8T1l9JU25SYsvpeFEkbYWfd3uzWKOnpZ1H9mj4ESjI22PjZL8ri7Pg6OKMP9X
+         dRVD9uctb8T6eVeeaQplxior5giwjd31z/pi643lQlV1n46y8awG4yC8ph9XbZ3htJQf
+         WBtunOLu3Huve7THHWjby6TzaUN5fmEuOiTB6rNg5sPU0SaMfhnRnL83DJZCkLNW0nLc
+         oVj+HmJpLacS0JDEZVJ2od7DP66WrHUf4GWQ5cOmJXXTpmrFlKWNgZcepBhEO1oEQVQs
+         laFA==
+X-Gm-Message-State: AOJu0YzKTyd934X/iwyjeuU55l2lwULiLZocYCqo6HiFpsNsPuW3gTvR
+	XxjfogJxXVbISKSUnOvjmiVNlsZTpxnsLW/2Ek5ITxcJWHpvvCq72+4mum1MUGAaEcOqudHNiYZ
+	EYWFWRZcyHKZv7AyXotMCS2FJNzvtz8UDOV7h8NBoH8qGOv8=
+X-Received: by 2002:a05:6122:3890:b0:4b7:185a:d8d with SMTP id eo16-20020a056122389000b004b7185a0d8dmr3176441vkb.1.1705410192511;
+        Tue, 16 Jan 2024 05:03:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH5OGDPaJ/pElYMM1FUKvzKRX3+RA4kcKome6XGeBKftjNA7FxErL90EMCaNp60VNPyBZs0+o+nBDaJcA7pBr0=
+X-Received: by 2002:a05:6122:3890:b0:4b7:185a:d8d with SMTP id
+ eo16-20020a056122389000b004b7185a0d8dmr3176426vkb.1.1705410192165; Tue, 16
+ Jan 2024 05:03:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=A536vFk3;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=v+qwMeT1
-X-Spamd-Result: default: False [0.19 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[9];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: 0.19
-X-Rspamd-Queue-Id: EC0C71FB9B
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Bar: /
+References: <CAOYeF9VsmqKMcQjo1k6YkGNujwN-nzfxY17N3F-CMikE1tYp+w@mail.gmail.com>
+ <ZaZesiKpbMEiiTrf@infradead.org>
+In-Reply-To: <ZaZesiKpbMEiiTrf@infradead.org>
+From: Allison Karlitskaya <allison.karlitskaya@redhat.com>
+Date: Tue, 16 Jan 2024 14:03:01 +0100
+Message-ID: <CAOYeF9VoN3LpA+CV=fkBR62vqZ8VEvoWD_Hb5Ay5tK9M-Xw1Xw@mail.gmail.com>
+Subject: Re: PROBLEM: BLKPG_DEL_PARTITION with GENHD_FL_NO_PART used to return
+ ENXIO, now returns EINVAL
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Li Lingfeng <lilingfeng3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue 16-01-24 11:50:32, Christian Brauner wrote:
+hi Christoph,
 
-<snip the usecase details>
+I'm not really setup for compiling and testing new kernel images which
+is why I didn't offer to develop a patch for myself (which would have
+looked a lot like this one which you just sent).  I also generally
+have a lot of other things I'm working on at the moment.
 
-> My initial reaction is to give userspace an API to drop the page cache
-> of a specific filesystem which may have additional uses. I initially had
-> started drafting an ioctl() and then got swayed towards a
-> posix_fadvise() flag. I found out that this was already proposed a few
-> years ago but got rejected as it was suspected this might just be
-> someone toying around without a real world use-case. I think this here
-> might qualify as a real-world use-case.
-> 
-> This may at least help securing users with a regular dm-crypt setup
-> where dm-crypt is the top layer. Users that stack additional layers on
-> top of dm-crypt may still leak plaintext of course if they introduce
-> additional caching. But that's on them.
+The thing that worries me about this approach is that it was already
+proposed some months ago, and shot down at the time with the (somewhat
+reasonable) justification that if you do any partition table
+operations on a device that doesn't contain a partition table, then
+"EINVAL" is perhaps somewhat more reasonable as an error.  See the
+email thread I linked from my earlier message, and particular this
+message from Li Lingfeng (who wrote the patch that introduced this
+regression in the first place):
 
-Well, your usecase has one substantial difference from drop_caches. You
-actually *require* pages to be evicted from the page cache for security
-purposes. And giving any kind of guarantees is going to be tough. Think for
-example when someone grabs page cache folio reference through vmsplice(2),
-then you initiate your dmSuspend and want to evict page cache. What are you
-going to do? You cannot free the folio while the refcount is elevated, you
-could possibly detach it from the page cache so it isn't at least visible
-but that has side effects too - after you resume the folio would remain
-detached so it will not see changes happening to the file anymore. So IMHO
-the only thing you could do without problematic side-effects is report
-error. Which would be user unfriendly and could be actually surprisingly
-frequent due to trasient folio references taken by various code paths.
+> I don't think so.
+>
+> GENHD_FL_NO_PART means "partition support is disabled". If users try
+> to add or resize partition on the disk with this flag, kernel should
+> remind them that the parameter of device is wrong.
+> So I think it's appropriate to return -EINVAL.
 
-Sure we could report error only if the page has pincount elevated, not only
-refcount, but it needs some serious thinking how this would interact.
+https://marc.info/?l=linux-kernel&m=169753292503830&w=2
 
-Also what is going to be the interaction with mlock(2)?
+So: I suspect the offered patch would solve the issue, but I'm not
+sure if it's correct.  Another approach might involve returning ENXIO
+for "delete" and keeping EINVAL for create (and also picking one of
+those for modify), which could also look like moving the check down to
+below the point in the function where bdev_del_partition() is called.
+I've cc:'d Li Lingfeng on this email, who can maybe provide some
+additional context.
 
-Overall this doesn't seem like "just tweak drop_caches a bit" kind of
-work...
+Thanks (and sorry...)
 
-								Honza
+Allison
 
+On Tue, 16 Jan 2024 at 12:16, Christoph Hellwig <hch@infradead.org> wrote:
+>
+> Hi Allison,
+>
+> please try this minimal fix.  I need to double check if we historically
+> returned ENXIO or EINVAL for adding / resizing partitions, which would
+> make things more complicated.  Or maybe you already have data for that
+> at hand?
+>
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 9c73a763ef8838..f2028e39767821 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -21,7 +21,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+>         sector_t start, length;
+>
+>         if (disk->flags & GENHD_FL_NO_PART)
+> -               return -EINVAL;
+> +               return -ENXIO;
+>         if (!capable(CAP_SYS_ADMIN))
+>                 return -EACCES;
+>         if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
+>
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
