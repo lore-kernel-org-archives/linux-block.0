@@ -1,128 +1,140 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E8C15957C
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 20:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EADE657A7;
+	Tue, 16 Jan 2024 20:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435235; cv=none; b=JHd/VMeabPMNUnC5pWJFuwkxQ8Ot3m4CK/0pzOfWYNxp4GLeEm1Q8IPlrpe39b1pYUBy/UWrzx4V2kjj2V980ujLYSpkQP6Eu6gXejG4yzHbI1T5XtlDWgDifkCw/YgDAdzNZzg6rVSc90D1Oy363BbGkpRez+6kPONdLBuIbZk=
+	t=1705435316; cv=none; b=L8l/kqWmygLjBaZp3mi+BOLW5DQKvBMZWbZLmwpFTywrJ2Nx1rbd+uLggvog4UrBkPW3q0U7OfxhSzN7pU1e21ga8eM+2V0DiI0Z5WoFOKMz7i4Mk+Hkq+9xYzIGWpcDtGzEZfskWfWL9LvkJmDJm7i9sFPzbcUNdWV+rabNYBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435235; c=relaxed/simple;
-	bh=0LpxdPDwIhXx9whWgjBylXCRhboUwUu+jIA/F2NRoWc=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=L/xfzYy+0rrNrhRqtMMjERWzOMr2RMVLRDPIUR+El7Dk6ggKlzui+koC6y8kmYz0ICQ3DAMxbTZl3SOE2Q0ynY/yzM+Z4UdQgD2RMhz9UsJK1ONtLQWfTcI6sGtYRUJbS2bE609Juo3Rv9fy5znAPnWGSAGaSjtQlLJhtFjTUdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IimP4Pc1; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1705435316; c=relaxed/simple;
+	bh=gehWr142WgimqB5I8h13XxP1fAqxRxT71+xWHWU5v8s=;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=phucwtbFOdpUiN78EGHuwQshfXDpKOMJmWHAk5tYZN/XVHhIvYPV1wuJMtZoZk2IFq0nLj3ArhBUCxnqxTNaUzooxf5zxq4fiv9k9qIOX3uRyJg/6PEBMAtbpFV+p2RQLLzOVgcMLYh2e9nLhgglIqo3ASQU7zWUhVKWdonvB3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZp6PRRb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IimP4Pc1"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3618c6a1d30so724375ab.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 12:00:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705435230; x=1706040030; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8Bzi0VNEZLd3xkt69kN62PfQd5yOGDUdslJTECLXFRg=;
-        b=IimP4Pc1UlT1Dxvn4rthZMYDf19IAeO/EBFr2fLbWHMWHQjjlbujtucKNyTHweQTI8
-         n7sWGwfxGb3TB7t1++rN5fAN5rRwxq07taKD/AwzUSiJPkbjrTVwg60yhn0ZhuRuaa8B
-         b3KbQHJxndhscKKaJmye9Kve//SiKKfNlfFJxpWCbifNWgQfVnmO00ZBmFFL19bDXmkz
-         7VMeRnrPGgsNj3AhzWQzWSdQcq0ww4/76/fZcrUGwupAmfQQ1ykoCjwfcGgZSnhlJB9y
-         +ItHxEb74pD+c9EBNnpijdHENmIYJdCqY/D3sZIe/qWH+r56qXn5KAKiW65hFQovuL39
-         KARA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705435230; x=1706040030;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Bzi0VNEZLd3xkt69kN62PfQd5yOGDUdslJTECLXFRg=;
-        b=Ymx9WD2OkvbYV8GWvemuvS0DlX9UK/7KGHnf2EYEQ6pzHFap22QEmmf0Ufho3g26JW
-         Xlyj1a7YIxkIaeNhGQrqcWukXRS1/RseHfPbu2eedFtmxwXvraEVwY8zSeCmXbG5Mqb3
-         RvZ6bc6TQpyH9anF257NKRacVJBPUdDbw8zcs6H6QjEFU9pf81swobF7WY8nZ37XQ4Hc
-         GRBR6PhhzpD8uoEpJ5NjYm+IE38avkiTqppmqO+arExRwBt2OpkzEmLvQvXoP/13elNJ
-         6EkenKMarGrafEs1wuhZk37ScEZjnMdEoXSxCaIyjTNWOAX76xS6kHaDPkJbH1wcWAqT
-         nPgg==
-X-Gm-Message-State: AOJu0YxTgL8PhOmF/uGLMHOHUcMmCNFEshpWDCp+OQQ/dIeH9+YXA9YC
-	PTuLYSyV81EFKGiBDDdy3DsHG3+Sf/d/KA==
-X-Google-Smtp-Source: AGHT+IGD/c0B/2oUpgwDPKxeGeaTpllkQKnSoDSKBOTPLNpwFPFn9e3DteSXI03hU/LqVgKuvSnt4Q==
-X-Received: by 2002:a6b:c845:0:b0:7bc:2603:575f with SMTP id y66-20020a6bc845000000b007bc2603575fmr14558885iof.0.1705435230304;
-        Tue, 16 Jan 2024 12:00:30 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id b8-20020a029a08000000b0046e1efd2e1dsm3079962jal.74.2024.01.16.12.00.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jan 2024 12:00:29 -0800 (PST)
-Message-ID: <e2e2bfad-c1be-42fc-be83-b0cb894887ca@kernel.dk>
-Date: Tue, 16 Jan 2024 13:00:29 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZp6PRRb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CE4FC4166C;
+	Tue, 16 Jan 2024 20:01:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705435316;
+	bh=gehWr142WgimqB5I8h13XxP1fAqxRxT71+xWHWU5v8s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GZp6PRRbx0GPaTTFmJc0YcHi/iWheXPt+kmI5VJcimd4HnCAVD4PJdjMCZx0mAoX8
+	 jOzBr5+vMa76lhG0pPZ8B79JJI2JMZIR/dDhpkSrrQG6HbJQWX38cZyVVPgp962wth
+	 YbNpcV6aCuVeq9U/HnV+iyiqfVw5+WyPaibleaJWptTpF/3s3SJgg/d0HhURr1Tw7w
+	 N9J1Lq/c5Nuf+Jqb5WmFyR2zkh3SUxtriZJqh/NX6rlsGNvpQ4HpOOnr1x9/PV08qn
+	 q46JW51C8VOkzDjYxaKdNEYFuxV4HCDhUCm2GWIUk9eYsGMIeX6AhV5NMDuxZdq/mz
+	 TIle95R1icsZA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>,
+	kernel test robot <lkp@intel.com>,
+	"Md . Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Guoqing Jiang <guoqing.jiang@linux.dev>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 26/44] block/rnbd-srv: Check for unlikely string overflow
+Date: Tue, 16 Jan 2024 14:59:55 -0500
+Message-ID: <20240116200044.258335-26-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240116200044.258335-1-sashal@kernel.org>
+References: <20240116200044.258335-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [block?] BUG: unable to handle kernel NULL pointer
- dereference in __bio_release_pages
-Content-Language: en-US
-To: Matthew Wilcox <willy@infradead.org>
-Cc: syzbot <syzbot+004c1e0fced2b4bc3dcc@syzkaller.appspotmail.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <000000000000dbe2f2060f0d2781@google.com>
- <4bd438c0-75b8-4e28-939c-954716df7563@kernel.dk>
- <ZabOF3/P/jQmjudb@casper.infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZabOF3/P/jQmjudb@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.10.208
+Content-Transfer-Encoding: 8bit
 
-On 1/16/24 11:42 AM, Matthew Wilcox wrote:
-> On Tue, Jan 16, 2024 at 11:00:52AM -0700, Jens Axboe wrote:
->> On 1/16/24 2:57 AM, syzbot wrote:
->>> pstate: 10000005 (nzcV daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
->>> pc : _compound_head include/linux/page-flags.h:247 [inline]
->>> pc : bio_first_folio include/linux/bio.h:289 [inline]
->>> pc : __bio_release_pages+0x100/0x73c block/bio.c:1153
->>> lr : bio_release_pages include/linux/bio.h:508 [inline]
->>> lr : blkdev_bio_end_io+0x2a0/0x3f0 block/fops.c:157
->>> sp : ffff800089a375e0
->>> x29: ffff800089a375e0 x28: 1fffe0000162e879 x27: ffff00000b1743c0
->>> x26: ffff00000b1743c8 x25: 000000000000000a x24: 1fffe000015a9e12
->>> x23: ffff00000ad4f094 x22: ffff00000f496600 x21: 1fffe0000162e87a
->>> x20: 0000000000000004 x19: 0000000000000000 x18: ffff00000b174432
->>> x17: ffff00000b174438 x16: ffff00000f948008 x15: 1fffe0000162e886
->>> x14: ffff00000b1743d4 x13: 00000000f1f1f1f1 x12: ffff6000015a9e13
->>> x11: 1fffe000015a9e12 x10: ffff6000015a9e12 x9 : dfff800000000000
->>> x8 : ffff00000b1743d4 x7 : 0000000041b58ab3 x6 : 1ffff00011346ed0
->>> x5 : ffff700011346ed0 x4 : 00000000f1f1f1f1 x3 : 000000000000f1f1
->>> x2 : 0000000000000001 x1 : dfff800000000000 x0 : 0000000000000008
->>> Call trace:
->>>  _compound_head include/linux/page-flags.h:247 [inline]
->>>  bio_first_folio include/linux/bio.h:289 [inline]
->>>  __bio_release_pages+0x100/0x73c block/bio.c:1153
->>>  bio_release_pages include/linux/bio.h:508 [inline]
->>>  blkdev_bio_end_io+0x2a0/0x3f0 block/fops.c:157
->>>  bio_endio+0x4a4/0x618 block/bio.c:1608
->>
->> This looks to be caused by:
->>
->> commit 1b151e2435fc3a9b10c8946c6aebe9f3e1938c55
->> Author: Matthew Wilcox (Oracle) <willy@infradead.org>
->> Date:   Mon Aug 14 15:41:00 2023 +0100
->>
->>     block: Remove special-casing of compound pages
-> 
-> This looks familiar ... looks like it came up right before Xmas and
-> I probably dropped the patch on the floor?
-> 
-> https://lore.kernel.org/all/ZX07SsSqIQ2TYwEi@casper.infradead.org/
+From: Kees Cook <keescook@chromium.org>
 
-Can you send out a proper patch please?
+[ Upstream commit 9e4bf6a08d1e127bcc4bd72557f2dfafc6bc7f41 ]
 
+Since "dev_search_path" can technically be as large as PATH_MAX,
+there was a risk of truncation when copying it and a second string
+into "full_path" since it was also PATH_MAX sized. The W=1 builds were
+reporting this warning:
 
+drivers/block/rnbd/rnbd-srv.c: In function 'process_msg_open.isra':
+drivers/block/rnbd/rnbd-srv.c:616:51: warning: '%s' directive output may be truncated writing up to 254 bytes into a region of size between 0 and 4095 [-Wformat-truncation=]
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                                                   ^~
+In function 'rnbd_srv_get_full_path',
+    inlined from 'process_msg_open.isra' at drivers/block/rnbd/rnbd-srv.c:721:14: drivers/block/rnbd/rnbd-srv.c:616:17: note: 'snprintf' output between 2 and 4351 bytes into a destination of size 4096
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  617 |                          dev_search_path, dev_name);
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To fix this, unconditionally check for truncation (as was already done
+for the case where "%SESSNAME%" was present).
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202312100355.lHoJPgKy-lkp@intel.com/
+Cc: Md. Haris Iqbal <haris.iqbal@ionos.com>
+Cc: Jack Wang <jinpu.wang@ionos.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc:  <linux-block@vger.kernel.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+Link: https://lore.kernel.org/r/20231212214738.work.169-kees@kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/rnbd/rnbd-srv.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index e1bc8b4cd592..9c5d52335e17 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -591,6 +591,7 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+ {
+ 	char *full_path;
+ 	char *a, *b;
++	int len;
+ 
+ 	full_path = kmalloc(PATH_MAX, GFP_KERNEL);
+ 	if (!full_path)
+@@ -602,19 +603,19 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+ 	 */
+ 	a = strnstr(dev_search_path, "%SESSNAME%", sizeof(dev_search_path));
+ 	if (a) {
+-		int len = a - dev_search_path;
++		len = a - dev_search_path;
+ 
+ 		len = snprintf(full_path, PATH_MAX, "%.*s/%s/%s", len,
+ 			       dev_search_path, srv_sess->sessname, dev_name);
+-		if (len >= PATH_MAX) {
+-			pr_err("Too long path: %s, %s, %s\n",
+-			       dev_search_path, srv_sess->sessname, dev_name);
+-			kfree(full_path);
+-			return ERR_PTR(-EINVAL);
+-		}
+ 	} else {
+-		snprintf(full_path, PATH_MAX, "%s/%s",
+-			 dev_search_path, dev_name);
++		len = snprintf(full_path, PATH_MAX, "%s/%s",
++			       dev_search_path, dev_name);
++	}
++	if (len >= PATH_MAX) {
++		pr_err("Too long path: %s, %s, %s\n",
++		       dev_search_path, srv_sess->sessname, dev_name);
++		kfree(full_path);
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+ 	/* eliminitate duplicated slashes */
 -- 
-Jens Axboe
-
+2.43.0
 
