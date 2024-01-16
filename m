@@ -1,79 +1,128 @@
-Received: from forward203b.mail.yandex.net (forward203b.mail.yandex.net [178.154.239.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA371BF22
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 14:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA271BF22
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 14:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="IpX3Paob"
-Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d102])
-	by forward203b.mail.yandex.net (Yandex) with ESMTPS id D6AE965C09
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 17:35:49 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-84.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-84.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:30a4:0:640:6426:0])
-	by forward102b.mail.yandex.net (Yandex) with ESMTP id 262F7608F3;
-	Tue, 16 Jan 2024 17:35:42 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-84.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id eZpm1CDOk0U0-iNNfpDju;
-	Tue, 16 Jan 2024 17:35:41 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1705415741; bh=hUqXt3iq3wr6WKTOdpFPRwCLgcCq56h8Q0+juNfIfao=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=IpX3PaobfaqOdmANcCrmCjzXYPdCzAZfQEBaVUlJO1HGtJgOSRWHvohes9Wa3RHpT
-	 jTAQ0U8/fkwNpzTBp2OtCbfJ0+xpxGw9/YvWQc9egSaUCJ9EgUweMOsNF0jIpwIAMO
-	 5rQgtDH/WyFEwLEBnx5y8rsDvYNpP0O98XL1YgA0=
-Authentication-Results: mail-nwsmtp-smtp-production-main-84.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH] block: bio-integrity: fix kcalloc() arguments order
-Date: Tue, 16 Jan 2024 17:34:31 +0300
-Message-ID: <20240116143437.89060-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D7yN45go"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-360630beb7bso7778265ab.0
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 06:43:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705416193; x=1706020993; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rrKHxnpFL43gNtqjixFGO85ojRP7W+RwELBqauGPTUk=;
+        b=D7yN45goia7yRk+rDVYjL7DuvE8be256fJqL4B0paptHYWBroEQUVOkpFsn+npkm/T
+         CJoyIKR65Y2rCU/QH0SrcwgMVJueE1bidTW9A0xgyp6BItLwgY4PQLRxYt0CUIjJuTPE
+         a754KTwMTgBk3+64O6JyDYwJGMweHyuqPY2dhCdTXrlg8oHva/vtOrQeidpcHEUqmiS7
+         HsS+Zuw68NhW7RBRQ13Va+YjnI86v4rfZ+oX1MdVmPlB3Ho6vSx7OHnhMybcpn/6S2sS
+         mLhR5NM8fDIyhjBzlDxfGrO6GLyW06ShAOL1kUUW45RoWvHXp1RL45Bs7HuLdvj4Wt9A
+         uA8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705416193; x=1706020993;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rrKHxnpFL43gNtqjixFGO85ojRP7W+RwELBqauGPTUk=;
+        b=SH96jSSlqE2MGwP384mMkMY1a7EH9itNfsrKmJjuvXarHI5Ckhu5b14qMUOUYDVPiz
+         phat2RDmy+B+7BuOTGxEs4XQgdk17QslLBjuh5dKQMVUwwayjtifLnt+GhRVRY8umqci
+         3wzY6ONeDgLEvgqDckfp8kQ49hdK+q2QsUoeQwP2rFyf3+B/Hq/x4rO8k8o2Is+WnTeS
+         rTZr+hdKT06QlMfFz/V+mcx7Ao1nPTugKpVjtnxDU7HXX0cbwQQuq9osxUwlc5FAxd/z
+         TCRU+/XKvqG8nmTOCRszoL8Q14kn8pAG/D4XDzZxSv6LKcyIp2u8JjmNuDqbM6fKUX5n
+         k/jw==
+X-Gm-Message-State: AOJu0YzptwH3k/NKG7Kp8RFt83+B0e8yX3albu696udq0t9aTS/uUSgw
+	+O5Kn3D+nud2FTE/2z3QfuPWkdlZbgpwrg==
+X-Google-Smtp-Source: AGHT+IGEDZDWtxDpwZAWR9ay3DfGokiow/x1zwcvh/FkAoj7YSLMXApURRI7WLCOHevnHmseN/6nFA==
+X-Received: by 2002:a92:ca07:0:b0:35f:b559:c2c7 with SMTP id j7-20020a92ca07000000b0035fb559c2c7mr12627242ils.3.1705416192396;
+        Tue, 16 Jan 2024 06:43:12 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id bq7-20020a056e02238700b0036088147a06sm3603463ilb.1.2024.01.16.06.43.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jan 2024 06:43:11 -0800 (PST)
+Message-ID: <17a5683c-8883-4adf-8c98-812f7176eff1@kernel.dk>
+Date: Tue, 16 Jan 2024 07:43:11 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] block: cache current nsec time in struct blk_plug
+Content-Language: en-US
+To: Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org
+References: <20240115215840.54432-1-axboe@kernel.dk>
+ <CGME20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77@epcas5p1.samsung.com>
+ <20240115215840.54432-3-axboe@kernel.dk>
+ <ff4a6649-9f09-23fc-ad33-06deb4845590@samsung.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ff4a6649-9f09-23fc-ad33-06deb4845590@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When compiling with gcc version 14.0.1 20240116 (experimental)
-and W=1, I've noticed the following warning:
+On 1/16/24 2:51 AM, Kanchan Joshi wrote:
+> On 1/16/2024 3:23 AM, Jens Axboe wrote:
+> 
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 11342af420d0..cc4db4d92c75 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -1073,6 +1073,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
+>>   	if (tsk->plug)
+>>   		return;
+>>   
+>> +	plug->cur_ktime = 0;
+>>   	plug->mq_list = NULL;
+>>   	plug->cached_rq = NULL;
+>>   	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 2f9ceea0e23b..23c237b22071 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -942,6 +942,7 @@ struct blk_plug {
+>>   
+>>   	/* if ios_left is > 1, we can batch tag/rq allocations */
+>>   	struct request *cached_rq;
+>> +	u64 cur_ktime;
+>>   	unsigned short nr_ios;
+>>   
+>>   	unsigned short rq_count;
+>> @@ -977,7 +978,15 @@ long nr_blockdev_pages(void);
+>>   
+>>   static inline u64 blk_time_get_ns(void)
+>>   {
+>> -	return ktime_get_ns();
+>> +	struct blk_plug *plug = current->plug;
+>> +
+>> +	if (!plug)
+>> +		return ktime_get_ns();
+>> +	if (!(plug->cur_ktime & 1ULL)) {
+>> +		plug->cur_ktime = ktime_get_ns();
+>> +		plug->cur_ktime |= 1ULL;
+>> +	}
+>> +	return plug->cur_ktime;
+> 
+> I did not understand the relevance of 1ULL here. If ktime_get_ns()
+> returns even value, it will turn that into an odd value before
+> caching.
 
-block/bio-integrity.c: In function 'bio_integrity_map_user':
-block/bio-integrity.c:339:38: warning: 'kcalloc' sizes specified with 'sizeof'
-in the earlier argument and not in the later argument [-Wcalloc-transposed-args]
-  339 |                 bvec = kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
-      |                                      ^
-block/bio-integrity.c:339:38: note: earlier argument should specify number of
-elements, later size of each element
+Right, it's potentially round it up by 1 nsec.
 
-Since 'n' and 'size' arguments of 'kcalloc()' are multiplied to
-calculate the final size, their actual order doesn't affect the
-result and so this is not a bug. But it's still worth to fix it.
+> And that value will be returned for the subsequent calls. But
+> how is that better compared to just caching whatever ktime_get_ns()
+> returned.
 
-Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- block/bio-integrity.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+0 could be a valid time. You could argue that this doesn't matter, we'd
+just do an extra ktime_get_ns() in that case. And that's probably fine.
+The LSB was meant to indicate "time stamp is valid".
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index feef615e2c9c..c9a16fba58b9 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -336,7 +336,7 @@ int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t bytes,
- 	if (nr_vecs > BIO_MAX_VECS)
- 		return -E2BIG;
- 	if (nr_vecs > UIO_FASTIOV) {
--		bvec = kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
-+		bvec = kcalloc(nr_vecs, sizeof(*bvec), GFP_KERNEL);
- 		if (!bvec)
- 			return -ENOMEM;
- 		pages = NULL;
+But not that important imho, I'll either add a comment or just use 0 as
+both the initializer (as it is now) and non-zero to indicate if the
+timestamp is valid or not.
+
 -- 
-2.43.0
+Jens Axboe
 
