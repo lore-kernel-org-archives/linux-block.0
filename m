@@ -1,113 +1,94 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3662A1F95B
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 21:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B230B2E653;
+	Tue, 16 Jan 2024 21:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705439321; cv=none; b=hT7tQJD6+aoNJU+LtzqemcGtmG2TAlQf+nrlZw3OzFJg7OufcNjcTNuwk3WObZKyFu3dt+9ySKJ7m3HL2o7FUCnF5sSNCdHU9/bgvjCVXZ7QRMyA0OBO0L7Fvlzm/OLDrZLawqIRBxI/7ONFKxNgbPM/1rSJsHQt2TNd+lBHvAs=
+	t=1705440605; cv=none; b=Rs5U68eAR9Su9oiIJlgRjrqrz5Yu6Fmi4esyEIFQLSjQqlviPQSuZfD+E/2Smh6HHuwg0+9pEZ4h/yOSmpeVIY6vzC4ANqo7Ec3HYksn9Jrh6eXqClg0XaZ6b3Qh6g+Dpn+PuYl6vS77z7JNBI/2DCAlJRJ15Q080Ggd/HtiSmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705439321; c=relaxed/simple;
-	bh=wjdhA9Wx/G9JI+UMvxCg1223sOIZUuC/gF+B08th0mQ=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 From:To:Cc:References:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=mgIbHS3OHezPzr9ae49eQ9OpASJoOR8wUX+cSg+ugEZv+a+nEc2yEJG0nuHog5gTNuppa5sS7ApZJRDqklxijwLoDb6D/e9ZiwhIeU0VAdZaO5DQ0jNcQR5bLRJvK/4cc0TZcYNebo0776pl+61fyE6DuqPP9myVlxWm3yXlGlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AvntdGYc; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1705440605; c=relaxed/simple;
+	bh=IAWk1YprB3PG7VN0yzjiLV8oZKHAOS9ZB6C24VAJCCQ=;
+	h=DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-Id:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding; b=jQ/qJZTL0/ubzkNgugGhwxpe7oxG8zDwD1xlq7dmr4I3XVL9LL6LnYzGyCbVtNRatHfC7vsqOQv2WoHt8SZixOxaOHqydYKztegxTcyDmazO8C9DtWMeBrMlSjNOM2G/hJ+Qln/gqD3qSeP1ugqa4iPmgAMgrJATSG120Y45dlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jSf9328k; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AvntdGYc"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-360630beb7bso8140145ab.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 13:08:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705439317; x=1706044117; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vZ9UWgbz5tCJlrTfYrqTFQs+p6e2qJiObigyvDXwRj4=;
-        b=AvntdGYc5qwQKwVIpcjjdBYGPGt4NJ8yCsgZYWqBAQYAe9IC2tuUQ0AKe9j+wMvKxO
-         emrCF8qUsnq6lW/weTmgbY0FPknRKKz6y1ltcTMSdjCPXN9EERmD86wR652J/ePeOEYJ
-         OPt5HX2hbfs05kkAQ7kA37K+PpqviYcIBkSlZ/bN6zzCpmS30R9dexfiJ2MDnUEf37+O
-         csGA+KPdrnPmEHt2E1LfrGSqRBdCJDdhaklS6q5U87az73FXVzCM11A2KYy/VBCr9H94
-         1D7jZvArmNNM8gG7MjQd9maFv9AFmEbhghO+OesSTjVhe6zdxOJ3NftLCyElGKV0L8f4
-         F2dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705439317; x=1706044117;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZ9UWgbz5tCJlrTfYrqTFQs+p6e2qJiObigyvDXwRj4=;
-        b=kTSi2n43LSc39mLSwlXNXOXV9iFiH3JSVCRZYVPV1P9zDjbKkAt5trPj8Qvzn7Zqr/
-         W6t7Z/9KyPXixfPMlMC/W8M2ri1tlkzrppRYry0BOkMe9J3Q+xo6sj3e9eabJYNW67dj
-         GmoV8GGKVJvInyVHWC0m69DflFoQVBgJeEl5H8J5EtMcnlfgK36Q4eIk8c2PdzGeqK84
-         qhqhgSW+A7m5GCc64kFaVwjHl30NqYDvIxuMvSoiLvutpDnVYHVeoxmAZkHuYEYwnksr
-         ElNbYKU3BLZZ1Wf9pLXGiIxCTtQpBNLHf0j/buDoeSJCaHDmIV4MmLuBZXq7B48m2tdJ
-         0C6Q==
-X-Gm-Message-State: AOJu0Yzsp1d1zYeLfzFyIQnBol7ss/LvO3q0n/kEhYJDG2SHs9TZpkFp
-	x9sISs5jOhVTKBkpjU6vpE8Gzt2SAAy5ZBcBcKpklskE/3CUvQ==
-X-Google-Smtp-Source: AGHT+IFuMSETEf3UojmE80fEvZPV6DIevsJQqiObnggttGyrsKhWb5JzTtBba2sScLgCwKxWoxWwxQ==
-X-Received: by 2002:a05:6e02:1bcb:b0:360:968d:bf98 with SMTP id x11-20020a056e021bcb00b00360968dbf98mr14394120ilv.1.1705439317331;
-        Tue, 16 Jan 2024 13:08:37 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id bd10-20020a056e02300a00b0035f7f712c78sm3782819ilb.36.2024.01.16.13.08.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jan 2024 13:08:36 -0800 (PST)
-Message-ID: <a43fda39-cda6-4fa4-9c5a-2062b0ef19f8@kernel.dk>
-Date: Tue, 16 Jan 2024 14:08:36 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jSf9328k"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=HM/2mnrR5ku0dJRu3DvkRCaTPaWRj5EtYUk/YkITPe0=; b=jSf9328kIeMp0WquyPLyQD2UbG
+	vdOiLmM3fVjvGvEIAGVSGmjkXI4q/ZzuI0kqep5Czy0xnrWg8fFBlWRV9bIzSn2IY/2ptCTijl0Ot
+	8fj9Prv++oNv4PoY1BL6q853A/5/e6Ohua7ySUW+rEIlKGOvNsKMz+wPz9JLSFFNnrkCIHYwxxSBg
+	cbGME98WXP1OA3X/qfenOm1/VYdcD1xvi6zSl/0fq9MR7GkqBKRrloOGG8lJQKo8+yIKwDvFONzYc
+	vRcYh6evnSqdD2J+aKAD4gACbN8iXbT0foOZsnHhVcDKt7YHNQYkvwvFLPZLzYUJm39YMdivO8T3E
+	sqHQQ0jQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1rPr0S-00EJsm-W2; Tue, 16 Jan 2024 21:30:01 +0000
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+8b23309d5788a79d3eea@syzkaller.appspotmail.com,
+	syzbot+004c1e0fced2b4bc3dcc@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: [PATCH] block: Fix iterating over an empty bio with bio_for_each_folio_all
+Date: Tue, 16 Jan 2024 21:29:59 +0000
+Message-Id: <20240116212959.3413014-1-willy@infradead.org>
+X-Mailer: git-send-email 2.37.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHSET RFC v2 0/5] Cache issue side time querying
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: kbusch@kernel.org, joshi.k@samsung.com
-References: <20240116165814.236767-1-axboe@kernel.dk>
-In-Reply-To: <20240116165814.236767-1-axboe@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/16/24 9:54 AM, Jens Axboe wrote:
-> Results in patch 2, but tldr is a more than 9% improvement (108M -> 118M
-> IOPS) for my test case, which doesn't even enable most of the costly
-> block layer items that you'd typically find in a distro and which would
-> further increase the number of issue side time calls. This brings iostats
-> enabled _almost_ to the level of turning it off.
+If the bio contains no data, bio_first_folio() calls page_folio() on a
+NULL pointer and oopses.  Move the test that we've reached the end of
+the bio from bio_next_folio() to bio_first_folio().
 
-Enabled the typical distro things (block cgroups, blk-wbt, iocost,
-iolatency) which all add considerable cost (and is an optimization
-project in itself) and this is the performance of the stock kernel with
-iostats enabled:
+Reported-by: syzbot+8b23309d5788a79d3eea@syzkaller.appspotmail.com
+Reported-by: syzbot+004c1e0fced2b4bc3dcc@syzkaller.appspotmail.com
+Fixes: 640d1930bef4 ("block: Add bio_for_each_folio_all()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ include/linux/bio.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-IOPS=91.01M, BW=44.44GiB/s, IOS/call=32/32
-IOPS=91.29M, BW=44.58GiB/s, IOS/call=31/32
-IOPS=91.27M, BW=44.57GiB/s, IOS/call=32/31
-IOPS=91.26M, BW=44.56GiB/s, IOS/call=32/31
-IOPS=91.38M, BW=44.62GiB/s, IOS/call=32/31
-IOPS=91.28M, BW=44.57GiB/s, IOS/call=32/32
-
-which is down from 122M for an optimized config and with iostats off.
-With this patchset applied (and one extra patch, missed a spot...), we
-now get:
-
-IOPS=101.38M, BW=49.50GiB/s, IOS/call=32/32
-IOPS=101.31M, BW=49.47GiB/s, IOS/call=32/32
-IOPS=101.35M, BW=49.49GiB/s, IOS/call=31/31
-IOPS=101.44M, BW=49.53GiB/s, IOS/call=32/31
-IOPS=101.32M, BW=49.47GiB/s, IOS/call=32/32
-IOPS=101.14M, BW=49.38GiB/s, IOS/call=32/31
-
-which is about a 10% improvement. Mostly ran this because I was curious,
-and while the above config changes do add more time stamping, it also
-adds additional overhead. In any case, 10% win for the distro config
-case is not bad at all.
-
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index ec4db73e5f4e..1518f1201ddd 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -286,6 +286,11 @@ static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
+ {
+ 	struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
+ 
++	if (i >= bio->bi_vcnt) {
++		fi->folio = NULL;
++		return;
++	}
++
+ 	fi->folio = page_folio(bvec->bv_page);
+ 	fi->offset = bvec->bv_offset +
+ 			PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
+@@ -303,10 +308,8 @@ static inline void bio_next_folio(struct folio_iter *fi, struct bio *bio)
+ 		fi->offset = 0;
+ 		fi->length = min(folio_size(fi->folio), fi->_seg_count);
+ 		fi->_next = folio_next(fi->folio);
+-	} else if (fi->_i + 1 < bio->bi_vcnt) {
+-		bio_first_folio(fi, bio, fi->_i + 1);
+ 	} else {
+-		fi->folio = NULL;
++		bio_first_folio(fi, bio, fi->_i + 1);
+ 	}
+ }
+ 
 -- 
-Jens Axboe
+2.43.0
 
