@@ -1,191 +1,150 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFF0125CE
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 08:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11731134A0
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 09:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="bCYy+LAR"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2cd0db24e03so109679051fa.3
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 00:39:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1705394359; x=1705999159; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w1CvrrNcIkgS+m/4ZjQFdMQQSZGMBxfOVQFgXMc67Lo=;
-        b=bCYy+LARQOsxTtrKuNTZR/GI9HCJXaJw1BmktfQS+P5p6oRtQb/U6zkuPhxm1YJRNs
-         woI7+ru2XJiMBN655of4X0cpByvVG1JEETNe34ZLn/3C1DwxEz6+Yw+DCdX+Dr1zcU1m
-         0gSho1pDgmgLurMoOqwDo+JNWnblUrOdpytT+X6hFg8U8M7jaUdnoDxSR/2RtGHW4a1L
-         bTkJYH0m24qU4LkmAkAoeddBmArez/A8L1uyUvW2ZkXCcA9K5e99kT2TFGfFvczgxlBZ
-         zjq4UOYdsK1PkBiq6bRiWYqMc+iWGJBc04WYnFqXI1FxbJ6r9QN5m2+TQ6VXSCbgzv8X
-         d/5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705394359; x=1705999159;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w1CvrrNcIkgS+m/4ZjQFdMQQSZGMBxfOVQFgXMc67Lo=;
-        b=BmbqG2NdAdkw+65oIuzifGb1/ItY3sf1NMmW0LHz2QQWazTQcIYfFwz8gRwEEJDlKL
-         MpFiZ/JKn25UYnZarlri85eMqm2gUa+x+4VJXRrrQcByqvExyJhpVOT2S0eci97H5hbt
-         mq/eR1EjUjcHCQBDCN31k2SbowGuRFtaXgK8xfzXZsERZCGIcHCrjM4dnvhFqtJKUVCr
-         wFOWoLgT27FT/35yDaTOdTIhBuldmUZGxskd2jlceve20omoxgLL5HHne419uV87kXpc
-         27+llx2hiNy3tfc0CciDpo5hhdYSG6jLIsUwPbkgjccG9rqAcIxVTxCXbQzfgmlljqHr
-         3BQw==
-X-Gm-Message-State: AOJu0YzSm9ZZ50NehfMm36cb6wO3esGvyZ/+7DGhQ4fhQnUJaGnXmdjq
-	/vvTI69x/8q3PlMsnLjXh+onljWKg/DG2gIToFNX90E7fn30MOTT
-X-Google-Smtp-Source: AGHT+IHzpBPMFejAuhe5xiepHjjQFUz2ftX3lyYNgoaOeP7qb8f9VKs4w9CNnTQlg+H0ndEF+6okqQ==
-X-Received: by 2002:a2e:b1c7:0:b0:2cc:5546:1ee0 with SMTP id e7-20020a2eb1c7000000b002cc55461ee0mr1298482lja.133.1705394358825;
-        Tue, 16 Jan 2024 00:39:18 -0800 (PST)
-Received: from smtpclient.apple ([2a00:1370:81a4:169c:5d31:9b9f:2cc5:3e9c])
-        by smtp.gmail.com with ESMTPSA id v18-20020a2e9912000000b002cd46eb25f1sm1576357lji.59.2024.01.16.00.39.17
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Jan 2024 00:39:18 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Bwg8wr5K"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240116095200epoutp03e2495706422434970615c75be752ec17~qyxneP4CL0264702647epoutp03H
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 09:52:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240116095200epoutp03e2495706422434970615c75be752ec17~qyxneP4CL0264702647epoutp03H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1705398720;
+	bh=oC8sfo8bga8IOkBztQXGlU14pAfv3VHLV1iyow+ZlNM=;
+	h=Date:Subject:To:From:In-Reply-To:References:From;
+	b=Bwg8wr5K2+jxE9MHQItjjqbGQkKInXwJZw0W3OMXZLlwPZyQLeSBntYXnxACQvf1i
+	 4JicEHLOGx2a8/Dzrc61O1FNv8IbMY4z1JA5d0py95x//bzFTfrrJlrGh60PJlaxRE
+	 +QcP6SX7vF/D8yF1xcdUjQWh7Ibl6hg0U6pz0o6E=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20240116095200epcas5p238c5f263932e783042905671daf0ec1c~qyxnT20OP1589515895epcas5p2r;
+	Tue, 16 Jan 2024 09:52:00 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4TDknC0FtGz4x9Pw; Tue, 16 Jan
+	2024 09:51:59 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	BA.01.09672.CB156A56; Tue, 16 Jan 2024 18:51:56 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240116095156epcas5p2ebd6d454e36eee7d9f0683513342afca~qyxjHKOfB1589515895epcas5p2h;
+	Tue, 16 Jan 2024 09:51:56 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240116095156epsmtrp2773057c3902bf91dc021b8cdbf8d9c15~qyxjGosOB3195731957epsmtrp2r;
+	Tue, 16 Jan 2024 09:51:56 +0000 (GMT)
+X-AuditID: b6c32a4b-39fff700000025c8-14-65a651bcf78c
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	FA.1D.08755.CB156A56; Tue, 16 Jan 2024 18:51:56 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240116095155epsmtip2a9f66195212b59a8331167c15c8b5b5c~qyxibvrWU0837608376epsmtip2a;
+	Tue, 16 Jan 2024 09:51:55 +0000 (GMT)
+Message-ID: <ff4a6649-9f09-23fc-ad33-06deb4845590@samsung.com>
+Date: Tue, 16 Jan 2024 15:21:54 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.4\))
-Subject: Re: [LSF/MM/BPF TOPIC] : Flexible Data Placement (FDP) availability
- for kernel space file systems
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-In-Reply-To: <20240115175445.pyxjxhyrmg7od6sc@mpHalley-2.localdomain>
-Date: Tue, 16 Jan 2024 11:39:16 +0300
-Cc: lsf-pc@lists.linux-foundation.org,
- Linux FS Devel <linux-fsdevel@vger.kernel.org>,
- Adam Manzanares <a.manzanares@samsung.com>,
- linux-scsi@vger.kernel.org,
- linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org,
- slava@dubeiko.com,
- Kanchan Joshi <joshi.k@samsung.com>,
- Bart Van Assche <bvanassche@acm.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <86106963-0E22-46D6-B0BE-A1ABD58CE7D8@dubeyko.com>
-References: <CGME20240115084656eucas1p219dd48243e2eaec4180e5e6ecf5e8ad9@eucas1p2.samsung.com>
- <20240115084631.152835-1-slava@dubeyko.com>
- <20240115175445.pyxjxhyrmg7od6sc@mpHalley-2.localdomain>
-To: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.4)
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH 2/2] block: cache current nsec time in struct blk_plug
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240115215840.54432-3-axboe@kernel.dk>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEKsWRmVeSWpSXmKPExsWy7bCmlu6ewGWpBt/uSVmsvtvPZrH3lrYD
+	k8fls6UenzfJBTBFZdtkpCampBYppOYl56dk5qXbKnkHxzvHm5oZGOoaWlqYKynkJeam2iq5
+	+AToumXmAA1XUihLzCkFCgUkFhcr6dvZFOWXlqQqZOQXl9gqpRak5BSYFOgVJ+YWl+al6+Wl
+	llgZGhgYmQIVJmRnNK5ZxlwwnaeibeYD9gbGG5xdjJwcEgImElsbHjJ1MXJxCAnsZpRY8bmX
+	DcL5xChxZ9VHqMw3RonFk9+ywLTsnP6dESKxl1Hiy/F3UFVvGSXObbjB2sXIwcErYCex7rcR
+	iMkioCqx7KI7SC+vgKDEyZlPwOaICiRJ/Lo6hxHEFhbwkljQM5MVxGYWEJe49WQ+E0iriICt
+	xPaVKSAmm4CmxIXJpSAVnAKmEhOXvGOEqJaX2P52DjPIARICh9glbrW/ZoQ400Xi35HtzBC2
+	sMSr41vYIWwpic/v9rJB2MkSl2aeY4KwSyQe7zkIZdtLtJ7qZwbZywy0d/0ufYhdfBK9v5+A
+	XSYhwCvR0SYEUa0ocW/SU1YIW1zi4YwlULaHRO/B56yQsNnMKLFu4XWWCYzys5ACYhaSh2ch
+	eWcWwuYFjCyrGCVTC4pz01OLTQuM81LL4TGcnJ+7iRGc2LS8dzA+evBB7xAjEwfjIUYJDmYl
+	EV5/g2WpQrwpiZVVqUX58UWlOanFhxhNgREykVlKNDkfmFrzSuINTSwNTMzMzEwsjc0MlcR5
+	X7fOTRESSE8sSc1OTS1ILYLpY+LglGpgSr6501MgUe7aTyNHvxCt1z5CJ2xMnyjd1IkK6gje
+	pOKxpKBvp/SrdEHGT9Z1Pxdv+5nD676Wn8X8IK/9vLSwU9Iz9RYYxxtHnClrUwt9EJVlma3V
+	uYRreojixAPfL3qYiGbP6rRsKxbn/bbYYNHi2QuN3xpuWS66w6n2y1Hb2sKIk+fPystNnsa2
+	rqUzpnSi3ZaJfAwSXId/8tx9alURNo93qmftyTStV1cCTl2a1qNprdL/JZ5vTvF2Xf/KEINV
+	JxRc5v0s+HD/ge3Zz6bl2oyzezwvTgxP+qyYd7ni1Gn54Pdb9ly32+J+7HOamOj0XwzLe+V5
+	Wk8Gej2fJsAmKfPDMeu736PaZ5whea5KLMUZiYZazEXFiQAJAacM9QMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHLMWRmVeSWpSXmKPExsWy7bCSvO6ewGWpBs0b2C1W3+1ns9h7S9uB
+	yePy2VKPz5vkApiiuGxSUnMyy1KL9O0SuDIa1yxjLpjOU9E28wF7A+MNzi5GTg4JAROJndO/
+	M3YxcnEICexmlJj1+hkjREJcovnaD3YIW1hi5b/n7BBFrxklZv/5xdLFyMHBK2Anse63EYjJ
+	IqAqseyiO0g5r4CgxMmZT1hAbFGBJIk99xuZQGxhAS+JBT0zWUFsZqDxt57MZwJpFRGwldi+
+	MgVi+mZGiVUvtoJNZxPQlLgwuRSknFPAVGLikneMEK1mEl1bu6BseYntb+cwT2AUnIVk8ywk
+	G2YhaZmFpGUBI8sqRsnUguLc9NxiwwLDvNRyveLE3OLSvHS95PzcTYzgINbS3MG4fdUHvUOM
+	TByMhxglOJiVRHj9DZalCvGmJFZWpRblxxeV5qQWH2KU5mBREucVf9GbIiSQnliSmp2aWpBa
+	BJNl4uCUamAy23jmT+/zDF7/rdMNpf+Yl4dtr/V+dOdAqXAH9zoBBgaXjZ3GVy2KNpk7nl+4
+	ZWHSh2qNhHfn58V/thRMy/82jb0qXS71dI92n/IyLqbqy+1adpEfymSVrAxW9yc5uDwKj9i5
+	qaKxelNBetzcCy+K2Q2O7ohcPne7Su38nwfums5PfO+xwlma67vYm59b8/fIJ7drhDiIJTy/
+	onzBS3Tqh80PTwWFHF3451lYgqLpAbcS9/+TCsW0+ZM1tm1h1fUpuS6vJTnhaInELJ2JF6Yv
+	ZbnyQtYigpGx+omzkOyhKw/fSW5PK3vd8+jpvzNccRv2yii+Nem//prtnsDPVCWNK8d8rXvi
+	7nbL9rhO/K3EUpyRaKjFXFScCABi1tVQ0QIAAA==
+X-CMS-MailID: 20240116095156epcas5p2ebd6d454e36eee7d9f0683513342afca
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77
+References: <20240115215840.54432-1-axboe@kernel.dk>
+	<CGME20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77@epcas5p1.samsung.com>
+	<20240115215840.54432-3-axboe@kernel.dk>
 
+On 1/16/2024 3:23 AM, Jens Axboe wrote:
 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 11342af420d0..cc4db4d92c75 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1073,6 +1073,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
+>   	if (tsk->plug)
+>   		return;
+>   
+> +	plug->cur_ktime = 0;
+>   	plug->mq_list = NULL;
+>   	plug->cached_rq = NULL;
+>   	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 2f9ceea0e23b..23c237b22071 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -942,6 +942,7 @@ struct blk_plug {
+>   
+>   	/* if ios_left is > 1, we can batch tag/rq allocations */
+>   	struct request *cached_rq;
+> +	u64 cur_ktime;
+>   	unsigned short nr_ios;
+>   
+>   	unsigned short rq_count;
+> @@ -977,7 +978,15 @@ long nr_blockdev_pages(void);
+>   
+>   static inline u64 blk_time_get_ns(void)
+>   {
+> -	return ktime_get_ns();
+> +	struct blk_plug *plug = current->plug;
+> +
+> +	if (!plug)
+> +		return ktime_get_ns();
+> +	if (!(plug->cur_ktime & 1ULL)) {
+> +		plug->cur_ktime = ktime_get_ns();
+> +		plug->cur_ktime |= 1ULL;
+> +	}
+> +	return plug->cur_ktime;
 
-> On Jan 15, 2024, at 8:54 PM, Javier Gonz=C3=A1lez =
-<javier.gonz@samsung.com> wrote:
->=20
-> On 15.01.2024 11:46, Viacheslav Dubeyko wrote:
->> Hi Javier,
->>=20
->> Samsung introduced Flexible Data Placement (FDP) technology
->> pretty recently. As far as I know, currently, this technology
->> is available for user-space solutions only. I assume it will be
->> good to have discussion how kernel-space file systems could
->> work with SSDs that support FDP technology by employing
->> FDP benefits.
->=20
-> Slava,
->=20
-> Thanks for bringing this up.
->=20
-> First, this is not a Samsung technology. Several vendors are building
-> FDP and several customers are already deploying first product.
->=20
-> We enabled FDP thtough I/O Passthru to avoid unnecesary noise in the
-> block layer until we had a clear idea on use-cases. We have been
-> following and reviewing Bart's write hint series and it covers all the
-> block layer and interface needed to support FDP. Currently, we have
-> patches with small changes to wire the NVMe driver. We plan to submit
-> them after Bart's patches are applied. Now it is a good time since we
-> have LSF and there are also 2 customers using FDP on block and file.
->=20
->>=20
->> How soon FDP API will be available for kernel-space file systems?
->=20
-> The work is done. We will submit as Bart's patches are applied.
->=20
-> Kanchan is doing this work.
->=20
->> How kernel-space file systems can adopt FDP technology?
->=20
-> It is based on write hints. There is no FS-specific placement =
-decisions.
-> All the responsibility is in the application.
->=20
-> Kanchan: Can you comment a bit more on this?
->=20
->> How FDP technology can improve efficiency and reliability of
->> kernel-space file system?
->=20
-> This is an open problem. Our experience is that making data placement
-> decisions on the FS is tricky (beyond the obvious data / medatadata). =
-If
-> someone has a good use-case for this, I think it is worth exploring.
-> F2FS is a good candidate, but I am not sure FDP is of interest for
-> mobile - here ZUFS seems to be the current dominant technology.
->=20
-
-If I understand the FDP technology correctly, I can see the benefits for
-file systems. :)
-
-For example, SSDFS is based on segment concept and it has multiple
-types of segments (superblock, mapping table, segment bitmap, b-tree
-nodes, user data). So, at first, I can use hints to place different =
-segment
-types into different reclaim units. The first point is clear, I can =
-place different
-type of data/metadata (with different =E2=80=9Chotness=E2=80=9D) into =
-different reclaim units.
-Second point could be not so clear. SSDFS provides the way to define
-the size of erase block. If it=E2=80=99s ZNS SSD, then mkfs tool uses =
-the size of zone
-that storage device exposes to mkfs tool. However, for the case of =
-conventional
-SSD, the size of erase block is defined by user. Technically speaking, =
-this size
-could be smaller or bigger that the real erase block inside of SSD. =
-Also, FTL could
-use a tricky mapping scheme that could combine LBAs in the way making
-FS activity inefficient even by using erase block or segment concept. I =
-can see
-how FDP can help here. First of all, reclaim unit makes guarantee that =
-erase
-blocks or segments on file system side will match to erase blocks =
-(reclaim units)
-on SSD side. Also, I can use various sizes of logical erase blocks but =
-the logical
-erase blocks of the same segment type will be placed into the same =
-reclaim unit.
-It could guarantee the decreasing the write amplification and =
-predictable reclaiming on
-SSD side. The flexibility to use various logical erase block sizes =
-provides
-the better efficiency of file system because various workloads could =
-require
-different logical erase block sizes.
-
-Technically speaking, any file system can place different types of =
-metadata in
-different reclaim units. However, user data is slightly more tricky =
-case. Potentially,
-file system logic can track =E2=80=9Chotness=E2=80=9D or frequency of =
-updates of some user data
-and try to direct the different types of user data in different reclaim =
-units.
-But, from another point of view, we have folders in file system =
-namespace.
-If application can place different types of data in different folders, =
-then, technically
-speaking, file system logic can place the content of different folders =
-into different
-reclaim units. But application needs to follow some =E2=80=9Cdiscipline=E2=
-=80=9D to store different
-types of user data (different =E2=80=9Chotness=E2=80=9D, for example) in =
-different folders.
-
-Thanks,
-Slava.
-
+I did not understand the relevance of 1ULL here.
+If ktime_get_ns() returns even value, it will turn that into an odd 
+value before caching. And that value will be returned for the subsequent 
+calls.
+But how is that better compared to just caching whatever ktime_get_ns() 
+returned.
