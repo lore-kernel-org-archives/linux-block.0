@@ -1,46 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F31286BB;
-	Tue, 16 Jan 2024 19:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C05605D3;
+	Tue, 16 Jan 2024 19:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434792; cv=none; b=gGLojrS/NtVx3X1HV6ubhc6dVOeyJhEMSbbcackchJhHGYsbh4tMJ6SERf0Bb4GUCfZZdrMEmbrvSW+Q0mbpeoNbELxB+vfTbHV1KsCWHxrNdO9S1rk3rFP2XJjht0X2udGE+OctqVGUHUC76EoKeIIgj/AEowxqnZeX7Q95oys=
+	t=1705435009; cv=none; b=GRoud/jeZsfAv0HKkpUYYDYaW82UVICw5ETBlZCbi3kwWRPsqZ+PAowRqXsxuxxjtkRF4vBxZnwQo8BMmzuNMGMODO4qjh6vT1G7JmkGxrt3E/SGhgHBnfz19W60zZxFR7wkuNn46WmZ4LeqP0mXmQ0VD64MV2GAIv7qtuikxPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434792; c=relaxed/simple;
-	bh=KANHFBaqsOkmhse8jBTL8CuQiAWzvFMUgPyS2O7nW3M=;
+	s=arc-20240116; t=1705435009; c=relaxed/simple;
+	bh=vSY0MlHzMrVhlqT/U5OwRyf8NukfDspdqwAqLXurF6I=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=uVz/TByFq9oKEmC0X/shux/wSAIEX7Gj4tuDudqqCrDqvU9fQUFIfrCgeWLVvxy6tgOJswatEUX7xfKXne9OVnQGEQvVROZloTylpWuwk4Xaf1jfZoVYu1TYnadlsTPOSSfK0F+L5URi7XZk0wJgSt26E/2tvbTGbtNyS/UoHdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ejm+Vxo+; arc=none smtp.client-ip=10.30.226.201
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=NO5PBtmCzsjncf7KoJzsPwAGojfxVE32znzx9LaqbYrYi8qW14vmP9Bt8qX0nq94rKoVFSh43/XJXS8jLe9z6EVkoWTF1/hdSj9We73R8nZsR9/mFtySHznTbRkh6g+jIvnc9LF4Qn2tVmclbV3QWqfnpmRHcBYRzzFcSUlj2Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aj3EMdIa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ejm+Vxo+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEEA6C433C7;
-	Tue, 16 Jan 2024 19:53:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aj3EMdIa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BECF4C433C7;
+	Tue, 16 Jan 2024 19:56:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434790;
-	bh=KANHFBaqsOkmhse8jBTL8CuQiAWzvFMUgPyS2O7nW3M=;
+	s=k20201202; t=1705435008;
+	bh=vSY0MlHzMrVhlqT/U5OwRyf8NukfDspdqwAqLXurF6I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ejm+Vxo+pjc0iVRjxEFmfG1pah6NwFKzgyO3bCjK807mxofbMmgCyCxInpktxHpb/
-	 8WzJE03gNkyspaoIneRc0b4bwgUcoh1kuI5N4/54QKv6Yvh+LAXjs3AZYZnONcHCsB
-	 9AdTGwQWAAKbXRmHPCPAq1GqZTgsiy2bpBZjVHjKtLLHiczQVdbi+SjiS4NcpwVMBJ
-	 6kECkdtTY0XUDi0PmpUjoFEa5TKRsDfWmFRbTAgZdfD5FOYlbbQrEdpt5vGkFYrrAc
-	 qHFrXfmT8iqKXIAk6X8LwNo9yIOqYSlglJ96CNAToRtd4KqJxhtGQTR52VEY+QnRZS
-	 /rwyT8qE4YevQ==
+	b=Aj3EMdIa7FFE5KRWv7c+QVJVeEZgCIdoAImbBChsk7rghyGLlGLN8IzczfCoPuOQJ
+	 yQyhwptVqAphzUvYeaBLSK1/UISWgEKMasIdRuDf3SY5HbcpjCIEsfEf/T3gxnj32D
+	 U2w0zk8cyZTtyoHcML/cHuVWQwBFn6k5TL6GKPuxHkBNABjyzt+6CxxG8pXr9MrQg5
+	 70LqQofCriRFe0GOltydbjOqp7fH9kjexZTdeGW6dyJOXS5Bj7Sp13jtVeXE72m5tk
+	 BrEvZ4M+PEJYng7SKQVf2+R8ZG8HJ0N2UZP4TaFfmxqeiRdSCQMxUVchfu3DpdBa/m
+	 /PKyjkIxVL9fA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+Cc: Kees Cook <keescook@chromium.org>,
+	kernel test robot <lkp@intel.com>,
+	"Md . Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
 	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 079/104] block: prevent an integer overflow in bvec_try_merge_hw_page
-Date: Tue, 16 Jan 2024 14:46:45 -0500
-Message-ID: <20240116194908.253437-79-sashal@kernel.org>
+	linux-block@vger.kernel.org,
+	Guoqing Jiang <guoqing.jiang@linux.dev>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 39/68] block/rnbd-srv: Check for unlikely string overflow
+Date: Tue, 16 Jan 2024 14:53:38 -0500
+Message-ID: <20240116195511.255854-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116194908.253437-1-sashal@kernel.org>
-References: <20240116194908.253437-1-sashal@kernel.org>
+In-Reply-To: <20240116195511.255854-1-sashal@kernel.org>
+References: <20240116195511.255854-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,37 +52,89 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.12
+X-stable-base: Linux 6.1.73
 Content-Transfer-Encoding: 8bit
 
-From: Christoph Hellwig <hch@lst.de>
+From: Kees Cook <keescook@chromium.org>
 
-[ Upstream commit 3f034c374ad55773c12dd8f3c1607328e17c0072 ]
+[ Upstream commit 9e4bf6a08d1e127bcc4bd72557f2dfafc6bc7f41 ]
 
-Reordered a check to avoid a possible overflow when adding len to bv_len.
+Since "dev_search_path" can technically be as large as PATH_MAX,
+there was a risk of truncation when copying it and a second string
+into "full_path" since it was also PATH_MAX sized. The W=1 builds were
+reporting this warning:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Link: https://lore.kernel.org/r/20231204173419.782378-2-hch@lst.de
+drivers/block/rnbd/rnbd-srv.c: In function 'process_msg_open.isra':
+drivers/block/rnbd/rnbd-srv.c:616:51: warning: '%s' directive output may be truncated writing up to 254 bytes into a region of size between 0 and 4095 [-Wformat-truncation=]
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                                                   ^~
+In function 'rnbd_srv_get_full_path',
+    inlined from 'process_msg_open.isra' at drivers/block/rnbd/rnbd-srv.c:721:14: drivers/block/rnbd/rnbd-srv.c:616:17: note: 'snprintf' output between 2 and 4351 bytes into a destination of size 4096
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  617 |                          dev_search_path, dev_name);
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To fix this, unconditionally check for truncation (as was already done
+for the case where "%SESSNAME%" was present).
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202312100355.lHoJPgKy-lkp@intel.com/
+Cc: Md. Haris Iqbal <haris.iqbal@ionos.com>
+Cc: Jack Wang <jinpu.wang@ionos.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc:  <linux-block@vger.kernel.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+Link: https://lore.kernel.org/r/20231212214738.work.169-kees@kernel.org
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/rnbd/rnbd-srv.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 816d412c06e9..cef830adbc06 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -944,7 +944,7 @@ bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 2cfed2e58d64..ad451224e663 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -587,6 +587,7 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+ {
+ 	char *full_path;
+ 	char *a, *b;
++	int len;
  
- 	if ((addr1 | mask) != (addr2 | mask))
- 		return false;
--	if (bv->bv_len + len > queue_max_segment_size(q))
-+	if (len > queue_max_segment_size(q) - bv->bv_len)
- 		return false;
- 	return bvec_try_merge_page(bv, page, len, offset, same_page);
- }
+ 	full_path = kmalloc(PATH_MAX, GFP_KERNEL);
+ 	if (!full_path)
+@@ -598,19 +599,19 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+ 	 */
+ 	a = strnstr(dev_search_path, "%SESSNAME%", sizeof(dev_search_path));
+ 	if (a) {
+-		int len = a - dev_search_path;
++		len = a - dev_search_path;
+ 
+ 		len = snprintf(full_path, PATH_MAX, "%.*s/%s/%s", len,
+ 			       dev_search_path, srv_sess->sessname, dev_name);
+-		if (len >= PATH_MAX) {
+-			pr_err("Too long path: %s, %s, %s\n",
+-			       dev_search_path, srv_sess->sessname, dev_name);
+-			kfree(full_path);
+-			return ERR_PTR(-EINVAL);
+-		}
+ 	} else {
+-		snprintf(full_path, PATH_MAX, "%s/%s",
+-			 dev_search_path, dev_name);
++		len = snprintf(full_path, PATH_MAX, "%s/%s",
++			       dev_search_path, dev_name);
++	}
++	if (len >= PATH_MAX) {
++		pr_err("Too long path: %s, %s, %s\n",
++		       dev_search_path, srv_sess->sessname, dev_name);
++		kfree(full_path);
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+ 	/* eliminitate duplicated slashes */
 -- 
 2.43.0
 
