@@ -1,120 +1,140 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484541C6AD;
-	Tue, 16 Jan 2024 18:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C243FB35;
+	Tue, 16 Jan 2024 19:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705430556; cv=none; b=TjyCuSUHBX2tDBYO7d3WYqEnBXpsFWAaIIwY8sALzofcwilNDSlHEoSnSbYTyG5j+U7DlRDW0ecVbEjYNEeReKJamba/bvz+Ne/wt8ZrLvtUY7bh/9TsCWg5lP006iffqRH2DHT9NNeN89bb03KajKRBHQgKFS8v599KK5nH2i8=
+	t=1705434323; cv=none; b=jzfNyQ1R+UxgQwZW2IFcJGP96uBH1ggHtbs4gjcH5b5E4ZjQ9mUl6YjlddVVbIIro7cOobr9qyhoveCpD7zEBQgCBAl4S1g8JxjuITKyCUQ1Yrg/9Kp+ofR/Cr+24Rgjnp/h6bZ9q+4y3mroPJxpqOXF3w+9ChyL49QZP1FlDnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705430556; c=relaxed/simple;
-	bh=S5KMdyv9vEL0CeRHyQGtOqQf9LU2qa2NACMCFu2WPsM=;
-	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=NZdlMhD1BibVcppRpEx23U7GCiO2Lt2PNv6S9Nw/D8IBWQZclzdOFIcl0AkQc24wsYJ02YPregOBQYJCROGOkaLOEgsK89kG7xBV0UvpQZgZR1oXEZ4bAW7FhTjBaIFa9Z8c2JzkWsk5JlIYIq8aiaU+znkF4vewxhPQs/7O+TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FZuToFFF; arc=none smtp.client-ip=90.155.50.34
+	s=arc-20240116; t=1705434323; c=relaxed/simple;
+	bh=4vf9MSNWAubfBAh0ArsuBB9cwHDCLIIqku+4MwBPn1k=;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=UjiWR4evignqlp/SGH5phPuIb6h/tkwJYRJtWJJ3AKDnStowC8gwynH9HOrjXsIK/FjXiTYR3XUC9z6Sl7wL4JtVvXC/ykfnIwaDTJmGIbONqCtFaPuRSrMKm1kzt3UZMecX53FM++DfrVw4G8zQWacfBtNb8mMWF8EULbYTMWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mR26B9A/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FZuToFFF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=e9TcTM+d6L0MWKH8TdLtoZT8t+lgwD6ToTcpjBl3L8w=; b=FZuToFFFkxYwpfM4dHeFp9mm8W
-	XAsUf9QlvmZxNQVzNbXYH0tIZ//pnEml6gCU6pORkGwajr84aYttfQaORLNiWHQE3LmisVPtBCv8U
-	v/IjDI/D2A+qFedtBSRpusUNBsMjsXRWDHp7CtTZ5f010nrYjPVuV0ERg/PnUCyYp5p//S4Rrd4Xh
-	aBIQgYnrjC6bPBgBYrMEJUyDUFtdRzCpSQ6QAeReS1TOruKUhIvuiI08yi0aw4WfmzstAKZAlKEsN
-	9IO0OyWKk2ytQvve1SNTSTBqT5Aki8r0eNFMHjgENTILYHh+goNYvLROmaZqLhJzN1f89/8d6MKEe
-	lzFeIwJQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rPoON-00Dt8T-KH; Tue, 16 Jan 2024 18:42:31 +0000
-Date: Tue, 16 Jan 2024 18:42:31 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: syzbot <syzbot+004c1e0fced2b4bc3dcc@syzkaller.appspotmail.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [block?] BUG: unable to handle kernel NULL pointer
- dereference in __bio_release_pages
-Message-ID: <ZabOF3/P/jQmjudb@casper.infradead.org>
-References: <000000000000dbe2f2060f0d2781@google.com>
- <4bd438c0-75b8-4e28-939c-954716df7563@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mR26B9A/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BD56C433F1;
+	Tue, 16 Jan 2024 19:45:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705434322;
+	bh=4vf9MSNWAubfBAh0ArsuBB9cwHDCLIIqku+4MwBPn1k=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mR26B9A/6/4UmBKgrWOJgSs+iNmTOLEtUSghFcwasb6wKhzOoC74pSoGrkntm8fTc
+	 3lCDO1LCz5BXWrhyh28ssJyV+8FpCbc5JbtOdaZZHo57SKKV+hkccYfQdmzVaoW8ss
+	 ld2BWH3QeD4C0v/co/W9WemNJT/qKvdE9U00RrdfoIiFnJafUFaacBgvJdKk5nrGHQ
+	 cxBOIBUo6g5lChmn9LJU0Vg/0bS2hoaZD8mEnx0AKhCsAX4DrKDrf1CdPeQDoWbNyc
+	 TB+e3BHTfUcvcLCfTPhLUy4mjOW5Rm2P+I8tePCvymJh5BjnVzny/cTRM1s/mAzjig
+	 SqaHV6jfdnGqg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>,
+	kernel test robot <lkp@intel.com>,
+	"Md . Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Guoqing Jiang <guoqing.jiang@linux.dev>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.7 063/108] block/rnbd-srv: Check for unlikely string overflow
+Date: Tue, 16 Jan 2024 14:39:29 -0500
+Message-ID: <20240116194225.250921-63-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240116194225.250921-1-sashal@kernel.org>
+References: <20240116194225.250921-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4bd438c0-75b8-4e28-939c-954716df7563@kernel.dk>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 16, 2024 at 11:00:52AM -0700, Jens Axboe wrote:
-> On 1/16/24 2:57 AM, syzbot wrote:
-> > pstate: 10000005 (nzcV daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> > pc : _compound_head include/linux/page-flags.h:247 [inline]
-> > pc : bio_first_folio include/linux/bio.h:289 [inline]
-> > pc : __bio_release_pages+0x100/0x73c block/bio.c:1153
-> > lr : bio_release_pages include/linux/bio.h:508 [inline]
-> > lr : blkdev_bio_end_io+0x2a0/0x3f0 block/fops.c:157
-> > sp : ffff800089a375e0
-> > x29: ffff800089a375e0 x28: 1fffe0000162e879 x27: ffff00000b1743c0
-> > x26: ffff00000b1743c8 x25: 000000000000000a x24: 1fffe000015a9e12
-> > x23: ffff00000ad4f094 x22: ffff00000f496600 x21: 1fffe0000162e87a
-> > x20: 0000000000000004 x19: 0000000000000000 x18: ffff00000b174432
-> > x17: ffff00000b174438 x16: ffff00000f948008 x15: 1fffe0000162e886
-> > x14: ffff00000b1743d4 x13: 00000000f1f1f1f1 x12: ffff6000015a9e13
-> > x11: 1fffe000015a9e12 x10: ffff6000015a9e12 x9 : dfff800000000000
-> > x8 : ffff00000b1743d4 x7 : 0000000041b58ab3 x6 : 1ffff00011346ed0
-> > x5 : ffff700011346ed0 x4 : 00000000f1f1f1f1 x3 : 000000000000f1f1
-> > x2 : 0000000000000001 x1 : dfff800000000000 x0 : 0000000000000008
-> > Call trace:
-> >  _compound_head include/linux/page-flags.h:247 [inline]
-> >  bio_first_folio include/linux/bio.h:289 [inline]
-> >  __bio_release_pages+0x100/0x73c block/bio.c:1153
-> >  bio_release_pages include/linux/bio.h:508 [inline]
-> >  blkdev_bio_end_io+0x2a0/0x3f0 block/fops.c:157
-> >  bio_endio+0x4a4/0x618 block/bio.c:1608
-> 
-> This looks to be caused by:
-> 
-> commit 1b151e2435fc3a9b10c8946c6aebe9f3e1938c55
-> Author: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Date:   Mon Aug 14 15:41:00 2023 +0100
-> 
->     block: Remove special-casing of compound pages
+From: Kees Cook <keescook@chromium.org>
 
-This looks familiar ... looks like it came up right before Xmas and
-I probably dropped the patch on the floor?
+[ Upstream commit 9e4bf6a08d1e127bcc4bd72557f2dfafc6bc7f41 ]
 
-https://lore.kernel.org/all/ZX07SsSqIQ2TYwEi@casper.infradead.org/
+Since "dev_search_path" can technically be as large as PATH_MAX,
+there was a risk of truncation when copying it and a second string
+into "full_path" since it was also PATH_MAX sized. The W=1 builds were
+reporting this warning:
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index ec4db73e5f4e..1518f1201ddd 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -286,6 +286,11 @@ static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
+drivers/block/rnbd/rnbd-srv.c: In function 'process_msg_open.isra':
+drivers/block/rnbd/rnbd-srv.c:616:51: warning: '%s' directive output may be truncated writing up to 254 bytes into a region of size between 0 and 4095 [-Wformat-truncation=]
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                                                   ^~
+In function 'rnbd_srv_get_full_path',
+    inlined from 'process_msg_open.isra' at drivers/block/rnbd/rnbd-srv.c:721:14: drivers/block/rnbd/rnbd-srv.c:616:17: note: 'snprintf' output between 2 and 4351 bytes into a destination of size 4096
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  617 |                          dev_search_path, dev_name);
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To fix this, unconditionally check for truncation (as was already done
+for the case where "%SESSNAME%" was present).
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202312100355.lHoJPgKy-lkp@intel.com/
+Cc: Md. Haris Iqbal <haris.iqbal@ionos.com>
+Cc: Jack Wang <jinpu.wang@ionos.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc:  <linux-block@vger.kernel.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+Link: https://lore.kernel.org/r/20231212214738.work.169-kees@kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/rnbd/rnbd-srv.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 65de51f3dfd9..ab78eab97d98 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -585,6 +585,7 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
  {
- 	struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
+ 	char *full_path;
+ 	char *a, *b;
++	int len;
  
-+	if (i >= bio->bi_vcnt) {
-+		fi->folio = NULL;
-+		return;
-+	}
-+
- 	fi->folio = page_folio(bvec->bv_page);
- 	fi->offset = bvec->bv_offset +
- 			PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
-@@ -303,10 +308,8 @@ static inline void bio_next_folio(struct folio_iter *fi, struct bio *bio)
- 		fi->offset = 0;
- 		fi->length = min(folio_size(fi->folio), fi->_seg_count);
- 		fi->_next = folio_next(fi->folio);
--	} else if (fi->_i + 1 < bio->bi_vcnt) {
--		bio_first_folio(fi, bio, fi->_i + 1);
+ 	full_path = kmalloc(PATH_MAX, GFP_KERNEL);
+ 	if (!full_path)
+@@ -596,19 +597,19 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+ 	 */
+ 	a = strnstr(dev_search_path, "%SESSNAME%", sizeof(dev_search_path));
+ 	if (a) {
+-		int len = a - dev_search_path;
++		len = a - dev_search_path;
+ 
+ 		len = snprintf(full_path, PATH_MAX, "%.*s/%s/%s", len,
+ 			       dev_search_path, srv_sess->sessname, dev_name);
+-		if (len >= PATH_MAX) {
+-			pr_err("Too long path: %s, %s, %s\n",
+-			       dev_search_path, srv_sess->sessname, dev_name);
+-			kfree(full_path);
+-			return ERR_PTR(-EINVAL);
+-		}
  	} else {
--		fi->folio = NULL;
-+		bio_first_folio(fi, bio, fi->_i + 1);
+-		snprintf(full_path, PATH_MAX, "%s/%s",
+-			 dev_search_path, dev_name);
++		len = snprintf(full_path, PATH_MAX, "%s/%s",
++			       dev_search_path, dev_name);
++	}
++	if (len >= PATH_MAX) {
++		pr_err("Too long path: %s, %s, %s\n",
++		       dev_search_path, srv_sess->sessname, dev_name);
++		kfree(full_path);
++		return ERR_PTR(-EINVAL);
  	}
- }
  
+ 	/* eliminitate duplicated slashes */
+-- 
+2.43.0
+
