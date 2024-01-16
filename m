@@ -1,98 +1,105 @@
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2DC1CAA5
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 16:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828E51CA8A
+	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 17:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705424321; cv=none; b=fkzTRb7IP+QBip/2V9xnjTuPfqDkbyhgGjZL+WRvJZGpPnflDIrlONEU/ZtEXElj7K4UaIkXYCnJI9SfwxdFZDExJN4rhaEp66RN0V+1eP+z+hjbRbR8ODdZIZZ0clQo3NBBwi6UAJvEXxJjCt4SDmzBKPXjoafBo19bnCJaK8M=
+	t=1705424623; cv=none; b=EbwUg7YJeWjkNx7xfgy2jy3OSNsXWsT2/ic7YXjDsxEHWixdck5YVuzsmtSJqn1EZWRVzH4LluYUGy1rAeFd5DLPvKIuyTqm3RW7Ppd5cWZd5qr9vrVgMvgPPmSAL60mCNscnzRLUTmRDDgDYmyqEJ14VFPjpW4Ag3OVYGdOgz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705424321; c=relaxed/simple;
-	bh=nxy770h9U2pCY6K0bvqLPQukkjPVs7NcQl3n9FbjxB4=;
+	s=arc-20240116; t=1705424623; c=relaxed/simple;
+	bh=VIplDjKnxv6G4iOJkD77TIjv6qySJZ1um401u34+dc8=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
-	 To:Cc:In-Reply-To:References:Subject:Message-Id:Date:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-Mailer; b=EetFpp36JGw/YeoJOLY7PJfNX90YlNo6/xdJt6VFGJ8xaHZTjECCZsxM8tPbailvO/fv4oJdJAlsjU3o+D8ekXpzsOMgqrlSjbh/b3bXMuq3K3UuqgPsB2YhVt+CEJS1t12mwfOHAoE9IYYGQf4jG5zO2EklW+DZbH9A6tYEqc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uGAuM8b/
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=CPE160zWMh2f7UzSxjA7NnmBtMh2Yuo9Q8FjImfzoj0OwAFD31/vAVbZXtSiFQKylQzkPuUfCbc/poAm0cRZXi+bf4WBzJC6BiubU6gwi024cTjs5K4k0NzE7/2/6gL5Q3nzRiu3yGm+A0zpiLYwgzf6xu9TX+FIN8Thb1AKcQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OA+cAPtA
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uGAuM8b/"
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-360630beb7bso7915755ab.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 08:58:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OA+cAPtA"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7bee9f626caso50035439f.0
+        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 09:03:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705424319; x=1706029119; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WI2jt+2IZp9dME34DGFD2FqtmRmP/aEuhYgGfBw4Gcw=;
-        b=uGAuM8b/b67e/KJQKaBiiP4dXda98TeieWzuW3lP+6xsPyPUH0LX0GxeLVYccW19wi
-         F5NoPgnGBRiTTMKG4vgIAhUB41YJKa853h4LR/SlJOGZ8DYmB217Zb0rnoFWpRP8AYnt
-         PMN3zRUpsw0nVE1qCshVw1EwZb1/lvilylxo+rdUbxYMxmAtQKDm/C4e8A8oTmxNnzgH
-         CmMr7Y+PqKRIW66tmbFnK7tcQmMz8L8fPRFgFsULgZ8acg+hSQmGi8VZnwRu2Pedg7/p
-         P4ccy3NToyv4vU/91qhHUDBkqEYs7TRmTOWqwSQnbqc1dejuvM1ynFCSm5atMyX6iVIt
-         qAZw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705424621; x=1706029421; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QY4M63jGX67p6S9WZCI3HqN7p+hdyR5DfWJbbjEx2xQ=;
+        b=OA+cAPtACVHGeLXVMS0wdidslXYBGBW8d9nm3skxafrlhjLirA//LPrTOCLNohDEiO
+         5oGdXP7Je2F1FnCQ9P3sc1utOJqaEs4zLMtEqcAi0SkxMiDFGYVjSLvOMNZSLwLQkxQZ
+         5vWzf+x44yPZW5TrkkwMmUc7tOVrMVmpQsN1VQBbNqM59zDBaYiVfx+IKefGE2LHoI65
+         aVks/ZzOtwjMXw07So0gJjMl58hJxqKBD4YN1E4R6tEkYd2wYVOHd4rt/pL8oZSxuUdg
+         JrE1DVZTOnYMZ4e2JdtKsQ53HiTZfjMDd4RWtx+pyR9wDv2kgZtPedwLXB1MT9nS8dDH
+         XCdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705424319; x=1706029119;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WI2jt+2IZp9dME34DGFD2FqtmRmP/aEuhYgGfBw4Gcw=;
-        b=MSi2LgqvbGUvx/RFsm1FVX+hvxfLBZ1TJoJbUWFEt8Y1SzxAGInW/Ai//7LfSiKSDd
-         EH0LYzI+v75PH1ITE7oZamHUjtlvZXM2V1VNpkDsmEkwSUlj2O2KvgPrPU0mvz1Y/9X4
-         oAyEorFVbubIAL6JVYwfPZn0z/ivVzfndDUXFtY6qHQZN7Af4oJkGPJJkDoeAU/3lGYy
-         3NndqJfnlDmoqhBJMBBiKRmcKzglCiNVyDB/x7arym5PR6T2pAvqJ4aFU3OqFLeyJdJU
-         RmWk3qSQuoErtOx6eXt1z0UQ6J7O7P1JPUWZl2uuBPe9T05XAv98kcOnWWtmDjFEO5TR
-         an7g==
-X-Gm-Message-State: AOJu0YwD9ZeCzHzBA8K1D2ndYWi4hMi+3EG/SANlFGMsPluFcsVV9y2z
-	zU/ibRhxJNZlc45laaOt9a1a2/QAiZF5Cp8d+z/0v3aFMUtgFA==
-X-Google-Smtp-Source: AGHT+IGhrspUaoOewiUY9G6s4/s5oSLx6zkbxeRu95TiUkcF7cIKX1KoX3hGqMiHI7beX+df3r20bg==
-X-Received: by 2002:a05:6602:1c7:b0:7bf:3651:4c6d with SMTP id w7-20020a05660201c700b007bf36514c6dmr7302125iot.2.1705424318830;
-        Tue, 16 Jan 2024 08:58:38 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id r8-20020a056638100800b0046dfd35b042sm2995191jab.73.2024.01.16.08.58.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 08:58:37 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Keith Busch <kbusch@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20240116143437.89060-1-dmantipov@yandex.ru>
-References: <20240116143437.89060-1-dmantipov@yandex.ru>
-Subject: Re: [PATCH] block: bio-integrity: fix kcalloc() arguments order
-Message-Id: <170542431761.238046.7077269438448097738.b4-ty@kernel.dk>
-Date: Tue, 16 Jan 2024 09:58:37 -0700
+        d=1e100.net; s=20230601; t=1705424621; x=1706029421;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QY4M63jGX67p6S9WZCI3HqN7p+hdyR5DfWJbbjEx2xQ=;
+        b=DoOu1xDbhn/CVmjU8x+wksblmy38qxV/26v/BN+z2MnprI7neFH8cBCFhts32T8zGz
+         sItFamiO781hTFQnFSk9ziyIWokMk9fWrsDXEDOrGIh3xDu1mjjNXBB8TAlzyPeFYr7g
+         sP9ac7TPJfWsXjh6FDJn8su6ouNalhApaAMZlzHjcbM+DGcmnDejboqferD8CCY3eV9i
+         sdxqtLlzcsFPPK7zf70Gq7X38eSWlzqMvPJ/QtARGnckb48Xd6uAXm6+VJ+oPUg88UvE
+         Y4QwlVEX/Vv9KvnWb/y/7/9COzQOePqo9673ql2h+Bhq1xiqmbF3Ukcj3xY7w0iqrMcr
+         YZlw==
+X-Gm-Message-State: AOJu0Yx+dvYc+f0iV4OLs7ATfaKw92C+6PxBOlKYa/va+peU/uTYsI9I
+	3g3GQuu8VoCBkJ3OOBzltswFgHxLnSMEMryKr5T/E7jDeMPPTQ==
+X-Google-Smtp-Source: AGHT+IEBVMI4TihyYpYwl3BKS+DmAx0+ElR/RL7HqF1Q3B4X2RPyUragAIBe3H20/oHQ8XJuBQSkug==
+X-Received: by 2002:a92:c26f:0:b0:35f:f59f:9f4c with SMTP id h15-20020a92c26f000000b0035ff59f9f4cmr15291439ild.1.1705424620861;
+        Tue, 16 Jan 2024 09:03:40 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id i2-20020a056e020ec200b0035faf00c555sm3703529ilk.31.2024.01.16.09.03.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jan 2024 09:03:40 -0800 (PST)
+Message-ID: <7810fdb9-0fcb-428d-b2b0-03b04aa27a91@kernel.dk>
+Date: Tue, 16 Jan 2024 10:03:39 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] block: convert struct blk_plug callback list to
+ hlists
+Content-Language: en-US
+To: linux-block@vger.kernel.org
+Cc: kbusch@kernel.org, joshi.k@samsung.com
+References: <20240116165814.236767-1-axboe@kernel.dk>
+ <20240116165814.236767-6-axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240116165814.236767-6-axboe@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
 
-
-On Tue, 16 Jan 2024 17:34:31 +0300, Dmitry Antipov wrote:
-> When compiling with gcc version 14.0.1 20240116 (experimental)
-> and W=1, I've noticed the following warning:
+On 1/16/24 9:54 AM, Jens Axboe wrote:
+> We currently use a doubly linked list, which means the head takes up
+> 16 bytes. As any iteration goes over the full list by first splicing it
+> to an on-stack copy, we never need to remove members from the middle of
+> the list.
 > 
-> block/bio-integrity.c: In function 'bio_integrity_map_user':
-> block/bio-integrity.c:339:38: warning: 'kcalloc' sizes specified with 'sizeof'
-> in the earlier argument and not in the later argument [-Wcalloc-transposed-args]
->   339 |                 bvec = kcalloc(sizeof(*bvec), nr_vecs, GFP_KERNEL);
->       |                                      ^
-> block/bio-integrity.c:339:38: note: earlier argument should specify number of
-> elements, later size of each element
-> 
-> [...]
+> Convert it to an hlist instead, saving 8 bytes in the blk_plug structure.
+> This also helps save 40 bytes of text in the core block code, tested on
+> arm64.
 
-Applied, thanks!
+Gah, looks like I forgot to refresh before committing this one, it
+just needs a one-liner for raid:
 
-[1/1] block: bio-integrity: fix kcalloc() arguments order
-      commit: be50df31c4e2a69f961a3bb759346d299eaa2b23
-
-Best regards,
+diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
+index 512746551f36..4a1b6f17067f 100644
+--- a/drivers/md/raid1-10.c
++++ b/drivers/md/raid1-10.c
+@@ -152,7 +152,7 @@ static inline bool raid1_add_bio_to_plug(struct mddev *mddev, struct bio *bio,
+ 	plug = container_of(cb, struct raid1_plug_cb, cb);
+ 	bio_list_add(&plug->pending, bio);
+ 	if (++plug->count / MAX_PLUG_BIO >= copies) {
+-		list_del(&cb->list);
++		hlist_del(&cb->list);
+ 		cb->callback(cb, false);
+ 	}
+ 
 -- 
 Jens Axboe
-
-
 
