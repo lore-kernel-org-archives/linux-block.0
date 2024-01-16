@@ -1,123 +1,164 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B8C1BC47;
-	Tue, 16 Jan 2024 13:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RlJwAxPp"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-598ee012192so1002945eaf.1;
-        Tue, 16 Jan 2024 05:30:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705411818; x=1706016618; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/gQ4JwYFgXubIxEB4f42Ft3SYuEBMzsffcySkA94liA=;
-        b=RlJwAxPpxli/kL99n9EXHUw8/eQO0JSJW60tEM1WFMd+/7x7VTEkgSoXKAEJic1awc
-         qtjTILHYfGRAlf89d85VtZp5OzyRejOLBROAmqUXyVl+Rck9kSlPdTBFEO1OEymtYzrq
-         NyDmBwBsqH05e4Q5CSj0fpy2+q3bzN1BI/bPYLEHbrYTg7DWymex39glJ9y3U5li/xjW
-         +F3l+iqbUxEUzqbOcQ+McxNCjnVtMDr5CjqwVbOCz3nea7enpTpLDZE7cQ7sfGMrCR8H
-         TMehM3DRS2moUdO9d655PJyhPF+KZ6r0Y3VxSZi9iCPKAfVK1mTi6v1KFuQXwa3LcjBP
-         sliw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705411818; x=1706016618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/gQ4JwYFgXubIxEB4f42Ft3SYuEBMzsffcySkA94liA=;
-        b=D87fgH1M4EhDTh019ppP2OQDg7rc+dQyDKXjnR5LQeiO5maUUhJPANcApT8elVBUzF
-         eYDI2XdHVNzQhJ4uRECji18vZNuPfkaX+ekeVGnr2Jke6KRMYGNbDa/dTJCphui2ZPwE
-         eTh/GK2zovXxtpzrKyqcGVEX56ib4QhdlTzmhF2PPmdhKj97mWn2t95EaW+/q7A7hyWS
-         8mIVpv+lXm9sMhVUJ3IlwNrhwFLvDEyjSZDJf677Hzi0sKL/f3HhNtjrpOJRJTPtV63u
-         Na01ANXkth2Sq2KLwLMgFDcwft+52jC8kIonty4Gb+I8FK0TuaUhToJpTLVVajIxUt2m
-         8qkA==
-X-Gm-Message-State: AOJu0YwiMtW2S7WawXSqlsbmsjpQOieR0g07ECUANgt/B8gpBO3uxPn7
-	wD7dCILpU0JSTCUaKkSo5lLQuwT1G2tXiDcQE4I=
-X-Google-Smtp-Source: AGHT+IGeMluJJQQQbTmTrVisFZ1ZOJH86hprZHiUL/HGfMODSuCVrW2E4yCJl64xkEYmK5B4pDqOjLPSaDFbbrFMBuA=
-X-Received: by 2002:a4a:1781:0:b0:591:2de4:1fb6 with SMTP id
- 123-20020a4a1781000000b005912de41fb6mr3331538ooe.1.1705411817849; Tue, 16 Jan
- 2024 05:30:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAE51BF23;
+	Tue, 16 Jan 2024 13:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TDqzb3cbZz4f3jJ2;
+	Tue, 16 Jan 2024 21:46:19 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 39D281A0A00;
+	Tue, 16 Jan 2024 21:46:23 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBnOBGtiKZlSqsRBA--.20499S3;
+	Tue, 16 Jan 2024 21:46:23 +0800 (CST)
+Subject: Re: PROBLEM: BLKPG_DEL_PARTITION with GENHD_FL_NO_PART used to return
+ ENXIO, now returns EINVAL
+To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@infradead.org>,
+ Allison Karlitskaya <allison.karlitskaya@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>
+References: <CAOYeF9VsmqKMcQjo1k6YkGNujwN-nzfxY17N3F-CMikE1tYp+w@mail.gmail.com>
+ <ZaZesiKpbMEiiTrf@infradead.org>
+ <210deda9-5439-244a-0ce2-af9dc8e5d7fe@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <592625f7-36d7-02e0-2ee6-8211334aa0f9@huaweicloud.com>
+Date: Tue, 16 Jan 2024 21:46:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7d98d8d45a89fc2434dd71d573fe4c6986986513.1705351057.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <7d98d8d45a89fc2434dd71d573fe4c6986986513.1705351057.git.christophe.jaillet@wanadoo.fr>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Tue, 16 Jan 2024 14:30:05 +0100
-Message-ID: <CAOi1vP-5Kp3z7+-pa2Rb_xTATKq7zN0a2eACeJNWw2zj=rr6JA@mail.gmail.com>
-Subject: Re: [PATCH] rbd: Remove usage of the deprecated ida_simple_xx() API
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>, 
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <210deda9-5439-244a-0ce2-af9dc8e5d7fe@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBnOBGtiKZlSqsRBA--.20499S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJw13XFyDCrWkKr48CrWkXrb_yoW5trWDpr
+	4vqrWUA3y5Grn3uFyUta17X34rGrnrtw18Jw18XF10vrW7ArnFqFy09ry09r4UXrZ7JFWf
+	XF10vryxZ3W7ArUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
+	DUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Jan 15, 2024 at 9:37=E2=80=AFPM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
->
-> ida_alloc() and ida_free() should be preferred to the deprecated
-> ida_simple_get() and ida_simple_remove().
->
-> Note that the upper limit of ida_simple_get() is exclusive, buInputt the =
-one of
-> ida_alloc_max() is inclusive. So a -1 has been added when needed.
->
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  drivers/block/rbd.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index a999b698b131..63897d0d6629 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -5326,7 +5326,7 @@ static void rbd_dev_release(struct device *dev)
->
->         if (need_put) {
->                 destroy_workqueue(rbd_dev->task_wq);
-> -               ida_simple_remove(&rbd_dev_id_ida, rbd_dev->dev_id);
-> +               ida_free(&rbd_dev_id_ida, rbd_dev->dev_id);
->         }
->
->         rbd_dev_free(rbd_dev);
-> @@ -5402,9 +5402,9 @@ static struct rbd_device *rbd_dev_create(struct rbd=
-_client *rbdc,
->                 return NULL;
->
->         /* get an id and fill in device name */
-> -       rbd_dev->dev_id =3D ida_simple_get(&rbd_dev_id_ida, 0,
-> -                                        minor_to_rbd_dev_id(1 << MINORBI=
-TS),
-> -                                        GFP_KERNEL);
-> +       rbd_dev->dev_id =3D ida_alloc_max(&rbd_dev_id_ida,
-> +                                       minor_to_rbd_dev_id(1 << MINORBIT=
-S) - 1,
-> +                                       GFP_KERNEL);
->         if (rbd_dev->dev_id < 0)
->                 goto fail_rbd_dev;
->
-> @@ -5425,7 +5425,7 @@ static struct rbd_device *rbd_dev_create(struct rbd=
-_client *rbdc,
->         return rbd_dev;
->
->  fail_dev_id:
-> -       ida_simple_remove(&rbd_dev_id_ida, rbd_dev->dev_id);
-> +       ida_free(&rbd_dev_id_ida, rbd_dev->dev_id);
->  fail_rbd_dev:
->         rbd_dev_free(rbd_dev);
->         return NULL;
-> --
-> 2.43.0
->
+Hi,
 
-Applied.
+在 2024/01/16 21:23, Yu Kuai 写道:
+> Hi, Christoph
+> 
+> 在 2024/01/16 18:47, Christoph Hellwig 写道:
+>> Hi Allison,
+>>
+>> please try this minimal fix.  I need to double check if we historically
+>> returned ENXIO or EINVAL for adding / resizing partitions, which would
+>> make things more complicated.  Or maybe you already have data for that
+>> at hand?
+>>
+>> diff --git a/block/ioctl.c b/block/ioctl.c
+>> index 9c73a763ef8838..f2028e39767821 100644
+>> --- a/block/ioctl.c
+>> +++ b/block/ioctl.c
+>> @@ -21,7 +21,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+>>       sector_t start, length;
+>>       if (disk->flags & GENHD_FL_NO_PART)
+>> -        return -EINVAL;
+>> +        return -ENXIO;
+> 
+> I think this might not be a proper fix, the reason if that before this
+> condition is added, -ENXIO is returned from bdev_del_partition(). And
+> there are also some other error number like -EACCES,-EFAULT following,
+> so this change will still make changes for user in other cases.
+
+Please ignore the patch from last email. Sorry for the noise...
+bdev_resize_partition() will also return -ENXIO if partition does't
+exist. So the right patch should be following:
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4160f4e6bd5b..ba8d44fa7e02 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -20,8 +20,6 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+         struct blkpg_partition p;
+         long long start, length;
+
+-       if (disk->flags & GENHD_FL_NO_PART)
+-               return -EINVAL;
+         if (!capable(CAP_SYS_ADMIN))
+                 return -EACCES;
+         if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index f47ffcfdfcec..f14602022c5e 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -447,6 +447,11 @@ int bdev_add_partition(struct gendisk *disk, int 
+partno, sector_t start,
+                 goto out;
+         }
+
++       if (disk->flags & GENHD_FL_NO_PART) {
++               ret = -EINVAL;
++               goto out;
++       }
++
+         if (partition_overlaps(disk, start, length, -1)) {
+                 ret = -EBUSY;
+                 goto out;
 
 Thanks,
+Kuai
+> 
+> How about following patch?
+> 
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 4160f4e6bd5b..ec012cf910dc 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -20,8 +20,6 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+>          struct blkpg_partition p;
+>          long long start, length;
+> 
+> -       if (disk->flags & GENHD_FL_NO_PART)
+> -               return -EINVAL;
+>          if (!capable(CAP_SYS_ADMIN))
+>                  return -EACCES;
+>          if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
+> @@ -38,6 +36,9 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+>          start = p.start >> SECTOR_SHIFT;
+>          length = p.length >> SECTOR_SHIFT;
+> 
+> +       if (disk->flags & GENHD_FL_NO_PART)
+> +               return -EINVAL;
+> +
+>          switch (op) {
+>          case BLKPG_ADD_PARTITION:
+>                  /* check if partition is aligned to blocksize */
+> 
+> Thanks,
+> Kuai
+> 
+> 
+>>       if (!capable(CAP_SYS_ADMIN))
+>>           return -EACCES;
+>>       if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
+>>
+>> .
+>>
+> 
+> .
+> 
 
-                Ilya
