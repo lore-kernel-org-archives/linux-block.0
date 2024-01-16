@@ -1,128 +1,113 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA271BF22
-	for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 14:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13A91BF59;
+	Tue, 16 Jan 2024 15:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D7yN45go"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-360630beb7bso7778265ab.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2024 06:43:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705416193; x=1706020993; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rrKHxnpFL43gNtqjixFGO85ojRP7W+RwELBqauGPTUk=;
-        b=D7yN45goia7yRk+rDVYjL7DuvE8be256fJqL4B0paptHYWBroEQUVOkpFsn+npkm/T
-         CJoyIKR65Y2rCU/QH0SrcwgMVJueE1bidTW9A0xgyp6BItLwgY4PQLRxYt0CUIjJuTPE
-         a754KTwMTgBk3+64O6JyDYwJGMweHyuqPY2dhCdTXrlg8oHva/vtOrQeidpcHEUqmiS7
-         HsS+Zuw68NhW7RBRQ13Va+YjnI86v4rfZ+oX1MdVmPlB3Ho6vSx7OHnhMybcpn/6S2sS
-         mLhR5NM8fDIyhjBzlDxfGrO6GLyW06ShAOL1kUUW45RoWvHXp1RL45Bs7HuLdvj4Wt9A
-         uA8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705416193; x=1706020993;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rrKHxnpFL43gNtqjixFGO85ojRP7W+RwELBqauGPTUk=;
-        b=SH96jSSlqE2MGwP384mMkMY1a7EH9itNfsrKmJjuvXarHI5Ckhu5b14qMUOUYDVPiz
-         phat2RDmy+B+7BuOTGxEs4XQgdk17QslLBjuh5dKQMVUwwayjtifLnt+GhRVRY8umqci
-         3wzY6ONeDgLEvgqDckfp8kQ49hdK+q2QsUoeQwP2rFyf3+B/Hq/x4rO8k8o2Is+WnTeS
-         rTZr+hdKT06QlMfFz/V+mcx7Ao1nPTugKpVjtnxDU7HXX0cbwQQuq9osxUwlc5FAxd/z
-         TCRU+/XKvqG8nmTOCRszoL8Q14kn8pAG/D4XDzZxSv6LKcyIp2u8JjmNuDqbM6fKUX5n
-         k/jw==
-X-Gm-Message-State: AOJu0YzptwH3k/NKG7Kp8RFt83+B0e8yX3albu696udq0t9aTS/uUSgw
-	+O5Kn3D+nud2FTE/2z3QfuPWkdlZbgpwrg==
-X-Google-Smtp-Source: AGHT+IGEDZDWtxDpwZAWR9ay3DfGokiow/x1zwcvh/FkAoj7YSLMXApURRI7WLCOHevnHmseN/6nFA==
-X-Received: by 2002:a92:ca07:0:b0:35f:b559:c2c7 with SMTP id j7-20020a92ca07000000b0035fb559c2c7mr12627242ils.3.1705416192396;
-        Tue, 16 Jan 2024 06:43:12 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id bq7-20020a056e02238700b0036088147a06sm3603463ilb.1.2024.01.16.06.43.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jan 2024 06:43:11 -0800 (PST)
-Message-ID: <17a5683c-8883-4adf-8c98-812f7176eff1@kernel.dk>
-Date: Tue, 16 Jan 2024 07:43:11 -0700
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="tXYH13F7";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="tXYH13F7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1705418723;
+	bh=MvWh+67ftiWh2+3eSFJmv3mJL/+4kfnHoljEwqdxTPw=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=tXYH13F7f9/A2kjZUfgcLq4Xw+gQVdGFIUdRYIZ5VtDKmcoc9XR1Ce2tI4o0xdzwC
+	 R5NGKecPG+8lXOghqb7ohkUIEQt4OiNrdy+9uAtfyoM2AzA/TErDC76D04PYrjW/4C
+	 LlxOo0M6PMBGIaAXCITzQvQyqcnsMjFwb4PCPIEU=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 61F911280773;
+	Tue, 16 Jan 2024 10:25:23 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id c3eCd6WnbF3W; Tue, 16 Jan 2024 10:25:23 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1705418723;
+	bh=MvWh+67ftiWh2+3eSFJmv3mJL/+4kfnHoljEwqdxTPw=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=tXYH13F7f9/A2kjZUfgcLq4Xw+gQVdGFIUdRYIZ5VtDKmcoc9XR1Ce2tI4o0xdzwC
+	 R5NGKecPG+8lXOghqb7ohkUIEQt4OiNrdy+9uAtfyoM2AzA/TErDC76D04PYrjW/4C
+	 LlxOo0M6PMBGIaAXCITzQvQyqcnsMjFwb4PCPIEU=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::c14])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 5E5FD1280473;
+	Tue, 16 Jan 2024 10:25:22 -0500 (EST)
+Message-ID: <458822c2889a4fce54a07ce80d001e998ca56b48.camel@HansenPartnership.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Christian Brauner <brauner@kernel.org>, lsf-pc@lists.linux-foundation.org
+Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org, Matthew Wilcox
+	 <willy@infradead.org>, Jan Kara <jack@suse.cz>, Christoph Hellwig
+	 <hch@infradead.org>
+Date: Tue, 16 Jan 2024 10:25:20 -0500
+In-Reply-To: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: cache current nsec time in struct blk_plug
-Content-Language: en-US
-To: Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org
-References: <20240115215840.54432-1-axboe@kernel.dk>
- <CGME20240115215903epcas5p1518ca37cf0c83499dadba07bd3e51c77@epcas5p1.samsung.com>
- <20240115215840.54432-3-axboe@kernel.dk>
- <ff4a6649-9f09-23fc-ad33-06deb4845590@samsung.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ff4a6649-9f09-23fc-ad33-06deb4845590@samsung.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/16/24 2:51 AM, Kanchan Joshi wrote:
-> On 1/16/2024 3:23 AM, Jens Axboe wrote:
+On Tue, 2024-01-16 at 11:50 +0100, Christian Brauner wrote:
+> So when we say luksSuspend we really mean block layer initiated
+> freeze. The overall goal or expectation of userspace is that after a
+> luksSuspend call all sensitive material has been evicted from
+> relevant caches to harden against various attacks. And luksSuspend
+> does wipe the encryption key and suspend the block device. However,
+> the encryption key can still be available clear-text in the page
+> cache. To illustrate this problem more simply:
 > 
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 11342af420d0..cc4db4d92c75 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -1073,6 +1073,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
->>   	if (tsk->plug)
->>   		return;
->>   
->> +	plug->cur_ktime = 0;
->>   	plug->mq_list = NULL;
->>   	plug->cached_rq = NULL;
->>   	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 2f9ceea0e23b..23c237b22071 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -942,6 +942,7 @@ struct blk_plug {
->>   
->>   	/* if ios_left is > 1, we can batch tag/rq allocations */
->>   	struct request *cached_rq;
->> +	u64 cur_ktime;
->>   	unsigned short nr_ios;
->>   
->>   	unsigned short rq_count;
->> @@ -977,7 +978,15 @@ long nr_blockdev_pages(void);
->>   
->>   static inline u64 blk_time_get_ns(void)
->>   {
->> -	return ktime_get_ns();
->> +	struct blk_plug *plug = current->plug;
->> +
->> +	if (!plug)
->> +		return ktime_get_ns();
->> +	if (!(plug->cur_ktime & 1ULL)) {
->> +		plug->cur_ktime = ktime_get_ns();
->> +		plug->cur_ktime |= 1ULL;
->> +	}
->> +	return plug->cur_ktime;
+> truncate -s 500M /tmp/img
+> echo password | cryptsetup luksFormat /tmp/img --force-password
+> echo password | cryptsetup open /tmp/img test
+> mkfs.xfs /dev/mapper/test
+> mount /dev/mapper/test /mnt
+> echo "secrets" > /mnt/data
+> cryptsetup luksSuspend test
+> cat /mnt/data
+
+Not really anything to do with the drop caches problem, but luks can
+use the kernel keyring API for this.  That should ensure the key itself
+can be shredded on suspend without replication anywhere in memory.  Of
+course the real problem is likely that the key has or is derived from a
+password and that password is in the user space gnome-keyring, which
+will be much harder to purge ... although if the keyring were using
+secret memory it would be way easier ...
+
+So perhaps before we start bending the kernel out of shape in the name
+of security, we should also ensure that the various user space
+components are secured first.  The most important thing to get right
+first is key management (lose the key and someone who can steal the
+encrypted data can access it).  Then you can worry about data leaks due
+to the cache, which are somewhat harder to exploit easily (to exploit
+this you have to get into the cache in the first place, which is
+harder).
+
+> This will still happily print the contents of /mnt/data even though
+> the block device and the owning filesystem are frozen because the
+> data is still in the page cache.
 > 
-> I did not understand the relevance of 1ULL here. If ktime_get_ns()
-> returns even value, it will turn that into an odd value before
-> caching.
+> To my knowledge, the only current way to get the contents of
+> /mnt/data or the encryption key out of the page cache is via
+> /proc/sys/vm/drop_caches which is a big hammer.
 
-Right, it's potentially round it up by 1 nsec.
+To be honest, why is this too big a hammer?  Secret data could be
+sprayed all over the cache, so killing all of it (assuming we can as
+Jan points out) would be a security benefit.  I'm sure people would be
+willing to pay the additional start up time of an entirely empty cache
+on resume in exchange for the nicely evaluateable security guarantee it
+gives.  In other words, dropping caches by device is harder to analyse
+from security terms (because now you have to figure out where secret
+data is and which caches you need to drop) and it's not clear it really
+has much advantage in terms of faster resume for the complexity it
+would introduce.
 
-> And that value will be returned for the subsequent calls. But
-> how is that better compared to just caching whatever ktime_get_ns()
-> returned.
-
-0 could be a valid time. You could argue that this doesn't matter, we'd
-just do an extra ktime_get_ns() in that case. And that's probably fine.
-The LSB was meant to indicate "time stamp is valid".
-
-But not that important imho, I'll either add a comment or just use 0 as
-both the initializer (as it is now) and non-zero to indicate if the
-timestamp is valid or not.
-
--- 
-Jens Axboe
+James
 
