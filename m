@@ -1,26 +1,61 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0828F21347;
-	Wed, 17 Jan 2024 15:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8A620323
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 15:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705504324; cv=none; b=t3uFqycTzxRkPE+/jbRkOqBKbXCQMPmYllpMPBRAE8hu4IccxtV4EpBqyZbW7SzYhVqOgyu3W1Wjfi2991gyr44xMp9HD0uE5UIklnkpgpxMqMOTHtTQYRNAZUgqabwDXwuzApI1j6OTeiAyi89J52VVCR+2xgoRQgpbEE9oIR8=
+	t=1705504833; cv=none; b=WINEZkwa/KVut21fX6o9sWeBSxBiBveNx+rJQGOOW+JlHFcPNJNsO7v1mnoFiZ6nKIdYED/E59pGBjNYKhXF1kSVCy3J4FVJjjhSAT7fUkSYBXZl+Dzhf7go8Hgj6CiFTDf2R754U3YiQzHXOOeKkDiK5aVFF8QLUveCDXv8m14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705504324; c=relaxed/simple;
-	bh=acCBulbuXyCgYg9lJzUatUvbDs5kj9YLkW2CYVibaBY=;
-	h=Received:Received:Message-ID:Date:MIME-Version:User-Agent:Subject:
-	 Content-Language:To:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=Ydxt7LAjVJV9pm2srOosvpJFbypikQ5/aBPGSdPoP/WkgldH6p1CFEwfrW1hTMyhayhN/vRufqb0c/iSfQIP5xT+j8dwGA2zwaobcpfb94GYSE2AqS7uDQdONx8QCroT1i9987GsoWm2hZVrEbN3ZLatX4NDG103mBCxmepgcP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 749B311FB;
-	Wed, 17 Jan 2024 07:12:47 -0800 (PST)
-Received: from [10.1.26.46] (e133047.arm.com [10.1.26.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF9593F5A1;
-	Wed, 17 Jan 2024 07:11:59 -0800 (PST)
-Message-ID: <e3e0147a-4fdb-4422-807d-24760c4ac30e@arm.com>
-Date: Wed, 17 Jan 2024 15:11:52 +0000
+	s=arc-20240116; t=1705504833; c=relaxed/simple;
+	bh=8h//Y4D40TIJ3bm66JZJVXSbBnrYa+8chML8MPwAOmA=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=ZiY5MzNubyiJBuDMPlCZqmet0zCNdo5oPfnpyK9QBQr4K3X+BjOZbb0rbBIRxJ8sG6Qe6vMbzlEul45W1tCS/6pkDXHYSfbFGl/N8SyvVHdvh6mfDGi88hRCKSHdNZKqrg8TEYC17dnxcJQC8FDxczwZfxY4tfgLyNMlCQe/r5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gVZpMmny; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gVZpMmny"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3608ec05dc2so5222435ab.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 07:20:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705504830; x=1706109630; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6t76MRgEP0lNMIx3NTwHCmr1aDY56vh5yaF0XHXtoYw=;
+        b=gVZpMmnyfWffE0R4LCDkMy23YNSdpMeWXGaWQVIn7JxPFfcOYffHUR4DSpCnjaD0o3
+         YD1VMUrY7Ficb2NZooiizLambUqEvUXon7ln0ymzDSfnt+B8vrd61CzxSlXj8NJ/PgA3
+         wb8dkQn+ha3XtF3IXrs4asNvaxN+yWr86jVtjVdonQdY2Ng4fUGS/g2Eg0/fj62WT3Uv
+         KLTPx6d4Rtm4/zsYLiDg4M+8o5XAB7o/W9ciH5dcv5aotLDGVIPRWLyNL+GpgijUukS/
+         EzPhBavd6A+noFC94vLG2hFv2k2xS/dKv7rWA/L5/RuOAEhYdU4uZDQ7f9DWOgGt3kjJ
+         jkbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705504830; x=1706109630;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6t76MRgEP0lNMIx3NTwHCmr1aDY56vh5yaF0XHXtoYw=;
+        b=YjfRCfzThOCfL5QMLzhSZgSOO8BsQpJBSoKFy2ig8OMoWnQwgVhr6BzDlcjc5yNivE
+         QNnl0UEePnsY84v3N0BYdGhnJhOxUMlowhZX+PapYo6rFTRDP1GIFOJNKEFM9/eysCnR
+         aji6bsuhs4uEGHf7f17IN/6p1ZuJYX9t2f29vQkjO5yYSXzuPGCTxG6AYwzBy4Kcfn5U
+         /yq4sLhFSsQ1DYcoU835ZULRutnT6yT50eO+yiglg360dufMD9lG/2baN0WJOfEeTWne
+         LhqZ7LDcZ/qwB8dqe3/cVOx5i7aclX8Y98b/ey0yuRD9h1jypR62okShuv4v2A55VKv3
+         jO4Q==
+X-Gm-Message-State: AOJu0YyY2yo9vqz6UGhkiHz020GkfnYBDACzIYE0uGQmFQ+8fcSG0cL/
+	nYlUUOx6dKCCVGHdcKIKLki5K9dEXssIa58SGDBACck+RXb24Q==
+X-Google-Smtp-Source: AGHT+IHTZVxZlpRMD6m3xrWxmZ4DDvayZPLBzeE0M+bz0WrzsfdwWXRN51BD8aqJtpX783JSZN6Rlg==
+X-Received: by 2002:a05:6602:14c7:b0:7be:edbc:629f with SMTP id b7-20020a05660214c700b007beedbc629fmr16799807iow.0.1705504829992;
+        Wed, 17 Jan 2024 07:20:29 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id b18-20020a026f52000000b0046e5fe2d364sm460581jae.9.2024.01.17.07.20.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 07:20:29 -0800 (PST)
+Message-ID: <00afbc29-9f25-403e-af18-08953fa79e24@kernel.dk>
+Date: Wed, 17 Jan 2024 08:20:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -28,64 +63,290 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Documentation: block: ioprio: Update schedulers
+Subject: Re: [RFC PATCH 1/1] block: introduce activity based ioprio
 Content-Language: en-US
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "axboe@kernel.dk" <axboe@kernel.dk>, "bvanassche@acm.org"
- <bvanassche@acm.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "corbet@lwn.net" <corbet@lwn.net>
-References: <cde50a18-7c09-4d00-b3b8-32da2992c952@arm.com>
- <8085ea13-29d2-46bd-8ca9-407d22266d0c@wdc.com>
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <8085ea13-29d2-46bd-8ca9-407d22266d0c@wdc.com>
+To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Zhaoyang Huang <huangzhaoyang@gmail.com>, steve.kang@unisoc.com
+References: <20240117092348.2873928-1-zhaoyang.huang@unisoc.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240117092348.2873928-1-zhaoyang.huang@unisoc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 17/01/2024 12:49, Johannes Thumshirn wrote:
-> On 17.01.24 13:20, Christian Loehle wrote:
->> This doc hasn't been touched in a while, in the meantime some
->> new io schedulers were added (e.g. all of mq), some with ioprio
->> support.
->>
->> Signed-off-by: Christian Loehle <christian.loehle@arm.com>
->> ---
->>   Documentation/block/ioprio.rst | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/Documentation/block/ioprio.rst b/Documentation/block/ioprio.rst
->> index a25c6d5df87b..5410308888d2 100644
->> --- a/Documentation/block/ioprio.rst
->> +++ b/Documentation/block/ioprio.rst
->> @@ -9,14 +9,14 @@ Intro
->>   With the introduction of cfq v3 (aka cfq-ts or time sliced cfq), basic io
->>   priorities are supported for reads on files.  This enables users to io nice
->>   processes or process groups, similar to what has been possible with cpu
->> -scheduling for ages.  This document mainly details the current possibilities
->> -with cfq; other io schedulers do not support io priorities thus far.
->> +scheduling for ages. Support for io priorities is io scheduler dependent and
->> +currently supported by bfq, mq-deadline and cfq.
+On 1/17/24 2:23 AM, zhaoyang.huang wrote:
+> [1]
+> ./fault_latency.bin 1 5 > /data/dd_costmem &
+> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+> dd if=/dev/block/sda of=/data/ddtest bs=1024 count=2048000 &
+> dd if=/dev/block/sda of=/data/ddtest1 bs=1024 count=2048000 &
+> dd if=/dev/block/sda of=/data/ddtest2 bs=1024 count=2048000 &
+> dd if=/dev/block/sda of=/data/ddtest3 bs=1024 count=2048000
 > 
-> CFQ went away with blk-mq and got replaced by BFQ IIRC.
+> [2]
+> mainline:
+> Summary for 5932.00(ms)
+>     All Faults:       1398   235.67 counts/sec
+>         Iowait:        553    93.22 counts/sec
+>    All latency:    7432948  1253.03 us/ms
+>         Iowait:    1321971   222.85 us/ms
+> Summary for 6706.00(ms)
+>     All Faults:       1921   286.46 counts/sec
+>         Iowait:       1273   189.83 counts/sec
+>    All latency:   25890252  3860.76 us/ms
+>         Iowait:    4468861   666.40 us/ms
+> Summary for 5838.00(ms)
+>     All Faults:       1580   270.64 counts/sec
+>         Iowait:        619   106.03 counts/sec
+>    All latency:    6862215  1175.44 us/ms
+>         Iowait:    1077616   184.59 us/ms
+> Summary for 5916.00(ms)
+>     All Faults:       1195   201.99 counts/sec
+>         Iowait:        494    83.50 counts/sec
+>    All latency:    4555134   769.97 us/ms
+>         Iowait:     902513   152.55 us/ms
+> Summary for 6229.00(ms)
+>     All Faults:       1395   223.95 counts/sec
+>         Iowait:        359    57.63 counts/sec
+>    All latency:    6091882   977.99 us/ms
+>         Iowait:    1251183   200.86 us/ms
+> Summary for 6059.00(ms)
+>     All Faults:       1201   198.22 counts/sec
+>         Iowait:        299    49.35 counts/sec
+>    All latency:    5612143   926.25 us/ms
+>         Iowait:    1155555   190.72 us/ms
+> Summary for 6005.00(ms)
+>     All Faults:        847   141.05 counts/sec
+>         Iowait:        320    53.29 counts/sec
+>    All latency:    5852541   974.61 us/ms
+>         Iowait:     433719    72.23 us/ms
+> Summary for 5895.00(ms)
+>     All Faults:       1039   176.25 counts/sec
+>         Iowait:        288    48.85 counts/sec
+>    All latency:    4184680   709.87 us/ms
+>         Iowait:     686266   116.41 us/ms
+> Summary for 6371.00(ms)
+>     All Faults:       1176   184.59 counts/sec
+>         Iowait:        269    42.22 counts/sec
+>    All latency:    6282918   986.17 us/ms
+>         Iowait:    1160952   182.22 us/ms
+> Summary for 6113.00(ms)
+>     All Faults:       1322   216.26 counts/sec
+>         Iowait:        281    45.97 counts/sec
+>    All latency:    7208880  1179.27 us/ms
+>         Iowait:    1336650   218.66 us/ms
+> 
+> commit:
+> Summary for 7225.00(ms)
+>     All Faults:       1384   191.56 counts/sec
+>         Iowait:        285    39.45 counts/sec
+>    All latency:    6593081   912.54 us/ms
+>         Iowait:     934041   129.28 us/ms
+> Summary for 6567.00(ms)
+>     All Faults:       1378   209.84 counts/sec
+>         Iowait:        167    25.43 counts/sec
+>    All latency:    3761554   572.80 us/ms
+>         Iowait:     220621    33.60 us/ms
+> Summary for 6118.00(ms)
+>     All Faults:       1304   213.14 counts/sec
+>         Iowait:        268    43.81 counts/sec
+>    All latency:    3835332   626.89 us/ms
+>         Iowait:     413900    67.65 us/ms
+> Summary for 6155.00(ms)
+>     All Faults:       1177   191.23 counts/sec
+>         Iowait:        185    30.06 counts/sec
+>    All latency:    4839084   786.20 us/ms
+>         Iowait:     660002   107.23 us/ms
+> Summary for 6448.00(ms)
+>     All Faults:       1283   198.98 counts/sec
+>         Iowait:        353    54.75 counts/sec
+>    All latency:    4798334   744.16 us/ms
+>         Iowait:    1258045   195.11 us/ms
+> Summary for 6179.00(ms)
+>     All Faults:       1285   207.96 counts/sec
+>         Iowait:        137    22.17 counts/sec
+>    All latency:    3668456   593.70 us/ms
+>         Iowait:     419731    67.93 us/ms
+> Summary for 6165.00(ms)
+>     All Faults:       1500   243.31 counts/sec
+>         Iowait:        182    29.52 counts/sec
+>    All latency:    3357435   544.60 us/ms
+>         Iowait:     279828    45.39 us/ms
+> Summary for 6270.00(ms)
+>     All Faults:       1507   240.35 counts/sec
+>         Iowait:        361    57.58 counts/sec
+>    All latency:    4428320   706.27 us/ms
+>         Iowait:     741304   118.23 us/ms
+> Summary for 6597.00(ms)
+>     All Faults:       1263   191.45 counts/sec
+>         Iowait:        238    36.08 counts/sec
+>    All latency:    5115168   775.38 us/ms
+>         Iowait:     950482   144.08 us/ms
+> Summary for 6503.00(ms)
+>     All Faults:       1456   223.90 counts/sec
+>         Iowait:        402    61.82 counts/sec
+>    All latency:    6782757  1043.02 us/ms
+>         Iowait:    1483803   228.17 us/ms
 
-Right, I'll remove the mentioning of CFQ here and in the introductory sentence.
-The introductory sentence also mentions "basic io priorities are supported for
-reads on files", a limitation which hasn't been there in a long time.
-Thanks, will send out v2 tomorrow.
+That's a lot of data, and I'm sure you did some analysis of this to
+conclude that the change makes a positive difference. It would be
+prudent to include such analysis, rather than just a raw dump of data.
+On top of that, you don't mention what you are testing on - what is sda?
 
-> 
-> 
->>   
->>   Scheduling classes
->>   ------------------
->>   
->> -CFQ implements three generic scheduling classes that determine how io is
->> -served for a process.
->> +Three generic scheduling classes are implemented for io priorities that
->> +determine how io is served for a process.
->>   
->>   IOPRIO_CLASS_RT: This is the realtime io class. This scheduling class is given
->>   higher priority than any other in the system, processes from this class are
-> 
+A few comments - regardless of whether or not this change makes
+functional sense.
+
+> diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+> index 27f11320b8d1..cd6fcfca7782 100644
+> --- a/block/Kconfig.iosched
+> +++ b/block/Kconfig.iosched
+> @@ -44,4 +44,11 @@ config BFQ_CGROUP_DEBUG
+>  	Enable some debugging help. Currently it exports additional stat
+>  	files in a cgroup which can be useful for debugging.
+>  
+> +config ACTIVITY_BASED_IOPRIO
+> +	bool "Enable folio activity based ioprio on deadline"
+> +	depends on LRU_GEN && MQ_IOSCHED_DEADLINE
+> +	default n
+> +	help
+> +	This item enable the feature of adjust request's priority by
+> +	calculating its folio's activity.
+
+Doesn't seem like this should be a config thing. In any case, 'default
+n' is the default, so you should kill that line.
+
+> @@ -224,14 +225,42 @@ static void deadline_remove_request(struct request_queue *q,
+>  		q->last_merge = NULL;
+>  }
+>  
+> +static enum dd_prio dd_req_ioprio(struct request *rq)
+> +{
+> +	enum dd_prio prio;
+> +	const u8 ioprio_class = dd_rq_ioclass(rq);
+> +#ifdef CONFIG_ACTIVITY_BASED_IOPRIO
+> +	struct bio *bio;
+> +	struct bio_vec bv;
+> +	struct bvec_iter iter;
+> +	struct page *page;
+> +	int gen = 0;
+> +	int cnt = 0;
+> +
+> +	if (req_op(rq) == REQ_OP_READ) {
+> +		__rq_for_each_bio(bio, rq) {
+> +			bio_for_each_bvec(bv, bio, iter) {
+> +				page = bv.bv_page;
+> +				gen += PageWorkingset(page) ? 1 : 0;
+> +				cnt++;
+> +			}
+> +		}
+> +		prio = (gen >= cnt / 2) ? ioprio_class_to_prio[IOPRIO_CLASS_RT] :
+> +			ioprio_class_to_prio[ioprio_class];
+> +	} else
+> +		prio = ioprio_class_to_prio[ioprio_class];
+> +#else
+> +	prio = ioprio_class_to_prio[ioprio_class];
+> +#endif
+> +	return prio;
+> +}
+
+This is pretty awful imho, you're iterating the pages which isn't
+exactly cheap. There's also a ternary operator (get rid of it), and
+magic cnt / 2 which isn't even explained.
+
+This would make much more sense to do when the page is added to the bio,
+rather than try and fix up the prio after the fact.
+
+>  static void dd_request_merged(struct request_queue *q, struct request *req,
+>  			      enum elv_merge type)
+>  {
+>  	struct deadline_data *dd = q->elevator->elevator_data;
+> -	const u8 ioprio_class = dd_rq_ioclass(req);
+> -	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
+> +	const enum dd_prio prio = dd_req_ioprio(req);
+>  	struct dd_per_prio *per_prio = &dd->per_prio[prio];
+> -
+>  	/*
+>  	 * if the merge was a front merge, we need to reposition request
+>  	 */
+> @@ -248,8 +277,7 @@ static void dd_merged_requests(struct request_queue *q, struct request *req,
+>  			       struct request *next)
+>  {
+>  	struct deadline_data *dd = q->elevator->elevator_data;
+> -	const u8 ioprio_class = dd_rq_ioclass(next);
+> -	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
+> +	const enum dd_prio prio = dd_req_ioprio(next);
+>  
+>  	lockdep_assert_held(&dd->lock);
+
+What are these changes?
+
+> @@ -745,10 +773,30 @@ static int dd_request_merge(struct request_queue *q, struct request **rq,
+>  {
+>  	struct deadline_data *dd = q->elevator->elevator_data;
+>  	const u8 ioprio_class = IOPRIO_PRIO_CLASS(bio->bi_ioprio);
+> -	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
+> -	struct dd_per_prio *per_prio = &dd->per_prio[prio];
+> +	struct dd_per_prio *per_prio;
+>  	sector_t sector = bio_end_sector(bio);
+>  	struct request *__rq;
+> +#ifdef CONFIG_ACTIVITY_BASED_IOPRIO
+> +	enum dd_prio prio;
+> +	struct bio_vec bv;
+> +	struct bvec_iter iter;
+> +	struct page *page;
+> +	int gen = 0;
+> +	int cnt = 0;
+> +
+> +	if (bio_op(bio) == REQ_OP_READ) {
+> +		bio_for_each_bvec(bv, bio, iter) {
+> +			page = bv.bv_page;
+> +			gen += PageWorkingset(page) ? 1 : 0;
+> +			cnt++;
+> +		}
+> +	}
+> +	prio = (gen >= cnt / 2) ? ioprio_class_to_prio[IOPRIO_CLASS_RT] :
+> +			ioprio_class_to_prio[ioprio_class];
+> +#else
+> +	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
+> +#endif
+> +	per_prio = &dd->per_prio[prio];
+
+And here you duplicate the entire thing from above again?
+
+> @@ -798,10 +846,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  	struct request_queue *q = hctx->queue;
+>  	struct deadline_data *dd = q->elevator->elevator_data;
+>  	const enum dd_data_dir data_dir = rq_data_dir(rq);
+> -	u16 ioprio = req_get_ioprio(rq);
+> -	u8 ioprio_class = IOPRIO_PRIO_CLASS(ioprio);
+>  	struct dd_per_prio *per_prio;
+> -	enum dd_prio prio;
+> +	enum dd_prio prio = dd_req_ioprio(rq);
+>  
+>  	lockdep_assert_held(&dd->lock);
+>  
+> @@ -811,7 +857,6 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  	 */
+>  	blk_req_zone_write_unlock(rq);
+>  
+> -	prio = ioprio_class_to_prio[ioprio_class];
+>  	per_prio = &dd->per_prio[prio];
+>  	if (!rq->elv.priv[0]) {
+>  		per_prio->stats.inserted++;
+> @@ -920,8 +965,7 @@ static void dd_finish_request(struct request *rq)
+>  {
+>  	struct request_queue *q = rq->q;
+>  	struct deadline_data *dd = q->elevator->elevator_data;
+> -	const u8 ioprio_class = dd_rq_ioclass(rq);
+> -	const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
+> +	const enum dd_prio prio = dd_req_ioprio(rq);
+>  	struct dd_per_prio *per_prio = &dd->per_prio[prio];
+
+And again these changes?
+
+-- 
+Jens Axboe
 
