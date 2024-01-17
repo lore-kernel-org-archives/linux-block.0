@@ -1,61 +1,46 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DE624B29
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 20:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B6324212
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 20:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705522839; cv=none; b=lYJeTDTOvw1gw1b35DU0+57TEU/q/qxcTYGibo1ljwjFp2Ln0bMeRblCiLIyl5wB44+oKw9A0gRFxt5RQpU1IzOMiI7gopPLQZwldNhHj6yzkHhgZOkt6jTX+8Qsr5lO6Ii2nyguYS5VO9qhIiVe62vqdmvjN1zH13gkFJYr/B8=
+	t=1705522963; cv=none; b=putvGLRwhOG7eSPIrNxbDY44g0ZufBLEvxWd2wHNGjTQTjDCkwaTkruWGUHER74FWv5qOWuNGUs/6bau8rI9dJJOXO7fUyCT0kMAVZnOM0foGVZ88YQwk0MrBEf9cT/SLKiFTadmi2oho2jmKUW1tz/TLUerlqbq5NBQfbhktH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705522839; c=relaxed/simple;
-	bh=tT0qfVOuAexeqBtyZ5zoGDcKcqX7Y5E/UX2lNdxzzV4=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=PkAvyBHPXngyisU8Vv3X4xyGkUfmqyfufztipmF4S9tqvl67Xi6KJanwz6DQmYs9zklUOhUc7a13FQZ1FO6jHKbQXVtI9mKBdmQAblhEDEL2MVb4LjcP02VYdQjh2aAN2vNz0jEt25LWgOuok8/S2VvKwtrIEwxUJ/XjWbZYaI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EHL+j1dD; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EHL+j1dD"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7bb06f56fe9so109614039f.0
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 12:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705522837; x=1706127637; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fIoquENYXWJoHN1A2Mrf3K7o57gEP0X/sUWlRZqWpBc=;
-        b=EHL+j1dD1GpX6gkLa3ssYkDaVDHQuiQ1NqRU50VjkoLHXYcjzkIuNZVJo6eTJFelwz
-         FVBs+Q6XXALrZOuGxd7CDOCGXGohOquuU6IMa5D9YDB+XPVrA/iRK5562vjzteLWN9Mp
-         pIXuVGi5/2MZG6rXdJSlvJU5umphsj1RxUr/cQRgg158R0LcKj3LDxKJ6YItGDVmdHJz
-         ShPBceZ2R8a5w4iCvxK9Wf3IVQ52Rug9De/Lgbcosn4JML+pnXdbRO++m8dksB6YXDq7
-         GYp3MTSrDn1eQe51EJR8wmq1mFX7w0U3HiVzXeX6dCMxgKgyuchJkXZdLSIfttpY7G/7
-         9c3w==
+	s=arc-20240116; t=1705522963; c=relaxed/simple;
+	bh=6Q73kxkTyRMQ/uqES9pxTm33SQgM22gVRwe2porzqxs=;
+	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 X-Google-Smtp-Source:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding; b=XhqDo9Fj0pX6VDTIGVRAWoCzGyRQ0Q4mLkqplfD+84y0fXm94bvCl3yKKB78ECtRrUb+GCgq+UmcHPEJcGC0gwtVbtQhmj+NOpVac1/NqS6J6NawtFI4jW/hnFtQZukrDWqZXez5kxPEGSViDOB07oQ+/zUUDoq22BzfbFow8WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6d9bec20980so6303244b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 12:22:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705522837; x=1706127637;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1705522961; x=1706127761;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fIoquENYXWJoHN1A2Mrf3K7o57gEP0X/sUWlRZqWpBc=;
-        b=TyOTCsreO3leUblS99QngPPjvmh4vOCf1MrQObHtMihu1LeZr8iu2pA72rotkX5OHo
-         IQGNYzFiDoN3Xa0SB8ZkeC4wTOMmRxxh04v65I9xpMzDYiWPRRerh1296jBF0E32yi6M
-         8AjHOz0KXEO0GUO6UkgkRwx3YWgLV7tjoZeV3uDsttkm41yJ6CU6Q5fZPi1x1VnjfRSN
-         838aCwZq+9HkoZWb1S1/pALpUp6HA1YVyj8tlJVZfPbYVHx8Jj6kztiL/JgLotGRYana
-         8/0I2pRjVm6m9O0OK6kvCmWL7W3D3sBN90sHFmnlOLJ6IUimhOApJbejAlevQdHeh3jf
-         5cFA==
-X-Gm-Message-State: AOJu0YxS55UOUxrwSQh5iuZRDDcgSE4TM+1T5qc6ZqTHa40nOiUO0LNC
-	xtn6CCmqj0FKUwIN8J4Kt+fM7t16AfblPA==
-X-Google-Smtp-Source: AGHT+IHNkGqCG/5i9QmTvp4l6I+DJ3/KFjMRzkufzIiVW/B+nmPmgokmhshaLBC+7Igp1Tt+BbP61g==
-X-Received: by 2002:a05:6602:2c95:b0:7be:e080:6869 with SMTP id i21-20020a0566022c9500b007bee0806869mr17304148iow.1.1705522837427;
-        Wed, 17 Jan 2024 12:20:37 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id h14-20020a05660208ce00b007bf021d13ebsm3628383ioz.49.2024.01.17.12.20.36
+        bh=0/ssYgMvSHU0V2p8049WYSJVkmv5/Vrtm0lsXdrQDb4=;
+        b=s/VU834n6vz5mYzhezO/mmD4MKmo7jE7fUhBkg3hohS2XI7Cc1skwrDAQqJZfK6gjL
+         8TabU33i07xt+njPqw7zam17Eypl/qE7GZ49OhMxUh3tELEVlep58WiNA4TTpcfO5WSm
+         udZD8S65kVOSfGMw/pm2bfMuoPZ+thmIJZpFSyxOTcrenyRt0dUX4OhwjyxeSdhjzjjA
+         Q+QSz0nH8Uv1iI6M0YYT5nN4vex4NFNWyQYaRGC1NWMQAZApaoY1D9pyYqOSSJ19at7d
+         sZSyi8OmpbrwETSJ8oqn2pJgtYDFOpRSif7h4+Y0+Y3TufkhKJiUmJolsAeswH2FgjKX
+         P06Q==
+X-Gm-Message-State: AOJu0YwdMRUrhK65s9ghtxHgpXCTCjXuZziTXVulwu4tSTSQ+xBvJvhG
+	6CDmg7v0trApbUSfusWvpylZ60Ikn0c=
+X-Google-Smtp-Source: AGHT+IGrBZ2QPoUY48q6/N2D2CEOosqci/KqldkB/vXK2m9mXYYQ4uDPmXVHLdi9Rw9WPQF8fibS5g==
+X-Received: by 2002:a05:6a20:9f4b:b0:19a:fd3c:b7d9 with SMTP id ml11-20020a056a209f4b00b0019afd3cb7d9mr4146365pzb.110.1705522961563;
+        Wed, 17 Jan 2024 12:22:41 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:718b:ab80:1dc2:cbee? ([2620:0:1000:8411:718b:ab80:1dc2:cbee])
+        by smtp.gmail.com with ESMTPSA id s19-20020a056a0008d300b006d9a6039745sm1852098pfu.40.2024.01.17.12.22.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 12:20:36 -0800 (PST)
-Message-ID: <9f4a6b8a-1c17-46b7-8344-cbf4bcb406ab@kernel.dk>
-Date: Wed, 17 Jan 2024 13:20:36 -0700
+        Wed, 17 Jan 2024 12:22:41 -0800 (PST)
+Message-ID: <37b7836b-f231-4bf5-bee1-7571f889d6ff@acm.org>
+Date: Wed, 17 Jan 2024 12:22:39 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,65 +48,42 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Zoned Storage Support
+Subject: Re: Race in block/blk-mq-sched.c blk_mq_sched_dispatch_requests
 Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Damien Le Moal
- <dlemoal@kernel.org>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Christoph Hellwig <hch@lst.de>
-References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
- <cc6999c2-2d53-4340-8e2b-c50cae1e5c3a@kernel.org>
- <43cc2e4c-1dce-40ab-b4dc-1aadbeb65371@acm.org>
- <c38ab7b2-63aa-4a0c-9fa6-96be304d8df1@kernel.dk>
- <2955b44a-68c0-4d95-8ff1-da38ef99810f@acm.org>
- <9af03351-a04a-4e61-a6d8-b58236b041a3@kernel.dk>
- <276eedc2-e3d0-40c7-b355-46232ea65662@kernel.dk>
- <39dfcd32-e5fc-45b9-a0ed-082b879a16a4@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <39dfcd32-e5fc-45b9-a0ed-082b879a16a4@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To: Jens Axboe <axboe@kernel.dk>, Gabriel Ryan <gabe@cs.columbia.edu>,
+ linux-block@vger.kernel.org
+References: <CALbthteVP3BnZuQuGWfW-SviB64CwjACP2v1N5ayDVFpnjEOtw@mail.gmail.com>
+ <e4347147-f88f-4a83-ac48-fde1af6a89e9@kernel.dk>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <e4347147-f88f-4a83-ac48-fde1af6a89e9@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/17/24 1:18 PM, Bart Van Assche wrote:
-> On 1/17/24 12:06, Jens Axboe wrote:
->> Case in point, I spent 10 min hacking up some smarts on the insertion
->> and dispatch side, and then we get:
+On 1/17/24 12:17, Jens Axboe wrote:
+> On 1/17/24 1:16 PM, Gabriel Ryan wrote:
+>> We found a race in the block message queue for kernel v5.18-rc5 using
+>> a race testing tool we are developing. We are reporting this race
+>> because it appears to be potentially harmful. The race occurs in
 >>
->> IOPS=2.54M, BW=1240MiB/s, IOS/call=32/32
+>> block/blk-mq-sched.c:333 blk_mq_sched_dispatch_requests
 >>
->> or about a 63% improvement when running the _exact same thing_. Looking
->> at profiles:
+>>      hctx->run++;
 >>
->> -   13.71%  io_uring  [kernel.kallsyms]  [k] queued_spin_lock_slowpath
->>
->> reducing the > 70% of locking contention down to ~14%. No change in data
->> structures, just an ugly hack that:
->>
->> - Serializes dispatch, no point having someone hammer on dd->lock for
->>    dispatch when already running
->> - Serialize insertions, punt to one of N buckets if insertion is already
->>    busy. Current insertion will notice someone else did that, and will
->>    prune the buckets and re-run insertion.
->>
->> And while I seriously doubt that my quick hack is 100% fool proof, it
->> works as a proof of concept. If we can get that kind of reduction with
->> minimal effort, well...
+>> where multiple threads can schedule dispatch requests and increment
+>> the request counter htctx->run simultaneously. This appears to lead to
+>> undefined behavior where multiple conflicting updates to the hctx->run
+>> value could result in it not matching the number of requests that
+>> have been scheduled with calls to blk_mq_sched_dispatch_requests.
 > 
-> If nobody else beats me to it then I will look into using separate
-> locks in the mq-deadline scheduler for insertion and dispatch.
+> I suggest you take a closer look at how that variable is actually
+> used.
 
-That's not going to help by itself, as most of the contention (as I
-showed in the profile trace in the email) is from dispatch competing
-with itself, and not necessarily dispatch competing with insertion. And
-not sure how that would even work, as insert and dispatch are working on
-the same structures.
+It's probably a good idea to explain this in a comment above the
+code that increments hctx->runs because others may also be wondering
+what the impact is of concurrent hctx->runs increments.
 
-Do some proper analysis first, then that will show you where the problem
-is.
+Thanks,
 
--- 
-Jens Axboe
+Bart.
+
 
