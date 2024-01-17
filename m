@@ -1,83 +1,191 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96647250EF;
-	Wed, 17 Jan 2024 20:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF0225555
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 21:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705525146; cv=none; b=YGxBxNjJbp762aH9d7tVIrbdu9jDh2aJ++jNB+O5jvhb6CVMDOLZgp74yVm95PYbXA4Z7dF6sxsILJx/dYEKjWCyEzBMVzaSdWXRnvsywcVe/hBWE1hOCD9dg9ksRzuj89E7pQoeFsQhNLpqtbTR4tlJt+D9Omh1ivicDJggCog=
+	t=1705525377; cv=none; b=QGEZYcgq40mYxaQ2GYSMpaZxKyDrAPuSSZYviSFEIEC5rrEClQ+hW7CSBD7PkmZox8iTh9EtPPktrslbJT1Q2AMPvWbyv2sfXSUN833SlFVyjTgLNWeKTg1BHai2ZujYsEoG2pYa/V4vwQEGbteIaP7Bgl4rLeuZSyjd2HH1PFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705525146; c=relaxed/simple;
-	bh=DlM/RuYuH1b01vCd/RhvIaHU3REIrO4rQFDg2+XvZq8=;
-	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=R2gpxcNJdFDVb3encgVBIfLNVLCe9TAksxmMgrdSFFSFrR27KuD+kHuAGlaQ4V6XA8frTJDplmTl5DHrWfDRH//vpoksUoZ7m7Cfv4ltr3JxrLziSj5vIXMg27Mk4rbgTfQzbrGWOneWXOqx2erIHnnBnJHuP36c4wIHT/nf8HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=beCoH6fw; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1705525377; c=relaxed/simple;
+	bh=dLWBwXlk2TQU5yZga82/ibp2y371ZNEt64HdcSraPxU=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 From:To:Cc:References:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=XBtK3BP/648M+dEtBv7XWPhy+eDfcKlOZ6i8nRd2DeznFTavJJQN6SY/DNvpk6yQxoyhnWySME7bVNBe8KJFHI55W43xgSBb45kmN1SJ7FWlqDJwkWTx4ypO09O2vgEq3yKaL5xHiP3fUhzCdjvMb/oWgL2VkOXcyEa0d+lkwrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H1gaA3xz; arc=none smtp.client-ip=209.85.166.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="beCoH6fw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=pkNWLL2Ut4cYQL6nLJM8ERU7VpEkSUkQghkmIkDx9X4=; b=beCoH6fwCVVp5Cb9B40CGR4rt7
-	1Os8tB3vYOYg1/5X1vAcDcrLvCjUVvVZFJSCVoV/ezCe3o4wt9RbNny/xjhihFQ40q9CRtCe6nuRY
-	gVELu/wGM/Aqyg6jYoTiHGQT/7wQgGmqUuxgZNYFKKlt33mbXmLFTNovAmNv+L18ki7qvjF6Duc+v
-	a8S287LV3IUwIkJjLzlxrHRSvjqKXA+mS7u58xSE3SU99x+VD70UZYjkrm1DF3+VWivjvB2uimjjM
-	J6Rhd4o6/wmzZpBSgKKJOIbjaJgl5XvbQxYwhnaf6dcCrqOJreBWxouUMKg++gSXxRf/fQGSatWBa
-	7CjDfUGQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rQCzz-00000000kRy-1kqe;
-	Wed, 17 Jan 2024 20:58:59 +0000
-Date: Wed, 17 Jan 2024 20:58:59 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Phillip Susi <phill@thesusis.net>
-Cc: Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
-	lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
-Message-ID: <Zag_k-csqVRuHpyK@casper.infradead.org>
-References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
- <20240116114519.jcktectmk2thgagw@quack3>
- <20240117-tupfen-unqualifiziert-173af9bc68c8@brauner>
- <20240117143528.idmyeadhf4yzs5ck@quack3>
- <ZafpsO3XakIekWXx@casper.infradead.org>
- <87il3rvg2u.fsf@vps.thesusis.net>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H1gaA3xz"
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-35d374bebe3so8861475ab.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 13:02:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705525374; x=1706130174; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xWPWFxixc3gOJ5TuAohxDe3jpGLKyM0nNrCjE6iAnNI=;
+        b=H1gaA3xzoeaC0JGPvRpiUa9pujVwZYq3szTIq7pkIeESf90h+mIV0J+himLX73RHhS
+         ldQQ6vDIKtg7AKimnGk0d+gDVjE722ufbG5K4BC0lZtbcAqQSrUVaPlrwlrdyH/zIfNZ
+         N/vm3xw9lqF53SIY8O1Flh+NQGrEDs2LvmT7nEq5LtUO9I/+96lq20zFxwqBHuaeurN5
+         s/FAStiC3UkHZtdqtPBZVhQwMlj4wTz2+xgbI9jrINP7Sruplos/h6YSB2qJmssJu0Jg
+         w0O3ebDe+6FKxE2tGghz+CFUlfpRwTYXBi0sjYW64IqQBtG1kYKkjCxB92FcIbIr2YiK
+         SEbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705525374; x=1706130174;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xWPWFxixc3gOJ5TuAohxDe3jpGLKyM0nNrCjE6iAnNI=;
+        b=Sbnb+SgK7BplrCaljzfZiSIh+cgTQDS1pgWv7+PHu8AHHP1UOHtz/7Pi6evZ7Zcn/q
+         y9jTXI0oTOS8US1Rpv+3qwmKvJQhZUHkZ27hiquoxWSOib4fV8Y4rJVtf52R7hQQ6oBL
+         SBPIbZsb+4WBcv6Gi8dkUFYAnkU53r0Jrbrm//gFyFDqVcnwAOGP7wOOFdwfazHn6cbs
+         yPZQCP9oMOV/UcpssS9wl1gVC/K5LzbMyo5+Y/S5ulLD/Yib8109kJC4wLH0oVcwSxlL
+         LRMsCP+9hniBi8h8Nw3suZMH+QBOewygfrMBMymgMdfW1bKqNnX7YTRdbOrgY1Aw37wb
+         D0Uw==
+X-Gm-Message-State: AOJu0Yxj82NojjYh1Q+4xVuW38FwaHoG49oL/b7F41H3ahpcGQf48Jeo
+	0XcVvBXQJZPpLbZFtkzV6dHFgY/l7QPJgA==
+X-Google-Smtp-Source: AGHT+IEqv20xRorrWet2nJBHIW4ExNsaq6Cj0+pd1nBEWoPOk2NmeNwke4/2lBC1s1s3GmOQvjXZ0g==
+X-Received: by 2002:a6b:7e01:0:b0:7be:e328:5e3a with SMTP id i1-20020a6b7e01000000b007bee3285e3amr15427250iom.0.1705525374172;
+        Wed, 17 Jan 2024 13:02:54 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id l13-20020a02cd8d000000b0046e578ed0aasm609987jap.96.2024.01.17.13.02.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 13:02:53 -0800 (PST)
+Message-ID: <207a985d-ad4e-4cad-ac07-961633967bfc@kernel.dk>
+Date: Wed, 17 Jan 2024 14:02:51 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87il3rvg2u.fsf@vps.thesusis.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] Improving Zoned Storage Support
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>, Damien Le Moal
+ <dlemoal@kernel.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
+ <cc6999c2-2d53-4340-8e2b-c50cae1e5c3a@kernel.org>
+ <43cc2e4c-1dce-40ab-b4dc-1aadbeb65371@acm.org>
+ <c38ab7b2-63aa-4a0c-9fa6-96be304d8df1@kernel.dk>
+ <2955b44a-68c0-4d95-8ff1-da38ef99810f@acm.org>
+ <9af03351-a04a-4e61-a6d8-b58236b041a3@kernel.dk>
+ <276eedc2-e3d0-40c7-b355-46232ea65662@kernel.dk>
+ <39dfcd32-e5fc-45b9-a0ed-082b879a16a4@acm.org>
+ <9f4a6b8a-1c17-46b7-8344-cbf4bcb406ab@kernel.dk>
+In-Reply-To: <9f4a6b8a-1c17-46b7-8344-cbf4bcb406ab@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 17, 2024 at 03:51:37PM -0500, Phillip Susi wrote:
-> Matthew Wilcox <willy@infradead.org> writes:
+On 1/17/24 1:20 PM, Jens Axboe wrote:
+> On 1/17/24 1:18 PM, Bart Van Assche wrote:
+>> On 1/17/24 12:06, Jens Axboe wrote:
+>>> Case in point, I spent 10 min hacking up some smarts on the insertion
+>>> and dispatch side, and then we get:
+>>>
+>>> IOPS=2.54M, BW=1240MiB/s, IOS/call=32/32
+>>>
+>>> or about a 63% improvement when running the _exact same thing_. Looking
+>>> at profiles:
+>>>
+>>> -   13.71%  io_uring  [kernel.kallsyms]  [k] queued_spin_lock_slowpath
+>>>
+>>> reducing the > 70% of locking contention down to ~14%. No change in data
+>>> structures, just an ugly hack that:
+>>>
+>>> - Serializes dispatch, no point having someone hammer on dd->lock for
+>>>    dispatch when already running
+>>> - Serialize insertions, punt to one of N buckets if insertion is already
+>>>    busy. Current insertion will notice someone else did that, and will
+>>>    prune the buckets and re-run insertion.
+>>>
+>>> And while I seriously doubt that my quick hack is 100% fool proof, it
+>>> works as a proof of concept. If we can get that kind of reduction with
+>>> minimal effort, well...
+>>
+>> If nobody else beats me to it then I will look into using separate
+>> locks in the mq-deadline scheduler for insertion and dispatch.
 > 
-> > We have numerous ways to intercept file reads and make them either
-> > block or fail.  The obvious one to me is security_file_permission()
-> > called from rw_verify_area().  Can we do everything we need with an LSM?
+> That's not going to help by itself, as most of the contention (as I
+> showed in the profile trace in the email) is from dispatch competing
+> with itself, and not necessarily dispatch competing with insertion. And
+> not sure how that would even work, as insert and dispatch are working on
+> the same structures.
 > 
-> I like the idea.  That runs when someone opens a file right?  What about
+> Do some proper analysis first, then that will show you where the problem
+> is.
 
-Every read() and write() call goes through there.  eg ksys_read ->
-vfs_read -> rw_verify_area -> security_file_permission
+Here's a quick'n dirty that brings it from 1.56M to:
 
-It wouldn't cover mmap accesses.  So if you had the file mmaped
-before suspend, you'd still be able to load from the mmap.  There's
-no security_ hook for that right now, afaik.
+IOPS=3.50M, BW=1711MiB/s, IOS/call=32/32
 
-> Is that in addition to, or instead of throwing out the key and
-> suspending IO at the block layer?  If it is in addition, then that would
-> mean that trying to open a file would fail cleanly, but accessing a page
-> that is already mapped could hang the task.  In an unkillable state.
-> For a long time.  Even the OOM killer can't kill a task blocked like
-> that can it?  Or did that get fixed at some point?
+by just doing something stupid - if someone is already dispatching, then
+don't dispatch anything. Clearly shows that this is just dispatch
+contention. But a 160% improvement from looking at the initial profile I
+sent and hacking up something stupid in a few minutes does show that
+there's a ton of low hanging fruit here.
 
-TASK_KILLABLE was added in 2008, but it's up to each individual call
-site whether to use killable or uninterruptible sleep.
+This is run on nvme, so there's going to be lots of hardware queues.
+This may even be worth solving in blk-mq rather than try and hack around
+it in the scheduler, blk-mq has no idea that mq-deadline is serializing
+all hardware queues like this. Or we just solve it in the io scheduler,
+since that's the one with the knowledge.
+
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index f958e79277b8..822337521fc5 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -80,6 +80,11 @@ struct dd_per_prio {
+ };
+ 
+ struct deadline_data {
++	spinlock_t lock;
++	spinlock_t zone_lock ____cacheline_aligned_in_smp;
++
++	unsigned long dispatch_state;
++
+ 	/*
+ 	 * run time data
+ 	 */
+@@ -100,9 +105,6 @@ struct deadline_data {
+ 	int front_merges;
+ 	u32 async_depth;
+ 	int prio_aging_expire;
+-
+-	spinlock_t lock;
+-	spinlock_t zone_lock;
+ };
+ 
+ /* Maps an I/O priority class to a deadline scheduler priority. */
+@@ -600,6 +602,10 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	struct request *rq;
+ 	enum dd_prio prio;
+ 
++	if (test_bit(0, &dd->dispatch_state) &&
++	    test_and_set_bit(0, &dd->dispatch_state))
++		return NULL;
++
+ 	spin_lock(&dd->lock);
+ 	rq = dd_dispatch_prio_aged_requests(dd, now);
+ 	if (rq)
+@@ -616,6 +622,7 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	}
+ 
+ unlock:
++	clear_bit(0, &dd->dispatch_state);
+ 	spin_unlock(&dd->lock);
+ 
+ 	return rq;
+
+-- 
+Jens Axboe
 
