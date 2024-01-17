@@ -1,99 +1,119 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7341B945A;
-	Wed, 17 Jan 2024 06:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAFB79EE
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 06:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705471912; cv=none; b=bX3u9o6uIMOXPe5gtus1zG2inScvnH4snh2HNS5JohPj0svuDBzS7Jo3TY/zo9J5TFMad9bEuJXMLbzJoiEBmft9oYYfZL5YFO1CJtuXFw8P2RYhjGgdXdyMdMHzJJOp8eR8DTB/qpUs8pQcn1Kqvfdix9rT4lW0WJLf9qTi964=
+	t=1705472315; cv=none; b=MX4hIBOPbefUkr222jtxs2yRQgTjdXZCi6M9dd7r5Q4qDwagXBjlPFWVt3D5OvumzTz+fTmDCp3Uq6zV4KJJ/SRBWvhoXBaUath8BZlDP3yq141DuVHrJbEb4sir8hI22MWkiFJTo3DZLoVc5SFeZrhKeO0S9U+BKshdvalJIFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705471912; c=relaxed/simple;
-	bh=agyNKKHeWmBULe5eCNrnhpH47X6wjlLOcZf7OlF16TQ=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=WVps+iayEvilx6uKfN2BVneAWWBoS+az4BnRz6BHUc+uocXBhfE85RKd/vdjzppVndLds88DYsD8Fz5qC+hwFd2xQcZV+FiTZN9oaZ9I0fUFyGBBi4/Ixc9eUbADXcvfMa3MKIEoDGOHoSohnz/RgX02A53NxgttKVKYoQyjp/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UGyMzZZh; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1705472315; c=relaxed/simple;
+	bh=wWBlwK0CZynAtmtGyN5rU69lkaqCaZm33b6Q4u8TbJY=;
+	h=Received:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=q9fYZ8XfFRNWxvtHB1YrE/jqjnZbMwUscZuCcNlARvTdniHTR4mqjF/SC4NoUTsNsVX+BDE2NqdsnAS45oqqQdAw3h3L2xWRP6GcUq3xoNgZhrh2EBvGZlNiLiO24JoXUluhuS4sQG8xTpkKNo4MoX0LkVRzok9y6ljXQpn68lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=bezi/DVB; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UGyMzZZh"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5c65ca2e1eeso5036519a12.2;
-        Tue, 16 Jan 2024 22:11:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705471911; x=1706076711; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OuJailNbnMKsoTe4rvq4VOL/78ldsC8lUzKL4himcuw=;
-        b=UGyMzZZh9FdwMDIRGSytAaHsO/FGpSl9uWe2x5wTCgFeO7bVlkhrddaiDbcbdKHLB1
-         vVucVQ8jF0LfNKwoJr6Nu5y1+EryePmEEPwsZOKPnpL2ZJ0iww0vCXV3+FN/t2EBCGX5
-         fcY+0sOg644DB0LHTjGpLoJeqkfJvjyFjnqeEhvA0UY6JrAqExlXkk1zr5lCDeSoYpcj
-         QnWtI0dpycnssfyOa/KGOwnJM1ncrgbq9PhHab2cd+QFJ7Zw0wgrlzFfklb5c1oRX6t0
-         myLl0TkmMC7PjUfTXa41+Xgj91MZM4G5VxyKTKysht5inG+34mPYnZHc0BW6vNCfwYeu
-         YzeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705471911; x=1706076711;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OuJailNbnMKsoTe4rvq4VOL/78ldsC8lUzKL4himcuw=;
-        b=Z0xLU515h7BectVQjpO3A+vJzuoN5+Il2cJKCyvygg2etC05ICO9GbAaQiDem6j05c
-         apuGFF0IyGIJ43UbEQ7MaHI5yuwOe4Mkpo/HKG/PVHLEo5ipDZsICAQLfgjg2qiu6AOl
-         qDJZRxz1zjfVIqXz2Qgn61GcYqxA+rQ/ZXlKfFlTofJMtKTKp/OvxiIp6ieMPSJALvFK
-         mv3v9N4gNWX9pcjwIHiFk2AhRCA8BWAAeMRyKPc8kW3snFge7XZGgT24r5kx4J1EPeuX
-         1XrQ3/1FK3YpBs5VkRS6ZY4LC28PE+UTl+QX8k/NqwwpYoFu8j02iP902wBW+hplgczs
-         +0zg==
-X-Gm-Message-State: AOJu0Yzw7lVafXmZ7rbC6xCC4kQLbDMYE+gmYmwXZKifbhjNmrA4RGaa
-	j572qPC8N1ervIcUsryTycwZ8oTAsQs=
-X-Google-Smtp-Source: AGHT+IHJTgNC3XOQcrLVeV1yrDVV12NKDyRqb4t0DsgepV6OX32Ke9U2ebYhPQKqqd9SPiVcfX2FQQ==
-X-Received: by 2002:a05:6a21:3982:b0:19a:fa18:c2fe with SMTP id ad2-20020a056a21398200b0019afa18c2femr3179002pzc.44.1705471910635;
-        Tue, 16 Jan 2024 22:11:50 -0800 (PST)
-Received: from [192.168.7.25] (45.78.55.121.16clouds.com. [45.78.55.121])
-        by smtp.gmail.com with ESMTPSA id mi15-20020a170902fccf00b001d5f009a69fsm1637873plb.142.2024.01.16.22.11.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jan 2024 22:11:50 -0800 (PST)
-Message-ID: <ce4f98a3-7683-490b-a717-0eeb035cbd86@gmail.com>
-Date: Wed, 17 Jan 2024 14:11:46 +0800
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="bezi/DVB"
+Received: from cwcc.thunk.org (pool-173-48-112-211.bstnma.fios.verizon.net [173.48.112.211])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 40H6HkWE025541
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Jan 2024 01:17:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1705472270; bh=wtJ6zGFmfFqYubGpggJKb+cEki0Jbdw4QovrPcQik+s=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=bezi/DVBmAx96tmLOtiemMvJ/aAlYItBBXdzYMsK17Se8wA+6n4CSiQWKHJNixTB/
+	 Xjv1wsbeBBrLx3rYSWVeG9jjbVYaqGZ4IxW16ZdyQOByzM6DBn/bObSRPWvCNLIYiN
+	 SBK+PxgkENa9spPGqYt2U0pT9mFIVP2dBnuUM+4qo8DXR9r7rq6Ctz7GEW3hNgmpTw
+	 Fidvz8Gs2pvXce0V4YUgOCUu+ahaOsE1/eOg4Yt+DN+7nkBtSrfkdJdCdMhaBEcr0h
+	 h89mWh9WWU8qS8zELcPAU9GxNQ8heI1iAgjrRbxNqqy3pD7U2j24C9+2OIqGHLGbft
+	 fh4OBI1DjDy6w==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id 3FD5F15C0278; Wed, 17 Jan 2024 01:17:42 -0500 (EST)
+Date: Wed, 17 Jan 2024 01:17:42 -0500
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Christian Brauner <brauner@kernel.org>, lsf-pc@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
+Message-ID: <20240117061742.GM911245@mit.edu>
+References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+ <ZabtYQqakvxJVYjM@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: fix length of strscpy()
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20240101175051.38479-2-pugokushin@gmail.com>
- <cb12eefa-9588-4244-a1de-b1ea62f6096d@kernel.dk>
-Content-Language: en-US
-From: Guoxin Pu <pugokushin@gmail.com>
-In-Reply-To: <cb12eefa-9588-4244-a1de-b1ea62f6096d@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZabtYQqakvxJVYjM@dread.disaster.area>
 
-On 02/01/2024 05:26, Jens Axboe wrote:
-> On 1/1/24 10:50 AM, Guoxin Pu wrote:
->> In commit 146afeb235ccec10c17ad8ea26327c0c79dbd968 ("block: use strscpy()
->> to instead of strncpy()") , the length that should now represent the length
->> of the string with the terminating NULL was not updated alongside the
->> change.
->>
->> This has caused blkdevparts= definition on kernel cmdline to be not
->> correctly recognized and partitions not correctly initialized, breaking any
->> device relying on such partitions to boot, on stable releases since 6.6
->>
->> This patch fixes the lengths to contain the terminating NULL.
-> This needs a Fixes line.
->
-Sorry for the late reply.
+On Wed, Jan 17, 2024 at 07:56:01AM +1100, Dave Chinner wrote:
+> 
+> The wiping of secrets is completely orthogonal to the freezing of
+> the device and filesystem - the freeze does not need to occur to
+> allow the encryption keys and decrypted data to be purged. They
+> should not be conflated; purging needs to be a completely separate
+> operation that can be run regardless of device/fs freeze status.
+> 
+> FWIW, focussing on purging the page cache omits the fact that
+> having access to the directory structure is a problem - one can
+> still retrieve other user information that is stored in metadata
+> (e.g. xattrs) that isn't part of the page cache. Even the directory
+> structure that is cached in dentries could reveal secrets someone
+> wants to keep hidden (e.g code names for operations/products).
 
-Thank you for the review. The Fixes line was added and I've sent the new 
-patch as "[PATCH v2] block: fix length of strscpy()" earlier on Jan, 2nd.
+Yeah, I think we need to really revisit the implicit requirements
+which were made upfront about wanting to protect against the page
+cache being exposed.
 
-And since 6.7 is out, do I need to rework the v2 patch and add cc stable 
-6.7.x?
+What is the threat model that you are trying to protect against?  If
+the attacker has access to the memory of the suspended processor, then
+number of things you need to protect against becomes *vast*.  For one
+thing, if you're going to blow away the LUKS encryption on suspend,
+then during the resume process, *before* you allow general user
+processes to start running again (when they might try to read from the
+file system whose encryption key is no longer available, and thus will
+be treated to EIO errors), you're going to have to request that user
+to provide the encryption key, either directly or indirectly.
 
+And if the attacker has access to the suspended memory, is it
+read-only access, or can the attacker modify the memory image to
+include a trojan that records the encryption once it is demanded of
+the user, and then mails it off to Moscow or Beijing or Fort Meade?
+
+To address the whole set of problems, it might be that the answer
+might lie in something like confidential compute, where the all of the
+memory encrypted.  Now you don't need to worry about wiping the page
+cache, since it's all encrypted.  Of course, you still need to solve
+the problem of how to restablish the confidential compute keys after
+it has been wiped as part of the suspend, but you needed to solve that
+with the LUKS key anyway.
+
+This also addresses Dave's concern of it might not being practical to
+drop all of the caches if their are millions of cached inodes and
+cached pages that all need to be dropped at suspend time.
+
+
+Anoter potential approach is a bit more targetted, which is to mark
+certain files as containing keying information, so the system can
+focus on making sure those pages are wiped at suspend time.  It still
+has issues, such as how the desire to wipe them from the memory at
+suspend time interacts with mlock(), which is often done by programs
+to prevent them from getting written to swap.  And of course, we still
+need to worry about what to do if the file is pinned because it's
+being accessed by RDMA or by sendfile(2) --- but perhaps a keyfile has
+no business of being accessed via RDMA or blasted out (unencrypted!)
+at high speed to a network connection via sendfile(2) --- and so
+perhaps those sorts of things should be disallowed if the file is
+marked as "this file contains secret keys --- treat it specially".
+
+	 		    	      	 - Ted
