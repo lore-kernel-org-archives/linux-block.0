@@ -1,97 +1,96 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA1322EF5
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 20:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E7924B25
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 20:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705522578; cv=none; b=VPIXQhlRNnEA1TE8gkF5SmCe6ldPlnDreeuvO+/C5Qs5KTl+Rdm0ZY0EROJW4OYZl777tNHZDeLzYWFkduXkZnpLAbedfcVokGjqGHrX6ZrV75w8Nw/aBtKZfkGLi+6Rj9gQ+Yh/jXT033orfcbWFj6ZjZxrGm0T727b4XRXybA=
+	t=1705522665; cv=none; b=TEQI0BVmTZnD/V3Ul1Zrn7HNXaDmODEe3EXZHDNaERYQ+waGdDBR/TAWm3p/QylnD+60lR6uECxdJb0wGkGAFCJFRVQ3Pc0AUv6YAGOq1/f6oz3WbIN/8lcpZQTpyI5mn1qkGekYgOEuhZ2UTSKc0n313SaEpIfX3vGGewqxffE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705522578; c=relaxed/simple;
-	bh=qoEOOX3YLp/QVdxBfVz9Fnwqv24cniUGOsZlBPUlqc8=;
-	h=Received:DKIM-Signature:Received:Received:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Received:X-Google-Smtp-Source:X-Received:
-	 MIME-Version:From:Date:Message-ID:Subject:To:Content-Type:
-	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details; b=g7gPJxLtedOscbwna9C1Bost29xqAZqBI0jqIEbJQ44suwVaOZ51ZcXCdoFOuHZeC7fainr11rZ21ohG181zlzIAnOKs1cU/uXR9Vj7/wy4shd6no37QoZTLvqnyz4bWMhhWFWMt+F8sn8ZrPDEGrOTiNptTX2X4pvfu0hyI6DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=GPvJLwIl; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1705522665; c=relaxed/simple;
+	bh=+2ZSoO1ZaIhXpAVpjkwPklSbkZYVdgtWw9yT7eVwQ6c=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=qoaollMh8FzUA1TSsXniHEiU6DwJuSBqbnJepxTgxHCfxIuxscCHDEooqbxghjSshkY31BCwYin85ckQ19MXDjTZeLFlzKXIG2Ev+InBpISQkXv/oKTgfKgjSVoTz8b7n+bZR1mJnM2nonDjl2WyzIVFsquC0cIknXOMf/m9DRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=k34StExL; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="GPvJLwIl"
-Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40HK0MVc007311
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 15:16:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=mime-version : from
- : date : message-id : subject : to : content-type; s=pps01;
- bh=mNgW9yXGmcFpv8TQ0N/YIz/pNkRXw64YC9gEZeE1Nyc=;
- b=GPvJLwIlfzpujEljpcZRnZ+za+wdGx+Jnfim9k2KcpfOtD4ttNnfayK0EgPquYsmjVZR
- 3rIQZHihVmsU377yhnkFXJqP9a3pAvE2Lu2Ttb7GD3KWxm9PVVRp55XF8Uavs93SfXSH
- eCtsi0MQJShjpe8sMBGegAHBQmZp3lyPkPmwAebKzWOlM2QodM1SHJK/PB6ZSNJYwuOF
- 5rJeER+PrSI+501zX81jEeVqmx6bj+ertc2B9z6pdYLXZDKJoBN1b3hwINSjFE4FUBAk
- 6mpWrsec5GxQA3aB6OH7Fkjxb4So7Wg/qPGTVv1MZUToaj7v5RlO0DrQSzMP4q8zVFWv 2Q== 
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 3vkqf9tagf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 15:16:16 -0500
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3bd6e446a50so4682275b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 12:16:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705522575; x=1706127375;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="k34StExL"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-35d374bebe3so8807225ab.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 12:17:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705522662; x=1706127462; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mNgW9yXGmcFpv8TQ0N/YIz/pNkRXw64YC9gEZeE1Nyc=;
-        b=mhBW3Z97ZRTXUPmkiVTi7JxZ3wAVV63Zu1hk64MU5d696q+ypfoxUFrgjSoLcVD/fU
-         mSjl0c967+sI3jtzz+bZwFXVTgDdpVqv8IFemtSYiEn13lGmnk4mfMBvZ2LFx0Qlf4o2
-         izOfZfX5aIx4AbMycPTBoxe1u2FukIJDcxQHWYumMcEKSV+fiAbf3XNg4eK5cwdfHlPt
-         Ka9kgxbvPTjBsK4U3EL9jnzQkOyMya4MU4jByzXseglWFDiARBbThorog2T4Q1+R8y4H
-         87FYTafAF3BlGh34OMof80S/m3PHcFGtaitPsFd7eoZZMgnjEs/n0UsiPjWz3egSjrvY
-         Kquw==
-X-Gm-Message-State: AOJu0YwY//sZZ1cF60toNyYana0mRmAilbRd8ECittl3KD+ByaEKdwVU
-	TAsSXaqcEzSdEokx+q7LBJmW41dLAxnINxgo6ehnZdlfNWYffWs5V7DB6sootWpeQHq0PjwatTt
-	SOwaBOqyfK7hRsMQ4HsAbbIOjTnSP4iVsuAS9vfs3ma6+aoFy8oVzSg==
-X-Received: by 2002:a05:6870:c085:b0:204:2d91:b155 with SMTP id c5-20020a056870c08500b002042d91b155mr12698494oad.80.1705522575189;
-        Wed, 17 Jan 2024 12:16:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEFrHGfspyqWm1fihNJD5MYpxRY8+4VDSQWOINlPV9CjOjiTd8oFqPABSGFzQSBoHrSfBoJ1khjhjfQ3CvSgiE=
-X-Received: by 2002:a05:6870:c085:b0:204:2d91:b155 with SMTP id
- c5-20020a056870c08500b002042d91b155mr12698489oad.80.1705522574988; Wed, 17
- Jan 2024 12:16:14 -0800 (PST)
+        bh=4ZDzwKFdbr5kcHk9jMrCcU9xNwk9atuhANr3VTJdGzg=;
+        b=k34StExLdwDZfcXvCWh2Zd9ZsZYObT/kx+Kw81crLATyYqPAoCLN5a3H1yETSrF2HL
+         uvj3uAUco/7/pkxg1zk7px7eYp/MLBAe+/bgep0+iR2vfIyjiQRpKU/O3c9lDGgEgZsc
+         8AJCo6jqnypD0CtI96fJy679mIR6RU/C6sShjgQkaYcDXvkBMlKGbi6Z7bEVLr0BkpbQ
+         gOF4z9ZGN/msg1CRF7pKab3/eSXF+4agTp2np57aQmUBHZL8JLX3qHvBMAtWa01P5d9C
+         4dbc2v0mxnXmUkT+gB48i5QJANY9vctJ2CaypxYYbBp4eHi/NzodDLuw1xx44YO/zrzi
+         RUHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705522662; x=1706127462;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ZDzwKFdbr5kcHk9jMrCcU9xNwk9atuhANr3VTJdGzg=;
+        b=S9OWixJARVQXv9PYIjqBM1i8/Pt9s1beUH/u9LIPqDfwXmp3CZfziWRzSC52Sa0mSJ
+         xsV2GGWM1Jdxdd48DXsnvpibAMFWj6ZcOkrL3TXeYDZOQPpQkWQ33S64fVqpGVt0XpU3
+         2wqzo2JB1nbsRTnCzpCvuNNs0HLKyohXI7EimfxutVOAONQTt1/Obf8iGL+zr7i3oJo6
+         dPoh88+JsYHSSOw8IHMN4Cp502UJvqXmwAWlP58WoJ6pFwWxJ8z7EVIkiO7HYwwGIIA0
+         +BZ5+/xUUZ+R5e567jeWiPJpqgxjQWSFx1SDJ31cr9G0iqbpxkB4pJCVkU3ocG/VpSGj
+         No3g==
+X-Gm-Message-State: AOJu0Yy+93cozYJgTKb/GlBZQU0ryRgUFXjsxf4WfvnB7QRNB9CpvFLe
+	hx6V5mmrXwDTPeFmoxUmL1Hbu10bbfgh5Z9RcdPlt98nDRIwFQ==
+X-Google-Smtp-Source: AGHT+IGiyGjyCDBmUUQKGsBRrMtHBe8I8FYv6dJdCX71r9hr1AUjIF9prlacQZ4s7BQu9rIWEGSeyw==
+X-Received: by 2002:a6b:6810:0:b0:7be:e376:fc44 with SMTP id d16-20020a6b6810000000b007bee376fc44mr15666852ioc.2.1705522662446;
+        Wed, 17 Jan 2024 12:17:42 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id x17-20020a02ac91000000b0046ea90fa158sm506865jan.16.2024.01.17.12.17.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 12:17:41 -0800 (PST)
+Message-ID: <e4347147-f88f-4a83-ac48-fde1af6a89e9@kernel.dk>
+Date: Wed, 17 Jan 2024 13:17:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Gabriel Ryan <gabe@cs.columbia.edu>
-Date: Wed, 17 Jan 2024 15:16:09 -0500
-Message-ID: <CALbthteVP3BnZuQuGWfW-SviB64CwjACP2v1N5ayDVFpnjEOtw@mail.gmail.com>
-Subject: Race in block/blk-mq-sched.c blk_mq_sched_dispatch_requests
-To: axboe@kernel.dk, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Proofpoint-GUID: Et_MMLisqqxTmz7EWQcSbSQfaz8I0U-w
-X-Proofpoint-ORIG-GUID: Et_MMLisqqxTmz7EWQcSbSQfaz8I0U-w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-17_12,2024-01-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=10
- suspectscore=0 adultscore=0 clxscore=1011 mlxscore=0 mlxlogscore=827
- priorityscore=1501 impostorscore=10 bulkscore=10 phishscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401170148
+User-Agent: Mozilla Thunderbird
+Subject: Re: Race in block/blk-mq-sched.c blk_mq_sched_dispatch_requests
+Content-Language: en-US
+To: Gabriel Ryan <gabe@cs.columbia.edu>, linux-block@vger.kernel.org
+References: <CALbthteVP3BnZuQuGWfW-SviB64CwjACP2v1N5ayDVFpnjEOtw@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CALbthteVP3BnZuQuGWfW-SviB64CwjACP2v1N5ayDVFpnjEOtw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-We found a race in the block message queue for kernel v5.18-rc5 using
-a race testing tool we are developing. We are reporting this race
-because it appears to be potentially harmful. The race occurs in
+On 1/17/24 1:16 PM, Gabriel Ryan wrote:
+> We found a race in the block message queue for kernel v5.18-rc5 using
+> a race testing tool we are developing. We are reporting this race
+> because it appears to be potentially harmful. The race occurs in
+> 
+> block/blk-mq-sched.c:333 blk_mq_sched_dispatch_requests
+> 
+>     hctx->run++;
+> 
+> where multiple threads can schedule dispatch requests and increment
+> the request counter htctx->run simultaneously. This appears to lead to
+> undefined behavior where multiple conflicting updates to the hctx->run
+>  value could result in it not matching the number of requests that
+> have been scheduled with calls to blk_mq_sched_dispatch_requests.
 
-block/blk-mq-sched.c:333 blk_mq_sched_dispatch_requests
+I suggest you take a closer look at how that variable is actually
+used.
 
-    hctx->run++;
+-- 
+Jens Axboe
 
-where multiple threads can schedule dispatch requests and increment
-the request counter htctx->run simultaneously. This appears to lead to
-undefined behavior where multiple conflicting updates to the hctx->run
- value could result in it not matching the number of requests that
-have been scheduled with calls to blk_mq_sched_dispatch_requests.
 
-Best,
-Gabe
