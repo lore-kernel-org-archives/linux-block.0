@@ -1,143 +1,108 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED4F22EE3
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 17:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5242522EFC;
+	Wed, 17 Jan 2024 18:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705514348; cv=none; b=CyK3DzyCuD/VE5xL3eMY8F4/RtSR2gHmh+2HRxbfN5EzpBCyt1WiVUPMLVf8RUSjmkwij+hUM15upmcGxRanFry5z59CrH4YDny3y6P1m5pKp/g7xxcVMZwsmoCtQtYP84SD2eQsayNnQ+KxGJIoeE/g9yjA2rLeAEygvb08KLo=
+	t=1705515732; cv=none; b=qBFWONCntQJULW3XOBX8FYE+EkKbVH21L7niKqsDsjfYa1zIbCdxcxcWpc+k5blJUjPwyflo5bzMoJEjswPmOCrP1CjVR+gBsZMr+RT6eXE/ldb9qCldxJoYGwpgfDOe6N1uX/RwkzYLola+4zTZLnAXCwKzn9dY7KZ5A9pPwQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705514348; c=relaxed/simple;
-	bh=DfV4loBRJ5ZNsLhYr2lFriXjb/0lyYbaOkTKhUdkm9o=;
-	h=DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-Id:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:X-SRS-Rewrite; b=T5qwt6WoNpy5Wwk2Tpkc7Pe0lYTqqsegzCwdfm1c4gZi4EV16hVUFfs+nwm0M1L3PRWeMdHmBaZ40B7MMvDwHRh0lWJHK8fLL5FfSDgOtLo+97TEBoza/t3LUklCyFYZIi8bZMvzd4RAitIGdAw4K1oeX590YFGVGSbYhYDeAJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=slm/D/Ni; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="slm/D/Ni"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=VCXHlry+DsluVv40kJQKXdVEswPXHTpK1oXC0y2Oxys=; b=slm/D/Nicy8lKGS4b/YPN9QNk1
-	D2ZnhogViv9RoyFjviF7cmbs30mU+bQ5vJADKMqunN85vw/ZVgi/1+2E0SChcFh+s89ge6Uo4nsxR
-	eL2ROvAdbt6tMorV4Mh5eD5JNKaYNSUL9wd6isrTZDOTBF5B2o79XR1MNfcqHqsp/pioA5SUtYh9h
-	JwSqngsF2ZDrmssbbt8IcT+C7bkErMq2vYsf5/EBfylOP0yqx82AS0sMEhkanqYIAFSHjP1O9hKVD
-	FWry177gS888zFFx53pzmr8TUL1lZgSkXE/bTwGLVqqW9rE31YAc/d3NucGvVb6bkQsMq0V2npo/W
-	Uu5hD16w==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rQABs-000I8d-0a;
-	Wed, 17 Jan 2024 17:59:04 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH] loop: fix the the direct I/O support check when used on top of block devices
-Date: Wed, 17 Jan 2024 18:59:01 +0100
-Message-Id: <20240117175901.871796-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1705515732; c=relaxed/simple;
+	bh=Zi0Od5m6Loerhz2JEA67PvLsbixKNMaoXlF2zKzjziU=;
+	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 X-Google-Smtp-Source:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding; b=ofwQHjsypkqiMo+r8SJU/om4JSHKjSE+UL3iCrBVxc4K4iTN9IjAXPoLJ8vtSEfuiyS6LYIA9SxhnkOL7QP/IyznrfWG2BOCCn8dec1f+6fujSeMTira4uEiX0hD343Pb9DCFxv//bb+WSC12RMCXjaJKNOmqn82zfnBlJaK33k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6d99980b2e0so9350482b3a.2;
+        Wed, 17 Jan 2024 10:22:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705515730; x=1706120530;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d4/T24RnyFB/ADa9apgCOMR0Hlg54AQd0st7W68AxiE=;
+        b=dwhO4YR63GbOFpLAsqH3wDjsJ+8pNFuyHJ+u3l3uHXkP6lEjSd4rmha6ZiUrvWCoq8
+         iHKJjDwajTU0XUUn884xIBcbucX9mCk8Yq7ldjSwefc5IKi5N0e+hvbRkatTbYghe8Xj
+         7SGTC9Rr+pUFlELJdrYao3syZe0F7DSehN6AnKZsgWBPySIkhP+PNpn3bC3YDN0T+jRd
+         EpU1hjG/U1c5wa36xa2MtJJLzoBQd4wqOhPmtQnw5BfLmA8uOMmd+Zmu/GGkg61yZj7t
+         QHI498Nx/8lPI02M6DWVyc9i1qEmztxtoVDEvAm/jvz2Vp56GEDHaDWtO3nM3cRlEIuZ
+         9Agg==
+X-Gm-Message-State: AOJu0YwN0tNDtievTJ2/6nDQho2AnNbecGVa0KhWAtcJKl44X89iPMs2
+	p/mAqNu4BpE2EEHndIGU4Z8=
+X-Google-Smtp-Source: AGHT+IFYbqyZvwDBQ8Mkv8SlzrFfh46Y79vWdOi7CaVoyBYiuWFAXxheUzXz7hIxq7nhlrH+i8/L/Q==
+X-Received: by 2002:a05:6a00:1d01:b0:6d9:e7d0:327f with SMTP id a1-20020a056a001d0100b006d9e7d0327fmr11472379pfx.23.1705515730356;
+        Wed, 17 Jan 2024 10:22:10 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:5421:8f53:45a:4e37? ([2620:0:1000:8411:5421:8f53:45a:4e37])
+        by smtp.gmail.com with ESMTPSA id kr8-20020a056a004b4800b006da73b90fe4sm1805094pfb.14.2024.01.17.10.22.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 10:22:09 -0800 (PST)
+Message-ID: <2955b44a-68c0-4d95-8ff1-da38ef99810f@acm.org>
+Date: Wed, 17 Jan 2024 10:22:08 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] Improving Zoned Storage Support
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
+ <cc6999c2-2d53-4340-8e2b-c50cae1e5c3a@kernel.org>
+ <43cc2e4c-1dce-40ab-b4dc-1aadbeb65371@acm.org>
+ <c38ab7b2-63aa-4a0c-9fa6-96be304d8df1@kernel.dk>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <c38ab7b2-63aa-4a0c-9fa6-96be304d8df1@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-__loop_update_dio only checks the alignment requirement for block backed
-file systems, but misses them for the case where the loop device is
-created directly on top of another block device.  Due to this creating
-a loop device with default option plus the direct I/O flag on a > 512 byte
-sector size file system will lead to incorrect I/O being submitted to the
-lower block device and a lot of error from the lock layer.  This can
-be seen with xfstests generic/563.
+On 1/17/24 09:48, Jens Axboe wrote:
+>> When posting this patch series, please include performance results
+>> (IOPS) for a zoned null_blk device instance. mq-deadline doesn't support
+>> more than 200 K IOPS, which is less than what UFS devices support. I
+>> hope that this performance bottleneck will be solved with the new
+>> approach.
+> 
+> Not really zone related, but I was very aware of the single lock
+> limitations when I ported deadline to blk-mq. Was always hoping that
+> someone would actually take the time to make it more efficient, but so
+> far that hasn't happened. Or maybe it'll be a case of "just do it
+> yourself, Jens" at some point...
 
-Fix the code in __loop_update_dio by factoring the alignment check into
-a helper, and calling that also for the struct block_device of a block
-device inode.
+Hi Jens,
 
-Also remove the TODO comment talking about dynamically switching between
-buffered and direct I/O, which is a would be a recipe for horrible
-performance and occasional data loss.
+I think it is something fundamental rather than something that can be
+fixed. The I/O scheduling algorithms in mq-deadline and BFQ require
+knowledge of all pending I/O requests. This implies that data structures
+must be maintained that are shared across all CPU cores. Making these
+thread-safe implies having synchronization mechanisms that are used
+across all CPU cores. I think this is where the (about) 200 K IOPS
+bottleneck comes from.
 
-Fixes: 2e5ab5f379f9 ("block: loop: prepare for supporing direct IO")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 52 +++++++++++++++++++++-----------------------
- 1 file changed, 25 insertions(+), 27 deletions(-)
+Additionally, the faster storage devices become, the larger the relative
+overhead of an I/O scheduler is (assuming that I/O schedulers won't
+become significantly faster).
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 2bd10f3bfcb296..01bb9436240484 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -165,39 +165,37 @@ static loff_t get_loop_size(struct loop_device *lo, struct file *file)
- 	return get_size(lo->lo_offset, lo->lo_sizelimit, file);
- }
- 
-+/*
-+ * We support direct I/O only if lo_offset is aligned with the logical I/O size
-+ * of backing device, and the logical block size of loop is bigger than that of
-+ * the backing device.
-+ */
-+static bool lo_bdev_can_use_dio(struct loop_device *lo,
-+		struct block_device *backing_bdev)
-+{
-+	unsigned short sb_bsize = bdev_logical_block_size(backing_bdev);
-+
-+	if (queue_logical_block_size(lo->lo_queue) < sb_bsize)
-+		return false;
-+	if (lo->lo_offset & (sb_bsize - 1))
-+		return false;
-+	return true;
-+}
-+
- static void __loop_update_dio(struct loop_device *lo, bool dio)
- {
- 	struct file *file = lo->lo_backing_file;
--	struct address_space *mapping = file->f_mapping;
--	struct inode *inode = mapping->host;
--	unsigned short sb_bsize = 0;
--	unsigned dio_align = 0;
-+	struct inode *inode = file->f_mapping->host;
-+	struct block_device *backing_bdev = NULL;
- 	bool use_dio;
- 
--	if (inode->i_sb->s_bdev) {
--		sb_bsize = bdev_logical_block_size(inode->i_sb->s_bdev);
--		dio_align = sb_bsize - 1;
--	}
-+	if (S_ISBLK(inode->i_mode))
-+		backing_bdev = I_BDEV(inode);
-+	else if (inode->i_sb->s_bdev)
-+		backing_bdev = inode->i_sb->s_bdev;
- 
--	/*
--	 * We support direct I/O only if lo_offset is aligned with the
--	 * logical I/O size of backing device, and the logical block
--	 * size of loop is bigger than the backing device's.
--	 *
--	 * TODO: the above condition may be loosed in the future, and
--	 * direct I/O may be switched runtime at that time because most
--	 * of requests in sane applications should be PAGE_SIZE aligned
--	 */
--	if (dio) {
--		if (queue_logical_block_size(lo->lo_queue) >= sb_bsize &&
--		    !(lo->lo_offset & dio_align) &&
--		    (file->f_mode & FMODE_CAN_ODIRECT))
--			use_dio = true;
--		else
--			use_dio = false;
--	} else {
--		use_dio = false;
--	}
-+	use_dio = dio && (file->f_mode & FMODE_CAN_ODIRECT) &&
-+		(!backing_bdev || lo_bdev_can_use_dio(lo, backing_bdev));
- 
- 	if (lo->use_dio == use_dio)
- 		return;
--- 
-2.39.2
+A fundamental limitation of I/O schedulers is that multiple commands
+must be submitted simultaneously to the storage device to achieve good
+performance. However, if the queue depth is larger than one then the
+device has some control over the order in which commands are executed.
+
+Because of all the above reasons I'm recommending my colleagues to move
+I/O prioritization into the storage device and to evolve towards a
+future for solid storage devices without I/O schedulers. I/O schedulers
+probably will remain important for rotating magnetic media.
+
+Thank you,
+
+Bart.
 
