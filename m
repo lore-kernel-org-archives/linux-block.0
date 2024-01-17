@@ -1,61 +1,61 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF0225555
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 21:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2BE2557E
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 21:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705525377; cv=none; b=QGEZYcgq40mYxaQ2GYSMpaZxKyDrAPuSSZYviSFEIEC5rrEClQ+hW7CSBD7PkmZox8iTh9EtPPktrslbJT1Q2AMPvWbyv2sfXSUN833SlFVyjTgLNWeKTg1BHai2ZujYsEoG2pYa/V4vwQEGbteIaP7Bgl4rLeuZSyjd2HH1PFo=
+	t=1705526086; cv=none; b=rAXW8jVahMbTWao9gn07Oa+4viTzLwfTgYAd7dc6jBEnvvMi7hB+7qhPEG6TrFXRxOLtfQqgEiSPXPzNpSh9rdoNH6MgjxJ4wtJGX3RHcpHBBH+egMHtHxiMrFQ/jdP/DfiYLjSRBKKkhnEZFiY0qK1DwFDcGBy6zEPDQkdcDN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705525377; c=relaxed/simple;
-	bh=dLWBwXlk2TQU5yZga82/ibp2y371ZNEt64HdcSraPxU=;
+	s=arc-20240116; t=1705526086; c=relaxed/simple;
+	bh=EYXqg9NonPHowGDAGulyABT8pjbAK8SGoNi7NuDcic0=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
 	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
 	 From:To:Cc:References:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=XBtK3BP/648M+dEtBv7XWPhy+eDfcKlOZ6i8nRd2DeznFTavJJQN6SY/DNvpk6yQxoyhnWySME7bVNBe8KJFHI55W43xgSBb45kmN1SJ7FWlqDJwkWTx4ypO09O2vgEq3yKaL5xHiP3fUhzCdjvMb/oWgL2VkOXcyEa0d+lkwrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H1gaA3xz; arc=none smtp.client-ip=209.85.166.181
+	 Content-Transfer-Encoding; b=LTFsvzurXn+nvF1uahKW6eCYm0X64SpeyVn7hUEecF9Vj9uG3mQbIb1NKgPZgAYCjSSe/Hb0+kYTyQb0Q32nqtoc57WVg7GnNfo2fWOOa0zdwWkdwTuw9ds5p1vvEU9smzsHnK2iVFXT4Wo3o98ks/HRvZCWoqnQSSjA8t7zvv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JAgL7V6/; arc=none smtp.client-ip=209.85.166.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H1gaA3xz"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-35d374bebe3so8861475ab.1
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 13:02:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JAgL7V6/"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-35d374bebe3so8876035ab.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 13:14:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705525374; x=1706130174; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705526083; x=1706130883; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xWPWFxixc3gOJ5TuAohxDe3jpGLKyM0nNrCjE6iAnNI=;
-        b=H1gaA3xzoeaC0JGPvRpiUa9pujVwZYq3szTIq7pkIeESf90h+mIV0J+himLX73RHhS
-         ldQQ6vDIKtg7AKimnGk0d+gDVjE722ufbG5K4BC0lZtbcAqQSrUVaPlrwlrdyH/zIfNZ
-         N/vm3xw9lqF53SIY8O1Flh+NQGrEDs2LvmT7nEq5LtUO9I/+96lq20zFxwqBHuaeurN5
-         s/FAStiC3UkHZtdqtPBZVhQwMlj4wTz2+xgbI9jrINP7Sruplos/h6YSB2qJmssJu0Jg
-         w0O3ebDe+6FKxE2tGghz+CFUlfpRwTYXBi0sjYW64IqQBtG1kYKkjCxB92FcIbIr2YiK
-         SEbg==
+        bh=7NlonM47ZL/DaVG1oQ0pMdWoMVzqK9l5NUiiZ/sWieg=;
+        b=JAgL7V6/uetEZ7tKsLA+LT9ZyEfJyG277UpK1E/6e3rohMg/ZbO+1UkuMzcfVf2ZXy
+         rEpWV9TWNL+zrtTKprmzt4dNWpckqG5u7S/7QKXuykanu7jScDTNyxS7ZoQ2MDtb15Ke
+         YSoEG9Tv0WMewMrvufLKKFeaJel92mwnBCiv50vhXx6QpSAlisXu30/yskicYu8qY1OM
+         ghF4Nc6eBiifZ2NUNHMV7Uf+jVahA80PnLAwaNhwv5rOlXiT42yN+zRn1shvjhAHKaEz
+         BTW+sJXo+QcwkeJ2x7oiWWL8W0q9X8Eh7evE9ts3XbN3p+2Fjxul/XJJPhNG7Pk3zz7B
+         V8uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705525374; x=1706130174;
+        d=1e100.net; s=20230601; t=1705526083; x=1706130883;
         h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xWPWFxixc3gOJ5TuAohxDe3jpGLKyM0nNrCjE6iAnNI=;
-        b=Sbnb+SgK7BplrCaljzfZiSIh+cgTQDS1pgWv7+PHu8AHHP1UOHtz/7Pi6evZ7Zcn/q
-         y9jTXI0oTOS8US1Rpv+3qwmKvJQhZUHkZ27hiquoxWSOib4fV8Y4rJVtf52R7hQQ6oBL
-         SBPIbZsb+4WBcv6Gi8dkUFYAnkU53r0Jrbrm//gFyFDqVcnwAOGP7wOOFdwfazHn6cbs
-         yPZQCP9oMOV/UcpssS9wl1gVC/K5LzbMyo5+Y/S5ulLD/Yib8109kJC4wLH0oVcwSxlL
-         LRMsCP+9hniBi8h8Nw3suZMH+QBOewygfrMBMymgMdfW1bKqNnX7YTRdbOrgY1Aw37wb
-         D0Uw==
-X-Gm-Message-State: AOJu0Yxj82NojjYh1Q+4xVuW38FwaHoG49oL/b7F41H3ahpcGQf48Jeo
-	0XcVvBXQJZPpLbZFtkzV6dHFgY/l7QPJgA==
-X-Google-Smtp-Source: AGHT+IEqv20xRorrWet2nJBHIW4ExNsaq6Cj0+pd1nBEWoPOk2NmeNwke4/2lBC1s1s3GmOQvjXZ0g==
-X-Received: by 2002:a6b:7e01:0:b0:7be:e328:5e3a with SMTP id i1-20020a6b7e01000000b007bee3285e3amr15427250iom.0.1705525374172;
-        Wed, 17 Jan 2024 13:02:54 -0800 (PST)
+        bh=7NlonM47ZL/DaVG1oQ0pMdWoMVzqK9l5NUiiZ/sWieg=;
+        b=TypnMPxN89KZpSJzX/eZdJUUaSr20XZD1qN95scLlfbW0fIiMPRC3z/qnCrWCuqmqv
+         ank5bBXKRJqtSINHOWAudoLP1LT056BPKncwOrQXd2+QCsKquGqdi0eheUkSFp6cthvn
+         G6dCdBXkxtWF1F2pcNr59j3H/3SctWXlqfLQCmMglwrqRABJC/qAn/RqwF0rSb7QS0FD
+         cUSkWoZ3hYp9S3UqjQRwR0BpXB8qNhJtgw3G72HWS5/ka5j0n7Xt/DCv1/39e5Rj1b8i
+         Lqv41vHOHM7GeTEGvzfU7OmhyjKFGK4CMZA1iIwvoqSGoduzrF4iendnCfUZlIPRVZVl
+         JDkA==
+X-Gm-Message-State: AOJu0YwSRmHcuiFVOEmuIfLaGTmOzzjVP9p9smAuUcGqyl4C3dfbbEbn
+	mAGfKYblZyRzyTpGYXgH9QQSFT4h2oCMbA==
+X-Google-Smtp-Source: AGHT+IG6Rn34LZJ41NucbqmkdsoUihrlcTuf+Vz+HLae2MAYSroiYFWXViZpyUAv5pBL8ScpZdOEvg==
+X-Received: by 2002:a05:6e02:1c0f:b0:361:9b07:be with SMTP id l15-20020a056e021c0f00b003619b0700bemr748987ilh.0.1705526083276;
+        Wed, 17 Jan 2024 13:14:43 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id l13-20020a02cd8d000000b0046e578ed0aasm609987jap.96.2024.01.17.13.02.53
+        by smtp.gmail.com with ESMTPSA id g14-20020a056e021a2e00b0035d6f8d02d7sm4308292ile.7.2024.01.17.13.14.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 13:02:53 -0800 (PST)
-Message-ID: <207a985d-ad4e-4cad-ac07-961633967bfc@kernel.dk>
-Date: Wed, 17 Jan 2024 14:02:51 -0700
+        Wed, 17 Jan 2024 13:14:42 -0800 (PST)
+Message-ID: <e8c32676-114b-4aaf-8753-5a6d7b04fc4b@kernel.dk>
+Date: Wed, 17 Jan 2024 14:14:42 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,81 +82,82 @@ References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
  <276eedc2-e3d0-40c7-b355-46232ea65662@kernel.dk>
  <39dfcd32-e5fc-45b9-a0ed-082b879a16a4@acm.org>
  <9f4a6b8a-1c17-46b7-8344-cbf4bcb406ab@kernel.dk>
-In-Reply-To: <9f4a6b8a-1c17-46b7-8344-cbf4bcb406ab@kernel.dk>
+ <207a985d-ad4e-4cad-ac07-961633967bfc@kernel.dk>
+In-Reply-To: <207a985d-ad4e-4cad-ac07-961633967bfc@kernel.dk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/17/24 1:20 PM, Jens Axboe wrote:
-> On 1/17/24 1:18 PM, Bart Van Assche wrote:
->> On 1/17/24 12:06, Jens Axboe wrote:
->>> Case in point, I spent 10 min hacking up some smarts on the insertion
->>> and dispatch side, and then we get:
+On 1/17/24 2:02 PM, Jens Axboe wrote:
+> On 1/17/24 1:20 PM, Jens Axboe wrote:
+>> On 1/17/24 1:18 PM, Bart Van Assche wrote:
+>>> On 1/17/24 12:06, Jens Axboe wrote:
+>>>> Case in point, I spent 10 min hacking up some smarts on the insertion
+>>>> and dispatch side, and then we get:
+>>>>
+>>>> IOPS=2.54M, BW=1240MiB/s, IOS/call=32/32
+>>>>
+>>>> or about a 63% improvement when running the _exact same thing_. Looking
+>>>> at profiles:
+>>>>
+>>>> -   13.71%  io_uring  [kernel.kallsyms]  [k] queued_spin_lock_slowpath
+>>>>
+>>>> reducing the > 70% of locking contention down to ~14%. No change in data
+>>>> structures, just an ugly hack that:
+>>>>
+>>>> - Serializes dispatch, no point having someone hammer on dd->lock for
+>>>>    dispatch when already running
+>>>> - Serialize insertions, punt to one of N buckets if insertion is already
+>>>>    busy. Current insertion will notice someone else did that, and will
+>>>>    prune the buckets and re-run insertion.
+>>>>
+>>>> And while I seriously doubt that my quick hack is 100% fool proof, it
+>>>> works as a proof of concept. If we can get that kind of reduction with
+>>>> minimal effort, well...
 >>>
->>> IOPS=2.54M, BW=1240MiB/s, IOS/call=32/32
->>>
->>> or about a 63% improvement when running the _exact same thing_. Looking
->>> at profiles:
->>>
->>> -   13.71%  io_uring  [kernel.kallsyms]  [k] queued_spin_lock_slowpath
->>>
->>> reducing the > 70% of locking contention down to ~14%. No change in data
->>> structures, just an ugly hack that:
->>>
->>> - Serializes dispatch, no point having someone hammer on dd->lock for
->>>    dispatch when already running
->>> - Serialize insertions, punt to one of N buckets if insertion is already
->>>    busy. Current insertion will notice someone else did that, and will
->>>    prune the buckets and re-run insertion.
->>>
->>> And while I seriously doubt that my quick hack is 100% fool proof, it
->>> works as a proof of concept. If we can get that kind of reduction with
->>> minimal effort, well...
+>>> If nobody else beats me to it then I will look into using separate
+>>> locks in the mq-deadline scheduler for insertion and dispatch.
 >>
->> If nobody else beats me to it then I will look into using separate
->> locks in the mq-deadline scheduler for insertion and dispatch.
+>> That's not going to help by itself, as most of the contention (as I
+>> showed in the profile trace in the email) is from dispatch competing
+>> with itself, and not necessarily dispatch competing with insertion. And
+>> not sure how that would even work, as insert and dispatch are working on
+>> the same structures.
+>>
+>> Do some proper analysis first, then that will show you where the problem
+>> is.
 > 
-> That's not going to help by itself, as most of the contention (as I
-> showed in the profile trace in the email) is from dispatch competing
-> with itself, and not necessarily dispatch competing with insertion. And
-> not sure how that would even work, as insert and dispatch are working on
-> the same structures.
+> Here's a quick'n dirty that brings it from 1.56M to:
 > 
-> Do some proper analysis first, then that will show you where the problem
-> is.
+> IOPS=3.50M, BW=1711MiB/s, IOS/call=32/32
+> 
+> by just doing something stupid - if someone is already dispatching, then
+> don't dispatch anything. Clearly shows that this is just dispatch
+> contention. But a 160% improvement from looking at the initial profile I
 
-Here's a quick'n dirty that brings it from 1.56M to:
+224%, not sure where that math came from...
 
-IOPS=3.50M, BW=1711MiB/s, IOS/call=32/32
-
-by just doing something stupid - if someone is already dispatching, then
-don't dispatch anything. Clearly shows that this is just dispatch
-contention. But a 160% improvement from looking at the initial profile I
-sent and hacking up something stupid in a few minutes does show that
-there's a ton of low hanging fruit here.
-
-This is run on nvme, so there's going to be lots of hardware queues.
-This may even be worth solving in blk-mq rather than try and hack around
-it in the scheduler, blk-mq has no idea that mq-deadline is serializing
-all hardware queues like this. Or we just solve it in the io scheduler,
-since that's the one with the knowledge.
-
+Anyway, just replying as I sent out the wrong patch. Here's the one I
+tested.
+ 
 diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index f958e79277b8..822337521fc5 100644
+index f958e79277b8..133ab4a2673b 100644
 --- a/block/mq-deadline.c
 +++ b/block/mq-deadline.c
-@@ -80,6 +80,11 @@ struct dd_per_prio {
+@@ -80,6 +80,13 @@ struct dd_per_prio {
  };
  
  struct deadline_data {
-+	spinlock_t lock;
-+	spinlock_t zone_lock ____cacheline_aligned_in_smp;
++	struct {
++		spinlock_t lock;
++		spinlock_t zone_lock;
++	} ____cacheline_aligned_in_smp;
 +
 +	unsigned long dispatch_state;
 +
  	/*
  	 * run time data
  	 */
-@@ -100,9 +105,6 @@ struct deadline_data {
+@@ -100,9 +107,6 @@ struct deadline_data {
  	int front_merges;
  	u32 async_depth;
  	int prio_aging_expire;
@@ -166,18 +167,18 @@ index f958e79277b8..822337521fc5 100644
  };
  
  /* Maps an I/O priority class to a deadline scheduler priority. */
-@@ -600,6 +602,10 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+@@ -600,6 +604,10 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
  	struct request *rq;
  	enum dd_prio prio;
  
-+	if (test_bit(0, &dd->dispatch_state) &&
++	if (test_bit(0, &dd->dispatch_state) ||
 +	    test_and_set_bit(0, &dd->dispatch_state))
 +		return NULL;
 +
  	spin_lock(&dd->lock);
  	rq = dd_dispatch_prio_aged_requests(dd, now);
  	if (rq)
-@@ -616,6 +622,7 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+@@ -616,6 +624,7 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
  	}
  
  unlock:
