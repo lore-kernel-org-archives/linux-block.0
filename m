@@ -1,20 +1,20 @@
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2043.outbound.protection.outlook.com [40.107.212.43])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FE55660
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 04:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D53E611A
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 04:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705465366; cv=fail; b=i2BfJKWMCSPUP64kZrEU1TQaTWv3fKzKLQV8WIi+643qoo+3dPW+XUTOJz8N2JH9kcJ91U9ESxhsnF8VP1Eeyq6bn4C/xRyMp6TFNfFV5rJyZrbjiQ5OuK3iIC1RDf8KSKhDRGhEOEEs0YLujeixwizVNQpffE90YM4XypKf2dE=
+	t=1705465369; cv=fail; b=CsloeegNOnIujQ0XdWv7Y9/DxfHKMuqIFUAMhYhNOAbQc+jjXMboawYAMj7wTk21+gQm7AcQxc7r6fZd7i/Eeu+hB1W0OFbbrFnHhMQGHKoFnFJS7D6Y+UZxKZF7vTx6rD0rAW/aIZngMhJmQT0e1j+A9efUU5uXBqzYT0c+4zE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705465366; c=relaxed/simple;
-	bh=WwF9K/Mll3VUK0MLLxRiTQUM2GYZmNAi9x308+QQrfY=;
+	s=arc-20240116; t=1705465369; c=relaxed/simple;
+	bh=WKjyvKpOsQZELM8j59smXHTK6+hr3SrJfcrlwnM0s7s=;
 	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
 	 Received:Received:X-MS-Exchange-Authentication-Results:
 	 Received-SPF:Received:Received:Received:From:To:CC:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 Content-Type:X-Originating-IP:X-ClientProxiedBy:
-	 X-EOPAttributedMessage:X-MS-PublicTrafficType:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy:X-EOPAttributedMessage:X-MS-PublicTrafficType:
 	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
 	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
 	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
@@ -26,63 +26,65 @@ ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	 X-MS-Exchange-CrossTenant-AuthSource:
 	 X-MS-Exchange-CrossTenant-AuthAs:
 	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=Q2W8Srtsh3+/+jTewkC1rVe2wRglMXtl1u310TL4b3kGWlW7PfxsECq0sdUJDfeScw0yNEssUyvYXzEPj7L52g912Mzijud7W215T0N8wmZMdBXYe+tL5Sv+He8lWQUmmUoGBmctDCzeVUuYooabMZz7tEP1PRz6EwtLkOr0m9I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FRuvgxn0; arc=fail smtp.client-ip=40.107.212.43
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=Uu5fhT/Z/nUSFKyIH7yQFISJ5k7T9VLffMBs4mODi3ztkVSdVXm7//rN8td0+UJs5P/1uwNE9tbllgPe0eWDK3LpiaGkMZJrwrsBMdx+yY7GynheYR3wn6x6EqJj0h1z4FjJS5xvzp3E6UbN0NPJQT1ok5tMVnEhRMeTiAsEt48=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rrOzB8lX; arc=fail smtp.client-ip=40.107.236.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FRuvgxn0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rrOzB8lX"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eBT5QsmShwrErtS4o7vTe/m0HPj0SeLOmPGLFLAi8/F4XIuAF1FXpkwDVIY2/1cfvODpMHZSjfNZBPBH0cOIorC5xbBjKgogjje2M7/86xMtMiL2+nqAnB5DCvr+43I5+eCCYQbJOamoqH7+STotZhZnbvFBij8DNA585kVUKCXURmaQX8nCXYlPEDMa5BHYqyDF71A8wK95GTWENCcWUCMcml4n8fnWz2d+pG4jV4bTB3hsC2HMmR2QaNmwpDkI58mU+dPbKzDwXY5Kqwv1gN5AOE9PsGfExD5x+HiggvXWeBBaDXA5lHnEfISFUC8WLN0weaYTkhgoWxpGki35hA==
+ b=EewG5gbWRBF6Ywqe0iBnCYubhNS16/RHK0qbpMyIXEyHQ7XEQ+m3XH0HogZkVE47MRBTB6hTENbM/yeq2MlVQl5iQkJyCFTJzFBJR1LLReneKb5CJxzrVYN5d18/jbTHvusC0czb6zLfinmow+KTQq5qRsCGHyuev3P6y+teQmK8anfIkQDyBwuU2RWfuLRA0GW85UzOXigUmNDtlKxP7sMrasQCMXojkL/RB8pgjGD759oWmEhHEJ6CeidwuUWVXe1o/DKaozSAW0MwbSrGgbF/EerSYfjtcHaBRc47NW3/d324G77j4gryLB4tcKFYu2F8YvC58VL1TsZQM6U8JA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SwAGAnffdUSvIy1baTVaOMwtuUT407Z8aVjSz0F0Zu8=;
- b=TJFxHzCksJppV12LT0eX6nO6u39QUy+zeKU6i5InrSGKjH0RXUfsaFolhBt5ia8i+cHhFiEB9PLydkCstWIPLY3VWVKhdIEjbuFYuidSzQzJUR7xoXX5745o8wtk6wLS1aaHh/aGgZLRZOm1u3RAFCA6MqPj+hCRllp8Yhd7po2wFTgIw6OJhHBa/DmIg7KGrysBNZ8lzoqTB7CPlYcCp6Z3IvJvyzIsoPrgExG7EwH7gVAkscdAUcUMWEOa6MAQtH1l0dUZdjQDaFa3s7PX1lP7dG+g2ar6D1XKF3RQStUlysCVRVqRnpOaQaDSlZTpbjjKyLR/ja8ztR49jTcmyw==
+ bh=SKEQi1OfW9NNDNlpRZKU/dzRzSLTneUxsl6FULUxdp8=;
+ b=KrqLNl8aK5h3uilyCwrjHmE2bIsmSYXyrPdS0PL8c6eNg4vI/PAuDiiIWTwhqHLqVIIfWdpJKZgZQedpjjJ34Rs+/ko0sfWWMRD62k9RB3Ds0exRjHux1YbFKDRCTJkUglkeMeUqkbni5+kiUGviKdxP9amxUJOJLfwzPuthjsnK22Hg/2fBshG7H70aB8HK5GPnoIWVfOr519OfCRdrga7c9FhRSyS60krt2eyaOMB4Ryo9/1uCReBHKkN6/AKD4hiJ9QyfSQ+Nwu0RfICOiVdiiu+gxhligSt2zi9euFpD/GUQz1oh770nhxDW3vURxKEtXoqS2FVdjDzHK2sBpQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.infradead.org
+ 216.228.117.160) smtp.rcpttodomain=lists.infradead.org
  smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
  header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SwAGAnffdUSvIy1baTVaOMwtuUT407Z8aVjSz0F0Zu8=;
- b=FRuvgxn0GQmPdVp5JUe/bTc5q3t3hTvfJ6wvabTO9DR5lDYm+vZS+C/KJ0c6nYBNWmYC0JU6wRkSk8v3B0wR2FlIdqaJTy1dH1x9OKnInxKEbEFWCiD7EAEuAL1v+DSz7bD4E5Hfiu3NyL4yjVd4S1AhyQolEdrgUtvm+32YtGdF2fKqqREvw+De/VysdKl9xLKYcnwdhX07LfkM3MfwK6VV0Z+JgKrNYfhDOXEITs5tqkOy8Sn9kJ3kV4WAUlgTnuNfYU6ynjJ9UWOIoq8sIJQNA1lN0J9q2B91R7YXytt+co1l+TWCiD4bdoKwxDK63Av5kz0Kk12zQxriSW3lpw==
-Received: from BY5PR17CA0038.namprd17.prod.outlook.com (2603:10b6:a03:167::15)
- by DM6PR12MB4121.namprd12.prod.outlook.com (2603:10b6:5:220::14) with
+ bh=SKEQi1OfW9NNDNlpRZKU/dzRzSLTneUxsl6FULUxdp8=;
+ b=rrOzB8lXWq+G0A70vFovodqCEtOg8YFssKw6CCBrf35I88wLlfv2wPTbHXndnDMyvCj/btDuj7VmqiGQdu8b/dtC3XQ3iULNsUpsXvgRlczww9Gki8S5NQyyVnW8z7P7QLfGVv2EAlhqJNLkNP659hJOTsTMdT2kW1B3JCjiU+PjqnUPRJ2kwuJ645OXPnjCzXmsVFKajoUM9b9Snft0nSWVTlF/tmIO5cZ4YO+hrcgeQFnqr52aotTWYBkrRpyNv1/9C0koa5fDvZgFhmbvy1Utpt6KE3XkP+vLqV78I2bvIaaOyOpqnN538h0mYJZvBg3o8oduN1DrKi+ZuO/qaA==
+Received: from BL1PR13CA0137.namprd13.prod.outlook.com (2603:10b6:208:2bb::22)
+ by PH7PR12MB6761.namprd12.prod.outlook.com (2603:10b6:510:1ab::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23; Wed, 17 Jan
- 2024 04:22:39 +0000
-Received: from CO1PEPF000044F5.namprd05.prod.outlook.com
- (2603:10b6:a03:167:cafe::ec) by BY5PR17CA0038.outlook.office365.com
- (2603:10b6:a03:167::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.29 via Frontend
- Transport; Wed, 17 Jan 2024 04:22:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.19; Wed, 17 Jan
+ 2024 04:22:44 +0000
+Received: from BL02EPF0001A0F9.namprd03.prod.outlook.com
+ (2603:10b6:208:2bb:cafe::24) by BL1PR13CA0137.outlook.office365.com
+ (2603:10b6:208:2bb::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23 via Frontend
+ Transport; Wed, 17 Jan 2024 04:22:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000044F5.mail.protection.outlook.com (10.167.241.75) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL02EPF0001A0F9.mail.protection.outlook.com (10.167.242.100) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.16 via Frontend Transport; Wed, 17 Jan 2024 04:22:38 +0000
+ 15.20.7202.16 via Frontend Transport; Wed, 17 Jan 2024 04:22:43 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 16 Jan
- 2024 20:22:18 -0800
-Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ 2024 20:22:29 -0800
+Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 16 Jan
- 2024 20:22:17 -0800
+ 2024 20:22:28 -0800
 From: Chaitanya Kulkarni <kch@nvidia.com>
 To: <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>
 CC: <shinichiro.kawasaki@wdc.com>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH blktests V2 0/1] nvme: add nvme pci timeout testcase
-Date: Tue, 16 Jan 2024 20:22:05 -0800
-Message-ID: <20240117042206.11031-1-kch@nvidia.com>
+Subject: [PATCH blktests V2 1/1] nvme: add nvme pci timeout testcase
+Date: Tue, 16 Jan 2024 20:22:06 -0800
+Message-ID: <20240117042206.11031-2-kch@nvidia.com>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20240117042206.11031-1-kch@nvidia.com>
+References: <20240117042206.11031-1-kch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -95,62 +97,125 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F5:EE_|DM6PR12MB4121:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a0f202b-ac89-4f38-dcea-08dc1713f060
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A0F9:EE_|PH7PR12MB6761:EE_
+X-MS-Office365-Filtering-Correlation-Id: 60c51410-8b47-4f08-41f6-08dc1713f396
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	lR6d2qM7coCqJSmpl3rUZzf2P7S6NhKJyxMX2W3CNif8dXsh1K8tS03CGjcyWtBWhDeGvtwWgtcMRt2iMjUW4Xfd7UBL1w28oErNGqsCs2wMVyy/Xj9RrdkQGYk6DBex4x6xC1J+bCETT+o83oK1mwyhg34WuNxa6KmOLxHxRrb2DIntx8fXGh6C5WQsN/eRCACW+8f7e4PTWe6u2QAi7vewS9FvPhrwwBczOcfP84bNNVP4D9AkwJAqxulNdYpFEycSttCeH3ECyd0yhfaREQLmWJUfaq1DRIqVXN09mEP4FDpe3UV39ZdyVbyXzXlcCDvOXAaKbzOQJ2HVNrBTiIzw7FTV+ptKQx+5kqNWwq/5R4zpSwFoPvsxfTAhrJkNhxTQk5pa3ovvF2PEL2X2LfFexj1/XiD1+tja3iwshLU5iSJKiYbXWySOekpS55zZKYUCmrw0qHeYaTVQhlspnjrFNbhQEfRhe9r5uV8c2ry/5TEOuwdoPuoJBqlxONJMKhl54AVz/8ieDIEMuEJhPQpwcxH7hBFE3KbrIBTopQviuCgFcosWjC3uwTnpDgf+7ul+RjCDcbeSUvUB1j/Z4tZg/GhuB+ipp1p3ZoWr2NSKIBKH5bM44gZDrlsnLqub66DnGv7aW1Hd+awSvf3JFWXiNtPQBtcqbahoNouXKRK6YNiED93OgG+QCEXty4ipgh9eOOBSHHFrpqYtVWc8+g7T74xrbNSucvzS72eCQWOdEzsi3fKZXyEvbPqWmg4A
+	OYRq2efTiwAUOhUSoNZYy7gSZ3uwSPv0BS9SLsILHjsLD4SF7t4hRvnQkwXIfyKbfiYErTg+c60c1/DYme8Zg7gPCLWYZ00pBWptQv+KOuT1ULoI9hGW0IG4BhXfSHcg5MhCbtHUpUB7QAbhpH8E7uZYh1Opp/sNxJpe9qAtO1I/oElAtUh+HNB7G9lcsgHSleK5zUWdVJEIfmbCdyTyp9Eh+z05hyb2atApAZJEr2fMbXWZWO7v5Rq83R3vl7h8P+zBKV+U3ozOuTb8Ie09050iUvmaUozDroiZUtp+ANu0sSj/iF168RMq78R6+OxD4+k0Xr7OT1JGmCLixyTUD9jR2x7bd7sIzZK1yFFxtu0L1sl1+hRRcdCI1YIzrf7FGuxsDa6Ld3gj4Gd3GQur0PRx9xiqAcIATD2w4W5CfRqVoTy4vN9WAHVR18dw0vF7TuGZF8NA2kOGQaAf6tTkSaXpcf/0fmp4mZ+BlH7UKhkUKoCno55SMyCD3uKk6tdHbxiGL4pG79sjGPEW1OmJrpejM1PDtXxQvgbugHCbg+/c2IbS1Y9uwnN8o+4fxKmice38/7u6w7CeXnyBaEyzjbAX8gyNrGsnaHuCejKdlJz8M0+2iO6wj0twMNSDiPSLZL1/elB2q62KFa3parOgjfxzgc6mnYAX4UrMTtx2vpO6b2jr+VSUymNeSUA34yCgs8DzZCobK/xWEZYRsz0n3tWdFNgRJGKyIloCYVtHnR4fSXsUAJ8zXDd0rJVXFxehj3e9Gl7RPIAxoCr4wcxROQ==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(346002)(396003)(376002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(82310400011)(46966006)(40470700004)(36840700001)(41300700001)(82740400003)(356005)(7636003)(47076005)(83380400001)(36860700001)(36756003)(316002)(110136005)(70586007)(54906003)(70206006)(5660300002)(2906002)(4744005)(4326008)(8936002)(26005)(336012)(1076003)(2616005)(426003)(16526019)(107886003)(478600001)(7696005)(6666004)(8676002)(40480700001)(40460700003)(2101003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(136003)(376002)(396003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(82310400011)(36840700001)(40470700004)(46966006)(82740400003)(83380400001)(7636003)(5660300002)(4326008)(8676002)(8936002)(356005)(2906002)(16526019)(336012)(2616005)(26005)(47076005)(426003)(40480700001)(107886003)(1076003)(36860700001)(40460700003)(7696005)(478600001)(6666004)(36756003)(110136005)(316002)(70206006)(70586007)(54906003)(41300700001)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 04:22:38.2902
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 04:22:43.6264
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a0f202b-ac89-4f38-dcea-08dc1713f060
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60c51410-8b47-4f08-41f6-08dc1713f396
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F5.namprd05.prod.outlook.com
+	BL02EPF0001A0F9.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4121
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6761
 
-Hi,
+Trigger and test nvme-pci timeout with concurrent fio jobs.
 
-Add a test to trigger nvme pci timeout handler function
-
-Below is the test log.
-	
--ck
-
-Change log :-
-
-1. Use test_device() and TEST_DEV.
-2. Make tesctcase pci only just like in nvme/032.
-3. Remove . from copyright and test description.
-4. Add _have_kernel_option FAIL_IO_TIMEOUT.
-5. Save and restore fault injection settings.
-6. Use "$(nproc)" to get rid of shellcheck annotation.
-7. Don't remove the device keep it as it is, add module remove testcase later.
-
-Chaitanya Kulkarni (1):
-  nvme: add nvme pci timeout testcase
-
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+---
  tests/nvme/050     | 74 ++++++++++++++++++++++++++++++++++++++++++++++
  tests/nvme/050.out |  2 ++
  2 files changed, 76 insertions(+)
  create mode 100755 tests/nvme/050
  create mode 100644 tests/nvme/050.out
 
-
-blktests (master) # modprobe  -r nvme
-blktests (master) # modprobe nvme
-blktests (master) # TEST_DEVS=/dev/nvme0n1 nvme_trtype=pci ./check nvme/050
-nvme/050 => nvme0n1 (test nvme-pci timeout with fio jobs)    [passed]
-    runtime  90.854s  ...  91.087s
-blktests (master) #
-
+diff --git a/tests/nvme/050 b/tests/nvme/050
+new file mode 100755
+index 0000000..6c44b43
+--- /dev/null
++++ b/tests/nvme/050
+@@ -0,0 +1,74 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Chaitanya Kulkarni
++#
++# Test NVMe-PCI timeout with FIO jobs by triggering the nvme_timeout function.
++#
++
++. tests/nvme/rc
++
++DESCRIPTION="test nvme-pci timeout with fio jobs"
++
++sysfs_path="/sys/kernel/debug/fail_io_timeout/"
++#restrict test to nvme-pci only
++nvme_trtype=pci
++
++# fault injection config array
++declare -A fi_array
++
++requires() {
++        _require_nvme_trtype pci
++        _have_fio
++        _nvme_requires
++        _have_kernel_option FAIL_IO_TIMEOUT
++}
++
++device_requires() {
++	_require_test_dev_is_nvme
++}
++
++save_fi_settings() {
++	for fi_attr in probability interval times space verbose
++	do
++		fi_array["${fi_attr}"]=$(cat "${sysfs_path}/${fi_attr}")
++	done
++}
++
++restore_fi_settings() {
++	for fi_attr in probability interval times space verbose
++	do
++		echo "${fi_array["${fi_attr}"]}" > "${sysfs_path}/${fi_attr}"
++	done
++}
++
++test_device() {
++	local nvme_ns
++	local io_fimeout_fail
++
++	echo "Running ${TEST_NAME}"
++
++	nvme_ns="$(basename "${TEST_DEV}")"
++	io_fimeout_fail="$(cat /sys/block/"${nvme_ns}"/io-timeout-fail)"
++	save_fi_settings
++	echo 1 > /sys/block/"${nvme_ns}"/io-timeout-fail
++
++	echo 99 > /sys/kernel/debug/fail_io_timeout/probability
++	echo 10 > /sys/kernel/debug/fail_io_timeout/interval
++	echo -1 > /sys/kernel/debug/fail_io_timeout/times
++	echo  0 > /sys/kernel/debug/fail_io_timeout/space
++	echo  1 > /sys/kernel/debug/fail_io_timeout/verbose
++
++	fio --bs=4k --rw=randread --norandommap --numjobs="$(nproc)" \
++	    --name=reads --direct=1 --filename="${TEST_DEV}" --group_reporting \
++	    --time_based --runtime=1m 2>&1 | grep -q "Input/output error"
++
++	# shellcheck disable=SC2181
++	if [ $? -eq 0 ]; then
++		echo "Test complete"
++	else
++		echo "Test failed"
++	fi
++
++	restore_fi_settings
++	echo "${io_fimeout_fail}" > /sys/block/"${nvme_ns}"/io-timeout-fail
++}
+diff --git a/tests/nvme/050.out b/tests/nvme/050.out
+new file mode 100644
+index 0000000..b78b05f
+--- /dev/null
++++ b/tests/nvme/050.out
+@@ -0,0 +1,2 @@
++Running nvme/050
++Test complete
 -- 
 2.40.0
 
