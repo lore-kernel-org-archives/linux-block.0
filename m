@@ -1,144 +1,100 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA12224DA;
-	Wed, 17 Jan 2024 16:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EA722619;
+	Wed, 17 Jan 2024 17:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705510010; cv=none; b=iObAVQg5kuiAP8zL+Z2Zf0Q174PFlWCf01KmLrSLEAq/viu3ZEvvlHcLys6Dj5gO+mZ64/MSZDlFa6SssHCZy4It5aMPXNJKTDCQY1dto/hBaeSvIgDpnwLcZEWt+giaVHZjuhKqgBY8japcTlu5ZvqR0IvJNc48x9Zn7qdSr94=
+	t=1705512590; cv=none; b=DpHN+nf6iZkNeNP/LtW/MHFAYEt8HNj5cC57VqqQhBAX2l8DuHwjdlQyA+HKtJAyU3KUs6sFIpiBs7RleTJjurZHSZrrp33QUBeckslc6nEfhXHsE+A8jj0ZGb9jecll7jLcjY8m43B+/wDV71WIa63KFxAsgEtXL3c485JJhao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705510010; c=relaxed/simple;
-	bh=SBDyEhkvjG6umiDsx40Tyl9tWANMzgVgqypPgmdJaxY=;
-	h=Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-Spam-Level:X-Rspamd-Server:
-	 X-Spamd-Result:X-Spam-Score:X-Rspamd-Queue-Id:X-Spam-Flag; b=Sd3QiXxJUfb9DwJ4doeiZhgoCQdKXXNKuzz67om2eIKdzWSK2hZniNch9IPt27oFPR+EF7uPNXCiyWeyA+uCHYpRv875/16Iq9DtNPKj4o6uPVp5GZa55KGpiXv8qtd+ZYoKQiwJTrq7jnxD+lpYAZIYS/28aEIdVIeQg4qdc4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=oWuEoXHn; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=h/bodwBg; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=gdZjzZwe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4ohGp0gV; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="oWuEoXHn";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="h/bodwBg";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="gdZjzZwe";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4ohGp0gV"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E71691FCDA;
-	Wed, 17 Jan 2024 16:46:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705510007; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sAVf3FNqk0d5oQTKyz83Is6ZquFpZpCQOqC7tozxc+o=;
-	b=oWuEoXHn6lFGV8zBfd7QGxFQRp63BT5Uo2Zm9u3L3KlyneTB5IxLLTk2T/Bv52Lwm7nQSe
-	OuUe/A0swKYukFGVvZ/Z6foICZoFXusVh7rhXvcsx0zGrF1zMetQlowYrk4/1tab+68qQI
-	aVPtSy6bEPo8lJKci/NqfUXvEpIWYgY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705510007;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sAVf3FNqk0d5oQTKyz83Is6ZquFpZpCQOqC7tozxc+o=;
-	b=h/bodwBge+P12MiDVlRkYpKJ26fKGSzu2XtuzrzaxxiPhOqerYKi+AlCyz6HWrTtH7YrEY
-	Byv4RYil2dMPWSCA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705510006; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sAVf3FNqk0d5oQTKyz83Is6ZquFpZpCQOqC7tozxc+o=;
-	b=gdZjzZweNvUta5fSgL4Wb2YE4gj7KGUTuBatm0IaPT9DexuCVqA9vL1wmvyonInpp6D+gM
-	dCBsl3HyWWqCeRDa2P9BDId6UJKiiisCliI60Cvg0asMNQ6DJIHtFa0Yvbk53xLjiAXFid
-	ZReUQ0G5F74jDBJZdXI6aAx4HvjL48g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705510006;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sAVf3FNqk0d5oQTKyz83Is6ZquFpZpCQOqC7tozxc+o=;
-	b=4ohGp0gV112rRm38XBTodO78fnpSEk+xCWc8S1IRtLdNDJuNKqhayk0c/V4HUpm8ky2MCB
-	x0X4eToPjGnciJBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D0B9B13800;
-	Wed, 17 Jan 2024 16:46:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ho/yMnYEqGURMwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 17 Jan 2024 16:46:46 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 704E5A0803; Wed, 17 Jan 2024 17:46:46 +0100 (CET)
-Date: Wed, 17 Jan 2024 17:46:46 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC 00/34] Open block devices as files & a bd_inode
- proposal
-Message-ID: <20240117164646.mpxmxx3dimx2f6ap@quack3>
-References: <20240103-vfs-bdev-file-v1-0-6c8ee55fb6ef@kernel.org>
+	s=arc-20240116; t=1705512590; c=relaxed/simple;
+	bh=3RguxiLQXwXyKy+/MBUXqv78BPdbE9j/r5/BDuDJGGQ=;
+	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 X-Google-Smtp-Source:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding; b=Mhp4HbHjwSMBNPPjkfii7zUzGQSlwIJPyxsZZyUFe0ptdOjUW/7qAEL/qTkCk+ud6nupFZDW3DBkvSWL2026HYvraWLwj7ZbB+TQ9JbFk6GVLrXtMWvCQULwu1U1UoLCAsZCm8lnfcJ6uBsgAgZT40oWa7iKWNL1HTPI0LZD65U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6ddf1e88e51so5480393a34.0;
+        Wed, 17 Jan 2024 09:29:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705512588; x=1706117388;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KdFUEs5+PqYWiTaTyZYNjEQamHx46wf3N9eVAnVojFA=;
+        b=hXjj3WE/wWjU7aeiEwx1BCibpQpWCg8O5k6mPWUP9RpxF8WpSKa2BkT3qyJ2Yebswv
+         W3kk2M2q+TbjAuqiTPeH0PKF4DUBayWy+hiDVTy25H+Sl0bW4BpbAUEr+4HhsaXUC3ML
+         6jZKGrsaM7oe6YaTU+4oCuPxTbCMBSPQLMDtog9Wz+nkHHbf59chhL8c+IUc7D+I7Q8u
+         UGJTOYBGYjPzjd/xqayj8Z0CD7o+sNyTaC3DBjlXBngY4JOUEwKPYutikfsCiY0gtb/a
+         yqpred3M/ftkHGJhiC1GY+ONVEi+IsNg0sMnVc5EhANeIzbHcYbZq1I/+potw/yl3D51
+         ZJPA==
+X-Gm-Message-State: AOJu0Yzo1mQGT0Lt+7hkUfpnCFui7sSsWJsxt9rP5iwkg+lnsqFnRT1R
+	4t6pGBT/WhKce0BMwcxLKuA=
+X-Google-Smtp-Source: AGHT+IG+FH7zCjgi/Z+ZeS0zl2Tjj1ArsPfPtOvQ3abP1FhMvb3AU15cAC4KywPUvX3blxub3iMr2A==
+X-Received: by 2002:a05:6358:b107:b0:175:55e2:c8f6 with SMTP id a7-20020a056358b10700b0017555e2c8f6mr10907066rwo.31.1705512587678;
+        Wed, 17 Jan 2024 09:29:47 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:5421:8f53:45a:4e37? ([2620:0:1000:8411:5421:8f53:45a:4e37])
+        by smtp.gmail.com with ESMTPSA id ca33-20020a056a0206a100b005c60ad6c4absm10788772pgb.4.2024.01.17.09.29.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 09:29:46 -0800 (PST)
+Message-ID: <5ff36535-7cd3-4e8f-a477-9d2a98d18dd9@acm.org>
+Date: Wed, 17 Jan 2024 09:29:44 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240103-vfs-bdev-file-v1-0-6c8ee55fb6ef@kernel.org>
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=gdZjzZwe;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=4ohGp0gV
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-1.01 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[30.11%]
-X-Spam-Score: -1.01
-X-Rspamd-Queue-Id: E71691FCDA
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/1] block: introduce activity based ioprio
+Content-Language: en-US
+To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe
+ <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>,
+ steve.kang@unisoc.com
+References: <20240117092348.2873928-1-zhaoyang.huang@unisoc.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240117092348.2873928-1-zhaoyang.huang@unisoc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed 03-01-24 13:54:58, Christian Brauner wrote:
-> I wanted to see whether we can make struct bdev_handle completely
-> private to the block layer in the next cycle and unexport low-level
-> helpers such as bdev_release() - formerly blkdev_put() - completely.
-> 
-> And afaict, we can actually get that to work. Simply put instead of
-> doing this bdev_open_by_*() dance where we return a struct block_device
-> we can just make bdev_file_open_by_*() return a struct file. Opening and
-> closing a block device from setup_bdev_super() and in all other places
-> just becomes equivalent to opening and closing a file.
+On 1/17/24 01:23, zhaoyang.huang wrote:
+> +static enum dd_prio dd_req_ioprio(struct request *rq)
+> +{
+> +	enum dd_prio prio;
+> +	const u8 ioprio_class = dd_rq_ioclass(rq);
+> +#ifdef CONFIG_ACTIVITY_BASED_IOPRIO
+> +	struct bio *bio;
+> +	struct bio_vec bv;
+> +	struct bvec_iter iter;
+> +	struct page *page;
+> +	int gen = 0;
+> +	int cnt = 0;
+> +
+> +	if (req_op(rq) == REQ_OP_READ) {
+> +		__rq_for_each_bio(bio, rq) {
+> +			bio_for_each_bvec(bv, bio, iter) {
+> +				page = bv.bv_page;
+> +				gen += PageWorkingset(page) ? 1 : 0;
+> +				cnt++;
+> +			}
+> +		}
+> +		prio = (gen >= cnt / 2) ? ioprio_class_to_prio[IOPRIO_CLASS_RT] :
+> +			ioprio_class_to_prio[ioprio_class];
+> +	} else
+> +		prio = ioprio_class_to_prio[ioprio_class];
+> +#else
+> +	prio = ioprio_class_to_prio[ioprio_class];
+> +#endif
+> +	return prio;
+> +}
 
-So I've checked the patchset (not too carefully) and overall I like the
-direction. I've commented on the few things I didn't quite understand /
-like but overall I like this.
+I don't like it that code is introduced in the mq-deadline scheduler
+that accesses page cache information. Isn't that a layering violation?
+Additionally, this approach only works for buffered I/O and not for
+direct I/O. Shouldn't the I/O submitter set the I/O priority instead of
+deciding the I/O priority in the mq-deadline scheduler?
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Bart.
