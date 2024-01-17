@@ -1,135 +1,186 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49A222EE8
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 21:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6542556C
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 21:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705527661; cv=none; b=ZN2yBP5XFdCmF5ExsZrWYsmnwuwJZL5A55KgzoIg0H9AHoKW2dX9q4TXYbG/ZXd/bh8GUE5zXde93fSCHwCJh+OuHrE3+KwvjHI3KLEnBqFoEtBG/82dBaqK4txNjZgu/k5ccfuOSBlb8hKrL60Wg1Rsw9ZdKbrumkmSrJg6N8A=
+	t=1705528302; cv=none; b=uIGy4DpXd+brgIc7zrEjlBmVwAfgbw1/MsQItcmP4Z98SOy6pY1Zi7bwnnSqk/2v58+aRaygHDl5jn8pfE/PUyqL35SaIIVkLmuoyEBl4yideMIG9TvmM4X5isVOFym49PdJ2RCVy4VFOyA1Zjjsrno9eUOrwzMDhFOfQMI4y+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705527661; c=relaxed/simple;
-	bh=IA/GVOT/nYaG4QLzwH3nHzODWYVDuIgMXt6khpIlc7I=;
+	s=arc-20240116; t=1705528302; c=relaxed/simple;
+	bh=+sYdn1TYu2tGHcp/A1BrZtQI1EBapoKO6YrKs/F84h0=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=jF7DwlMPCRQa0bU35gNjqp4YwwR829HWh7TJFyCZUk8S6uTIGg054zXpx8FVDUJS/NoDl+jCSlFcDFYRT/ziu0SHp/W3Bve0do1vjMOp+AfzQSqoFw6bOem8Msd9uwjHcet4YLxyja1A3N3alpZEOQVZIWBE+0pZuTQoB73cYpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CmsJg2UP; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To; b=DIMo0ePn9wWUSmsspq86hKJZB9llKqah76TlEMHeVUPbV2xiz/A/rgCaXS6P7ZhENo6mPbeeHRTJiZvHlKYHdiZtoCOBES8bWAwQTnC1Ek+DM3wyqPebpVoATy20ZndpdfyrziFc4Tqo0yXEvSgymvj6iEYh8gTo8RfbdvVgcNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=KrSyzp3B; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CmsJg2UP"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7bed82030faso65214739f.1
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 13:40:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="KrSyzp3B"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3bba50cd318so9776449b6e.0
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 13:51:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705527657; x=1706132457; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=smBRC0fGIjV7NVWRRSnbObc9QKfnzsw9Zntd5C5Qdwo=;
-        b=CmsJg2UPVLGtd2syG2NNQ+fLfwRAsuU4yztxqy6ub0ngFxZR+niAxDvJi+FKaPUoR2
-         sMv/IrvDYo++w7n2gBlhU//Z0Z16ZFXpZ0LgQV6dmK9+Fdyq3mxtyvcXt/SBpH1PmSFx
-         MmYusewGP5yhVqTxdQ6G91VFf8llcU77XZCoes4uQX5S8rcNd/OB1LB2OOAQrsJ106av
-         /88DsJeTZgVsyUQmGvVO30z43L7XW40j/7luJozAKBdA3zyMAvCIGCFo9oWQK2g0KYZ+
-         Ymhrkn8roaGQkRmmAy0w7wyq4vI7Du+y0eghPKV7EQVf0arZcDsREJvtbW3XK5tTuJ8m
-         qVKA==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1705528300; x=1706133100; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LLeFnk3Q55H1BPBw4YoBu7toGUDI6gBA877Kx/ZWOrU=;
+        b=KrSyzp3BoIJpk7vgXhCD+rsQm6gFnIkzVcXPLAT5BCHXBk+l9bunQE+Q/vr+S9EXXy
+         xKpxghI+4oMWPxkdbfZl2/56MF904010J33WHaUP2aFPB96RwGDx0SyoXY7iRl/6DqyS
+         OM4c9nvKF6Vj4M6R1ZISmYZV6ZQ8HNXJ5LB0AqJLu1wQE94wq7D+GLpNJU71V0VNhd4y
+         vHC8ilzWvBuHy1kkiZFN5nTWROBqGXBlmQ8EWp6uMSNGZRmHV/8lkDqqhBwNZ0x0un4G
+         mAJPYJLYQgC7qs/HCXWHtcXg5nUmA6dh4F99okJ+gdhO/BifnofQG/dLWn1PZnISpubH
+         85Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705527657; x=1706132457;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1705528300; x=1706133100;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=smBRC0fGIjV7NVWRRSnbObc9QKfnzsw9Zntd5C5Qdwo=;
-        b=mXyTrIE9YVi+sldjphwoKKPzC+uPB+GFbnmnikmRBOm/altR6I3sM4X3paav12ptWY
-         wcj4WId1KEbX77u/kMzHkK0tj3lQW65rty0oAJ0TfW8XILgJO/eKEnWMSvKspNhfgGim
-         QXfPDqbkhlc5erHp4bjGTouQapC07pA0/baAzHzKrST3pv25upLYU+BLRFSQvo65Rcnq
-         +BU7fJ31s8/gn5EV1PVYHI8Wm8RP4fPk2btGPqNvkHlTTeOCyeywiY/AC7jF+TnVJe+0
-         fVp8MPpcuwk3SwvRqNSmQP01Tlol9vCLJYema9RmHKSKrM6184Bjq+zxLMGF0sqmI107
-         xoCA==
-X-Gm-Message-State: AOJu0YyznusWS+aTl4gsgWBvOOXw/oPqL6f+2IvC1YEtu/e+6RJeKmq5
-	JkheiBf13IioUyTGdKXWI6bBQWZ+Sef0rQ==
-X-Google-Smtp-Source: AGHT+IEFCB+mlkil6mSwJtj1E/FwGBlpCCSuAEtTZsOEEjRvUWlgz2WoebfbWy1i24fq79CojzvXCw==
-X-Received: by 2002:a6b:5803:0:b0:7bf:4758:2a12 with SMTP id m3-20020a6b5803000000b007bf47582a12mr9490867iob.0.1705527656920;
-        Wed, 17 Jan 2024 13:40:56 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id g1-20020a05663811c100b0046b451e7b57sm614364jas.45.2024.01.17.13.40.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 13:40:56 -0800 (PST)
-Message-ID: <90de77e4-ed8a-47be-b5df-2178913ec115@kernel.dk>
-Date: Wed, 17 Jan 2024 14:40:55 -0700
+        bh=LLeFnk3Q55H1BPBw4YoBu7toGUDI6gBA877Kx/ZWOrU=;
+        b=rtiSBQjOVWHgIsqshlTPVXBaeh+MY5noMh2WTxkBCxtDxSLHNnhyIAZIoemYUh4QDW
+         QuKwz4nvOYBVPregUeKuXvLhf6mYjXfHxAFFT1Quo0huq3MUFFL2c+VpMTo4wh/klZfz
+         KK6nU3LZRXyXOG5VLQRodzt9dMZ0Gb6IygcbOpQF1OPsCj8r9JSSZQbdnujiokdgWWkU
+         B4k1EOJHreIUoP6SpSbQcV1LnpHwCTPz44LSD/loP/3jN0h5k9gwmyaRaua70eTTQKlY
+         tHovTl5FAS12gSIrQMa6iEVbi9ICBlOIGWaZiIgvi30t6VagjLeWNRyntcqb8TlrAFvE
+         h7gQ==
+X-Gm-Message-State: AOJu0YymvJWzcW6LDJinUGX+HaQb60fRkuosIWjZdOCHf50Ni3RnVnME
+	Uav1kCvHhnMM8jnRlz6R8cVZ7ec7CNBObQ==
+X-Google-Smtp-Source: AGHT+IGESx3XdAVciQo32JGzL/U/9t/1OLisSeEzkhwKrP6ShbUuF6hJSrsKjUR/tdf3Tqk5GRjSUA==
+X-Received: by 2002:a05:6808:f8e:b0:3bd:986e:23 with SMTP id o14-20020a0568080f8e00b003bd986e0023mr1186949oiw.2.1705528300428;
+        Wed, 17 Jan 2024 13:51:40 -0800 (PST)
+Received: from dread.disaster.area (pa49-180-249-6.pa.nsw.optusnet.com.au. [49.180.249.6])
+        by smtp.gmail.com with ESMTPSA id z14-20020a62d10e000000b006d9b38f2e75sm2009134pfg.32.2024.01.17.13.51.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 13:51:39 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rQDov-00BkQF-2K;
+	Thu, 18 Jan 2024 08:51:37 +1100
+Date: Thu, 18 Jan 2024 08:51:37 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
+Cc: Viacheslav Dubeyko <slava@dubeyko.com>,
+	lsf-pc@lists.linux-foundation.org,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+	Adam Manzanares <a.manzanares@samsung.com>,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, slava@dubeiko.com,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [LSF/MM/BPF TOPIC] : Flexible Data Placement (FDP) availability
+ for kernel space file systems
+Message-ID: <ZahL6RKDt/B8O2Jk@dread.disaster.area>
+References: <CGME20240115084656eucas1p219dd48243e2eaec4180e5e6ecf5e8ad9@eucas1p2.samsung.com>
+ <20240115084631.152835-1-slava@dubeyko.com>
+ <20240115175445.pyxjxhyrmg7od6sc@mpHalley-2.localdomain>
+ <86106963-0E22-46D6-B0BE-A1ABD58CE7D8@dubeyko.com>
+ <20240117115812.e46ihed2qt67wdue@ArmHalley.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Zoned Storage Support
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Damien Le Moal
- <dlemoal@kernel.org>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Christoph Hellwig <hch@lst.de>
-References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
- <cc6999c2-2d53-4340-8e2b-c50cae1e5c3a@kernel.org>
- <43cc2e4c-1dce-40ab-b4dc-1aadbeb65371@acm.org>
- <c38ab7b2-63aa-4a0c-9fa6-96be304d8df1@kernel.dk>
- <2955b44a-68c0-4d95-8ff1-da38ef99810f@acm.org>
- <9af03351-a04a-4e61-a6d8-b58236b041a3@kernel.dk>
- <276eedc2-e3d0-40c7-b355-46232ea65662@kernel.dk>
- <39dfcd32-e5fc-45b9-a0ed-082b879a16a4@acm.org>
- <9f4a6b8a-1c17-46b7-8344-cbf4bcb406ab@kernel.dk>
- <207a985d-ad4e-4cad-ac07-961633967bfc@kernel.dk>
- <e8c32676-114b-4aaf-8753-5a6d7b04fc4b@kernel.dk>
- <86a1f9e6-d3ae-4051-8528-13a952cf74a1@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <86a1f9e6-d3ae-4051-8528-13a952cf74a1@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240117115812.e46ihed2qt67wdue@ArmHalley.local>
 
-On 1/17/24 2:33 PM, Bart Van Assche wrote:
-> On 1/17/24 13:14, Jens Axboe wrote:
->>   /* Maps an I/O priority class to a deadline scheduler priority. */
->> @@ -600,6 +604,10 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->>       struct request *rq;
->>       enum dd_prio prio;
->>   +    if (test_bit(0, &dd->dispatch_state) ||
->> +        test_and_set_bit(0, &dd->dispatch_state))
->> +        return NULL;
->> +
->>       spin_lock(&dd->lock);
->>       rq = dd_dispatch_prio_aged_requests(dd, now);
->>       if (rq)
->> @@ -616,6 +624,7 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->>       }
->>     unlock:
->> +    clear_bit(0, &dd->dispatch_state);
->>       spin_unlock(&dd->lock);
+On Wed, Jan 17, 2024 at 12:58:12PM +0100, Javier González wrote:
+> On 16.01.2024 11:39, Viacheslav Dubeyko wrote:
+> > > On Jan 15, 2024, at 8:54 PM, Javier González <javier.gonz@samsung.com> wrote:
+> > > > How FDP technology can improve efficiency and reliability of
+> > > > kernel-space file system?
+> > > 
+> > > This is an open problem. Our experience is that making data placement
+> > > decisions on the FS is tricky (beyond the obvious data / medatadata). If
+> > > someone has a good use-case for this, I think it is worth exploring.
+> > > F2FS is a good candidate, but I am not sure FDP is of interest for
+> > > mobile - here ZUFS seems to be the current dominant technology.
+> > > 
+> > 
+> > If I understand the FDP technology correctly, I can see the benefits for
+> > file systems. :)
+> > 
+> > For example, SSDFS is based on segment concept and it has multiple
+> > types of segments (superblock, mapping table, segment bitmap, b-tree
+> > nodes, user data). So, at first, I can use hints to place different segment
+> > types into different reclaim units.
 > 
-> Can the above code be simplified by using spin_trylock() instead of
-> test_bit() and test_and_set_bit()?
+> Yes. This is what I meant with data / metadata. We have looked also into
+> using 1 RUH for metadata and rest make available to applications. We
+> decided to go with a simple solution to start with and complete as we
+> see users.
 
-It can't, because you can't assume that just because dd->lock is already
-being held that dispatch is running.
+XFS has an abstract type definition for metadata that is uses to
+prioritise cache reclaim (i.e. classifies what metadata is more
+important/hotter) and that could easily be extended to IO hints
+to indicate placement.
 
-> Please note that whether or not spin_trylock() is used, there is a
-> race condition in this approach: if dd_dispatch_request() is called
-> just before another CPU calls spin_unlock() from inside
-> dd_dispatch_request() then some requests won't be dispatched until the
-> next time dd_dispatch_request() is called.
+We also have a separate journal IO path, and that is probably the
+hotest LBA region of the filesystem (circular overwrite region)
+which would stand to have it's own classification as well.
 
-Sure, that's not surprising. What I cared most about here is that we
-should not have a race such that we'd stall. Since we haven't returned
-this request just yet if we race, we know at least one will be issued
-and we'll re-run at completion. So yeah, we may very well skip an issue,
-that's well known within that change, which will be postponed to the
-next queue run.
+We've long talked about making use of write IO hints for separating
+these things out, but requiring 10+ IO hint channels just for
+filesystem metadata to be robustly classified has been a show
+stopper. Doing nothing is almost always better than doing placement
+hinting poorly.
 
-The patch is more to demonstrate that it would not take much to fix this
-case, at least, it's a proof-of-concept.
+> > Technically speaking, any file system can place different types of metadata in
+> > different reclaim units. However, user data is slightly more tricky case. Potentially,
+> > file system logic can track “hotness” or frequency of updates of some user data
+> > and try to direct the different types of user data in different reclaim units.
 
+*cough*
+
+We already do this in the LBA space via the filesytsem allocators.
+It's often configurable and generally called "allocation policies".
+
+> > But, from another point of view, we have folders in file system namespace.
+> > If application can place different types of data in different folders, then, technically
+> > speaking, file system logic can place the content of different folders into different
+> > reclaim units. But application needs to follow some “discipline” to store different
+> > types of user data (different “hotness”, for example) in different folders.
+
+Yup, XFS does this "physical locality is determined by parent
+directory" separation by default (the inode64 allocation policy).
+Every new directory inode is placed in a different allocation group
+(LBA space) based on a rotor mechanism. All the files within that
+directory are kept local to the directory (i.e. in the same AG/LBA
+space) as much as possible.
+
+Most filesystems have LBA locality policies like this because it is
+highly efficient on physical seek latency limited storage hardware.
+i.e. the storage hardware we've mostly been using since the early
+1980s.
+
+We could make allocation groups have different reclaim units,
+but then we are talking about needing an arbitrary number of
+different IO hints - XFS supports ~2^31 AGs if the filesystem is
+large enough, and there's no way we're going to try to support that
+many IO hints (software or hardware) in the foreseeable future.
+
+IF devices want to try to classify related data themselves, then
+using LBA locality internally to classify relationships below the
+level of IO hints, then that would be a much closer match to how
+filesystems have traditionally structured the data and metadata on
+disk. Related data and metadata tends to get written to the same LBA
+regions because that's the fastest way to access related and
+metadata on seek-limited hardware.
+
+Yeah, I know that these are SSDs we are talking about and they
+aren't seek limited, but when we already have filesystem
+implementations that try to clump related things to nearby LBA
+spaces, it might be best to try to leverage this behaviour rather
+than try to rely on kernel and userspace to correctly provide hints
+about their data patterns.
+
+Cheers,
+
+Dave.
 -- 
-Jens Axboe
-
+Dave Chinner
+david@fromorbit.com
