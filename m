@@ -1,182 +1,202 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6542556C
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 21:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B746C286B1
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 22:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705528302; cv=none; b=uIGy4DpXd+brgIc7zrEjlBmVwAfgbw1/MsQItcmP4Z98SOy6pY1Zi7bwnnSqk/2v58+aRaygHDl5jn8pfE/PUyqL35SaIIVkLmuoyEBl4yideMIG9TvmM4X5isVOFym49PdJ2RCVy4VFOyA1Zjjsrno9eUOrwzMDhFOfQMI4y+U=
+	t=1705530380; cv=none; b=QrBf3V5y9h1VwLCK1813vyV4xV3/Jb1lYjb+9dJDZ/W7fU8O+E3Tf7N9DanKPqH8MWBer4iC3ARpgai4tGuq9nUxjhJ0gObqSQeX8QAsHuAlMAtcteCIiNMvO6Z+Nc/QH+O4ROHie46VmWljP1tjlZYsDUZZYmUT+sYna5z7Lpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705528302; c=relaxed/simple;
-	bh=+sYdn1TYu2tGHcp/A1BrZtQI1EBapoKO6YrKs/F84h0=;
+	s=arc-20240116; t=1705530380; c=relaxed/simple;
+	bh=fbGRpFNzjDJ58+XoKzZOb69zWNASCmMS9ecNHaJmtZM=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
 	 Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To; b=DIMo0ePn9wWUSmsspq86hKJZB9llKqah76TlEMHeVUPbV2xiz/A/rgCaXS6P7ZhENo6mPbeeHRTJiZvHlKYHdiZtoCOBES8bWAwQTnC1Ek+DM3wyqPebpVoATy20ZndpdfyrziFc4Tqo0yXEvSgymvj6iEYh8gTo8RfbdvVgcNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=KrSyzp3B; arc=none smtp.client-ip=209.85.167.170
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=Ymu8EhqR2Asnz87p4RLRg96QNK0kDqxVWGPGs7CA7g0A3BBWvpdTdslXcUnLfwehYTXR6MyfH4UaWS0C6ndnIxGE6Zm1RC0A2WPibugiD25b29MSUmoWq1qrmHlU37SncN501qqJb/S0ka7dsIycwc5tKntSRxJmYSBsz/9TX6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=OK+yHujq; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="KrSyzp3B"
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3bba50cd318so9776449b6e.0
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 13:51:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="OK+yHujq"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d5db9eb0e7so19991835ad.2
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 14:26:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1705528300; x=1706133100; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LLeFnk3Q55H1BPBw4YoBu7toGUDI6gBA877Kx/ZWOrU=;
-        b=KrSyzp3BoIJpk7vgXhCD+rsQm6gFnIkzVcXPLAT5BCHXBk+l9bunQE+Q/vr+S9EXXy
-         xKpxghI+4oMWPxkdbfZl2/56MF904010J33WHaUP2aFPB96RwGDx0SyoXY7iRl/6DqyS
-         OM4c9nvKF6Vj4M6R1ZISmYZV6ZQ8HNXJ5LB0AqJLu1wQE94wq7D+GLpNJU71V0VNhd4y
-         vHC8ilzWvBuHy1kkiZFN5nTWROBqGXBlmQ8EWp6uMSNGZRmHV/8lkDqqhBwNZ0x0un4G
-         mAJPYJLYQgC7qs/HCXWHtcXg5nUmA6dh4F99okJ+gdhO/BifnofQG/dLWn1PZnISpubH
-         85Yw==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1705530378; x=1706135178; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Z/hRTX+MQ2pZDmJRifmLI1vSLH0o1ZgpBqyx2XxHN0=;
+        b=OK+yHujqwR+5rXMuqSWZM/qUzQETYTMp8HCziT/DL6fg2mc+6RDZjj7Rr0iy+dq1jj
+         RIY7KRzuO46OK6o5aMOsiuJUjH1255J8DEVyuYgwnxQhfGgQSo2yC/WZnLS6cyQ4GtZi
+         ux51+yFDrzu5rsBdktdpMLGoj9W+p17H8yjyptljENOisvCOTCn+fho5pUI0q0CdkJW3
+         bjVsCz7+8YYcIRUvJuAcrw5aM2DGUM60paMguWVgDC8dTVGJxF7srZSssr2x9YL2rZd9
+         ggiupD456xhtbuLyCpZO8apf5lZfnqo6uQOeDZ83UXfWOMyJJSEx9EJ8TYWJgfQ7XxXL
+         /GIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705528300; x=1706133100;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LLeFnk3Q55H1BPBw4YoBu7toGUDI6gBA877Kx/ZWOrU=;
-        b=rtiSBQjOVWHgIsqshlTPVXBaeh+MY5noMh2WTxkBCxtDxSLHNnhyIAZIoemYUh4QDW
-         QuKwz4nvOYBVPregUeKuXvLhf6mYjXfHxAFFT1Quo0huq3MUFFL2c+VpMTo4wh/klZfz
-         KK6nU3LZRXyXOG5VLQRodzt9dMZ0Gb6IygcbOpQF1OPsCj8r9JSSZQbdnujiokdgWWkU
-         B4k1EOJHreIUoP6SpSbQcV1LnpHwCTPz44LSD/loP/3jN0h5k9gwmyaRaua70eTTQKlY
-         tHovTl5FAS12gSIrQMa6iEVbi9ICBlOIGWaZiIgvi30t6VagjLeWNRyntcqb8TlrAFvE
-         h7gQ==
-X-Gm-Message-State: AOJu0YymvJWzcW6LDJinUGX+HaQb60fRkuosIWjZdOCHf50Ni3RnVnME
-	Uav1kCvHhnMM8jnRlz6R8cVZ7ec7CNBObQ==
-X-Google-Smtp-Source: AGHT+IGESx3XdAVciQo32JGzL/U/9t/1OLisSeEzkhwKrP6ShbUuF6hJSrsKjUR/tdf3Tqk5GRjSUA==
-X-Received: by 2002:a05:6808:f8e:b0:3bd:986e:23 with SMTP id o14-20020a0568080f8e00b003bd986e0023mr1186949oiw.2.1705528300428;
-        Wed, 17 Jan 2024 13:51:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705530378; x=1706135178;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Z/hRTX+MQ2pZDmJRifmLI1vSLH0o1ZgpBqyx2XxHN0=;
+        b=jliPn3yXZwWWzsV8LB7efkaPGPZZ8GD2jF1k0g+uxcfLdNXX5JAZlvaJ8s5CGM6BoO
+         kIUTVzjhYW8YTM4qcBqCbLgdVH46qRmxAUSb1u4UR2nuVF9rwu8CaQbam5czk75ebGag
+         pva+Jl8DdrbVYDwTT3UWrUtJGLbsdFcuLZY/oFsttuKuXXj8QmQnsrFPgwd8ItAqVnXC
+         IVrPiWvrKP1dfV8vkwLV8VMxbhjP6g3ONtrnE3UIAT56ZkvlZv+J8JQ3Aqhu99hPrOhZ
+         Ddc4Ic6cHDziHuiARMpN3C/lAX4YGW+htAC1K3Ia/0tF1Zjstfi1pdlqJoLCIO+gOxDK
+         5OLw==
+X-Gm-Message-State: AOJu0YwcBd/cmpeQTsiYGaMpAcCaCih5kxEOXGvIwc1ioDGwjOiLRWD2
+	P1T0EmTMt4KNCP07Wy5y2XHiPETLR8fWmw==
+X-Google-Smtp-Source: AGHT+IHXfhiJO0uOdn4WriD5J2oZVP6Jq3kTbXvHM9B9awAtkN42CQFn1wuH4PYtyXhbASYEzOE6mQ==
+X-Received: by 2002:a17:902:db03:b0:1d6:f9a8:532d with SMTP id m3-20020a170902db0300b001d6f9a8532dmr1083027plx.107.1705530378063;
+        Wed, 17 Jan 2024 14:26:18 -0800 (PST)
 Received: from dread.disaster.area (pa49-180-249-6.pa.nsw.optusnet.com.au. [49.180.249.6])
-        by smtp.gmail.com with ESMTPSA id z14-20020a62d10e000000b006d9b38f2e75sm2009134pfg.32.2024.01.17.13.51.39
+        by smtp.gmail.com with ESMTPSA id 17-20020a170902ee5100b001d5e5836292sm139483plo.130.2024.01.17.14.26.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 13:51:39 -0800 (PST)
+        Wed, 17 Jan 2024 14:26:17 -0800 (PST)
 Received: from dave by dread.disaster.area with local (Exim 4.96)
 	(envelope-from <david@fromorbit.com>)
-	id 1rQDov-00BkQF-2K;
-	Thu, 18 Jan 2024 08:51:37 +1100
-Date: Thu, 18 Jan 2024 08:51:37 +1100
+	id 1rQEMR-00BlDA-00;
+	Thu, 18 Jan 2024 09:26:15 +1100
+Date: Thu, 18 Jan 2024 09:26:14 +1100
 From: Dave Chinner <david@fromorbit.com>
-To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
-Cc: Viacheslav Dubeyko <slava@dubeyko.com>,
-	lsf-pc@lists.linux-foundation.org,
-	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-	Adam Manzanares <a.manzanares@samsung.com>,
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, slava@dubeiko.com,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [LSF/MM/BPF TOPIC] : Flexible Data Placement (FDP) availability
- for kernel space file systems
-Message-ID: <ZahL6RKDt/B8O2Jk@dread.disaster.area>
-References: <CGME20240115084656eucas1p219dd48243e2eaec4180e5e6ecf5e8ad9@eucas1p2.samsung.com>
- <20240115084631.152835-1-slava@dubeyko.com>
- <20240115175445.pyxjxhyrmg7od6sc@mpHalley-2.localdomain>
- <86106963-0E22-46D6-B0BE-A1ABD58CE7D8@dubeyko.com>
- <20240117115812.e46ihed2qt67wdue@ArmHalley.local>
+To: Christian Brauner <brauner@kernel.org>
+Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+	adrianvovk@gmail.com
+Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
+Message-ID: <ZahUBkqYad0Lb3/V@dread.disaster.area>
+References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+ <ZabtYQqakvxJVYjM@dread.disaster.area>
+ <20240117-yuppie-unflexibel-dbbb281cb948@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240117115812.e46ihed2qt67wdue@ArmHalley.local>
+In-Reply-To: <20240117-yuppie-unflexibel-dbbb281cb948@brauner>
 
-On Wed, Jan 17, 2024 at 12:58:12PM +0100, Javier González wrote:
-> On 16.01.2024 11:39, Viacheslav Dubeyko wrote:
-> > > On Jan 15, 2024, at 8:54 PM, Javier González <javier.gonz@samsung.com> wrote:
-> > > > How FDP technology can improve efficiency and reliability of
-> > > > kernel-space file system?
+On Wed, Jan 17, 2024 at 02:19:43PM +0100, Christian Brauner wrote:
+> On Wed, Jan 17, 2024 at 07:56:01AM +1100, Dave Chinner wrote:
+> > On Tue, Jan 16, 2024 at 11:50:32AM +0100, Christian Brauner wrote:
+> > > Hey,
 > > > 
-> > > This is an open problem. Our experience is that making data placement
-> > > decisions on the FS is tricky (beyond the obvious data / medatadata). If
-> > > someone has a good use-case for this, I think it is worth exploring.
-> > > F2FS is a good candidate, but I am not sure FDP is of interest for
-> > > mobile - here ZUFS seems to be the current dominant technology.
+> > > I'm not sure this even needs a full LSFMM discussion but since I
+> > > currently don't have time to work on the patch I may as well submit it.
 > > > 
+> > > Gnome recently got awared 1M Euro by the Sovereign Tech Fund (STF). The
+> > > STF was created by the German government to fund public infrastructure:
+> > > 
+> > > "The Sovereign Tech Fund supports the development, improvement and
+> > >  maintenance of open digital infrastructure. Our goal is to sustainably
+> > >  strengthen the open source ecosystem. We focus on security, resilience,
+> > >  technological diversity, and the people behind the code." (cf. [1])
+> > > 
+> > > Gnome has proposed various specific projects including integrating
+> > > systemd-homed with Gnome. Systemd-homed provides various features and if
+> > > you're interested in details then you might find it useful to read [2].
+> > > It makes use of various new VFS and fs specific developments over the
+> > > last years.
+> > > 
+> > > One feature is encrypting the home directory via LUKS. An approriate
+> > > image or device must contain a GPT partition table. Currently there's
+> > > only one partition which is a LUKS2 volume. Inside that LUKS2 volume is
+> > > a Linux filesystem. Currently supported are btrfs (see [4] though),
+> > > ext4, and xfs.
+> > > 
+> > > The following issue isn't specific to systemd-homed. Gnome wants to be
+> > > able to support locking encrypted home directories. For example, when
+> > > the laptop is suspended. To do this the luksSuspend command can be used.
+> > > 
+> > > The luksSuspend call is nothing else than a device mapper ioctl to
+> > > suspend the block device and it's owning superblock/filesystem. Which in
+> > > turn is nothing but a freeze initiated from the block layer:
+> > > 
+> > > dm_suspend()
+> > > -> __dm_suspend()
+> > >    -> lock_fs()
+> > >       -> bdev_freeze()
+> > > 
+> > > So when we say luksSuspend we really mean block layer initiated freeze.
+> > > The overall goal or expectation of userspace is that after a luksSuspend
+> > > call all sensitive material has been evicted from relevant caches to
+> > > harden against various attacks. And luksSuspend does wipe the encryption
+> > > key and suspend the block device. However, the encryption key can still
+> > > be available clear-text in the page cache.
 > > 
-> > If I understand the FDP technology correctly, I can see the benefits for
-> > file systems. :)
-> > 
-> > For example, SSDFS is based on segment concept and it has multiple
-> > types of segments (superblock, mapping table, segment bitmap, b-tree
-> > nodes, user data). So, at first, I can use hints to place different segment
-> > types into different reclaim units.
+> > The wiping of secrets is completely orthogonal to the freezing of
+> > the device and filesystem - the freeze does not need to occur to
+> > allow the encryption keys and decrypted data to be purged. They
+> > should not be conflated; purging needs to be a completely separate
+> > operation that can be run regardless of device/fs freeze status.
 > 
-> Yes. This is what I meant with data / metadata. We have looked also into
-> using 1 RUH for metadata and rest make available to applications. We
-> decided to go with a simple solution to start with and complete as we
-> see users.
+> Yes, I'm aware. I didn't mean to imply that these things are in any way
+> necessarily connected. Just that there are use-cases where they are. And
+> the encrypted home directory case is one. One froze the block device and
+> filesystem one would now also like to drop the page cache which has most
+> of the interesting data.
+> 
+> The fact that after a block layer initiated freeze - again mostly a
+> device mapper problem - one may or may not be able to successfully read
+> from the filesystem is annoying. Of course one can't write, that will
+> hang one immediately. But if one still has some data in the page cache
+> one can still dump the contents of that file. That's at least odd
+> behavior from a users POV even if for us it's cleary why that's the
+> case.
 
-XFS has an abstract type definition for metadata that is uses to
-prioritise cache reclaim (i.e. classifies what metadata is more
-important/hotter) and that could easily be extended to IO hints
-to indicate placement.
+A frozen filesystem doesn't prevent read operations from occurring.
 
-We also have a separate journal IO path, and that is probably the
-hotest LBA region of the filesystem (circular overwrite region)
-which would stand to have it's own classification as well.
+> And a freeze does do a sync_filesystem() and a sync_blockdev() to flush
+> out any dirty data for that specific filesystem.
 
-We've long talked about making use of write IO hints for separating
-these things out, but requiring 10+ IO hint channels just for
-filesystem metadata to be robustly classified has been a show
-stopper. Doing nothing is almost always better than doing placement
-hinting poorly.
+Yes, it's required to do that - the whole point of freezing a
+filesystem is to bring the filesystem into a *consistent physical
+state on persistent storage* and to hold it in that state until it
+is thawed.
 
-> > Technically speaking, any file system can place different types of metadata in
-> > different reclaim units. However, user data is slightly more tricky case. Potentially,
-> > file system logic can track “hotness” or frequency of updates of some user data
-> > and try to direct the different types of user data in different reclaim units.
+> So it would be fitting
+> to give users an api that allows them to also drop the page cache
+> contents.
 
-*cough*
+Not as part of a freeze operation.
 
-We already do this in the LBA space via the filesytsem allocators.
-It's often configurable and generally called "allocation policies".
+Read operations have *always* been allowed from frozen filesystems;
+they are intended to be allowed because one of the use cases for
+freezing is to create a consistent filesystem state for backup of
+the filesystem. That requires everything in the filesystem can be
+read whilst it is frozen, and that means the page cache needs to
+remain operational.
 
-> > But, from another point of view, we have folders in file system namespace.
-> > If application can place different types of data in different folders, then, technically
-> > speaking, file system logic can place the content of different folders into different
-> > reclaim units. But application needs to follow some “discipline” to store different
-> > types of user data (different “hotness”, for example) in different folders.
+What the underlying device allows when it has been *suspended* is a
+different issue altogether. The key observation here is that storage
+device suspend != filesystem freeze and they can have very different
+semantics depending on the operation being performed on the block
+device while it is suspended.
 
-Yup, XFS does this "physical locality is determined by parent
-directory" separation by default (the inode64 allocation policy).
-Every new directory inode is placed in a different allocation group
-(LBA space) based on a rotor mechanism. All the files within that
-directory are kept local to the directory (i.e. in the same AG/LBA
-space) as much as possible.
+IOWs, a device suspend implementation might freeze the filesystem to
+bring the contents of the storage device whilst frozen into a
+consistent, uptodate state (e.g. for device level backups), but
+block device level suspend does not *require* that the filesystem is
+frozen whilst the device IO operations are suspended.
 
-Most filesystems have LBA locality policies like this because it is
-highly efficient on physical seek latency limited storage hardware.
-i.e. the storage hardware we've mostly been using since the early
-1980s.
+> For some use-cases like the Gnome use-case one wants to do a freeze and
+> drop everything that one can from the page cache for that specific
+> filesystem.
 
-We could make allocation groups have different reclaim units,
-but then we are talking about needing an arbitrary number of
-different IO hints - XFS supports ~2^31 AGs if the filesystem is
-large enough, and there's no way we're going to try to support that
-many IO hints (software or hardware) in the foreseeable future.
+So they have to do an extra system call between FS_IOC_FREEZE and
+FS_IOC_THAW. What's the problem with that? What are you trying to
+optimise by colliding cache purging with FS_IOC_FREEZE?
 
-IF devices want to try to classify related data themselves, then
-using LBA locality internally to classify relationships below the
-level of IO hints, then that would be a much closer match to how
-filesystems have traditionally structured the data and metadata on
-disk. Related data and metadata tends to get written to the same LBA
-regions because that's the fastest way to access related and
-metadata on seek-limited hardware.
-
-Yeah, I know that these are SSDs we are talking about and they
-aren't seek limited, but when we already have filesystem
-implementations that try to clump related things to nearby LBA
-spaces, it might be best to try to leverage this behaviour rather
-than try to rely on kernel and userspace to correctly provide hints
-about their data patterns.
+If the user/application/infrastructure already has to iterate all
+the mounted filesystems to freeze them, then it's trivial for them
+to add a cache purging step to that infrastructure for the storage
+configurations that might need it. I just don't see why this needs
+to be part of a block device freeze operation, especially as the
+"purge caches on this filesystem" operation has potential use cases
+outside of the luksSuspend context....
 
 Cheers,
 
