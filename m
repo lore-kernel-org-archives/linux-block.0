@@ -1,61 +1,61 @@
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375B22374E
-	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 18:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16E824A18
+	for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 20:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705517031; cv=none; b=Ublr9r3nBTGwinpFtVF2dtWRrbPqJvgqYc0VL58o8wA2NVTi15z7XlRnPHW4esDuDPCkPKeD8IB9J3qveHb1ZfFbqDrh5l2LZPax3A3Vh4E/AkjcDbcEbOwfmznc5kEM6/NNtjPv1U7fLoagm8N+nB6LijVVvSn69qOQ2CrvYUs=
+	t=1705521988; cv=none; b=KYKJkJBDp5wpPFg2o60is8Bpk7I6ZwCOeunvTdao4kKxdv8yFhm8R6v2ipOJA7KSrEZ71EYk0Ohm07LWhao4sPfk2aS7o9MNhTDeNNxf636iGsWtAW7O5IrGR9wE/G1mtaeVGFS6R/TPdQ6bPd/hMQo5ClzRr2YHtDLMQp59EP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705517031; c=relaxed/simple;
-	bh=QeIsyT+MnNMM38OwdadVGjxWcO3q6apltzzjGi4TZT4=;
+	s=arc-20240116; t=1705521988; c=relaxed/simple;
+	bh=XrCbn8NqIBW6LmrHSdKJd3VVhmxEPJ9wyh9xzdzr2XE=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
 	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=IPkEgfQczSo49aCdlYm9J1/9EUvc/7urgduD1BgQWOebUkrwoN3rj0+M15BgYcdH7eYrYbg3h8dIlnmighlokZ/GXQUzeVVuXXOm2QPVS5oGx7CDmtfL6+M27KKwmvOLXxFyuSl3sTARs6yrlIF8LDPiBpVnxAXOB2CF3afdP5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nn7YnvS+; arc=none smtp.client-ip=209.85.166.174
+	 From:To:Cc:References:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=G5SWAF8CVDC1a0hFn4fZu//2VDIGW5D2YKdN24QCif9LWP8/wJjeIC3C4eixlTbufet9BQITJqp4d+6+ZG8xCKFKbrmbX8hgU1+eq1F5aNrs7j476kx9NqlJBuynori6T+k9hKS4IsFWClHuVn+bqaxkCUmW+iZ3lDZ8VhLPirI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=f75+nqwo; arc=none smtp.client-ip=209.85.166.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nn7YnvS+"
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-36191ee7be4so1939615ab.0
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 10:43:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="f75+nqwo"
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso77089239f.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2024 12:06:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705517028; x=1706121828; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705521986; x=1706126786; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0m1ycGClAI8pu+Re80UY95eqKAnya4GvX4pu0skEd3s=;
-        b=nn7YnvS+cd1mdqyM8EiSFd4c7WoNNjpQoHRIZ1cLBwdHxT17N2luL4XUCI6fUxV+JG
-         QqKFNzBNCn8kblGPjiWbj/fc1zfSrqO5I+VVQZsy435FJxf8a6fJ+9lSds37qNrR0ijL
-         7rrOMSG3SpNjGIv6K3MmBZILe+k/+wQyOFSEBLaMLXcjBtJKVagS2sUrs40z7yDaJqig
-         fyVduVEnd5g16uBz2Of8xKCHOBJ1EFU15QmzOzFS9E32LpsCZXSYP5d3Xo3pAzAdK7vY
-         mqAsWHxuwT7CBt1s1CfRVK/fa0cgvKX5Y9FpYjnuiWG2B0KY7ftjmRhzoJaquacPBGOQ
-         HrEw==
+        bh=RylSDua2BnQBNhz0ri2mwOlsrVpcdZ7iruL97tOno0k=;
+        b=f75+nqwoq7ZxV7xGHotenGl/cZzlI+RaJFg3Zwq29j5zkRa9kpPTenYIQp2z6vg1a3
+         lESAs0E0dY9VDGaWqJdLi2J3UzUwKzddLDJ0ZrNze7BgLnv9J+b+vJaYDEc3Z6Q4MDYG
+         CZWRqiy6Ug3LY+H1wCwm7Q6kwRtzOjMrftPcO2Kr90t9/221p4KH/aUs50+Ws38pNuW7
+         K+7mheiA+TOzku7498h21ghIMyXf+MFAZanYRyrVL3FgYAAsxT49eg123YPJfVOpdYTT
+         46HGlyBuzc+QR5tPK/sCxUSlLcR1hTHq1AFM/y2pIIkpTbiS8zGX4N1qOXyYuV56wEPt
+         yD+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705517028; x=1706121828;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1705521986; x=1706126786;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0m1ycGClAI8pu+Re80UY95eqKAnya4GvX4pu0skEd3s=;
-        b=UZsjv+N9nYxpPr8uG8u9qaB6pw5cOckTN5eDAIXXm+ARZSjLyLfEBS7vr18qAhewuQ
-         71Bw+DZBGRAh8C28hO9GVpsEQsEP/zS2YrgX2aycLkEVs58o5tvByMm3ta/3/1YIzfEr
-         NBPNU8goNDM3CcRfmH/TKlT4/YI9EPf7l5zD4kW5E5kitkfMG7hOIAw9Mb1LTVd85REF
-         iqnz8nAAMCCsnIgbrcINP5D4EWfpb2k8pnP/yHzhe/qrXUuhm66WaeIX+kvuCQ8K8DXU
-         KjVAG3KsKvaoCUyVHq7sfYOK/MbNyQmFGxnBkQxnAc7+jdOA0km4gcpv9lT/B+FgIuHr
-         bAPw==
-X-Gm-Message-State: AOJu0YxNjE1IwjDrf0EJ0vyHaKJGpk5mkRaohJtirdXjGU82tf9YRe1Q
-	CJtRi2HAVoU/eYi+MaPDjAmePlkoFeGxhQ==
-X-Google-Smtp-Source: AGHT+IFkIYxYV/DPUCmo6RY0/kKekLwm0mFUcgJ8bvfzFQUKklviLuP1Lu2hOB5T/p6Dzou6BB+BHw==
-X-Received: by 2002:a6b:6810:0:b0:7be:e376:fc44 with SMTP id d16-20020a6b6810000000b007bee376fc44mr15408400ioc.2.1705517028234;
-        Wed, 17 Jan 2024 10:43:48 -0800 (PST)
+        bh=RylSDua2BnQBNhz0ri2mwOlsrVpcdZ7iruL97tOno0k=;
+        b=kixsoladmMs7PVaqD8RVyXqhu8bkI3GTPIPFB52KurXGNYEjlZgddwdr1ofFNmTAvO
+         8YUaO1ebyQM61PXUG9EqJSB5kmBYRuhZbsC42h6OvmStvhlzKbsPY5Whgu5C53FZpgm8
+         byps9AaEUY0wK3lRK7yh5l7k1GCTf6tYDxe32OV5eRHebb68mIHvooI2qVYEe8r707M3
+         gkLY5m4uoiOcUk3Uu4V71lkhPirgKxGpsit7fcQZDGt7VsO7aarYjUgWgAozHOtDQl9U
+         s0NNKf8qCK2ZcQV0RoDs8KvX8kkTzlR5eHdL0ADNGY8VRtHtDb0YnD3GV91BzTaDRknc
+         7A1g==
+X-Gm-Message-State: AOJu0Yy8nsjx/aDEeWP2ZZDV6vwX9IoX2Y6iMaWIXcF8OQUSgnaqbM2t
+	yXhL9U9x/AL06nWMdfxa06hR6pM/qGYSVg==
+X-Google-Smtp-Source: AGHT+IGWsohYVR1pZF1dkrm0P3WI2640KWeQttN82iMT/+YWYam6SPj4ldcXSQVyCmlk/vJ0pfftEA==
+X-Received: by 2002:a5e:834b:0:b0:7bc:2603:575f with SMTP id y11-20020a5e834b000000b007bc2603575fmr3270490iom.0.1705521985985;
+        Wed, 17 Jan 2024 12:06:25 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id i5-20020a5d8405000000b007bbab8c40d2sm3443754ion.44.2024.01.17.10.43.47
+        by smtp.gmail.com with ESMTPSA id l16-20020a056638221000b0046df601152dsm589695jas.66.2024.01.17.12.06.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 10:43:47 -0800 (PST)
-Message-ID: <9af03351-a04a-4e61-a6d8-b58236b041a3@kernel.dk>
-Date: Wed, 17 Jan 2024 11:43:47 -0700
+        Wed, 17 Jan 2024 12:06:25 -0800 (PST)
+Message-ID: <276eedc2-e3d0-40c7-b355-46232ea65662@kernel.dk>
+Date: Wed, 17 Jan 2024 13:06:19 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,6 +65,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [LSF/MM/BPF TOPIC] Improving Zoned Storage Support
 Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
 To: Bart Van Assche <bvanassche@acm.org>, Damien Le Moal
  <dlemoal@kernel.org>,
  "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
@@ -77,144 +78,61 @@ References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
  <43cc2e4c-1dce-40ab-b4dc-1aadbeb65371@acm.org>
  <c38ab7b2-63aa-4a0c-9fa6-96be304d8df1@kernel.dk>
  <2955b44a-68c0-4d95-8ff1-da38ef99810f@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <2955b44a-68c0-4d95-8ff1-da38ef99810f@acm.org>
+ <9af03351-a04a-4e61-a6d8-b58236b041a3@kernel.dk>
+In-Reply-To: <9af03351-a04a-4e61-a6d8-b58236b041a3@kernel.dk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/17/24 11:22 AM, Bart Van Assche wrote:
-> On 1/17/24 09:48, Jens Axboe wrote:
->>> When posting this patch series, please include performance results
->>> (IOPS) for a zoned null_blk device instance. mq-deadline doesn't support
->>> more than 200 K IOPS, which is less than what UFS devices support. I
->>> hope that this performance bottleneck will be solved with the new
->>> approach.
->>
->> Not really zone related, but I was very aware of the single lock
->> limitations when I ported deadline to blk-mq. Was always hoping that
->> someone would actually take the time to make it more efficient, but so
->> far that hasn't happened. Or maybe it'll be a case of "just do it
->> yourself, Jens" at some point...
+On 1/17/24 11:43 AM, Jens Axboe wrote:
+> Certainly slower. Now let's try and have the scheduler place the same 4
+> threads where it sees fit:
 > 
-> Hi Jens,
+> IOPS=1.56M, BW=759MiB/s, IOS/call=32/31
 > 
-> I think it is something fundamental rather than something that can be
-> fixed. The I/O scheduling algorithms in mq-deadline and BFQ require
-> knowledge of all pending I/O requests. This implies that data structures
-> must be maintained that are shared across all CPU cores. Making these
-> thread-safe implies having synchronization mechanisms that are used
-> across all CPU cores. I think this is where the (about) 200 K IOPS
-> bottleneck comes from.
+> Yikes! That's still substantially more than 200K IOPS even with heavy
+> contention, let's take a look at the profile:
+> 
+> -   70.63%  io_uring  [kernel.kallsyms]  [k] queued_spin_lock_slowpath
+>    - submitter_uring_fn
+>       - entry_SYSCALL_64
+>       - do_syscall_64
+>          - __se_sys_io_uring_enter
+>             - 70.62% io_submit_sqes
+>                  blk_finish_plug
+>                  __blk_flush_plug
+>                - blk_mq_flush_plug_list
+>                   - 69.65% blk_mq_run_hw_queue
+>                        blk_mq_sched_dispatch_requests
+>                      - __blk_mq_sched_dispatch_requests
+>                         + 60.61% dd_dispatch_request
+>                         + 8.98% blk_mq_dispatch_rq_list
+>                   + 0.98% dd_insert_requests
+> 
+> which is exactly as expected, we're spending 70% of the CPU cycles
+> banging on dd->lock.
 
-Has any analysis been done on where the limitation comes from? For
-kicks, I ran an IOPS benchmark on a smaller AMD box. It has 4 fast
-drives, and if I use mq-deadline on those 4 drives I can get 13.5M IOPS
-using just 4 threads, and only 2 cores. That's vastly more than 200K, in
-fact that's ~3.3M per drive. At the same time it's vastly slower than
-the 5M that they will do without a scheduler.
+Case in point, I spent 10 min hacking up some smarts on the insertion
+and dispatch side, and then we get:
 
-Doing a quick look at what slows it down, it's a mix of not being able
-to use completion side batching (which again then brings in TSC reading
-as the highest cycler user...), and some general deadline overhead. In
-order:
+IOPS=2.54M, BW=1240MiB/s, IOS/call=32/32
 
-+    3.32%  io_uring  [kernel.kallsyms]  [k] __dd_dispatch_request
-+    2.71%  io_uring  [kernel.kallsyms]  [k] dd_insert_requests
-+    1.21%  io_uring  [kernel.kallsyms]  [k] dd_dispatch_request
+or about a 63% improvement when running the _exact same thing_. Looking
+at profiles:
 
-with the rest being noise. Biggest one is dd_has_work(), which seems
-like it would be trivially fixable by just having a shared flag if ANY
-of the priorities had work.
+-   13.71%  io_uring  [kernel.kallsyms]  [k] queued_spin_lock_slowpath
 
-Granted, this test case is single threaded as far as a device is
-concerned, which is obviously best case. Which then leads me to believe
-that it may indeed be locking that's the main issue here, which is what
-I suspected from the get-go. And while yes this is a lot of shared data,
-there's absolutely ZERO reason why we would end up with a hard limit of
-~200K IOPS even maintaining the behavior it has now.
+reducing the > 70% of locking contention down to ~14%. No change in data
+structures, just an ugly hack that:
 
-So let's try a single device, single thread:
+- Serializes dispatch, no point having someone hammer on dd->lock for
+  dispatch when already running
+- Serialize insertions, punt to one of N buckets if insertion is already
+  busy. Current insertion will notice someone else did that, and will
+  prune the buckets and re-run insertion.
 
-IOPS=5.10M, BW=2.49GiB/s, IOS/call=32/31
-
-That's device limits, using mq-deadline. Now let's try and have 4
-threads banging on it, pinned to the same two cores:
-
-IOPS=3.90M, BW=1903MiB/s, IOS/call=32/31
-
-Certainly slower. Now let's try and have the scheduler place the same 4
-threads where it sees fit:
-
-IOPS=1.56M, BW=759MiB/s, IOS/call=32/31
-
-Yikes! That's still substantially more than 200K IOPS even with heavy
-contention, let's take a look at the profile:
-
--   70.63%  io_uring  [kernel.kallsyms]  [k] queued_spin_lock_slowpath
-   - submitter_uring_fn
-      - entry_SYSCALL_64
-      - do_syscall_64
-         - __se_sys_io_uring_enter
-            - 70.62% io_submit_sqes
-                 blk_finish_plug
-                 __blk_flush_plug
-               - blk_mq_flush_plug_list
-                  - 69.65% blk_mq_run_hw_queue
-                       blk_mq_sched_dispatch_requests
-                     - __blk_mq_sched_dispatch_requests
-                        + 60.61% dd_dispatch_request
-                        + 8.98% blk_mq_dispatch_rq_list
-                  + 0.98% dd_insert_requests
-
-which is exactly as expected, we're spending 70% of the CPU cycles
-banging on dd->lock.
-
-Let's run the same thing again, but let's just do single requests at the
-time:
-
-IOPS=1.10M, BW=535MiB/s, IOS/call=1/0
-
-worse again, but still a far cry from 200K IOPS. Contention basically
-the same, but now we're not able to amortize other submission side
-costs.
-
-What I'm getting at is that it's a trap to just say "oh IO schedulers
-can't scale beyong low IOPS" without even looking into where those
-limits may be coming from. I'm willing to bet that increasing the
-current limit for multi-threaded workloads would not be that difficult,
-and it would probably 5x the performance potential of such setups.
-
-Do we care? Maybe not, if we accept that an IO scheduler is just for
-"slower devices". But let's not go around spouting some 200K number as
-if it's gospel, when it depends on so many factors like IO workload,
-system used, etc.
-
-> Additionally, the faster storage devices become, the larger the relative
-> overhead of an I/O scheduler is (assuming that I/O schedulers won't
-> become significantly faster).
-
-FIrst part is definitely true, second assumption I think is a "I just
-give up without even looking at why" kind of attitude.
-
-> A fundamental limitation of I/O schedulers is that multiple commands
-> must be submitted simultaneously to the storage device to achieve good
-> performance. However, if the queue depth is larger than one then the
-> device has some control over the order in which commands are executed.
-
-This isn't new, that's been known and understood for decades.
-
-> Because of all the above reasons I'm recommending my colleagues to move
-> I/O prioritization into the storage device and to evolve towards a
-> future for solid storage devices without I/O schedulers. I/O schedulers
-> probably will remain important for rotating magnetic media.
-
-While I don't agree with a lot of your stipulations above, this is a
-recommendation I've been giving for a long time as well. Mostly
-because it means less cruft for us to maintain in software, also full
-well knowing that we're then at the mercy of hardware implementations
-which may all behave differently. And even if we historically have not
-had good luck punting these problems to hardware and getting the desired
-outcome.
+And while I seriously doubt that my quick hack is 100% fool proof, it
+works as a proof of concept. If we can get that kind of reduction with
+minimal effort, well...
 
 -- 
 Jens Axboe
