@@ -1,46 +1,46 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EA722619;
-	Wed, 17 Jan 2024 17:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F3722618;
+	Wed, 17 Jan 2024 17:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705512590; cv=none; b=DpHN+nf6iZkNeNP/LtW/MHFAYEt8HNj5cC57VqqQhBAX2l8DuHwjdlQyA+HKtJAyU3KUs6sFIpiBs7RleTJjurZHSZrrp33QUBeckslc6nEfhXHsE+A8jj0ZGb9jecll7jLcjY8m43B+/wDV71WIa63KFxAsgEtXL3c485JJhao=
+	t=1705513018; cv=none; b=qOCM28KFCTh5v4/zw5WXe0+iqdX47IwbhdFi4PX0tb8l7j8+mmvsHswyGZ8/sgn91T2YO7PkvBb3WyGaUGQ4Lc69o+vxDbb24X0F6ZwHCrPE52To3eGhHgg6ttx7VmAJubQy0rbLU3dHtQ7BXHm/El47ijb00TnTq+1yEE7TTzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705512590; c=relaxed/simple;
-	bh=3RguxiLQXwXyKy+/MBUXqv78BPdbE9j/r5/BDuDJGGQ=;
+	s=arc-20240116; t=1705513018; c=relaxed/simple;
+	bh=OEzof7qyTLruGa+JN283GHR3pCSjT8MuZ8if8KRkzM8=;
 	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
 	 X-Google-Smtp-Source:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding; b=Mhp4HbHjwSMBNPPjkfii7zUzGQSlwIJPyxsZZyUFe0ptdOjUW/7qAEL/qTkCk+ud6nupFZDW3DBkvSWL2026HYvraWLwj7ZbB+TQ9JbFk6GVLrXtMWvCQULwu1U1UoLCAsZCm8lnfcJ6uBsgAgZT40oWa7iKWNL1HTPI0LZD65U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.45
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding; b=XH8WxzWVhjtw4D0nG+1F5/RAdbrUJ2j5hgcGhspB03GZsiW8dB6wCbhtPAdKqBsGttFHZU41eVhOBNKTfKiPk7uX2kYj6/A+oUJ2uMu4huw4/bgCxKUxAciz3rzEgAwW0bGf6bSvmi6K0HWssWH0xNpGpR11F0KDfYcCl3KzJoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6ddf1e88e51so5480393a34.0;
-        Wed, 17 Jan 2024 09:29:48 -0800 (PST)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6daa89a6452so6988554b3a.2;
+        Wed, 17 Jan 2024 09:36:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705512588; x=1706117388;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1705513016; x=1706117816;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KdFUEs5+PqYWiTaTyZYNjEQamHx46wf3N9eVAnVojFA=;
-        b=hXjj3WE/wWjU7aeiEwx1BCibpQpWCg8O5k6mPWUP9RpxF8WpSKa2BkT3qyJ2Yebswv
-         W3kk2M2q+TbjAuqiTPeH0PKF4DUBayWy+hiDVTy25H+Sl0bW4BpbAUEr+4HhsaXUC3ML
-         6jZKGrsaM7oe6YaTU+4oCuPxTbCMBSPQLMDtog9Wz+nkHHbf59chhL8c+IUc7D+I7Q8u
-         UGJTOYBGYjPzjd/xqayj8Z0CD7o+sNyTaC3DBjlXBngY4JOUEwKPYutikfsCiY0gtb/a
-         yqpred3M/ftkHGJhiC1GY+ONVEi+IsNg0sMnVc5EhANeIzbHcYbZq1I/+potw/yl3D51
-         ZJPA==
-X-Gm-Message-State: AOJu0Yzo1mQGT0Lt+7hkUfpnCFui7sSsWJsxt9rP5iwkg+lnsqFnRT1R
-	4t6pGBT/WhKce0BMwcxLKuA=
-X-Google-Smtp-Source: AGHT+IG+FH7zCjgi/Z+ZeS0zl2Tjj1ArsPfPtOvQ3abP1FhMvb3AU15cAC4KywPUvX3blxub3iMr2A==
-X-Received: by 2002:a05:6358:b107:b0:175:55e2:c8f6 with SMTP id a7-20020a056358b10700b0017555e2c8f6mr10907066rwo.31.1705512587678;
-        Wed, 17 Jan 2024 09:29:47 -0800 (PST)
+        bh=HLcu/boAZYyJQLYT+m7wrWheub7FYhYbkhG1JYhS+fk=;
+        b=jPnEu9vDMBEos4difq4Q6+9hwt1QMFa/uktFnwJ5cKjhbGc3xQfdlU5W3Va1feHA0n
+         usuV1rZZD5fGZJRva2o4uBhVnktZeDkGllqS57h1bZPiCFfBCfJ1vOuZbjrpnHK/QbQH
+         zEHVVDwb+1DozyvWgYsKOlqy/SRPrTCNp/O/2sUkWuosl86/V2vKN+THYtOD/rno8siJ
+         S9SpPfh5d785gB6fb9jxyH5Tw0gSaQEJWU6o4L+d7XPInr/voZvqAfeqSaG0nzLvP905
+         RHXS4nL6M00z8HGqv3WyyZmNrFEA6Jpyksy3OEfyeItlqBVylYQw7AAQoEfKMcVUZ4g+
+         /lRg==
+X-Gm-Message-State: AOJu0YzFiHSeVMTHxR9kTI6IvNAWR0faI5rdd7HvNzrq/sI0zXs96Qd0
+	r1C3CV/qRDWU51sRr1FAq3MubgYK9kI=
+X-Google-Smtp-Source: AGHT+IHI9/Ofhg6vM6YAfEYG7xK18CTwCIfRXr/qD5ZaProbRjtw16y9FIupDIFf8JVEce1mLFyazg==
+X-Received: by 2002:a05:6a20:439e:b0:19a:9655:49fa with SMTP id i30-20020a056a20439e00b0019a965549famr5691111pzl.84.1705513016241;
+        Wed, 17 Jan 2024 09:36:56 -0800 (PST)
 Received: from ?IPV6:2620:0:1000:8411:5421:8f53:45a:4e37? ([2620:0:1000:8411:5421:8f53:45a:4e37])
-        by smtp.gmail.com with ESMTPSA id ca33-20020a056a0206a100b005c60ad6c4absm10788772pgb.4.2024.01.17.09.29.45
+        by smtp.gmail.com with ESMTPSA id fi21-20020a056a00399500b006d0d90edd2csm1698751pfb.42.2024.01.17.09.36.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 09:29:46 -0800 (PST)
-Message-ID: <5ff36535-7cd3-4e8f-a477-9d2a98d18dd9@acm.org>
-Date: Wed, 17 Jan 2024 09:29:44 -0800
+        Wed, 17 Jan 2024 09:36:54 -0800 (PST)
+Message-ID: <43cc2e4c-1dce-40ab-b4dc-1aadbeb65371@acm.org>
+Date: Wed, 17 Jan 2024 09:36:52 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,53 +48,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/1] block: introduce activity based ioprio
+Subject: Re: [LSF/MM/BPF TOPIC] Improving Zoned Storage Support
 Content-Language: en-US
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe
- <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>,
- steve.kang@unisoc.com
-References: <20240117092348.2873928-1-zhaoyang.huang@unisoc.com>
+To: Damien Le Moal <dlemoal@kernel.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
+ <cc6999c2-2d53-4340-8e2b-c50cae1e5c3a@kernel.org>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240117092348.2873928-1-zhaoyang.huang@unisoc.com>
+In-Reply-To: <cc6999c2-2d53-4340-8e2b-c50cae1e5c3a@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/17/24 01:23, zhaoyang.huang wrote:
-> +static enum dd_prio dd_req_ioprio(struct request *rq)
-> +{
-> +	enum dd_prio prio;
-> +	const u8 ioprio_class = dd_rq_ioclass(rq);
-> +#ifdef CONFIG_ACTIVITY_BASED_IOPRIO
-> +	struct bio *bio;
-> +	struct bio_vec bv;
-> +	struct bvec_iter iter;
-> +	struct page *page;
-> +	int gen = 0;
-> +	int cnt = 0;
-> +
-> +	if (req_op(rq) == REQ_OP_READ) {
-> +		__rq_for_each_bio(bio, rq) {
-> +			bio_for_each_bvec(bv, bio, iter) {
-> +				page = bv.bv_page;
-> +				gen += PageWorkingset(page) ? 1 : 0;
-> +				cnt++;
-> +			}
-> +		}
-> +		prio = (gen >= cnt / 2) ? ioprio_class_to_prio[IOPRIO_CLASS_RT] :
-> +			ioprio_class_to_prio[ioprio_class];
-> +	} else
-> +		prio = ioprio_class_to_prio[ioprio_class];
-> +#else
-> +	prio = ioprio_class_to_prio[ioprio_class];
-> +#endif
-> +	return prio;
-> +}
+On 1/16/24 15:34, Damien Le Moal wrote:
+> FYI, I am about to post 20-something patches that completely remove zone write
+> locking and replace it with "zone write plugging". That is done above the IO
+> scheduler and also provides zone append emulation for drives that ask for it.
+> 
+> With this change:
+>   - Zone append emulation is moved to the block layer, as a generic
+> implementation. sd and dm zone append emulation code is removed.
+>   - Any scheduler can be used, including "none". mq-deadline zone block device
+> special support is removed.
+>   - Overall, a lot less code (the series removes more code than it adds).
+>   - Reordering problems such as due to IO priority is resolved as well.
+> 
+> This will need a lot of testing, which we are working on. But your help with
+> testing on UFS devices will be appreciated as well.
 
-I don't like it that code is introduced in the mq-deadline scheduler
-that accesses page cache information. Isn't that a layering violation?
-Additionally, this approach only works for buffered I/O and not for
-direct I/O. Shouldn't the I/O submitter set the I/O priority instead of
-deciding the I/O priority in the mq-deadline scheduler?
+When posting this patch series, please include performance results
+(IOPS) for a zoned null_blk device instance. mq-deadline doesn't support
+more than 200 K IOPS, which is less than what UFS devices support. I
+hope that this performance bottleneck will be solved with the new
+approach.
+
+Thank you,
 
 Bart.
+
