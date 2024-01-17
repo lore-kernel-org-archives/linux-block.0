@@ -1,181 +1,192 @@
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB3A1F5F7;
-	Wed, 17 Jan 2024 13:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1819720308;
+	Wed, 17 Jan 2024 14:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705498668; cv=none; b=B5KUoLOVCVYA5pMy2KmFwPP4p0lXo3GI6jLEgDu6c+Qnyqtm6MOk52NCwx+x8ZH5dmhf+aAcvpVEhAZFzkkUHEbrpk5+BEfeUPzvZVe5l9zksSNVIIzsDyKW8/UiQVLkhAJ9zWKJZ0nJ0EIeVoQT/XKfPhMgja1OSnt3RvtUQJg=
+	t=1705502137; cv=none; b=btT6yNxikGTfApUZqIBSouvd7ufbkir0cCnhQV8GocrhGDJbBil8bP/wyg+gUogaGuubR6OTZ9solpkGE4alIuf5Hq4kJIlYFkXheELY838y0ImMAT2P1jfssk8kTzvPXF4pHddeumrBWVDUbIqjKqM1UaObHz3AwqxnDbcMFGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705498668; c=relaxed/simple;
-	bh=a0o55pxxDCLHmqaWvxrygvI6niPdHttBqY/E85EhHew=;
-	h=DKIM-Signature:Received:Received:Subject:From:To:Cc:References:
-	 Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:Content-Type:
-	 Content-Language:Content-Transfer-Encoding:X-Authenticated-Sender:
-	 X-Virus-Scanned; b=iKGkQOtampxcIClUmVv8tX3N9MbzIz200z1UJvn0ZLjNfPJLpz41xXGqpbXT74z6ZMVPQpV3o72bMqteDzZ3vsTiWi7FNTxwgDy0eNnll+oZwwSfHX7gayt1DdL9kdA2Cm1xYnZm4hb3chfsyOBHhUpGceIp5naUw2nSzVBy+TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=DEGHyY+4; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+	s=arc-20240116; t=1705502137; c=relaxed/simple;
+	bh=ZMgJeIhj9LTBaaPOmPOWLfs14Y33hjhRU4gwsLGCvpw=;
+	h=Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:X-Spam-Level:X-Rspamd-Server:
+	 X-Spamd-Result:X-Spam-Score:X-Rspamd-Queue-Id:X-Spam-Flag; b=m1DyS4BIpX2x6IX7uA8K5tRWFXZxrbQJHAu06MYE0byAtwb38gaa7wuJLaZK/HCYVUaaVW1udG+s+Sq6+00HBPuBjA8nXMWl+crod2T3DRAnXv6uKRC4SN57cnRfSEhw7wKjQAXf0eGxxtEfptcD+BPtfrR1XwzOOHjQyJoxo4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=WzEDhvlN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=KNR2Ef5+; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=WzEDhvlN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=KNR2Ef5+; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="DEGHyY+4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=EUpvZ7ImcN6iRBfQR5QrQA+ZGjPdmy3aiW0Hd3hcrnQ=; b=DEGHyY+49LEH3JYxGgz1hw+W01
-	u8ZPQ5hafPlp6u04J2wN52hOOGCB3BQLSYBSxcAeo1w+RKoiyUBhGnNg0Sz3l5VCByCNn+JzxzsIr
-	5HU91Q3fKkxhIEhuZIxOnJzyqJvtzz3JDCJ143149F0dx/695qfuSJZIb6uncyA0Eszq9kdWqY5Us
-	DAISHVTJ3azdLRkAb+v7THDFfp3dk5oROIAFY3mDvTU26s7HwXOMao46pD6RbkTRBlR/0pTXv13JB
-	PQunZBTeSUjfhN1b9tPLnHan9qvIDeOhXeDJ/0y9/C0aVlrREfowX/rZRib95Gc/G2nqY0SVSd1LD
-	2mWUk//Q==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rQ66w-000ExX-1L; Wed, 17 Jan 2024 14:37:42 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rQ66v-000EvW-F7; Wed, 17 Jan 2024 14:37:41 +0100
-Subject: LSF/MM/BPF: 2024: Call for Proposals [Reminder]
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: lsf-pc@lists.linuxfoundation.org
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-nvme@lists.infradead.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
- <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
-Message-ID: <c91530f0-2688-647d-2603-a7b1673f8e42@iogearbox.net>
-Date: Wed, 17 Jan 2024 14:37:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WzEDhvlN";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="KNR2Ef5+";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WzEDhvlN";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="KNR2Ef5+"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B24C3220B6;
+	Wed, 17 Jan 2024 14:35:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705502132; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fmadxpqMu4C5DBMON/D+IvGv5Kr7MEI26W5sM9IrEes=;
+	b=WzEDhvlNIHHx9adDBXGceN+LdYnU+FqlpoDH/rtQoawQbq9SQl0CQMwV3BhyonEXIbc5ti
+	YlS8cEjzU5Qqs+knkBFSm05U+QOEFEOMUxhcUxHtnNpoEPlXhcMMBu4vc8CxRxZenNDNXl
+	zrvgZGMslJiYHyE7DSzSc3BT0X4lbUU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705502132;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fmadxpqMu4C5DBMON/D+IvGv5Kr7MEI26W5sM9IrEes=;
+	b=KNR2Ef5+zZYVRy8Nm1HsIcH3SxPY18Ona94DE7oJUNzfjsenh0g93qJQXWd4WsQb1viWBL
+	kMOmfAELIvoSCwAA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705502132; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fmadxpqMu4C5DBMON/D+IvGv5Kr7MEI26W5sM9IrEes=;
+	b=WzEDhvlNIHHx9adDBXGceN+LdYnU+FqlpoDH/rtQoawQbq9SQl0CQMwV3BhyonEXIbc5ti
+	YlS8cEjzU5Qqs+knkBFSm05U+QOEFEOMUxhcUxHtnNpoEPlXhcMMBu4vc8CxRxZenNDNXl
+	zrvgZGMslJiYHyE7DSzSc3BT0X4lbUU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705502132;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fmadxpqMu4C5DBMON/D+IvGv5Kr7MEI26W5sM9IrEes=;
+	b=KNR2Ef5+zZYVRy8Nm1HsIcH3SxPY18Ona94DE7oJUNzfjsenh0g93qJQXWd4WsQb1viWBL
+	kMOmfAELIvoSCwAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A51AB13800;
+	Wed, 17 Jan 2024 14:35:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id XmtHKLTlp2WuBgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 17 Jan 2024 14:35:32 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 540BFA0803; Wed, 17 Jan 2024 15:35:28 +0100 (CET)
+Date: Wed, 17 Jan 2024 15:35:28 +0100
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, lsf-pc@lists.linux-foundation.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
+Message-ID: <20240117143528.idmyeadhf4yzs5ck@quack3>
+References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+ <20240116114519.jcktectmk2thgagw@quack3>
+ <20240117-tupfen-unqualifiziert-173af9bc68c8@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27157/Wed Jan 17 10:41:11 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240117-tupfen-unqualifiziert-173af9bc68c8@brauner>
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=WzEDhvlN;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=KNR2Ef5+
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-5.51 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_DKIM_ARC_DNSWL_HI(-1.00)[];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.cz:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_SEVEN(0.00)[9];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_IN_DNSWL_HI(-0.50)[2a07:de40:b281:106:10:150:64:167:received];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from]
+X-Spam-Score: -5.51
+X-Rspamd-Queue-Id: B24C3220B6
+X-Spam-Flag: NO
 
-The annual Linux Storage, Filesystem, Memory Management, and BPF
-(LSF/MM/BPF) Summit for 2024 will be held from May 13 to May 15
-at the Hilton Salt Lake City Center in Salt Lake City, Utah, USA.
+On Wed 17-01-24 13:53:20, Christian Brauner wrote:
+> On Tue, Jan 16, 2024 at 12:45:19PM +0100, Jan Kara wrote:
+> > On Tue 16-01-24 11:50:32, Christian Brauner wrote:
+> > 
+> > <snip the usecase details>
+> > 
+> > > My initial reaction is to give userspace an API to drop the page cache
+> > > of a specific filesystem which may have additional uses. I initially had
+> > > started drafting an ioctl() and then got swayed towards a
+> > > posix_fadvise() flag. I found out that this was already proposed a few
+> > > years ago but got rejected as it was suspected this might just be
+> > > someone toying around without a real world use-case. I think this here
+> > > might qualify as a real-world use-case.
+> > > 
+> > > This may at least help securing users with a regular dm-crypt setup
+> > > where dm-crypt is the top layer. Users that stack additional layers on
+> > > top of dm-crypt may still leak plaintext of course if they introduce
+> > > additional caching. But that's on them.
+> > 
+> > Well, your usecase has one substantial difference from drop_caches. You
+> > actually *require* pages to be evicted from the page cache for security
+> > purposes. And giving any kind of guarantees is going to be tough. Think for
+> > example when someone grabs page cache folio reference through vmsplice(2),
+> > then you initiate your dmSuspend and want to evict page cache. What are you
+> > going to do? You cannot free the folio while the refcount is elevated, you
+> > could possibly detach it from the page cache so it isn't at least visible
+> > but that has side effects too - after you resume the folio would remain
+> > detached so it will not see changes happening to the file anymore. So IMHO
+> > the only thing you could do without problematic side-effects is report
+> > error. Which would be user unfriendly and could be actually surprisingly
+> > frequent due to trasient folio references taken by various code paths.
+> 
+> I wonder though, if you start suspending userspace and the filesystem
+> how likely are you to encounter these transient errors?
 
-LSF/MM/BPF is an invitation-only technical workshop to map out
-improvements to the Linux storage, filesystem, BPF, and memory
-management subsystems that will make their way into the mainline
-kernel within the coming years.
+Yeah, my expectation is it should not be frequent in that case. But there
+could be surprises there - e.g. pages mapping running executable code are
+practically unevictable. Userspace should be mostly sleeping so there
+shouldn't be many but there would be some so in the worst case that could
+result in always returning error from the page cache eviction which would
+not be very useful.
 
-LSF/MM/BPF 2024 will be a three day, stand-alone conference with
-four subsystem-specific tracks, cross-track discussions, as well
-as BoF and hacking sessions:
+> > Sure we could report error only if the page has pincount elevated, not only
+> > refcount, but it needs some serious thinking how this would interact.
+> > 
+> > Also what is going to be the interaction with mlock(2)?
+> > 
+> > Overall this doesn't seem like "just tweak drop_caches a bit" kind of
+> > work...
+> 
+> So when I talked to the Gnome people they were interested in an optimal
+> or a best-effort solution. So returning an error might actually be useful.
 
-          https://events.linuxfoundation.org/lsfmmbpf/
+OK. So could we then define the effect of your desired call as calling
+posix_fadvise(..., POSIX_FADV_DONTNEED) for every file? This is kind of
+best-effort eviction which is reasonably well understood by everybody.
 
-On behalf of the committee I am issuing a call for agenda proposals
-that are suitable for cross-track discussion as well as technical
-subjects for the breakout sessions.
-
-If advance notice is required for visa applications then please
-point that out in your proposal or request to attend, and submit
-the topic as soon as possible.
-
-We are asking that you please let us know you want to be invited
-by March 1, 2024. We realize that travel is an ever changing target,
-but it helps us to get an idea of possible attendance numbers.
-Clearly things can and will change, so consider the request to
-attend deadline more about planning and less about concrete plans.
-
-1) Fill out the following Google form to request attendance and
-suggest any topics for discussion:
-
-          https://forms.gle/TGCgBDH1x5pXiWFo7
-
-In previous years we have accidentally missed people's attendance
-requests because they either did not Cc lsf-pc@ or we simply missed
-them in the flurry of emails we get. Our community is large and our
-volunteers are busy, filling this out will help us to make sure we
-do not miss anybody.
-
-2) Proposals for agenda topics should ideally still be sent to the
-following lists to allow for discussion among your peers. This will
-help us figure out which topics are important for the agenda:
-
-          lsf-pc@lists.linux-foundation.org
-
-... and Cc the mailing lists that are relevant for the topic in
-question:
-
-          FS:     linux-fsdevel@vger.kernel.org
-          MM:     linux-mm@kvack.org
-          Block:  linux-block@vger.kernel.org
-          ATA:    linux-ide@vger.kernel.org
-          SCSI:   linux-scsi@vger.kernel.org
-          NVMe:   linux-nvme@lists.infradead.org
-          BPF:    bpf@vger.kernel.org
-
-Please tag your proposal with [LSF/MM/BPF TOPIC] to make it easier
-to track. In addition, please make sure to start a new thread for
-each topic rather than following up to an existing one. Agenda
-topics and attendees will be selected by the program committee,
-but the final agenda will be formed by consensus of the attendees
-on the day.
-
-3) This year we would also like to try and make sure we are
-including new members in the community that the program committee
-may not be familiar with. The Google form has an area for people to
-add required/optional attendees. Please encourage new members of the
-community to submit a request for an invite as well, but additionally
-if maintainers or long term community members could add nominees to
-the form it would help us make sure that new members get the proper
-consideration.
-
-For discussion leaders, slides and visualizations are encouraged to
-outline the subject matter and focus the discussions. Please refrain
-from lengthy presentations and talks in order for sessions to be
-productive; the sessions are supposed to be interactive, inclusive
-discussions.
-
-We are still looking into the virtual component. We will likely run
-something similar to what we did last year, but details on that will
-be forthcoming.
-
-2023: https://lwn.net/Articles/lsfmmbpf2023/
-
-2022: https://lwn.net/Articles/lsfmm2022/
-
-2019: https://lwn.net/Articles/lsfmm2019/
-
-2018: https://lwn.net/Articles/lsfmm2018/
-
-2017: https://lwn.net/Articles/lsfmm2017/
-
-2016: https://lwn.net/Articles/lsfmm2016/
-
-2015: https://lwn.net/Articles/lsfmm2015/
-
-2014: http://lwn.net/Articles/LSFMM2014/
-
-4) If you have feedback on last year's meeting that we can use to
-improve this year's, please also send that to:
-
-          lsf-pc@lists.linux-foundation.org
-
-Thank you on behalf of the program committee:
-
-          Amir Goldstein (Filesystems)
-          Jan Kara (Filesystems)
-          Martin K. Petersen (Storage)
-          Javier González (Storage)
-          Michal Hocko (MM)
-          Dan Williams (MM)
-          Daniel Borkmann (BPF)
-          Martin KaFai Lau (BPF)
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
