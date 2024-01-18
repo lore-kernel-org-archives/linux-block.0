@@ -1,61 +1,66 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CDC2E3F5
-	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 19:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6FB2E3F8
+	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 19:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705605832; cv=none; b=vFOrCmcLq1yyOeozWBVlcq8Q7gTUEvWltWZ82jY+ngrMPhvT+WQGfIU2EZKDJ6eaeJD9JlipjPGvpdzR2aAYjKRqM7YF4kuMsib4/BiP7AczSIrrOSiVYJUdoNu27247E6Ndbb0ZaOcGobjp8MOYLQwraOyWiSs6q/bXAAWobkk=
+	t=1705605833; cv=none; b=tFQpZbeDYbrMyElmC9SxszQvnVzIOmDRr5oFzW4Sx5BrxMfmWHsPJfSOH9Y4oVgCsW6LOCMk4V5A0aEOYBYcGS0V+BPBGPIeSWFZ8Kj1o1SocZHR2rDO/tLiOJ1cr9FEJvXzXwFOgwUa2uJ8NV7GXNULHUMzrgF7H8dbLSdMFVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705605832; c=relaxed/simple;
-	bh=Yp0E2AgSbasub0nPNig18BzWpbGNPiHp5vfLLAGw0Eg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=M/n6c5KfHntGTFT9tkqQyUy3fM7+Ry1LAWchby7gBymMD3nzcMMJPcX8xlsR05b1+LW+01IoDd2Il1oELgt9XeOlqeQm7tLqt0A/Dndmw7KWWBlecWO3SFFa7NRCkxaS6D/t6J9Z/nul3ZxVwc9vHtwM6E8/hjVISCrhWjifHRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FtntKtuF; arc=none smtp.client-ip=209.85.166.49
+	s=arc-20240116; t=1705605833; c=relaxed/simple;
+	bh=+mtYadm3M+ilgJiBZY+vUq8IU5xjNYe+J28FqoPsnj8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M9HBruxgI0A5IhSqApTTBuDcZQpMb3wFTk56oQoANInPahqDb+78b7pmdzKAoSi8erQ7O/v73AO5x1c8LNNDpHiEk4DBdomO4Bu+bZFpL2NBsxqGOuQNjNeX4BhxbvGc9uPpzQYSysBSP4nccsfBPqxYzlRCqNu5G+upecsnf7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CPQ1aONl; arc=none smtp.client-ip=209.85.166.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FtntKtuF"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bee01886baso50331239f.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 11:23:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CPQ1aONl"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7bee01886baso50332239f.1
+        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 11:23:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705605828; x=1706210628; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mw/EBgf3QFgrXF9/RJBSlupid0w7/Gbvv5V64k+/wBY=;
-        b=FtntKtuFExYeeCi/O24QB2U48ZKxxyGudT2LMIllGgz9wZetpcM8O2aa3FXUyOpSnA
-         x5dZh201sNcfuEEI6kDDorbyJxXpLpNK9QPKk9UX3ZAt4h9nq4kmD3HuX7VRD73acu37
-         mS1kwyImCFUz5XDzLSv7ILDtrdXIvMjFu9F33kcrgBB6f220g49DqzmT0/5BUEEkRroI
-         tS8FoJKF7CXexU+PN8ELTLvUT8AuBkQZcfbm0no8m91kWja9Mr29OfGmPhzxIjiKPYvS
-         uwYP4diXM9oKt4nQg7Vm4rfRWEdMkhWsCzwuH058d8y0wS/Hsm4vBie4m8moc0aVNJ8n
-         tVIQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705605829; x=1706210629; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fl7xBNgNabyen0blKRPhiVPUOU+ukJNqSOFOnGFVt7U=;
+        b=CPQ1aONlkJl5kMNKdcnDcpnZdqDs5Vh7Vh8vpwPM02R+faACbfNSIjUq6el8RpdRNh
+         uuq6wDT6mH3ed4KxVNuO5Sp8gn3p8Zi6k6oWyRtBwph2yUgZsbwhpjKvW0cyiUZLea84
+         V3HxS4XoweIUu3oQQuK/Q19N7o7iMMjAXdL1U3RN47z3F3cERl9b/rF+AeIOYHDhjzWC
+         XWYSAMTCZ8INdY18H3pMjuaFvzuwho1Z8CQofbLwrg9A9szjGuj4k+WboA2nVsB+I1q5
+         4xJ69MwzaT/6vl8DjrLQjTeBPDuUcKqQBTMb+CS6vru/Uvl23QciuiEXBP1Yrv9JuMI8
+         KM9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705605828; x=1706210628;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mw/EBgf3QFgrXF9/RJBSlupid0w7/Gbvv5V64k+/wBY=;
-        b=KemSyRmRDA01b4ITdyB8szN7mFzfZ3++O/DnPI8aGPVvPXyDtTdpzgLpoPQlmJFHc7
-         2JjuAngK0pfmgXPfS3rvoY0+phtHz8hQuSlv0rLthuHQ81vDeTidBUQWRtmh9ZQnWXfr
-         pXika/ABHCNKEnqSl70Uc1U97r9QWLvdiAv4/hjFjHeeuzEDADRSCqv63Lq1r/kLeBhw
-         vwT1phsmaKnLoX75d0FHL+AHfTxq3+mJe31W+VJRYTWyuLWRyTalWNohqOCLtA+ZORsZ
-         0MNTtYQkKDoswVg02wsOedcGHOISg3oOapo39Ta/WkF4nGsjwUyNcT6SLwdQWPsTYM1n
-         +viQ==
-X-Gm-Message-State: AOJu0Yyfc7QKeAahnGDt4IHoDSqZae3cH3ondqpWXu7pPEervh6fSR07
-	LkX4LbfiCMuxlrj17JGWhohnzpW0PYx6MBDUKXj2M4PyeX6BgTQQPmEIbM6b1d6qccdwe5vOQhD
-	qo3s=
-X-Google-Smtp-Source: AGHT+IH4S1mpxXN35s35RC65Kcbl7r9DKsdPn/OAxVzhOF/3VxZCHT451dq8UnNMr44qkbRtiCj/2g==
-X-Received: by 2002:a5d:8b50:0:b0:7bf:7374:edd2 with SMTP id c16-20020a5d8b50000000b007bf7374edd2mr396050iot.0.1705605827788;
-        Thu, 18 Jan 2024 11:23:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705605829; x=1706210629;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fl7xBNgNabyen0blKRPhiVPUOU+ukJNqSOFOnGFVt7U=;
+        b=XQJsIdW0zeKd3LSvtdaSHPsWEhz4dgD7Fjy19BHobEkQWILK7YbJU+3HDArTyA+4vo
+         iRGLlzlW8cFFVrnYST+iE94cR9Kvs4qyiDj8yWxHnwUQNZCcuB/AgxZ8xinFdI6apY8L
+         nLe051Imz5iMjuudzxvIFckqoBUl2GSKH1VR++aVTCam5H4P+yi6RV9UMqtC3JAzlNWk
+         adFqgLxUXEAzsykIHuHmy72eGFCO1bz2jEUf8urSaqIE8yV9YvUOBFs4DJEaTvR/jr+p
+         Yg9gIT6/XYRhs4PMgYH5GDoRqEyfH8Rqcyg0hkUbpqAuv6C0DBw7rzRmlXBeY0w0JFxa
+         Ts5g==
+X-Gm-Message-State: AOJu0YxjB72loldMklx11S8AszdnNAcoBez0gNrb58g8kNzOkz1HRlix
+	QDww2vw7X7wn6/LZ0kriolZ/eQcSfadw/AIw1Oy+Yo9xAnS/sqC1O70xtWEWxIf6/wjY+CqyS/S
+	yhsc=
+X-Google-Smtp-Source: AGHT+IEH7pCx5Oo1v/Im3VilHn0TAfTpltlALsNiDAiqbGs1IJrB+cCCM0eC/rPdapRquUhgT16V2Q==
+X-Received: by 2002:a6b:5a0d:0:b0:7bf:35d5:bd21 with SMTP id o13-20020a6b5a0d000000b007bf35d5bd21mr356065iob.1.1705605829454;
+        Thu, 18 Jan 2024 11:23:49 -0800 (PST)
 Received: from localhost.localdomain ([96.43.243.2])
         by smtp.gmail.com with ESMTPSA id gc18-20020a056638671200b0046e5c69376asm1155588jab.40.2024.01.18.11.23.47
-        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jan 2024 11:23:47 -0800 (PST)
+        Thu, 18 Jan 2024 11:23:48 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
-Subject: [PATCHSET RFC v3 0/6] Cache issue side time querying
-Date: Thu, 18 Jan 2024 12:20:51 -0700
-Message-ID: <20240118192343.953539-1-axboe@kernel.dk>
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/6] block: move cgroup time handling code into blkdev.h
+Date: Thu, 18 Jan 2024 12:20:52 -0700
+Message-ID: <20240118192343.953539-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240118192343.953539-1-axboe@kernel.dk>
+References: <20240118192343.953539-1-axboe@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,59 +69,129 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+In preparation for moving time keeping into blkdev.h, move the cgroup
+related code for timestamps in here too. This will help avoid a circular
+dependency.
 
-When I run my peak testing to see if we've regressed, my test script
-always does:
+Leave struct bio_issue in blk_types.h as it's a proper time definition.
 
-	echo 0 > /sys/block/$DEV/queue/iostats
-	echo 2 > /sys/block/$DEV/queue/nomerges
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ include/linux/blk_types.h | 42 --------------------------------------
+ include/linux/blkdev.h    | 43 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+), 42 deletions(-)
 
-for each device being used. It's unfortunate that we need to disable
-iostats, but without doing that, I lose about 12% performance. The main
-reason for that is the time querying we need to do, when iostats are
-enabled. As it turns out, lots of other block code is quite trigger
-happy with querying time as well. We do have some nice batching in place
-which helps ammortize that, but it's not perfect.
-
-This trivial patchset simply caches the current time in struct blk_plug,
-on the premise that any issue side time querying can get adequate
-granularity through that. Nobody really needs nsec granularity on the
-timestamp.
-
-Results in patch 2, but tldr is a more than 9% improvement (108M -> 118M
-IOPS) for my test case, which doesn't even enable most of the costly
-block layer items that you'd typically find in a distro and which would
-further increase the number of issue side time calls. This brings iostats
-enabled _almost_ to the level of turning it off.
-
-Can also be found in my block-issue-ts branch:
-
-https://git.kernel.dk/cgit/linux/log/?h=block-issue-ts
-
- block/bfq-cgroup.c        | 14 +++---
- block/bfq-iosched.c       | 22 +++++-----
- block/blk-cgroup.c        |  2 +-
- block/blk-core.c          | 33 ++++++++------
- block/blk-flush.c         |  2 +-
- block/blk-iocost.c        |  6 +--
- block/blk-iolatency.c     |  6 +--
- block/blk-mq.c            | 18 ++++----
- block/blk-throttle.c      |  6 +--
- block/blk-wbt.c           |  5 +--
- drivers/md/raid1-10.c     |  2 +-
- include/linux/blk_types.h | 42 ------------------
- include/linux/blkdev.h    | 92 ++++++++++++++++++++++++++++++++++++---
- include/linux/sched.h     |  2 +-
- kernel/sched/core.c       |  4 +-
- 15 files changed, 151 insertions(+), 105 deletions(-)
-
-Changes since v2:
-	- Ensure PF_BLOCK_TS is cleared when plug is flushed or
-	  invalidated
-	- Fix missing raid1-10 conversion
-	- Fix missing cgroup timestamp
-
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index f288c94374b3..1c07848dea7e 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -206,52 +206,10 @@ static inline bool blk_path_error(blk_status_t error)
+ 	return true;
+ }
+ 
+-/*
+- * From most significant bit:
+- * 1 bit: reserved for other usage, see below
+- * 12 bits: original size of bio
+- * 51 bits: issue time of bio
+- */
+-#define BIO_ISSUE_RES_BITS      1
+-#define BIO_ISSUE_SIZE_BITS     12
+-#define BIO_ISSUE_RES_SHIFT     (64 - BIO_ISSUE_RES_BITS)
+-#define BIO_ISSUE_SIZE_SHIFT    (BIO_ISSUE_RES_SHIFT - BIO_ISSUE_SIZE_BITS)
+-#define BIO_ISSUE_TIME_MASK     ((1ULL << BIO_ISSUE_SIZE_SHIFT) - 1)
+-#define BIO_ISSUE_SIZE_MASK     \
+-	(((1ULL << BIO_ISSUE_SIZE_BITS) - 1) << BIO_ISSUE_SIZE_SHIFT)
+-#define BIO_ISSUE_RES_MASK      (~((1ULL << BIO_ISSUE_RES_SHIFT) - 1))
+-
+-/* Reserved bit for blk-throtl */
+-#define BIO_ISSUE_THROTL_SKIP_LATENCY (1ULL << 63)
+-
+ struct bio_issue {
+ 	u64 value;
+ };
+ 
+-static inline u64 __bio_issue_time(u64 time)
+-{
+-	return time & BIO_ISSUE_TIME_MASK;
+-}
+-
+-static inline u64 bio_issue_time(struct bio_issue *issue)
+-{
+-	return __bio_issue_time(issue->value);
+-}
+-
+-static inline sector_t bio_issue_size(struct bio_issue *issue)
+-{
+-	return ((issue->value & BIO_ISSUE_SIZE_MASK) >> BIO_ISSUE_SIZE_SHIFT);
+-}
+-
+-static inline void bio_issue_init(struct bio_issue *issue,
+-				       sector_t size)
+-{
+-	size &= (1ULL << BIO_ISSUE_SIZE_BITS) - 1;
+-	issue->value = ((issue->value & BIO_ISSUE_RES_MASK) |
+-			(ktime_get_ns() & BIO_ISSUE_TIME_MASK) |
+-			((u64)size << BIO_ISSUE_SIZE_SHIFT));
+-}
+-
+ typedef __u32 __bitwise blk_opf_t;
+ 
+ typedef unsigned int blk_qc_t;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 99e4f5e72213..da0f7e1caa5a 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -974,6 +974,49 @@ static inline void blk_flush_plug(struct blk_plug *plug, bool async)
+ 
+ int blkdev_issue_flush(struct block_device *bdev);
+ long nr_blockdev_pages(void);
++
++/*
++ * From most significant bit:
++ * 1 bit: reserved for other usage, see below
++ * 12 bits: original size of bio
++ * 51 bits: issue time of bio
++ */
++#define BIO_ISSUE_RES_BITS      1
++#define BIO_ISSUE_SIZE_BITS     12
++#define BIO_ISSUE_RES_SHIFT     (64 - BIO_ISSUE_RES_BITS)
++#define BIO_ISSUE_SIZE_SHIFT    (BIO_ISSUE_RES_SHIFT - BIO_ISSUE_SIZE_BITS)
++#define BIO_ISSUE_TIME_MASK     ((1ULL << BIO_ISSUE_SIZE_SHIFT) - 1)
++#define BIO_ISSUE_SIZE_MASK     \
++	(((1ULL << BIO_ISSUE_SIZE_BITS) - 1) << BIO_ISSUE_SIZE_SHIFT)
++#define BIO_ISSUE_RES_MASK      (~((1ULL << BIO_ISSUE_RES_SHIFT) - 1))
++
++/* Reserved bit for blk-throtl */
++#define BIO_ISSUE_THROTL_SKIP_LATENCY (1ULL << 63)
++
++static inline u64 __bio_issue_time(u64 time)
++{
++	return time & BIO_ISSUE_TIME_MASK;
++}
++
++static inline u64 bio_issue_time(struct bio_issue *issue)
++{
++	return __bio_issue_time(issue->value);
++}
++
++static inline sector_t bio_issue_size(struct bio_issue *issue)
++{
++	return ((issue->value & BIO_ISSUE_SIZE_MASK) >> BIO_ISSUE_SIZE_SHIFT);
++}
++
++static inline void bio_issue_init(struct bio_issue *issue,
++				       sector_t size)
++{
++	size &= (1ULL << BIO_ISSUE_SIZE_BITS) - 1;
++	issue->value = ((issue->value & BIO_ISSUE_RES_MASK) |
++			(ktime_get_ns() & BIO_ISSUE_TIME_MASK) |
++			((u64)size << BIO_ISSUE_SIZE_SHIFT));
++}
++
+ #else /* CONFIG_BLOCK */
+ struct blk_plug {
+ };
 -- 
-Jens Axboe
+2.43.0
 
