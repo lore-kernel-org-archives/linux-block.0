@@ -1,46 +1,81 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4118517C3;
-	Thu, 18 Jan 2024 00:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2519467
+	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 06:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705539272; cv=none; b=Ya4GGdnf4aXCmstU2p7UwvOgTIhxCnI8Opy6lVFMUCMLDgDtdsLZsWDVZVBZZCRBPItYhvMTczbN30sLw3WISktTAZI8jVpjopewIx+SeYPc9ArSqVpZdxko/fA9gsWH1ExpgFGgLSIDsiFUp7U5PDmYHjd3mmawEGb79+RCWMI=
+	t=1705558414; cv=none; b=N7Ex3FMtMTVSdmBy1sH/pA6Zy+U28VpQkC6Sa5UctYnfYBVBhp8CVRCmcpaMZWFipuEduhSThLg40uej7IIl/6+Rg8NUqtkIap5IqaOXroFFlTmbgHBIysCqjCR4uP88iJxLK/fjqY3lz6IPfqun/MWrz8MbilfcpHFrvgL5jQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705539272; c=relaxed/simple;
-	bh=U0wYbpkVCX0nOWn+y9CyglGR9SY/KEry8JLYHWUQw6Q=;
-	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
-	 X-Google-Smtp-Source:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding; b=N+1/UvNS0kcIlQ2m9jHWHQqempJ78I4k5fSU7K9NyuUBg2uN/NQaqtdi0Fl0fTOsESW3+jQ+gfAu52+8y7cxSEeRaPW3URHhg9JCyssJqDUjck1KOHDFEUjzRitqsfI85nxhR+1SAaWRyfxOWeSG0XrYWaMfKLCKM0YwbuT5k80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-36074b286d6so59221855ab.1;
-        Wed, 17 Jan 2024 16:54:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705539270; x=1706144070;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I45qqr9n38DIIRtEluaEbO4BQdx4bUm7wkLvhBzuhuU=;
-        b=pZQWtf+ryje0BhXLDSmrES6xc87ayG/XpYIt4P49KzK1Dr8oHbvkoMRlXze67aTzq9
-         7ITNo+/Ik72QsxfajkmaTxdwX4ojwGY3Zpyw8oMP6XkOfjXFYBNO79Ts8+QXYvl78CSf
-         0FTAUX+5cgttwV9wKqIlb9HaFQx4/SC7RtgXf3dK6zO/+iV5tBVHs6AIDHJRf3mrdH1L
-         rdRyP/U2BlfK/6y8bOtuJvMu376jx2uSQDM5gskmmNYzv/OiL0n5A2YIXnGmredikKST
-         10D1kMuEqoa0C4LrSf35VheTa7fWJuW1yqVMR2NHF8Rg6x5kGzx6tAyKM/PqQtfhjSja
-         pdyQ==
-X-Gm-Message-State: AOJu0YycxnAOcR9MKkjtypGuieGa54avPQEbvk7fEzdp6xLaADRxPSyn
-	BxH0J6C+k3VW8iaoRdnNkKBKWcQEwQhGOW6GRq+xvU+NZ/nM0vp+38s3hL+Z
-X-Google-Smtp-Source: AGHT+IHesprjDRDHKDmWAU1kXOqX9BSX1AEcL/MOMAN2IhfSYFpDHbPo2rnOkF9E8n7AzllJQIuYag==
-X-Received: by 2002:a92:cec2:0:b0:360:70a9:12c5 with SMTP id z2-20020a92cec2000000b0036070a912c5mr173583ilq.11.1705539270228;
-        Wed, 17 Jan 2024 16:54:30 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id y63-20020a638a42000000b005c2185be2basm281448pgd.54.2024.01.17.16.54.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 16:54:29 -0800 (PST)
-Message-ID: <0853691b-0b70-48c5-825a-4b709d066e20@acm.org>
-Date: Wed, 17 Jan 2024 16:54:28 -0800
+	s=arc-20240116; t=1705558414; c=relaxed/simple;
+	bh=QXkc6ICjU3udzzx+eJ8q0NWKxcGr/kWxtTrWIwyAzCQ=;
+	h=Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:Content-Language:To:Cc:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Spam-Level:
+	 X-Spam-Score:X-Spamd-Result:X-Spam-Flag; b=K6XLvKWVtiRB+z3jE/RTJ7QgO/aRaXJsaLUDjGZrZU5BDgVeB2Pn0CR0bAS6b1ka5DcgOjzAXx4BkLW9vdm71hVhS552bL1B3yTb8QnqKbK9pbC8E1uvlCkujCPHcNvcYDuBrEXi0SW3rao+KUtRHmCVKbTHC+zAV2ZLb5FWhOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qDd1ExSb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CogyaDWY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Iz2GHY7d; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=M+2Eokzc; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qDd1ExSb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CogyaDWY";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Iz2GHY7d";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="M+2Eokzc"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CF7061F461;
+	Thu, 18 Jan 2024 06:13:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1705558409; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zd8+L+8Yu0wsGCdgXw69NN+YaaLD4Hry2qPw8jaVvHw=;
+	b=qDd1ExSbzEgMI7eLbdHII6NfWVLRpUDtoqTdFuP/0+f7pFSmBlDWHYJzq6NB4B1yq6OYca
+	Ze5Q7SEVTqxxygtyeJw83oM6TqGTpyt6kgGqo7RracjYcp86Lgn0EWNNy+T0oZlgX1QR4L
+	a3Li7yGWtELMMGZIkCi5UiG580L31CE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1705558409;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zd8+L+8Yu0wsGCdgXw69NN+YaaLD4Hry2qPw8jaVvHw=;
+	b=CogyaDWYSMO7YgYwcnZFCQ1D8hjLVc/3gWvP+rGrPLelD0BucetU+4diPVe4V1ZgKaUpXt
+	QoGmSPxpMGkfLfBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1705558407; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zd8+L+8Yu0wsGCdgXw69NN+YaaLD4Hry2qPw8jaVvHw=;
+	b=Iz2GHY7deR7xmA8F0FB9caeJp71wR5AiooMbosGK/XJ0+7XbwtRLvkRC8hSuh8C1PNN4om
+	hJUhxSLzwlEDTvXZNbfkUt06gS22Q0AE86IbDzhHTTN+1pmFOi//a/qI/sCZiZpHAyDwue
+	bDen7v2nQGZ6arp/zXAW90cDaWto3rQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1705558407;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zd8+L+8Yu0wsGCdgXw69NN+YaaLD4Hry2qPw8jaVvHw=;
+	b=M+2EokzcjSp3if3RM3H6qaIShwcwsGfTceIRuZ/GN5mJGEOnWkRkS4Mgt0puyilODzjeb+
+	hQVtvTY5AtKFN2Bg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8E49F136F5;
+	Thu, 18 Jan 2024 06:13:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id J7yOIIfBqGVPAwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 18 Jan 2024 06:13:27 +0000
+Message-ID: <a3b8e644-0085-494f-a16f-f1ee11ddf1cb@suse.de>
+Date: Thu, 18 Jan 2024 07:13:26 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,66 +83,65 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Zoned Storage Support
+Subject: Re: [PATCH] blk-mq: Remove the hctx 'run' debugfs attribute
 Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Christoph Hellwig <hch@lst.de>
-References: <5b3e6a01-1039-4b68-8f02-386f3cc9ddd1@acm.org>
- <cc6999c2-2d53-4340-8e2b-c50cae1e5c3a@kernel.org>
- <43cc2e4c-1dce-40ab-b4dc-1aadbeb65371@acm.org>
- <c38ab7b2-63aa-4a0c-9fa6-96be304d8df1@kernel.dk>
- <2955b44a-68c0-4d95-8ff1-da38ef99810f@acm.org>
- <9af03351-a04a-4e61-a6d8-b58236b041a3@kernel.dk>
- <c6dfb4f5-10f9-461e-8743-b730a8384f95@acm.org>
- <e19746ce-fdea-4372-bc26-1ee7b1a9a22d@kernel.dk>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <e19746ce-fdea-4372-bc26-1ee7b1a9a22d@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Gabriel Ryan <gabe@cs.columbia.edu>
+References: <20240117203609.4122520-1-bvanassche@acm.org>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240117203609.4122520-1-bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -1.89
+X-Spamd-Result: default: False [-1.89 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-0.60)[81.83%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCPT_COUNT_FIVE(0.00)[6];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[kernel.dk:email,columbia.edu:email,acm.org:email,suse.de:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Flag: NO
 
-On 1/17/24 16:42, Jens Axboe wrote:
-> On 1/17/24 5:38 PM, Bart Van Assche wrote:
->> On 1/17/24 10:43, Jens Axboe wrote:
->>> Do we care? Maybe not, if we accept that an IO scheduler is just for
->>> "slower devices". But let's not go around spouting some 200K number as
->>> if it's gospel, when it depends on so many factors like IO workload,
->>> system used, etc.
->> I've never seen more than 200K IOPS in a single-threaded test. Since
->> your tests report higher IOPS numbers, I assume that you are submitting
->> I/O from multiple CPU cores at the same time.
+On 1/17/24 21:36, Bart Van Assche wrote:
+> Nobody uses the debugfs hctx 'run' attribute. Hence remove this
+> attribute and also the code that updates the corresponding member
+> variable.
 > 
-> Single core, using mq-deadline (with the poc patch, but number without
-> you can already find in a previous reply):
+> Suggested-by: Jens Axboe <axboe@kernel.dk>
+> Cc: Gabriel Ryan <gabe@cs.columbia.edu>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   block/blk-mq-debugfs.c | 18 ------------------
+>   block/blk-mq-sched.c   |  2 --
+>   include/linux/blk-mq.h |  3 ---
+>   3 files changed, 23 deletions(-)
 > 
-> axboe@7950x ~/g/fio (master)> cat /sys/block/nvme0n1/queue/scheduler
-> none [mq-deadline]
-> axboe@7950x ~/g/fio (master)> sudo t/io_uring -p1 -d128 -b512 -s32 -c32 -F1 -B1 -R1 -X1 -n1 /dev/nvme0n1
-> 
-> submitter=0, tid=1957, file=/dev/nvme0n1, node=-1
-> polled=1, fixedbufs=1/0, register_files=1, buffered=0, QD=128
-> Engine=io_uring, sq_ring=128, cq_ring=128
-> IOPS=5.10M, BW=2.49GiB/s, IOS/call=32/31
-> IOPS=5.10M, BW=2.49GiB/s, IOS/call=32/32
-> IOPS=5.10M, BW=2.49GiB/s, IOS/call=31/31
-> 
-> Using non-polled IO, the number is around 4M.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-A correction: my tests ran with 72 fio jobs instead of 1. I used
-fio + io_uring + null_blk in my tests. I see about 1100 K IOPS with
-a single fio job and about 150 K IOPS with 72 fio jobs. This shows
-how I measured mq-deadline performance:
+Cheers,
 
-modprobe null_blk
-fio --bs=4096 --group_reporting=1 --gtod_reduce=1 --invalidate=1 \
-     --ioengine=io_uring --ioscheduler=mq-deadline --norandommap \
-     --runtime=60 --rw=randread --thread --time_based=1 --buffered=0 \
-     --numjobs=72 --iodepth=128 --iodepth_batch_submit=64 \
-     --iodepth_batch_complete=64 --name=/dev/nullb0 --filename=/dev/nullb0
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Ivo Totev, Andrew McDonald,
+Werner Knoblich
 
-Thanks,
-
-Bart.
