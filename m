@@ -1,64 +1,64 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B232E3F8
-	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 19:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073A72E41A
+	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 19:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705605836; cv=none; b=k6dswxdjLx06qEf3r2bOT/wCY0orV+k6PgPevegvJL1e419wCBp2WvLf+RgLVwfG6GhByUbUwlEuLtMwUTB84fIdHubTBevi/zRzlH2QP2o/L28Mx6DucAQ23ncvAGLV+oC0mzPs1BGwdimfcXPoJx/vsydMVs3YcGKetliZU7o=
+	t=1705605838; cv=none; b=htTx51smYRG0WoyixOwGhcjcmNkO6KmCypkslY4jsTUs4W255abzk50VPc77Z2XEhOPs2Jx5t/6+nCOC4zpFGTh//0rwxVG6zyRg0BFG6ZrbGGkMbMr4R6n+R/Gl0um9fhhbY1CyJ4CZ50aTsVxT77+DhTXzLWyAydrbPV2lXT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705605836; c=relaxed/simple;
-	bh=KrkEwpyLUCm9K4yMuhSJJ1LIar/4ExZN2t7cEh8dOaI=;
+	s=arc-20240116; t=1705605838; c=relaxed/simple;
+	bh=KY5qKDHUEdtAiLOzRKB7ikeqsfi0OBJRwdVu0qawenM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nqflI3r0tmK8sFpkKcM83BwHrIKkxHkagNlZAXzDI4NFUs9GBBcKqXhXhOOYsywTBjmPo1xB5dgzsVXxeeWHwrc3coth6CJs8Qrn+QQu15qtPZozSDFdjTZz+1ZosaBktz7JbVHCnmj1JntpkS/T9b//Ldfstz1fNBpCRJxlQtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EzfO7iJ1; arc=none smtp.client-ip=209.85.166.48
+	 MIME-Version; b=Z0cdxVBxNSL77B9QTfi6orGmsTd7brevDeysNzN4dBLm73lZkEiYQj5cvaE0pxgsxsweq06nPuAxCQDfW93yjIMVxFUrlpEcbpPoW3ZgljsNXrC3eLSUoopkYOpM0CTUXB08KRVjgf8dyENw8NJ6q5dec19rYwMHIxLMA6ijxkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GeV2daDf; arc=none smtp.client-ip=209.85.166.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EzfO7iJ1"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso84041539f.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 11:23:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GeV2daDf"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bf3283c18dso99839f.0
+        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 11:23:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705605833; x=1706210633; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705605835; x=1706210635; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NrTfITcy5xm7tHNgS6AMID6p74u6gKo/HsHWXAFrnLE=;
-        b=EzfO7iJ1jz1JsVABPv2W4vCUBvL/TVuK7AUsnoX+2nDCbdCsWmz8TfLx6hInYQbMdk
-         bshouqdYM9AxlDhij7hRQIRx0E5RWQfhKwDxmshp23/A/DGc+Lk/SZMTO66uUXb+GoUU
-         YrogHtTNJYQBrz6pJrn0okIQmsfvTAgalKASKDNGI5aL15ulipkTq/6qKYaCXQhy9u6q
-         RMdosKfZitGsQDAyCcRAcrIS5cykaP1v91JfYPE95ztUG88AJ9P3NRplOgcPcHF0f+ew
-         dHdhUN/BQlnXCdaj4mRatBD0sQA52mkMsUH6jWpljfVMTj3hdR4p4QbduT7RfpSZF5ti
-         rzlQ==
+        bh=nG9bYwLCypK88nVwwMvHo/MQtnbDeCQ4odqIEB4uqt8=;
+        b=GeV2daDfrIthDUAVh8jqG5h7djRbQM7FiBxD7lldiz0Di9M5GkkyasFELO0HhRUkZ+
+         42RgMl8dsfBGvyt+pvHhcKboPBNB8a6aHdop3RzfzECfVmIPp54NaO5jRvK5nl1sznyJ
+         d040dEJB+Wo3Kvh75SJcZmAZBUFl1WG5goDaTUT75FAg4KxDfjWIoElgvjLWRpnAVBJj
+         PJiDfEQ4xSgAWDo/hzMzK23Bsr2fCyHRtt7ROWr2j3mqAioez9+fnm/bjpCijemas2sF
+         Dh8TL/HOFGZn/RsBq4XkmBCIhlUebl+4njsQWvSUTgwMClEZ6Accd8HbaYKQ0VbNfNcC
+         0wwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705605833; x=1706210633;
+        d=1e100.net; s=20230601; t=1705605835; x=1706210635;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NrTfITcy5xm7tHNgS6AMID6p74u6gKo/HsHWXAFrnLE=;
-        b=nG6H7Oyj3Z+JPxQuFEJKSzOr6nqXOYufAhaf2dqPppPzyRCodWxK1Wga6kt31E3vll
-         d2pah6PcXMEJX9sc8PXM6dIDxW95brFLWimVhW/YotDsrxG821e33LwryW4lAePKoLjf
-         F2jwtYFv0cWNpj77TX7oJNpdNdUch4WzvW4N3/5sv8yDr8kI+SI45WxRUtAEPcyNZoMo
-         qmWNUsj4wDgzz4m9c4jw0rlbuHgo/b8r4uuHp3tXHOxL0yKxXOm5KCFD6NoClufbV24h
-         2cY1yj+458qdK8MCxSMGPmm4qWcbRSbL9v5Q4UkJNmxkKuI+oNkVY6JpNiHTevCpKr/n
-         Rkiw==
-X-Gm-Message-State: AOJu0Yx94LYKCz5BoaHIHs1hkK7LCIfQucKs0c+8v28ASpHtfC4OXRvY
-	uroCpu0froP/s7RQQDmpgehlVu8yM5XBfjvLLli3p5HH8kN1uaX6CsRUhIPsIh8UVFvQptQauVG
-	umFo=
-X-Google-Smtp-Source: AGHT+IEj7AdGjD3oJmEkC4C7/AzOt4kWeP1z4BO5i9CLAZ/qEk3IZjUQ0FAnadthY5x2gVas15hmYQ==
-X-Received: by 2002:a05:6602:1233:b0:7bc:207d:5178 with SMTP id z19-20020a056602123300b007bc207d5178mr2700865iot.2.1705605832939;
-        Thu, 18 Jan 2024 11:23:52 -0800 (PST)
+        bh=nG9bYwLCypK88nVwwMvHo/MQtnbDeCQ4odqIEB4uqt8=;
+        b=ozTvEX/vpiGimVluLp4U2rtnL2JUnjYrMzU4/rERL4UKbHUif945VYC1Cwe3WXWPbC
+         MKzhlWya+liT3Y9G3MHUDpceQPjlYwG1wxky4hgsNG5HeFE27RWGNS1crXxjTY0yWVSC
+         PZiZPqzl52KmIQlV6Aee7CYmRbxBzTOsSQrr0HCFLExuP9oMPwLdUFKwtBnX1mzOR6NJ
+         jn9zGzAn9u5DGAgUjYyU97K8699L+YPFzk/5U5cdLScTaljWzrFkbz/5/X8Qga+RXWhH
+         oyeay0RG6jdxw7+LG4dGTL0WN5ZFvNMV43YwF1W5dwz7ZHrSc8Ryd7KszBDMOmy3/5Gq
+         KNBA==
+X-Gm-Message-State: AOJu0Yw7LpFM8Ywegb6S+EjIgXHDHvv4uqOCCe5PrDw4y3UckqWp4m9c
+	NG6Nyp8wmEEAJ52DLNceq6fQJAzvVeYQ2gp/g2UI31iJMRC7HiC/Q/JfxwC+sTeCB9LpY5ozhjm
+	1PW4=
+X-Google-Smtp-Source: AGHT+IGPbRNmeIwwoBg/o1yVOjJ1Tf0T7e9UDGPZFa3nmr4E9dl/ef2YvgRft6cnQUkFNwxbmgmNqA==
+X-Received: by 2002:a5e:8302:0:b0:7be:e376:fc44 with SMTP id x2-20020a5e8302000000b007bee376fc44mr357826iom.2.1705605834694;
+        Thu, 18 Jan 2024 11:23:54 -0800 (PST)
 Received: from localhost.localdomain ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id gc18-20020a056638671200b0046e5c69376asm1155588jab.40.2024.01.18.11.23.51
+        by smtp.gmail.com with ESMTPSA id gc18-20020a056638671200b0046e5c69376asm1155588jab.40.2024.01.18.11.23.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jan 2024 11:23:51 -0800 (PST)
+        Thu, 18 Jan 2024 11:23:53 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>,
 	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 3/6] block: cache current nsec time in struct blk_plug
-Date: Thu, 18 Jan 2024 12:20:54 -0700
-Message-ID: <20240118192343.953539-4-axboe@kernel.dk>
+Subject: [PATCH 4/6] block: update cached timestamp post schedule/preemption
+Date: Thu, 18 Jan 2024 12:20:55 -0700
+Message-ID: <20240118192343.953539-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240118192343.953539-1-axboe@kernel.dk>
 References: <20240118192343.953539-1-axboe@kernel.dk>
@@ -70,108 +70,109 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Querying the current time is the most costly thing we do in the block
-layer per IO, and depending on kernel config settings, we may do it
-many times per IO.
-
-None of the callers actually need nsec granularity. Take advantage of
-that by caching the current time in the plug, with the assumption here
-being that any time checking will be temporally close enough that the
-slight loss of precision doesn't matter.
-
-If the block plug gets flushed, eg on preempt or schedule out, then
-we invalidate the cached clock.
-
-On a basic peak IOPS test case with iostats enabled, this changes
-the performance from:
-
-IOPS=108.41M, BW=52.93GiB/s, IOS/call=31/31
-IOPS=108.43M, BW=52.94GiB/s, IOS/call=32/32
-IOPS=108.29M, BW=52.88GiB/s, IOS/call=31/32
-IOPS=108.35M, BW=52.91GiB/s, IOS/call=32/32
-IOPS=108.42M, BW=52.94GiB/s, IOS/call=31/31
-IOPS=108.40M, BW=52.93GiB/s, IOS/call=32/32
-IOPS=108.31M, BW=52.89GiB/s, IOS/call=32/31
-
-to
-
-IOPS=118.79M, BW=58.00GiB/s, IOS/call=31/32
-IOPS=118.62M, BW=57.92GiB/s, IOS/call=31/31
-IOPS=118.80M, BW=58.01GiB/s, IOS/call=32/31
-IOPS=118.78M, BW=58.00GiB/s, IOS/call=32/32
-IOPS=118.69M, BW=57.95GiB/s, IOS/call=32/31
-IOPS=118.62M, BW=57.92GiB/s, IOS/call=32/31
-IOPS=118.63M, BW=57.92GiB/s, IOS/call=31/32
-
-which is more than a 9% improvement in performance. Looking at perf diff,
-we can see a huge reduction in time overhead:
-
-    10.55%     -9.88%  [kernel.vmlinux]  [k] read_tsc
-     1.31%     -1.22%  [kernel.vmlinux]  [k] ktime_get
-
-Note that since this relies on blk_plug for the caching, it's only
-applicable to the issue side. But this is where most of the time calls
-happen anyway. On the completion side, cached time stamping is done with
-struct io_comp patch, as long as the driver supports it.
-
-It's also worth noting that the above testing doesn't enable any of the
-higher cost CPU items on the block layer side, like wbt, cgroups,
-iocost, etc, which all would add additional time querying and hence
-overhead. IOW, results would likely look even better in comparison with
-those enabled, as distros would do.
+Mark the task as having a cached timestamp when set assign it, so we
+can efficiently check if it needs updating post being scheduled back in.
+This covers both the actual schedule out case, which would've flushed
+the plug, and the preemption case which doesn't touch the plugged
+requests (for many reasons, one of them being then we'd need to have
+preemption disabled around plug state manipulation).
 
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-core.c       |  1 +
- include/linux/blkdev.h | 15 ++++++++++++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ block/blk-core.c       |  2 ++
+ include/linux/blkdev.h | 20 +++++++++++++++++++-
+ include/linux/sched.h  |  2 +-
+ kernel/sched/core.c    |  4 +++-
+ 4 files changed, 25 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 11342af420d0..cc4db4d92c75 100644
+index cc4db4d92c75..71c6614a97fe 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -1073,6 +1073,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
- 	if (tsk->plug)
- 		return;
- 
-+	plug->cur_ktime = 0;
- 	plug->mq_list = NULL;
- 	plug->cached_rq = NULL;
- 	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4495de020d9a..26226afaeb91 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -943,6 +943,7 @@ struct blk_plug {
- 
- 	/* if ios_left is > 1, we can batch tag/rq allocations */
- 	struct request *cached_rq;
-+	u64 cur_ktime;
- 	unsigned short nr_ios;
- 
- 	unsigned short rq_count;
-@@ -978,7 +979,19 @@ long nr_blockdev_pages(void);
- 
- static inline u64 blk_time_get_ns(void)
- {
--	return ktime_get_ns();
-+	struct blk_plug *plug = current->plug;
+@@ -1173,6 +1173,8 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
+ 	 */
+ 	if (unlikely(!rq_list_empty(plug->cached_rq)))
+ 		blk_mq_free_plug_rqs(plug);
 +
-+	if (!plug)
-+		return ktime_get_ns();
-+
-+	/*
-+	 * 0 could very well be a valid time, but rather than flag "this is
-+	 * a valid timestamp" separately, just accept that we'll do an extra
-+	 * ktime_get_ns() if we just happen to get 0 as the current time.
-+	 */
-+	if (!plug->cur_ktime)
-+		plug->cur_ktime = ktime_get_ns();
-+	return plug->cur_ktime;
++	current->flags &= ~PF_BLOCK_TS;
  }
  
- /*
+ /**
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 26226afaeb91..518c77d1f0c3 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -977,6 +977,18 @@ static inline void blk_flush_plug(struct blk_plug *plug, bool async)
+ int blkdev_issue_flush(struct block_device *bdev);
+ long nr_blockdev_pages(void);
+ 
++/*
++ * tsk == current here
++ */
++static inline void blk_plug_invalidate_ts(struct task_struct *tsk)
++{
++	struct blk_plug *plug = tsk->plug;
++
++	if (plug)
++		plug->cur_ktime = 0;
++	current->flags &= ~PF_BLOCK_TS;
++}
++
+ static inline u64 blk_time_get_ns(void)
+ {
+ 	struct blk_plug *plug = current->plug;
+@@ -989,8 +1001,10 @@ static inline u64 blk_time_get_ns(void)
+ 	 * a valid timestamp" separately, just accept that we'll do an extra
+ 	 * ktime_get_ns() if we just happen to get 0 as the current time.
+ 	 */
+-	if (!plug->cur_ktime)
++	if (!plug->cur_ktime) {
+ 		plug->cur_ktime = ktime_get_ns();
++		current->flags |= PF_BLOCK_TS;
++	}
+ 	return plug->cur_ktime;
+ }
+ 
+@@ -1057,6 +1071,10 @@ static inline void blk_flush_plug(struct blk_plug *plug, bool async)
+ {
+ }
+ 
++static inline void blk_plug_invalidate_ts(struct task_struct *tsk)
++{
++}
++
+ static inline int blkdev_issue_flush(struct block_device *bdev)
+ {
+ 	return 0;
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 9a66147915b2..d8a073b06495 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1642,7 +1642,7 @@ extern struct pid *cad_pid;
+ #define PF_NO_SETAFFINITY	0x04000000	/* Userland is not allowed to meddle with cpus_mask */
+ #define PF_MCE_EARLY		0x08000000      /* Early kill for mce process policy */
+ #define PF_MEMALLOC_PIN		0x10000000	/* Allocation context constrained to zones which allow long term pinning. */
+-#define PF__HOLE__20000000	0x20000000
++#define PF_BLOCK_TS		0x20000000	/* plug has ts that needs updating */
+ #define PF__HOLE__40000000	0x40000000
+ #define PF_SUSPEND_TASK		0x80000000      /* This thread called freeze_processes() and should not be frozen */
+ 
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 9116bcc90346..4675d59313ba 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -6787,7 +6787,9 @@ static inline void sched_submit_work(struct task_struct *tsk)
+ 
+ static void sched_update_worker(struct task_struct *tsk)
+ {
+-	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
++	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS)) {
++		if (tsk->flags & PF_BLOCK_TS)
++			blk_plug_invalidate_ts(tsk);
+ 		if (tsk->flags & PF_WQ_WORKER)
+ 			wq_worker_running(tsk);
+ 		else
 -- 
 2.43.0
 
