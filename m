@@ -1,58 +1,58 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECB62DF68
-	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 18:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5F02D629
+	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 18:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705604152; cv=none; b=oVTd3CMtKe40YwtUq00o6sqI8zSqpQaP3aRjuF3pT6i+eRiFlcuD6+IX8kL+PvKPpbODqe02CaJYJ1hNWOhH/H/E6MDDf1bYfkWXyd1R1iDwLuUq4JFFtPcAIqP76mGNMYn+J2UQIVwIf2UyP6xyMjxlv4qDSk6kH/fxD8cHbD8=
+	t=1705604174; cv=none; b=G45BYw5tIKbEIVJ/zZNff8Qu0Gc098DFR9fW4a32sYuiqznKhOuwpzhD/g/iftdf6qr2OCni1ymC7Jcn5qkx3FQyHNLfgV30Frx0TOD3nQsfpbjLT1/cnvKRD3YatQ6e2jAaivM5hu77ywNsVfXZc60V4/XRWlLLQ8s3pr9eUgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705604152; c=relaxed/simple;
-	bh=JUiao2tbiqPs02c+3Yuc91GM7JBJJK946dDBDxlwWt8=;
+	s=arc-20240116; t=1705604174; c=relaxed/simple;
+	bh=mGHcisxBHkO3/8FyZmo//V3Ik6pdV6NFeddlqZY6C+U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=YTWNM9Li34vDK4RY0FBO5+nCUsrHJuWyJPfBH48MfjWq+1ewyI2ivwnP32AjbMmcnJUjmcGO9tyr1miyogpvVQYyfQ1/6urQor5bzI8YEEAuNqlNl7C360Fz2f/Gn+b80M9w+l+59Nvb5GmeLAF1yQsPQQqFrqTs45VDJoxVuPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GRKFUcWx; arc=none smtp.client-ip=209.85.166.42
+	 In-Reply-To:Content-Type; b=M/krvpSaRqCAyFG1o7ROHguBsz1ZlM0+vT+8MD5QYsRGxAm4zkXZVdyx1s3VOAOrtz5j6vMKvi/xxti9y3L1/vXp14wT9mBVTmpYomCzEcFeXBOfTblrsvmGCAPEZw7xqdrtj4ogytNIsqD8OWHAjVYUvFSvRyvPeBLuEZVNa3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YBXvn02D; arc=none smtp.client-ip=209.85.166.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GRKFUcWx"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7bee01886baso49928339f.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 10:55:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YBXvn02D"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7beeeb1ba87so66489839f.0
+        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 10:56:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705604149; x=1706208949; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705604172; x=1706208972; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=W49R8CBe6tc7SCs17WAk1daZ60gNay+8tkI0bVApQFo=;
-        b=GRKFUcWxIZxExzO+2RsqRBRYy7NgBxwum6lflExnHcTzvgkloFBp9rHgllWZfTWs8x
-         FAKuYeFep3SC9ow4zy2z/HjFR31+nbgBpeSLyMib4WkcfFNspaFFqLTmJlIMKfRAi938
-         XCkhXFu6ffcCRdkwlAGYB+4FVa+lxcdeuExf3N7UE1UGIxC5Eyt9ZGbP1lHQUQBqIFHR
-         3PY0IDXyYr67FtqTF0gLWuf9oBhfaZtKU5sdIEe6flAiBh/a4Tf0hdSL9NuCyDpOeDra
-         BjqyfJIH0+fAZPUfyJGkktyf5uO5bJr3AVL70iu46JeFQ6y+/jmH9egORk2lTWp6LxFM
-         ZySg==
+        bh=xs8ZOh3O/xvMnS6lQsWYl9cRpf822755mVwZiWOr/jI=;
+        b=YBXvn02DxxDTLfrQ/aPq+wRn0fVdTlHwp5JBJKOUhMeccFIbSipI7RUJ5aem/C7SaY
+         VIfjoZ0mvOHzFZ0jnIzhf/9HcEfu+G7NdDulHbWh3r5RE4+8NiaBSBanN6nf6L3U1DEC
+         +efrE1wRtCLYJCqJvWnV5rqkB3wRKXWj2D6G1MHaCfKTirwpS/oYfIXiWas8HGGHtVX4
+         ZDtnDrmXFo++Ab1k+T/iZuNykqOKUxj8Vkzs/4BVRxRgMznFi6d7R05yvX8G7al9Lwgm
+         wmIsXZWp7vqxXveiLFOV48y38hcR0xYiOULLbf4cg/o+skekVzX+4srOcqco3pbtmJcA
+         Iy7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705604149; x=1706208949;
+        d=1e100.net; s=20230601; t=1705604172; x=1706208972;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W49R8CBe6tc7SCs17WAk1daZ60gNay+8tkI0bVApQFo=;
-        b=QxEF3gC7VvEP0PoshMtZ8KjMouiqfyplJpqDdsM0XGVcNYqR+OElnVQvp15QfP9n+F
-         z3PaPYt99F4swjV6P0/Fb9M1y8W86RYiShug171JMZBMdtCSwjEgPSEgQLFiTzv0WSC5
-         I8wutRFTvLBAJfSDYVG5K1Jp4A+Rf8nZI/5MxSWspwin11Ef7C2oliBcFNHnHu1FmeOF
-         1dz1QehRHJZHmkWFD5eRjCp5MvDDgObwP245kXeukhbidCDowDxpGdYlZywJdOErb6Jn
-         cZxMYMdk7Nd9pUF//y8GoulPdbL/s7scU8z+IoLXvaJrlqVcp2VFb/K7Pd37O5x+27Jq
-         HjQA==
-X-Gm-Message-State: AOJu0YxRgp4DZHcAwbfyCk6W2Wross60ewd9aKAomR/nEpxSCBXQrwPX
-	I0jkS7W45ObobZ3OvFM6iJZeb63r1YQoAenz2wIWH4LcA9xrWYtM2PGIIQMV69k=
-X-Google-Smtp-Source: AGHT+IEDlp84snpsi2bLTeYmzY7AB+2LTDbelEhcvnLOE/p7oVGAsW8WBV/5Yt3FJ1etXN37e46S8w==
-X-Received: by 2002:a5d:8b50:0:b0:7bf:7374:edd2 with SMTP id c16-20020a5d8b50000000b007bf7374edd2mr317642iot.0.1705604148826;
-        Thu, 18 Jan 2024 10:55:48 -0800 (PST)
+        bh=xs8ZOh3O/xvMnS6lQsWYl9cRpf822755mVwZiWOr/jI=;
+        b=P35RZZ51AghqMFxln61Vdv/YpTjdkkkbsWQm8EhAWF0L73URU1EcpjnyGgCpzlwF1N
+         qnjTZ2NcFjnCFEoraDg1yvWdqAbgy5yVM0ZKgPOqCFRW1V2xkWDKBgGzDWUX1vyZLf1M
+         lpkypVvhJ4YLn93RSVkbTtERlOrq5Qp1lCYqIaUElzNJDTIhEuzyrLl9too2jd1HLF0y
+         XdXhCZKQL/0E/EdW/1j7FrkLVIKdVJe4EbZ37hrbX81o5UmoGFPmVzto8EoqF0MDxXDT
+         pBa86Xp33XW+hMQSJ4yjh2UXsabCzMwCzBlqYXF4WCXj/V2pZCMiEnGR4IPpr3u5Ac9a
+         vhzg==
+X-Gm-Message-State: AOJu0YxqKGE4dER7cTPN4VLibnuabGb2pcNcUedOixaW0QDzMfo4wCHx
+	MaAqHtZHIFg8hmbb3mNrPXrt4YhVxQAhY/iNOCY7ZSozgstabAj8maygCXD2JXo=
+X-Google-Smtp-Source: AGHT+IHFBUx+qZipH9c156ncD/nQ8zjHjKBpODmHdhGaenRTcB0HN2GVVoFcbU7AoCZ1BZs1Ykfn9A==
+X-Received: by 2002:a6b:ea12:0:b0:7bf:60bc:7f1e with SMTP id m18-20020a6bea12000000b007bf60bc7f1emr323421ioc.1.1705604172095;
+        Thu, 18 Jan 2024 10:56:12 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id a10-20020a5d980a000000b007bf45b1c049sm2243874iol.0.2024.01.18.10.55.48
+        by smtp.gmail.com with ESMTPSA id a10-20020a5d980a000000b007bf45b1c049sm2243874iol.0.2024.01.18.10.56.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jan 2024 10:55:48 -0800 (PST)
-Message-ID: <ba770235-7c2f-4886-9507-2fc2ff521e35@kernel.dk>
-Date: Thu, 18 Jan 2024 11:55:47 -0700
+        Thu, 18 Jan 2024 10:56:11 -0800 (PST)
+Message-ID: <248b7070-a7c6-456d-99be-c3fff6f94f5e@kernel.dk>
+Date: Thu, 18 Jan 2024 11:56:11 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,54 +60,42 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block/mq-deadline: serialize request dispatching
+Subject: Re: [PATCH 2/2] block/mq-deadline: fallback to per-cpu insertion
+ buckets under contention
 Content-Language: en-US
 To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
 References: <20240118180541.930783-1-axboe@kernel.dk>
- <20240118180541.930783-2-axboe@kernel.dk>
- <d8485e78-5cf5-47c1-89d4-89f52ba7149f@acm.org>
- <3910157f-dbb7-4048-ac52-a2b354048be6@kernel.dk>
- <5f1e2bd2-b376-4272-93ce-a77c9b0c81ca@acm.org>
+ <20240118180541.930783-3-axboe@kernel.dk>
+ <0ca63d05-fc5b-4e6a-a828-52eb24305545@acm.org>
+ <c9f1b580-2241-4415-aa48-e4b7e1bacdea@kernel.dk>
+ <e4892064-cdf2-4cd9-8033-901d8db07cbf@acm.org>
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <5f1e2bd2-b376-4272-93ce-a77c9b0c81ca@acm.org>
+In-Reply-To: <e4892064-cdf2-4cd9-8033-901d8db07cbf@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/18/24 11:51 AM, Bart Van Assche wrote:
-> On 1/18/24 10:45, Jens Axboe wrote:
->> Do you read the replies to the emails, from the other thread?
+On 1/18/24 11:53 AM, Bart Van Assche wrote:
+> On 1/18/24 10:33, Jens Axboe wrote:
+>> On 1/18/24 11:31 AM, Bart Van Assche wrote:
+>>> On 1/18/24 10:04, Jens Axboe wrote:
+>>>> If we attempt to insert a list of requests but someone else is already
+>>>> running an insertion, then fallback to queueing it internally and let
+>>>> the existing inserter finish the operation.
+>>>
+>>> Because this patch adds significant complexity: what are the use cases
+>>> that benefit from this kind of optimization? Are these perhaps workloads
+>>> on systems with many CPU cores and fast storage? If the storage is fast,
+>>> why to use mq-deadline instead of "none" as I/O-scheduler?
+>>
+>> You and others complain that mq-deadline is slow and doesn't scale,
+>> these two patches help improve that situation. Not sure why this is even
+>> a question?
 > 
-> Yes.
+> How much does this patch improve performance?
 
-Well it's been a bit frustrating to say the least, as you seem to either
-not read them or just ignore what's in them.
-
->  > And secondly, this avoids a RMW if it's already set.
-> From the spinlock implementation (something I looked up before I wrote
-> my previous reply):
-> 
-> static __always_inline int queued_spin_trylock(struct qspinlock *lock)
-> {
->     int val = atomic_read(&lock->val);
-> 
->     if (unlikely(val))
->         return 0;
-> 
->     return likely(atomic_try_cmpxchg_acquire(&lock->val, &val,
->                                                  _Q_LOCKED_VAL));
-> }
-> 
-> I think this implementation does not perform a RMW if the spinlock is
-> already locked.
-
-This looks like a generic trylock, is the same true for the arch
-variants? Because your attempt either failed because of RMW or because
-you are hammering it repeatedly, or both.
-
-In any case, even if any trylock would avoid the initial atomic, it
-doesn't give you anything that a bitop would not just do, and we use the
-latter trick elsewhere in blk-mq.
+Do you need me to link the cover letter that you were CC'ed on?
 
 -- 
 Jens Axboe
+
 
