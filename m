@@ -1,89 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69952C127
-	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 08:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2721170E;
+	Thu, 18 Jan 2024 08:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705566082; cv=none; b=JBODjuB1Pr4VDFar7TvylxpfhM6qELMRRwXoWt8BF31GSaTdV2Hg16xty7cHSh+rEpokb2X797OxHmbhXLvUwRDgfth9kCq3ZNtBb0ic5f19llO/8L9yoP9EwtkhT9K2CuO8MeSdClWQmwoJz/nKQjBqa/EymP4bNPLxdeAYBbQ=
+	t=1705567252; cv=none; b=G+sLVeRqLlKwwRi2oQZOPbCCWSbmvkE7Ok7w1vxweAhk6F8L+98zRloG5M4wuCgHRQ94n7ogmvrmX9atbSJ94Vj03Ggwp4feGJnNt7kQJBj1fi5pPE0ewo3Tq9XkBlb429buwPFMh2U4XsJKawK7LhXSFYhebkGlCWT5HDnk3ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705566082; c=relaxed/simple;
-	bh=qsEVQwBjugQ1vPS6kz1w+aAKQkLix6t05nctAwQ2INE=;
-	h=DKIM-Signature:Received:X-MC-Unique:Received:Received:Date:From:
-	 To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-Scanned-By; b=Q+7+PqzpDnfOxGXWUTggz4qwZGLBeOdIlhGIb+W+h28Hex58AJfH4ugH24f0tBVEmIhK13rmTrBdcTJDVmCxn80mynfbYlZFwH9h00YzxfdeUXTpXQFCvPEvmOQpGwGCqPegu/YcKEgAvSRPHw0dyuV+a5tdQkvCG0KifEF8ZUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SbqebJG4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1705567252; c=relaxed/simple;
+	bh=kTrKvY+ZpZRvmrl04Xmv+nqP95dJog5F0KPUXF/ZEhQ=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=UwHpW8Lc3ni4r5Kr/laGb81ceipHT+r0EyCRSUuUFTPB0kIhvazYl9o+c+pEfRyjLcsgZdt4jJ/lTBw3vV4SnIOanKPttDqw7GpElArdZ3ZwS/Sd9cufP7RBpSWUT9vmZOy70o7FxNwA/leE7IwYetmokLRxIYlh02/atjnV2r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JvPB4S8V; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbqebJG4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705566080;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fkFDv/eNX9aWpWWkgiq2ThZ0JtGxjcDcXpuszzedJAM=;
-	b=SbqebJG4hfhjiCUmG9bt2g0FCLLDJljOulwHF6dChAlSKEXpewrQq1ntwnNhCfCyi8KR2Z
-	9yrv4ERw7dAD8euaJW9R0q5M8pbyhcfR5h09BBxvuFsBoMxoPkQflHHV0srQTP1CsOCHm4
-	6wqFkhMmfx//GRbFAJV/Ab3+xIHXEKE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-675-PenXo_UnNvKvIe7t9OpnfA-1; Thu,
- 18 Jan 2024 03:21:18 -0500
-X-MC-Unique: PenXo_UnNvKvIe7t9OpnfA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 72D011C29EB3;
-	Thu, 18 Jan 2024 08:21:18 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A4FDC158BD;
-	Thu, 18 Jan 2024 08:21:15 +0000 (UTC)
-Date: Thu, 18 Jan 2024 16:21:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH] loop: fix the the direct I/O support check when used on
- top of block devices
-Message-ID: <Zajfd6ee6/ej0IRU@fedora>
-References: <20240117175901.871796-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JvPB4S8V"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2cd33336b32so158089831fa.0;
+        Thu, 18 Jan 2024 00:40:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705567249; x=1706172049; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6uEQJFz2oWfMfQv57hY7KbsMu1MXvb5toYweGJv4ICU=;
+        b=JvPB4S8VWLuJuFi1RKKgLIsLmk5AFNl54UCkJjNEtpw+pHkMjn386ZuQyBR1jhwdxS
+         xYJL7QXFsr2KCbDKK10JnAGGDjquVyiTMRSZK7/12W3nPO/MX30A188y5yxm1w8+ZySO
+         hwHjkdtp+fHuOiu1/IqydjkUSXl0gieDkP9Y90rzHfNnAypQRdN63yJxz5DC2YHNyKED
+         6veRnw0cxpA0GxxZ+vj0JomQzrnrIZShsYdGN68nLoBvhSqRXYa9xxClOsVNY+DgbJGq
+         42LglsV/H59CCMiKfmkFJmWSqdntoCQG+a20Rwmc4B3OnMidtDKGZVn3PyB3xSm+zcpm
+         AL4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705567249; x=1706172049;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6uEQJFz2oWfMfQv57hY7KbsMu1MXvb5toYweGJv4ICU=;
+        b=JsT5r18PIBUXd/LoHQgLj+7aijDdda5T/wljAYY+8LkL/HpinzTE2fYFEzI4wKTvlm
+         bhrmsphydzQsTbXlGYQm8pB/wdT0LOzdrmh7yTzLpFBqD6gexoS+P0wsjs3KwufFuMLS
+         VWpRz+3kuWk4HN/1eMu0LrMnTkKrgN41FjVDWDhW56dV3tZXF1x4KfhKCyljvH9KEtqX
+         NeDvB6JppyRNKgasmucIWkWL3kpIA8nsstva3koQVsrO/7nqaEDfXYq/omsmHKeqrK3u
+         G15QgtLc9pZIubDB4N8KiFkPaitBx0m3u88JxWXxsX7LUgNkHUCi33O2nyR9mFlvumbA
+         hHnw==
+X-Gm-Message-State: AOJu0Yyt510GAtemcpY1H86wIATPMJlBbAtJD+fc1irimuSe8rLieQwD
+	SfAKJjBv2hSglpbQkvfYDF33sCAN4mzxBk43t3Gg8NjjDk8PU/t6CMiGAzuH9hl/tMzfTkojtYk
+	+NbKqPxQfsG8Sotud3Y5WadwVimPLW+j1nLs=
+X-Google-Smtp-Source: AGHT+IF6zMqIDK/PXaX7kXc/UK3PLNys16DVuVwxqvH10vIuoa7Cob7zZ9Eq4gItq0YfwysG0+OZi8ZAq4M/0aWAwTE=
+X-Received: by 2002:a05:651c:220b:b0:2cc:74c2:3af2 with SMTP id
+ y11-20020a05651c220b00b002cc74c23af2mr455782ljq.28.1705567248948; Thu, 18 Jan
+ 2024 00:40:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240117175901.871796-1-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+References: <20240117092348.2873928-1-zhaoyang.huang@unisoc.com> <5ff36535-7cd3-4e8f-a477-9d2a98d18dd9@acm.org>
+In-Reply-To: <5ff36535-7cd3-4e8f-a477-9d2a98d18dd9@acm.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Thu, 18 Jan 2024 16:40:37 +0800
+Message-ID: <CAGWkznGc67yY9xCHJFLGvJZBu2oXOgOgHKZ_OvbBrv5mqRMywg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/1] block: introduce activity based ioprio
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 17, 2024 at 06:59:01PM +0100, Christoph Hellwig wrote:
-> __loop_update_dio only checks the alignment requirement for block backed
-> file systems, but misses them for the case where the loop device is
-> created directly on top of another block device.  Due to this creating
-> a loop device with default option plus the direct I/O flag on a > 512 byte
-> sector size file system will lead to incorrect I/O being submitted to the
-> lower block device and a lot of error from the lock layer.  This can
-> be seen with xfstests generic/563.
-> 
-> Fix the code in __loop_update_dio by factoring the alignment check into
-> a helper, and calling that also for the struct block_device of a block
-> device inode.
-> 
-> Also remove the TODO comment talking about dynamically switching between
-> buffered and direct I/O, which is a would be a recipe for horrible
-> performance and occasional data loss.
-> 
-> Fixes: 2e5ab5f379f9 ("block: loop: prepare for supporing direct IO")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Thu, Jan 18, 2024 at 1:29=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
+> wrote:
+>
+> On 1/17/24 01:23, zhaoyang.huang wrote:
+> > +static enum dd_prio dd_req_ioprio(struct request *rq)
+> > +{
+> > +     enum dd_prio prio;
+> > +     const u8 ioprio_class =3D dd_rq_ioclass(rq);
+> > +#ifdef CONFIG_ACTIVITY_BASED_IOPRIO
+> > +     struct bio *bio;
+> > +     struct bio_vec bv;
+> > +     struct bvec_iter iter;
+> > +     struct page *page;
+> > +     int gen =3D 0;
+> > +     int cnt =3D 0;
+> > +
+> > +     if (req_op(rq) =3D=3D REQ_OP_READ) {
+> > +             __rq_for_each_bio(bio, rq) {
+> > +                     bio_for_each_bvec(bv, bio, iter) {
+> > +                             page =3D bv.bv_page;
+> > +                             gen +=3D PageWorkingset(page) ? 1 : 0;
+> > +                             cnt++;
+> > +                     }
+> > +             }
+> > +             prio =3D (gen >=3D cnt / 2) ? ioprio_class_to_prio[IOPRIO=
+_CLASS_RT] :
+> > +                     ioprio_class_to_prio[ioprio_class];
+> > +     } else
+> > +             prio =3D ioprio_class_to_prio[ioprio_class];
+> > +#else
+> > +     prio =3D ioprio_class_to_prio[ioprio_class];
+> > +#endif
+> > +     return prio;
+> > +}
+>
+> I don't like it that code is introduced in the mq-deadline scheduler
+> that accesses page cache information. Isn't that a layering violation?
+ok. I will try to update a new version to implement these in block layer
 
-Looks one nice cleanup & fix:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-
-Thanks,
-Ming
-
+> Additionally, this approach only works for buffered I/O and not for
+> direct I/O. Shouldn't the I/O submitter set the I/O priority instead of
+> deciding the I/O priority in the mq-deadline scheduler?
+That's just the purpose of this commit, that is, introducing content
+activity based ioprio OR the one that submitter decided
+>
+> Bart.
