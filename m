@@ -1,101 +1,122 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5F02D629
-	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 18:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CDC2E3F5
+	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 19:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705604174; cv=none; b=G45BYw5tIKbEIVJ/zZNff8Qu0Gc098DFR9fW4a32sYuiqznKhOuwpzhD/g/iftdf6qr2OCni1ymC7Jcn5qkx3FQyHNLfgV30Frx0TOD3nQsfpbjLT1/cnvKRD3YatQ6e2jAaivM5hu77ywNsVfXZc60V4/XRWlLLQ8s3pr9eUgg=
+	t=1705605832; cv=none; b=vFOrCmcLq1yyOeozWBVlcq8Q7gTUEvWltWZ82jY+ngrMPhvT+WQGfIU2EZKDJ6eaeJD9JlipjPGvpdzR2aAYjKRqM7YF4kuMsib4/BiP7AczSIrrOSiVYJUdoNu27247E6Ndbb0ZaOcGobjp8MOYLQwraOyWiSs6q/bXAAWobkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705604174; c=relaxed/simple;
-	bh=mGHcisxBHkO3/8FyZmo//V3Ik6pdV6NFeddlqZY6C+U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=M/krvpSaRqCAyFG1o7ROHguBsz1ZlM0+vT+8MD5QYsRGxAm4zkXZVdyx1s3VOAOrtz5j6vMKvi/xxti9y3L1/vXp14wT9mBVTmpYomCzEcFeXBOfTblrsvmGCAPEZw7xqdrtj4ogytNIsqD8OWHAjVYUvFSvRyvPeBLuEZVNa3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YBXvn02D; arc=none smtp.client-ip=209.85.166.46
+	s=arc-20240116; t=1705605832; c=relaxed/simple;
+	bh=Yp0E2AgSbasub0nPNig18BzWpbGNPiHp5vfLLAGw0Eg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=M/n6c5KfHntGTFT9tkqQyUy3fM7+Ry1LAWchby7gBymMD3nzcMMJPcX8xlsR05b1+LW+01IoDd2Il1oELgt9XeOlqeQm7tLqt0A/Dndmw7KWWBlecWO3SFFa7NRCkxaS6D/t6J9Z/nul3ZxVwc9vHtwM6E8/hjVISCrhWjifHRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FtntKtuF; arc=none smtp.client-ip=209.85.166.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YBXvn02D"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7beeeb1ba87so66489839f.0
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 10:56:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FtntKtuF"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bee01886baso50331239f.1
+        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 11:23:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705604172; x=1706208972; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xs8ZOh3O/xvMnS6lQsWYl9cRpf822755mVwZiWOr/jI=;
-        b=YBXvn02DxxDTLfrQ/aPq+wRn0fVdTlHwp5JBJKOUhMeccFIbSipI7RUJ5aem/C7SaY
-         VIfjoZ0mvOHzFZ0jnIzhf/9HcEfu+G7NdDulHbWh3r5RE4+8NiaBSBanN6nf6L3U1DEC
-         +efrE1wRtCLYJCqJvWnV5rqkB3wRKXWj2D6G1MHaCfKTirwpS/oYfIXiWas8HGGHtVX4
-         ZDtnDrmXFo++Ab1k+T/iZuNykqOKUxj8Vkzs/4BVRxRgMznFi6d7R05yvX8G7al9Lwgm
-         wmIsXZWp7vqxXveiLFOV48y38hcR0xYiOULLbf4cg/o+skekVzX+4srOcqco3pbtmJcA
-         Iy7w==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705605828; x=1706210628; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mw/EBgf3QFgrXF9/RJBSlupid0w7/Gbvv5V64k+/wBY=;
+        b=FtntKtuFExYeeCi/O24QB2U48ZKxxyGudT2LMIllGgz9wZetpcM8O2aa3FXUyOpSnA
+         x5dZh201sNcfuEEI6kDDorbyJxXpLpNK9QPKk9UX3ZAt4h9nq4kmD3HuX7VRD73acu37
+         mS1kwyImCFUz5XDzLSv7ILDtrdXIvMjFu9F33kcrgBB6f220g49DqzmT0/5BUEEkRroI
+         tS8FoJKF7CXexU+PN8ELTLvUT8AuBkQZcfbm0no8m91kWja9Mr29OfGmPhzxIjiKPYvS
+         uwYP4diXM9oKt4nQg7Vm4rfRWEdMkhWsCzwuH058d8y0wS/Hsm4vBie4m8moc0aVNJ8n
+         tVIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705604172; x=1706208972;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xs8ZOh3O/xvMnS6lQsWYl9cRpf822755mVwZiWOr/jI=;
-        b=P35RZZ51AghqMFxln61Vdv/YpTjdkkkbsWQm8EhAWF0L73URU1EcpjnyGgCpzlwF1N
-         qnjTZ2NcFjnCFEoraDg1yvWdqAbgy5yVM0ZKgPOqCFRW1V2xkWDKBgGzDWUX1vyZLf1M
-         lpkypVvhJ4YLn93RSVkbTtERlOrq5Qp1lCYqIaUElzNJDTIhEuzyrLl9too2jd1HLF0y
-         XdXhCZKQL/0E/EdW/1j7FrkLVIKdVJe4EbZ37hrbX81o5UmoGFPmVzto8EoqF0MDxXDT
-         pBa86Xp33XW+hMQSJ4yjh2UXsabCzMwCzBlqYXF4WCXj/V2pZCMiEnGR4IPpr3u5Ac9a
-         vhzg==
-X-Gm-Message-State: AOJu0YxqKGE4dER7cTPN4VLibnuabGb2pcNcUedOixaW0QDzMfo4wCHx
-	MaAqHtZHIFg8hmbb3mNrPXrt4YhVxQAhY/iNOCY7ZSozgstabAj8maygCXD2JXo=
-X-Google-Smtp-Source: AGHT+IHFBUx+qZipH9c156ncD/nQ8zjHjKBpODmHdhGaenRTcB0HN2GVVoFcbU7AoCZ1BZs1Ykfn9A==
-X-Received: by 2002:a6b:ea12:0:b0:7bf:60bc:7f1e with SMTP id m18-20020a6bea12000000b007bf60bc7f1emr323421ioc.1.1705604172095;
-        Thu, 18 Jan 2024 10:56:12 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id a10-20020a5d980a000000b007bf45b1c049sm2243874iol.0.2024.01.18.10.56.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jan 2024 10:56:11 -0800 (PST)
-Message-ID: <248b7070-a7c6-456d-99be-c3fff6f94f5e@kernel.dk>
-Date: Thu, 18 Jan 2024 11:56:11 -0700
+        d=1e100.net; s=20230601; t=1705605828; x=1706210628;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mw/EBgf3QFgrXF9/RJBSlupid0w7/Gbvv5V64k+/wBY=;
+        b=KemSyRmRDA01b4ITdyB8szN7mFzfZ3++O/DnPI8aGPVvPXyDtTdpzgLpoPQlmJFHc7
+         2JjuAngK0pfmgXPfS3rvoY0+phtHz8hQuSlv0rLthuHQ81vDeTidBUQWRtmh9ZQnWXfr
+         pXika/ABHCNKEnqSl70Uc1U97r9QWLvdiAv4/hjFjHeeuzEDADRSCqv63Lq1r/kLeBhw
+         vwT1phsmaKnLoX75d0FHL+AHfTxq3+mJe31W+VJRYTWyuLWRyTalWNohqOCLtA+ZORsZ
+         0MNTtYQkKDoswVg02wsOedcGHOISg3oOapo39Ta/WkF4nGsjwUyNcT6SLwdQWPsTYM1n
+         +viQ==
+X-Gm-Message-State: AOJu0Yyfc7QKeAahnGDt4IHoDSqZae3cH3ondqpWXu7pPEervh6fSR07
+	LkX4LbfiCMuxlrj17JGWhohnzpW0PYx6MBDUKXj2M4PyeX6BgTQQPmEIbM6b1d6qccdwe5vOQhD
+	qo3s=
+X-Google-Smtp-Source: AGHT+IH4S1mpxXN35s35RC65Kcbl7r9DKsdPn/OAxVzhOF/3VxZCHT451dq8UnNMr44qkbRtiCj/2g==
+X-Received: by 2002:a5d:8b50:0:b0:7bf:7374:edd2 with SMTP id c16-20020a5d8b50000000b007bf7374edd2mr396050iot.0.1705605827788;
+        Thu, 18 Jan 2024 11:23:47 -0800 (PST)
+Received: from localhost.localdomain ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id gc18-20020a056638671200b0046e5c69376asm1155588jab.40.2024.01.18.11.23.47
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jan 2024 11:23:47 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Subject: [PATCHSET RFC v3 0/6] Cache issue side time querying
+Date: Thu, 18 Jan 2024 12:20:51 -0700
+Message-ID: <20240118192343.953539-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block/mq-deadline: fallback to per-cpu insertion
- buckets under contention
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-References: <20240118180541.930783-1-axboe@kernel.dk>
- <20240118180541.930783-3-axboe@kernel.dk>
- <0ca63d05-fc5b-4e6a-a828-52eb24305545@acm.org>
- <c9f1b580-2241-4415-aa48-e4b7e1bacdea@kernel.dk>
- <e4892064-cdf2-4cd9-8033-901d8db07cbf@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <e4892064-cdf2-4cd9-8033-901d8db07cbf@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/18/24 11:53 AM, Bart Van Assche wrote:
-> On 1/18/24 10:33, Jens Axboe wrote:
->> On 1/18/24 11:31 AM, Bart Van Assche wrote:
->>> On 1/18/24 10:04, Jens Axboe wrote:
->>>> If we attempt to insert a list of requests but someone else is already
->>>> running an insertion, then fallback to queueing it internally and let
->>>> the existing inserter finish the operation.
->>>
->>> Because this patch adds significant complexity: what are the use cases
->>> that benefit from this kind of optimization? Are these perhaps workloads
->>> on systems with many CPU cores and fast storage? If the storage is fast,
->>> why to use mq-deadline instead of "none" as I/O-scheduler?
->>
->> You and others complain that mq-deadline is slow and doesn't scale,
->> these two patches help improve that situation. Not sure why this is even
->> a question?
-> 
-> How much does this patch improve performance?
+Hi,
 
-Do you need me to link the cover letter that you were CC'ed on?
+When I run my peak testing to see if we've regressed, my test script
+always does:
+
+	echo 0 > /sys/block/$DEV/queue/iostats
+	echo 2 > /sys/block/$DEV/queue/nomerges
+
+for each device being used. It's unfortunate that we need to disable
+iostats, but without doing that, I lose about 12% performance. The main
+reason for that is the time querying we need to do, when iostats are
+enabled. As it turns out, lots of other block code is quite trigger
+happy with querying time as well. We do have some nice batching in place
+which helps ammortize that, but it's not perfect.
+
+This trivial patchset simply caches the current time in struct blk_plug,
+on the premise that any issue side time querying can get adequate
+granularity through that. Nobody really needs nsec granularity on the
+timestamp.
+
+Results in patch 2, but tldr is a more than 9% improvement (108M -> 118M
+IOPS) for my test case, which doesn't even enable most of the costly
+block layer items that you'd typically find in a distro and which would
+further increase the number of issue side time calls. This brings iostats
+enabled _almost_ to the level of turning it off.
+
+Can also be found in my block-issue-ts branch:
+
+https://git.kernel.dk/cgit/linux/log/?h=block-issue-ts
+
+ block/bfq-cgroup.c        | 14 +++---
+ block/bfq-iosched.c       | 22 +++++-----
+ block/blk-cgroup.c        |  2 +-
+ block/blk-core.c          | 33 ++++++++------
+ block/blk-flush.c         |  2 +-
+ block/blk-iocost.c        |  6 +--
+ block/blk-iolatency.c     |  6 +--
+ block/blk-mq.c            | 18 ++++----
+ block/blk-throttle.c      |  6 +--
+ block/blk-wbt.c           |  5 +--
+ drivers/md/raid1-10.c     |  2 +-
+ include/linux/blk_types.h | 42 ------------------
+ include/linux/blkdev.h    | 92 ++++++++++++++++++++++++++++++++++++---
+ include/linux/sched.h     |  2 +-
+ kernel/sched/core.c       |  4 +-
+ 15 files changed, 151 insertions(+), 105 deletions(-)
+
+Changes since v2:
+	- Ensure PF_BLOCK_TS is cleared when plug is flushed or
+	  invalidated
+	- Fix missing raid1-10 conversion
+	- Fix missing cgroup timestamp
 
 -- 
 Jens Axboe
-
 
