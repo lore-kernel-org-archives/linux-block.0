@@ -1,68 +1,67 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B7F1E890
-	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 15:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41E720B07
+	for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 15:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705591292; cv=none; b=ph5ipbE9LfVmqJkypsP6s1K5bAWgRFk7+d0v6pNtfTFz90AM+nS/dsPyv15aEmyaURh2cLfy2UK/4pnd4+w+p0zuMXiG4r8GcUabY542jE+qHJ3ukJYc5bSXU22RdJyJqOO1cynSlb3pdCaOiIyghHIfVVPFEc/ekLh/S560wgg=
+	t=1705591294; cv=none; b=nxykrIT7Gk3OwCVWLTgznMXDSukKyTimuc2yuVAZUQUQztb/waZRxKM0/NKk7qOGxikyXb4T2FmVcYHVKxvLcoXLVm7Kfl8rtlr3UFcmw8zHIjP2CLBwXWaV5/s7Kd6/EPb0JemsR+yIUTfZCUs4YcUN5KTBae79gWnGP7bNXv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705591292; c=relaxed/simple;
-	bh=gAhT4qjzzVO7gH8H6xZMYzKc7Qi23turOgX9/Q47LBU=;
+	s=arc-20240116; t=1705591294; c=relaxed/simple;
+	bh=nHY2H4qZ70M06IbJgXL+mh1dOxF31u6zQs+MBaMqFF8=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
-	 To:Cc:In-Reply-To:References:Subject:Message-Id:Date:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-Mailer; b=i8piZw/a3f9tptCahhJHMjGmjiNPt1Ugqsnbj6gkiitiwWpJqp2Yze24dl/rqGQcSz/D0bKTripmTOm3UyFDpmXTIisgnLcSPjK7/4LVv3DbHYEyi1oQQnSZLMAiBrGOsUUEpOeUC9SCziC+jONeZH0jOl+9OPFrs9RTTHcMNiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HB0MwMk/; arc=none smtp.client-ip=209.85.166.49
+	 To:In-Reply-To:References:Subject:Message-Id:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-Mailer; b=AlbdB/oU7NtZ/OV1qWCV1cLVlCynfxoUd008y+mDR3EHMKOb302OzIw9t6vie5rK+IdOTWa3amolk0tK8dPjTOqLG/tiS5dRy0KmECNJwrIywl31259ryghes38zLbjr8mnk+rtVICWKQXwzQYPsIyBh6QoLPCp8tlnejDuc7pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3TKXrvdF; arc=none smtp.client-ip=209.85.166.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HB0MwMk/"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bee01886baso48309339f.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 07:21:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3TKXrvdF"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36191ee7be4so3170955ab.0
+        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 07:21:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705591290; x=1706196090; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705591292; x=1706196092; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HnpT+ljAKyPAm8ysQyFU6nEF6rkE3TZI0/V0VGFrAgk=;
-        b=HB0MwMk/jyj5TUqEev0fACXVuzpo5r2yJbomu3IMtejvFi+JZqpXpla1CKig1RjYPy
-         PVvn5OEuVaB3iEkD7qcnFKAiwGHRCoo232Ete2bLY1DwYVg4Joybs5unvl7e40MlfStA
-         E8Zhp4DMmg6dCRsgqy1xj8WtyPSZccudbJmczLeMebKVDVgLFa7l/zBrl5eAPNS9buJ5
-         ua6nHw+C5u515CZvqxavZzhZ0JVQKooph2Rp2WjZa8tcKYKpfROp/ofiJtxcb7Hboyc6
-         CdTkZlkd9kQjBq9aSpjo7mTStuATsvgv3/+xDYNvZ5g4crddl0cxzeT2NtD2U+PBJefs
-         nc2g==
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Vj406VBQBP421CwVVlFdOXwBadhTGvoDsY699rjci0=;
+        b=3TKXrvdFyERzadON9o3LeYSpPx1hRH243VMQEEo8GK5NVaBYt2n4wt60jCuDra0TNA
+         eG0IlV2DIP0VwtRLm7uwudM2cI8Lci+ITHT9Ajf1d55pZ81cLHDYNAcWrjpB7H+krPES
+         dM8FwgFqLWcy2DlpHv//zYAVGeLtLejqQA1V3TuENzgtU5MbXfXP5a8QZqv9n6ExM4ja
+         qtqP3aNyrK1uvMbDYK2buxxtherrfJ8pskAnK1iAukEGVKOnYvuX/um6JxeL5FqMfhDQ
+         MTIxJ+Z255cJkxrwIUioPxLR28AvpcWei8B0Y5GZhY7yZoqbr5/QjdCotLhU9kBV46HE
+         5Uqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705591290; x=1706196090;
+        d=1e100.net; s=20230601; t=1705591292; x=1706196092;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HnpT+ljAKyPAm8ysQyFU6nEF6rkE3TZI0/V0VGFrAgk=;
-        b=M/IECz7ms82XDM7pNwe+Yh3q44wkpBvcYlPtpQFp/OCOWuSnvMwNkwi9vfG7Q1v1lu
-         goOAWFnq1FtW4Y31G11HWIuTnONdeUMzbiSruZFcIjlUALA4CDxaE9B+lWr4nAH+yL5C
-         KGugoxr29ceqfj0uPf0MwDSgLit/LEPI1x8Ym5Fi/7pCUHnx+kXZkDUG5dUgdTe1p4ZU
-         qOP777MWbx8WLrcB4XIfBJvzx84HK/N9YnMa1rjDlWIU2jxMkBkuJpuPKEuKqesS5wJY
-         VOrG9qB/MDaBnp5E1Z70Vs5zLMHnLO7af0EQWMQAcTuZoZTN5i+TNBesn4g2FAtSTWNw
-         ZdHA==
-X-Gm-Message-State: AOJu0Yypek43+V1YGEsP4jgUuxTqFE9PZ2Y2MB20GHoZQhFfgkU73bp0
-	JLoZB90POcjdxCVdEt3lCaWNfHGjeA/pZfy2PnoG3kDtWe+NoVhTLW9JICgndFGYdkVBT/iouQx
-	Vdxc=
-X-Google-Smtp-Source: AGHT+IH/n7ANlPsCX/Ge5eGXLy0X46iUplDU69f47Fpn//8Kvr4Rpq1IPzEZBs//G5SpT3vwDHfHOw==
-X-Received: by 2002:a6b:794c:0:b0:7be:e376:fc44 with SMTP id j12-20020a6b794c000000b007bee376fc44mr1855177iop.2.1705591290280;
-        Thu, 18 Jan 2024 07:21:30 -0800 (PST)
+        bh=8Vj406VBQBP421CwVVlFdOXwBadhTGvoDsY699rjci0=;
+        b=hLivGh95noyi+q+Eg++MGn5PFjEzpsiFHpf0QCP8vjpK8Pgyyh9SP3I8Tzaa8sgR3E
+         fYtdvt8sFYMT+WZiuczeWWs4EYo1cIma3e+r0ZRytN/sO+aaw/haZg0NfKaNLYeJ3G/M
+         mRdOrp13CWkmzp+hRsTMZyZiO7yqH3s4JQUhLU3WMclTxkOplkpv+Dr3p+Z5eQ46yElv
+         aN2o7ZJPkLHGpsoOikOROsMXqv5gWKf2s8cURuYcnw6sg+MuKMB3Xsd+/EtrKHGJGIpI
+         1GlUUpej1C1RBJUvRvYrFYweQVwEj0DhNHpOjzE95ahGotikHNRMlCOMY3+rR2Po7p7g
+         ciWA==
+X-Gm-Message-State: AOJu0YzkY3z0Ufx3CtG9bmZoK8CYZDosydHZDBv17K2LXP1JrOT6/aW0
+	FCmil0prxmNFVzg3Hobt+KcCZMVvFuFCoC/JkmQJuwWEOOcZhj+fn/jGAcSPojY=
+X-Google-Smtp-Source: AGHT+IFkkMB2jwGOsZvQjb8QBB5LeF/SJeIxo/NVxeAS7b9UoD+d0eANohhQtP3B1gjOGidA2wDYwg==
+X-Received: by 2002:a5e:9747:0:b0:7bf:35d5:bd21 with SMTP id h7-20020a5e9747000000b007bf35d5bd21mr2142003ioq.1.1705591292064;
+        Thu, 18 Jan 2024 07:21:32 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id n26-20020a6b411a000000b007bf2dcd385bsm3129897ioa.5.2024.01.18.07.21.29
+        by smtp.gmail.com with ESMTPSA id n26-20020a6b411a000000b007bf2dcd385bsm3129897ioa.5.2024.01.18.07.21.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jan 2024 07:21:29 -0800 (PST)
+        Thu, 18 Jan 2024 07:21:30 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org
-In-Reply-To: <20240117175901.871796-1-hch@lst.de>
-References: <20240117175901.871796-1-hch@lst.de>
-Subject: Re: [PATCH] loop: fix the the direct I/O support check when used
- on top of block devices
-Message-Id: <170559128967.861386.17373605187757527812.b4-ty@kernel.dk>
-Date: Thu, 18 Jan 2024 08:21:29 -0700
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, corbet@lwn.net, 
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+ Christian Loehle <christian.loehle@arm.com>
+In-Reply-To: <a86cfdc8-016f-40f1-8b58-0cb15d2a792c@arm.com>
+References: <a86cfdc8-016f-40f1-8b58-0cb15d2a792c@arm.com>
+Subject: Re: [PATCHv2] Documentation: block: ioprio: Update schedulers
+Message-Id: <170559129037.861386.11416426652561854463.b4-ty@kernel.dk>
+Date: Thu, 18 Jan 2024 08:21:30 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,21 +73,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Wed, 17 Jan 2024 18:59:01 +0100, Christoph Hellwig wrote:
-> __loop_update_dio only checks the alignment requirement for block backed
-> file systems, but misses them for the case where the loop device is
-> created directly on top of another block device.  Due to this creating
-> a loop device with default option plus the direct I/O flag on a > 512 byte
-> sector size file system will lead to incorrect I/O being submitted to the
-> lower block device and a lot of error from the lock layer.  This can
-> be seen with xfstests generic/563.
+On Thu, 18 Jan 2024 09:29:56 +0000, Christian Loehle wrote:
+> This doc hasn't been touched in a while, in the meantime some
+> new io schedulers were added (e.g. all of mq), some with ioprio
+> support.
+> 
+> Also reword the introduction to remove reference to CFQ and the
+> limitation that io priorities only work on reads, which is no longer
+> true.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] loop: fix the the direct I/O support check when used on top of block devices
-      commit: baa7d536077dcdfe2b70c476a8873d1745d3de0f
+[1/1] Documentation: block: ioprio: Update schedulers
+      commit: b2e792ae883a0aa976d4176dfa7dc933263440ea
 
 Best regards,
 -- 
