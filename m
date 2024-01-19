@@ -1,91 +1,81 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842E9322A;
-	Fri, 19 Jan 2024 01:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2DD1109
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 02:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705627663; cv=none; b=M+wt7//DanQ/X6bcorKVcObg4cpEuPdHTs8HtH+KUBNcAfPW+RYLEQK5u7Ix2BQN+MwDd5gncfBackCQQFnsrjT6LsT8ttrndmDr3Ac4EIOIXc1SVcLRSnlEGtvd0gsVSbynefq/3Zkq4JjQ8Ru9C3e0Ezeo+rXhBmh7uw/GyFg=
+	t=1705631273; cv=none; b=hv5WxM2pFpA4ivNxq1jUOfbOHVpejSjNC6SaBNiYSasNpe2ZHHt64VrrIkSh5JY09rngZfOKGWNXCVaxYf7dVKTkPIeYijPrSBATw0KkEOHF7pllq6JaKCiFh7bUjf6prwcvho4wH4AwCb0eV0EvzqLkl2X/NmT2D7RiDLqbjoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705627663; c=relaxed/simple;
-	bh=T2KrNq+0FoKIbhPTRgYchgT5nfKU6YqP1rVxIQBzJns=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=KFOZFLc6r5Jh9/GOfbIBVYMXSPeRWTO1S7nkaAecqgULuCMuWWjAUbRMCF1WijhvN9Mx6tJTPytulAQyynBnO152UFgk9NZA7UdRsg6SSJQWnrAu72mMTWT2X7x4U/L4wmq+tHNJE0t+XiDDjyTnRfMhaXmSgeXIL1vBFvqKjgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TGMRm6mc0z4f3kF5;
-	Fri, 19 Jan 2024 09:27:32 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id B52B71A0172;
-	Fri, 19 Jan 2024 09:27:36 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBnOBEG0Klly7QUBQ--.22293S3;
-	Fri, 19 Jan 2024 09:27:36 +0800 (CST)
-Subject: Re: [PATCH] block: Move checking GENHD_FL_NO_PART to
- bdev_add_partition()
-To: Jens Axboe <axboe@kernel.dk>, Li Lingfeng <lilingfeng@huaweicloud.com>,
- allison.karlitskaya@redhat.com, hch@infradead.org, yukuai1@huaweicloud.com
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240118130401.792757-1-lilingfeng@huaweicloud.com>
- <f6e687cc-debd-4864-901a-fb35be9f2adc@kernel.dk>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <00c59648-bbf3-7ae4-4cea-aeccbb2bfe0c@huaweicloud.com>
-Date: Fri, 19 Jan 2024 09:27:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1705631273; c=relaxed/simple;
+	bh=edvetmp62ZZxosTVvvpudn8YlxRguP+yP4LfPmqaj/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DxQP0g5+5P4ip9b97tzFU1/WAiQpKRpC5AdzbN0oLh9dIr7iGpU9ZYuo6L8fXhKMV70krVAmJuJtkfZWObcHpai3Ot+ru83gObQZKmKEXEEifxcPbwzh61EHiD1ypi1HmEznikPMobFJlEluVyurjyuJ0e1ktkL6qMoYHb5KPV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TA5GZT3f; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TA5GZT3f"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e87d07c07so3495585e9.1
+        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 18:27:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1705631269; x=1706236069; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QQMpEh4LvE69eda9uIzfnkERGeyOwbwYAU7yhuC08lw=;
+        b=TA5GZT3fY0FWuOhulHE5N8lbuk90aERZqfnF0LzV0QfmFhRKAByRMLx/PPVXYcHg77
+         FtCge6mc00uRy4ok/KY/IaoQ+G6SXoRDvSftOarLnex7RIof0lMEFyGRTO+HPp4REj8s
+         Y1VWdIh0Bx1MNr612sBWS6BnyyAVHf4kIwrXc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705631269; x=1706236069;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QQMpEh4LvE69eda9uIzfnkERGeyOwbwYAU7yhuC08lw=;
+        b=qp57GZD2Ry1AuQP2yZXX0D0jyqknU13/OcyXnR8B98d8zjYLSxTue7pU3w0+SI4c+9
+         8inZ/Q+HS3W4lQpmKl+bb2nLM4nRLBiJomOfiU5VOWNvvAI6npxIiDu0k3x2EC99+WKN
+         m48OjjaquHDudb5yeLPkwHumblXUjsvqJGJcptprbM9sf2wfrPyTtSgv+U2QSpp5EpZK
+         n/l/x0PnhSaGXRRyNpQIgaE7Kwv1UwR3sQ261LWC3YkZWRLFL9Kos7PuTYDIhntrtDXm
+         zjY0cplO32maGS9p9NLesxUeVI+FNwSWdHgaCkF1gyPuTLrJk7bInHuPlpLJHaWoC/c0
+         ETDA==
+X-Gm-Message-State: AOJu0YwX+d0YJMwox5VMn9uqUwupedZTq79Fv1nZ93QSidn93gGYV4Vr
+	f+nh9+EiPSaz+WvBMSf42SYx2mIPIfN43uIFpuc0R5KaHMzR1X0mR0kFHs/tk2/6E8j/R1/h7/8
+	T4z+wyQ==
+X-Google-Smtp-Source: AGHT+IFiT5StLrUM6EIrHqhpQO36Bfm40V6hx60NDHj9XJGPQNlO6BpDODNqCGC+YksnzVl1/FNE9Q==
+X-Received: by 2002:a05:600c:178a:b0:40e:73fb:17 with SMTP id x10-20020a05600c178a00b0040e73fb0017mr1308259wmo.154.1705631268908;
+        Thu, 18 Jan 2024 18:27:48 -0800 (PST)
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
+        by smtp.gmail.com with ESMTPSA id 19-20020a170906301300b00a26a93731c5sm9702226ejz.111.2024.01.18.18.27.48
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Jan 2024 18:27:48 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a2821884a09so18335866b.2
+        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 18:27:48 -0800 (PST)
+X-Received: by 2002:aa7:df8a:0:b0:558:857a:fe0 with SMTP id
+ b10-20020aa7df8a000000b00558857a0fe0mr1057835edy.70.1705631268125; Thu, 18
+ Jan 2024 18:27:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f6e687cc-debd-4864-901a-fb35be9f2adc@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBnOBEG0Klly7QUBQ--.22293S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw47trWkZr18Cw13JF4xZwb_yoW3CrX_Zw
-	1FkwnrJr4xJa4SgF40krWayryY9ayUW347ZrsrJrsxXrykA34kCFZagwna93yxXFs7Krn8
-	CrnxWr4DZa1IvjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <78f34b79-cdf9-4240-a25b-90a948490e36@kernel.dk>
+In-Reply-To: <78f34b79-cdf9-4240-a25b-90a948490e36@kernel.dk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 18 Jan 2024 18:27:30 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgHpR8ezS5F_Gx0JwjVMq6oCPz=ybJxf2amFp3XvT6c_Q@mail.gmail.com>
+Message-ID: <CAHk-=wgHpR8ezS5F_Gx0JwjVMq6oCPz=ybJxf2amFp3XvT6c_Q@mail.gmail.com>
+Subject: Re: [GIT PULL] Followup block fixes for 6.8-rc1
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+On Thu, 18 Jan 2024 at 14:12, Jens Axboe <axboe@kernel.dk> wrote:
+>
+> https://www.wikihow.com/Live-off-the-Grid
+> https://www.bobvila.com/articles/best-generator-brand/
 
-在 2024/01/18 23:20, Jens Axboe 写道:
-> On 1/18/24 6:04 AM, Li Lingfeng wrote:
->> From: Li Lingfeng <lilingfeng3@huawei.com>
->>
->> Commit 1a721de8489f ("block: don't add or resize partition on the disk
->> with GENHD_FL_NO_PART") prevented all operations about partitions on disks
->> with GENHD_FL_NO_PART in blkpg_do_ioctl() since they are meaningless.
->> However, it changed error code in some scenarios. So move checking
->> GENHD_FL_NO_PART to bdev_add_partition() to eliminate impact.
-> 
-> This looks fine, but it's identical to the one sent out by Yu two days
-> ago. Hmm? Who's the proper author?
+I "appreciate" the "helpful" pointers.
 
-Lingfeng is my collegue and I told him that he should send a fix for his
-formal patch. Sorry for the confusion :)
-
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-
-> 
-> Adding Yu.
-> 
-
+             Linus
