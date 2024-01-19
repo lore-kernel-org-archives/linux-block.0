@@ -1,52 +1,41 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF8779C5
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 02:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F07E1378
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 04:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705632058; cv=none; b=bPzO0ZvkSkC/da5Oxe0EwvUpb2l/WmKKMkXzwRQJ5vMFCbGJ4BXYlyUpb8Cp9X3dVwS6y3rvSM5bg3wftljPqPBave85XN8rONbl3Is45jVzfFwNcSWlSo7IkqcBgkqbnLr/gTNcoxBQmmQjhiiFjexn4PcCSg4DGPtyZKvLZDs=
+	t=1705639687; cv=none; b=rQb+uGoWJVmw7wnNHu0clV5MRuyhVnjYji4qIRNRc4mfl9Z0Q9q/HL46qq7uJUwuTZ1/NE5sIT7QKAnXGIkWDHLUbIeCz1cfko3P51tjpKiQYo9XZboNSX7gfNn7OHq+rQjn8G0jTgOj36xvgIHxhM7OOqgkoYCblzbYqiH0MqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705632058; c=relaxed/simple;
-	bh=mqu/oYgc39NCtbNEfd31+1L6bRinx684vh926/4r8XI=;
+	s=arc-20240116; t=1705639687; c=relaxed/simple;
+	bh=2zMwRd++WGHO/dzFJ8oPHiUxD0AI5KxVbZ4Jm8rX+50=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fbUfbPN09aKQ+sHjU2o1T//4VDYmF5o843E7HOW80VkI2j8s3ARTEyqHPg/UF422ptC93JGbxcbt+XlJZXyxfAa59Z6CRdADWpghcDDYnfzAJ1AE/EVCIcw/ZLwm3VVZihFk8uXMX4bmprJMjC9qtCjLNR6Nke7+4ZOozz/IEgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VXY0bZrL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nm1on9m6AiNeDwVpRDLQvSe6vJUEXBFFmGvCCdkXyeRDG7dl2YE5cDMG5CXiaD8YmxkiYOq7cqFszOtia9eQy6+IEwLh+B41I8UGAJzFdfK1q7hNdG7hxleSVE9b89fuHZZc4pE4hxqD2ULv5rXScUn85xefVMMdiS8ZyPStiMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fM89tsep; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXY0bZrL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705632055;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=48NL6D0TFLHayEtkNm5LqOA8XMHwzOhk5xf3Nd7hWxc=;
-	b=VXY0bZrLmx4yg7PEsKxZo4+yEWn7SeRrq2P5/FJvRUcPofYnuHQYm2K0hTWbbjE2wDBRbo
-	Hyn7CiENPn+ayXkMZjE0VH6/W28QDghhvalBlcsVjdYS7OuAWwWhd0YoTGsN0NNT/fVhh2
-	8F7mxlucqprOZiPhgtxasvWMq23+940=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-554-wORpOeeiN22G7LQw97jVbw-1; Thu, 18 Jan 2024 21:40:54 -0500
-X-MC-Unique: wORpOeeiN22G7LQw97jVbw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E046685A588;
-	Fri, 19 Jan 2024 02:40:53 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.48])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BD76494;
-	Fri, 19 Jan 2024 02:40:51 +0000 (UTC)
-Date: Fri, 19 Jan 2024 10:40:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, bvanassche@acm.org, ming.lei@redhat.com
-Subject: Re: [PATCH 1/2] block/mq-deadline: serialize request dispatching
-Message-ID: <ZanhL+fOWNSz2zJf@fedora>
-References: <20240118180541.930783-1-axboe@kernel.dk>
- <20240118180541.930783-2-axboe@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fM89tsep"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2178BC433F1;
+	Fri, 19 Jan 2024 04:48:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705639686;
+	bh=2zMwRd++WGHO/dzFJ8oPHiUxD0AI5KxVbZ4Jm8rX+50=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fM89tsepURNVeAZMjmdtYRyZjjLAd/QfOS3pzh/OnTAX7APvs+FEdqj+KWtmysfoh
+	 AOpbM4gfq/nw5pcxS30EedesQ3Iat1omHxgzeHq3a25R6aKX203B/jLZKzB6KSXcY7
+	 49m0qLHs9C8CEqPDAk0Y2wiRBRo7U6jLW89VGPl0DVT95qo6RJFHBIJYzKoHETrCQo
+	 LsdI9tkLeZgmkA3Es31W+4C6V9yu8s2IsdH+b8qtTbfQcQl7H0D75YeUaJoPjrs9DT
+	 fGHHLCSATDC0DgbzzoCHmym56Yqls7k9pO5sQ+mjHG0Rd7/NxRbyO748+00y/isRFe
+	 5JhC39M15Db7A==
+Date: Thu, 18 Jan 2024 21:48:03 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: alan.adamson@oracle.com
+Cc: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+	sagi@grimberg.me, linux-block@vger.kernel.org
+Subject: Re: [RFC 0/1] nvme: Add NVMe LBA Fault Injection
+Message-ID: <Zan_A-dR5ReYTfBF@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240116232728.3392996-1-alan.adamson@oracle.com>
+ <20240118072419.GA21315@lst.de>
+ <6874a81c-3f4f-428a-8a95-19898ca004a2@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,78 +44,52 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240118180541.930783-2-axboe@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+In-Reply-To: <6874a81c-3f4f-428a-8a95-19898ca004a2@oracle.com>
 
-On Thu, Jan 18, 2024 at 11:04:56AM -0700, Jens Axboe wrote:
-> If we're entering request dispatch but someone else is already
-> dispatching, then just skip this dispatch. We know IO is inflight and
-> this will trigger another dispatch event for any completion. This will
-> potentially cause slightly lower queue depth for contended cases, but
-> those are slowed down anyway and this should not cause an issue.
+On Thu, Jan 18, 2024 at 09:02:43AM -0800, alan.adamson@oracle.com wrote:
 > 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  block/mq-deadline.c | 28 +++++++++++++++++++++++-----
->  1 file changed, 23 insertions(+), 5 deletions(-)
+> On 1/17/24 11:24 PM, Christoph Hellwig wrote:
+> > On Tue, Jan 16, 2024 at 03:27:27PM -0800, Alan Adamson wrote:
+> > > It has been requested that the NVMe fault injector be able to inject faults when accessing
+> > > specific Logical Block Addresses (LBA).
+> > Curious, but who has requested this?  Because injecting errors really
+> > isn't the drivers job.
 > 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index f958e79277b8..9e0ab3ea728a 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -79,10 +79,20 @@ struct dd_per_prio {
->  	struct io_stats_per_prio stats;
->  };
->  
-> +enum {
-> +	DD_DISPATCHING	= 0,
-> +};
-> +
->  struct deadline_data {
->  	/*
->  	 * run time data
->  	 */
-> +	struct {
-> +		spinlock_t lock;
-> +		spinlock_t zone_lock;
-> +	} ____cacheline_aligned_in_smp;
-> +
-> +	unsigned long run_state;
->  
->  	struct dd_per_prio per_prio[DD_PRIO_COUNT];
->  
-> @@ -100,9 +110,6 @@ struct deadline_data {
->  	int front_merges;
->  	u32 async_depth;
->  	int prio_aging_expire;
-> -
-> -	spinlock_t lock;
-> -	spinlock_t zone_lock;
->  };
->  
->  /* Maps an I/O priority class to a deadline scheduler priority. */
-> @@ -600,6 +607,15 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->  	struct request *rq;
->  	enum dd_prio prio;
->  
-> +	/*
-> +	 * If someone else is already dispatching, skip this one. This will
-> +	 * defer the next dispatch event to when something completes, and could
-> +	 * potentially lower the queue depth for contended cases.
-> +	 */
-> +	if (test_bit(DD_DISPATCHING, &dd->run_state) ||
-> +	    test_and_set_bit(DD_DISPATCHING, &dd->run_state))
-> +		return NULL;
-> +
+> 
+> It's an application (database) that is requesting it for their error
+> handling testing.
 
-This patch looks fine.
+Going out on a limb here... This seems so obscure to burden a driver to
+synthesize. Could we just give a hook for a bpf override and you can
+totally go for whatever scenario you can imagine with a script?
 
-BTW, the current dispatch is actually piggyback in the in-progress dispatch,
-see blk_mq_do_dispatch_sched(). And the correctness should depend on
-the looping dispatch & retry for nothing to dispatch in
-blk_mq_do_dispatch_sched(), maybe we need to document it here.
-
-
-Thanks,
-Ming
-
+---
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 50818dbcfa1ae..df87a63335aa8 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -381,9 +381,22 @@ static inline void nvme_end_req_zoned(struct request *req)
+ 	}
+ }
+ 
++#ifdef CONFIG_BPF_KPROBE_OVERRIDE
++static noinline blk_status_t nvme_req_status(struct nvme_request *req)
++{
++	return nvme_error_status(req->status);
++}
++ALLOW_ERROR_INJECTION(nvme_req_status, ERRNO);
++#else
++static inline blk_status_t nvme_req_status(struct nvme_request *req)
++{
++	return nvme_error_status(req->status);
++}
++#endif
++
+ static inline void nvme_end_req(struct request *req)
+ {
+-	blk_status_t status = nvme_error_status(nvme_req(req)->status);
++	blk_status_t status = nvme_req_status(nvme_req(req));
+ 
+ 	if (unlikely(nvme_req(req)->status && !(req->rq_flags & RQF_QUIET)))
+ 		nvme_log_error(req);
+--
