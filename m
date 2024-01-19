@@ -1,81 +1,63 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2DD1109
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 02:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0151D53A
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 02:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705631273; cv=none; b=hv5WxM2pFpA4ivNxq1jUOfbOHVpejSjNC6SaBNiYSasNpe2ZHHt64VrrIkSh5JY09rngZfOKGWNXCVaxYf7dVKTkPIeYijPrSBATw0KkEOHF7pllq6JaKCiFh7bUjf6prwcvho4wH4AwCb0eV0EvzqLkl2X/NmT2D7RiDLqbjoM=
+	t=1705632025; cv=none; b=UMKlGwHdbDirglUFmSqprs3hQu/1D+Vm/T1lBTmcFQY5DbnYBbBUPj6/oBm54c3RdkclPjdYY8XJm+2xopbcaF5vIQ4/wapNuYVdeduiR9sxfb0VjQbxPSfv1Zu6cxA3R/Sc05PRUowrQQvq8GSotSmW14MoHevn782GurSGpnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705631273; c=relaxed/simple;
-	bh=edvetmp62ZZxosTVvvpudn8YlxRguP+yP4LfPmqaj/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DxQP0g5+5P4ip9b97tzFU1/WAiQpKRpC5AdzbN0oLh9dIr7iGpU9ZYuo6L8fXhKMV70krVAmJuJtkfZWObcHpai3Ot+ru83gObQZKmKEXEEifxcPbwzh61EHiD1ypi1HmEznikPMobFJlEluVyurjyuJ0e1ktkL6qMoYHb5KPV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TA5GZT3f; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1705632025; c=relaxed/simple;
+	bh=fMVFdlTbxfzNsEfzzZcJasxPQmuT8SZepW1fKlDIwGw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=oupGVg2N+dvdi3K8va42SgfYcikw7tDtvuIQZ9XEUOfrne+COPR9uS+Chl9/2wvwrbs37vv24DLl6KaSk7XfL0cbh2v7iL1vQDF115euEqGNDt/hr7R5+Q+EAOkgidtsT+TxSx2CKzl1JKsFJh46mQiP9PV20GlI9LOrP9NGzoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlCouuKG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TA5GZT3f"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e87d07c07so3495585e9.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 18:27:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1705631269; x=1706236069; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QQMpEh4LvE69eda9uIzfnkERGeyOwbwYAU7yhuC08lw=;
-        b=TA5GZT3fY0FWuOhulHE5N8lbuk90aERZqfnF0LzV0QfmFhRKAByRMLx/PPVXYcHg77
-         FtCge6mc00uRy4ok/KY/IaoQ+G6SXoRDvSftOarLnex7RIof0lMEFyGRTO+HPp4REj8s
-         Y1VWdIh0Bx1MNr612sBWS6BnyyAVHf4kIwrXc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705631269; x=1706236069;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QQMpEh4LvE69eda9uIzfnkERGeyOwbwYAU7yhuC08lw=;
-        b=qp57GZD2Ry1AuQP2yZXX0D0jyqknU13/OcyXnR8B98d8zjYLSxTue7pU3w0+SI4c+9
-         8inZ/Q+HS3W4lQpmKl+bb2nLM4nRLBiJomOfiU5VOWNvvAI6npxIiDu0k3x2EC99+WKN
-         m48OjjaquHDudb5yeLPkwHumblXUjsvqJGJcptprbM9sf2wfrPyTtSgv+U2QSpp5EpZK
-         n/l/x0PnhSaGXRRyNpQIgaE7Kwv1UwR3sQ261LWC3YkZWRLFL9Kos7PuTYDIhntrtDXm
-         zjY0cplO32maGS9p9NLesxUeVI+FNwSWdHgaCkF1gyPuTLrJk7bInHuPlpLJHaWoC/c0
-         ETDA==
-X-Gm-Message-State: AOJu0YwX+d0YJMwox5VMn9uqUwupedZTq79Fv1nZ93QSidn93gGYV4Vr
-	f+nh9+EiPSaz+WvBMSf42SYx2mIPIfN43uIFpuc0R5KaHMzR1X0mR0kFHs/tk2/6E8j/R1/h7/8
-	T4z+wyQ==
-X-Google-Smtp-Source: AGHT+IFiT5StLrUM6EIrHqhpQO36Bfm40V6hx60NDHj9XJGPQNlO6BpDODNqCGC+YksnzVl1/FNE9Q==
-X-Received: by 2002:a05:600c:178a:b0:40e:73fb:17 with SMTP id x10-20020a05600c178a00b0040e73fb0017mr1308259wmo.154.1705631268908;
-        Thu, 18 Jan 2024 18:27:48 -0800 (PST)
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
-        by smtp.gmail.com with ESMTPSA id 19-20020a170906301300b00a26a93731c5sm9702226ejz.111.2024.01.18.18.27.48
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jan 2024 18:27:48 -0800 (PST)
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a2821884a09so18335866b.2
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 18:27:48 -0800 (PST)
-X-Received: by 2002:aa7:df8a:0:b0:558:857a:fe0 with SMTP id
- b10-20020aa7df8a000000b00558857a0fe0mr1057835edy.70.1705631268125; Thu, 18
- Jan 2024 18:27:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlCouuKG"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 540D0C43609;
+	Fri, 19 Jan 2024 02:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705632025;
+	bh=fMVFdlTbxfzNsEfzzZcJasxPQmuT8SZepW1fKlDIwGw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=qlCouuKGRm/fDdOCkd75Sm72NpVime5vObpWO/aWGmV5rTStPaa6vcJC/gC4Pix0e
+	 dwkd601B5iL7lILVUQTVG+Jmi5Vnii+Ph66yEMCXC6+ZRijtwbigdpBkilQP+O/Q6O
+	 OGX0F/c4um8ogoKgItI7nKc70fkjvqkNV1eul6mXozTYZKraT0tcqNPeAcSvWSsCbn
+	 Mu82Cwv5uBpy5pRMLHnJ73lbOGnnYG6ZvXecX8J7+HoLa3ZGiAqDCcw+MEza0b6BMV
+	 twbbGspTrwbykjobqM7tZTZzxcoyjIlOuNfSuRE+52/ky+wz1VQPii5k/nJz5iqDm2
+	 iGtYvBtO7WW4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 42AECD8C985;
+	Fri, 19 Jan 2024 02:40:25 +0000 (UTC)
+Subject: Re: [GIT PULL] Followup block fixes for 6.8-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <78f34b79-cdf9-4240-a25b-90a948490e36@kernel.dk>
+References: <78f34b79-cdf9-4240-a25b-90a948490e36@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <78f34b79-cdf9-4240-a25b-90a948490e36@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/for-6.8/block-2024-01-18
+X-PR-Tracked-Commit-Id: b2e792ae883a0aa976d4176dfa7dc933263440ea
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 9d1694dc91ce7b80bc96d6d8eaf1a1eca668d847
+Message-Id: <170563202526.16016.2959873453653822353.pr-tracker-bot@kernel.org>
+Date: Fri, 19 Jan 2024 02:40:25 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <78f34b79-cdf9-4240-a25b-90a948490e36@kernel.dk>
-In-Reply-To: <78f34b79-cdf9-4240-a25b-90a948490e36@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 18 Jan 2024 18:27:30 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgHpR8ezS5F_Gx0JwjVMq6oCPz=ybJxf2amFp3XvT6c_Q@mail.gmail.com>
-Message-ID: <CAHk-=wgHpR8ezS5F_Gx0JwjVMq6oCPz=ybJxf2amFp3XvT6c_Q@mail.gmail.com>
-Subject: Re: [GIT PULL] Followup block fixes for 6.8-rc1
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 18 Jan 2024 at 14:12, Jens Axboe <axboe@kernel.dk> wrote:
->
-> https://www.wikihow.com/Live-off-the-Grid
-> https://www.bobvila.com/articles/best-generator-brand/
+The pull request you sent on Thu, 18 Jan 2024 15:12:38 -0700:
 
-I "appreciate" the "helpful" pointers.
+> git://git.kernel.dk/linux.git tags/for-6.8/block-2024-01-18
 
-             Linus
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/9d1694dc91ce7b80bc96d6d8eaf1a1eca668d847
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
