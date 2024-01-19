@@ -1,76 +1,91 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348711EA91;
-	Fri, 19 Jan 2024 16:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5316F54FB0
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 16:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705682081; cv=none; b=kJXRDQ6RlD6PT7GnoOMJ5vE+0A/0stZ7Cr7SuWExF62fz06268IafRn1XR8/wGzHW8qoaxvBG/9f8QYMJj5JDrgQsD8b6XijC/kPm7zzoYFKzUOkOQtoOZlzQSlQLXDpn4WKD3sQjJ4yT/YlBjZxawJHGmY0Q1B3JW/eXiqJwJU=
+	t=1705682504; cv=none; b=SMS3UZJFlzVzyZ7At5u0KuS3DzTT1uXsqD6+B7jann6ergA6Jsup3xFHN5E7vhDTXAJwiGa9MaVh2SgBDmDxvyrO/flKsGn+by2WWI+ElBvri8Q/Jfh0q+1pRcxoRePGFYDtPkjb/41fRPJmeUziN0g21aCXI6A/lROra/r9J+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705682081; c=relaxed/simple;
-	bh=p0uhRomXP747eD0lrfKRHR3XfogCxogKEHI4Bqv1SBg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=etOb/KfTR0rja30nw4f32M88Yf00fyjHUDn0Hyg1JJyotkyTALlXq4RtTC3VWqqxhlx/P0nHcQGMJ3xi2RD/uCJbDCvkFY3QNvIIIy8x/4pBHipVN9auso9pWvMlBVX30lmWGJQ6hDOgJS8/Wqs6dKxxRHGSZ8z3ySQYcxM8E+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Lt4lcHZr; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1705682504; c=relaxed/simple;
+	bh=azMRYqvk1Vz+HvUwch48zgp9sztbupEWVObn4s0Ufrw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OvO7yjh+hjOmEPGPME25AAA+vVfuzAg6X0NL8Rvmcpde8Eu8A4/tXYY0TXNoB/vyP8IBpRIePTPBJtf1j7W3M5zhjp4jz7qvQgPjj8GHo1u/zDsAYKo/FJbUwb98yI/6yUEENxMSvTzRP/V3TSlpV6hEDUGM777Kt9tPnlC3FUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=X/jyD+VG; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lt4lcHZr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=E2DXX9J+b94QW5GPGfNYquiYbNTYKAfgE95rMIVDquM=; b=Lt4lcHZrYrOo7GYWIA1f9BGqCq
-	7NYGF5wH98DEKKDKQKZWHUSYoI7ImlG7QnlD19/ZjAK4USUFrk4NSHh1HlsluWddhKf0nxncPbviU
-	+aAODSWWqGuB5uQQ5Fr//F0n7rYLw7N3BuPUFGuE6SDesO3UrZy9L6gpRs2ZiuVpQJOvFMuY3kb/w
-	gTXYUJbH0hRF9+77TR8xgpdwc31BS2pREfY0F/plEtounuD+le+DWJqyL9wrpN96ZYnNpQzAwHyXd
-	YRee8sBHBZTYughIQpPk4Sa4ex4ydhYRorXVOdVW+OyoSjnXKBXijUE3Q0eYuyLU4Bu679fb/ubkq
-	hsU4mWow==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rQrpG-00000005hDX-090S;
-	Fri, 19 Jan 2024 16:34:38 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] block: Remove unnecessary unlikely()
-Date: Fri, 19 Jan 2024 16:34:00 +0000
-Message-ID: <20240119163434.1357155-1-willy@infradead.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="X/jyD+VG"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-36095e0601bso449565ab.0
+        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 08:41:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705682501; x=1706287301; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sQklyqCzykir7KyEueElXoaEtB+kuoHpU7ZGJJMiaxM=;
+        b=X/jyD+VGS71qIv4BgELKZBYQQ+4hnEHd+Dw8FYaBujRdjxxqsh3rPC/b0da7prMmSC
+         P8Cv6C0N6DyxCJcQ5WtD5Gnx226SILBaepvlqK0Gb8bm+hfdY5BoxRwU4Wb7m8fQbz/3
+         RqOjc1GwGx20G/+9XiystXGFUnmEAK9ZB2Yxlp061UCT8OEiDgi4rDszpWmfNKHsvWCq
+         CnprH6KaNOxvU60751CdRF0AaiIyvZY15oNiRCT7SIgUSzZQP3W3Czu9IuyW5zF00/aC
+         UMGawu75NKP47ijwUX6qz12Z8XkJdzJ/7pLqsntUNSORcrv+7cTVvITcl7mSrdG1x2fJ
+         R65Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705682501; x=1706287301;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sQklyqCzykir7KyEueElXoaEtB+kuoHpU7ZGJJMiaxM=;
+        b=F3+ey8rojpRx0h/xem2cEvD9zp+2ExEqg9ZJXddlEpNzPdef+KC1FeH4LEZTOlgSvG
+         W3C+5e+ARLGiS9AeE8+WyUZJlgLvp+N9WDJ9m7PZEgSMRj1EAoMpuTvlQcP1r6QZ5jiT
+         a+XUYI2sXCevwXO6xpVeNnxXtreDr0KYm2lLrMBJvkRlfxWHdAQxiYle4qMlo2k765xq
+         FM8zwRjaEb1q7BMm4YiYmtdwdtq+lzYU22TepQLX5v8z+GnXWXlPbVQEq9yM2U8+ukRf
+         vP8ljp+uszdzWJvqrC1qWiqw6OxIGj/IL3ioBQIj5pqSmi9fncXckFCL6XS4B18GCg3B
+         y8ZA==
+X-Gm-Message-State: AOJu0YwqDgQj6/EghXS2yGHSsx+xaRyecbcUJnetP+15GCafP2D8nYv9
+	9+5IRxzgNLli3NplxLOjBeBlY4FgFKcwY76eubUovnnGoM+TgHwD08FzWU1qqGwddLncv7FKT9a
+	IMcE=
+X-Google-Smtp-Source: AGHT+IEQzErgEl9CkxmRGuWHPrGq7DyyFeysApP9aPzAPnIao1mWImm82UBhKNq81p6iFjY047QXCg==
+X-Received: by 2002:a05:6e02:1be8:b0:360:702a:3f89 with SMTP id y8-20020a056e021be800b00360702a3f89mr260523ilv.0.1705682501472;
+        Fri, 19 Jan 2024 08:41:41 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id bb5-20020a056e02000500b003619ab760f1sm1359094ilb.24.2024.01.19.08.41.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jan 2024 08:41:40 -0800 (PST)
+Message-ID: <fe1f4fe8-48d8-4b09-bd50-36e8fd8e75cb@kernel.dk>
+Date: Fri, 19 Jan 2024 09:41:40 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
-Jens added unlikely() thinking that this was an error path.  It's
-actually just the end of the iteration, so does not warrant an
-unlikely().
-
-Fixes: 7bed6f3d08b7 ("block: Fix iterating over an empty bio with bio_for_each_folio_all")
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Remove unnecessary unlikely()
+Content-Language: en-US
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- include/linux/bio.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+References: <20240119163434.1357155-1-willy@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240119163434.1357155-1-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 875d792bffff..1518f1201ddd 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -286,7 +286,7 @@ static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
- {
- 	struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
- 
--	if (unlikely(i >= bio->bi_vcnt)) {
-+	if (i >= bio->bi_vcnt) {
- 		fi->folio = NULL;
- 		return;
- 	}
+On 1/19/24 9:34 AM, Matthew Wilcox (Oracle) wrote:
+> Jens added unlikely() thinking that this was an error path.  It's
+> actually just the end of the iteration, so does not warrant an
+> unlikely().
+
+This is because the previous fix (or my attempt at least) didn't do the
+i >= vcnt, it checked for an empty bio instead. Which then definitely
+did make it an error/unlikely path, but obviously this one is not.
+
+The bio iterator stuff has gotten terribly unwieldy and complicated, and
+not very efficient either. But I guess that's a story for another
+investigation...
+
 -- 
-2.43.0
+Jens Axboe
 
