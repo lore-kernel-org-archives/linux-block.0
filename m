@@ -1,303 +1,174 @@
-Received: from redpilled.dev (redpilled.dev [195.201.122.22])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1627524A0;
-	Fri, 19 Jan 2024 13:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.201.122.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43B3524D8
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 13:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705669506; cv=none; b=Ze+DuYKlFk90Hl+lysLxspCVdlxDas7wRp+GEyK1M4rIay8upzXL3MOKuQyfz2lhRGZushOiQijKhRQeFphJ81GZqgM7ccia+/qn/4+uDDQK7DOJruKG5cEjqfBA473E3CXJJU0YqX38s1cDyG6awuzxHa16SZyGyiIk/UAPFcA=
+	t=1705672600; cv=none; b=azMvo+SR9UrwupitunoIdfYLzbyAqhc4w7tGkPzrghN9gb6cYRhZrl7XICyKIQE5CEniplEVujkj3ZDZHXo65wcMbTlBVBJ3zQp3eEhV/jSbpQFsFg6RPSAnNyBzDWnylm4o/yfvRnMmbZaxH6rxpVcvQ7Md2VkfVUZJ0/v5lGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705669506; c=relaxed/simple;
-	bh=6fOFBGsYFmAePcb+gbennPXklURii6NFccNMiDvdd6E=;
-	h=MIME-Version:Date:From:To:Cc:Subject:Message-ID:Content-Type; b=EKQSwGke/sFi4y8TB+9stKhSHR2/el9vEpod2bAMzbET6ayimhqXcvzk0CXJv+J+fPRh09eL/CHIp31Yw0wQJKdjohUb3TNkKS+wWRBjkGckBLKoJBboGXdWVFO2LQ24cS/W1bpConFpPee6pYBMV8BhIV/zPNZQtk1ojp+t3jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redpilled.dev; spf=pass smtp.mailfrom=redpilled.dev; dkim=pass (1024-bit key) header.d=redpilled.dev header.i=@redpilled.dev header.b=btcIxcCA; arc=none smtp.client-ip=195.201.122.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redpilled.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redpilled.dev
+	s=arc-20240116; t=1705672600; c=relaxed/simple;
+	bh=xKDBjhSIQeHRiyBuvswYCR7Q2MyTamGKnI7gDtPSo9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=E28e5GdqeImOq1AtWKg+nWB/c+tsk2j/ccYJxkud18v3+Iu2+/YTxYH/QlKe/yGLQQwsPS/UuxaEA3S1+PPgeINDezjdBJI2asi+TjOaRJEdveGWtNwAW1No5X9z27S4SfQKOBu9HwWNv7B0GhwunkLXDXqMTxsyzeYe54JbcYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=aQN6qU1F; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redpilled.dev header.i=@redpilled.dev header.b="btcIxcCA"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="aQN6qU1F"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240119135635epoutp021576ad50f6d510b177a54653242e07d5~rxDBQHpdo1860918609epoutp02h
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 13:56:35 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240119135635epoutp021576ad50f6d510b177a54653242e07d5~rxDBQHpdo1860918609epoutp02h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1705672595;
+	bh=W+RflgyenszR5l0ujHluv04CpVMqFfMdltxcbwxC4Dc=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=aQN6qU1FoblAU800GFvBwsWPll2Cam2INs5dplxzXu8ct9OQzcymxeILiy/ja/IuU
+	 ckReS347iDXXN0Sriu3iNgkVrfdeIwMbMTH8Rph+nElfSuV6xZwOvZcYhEWqx5401Q
+	 5bhQulUXPxGIjvNAeI4MfKLBWP1jQnRka4aacF7U=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20240119135634epcas5p239b4222d5ff49b2334f45d2e8ee4c237~rxDAMYUOz2244622446epcas5p2V;
+	Fri, 19 Jan 2024 13:56:34 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.183]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4TGh405bybz4x9Pp; Fri, 19 Jan
+	2024 13:56:32 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	9B.38.10009.09F7AA56; Fri, 19 Jan 2024 22:56:32 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20240119135631epcas5p395210d5cb1880721719bdb46349b1625~rxC9fdr862438224382epcas5p36;
+	Fri, 19 Jan 2024 13:56:31 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240119135631epsmtrp24f31082e3acee7b1d7b4302edc898d3e~rxC9d9Vsa2247922479epsmtrp28;
+	Fri, 19 Jan 2024 13:56:31 +0000 (GMT)
+X-AuditID: b6c32a4a-ff1ff70000002719-c7-65aa7f90f7b7
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	36.C8.08817.F8F7AA56; Fri, 19 Jan 2024 22:56:31 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240119135629epsmtip191f7c61126b6f0e860791b7e09a9cbeb~rxC7wT0ZV0975809758epsmtip1G;
+	Fri, 19 Jan 2024 13:56:29 +0000 (GMT)
+Message-ID: <9fa04d79-0ba6-a2e0-6af7-d1c85f08923b@samsung.com>
+Date: Fri, 19 Jan 2024 19:26:28 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redpilled.dev;
-	s=mail; t=1705667162;
-	bh=zjv/K4BDJq6mHH6xaikJhlEHfdzmdGc7uo6JC3hv3j0=;
-	h=Date:From:To:Cc:Subject;
-	b=btcIxcCAAvGS81uL+pLqe0z/Md4znXwBDtf4G+U9RxEoTwDDCc2vXUuFBv6sMczF6
-	 heSqH5CWG5faElPRsr+Eqx2RTYWudh2EYS5W9ljMT9lmYDvryst69GO88o0rMT3kyf
-	 vp4lOBIxq8PZ36Q0mDfXBc9l6kjQRDyW+EY2F5+I=
-Date: Fri, 19 Jan 2024 12:25:58 +0000
-From: Mia Kanashi <chad@redpilled.dev>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: linux-bcachefs@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>, Christoph
- Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Subject: [BUG] I/O timeouts and system freezes on Kingston A2000 NVME with
- BCACHEFS
-Message-ID: <54fcc150f287216593b19271f443bf13@redpilled.dev>
-X-Sender: chad@redpilled.dev
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v8 06/19] block, fs: Propagate write hints to the block
+ device inode
+Content-Language: en-US
+To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Daejun Park
+	<daejun7.park@samsung.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <9b854847-d29e-4df2-8d5d-253b6e6afc33@acm.org>
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDJsWRmVeSWpSXmKPExsWy7bCmuu6E+lWpBkt3qlmsvtvPZvH68CdG
+	i2kffjJb/L/7nMli1YNwi5WrjzJZ/Fy2it1i7y1tiz17T7JYdF/fwWax/Pg/Jovzf4+zOvB4
+	XL7i7XH5bKnHplWdbB67bzaweXx8eovFo2/LKkaPz5vkPDY9ecsUwBGVbZORmpiSWqSQmpec
+	n5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdKqSQlliTilQKCCxuFhJ386m
+	KL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtj/bvcgvv8FbcWWzYw
+	ruDtYuTkkBAwkejo/M7YxcjFISSwm1HiSMMUNgjnE6PEpyVX2CGcb4wSk29vYoJpefV6DytE
+	Yi+jxLHeOVDOW0aJnbc3sYJU8QrYSWyctYsdxGYRUJWYtGoTI0RcUOLkzCcsILaoQJLEr6tz
+	wOLCAlESSybvZQaxmQXEJW49mQ+0jYNDRMBD4tYbP4jwDyaJGdcUQcJsApoSFyaXgoQ5Bawl
+	Jv6cyQRRIi/RvHU2M8g5EgIHOCQuzpjHDHG0i0Tnp6eMELawxKvjW9ghbCmJz+/2skHYyRKX
+	Zp6DerJE4vGeg1C2vUTrqX5mkL3MQHvX79KH2MUn0fv7CdiVEgK8Eh1tQhDVihL3Jj1lhbDF
+	JR7OWAJle0h8utnHBAmpE8wSD1r/s01gVJiFFCizkDw/C8k7sxA2L2BkWcUomVpQnJueWmxa
+	YJSXWg6P7eT83E2M4GSs5bWD8eGDD3qHGJk4GA8xSnAwK4nw8quuShXiTUmsrEotyo8vKs1J
+	LT7EaAqMnYnMUqLJ+cB8kFcSb2hiaWBiZmZmYmlsZqgkzvu6dW6KkEB6YklqdmpqQWoRTB8T
+	B6dUA1PL5JC5793/bXlzR4m/buEOYZ9Q++9iK6uFt7IedHWdFfYzo/7QZ8sGm5WX3j9Z7n4t
+	yI5/XnzJv3vfnBQvTas8yXNVY5N0ofGxe/fXKR9WKfth8sBkf+bzB03Hsnd+UfOcPEdm2sSe
+	CHeRe3Xbz8e+cbyyM/ef3QIRQ7N+Had5/zoaEycfk8pwrgzfeuPs/YjzQmwMDWU5bU2TXJdN
+	dnt1f9nhvz5zV/0xkUo+OtfSIN9Zwv7ymtgJTfeiDF8FebTw2p66oHBgmtbLe4x7m5Zf263b
+	9E7j9dzaIyLiVa+rXzmsvv2hwLDrybWqDOYfkQ9llKYKBzV7MdVqHjKTV978JnvX2wpjn0iP
+	73MYnaYrsRRnJBpqMRcVJwIAGnf/1E8EAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsWy7bCSnG5//apUgx1d8har7/azWbw+/InR
+	YtqHn8wW/+8+Z7JY9SDcYuXqo0wWP5etYrfYe0vbYs/ekywW3dd3sFksP/6PyeL83+OsDjwe
+	l694e1w+W+qxaVUnm8fumw1sHh+f3mLx6NuyitHj8yY5j01P3jIFcERx2aSk5mSWpRbp2yVw
+	Zax/l1twn7/i1mLLBsYVvF2MnBwSAiYSr17vYQWxhQR2M0ocv1YBEReXaL72gx3CFpZY+e85
+	kM0FVPOaUeLAtkvMIAleATuJjbN2gRWxCKhKTFq1iREiLihxcuYTFhBbVCBJYs/9RiYQW1gg
+	SmLJ5L1gvcxAC249mQ8U5+AQEfCQuPXGD2Q+s8AvJomGx9ehlh1hlni99x87SBGbgKbEhcml
+	IL2cAtYSE3/OZIKYYybRtbWLEcKWl2jeOpt5AqPQLCRnzEKybhaSlllIWhYwsqxilEwtKM5N
+	zy02LDDKSy3XK07MLS7NS9dLzs/dxAiOPC2tHYx7Vn3QO8TIxMF4iFGCg1lJhJdfdVWqEG9K
+	YmVValF+fFFpTmrxIUZpDhYlcd5vr3tThATSE0tSs1NTC1KLYLJMHJxSDUyFzTb1hcsvBIbs
+	6Q7be3+H9+ndu868fvgyoT95usqf3cv+fdr1cuHLOUcaDP9wmr89yz1hz/Vqmzs9Qj0sfzc0
+	Jz1y+xBimvp47spf7WX//vyZLXc18lzDDTvXYGf+670ini0G79Wjj8zJZHxjc39b64R/y6zT
+	GDrj9V+EHF6nLWZ8p+NHts+KzFuls8q11p/ZXxUYv7q8vj9mrp3xzX8+Uy+95urczdK1J9G0
+	q/N/o/J02/WCW9eEJmz9Gc1c8W2TpMqvyZ4hlxmE9sQ/eDNP/6iwsY4Pl/vvXKGVkRObY3R8
+	jvJP/qq+Jz/wyDwbgXlXZDZ32z9//F056IjcZjVJ4advXb9leKvtunow6ly3EktxRqKhFnNR
+	cSIAf9GIDCsDAAA=
+X-CMS-MailID: 20240119135631epcas5p395210d5cb1880721719bdb46349b1625
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc
+References: <20231219000815.2739120-1-bvanassche@acm.org>
+	<20231219000815.2739120-7-bvanassche@acm.org>
+	<20231228071206.GA13770@lst.de>
+	<00cf8ffa-8ad5-45e4-bf7c-28b07ab4de21@acm.org>
+	<20240103090204.GA1851@lst.de>
+	<CGME20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc@epcas5p4.samsung.com>
+	<23753320-63e5-4d76-88e2-8f2c9a90505c@acm.org>
+	<b294a619-c37e-cb05-79a8-8a62aec88c7f@samsung.com>
+	<9b854847-d29e-4df2-8d5d-253b6e6afc33@acm.org>
 
-This issue was originally reported here: 
-https://github.com/koverstreet/bcachefs/issues/628
+On 1/19/2024 12:24 AM, Bart Van Assche wrote:
+> On 1/18/24 10:51, Kanchan Joshi wrote:
+>> Are you considering to change this so that hint is set only on one inode
+>> (and not on two)?
+>> IOW, should not this fragment be like below:
+>>
+>> --- a/fs/fcntl.c
+>> +++ b/fs/fcntl.c
+>> @@ -306,7 +306,6 @@ static long fcntl_get_rw_hint(struct file *file,
+>> unsigned int cmd,
+>>    static long fcntl_set_rw_hint(struct file *file, unsigned int cmd,
+>>                                 unsigned long arg)
+>>    {
+>> -       void (*apply_whint)(struct file *, enum rw_hint);
+>>           struct inode *inode = file_inode(file);
+>>           u64 __user *argp = (u64 __user *)arg;
+>>           u64 hint;
+>> @@ -316,11 +315,15 @@ static long fcntl_set_rw_hint(struct file *file,
+>> unsigned int cmd,
+>>           if (!rw_hint_valid(hint))
+>>                   return -EINVAL;
+>>
+>> +       /*
+>> +        * file->f_mapping->host may differ from inode. As an example
+>> +        * blkdev_open() modifies file->f_mapping
+>> +        */
+>> +       if (file->f_mapping->host != inode)
+>> +               inode = file->f_mapping->host;
+>> +
+>>           inode_lock(inode);
+>>           inode->i_write_hint = hint;
+>> -       apply_whint = inode->i_fop->apply_whint;
+>> -       if (apply_whint)
+>> -               apply_whint(file, hint);
+>>           inode_unlock(inode);
+> 
+> I think the above proposal would introduce a bug: it would break the
+> F_GET_RW_HINT implementation.
 
-Transferring large amounts of files to the bcachefs from the btrfs 
-causes I/O timeouts and freezes the whole system. This doesn't seem to 
-be related to the btrfs, but rather to the heavy I/O on the drive, as it 
-happens without btrfs being mounted. Transferring the files to the HDD, 
-and then from it to the bcachefs on the NVME sometimes doesn't make the 
-problem occur.
-The problem only happens on the bcachefs, not on btrfs or ext4. It 
-doesn't happen on the HDD, I can't test with other NVME drives sadly.
-The behaviour when it is frozen is like this: all drive accesses can't 
-process, when not cached in ram, so every app that is loaded in the ram, 
-continues to function, but at the moment it tries to access the drive it 
-freezes, until the drive is reset and those abort status messages appear 
-in the dmesg, after that system is unfrozen for a moment, if you keep 
-copying the files then the problem reoccurs once again.
-
-This drive is known to have problems with the power management in the 
-past:
-https://wiki.archlinux.org/title/Solid_state_drive/NVMe#Troubleshooting
-But those problems where since fixed with kernel workarounds / firmware 
-updates.
-This issue is may be related, perhaps bcachefs does something different 
-from the other filesystems, and workarounds don't apply, which causes 
-the bug to occur only on it. It may be a problem in the nvme subsystem, 
-or just some edge case in the bcachefs too, who knows.
-I tried to disable ASPM and setting latency to 0 like was suggested, it 
-didn't fix the problem, so I don't know.
-If this is indeed related to that specific drive it would be hard to 
-reproduce.
----
-
-Errors:
-
-```
-! dmesg
-[   34.890981] bcachefs (nvme0n1p3): mounting version 1.3: 
-rebalance_work
-[   34.890988] bcachefs (nvme0n1p3): recovering from clean shutdown, 
-journal seq 1782
-[   34.899111] bcachefs (nvme0n1p3): alloc_read... done
-[   34.899130] bcachefs (nvme0n1p3): stripes_read... done
-[   34.899132] bcachefs (nvme0n1p3): snapshots_read... done
-[   34.906883] bcachefs (nvme0n1p3): journal_replay... done
-[   34.906887] bcachefs (nvme0n1p3): resume_logged_ops... done
-[   34.907482] bcachefs (nvme0n1p3): going read-write
-[   92.196122] nvme nvme0: I/O 512 (I/O Cmd) QID 1 timeout, aborting
-[   92.196134] nvme nvme0: I/O 513 (I/O Cmd) QID 1 timeout, aborting
-[   92.196138] nvme nvme0: I/O 514 (I/O Cmd) QID 1 timeout, aborting
-[   92.196141] nvme nvme0: I/O 515 (I/O Cmd) QID 1 timeout, aborting
-[   92.196145] nvme nvme0: I/O 516 (I/O Cmd) QID 1 timeout, aborting
-[  122.405176] nvme nvme0: I/O 512 QID 1 timeout, reset controller
-[  185.384762] nvme0n1: I/O Cmd(0x2) @ LBA 105272408, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384768] I/O error, dev nvme0n1, sector 105272408 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384772] nvme0n1: I/O Cmd(0x2) @ LBA 105272664, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384774] I/O error, dev nvme0n1, sector 105272664 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384775] nvme0n1: I/O Cmd(0x2) @ LBA 105272920, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384776] I/O error, dev nvme0n1, sector 105272920 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384778] nvme0n1: I/O Cmd(0x2) @ LBA 105273176, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384779] I/O error, dev nvme0n1, sector 105273176 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384780] nvme0n1: I/O Cmd(0x2) @ LBA 105273432, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384781] I/O error, dev nvme0n1, sector 105273432 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384782] nvme0n1: I/O Cmd(0x2) @ LBA 105273688, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384783] I/O error, dev nvme0n1, sector 105273688 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384784] nvme0n1: I/O Cmd(0x2) @ LBA 105273944, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384785] I/O error, dev nvme0n1, sector 105273944 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384786] nvme0n1: I/O Cmd(0x2) @ LBA 105274200, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384787] I/O error, dev nvme0n1, sector 105274200 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384788] nvme0n1: I/O Cmd(0x2) @ LBA 105274456, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384789] I/O error, dev nvme0n1, sector 105274456 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384790] nvme0n1: I/O Cmd(0x2) @ LBA 105274712, 256 blocks, I/O 
-Error (sct 0x3 / sc 0x71)
-[  185.384791] I/O error, dev nvme0n1, sector 105274712 op 0x0:(READ) 
-flags 0x84700 phys_seg 1 prio class 2
-[  185.384834] nvme nvme0: Abort status: 0x371
-[  185.384836] nvme nvme0: Abort status: 0x371
-[  185.384837] nvme nvme0: Abort status: 0x371
-[  185.384839] nvme nvme0: Abort status: 0x371
-[  185.384840] nvme nvme0: Abort status: 0x371
-[  185.388439] nvme nvme0: 8/0/0 default/read/poll queues
-```
----
-
-System info:
-
-```
-› uname -a
-Linux hp-laptop 6.7.0 #1-NixOS SMP PREEMPT_DYNAMIC Sun Jan  7 20:18:38 
-UTC 2024 x86_64 GNU/Linux
-```
-
-```
-› rg -z -i bcachefs  /proc/config.gz
-10478:CONFIG_BCACHEFS_FS=m
-10479:CONFIG_BCACHEFS_QUOTA=y
-10480:# CONFIG_BCACHEFS_ERASURE_CODING is not set
-10481:CONFIG_BCACHEFS_POSIX_ACL=y
-10482:# CONFIG_BCACHEFS_DEBUG_TRANSACTIONS is not set
-10483:# CONFIG_BCACHEFS_DEBUG is not set
-10484:# CONFIG_BCACHEFS_TESTS is not set
-10485:# CONFIG_BCACHEFS_LOCK_TIME_STATS is not set
-10486:# CONFIG_BCACHEFS_NO_LATENCY_ACCT is not set
-```
-
-```
-! nvme list
-Node           Generic     Model                   Namespace  Usage      
-                 Format           FW Rev
--------------- ----------- ----------------------- ---------- 
--------------------------- ---------------- --------
-/dev/nvme0n1   /dev/ng0n1  KINGSTON SA2000M8500G   0x1        348.70  GB 
-/ 500.11  GB    512   B +  0 B   S5Z42109
-```
-
-```
-› lsblk -f
-NAME        FSTYPE   FSVER LABEL   UUID                                 
-FSAVAIL FSUSE% MOUNTPOINTS
-sda
-├─sda1      ext4     1.0   storage 7ad8dd91-b675-4411-81bc-301e72af3ddb
-├─sda2
-└─sda3      ntfs           System  EAEAA44FEAA419B9
-zram0                                                                    
-               [SWAP]
-nvme0n1
-├─nvme0n1p1 vfat     FAT32 boot    145B-7C42                             
-402.4M    19% /boot
-├─nvme0n1p2 btrfs          iris    0501be49-5d61-483d-b95e-8879cecd0f12  
-    50G    66% /home
-│                                                                        
-               /nix/store
-│                                                                        
-               /nix
-│                                                                        
-               /
-└─nvme0n1p3 bcachefs 1027  irene   85599249-65d6-47dc-b17c-635dc7407581  
-133.8G     2% /mnt
-```
-
----
-
-This is when it happens on my machine:
-
-```
-! mkfs -t bcachefs -f /dev/nvme0n1p3
-/dev/nvme0n1p3 contains a bcachefs filesystem
-External UUID:                              
-5bb48a77-c303-4b98-aa7d-ec3d01443fc6
-Internal UUID:                              
-c8348431-90e8-4cb1-b31d-170fdfe00522
-Device index:                               0
-Label:
-Version:                                    1.3: rebalance_work
-Version upgrade complete:                   0.0: (unknown version)
-Oldest version on disk:                     1.3: rebalance_work
-Created:                                    Wed Jan 10 10:26:51 2024
-Sequence number:                            0
-Superblock size:                            952
-Clean:                                      0
-Devices:                                    1
-Sections:                                   members_v1,members_v2
-Features:                                   
-new_siphash,new_extent_overwrite,btree_ptr_v2,extents_above_btree_updates,btree_updates_journalled,new_varint,journal_no_flush,alloc_v2,extents_across_btree_nodes
-Compat features:
-
-Options:
-   block_size:                               512 B
-   btree_node_size:                          256 KiB
-   errors:                                   continue [ro] panic
-   metadata_replicas:                        1
-   data_replicas:                            1
-   metadata_replicas_required:               1
-   data_replicas_required:                   1
-   encoded_extent_max:                       64.0 KiB
-   metadata_checksum:                        none [crc32c] crc64 xxhash
-   data_checksum:                            none [crc32c] crc64 xxhash
-   compression:                              none
-   background_compression:                   none
-   str_hash:                                 crc32c crc64 [siphash]
-   metadata_target:                          none
-   foreground_target:                        none
-   background_target:                        none
-   promote_target:                           none
-   erasure_code:                             0
-   inodes_32bit:                             1
-   shard_inode_numbers:                      1
-   inodes_use_key_cache:                     1
-   gc_reserve_percent:                       8
-   gc_reserve_bytes:                         0 B
-   root_reserve_percent:                     0
-   wide_macs:                                0
-   acl:                                      1
-   usrquota:                                 0
-   grpquota:                                 0
-   prjquota:                                 0
-   journal_flush_delay:                      1000
-   journal_flush_disabled:                   0
-   journal_reclaim_delay:                    100
-   journal_transaction_names:                1
-   version_upgrade:                          [compatible] incompatible 
-none
-   nocow:                                    0
-
-members_v2 (size 136):
-   Device:                                   0
-     Label:                                  (none)
-     UUID:                                   
-109a3a6c-bf69-435d-b2cc-c6b92dab1a22
-     Size:                                   153 GiB
-     read errors:                            0
-     write errors:                           0
-     checksum errors:                        0
-     seqread iops:                           0
-     seqwrite iops:                          0
-     randread iops:                          0
-     randwrite iops:                         0
-     Bucket size:                            256 KiB
-     First bucket:                           0
-     Buckets:                                625088
-     Last mount:                             (never)
-     State:                                  rw
-     Data allowed:                           journal,btree,user
-     Has data:                               (none)
-     Durability:                             2
-     Discard:                                0
-     Freespace initialized:                  0
-mounting version 1.3: rebalance_work
-initializing new filesystem
-going read-write
-initializing freespace
-
-! mount -t bcachefs 
-/dev/disk/by-partuuid/dab50f50-ff2e-4a54-8d59-6d267cb31148 /mnt
-
-! cp -ax /home /mnt/
-```
-
----
-
-Please tell as to what other info do you need and how to provide it.
+Right. I expected to keep the exact change in GET, too, but that will 
+not be free from the side-effect.
+The buffered-write path (block_write_full_page) picks the hint from one 
+inode, and the direct-write path (__blkdev_direct_IO_simple) picks the 
+hint from a different inode.
+So, updating both seems needed here.
