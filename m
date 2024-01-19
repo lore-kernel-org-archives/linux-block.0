@@ -1,174 +1,147 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43B3524D8
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 13:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377B954F8D
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 15:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705672600; cv=none; b=azMvo+SR9UrwupitunoIdfYLzbyAqhc4w7tGkPzrghN9gb6cYRhZrl7XICyKIQE5CEniplEVujkj3ZDZHXo65wcMbTlBVBJ3zQp3eEhV/jSbpQFsFg6RPSAnNyBzDWnylm4o/yfvRnMmbZaxH6rxpVcvQ7Md2VkfVUZJ0/v5lGU=
+	t=1705679357; cv=none; b=WyYboV/uoSR7mw+kP62DJaLiPaePNTrsdWeBHljIfKrqf3PU/PQSSnWKnypHYnnb8+njWVxRjrht/dSdw/71m7ezfMdLqqQKzsiQvUoS7hr73AF7ZMxESfLMl9A6BK4mzGItYzyTeKKpVn9c1z2NifQ1mI9Opep/GWLLdY14O6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705672600; c=relaxed/simple;
-	bh=xKDBjhSIQeHRiyBuvswYCR7Q2MyTamGKnI7gDtPSo9w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=E28e5GdqeImOq1AtWKg+nWB/c+tsk2j/ccYJxkud18v3+Iu2+/YTxYH/QlKe/yGLQQwsPS/UuxaEA3S1+PPgeINDezjdBJI2asi+TjOaRJEdveGWtNwAW1No5X9z27S4SfQKOBu9HwWNv7B0GhwunkLXDXqMTxsyzeYe54JbcYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=aQN6qU1F; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1705679357; c=relaxed/simple;
+	bh=2YI418v4TabqOEskSkhda35882fqJEANS3PODQpwtd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HMREW4wliL0RIaRWoQ0qyy3LmAFVnaTAgaH996TTRNhh+n4AR8sO9YTLAKKlqmKUYxxEpRTuzKQRoMSB/GQ5SfqrO7tMeLSiN850AeIWtEDzguNQvYIb/2i+zJX8bi7zSO2bWH0mBSLaKk2PHO9JlMe/z0v5QAjo7qDnsBlTuTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mpYn2zBl; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="aQN6qU1F"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240119135635epoutp021576ad50f6d510b177a54653242e07d5~rxDBQHpdo1860918609epoutp02h
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 13:56:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240119135635epoutp021576ad50f6d510b177a54653242e07d5~rxDBQHpdo1860918609epoutp02h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1705672595;
-	bh=W+RflgyenszR5l0ujHluv04CpVMqFfMdltxcbwxC4Dc=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=aQN6qU1FoblAU800GFvBwsWPll2Cam2INs5dplxzXu8ct9OQzcymxeILiy/ja/IuU
-	 ckReS347iDXXN0Sriu3iNgkVrfdeIwMbMTH8Rph+nElfSuV6xZwOvZcYhEWqx5401Q
-	 5bhQulUXPxGIjvNAeI4MfKLBWP1jQnRka4aacF7U=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240119135634epcas5p239b4222d5ff49b2334f45d2e8ee4c237~rxDAMYUOz2244622446epcas5p2V;
-	Fri, 19 Jan 2024 13:56:34 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4TGh405bybz4x9Pp; Fri, 19 Jan
-	2024 13:56:32 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	9B.38.10009.09F7AA56; Fri, 19 Jan 2024 22:56:32 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240119135631epcas5p395210d5cb1880721719bdb46349b1625~rxC9fdr862438224382epcas5p36;
-	Fri, 19 Jan 2024 13:56:31 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240119135631epsmtrp24f31082e3acee7b1d7b4302edc898d3e~rxC9d9Vsa2247922479epsmtrp28;
-	Fri, 19 Jan 2024 13:56:31 +0000 (GMT)
-X-AuditID: b6c32a4a-ff1ff70000002719-c7-65aa7f90f7b7
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	36.C8.08817.F8F7AA56; Fri, 19 Jan 2024 22:56:31 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240119135629epsmtip191f7c61126b6f0e860791b7e09a9cbeb~rxC7wT0ZV0975809758epsmtip1G;
-	Fri, 19 Jan 2024 13:56:29 +0000 (GMT)
-Message-ID: <9fa04d79-0ba6-a2e0-6af7-d1c85f08923b@samsung.com>
-Date: Fri, 19 Jan 2024 19:26:28 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mpYn2zBl"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bb5be6742fso8934439f.1
+        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 07:49:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705679352; x=1706284152; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+WKapYxw0olTh7QYnz3zk/dvq2XdeKyn458JEWouS18=;
+        b=mpYn2zBlAiBwO0J9O7cWbOcRYXlA8+tl1A1bsTnI5ETFc8+EKwlgNmRmMiIENCuue0
+         Co6bXykQIzk0H+cnndvvg7C7j/MLs4742nKSI2pDL1/ld10iTW4PlO5LyFWZi2+fHdt4
+         qM+islh/14k9exW46U0st5dJSxdzQEqXGKuTHyZaeXL2Wbv4CA1LYyv5Sqp+K3jsfxV1
+         KrBUqfj+fP2pTGY+K/8tE5anT7Xu1x81GezqxDADgtSYVR4r9BedEKVhVVxLvjaME5T+
+         JK0snR6+9k1/Q+8ekW4/uqylQkIJnFOrG+BuBylut66sagBM58WAqn/k+JT446RlFQrz
+         J6fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705679352; x=1706284152;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+WKapYxw0olTh7QYnz3zk/dvq2XdeKyn458JEWouS18=;
+        b=nIu644y/0uBcHnQaqWaev1x6nht6cW6usyqUZD7zM2fgu1/xS1rChzcggpk9pISvJc
+         at7v8iPRdpHuLEYaZYUDl3eR6EzafaS5EJVs34fGOy/LA657yV+sW8WEhEjzA0akNaIX
+         MU6jZ1m6hZJQ+fFMqWTluOHnvEek94tlSLX+fdulon+pRNHUOO82OUA62sg/Si8Wp6uf
+         SDhpVaCXmKItyhMXV5HPv5ejtG7jP//eTEcyx9iAg86uGK9qG7UsrIioY66MpeQrE53v
+         xLYd+KQZDu9VMsYNEH+ITtBTLUIR6miZj0z51rGb3Y8Ea4Zu+dZOwLDPM1vin569RDza
+         IjXw==
+X-Gm-Message-State: AOJu0YzB100kaCFXhCzdpVlEYgeck4YqLuqfJhs1YPlkqyphnA/yWF8K
+	s2380PiaBhqYE1dPwDaplynWJiLpizLsRHneDTJj78/w8JAWCfjnQ0BuSm8Inx8=
+X-Google-Smtp-Source: AGHT+IG2O3Glnw1iNXj6xsauW8+VdK2a0giISK1vfJMq14HiKLsyCy0VcS253XBzASUy7Rx+dE8sfg==
+X-Received: by 2002:a05:6e02:1ca2:b0:35e:6ae2:a4b7 with SMTP id x2-20020a056e021ca200b0035e6ae2a4b7mr12671ill.2.1705679351973;
+        Fri, 19 Jan 2024 07:49:11 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id v10-20020a056e0213ca00b00361a86442eesm607139ilj.30.2024.01.19.07.49.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jan 2024 07:49:11 -0800 (PST)
+Message-ID: <39a3740e-f629-49a3-8536-1b0667f25735@kernel.dk>
+Date: Fri, 19 Jan 2024 08:49:10 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH v8 06/19] block, fs: Propagate write hints to the block
- device inode
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block/mq-deadline: serialize request dispatching
 Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Daejun Park
-	<daejun7.park@samsung.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <9b854847-d29e-4df2-8d5d-253b6e6afc33@acm.org>
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDJsWRmVeSWpSXmKPExsWy7bCmuu6E+lWpBkt3qlmsvtvPZvH68CdG
-	i2kffjJb/L/7nMli1YNwi5WrjzJZ/Fy2it1i7y1tiz17T7JYdF/fwWax/Pg/Jovzf4+zOvB4
-	XL7i7XH5bKnHplWdbB67bzaweXx8eovFo2/LKkaPz5vkPDY9ecsUwBGVbZORmpiSWqSQmpec
-	n5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdKqSQlliTilQKCCxuFhJ386m
-	KL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtj/bvcgvv8FbcWWzYw
-	ruDtYuTkkBAwkejo/M7YxcjFISSwm1HiSMMUNgjnE6PEpyVX2CGcb4wSk29vYoJpefV6DytE
-	Yi+jxLHeOVDOW0aJnbc3sYJU8QrYSWyctYsdxGYRUJWYtGoTI0RcUOLkzCcsILaoQJLEr6tz
-	wOLCAlESSybvZQaxmQXEJW49mQ+0jYNDRMBD4tYbP4jwDyaJGdcUQcJsApoSFyaXgoQ5Bawl
-	Jv6cyQRRIi/RvHU2M8g5EgIHOCQuzpjHDHG0i0Tnp6eMELawxKvjW9ghbCmJz+/2skHYyRKX
-	Zp6DerJE4vGeg1C2vUTrqX5mkL3MQHvX79KH2MUn0fv7CdiVEgK8Eh1tQhDVihL3Jj1lhbDF
-	JR7OWAJle0h8utnHBAmpE8wSD1r/s01gVJiFFCizkDw/C8k7sxA2L2BkWcUomVpQnJueWmxa
-	YJSXWg6P7eT83E2M4GSs5bWD8eGDD3qHGJk4GA8xSnAwK4nw8quuShXiTUmsrEotyo8vKs1J
-	LT7EaAqMnYnMUqLJ+cB8kFcSb2hiaWBiZmZmYmlsZqgkzvu6dW6KkEB6YklqdmpqQWoRTB8T
-	B6dUA1PL5JC5793/bXlzR4m/buEOYZ9Q++9iK6uFt7IedHWdFfYzo/7QZ8sGm5WX3j9Z7n4t
-	yI5/XnzJv3vfnBQvTas8yXNVY5N0ofGxe/fXKR9WKfth8sBkf+bzB03Hsnd+UfOcPEdm2sSe
-	CHeRe3Xbz8e+cbyyM/ef3QIRQ7N+Had5/zoaEycfk8pwrgzfeuPs/YjzQmwMDWU5bU2TXJdN
-	dnt1f9nhvz5zV/0xkUo+OtfSIN9Zwv7ymtgJTfeiDF8FebTw2p66oHBgmtbLe4x7m5Zf263b
-	9E7j9dzaIyLiVa+rXzmsvv2hwLDrybWqDOYfkQ9llKYKBzV7MdVqHjKTV978JnvX2wpjn0iP
-	73MYnaYrsRRnJBpqMRcVJwIAGnf/1E8EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsWy7bCSnG5//apUgx1d8har7/azWbw+/InR
-	YtqHn8wW/+8+Z7JY9SDcYuXqo0wWP5etYrfYe0vbYs/ekywW3dd3sFksP/6PyeL83+OsDjwe
-	l694e1w+W+qxaVUnm8fumw1sHh+f3mLx6NuyitHj8yY5j01P3jIFcERx2aSk5mSWpRbp2yVw
-	Zax/l1twn7/i1mLLBsYVvF2MnBwSAiYSr17vYQWxhQR2M0ocv1YBEReXaL72gx3CFpZY+e85
-	kM0FVPOaUeLAtkvMIAleATuJjbN2gRWxCKhKTFq1iREiLihxcuYTFhBbVCBJYs/9RiYQW1gg
-	SmLJ5L1gvcxAC249mQ8U5+AQEfCQuPXGD2Q+s8AvJomGx9ehlh1hlni99x87SBGbgKbEhcml
-	IL2cAtYSE3/OZIKYYybRtbWLEcKWl2jeOpt5AqPQLCRnzEKybhaSlllIWhYwsqxilEwtKM5N
-	zy02LDDKSy3XK07MLS7NS9dLzs/dxAiOPC2tHYx7Vn3QO8TIxMF4iFGCg1lJhJdfdVWqEG9K
-	YmVValF+fFFpTmrxIUZpDhYlcd5vr3tThATSE0tSs1NTC1KLYLJMHJxSDUyFzTb1hcsvBIbs
-	6Q7be3+H9+ndu868fvgyoT95usqf3cv+fdr1cuHLOUcaDP9wmr89yz1hz/Vqmzs9Qj0sfzc0
-	Jz1y+xBimvp47spf7WX//vyZLXc18lzDDTvXYGf+670ini0G79Wjj8zJZHxjc39b64R/y6zT
-	GDrj9V+EHF6nLWZ8p+NHts+KzFuls8q11p/ZXxUYv7q8vj9mrp3xzX8+Uy+95urczdK1J9G0
-	q/N/o/J02/WCW9eEJmz9Gc1c8W2TpMqvyZ4hlxmE9sQ/eDNP/6iwsY4Pl/vvXKGVkRObY3R8
-	jvJP/qq+Jz/wyDwbgXlXZDZ32z9//F056IjcZjVJ4advXb9leKvtunow6ly3EktxRqKhFnNR
-	cSIAf9GIDCsDAAA=
-X-CMS-MailID: 20240119135631epcas5p395210d5cb1880721719bdb46349b1625
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc
-References: <20231219000815.2739120-1-bvanassche@acm.org>
-	<20231219000815.2739120-7-bvanassche@acm.org>
-	<20231228071206.GA13770@lst.de>
-	<00cf8ffa-8ad5-45e4-bf7c-28b07ab4de21@acm.org>
-	<20240103090204.GA1851@lst.de>
-	<CGME20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc@epcas5p4.samsung.com>
-	<23753320-63e5-4d76-88e2-8f2c9a90505c@acm.org>
-	<b294a619-c37e-cb05-79a8-8a62aec88c7f@samsung.com>
-	<9b854847-d29e-4df2-8d5d-253b6e6afc33@acm.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, bvanassche@acm.org
+References: <20240118180541.930783-1-axboe@kernel.dk>
+ <20240118180541.930783-2-axboe@kernel.dk> <ZanhL+fOWNSz2zJf@fedora>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZanhL+fOWNSz2zJf@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 1/19/2024 12:24 AM, Bart Van Assche wrote:
-> On 1/18/24 10:51, Kanchan Joshi wrote:
->> Are you considering to change this so that hint is set only on one inode
->> (and not on two)?
->> IOW, should not this fragment be like below:
+On 1/18/24 7:40 PM, Ming Lei wrote:
+> On Thu, Jan 18, 2024 at 11:04:56AM -0700, Jens Axboe wrote:
+>> If we're entering request dispatch but someone else is already
+>> dispatching, then just skip this dispatch. We know IO is inflight and
+>> this will trigger another dispatch event for any completion. This will
+>> potentially cause slightly lower queue depth for contended cases, but
+>> those are slowed down anyway and this should not cause an issue.
 >>
->> --- a/fs/fcntl.c
->> +++ b/fs/fcntl.c
->> @@ -306,7 +306,6 @@ static long fcntl_get_rw_hint(struct file *file,
->> unsigned int cmd,
->>    static long fcntl_set_rw_hint(struct file *file, unsigned int cmd,
->>                                 unsigned long arg)
->>    {
->> -       void (*apply_whint)(struct file *, enum rw_hint);
->>           struct inode *inode = file_inode(file);
->>           u64 __user *argp = (u64 __user *)arg;
->>           u64 hint;
->> @@ -316,11 +315,15 @@ static long fcntl_set_rw_hint(struct file *file,
->> unsigned int cmd,
->>           if (!rw_hint_valid(hint))
->>                   return -EINVAL;
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  block/mq-deadline.c | 28 +++++++++++++++++++++++-----
+>>  1 file changed, 23 insertions(+), 5 deletions(-)
 >>
->> +       /*
->> +        * file->f_mapping->host may differ from inode. As an example
->> +        * blkdev_open() modifies file->f_mapping
->> +        */
->> +       if (file->f_mapping->host != inode)
->> +               inode = file->f_mapping->host;
+>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+>> index f958e79277b8..9e0ab3ea728a 100644
+>> --- a/block/mq-deadline.c
+>> +++ b/block/mq-deadline.c
+>> @@ -79,10 +79,20 @@ struct dd_per_prio {
+>>  	struct io_stats_per_prio stats;
+>>  };
+>>  
+>> +enum {
+>> +	DD_DISPATCHING	= 0,
+>> +};
 >> +
->>           inode_lock(inode);
->>           inode->i_write_hint = hint;
->> -       apply_whint = inode->i_fop->apply_whint;
->> -       if (apply_whint)
->> -               apply_whint(file, hint);
->>           inode_unlock(inode);
+>>  struct deadline_data {
+>>  	/*
+>>  	 * run time data
+>>  	 */
+>> +	struct {
+>> +		spinlock_t lock;
+>> +		spinlock_t zone_lock;
+>> +	} ____cacheline_aligned_in_smp;
+>> +
+>> +	unsigned long run_state;
+>>  
+>>  	struct dd_per_prio per_prio[DD_PRIO_COUNT];
+>>  
+>> @@ -100,9 +110,6 @@ struct deadline_data {
+>>  	int front_merges;
+>>  	u32 async_depth;
+>>  	int prio_aging_expire;
+>> -
+>> -	spinlock_t lock;
+>> -	spinlock_t zone_lock;
+>>  };
+>>  
+>>  /* Maps an I/O priority class to a deadline scheduler priority. */
+>> @@ -600,6 +607,15 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+>>  	struct request *rq;
+>>  	enum dd_prio prio;
+>>  
+>> +	/*
+>> +	 * If someone else is already dispatching, skip this one. This will
+>> +	 * defer the next dispatch event to when something completes, and could
+>> +	 * potentially lower the queue depth for contended cases.
+>> +	 */
+>> +	if (test_bit(DD_DISPATCHING, &dd->run_state) ||
+>> +	    test_and_set_bit(DD_DISPATCHING, &dd->run_state))
+>> +		return NULL;
+>> +
 > 
-> I think the above proposal would introduce a bug: it would break the
-> F_GET_RW_HINT implementation.
+> This patch looks fine.
+> 
+> BTW, the current dispatch is actually piggyback in the in-progress dispatch,
+> see blk_mq_do_dispatch_sched(). And the correctness should depend on
+> the looping dispatch & retry for nothing to dispatch in
+> blk_mq_do_dispatch_sched(), maybe we need to document it here.
 
-Right. I expected to keep the exact change in GET, too, but that will 
-not be free from the side-effect.
-The buffered-write path (block_write_full_page) picks the hint from one 
-inode, and the direct-write path (__blkdev_direct_IO_simple) picks the 
-hint from a different inode.
-So, updating both seems needed here.
+Thanks for taking a look, I'll add a comment.
+
+-- 
+Jens Axboe
+
