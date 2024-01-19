@@ -1,320 +1,303 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from redpilled.dev (redpilled.dev [195.201.122.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D5E4C628
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 11:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705662671; cv=fail; b=qiYcwyTcH4KoxbZzfyIZME20i2CpNvU4wjDLUXrpcJA5pSAimsZF+xk3HLww19HMj7aY78+h1Eu5vgLbRTF7TmByLxM3MAyhzfD4ifLWfa0yT50TWimngBjjiJQ+AJyG85gEfCOoDBZt2QYxeUfzuT+WeV1QaYX7HEQaQXtAH7c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705662671; c=relaxed/simple;
-	bh=d3HkOnbznhBzBQ9wXOHm12scsOlIm6/hBHWQurUGLT8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Opd7XwDDrlUtPYis9Vq6QB7hLSWhNYoji5tamFuA/drVdxLHclir4sFVz2Ql2ppNKqn69sGq7x362DNdG6z3hTp0ua0TP5WNQyBz3jVVTJOn+vdasE1L57kNKVYMbmAF2XqcvA9+yVQy6tkxLA5RTU2x0OUQOM0OPRithR6ZYMc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Y0WnCqtG; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=RDcfUC2f; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1627524A0;
+	Fri, 19 Jan 2024 13:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.201.122.22
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705669506; cv=none; b=Ze+DuYKlFk90Hl+lysLxspCVdlxDas7wRp+GEyK1M4rIay8upzXL3MOKuQyfz2lhRGZushOiQijKhRQeFphJ81GZqgM7ccia+/qn/4+uDDQK7DOJruKG5cEjqfBA473E3CXJJU0YqX38s1cDyG6awuzxHa16SZyGyiIk/UAPFcA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705669506; c=relaxed/simple;
+	bh=6fOFBGsYFmAePcb+gbennPXklURii6NFccNMiDvdd6E=;
+	h=MIME-Version:Date:From:To:Cc:Subject:Message-ID:Content-Type; b=EKQSwGke/sFi4y8TB+9stKhSHR2/el9vEpod2bAMzbET6ayimhqXcvzk0CXJv+J+fPRh09eL/CHIp31Yw0wQJKdjohUb3TNkKS+wWRBjkGckBLKoJBboGXdWVFO2LQ24cS/W1bpConFpPee6pYBMV8BhIV/zPNZQtk1ojp+t3jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redpilled.dev; spf=pass smtp.mailfrom=redpilled.dev; dkim=pass (1024-bit key) header.d=redpilled.dev header.i=@redpilled.dev header.b=btcIxcCA; arc=none smtp.client-ip=195.201.122.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redpilled.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redpilled.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Y0WnCqtG";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="RDcfUC2f"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1705662668; x=1737198668;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=d3HkOnbznhBzBQ9wXOHm12scsOlIm6/hBHWQurUGLT8=;
-  b=Y0WnCqtGGrJzY8Tm9kF6N6i5fqUQkO8UvYOUd/ccUeObyzixbjRSlG/G
-   dYQgh124aILnLKijtI9gPwHk+vUH2JOCDLzGWwwZIYkrKvtMHFy9vVqKK
-   RBOfjO3BZxV3NVd51IwVaBmKOLX9VUme3L2LVaAmL6vep1vS7uXr+dVoZ
-   crJ7fApbO8x41fHFOHHb21eHe+kDoa+1ELqwxR2In9uONVncYKGvvV+R2
-   g6qEQyLeiwEDTmI1P5BAJO3vQYYtytrb6UMvack9Q2PDkbdBNTEscPZHv
-   c63+RADkx9jU5gkPCfB+wXD0ndE+tZMCs93htvpXm7hkQam3D15+xlfBF
-   g==;
-X-CSE-ConnectionGUID: N+8gwyI3Sk+n4M6BHgrjeA==
-X-CSE-MsgGUID: 7raXkEusSomNS0au8yAp+Q==
-X-IronPort-AV: E=Sophos;i="6.05,204,1701100800"; 
-   d="scan'208";a="7493196"
-Received: from mail-mw2nam12lp2040.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.40])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Jan 2024 19:11:02 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WThZhZFMerDCC2ky1XeaQBKyiYgrhPySAPudBJe4KcP5N9krXSEVznbZ4oZ3BELG9Veqx35PXwp5CYCPG12viFz+LVOHdAOH01vhkRTeE43SiGPGMgvIcHql91lW+JoSnMtXHgC3WvU1/TddQvAHiFiiRPg3w64FrcsCYzI+lJYM8TULtdhYQ9GD0KB0xn2cVFVLAjFLfcOpoGoHo8wznIT8joTwI7TKfx12oZmTudunGYyG2p/uB7y0yaj+Cc0r1cnMTsqSRhs4glNtLZmb9E7B8QnO/8tKTPg7T76RtsVkLmn1lwsJ8ILfHuSDPz01Aes/kP/Djb+Elqt7vN8RWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LIleoD6gEXnuGxTFkV5ZZ1FMWD85XDMZxOwOQHJhXic=;
- b=A539XGfVZaqgVa7xcmB/c8PSmA8q+6y2G2K/mpcVnNOjftyIpj+WU5sGkuO5wR0uX3cQ5UxbcAVwudWfkj6k8DuuDMlcStjTrCXeKaNMiTYejpCx7aUpRDKPu7YcyMHx0rLeRetD4RxJkX7YHnQnuKnqJ6mV1AUSSVrZ4SZZD5DBo4kpeDqyHaWPyw8WLx36Vw+Pw6RmfnckbNnk3AQpUeWgQyewMtctuo51DKJt1CCTwRhZl4bl9F8TMhUxSKiqc2XLJm2Ppxwn4ihj7itTIbnruM3GV0YnqOrprLgYbQowrkS4AoW3o0yJQVrcigtFhPfftzwFFSbiScw9Lddnbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LIleoD6gEXnuGxTFkV5ZZ1FMWD85XDMZxOwOQHJhXic=;
- b=RDcfUC2fwKMeObmTCS7WP/r1spx+25UEkmtadGJgYxUa4WsrSjudbbuqW9YlReUjXIe3CbxolDnOrH7dCuvHvVyPjGpn0Tloo8lzApk85R7l8WoZ/Kn326WpPGpwvgld6oip1HtUIPsarmfPDDT18MYvk0Njy50oXSP3M28cDg8=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- CO6PR04MB8396.namprd04.prod.outlook.com (2603:10b6:303:143::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.26; Fri, 19 Jan 2024 11:11:00 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::25d0:1445:7392:e814]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::25d0:1445:7392:e814%6]) with mapi id 15.20.7202.026; Fri, 19 Jan 2024
- 11:11:00 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Chaitanya Kulkarni <kch@nvidia.com>
-CC: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests V2 1/1] nvme: add nvme pci timeout testcase
-Thread-Topic: [PATCH blktests V2 1/1] nvme: add nvme pci timeout testcase
-Thread-Index: AQHaSPzY/SPwURlt0kGhyO8ON5HoDLDg/mEA
-Date: Fri, 19 Jan 2024 11:11:00 +0000
-Message-ID: <r6txdry3nph5s33z2wrgilq4hle5fvg65y6nhf7tfpwkdwqtmx@ju32opkuqqv3>
-References: <20240117042206.11031-1-kch@nvidia.com>
- <20240117042206.11031-2-kch@nvidia.com>
-In-Reply-To: <20240117042206.11031-2-kch@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|CO6PR04MB8396:EE_
-x-ms-office365-filtering-correlation-id: 85d974a6-5c4d-495e-e940-08dc18df5188
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- POXSUuNIgayyrtAp7lEil8IX/dGPJyxfJIS2YxQIeMzhf2XW8PBVorA4knbaUhR0x+HbGmzco/wo6ApgVPQDKq9q8YyhT7XghU/zi2YXN8FWkrPaqY4PzfO2Jvv+QDBMNYWU4p12ZMYiV7XJM1nlU5rOb2AOnl0hcmQNB4v45IRa1XSj2wWa5p8HIyOENKDMBe6Ybey/rFAgf7OI5Nto9bMlnPh/kPqP/FHAhy3O7MMbpD+54cwSY8UsO72GWc1SCdgQj2XpN3vDcvpcn1KiHYIOeFH/wkZnzlQ0eWaoVkzNIig1XvX8o0Ec/cAYMf7FBBo0IiKqBggTNzBtdTWkx+9N29V721+S5j5cj9GcWPXfoaDiysyd0cU2hEgT4OxALXhE2i7xKX2gWZau7chzuJG6/ny/HcIkkUKYd94NY5vPEbei05PXwYhnv/LtoK012gw7NNvvvs6iuuA2eWr9GqSzMrqVdZMJsBzcS11gnI/t0uD0gSNE8rijMoUoar3yOfdqjlMXo33QKw32Es5O4O3XqmINDUZ93mvh5Wf1wNSAz0cQtudzukDwfanTJLR+FPuppZ27yf9XMH1W5DrZUUDsIWJhj/gLRU7D3DhcQtE=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(346002)(136003)(376002)(39860400002)(366004)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(9686003)(6512007)(6506007)(26005)(33716001)(8936002)(4326008)(8676002)(54906003)(86362001)(6916009)(316002)(2906002)(44832011)(64756008)(5660300002)(66446008)(66476007)(38070700009)(66946007)(91956017)(76116006)(66556008)(71200400001)(6486002)(966005)(41300700001)(478600001)(83380400001)(38100700002)(82960400001)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?PdRW3dyirAl9PUZ8PtCeRQed3b4SH0Y5lnUm73bjdf1Upt0jvu2ikK1oP92F?=
- =?us-ascii?Q?zv+YPStVOiBmhVSWrIEpPJ5zADDpsdEgd4MZ+n/L2TD3FGJYL5xeJcEwADL1?=
- =?us-ascii?Q?Jlyj9tc1fROjntnfdL+Y1fGMSikpzwwMUwT73BLWPC2vJcVQc76OcL3RS6ZE?=
- =?us-ascii?Q?qZZ1KnN1lVgrEJS9Givo7NdrxY5E/ae5o6RH46qhE4SImnQBTsqn2lZqQjA2?=
- =?us-ascii?Q?ix/nF0yYQMSJpVcx3yiXgCnpD+3qU8l5FnKkK/9xBMo6pD+51QQjD5p0g8Nu?=
- =?us-ascii?Q?dNiZDxWT4eiT9tFPDQ9r8dFpwygPfnCYgEVZcfdYtLcGWa0q/1YucTFlqOZA?=
- =?us-ascii?Q?sUeKe6eCpIoc4Bjswt/TLax6K8d8tqaiHhjMR9edfRpBIDPYF88WxUEWF9XC?=
- =?us-ascii?Q?TPHkjPJ/vkqfBcp1/nQIMo8Fok3ERHCQk1fXHTMJ1ZcGv2jqqLYIB9Uv/Vit?=
- =?us-ascii?Q?IqSiaIa42vhhG97wNwPlpFI10EQ31QThyGa9K3i/3h6kHecjSfKU/IaMfSVe?=
- =?us-ascii?Q?L6lPZRE3n0u53vyW6nHojKbGZNgCXvK4EQyzqR+Ms5BRYT1h+bML0d6uTUKR?=
- =?us-ascii?Q?xvuBDrIi1ybg7bjgvpzEHEN7OpBSh0K7odF0tr4LvVDCYPgjsPF4P7tR0FZo?=
- =?us-ascii?Q?KMnlfUdpPQF+m2jE/OJ3ROHT9aQmwzP/fqWAc3FN4HI4EfdlRQ/A0DjH6e9q?=
- =?us-ascii?Q?fs1bHqs4FpbZQMHpNXjYU8du/C/mOCUnFEJyKgEBZvicBJDwzcfAgjNbRw0f?=
- =?us-ascii?Q?ee4l7BFRpgPqa4wucWPpZD/nJ5MGpMmGHXaIo9DDrflY0fXr9gQDoa09kvz5?=
- =?us-ascii?Q?dUrvOpQsYpMccX5KO+NmZ7Z3/Wzt8v/g4R5Wf+Qzf2YzK8B44gPgsHTvRt75?=
- =?us-ascii?Q?pwtJVXrKv3l2j7k+7u+XekPhv2J0mkNnqHCcIGchsx8EK8t5pWY8wJ2auR8R?=
- =?us-ascii?Q?MztG7RpGQ6ZLQpGKefUCSwqyvFq7axHqaJQgfcP/JOfeL+L1+wjO66mv9LHo?=
- =?us-ascii?Q?gbLDDMJPVJMOOEk/MIV8D+I4xlwsbbf5/h9jt+YRdxuK2Ntl6fnVBNEYkKsL?=
- =?us-ascii?Q?uufcq8K75qaDARQevfXvVr/fxY5WxXD/FUUTm2KAWJ6Vvy6stal1ODsjUjLD?=
- =?us-ascii?Q?Q/5XQJvt92YV7xolPaOpmg+steIaj5Lk3701qIDz6zgdz+kq6recoUTAtyUR?=
- =?us-ascii?Q?vdtTeMV4B5oRWZST6CsVlYTxD07kozavj6NZgTUvGG72zU9sNyuuZ/3qLb8V?=
- =?us-ascii?Q?zQNA7u0jhV2VC4eVZuluycLus/FaVp8uRxiiDv3fAOizDtnUOPkaBD6q3dgW?=
- =?us-ascii?Q?V7TocgFyIrRyhO0EwyYF45COYvLAG6wiwofRc9uEP3rAmmle2bYdNJSqIMn7?=
- =?us-ascii?Q?yUcWtYsbgmIdetUVh5iAJD+H36oVuErZin0koiDaCbYbWLQPV2XooS+a3dWi?=
- =?us-ascii?Q?zLd0AXh5qroYWCITMHMdlHKIGkfeaEoyJ9NtrSg9QHY8UUSQJIYlnAq08J2I?=
- =?us-ascii?Q?w6+Bl2PGbcRZWsAI6ief66eOWudkmshDToqqHm/FGzIQt4CmIqRx9QkBkK0f?=
- =?us-ascii?Q?9InV11/sKDRTbLZBJ3DbtfwMvUwkoAt0r5ghgeRJKAXUJYo8BBeqdtuTySUJ?=
- =?us-ascii?Q?+GtEnqdg/mcrKnBucCGfnGQ=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <18856B46F93C3D45BE418185DB29FF2A@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redpilled.dev header.i=@redpilled.dev header.b="btcIxcCA"
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	R4bdQkELe9mBB3GmZoyyvGMd8GqMIPgu8U3jHIJzuQ5uM3lEewZlbk15pZIQm4+YPg4hcDnpRegZzBuYzNx0wrUiUdEl60XUV0p0mMB3dQOKrU0tNlMIxoyJTwbQgamBtxX/ofLhR/4gClQbLUikfRAbyRCule+kSTZzgMTbLlc6pF4seQZ/dBeVjaSUJjKDFk2gIL4WsycfLg8I6i44S4633V7NhPQEyhWUK9nlVzDsPRQ83rSKaMDFzUOqNDhL0i4Y4P+mI3xPw7g4ofUBOXIn0La0+Q4y5HbUgvPsBwFnUVlnhfgr8nFHc5CmleC6UUFqiYpEfuZRdvhJ/d5+P3LnWbnkSp5Nq563BeTF3dty3JqCPicRZqNrK7Oq2hTSkaSUsQB6cN0+NL7bYQDR4GugsdPEURXW/XTNlnxrq41IrsqNP2IoqZ0JvWfFLLo5iYHuGkZttqmk9Bq2IzMcU8MTV9aimYZIY6U82fN4TtSQXT373lfss7WvNalahU5LDHjZ6dpcADXz7wxKJj8jeIzbI/Cb+FlI6t5JeaE8skQzf8B5hhTlae3eY9OyX0pTEeefNRYanwAv2LJZ2B77cvQCwGJ4IY5SDjATLU5DomUDMRmNhpmd+2qaUTR3wdyO
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85d974a6-5c4d-495e-e940-08dc18df5188
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jan 2024 11:11:00.3923
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZfCnNsvTEPMGhNp15YjhqIr9I86yVvLxkaiDyrrxxuGucUJZXdWmSfL7AAXCZg7lX/2m0o6KmJbzmUwFuCqzrEQACtItQJwgej9+cjOe2ow=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB8396
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redpilled.dev;
+	s=mail; t=1705667162;
+	bh=zjv/K4BDJq6mHH6xaikJhlEHfdzmdGc7uo6JC3hv3j0=;
+	h=Date:From:To:Cc:Subject;
+	b=btcIxcCAAvGS81uL+pLqe0z/Md4znXwBDtf4G+U9RxEoTwDDCc2vXUuFBv6sMczF6
+	 heSqH5CWG5faElPRsr+Eqx2RTYWudh2EYS5W9ljMT9lmYDvryst69GO88o0rMT3kyf
+	 vp4lOBIxq8PZ36Q0mDfXBc9l6kjQRDyW+EY2F5+I=
+Date: Fri, 19 Jan 2024 12:25:58 +0000
+From: Mia Kanashi <chad@redpilled.dev>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: linux-bcachefs@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>, Christoph
+ Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: [BUG] I/O timeouts and system freezes on Kingston A2000 NVME with
+ BCACHEFS
+Message-ID: <54fcc150f287216593b19271f443bf13@redpilled.dev>
+X-Sender: chad@redpilled.dev
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Chaitanya, thanks for this v2 patch.
+This issue was originally reported here: 
+https://github.com/koverstreet/bcachefs/issues/628
 
-I ran this new test case with several devices and observed these two:
+Transferring large amounts of files to the bcachefs from the btrfs 
+causes I/O timeouts and freezes the whole system. This doesn't seem to 
+be related to the btrfs, but rather to the heavy I/O on the drive, as it 
+happens without btrfs being mounted. Transferring the files to the HDD, 
+and then from it to the bcachefs on the NVME sometimes doesn't make the 
+problem occur.
+The problem only happens on the bcachefs, not on btrfs or ext4. It 
+doesn't happen on the HDD, I can't test with other NVME drives sadly.
+The behaviour when it is frozen is like this: all drive accesses can't 
+process, when not cached in ram, so every app that is loaded in the ram, 
+continues to function, but at the moment it tries to access the drive it 
+freezes, until the drive is reset and those abort status messages appear 
+in the dmesg, after that system is unfrozen for a moment, if you keep 
+copying the files then the problem reoccurs once again.
 
-1) The test case fails with my QEMU NMVE devices. It looks all of the injec=
-t
-   failures get recovered by error handler, then no I/O error is reported t=
-o the
-   fio process. I modified two fail_io_timeout parameters as follows to inj=
-ect
-   more failures, and saw the test case fails with the device. I suggest th=
-ese
-   parameters.
+This drive is known to have problems with the power management in the 
+past:
+https://wiki.archlinux.org/title/Solid_state_drive/NVMe#Troubleshooting
+But those problems where since fixed with kernel workarounds / firmware 
+updates.
+This issue is may be related, perhaps bcachefs does something different 
+from the other filesystems, and workarounds don't apply, which causes 
+the bug to occur only on it. It may be a problem in the nvme subsystem, 
+or just some edge case in the bcachefs too, who knows.
+I tried to disable ASPM and setting latency to 0 like was suggested, it 
+didn't fix the problem, so I don't know.
+If this is indeed related to that specific drive it would be hard to 
+reproduce.
+---
 
-@@ -49,8 +50,8 @@ test_device() {
-        save_fi_settings
-        echo 1 > /sys/block/"${nvme_ns}"/io-timeout-fail
+Errors:
 
--       echo 99 > /sys/kernel/debug/fail_io_timeout/probability
--       echo 10 > /sys/kernel/debug/fail_io_timeout/interval
-+       echo 100 > /sys/kernel/debug/fail_io_timeout/probability
-+       echo 1 > /sys/kernel/debug/fail_io_timeout/interval
-        echo -1 > /sys/kernel/debug/fail_io_timeout/times
-        echo  0 > /sys/kernel/debug/fail_io_timeout/space
-        echo  1 > /sys/kernel/debug/fail_io_timeout/verbose
+```
+! dmesg
+[   34.890981] bcachefs (nvme0n1p3): mounting version 1.3: 
+rebalance_work
+[   34.890988] bcachefs (nvme0n1p3): recovering from clean shutdown, 
+journal seq 1782
+[   34.899111] bcachefs (nvme0n1p3): alloc_read... done
+[   34.899130] bcachefs (nvme0n1p3): stripes_read... done
+[   34.899132] bcachefs (nvme0n1p3): snapshots_read... done
+[   34.906883] bcachefs (nvme0n1p3): journal_replay... done
+[   34.906887] bcachefs (nvme0n1p3): resume_logged_ops... done
+[   34.907482] bcachefs (nvme0n1p3): going read-write
+[   92.196122] nvme nvme0: I/O 512 (I/O Cmd) QID 1 timeout, aborting
+[   92.196134] nvme nvme0: I/O 513 (I/O Cmd) QID 1 timeout, aborting
+[   92.196138] nvme nvme0: I/O 514 (I/O Cmd) QID 1 timeout, aborting
+[   92.196141] nvme nvme0: I/O 515 (I/O Cmd) QID 1 timeout, aborting
+[   92.196145] nvme nvme0: I/O 516 (I/O Cmd) QID 1 timeout, aborting
+[  122.405176] nvme nvme0: I/O 512 QID 1 timeout, reset controller
+[  185.384762] nvme0n1: I/O Cmd(0x2) @ LBA 105272408, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384768] I/O error, dev nvme0n1, sector 105272408 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384772] nvme0n1: I/O Cmd(0x2) @ LBA 105272664, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384774] I/O error, dev nvme0n1, sector 105272664 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384775] nvme0n1: I/O Cmd(0x2) @ LBA 105272920, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384776] I/O error, dev nvme0n1, sector 105272920 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384778] nvme0n1: I/O Cmd(0x2) @ LBA 105273176, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384779] I/O error, dev nvme0n1, sector 105273176 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384780] nvme0n1: I/O Cmd(0x2) @ LBA 105273432, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384781] I/O error, dev nvme0n1, sector 105273432 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384782] nvme0n1: I/O Cmd(0x2) @ LBA 105273688, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384783] I/O error, dev nvme0n1, sector 105273688 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384784] nvme0n1: I/O Cmd(0x2) @ LBA 105273944, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384785] I/O error, dev nvme0n1, sector 105273944 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384786] nvme0n1: I/O Cmd(0x2) @ LBA 105274200, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384787] I/O error, dev nvme0n1, sector 105274200 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384788] nvme0n1: I/O Cmd(0x2) @ LBA 105274456, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384789] I/O error, dev nvme0n1, sector 105274456 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384790] nvme0n1: I/O Cmd(0x2) @ LBA 105274712, 256 blocks, I/O 
+Error (sct 0x3 / sc 0x71)
+[  185.384791] I/O error, dev nvme0n1, sector 105274712 op 0x0:(READ) 
+flags 0x84700 phys_seg 1 prio class 2
+[  185.384834] nvme nvme0: Abort status: 0x371
+[  185.384836] nvme nvme0: Abort status: 0x371
+[  185.384837] nvme nvme0: Abort status: 0x371
+[  185.384839] nvme nvme0: Abort status: 0x371
+[  185.384840] nvme nvme0: Abort status: 0x371
+[  185.388439] nvme nvme0: 8/0/0 default/read/poll queues
+```
+---
 
-2) After I ran the test case, I see the test target device left with zero
-   size. I think this is consistent as your report [*]. I still think devic=
-e
-   remove and rescan at the test case end is required to avoid impacts on
-   following test cases. It will depend on the discussion for your report,
-   though.
+System info:
 
-[*] https://lore.kernel.org/linux-nvme/287b9ed9-6eb3-46d0-a6f0-a9d283245b90=
-@nvidia.com/
+```
+› uname -a
+Linux hp-laptop 6.7.0 #1-NixOS SMP PREEMPT_DYNAMIC Sun Jan  7 20:18:38 
+UTC 2024 x86_64 GNU/Linux
+```
 
-Please find my some more comments in line:
+```
+› rg -z -i bcachefs  /proc/config.gz
+10478:CONFIG_BCACHEFS_FS=m
+10479:CONFIG_BCACHEFS_QUOTA=y
+10480:# CONFIG_BCACHEFS_ERASURE_CODING is not set
+10481:CONFIG_BCACHEFS_POSIX_ACL=y
+10482:# CONFIG_BCACHEFS_DEBUG_TRANSACTIONS is not set
+10483:# CONFIG_BCACHEFS_DEBUG is not set
+10484:# CONFIG_BCACHEFS_TESTS is not set
+10485:# CONFIG_BCACHEFS_LOCK_TIME_STATS is not set
+10486:# CONFIG_BCACHEFS_NO_LATENCY_ACCT is not set
+```
 
-On Jan 16, 2024 / 20:22, Chaitanya Kulkarni wrote:
-> Trigger and test nvme-pci timeout with concurrent fio jobs.
->=20
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->  tests/nvme/050     | 74 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/nvme/050.out |  2 ++
->  2 files changed, 76 insertions(+)
->  create mode 100755 tests/nvme/050
->  create mode 100644 tests/nvme/050.out
->=20
-> diff --git a/tests/nvme/050 b/tests/nvme/050
-> new file mode 100755
-> index 0000000..6c44b43
-> --- /dev/null
-> +++ b/tests/nvme/050
-> @@ -0,0 +1,74 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2024 Chaitanya Kulkarni
-> +#
-> +# Test NVMe-PCI timeout with FIO jobs by triggering the nvme_timeout fun=
-ction.
-> +#
-> +
-> +. tests/nvme/rc
-> +
-> +DESCRIPTION=3D"test nvme-pci timeout with fio jobs"
+```
+! nvme list
+Node           Generic     Model                   Namespace  Usage      
+                 Format           FW Rev
+-------------- ----------- ----------------------- ---------- 
+-------------------------- ---------------- --------
+/dev/nvme0n1   /dev/ng0n1  KINGSTON SA2000M8500G   0x1        348.70  GB 
+/ 500.11  GB    512   B +  0 B   S5Z42109
+```
 
-I ran this test case a ZNS drive today, and it looks working. I suggest to =
-add:
+```
+› lsblk -f
+NAME        FSTYPE   FSVER LABEL   UUID                                 
+FSAVAIL FSUSE% MOUNTPOINTS
+sda
+├─sda1      ext4     1.0   storage 7ad8dd91-b675-4411-81bc-301e72af3ddb
+├─sda2
+└─sda3      ntfs           System  EAEAA44FEAA419B9
+zram0                                                                    
+               [SWAP]
+nvme0n1
+├─nvme0n1p1 vfat     FAT32 boot    145B-7C42                             
+402.4M    19% /boot
+├─nvme0n1p2 btrfs          iris    0501be49-5d61-483d-b95e-8879cecd0f12  
+    50G    66% /home
+│                                                                        
+               /nix/store
+│                                                                        
+               /nix
+│                                                                        
+               /
+└─nvme0n1p3 bcachefs 1027  irene   85599249-65d6-47dc-b17c-635dc7407581  
+133.8G     2% /mnt
+```
 
-CAN_BE_ZONED=3D1
+---
 
-> +
-> +sysfs_path=3D"/sys/kernel/debug/fail_io_timeout/"
-> +#restrict test to nvme-pci only
-> +nvme_trtype=3Dpci
-> +
-> +# fault injection config array
-> +declare -A fi_array
-> +
-> +requires() {
-> +        _require_nvme_trtype pci
+This is when it happens on my machine:
 
-We can remove this line, since we added "nvme_trtype=3Dpci" above.
+```
+! mkfs -t bcachefs -f /dev/nvme0n1p3
+/dev/nvme0n1p3 contains a bcachefs filesystem
+External UUID:                              
+5bb48a77-c303-4b98-aa7d-ec3d01443fc6
+Internal UUID:                              
+c8348431-90e8-4cb1-b31d-170fdfe00522
+Device index:                               0
+Label:
+Version:                                    1.3: rebalance_work
+Version upgrade complete:                   0.0: (unknown version)
+Oldest version on disk:                     1.3: rebalance_work
+Created:                                    Wed Jan 10 10:26:51 2024
+Sequence number:                            0
+Superblock size:                            952
+Clean:                                      0
+Devices:                                    1
+Sections:                                   members_v1,members_v2
+Features:                                   
+new_siphash,new_extent_overwrite,btree_ptr_v2,extents_above_btree_updates,btree_updates_journalled,new_varint,journal_no_flush,alloc_v2,extents_across_btree_nodes
+Compat features:
 
-> +        _have_fio
-> +        _nvme_requires
-> +        _have_kernel_option FAIL_IO_TIMEOUT
+Options:
+   block_size:                               512 B
+   btree_node_size:                          256 KiB
+   errors:                                   continue [ro] panic
+   metadata_replicas:                        1
+   data_replicas:                            1
+   metadata_replicas_required:               1
+   data_replicas_required:                   1
+   encoded_extent_max:                       64.0 KiB
+   metadata_checksum:                        none [crc32c] crc64 xxhash
+   data_checksum:                            none [crc32c] crc64 xxhash
+   compression:                              none
+   background_compression:                   none
+   str_hash:                                 crc32c crc64 [siphash]
+   metadata_target:                          none
+   foreground_target:                        none
+   background_target:                        none
+   promote_target:                           none
+   erasure_code:                             0
+   inodes_32bit:                             1
+   shard_inode_numbers:                      1
+   inodes_use_key_cache:                     1
+   gc_reserve_percent:                       8
+   gc_reserve_bytes:                         0 B
+   root_reserve_percent:                     0
+   wide_macs:                                0
+   acl:                                      1
+   usrquota:                                 0
+   grpquota:                                 0
+   prjquota:                                 0
+   journal_flush_delay:                      1000
+   journal_flush_disabled:                   0
+   journal_reclaim_delay:                    100
+   journal_transaction_names:                1
+   version_upgrade:                          [compatible] incompatible 
+none
+   nocow:                                    0
 
-Today, I found that this test case depends on another kernel option. Let's =
-add,
+members_v2 (size 136):
+   Device:                                   0
+     Label:                                  (none)
+     UUID:                                   
+109a3a6c-bf69-435d-b2cc-c6b92dab1a22
+     Size:                                   153 GiB
+     read errors:                            0
+     write errors:                           0
+     checksum errors:                        0
+     seqread iops:                           0
+     seqwrite iops:                          0
+     randread iops:                          0
+     randwrite iops:                         0
+     Bucket size:                            256 KiB
+     First bucket:                           0
+     Buckets:                                625088
+     Last mount:                             (never)
+     State:                                  rw
+     Data allowed:                           journal,btree,user
+     Has data:                               (none)
+     Durability:                             2
+     Discard:                                0
+     Freespace initialized:                  0
+mounting version 1.3: rebalance_work
+initializing new filesystem
+going read-write
+initializing freespace
 
-        _have_kernel_option FAULT_INJECTION_DEBUG_FS
+! mount -t bcachefs 
+/dev/disk/by-partuuid/dab50f50-ff2e-4a54-8d59-6d267cb31148 /mnt
 
-> +}
-> +
-> +device_requires() {
-> +	_require_test_dev_is_nvme
-> +}
+! cp -ax /home /mnt/
+```
 
-Actually, this check is not required here, since it is already done in
-group_device_requires() in tests/nvme/rc. It is a small left work to remove
-the same device_requires() in nvme/032.
+---
 
-> +
-> +save_fi_settings() {
-> +	for fi_attr in probability interval times space verbose
-> +	do
-> +		fi_array["${fi_attr}"]=3D$(cat "${sysfs_path}/${fi_attr}")
-> +	done
-> +}
-> +
-> +restore_fi_settings() {
-> +	for fi_attr in probability interval times space verbose
-> +	do
-> +		echo "${fi_array["${fi_attr}"]}" > "${sysfs_path}/${fi_attr}"
-> +	done
-> +}
-> +
-> +test_device() {
-> +	local nvme_ns
-> +	local io_fimeout_fail
-> +
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	nvme_ns=3D"$(basename "${TEST_DEV}")"
-> +	io_fimeout_fail=3D"$(cat /sys/block/"${nvme_ns}"/io-timeout-fail)"
-> +	save_fi_settings
-> +	echo 1 > /sys/block/"${nvme_ns}"/io-timeout-fail
-> +
-> +	echo 99 > /sys/kernel/debug/fail_io_timeout/probability
-> +	echo 10 > /sys/kernel/debug/fail_io_timeout/interval
-> +	echo -1 > /sys/kernel/debug/fail_io_timeout/times
-> +	echo  0 > /sys/kernel/debug/fail_io_timeout/space
-> +	echo  1 > /sys/kernel/debug/fail_io_timeout/verbose
-> +
-> +	fio --bs=3D4k --rw=3Drandread --norandommap --numjobs=3D"$(nproc)" \
-> +	    --name=3Dreads --direct=3D1 --filename=3D"${TEST_DEV}" --group_repo=
-rting \
-> +	    --time_based --runtime=3D1m 2>&1 | grep -q "Input/output error"
-
-When I investigated the failure cause of this test case, I found fio output
-is useful. So, I suggest to keep the output in $FULL.
-
-            --time_based --runtime=3D1m >&"$FULL"
-
-> +
-> +	# shellcheck disable=3DSC2181
-> +	if [ $? -eq 0 ]; then
-
-With that $FULL file, the if statement can be as follows. And we don't need=
- to
-disable SC2181 either.
-
-       if grep -q "Input/output error" "$FULL"; then
-
-> +		echo "Test complete"
-> +	else
-> +		echo "Test failed"
-> +	fi
-> +
-> +	restore_fi_settings
-> +	echo "${io_fimeout_fail}" > /sys/block/"${nvme_ns}"/io-timeout-fail
-> +}
-> diff --git a/tests/nvme/050.out b/tests/nvme/050.out
-> new file mode 100644
-> index 0000000..b78b05f
-> --- /dev/null
-> +++ b/tests/nvme/050.out
-> @@ -0,0 +1,2 @@
-> +Running nvme/050
-> +Test complete
-> --=20
-> 2.40.0
-> =
+Please tell as to what other info do you need and how to provide it.
