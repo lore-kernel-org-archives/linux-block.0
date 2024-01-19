@@ -1,99 +1,73 @@
-Received: from redpilled.dev (redpilled.dev [195.201.122.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE7D54BDA;
-	Fri, 19 Jan 2024 22:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.201.122.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A02458AA4
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 23:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705702840; cv=none; b=e4bEzuarJ4Y/60qXqMZxpS7LY7A9X3BmK+WS377JUhoWMYo4ZSsAIzo3ZQbTbufSqntTtxVpoRpxBX61U7yNhQBkWFPhleDxG5VSNlUKQPzoRm8amDsnWFbRexiKmceh1MbEF9Q8awSA40eH1fBoRD8eqdZ1NeMDZf0BIwlRhEA=
+	t=1705705897; cv=none; b=uamKIxPlaPbhW5hja1n8e3etRU9Iu4J08fZ6EDffSr4w8u3RdWkDCOuIVl+TH0ypA2QBaldBmBi5NiCCe8i/gwo+LUbwrMrY0C3YjhQCMb2GN0kzO3ktF4MHkWJMBCwiI2hFtqb8mbSofT1wCb3TKrP3IFbZN50tG+Wv2wp2DM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705702840; c=relaxed/simple;
-	bh=1yGh0GCLiibhe/Yj4BnNXSiJphJnDALPM2vFlcHw/OU=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=Jq/0bzll5vKbA9GsybFxqIU8AzWfCoEIx5kwC6Sjm6+dAm6Vo3kMlHHtPt1qMnlQ3Cj3DQGNbAj2n5ZhbK8OtnWWIXEv09Agw/UoN1ZUCOFhuLcugSb5hmltpPMz2UF5ll+6efGoHaetn648HyvrozKWrj0F4YIlK0SZVy4OWWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redpilled.dev; spf=pass smtp.mailfrom=redpilled.dev; dkim=pass (1024-bit key) header.d=redpilled.dev header.i=@redpilled.dev header.b=MWZC+UuT; arc=none smtp.client-ip=195.201.122.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redpilled.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redpilled.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redpilled.dev header.i=@redpilled.dev header.b="MWZC+UuT"
+	s=arc-20240116; t=1705705897; c=relaxed/simple;
+	bh=bWkIiGGZ1S7TdgOjWWHeUaV9f7b50YSPnO9JLi/Hw6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=tDsSFk3pVaunr9ZjP0Uqx0Oz6Bc2W5bX6m4sJsZ65sNIJFrA2beVhK9Zg1tm7+4iRDM1jyAxxn7AzkRCcjDF7QlNOUeJvQ/4mBipww8R+pKf8NA51SkTJi8K7nQPch2dn6DpI7XZvhKIQDGEiW9+psSJK/WkBrShNRxlTBP9IYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-595b208a050so663229eaf.0
+        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 15:11:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705705895; x=1706310695;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaSYCIz/kHh/iXsbRscjG1xKWRdooT/uqBj1xGstq5M=;
+        b=oUq0sQW7uY2G+7bSgeNm1bchiCSdDfOWyomF5QgJElxH8k8tlgjYrvXsAmt+tW3W5v
+         XLWQDQzCI5a5QbwAC9xZdzDCs7l7+YEQpNwuEe5csh+SlAufp4eMVY6Lp3ZqvcB6qFuD
+         Hn4YAuSBR0mbF4rD+f55dlDam6fznx5hKB9o/MQFbo0fK3djCDayJc+EsUX+seiF6kMb
+         308xW4jirzd255UvrLjA3B9auhirK8dJRC+21EA7OB89PrfirdlStfL06KfIG94S/s78
+         v8vgSo8N0T++xG8vZdU/7wtZikYr7aLRc6NSGqyzXS/0QxrQjwwt9wZ9xgBnVQ5pinvn
+         dsTw==
+X-Gm-Message-State: AOJu0Yzslk96MTlNoNfPLwwZlSIwvHDg6cAPEyW1aWv7FVtDzXRuRWoN
+	3k7ZBmpKaoSExBSXbsafwiKmhUGYeKs/T+M8t7Ho578AcKKjRLbjW4qV3dmH
+X-Google-Smtp-Source: AGHT+IGdtv8GVaD1ZL0LHP8pAVp33Q9RT0gmNzzpBEAgfIUGZutHoMr8DFjRee9KwPHYdgt1EUT+wQ==
+X-Received: by 2002:a05:6358:281a:b0:170:f1ab:9612 with SMTP id k26-20020a056358281a00b00170f1ab9612mr580925rwb.65.1705705895305;
+        Fri, 19 Jan 2024 15:11:35 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:4855:2a4:21e0:417? ([2620:0:1000:8411:4855:2a4:21e0:417])
+        by smtp.gmail.com with ESMTPSA id p42-20020a056a000a2a00b006d9b345092dsm5609318pfh.156.2024.01.19.15.11.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jan 2024 15:11:34 -0800 (PST)
+Message-ID: <9fd4e85d-d0bf-45e6-8028-0248afe11fce@acm.org>
+Date: Fri, 19 Jan 2024 15:11:33 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redpilled.dev;
-	s=mail; t=1705702833;
-	bh=mbnDyIiVf5E50dfFktZEEA5wjQCTaxqYRqmmy0cjVgM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=MWZC+UuTt38VN3GTbHaTX9BX9UlKHSC67V0tcchpS+6KGHkeOXX1sCEhvIaf4rogY
-	 +G1qrEm8TD2CWMgWdR0ntG4R0IFEBxBd0g/u2x3A8bVFn84U8a/ufjBzOD2Oqjt2li
-	 Rxr/Fp1GVqIcD5PDZ0UyklZgjqvT77Rd37iJs9xo=
-Date: Fri, 19 Jan 2024 22:20:32 +0000
-From: Mia Kanashi <chad@redpilled.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>,
- linux-bcachefs@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>, Christoph
- Hellwig <hch@lst.de>
-Subject: Re: [BUG] I/O timeouts and system freezes on Kingston A2000 NVME with
- BCACHEFS
-In-Reply-To: <c8f441c2-d662-43fc-9e8e-fc847428dbaa@kernel.dk>
-References: <54fcc150f287216593b19271f443bf13@redpilled.dev>
- <c8f441c2-d662-43fc-9e8e-fc847428dbaa@kernel.dk>
-Message-ID: <7d9c23450fb3fca7e3820c317c24b112@redpilled.dev>
-X-Sender: chad@redpilled.dev
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] block/mq-deadline: fallback to per-cpu insertion
+ buckets under contention
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20240118180541.930783-1-axboe@kernel.dk>
+ <20240118180541.930783-3-axboe@kernel.dk>
+ <0ca63d05-fc5b-4e6a-a828-52eb24305545@acm.org>
+ <c9f1b580-2241-4415-aa48-e4b7e1bacdea@kernel.dk>
+ <e4892064-cdf2-4cd9-8033-901d8db07cbf@acm.org>
+ <248b7070-a7c6-456d-99be-c3fff6f94f5e@kernel.dk>
+ <239455a4-7e58-449d-9450-8297473cb441@acm.org>
+ <6f27bf5f-0d12-4bac-96ff-5b7824d8bd8b@kernel.dk>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <6f27bf5f-0d12-4bac-96ff-5b7824d8bd8b@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2024-01-19 21:22, Jens Axboe wrote:
-> On 1/19/24 5:25 AM, Mia Kanashi wrote:
->> This issue was originally reported here: 
->> https://github.com/koverstreet/bcachefs/issues/628
->> 
->> Transferring large amounts of files to the bcachefs from the btrfs
->> causes I/O timeouts and freezes the whole system. This doesn't seem to
->> be related to the btrfs, but rather to the heavy I/O on the drive, as
->> it happens without btrfs being mounted. Transferring the files to the
->> HDD, and then from it to the bcachefs on the NVME sometimes doesn't
->> make the problem occur. The problem only happens on the bcachefs, not
->> on btrfs or ext4. It doesn't happen on the HDD, I can't test with
->> other NVME drives sadly. The behaviour when it is frozen is like this:
->> all drive accesses can't process, when not cached in ram, so every app
->> that is loaded in the ram, continues to function, but at the moment it
->> tries to access the drive it freezes, until the drive is reset and
->> those abort status messages appear in the dmesg, after that system is
->> unfrozen for a moment, if you keep copying the files then the problem
->> reoccurs once again.
->> 
->> This drive is known to have problems with the power management in the
->> past:
->> https://wiki.archlinux.org/title/Solid_state_drive/NVMe#Troubleshooting
->> But those problems where since fixed with kernel workarounds /
->> firmware updates. This issue is may be related, perhaps bcachefs does
->> something different from the other filesystems, and workarounds don't
->> apply, which causes the bug to occur only on it. It may be a problem
->> in the nvme subsystem, or just some edge case in the bcachefs too, who
->> knows. I tried to disable ASPM and setting latency to 0 like was
->> suggested, it didn't fix the problem, so I don't know. If this is
->> indeed related to that specific drive it would be hard to reproduce.
-> 
-> From a quick look, looks like a broken drive/firmware. It is suspicious
-> that all failed IO is 256 blocks. You could try and limit the transfer
-> size and see if that helps:
-> 
-> # echo 64 > /sys/block/nvme0n1/queue/max_sectors_kb
-> 
-> Or maybe the transfer size is just a red herring, who knows. The error
-> code seems wonky:
-> 
->> [  185.384762] nvme0n1: I/O Cmd(0x2) @ LBA 105272408, 256 blocks, I/O 
->> Error (sct 0x3 / sc 0x71)
+On 1/18/24 12:52, Jens Axboe wrote:
+> And you had clearly seen the results, which means that rather
+> than the passive aggressive question, you could have said [ ... ]
 
-Changing max_sectors_kb to 64 does indeed seem to fix the issue at the 
-first glance, default value is 128.
-Also tried changing bcachefs flags during the format 
---btree_node_size=64k --bucket=64k
-thought maybe that is related, but that didn't help.
-It is really weird that this problem only occurs on bcachefs.
+I'm never passive aggressive. If that is how my message was received I 
+want to apologize.
+
+Bart.
