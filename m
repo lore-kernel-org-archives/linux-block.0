@@ -1,62 +1,67 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FD34EB4C
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 16:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C0D52F61
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 16:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705680225; cv=none; b=PaX2J1zG0u1XUkJyK/lw1huQbco79HyMImnsYep2RjHlzvqcEouAIGZYP5CTNNqIEnuwOO9WLxFzZ0Jzm71DyMbf4AVz/Gs64wdLULhIzsceao7u6+iKH20qHblTeuo/jVpfzBJ3Zh64BQu9ombjTgspvVRHzhr6SvZp5B274yo=
+	t=1705680225; cv=none; b=LFyGbIMrwRDID8ziGK1whjexOihsLx+TOQS4t4zhxQ9EgRiiEZr9fYzD5+mJxlBuSyaSo7PHj9i13GBCfQmDzZ7/OyRjmOvctg6/FF7mlqJ7TNLo3ha7rL8J4iZZoPSHwJIFCFV+o4XNLKo3PKJS4vExDTzCsXps/gCjwcYKmXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705680225; c=relaxed/simple;
-	bh=5egZooH6XED8XdfRAckc2doTEkMT0HASO+KVZwEjpJc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qjKR31dma9GyNNYP31aJOSGUYmgiuYdY0kTXMP51evoB1V+AloGQjrc5/10jiykfEob8bu9JP1tjMxUl1Ty6vHdZMrVb4MKArNg3+jV4q4XXCMcQTXg2nDrtav8+AKGC2GTbaxmMiZO+MuPtNsFPbjqzGmYkIfzJFzNw19dZ7Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dcTnU9zS; arc=none smtp.client-ip=209.85.166.46
+	bh=tcuVntrfVztS32kuzKXBWCs7g7jQvxJZgfWq07XJAK0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uc04BdWcyGPTWXroRzLm7THKV7U1I+GiZMeHmiLW6RXd24OR/3M7ETyblp8Y0YJxrkgGSM6y0NhVWx5wHb1Ho85cZq6ktWCk5OoTiod+Per31EFASg2nvCi+Pf08725+lkCrNLl4vTEsRMxzP5ULgCnx+vdvPF7f/KPjPIHRDu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DqPRpDQi; arc=none smtp.client-ip=209.85.166.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dcTnU9zS"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7bee9f626caso13149839f.0
-        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 08:03:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DqPRpDQi"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7bee9f626caso13150539f.0
+        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 08:03:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705680221; x=1706285021; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5vm7CkYwt+nXmzpPNNrfAgm10W9UTxbtw6IhoDKUp8c=;
-        b=dcTnU9zSbv0X1QhqTAfZq2EnA9j+yIDNsYwJgGGyPWS9TwN2isWKfwYW1D+LirCyUo
-         VIRSZWzo7NGLuB4vm28Iy14C2tM6QkaplWjkSThqllLHf991vEC+ZQV1DAHHIT0S9L8c
-         fFOX/mJiJg5FxMBuAfJcCw2i61jXovPIuuuK4piPbQnwH9QI5rtFHAsmeHzhaZSOdhMo
-         j4rWV5SnZ7gtNNBN7SCMDO18SicLuEvh/Muf9UcdNzsZWXljJ0GuNS9wuBVfgq2p8nDq
-         1i7nzjMQnc5yEO3OJEo09HTh41t4AaY1fPyj5lq+MvX6Kse+SnA0uB0esDsUPMYjZ5St
-         5vFA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705680222; x=1706285022; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OiTfz39ZKyKMN0Cev9jwvMiF20xs0nOs8gdILsd+qdI=;
+        b=DqPRpDQiz/a96hCP9pgJA5LSV1u2ra7mY/qCd2tllsOPPjMOUEce53cWTQmp0gK4p1
+         bjnkPtXjqltiLdc9bKMtCTewN3HTQtytGOfR/4wpfo7qABqiiol8XC1bgWAUxo3Rmfbc
+         xyCNZXMcIVPHuUSH3lZFo1joXHirnGlG4BmeHtbFcw+/LLV5N9YQbqj9IwSUOMTw7Bi7
+         L+Z7WH5jvJ1WFixB4I2c8U/NK9KYhgfNUpVFSlKJoXwsiNmO0L/+aWL9Bh4JvxzFt3db
+         epJcFtXWKLghjxE3SbG5ZyoS088o9R56Z0Wk/oN9U6VeSvn/8YDpQbdKGxNUEnPjDjYZ
+         1n+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705680221; x=1706285021;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5vm7CkYwt+nXmzpPNNrfAgm10W9UTxbtw6IhoDKUp8c=;
-        b=dhzKf7x3JzNmIe0kYPK3yMMivPxvygunP8jHJPEmeIyfbevf8AoDy3gY0IkqJ2Nxv2
-         Q82S9i/TZmdjyNpBnf/bs7KEKQqB0UcBZHscAJEJ7E6AkWoIwSMzYrdfCfBsXVCPnPxR
-         0I4N+WUKQXZKBF3q+GMzfa4JDpapZ4dpha8GQGVDXGRkRWP5NvaNPI5GtdbGzzRPg+t4
-         Id94wBcBmLCV22uqS5seRzU6D/9ezfk3dywJiPJvFLKDq5Mi1NGFoMk1l2PEnlCiRnv9
-         +MhYLqF1AQSQrNHAz6DCRxuFS2JO6GNRfwx5SyS+QNmVtbM4t7am7MveLYAOk0R1Uetq
-         6lDA==
-X-Gm-Message-State: AOJu0YxIB/P6wOhzOVKqRYUyzdyKP1VSjKibGxr7/TjTz53x9u3FW9Et
-	MU76JvfJTAwvDYr9ScMnurS6y60h/V0WDtcNdgI/aD2CmbF1cin8vy94Skrb00kmK/jW2L7Llsi
-	zzy4=
-X-Google-Smtp-Source: AGHT+IEEt9BSt3m74YasmtZUcXWj1+tdC9p/nuXjUy8WR8IOQvkcefLYlq4iewFqo6x4AjaQz+yREA==
-X-Received: by 2002:a92:c549:0:b0:360:7937:6f7 with SMTP id a9-20020a92c549000000b00360793706f7mr50732ilj.3.1705680221301;
-        Fri, 19 Jan 2024 08:03:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705680222; x=1706285022;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OiTfz39ZKyKMN0Cev9jwvMiF20xs0nOs8gdILsd+qdI=;
+        b=SCg4vNvREdBG4lVWHlP3wjYncikYX+ekeEtLVkVN0At78ykR547L3BJRrx3KyeB5gg
+         r3VylOf55x+ZQKN7GspAi4QAGSqeXBKaZDDVCF8RfigLKaqFoVf3HYAKoYZRLTIZMV8C
+         TLL5+1aAE4RUvfox+B4/9Jye4PrIK+9Fi2M8q9whU+HVEdnOf95U6Qs7oXakg3tm8+BB
+         jfSlKyU+72F1GCAPsyqbheyWx6vxj0yZOe5BQ+7VXE/gE5TjdxqNBLBRw6jHNF+Bkfhd
+         nxlgRjCbNhgiGfj0E2Idl2r98+n1+HQ8FRvKsyMjzrN+sLHUF7bdZhaBJDISAZbCnrfH
+         i6SA==
+X-Gm-Message-State: AOJu0YwZaI0r/bweyJDwAValj85O+S+7E+2FhtD7LQVTgYBLVSLcjFlc
+	BKfoS3PLZmLrUh+G93wqZ/U8Dho7+XoUF2enEh8gBzrPQDD3ye9LETAkzPzaGBYC3d35x3822VK
+	2dwA=
+X-Google-Smtp-Source: AGHT+IGrnt4TSJrwbZB1W5hK9erkO7reo8k323wAyOYyqAIN327E6dRiMqJy5rOXfjj56RfFkTMGVA==
+X-Received: by 2002:a05:6e02:1c2f:b0:35f:f59f:9f4c with SMTP id m15-20020a056e021c2f00b0035ff59f9f4cmr74615ilh.1.1705680222550;
+        Fri, 19 Jan 2024 08:03:42 -0800 (PST)
 Received: from localhost.localdomain ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id bc8-20020a056e02008800b0035fe37a9c09sm5645163ilb.20.2024.01.19.08.03.40
+        by smtp.gmail.com with ESMTPSA id bc8-20020a056e02008800b0035fe37a9c09sm5645163ilb.20.2024.01.19.08.03.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jan 2024 08:03:40 -0800 (PST)
+        Fri, 19 Jan 2024 08:03:41 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
-Cc: bvanassche@acm.org
-Subject: [PATCHSET RFC v2 0/4] mq-deadline scalability improvements
-Date: Fri, 19 Jan 2024 09:02:05 -0700
-Message-ID: <20240119160338.1191281-1-axboe@kernel.dk>
+Cc: bvanassche@acm.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/4] block/mq-deadline: pass in queue directly to dd_insert_request()
+Date: Fri, 19 Jan 2024 09:02:06 -0700
+Message-ID: <20240119160338.1191281-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240119160338.1191281-1-axboe@kernel.dk>
+References: <20240119160338.1191281-1-axboe@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,91 +70,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+The hardware queue isn't relevant, deadline only operates on the queue
+itself. Pass in the queue directly rather than the hardware queue, as
+that more clearly explains what is being operated on.
 
-It's no secret that mq-deadline doesn't scale very well - it was
-originally done as a proof-of-concept conversion from deadline, when the
-blk-mq multiqueue layer was written. In the single queue world, the
-queue lock protected the IO scheduler as well, and mq-deadline simply
-adopted an internal dd->lock to fill the place of that.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/mq-deadline.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-While mq-deadline works under blk-mq and doesn't suffer any scaling on
-that side, as soon as request insertion or dispatch is done, we're
-hitting the per-queue dd->lock quite intensely. On a basic test box
-with 16 cores / 32 threads, running a number of IO intensive threads
-on either null_blk (single hw queue) or nvme0n1 (many hw queues) shows
-this quite easily:
-
-The test case looks like this:
-
-fio --bs=512 --group_reporting=1 --gtod_reduce=1 --invalidate=1 \
-	--ioengine=io_uring --norandommap --runtime=60 --rw=randread \
-	--thread --time_based=1 --buffered=0 --fixedbufs=1 --numjobs=32 \
-	--iodepth=4 --iodepth_batch_submit=4 --iodepth_batch_complete=4 \
-	--name=scaletest --filename=/dev/$DEV
-
-and is being run on a desktop 7950X box.
-
-which is 32 threads each doing 4 IOs, for a total queue depth of 128.
-
-Results before the patches:
-
-Device		IOPS	sys	contention	diff
-====================================================
-null_blk	879K	89%	93.6%
-nvme0n1		901K	86%	94.5%
-
-which looks pretty miserable, most of the time is spent contending on
-the queue lock.
-
-This RFC patchset attempts to address that by:
-
-1) Serializing dispatch of requests. If we fail dispatching, rely on
-   the next completion to dispatch the next one. This could potentially
-   reduce the overall depth achieved on the device side, however even
-   for the heavily contended test I'm running here, no observable
-   change is seen. This is patch 2.
-
-2) Serialize request insertion, using internal per-cpu lists to
-   temporarily store requests until insertion can proceed. This is
-   patch 3.
-
-3) Skip expensive merges if the queue is already contended. Reasonings
-   provided in that patch, patch 4.
-
-With that in place, the same test case now does:
-
-Device		IOPS	sys	contention	diff
-====================================================
-null_blk	2311K	10.3%	21.1%		+257%
-nvme0n1		2610K	11.0%	24.6%		+289%
-
-and while that doesn't completely eliminate the lock contention, it's
-oodles better than what it was before. The throughput increase shows
-that nicely, with more than a 200% improvement for both cases.
-
-Since the above is very high IOPS testing to show the scalability
-limitations, I also ran this on a more normal drive on a Dell R7525 test
-box. It doesn't change the performance there (around 66K IOPS), but
-it does reduce the system time required to do the IO from 12.6% to
-10.7%, or about 20% less time spent in the kernel.
-
-TODO: probably make DD_CPU_BUCKETS depend on number of online CPUs
-in the system, rather than just default to 32.
-
- block/mq-deadline.c | 178 +++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 161 insertions(+), 17 deletions(-)
-
-Since v1:
-	- Redid numbers as I enabled fixedbufs for the workload,
-	  and did not disable expensive merges but rather left it
-	  at the kernel default settings.
-	- Cleanup the insertion handling, also more efficient now.
-	- Add merge contention patch
-	- Expanded some of the commit messages
-	- Add/expand code comments
-	- Rebase to current master as block bits landed
-
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index f958e79277b8..9b7563e9d638 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -792,10 +792,9 @@ static bool dd_bio_merge(struct request_queue *q, struct bio *bio,
+ /*
+  * add rq to rbtree and fifo
+  */
+-static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
++static void dd_insert_request(struct request_queue *q, struct request *rq,
+ 			      blk_insert_t flags, struct list_head *free)
+ {
+-	struct request_queue *q = hctx->queue;
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const enum dd_data_dir data_dir = rq_data_dir(rq);
+ 	u16 ioprio = req_get_ioprio(rq);
+@@ -875,7 +874,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 
+ 		rq = list_first_entry(list, struct request, queuelist);
+ 		list_del_init(&rq->queuelist);
+-		dd_insert_request(hctx, rq, flags, &free);
++		dd_insert_request(q, rq, flags, &free);
+ 	}
+ 	spin_unlock(&dd->lock);
+ 
 -- 
-Jens Axboe
+2.43.0
 
