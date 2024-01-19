@@ -1,132 +1,91 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059111367
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 01:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842E9322A;
+	Fri, 19 Jan 2024 01:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705627489; cv=none; b=oil5R/XEJ9HoPNddjyUWDHXir24J5bzivuRLA+XeKCyzwp4wQ8aaNr+g3qkF0QHXTAhtDcuP18ZdEpH+DmztDaT6fgGmjpyp969VUw0GQe78nW1/FIitCf9CY93mUn+eaZXZu9RNyfRylgRPK5KopoZbWiV1r+Er9nNI3vUmHxA=
+	t=1705627663; cv=none; b=M+wt7//DanQ/X6bcorKVcObg4cpEuPdHTs8HtH+KUBNcAfPW+RYLEQK5u7Ix2BQN+MwDd5gncfBackCQQFnsrjT6LsT8ttrndmDr3Ac4EIOIXc1SVcLRSnlEGtvd0gsVSbynefq/3Zkq4JjQ8Ru9C3e0Ezeo+rXhBmh7uw/GyFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705627489; c=relaxed/simple;
-	bh=qHe413gfrqhWMzPS+kpL1P7lBu3BrHu/YwPYvmilhnQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KwiH1+PdvJ5tLy3TczF8lCMp/xYvuW5qM/bLi65Y9ZtSWgps2Mc7J7LsQsP65RW4Os5Vge78FwaIL3e+kxK+hyxbNFgFm27++zQMpO3qkWoe5U7rEMJ6nvSCKrnAkZ12k3HNrhOwIl0C3Kjy/Jq7UmuDQea8+N1cHoEblgVy9aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ee/SpJLH; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ee/SpJLH"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3367a304091so212415f8f.3
-        for <linux-block@vger.kernel.org>; Thu, 18 Jan 2024 17:24:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705627485; x=1706232285; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hc2bIqNsKQyWLXjcwoAS4v6rdrw7++mp5+Y3/zgcmhw=;
-        b=Ee/SpJLH/g9jMDuq9g3QY+RLGfYRKvA893OvM/xReJ/rA4PC3XdvKY+xN0sMMo37M/
-         kWm3UCSJDxPxhm5dJoJ9Q95AcTux3SoLs+LSgXgPbSvVi4x7LvtI7aMQ6n1jCC2uA+MY
-         /ysArGlBGxEDQ+d1m4wPSn7glQZCj6A3UXptusEMgyNzYr7e7+QCfwcHKWxLkH+rkcTB
-         LuZHJHb6D6Il0x2keB/Ai1BpmzSlNL7exVQD7+UbIHxs9Pa9CLhebnAsT9LcPVojMETI
-         /WYwNxW1XNDsUg6F4yEH+HneybDlup4zfMLlxXJV/TnmdtMb9NVsZYQO1AaOWf5dmrvr
-         tSlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705627485; x=1706232285;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hc2bIqNsKQyWLXjcwoAS4v6rdrw7++mp5+Y3/zgcmhw=;
-        b=hOs/nBrGaMrPWB8xC2Sm5JL+fm5m7CciLn7O65ar7Qyh9q32GbDxzA5kDRGgjLfpkp
-         u6npl9gmRn36hXZk4WBl2CmTjvRTWIvxGMKT6u4G1Ancp8/jluukCZK2Je+5pFhgw0Lu
-         8OAXCuYZw1MLoMf5QRrw820Ac/DbRH0OMCC9vU+tNVml3b5H/sU+WQU54rSF8nKJ5hXa
-         Pd4nL8a3DYWDoTaNZT5WHZueF+iSqcZaAaeIXJHS1Dms/u776no0KUWT4ku1rkVXTHwe
-         1V6Ulh3xrY3FUjdRKu4xQRvegLdUyQRT0f7oJHIVPxx1E5yPx+roY0VU6TLHQfNgRjPm
-         GPgg==
-X-Gm-Message-State: AOJu0YzFpSSGj4YKSafhh4FOAIvRDF+/LJyYa2clV+0FtUJ4+xAUAoE5
-	UySCt/gJQ5u9zoQSulE2Yc7XZz+hb8YdM/80DxOaLfGZTROBCgC34rLouN46
-X-Google-Smtp-Source: AGHT+IHEk7NGgGUDCxnrVSECcptW8AI6T0Em7zJYmePneNUvQRLka+ixFkICPVvQhAYqPdL8QZa4RA==
-X-Received: by 2002:adf:f802:0:b0:337:c331:b469 with SMTP id s2-20020adff802000000b00337c331b469mr698675wrp.49.1705627485432;
-        Thu, 18 Jan 2024 17:24:45 -0800 (PST)
-Received: from 127.0.0.1localhost ([148.252.141.25])
-        by smtp.gmail.com with ESMTPSA id dw15-20020a0560000dcf00b00337beb77c86sm5176458wrb.67.2024.01.18.17.24.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jan 2024 17:24:45 -0800 (PST)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com
-Subject: [PATCH 1/1] block: optimise in irq bio put caching
-Date: Fri, 19 Jan 2024 01:23:44 +0000
-Message-ID: <dc78cadc0a057509dfb0f7fb2ce31affaefeb0c7.1705627291.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705627663; c=relaxed/simple;
+	bh=T2KrNq+0FoKIbhPTRgYchgT5nfKU6YqP1rVxIQBzJns=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=KFOZFLc6r5Jh9/GOfbIBVYMXSPeRWTO1S7nkaAecqgULuCMuWWjAUbRMCF1WijhvN9Mx6tJTPytulAQyynBnO152UFgk9NZA7UdRsg6SSJQWnrAu72mMTWT2X7x4U/L4wmq+tHNJE0t+XiDDjyTnRfMhaXmSgeXIL1vBFvqKjgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TGMRm6mc0z4f3kF5;
+	Fri, 19 Jan 2024 09:27:32 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id B52B71A0172;
+	Fri, 19 Jan 2024 09:27:36 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBnOBEG0Klly7QUBQ--.22293S3;
+	Fri, 19 Jan 2024 09:27:36 +0800 (CST)
+Subject: Re: [PATCH] block: Move checking GENHD_FL_NO_PART to
+ bdev_add_partition()
+To: Jens Axboe <axboe@kernel.dk>, Li Lingfeng <lilingfeng@huaweicloud.com>,
+ allison.karlitskaya@redhat.com, hch@infradead.org, yukuai1@huaweicloud.com
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240118130401.792757-1-lilingfeng@huaweicloud.com>
+ <f6e687cc-debd-4864-901a-fb35be9f2adc@kernel.dk>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <00c59648-bbf3-7ae4-4cea-aeccbb2bfe0c@huaweicloud.com>
+Date: Fri, 19 Jan 2024 09:27:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <f6e687cc-debd-4864-901a-fb35be9f2adc@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBnOBEG0Klly7QUBQ--.22293S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw47trWkZr18Cw13JF4xZwb_yoW3CrX_Zw
+	1FkwnrJr4xJa4SgF40krWayryY9ayUW347ZrsrJrsxXrykA34kCFZagwna93yxXFs7Krn8
+	CrnxWr4DZa1IvjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-The put side of the percpu bio caching is mainly targeting completions
-in the hard irq context, but the context is not guaranteed so we guard
-against those cases by switching interrupts off.
+Hi,
 
-Disabling interrupts while they're already disabled is supposed to be
-fast, but profiling shows it's far from perfect. Instead, we can infer
-the interrupt state from in_hardirq(), which is just a fast var read,
-and fall back to the normal bio_free() otherwise. With that, the caching
-doesn't cover in softirq/task completions anymore, but that should be
-just fine, we have never measured if caching brings anything in those
-scenarios.
+在 2024/01/18 23:20, Jens Axboe 写道:
+> On 1/18/24 6:04 AM, Li Lingfeng wrote:
+>> From: Li Lingfeng <lilingfeng3@huawei.com>
+>>
+>> Commit 1a721de8489f ("block: don't add or resize partition on the disk
+>> with GENHD_FL_NO_PART") prevented all operations about partitions on disks
+>> with GENHD_FL_NO_PART in blkpg_do_ioctl() since they are meaningless.
+>> However, it changed error code in some scenarios. So move checking
+>> GENHD_FL_NO_PART to bdev_add_partition() to eliminate impact.
+> 
+> This looks fine, but it's identical to the one sent out by Yu two days
+> ago. Hmm? Who's the proper author?
 
-Profiling indicates that the bio_put() cost is reduced by ~3.5 times
-(1.76% -> 0.49%), and and throughput of CPU bound benchmarks improve
-by around 1% (t/io_uring with high QD and several drives).
+Lingfeng is my collegue and I told him that he should send a fix for his
+formal patch. Sorry for the confusion :)
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/bio.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-diff --git a/block/bio.c b/block/bio.c
-index 816d412c06e9..a8a4f3211893 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -763,26 +763,29 @@ static inline void bio_put_percpu_cache(struct bio *bio)
- 
- 	cache = per_cpu_ptr(bio->bi_pool->cache, get_cpu());
- 	if (READ_ONCE(cache->nr_irq) + cache->nr > ALLOC_CACHE_MAX) {
-+free:
- 		put_cpu();
- 		bio_free(bio);
- 		return;
- 	}
- 
--	bio_uninit(bio);
--
--	if ((bio->bi_opf & REQ_POLLED) && !WARN_ON_ONCE(in_interrupt())) {
-+	if (bio->bi_opf & REQ_POLLED) {
-+		if (WARN_ON_ONCE(!in_task()))
-+			goto free;
-+		bio_uninit(bio);
- 		bio->bi_next = cache->free_list;
- 		bio->bi_bdev = NULL;
- 		cache->free_list = bio;
- 		cache->nr++;
--	} else {
--		unsigned long flags;
-+	} else if (in_hardirq()) {
-+		lockdep_assert_irqs_disabled();
- 
--		local_irq_save(flags);
-+		bio_uninit(bio);
- 		bio->bi_next = cache->free_list_irq;
- 		cache->free_list_irq = bio;
- 		cache->nr_irq++;
--		local_irq_restore(flags);
-+	} else {
-+		goto free;
- 	}
- 	put_cpu();
- }
--- 
-2.43.0
+> 
+> Adding Yu.
+> 
 
