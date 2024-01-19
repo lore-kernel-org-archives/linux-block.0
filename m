@@ -1,41 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F07E1378
-	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 04:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6011E534
+	for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 08:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705639687; cv=none; b=rQb+uGoWJVmw7wnNHu0clV5MRuyhVnjYji4qIRNRc4mfl9Z0Q9q/HL46qq7uJUwuTZ1/NE5sIT7QKAnXGIkWDHLUbIeCz1cfko3P51tjpKiQYo9XZboNSX7gfNn7OHq+rQjn8G0jTgOj36xvgIHxhM7OOqgkoYCblzbYqiH0MqY=
+	t=1705653733; cv=none; b=k30h/m72ZN2kLJL9sa64XG9ykRQI0dKhMjWg6dZixXpOfIkoNvlktEjCfgAPCLGDoOQQTgFxZly12YGkdgK3aidoWThD7vtaG+MULrzGY1Mst6yk8ehMrC2WSf0n09mPrxj4a3qV3hDQr2CXAbNot+WU0th8KEd9wsB4CWedIN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705639687; c=relaxed/simple;
-	bh=2zMwRd++WGHO/dzFJ8oPHiUxD0AI5KxVbZ4Jm8rX+50=;
+	s=arc-20240116; t=1705653733; c=relaxed/simple;
+	bh=enRZTZ3A/5sPOqR7e0wgcPMlzxpsSHc7+zk9ab9y1H8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nm1on9m6AiNeDwVpRDLQvSe6vJUEXBFFmGvCCdkXyeRDG7dl2YE5cDMG5CXiaD8YmxkiYOq7cqFszOtia9eQy6+IEwLh+B41I8UGAJzFdfK1q7hNdG7hxleSVE9b89fuHZZc4pE4hxqD2ULv5rXScUn85xefVMMdiS8ZyPStiMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fM89tsep; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=DuZXCGOHz87qAUdpF1P6mAN/8J/ElKVTTkymu2rXxwbVz1rw2u7ohQ13Bw0mNA7e4cPTXVxQ8dVeBNpUOaGopXzmXYOMXdtwPN/tEq0wKNLtPd7dGFac+nJHwyJ2rTL9YrLQ2rXtESwTzZH67ycSGklPWc6BFjD6TIfEaOf2U1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bEQRenmb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fM89tsep"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2178BC433F1;
-	Fri, 19 Jan 2024 04:48:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705639686;
-	bh=2zMwRd++WGHO/dzFJ8oPHiUxD0AI5KxVbZ4Jm8rX+50=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fM89tsepURNVeAZMjmdtYRyZjjLAd/QfOS3pzh/OnTAX7APvs+FEdqj+KWtmysfoh
-	 AOpbM4gfq/nw5pcxS30EedesQ3Iat1omHxgzeHq3a25R6aKX203B/jLZKzB6KSXcY7
-	 49m0qLHs9C8CEqPDAk0Y2wiRBRo7U6jLW89VGPl0DVT95qo6RJFHBIJYzKoHETrCQo
-	 LsdI9tkLeZgmkA3Es31W+4C6V9yu8s2IsdH+b8qtTbfQcQl7H0D75YeUaJoPjrs9DT
-	 fGHHLCSATDC0DgbzzoCHmym56Yqls7k9pO5sQ+mjHG0Rd7/NxRbyO748+00y/isRFe
-	 5JhC39M15Db7A==
-Date: Thu, 18 Jan 2024 21:48:03 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: alan.adamson@oracle.com
-Cc: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-	sagi@grimberg.me, linux-block@vger.kernel.org
-Subject: Re: [RFC 0/1] nvme: Add NVMe LBA Fault Injection
-Message-ID: <Zan_A-dR5ReYTfBF@kbusch-mbp.dhcp.thefacebook.com>
-References: <20240116232728.3392996-1-alan.adamson@oracle.com>
- <20240118072419.GA21315@lst.de>
- <6874a81c-3f4f-428a-8a95-19898ca004a2@oracle.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bEQRenmb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705653730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iZwuvLGmOYB4Vf9wQkXsFnJm7UNiZ3ky5C2IOeAmnx0=;
+	b=bEQRenmb1V0Wdyiwe7qTFn7SGplajTTHQYNZpcWnNW1MfWwY5tQDR2qw/a/yEIDO9oRwBk
+	F4CM9zfUxlmwW6/rho3w8pdsMuEkP+ie47AdfUyNU2xBJFv2rFszAE3mZY1uvdV/EC0vvo
+	aTD7A4t+xGlOTafz0gcs0J2dcUFAu2g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-Sqz9YkkjMUu6uMmdzNElJQ-1; Fri, 19 Jan 2024 03:42:07 -0500
+X-MC-Unique: Sqz9YkkjMUu6uMmdzNElJQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9C18E83535E;
+	Fri, 19 Jan 2024 08:42:06 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.42])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 61B8F40C1430;
+	Fri, 19 Jan 2024 08:42:02 +0000 (UTC)
+Date: Fri, 19 Jan 2024 16:41:58 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Li Nan <linan666@huaweicloud.com>,
+	Zdenek Kabelac <zkabelac@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+	ming.lei@redhat.com
+Subject: Re: [PATCH v3 0/4] brd discard patches
+Message-ID: <Zao1PNip1SRVB4Rp@fedora>
+References: <2dacc73-854-e71c-1746-99b017401c9a@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,52 +59,67 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6874a81c-3f4f-428a-8a95-19898ca004a2@oracle.com>
+In-Reply-To: <2dacc73-854-e71c-1746-99b017401c9a@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Thu, Jan 18, 2024 at 09:02:43AM -0800, alan.adamson@oracle.com wrote:
-> 
-> On 1/17/24 11:24 PM, Christoph Hellwig wrote:
-> > On Tue, Jan 16, 2024 at 03:27:27PM -0800, Alan Adamson wrote:
-> > > It has been requested that the NVMe fault injector be able to inject faults when accessing
-> > > specific Logical Block Addresses (LBA).
-> > Curious, but who has requested this?  Because injecting errors really
-> > isn't the drivers job.
-> 
-> 
-> It's an application (database) that is requesting it for their error
-> handling testing.
+Hi Mikulas,
 
-Going out on a limb here... This seems so obscure to burden a driver to
-synthesize. Could we just give a hook for a bpf override and you can
-totally go for whatever scenario you can imagine with a script?
+On Thu, Aug 10, 2023 at 12:07:07PM +0200, Mikulas Patocka wrote:
+> Hi
+> 
+> Here I'm submitting the ramdisk discard patches for the next merge window. 
+> If you want to make some more changes, please let me now.
 
----
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 50818dbcfa1ae..df87a63335aa8 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -381,9 +381,22 @@ static inline void nvme_end_req_zoned(struct request *req)
- 	}
- }
- 
-+#ifdef CONFIG_BPF_KPROBE_OVERRIDE
-+static noinline blk_status_t nvme_req_status(struct nvme_request *req)
-+{
-+	return nvme_error_status(req->status);
-+}
-+ALLOW_ERROR_INJECTION(nvme_req_status, ERRNO);
-+#else
-+static inline blk_status_t nvme_req_status(struct nvme_request *req)
-+{
-+	return nvme_error_status(req->status);
-+}
-+#endif
-+
- static inline void nvme_end_req(struct request *req)
- {
--	blk_status_t status = nvme_error_status(nvme_req(req)->status);
-+	blk_status_t status = nvme_req_status(nvme_req(req));
- 
- 	if (unlikely(nvme_req(req)->status && !(req->rq_flags & RQF_QUIET)))
- 		nvme_log_error(req);
---
+brd discard is removed in f09a06a193d9 ("brd: remove discard support")
+in 2017 because it is just driver private write_zero, and user can get same
+result with fallocate(FALLOC_FL_ZERO_RANGE).
+
+Also you only mentioned the motivation in V1 cover-letter:
+
+https://lore.kernel.org/linux-block/alpine.LRH.2.02.2209151604410.13231@file01.intranet.prod.int.rdu2.redhat.com/
+
+```
+Zdenek asked me to write it, because we use brd in the lvm2 testsuite and
+it would be benefical to run the testsuite with discard enabled in order
+to test discard handling.
+```
+
+But we have lots of test disks with discard support: loop, scsi_debug,
+null_blk, ublk, ..., so one requestion is that why brd discard is
+a must for lvm2 testsuite to cover (lvm)discard handling?
+
+The reason why brd didn't support discard by freeing pages is writeback
+deadlock risk, see:
+
+commit f09a06a193d9 ("brd: remove discard support")
+
+-static void discard_from_brd(struct brd_device *brd,
+-                       sector_t sector, size_t n)
+-{
+-       while (n >= PAGE_SIZE) {
+-               /*
+-                * Don't want to actually discard pages here because
+-                * re-allocating the pages can result in writeback
+-                * deadlocks under heavy load.
+-                */
+-               if (0)
+-                       brd_free_page(brd, sector);
+-               else
+-                       brd_zero_page(brd, sector);
+-               sector += PAGE_SIZE >> SECTOR_SHIFT;
+-               n -= PAGE_SIZE;
+-       }
+-}
+
+However, you didn't mention how your patches address this potential
+risk, care to document it? I can't find any related words about
+this problem.
+
+BTW, your patches looks more complicated than the original removed
+discard implementation. And if the above questions get addressed,
+I am happy to provide review on the following patches.
+
+
+Thanks,
+Ming
+
