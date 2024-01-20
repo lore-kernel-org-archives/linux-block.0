@@ -1,121 +1,97 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1325439C
-	for <linux-block@vger.kernel.org>; Sat, 20 Jan 2024 00:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A43C10FC
+	for <linux-block@vger.kernel.org>; Sat, 20 Jan 2024 01:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705710669; cv=none; b=PfIfsnjq8r6WLvdRQujNy8qyPkG+ASO1QrujpvQNj4wrZxqchnvTYGzOPHBJsF5vOvPO83MQNvYnZ9ocZ4Px4nifWG/Blt1E5hKnuVdrwzu70Kjvme3Q4i/GTnd03id2E7doquFq23HxltMXHN+kX8LlRjpAaKj1AIOmCjjFQMw=
+	t=1705712932; cv=none; b=KorqUzSZ07VaizJR24Jsy1vk4LPq08TpeqMUN4oPOduU42DH0iU9VBJ/jxy5gYP4jpb8hmK7KdKBFvlP29frlGpXW3BwSypG/VdUV23K+URyfxnOK/bFqmDc1YYVHQn1P82Ljq8oHWStqgNmtAxYfRLOzX/fSNNWv0B5aT9V/mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705710669; c=relaxed/simple;
-	bh=g0UGGmWeLAg6DyAuAlHm6I6H9Seo1NDjCVDotbPdadA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=Hf+1UThUUeJpyjRypjAUZbZYlEP78hhNYtDs58zASM7W2DwrgTutf2MGxoWr4jcNNYFOfvA93y2EgdX7Gc+qVm1sSw+1ytlsBnOyxxB3WLz6utjhXOyoRpifBGdfBU3soaFh7GybhHR3SkGdOf+mldyMLwqmJdla+XhlNFzO5ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0dx9Pdya; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1705712932; c=relaxed/simple;
+	bh=lZQiNZgacSuuVY81zUxInYKxrcCFl6nLvZFElxAfs0c=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Q+FlqquUd/9hIrJFeImfeK0b0FyevEwOLwF2yHtt5/Y4qwHNX3jw3OXMYXQpWapYCB81crTd5qDWsmsAO84Kv/9yhT3xjbfDR78CNgqJ7p6H37eetUbXyYZ+xw3ua5TpMMIpuIGxFgTh4yd699/+2qAygNRbX11ST4jJkIqOHKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Jj8Vv4fv; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0dx9Pdya"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6d9b41a3cb7so349420b3a.0
-        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 16:31:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Jj8Vv4fv"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6d9b760610bso267392b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 17:08:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705710663; x=1706315463; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6TGmXAoUQHt8aDfak0ug6bpaZtnyVT7ONfXQ8J1tL1o=;
-        b=0dx9PdyalAHQhg5qmX1RRywqTSkk/dr+maqXpftNsJSkTmT6wGvpsu31jgA63v/9Xy
-         224T7ob+PGhJXgjwXoDz0yupsttb17cloklCkABxq3zt2w1qMrFb7Fk0dHwW9h9YzFjF
-         5WMW9O3mghsi4GrUYIv5iMz8sOpslM0gbeI/stKTON739zbjqxF/PtGKLQVNk6bIij/Z
-         eLBfQeWn73YKg+XeCq6/Na5Nxz3aoy4Bo6qRlbnzOXOdGXXfUwM8/DSwiDhFkQDmwj2G
-         wyAOcOVnQxEB/z8nt7LqNJWok+hR0G4B7UiMOQXO9XU/Yb3zeUDbcb4HTwNqZipuvsbj
-         JKyg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705712929; x=1706317729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hQpMBDa/SGuSKIQdLMIHYKIk+tXCd6t4BBAUn2QqMSU=;
+        b=Jj8Vv4fvjgzXEl/bjXPvlcWAYOqrbUmo/VdthNNJJqnkrRZxUZwZM6jbZlnFo/raUk
+         P1aOW1+kzAkUcfhYZToX2SIsk8eTJQ7TEQbTZSl4fmfZ/V0yvJUk47g61AZ3ncaE9ZxE
+         L1sVk8nOIPjH6pwxk8ra7GkqP2inopfvZEotbqetDuhRsmuDeZCQ44S7Ybl9xfkJcRyA
+         ynGo0Jl47Y+cIORINgkaq3zewpDXNNQywKrB6zah7mXOPV/HQsRe7qz7D8Gcw2XXpGfi
+         7L2ysuPAnzVptUSa2yVZY9ejDwFqfEG5s9OpM8jYK0zhIRELr7jmK5kjdPNvkZIYvSOw
+         uOJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705710663; x=1706315463;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6TGmXAoUQHt8aDfak0ug6bpaZtnyVT7ONfXQ8J1tL1o=;
-        b=qetlr0Dm9n3L0VmX9wJgrpeIskN3HBJ/zO42PlhfiAGSFUN7J3NOpYIXfDCFCHPQoA
-         Z+Ad2MIY8EPF2kMA/crb+LC9qLpG+CsBoLop4ihk3M0Fw4bEF5Hjty++uVa9mmb3rinA
-         cdfD8qgezyMm9B2hYYApJmjJ556e6Zfuy2TWoSLE3XKt9HyV81WsCG8IjGfrTHOh62HB
-         xjQi7dxmWJb40F8YfN2u7noOuKLvci+6u+uwCvyL8COPbJTiD6qeLvXRajaVTPYSS+1N
-         xb4m50AL1tICS8YHW5tL2mzUoC8wPQAESqok/OcM2gqAbssrpwUEdio71TbgiqEdn87M
-         dGjw==
-X-Gm-Message-State: AOJu0YyoFOWnfqlYm4ORGtN9EZJ8FQYsuBGrUhj+K5dkSyFlu6so5JRW
-	BUiEvPUYcIqqI3HHZZPMywLaryE/vlrxbYJWr7SXxbhTSbobQjUdpnyEMgRmEC0=
-X-Google-Smtp-Source: AGHT+IE0yBuziGiUMLYTKLit3m+CHS49T6t31Tj6RccdjB1f6Vl62rPQ7XcTUY1AyDA81GUNWI17GQ==
-X-Received: by 2002:aa7:9d0f:0:b0:6db:936c:aabe with SMTP id k15-20020aa79d0f000000b006db936caabemr1357481pfp.2.1705710663333;
-        Fri, 19 Jan 2024 16:31:03 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id fh35-20020a056a00392300b006da1d9f4adcsm5690148pfb.127.2024.01.19.16.31.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jan 2024 16:31:02 -0800 (PST)
-Message-ID: <8ef6eba4-b7b1-48b4-84a3-db6a4e27a348@kernel.dk>
-Date: Fri, 19 Jan 2024 17:31:01 -0700
+        d=1e100.net; s=20230601; t=1705712929; x=1706317729;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hQpMBDa/SGuSKIQdLMIHYKIk+tXCd6t4BBAUn2QqMSU=;
+        b=QsnhD3ZxfjKackCwW7c0ajkzf+mVYjxdDvcPRTblKvZHwX5bBPMZLwJlMNOreBEriG
+         zsyI/hHTkFteCCCtIhUvfUvlmvUls/qLVCoaA7xpq+sRnIQem65bTFDGbw7bc0X9V2j5
+         cBG2NCPoDNKNtWFQQRZXuSpj58HO85i4hwUhJFW9A0Xca/dIOseoymk6CY/2/vgo4NB4
+         oEb6CNaahqKSFar+jNo0Ir4w6VGq3ED7LsipCrMmHWaS/hyAr4CUN4Apn9DfWMR4c70l
+         ZQdkcJYdrI5N+myL4UiG3nvwTHuRvmGatRTAGtvqDZ/d9WYLQoJOcTrRPhAMzcn5G6eJ
+         0UfA==
+X-Gm-Message-State: AOJu0Yw926cNf8ipc94wWO16TPLw3+1FJ9/7l3B683cKiTaD/rclhJGU
+	SJFV/cmyrmMW3PAxANaQvNj2Hj90jF4G6FXEXpTgmpwLEAXtEOE2C+z0ps+oLLzvClhzzq0R0yQ
+	gSXM=
+X-Google-Smtp-Source: AGHT+IE4vLPx8u6Hcm29S+YPOOx/pehQuvP9uVQgYFebkkeXDmYjGuezIkqhGc0qBOC3Wi6QLelqIg==
+X-Received: by 2002:a05:6a20:43a1:b0:19b:7147:f7df with SMTP id i33-20020a056a2043a100b0019b7147f7dfmr1486502pzl.0.1705712929265;
+        Fri, 19 Jan 2024 17:08:49 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id fn19-20020a056a002fd300b006dbcc97dc7fsm338162pfb.95.2024.01.19.17.08.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jan 2024 17:08:48 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: allison.karlitskaya@redhat.com, hch@infradead.org, 
+ yukuai1@huaweicloud.com, Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+ houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20240118130401.792757-1-lilingfeng@huaweicloud.com>
+References: <20240118130401.792757-1-lilingfeng@huaweicloud.com>
+Subject: Re: [PATCH] block: Move checking GENHD_FL_NO_PART to
+ bdev_add_partition()
+Message-Id: <170571292805.1346839.6434955686837656985.b4-ty@kernel.dk>
+Date: Fri, 19 Jan 2024 18:08:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] block/mq-deadline: fallback to per-cpu insertion
- buckets under contention
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-References: <20240119160338.1191281-1-axboe@kernel.dk>
- <20240119160338.1191281-4-axboe@kernel.dk>
- <9bf23380-b006-4e80-95a6-f5b95c35a475@acm.org>
- <af2f895c-ee57-41a1-ae14-1f531b5671e0@kernel.dk>
-In-Reply-To: <af2f895c-ee57-41a1-ae14-1f531b5671e0@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 1/19/24 5:05 PM, Jens Axboe wrote:
-> On 1/19/24 4:16 PM, Bart Van Assche wrote:
->> On 1/19/24 08:02, Jens Axboe wrote:
->>> If we attempt to insert a list of requests, but someone else is already
->>> running an insertion, then fallback to queueing that list internally and
->>> let the existing inserter finish the operation. The current inserter
->>> will either see and flush this list, of if it ends before we're done
->>> doing our bucket insert, then we'll flush it and insert ourselves.
->>>
->>> This reduces contention on the dd->lock, which protects any request
->>> insertion or dispatch, by having a backup point to insert into which
->>> will either be flushed immediately or by an existing inserter. As the
->>> alternative is to just keep spinning on the dd->lock, it's very easy
->>> to get into a situation where multiple processes are trying to do IO
->>> and all sit and spin on this lock.
->>
->> With this alternative patch I achieve 20% higher IOPS than with patch
->> 3/4 of this series for 1..4 CPU cores (null_blk + fio in an x86 VM):
+
+On Thu, 18 Jan 2024 21:04:01 +0800, Li Lingfeng wrote:
+> Commit 1a721de8489f ("block: don't add or resize partition on the disk
+> with GENHD_FL_NO_PART") prevented all operations about partitions on disks
+> with GENHD_FL_NO_PART in blkpg_do_ioctl() since they are meaningless.
+> However, it changed error code in some scenarios. So move checking
+> GENHD_FL_NO_PART to bdev_add_partition() to eliminate impact.
 > 
-> Performance aside, I think this is a much better approach rather than
-> mine. Haven't tested yet, but I think this instead of my patch 3 and the
-> other patches and this should further drastically cut down on the
-> overhead. Can you send a "proper" patch and I'll just replace the one
-> that I have?
+> 
+> [...]
 
-Ran with this real quick and the incremental I sent, here's what I see.
-For reference, this is before the series:
+Applied, thanks!
 
-Device		IOPS	sys	contention	diff
-====================================================
-null_blk	879K	89%	93.6%
-nvme0n1		901K	86%	94.5%
+[1/1] block: Move checking GENHD_FL_NO_PART to bdev_add_partition()
+      commit: 6a1cf2468a9ba1f56de7478ee6ad0d54e0aa821a
 
-and now with the series:
-
-Device		IOPS	sys	contention	diff
-====================================================
-null_blk	2867K	11.1%	~6.0%		+326%
-nvme0n1		3162K	 9.9%	~5.0%		+350%
-
-which looks really good, it removes the last bit of contention that was
-still there. And talk about a combined improvement...
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
