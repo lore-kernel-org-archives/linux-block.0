@@ -1,59 +1,58 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470EAEA3
-	for <linux-block@vger.kernel.org>; Sat, 20 Jan 2024 00:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1325439C
+	for <linux-block@vger.kernel.org>; Sat, 20 Jan 2024 00:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705709594; cv=none; b=P6rsIXzSivQhSbaTcCVqr5/J9gqpxvHOBmYVsfWiH7XuHEuVlGzhMbXgho0AzV1yYbZuArtgs+zMn8pIxwb/Rt0nz4pVdz5TrYm8l2EFnfH7M1HPMIzCerMC2gfoy7bYaK3G0GxMLns8SrM6HlWyKASjM+m2v8RGCGRO6zuZpf0=
+	t=1705710669; cv=none; b=PfIfsnjq8r6WLvdRQujNy8qyPkG+ASO1QrujpvQNj4wrZxqchnvTYGzOPHBJsF5vOvPO83MQNvYnZ9ocZ4Px4nifWG/Blt1E5hKnuVdrwzu70Kjvme3Q4i/GTnd03id2E7doquFq23HxltMXHN+kX8LlRjpAaKj1AIOmCjjFQMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705709594; c=relaxed/simple;
-	bh=Om5pA1oAx6jwdfWxyZlOPs6Qt2CDYz5up/btxrLpciM=;
+	s=arc-20240116; t=1705710669; c=relaxed/simple;
+	bh=g0UGGmWeLAg6DyAuAlHm6I6H9Seo1NDjCVDotbPdadA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=mgsW5o+UNfWva3mrx9qERk6ZtcHZjJguiKqCIj3hq5CVFXIWccVVYI4nCQbwLwa8Orz8+bwRmfrr/kqyfdfLqKGSphivUPPcudk0h5dx39RGqCuYMCp24HjVwbuflCb3BzLN70+1w5dLzWctM8gCbIkDSJGF6MeDYV3e7+MhUHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UIVTUwCJ; arc=none smtp.client-ip=209.85.215.172
+	 In-Reply-To:Content-Type; b=Hf+1UThUUeJpyjRypjAUZbZYlEP78hhNYtDs58zASM7W2DwrgTutf2MGxoWr4jcNNYFOfvA93y2EgdX7Gc+qVm1sSw+1ytlsBnOyxxB3WLz6utjhXOyoRpifBGdfBU3soaFh7GybhHR3SkGdOf+mldyMLwqmJdla+XhlNFzO5ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0dx9Pdya; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UIVTUwCJ"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so249376a12.0
-        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 16:13:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0dx9Pdya"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6d9b41a3cb7so349420b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 19 Jan 2024 16:31:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705709591; x=1706314391; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1705710663; x=1706315463; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:references:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mgySmpOsqmxiCev4K3vAEeL4RRNgneTlfNKaog8g/a4=;
-        b=UIVTUwCJTXprVM3fPdY75FSj8bYJUDG8oResEFF9RaIcAeaObTY+rrINA7JpzpbdFP
-         SmQEL5XeuCCQgJm74/nTbSoeOSsyb0JmmObc1upB2XHitjypcZpCzAeR8gN+3Zpd+YU8
-         CLmwUmw9wufpzsjruPZi7bZuk1HGSS9/0t7qMgoZj/NgPFC/Qvodk0toNdZ1RQkvwkOr
-         Y19jt+fTdKW5dywop39I71UhW+hno2OnVVpDOc2qXAp63Vw8a3iGTgGyWmBG4sxDeaaD
-         EbX2pAcA5g2/t8+6r7Djog8UUN/pKf8/HzD/L2feglkL6hPcMhH9XMASVdIKmx9DCnGo
-         w9gw==
+        bh=6TGmXAoUQHt8aDfak0ug6bpaZtnyVT7ONfXQ8J1tL1o=;
+        b=0dx9PdyalAHQhg5qmX1RRywqTSkk/dr+maqXpftNsJSkTmT6wGvpsu31jgA63v/9Xy
+         224T7ob+PGhJXgjwXoDz0yupsttb17cloklCkABxq3zt2w1qMrFb7Fk0dHwW9h9YzFjF
+         5WMW9O3mghsi4GrUYIv5iMz8sOpslM0gbeI/stKTON739zbjqxF/PtGKLQVNk6bIij/Z
+         eLBfQeWn73YKg+XeCq6/Na5Nxz3aoy4Bo6qRlbnzOXOdGXXfUwM8/DSwiDhFkQDmwj2G
+         wyAOcOVnQxEB/z8nt7LqNJWok+hR0G4B7UiMOQXO9XU/Yb3zeUDbcb4HTwNqZipuvsbj
+         JKyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705709591; x=1706314391;
+        d=1e100.net; s=20230601; t=1705710663; x=1706315463;
         h=content-transfer-encoding:in-reply-to:references:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mgySmpOsqmxiCev4K3vAEeL4RRNgneTlfNKaog8g/a4=;
-        b=fWBcU2NYCB4sXx11SBgJvqMDPWFSqQXK7URj5uoWAnypMwLZ3iTK6EgyCpnMuI0/c9
-         ENNnDhLhn9g6/ty9kHUaqZPvP9sp+k3C9xd06KbH+ST0Yj4erfEQx+oVcxl992idXoyV
-         /BFTNqXPBISy8EO5kpzt68SJerdPpsz4dp1fVm1ANjnvFanb3R4pS7iIIbLpy6hO4J4k
-         cL4JQo2dB0/YDU2VfBAB761A3dXYd/rM6z3LIWGf0cJdC1E7zGWvNcXem+VAcrrDfbeJ
-         hI6bJakERVUIxjhvmlhHqIn7Gf2cSEvX4x4ILfR6PoJx/kIaiD3pLrCqM3BZthmAeAzB
-         FmnQ==
-X-Gm-Message-State: AOJu0YyuE2FowQXJYPK1W5i0y00bVozLhDXGR1B71qop39cDXcDOWmYR
-	ImujI9IgxzJUU93xvoqAdxTZD8PHTK6UoUE39enbqwZXn4okIcEDfazy06OFzu79ktkH+/rcegb
-	aJsk=
-X-Google-Smtp-Source: AGHT+IGm/3Gnpmrk3CIrU2YZVLPU4hZOLw/5zG0XxJ4g5ya+7q/r8w4jzz8dZtwEg1esonssfCsSIA==
-X-Received: by 2002:a17:902:c386:b0:1d3:f790:e0c6 with SMTP id g6-20020a170902c38600b001d3f790e0c6mr1354155plg.2.1705709591464;
-        Fri, 19 Jan 2024 16:13:11 -0800 (PST)
+        bh=6TGmXAoUQHt8aDfak0ug6bpaZtnyVT7ONfXQ8J1tL1o=;
+        b=qetlr0Dm9n3L0VmX9wJgrpeIskN3HBJ/zO42PlhfiAGSFUN7J3NOpYIXfDCFCHPQoA
+         Z+Ad2MIY8EPF2kMA/crb+LC9qLpG+CsBoLop4ihk3M0Fw4bEF5Hjty++uVa9mmb3rinA
+         cdfD8qgezyMm9B2hYYApJmjJ556e6Zfuy2TWoSLE3XKt9HyV81WsCG8IjGfrTHOh62HB
+         xjQi7dxmWJb40F8YfN2u7noOuKLvci+6u+uwCvyL8COPbJTiD6qeLvXRajaVTPYSS+1N
+         xb4m50AL1tICS8YHW5tL2mzUoC8wPQAESqok/OcM2gqAbssrpwUEdio71TbgiqEdn87M
+         dGjw==
+X-Gm-Message-State: AOJu0YyoFOWnfqlYm4ORGtN9EZJ8FQYsuBGrUhj+K5dkSyFlu6so5JRW
+	BUiEvPUYcIqqI3HHZZPMywLaryE/vlrxbYJWr7SXxbhTSbobQjUdpnyEMgRmEC0=
+X-Google-Smtp-Source: AGHT+IE0yBuziGiUMLYTKLit3m+CHS49T6t31Tj6RccdjB1f6Vl62rPQ7XcTUY1AyDA81GUNWI17GQ==
+X-Received: by 2002:aa7:9d0f:0:b0:6db:936c:aabe with SMTP id k15-20020aa79d0f000000b006db936caabemr1357481pfp.2.1705710663333;
+        Fri, 19 Jan 2024 16:31:03 -0800 (PST)
 Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id kk12-20020a170903070c00b001d717e6001csm2199114plb.144.2024.01.19.16.13.10
+        by smtp.gmail.com with ESMTPSA id fh35-20020a056a00392300b006da1d9f4adcsm5690148pfb.127.2024.01.19.16.31.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jan 2024 16:13:10 -0800 (PST)
-Message-ID: <4d8ae6d7-7b9b-4f96-9bbe-5fc5d7a2060a@kernel.dk>
-Date: Fri, 19 Jan 2024 17:13:10 -0700
+        Fri, 19 Jan 2024 16:31:02 -0800 (PST)
+Message-ID: <8ef6eba4-b7b1-48b4-84a3-db6a4e27a348@kernel.dk>
+Date: Fri, 19 Jan 2024 17:31:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -99,54 +98,23 @@ On 1/19/24 5:05 PM, Jens Axboe wrote:
 > overhead. Can you send a "proper" patch and I'll just replace the one
 > that I have?
 
-I'd probably just fold in this incremental, as I think it cleans it up.
+Ran with this real quick and the incremental I sent, here's what I see.
+For reference, this is before the series:
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 88991a791c56..977c512465ca 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -599,10 +599,21 @@ static struct request *dd_dispatch_prio_aged_requests(struct deadline_data *dd,
- 	return NULL;
- }
- 
-+static void __dd_do_insert(struct request_queue *q, blk_insert_t flags,
-+			   struct list_head *list, struct list_head *free)
-+{
-+	while (!list_empty(list)) {
-+		struct request *rq;
-+
-+		rq = list_first_entry(list, struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+		dd_insert_request(q, rq, flags, free);
-+	}
-+}
-+
- static void dd_do_insert(struct request_queue *q, struct list_head *free)
- {
- 	struct deadline_data *dd = q->elevator->elevator_data;
--	struct request *rq;
- 	LIST_HEAD(at_head);
- 	LIST_HEAD(at_tail);
- 
-@@ -611,16 +622,8 @@ static void dd_do_insert(struct request_queue *q, struct list_head *free)
- 	list_splice_init(&dd->at_tail, &at_tail);
- 	spin_unlock(&dd->insert_lock);
- 
--	while (!list_empty(&at_head)) {
--		rq = list_first_entry(&at_head, struct request, queuelist);
--		list_del_init(&rq->queuelist);
--		dd_insert_request(q, rq, BLK_MQ_INSERT_AT_HEAD, free);
--	}
--	while (!list_empty(&at_tail)) {
--		rq = list_first_entry(&at_tail, struct request, queuelist);
--		list_del_init(&rq->queuelist);
--		dd_insert_request(q, rq, 0, free);
--	}
-+	__dd_do_insert(q, BLK_MQ_INSERT_AT_HEAD, &at_head, free);
-+	__dd_do_insert(q, 0, &at_tail, free);
- }
- 
- /*
+Device		IOPS	sys	contention	diff
+====================================================
+null_blk	879K	89%	93.6%
+nvme0n1		901K	86%	94.5%
+
+and now with the series:
+
+Device		IOPS	sys	contention	diff
+====================================================
+null_blk	2867K	11.1%	~6.0%		+326%
+nvme0n1		3162K	 9.9%	~5.0%		+350%
+
+which looks really good, it removes the last bit of contention that was
+still there. And talk about a combined improvement...
 
 -- 
 Jens Axboe
