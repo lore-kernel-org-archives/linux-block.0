@@ -1,95 +1,176 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073E541201;
-	Mon, 22 Jan 2024 20:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA79C10A15
+	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 22:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705954150; cv=none; b=QRDcAzXaebAKjzxZbe9upDUmSXpJATCrtOK5A7tHYXs8DbnqqS+aQQI1yG2lO2jYFdnHZq42zUMbrP+q5VI09u+5XlNYY6Jw2m57GE5FFkuXj+kqSGFFx9r/tNOp0hWe9mJ4yaz/xeKafEf98Sn5+ejBrvMI7w2/hjRWENcjgww=
+	t=1705963390; cv=none; b=Tz1nvxedQTfAPRrZhBYBOo2OX8UcTdZ7avLEUvjxuIF+H3PdjOFIT2Lfw/gTQRoMqtw+TAQvz2BdEbEBk3uJd5s92tSKoZtVj2dekV23UGxnEFqtNkAncLmTH+8lgrmGfbjXhjYQB8iu+D/GcXMb2hI6srvhIBoA3OKyekP3NRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705954150; c=relaxed/simple;
-	bh=A9UvLOwOpodh+7+qQNvGu4uH1RSZ0x0pBvj1w7jcJK0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OCsHBUYkEy195n8YDf5BTfp0Ha1aCiRM+6TwAkh3RvHid27fDszAn8aPZjT8vftcqb4jZhHrf2fF+nnGbmDavRJT5cXjyUHAfp74N3B0dM3LcTKwLUYusTEfF8lYhq1lRStnmT6BYtFJ7kQ/P31GqL66egdIPuQUDRMk5zOpuQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6dbb26ec1deso3689060b3a.0;
-        Mon, 22 Jan 2024 12:09:08 -0800 (PST)
+	s=arc-20240116; t=1705963390; c=relaxed/simple;
+	bh=jq6waBdRNkIn/pUr1wxFo1S8k72Er9q9GsNFxc1jCWM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HDA+bDD3esyNsIDau9aL8yUNUHdJ0zZeBT/5b5FP4bnCAgjnThcr45KAAZZCYb9iFmfGkkBXts+5ALMNA4lZ9IQMW8KZu5MyjxFJGGzJ4oj4BuDSYzoBFVKNrm46eZ79c3l7SdjYzbqdI6pk5+MgQYSvml4ZVJ0mY05xx/O34Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=RKLRbBZI; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="RKLRbBZI"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e87d07c07so47295545e9.1
+        for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 14:43:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1705963387; x=1706568187; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9HIAkUY/IV0amVuu3edtawXBj2pvEspdSiVxTepe+1A=;
+        b=RKLRbBZIjEezbsnhPUeiat7Q7ReFw7qDQLP8phEw9D8P0JpFxE5I7g5dwxMhxPvDtg
+         S3VmKYohHnK3bmepVwnLrOQeygSDPvxtMhdgrjjXx+zR+A2LENyin76l31e2XylenONg
+         DCChTSCy8DCJ5P9CaJaEiy20WPlNzc3b6umQV5/hOrKnby+mN/GWCmM+kN09OEja8pXC
+         6Fsc2eamPTG2yKVT8TWepatmMuS4yWCHadwYN9wp4Dh/4fv1IyYd1z7ANMfdRDSVAOD+
+         26a7nXtV1Z/rVGjT0bOpvZTSkhi4OV2KGc9Usp/nanXXW1rzUHSyeCmdSQfl/fTGiex/
+         pN+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705954148; x=1706558948;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsNEGOg1W9SSUbMC5dXx27HrjziDPHGrITW9iQruscY=;
-        b=hl3TypwJahOJZL5fNcL5YCAaoc73peg09YvPaUEX6j3zhwEx+l1X6Uk4VdFrlgme02
-         MsA3kP6+Jgbiffxohs1NnwOXsoYro7lef9peS/wL8RUPwlIndz1/7J707khVLRTzr8px
-         kA7mkgCoH/dKrZesEQbqaiDVZo56ErSr1r71QtU3j6Sjl+hQq8YIsvd6QjEI9Dd3FSre
-         M88mnhtWk0rCXLI+N+PVSUFkVJzclLxzMtohLtkIRDbcPH74v0Fd7x3mCmx4jtivG6M4
-         6d283cCJO+/WZlI67ZHeCyHmWS/f4aaMQEgjCO3slGHMx6MFevRQtpD0y+jpbld5NS5C
-         kz4g==
-X-Gm-Message-State: AOJu0YwTlRIOJoqVlqrMKPTBk80gnHCV/84jm7NPZzU65e2UO9uFtLH6
-	B8Qz12OG0vF535pCVgDVoizN3/PsepkkdYVPCM1dAeFFHDcGSNGZE4NANWy+
-X-Google-Smtp-Source: AGHT+IELoHpJB8ahHqjAgPvgmLB3hbJtkcVq7YDOJH3Vi5yiiOcgGl4qY8TFnx9Du2OGo1ZlXlfKNA==
-X-Received: by 2002:a05:6a20:324a:b0:19a:b86c:5b98 with SMTP id hm10-20020a056a20324a00b0019ab86c5b98mr4410806pzc.121.1705954148215;
-        Mon, 22 Jan 2024 12:09:08 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id fc13-20020a056a002e0d00b006d9cf4b56edsm10301417pfb.175.2024.01.22.12.09.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jan 2024 12:09:07 -0800 (PST)
-Message-ID: <edefdfbc-8584-47ad-9cb0-19ecb94321a8@acm.org>
-Date: Mon, 22 Jan 2024 12:09:06 -0800
+        d=1e100.net; s=20230601; t=1705963387; x=1706568187;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9HIAkUY/IV0amVuu3edtawXBj2pvEspdSiVxTepe+1A=;
+        b=qy2rQPUkyZrAcjOlC78hk/jm5fWB46Cr/P47crIVpv/YNJscFpusVVVV01wzSOjiLc
+         AykwKsVJKUY5z3mYabKO+xsQC03n2gfBESXdNXhqF9WBPvgw+3WwBJQWkPQT8PfF1y9h
+         jomButwx7tFmklpolf3WJcECvPBJomzFoq72e3ETIEuf5YvGPUyeXOp76S8uA5zfJxFQ
+         l+NHvnuhFghSQ40EVuQR28SWgm7oRqqfOWpCB5kFI23SQGZ+N8CnBpMzsZdfXaNWAqR4
+         9KH5uT9UntSEYdXt0FmKI3yKe/PxVkaViXAVtylolYtCF1FKfx8P57i/rfCmtlmXxHYX
+         osFg==
+X-Gm-Message-State: AOJu0YzHbta8M7OpEQ0bksrR6fdp+No50p0kcDlSwHHaZ7MYyYxpaDek
+	kcbBusWje9ppaMYYGn3ncI9abov2yMIoA1D0wHBQtAqVSwjLOQNTZc9Kl/EYzolWHxSCPaA+LVZ
+	G
+X-Google-Smtp-Source: AGHT+IEjlD5xRIOcTScuTGHjM6USJ+02b5+1PMeHVKOP7Pp8OqF4DhozZcwaJeTcrhn8QZSDG2G24Q==
+X-Received: by 2002:a7b:c38f:0:b0:40e:6617:fc33 with SMTP id s15-20020a7bc38f000000b0040e6617fc33mr2680804wmj.146.1705963386703;
+        Mon, 22 Jan 2024 14:43:06 -0800 (PST)
+Received: from airbuntu.. ([213.122.231.14])
+        by smtp.gmail.com with ESMTPSA id x16-20020adfdd90000000b00337d6539d52sm11412758wrl.18.2024.01.22.14.43.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 14:43:06 -0800 (PST)
+From: Qais Yousef <qyousef@layalina.io>
+To: Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Wei Wang <wvw@google.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Qais Yousef <qyousef@layalina.io>
+Subject: [PATCH] block/blk-mq: Don't complete locally if capacities are different
+Date: Mon, 22 Jan 2024 22:42:20 +0000
+Message-Id: <20240122224220.1206234-1-qyousef@layalina.io>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 06/19] block, fs: Propagate write hints to the block
- device inode
-Content-Language: en-US
-To: Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Daejun Park <daejun7.park@samsung.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>,
- Chuck Lever <chuck.lever@oracle.com>
-References: <20231219000815.2739120-1-bvanassche@acm.org>
- <20231219000815.2739120-7-bvanassche@acm.org> <20231228071206.GA13770@lst.de>
- <00cf8ffa-8ad5-45e4-bf7c-28b07ab4de21@acm.org> <20240103090204.GA1851@lst.de>
- <CGME20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc@epcas5p4.samsung.com>
- <23753320-63e5-4d76-88e2-8f2c9a90505c@acm.org>
- <b294a619-c37e-cb05-79a8-8a62aec88c7f@samsung.com>
- <9b854847-d29e-4df2-8d5d-253b6e6afc33@acm.org>
- <9fa04d79-0ba6-a2e0-6af7-d1c85f08923b@samsung.com>
- <85be3166-1886-b56a-4910-7aff8a13ea3b@samsung.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <85be3166-1886-b56a-4910-7aff8a13ea3b@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/22/24 01:31, Kanchan Joshi wrote:
-> On 1/19/2024 7:26 PM, Kanchan Joshi wrote:
->> On 1/19/2024 12:24 AM, Bart Van Assche wrote:
->>> I think the above proposal would introduce a bug: it would break the
->>> F_GET_RW_HINT implementation.
->>
->> Right. I expected to keep the exact change in GET, too, but that will
->> not be free from the side-effect.
->> The buffered-write path (block_write_full_page) picks the hint from one
->> inode, and the direct-write path (__blkdev_direct_IO_simple) picks the
->> hint from a different inode.
->> So, updating both seems needed here.
-> 
-> I stand corrected. It's possible to do away with two updates.
-> The direct-io code (patch 8) should rather be changed to pick the hint
-> from bdev inode (and not from file inode).
-> With that change, this patch only need to set the hint into only one
-> inode (bdev one). What do you think?
+The logic in blk_mq_complete_need_ipi() assumes SMP systems where all
+CPUs have equal capacities and only LLC cache can make a different on
+perceived performance. But this assumption falls apart on HMP systems
+where LLC is shared, but the CPUs have different capacities. Staying
+local then can have a big performance impact if the IO request was done
+from a CPU with higher capacity but the interrupt is serviced on a lower
+capacity CPU.
 
-I think that would break direct I/O submitted by a filesystem.
+Introduce new cpus_gte_capacity() function to enable do the additional
+check.
 
-Bart.
+Without the patch I see the BLOCK softirq always running on little cores
+(where the hardirq is serviced). With it I can see it running on all
+cores.
+
+This was noticed after the topology change [1] where now on a big.LITTLE
+we truly get that the LLC is shared between all cores where as in the
+past it was being misrepresented for historical reasons. The logic
+exposed a missing dependency on capacities for such systems where there
+can be a big performance difference between the CPUs.
+
+This of course introduced a noticeable change in behavior depending on
+how the topology is presented. Leading to regressions in some workloads
+as the performance of the BLOCK softirq on littles can be noticeably
+worse.
+
+[1] https://lpc.events/event/16/contributions/1342/attachments/962/1883/LPC-2022-Android-MC-Phantom-Domains.pdf
+
+Signed-off-by: Qais Yousef (Google) <qyousef@layalina.io>
+---
+ block/blk-mq.c                 | 5 +++--
+ include/linux/sched/topology.h | 6 ++++++
+ kernel/sched/core.c            | 8 ++++++++
+ 3 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ac18f802c027..9b2d278a7ae7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1163,10 +1163,11 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
+ 	if (force_irqthreads())
+ 		return false;
+ 
+-	/* same CPU or cache domain?  Complete locally */
++	/* same CPU or cache domain and capacity?  Complete locally */
+ 	if (cpu == rq->mq_ctx->cpu ||
+ 	    (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
+-	     cpus_share_cache(cpu, rq->mq_ctx->cpu)))
++	     cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
++	     cpus_gte_capacity(cpu, rq->mq_ctx->cpu)))
+ 		return false;
+ 
+ 	/* don't try to IPI to an offline CPU */
+diff --git a/include/linux/sched/topology.h b/include/linux/sched/topology.h
+index a6e04b4a21d7..31cef5780ba4 100644
+--- a/include/linux/sched/topology.h
++++ b/include/linux/sched/topology.h
+@@ -176,6 +176,7 @@ extern void partition_sched_domains(int ndoms_new, cpumask_var_t doms_new[],
+ cpumask_var_t *alloc_sched_domains(unsigned int ndoms);
+ void free_sched_domains(cpumask_var_t doms[], unsigned int ndoms);
+ 
++bool cpus_gte_capacity(int this_cpu, int that_cpu);
+ bool cpus_share_cache(int this_cpu, int that_cpu);
+ bool cpus_share_resources(int this_cpu, int that_cpu);
+ 
+@@ -226,6 +227,11 @@ partition_sched_domains(int ndoms_new, cpumask_var_t doms_new[],
+ {
+ }
+ 
++static inline bool cpus_gte_capacity(int this_cpu, int that_cpu)
++{
++	return true;
++}
++
+ static inline bool cpus_share_cache(int this_cpu, int that_cpu)
+ {
+ 	return true;
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index db4be4921e7f..db5ab4b3cee7 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -3954,6 +3954,14 @@ void wake_up_if_idle(int cpu)
+ 	}
+ }
+ 
++bool cpus_gte_capacity(int this_cpu, int that_cpu)
++{
++	if (this_cpu == that_cpu)
++		return true;
++
++	return arch_scale_cpu_capacity(this_cpu) >= arch_scale_cpu_capacity(that_cpu);
++}
++
+ bool cpus_share_cache(int this_cpu, int that_cpu)
+ {
+ 	if (this_cpu == that_cpu)
+-- 
+2.34.1
+
