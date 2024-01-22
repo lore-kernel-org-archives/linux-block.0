@@ -1,102 +1,87 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57233482FF;
-	Mon, 22 Jan 2024 17:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409454EB3F;
+	Mon, 22 Jan 2024 18:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705945660; cv=none; b=qRuQs9w7Y06QE8UUGDBW9ZrOG6QgnKF9CalZD+WmJ0teqfxFqwH1T1n4O9pdOTT9KpJoHoyI6bNdyRo8qfWKeKQPwQwmtziMjADzvw+p3ZCwAU8l8BIuFScGf38g/8nGG0Fqmk0zt/88BcrsQ9LOb8vgNMHgpmsQ9cLwR+vDDAs=
+	t=1705948039; cv=none; b=RPTKYI9n6E4/9OKzGiZsw3HdKVkSTcClMIdN0XM5YfZddxzuMxvdXbkD+e/avRbazeKzHmLCZ9pVCjBhvqMsVZ1iV1rkrDvUpl8TdOt+PWZ85Wuauk0tCcndjd6pdhhneq0JG5p2+uhSphVYHMJ1WBkfQ9TZslkYq0fxoDaHBHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705945660; c=relaxed/simple;
-	bh=5JMS+q62XZW23hNclILrAtW7tpPqJU12NjrpErZJU6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=plmc362ArgO6wulMK04JtiUcUaTfr3dLYJqno8FsdFaMI1llpiMeBQpQYteGaQI28Dn7yZ8n5zrluf2oQatyBcapeHW+DaOZWAqGNaxiTRsSuNQWi3+rhZN3emNteI9AnarWimlXPDCMdHWNJWfUB37PlqbfZsM22MWE5iII1O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i7VTDa6b; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1705948039; c=relaxed/simple;
+	bh=PlJsX8lq4hlaXsdUus+uVis54Jh85qBVrYR1P5XnPmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kXjDlcd4aej1JS/2hiPe0wbNdo8WBFwQ46GksyGsgKOFrajYpXIjUMOr2tkAXMoh5KE8aRVyTb4OnkQVYW1Yyt04fmr2wbbc806NyGL4hNm4cv43z769Ivj9s9Zc5lpYjjYrblreXn1GyHlIp3qLuZtsVjMo0IUBmBaGchATUAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oWMOAhkw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7VTDa6b"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3bd6581bc62so2521619b6e.2;
-        Mon, 22 Jan 2024 09:47:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705945658; x=1706550458; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=LXuYDfCriPwb12rx/ZYT8NxGUq7r+dv6zy6nRCpOHlQ=;
-        b=i7VTDa6bmjvB7Z/3EVJ6Dzn0IVZPDVxs0m8OGAw0j24rGjYXOLH7lVaGo2aKApz4Ob
-         DMz2etAJz8LpXqQ9pb6m380N8vCGPuF1J9xRoPXIlEWs58B/KpC01zD32+aC/7+mvCJy
-         Ya9y1jFyPaQYVOjGi3rB2x8u+R0x7VnWg0jGxvaZAimcHj0WZSAZpJKm7xxNf+L2w4O9
-         4KNMHdmXgb+aN+bENgx3G5J8fqn7dmDqTCFc00fHpkbn0BOkBVs2s5ts//cl6GuwylD4
-         U3GZHHaNIh3Bga2DI+CpbS8hfkHqQ+Kt+4reSARYoCl5szYE2I8y6aTfN0QPJY1rlS5M
-         rOGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705945658; x=1706550458;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LXuYDfCriPwb12rx/ZYT8NxGUq7r+dv6zy6nRCpOHlQ=;
-        b=JTmoRVEELI0Coe3vtJIbgSYiunaSxjDBR2jdCTd4jpBNEmywWzo8urfNvgqVDG6Dur
-         gBawOvDxzSdxw12lxD0l0BonAGzIQgnmzKGgVTYrDCrp96qJj9rCCsBrD1sGJL3W+xkE
-         rTaXBfUjTW0TyaOuB1pJ60pFTBtm/eMSUZPcenp7vPfcgc323hVovReBmafp1keQ6RAz
-         zSJxuoqfuc5j/OMKskFtRCwj30onHqW6qkpjpWyh9SkzNe8E0/u+b9REgFx8KgSX7dEZ
-         WmmfwUNLZzzmCc75ISMYxizPYZFiNyFOFoPyCJy2sM47BErkbYJSM64sHmAO7V7N0d4k
-         ocBg==
-X-Gm-Message-State: AOJu0YwyOvWR9HYxueXl8tdiNNN2g+QSfsziqMPJ5MWkC9ufpcbyC93F
-	neAutOvwF5NdxPJZokZa1sc9I+k8DZmmwMppRUmBEg/9solMsZn53I5UTPLzXOUMs1Eeti8owmd
-	JDv5csC2VD787k14jJP1vBk+JQ7k=
-X-Google-Smtp-Source: AGHT+IFBPlz+RgibcswccIxunRUauN9Us0ZVtsgo5fHnIR0Z4jyywDWN7TzgdTClehWzdrId7Z0Ij/5fS4mvUZpKvTs=
-X-Received: by 2002:aca:1809:0:b0:3bd:6f2f:6903 with SMTP id
- h9-20020aca1809000000b003bd6f2f6903mr3867589oih.111.1705945658414; Mon, 22
- Jan 2024 09:47:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oWMOAhkw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D52EDC433C7;
+	Mon, 22 Jan 2024 18:27:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705948038;
+	bh=PlJsX8lq4hlaXsdUus+uVis54Jh85qBVrYR1P5XnPmA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oWMOAhkwVSBJ3AEfqFEvKX11Hz05OIRqB4ABWsbho088Ga2Cx0RG7E35ba45no3Zi
+	 zaVv5Mbe+zgWL0AuaZXj2BRHaCkBpS2ud8TZ6mGSu1KL+z2Z2fl97EIAZ03N6Fgjet
+	 pEqGlVkThabnQoyFEJihfuPQMlFG0MD3qLx9Bck72plbi8mYijTgka0czNY7guWoii
+	 Hro4Arm3HOAxnyL8Bkg+TTKXm7xK8G9Zm6zyrD/tWkTbQP+ZsD57U9EIWRhjfxq5qj
+	 Xe66J+3zLwsB/OARPDDie1prAtn5Dt8SW4VDYZEc+n5vIAqh5PgUyuSKABGIXHv4jd
+	 mL3mbpNpnldng==
+Date: Mon, 22 Jan 2024 11:27:15 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH 05/15] block: add a max_user_discard_sectors queue limit
+Message-ID: <Za6zg-pA8IJkIb_b@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240122173645.1686078-1-hch@lst.de>
+ <20240122173645.1686078-6-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231130070133.8059-1-kch@nvidia.com> <20231130070133.8059-2-kch@nvidia.com>
- <20231201012507.GA1209828@fedora> <f4c17344-33be-4832-9045-fb6b40a478b6@nvidia.com>
-In-Reply-To: <f4c17344-33be-4832-9045-fb6b40a478b6@nvidia.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 22 Jan 2024 12:47:25 -0500
-Message-ID: <CAJSP0QX7H5F=rzz=STeWWYZbTxog0S-MARXgoHkR=u04qTD+_w@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/1] virtio-blk: process block layer timedout request
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, "hch@lst.de" <hch@lst.de>, 
-	"jasowang@redhat.com" <jasowang@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, "axboe@kernel.dk" <axboe@kernel.dk>, 
-	Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122173645.1686078-6-hch@lst.de>
 
-On Mon, 8 Jan 2024 at 22:33, Chaitanya Kulkarni <chaitanyak@nvidia.com> wrote:
-> On 11/30/23 17:25, Stefan Hajnoczi wrote:
-> > On Wed, Nov 29, 2023 at 11:01:33PM -0800, Chaitanya Kulkarni wrote:
-> >> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> >> index 3744e4da1b2a..ed864195ab26 100644
-> >> --- a/include/uapi/linux/virtio_blk.h
-> >> +++ b/include/uapi/linux/virtio_blk.h
-> >> @@ -317,6 +317,7 @@ struct virtio_scsi_inhdr {
-> >>   #define VIRTIO_BLK_S_OK            0
-> >>   #define VIRTIO_BLK_S_IOERR 1
-> >>   #define VIRTIO_BLK_S_UNSUPP        2
-> >> +#define VIRTIO_BLK_S_TIMEOUT        3
-> > The structs and constants in this header file come from the VIRTIO
-> > specification. Anything changed in this file must first be accepted into
-> > the VIRTIO spec because this is the hardware interface definition.
-> >
-> > VIRTIO_BLK_S_TIMEOUT seems to be synthetic value that is purely used by
-> > software, not the device. Maybe there is no need to update the spec.
-> > Just avoid using in_hdr.status to signal timeouts and use a separate
-> > flag/field instead in a block layer or virtio_blk driver request struct.
->
-> It is a specific error hence I've added that on the similar lines,
-> do you have a specific field in mind that you would prefer ?
+On Mon, Jan 22, 2024 at 06:36:35PM +0100, Christoph Hellwig wrote:
+> @@ -174,23 +174,23 @@ static ssize_t queue_discard_max_show(struct request_queue *q, char *page)
+>  static ssize_t queue_discard_max_store(struct request_queue *q,
+>  				       const char *page, size_t count)
+>  {
+> -	unsigned long max_discard;
+> -	ssize_t ret = queue_var_store(&max_discard, page, count);
+> +	unsigned long max_discard_bytes;
+> +	ssize_t ret;
+>  
+> +	ret = queue_var_store(&max_discard_bytes, page, count);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	if (max_discard & (q->limits.discard_granularity - 1))
+> +	if (max_discard_bytes & (q->limits.discard_granularity - 1))
+>  		return -EINVAL;
+>  
+> -	max_discard >>= 9;
+> -	if (max_discard > UINT_MAX)
+> +	if ((max_discard_bytes >> SECTOR_SHIFT) > UINT_MAX)
+>  		return -EINVAL;
+>  
+> -	if (max_discard > q->limits.max_hw_discard_sectors)
+> -		max_discard = q->limits.max_hw_discard_sectors;
+> -
+> -	q->limits.max_discard_sectors = max_discard;
+> +	q->limits.max_user_discard_sectors = max_discard_bytes >> SECTOR_SHIFT;
+> +	q->limits.max_discard_sectors =
+> +		min_not_zero(q->limits.max_hw_discard_sectors,
+> +			     q->limits.max_user_discard_sectors);
 
-I didn't have a specific flag or field in mind, but it's probably no
-longer necessary in v2 because the code needs to wait for the device
-to complete the request anyway.
-
-Stefan
+Shouldn't writing 0 disable discards?
