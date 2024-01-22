@@ -1,72 +1,51 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA79C10A15
-	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 22:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E95312E56
+	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 23:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705963390; cv=none; b=Tz1nvxedQTfAPRrZhBYBOo2OX8UcTdZ7avLEUvjxuIF+H3PdjOFIT2Lfw/gTQRoMqtw+TAQvz2BdEbEBk3uJd5s92tSKoZtVj2dekV23UGxnEFqtNkAncLmTH+8lgrmGfbjXhjYQB8iu+D/GcXMb2hI6srvhIBoA3OKyekP3NRc=
+	t=1705967637; cv=none; b=mzlgOmnNIwVuRc/eurzwBCbWUEVh6F5Iu/xjuw2hGtD8M698O9aPupiF7NL9eUWAYWxT6MgHWaOjEBEQZEFsBoo5KDZsesr4EIC7j9pGuHt2N5ZgCCWZY9fxF+4vWpi9DICAL8KQewXgex7b+hrm0YP91LIise4ruWC392cXkiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705963390; c=relaxed/simple;
-	bh=jq6waBdRNkIn/pUr1wxFo1S8k72Er9q9GsNFxc1jCWM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HDA+bDD3esyNsIDau9aL8yUNUHdJ0zZeBT/5b5FP4bnCAgjnThcr45KAAZZCYb9iFmfGkkBXts+5ALMNA4lZ9IQMW8KZu5MyjxFJGGzJ4oj4BuDSYzoBFVKNrm46eZ79c3l7SdjYzbqdI6pk5+MgQYSvml4ZVJ0mY05xx/O34Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=RKLRbBZI; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="RKLRbBZI"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e87d07c07so47295545e9.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 14:43:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1705963387; x=1706568187; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9HIAkUY/IV0amVuu3edtawXBj2pvEspdSiVxTepe+1A=;
-        b=RKLRbBZIjEezbsnhPUeiat7Q7ReFw7qDQLP8phEw9D8P0JpFxE5I7g5dwxMhxPvDtg
-         S3VmKYohHnK3bmepVwnLrOQeygSDPvxtMhdgrjjXx+zR+A2LENyin76l31e2XylenONg
-         DCChTSCy8DCJ5P9CaJaEiy20WPlNzc3b6umQV5/hOrKnby+mN/GWCmM+kN09OEja8pXC
-         6Fsc2eamPTG2yKVT8TWepatmMuS4yWCHadwYN9wp4Dh/4fv1IyYd1z7ANMfdRDSVAOD+
-         26a7nXtV1Z/rVGjT0bOpvZTSkhi4OV2KGc9Usp/nanXXW1rzUHSyeCmdSQfl/fTGiex/
-         pN+A==
+	s=arc-20240116; t=1705967637; c=relaxed/simple;
+	bh=WNaLQOTvRlltijApE3q3YmhNrqciDTqUmW5xLl+bqfc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZkVIz2K6GETQ+4Oim+6FN4hi1KLhKVUPkfjwSLyoY69gfZAnZPMLgf7jElYufITnuBGNaqrcbs0tdNPCFvlofDq/wq9JyLqCsJcqUoXZV0GmHIjUrKFQlkeWOkpNv02jQntQRyEykPk1iyleMRTYGtWuhwhyaAM6b+sboVCr96o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6db0fdd2b8fso1771640b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 15:53:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705963387; x=1706568187;
+        d=1e100.net; s=20230601; t=1705967635; x=1706572435;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9HIAkUY/IV0amVuu3edtawXBj2pvEspdSiVxTepe+1A=;
-        b=qy2rQPUkyZrAcjOlC78hk/jm5fWB46Cr/P47crIVpv/YNJscFpusVVVV01wzSOjiLc
-         AykwKsVJKUY5z3mYabKO+xsQC03n2gfBESXdNXhqF9WBPvgw+3WwBJQWkPQT8PfF1y9h
-         jomButwx7tFmklpolf3WJcECvPBJomzFoq72e3ETIEuf5YvGPUyeXOp76S8uA5zfJxFQ
-         l+NHvnuhFghSQ40EVuQR28SWgm7oRqqfOWpCB5kFI23SQGZ+N8CnBpMzsZdfXaNWAqR4
-         9KH5uT9UntSEYdXt0FmKI3yKe/PxVkaViXAVtylolYtCF1FKfx8P57i/rfCmtlmXxHYX
-         osFg==
-X-Gm-Message-State: AOJu0YzHbta8M7OpEQ0bksrR6fdp+No50p0kcDlSwHHaZ7MYyYxpaDek
-	kcbBusWje9ppaMYYGn3ncI9abov2yMIoA1D0wHBQtAqVSwjLOQNTZc9Kl/EYzolWHxSCPaA+LVZ
-	G
-X-Google-Smtp-Source: AGHT+IEjlD5xRIOcTScuTGHjM6USJ+02b5+1PMeHVKOP7Pp8OqF4DhozZcwaJeTcrhn8QZSDG2G24Q==
-X-Received: by 2002:a7b:c38f:0:b0:40e:6617:fc33 with SMTP id s15-20020a7bc38f000000b0040e6617fc33mr2680804wmj.146.1705963386703;
-        Mon, 22 Jan 2024 14:43:06 -0800 (PST)
-Received: from airbuntu.. ([213.122.231.14])
-        by smtp.gmail.com with ESMTPSA id x16-20020adfdd90000000b00337d6539d52sm11412758wrl.18.2024.01.22.14.43.05
+        bh=VGY7+s5+ev7hogDnsMOEa6sW1fzkfiXEUne6AffkzpQ=;
+        b=le7WgGLn2CA/u7rmcLKXZRyte1qE+tCgqGRlSbeH3t3tEjVYW5oLqd/NIVUnhSoxcd
+         sEf6+ioHtf1AyHL3DyT2ln72eXQPTyPNS+iEz+rQTnQFelqq84kpQD2h7Knac5mFaVZQ
+         Rz2z8o/4uRhcX9tt6CuxpOsWjC3uv/1cuT8ANHplhw7UbAwPQrTToKbyBfv1IB7PtQlN
+         BcCcch/uQnMyaeFd93Vo3aEb/naPxd1+iIM/pyZgTmOCdTYMUEt4+D/FnDCAmj3xECcr
+         OtncvHDHE5sZ+hDdIHmnrtr6A7NqjvkZVCaP5o2AQ1qUGnQeIbdIV/0lhj3XzcZ8qjIj
+         Ph3A==
+X-Gm-Message-State: AOJu0Yw+61Ywlz5hG4BVKYsw/UpU+K6SiUrSGq3fD54jVBg4bmO+0g5F
+	bUOM0AP2GEi3cELDdv7FfHnPlaDg9oG6hAORJDDOVpB7tGngpYmI
+X-Google-Smtp-Source: AGHT+IFaEXvap8r9gt1HAtsgzyOBxt1uCYgriTzCDr/hDMwZAEVKw6h65yewgYB9L2Kht2oPAt+ilQ==
+X-Received: by 2002:a05:6a00:4612:b0:6db:c6a6:c9eb with SMTP id ko18-20020a056a00461200b006dbc6a6c9ebmr3591711pfb.1.1705967634768;
+        Mon, 22 Jan 2024 15:53:54 -0800 (PST)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:317b:f783:2438:d626])
+        by smtp.gmail.com with ESMTPSA id t15-20020a62d14f000000b006d9a6953f08sm10600338pfl.103.2024.01.22.15.53.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 14:43:06 -0800 (PST)
-From: Qais Yousef <qyousef@layalina.io>
-To: Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Wei Wang <wvw@google.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Qais Yousef <qyousef@layalina.io>
-Subject: [PATCH] block/blk-mq: Don't complete locally if capacities are different
-Date: Mon, 22 Jan 2024 22:42:20 +0000
-Message-Id: <20240122224220.1206234-1-qyousef@layalina.io>
-X-Mailer: git-send-email 2.34.1
+        Mon, 22 Jan 2024 15:53:54 -0800 (PST)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH] block/mq-deadline: Optimize request insertion
+Date: Mon, 22 Jan 2024 15:53:32 -0800
+Message-ID: <20240122235332.2299150-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,102 +54,157 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The logic in blk_mq_complete_need_ipi() assumes SMP systems where all
-CPUs have equal capacities and only LLC cache can make a different on
-perceived performance. But this assumption falls apart on HMP systems
-where LLC is shared, but the CPUs have different capacities. Staying
-local then can have a big performance impact if the IO request was done
-from a CPU with higher capacity but the interrupt is serviced on a lower
-capacity CPU.
+Reduce lock contention on dd->lock by calling dd_insert_request() from
+inside the dispatch callback instead of from the insert callback. This
+patch is inspired by a patch from Jens.
 
-Introduce new cpus_gte_capacity() function to enable do the additional
-check.
-
-Without the patch I see the BLOCK softirq always running on little cores
-(where the hardirq is serviced). With it I can see it running on all
-cores.
-
-This was noticed after the topology change [1] where now on a big.LITTLE
-we truly get that the LLC is shared between all cores where as in the
-past it was being misrepresented for historical reasons. The logic
-exposed a missing dependency on capacities for such systems where there
-can be a big performance difference between the CPUs.
-
-This of course introduced a noticeable change in behavior depending on
-how the topology is presented. Leading to regressions in some workloads
-as the performance of the BLOCK softirq on littles can be noticeably
-worse.
-
-[1] https://lpc.events/event/16/contributions/1342/attachments/962/1883/LPC-2022-Android-MC-Phantom-Domains.pdf
-
-Signed-off-by: Qais Yousef (Google) <qyousef@layalina.io>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c                 | 5 +++--
- include/linux/sched/topology.h | 6 ++++++
- kernel/sched/core.c            | 8 ++++++++
- 3 files changed, 17 insertions(+), 2 deletions(-)
+ block/mq-deadline.c | 70 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 58 insertions(+), 12 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ac18f802c027..9b2d278a7ae7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1163,10 +1163,11 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
- 	if (force_irqthreads())
- 		return false;
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 83bc21801226..d11b8604f046 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -89,11 +89,15 @@ struct deadline_data {
+ 	 */
+ 	struct {
+ 		spinlock_t lock;
++		spinlock_t insert_lock;
+ 		spinlock_t zone_lock;
+ 	} ____cacheline_aligned_in_smp;
  
--	/* same CPU or cache domain?  Complete locally */
-+	/* same CPU or cache domain and capacity?  Complete locally */
- 	if (cpu == rq->mq_ctx->cpu ||
- 	    (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
--	     cpus_share_cache(cpu, rq->mq_ctx->cpu)))
-+	     cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
-+	     cpus_gte_capacity(cpu, rq->mq_ctx->cpu)))
- 		return false;
+ 	unsigned long run_state;
  
- 	/* don't try to IPI to an offline CPU */
-diff --git a/include/linux/sched/topology.h b/include/linux/sched/topology.h
-index a6e04b4a21d7..31cef5780ba4 100644
---- a/include/linux/sched/topology.h
-+++ b/include/linux/sched/topology.h
-@@ -176,6 +176,7 @@ extern void partition_sched_domains(int ndoms_new, cpumask_var_t doms_new[],
- cpumask_var_t *alloc_sched_domains(unsigned int ndoms);
- void free_sched_domains(cpumask_var_t doms[], unsigned int ndoms);
++	struct list_head at_head;
++	struct list_head at_tail;
++
+ 	struct dd_per_prio per_prio[DD_PRIO_COUNT];
  
-+bool cpus_gte_capacity(int this_cpu, int that_cpu);
- bool cpus_share_cache(int this_cpu, int that_cpu);
- bool cpus_share_resources(int this_cpu, int that_cpu);
+ 	/* Data direction of latest dispatched request. */
+@@ -120,6 +124,9 @@ static const enum dd_prio ioprio_class_to_prio[] = {
+ 	[IOPRIO_CLASS_IDLE]	= DD_IDLE_PRIO,
+ };
  
-@@ -226,6 +227,11 @@ partition_sched_domains(int ndoms_new, cpumask_var_t doms_new[],
++static void dd_insert_request(struct request_queue *q, struct request *rq,
++			      blk_insert_t flags, struct list_head *free);
++
+ static inline struct rb_root *
+ deadline_rb_root(struct dd_per_prio *per_prio, struct request *rq)
  {
+@@ -592,6 +599,35 @@ static struct request *dd_dispatch_prio_aged_requests(struct deadline_data *dd,
+ 	return NULL;
  }
  
-+static inline bool cpus_gte_capacity(int this_cpu, int that_cpu)
++static void __dd_do_insert(struct request_queue *q, blk_insert_t flags,
++			   struct list_head *list, struct list_head *free)
 +{
-+	return true;
++	while (!list_empty(list)) {
++		struct request *rq;
++
++		rq = list_first_entry(list, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		dd_insert_request(q, rq, flags, free);
++	}
 +}
 +
- static inline bool cpus_share_cache(int this_cpu, int that_cpu)
- {
- 	return true;
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index db4be4921e7f..db5ab4b3cee7 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -3954,6 +3954,14 @@ void wake_up_if_idle(int cpu)
- 	}
++static void dd_do_insert(struct request_queue *q, struct list_head *free)
++{
++	struct deadline_data *dd = q->elevator->elevator_data;
++	LIST_HEAD(at_head);
++	LIST_HEAD(at_tail);
++
++	lockdep_assert_held(&dd->lock);
++
++	spin_lock(&dd->insert_lock);
++	list_splice_init(&dd->at_head, &at_head);
++	list_splice_init(&dd->at_tail, &at_tail);
++	spin_unlock(&dd->insert_lock);
++
++	__dd_do_insert(q, BLK_MQ_INSERT_AT_HEAD, &at_head, free);
++	__dd_do_insert(q, 0, &at_tail, free);
++}
++
+ /*
+  * Called from blk_mq_run_hw_queue() -> __blk_mq_sched_dispatch_requests().
+  *
+@@ -606,6 +642,7 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	const unsigned long now = jiffies;
+ 	struct request *rq;
+ 	enum dd_prio prio;
++	LIST_HEAD(free);
+ 
+ 	/*
+ 	 * If someone else is already dispatching, skip this one. This will
+@@ -620,6 +657,11 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 		return NULL;
+ 
+ 	spin_lock(&dd->lock);
++        /*
++         * Request insertion happens from inside the dispatch callback instead
++         * of inside the insert callback to minimize contention on dd->lock.
++         */
++	dd_do_insert(hctx->queue, &free);
+ 	rq = dd_dispatch_prio_aged_requests(dd, now);
+ 	if (rq)
+ 		goto unlock;
+@@ -638,6 +680,8 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	clear_bit(DD_DISPATCHING, &dd->run_state);
+ 	spin_unlock(&dd->lock);
+ 
++	blk_mq_free_requests(&free);
++
+ 	return rq;
  }
  
-+bool cpus_gte_capacity(int this_cpu, int that_cpu)
-+{
-+	if (this_cpu == that_cpu)
+@@ -727,8 +771,12 @@ static int dd_init_sched(struct request_queue *q, struct elevator_type *e)
+ 	eq->elevator_data = dd;
+ 
+ 	spin_lock_init(&dd->lock);
++	spin_lock_init(&dd->insert_lock);
+ 	spin_lock_init(&dd->zone_lock);
+ 
++	INIT_LIST_HEAD(&dd->at_head);
++	INIT_LIST_HEAD(&dd->at_tail);
++
+ 	for (prio = 0; prio <= DD_PRIO_MAX; prio++) {
+ 		struct dd_per_prio *per_prio = &dd->per_prio[prio];
+ 
+@@ -899,19 +947,13 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+-	LIST_HEAD(free);
+-
+-	spin_lock(&dd->lock);
+-	while (!list_empty(list)) {
+-		struct request *rq;
+ 
+-		rq = list_first_entry(list, struct request, queuelist);
+-		list_del_init(&rq->queuelist);
+-		dd_insert_request(q, rq, flags, &free);
+-	}
+-	spin_unlock(&dd->lock);
+-
+-	blk_mq_free_requests(&free);
++	spin_lock(&dd->insert_lock);
++	if (flags & BLK_MQ_INSERT_AT_HEAD)
++		list_splice_init(list, &dd->at_head);
++	else
++		list_splice_init(list, &dd->at_tail);
++	spin_unlock(&dd->insert_lock);
+ }
+ 
+ /* Callback from inside blk_mq_rq_ctx_init(). */
+@@ -990,6 +1032,10 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
+ 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+ 	enum dd_prio prio;
+ 
++	if (!list_empty_careful(&dd->at_head) ||
++	    !list_empty_careful(&dd->at_tail))
 +		return true;
 +
-+	return arch_scale_cpu_capacity(this_cpu) >= arch_scale_cpu_capacity(that_cpu);
-+}
-+
- bool cpus_share_cache(int this_cpu, int that_cpu)
- {
- 	if (this_cpu == that_cpu)
--- 
-2.34.1
-
+ 	for (prio = 0; prio <= DD_PRIO_MAX; prio++)
+ 		if (dd_has_work_for_prio(&dd->per_prio[prio]))
+ 			return true;
