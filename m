@@ -1,165 +1,123 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62113AC08
-	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 16:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A1B40BE3;
+	Mon, 22 Jan 2024 17:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705941018; cv=none; b=WH7m9fTBWRI5S/9Ppb8wAZvY+u514tE5yGvgy64tbLzFlc0cymGqBZorAfoHZnLKN5CK9idxx+9B4gBEU0vUVRn1csFb4U1BPNtPjIBd89U4We2K8lFHuVnsVhEezkdXraSKR8DwJqZ7Z3m4wa1iCLVaThrs1PJjA+bfwXTG8Do=
+	t=1705945024; cv=none; b=ICpRHIqIDRa60NGfr+z8tvLTsSn977nm7NYzpD0HFmJZBDYhwjv8jLX78usTQ89rZck8sW/a2R+dpKYkDjv4m6s8rqb0kgdN86iTVKBYx61uhwivxtmzGArOnJjVqiGXX9APNFtfeMXmB9s6TLi8rw7RzZvziZCpPc4cQktuekk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705941018; c=relaxed/simple;
-	bh=FkeU1P4Kg6q0fZ6PmJzlGNg2n2Hty/oMxcKzx2UOhlQ=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=G3AuNCYt6m+c8sRUBDxCfDTTZbfFtQgR37H+Yv/oeDPYzYvdtutTzTygWQ+Qt3kHukBz2brlgV7lJcnAxqbKexEvW4pjQi4VE91cOdnAxbT6dsBGW6VTyxUFUsjlJC1NTcaUGuXxlB4lVXBdL4rnIcvQRBGUa91jPY6vsoQ6M44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M91NIq+v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1705945024; c=relaxed/simple;
+	bh=fHROvt5OFKXveRtwm7nS7D7bWwlzshkrfW7uin0qYGo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=paOJ/aUauzxfG2GTIP7yOTmk/7QBmg+6DKSryV0iuOd8TjHOBBRcl2ETtDcowqqAYmxfUKhFueTCO7GQNTwZq7U+ZfaFWvd8RmV2TaNl1SP+8uEybWWFhqyEdxZE2vOZyNylHZRpiVGxIlGqbCkOoEOxXvQKN03rPawca9bg4kY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DTKAfP2U; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M91NIq+v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705941015;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gh5n5hMcdVsHj3TbGR4iAicOuNL7iE5wuH4NHtg9SMQ=;
-	b=M91NIq+vtGofetGeaUUIpb7MelGbz3AYSGfo6HXUOiJTAXsN8sCeNw0SWcCw7CeEnkqb8d
-	S40eYor5PwoxwH7yogfdo6mRPrt6xB88++so4fgw4fxte8n18jubcoU/l03nu5NQqdr/74
-	UKKamJN4s758owYGgpAQ8B5Hp/Bqe8k=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-452-pFhktqY5NmG4MXBEsctt1w-1; Mon, 22 Jan 2024 11:30:09 -0500
-X-MC-Unique: pFhktqY5NmG4MXBEsctt1w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E55686EB4B;
-	Mon, 22 Jan 2024 16:30:08 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 41CFF111DCF0;
-	Mon, 22 Jan 2024 16:30:08 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id E373D30B9D67; Mon, 22 Jan 2024 16:30:07 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id DF3763FB50;
-	Mon, 22 Jan 2024 17:30:07 +0100 (CET)
-Date: Mon, 22 Jan 2024 17:30:07 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>, Zdenek Kabelac <zkabelac@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>, Li Nan <linan666@huaweicloud.com>, 
-    Christoph Hellwig <hch@infradead.org>, 
-    Chaitanya Kulkarni <chaitanyak@nvidia.com>, linux-block@vger.kernel.org, 
-    dm-devel@lists.linux.dev
-Subject: Re: [PATCH v3 0/4] brd discard patches
-In-Reply-To: <Zao1PNip1SRVB4Rp@fedora>
-Message-ID: <dc9e648b-6c5f-9642-8892-b48dbc893c6@redhat.com>
-References: <2dacc73-854-e71c-1746-99b017401c9a@redhat.com> <Zao1PNip1SRVB4Rp@fedora>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DTKAfP2U"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=tkwWaCS229lrm8RVxOlCwAX2BdD4eXBnEUqUwp253oU=; b=DTKAfP2UJmCqETONB0o8+Voaj6
+	lXjhdhip72xAOqdWK7u3UbwUiI3jwoqt7NgpqHfTCXuzUBGF7Q1f9PZFnR66I8JFrL38MW0WEyZGB
+	gp1HHF/zl/Vnj+p/QPo0L03Fr3gdwCENSyHTDJBjK4GlQo55tj74Gg1pxLtGlKHRBFgFlZINCpak1
+	VZ0KGNPNpsW2upEb8xWtdTMh+3O4k3x0mffyv/PJT4+RRv53kD5tkH5kOyWikttwH4lE6ZgnSU+/J
+	wuTBGfwwIXYXs6RChRQNlr3IO7CtJJaTFbZyTvSHqUMIwZyvuHxpcXpMd1UMweyjMQ/VxeT5aOrgi
+	KtNh0gag==;
+Received: from [2001:4bb8:198:a22c:146a:86ef:5806:b115] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rRyE7-00DGbT-18;
+	Mon, 22 Jan 2024 17:36:51 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	virtualization@lists.linux.dev
+Subject: [PATCH 01/15] block: move max_{open,active}_zones to struct queue_limits
+Date: Mon, 22 Jan 2024 18:36:31 +0100
+Message-Id: <20240122173645.1686078-2-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240122173645.1686078-1-hch@lst.de>
+References: <20240122173645.1686078-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="185210117-1207581628-1705941007=:2579516"
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+The maximum number of open and active zones is a limit on the queue
+and should be places there so that we can including it in the upcoming
+queue limits batch update API.
 
---185210117-1207581628-1705941007=:2579516
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 8BIT
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blkdev.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Hi
-
-
-On Fri, 19 Jan 2024, Ming Lei wrote:
-
-> Hi Mikulas,
-> 
-> On Thu, Aug 10, 2023 at 12:07:07PM +0200, Mikulas Patocka wrote:
-> > Hi
-> > 
-> > Here I'm submitting the ramdisk discard patches for the next merge window. 
-> > If you want to make some more changes, please let me now.
-> 
-> brd discard is removed in f09a06a193d9 ("brd: remove discard support")
-> in 2017 because it is just driver private write_zero, and user can get same
-> result with fallocate(FALLOC_FL_ZERO_RANGE).
-> 
-> Also you only mentioned the motivation in V1 cover-letter:
-> 
-> https://lore.kernel.org/linux-block/alpine.LRH.2.02.2209151604410.13231@file01.intranet.prod.int.rdu2.redhat.com/
-> 
-> ```
-> Zdenek asked me to write it, because we use brd in the lvm2 testsuite and
-> it would be benefical to run the testsuite with discard enabled in order
-> to test discard handling.
-> ```
-> 
-> But we have lots of test disks with discard support: loop, scsi_debug,
-> null_blk, ublk, ..., so one requestion is that why brd discard is
-> a must for lvm2 testsuite to cover (lvm)discard handling?
-
-We should ask Zdenìk Kabeláè about it - he is expert about the lvm2 
-testsuite.
-
-> The reason why brd didn't support discard by freeing pages is writeback
-> deadlock risk, see:
-> 
-> commit f09a06a193d9 ("brd: remove discard support")
-> 
-> -static void discard_from_brd(struct brd_device *brd,
-> -                       sector_t sector, size_t n)
-> -{
-> -       while (n >= PAGE_SIZE) {
-> -               /*
-> -                * Don't want to actually discard pages here because
-> -                * re-allocating the pages can result in writeback
-> -                * deadlocks under heavy load.
-> -                */
-> -               if (0)
-> -                       brd_free_page(brd, sector);
-> -               else
-> -                       brd_zero_page(brd, sector);
-> -               sector += PAGE_SIZE >> SECTOR_SHIFT;
-> -               n -= PAGE_SIZE;
-> -       }
-> -}
-> 
-> However, you didn't mention how your patches address this potential
-> risk, care to document it? I can't find any related words about
-> this problem.
-
-The writeback deadlock can happen even without discard - if the machine 
-runs out of memory while writing data to a ramdisk. But the probability is 
-increased when discard is used, because pages are freed and re-allocated 
-more often.
-
-Generally, the admin should make sure that the machine has enough 
-available memory when creating a ramdisk - then, the deadlock can't 
-happen.
-
-Ramdisk has no limit on the number of allocated pages, so when it runs out 
-of memory, the oom killer will try to kill unrelated processes and the 
-machine will hang. If there is risk of overflowing the available memory, 
-the admin should use tmpfs instead of a ramdisk - tmpfs can be configured 
-with a limit and it can also swap out pages.
-
-> BTW, your patches looks more complicated than the original removed
-> discard implementation. And if the above questions get addressed,
-> I am happy to provide review on the following patches.
-
-My patches actually free the discarded pages. The original discard 
-implementation just overwrote the pages with zeroes without freeing them.
-
-Mikulas
-
-> 
-> 
-> Thanks,
-> Ming
-> 
---185210117-1207581628-1705941007=:2579516--
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 99e4f5e722132c..4a2e82c7971c86 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -189,8 +189,6 @@ struct gendisk {
+ 	 * blk_mq_unfreeze_queue().
+ 	 */
+ 	unsigned int		nr_zones;
+-	unsigned int		max_open_zones;
+-	unsigned int		max_active_zones;
+ 	unsigned long		*conv_zones_bitmap;
+ 	unsigned long		*seq_zones_wlock;
+ #endif /* CONFIG_BLK_DEV_ZONED */
+@@ -307,6 +305,8 @@ struct queue_limits {
+ 	unsigned char		discard_misaligned;
+ 	unsigned char		raid_partial_stripes_expensive;
+ 	bool			zoned;
++	unsigned int		max_open_zones;
++	unsigned int		max_active_zones;
+ 
+ 	/*
+ 	 * Drivers that set dma_alignment to less than 511 must be prepared to
+@@ -639,23 +639,23 @@ static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
+ static inline void disk_set_max_open_zones(struct gendisk *disk,
+ 		unsigned int max_open_zones)
+ {
+-	disk->max_open_zones = max_open_zones;
++	disk->queue->limits.max_open_zones = max_open_zones;
+ }
+ 
+ static inline void disk_set_max_active_zones(struct gendisk *disk,
+ 		unsigned int max_active_zones)
+ {
+-	disk->max_active_zones = max_active_zones;
++	disk->queue->limits.max_active_zones = max_active_zones;
+ }
+ 
+ static inline unsigned int bdev_max_open_zones(struct block_device *bdev)
+ {
+-	return bdev->bd_disk->max_open_zones;
++	return bdev->bd_disk->queue->limits.max_open_zones;
+ }
+ 
+ static inline unsigned int bdev_max_active_zones(struct block_device *bdev)
+ {
+-	return bdev->bd_disk->max_active_zones;
++	return bdev->bd_disk->queue->limits.max_active_zones;
+ }
+ 
+ #else /* CONFIG_BLK_DEV_ZONED */
+-- 
+2.39.2
 
