@@ -1,95 +1,59 @@
-Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370C83D0A4
-	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 11:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210E03C6BC;
+	Mon, 22 Jan 2024 13:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705921664; cv=none; b=FQp6U4wM6WbCIbNrBK2LtDFwQw3Xb3Cj9qjtDVSVNoppQ4rllqB21cT164KzyOy/xUkucQG+gWFJIoKvln3vVAAVEKI87M/rIBIB+G1mSWBQZZBR4RThYKA3XEslFvY82JGanKV691IDQ3eDGiJm3CFEAuBMf6N+LmjAvlem1jU=
+	t=1705930780; cv=none; b=VKerAMTitsg20017H+g36JhRIMOeEkKZrFtCBf0stiHteDvbu7ULmKpPkPsOOZp31rc10JuKZhES3nysjt1QmbI0Xn8A7e+8xi0sbLL+qKAyQ8/0j2RJUgYpwgLpwu808JmNpiVDWg6MXIW2GtcoI/Zay8oxx/gzspxwlmZSVKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705921664; c=relaxed/simple;
-	bh=tEBM8ROgFnpAjPpGkQqFn+5G7qisAii32clsfbRevhI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e6kyKFpTrGMtLBisP77xn2N/KKYg+VlvCWn7sKddN7hgiqdQGDAyR2MPnMIeimXysxdLq7tlOYDjzat/TvGLzggRR/1N2bn4KzM5oOcef2iZsVNH6vjc9RyBjlVacxxKsWZlD70EFdqZhhFPhuFTKnasYmE1ebv39YqrrQvbhjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 40MB7TmP062317;
-	Mon, 22 Jan 2024 19:07:29 +0800 (+08)
-	(envelope-from Yi.Sun@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4TJS153t0qz2RcY8P;
-	Mon, 22 Jan 2024 19:00:09 +0800 (CST)
-Received: from tj10379pcu.spreadtrum.com (10.5.32.15) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Mon, 22 Jan 2024 19:07:27 +0800
-From: Yi Sun <yi.sun@unisoc.com>
-To: <axboe@kernel.dk>, <mst@redhat.com>, <jasowang@redhat.com>
-CC: <xuanzhuo@linux.alibaba.com>, <pbonzini@redhat.com>, <stefanha@redhat.com>,
-        <virtualization@lists.linux.dev>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.sun@unisoc.com>,
-        <zhiguo.niu@unisoc.com>, <hongyu.jin@unisoc.com>,
-        <sunyibuaa@gmail.com>
-Subject: [PATCH 2/2] virtio-blk: Ensure no requests in virtqueues before deleting vqs.
-Date: Mon, 22 Jan 2024 19:07:22 +0800
-Message-ID: <20240122110722.690223-3-yi.sun@unisoc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240122110722.690223-1-yi.sun@unisoc.com>
-References: <20240122110722.690223-1-yi.sun@unisoc.com>
+	s=arc-20240116; t=1705930780; c=relaxed/simple;
+	bh=lOQUMEve7ymeYfx4uar1XhrzZJexkIJlNiV7GUicVco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fPMMjL2IBO3HxN6eBeAhA2ofiSjDcU1ci2BkiVSzp08VU+Mu9JJJNJTN8EFv7KgmVRfgt0fBQ+Xv9Wy6r/L9rRCxN2Xav4o8AVh+2JmX+/f5/qAs6V/4N0s/OH2vbdt9Ve95G2Ip+o1HiEMrweSvL14SLQzIhLDx+56W9UnXMqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A647D68BEB; Mon, 22 Jan 2024 14:39:32 +0100 (CET)
+Date: Mon, 22 Jan 2024 14:39:32 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Christoph Hellwig <hch@lst.de>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: mmc vs highmem, was: Re: [PATCH 2/2] blk-mq: ensure a
+ q_usage_counter reference is held when splitting bios
+Message-ID: <20240122133932.GB20434@lst.de>
+References: <20240112054449.GA6829@lst.de> <9eb0f18e-f3ce-497c-931d-339efee2190d@kernel.dk> <CAPDyKFpmEB9FGAmGAQNdEH+DtRtcCNnFszfv_ewihzUU9du+Xg@mail.gmail.com> <20240122073423.GA25859@lst.de> <14ea6933-763f-4ba7-9109-1eea580e1c29@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL:SHSQR01.spreadtrum.com 40MB7TmP062317
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <14ea6933-763f-4ba7-9109-1eea580e1c29@app.fastmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Ensure no remaining requests in virtqueues before resetting vdev and
-deleting virtqueues. Otherwise these requests will never be completed.
-It may cause the system to become unresponsive. So it is better to place
-blk_mq_quiesce_queue() in front of virtio_reset_device().
+On Mon, Jan 22, 2024 at 10:26:30AM +0100, Arnd Bergmann wrote:
+> > A better indicator might be the use of page_address in the I/O path,
+> > which usually comes in the form of using the sg_virt() helper.
+> > For drivers/mmc/ that seems to be: davinci_mmc, moxart-mmc, mvsdio,
+> > mxcmmc, omap, sdhci-esdhc-mcf and sh_mmcif.
+> 
+> Out of these, I think only the mvsdio one is actually use
+> on boards with highmem: davinci, moxart, mcx (imx3) and omap2
+> are old enough to never have had more than 256MB or so of RAM,
+> and mcf (m68k) and sh can't even be built with CONFIG_HIGHMEM.
 
-Function blk_mq_quiesce_queue() can ensure that requests have become
-in_flight status, but it cannot guarantee that requests have been
-processed by the device. Virtqueues should never be deleted before
-all requests become complete status.
-
-New function blk_mq_tagset_wait_request_completed() ensure that all
-requests in virtqueues become complete status.
-
-Signed-off-by: Yi Sun <yi.sun@unisoc.com>
----
- drivers/block/virtio_blk.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 3b6b9abb8ce1..380f009953dd 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -1595,14 +1595,16 @@ static int virtblk_freeze(struct virtio_device *vdev)
- {
- 	struct virtio_blk *vblk = vdev->priv;
- 
-+	/* Ensure no requests in virtqueues before deleting vqs. */
-+	blk_mq_quiesce_queue(vblk->disk->queue);
-+	blk_mq_tagset_wait_request_completed(vblk->disk->queue->tag_set);
-+
- 	/* Ensure we don't receive any more interrupts */
- 	virtio_reset_device(vdev);
- 
- 	/* Make sure no work handler is accessing the device. */
- 	flush_work(&vblk->config_work);
- 
--	blk_mq_quiesce_queue(vblk->disk->queue);
--
- 	vdev->config->del_vqs(vdev);
- 	kfree(vblk->vqs);
- 
--- 
-2.25.1
-
+It would be good to fix the one or two that could use highmem and add a
+depends on !HIGHMEM for the others and then kill the bounce setup in
+mmc.  It turn out in addition to the one legacy ISA SCSI driver and the
+two parport SCSI driver usb-storage actually also sets this flag,
+which might be a road blocker, but at this point I'm getting ready
+to just pull the plug if it doesn't break using embedded platforms
+using mmc entirely.
