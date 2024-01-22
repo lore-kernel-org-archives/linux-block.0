@@ -1,210 +1,72 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E95312E56
-	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 23:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AA95F84A
+	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 23:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967637; cv=none; b=mzlgOmnNIwVuRc/eurzwBCbWUEVh6F5Iu/xjuw2hGtD8M698O9aPupiF7NL9eUWAYWxT6MgHWaOjEBEQZEFsBoo5KDZsesr4EIC7j9pGuHt2N5ZgCCWZY9fxF+4vWpi9DICAL8KQewXgex7b+hrm0YP91LIise4ruWC392cXkiA=
+	t=1705967729; cv=none; b=kBDKZnyk7tRzyIvaM4Mwod+vatUzqRUkBvQJX/SUmW7bscEdco/7hubsXq0d1wPWb9tdY6w8B8NowJp45LqbHz94GE4aqGQqlhJbWYRYRTrIMag8+SueLwozgC3XpH3/Cp9tFduiIB0sZzy2kTsiyL4Y4iYpYak7FHGYiKLatZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705967637; c=relaxed/simple;
-	bh=WNaLQOTvRlltijApE3q3YmhNrqciDTqUmW5xLl+bqfc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZkVIz2K6GETQ+4Oim+6FN4hi1KLhKVUPkfjwSLyoY69gfZAnZPMLgf7jElYufITnuBGNaqrcbs0tdNPCFvlofDq/wq9JyLqCsJcqUoXZV0GmHIjUrKFQlkeWOkpNv02jQntQRyEykPk1iyleMRTYGtWuhwhyaAM6b+sboVCr96o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.177
+	s=arc-20240116; t=1705967729; c=relaxed/simple;
+	bh=xVyVD7GxLtKycixfGjXqkAB5Zh2y1l5iWBFg3ntDf2Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=lxZAajTMYTPn1EzSiuv1dYFplkqqhs3Z9u5qO3R363v40U0rzIz2pnDvFhfUavQ3fHIlVpNcnRs2ke5BUhFh85Jlg6WxAHnUJAqxTN7aOAkyWcCEP9mIaSuRhcHRvdg4YQhpXksxF/ejWjUkMKvbvUGY2uIUO0tzOva28p3Ehas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6db0fdd2b8fso1771640b3a.2
-        for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 15:53:55 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6dbebe4938bso789155b3a.3
+        for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 15:55:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705967635; x=1706572435;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VGY7+s5+ev7hogDnsMOEa6sW1fzkfiXEUne6AffkzpQ=;
-        b=le7WgGLn2CA/u7rmcLKXZRyte1qE+tCgqGRlSbeH3t3tEjVYW5oLqd/NIVUnhSoxcd
-         sEf6+ioHtf1AyHL3DyT2ln72eXQPTyPNS+iEz+rQTnQFelqq84kpQD2h7Knac5mFaVZQ
-         Rz2z8o/4uRhcX9tt6CuxpOsWjC3uv/1cuT8ANHplhw7UbAwPQrTToKbyBfv1IB7PtQlN
-         BcCcch/uQnMyaeFd93Vo3aEb/naPxd1+iIM/pyZgTmOCdTYMUEt4+D/FnDCAmj3xECcr
-         OtncvHDHE5sZ+hDdIHmnrtr6A7NqjvkZVCaP5o2AQ1qUGnQeIbdIV/0lhj3XzcZ8qjIj
-         Ph3A==
-X-Gm-Message-State: AOJu0Yw+61Ywlz5hG4BVKYsw/UpU+K6SiUrSGq3fD54jVBg4bmO+0g5F
-	bUOM0AP2GEi3cELDdv7FfHnPlaDg9oG6hAORJDDOVpB7tGngpYmI
-X-Google-Smtp-Source: AGHT+IFaEXvap8r9gt1HAtsgzyOBxt1uCYgriTzCDr/hDMwZAEVKw6h65yewgYB9L2Kht2oPAt+ilQ==
-X-Received: by 2002:a05:6a00:4612:b0:6db:c6a6:c9eb with SMTP id ko18-20020a056a00461200b006dbc6a6c9ebmr3591711pfb.1.1705967634768;
-        Mon, 22 Jan 2024 15:53:54 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:317b:f783:2438:d626])
-        by smtp.gmail.com with ESMTPSA id t15-20020a62d14f000000b006d9a6953f08sm10600338pfl.103.2024.01.22.15.53.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 15:53:54 -0800 (PST)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH] block/mq-deadline: Optimize request insertion
-Date: Mon, 22 Jan 2024 15:53:32 -0800
-Message-ID: <20240122235332.2299150-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+        d=1e100.net; s=20230601; t=1705967727; x=1706572527;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xVyVD7GxLtKycixfGjXqkAB5Zh2y1l5iWBFg3ntDf2Q=;
+        b=fr5YYV6QlskaKXTk34IJYLzXOcv+yTFn3kM6RXLG4hFw7QQNmeVAdTipJwfg051j9Z
+         /tHd4gkruoNO9ND7m18x0+/llRx4SFh+bcWYot6ztis4pl3pCbbMqNfR7hDqT0UmSFoY
+         8WCgykCozBrcd8TOlcI6vTqv99Eojbi+jyMn8CWpqBEXdukOrd0MwDJRIalEOajZd9pG
+         4xhvmZUHZwWUqUKCSZvgPgT2WoFQdcTDP7OEOw4OYLBgAW8nDsVHC1sfcBHgeOfMgQJV
+         dn2hR7eOH0KAxUTG4UgvPinAm4D1eT7nAfH1QRZ87QeSr2VoANp+6aL2y6a0jcrK6HP9
+         pD/Q==
+X-Gm-Message-State: AOJu0YwCGF3t9VTiqDRBXTzuasfVj/DyaQKrLArRokFB4E6obXv54lFU
+	OlNz9+L5VMcbG8z6R7WqPp5my2Lex120I0k3mgRsIpTW93n/jCTa0mSGWj1X
+X-Google-Smtp-Source: AGHT+IEPkC2/0Tw/Ts7x/nKkCulZ4ZYW1OfiF9LgYbG1Wb9fmm7CxP43wXye138ToztAYBFoMcMVsA==
+X-Received: by 2002:a05:6a00:99d:b0:6db:d7ef:325c with SMTP id u29-20020a056a00099d00b006dbd7ef325cmr2277599pfg.13.1705967727369;
+        Mon, 22 Jan 2024 15:55:27 -0800 (PST)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
+        by smtp.gmail.com with ESMTPSA id k11-20020aa79d0b000000b006da04f1b884sm10038566pfp.105.2024.01.22.15.55.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jan 2024 15:55:27 -0800 (PST)
+Message-ID: <cd8a804c-0439-40ae-90f3-61c0219e844d@acm.org>
+Date: Mon, 22 Jan 2024 15:55:26 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] block/mq-deadline: fallback to per-cpu insertion
+ buckets under contention
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20240119160338.1191281-1-axboe@kernel.dk>
+ <20240119160338.1191281-4-axboe@kernel.dk>
+ <9bf23380-b006-4e80-95a6-f5b95c35a475@acm.org>
+ <af2f895c-ee57-41a1-ae14-1f531b5671e0@kernel.dk>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <af2f895c-ee57-41a1-ae14-1f531b5671e0@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Reduce lock contention on dd->lock by calling dd_insert_request() from
-inside the dispatch callback instead of from the insert callback. This
-patch is inspired by a patch from Jens.
+On 1/19/24 16:05, Jens Axboe wrote:
+> Can you send a "proper" patch and I'll just replace the one that I have?
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/mq-deadline.c | 70 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 58 insertions(+), 12 deletions(-)
+Please take a look at
+https://lore.kernel.org/linux-block/20240122235332.2299150-1-bvanassche@acm.org/T/#u
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 83bc21801226..d11b8604f046 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -89,11 +89,15 @@ struct deadline_data {
- 	 */
- 	struct {
- 		spinlock_t lock;
-+		spinlock_t insert_lock;
- 		spinlock_t zone_lock;
- 	} ____cacheline_aligned_in_smp;
- 
- 	unsigned long run_state;
- 
-+	struct list_head at_head;
-+	struct list_head at_tail;
-+
- 	struct dd_per_prio per_prio[DD_PRIO_COUNT];
- 
- 	/* Data direction of latest dispatched request. */
-@@ -120,6 +124,9 @@ static const enum dd_prio ioprio_class_to_prio[] = {
- 	[IOPRIO_CLASS_IDLE]	= DD_IDLE_PRIO,
- };
- 
-+static void dd_insert_request(struct request_queue *q, struct request *rq,
-+			      blk_insert_t flags, struct list_head *free);
-+
- static inline struct rb_root *
- deadline_rb_root(struct dd_per_prio *per_prio, struct request *rq)
- {
-@@ -592,6 +599,35 @@ static struct request *dd_dispatch_prio_aged_requests(struct deadline_data *dd,
- 	return NULL;
- }
- 
-+static void __dd_do_insert(struct request_queue *q, blk_insert_t flags,
-+			   struct list_head *list, struct list_head *free)
-+{
-+	while (!list_empty(list)) {
-+		struct request *rq;
-+
-+		rq = list_first_entry(list, struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+		dd_insert_request(q, rq, flags, free);
-+	}
-+}
-+
-+static void dd_do_insert(struct request_queue *q, struct list_head *free)
-+{
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+	LIST_HEAD(at_head);
-+	LIST_HEAD(at_tail);
-+
-+	lockdep_assert_held(&dd->lock);
-+
-+	spin_lock(&dd->insert_lock);
-+	list_splice_init(&dd->at_head, &at_head);
-+	list_splice_init(&dd->at_tail, &at_tail);
-+	spin_unlock(&dd->insert_lock);
-+
-+	__dd_do_insert(q, BLK_MQ_INSERT_AT_HEAD, &at_head, free);
-+	__dd_do_insert(q, 0, &at_tail, free);
-+}
-+
- /*
-  * Called from blk_mq_run_hw_queue() -> __blk_mq_sched_dispatch_requests().
-  *
-@@ -606,6 +642,7 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	const unsigned long now = jiffies;
- 	struct request *rq;
- 	enum dd_prio prio;
-+	LIST_HEAD(free);
- 
- 	/*
- 	 * If someone else is already dispatching, skip this one. This will
-@@ -620,6 +657,11 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 		return NULL;
- 
- 	spin_lock(&dd->lock);
-+        /*
-+         * Request insertion happens from inside the dispatch callback instead
-+         * of inside the insert callback to minimize contention on dd->lock.
-+         */
-+	dd_do_insert(hctx->queue, &free);
- 	rq = dd_dispatch_prio_aged_requests(dd, now);
- 	if (rq)
- 		goto unlock;
-@@ -638,6 +680,8 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	clear_bit(DD_DISPATCHING, &dd->run_state);
- 	spin_unlock(&dd->lock);
- 
-+	blk_mq_free_requests(&free);
-+
- 	return rq;
- }
- 
-@@ -727,8 +771,12 @@ static int dd_init_sched(struct request_queue *q, struct elevator_type *e)
- 	eq->elevator_data = dd;
- 
- 	spin_lock_init(&dd->lock);
-+	spin_lock_init(&dd->insert_lock);
- 	spin_lock_init(&dd->zone_lock);
- 
-+	INIT_LIST_HEAD(&dd->at_head);
-+	INIT_LIST_HEAD(&dd->at_tail);
-+
- 	for (prio = 0; prio <= DD_PRIO_MAX; prio++) {
- 		struct dd_per_prio *per_prio = &dd->per_prio[prio];
- 
-@@ -899,19 +947,13 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- {
- 	struct request_queue *q = hctx->queue;
- 	struct deadline_data *dd = q->elevator->elevator_data;
--	LIST_HEAD(free);
--
--	spin_lock(&dd->lock);
--	while (!list_empty(list)) {
--		struct request *rq;
- 
--		rq = list_first_entry(list, struct request, queuelist);
--		list_del_init(&rq->queuelist);
--		dd_insert_request(q, rq, flags, &free);
--	}
--	spin_unlock(&dd->lock);
--
--	blk_mq_free_requests(&free);
-+	spin_lock(&dd->insert_lock);
-+	if (flags & BLK_MQ_INSERT_AT_HEAD)
-+		list_splice_init(list, &dd->at_head);
-+	else
-+		list_splice_init(list, &dd->at_tail);
-+	spin_unlock(&dd->insert_lock);
- }
- 
- /* Callback from inside blk_mq_rq_ctx_init(). */
-@@ -990,6 +1032,10 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
- 	enum dd_prio prio;
- 
-+	if (!list_empty_careful(&dd->at_head) ||
-+	    !list_empty_careful(&dd->at_tail))
-+		return true;
-+
- 	for (prio = 0; prio <= DD_PRIO_MAX; prio++)
- 		if (dd_has_work_for_prio(&dd->per_prio[prio]))
- 			return true;
+Thanks,
+
+Bart.
+
+
