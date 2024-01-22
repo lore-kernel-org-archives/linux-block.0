@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E23759B46;
-	Mon, 22 Jan 2024 17:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6CD59B5F;
+	Mon, 22 Jan 2024 17:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705945035; cv=none; b=MmFhjEwbUC6c7avxJP11vrNMBpqWgojN4dCNIYyeYw3Ed2y+4rScK9GkllEF5LKENFg4Wdrr8r0La6shy3a1TE43NzP5Kr5efarE2/VgOqOYV7bQjfmjIM7eeudIn+0ZHZJMM0wr4LDnuYJKhNtMi7TXD9JVRlCGZhYDZyBzuUM=
+	t=1705945040; cv=none; b=VEKbNBZmkZMnYHkRnok18oITSvun11OoJhyPR/kintzrUgGS8OXqnkrpAXFVnuv7Rglh9aHgZTblfVLA6zpFr0Ho57u7lNkuwZ2kGBotNdGJBPG0eAooeBDCaYl0SlYAXGP2yJmVyqf4ZnIAN/ClSCoGmK4IDWPDOsYRbIKaxkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705945035; c=relaxed/simple;
-	bh=xy0BeYL3mUJ5e7KYLsaN9ZPi/KXZkZeh/8QlMyEp2Cg=;
+	s=arc-20240116; t=1705945040; c=relaxed/simple;
+	bh=Gx7ge95K0X5swpjXLnkohydYiBMOE5wBS9q4XMuD3CM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=s4KnmhoAAqATMLpwDoXFYdaCzHgiJhl3CAvDtMUuUMbXeiSOsnjcnA0WwJ6w7EBJXF7i8FsRyjmVE737YD+mMxXuDUDeHeDuggmAS7/BVCKwPj10xq7UeZxRJ9PSPcLY0vzx6X9PLk8XZUU1oKimFP1xoDC76skbyk8Mjh3uqLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qXLjG4SO; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=Dt22Z/dFAtiqZuh08NpeLrpr21hkVJ2XzuZjRdp5L/Qeqv52iKKiqo5D5tZyZaku8EBH6a1p0rlpyTK3tpiz82lDPCZKyF0EoS22hP2uqusaEQxTSBrUdKEtO44aM/97a645y9ufi0Ub93/rr0Vy7u+Yqi0XkCLvCSzmd4qH1po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mjR38lmH; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qXLjG4SO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mjR38lmH"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=QGWbKYlVFWK+oadU1xwjKPo8yRfdDiY9GpjAcsWorHA=; b=qXLjG4SO2PpqWaS53xSdhHfCEw
-	BEtbSC+n7soYkoyfUsNlunf3c+VjbN8pGaMF7tRrD5n+yRa7riOdrtU2L3wM+91USBC55pqwGgm53
-	43iCqXVBRdkJwC0k69xFrDqiASCFc+IM3qPteLkTwGCtHcWCoo8tvlkvOmK39XDiiIM+Sp+mbsmhk
-	SZmAQrRYr2KBR+gN9IikcjLMDJu9SQNRi1Tcigm2Dsz/KIQxtwJCmIKWrxD4OoABCjEH+U81i0xeP
-	Ea3iYifMuyxVOlMAuvrdL8aJmXYfHoESDNadBVRKU3QXQtSYBhm5HKIGS95lMl6XPnESNxZ71Gliv
-	VUc1w5ww==;
+	bh=6xt03nH75W2N6Ede/oekBYFRh3OyvqFO38yVWBgIHLg=; b=mjR38lmH2i/2wTYwmqOuSWrJqD
+	B+o8m/kqhpHlQnZt/T+ts7PY8wiVDpE+u6eQIE3HzKMnaglHn2RWrvZIiHevaQknNt0MhCtQ7VP0d
+	dVwTx7zV3B/WVX3pyLvxvIwmVYvsCen3cLPSrdDlDM7yeEXrNqGECcd4YgNF9SrDZjAGmiiDsxYre
+	29Wgp/+mrl/qJLjRAc3cZGUY4JfjLkNevlJIAp/9XHx9HUcbNIv5GrQ6sar6/eaRXy4x2expeMvuJ
+	cDL6BQ+O6VNYj9IHLnBFSwCKlC7ZLuIQjFluOq0A+f/8l6Fv7TqWtLc/DcOeE6lwqa6rVkjOQFSCK
+	ys01vF0A==;
 Received: from [2001:4bb8:198:a22c:146a:86ef:5806:b115] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rRyEK-00DGiY-2D;
-	Mon, 22 Jan 2024 17:37:05 +0000
+	id 1rRyEN-00DGkp-2b;
+	Mon, 22 Jan 2024 17:37:08 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -44,9 +44,9 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	virtualization@lists.linux.dev
-Subject: [PATCH 06/15] nvme: remove the hack to not update the discard limits in nvme_config_discard
-Date: Mon, 22 Jan 2024 18:36:36 +0100
-Message-Id: <20240122173645.1686078-7-hch@lst.de>
+Subject: [PATCH 07/15] block: use queue_limits_commit_update in queue_discard_max_store
+Date: Mon, 22 Jan 2024 18:36:37 +0100
+Message-Id: <20240122173645.1686078-8-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240122173645.1686078-1-hch@lst.de>
 References: <20240122173645.1686078-1-hch@lst.de>
@@ -59,36 +59,49 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Now that the block layer tracks a separate user max discard limit, there
-is no need to prevent nvme from updating it on controller capability
-changes.
+Convert queue_discard_max_store to use queue_limits_commit_update to
+check and updated the max_sectors limit and freeze the queue before
+doing so to ensure we don't have request in flight while changing
+the limits.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ block/blk-sysfs.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 85ab0fcf9e8864..ef70268dccbc5a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1754,16 +1754,6 @@ static void nvme_config_discard(struct nvme_ctrl *ctrl, struct gendisk *disk,
- 	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct nvme_dsm_range) <
- 			NVME_DSM_MAX_RANGES);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 54e10604ddb1dd..8c8f69d8ba48ee 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -175,7 +175,9 @@ static ssize_t queue_discard_max_store(struct request_queue *q,
+ 				       const char *page, size_t count)
+ {
+ 	unsigned long max_discard_bytes;
++	struct queue_limits lim;
+ 	ssize_t ret;
++	int err;
  
--	/*
--	 * If discard is already enabled, don't reset queue limits.
--	 *
--	 * This works around the fact that the block layer can't cope well with
--	 * updating the hardware limits when overridden through sysfs.  This is
--	 * harmless because discard limits in NVMe are purely advisory.
--	 */
--	if (queue->limits.max_discard_sectors)
--		return;
--
- 	blk_queue_max_discard_sectors(queue, max_discard_sectors);
- 	if (ctrl->dmrl)
- 		blk_queue_max_discard_segments(queue, ctrl->dmrl);
+ 	ret = queue_var_store(&max_discard_bytes, page, count);
+ 	if (ret < 0)
+@@ -187,10 +189,14 @@ static ssize_t queue_discard_max_store(struct request_queue *q,
+ 	if ((max_discard_bytes >> SECTOR_SHIFT) > UINT_MAX)
+ 		return -EINVAL;
+ 
+-	q->limits.max_user_discard_sectors = max_discard_bytes >> SECTOR_SHIFT;
+-	q->limits.max_discard_sectors =
+-		min_not_zero(q->limits.max_hw_discard_sectors,
+-			     q->limits.max_user_discard_sectors);
++	blk_mq_freeze_queue(q);
++	lim = queue_limits_start_update(q);
++	lim.max_user_discard_sectors = max_discard_bytes >> SECTOR_SHIFT;
++	err = queue_limits_commit_update(q, &lim);
++	blk_mq_unfreeze_queue(q);
++
++	if (err)
++		return err;
+ 	return ret;
+ }
+ 
 -- 
 2.39.2
 
