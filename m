@@ -1,187 +1,156 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68F036120;
-	Mon, 22 Jan 2024 08:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705912253; cv=fail; b=pmt81luxflaK/bxGz+GbC3hljTcalYHEAbfpC+ra7bem8AMMp++s6zDE6ikzrVGttMoq99aUn+WF/HAd2r7k6oP6Nie6t017AGhc0wVnr1dsvoztWJJiaDlbrkVI0k9p4DjWil2rMtrpEn8C9mEeQ+Wzu+hGvEiHdvuC3JIY0V0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705912253; c=relaxed/simple;
-	bh=pyM/WiJIcuA5IzKZWhbZzIN+OcJnfdo5TPtpJsZKJ6Q=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=T3p6uNqXwaDJfETxtjX2wbnsa6BxpJsHZfBky3NpMNwLdIGj3UTia99KEResi4IyViWKkHr9OHu0OOWyFeXk0bijrLiBmrrU6g0laqSmNHZZz4nq5cPon4y8Mh+ElqgCYlvITDtQK+gYeo6xVAa84UECCPWUJrxCFZnvu6jdYxU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=CAAU8ZOl; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=NkJM3Whj; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6C439ADB
+	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 09:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705915429; cv=none; b=jNaTPA/RYbAwCNd/kSyL6lMTnaTysY+KaM5DMajcyNsm9hoxoja3vQXOo2sSlgJJ6m0jP5cP5gMxHv1H4qPHx73MOSePFVVNwSgSXcGNnhJrixTuckfIcj9ZByIzi0yd38G/9tlZOtHGEWR6GptWmQ+0B/xuPnVruyAdMBMtIRY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705915429; c=relaxed/simple;
+	bh=SwrScSab5wWDwtOlpQAVOaOc78P6dsbBs5Xsj7XG6ww=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=pTe7jXauq2RdNT8l85etI/BJfw86FUWN1v5mqGieid2pwJPh5WpZCfeZpk21fvICRnfUR4yxvQrMuVjx9sEBo3NdQlDJsGUg+qlB+TvK5bmG6iGLJoRnSRs8eVXcjpNmy7nhtwG1Hc36UwZ5nEFAhOJMr0mgTp43N7Z1BiB4rr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=TzJtnGkQ; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CAAU8ZOl";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="NkJM3Whj"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40M7g1mY008112;
-	Mon, 22 Jan 2024 08:29:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=7p9q4Otjtl84UgQiGJyjQ1R9f/Z8EbiZYT4EZTUX0nI=;
- b=CAAU8ZOlctxNIg2pC11gkRgOn5tpf3e8x9WUJJ391+mKqYfSnbSlH1pvuavZ8U0U5QUR
- lgu8BXGivbL/2ODZF5ajgX+ySbpIczoaq/XDLl0wY8/DpRk+tRLjmcgVzwU0E+Xa0mO1
- 0IYffaRmSHUVsVz/+VM06DwRIWLonThtUS/xi0cQ9m1mUTnOjRztaj1g8E9FNs9vlQ+R
- Qw7T21DoiJpdBgb9QN9nIm3sQUkf7DGoCRZcXfranySoNChl1wkKmDW2ptpmYaFbN6pL
- 9dm9J4x5mlDXZi+tQ047ssS1s3kXaOAzWisyCFexoHOTr+tBAxPmOg9Ee0muIYXoeMJm IQ== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vr7cxtukr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Jan 2024 08:29:36 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40M8Fg4d039337;
-	Mon, 22 Jan 2024 08:29:35 GMT
-Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2040.outbound.protection.outlook.com [104.47.51.40])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3vs36yatm4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Jan 2024 08:29:35 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DYAF1BDde2P78aGvV1UIGDz8ZC5PfFNL8WEaJPV7RyGZkzMLXeji3KAiWmGXIphUPteKvk/3JFgQy2uMDkMKZjeL3rar9rwcXNZbFhH6fMZVlI+fH3TZXXoQXyA0PUkGDOnuKJ09vXZGT3qAAk0ZVNnytAgcuyTN3xyw3CVWLziRMvG1A5+N5DOO3uaif5Tcg54MDLyoE23VISb26BAuADSzr8BTeqpFJhqF3KMFN0Jvq59gC73PN0c5pNJLyGU+VU6rlC87K6N9mWjFJgyFWmbVkzJKZJ8o0kjIuh8HV14v7VAQ4aJ+8s1hRUTpXSlVMcMxB1cqAdmy6YCMj2cs5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7p9q4Otjtl84UgQiGJyjQ1R9f/Z8EbiZYT4EZTUX0nI=;
- b=mwAEIxltpowflhCIKVWaO/63HApHT4w3ItoIl+wdsx0ZzeLxZCKvpQmOL1fpURIpOP61AzzkJ+ljIfwfI6fCcp0paajVNF4+Q7lbgwljjUPoVDMHSMR3uBayCnudpL+fzRbkX2l1mTL8APj1LriSV0t+TVUdvVzh+OjEWoZ0dzqrVw2N0Wgjwjl0DpJP2yqnzCiLvlmL5Vi72SmCLrCbBSUZvZxphBj1GG2za9ogtWWe/geIwJdhwK9eD3YZjhKXIEICkOZTmuQG7g+wZqo/NvK7aPrK56UMDhZDAcxfF4oxqw3ncJ+00xwiZdE76bJj5vglrYCWXdJACJSEu9zF4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7p9q4Otjtl84UgQiGJyjQ1R9f/Z8EbiZYT4EZTUX0nI=;
- b=NkJM3WhjFhgNndl9JXm2t9IUozHE7JuyOQdE8uwYcTzsTt60ysvRRqyow4KlFl+mPylYS2KYTT9XAVf932E7DalVSwuBnJwtxhqFmCWvfM9sqo8fJ3GxB0K9RwDkq00Xh8G3u3RqOk+czZEEBkvaxVTvAt6G3FRiQcRz5J5fuSg=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by CH3PR10MB6692.namprd10.prod.outlook.com (2603:10b6:610:148::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 22 Jan
- 2024 08:29:33 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::f11:7303:66e7:286c]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::f11:7303:66e7:286c%4]) with mapi id 15.20.7202.031; Mon, 22 Jan 2024
- 08:29:33 +0000
-Message-ID: <6c1c9cf1-9202-4cab-9ca7-404c2116b21a@oracle.com>
-Date: Mon, 22 Jan 2024 08:29:27 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/16] fs: Add RWF_ATOMIC and IOCB_ATOMIC flags for
- atomic write support
-Content-Language: en-US
-To: viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-scsi@vger.kernel.org, ming.lei@redhat.com, ojaswin@linux.ibm.com,
-        bvanassche@acm.org, Prasad Singamsetty <prasad.singamsetty@oracle.com>,
-        dchinner@redhat.com, djwong@kernel.org, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
-        martin.petersen@oracle.com
-References: <20231212110844.19698-1-john.g.garry@oracle.com>
- <20231212110844.19698-6-john.g.garry@oracle.com>
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20231212110844.19698-6-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0235.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:315::12) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="TzJtnGkQ"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240122092344epoutp036e4419cc31f6956d6bf2d7df2fc787c3~soQpFVeuA0894608946epoutp03o
+	for <linux-block@vger.kernel.org>; Mon, 22 Jan 2024 09:23:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240122092344epoutp036e4419cc31f6956d6bf2d7df2fc787c3~soQpFVeuA0894608946epoutp03o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1705915424;
+	bh=zX0qWDTs/xgDr9Sr6z3Ege2Z/e+QPUCxSaBiFzBG1Fo=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=TzJtnGkQH6WxvI8ZnlqbYDSIo3pVlYoHOT6zewYErqx+tA0TRBepZ2fLKyyeQM6l4
+	 TgtC6PR0YjWZZVWi4q2iGj1eSsnvB3+4KvboLsdbysqFn0vfg2Mv7fb9p2MtD8U2bv
+	 z4MbdKON3M3JlOrI6nJ7TJHMySqaMVv/lTxH+pX8=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240122092343epcas5p3a328d02426eeb514cf7c94cb99ee7281~soQocDGwD1149711497epcas5p3z;
+	Mon, 22 Jan 2024 09:23:43 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4TJPsp0Tq3z4x9Pw; Mon, 22 Jan
+	2024 09:23:42 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	9E.18.10009.D143EA56; Mon, 22 Jan 2024 18:23:41 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240122092341epcas5p47b118ee78ba8496ceea9e2d3ea4e04c4~soQmrwZ3w1654316543epcas5p4B;
+	Mon, 22 Jan 2024 09:23:41 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240122092341epsmtrp264a8600a5b35daf860e534a3be7002cf~soQmqSbsu0236302363epsmtrp2Q;
+	Mon, 22 Jan 2024 09:23:41 +0000 (GMT)
+X-AuditID: b6c32a4a-261fd70000002719-50-65ae341dba2b
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E5.EF.07368.D143EA56; Mon, 22 Jan 2024 18:23:41 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240122092340epsmtip2cdc2da648ebb8e30e6ba99435a2cbdc7~soQlKp2M40565805658epsmtip21;
+	Mon, 22 Jan 2024 09:23:40 +0000 (GMT)
+Message-ID: <23354a9b-dd1e-5eed-f537-6a2de9185d7a@samsung.com>
+Date: Mon, 22 Jan 2024 14:53:39 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|CH3PR10MB6692:EE_
-X-MS-Office365-Filtering-Correlation-Id: c70fe653-62de-4f92-69d8-08dc1b24428e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	UHjBsGkwBy5EPISJCiwDsJqNY+2GfSbMaOQQB+o0nH2oyWAhG15I4EtlMsWEcmvwoqxJeRzpsxtzOekWqfhnkgZ7ZsyERDmVTgK2wUgMpmfL6KQueI3a8QYU/VCn8scHWhr6dMweL1sM7+C1/7ixdSzccEtjImTesDaGS+zBMmyAm6mK7N6eMwOo7+SPYn1kp4aD34AcIkKmSlOt/0yOiHc1oefLdxMdnGXE/FGvx0gj2fxkEmJbi+PglvQ+v8M8DDGrxhvUGFYFCliqZxoVJt/IaAafHT3LfsEzbigFLdgAXXmRSecGlPinNxz930jU/njXjE/9TrWgyVG78QeE51z4RXH78RcCEoIDd0PF4PE/Xa9z0JmpQ9o1vDPTzuDWJnRL2ctZRiOgwUCx+BUusk3jjD09zFQ5mipOBZ4sHpInkOJ3AQAxfVs2b7qd84tanM/vlulFLqtwTAyqtirx+9lNcQrOhTV4vjAI4Vygzz1cI0xP0kuyRpQ6YSRSc/c6CTHs3ytPQm8L139Myrink22xHWPKqGCAoIY7RxlXgqmX1Q9eol3FAaKPeFDZfKtW7YIwfBUad5k4ZwU6s2KMN3RtGhcvklAUYVrKFu0iq+pyAgoc/vPI1K4zVxEgYelv
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(136003)(376002)(396003)(346002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(36756003)(41300700001)(31696002)(86362001)(38100700002)(6512007)(478600001)(6666004)(36916002)(8676002)(8936002)(4326008)(6486002)(6506007)(66476007)(66946007)(966005)(7416002)(66556008)(26005)(2906002)(4744005)(316002)(107886003)(2616005)(53546011)(5660300002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?SHZwY2ZuWndYS0RSSENTcDdyUmxaTW9LOVBpSWNBbkxzQ0FpSi9NNUppU0lv?=
- =?utf-8?B?SktuNGdDTGdSQXphSzZMbjlsN3Irb3RJYzdOWWVjRmxqcDAzbFVJd3Iwdk5N?=
- =?utf-8?B?U0ROb0xMVnB1dXI0OWhKOUVKS1ptVGNYQWJwRnhuUlhJT3k0OG1xeEd1WXdp?=
- =?utf-8?B?U0ZDUzJRRTFUQkR5UjZ3a2lnTUtSTjVYTUplczVwYVdmUzY0SmJkenNzWEI1?=
- =?utf-8?B?aXJEZGJhR0UrZGZvdU5WR0VKRXRDUWt5b2Y5eGkvVDJDalNQWmlmUlNTcHpv?=
- =?utf-8?B?UHE2eXd0MUg1ZFpkREJJelQvSTVKWmJlMS9jVWFVVWc2bDdZZnRBYXQ2MEdS?=
- =?utf-8?B?dCtKY2R3TTJCUmtXS3lrT1E3a0FmZkFxYS9wZ25zZFVycjBMeTRZYkhqZ0Vn?=
- =?utf-8?B?UmJRdzVMZFdoMTBQTURyaVkxbWpCY1YzVUdjRmtQZjVpWmw3ZW5ISXNaWFFj?=
- =?utf-8?B?MEhrSEZtbmFzN0NIc0dFL09lN3pwdlNtbzMxMUFTeVhQU2ZERjZTaUE0encw?=
- =?utf-8?B?M05VMWlpR2RJdFlzTXRzUGdvTkRNempVZUNta2lsNGsvRHZaT0dkSEtvbzhC?=
- =?utf-8?B?a3FWYmIvaFNJZmh0aE1VZmRKVno3UmQzNy9EZTVpWjNzOTNpcW9CZFRLMlFn?=
- =?utf-8?B?N09DbFZMK2d3eFFSa2MzdTJVaDBocjBoVVEvdHhtTXMreU1TVnIzRnAwcWZn?=
- =?utf-8?B?RkFCU3dHd0xhWWpyWEs5UnJMQ1ZSMFVJNHdjSWN5NzFieGFuZlpoSDdJcStH?=
- =?utf-8?B?a3Q3dnBYMmcySXUrMmkxa29VRHFHR2VSK3VZZUtldjM4TDY0SDhyUE9nUXJO?=
- =?utf-8?B?Z041cXZtczBFUDhVNjhBQzNMMFF0dk1LK0ExcEE2OCtFMm1vZ1dpWk9UeXdr?=
- =?utf-8?B?MFlqZzArWFdaMit2b3FTalluNjRxTmd0dEt0MEZPRGpjODRXWjhhZ1o3UHFT?=
- =?utf-8?B?dzNMejlLK2Ztbjh6a0VsYVNFWlc2RS9EcWx5ZE9DVHNPOUtXVDc1MjQxK0N5?=
- =?utf-8?B?UC9sYzhoWlhLaDZUaTFoZGpxZndWWDhUMlBBRzI0MG84bTVKdVd0Ym5QOTZ0?=
- =?utf-8?B?dE04U3AvMDhTTGU4VCtZYU0vRitCVE9EZ3dEdTJtNnpwMExXUVpyR2JhajBH?=
- =?utf-8?B?UXg3UG5LcEFacUF6QmhDNnlvbjlxOWx3WWZOM0R4UmxwaUJ4YkhNWWRrbTlD?=
- =?utf-8?B?V1JnMmsrdy9tZjdoSkljRTA1NUM0MVM3MVJrUDBvY3MwdDRmUmVackkwTnNM?=
- =?utf-8?B?STE1MG1POGlITkxpQktUTkxDdElPUTV6UWEyeE5TZlE0ekpQNE41TnNPcmZY?=
- =?utf-8?B?STB2c3lUQTVMaVJkeXVxRFJqLzlpYUZFR3lya0xTdGcxMlhZNHdRRHAzbUNT?=
- =?utf-8?B?UWdmVjdUbnFmSWtudkJUNnd4blhJR0UwWE85MUJ5bThEQzZHWXU4dlVKSkpx?=
- =?utf-8?B?eUF4MmV3SVVIU015NlhKL1U5QUhwMWdvbWl2MHRBUWYyL0JOOHY1cVltT05L?=
- =?utf-8?B?cVRXVCtON1hQUlF4dEVJbFd0S0dOdWZWZzczRk1Vbzl3Y2hOM0NMUEdnOVoz?=
- =?utf-8?B?dWc3MlA1NnVkSDBwQXhubk9IV3ZKWUQwUFM3Z3ZBUTJQeWJHSS9kT0kwSld2?=
- =?utf-8?B?SXFFcld0RUxKMmthMFpZQTBwb29YcnhpQkV0bVRPVHlaMUFQWFI3ZzY0OTRP?=
- =?utf-8?B?YTg5ZS9GM0FveVBudnJjakR4bW1pb2doWUtDaDdKanFmejZhVmljZUJzN3dI?=
- =?utf-8?B?ay9IcDA0Q0NBWUpWbGVOVUprLzk1M2xxSXJkZHFnTnVJbG0rekNUMVV1dzhD?=
- =?utf-8?B?Y09vTE5GMDIvMFJNZlB3UUNkQytUQUVUdlF0dFBYRmlEcnEwS0ZObndrUHli?=
- =?utf-8?B?aHd1cXhUSWVhaVBZdVdhV1FBa3BUeWk3U1V2a1A3OTFCb0FyakNJclZ0Y0lo?=
- =?utf-8?B?VlNIcmgxNGE4aG1NdGRsN1I4R3VOWlN2L0ZpUm5lbUxnM0h4M0RZakc4UGo3?=
- =?utf-8?B?eWhTTzBwR1dQVWxqZVd5V0pRYmo2WHpET2NMMHpFTVJEOVhOK1lQT204L3NJ?=
- =?utf-8?B?dEViTE9TU3R6cVd6aDU3cmgvb1kya09iSTZMQ0xORlozQldyaFRRZ2lCVFlv?=
- =?utf-8?B?dTBFUzZ2MnZlRDZBblZGNXI4YnRLOWRjN3dqY3M4R3lJeU15ZGtBMCtJKzFT?=
- =?utf-8?B?clE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	A0gj8r23v04k126YlQke4gv5wlJ0cJBW89IB08PNfvwvr8ZH7jgnz6otWcpVFwakEjPOiYyh/tyEdrO6TozFSf4QnLHIUoIvvH0ZD5cdZWJoKJaHAkgKNfTkp5K9AFNNXkF+lLvREVccwnmEajCRG/L0cpQzOcf/NrQlYtqZjnNI81H5TkIgM1SuriaxlVbHsb1vx9JYTb6t2Vd0zOcL4ahgZuW6f1/xSeL+0MR8+tl6wb4Wr563EqK17Nkm0ETH4F2Q8F59Zn8MIgsF+//22kYMZi3uFAHPCGSdeFZNF6BUZpat94EZJfuqq+uyg8ebyklFGlEpA2NsHzYBvp+/RdV/eUtc/wrO3LaetrDwd+evb8z7lJIyXsoOMKVJawEM0Ox3uSaDNeKcRQlx75PnBpUHgGuiwFmDvw7HsAebGkyP7tNH1n4sagtIUKwX094xKLiFiLFBswS2Q7vN0zpecCcAhDvQkfocHHn1WWXFYQWgMXM4y82hdqA7l+J65fvSihSPlWNoHp+ITUEMPxsX5E8W0nk2U36HjV0HWZcA51roYonU4jmk2Ou1LsFADqKafFJdqecJUoByzOdJYWMpIQIkKZFbKz99YLIVFfU3o/U=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c70fe653-62de-4f92-69d8-08dc1b24428e
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2024 08:29:33.1321
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /dEz0WwsTAJOFOdJ4kLLpNWFNvjxRlDYEcsTnvz+aj6lsBhfGhW2q+65FItUQgFxdU8Plh/DfQpx6K20qhuI6w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB6692
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-21_04,2024-01-19_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=986
- malwarescore=0 mlxscore=0 phishscore=0 bulkscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401220060
-X-Proofpoint-ORIG-GUID: HXuY2HiYWUCfvmkb27FDlT3rsYJ0yJ0P
-X-Proofpoint-GUID: HXuY2HiYWUCfvmkb27FDlT3rsYJ0yJ0P
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v8 05/19] block, fs: Restore the per-bio/request data
+ lifetime fields
+Content-Language: en-US
+To: Bart Van Assche <bvanassche@acm.org>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Christoph
+	Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20231219000815.2739120-6-bvanassche@acm.org>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrKJsWRmVeSWpSXmKPExsWy7bCmuq6sybpUgxV9Nhar7/azWbw+/InR
+	YtqHn8wWqx6EW6xcfZTJYu8tbYs9e0+yWHRf38Fmsfz4PyaL83+PszpweVy+4u1x+Wypx6ZV
+	nWweu282sHl8fHqLxaNvyypGj8+b5Dw2PXnLFMARlW2TkZqYklqkkJqXnJ+SmZduq+QdHO8c
+	b2pmYKhraGlhrqSQl5ibaqvk4hOg65aZA3SgkkJZYk4pUCggsbhYSd/Opii/tCRVISO/uMRW
+	KbUgJafApECvODG3uDQvXS8vtcTK0MDAyBSoMCE7o+XKH5aCdu6K7dtmMTcwdnJ2MXJySAiY
+	SPTc2MHUxcjFISSwm1HiQ/cjVgjnE6NE276DUM43RokFCz+yw7S8/3qZESKxl1GiYWcLM4Tz
+	llHi4OXvTCBVvAJ2Er09t5hBbBYBVYnFC46wQsQFJU7OfMICYosKJEn8ujqHEcQWFoiWaFs5
+	EWwDs4C4xK0n88HmiAjESbTOegW2jVlgBpPEutfXgIo4ONgENCUuTC4FqeEUsJKY0raaGaJX
+	XmL72zlgB0kI7OCQODljLStIvYSAi8T9D2oQHwhLvDq+BeobKYnP7/ayQdjJEpdmnmOCsEsk
+	Hu85CGXbS7Se6mcGGcMMtHb9Ln2IVXwSvb+fMEFM55XoaBOCqFaUuDfpKSuELS7xcMYSKNtD
+	4vKrh8zwcPvTdoB1AqPCLKRQmYXk+1lIvpmFsHkBI8sqRsnUguLc9NRi0wKjvNRyeIQn5+du
+	YgSnXy2vHYwPH3zQO8TIxMF4iFGCg1lJhPeG5LpUId6UxMqq1KL8+KLSnNTiQ4ymwOiZyCwl
+	mpwPzAB5JfGGJpYGJmZmZiaWxmaGSuK8r1vnpggJpCeWpGanphakFsH0MXFwSjUwCe8zV1C+
+	9TTXevqREx2Vx9+z/569jcHpqayuQnGimvqzaAeLcnvG73W+3ouSVvsfFcn8Fu6+ky3RcrbN
+	N+6/91UZfzxUqXX6b32Hb/7XPKt5iSInw51eijtFsit/Y1v2pZb70s3Qmlfc/w7P8PpoIC+0
+	MTRrZfHlz5v2/Xc//fzdF9+yfsclm7+v2z7BWvnIgo1lp9Wb0k3LfvcLXt9wTPfMQTMOz6Db
+	6WfOSJ2q3s+dvpdzgo37lzn2zI1zWS8yTOEsZpm/8pQMR7FVf7LIsaVvtH9OWVa8f19g7BFp
+	r01z96WdT9husiBLNTCsKUmU3/t3Z9f9IqWPr6bPnnYuOkHwx0eH1Bbek/u2LT8qrMRSnJFo
+	qMVcVJwIAMQkbcNIBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEIsWRmVeSWpSXmKPExsWy7bCSvK6sybpUg1lv1CxW3+1ns3h9+BOj
+	xbQPP5ktVj0It1i5+iiTxd5b2hZ79p5ksei+voPNYvnxf0wW5/8eZ3Xg8rh8xdvj8tlSj02r
+	Otk8dt9sYPP4+PQWi0ffllWMHp83yXlsevKWKYAjissmJTUnsyy1SN8ugSuj5cofloJ27ort
+	22YxNzB2cnYxcnJICJhIvP96mbGLkYtDSGA3o8Ts701sEAlxieZrP9ghbGGJlf+es0MUvWaU
+	mPlpKliCV8BOorfnFjOIzSKgKrF4wRFWiLigxMmZT1hAbFGBJIk99xuZQGxhgWiJtpUTwXqZ
+	gRbcejIfLC4iECdxeP8NsAXMArOYJJ6ff8gGsW0vo8TNFX+B7uPgYBPQlLgwuRSkgVPASmJK
+	22pmiEFmEl1buxghbHmJ7W/nME9gFJqF5I5ZSPbNQtIyC0nLAkaWVYySqQXFuem5yYYFhnmp
+	5XrFibnFpXnpesn5uZsYwdGmpbGD8d78f3qHGJk4GA8xSnAwK4nw3pBclyrEm5JYWZValB9f
+	VJqTWnyIUZqDRUmc13DG7BQhgfTEktTs1NSC1CKYLBMHp1QD0+ppZ67ar/zkXbq8L9Pg97mb
+	x3+l2+4022W3JuP9BdaVAS7yX4qcVz8LvNqvu9oiRitk6bN/0a/+bHn/n7Nvd+K5W6/2zihw
+	EBGeePbKyoO/ZKWkrey2Po5rbD08TfKayPd16v1SntvmPtx9p9nZ+e4XjXsZ0WWBojub9TP/
+	ZLvn9VWdzxLuOWn1vHnyMvPTC47/iqooDm27ek9i6XExJr9usVtXwv980jg+y/COd6+zE/Pk
+	Y7JKk9fUG157eHuld5L7q0KN1l2hPx/5blaa/XWb037VmTWtusEM23oPJmZE3Tsp7qPwIYnl
+	Euf9jNprj2z/8/7cvupFleLxo56HRdj/nH38ekK317L4TwuSSjWUWIozEg21mIuKEwGS6mrL
+	JQMAAA==
+X-CMS-MailID: 20240122092341epcas5p47b118ee78ba8496ceea9e2d3ea4e04c4
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231219000844epcas5p277a34c3a0e212b4a3abec0276ea9e6c6
+References: <20231219000815.2739120-1-bvanassche@acm.org>
+	<CGME20231219000844epcas5p277a34c3a0e212b4a3abec0276ea9e6c6@epcas5p2.samsung.com>
+	<20231219000815.2739120-6-bvanassche@acm.org>
 
-On 12/12/2023 11:08, John Garry wrote:
-> --- a/include/uapi/linux/fs.h
-> +++ b/include/uapi/linux/fs.h
-> @@ -301,9 +301,12 @@ typedef int __bitwise __kernel_rwf_t;
->   /* per-IO O_APPEND */
->   #define RWF_APPEND	((__force __kernel_rwf_t)0x00000010)
+On 12/19/2023 5:37 AM, Bart Van Assche wrote:
+
+> diff --git a/block/fops.c b/block/fops.c
+> index 0abaac705daf..787ce52bc2c6 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -73,6 +73,7 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+>   		bio_init(&bio, bdev, vecs, nr_pages, dio_bio_write_op(iocb));
+>   	}
+>   	bio.bi_iter.bi_sector = pos >> SECTOR_SHIFT;
+> +	bio.bi_write_hint = file_inode(iocb->ki_filp)->i_write_hint;
+>   	bio.bi_ioprio = iocb->ki_ioprio;
 >   
-> +/* Atomic Write */
-> +#define RWF_ATOMIC	((__force __kernel_rwf_t)0x00000020)
-> +
+>   	ret = bio_iov_iter_get_pages(&bio, iter);
+> @@ -203,6 +204,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+>   
+>   	for (;;) {
+>   		bio->bi_iter.bi_sector = pos >> SECTOR_SHIFT;
+> +		bio->bi_write_hint = file_inode(iocb->ki_filp)->i_write_hint;
+>   		bio->bi_private = dio;
+>   		bio->bi_end_io = blkdev_bio_end_io;
+>   		bio->bi_ioprio = iocb->ki_ioprio;
+> @@ -321,6 +323,7 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
+>   	dio->flags = 0;
+>   	dio->iocb = iocb;
+>   	bio->bi_iter.bi_sector = pos >> SECTOR_SHIFT;
+> +	bio->bi_write_hint = file_inode(iocb->ki_filp)->i_write_hint;
 
-vfs maintainers, due to 
-https://lore.kernel.org/linux-fsdevel/20240119191053.GT22081@brightrain.aerifal.cx/T/#t, 
-I now plan to change this value to 0x40.
+This (and two more places above) should rather be changed to:
 
-Thanks,
-John
+bio.bi_write_hint = bdev_file_inode(iocb->ki_filp)->i_write_hint;
+
+Note that at other places too (e.g., blkdev_fallocate, blkdev_mmap, 
+blkdev_lseek) bdev inode is used and not file inode.
