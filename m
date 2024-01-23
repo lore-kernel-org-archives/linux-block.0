@@ -1,58 +1,44 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93914612E1
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 15:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5960860277;
+	Tue, 23 Jan 2024 15:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706025533; cv=none; b=BgiZKbggneKWo2VDxl6DjZ+VTRvyQ83FmGUBH/prk6J9+Kk7dN+kMIhVu2vlNeTPTGKAp1GiHcCPMHW7ie96usVbkSWhzxiuP+3QSjWkcEgTJBCSo67LPKBTwXXUWuk3vOOr+1gRhVQ4qvd7zy5q9e+kFQKInh9h1srzY7OxB6s=
+	t=1706025592; cv=none; b=QRDrGCM5cr+Fl/SDlOi1TeXHhslXs8/usk+35kiKmEKgSYfr6OrubEC7jO08qWzVi6Hur/RSv2zcTZvR7SmSQfsrCDj51cbYd5YoYduHvP1iDzaUXVG2xsxfPJmILHIQemCLknEb2nhksRBMuy7rHVE7ytadaabD/6VZuKdf5e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706025533; c=relaxed/simple;
-	bh=9qIE2bfiFVPT+0QiWv+qdn9ncuMe3NLV+5xTbhnxIKc=;
+	s=arc-20240116; t=1706025592; c=relaxed/simple;
+	bh=iIHhwJmlVl4McxGC9PbqY4l+E23pzobb4tPG9neNLtE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZJbQVctvvgJG5dM/2Ov8roPIqYCZ9QXmufYHJZgbqgL3GXK30Yqpdkm/+kiVNsaWD5xkACaH+0bLg00xWljCr4qo+lV7Lj44sEMwdGnuZ/eUdZWKluBu/8ywtYe/e9DF114sAaW6nHLYuWbN/1aQlXElBjm/ly4MskTCBxEU9M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FaYWSg82; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FaYWSg82"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7beeeb1ba87so60141839f.0
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 07:58:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706025530; x=1706630330; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QCq8nDnOxhz7egI8at/3y+/B1QQQ2aCDP0fX/KoZQek=;
-        b=FaYWSg821j4LM6DJij6YqzWGB9kOsP4WC34zp1K83+kX3xxsGWc/G8nvx9B2MpL7rC
-         k2I8yf1nzljxu6DqcDo05eFRbsfeG9VMR57KVw9Mfo331RGpCIvspJgPKKJMOXYiGkDz
-         Uj9Lw0eeyttw1uA5kldQgMm2WsMYWfHTaib1rsTVJ/3JZRJ14EAFk46QFcE7J83idTCK
-         UxfKJMJjEUnlNDlLpPk1l1aW9gVDmQAKUdH8T6crPmdcM9+xy0QXVCNRLMIVlNxM73ah
-         P1evjD/xZgqCAev+zbWvt2mEIWrwYr/Fpci43AWC9bxerU2QFzDf1gORKKymzMmnBvu+
-         IYTw==
+	 In-Reply-To:Content-Type; b=QOFAF04E3XxGuNcqdjQRT7EvyP8voI/xtE7nL+laNOQi1HLzvUkgd50NFuc8ur6HUQdN2sznMmphxcNTHbUrwBU4iaS4FrFrHei3fvS81cf5cDtWIvqWkmhr6kIee8VakRaijAQbsdNHKTFf2k6zZQxDTf4FcS4Ss0gY+eurG9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-29026523507so3384719a91.0;
+        Tue, 23 Jan 2024 07:59:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706025530; x=1706630330;
+        d=1e100.net; s=20230601; t=1706025590; x=1706630390;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QCq8nDnOxhz7egI8at/3y+/B1QQQ2aCDP0fX/KoZQek=;
-        b=AnWALApvF4pLoFOwk+9xNCLo5hT5ZL3pruSrag1fUtD5dlkWcqGSS5qM7eUyeqgzjn
-         J6V07z1wXdJnRmMQ4Q0wRbh9HwGbiJynUt49RgkQs7PFSAp4ZSmFqxfFbD1kqKKXZ+MU
-         QQRQKsSxNjVObwaFD17d9ZDg+SBIQQpkiMYtXdp4yqLO442wAFn8MGoxZoxYPSSWdAiR
-         UuDm7ZBJ8Gr+4EvRgQQ0SPzQbT5wRAEtbsY8K0cZGHeltZbfeyheX5ZsLOazDxqSVnj0
-         7do7gb0BMVQ23t4jCUG83qI325zC75VXMxyVcZPME4usnAsjYcxMfJ3OH0q7LYh4F39l
-         n4JQ==
-X-Gm-Message-State: AOJu0YxYE8jReVhtPJOwV3iSK4F7fSkopD/K67VweGdaReFPwrkgYsEV
-	ooITIgCOszT7BF5WmW7OslwSkbEBCdydp4Zh8QY9mDZmStuysmJt/H7BDVEqOuc=
-X-Google-Smtp-Source: AGHT+IGv/p+Wyasu5GYuiW+vbacdlKgB4j1xLZF2CMvBqfQGEOpuuw1wBPaU685cUB7SCh6MHnE8/Q==
-X-Received: by 2002:a05:6e02:1be8:b0:361:969c:5b4b with SMTP id y8-20020a056e021be800b00361969c5b4bmr10247052ilv.3.1706025530677;
-        Tue, 23 Jan 2024 07:58:50 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id u15-20020a056e02110f00b003619fd1f271sm3695586ilk.69.2024.01.23.07.58.49
+        bh=iIHhwJmlVl4McxGC9PbqY4l+E23pzobb4tPG9neNLtE=;
+        b=WXznCNFtNDeBnfj7ZoMnppx1mLRidFZuOmZPdigWNST6zkXrWznB/kpEQQO9dSBPHt
+         Hkg+5+3l1Dv+BcuAU7692Bru+qa6LDBv5S1JDgVAR4gCgQcC5Z6N+39OXR34smgBw05t
+         O2uIHDPXVHNRyZk1l7+micBhOccFZf5wINr2uYLy4PMFmU5QW17pCdGR9Dg1eT/vh1/V
+         pBhtf0lj8VxyAJZaFQP8a1i2iSXJoS3oeP8YhH9rs7VluzmGJNME+zQlag//WTRosZ1z
+         kr2eAYCcJA4BmWuqXJhOK3o0oNVNZ9J5TT2LmXvNldrHSlb1XYFuWrueKl4on3SB6U0z
+         eQJg==
+X-Gm-Message-State: AOJu0YxLp1cusiIFky/Se7/04Lv0HwBGuvZ+oK7nWmcEWhChFDJ1iGJ2
+	GS9JBaK+daEHFlOTVJAPOgjonwxlOeStfM8fLh1tl7xD+NQwn2yy
+X-Google-Smtp-Source: AGHT+IFBKo6TaGjN+xsbdjkKy45LeO8Nqvlw3rKgL8wySffscXcpKtUN5cn2mbrHecHhdrY25UKkDw==
+X-Received: by 2002:a17:90a:e38a:b0:28e:84e4:f7d1 with SMTP id b10-20020a17090ae38a00b0028e84e4f7d1mr3417266pjz.93.1706025590529;
+        Tue, 23 Jan 2024 07:59:50 -0800 (PST)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
+        by smtp.gmail.com with ESMTPSA id sy14-20020a17090b2d0e00b0029005525d76sm11890089pjb.16.2024.01.23.07.59.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 07:58:50 -0800 (PST)
-Message-ID: <c85898de-0780-4690-adfa-99332eae0090@kernel.dk>
-Date: Tue, 23 Jan 2024 08:58:48 -0700
+        Tue, 23 Jan 2024 07:59:50 -0800 (PST)
+Message-ID: <7d24a322-47a7-4b28-b3a3-42cf3dfbee82@acm.org>
+Date: Tue, 23 Jan 2024 07:59:49 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,43 +46,37 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block/blk-mq: Don't complete locally if capacities are
- different
+Subject: Re: [PATCH v8 05/19] block, fs: Restore the per-bio/request data
+ lifetime fields
 Content-Language: en-US
-To: Christoph Hellwig <hch@infradead.org>, Qais Yousef <qyousef@layalina.io>
-Cc: Ingo Molnar <mingo@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
- Wei Wang <wvw@google.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
- Bart Van Assche <bvanassche@acm.org>
-References: <20240122224220.1206234-1-qyousef@layalina.io>
- <Za99LKnQE/M6pVfM@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Za99LKnQE/M6pVfM@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+To: Kanchan Joshi <joshi.k@samsung.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>
+References: <20231219000815.2739120-1-bvanassche@acm.org>
+ <CGME20231219000844epcas5p277a34c3a0e212b4a3abec0276ea9e6c6@epcas5p2.samsung.com>
+ <20231219000815.2739120-6-bvanassche@acm.org>
+ <23354a9b-dd1e-5eed-f537-6a2de9185d7a@samsung.com>
+ <bbaf780c-2807-44df-93b4-f3c9f6c43fad@acm.org>
+ <51194dc8-dd4d-1b0b-f6c1-4830ea3a63e9@samsung.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <51194dc8-dd4d-1b0b-f6c1-4830ea3a63e9@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/23/24 1:47 AM, Christoph Hellwig wrote:
-> On Mon, Jan 22, 2024 at 10:42:20PM +0000, Qais Yousef wrote:
->> The logic in blk_mq_complete_need_ipi() assumes SMP systems where all
->> CPUs have equal capacities
-> 
-> What is a capacity here?
+On 1/23/24 04:35, Kanchan Joshi wrote:
+> At the cost of inviting some extra work. Because this patch used
+> file_inode, the patch 6 needs to set the hint on two inodes.
+> If we use bdev_file_inode, this whole thing becomes clean.
 
-It seems to be the chosen word to describe the performance potential of
-the core in question, we use it elsewhere in the kernel. But yes, could
-do with a bit more of an explanation.
+The idea of accessing block devices only in the F_SET_RW_HINT
+implementation is wrong because it involves a layering violation.
+With the current patch series data lifetime information is
+available to filesystems like Fuse. If the F_SET_RW_HINT
+implementation would iterate over block devices, no data lifetime
+information would be available to filesystems like Fuse.
 
->> +	return arch_scale_cpu_capacity(this_cpu) >= arch_scale_cpu_capacity(that_cpu);
-> 
-> oerly long line here.
-> 
-> Also pleas split patches for different subsystems.
-
-Yes please, the sched/topology thing should be a separate prep patch.
-
--- 
-Jens Axboe
-
-
+Bart.
