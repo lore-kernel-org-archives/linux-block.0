@@ -1,100 +1,101 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9D950A64
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 19:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C5B50A64;
+	Tue, 23 Jan 2024 19:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706037291; cv=none; b=hnSqFBoeYnDfKmB6NjqIqOBC/P2ak4KJ/HjDVL0LcTsg3ng9WvSAbDnLcEAVwE+frUP/r3GSONsk3jta9+FgfOXRn6/omp7CD3vXZHBYj/+W2RbxUfH3hs+feMJRYsYYUzpWZcmfGWli2xIKfDwxoj/OAdVXtAh1ort9aSDxYmw=
+	t=1706037298; cv=none; b=isPE9iDWPoD3GNLi0RSLJ+34BseevENUJDkXYMkpz2JoOlSMHPixSWmx/2xH93gtRsemc3NsOpmrssEF6lcBnikBqzuwRT9jSN9KpqLQXp7aYWXh+DPPeHYGxwMCXZzhdhp1RzQRPj2m17lj0IgdrPNPFOx1NWrnLpyRnqc5w3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706037291; c=relaxed/simple;
-	bh=GRUtmW5DDTyaa9sa4M6VNFXyo2pl/IQKnJb55iswBnU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OJZdCaP9Ju7VwNoaUTJWURxWxIFGPNNfd3B91byCDEEcDjMcJD7rO8HkiCIPlAuRAeVFGQMhhqUsSSOnms5gSQ1mnPzYscEdtJi51kNznMX0Kmm3Gr26EGMShDLgz4sBSpiog/i0XOdQspXzOvIsgGXjqLjY/TeQwpVD+rxyuGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IUlHvCc7; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1706037298; c=relaxed/simple;
+	bh=yUpKsP8bVl80uJpZfTJsdrlqZYLDIS9nN+AT5h0Y3hs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rK0tozJFjrGpIrJEZGSURu+ZNiIImo14UpuKZv8Gz5rzAgRJ1JqIG40xAf/8HMR5/zsC+WYQ3pNfESAqe3YInPEL9y/LSvoDTSNVLavY1BVaay5K+Yz8U6+e77MNgQTSQFQBlB9ATRIw68h7vfClcNiBA7PgsPvj8D3QrX3ua0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsLzpfBz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IUlHvCc7"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7bb06f56fe9so53406439f.0
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 11:14:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706037288; x=1706642088; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eQmD14o2i+RFk1Bbm2vKAG2qqUM4FFqg7Wme+8/Qmbw=;
-        b=IUlHvCc7vKTppz25VUHbh/gpF2DHwL8FzAx34I/0z3bFYAn5FA/WysaO2m7FdmR3mH
-         ye8pXFPfh1ik3CBO+3kZPS0Gb5l+E5NV5LiVH5PEZWWyIvl0bqzKSY2VJBeVXgHDush3
-         TAz96E3RJLwKjysGJIGoGDRaFQuM3RFbCTXUwLnVrf7FSnykeq76e6dfT//YyO8fEcVM
-         Bi/0VZlT0sbydT35BoLBTndJ/RVLMUPHD5CascYBPICqhi1FdVF75/YS8eYfHFqpLWgI
-         +LvFOUUCgCF1iv4aBUtQmpRb/2Eod2hhxXw8FsqwkmIY5wvlz8ry5XPvOQmxm81Moy+Y
-         ZL/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706037288; x=1706642088;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eQmD14o2i+RFk1Bbm2vKAG2qqUM4FFqg7Wme+8/Qmbw=;
-        b=oS5Uh7kdiYAi/E5SgPRH1vfSMRRw827xpVohpKuYH8XVNDDAQCE247LKm9KWovpCRk
-         9P9fxMzEWxFzZCs4wlUGEfoi/FgeaLf8VP/0Y4P5FgyjflCbsEdnmzMXwimaoZHXZroA
-         nc+45qkFPvhR8UkP+3VlkgqjkA5GqMTIeGteG48EzZRXZ5vWwNjLjr7uoWgfibFTCGF1
-         heuq38kL6vGAsd5Lo2mVJaByAsI1NTfIYeTq6Lrxj/wglbVinbxvD6pv5dSxPxAkeV/3
-         Nx8MdJEyNwJBBVpFlu5UJOJRoxAIIZqdI3GQH3dyAqWulUJcN9UsNNDbdvWshWEq0c2J
-         oHiQ==
-X-Gm-Message-State: AOJu0YyVzeaDiWtF4mUJQ9A1+gmjNV55fcZ+bPAmoN267+FNW1eYKuXS
-	1H7YoPTKcPTapIvXC12+VHy7Ghzz7NOHbxuWSxG4GPsJWwF5rUbUcUMdDj6xWDeKiWBEmTSCbyc
-	J5ds=
-X-Google-Smtp-Source: AGHT+IF54bzrhzAGZX5d4ih2uHeHJVsqHiRDHwwlR0yqshJ/6GvVw9a4NXA/m1XJYUQ0JY56jBqCgw==
-X-Received: by 2002:a05:6e02:1a42:b0:361:9667:937f with SMTP id u2-20020a056e021a4200b003619667937fmr201044ilv.1.1706037288089;
-        Tue, 23 Jan 2024 11:14:48 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id l4-20020a056e020e4400b00361a956a57bsm3445104ilk.53.2024.01.23.11.14.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 11:14:47 -0800 (PST)
-Message-ID: <c16f98f8-f973-4a10-ab40-3a678d9be4a4@kernel.dk>
-Date: Tue, 23 Jan 2024 12:14:47 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsLzpfBz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F18C433F1;
+	Tue, 23 Jan 2024 19:14:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706037297;
+	bh=yUpKsP8bVl80uJpZfTJsdrlqZYLDIS9nN+AT5h0Y3hs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MsLzpfBz//jNj6WTNX3v/HYwgipRg0uP3mI3V+orEgrXFs6JQUZpUshVL22Av9mqG
+	 fQbMT4X/lC2E1T73SebaeykdGxZ5Yccn+xTVCMGMSS7ofCY1OYb5gGb5l97sBhOIby
+	 rOgwjOGyLo4sEgiLdwDaDAHIflJoU16D5rG9vRygUVftJGD89pL/5Th/wmF9GwJg2l
+	 QgGyyFNwG6KTcoKjMjlAmJ1utyi8MooF0TzmIZNRL52syH8+qkq6Fr66I8TKp1D2Bc
+	 17RNuOI8OXnzqqnW7lVNsRqwKHNiz8PJaeVC3/lilfhP9MihYZmHHOn8HaxUddYF4c
+	 iTSJN+9k9184g==
+Date: Tue, 23 Jan 2024 12:14:53 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Yi Sun <yi.sun@unisoc.com>
+Cc: axboe@kernel.dk, mst@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, pbonzini@redhat.com,
+	stefanha@redhat.com, virtualization@lists.linux.dev,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zhiguo.niu@unisoc.com, hongyu.jin@unisoc.com, sunyibuaa@gmail.com
+Subject: Re: [PATCH 1/2] blk-mq: introduce
+ blk_mq_tagset_wait_request_completed()
+Message-ID: <ZbAQLRLNSx-IRRwM@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240122110722.690223-1-yi.sun@unisoc.com>
+ <20240122110722.690223-2-yi.sun@unisoc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/8] block/bfq: skip expensive merge lookups if contended
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-References: <20240123174021.1967461-1-axboe@kernel.dk>
- <20240123174021.1967461-8-axboe@kernel.dk>
- <43b9a943-45f4-4001-a68c-a68a7364f995@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <43b9a943-45f4-4001-a68c-a68a7364f995@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122110722.690223-2-yi.sun@unisoc.com>
 
-On 1/23/24 11:44 AM, Bart Van Assche wrote:
-> On 1/23/24 09:34, Jens Axboe wrote:
->> where we almost tripple the lock contention (~32% -> ~87%) by attempting
->                   ^^^^^^^
->                   triple?
+On Mon, Jan 22, 2024 at 07:07:21PM +0800, Yi Sun wrote:
+> In some cases, it is necessary to wait for all requests to become complete
+> status before performing other operations. Otherwise, these requests will never
+> be processed successfully.
 > 
->> +    /*
->> +     * bio merging is called for every bio queued, and it's very easy
->> +     * to run into contention because of that. If we fail getting
->> +     * the dd lock, just skip this merge attempt. For related IO, the
->                ^^
->               bfqd?
->> +     * plug will be the successful merging point. If we get here, we
->> +     * already failed doing the obvious merge. Chances of actually
->> +     * getting a merge off this path is a lot slimmer, so skipping an
->> +     * occassional lookup that will most likely not succeed anyway should
->> +     * not be a problem.
->> +     */
+> For example, when the virtio device is in hibernation, the virtqueues
+> will be deleted. It must be ensured that virtqueue is not in use before being deleted.
+> Otherwise the requests in the virtqueue will be lost. This function can ensure
+> that all requests have been taken out of the virtqueues.
 > 
-> Otherwise this patch looks good to me.
+> Prepare for fixing this kind of issue by introducing
+> blk_mq_tagset_wait_request_completed().
 
-Thanks, will update both.
+Does blk_mq_freeze_queue() not work for your use case? I think that
+should work unless you have some driver specific requests entered that
+don't ever get released.
+ 
+> +static bool blk_mq_tagset_count_inflight_rqs(struct request *rq, void *data)
+> +{
+> +	unsigned int *count = data;
+> +
+> +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
+> +		(*count)++;
+> +	return true;
+> +}
+> +
+> +/**
+> + * blk_mq_tagset_wait_request_completed - Wait for all inflight requests
+> + * to become completed.
+> + *
+> + * Note: This function has to be run after all IO queues are shutdown.
+> + */
+> +void blk_mq_tagset_wait_request_completed(struct blk_mq_tag_set *tagset)
+> +{
+> +	while (true) {
+> +		unsigned int count = 0;
+> +
+> +		blk_mq_tagset_busy_iter(tagset,
+> +				blk_mq_tagset_count_inflight_rqs, &count);
 
--- 
-Jens Axboe
+If the tagset is shared, then one active user can prevent this from ever
+completing. It sounds like your use case cares about just one specific
+request_queue, not all of them.
 
+> +		if (!count)
+> +			break;
+> +		msleep(20);
+> +	}
+> +}
+> +EXPORT_SYMBOL(blk_mq_tagset_wait_request_completed);
