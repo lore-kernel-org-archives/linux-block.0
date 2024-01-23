@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EC87E6;
-	Tue, 23 Jan 2024 04:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7D07E6;
+	Tue, 23 Jan 2024 04:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705984758; cv=none; b=q2SOz77P+kNs7qeDApUwNhGtSS7DTyLvjQkgvhuHoKlPoQvLXuuJzXU9MD1KBdv/pFaqRr3RHIx1uLOYRa+3hqepRFsk1iCONOhaHdVpr/WFsjLm2WFrCKx08kaPOuKq2Ad4Vfa7HEZN5mHt4NTP/9fT2TdX7XkwSIhDkr9mnKM=
+	t=1705984869; cv=none; b=udxcPxlcAJg5UJwhFecpD/8oTaq3z5pgIl9MqglCb3c4WKabRgD0+QHHo4jWIHyZT6Iu+A28O1jsnYmKHKkrbRd1eUhbDTAcuJrh/hVeNm6EOytKqYsbnG/6qGMz3LePDd7SBDN4l015d7gLa8a0TuQX0R2MVDf4gezhYddx+3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705984758; c=relaxed/simple;
-	bh=ENhGdnTXi5oZTFrpBO4asSbiZwsBH4Q1o3HBHTCIVUA=;
+	s=arc-20240116; t=1705984869; c=relaxed/simple;
+	bh=ydiaEKqGk/zYwexK6yzv2Z6sXqMYYQwc2PODQ/3cRT0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JXXUKDgrQFWT6bWJjoq4LCOUxrS/jpVIoYs2KTXvROI8MKDmVrch0os1fhJYi3xIZMIlmNaP9lZKHd4DJwgjocHwsELl8UPcQre5YWKIhrkBGsEVWUTEPdL0igiYMtshrDOHxBrV27oOqko3GCw2irtMJHMZL3g67utIFSVhcTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TeRUfrxC; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=ayjRWz5XIUp521jnqbVg6AgWOeGB1CFyWe1xJZC5P/Rag7mk+UNX0JUX2ASOaAMRiK8M3iCW8YCZzaGqWpGJZhcOijRtmINEFLduwhwLNsYx2o2oTqH0hav/QQGZu+DIAmYY8o59j7qBzcrzgDymbr21WZ3NcMvhwXR0keTW0XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLqrVb+9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TeRUfrxC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF0BDC433C7;
-	Tue, 23 Jan 2024 04:39:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLqrVb+9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E062AC433F1;
+	Tue, 23 Jan 2024 04:41:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705984757;
-	bh=ENhGdnTXi5oZTFrpBO4asSbiZwsBH4Q1o3HBHTCIVUA=;
+	s=k20201202; t=1705984868;
+	bh=ydiaEKqGk/zYwexK6yzv2Z6sXqMYYQwc2PODQ/3cRT0=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TeRUfrxCFyCGOw4oNFTmLA/mdXvJT0bJ1pWXonOksXzRA2uW/dsFBfRH6OgDCZfei
-	 /BvQy8TH4p34274weuYtS/xikv2JDQd72kijKqJdGZIrtfkhTykfzUMnpTTq6pQziv
-	 ByWqicuoZRqvv8XA4b06y0toIEOyMr+kigyJvxQhdbfeCRZqw/33Zl2K+sFHvPmHZy
-	 d7Sj0KC0pXbsRyLaCyNWsqnTiugzD3rwxI1hUmmbayX/CIMoYqTx2m8+oA6LGMAx8C
-	 +H35N6q7cmkiqWQ0PWe66HKaa7UU4pIyEuJI2EUjKwPe2wcs55zPakccJ4SAD9FHrw
-	 L1D6AntGZPqEg==
-Message-ID: <65f1df6b-3a44-4636-898e-0c2f2a637d85@kernel.org>
-Date: Tue, 23 Jan 2024 13:39:14 +0900
+	b=eLqrVb+9U+loA7Exrh1sMeqofdgr3FTefrzp9Ur7YpMWuAY7BVaSth6Awf5CgvIGe
+	 tFu/z70wDR03btfPn6ZM4ATGRaEcUW8PIVMzPw3HLpj5/rfMX4gQZ7HIlbVYtCGYUU
+	 Z75d9VNpDR2WjSYuqulqz78htBcsHA1m34DRJawlAULEYGxNRhzRJRpjkHmRdizAi1
+	 cZY86Z//2ifd/dM26MA/vOyInP68HoJUDL0dxvpmJVQifKtWgD2xKyn65rR0MWRaNR
+	 34QL1I/DUy+xxmCFlAutaX7YQKVE0HUMGuONPobg/ejXxKmQPtftXY50lrDqIRmysg
+	 MF67DWUz9yxdg==
+Message-ID: <96007133-162c-4fff-9343-dd88ca520aa7@kernel.org>
+Date: Tue, 23 Jan 2024 13:41:05 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,8 +35,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/15] block: move max_{open,active}_zones to struct
- queue_limits
+Subject: Re: [PATCH 02/15] block: refactor disk_update_readahead
 Content-Language: en-US
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
@@ -47,23 +46,69 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
  virtualization@lists.linux.dev
 References: <20240122173645.1686078-1-hch@lst.de>
- <20240122173645.1686078-2-hch@lst.de>
+ <20240122173645.1686078-3-hch@lst.de>
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20240122173645.1686078-2-hch@lst.de>
+In-Reply-To: <20240122173645.1686078-3-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 1/23/24 02:36, Christoph Hellwig wrote:
-> The maximum number of open and active zones is a limit on the queue
-> and should be places there so that we can including it in the upcoming
-> queue limits batch update API.
+> Factor out a blk_apply_bdi_limits limits helper that can be used with
+> an explicit queue_limits argument, which will be useful later.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-settings.c | 21 ++++++++++++---------
+>  1 file changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 06ea91e51b8b2e..e872b0e168525e 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -85,6 +85,17 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>  }
+>  EXPORT_SYMBOL(blk_set_stacking_limits);
+>  
+> +static void blk_apply_bdi_limits(struct backing_dev_info *bdi,
+> +		struct queue_limits *lim)
+> +{
+> +	/*
+> +	 * For read-ahead of large files to be effective, we need to read ahead
+> +	 * at least twice the optimal I/O size.
+> +	 */
+> +	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
 
-Looks good.
+Nit: while at it, you could replace that division by PAGE_SIZE with a right
+shift by PAGE_SHIFT.
+
+Other than that, looks good to me.
 
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+> +	bdi->io_pages = lim->max_sectors >> (PAGE_SHIFT - 9);
+> +}
+> +
+>  /**
+>   * blk_queue_bounce_limit - set bounce buffer limit for queue
+>   * @q: the request queue for the device
+> @@ -393,15 +404,7 @@ EXPORT_SYMBOL(blk_queue_alignment_offset);
+>  
+>  void disk_update_readahead(struct gendisk *disk)
+>  {
+> -	struct request_queue *q = disk->queue;
+> -
+> -	/*
+> -	 * For read-ahead of large files to be effective, we need to read ahead
+> -	 * at least twice the optimal I/O size.
+> -	 */
+> -	disk->bdi->ra_pages =
+> -		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
+> -	disk->bdi->io_pages = queue_max_sectors(q) >> (PAGE_SHIFT - 9);
+> +	blk_apply_bdi_limits(disk->bdi, &disk->queue->limits);
+>  }
+>  EXPORT_SYMBOL_GPL(disk_update_readahead);
+>  
 
 -- 
 Damien Le Moal
