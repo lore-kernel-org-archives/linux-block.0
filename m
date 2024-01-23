@@ -1,299 +1,152 @@
 Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08D95DF31;
-	Tue, 23 Jan 2024 09:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.143.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706003051; cv=none; b=Ya6bQqi6QDh7TYKwCj63+p360IqJd/3g/sG5nrGUdEQ0mjX6F9EBSFZoDjg52v6PSWETSrj6jdyE+6Lnklvx/mkub+aey/n7QBdbyMPN30uhJ8vbm6a14Cw5ORSlrdtfda1SGlzpGsfZ0MuRz6emyviXmOBLb0WtNLlz+J8FCCg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706003051; c=relaxed/simple;
-	bh=aOQGuVXVKnWXSkXzQjMJhwwtHyTg4oH1lbCa+QOjXsc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cPGpa3xvPQq1gJ127X/BA5QqJNd7t6fxet8xVS09uERiE30oDz/fQMRteLtf7lyo/CT07/9VwUIRRXf20MjsulmYa5BLvsnHQ47cjTaDD6Lil8Jwa5aaTd9mc8PO0VBgTc6U+GXk04+CayZ9x+iSZPp9QxBNF4W9fr9MyEDEpwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=fZduKiyX; arc=none smtp.client-ip=68.232.143.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0E65D727
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 10:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706006726; cv=fail; b=AJCqOASv983bPjZTOTosS4Jyyj9OvTSCpzHZpR+BTagGMEG0Nl/1aJpzTUFjxlhBZqfBZ/LCuUg2i8jbebSvpOfGuqr+LxQHxJ0MKSHPu8s+d+lgUtBeA57/Or51xTCLLOfHjfSMFY037vlPB6+CIT61HiB86tlXyvvA/IXBClw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706006726; c=relaxed/simple;
+	bh=k/WtmNbk10QWLIzlk56Iv/14JR9CXxqeNX/GX41nFps=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rZnlgNZpb9StCGkijx/HIZB7cZxjAIDEr6tHQBorhiPBhair1cKdTCvJ9BPZ8XpcU4ujodpB7TZ90m0zewZiVnZDLsuTdJOSSYYEMPf5nbXOlzRaScUDEDWYmvR5ndwW9iXKq+ASJO7aHqebGqqMFFCc+0SQC8DiTie1K1c+sDk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=mAzLrhS4; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=CbDlDDWy; arc=fail smtp.client-ip=68.232.143.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fZduKiyX"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mAzLrhS4";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="CbDlDDWy"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1706003049; x=1737539049;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=aOQGuVXVKnWXSkXzQjMJhwwtHyTg4oH1lbCa+QOjXsc=;
-  b=fZduKiyXLa83wAXnenDiGunxbMGrBSUFOUjCcfTu8eR1VEZHAXgak8hy
-   voOVoiZSOxWz0HMGQT9klrBTq25OR9Hu3hlN3QYw/7qgYvxuw7HDk+/1i
-   9AK71qsUP/NPLB/cEtGJ3TuK0BoSw58jhXsSYSCTA5Zx4x3BmuI9fqz1g
-   X+NfS3h2+PIaru4/UQLZaTe1QA6yvkh9s/kZF/H7UXF2AY/RG2+Hs3BFR
-   7djXBCetxCYnrfQ3WXgEzd7gU6cotGBxG0q5LSDCB+DzDdp5zOLw5JY92
-   FPQuN+N9U61iVAEB9qeLo8HtEdDBLv8Kt4PGETaCriXIlTL2z87UE7TXE
-   w==;
-X-CSE-ConnectionGUID: lONOpAhdRhqtZ75GFWVmCA==
-X-CSE-MsgGUID: EBWonMbyQ5OHzaVNYTHoeg==
+  t=1706006724; x=1737542724;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version;
+  bh=k/WtmNbk10QWLIzlk56Iv/14JR9CXxqeNX/GX41nFps=;
+  b=mAzLrhS4Yc2ZLNii1/vSPeJ2zRcEukYgTB+CvIbwR9VnR5EuhvAEn87+
+   B2qaXIpj5UWgurw/czKnCVE0QiB2VNjWsi2zRqp5OowiFOo6ztcBZF2Df
+   yhmf3KwHvRtAzicpfhgUNoh2JQftkR+t+yb7HlSFOjEZ7CAP3dAxT3VXm
+   lsO/WPNdDyVCWW2qCkukukCbpGi8iNEefc7DVHR0002MZNlJsgG/yEd0t
+   sRe8Tv3IZhN0JNuPbpG7Zm3TOZby4df+UBN6tdKG80eDZG2JutbQvMels
+   5hkH7PcB4g2oIM/VcQ9WZcm/0HpnRo398L5k8OAp5TqjjUNit+514CdTV
+   Q==;
+X-CSE-ConnectionGUID: ijvIUkOUQOiX4wgZv+h4yA==
+X-CSE-MsgGUID: bmOJSTTMSRqEnhFYDeoZrQ==
 X-IronPort-AV: E=Sophos;i="6.05,214,1701100800"; 
-   d="scan'208";a="7514674"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Jan 2024 17:44:09 +0800
-IronPort-SDR: qQzQ1TIyLbA96EGKteAh9ZW4eN1v9ZvN9J4i6Krj9ePaQMgOyEAm54Li43i3Cx8HhWNm8g+uQs
- 0qoIZEnBghPg==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jan 2024 00:54:12 -0800
-IronPort-SDR: GxErUU2Z3wBmibU/ymnLULMg2kdoT+BykBlVME6B2sftvvOCc86RtlFFRM9mrvTOS3KUyNKwrD
- MTBjZoriu3MQ==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.6])
-  by uls-op-cesaip02.wdc.com with ESMTP; 23 Jan 2024 01:44:05 -0800
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Date: Tue, 23 Jan 2024 01:43:46 -0800
-Subject: [PATCH 5/5] block: remove gfp_flags from blkdev_zone_mgmt
+   d="scan'208";a="7517876"
+Received: from mail-eastusazlp17013024.outbound.protection.outlook.com (HELO BL0PR05CU006.outbound.protection.outlook.com) ([40.93.11.24])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Jan 2024 18:45:22 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k33NSiD7m5w7Fq1pE6XKzlzLP/QaUuBsK/7bSg6bjjCJdHoIw514rmCmXrEejCZAanRG012UoUKScOw5LhKIl4DxbGSAxli3MS8rqe+HfFNCp9fPxDSOYKQD3QphWBUl+A3WI701K6piTOMtGtCLUz3orkvUb/lyfdEoj8UNC/r8JTxzOPBVzWChlkdFvdLGISFM8rUwKw/5QIRrde3KASqvAGwWM/Y4L6ZWM92MlxCVhJo1j5dCXqRNAfuQzG9pt+5Flv43rmtEWjNfx9AyeK+jpfV7tbYKL4nuNsidlOXhrvOZk/XcPJWBDbDMPo0EzBpgE7f6KLFQMFDB5ie/dA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k/WtmNbk10QWLIzlk56Iv/14JR9CXxqeNX/GX41nFps=;
+ b=k2wD3wyT6Jg4xXVerE0oJd1aXS0iROXSaeXUYUu5H+v69w67RJ/rHEKe9FFTTK7Qf+zCVxSVF02A2v3IcEZyBhN5R81oUXQ7br+044QgxedTPY8wTa6W/y0n+Owh33kuWcXfTk64Y//Hr862oc7galG1gpjx9lt1f99h3/c6RBKijwJCd6T0mWFdh7z+jZQ7L6QuKvqsmyCHjx9hl1SYizYL04r0PAYk0W9KAYn8iVQ6KRpPfgab4T1utOLGUAXa/pdQ3L5Srs3jLEyC2V/Jy5REospQg57TYy1GqbgNvHYkR+Hg+frLhL5CVvedt0LvsHnXwWXd/jdUR32baP03Yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k/WtmNbk10QWLIzlk56Iv/14JR9CXxqeNX/GX41nFps=;
+ b=CbDlDDWy+CZIcULUpGDAlm6/Rw1f7kN6K0aAlabsPjgcv0mJAM17cYz3WUTnJcFYt3TCoAFZrHApRoXvufdO6b7Q59WfOEZ1Ij8QF/q5VtqS8KGrYJBEBah8aEOeTdVK71fMjNpUdf+1hbuBWkA2BJlgFSt/piQudb2jCP0zDCo=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SN7PR04MB8461.namprd04.prod.outlook.com (2603:10b6:806:323::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.33; Tue, 23 Jan
+ 2024 10:45:21 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::25d0:1445:7392:e814]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::25d0:1445:7392:e814%6]) with mapi id 15.20.7202.035; Tue, 23 Jan 2024
+ 10:45:20 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests v3 0/2] block/031: allow to run with built-in
+ null_blk driver
+Thread-Topic: [PATCH blktests v3 0/2] block/031: allow to run with built-in
+ null_blk driver
+Thread-Index: AQHaRGyq9Q76T/xt3USeBN39WlbOqLDnSaqA
+Date: Tue, 23 Jan 2024 10:45:20 +0000
+Message-ID: <5sm4e7lozq5suw3ndi7uwtdkb2aqxyatr5cve7e3ltjjgpfqyy@l4va7fgk42lm>
+References: <20240111090038.4045250-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20240111090038.4045250-1-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SN7PR04MB8461:EE_
+x-ms-office365-filtering-correlation-id: bb1efbad-bfed-435e-ef2c-08dc1c006511
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ PJJOFelRRn5Cpy5IDxPbP8VsSUBpeZy+h+vFDOU0mUECq/7RU2DKWWpqwYn+4vfsd8hWmhq/N/wz+ehPgw4eGd+7fzVhzNKwciZYDglB3cDLCf14+6vkuTLV7Z78rjNewLSVIzVsxTX9jATSYC6iPZfCh7FbV2YlIzWheEkdFv0JvFZvhWQFKYZY/JDSfksc4Nuus3urCGVbM2lzvoHX/7S7X/jF8QYB/T9MpE0OnhrfAwQDBqetsXAc6PAYk/YxCaMyPoRYmARVrmhMG8lhtca9HyuXuaTdecTbDIW6wVNxWcEZLTyGm67xJViqacPkYsvhnT9u1HsiV+M/GGVbZDNtBvkvlZVP71IQWpzP7OEdMsFKiQ6xDhRTG38v9y6MpwaiwVGKT5eYiSq/lqHfoHXDHFkf6NiOIr2WR7yhxcTiwJDc9BJlqET1BKTzGycUu43xEIBHEGCAIIsU1YKI0/8BIRfeu+V5IkzZX+Ql7dA5dAHektFIhZXaPuUwVr9o1KI8NfAhJaY/Q5C8k0DJTmXXBJccnAjyUbugiqji49e0OD2OpdB4YxZFK4ZFrJm5y6YEGBw5Kwc8/4qbV8tQdcZJUGFcYsJLxH8WjLfC1AQZnkOQDA/gf89fP5wK7WX6
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(39860400002)(376002)(346002)(136003)(396003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(316002)(83380400001)(5660300002)(26005)(82960400001)(33716001)(66946007)(41300700001)(66476007)(66556008)(38100700002)(122000001)(76116006)(71200400001)(66446008)(64756008)(91956017)(44832011)(8936002)(2906002)(8676002)(6512007)(9686003)(6916009)(6506007)(6486002)(478600001)(558084003)(86362001)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?xevMOsS5bWcybD9EM+U567evq0cafyBBTE9erk3xhEjmpoTmE4FfEld7iBfX?=
+ =?us-ascii?Q?x4hOhNbZYvi9uID7D0h48cYWSUnkrDOLhYxCVSqLrf7SFOyHu9ln6LAamoiu?=
+ =?us-ascii?Q?vPZAYMdSW6Eae1zljojD88KMtgn47/LWKMn5BWhqPh5AG9BS2GtB7mqJwevX?=
+ =?us-ascii?Q?kVbmxs8NijmYjcCBk38WZOH6L6LVtkov1CSqt+udTwQWWeNfL36Fm0Gq0egT?=
+ =?us-ascii?Q?Ve4BZos+bSffZ1P87dflaKdMX5jCfAuRKJSrYYc6pyOY/IVUXDypVkhF2RXl?=
+ =?us-ascii?Q?YU4rNgfIKvmAY4S0DydT0uBj5GrRmDvCDNdyAikdtuAbwmZHVJA3+3R3sCc9?=
+ =?us-ascii?Q?W1Nmhcbt9OJ2/J0Bh1dATnn0DD1KI+F5VSl3bhgVS0sxmi7gjSHrMyOtE+a4?=
+ =?us-ascii?Q?j71UpdmPTWBFG4Rgf+3nfU7G7UWnaCJQueEO8ozhUtbS8fZ+zGDQ2kPDTQ7g?=
+ =?us-ascii?Q?b5JlPONN2cK1GUlAjrxhaFJSc5dBLOyzPW9+WoCfTaHtmr9WU51qzaf/qZ0D?=
+ =?us-ascii?Q?FTmQG/+X/FStj1snOLIT0UnH6i9IvAP7ansNyiJJzWOuhhsttUuBoDKDDUeN?=
+ =?us-ascii?Q?RExk/LrbNyj5wfq72HVOPB79EeWIHm22XboyivESfQRh6FYpiGbi+pfmgZXc?=
+ =?us-ascii?Q?rPvfhXu6w2ki68Hhl4XD0e7JZVXj5d88ld+jWozFU8F4QjsaJ+ZpvaF1baoA?=
+ =?us-ascii?Q?OZqypGZg4bysP/8JxSmOTaw3/09cLER8NDwGZRfdcJggkHAUc6MLQR4Xxs6y?=
+ =?us-ascii?Q?TmzCH++NUPzaqKtDAYdb4RH3+yYsUEYuvFeVwvhEcblHTUcihZxUBI9+wrks?=
+ =?us-ascii?Q?9lLC4OXtajYMMghrMHKNqpCL5VRSqgyL+j7pYccgP3TRJID3wgD99cjAMA2K?=
+ =?us-ascii?Q?SprRVW3E77h/QR711lWy/CRxp5AUyKE5lgMKyKwmvanZGJQ0lFMIBBaRHywx?=
+ =?us-ascii?Q?T71Ju8up1EgjQi37KSEyfPfmPOWGntSc9G7V76zHSRsR4IwmbJx4PMpJSi5h?=
+ =?us-ascii?Q?kIoWV2+KlQZDA+5xBm5TWdmI9cO/Z4ArnItNUS1ZOgyAbxJ6pGfqvmiBk4hi?=
+ =?us-ascii?Q?ReJQAyUVpyFamrTx1N2Cp0qbmU6NW9BKbWLXEn+0yVqeT1Me7xOB34jKvb99?=
+ =?us-ascii?Q?uVy/J1pfnAjHGCVvepasyuK9Tv0aFrBkUvAj+/qRvNrRxtii1SYh9Sj0GZJM?=
+ =?us-ascii?Q?lGd8Z/7kCHpYw4WupWxoIX+Yzw2a40AJD/PViGkzFv9ALdKQ0JV/AYt4eMZ1?=
+ =?us-ascii?Q?klW7pB5mL77etUvuKFWLXsEb4ZbUA2xSVdzHTnPimAAPX7HpqHKS5aul/doC?=
+ =?us-ascii?Q?8YfJdMlCLplOFdIwjlsY31loZ2QxKLQFNmbFRjkOlnl0wGfhLSuKL5AXgbrY?=
+ =?us-ascii?Q?3sqx/z292HPP1UymjUvOU7/NVN8qerqfcybHro1bLnkJZ6liEwBFddsrAi2E?=
+ =?us-ascii?Q?IbgVoMbdf9JG5nC7+2xuJlG8txTHHd0vOihjTxm7bBiOmfwwrri9El9qMHIm?=
+ =?us-ascii?Q?fWAf8XlsPs8/MNvj9U+A4wjCXaSrdhMrR+5IHqksjePrwyrWUpiLRnYZuIU8?=
+ =?us-ascii?Q?OVXFEw6RWye1oOBT4OWt7ZLOPWxdqUw86jpH42hAskh1Qirp+ib4hAWiB9JH?=
+ =?us-ascii?Q?smRCuEjHuKNoxI5SiQMfh8Q=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <343FE19A380C5A40A2A80AA0046A8B60@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240123-zonefs_nofs-v1-5-cc0b0308ef25@wdc.com>
-References: <20240123-zonefs_nofs-v1-0-cc0b0308ef25@wdc.com>
-In-Reply-To: <20240123-zonefs_nofs-v1-0-cc0b0308ef25@wdc.com>
-To: Damien Le Moal <dlemoal@kernel.org>, 
- Naohiro Aota <naohiro.aota@wdc.com>, Mike Snitzer <snitzer@kernel.org>, 
- dm-devel@lists.linux.dev, Chris Mason <clm@fb.com>, 
- Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, 
- Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-btrfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- Johannes Thumshirn <johannes.thumshirn@wdc.com>, 
- "Matthew Wilcox (Oracle)" <willy@infradead.org>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706003027; l=8572;
- i=johannes.thumshirn@wdc.com; s=20230613; h=from:subject:message-id;
- bh=aOQGuVXVKnWXSkXzQjMJhwwtHyTg4oH1lbCa+QOjXsc=;
- b=Zv2P0hHGSf6rJYLtrJRV0J0ObyD9jw1/Pl477Ae1/4W0hj0Dd9O4uq+U9sZMuC1nW19PKQA6/
- dtHVkawovRjBi5jCyk9GZWc4UUplEmYHtxWWtobNtQI0xLL0B7+rV3B
-X-Developer-Key: i=johannes.thumshirn@wdc.com; a=ed25519;
- pk=TGmHKs78FdPi+QhrViEvjKIGwReUGCfa+3LEnGoR2KM=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	NGOCNUoMke4Zc8sXLwlHwYgLNRkBh4a/Hfkt6IUHVRnOvNr8kkKrjw0/VGQMqf1D2mXVb5yuYdtThp3YPabpEBAqOqJgsPCCi0aqD7uOj7uO4BEcO2Y1ByjCI0T+LsfCZ4+Njt3/zdji4/7260luyURs3+7vgXVOO8PWj6ERFBZhVm9ZxtQ+okTVnj7dDw/9AVFBMyVIAqgeiT4eoOqzBKWbxhKV7X8v4wiWw8YQ6pkuReCmFUI1kgzZ5eTw/Wag8jUTu4Dm51gWSe++X6KDEL3ikX+vk478bWhWiw754gev57v7BlfxkQNx0NXnyuzVOSrjUWAOXFw7p1Rli+ZNy2NFxAO6LR3qMDbAB/7SHurUFnJ7ljPSWOZOAKCFXbxjQatLLJXaWnxT6TORrQRDOk26UZD0bBjGXZkqVxD09Fs1Lb5gJSLrzJh/0alBfaTgYjsb9WoCPjW48PM7PGpLGjRnTTWlGf3/OXpByzNjek/1yp4szZqqLjj+8/8XtbdblXW0sUsDBmAFptziyIbVTc/3zbXCVVQgq1sdXxo3TdIB2p+mRpwzU3yD6R7VQ3TcjilX82QKaW341vDk2XkynUmhSCmD1ZFph0JC1X3f6ddrzcvWZGRgiwERcAunHOsN
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb1efbad-bfed-435e-ef2c-08dc1c006511
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2024 10:45:20.0726
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7EgW0cSDyLVZLQWB/P5yey/IZ+HZWaJmi4g82g/fLv8UGWn1OeDo9qNEcjB4icI36IqoLqW4dXZ4zHIMaV0XjSxpz9bi25L8R29zvWgeCW8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR04MB8461
 
-Now that all callers pass in GFP_KERNEL to blkdev_zone_mgmt() and use
-memalloc_no{io,fs}_{save,restore}() to define the allocation scope, we can
-drop the gfp_mask parameter from blkdev_zone_mgmt() as well as
-blkdev_zone_reset_all() and blkdev_zone_reset_all_emulated().
+On Jan 11, 2024 / 18:00, Shin'ichiro Kawasaki wrote:
+> The test case block/031 now requires the loadable null_blk driver. This s=
+eries
+> allows it to run with the built-in null_blk driver. The first patch prepa=
+res for
+> it. The second patch makes the change.
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- block/blk-zoned.c         | 19 ++++++++-----------
- drivers/nvme/target/zns.c |  5 ++---
- fs/btrfs/zoned.c          | 14 +++++---------
- fs/f2fs/segment.c         |  4 ++--
- fs/zonefs/super.c         |  2 +-
- include/linux/blkdev.h    |  2 +-
- 6 files changed, 19 insertions(+), 27 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index d343e5756a9c..d4f4f8325eff 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -177,8 +177,7 @@ static int blk_zone_need_reset_cb(struct blk_zone *zone, unsigned int idx,
- 	}
- }
- 
--static int blkdev_zone_reset_all_emulated(struct block_device *bdev,
--					  gfp_t gfp_mask)
-+static int blkdev_zone_reset_all_emulated(struct block_device *bdev)
- {
- 	struct gendisk *disk = bdev->bd_disk;
- 	sector_t capacity = bdev_nr_sectors(bdev);
-@@ -205,7 +204,7 @@ static int blkdev_zone_reset_all_emulated(struct block_device *bdev,
- 		}
- 
- 		bio = blk_next_bio(bio, bdev, 0, REQ_OP_ZONE_RESET | REQ_SYNC,
--				   gfp_mask);
-+				   GFP_KERNEL);
- 		bio->bi_iter.bi_sector = sector;
- 		sector += zone_sectors;
- 
-@@ -223,7 +222,7 @@ static int blkdev_zone_reset_all_emulated(struct block_device *bdev,
- 	return ret;
- }
- 
--static int blkdev_zone_reset_all(struct block_device *bdev, gfp_t gfp_mask)
-+static int blkdev_zone_reset_all(struct block_device *bdev)
- {
- 	struct bio bio;
- 
-@@ -238,7 +237,6 @@ static int blkdev_zone_reset_all(struct block_device *bdev, gfp_t gfp_mask)
-  * @sector:	Start sector of the first zone to operate on
-  * @nr_sectors:	Number of sectors, should be at least the length of one zone and
-  *		must be zone size aligned.
-- * @gfp_mask:	Memory allocation flags (for bio_alloc)
-  *
-  * Description:
-  *    Perform the specified operation on the range of zones specified by
-@@ -248,7 +246,7 @@ static int blkdev_zone_reset_all(struct block_device *bdev, gfp_t gfp_mask)
-  *    or finish request.
-  */
- int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
--		     sector_t sector, sector_t nr_sectors, gfp_t gfp_mask)
-+		     sector_t sector, sector_t nr_sectors)
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	sector_t zone_sectors = bdev_zone_sectors(bdev);
-@@ -285,12 +283,12 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
- 	 */
- 	if (op == REQ_OP_ZONE_RESET && sector == 0 && nr_sectors == capacity) {
- 		if (!blk_queue_zone_resetall(q))
--			return blkdev_zone_reset_all_emulated(bdev, gfp_mask);
--		return blkdev_zone_reset_all(bdev, gfp_mask);
-+			return blkdev_zone_reset_all_emulated(bdev);
-+		return blkdev_zone_reset_all(bdev);
- 	}
- 
- 	while (sector < end_sector) {
--		bio = blk_next_bio(bio, bdev, 0, op | REQ_SYNC, gfp_mask);
-+		bio = blk_next_bio(bio, bdev, 0, op | REQ_SYNC, GFP_KERNEL);
- 		bio->bi_iter.bi_sector = sector;
- 		sector += zone_sectors;
- 
-@@ -419,8 +417,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		return -ENOTTY;
- 	}
- 
--	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors,
--			       GFP_KERNEL);
-+	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
- 
- fail:
- 	if (cmd == BLKRESETZONE)
-diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-index 5b5c1e481722..3148d9f1bde6 100644
---- a/drivers/nvme/target/zns.c
-+++ b/drivers/nvme/target/zns.c
-@@ -456,8 +456,7 @@ static u16 nvmet_bdev_execute_zmgmt_send_all(struct nvmet_req *req)
- 	switch (zsa_req_op(req->cmd->zms.zsa)) {
- 	case REQ_OP_ZONE_RESET:
- 		ret = blkdev_zone_mgmt(req->ns->bdev, REQ_OP_ZONE_RESET, 0,
--				       get_capacity(req->ns->bdev->bd_disk),
--				       GFP_KERNEL);
-+				       get_capacity(req->ns->bdev->bd_disk));
- 		if (ret < 0)
- 			return blkdev_zone_mgmt_errno_to_nvme_status(ret);
- 		break;
-@@ -508,7 +507,7 @@ static void nvmet_bdev_zmgmt_send_work(struct work_struct *w)
- 		goto out;
- 	}
- 
--	ret = blkdev_zone_mgmt(bdev, op, sect, zone_sectors, GFP_KERNEL);
-+	ret = blkdev_zone_mgmt(bdev, op, sect, zone_sectors);
- 	if (ret < 0)
- 		status = blkdev_zone_mgmt_errno_to_nvme_status(ret);
- 
-diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
-index 05640d61e435..cf2e779d8ef4 100644
---- a/fs/btrfs/zoned.c
-+++ b/fs/btrfs/zoned.c
-@@ -830,8 +830,7 @@ static int sb_log_location(struct block_device *bdev, struct blk_zone *zones,
- 
- 			nofs_flags = memalloc_nofs_save();
- 			ret = blkdev_zone_mgmt(bdev, REQ_OP_ZONE_RESET,
--					       reset->start, reset->len,
--					       GFP_KERNEL);
-+					       reset->start, reset->len);
- 			memalloc_nofs_restore(nofs_flags);
- 			if (ret)
- 				return ret;
-@@ -984,7 +983,7 @@ int btrfs_advance_sb_log(struct btrfs_device *device, int mirror)
- 				nofs_flags = memalloc_nofs_save();
- 				ret = blkdev_zone_mgmt(device->bdev,
- 						REQ_OP_ZONE_FINISH, zone->start,
--						zone->len, GFP_KERNEL);
-+						zone->len);
- 				memalloc_nofs_restore(nofs_flags);
- 				if (ret)
- 					return ret;
-@@ -1023,8 +1022,7 @@ int btrfs_reset_sb_log_zones(struct block_device *bdev, int mirror)
- 	nofs_flags = memalloc_nofs_save();
- 	ret = blkdev_zone_mgmt(bdev, REQ_OP_ZONE_RESET,
- 			       zone_start_sector(sb_zone, bdev),
--			       zone_sectors * BTRFS_NR_SB_LOG_ZONES,
--			       GFP_KERNEL);
-+			       zone_sectors * BTRFS_NR_SB_LOG_ZONES);
- 	memalloc_nofs_restore(nofs_flags);
- 	return ret;
- }
-@@ -1143,8 +1141,7 @@ int btrfs_reset_device_zone(struct btrfs_device *device, u64 physical,
- 	*bytes = 0;
- 	nofs_flags = memalloc_nofs_save();
- 	ret = blkdev_zone_mgmt(device->bdev, REQ_OP_ZONE_RESET,
--			       physical >> SECTOR_SHIFT, length >> SECTOR_SHIFT,
--			       GFP_KERNEL);
-+			       physical >> SECTOR_SHIFT, length >> SECTOR_SHIFT);
- 	memalloc_nofs_restore(nofs_flags);
- 	if (ret)
- 		return ret;
-@@ -2258,8 +2255,7 @@ static int do_zone_finish(struct btrfs_block_group *block_group, bool fully_writ
- 		nofs_flags = memalloc_nofs_save();
- 		ret = blkdev_zone_mgmt(device->bdev, REQ_OP_ZONE_FINISH,
- 				       physical >> SECTOR_SHIFT,
--				       zinfo->zone_size >> SECTOR_SHIFT,
--				       GFP_KERNEL);
-+				       zinfo->zone_size >> SECTOR_SHIFT);
- 		memalloc_nofs_restore(nofs_flags);
- 
- 		if (ret)
-diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
-index 0094fe491364..e1065ba70207 100644
---- a/fs/f2fs/segment.c
-+++ b/fs/f2fs/segment.c
-@@ -1977,7 +1977,7 @@ static int __f2fs_issue_discard_zone(struct f2fs_sb_info *sbi,
- 			trace_f2fs_issue_reset_zone(bdev, blkstart);
- 			nofs_flags = memalloc_nofs_save();
- 			ret = blkdev_zone_mgmt(bdev, REQ_OP_ZONE_RESET,
--						sector, nr_sects, GFP_KERNEL);
-+						sector, nr_sects);
- 			memalloc_nofs_restore(nofs_flags);
- 			return ret;
- 		}
-@@ -4921,7 +4921,7 @@ static int check_zone_write_pointer(struct f2fs_sb_info *sbi,
- 
- 	nofs_flags = memalloc_nofs_save();
- 	ret = blkdev_zone_mgmt(fdev->bdev, REQ_OP_ZONE_FINISH,
--				zone->start, zone->len, GFP_KERNEL);
-+				zone->start, zone->len);
- 	memalloc_nofs_restore(nofs_flags);
- 	if (ret == -EOPNOTSUPP) {
- 		ret = blkdev_issue_zeroout(fdev->bdev, zone->wp,
-diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
-index 63fbac018c04..cadb1364f951 100644
---- a/fs/zonefs/super.c
-+++ b/fs/zonefs/super.c
-@@ -113,7 +113,7 @@ static int zonefs_zone_mgmt(struct super_block *sb,
- 
- 	trace_zonefs_zone_mgmt(sb, z, op);
- 	ret = blkdev_zone_mgmt(sb->s_bdev, op, z->z_sector,
--			       z->z_size >> SECTOR_SHIFT, GFP_KERNEL);
-+			       z->z_size >> SECTOR_SHIFT);
- 	if (ret) {
- 		zonefs_err(sb,
- 			   "Zone management operation %s at %llu failed %d\n",
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 99e4f5e72213..8467c1910404 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -325,7 +325,7 @@ void disk_set_zoned(struct gendisk *disk);
- int blkdev_report_zones(struct block_device *bdev, sector_t sector,
- 		unsigned int nr_zones, report_zones_cb cb, void *data);
- int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
--		sector_t sectors, sector_t nr_sectors, gfp_t gfp_mask);
-+		sector_t sectors, sector_t nr_sectors);
- int blk_revalidate_disk_zones(struct gendisk *disk,
- 		void (*update_driver_data)(struct gendisk *disk));
- 
-
--- 
-2.43.0
-
+FYI, the patches have got applied.=
