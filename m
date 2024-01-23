@@ -1,207 +1,137 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2062.outbound.protection.outlook.com [40.107.237.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BCC6AAB
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 22:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706050577; cv=fail; b=nIKHaETTkBJcDIjOuEgnt22pL5jTM8ngg18SGUG9AnrfazHSXKrwrKntx4piAnwt/Ll7AsBVQkcyU387cB6M2X2cfJjxJ/WxJHJjEfYmrZU/+U+DWj67mZzsfwu5CIkak0FvB0ST4lCbMUV7ZAmpuCCSs4iJl2iw2WcSK3Cbwn4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706050577; c=relaxed/simple;
-	bh=T7eP1jwsbC3QXYtYdlDHFTXZQUR+VUUHNCEmRzVdD7k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Z0swH2/HKu1fFPh8bGpOnMo9WXlj0/LAbRwP+6h1wvRzEf7AnmXUyUGwRozd0IpysO1B04TGM6UwjAWyCAhLnZM2iNYXdBGEKGQ8Rf8uWX4AWO5sJQm+t4AM+jyCB4OSBRHoLqN5CRhP+IH7z8MvIBez5DsvZ0ZAoR+xL8e4WQc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QT7dYXej; arc=fail smtp.client-ip=40.107.237.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F7B53E2B
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 23:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706052114; cv=none; b=TtGt3ZfKtkDJB/c35rA0bpye4AEpH41Vsn/QdjsE/iQ+LaO+BfK/iXOFoXMND35IJHflxgR595BI8rvq+Mjj7v/02HTKWnX4kS6JuzyCmg68dcc77JMfZfUJajUqcceJBV0D0r3yFCu4faaYFFJaINbrEYWTRXZq8wES1YfBnws=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706052114; c=relaxed/simple;
+	bh=ZR7sfWUwnT5BjG/tPD79vE4fth31migQSpuAcSwowUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jro/2p56s8zU5NgBa16rqVYuge4jfCPREuVliV9Gcdmel8Pi6TfUHKoG3wYDNoGFVhn+ck0KVf+V/tzlOUrrCdrPNJFYCHyyx7uRDUs6t+qn9hEQz5o5U+NIbDHwS9429SRe6iSZDtTk1YCSzQjzmwh4Wc4Zmf0V6g+TxdFlqbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=RvX4HvfC; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QT7dYXej"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YwZHocADYrdu5K+HP3h7ZWgu9iV4XlhDAdoOpWVMWRrwuwUFDDtOuYQ5t9TR8BmUcC9mU3c++tHrHVyfkA0yK4EREDr0IUomBJQwhtOopGF/edLmvOnAVOll7NXXtVZvC5KgxaL1R/SbkcdhsEsmRl3N2zW0NRMCgPqAo/cGx6wovAmgNwCfM6OjEOHQn3gg+SDCecmpoJxNO+pGzOOrVv5JqcXms19Cqdz2CyckComA4RLAOdx5P/5qeCH1bvsK182byqw+8wYfjYAN080Xt7cHOV8BtA4o6gmwO3sRzAfeT6WZRwLbyKyEQcTDkfExER9hy9gMhmgSSoZz87BEUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IBRpUTjrcPjLi12V2/abHhsCuQQrukxPEn0+So5Z6R0=;
- b=lsbHE+dUQRU+XYK0106CZSme1amb6KVkmM3rCEDV5nVH+GFQ/wHP+BmEVpp9Xls1G68gm7xTaOxTlcbybphAz3MfeHYAYbSDGyXpLBk2OrNLdH4pCw8B+j+NoAT8HO6bov0+/ae9L76UyNG0ahKbnRFs/vCP9m1J6q/reu22qZ+uVrG3PxQP+XLJe+1g/Txtruc3HCoFD923ULtGgXEN6qku7H60j2wfaf1Sv7bNKgO4KgdVSByrSjMI8SPstMQ/SCuy+HZDaZ+Wi4It3tD/9RW/leByJ3q4K9PMq4XmsojuMRUSaYYUyR/ZqXJc0/DgUaUsEKY4R1mvpCDCNNZjQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.infradead.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IBRpUTjrcPjLi12V2/abHhsCuQQrukxPEn0+So5Z6R0=;
- b=QT7dYXejullbaRwGSqVC85ZMq6PshDs6Ne1g2+cEsBgzkGQzBqIPZGRsHspjUQ5pX3o1CMA+jHjccb0xe5tHQYLK0cSPVoKfxZfOJZIzeR9J3/W3hyAFGN2TjLnJqFMcdzO6SjjwRe09sCIDFRzSLoEKMTH6GTKKLW+6qycmafyRB6hiUseEn3hQkF7iDkqn9aeHD3VepXDU/gcQ9k1jz8jWd6Q+eTKOMZ3o7vbPBmEHRT9X+5Jms4RI+RpX+0K8jO/XL9kMzhrihpce0gLWuoC97HE8J2XQ9FZXXadQ1jZbe5U/KfTzWsHcOp+ZK3ZgsbsbtW3R9K+PQ6GB/APtMA==
-Received: from BL1PR13CA0442.namprd13.prod.outlook.com (2603:10b6:208:2c3::27)
- by LV8PR12MB9334.namprd12.prod.outlook.com (2603:10b6:408:20b::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Tue, 23 Jan
- 2024 22:56:12 +0000
-Received: from MN1PEPF0000ECD8.namprd02.prod.outlook.com
- (2603:10b6:208:2c3:cafe::e) by BL1PR13CA0442.outlook.office365.com
- (2603:10b6:208:2c3::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.21 via Frontend
- Transport; Tue, 23 Jan 2024 22:56:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MN1PEPF0000ECD8.mail.protection.outlook.com (10.167.242.137) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.16 via Frontend Transport; Tue, 23 Jan 2024 22:56:12 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 23 Jan
- 2024 14:55:54 -0800
-Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 23 Jan
- 2024 14:55:54 -0800
-From: Chaitanya Kulkarni <kch@nvidia.com>
-To: <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>
-CC: <shinichiro.kawasaki@wdc.com>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH blktests V3] nvme: add nvme pci timeout testcase
-Date: Tue, 23 Jan 2024 14:55:47 -0800
-Message-ID: <20240123225547.10221-1-kch@nvidia.com>
-X-Mailer: git-send-email 2.40.0
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="RvX4HvfC"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6db9e52bbccso3039139b3a.3
+        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 15:21:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1706052111; x=1706656911; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pyNE0YBQ61XvxQg0qzcUw/mj3pyKM5V+H7U9PFr3Dnc=;
+        b=RvX4HvfCp9MumJ6K8hIZzKFqBmgWHy/Y6u1vIUhjUQtIO4WFvjpCcqE70cg9PTfjRU
+         +gDCUwKH4q0tfBIS0xfLoBJ1oaO5rJFYohmjq2yfeAKb8gQSJqyHKp44xaQeRPdQS5XI
+         fDZcdggS8uPRwLROIRGfDdxD/56XoKevdcwY6M3M3FLudZgNoy6HsBhV4f2FMDeblEsL
+         azKvCt06cZXAxAVsFCC6vJWC9/AvSgwn6Dzx+NkAbMyg9LsjT2K4Uf6JwkuG00v2geI8
+         Yt9qz2qHhvckMjKyDxEIBSZ3kbhkOb9M5H0N+UYQG6SHzoYr+4GlCEbngYI/xIUF0JRZ
+         Da4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706052111; x=1706656911;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pyNE0YBQ61XvxQg0qzcUw/mj3pyKM5V+H7U9PFr3Dnc=;
+        b=qZ3qM7uUBvBexVzhHq0QVrIx12Ssvy/kDpnbAhu05lv7d+uj96+wVXg1Ud/dklGMa1
+         8bHhMxovtify5M//pAA1jQVwH0g76v1JA+ryh4OHONlNj5EH1Anb7iZ9vfbpwxhRnrhv
+         Gt33QKIj2UXqzN0iv1c8diIfLezcyXy/4G3ajeqJQUgaSsigbSSTJaSq/YdA1kd2Htl8
+         dDCRbjMZ4NnqaGdyQUY8WSPid+x3Ix1791/Sx1DpPxPJXcOs5HJ8RrN+5HuBul4BCmgx
+         bPEzAF1ISUs/zt+r+ZQPyIX10UPqOq0/kscCBHWqt0Ma18kYT14d46cEWYS4pU+e0QHy
+         /yRA==
+X-Gm-Message-State: AOJu0YzzUMAqbPJUG5W0lhFMulUKRJy7MvXpMqcsaRid4e9IbWP1uxfX
+	sD63SkG6ogYgkd5jqsAtBIKejaI1qZtFK9/REcliPeATJjX2k7O2CQafzfXTNAE=
+X-Google-Smtp-Source: AGHT+IGeQm//kQ1jNNCFdA/q04f/cj+3wXvZbTLBGBCW2U08K7o/GP2/AW3XgLOokmhWoQbjbV2FZg==
+X-Received: by 2002:a17:902:d202:b0:1d7:1e5d:ab39 with SMTP id t2-20020a170902d20200b001d71e5dab39mr3908243ply.80.1706052110812;
+        Tue, 23 Jan 2024 15:21:50 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-38-249.pa.nsw.optusnet.com.au. [49.181.38.249])
+        by smtp.gmail.com with ESMTPSA id t10-20020a170902bc4a00b001d714a1530bsm8165932plz.176.2024.01.23.15.21.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 15:21:50 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rSQ5T-00EPce-2c;
+	Wed, 24 Jan 2024 10:21:47 +1100
+Date: Wed, 24 Jan 2024 10:21:47 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
+	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+	David Sterba <dsterba@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>
+Subject: Re: [PATCH 1/5] zonefs: pass GFP_KERNEL to blkdev_zone_mgmt() call
+Message-ID: <ZbBKC3U3/1yPvWDR@dread.disaster.area>
+References: <20240123-zonefs_nofs-v1-0-cc0b0308ef25@wdc.com>
+ <20240123-zonefs_nofs-v1-1-cc0b0308ef25@wdc.com>
+ <31e0f796-1c5-b7f8-2f4b-d937770e8d5@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD8:EE_|LV8PR12MB9334:EE_
-X-MS-Office365-Filtering-Correlation-Id: 144f3fa8-155d-4137-eab5-08dc1c667ef5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	IASm98q5dOBhZjJfguYYOyyxZEVaHF/0lYF4svicaOt1lybUTye25YK4QWWe8slCFEIYZENBW0wg7TwKd2taF7qtN/ETpW9+ZqbBwanb37Ms8DisD6dW7GSTe0oG+o8ueTxS3/zzypI8rlVvE+agXYxlFN+UgMGBIfyxNaQZaHuNEEWrKgk7p88hCR2C1L2XFBqh6diBptbCDad0ei251h/XErcLr/7QRqXS0SfwLS54p5SwDNFdXx8JkNjywbW0aLDKKVorICzceEoAc/JSJf6rjHlLswPrqpxkYPsAjM1Tl1vcxDPwV7rVyYYQxzGF4v1p57upHirG27gsYb1ybjX7R1SGN+0cZ0lWThvKNUuL1m7yHn0Q/VOJZ8W/ObjfvEjQiIpUHvL1n6LDZ+8yhyTdVV8yB3TPjSBT8XP1xTigyOtDfgwBdN7J7CXz9mdmOT303GHwU+774l02mCS6fC7zKb0piT82S3qLt87VoCeAE8hnXLJAn0j2iHntfjg1R4woaEntTYh8F9vwagG/FotAw6aQPSyFJVGFQaJ/MQgQQoeuK620QFtbNOiAJeTIyR0Q6i6VNvwHWM8DH+Z73pRrde1osn08p9Fu5ER1kaxi2OjAqmowmEiFefdjKCmjfZxso89Ovov33u/zDOaBslm1rGIQ+0Sd/k25JWws4FpszaFil46tw5zXm2U8uBMqe3Syn7IF1UiduFcU1w7UF4rE1TVo/VLLEOwYH/Fn45F7x2JTPTxSQeq4GRpcW9y0YzFeOTeFj9q5MWERNgryyQ==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(376002)(396003)(346002)(230922051799003)(186009)(82310400011)(451199024)(64100799003)(1800799012)(40470700004)(36840700001)(46966006)(356005)(336012)(26005)(1076003)(107886003)(7696005)(426003)(6666004)(2616005)(5660300002)(2906002)(83380400001)(47076005)(8936002)(70586007)(70206006)(54906003)(478600001)(4326008)(316002)(110136005)(8676002)(41300700001)(82740400003)(36756003)(7636003)(36860700001)(16526019)(40480700001)(40460700003)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2024 22:56:12.0024
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 144f3fa8-155d-4137-eab5-08dc1c667ef5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD8.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9334
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <31e0f796-1c5-b7f8-2f4b-d937770e8d5@redhat.com>
 
-Trigger and test nvme-pci timeout with concurrent fio jobs.
+On Tue, Jan 23, 2024 at 09:39:02PM +0100, Mikulas Patocka wrote:
+> 
+> 
+> On Tue, 23 Jan 2024, Johannes Thumshirn wrote:
+> 
+> > Pass GFP_KERNEL instead of GFP_NOFS to the blkdev_zone_mgmt() call in
+> > zonefs_zone_mgmt().
+> > 
+> > As as zonefs_zone_mgmt() and zonefs_inode_zone_mgmt() are never called
+> > from a place that can recurse back into the filesystem on memory reclaim,
+> > it is save to call blkdev_zone_mgmt() with GFP_KERNEL.
+> > 
+> > Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> > ---
+> >  fs/zonefs/super.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
+> > index 93971742613a..63fbac018c04 100644
+> > --- a/fs/zonefs/super.c
+> > +++ b/fs/zonefs/super.c
+> > @@ -113,7 +113,7 @@ static int zonefs_zone_mgmt(struct super_block *sb,
+> >  
+> >  	trace_zonefs_zone_mgmt(sb, z, op);
+> >  	ret = blkdev_zone_mgmt(sb->s_bdev, op, z->z_sector,
+> > -			       z->z_size >> SECTOR_SHIFT, GFP_NOFS);
+> > +			       z->z_size >> SECTOR_SHIFT, GFP_KERNEL);
+> >  	if (ret) {
+> >  		zonefs_err(sb,
+> >  			   "Zone management operation %s at %llu failed %d\n",
+> > 
+> > -- 
+> > 2.43.0
+> 
+> zonefs_inode_zone_mgmt calls 
+> lockdep_assert_held(&ZONEFS_I(inode)->i_truncate_mutex); - so, this 
+> function is called with the mutex held - could it happen that the 
+> GFP_KERNEL allocation recurses into the filesystem and attempts to take 
+> i_truncate_mutex as well?
+> 
+> i.e. GFP_KERNEL -> iomap_do_writepage -> zonefs_write_map_blocks -> 
+> zonefs_write_iomap_begin -> mutex_lock(&zi->i_truncate_mutex)
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
-V3:-
+zonefs doesn't have a ->writepage method, so writeback can't be
+called from memory reclaim like this.
 
-1. Add CAN_BE_ZONED.
-2. Add FAULT_INJECTION_DEBUG_FS check in requires.
-3. Remove _require_nvme_trtype pci in requires().
-4. Remove device_requires().
-5. Store fio output in FULL.
-6. Revmoe shellcheck and use grep I/O error value to pass/fail testcase.
-
----
- tests/nvme/050     | 69 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/050.out |  2 ++
- 2 files changed, 71 insertions(+)
- create mode 100755 tests/nvme/050
- create mode 100644 tests/nvme/050.out
-
-diff --git a/tests/nvme/050 b/tests/nvme/050
-new file mode 100755
-index 0000000..cacaba6
---- /dev/null
-+++ b/tests/nvme/050
-@@ -0,0 +1,69 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Chaitanya Kulkarni
-+#
-+# Test NVMe-PCI timeout with FIO jobs by triggering the nvme_timeout function.
-+#
-+
-+. tests/nvme/rc
-+
-+DESCRIPTION="test nvme-pci timeout with fio jobs"
-+CAN_BE_ZONED=1
-+
-+sysfs_path="/sys/kernel/debug/fail_io_timeout/"
-+#restrict test to nvme-pci only
-+nvme_trtype=pci
-+
-+# fault injection config array
-+declare -A fi_array
-+
-+requires() {
-+	_have_fio
-+	_nvme_requires
-+	_have_kernel_option FAIL_IO_TIMEOUT
-+	_have_kernel_option FAULT_INJECTION_DEBUG_FS
-+}
-+
-+save_fi_settings() {
-+	for fi_attr in probability interval times space verbose
-+	do
-+		fi_array["${fi_attr}"]=$(cat "${sysfs_path}/${fi_attr}")
-+	done
-+}
-+
-+restore_fi_settings() {
-+	for fi_attr in probability interval times space verbose
-+	do
-+		echo "${fi_array["${fi_attr}"]}" > "${sysfs_path}/${fi_attr}"
-+	done
-+}
-+
-+test_device() {
-+	local nvme_ns
-+	local io_fimeout_fail
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	nvme_ns="$(basename "${TEST_DEV}")"
-+	io_fimeout_fail="$(cat /sys/block/"${nvme_ns}"/io-timeout-fail)"
-+	save_fi_settings
-+	echo 1 > /sys/block/"${nvme_ns}"/io-timeout-fail
-+
-+	echo 100 > /sys/kernel/debug/fail_io_timeout/probability
-+	echo   1 > /sys/kernel/debug/fail_io_timeout/interval
-+	echo  -1 > /sys/kernel/debug/fail_io_timeout/times
-+	echo   0 > /sys/kernel/debug/fail_io_timeout/space
-+	echo   1 > /sys/kernel/debug/fail_io_timeout/verbose
-+
-+	fio --bs=4k --rw=randread --norandommap --numjobs="$(nproc)" \
-+	    --name=reads --direct=1 --filename="${TEST_DEV}" --group_reporting \
-+	    --time_based --runtime=1m >& "$FULL"
-+
-+	if grep -q "Input/output error" "$FULL"; then
-+		echo "Test complete"
-+	else
-+		echo "Test failed"
-+	fi
-+	restore_fi_settings
-+	echo "${io_fimeout_fail}" > /sys/block/"${nvme_ns}"/io-timeout-fail
-+}
-diff --git a/tests/nvme/050.out b/tests/nvme/050.out
-new file mode 100644
-index 0000000..b78b05f
---- /dev/null
-+++ b/tests/nvme/050.out
-@@ -0,0 +1,2 @@
-+Running nvme/050
-+Test complete
+-Dave.
 -- 
-2.40.0
-
+Dave Chinner
+david@fromorbit.com
