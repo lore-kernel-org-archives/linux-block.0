@@ -1,63 +1,63 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEDD7FBA1
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 17:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D90580028
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 17:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031206; cv=none; b=qYdfYV6fvdjf7S7ZBbwfihEPM4R1Feg5+g6iO5CbrTc24Pe5h/RWbt61r63FVotbVA9DM8qUZCDwG7wXzDdHackTeHrGet98qmmFMsdAFAiLvsn8UnJzEy54fEzxihFbPyQMCbVO/AGDibIRx9fBrC2PApX7ZSjm85x6qzsI0m4=
+	t=1706031207; cv=none; b=YKI5X3HfEsAXcCMVf08jhiRTC2x5St8AD5W+LYZe5PiDEPVf+j6qifZfer2DmefC3ke0KaktiCZJFYdKoW3vLiipqLSEHHd5MHJZphQ36I7wTYXBhbKzlQE5d1a+nzECDNuP23ibXhsbc0iUUinoxxn+o2gvSi3C5io0oRuGS34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031206; c=relaxed/simple;
-	bh=p7vwFJau7qEQ4ufBglXQjs3pqU2/i4O3ue7lco2L1hc=;
+	s=arc-20240116; t=1706031207; c=relaxed/simple;
+	bh=0dAmO6x2styloC+APT5Im4vJgC6epFT1Zp74CyP8Mww=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dJdvZJ7UsjxDvjvrXkpR2gg8HeHUjKDiq8doPxqiJR8sQmYIBS/2sak4sW02smN6mv+Fa3ieAuhd4woW2xq8PHFJKGYlgXG68nIDQmRboiB6T6WgrYkoVI7ZCInQeF8MjWLLT7LXYvo9TdQlA1SXpG/neAxIyptCeTMuYREODys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sSZQmbmB; arc=none smtp.client-ip=209.85.166.54
+	 MIME-Version; b=jWm4KjnrvLy92DtzA5li9V+MqK7wyzCvTe90qIDLl0x8A0bN5LTitgdYoA7ecnApZDwF1Kxcm+QIVqep9jqp4wrTQ0/JscaH//B1B9o1d+qyyoYBC6LS0G651AdbINIhyrJnFdG5eBo9B3UWav1AkS/X727aQgcyjcKDE8Ihz14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=U1nfBwfU; arc=none smtp.client-ip=209.85.166.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sSZQmbmB"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7bee9f626caso62081239f.0
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 09:33:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="U1nfBwfU"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7bf3283c18dso60900239f.0
+        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 09:33:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706031203; x=1706636003; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706031205; x=1706636005; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gH4lZhxqtdD3FbEMI55dx5z4UKpqUWwGArOpZ0i0C1Q=;
-        b=sSZQmbmBNdylw4QsOXos2AKOHpNy9FXdq/nQZkQbpigksozGN9P/miKNSptjP6hYKX
-         chRbBlth6Yo9dTTXtZI4Qc6hzGzO/8Clvp9X8NDKMMr8AYmTwK6SFbNWRlXqoBZInbL+
-         DFHPqTBcBQneFziHXDOKaSryQrvVK+boVMfTUKhYYfQ7fY3M0P+sZvZ5PJEnec8f6IvC
-         DNOTm4EU4JSAXBrCAZRR8VMjPFuvCr0zxUmY6TSffRokF6HrORjsuwHxaPZTHZBR3Kw/
-         7XIEOU0P9fVRzDeiuK/eZNZ80ttbVb0fKSXyiW9i9V+5S19GGUM1kVdTWR71lvebpTPj
-         iTbA==
+        bh=+/Ald4gHrRglycNy6wXvcN5PFyAD6wLCcn4WkvqJFC0=;
+        b=U1nfBwfUVvg4gjho/xp8VxuWK3QoxpChY/ACWDu9+B/v70n4oTQx7ubSDKG57Bflo8
+         Xwxy6Wggb8ZUf6U/cbCOhEWssGQTE1PnQtxKA4JevUbcVJqA4mu4JJHG6dDBtqS7Z4cf
+         iL6f8PDYD0FdfdoTLUBUVlsQyziN2Blp7L0HLAAsiQVw6Vy62dIy4pPueIJh2qPAuHBY
+         BA/TV/d15zjsaz3M/bmKbQraQq7IT6J7kE6Uux9DcJnVZcHnsPiZy5TRmQW4ZGFIa+rx
+         p/qxlWzH9eCk2nYMfpfbHEbpppmJ65KstRtRoyO79XsIVvMuORejj+4ZwpBJO8Ohzn42
+         y9KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706031203; x=1706636003;
+        d=1e100.net; s=20230601; t=1706031205; x=1706636005;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gH4lZhxqtdD3FbEMI55dx5z4UKpqUWwGArOpZ0i0C1Q=;
-        b=ULmwCmwdsJ9rfEdWTMgRz1rrRhxVtYjZbjO0kdBSmKM5IkIGc3V7a6mWA8PdNu8xyN
-         bcid59ky56XP59PtCfu4txRe9vXWlO0CA3iVXmytJO7W/W9YbsItI0sstacrRfcHb4o2
-         36XjRcpOmtrUGrOUZwiDRxIsyqPn0d6qW7I5P+DZnHZ8e0ZIFvb83kf5TevRDi4gVqJo
-         Tx+sRPPoLuTB5CzlQFu+Sj+5SVPAqzWHxmLsLYGvLN+edeu9ucFuVhs98POFG6kq3KL+
-         5gy/QWYTw2zEjLraW77Mu9x3/16mxiyUmkhYb2cdeSpDx9y5nC7ef9GAtIKLTRwfRM7N
-         I+WA==
-X-Gm-Message-State: AOJu0Yze17viNpg4XoxcZCsNOhIjvR8Lk9voIHlZp+QZbSVTZ7ANOFdN
-	O/QXbOhhRTJTz8vVsHSWWy+KVnuyv0NetH9zPRNYucFq3JPE+BtLL3+vZtzw+aJrpon1ofwWcr9
-	xpK4=
-X-Google-Smtp-Source: AGHT+IHgLQJxIFtXneGZwVz9S47OXeWhgLLk2cedeglfcOKnm0WCh1YP3OXrzkQ4vjXjGkKh2d8z1A==
-X-Received: by 2002:a05:6602:e04:b0:7bf:f20:2c78 with SMTP id gp4-20020a0566020e0400b007bf0f202c78mr9470693iob.1.1706031203236;
-        Tue, 23 Jan 2024 09:33:23 -0800 (PST)
+        bh=+/Ald4gHrRglycNy6wXvcN5PFyAD6wLCcn4WkvqJFC0=;
+        b=svn3zoq/DVkPOdGstggYmUNHunWiFlUTSvHzycNJBCVZuUFYUJnn3oHqorZ2tHveDx
+         gld/yJe+V26tLgE02lgNsh6n7iiZivS2lovoouAbUY0YYGte4BakmmIn+8gROtS1XZW2
+         QJ7QhQxvz36IhLpp5kihFRvwNIc8fGBRcElHJA5o0NDHZfq7WzOv4aYdLGWAVlalU1y8
+         vaTlOXcGPqNxg5fuN/mnzt4eovBf9qZ6cYQdqAave3/mrQPpXpKlJc7hZ+hcHBgkDPpj
+         L3lVsQYe2GtGdE1HG8KCDPS3IdrSeWGeG4cClnsk+nCT133BpTfT7haiDDc/mYSkcnl7
+         Otxg==
+X-Gm-Message-State: AOJu0YzKh+yzP0aun5xXs3AdHGnxqwtzjZO5y/CLW8OTDnihX4UNZuuY
+	SSL8BQx3IiRgOZ/DiIihI9/MU+ohS3mnlh0HpRn0jz01GxGo0TrvIS/CmijMnfDOCcg/twtUy7k
+	quTU=
+X-Google-Smtp-Source: AGHT+IElRCm4FAwDKHywvZV0YwCO0C/6R+Ki3OzPgiP7nMOonsmT50PyINzaXuntWvrzICAf02VBow==
+X-Received: by 2002:a5d:9304:0:b0:7be:e376:fc44 with SMTP id l4-20020a5d9304000000b007bee376fc44mr9545381ion.2.1706031205127;
+        Tue, 23 Jan 2024 09:33:25 -0800 (PST)
 Received: from localhost.localdomain ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id gu12-20020a0566382e0c00b0046df4450843sm3640708jab.50.2024.01.23.09.33.21
+        by smtp.gmail.com with ESMTPSA id gu12-20020a0566382e0c00b0046df4450843sm3640708jab.50.2024.01.23.09.33.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 09:33:21 -0800 (PST)
+        Tue, 23 Jan 2024 09:33:23 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/6] block: shrink plug->{nr_ios, rq_count} to unsigned char
-Date: Tue, 23 Jan 2024 10:30:37 -0700
-Message-ID: <20240123173310.1966157-6-axboe@kernel.dk>
+Subject: [PATCH 6/6] block: convert struct blk_plug callback list to hlists
+Date: Tue, 23 Jan 2024 10:30:38 -0700
+Message-ID: <20240123173310.1966157-7-axboe@kernel.dk>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240123173310.1966157-1-axboe@kernel.dk>
 References: <20240123173310.1966157-1-axboe@kernel.dk>
@@ -69,86 +69,128 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We never use more than 64 max in here, we can change them from unsigned
-short to just a byte. Add a BUILD_BUG_ON() check, in case the max plug
-count changes in the future.
+We currently use a doubly linked list, which means the head takes up
+16 bytes. As any iteration goes over the full list by first splicing it
+to an on-stack copy, we never need to remove members from the middle of
+the list.
+
+Convert it to an hlist instead, saving 8 bytes in the blk_plug structure.
+This also helps save 40 bytes of text in the core block code, tested on
+arm64.
+
+This does mean that flush callbacks will be run in reverse. While this
+should not pose a problem, we can always change the list splicing to
+just iteration-and-add instead, preservering ordering. These lists are
+generally just a single entry (or a few entries), either way this should
+be fine.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-core.c       | 4 ++--
- block/blk-mq.c         | 2 ++
- include/linux/blkdev.h | 8 ++++----
- 3 files changed, 8 insertions(+), 6 deletions(-)
+ block/blk-core.c       | 26 ++++++++++++++------------
+ drivers/md/raid1-10.c  |  2 +-
+ include/linux/blkdev.h |  4 ++--
+ 3 files changed, 17 insertions(+), 15 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 71c6614a97fe..dd593008511c 100644
+index dd593008511c..f28859b4a3ef 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -1063,7 +1063,7 @@ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
- }
- EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
- 
--void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
-+void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned char nr_ios)
- {
- 	struct task_struct *tsk = current;
- 
-@@ -1076,7 +1076,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
- 	plug->cur_ktime = 0;
- 	plug->mq_list = NULL;
- 	plug->cached_rq = NULL;
--	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
-+	plug->nr_ios = min_t(unsigned char, nr_ios, BLK_MAX_REQUEST_COUNT);
+@@ -1080,7 +1080,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned char nr_ios)
  	plug->rq_count = 0;
  	plug->multiple_queues = false;
  	plug->has_elevator = false;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index aff9e9492f59..a9b4a66e1e13 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1283,6 +1283,8 @@ EXPORT_SYMBOL(blk_mq_start_request);
-  */
- static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
+-	INIT_LIST_HEAD(&plug->cb_list);
++	INIT_HLIST_HEAD(&plug->cb_list);
+ 
+ 	/*
+ 	 * Store ordering should not be needed here, since a potential
+@@ -1120,16 +1120,18 @@ EXPORT_SYMBOL(blk_start_plug);
+ 
+ static void flush_plug_callbacks(struct blk_plug *plug, bool from_schedule)
  {
-+	BUILD_BUG_ON(2 * BLK_MAX_REQUEST_COUNT > U8_MAX);
+-	LIST_HEAD(callbacks);
++	HLIST_HEAD(callbacks);
+ 
+-	while (!list_empty(&plug->cb_list)) {
+-		list_splice_init(&plug->cb_list, &callbacks);
++	while (!hlist_empty(&plug->cb_list)) {
++		struct hlist_node *entry, *tmp;
+ 
+-		while (!list_empty(&callbacks)) {
+-			struct blk_plug_cb *cb = list_first_entry(&callbacks,
+-							  struct blk_plug_cb,
+-							  list);
+-			list_del(&cb->list);
++		hlist_move_list(&plug->cb_list, &callbacks);
 +
- 	if (plug->multiple_queues)
- 		return BLK_MAX_REQUEST_COUNT * 2;
- 	return BLK_MAX_REQUEST_COUNT;
++		hlist_for_each_safe(entry, tmp, &callbacks) {
++			struct blk_plug_cb *cb;
++
++			cb = hlist_entry(entry, struct blk_plug_cb, list);
++			hlist_del(&cb->list);
+ 			cb->callback(cb, from_schedule);
+ 		}
+ 	}
+@@ -1144,7 +1146,7 @@ struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug, void *data,
+ 	if (!plug)
+ 		return NULL;
+ 
+-	list_for_each_entry(cb, &plug->cb_list, list)
++	hlist_for_each_entry(cb, &plug->cb_list, list)
+ 		if (cb->callback == unplug && cb->data == data)
+ 			return cb;
+ 
+@@ -1154,7 +1156,7 @@ struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug, void *data,
+ 	if (cb) {
+ 		cb->data = data;
+ 		cb->callback = unplug;
+-		list_add(&cb->list, &plug->cb_list);
++		hlist_add_head(&cb->list, &plug->cb_list);
+ 	}
+ 	return cb;
+ }
+@@ -1162,7 +1164,7 @@ EXPORT_SYMBOL(blk_check_plugged);
+ 
+ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
+ {
+-	if (!list_empty(&plug->cb_list))
++	if (!hlist_empty(&plug->cb_list))
+ 		flush_plug_callbacks(plug, from_schedule);
+ 	blk_mq_flush_plug_list(plug, from_schedule);
+ 	/*
+diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
+index 512746551f36..4a1b6f17067f 100644
+--- a/drivers/md/raid1-10.c
++++ b/drivers/md/raid1-10.c
+@@ -152,7 +152,7 @@ static inline bool raid1_add_bio_to_plug(struct mddev *mddev, struct bio *bio,
+ 	plug = container_of(cb, struct raid1_plug_cb, cb);
+ 	bio_list_add(&plug->pending, bio);
+ 	if (++plug->count / MAX_PLUG_BIO >= copies) {
+-		list_del(&cb->list);
++		hlist_del(&cb->list);
+ 		cb->callback(cb, false);
+ 	}
+ 
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9660a65bb927..ce6d057de2f0 100644
+index ce6d057de2f0..f3105a519ef4 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -944,9 +944,9 @@ struct blk_plug {
- 	/* if ios_left is > 1, we can batch tag/rq allocations */
- 	struct request *cached_rq;
- 	u64 cur_ktime;
--	unsigned short nr_ios;
-+	unsigned char nr_ios;
- 
--	unsigned short rq_count;
-+	unsigned char rq_count;
- 
+@@ -951,13 +951,13 @@ struct blk_plug {
  	bool multiple_queues;
  	bool has_elevator;
-@@ -964,7 +964,7 @@ struct blk_plug_cb {
- extern struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug,
- 					     void *data, int size);
- extern void blk_start_plug(struct blk_plug *);
--extern void blk_start_plug_nr_ios(struct blk_plug *, unsigned short);
-+extern void blk_start_plug_nr_ios(struct blk_plug *, unsigned char);
- extern void blk_finish_plug(struct blk_plug *);
  
- void __blk_flush_plug(struct blk_plug *plug, bool from_schedule);
-@@ -1060,7 +1060,7 @@ struct blk_plug {
+-	struct list_head cb_list; /* md requires an unplug callback */
++	struct hlist_head cb_list; /* md requires an unplug callback */
  };
  
- static inline void blk_start_plug_nr_ios(struct blk_plug *plug,
--					 unsigned short nr_ios)
-+					 unsigned char nr_ios)
- {
- }
- 
+ struct blk_plug_cb;
+ typedef void (*blk_plug_cb_fn)(struct blk_plug_cb *, bool);
+ struct blk_plug_cb {
+-	struct list_head list;
++	struct hlist_node list;
+ 	blk_plug_cb_fn callback;
+ 	void *data;
+ };
 -- 
 2.43.0
 
