@@ -1,245 +1,119 @@
-Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9081A59B57;
-	Tue, 23 Jan 2024 09:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2265BAE1;
+	Tue, 23 Jan 2024 09:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.143.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706002550; cv=none; b=kf+N2F9uk0oNNIogTo8hw+cshVUUbgczY/i/dJaxSejbedA4CLKOOJ/AY+V928diX0jd2iepHTxlC8kWtbJU0hSSAtsqqr7KnmWwu6+3Caw5Qp1yjUCTd52JmsRaff1s+tAFi9h3Z6/69iEha+kkRXgroK8rUnN8kv1dQRga6ig=
+	t=1706003042; cv=none; b=Msw3mbrXs7AjekOoFGLapTlF+1iTIohmZgncqgJy62Uc9EUdjSlWfiGony0QPJQjnn0GodvaUlS5IS4Oi0Mk8DUmTPK5LNmY9NoSigwLJiDKCZtixxFvBpRARgnOO1+a2vHEwRhTWhY4KHEdL1VNjfgU7BcP+BGbvYrIGWbgiHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706002550; c=relaxed/simple;
-	bh=Tu+BwNek8vAM+4J1UIC0Oeg0jEZrrdKM/AvlAiSBnP4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jKqb7Vh5/2z+mPSCCSaqBm2WLgqHashqxUzmdcGnCOrcEgFxovhi3kmdP/vngUtTGszh1/rFPeGBTQ085vHtxTNdUbrSian5FzR1RlSRWN/wVMwqqS86wDiJOfy6QmXuayfYtOTrJclOB6oAt7artz166zzAW8QHwDA6pq+Y6jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 40N9Xxha075020;
-	Tue, 23 Jan 2024 17:33:59 +0800 (+08)
-	(envelope-from zhaoyang.huang@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4TK1tk3GRKz2SCT4w;
-	Tue, 23 Jan 2024 17:26:38 +0800 (CST)
-Received: from bj03382pcu01.spreadtrum.com (10.0.73.40) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Tue, 23 Jan 2024 17:33:58 +0800
-From: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-To: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Zhaoyang Huang <huangzhaoyang@gmail.com>, <steve.kang@unisoc.com>
-Subject: [PATCH] block: introduce content activity based ioprio
-Date: Tue, 23 Jan 2024 17:33:52 +0800
-Message-ID: <20240123093352.3007660-1-zhaoyang.huang@unisoc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1706003042; c=relaxed/simple;
+	bh=/4h6qYS/eHpSlVim37uPdGcbFkvmnDTQ5JZLyrLcZnE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Bq7p31t/eidxr6Q622mS7e2KSbLszGFUwhvZVnh8kXw2SQseV6MjUgpkaS9+lmoGAmo9+eR5FPS8KRU5oHYuj8A8Acef/Qx0KEspKglQYCKq1dlw7D9i544HJUGYLW9CybdSJS7ufC9oz7OeDsUEP1YvaBYHwhpKBW2ac52CB0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=klyV34Le; arc=none smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="klyV34Le"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1706003040; x=1737539040;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=/4h6qYS/eHpSlVim37uPdGcbFkvmnDTQ5JZLyrLcZnE=;
+  b=klyV34LehoM/bKGpsEoje1bsQvWnEdkBJm3CmcnxHI+HRti6ZJ/+u1HC
+   76xo81pd3t54FEBqSixPxSZsd4+ixpHRWPY1QeoerQ+TXk7dQRRE/0z/d
+   BdUk5ztm8cSHoDG+j0zrVHFVdqfFia+Q+iwBTDBwaxeoUwfTOwIKxyO/a
+   SnMwMXm4Q6mzQswYf2Mqjkh4M9p2UkvbwRXftOAS8HcD2XkB+qnyRJUQt
+   Toij5t7e3KHfBaDAXNfVRr4TQB2+egWSu5qhj2igJI0n4whAoJLGNukGL
+   9DcqMmmKYCT7f9nMS4XgxBNS3nXU0TXjgLG4HBK1YO7xiGWqIw6uz84Xp
+   A==;
+X-CSE-ConnectionGUID: fbbQ3aUnSa+jfjkiYUqLHg==
+X-CSE-MsgGUID: 9vYZCiNdSh+ZfSVKjIc7BA==
+X-IronPort-AV: E=Sophos;i="6.05,214,1701100800"; 
+   d="scan'208";a="7514644"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Jan 2024 17:43:50 +0800
+IronPort-SDR: TwR3OQ6czbuBwupgP2Pw5/UU9AIJprA4iK31Yg5UGdeifAB7nVUszKOeanYCR1XWjuTUkYP9y8
+ XGwGimQPDegQ==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jan 2024 00:53:53 -0800
+IronPort-SDR: zUnRHHmVsKHmYWHqPESmgsAEmU5gU8xkWm6MN/q4pTyWM+A4c3LciGXWMEKUbx1GLBqQ7hfn4G
+ QMsyEBuf/JKg==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.6])
+  by uls-op-cesaip02.wdc.com with ESMTP; 23 Jan 2024 01:43:47 -0800
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 0/5] block: remove gfp_mask for blkdev_zone_mgmt()
+Date: Tue, 23 Jan 2024 01:43:41 -0800
+Message-Id: <20240123-zonefs_nofs-v1-0-cc0b0308ef25@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL:SHSQR01.spreadtrum.com 40N9Xxha075020
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAE2Kr2UC/x3MMQqAMAxA0atIZgtpKA5eRUTUppqllQZELL27x
+ fEN/xdQzsIKY1cg8y0qKTbYvoP9XOPBRnwzEJJDa9G8KXLQJaagxnvLRBsxugFacWUO8vy3aa7
+ 1AzrU4INdAAAA
+To: Damien Le Moal <dlemoal@kernel.org>, 
+ Naohiro Aota <naohiro.aota@wdc.com>, Mike Snitzer <snitzer@kernel.org>, 
+ dm-devel@lists.linux.dev, Chris Mason <clm@fb.com>, 
+ Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, 
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-btrfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>, 
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706003027; l=1540;
+ i=johannes.thumshirn@wdc.com; s=20230613; h=from:subject:message-id;
+ bh=/4h6qYS/eHpSlVim37uPdGcbFkvmnDTQ5JZLyrLcZnE=;
+ b=XWApU1yRY0zet3szE9Y5YwxO0lp/MB+nH+oGhmBdyhChEBIQpYa6r7zw4rgXKerbrVnIXc2mT
+ UtgASe05xPWAqN+bStf/4/hcrd6JLPpuUKW556WA7lZY9ZeLtErtKq6
+X-Developer-Key: i=johannes.thumshirn@wdc.com; a=ed25519;
+ pk=TGmHKs78FdPi+QhrViEvjKIGwReUGCfa+3LEnGoR2KM=
 
-From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+Fueled by the LSFMM discussion on removing GFP_NOFS initiated by Willy,
+I've looked into the sole GFP_NOFS allocation in zonefs. As it turned out,
+it is only done for zone management commands and can be removed.
 
-Currently, request's ioprio are set via task's schedule priority(when no
-blkcg configured), which has high priority tasks possess the privilege on
-both of CPU and IO scheduling.
-This commit try to introduce a feature which adjust the request ioprio
-based on the folio's activity. The original idea comes from LRU_GEN
-which provides more precised folio activity than before. This commit try
-to adjust the request's ioprio when certain part of its folios are hot,
-which indicate that this request carry important contents and need be
-scheduled ealier.
+After digging into more callers of blkdev_zone_mgmt() I came to the
+conclusion that the gfp_mask parameter can be removed alltogether.
 
-This commit is verified via bellowing script[1] on a v6.6 android system
-and get significant improved fault time as expected[2] while dd's cost
-also shrink from 55s to 40s.
+So this series switches all callers of blkdev_zone_mgmt() to either use
+GFP_KERNEL where possible or grab a memalloc_no{fs,io} context.
 
-1. fault_latency.bin is an ebpf based test tool which measure all task's
-   iowait latency during page fault when scheduled out/in.
-2. costmem generate page fault by mmaping a file and access the VA.
-3. dd generate concurrent vfs io.
+The final patch in this series is getting rid of the gfp_mask parameter.
 
-[1]
-./fault_latency.bin 1 5 > /data/dd_costmem &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-dd if=/dev/block/sda of=/data/ddtest bs=1024 count=2048000 &
-dd if=/dev/block/sda of=/data/ddtest1 bs=1024 count=2048000 &
-dd if=/dev/block/sda of=/data/ddtest2 bs=1024 count=2048000 &
-dd if=/dev/block/sda of=/data/ddtest3 bs=1024 count=2048000
+Link: https://lore.kernel.org/all/ZZcgXI46AinlcBDP@casper.infradead.org/
 
-[2]
-                       mainline		commit
-io wait                836us            156us
-
-This commit is also verified by the case of launching camera APP which is
-usually considered as heavy working load on both of memory and IO, which
-shows 12%-24% improvement.
-
-		ttl = 0		ttl = 50	ttl = 100
-mainline        2267ms		2420ms		2316ms
-commit          1992ms          1806ms          1998ms
-
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
 ---
- block/Kconfig               |  8 ++++++++
- block/bio.c                 | 10 ++++++++++
- block/blk-mq.c              | 21 +++++++++++++++++++++
- include/uapi/linux/ioprio.h | 20 +++++++++++++++-----
- 4 files changed, 54 insertions(+), 5 deletions(-)
+Johannes Thumshirn (5):
+      zonefs: pass GFP_KERNEL to blkdev_zone_mgmt() call
+      dm: dm-zoned: pass GFP_KERNEL to blkdev_zone_mgmt
+      btrfs: zoned: call blkdev_zone_mgmt in nofs scope
+      f2fs: guard blkdev_zone_mgmt with nofs scope
+      block: remove gfp_flags from blkdev_zone_mgmt
 
-diff --git a/block/Kconfig b/block/Kconfig
-index f1364d1c0d93..8d6075575eae 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -228,6 +228,14 @@ config BLOCK_HOLDER_DEPRECATED
- config BLK_MQ_STACKING
- 	bool
- 
-+config CONTENT_ACT_BASED_IOPRIO
-+	bool "Enable content activity based ioprio"
-+	depends on LRU_GEN
-+	default y
-+	help
-+	This item enable the feature of adjust bio's priority by
-+	calculating its content's activity.
-+
- source "block/Kconfig.iosched"
- 
- endif # BLOCK
-diff --git a/block/bio.c b/block/bio.c
-index 816d412c06e9..7fb65745d838 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -24,6 +24,7 @@
- #include "blk.h"
- #include "blk-rq-qos.h"
- #include "blk-cgroup.h"
-+#include "blk-ioprio.h"
- 
- #define ALLOC_CACHE_THRESHOLD	16
- #define ALLOC_CACHE_MAX		256
-@@ -1069,12 +1070,21 @@ EXPORT_SYMBOL_GPL(bio_add_zone_append_page);
- void __bio_add_page(struct bio *bio, struct page *page,
- 		unsigned int len, unsigned int off)
- {
-+	int class, level, hint, activity;
-+
-+	class = IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-+	level = IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-+	hint = IOPRIO_PRIO_HINT(bio->bi_ioprio);
-+	activity = IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-+
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
- 	WARN_ON_ONCE(bio_full(bio, len));
- 
- 	bvec_set_page(&bio->bi_io_vec[bio->bi_vcnt], page, len, off);
- 	bio->bi_iter.bi_size += len;
- 	bio->bi_vcnt++;
-+	activity += (bio->bi_vcnt <= IOPRIO_NR_ACTIVITY && PageWorkingset(page)) ? 1 : 0;
-+	bio->bi_ioprio = IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint, activity);
- }
- EXPORT_SYMBOL_GPL(__bio_add_page);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1fafd54dce3c..05cdd3adde94 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2939,6 +2939,26 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	return rq;
- }
- 
-+#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-+static void bio_set_ioprio(struct bio *bio)
-+{
-+	int class, level, hint, activity;
-+
-+	class = IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-+	level = IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-+	hint = IOPRIO_PRIO_HINT(bio->bi_ioprio);
-+	activity = IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-+
-+	if (activity >= bio->bi_vcnt / 2)
-+		class = IOPRIO_CLASS_RT;
-+	else if (activity >= bio->bi_vcnt / 4)
-+		class = max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IOPRIO_CLASS_BE);
-+
-+	bio->bi_ioprio = IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint, activity);
-+
-+	blkcg_set_ioprio(bio);
-+}
-+#else
- static void bio_set_ioprio(struct bio *bio)
- {
- 	/* Nobody set ioprio so far? Initialize it based on task's nice value */
-@@ -2946,6 +2966,7 @@ static void bio_set_ioprio(struct bio *bio)
- 		bio->bi_ioprio = get_current_ioprio();
- 	blkcg_set_ioprio(bio);
- }
-+#endif
- 
- /**
-  * blk_mq_submit_bio - Create and send a request to block device.
-diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-index bee2bdb0eedb..d1c6081e796b 100644
---- a/include/uapi/linux/ioprio.h
-+++ b/include/uapi/linux/ioprio.h
-@@ -71,12 +71,18 @@ enum {
-  * class and level.
-  */
- #define IOPRIO_HINT_SHIFT		IOPRIO_LEVEL_NR_BITS
--#define IOPRIO_HINT_NR_BITS		10
-+#define IOPRIO_HINT_NR_BITS		3
- #define IOPRIO_NR_HINTS			(1 << IOPRIO_HINT_NR_BITS)
- #define IOPRIO_HINT_MASK		(IOPRIO_NR_HINTS - 1)
- #define IOPRIO_PRIO_HINT(ioprio)	\
- 	(((ioprio) >> IOPRIO_HINT_SHIFT) & IOPRIO_HINT_MASK)
- 
-+#define IOPRIO_ACTIVITY_SHIFT		(IOPRIO_HINT_NR_BITS + IOPRIO_LEVEL_NR_BITS)
-+#define IOPRIO_ACTIVITY_NR_BITS		7
-+#define IOPRIO_NR_ACTIVITY		(1 << IOPRIO_ACTIVITY_NR_BITS)
-+#define IOPRIO_ACTIVITY_MASK		(IOPRIO_NR_ACTIVITY - 1)
-+#define IOPRIO_PRIO_ACTIVITY(ioprio)	\
-+	(((ioprio) >> IOPRIO_ACTIVITY_SHIFT) & IOPRIO_ACTIVITY_MASK)
- /*
-  * I/O hints.
-  */
-@@ -108,20 +114,24 @@ enum {
-  * Return an I/O priority value based on a class, a level and a hint.
-  */
- static __always_inline __u16 ioprio_value(int prioclass, int priolevel,
--					  int priohint)
-+					  int priohint, int activity)
- {
- 	if (IOPRIO_BAD_VALUE(prioclass, IOPRIO_NR_CLASSES) ||
- 	    IOPRIO_BAD_VALUE(priolevel, IOPRIO_NR_LEVELS) ||
--	    IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS))
-+	    IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS) ||
-+	    IOPRIO_BAD_VALUE(activity, IOPRIO_NR_ACTIVITY))
- 		return IOPRIO_CLASS_INVALID << IOPRIO_CLASS_SHIFT;
- 
- 	return (prioclass << IOPRIO_CLASS_SHIFT) |
-+		(activity << IOPRIO_ACTIVITY_SHIFT) |
- 		(priohint << IOPRIO_HINT_SHIFT) | priolevel;
- }
- 
- #define IOPRIO_PRIO_VALUE(prioclass, priolevel)			\
--	ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE)
-+	ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE, 0)
- #define IOPRIO_PRIO_VALUE_HINT(prioclass, priolevel, priohint)	\
--	ioprio_value(prioclass, priolevel, priohint)
-+	ioprio_value(prioclass, priolevel, priohint, 0)
-+#define IOPRIO_PRIO_VALUE_ACTIVITY(prioclass, priolevel, priohint, activity)	\
-+	ioprio_value(prioclass, priolevel, priohint, activity)
- 
- #endif /* _UAPI_LINUX_IOPRIO_H */
+ block/blk-zoned.c              | 19 ++++++++-----------
+ drivers/md/dm-zoned-metadata.c |  2 +-
+ drivers/nvme/target/zns.c      |  5 ++---
+ fs/btrfs/zoned.c               | 35 +++++++++++++++++++++++++----------
+ fs/f2fs/segment.c              | 15 ++++++++++++---
+ fs/zonefs/super.c              |  2 +-
+ include/linux/blkdev.h         |  2 +-
+ 7 files changed, 50 insertions(+), 30 deletions(-)
+---
+base-commit: 7ed2632ec7d72e926b9e8bcc9ad1bb0cd37274bf
+change-id: 20240110-zonefs_nofs-dd1e22b2e046
+
+Best regards,
 -- 
-2.25.1
+Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
