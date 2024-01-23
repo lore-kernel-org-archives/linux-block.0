@@ -1,117 +1,171 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED264403
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 20:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513444D5BF
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 22:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706042351; cv=none; b=CIWUuhPwtkuvZh6KzG7rjL3qY7db1/MaAHKC4OmJJOTkP2aMpbvlpfP6QCIQQ+vI4678rQ4kUZwYihCncx263Qv6WLRx1sszw9Bn9v8cDYdHuP+7Bue2K1ub8z0OPW6VY3nIQj+9cTBLOWCrVYvqzLNhFANKSMES6179Hk06THw=
+	t=1706048070; cv=none; b=NDPt1EfLoRMBCI+IR+GrS6igiZBOGwWVxUARilMOBPqNTYZmH4OJPQPqY6pUXtOIn6AeTmAdNMnG8cwHzvgmBqM4JpWMkgJCQyGEeRVS/g12EuJ2npPcpKkUwt1KpWIz5GLAENCjLpprzAuUUkXhcStWZsTh8XZxg6LIVU+HyIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706042351; c=relaxed/simple;
-	bh=AKvnUEhfVuCU8VrVyAXnPsxlke6MhfWDzU9qTo+VAk8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=PNH4tU0xII5+m8hbNGS0cV1bsWV/ZWcspq9j+okVBE8nGuj3WHqQm+W8OboCdQ6LPPGltaevb7p41HecKvoUtgulb/vx30AEv68NdemxBfqtO79u0kdR9KDPVPQjKJM5eS21opkejlMaEz/ojK0DNFgtAXoowu73Gz/dkm1EGdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbXrdpmF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1706048070; c=relaxed/simple;
+	bh=hc1Po8Epl8QLTSAnFW/VHh4gDdNobReMgl7lYoAphcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Y7udSTl+0kvqNZBbR7wgRveBXbqkdJav/ZehgjCO6MNS/cDPG1LALStAjno0hP2QraNOleynOt7VLz/Q0Cg4UBLqGuU7IZ+iFd1L3hrJ0t6qluP565D6bF6Wt95SeB8ByjEwANMAyRA0aQdeNL3HseIFKkx7DMkzMIEnE4tvu4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SSzHRNVx; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbXrdpmF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706042349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MZviQqgVcq2tRc3p4TWEA+VfgMFTGON5OotgVwwOHF4=;
-	b=CbXrdpmFs4TQUIcF32wb5YWwaS69sqlpZHge0Qe7wOHEPV1GHX3gufTw2+LZwyouVJrnso
-	UefbgKNL2TYjr2HKHCcBWl2Gzy+WV9cyHimFPhmhMdNoWXtRLmRxJwd/k4+5Fbpsu4Ps+u
-	5e1VEVCRLKdrVzyAqATz0WyQdqxL3ZA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-16-4b7BRzuFOe-EJjmvnNvwOg-1; Tue, 23 Jan 2024 15:39:04 -0500
-X-MC-Unique: 4b7BRzuFOe-EJjmvnNvwOg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 088278828C2;
-	Tue, 23 Jan 2024 20:39:03 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC2462026D66;
-	Tue, 23 Jan 2024 20:39:02 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id D9D7030A79CB; Tue, 23 Jan 2024 20:39:02 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id D72613FB4E;
-	Tue, 23 Jan 2024 21:39:02 +0100 (CET)
-Date: Tue, 23 Jan 2024 21:39:02 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-cc: Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
-    Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev, 
-    Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
-    David Sterba <dsterba@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>, 
-    Chao Yu <chao@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-    Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-    Chaitanya Kulkarni <kch@nvidia.com>, linux-fsdevel@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-    linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org, 
-    linux-nvme@lists.infradead.org, 
-    "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Subject: Re: [PATCH 1/5] zonefs: pass GFP_KERNEL to blkdev_zone_mgmt() call
-In-Reply-To: <20240123-zonefs_nofs-v1-1-cc0b0308ef25@wdc.com>
-Message-ID: <31e0f796-1c5-b7f8-2f4b-d937770e8d5@redhat.com>
-References: <20240123-zonefs_nofs-v1-0-cc0b0308ef25@wdc.com> <20240123-zonefs_nofs-v1-1-cc0b0308ef25@wdc.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SSzHRNVx"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5cf9e543562so399868a12.1
+        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 14:14:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706048068; x=1706652868; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oJBxxt3ypRyes1+Emb3kOT9WWT6BEwzwvnfoqAHrT8Y=;
+        b=SSzHRNVxbFslrD1rBDQN4Wtk28RjaTovNUPYekqkzuR5rM/OuKGecKol6aH48Ss/8R
+         2gCxvCOQFh4zEoee1yonDuP6Ai0NUDV716nCJ25BGRNaNRm+2RIT2zoJYyoqi5BFBC2z
+         ic9OaKkb6lztS23WX23Nmk+ITyQTnRc45PsJ2XKEFmJUuPEobMyIGkmgofKP4IK927Zc
+         QYHzxkb5hZ+EFvzaUEWYZ30pyUuSoGUiSEHQ8fI/9FbNg0MMqHGQpQpt7bR4DYOpmhAt
+         szAk0yz2EHTwGnKHdnRMRiMZx7Nmt8Xv0JQ9G3KLhqZrHkJaFh3xScHD4nIHYKzGS6hk
+         WvRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706048068; x=1706652868;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oJBxxt3ypRyes1+Emb3kOT9WWT6BEwzwvnfoqAHrT8Y=;
+        b=MAVGxfJAGM197EGeoH0iL2GaI4dge2OjKBrgUzbUcGV+pUIEtmugmeq5qa4nJtWZ8h
+         8euqpCJMq3hgkfJJx+UW9L3rxaFGitWhrwocDuHx83eV56TG6fl3HCM9cc4FdNta9Vcp
+         l34VjJ8o9nGRDWmC1Ifub7TaK1op8Yb7QrBL0uKAw3jMtWmbg2DuP1JRZpEuosQjEY9v
+         JpWKRzEwzbhYJRRWnR62tV2JigOoyt16Zu1QHfpHzKGiaE5uQlnQQzGYVTi1V3sX1yy4
+         a1kW18NCIUUEBvPiYGET3upXjT4VH/CTUsYadMnNfDnglsTUsVjlLKovXRPMYucW5JW9
+         5iRg==
+X-Gm-Message-State: AOJu0YyAIc3xeq3X7vxBpdy+7rAaXjCLvbYQxQCntZA21VAQlifIWshT
+	rrytyxB4U07CJHErocGiigZ6qE6Z+HQJkTkvK4LEoHnS+EX1lBMnjlWQMH8KkiNroqlRUfEUBqw
+	Ex3s=
+X-Google-Smtp-Source: AGHT+IFAKF2CvyfN7pgUKTMTism7+OWMVmCNk4YkSxp7sMuQPGtlFrtxs+fv+koE6RM8+bdt75CE6A==
+X-Received: by 2002:a17:902:6547:b0:1d4:e308:cb0d with SMTP id d7-20020a170902654700b001d4e308cb0dmr646555pln.5.1706048068583;
+        Tue, 23 Jan 2024 14:14:28 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id z4-20020a170903018400b001d755bde001sm3619823plg.258.2024.01.23.14.14.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jan 2024 14:14:27 -0800 (PST)
+Message-ID: <c67b93f8-22c2-4ecd-b5e7-d7830c2f6aac@kernel.dk>
+Date: Tue, 23 Jan 2024 15:14:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHSET v3] mq-deadline and BFQ scalability improvements
+Content-Language: en-US
+To: Oleksandr Natalenko <oleksandr@natalenko.name>,
+ linux-block@vger.kernel.org
+References: <20240123174021.1967461-1-axboe@kernel.dk>
+ <2313676.ElGaqSPkdT@natalenko.name>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <2313676.ElGaqSPkdT@natalenko.name>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On Tue, 23 Jan 2024, Johannes Thumshirn wrote:
-
-> Pass GFP_KERNEL instead of GFP_NOFS to the blkdev_zone_mgmt() call in
-> zonefs_zone_mgmt().
+On 1/23/24 1:03 PM, Oleksandr Natalenko wrote:
+> Hello.
 > 
-> As as zonefs_zone_mgmt() and zonefs_inode_zone_mgmt() are never called
-> from a place that can recurse back into the filesystem on memory reclaim,
-> it is save to call blkdev_zone_mgmt() with GFP_KERNEL.
+> On ?ter? 23. ledna 2024 18:34:12 CET Jens Axboe wrote:
+>> Hi,
+>>
+>> It's no secret that mq-deadline doesn't scale very well - it was
+>> originally done as a proof-of-concept conversion from deadline, when the
+>> blk-mq multiqueue layer was written. In the single queue world, the
+>> queue lock protected the IO scheduler as well, and mq-deadline simply
+>> adopted an internal dd->lock to fill the place of that.
+>>
+>> While mq-deadline works under blk-mq and doesn't suffer any scaling on
+>> that side, as soon as request insertion or dispatch is done, we're
+>> hitting the per-queue dd->lock quite intensely. On a basic test box
+>> with 16 cores / 32 threads, running a number of IO intensive threads
+>> on either null_blk (single hw queue) or nvme0n1 (many hw queues) shows
+>> this quite easily:
+>>
+>> The test case looks like this:
+>>
+>> fio --bs=512 --group_reporting=1 --gtod_reduce=1 --invalidate=1 \
+>> 	--ioengine=io_uring --norandommap --runtime=60 --rw=randread \
+>> 	--thread --time_based=1 --buffered=0 --fixedbufs=1 --numjobs=32 \
+>> 	--iodepth=4 --iodepth_batch_submit=4 --iodepth_batch_complete=4 \
+>> 	--name=scaletest --filename=/dev/$DEV
+>>
+>> and is being run on a desktop 7950X box.
+>>
+>> which is 32 threads each doing 4 IOs, for a total queue depth of 128.
+>>
+>> Results before the patches:
+>>
+>> Device		IOPS	sys	contention	diff
+>> ====================================================
+>> null_blk	879K	89%	93.6%
+>> nvme0n1		901K	86%	94.5%
+>>
+>> which looks pretty miserable, most of the time is spent contending on
+>> the queue lock.
+>>
+>> This RFC patchset attempts to address that by:
+>>
+>> 1) Serializing dispatch of requests. If we fail dispatching, rely on
+>>    the next completion to dispatch the next one. This could potentially
+>>    reduce the overall depth achieved on the device side, however even
+>>    for the heavily contended test I'm running here, no observable
+>>    change is seen. This is patch 2.
+>>
+>> 2) Serialize request insertion, using internal per-cpu lists to
+>>    temporarily store requests until insertion can proceed. This is
+>>    patch 3.
+>>
+>> 3) Skip expensive merges if the queue is already contended. Reasonings
+>>    provided in that patch, patch 4.
+>>
+>> With that in place, the same test case now does:
+>>
+>> Device		IOPS	sys	contention	diff
+>> ====================================================
+>> null_blk	2867K	11.1%	~6.0%		+226%
+>> nvme0n1		3162K	 9.9%	~5.0%		+250%
+>>
+>> and while that doesn't completely eliminate the lock contention, it's
+>> oodles better than what it was before. The throughput increase shows
+>> that nicely, with more than a 200% improvement for both cases.
+>>
+>> Since the above is very high IOPS testing to show the scalability
+>> limitations, I also ran this on a more normal drive on a Dell R7525 test
+>> box. It doesn't change the performance there (around 66K IOPS), but
+>> it does reduce the system time required to do the IO from 12.6% to
+>> 10.7%, or about 20% less time spent in the kernel.
+>>
+>>  block/mq-deadline.c | 178 +++++++++++++++++++++++++++++++++++++++-----
+>>  1 file changed, 161 insertions(+), 17 deletions(-)
+>>
+>> Since v2:
+>> 	- Update mq-deadline insertion locking optimization patch to
+>> 	  use Bart's variant instead. This also drops the per-cpu
+>> 	  buckets and hence resolves the need to potentially make
+>> 	  the number of buckets dependent on the host.
+>> 	- Use locking bitops
+>> 	- Add similar series for BFQ, with good results as well
+>> 	- Rebase on 6.8-rc1
+>>
+>>
+>>
 > 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
->  fs/zonefs/super.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> I'm running this for a couple of days with no issues, hence for the series:
 > 
-> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
-> index 93971742613a..63fbac018c04 100644
-> --- a/fs/zonefs/super.c
-> +++ b/fs/zonefs/super.c
-> @@ -113,7 +113,7 @@ static int zonefs_zone_mgmt(struct super_block *sb,
->  
->  	trace_zonefs_zone_mgmt(sb, z, op);
->  	ret = blkdev_zone_mgmt(sb->s_bdev, op, z->z_sector,
-> -			       z->z_size >> SECTOR_SHIFT, GFP_NOFS);
-> +			       z->z_size >> SECTOR_SHIFT, GFP_KERNEL);
->  	if (ret) {
->  		zonefs_err(sb,
->  			   "Zone management operation %s at %llu failed %d\n",
-> 
-> -- 
-> 2.43.0
+> Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 
-zonefs_inode_zone_mgmt calls 
-lockdep_assert_held(&ZONEFS_I(inode)->i_truncate_mutex); - so, this 
-function is called with the mutex held - could it happen that the 
-GFP_KERNEL allocation recurses into the filesystem and attempts to take 
-i_truncate_mutex as well?
+That's great to know, thanks for testing!
 
-i.e. GFP_KERNEL -> iomap_do_writepage -> zonefs_write_map_blocks -> 
-zonefs_write_iomap_begin -> mutex_lock(&zi->i_truncate_mutex)
-
-Mikulas
+-- 
+Jens Axboe
 
