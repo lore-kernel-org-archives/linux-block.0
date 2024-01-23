@@ -1,77 +1,204 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D037141A85
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 15:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1380360245
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 15:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706022545; cv=none; b=Tz48vxTwJQXO85J2L56cioJ17gqGCCEawXqntBy+pyaIbv+N/dxI8EZlaMish5kQN4Q8JkWbtXPotpGKY4JLlzvR44DwRXPeMo0z/s+61uUKYbqCno72eDWZF1Wa5/5UslzJYtdnBfUiMSqAWrhGarbsIv/E33mkII5iEZ1UlgA=
+	t=1706022574; cv=none; b=Ui5bDVSfu2MDb9Gq2rblbyk+Gvo8umHaaDR7L53Uaz9Z6MGsBIPHTTWBFZl1hNh5gvH55NtbidGs3Dq84eswPR8aXod5qwx74ANG1LyCRa7Xa3CCU8/6KiMtDAcWvUF91FZ2+DCLQejybQ+Fini/d3I6DmQkbxrAnmuY08UxR3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706022545; c=relaxed/simple;
-	bh=6MlqNG3sthSP5k/SOe9ddEU1Cp/XKlYZU8GZUusjK1Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HjwiOUtv0H3cxlUH80JEqs0KpqjNmL5H40Dlb05Dyx3teaRX4UWtoQyuZZSOP1XSjXelpjdG1N56kyXsgqsS9Pm3pNKVP2Wz0KJ8oOHqu7r9b2rZdF1ZeMVANAWZCTxhqWj4vai0S5OTq2nCFHl+erAR4QMw8+DmbRmimYZR/Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d74045c463so14983935ad.3
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 07:09:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706022543; x=1706627343;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NoeC7zDq1mvguyHAhZoeMhkVymvRSfpvOQnlewBbLqc=;
-        b=HkEgkOv30YtRTV8GfIBqZgDLvEbgoqGu3lEPsKW94snu7REGt1dD2Yt8+jjGdEr9ez
-         3sds01I3Lp3ex15AiWTMPY2iY0Jww4LfF+OWQlBVU+rgYzEUaCBDL/GEzJMKSPFqb2tz
-         RCYx3VXDgoCy5bjrqP8QDTlEKxZYxfcckPVHxOKvjHt4oJtFx/0G+ksaDTOlyIftCVG8
-         /zuo+eKgvVQVtNn8Pak5v5XN3CdBhVAB1GJzgWVdpBJtQJ/fJAoh878B0O3nKrhACgvH
-         eVX6y7TQS0oHYettitZwb2V0tgYs2Bvl06T6xrunUNNRiTkcN3/QQbRzeJl4JN0Xk3rm
-         dXcQ==
-X-Gm-Message-State: AOJu0Yxq6VyQ+wrQQu5feWpYVVoICtq2n15ptyaCzp0Px3KBaiyCs9pT
-	OgsVo78Ue282HV/a3mHf4Cvs4+auN4DSd/2siCX0DD4EbMfFDarmPwIwz5E/
-X-Google-Smtp-Source: AGHT+IG3Ja/r++nPN8gXeDgPB1cgy1SlN+d3koZSCfZCNMStjDgQxnwjE2E39AyifcWGmkiZIX5CKA==
-X-Received: by 2002:a17:90a:65c5:b0:290:a1c8:91e5 with SMTP id i5-20020a17090a65c500b00290a1c891e5mr2057558pjs.61.1706022543009;
-        Tue, 23 Jan 2024 07:09:03 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id sk1-20020a17090b2dc100b0028bd303dc58sm11798086pjb.11.2024.01.23.07.09.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 07:09:02 -0800 (PST)
-Message-ID: <63db4419-2440-4348-8bb7-c6086d7ba88c@acm.org>
-Date: Tue, 23 Jan 2024 07:09:01 -0800
+	s=arc-20240116; t=1706022574; c=relaxed/simple;
+	bh=yFhqjSYMsfQsAfF+2fsdyL48rxFoZ4t0QJ4RfI6DXGc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eL4gbirC2p6ebqw34xvphiHyywx0ddfRiXEZB/p7L7ez1j6iu80Vs+spFoCNw5uwl0I1gYm27pt9akYgYz9ZECLx2NqGJgOfHWsPz8yhXagRpc6aoBxfPB/B9QWMAiSZEBE+zEBomZfeVDnuWYFILYjyXed1wh9VyXY1aJgPTLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gMgD5Hhy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMgD5Hhy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706022572;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UEbkk1tO4HfhPK2JUx6qrKqs0KZDvkUBuiz6BAIPH5w=;
+	b=gMgD5HhyEFzw5u4NN7Hdge9ZecXFIlrZtpse3cDARzzGs61q8ERaPi68XQjr1E/eiBPbP9
+	0Ov3xDzNSfjfgJPFW3krkxKh0kjUmighOheLTnrfTcE5whAgIedHKBxTPNp/ePDbp5TM26
+	53h7YRtBcTHgMfxVF1K9U2LrcqZbeVc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-79EebRTCNnK9c8xzYxIZzw-1; Tue, 23 Jan 2024 10:09:27 -0500
+X-MC-Unique: 79EebRTCNnK9c8xzYxIZzw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CCA1383FC21;
+	Tue, 23 Jan 2024 15:09:26 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.153])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1F41A2905;
+	Tue, 23 Jan 2024 15:09:25 +0000 (UTC)
+Date: Tue, 23 Jan 2024 10:09:24 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: mst@redhat.com
+Cc: Yi Sun <yi.sun@unisoc.com>, axboe@kernel.dk,
+	yi sun <sunyibuaa@gmail.com>, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, pbonzini@redhat.com,
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, zhiguo.niu@unisoc.com,
+	hongyu.jin@unisoc.com
+Subject: Re: [PATCH 2/2] virtio-blk: Ensure no requests in virtqueues before
+ deleting vqs.
+Message-ID: <20240123150924.GD484337@fedora>
+References: <20240122110722.690223-1-yi.sun@unisoc.com>
+ <20240122110722.690223-3-yi.sun@unisoc.com>
+ <20240122154255.GA389442@fedora>
+ <CALpufv0h-sQ4Qfp-Sxd7wME4onMNAMop_gi-np6Dk2R96sba0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block/mq-deadline: Optimize request insertion
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20240122235332.2299150-1-bvanassche@acm.org>
- <1f140e5c-c7b3-424b-9231-fe51ddb6fbf7@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <1f140e5c-c7b3-424b-9231-fe51ddb6fbf7@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="5XZvsWUA6IsHlc+K"
+Content-Disposition: inline
+In-Reply-To: <CALpufv0h-sQ4Qfp-Sxd7wME4onMNAMop_gi-np6Dk2R96sba0Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 1/22/24 18:30, Damien Le Moal wrote:
-> On 1/23/24 08:53, Bart Van Assche wrote:
->> Reduce lock contention on dd->lock by calling dd_insert_request() from
->> inside the dispatch callback instead of from the insert callback. This
->> patch is inspired by a patch from Jens.
-> 
-> I supposed this is a followup of the performance discussion with Jens. If so,
-> can you add performance numbers here and so justifying the change ?
-> Otherwise, it is hard to figure out the effect of the patch and so why you are
-> making this change.
 
-Hi Damien,
+--5XZvsWUA6IsHlc+K
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If I replace Jens' patch 3/4 with this patch I achieve 20% higher IOPS
-for 1..4 CPU cores (null_blk + fio in an x86 VM).
+Hi Michael,
+This could potentially affect other VIRTIO drivers too. Please see
+below.
 
-Bart.
+On Tue, Jan 23, 2024 at 11:27:40AM +0800, yi sun wrote:
+> On Mon, Jan 22, 2024 at 11:43=E2=80=AFPM Stefan Hajnoczi <stefanha@redhat=
+=2Ecom> wrote:
+> >
+> > On Mon, Jan 22, 2024 at 07:07:22PM +0800, Yi Sun wrote:
+> > > Ensure no remaining requests in virtqueues before resetting vdev and
+> > > deleting virtqueues. Otherwise these requests will never be completed.
+> > > It may cause the system to become unresponsive. So it is better to pl=
+ace
+> > > blk_mq_quiesce_queue() in front of virtio_reset_device().
+> >
+> > QEMU's virtio-blk device implementation completes all requests during
+> > device reset. Most device implementations have to do the same to avoid
+> > leaving dangling requests in flight across device reset.
+> >
+> > Which device implementation are you using and why is it safe for the
+> > device is simply drop requests across device reset?
+> >
+> > Stefan
+>=20
+> Virtio-blk device implementation completes all requests during device res=
+et, but
+> this can only ensure that the device has finished using virtqueue. We sho=
+uld
+> also consider the driver's use of virtqueue.
+>=20
+> I caught such an example. Before del_vqs, the request had been processed =
+by
+> the device, but it had not been processed by the driver. Although I am
+> using kernel5.4,
+> I think this problem may also occur with the latest version of kernel.
+>=20
+> The debug code I added is as follows:
+> virtblk_freeze()
+> {
+>         vdev reset();
+>         quiesce queue();
+>         if (virtqueue->num_free !=3D 1024) //1024 is the init value.
+>                 BUG_ON(1);
+>         vdev del_vqs();
+> }
+>=20
+> BUG_ON triggered the dump, the analysis is as follows:
+>=20
+> There is one request left in request_queue.
+> crash_arm64> struct request ffffff81f0560000 | grep -e state -e __data_len
+>   __data_len =3D 20480,
+>   state =3D MQ_RQ_IN_FLIGHT,
+>=20
+> crash_arm64> vring_virtqueue.packed,last_used_idx,broken,vq 0xffffff8086f=
+92900 |
+> grep -e num -e used_wrap_counter -e last_used_idx -e broken -e
+> num_free -e desc_state -e "desc =3D"
+>         num =3D 1024,
+>         desc =3D 0xffffff8085ff8000,
+>       used_wrap_counter =3D false,
+>       desc_state =3D 0xffffff8085610000,
+>   last_used_idx =3D 487,
+>   broken =3D false,
+>     num_free =3D 1017,
+>=20
+> Find desc based on last_used_idx. Through flags, we can know that the req=
+uest
+> has been processed by the device, but it is still in flight state
+> because it has not
+> had time to run virtblk_done().
+> crash_arm> vring_packed_desc ffffff8085ff9e70
+> struct vring_packed_desc {
+>   addr =3D 10474619192,
+>   len =3D 20481,
+>   id =3D 667,
+>   flags =3D 2
+> }
+>=20
+> I'm using a closed source virtual machine, so I can't see the source
+> code for it,
+> but I'm guessing it's similar to qemu.
+>=20
+> After the device completes the request, we must also ensure that the driv=
+er can
+> complete the request in virtblk_done().
+>=20
+
+Okay, I think your approach of waiting for requests before
+virtio_device_reset() makes sense. blk_mq_complete_request() is async
+(might be deferred to an IPI or softirq) so it's not enough for
+virtblk_done() to run before virtio_device_reset() returns. There is no
+guarantee that virtblk_request_done() runs before virtio_device_reset()
+returns.
+
+A separate issue about virtio_device_reset():
+
+Are you using virtio-mmio? virtio-mmio's vm_reset() doesn't offer the
+same guarantees as virtio-pci's reset functions. virtio-pci guarantees
+that irqs sent by the device during the reset operation complete and the
+irq handlers run before virtio_device_reset() returns. virtio-mmio does
+not.
+
+(On top of this, virtio_device_reset() now has
+CONFIG_VIRTIO_HARDEN_NOTIFICATION which changes the semantics. Drivers
+cannot expect to complete any in-flight requests in
+virtio_device_reset() when complied with this config option.)
+
+Other drivers may be affected by these inconsistent
+virtio_device_reset() semantics. I haven't audited the code.
+
+Stefan
+
+--5XZvsWUA6IsHlc+K
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmWv1qQACgkQnKSrs4Gr
+c8jpgAf+NXHJgW/fRiaSNygOJ4hNh3a2hy8o6bZssqK9v3TAl8S3iIWCBF+IWuCA
+apnBdRbOu6nWpp9DtMjEwKzt3JAzdwRGkEpK/PbGP53Y07KihDTeJU6FhssuUxLn
+idP+j15guyV/m4+wVQJgNR6c3k9rFc+P4pH97CcxkLH7SX0uUA5dMQEBUgBN3sVb
+V+nx/vm0jTUe3BJ3mJaUzB5G4iECMAeaKTLQQj3fOoKMJ1vt8+HQGTLeHaHL9pOW
+3qeHUov5iMlp2CZpMtn0DDjqs3mX9uj3uhXGHW95BfkU1QRVHVWQypHGHE5xzAmq
+PgAw13jcz8svFhI7lztiQBHmJ5N9ug==
+=cz+B
+-----END PGP SIGNATURE-----
+
+--5XZvsWUA6IsHlc+K--
 
