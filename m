@@ -1,58 +1,59 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B327780021
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 19:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530297F7CC
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 19:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706037360; cv=none; b=ql4aU5tjGDW3s+mnFIiEMuVQiYr3Vce1EGxTIcXJeNj38E9a4zZawaNk1+wzbIuFLZ7kHGRxNQtJZV++T25BI2kBPPOvcJ70xL3m9N90WrItS9xAq8bYekWMdRNoCMangCSQSqxsjLcuoNmvHd9NPC7r9dqyswWkLHMH96WxUoY=
+	t=1706037489; cv=none; b=OZLX05yYjQPZ1HMK+kjyXcUOBFOR/VfdmU/sd1lc9sVWRPS/3U1V+T3mI3Z8yLiU3xoyv6j6EUqxyl8ouR5cmNCQmPQvb7lqae0oFyPQlFgsmBQE7Rx1McXytBhevvbvwabul280fOSCNaNzXqrZkQTIaFAzkvP+4qEJ+IJ+FqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706037360; c=relaxed/simple;
-	bh=C9VuE0opHyBTM9izpvu7+cUZQbCOwl4cNpryO2ar26Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OJpOwPPM5+G9rg250DoVtvwQlk7Gt2RQTlRvRL26e5p/Kbui1m4/NLGmDIt0O5uZHJBdoaRC1C/kCmnaB9fAs3TbZavTBR77lSq+FMsVCkqK6msSqsdxY0VqDqYUyLFk1XsItd3AYpRycdjNJYDq3mdQS91lbci66RvfKL9xPSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pnWK+fU1; arc=none smtp.client-ip=209.85.166.53
+	s=arc-20240116; t=1706037489; c=relaxed/simple;
+	bh=iiRrK8anJwPJ+QrheDvFg+C+DfMIw8xs7qiifN/qEGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=pb3TxC8vgPpJehOaHwcCe2szEd7MnR2mpIs1SuNSLk5uu0YLVsXjZVT9R4FZEA1iXZDyZxnMrg2D/tJpvJzm3rooHPwiWp5/qg/ZD06A0RR7MYftAKG0lzll7g51yuthFLrDBD8w68ZNNtCPQDT3lsJ70c3nZ0rCMo/JnU4gMYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=goGrqR7w; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pnWK+fU1"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7bee01886baso58778639f.1
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 11:15:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="goGrqR7w"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7beeeb1ba87so63089539f.0
+        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 11:18:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706037358; x=1706642158; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706037486; x=1706642286; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Fsx6I8Izi8B3v0vTTTixgXYDtfLKf3hLJxeAvGwfj0=;
-        b=pnWK+fU1eGq5yui9HX1kYIFAjIatJKWHkkdcN36hHvU8Y8lvBeNtm2KqD/CEWESPVj
-         aYbsSe8aRTFPJGOS2s3RJyw1BKt8ZCMlXMFh7owdXUwjm00xYWCRjQZJL70nuQew3Ksa
-         sTApAYZ7FWvTm9Zk7+4IlQowYd4Gfdq1rZW2Q8zHF/64OrWzOjJzsFakhfbqyA+H0iXv
-         ycm4sYl+MIHmFLCZCY62H3vn+lgEq9exUxVRg9fJiSWPD7RC1VVJeKvQOLi04GyJxrk1
-         CVwUjFA24gigTMyHTIAu44/9uwaqO5uUkkmI4gi3BJ7q0Nq0oBEPy2POmkxy/OqVcePW
-         HiTg==
+        bh=aBjUWCkpPaww4aeACfE8GkQNEDnG/EV/35Dc0mnWln4=;
+        b=goGrqR7wDIghqWLA8YTKEpHpezGCYX0+Wx4zS4C0mkC4Ty11Vhl83A9YKC5aLhNf9H
+         DDtZhF3h9qX6EeXRLxRwWsd58IaRA0Jid/xlqdsh2r1YQXh2DygVRYHryMn6HxgFk+dF
+         eP7RPlw7f3+rVUSRDlQoNwSssT69FRsSDjUuuJQV4Hs2B0qLZJkgnHcSbL6wP7+M9FLv
+         ExYczmOieG+tp+cFJXWOXTmrw41WtD1oOEk4WQn8PjI2rTu27kv+MjTWoIbeEgZi9Wc8
+         8Zl2hgP7Tqg+2d+y47fWcLq2hnK9y07CrVe4rlz7CPG0QIDUYUw+4ns195J8pufIHLK6
+         pdXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706037358; x=1706642158;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1706037486; x=1706642286;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Fsx6I8Izi8B3v0vTTTixgXYDtfLKf3hLJxeAvGwfj0=;
-        b=NFPHxmzMu9Jcm46+qeeNDi8dD3DVuNIhaJeTEyGcV3h2dp3BnVSs8GM5AK8L9VEY3/
-         eQJ66d5LX+l6iUOkvC6jCdWK5xlhVulZK9OXKc5OZHhHUUBWLjX+qzEyo2gieOg63fxi
-         yea8xPl9pv7h2UtRKzBA5Q2sXNFUCQ0Wct2pI+0NDq9mV+TAcB7c9ljV4VQo8nKcNSuV
-         fVQRkVzeJGZFoQJ9rXARB/RmrjccR2ltOiAU2I+MEhT8THrN8Hj0Pl+iwWyS0hVEz7JQ
-         KsivGgPIch+atyO7BDJUouk0YhDijN0t2vRdfzjFSpN10jpTSJz0AGBTcmD8B/Hp/AkH
-         eeLA==
-X-Gm-Message-State: AOJu0YwuKPJ2QNnWijN4I/ZrhMSUvDVlehHYa2cdN/1nfG9fv24NochV
-	7TU2XLw1Vpp3ihOFxQJlD6UXuvZH+f9xlcrQJeJoqZ0DEaQNCwbL/SkQJz5PPgk=
-X-Google-Smtp-Source: AGHT+IGBAKhxOEnS+4pbTbTAy665pq9de0BbDWPxLlAj2zqUfSFTHmWZw3VoJw5mgkp8rgO9Q5gC1g==
-X-Received: by 2002:a05:6e02:1caa:b0:35f:fa79:644 with SMTP id x10-20020a056e021caa00b0035ffa790644mr10965876ill.3.1706037357775;
-        Tue, 23 Jan 2024 11:15:57 -0800 (PST)
+        bh=aBjUWCkpPaww4aeACfE8GkQNEDnG/EV/35Dc0mnWln4=;
+        b=gdFwIPMQUSJjQquHsjAW7nmE2X7fLztJnv5PJkXRP8P8hNdGxQLUhtmopCsMoWW4Tl
+         lnuo+YH+UB7vnRgT/1qcPYrfaqeK6flsUQyVD8JvFXiFpnSeTKUYUm4zraVxduKUpUGs
+         b7RxdmtedS090dWULZR42zh/Nm14rTPYLOr99O5zqbUzH4OrASEk4VsBBLA68XFpOAXd
+         N4uLdSsx2DLs4qSysv2Wlc9QZpJi2QvLZSbkSlfnUUk7sRmY8k/xbVVJobOmziaGcDvz
+         Og9qcV82jUodRn91yHiPbdTqOxEywCt+SosOoXQHWBVXW5Jefm40WKdP8tnWWgterHlE
+         WYEA==
+X-Gm-Message-State: AOJu0Yy1Diwe2WvvHsvRX5tgFjxIIruv/msd4XRq9mbFfdnjgcK4vkRw
+	0RqBXW1XGSALWuLIs7Zpl7RrBXvRevlnDsX5AewOt7IK652thT6+YqXXedkNZImUD7VOrcCpgLn
+	K5iI=
+X-Google-Smtp-Source: AGHT+IHtr6V4ywmpVUFODw3V+X8W/+CBDjolk9kw91hm6DZNWY9hq4mjio8iAPslAQat2mygSnoa2A==
+X-Received: by 2002:a05:6e02:2199:b0:35f:b16d:cd64 with SMTP id j25-20020a056e02219900b0035fb16dcd64mr235306ila.0.1706037486449;
+        Tue, 23 Jan 2024 11:18:06 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id l4-20020a056e020e4400b00361a956a57bsm3445104ilk.53.2024.01.23.11.15.57
+        by smtp.gmail.com with ESMTPSA id a5-20020a92c545000000b00361b2dee4c2sm2676766ilj.78.2024.01.23.11.18.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 11:15:57 -0800 (PST)
-Message-ID: <8273c2ed-c22e-48f1-b595-a1e124232a1a@kernel.dk>
-Date: Tue, 23 Jan 2024 12:15:57 -0700
+        Tue, 23 Jan 2024 11:18:05 -0800 (PST)
+Message-ID: <a4436085-f31e-4b46-966d-d43a122e0898@kernel.dk>
+Date: Tue, 23 Jan 2024 12:18:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,41 +61,51 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] block: update cached timestamp post
- schedule/preemption
+Subject: Re: [PATCH 8/8] block/bfq: use separate insertion lists
 Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>
-Cc: linux-block@vger.kernel.org,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20240123173310.1966157-1-axboe@kernel.dk>
- <20240123173310.1966157-5-axboe@kernel.dk>
- <Za_9e8zEw94UpkBE@kbusch-mbp.dhcp.thefacebook.com>
+To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
+References: <20240123174021.1967461-1-axboe@kernel.dk>
+ <20240123174021.1967461-9-axboe@kernel.dk>
+ <5db987f3-9f73-4ab8-856e-a4edd74d10b4@acm.org>
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Za_9e8zEw94UpkBE@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <5db987f3-9f73-4ab8-856e-a4edd74d10b4@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/23/24 10:55 AM, Keith Busch wrote:
-> On Tue, Jan 23, 2024 at 10:30:36AM -0700, Jens Axboe wrote:
->>  static void sched_update_worker(struct task_struct *tsk)
->>  {
->> -	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
->> +	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS)) {
->> +		if (tsk->flags & PF_BLOCK_TS)
->> +			blk_plug_invalidate_ts(tsk);
->>  		if (tsk->flags & PF_WQ_WORKER)
->>  			wq_worker_running(tsk);
->>  		else
-> 
-> I don't even know what is in the 'else' case, but it doesn't look right
-> now that you added another flag to enter into this block. Before this
-> patch, it looks like we could assume PF_IO_WORKER was set in the 'else'
-> condition, but that's not necessarily the case with this change.
+On 1/23/24 11:47 AM, Bart Van Assche wrote:
+> On 1/23/24 09:34, Jens Axboe wrote:
+>> Based on the similar patch for mq-deadline, this uses separate
+>> insertion lists so we can defer touching dd->lock until dispatch
+>                                            ^^^^^^^^
+>                                           bfqd->lock?
 
-Will add an else if for PF_IO_WORKER for that case, to be on the safe
-side.
+Thanks
+
+>> with ~30% lock contention and 14.5% sys time, by applying the lessons
+>> learnt with scaling mq-deadline. Patch needs to be split, but it:
+> 
+> Is the last sentence above perhaps incomplete?
+
+It should just be removed, it's outdated as it doesn't need splitting
+anymore, I already did that work.
+
+>> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+>> index 56ff69f22163..f44f5d4ec2f4 100644
+>> --- a/block/bfq-iosched.h
+>> +++ b/block/bfq-iosched.h
+>> @@ -516,10 +516,14 @@ enum {
+>>   struct bfq_data {
+>>       struct {
+>>           spinlock_t lock;
+>> +        spinlock_t insert_lock;
+>>       } ____cacheline_aligned_in_smp;
+> 
+> Can lock contention be reduced further by applying
+> ____cacheline_aligned_in_smp to each spinlock instead of the
+> surrounding struct?
+
+Same as deadline, it doesn't really matter in my testing.
 
 -- 
 Jens Axboe
-
 
