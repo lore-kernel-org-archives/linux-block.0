@@ -1,184 +1,152 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED2C7F4
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 02:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF8FA47;
+	Tue, 23 Jan 2024 03:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705978195; cv=none; b=ZLv3dwKd6MmIwiPBghOqYA6HOyEbmx6CEM4cnjHMqBWrjkOli767OGz1S1f21ED71GGzWxILph2pxT98CwZeLnfKmMEuut9I8x8NvEycrJtBXiMqC/TAuo7/GFfk0i0/n6haL5foboEknPrkY6ZJNee5CGvquONbqxZkIt+Ql5Y=
+	t=1705980500; cv=none; b=D47dfTr5xYTXD4kLSB3nrH/32/fUbOFeCp4du2IqOKz/m9RcgToaL+drFcXwc1B+6kOpLkKwaXfPPj8Z4hfrVgAjyhrlc49NVTayCUs+p3/ado0vu2aD2A1NjklAsg0aBki1sa/TYTE1CdWRCrI/q9IJ0v0sCKHAnqKDCmbNark=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705978195; c=relaxed/simple;
-	bh=d7BWMF343mBTabYPriM1CL7mmXJ7zWSl3yWDLj6BsTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MO0Fc2C5mVeZfbZsKOdowumHKvZ3VQ96NeRy4Ao+vjUsOT5Ozt+GvRcLU28BXs+J7gD7Ta/2zpzinkABuW/9Q20af+6xPAyWLuPTiT9F+7+ua3Px/PNduFKClsUzjV8Whn8wd5n5ZBUHTbwEnDNuBxzSOFTavQKlUNN2k28pTjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OpAzzm6c; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1705980500; c=relaxed/simple;
+	bh=WYhT1KSTjcRFHQZ0dFY+HaX12W5Ope1cBkdGfWhmFm0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pErhr9R7MUFLuevn3EIOOD9fi/Am54ZEJScUPiWIDHsP+mcEuUhj6/+B/KPcYkhsJO2rdlgaiqW35dAoFUzXE9+Ob0zUjekUrNt/7qJQsH30pFEj8RuThqMOk+Wl2kVaOvG6EbyM2rfcD+7pGV4rsQ6WoQD6aY1YnPRQjpt0ql0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c16XrNBA; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpAzzm6c"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705978192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TSjPEBBGKngXqT4kXanMD5uITl62jWsIl7MG+AM+XF4=;
-	b=OpAzzm6cRK6clGqEO8YQ3JVhLQ8hLLyNZt7f01SID3hdbTIbpD1owMBGqGCTmJIdfMP2qB
-	zA3lI5vfxJ86wKw55Fqd3RysOacLlQv4ANFL+jBMb5j0JYrJYvL+G8MxlmpwNsmtYts9On
-	94kbpG701LHQBG7Ilueuup/A+1mK4QA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-346-B9Gkei2oOnSgxMOkE_jAfw-1; Mon, 22 Jan 2024 21:49:49 -0500
-X-MC-Unique: B9Gkei2oOnSgxMOkE_jAfw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDE1E1013767;
-	Tue, 23 Jan 2024 02:49:48 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.123])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 83736492BE2;
-	Tue, 23 Jan 2024 02:49:44 +0000 (UTC)
-Date: Tue, 23 Jan 2024 10:49:40 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Zdenek Kabelac <zkabelac@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Li Nan <linan666@huaweicloud.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	ming.lei@redhat.com
-Subject: Re: [PATCH v3 0/4] brd discard patches
-Message-ID: <Za8pRGZ9ZV3/jwCH@fedora>
-References: <2dacc73-854-e71c-1746-99b017401c9a@redhat.com>
- <Zao1PNip1SRVB4Rp@fedora>
- <dc9e648b-6c5f-9642-8892-b48dbc893c6@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c16XrNBA"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50e741123acso4431501e87.0;
+        Mon, 22 Jan 2024 19:28:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705980497; x=1706585297; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YBJbKQX0OEBxeprRN+v16JluNv16fHJFSLP63KZqjwQ=;
+        b=c16XrNBAHTxbbk2F6TzvQhKsQ7p91SuUQh3d9nHSS4DIp1TNR0lPEe9Kh4DGi8726Y
+         WKfDT/ngsw9mbyg6TMKrf1urJsnYQylYY+Fo5PB4XeJHjoqgSu9w11zn0Wo3joA9idLr
+         eENRZx9JxnYadHJVLUyfwKpe1lBdqgR8oil1xcXshcoSTFwrfuUqgfOBKEjHlYoO+fI1
+         m/CvYBPB54iB/0BWxkFRGTPGQ44JpuHCChfzZzVyhiDm+mprp6dp84yHy5Z9iDkyHQ/M
+         QGeb8UDIbaG/H6KppnJQG8KF5CNKpqC2lmuRettafpQ9Gve9Y2PXv6495tWUvf4TR40+
+         CEiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705980497; x=1706585297;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YBJbKQX0OEBxeprRN+v16JluNv16fHJFSLP63KZqjwQ=;
+        b=B3LDRR96cc+KSrAFL1cLyzCPwdNU9Nw3Tn3WeprRUsOuOzNjGnv1RiumInbKfgJZl6
+         izbb3OI6NMCgWVQuDTcLCFSooC2gQfwqwujh2rsNS+AmHPpNDQ1vUPAxjvcXtj5/1LgS
+         Re0UKQuGWrGWa2dVhw+PpfrjqIgZ5RaJ/d1kUzUmNFz7tUOOauKaiEh1LueUS7dLgVlM
+         rlFfudeWNBwnii4moplUscc3AxdxNPMyk/BH1Y/CVtbWAeaWVpdZ0jDBlVFzTs7zQMsc
+         gJb0Jg1iV785uBB0jsZsDsQr/a5d+xQV64GGQC5mWX86WuM3m/LSUKNQC7RMPGK0k6xM
+         FiaQ==
+X-Gm-Message-State: AOJu0YysbZ+5L9Hw2kH5E88YFTgDQX19QSJ85V3O4vjLNG7LiZOhmya6
+	EfkwK3GrbCRUiGU/BVwt4qlauwdXnJPE+XgMOyWpacyyhOfbDsBYMPgqNn2G5coP9v9igz7iHo2
+	25dry+4SLw5GlxW4G5Z7CpZdc8ig=
+X-Google-Smtp-Source: AGHT+IHzrHeX6AxgLJC298KaOYuxpbO5DUKstT5SH6IZswiIFSfK1NEzNpCYLrou/eJ6ElOxb9uC6K879m4tnEDH8H8=
+X-Received: by 2002:a05:6512:6d3:b0:50e:e0af:4efb with SMTP id
+ u19-20020a05651206d300b0050ee0af4efbmr2673823lff.104.1705980496515; Mon, 22
+ Jan 2024 19:28:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <dc9e648b-6c5f-9642-8892-b48dbc893c6@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+References: <20240122110722.690223-1-yi.sun@unisoc.com> <20240122110722.690223-3-yi.sun@unisoc.com>
+ <20240122154255.GA389442@fedora>
+In-Reply-To: <20240122154255.GA389442@fedora>
+From: yi sun <sunyibuaa@gmail.com>
+Date: Tue, 23 Jan 2024 11:27:40 +0800
+Message-ID: <CALpufv0h-sQ4Qfp-Sxd7wME4onMNAMop_gi-np6Dk2R96sba0Q@mail.gmail.com>
+Subject: Re: [PATCH 2/2] virtio-blk: Ensure no requests in virtqueues before
+ deleting vqs.
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Yi Sun <yi.sun@unisoc.com>, axboe@kernel.dk, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, pbonzini@redhat.com, 
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiguo.niu@unisoc.com, hongyu.jin@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 22, 2024 at 05:30:07PM +0100, Mikulas Patocka wrote:
-> Hi
-> 
-> 
-> On Fri, 19 Jan 2024, Ming Lei wrote:
-> 
-> > Hi Mikulas,
-> > 
-> > On Thu, Aug 10, 2023 at 12:07:07PM +0200, Mikulas Patocka wrote:
-> > > Hi
-> > > 
-> > > Here I'm submitting the ramdisk discard patches for the next merge window. 
-> > > If you want to make some more changes, please let me now.
-> > 
-> > brd discard is removed in f09a06a193d9 ("brd: remove discard support")
-> > in 2017 because it is just driver private write_zero, and user can get same
-> > result with fallocate(FALLOC_FL_ZERO_RANGE).
-> > 
-> > Also you only mentioned the motivation in V1 cover-letter:
-> > 
-> > https://lore.kernel.org/linux-block/alpine.LRH.2.02.2209151604410.13231@file01.intranet.prod.int.rdu2.redhat.com/
-> > 
-> > ```
-> > Zdenek asked me to write it, because we use brd in the lvm2 testsuite and
-> > it would be benefical to run the testsuite with discard enabled in order
-> > to test discard handling.
-> > ```
-> > 
-> > But we have lots of test disks with discard support: loop, scsi_debug,
-> > null_blk, ublk, ..., so one requestion is that why brd discard is
-> > a must for lvm2 testsuite to cover (lvm)discard handling?
-> 
-> We should ask Zdeněk Kabeláč about it - he is expert about the lvm2 
-> testsuite.
-> 
-> > The reason why brd didn't support discard by freeing pages is writeback
-> > deadlock risk, see:
-> > 
-> > commit f09a06a193d9 ("brd: remove discard support")
-> > 
-> > -static void discard_from_brd(struct brd_device *brd,
-> > -                       sector_t sector, size_t n)
-> > -{
-> > -       while (n >= PAGE_SIZE) {
-> > -               /*
-> > -                * Don't want to actually discard pages here because
-> > -                * re-allocating the pages can result in writeback
-> > -                * deadlocks under heavy load.
-> > -                */
-> > -               if (0)
-> > -                       brd_free_page(brd, sector);
-> > -               else
-> > -                       brd_zero_page(brd, sector);
-> > -               sector += PAGE_SIZE >> SECTOR_SHIFT;
-> > -               n -= PAGE_SIZE;
-> > -       }
-> > -}
-> > 
-> > However, you didn't mention how your patches address this potential
-> > risk, care to document it? I can't find any related words about
-> > this problem.
-> 
-> The writeback deadlock can happen even without discard - if the machine 
-> runs out of memory while writing data to a ramdisk. But the probability is 
-> increased when discard is used, because pages are freed and re-allocated 
-> more often.
+On Mon, Jan 22, 2024 at 11:43=E2=80=AFPM Stefan Hajnoczi <stefanha@redhat.c=
+om> wrote:
+>
+> On Mon, Jan 22, 2024 at 07:07:22PM +0800, Yi Sun wrote:
+> > Ensure no remaining requests in virtqueues before resetting vdev and
+> > deleting virtqueues. Otherwise these requests will never be completed.
+> > It may cause the system to become unresponsive. So it is better to plac=
+e
+> > blk_mq_quiesce_queue() in front of virtio_reset_device().
+>
+> QEMU's virtio-blk device implementation completes all requests during
+> device reset. Most device implementations have to do the same to avoid
+> leaving dangling requests in flight across device reset.
+>
+> Which device implementation are you using and why is it safe for the
+> device is simply drop requests across device reset?
+>
+> Stefan
 
-Yeah, I agree, what I meant is that this thing needs to be documented,
-given discard is re-introduced, and the original deadlock comment isn't
-addressed
+Virtio-blk device implementation completes all requests during device reset=
+, but
+this can only ensure that the device has finished using virtqueue. We shoul=
+d
+also consider the driver's use of virtqueue.
 
-> 
-> Generally, the admin should make sure that the machine has enough 
-> available memory when creating a ramdisk - then, the deadlock can't 
-> happen.
-> 
-> Ramdisk has no limit on the number of allocated pages, so when it runs out 
-> of memory, the oom killer will try to kill unrelated processes and the 
-> machine will hang. If there is risk of overflowing the available memory, 
-> the admin should use tmpfs instead of a ramdisk - tmpfs can be configured 
-> with a limit and it can also swap out pages.
-> 
-> > BTW, your patches looks more complicated than the original removed
-> > discard implementation. And if the above questions get addressed,
-> > I am happy to provide review on the following patches.
-> 
-> My patches actually free the discarded pages. The original discard 
-> implementation just overwrote the pages with zeroes without freeing them.
+I caught such an example. Before del_vqs, the request had been processed by
+the device, but it had not been processed by the driver. Although I am
+using kernel5.4,
+I think this problem may also occur with the latest version of kernel.
 
-The original implementation supports to discard by freeing pages, and
-it is just bypassed unconditionally by:
+The debug code I added is as follows:
+virtblk_freeze()
+{
+        vdev reset();
+        quiesce queue();
+        if (virtqueue->num_free !=3D 1024) //1024 is the init value.
+                BUG_ON(1);
+        vdev del_vqs();
+}
 
-               if (0)
-                       brd_free_page(brd, sector);
-               else
-                       brd_zero_page(brd, sector);
+BUG_ON triggered the dump, the analysis is as follows:
 
-However, page could be freed by discard when it is being consumed in brd_do_bvec().
+There is one request left in request_queue.
+crash_arm64> struct request ffffff81f0560000 | grep -e state -e __data_len
+  __data_len =3D 20480,
+  state =3D MQ_RQ_IN_FLIGHT,
 
-Maybe your patch of "brd: extend the rcu regions to cover read and write"
-can be simplified a bit, such as:
+crash_arm64> vring_virtqueue.packed,last_used_idx,broken,vq 0xffffff8086f92=
+900 |
+grep -e num -e used_wrap_counter -e last_used_idx -e broken -e
+num_free -e desc_state -e "desc =3D"
+        num =3D 1024,
+        desc =3D 0xffffff8085ff8000,
+      used_wrap_counter =3D false,
+      desc_state =3D 0xffffff8085610000,
+  last_used_idx =3D 487,
+  broken =3D false,
+    num_free =3D 1017,
 
-- grab rcu read lock in brd_do_bvec()
-- release the rcu read lock when allocating page via alloc_page() in
-  brd_insert_page()
-- change free page by rcu
+Find desc based on last_used_idx. Through flags, we can know that the reque=
+st
+has been processed by the device, but it is still in flight state
+because it has not
+had time to run virtblk_done().
+crash_arm> vring_packed_desc ffffff8085ff9e70
+struct vring_packed_desc {
+  addr =3D 10474619192,
+  len =3D 20481,
+  id =3D 667,
+  flags =3D 2
+}
 
-Or avoid it by holding page reference:
+I'm using a closed source virtual machine, so I can't see the source
+code for it,
+but I'm guessing it's similar to qemu.
 
-- grabbing page reference in brd_lookup_page() if it is called from
-copy_to_brd() or copy_from_brd(), and drop it after it is consumed
-
-
-Thanks,
-Ming
-
+After the device completes the request, we must also ensure that the driver=
+ can
+complete the request in virtblk_done().
