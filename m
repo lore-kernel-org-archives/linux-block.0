@@ -1,109 +1,98 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD905FDD5;
-	Tue, 23 Jan 2024 15:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7445F60BA3
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 15:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706023753; cv=none; b=oSVzAtUQQs10uFTD997TScBjQrn3cyuFQcfiBiWXfeHKFbfE+rPq97N1jUqLN+Sk78xg71rWj0wrNuwD4pxoVcCb+SFVZOptCHIm6LqOAvXPEJHh1Mwa8SvVJnbPtO0TYotbvRYWcRytQCh2/QorQoVwmNREIxy1Z7vHCCPEzw4=
+	t=1706025425; cv=none; b=LziTxKLOloZ5VxgcYO0+/RTBOKtXER5dbYYwbYQN+046yaeoMzHIWDhAuXsBHyfjh4/PwxPF9J+20nJmPFuHSLRUYEwBBo1PWeURF1B2nFY68+cJIiGE4AX53BpJhi3xY5KY/TgHkoDGCCL8/goLptubDExjkbb2wh/edYxgB8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706023753; c=relaxed/simple;
-	bh=s6jgl5KcyFsafPQ+hFpzhVn26U7GR5BduKRkjTiqmyM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gu+VS20tsfdFPnDGVnoxf/RCo14ddGJ7kpi4ZAt5GOqcvOSA4yntzqo73B5ADQ/epIcZcthxfa+t7CiIkk/Gf5Q39DNZagViQBbA7K+tizmAPosVPPF7bQHPUEJbg2/wxvjexLrMcd+6HYEw6bn6hgzDauCq/bi81eNf9MEAMkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d7232dcb3eso18829735ad.2;
-        Tue, 23 Jan 2024 07:29:11 -0800 (PST)
+	s=arc-20240116; t=1706025425; c=relaxed/simple;
+	bh=AaP24geF8IGRtSt63M/PXToa50MRD8//aI+xG8otgCI=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=SOxa95OZ1mramV1ttSc8U3bCt1v+LA5WHdFuQP6AdrZUeMjnR4F67sXcVJyHR6gUgahlgXO8d+XRjCeipbgoLrvLDXUOKwJLJ3/si49vDlVSwNf7UOzHP6yrOOcbdQWrqv1AiZIcQTl04pVChVPQ7vlp/ExGghcdTdpA+fqM1uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=riQ4Ag1o; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="riQ4Ag1o"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7bed82030faso57913239f.1
+        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 07:57:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706025422; x=1706630222; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=llje3QQCcfIgLmjM+yLro18lUt9cBa2L6SktSvFiZZE=;
+        b=riQ4Ag1oWtuepQpBUmQdkqOfJ9kIYFT7/tXbyijkBGIbCWPrDRA7K2OLtVNM0kxdiF
+         QBDSpe6z2MS3mor2EgoTZPlUfypphYqd4XUL7j48dNnXN5ZsFW86JXzyJQiASAGjhJTV
+         KgXQLmPUHGK/y6qlmjvqyImWf8HQ+S8V+u76J2jOtyrZV+3p8kAhCQetuoGivWOyL4b4
+         vjg+aojAav4xvEFzHyaACIIg1NS/eU3Pnw9Xr/as9mTPO0kI5HE3X+qPdyZES6WRxn4Z
+         SttdV85vjfsp6BWHzdIunc4Fh+pkQHNzB3RWfd01mldcg5AH/B/GRzxR2aNyEP/T372u
+         bydQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706023751; x=1706628551;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BEoXkdsFzObck9VQxVE2hGH3a3xF+qG8H5BqRHfrQRM=;
-        b=PBx9QDzWHnMhxgqxdNB2v0jFYL/URQfek/nb+AYQkQWZoZjnrlQMyLdukzMWs3bGq5
-         hTJ6yWzNNF7U1EVFRC2FE4EWSZLd1Hw5DhV0BU/G//uXeiNWD0lrF9BLppk4ufyiqHKa
-         AiS+tOsvlhiluuATKcI9+RE89eWEaWtHUDoA2J94LE03/YMNbNK3c+g3XcUpyvNTBUi8
-         wcS/DJ8GdXEd3fs/qyA/CUQ1kRCchVZtUtrtLd+gGEAYcUW9cWNjdAJwl5rSRb4yKqbV
-         9VNGycQb4vCv4yEnkTUuInD/iIyGu/RVe7+tdqcny5AiZLOhAMwBmukwavJJqAXkS1qC
-         /2sg==
-X-Gm-Message-State: AOJu0Yyl+UlVqdMbhOk/T+IzFSTSGns+FPXB7Utm0vwQ+KFsSJL4EoRk
-	+ge2pa0Twm52i3dEmFNx+LRlS3sMt37m3Rdk8lxxGUMKtV8RRpSs
-X-Google-Smtp-Source: AGHT+IESSOPXAtxeDnwtmAzzfqPO0vHSCSiFgAsWzZ1m6fJrkXNCGAF1nxYU6Vw1hCMO9M/5h+Bkqw==
-X-Received: by 2002:a17:903:1107:b0:1d7:2455:2e70 with SMTP id n7-20020a170903110700b001d724552e70mr3613598plh.21.1706023750906;
-        Tue, 23 Jan 2024 07:29:10 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id d5-20020a170902ef0500b001d7244c8ee0sm6819370plx.117.2024.01.23.07.29.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 07:29:10 -0800 (PST)
-Message-ID: <0d266548-b8dc-473c-9603-41f8adb2d3c1@acm.org>
-Date: Tue, 23 Jan 2024 07:29:09 -0800
+        d=1e100.net; s=20230601; t=1706025422; x=1706630222;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=llje3QQCcfIgLmjM+yLro18lUt9cBa2L6SktSvFiZZE=;
+        b=soOiseMkRdRun+c0on7tDrRh0I64aqTDs/JpSpSEVKk4vPums1wsV3uw8Y7wN54P+/
+         FQhlXkP8Wm853/L4gNHRKlXzCx/qpSKy9OAGSW97zbiUzYVSzstjLCdOBEHMFFLm+GUU
+         jg/Amo/GUmFIHS+QXq//bkeBf0smEuP7euMLNWQBFc6wyglUW97wRb5TzyLHISZI1o/c
+         +qs4Cy1G6TgdLJeDiZ09tUe/neBsJRQMESOxpwJ1gUUtMaYcLWd9eSzWanErFE+J3Obh
+         1j2JIrg2r/Xie5lw83pQEHFQn6073Vu077adM3027iKgipB736lcyRJHbW43oaT+/wpI
+         hXzg==
+X-Gm-Message-State: AOJu0YyU5SU7JEDUmvrZ28/+ItdwqOanC8rlwtx3MRR/prHBLSuoUQ4m
+	tv+QR8QKcuOGsVMtP3EPpcDeuMAuG30+BDQWlWqRk7M1Dsh3nbpa6thAMi4JRjyJDH/tcGQFSD0
+	AIiM=
+X-Google-Smtp-Source: AGHT+IHnzXr+yl4mKBgGkEQDebXz6TP1F2cEuykTezsEAK2jt26K38kM3gc4dxu/46xr6nynPv+mmg==
+X-Received: by 2002:a05:6e02:1a25:b0:35f:b16d:cd64 with SMTP id g5-20020a056e021a2500b0035fb16dcd64mr10136211ile.0.1706025422600;
+        Tue, 23 Jan 2024 07:57:02 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id n6-20020a056e0208e600b0036193f4e5c4sm4680769ilt.25.2024.01.23.07.57.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 07:57:01 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Christian A. Ehrhardt" <lk@c--e.de>
+Cc: syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com, 
+ syzbot+63dec323ac56c28e644f@syzkaller.appspotmail.com, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>
+In-Reply-To: <20240121202634.275068-1-lk@c--e.de>
+References: <20240121202634.275068-1-lk@c--e.de>
+Subject: Re: [PATCH] block: Fix WARNING in _copy_from_iter
+Message-Id: <170602542154.1916499.2341274393906762651.b4-ty@kernel.dk>
+Date: Tue, 23 Jan 2024 08:57:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 06/19] block, fs: Propagate write hints to the block
- device inode
-Content-Language: en-US
-To: Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Daejun Park <daejun7.park@samsung.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>,
- Chuck Lever <chuck.lever@oracle.com>
-References: <20231219000815.2739120-1-bvanassche@acm.org>
- <20231219000815.2739120-7-bvanassche@acm.org> <20231228071206.GA13770@lst.de>
- <00cf8ffa-8ad5-45e4-bf7c-28b07ab4de21@acm.org> <20240103090204.GA1851@lst.de>
- <CGME20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc@epcas5p4.samsung.com>
- <23753320-63e5-4d76-88e2-8f2c9a90505c@acm.org>
- <b294a619-c37e-cb05-79a8-8a62aec88c7f@samsung.com>
- <9b854847-d29e-4df2-8d5d-253b6e6afc33@acm.org>
- <9fa04d79-0ba6-a2e0-6af7-d1c85f08923b@samsung.com>
- <85be3166-1886-b56a-4910-7aff8a13ea3b@samsung.com>
- <edefdfbc-8584-47ad-9cb0-19ecb94321a8@acm.org>
- <4f36fc64-a93b-9b2c-7a12-79e25671b375@samsung.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <4f36fc64-a93b-9b2c-7a12-79e25671b375@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 1/23/24 04:16, Kanchan Joshi wrote:
-> On 1/23/2024 1:39 AM, Bart Van Assche wrote:
->> On 1/22/24 01:31, Kanchan Joshi wrote:
->>> On 1/19/2024 7:26 PM, Kanchan Joshi wrote:
->>>> On 1/19/2024 12:24 AM, Bart Van Assche wrote:
->>>>> I think the above proposal would introduce a bug: it would break the
->>>>> F_GET_RW_HINT implementation.
->>>>
->>>> Right. I expected to keep the exact change in GET, too, but that will
->>>> not be free from the side-effect.
->>>> The buffered-write path (block_write_full_page) picks the hint from one
->>>> inode, and the direct-write path (__blkdev_direct_IO_simple) picks the
->>>> hint from a different inode.
->>>> So, updating both seems needed here.
->>>
->>> I stand corrected. It's possible to do away with two updates.
->>> The direct-io code (patch 8) should rather be changed to pick the hint
->>> from bdev inode (and not from file inode).
->>> With that change, this patch only need to set the hint into only one
->>> inode (bdev one). What do you think?
->>
->> I think that would break direct I/O submitted by a filesystem.
+
+On Sun, 21 Jan 2024 21:26:34 +0100, Christian A. Ehrhardt wrote:
+> Syzkaller reports a warning in _copy_from_iter because an
+> iov_iter is supposedly used in the wrong direction. The reason
+> is that syzcaller managed to generate a request with
+> a transfer direction of SG_DXFER_TO_FROM_DEV. This instructs
+> the kernel to copy user buffers into the kernel, read into
+> the copied buffers and then copy the data back to user space.
 > 
-> By breakage do you mean not being able to set/get the hint correctly?
-> I tested with XFS and Ext4 direct I/O. No breakage.
+> [...]
 
-The approach that you proposed is wrong from a conceptual point of view.
-Zero, one or more block devices can be associated with a filesystem. It
-would be wrong to try to access all associated block devices from inside
-the F_SET_RW_HINT implementation. I don't think that there is any API in
-the Linux kernel for iterating over all the block devices associated with
-a filesystem.
+Applied, thanks!
 
-Bart.
+[1/1] block: Fix WARNING in _copy_from_iter
+      commit: 13f3956eb5681a4045a8dfdef48df5dc4d9f58a6
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
