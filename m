@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754172107;
-	Tue, 23 Jan 2024 05:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1145220;
+	Tue, 23 Jan 2024 05:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705986433; cv=none; b=WWmkEymJkWfEbrRnk8Lu7/WxfYNLHY8L9Ul88lw3ri9gNNrpXW6Dn6JSMxqCENGHPPteQOhwL/qF7wMZuEJggumsFzfEmYJ/krwMQkhiegd6p9OCCg1cBET1tY6/Jedab77cZofWq7Z3VBb1+66EN7VnVjRxWaHCvuCQb3LIRSA=
+	t=1705986896; cv=none; b=StZMY3CSwEYu6V4YqVco7dIZhor7M8TjL7WO4Qok7ZuS0f6Ex6F81Fl4x2aTJWMy6RnKYjv09j9vDT1it2qLsL1HskF6VhH4eZVU8MLmhIjCM+AlL5tbPUvKZroPf8L38+p/k+zrzIkmNaejYXhVbsbc6fQyeZ8zg+eLl6RDOF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705986433; c=relaxed/simple;
-	bh=pP73/t4EQeLWbOVO+IMYjVn0jX0lOCnSILJMj+j+sUI=;
+	s=arc-20240116; t=1705986896; c=relaxed/simple;
+	bh=SeDxthAOTwIFhmRZDIowt7SyrKBsfhtYcYm8P7eDFOU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T9ChOlwpo0zqVIAyAMsI8NAKw19h2VE6nvcX0BSESO38RaJma77vXB4QYlVVEFa7qNWH4YWOHvqpgI0jddFN9MgO8O4vQS3Ldi3oo1nl3FRgExXk0AbrB8yH9bzH/8+vokJijXz0xot68Mtg32oF0mFQbeXcUBQzGJJdMz+wuW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azAf600c; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=DHZ9cP7C7s2qVItmkBLbfutNHgVUdMiFBU1auhmNAThjrSJvOAxay+APgC4wmAaXtSrc5gazWNoj5yvG4nFUOL+QeJoPMR8aWhybJ/4nJ3+zP8t5GkDmF39wdkIsN2AUMYns0faj9uGmh/eyDHOAlg94frtVfsPNR27BmgY1hIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZ0y6vCD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azAf600c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 850CCC43390;
-	Tue, 23 Jan 2024 05:07:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZ0y6vCD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17D38C433C7;
+	Tue, 23 Jan 2024 05:14:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705986433;
-	bh=pP73/t4EQeLWbOVO+IMYjVn0jX0lOCnSILJMj+j+sUI=;
+	s=k20201202; t=1705986896;
+	bh=SeDxthAOTwIFhmRZDIowt7SyrKBsfhtYcYm8P7eDFOU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=azAf600cCndJ1ldkIpfi9L/CwKa1f/qYxVkMLOb2GTvmHseQ0pND7OdDBad/D17Ne
-	 qPfjZA+eyHu6uLA3lHNGVMVmJ1DEE4AGQvGj5+ej3G68QTvfNdqblKilyJjaPZX7XQ
-	 gRnRsKho/UL0N/lt8+Y8p3q6rj49uZji08uBx92kzNLcecR6ikeuLg0K4nTBv+zn/f
-	 0G0Zfh3gCiwv7Gne0GXDJuY/QWIpkFcK4IprajCsIGd0Dkyqg+14wg1PKF+XFSQbkA
-	 WAB3LaBwKjCHDOcCG+OapsB1Qo5psfL1DZwsNhSKuXOTivosKNCpNx42veJyTVcbbt
-	 nMOoq8hBfqpfQ==
-Message-ID: <d3e5c919-0040-4284-96a3-df39f1aed819@kernel.org>
-Date: Tue, 23 Jan 2024 14:07:10 +0900
+	b=EZ0y6vCD6HFvuRmSM7s/RT9DEP3p7gRhTKVYy4+fidZ2Hu/56vVZ1in80rhT1IPde
+	 Mz/BDuGECMXYB+VnSD3hQnnr5vzj20uZKGoU6NEauXc0UUSa3LmEKumv7jEBgZoN+n
+	 FtPDuN37BqeZOMSEBYio35lkhWbDilu9k7xj93vMz5OKSnwjCgulvtyd5LDsPnr+ed
+	 yy5+DhSTlQoBeyYzghqCEWZyYJQs6uZQsSwq4ZtfP1C4LbgMftQ/rLUSFZ/+MGlPCr
+	 Ztqvp/ZCUrPr/6Ytzn2pcb2FPj5rkvozgjgc5x6uQe7EQqNQyQm/CfIgTKrME5cSCs
+	 i5jF2UPHmzNtQ==
+Message-ID: <c0738ba9-2eb8-4997-b357-af481da0a457@kernel.org>
+Date: Tue, 23 Jan 2024 14:12:37 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/15] block: use queue_limits_commit_update in
- queue_max_sectors_store
+Subject: Re: [PATCH 06/15] nvme: remove the hack to not update the discard
+ limits in nvme_config_discard
 Content-Language: en-US
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
@@ -47,36 +47,48 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
  virtualization@lists.linux.dev
 References: <20240122173645.1686078-1-hch@lst.de>
- <20240122173645.1686078-5-hch@lst.de>
+ <20240122173645.1686078-7-hch@lst.de>
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20240122173645.1686078-5-hch@lst.de>
+In-Reply-To: <20240122173645.1686078-7-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 1/23/24 02:36, Christoph Hellwig wrote:
-> Convert queue_max_sectors_store to use queue_limits_commit_update to
-> check and updated the max_sectors limit and freeze the queue before
-
-s/updated/update
-
-> doing so to ensure we don't have request in flight while changing
-
-s/request/requests
-
-> the limits.
-> 
-> Note that this removes the previously held queue_lock that doesn't
-> protect against any other read or writer.
-
-s/read/reader
-
+> Now that the block layer tracks a separate user max discard limit, there
+> is no need to prevent nvme from updating it on controller capability
+> changes.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/nvme/host/core.c | 10 ----------
+>  1 file changed, 10 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 85ab0fcf9e8864..ef70268dccbc5a 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -1754,16 +1754,6 @@ static void nvme_config_discard(struct nvme_ctrl *ctrl, struct gendisk *disk,
+>  	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct nvme_dsm_range) <
+>  			NVME_DSM_MAX_RANGES);
+>  
+> -	/*
+> -	 * If discard is already enabled, don't reset queue limits.
+> -	 *
+> -	 * This works around the fact that the block layer can't cope well with
+> -	 * updating the hardware limits when overridden through sysfs.  This is
+> -	 * harmless because discard limits in NVMe are purely advisory.
+> -	 */
+> -	if (queue->limits.max_discard_sectors)
+> -		return;
+> -
+>  	blk_queue_max_discard_sectors(queue, max_discard_sectors);
 
-Other than these typos, looks good to me.
+This function references max_user_discard_sectors but that access is done
+without holding the queue limits mutex. Is that safe ?
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+>  	if (ctrl->dmrl)
+>  		blk_queue_max_discard_segments(queue, ctrl->dmrl);
 
 -- 
 Damien Le Moal
