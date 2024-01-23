@@ -1,44 +1,44 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1200D5F858;
-	Tue, 23 Jan 2024 15:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D9E5FDC1;
+	Tue, 23 Jan 2024 15:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706022797; cv=none; b=uo5g7DvdUALsht1Eu4WTty/c5AgUycBGd20t56f10w94dLfpeV8tHM+/RWqXUvGYyC8Lq4B6k323G0+onQE8umA2EOuYzDe/p6B0wQmFXqtS9TOtARnK3mx6v7yqN85q0hA2x7TWMHQ1pdl3XCbXgcpLitppL1izJRZX/XBmRSk=
+	t=1706022969; cv=none; b=RXCvwKIw6a6geFLBlWqcpPxq488/Zi2N+ZMm7mCBLe68BLixPU922BqiaDiu5Ga6kLnyNJjMoXWWH0yoeN4OV8Z5QXu6b8JDgE0/hWuUgQV6mUhRqoistatLcP7P2Q99q8F4b0AQXt9pWmyhjDF8890DzJLfXSjAmsSpfy7vSbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706022797; c=relaxed/simple;
-	bh=u0Leg9PiHF+SJm46VLNcoF7rGsCiIovBve84jf6JUr4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=bRAmcLe/JTvmR3SX5m6H9EPuV+oLM7RDBOm9kAaEJBCNnGa+sxPJ7IFVG4/Jbx4gWRJ4qLVT9gB6uI98zRXJc1rIfJg3Rgox8GevKZW0fL1oH1GDaKzgy1qaJceJosmvHH9IkmnesrgQ9MEPOCSftT1ayvlljG1C7lf3SFs0cHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1706022969; c=relaxed/simple;
+	bh=4MN9XPaI8DG5h/Mb5684YL7mALVoD0cvXWChmDz4dxE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n3oZlQM/R+Sr/moi/to1kT33FSOm1Jq2twkZF+2OtsP+R2hKHjVW2p3v989+TD7MGGNh2A/TBt+7XM/Oyvf1fD0vhM5hOGst2j9oqdLKcS+fgZ5DJBRDOQ4dG65zwmXegv+UEmJR6lN5yJQmD61xt3g364y89eyvjsNGc0+xT0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d75c97ea6aso13690285ad.1;
-        Tue, 23 Jan 2024 07:13:15 -0800 (PST)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6da4a923b1bso2921201b3a.2;
+        Tue, 23 Jan 2024 07:16:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706022795; x=1706627595;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1706022968; x=1706627768;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pR/WckuwdSJfMEWLdLn8merKply6UNVDy0QMROF2vEQ=;
-        b=hj/8efLUIfnnQdJVAQ5ru7DyDZqm1N7zSFByLZ2F9UNwo8mrDh2l01KWf7Vk1mbJgN
-         9UJQEKbkCaODE3fCJdmy816e1bzXQXYQCzm0vqUtpNfjSGN6B2Of4D733GljA63Ve+ZH
-         GpmCgpxjVgFTpFt6BID8K58LKr29PXYIShRj/rm+I2mDsQF2KR07AYJJVueq9vgl0GfO
-         mFXAGSOO/k0vNB7Q49ZnPGfa++g0Zc1Qr9PKuuXCiiEZYYl069oxYg9+7VXJgEeM5GNB
-         s/gkh3DLffJLB5lBN4n1Toot+gI130vqfv39aHCXTZFu5cpCnXnDy9WmggIGJnh+eUA7
-         K0bw==
-X-Gm-Message-State: AOJu0YxeFdUvqhyY7IVyu/9Ss+vliZQxDxYUdhdbzs/iV5Kiyq2ADduE
-	k3gSlFMknM6C/16cvsrzyNDXpBPqhwjYWyNLiAzROQ9S6zWPgI2c
-X-Google-Smtp-Source: AGHT+IEmEm4Jm4p8GuqiECjJQQGO4iygUAnaH/jUt4l6k7Ix25qX6in2iCpCqMI/CuSw6xK9rrgLPA==
-X-Received: by 2002:a17:902:fe0c:b0:1d3:8bf1:9add with SMTP id g12-20020a170902fe0c00b001d38bf19addmr7820844plj.36.1706022795040;
-        Tue, 23 Jan 2024 07:13:15 -0800 (PST)
+        bh=4MN9XPaI8DG5h/Mb5684YL7mALVoD0cvXWChmDz4dxE=;
+        b=ewyUShQx9cyMPoIyJ4KSK407ri6hDUuTByaaZtHgmmSefuyraQI6LZAqEgPD6pwScI
+         f2T04ofTyZCzdArs/R6xwNPLCTTubJjiyNaW0mNnKpxIzGby0YUedLD4kaBxGF7+grvN
+         eW5OtHQP1b08TexsshIi/Cftrj3i8NXjMYBQoOuV0dV/UNspC3s3X2hrgIsLNznBnQwH
+         ozr3QgfvZYozYZ1wsQvYtIhQwC29sqMVNjepflYwrNq6yiTHfKxOj1Y1ukTxNH+N7qVY
+         VGatJ3PBnbcMxXoNRx4Ob0Y3wpNSd6IrAn7FsGL5JiaH1rwe0jF18wapWHt0XwG3dC4s
+         7DNQ==
+X-Gm-Message-State: AOJu0YzRnOlYws7lzymiE05qrS4bNI6TeESmqWHAA+Y4G31FwacHHsKk
+	liy8uziNqzllzqzkpRf9Qb1XGw2eksj+QLCW4tjI5JgSGVSosWb/
+X-Google-Smtp-Source: AGHT+IFp7pMnYH0gktm7QzybFFbhLvtSr7LvguBU3uq+yohXAmjef/mpr/BM6n/KLut6dYDgxALkCQ==
+X-Received: by 2002:a05:6a20:7aa1:b0:199:f15e:f8cb with SMTP id u33-20020a056a207aa100b00199f15ef8cbmr2612477pzh.53.1706022967737;
+        Tue, 23 Jan 2024 07:16:07 -0800 (PST)
 Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id b5-20020a170902bd4500b001d74c170f2dsm3853359plx.90.2024.01.23.07.13.13
+        by smtp.gmail.com with ESMTPSA id h10-20020a65638a000000b005c2420fb198sm9026991pgv.37.2024.01.23.07.16.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 07:13:14 -0800 (PST)
-Message-ID: <9154bfb7-851d-4144-a69e-1aa25b72e8ad@acm.org>
-Date: Tue, 23 Jan 2024 07:13:11 -0800
+        Tue, 23 Jan 2024 07:16:07 -0800 (PST)
+Message-ID: <ac240189-d889-448b-b5f7-7d5a13d4316d@acm.org>
+Date: Tue, 23 Jan 2024 07:16:05 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,26 +46,42 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: introduce content activity based ioprio
+Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
 Content-Language: en-US
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe
- <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>,
- steve.kang@unisoc.com
-References: <20240123093352.3007660-1-zhaoyang.huang@unisoc.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ Ed Tsai <ed.tsai@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <69b17db7-e9c9-df09-1022-ff7a9e5e04dd@huaweicloud.com>
+ <20240112043915.GA5664@lst.de>
+ <2d83fcb3-06e6-4a7c-9bd7-b8018208b72f@huaweicloud.com>
+ <20240115055940.GA745@lst.de>
+ <0d23e3d3-1d7a-f76b-307b-7d74b3f91e05@huaweicloud.com>
+ <f1cac818-8fc8-4f24-b445-d10aa99c04ba@acm.org>
+ <e0305a2c-20c1-7e0f-d25d-003d7a72355f@huaweicloud.com>
+ <aedc82bc-ef10-4bc6-b76c-bf239f48450f@acm.org>
+ <20240118073151.GA21386@lst.de>
+ <434b771a-7873-4c53-9faa-c5dbc4296495@acm.org>
+ <20240123091316.GA32130@lst.de>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240123093352.3007660-1-zhaoyang.huang@unisoc.com>
+In-Reply-To: <20240123091316.GA32130@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/23/24 01:33, zhaoyang.huang wrote:
-> +	activity += (bio->bi_vcnt <= IOPRIO_NR_ACTIVITY && PageWorkingset(page)) ? 1 : 0;
-> +	bio->bi_ioprio = IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint, activity);
+On 1/23/24 01:13, Christoph Hellwig wrote:
+> The point is why you think fair sharing is not actually required for
+> these particular setups only.
 
-Shouldn't any code that is related to the page cache occur in filesystem code
-(fs/) instead of in the block layer (block/)?
+Hi Christoph,
+
+Do you perhaps want me to move the SCSI host sysfs attribute that controls
+fair sharing to the /sys/block/${bdev}/queue directory?
 
 Thanks,
 
 Bart.
-
