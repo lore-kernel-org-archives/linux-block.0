@@ -1,234 +1,185 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from prime.voidband.net (prime.voidband.net [199.247.17.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC11823B6
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 19:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F9982D6E
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 20:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.247.17.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706038540; cv=none; b=gdxE9O5gHEYK3mE9TFBdDJg8QwJCl0E/ETriZopzIXYWNgOhBMEPMLg9C/PA/GumVNP5sydU6tcqm8crrw2flYmY1lF7rhuO4rdqrPx2eZAfNbBjHpvxx0FuJQqudHU7V8gKDnNqxhcum2xXrES1urNrQucSVLUv98Akt7Hol8E=
+	t=1706040255; cv=none; b=u9vxQrwiXO9Xk51sov3VWVHbG+WPZGw+lvf5DLg4rCxlcD6ISmedGgMruC/8EvcQno1ZXE397S19fsr5ZHWGKedfjaU46kFjD8Oz746PRGHX/QK9XSYhFYk31OyjJU6TKNOAOajYnqwtaCV2g+sH25vkPR+Hf/3nfa28TpU5RW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706038540; c=relaxed/simple;
-	bh=UlJXHzckCQJdamra/G6D9M8Y+u6D7yXFSqzOhtZP1dM=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=F9ecWDVte8X2rSrmacwmmHI3QP/Z0aWBrAZBM2kBIhY1YjW7T5iETPL1mIJQ9duYvOnH8H1R8TriAQs1pQuRU1TmMeI/HhnT/ldb2tBbL8I2JdGhWHuNvLwQolhx7aTB2UXHNlDs9AK++rHfxmJoywR4diIipS5OtH9VJA0Z1dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=Jh6DFuwS; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1706040255; c=relaxed/simple;
+	bh=mOmIH5wL4V/CCoLcyqHhQgE8tzV1Oo8ITTb61A38GZw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ibM0hRvGwjnS3l1SkEUhw8vEcruBnzEt1jhv3S7vvm+/mrMqULeUgGwniUS6oP7jqsMB5EHA9b1ikn5bKmgG+SHNDGveYlXu5m55rBwaMgUHa32jz9+a/SHOZb2roWu9qNA3iiyj33dK3mjghYB1sRPpCLQWFlypUlqmVsxnyN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name; spf=pass smtp.mailfrom=natalenko.name; dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b=u8pwC+xR; arc=none smtp.client-ip=199.247.17.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=natalenko.name
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="Jh6DFuwS"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a293f2280c7so488933266b.1
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 11:35:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1706038536; x=1706643336; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NajI3TyyQ9rVjJzigsgGZze0f+PlQKZyJBohU0PsaJA=;
-        b=Jh6DFuwSN+WUkKnMU3d4iIsjF3HOxY+RAhAvx4wswwS/kfuhwe7/1vFT7VgeGXhx+y
-         8STV8Ra3CFmg0xmKyWy8+2JUaL9jybGP0CH89Rfdvo2WaGMGpY0eopxrbmU/NxFLSz1Z
-         zbpzNp+VGBsnx/aQAiUT84qMDXqmeRU5Oa5s308nVFxl0vrrQDO3Rlnl29PKp0bBxFnC
-         d8fDSqQLwe+kf9ipBKyl/x87HzQ/ew9ruOkblgtdBKvmVOMB5AXoKJHHDqoFDs4Wf1Fu
-         J2VPPzu/5azY1E8TJxxdu17Y7VkpM6gqBb1DQ86bSEykYNWETif/Sv9Qj+oobdw23isb
-         XFvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706038536; x=1706643336;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NajI3TyyQ9rVjJzigsgGZze0f+PlQKZyJBohU0PsaJA=;
-        b=AbxGtBIuEv9udgZEgN2A8nxZzvcQf17i7Plri2k4SUcA199cGvJDALC2sh7rTU0Z5U
-         7dlw94n5Poq8bFVtJfU/B6wTJoxQcqVVIhUUq51i9itimKLEBpNs69pY0ZtF50LLAB0n
-         XHchvSApzJPs6KTDzJV3t/7CyKaNt006oAr01/tvHExEvO19XBLM+FQZz7dCVKNJQBnY
-         HtX8uO5V/5W5iDb5qGFIXNnB7Pu6LfjwQxvAoT2o9DI4hLrnttz8akOrlDjw22OH/3Bo
-         r3Vp/YGDrL7ApYtfBA8qrRBPAhMNVOUaBWFTBzgmfQCdsGtA39CLqXF37IWN+iqHsecY
-         R7zA==
-X-Gm-Message-State: AOJu0YztIHoSmp0F5hDB+ZQM52MzaFbi/a3dga1EsjLTqrSq6U2FJ0B2
-	uQxCdUQvXClGOa/R8KV9tLi/km5jWvXvKixemsFRgtqsVuSd5xClQnv7Hf5FMPI=
-X-Google-Smtp-Source: AGHT+IH+nEjpWVx0IVAFz3yVMdU+gU7oGcfJTGzNXfC0VN2oXyQ4l7UdqaC8c9fQ5/eV65g/ZF9OTg==
-X-Received: by 2002:a17:906:458:b0:a2f:c87a:385b with SMTP id e24-20020a170906045800b00a2fc87a385bmr113163eja.3.1706038535403;
-        Tue, 23 Jan 2024 11:35:35 -0800 (PST)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id e13-20020a170906c00d00b00a2a1bbda0a6sm14819283ejz.175.2024.01.23.11.35.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 11:35:34 -0800 (PST)
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <20230503090708.2524310-4-nmi@metaspace.dk>
- <iL2M45BoRlK6yS9y8uo0A5yUXcZWMkdk3vtH3LRFSWXfvPVagVZ-0YC7taIKOBFUcjJYA_2xNNFPoC4WL-_ulCHOLkbqvsZlIshE_LEeYtU=@proton.me>
- <87il3kjgk0.fsf@metaspace.dk>
- <104a22f7-a5bb-4fb6-9ce9-aa2d4e63417f@proton.me>
-User-agent: mu4e 1.10.8; emacs 28.2.50
-From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith
- Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes
- Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
- rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew
- Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
- <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun
- Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org,
- gost.dev@samsung.com
-Subject: Re: [RFC PATCH 03/11] rust: block: introduce `kernel::block::mq`
- module
-Date: Tue, 23 Jan 2024 19:39:15 +0100
-In-reply-to: <104a22f7-a5bb-4fb6-9ce9-aa2d4e63417f@proton.me>
-Message-ID: <874jf3kflx.fsf@metaspace.dk>
+	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="u8pwC+xR"
+Received: from spock.localnet (unknown [94.142.239.106])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by prime.voidband.net (Postfix) with ESMTPSA id 3C360635B04A;
+	Tue, 23 Jan 2024 21:04:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+	s=dkim-20170712; t=1706040242;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=imb7tfjJqL2msrJNrUU6kOeGMtI7Z0rfy9NcNMo6ffw=;
+	b=u8pwC+xR/inTvts2VErcRnSHJ8q6zRwIOUoFZudjjSzKmNanI/3FUAA9dJslQKtgZZQ0yd
+	bGgzuWVtBa2lLJVLRs5g2Yp9kOM+m7C8stul7kRu22kLHUmqzxMM8h38++TQwGr8MY+314
+	HYmmIlkNTYqZuUhSZsmVwZuiWxdOuvo=
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCHSET v3] mq-deadline and BFQ scalability improvements
+Date: Tue, 23 Jan 2024 21:03:51 +0100
+Message-ID: <2313676.ElGaqSPkdT@natalenko.name>
+In-Reply-To: <20240123174021.1967461-1-axboe@kernel.dk>
+References: <20240123174021.1967461-1-axboe@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; boundary="nextPart4865610.GXAFRqVoOG";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+
+--nextPart4865610.GXAFRqVoOG
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"; protected-headers="v1"
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Date: Tue, 23 Jan 2024 21:03:51 +0100
+Message-ID: <2313676.ElGaqSPkdT@natalenko.name>
+In-Reply-To: <20240123174021.1967461-1-axboe@kernel.dk>
+References: <20240123174021.1967461-1-axboe@kernel.dk>
+MIME-Version: 1.0
+
+Hello.
+
+On =FAter=FD 23. ledna 2024 18:34:12 CET Jens Axboe wrote:
+> Hi,
+>=20
+> It's no secret that mq-deadline doesn't scale very well - it was
+> originally done as a proof-of-concept conversion from deadline, when the
+> blk-mq multiqueue layer was written. In the single queue world, the
+> queue lock protected the IO scheduler as well, and mq-deadline simply
+> adopted an internal dd->lock to fill the place of that.
+>=20
+> While mq-deadline works under blk-mq and doesn't suffer any scaling on
+> that side, as soon as request insertion or dispatch is done, we're
+> hitting the per-queue dd->lock quite intensely. On a basic test box
+> with 16 cores / 32 threads, running a number of IO intensive threads
+> on either null_blk (single hw queue) or nvme0n1 (many hw queues) shows
+> this quite easily:
+>=20
+> The test case looks like this:
+>=20
+> fio --bs=3D512 --group_reporting=3D1 --gtod_reduce=3D1 --invalidate=3D1 \
+> 	--ioengine=3Dio_uring --norandommap --runtime=3D60 --rw=3Drandread \
+> 	--thread --time_based=3D1 --buffered=3D0 --fixedbufs=3D1 --numjobs=3D32 \
+> 	--iodepth=3D4 --iodepth_batch_submit=3D4 --iodepth_batch_complete=3D4 \
+> 	--name=3Dscaletest --filename=3D/dev/$DEV
+>=20
+> and is being run on a desktop 7950X box.
+>=20
+> which is 32 threads each doing 4 IOs, for a total queue depth of 128.
+>=20
+> Results before the patches:
+>=20
+> Device		IOPS	sys	contention	diff
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> null_blk	879K	89%	93.6%
+> nvme0n1		901K	86%	94.5%
+>=20
+> which looks pretty miserable, most of the time is spent contending on
+> the queue lock.
+>=20
+> This RFC patchset attempts to address that by:
+>=20
+> 1) Serializing dispatch of requests. If we fail dispatching, rely on
+>    the next completion to dispatch the next one. This could potentially
+>    reduce the overall depth achieved on the device side, however even
+>    for the heavily contended test I'm running here, no observable
+>    change is seen. This is patch 2.
+>=20
+> 2) Serialize request insertion, using internal per-cpu lists to
+>    temporarily store requests until insertion can proceed. This is
+>    patch 3.
+>=20
+> 3) Skip expensive merges if the queue is already contended. Reasonings
+>    provided in that patch, patch 4.
+>=20
+> With that in place, the same test case now does:
+>=20
+> Device		IOPS	sys	contention	diff
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> null_blk	2867K	11.1%	~6.0%		+226%
+> nvme0n1		3162K	 9.9%	~5.0%		+250%
+>=20
+> and while that doesn't completely eliminate the lock contention, it's
+> oodles better than what it was before. The throughput increase shows
+> that nicely, with more than a 200% improvement for both cases.
+>=20
+> Since the above is very high IOPS testing to show the scalability
+> limitations, I also ran this on a more normal drive on a Dell R7525 test
+> box. It doesn't change the performance there (around 66K IOPS), but
+> it does reduce the system time required to do the IO from 12.6% to
+> 10.7%, or about 20% less time spent in the kernel.
+>=20
+>  block/mq-deadline.c | 178 +++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 161 insertions(+), 17 deletions(-)
+>=20
+> Since v2:
+> 	- Update mq-deadline insertion locking optimization patch to
+> 	  use Bart's variant instead. This also drops the per-cpu
+> 	  buckets and hence resolves the need to potentially make
+> 	  the number of buckets dependent on the host.
+> 	- Use locking bitops
+> 	- Add similar series for BFQ, with good results as well
+> 	- Rebase on 6.8-rc1
+>=20
+>=20
+>=20
+
+I'm running this for a couple of days with no issues, hence for the series:
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+
+Thank you.
+
+=2D-=20
+Oleksandr Natalenko (post-factum)
+--nextPart4865610.GXAFRqVoOG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEZUOOw5ESFLHZZtOKil/iNcg8M0sFAmWwG6cACgkQil/iNcg8
+M0sQBRAAq/xXyerNlTDv0zKkdWKsPjbJNpTqSpIW5FgqnxfQIkuqT5z27UHJCurY
+IUDhCKIzBpxwLo+Nr+XuUkL5y0IM+3a7lodNHXuP7yNZX0QbAvGH9N3P0qQ+QYqc
+7yNM2Lm0s+DiGYhtVxKR4XY8utogCUSzw1DrMkQrz8aOeBSs4JO8LFsmpGRgzS9R
+rLN3ah6Yg/s9rVWcic2jqIQc1DnqW2+eWCxMt19+wqGJu0bVcC+2AANaWSfVumEB
+bmFTuzvyhurPLNG0Au8OvwLFhKfRMd6yxZspNSUaq54Q57Om3n4NZsKmx5itKt6q
+S67V301SyQQ+g9cUOd9XPkncvQ6+4rP2tp83ocnRcg3JRViQLbOBEzDqHblphbV/
+2/oO6qJmv1I91YQwzQGkCM40p/mr11QgpINDOQcBUyqLmadDseEd92bc+MYpP7F1
+AG7xYlgIbUkO0C62kwCwQpwZwtP08ReZS/H9tMbNYJj//heJeWph2SQ5tdBfRNzD
+3HuRJU+5vhB8a6fYV/vIweWfrmBtI6O8ZN8RiYCXvGo6rap/PhtKbnJemXZy/Ba6
+EFih85tL1OCUtRlljZTs2Amwe0L7bzdO5XDWuKkzgZUoN8TYOM93aLOz8NVa+x9d
+mkqYDqsX2WnuDVVHPk7aiPfGESvb5AFRpRe6EpnkqBqC3qTmu/E=
+=fEwg
+-----END PGP SIGNATURE-----
+
+--nextPart4865610.GXAFRqVoOG--
 
 
-Benno Lossin <benno.lossin@proton.me> writes:
 
-> Hi Andreas,
->
-> just so you know, I received this email today, so it was very late,
-> since the send date is January 12.
-
-My mistake. I started drafting Jan 12, but did not get time to finish
-the mail until today. I guess that is how mu4e does things, I should be
-aware and fix up the date. Thanks for letting me know =F0=9F=91=8D
-
->
-> On 12.01.24 10:18, Andreas Hindborg (Samsung) wrote:
->>=20
->> Hi Benno,
->>=20
->> Benno Lossin <benno.lossin@proton.me> writes:
->>=20
->> <...>
->>=20
->>>> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/g=
-en_disk.rs
->>>> new file mode 100644
->>>> index 000000000000..50496af15bbf
->>>> --- /dev/null
->>>> +++ b/rust/kernel/block/mq/gen_disk.rs
->>>> @@ -0,0 +1,133 @@
->>>> +// SPDX-License-Identifier: GPL-2.0
->>>> +
->>>> +//! GenDisk abstraction
->>>> +//!
->>>> +//! C header: [`include/linux/blkdev.h`](../../include/linux/blkdev.h)
->>>> +//! C header: [`include/linux/blk_mq.h`](../../include/linux/blk_mq.h)
->>>> +
->>>> +use crate::block::mq::{raw_writer::RawWriter, Operations, TagSet};
->>>> +use crate::{
->>>> +    bindings, error::from_err_ptr, error::Result, sync::Arc, types::F=
-oreignOwnable,
->>>> +    types::ScopeGuard,
->>>> +};
->>>> +use core::fmt::{self, Write};
->>>> +
->>>> +/// A generic block device
->>>> +///
->>>> +/// # Invariants
->>>> +///
->>>> +///  - `gendisk` must always point to an initialized and valid `struc=
-t gendisk`.
->>>> +pub struct GenDisk<T: Operations> {
->>>> +    _tagset: Arc<TagSet<T>>,
->>>> +    gendisk: *mut bindings::gendisk,
->>>
->>> Why are these two fields not embedded? Shouldn't the user decide where
->>> to allocate?
->>=20
->> The `TagSet` can be shared between multiple `GenDisk`. Using an `Arc`
->> seems resonable?
->>=20
->> For the `gendisk` field, the allocation is done by C and the address
->> must be stable. We are owning the pointee and must drop it when it goes =
-out
->> of scope. I could do this:
->>=20
->> #[repr(transparent)]
->> struct GenDisk(Opaque<bindings::gendisk>);
->>=20
->> struct UniqueGenDiskRef {
->>      _tagset: Arc<TagSet<T>>,
->>      gendisk: Pin<&'static mut GenDisk>,
->>=20
->> }
->>=20
->> but it seems pointless. `struct GenDisk` would not be pub in that case. =
-What do you think?
->
-> Hmm, I am a bit confused as to how you usually use a `struct gendisk`.
-> You said that a `TagSet` might be shared between multiple `GenDisk`s,
-> but that is not facilitated by the C side?
->
-> Is it the case that on the C side you create a struct containing a
-> tagset and a gendisk for every block device you want to represent?
-
-Yes, but the `struct tag_set` can be shared between multiple `struct
-gendisk`.
-
-Let me try to elaborate:
-
-In C you would first allocate a `struct tag_set` and partially
-initialize it. The allocation can be dynamic, static or part of existing
-allocation. You would then partially initialize the structure and finish
-the initialization by calling `blk_mq_alloc_tag_set()`. This populates
-the rest of the structure which includes more dynamic allocations.
-
-You then allocate a `struct gendisk` by calling `blk_mq_alloc_disk()`,
-passing in a pointer to the `struct tag_set` you just created. This
-function will return a pointer to a `struct gendisk` on success.
-
-In the Rust abstractions, we allocate the `TagSet`:
-
-#[pin_data(PinnedDrop)]
-#[repr(transparent)]
-pub struct TagSet<T: Operations> {
-    #[pin]
-    inner: Opaque<bindings::blk_mq_tag_set>,
-    _p: PhantomData<T>,
-}
-
-with `PinInit` [^1]. The initializer will partially initialize the struct a=
-nd
-finish the initialization like C does by calling
-`blk_mq_alloc_tag_set()`. We now need a place to point the initializer.
-`Arc::pin_init()` is that place for now. It allows us to pass the
-`TagSet` reference to multiple `GenDisk` if required. Maybe we could be
-generic over `Deref<TagSet>` in the future. Bottom line is that we need
-to hold on to that `TagSet` reference until the `GenDisk` is dropped.
-
-`struct tag_set` is not reference counted on the C side. C
-implementations just take care to keep it alive, for instance by storing
-it next to a pointer to `struct gendisk` that it is servicing.
-
-> And you decided for the Rust abstractions that you want to have only a
-> single generic struct for any block device, distinguished by the generic
-> parameter?
-
-Yes, we have a single generic struct (`GenDisk`) representing the C
-`struct gendisk`, and a single generic struct (`TagSet`) representing
-the C `struct tag_set`. These are both generic over `T: Operations`.
-`Operations` represent a C vtable (`struct blk_mq_ops`) attached to the
-`struct tag_set`. This vtable is provided by the driver and holds
-function pointers that allow the kernel to perform actions such as queue
-IO requests with the driver. A C driver can instantiate multiple `struct
-gendisk` and service them with the same `struct tag_set` and thereby the
-same vtable. Or it can use separate tag sets and the same vtable. Or a
-separate tag_set and vtable for each gendisk.
-
-> I think these kinds of details would be nice to know. Not only for
-> reviewers, but also for veterans of the C APIs.
-
-I should write some module level documentation clarifying the use of
-these types. The null block driver is a simple example, but it is just
-code. I will include more docs in the next version.
-
-Best regards
-Andreas
-
-
-[^1]: This was not `PinInit` in the RFC, I changed this based on your
-feedback. The main points are still the same though.
