@@ -1,82 +1,132 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5960860277;
-	Tue, 23 Jan 2024 15:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD4D50A69;
+	Tue, 23 Jan 2024 16:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706025592; cv=none; b=QRDrGCM5cr+Fl/SDlOi1TeXHhslXs8/usk+35kiKmEKgSYfr6OrubEC7jO08qWzVi6Hur/RSv2zcTZvR7SmSQfsrCDj51cbYd5YoYduHvP1iDzaUXVG2xsxfPJmILHIQemCLknEb2nhksRBMuy7rHVE7ytadaabD/6VZuKdf5e0=
+	t=1706026520; cv=none; b=YSwYLB0kwkkStxtwk3E9Fn4q3bkA4SimuIMPoGKGBtsTOvNcwNw3gvwje2iRcVD5MHYT4GolA0wpLn8u6ts3UhFCTGSty8D/dFc6PhcejenZNBMS3kkf+m8uPBMS7wLf+num9wsGasRXRqBTyOPYdgGrMv+JKiJeAQH5BdigODA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706025592; c=relaxed/simple;
-	bh=iIHhwJmlVl4McxGC9PbqY4l+E23pzobb4tPG9neNLtE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QOFAF04E3XxGuNcqdjQRT7EvyP8voI/xtE7nL+laNOQi1HLzvUkgd50NFuc8ur6HUQdN2sznMmphxcNTHbUrwBU4iaS4FrFrHei3fvS81cf5cDtWIvqWkmhr6kIee8VakRaijAQbsdNHKTFf2k6zZQxDTf4FcS4Ss0gY+eurG9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-29026523507so3384719a91.0;
-        Tue, 23 Jan 2024 07:59:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706025590; x=1706630390;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iIHhwJmlVl4McxGC9PbqY4l+E23pzobb4tPG9neNLtE=;
-        b=WXznCNFtNDeBnfj7ZoMnppx1mLRidFZuOmZPdigWNST6zkXrWznB/kpEQQO9dSBPHt
-         Hkg+5+3l1Dv+BcuAU7692Bru+qa6LDBv5S1JDgVAR4gCgQcC5Z6N+39OXR34smgBw05t
-         O2uIHDPXVHNRyZk1l7+micBhOccFZf5wINr2uYLy4PMFmU5QW17pCdGR9Dg1eT/vh1/V
-         pBhtf0lj8VxyAJZaFQP8a1i2iSXJoS3oeP8YhH9rs7VluzmGJNME+zQlag//WTRosZ1z
-         kr2eAYCcJA4BmWuqXJhOK3o0oNVNZ9J5TT2LmXvNldrHSlb1XYFuWrueKl4on3SB6U0z
-         eQJg==
-X-Gm-Message-State: AOJu0YxLp1cusiIFky/Se7/04Lv0HwBGuvZ+oK7nWmcEWhChFDJ1iGJ2
-	GS9JBaK+daEHFlOTVJAPOgjonwxlOeStfM8fLh1tl7xD+NQwn2yy
-X-Google-Smtp-Source: AGHT+IFBKo6TaGjN+xsbdjkKy45LeO8Nqvlw3rKgL8wySffscXcpKtUN5cn2mbrHecHhdrY25UKkDw==
-X-Received: by 2002:a17:90a:e38a:b0:28e:84e4:f7d1 with SMTP id b10-20020a17090ae38a00b0028e84e4f7d1mr3417266pjz.93.1706025590529;
-        Tue, 23 Jan 2024 07:59:50 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id sy14-20020a17090b2d0e00b0029005525d76sm11890089pjb.16.2024.01.23.07.59.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 07:59:50 -0800 (PST)
-Message-ID: <7d24a322-47a7-4b28-b3a3-42cf3dfbee82@acm.org>
-Date: Tue, 23 Jan 2024 07:59:49 -0800
+	s=arc-20240116; t=1706026520; c=relaxed/simple;
+	bh=1ENQhjPmqQqDuRq4QiAjxPKkdrMTPT16721GC13SkRI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ElGBgksE5yQCCyjq1FlqQCWN7A++nMMv0EWZtpJG+LyEBnkhp6uJnVkQrsN8lRRBzdRYC6fVxdQ+xTyEvRlcfPLTFffGuOqbgQ0uPws+DqkXycVLjpfvIzQglmjFFwY8vCp5wnhlm30HxOclxuTwBmSj8r4bfgMizofQyWOGfZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Ux+KWEpn; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Ux+KWEpn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=oivkfmluazbg5k63zstr4jyxyy.protonmail; t=1706026515; x=1706285715;
+	bh=lFmPnlDhdUF+oK3pA8hGDyEbiO46BnuhG9DGtH2Rdyo=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Ux+KWEpnI8Dx8i/G7/kvFMHgnv6uPzBujikGY55tXrWjrmqnG6M8wQLWlqXRBD7Wc
+	 MUlhB1dkjr+emcMlqpSxlP6bhr2k+MofZPCxaWVUko11mro4oIPwFvZ6TMC0i2fpwL
+	 Szed1TwzSkrDTOphiTbtzCVhWfo1nckoIOJVL8mI328f/zzhrCQNz02qJjsgLjGco6
+	 iv7rQ4TuZp9/IOO7T3XLtKJGvV0JFYLvxMIXUhkRXYewQmvsy8dowGofwTLE0D1AtL
+	 dbOr19rRoulYuXfelPXhwLC5D2yhHubsJ0+jjREsKv3UIWLut/OCVKYHFqWiV8+KFY
+	 1OXvUbRfK1lVw==
+Date: Tue, 23 Jan 2024 16:14:58 +0000
+To: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [RFC PATCH 03/11] rust: block: introduce `kernel::block::mq` module
+Message-ID: <104a22f7-a5bb-4fb6-9ce9-aa2d4e63417f@proton.me>
+In-Reply-To: <87il3kjgk0.fsf@metaspace.dk>
+References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-4-nmi@metaspace.dk> <iL2M45BoRlK6yS9y8uo0A5yUXcZWMkdk3vtH3LRFSWXfvPVagVZ-0YC7taIKOBFUcjJYA_2xNNFPoC4WL-_ulCHOLkbqvsZlIshE_LEeYtU=@proton.me> <87il3kjgk0.fsf@metaspace.dk>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 05/19] block, fs: Restore the per-bio/request data
- lifetime fields
-Content-Language: en-US
-To: Kanchan Joshi <joshi.k@samsung.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>
-References: <20231219000815.2739120-1-bvanassche@acm.org>
- <CGME20231219000844epcas5p277a34c3a0e212b4a3abec0276ea9e6c6@epcas5p2.samsung.com>
- <20231219000815.2739120-6-bvanassche@acm.org>
- <23354a9b-dd1e-5eed-f537-6a2de9185d7a@samsung.com>
- <bbaf780c-2807-44df-93b4-f3c9f6c43fad@acm.org>
- <51194dc8-dd4d-1b0b-f6c1-4830ea3a63e9@samsung.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <51194dc8-dd4d-1b0b-f6c1-4830ea3a63e9@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 1/23/24 04:35, Kanchan Joshi wrote:
-> At the cost of inviting some extra work. Because this patch used
-> file_inode, the patch 6 needs to set the hint on two inodes.
-> If we use bdev_file_inode, this whole thing becomes clean.
+Hi Andreas,
 
-The idea of accessing block devices only in the F_SET_RW_HINT
-implementation is wrong because it involves a layering violation.
-With the current patch series data lifetime information is
-available to filesystems like Fuse. If the F_SET_RW_HINT
-implementation would iterate over block devices, no data lifetime
-information would be available to filesystems like Fuse.
+just so you know, I received this email today, so it was very late,
+since the send date is January 12.
 
-Bart.
+On 12.01.24 10:18, Andreas Hindborg (Samsung) wrote:
+>=20
+> Hi Benno,
+>=20
+> Benno Lossin <benno.lossin@proton.me> writes:
+>=20
+> <...>
+>=20
+>>> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/ge=
+n_disk.rs
+>>> new file mode 100644
+>>> index 000000000000..50496af15bbf
+>>> --- /dev/null
+>>> +++ b/rust/kernel/block/mq/gen_disk.rs
+>>> @@ -0,0 +1,133 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +
+>>> +//! GenDisk abstraction
+>>> +//!
+>>> +//! C header: [`include/linux/blkdev.h`](../../include/linux/blkdev.h)
+>>> +//! C header: [`include/linux/blk_mq.h`](../../include/linux/blk_mq.h)
+>>> +
+>>> +use crate::block::mq::{raw_writer::RawWriter, Operations, TagSet};
+>>> +use crate::{
+>>> +    bindings, error::from_err_ptr, error::Result, sync::Arc, types::Fo=
+reignOwnable,
+>>> +    types::ScopeGuard,
+>>> +};
+>>> +use core::fmt::{self, Write};
+>>> +
+>>> +/// A generic block device
+>>> +///
+>>> +/// # Invariants
+>>> +///
+>>> +///  - `gendisk` must always point to an initialized and valid `struct=
+ gendisk`.
+>>> +pub struct GenDisk<T: Operations> {
+>>> +    _tagset: Arc<TagSet<T>>,
+>>> +    gendisk: *mut bindings::gendisk,
+>>
+>> Why are these two fields not embedded? Shouldn't the user decide where
+>> to allocate?
+>=20
+> The `TagSet` can be shared between multiple `GenDisk`. Using an `Arc`
+> seems resonable?
+>=20
+> For the `gendisk` field, the allocation is done by C and the address
+> must be stable. We are owning the pointee and must drop it when it goes o=
+ut
+> of scope. I could do this:
+>=20
+> #[repr(transparent)]
+> struct GenDisk(Opaque<bindings::gendisk>);
+>=20
+> struct UniqueGenDiskRef {
+>      _tagset: Arc<TagSet<T>>,
+>      gendisk: Pin<&'static mut GenDisk>,
+>=20
+> }
+>=20
+> but it seems pointless. `struct GenDisk` would not be pub in that case. W=
+hat do you think?
+
+Hmm, I am a bit confused as to how you usually use a `struct gendisk`.
+You said that a `TagSet` might be shared between multiple `GenDisk`s,
+but that is not facilitated by the C side?
+
+Is it the case that on the C side you create a struct containing a
+tagset and a gendisk for every block device you want to represent?
+And you decided for the Rust abstractions that you want to have only a
+single generic struct for any block device, distinguished by the generic
+parameter?
+I think these kinds of details would be nice to know. Not only for
+reviewers, but also for veterans of the C APIs.
+
+--=20
+Cheers,
+Benno
+
