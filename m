@@ -1,44 +1,49 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0DD57316;
-	Tue, 23 Jan 2024 08:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B557860;
+	Tue, 23 Jan 2024 08:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705999592; cv=none; b=tBaOg/gjdD4spUkomwDo0crrZSV5nvIJOaAj8zka+Zr3eD8QiAzBOVU2Qa87EmT6Xqy1wjCLtM7GqNBElVZMbkvTWK/f3+S1poD4LJ9PCXrIt2kPwr4/Hmr8gbYmcTqwvDti6yw1LCEjhMlMgKzIXbBmouTHAspk6khvlREsTZI=
+	t=1705999664; cv=none; b=d5GsMPFFTlftmX8lrH4ot49Ha7O9VdMxa5YAWisaeDnE31MmC4UKMhstoWsVIxnRDbTLtAdp2oCPgm4iJM6YtU7gEF9lg4AZbhjtq8HQ/4LXemo7oCSw1vHvhZrVveedHOn9QW1EXtFvDzuo+0DLfXq+ri5kmaUp2VPRprNk7XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705999592; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1705999664; c=relaxed/simple;
+	bh=8RQY7arEYehD1BOniNMroVFilVaiSnwq/CgGVP3ThIQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UWBy8pbdEEmDg8RNgLS+4SVuvLd8AJzCueNDX+wZVcvBFKUzy5QRNHNrbYv4zulYimSngSu80kzHn3S6hizWCjbkRa5EMv+S/pVzMBqBSZIrFE+Q69mMVAIhOh8LY4R4QrTT/qi5Qck9t8vq00Pk/diQTMgDjE0fMYsA2HoQIsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=D6iyN1EW; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=TEh68BOuBaLKmZhCH0jN4kWlwxhmvsWx1Iwiz1ATzOPUIaVUYqvcpMmwJlEqsN0b07iRvkXjqy+T8dO28vTKKnwiXOAbP4X7dH1FsxJE+wHXCeF4Bs8MMrYa7oBj6Gk1xcrebnKgwF5yRrRKeNdLR2Nk3WiyDAX0SFLn5U/XsQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WYbEiRNQ; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D6iyN1EW"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WYbEiRNQ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=D6iyN1EWmmMw2R0pqSUNme4xDL
-	UvmpKetVaKS+eeWapPSFD8YqOeYMaPf0jCnW8rL3M9hnqG/ekImj2UsO5xS4EURLl7X4aWzAoMq3G
-	EfWx2xDrVAT4Vv3kmgLmiNNvNEcchk5bKbhonvH/qij/dQOZVybk0ILxMM/EXeFoYMrK+7Gf5NKYI
-	x1lbZx/tHMW716TCozDMR3ZN3xlwhXdPg3OTBfCk/SMiT3vu+YEnCQ2Q/FM+k1wZs9M5hsd14uakV
-	NUI+Ruxe0VFn8AsBpHFONAGvBln/97K+cRbLm0lMttUVm+ZsbksRn7QX2is1jzB48BXqTUSNXCeLx
-	YZX8xsiw==;
+	bh=fSTvLztS7719yyFEnMvAe2uObBUKHJdWLKe1j3LT2Iw=; b=WYbEiRNQwbZ4vG/wMXl1gMSx1+
+	0k17q4Gx+7d7CfXLBjK8+kYuiB26pdCXTopSWlMoMezp2bZatP6vbW+rkpyLLoqgJJ7eN3Vsco30M
+	LRGxHDPLBdrSwC4x0Iu+gy6GZ+bv2T13wWlXM2ZdqG71/XQ56Eewzxwv9f6AAxKd+ZdDFQEnVIdtC
+	TFrSoMOFqjqfzPccY/64LeywGv42iXLyOIvOyqwOsKNkY7BbZ6KxBbMFPE5BPrZZgZUxG4yHdHyyu
+	snrJ1b4oMX9owN++IGdrZ+fFm3eXpyK4nyFOrU7pFKlV4TA+Wmj18jXLDyx7+BLxcuDX/bpSIyTEK
+	vSWze7tg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rSCQO-00FcWD-0C;
-	Tue, 23 Jan 2024 08:46:28 +0000
-Date: Tue, 23 Jan 2024 00:46:28 -0800
+	id 1rSCRY-00Fcoj-0I;
+	Tue, 23 Jan 2024 08:47:40 +0000
+Date: Tue, 23 Jan 2024 00:47:40 -0800
 From: Christoph Hellwig <hch@infradead.org>
-To: Tang Yizhou <yizhou.tang@shopee.com>
-Cc: tj@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-	chunguang.xu@shopee.com
-Subject: Re: [PATCH] blk-throttle: Eliminate redundant checks for data
- direction
-Message-ID: <Za985ElMjsCWPwY3@infradead.org>
-References: <20240123081248.3752878-1-yizhou.tang@shopee.com>
+To: Qais Yousef <qyousef@layalina.io>
+Cc: Jens Axboe <axboe@kernel.dk>, Ingo Molnar <mingo@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>, Wei Wang <wvw@google.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH] block/blk-mq: Don't complete locally if capacities are
+ different
+Message-ID: <Za99LKnQE/M6pVfM@infradead.org>
+References: <20240122224220.1206234-1-qyousef@layalina.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,9 +52,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240123081248.3752878-1-yizhou.tang@shopee.com>
+In-Reply-To: <20240122224220.1206234-1-qyousef@layalina.io>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good:
+On Mon, Jan 22, 2024 at 10:42:20PM +0000, Qais Yousef wrote:
+> The logic in blk_mq_complete_need_ipi() assumes SMP systems where all
+> CPUs have equal capacities
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+What is a capacity here?
+
+> +	return arch_scale_cpu_capacity(this_cpu) >= arch_scale_cpu_capacity(that_cpu);
+
+oerly long line here.
+
+Also pleas split patches for different subsystems.
+
