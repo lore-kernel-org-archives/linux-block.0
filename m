@@ -1,214 +1,184 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35DCF9DE
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 02:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED2C7F4
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 02:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705977041; cv=none; b=eL9vSGz2EmVpgd6pEunY+saanxWLlzsAdnXON5A+QU4W1oDbYzrogjXqSrxeA15/+Rh03QLEdmYbvxJKQhHotmKPeCGpUbWSh3gJ2TAtVFHbiVHiGdTn7vyFq/tZt3y9XaQy5rDMIDOuuQi6dZh2x0yABigmBI0ZQM+WoF0R6RY=
+	t=1705978195; cv=none; b=ZLv3dwKd6MmIwiPBghOqYA6HOyEbmx6CEM4cnjHMqBWrjkOli767OGz1S1f21ED71GGzWxILph2pxT98CwZeLnfKmMEuut9I8x8NvEycrJtBXiMqC/TAuo7/GFfk0i0/n6haL5foboEknPrkY6ZJNee5CGvquONbqxZkIt+Ql5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705977041; c=relaxed/simple;
-	bh=QE53X/xWXwcKBomQY1jbzB3x3h6ecrLHnmpGX5csJfc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NmTlUtKo6OU7QvN/AFiCnR5kjgKkLB8ofGFrpKPsPColTmB5FDqCQ9aHfqaAXF0pYTaTVO+mS3tag1mLVu0HOuJqzNguKHXGct8EMJHgkIkfD+KnK+aWCWPFUGv3gui21ABRWmf5+ShKuYf2o4sAtxql34f/us5fHDymwNMBs6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MvDSHpca; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1705978195; c=relaxed/simple;
+	bh=d7BWMF343mBTabYPriM1CL7mmXJ7zWSl3yWDLj6BsTs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MO0Fc2C5mVeZfbZsKOdowumHKvZ3VQ96NeRy4Ao+vjUsOT5Ozt+GvRcLU28BXs+J7gD7Ta/2zpzinkABuW/9Q20af+6xPAyWLuPTiT9F+7+ua3Px/PNduFKClsUzjV8Whn8wd5n5ZBUHTbwEnDNuBxzSOFTavQKlUNN2k28pTjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OpAzzm6c; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MvDSHpca"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3045C433F1;
-	Tue, 23 Jan 2024 02:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705977041;
-	bh=QE53X/xWXwcKBomQY1jbzB3x3h6ecrLHnmpGX5csJfc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MvDSHpcaDSh1DF90EHB5v/WczcVUFfWPpFgUQCJxdZL3KwaA5CRnbO0E2RxdeyYVC
-	 sTm0bqtK+dk9mLR1dRs8KwMtohhkv5JQC29E39b0CP+w1FNzWVfVyNCXCXZiaK7YeG
-	 PdIhAnDGgiluUsliodIHeTkW+R0GY57xEz/I80afCqHTHKmYLJTBe4DV+g/WLAyZYA
-	 yfGsKPT7gAbgo+Aw92tBu7SewnHKaah2AuY6wGwKgKLPaJgWH9pNFjfz6bC1cSjiOn
-	 m4lroeQVtUK01GSGaer0OFkAwG6PEyrxoYjk7ua0sgjcp4C4xRt+99RRZfJVUZOyZz
-	 v1R+lQVvd8dkQ==
-Message-ID: <1f140e5c-c7b3-424b-9231-fe51ddb6fbf7@kernel.org>
-Date: Tue, 23 Jan 2024 11:30:39 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpAzzm6c"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705978192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TSjPEBBGKngXqT4kXanMD5uITl62jWsIl7MG+AM+XF4=;
+	b=OpAzzm6cRK6clGqEO8YQ3JVhLQ8hLLyNZt7f01SID3hdbTIbpD1owMBGqGCTmJIdfMP2qB
+	zA3lI5vfxJ86wKw55Fqd3RysOacLlQv4ANFL+jBMb5j0JYrJYvL+G8MxlmpwNsmtYts9On
+	94kbpG701LHQBG7Ilueuup/A+1mK4QA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-346-B9Gkei2oOnSgxMOkE_jAfw-1; Mon, 22 Jan 2024 21:49:49 -0500
+X-MC-Unique: B9Gkei2oOnSgxMOkE_jAfw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDE1E1013767;
+	Tue, 23 Jan 2024 02:49:48 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.123])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 83736492BE2;
+	Tue, 23 Jan 2024 02:49:44 +0000 (UTC)
+Date: Tue, 23 Jan 2024 10:49:40 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Zdenek Kabelac <zkabelac@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Li Nan <linan666@huaweicloud.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+	ming.lei@redhat.com
+Subject: Re: [PATCH v3 0/4] brd discard patches
+Message-ID: <Za8pRGZ9ZV3/jwCH@fedora>
+References: <2dacc73-854-e71c-1746-99b017401c9a@redhat.com>
+ <Zao1PNip1SRVB4Rp@fedora>
+ <dc9e648b-6c5f-9642-8892-b48dbc893c6@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block/mq-deadline: Optimize request insertion
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20240122235332.2299150-1-bvanassche@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20240122235332.2299150-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dc9e648b-6c5f-9642-8892-b48dbc893c6@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On 1/23/24 08:53, Bart Van Assche wrote:
-> Reduce lock contention on dd->lock by calling dd_insert_request() from
-> inside the dispatch callback instead of from the insert callback. This
-> patch is inspired by a patch from Jens.
+On Mon, Jan 22, 2024 at 05:30:07PM +0100, Mikulas Patocka wrote:
+> Hi
+> 
+> 
+> On Fri, 19 Jan 2024, Ming Lei wrote:
+> 
+> > Hi Mikulas,
+> > 
+> > On Thu, Aug 10, 2023 at 12:07:07PM +0200, Mikulas Patocka wrote:
+> > > Hi
+> > > 
+> > > Here I'm submitting the ramdisk discard patches for the next merge window. 
+> > > If you want to make some more changes, please let me now.
+> > 
+> > brd discard is removed in f09a06a193d9 ("brd: remove discard support")
+> > in 2017 because it is just driver private write_zero, and user can get same
+> > result with fallocate(FALLOC_FL_ZERO_RANGE).
+> > 
+> > Also you only mentioned the motivation in V1 cover-letter:
+> > 
+> > https://lore.kernel.org/linux-block/alpine.LRH.2.02.2209151604410.13231@file01.intranet.prod.int.rdu2.redhat.com/
+> > 
+> > ```
+> > Zdenek asked me to write it, because we use brd in the lvm2 testsuite and
+> > it would be benefical to run the testsuite with discard enabled in order
+> > to test discard handling.
+> > ```
+> > 
+> > But we have lots of test disks with discard support: loop, scsi_debug,
+> > null_blk, ublk, ..., so one requestion is that why brd discard is
+> > a must for lvm2 testsuite to cover (lvm)discard handling?
+> 
+> We should ask Zdeněk Kabeláč about it - he is expert about the lvm2 
+> testsuite.
+> 
+> > The reason why brd didn't support discard by freeing pages is writeback
+> > deadlock risk, see:
+> > 
+> > commit f09a06a193d9 ("brd: remove discard support")
+> > 
+> > -static void discard_from_brd(struct brd_device *brd,
+> > -                       sector_t sector, size_t n)
+> > -{
+> > -       while (n >= PAGE_SIZE) {
+> > -               /*
+> > -                * Don't want to actually discard pages here because
+> > -                * re-allocating the pages can result in writeback
+> > -                * deadlocks under heavy load.
+> > -                */
+> > -               if (0)
+> > -                       brd_free_page(brd, sector);
+> > -               else
+> > -                       brd_zero_page(brd, sector);
+> > -               sector += PAGE_SIZE >> SECTOR_SHIFT;
+> > -               n -= PAGE_SIZE;
+> > -       }
+> > -}
+> > 
+> > However, you didn't mention how your patches address this potential
+> > risk, care to document it? I can't find any related words about
+> > this problem.
+> 
+> The writeback deadlock can happen even without discard - if the machine 
+> runs out of memory while writing data to a ramdisk. But the probability is 
+> increased when discard is used, because pages are freed and re-allocated 
+> more often.
 
-I supposed this is a followup of the performance discussion with Jens. If so,
-can you add performance numbers here and so justifying the change ?
-Otherwise, it is hard to figure out the effect of the patch and so why you are
-making this change.
+Yeah, I agree, what I meant is that this thing needs to be documented,
+given discard is re-introduced, and the original deadlock comment isn't
+addressed
 
 > 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/mq-deadline.c | 70 +++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 58 insertions(+), 12 deletions(-)
+> Generally, the admin should make sure that the machine has enough 
+> available memory when creating a ramdisk - then, the deadlock can't 
+> happen.
 > 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 83bc21801226..d11b8604f046 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -89,11 +89,15 @@ struct deadline_data {
->  	 */
->  	struct {
->  		spinlock_t lock;
-> +		spinlock_t insert_lock;
->  		spinlock_t zone_lock;
->  	} ____cacheline_aligned_in_smp;
->  
->  	unsigned long run_state;
->  
-> +	struct list_head at_head;
-> +	struct list_head at_tail;
-> +
->  	struct dd_per_prio per_prio[DD_PRIO_COUNT];
->  
->  	/* Data direction of latest dispatched request. */
-> @@ -120,6 +124,9 @@ static const enum dd_prio ioprio_class_to_prio[] = {
->  	[IOPRIO_CLASS_IDLE]	= DD_IDLE_PRIO,
->  };
->  
-> +static void dd_insert_request(struct request_queue *q, struct request *rq,
-> +			      blk_insert_t flags, struct list_head *free);
-> +
->  static inline struct rb_root *
->  deadline_rb_root(struct dd_per_prio *per_prio, struct request *rq)
->  {
-> @@ -592,6 +599,35 @@ static struct request *dd_dispatch_prio_aged_requests(struct deadline_data *dd,
->  	return NULL;
->  }
->  
-> +static void __dd_do_insert(struct request_queue *q, blk_insert_t flags,
-> +			   struct list_head *list, struct list_head *free)
-> +{
-> +	while (!list_empty(list)) {
-> +		struct request *rq;
-> +
-> +		rq = list_first_entry(list, struct request, queuelist);
-> +		list_del_init(&rq->queuelist);
-> +		dd_insert_request(q, rq, flags, free);
-> +	}
-> +}
-> +
-> +static void dd_do_insert(struct request_queue *q, struct list_head *free)
-> +{
-> +	struct deadline_data *dd = q->elevator->elevator_data;
-> +	LIST_HEAD(at_head);
-> +	LIST_HEAD(at_tail);
-> +
-> +	lockdep_assert_held(&dd->lock);
-> +
-> +	spin_lock(&dd->insert_lock);
-> +	list_splice_init(&dd->at_head, &at_head);
-> +	list_splice_init(&dd->at_tail, &at_tail);
-> +	spin_unlock(&dd->insert_lock);
-> +
-> +	__dd_do_insert(q, BLK_MQ_INSERT_AT_HEAD, &at_head, free);
-> +	__dd_do_insert(q, 0, &at_tail, free);
-> +}
-> +
->  /*
->   * Called from blk_mq_run_hw_queue() -> __blk_mq_sched_dispatch_requests().
->   *
-> @@ -606,6 +642,7 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->  	const unsigned long now = jiffies;
->  	struct request *rq;
->  	enum dd_prio prio;
-> +	LIST_HEAD(free);
->  
->  	/*
->  	 * If someone else is already dispatching, skip this one. This will
-> @@ -620,6 +657,11 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->  		return NULL;
->  
->  	spin_lock(&dd->lock);
-> +        /*
-> +         * Request insertion happens from inside the dispatch callback instead
-> +         * of inside the insert callback to minimize contention on dd->lock.
-> +         */
-> +	dd_do_insert(hctx->queue, &free);
->  	rq = dd_dispatch_prio_aged_requests(dd, now);
->  	if (rq)
->  		goto unlock;
-> @@ -638,6 +680,8 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->  	clear_bit(DD_DISPATCHING, &dd->run_state);
->  	spin_unlock(&dd->lock);
->  
-> +	blk_mq_free_requests(&free);
-> +
->  	return rq;
->  }
->  
-> @@ -727,8 +771,12 @@ static int dd_init_sched(struct request_queue *q, struct elevator_type *e)
->  	eq->elevator_data = dd;
->  
->  	spin_lock_init(&dd->lock);
-> +	spin_lock_init(&dd->insert_lock);
->  	spin_lock_init(&dd->zone_lock);
->  
-> +	INIT_LIST_HEAD(&dd->at_head);
-> +	INIT_LIST_HEAD(&dd->at_tail);
-> +
->  	for (prio = 0; prio <= DD_PRIO_MAX; prio++) {
->  		struct dd_per_prio *per_prio = &dd->per_prio[prio];
->  
-> @@ -899,19 +947,13 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
->  {
->  	struct request_queue *q = hctx->queue;
->  	struct deadline_data *dd = q->elevator->elevator_data;
-> -	LIST_HEAD(free);
-> -
-> -	spin_lock(&dd->lock);
-> -	while (!list_empty(list)) {
-> -		struct request *rq;
->  
-> -		rq = list_first_entry(list, struct request, queuelist);
-> -		list_del_init(&rq->queuelist);
-> -		dd_insert_request(q, rq, flags, &free);
-> -	}
-> -	spin_unlock(&dd->lock);
-> -
-> -	blk_mq_free_requests(&free);
-> +	spin_lock(&dd->insert_lock);
-> +	if (flags & BLK_MQ_INSERT_AT_HEAD)
-> +		list_splice_init(list, &dd->at_head);
-> +	else
-> +		list_splice_init(list, &dd->at_tail);
-> +	spin_unlock(&dd->insert_lock);
->  }
->  
->  /* Callback from inside blk_mq_rq_ctx_init(). */
-> @@ -990,6 +1032,10 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
->  	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
->  	enum dd_prio prio;
->  
-> +	if (!list_empty_careful(&dd->at_head) ||
-> +	    !list_empty_careful(&dd->at_tail))
-> +		return true;
-> +
->  	for (prio = 0; prio <= DD_PRIO_MAX; prio++)
->  		if (dd_has_work_for_prio(&dd->per_prio[prio]))
->  			return true;
+> Ramdisk has no limit on the number of allocated pages, so when it runs out 
+> of memory, the oom killer will try to kill unrelated processes and the 
+> machine will hang. If there is risk of overflowing the available memory, 
+> the admin should use tmpfs instead of a ramdisk - tmpfs can be configured 
+> with a limit and it can also swap out pages.
+> 
+> > BTW, your patches looks more complicated than the original removed
+> > discard implementation. And if the above questions get addressed,
+> > I am happy to provide review on the following patches.
+> 
+> My patches actually free the discarded pages. The original discard 
+> implementation just overwrote the pages with zeroes without freeing them.
 
--- 
-Damien Le Moal
-Western Digital Research
+The original implementation supports to discard by freeing pages, and
+it is just bypassed unconditionally by:
+
+               if (0)
+                       brd_free_page(brd, sector);
+               else
+                       brd_zero_page(brd, sector);
+
+However, page could be freed by discard when it is being consumed in brd_do_bvec().
+
+Maybe your patch of "brd: extend the rcu regions to cover read and write"
+can be simplified a bit, such as:
+
+- grab rcu read lock in brd_do_bvec()
+- release the rcu read lock when allocating page via alloc_page() in
+  brd_insert_page()
+- change free page by rcu
+
+Or avoid it by holding page reference:
+
+- grabbing page reference in brd_lookup_page() if it is called from
+copy_to_brd() or copy_from_brd(), and drop it after it is consumed
+
+
+Thanks,
+Ming
 
