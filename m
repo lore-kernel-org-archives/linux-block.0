@@ -1,38 +1,44 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E5D56B65
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 08:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0DD57316;
+	Tue, 23 Jan 2024 08:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705999538; cv=none; b=ObWfT0eiE604YIPqGixTqNzKJk3dOGumrcA1ugphZ2ABc5gP77qPZ1BgDQ9OWJxvz6B3VnobzLPt8l8Zlypn0wcIyYcPkNTmgw7J/6f3P6pzU00VuwiFJeYOhHQ/+1a6T+W2On2on/i0yWwhg+37r3df+MyEqzd95weTcm3ppFs=
+	t=1705999592; cv=none; b=tBaOg/gjdD4spUkomwDo0crrZSV5nvIJOaAj8zka+Zr3eD8QiAzBOVU2Qa87EmT6Xqy1wjCLtM7GqNBElVZMbkvTWK/f3+S1poD4LJ9PCXrIt2kPwr4/Hmr8gbYmcTqwvDti6yw1LCEjhMlMgKzIXbBmouTHAspk6khvlREsTZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705999538; c=relaxed/simple;
-	bh=IGWxeDGvAVRpfu8Qw1CC/z/F0AIWBIGIgkCgkoEyemA=;
+	s=arc-20240116; t=1705999592; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q1BHQvLImWVRNb8y1QiEY21FVJINg4gB1k5lZMiUZdkpe7w0+TB9gGkS5hEUWS6KzVg/7rJsfxJj0YB9UFYiU4w0pxocDDgyu8gwD86fPOGTH30zSUEzljVAULPT4TlwhWTLPvQGNVKn7v66zNfdbavLsXXUL9oVNyrxH2SgJNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6DCCA68C4E; Tue, 23 Jan 2024 09:45:33 +0100 (CET)
-Date: Tue, 23 Jan 2024 09:45:32 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH 06/15] nvme: remove the hack to not update the discard
- limits in nvme_config_discard
-Message-ID: <20240123084532.GC29041@lst.de>
-References: <20240122173645.1686078-1-hch@lst.de> <20240122173645.1686078-7-hch@lst.de> <c0738ba9-2eb8-4997-b357-af481da0a457@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UWBy8pbdEEmDg8RNgLS+4SVuvLd8AJzCueNDX+wZVcvBFKUzy5QRNHNrbYv4zulYimSngSu80kzHn3S6hizWCjbkRa5EMv+S/pVzMBqBSZIrFE+Q69mMVAIhOh8LY4R4QrTT/qi5Qck9t8vq00Pk/diQTMgDjE0fMYsA2HoQIsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=D6iyN1EW; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D6iyN1EW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=D6iyN1EWmmMw2R0pqSUNme4xDL
+	UvmpKetVaKS+eeWapPSFD8YqOeYMaPf0jCnW8rL3M9hnqG/ekImj2UsO5xS4EURLl7X4aWzAoMq3G
+	EfWx2xDrVAT4Vv3kmgLmiNNvNEcchk5bKbhonvH/qij/dQOZVybk0ILxMM/EXeFoYMrK+7Gf5NKYI
+	x1lbZx/tHMW716TCozDMR3ZN3xlwhXdPg3OTBfCk/SMiT3vu+YEnCQ2Q/FM+k1wZs9M5hsd14uakV
+	NUI+Ruxe0VFn8AsBpHFONAGvBln/97K+cRbLm0lMttUVm+ZsbksRn7QX2is1jzB48BXqTUSNXCeLx
+	YZX8xsiw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rSCQO-00FcWD-0C;
+	Tue, 23 Jan 2024 08:46:28 +0000
+Date: Tue, 23 Jan 2024 00:46:28 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Tang Yizhou <yizhou.tang@shopee.com>
+Cc: tj@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+	chunguang.xu@shopee.com
+Subject: Re: [PATCH] blk-throttle: Eliminate redundant checks for data
+ direction
+Message-ID: <Za985ElMjsCWPwY3@infradead.org>
+References: <20240123081248.3752878-1-yizhou.tang@shopee.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,13 +47,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c0738ba9-2eb8-4997-b357-af481da0a457@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240123081248.3752878-1-yizhou.tang@shopee.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Jan 23, 2024 at 02:12:37PM +0900, Damien Le Moal wrote:
-> >  	blk_queue_max_discard_sectors(queue, max_discard_sectors);
-> 
-> This function references max_user_discard_sectors but that access is done
-> without holding the queue limits mutex. Is that safe ?
+Looks good:
 
-No.  But fixing nvme will be done in a follow series.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
