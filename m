@@ -1,242 +1,157 @@
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81C84BAA8
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 11:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04435DF18
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 12:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706010105; cv=none; b=b/pHExmMM6YfdTqT9wTtrW2p95iOl19oWjYdA/Q4pazdH/M5FSeBc5LuRkkE8ptXMXTdHYuYER9QzID4ZDjyR+MIXoS5n7F3ypKLij9Lu0T173shuGW6sP/XOhhzn9fL+zGCPCYg0vxBsZgHDKmzxgsEfJA9tiVE7xlgDGUnDG8=
+	t=1706012230; cv=none; b=IhMTvf/bJZ9mwuBKmTJAh/3NqAWClV/gJ/ZhgN+looQOAddGc7feFHo62YMlIIC6sZnExKwyICUdcsZihULc6tnWtkZzqg4oNyf660M2s/jRWjrdxEM4T5jGn5XJUgQqz9rJcWF0P9GpsUbT0MaoIUxLdsXfMs+XHqPRbqWaYzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706010105; c=relaxed/simple;
-	bh=rdY6o5KnzP2e1/vhxVI3SZd9vxfpL/4bNcumfI2Y3Gc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uiXaLqIHv63O1hRNkpiq5cX9wKRyGc++iQ8YOHzYAaQ1j+ebaYJ6e5CztcD2upy6COkRizBhz6ID6pKwwOBKT8VEpBM4jv8xXPCNTQmQntEDRFgHmM7mF9iE188bOqwpUfqV1zUNV1kBrZe8iz/F7dIyXFBscRt7vt0t3121zwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R541e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=kanie@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0W.Ch9wL_1706010091;
-Received: from 30.178.83.152(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0W.Ch9wL_1706010091)
-          by smtp.aliyun-inc.com;
-          Tue, 23 Jan 2024 19:41:32 +0800
-Message-ID: <2aabf106-d9e8-4e6f-a156-dc6b0fc62db4@linux.alibaba.com>
-Date: Tue, 23 Jan 2024 19:41:30 +0800
+	s=arc-20240116; t=1706012230; c=relaxed/simple;
+	bh=imzXfzj9Mz2WYh709kompIJxnI7EtSqg5p4gmd8D7u4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=D6+XXWfqrjsZqhmvKom8K/tfrQ6JSj4Bwuddv96UIxCIAjTdxCvMtfajbVVMEtsbMmWLhEXxx7rNxrbRgy3OgUv9sDBlFM72IxH1r/g+vnr4gN6sOxvYmBjSTfVhc1rS5/JI9WJBrgJtsPwS/17lbavBiLZx0lLaaLm0tgV55os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=lpacmLSv; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="lpacmLSv"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240123121658epoutp023024eaa7533b1130134ce1e59529de4b~s_RL0avR50187601876epoutp02T
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 12:16:58 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240123121658epoutp023024eaa7533b1130134ce1e59529de4b~s_RL0avR50187601876epoutp02T
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1706012218;
+	bh=VJDSvXJfTACTi00FTu9C3MOUzMWL79ai+VA/vLu2f+s=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=lpacmLSvdQpRA4ONjiGvEWdBrWPp+xmx/DCmt9fRxQB4e8tdINkqPA2F2qs6ohqGK
+	 3f1rp7d7/nhvBG34sSAjJwK/ANTs7IEIKu87a+fRXCIDAJ+BSIgk9wznJ3+93F9Pb1
+	 RLjqEy/9B86kXNb1CI+YC6+mSw/JXBy0bTqN6QZc=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240123121658epcas5p40610e0760894d467c8a3aa82bb501560~s_RLc8puv0351403514epcas5p4e;
+	Tue, 23 Jan 2024 12:16:58 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.176]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4TK5gD5L65z4x9Pt; Tue, 23 Jan
+	2024 12:16:56 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	18.23.19369.83EAFA56; Tue, 23 Jan 2024 21:16:56 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240123121656epcas5p46e583609192022c6dca8d75e618e1738~s_RJofRPN0573305733epcas5p4K;
+	Tue, 23 Jan 2024 12:16:56 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240123121656epsmtrp1f198caf7cdf5b3359dc8fa09ef26fd0e~s_RJnlWlQ0683506835epsmtrp1J;
+	Tue, 23 Jan 2024 12:16:56 +0000 (GMT)
+X-AuditID: b6c32a50-c99ff70000004ba9-bc-65afae38dfee
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	4A.1E.08755.83EAFA56; Tue, 23 Jan 2024 21:16:56 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240123121654epsmtip155135df5a224d59190d3e85828ea72d6~s_RH6dVJl2470924709epsmtip1K;
+	Tue, 23 Jan 2024 12:16:54 +0000 (GMT)
+Message-ID: <4f36fc64-a93b-9b2c-7a12-79e25671b375@samsung.com>
+Date: Tue, 23 Jan 2024 17:46:53 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 2/2] test/nvme/050: test the reservation feature
-Content-Language: en-GB
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "chaitanyak@nvidia.com" <chaitanyak@nvidia.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-References: <20240117081742.93941-1-kanie@linux.alibaba.com>
- <20240117081742.93941-3-kanie@linux.alibaba.com>
- <rfxc3j4jscw4jiivibr5mxdhn65yyh4f5g3gykypvpbcswpud6@gtpyfwidf7af>
-From: Guixin Liu <kanie@linux.alibaba.com>
-In-Reply-To: <rfxc3j4jscw4jiivibr5mxdhn65yyh4f5g3gykypvpbcswpud6@gtpyfwidf7af>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v8 06/19] block, fs: Propagate write hints to the block
+ device inode
+Content-Language: en-US
+To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Daejun Park
+	<daejun7.park@samsung.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <edefdfbc-8584-47ad-9cb0-19ecb94321a8@acm.org>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDJsWRmVeSWpSXmKPExsWy7bCmhq7FuvWpBt2T1SxW3+1ns3h9+BOj
+	xbQPP5kt/t99zmSx6kG4xcrVR5ksfi5bxW6x95a2xZ69J1ksuq/vYLNYfvwfk8X5v8dZHXg8
+	Ll/x9rh8ttRj06pONo/dNxvYPD4+vcXi0bdlFaPH501yHpuevGUK4IjKtslITUxJLVJIzUvO
+	T8nMS7dV8g6Od443NTMw1DW0tDBXUshLzE21VXLxCdB1y8wBOlVJoSwxpxQoFJBYXKykb2dT
+	lF9akqqQkV9cYquUWpCSU2BSoFecmFtcmpeul5daYmVoYGBkClSYkJ1x9ehRloL/HBWHn+1k
+	amCczd7FyMEhIWAiceV7SRcjF4eQwB5GiQtLz7NBOJ8YJR6veM0K4XxjlGjuXsrcxcgJ1jGv
+	bzM7RGIvo0TjrW4o5y2jxK5pz5hAqngF7CRmvp3ACmKzCKhKtG17ywgRF5Q4OfMJC4gtKpAk
+	8evqHLC4sECUxJLJe8E2MAuIS9x6Mp8J5D4RAQ+JW2/8IMI/mCRmXFMECbMJaEpcmFwKYnIK
+	WEs8na8CUSEvsf3tHGaQayQEDnBI9L6fzATxpYvExJWKEOcLS7w6voUdwpaSeNnfBmUnS1ya
+	eY4Jwi6ReLznIJRtL9F6qp8ZZAwz0Nb1u/QhVvFJ9P5+AjWdV6KjTQiiWlHi3qSnrBC2uMTD
+	GUugbA+JTzf7mCDh9JhF4vCHG4wTGBVmIQXJLCSvz0LyzSyEzQsYWVYxSqUWFOempyabFhjq
+	5qWWw2M7OT93EyM4GWsF7GBcveGv3iFGJg7GQ4wSHMxKIrw3JNelCvGmJFZWpRblxxeV5qQW
+	H2I0BUbORGYp0eR8YD7IK4k3NLE0MDEzMzOxNDYzVBLnfd06N0VIID2xJDU7NbUgtQimj4mD
+	U6qBSaJebPuzClHJx+lb4u79b/4iYDlVqZb5d2hDSd2bLwvCw3cVCatfWWp+f/Gewr/J/XH3
+	Iw8fvyn9UvBDS05Y65vcy4eOvr24ad82o9Kcs3pcb/87lD075nvRp1i6j8HGILFeZgXbXku1
+	3riLYucygzUYVyWq3C+/zRJadnnL11czBJvYMwUy6yslPy5hii9035nteUssac6+SOvrbg96
+	/mhzTi5je5pyqa+H9euVT/M/M9y5/87l0rLMXQ0dq6LdTBpEQ/W/7Gpn38/jUjWr1EaiqHdK
+	pc4pwQnLzF9ekzb+qPtspsu6TTOWXqrU9t55eN7BngUz/ynv6WC/cKxwy+NHTU+6d+abLL3y
+	ZUNFtxJLcUaioRZzUXEiAHwQNRdPBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFIsWRmVeSWpSXmKPExsWy7bCSnK7FuvWpBnueclusvtvPZvH68CdG
+	i2kffjJb/L/7nMli1YNwi5WrjzJZ/Fy2it1i7y1tiz17T7JYdF/fwWax/Pg/Jovzf4+zOvB4
+	XL7i7XH5bKnHplWdbB67bzaweXx8eovFo2/LKkaPz5vkPDY9ecsUwBHFZZOSmpNZllqkb5fA
+	lXH16FGWgv8cFYef7WRqYJzN3sXIySEhYCIxr28zkM3FISSwm1Hi0ZaNrBAJcYnmaz+gioQl
+	Vv57DlX0mlGiees0FpAEr4CdxMy3E8AaWARUJdq2vWWEiAtKnJz5BKxGVCBJYs/9RiYQW1gg
+	SmLJ5L3MIDYz0IJbT+YDxTk4RAQ8JG698QOZzyzwi0mi4fF1qGX3WSQWrt3LCFLEJqApcWFy
+	KYjJKWAt8XS+CsQYM4murV2MELa8xPa3c5gnMArNQnLFLCTbZiFpmYWkZQEjyypGydSC4tz0
+	3GLDAsO81HK94sTc4tK8dL3k/NxNjODo09Lcwbh91Qe9Q4xMHIyHGCU4mJVEeG9IrksV4k1J
+	rKxKLcqPLyrNSS0+xCjNwaIkziv+ojdFSCA9sSQ1OzW1ILUIJsvEwSnVwCTPE73CeoLEqQdu
+	Jt1OukYP+VY5TjW4ObusPk8n1eBx+9PakxZ7rtixupybsO5dNGP/VfY3X6PDjn86tInbzNVz
+	tdDignsJO5N8Ku6Y60/S5uR/12wt/EZ1QuGbF5U5BpPipjVMiu9YsrAq73Ky18wi6fuf96ty
+	z3mYeOvbv1b54qTXTyPdGFbMlswSO8hrb87gP1O0uO/lbb+Pdx5MmpZ0XNxiP6u6uX5ggcX+
+	1cIfGzexKueue1V7uGbHsqZVPu4Zc1L+W4nf+84cG7xfKKvuuqd8z875PZW/ne6sEF2foPk2
+	9H4e35IlcgeevZa/sybqXeql3ZaWjLL8BSd+LpXad/Vob6jvxvBpOpfW+SuxFGckGmoxFxUn
+	AgAxbQ8XLQMAAA==
+X-CMS-MailID: 20240123121656epcas5p46e583609192022c6dca8d75e618e1738
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc
+References: <20231219000815.2739120-1-bvanassche@acm.org>
+	<20231219000815.2739120-7-bvanassche@acm.org>
+	<20231228071206.GA13770@lst.de>
+	<00cf8ffa-8ad5-45e4-bf7c-28b07ab4de21@acm.org>
+	<20240103090204.GA1851@lst.de>
+	<CGME20240103230906epcas5p468e1779bf14eeaa6f70f045be85afffc@epcas5p4.samsung.com>
+	<23753320-63e5-4d76-88e2-8f2c9a90505c@acm.org>
+	<b294a619-c37e-cb05-79a8-8a62aec88c7f@samsung.com>
+	<9b854847-d29e-4df2-8d5d-253b6e6afc33@acm.org>
+	<9fa04d79-0ba6-a2e0-6af7-d1c85f08923b@samsung.com>
+	<85be3166-1886-b56a-4910-7aff8a13ea3b@samsung.com>
+	<edefdfbc-8584-47ad-9cb0-19ecb94321a8@acm.org>
 
-
-在 2024/1/23 19:21, Shinichiro Kawasaki 写道:
-> On Jan 17, 2024 / 16:17, Guixin Liu wrote:
->> Test the reservation feature, includes register, acquire, release
->> and report.
+On 1/23/2024 1:39 AM, Bart Van Assche wrote:
+> On 1/22/24 01:31, Kanchan Joshi wrote:
+>> On 1/19/2024 7:26 PM, Kanchan Joshi wrote:
+>>> On 1/19/2024 12:24 AM, Bart Van Assche wrote:
+>>>> I think the above proposal would introduce a bug: it would break the
+>>>> F_GET_RW_HINT implementation.
+>>>
+>>> Right. I expected to keep the exact change in GET, too, but that will
+>>> not be free from the side-effect.
+>>> The buffered-write path (block_write_full_page) picks the hint from one
+>>> inode, and the direct-write path (__blkdev_direct_IO_simple) picks the
+>>> hint from a different inode.
+>>> So, updating both seems needed here.
 >>
->> Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
-> Thanks for this v2. I ran it with kernel side v4 patch [1], enabling lockdep.
-> And I observed lockdep WARN [2]. For your reference, I attached the WARN at
-> the end of this e-mail.
->
-> [1] https://lore.kernel.org/linux-nvme/20240118125057.56200-2-kanie@linux.alibaba.com/
->
-> This blktests patch looks almost good for me. Please find minor nit comments
-> in line.
->
->> ---
->>   tests/nvme/050     |  96 ++++++++++++++++++++++++++++++++++++++++
->>   tests/nvme/050.out | 108 +++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 204 insertions(+)
->>   create mode 100644 tests/nvme/050
->>   create mode 100644 tests/nvme/050.out
->>
->> diff --git a/tests/nvme/050 b/tests/nvme/050
->> new file mode 100644
->> index 0000000..7e59de4
->> --- /dev/null
->> +++ b/tests/nvme/050
->> @@ -0,0 +1,96 @@
->> +#!/bin/bash
->> +# SPDX-License-Identifier: GPL-3.0+
->> +# Copyright (C) 2024 Guixin Liu
->> +# Copyright (C) 2024 Alibaba Group.
->> +#
->> +# Test the NVMe reservation feature
->> +#
->> +. tests/nvme/rc
->> +
->> +DESCRIPTION="test the reservation feature"
->> +QUICK=1
->> +
->> +requires() {
->> +	_nvme_requires
->> +}
->> +
->> +resv_report() {
->> +	local nvmedev=$1
->> +
->> +	if nvme resv-report --help 2>&1 | grep -- '--eds' > /dev/null; then
-> It feels costly to call "resv-report --help" multiple times. I suggest to call
-> it only once at the beginning of test_resv(). Based on the check result, a local
-> variable can be set up and passed to resv_report().
-OK, I will change it in v3.
->> +		nvme resv-report "/dev/${nvmedev}n1" --eds | grep -v "hostid"
->> +	else
->> +		nvme resv-report "/dev/${nvmedev}n1" --cdw11=1 | grep -v "hostid"
-> The two lines above are almost same. I think they can be unified with the
-> variable passed from the caller.
-OK, I will change it in v3.
->
->> +	fi
->> +}
->> +
-> [...]
->
-> [2]
->
-> run blktests nvme/050 at 2024-01-23 19:05:08
-> nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-> nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
-> nvme nvme1: Please enable CONFIG_NVME_MULTIPATH for full support of multi-port devices.
-> nvme nvme1: creating 4 I/O queues.
-> nvme nvme1: new ctrl: "blktests-subsystem-1"
-> nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1"
->
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> 6.7.0+ #142 Not tainted
-> ------------------------------------------------------
-> check/1061 is trying to acquire lock:
-> ffff888139743a78 (&ns->pr.pr_lock){+.+.}-{3:3}, at: nvmet_pr_exit_ns+0x2e/0x230 [nvmet]
->
-> but task is already holding lock:
-> ffff888110cf7070 (&subsys->lock#2){+.+.}-{3:3}, at: nvmet_ns_disable+0x2a2/0x4a0 [nvmet]
->
-> which lock already depends on the new lock.
->
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #1 (&subsys->lock#2){+.+.}-{3:3}:
->         __mutex_lock+0x185/0x18c0
->         nvmet_pr_send_resv_released+0x57/0x220 [nvmet]
->         nvmet_pr_preempt+0x651/0xc80 [nvmet]
->         nvmet_execute_pr_acquire+0x26f/0x5c0 [nvmet]
->         process_one_work+0x74c/0x1260
->         worker_thread+0x723/0x1300
->         kthread+0x2f1/0x3d0
->         ret_from_fork+0x30/0x70
->         ret_from_fork_asm+0x1b/0x30
->
-> -> #0 (&ns->pr.pr_lock){+.+.}-{3:3}:
->         __lock_acquire+0x2e96/0x5f40
->         lock_acquire+0x1a9/0x4e0
->         __mutex_lock+0x185/0x18c0
->         nvmet_pr_exit_ns+0x2e/0x230 [nvmet]
->         nvmet_ns_disable+0x313/0x4a0 [nvmet]
->         nvmet_ns_enable_store+0x8a/0xe0 [nvmet]
->         configfs_write_iter+0x2ae/0x460
->         vfs_write+0x540/0xd90
->         ksys_write+0xf7/0x1d0
->         do_syscall_64+0x60/0xe0
->         entry_SYSCALL_64_after_hwframe+0x6e/0x76
->
-> other info that might help us debug this:
->
-> Possible unsafe locking scenario:
->
->         CPU0                    CPU1
->         ----                    ----
->    lock(&subsys->lock#2);
->                                 lock(&ns->pr.pr_lock);
->                                 lock(&subsys->lock#2);
->    lock(&ns->pr.pr_lock);
->
->   *** DEADLOCK ***
->
-> 4 locks held by check/1061:
->   #0: ffff88813a8e8418 (sb_writers#14){.+.+}-{0:0}, at: ksys_write+0xf7/0x1d0
->   #1: ffff88811e893a88 (&buffer->mutex){+.+.}-{3:3}, at: configfs_write_iter+0x73/0x460
->   #2: ffff88812e673978 (&p->frag_sem){++++}-{3:3}, at: configfs_write_iter+0x1db/0x460
->   #3: ffff888110cf7070 (&subsys->lock#2){+.+.}-{3:3}, at: nvmet_ns_disable+0x2a2/0x4a0 [nvmet]
->
-> stack backtrace:
-> CPU: 0 PID: 1061 Comm: check Not tainted 6.7.0+ #142
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-1.fc39 04/01/2014
-> Call Trace:
->   <TASK>
->   dump_stack_lvl+0x57/0x90
->   check_noncircular+0x309/0x3f0
->   ? __pfx_check_noncircular+0x10/0x10
->   ? lockdep_lock+0xca/0x1c0
->   ? __pfx_lockdep_lock+0x10/0x10
->   ? lock_release+0x378/0x650
->   ? __stack_depot_save+0x246/0x470
->   __lock_acquire+0x2e96/0x5f40
->   ? __pfx___lock_acquire+0x10/0x10
->   lock_acquire+0x1a9/0x4e0
->   ? nvmet_pr_exit_ns+0x2e/0x230 [nvmet]
->   ? __pfx_lock_acquire+0x10/0x10
->   ? lock_is_held_type+0xce/0x120
->   ? __pfx_lock_acquire+0x10/0x10
->   ? __pfx___might_resched+0x10/0x10
->   __mutex_lock+0x185/0x18c0
->   ? nvmet_pr_exit_ns+0x2e/0x230 [nvmet]
->   ? nvmet_pr_exit_ns+0x2e/0x230 [nvmet]
->   ? rcu_is_watching+0x11/0xb0
->   ? __mutex_lock+0x2a2/0x18c0
->   ? __pfx___mutex_lock+0x10/0x10
->   ? nvmet_pr_exit_ns+0x2e/0x230 [nvmet]
->   nvmet_pr_exit_ns+0x2e/0x230 [nvmet]
->   nvmet_ns_disable+0x313/0x4a0 [nvmet]
->   ? __pfx_nvmet_ns_disable+0x10/0x10 [nvmet]
->   nvmet_ns_enable_store+0x8a/0xe0 [nvmet]
->   ? __pfx_nvmet_ns_enable_store+0x10/0x10 [nvmet]
->   configfs_write_iter+0x2ae/0x460
->   vfs_write+0x540/0xd90
->   ? __pfx_vfs_write+0x10/0x10
->   ? __pfx___lock_acquire+0x10/0x10
->   ? __handle_mm_fault+0x12c5/0x1870
->   ? __fget_light+0x51/0x220
->   ksys_write+0xf7/0x1d0
->   ? __pfx_ksys_write+0x10/0x10
->   ? syscall_enter_from_user_mode+0x22/0x90
->   do_syscall_64+0x60/0xe0
->   ? __pfx_lock_release+0x10/0x10
->   ? count_memcg_events.constprop.0+0x4a/0x60
->   ? handle_mm_fault+0x1b1/0x9d0
->   ? exc_page_fault+0xc0/0x100
->   ? rcu_is_watching+0x11/0xb0
->   ? asm_exc_page_fault+0x22/0x30
->   ? lockdep_hardirqs_on+0x7d/0x100
->   entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> RIP: 0033:0x7f604525ac34
-> Code: c7 00 16 00 00 00 b8 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 80 3d 35 77 0d 00 00 74 13 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 55 48 89 e5 48 83 ec 20 48 89
-> RSP: 002b:00007ffec7fd6ce8 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f604525ac34
-> RDX: 0000000000000002 RSI: 0000562b0cd805a0 RDI: 0000000000000001
-> RBP: 00007ffec7fd6d10 R08: 0000000000001428 R09: 0000000100000000
-> R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000002
-> R13: 0000562b0cd805a0 R14: 00007f604532b5c0 R15: 00007f6045328f20
->   </TASK>
+>> I stand corrected. It's possible to do away with two updates.
+>> The direct-io code (patch 8) should rather be changed to pick the hint
+>> from bdev inode (and not from file inode).
+>> With that change, this patch only need to set the hint into only one
+>> inode (bdev one). What do you think?
+> 
+> I think that would break direct I/O submitted by a filesystem.
+> 
 
-Thanks a lot, I will fix this in my reservation patch set v5.
-
-Best regards,
-
-Guixin Liu
-
+By breakage do you mean not being able to set/get the hint correctly?
+I tested with XFS and Ext4 direct I/O. No breakage.
