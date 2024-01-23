@@ -1,124 +1,85 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6912381217;
-	Tue, 23 Jan 2024 18:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3B3129A9E
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 18:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706035538; cv=none; b=F6FAUhmFMll/awMQDMKVv88d5sT2gkctxFKDV9NaPLGhhd2sQp60YB97cEJ+ApcOy7Wq0YkB4axGqnsCLmqSqIJOQvVP1BEKLVU9AC99wp8RnYD/wsNCL2ku3Zvw3MbD91tZFQplKqWVj8u9x8U7b0Wu/NRVn+P2SCF0IBNKW98=
+	t=1706035637; cv=none; b=uPX89q/fo4GoP142ZTrAUgPc9sFySPCWN4ISjurQMs0hsUAkwIKIaEXDJXsU3c5+Gdb4RUJR/wAZnyIuEGIqZF2w9VOaw+mumcyEf/b+/cUTFx7X0l7fcQ5VLSieet2MtW6VcLd7zG0cX+x8dWX5Y5Hc8oNC7c7KT78tgTO+EpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706035538; c=relaxed/simple;
-	bh=9Y3gZLMDAO/ZiqXH+H2JOVRgL+9SRPuL/r8AXWwdHSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DR2XASxUf8fLw24RP7aY+KIlWQfqMZr+GjbSUKyN7BWXWbunJ3hEVmxROfvXS6bBZJZPV+HE790Gx1ZMQEs8Ma9C169lm8LdDwE8S31VpGFOtRCgghDR0+Fl5BWkfsIOKt1dyEIHd3Llwymk4CvqMtP0I69ZLNTFHjSAo5JfH/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kPO3habK; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kPO3habK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706035536; x=1737571536;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9Y3gZLMDAO/ZiqXH+H2JOVRgL+9SRPuL/r8AXWwdHSA=;
-  b=kPO3habKBzMdMCf8Zm2r1qPT11+SEXqSP/CFeKn7QRsMUM6ooQWn5/uZ
-   W1xCNLj+tQDsPJ1gsDCRh5YKijVyeVkiosc0lISuTslaL0v/DctUZfUKI
-   G3utlacW8hs6zjy9lSQY58B4yosuxkCtAu2JjTPo17MuG6+TF3D/T3a6v
-   76fP4Tk9EdhNwc/uEuHuWesJb2U2KKVvi3nSRiTtHDJCwMQSe9Eku9xFw
-   ouXcaI71g9sUwErF44eYqI93e43wi1eqqlGXJ/rlwvXxzdQzTzG6sNSKO
-   YdVnu6bwnNandf6ItRgV2Z7Ifc4FPWgpPtwh/98X5nC4q/LRYcEzlRkDV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="8980484"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="8980484"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 10:45:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="929419840"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="929419840"
-Received: from lkp-server01.sh.intel.com (HELO 961aaaa5b03c) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Jan 2024 10:45:32 -0800
-Received: from kbuild by 961aaaa5b03c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rSLm6-0007br-1O;
-	Tue, 23 Jan 2024 18:45:30 +0000
-Date: Wed, 24 Jan 2024 02:45:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yi Sun <yi.sun@unisoc.com>, axboe@kernel.dk, mst@redhat.com,
-	jasowang@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	pbonzini@redhat.com, stefanha@redhat.com,
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yi.sun@unisoc.com,
-	zhiguo.niu@unisoc.com, hongyu.jin@unisoc.com, sunyibuaa@gmail.com
-Subject: Re: [PATCH 1/2] blk-mq: introduce
- blk_mq_tagset_wait_request_completed()
-Message-ID: <202401240242.k3K7SkiZ-lkp@intel.com>
-References: <20240122110722.690223-2-yi.sun@unisoc.com>
+	s=arc-20240116; t=1706035637; c=relaxed/simple;
+	bh=EBOEITjKipbpLPMtwdHzYPT9xq5i4R3pf4nEG0d9Bqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Q6pE1iWj9c3Y2Vugjw1GTYp8NJw4ETm5SQjUJL0HnAiwqtM6UQoBQq7k/GAVf5umQdNLVI95K+eQSODK3FYJQVzV9lPsMRjS9SZ8eMN71o1BSZhbWiWLSzaSQWRZS7GK1ZXRb17Ri91b/mg/0qQcz59e3QJibwQd/p5vQaAf1bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d6fbaaec91so38375685ad.3
+        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 10:47:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706035634; x=1706640434;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5CKQ/fqk5fZYUbDCkkGaF+xWY+pTgHN24WzJtVqXN0A=;
+        b=pVIgAqlrEbSWqnQqqZoz+IXJlwgecBb02SXXR8JQw47wkwU569FcS7aBnDMtlFVkdU
+         QfgDYcQDe8lYwLjgDmk/Avo1S3dDdG8qANCx6qF4oE9rXScPzfyNcQ8jvRsjEab+usMw
+         +xkXY0DDLt24mNklaypH2wOesA6CRtW+sSRKzn134MQFb0V/4VRABT7iUwJyOzH7idKK
+         Rqas3PFPozI6dGUw9lrVs+r/usnJsnHGPg7kkI89RcsNVwj/j/GmaJBGKzhH3MA708pH
+         Mc8mt87kRW2fG2QUp+N/ayK9ainYWQpSeMFQ3DfA+wahdjKKLDP6OA/vCsgnpdrCbSvy
+         Fo9Q==
+X-Gm-Message-State: AOJu0YwCPIyjDxnHto5Ncyus2iQk/j+nMQdbSY3ZpU/xqdytMTx5s29H
+	XH5vdB6fu3i9kdKRPhRwA5+kbl5uBww9itMsjdw2WIhTMcFXURDRN2qnCyks
+X-Google-Smtp-Source: AGHT+IGEE9kD46UnT5FwT/HK/Xu94f/QgOsPeG/mtoRY8GcSHp/EBPGM9ELxDt+w+I7TiMqU27sPnA==
+X-Received: by 2002:a17:902:f80e:b0:1d7:389e:325f with SMTP id ix14-20020a170902f80e00b001d7389e325fmr4778819plb.13.1706035634449;
+        Tue, 23 Jan 2024 10:47:14 -0800 (PST)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
+        by smtp.gmail.com with ESMTPSA id l13-20020a170903244d00b001d77e3c59b7sm207069pls.83.2024.01.23.10.47.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jan 2024 10:47:14 -0800 (PST)
+Message-ID: <5db987f3-9f73-4ab8-856e-a4edd74d10b4@acm.org>
+Date: Tue, 23 Jan 2024 10:47:12 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122110722.690223-2-yi.sun@unisoc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 8/8] block/bfq: use separate insertion lists
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20240123174021.1967461-1-axboe@kernel.dk>
+ <20240123174021.1967461-9-axboe@kernel.dk>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240123174021.1967461-9-axboe@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Yi,
+On 1/23/24 09:34, Jens Axboe wrote:
+> Based on the similar patch for mq-deadline, this uses separate
+> insertion lists so we can defer touching dd->lock until dispatch
+                                            ^^^^^^^^
+                                           bfqd->lock?
+> with ~30% lock contention and 14.5% sys time, by applying the lessons
+> learnt with scaling mq-deadline. Patch needs to be split, but it:
 
-kernel test robot noticed the following build warnings:
+Is the last sentence above perhaps incomplete?
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.8-rc1 next-20240123]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 56ff69f22163..f44f5d4ec2f4 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -516,10 +516,14 @@ enum {
+>   struct bfq_data {
+>   	struct {
+>   		spinlock_t lock;
+> +		spinlock_t insert_lock;
+>   	} ____cacheline_aligned_in_smp;
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yi-Sun/blk-mq-introduce-blk_mq_tagset_wait_request_completed/20240122-192222
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20240122110722.690223-2-yi.sun%40unisoc.com
-patch subject: [PATCH 1/2] blk-mq: introduce blk_mq_tagset_wait_request_completed()
-config: i386-buildonly-randconfig-002-20240123 (https://download.01.org/0day-ci/archive/20240124/202401240242.k3K7SkiZ-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240124/202401240242.k3K7SkiZ-lkp@intel.com/reproduce)
+Can lock contention be reduced further by applying ____cacheline_aligned_in_smp
+to each spinlock instead of the surrounding struct?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401240242.k3K7SkiZ-lkp@intel.com/
+Thanks,
 
-All warnings (new ones prefixed by >>):
-
->> block/blk-mq-tag.c:498: warning: Function parameter or struct member 'tagset' not described in 'blk_mq_tagset_wait_request_completed'
-
-
-vim +498 block/blk-mq-tag.c
-
-   490	
-   491	/**
-   492	 * blk_mq_tagset_wait_request_completed - Wait for all inflight requests
-   493	 * to become completed.
-   494	 *
-   495	 * Note: This function has to be run after all IO queues are shutdown.
-   496	 */
-   497	void blk_mq_tagset_wait_request_completed(struct blk_mq_tag_set *tagset)
- > 498	{
-   499		while (true) {
-   500			unsigned int count = 0;
-   501	
-   502			blk_mq_tagset_busy_iter(tagset,
-   503					blk_mq_tagset_count_inflight_rqs, &count);
-   504			if (!count)
-   505				break;
-   506			msleep(20);
-   507		}
-   508	}
-   509	EXPORT_SYMBOL(blk_mq_tagset_wait_request_completed);
-   510	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Bart.
