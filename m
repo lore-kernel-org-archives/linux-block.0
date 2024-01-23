@@ -1,98 +1,103 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F315FB83
-	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 14:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164F05F856
+	for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 14:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706018639; cv=none; b=nAFeHuiWO4WVzm011K6R1v7VXYmOibBbUr6ZUXoWDKcsTXYeDPgNNDAOzP80N/Y+E+7ip3rdbakok/FyBcHoEUndXBoQkQsb6xMoqbKGgmX+EDFWIByvGvGjaQk8KDIWRso+2AlJGvHKMWv/1YosLmcuL3xCqTk90pbK1wtxJY4=
+	t=1706019389; cv=none; b=ThFpDTh5oUGkz8RDCj2pk0fyEn41TiwI7b4XvHiWfFjYLKLFlGqvOL/qfHAq+GH0wab+UR4qAa9IqWTVkpBJu0REsAKtui0DnWVQlUCQ5PcxjUUPHGG1sB1ihqoAzeKdTLw0qVN0Px/Y5QCP4btZ8eMhkZpB20dxOnY4JZMPo9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706018639; c=relaxed/simple;
-	bh=WiDhZydkUg7/c4vU+lUs9zcwwnC3I1JZWZ/N5KklzHY=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=gqYDRux6CZRI7e/Z44aCONAjZn5mgde8yrQUHZQgSmqGbPntzQ5/GEWEiZhZQIgalY04813FP268dceZE84brzAF4eqnU3UeCoWQYbggn7B9PcS875McAELy0uYkywlTyTRiF5oPXnqFnD3U6JPWYJ8yrHHJzgHAwZEPObMMwQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=0AMbeG7F; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1706019389; c=relaxed/simple;
+	bh=Fj62Bwi3DGd1EjyWqxR9D2cFSWSB7HzQaM5pnO92gqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FiCpOGWPfWyEc661KbXEMNEyepjBHGBMoHvO5KEI/Mb9MrjkAG88TBkAeA5vR+tZ2wOfVFefViNywn8U52WcGjjAocgge6aXwlnufIVb1+USNApsCNUDzHGtMflK/lEk+KcdFVz8GR/m0C0Td1yL0XttmwEpjXExedEFzJk/+xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CYZsNeXJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="0AMbeG7F"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a2dc7827a97so475624366b.2
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 06:03:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1706018636; x=1706623436; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rGn9arawL6VXVy2ok8i84OPEddY9NvmiVo7v4viWUQ0=;
-        b=0AMbeG7FhdvKz9UIvSM6fcwHyFIkyGctil7EBzNxvP0a9rExe3chpF9wvHSIQhnvkK
-         fWBK7L/GcKtNke8aQqpDG7kgYOlpwINaM40MvEEgWVOvug89DEToMhCTG5fiIyIKYcT3
-         ByII4Ov0hpUfq66mhJhUNdt/IzlPPWbfj5HBLJp24ZeBIPCdbOVP6k8zuDrP3gfoGDHl
-         13m2G/6kKCU1RsklCFc1UoFkaDGBZVJhXFo2/IaqQsDhVl6oqAZ2hh8qsHDRAbZgLdU6
-         1gTHZksqo8B6p4C9zYl7qiH86J8gF0X70z6+R8y92iACejygaebx8QLx/zovPfPHugB3
-         4SeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706018636; x=1706623436;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rGn9arawL6VXVy2ok8i84OPEddY9NvmiVo7v4viWUQ0=;
-        b=XfmHYfN2O/V1cNGj5Cbv4v+pEFjWYe9EC+lMvaCwuwPUO1+uWKmbgw4iSy/mneerku
-         KMJ3AnUBM8vICQPMzUWJjcWS9EgZAxi2ts9yUf6q8FJUKqu0cHemogO1KEs55tfRmS0L
-         SE4npBSR2t6Wc+AUqi/JmMww5E5awA11E8X2fKV5C8UbEUtPPEeGGuCZGIaKU7hfWEnH
-         2U4r7nH2eMZ4Vo+wjDO0hcqEM6h5oujtd1sCBvrIyyUTRj7zdl5fGrS54EmhF5pLN1Qb
-         WvOUKrIsXbeWW+AQuWgbfqvzjBt9bTWz/CZopN8Q3ZmhZ/KT/ctVIO9sBU4NHHZkjia9
-         CLow==
-X-Gm-Message-State: AOJu0Yw9hiyH4vDiiYmW8v9NFkNM7sCzqf6sSKwn7JGg0F2stCvFey+i
-	fINZ821kehsEOX2/n3fqlNxXyKWD+SVvRCjfriCXk0SsDIIaHyuot8CbX6iL+Do=
-X-Google-Smtp-Source: AGHT+IFSzTFRrplwglge0jr3yuPQ6ilgY0lWVkp2GUdWMnTQ89MS9dRfMtnpFMw+ZJfe/H3GMbkkWQ==
-X-Received: by 2002:a17:907:3f20:b0:a28:a7b0:b46f with SMTP id hq32-20020a1709073f2000b00a28a7b0b46fmr3812814ejc.5.1706018636616;
-        Tue, 23 Jan 2024 06:03:56 -0800 (PST)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id w4-20020a170906130400b00a26f1e3093asm14415484ejb.49.2024.01.23.06.03.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 06:03:56 -0800 (PST)
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <20230503090708.2524310-4-nmi@metaspace.dk>
- <iL2M45BoRlK6yS9y8uo0A5yUXcZWMkdk3vtH3LRFSWXfvPVagVZ-0YC7taIKOBFUcjJYA_2xNNFPoC4WL-_ulCHOLkbqvsZlIshE_LEeYtU=@proton.me>
- <CAA76j92c1e9E7ik_k_8gqfrAczdReKwH0ZvviFMv+7rr1_GoNA@mail.gmail.com>
-User-agent: mu4e 1.10.8; emacs 28.2.50
-From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To: Sergio =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>
-Cc: Benno Lossin <benno.lossin@proton.me>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le
- Moal <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>,
- lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
- linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>, Miguel
- Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson
- Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>,
- Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>,
- linux-kernel@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 03/11] rust: block: introduce `kernel::block::mq`
- module
-Date: Tue, 23 Jan 2024 15:03:09 +0100
-In-reply-to: <CAA76j92c1e9E7ik_k_8gqfrAczdReKwH0ZvviFMv+7rr1_GoNA@mail.gmail.com>
-Message-ID: <87ede8jgeq.fsf@metaspace.dk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYZsNeXJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706019386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=75cy3zssEp2rPaNsGHCEEFCL2n3UbPgvrY96j6PBPS4=;
+	b=CYZsNeXJkOkIwmyTSBZ2TrGP1XCnvvXbGSyZd8xjqpVrvOuWXElDMa2eyz+67eHH2os15A
+	2WbNZzbv9w6mu0VLcbFCc1FuQuRDCtHh3PrEjLsmJKULL6Vp0nf9U3EJDqdnetf69ubezF
+	dNQkuNygqB8XrrlPez6KpV8vZhgkLWg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-206-IzDKtTLvPmqw7T0dUBtMOw-1; Tue, 23 Jan 2024 09:16:20 -0500
+X-MC-Unique: IzDKtTLvPmqw7T0dUBtMOw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1ED2A10B726A;
+	Tue, 23 Jan 2024 14:16:19 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.153])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 576D51C060B1;
+	Tue, 23 Jan 2024 14:16:18 +0000 (UTC)
+Date: Tue, 23 Jan 2024 09:16:16 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 11/15] virtio_blk: split virtblk_probe
+Message-ID: <20240123141616.GB484337@fedora>
+References: <20240122173645.1686078-1-hch@lst.de>
+ <20240122173645.1686078-12-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="oB8a124sWRz1YLzS"
+Content-Disposition: inline
+In-Reply-To: <20240122173645.1686078-12-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+
+
+--oB8a124sWRz1YLzS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jan 22, 2024 at 06:36:41PM +0100, Christoph Hellwig wrote:
+> Split out a virtblk_read_limits helper that just reads the various
+> queue limits to separate it from the higher level probing logic.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/virtio_blk.c | 193 +++++++++++++++++++------------------
+>  1 file changed, 101 insertions(+), 92 deletions(-)
 
-Sergio Gonz=C3=A1lez Collado <sergio.collado@gmail.com> writes:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> +    /// Call to tell the block layer the capcacity of the device
-> +    pub fn set_capacity(&self, sectors: u64) {
-> +        unsafe { bindings::set_capacity(self.gendisk, sectors) };
-> +    }
->
-> Nit in the comment: capcacity -> capacity
+--oB8a124sWRz1YLzS
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks!
+-----BEGIN PGP SIGNATURE-----
 
-BR Andreas
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmWvyjAACgkQnKSrs4Gr
+c8ja0AgAq5E2zDmIm2JQLzkb1yOzqxsO4TvGEPTyDTa7GkumGdesCYk8VI2uzCz/
+ek4tut3Sb1TPcr2R6zZBKLSpUMRxmURQC/Y66xLy/LTxy6HmGrcamEEQd5iMDbj0
+nEv2cdvekh5L96K9+DRSceuZS0Kw7dXcL4tE2hKE6hov+OAXS3Kxqambvftg6IoF
+Ksifm7JxGBuKx1s9CsTDUE3QF5oXL5jT969r1k/2l/jf3yS0QSH7sIbK1h4+MHSV
+id47U0I3yANjqYGRpKXW23blqx64x1WIJB1vVs4jrtJdvJnPzb6Iy8XprQZJ5rWK
+JHPKPsGnz/m7RTZaq2zfX+NygtBATg==
+=4cBN
+-----END PGP SIGNATURE-----
+
+--oB8a124sWRz1YLzS--
 
