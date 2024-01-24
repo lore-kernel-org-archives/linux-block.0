@@ -1,119 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687706FC2;
-	Tue, 23 Jan 2024 23:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C8964E
+	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 00:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706052671; cv=none; b=Qwl7Snjbfn/sdQnJc/CCSqvwJiih2lESXj6OCNQYtHkVfiP12rk6tATlIIGheyBjicBgV8IVi9X1CmBBRTLQ+1cE7TdazmpFK/QTzRzjvBjRexGKufLQbE+sAPrfLCRjaWF0T7ZdCQi8Xn7kVwHdzqFFmsNSfZR/TL3QyvbEzWo=
+	t=1706055882; cv=none; b=qKHx6DIkGwPkDWYKfYEW+orlZ0MkuESMUR8Qt4TG8ZixT3CDz95Q7s7MZQ/3LixH++I6x+2scJI9+Gvx0UolXt5GVv1ONI9rSTC3vRQCJ9pjS9dJkAme5+B+YbtYciuuNfbh1v7P6vzTdFKc694fz003XnAOyRZ/BGT44d7ert8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706052671; c=relaxed/simple;
-	bh=5IKCI89izY9q7OnAbvvB4vyI9VWaIqEYhVeW69cwKBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HDLR+mXjSyJKzJmKZHPKQhr/c9kpKLhYSMc1Rwr0izufnJ1zQre8aj/4NgIVSuaRcIbrFYhxV0M6jt3nMMs1O1rpLjp6yPMRKiamDnMet9u2USF86a6dEg6AdUro7karHXi02Z2iahD8wizuAEbKD7CB/rhQs5+0LQlB68ko4x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=msTHDUvy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706055882; c=relaxed/simple;
+	bh=hMh6ehSMtCLiTnXPJTwHRtndnydv9lJWmV6MQHsynhs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YPshepfKK05hx0WAX+eMHtkR1qO3vK04R05LMrVzBhiHg9MvoCtzcoZI6+3VF3eB4VMik7iNBxxN8HtvAnoj+hnn06RQCigz6ntStXvD0HVfD5zSEAC515AFagsQL1jXF6HmpfVWMHMjfPygap14hIrQ0E1TGjx0a/dkS3i2EoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=GD8m5pAf; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="msTHDUvy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B68F9C433C7;
-	Tue, 23 Jan 2024 23:31:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706052670;
-	bh=5IKCI89izY9q7OnAbvvB4vyI9VWaIqEYhVeW69cwKBo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=msTHDUvykvzFCBJnKtqkfMnJkhCV4e1CWKyluOEIj1Qy17EJpTXSHTeb5+mROq8wc
-	 RQhoZ8shAfLx5k88DQXJX8bx/UFxML65CH+qDuFsfun+R0Tkz3P7qY1d2LtdEdF7cK
-	 +VfPtaqJG4NgOMJiwMlU+9wqG4FVcDhKNvh5WzwN6DWM+BH7uFAjWOWs+jxAaysQb6
-	 mtP+GPGpeeLUVX/oW0VjbXqKyXEWl0r+yZ9Fiq7ozko2SMkoqocAjhpq6zfnKDyqqY
-	 oFeXFGIDddZpbotoXXZxw/1sKXOG8gM5jeAjiedV5py8EDl4olJY48Vy/4O2c1b0OR
-	 FpL2Ka9boi3Rw==
-Message-ID: <a08be89b-6825-4559-a909-632f9571d387@kernel.org>
-Date: Wed, 24 Jan 2024 08:31:05 +0900
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="GD8m5pAf"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40eb2f392f0so16868895e9.1
+        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2024 16:24:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1706055878; x=1706660678; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oYTN8ome+CxuG7BZfLTx74gUUZSxMsFlzHcqYkFKxT8=;
+        b=GD8m5pAfyOo9iUby3bTRSx21BPUEfdEbVbNqKmiJsALBZAcjwokmC89H0HsCihCPlX
+         7MniI/ulDEy1YhUuIj1XNvH0AGF4+Bu6vSjAbwa912pvvcBmQEXijUtIVAYvuecjdaCB
+         7MJB/GEcFJZcooXc4rLHmWFe71T6qbSKBXIafjhP+Km3Lqn88mBfTVisZL9xItVtm6TH
+         Z8PUy5cuTuTukSRxqawi8kWxjGeL/aSYwaDnkRMxEL1A8qp4Wo2X8Jxux2BR6TunLWu+
+         /WRK4a0WxKXWjaxjovMqPMfs880PXhf4pls+5GdoTU6BAVShOpLflY21POjzSjGlY5A0
+         7NIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706055878; x=1706660678;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oYTN8ome+CxuG7BZfLTx74gUUZSxMsFlzHcqYkFKxT8=;
+        b=IVsEQfM1qDiM786RGjrKC2Lz13pHU3brlZZ3ovJOMc2suGMBFgLELvCD49gzX3Lvye
+         APVu/PDbqOoAl4a5gf9ab0dNxxYacHITYLO1sXqzQfiCmzn9W1gp80j4E/uD3I6+LD7L
+         WgM9s9Xt9dBHXl7j6XfZDBXZF7M12OZhouanGQJfPlJTW73Yq8+pzelViHr81cySu16W
+         7NtyMdh8vQdFRB5M264W/SQZErHGflrnuQpyy1nRT8rzL2NtPrsMCtTo3lLERS6VbIAf
+         XLh0XqZG7jIB+gxhXuX4tVNaZ6mwmXUakRRT5loaJlqHes5An30NFPGUiUFu1RBC9ZDW
+         0JAw==
+X-Gm-Message-State: AOJu0YyQSsdZXwPmf7VHAVPS9bdtCizFnyPhJ5n1ZXuDYGI8vWYqTNVt
+	NYGGhjDgLPsKFaJSknvFdtbqk+tcinPOpPLci+e808EYvc8jkMXxcukQNDbFG60=
+X-Google-Smtp-Source: AGHT+IEQEHnFx8D7dWd7qppBAry9oTyW6DVU6m4DstaCMTezb1yu1bJDpuzDp/n0gGRM1R0enN1Hmg==
+X-Received: by 2002:a05:600c:2203:b0:40e:869b:4c12 with SMTP id z3-20020a05600c220300b0040e869b4c12mr568787wml.162.1706055878546;
+        Tue, 23 Jan 2024 16:24:38 -0800 (PST)
+Received: from airbuntu ([213.122.231.14])
+        by smtp.gmail.com with ESMTPSA id f6-20020a05600c154600b0040e880ac6ecsm24156066wmg.35.2024.01.23.16.24.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 16:24:37 -0800 (PST)
+Date: Wed, 24 Jan 2024 00:24:36 +0000
+From: Qais Yousef <qyousef@layalina.io>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>, Ingo Molnar <mingo@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>, Wei Wang <wvw@google.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH] block/blk-mq: Don't complete locally if capacities are
+ different
+Message-ID: <20240124002436.dj5lpjpdc3uttbx4@airbuntu>
+References: <20240122224220.1206234-1-qyousef@layalina.io>
+ <Za99LKnQE/M6pVfM@infradead.org>
+ <c85898de-0780-4690-adfa-99332eae0090@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] zonefs: pass GFP_KERNEL to blkdev_zone_mgmt() call
-Content-Language: en-US
-To: Dave Chinner <david@fromorbit.com>, Mikulas Patocka <mpatocka@redhat.com>
-Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- Naohiro Aota <naohiro.aota@wdc.com>, Mike Snitzer <snitzer@kernel.org>,
- dm-devel@lists.linux.dev, Chris Mason <clm@fb.com>,
- Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
- Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>
-References: <20240123-zonefs_nofs-v1-0-cc0b0308ef25@wdc.com>
- <20240123-zonefs_nofs-v1-1-cc0b0308ef25@wdc.com>
- <31e0f796-1c5-b7f8-2f4b-d937770e8d5@redhat.com>
- <ZbBKC3U3/1yPvWDR@dread.disaster.area>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <ZbBKC3U3/1yPvWDR@dread.disaster.area>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c85898de-0780-4690-adfa-99332eae0090@kernel.dk>
 
-On 1/24/24 08:21, Dave Chinner wrote:
-> On Tue, Jan 23, 2024 at 09:39:02PM +0100, Mikulas Patocka wrote:
->>
->>
->> On Tue, 23 Jan 2024, Johannes Thumshirn wrote:
->>
->>> Pass GFP_KERNEL instead of GFP_NOFS to the blkdev_zone_mgmt() call in
->>> zonefs_zone_mgmt().
->>>
->>> As as zonefs_zone_mgmt() and zonefs_inode_zone_mgmt() are never called
->>> from a place that can recurse back into the filesystem on memory reclaim,
->>> it is save to call blkdev_zone_mgmt() with GFP_KERNEL.
->>>
->>> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
->>> ---
->>>  fs/zonefs/super.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
->>> index 93971742613a..63fbac018c04 100644
->>> --- a/fs/zonefs/super.c
->>> +++ b/fs/zonefs/super.c
->>> @@ -113,7 +113,7 @@ static int zonefs_zone_mgmt(struct super_block *sb,
->>>  
->>>  	trace_zonefs_zone_mgmt(sb, z, op);
->>>  	ret = blkdev_zone_mgmt(sb->s_bdev, op, z->z_sector,
->>> -			       z->z_size >> SECTOR_SHIFT, GFP_NOFS);
->>> +			       z->z_size >> SECTOR_SHIFT, GFP_KERNEL);
->>>  	if (ret) {
->>>  		zonefs_err(sb,
->>>  			   "Zone management operation %s at %llu failed %d\n",
->>>
->>> -- 
->>> 2.43.0
->>
->> zonefs_inode_zone_mgmt calls 
->> lockdep_assert_held(&ZONEFS_I(inode)->i_truncate_mutex); - so, this 
->> function is called with the mutex held - could it happen that the 
->> GFP_KERNEL allocation recurses into the filesystem and attempts to take 
->> i_truncate_mutex as well?
->>
->> i.e. GFP_KERNEL -> iomap_do_writepage -> zonefs_write_map_blocks -> 
->> zonefs_write_iomap_begin -> mutex_lock(&zi->i_truncate_mutex)
+On 01/23/24 08:58, Jens Axboe wrote:
+> On 1/23/24 1:47 AM, Christoph Hellwig wrote:
+> > On Mon, Jan 22, 2024 at 10:42:20PM +0000, Qais Yousef wrote:
+> >> The logic in blk_mq_complete_need_ipi() assumes SMP systems where all
+> >> CPUs have equal capacities
+> > 
+> > What is a capacity here?
 > 
-> zonefs doesn't have a ->writepage method, so writeback can't be
-> called from memory reclaim like this.
+> It seems to be the chosen word to describe the performance potential of
+> the core in question, we use it elsewhere in the kernel. But yes, could
+> do with a bit more of an explanation.
 
-And also, buffered writes are allowed only for conventional zone files, for
-which we never do zone management. For sequential zone files which may have
-there zone managed with blkdev_zone_mgmt(), only direct writes are allowed.
+Is referring to it as compute capacity makes it clearer? Sorry I thought that's
+a common term.
 
 > 
-> -Dave.
+> >> +	return arch_scale_cpu_capacity(this_cpu) >= arch_scale_cpu_capacity(that_cpu);
+> > 
+> > oerly long line here.
 
--- 
-Damien Le Moal
-Western Digital Research
+This is consistent with similar long lines in the same file and it's more
+readable as one line. checkpatch doesn't complain about this being long;
+I think they look for 100 or 120 now. This is 86.
 
+> > 
+> > Also pleas split patches for different subsystems.
+> 
+> Yes please, the sched/topology thing should be a separate prep patch.
+
+Okay. I thought the norm to keep such small patches self contained as adding
+dead code followed by a one liner isn't always seen as better. But a split it
+is :)
+
+I'll give the sched/arm folks time to have a look before I post a new version.
+
+
+Thanks!
+
+--
+Qais Yousef
