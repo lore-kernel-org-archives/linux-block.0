@@ -1,157 +1,81 @@
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CA561689;
-	Wed, 24 Jan 2024 12:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DE562814
+	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 12:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706097606; cv=none; b=gWtQ/8TTRLUuCiL2wQMHe/8bkOL0XmEUwuKxVD8TYzfOiBnuQIOOwdCrsJH3iCdmPZHY7tX5xoImIAJ9+dr2pbxlSAAgsCvO9unkMuAqQsaamy/9r8clvNXa1JoywG+k6/8Wt7me/ZuO0z9eWLeIxtqUqhbUeM3HUjjs01I5ApU=
+	t=1706097606; cv=none; b=ZJfia9k/Z/8oUBDrrtELfwJf46qDkEbY3xEXX/vbct2EKk9UYG7KIkGA4sHPHPeHEOIcxcvtAPggLaWWqRuijiHtG78EW0kCrP543LitxyqZ+jU5xPicfP4fPXHbDfvFVjmSX0Qd3yZ2pF59rqi1TDWHlJ0r7X4Z7WAQxqyLGa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706097606; c=relaxed/simple;
-	bh=tg0pA2ZlUNywKtzMfrdbwkG7GYbhIVlK2HrCAbcpiMY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Hj+u0yPTySOtfvFv4PV2MHBT6TLQLoPnOznZkhgLhOvtLpH3jPzvFVs+NcPt3C4YloUelNOf/yRkZHCcCvmJm9nyAVGhQLlInVs2qi/LbYqhBCHjKc7Uk8UST6ebKRUhbcCobSLHOW1WDg3zBocTjPrrTFe3wktGd/9ODyfiAE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-d85ff70000001748-c5-65b0fbb52f43
-From: Byungchul Park <byungchul@sk.com>
-To: linux-kernel@vger.kernel.org
-Cc: kernel_team@skhynix.com,
-	torvalds@linux-foundation.org,
-	damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org,
-	adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	will@kernel.org,
-	tglx@linutronix.de,
-	rostedt@goodmis.org,
-	joel@joelfernandes.org,
-	sashal@kernel.org,
-	daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com,
-	johannes.berg@intel.com,
-	tj@kernel.org,
-	tytso@mit.edu,
-	willy@infradead.org,
-	david@fromorbit.com,
-	amir73il@gmail.com,
-	gregkh@linuxfoundation.org,
-	kernel-team@lge.com,
-	linux-mm@kvack.org,
-	akpm@linux-foundation.org,
-	mhocko@kernel.org,
-	minchan@kernel.org,
-	hannes@cmpxchg.org,
-	vdavydov.dev@gmail.com,
-	sj@kernel.org,
-	jglisse@redhat.com,
-	dennis@kernel.org,
-	cl@linux.com,
-	penberg@kernel.org,
-	rientjes@google.com,
-	vbabka@suse.cz,
-	ngupta@vflare.org,
-	linux-block@vger.kernel.org,
-	josef@toxicpanda.com,
-	linux-fsdevel@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	jack@suse.cz,
-	jlayton@kernel.org,
-	dan.j.williams@intel.com,
-	hch@infradead.org,
-	djwong@kernel.org,
-	dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com,
-	melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com,
-	42.hyeyoo@gmail.com,
-	chris.p.wilson@intel.com,
-	gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com,
-	boqun.feng@gmail.com,
-	longman@redhat.com,
-	hdanton@sina.com,
-	her0gyugyu@gmail.com
-Subject: [PATCH v11 08/26] dept: Apply sdt_might_sleep_{start,end}() to swait
-Date: Wed, 24 Jan 2024 20:59:19 +0900
-Message-Id: <20240124115938.80132-9-byungchul@sk.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240124115938.80132-1-byungchul@sk.com>
-References: <20240124115938.80132-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0iTcRSH/b93Z6uXJfRmRDKwe6ZlcjANoQ+9fQiioKAIXfmSq6k10zKI
-	vKbNvIat8tLUmGuarq1ArdlSsky8S5qYqJlp3nK5kTorZ/Tl8ON3zvN8OgwuqSE9GHnkFUEZ
-	KVNIKREhmlpVvOvFokHwGf3hDzl3fMA2l0ZAQVUFBe2V5QgqnidgMP72EPTYJxEstrThoM5r
-	R1A89BmH540DCMy6RAq6RlZDt22Ggqa8dAqSSqso6JhwYNB/LxeDcuMRaM4uwcAy/40A9TgF
-	+eokbHmMYTCv1dOgjfeCYd1DGhxDvtA08JEEc98OeFDUT8ErcxMBjdXDGHTVFlAwUPGHhObG
-	9wS052SQ8HS6hIIJuxYHrW2Ghk6LBgND8rLo1s/fJLzLsGBw6/EzDLo/vURQlzaIgbHiIwUN
-	tkkMTMY8HBbK3iIYzpyiIeXOPA35CZkI0lPuEdC29I6E5P59sPirgAoO4BsmZ3A+2XSVN9s1
-	BP+hhONrHn6m+eS6PprXGGN4k247X/pqHOOLrTaSN+pvU7zRmkvzqqlujJ9ubaX59/cXCX6k
-	W40d3XBKFBgmKOSxgnL3gVBReGaajbrUyFwzx08S8aiNUiFXhmP9uNSeWVqFmJX8yIacNcVu
-	4Xp753Fndmc9OVPGKKlCIgZnU9043Y+WFXYte4Qb7RkinCzBenE1po3OWszu44a/lhL/9Ju4
-	coNlxePK+nNPH/St9JLlm0F9Fu10cmyqK9fpSMT/Aeu5N7peIhuJNchFjyTyyNgImVzh5x0e
-	Fym/5n0uKsKIlh9Ke8NxuhpZ24/XI5ZB0lXiYH2VICFlsdFxEfWIY3Cpu7h3faUgEYfJ4q4L
-	yqgQZYxCiK5HGxhCuk68x341TMKel10RLgrCJUH5f4sxrh7x6PbmgKWF7xbN2P3dE9UuDs+s
-	g8cvezUEgHjN5aDg07Vbz41su1sYFmS9cWyv4+zNM4WzmwIV38VF6W5lRaEZrVZ11hMX93VD
-	ZRHoROXSG2vpVP3+EM/X/sw3Q4HCpbjWcYEl/VVjdzNj6r6ktZoGT+bVSe2BHb9jD3/JnfMz
-	eLvtlBLR4TLf7bgyWvYXhYsroUwDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzVSfUyMcRz3+z3P83uejuPZuc3jbezMGPPe2dcy/OHlN6NYf9i8TEcPHZXc
-	kTKslFSUioSSFKddx9Udm3DWatKxFN16k6ZWkiJL15yLdDb/fPbZ5+2vj8Cocrlpgj7ymGyI
-	1IVriIJVBAYkLHrkLZWXOq2zIPPiUnAPJbOQZ7UQqH9QgsDyMB5D74tN0DTcj8BbW8dATnY9
-	gtsdHxh4WN2OwFF8lkBD10RwuQcIOLMvEEgoshJ42zeCoe1qFoYS21Z4nVGIocLTw0JOL4Hc
-	nAQ8Bp8xeExmHkxxc6Gz+AYPIx3LwNneyEHVTScHjtaFcD2/jcAzh5OF6sedGBqe5BFot4xy
-	8Lq6hoX6zDQO7n8rJNA3bGLA5B7g4V1FAYbSxLG1pB9/OHiZVoEh6U4ZBlfLUwTPkz9isFka
-	CVS5+zHYbdkM/Lr3AkFn+lcezl308JAbn47gwrmrLNT9fslBYpsWvD/zyLoAWtU/wNBE+wnq
-	GC5g6atCiZbf+MDTxOetPC2wHaf24gW06FkvprcH3Ry1mVMItQ1m8TT1qwvTb2/e8LTmmpel
-	Xa4cvG3GTsXqUDlcHy0blqwJUYSlJ7tJVLUQ44jrZ+NQHUlFgiCJ/tItN0pFfgIR50nNzR7G
-	x9XibMme9olLRQqBEc+Pl4q/1xKfMVncKn1q6mB9XVacK5XbZ/pkpaiVOruLWB+XxFlSSWnF
-	vx0/caV0/3rrP101lvlovsRnIEUBGmdGan1kdIROH65dbDwcFhupj1m8/0iEDY1dxnR6JPMx
-	GmrYVIlEAWkmKNeZrbKK00UbYyMqkSQwGrWyeeoDWaUM1cWelA1H9hqOh8vGSjRdYDVTlJt3
-	yCEq8aDumHxYlqNkw38XC37T4tCj0ffDizKcV5SvXO/OBAbOcZfOrFKrA7LmrxqNvxRUtHuz
-	K9TjFXf3hfRtH0j5Tpsua4OeLFye1Hx3wqD/5bUb1h9V+Q8GBbeX2coP3DnVOOnsii35OzcE
-	H5ojSWXBu8hvHDN/9p6hlEouu8XRfTPfKtbkaVfXnu7p3tjTvWaf5UuXhjWG6ZYtYAxG3V8+
-	1AJ4LgMAAA==
-X-CFilter-Loop: Reflected
+	bh=s+U/I1kbGvtdSDHN3vLuy14cJeTvPNTBLK9/RJFkaYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qF27ANNbKkjkYPrflCrAW6GJeb9V8zN4z3Y3lNrHqKWaMN3LJ5AxTfmPLq3qsOt1GhcBhutmF3rTQ0Xs2c89sH4sBfwNgJUvSt0fBzT0NlDdypXSglXf0UnR2o2r/jV8/uDAMOBy7K6YxTfWSU6riPE9rjpqoe9PXx2bRcNYHVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xc8F8ANW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xc8F8ANW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706097602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=EOJO21mMWm9Ve37XvF5zAOvUvne3pqlm8zmlzW92C/4=;
+	b=Xc8F8ANWvoBmVba94ZKc9w7c8oJhixzB+803VQ53T7X8sOxdP3a9umYYuSCjLlRvK45SJf
+	5e5IcOeqMSN0oBOrkBSIfoQ4WhTSzzcAvvzFheEkMUIemRl/43KXptoddoLH8tynOR5SHw
+	hNQXZWQ7nyGJvnBMyE6CJQvf+GnjabU=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-34-hTHzp1ECNrKOB1WIMu4y9w-1; Wed,
+ 24 Jan 2024 07:00:01 -0500
+X-MC-Unique: hTHzp1ECNrKOB1WIMu4y9w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C43F73C0F1A9;
+	Wed, 24 Jan 2024 12:00:00 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.11])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EA262166B32;
+	Wed, 24 Jan 2024 11:59:57 +0000 (UTC)
+Date: Wed, 24 Jan 2024 19:59:54 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org
+Cc: ming.lei@redhat.com
+Subject: [Report] requests are submitted to hardware in reverse order from
+ nvme/virtio-blk queue_rqs()
+Message-ID: <ZbD7ups50ryrlJ/G@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Makes Dept able to track dependencies by swaits.
+Hello,
 
-Signed-off-by: Byungchul Park <byungchul@sk.com>
----
- include/linux/swait.h | 3 +++
- 1 file changed, 3 insertions(+)
+Requests are added to plug list in reverse order, and both virtio-blk
+and nvme retrieves request from plug list in order, so finally requests
+are submitted to hardware in reverse order via nvme_queue_rqs() or
+virtio_queue_rqs, see:
 
-diff --git a/include/linux/swait.h b/include/linux/swait.h
-index d324419482a0..277ac74f61c3 100644
---- a/include/linux/swait.h
-+++ b/include/linux/swait.h
-@@ -6,6 +6,7 @@
- #include <linux/stddef.h>
- #include <linux/spinlock.h>
- #include <linux/wait.h>
-+#include <linux/dept_sdt.h>
- #include <asm/current.h>
- 
- /*
-@@ -161,6 +162,7 @@ extern void finish_swait(struct swait_queue_head *q, struct swait_queue *wait);
- 	struct swait_queue __wait;					\
- 	long __ret = ret;						\
- 									\
-+	sdt_might_sleep_start(NULL);					\
- 	INIT_LIST_HEAD(&__wait.task_list);				\
- 	for (;;) {							\
- 		long __int = prepare_to_swait_event(&wq, &__wait, state);\
-@@ -176,6 +178,7 @@ extern void finish_swait(struct swait_queue_head *q, struct swait_queue *wait);
- 		cmd;							\
- 	}								\
- 	finish_swait(&wq, &__wait);					\
-+	sdt_might_sleep_end();						\
- __out:	__ret;								\
- })
- 
--- 
-2.17.1
+	io_uring       submit_bio  vdb      6302096     4096
+	io_uring       submit_bio  vdb     12235072     4096
+	io_uring       submit_bio  vdb      7682280     4096
+	io_uring       submit_bio  vdb     11912464     4096
+	io_uring virtio_queue_rqs  vdb     11912464     4096
+	io_uring virtio_queue_rqs  vdb      7682280     4096
+	io_uring virtio_queue_rqs  vdb     12235072     4096
+	io_uring virtio_queue_rqs  vdb      6302096     4096
+
+
+May this reorder be one problem for virtio-blk and nvme-pci?
+
+
+Thanks,
+Ming
 
