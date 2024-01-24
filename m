@@ -1,136 +1,194 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BBD16428;
-	Wed, 24 Jan 2024 07:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F04517552;
+	Wed, 24 Jan 2024 07:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706081093; cv=none; b=d/hTdGQ86YtLx/tYzNUCWFN44bKCkY+DDdQ1OQ2/ZtkCh//TNXyZ7c8QvO4IlCYhC51zQH0jV1PR7FSg/1w3fReujipp0vMqiGcngOMRBc9q31/ZT2RC91Ie2RDlN6z4mN1VQqy98Se9vUmRcP7HLUdof314ffrq0RcWRdX0dRc=
+	t=1706081955; cv=none; b=JyYiHuqfVH4Oy3vKw3oDAnC0L48YQCafbRs1uHFPZwRN74m8+P6TMCftJ/aOI9tDT74AxjxjyTLQKpuUb5ZY281Vtw5XseIlAxEb8ylpfoZFgAU4Qnu+IFQj8AO/nsxeh1UeOZwo+7cm7c3u9Z5M9AWXcOzE2WmyduPbcGERH3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706081093; c=relaxed/simple;
-	bh=gGTI6E/3Uq1rswyx/VCnY4ITQEVHmH86csU6Jxmh17k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jKKbAkYOwZdsNxVbuVsHKJhX87BWMkZ5hT/PmDhTv2Vm0GtdCpJRBpx7X4Ep1jJadZYZdOg8UX+torpXxGsqX5Kb9SXbvj7Aqq/KguV03ICcIGOOCecLv8XIUWMCQl9fW9ph2COa4tYYdKTgSsGu/mRgHTz2grlxrWsfqiR3XhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Blqix7i8; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1706081955; c=relaxed/simple;
+	bh=oyPADhSHwEU24RtFpATiv+amECQBJiGyb2+3W+A/YO4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SJYWy4s98hvsGcdaWhs5gRfrvxXwqBCEdWylI1rzgQxshoP0yg5Tr9p9PwWuOsx+z++/lThIg97Cmr5UhqyR2G0DeJDXuWvzya+Tm2h52JgnCSVBh7c7Wy8VWqps2c9/mutDXwCfFGVwxQZbAffTvNXvdeK/ToWf37ehb6L91yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ldsm0IO0; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Blqix7i8"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5100c4aa08cso1318958e87.2;
-        Tue, 23 Jan 2024 23:24:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ldsm0IO0"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5100893015fso1723655e87.1;
+        Tue, 23 Jan 2024 23:39:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706081090; x=1706685890; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1706081952; x=1706686752; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=B9uZC1dIj5M+eMoRLHxiej0eM3JdeDGVY5f4KmbEUp0=;
-        b=Blqix7i8Lw+KJ9kXUYIWuNbdrDLcWrmRHgiaGKUPPbTL78i4Tiz7AGoQlVANPHvqgP
-         oiyWF4W4hhgYZVqz5Af660d4qyMZW59sbZBn6//OIKwnv2tYvgS2Ag6Bnh++KK07hxVe
-         lcljN+R2ncTuZdHBQRMhhZBZmgxvqgF+opKH2+suRquYojUsI+IlyYVB2t8Pb3OwsKcr
-         h3ClAsGMlHtUCAa+iQnFDB/69nc0XBaF8422WoM+Pt6hHNExFsUrDOqfC6Z7q5NvvaZS
-         em5xy/CP07RH0IH45us0VKRSqSS7lVU5hz4gEcyevEo9bSLxI/MyHoBE7LLVMVNE1vvh
-         gTkg==
+        bh=U8Bfuvk8oKuA+3Tc2xTLQDMirdliyrSB9iEQK+0MXno=;
+        b=ldsm0IO01bItcOWQbrOElpDDpUI6HLt6y+onQRzAa1+TskX+ULsafoP7jQ8ktHW1vv
+         W6VXYuD5U+pCOpBO9Qe3bPGRYjB1uJ7IC6gwKKMLZ3dgiEwaWAM//9KevYkKIhmoJvos
+         Ao+sB+jQOgocZ4DXBTXK+Rxai34/c8h3vD51n5fP5c3Hp3OlUUl8WfntdFE5bhWDMhAQ
+         YqDUOicMFmWeRsK8sDwGlYEHoICix16lEwPLrB5nv8IDkx6860ch1kxK4u7eR3imZp+h
+         yuU5IHV//55PFkbsDYBA2h2Z30NJvEzdrXMjk1TDk7+qwxnEvpF04VAD+3UeClabVm7o
+         J3jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706081090; x=1706685890;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1706081952; x=1706686752;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=B9uZC1dIj5M+eMoRLHxiej0eM3JdeDGVY5f4KmbEUp0=;
-        b=aWi8Zzn/Dvvby2+qV4glb6e9POLsNpPSFb7EQtbd7efOvcv+ejZ5Ohl/flAcRaiTCX
-         j4/nyBzF7sf6byCwFdIpJ3DZGCAZKshHu4N3yJwHD0DU+CLYk2wAE2dOBv6Gq7VJLGhC
-         B6qZXM2+zvWvRvV8e+nNWwCID4PUj2x3BcH+hXOzV+s1sA9O9yg/4k8zWRe6OALebxU/
-         XK4mw//iKNFdNrKfPHJ+G8SyZ3gPgO9+qQcdO+lxnl5O6HdEmvwBLr770eZG7utDZJNa
-         DvCAhf3bvM/mjHuk3jgmnvolcmUEM8NNvVXi6Imu7lssDecMzsQ6BosOd6jPI3LiUI68
-         vzxQ==
-X-Gm-Message-State: AOJu0YxJfjuRGmvU8RqvHjjfUYrXkdk0xbiC0L9va76DbL6Ha/7vbDta
-	aNQ5o/CnmgOhiqNB1aBJmVUKn7oMqWddX/jvx4DS8bOgsk5VfA8X
-X-Google-Smtp-Source: AGHT+IGx+rZ1X/HhmTr23mLmA/XF03fr1OOXTm66vuGecPuhfinlKC7ireQ5C9o9eihHds0NqOoIrQ==
-X-Received: by 2002:a05:6512:3f13:b0:50e:7be3:d326 with SMTP id y19-20020a0565123f1300b0050e7be3d326mr3702820lfa.85.1706081089673;
-        Tue, 23 Jan 2024 23:24:49 -0800 (PST)
-Received: from user-PC.. ([178.134.198.138])
-        by smtp.gmail.com with ESMTPSA id c18-20020a056512105200b0050e64a0c62dsm2481708lfb.240.2024.01.23.23.24.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 23:24:49 -0800 (PST)
-From: Maksim Kiselev <bigunclemax@gmail.com>
-To: 
-Cc: Justin Sanders <justin@coraid.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Maksim Kiselev <bigunclemax@gmail.com>
-Subject: [PATCH v1 1/1] aoe: avoid potential deadlock at set_capacity
-Date: Wed, 24 Jan 2024 10:24:36 +0300
-Message-Id: <20240124072436.3745720-2-bigunclemax@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240124072436.3745720-1-bigunclemax@gmail.com>
-References: <20240124072436.3745720-1-bigunclemax@gmail.com>
+        bh=U8Bfuvk8oKuA+3Tc2xTLQDMirdliyrSB9iEQK+0MXno=;
+        b=PEw/blxYL4cGrrsMm1LU2+lKPTariGZVgZt81TakmnaPD5gLU/18OaodJxqMoFxCw5
+         CRoYGG2MUE/kVB3gcS8+6uWsxNliIsGLAgbDcV5v/c7Xmr001F2WrKMNE1CYyKOHzPyQ
+         WYu3T/WfK9mpEW2oO+f/BbiN96ITsczz/5WeP1SHRwgCi3ErwhzqwcwxmOszoRtac9wz
+         FFnyuI2Qfr7rOciOmTNbZno7kWNi/YtRkJSJtMRuLINwAucsW9wPO7CcM0tQh1TlcTgk
+         ggxpIoQA7ZWqCAZoFgYIGP/YE3kCqPlwywL5jpMZaMhlpfUGQcGS+nvb8atyfytIwTs+
+         7KeA==
+X-Gm-Message-State: AOJu0YzA453m6Pv+N0l48JHG6CeXithoiD2fUVNldb8p5K9rvhULdXd1
+	uRSbZHGRxHQOrf19xd0PfR08m1Kboywv8X0yAXxznw3ZQV5Q+HYNa2ZkhdRP2iwQDXOf8pKDkzd
+	jczZsRZ+kf/S+YWf5vAzRRys9qyo=
+X-Google-Smtp-Source: AGHT+IHfBrI2fT2JfWR70NQTj2TLaC2gpW8mlbjz8KC+gHPggrkHLo1dlVDPBXSxm1k0FmOHVzCm0rSmMRlZiD6fJro=
+X-Received: by 2002:ac2:5b4b:0:b0:510:1439:2bee with SMTP id
+ i11-20020ac25b4b000000b0051014392beemr45089lfp.191.1706081951853; Tue, 23 Jan
+ 2024 23:39:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240122110722.690223-1-yi.sun@unisoc.com> <20240122110722.690223-3-yi.sun@unisoc.com>
+ <20240122154255.GA389442@fedora> <CALpufv0h-sQ4Qfp-Sxd7wME4onMNAMop_gi-np6Dk2R96sba0Q@mail.gmail.com>
+ <20240123150924.GD484337@fedora>
+In-Reply-To: <20240123150924.GD484337@fedora>
+From: yi sun <sunyibuaa@gmail.com>
+Date: Wed, 24 Jan 2024 15:38:35 +0800
+Message-ID: <CALpufv385oK0+EqYZw1Mk8xxm1Av_jYfcPS0khBi=NSu7qCeHQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] virtio-blk: Ensure no requests in virtqueues before
+ deleting vqs.
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: mst@redhat.com, Yi Sun <yi.sun@unisoc.com>, axboe@kernel.dk, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, pbonzini@redhat.com, 
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiguo.niu@unisoc.com, hongyu.jin@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Move set_capacity() outside of the section procected by (&d->lock).
-To avoid possible interrupt unsafe locking scenario:
+Yes, I'm using virtio-mmio.
 
-        CPU0                    CPU1
-        ----                    ----
-[1] lock(&bdev->bd_size_lock);
-                                local_irq_disable();
-                            [2] lock(&d->lock);
-                            [3] lock(&bdev->bd_size_lock);
-   <Interrupt>
-[4]  lock(&d->lock);
-
-  *** DEADLOCK ***
-
-Where [1](&bdev->bd_size_lock) hold by zram_add()->set_capacity().
-[2]lock(&d->lock) hold by aoeblk_gdalloc(). And aoeblk_gdalloc()
-is trying to acquire [3](&bdev->bd_size_lock) at set_capacity() call.
-In this situation an attempt to acquire [4]lock(&d->lock) from
-aoecmd_cfg_rsp() will lead to deadlock.
-
-So the simplest solution is breaking lock dependency
-[2](&d->lock) -> [3](&bdev->bd_size_lock) by moving set_capacity()
-outside.
-
-Signed-off-by: Maksim Kiselev <bigunclemax@gmail.com>
----
- drivers/block/aoe/aoeblk.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index d2dbf8aaccb5..b1b47d88f5db 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -333,6 +333,7 @@ aoeblk_gdalloc(void *vp)
- 	struct gendisk *gd;
- 	mempool_t *mp;
- 	struct blk_mq_tag_set *set;
-+	sector_t ssize;
- 	ulong flags;
- 	int late = 0;
- 	int err;
-@@ -396,7 +397,7 @@ aoeblk_gdalloc(void *vp)
- 	gd->minors = AOE_PARTITIONS;
- 	gd->fops = &aoe_bdops;
- 	gd->private_data = d;
--	set_capacity(gd, d->ssize);
-+	ssize = d->ssize;
- 	snprintf(gd->disk_name, sizeof gd->disk_name, "etherd/e%ld.%d",
- 		d->aoemajor, d->aoeminor);
- 
-@@ -405,6 +406,8 @@ aoeblk_gdalloc(void *vp)
- 
- 	spin_unlock_irqrestore(&d->lock, flags);
- 
-+	set_capacity(gd, ssize);
-+
- 	err = device_add_disk(NULL, gd, aoe_attr_groups);
- 	if (err)
- 		goto out_disk_cleanup;
--- 
-2.40.1
-
+On Tue, Jan 23, 2024 at 11:09=E2=80=AFPM Stefan Hajnoczi <stefanha@redhat.c=
+om> wrote:
+>
+> Hi Michael,
+> This could potentially affect other VIRTIO drivers too. Please see
+> below.
+>
+> On Tue, Jan 23, 2024 at 11:27:40AM +0800, yi sun wrote:
+> > On Mon, Jan 22, 2024 at 11:43=E2=80=AFPM Stefan Hajnoczi <stefanha@redh=
+at.com> wrote:
+> > >
+> > > On Mon, Jan 22, 2024 at 07:07:22PM +0800, Yi Sun wrote:
+> > > > Ensure no remaining requests in virtqueues before resetting vdev an=
+d
+> > > > deleting virtqueues. Otherwise these requests will never be complet=
+ed.
+> > > > It may cause the system to become unresponsive. So it is better to =
+place
+> > > > blk_mq_quiesce_queue() in front of virtio_reset_device().
+> > >
+> > > QEMU's virtio-blk device implementation completes all requests during
+> > > device reset. Most device implementations have to do the same to avoi=
+d
+> > > leaving dangling requests in flight across device reset.
+> > >
+> > > Which device implementation are you using and why is it safe for the
+> > > device is simply drop requests across device reset?
+> > >
+> > > Stefan
+> >
+> > Virtio-blk device implementation completes all requests during device r=
+eset, but
+> > this can only ensure that the device has finished using virtqueue. We s=
+hould
+> > also consider the driver's use of virtqueue.
+> >
+> > I caught such an example. Before del_vqs, the request had been processe=
+d by
+> > the device, but it had not been processed by the driver. Although I am
+> > using kernel5.4,
+> > I think this problem may also occur with the latest version of kernel.
+> >
+> > The debug code I added is as follows:
+> > virtblk_freeze()
+> > {
+> >         vdev reset();
+> >         quiesce queue();
+> >         if (virtqueue->num_free !=3D 1024) //1024 is the init value.
+> >                 BUG_ON(1);
+> >         vdev del_vqs();
+> > }
+> >
+> > BUG_ON triggered the dump, the analysis is as follows:
+> >
+> > There is one request left in request_queue.
+> > crash_arm64> struct request ffffff81f0560000 | grep -e state -e __data_=
+len
+> >   __data_len =3D 20480,
+> >   state =3D MQ_RQ_IN_FLIGHT,
+> >
+> > crash_arm64> vring_virtqueue.packed,last_used_idx,broken,vq 0xffffff808=
+6f92900 |
+> > grep -e num -e used_wrap_counter -e last_used_idx -e broken -e
+> > num_free -e desc_state -e "desc =3D"
+> >         num =3D 1024,
+> >         desc =3D 0xffffff8085ff8000,
+> >       used_wrap_counter =3D false,
+> >       desc_state =3D 0xffffff8085610000,
+> >   last_used_idx =3D 487,
+> >   broken =3D false,
+> >     num_free =3D 1017,
+> >
+> > Find desc based on last_used_idx. Through flags, we can know that the r=
+equest
+> > has been processed by the device, but it is still in flight state
+> > because it has not
+> > had time to run virtblk_done().
+> > crash_arm> vring_packed_desc ffffff8085ff9e70
+> > struct vring_packed_desc {
+> >   addr =3D 10474619192,
+> >   len =3D 20481,
+> >   id =3D 667,
+> >   flags =3D 2
+> > }
+> >
+> > I'm using a closed source virtual machine, so I can't see the source
+> > code for it,
+> > but I'm guessing it's similar to qemu.
+> >
+> > After the device completes the request, we must also ensure that the dr=
+iver can
+> > complete the request in virtblk_done().
+> >
+>
+> Okay, I think your approach of waiting for requests before
+> virtio_device_reset() makes sense. blk_mq_complete_request() is async
+> (might be deferred to an IPI or softirq) so it's not enough for
+> virtblk_done() to run before virtio_device_reset() returns. There is no
+> guarantee that virtblk_request_done() runs before virtio_device_reset()
+> returns.
+>
+> A separate issue about virtio_device_reset():
+>
+> Are you using virtio-mmio? virtio-mmio's vm_reset() doesn't offer the
+> same guarantees as virtio-pci's reset functions. virtio-pci guarantees
+> that irqs sent by the device during the reset operation complete and the
+> irq handlers run before virtio_device_reset() returns. virtio-mmio does
+> not.
+>
+> (On top of this, virtio_device_reset() now has
+> CONFIG_VIRTIO_HARDEN_NOTIFICATION which changes the semantics. Drivers
+> cannot expect to complete any in-flight requests in
+> virtio_device_reset() when complied with this config option.)
+>
+> Other drivers may be affected by these inconsistent
+> virtio_device_reset() semantics. I haven't audited the code.
+>
+> Stefan
