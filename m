@@ -1,87 +1,150 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267FE18E2E;
-	Wed, 24 Jan 2024 10:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B649C1AAD0;
+	Wed, 24 Jan 2024 11:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091806; cv=none; b=mthDJqw2hMqvLTgGEJO0j7u+3xJzKwHv+7zkYbJm2gg2jflzyeEsyRZMwNTF8XxIzSm7LwsLKm5QppL0qwy3T03C/2DCCm32t6IBmz7jUjhoDsgIPQBlqssMWxjXFoYgYZOPn4hR5Ca+y3vboxbCDUlo9L4KgKMJLrCt7Kc13KY=
+	t=1706095382; cv=none; b=tYd8/4iIlMYMvHtQlWNTPZ1k6niwAfnZWmGlV90DF2JTYSvAJykYE+GFvwqYCPR3g0qwRdRo5ov3V/5SNw6mBGJjH3Q5WSWpmKqbD1WNwGGIcCYwKU7LCqPMEDfwTfRPc9FpFz76qFDtZB53uNXdZMyICUhwEszAwGXlw2M1va0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091806; c=relaxed/simple;
-	bh=/VJeUAM84CSLJvQc/kYjOBJ8RgcjG3WuFyUcu2r93yo=;
+	s=arc-20240116; t=1706095382; c=relaxed/simple;
+	bh=ZzIGwtAn2QzZ+2GpJ7X6yrHuHp8dp5kYFExvtnM8l2I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lL0T585A8pjBDfYn3uYo4E2tC1mrUX2LJo5RPrmn7fkwCo92edv6hm/UqHrBlFBTO/P2/wueCjEwEOjuPCvogLkgENAXwQes1gC3zsChz7nYkOYkyf288JaKhdUMEQrF83H+8HUiP1DXlPB/2EXe9ViKD74DZGqx2M72sSvOyeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XygMAVFD; arc=none smtp.client-ip=209.85.167.51
+	 To:Cc:Content-Type; b=t8N4/nM5Odnbi1rZbP8kmEFBS6ngtlsQeavdmUKramz/VJBmEegI4MOb0y549sl0RuvMvmPAGSojube9kL4m0PJkQRtS0WOoXgE3kgCznHyDE3kUh7qfZn7gELhLUif21jH1sejijBY+3JyIKTD9L44Ba1NiS1MXDM1ItDSobzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J+f1d/8X; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XygMAVFD"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5100b424f8fso1409910e87.0;
-        Wed, 24 Jan 2024 02:23:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+f1d/8X"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2cf108d8dbeso20220061fa.3;
+        Wed, 24 Jan 2024 03:23:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706091803; x=1706696603; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706095379; x=1706700179; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/VJeUAM84CSLJvQc/kYjOBJ8RgcjG3WuFyUcu2r93yo=;
-        b=XygMAVFDtCFHeOhuZlSuWfxLkdG9lIrhAlZjj0wgtyejXhbFjK1VYtQJ2ahijnm8z0
-         2+UY5W0Kk6zx5s7t3uPxIUoExWRmCTaci5t69mltQM7KHW5Zh840VA/gkecSQ4FAaSTI
-         BTAXUVHoly1XTIdckAAmdBlStcbGwKeS3wcZ1L3L26EmFc96wPy/hQfiTOYilFCWKzyQ
-         5/pIZVcwtkUH2CbSzPb9ZytqzVUoRWYmkIncB6GwQ6ArR5o6XmWerGMuFm6cj3j+5+54
-         NVATVg17skefPCWAmsMNLOYo5Q+cx0nJoy5+ekdB3qU0q7V11UQkDaoR9kTOt0vIDl8f
-         JbGw==
+        bh=WlGnsP1Guq+73aimmzzt0YePXReMuB30joC9rhAKutI=;
+        b=J+f1d/8XGutKJmZWOymV5cAHxEGsfaQfPN+r0jgwFabAScsHDJamR+NPnzKpxIf2Dv
+         OahEM/yUYu6vt/QwbzZ1RjNGMFz76pnLKhQMtZVLqp7+f0B8tPvSDKLzenrPVw8JHkAR
+         uYPN0PZiRNxxOXO4vtMyMSvOlvKKaDYenaBZ8IHAw/TeCiVjTFA1BROudaxsi4rHaUHJ
+         D74w6uSS7GmzO9hsRoiAE/s9MPDTwcZiubTC96bPru8MDJ3FmzIyW96+1s5L3qLlCKxU
+         uliMP03HV5MCpWj1bOuIpHjv4KYDTdHPQcwai/2HZ1fJ0h2CQ50xX8HNZAoRjDNx6UGX
+         Vr4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706091803; x=1706696603;
+        d=1e100.net; s=20230601; t=1706095379; x=1706700179;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/VJeUAM84CSLJvQc/kYjOBJ8RgcjG3WuFyUcu2r93yo=;
-        b=ZgC3MVN8g24z57uRWY47SKfz9e2Q0JvPIv0dXwOYlFZ0fNmWPeyxzaWjbx/0+jU9fE
-         DobcDUWLXGt+Z1Xw0pXzpBi2Lb7qzc33DhXh1PXnYtFkahfvYJoLRxoFVVxBOzg2UOvW
-         nGmJZFL30cCsDCLH9y0hX19tiXUyFMsctUcYXDFSDAoLlCI3DE66LhM/k5iof7Ds/m93
-         n14DvBRdHxZAzuQHMJpFaOVIILky9EIO1y6eevPmym2+IFHZ+0aexHaIwyeHPYaGgBCK
-         oi8ZUrItLqB20l97mTI7L7KnIHpEdSNT/UhvlNa9RmSTdORm5tXqUcs0BU1pfuK3NjIf
-         IS4g==
-X-Gm-Message-State: AOJu0Yz/LDrcIapv9Rhw66cEVl8H0pfH6oAY4D5afmaqwk4zCmzmuF/w
-	hADH6ach99yq3sS8Y85sK8F/kJSIszXUVHRYfROA2olU32sCtgAUubmf4wPPcJlevVgoZc4gxGA
-	rwYJ4/lwwIZAD8SCOlVzcltfoV7fKvejU1U8=
-X-Google-Smtp-Source: AGHT+IHVUHj4ZWKcDVAzVxEsRP3TMRqjTrkTddl6alF5VOMTinXZ91Fx9PiHMwcDZjn53Je3HAsriWOENxwFy1mgY9U=
-X-Received: by 2002:a05:6512:3611:b0:510:cfa:994f with SMTP id
- f17-20020a056512361100b005100cfa994fmr734818lfs.100.1706091802960; Wed, 24
- Jan 2024 02:23:22 -0800 (PST)
+        bh=WlGnsP1Guq+73aimmzzt0YePXReMuB30joC9rhAKutI=;
+        b=ZKSK/y/HEeUXW97Te8xkg+/zP9EpEk3ZjYYyORoXOsXHR7O+R4A9SL+c9B9FE6cFAi
+         Pg10OTvQlrxAvYI0j6CexwmSBXeW3pJZkK+NxNJFN4O58EcA1x+++pWXXkUh7PjGqB7Z
+         BWOq4nZS+A2X2cQAETt0Fcmnit4DOMIOVcEQCkxmRHB2poM/0ksdUK+AgZeS3peM3RRV
+         HnSZ/06rwS/va/ixHvMoMbtSZFxYtffuTr1tp07w8whO5ZX8rzpyvuzljp+wsLdVe6kc
+         9bkDKFuWxNU1SvKes4c1o0n+aUW9XKpA3wKLQXxpAxwFAl4sCRazZrTiFZIT7zfL6PFM
+         m6CA==
+X-Gm-Message-State: AOJu0Yx8Un1Qk7dGXHNezIqxOKlMToll6N5uKkFvm+wiNpvgDGs5XYfr
+	ScsaH/TjqG98lLCH0TnDf/Mwv9FDMVsdgh/RPU98bem/n4elXRNeL6GPh1IP3Vt5JeQQ5/RrSi0
+	jQmw2u8xpaN9X0IBZtUYaLreg2ns=
+X-Google-Smtp-Source: AGHT+IEkb3Xpt+58vOiWxG6JhAbfK2iGy3KLOjaay+O2w7JwGWLv/HZUJ/QgwApQxLQVRQ6d1ibzMMIw8aMxLzlr/rQ=
+X-Received: by 2002:a2e:bc25:0:b0:2cc:e51c:4d0c with SMTP id
+ b37-20020a2ebc25000000b002cce51c4d0cmr974155ljf.66.1706095378493; Wed, 24 Jan
+ 2024 03:22:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124072436.3745720-1-bigunclemax@gmail.com>
- <20240124072436.3745720-2-bigunclemax@gmail.com> <ZbDV1RcDGnRjVqI7@infradead.org>
-In-Reply-To: <ZbDV1RcDGnRjVqI7@infradead.org>
-From: Maxim Kiselev <bigunclemax@gmail.com>
-Date: Wed, 24 Jan 2024 13:23:11 +0300
-Message-ID: <CALHCpMgT_3QbyNm6NmyVtUD6=rxcwzJ_udMyKejLjMNeJ8AYgA@mail.gmail.com>
-Subject: Re: [PATCH v1 1/1] aoe: avoid potential deadlock at set_capacity
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20240122110722.690223-1-yi.sun@unisoc.com> <20240122110722.690223-2-yi.sun@unisoc.com>
+ <ZbAQLRLNSx-IRRwM@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <ZbAQLRLNSx-IRRwM@kbusch-mbp.dhcp.thefacebook.com>
+From: yi sun <sunyibuaa@gmail.com>
+Date: Wed, 24 Jan 2024 19:22:21 +0800
+Message-ID: <CALpufv1XRYX7bv-NAUMmRjWr0jhDC1xrd+d48XejJZPjZZLEYQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_tagset_wait_request_completed()
+To: Keith Busch <kbusch@kernel.org>
+Cc: Yi Sun <yi.sun@unisoc.com>, axboe@kernel.dk, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, pbonzini@redhat.com, stefanha@redhat.com, 
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiguo.niu@unisoc.com, hongyu.jin@unisoc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi, Christoph
+In my case, I want all hw queues owned by this device to be clean.
+Because in the virtio device, each hw queue corresponds to a virtqueue,
+and all virtqueues will be deleted when vdev suspends.
 
-=D1=81=D1=80, 24 =D1=8F=D0=BD=D0=B2. 2024=E2=80=AF=D0=B3. =D0=B2 12:18, Chr=
-istoph Hellwig <hch@infradead.org>:
->
-> Looks good:
->
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
->
-> Just curious: what is your rason for using aeo over nbd?
+The blk_mq_tagset_wait_request_completed() function can ensure that
+the device has processed all in_flight requests , and these requests have
+become the complete state. I don=E2=80=99t understand the blk_mq_freeze_que=
+ue()
+function very well. Can the function ensure that all requests have become
+complete status? How should I use the function to achieve the same effect?
 
-The main reason why I use aoe, because it's not require a userspace
-client. All magic can be done by the kernel itself :)
-Just enough to specify an aoe interface via cmdline or bootparams.
+ps: requests become in_flight status in virtio_queue_rq() and become comple=
+te
+status in virtblk_done().
 
-Cheers,
-Maksim
+Yi
+
+On Wed, Jan 24, 2024 at 3:14=E2=80=AFAM Keith Busch <kbusch@kernel.org> wro=
+te:
+>
+> On Mon, Jan 22, 2024 at 07:07:21PM +0800, Yi Sun wrote:
+> > In some cases, it is necessary to wait for all requests to become compl=
+ete
+> > status before performing other operations. Otherwise, these requests wi=
+ll never
+> > be processed successfully.
+> >
+> > For example, when the virtio device is in hibernation, the virtqueues
+> > will be deleted. It must be ensured that virtqueue is not in use before=
+ being deleted.
+> > Otherwise the requests in the virtqueue will be lost. This function can=
+ ensure
+> > that all requests have been taken out of the virtqueues.
+> >
+> > Prepare for fixing this kind of issue by introducing
+> > blk_mq_tagset_wait_request_completed().
+>
+> Does blk_mq_freeze_queue() not work for your use case? I think that
+> should work unless you have some driver specific requests entered that
+> don't ever get released.
+>
+> > +static bool blk_mq_tagset_count_inflight_rqs(struct request *rq, void =
+*data)
+> > +{
+> > +     unsigned int *count =3D data;
+> > +
+> > +     if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
+> > +             (*count)++;
+> > +     return true;
+> > +}
+> > +
+> > +/**
+> > + * blk_mq_tagset_wait_request_completed - Wait for all inflight reques=
+ts
+> > + * to become completed.
+> > + *
+> > + * Note: This function has to be run after all IO queues are shutdown.
+> > + */
+> > +void blk_mq_tagset_wait_request_completed(struct blk_mq_tag_set *tagse=
+t)
+> > +{
+> > +     while (true) {
+> > +             unsigned int count =3D 0;
+> > +
+> > +             blk_mq_tagset_busy_iter(tagset,
+> > +                             blk_mq_tagset_count_inflight_rqs, &count)=
+;
+>
+> If the tagset is shared, then one active user can prevent this from ever
+> completing. It sounds like your use case cares about just one specific
+> request_queue, not all of them.
+>
+> > +             if (!count)
+> > +                     break;
+> > +             msleep(20);
+> > +     }
+> > +}
+> > +EXPORT_SYMBOL(blk_mq_tagset_wait_request_completed);
