@@ -1,66 +1,104 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D21117BD5
-	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 09:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8009617C61;
+	Wed, 24 Jan 2024 09:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706088751; cv=none; b=hncQT00tIhHL73Go4781fWjTRtmBqp20bGXM1tkzCgH4UdepJVDlSWOzBMtF48VDwSYQq7FnZl3ut1zceAnbo1e9ZfTyKNxNTBnar9AyHYvJtHKacyY6sLnRIV5KuOumb1PxYSGetzW//sJgmJNMzHapm/eq5ObpYOAwnDyYZn4=
+	t=1706088962; cv=none; b=GVsiGoLTVeIXOAbvoaMCTrYqUXefBhEN4mlBNPvIXSl676onTashBWRGudFB1Fr6mb3gGUcj+Afc3n2Bj4ZupdkiuWFzMC2IbjITdxzvK0ktJRCOJyvtrCF35AxYvivrJ58E+3O0N1A1mVWH2rAMtJcjn0pJz+CFx2tzRo5q6IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706088751; c=relaxed/simple;
-	bh=h/aVBgqDYfD++lXGhbAHqMkwUauFOGOdnfWCyQG5Onk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RgzANBCsA1Srjji5Yi5oKxD/QdpfWy7e0UjxV4ps9+TnoylfFzPKlT194SZLXGtGciZeWLaLdeNtXDqO3/HxFZJ7OXglHq4SwVEsY7K8rpc7a7JLeX1n201PBw84DATJLgJBW0ykxlyPkdRow4BT7H+Aj3TuUZaqOw1tvqrmF94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=5D3X/vnH; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1706088962; c=relaxed/simple;
+	bh=IkOzD3WQiOa41IYz5QTMBQFirnR9+U4zXgNFYBu5X7M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tTl+UVBZywsMwJLyGnsthHDEpZRqrIdToc7SoMSIzsnVe8VpdRxRUhpmardMQrh+B8DYRQb4MQLVtFFrCKDBt+C1ED44G/tCwdylF3Jqnp4GrEViT716uYyhEa6t4mEURinwFCWDaX3PXyk7XFnOAXKXxq5lIQKJ08VN5MC9jiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fP0MVfJr; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="5D3X/vnH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=G32e2zluIm5Xbr48OGPYliQPPUwqVD1ZYggar/Epkmo=; b=5D3X/vnHNaJ8o2mdWwvkfe26Yd
-	Hv4JRUFTzrAIU9qI74pTMqxgu3eWLLXHEp/C+0YAz0CHY6qyi6TQ7adqLMixVZhPbyIKgKlCVh9x5
-	RaIlpJR3V79ROyCjIsZ4RNtnSMZtdEF+tSNZvw9kX5WHkgg/jMKiFKK+9LW3zciFbGuMlezOE+3qW
-	3AaE/P67Xogs8NxykNs7IDVyE6zOUAea5MylRNEsRnk79GP2F1y4DD6du4Osa9YK78rAEOqUkPSpC
-	rsaGmZwDqgAic8G2xfb98442MwWC90rzs0Bfr4ab8jR18Y6s8vuOOrK6RWXKWH9K/pnkzqYRIM5Qg
-	z/2MFdbQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rSZcT-002G1V-1X;
-	Wed, 24 Jan 2024 09:32:29 +0000
-Date: Wed, 24 Jan 2024 01:32:29 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/8] block/mq-deadline: skip expensive merge lookups if
- contended
-Message-ID: <ZbDZLUDwA8ObY+9O@infradead.org>
-References: <20240123174021.1967461-1-axboe@kernel.dk>
- <20240123174021.1967461-4-axboe@kernel.dk>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fP0MVfJr"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5100cb64e7dso1278554e87.0;
+        Wed, 24 Jan 2024 01:36:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706088958; x=1706693758; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tx7XeGiLu0dPd7LHjpTzO0dQgZ5zb0c2EqLFG0xX8E0=;
+        b=fP0MVfJrNRQk/+8HHLjw7jTqQpm32E/qlzsHqm0ULUt4MLxqiFjafe08L1iMPkYCfx
+         fU3kSYyKGntiXW+OPkufskwu2nEQl/K0rGRd5nO2ek7Dp57TOs+WKU9Zz+tE3RVw+o9C
+         HizR/ywNIp6R12eKHVtyudpXJTdktTA7/1Rs9A9aAbI4qSyvEvIMTg0KwVFuIonh7aj8
+         AnFwdGscuhGcfQh7WZzdB3PYah8MMb3BocVla3074GiRfHor1TB2v73tokVL0W9wSqYL
+         rxIT3AsOUSpGIbnKYFV56pNyOMfIRuZvJu+FuxMWPAR+XI0kNelybH7DrTsWvyQTJHLd
+         YPEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706088958; x=1706693758;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tx7XeGiLu0dPd7LHjpTzO0dQgZ5zb0c2EqLFG0xX8E0=;
+        b=NhCNmhOL3tAdNxI7iseh+sMNp/Kxib5XN/77eyNJQPEoPgv9O5tPPZL1gsadhJ6634
+         ++EHtACH06G94ToTDNedHQrk2MaZ4Ocu82UrNzfXfDgAkRxQ8aHViDJ+l4vOknXY5wjo
+         rDD9LrbA0QteRIxDvtqHb1oBqF+3gQZh4FwRb+PArK6AiQoHXxD1UWO9dCsElEO2UVZM
+         NC9cNJ0urnbJDdDT0+z3zG7I2/IniULo0atQlDeat89fLplBaEa9hZ0NHesXoeXb18R8
+         u6tip7nAt5ugrofsT5b0zmRkB+rcoGgMEw7+uhN3nUvcferyQlnZ555ljlJkWQnezzzO
+         9jGQ==
+X-Gm-Message-State: AOJu0YzwLuF7/3O+lLLMPKXXLZ9mZYCVwLaFAc/Vbf4seuWnc0WJoYxd
+	deto5fmaSe6Lqci09sgycYGbTg+1oflSTg3pNpZWUjNW3VzUZ7wRPuxUpP6YZ+m9WraA/ZPB4P8
+	YzpwtlF6ckPjZeb38PEtHnyz/aJA=
+X-Google-Smtp-Source: AGHT+IE4TU4dbR1fiZgEMFn92/jrB53uGuhwBUPRGQSV5l+FDUZbGu2KLwgWzu+WWvVFwxcOdh/2tfAZ0FzqZ2CxtHA=
+X-Received: by 2002:a05:6512:4002:b0:510:1025:6a4 with SMTP id
+ br2-20020a056512400200b00510102506a4mr234021lfb.96.1706088958347; Wed, 24 Jan
+ 2024 01:35:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123174021.1967461-4-axboe@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20240124085334.3060748-1-zhaoyang.huang@unisoc.com> <ZbDWSUkT/OjHTe0t@infradead.org>
+In-Reply-To: <ZbDWSUkT/OjHTe0t@infradead.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Wed, 24 Jan 2024 17:35:47 +0800
+Message-ID: <CAGWkznHAi_U5erM0s8vFWwwucRKPoSzimNr9tdsPvs_sApGxgQ@mail.gmail.com>
+Subject: Re: [PATCHv2 1/1] block: introduce content activity based ioprio
+To: Christoph Hellwig <hch@infradead.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 23, 2024 at 10:34:15AM -0700, Jens Axboe wrote:
-> We do several stages of merging in the block layer - the most likely one
-> to work is also the cheap one, merging direct in the per-task plug when
-> IO is submitted. Getting merges outside of that is a lot less likely,
-> but IO schedulers may still maintain internal data structures to
-> facilitate merge lookups outside of the plug.
-> 
-> Make mq-deadline skip expensive merge lookups if the queue lock is
-> already contended. The likelihood of getting a merge here is not very
-> high, hence it should not be a problem skipping the attempt in the also
-> unlikely event that the queue is already contended.
-
-I'm curious if you tried benchmarking just removing these extra
-merges entirely?
-
+On Wed, Jan 24, 2024 at 5:20=E2=80=AFPM Christoph Hellwig <hch@infradead.or=
+g> wrote:
+>
+> On Wed, Jan 24, 2024 at 04:53:34PM +0800, zhaoyang.huang wrote:
+> >  void __bio_add_page(struct bio *bio, struct page *page,
+> >               unsigned int len, unsigned int off)
+> >  {
+> > +     int class, level, hint, activity;
+> > +
+> > +     class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
+> > +     level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
+> > +     hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
+> > +     activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
+> > +
+> >       WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+> >       WARN_ON_ONCE(bio_full(bio, len));
+> >
+> >       bvec_set_page(&bio->bi_io_vec[bio->bi_vcnt], page, len, off);
+> >       bio->bi_iter.bi_size +=3D len;
+> >       bio->bi_vcnt++;
+> > +     activity +=3D bio_page_if_active(bio, page, IOPRIO_NR_ACTIVITY);
+> > +     bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint,=
+ activity);
+>
+> If you need to touch anything in the block layer I/O path
+> you're doign this wrong.  The file system that is submitting the
+> I/O needs to be in control of the priorities.
+> must not hack the assignment behind the
+Please correct me if I am wrong. According to my understanding,
+bio(request)'s ioprio is set via either task's scheduler priority or
+blkcg's priority during submit_bio, that is, there is no explicit
+operation over ioprio from the file system so far. Furthermore, this
+commit is actually an add-on feature which is not against the current
+way of setting ioprio.
