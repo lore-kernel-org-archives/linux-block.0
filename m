@@ -1,156 +1,112 @@
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1A87A70A;
-	Wed, 24 Jan 2024 14:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89A91CD08
+	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 15:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706105695; cv=none; b=UJN+z51FisOeJEMID7M9JbTh8o3KEOlQoMIvJm5vI2ZBn7oXGQabnaZph9SVVckeVgeJOkIdKyzum5jMbUcaQHKIF58dOze5+bO8ebEiTPaXrTPrSxQyiAfXLX+5036Smg3ERW7JT88+1qs5rUYAOkYsuSSODUL6r7iQM9ppHHo=
+	t=1706108443; cv=none; b=uvyPOvZslf8OMVGT+rj5YuzV0d7SOeP2lQ8usvEUcCnZTCDyBz7K0YgK+ai8VpkO6eDF+PnnYjrN2sArM5TE58teejIhmpkEwz1zVywJ7e8s3cbc2x7GdIy2TTsj73FmXE4OlujF2KYOlJSM6ctvv689hwh6zC7oTbeLSukj/Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706105695; c=relaxed/simple;
-	bh=QlgIGz26xqq1QCGnq0oXBfcZ6f42DD5S71PIws0pxXk=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=W90Ubk4Z9qH9w+pa+zsgDTqAQvLUcUJ9+NnEwgKN5ESptF2qy/FOO9x6Y3ZYgGGZDg6l24ctz+wh48v5kJNvxAy7e/FKiRHpmNS9KcItW1KNAHcKsxLMe+3IbAV6Xy56Bu8q7qP1jQzF3bBy9lXdXHoM3n5MzuYVV6ju/3chUWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=MK/DTaPS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PU8yetdi; arc=none smtp.client-ip=66.111.4.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1706108443; c=relaxed/simple;
+	bh=8GiPMJfa5kMy9g5wq7yuUGkfo1MdFpMfxBsq5mHXilU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZlhFBcALDAvSLOlhNqicznhwLuVa+9z7I4sqv9x2P9caE91NcszITzxw4NRHTKwa9kLXdaat7DZxMQaIFcrNkv8mStSyykZtq9EOIlget2nx1fdWb4cZqdcjnNMClbZlrIpSV9VlipmYmNOwFHu9Tm9qv/ZweGo+NYZ6Y0kFoXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gT/MI1CK; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="MK/DTaPS";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PU8yetdi"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id A0CFE5C0094;
-	Wed, 24 Jan 2024 09:14:52 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 24 Jan 2024 09:14:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1706105692;
-	 x=1706192092; bh=zFp+9fzAQjxj+vatrVmlqze46/6SfiUYsAn91Q5f1po=; b=
-	MK/DTaPShgK40Na539ulXWXyYwWKIaMi9R+zGymB6bku6Y4B4n8/ZUfCI3Ec+t4p
-	isFhNQTuJJsbb3brOhyQiylBZLHfozLI0X5RuZhkLQxc0vf8+N8iSnuAzQkyPuly
-	wwy/2TZFRf2sHr8nPW4J4OFoRWYvGfFFyor1WejQlu4QtK6i9X2AriGJoB+Ar0Z5
-	xmsi/AB0oXTUdNeqdSiyWQPVaZLKCL7IkT4lNbdshnpE2nBMRFdS6a/cHY2ZHXVz
-	z1iFSKdU0PrnXOUBeWbFtgjY8IZUccPY2Sd9ZmR6WleHNXz3fI6x61Kdww6pPPnw
-	2ZWa2dt4PjivjH3mKgt4EQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1706105692; x=
-	1706192092; bh=zFp+9fzAQjxj+vatrVmlqze46/6SfiUYsAn91Q5f1po=; b=P
-	U8yetdibI5IEbWWmIxNgc+vRLpN+5gs3AN5MkFsyvlh80l8NO2aIKfl2CCu3QKI7
-	bl8+bP/KagdlgzwLmqpaXecKDUmbrQNEJYCnHcj9CGcEh1ybD6EyGsFt1gPca413
-	Y0tiYpJ1OoMj521RTdLtEt5xpLtY7XdGfIgvW2IhczOqbjGz6oTZCvyZ/VagrUm7
-	Jjfk+EDiK/1uRmweLTRSzq+0A9HgzaPXM92JKkDMSRI8TPdIo/E4Ac/bEB5xrd8b
-	rOWvq43W+YDgluTq5X8l9o436nrEQeWsDo6INofvOqdYMi0vZ1D3Za5EepDIJkFb
-	rQEsxbDSkU0BtL8zzOBZA==
-X-ME-Sender: <xms:XBuxZS486J7S5dPddku8rcLSQ3RddfvanQGbdaYUQu6poePPQ0O9Gg>
-    <xme:XBuxZb4PUfXBtUlz8M4SivYTptAboqFswAfZ3nI_v0YdEeHaoY4HaNZavMBsbGyy_
-    JlhdIZQerI8wIRHWIo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeluddgiedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedt
-    gfejveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:XBuxZRfAMIamAU2bRipflsZCbsqvdfmKufJuuh4bkwqc2l3CWYy3fg>
-    <xmx:XBuxZfLfbTuRpzUjlC4HcdJ2EaipDrdQqn4qpt5gYGGP4AY_ScgbZA>
-    <xmx:XBuxZWKKV5CXaE_ooRF1gWaVViuWLwFMS0BvH6E07MStB5ehEEp73g>
-    <xmx:XBuxZXoFNkBUkY8Eoqjsoff6TjW8qq5qdZINF_Jgiy6wygXnfogx8Q>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id EF08EB60092; Wed, 24 Jan 2024 09:14:51 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gT/MI1CK"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso69684739f.1
+        for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 07:00:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706108441; x=1706713241; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DVFxuFcvUZ91jVhn3jmAWIGGYe/ziVKPAkXOw844vqs=;
+        b=gT/MI1CKY6waXPG6uCdTGMMxAOe+Vr7nLnGWTWp3NBCwqqL5n/D8FcfP5wE8tavmOD
+         EvsokRAWD+TL3B8IhHWc3HykBSWqCS+pzx9HH38y6G1FiTZ46j/BztUE4NApjGLqLEdi
+         uOCN7bhMKCVBS81QWLEjJXxWDxdUYcrImrb8OK4g/VlKblTGxqoTMgYT/R9VB1JMbxyU
+         +pDp87XIvABem4drPxTKoYnFXBPMYM1nR+Xr0PVMYSPaJ4E+3vGLeArTB1s2/x0WnHe+
+         tvmcCUYX8zYI/w1UGl3R1c/OXax2++cn4F/V8IxK7BeymuoGqB/3yBVkyZ2pa1pOZ8TN
+         PDng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706108441; x=1706713241;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DVFxuFcvUZ91jVhn3jmAWIGGYe/ziVKPAkXOw844vqs=;
+        b=UOQdXyhBaM+SjTWdgsDAj9RvcyZ/L3cbEeHIKGyTXgKtz7HjfvGO7SqhFYA+iIYM5r
+         8A5Cix2n7sLcN9mY/OjUHuxeX5y31k+xtyG2P4hh41p2iwCt86dnTkOoL4VMk30xQAsN
+         6CR62jiqaUnqVDGjYlwW9dO8IhQq66dhAjE3eUKs6gIPpcrnhvRVTA2/HQzmHWfJXt3C
+         4Bp8GEBpeENDOz3izWhznYPDDRDiQ7Y8Vu4ZTrw9QqXaEOQq2AJXMzKNvypnGB9aplx8
+         Jd/PzS1iiOL5RjBKgzKv48X++5550ap0M0OQQKL7GplU/NHo8k6QiR0wNFsdQ/tWRY0M
+         qQjQ==
+X-Gm-Message-State: AOJu0Yz9Lqi5VlDEhc8ymZQtcTjn9RbgJ3oyLjMSJy1u10MyVsrJL+Y2
+	zsD1Iu8GKvq/CcjOMSoRQ8hRw1SmbkWxWdvIrd7GslCnxBCVlqZzSzXu9fss1PEExECrZY9ZjMR
+	ndbY=
+X-Google-Smtp-Source: AGHT+IEEJU4qB8w2J/sBdQpGnI8WVKRdOGLKpsvzr3p0zpRPb7WSIuyioYTe0mFyI1khmjM/nWmNyg==
+X-Received: by 2002:a05:6e02:1b83:b0:35f:f59f:9f4c with SMTP id h3-20020a056e021b8300b0035ff59f9f4cmr2911869ili.1.1706108440742;
+        Wed, 24 Jan 2024 07:00:40 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id j12-20020a056e02154c00b003627b70d918sm2353477ilu.66.2024.01.24.07.00.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 07:00:40 -0800 (PST)
+Message-ID: <a0176135-ccf2-4948-a61c-9527b25f5d34@kernel.dk>
+Date: Wed, 24 Jan 2024 08:00:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <8705302a-6127-4065-aad8-8033e5176411@app.fastmail.com>
-In-Reply-To: 
- <CACRpkdYYtpk8fMe6Gjo5Fu9byS=PqA5GJGeJpKTaw9QxcLqY8A@mail.gmail.com>
-References: <20240112054449.GA6829@lst.de>
- <9eb0f18e-f3ce-497c-931d-339efee2190d@kernel.dk>
- <CAPDyKFpmEB9FGAmGAQNdEH+DtRtcCNnFszfv_ewihzUU9du+Xg@mail.gmail.com>
- <20240122073423.GA25859@lst.de>
- <14ea6933-763f-4ba7-9109-1eea580e1c29@app.fastmail.com>
- <20240122133932.GB20434@lst.de>
- <d2289b38-f463-43e6-a60c-486fd479d275@app.fastmail.com>
- <20240123091132.GA32056@lst.de>
- <6f38c2db-3aae-42fe-ab97-dd027b90b690@app.fastmail.com>
- <CACRpkdbw8mGBUOh9W_E=KZQsOpc3TefL3QWApB+t5Z6w6wNRdA@mail.gmail.com>
- <9650b123-5954-4d80-a909-a46ec08ef052@app.fastmail.com>
- <CACRpkdYYtpk8fMe6Gjo5Fu9byS=PqA5GJGeJpKTaw9QxcLqY8A@mail.gmail.com>
-Date: Wed, 24 Jan 2024 15:14:29 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Linus Walleij" <linus.walleij@linaro.org>
-Cc: "Christoph Hellwig" <hch@lst.de>, "Ulf Hansson" <ulf.hansson@linaro.org>,
- "Jens Axboe" <axboe@kernel.dk>, "Ming Lei" <ming.lei@redhat.com>,
- linux-block@vger.kernel.org,
- "linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
- "Andrew Lunn" <andrew@lunn.ch>,
- "Gregory Clement" <gregory.clement@bootlin.com>,
- "Sebastian Hesselbarth" <sebastian.hesselbarth@gmail.com>
-Subject: Re: mmc vs highmem, was: Re: [PATCH 2/2] blk-mq: ensure a q_usage_counter
- reference is held when splitting bios
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/8] block/mq-deadline: serialize request dispatching
+Content-Language: en-US
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
+References: <20240123174021.1967461-1-axboe@kernel.dk>
+ <20240123174021.1967461-3-axboe@kernel.dk>
+ <1c695e25-af8e-41b2-adfe-58c843e7dbc1@acm.org>
+ <77209dea-406f-4143-98b7-b034b4d1dfe6@kernel.dk>
+ <ZbDY80W3Sr4DQHVJ@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZbDY80W3Sr4DQHVJ@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 24, 2024, at 14:16, Linus Walleij wrote:
-> On Wed, Jan 24, 2024 at 1:55=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> =
-wrote:
->
->> > So I am seeing if these can be excluded from the "most omap2plus
->> > systems" list.
+On 1/24/24 2:31 AM, Christoph Hellwig wrote:
+> On Tue, Jan 23, 2024 at 12:13:29PM -0700, Jens Axboe wrote:
+>> On 1/23/24 11:36 AM, Bart Van Assche wrote:
+>>> On 1/23/24 09:34, Jens Axboe wrote:
+>>>> +    struct {
+>>>> +        spinlock_t lock;
+>>>> +        spinlock_t zone_lock;
+>>>> +    } ____cacheline_aligned_in_smp;
+>>>
+>>> It is not clear to me why the ____cacheline_aligned_in_smp attribute
+>>> is applied to the two spinlocks combined? Can this cause both spinlocks
+>>> to end up in the same cache line? If the ____cacheline_aligned_in_smp
+>>> attribute would be applied to each spinlock separately, could that
+>>> improve performance even further? Otherwise this patch looks good to me,
+>>> hence:
 >>
->> Unfortunately excluding Nokia n8x0 would turn the omap2plus
->> defconfig into an omap3plus_defconfig effectively.
->
-> I did like this:
->
-> @@ -135,7 +135,7 @@ config ARCH_OMAP2PLUS_TYPICAL
->         bool "Typical OMAP configuration"
->         default y
->         select AEABI
-> -       select HIGHMEM
-> +       select HIGHMEM if !SOC_OMAP2420
->
-> Effectively disabling HIGHMEM when using omap2plus_defconfig.
->
-> If we want all systems supported, we just apply this at the expense
-> of highmem for OMAP 2430, OMAP3 and OMAP4 and the
+>> It is somewhat counterintuitive, but my testing shows that there's no
+>> problem with them in the same cacheline. Hence I'm reluctant to move
+>> them out of the struct and align both of them, as it'd just waste memory
+>> for seemingly no runtime benefit.
+> 
+> Is there ay benefit in aligning either of them?  The whole cache line
+> align locks thing seemed to have been very popular 20 years ago,
+> and these days it tends to not make much of a difference.
 
-As far as I can tell, none of the above actually have more than
-1GB of RAM, as OMAP4/AM4 maxes out at a single 8Gbit LPDDR2
-RAM. For those machines, using CONFIG_VMSPLIT_3G_OPT is likely
-going to be much better than CONFIG_HIGHMEM anyway.
+It's about 1% for me, so does make a difference. Probably because it
+shares with run_state otherwise. And I'll have to violently disagree
+that aligning frequently used locks outside of other modified or
+mostly-read regions was a fad from 20 years ago, it still very much
+makes sense. It may be overdone, like any "trick" like that, but it's
+definitely not useless.
 
-Unfortunately, this does not work for OMAP5/AM5/DRA7, which
-can have 2GB or possibly 4GB (as used in the Pyra) of DDR3,
-so we'd still lose.
+-- 
+Jens Axboe
 
-> We can then either
->
-> - Disable SOC_OMAP2420 in omap2plus_defconfig (I made a
->   patch for this) turning it
->   into an omap3plus_defconfig as you say
->
-> or
->
-> - Actually add a new defconfig named omap3plus_defconfig
->   with highmem enabled but SOC_OMAP2420 disabled.
->
-> I don't know which option is the lesser evil ... it's a bit hairy.
->
-> (A third option would be to reexamine runtime restriction options...)
-
-Or actually using kmap_local_page() in mmc_omap_xfer_data(),
-as Christoph suggested.
-
-      Arnd
