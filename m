@@ -1,59 +1,58 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33AA18624
-	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 15:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A57443154
+	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 15:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706108643; cv=none; b=P75wTPLJrsLYJJ/Ov6TPvR1iDj8J/vBaKVFwpqmuR7VPg+ph0HQMtyuV/DwJ0kaLjYu4O3r506G00LcBU/omX+IS+VLQ/Q1yUHFqOp5a5C4sBIBeX9taenFMYUn5QR1XOA+UKcVqdBHR3AFshfZfO1o576eOLMWYx6Ea3hsIKlo=
+	t=1706108691; cv=none; b=bGTukitgwTN8PhZ5DyHdbT0wUhR24LhCDppQSRob5vV7EOvGBLpsW1oxzwrnWuYCYWNMDDih5goJ6GpNxze2geZXDONKt3D+rGRvx5f1sPIsgmuzJzlAl1SpzotxnXD5tQwwrNxnon9nhsPNSEeaMRnR18maOFy/QD8dD/ch22s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706108643; c=relaxed/simple;
-	bh=plg0Oqamdyq6LHk4NWiibmjhCo9fRB9rF5VFirgM9A0=;
+	s=arc-20240116; t=1706108691; c=relaxed/simple;
+	bh=UqvQVK2OD2LxkaZ6sXw2a1ZwA5j5dQ9WbqrEdGz26sw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kVXYI3NP8op0+p2UdGqbGe2BaaeTrS/jVj4MpJsDHfRIN6kJcYgzoNG5VoE44+EBvv/Jq6RkUAjht1mLQGpB1yI/NQaQPfZA0bhKZRL/suYjysgpQ1C9Gw8JlpVoDcqYLnzFzpB4FLa5ml+0BHvEs6KDU20nwVbX/3m/hKO6T08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IBFjI06G; arc=none smtp.client-ip=209.85.166.53
+	 In-Reply-To:Content-Type; b=EAC2tfFzHY2IfXJA9J7GD8F9Pe6yswBa0/eSu4M60p3K0n8TVvK+FxqUUnX0DY2sX1z41kO8DrdAKQEu8hqEo8gGbLQBunO2olTuCeme+B7mckOto+Awj0yc8Vtsp/U4B8Y/TE6ePI0DA7taHq7i8lTRrnkzHnj1tMEivMIIxj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=n62eSc5z; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IBFjI06G"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7bed82030faso73464539f.1
-        for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 07:04:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="n62eSc5z"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d74058f6aaso3549915ad.1
+        for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 07:04:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706108641; x=1706713441; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706108689; x=1706713489; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=QosYFauF2ksuu2Ex5Kpe8kLZd38WjhGStS5b5dWBQYc=;
-        b=IBFjI06Gj68KUaCYWTmRH/7ka9IbkQT5oNK1IUyg1nosqU0zD33o0qc0Y53culxxRQ
-         WJ2epxEc1gam6CyB6leobxhpGtiExHGwJw4/QYE6dDaon3YtqFMmVuax+x/7DxXu+W+o
-         6OqUeHi+D9a8/WS/ZnHfGRhYellSyhLXqUkqy1fjYNrcCvz5wn56zrYAc99pHHBWer6B
-         p7bcRUrGGHxlnxIAJWSPzG8lhbE7odBa6WfCw6Um7BlTv+YeVm1VPLGF33QJ19R5C2hf
-         zskKvX1tZresu78WGLwXhX2cWxWPhznOzDSIcF45LNDq3WPCP+pwDh6HN47RushoNwBY
-         p+Fw==
+        bh=K/ImrXRLhVzXulGu2ndZAfk2gq3ebdP7+hVyl9Y6DO0=;
+        b=n62eSc5zTu3NBFHTt1SrhhAgH/LMUUO/uxSPP1DxDIR0ZUSMUjbzSpqb7Z/9LvYB0r
+         HwTXMnU1UXRqiDPKxsymRum4wR+tfqUX5K++SGnhsqucKZuCUPVGOjPmJXXOlPNXLd++
+         Nkkce+QRow+05XqX/NgCfq4Q885E0l69EHYCwtNxug/ovTUvx9FqqHMS5KtUuX3BaOGP
+         Hpz+hJRqxSthJdb4mzljmCsLAM/glaVDx4bkGS284Kw9r0/pxbkHbC+FiJIb0zvLrm2Z
+         plFWh3usKhGcmv29rhyp6GKqiD9w7yWFBpt3F3HiRyPCqrwitOfim0YdsEbWmyITQpec
+         AKUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706108641; x=1706713441;
+        d=1e100.net; s=20230601; t=1706108689; x=1706713489;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QosYFauF2ksuu2Ex5Kpe8kLZd38WjhGStS5b5dWBQYc=;
-        b=oqGMLYhLwRw7lry/WIJpc1RYDMQywfmmaZQ9HfSOQlHr3ogSlgv6Wnp7KwM30tHAk4
-         uCoNeSfVPQ2TNkoeHt/1sroW60lKo4NCqPepGjBb0UmyDIMpUBntRF8hiTe0gvqr2i3Q
-         +npFBi2jFNlRECHPilgUBpVvWpInMKKvxc2RQ8u9gGWLJixCgd4Lyn2zVeU3q7SSq+cu
-         ZbrkdtwEj+Y8AUC3pnYwAdRbhGAC8QPodh4hGk8JzbwPsST6puCg8glkdmskBSx5f6KX
-         E6tLiYPtdqLpYgBJFF+FibWJqVJH6XT9NrIVB4LlUTbNsRuZehBV+gdtyd3DzO030dEV
-         FAjg==
-X-Gm-Message-State: AOJu0YzpB4dF5QNnoB7FzjQg4sVE6U8kGROXSxyM/bXm4NqIBwoNVYqG
-	H3rUnkRNRlqJPrna5JxGdC42CHBkULohfEEX9Ntg4DVeCtI2csdqNyf3sLoFHd1d/ThYE6mimho
-	7iL8=
-X-Google-Smtp-Source: AGHT+IHfWzHnPEd7Pzy0Bw5Tx8op+Xn+D8pFWK2b2vk+70Wk6/lNmh9xexfWZXK9XkKsOHuof3FeZw==
-X-Received: by 2002:a5d:9b8d:0:b0:7bf:4758:2a12 with SMTP id r13-20020a5d9b8d000000b007bf47582a12mr2649849iom.0.1706108641105;
-        Wed, 24 Jan 2024 07:04:01 -0800 (PST)
+        bh=K/ImrXRLhVzXulGu2ndZAfk2gq3ebdP7+hVyl9Y6DO0=;
+        b=NGFYnmvneTzKFFpPsrrMMQxCe8uV4fB/rAQ+n+k6VNGgCDlVEKpIH8APIeOztt9+z9
+         ejLgEB1tNfmQFDrp2b2eq2p2iUUejkgHOjiZe5zgVXkvDUKeQcrxNw0K8cqZY/Jd2qga
+         SML9+xZd8569Nuo9+MtM3hsXhvdbAjim5Whgiumsp74iD2AF3BzkA+sqchHp0H8fOZ1J
+         y48JLK1Jvfi83S1c+Tr0M7HBZqc6OPJq+xoDI3lGlTA3GnfATK28vRPLTNPWBwbnPTjO
+         xREiJF0YVN35UakB+RkQSgn1rchCJ3RVl1idHgBlsEotiFcEXpzgXSKfd1itSXZFfM5S
+         Wm5Q==
+X-Gm-Message-State: AOJu0Yz03vEE4n+U4s7e0BcpGR1cRiiooAfscvc8XxNZJ/GGRhe0Qck3
+	RRho3roHGhjFV8iuP1tC52g3mYpWkjAkJTnDC/8o/yAgetNAfi23pTvllOETBw4=
+X-Google-Smtp-Source: AGHT+IEoBSysEcydmF4weUfzexA/pTRlSiUZYGl9IHS3Yv8khCg4y6ytTMl2Q07KnHbCKwn8LKA+yw==
+X-Received: by 2002:a17:902:ea85:b0:1d4:e2bc:89f3 with SMTP id x5-20020a170902ea8500b001d4e2bc89f3mr2556408plb.4.1706108689587;
+        Wed, 24 Jan 2024 07:04:49 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id q20-20020a02a314000000b0046eef94b4dasm1297197jai.170.2024.01.24.07.04.00
+        by smtp.gmail.com with ESMTPSA id q20-20020a02a314000000b0046eef94b4dasm1297197jai.170.2024.01.24.07.04.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 07:04:00 -0800 (PST)
-Message-ID: <ac42af94-5c53-4c03-a601-548bafb2e1da@kernel.dk>
-Date: Wed, 24 Jan 2024 08:04:00 -0700
+        Wed, 24 Jan 2024 07:04:49 -0800 (PST)
+Message-ID: <43f10d1c-d386-4ddc-b7df-1eeb4af87db9@kernel.dk>
+Date: Wed, 24 Jan 2024 08:04:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,34 +60,30 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] block: add blk_time_get_ns() and blk_time_get()
- helpers
+Subject: Re: [PATCH 5/6] block: shrink plug->{nr_ios, rq_count} to unsigned
+ char
 Content-Language: en-US
 To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: linux-block@vger.kernel.org
 References: <20240123173310.1966157-1-axboe@kernel.dk>
- <20240123173310.1966157-3-axboe@kernel.dk> <ZbDYNPsbwQo11Fgv@infradead.org>
+ <20240123173310.1966157-6-axboe@kernel.dk> <ZbDYbVhKlqnf6Yk5@infradead.org>
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZbDYNPsbwQo11Fgv@infradead.org>
+In-Reply-To: <ZbDYbVhKlqnf6Yk5@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/24/24 2:28 AM, Christoph Hellwig wrote:
-> On Tue, Jan 23, 2024 at 10:30:34AM -0700, Jens Axboe wrote:
->> Convert any user of ktime_get_ns() to use blk_time_get_ns(), and
->> ktime_get() to blk_time_get(), so we have a unified API for querying the
->> current time in nanoseconds or as ktime.
->>
->> No functional changes intended, this patch just wraps ktime_get_ns()
->> and ktime_get() with a block helper.
+On 1/24/24 2:29 AM, Christoph Hellwig wrote:
+> On Tue, Jan 23, 2024 at 10:30:37AM -0700, Jens Axboe wrote:
+>> We never use more than 64 max in here, we can change them from unsigned
+>> short to just a byte. Add a BUILD_BUG_ON() check, in case the max plug
+>> count changes in the future.
 > 
-> Given that the helper only is (and only should be) used in the
-> block layer code, any reason not to keep it private in block/ ?
+> Do we care about the size of this once per task structure?  byte-level
+> access tends to be quite a bit more expensive on various architectures.
 
-I did originally put it in there, but you then run into dependency
-issues with needing the struct definitions too, eg for struct blk_plug.
-Hence not sure it makes sense, even if logically it'd fit better there.
+I don't think we care that much, and honestly I'm fine dropping the last
+two patches. They don't matter that much to me, and we can always
+revisit if we do care more about shrinking the blk_plug later on.
 
 -- 
 Jens Axboe
