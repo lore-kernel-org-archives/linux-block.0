@@ -1,168 +1,180 @@
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC55877652;
-	Wed, 24 Jan 2024 16:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.27
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706114177; cv=none; b=CjGFkmgcpHyqiKkRSHqbXnTDopVgzrTehlUK6XjSecppBj+JoNKFzT9MryJ35x/fD5RYcaKR0ZMtWQ2SVgq39v81X/YV9oywuz9iWkiAATwryLY+HtCyd/XtmuFr3XYdG5yIWxCInOPwEkAOUHTx9CSOutNcLMRndicgi+fQjcA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706114177; c=relaxed/simple;
-	bh=QW2noZyRPGuHNKDAj2HXtvl9nLGVFak+RwCFUtNxUEs=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=UXqB/y0Aq1w69zv+7M1zIaYguWXbGJ23jAWODWoNi+eo75ocZRIs3khCg+lYfNX6sVFue9eF/NybaDuuV569+3hovmyL1BSvRFqqReJLdx9AOdmFSWC3C8EzL/0gJQIMvnj9ikrBKvnQmSP2z4kKFfsPRjftZi6Vhs2MNIUa2WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=cTKUY4g8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ImKIn6If; arc=none smtp.client-ip=66.111.4.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C497C08C
+	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 16:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706115197; cv=fail; b=WX0UQNv8s1cPla3bLMEFOw6a8jBKPA1uQ4o5UnhZok3CeQx03+kx6i7NLmKlpMoR/uvgbmMwHuRSH5G9+ij2xzEnoQez5v11V06tyJgBd+ZBz8nHzMq2qMlMwrXj5kjj/RxQFU61r5DVhyT3/dFfYO9a8Y0EkEOvW9Q7rMz+qyY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706115197; c=relaxed/simple;
+	bh=Vu0AJSTTKuFq2Zv8eoG9jSmUFCD6DDKTub7Mrs573SE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=I8oyhSl9xDiw9PagUeGRs+AT/mdgqkO2xcLavROL8v36vYADwGaE0bFJ2TLC4KtZ/DtM8/ksQNOqZXofNMwOBIz9aqOG/Du3dTW/2yiNZfOuUk8mSOVXAD0AS+RiypXiBrKUxWseUUsxfKUuZy4uuLnKfyoULcW05GaX032HTn8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ReY6GtR0; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=M2zuS4Ov; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="cTKUY4g8";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ImKIn6If"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id A7BE05C012E;
-	Wed, 24 Jan 2024 11:36:12 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 24 Jan 2024 11:36:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1706114172;
-	 x=1706200572; bh=2CXLns6hzjly6ZZt1NQ2rlZOa4H0ebqQSTs2jpivDoo=; b=
-	cTKUY4g82k3Q9SJVkuoagMaqHATeCWdXskvL9fR7ZBUW/vYsDDUU4CeO4SPBaKE8
-	EDiHBTg9Qj19Ze1LqsXYGZLOC+3OEd769eUzNrM8HM6fKeVvtgr1qfvrpzQ1uFCI
-	Ol1CCuhOAlQRVYRCRIo9ZZFx8SdY5SnhipwWtzJYtjnysT5vW8sZvZaGr4ZLCmVF
-	i5LeMhmRJpGDRwXgMMeYDJ+3iMQ8QYc2w9gOL+PpiLGEpIBV9j7tNLQNUSO9UPig
-	b0NucnY3EdH9XFGAavzY2FlQDNuVMr3ObNFYTLkMv/O0FUva5P3T6PNFZK8Ja8xY
-	H5koiAnugjOm+LiH7GTARw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1706114172; x=
-	1706200572; bh=2CXLns6hzjly6ZZt1NQ2rlZOa4H0ebqQSTs2jpivDoo=; b=I
-	mKIn6IfxShIJ7nBr2FJPFgiyWLqPeAg13Y3chqwORUcTts6IYRjzEIcE4wHJ5jdL
-	v69CUgeVS70RCzDp+8LpocPrzGoi9maVoEMzIy3DhcxrWJKJ6D5MeBh51HuKCNO2
-	GnQTtbzTG5biDzGcOPAcJrrWSMmfIV5UKFb4EW4LUnx3rP7kXdVsS42IEMRKsDDJ
-	jDNxhHtR8reukP4VIBS+oU0tc3QgKYoMnzNqb00GlX4sFuSzvI0ovXJPTKsYWtul
-	NF54kvFBdZFqrqLjuGfoIFk45wNh2G/0zkF/v7QZ9I5eo6L4nnsa4tYjiCH1S9J5
-	rZ29t6x2aIQqSNjkO4Glg==
-X-ME-Sender: <xms:ezyxZcAx9ORWf7rzhjCR74VLZqrFXzWle_4bocyoOc11TKVXw3Tilw>
-    <xme:ezyxZejKoYUwAQ6mseR38i_2q8eX2mPdhFj_ba-x1tBPdAkWbQfwTkp2Sgnk0RR0B
-    R8CYa-Qjfy61m3uxlc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeluddgkeekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedt
-    gfejveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:ezyxZfkscHdhVp7cCgkX6jd_HZ4TUK74u8RFkNOL5lGtfkf_Dt6VvA>
-    <xmx:ezyxZSxImkvkzX8_E1jPLPTdqNSTc1yKxucjgfEiXkKJ_pzcb-APfg>
-    <xmx:ezyxZRQHXLoEplbO1667pRKbwXy6jidlfN0bpMb1emxH45_99L1lIQ>
-    <xmx:fDyxZfNafSd0lpgsQImCrvSu7q3mm2RQK576kbv22GCaRsCpIYh3Cw>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id D7867B6008D; Wed, 24 Jan 2024 11:36:11 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ReY6GtR0";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="M2zuS4Ov"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40OEtupg002309;
+	Wed, 24 Jan 2024 16:52:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=LQiq9FrEIk8CqzOxP+R4mdvM1pE6YMmAt08u/zNOTaI=;
+ b=ReY6GtR0H+7lpWSSTYzw9/l4d7yU/X2DL+3S06qdnr0MUz31YbyfSeluou+nDdYmf3nJ
+ tmmEvHei4xfL+7HSCiweEYc4zdNrHBBgdqoY5vlpJg5kKmXbQslXNjFSxlI3s7EC5xmz
+ 8yB8YnrzWrqjEhk9OIB4mXmDGmXMwVwxjapBiaVfdCHa2NrBAzbfDGQcU1XHzbKqsf/J
+ f3dlwSSufl1nIgO06oYy1VHRl/P9zy3S7OppZE0gtqyJzkrZud0XiM4p4JSmAsCXF4SN
+ sJuEDbamwc17kiDQE90H/vbmTrzik+RRpAtLCvS0rgDuUzOgARF8dFa8u5V0+rp+2sOn Iw== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vr79nmetc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Jan 2024 16:52:59 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40OFwRYE026023;
+	Wed, 24 Jan 2024 16:52:58 GMT
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2041.outbound.protection.outlook.com [104.47.73.41])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3vs317ft6c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Jan 2024 16:52:58 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d3ECZwfkX58n3TxulO2bBMtZbBppFYb+LTWLvS+yXI1FhlUyBGQ3l2Mm3eA8RTIln7t0ro1Yr4GYRuZiw2kVFyT7yjo75sUBx8v6XjfG++zfT9NaFWlYq6crz6XQTQvJ3DciI3uCiAoqaglM8c8H1zesZ8qO9yCYxuMx6tYjYispfaYL2891BJKnySEzRlcxZYDT6I8ShQUNMvsjKO7zXwmvlXXi4gF1jAkN7+vKQGf+wSdInJs4MReAymi3G81C+V3nMMvThWlv3TCZMGtw8yGHHnPGjZiU3lo/mI6ItmGm5aVQk35ieer88fiIXqPzO8rTkQACn3erJsnxeMTwtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LQiq9FrEIk8CqzOxP+R4mdvM1pE6YMmAt08u/zNOTaI=;
+ b=Wl397LtjCSYY4M4WLADRR/HgMT/ediy26GBvV7dp2EIs4Tg8DtD5jkhp5LIIzS4GPD0aFhwiALiWC5lfKoszYa4OOomDerboFzEbvll+s0sannlBOUtV2oQVPiHE9dtFNZ8OYLK2DLEz/m8/vNCXbchk01kCi0AQk/mN3tBwgP/7YdL464+ZQpACiOuQz9uGpHXw/jZvL+YdRlQCxPwNlbXvZ0WhGhe9Wg6z6WkHDOCMzQ/c1/zqjxdib0WsJ4jcKpVWCG+laQ0t9W/3PX5+mEdtzLyCEh2nGcJd3hSCz0k4Pqwma0CtQAvUTqjI6C5kfDUD2AEU5xuzwE+PD6YewQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LQiq9FrEIk8CqzOxP+R4mdvM1pE6YMmAt08u/zNOTaI=;
+ b=M2zuS4OvQG13Gcb3IFx7pItbwEea/M9XRcc9tg+9Usj1PvGsx4mFuUyLF620H6VGscCdKdzkX9UYYx1Ueozh6VDyjn88bhJKosUBSXtS1COykngUnuP15vqlptEYhIc7QIT29LLCEn1EGViH1l+OWRZCLkoRU2VxwYGaIWtsiUQ=
+Received: from CO6PR10MB5537.namprd10.prod.outlook.com (2603:10b6:303:134::20)
+ by CO6PR10MB5393.namprd10.prod.outlook.com (2603:10b6:5:35e::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Wed, 24 Jan
+ 2024 16:52:56 +0000
+Received: from CO6PR10MB5537.namprd10.prod.outlook.com
+ ([fe80::a6ec:9178:f73f:e03c]) by CO6PR10MB5537.namprd10.prod.outlook.com
+ ([fe80::a6ec:9178:f73f:e03c%2]) with mapi id 15.20.7228.022; Wed, 24 Jan 2024
+ 16:52:56 +0000
+Message-ID: <d63f74b2-b455-4fd4-9b32-2657c6d81588@oracle.com>
+Date: Wed, 24 Jan 2024 08:52:54 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/1] nvme: Add NVMe LBA Fault Injection
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, kbusch@kernel.org, sagi@grimberg.me,
+        linux-block@vger.kernel.org
+References: <20240116232728.3392996-1-alan.adamson@oracle.com>
+ <20240118072419.GA21315@lst.de>
+ <6874a81c-3f4f-428a-8a95-19898ca004a2@oracle.com>
+ <20240123090506.GA31535@lst.de>
+ <7d7d7855-8a37-4de1-a32b-2edf0b53a05c@oracle.com>
+ <20240124090453.GB27760@lst.de>
+From: alan.adamson@oracle.com
+In-Reply-To: <20240124090453.GB27760@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR13CA0151.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c7::6) To CO6PR10MB5537.namprd10.prod.outlook.com
+ (2603:10b6:303:134::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <215c8e8e-8aee-411b-9f72-6ae40814c73d@app.fastmail.com>
-In-Reply-To: 
- <CACRpkdZKwHdPsR8KoyrhDjihLKiP5GdEgtYi_p-7L8b4_Ty_gg@mail.gmail.com>
-References: <20240112054449.GA6829@lst.de>
- <9eb0f18e-f3ce-497c-931d-339efee2190d@kernel.dk>
- <CAPDyKFpmEB9FGAmGAQNdEH+DtRtcCNnFszfv_ewihzUU9du+Xg@mail.gmail.com>
- <20240122073423.GA25859@lst.de>
- <14ea6933-763f-4ba7-9109-1eea580e1c29@app.fastmail.com>
- <CACRpkdZKwHdPsR8KoyrhDjihLKiP5GdEgtYi_p-7L8b4_Ty_gg@mail.gmail.com>
-Date: Wed, 24 Jan 2024 17:35:40 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Linus Walleij" <linus.walleij@linaro.org>
-Cc: "Christoph Hellwig" <hch@lst.de>, "Ulf Hansson" <ulf.hansson@linaro.org>,
- "Jens Axboe" <axboe@kernel.dk>, "Ming Lei" <ming.lei@redhat.com>,
- linux-block@vger.kernel.org,
- "linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>
-Subject: Re: mmc vs highmem, was: Re: [PATCH 2/2] blk-mq: ensure a q_usage_counter
- reference is held when splitting bios
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO6PR10MB5537:EE_|CO6PR10MB5393:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba52e751-4b4f-4731-a370-08dc1cfcea10
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	PHq4CoBUIwWUyGHtd5NlJk3bqT/DvEBpvfnwYLG9rGRaStBaH9ZWpZHsIVUUM4/e0lFkoIfhmHPV+6SUyX88K7d2zcBgno6aJlh6tvIhiYRBNGLTMIpwXG+dwIlnZSL7oAbeqaCQKJvtoHPrSOUqcauD5VZp2DEcNu6Xt41sB3jTIvR9lknA0NYAPJ6PKzVDZZpBNSRjt9Lp4sLUd+KXNmjiz/I7qqdemcym1GSlY/nI97nalhq5i4nx3bU4VkB8jMLBrTWyYSDsMYwXrIPzDa8rYbYGIr1vCp8CMp1XhNfq0DA2Bn3Job9YBHyXdUV4HdgKPCyjPhpU0OCDtaSv334t4xP4Bbg76bzfJlW5VWTOMmxl7VvTb1Uv4th6EQOZ7WFuK++X4yrggTG+eU2exXv3x5+w/O6l1AopKjqutQMfbM1RjOaRH3A8MJmsryoaBwiAMggB9YKUPGLXrE8+KYYCbWhCyIIRWjT46KZ2KRM60iFvCE8SF2NlmAl7k+Ogmv1/YdbeUQdSfJcC8YpekUIPpV0a0BW7dUZoyNA6s+bFlgvzTIH3KHVMAITVB05vLEQJBEu53txa6le+oQFThLnQ/d1u5jojFMitMBUUwijcFRIpkJmuHlwtKlbVNkuW
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR10MB5537.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(366004)(346002)(396003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(31686004)(5660300002)(4744005)(2906002)(66476007)(6916009)(316002)(66556008)(66946007)(4326008)(8936002)(41300700001)(8676002)(478600001)(31696002)(38100700002)(86362001)(36756003)(26005)(6512007)(53546011)(2616005)(9686003)(83380400001)(6486002)(6506007)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?VkhzcEdFTkhxaC91Sys1QUJvdHVQUzQ0YjEvanhpNWFLYkVJVEQyRWpweGhL?=
+ =?utf-8?B?SlROUDZJQ1NPd2o0Zi9td05TcFE4UEd0a2FubXhsdU01RHZKOTcrY2d3cDZv?=
+ =?utf-8?B?WERzSWMzUDNpTXh6VnJQZG9qQmZxTUszMHRXb3dac3RZTkJDdXhWaFhUTzli?=
+ =?utf-8?B?T0d2eDJVak4yTk1oTHBGREFZYWk0TzA0SEE5c08xK0ZqK1pKaGFYWVBMbVMx?=
+ =?utf-8?B?Rll1Wm5FNkhEdzNKcElKQk9QRzNZMXk3eGYvV25VZ05vZGRTZTJCamZadE9T?=
+ =?utf-8?B?KzRCS2N6WDdMNjV1SlZ3M1l0V21CL2ZlcGNib2FvRWdLVGlnN2k0cXJ0OVY4?=
+ =?utf-8?B?WGdaLzk5VEFUd1FvV1J4b3Ewem9GZWZneHFiSDBnZEVFZ1N1Q2htYU1XMWVL?=
+ =?utf-8?B?azBGMVViWnNGaHFsRGRYejBpQU1zM01yTVNOYTRwRFJkNkNvdFI2V3crazR3?=
+ =?utf-8?B?YkpicVdHMjNFN2RzVVVmbkp4Z2lyOElqY2tFZW9iUXBFYlpTWG9pK1g0Ynlm?=
+ =?utf-8?B?WDF0cnVVc0RRVTFqb09UV25GS0drcHg1NFVxQnM5TUJxVDluVk9aZkxnQjlP?=
+ =?utf-8?B?ZW5tQWhGUEx1Q0YvSDFPeEVLRmp6dE04Wm5WSm9KOC95TXZxcDlmS0piR3ZV?=
+ =?utf-8?B?Y0Z3RFBNd1p3VkhSdWFqYzdkMjRLK3JmV1hpQWNHTUZZLzlOYkQrMnY1UFhi?=
+ =?utf-8?B?NjdNODEvM2o1VWdDRzdFQnN0bXpWY1UyOThSMkp1OXpDRStRZUpiS0Rpb2Ro?=
+ =?utf-8?B?TGJuWXo4SW1DeE1BL0xMYkM2STlJZGdEZW9GVVQ2QnQ1a1pOUHBwQXVsTXBH?=
+ =?utf-8?B?N1Z1SGpVNnNxSnFSUmw5T3N2Mml2STlRRFp6LzlKMnpmQkV3RWR4dENQSDZR?=
+ =?utf-8?B?TlZCMlllZkcrSm9sS3JYeEg1QThaR2gvZzJaMkVWRzVaYmVqRzFYVjZtTy95?=
+ =?utf-8?B?c1daSHBvRWR5WExDQkZzcDExWW40bFFpUDJkNHVYckNNMUJaeHhWN3ZUQzAw?=
+ =?utf-8?B?SisvQ2FlOTZiemcveXVJSGNPcFNPR0RkOXVuTFpBNnIvL2ZvYmdnQ3BXVW9z?=
+ =?utf-8?B?SEVpUCtSdUtYem9uR0xhTkdodXFDVFZDZkFWY2g0V1ZiUmx4U3NLU2J0RzFy?=
+ =?utf-8?B?L3R1Tm16OVJUcThWd1pCcmVzSW5lTFdTbW9sZmRVYmIyc2JrWUg3aVh3VFF0?=
+ =?utf-8?B?eHdkT0xRY0dQbTlQZEt5WjBSSEFwTUpvVk53elFXczFUR2FjM3EyUytuM0lw?=
+ =?utf-8?B?eUJHZ29xbUlEVUZ1cHcyczNGeTJETUZxdEptYTl0R3Q2Z09ONEFid09BWkgr?=
+ =?utf-8?B?Z1dPbCtRVmI0clZ5WW94Yjc2STFqclB5RVZHUzhsNHpxM2F4M0R0aXJpK2o1?=
+ =?utf-8?B?dFh2eXVOUGhxWkJiTHJYUEFIbzlXNDZITWJjaXAyaCt4Sm5YRjcyNkhIdlhZ?=
+ =?utf-8?B?SUg3MW53WEpuWXN4S09OZEh4aHFuNEF3QnBqZGM2Q2hBMmh4eEs4VXJWMW55?=
+ =?utf-8?B?Ky95WmlKLzZMRHhnQWVxL3hDQUdDVDZvS29yWjZILy9ieXpnR0k5K3hDWExl?=
+ =?utf-8?B?UDNVV3F2Tyt5bG8yNEpBdEtuVTBBc0EwTHBtNGNwSW0vTEFTakd5aWJCSG5C?=
+ =?utf-8?B?MlJQYmVwVXFpYWVRSm52NUg2V2RBSndDN1hEUDJiTFJHdGVWRWtZUjNpT2kw?=
+ =?utf-8?B?cUJyM3JLTndhZmlRMG1sWVU5S2YxYld1M2F0YjlJMnByRHNRWlZEdVRJUlFO?=
+ =?utf-8?B?ZS9rVHUraVhlVkpMd2VWa25YL2l3RlFFamxPalFMMUpzakQ3K1RTN2xMNGpy?=
+ =?utf-8?B?Q1pRUGVnOGdSMEh0K0NaZllZdVJrQjhrM2UxUTRJMUpYbTlFcnp3SERKL2xI?=
+ =?utf-8?B?WDJudGRwSENEbmVteEF3ZkhHdG9BOUs1UUIwZ21sdTJUVXNUcGFsRkFOM0tt?=
+ =?utf-8?B?bVVkTXdrMml2V3ptWVJpbDVtQ1drcXpncU1IVmJHL0IyL2FPZTRZR0ZHN0pB?=
+ =?utf-8?B?bGhqenZOVWRNZXpaT1Rxc09ReTJaUjJ0TTBWUGxjaGhKbHBzQ2dTOGtybzRN?=
+ =?utf-8?B?Z1d6dlVFTThNUzMzbWdIOWg0QlFtOG8xMGVqSTd4bGk0czZKbmhaM2JhMjZ2?=
+ =?utf-8?Q?TJbYgPW0mBFoajSEF8mf3e4L5?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	FmGka307nsKNzhJvaA+AH9vbSabXflzsvyWqvu8UV9uBt++2owfRkUpiCtu34cgy8dL5fgF9W50ypMHWOS7lLmdUbBk7STOEVLTz+1ead/GK+eaDHQ2oj+ug5Ejw/tf6wDdDp3K8FyuzfZQ8XqOea8VFnEy0f6xwT5cbNsgnzeCojPw6EPtgPeJi29furKhbBaWz1EONnqnFQFQvHacsaqdaA7h/rK8hHRjLpAaFYiweknKZW3gVvbCWrqgocos7ddIXffbvGwHA9hXLwIldOEHiE3N7nXriIQzj4DQugKW39VHp0FOe3yUCd5q23r5lcm4UKjOnjwcLBoYa9USH8DqPPSxnaB0FxHlpTaJky6PYCnUj1+TULVWHlN3JjvN7ipjJSBnWeq3Ss9ej4Zu9oP8RH3W+MWg294u5iM/S8MEwfuFkLeUpVbHs1YYzGW3T3A8jq6dMLmELsKMcIcvRApeE9xozu9hgrJCP60KIGsExg7Yie/Eyb4JcBLb+H1Qjb88rc/CYDtIHUDLn0sqfe2T6YrwETjzBYWnauAMv76XotrJmP1b3Fg5V77tqA0YQ2EbYEnC8LYN47BWfQw4anO3hT0nUrV22tQ7OREwSBIU=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba52e751-4b4f-4731-a370-08dc1cfcea10
+X-MS-Exchange-CrossTenant-AuthSource: CO6PR10MB5537.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2024 16:52:56.5416
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dtBBwGuZyIYWZTucMYp8OnjZok25pmQLL3bqKrR7trUJeVZx68JA3FhfsnFZc7frA9raQMQ4uMNXG65hgSP/7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR10MB5393
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-24_06,2024-01-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 suspectscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401240123
+X-Proofpoint-GUID: mVuB4k_69tFOV_AjU2wmmhaxHjO5XeaK
+X-Proofpoint-ORIG-GUID: mVuB4k_69tFOV_AjU2wmmhaxHjO5XeaK
 
-On Wed, Jan 24, 2024, at 14:49, Linus Walleij wrote:
-> On Mon, Jan 22, 2024 at 10:26=E2=80=AFAM Arnd Bergmann <arnd@arndb.de>=
- wrote:
->
->> I found five drivers that have a legacy platform device
->> definition without a DMA mask:
->>
->> arch/m68k/coldfire/device.c: "sdhci-esdhc-mcf"
->> arch/arm/mach-omap1/devices.c: "mmci-omap" (slave DMA)
->> arch/sh/boards/board-sh7757lcr.c: "sh_mmcif" (slave DMA)
->> arch/sh/boards/mach-ecovec24/setup.c: sh_mmcif" (slave DMA)
->> arch/sh/boards/mach-*/setup.c: "sh_mobile_sdhi" (slave DMA)
->> drivers/misc/cb710/core.c: "cb710-mmc" (pio-only)
->>
->> None of these embedded platforms actually have highmem,
->> though the omap1 machine may run a kernel that has highmem
->> support enabled.
->>
->> Most of the others only support DT based probing after we
->> removed a lot of old board files a year ago, so they will
->> always have a 32-bit mask set at probe time.
->
-> For sh_mmcif I just added dma_mask and coherent_dma_mask
-> as DMA_BIT_MASK(32) in the boardfile
 
-I think technically it's wrong to set the DMA mask
-for the sh_mmcif device. The mask is set correctly
-for the dmaengine driver, which is used correctly in
+On 1/24/24 1:04 AM, Christoph Hellwig wrote:
+> On Tue, Jan 23, 2024 at 09:25:51AM -0800, alan.adamson@oracle.com wrote:
+>> I get it, but there is already an injection framework in place for nvme. Is
+>> there no plan to improve it?
+> Injecting fake I/O error really isn't the driver job.  For block
+> I/O we could do it the block layer or DM, but that's not something
+> to add to random drivers.  Error injection makes sense for testing
+> the driver itself, not applications.
 
-        ret =3D dma_map_sg(chan->device->dev, sg, data->sg_len,
-                         DMA_FROM_DEVICE);
+Thanks, I'll look at the block layer for this.  Do you think adding 
+error injection to qemu-nvme makes sense?
 
-Since SH never has highmem, I don't think there is
-anything that needs to be done for these.
+Alan
 
-Also for cb710, there is no DMA, and highmem gets
-handled correctly through using sg_miter_next() etc.
-
-> and I consider doing it
-> for pretty much all of them: If they
-> - Run without HIGHMEM enabled and
-> - With highmem are bouncing buffers around to PKMAP (right?) when
->   BLK_BOUNCE_HIGH is set
-
-> That kind of indicates that they are
-> probably 32bit DMA capable, pretty much as the device trees
-> assumes in most cases.
-
-> This avoids doing Kconfig trickery, make it runtime handled
-> and we can delete BLK_BOUNCE_HIGH as that branch is
-> never taken and just refuse to probe if dma_mask =3D=3D 0.
-
-We can probably treat this as two different issues now:
-
-a) drivers that don't set a DMA mask get the block layer
-   bounce buffers, and as far as I can tell none of these
-   actually need the bounce buffers, so we can already
-   remove the BLK_BOUNCE_HIGH setting without causing
-   a chance in behavior. cb710 is likely to see a
-   small performance improvement when used on highmem
-   systems without BLK_BOUNCE_HIGH but it's a very slow
-   and old device, so nobody will notice
-
-b) drivers that use sg_virt() instead of kmap_local_page()
-   or sg_iter are currently broken if they run on on
-   systems using highmem, as there is no bounce buffer
-   when the DMA mask is set. Some of these may have
-   used BLK_BOUNCE_HIGH in the past before the conversion
-   to DT probing.
-
-It's the second point that requires the Kconfig dependency.
-
-      Arnd
