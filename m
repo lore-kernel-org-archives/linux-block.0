@@ -1,194 +1,101 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F04517552;
-	Wed, 24 Jan 2024 07:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A17C171A2;
+	Wed, 24 Jan 2024 07:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706081955; cv=none; b=JyYiHuqfVH4Oy3vKw3oDAnC0L48YQCafbRs1uHFPZwRN74m8+P6TMCftJ/aOI9tDT74AxjxjyTLQKpuUb5ZY281Vtw5XseIlAxEb8ylpfoZFgAU4Qnu+IFQj8AO/nsxeh1UeOZwo+7cm7c3u9Z5M9AWXcOzE2WmyduPbcGERH3s=
+	t=1706082846; cv=none; b=fnyHV31PE1JKSSg1thYQujNmhlB+0JtopLNx8MibwMsWILHGqNa7ivxqmxHW6rwtM8vKMatGAybr975La7ApID182D1IZOAlGyuL8Qrlhs1nyR6cPdqmdhv+whOBah8jh1r4ifG2gmch6lGgt6ue+GWYyyR1BFLprVFO1LPAQfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706081955; c=relaxed/simple;
-	bh=oyPADhSHwEU24RtFpATiv+amECQBJiGyb2+3W+A/YO4=;
+	s=arc-20240116; t=1706082846; c=relaxed/simple;
+	bh=3t6xH3QbW5FMmzWRwU4q1T3GJ8BzpO16CpDp0xXh9LU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SJYWy4s98hvsGcdaWhs5gRfrvxXwqBCEdWylI1rzgQxshoP0yg5Tr9p9PwWuOsx+z++/lThIg97Cmr5UhqyR2G0DeJDXuWvzya+Tm2h52JgnCSVBh7c7Wy8VWqps2c9/mutDXwCfFGVwxQZbAffTvNXvdeK/ToWf37ehb6L91yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ldsm0IO0; arc=none smtp.client-ip=209.85.167.54
+	 To:Cc:Content-Type; b=j2t8i58UsObUP4/QiAJdqJ1XEQ/ZKQjwNIrMLW/r1C6hFFE0bj6s2KUeDXp/phkn/K33rquuD7ceMFe3PkWs/C7TECq0+yN1R8LwmM0cNPDkzZDZ0qaghlV7+7ByitaJhWnOZR+LrXiI6V2x9jj8x6DhWG+b7g45Guv+t5GHEok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pjz3HyVu; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ldsm0IO0"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5100893015fso1723655e87.1;
-        Tue, 23 Jan 2024 23:39:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pjz3HyVu"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5100b424f8fso1242140e87.0;
+        Tue, 23 Jan 2024 23:54:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706081952; x=1706686752; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706082842; x=1706687642; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U8Bfuvk8oKuA+3Tc2xTLQDMirdliyrSB9iEQK+0MXno=;
-        b=ldsm0IO01bItcOWQbrOElpDDpUI6HLt6y+onQRzAa1+TskX+ULsafoP7jQ8ktHW1vv
-         W6VXYuD5U+pCOpBO9Qe3bPGRYjB1uJ7IC6gwKKMLZ3dgiEwaWAM//9KevYkKIhmoJvos
-         Ao+sB+jQOgocZ4DXBTXK+Rxai34/c8h3vD51n5fP5c3Hp3OlUUl8WfntdFE5bhWDMhAQ
-         YqDUOicMFmWeRsK8sDwGlYEHoICix16lEwPLrB5nv8IDkx6860ch1kxK4u7eR3imZp+h
-         yuU5IHV//55PFkbsDYBA2h2Z30NJvEzdrXMjk1TDk7+qwxnEvpF04VAD+3UeClabVm7o
-         J3jA==
+        bh=JzlYpDM5q2ItPg3GY2j9GxLh93+1lpjpq8xQsFJhc/Y=;
+        b=Pjz3HyVuLaTt6aqgu+cLnpC2hLjRtfQ4RQgPyakOB75GHuw6EeTwrF7GCYAwuat/9B
+         sEJ3Z4Ojl/n8EjesevEp2xvLEalt+quuNhm3UjTkarFFiudKglVQN4UX5rcctrt1zeV1
+         zvmGV8HxDWhj3wLD3gnobWz0p8c/D9lMxVJi89LH5lub5dfHsnL+RPuG91AYeiji18dp
+         XQMF3ZF7f5etaxujXjwK9/R65WH6lXs797RQfY/o1N5PeyifIp1SGkYRKVG6gfY+j9W1
+         npPSiBV5QUwX7dvyGyUxpSQUD5ZzXc+WsFDDzOTMwQEHvk9Ns4Y/grtnTXZ+ZEwWATB2
+         PFZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706081952; x=1706686752;
+        d=1e100.net; s=20230601; t=1706082842; x=1706687642;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U8Bfuvk8oKuA+3Tc2xTLQDMirdliyrSB9iEQK+0MXno=;
-        b=PEw/blxYL4cGrrsMm1LU2+lKPTariGZVgZt81TakmnaPD5gLU/18OaodJxqMoFxCw5
-         CRoYGG2MUE/kVB3gcS8+6uWsxNliIsGLAgbDcV5v/c7Xmr001F2WrKMNE1CYyKOHzPyQ
-         WYu3T/WfK9mpEW2oO+f/BbiN96ITsczz/5WeP1SHRwgCi3ErwhzqwcwxmOszoRtac9wz
-         FFnyuI2Qfr7rOciOmTNbZno7kWNi/YtRkJSJtMRuLINwAucsW9wPO7CcM0tQh1TlcTgk
-         ggxpIoQA7ZWqCAZoFgYIGP/YE3kCqPlwywL5jpMZaMhlpfUGQcGS+nvb8atyfytIwTs+
-         7KeA==
-X-Gm-Message-State: AOJu0YzA453m6Pv+N0l48JHG6CeXithoiD2fUVNldb8p5K9rvhULdXd1
-	uRSbZHGRxHQOrf19xd0PfR08m1Kboywv8X0yAXxznw3ZQV5Q+HYNa2ZkhdRP2iwQDXOf8pKDkzd
-	jczZsRZ+kf/S+YWf5vAzRRys9qyo=
-X-Google-Smtp-Source: AGHT+IHfBrI2fT2JfWR70NQTj2TLaC2gpW8mlbjz8KC+gHPggrkHLo1dlVDPBXSxm1k0FmOHVzCm0rSmMRlZiD6fJro=
-X-Received: by 2002:ac2:5b4b:0:b0:510:1439:2bee with SMTP id
- i11-20020ac25b4b000000b0051014392beemr45089lfp.191.1706081951853; Tue, 23 Jan
- 2024 23:39:11 -0800 (PST)
+        bh=JzlYpDM5q2ItPg3GY2j9GxLh93+1lpjpq8xQsFJhc/Y=;
+        b=urdBUJTUDB+Dy3UGIVYAs0lXKbbyfz4ZBQwbQ7ca3j6KYMFU3kbHtWAioDMkCvA78p
+         IfudmIhRYNSyppGL0Z6kEdPF4iMLLL1H+nFT5Mj7zrscax3/eDuHL0KdXvcF1LGhFk0w
+         eSdzPl7xqy4t1pSTYcuw3Hfq5+9tjgZEFNkO8v4cIAqR691P6OZDnqVa/OdO778eWSpX
+         PS3vTwhnsN4CFySERaRc+hzPZtPTgeg3xAmJNvGgQ2B7AFecjxDA7zUwxHbfWQ3lK44t
+         iXxJ6NgaWhe9F8FdA4q8YDbbggmyYju/73pJuqt5MwgAMYaiBSWLmpGg/4xgEWuOqbYN
+         TuYw==
+X-Gm-Message-State: AOJu0YzD+K1TA9mIFRfi0YrhYzphXLdVfh3wtVnse8jjcjREOv6luTH9
+	foIYUKzNa/cSGjVx4AqXcdMdHL56CnU6uVUTMeMj5Py1vgApQqxB7k8LNUjgmJovreLK2UOpiRC
+	QSVS7kgPpd7ZGuOIEqeuogVYrMcNQMncb
+X-Google-Smtp-Source: AGHT+IHzMasL7hD1TBMeJJAKJBMXLqBHrgDkRbfINdmnbYWspCldchti2DFDIAWqmZv9FFaEISvj6Gg9pe25h/ADf/k=
+X-Received: by 2002:a05:6512:6c2:b0:50e:c642:3aed with SMTP id
+ u2-20020a05651206c200b0050ec6423aedmr4218396lff.43.1706082842020; Tue, 23 Jan
+ 2024 23:54:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122110722.690223-1-yi.sun@unisoc.com> <20240122110722.690223-3-yi.sun@unisoc.com>
- <20240122154255.GA389442@fedora> <CALpufv0h-sQ4Qfp-Sxd7wME4onMNAMop_gi-np6Dk2R96sba0Q@mail.gmail.com>
- <20240123150924.GD484337@fedora>
-In-Reply-To: <20240123150924.GD484337@fedora>
-From: yi sun <sunyibuaa@gmail.com>
-Date: Wed, 24 Jan 2024 15:38:35 +0800
-Message-ID: <CALpufv385oK0+EqYZw1Mk8xxm1Av_jYfcPS0khBi=NSu7qCeHQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] virtio-blk: Ensure no requests in virtqueues before
- deleting vqs.
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: mst@redhat.com, Yi Sun <yi.sun@unisoc.com>, axboe@kernel.dk, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, pbonzini@redhat.com, 
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhiguo.niu@unisoc.com, hongyu.jin@unisoc.com
+References: <20240123093352.3007660-1-zhaoyang.huang@unisoc.com> <Za+5uEpmNWbT8tXt@infradead.org>
+In-Reply-To: <Za+5uEpmNWbT8tXt@infradead.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Wed, 24 Jan 2024 15:53:50 +0800
+Message-ID: <CAGWkznEu5u1-MgK1XoexDkRetp34b_D1KvmDLfaOayY959BBOw@mail.gmail.com>
+Subject: Re: [PATCH] block: introduce content activity based ioprio
+To: Christoph Hellwig <hch@infradead.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Yes, I'm using virtio-mmio.
-
-On Tue, Jan 23, 2024 at 11:09=E2=80=AFPM Stefan Hajnoczi <stefanha@redhat.c=
-om> wrote:
+On Tue, Jan 23, 2024 at 9:06=E2=80=AFPM Christoph Hellwig <hch@infradead.or=
+g> wrote:
 >
-> Hi Michael,
-> This could potentially affect other VIRTIO drivers too. Please see
-> below.
+> On Tue, Jan 23, 2024 at 05:33:52PM +0800, zhaoyang.huang wrote:
+> >  #define ALLOC_CACHE_MAX              256
+> > @@ -1069,12 +1070,21 @@ EXPORT_SYMBOL_GPL(bio_add_zone_append_page);
+> >  void __bio_add_page(struct bio *bio, struct page *page,
+> >               unsigned int len, unsigned int off)
+> >  {
+> > +     int class, level, hint, activity;
+> > +
+> > +     class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
+> > +     level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
+> > +     hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
+> > +     activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
+> > +
+> >       WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+> >       WARN_ON_ONCE(bio_full(bio, len));
+> >
+> >       bvec_set_page(&bio->bi_io_vec[bio->bi_vcnt], page, len, off);
+> >       bio->bi_iter.bi_size +=3D len;
+> >       bio->bi_vcnt++;
+> > +     activity +=3D (bio->bi_vcnt <=3D IOPRIO_NR_ACTIVITY && PageWorkin=
+gset(page)) ? 1 : 0;
 >
-> On Tue, Jan 23, 2024 at 11:27:40AM +0800, yi sun wrote:
-> > On Mon, Jan 22, 2024 at 11:43=E2=80=AFPM Stefan Hajnoczi <stefanha@redh=
-at.com> wrote:
-> > >
-> > > On Mon, Jan 22, 2024 at 07:07:22PM +0800, Yi Sun wrote:
-> > > > Ensure no remaining requests in virtqueues before resetting vdev an=
-d
-> > > > deleting virtqueues. Otherwise these requests will never be complet=
-ed.
-> > > > It may cause the system to become unresponsive. So it is better to =
-place
-> > > > blk_mq_quiesce_queue() in front of virtio_reset_device().
-> > >
-> > > QEMU's virtio-blk device implementation completes all requests during
-> > > device reset. Most device implementations have to do the same to avoi=
-d
-> > > leaving dangling requests in flight across device reset.
-> > >
-> > > Which device implementation are you using and why is it safe for the
-> > > device is simply drop requests across device reset?
-> > >
-> > > Stefan
-> >
-> > Virtio-blk device implementation completes all requests during device r=
-eset, but
-> > this can only ensure that the device has finished using virtqueue. We s=
-hould
-> > also consider the driver's use of virtqueue.
-> >
-> > I caught such an example. Before del_vqs, the request had been processe=
-d by
-> > the device, but it had not been processed by the driver. Although I am
-> > using kernel5.4,
-> > I think this problem may also occur with the latest version of kernel.
-> >
-> > The debug code I added is as follows:
-> > virtblk_freeze()
-> > {
-> >         vdev reset();
-> >         quiesce queue();
-> >         if (virtqueue->num_free !=3D 1024) //1024 is the init value.
-> >                 BUG_ON(1);
-> >         vdev del_vqs();
-> > }
-> >
-> > BUG_ON triggered the dump, the analysis is as follows:
-> >
-> > There is one request left in request_queue.
-> > crash_arm64> struct request ffffff81f0560000 | grep -e state -e __data_=
-len
-> >   __data_len =3D 20480,
-> >   state =3D MQ_RQ_IN_FLIGHT,
-> >
-> > crash_arm64> vring_virtqueue.packed,last_used_idx,broken,vq 0xffffff808=
-6f92900 |
-> > grep -e num -e used_wrap_counter -e last_used_idx -e broken -e
-> > num_free -e desc_state -e "desc =3D"
-> >         num =3D 1024,
-> >         desc =3D 0xffffff8085ff8000,
-> >       used_wrap_counter =3D false,
-> >       desc_state =3D 0xffffff8085610000,
-> >   last_used_idx =3D 487,
-> >   broken =3D false,
-> >     num_free =3D 1017,
-> >
-> > Find desc based on last_used_idx. Through flags, we can know that the r=
-equest
-> > has been processed by the device, but it is still in flight state
-> > because it has not
-> > had time to run virtblk_done().
-> > crash_arm> vring_packed_desc ffffff8085ff9e70
-> > struct vring_packed_desc {
-> >   addr =3D 10474619192,
-> >   len =3D 20481,
-> >   id =3D 667,
-> >   flags =3D 2
-> > }
-> >
-> > I'm using a closed source virtual machine, so I can't see the source
-> > code for it,
-> > but I'm guessing it's similar to qemu.
-> >
-> > After the device completes the request, we must also ensure that the dr=
-iver can
-> > complete the request in virtblk_done().
-> >
+> The block layer must not look at page bits.  I've fixed all this crap
+> with a lot of work and we're not going to re-add it for another qute
+> hack.  The place to figure out any kind of I/O priority is the file
+> system (preferably using generic helpers).
+ok, will use helper function in next version
 >
-> Okay, I think your approach of waiting for requests before
-> virtio_device_reset() makes sense. blk_mq_complete_request() is async
-> (might be deferred to an IPI or softirq) so it's not enough for
-> virtblk_done() to run before virtio_device_reset() returns. There is no
-> guarantee that virtblk_request_done() runs before virtio_device_reset()
-> returns.
->
-> A separate issue about virtio_device_reset():
->
-> Are you using virtio-mmio? virtio-mmio's vm_reset() doesn't offer the
-> same guarantees as virtio-pci's reset functions. virtio-pci guarantees
-> that irqs sent by the device during the reset operation complete and the
-> irq handlers run before virtio_device_reset() returns. virtio-mmio does
-> not.
->
-> (On top of this, virtio_device_reset() now has
-> CONFIG_VIRTIO_HARDEN_NOTIFICATION which changes the semantics. Drivers
-> cannot expect to complete any in-flight requests in
-> virtio_device_reset() when complied with this config option.)
->
-> Other drivers may be affected by these inconsistent
-> virtio_device_reset() semantics. I haven't audited the code.
->
-> Stefan
