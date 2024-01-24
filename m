@@ -1,43 +1,39 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE6A182DD;
-	Wed, 24 Jan 2024 09:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92AF1B5A4
+	for <linux-block@vger.kernel.org>; Wed, 24 Jan 2024 09:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706088015; cv=none; b=ghn510BRO2xGSE2Nww3bybOB/BC7j+p84oXsESbsJ9XbOy8WxIxaYepB1P+/swaKV/xzbczfLvnNme7/N+Yh5wWTz6ZONQmztSAF1Xl5FTNVm+y/dOrC0xhFDd3QrWxomzm2P/9u879jgQrUL6Ni/PKzWF0Yv9Mz9v3kBvERH5s=
+	t=1706088115; cv=none; b=E9xYa/KvD3SqPDOkywB6EjqE9J+ftRhfhSfnQfSCYGmyoyrGuDyyK07rN0uTfZsUeKfyDIJPSHY8gItNuArjk/UZe/vkFj64Oe63OZW8JC293jT0K7kM+Gp/c57yyOcvRC3L/vEMQrdnpgJTA4Hcbhk44HWqnVo3jLXwuem9g+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706088015; c=relaxed/simple;
-	bh=0RNVoVPorVZfd5XfeIrUrbw9uQITz+8rwALrIiiF5SI=;
+	s=arc-20240116; t=1706088115; c=relaxed/simple;
+	bh=Q0kfJGwfJNRpe/Ml0n5ViX31n5MiHcRCZGahnNtHrwQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fk1bcq41CSORHkXm88eTSBV930pAQuoMkxaE69n+JnmUVZ6dY3GQbcSTNVnVqv6CkBVrKZK6ONbnZ03ErWQHlbxv22D2kewEsHAeizZV1oZ3zH2D4RexhJmbYfhkSuYwEZieazU0h+gtI/I9eqab5qwq7Zv162KbycsxwfTrCzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pWIw3d6+; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pWIw3d6+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=c+ZfvrjquqzlfSZdWFV1/+Mtsm0Gets8I4mX6+MdRHE=; b=pWIw3d6+jgURd/sfpZEVB1Aiml
-	vM1O8VgYkw32OUUokRaha95eKs81ULZjWXHkhsUL3xnYi7r7PvBvftRJ8l4CSHNqUStqBEYptww4D
-	5KSU1WgXxBv2BaluAoqZEYsilp+LiZ0knK8rhJU64j2F2+50DSmcLEdVbXywP+/yzCxyOilVOC2wm
-	y7Ccnq0mtlWXFXosjW8h+s6X6n93pkulx1j6D9nuxjBLhhu4+TqaE36D+HZyhXzvfetcHgG74Acqa
-	xTyMXU0qUnkKRyArkhnttoLhuWK0guIAsi4jn+v3AktzS0GlKGmF6eyYdu04dmhsFi5YWj+aJgTfH
-	x171c8qQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rSZQX-002BYQ-1t;
-	Wed, 24 Jan 2024 09:20:09 +0000
-Date: Wed, 24 Jan 2024 01:20:09 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zhaoyang Huang <huangzhaoyang@gmail.com>, steve.kang@unisoc.com
-Subject: Re: [PATCHv2 1/1] block: introduce content activity based ioprio
-Message-ID: <ZbDWSUkT/OjHTe0t@infradead.org>
-References: <20240124085334.3060748-1-zhaoyang.huang@unisoc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=srhJulVKuaG7xnRUw52Vmsqhl1d7fokgXKsLLZcGvog8IZmzR1ZYq7hQZw92m1maZHOJ4R6DFbP9raXpfwXTYlcwaohKsgd1DMU8U/Psrgd6gHbCGMu8qj61fD98MRZc/Q4jK0yqK8+QBcoA2GaSWpuvYiEDJ1sdBR+uAiw09VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 0EC1B68AFE; Wed, 24 Jan 2024 10:21:49 +0100 (CET)
+Date: Wed, 24 Jan 2024 10:21:48 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 03/15] block: add an API to atomically update queue
+ limits
+Message-ID: <20240124092148.GA28770@lst.de>
+References: <20240122173645.1686078-1-hch@lst.de> <20240122173645.1686078-4-hch@lst.de> <de3cd926-c78c-4e68-bee0-2f571ccdaf8d@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,30 +42,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240124085334.3060748-1-zhaoyang.huang@unisoc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <de3cd926-c78c-4e68-bee0-2f571ccdaf8d@suse.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Jan 24, 2024 at 04:53:34PM +0800, zhaoyang.huang wrote:
->  void __bio_add_page(struct bio *bio, struct page *page,
->  		unsigned int len, unsigned int off)
->  {
-> +	int class, level, hint, activity;
-> +
-> +	class = IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +	level = IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +	hint = IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +	activity = IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-> +
->  	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
->  	WARN_ON_ONCE(bio_full(bio, len));
->  
->  	bvec_set_page(&bio->bi_io_vec[bio->bi_vcnt], page, len, off);
->  	bio->bi_iter.bi_size += len;
->  	bio->bi_vcnt++;
-> +	activity += bio_page_if_active(bio, page, IOPRIO_NR_ACTIVITY);
-> +	bio->bi_ioprio = IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint, activity);
+On Wed, Jan 24, 2024 at 07:08:58AM +0100, Hannes Reinecke wrote:
+>> + * that there is outstanding I/O by other means.
+>> + */
+>> +static inline struct queue_limits
+>> +queue_limits_start_update(struct request_queue *q)
+>> +	__acquires(q->limits_lock)
+>> +{
+>> +	mutex_lock(&q->limits_lock);
+>> +	return q->limits;
+>> +}
+>
+> I'm slightly confused about the lifetime of the returned structure.
+> By my understanding, the returned 'struct queue_limit' is allocated
+> on the stack of the caller, right?
+> Shouldn't we note this somewhere such that people don't start passing
+> the structure around, or, worse, calling 'kfree()' on it?
 
-If you need to touch anything in the block layer I/O path
-you're doign this wrong.  The file system that is submitting the
-I/O needs to be in control of the priorities.
-must not hack the assignment behind the 
+queue_limits_start_update returns the structure by value.  So the
+lifetime is that of whatever variable you assign it to, which better
+be on the stack.  Tryign to kfree a non-pointer type will get the
+compiler complain, as does passing a reference to it outside the
+function these days.
