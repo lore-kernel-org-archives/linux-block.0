@@ -1,140 +1,125 @@
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665327CF13;
-	Thu, 25 Jan 2024 16:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6895A1353F5;
+	Thu, 25 Jan 2024 16:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706200667; cv=none; b=LOQe9c5+gZEeAlj0IC4TK9/4kJpv79TA8PyT/dJyo5T0JaUlz/RoOxLnwwrzM9hXgZ0ABWtU3B2q9U3F9A7zryo5OriUDc1NPy6XFuQacb5nWzVbMpm7VSAiASVwTzDft7wTRUTN4dKPD+F7xB6Sjyqu7gSV7o3OlbvG2pMYqA0=
+	t=1706201622; cv=none; b=nYkm4osvq9h/glYwJ9a5XJ8AxCyJR5IYITTgkU+2XBxk9zqwcGSXoldWHkn0ZePO0Bl1R+gS9h8L+i7oODA/G4G8/ojvgKuiT3fJMED+bt/pYcQUgrDmyYLlIizFQnXVEZvKBqipdb+CqftT8WvbYALZ5m+75UnNZfay3wnGZlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706200667; c=relaxed/simple;
-	bh=8fOPIjHVb90c7CRguRNiFQ8VqTpSNg82Bt7oXHc10n0=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=ebE2BTSTA8I5rAJJnYKyMqsvugKh4gwMCsZ9lAEoiF6pjTzjXhRQt5Qq7bQF44EQbjCRZ49Psz8Ch+t08h1nb7RE5SUIb2WtmIChYW626y2LGcVN1ZABSnjWAxpqtmTlFwSMBoExEgtsK8/FspSfKySB8sxUUuWcODkMUo9pN+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=n4shag+V; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aqPlbphJ; arc=none smtp.client-ip=64.147.123.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1706201622; c=relaxed/simple;
+	bh=0N4F/gjOaEHcA1EmZZhcmvU+dQFlqf6CupFhM16+QGk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ezU1zmJXENWuguN4aOCj0mi/kzB6AuIdlnm064NiymksMDqgexKHO5rPG3zbv7/w2w/dS7tdPpaMQ6ZgCsTvFnqyVrzcLm0PyVg1KjYb+TY9sbaPcoQov1KO+BmMZxUJnzgp+oe156WWGaY1ZJx3CoH4YvCSZatyWFrOpE+flnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=H8RO9z9M; arc=none smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="n4shag+V";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aqPlbphJ"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id 825643200B08;
-	Thu, 25 Jan 2024 11:37:43 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Thu, 25 Jan 2024 11:37:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1706200663; x=1706287063; bh=J5VRdZ5Wrh
-	/dRaVmPUXcvh82GOraLIduVTWkeuUJFbU=; b=n4shag+VqaeUJhDNLSjR9TUSyX
-	mAn9cxpCCuEPUB8eH+KvngqOdKK3ZLxDAcWhjJVM/BIqvYV1yz6Zf6bR+sCqMSVy
-	syctT8VoIQoN+zN+1AOruKbw+qT/4Fw2odpQMK9Vlr4ZuMveDvch0ECoc+4bdv79
-	U8UA/hCoGvhOyup7Wr48hfOayk3PLor9oA6jUoohmNCAJYPS2cUVhWyqr1KOCXqx
-	Emhc70Xd9hHtn4SDQKV+F4bLj8VUbbxCzoz6jJs7JOfr6dCUG0AjeSbjjp5oKeeM
-	pj0fvjX3u/oyuF7vjfC9ebLxY6tP5IiSb45wiPmYyuFo6Gey0wm+BBGM5zdA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1706200663; x=1706287063; bh=J5VRdZ5Wrh/dRaVmPUXcvh82GOra
-	LIduVTWkeuUJFbU=; b=aqPlbphJhWHMQjdedoU7ZRJmdXfsrAwXBis/SyhkSp65
-	ZQ2BUcPfalbo9gr9jesOg0lj9fXNdtpKHFoP3ZiIqLEmLSql++srx0dhAijNlCss
-	zVYG0KxKd2NMdWJi8b3w3D8YG/xYTdk+hqFPFUTQtKTvMHEQQF0w2gMRhs4fZOfj
-	DGECoiF6RWVF/IhI7NNuJwRVEUC18IMUo5DQs7Z02+9V6a9vsbI9KySWuRBE4b9z
-	X/Gfbyym5xkv7MhEmXS2tEJHU2EVwaaYknznio2l9hT0Z9fzi70UecbRJ9JUwK3n
-	R6SMMe7owtNVXca/cV0et7cPpwnAfp7Hr8KiDlVE0A==
-X-ME-Sender: <xms:Vo6yZbnam_W0ANRv1TjXGUm4qyL3EhHW59_aaqosk3LCt5j60FEiDQ>
-    <xme:Vo6yZe1yYPLx_yuIF8pi3OOY3d_9tSvVK9PJsucgHVKXcUlHhshmnFd-YVunYN8Ns
-    CI6MMC0mWFxKmHebpM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdelgedgieefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepvefhffeltdegheeffffhtdegvdehjedtgfekueevgfduffettedtkeekueef
-    hedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:Vo6yZRo1LkrxEhYyI-DFbbbZdx8tb0IaMbP6sfg8DMN9W4LNTpXC3g>
-    <xmx:Vo6yZTlkPd64S2eP45kt2cGe04z14oOCpLgHxGGLj9YqKweTkAAxFA>
-    <xmx:Vo6yZZ2m_taDGKWkwSphpb2QbSVP29-mrypkTHprhs8aDzgfsPRP1Q>
-    <xmx:V46yZTwFSM8_9HKXzg4FILbZoph0a1S964FLaUBsnEuTLsg53IIIfQ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 65321B6008D; Thu, 25 Jan 2024 11:37:42 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="H8RO9z9M"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1706201620; x=1737737620;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=0N4F/gjOaEHcA1EmZZhcmvU+dQFlqf6CupFhM16+QGk=;
+  b=H8RO9z9M4JzEsXfJ/iJwt16qt/EJEEE+a9KzFnTwCWXi0scmbnea/yXb
+   BvMZJnltkLVgWUpE923Jl5L0Qo57PBmRplh4ZTg/Gb5abidUp62TTqjB7
+   c/Q2nTwnwKzrxINkMtMErzucyJyAubobopAXhzVy7zXA2Fn1LXtgcBC3y
+   Go6pAOdAs0HD86N6ytNhJ8zR+IkRdLUN9RUEeMMDsczWKM0N/7vv+vGW6
+   3bbwtZK17GxgPpURCpOeLaBF7coERF1lhv0yZN7OoP0IY+uaKUge70M5V
+   ek2M9nZjC0snW/R09yr0jSh84L8MiezpnURfbXsUf3k0mtyyG0G/vQF0y
+   A==;
+X-CSE-ConnectionGUID: SLtgWUqwSFiSDx8PwaGf4Q==
+X-CSE-MsgGUID: S5aX1V9mQVOclfDjxcofgQ==
+X-IronPort-AV: E=Sophos;i="6.05,216,1701100800"; 
+   d="scan'208";a="8248247"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2024 00:53:32 +0800
+IronPort-SDR: UlaRYi/mm3wurEb8x0tmGlxeSFNSbtEMOUa0qrcayk73aEt8h8L7aiSgs2m+pi0J8+W8nyak/g
+ vs0Juk/DByzg==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Jan 2024 08:03:32 -0800
+IronPort-SDR: OE+tRkmMpFkhDRa1z/PeEZo8HAAoGZY5dfaVEn8/s2a64gELw2HyRSw+9hYcenKw2PYuCiSi5y
+ qsHOshAr8N7g==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.6])
+  by uls-op-cesaip01.wdc.com with ESMTP; 25 Jan 2024 08:53:29 -0800
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v2 0/5] block: remove gfp_mask for blkdev_zone_mgmt()
+Date: Thu, 25 Jan 2024 08:53:23 -0800
+Message-Id: <20240125-zonefs_nofs-v2-0-2d975c8c1690@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <7ca13324-ac47-4648-9b3c-c616de515625@app.fastmail.com>
-In-Reply-To: <20240125-mmc-proper-kmap-v1-1-ba953c1ac3f9@linaro.org>
-References: <20240125-mmc-proper-kmap-v1-0-ba953c1ac3f9@linaro.org>
- <20240125-mmc-proper-kmap-v1-1-ba953c1ac3f9@linaro.org>
-Date: Thu, 25 Jan 2024 17:37:21 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Linus Walleij" <linus.walleij@linaro.org>,
- "Christoph Hellwig" <hch@lst.de>, "Jens Axboe" <axboe@kernel.dk>,
- "Ming Lei" <ming.lei@redhat.com>, "Ulf Hansson" <ulf.hansson@linaro.org>,
- "Nicolas Pitre" <nico@fluxnic.net>, "Aaro Koskinen" <aaro.koskinen@iki.fi>,
- "Adrian Hunter" <adrian.hunter@intel.com>,
- "Angelo Dureghello" <angelo.dureghello@timesys.com>
-Cc: "linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
- linux-block@vger.kernel.org, Linux-OMAP <linux-omap@vger.kernel.org>
-Subject: Re: [PATCH 1/7] mmc: davinci_mmc: Map the virtual page for PIO
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAOSsmUC/1XMywrCMBCF4VcpszYymVYRV76HFLHJxM7CRDISL
+ 6XvbixuXP4HzjeBchZW2DcTZC6ikmINWjXgxnO8sBFfGwipQ2vRvFPkoKeYghrvLRMNxNhtoT5
+ umYM8F+3Y1x5F7ym/FrzY7/pzqP1zijVonMMBW9xxoM3h4d3apSv08zx/AOnqE66kAAAA
+To: Damien Le Moal <dlemoal@kernel.org>, 
+ Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, 
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+ Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
+ Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
+ David Sterba <dsterba@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>, 
+ Chao Yu <chao@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+ Chaitanya Kulkarni <kch@nvidia.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-btrfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706201608; l=1733;
+ i=johannes.thumshirn@wdc.com; s=20230613; h=from:subject:message-id;
+ bh=0N4F/gjOaEHcA1EmZZhcmvU+dQFlqf6CupFhM16+QGk=;
+ b=UDiRHl7vyONFeE/+Uc9h4ZkfV2sLDGr/bQXidpKeyTTKnEZ1boUAGnz1/g8SHkp2NIP1u8WfY
+ k+ntypLEWF8Dk7T6KptUtV/AFpEKDBwUlfE02SJfrjkjKtMj15vuipc
+X-Developer-Key: i=johannes.thumshirn@wdc.com; a=ed25519;
+ pk=TGmHKs78FdPi+QhrViEvjKIGwReUGCfa+3LEnGoR2KM=
 
-On Thu, Jan 25, 2024, at 15:37, Linus Walleij wrote:
-> Use kmap_local_page() instead of sg_virt() to obtain a page
-> from the scatterlist: sg_virt() will not perform bounce
-> buffering if the page happens to be located in high memory,
-> which the driver may or may not be using.
->
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Link: https://lore.kernel.org/linux-mmc/20240122073423.GA25859@lst.de/
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  drivers/mmc/host/davinci_mmc.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/mmc/host/davinci_mmc.c 
-> b/drivers/mmc/host/davinci_mmc.c
-> index ee3b1a4e0848..4e9f96b1caf3 100644
-> --- a/drivers/mmc/host/davinci_mmc.c
-> +++ b/drivers/mmc/host/davinci_mmc.c
-> @@ -216,7 +216,7 @@ static irqreturn_t mmc_davinci_irq(int irq, void 
-> *dev_id);
->  static void mmc_davinci_sg_to_buf(struct mmc_davinci_host *host)
->  {
->  	host->buffer_bytes_left = sg_dma_len(host->sg);
-> -	host->buffer = sg_virt(host->sg);
-> +	host->buffer = kmap_local_page(sg_page(host->sg));
->  	if (host->buffer_bytes_left > host->bytes_left)
->  		host->buffer_bytes_left = host->bytes_left;
->  }
+Fueled by the LSFMM discussion on removing GFP_NOFS initiated by Willy,
+I've looked into the sole GFP_NOFS allocation in zonefs. As it turned out,
+it is only done for zone management commands and can be removed.
 
-I see multiple problems here:
+After digging into more callers of blkdev_zone_mgmt() I came to the
+conclusion that the gfp_mask parameter can be removed alltogether.
 
- - you are missing the offset within the page, which you
-   get by adding sg->offset
+So this series switches all callers of blkdev_zone_mgmt() to either use
+GFP_KERNEL where possible or grab a memalloc_no{fs,io} context.
 
- - kmap_local_page() only maps one page at a time, so
-   this will fail if the scatterlist entry spans one or
-   more pages.
+The final patch in this series is getting rid of the gfp_mask parameter.
 
- - the first call to mmc_davinci_sg_to_buf() may happen
-   in mmc_davinci_prepare_data(), while the rest is done
-   in the interrupt handler, and you can't hold the
-   kmap reference across multiple contexts
+Link: https://lore.kernel.org/all/ZZcgXI46AinlcBDP@casper.infradead.org/
 
- - It looks like you are missing the unmap inside of
-   loop when moving to the next sg element.
+---
+Changes in v2:
+- guard blkdev_zone_mgmt in dm-zoned-metadata.c with memalloc_noio context
+- Link to v1: https://lore.kernel.org/r/20240123-zonefs_nofs-v1-0-cc0b0308ef25@wdc.com
 
-I think to do this properly, the driver would have to
-use struct sg_mapping_iter like the cb710 driver does,
-but the conversion is not as simple as your patch here.
+---
+Johannes Thumshirn (5):
+      zonefs: pass GFP_KERNEL to blkdev_zone_mgmt() call
+      dm: dm-zoned: guard blkdev_zone_mgmt with noio scope
+      btrfs: zoned: call blkdev_zone_mgmt in nofs scope
+      f2fs: guard blkdev_zone_mgmt with nofs scope
+      block: remove gfp_flags from blkdev_zone_mgmt
 
-       Arnd
+ block/blk-zoned.c              | 19 ++++++++-----------
+ drivers/md/dm-zoned-metadata.c |  5 ++++-
+ drivers/nvme/target/zns.c      |  5 ++---
+ fs/btrfs/zoned.c               | 35 +++++++++++++++++++++++++----------
+ fs/f2fs/segment.c              | 15 ++++++++++++---
+ fs/zonefs/super.c              |  2 +-
+ include/linux/blkdev.h         |  2 +-
+ 7 files changed, 53 insertions(+), 30 deletions(-)
+---
+base-commit: 615d300648869c774bd1fe54b4627bb0c20faed4
+change-id: 20240110-zonefs_nofs-dd1e22b2e046
+
+Best regards,
+-- 
+Johannes Thumshirn <johannes.thumshirn@wdc.com>
+
