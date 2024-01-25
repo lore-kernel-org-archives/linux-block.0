@@ -1,140 +1,165 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669441C29F
-	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 09:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2DB1B961;
+	Thu, 25 Jan 2024 09:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706173662; cv=none; b=fa9LQ81LIw0NA0kfjP5CnNRb0MZdZF0Tk7F+2rqbOvj6HEDJ50h16+g4xXPFvzyhXPMzn+gXQi+sve9nuOWT48ZLo5QjQVVEZW+JdxlSQ7L6E8FGqMk8zOcLyYwTYC6XO/Q2uIb8G1mA7O9NiNmhqQnN5PXq4lZK5vAYcnSDArQ=
+	t=1706174825; cv=none; b=clqW8aPd3K/rZ32R2BLxhmBESD+f/4EFpVlb3vQFk35HjMjDgirislZK7+REgwNOpG4+yFwPKVDjtbVL/OBuBONi8Rj5q4VMBiZi4zUt/1ny3iWaBSukKxi2uKP3q9Y+s0rmjTRbM0dlKTq3hnuoR+YAQs049MttWEMX9Hp6E6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706173662; c=relaxed/simple;
-	bh=vAeDSSN4CvvWCtqCLAIaHEzK7l96MnUrA7S/EltXCN8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:From:In-Reply-To:
-	 Content-Type:References; b=kHQ79jY+BpScfEZd314NypbC/qVNxXVtWvXZYvVHbyuNLnqB0XpdDnuH/Ttr4HwPYKLMalfTpaE13bAypWx7S4iWTM7IywiZFYpWwqCDjHPdZ117waJkUh3K3ufIm4aZYgnzagJY/stvthKX1OYvETDkgOb5kvwbGqvYuNON0F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=EO1BmP1x; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1706174825; c=relaxed/simple;
+	bh=488//va03Lc+B/1ZyVuMhHZy+u75yY7UHFrjzmg8sAw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ALXJR5oIUS8PWMo8wYvk6Ja+yXFb/GiWZiFtLtTe49j7EXwg5NKkfqheIUDrhKIb3x7WP7ff8J6wjPdSb0IxxBduIVFfgRScNF6Wb7GxjnyhfyUpswH3+SxkNdj3Qxv9ly/548cteqVxlgImeo0UIfTmFc937xLqvV015KJB5V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=aamXmgNw; arc=none smtp.client-ip=185.70.40.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="EO1BmP1x"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240125090737euoutp0192a3cc2a338fd337db8ac0898c1b9b32~ti_bXYiAX2652526525euoutp01K
-	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 09:07:37 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240125090737euoutp0192a3cc2a338fd337db8ac0898c1b9b32~ti_bXYiAX2652526525euoutp01K
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1706173657;
-	bh=PFsNUmgLCKUdzUro9n3bBkakNSd/IUhVnsDoeOvBGGo=;
-	h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-	b=EO1BmP1xTKQHvWVqyFFhFtakJ+rPKJOdyPy+UalE2vbmhTQSoB742EpB5MyID/TnN
-	 J/aEV0zqUt4YDXWiKCWmrfeKhabznRrnF0c7Oqk++Tb+EsRsa7iH81/TeVTR3VwqFp
-	 J94BDSPT1EjlxPEAgN2GkfA0ZCG0c/FDhxEIhnEA=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20240125090737eucas1p26797a7b213a2eaff0ae76173d4ea6e31~ti_bQNdPO3127831278eucas1p2D;
-	Thu, 25 Jan 2024 09:07:37 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id 29.8D.09552.9D422B56; Thu, 25
-	Jan 2024 09:07:37 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240125090736eucas1p2db13dcc5d62272ce330da83b2bf7b1cd~ti_a7_Ig83126831268eucas1p2B;
-	Thu, 25 Jan 2024 09:07:36 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240125090736eusmtrp1280fbd7639d3324b94b66efff61387c8~ti_a7eCCu3004130041eusmtrp1T;
-	Thu, 25 Jan 2024 09:07:36 +0000 (GMT)
-X-AuditID: cbfec7f5-853ff70000002550-7f-65b224d904bf
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 29.F3.09146.8D422B56; Thu, 25
-	Jan 2024 09:07:36 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240125090736eusmtip262c9f11a2356eca44627386b96fcde56~ti_av2_yC2714727147eusmtip2A;
-	Thu, 25 Jan 2024 09:07:36 +0000 (GMT)
-Received: from [192.168.8.209] (106.210.248.230) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Thu, 25 Jan 2024 09:07:36 +0000
-Message-ID: <c3a537ee-7b93-4337-a795-cbd2647a8201@samsung.com>
-Date: Thu, 25 Jan 2024 10:07:35 +0100
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="aamXmgNw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1706174821; x=1706434021;
+	bh=VXueD5sixGPDTa6BhUDnnsLagnOCQf9tNkKiKlaVKTY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=aamXmgNwwKSW97xc2/lztAj/XZ+IpEf9YCkJzEPQSBQ/t+QV3TP1t/iDzLXjOM1jb
+	 nAD+PCQjoglFNEwp6zs+OXw5VvPw7KFfSrZuIbgr1prXnZ4kAs31BR+N5Z2GhLW+Bz
+	 XMLK2ifAfUy+ciRK7qzOHpl+x/tLH/8+1VaHh4gtzJt0b9+cNvqs2DLmSdUk4VRCHe
+	 35K9zn/vLG5P6Pl0D6tdwY+eQiz8sP+Ho8ZEZjCeMtD/h8jgczNV7/pKV9Y3DSwkGv
+	 ce8Z/telLXlvihEO18bufrzoFnncbx1CHRGrPYgv1aEQxzZKyrVN02ecQ2fAYwVfIL
+	 VLAEudG8EbFzw==
+Date: Thu, 25 Jan 2024 09:26:52 +0000
+To: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [RFC PATCH 03/11] rust: block: introduce `kernel::block::mq` module
+Message-ID: <59f007a0-bb30-4291-ab49-0e69112e2566@proton.me>
+In-Reply-To: <874jf3kflx.fsf@metaspace.dk>
+References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-4-nmi@metaspace.dk> <iL2M45BoRlK6yS9y8uo0A5yUXcZWMkdk3vtH3LRFSWXfvPVagVZ-0YC7taIKOBFUcjJYA_2xNNFPoC4WL-_ulCHOLkbqvsZlIshE_LEeYtU=@proton.me> <87il3kjgk0.fsf@metaspace.dk> <104a22f7-a5bb-4fb6-9ce9-aa2d4e63417f@proton.me> <874jf3kflx.fsf@metaspace.dk>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: can we drop the bio based path in null_blk
-To: Christoph Hellwig <hch@lst.de>, "Pankaj Raghav (Samsung)"
-	<kernel@pankajraghav.com>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-Content-Language: en-US
-From: Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <20240125081502.GC21006@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupgleLIzCtJLcpLzFFi42LZduznOd2bKptSDY4t4rdYfbefzWLl6qNM
-	Fmdefmax2HtL24HF4/LZUo/dNxvYPM6udPT4vEkugCWKyyYlNSezLLVI3y6BK2Pp02dMBYc4
-	Ku7PW8vWwPiCrYuRk0NCwERi1fovLF2MXBxCAisYJRYv6GeCcL4wSvy8O5kZwvnMKLFm/WsW
-	mJZlPRNYIRLLGSXaXzxlg6u6+XA1VP9uRokjr84ygrTwCthJ7H08DaydRUBVYuKzNawQcUGJ
-	kzOfgMVFBeQl7t+awQ5iCwuYS6x5cBKsV0QgUmLFvQ4mEJsZaPXVd9eYIWxxiVtP5gPFOTjY
-	BLQkGjvBWjkFdCTm9N+DKtGUaN3+mx3ClpfY/nYOM0i5hICyxNSlXhDP1Eqc2nIL7GQJgQcc
-	EjdOHYX60kVia/NGVghbWOLV8S3sELaMxOnJPVA11RJPb/xmhmhuYZTo37meDWKBtUTfmRyI
-	GkeJ63vXQu3lk7jxVhDiHD6JSdumM09gVJ2FFBCzkDw2C8kHs5B8sICRZRWjeGppcW56arFx
-	Xmq5XnFibnFpXrpecn7uJkZgYjn97/jXHYwrXn3UO8TIxMF4iFGCg1lJhNfEdGOqEG9KYmVV
-	alF+fFFpTmrxIUZpDhYlcV7VFPlUIYH0xJLU7NTUgtQimCwTB6dUA1OsjMmhp48CuNvfHL9k
-	cTF0j/zeKK2udD3N/VvNWr1ahNapTiqJYm+ZYLFRp5Npxtn/9wV95n2bUyfotshEbtvr2eIB
-	Huz3FU6XJjC5VKddm77n6LqHBre92RSXBd+q6T3q6+vRZ5G++zOzvUaNv8nuuUd6HYyv8G3b
-	du6V7vFohct1H1s238mc6f+76jL3m+XnRG9wn6q0OblR7ekCjhmiZmY1806ZaMSdWnLOqStE
-	s/H5x8q5zYKXYzaeDeTV0eOtKFhwJuLRzq6H7NlF519eVF7zM9IjYGfkt7um08xmllx/HBDu
-	+5WZv7HGd9LGpWqsPMaKUyPXS+U/NmFrZ3o1YfnSCa9mXud/xVj12FGJpTgj0VCLuag4EQCC
-	W58omwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDIsWRmVeSWpSXmKPExsVy+t/xe7o3VDalGqzuN7FYfbefzWLl6qNM
-	Fmdefmax2HtL24HF4/LZUo/dNxvYPM6udPT4vEkugCVKz6Yov7QkVSEjv7jEVina0MJIz9DS
-	Qs/IxFLP0Ng81srIVEnfziYlNSezLLVI3y5BL2Pp02dMBYc4Ku7PW8vWwPiCrYuRk0NCwERi
-	Wc8E1i5GLg4hgaWMEqt+r2WCSMhIbPxylRXCFpb4c60LrEFI4COjxNkViRANuxkl/nR/YwdJ
-	8ArYSex9PI0FxGYRUJWY+GwNK0RcUOLkzCdgcVEBeYn7t2aA1QsLmEuseXCSEcQWEYiUWHGv
-	A2wxM9BFV99dY4ZY8JRRomXiSaiEuMStJ/OBbA4ONgEticZOsDmcAjoSc/rvMUOUaEq0bv/N
-	DmHLS2x/O4cZpFxCQFli6lIviF9qJT7/fcY4gVF0FpLrZiFZMAvJpFlIJi1gZFnFKJJaWpyb
-	nltsqFecmFtcmpeul5yfu4kRGI3bjv3cvINx3quPeocYmTgYDzFKcDArifCamG5MFeJNSays
-	Si3Kjy8qzUktPsRoCgyiicxSosn5wHSQVxJvaGZgamhiZmlgamlmrCTO61nQkSgkkJ5Ykpqd
-	mlqQWgTTx8TBKdXAxH9FfUtm4wXBPY5/K3ayvZt7Ku3ml2atyHfybK4qNwSXb/x/T3zTrX1l
-	zL+V7xjZPPPlWn5/8Zqbr9cHndFd3ml1yMrqSSmz1mr7n6GaPpXfH+h4GT9m3/M5umbPP19G
-	4wrp+xd2c66+bcT9+i3jjCdxe74dzxU7c6Yw/+CxFptL9kqCU/eevS2RwBU20/eDu2nVuTet
-	C6pOnI/af119GqPYjIMyInMnq/i2Tco6pybrVeac6OPwxeHFVJv5Jds+xB6WcW/t87gfcmLS
-	OqOfs+33H758eR9Pw9m/+epiS8P+eP7YyDVfOo533QaN9ZbvIi+VL5u2Sy6wkFXU4drVO9ue
-	sPxabCW/WX82e+oPFz8lluKMREMt5qLiRAASTZhHTwMAAA==
-X-CMS-MailID: 20240125090736eucas1p2db13dcc5d62272ce330da83b2bf7b1cd
-X-Msg-Generator: CA
-X-RootMTR: 20240125081512eucas1p1991b4134149cefdc11db7b5e96fb6d81
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240125081512eucas1p1991b4134149cefdc11db7b5e96fb6d81
-References: <20240123084942.GA29949@lst.de>
-	<znc7pqdsqkznoszbzhvxyyphmpqbesjh56ygn5xt5fjej4glvc@mcccy2dky5eg>
-	<CGME20240125081512eucas1p1991b4134149cefdc11db7b5e96fb6d81@eucas1p1.samsung.com>
-	<20240125081502.GC21006@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 25/01/2024 09:15, Christoph Hellwig wrote:
-> On Wed, Jan 24, 2024 at 09:31:25PM +0100, Pankaj Raghav (Samsung) wrote:
->> The subject says removing the bio mode in null_blk but here you are
->> asking an open question about the non-so-relevant ones should move to
->> blk-mq. My input is for the latter part, FWIW.
-> 
-> Well, it's two different things.  My prime concern right now is
-> null_blk, which is very clumsy due to the two different I/O paths,
-> and actually broken in that the bio mode doesn't respect various
-> I/O limits that can be configured, and at least in zone modes also
-> ones that aren't configured but required (I/Os spanning zones).
-> 
+On 23.01.24 19:39, Andreas Hindborg (Samsung) wrote:
+>>>>> +/// A generic block device
+>>>>> +///
+>>>>> +/// # Invariants
+>>>>> +///
+>>>>> +///  - `gendisk` must always point to an initialized and valid `stru=
+ct gendisk`.
+>>>>> +pub struct GenDisk<T: Operations> {
+>>>>> +    _tagset: Arc<TagSet<T>>,
+>>>>> +    gendisk: *mut bindings::gendisk,
+>>>>
+>>>> Why are these two fields not embedded? Shouldn't the user decide where
+>>>> to allocate?
+>>>
+>>> The `TagSet` can be shared between multiple `GenDisk`. Using an `Arc`
+>>> seems resonable?
+>>>
+>>> For the `gendisk` field, the allocation is done by C and the address
+>>> must be stable. We are owning the pointee and must drop it when it goes=
+ out
+>>> of scope. I could do this:
+>>>
+>>> #[repr(transparent)]
+>>> struct GenDisk(Opaque<bindings::gendisk>);
+>>>
+>>> struct UniqueGenDiskRef {
+>>>       _tagset: Arc<TagSet<T>>,
+>>>       gendisk: Pin<&'static mut GenDisk>,
+>>>
+>>> }
+>>>
+>>> but it seems pointless. `struct GenDisk` would not be pub in that case.=
+ What do you think?
+>>
+>> Hmm, I am a bit confused as to how you usually use a `struct gendisk`.
+>> You said that a `TagSet` might be shared between multiple `GenDisk`s,
+>> but that is not facilitated by the C side?
+>>
+>> Is it the case that on the C side you create a struct containing a
+>> tagset and a gendisk for every block device you want to represent?
+>=20
+> Yes, but the `struct tag_set` can be shared between multiple `struct
+> gendisk`.
+>=20
+> Let me try to elaborate:
+>=20
+> In C you would first allocate a `struct tag_set` and partially
+> initialize it. The allocation can be dynamic, static or part of existing
+> allocation. You would then partially initialize the structure and finish
+> the initialization by calling `blk_mq_alloc_tag_set()`. This populates
+> the rest of the structure which includes more dynamic allocations.
+>=20
+> You then allocate a `struct gendisk` by calling `blk_mq_alloc_disk()`,
+> passing in a pointer to the `struct tag_set` you just created. This
+> function will return a pointer to a `struct gendisk` on success.
+>=20
+> In the Rust abstractions, we allocate the `TagSet`:
+>=20
+> #[pin_data(PinnedDrop)]
+> #[repr(transparent)]
+> pub struct TagSet<T: Operations> {
+>      #[pin]
+>      inner: Opaque<bindings::blk_mq_tag_set>,
+>      _p: PhantomData<T>,
+> }
+>=20
+> with `PinInit` [^1]. The initializer will partially initialize the struct=
+ and
+> finish the initialization like C does by calling
+> `blk_mq_alloc_tag_set()`. We now need a place to point the initializer.
+> `Arc::pin_init()` is that place for now. It allows us to pass the
+> `TagSet` reference to multiple `GenDisk` if required. Maybe we could be
+> generic over `Deref<TagSet>` in the future. Bottom line is that we need
+> to hold on to that `TagSet` reference until the `GenDisk` is dropped.
 
-My 2 cents: The drivers that still use submit_bio are mostly memory
-based except for n64. And there is only one blktest(block/023) that
-tests the bio path (Shinchiro can comment here if this is wrong).
+I see, thanks for the elaborate explanation! I now think that using `Arc`
+makes sense.
 
-So we could remove the submit_bio path in null_blk to simplify things
-as most of the drivers that uses this path do not do anything complicated
-in submit_bio and are mostly memory based.
+> `struct tag_set` is not reference counted on the C side. C
+> implementations just take care to keep it alive, for instance by storing
+> it next to a pointer to `struct gendisk` that it is servicing.
 
---
-Pankaj Raghav
+This is interesting, is this also done in the case where it is shared
+among multiple `struct gendisk`s?
+Does this have some deeper reason? Or am I right to assume that creating
+`Gendisk`/`TagSet` is done rarely (i.e. only at initialization of the
+driver)?
+
+>> And you decided for the Rust abstractions that you want to have only a
+>> single generic struct for any block device, distinguished by the generic
+>> parameter?
+>=20
+> Yes, we have a single generic struct (`GenDisk`) representing the C
+> `struct gendisk`, and a single generic struct (`TagSet`) representing
+> the C `struct tag_set`. These are both generic over `T: Operations`.
+> `Operations` represent a C vtable (`struct blk_mq_ops`) attached to the
+> `struct tag_set`. This vtable is provided by the driver and holds
+> function pointers that allow the kernel to perform actions such as queue
+> IO requests with the driver. A C driver can instantiate multiple `struct
+> gendisk` and service them with the same `struct tag_set` and thereby the
+> same vtable. Or it can use separate tag sets and the same vtable. Or a
+> separate tag_set and vtable for each gendisk.
+>=20
+>> I think these kinds of details would be nice to know. Not only for
+>> reviewers, but also for veterans of the C APIs.
+>=20
+> I should write some module level documentation clarifying the use of
+> these types. The null block driver is a simple example, but it is just
+> code. I will include more docs in the next version.
+
+Thanks a lot for explaining!
+
+--=20
+Cheers,
+Benno
+
+
