@@ -1,121 +1,140 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AEA1292F1
-	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 16:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665327CF13;
+	Thu, 25 Jan 2024 16:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706199221; cv=none; b=i4aOAPIt6wOjEvXrbVyp+s0ozrlYaUbrtq5zxsICo9BK/FkwLbc257Q1ZvaZUv5yEb3FMy+aw2EB/NzyGThoAVXIeCszc5Ur3GjfcsR7F8dDSt8029q3WUKlEdFHeE8XQHAf5CWXVVYEQJHRYNF65M7EUFsqJxDd+vTLtf1ni+o=
+	t=1706200667; cv=none; b=LOQe9c5+gZEeAlj0IC4TK9/4kJpv79TA8PyT/dJyo5T0JaUlz/RoOxLnwwrzM9hXgZ0ABWtU3B2q9U3F9A7zryo5OriUDc1NPy6XFuQacb5nWzVbMpm7VSAiASVwTzDft7wTRUTN4dKPD+F7xB6Sjyqu7gSV7o3OlbvG2pMYqA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706199221; c=relaxed/simple;
-	bh=2WKa9upsU01rKQEE3pfd64lsMOLUYKGGxXVIj2owvow=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=LhgE+V3yjY+0YR5EPRuL543XICM5qW11YmAgtB6Jnpbm1KOkR/U9GIAGHTSj/CZDGr0+Qk//vy5tEAQcPG2oYaCn6qlyg8UZ6cS4sfTr1Yaz6CDw50rGJCkhw8wmTsfkD6ydMn3/fvdLMHinlPdJ1iwj9k1NS/jDzWVOGoBGz0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=11kTOu+h; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1706200667; c=relaxed/simple;
+	bh=8fOPIjHVb90c7CRguRNiFQ8VqTpSNg82Bt7oXHc10n0=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=ebE2BTSTA8I5rAJJnYKyMqsvugKh4gwMCsZ9lAEoiF6pjTzjXhRQt5Qq7bQF44EQbjCRZ49Psz8Ch+t08h1nb7RE5SUIb2WtmIChYW626y2LGcVN1ZABSnjWAxpqtmTlFwSMBoExEgtsK8/FspSfKySB8sxUUuWcODkMUo9pN+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=n4shag+V; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aqPlbphJ; arc=none smtp.client-ip=64.147.123.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="11kTOu+h"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7bee9f626caso94429539f.0
-        for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 08:13:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706199219; x=1706804019; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HAkOTZIz5lxs8HKEuq4313296H/ZzDgpO7vgoAQKpT4=;
-        b=11kTOu+hnxRlX0lrfdDWgNFudIP9CKRbQgDf+pvqFsI6Ne8Q3sc9SgDI2ur9jgd62N
-         fBw0HQexZwccDopIyk8nq+VbQtGgdLbWzD3eLu4O31OzyqBIo3blJnNu8oEaeZvi4DAj
-         Bp7X+6cDcvlSQhdGms95boHV+tAL62OF4AWiccmImeMfHR3ItnvKh3t9LX+uI5BwNMyO
-         mVNeoVdJjRgzZ0z0H1X3vLSFuJftSGKJq3GcsVa3284h7Av+mGiaxVJ98g3fP3TTitsh
-         nHk6JrjULIyFWcjsfTUbYym035DogfkOV13eAFPFfT5IdnjHFnjCq4FdjLCuk+JlZgy9
-         rA5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706199219; x=1706804019;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HAkOTZIz5lxs8HKEuq4313296H/ZzDgpO7vgoAQKpT4=;
-        b=C7jc0yXWVW5TNhH/l1Nmvzo7moCOkS6gdCswfXS8UVxGyiw4RpPhl9PPJhbRMWza0c
-         m3pOGqX1eROfNwGqe9wZuWBp7uYYtBDo1FGn4zCr0CXdaNwwB8IEX9eGQXcqQgp1lOQm
-         692dghCIOs1z4hDE1a0davHAa4K/41pP1u9hSt0SoHO+g6SbHosVQ2tKETMXugig35Ve
-         PEzCrNdvHTc2XA9IEKNi2SeOrb0OChzSXOhHBzyijov6Ube1/Cx5mD5Bec66v0+VFLl5
-         lHo7HQboqVpcGSCWgWc0VDeJeVch3mHaPdRwBcZqkFdhh9IR9hUeVRFk0ZO2r+/6U46a
-         vA3Q==
-X-Forwarded-Encrypted: i=0; AJvYcCVv5ufuUDfEvbg9vO/X5Orbs+YPG3/DHSg5SkOdc5NfraUiFGM+byExZxO59Jj89n+rabxq4hshqB+2ZEcZ4uXQA09/XcqEkMNf+SY=
-X-Gm-Message-State: AOJu0Yw9FrgZGsp4byQvHvq4IlOIaKNAWzhtkY32E/9wQldN69dyF+Ci
-	m5LKmAQUC2tOOO07+SXLZqC5e3WX1o1PN3YFsLELWTvOQ0s/7Z04dpKkUqTKMk4=
-X-Google-Smtp-Source: AGHT+IGxmHdLcWxr2mQPouIDjWNx7Kev4k3u8IORuaWbpZv1GYb8yieuqEh/afnZO7lUdPnu5h+QoQ==
-X-Received: by 2002:a5e:d714:0:b0:7bf:b770:d4ed with SMTP id v20-20020a5ed714000000b007bfb770d4edmr10280iom.0.1706199219230;
-        Thu, 25 Jan 2024 08:13:39 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id y13-20020a5ec80d000000b007bf4f95cf85sm5785870iol.37.2024.01.25.08.13.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jan 2024 08:13:38 -0800 (PST)
-Message-ID: <6c4a4cf3-c5ed-4236-a6b2-9d53e927f979@kernel.dk>
-Date: Thu, 25 Jan 2024 09:13:37 -0700
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="n4shag+V";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aqPlbphJ"
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 825643200B08;
+	Thu, 25 Jan 2024 11:37:43 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Thu, 25 Jan 2024 11:37:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1706200663; x=1706287063; bh=J5VRdZ5Wrh
+	/dRaVmPUXcvh82GOraLIduVTWkeuUJFbU=; b=n4shag+VqaeUJhDNLSjR9TUSyX
+	mAn9cxpCCuEPUB8eH+KvngqOdKK3ZLxDAcWhjJVM/BIqvYV1yz6Zf6bR+sCqMSVy
+	syctT8VoIQoN+zN+1AOruKbw+qT/4Fw2odpQMK9Vlr4ZuMveDvch0ECoc+4bdv79
+	U8UA/hCoGvhOyup7Wr48hfOayk3PLor9oA6jUoohmNCAJYPS2cUVhWyqr1KOCXqx
+	Emhc70Xd9hHtn4SDQKV+F4bLj8VUbbxCzoz6jJs7JOfr6dCUG0AjeSbjjp5oKeeM
+	pj0fvjX3u/oyuF7vjfC9ebLxY6tP5IiSb45wiPmYyuFo6Gey0wm+BBGM5zdA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1706200663; x=1706287063; bh=J5VRdZ5Wrh/dRaVmPUXcvh82GOra
+	LIduVTWkeuUJFbU=; b=aqPlbphJhWHMQjdedoU7ZRJmdXfsrAwXBis/SyhkSp65
+	ZQ2BUcPfalbo9gr9jesOg0lj9fXNdtpKHFoP3ZiIqLEmLSql++srx0dhAijNlCss
+	zVYG0KxKd2NMdWJi8b3w3D8YG/xYTdk+hqFPFUTQtKTvMHEQQF0w2gMRhs4fZOfj
+	DGECoiF6RWVF/IhI7NNuJwRVEUC18IMUo5DQs7Z02+9V6a9vsbI9KySWuRBE4b9z
+	X/Gfbyym5xkv7MhEmXS2tEJHU2EVwaaYknznio2l9hT0Z9fzi70UecbRJ9JUwK3n
+	R6SMMe7owtNVXca/cV0et7cPpwnAfp7Hr8KiDlVE0A==
+X-ME-Sender: <xms:Vo6yZbnam_W0ANRv1TjXGUm4qyL3EhHW59_aaqosk3LCt5j60FEiDQ>
+    <xme:Vo6yZe1yYPLx_yuIF8pi3OOY3d_9tSvVK9PJsucgHVKXcUlHhshmnFd-YVunYN8Ns
+    CI6MMC0mWFxKmHebpM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdelgedgieefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepvefhffeltdegheeffffhtdegvdehjedtgfekueevgfduffettedtkeekueef
+    hedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:Vo6yZRo1LkrxEhYyI-DFbbbZdx8tb0IaMbP6sfg8DMN9W4LNTpXC3g>
+    <xmx:Vo6yZTlkPd64S2eP45kt2cGe04z14oOCpLgHxGGLj9YqKweTkAAxFA>
+    <xmx:Vo6yZZ2m_taDGKWkwSphpb2QbSVP29-mrypkTHprhs8aDzgfsPRP1Q>
+    <xmx:V46yZTwFSM8_9HKXzg4FILbZoph0a1S964FLaUBsnEuTLsg53IIIfQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 65321B6008D; Thu, 25 Jan 2024 11:37:42 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH, RFC] block: set noio context in submit_bio_noacct_nocheck
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
- tj@kernel.org, jiangshanlai@gmail.com, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-References: <20240124093941.2259199-1-hch@lst.de>
- <be690355-03c6-42e2-a13f-b593ad1c0edd@kernel.dk>
- <20240125081050.GA21006@lst.de>
- <07de550c-2048-4b2f-8127-e20de352ffde@kernel.dk>
- <ZbKIN5tn4MqHzw6U@casper.infradead.org>
-Content-Language: en-US
-In-Reply-To: <ZbKIN5tn4MqHzw6U@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-Id: <7ca13324-ac47-4648-9b3c-c616de515625@app.fastmail.com>
+In-Reply-To: <20240125-mmc-proper-kmap-v1-1-ba953c1ac3f9@linaro.org>
+References: <20240125-mmc-proper-kmap-v1-0-ba953c1ac3f9@linaro.org>
+ <20240125-mmc-proper-kmap-v1-1-ba953c1ac3f9@linaro.org>
+Date: Thu, 25 Jan 2024 17:37:21 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Linus Walleij" <linus.walleij@linaro.org>,
+ "Christoph Hellwig" <hch@lst.de>, "Jens Axboe" <axboe@kernel.dk>,
+ "Ming Lei" <ming.lei@redhat.com>, "Ulf Hansson" <ulf.hansson@linaro.org>,
+ "Nicolas Pitre" <nico@fluxnic.net>, "Aaro Koskinen" <aaro.koskinen@iki.fi>,
+ "Adrian Hunter" <adrian.hunter@intel.com>,
+ "Angelo Dureghello" <angelo.dureghello@timesys.com>
+Cc: "linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
+ linux-block@vger.kernel.org, Linux-OMAP <linux-omap@vger.kernel.org>
+Subject: Re: [PATCH 1/7] mmc: davinci_mmc: Map the virtual page for PIO
+Content-Type: text/plain
 
-On Thu, Jan 25, 2024 at 9:11?AM Matthew Wilcox <willy@infradead.org> wrote:
+On Thu, Jan 25, 2024, at 15:37, Linus Walleij wrote:
+> Use kmap_local_page() instead of sg_virt() to obtain a page
+> from the scatterlist: sg_virt() will not perform bounce
+> buffering if the page happens to be located in high memory,
+> which the driver may or may not be using.
 >
-> On Thu, Jan 25, 2024 at 09:09:44AM -0700, Jens Axboe wrote:
-> > On 1/25/24 1:10 AM, Christoph Hellwig wrote:
-> > > On Wed, Jan 24, 2024 at 08:40:28AM -0700, Jens Axboe wrote:
-> > >> On 1/24/24 2:39 AM, Christoph Hellwig wrote:
-> > >>> Make sure all in-line block layer submission runs in noio reclaim
-> > >>> context.  This is a big step towards allowing GFP_NOIO, the other
-> > >>> one would be to have noio (and nofs for that matter) workqueues for
-> > >>> kblockd and driver internal workqueues.
-> > >>
-> > >> I really don't like adding this for no good reason. Who's doing non NOIO
-> > >> allocations down from this path?
-> > >
-> > > If there is a non-NOIO allocation right now that would be a bug,
-> > > although I would not be surprised if we had a few of them.
-> > >
-> > > The reason to add this is a different one:  The MM folks want to
-> > > get rid of GFP_NOIO and GFP_NOFS and replace them by these context.
-> > >
-> > > And doing this in the submission path and kblockd will cover almost
-> > > all of the noio context, with the rest probably covered by other
-> > > workqueues.  And this feels a lot less error prone than requiring
-> > > every driver to annotate the context in their submission routines.
-> >
-> > I think it'd be much better to add a DEBUG protected aid that checks for
-> > violating allocations. Nothing that isn't buggy should trigger this,
-> > right now, and then we could catch problems if there are any. If we do
-> > the save/restore there and call it good, then we're going to be stuck
-> > with that forever. Regardless of whether it's actually needed or not.
+> Suggested-by: Christoph Hellwig <hch@lst.de>
+> Link: https://lore.kernel.org/linux-mmc/20240122073423.GA25859@lst.de/
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  drivers/mmc/host/davinci_mmc.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 >
-> Nono, you don't understand.  The plan is to remove GFP_NOIO
-> entirely.  Allocations should be done with GFP_KERNEL while under a
-> memalloc_noio_save().
+> diff --git a/drivers/mmc/host/davinci_mmc.c 
+> b/drivers/mmc/host/davinci_mmc.c
+> index ee3b1a4e0848..4e9f96b1caf3 100644
+> --- a/drivers/mmc/host/davinci_mmc.c
+> +++ b/drivers/mmc/host/davinci_mmc.c
+> @@ -216,7 +216,7 @@ static irqreturn_t mmc_davinci_irq(int irq, void 
+> *dev_id);
+>  static void mmc_davinci_sg_to_buf(struct mmc_davinci_host *host)
+>  {
+>  	host->buffer_bytes_left = sg_dma_len(host->sg);
+> -	host->buffer = sg_virt(host->sg);
+> +	host->buffer = kmap_local_page(sg_page(host->sg));
+>  	if (host->buffer_bytes_left > host->bytes_left)
+>  		host->buffer_bytes_left = host->bytes_left;
+>  }
 
-I do understand, but thanks for the vote of confidence. Place the
-save/restore higher up, most likely actual IO submission isn't going to
-be the only (or even major) allocation potentially needed for the IO.
+I see multiple problems here:
 
--- 
-Jens Axboe
+ - you are missing the offset within the page, which you
+   get by adding sg->offset
 
+ - kmap_local_page() only maps one page at a time, so
+   this will fail if the scatterlist entry spans one or
+   more pages.
+
+ - the first call to mmc_davinci_sg_to_buf() may happen
+   in mmc_davinci_prepare_data(), while the rest is done
+   in the interrupt handler, and you can't hold the
+   kmap reference across multiple contexts
+
+ - It looks like you are missing the unmap inside of
+   loop when moving to the next sg element.
+
+I think to do this properly, the driver would have to
+use struct sg_mapping_iter like the cb710 driver does,
+but the conversion is not as simple as your patch here.
+
+       Arnd
