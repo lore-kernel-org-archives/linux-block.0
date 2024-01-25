@@ -1,165 +1,155 @@
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2DB1B961;
-	Thu, 25 Jan 2024 09:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A74200C7;
+	Thu, 25 Jan 2024 09:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706174825; cv=none; b=clqW8aPd3K/rZ32R2BLxhmBESD+f/4EFpVlb3vQFk35HjMjDgirislZK7+REgwNOpG4+yFwPKVDjtbVL/OBuBONi8Rj5q4VMBiZi4zUt/1ny3iWaBSukKxi2uKP3q9Y+s0rmjTRbM0dlKTq3hnuoR+YAQs049MttWEMX9Hp6E6A=
+	t=1706175183; cv=none; b=PcjP/Ey6Bp7Qex8qk5QewE7sAe+NBgyTQeQtrar77vfeRHUdMunTP/p/JPiJimmlG3qFc+3S1Al926ikE8VTp1ESVpsbhCTY+AMn5x1bxYMQaC9L162HoC7DSEsOs9CzvysPAzN9+k3co5NdJviZcOT2kS7tS7C9T9EuXqW1mJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706174825; c=relaxed/simple;
-	bh=488//va03Lc+B/1ZyVuMhHZy+u75yY7UHFrjzmg8sAw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ALXJR5oIUS8PWMo8wYvk6Ja+yXFb/GiWZiFtLtTe49j7EXwg5NKkfqheIUDrhKIb3x7WP7ff8J6wjPdSb0IxxBduIVFfgRScNF6Wb7GxjnyhfyUpswH3+SxkNdj3Qxv9ly/548cteqVxlgImeo0UIfTmFc937xLqvV015KJB5V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=aamXmgNw; arc=none smtp.client-ip=185.70.40.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1706175183; c=relaxed/simple;
+	bh=x5hqVLU8CoA4s0xQoY88RQhPoRuUkCm6lyBsX2EB/Gw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ba6Zoz295wO5g9XzL7rUee9R64JHFKbCY8VhsKRHaGR7XDSXqNE+WY4rGxBw7L21Wa3fyagbRkfdEHzUiUV61DaJwwNwtHY58jv5FDna8WBJA3Y3AaPQ49Cs35klxYEodfQbldXyzMtlZGDhqpIe0f7R4Yyqtghp16fMuodFt3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KFbLaFf+; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="aamXmgNw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1706174821; x=1706434021;
-	bh=VXueD5sixGPDTa6BhUDnnsLagnOCQf9tNkKiKlaVKTY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=aamXmgNwwKSW97xc2/lztAj/XZ+IpEf9YCkJzEPQSBQ/t+QV3TP1t/iDzLXjOM1jb
-	 nAD+PCQjoglFNEwp6zs+OXw5VvPw7KFfSrZuIbgr1prXnZ4kAs31BR+N5Z2GhLW+Bz
-	 XMLK2ifAfUy+ciRK7qzOHpl+x/tLH/8+1VaHh4gtzJt0b9+cNvqs2DLmSdUk4VRCHe
-	 35K9zn/vLG5P6Pl0D6tdwY+eQiz8sP+Ho8ZEZjCeMtD/h8jgczNV7/pKV9Y3DSwkGv
-	 ce8Z/telLXlvihEO18bufrzoFnncbx1CHRGrPYgv1aEQxzZKyrVN02ecQ2fAYwVfIL
-	 VLAEudG8EbFzw==
-Date: Thu, 25 Jan 2024 09:26:52 +0000
-To: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 03/11] rust: block: introduce `kernel::block::mq` module
-Message-ID: <59f007a0-bb30-4291-ab49-0e69112e2566@proton.me>
-In-Reply-To: <874jf3kflx.fsf@metaspace.dk>
-References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-4-nmi@metaspace.dk> <iL2M45BoRlK6yS9y8uo0A5yUXcZWMkdk3vtH3LRFSWXfvPVagVZ-0YC7taIKOBFUcjJYA_2xNNFPoC4WL-_ulCHOLkbqvsZlIshE_LEeYtU=@proton.me> <87il3kjgk0.fsf@metaspace.dk> <104a22f7-a5bb-4fb6-9ce9-aa2d4e63417f@proton.me> <874jf3kflx.fsf@metaspace.dk>
-Feedback-ID: 71780778:user:proton
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KFbLaFf+"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5100cb238bcso3642204e87.3;
+        Thu, 25 Jan 2024 01:33:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706175179; x=1706779979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WXpA01mh+uoqFSOs4uTrSuWJ4K282ZLZOddu5UiLmkI=;
+        b=KFbLaFf+LCPumyRb7GgHquV958M7oNqgKvNBBc8p7zQQGPlPwOQ4Lu3f1+ayv8hhfO
+         MCB1IaZ5SKbOKOluRQ+Qix44I8d/qHZaNj2aTa7jNBIrm5wH0DzytsNMO+F2gJxnk72c
+         Y4IrO4z1GAYPbt1FyKmMackEZReOcehv8J6gqrc3l6oY6CFG9BFmLNkPzogVuNHD24UF
+         5+IYmDDe37XtpKya1BeL9QVd/RURZexH/x5pGxCfFlhgxRe6vIZy85EURLZNMFhnDpDd
+         fT/xn4Yvf1lyrZSIapRqWJteM4Tq1M0lapEfF+kWD/5ZnjRE0gOwFg1H0+KZyLlYJWpF
+         Yy1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706175179; x=1706779979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WXpA01mh+uoqFSOs4uTrSuWJ4K282ZLZOddu5UiLmkI=;
+        b=S/A5i7mvLAUggi1X9f/lU5GIP8M+rY6dRx7LwqlTBqh05FqqPWsP9tKuAdsCzAGfDp
+         ++0tvhQqAF+fcPvui6TSk2IiIELZtfNGw0WEHHGfYWUihAMdXnmpa2MyHqGKoSJdzH8z
+         9vORoU/sX0LaC2w4Z2OhI5ILU5zXTQNtaMKT6L8LeRmTP877l3BqOdJfIPqCW5hmLecg
+         yhdrZ9yUsA46B0YfQWoWNaaWvAIS3T3d1N9DdiG+o24GsD81LwbHkGROopohfsWUMn1y
+         1BpGWtypbYrFVDr7q4fMpmTJw2ujcwPQzy3XeIL3+uHmBeS/iYk0BSIzaGqcpBzXznyp
+         PN+w==
+X-Gm-Message-State: AOJu0Yw6pdkVbezJdh6BbDsZ1txhCWxdbQo3IM41i7LiGOnZbH1tuZkn
+	0tL6C0XoEgW3RNsVAGMaFnTiTiwgvWVcfg6YR5HaD8OgJLbhc6QP18vFOFyVbng420NSi+el1MZ
+	em/rG5y1WTrjYkaIPubrIz9vtjJM=
+X-Google-Smtp-Source: AGHT+IEpAN37g8lQLWY17BHVRMY5kv2VlCPoXzDwLx7v6JaIe9FJuFcnMcVKK5aAhAryJtEYCMvqwl5apgN50iGJRsM=
+X-Received: by 2002:a19:6554:0:b0:50e:aa1e:d994 with SMTP id
+ c20-20020a196554000000b0050eaa1ed994mr305289lfj.91.1706175179064; Thu, 25 Jan
+ 2024 01:32:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240125071901.3223188-1-zhaoyang.huang@unisoc.com>
+ <6b2d5694-f802-43a4-a0fd-1c8e34f8e69a@kernel.org> <CAGWkznHK5UPajY2PG24Jm7+A0c9q+tyQzrPdd=n3tp0dgX+T0w@mail.gmail.com>
+ <95082224-a61d-4f4b-bc96-1beea8aa93a9@kernel.org>
+In-Reply-To: <95082224-a61d-4f4b-bc96-1beea8aa93a9@kernel.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Thu, 25 Jan 2024 17:32:47 +0800
+Message-ID: <CAGWkznGe+37K7_E34G_MZQXNxoLuM3E0mY=BZCGpyiq+TB_PoA@mail.gmail.com>
+Subject: Re: [PATCHv3 1/1] block: introduce content activity based ioprio
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, Yu Zhao <yuzhao@google.com>, 
+	Niklas Cassel <niklas.cassel@wdc.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, 
+	Hannes Reinecke <hare@suse.de>, Linus Walleij <linus.walleij@linaro.org>, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 23.01.24 19:39, Andreas Hindborg (Samsung) wrote:
->>>>> +/// A generic block device
->>>>> +///
->>>>> +/// # Invariants
->>>>> +///
->>>>> +///  - `gendisk` must always point to an initialized and valid `stru=
-ct gendisk`.
->>>>> +pub struct GenDisk<T: Operations> {
->>>>> +    _tagset: Arc<TagSet<T>>,
->>>>> +    gendisk: *mut bindings::gendisk,
->>>>
->>>> Why are these two fields not embedded? Shouldn't the user decide where
->>>> to allocate?
->>>
->>> The `TagSet` can be shared between multiple `GenDisk`. Using an `Arc`
->>> seems resonable?
->>>
->>> For the `gendisk` field, the allocation is done by C and the address
->>> must be stable. We are owning the pointee and must drop it when it goes=
- out
->>> of scope. I could do this:
->>>
->>> #[repr(transparent)]
->>> struct GenDisk(Opaque<bindings::gendisk>);
->>>
->>> struct UniqueGenDiskRef {
->>>       _tagset: Arc<TagSet<T>>,
->>>       gendisk: Pin<&'static mut GenDisk>,
->>>
->>> }
->>>
->>> but it seems pointless. `struct GenDisk` would not be pub in that case.=
- What do you think?
->>
->> Hmm, I am a bit confused as to how you usually use a `struct gendisk`.
->> You said that a `TagSet` might be shared between multiple `GenDisk`s,
->> but that is not facilitated by the C side?
->>
->> Is it the case that on the C side you create a struct containing a
->> tagset and a gendisk for every block device you want to represent?
->=20
-> Yes, but the `struct tag_set` can be shared between multiple `struct
-> gendisk`.
->=20
-> Let me try to elaborate:
->=20
-> In C you would first allocate a `struct tag_set` and partially
-> initialize it. The allocation can be dynamic, static or part of existing
-> allocation. You would then partially initialize the structure and finish
-> the initialization by calling `blk_mq_alloc_tag_set()`. This populates
-> the rest of the structure which includes more dynamic allocations.
->=20
-> You then allocate a `struct gendisk` by calling `blk_mq_alloc_disk()`,
-> passing in a pointer to the `struct tag_set` you just created. This
-> function will return a pointer to a `struct gendisk` on success.
->=20
-> In the Rust abstractions, we allocate the `TagSet`:
->=20
-> #[pin_data(PinnedDrop)]
-> #[repr(transparent)]
-> pub struct TagSet<T: Operations> {
->      #[pin]
->      inner: Opaque<bindings::blk_mq_tag_set>,
->      _p: PhantomData<T>,
-> }
->=20
-> with `PinInit` [^1]. The initializer will partially initialize the struct=
- and
-> finish the initialization like C does by calling
-> `blk_mq_alloc_tag_set()`. We now need a place to point the initializer.
-> `Arc::pin_init()` is that place for now. It allows us to pass the
-> `TagSet` reference to multiple `GenDisk` if required. Maybe we could be
-> generic over `Deref<TagSet>` in the future. Bottom line is that we need
-> to hold on to that `TagSet` reference until the `GenDisk` is dropped.
+On Thu, Jan 25, 2024 at 4:26=E2=80=AFPM Damien Le Moal <dlemoal@kernel.org>=
+ wrote:
+>
+> On 1/25/24 16:52, Zhaoyang Huang wrote:
+> > On Thu, Jan 25, 2024 at 3:40=E2=80=AFPM Damien Le Moal <dlemoal@kernel.=
+org> wrote:
+> >>
+> >> On 1/25/24 16:19, zhaoyang.huang wrote:
+> >>> From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+> >>>
+> >>> Currently, request's ioprio are set via task's schedule priority(when=
+ no
+> >>> blkcg configured), which has high priority tasks possess the privileg=
+e on
+> >>> both of CPU and IO scheduling.
+> >>> This commit works as a hint of original policy by promoting the reque=
+st ioprio
+> >>> based on the page/folio's activity. The original idea comes from LRU_=
+GEN
+> >>> which provides more precised folio activity than before. This commit =
+try
+> >>> to adjust the request's ioprio when certain part of its folios are ho=
+t,
+> >>> which indicate that this request carry important contents and need be
+> >>> scheduled ealier.
+> >>>
+> >>> This commit is verified on a v6.6 6GB RAM android14 system via 4 test=
+ cases
+> >>> by changing the bio_add_page/folio API in ext4 and f2fs.
+> >>
+> >> And as mentioned already by Chrisoph and Jens, why don't you just simp=
+ly set
+> >> bio->bi_ioprio to the value you want before calling submit_bio() in th=
+ese file
+> >> systems ? Why all the hacking of the priority code for that ? That is =
+not
+> >> justified at all.
+> >>
+> >> Furthermore, the activity things reduces the ioprio hint bits to the b=
+are
+> >> minimum 3 bits necessary for command duration limits. Not great. But i=
+f you
+> >> simply set the prio class based on your activity algorithm, you do not=
+ need to
+> >> change all that.
+> > That is because bio->io_prio changes during bio grows with adding
+> > different activity pages in. I have to wrap these into an API which
+> > has both of fs and block be transparent to the process.
+>
+> Pages are not added to BIOs on the fly. The FS does bio_add_page() or sim=
+ilar
+> (it can be a get user pages for direct IOs) and then calls bio_submit(). =
+Between
+> these 2, you can set your IO priority according to how many pages you hav=
+e.
+Please correct me if I am wrong. So you suggest iterating the
+request->bios->bvecs(pages) before final submit_bio? Is it too costly
+and introduces too many modifications on each fs.
+>
+> You can even likely do all of this based on the iocb (and use iocb->ki_io=
+prio to
+> set the prio), so before one starts allocating and setting up BIOs to pro=
+cess
+> the user IO.
+Actually, the activity information comes from page's history (recorded
+at page cache's slot) instead of user space in step(1) and can be
+associate with bio in step(2) or iterate the bio in step(3)
 
-I see, thanks for the elaborate explanation! I now think that using `Arc`
-makes sense.
-
-> `struct tag_set` is not reference counted on the C side. C
-> implementations just take care to keep it alive, for instance by storing
-> it next to a pointer to `struct gendisk` that it is servicing.
-
-This is interesting, is this also done in the case where it is shared
-among multiple `struct gendisk`s?
-Does this have some deeper reason? Or am I right to assume that creating
-`Gendisk`/`TagSet` is done rarely (i.e. only at initialization of the
-driver)?
-
->> And you decided for the Rust abstractions that you want to have only a
->> single generic struct for any block device, distinguished by the generic
->> parameter?
->=20
-> Yes, we have a single generic struct (`GenDisk`) representing the C
-> `struct gendisk`, and a single generic struct (`TagSet`) representing
-> the C `struct tag_set`. These are both generic over `T: Operations`.
-> `Operations` represent a C vtable (`struct blk_mq_ops`) attached to the
-> `struct tag_set`. This vtable is provided by the driver and holds
-> function pointers that allow the kernel to perform actions such as queue
-> IO requests with the driver. A C driver can instantiate multiple `struct
-> gendisk` and service them with the same `struct tag_set` and thereby the
-> same vtable. Or it can use separate tag sets and the same vtable. Or a
-> separate tag_set and vtable for each gendisk.
->=20
->> I think these kinds of details would be nice to know. Not only for
->> reviewers, but also for veterans of the C APIs.
->=20
-> I should write some module level documentation clarifying the use of
-> these types. The null block driver is a simple example, but it is just
-> code. I will include more docs in the next version.
-
-Thanks a lot for explaining!
-
---=20
-Cheers,
-Benno
-
-
+page fault        \
+(1)
+                              (2)                       (3)
+                          allocate_pages=3D=3D>add_page_to_page_cache(get
+activity information)=3D=3D>xxx_readpage=3D=3D>bio_add_page=3D=3D>submit_bi=
+o
+vfs read/write  /
+>
+> --
+> Damien Le Moal
+> Western Digital Research
+>
