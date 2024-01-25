@@ -1,155 +1,140 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2041.outbound.protection.outlook.com [40.107.94.41])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDB71BC26
-	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 08:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706173082; cv=fail; b=XOz03evMK4SyOfdKV5tdvWc4hcCBbvevsvabWDU8BpkbQKcL3Fj0eH4zNltofGhiZYsPItmvLHI4AZIiNwUuRpCO9TOffJ6hA2ThQv8yB2LilauaLpgSvV0RX7ZkaQoviXDwH/VSNRy1SRKu/ArCigmiqDurY3zmC3wcwwe9tE0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706173082; c=relaxed/simple;
-	bh=tHk06XkzTPH99Rymf6Jn0uUuDozplg2Qa2eOqsPLvFI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UvFTB57G3KI132x9xiikqSXBpVRlj845TH6ZFXCfI9OH3DI4O1WeARFG2AUXgl48GLW7oUh57CM5j5kxvDrbbNHM5JTdRV/7ST6RP7nbnXRjL+RgzGG2A6Nldfw6pOyPzwu3CayPexfHz7sttkz4E8t4u/AD3YAralPQeoSGWtI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MLep3DCx; arc=fail smtp.client-ip=40.107.94.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669441C29F
+	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 09:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706173662; cv=none; b=fa9LQ81LIw0NA0kfjP5CnNRb0MZdZF0Tk7F+2rqbOvj6HEDJ50h16+g4xXPFvzyhXPMzn+gXQi+sve9nuOWT48ZLo5QjQVVEZW+JdxlSQ7L6E8FGqMk8zOcLyYwTYC6XO/Q2uIb8G1mA7O9NiNmhqQnN5PXq4lZK5vAYcnSDArQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706173662; c=relaxed/simple;
+	bh=vAeDSSN4CvvWCtqCLAIaHEzK7l96MnUrA7S/EltXCN8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:From:In-Reply-To:
+	 Content-Type:References; b=kHQ79jY+BpScfEZd314NypbC/qVNxXVtWvXZYvVHbyuNLnqB0XpdDnuH/Ttr4HwPYKLMalfTpaE13bAypWx7S4iWTM7IywiZFYpWwqCDjHPdZ117waJkUh3K3ufIm4aZYgnzagJY/stvthKX1OYvETDkgOb5kvwbGqvYuNON0F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=EO1BmP1x; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MLep3DCx"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S/bSGt9k1rb9lmP6KO8qFNfkLkFpCwyhObBpa1VKi1M9IiueSMMac8PXh1tXiUzEkaZjDUUOgDRbAb8IYb6QAOvMFa1F+obCdJLXGFipHm3w9Gf2s0YsYilARwr1ctIfuNCX2mJBI0NSXCH+tCS9fyyzu5pXyvOoS+fgYikZRPoeTP5Yaku17KoSeXg7NrW/ghXPgMVPcLik/tWS2ZKrqQloT0luxAxssEmHUjbC9RlIhtmbAaAO3X4ReiYkcnzo9t/KQOa/Wajx/837gnZe6mpeiFIdJdE33+Xpx4FWj1/NmnNSAw5aNV4OK/lQpNQL773lwFEMewKP4Bi0WcR/pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tHk06XkzTPH99Rymf6Jn0uUuDozplg2Qa2eOqsPLvFI=;
- b=ANhiws3Wk2oKzZ7H2LwGNiYoVLh3nbBdwbJ1gPrIypSOyfej+Xz4idMoAvaNFU+dKJZTzhvP5K6jRPdwhbEATlGxrKfU0E8AUNXAZTcaKuEKc6tMiOniW82V8qEVPDHfbD2zleeWkjz44+C88UE4Rbp3vS1nKaKdF63bwgQ/RJ9AEZRcX7om3G3X8QLSvJp0SIdHjWGwGfAqmS93LnWYTpJISHBv9ZUuwyeYEydFGmYLap2uBf7iBlizx6sUBmzFY9yKnlQm19zXYzZbQ6OiIg5uh5cSFYW+JBQGvdrnlHbCYPxfdVqVtcS6ZDG6C0oEIkBDU9eNCmlO8HfmC3W3wQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tHk06XkzTPH99Rymf6Jn0uUuDozplg2Qa2eOqsPLvFI=;
- b=MLep3DCxbIaiCvNbl/tozYno9wgH349xWiWsmB2gxqdYvRM3o9gB8/7EsuS7zU+WlCgCtAlX9f469+9xVtCZpo/+QOxT29Mn+CgIrO3IK9AX42AYHPN3JPTjhf50kF0T8LitiFv0uQGg2ieuMLmB30ymDdVlkjfJpiKzepMGCNmYAq0woY9kGVDwsTu9R+k4V6OnGYB6k1hNctgVWPI5oXJ36+Eb9iuT22vuj6BtbaAU+cytivbq2RnzOebqVWv8KB1aAXnYgp4IlcAtAUiPtBqeESRWnesvERSQNmQK9yw1HXUOAIiBUubUlE/NPDspuGQNXpgVu7+9ZZAw9xi+Mw==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by SN7PR12MB7977.namprd12.prod.outlook.com (2603:10b6:806:340::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Thu, 25 Jan
- 2024 08:57:58 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::ffce:bbde:c1ca:39ed]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::ffce:bbde:c1ca:39ed%4]) with mapi id 15.20.7228.022; Thu, 25 Jan 2024
- 08:57:58 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Christoph Hellwig <hch@lst.de>
-CC: "axboe@kernel.dk" <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-Subject: Re: can we drop the bio based path in null_blk
-Thread-Topic: can we drop the bio based path in null_blk
-Thread-Index: AQHaTdlGIGiGKoqxwke9v0ex+jH9wLDpbOeAgADElgCAAAv+gA==
-Date: Thu, 25 Jan 2024 08:57:58 +0000
-Message-ID: <f2f14d30-7192-4a8e-ae5e-246e3c081eea@nvidia.com>
-References: <20240123084942.GA29949@lst.de>
- <znc7pqdsqkznoszbzhvxyyphmpqbesjh56ygn5xt5fjej4glvc@mcccy2dky5eg>
- <20240125081502.GC21006@lst.de>
-In-Reply-To: <20240125081502.GC21006@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SN7PR12MB7977:EE_
-x-ms-office365-filtering-correlation-id: 7e09e1a8-02fd-4bb5-a519-08dc1d83ba27
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- aWR+H+vZIhhEJ+y4NYt2+wsvTlf8HkRaldmFBQk3Kyymzg7sfrrAwk0zfKhXkGl39vL5n2nM1g/N08evDCLB/TMUo5RUt9a0FuoxR2t8ohEPyS4tJasYqGvmwJZaRE4Y2VYTexvEK4u1GGXCYzUZRM8/MrWNhNdwfwqiiQaIglDvT7ciLuSnWie70QZZCLIHMwIG5LcirAZ+yaih+oe7RgX0fZAIEikEZcborxtxjBFCf+QqY8scna05qNgshYnaCMxuuUZcdu6yuxt+Q2Y1889XRZXUraVJ7y3DU8fBgjMLmVz9A5rVatoMfJQhotLX1lxFNKJICixZUgwLVzrILJl0tWJnHGo1Xz+Ox70GMCWT9cPmV0zldrOI0z0v2M3Og40cmyB0BYTTnjTE5XvHz624ZKocJHkGVl7RP6U4aoYrqVcqn1GF0+8o+P8PPgNUNyseG77ewx9365kNwm1QlxSfKRzyaIMLIl74g+GXLznNlIRAGjlBZVMkOlI3ajdydXYfuH0amF6KgW6Nj3wXrC8IDws6py5YeThTs6YTUErcxOhls/xL97BSxuT39ToSsEhma0OyM8yhvzz9pUG4zdeFKpg2wDVDLGweEW1dW5tR5JY7VD9Kgq4q+j6RvQNeq7af+tybx0DwObXybI7kPps86eI81lYzILeUyWJsz3AG8FkCaDu+dH8sFIdxKyMK
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(39860400002)(136003)(396003)(366004)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(4326008)(66556008)(8676002)(8936002)(66946007)(66476007)(76116006)(64756008)(316002)(54906003)(6916009)(91956017)(66446008)(31696002)(38070700009)(86362001)(36756003)(2906002)(41300700001)(5660300002)(6506007)(38100700002)(53546011)(31686004)(6512007)(122000001)(6486002)(71200400001)(478600001)(26005)(83380400001)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SGJFN3kwQldQRWRWNTRpV1cxOGJjNHhuOEdkcm9KK3g0UmRpcVJFYkkrajJR?=
- =?utf-8?B?dVF1Tk1vcHZDelhidzV0NjEvbXNBQjVlZFJvWEl0WUwxYmlIdGVjQ1lrQTJT?=
- =?utf-8?B?Y2N4K1B0RXJXcUN3WDg3eWdUeVhOTzFXOHFaN0dCNVpRak93ZG9QcVFTYi9N?=
- =?utf-8?B?OS8yZjZPTzhGU2x6VjZsZzlNaHhvNG1pc3RuVVY4Q25qREZhclZrU0NPUVlW?=
- =?utf-8?B?bXpoTTJwME9BWnI3U2FmMFBjOFg4Si9JSmtwcU91WUlnRHJDTGdNZkdWYXkv?=
- =?utf-8?B?WG13UUQ2eXVnZFVCNWtwSDUwblZJa09qQ3o5dU9lYnIrUWdJek1IVFMrMzBl?=
- =?utf-8?B?Q3VaaWRSdGJkK0V1NFVOWnAyd2tmZkswRTVwcDVWN1NTUmt2VkoxQUZWQWRm?=
- =?utf-8?B?UUNMMzdtNU1xMEhzYVB5Zm95d1V3Mnp4OW9tL1ZTTFFPQmhBYVprVm9CUTY4?=
- =?utf-8?B?VmprclF5NlhLL05IVDRoNzFkV24vNnRRMExlZUx3NnRoU1FpNkZkdlpDbjJH?=
- =?utf-8?B?L3MzbUlFTXo1Ri9uNFFxV0o2TE9CWk1JSmt1QzJuc0N1bHYwMlJ1YW5UNnlq?=
- =?utf-8?B?aUpJa01tV0txbkNNVEpEZVhCUUdlUlUyM045UjlqZXg5cmI2U0d1akI0NzRZ?=
- =?utf-8?B?R3BWaTVSem9lM3RLNXVpSmIyTVR5Z3Robk5NeGxmMU5RZUFEWkE4VlBnZjdh?=
- =?utf-8?B?cG9QTWNHZndoc3gwbkU1RGgySUFwTVlKc3ZpZURJN3Y1dHh1eGJaSlRoejY0?=
- =?utf-8?B?c2hVTnNBeDkrRnhhWGhnQkxtSVV6cGY1aS9IakZzU3FKWFY0UzdmU2ZMeU1w?=
- =?utf-8?B?TFBtZXRkUGVORG00NUYxc3ltTWpzM2t1QmVSVkwrdmJQMkpPK0Q3SWI4Vkwr?=
- =?utf-8?B?SWtYWXdER2x0K3h6azdlbmZtd01EYlk0aUE2WDZ4QjNFbUVWVnk4VTRoUEJ1?=
- =?utf-8?B?d3d0NFRFWFNLOGtnSWl2Nk4yWEVhN2ZiMVU0dVJGcmJsK1J3K3g3T3BzVHVu?=
- =?utf-8?B?SWpiYzlsOVhJclBkbEs5NWMzWUl2V0tpUmRGUUFlVHBMRDU4M3Y0Um1zQ3d5?=
- =?utf-8?B?UTBVSGQ1NEVrSXVyRXJYaDJDdVlYMjhzR0krVFlndjlZdkljVkdNTGhqNCtT?=
- =?utf-8?B?TmVqRkxtZFlCejlHT3N1WnZMUC91N3R5QUEvSEFkU3pQS2J3U2MrV2VydHBx?=
- =?utf-8?B?dDJqTlhEeFlRV2w3S3NrV1hoZ3FaT0lyNTZvcFhGcmprdVpYQjFTZ1pKUlF3?=
- =?utf-8?B?Y0dxZjNQQ2tWQU1BbVQ0WkRSUHc0ODBHbUhvRjdhWHAxaVpua3dRdlRwcWEr?=
- =?utf-8?B?YVpOTFY3ZlRsVlhkVTJSQVVwYnNJZEl5OEFaRjBxNDZ5NWoySjNNK00zZmJX?=
- =?utf-8?B?UkF0K2d1Q2N6eDFDdjExdHFrQmlIQ0hTMFU2TkhvMXZodUo1TWQ4WFlCV2xD?=
- =?utf-8?B?QWw1bGc3M0FnT3ZiTWtMdE1qZkxNdUxVQ2lpYzREa2V5NmtZdmNzaUtjaTVj?=
- =?utf-8?B?VFJSbjBwbDBEdllnQ1RtNkxFNlVpRURuRVpBUHFibUVWWHJDR3hrM3dmTzRt?=
- =?utf-8?B?MjJDLzErdEhYdm9CaGRBVmV1a1FZaXRBOUNRei9DbHlJb0pDdXBpUVNhQlc4?=
- =?utf-8?B?TldXZjRIK0UvSHR4dGVZQjFYdnNEbHZOVytQYTVHNnFRQlJBOGR0UWVWQzZ0?=
- =?utf-8?B?UXVrL0RKam95a0lSSVNDTk15dGNkdjZiVGJPdGw4a3paM2cvUnV2WlFMWll4?=
- =?utf-8?B?M1dNS0R3azI0cE5OdVhBQ3BkY2tkNUlEc0EweFZUTGFnekR5YTFTeng2OVkr?=
- =?utf-8?B?ZEJ5WndEenJoeURkcUliWFpzVGpNajFwUkF0UWtXRm8vTlErMDZIWkFMb2xi?=
- =?utf-8?B?M0o2cG1lc1VpSlFldGlCNDdJSkFZcGxaSVl0ZlkycW9kV3krZlhVQlFvRjZ5?=
- =?utf-8?B?YTJXK2plcUdoMVhGbkRiVnRJdzdYNURLa0hKWWlEZGJDencrcFNZdDB5TTUx?=
- =?utf-8?B?dlNVNDFobldCYVdtM1pHSXlGVjNvcEsrNy9JTmpPcWlHV2EwMEFJMnp2N0w5?=
- =?utf-8?B?STBNeXRBQml5eDVqRmtUWFY0RnJJanlJVnBtVDZYd2FuZzdSS0RUV2VpSlox?=
- =?utf-8?Q?PRp+cG8nZdgLb9TooJ5g8eQUA?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3251E664F75CAB42A550B7F39D24A011@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="EO1BmP1x"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240125090737euoutp0192a3cc2a338fd337db8ac0898c1b9b32~ti_bXYiAX2652526525euoutp01K
+	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 09:07:37 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240125090737euoutp0192a3cc2a338fd337db8ac0898c1b9b32~ti_bXYiAX2652526525euoutp01K
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1706173657;
+	bh=PFsNUmgLCKUdzUro9n3bBkakNSd/IUhVnsDoeOvBGGo=;
+	h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+	b=EO1BmP1xTKQHvWVqyFFhFtakJ+rPKJOdyPy+UalE2vbmhTQSoB742EpB5MyID/TnN
+	 J/aEV0zqUt4YDXWiKCWmrfeKhabznRrnF0c7Oqk++Tb+EsRsa7iH81/TeVTR3VwqFp
+	 J94BDSPT1EjlxPEAgN2GkfA0ZCG0c/FDhxEIhnEA=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20240125090737eucas1p26797a7b213a2eaff0ae76173d4ea6e31~ti_bQNdPO3127831278eucas1p2D;
+	Thu, 25 Jan 2024 09:07:37 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id 29.8D.09552.9D422B56; Thu, 25
+	Jan 2024 09:07:37 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240125090736eucas1p2db13dcc5d62272ce330da83b2bf7b1cd~ti_a7_Ig83126831268eucas1p2B;
+	Thu, 25 Jan 2024 09:07:36 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240125090736eusmtrp1280fbd7639d3324b94b66efff61387c8~ti_a7eCCu3004130041eusmtrp1T;
+	Thu, 25 Jan 2024 09:07:36 +0000 (GMT)
+X-AuditID: cbfec7f5-853ff70000002550-7f-65b224d904bf
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 29.F3.09146.8D422B56; Thu, 25
+	Jan 2024 09:07:36 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240125090736eusmtip262c9f11a2356eca44627386b96fcde56~ti_av2_yC2714727147eusmtip2A;
+	Thu, 25 Jan 2024 09:07:36 +0000 (GMT)
+Received: from [192.168.8.209] (106.210.248.230) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Thu, 25 Jan 2024 09:07:36 +0000
+Message-ID: <c3a537ee-7b93-4337-a795-cbd2647a8201@samsung.com>
+Date: Thu, 25 Jan 2024 10:07:35 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e09e1a8-02fd-4bb5-a519-08dc1d83ba27
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jan 2024 08:57:58.0195
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dm76vlQ7dlHrFv+bF9YAKy9W1uRJhcmQ6Xfh1f7/2FOpljm1sgAdWgpMPc1WO/osFW5Mm6c/zrVpeTNqOutxMA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7977
+User-Agent: Mozilla Thunderbird
+Subject: Re: can we drop the bio based path in null_blk
+To: Christoph Hellwig <hch@lst.de>, "Pankaj Raghav (Samsung)"
+	<kernel@pankajraghav.com>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+Content-Language: en-US
+From: Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <20240125081502.GC21006@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupgleLIzCtJLcpLzFFi42LZduznOd2bKptSDY4t4rdYfbefzWLl6qNM
+	Fmdefmax2HtL24HF4/LZUo/dNxvYPM6udPT4vEkugCWKyyYlNSezLLVI3y6BK2Pp02dMBYc4
+	Ku7PW8vWwPiCrYuRk0NCwERi1fovLF2MXBxCAisYJRYv6GeCcL4wSvy8O5kZwvnMKLFm/WsW
+	mJZlPRNYIRLLGSXaXzxlg6u6+XA1VP9uRokjr84ygrTwCthJ7H08DaydRUBVYuKzNawQcUGJ
+	kzOfgMVFBeQl7t+awQ5iCwuYS6x5cBKsV0QgUmLFvQ4mEJsZaPXVd9eYIWxxiVtP5gPFOTjY
+	BLQkGjvBWjkFdCTm9N+DKtGUaN3+mx3ClpfY/nYOM0i5hICyxNSlXhDP1Eqc2nIL7GQJgQcc
+	EjdOHYX60kVia/NGVghbWOLV8S3sELaMxOnJPVA11RJPb/xmhmhuYZTo37meDWKBtUTfmRyI
+	GkeJ63vXQu3lk7jxVhDiHD6JSdumM09gVJ2FFBCzkDw2C8kHs5B8sICRZRWjeGppcW56arFx
+	Xmq5XnFibnFpXrpecn7uJkZgYjn97/jXHYwrXn3UO8TIxMF4iFGCg1lJhNfEdGOqEG9KYmVV
+	alF+fFFpTmrxIUZpDhYlcV7VFPlUIYH0xJLU7NTUgtQimCwTB6dUA1OsjMmhp48CuNvfHL9k
+	cTF0j/zeKK2udD3N/VvNWr1ahNapTiqJYm+ZYLFRp5Npxtn/9wV95n2bUyfotshEbtvr2eIB
+	Huz3FU6XJjC5VKddm77n6LqHBre92RSXBd+q6T3q6+vRZ5G++zOzvUaNv8nuuUd6HYyv8G3b
+	du6V7vFohct1H1s238mc6f+76jL3m+XnRG9wn6q0OblR7ekCjhmiZmY1806ZaMSdWnLOqStE
+	s/H5x8q5zYKXYzaeDeTV0eOtKFhwJuLRzq6H7NlF519eVF7zM9IjYGfkt7um08xmllx/HBDu
+	+5WZv7HGd9LGpWqsPMaKUyPXS+U/NmFrZ3o1YfnSCa9mXud/xVj12FGJpTgj0VCLuag4EQCC
+	W58omwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDIsWRmVeSWpSXmKPExsVy+t/xe7o3VDalGqzuN7FYfbefzWLl6qNM
+	Fmdefmax2HtL24HF4/LZUo/dNxvYPM6udPT4vEkugCVKz6Yov7QkVSEjv7jEVina0MJIz9DS
+	Qs/IxFLP0Ng81srIVEnfziYlNSezLLVI3y5BL2Pp02dMBYc4Ku7PW8vWwPiCrYuRk0NCwERi
+	Wc8E1i5GLg4hgaWMEqt+r2WCSMhIbPxylRXCFpb4c60LrEFI4COjxNkViRANuxkl/nR/YwdJ
+	8ArYSex9PI0FxGYRUJWY+GwNK0RcUOLkzCdgcVEBeYn7t2aA1QsLmEuseXCSEcQWEYiUWHGv
+	A2wxM9BFV99dY4ZY8JRRomXiSaiEuMStJ/OBbA4ONgEticZOsDmcAjoSc/rvMUOUaEq0bv/N
+	DmHLS2x/O4cZpFxCQFli6lIviF9qJT7/fcY4gVF0FpLrZiFZMAvJpFlIJi1gZFnFKJJaWpyb
+	nltsqFecmFtcmpeul5yfu4kRGI3bjv3cvINx3quPeocYmTgYDzFKcDArifCamG5MFeJNSays
+	Si3Kjy8qzUktPsRoCgyiicxSosn5wHSQVxJvaGZgamhiZmlgamlmrCTO61nQkSgkkJ5Ykpqd
+	mlqQWgTTx8TBKdXAxH9FfUtm4wXBPY5/K3ayvZt7Ku3ml2atyHfybK4qNwSXb/x/T3zTrX1l
+	zL+V7xjZPPPlWn5/8Zqbr9cHndFd3ml1yMrqSSmz1mr7n6GaPpXfH+h4GT9m3/M5umbPP19G
+	4wrp+xd2c66+bcT9+i3jjCdxe74dzxU7c6Yw/+CxFptL9kqCU/eevS2RwBU20/eDu2nVuTet
+	C6pOnI/af119GqPYjIMyInMnq/i2Tco6pybrVeac6OPwxeHFVJv5Jds+xB6WcW/t87gfcmLS
+	OqOfs+33H758eR9Pw9m/+epiS8P+eP7YyDVfOo533QaN9ZbvIi+VL5u2Sy6wkFXU4drVO9ue
+	sPxabCW/WX82e+oPFz8lluKMREMt5qLiRAASTZhHTwMAAA==
+X-CMS-MailID: 20240125090736eucas1p2db13dcc5d62272ce330da83b2bf7b1cd
+X-Msg-Generator: CA
+X-RootMTR: 20240125081512eucas1p1991b4134149cefdc11db7b5e96fb6d81
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240125081512eucas1p1991b4134149cefdc11db7b5e96fb6d81
+References: <20240123084942.GA29949@lst.de>
+	<znc7pqdsqkznoszbzhvxyyphmpqbesjh56ygn5xt5fjej4glvc@mcccy2dky5eg>
+	<CGME20240125081512eucas1p1991b4134149cefdc11db7b5e96fb6d81@eucas1p1.samsung.com>
+	<20240125081502.GC21006@lst.de>
 
-Q2hyaXN0b3BoLA0KDQpPbiAxLzI1LzI0IDAwOjE1LCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToN
-Cj4gT24gV2VkLCBKYW4gMjQsIDIwMjQgYXQgMDk6MzE6MjVQTSArMDEwMCwgUGFua2FqIFJhZ2hh
-diAoU2Ftc3VuZykgd3JvdGU6DQo+PiBUaGUgc3ViamVjdCBzYXlzIHJlbW92aW5nIHRoZSBiaW8g
-bW9kZSBpbiBudWxsX2JsayBidXQgaGVyZSB5b3UgYXJlDQo+PiBhc2tpbmcgYW4gb3BlbiBxdWVz
-dGlvbiBhYm91dCB0aGUgbm9uLXNvLXJlbGV2YW50IG9uZXMgc2hvdWxkIG1vdmUgdG8NCj4+IGJs
-ay1tcS4gTXkgaW5wdXQgaXMgZm9yIHRoZSBsYXR0ZXIgcGFydCwgRldJVy4NCj4gV2VsbCwgaXQn
-cyB0d28gZGlmZmVyZW50IHRoaW5ncy4gIE15IHByaW1lIGNvbmNlcm4gcmlnaHQgbm93IGlzDQo+
-IG51bGxfYmxrLCB3aGljaCBpcyB2ZXJ5IGNsdW1zeSBkdWUgdG8gdGhlIHR3byBkaWZmZXJlbnQg
-SS9PIHBhdGhzLA0KPiBhbmQgYWN0dWFsbHkgYnJva2VuIGluIHRoYXQgdGhlIGJpbyBtb2RlIGRv
-ZXNuJ3QgcmVzcGVjdCB2YXJpb3VzDQo+IEkvTyBsaW1pdHMgdGhhdCBjYW4gYmUgY29uZmlndXJl
-ZCwgYW5kIGF0IGxlYXN0IGluIHpvbmUgbW9kZXMgYWxzbw0KPiBvbmVzIHRoYXQgYXJlbid0IGNv
-bmZpZ3VyZWQgYnV0IHJlcXVpcmVkIChJL09zIHNwYW5uaW5nIHpvbmVzKS4NCj4NCj4NCg0KRm9j
-dXNpbmcgb24gbnVsbF9ibGsgOi0NCg0KcmVtb3ZpbmcgYmlvIG1vZGUgd2lsbCBzaWduaWZpY2Fu
-dGx5IHNpbXBsaWZ5IG51bGxfYmxrIGNvZGUsIGJ1dCB0aGVuIHdoaWNoDQpiaW8gYmFzZWQgZHJp
-dmVyIHdlIHNob3VsZCB1c2UgYXMgYSByZXBsYWNlbWVudCB0byA6LQ0KDQoxLiBFc3RhYmxpc2gg
-YmFzZWxpbmUgc3RhYmlsaXR5IG9mIGJsb2NrIGxheWVyIGJpbyBtb2RlID8gZmlvIHZlcmlmeSAN
-CnRlc3QgZXRjLi4NCjIuIEVzdGFibGlzaCBwZXJmb3JtYW5jZSBjb25zaXN0ZW5jeSBvZiBibG9j
-ayBsYXllciBiaW8gbW9kZSBkcml2ZXIgYWNyb3NzDQogwqDCoCBkaWZmZXJlbnQga2VybmVsIHJl
-bGVhc2U/DQozLiBXaGljaCBkcml2ZXIgb25lIHNob3VsZCB1c2UgdG8gY29tcGFyZSB0aGUgYmlv
-IHZzIG1xIG1vZGUgcGVyZm9ybWFuY2UNCiDCoMKgIGNvbXBhcmlzb24gd2l0aG91dCB0aGUgbmVl
-ZCBvZiByZWFsIEgvVyA/DQoNCm9uZSBjYW5kaWRhdGUgY29tZXMgdG8gbWluZCBpcyBicmQgZm9y
-ICMxICYgIzIsIGJ1dCB1bmZvcnR1bmF0ZWx5IGl0IGRvZXNuJ3QNCnN1cHBvcnQgYmxrLW1xIG1v
-ZGUgc28gIzMgaXMgc3RpbGwgYW4gb3BlbiBxdWVzdGlvbiBvciB3ZSBkb24ndCBoYXZlIHRvIA0K
-d29ycnkNCmFib3V0ICMzIGF0IGFsbCA/DQoNCi1jaw0KDQoNCg==
+On 25/01/2024 09:15, Christoph Hellwig wrote:
+> On Wed, Jan 24, 2024 at 09:31:25PM +0100, Pankaj Raghav (Samsung) wrote:
+>> The subject says removing the bio mode in null_blk but here you are
+>> asking an open question about the non-so-relevant ones should move to
+>> blk-mq. My input is for the latter part, FWIW.
+> 
+> Well, it's two different things.  My prime concern right now is
+> null_blk, which is very clumsy due to the two different I/O paths,
+> and actually broken in that the bio mode doesn't respect various
+> I/O limits that can be configured, and at least in zone modes also
+> ones that aren't configured but required (I/Os spanning zones).
+> 
+
+My 2 cents: The drivers that still use submit_bio are mostly memory
+based except for n64. And there is only one blktest(block/023) that
+tests the bio path (Shinchiro can comment here if this is wrong).
+
+So we could remove the submit_bio path in null_blk to simplify things
+as most of the drivers that uses this path do not do anything complicated
+in submit_bio and are mostly memory based.
+
+--
+Pankaj Raghav
