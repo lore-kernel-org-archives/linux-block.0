@@ -1,60 +1,61 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757626E2DC
-	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 14:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A226EB4E
+	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 14:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706193437; cv=none; b=sMOTc8evFVDi2kAgr3X5JVONJ6C+E6SLvVyQvwL4dYLZmp5a0D+nT4ak54vdP9oe4kH7ARh5s8DPPEQbjf34ZCuA3h+70x7Nv8vPB+VJN6cPCQsGQWWkWzoaKnuBcrsYVm+gYU2Oq7zf+//2QSW3rbUMdpaHmn3d0PC5OZmZvGg=
+	t=1706193437; cv=none; b=NpBw1m4vRe0mkFGgC+5IHdUqbD1F7/ZJ33teyfq90oc/bUAcMQH6cxvOxVbFIYlT4u5O0PbScycUDdJU2mcBsFau1lWWeZTyMZGjWnMrwXdNxFEnPERl6QGHHIZgkCwRcDk5PaqpeXibgTJP4vlZi3CWOv0AJ0tHPRRwVsP08Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706193437; c=relaxed/simple;
-	bh=dUmbPvU0C8VRoo9iWbxEG6uM01EkIK75bcOiAdjB25w=;
+	bh=Qs//UMnixr5IUp6jilmOnSE7i7QVfxi3SrizSBiLzF4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nwBo+FlAOEab3aa/nY+gUb+mii2o+J4qOlQdBl+9jd0haQ4P3F9R1C3BRKrpx8lMNsz95rNiq7T+qCts+5RhPMzuYNA4kbGxLNOem2CHRJ+BNC3zXInM6/Fe8+JVcNnN37z1ds5/snmULvf0lbl+EwBSHHgKz222LK+YEDX5Ew4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SGD+fkCN; arc=none smtp.client-ip=209.85.208.171
+	 In-Reply-To:To:Cc; b=sTqJHRogkHesknbSIlgvahyX1/wMTzDY0TbysVvTMtYhJ6PPtIENGnlO1UIjQDbobxBBZl6OhewtUvpjbLh43ujpWitp6uZ5Z+I9wKL4mNylwY+qpXLBYW81FkOnCXQcUiqCM66rXYOZ7KIxmjyCT01pDpRKHMAOkNYUbAxj+P0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FgviSqIx; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SGD+fkCN"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cd33336b32so91434551fa.0
-        for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 06:37:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FgviSqIx"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cf338e1438so8396031fa.0
+        for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 06:37:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706193433; x=1706798233; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1706193432; x=1706798232; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0p/ZF4Qoyc/L5BPHTulDTqASzKK4BbFP5+9sQzchQas=;
-        b=SGD+fkCNkm4T6il7tamKcdiyYox6b0VQ97GEy+Vea2PwX2YV8H+2S5MD92XUqO4FTS
-         L0YVT59MZ8Tcl5jvSthxmT5ZAQg9ZPB2WalQxkUMxUspNNh7vPnj4ZTEmnjthCNPQEba
-         iZNWa8rP7G66oEcejUqJk5TKV6hRQgdnZGwTFC+SvNrPZENEHKCNzuTA7cUqJCiVUNBM
-         TOc+OWM1A8E/RsLwQivMRZPgNks3xylmsnrfL+9l5SgImVm3p0lMGG705MZHPg0dSMuF
-         o+qAMw/ax098kNIJpRsWaLITgOPx8LU5n7vmuVkQ0+gPUZJvLyQ8Lo00/XY/CbV9YIf3
-         7uKg==
+        bh=bJBLYCKXFwySdbkU5jNVGgegDvui0xTSvQmfM70ZSEk=;
+        b=FgviSqIxltqJDnUcgyL4fGiH6UPmwn1BrCqJpvncZd5lLNvubQcrzIjzJLoIsODfol
+         /bqK9UYHLbRJyzJnMiP0kBtRnXvOEvLBvjhxkO48nqp4yWkznbUDwVdq4iRLwDikOO2O
+         eSxO5zrRWd68rPJ3CfYiYX1Q8QHn6KY2Q/bE6sKLEBQOyxh5fFQ4/lO+nYN7mj+Hl5kp
+         9eTwYvlgUJXEZEZGlLpB0RpJZ32AHBBN2kCYNzOvu4KBM5MoyjK8kq5EXpF0zjfFq2MT
+         CZiyiFDPJk5pNCvUz6fkcJ0w+kS50ZpsM64xiFMCQejir7GVUsu74L62LWpu5awoamcu
+         JfJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706193433; x=1706798233;
+        d=1e100.net; s=20230601; t=1706193432; x=1706798232;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0p/ZF4Qoyc/L5BPHTulDTqASzKK4BbFP5+9sQzchQas=;
-        b=lp0HYz8g201HRw2gLpul4ZG6TkPLB30H/GVtruXUUKoJ7gjgXyPwKU7EShYHAThrZn
-         cEOQqZzj6U5C+znDH2308dMt/AXvLXbse7MZp+yC3lg2MLq7F+/8oeaNIDPJGPLub10Z
-         GjkS1pKzYxRCbXlYPschhgl+OWLOPdOJyPMRFhnPoSgLXjpHO3zOjeipgdOPZ1A1R2VZ
-         vkwZxA7QznCqPiGQdPrtfM2D4MJ9AULPPUa2dt/2YSBJEl/bw4QnoN2+bdnCNJipCgNk
-         36VItQzspdAurbyAhVHRT02lGAMl8vbAeclDBzh/AdAq+vg6QgKkA9x5YAXEvaOVFX4t
-         FNJw==
-X-Gm-Message-State: AOJu0Yyu/WeVIGPbLxZjN6fTo73pHgjgfbzvy31PINyILZmrgLsAHTLX
-	1TdRwyWKRWuGVZ9bRheqfMdf6tKNEkiThLMARaGON0czTehtdI3qdEaq+Ys+vf+okesghMSLFwd
-	+
-X-Google-Smtp-Source: AGHT+IE2j/hx+TjW/VFSr9+UBY3Hbz0FN2hxOgkz7PQpgoay1lOTJOQqMnIpUCN7BuM5xSBcSZQTKg==
-X-Received: by 2002:a2e:995a:0:b0:2cf:1c41:39bb with SMTP id r26-20020a2e995a000000b002cf1c4139bbmr731800ljj.69.1706193433640;
-        Thu, 25 Jan 2024 06:37:13 -0800 (PST)
+        bh=bJBLYCKXFwySdbkU5jNVGgegDvui0xTSvQmfM70ZSEk=;
+        b=XCTbYXjlqi3EUODDoTA1+qdmh5fHdhkW/uPGbAR65avrRqBlsoXHHuFiH3owcUoEmh
+         w+eru/86peNrUQkv80qgiGibWU9phD0ivqEW7Id54ojuOTu106i93qaNaPZvVq3BOrZa
+         mKt+9lkWu1N8G8h4M0FQ/+lXdWtrT7tokxyt+wO1VNmAfBOO+fS+6KHivyhkPxFMF5H9
+         k+8FnUw8giG68aaOKnfHsPWTKXcFbTI5CUm9TL7LnZdZv/EqXFMcr8eesfbgkk0T6x9w
+         hjhJGc9sJVE6Z536amFmrRP2WnExyGrfRkSwEn9j7QfxC8zhi7sVbSPbUZC3nnpqgCuN
+         kgQw==
+X-Gm-Message-State: AOJu0YxmS8YVl6rNcHmuxjRvlaHhsrzqKoJepyn2sJCqDED7ruHajPcK
+	QUEX2s3BwH2Q1+hyvayLEY4jRdXdAuvbR4fsLvyV1WSw1fq+GeokpUsu27QU9hAhKthrbJ4R/8m
+	1
+X-Google-Smtp-Source: AGHT+IHyoh6DqOZQxyE2KVxGS/rWXgxchalYubf3yeda14PSRbE8B6cvrgMcdIMq6MgeVioRNGja3Q==
+X-Received: by 2002:a2e:90cb:0:b0:2cf:329c:31d3 with SMTP id o11-20020a2e90cb000000b002cf329c31d3mr596119ljg.25.1706193432776;
+        Thu, 25 Jan 2024 06:37:12 -0800 (PST)
 Received: from [127.0.1.1] ([85.235.12.238])
         by smtp.gmail.com with ESMTPSA id y24-20020a2e3218000000b002ce098d3f0asm292644ljy.115.2024.01.25.06.37.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 06:37:13 -0800 (PST)
+        Thu, 25 Jan 2024 06:37:12 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 25 Jan 2024 15:37:11 +0100
-Subject: [PATCH 7/7] mmc: sh_mmcif: Map the virtual page for PIO
+Date: Thu, 25 Jan 2024 15:37:10 +0100
+Subject: [PATCH 6/7] mmc: sdhci-esdhc-mcf: Map the virtual page for
+ swapping
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,7 +64,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240125-mmc-proper-kmap-v1-7-ba953c1ac3f9@linaro.org>
+Message-Id: <20240125-mmc-proper-kmap-v1-6-ba953c1ac3f9@linaro.org>
 References: <20240125-mmc-proper-kmap-v1-0-ba953c1ac3f9@linaro.org>
 In-Reply-To: <20240125-mmc-proper-kmap-v1-0-ba953c1ac3f9@linaro.org>
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
@@ -81,69 +82,28 @@ from the scatterlist: sg_virt() will not perform bounce
 buffering if the page happens to be located in high memory,
 which the driver may or may not be using.
 
-This code is a bit asynchronous due to being called
-repeatedly from an interrupt handler, so it would be great
-if someone can test this.
-
 Suggested-by: Christoph Hellwig <hch@lst.de>
 Link: https://lore.kernel.org/linux-mmc/20240122073423.GA25859@lst.de/
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/mmc/host/sh_mmcif.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ drivers/mmc/host/sdhci-esdhc-mcf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/mmc/host/sh_mmcif.c b/drivers/mmc/host/sh_mmcif.c
-index 077d711e964e..f9f56d653ff4 100644
---- a/drivers/mmc/host/sh_mmcif.c
-+++ b/drivers/mmc/host/sh_mmcif.c
-@@ -611,13 +611,27 @@ static bool sh_mmcif_next_block(struct sh_mmcif_host *host, u32 *p)
- 
- 	if (host->sg_blkidx == data->sg->length) {
- 		host->sg_blkidx = 0;
-+		/* Unmap previous sg and map the next one */
-+		if (host->pio_ptr) {
-+			kunmap_local(host->pio_ptr);
-+			host->pio_ptr = NULL;
-+		}
- 		if (++host->sg_idx < data->sg_len)
--			host->pio_ptr = sg_virt(++data->sg);
-+			host->pio_ptr = kmap_local_page(sg_page(++data->sg));
- 	} else {
- 		host->pio_ptr = p;
+diff --git a/drivers/mmc/host/sdhci-esdhc-mcf.c b/drivers/mmc/host/sdhci-esdhc-mcf.c
+index a07f8333cd6b..ed851afbf9bc 100644
+--- a/drivers/mmc/host/sdhci-esdhc-mcf.c
++++ b/drivers/mmc/host/sdhci-esdhc-mcf.c
+@@ -314,8 +314,9 @@ static void esdhc_mcf_request_done(struct sdhci_host *host,
+ 	 * transfer endiannes. A swap after the transfer is needed.
+ 	 */
+ 	for_each_sg(mrq->data->sg, sg, mrq->data->sg_len, i) {
+-		buffer = (u32 *)sg_virt(sg);
++		buffer = kmap_local_page(sg_page(sg));
+ 		esdhc_mcf_buffer_swap32(buffer, sg->length);
++		kunmap_local(buffer);
  	}
  
--	return host->sg_idx != data->sg_len;
-+	/*
-+	 * We return true of there are more blocks, and false if there is no
-+	 * next block.
-+	 */
-+	if (host->sg_idx != data->sg_len)
-+		return true;
-+	/* Unmap the last buffer if any */
-+	if (host->pio_ptr)
-+		kunmap_local(host->pio_ptr);
-+	return false;
- }
- 
- static void sh_mmcif_single_read(struct sh_mmcif_host *host,
-@@ -669,7 +683,7 @@ static void sh_mmcif_multi_read(struct sh_mmcif_host *host,
- 	host->wait_for = MMCIF_WAIT_FOR_MREAD;
- 	host->sg_idx = 0;
- 	host->sg_blkidx = 0;
--	host->pio_ptr = sg_virt(data->sg);
-+	host->pio_ptr = kmap_local_page(sg_page(data->sg));
- 
- 	sh_mmcif_bitset(host, MMCIF_CE_INT_MASK, MASK_MBUFREN);
- }
-@@ -749,7 +763,7 @@ static void sh_mmcif_multi_write(struct sh_mmcif_host *host,
- 	host->wait_for = MMCIF_WAIT_FOR_MWRITE;
- 	host->sg_idx = 0;
- 	host->sg_blkidx = 0;
--	host->pio_ptr = sg_virt(data->sg);
-+	host->pio_ptr = kmap_local_page(sg_page(data->sg));
- 
- 	sh_mmcif_bitset(host, MMCIF_CE_INT_MASK, MASK_MBUFWEN);
- }
+ exit_done:
 
 -- 
 2.34.1
