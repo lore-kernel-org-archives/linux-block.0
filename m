@@ -1,83 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6531BDE1;
-	Thu, 25 Jan 2024 09:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86821BC59;
+	Thu, 25 Jan 2024 10:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706176472; cv=none; b=cEw/DBVkWkgx8Th9xZ00pBit9//7vWrhGjXE6C/x+WyuyMlJhnpp0nk1zxYsubHjkebmrHtyoFWLgQTr0S0Qvpxd4xIePdencVcL/PVQrKrjgV9iPSsfKOxUtBc2OE/2Ohl7k08gz6LTn6Ylrd0N2qLE0zPl28fhW5qw21N4Zjo=
+	t=1706177456; cv=none; b=fnPygsU2/6VeXP2H0ByM/9qG6VpW9NVU1F5fXeemGpDWQOBAjh9tcp51UUNnvPQwFStOEVCDiqUpDLDkdR+d1rfKpDwVs1k+UM2QUCAwzKNphdipNCC3VculiKBWPu5Lj3V7iCoDUaSRGI0G4+N7GApcBQTF2kX9vXl8LM9rZBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706176472; c=relaxed/simple;
-	bh=8sV11cCodbI7pM5kIxaj6DbkQcEBI2nlp/GIYjsNtag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IcgI8ivt5hMF1r5INhPkvT8/SUHtO48VfNMbxObystU3uxyLKaDeRd9xiSmATFPYMRZoM8RbcKNXtQGZA1jiZ90XVekEF7PKgbC+tU8KMGEDycS1RnB5INSq+X99yobt3/mUHO8VK3dyVey2A4pDARCoLn7bwAHHVuakWYHSBNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SUxdD07i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706177456; c=relaxed/simple;
+	bh=DrCpUka4LE7f28/xZ1+9p8HGvQNODuskxIvCYYf144U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=svtKSnSmnUld9fvhNb34i/P6QKVDXZMBdwtxP35vWwRd1+uS2cdsMRBzLF3nwQbXEzv+BsBzus2RSctVZJ36lx3PXFMjFLohRovexTpXJaYEuEXgekZWvAn9pQlJqWKPl94AzcpYQuJujotch6CeP/DsMA8YlXDAId+d2Kfua6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bnNUq+5s; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SUxdD07i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5470EC433F1;
-	Thu, 25 Jan 2024 09:54:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706176472;
-	bh=8sV11cCodbI7pM5kIxaj6DbkQcEBI2nlp/GIYjsNtag=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SUxdD07iIGwk8Aw2N8NsyEgJXNF4/m0+uvuV4Q1uBshNvQWo6CP2idSHtrGOp9ug7
-	 Bu7jBFIBRJg6T6EBD8PXUKZ7nn8n4h3YlRN7Z0T01UfqHJq2pQydq81wfWDZlvU5B5
-	 Gvi+0KFyyvORYL0jsEVQpMQRv3dfG5bW4kx7xbJ8IuxWbj/ir18e5g2cQZpnAsekxd
-	 joaKG3MEE7EEbS6g2dQLmo4FjmUGcThNG+FkcTd5hmMcZyz+yQZULbj1JyDD6bfHec
-	 VB7MqNsUIyMeKm2b+Ha+MCZyMks9ECvEx8jT2cHdsBEIAKHfzl2/O67RbbyNH9sT5k
-	 KmyHvMFGMmMWA==
-Message-ID: <15d07953-aeff-460e-81fe-ea7fc2f6145d@kernel.org>
-Date: Thu, 25 Jan 2024 18:54:28 +0900
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnNUq+5s"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-50eabd1c701so7495510e87.3;
+        Thu, 25 Jan 2024 02:10:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706177453; x=1706782253; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DrCpUka4LE7f28/xZ1+9p8HGvQNODuskxIvCYYf144U=;
+        b=bnNUq+5szB1dE36e7AkeyN0aswf3vUo7Xwgovtc0S6Dg6BurDsK0N4tmYjNjBZegfP
+         MxJsL9q1Uk/BJN1TJ+u3y51zkJb+uvBuPQPszgOvC1bkpmNH7XGMqVyY7cyFBH4Vywo1
+         zfTVAiKYrnG+jSed2JLKQIQFMgRl/DXZOC4Vx/oE13+JoIuNono75wFIIkCGvi+tMUVd
+         dELJRwZEpnaSqeIeUD6WG5v0V/KNy7BB35K4tHmpzwOX3kqLfkwW/9ufYFY7uQTBZQHP
+         7Mo/fvCrl9c4sJav+hLRFcyn94fWGo6VeGxW4Xab8M0+Ul0Un/T6dDj9UiZJ5n7UFEa2
+         uo3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706177453; x=1706782253;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DrCpUka4LE7f28/xZ1+9p8HGvQNODuskxIvCYYf144U=;
+        b=TCWJg9auIFQC4U6frlgvjVcKJu/UV8VKQHRNsWvQMMn5dCked2UUaPymDHFR4qW3EJ
+         fC2trnxpv2YBaXnLHYsNLAKNjzXMcfgZ6O7E1fTyqDTVZDan5MkxFL+3h0LPMiN2Ewf3
+         BHR7mTjYgu1b+TrOPjRA0hPCGv8x6km4XPwcHr+TFbJp46SzdRelBfKydwYfCUl9BSQV
+         QvmIQ7gQhnwc2bZ8MeTZ7KBDJiFn2NI/5JI2CNiyAnSa+K/AeMANzGfsGAUEyh6P2vcL
+         W9jlrbvgXzhVAAzAKp7pwI42PUOxkU6ltgsvOtSQZPZGlU2TvRwpo5h9OZc7EDFL1JeG
+         BBBw==
+X-Gm-Message-State: AOJu0YwDD7Y7HuJTERfvjRCmWGx5xoOFWPHicFWohs+JELxpPp/s7iv3
+	Lxw5JZWABCydGqTAe3VvoyZU7OcKgUGzyf9hjms2HsbgTDiVh8VUYk//cjHE4RMcBOimqFxkO1x
+	U1Dzawen4ubJ1WJ7aFI/qGfpn6zo=
+X-Google-Smtp-Source: AGHT+IEpIDWyl6tFm+r49tMS3Z+8PP4EdyyPXZikf9e6m3sNiCyizIlXH8ymocrkSQalk5NR4qt9fpxCV5mQmwC4Q/g=
+X-Received: by 2002:a2e:a277:0:b0:2ce:d2d:72a0 with SMTP id
+ k23-20020a2ea277000000b002ce0d2d72a0mr528628ljm.104.1706177452638; Thu, 25
+ Jan 2024 02:10:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 1/1] block: introduce content activity based ioprio
-Content-Language: en-US
-To: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
- Yu Zhao <yuzhao@google.com>, Niklas Cassel <niklas.cassel@wdc.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Hannes Reinecke <hare@suse.de>, Linus Walleij <linus.walleij@linaro.org>,
- linux-mm@kvack.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, steve.kang@unisoc.com
 References: <20240125071901.3223188-1-zhaoyang.huang@unisoc.com>
- <6b2d5694-f802-43a4-a0fd-1c8e34f8e69a@kernel.org>
- <CAGWkznHK5UPajY2PG24Jm7+A0c9q+tyQzrPdd=n3tp0dgX+T0w@mail.gmail.com>
- <95082224-a61d-4f4b-bc96-1beea8aa93a9@kernel.org>
- <CAGWkznGe+37K7_E34G_MZQXNxoLuM3E0mY=BZCGpyiq+TB_PoA@mail.gmail.com>
- <CAGWkznGJejDMZsryPpS-11mb50wMhhQe-=sNoV4_iO5ogVLtLQ@mail.gmail.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <CAGWkznGJejDMZsryPpS-11mb50wMhhQe-=sNoV4_iO5ogVLtLQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <6b2d5694-f802-43a4-a0fd-1c8e34f8e69a@kernel.org> <CAGWkznHK5UPajY2PG24Jm7+A0c9q+tyQzrPdd=n3tp0dgX+T0w@mail.gmail.com>
+ <95082224-a61d-4f4b-bc96-1beea8aa93a9@kernel.org> <CAGWkznGe+37K7_E34G_MZQXNxoLuM3E0mY=BZCGpyiq+TB_PoA@mail.gmail.com>
+ <CAGWkznGJejDMZsryPpS-11mb50wMhhQe-=sNoV4_iO5ogVLtLQ@mail.gmail.com> <15d07953-aeff-460e-81fe-ea7fc2f6145d@kernel.org>
+In-Reply-To: <15d07953-aeff-460e-81fe-ea7fc2f6145d@kernel.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Thu, 25 Jan 2024 18:10:41 +0800
+Message-ID: <CAGWkznF_mQdA0ebTfyXKnJ0xu6v=iqhr9yDJ4DohL38mRgeTrw@mail.gmail.com>
+Subject: Re: [PATCHv3 1/1] block: introduce content activity based ioprio
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, Yu Zhao <yuzhao@google.com>, 
+	Niklas Cassel <niklas.cassel@wdc.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, 
+	Hannes Reinecke <hare@suse.de>, Linus Walleij <linus.walleij@linaro.org>, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/25/24 18:37, Zhaoyang Huang wrote:
-> Actually, the activity information comes from page's history (recorded
-> at page cache's slot) instead of user space in step(1) and can be
-> associate with bio in step(2) or iterate the bio in step(3)
-> page fault(or vfs)(1)
-> |
-> alloc_pages
-> |
-> add_page_to_pagecache(get the page's activity information)
-> |
-> fs_readpage
-> |
-> bio_add_page(2)
-> |
-
-set your prio here. No change to the block layer needed. That is FS land.
-
-> submit_bio(3)
-
-
--- 
-Damien Le Moal
-Western Digital Research
-
+On Thu, Jan 25, 2024 at 5:54=E2=80=AFPM Damien Le Moal <dlemoal@kernel.org>=
+ wrote:
+>
+> On 1/25/24 18:37, Zhaoyang Huang wrote:
+> > Actually, the activity information comes from page's history (recorded
+> > at page cache's slot) instead of user space in step(1) and can be
+> > associate with bio in step(2) or iterate the bio in step(3)
+> > page fault(or vfs)(1)
+> > |
+> > alloc_pages
+> > |
+> > add_page_to_pagecache(get the page's activity information)
+> > |
+> > fs_readpage
+> > |
+> > bio_add_page(2)
+> > |
+>
+> set your prio here. No change to the block layer needed. That is FS land.
+Yes, that is what I suggested in patchv3 which keeps the block layer
+clean by introducing a set of helper functions which wrap up the
+activity things for FS utilization.
+>
+> > submit_bio(3)
+>
+>
+> --
+> Damien Le Moal
+> Western Digital Research
+>
