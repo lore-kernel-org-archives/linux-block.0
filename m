@@ -1,256 +1,91 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC181350CA
-	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 19:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84A2171AB
+	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 23:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706211096; cv=none; b=nwFxr/ZUyg44NoZWEod/ihRqq8xCVShPSxn25gqMk1IHCgZhe5Vldh0T5JZXKQv8YJnLmRsI1hrPcRt+0XEBvjKSM+RJHd40zS2Zgtb7kRQm8cqpeu7hMQZnwQviFSLBbbKUuz+lmZ1SOEMQQLP5Jn/Qg8gyL/HuLOiGfgnubow=
+	t=1706224737; cv=none; b=KcTnrMpcIMh35x+EgZVTvEDZfHJT68qY5M13sxACuGpdI2mMu6ksq4IteOU2fhX5f2Yd7UV8odRYo51CWNIbQvtvi6vQQiJRRScU9Z/TY8BVsMONqSDzKLZ3q/baDRqnRrkZvnJbhIchvy+B4tav7eWybCVr+fmW1yBTanT+Ed4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706211096; c=relaxed/simple;
-	bh=qsfCjdbrIa5MAWUi1No6qKB4gMcdukFiTFGSPaOzpk4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UeGUv+2ybGi5XwkBO5FDXeE6zOe2DiTm3DqrXFDfh8D3c+CpvAVU/H18RO1JLlG7g7CpJH+m7xqMKksMZCvAjTdH6OpvlAJ+kUno5ENz+xZUBLTaYbijPnXq5+KE4NSIvh8J7M3q9mM0gjU4cUoQK8y0XUSeE3lsqZJ43bufsFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36276d56919so33502215ab.3
-        for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 11:31:34 -0800 (PST)
+	s=arc-20240116; t=1706224737; c=relaxed/simple;
+	bh=7uvqzJiFOH7CqK9D/XE9qIcs6f8P8aqvGseDf75yXXM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NmwMjZXCuXUUTNzWrfYEOcidBhVA20m1wGv4X6ePRLx//agyXhdAQ1EqUpK3nYViHfLgr3ekzEOcc/IXGweim/cY5AsBBhPcvHCCTE2dzDd9j0aAXWx6uI3zbPvjANzMeMLKFJbFPkwKdew1f1AmqNiLryJ5MV0n/7/lrt05SRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZsSCs86a; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZsSCs86a"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6002317a427so39796627b3.2
+        for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 15:18:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706224734; x=1706829534; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7uvqzJiFOH7CqK9D/XE9qIcs6f8P8aqvGseDf75yXXM=;
+        b=ZsSCs86a/S2lz8chareQY9wVV7h/sZwKG7z3FaRYk2qI7Plqd1cVedCVgy07OdHtrU
+         X823lr3pENXGI3wijqr7ejCytYOwlL1+WZkhRm4sIDQKWJYlOP9rCm4Jc5eWvzfTW/ox
+         Rxvh5eh1BJv+5PqtvNdEZ5Xk0zQxmLUnTQZ9efZGubshZFTVIGAFJkOMKCW5vbVxzH4y
+         ZmkL2gazF3rb9ejhMOw5D1B4TW1zRu28+bsv+fwyq8uyrhHEDrWJmF+J1ETDArQYkkKW
+         BtpnPhBRf7GnX2ju0BQPIm+r8F3HZ1KNuddnuiwRSbB9/U08aNnLjQZW3RbRT6mFVSgp
+         ty4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706211094; x=1706815894;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pnJF9wz83hBRcmFwcvanKj4sa0OcSNp8RyMTa15ma0A=;
-        b=FSjVvYHTHhFbryFCxsQPMUl6BpBc5C/AlvUntxbCGOjVkJ0DZXR9cxYDV/Bw7S0eCz
-         4lF0JwvMVP+edgj26XeGeBK3Y2m89IkR89+Xl5GNEF3jX4Uuzej1HtGrIfFwyJ+1AzT2
-         K27RJ7hGcRYYX0R5mmqm876Aox1zsxs3ZV5MhIbforwEYsNnxBhvQpcjePMMZv28be2z
-         7l3+uN7OeV576VdxcNkdUnVFoCTSiuOQu/W2b1BopDgTP1+fJHOnVYhDrTuJvjJ0dLpb
-         oWi6m26Ao9S48o5KLFwmY0ClaI7RFKMh+FT6TLTgvIqqZ4vUnk5pnOvFxrmZPBLA1mZ/
-         V2uA==
-X-Gm-Message-State: AOJu0YxWJLrHKIe7lPjQhHAiE621ZQXhK6ksyjSDndf031tGmjjCUzRM
-	YsknAA+ov1YuGnyfDxjL3RKyJAYRaNXpRdF2R4ahX2XYVMnP0GNDn8J5t0DbyeAvKDeOy6mIUJY
-	FHoiO0kABYTbfsX0IAfIBZu1Dxqg3qEj31CrGV21mIcc0hN4j90blzKQ=
-X-Google-Smtp-Source: AGHT+IGIttVkEPMElQUiTa3PaxzUkBuB9Ab/x84X6vPhgJxWzwcRzX/odoX8t5g21GSF5vMmd5LywWmEwISYptxpMeUKRXp5LRP/
+        d=1e100.net; s=20230601; t=1706224734; x=1706829534;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7uvqzJiFOH7CqK9D/XE9qIcs6f8P8aqvGseDf75yXXM=;
+        b=ImCG0BsKZzQDLTND+tOtZX0wH4wiuP/uoApRcn7LNCuRGR81Csxf2g0ViCgjvP0GgE
+         aP9CJS04wIh+OlS6HbJl1qpPLKW70/zLdQaJ5N9DKnp9EZFdw5RjjPtxMM7n4uyRQXtZ
+         LhcHwZNyYHyr09l7+YnSGxiyV/AbFG88yey0ixULeKoKXTpNfXD+kRkfWE5KII6dODbL
+         HgvcrbiUMPan93CXebNNscn6j/QhdY48AnKp2KayO2ScDvB3otNQn2MktNKZ0Ih1eXm2
+         N8I3QoKSi8Y2UDCpnEOJk7PfZSNVtQLNR5T8/N78DZ5E7Rm96WfJvL+vCBvQE8rk7aQd
+         yPaA==
+X-Gm-Message-State: AOJu0Yxnv8ejjo79uaHMQ3xsI3+eSCNfDjnCOee9PaiqUYCOy0/q1sWt
+	M7ekLq2995mIEZdBTKJe8Z3afNN7tnLUjuluHfk9CTjjX4lF/n5HFV7QGL9HHOTt114FiKS7NIG
+	yVMYWtZVdBrqh8UL9lhacEHz/7i+uDtIUtQ8Rdw==
+X-Google-Smtp-Source: AGHT+IGYkPRYDSlscKRk4G+SfhQLgKGn3yOaS30O2gXXD5Tt9NYFdgvgNJQJQsN4IwIhaD5odaQS198rhu6R/5DbH+Y=
+X-Received: by 2002:a81:aa4c:0:b0:5ff:35f1:714b with SMTP id
+ z12-20020a81aa4c000000b005ff35f1714bmr601737ywk.12.1706224734637; Thu, 25 Jan
+ 2024 15:18:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a6b:b0:361:9a73:5a8f with SMTP id
- w11-20020a056e021a6b00b003619a735a8fmr24922ilv.5.1706211093976; Thu, 25 Jan
- 2024 11:31:33 -0800 (PST)
-Date: Thu, 25 Jan 2024 11:31:33 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002b1fc7060fca3adf@google.com>
-Subject: [syzbot] [block?] [trace?] INFO: task hung in blk_trace_remove (2)
-From: syzbot <syzbot+2373f6be3e6de4f92562@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, axboe@kernel.dk, dvyukov@google.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com, 
-	mhiramat@kernel.org, pengfei.xu@intel.com, rostedt@goodmis.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20240125-mmc-proper-kmap-v1-0-ba953c1ac3f9@linaro.org>
+ <20240125-mmc-proper-kmap-v1-1-ba953c1ac3f9@linaro.org> <7ca13324-ac47-4648-9b3c-c616de515625@app.fastmail.com>
+In-Reply-To: <7ca13324-ac47-4648-9b3c-c616de515625@app.fastmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 26 Jan 2024 00:18:43 +0100
+Message-ID: <CACRpkdZWrRCoG_HL4WxpcauP_ipvfekg3j67fUHewUuMxGzBeA@mail.gmail.com>
+Subject: Re: [PATCH 1/7] mmc: davinci_mmc: Map the virtual page for PIO
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Nicolas Pitre <nico@fluxnic.net>, 
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Angelo Dureghello <angelo.dureghello@timesys.com>, 
+	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>, linux-block@vger.kernel.org, 
+	Linux-OMAP <linux-omap@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Jan 25, 2024 at 5:37=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
+:
 
-syzbot found the following issue on:
+> I think to do this properly, the driver would have to
+> use struct sg_mapping_iter like the cb710 driver does,
+> but the conversion is not as simple as your patch here.
 
-HEAD commit:    7a396820222d Merge tag 'v6.8-rc-part2-smb-client' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10c2406be80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4059ab9bf06b6ceb
-dashboard link: https://syzkaller.appspot.com/bug?extid=2373f6be3e6de4f92562
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14669c6fe80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d23ae3e80000
+Ack, how typical, so that is what I write in the cover letter
+that I wanted to avoid but it seems there is no avoiding it then.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6bbe281de19f/disk-7a396820.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/aad457fc635f/vmlinux-7a396820.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b41601ff5beb/bzImage-7a396820.xz
+It's a bit trickier but I guess I can pull it off, it better get some
+testing.
 
-The issue was bisected to:
+Thanks Arnd!
 
-commit 0d345996e4cb573f8cc81d49b3ee9a7fd2035bef
-Author: Pengfei Xu <pengfei.xu@intel.com>
-Date:   Mon Jul 31 03:04:18 2023 +0000
-
-    x86/kernel: increase kcov coverage under arch/x86/kernel folder
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1594cacfe80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1794cacfe80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1394cacfe80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2373f6be3e6de4f92562@syzkaller.appspotmail.com
-Fixes: 0d345996e4cb ("x86/kernel: increase kcov coverage under arch/x86/kernel folder")
-
-INFO: task syz-executor208:5137 blocked for more than 143 seconds.
-      Not tainted 6.7.0-syzkaller-12991-g7a396820222d #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor208 state:D stack:29312 pid:5137  tgid:5134  ppid:5112   flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5400 [inline]
- __schedule+0xf12/0x5c00 kernel/sched/core.c:6727
- __schedule_loop kernel/sched/core.c:6802 [inline]
- schedule+0xe9/0x270 kernel/sched/core.c:6817
- schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6874
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:752
- blk_trace_remove+0x1f/0x40 kernel/trace/blktrace.c:406
- sg_ioctl_common drivers/scsi/sg.c:1126 [inline]
- sg_ioctl+0x9ac/0x2760 drivers/scsi/sg.c:1160
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl fs/ioctl.c:857 [inline]
- __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f61c0ac50d9
-RSP: 002b:00007f61c0a60168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f61c0b4c3d8 RCX: 00007f61c0ac50d9
-RDX: 0000000000000000 RSI: 0000000000001276 RDI: 0000000000000003
-RBP: 00007f61c0b4c3d0 R08: 00007ffdb9ff9147 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f61c0b4c3dc
-R13: 000000000000006e R14: 00007ffdb9ff9060 R15: 00007ffdb9ff9148
- </TASK>
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/29:
- #0: ffffffff8d1acba0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #0: ffffffff8d1acba0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #0: ffffffff8d1acba0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6614
-2 locks held by getty/4817:
- #0: ffff8880297d30a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
- #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc6/0x1490 drivers/tty/n_tty.c:2201
-3 locks held by syz-executor208/5136:
-1 lock held by syz-executor208/5137:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_remove+0x1f/0x40 kernel/trace/blktrace.c:406
-1 lock held by syz-executor208/5140:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0x33/0x60 kernel/trace/blktrace.c:648
-1 lock held by syz-executor208/5141:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_remove+0x1f/0x40 kernel/trace/blktrace.c:406
-1 lock held by syz-executor208/5149:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0x33/0x60 kernel/trace/blktrace.c:648
-1 lock held by syz-executor208/5152:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_remove+0x1f/0x40 kernel/trace/blktrace.c:406
-1 lock held by syz-executor208/5151:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0x33/0x60 kernel/trace/blktrace.c:648
-1 lock held by syz-executor208/5153:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_remove+0x1f/0x40 kernel/trace/blktrace.c:406
-1 lock held by syz-executor208/5155:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0x33/0x60 kernel/trace/blktrace.c:648
-1 lock held by syz-executor208/5156:
- #0: ffff88801e9032b0 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_remove+0x1f/0x40 kernel/trace/blktrace.c:406
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 PID: 29 Comm: khungtaskd Not tainted 6.7.0-syzkaller-12991-g7a396820222d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- nmi_cpu_backtrace+0x277/0x390 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x299/0x300 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
- watchdog+0xf87/0x1210 kernel/hung_task.c:379
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 5136 Comm: syz-executor208 Not tainted 6.7.0-syzkaller-12991-g7a396820222d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:check_kcov_mode kernel/kcov.c:173 [inline]
-RIP: 0010:write_comp_data+0x19/0x80 kernel/kcov.c:236
-Code: 8b 80 f0 15 00 00 c3 66 2e 0f 1f 84 00 00 00 00 00 49 89 d2 49 89 f8 49 89 f1 65 48 8b 14 25 80 c2 03 00 65 8b 05 bf a6 7b 7e <a9> 00 01 ff 00 74 0f f6 c4 01 74 59 8b 82 fc 15 00 00 85 c0 74 4f
-RSP: 0018:ffffc900045e77e0 EFLAGS: 00000202
-RAX: 0000000080000001 RBX: 0000000000000002 RCX: ffffffff813a4c8d
-RDX: ffff88806d973b80 RSI: 0000000000000003 RDI: 0000000000000001
-RBP: ffffffff8ac9ccc0 R08: 0000000000000001 R09: 0000000000000003
-R10: 0000000000000002 R11: 0000000000000002 R12: 0000000000000002
-R13: 0000000000000001 R14: 0000000000000003 R15: 0000000000000002
-FS:  00007f61c0a606c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055e6254f9440 CR3: 000000006e15a000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- __sanitizer_cov_trace_switch+0x54/0x90 kernel/kcov.c:341
- unwind_next_frame+0x77d/0x2390 arch/x86/kernel/unwind_orc.c:581
- __unwind_start+0x5a4/0x880 arch/x86/kernel/unwind_orc.c:760
- unwind_start arch/x86/include/asm/unwind.h:64 [inline]
- arch_stack_walk+0xaf/0x170 arch/x86/kernel/stacktrace.c:24
- stack_trace_save+0x96/0xd0 kernel/stacktrace.c:122
- save_stack+0x160/0x1f0 mm/page_owner.c:129
- __reset_page_owner+0x51/0x2e0 mm/page_owner.c:150
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1140 [inline]
- free_unref_page_prepare+0x51f/0xb10 mm/page_alloc.c:2346
- free_unref_page+0x33/0x3c0 mm/page_alloc.c:2486
- relay_destroy_buf+0x121/0x3e0 kernel/relay.c:201
- relay_remove_buf kernel/relay.c:221 [inline]
- kref_put include/linux/kref.h:65 [inline]
- relay_close_buf+0x153/0x1b0 kernel/relay.c:430
- relay_close kernel/relay.c:766 [inline]
- relay_close+0x3a8/0x5d0 kernel/relay.c:752
- blk_trace_free+0x37/0x170 kernel/trace/blktrace.c:316
- blk_trace_cleanup kernel/trace/blktrace.c:384 [inline]
- __blk_trace_remove+0x7f/0x130 kernel/trace/blktrace.c:397
- blk_trace_remove+0x27/0x40 kernel/trace/blktrace.c:407
- sg_ioctl_common drivers/scsi/sg.c:1126 [inline]
- sg_ioctl+0x9ac/0x2760 drivers/scsi/sg.c:1160
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl fs/ioctl.c:857 [inline]
- __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f61c0ac50d9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f61c0a60168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f61c0b4c3d8 RCX: 00007f61c0ac50d9
-RDX: 0000000000000000 RSI: 0000000000001276 RDI: 0000000000000003
-RBP: 00007f61c0b4c3d0 R08: 00007ffdb9ff9147 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f61c0b4c3dc
-R13: 000000000000006e R14: 00007ffdb9ff9060 R15: 00007ffdb9ff9148
- </TASK>
-INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.919 msecs
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Yours,
+Linus Walleij
