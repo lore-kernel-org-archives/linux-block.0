@@ -1,367 +1,371 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30551B7F4;
-	Fri, 26 Jan 2024 09:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706262590; cv=none; b=H7y7GSIPaS5LIsFHC7S2jS5H87J5UpLx896jQfGeR95oumyZ0P/fptdnzC87VstYrBWi0Fkz9GuphXqH/LxBm2NIkihushachtBSF1tMLKPgAl/SkALuhJzoRckcrBBhkGD4+Oyk755TNR/yd7uWYxNoHj58C72pPgiDQVStj6U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706262590; c=relaxed/simple;
-	bh=PPgG7drf9kCNNzh1htJ4AGBB18N7yncIxcDSWFLL728=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SMbj27kDJcN/bWo34ljL3d3QPerEahS8ZbJiidq8gqMgdf13KPRA+PFIvIjk84MP5PoDbMQx6sfSH1QtaSKSmcqf0q8xlujsSKobLh/COMbqwHbNcSkXTg2L3bOneFqFJC5wbsa9LZQUj3ScW82mWbFSwwsWxco1PKzQ3upP2CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIlzS1bh; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF5E13FEB
+	for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 11:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706267409; cv=fail; b=EEQBga4hdSYGITHUJwArb0YLQgj9OSplXU54+G2eopk74vB0L0p+wtcNJZDZf7SDYU7TVmeA6eFBZmqJ/CfS/Iy8hLL40LNayPPItvt6sXUqpUC4sq634oyCUN2szaFtP64g+gxXCc0bxNPyQfOIzZcho3dcIhdJLeVetOlUsGM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706267409; c=relaxed/simple;
+	bh=JzaS7mbD9VI+TvtCVQgO+d7bxMgS+3D08zoGPwyeDqk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Tz18QjEcTel2FBwPGGPTMDBJpAR5pLCguq06obluU2CyFt0fxt2rimUkulxP3SFeGxAgmf3dVngA1mYQnXL5qYFONh5JTVj4gW1C90xSMEV17w/cCn989JG4prg2xFOahU9IPVRQizgu42xerC65RgZ7zl81d+NBwIyYqNaq720=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=mS0J8sjf; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=oqJp3PEb; arc=fail smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIlzS1bh"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5100fd7f71dso920621e87.1;
-        Fri, 26 Jan 2024 01:49:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mS0J8sjf";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="oqJp3PEb"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1706267406; x=1737803406;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=JzaS7mbD9VI+TvtCVQgO+d7bxMgS+3D08zoGPwyeDqk=;
+  b=mS0J8sjfc9Lb/bVVHIOloht5ZV4/BZN327h6vVFCvH/GG0KaIHDOITky
+   8Yi3zhRsgvpyCajL6SYivc1zIGKhK2D6+IhFAJwS+5BIuKYpm0YbFdGxQ
+   M5p3sQilaaXw5IDVKSJkk2vPbTxnL07JhU0k28n2vfS7LqIqZ0JAtGNC4
+   EW8cPc0PdawntuaLUPQBLTKZJXXypyWc/X30xdQEnc5hGMLscUWkSp78Z
+   rYI8CpQeVF7puN/vNH71B3HdC4kNau74X5hTKn1Vw+C85GnYOlA25Ub7B
+   5b6AG1/5bUAiNC4Eoz7s9WZqIOLcef5O3x9NPuFNn3gCKRxG9etKWKg2m
+   A==;
+X-CSE-ConnectionGUID: W/qZVLVmRumBB7RS83zqNg==
+X-CSE-MsgGUID: GuAY+AAXR7Gn4qkWxUeg0Q==
+X-IronPort-AV: E=Sophos;i="6.05,216,1701100800"; 
+   d="scan'208";a="7517996"
+Received: from mail-dm6nam10lp2100.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.100])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2024 19:10:02 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NJtK00iOW1m1ZLesuh8fy/ngTMcQynhy9AW6JIyd6zlwvhjolQyvTUR/LbhAJ4lkuEdXyUARyNAqyN6N9t5YikWdWGSdP4knCN/0X7adGZeXxeJ2WRPZJljAjeGOxaOP2S9MEjfOAcU0jZDBzDB0aPuQhd6XERYJOmn0b7Ytkh4GCVy5sEkZ+b7axiwqPUHPkkHP898swC3sQxyvSebKfSLuZ1jbGw3SU+ScUV4KQT5nkBpmK0BGrKW9dEuUc2ejIk5VTkM4yzA0VYCm7HO0LhumXxzGOzEKuDLQx7vA+bKb5AKJPFfoesMqZ4ueeF2QqxMS7OQbyy1eK562mXAoaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V+nA3m7Fl10CInq7mc6R99UgJ9zOZpyfSWbvyPlgACQ=;
+ b=c1RY0D6IE2Iy00DJioNyG10yoCu2X0ZlfVajf5WWQ78FOvekDI8IpJo/+tE54kkT82kR83EwrZYRv0ZmQ0OwpzpF/PrfxpSAqq15QSofjEQlJk/YGu88Hp2qkWkZbu6M7JV+JSeVYsWrbcfc/i0a8upQCJQpiIwcXvFsZJATwhRIWmIfDJC6HMoqsXy5d2uzWHdObCrd0bgn8eYLMQTPbnYXJDRTJp+3uqQR6JmdDmG1fnWl+D969RuHRwBaQRrEuLpS2jNuRgk/fGpALxz6F2O5GgrAQLubN4CIDA5sB5TKM32XWNPBVaYIfyDUMSwNbENNnEalTWhACSY9eQMVgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706262586; x=1706867386; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ptFTQQXSz+aL0eaWKXOJXvJWajvtj/+L68MiyW1Ryc4=;
-        b=SIlzS1bh6xNhl4CZTu0DCNxZdvUroyYXxgtnOpTJDtsWMR5MrZ4z1ShjoclTto/+yq
-         J9frYa6KTdmlrDBGzysPiuEKS1/+Ve6sJGnjR0t56wR261DO+HeBpGvMEVxbQF9oIfrM
-         UuHcl1x3PHjW/g4zoomtfqmkgRCRHZdfi2jVzXss0X5t8SH/g0o6ogs+pv01dts44oiR
-         bhuJT3kK5yUsnfBZ0IL4MCFwv6phLEiGv8jFihj8iSXUEIftdzqDVLpyfajNsiHOme60
-         vclRDGWdU9Miq3eDKCiQBzHoRkIbsUfc4xBL7femSdYgAcgxC63ypVGumwSGhDVu7S/k
-         hYWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706262586; x=1706867386;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ptFTQQXSz+aL0eaWKXOJXvJWajvtj/+L68MiyW1Ryc4=;
-        b=kfD1cGw5pN5jid2G2UeszNlKgJyKoSLrl2m8493lrsY9H7mjrx80q19iAS3JmYOTx6
-         VGWMNOuO/+PDXlMLsuYtDlgLMEOsryt431CassJc20J63tmnLy76zV5YDYI1NQmb45YL
-         4gRMDkqPekQW47RrZBbYUobsWjMqt0BQFdtK1YIkk9PSLFtWiW0HYFWeNg2hA5cEy73U
-         ChdY3E6EKUly63lfeM4fvOx9OiIG0KRkzbsX0od3U49bl51+r14mgLRimUdypWRoFl9J
-         6I4e1HOwbMIjnbUaivKLk0o8+JMB56Y/jdxLPBQrQSQnZsZbHMEJxzC44ECfu7z/12zU
-         UKyg==
-X-Gm-Message-State: AOJu0YxJFGILEs1o9o1/5vm5cGsQHRMPNxHFBLMjJ+v77fzwwom1hTYX
-	Sx8OorJ9c8/9Bppp9yqUFMaW5o/Y2rsBzMbTfSs6Jj0znDDQMpb7MCq10Xhx+6Yg2IfUvbsp1jK
-	/yU/u94mlnC+AyL8uIsSHNcCX6so=
-X-Google-Smtp-Source: AGHT+IEdQhrVqmM6vTIx80vQbNKtGUOsr4W2pIZnL2O1JX8ZzISg+Z4bWrn7fiFxFoLyYNcSEqwGCFDCzWyrrQn/OSQ=
-X-Received: by 2002:ac2:51a5:0:b0:50e:71d4:a37f with SMTP id
- f5-20020ac251a5000000b0050e71d4a37fmr594147lfk.55.1706262585552; Fri, 26 Jan
- 2024 01:49:45 -0800 (PST)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V+nA3m7Fl10CInq7mc6R99UgJ9zOZpyfSWbvyPlgACQ=;
+ b=oqJp3PEbskbQLOao8xAgJxl9aAaljmPZIm2pfPbeh1Rbk3w1VhEtkE1DRUO5qRmQHwyF934zsn0T2L8VeHzmWT8ByIKNQBPwq+eu4bQJOUf4ZFIrVYWv8rrMG2h2AMDmjXOBGTHJn1EEv/lKSac4AAJ8FQNwwSACEY+dJc2fbe0=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ PH8PR04MB8613.namprd04.prod.outlook.com (2603:10b6:510:259::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.27; Fri, 26 Jan
+ 2024 11:10:00 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::25d0:1445:7392:e814]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::25d0:1445:7392:e814%7]) with mapi id 15.20.7228.027; Fri, 26 Jan 2024
+ 11:10:00 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>
+Subject: Re: [PATCH for-next v2] null_blk: add configfs variable shared_tags
+Thread-Topic: [PATCH for-next v2] null_blk: add configfs variable shared_tags
+Thread-Index: AQHaT3dJ7QOQ/NfNgEeOFnHjKBviibDrpFcAgABNHwA=
+Date: Fri, 26 Jan 2024 11:09:59 +0000
+Message-ID: <6cx2neamoup5ze6mzpmfgsx4ni4zoi6jufhc36esgkz2vqzdjo@owzusgg75saz>
+References: <20240125101425.2054263-1-shinichiro.kawasaki@wdc.com>
+ <9a263919-51da-4188-9fd7-52c4bcafa65a@nvidia.com>
+In-Reply-To: <9a263919-51da-4188-9fd7-52c4bcafa65a@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH8PR04MB8613:EE_
+x-ms-office365-filtering-correlation-id: 03dd5ceb-d4dc-4e2e-a787-08dc1e5f565b
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ yZKhutXATqeS5jbWfhf0kFIMMuwlnNxVQBwJ94V5hpZ81MIpTuvL6Kh0lP4Mag9MNFugrE2scEbPAxuyXT20you6rhH4INzXcuJHyPkR448Lz/Ph6IXahITGvzZ4b2enwcA1nNUqh6aIuyA/76JT3N+IccoVKZ5h0DuRCx3ahYAlmCW97XfH00+fPo1xb0+z+McmZ2clCh+5P47x5dCsRoQDIn84lPCTk8A7Uwzuf6m3QAfRLpJTGpJC/3CZFgrwb6nc09/m3clgV/Y9KvCCqG8Yd1t7EwpTF78TapIk3rvstn9AIAD06HkvqMsiMqaCOTxmMEL+zA5bZmqxLjoxXk5+3lpqBMmSw9wlHA2jcC/rqN4WDpIrJZx2Fx8UjGarVY7OA9f2DG0OltbA3t9/xCHUh+9Oz5rpJtnP3iF4GpPT5axn1Zqxj2nanrMwlQchbFyn6CaZZca6FAkFl86Lcysha6JdNwRKScUCyF+BVqaAvIBTH4QuFsHDlnc+6FEW3QXPnaQC9SJKKvBeWmgs3GLFXRT7Iid+hL8BfnO652eoK8br3EL1xLeKMHCKONten8xVQ1vxrQHgnWAyasYMQ3l41HFfS08vKjKm3vuI9ss=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(376002)(39860400002)(136003)(346002)(366004)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(83380400001)(41300700001)(6486002)(6512007)(9686003)(33716001)(26005)(122000001)(38100700002)(4326008)(5660300002)(8676002)(44832011)(8936002)(54906003)(53546011)(478600001)(2906002)(6506007)(64756008)(66446008)(66556008)(66476007)(76116006)(6916009)(91956017)(71200400001)(316002)(66946007)(38070700009)(82960400001)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?IUqemGKMOG6RN2METX67sLZYJ7OepGTb/oHYzJbHTeDSXIp85QNsUFJ6qC?=
+ =?iso-8859-1?Q?GuMXfUubyN7N5POeIkHIu/q9zx5u/sjNTCpkSCJcDuu9U2MpDH9pFzOQcV?=
+ =?iso-8859-1?Q?jbBLRTMM7VBL4gFQCGePcTN6+nqfdUdLHSEANwV+4HJxfJCV68LfG9+O/0?=
+ =?iso-8859-1?Q?qXJKyljsa6U0bNjxi3vDQEsLHV14fYVjt9ofxw/QW8NJVLis6SMzjiJWPA?=
+ =?iso-8859-1?Q?jVcGQJXzA3o9TIWWytnyjiSLD/8fSU7dz4HOgnpPSlgU96oa/XNLWduXXm?=
+ =?iso-8859-1?Q?cf85hE9eM3Oc3Xrf3/8AhvV+ZcVF/140OM/J2U3SI76FK6MQMfpjHJ+sjT?=
+ =?iso-8859-1?Q?w2EON15BFpMow69R8PAuY8axNup8tOGwChSz8Kiz+YiShCbh5njeAomgx5?=
+ =?iso-8859-1?Q?XmrtkIj753dO/I1ORFzcKkUkqucjX89vKzXvQ8PAHaHvdP8rZQadWq3r0J?=
+ =?iso-8859-1?Q?4tGy0ZKhraKCcC/vl2vUoZjeOEdjTTIKML0iIohM92T/NwrBxoIxmCZPWY?=
+ =?iso-8859-1?Q?mSHjLf/zMZ43U0pM2aF+tQ0t0K9pIDizIOcZHSjvs9wH00eMUHjnhkJa7/?=
+ =?iso-8859-1?Q?SmmYjHMDOJUPLD5k1pJhbAJ8JzA24fII1wp4iEiflTKV+4MbgrYVpAoNEy?=
+ =?iso-8859-1?Q?JN522BC9c9PB7s1lERyB70dWyP++BDvBcQlrf0CW/G/kHo5mYViTUBo9V7?=
+ =?iso-8859-1?Q?yHTFp8E6KMBfZ08CjxGkf7tFoTkfrCw/eS+vUJHNM5VHEafSviw2NekB4E?=
+ =?iso-8859-1?Q?3h327xFowdg5jddgDDdHSbMS+uiu09jZwHw00BI6HbfDzUzeKw9/8OGI5c?=
+ =?iso-8859-1?Q?wAZqNGZBU9lHVxHEO9leKYA2XzzuGDmxeob4Sj8+npXTEa/LhtgHqltFdD?=
+ =?iso-8859-1?Q?Jn/KPSuu3DS6N9GwS7XNAHVu9AgTF9kkHYuaNwu1dcdFnB+f/wbQ9i9ApE?=
+ =?iso-8859-1?Q?+JXpfIVNZcK0ulSiVnCe3mBYSRnFZXMzm2o4YlOinUrBNXqCp8Lclszee5?=
+ =?iso-8859-1?Q?AGm0JzHRv50u21XM63cea+Ir844a3uQu40LcAuuGub+40iZdkIZAbD/u1D?=
+ =?iso-8859-1?Q?8Mlh/ss9WkIJDdMPHYWhnwLxjknqt8lBqr/sQJNi2WsclS4YCQX+/+uBir?=
+ =?iso-8859-1?Q?dO+UyUf/VWt4lRQQKh77pEX2PMqLu/DWO8yYEDRXcMyRRbQsJCv08s6PLU?=
+ =?iso-8859-1?Q?n+ObOgpISgeN+MQ3t/ylARffiGN+8qutUkfdzE+riFWqL+6DUmw3alL0mA?=
+ =?iso-8859-1?Q?FE7EGlWDEd+NuKqa/hyF/Ebxy3J4Dxg1FUEF0rsQ1FYppllF/1PcXvR8tq?=
+ =?iso-8859-1?Q?oReixWTgI/bRXWgs2xZw/UsAuNsCD0Fz6G09NNCOAKnN4lrIEqW05j+XVX?=
+ =?iso-8859-1?Q?n2zpHDvYqtIXh3k4MwTfG6MaEKiID2qBtwUJ2f4jOttABjmbdWDfx80mWG?=
+ =?iso-8859-1?Q?0ZP8Xe91tD2EzVKYwQ9PqB62VBJDXfl/Fm/zD90QHSKmk1ZGxoYLAoim/B?=
+ =?iso-8859-1?Q?WLjxp15smtbNDYSmnhnndf9J+Sbnul420mRUIL5Rsbi6Plnih6hnbLcuXf?=
+ =?iso-8859-1?Q?XE700bwWrKZmiLsSwxIG7wYpgPChGNuSGIIjKUyCJv1Bb5c9qQDikPlsE3?=
+ =?iso-8859-1?Q?lmZBSJr0geojyxc4xDnugTJR3nQuUcqkjPJIX7Bt7we0N7IUzrJTUFS26c?=
+ =?iso-8859-1?Q?Kwsx083N5eijsgDJBCQ=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <8299185D1527FB46AE5B292DEE207D90@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125071901.3223188-1-zhaoyang.huang@unisoc.com>
- <CAGWkznGpW=bUxET8yZGu4dNTBfsj7n79yXsTD23fE5-SWkdjfA@mail.gmail.com>
- <ZbNziLeet7TbDKEl@casper.infradead.org> <CAGWkznGG1xLcPMsWbbXqO5iUWqC2UmyWwcJaFd4WBQ-aFE=-jA@mail.gmail.com>
- <ZbN9JDE50Th-dT3Y@casper.infradead.org>
-In-Reply-To: <ZbN9JDE50Th-dT3Y@casper.infradead.org>
-From: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Date: Fri, 26 Jan 2024 17:49:34 +0800
-Message-ID: <CAGWkznGW+W+x0JCAmJJBYznSAWqnYDPTpe_p=8ubFx8C+V9oNQ@mail.gmail.com>
-Subject: Re: [PATCHv3 1/1] block: introduce content activity based ioprio
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, Yu Zhao <yuzhao@google.com>, 
-	Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <niklas.cassel@wdc.com>, 
-	"Martin K . Petersen" <martin.petersen@oracle.com>, Hannes Reinecke <hare@suse.de>, 
-	Linus Walleij <linus.walleij@linaro.org>, linux-mm@kvack.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, steve.kang@unisoc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	mB7pHnPJO53ifB069YQdTZt/KAbR2cz4HXBJrg+XVzchTeY93JDjSfVWrxr/dXjZB4h5Dy/fc/menHHHIwTsXw6yMd6VEp23+NYRtH7uXyyTIihkokMKkzZiXe1tBZwAQf8BEVLhWTlh4Ddf8EFKXAWs5NthwXs16DfUH0pGD8trP5ZhBiGCEOUai6Twe74fUbt4oNkExtiRoAaZ07KQTtL+3FGGb9fe4hbNO8R4r+r66TzdiVoYMk8vb78grmhauCROtXTpqumPUgCYDJscETo+Nh/079jHUlkOicEt+BEAKnV+SqeYFc7VKj+ZIqdTHDajuFBoDHiPj45V6uGAj13CrrFv1aLwtuOunrZRkRa+PrK/i805D077+TOWx1LkwamDYjs3lzYA4Zp7VHLrlItB14DG31+IzwBtKhi5uSpsJfocc/NyGqINZ2uCdq6YPXnlo+2/vZVofQ9qS+wFxH/DfPpCurLuMUIWIvIBzQC/m4wC5VzX75DlWKNGTuY/MsVHvWHXnBoy/l9T1EnEbHs3IE7t86s318zkUAA5a7F2oDUEv17QpYcATdAZMUZTVy1ZnKNPRI5CAtvl+rJDs/l4SBzRLdParcOIx+NvHA5V4gaj7FThYoVXwAtuVAh2
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03dd5ceb-d4dc-4e2e-a787-08dc1e5f565b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2024 11:09:59.9227
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PclJwyZbDC0JOashuOabrj4uFggCHId9kJHCFahXtk+0DdCJVwLfM/l1qt51K5Iy55CUrDgPHaKOm5oY2PRQFlbnCQks2/ZL40hFaiYC0LE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR04MB8613
 
-On Fri, Jan 26, 2024 at 5:36=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> On Fri, Jan 26, 2024 at 05:28:58PM +0800, Zhaoyang Huang wrote:
-> > On Fri, Jan 26, 2024 at 4:55=E2=80=AFPM Matthew Wilcox <willy@infradead=
-.org> wrote:
-> > >
-> > > On Fri, Jan 26, 2024 at 03:59:48PM +0800, Zhaoyang Huang wrote:
-> > > > loop more mm and fs guys for more comments
-> > >
-> > > I agree with everything Damien said.  But also ...
-> > ok, I will find a way to solve this problem.
-> > >
-> > > > > +bool BIO_ADD_FOLIO(struct bio *bio, struct folio *folio, size_t =
-len,
-> > > > > +               size_t off)
-> > >
-> > > You don't add any users of these functions.  It's hard to assess whet=
-her
-> > > this is the right API when there are no example users.
-> > Actually, the code has been tested on ext4 and f2fs by patchv2 on a
-> > v6.6 6GB android system where I get the test result posted on the
-> > commit message. These APIs is to keep block layer clean and wrap
-> > things up for fs.
->
-> well, where's patch v2?  i don't see it in my inbox.  i'm not going
-> to go hunting around the email lists for it.  this is not good enough.
->
-> > > why are BIO_ADD_PAGE and BIO_ADD_FOLIO so very different from each
-> > > other?
-> > These two API just repeat the same thing that bio_add_page and
-> > bio_add_folio do.
->
-> what?
->
-> here's the patch you sent.  these two functions do wildly different
-> things:
->
-> +bool BIO_ADD_FOLIO(struct bio *bio, struct folio *folio, size_t len,
-> +               size_t off)
-> +{
-> +       int class, level, hint, activity;
-> +
-> +       if (len > UINT_MAX || off > UINT_MAX)
-> +               return false;
-> +
-> +       class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +       level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +       hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +       activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-> +
-> +       activity +=3D (bio->bi_vcnt + 1 <=3D IOPRIO_NR_ACTIVITY &&
-> +                       PageWorkingset(&folio->page)) ? 1 : 0;
-> +       if (activity >=3D bio->bi_vcnt / 2)
-> +               class =3D IOPRIO_CLASS_RT;
-> +       else if (activity >=3D bio->bi_vcnt / 4)
-> +               class =3D max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IO=
-PRIO_CLASS_BE);
-> +
-> +       bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint,=
- activity);
-> +
-> +       return bio_add_page(bio, &folio->page, len, off) > 0;
-> +}
-> +
-> +int BIO_ADD_PAGE(struct bio *bio, struct page *page,
-> +               unsigned int len, unsigned int offset)
-> +{
-> +       int class, level, hint, activity;
-> +
-> +       if (bio_add_page(bio, page, len, offset) > 0) {
-> +               class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +               level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +               hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +               activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-> +               activity +=3D (bio->bi_vcnt <=3D IOPRIO_NR_ACTIVITY && Pa=
-geWorkingset(page)) ? 1 : 0;
-> +               bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_ACTIVITY(class, leve=
-l, hint, activity);
-> +       }
-> +
-> +       return len;
-> +}
->
-> did you change one and forget to change the other?
-Sorry for missing you in the list. Please find below patchv2 where all
-activity calculation is located within _bio_add_page which aims at
-avoiding iterating the bio->bvec before submit_bio. This is rejected
-by Jens as it introduces page operation in the block layer.
+On Jan 26, 2024 / 06:33, Chaitanya Kulkarni wrote:
+> On 1/25/24 02:14, Shin'ichiro Kawasaki wrote:
+> > Allow setting shared_tags through configfs, which could only be set as =
+a
+> > module parameter. For that purpose, delay tag_set initialization from
+> > null_init() to null_add_dev(). Introduce the flag tag_set_initialized t=
+o
+> > manage the initialization status of tag_set.
+>=20
+> we probably don't need the tag_set_initialized see below ..
+>=20
+> > The following parameters can not be set through configfs yet:
+> >
+> >      timeout
+> >      requeue
+> >      init_hctx
+>=20
+> I've not seen something like this in the commit log, but if everyone is o=
+kay
+> sure ...
 
-block/Kconfig               |  8 ++++++++
- block/bio.c                 | 10 ++++++++++
- block/blk-mq.c              | 21 +++++++++++++++++++++
- fs/buffer.c                 |  6 ++++++
- include/linux/buffer_head.h |  1 +
- include/uapi/linux/ioprio.h | 20 +++++++++++++++-----
- 6 files changed, 61 insertions(+), 5 deletions(-)
+The commit 7012eef520cb ("null_blk: add configfs variables for 2 options") =
+has
+similar log. I tried to make the commit logs consistent.
 
-diff --git a/block/Kconfig b/block/Kconfig
-index f1364d1c0d93..8d6075575eae 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -228,6 +228,14 @@ config BLOCK_HOLDER_DEPRECATED
- config BLK_MQ_STACKING
-        bool
-
-+config CONTENT_ACT_BASED_IOPRIO
-+       bool "Enable content activity based ioprio"
-+       depends on LRU_GEN
-+       default y
-+       help
-+       This item enable the feature of adjust bio's priority by
-+       calculating its content's activity.
-+
- source "block/Kconfig.iosched"
-
- endif # BLOCK
-diff --git a/block/bio.c b/block/bio.c
-index 816d412c06e9..1228e2a4940f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -24,6 +24,7 @@
- #include "blk.h"
- #include "blk-rq-qos.h"
- #include "blk-cgroup.h"
-+#include "blk-ioprio.h"
-
- #define ALLOC_CACHE_THRESHOLD  16
- #define ALLOC_CACHE_MAX                256
-@@ -1069,12 +1070,21 @@ EXPORT_SYMBOL_GPL(bio_add_zone_append_page);
- void __bio_add_page(struct bio *bio, struct page *page,
-                unsigned int len, unsigned int off)
- {
-+       int class, level, hint, activity;
-+
-+       class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-+       level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-+       hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
-+       activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-+
-        WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-        WARN_ON_ONCE(bio_full(bio, len));
-
-        bvec_set_page(&bio->bi_io_vec[bio->bi_vcnt], page, len, off);
-        bio->bi_iter.bi_size +=3D len;
-        bio->bi_vcnt++;
-+       activity +=3D bio_page_if_active(bio, page, IOPRIO_NR_ACTIVITY);
-+       bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_ACTIVITY(class, level,
-hint, activity);
- }
- EXPORT_SYMBOL_GPL(__bio_add_page);
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1fafd54dce3c..05cdd3adde94 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2939,6 +2939,26 @@ static inline struct request
-*blk_mq_get_cached_request(struct request_queue *q,
-        return rq;
- }
-
-+#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-+static void bio_set_ioprio(struct bio *bio)
-+{
-+       int class, level, hint, activity;
-+
-+       class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-+       level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-+       hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
-+       activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-+
-+       if (activity >=3D bio->bi_vcnt / 2)
-+               class =3D IOPRIO_CLASS_RT;
-+       else if (activity >=3D bio->bi_vcnt / 4)
-+               class =3D max(IOPRIO_PRIO_CLASS(get_current_ioprio()),
-IOPRIO_CLASS_BE);
-+
-+       bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_ACTIVITY(class, level,
-hint, activity);
-+
-+       blkcg_set_ioprio(bio);
-+}
-+#else
- static void bio_set_ioprio(struct bio *bio)
- {
-        /* Nobody set ioprio so far? Initialize it based on task's nice val=
-ue */
-@@ -2946,6 +2966,7 @@ static void bio_set_ioprio(struct bio *bio)
-                bio->bi_ioprio =3D get_current_ioprio();
-        blkcg_set_ioprio(bio);
- }
-+#endif
-
- /**
-  * blk_mq_submit_bio - Create and send a request to block device.
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 12e9a71c693d..b15bff481706 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2832,6 +2832,12 @@ void submit_bh(blk_opf_t opf, struct buffer_head *bh=
+>=20
+> > Signed-off-by: Shin'ichiro Kawasaki<shinichiro.kawasaki@wdc.com>
+> > ---
+> > This patch will allow running the blktests test cases block/010 and blo=
+ck/022
+> > using the built-in null_blk driver. Corresponding blktests side changes=
+ are
+> > drafted here [1].
+> >
+> > [1]https://github.com/kawasaki/blktests/tree/shared_tags
+> >
+> > Changes from v1:
+> > * Removed unnecessary global variable initializer
+> >
+> >   drivers/block/null_blk/main.c     | 38 ++++++++++++++++--------------=
+-
+> >   drivers/block/null_blk/null_blk.h |  1 +
+> >   2 files changed, 21 insertions(+), 18 deletions(-)
+> >
+> > diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/mai=
+n.c
+> > index 36755f263e8e..1407d4e3452a 100644
+> > --- a/drivers/block/null_blk/main.c
+> > +++ b/drivers/block/null_blk/main.c
+> > @@ -69,6 +69,7 @@ static LIST_HEAD(nullb_list);
+> >   static struct mutex lock;
+> >   static int null_major;
+> >   static DEFINE_IDA(nullb_indexes);
+> > +static bool tag_set_initialized;
+> >   static struct blk_mq_tag_set tag_set;
+> >  =20
+> >  =20
+>=20
+> [...]
+>=20
+> > @@ -2124,7 +2129,13 @@ static int null_add_dev(struct nullb_device *dev=
 )
- }
- EXPORT_SYMBOL(submit_bh);
+> >   		goto out_free_nullb;
+> >  =20
+> >   	if (dev->queue_mode =3D=3D NULL_Q_MQ) {
+> > -		if (shared_tags) {
+> > +		if (dev->shared_tags) {
+> > +			if (!tag_set_initialized) {
+> > +				rv =3D null_init_tag_set(NULL, &tag_set);
+> > +				if (rv)
+> > +					goto out_cleanup_queues;
+> > +				tag_set_initialized =3D true;
+> > +			}
+> >   			nullb->tag_set =3D &tag_set;
+> >   			rv =3D 0;
+> >   		} else {
+> > @@ -2311,18 +2322,12 @@ static int __init null_init(void)
+> >   		g_submit_queues =3D 1;
+> >   	}
+> >  =20
+> > -	if (g_queue_mode =3D=3D NULL_Q_MQ && shared_tags) {
+> > -		ret =3D null_init_tag_set(NULL, &tag_set);
+> > -		if (ret)
+> > -			return ret;
+> > -	}
+> > -
+> >   	config_group_init(&nullb_subsys.su_group);
+> >   	mutex_init(&nullb_subsys.su_mutex);
+> >  =20
+> >   	ret =3D configfs_register_subsystem(&nullb_subsys);
+> >   	if (ret)
+> > -		goto err_tagset;
+> > +		return ret;
+> >  =20
+> >   	mutex_init(&lock);
+> >  =20
+> > @@ -2349,9 +2354,6 @@ static int __init null_init(void)
+> >   	unregister_blkdev(null_major, "nullb");
+> >   err_conf:
+> >   	configfs_unregister_subsystem(&nullb_subsys);
+> > -err_tagset:
+> > -	if (g_queue_mode =3D=3D NULL_Q_MQ && shared_tags)
+> > -		blk_mq_free_tag_set(&tag_set);
+> >   	return ret;
+> >   }
+> >  =20
+> > @@ -2370,7 +2372,7 @@ static void __exit null_exit(void)
+> >   	}
+> >   	mutex_unlock(&lock);
+> >  =20
+> > -	if (g_queue_mode =3D=3D NULL_Q_MQ && shared_tags)
+> > +	if (tag_set_initialized)
+> >   		blk_mq_free_tag_set(&tag_set);
+> >   }
+> >  =20
+> >
+>=20
+> The global variable tag_set_initialized is used to indicate if global=20
+> variable
+> struct blk_mq_tag_set tag_set is initialized or not, it only allow=20
+> tag_set to be
+> initialized once when dev->shared_tags =3D=3D true first time and in=20
+> null_exit() we
+> can call blk_mq_free_tag_set(&tag_set).
+>=20
+> One way to remove tag_set_initialized is to replace tag_set_initialized w=
+ith
+> global variable tag_set.ops with NULL check.
+>=20
+> This might work since in null_add_dev() when dev->shared_tags =3D=3D true=
+=20
+> for the
+> first time tags_set.ops will be NULL because it is only initialized in
+> null_init_tag_set() and for subsequent calls to null_add_dev() tag_set.op=
+s
+> will not be NULL, ensuring only one call to null_init_tag_set() with glob=
+al
+> variable tag_set.
+>=20
+> Unless there is any objection on using tag_set.ops, how about following
+> (totally untested) on the top of yours, that removes tag_set_initialized =
+?
 
-+int bio_page_if_active(struct bio *bio, struct page *page, unsigned
-short limit)
-+{
-+       return (bio->bi_vcnt <=3D limit && PageWorkingset(page)) ? 1 : 0;
-+}
-+EXPORT_SYMBOL(bio_page_if_active);
-+
- void write_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
- {
-        lock_buffer(bh);
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index 44e9de51eedf..9a374f5965ec 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -248,6 +248,7 @@ int bh_uptodate_or_lock(struct buffer_head *bh);
- int __bh_read(struct buffer_head *bh, blk_opf_t op_flags, bool wait);
- void __bh_read_batch(int nr, struct buffer_head *bhs[],
-                     blk_opf_t op_flags, bool force_lock);
-+int bio_page_if_active(struct bio *bio, struct page *page, unsigned
-short limit);
+Thank you for this idea. I think it is the simpler and the better.
 
- /*
-  * Generic address_space_operations implementations for buffer_head-backed
-diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-index bee2bdb0eedb..d1c6081e796b 100644
---- a/include/uapi/linux/ioprio.h
-+++ b/include/uapi/linux/ioprio.h
-@@ -71,12 +71,18 @@ enum {
-  * class and level.
-  */
- #define IOPRIO_HINT_SHIFT              IOPRIO_LEVEL_NR_BITS
--#define IOPRIO_HINT_NR_BITS            10
-+#define IOPRIO_HINT_NR_BITS            3
- #define IOPRIO_NR_HINTS                        (1 << IOPRIO_HINT_NR_BITS)
- #define IOPRIO_HINT_MASK               (IOPRIO_NR_HINTS - 1)
- #define IOPRIO_PRIO_HINT(ioprio)       \
-        (((ioprio) >> IOPRIO_HINT_SHIFT) & IOPRIO_HINT_MASK)
+>=20
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
+c
+> index 1407d4e3452a..3d69c7b9fa7f 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -69,7 +69,6 @@ static LIST_HEAD(nullb_list);
+>  =A0static struct mutex lock;
+>  =A0static int null_major;
+>  =A0static DEFINE_IDA(nullb_indexes);
+> -static bool tag_set_initialized;
+>  =A0static struct blk_mq_tag_set tag_set;
+>=20
+>  =A0enum {
+> @@ -2130,11 +2129,10 @@ static int null_add_dev(struct nullb_device *dev)
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0 if (dev->queue_mode =3D=3D NULL_Q_MQ) {
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (dev->shared_tags) {
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!=
+tag_set_initialized) {
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!=
+tag_set.ops) {
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 rv =3D null_init_tag_set(NULL, &tag_set);
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 if (rv)
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto out_cleanup_queues;
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 tag_set_initialized =3D true;
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nu=
+llb->tag_set =3D &tag_set;
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rv=
+ =3D 0;
 
-+#define IOPRIO_ACTIVITY_SHIFT          (IOPRIO_HINT_NR_BITS +
-IOPRIO_LEVEL_NR_BITS)
-+#define IOPRIO_ACTIVITY_NR_BITS                7
-+#define IOPRIO_NR_ACTIVITY             (1 << IOPRIO_ACTIVITY_NR_BITS)
-+#define IOPRIO_ACTIVITY_MASK           (IOPRIO_NR_ACTIVITY - 1)
-+#define IOPRIO_PRIO_ACTIVITY(ioprio)   \
-+       (((ioprio) >> IOPRIO_ACTIVITY_SHIFT) & IOPRIO_ACTIVITY_MASK)
- /*
-  * I/O hints.
-  */
-@@ -108,20 +114,24 @@ enum {
-  * Return an I/O priority value based on a class, a level and a hint.
-  */
- static __always_inline __u16 ioprio_value(int prioclass, int priolevel,
--                                         int priohint)
-+                                         int priohint, int activity)
- {
-        if (IOPRIO_BAD_VALUE(prioclass, IOPRIO_NR_CLASSES) ||
-            IOPRIO_BAD_VALUE(priolevel, IOPRIO_NR_LEVELS) ||
--           IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS))
-+           IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS) ||
-+           IOPRIO_BAD_VALUE(activity, IOPRIO_NR_ACTIVITY))
-                return IOPRIO_CLASS_INVALID << IOPRIO_CLASS_SHIFT;
+I think NULL should be set to tag_set.opts in case null_init_tag_set() fail=
+ed.
+So I think the hunk above will be as follows.
 
-        return (prioclass << IOPRIO_CLASS_SHIFT) |
-+               (activity << IOPRIO_ACTIVITY_SHIFT) |
-                (priohint << IOPRIO_HINT_SHIFT) | priolevel;
- }
-
- #define IOPRIO_PRIO_VALUE(prioclass, priolevel)                        \
--       ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE)
-+       ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE, 0)
- #define IOPRIO_PRIO_VALUE_HINT(prioclass, priolevel, priohint) \
--       ioprio_value(prioclass, priolevel, priohint)
-+       ioprio_value(prioclass, priolevel, priohint, 0)
-+#define IOPRIO_PRIO_VALUE_ACTIVITY(prioclass, priolevel, priohint,
-activity)   \
-+       ioprio_value(prioclass, priolevel, priohint, activity)
-
- #endif /* _UAPI_LINUX_IOPRIO_H */
+@@ -2124,7 +2128,14 @@ static int null_add_dev(struct nullb_device *dev)
+ 		goto out_free_nullb;
+=20
+ 	if (dev->queue_mode =3D=3D NULL_Q_MQ) {
+-		if (shared_tags) {
++		if (dev->shared_tags) {
++			if (!tag_set.ops) {
++				rv =3D null_init_tag_set(NULL, &tag_set);
++				if (rv) {
++					tag_set.ops =3D NULL;
++					goto out_cleanup_queues;
++				}
++			}
+ 			nullb->tag_set =3D &tag_set;
+ 			rv =3D 0;
+ 		} else {
 
 
->
-> > These white spaces are trimmed by vim, I will change them back in next =
-version.
->
-> vim doesn't do that by default.
->
+> @@ -2372,7 +2370,7 @@ static void __exit null_exit(void)
+>  =A0=A0=A0=A0=A0=A0=A0 }
+>  =A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&lock);
+>=20
+> -=A0=A0=A0=A0=A0=A0 if (tag_set_initialized)
+> +=A0=A0=A0=A0=A0=A0 if (tags_set.ops)
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 blk_mq_free_tag_set(&tag_s=
+et);
+>  =A0}
+>=20
+> any thoughts ?
+
+If there is no other comment, I will revise the patch with your idea and po=
+st v3
+next week.
+
+>=20
+> I've tested your original patch with blktests:block/010, it looks good
+> to me ...
+
+Thanks!=
