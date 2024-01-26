@@ -1,91 +1,88 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84A2171AB
-	for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 23:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FB1399
+	for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 00:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706224737; cv=none; b=KcTnrMpcIMh35x+EgZVTvEDZfHJT68qY5M13sxACuGpdI2mMu6ksq4IteOU2fhX5f2Yd7UV8odRYo51CWNIbQvtvi6vQQiJRRScU9Z/TY8BVsMONqSDzKLZ3q/baDRqnRrkZvnJbhIchvy+B4tav7eWybCVr+fmW1yBTanT+Ed4=
+	t=1706230235; cv=none; b=YbpsY0KlMv4oA4ICUgnUI18IdDZVD7sGHwo5zwIwVn9nLnFrdY/c/T95O2pWppMvJJ1wVnM24cD+t4k+vgKzd2lz4grcHVev4//0aSE2iOeS7JdvFPTTfDooAt9YDYhdEy3hnKwqD6CTEegTGVknH3NE78yktVlZE19S5SlGjfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706224737; c=relaxed/simple;
-	bh=7uvqzJiFOH7CqK9D/XE9qIcs6f8P8aqvGseDf75yXXM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NmwMjZXCuXUUTNzWrfYEOcidBhVA20m1wGv4X6ePRLx//agyXhdAQ1EqUpK3nYViHfLgr3ekzEOcc/IXGweim/cY5AsBBhPcvHCCTE2dzDd9j0aAXWx6uI3zbPvjANzMeMLKFJbFPkwKdew1f1AmqNiLryJ5MV0n/7/lrt05SRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZsSCs86a; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1706230235; c=relaxed/simple;
+	bh=aLWy7AJGcY/5dv+Meu+RHP02ccp+hiCSiIqjsspDQ14=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=no5jzGFPTySnNvNryTR/nCjuChuQZs6ZRkIoBRe1374kpFtnQadPohXHfhH04JAwbLm8TIRAL4OPpLuGbeELZGFMOW1J1cvhRfRP/twkFlTogu+gTRMlf+rzNgw/+/kIeJlY9Hm8sqk1OYdhcaS7CKM8eZIa3lQaxvGOuiEgNZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FLyLZemu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZsSCs86a"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6002317a427so39796627b3.2
-        for <linux-block@vger.kernel.org>; Thu, 25 Jan 2024 15:18:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706224734; x=1706829534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7uvqzJiFOH7CqK9D/XE9qIcs6f8P8aqvGseDf75yXXM=;
-        b=ZsSCs86a/S2lz8chareQY9wVV7h/sZwKG7z3FaRYk2qI7Plqd1cVedCVgy07OdHtrU
-         X823lr3pENXGI3wijqr7ejCytYOwlL1+WZkhRm4sIDQKWJYlOP9rCm4Jc5eWvzfTW/ox
-         Rxvh5eh1BJv+5PqtvNdEZ5Xk0zQxmLUnTQZ9efZGubshZFTVIGAFJkOMKCW5vbVxzH4y
-         ZmkL2gazF3rb9ejhMOw5D1B4TW1zRu28+bsv+fwyq8uyrhHEDrWJmF+J1ETDArQYkkKW
-         BtpnPhBRf7GnX2ju0BQPIm+r8F3HZ1KNuddnuiwRSbB9/U08aNnLjQZW3RbRT6mFVSgp
-         ty4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706224734; x=1706829534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7uvqzJiFOH7CqK9D/XE9qIcs6f8P8aqvGseDf75yXXM=;
-        b=ImCG0BsKZzQDLTND+tOtZX0wH4wiuP/uoApRcn7LNCuRGR81Csxf2g0ViCgjvP0GgE
-         aP9CJS04wIh+OlS6HbJl1qpPLKW70/zLdQaJ5N9DKnp9EZFdw5RjjPtxMM7n4uyRQXtZ
-         LhcHwZNyYHyr09l7+YnSGxiyV/AbFG88yey0ixULeKoKXTpNfXD+kRkfWE5KII6dODbL
-         HgvcrbiUMPan93CXebNNscn6j/QhdY48AnKp2KayO2ScDvB3otNQn2MktNKZ0Ih1eXm2
-         N8I3QoKSi8Y2UDCpnEOJk7PfZSNVtQLNR5T8/N78DZ5E7Rm96WfJvL+vCBvQE8rk7aQd
-         yPaA==
-X-Gm-Message-State: AOJu0Yxnv8ejjo79uaHMQ3xsI3+eSCNfDjnCOee9PaiqUYCOy0/q1sWt
-	M7ekLq2995mIEZdBTKJe8Z3afNN7tnLUjuluHfk9CTjjX4lF/n5HFV7QGL9HHOTt114FiKS7NIG
-	yVMYWtZVdBrqh8UL9lhacEHz/7i+uDtIUtQ8Rdw==
-X-Google-Smtp-Source: AGHT+IGYkPRYDSlscKRk4G+SfhQLgKGn3yOaS30O2gXXD5Tt9NYFdgvgNJQJQsN4IwIhaD5odaQS198rhu6R/5DbH+Y=
-X-Received: by 2002:a81:aa4c:0:b0:5ff:35f1:714b with SMTP id
- z12-20020a81aa4c000000b005ff35f1714bmr601737ywk.12.1706224734637; Thu, 25 Jan
- 2024 15:18:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FLyLZemu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63F04C433F1;
+	Fri, 26 Jan 2024 00:50:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706230234;
+	bh=aLWy7AJGcY/5dv+Meu+RHP02ccp+hiCSiIqjsspDQ14=;
+	h=From:To:Subject:Date:From;
+	b=FLyLZemu5xrTm4P7Ns0buDGJRhCp+FFEwNlRfkPLGRetHMl8lPXsP1kAYi9yQ5Jmn
+	 TjJ4KmW+5z+QZsnSTtwRX4kKWxDr3iyL0IiCuFPoUIUEJMwbCPp65TDVcW+MK5q+R7
+	 9xjczuMD7C/fk9Medsi8xSkN4O6MPa+WJZApsZOE6SPIgTFxbzkMOOHOpu8kHMq2IU
+	 iVYbe6UHSLYHQYw4Cw0JFm0Qn6AQBWxunBKup3L7DcTXQTI1+CY7XhrRQbJFULD6TF
+	 Ar+6OsFSmoAUnjnqGaMhfJuyYjIU12mZLnH4FNhQqcywVkdBKq4MDCvADa5DrpKLap
+	 Eg5upE1R2qqeg==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH] null_blk: Always split BIOs to respect queue limits
+Date: Fri, 26 Jan 2024 09:50:32 +0900
+Message-ID: <20240126005032.1985245-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125-mmc-proper-kmap-v1-0-ba953c1ac3f9@linaro.org>
- <20240125-mmc-proper-kmap-v1-1-ba953c1ac3f9@linaro.org> <7ca13324-ac47-4648-9b3c-c616de515625@app.fastmail.com>
-In-Reply-To: <7ca13324-ac47-4648-9b3c-c616de515625@app.fastmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 26 Jan 2024 00:18:43 +0100
-Message-ID: <CACRpkdZWrRCoG_HL4WxpcauP_ipvfekg3j67fUHewUuMxGzBeA@mail.gmail.com>
-Subject: Re: [PATCH 1/7] mmc: davinci_mmc: Map the virtual page for PIO
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Nicolas Pitre <nico@fluxnic.net>, 
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Angelo Dureghello <angelo.dureghello@timesys.com>, 
-	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>, linux-block@vger.kernel.org, 
-	Linux-OMAP <linux-omap@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 25, 2024 at 5:37=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
-:
+The function null_submit_bio() used for null_blk devices configured
+with a BIO-based queue never splits BIOs according to the queue limits
+set with the various module and configfs parameters that the user can
+specify.
 
-> I think to do this properly, the driver would have to
-> use struct sg_mapping_iter like the cb710 driver does,
-> but the conversion is not as simple as your patch here.
+Add a call to bio_split_to_limits() to correctly handle large
+BIOs that need splitting. Doing so also fixes issues with zoned devices
+as a large BIO may cross over a zone boundary, which breaks null_blk
+zone emulation.
 
-Ack, how typical, so that is what I write in the cover letter
-that I wanted to avoid but it seems there is no avoiding it then.
+While at it, remove all the local variable that are not necessary.
 
-It's a bit trickier but I guess I can pull it off, it better get some
-testing.
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ drivers/block/null_blk/main.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-Thanks Arnd!
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 36755f263e8e..514c2592046a 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1528,12 +1528,16 @@ static struct nullb_queue *nullb_to_queue(struct nullb *nullb)
+ 
+ static void null_submit_bio(struct bio *bio)
+ {
+-	sector_t sector = bio->bi_iter.bi_sector;
+-	sector_t nr_sectors = bio_sectors(bio);
+-	struct nullb *nullb = bio->bi_bdev->bd_disk->private_data;
+-	struct nullb_queue *nq = nullb_to_queue(nullb);
++	struct nullb_queue *nq =
++		nullb_to_queue(bio->bi_bdev->bd_disk->private_data);
++
++	/* Respect the queue limits */
++	bio = bio_split_to_limits(bio);
++	if (!bio)
++		return;
+ 
+-	null_handle_cmd(alloc_cmd(nq, bio), sector, nr_sectors, bio_op(bio));
++	null_handle_cmd(alloc_cmd(nq, bio), bio->bi_iter.bi_sector,
++			bio_sectors(bio), bio_op(bio));
+ }
+ 
+ #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
+-- 
+2.43.0
 
-Yours,
-Linus Walleij
