@@ -1,70 +1,97 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5D21DFED
-	for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 14:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445532232D;
+	Fri, 26 Jan 2024 17:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706279251; cv=none; b=bqJDOhQ9Q34MAqo3DBwq13XkllybHkbhrEhh7JS1klqL78N6UuzwOdza0YFPvJmhNbhrIsN4woS/9OH+EUm4QtmoZSEGJxWRvbvjfZZJTstThSThy7vfX7nS9yy1rLYB/V7EBeZRVt+DYbuJ41+1lxcNDnzhVWcLVemknHBdDzg=
+	t=1706290206; cv=none; b=L5YvgZjs770hr3tZmtODHg5gAj7dOKu0ac/byP00eN1b4geL7ZVfyc4vJhoxBOsHqJLnySm2quOzKkAVsa0Qmt705was782T0lkULPNJatUaK3p7Q1LDCNlsSrWwbYlph2HpQK9hiXuD7+l0xC29z/THstn1aoPnRf3VB80e7yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706279251; c=relaxed/simple;
-	bh=9J7ZnHQwVtLZUgl5e1iKAl1KwZVGp07AxNsLfROdmN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uxqc7nHnafhO55i+BgiIBEF584akCgxZ54/R8F5P3G4TbN5bA4Vzdcl+SJJKgEAcazXpOP6ciF5lVzpoC0PGGEKohuWw6VPnvSqnTZu8PSq0K3it+5vyCmVIaw/uGcyRGKw8Ou4PcufLydTxrDXq4j0OIX1vqbaGKHJe8p95FMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=R+kY5Ha4; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1706290206; c=relaxed/simple;
+	bh=AY8Cks8zfkNSy5SPyTgmyBUVqOof+a8pLzc/7ONF3ao=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tO008iGdDgwW2UsvOL6xI0dD8oonNyeMrNQM/Yd6SuS0udpyHQWKwKl/jDobxLwwNg5xzxM9CKAOXYGMknR0dbPph9AfyjuXn7Gx/NFn94rhEvnZtvPdTy1VtFrz9iGTPSlz4koV+00K+zdChgVYJn/5aISnMqySDurzbIT6TVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bGdeKoUW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tuzagaiU; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R+kY5Ha4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ZN2YnUJrp3qMh6mKwaRoSrB5jt+h3BuIMtx6+7Ae6Zk=; b=R+kY5Ha4+KY3CAjvUGxpjwLINv
-	ix+AYlT641Bs7UcK8h8IpFwslqWctK698Vm8iyg8JvnB6xibbCaUqVCEJ64F6fCZzywG8mZg05Z15
-	2wzoV3Z4aaa7lU9y7qT+3iOP3fNq0oqDRYBBN/OT5i8QOTqt6MmZO9NJIx+f6fGz2rz7KUUlZkItr
-	xFelGLVysdrjuQTPmHJnfilQ+FDs2mucjZQIbPFDUjeMq81T6TH53t/6UaV+FGQrtnkwBlA+Rmx59
-	MDbn87xeiwjXoZbBNmKZ8hXGp70ue+z+lva9Yuz9hwyBKTZWNsJGrm3zg23m/In56YoTcCDeXr8HD
-	vjazLIBg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rTNB1-00000004Krh-49V0;
-	Fri, 26 Jan 2024 14:27:29 +0000
-Date: Fri, 26 Jan 2024 06:27:27 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] null_blk: Always split BIOs to respect queue limits
-Message-ID: <ZbPBTzxu-NWTU7Q8@infradead.org>
-References: <20240126005032.1985245-1-dlemoal@kernel.org>
- <84dce2ee-5d71-47a4-b114-3ca69b3c31fb@suse.de>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bGdeKoUW";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tuzagaiU"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1706290203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y16NGcUWXAd/jpol4Aw++3XVEwkU5CL0GFzr1MU53XY=;
+	b=bGdeKoUW9WdLqEtKEsxkWkPluiF27VXCxZSKAv3EF91of84hHPJu/t+7B9mlIfqDmwyhVQ
+	5Wy0Ak8LYkBMFC536ObQrarSAFKXlxaX18tfj4mZezpiUfaQdkDMG9wQCtqs11xhoOwLv7
+	pA8thEtSPHwm3lmTvJ07FPxtZYE52z+dy31Yz3fjNkM6LKIgSZ5nuds6Q52aKp/nVmBSyY
+	+spk4CBBiK/sbO9HcOKfH2EIVtfT4fH6iY90wZoZZeksjxdCmGo7r0pBec73lzMMxFQhVc
+	xpFa/bEbvEtI2gao8tw9CtiPgX/FYFPnpnN4YzjNzl3kjaWgFj/y/mmB8OSJKQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1706290203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y16NGcUWXAd/jpol4Aw++3XVEwkU5CL0GFzr1MU53XY=;
+	b=tuzagaiUxCjRffYVMgp6n3kaVE2tR+Ydl0coEnXTNFJKMgQQ2tLfSrtS+THdp+B8unTwvq
+	SjL+Cz4iYZ9oxJBQ==
+To: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org
+Cc: kernel_team@skhynix.com, torvalds@linux-foundation.org,
+ damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+ adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com,
+ peterz@infradead.org, will@kernel.org, rostedt@goodmis.org,
+ joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+ duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+ willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+ gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org,
+ akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
+ hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
+ jglisse@redhat.com, dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+ rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+ linux-block@vger.kernel.org, josef@toxicpanda.com,
+ linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+ jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+ djwong@kernel.org, dri-devel@lists.freedesktop.org,
+ rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+ hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
+ gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
+ boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
+ her0gyugyu@gmail.com
+Subject: Re: [PATCH v11 14/26] locking/lockdep, cpu/hotplus: Use a weaker
+ annotation in AP thread
+In-Reply-To: <20240124115938.80132-15-byungchul@sk.com>
+References: <20240124115938.80132-1-byungchul@sk.com>
+ <20240124115938.80132-15-byungchul@sk.com>
+Date: Fri, 26 Jan 2024 18:30:02 +0100
+Message-ID: <87il3ggfz9.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <84dce2ee-5d71-47a4-b114-3ca69b3c31fb@suse.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
 
-On Fri, Jan 26, 2024 at 08:05:21AM +0100, Hannes Reinecke wrote:
-> > BIOs that need splitting. Doing so also fixes issues with zoned devices
-> > as a large BIO may cross over a zone boundary, which breaks null_blk
-> > zone emulation.
-> > 
-> That feels so wrong. Why would we need to apply queue limits to a bio?
-> (Yes, I know why. We still shouldn't be doing it.)
+On Wed, Jan 24 2024 at 20:59, Byungchul Park wrote:
 
-Because a driver that has limits should enforce them.  Your hardware
-doesn't suddenly use limits because you're using a bio based driver,
-and null_blk shouldn't suddenly ignore the configured limits just
-because you're using it in bio mode.
+Why is lockdep in the subsystem prefix here? You are changing the CPU
+hotplug (not hotplus) code, right?
 
-The patch looks good:
+> cb92173d1f0 ("locking/lockdep, cpu/hotplug: Annotate AP thread") was
+> introduced to make lockdep_assert_cpus_held() work in AP thread.
+>
+> However, the annotation is too strong for that purpose. We don't have to
+> use more than try lock annotation for that.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+This lacks a proper explanation why this is too strong.
 
-But yeah, I'd rather kill the bio mode.  Jens, are you attached
-to the bio mode?  Otherwise I'll cook up a patch over the weekend.
+> Furthermore, now that Dept was introduced, false positive alarms was
+> reported by that. Replaced it with try lock annotation.
+
+I still have zero idea what this is about.
+
+Thanks,
+
+        tglx
