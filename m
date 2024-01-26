@@ -1,372 +1,153 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5454C612CF;
-	Fri, 26 Jan 2024 08:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706256004; cv=none; b=gY2jBLb2xSQsvaufuaXLko3IEeos8FVltqev6+8sny/Hwk396C8FmcoEJSLSNcZmKJR4xayR29I+Jowv9W5VENWkOomNX0e1EqDPU2AksKJg/H5Z/o4MiQEAHSQg7iYd2MbdFUxAjuN2BgusNOa5w5U5obGTfDoSHHrnjt4uw2U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706256004; c=relaxed/simple;
-	bh=o9UrlAal6G/S30iXQfnVq2nuTTFQ/4b02ogSKoB6WBU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H14W4rtSCnKQaGL76U99bDxccqVCtklqt1XyJL9o8GkVxMHoBMxu5ShCwsz/+9R6fxyMdNQggr0h+07FIZ3gw7K+iAPZNM3GcU4RhfEBywjtKb8JlRDLXCTCOJ6pCiYrNoGvCwrbHB8lUr3ndgXpvvy/97B9oNR8zhFJ0ZTSceQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TpCt1fl9; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FB81A71F
+	for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 08:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706258242; cv=fail; b=mYebTOjqVB/wOCIRuL4J6NNihF9vQ4IM8sojypy/D3e7tJlEgbu3pU03V2kByMv6SqVaNIt/z9EYwMh7bx+yk+w9iP+gPqDNji8kk+NCZfzNnfxGusnwWbN+uM1UdGAycNhVyJvI+d5hZj1UXY8jFHCgNSOHqyO9h8yyFymotyM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706258242; c=relaxed/simple;
+	bh=nC3Vx+3iNnNiWVh3I9+8g3T6e8lZ6rrdJ4okVTQduD8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kdmJBaMlIsddUO3sJGR+OlxXBHkduU/WccfdDJoiumwLfXscy8nbUl6WzUCEwrS+SGtdMWA9Gh5WGqmRfqd1noJJcz7Q3gqxJ3oGV/QHIagWPlbZis612SMOVIgJw3VWpcMeqPYdRRnv+OyQBVNlWT0kFhRACVAH3yteGKk/l5I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JX6KVLgY; arc=fail smtp.client-ip=40.107.243.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TpCt1fl9"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51005675963so554768e87.0;
-        Fri, 26 Jan 2024 00:00:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706256000; x=1706860800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/8hqt2SFHfJ4q86HFT49vy1zOoWWvxgjVKCrnK0jkDQ=;
-        b=TpCt1fl90zR69h8nJqU3s3NTg9A6eXcV0E91mqQcFFtpyV8uQDYMFGj8HYd7UCOkTf
-         3LfU6xMKjc8eGldgFGrDkaFUGw7c2ZCayo1Vj8sDj81/PwP5tN2FP2iZrCQRLdMZ1vyZ
-         79P21548woaiWQQy9wb8SkWVT3j1IhEtTC2Vpu/RXaPo7SHxVVGyv5hxqPkMq8gSAKkQ
-         0KLzjHTx9KXCbWz01d0ESaKqoyp6INxiCO5sTQB+kplCqqj4vPME7gIp5c3Y0XClbD9r
-         lygcSd8vNaJkj6/vC/DKrWNiBkTAvi1KtpS2ePvdEuxGfPD0SnQFXN56y2cAKliFKBNU
-         Sk/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706256000; x=1706860800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/8hqt2SFHfJ4q86HFT49vy1zOoWWvxgjVKCrnK0jkDQ=;
-        b=FmTL5eVRPiTkFR4FqqDvDNWvA2mUiKdRq05XvEM8KlaGL6iMlJsrqmcnkdTMn+OuBk
-         O1vCgnECZcVeoO4LYEw8IELP1HNtsqIae/kyrAToiexrj9suBdnlXxWpT2WskhjVh2YT
-         sPENs+K7MfedC3wN/eKOoApoORV7RK/9I1nnUcXlt4X1UPYcL14GmKHkhGORW4nRuZwQ
-         ySkhvrl8NXd3LhOKT2ZIG5aXtoKTC5fngxZgAbU1ZGJwCb+Jn0Z/GfH9GghUWHIN3wd+
-         EJcej24BlgfXztSKHXqViyKS3u8gzJRrZTyTDXNNryE+6FF5US8dHSyNzRb4bOHs9zJ5
-         QC8A==
-X-Gm-Message-State: AOJu0YwgcEVz9IBKDFuKbh89YHYT6/rg0fvlfCOXBr5pxRbgltaZszi3
-	v2BDu/F+DaWyh/BZj8/RcRWsPNEw9xmKlL0B/hJrxzPD/UbHsjixNfRF/ofE4RpH31U9aGxNpyP
-	YSsEp1Ij1+OhkgMZ9+0VCzyHoobo=
-X-Google-Smtp-Source: AGHT+IHCgCuxb4c2ngXVrYMFx9oVSfgBF9mfeeCBMXL3orNFZBA2hzGGkT7mfAZ9oxWspVLQvpi/MzClMoasYmg7sck=
-X-Received: by 2002:a19:ad08:0:b0:510:11de:c384 with SMTP id
- t8-20020a19ad08000000b0051011dec384mr325378lfc.55.1706255999939; Thu, 25 Jan
- 2024 23:59:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JX6KVLgY"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=muAzOkQD5gdAys8qIbWZ7n7PbfYVClOJa9mu+EQMtDvXFIuVrpiUgZca/0dDVZBc/MOqrmaQjtwDJY/R3ErjbDu08Iu1/q8tmeK7+H+qAHZJP9hm4loLRcquUtFWxH2ViqplBbhEeKb7LYP9INNEAjYC22CjN41yEb5xTW/crzjnxPe4pJxaDHHaEmuHd+Bsxp5WQmBYs2AWrNpTtJfvNfi3Z1/CC1YGKi764QaLrwAo61l3BF7z+chK56AZxKT9j2P/IV3ju5apB8xHdHIfrwtbwSWfglIXTRjRgurpGWo22aoJu/WuKb00pZxSlRuRIJyJnwG3aqXlRM14JsAPEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nC3Vx+3iNnNiWVh3I9+8g3T6e8lZ6rrdJ4okVTQduD8=;
+ b=LPQoBhB+UguY/ciWe/6BEgnCCgBLgrnFsZ7h+DLJy8aEnRCZWwwqZhUV2RpAFyeGgfgLPsK4WJxNsxZXp8OBg8VqmEkbGLQUuI8VARoXwjKJ7/iINY1D4qXbkVSeUywxr39Wnz6l5VRZwWoZC3Y0oj6KzVdNhWNxlNZW4088GJKWc1ihD0LpCqOpg85nJBzCCl2EQxd9Od4HJu2qgCeZ9B4y2AX9FcKdK0RjmjTUc+DqrBD9h0STT14br4krxZpH+ndA9dmLemNJhU8y0TZuD2klWel9oj2jeXqqImKY2iwxJPH2Koi8gZHx2s9HR1Y/5ZO9eU2ZKxQXcQ362UieHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nC3Vx+3iNnNiWVh3I9+8g3T6e8lZ6rrdJ4okVTQduD8=;
+ b=JX6KVLgYxOEAA2Qe/EqEZfmW0MH4O9XBUjrQTf95LsRJqWrHh5Miwr7Su0ZXNtuGVBsXXru3cY1F5D9se7yyZM2R5SS4Y0IpwsRIVTD5nFKIKS/gWVsJAaC2S05zMi8GmMW9f/5xidyuf1HHXKClrOyt6+OTheYQURFW5Y8yeEN+3H/hcxZAREGIeX6h0KfK7STIOs00NlB5pzRVks+nWcyXxBoyLg8ou6EUoyKUjqrtkWzJJP0iFOQkLhVhQkXjnW0n1GUMk9zO4ZoI9xdjr0VGjuXjxLR+g+5F9pUrAspfhxvvEXgFYIMBnBeodFKJpzo0fGqH9WImhbtPXs3GUg==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by SA1PR12MB7248.namprd12.prod.outlook.com (2603:10b6:806:2be::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.37; Fri, 26 Jan
+ 2024 08:37:18 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed%4]) with mapi id 15.20.7228.027; Fri, 26 Jan 2024
+ 08:37:18 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>
+Subject: Re: [PATCH] null_blk: Always split BIOs to respect queue limits
+Thread-Topic: [PATCH] null_blk: Always split BIOs to respect queue limits
+Thread-Index: AQHaT/G6xCRQH27V9EOFj2KStGm7CrDrwUaYgAAEk4A=
+Date: Fri, 26 Jan 2024 08:37:18 +0000
+Message-ID: <b21b781d-36d8-4f5a-824e-5a7f98b3f627@nvidia.com>
+References: <20240126005032.1985245-1-dlemoal@kernel.org>
+ <84dce2ee-5d71-47a4-b114-3ca69b3c31fb@suse.de>
+ <89fcb470-2e21-43a3-a428-000e1c6ab706@kernel.org>
+In-Reply-To: <89fcb470-2e21-43a3-a428-000e1c6ab706@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SA1PR12MB7248:EE_
+x-ms-office365-filtering-correlation-id: 78037a41-0211-4fbd-1601-08dc1e4a0176
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ o1vx619EfxOK9up/W7qsHJAQuf5K8YuITySdNXEJrVWjL6Ys5kkrtv6DnHCyxh6OGBc4NU1DETWPE+ImpwYv2zLJLCJt87Nn+m1Y3j13X5SFZ2cFOQgGZ67SlQVrWaHELQ6sYTLPtjL2vR+n4pTenzg7NuKxkALEF409dTI7eiHIecSRt0CPKIFqlESZXSpkFAJnonkm8HZYufKDpEWO51zeZ7xwkFjhkgHq9XD4um2+OwQm8k308kALoEr8Yx0HliAipAv/7Azy07ZDTx7BCjZf/Rk7zChXKZmOC96mHUzJsl/lBZ2d+AdH6ZHNH+LogYZdJvKXYItlUP2tgT7HzezWKX/VpWAAk5NaH/6c5kEOaX4gyDzBtILAdBerOHhT0If3ser2TMbrcD4p7Hn4YPA1e9L+OsGQSXmdG0ZuRBZaa1HOH/6ACTyW0xWoxTpXxI8mujchGG0VRoSvjAG7K6f6NQj36+hDlZQDH7dx21FczYPorSKI2c/spnMnxbUyJKbfx+FGhnIDSImAJU/2GguUeJNpICuMt9zOi0fjKlMFwqMD/eXKHOGvmqwttkHnScNz+7M6qPV0xo6NFt9zngXD9WXZZ3bGicsuH/aOP7eMeDG24l174ARUVajL43EipjKTd0GqdPZ7R3V/kE0n5Aav//PpyTdBClAbjrdEia7iuZejwSs4N9Rj0UHVtqCx
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(376002)(136003)(39860400002)(396003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(2616005)(83380400001)(66476007)(26005)(38100700002)(6512007)(54906003)(122000001)(53546011)(41300700001)(8676002)(4326008)(2906002)(76116006)(5660300002)(66556008)(71200400001)(110136005)(316002)(478600001)(66946007)(64756008)(66446008)(6506007)(31696002)(8936002)(91956017)(36756003)(38070700009)(86362001)(6486002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?RUxqV0tCTXBhc0s2WVMxakJBbTJFenZVdkYwdWN5clNTNEwxTFpXd2RneEVp?=
+ =?utf-8?B?RmdBTndVOXhhU3hkNWMxZGlPbkhzKzg5WHFOQ1lyVWd2RTIwMWRmd0pLdlM5?=
+ =?utf-8?B?TzJTT2Vsc0x0eGtxeVkwc0JlREVwSmprZ2VrZkM5enRzNmRYTlRYd3doVm91?=
+ =?utf-8?B?anVKMkZLYkwzZjBQWEVGVlJNUHg2d2NoVzN1ZEdycHJiTEdibVoxUjhLTTBU?=
+ =?utf-8?B?clpIN2hya1pIMUU1ajM2RDdIdVUrUWM5QmxoQmxyaHhiSkRTTWhndGY1N2pF?=
+ =?utf-8?B?d21vYml2Vlc5dVR3Uno2cUFGK0dLbTFZL205OVAvMkd3UmFXdUlMaFI1VlVY?=
+ =?utf-8?B?dEhSMzRYZVBtZFZrZEtpbWpNZnAydkF6Qkd4b2RPU2R4Z1h4RVIxZHRTSUNO?=
+ =?utf-8?B?N2dVMmNUdTdJaGZBRTczQU8rWFlaaGxGbmZqWXYxakRXZHJVRmlMYkxIYmgx?=
+ =?utf-8?B?VVFBNXhXY1pNcThKZkN4Wm1Eb1ppV3pLYnBkbnVXSjdCTU1nS2RFNHk4SjFS?=
+ =?utf-8?B?L1FLZExhMjlaZW1NOTdYaFFueDRnMXBGSGpqSlFscEVMdjladHpobWpackZY?=
+ =?utf-8?B?eXJ0ZlV6VzRJcGw0WHZDNlNWNzZFdTJ0WTJvMkcvSVgrQVJKTU4rdWVzaVh0?=
+ =?utf-8?B?eVd6d2Y2aHd6aGo4RHJ6dHZaUTNUQVZhd3NrUGF0QzBZRXR4QmNnWXhDMElC?=
+ =?utf-8?B?RGkxME5NQmFZQnhtMmUrMUdkcXVRaDI4T2lNMDA5djV4SU1vZmR3dTZudFg1?=
+ =?utf-8?B?clZRdyt1OUIyam9kSmU5TDl4YWs3dlc4TXR4RTNDL25CR0JYcnhwbC9UQjhK?=
+ =?utf-8?B?MlNYMzBEQmpXWEoyWlZZM2hoUFRUbXFJZm92Vm1oR2Nkb2E5ZWltcE1JOXlp?=
+ =?utf-8?B?R1hNY3RYOTVBemE0ZGEyanV3dm9Kdm0xa3Y0cGs3b1NPNDdES2l4ZHN2dDNq?=
+ =?utf-8?B?cHN1R0ttak04c0Z0QitobXFUaUxMQUVvRWF1YVlWZ2hleEorVkYzeDZzcU5z?=
+ =?utf-8?B?YWgyaWpQaTdvTjk0d29xeWVEVDRWVDFjU2NBR29nd21aTE9MZEd3RERtbW5a?=
+ =?utf-8?B?d21wUXJMSDYvL01QWERPN2QyS2o2TVZyTnFLWXM1QVN6VCtyQjNvUjJObUxp?=
+ =?utf-8?B?bDFCSE5MNExGZVVaOW8xZWxnQmErMmsydFU2RmJrNmVYc3ZzTkJKUEV5MWpt?=
+ =?utf-8?B?TWpBWFEweGt5YUVDY2JTYnlZem8wTjhzYUVnQ1l5NzhMWndOMTlvWE1NR0h3?=
+ =?utf-8?B?Q3RBK0RqYzMxSVA4bXdsdmErcnd6WkN6YVpwdmR2V1NrcU1JQVYyL0pIMEx6?=
+ =?utf-8?B?RENFS2J3TWRVNjZFV2s5YUVSbSt0MmpQV0ZyQWdxOUlHZGVtVGNLVmhPUHVW?=
+ =?utf-8?B?YS9yUkhMVnlqWTVkZm5WUUpZalV5c0Y1eE9UZVkvYnpkUk9iUFJPVS9Xck15?=
+ =?utf-8?B?K3JPbTRaRnpzNitaZDlKOFM2bWxmVnkwTkhnY2thV0ZYMExHQzU4YjZrS21l?=
+ =?utf-8?B?WkoxOFZtd1FuY2lybFFhMjNFY0o4L1IzQThvOEtubGtSZVdHbnI2TTZWTnRN?=
+ =?utf-8?B?cDU1OTl6WFJSYmlSY0ZwWFg1L1F2YzNQY1EwM0FVT2RLb2RVak9JcnVWa0Q1?=
+ =?utf-8?B?VTR2K3V5UkRqa29OY0dVY3RWRVo1Ty85UEpuK2NCMUw0N1E4MThZS1FZYjd1?=
+ =?utf-8?B?TzN0dS9zZ002dzhuR0pmTEQrLzVpMnQxT2t6REh3eVN6YjJFMFoxTmtVK2kr?=
+ =?utf-8?B?MVJWTGlJbjZ2QldOZVBoT1V1czBlbFNPcjR0aXJEbFNMMkJ0WFlldGRSb09R?=
+ =?utf-8?B?OXp5RDRHeGh0dTljdG5wT3UwcWZVVHcwNEkrUHRjWXpzUlo3QnQrYThGVXE2?=
+ =?utf-8?B?Ty8xZWpFVXhBN2R5ZUk3Yk9KVVEzRjJ6bVhKODRHU0piL3JLNDdDKzJ5RG9r?=
+ =?utf-8?B?T3F2WlZ0V3B3VjBaa3FnM3V3ai90b3ZOR05LQjNjR2dCbnNsMGs2OG40dk1z?=
+ =?utf-8?B?YzdTbXRxNzduNWIxRU91ckg1ZjJ2WUExS3drNU80UmZVRnlaNEEzSVBNR29R?=
+ =?utf-8?B?VjFGZzBwUTE1SnZJQkZlVS8zN295M2tURlJDRUNlTFZISWxNdFNRMDJnNU1P?=
+ =?utf-8?Q?xRZWkVN4iFrjech3hndDOJ0Df?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2CE6D292D3009345BBC22F549F7A3521@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125071901.3223188-1-zhaoyang.huang@unisoc.com>
-In-Reply-To: <20240125071901.3223188-1-zhaoyang.huang@unisoc.com>
-From: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Date: Fri, 26 Jan 2024 15:59:48 +0800
-Message-ID: <CAGWkznGpW=bUxET8yZGu4dNTBfsj7n79yXsTD23fE5-SWkdjfA@mail.gmail.com>
-Subject: Re: [PATCHv3 1/1] block: introduce content activity based ioprio
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Matthew Wilcox <willy@infradead.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	linux-fsdevel@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, 
-	Yu Zhao <yuzhao@google.com>, Damien Le Moal <dlemoal@kernel.org>, 
-	Niklas Cassel <niklas.cassel@wdc.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, 
-	Hannes Reinecke <hare@suse.de>, Linus Walleij <linus.walleij@linaro.org>, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	steve.kang@unisoc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78037a41-0211-4fbd-1601-08dc1e4a0176
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2024 08:37:18.0446
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 29uKF824Jq+t3091ewhPcXwclPw57U8/z4UblE5a54aZeDLmjN2ocAWErpzZ+sskl1DZ8ksROPkQh4KxM5P1Cg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7248
 
-loop more mm and fs guys for more comments
-
-On Thu, Jan 25, 2024 at 3:22=E2=80=AFPM zhaoyang.huang
-<zhaoyang.huang@unisoc.com> wrote:
->
-> From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
->
-> Currently, request's ioprio are set via task's schedule priority(when no
-> blkcg configured), which has high priority tasks possess the privilege on
-> both of CPU and IO scheduling.
-> This commit works as a hint of original policy by promoting the request i=
-oprio
-> based on the page/folio's activity. The original idea comes from LRU_GEN
-> which provides more precised folio activity than before. This commit try
-> to adjust the request's ioprio when certain part of its folios are hot,
-> which indicate that this request carry important contents and need be
-> scheduled ealier.
->
-> This commit is verified on a v6.6 6GB RAM android14 system via 4 test cas=
-es
-> by changing the bio_add_page/folio API in ext4 and f2fs.
->
-> Case 1:
-> script[a] which get significant improved fault time as expected[b]
-> where dd's cost also shrink from 55s to 40s.
-> (1). fault_latency.bin is an ebpf based test tool which measure all task'=
-s
->    iowait latency during page fault when scheduled out/in.
-> (2). costmem generate page fault by mmaping a file and access the VA.
-> (3). dd generate concurrent vfs io.
->
-> [a]
-> ./fault_latency.bin 1 5 > /data/dd_costmem &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> dd if=3D/dev/block/sda of=3D/data/ddtest bs=3D1024 count=3D2048000 &
-> dd if=3D/dev/block/sda of=3D/data/ddtest1 bs=3D1024 count=3D2048000 &
-> dd if=3D/dev/block/sda of=3D/data/ddtest2 bs=3D1024 count=3D2048000 &
-> dd if=3D/dev/block/sda of=3D/data/ddtest3 bs=3D1024 count=3D2048000
-> [b]
->                        mainline         commit
-> io wait                836us            156us
->
-> Case 2:
-> fio -filename=3D/dev/block/by-name/userdata -rw=3Drandread -direct=3D0 -b=
-s=3D4k -size=3D2000M -numjobs=3D8 -group_reporting -name=3Dmytest
-> mainline: 513MiB/s
-> READ: bw=3D531MiB/s (557MB/s), 531MiB/s-531MiB/s (557MB/s-557MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30137-30137msec
-> READ: bw=3D543MiB/s (569MB/s), 543MiB/s-543MiB/s (569MB/s-569MB/s), io=3D=
-15.6GiB (16.8GB), run=3D29469-29469msec
-> READ: bw=3D474MiB/s (497MB/s), 474MiB/s-474MiB/s (497MB/s-497MB/s), io=3D=
-15.6GiB (16.8GB), run=3D33724-33724msec
-> READ: bw=3D535MiB/s (561MB/s), 535MiB/s-535MiB/s (561MB/s-561MB/s), io=3D=
-15.6GiB (16.8GB), run=3D29928-29928msec
-> READ: bw=3D523MiB/s (548MB/s), 523MiB/s-523MiB/s (548MB/s-548MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30617-30617msec
-> READ: bw=3D492MiB/s (516MB/s), 492MiB/s-492MiB/s (516MB/s-516MB/s), io=3D=
-15.6GiB (16.8GB), run=3D32518-32518msec
-> READ: bw=3D533MiB/s (559MB/s), 533MiB/s-533MiB/s (559MB/s-559MB/s), io=3D=
-15.6GiB (16.8GB), run=3D29993-29993msec
-> READ: bw=3D524MiB/s (550MB/s), 524MiB/s-524MiB/s (550MB/s-550MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30526-30526msec
-> READ: bw=3D529MiB/s (554MB/s), 529MiB/s-529MiB/s (554MB/s-554MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30269-30269msec
-> READ: bw=3D449MiB/s (471MB/s), 449MiB/s-449MiB/s (471MB/s-471MB/s), io=3D=
-15.6GiB (16.8GB), run=3D35629-35629msec
->
-> commit: 633MiB/s
-> READ: bw=3D668MiB/s (700MB/s), 668MiB/s-668MiB/s (700MB/s-700MB/s), io=3D=
-15.6GiB (16.8GB), run=3D23952-23952msec
-> READ: bw=3D589MiB/s (618MB/s), 589MiB/s-589MiB/s (618MB/s-618MB/s), io=3D=
-15.6GiB (16.8GB), run=3D27164-27164msec
-> READ: bw=3D638MiB/s (669MB/s), 638MiB/s-638MiB/s (669MB/s-669MB/s), io=3D=
-15.6GiB (16.8GB), run=3D25071-25071msec
-> READ: bw=3D714MiB/s (749MB/s), 714MiB/s-714MiB/s (749MB/s-749MB/s), io=3D=
-15.6GiB (16.8GB), run=3D22409-22409msec
-> READ: bw=3D600MiB/s (629MB/s), 600MiB/s-600MiB/s (629MB/s-629MB/s), io=3D=
-15.6GiB (16.8GB), run=3D26669-26669msec
-> READ: bw=3D592MiB/s (621MB/s), 592MiB/s-592MiB/s (621MB/s-621MB/s), io=3D=
-15.6GiB (16.8GB), run=3D27036-27036msec
-> READ: bw=3D691MiB/s (725MB/s), 691MiB/s-691MiB/s (725MB/s-725MB/s), io=3D=
-15.6GiB (16.8GB), run=3D23150-23150msec
-> READ: bw=3D569MiB/s (596MB/s), 569MiB/s-569MiB/s (596MB/s-596MB/s), io=3D=
-15.6GiB (16.8GB), run=3D28142-28142msec
-> READ: bw=3D563MiB/s (590MB/s), 563MiB/s-563MiB/s (590MB/s-590MB/s), io=3D=
-15.6GiB (16.8GB), run=3D28429-28429msec
-> READ: bw=3D712MiB/s (746MB/s), 712MiB/s-712MiB/s (746MB/s-746MB/s), io=3D=
-15.6GiB (16.8GB), run=3D22478-22478msec
->
-> Case 3:
-> This commit is also verified by the case of launching camera APP which is
-> usually considered as heavy working load on both of memory and IO, which
-> shows 12%-24% improvement.
->
->                 ttl =3D 0         ttl =3D 50        ttl =3D 100
-> mainline        2267ms          2420ms          2316ms
-> commit          1992ms          1806ms          1998ms
->
-> case 4:
-> androbench has no improvment as well as regression which supposed to be
-> its test time is short which MGLRU hasn't take effect yet.
->
-> Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
-> ---
-> change of v2: calculate page's activity via helper function
-> change of v3: solve layer violation by move API into mm
-> change of v4: keep block clean by removing the page related API
-> ---
-> ---
->  include/linux/act_ioprio.h  | 62 +++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/ioprio.h | 44 +++++++++++++++++++++++---
->  mm/Kconfig                  |  8 +++++
->  3 files changed, 110 insertions(+), 4 deletions(-)
->  create mode 100644 include/linux/act_ioprio.h
->
-> diff --git a/include/linux/act_ioprio.h b/include/linux/act_ioprio.h
-> new file mode 100644
-> index 000000000000..8cfb3df270bd
-> --- /dev/null
-> +++ b/include/linux/act_ioprio.h
-> @@ -0,0 +1,62 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +#ifndef _ACT_IOPRIO_H
-> +#define _ACT_IOPRIO_H
-> +
-> +#include <linux/bio.h>
-> +
-> +#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-> +bool BIO_ADD_FOLIO(struct bio *bio, struct folio *folio, size_t len,
-> +               size_t off)
-> +{
-> +       int class, level, hint, activity;
-> +
-> +       if (len > UINT_MAX || off > UINT_MAX)
-> +               return false;
-> +
-> +       class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +       level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +       hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +       activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-> +
-> +       activity +=3D (bio->bi_vcnt + 1 <=3D IOPRIO_NR_ACTIVITY &&
-> +                       PageWorkingset(&folio->page)) ? 1 : 0;
-> +       if (activity >=3D bio->bi_vcnt / 2)
-> +               class =3D IOPRIO_CLASS_RT;
-> +       else if (activity >=3D bio->bi_vcnt / 4)
-> +               class =3D max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IO=
-PRIO_CLASS_BE);
-> +
-> +       bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint,=
- activity);
-> +
-> +       return bio_add_page(bio, &folio->page, len, off) > 0;
-> +}
-> +
-> +int BIO_ADD_PAGE(struct bio *bio, struct page *page,
-> +               unsigned int len, unsigned int offset)
-> +{
-> +       int class, level, hint, activity;
-> +
-> +       if (bio_add_page(bio, page, len, offset) > 0) {
-> +               class =3D IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +               level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +               hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +               activity =3D IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-> +               activity +=3D (bio->bi_vcnt <=3D IOPRIO_NR_ACTIVITY && Pa=
-geWorkingset(page)) ? 1 : 0;
-> +               bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_ACTIVITY(class, leve=
-l, hint, activity);
-> +       }
-> +
-> +       return len;
-> +}
-> +#else
-> +bool BIO_ADD_FOLIO(struct bio *bio, struct folio *folio, size_t len,
-> +               size_t off)
-> +{
-> +       return bio_add_folio(bio, folio, len, off);
-> +}
-> +
-> +int BIO_ADD_PAGE(struct bio *bio, struct page *page,
-> +               unsigned int len, unsigned int offset)
-> +{
-> +       return bio_add_page(bio, page, len, offset);
-> +}
-> +#endif
-> +#endif
-> diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-> index bee2bdb0eedb..f933af54d71e 100644
-> --- a/include/uapi/linux/ioprio.h
-> +++ b/include/uapi/linux/ioprio.h
-> @@ -71,12 +71,24 @@ enum {
->   * class and level.
->   */
->  #define IOPRIO_HINT_SHIFT              IOPRIO_LEVEL_NR_BITS
-> +#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-> +#define IOPRIO_HINT_NR_BITS            3
-> +#else
->  #define IOPRIO_HINT_NR_BITS            10
-> +#endif
->  #define IOPRIO_NR_HINTS                        (1 << IOPRIO_HINT_NR_BITS=
-)
->  #define IOPRIO_HINT_MASK               (IOPRIO_NR_HINTS - 1)
->  #define IOPRIO_PRIO_HINT(ioprio)       \
->         (((ioprio) >> IOPRIO_HINT_SHIFT) & IOPRIO_HINT_MASK)
->
-> +#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-> +#define IOPRIO_ACTIVITY_SHIFT          (IOPRIO_HINT_NR_BITS + IOPRIO_LEV=
-EL_NR_BITS)
-> +#define IOPRIO_ACTIVITY_NR_BITS                7
-> +#define IOPRIO_NR_ACTIVITY             (1 << IOPRIO_ACTIVITY_NR_BITS)
-> +#define IOPRIO_ACTIVITY_MASK           (IOPRIO_NR_ACTIVITY - 1)
-> +#define IOPRIO_PRIO_ACTIVITY(ioprio)   \
-> +       (((ioprio) >> IOPRIO_ACTIVITY_SHIFT) & IOPRIO_ACTIVITY_MASK)
-> +#endif
->  /*
->   * I/O hints.
->   */
-> @@ -104,24 +116,48 @@ enum {
->
->  #define IOPRIO_BAD_VALUE(val, max) ((val) < 0 || (val) >=3D (max))
->
-> +#ifndef CONFIG_CONTENT_ACT_BASED_IOPRIO
->  /*
->   * Return an I/O priority value based on a class, a level and a hint.
->   */
->  static __always_inline __u16 ioprio_value(int prioclass, int priolevel,
-> -                                         int priohint)
-> +               int priohint)
->  {
->         if (IOPRIO_BAD_VALUE(prioclass, IOPRIO_NR_CLASSES) ||
-> -           IOPRIO_BAD_VALUE(priolevel, IOPRIO_NR_LEVELS) ||
-> -           IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS))
-> +                       IOPRIO_BAD_VALUE(priolevel, IOPRIO_NR_LEVELS) ||
-> +                       IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS))
->                 return IOPRIO_CLASS_INVALID << IOPRIO_CLASS_SHIFT;
->
->         return (prioclass << IOPRIO_CLASS_SHIFT) |
->                 (priohint << IOPRIO_HINT_SHIFT) | priolevel;
->  }
-> -
->  #define IOPRIO_PRIO_VALUE(prioclass, priolevel)                        \
->         ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE)
->  #define IOPRIO_PRIO_VALUE_HINT(prioclass, priolevel, priohint) \
->         ioprio_value(prioclass, priolevel, priohint)
-> +#else
-> +/*
-> + * Return an I/O priority value based on a class, a level and a hint.
-> + */
-> +static __always_inline __u16 ioprio_value(int prioclass, int priolevel,
-> +               int priohint, int activity)
-> +{
-> +       if (IOPRIO_BAD_VALUE(prioclass, IOPRIO_NR_CLASSES) ||
-> +                       IOPRIO_BAD_VALUE(priolevel, IOPRIO_NR_LEVELS) ||
-> +                       IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS) ||
-> +                       IOPRIO_BAD_VALUE(activity, IOPRIO_NR_ACTIVITY))
-> +               return IOPRIO_CLASS_INVALID << IOPRIO_CLASS_SHIFT;
->
-> +       return (prioclass << IOPRIO_CLASS_SHIFT) |
-> +               (activity << IOPRIO_ACTIVITY_SHIFT) |
-> +               (priohint << IOPRIO_HINT_SHIFT) | priolevel;
-> +}
-> +
-> +#define IOPRIO_PRIO_VALUE(prioclass, priolevel)                        \
-> +       ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE, 0)
-> +#define IOPRIO_PRIO_VALUE_HINT(prioclass, priolevel, priohint) \
-> +       ioprio_value(prioclass, priolevel, priohint, 0)
-> +#define IOPRIO_PRIO_VALUE_ACTIVITY(prioclass, priolevel, priohint, activ=
-ity)   \
-> +       ioprio_value(prioclass, priolevel, priohint, activity)
-> +#endif
->  #endif /* _UAPI_LINUX_IOPRIO_H */
-> diff --git a/mm/Kconfig b/mm/Kconfig
-> index 264a2df5ecf5..e0e5a5a44ded 100644
-> --- a/mm/Kconfig
-> +++ b/mm/Kconfig
-> @@ -1240,6 +1240,14 @@ config LRU_GEN_STATS
->           from evicted generations for debugging purpose.
->
->           This option has a per-memcg and per-node memory overhead.
-> +
-> +config CONTENT_ACT_BASED_IOPRIO
-> +       bool "Enable content activity based ioprio"
-> +       depends on LRU_GEN
-> +       default n
-> +       help
-> +         This item enable the feature of adjust bio's priority by
-> +         calculating its content's activity.
->  # }
->
->  config ARCH_SUPPORTS_PER_VMA_LOCK
-> --
-> 2.25.1
->
+T24gMS8yNS8yNCAyMzowOSwgRGFtaWVuIExlIE1vYWwgd3JvdGU6DQo+IE9uIDEvMjYvMjQgMTY6
+MDUsIEhhbm5lcyBSZWluZWNrZSB3cm90ZToNCj4+IE9uIDEvMjYvMjQgMDE6NTAsIERhbWllbiBM
+ZSBNb2FsIHdyb3RlOg0KPj4+IFRoZSBmdW5jdGlvbiBudWxsX3N1Ym1pdF9iaW8oKSB1c2VkIGZv
+ciBudWxsX2JsayBkZXZpY2VzIGNvbmZpZ3VyZWQNCj4+PiB3aXRoIGEgQklPLWJhc2VkIHF1ZXVl
+IG5ldmVyIHNwbGl0cyBCSU9zIGFjY29yZGluZyB0byB0aGUgcXVldWUgbGltaXRzDQo+Pj4gc2V0
+IHdpdGggdGhlIHZhcmlvdXMgbW9kdWxlIGFuZCBjb25maWdmcyBwYXJhbWV0ZXJzIHRoYXQgdGhl
+IHVzZXIgY2FuDQo+Pj4gc3BlY2lmeS4NCj4+Pg0KPj4+IEFkZCBhIGNhbGwgdG8gYmlvX3NwbGl0
+X3RvX2xpbWl0cygpIHRvIGNvcnJlY3RseSBoYW5kbGUgbGFyZ2UNCj4+PiBCSU9zIHRoYXQgbmVl
+ZCBzcGxpdHRpbmcuIERvaW5nIHNvIGFsc28gZml4ZXMgaXNzdWVzIHdpdGggem9uZWQgZGV2aWNl
+cw0KPj4+IGFzIGEgbGFyZ2UgQklPIG1heSBjcm9zcyBvdmVyIGEgem9uZSBib3VuZGFyeSwgd2hp
+Y2ggYnJlYWtzIG51bGxfYmxrDQo+Pj4gem9uZSBlbXVsYXRpb24uDQo+Pj4NCj4+IFRoYXQgZmVl
+bHMgc28gd3JvbmcuIFdoeSB3b3VsZCB3ZSBuZWVkIHRvIGFwcGx5IHF1ZXVlIGxpbWl0cyB0byBh
+IGJpbz8NCj4+IChZZXMsIEkga25vdyB3aHkuIFdlIHN0aWxsIHNob3VsZG4ndCBiZSBkb2luZyBp
+dC4pDQo+IFNwbGl0dGluZyBpcyBhdCBsZWFzdCBuZWVkZWQgZm9yIHpvbmVkIGRldmljZXMuIE90
+aGVyd2lzZSwgZXZlcnl0aGluZyBicmVha3MNCj4gd2l0aCB0aGUgem9uZSBlbXVsYXRpb24uDQo+
+PiBNYXliZSBpbmRlZWQgdGltZSB0byBraWxsIHRoZSBiaW8tYmFzZWQgcGF0aC4NCj4gSSBoYXZl
+IG5vdGhpbmcgYWdhaW5zdCB0aGF0IDopDQo+DQo+PiBCdXQgdW50aWwgdGhhdCBoYXBwZW5zOg0K
+Pj4NCj4+IFJldmlld2VkLWJ5OiBIYW5uZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5kZT4NCj4+DQo+
+PiBDaGVlcnMsDQo+Pg0KPj4gSGFubmVzDQoNCklmIHdlIGFyZSBnb2luZyB0byBraWxsIGl0IHdl
+IHJlYWxseSBkb24ndCBuZWVkIHRoaXMgcGF0Y2gsIGlycmVzcGVjdGl2ZSBvZg0KdGhhdCA6LQ0K
+DQpSZXZpZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNr
+DQoNCg0K
