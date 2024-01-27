@@ -1,59 +1,59 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358B8185D
-	for <linux-block@vger.kernel.org>; Sat, 27 Jan 2024 00:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62452573
+	for <linux-block@vger.kernel.org>; Sat, 27 Jan 2024 00:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706314816; cv=none; b=pVWpd4Vqfl8o6TLib2We2/LvFORSCvK2JUbeEO2/RiBXH7OdQGfMlNGH9mtfS/HuaeEJRAmoDN+MGBP9eezgOjDUT7iVyEtqr0iPPP0KjolVzYJYRR6bJP9JGOelOSlDZr3jYU52b0C9lSrKkr3SWyRe/BGo7JKgoHM6wdas6lU=
+	t=1706314817; cv=none; b=afVpBxkYTeKKb39vs2oERFRsVMZgUi1JkQjHvlx6M6nxMFukN7UZNYgETP6vXAJRxLBJG3LDXTNF22jzYXxbjhH77//0BPqWn0a1x+dtUelafsQaGpGtBCflytx2TdbrFYXch+Z7v+W2zWGjSMDnzUIPD1UjwL0upgt8lSCZuYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706314816; c=relaxed/simple;
-	bh=jja+9BUfY3p7IJ0UBkje+VXn//Mt2abUDD8oxOrr20c=;
+	s=arc-20240116; t=1706314817; c=relaxed/simple;
+	bh=E9ziAqKRF7avg+9XAu41DqCMnZeKd+R+sbDJSS4jrKs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qenLBmkeKXVdoXi3Bz//TgPb3wRqY/T/8rpuMu6yqDwFy7YK8HrQqDxJ51+XDg2OjLto+jRIf3Qe6ye5Ehm5Pth8ktx0el8KxoY9iwhs//YC28ZiQgD7VKCVemA5Y8PoDP3SaJZmv+qZ41qJODq4XqcpovpiGCLjweCASUOTB9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hWdWawAa; arc=none smtp.client-ip=209.85.167.46
+	 In-Reply-To:To:Cc; b=CDqbl2o6ucbiftoOWjmbdLOS2/VxGpL2Ns6X+oQ5Tt3/Dk6nDqXHHX+OOXcw6WrHsAMQFjgVAN2IDTBZh8n0RmKi6/Wiq2+9Gca8RIK1J0PM0DfXtNCaFPYMw5/iMPA3ljMwCj2N45S0K7VasoQ4tg0kAySTbopAnQSlpHTQLRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=emnVVWLe; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hWdWawAa"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5101cd91017so860766e87.2
-        for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 16:20:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="emnVVWLe"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50edf4f478eso1199048e87.3
+        for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 16:20:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706314812; x=1706919612; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1706314814; x=1706919614; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=b+qf6Kmkzij/J63a/y1MVzoBzMnJtm5VXzLHR9Dn/dQ=;
-        b=hWdWawAaSaItzBtqKbpQEAMuqfjIm5T8WPLYY6pnPzEsZnbwgwa7fBCC+4eEB7Edmr
-         pbAZd7Bt7XE0xgoh3KfWuwItO/+cQ8kfm9infUbwzazIDoW/EzY/FlT5KfkwfwlIPGAX
-         CoagdjgykEN3txTbffYLGO7Ac9581EG4OOfGAfQxy0q2Oa/MjGM2W8Zykty71nFinhXK
-         2gOsiJraym3QeUL5UZzXMu8jSkas+v3MXfQXm9TVJ/xl748enJgde8c8Z/rp6pLPuaOE
-         DpOdUJkWiTje7Iwc87R7DSLKd+foXPaOWYZHfWRv0TZo0vXd5oIpmU62VuuknYz99kyU
-         9mwQ==
+        bh=N5SahCLN1505rQ5cLqj1DAZZAA4U+IFMjOwfguXW3/Y=;
+        b=emnVVWLeg/3uw0D7kDOuch6/gCpWAf6ndV4K4LdzZ0euGS/eUBi3wm0zFBLkkWZhcs
+         2s21lonvVDaMr2EZNprRN/VRd7ta7FYKfBkniU2TnjMpQKEXjoFTeh86V0Bk7Xq0Vv2y
+         WVug8eifCUjXeVoZbOyREIVijrrWUe8iUC0x9vPvFjn8lyMQ1nnwFMJHkEaYSqt06kyR
+         AW5VPt1C6h1PjU1M7+aAu4oYxHysvUB0DASsvX2Ue/aW2Qpp3WpI3jRJvzl/OQc/nH8L
+         Y9tzy2YuqBL1EWbUs7vxVWX5PzYO1xlNzGykYl7KmI818V0ZKZcHunSjIL2wwfwzTA9f
+         Zw4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706314812; x=1706919612;
+        d=1e100.net; s=20230601; t=1706314814; x=1706919614;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=b+qf6Kmkzij/J63a/y1MVzoBzMnJtm5VXzLHR9Dn/dQ=;
-        b=myk7eE0YqtMH4+9yQHid3ndb/k8M9jBzWIeoCcC+4yT0pJ7oxQ2eWDjwNg7p8YRgdJ
-         mNDkWHu2Eu/QqOliM/58PxU4y7GFVo44mP7AXCo0XIe9/vK0Ifj07ZQvtHC799MTixy/
-         FkaGQtpYPgSZXr/wnIdCvUs5hzAYG1aFuRiKH7xjU9DfZr25A9L0uPHi6hNBne0+XfcT
-         IKJ0AK0XT3INg/KLZWlq9ICaggV2QbYxTWsr6UUruaGJHNcVb8gxE1rAsgfGIpTwvL7G
-         DZ33ao1Crbw4CebIzKP5xgNvTUyHcZY9v+9kj2pVdMNQHdmbAIjR64yLZvi4lEF5Z63v
-         B8sQ==
-X-Gm-Message-State: AOJu0Ywr2WctOxf/CoiGEX8Lo4SPLKqmX1hHDUIwFi9hZ9LzgQYQIybn
-	viKpkZFNQJ2fpIxyzdH+xk8JnTiuhdTeaH1VTy6WzpZGSGbUvXYzDt3w4XWgyLk=
-X-Google-Smtp-Source: AGHT+IGXujxtRX891ftx+e1FMFa5nxtOLkCUmc0pj5Kz6Y/AmfxBMocPdT5qL8vfQz+W0W7Du3/Qvw==
-X-Received: by 2002:a05:6512:48a:b0:50e:ca97:5afb with SMTP id v10-20020a056512048a00b0050eca975afbmr244799lfq.18.1706314811925;
-        Fri, 26 Jan 2024 16:20:11 -0800 (PST)
+        bh=N5SahCLN1505rQ5cLqj1DAZZAA4U+IFMjOwfguXW3/Y=;
+        b=KUUdEe6SFPRjEAdr7x4eXgbyPIAph1TOtWHof75czlByAIkY2XnAY8Xj3QEm0wqaae
+         LDC2w97mhXJXDyA0U0SO7k3f2JsuyjjrXa4+PeaZ7EbvHXQ/e2WuO1h+bPKoAaaAak5+
+         Wsk7rMM+eMYdS+yzMmgteD5f2wlmGZmjEzcb4GEknBrZTAD76agr+iu6q+ZoGU05BsYB
+         9fx19FJxCuttvQIKBZqGhSwM5NNRKpcahmO8JgdLxS+JALaUh6sV7/f4WWEJfXewlaV1
+         XRCDXDU5ZgNQ4+m6QhOfaC81YydrO9Igl2UHT84pKsxRdNYSIZcBdwlPyVoqPavij/Z/
+         /3EA==
+X-Gm-Message-State: AOJu0YzUWZK06Z+p/c6AugPb7kMWKi56Fj+bLFbBQ5c1Y7rdZhraFB6t
+	XlEU9p7zdMtPxQZ9al+uiNWoDPPLLJxqy/ZdWMle86pgaX3qS8WA0+wCuZyV2s4=
+X-Google-Smtp-Source: AGHT+IFc5/iBp3Z+YfgOFibaw+mJcjoLiqn1ysw4Wwecz9Q0A3UtJBPMsKwdVvx3H7ibywtjZio/1w==
+X-Received: by 2002:a05:6512:3b0e:b0:50e:b23c:e37 with SMTP id f14-20020a0565123b0e00b0050eb23c0e37mr373430lfv.48.1706314813988;
+        Fri, 26 Jan 2024 16:20:13 -0800 (PST)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id x25-20020a19f619000000b0050e7f5cffa6sm325226lfe.273.2024.01.26.16.20.10
+        by smtp.gmail.com with ESMTPSA id x25-20020a19f619000000b0050e7f5cffa6sm325226lfe.273.2024.01.26.16.20.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 16:20:11 -0800 (PST)
+        Fri, 26 Jan 2024 16:20:12 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 27 Jan 2024 01:19:48 +0100
-Subject: [PATCH v2 1/9] mmc: davinci_mmc: Use sg_miter for PIO
+Date: Sat, 27 Jan 2024 01:19:49 +0100
+Subject: [PATCH v2 2/9] mmc: moxart-mmc: Factor out moxart_use_dma() helper
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,7 +62,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240127-mmc-proper-kmap-v2-1-d8e732aa97d1@linaro.org>
+Message-Id: <20240127-mmc-proper-kmap-v2-2-d8e732aa97d1@linaro.org>
 References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
 In-Reply-To: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
@@ -75,166 +75,48 @@ Cc: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
  linux-omap@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
 X-Mailer: b4 0.12.4
 
-Use the scatterlist memory iterator instead of just
-dereferencing virtual memory using sg_virt().
-This make highmem references work properly.
+The same code is in two places and we will add a third place.
+Break this out into its own function.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/linux-mmc/20240122073423.GA25859@lst.de/
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/mmc/host/davinci_mmc.c | 61 +++++++++++++++++++-----------------------
- 1 file changed, 28 insertions(+), 33 deletions(-)
+ drivers/mmc/host/moxart-mmc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/mmc/host/davinci_mmc.c b/drivers/mmc/host/davinci_mmc.c
-index ee3b1a4e0848..c46577305138 100644
---- a/drivers/mmc/host/davinci_mmc.c
-+++ b/drivers/mmc/host/davinci_mmc.c
-@@ -180,12 +180,6 @@ struct mmc_davinci_host {
- #define DAVINCI_MMC_DATADIR_WRITE	2
- 	unsigned char data_dir;
+diff --git a/drivers/mmc/host/moxart-mmc.c b/drivers/mmc/host/moxart-mmc.c
+index 5cfdd3a86e54..d12d7d79b19c 100644
+--- a/drivers/mmc/host/moxart-mmc.c
++++ b/drivers/mmc/host/moxart-mmc.c
+@@ -254,6 +254,11 @@ static void moxart_dma_complete(void *param)
+ 	complete(&host->dma_complete);
+ }
  
--	/* buffer is used during PIO of one scatterlist segment, and
--	 * is updated along with buffer_bytes_left.  bytes_left applies
--	 * to all N blocks of the PIO transfer.
--	 */
--	u8 *buffer;
--	u32 buffer_bytes_left;
- 	u32 bytes_left;
- 
- 	struct dma_chan *dma_tx;
-@@ -196,8 +190,8 @@ struct mmc_davinci_host {
- 	bool active_request;
- 
- 	/* For PIO we walk scatterlists one segment at a time. */
-+	struct sg_mapping_iter sg_miter;
- 	unsigned int		sg_len;
--	struct scatterlist *sg;
- 
- 	/* Version of the MMC/SD controller */
- 	u8 version;
-@@ -213,30 +207,24 @@ struct mmc_davinci_host {
- static irqreturn_t mmc_davinci_irq(int irq, void *dev_id);
- 
- /* PIO only */
--static void mmc_davinci_sg_to_buf(struct mmc_davinci_host *host)
--{
--	host->buffer_bytes_left = sg_dma_len(host->sg);
--	host->buffer = sg_virt(host->sg);
--	if (host->buffer_bytes_left > host->bytes_left)
--		host->buffer_bytes_left = host->bytes_left;
--}
--
- static void davinci_fifo_data_trans(struct mmc_davinci_host *host,
- 					unsigned int n)
- {
-+	struct sg_mapping_iter *sgm = &host->sg_miter;
-+	size_t sglen;
- 	u8 *p;
- 	unsigned int i;
- 
--	if (host->buffer_bytes_left == 0) {
--		host->sg = sg_next(host->data->sg);
--		mmc_davinci_sg_to_buf(host);
-+	/*
-+	 * By adjusting sgm->consumed this will give a pointer to the
-+	 * current index into the sgm.
-+	 */
-+	if (!sg_miter_next(sgm)) {
-+		dev_err(mmc_dev(host->mmc), "ran out of sglist prematurely\n");
-+		return;
- 	}
--
--	p = host->buffer;
--	if (n > host->buffer_bytes_left)
--		n = host->buffer_bytes_left;
--	host->buffer_bytes_left -= n;
--	host->bytes_left -= n;
-+	p = sgm->addr;
-+	sglen = sgm->length;
- 
- 	/* NOTE:  we never transfer more than rw_threshold bytes
- 	 * to/from the fifo here; there's no I/O overlap.
-@@ -261,7 +249,9 @@ static void davinci_fifo_data_trans(struct mmc_davinci_host *host,
- 			p = p + (n & 3);
- 		}
- 	}
--	host->buffer = p;
++static bool moxart_use_dma(struct moxart_host *host)
++{
++	return (host->data_len > host->fifo_width) && host->have_dma;
++}
 +
-+	sgm->consumed = n;
-+	host->bytes_left -= n;
- }
- 
- static void mmc_davinci_start_command(struct mmc_davinci_host *host,
-@@ -517,6 +507,7 @@ mmc_davinci_prepare_data(struct mmc_davinci_host *host, struct mmc_request *req)
- 	int fifo_lev = (rw_threshold == 32) ? MMCFIFOCTL_FIFOLEV : 0;
- 	int timeout;
- 	struct mmc_data *data = req->data;
-+	unsigned int flags = SG_MITER_ATOMIC; /* Used from IRQ */
- 
- 	if (host->version == MMC_CTLR_VERSION_2)
- 		fifo_lev = (rw_threshold == 64) ? MMCFIFOCTL_FIFOLEV : 0;
-@@ -545,12 +536,14 @@ mmc_davinci_prepare_data(struct mmc_davinci_host *host, struct mmc_request *req)
- 
- 	/* Configure the FIFO */
- 	if (data->flags & MMC_DATA_WRITE) {
-+		flags |= SG_MITER_FROM_SG;
- 		host->data_dir = DAVINCI_MMC_DATADIR_WRITE;
- 		writel(fifo_lev | MMCFIFOCTL_FIFODIR_WR | MMCFIFOCTL_FIFORST,
- 			host->base + DAVINCI_MMCFIFOCTL);
- 		writel(fifo_lev | MMCFIFOCTL_FIFODIR_WR,
- 			host->base + DAVINCI_MMCFIFOCTL);
- 	} else {
-+		flags |= SG_MITER_TO_SG;
- 		host->data_dir = DAVINCI_MMC_DATADIR_READ;
- 		writel(fifo_lev | MMCFIFOCTL_FIFODIR_RD | MMCFIFOCTL_FIFORST,
- 			host->base + DAVINCI_MMCFIFOCTL);
-@@ -558,7 +551,6 @@ mmc_davinci_prepare_data(struct mmc_davinci_host *host, struct mmc_request *req)
- 			host->base + DAVINCI_MMCFIFOCTL);
- 	}
- 
--	host->buffer = NULL;
- 	host->bytes_left = data->blocks * data->blksz;
- 
- 	/* For now we try to use DMA whenever we won't need partial FIFO
-@@ -576,8 +568,7 @@ mmc_davinci_prepare_data(struct mmc_davinci_host *host, struct mmc_request *req)
- 	} else {
- 		/* Revert to CPU Copy */
- 		host->sg_len = data->sg_len;
--		host->sg = host->data->sg;
--		mmc_davinci_sg_to_buf(host);
-+		sg_miter_start(&host->sg_miter, data->sg, data->sg_len, flags);
- 	}
- }
- 
-@@ -843,6 +834,8 @@ davinci_abort_data(struct mmc_davinci_host *host, struct mmc_data *data)
+ static void moxart_transfer_dma(struct mmc_data *data, struct moxart_host *host)
  {
- 	mmc_davinci_reset_ctrl(host, 1);
- 	mmc_davinci_reset_ctrl(host, 0);
-+	if (!host->do_dma)
-+		sg_miter_stop(&host->sg_miter);
- }
+ 	u32 len, dir_slave;
+@@ -375,7 +380,7 @@ static void moxart_prepare_data(struct moxart_host *host)
+ 	if (data->flags & MMC_DATA_WRITE)
+ 		datactrl |= DCR_DATA_WRITE;
  
- static irqreturn_t mmc_davinci_sdio_irq(int irq, void *dev_id)
-@@ -919,11 +912,13 @@ static irqreturn_t mmc_davinci_irq(int irq, void *dev_id)
- 	if (qstatus & MMCST0_DATDNE) {
- 		/* All blocks sent/received, and CRC checks passed */
- 		if (data != NULL) {
--			if ((host->do_dma == 0) && (host->bytes_left > 0)) {
--				/* if datasize < rw_threshold
--				 * no RX ints are generated
--				 */
--				davinci_fifo_data_trans(host, host->bytes_left);
-+			if (!host->do_dma) {
-+				if (host->bytes_left > 0)
-+					/* if datasize < rw_threshold
-+					 * no RX ints are generated
-+					 */
-+					davinci_fifo_data_trans(host, host->bytes_left);
-+				sg_miter_stop(&host->sg_miter);
- 			}
- 			end_transfer = 1;
- 			data->bytes_xfered = data->blocks * data->blksz;
+-	if ((host->data_len > host->fifo_width) && host->have_dma)
++	if (moxart_use_dma(host))
+ 		datactrl |= DCR_DMA_EN;
+ 
+ 	writel(DCR_DATA_FIFO_RESET, host->base + REG_DATA_CONTROL);
+@@ -407,7 +412,7 @@ static void moxart_request(struct mmc_host *mmc, struct mmc_request *mrq)
+ 	moxart_send_command(host, host->mrq->cmd);
+ 
+ 	if (mrq->cmd->data) {
+-		if ((host->data_len > host->fifo_width) && host->have_dma) {
++		if (moxart_use_dma(host)) {
+ 
+ 			writel(CARD_CHANGE, host->base + REG_INTERRUPT_MASK);
+ 
 
 -- 
 2.34.1
