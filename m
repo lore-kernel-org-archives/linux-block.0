@@ -1,59 +1,59 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7F933EE
-	for <linux-block@vger.kernel.org>; Sat, 27 Jan 2024 00:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691E064A
+	for <linux-block@vger.kernel.org>; Sat, 27 Jan 2024 00:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706314820; cv=none; b=d2/OgQxiNxOkEoazpe6/eN0Nmz11ed+/geQVA2hN7zbCws04BDneYXzV4w1fAUM32L29t+kWnly5gkhUYK5zPYcY01yinnPy4GDcq9gTv9emPpChVfVwMWKFjZb6cBSH7vkwCkMEcxSMwVxY572Q7Lf0eWL+qNH6ZpBbZpwagwI=
+	t=1706314821; cv=none; b=byDyqpHtVhSJ32IDTrKyfmbqVN5j0qKmuJEng/8xHCZb9xn5A1fU72TU8wu6Ht9+o9RDG66YwxQbVSXh8spMFkhzcdz2oA9PDC9HmHvwGoR887LyBkcPzfStTebx6ypRxfGTI5zpgcJEJ3+OCDpa/pomIk3FyZviwOZlTH3Wwmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706314820; c=relaxed/simple;
-	bh=dFn2ks6EacXxE3ISx+PVGru3tsQjDI5FXRhrLZ+AE6Q=;
+	s=arc-20240116; t=1706314821; c=relaxed/simple;
+	bh=9/wwLT18BUDyTWXggkK9BCgrhK2swAAIK+73Bo29JTg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=huIHF/OssVNYFJGE+U4qVtLUlhJdzDC7sOj3BV7bajFGykM6/KwXFusTSwPZx2SZzNyhTtJBW/vqLrNRSPfjulT0Qz22v6WnKsZUdni989ukfpeIjY1FxAjGE6VvKUuBfkx+XlMTiAttYe9gQ5JzlC0eCQVzk53RDX3moUMATp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pBOIqkl5; arc=none smtp.client-ip=209.85.167.54
+	 In-Reply-To:To:Cc; b=CzbMMlADNMJ5XzJ+x6fEjWoUkFrv4Y/huWGdVEtoWgTH7VOivsXfmdxx0bSMqXKYWF8HxcQxulDyvp7NGh6ydQLlll0CdWLn0y9UMN5GdEb7qHTQsEua5kSh4rWNcaI8iNaBrQfKlFhLzZnlbJvZ4zRJsIildSWm4SGP6d3b/xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Q+MHfxAc; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pBOIqkl5"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50eabfac2b7so1130339e87.0
-        for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 16:20:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q+MHfxAc"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5100c3f7df1so1225069e87.0
+        for <linux-block@vger.kernel.org>; Fri, 26 Jan 2024 16:20:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706314816; x=1706919616; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1706314817; x=1706919617; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ofuXItHZiXctDb5vYJexyw4lWFm2o06QaWEWbHlsUFY=;
-        b=pBOIqkl54M8xJ664Cr0wpalsghoMvF6s63n9XN3S0Qv0MVq3j17OvOzWz7jUQK6/KI
-         Vo5oWlKOnHPZ8HWrgC4ciEaJVLIloaIuIYl+qFjy+166stenQ0Nqn/vOrlP6+B9PtTHz
-         JXUjybQ+lbc1JF7nAg+hIrNUDb+OS141Vz6Pgla5x/cUyP81XdxY+O6LVcVMQDoOr0wd
-         sKhqh9dD3bjO5PVBl9quo0VeYScKA7giAUFBXxlB/FQWEqN/KkpiRgMUtbuCCTsAh+Kh
-         VbPjPHor97efBHQq2qxO1vnBZuEwvVMw6PImMlBIfnSIJdHoH9cAbCyomMtYZQuxbtcl
-         naQA==
+        bh=eRirpuRqStGDqBkFHe65SrxV5jM0SILjOXPwd5g5zmY=;
+        b=Q+MHfxAc0cLNJjfF1fRsYczigZHMUGfK5rrDcLpEBNaQNq9LHwP4eqBLVBtLyWXYeZ
+         Lki7Ti9AtPtJbYsmRzLong1EwC6UMh6YYQJFj//SjGyrrWQ+NzOGmB2HNvOHOJ9m6Kmu
+         R4fTgm9rkEfqAY1EPbD1lE10KIKA2F0u5OWEGb60vaKBnPWMjbgLI/+iAGI8GFnMT3yx
+         DGZt7GNT4rybMjokIamuN4GWU6+F4Q5FsyMvgQlU0/18A0WkrT/bqMhrHgivopkfO6iB
+         /+9MGdBG+VSH5bN+Af3SCcrxpy0nXw7IA4A/LYz4Uk6/6dvH0sjaWPRrB2IStf9RzsTi
+         U8kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706314816; x=1706919616;
+        d=1e100.net; s=20230601; t=1706314817; x=1706919617;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ofuXItHZiXctDb5vYJexyw4lWFm2o06QaWEWbHlsUFY=;
-        b=aKCVSVhgeDbqcAhA+9kNIy+hvO+s+rZq+uD6CZYuoSt2JoP4rPsT+ncTlLpucGJeJR
-         7ZowcUB5kgk3hHtD0N7ITOFyx//kqgp5HOEtHHCfRFnD8uSVIZTGWwPyMak2n/YqLbYd
-         uNVSx3tfHis6Zd8Ao9OQ1vriILXQz/5bM/0NwjxEgimzaUgft27fbW668vOqMQ4lD0ee
-         LGg/qz8PG1/diZ5O1Y16M/T++vE+8QAW6TvWzvzpR5cCRIcVR/GT8hopCh6YjVMWwPKT
-         z1BFea/jwNS0MnkA3FuJtFpbiywWMB/hduuUhUyIGlCvvPyNq42JUFYcdZIvBZwE8H0M
-         KibA==
-X-Gm-Message-State: AOJu0YxI123OY2We0sJ1764b5qgFVxxkWcGGS7CxtRaIeeZ2TShKq8BP
-	G19DA9Vd2bpIMf50LsfUAShBwnV1ZvvROtTM9Uzx7XH5a8q0uNDxrV1qLDqLkyc=
-X-Google-Smtp-Source: AGHT+IGyvgr05EIrw1L+Y9U4iitEjJQ8+0O5OLxehL3iS289M5RLEqax89yMlhsUVY2qH3SITfm7pw==
-X-Received: by 2002:ac2:4bc9:0:b0:510:893:f8c3 with SMTP id o9-20020ac24bc9000000b005100893f8c3mr412301lfq.20.1706314816586;
-        Fri, 26 Jan 2024 16:20:16 -0800 (PST)
+        bh=eRirpuRqStGDqBkFHe65SrxV5jM0SILjOXPwd5g5zmY=;
+        b=Zq//kVWBEcn5SIvwZKxcSQeb05eoo78d2Tbpv3I3rLPKRMesjeUFSqvnwon/kZ+6d/
+         iinGuvNwTH2sGZdoLfKXc7EsFJx8/YR4J7vVuPrDjQdEYvYTJGga7fdEU0xIhqlt6Tpy
+         /nz3uEV9yIgqb4WUQK219jO9jY/wh9HlWHaFqPIstjRCci6rH0crVbY9C1LbWzoDKQ7N
+         AqGR5h7HdZa22VPX/2kawgteJeKUvbA3jlSu3VdLO8bIRz8PjnllE/uhDcvGc8vAI+ZQ
+         AWGdCNwjEeq2OTUTcr67uhrnjsunyoQ3gC6cRXYYMJC0HU5bi6HcVidGOqqPI55/XU9E
+         xnOg==
+X-Gm-Message-State: AOJu0YwbqPVecK6rfuxdFIn/c5ppJbme6PwLGkEsy1lA/iqgSXQ4TCX4
+	dxwCApAGpZsC8ZRjsYyzB6dyTue203At9TTazOtKAwcKU2MeulKhCqIhvlafVL4=
+X-Google-Smtp-Source: AGHT+IEieB9VwK0RUyhp0+dIhGeLrFmYpVXkTt01iumobPvcTXn/Pm6yTciatsKZBbXQy4sYm4+lRg==
+X-Received: by 2002:ac2:4911:0:b0:510:b1b:5db3 with SMTP id n17-20020ac24911000000b005100b1b5db3mr739998lfi.67.1706314817623;
+        Fri, 26 Jan 2024 16:20:17 -0800 (PST)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id x25-20020a19f619000000b0050e7f5cffa6sm325226lfe.273.2024.01.26.16.20.15
+        by smtp.gmail.com with ESMTPSA id x25-20020a19f619000000b0050e7f5cffa6sm325226lfe.273.2024.01.26.16.20.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 16:20:15 -0800 (PST)
+        Fri, 26 Jan 2024 16:20:17 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 27 Jan 2024 01:19:51 +0100
-Subject: [PATCH v2 4/9] mmc: moxart-mmc: Use sg_miter for PIO
+Date: Sat, 27 Jan 2024 01:19:52 +0100
+Subject: [PATCH v2 5/9] mmc: mvsdio: Use sg_miter for PIO
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,7 +62,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240127-mmc-proper-kmap-v2-4-d8e732aa97d1@linaro.org>
+Message-Id: <20240127-mmc-proper-kmap-v2-5-d8e732aa97d1@linaro.org>
 References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
 In-Reply-To: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
@@ -79,168 +79,203 @@ Use the scatterlist memory iterator instead of just
 dereferencing virtual memory using sg_virt().
 This make highmem references work properly.
 
+This driver also has a bug in the PIO sglist handling that
+is fixed as part of the patch: it does not travers the
+list of scatterbuffers: it will just process the first
+item in the list. This is fixed by augmenting the logic
+such that we do not process more than one sgitem
+per IRQ instead of counting down potentially the whole
+length of the request.
+
+We can suspect that the PIO path is quite untested.
+
 Suggested-by: Christoph Hellwig <hch@lst.de>
 Link: https://lore.kernel.org/linux-mmc/20240122073423.GA25859@lst.de/
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/mmc/host/moxart-mmc.c | 77 +++++++++++++++++++------------------------
- 1 file changed, 34 insertions(+), 43 deletions(-)
+ drivers/mmc/host/mvsdio.c | 71 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 53 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/mmc/host/moxart-mmc.c b/drivers/mmc/host/moxart-mmc.c
-index 8ede4ce93271..b88d6dec209f 100644
---- a/drivers/mmc/host/moxart-mmc.c
-+++ b/drivers/mmc/host/moxart-mmc.c
-@@ -131,12 +131,10 @@ struct moxart_host {
- 	struct dma_async_tx_descriptor	*tx_desc;
- 	struct mmc_host			*mmc;
- 	struct mmc_request		*mrq;
--	struct scatterlist		*cur_sg;
- 	struct completion		dma_complete;
- 	struct completion		pio_complete;
- 
--	u32				num_sg;
--	u32				data_remain;
-+	struct sg_mapping_iter		sg_miter;
- 	u32				data_len;
- 	u32				fifo_width;
- 	u32				timeout;
-@@ -148,35 +146,6 @@ struct moxart_host {
- 	bool				is_removed;
- };
- 
--static inline void moxart_init_sg(struct moxart_host *host,
--				  struct mmc_data *data)
--{
--	host->cur_sg = data->sg;
--	host->num_sg = data->sg_len;
--	host->data_remain = host->cur_sg->length;
--
--	if (host->data_remain > host->data_len)
--		host->data_remain = host->data_len;
--}
--
--static inline int moxart_next_sg(struct moxart_host *host)
--{
--	int remain;
--	struct mmc_data *data = host->mrq->cmd->data;
--
--	host->cur_sg++;
--	host->num_sg--;
--
--	if (host->num_sg > 0) {
--		host->data_remain = host->cur_sg->length;
--		remain = host->data_len - data->bytes_xfered;
--		if (remain > 0 && remain < host->data_remain)
--			host->data_remain = remain;
--	}
--
--	return host->num_sg;
--}
--
- static int moxart_wait_for_status(struct moxart_host *host,
- 				  u32 mask, u32 *status)
- {
-@@ -309,14 +278,28 @@ static void moxart_transfer_dma(struct mmc_data *data, struct moxart_host *host)
- 
- static void moxart_transfer_pio(struct moxart_host *host)
- {
-+	struct sg_mapping_iter *sgm = &host->sg_miter;
- 	struct mmc_data *data = host->mrq->cmd->data;
- 	u32 *sgp, len = 0, remain, status;
- 
- 	if (host->data_len == data->bytes_xfered)
- 		return;
- 
--	sgp = sg_virt(host->cur_sg);
--	remain = host->data_remain;
-+	/*
-+	 * By updating sgm->consumes this will get a proper pointer into the
-+	 * buffer at any time.
-+	 */
-+	if (!sg_miter_next(sgm)) {
-+		/* This shold not happen */
-+		dev_err(mmc_dev(host->mmc), "ran out of scatterlist prematurely\n");
-+		data->error = -EINVAL;
-+		complete(&host->pio_complete);
-+		return;
-+	}
-+	sgp = sgm->addr;
-+	remain = sgm->length;
-+	if (remain > host->data_len)
-+		remain = host->data_len;
- 
- 	if (data->flags & MMC_DATA_WRITE) {
- 		while (remain > 0) {
-@@ -331,6 +314,7 @@ static void moxart_transfer_pio(struct moxart_host *host)
- 				sgp++;
- 				len += 4;
- 			}
-+			sgm->consumed += len;
- 			remain -= len;
- 		}
- 
-@@ -347,22 +331,22 @@ static void moxart_transfer_pio(struct moxart_host *host)
- 				sgp++;
- 				len += 4;
- 			}
-+			sgm->consumed += len;
- 			remain -= len;
- 		}
- 	}
- 
--	data->bytes_xfered += host->data_remain - remain;
--	host->data_remain = remain;
--
--	if (host->data_len != data->bytes_xfered)
--		moxart_next_sg(host);
--	else
-+	data->bytes_xfered += sgm->consumed;
-+	if (host->data_len == data->bytes_xfered) {
- 		complete(&host->pio_complete);
-+		return;
-+	}
- }
- 
- static void moxart_prepare_data(struct moxart_host *host)
- {
- 	struct mmc_data *data = host->mrq->cmd->data;
-+	unsigned int flags = SG_MITER_ATOMIC; /* Used from IRQ */
- 	u32 datactrl;
- 	int blksz_bits;
- 
-@@ -373,15 +357,19 @@ static void moxart_prepare_data(struct moxart_host *host)
- 	blksz_bits = ffs(data->blksz) - 1;
- 	BUG_ON(1 << blksz_bits != data->blksz);
- 
--	moxart_init_sg(host, data);
--
- 	datactrl = DCR_DATA_EN | (blksz_bits & DCR_BLK_SIZE);
- 
--	if (data->flags & MMC_DATA_WRITE)
-+	if (data->flags & MMC_DATA_WRITE) {
-+		flags |= SG_MITER_FROM_SG;
- 		datactrl |= DCR_DATA_WRITE;
-+	} else {
-+		flags |= SG_MITER_TO_SG;
-+	}
- 
- 	if (moxart_use_dma(host))
- 		datactrl |= DCR_DMA_EN;
-+	else
-+		sg_miter_start(&host->sg_miter, data->sg, data->sg_len, flags);
- 
- 	writel(DCR_DATA_FIFO_RESET, host->base + REG_DATA_CONTROL);
- 	writel(MASK_DATA | FIFO_URUN | FIFO_ORUN, host->base + REG_CLEAR);
-@@ -454,6 +442,9 @@ static void moxart_request(struct mmc_host *mmc, struct mmc_request *mrq)
- 	}
- 
- request_done:
-+	if (!moxart_use_dma(host))
-+		sg_miter_stop(&host->sg_miter);
+diff --git a/drivers/mmc/host/mvsdio.c b/drivers/mmc/host/mvsdio.c
+index ca01b7d204ba..af7f21888e27 100644
+--- a/drivers/mmc/host/mvsdio.c
++++ b/drivers/mmc/host/mvsdio.c
+@@ -38,8 +38,9 @@ struct mvsd_host {
+ 	unsigned int xfer_mode;
+ 	unsigned int intr_en;
+ 	unsigned int ctrl;
++	bool use_pio;
++	struct sg_mapping_iter sg_miter;
+ 	unsigned int pio_size;
+-	void *pio_ptr;
+ 	unsigned int sg_frags;
+ 	unsigned int ns_per_clk;
+ 	unsigned int clock;
+@@ -114,11 +115,18 @@ static int mvsd_setup_data(struct mvsd_host *host, struct mmc_data *data)
+ 		 * data when the buffer is not aligned on a 64 byte
+ 		 * boundary.
+ 		 */
++		unsigned int miter_flags = SG_MITER_ATOMIC; /* Used from IRQ */
 +
- 	spin_unlock_irqrestore(&host->lock, flags);
- 	mmc_request_done(host->mmc, mrq);
++		if (data->flags & MMC_DATA_READ)
++			miter_flags |= SG_MITER_TO_SG;
++		else
++			miter_flags |= SG_MITER_FROM_SG;
++
+ 		host->pio_size = data->blocks * data->blksz;
+-		host->pio_ptr = sg_virt(data->sg);
++		sg_miter_start(&host->sg_miter, data->sg, data->sg_len, miter_flags);
+ 		if (!nodma)
+-			dev_dbg(host->dev, "fallback to PIO for data at 0x%p size %d\n",
+-				host->pio_ptr, host->pio_size);
++			dev_dbg(host->dev, "fallback to PIO for data\n");
++		host->use_pio = true;
+ 		return 1;
+ 	} else {
+ 		dma_addr_t phys_addr;
+@@ -129,6 +137,7 @@ static int mvsd_setup_data(struct mvsd_host *host, struct mmc_data *data)
+ 		phys_addr = sg_dma_address(data->sg);
+ 		mvsd_write(MVSD_SYS_ADDR_LOW, (u32)phys_addr & 0xffff);
+ 		mvsd_write(MVSD_SYS_ADDR_HI,  (u32)phys_addr >> 16);
++		host->use_pio = false;
+ 		return 0;
+ 	}
  }
+@@ -288,8 +297,8 @@ static u32 mvsd_finish_data(struct mvsd_host *host, struct mmc_data *data,
+ {
+ 	void __iomem *iobase = host->base;
+ 
+-	if (host->pio_ptr) {
+-		host->pio_ptr = NULL;
++	if (host->use_pio) {
++		sg_miter_stop(&host->sg_miter);
+ 		host->pio_size = 0;
+ 	} else {
+ 		dma_unmap_sg(mmc_dev(host->mmc), data->sg, host->sg_frags,
+@@ -344,9 +353,12 @@ static u32 mvsd_finish_data(struct mvsd_host *host, struct mmc_data *data,
+ static irqreturn_t mvsd_irq(int irq, void *dev)
+ {
+ 	struct mvsd_host *host = dev;
++	struct sg_mapping_iter *sgm = &host->sg_miter;
+ 	void __iomem *iobase = host->base;
+ 	u32 intr_status, intr_done_mask;
+ 	int irq_handled = 0;
++	u16 *p;
++	int s;
+ 
+ 	intr_status = mvsd_read(MVSD_NOR_INTR_STATUS);
+ 	dev_dbg(host->dev, "intr 0x%04x intr_en 0x%04x hw_state 0x%04x\n",
+@@ -370,15 +382,36 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
+ 	spin_lock(&host->lock);
+ 
+ 	/* PIO handling, if needed. Messy business... */
+-	if (host->pio_size &&
++	if (host->use_pio) {
++		/*
++		 * As we set sgm->consumed this always gives a valid buffer
++		 * position.
++		 */
++		if (!sg_miter_next(sgm)) {
++			/* This should not happen */
++			dev_err(host->dev, "ran out of scatter segments\n");
++			spin_unlock(&host->lock);
++			host->intr_en &=
++				~(MVSD_NOR_RX_READY | MVSD_NOR_RX_FIFO_8W |
++				  MVSD_NOR_TX_AVAIL | MVSD_NOR_TX_FIFO_8W);
++			mvsd_write(MVSD_NOR_INTR_EN, host->intr_en);
++			return IRQ_HANDLED;
++		}
++		p = sgm->addr;
++		s = sgm->length;
++		if (s > host->pio_size)
++			s = host->pio_size;
++	}
++
++	if (host->use_pio &&
+ 	    (intr_status & host->intr_en &
+ 	     (MVSD_NOR_RX_READY | MVSD_NOR_RX_FIFO_8W))) {
+-		u16 *p = host->pio_ptr;
+-		int s = host->pio_size;
++
+ 		while (s >= 32 && (intr_status & MVSD_NOR_RX_FIFO_8W)) {
+ 			readsw(iobase + MVSD_FIFO, p, 16);
+ 			p += 16;
+ 			s -= 32;
++			sgm->consumed += 32;
+ 			intr_status = mvsd_read(MVSD_NOR_INTR_STATUS);
+ 		}
+ 		/*
+@@ -391,6 +424,7 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
+ 				put_unaligned(mvsd_read(MVSD_FIFO), p++);
+ 				put_unaligned(mvsd_read(MVSD_FIFO), p++);
+ 				s -= 4;
++				sgm->consumed += 4;
+ 				intr_status = mvsd_read(MVSD_NOR_INTR_STATUS);
+ 			}
+ 			if (s && s < 4 && (intr_status & MVSD_NOR_RX_READY)) {
+@@ -398,10 +432,13 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
+ 				val[0] = mvsd_read(MVSD_FIFO);
+ 				val[1] = mvsd_read(MVSD_FIFO);
+ 				memcpy(p, ((void *)&val) + 4 - s, s);
++				sgm->consumed += s;
+ 				s = 0;
+ 				intr_status = mvsd_read(MVSD_NOR_INTR_STATUS);
+ 			}
+-			if (s == 0) {
++			/* PIO transfer done */
++			host->pio_size -= sgm->consumed;
++			if (host->pio_size == 0) {
+ 				host->intr_en &=
+ 				     ~(MVSD_NOR_RX_READY | MVSD_NOR_RX_FIFO_8W);
+ 				mvsd_write(MVSD_NOR_INTR_EN, host->intr_en);
+@@ -413,14 +450,10 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
+ 		}
+ 		dev_dbg(host->dev, "pio %d intr 0x%04x hw_state 0x%04x\n",
+ 			s, intr_status, mvsd_read(MVSD_HW_STATE));
+-		host->pio_ptr = p;
+-		host->pio_size = s;
+ 		irq_handled = 1;
+-	} else if (host->pio_size &&
++	} else if (host->use_pio &&
+ 		   (intr_status & host->intr_en &
+ 		    (MVSD_NOR_TX_AVAIL | MVSD_NOR_TX_FIFO_8W))) {
+-		u16 *p = host->pio_ptr;
+-		int s = host->pio_size;
+ 		/*
+ 		 * The TX_FIFO_8W bit is unreliable. When set, bursting
+ 		 * 16 halfwords all at once in the FIFO drops data. Actually
+@@ -431,6 +464,7 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
+ 			mvsd_write(MVSD_FIFO, get_unaligned(p++));
+ 			mvsd_write(MVSD_FIFO, get_unaligned(p++));
+ 			s -= 4;
++			sgm->consumed += 4;
+ 			intr_status = mvsd_read(MVSD_NOR_INTR_STATUS);
+ 		}
+ 		if (s < 4) {
+@@ -439,10 +473,13 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
+ 				memcpy(((void *)&val) + 4 - s, p, s);
+ 				mvsd_write(MVSD_FIFO, val[0]);
+ 				mvsd_write(MVSD_FIFO, val[1]);
++				sgm->consumed += s;
+ 				s = 0;
+ 				intr_status = mvsd_read(MVSD_NOR_INTR_STATUS);
+ 			}
+-			if (s == 0) {
++			/* PIO transfer done */
++			host->pio_size -= sgm->consumed;
++			if (host->pio_size == 0) {
+ 				host->intr_en &=
+ 				     ~(MVSD_NOR_TX_AVAIL | MVSD_NOR_TX_FIFO_8W);
+ 				mvsd_write(MVSD_NOR_INTR_EN, host->intr_en);
+@@ -450,8 +487,6 @@ static irqreturn_t mvsd_irq(int irq, void *dev)
+ 		}
+ 		dev_dbg(host->dev, "pio %d intr 0x%04x hw_state 0x%04x\n",
+ 			s, intr_status, mvsd_read(MVSD_HW_STATE));
+-		host->pio_ptr = p;
+-		host->pio_size = s;
+ 		irq_handled = 1;
+ 	}
+ 
 
 -- 
 2.34.1
