@@ -1,115 +1,122 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73EA8F68;
-	Sun, 28 Jan 2024 06:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A1055C05;
+	Sun, 28 Jan 2024 16:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706424561; cv=none; b=Gh0JZ+uhIH+YvPYWLxqB5p4E5kU/l7HsVMcZkyul28VW7lhgTCI16PoqWwCqZUE7sDQ+9Pv5F6hIo2wLGCS3wZ7XkSN30kTR50uX0Urkxv8ZYEHE8EHRZ3FxU0R6R+JfJC9mFJ6uIlM++noHBpYkAeh2AkGHDxUgoyR96P5nTOY=
+	t=1706458360; cv=none; b=Qq62E8nBrtU0YYGy3ds+XRfJ+k6js+FRC0vRVWNf7OQi0rJ9Z3GRvr2qr1FLOxoc+ni/sst/IPCToSGKRaWuZhr+tDpjW1U5p8F2d3y0AIrYIr8pb6tho5vzwsDynGaWLvG9zAfhTQnTEKkNJ0wgOuTZew83Qi2RLoxJ9i7752s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706424561; c=relaxed/simple;
-	bh=Y0KyCo+35BWc8oGfVah4O/KZ+KcNek3uewoK+eI1Tos=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fs3RGDzbvqQ7lav/OlFwF7Sno/4XHSoB9fdMTmu+D/HHQE4vWZvcny8q2d6f5WZmt6C3dvQ6o8LKUD2kFfRhcD5tU9xr3arjiJRCHFyZRqL88n5K3IoA7937SvERkCfqTfzcX/T1Rm/5dlbi60u5ew1v1Hfnlnr6R921BvTbWw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CypHp5od; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1706458360; c=relaxed/simple;
+	bh=tilC0+HJLhz3uWCPGBROp4NrgSw0Y9SOrcJz40WnTrQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AHgPAVB3IP2KMqFEUR7nuBpSTpelafxddoVIh4gnVY7hWVeEAABaApMfyC58WNnrKMBVwFLvp5ZGK+taKof7pCZAca4xeFVWg15mpANPqPRPmg0/mk0Z87SkpxWVPgNgJD/KrKcyIw47hAQ+x71xt6wdv3Y6tuvaZW0n65NRaHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBjrqJh3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CypHp5od"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706424560; x=1737960560;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Y0KyCo+35BWc8oGfVah4O/KZ+KcNek3uewoK+eI1Tos=;
-  b=CypHp5odxgSGE289FkK/p8UOvEiteY8cMhqg/Qkf6bBiA/XezHzr8wP+
-   ib0QwE8Ynaz2KvRo0wi4Y5O78Xfw2rMV0VucOd3caD7xTHzfHs5Zq6cHf
-   BZF6n35hGHMAX4sFk5YJYQswztjXfDALpDV5yE5g5CINr4MhXUNVXKGcT
-   vxK1+kHCgXhGpXkvAkp6z/Zpbd0xHw/Zr2cfULXwaVv+dBxdFHMYYTwUw
-   oePMXr6Mr1EqapjdH5+wt0NWlTA+gh+kDtQWaN8HtTnIMLDJaOgIC5npc
-   0ztRuOxSjcQf3UEiGNSWi471m7hU7m1fQv6nLQY01dzfrviKyXMJ2kgIq
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="2612197"
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="2612197"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2024 22:49:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="3045776"
-Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 27 Jan 2024 22:49:17 -0800
-Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rTyyg-0003Ak-1t;
-	Sun, 28 Jan 2024 06:49:14 +0000
-Date: Sun, 28 Jan 2024 14:48:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kent Overstreet <kent.overstreet@linux.dev>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Kent Overstreet <kent.overstreet@linux.dev>, peterz@infradead.org,
-	boqun.feng@gmail.com, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 2/4] pktcdvd: kill mutex_lock_nested() usage
-Message-ID: <202401281405.72SjSYnP-lkp@intel.com>
-References: <20240127020833.487907-3-kent.overstreet@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBjrqJh3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8529C433F1;
+	Sun, 28 Jan 2024 16:12:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706458359;
+	bh=tilC0+HJLhz3uWCPGBROp4NrgSw0Y9SOrcJz40WnTrQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lBjrqJh38yPQnSVQyOqCyeyon1Blb71hMzbsjte5l4am9nzFHjockzfm7A90D/I1p
+	 kDGD+B6aRsJGuYUhbd5KOdYwnkijzSuDb98Q55PXWa9YY8FsWVrgvgRbF0Z42TZFiM
+	 vUCp2d33SuQNVdA1IMXGxdo1SyVtT+QxQQvPcwoHPNC0CKQX/3bv/MXnO60VuOh00+
+	 6Y+khqKP3AMRV8cPmm5csY7ZMQRxY33BG0j+ECzSVqZJbFY55y24x5lOcaWo4uloCT
+	 x/3eW1XasvpvT2uksa9OmwfVqu3q59vYkBgHXQ8d0yOQhubmstZpb8Vg2gYtCOeVp2
+	 lWLwO93red6ZQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Jan Kara <jack@suse.cz>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Changhui Zhong <czhong@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.7 30/39] blk-mq: fix IO hang from sbitmap wakeup race
+Date: Sun, 28 Jan 2024 11:10:50 -0500
+Message-ID: <20240128161130.200783-30-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240128161130.200783-1-sashal@kernel.org>
+References: <20240128161130.200783-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240127020833.487907-3-kent.overstreet@linux.dev>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7.2
+Content-Transfer-Encoding: 8bit
 
-Hi Kent,
+From: Ming Lei <ming.lei@redhat.com>
 
-kernel test robot noticed the following build errors:
+[ Upstream commit 5266caaf5660529e3da53004b8b7174cab6374ed ]
 
-[auto build test ERROR on tip/locking/core]
-[also build test ERROR on net/main net-next/main linus/master v6.8-rc1 next-20240125]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+In blk_mq_mark_tag_wait(), __add_wait_queue() may be re-ordered
+with the following blk_mq_get_driver_tag() in case of getting driver
+tag failure.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kent-Overstreet/fs-pipe-Convert-to-lockdep_cmp_fn/20240127-101832
-base:   tip/locking/core
-patch link:    https://lore.kernel.org/r/20240127020833.487907-3-kent.overstreet%40linux.dev
-patch subject: [PATCH 2/4] pktcdvd: kill mutex_lock_nested() usage
-config: x86_64-randconfig-161-20240127 (https://download.01.org/0day-ci/archive/20240128/202401281405.72SjSYnP-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240128/202401281405.72SjSYnP-lkp@intel.com/reproduce)
+Then in __sbitmap_queue_wake_up(), waitqueue_active() may not observe
+the added waiter in blk_mq_mark_tag_wait() and wake up nothing, meantime
+blk_mq_mark_tag_wait() can't get driver tag successfully.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401281405.72SjSYnP-lkp@intel.com/
+This issue can be reproduced by running the following test in loop, and
+fio hang can be observed in < 30min when running it on my test VM
+in laptop.
 
-All errors (new ones prefixed by >>):
+	modprobe -r scsi_debug
+	modprobe scsi_debug delay=0 dev_size_mb=4096 max_queue=1 host_max_queue=1 submit_queues=4
+	dev=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
+	fio --filename=/dev/"$dev" --direct=1 --rw=randrw --bs=4k --iodepth=1 \
+       		--runtime=100 --numjobs=40 --time_based --name=test \
+        	--ioengine=libaio
 
-   kernel/locking/lockdep.c: In function 'lockdep_ptr_order_cmp_fn':
->> kernel/locking/lockdep.c:4925:9: error: implicit declaration of function 'cmp_int'; did you mean 'smp_init'? [-Werror=implicit-function-declaration]
-    4925 |  return cmp_int((unsigned long) a, (unsigned long) b);
-         |         ^~~~~~~
-         |         smp_init
-   cc1: some warnings being treated as errors
+Fix the issue by adding one explicit barrier in blk_mq_mark_tag_wait(), which
+is just fine in case of running out of tag.
 
+Cc: Jan Kara <jack@suse.cz>
+Cc: Kemeng Shi <shikemeng@huaweicloud.com>
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20240112122626.4181044-1-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-mq.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-vim +4925 kernel/locking/lockdep.c
-
-  4920	
-  4921	#ifdef CONFIG_PROVE_LOCKING
-  4922	int lockdep_ptr_order_cmp_fn(const struct lockdep_map *a,
-  4923				     const struct lockdep_map *b)
-  4924	{
-> 4925		return cmp_int((unsigned long) a, (unsigned long) b);
-  4926	}
-  4927	
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ac18f802c027..9171f3f201ce 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1858,6 +1858,22 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
+ 	__add_wait_queue(wq, wait);
+ 
++	/*
++	 * Add one explicit barrier since blk_mq_get_driver_tag() may
++	 * not imply barrier in case of failure.
++	 *
++	 * Order adding us to wait queue and allocating driver tag.
++	 *
++	 * The pair is the one implied in sbitmap_queue_wake_up() which
++	 * orders clearing sbitmap tag bits and waitqueue_active() in
++	 * __sbitmap_queue_wake_up(), since waitqueue_active() is lockless
++	 *
++	 * Otherwise, re-order of adding wait queue and getting driver tag
++	 * may cause __sbitmap_queue_wake_up() to wake up nothing because
++	 * the waitqueue_active() may not observe us in wait queue.
++	 */
++	smp_mb();
++
+ 	/*
+ 	 * It's possible that a tag was freed in the window between the
+ 	 * allocation failure and adding the hardware queue to the wait
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
