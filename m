@@ -1,132 +1,117 @@
-Received: from pb-smtp1.pobox.com (pb-smtp1.pobox.com [64.147.108.70])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD851F610;
-	Sat, 27 Jan 2024 22:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.108.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CB763D9;
+	Sun, 28 Jan 2024 04:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706394212; cv=none; b=PSBENNcfibVSovP1yGlTyKwQO1D6UG3hAovaJtJp4dOP8Fmy29ATBe7QA6XZRoaweU0cjS9zEEO0VjbOnw6AMhVllJGabaDzlWZhJp7CI6SefD7WQIcbb1fHg82Bf0SUmzOfDbVl26P7kn/OAePbMoisyUR9+JZ7h28+UmM9uPY=
+	t=1706416219; cv=none; b=uFBU9PmOzpayJ/rX2EnCrWASkFn9nVeGGRk5Y+4BUxSLALK6hindrNuwTJxfhIaEvjDi6Lpsv+g9bhpYFsvVGgIvLENxVS5vtWPBTMHFQgwYiXPXXsQNTw2v3u3bWDzEdgu0pAcHb5MxIC8Ok7JIL6jIfYXJGWkt2TEpYuxUhwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706394212; c=relaxed/simple;
-	bh=dXEKKJJKMssrfti5+IVKpGLfu0rUAaaK1AGmWF0f7FI=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=RnR42UPgucIPhqY1dOAvbD6gy/+e1H/60+Ijz0ZFQjikmAFYkC2NB5UE8xloOOmOquYREzxDr2ApZDIT7I638p4yXrS6Ql82pIteOabgAn4wK5HrZAi6EEhjB2e0DroTZCbh1cJ27YOhPo3kW5Ck3r3psoidBaEihQghWFfq7a8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (1024-bit key) header.d=pobox.com header.i=@pobox.com header.b=LyciiXu4; dkim=fail (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=xn5lipg3 reason="signature verification failed"; arc=none smtp.client-ip=64.147.108.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
+	s=arc-20240116; t=1706416219; c=relaxed/simple;
+	bh=82WJ+QojB1cPxyI/Ym5sbW8tqYYq8qJcoOqZ+Ywj8As=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C5z6BMoF7PTVOxl5IIcOJ5BObOuUePKWipPwoIpUs8ZbTwYpEH60xLok6FQeyhPMdHigvsjiu0ssGu8aHL28h6oB1mngL/YHIvsH2bfYh1s7eteZMSXlr8Sw/L8+nfKIvw6C2GqUgRVVswEYClTEfDyn27NhzHR4mzexHjGwh04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JXPyK6MX; arc=none smtp.client-ip=192.55.52.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pobox.com header.i=@pobox.com header.b="LyciiXu4";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="xn5lipg3"
-Received: from pb-smtp1.pobox.com (unknown [127.0.0.1])
-	by pb-smtp1.pobox.com (Postfix) with ESMTP id A5F761D4885;
-	Sat, 27 Jan 2024 17:23:23 -0500 (EST)
-	(envelope-from nico@fluxnic.net)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=pobox.com; h=date:from
-	:to:cc:subject:in-reply-to:message-id:references:mime-version
-	:content-type; s=sasl; bh=dXEKKJJKMssrfti5+IVKpGLfu0rUAaaK1AGmWF
-	0f7FI=; b=LyciiXu4/sxWh71EiYf/n8K/olbEOJOTsJZLDi8UFC3tz6XR8OOac1
-	0PIW825MHLObj+z/u3HgyqCryRJ3XJ/rgt12jCAN1HRr/eil4C18OnuK/ilS3L8x
-	o8w4MIRS2S2YFDKmXNKt5HOS0W6TbAEIywXYOnlKSg08dW5ZDPPQU=
-Received: from pb-smtp1.nyi.icgroup.com (unknown [127.0.0.1])
-	by pb-smtp1.pobox.com (Postfix) with ESMTP id 9DF1A1D4884;
-	Sat, 27 Jan 2024 17:23:23 -0500 (EST)
-	(envelope-from nico@fluxnic.net)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=fluxnic.net;
- h=date:from:to:cc:subject:in-reply-to:message-id:references:mime-version:content-type; s=2016-12.pbsmtp; bh=ZqdVXZMIxb6mKxSxxgHX9MkJMIE0Aldd2k6ZEOeFgR8=; b=xn5lipg36+IIpkr+wBabEfmZuYKGjocjBGVgYeVrtFBlNDU4dKrapObRVd9IsMLme9AAIKNwPKwyimnrwhdhAFWcjj8r42qpYHY9QoaUYxLMsuD6uvL/zUMpv+IAbwdG4cNyOlvVCSLpKBRkJ0nRD7Sd6XVIs/wfgNIeweaAxM4=
-Received: from yoda.fluxnic.net (unknown [24.201.101.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by pb-smtp1.pobox.com (Postfix) with ESMTPSA id 16B791D4883;
-	Sat, 27 Jan 2024 17:23:23 -0500 (EST)
-	(envelope-from nico@fluxnic.net)
-Received: from xanadu (unknown [IPv6:fd17:d3d3:663b:0:9696:df8a:e3:af35])
-	by yoda.fluxnic.net (Postfix) with ESMTPSA id E6E7FB0948B;
-	Sat, 27 Jan 2024 17:23:21 -0500 (EST)
-Date: Sat, 27 Jan 2024 17:23:21 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
-To: Linus Walleij <linus.walleij@linaro.org>
-cc: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 5/9] mmc: mvsdio: Use sg_miter for PIO
-In-Reply-To: <CACRpkdaXc98RkxRp3tO3yXYdGU3psnRQ-ZW0-hmMO0wzbBt+dg@mail.gmail.com>
-Message-ID: <o784r666-60o0-18n6-72pn-8sr4rs413543@syhkavp.arg>
-References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org> <20240127-mmc-proper-kmap-v2-5-d8e732aa97d1@linaro.org> <qr2sr893-775p-9770-2441-4o02qqo105or@syhkavp.arg> <CACRpkdaXc98RkxRp3tO3yXYdGU3psnRQ-ZW0-hmMO0wzbBt+dg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JXPyK6MX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706416217; x=1737952217;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=82WJ+QojB1cPxyI/Ym5sbW8tqYYq8qJcoOqZ+Ywj8As=;
+  b=JXPyK6MXcFSbRkff/npSvwudKlAen/NhuwS+1rNkF4JEY3Anu1nwCkFY
+   zkM4sQouM/peuRgupTufnptLboml/BIpqIQ0LAWNrqArv2Zn4x+OfkAbx
+   A40wi4Y79WXxuPtTiqK4TqiODwBl8Z2bZ9SJPxLKH2vuwrkoRPbF3L8jr
+   oKUAubU/ZZNhlTCKLh2tpBUtskIBlAELrMvQZLqi8M3LkLTDCFTGz1n5J
+   hQCi5db5GVe1931s5MwHXOAPhLaj5BB7TftbbTD5kXiStG6dfk1wLUawq
+   0v9QnaiJTToPfaSNkoiTdUwc8p66qcz+It9TmuKaIMkxarueS6ILzkKYm
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="433900316"
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="433900316"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2024 20:30:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="910718820"
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="910718820"
+Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 27 Jan 2024 20:30:13 -0800
+Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rTwo7-00034i-1R;
+	Sun, 28 Jan 2024 04:30:11 +0000
+Date: Sun, 28 Jan 2024 12:29:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kent Overstreet <kent.overstreet@linux.dev>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Kent Overstreet <kent.overstreet@linux.dev>, peterz@infradead.org,
+	boqun.feng@gmail.com, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 2/4] pktcdvd: kill mutex_lock_nested() usage
+Message-ID: <202401281210.ZqZ0bZlb-lkp@intel.com>
+References: <20240127020833.487907-3-kent.overstreet@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463781375-595774222-1706394201=:37909"
-X-Pobox-Relay-ID:
- AEBBF42C-BD62-11EE-AB95-78DCEB2EC81B-78420484!pb-smtp1.pobox.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240127020833.487907-3-kent.overstreet@linux.dev>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hi Kent,
 
----1463781375-595774222-1706394201=:37909
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+kernel test robot noticed the following build errors:
 
-On Sat, 27 Jan 2024, Linus Walleij wrote:
+[auto build test ERROR on tip/locking/core]
+[also build test ERROR on net/main net-next/main linus/master v6.8-rc1 next-20240125]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> Hi Nico!
->=20
-> nice to mail with you as always!
->=20
-> On Sat, Jan 27, 2024 at 4:51=E2=80=AFAM Nicolas Pitre <nico@fluxnic.net=
-> wrote:
-> > On Sat, 27 Jan 2024, Linus Walleij wrote:
-> >
-> > > Use the scatterlist memory iterator instead of just
-> > > dereferencing virtual memory using sg_virt().
-> > > This make highmem references work properly.
-> > >
-> > > This driver also has a bug in the PIO sglist handling that
-> > > is fixed as part of the patch: it does not travers the
-> > > list of scatterbuffers: it will just process the first
-> > > item in the list. This is fixed by augmenting the logic
-> > > such that we do not process more than one sgitem
-> > > per IRQ instead of counting down potentially the whole
-> > > length of the request.
-> > >
-> > > We can suspect that the PIO path is quite untested.
-> >
-> > It was tested for sure ... at least by myself ... some 17 years ago !
->=20
-> Hm, on the DMA path the code is taking struct mmc_data .sg_len
-> into account but not on the polled I/O path.
->=20
-> But I think sg_len is very often 1, as long as the memory isn't very
-> fragmented so pieces of a file you read/write are all over the place.
->=20
-> It needs to be tested under high memory pressure to provoke errors
-> I think. I'm not sure, the block layer people may have some secret
-> testing trick! (I actually have this hardware in a Kirkwood NAS.)
+url:    https://github.com/intel-lab-lkp/linux/commits/Kent-Overstreet/fs-pipe-Convert-to-lockdep_cmp_fn/20240127-101832
+base:   tip/locking/core
+patch link:    https://lore.kernel.org/r/20240127020833.487907-3-kent.overstreet%40linux.dev
+patch subject: [PATCH 2/4] pktcdvd: kill mutex_lock_nested() usage
+config: mips-randconfig-r063-20240127 (https://download.01.org/0day-ci/archive/20240128/202401281210.ZqZ0bZlb-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240128/202401281210.ZqZ0bZlb-lkp@intel.com/reproduce)
 
-Oh, I don't mean to imply that the testing was thorough. Especially=20
-given that, under normal circumstances, you're always using DMA with=20
-nicely aligned and sized blocks.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401281210.ZqZ0bZlb-lkp@intel.com/
 
-But SDIO is different (smallish buffers). So the PIO support was added=20
-only to work around hw bugs in that case.
+All errors (new ones prefixed by >>):
 
-Good you fixed it nevertheless.
+>> kernel/locking/lockdep.c:4925:9: error: call to undeclared function 'cmp_int'; ISO C99 and later do not support implicit function declarations [-Werror,-Wimplicit-function-declaration]
+           return cmp_int((unsigned long) a, (unsigned long) b);
+                  ^
+   kernel/locking/lockdep.c:4925:9: note: did you mean 'smp_init'?
+   include/linux/smp.h:225:20: note: 'smp_init' declared here
+   static inline void smp_init(void) { }
+                      ^
+   1 error generated.
 
-> > >               if (!nodma)
-> > > -                     dev_dbg(host->dev, "fallback to PIO for data =
-at 0x%p size %d\n",
-> > > -                             host->pio_ptr, host->pio_size);
-> > > +                     dev_dbg(host->dev, "fallback to PIO for data\=
-n");
-> >
-> > Given this message is about telling you why PIO is used despite not
-> > having asked for it, I think it would be nicer to preserve the
-> > equivalent info responsible for this infliction i.e. data->sg->offset
-> > and data->blksz.
->=20
-> OK I fix!
->=20
-> Yours,
-> Linus Walleij
->=20
----1463781375-595774222-1706394201=:37909--
+
+vim +/cmp_int +4925 kernel/locking/lockdep.c
+
+  4920	
+  4921	#ifdef CONFIG_PROVE_LOCKING
+  4922	int lockdep_ptr_order_cmp_fn(const struct lockdep_map *a,
+  4923				     const struct lockdep_map *b)
+  4924	{
+> 4925		return cmp_int((unsigned long) a, (unsigned long) b);
+  4926	}
+  4927	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
