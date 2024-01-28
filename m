@@ -1,122 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE5F524A2;
-	Sun, 28 Jan 2024 16:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2D720B29;
+	Sun, 28 Jan 2024 16:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706458636; cv=none; b=HjLCPTpVkZTQmUGcsicA1xdGj7tpDhDQfzDRD5qAPFF0c2Hzfp2wPQ4JrVKrHeZwoM4oWUB1raY1tD7qXWPGLT7Sgps06xMl7ycmpD1JTfVsN/X2CRJrwYMpm3uAmYhybcnRhJ0N/dH6jXMrf3jzPKV6lyrX/vBt3R/M2IwYlCI=
+	t=1706461108; cv=none; b=DN/zK8wEUpvTFA3eqlWwlfaB+mg1ZiQAfyaTY2uahU+ghUfvp2OJPHrCc+EICn2L/n+P3KnXzvy7se1/7BN4c9PlbR1vuXcrYCMJMHeQO50NK6gjVHwT8IKRePZZ7QM0Fckktkzp1AVPAtWPuo4Krr8b+7LeJB7Mxn2Fkhe0YM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706458636; c=relaxed/simple;
-	bh=76J1OpPZEDhDhLfl2S4BMXsylw8T+SlH2hIp+v1g98c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iEJyFqeVDW8PAH9GvU+vXEhJkZTDRify+Mum5rXGbEp5f8i+Aw1rH0NN+0287Uvra4dVjDS4lwKJfrVj7ADVc3s1zJaty634oeVuP60dnRJ5dqIIKgOzed17Zl2cUI6JbH21Fnio1apFxyEIoa3JunmSN4PyHW27yVpQC3+kdJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KFToCTJe; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706461108; c=relaxed/simple;
+	bh=pOxejoN0CG5BeWMnHP97I/IC1yUpa4Bx5Jxxor5j5Kw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oL5tBDb25INlMbslR5woinv0MRRkY2ohNKUD70q6bqPmFcavzSabh+BTljhkIp52mhuXQBLNppwu5jocM4zdr5k4WryQJkbjeW/9LvQs2Mw8jVhAPeXQk5HR4Lf1DIOh328usloeEe7OwHIH1fgAkNlgjRZLCZSmBPsTvCMaR6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vtnf37Yg; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KFToCTJe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23DB4C43390;
-	Sun, 28 Jan 2024 16:17:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706458636;
-	bh=76J1OpPZEDhDhLfl2S4BMXsylw8T+SlH2hIp+v1g98c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KFToCTJeuLVqmoH/C2p6JrS//BhyqliuGeobjfA6SdjsoGz4rvKz86ykX2cHg11vC
-	 PGB3cIpIZ0MqadPQ7h6Rpw4fTfTFvM9IL7HEYaDAbU2quFE9vNh86L9rUtZtSlFQFc
-	 bBAZUQxCOf+sEAGqx4B6HdEwo703O7uylKXm7fUmrR0X2CkfzMZXc1yD/Tow5LJB/q
-	 vpSCcrwKgYhE2DV9Ps/urozkizAJjh0gDVp0iF50K5iRT4RTQ1UotcxeuNrPbe7Pgu
-	 a6DC4L8yqz75NEpwrQT5iqoGTCkRlZedISpA+J6g54mm4GybOMn+Padfl2IiGf98yG
-	 EyTVn6Fw7zXrg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Jan Kara <jack@suse.cz>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Changhui Zhong <czhong@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 6/8] blk-mq: fix IO hang from sbitmap wakeup race
-Date: Sun, 28 Jan 2024 11:16:57 -0500
-Message-ID: <20240128161704.205756-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240128161704.205756-1-sashal@kernel.org>
-References: <20240128161704.205756-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vtnf37Yg"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=t8/5TaCxuroVSP4GMjqC2cE3K0Q1/cXcNHEHPiYjfPk=; b=vtnf37Yg1h1KOo8mN5uMvN2H8c
+	oV4/vRZgkDkGuQ+weW/szEeIDgoL6vGviR5JOA+06nxBE48ivRU/maqN21IolW9yzWwwuNYAGsMxP
+	o93ifuFpCQdDsknfRBgdbgMCor8al4tqJGqVMIdac32xzH61JyB6/66M5x4L7Hox/dzDcoYvFFxwk
+	I9g8FwPmwC6GuYRnuqFFwYoic3qkfkiSiIu5C26XMqGN3brranzv8/37Fpj/t56PbSSABzyHxkbLh
+	8nKLMcKItBTkxJ0qGgp8ItUgHk2cg5OT/AZ15UejGk67LskWGRsahsB9+jiP1NKR4HwHmebMBdjwB
+	ebpqbHOA==;
+Received: from [2001:4bb8:182:6550:c70:4a89:bc61:3] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rU8U5-0000000A1xA-0ggr;
+	Sun, 28 Jan 2024 16:58:17 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	virtualization@lists.linux.dev
+Subject: atomic queue limits updates v2
+Date: Sun, 28 Jan 2024 17:57:59 +0100
+Message-Id: <20240128165813.3213508-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.306
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Ming Lei <ming.lei@redhat.com>
+Hi Jens,
 
-[ Upstream commit 5266caaf5660529e3da53004b8b7174cab6374ed ]
+currently queue limits updates are a mess in that they are updated one
+limit at a time, which makes both cross-checking them against other
+limits hard, and also makes it hard to provide atomicy.
 
-In blk_mq_mark_tag_wait(), __add_wait_queue() may be re-ordered
-with the following blk_mq_get_driver_tag() in case of getting driver
-tag failure.
+This series tries to change this by updating the whole set of queue
+limits atomically.   This in done in two ways:
 
-Then in __sbitmap_queue_wake_up(), waitqueue_active() may not observe
-the added waiter in blk_mq_mark_tag_wait() and wake up nothing, meantime
-blk_mq_mark_tag_wait() can't get driver tag successfully.
+ - for the initial setup the queue_limits structure is simply passed to
+   the queue/disk allocation helpers and applies there after validation.
+ - for the (relatively few) cases that update limits at runtime a pair
+   of helpers to take a snapshot of the current limits and to commit it
+   after picking up the callers changes are provided.
 
-This issue can be reproduced by running the following test in loop, and
-fio hang can be observed in < 30min when running it on my test VM
-in laptop.
+As the series is big enough it only converts two drivers - virtio_blk as
+a heavily used driver in virtualized setups, and loop as one that actually
+does runtime updates while being fairly simple.  I plan to update most
+drivers for this merge window, although SCSI will probably have to wait
+for the next one given that it will need extensive API changes in the
+LLDD and ULD interfaces.
 
-	modprobe -r scsi_debug
-	modprobe scsi_debug delay=0 dev_size_mb=4096 max_queue=1 host_max_queue=1 submit_queues=4
-	dev=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
-	fio --filename=/dev/"$dev" --direct=1 --rw=randrw --bs=4k --iodepth=1 \
-       		--runtime=100 --numjobs=40 --time_based --name=test \
-        	--ioengine=libaio
+Chances since v1:
+ - remove a spurious NULL return in blk_alloc_queue
+ - keep the existing max_discard_sectors == 0 behavior
+ - drop the patch nvme discard limit update hack - it will go into
+   the series updating nvme instead
+ - drop a chunk_sector check
+ - use PAGE_SECTORS in a few places
+ - document the checks and defaults in blk_validate_limits
+ - various spelling fixes
 
-Fix the issue by adding one explicit barrier in blk_mq_mark_tag_wait(), which
-is just fine in case of running out of tag.
-
-Cc: Jan Kara <jack@suse.cz>
-Cc: Kemeng Shi <shikemeng@huaweicloud.com>
-Reported-by: Changhui Zhong <czhong@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20240112122626.4181044-1-ming.lei@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ae70b4809bec..0cb559d63998 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1064,6 +1064,22 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
- 	__add_wait_queue(wq, wait);
- 
-+	/*
-+	 * Add one explicit barrier since blk_mq_get_driver_tag() may
-+	 * not imply barrier in case of failure.
-+	 *
-+	 * Order adding us to wait queue and allocating driver tag.
-+	 *
-+	 * The pair is the one implied in sbitmap_queue_wake_up() which
-+	 * orders clearing sbitmap tag bits and waitqueue_active() in
-+	 * __sbitmap_queue_wake_up(), since waitqueue_active() is lockless
-+	 *
-+	 * Otherwise, re-order of adding wait queue and getting driver tag
-+	 * may cause __sbitmap_queue_wake_up() to wake up nothing because
-+	 * the waitqueue_active() may not observe us in wait queue.
-+	 */
-+	smp_mb();
-+
- 	/*
- 	 * It's possible that a tag was freed in the window between the
- 	 * allocation failure and adding the hardware queue to the wait
--- 
-2.43.0
-
+Diffstat:
+ arch/um/drivers/ubd_kern.c          |    2 
+ block/blk-core.c                    |   31 ++-
+ block/blk-mq.c                      |   26 +--
+ block/blk-settings.c                |  213 ++++++++++++++++++++++++-
+ block/blk-sysfs.c                   |   59 +++----
+ block/blk.h                         |    3 
+ block/bsg-lib.c                     |    2 
+ block/genhd.c                       |    4 
+ drivers/block/amiflop.c             |    2 
+ drivers/block/aoe/aoeblk.c          |    2 
+ drivers/block/ataflop.c             |    2 
+ drivers/block/floppy.c              |    2 
+ drivers/block/loop.c                |   75 ++++-----
+ drivers/block/mtip32xx/mtip32xx.c   |    2 
+ drivers/block/nbd.c                 |    2 
+ drivers/block/null_blk/main.c       |    2 
+ drivers/block/ps3disk.c             |    2 
+ drivers/block/rbd.c                 |    2 
+ drivers/block/rnbd/rnbd-clt.c       |    2 
+ drivers/block/sunvdc.c              |    2 
+ drivers/block/swim.c                |    2 
+ drivers/block/swim3.c               |    2 
+ drivers/block/ublk_drv.c            |    2 
+ drivers/block/virtio_blk.c          |  299 ++++++++++++++++++------------------
+ drivers/block/xen-blkfront.c        |    2 
+ drivers/block/z2ram.c               |    2 
+ drivers/cdrom/gdrom.c               |    2 
+ drivers/memstick/core/ms_block.c    |    2 
+ drivers/memstick/core/mspro_block.c |    2 
+ drivers/mmc/core/queue.c            |    2 
+ drivers/mtd/mtd_blkdevs.c           |    2 
+ drivers/mtd/ubi/block.c             |    2 
+ drivers/nvme/host/apple.c           |    2 
+ drivers/nvme/host/core.c            |    8 
+ drivers/s390/block/dasd_genhd.c     |    2 
+ drivers/s390/block/scm_blk.c        |    2 
+ drivers/scsi/scsi_scan.c            |    2 
+ drivers/ufs/core/ufshcd.c           |    2 
+ include/linux/blk-mq.h              |   10 -
+ include/linux/blkdev.h              |   36 +++-
+ 40 files changed, 526 insertions(+), 296 deletions(-)
