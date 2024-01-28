@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A1055C05;
-	Sun, 28 Jan 2024 16:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5171B64CC4;
+	Sun, 28 Jan 2024 16:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706458360; cv=none; b=Qq62E8nBrtU0YYGy3ds+XRfJ+k6js+FRC0vRVWNf7OQi0rJ9Z3GRvr2qr1FLOxoc+ni/sst/IPCToSGKRaWuZhr+tDpjW1U5p8F2d3y0AIrYIr8pb6tho5vzwsDynGaWLvG9zAfhTQnTEKkNJ0wgOuTZew83Qi2RLoxJ9i7752s=
+	t=1706458433; cv=none; b=i3x5i7stzvO2OeQJz1GhxZz8qFuxVOR78oLJKoJvCvvAKJD/dnjTojPZTlGbWbIxgqoTfTjFInK/xjn0be5bTN/FTCYjPqYEF3YChVvUipWzbv9nLw7Ijq264Rmed7zP6BYxT7Iie5ABPG3r6/xb3RpfIWmFq20PH3WgQ3860EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706458360; c=relaxed/simple;
-	bh=tilC0+HJLhz3uWCPGBROp4NrgSw0Y9SOrcJz40WnTrQ=;
+	s=arc-20240116; t=1706458433; c=relaxed/simple;
+	bh=yJ1Oj3swyiAjLs0NVZWmoFRw1rXXItNVrGGLG54VkcA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AHgPAVB3IP2KMqFEUR7nuBpSTpelafxddoVIh4gnVY7hWVeEAABaApMfyC58WNnrKMBVwFLvp5ZGK+taKof7pCZAca4xeFVWg15mpANPqPRPmg0/mk0Z87SkpxWVPgNgJD/KrKcyIw47hAQ+x71xt6wdv3Y6tuvaZW0n65NRaHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBjrqJh3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=R5Pedq5KeThaEa2KTSVjZ/s17u/uGZO7UZxNoyUIY2M9S3hlwZBwTShiFsDCnHNnMBY6BM7671EWpuxW6zPTy4xDsTj6VcNyDKK6VixU3F51HfuKaCO5uXgA6/tdDJBYL8PZvRnfyZ+iw/DKZjVQpMmC+WVVTVo3DancqQuhwtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJLEApAk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBjrqJh3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8529C433F1;
-	Sun, 28 Jan 2024 16:12:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJLEApAk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B0EEC43390;
+	Sun, 28 Jan 2024 16:13:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706458359;
-	bh=tilC0+HJLhz3uWCPGBROp4NrgSw0Y9SOrcJz40WnTrQ=;
+	s=k20201202; t=1706458433;
+	bh=yJ1Oj3swyiAjLs0NVZWmoFRw1rXXItNVrGGLG54VkcA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lBjrqJh38yPQnSVQyOqCyeyon1Blb71hMzbsjte5l4am9nzFHjockzfm7A90D/I1p
-	 kDGD+B6aRsJGuYUhbd5KOdYwnkijzSuDb98Q55PXWa9YY8FsWVrgvgRbF0Z42TZFiM
-	 vUCp2d33SuQNVdA1IMXGxdo1SyVtT+QxQQvPcwoHPNC0CKQX/3bv/MXnO60VuOh00+
-	 6Y+khqKP3AMRV8cPmm5csY7ZMQRxY33BG0j+ECzSVqZJbFY55y24x5lOcaWo4uloCT
-	 x/3eW1XasvpvT2uksa9OmwfVqu3q59vYkBgHXQ8d0yOQhubmstZpb8Vg2gYtCOeVp2
-	 lWLwO93red6ZQ==
+	b=sJLEApAkgPjqT6xPuN/CecWnpeWW6MfZZMoYu2yIHN8EkvYvkANsvl1aIRBx3Tzg3
+	 Ovw+nA+3Tzd0qbFRer4BWjdcS5NbKnBiRhLIVvg3a094C2WG9DTZLEcrtqQIuhTDLe
+	 fWwuvPnrYI7Q7cv5yNAwG+Wo9IQst2ABvX9C9jVWwxzJ0SdwWUpaoq/+jsvTKS9rbs
+	 yk+alIV9V8UqctNU/zPnXQSTayyJOfJa+ZaQA4TnGsa9v0Ie0bMhb8n0/dJ9GuyEir
+	 Aq7eDb1DJAnVz0FPY59owUBojt5eVKS7JGqSWeoqzGKoztXPvyegf34eORPeSB9QYG
+	 8O3RNqNd1h/fg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -36,12 +36,12 @@ Cc: Ming Lei <ming.lei@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 30/39] blk-mq: fix IO hang from sbitmap wakeup race
-Date: Sun, 28 Jan 2024 11:10:50 -0500
-Message-ID: <20240128161130.200783-30-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 22/31] blk-mq: fix IO hang from sbitmap wakeup race
+Date: Sun, 28 Jan 2024 11:12:52 -0500
+Message-ID: <20240128161315.201999-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240128161130.200783-1-sashal@kernel.org>
-References: <20240128161130.200783-1-sashal@kernel.org>
+In-Reply-To: <20240128161315.201999-1-sashal@kernel.org>
+References: <20240128161315.201999-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.7.2
+X-stable-base: Linux 6.6.14
 Content-Transfer-Encoding: 8bit
 
 From: Ming Lei <ming.lei@redhat.com>
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 16 insertions(+)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ac18f802c027..9171f3f201ce 100644
+index 20ecd0ab616f..76b5b65ca62f 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1858,6 +1858,22 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+@@ -1870,6 +1870,22 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
  	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
  	__add_wait_queue(wq, wait);
  
