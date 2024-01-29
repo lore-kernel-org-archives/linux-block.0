@@ -1,149 +1,236 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8116F08E
-	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 19:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491C9158D64
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 22:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706556559; cv=none; b=azTWOcy7/yWUm04S5VQcSsmLIIxW/lZDIDjmkAVBV2s/mL5cH/0DFGPriEpT5PrrO4i5tNIo0jEBrDUNHj2v3GyTVMi7D3n9zZ0wsiQHNaJYLpz9Opw30zDxZMQMW/tOa9SGeC7a1mGYvRKa9Yvto1daRVYbp+cBLbTqHWyqEOI=
+	t=1706566053; cv=none; b=JTAO+Bi/h71W/6Z1Qw/zjZ7hU7anfCAeBTWc2mwPk04e6ppKSf2bRHNW1VnaDTa/61M8zUW/2kCGuX4FJLG1UmSonvxseofg1ZbpKct4M3HkCopZ3QudPBB2kA3VP9TpFhlgml5PnL2OaDOeoH1eDuSsRg1pLKztWpHur1nvegU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706556559; c=relaxed/simple;
-	bh=ZESgME+ALPbx9lJo++BhthHpPseuVzsqW4G7/pIDDu8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=IOS697FxlySg+EQzQwifbxMDK8u7gPXoXs0O5CkISiLO0lmDunQuzgJq2ygTthf9GxZZWkg2A7GaXGWB5U9gpGfrER+GNSyOL76bFeN3Vxdr3InZk3E2Ba2rsP4gv7/0TKD1HOaHmElrpFUvbkV98F6fqXmItvIavm7vRRasnLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AJMH9vyB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1706566053; c=relaxed/simple;
+	bh=yEzWXYpJ0zzsfLH9yoENH2HRJkA6mj6FdpG+ugY3fhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qkXgymOlUEDN+rSYSASS8BSCUqpwvOXm3jdzN1Vfuj1mS0IdW5bj4gbiaegtbthsLYUEf5KUI4y07Ey8aBFNhpXlqXOdmF8PvleXVB8f0Pm1LnC/t2eytWlUmvIdonSM2I2oZea9XjH2hyCyRSJS2DaF8GRX+VSmSARZBfECLNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=lFL2BqOA; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJMH9vyB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706556556;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cfAt1hi0Z3grmQvgCjXAH8jNPiFb7a7TOp8BzFVC+CU=;
-	b=AJMH9vyBewnpDaba4IWOToN6KvUel8GPyTphwD7DXCLSthknctKTVCcRZ7d4JSVMXKriqK
-	1RWGouzBJmgeTT2UQgLlMy/OH7wIFzXDFIQpzRNUJxCpeozmhGUjhrK2doPHQwxQ8OS11O
-	wQHV1oq518XXJYY7ynPy12gkRGK70uw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-xTtw-wHBNZe64_K3hDLlAQ-1; Mon, 29 Jan 2024 14:29:11 -0500
-X-MC-Unique: xTtw-wHBNZe64_K3hDLlAQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C6D5685A58E;
-	Mon, 29 Jan 2024 19:29:10 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7648EC2590E;
-	Mon, 29 Jan 2024 19:29:10 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id 5F15330C14EB; Mon, 29 Jan 2024 19:29:10 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 54E793FB4E;
-	Mon, 29 Jan 2024 20:29:10 +0100 (CET)
-Date: Mon, 29 Jan 2024 20:29:10 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Hongyu Jin <hongyu.jin.cn@gmail.com>
-cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, ebiggers@kernel.org, 
-    zhiguo.niu@unisoc.com, ke.wang@unisoc.com, yibin.ding@unisoc.com, 
-    hongyu.jin@unisoc.com, linux-kernel@vger.kernel.org, 
-    dm-devel@lists.linux.dev, linux-block@vger.kernel.org
-Subject: Re: [PATCH v8 0/5] Fix I/O priority lost in device-mapper
-In-Reply-To: <20240124053556.126468-1-hongyu.jin.cn@gmail.com>
-Message-ID: <8b31bbef-35f7-6efd-d1ba-381cc1952e5d@redhat.com>
-References: <20231221103139.15699-6-hongyu.jin.cn@gmail.com> <20240124053556.126468-1-hongyu.jin.cn@gmail.com>
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="lFL2BqOA"
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-59a1a03d09aso1054416eaf.3
+        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 14:07:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1706566050; x=1707170850; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TkOK2ky57QWvLHymi2f083eMbmQg+Iob+b+B/RRjeqM=;
+        b=lFL2BqOA25ZiZLccZCqarYVbk7s9lzka/jD2p1x5dDjHYDDlEQapEBMYBr2Z0qabrx
+         6nCiDvqXSV7WP9/hGVmB7MVatpx9j+6zL0CEoTfZG37kNxGGyXSPCGhTBIoLpiMHnaXH
+         A8JyRF//IrocwDqizXQ5Jw1IeEZWhK0ccB0zCK9VbPNnP6utimyeDJM+5nVTFEQmXaV+
+         B5IWi8GmqQ64Q5+UU6wBEcfdBi5BufJ1HC/c/+oQaHEC+GCN+ZcojX17S6HB3sBIcPOD
+         dQQdBBhIEiBAepIDn+YbmsatDg+Qqv44moAt4stYMTdyBP7toF+PO1/8NpmToplBYBER
+         mVyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706566050; x=1707170850;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TkOK2ky57QWvLHymi2f083eMbmQg+Iob+b+B/RRjeqM=;
+        b=gd0n90GFlp+JIJ9YfgLUEhcN1FFPl5q2k9hKVdquWWLJSPZBIKRAH/iNXJR/diI+Zc
+         R2HRFjnxUTjsrL5gHL9ze6kha6O1VRlZzz4LrBNBd5t2kxboIKpvqix0UgyQxShchQQH
+         cuP82k9DW8P80WmLJKBxxE6CReFlOCi/B4LrwXA/FMr5EWss6qsZj7p+m4LoogReZQCM
+         wmLs9P+7e4K11fCi8aUWwqYMDbySJPgnv3nJGlYyCzMd212YEmICCbc7A+dl96UDJnV6
+         TBH2qshLhtMQsCs1JUB8Ltcl4j433OZZ5m+C/OEBQ/T3pw/bJSHHjno2mzMoOKxfSnXW
+         1zJw==
+X-Gm-Message-State: AOJu0YwCF8JdUR35fesILYza28UsCnmMCGqK42cyX/TfzEx1OLbV1yPx
+	V53/VIQ6+V7eDYNs2Yj0hyOtFXBwiuWZpvDb1NmpZc0k+bcO+vl8Q5XvkG1iP5Q=
+X-Google-Smtp-Source: AGHT+IHqFp8kC5K5GfPaXb9+ihxnatcrPICumwWH3mnaHLyMvECkA4Ua2vHGp4VeYhJjrFZ6wQGdfQ==
+X-Received: by 2002:a05:6358:7e99:b0:178:7f7f:2460 with SMTP id o25-20020a0563587e9900b001787f7f2460mr1290013rwn.47.1706566049776;
+        Mon, 29 Jan 2024 14:07:29 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-38-249.pa.nsw.optusnet.com.au. [49.181.38.249])
+        by smtp.gmail.com with ESMTPSA id jw3-20020a056a00928300b006dbd2231184sm6320885pfb.70.2024.01.29.14.07.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 14:07:29 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rUZmm-00H2v9-1z;
+	Tue, 30 Jan 2024 09:07:24 +1100
+Date: Tue, 30 Jan 2024 09:07:24 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Mike Snitzer <snitzer@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, Don Dutile <ddutile@redhat.com>,
+	Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org
+Subject: Re: [RFC PATCH] mm/readahead: readahead aggressively if read drops
+ in willneed range
+Message-ID: <ZbghnK+Hs+if6vEz@dread.disaster.area>
+References: <20240128142522.1524741-1-ming.lei@redhat.com>
+ <ZbbPCQZdazF7s0_b@casper.infradead.org>
+ <ZbbfXVg9FpWRUVDn@redhat.com>
+ <ZbbvfFxcVgkwbhFv@casper.infradead.org>
+ <CAH6w=aw_46Ker0w8HmSA41vUUDKGDGC3gxBFWAhd326+kEtrNg@mail.gmail.com>
+ <ZbcDvTkeDKttPfJ4@dread.disaster.area>
+ <ZbciOba1h3V9mmup@fedora>
+ <Zbc0ZJceZPyt8m7q@dread.disaster.area>
+ <ZbdhBaXkXm6xyqgC@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZbdhBaXkXm6xyqgC@fedora>
 
-The patchset seems OK to me.
+On Mon, Jan 29, 2024 at 04:25:41PM +0800, Ming Lei wrote:
+> On Mon, Jan 29, 2024 at 04:15:16PM +1100, Dave Chinner wrote:
+> > On Mon, Jan 29, 2024 at 11:57:45AM +0800, Ming Lei wrote:
+> > > On Mon, Jan 29, 2024 at 12:47:41PM +1100, Dave Chinner wrote:
+> > > > On Sun, Jan 28, 2024 at 07:39:49PM -0500, Mike Snitzer wrote:
+> > > Follows the current report:
+> > > 
+> > > 1) usersapce call madvise(willneed, 1G)
+> > > 
+> > > 2) only the 1st part(size is from bdi->io_pages, suppose it is 2MB) is
+> > > readahead in madvise(willneed, 1G) since commit 6d2be915e589
+> > > 
+> > > 3) the other parts(2M ~ 1G) is readahead by unit of bdi->ra_pages which is
+> > > set as 64KB by userspace when userspace reads the mmaped buffer, then
+> > > the whole application becomes slower.
+> > 
+> > It gets limited by file->f_ra->ra_pages being initialised to
+> > bdi->ra_pages and then never changed as the advice for access
+> > methods to the file are changed.
+> > 
+> > But the problem here is *not the readahead code*. The problem is
+> > that the user has configured the device readahead window to be far
+> > smaller than is optimal for the storage. Hence readahead is slow.
+> > The fix for that is to either increase the device readahead windows,
+> > or to change the specific readahead window for the file that has
+> > sequential access patterns.
+> > 
+> > Indeed, we already have that - FADV_SEQUENTIAL will set
+> > file->f_ra.ra_pages to 2 * bdi->ra_pages so that readahead uses
+> > larger IOs for that access.
+> > 
+> > That's what should happen here - MADV_WILLNEED does not imply a
+> > specific access pattern so the application should be running
+> > MADV_SEQUENTIAL (triggers aggressive readahead) then MADV_WILLNEED
+> > to start the readahead, and then the rest of the on-demand readahead
+> > will get the higher readahead limits.
+> > 
+> > > This patch changes 3) to use bdi->io_pages as readahead unit.
+> > 
+> > I think it really should be changing MADV/FADV_SEQUENTIAL to set
+> > file->f_ra.ra_pages to bdi->io_pages, not bdi->ra_pages * 2, and the
+> > mem.load() implementation in the application converted to use
+> > MADV_SEQUENTIAL to properly indicate it's access pattern to the
+> > readahead algorithm.
+> 
+> Here the single .ra_pages may not work, that is why this patch stores
+> the willneed range in maple tree, please see the following words from
+> the original RH report:
 
-Reviewed-by: Mikulas Patocka <mpatocka@redhat.com>
+> "
+> Increasing read ahead is not an option as it has a mixed I/O workload of
+> random I/O and sequential I/O, so that a large read ahead is very counterproductive
+> to the random I/O and is unacceptable.
+> "
+
+Yes, I've read the bug. There's no triage that tells us what the
+root cause of the application perofrmance issue might be. Just an
+assertion that "this is how we did it 10 years ago, it's been
+unchanged for all this time, the new kernel we are upgrading
+to needs to behave exactly like pre-3.10 era kernels did.
+
+And to be totally honest, my instincts tell me this is more likely a
+problem with a root cause in poor IO scheduling decisions than be a
+problem with the page cache readahead implementation. Readahead has
+been turned down to stop the bandwidth it uses via background async
+read IO from starving latency dependent foreground random IO
+operation, and then we're being asked to turn readahead back up
+in specific situations because it's actually needed for performance
+in certain access patterns. This is the sort of thing bfq is
+intended to solve.
 
 
-On Wed, 24 Jan 2024, Hongyu Jin wrote:
+> Also almost all these advises(SEQUENTIA, WILLNEED, NORMAL, RANDOM)
+> ignore the passed range, and the behavior becomes all or nothing,
+> instead of something only for the specified range, which may not
+> match with man, please see 'man posix_fadvise':
 
-> From: Hongyu Jin <hongyu.jin@unisoc.com>
-> 
-> High-priority tasks get data from dm-verity devices via RT IO priority,
-> I/O will lose RT priority when reading FEC and hash values via kworker
-> submission IO during verification, and the verification phase may be
-> blocked by low-priority IO.
-> 
-> Dm-crypt has the same problem in the data writing process.
-> 
-> This is because io_context and blkcg are missing.
-> 
-> Move bio_set_ioprio() into submit_bio():
-> 1. Only call bio_set_ioprio() once to set the priority of original bio,
->    the bio that cloned and splited from original bio will auto inherit
->    the priority of original bio in clone process.
-> 
-> 2. Make the IO priority of the original bio to be passed to dm,
->    and the dm target inherits the IO priority as needed.
-> 
-> Changes in v8:
->   - Rebase patch 1 on commit 7ed2632ec7d7
-> Changes in v7:
->   - Modify patch 4: change dm-verity-fec.c
-> Changes in v6:
->   - Rebase patch and resolve conflict for patch 1, 3, 4
->   - Modify patch 4: fec_read_parity() follow the priority of original
->     bio
->   - Update commit message
-> Changes in v5:
->   - Rewrite patch 2, add ioprio parameter in dm_io();
->   - Modify dm_io() in patch 3
-> Changes in v4:
->   - Modify commit message by Suggestion
->   - Modify patch for dm-crypt
-> Changes in v3:
->   - Split patch for device-mapper
->   - Add patch to fix dm-crypy I/O priority question
->   - Add block patch to review together
->   - Fix some error in v2 patch
-> Changes in v2:
->   - Add ioprio field in struct dm_io_region
->   - Initial struct dm_io_region::ioprio to IOPRIO_DEFAULT
->   - Add two interface
-> 
-> 
-> Hongyu Jin (5):
->   block: Fix bio IO priority setting
->   dm: Support I/O priority for dm_io()
->   dm-bufio: Support I/O priority
->   dm verity: Fix I/O priority lost when read FEC and hash
->   dm-crypt: Fix lost ioprio when queuing write bios
-> 
->  block/blk-core.c                              | 10 +++++
->  block/blk-mq.c                                | 10 -----
->  drivers/md/dm-bufio.c                         | 43 +++++++++++--------
->  drivers/md/dm-crypt.c                         |  1 +
->  drivers/md/dm-ebs-target.c                    |  8 ++--
->  drivers/md/dm-integrity.c                     | 12 +++---
->  drivers/md/dm-io.c                            | 23 +++++-----
->  drivers/md/dm-kcopyd.c                        |  4 +-
->  drivers/md/dm-log.c                           |  4 +-
->  drivers/md/dm-raid1.c                         |  6 +--
->  drivers/md/dm-snap-persistent.c               |  8 ++--
->  drivers/md/dm-verity-fec.c                    | 21 +++++----
->  drivers/md/dm-verity-target.c                 | 13 ++++--
->  drivers/md/dm-writecache.c                    |  8 ++--
->  drivers/md/persistent-data/dm-block-manager.c |  6 +--
->  include/linux/dm-bufio.h                      |  5 ++-
->  include/linux/dm-io.h                         |  3 +-
->  17 files changed, 102 insertions(+), 83 deletions(-)
-> 
-> 
-> base-commit: 7ed2632ec7d72e926b9e8bcc9ad1bb0cd37274bf
-> -- 
-> 2.34.1
+The man page says:
 
+	The advice is not binding; it merely constitutes an
+	expectation on behalf of the application.
+
+> It is even worse for readahead() syscall:
+> 
+> 	``` DESCRIPTION readahead()  initiates readahead on a file
+> 	so that subsequent reads from that file will be satisfied
+> 	from the cache, and not block on disk I/O (assuming the
+> 	readahead was initiated early enough and that other activity
+> 	on the system did not in the meantime flush pages from the
+> 	cache).  ```
+
+Yes, that's been "broken" for a long time (since the changes to cap
+force_page_cache_readahead() to ra_pages way back when), but the
+assumption documented about when readahead(2) will work goes to the
+heart of why we don't let user controlled readahead actually do much
+in the way of direct readahead. i.e. too much readahead is
+typically harmful to IO and system performance and very, very few
+applications actually need files preloaded entirely into memory.
+
+----
+
+All said, I'm starting to think that there isn't an immediate
+upstream kernel change needed right now.  I just did a quick check
+through the madvise() man page to see if I'd missed anything, and I
+most definitely did miss what is a relatively new addition to it:
+
+MADV_POPULATE_READ (since Linux 5.14)
+     "Populate (prefault) page tables readable, faulting in all
+     pages in the range just as if manually reading from each page;
+     however, avoid the actual memory access that would have been
+     performed after handling the fault.
+
+     In contrast to MAP_POPULATE, MADV_POPULATE_READ does not hide
+     errors, can be applied to (parts of) existing mappings and will
+     al‐ ways  populate (prefault) page tables readable.  One
+     example use case is prefaulting a file mapping, reading all
+     file content from disk; however, pages won't be dirtied and
+     consequently won't have to be written back to disk when
+     evicting the pages from memory.
+
+That's exactly what the application is apparently wanting
+MADV_WILLNEED to do.
+
+Please read the commit message for commit 4ca9b3859dac ("mm/madvise:
+introduce MADV_POPULATE_(READ|WRITE) to prefault page tables"). It
+has some relevant commentary on why MADV_WILLNEED could not be
+modified to meet the pre-population requirements of the applications
+that required this pre-population behaviour from the kernel.
+
+With this, I suspect that the application needs to be updated to
+use MADV_POPULATE_READ rather than MADV_WILLNEED, and then we can go
+back and do some analysis of the readahead behaviour of the
+application and the MADV_POPULATE_READ operation. We may need to
+tweak MADV_POPULATE_READ for large readahead IO, but that's OK
+because it's no longer "optimistic speculation" about whether the
+data is needed in cache - the operation being performed guarantees
+that or it fails with an error. IOWs, MADV_POPULATE_READ is
+effectively user data IO at this point, not advice about future
+access patterns...
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
