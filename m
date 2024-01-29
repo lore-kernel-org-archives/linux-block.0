@@ -1,145 +1,189 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC9F657C4
-	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 14:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D2266B24
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 14:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706537336; cv=none; b=Mnt2mYbnal1Vdexo1TERj91mhJCEom5HV2ydKDJiaqpXqUTUQac3BZxWWE0IjDY8dfunOzJvCOaxVOugT7zNATSLdDN+pzm4FMubZ3jU/LoOLzpaPkgB9RLQdMlmM9G2yJrwodx9c35xDhxFS5O2mmpGNETgdkmIGhm6Xq9gj9s=
+	t=1706538465; cv=none; b=TuCLsXn+JbUX3B4vJ+D1vevqNw/zeN0d1Q5cl0k62wX/eXMPS1VQZ7/dpQ3e3MUZTdskqWpXpvIetAbAN9HxXLnLeZOHdboOgfCy6GJ/GD2ziC2Sr6rCZ/efgPxZTQXqTpOiyAaf2TKNMWOEU1uv+g2NKJM/CfM10C62piL5OKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706537336; c=relaxed/simple;
-	bh=YaeXcqiP87h1vlZY4F77PCsMzchkACuuqInbpx8DQqE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WVdNgjVWoI9QB20CAJRXBfdHOv+hro4w2u2aSq8fVMUhABUKNFFLh+PAqlkjBwgiRqD04K7IQgqYb4jAi0dWZSMSU5e+ijJCUlAOnJeRgIbZbvDECah0odiMeQwKri7ptnNXZLRkg+zgKy2GcaT6ugOsTPzW6TudS3dmv9SK+kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Tna1jScl; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1706538465; c=relaxed/simple;
+	bh=6bzM16UBxP08WHaFfcFo1ofPi4ev583qMl2qYHoKPgo=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=BUxXtnbUMFRkxpwX2WzKgg71G8CzhY2XQSB5mKDCeTLLTekDw8CHtm9zvIITFXDxB7a3WcTOY8nYe3bdyAk32W9r9sjKcacTMSxcaHGkTxuIrDRzIHxNfzMgPUtX+20aHENjDQ64+V/Xt/BVEv1tu9m78FEqeea13Oj5K282Id4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=Bnk4P57t; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Tna1jScl"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-5cfcf509fbdso728509a12.1
-        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 06:08:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="Bnk4P57t"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40e76626170so34669385e9.2
+        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 06:27:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706537334; x=1707142134; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G9KKHKqHeKTxqmk7e3IjR8WXdYGcVRsY/057RPL3b2E=;
-        b=Tna1jSclRBtBeCSEPsL8tYix1O2o7V3s91xahxK0Hm2LPGOgOqQ2bQgYxSkdKTii37
-         l/KK9WnUo8pztFjCrQDC3ZwW54Y0ItTmsu1d2KBBb5PfUXFOnOpiPgaq5SogoAEXhSmx
-         85bFaC25I/xtZBzhx7DetqcFeMdvq7KTSNAud0AEsJ4i18QKr6qHhXb58ECARmP+PePY
-         XY7ZRUaZhngiqzUFW4bUnSBxqCIQdDAjt4MqCD4Mv5pG1c5khXJPQ+OrUUMncZxj19NY
-         bLV7RUxgzgP35EcauKYOu5/GDmjv778DAYvQx8R2XxvejLQcRl0eusbiiM6+DyN05Hi2
-         ELnQ==
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1706538461; x=1707143261; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=9SpRD2seb2hFO2F2eYuqqQkOpWG+jBIz46VQxNPe840=;
+        b=Bnk4P57t6cpXMr9bIHUjebrMow12H1ie7eOrIl+eYVcEK14V+XJm67zHWjQzAY9qPN
+         0/MLDsIWOmGgetC79xU08NO79JGNx3RS1FRPQeDLArzYBIoOL5gtzq9xRt/M3ERBm6Tu
+         T8shhjG6BpUS/vm9QYbdpcaUdnLIPbzCyfA2xUsIg2A4GWg6q2rIiHlZMCZfjg5xqm6q
+         SUT5D6DcQe6r2l00cs4tM2hnbtfIlGAUtsO3v+jFfm+dv3+TUBa9jvPtVO5UAgxsGY4I
+         kcqvzyuAUGcHAzQQ3OWyQq+OQUghA25FwbNF21uaieDNFzflnrA6Dmm8D38z80KirOoS
+         sX3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706537334; x=1707142134;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G9KKHKqHeKTxqmk7e3IjR8WXdYGcVRsY/057RPL3b2E=;
-        b=dSVQxO+nBu7/NZQPPKOANMAZr0YwrLmrxlRfV7mWHTz3kyqCSlp8CAqRfGPRm3NxKX
-         GIi9sD0yvqnUQUanWhpJAUSutwsP0+xaFKlYtjQjar9TkSdsS/vcHWdRVRfHnP4bC2CA
-         13wp2i7r/N5QjKqr2IVS77ITnQc6bt8vB2inbSmZiyIwysHGR7QZ+5EYzmYV2DMFyGUy
-         wduZsZ0VUFSZ3VHwwhSCvk570WO1yWlEfOwNmQybIdc0MdoAi3ol+gXFN/gvM7lcGW7G
-         MGqKYM1DqVx4giu3wgJZ0f2sJqgqjDnZaiaC9/EH6Mp8OoylCZyp/EzVgxo2znTU0Gcj
-         w5mw==
-X-Forwarded-Encrypted: i=0; AJvYcCV+8fG8nsKo+liwb36uCbJdhjLl/gREC1gE4uvJjRRGwtPcLEAStFkghki9YJrVQFbjIT0r5n9yJBc1vgRk5G7PjiTh2FIe83lDc8k=
-X-Gm-Message-State: AOJu0Yz1PRmGVox9Rcnall0S1ZJH8+ty7Albj0RkwhQ/7VneLe97qghX
-	Jw+hlmaUfDQsR5Ie0GMRae9wJFfsYdpZpzzNlJX4OQhCUywGMH3gXJU+zYwRYeruVsRtQOZzP0A
-	JS9I=
-X-Google-Smtp-Source: AGHT+IGH+XWLsmo2XHMBmmKJn+U1yqwL6cJjbaoQYMPoY31pfBuu5mVY/Ql6LuenCe5TejSan66Z/A==
-X-Received: by 2002:a05:6a21:99a2:b0:19c:9b53:2ed8 with SMTP id ve34-20020a056a2199a200b0019c9b532ed8mr8839902pzb.1.1706537334409;
-        Mon, 29 Jan 2024 06:08:54 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id y12-20020a170903010c00b001d72f06931bsm2382522plc.186.2024.01.29.06.08.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jan 2024 06:08:53 -0800 (PST)
-Message-ID: <ca969732-5d80-458c-b2dc-b5e65629e64b@kernel.dk>
-Date: Mon, 29 Jan 2024 07:08:52 -0700
+        d=1e100.net; s=20230601; t=1706538461; x=1707143261;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9SpRD2seb2hFO2F2eYuqqQkOpWG+jBIz46VQxNPe840=;
+        b=pUN7ci7pHukal9za2gDsGezsX6SesbKx/updqHr6RqyJf6PpPgaUvbcqo/saEa33Sg
+         3NbVB6GRcNpjmykZyWjD4ZMqzS1PCS6kHAtNmSlyZdlTKVIbiSjHx83RQiwG0QoajHF7
+         mzkpBJvTR1tWYRDeRngy30Vom6hAyKY43pVaysA6Sv3AeCJPp7jK8Jg0KRutm9hPmkRZ
+         g9Wb5sPbw5oV84vHytuCkyC/qFS+/vn6Oh2BI/3aOjYt5G8gp6LgGlvCG9aYOMv4Aoni
+         7ox9q47JqhUwur23wbICsH73hJwWqiR8n5OHBwzgJVKqCV416RR2Og/pEu4RxGvfowz6
+         p0FA==
+X-Gm-Message-State: AOJu0Yze7vzRzF13/WFEWirFynRUWdmY/uyC1/2h9aA4lTQULjA1ORKK
+	MxEpjKD9hnwSNR0/QxPLwTdDkfVhEjuozjLvdC9TcLadfiUo7PwVdM8lpxGbsBk=
+X-Google-Smtp-Source: AGHT+IF687yIs+FI2jGNHFF+JBGNUG60+S+Rqe4sHIAnRad9l9UQH5/3KSyty1FjpSpCXMtpmut+RQ==
+X-Received: by 2002:adf:8b56:0:b0:33a:e598:cabb with SMTP id v22-20020adf8b56000000b0033ae598cabbmr3910064wra.70.1706538460714;
+        Mon, 29 Jan 2024 06:27:40 -0800 (PST)
+Received: from localhost ([165.225.194.205])
+        by smtp.gmail.com with ESMTPSA id eo9-20020a056000428900b0033ae9e7f6b6sm4015743wrb.111.2024.01.29.06.27.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 06:27:40 -0800 (PST)
+References: <20230503090708.2524310-1-nmi@metaspace.dk>
+ <20230503090708.2524310-4-nmi@metaspace.dk>
+ <iL2M45BoRlK6yS9y8uo0A5yUXcZWMkdk3vtH3LRFSWXfvPVagVZ-0YC7taIKOBFUcjJYA_2xNNFPoC4WL-_ulCHOLkbqvsZlIshE_LEeYtU=@proton.me>
+ <87il3kjgk0.fsf@metaspace.dk>
+ <104a22f7-a5bb-4fb6-9ce9-aa2d4e63417f@proton.me>
+ <874jf3kflx.fsf@metaspace.dk>
+ <59f007a0-bb30-4291-ab49-0e69112e2566@proton.me>
+User-agent: mu4e 1.10.8; emacs 29.2
+From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith
+ Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes
+ Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
+ rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew
+ Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
+ <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun
+ Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
+ =?utf-8?Q?=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org,
+ gost.dev@samsung.com
+Subject: Re: [RFC PATCH 03/11] rust: block: introduce `kernel::block::mq`
+ module
+Date: Mon, 29 Jan 2024 15:14:50 +0100
+In-reply-to: <59f007a0-bb30-4291-ab49-0e69112e2566@proton.me>
+Message-ID: <87r0i0gqp8.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] block: update cached timestamp post
- schedule/preemption
-Content-Language: en-US
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20240126213827.2757115-1-axboe@kernel.dk>
- <20240126213827.2757115-5-axboe@kernel.dk>
- <9e13afd4-d073-4822-92ff-936788f0c2a1@wdc.com>
- <1b0c9f7f-9b1b-484b-a9fb-bf2c42d9a18d@kernel.dk>
- <c2cad14a-6add-4301-83b1-be40e48c0daf@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <c2cad14a-6add-4301-83b1-be40e48c0daf@wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 1/29/24 7:06 AM, Johannes Thumshirn wrote:
-> On 29.01.24 15:02, Jens Axboe wrote:
->> On 1/29/24 1:01 AM, Johannes Thumshirn wrote:
->>> On 26.01.24 22:39, Jens Axboe wrote:
->>>>    static void sched_update_worker(struct task_struct *tsk)
->>>>    {
->>>> -	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
->>>> +	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS)) {
->>>> +		if (tsk->flags & PF_BLOCK_TS)
->>>> +			blk_plug_invalidate_ts(tsk);
->>>>    		if (tsk->flags & PF_WQ_WORKER)
->>>>    			wq_worker_running(tsk);
->>>> -		else
->>>> +		else if (tsk->flags & PF_IO_WORKER)
->>>>    			io_wq_worker_running(tsk);
->>>>    	}
->>>>    }
+
+Benno Lossin <benno.lossin@proton.me> writes:
+
+> On 23.01.24 19:39, Andreas Hindborg (Samsung) wrote:
+>>>>>> +/// A generic block device
+>>>>>> +///
+>>>>>> +/// # Invariants
+>>>>>> +///
+>>>>>> +///  - `gendisk` must always point to an initialized and valid `struct gendisk`.
+>>>>>> +pub struct GenDisk<T: Operations> {
+>>>>>> +    _tagset: Arc<TagSet<T>>,
+>>>>>> +    gendisk: *mut bindings::gendisk,
+>>>>>
+>>>>> Why are these two fields not embedded? Shouldn't the user decide where
+>>>>> to allocate?
+>>>>
+>>>> The `TagSet` can be shared between multiple `GenDisk`. Using an `Arc`
+>>>> seems resonable?
+>>>>
+>>>> For the `gendisk` field, the allocation is done by C and the address
+>>>> must be stable. We are owning the pointee and must drop it when it goes out
+>>>> of scope. I could do this:
+>>>>
+>>>> #[repr(transparent)]
+>>>> struct GenDisk(Opaque<bindings::gendisk>);
+>>>>
+>>>> struct UniqueGenDiskRef {
+>>>>       _tagset: Arc<TagSet<T>>,
+>>>>       gendisk: Pin<&'static mut GenDisk>,
+>>>>
+>>>> }
+>>>>
+>>>> but it seems pointless. `struct GenDisk` would not be pub in that case. What do you think?
 >>>
+>>> Hmm, I am a bit confused as to how you usually use a `struct gendisk`.
+>>> You said that a `TagSet` might be shared between multiple `GenDisk`s,
+>>> but that is not facilitated by the C side?
 >>>
->>> Why the nested if? Isn't that more readable:
->>
->> It's so that we can keep it at a single branch for the fast case of none
->> of them being true, which is also how it was done before this change.
->> This one just adds one more flag to check. With your change, it's 3
->> branches instead of one for the fast case.
->>
-> 
-> Although I don't really have hard feelings for it, that could be solved 
-> as well:
-> 
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index 9116bcc90346..74beb0126da6 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -6787,12 +6787,12 @@ static inline void sched_submit_work(struct
-> task_struct *tsk)
-> 
->    static void sched_update_worker(struct task_struct *tsk)
->    {
-> -       if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
-> -               if (tsk->flags & PF_WQ_WORKER)
-> -                       wq_worker_running(tsk);
-> -               else
-> -                       io_wq_worker_running(tsk);
-> -       }
-> +	if (tsk->flags & !(PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS))
-> +		return;
+>>> Is it the case that on the C side you create a struct containing a
+>>> tagset and a gendisk for every block device you want to represent?
+>> 
+>> Yes, but the `struct tag_set` can be shared between multiple `struct
+>> gendisk`.
+>> 
+>> Let me try to elaborate:
+>> 
+>> In C you would first allocate a `struct tag_set` and partially
+>> initialize it. The allocation can be dynamic, static or part of existing
+>> allocation. You would then partially initialize the structure and finish
+>> the initialization by calling `blk_mq_alloc_tag_set()`. This populates
+>> the rest of the structure which includes more dynamic allocations.
+>> 
+>> You then allocate a `struct gendisk` by calling `blk_mq_alloc_disk()`,
+>> passing in a pointer to the `struct tag_set` you just created. This
+>> function will return a pointer to a `struct gendisk` on success.
+>> 
+>> In the Rust abstractions, we allocate the `TagSet`:
+>> 
+>> #[pin_data(PinnedDrop)]
+>> #[repr(transparent)]
+>> pub struct TagSet<T: Operations> {
+>>      #[pin]
+>>      inner: Opaque<bindings::blk_mq_tag_set>,
+>>      _p: PhantomData<T>,
+>> }
+>> 
+>> with `PinInit` [^1]. The initializer will partially initialize the struct and
+>> finish the initialization like C does by calling
+>> `blk_mq_alloc_tag_set()`. We now need a place to point the initializer.
+>> `Arc::pin_init()` is that place for now. It allows us to pass the
+>> `TagSet` reference to multiple `GenDisk` if required. Maybe we could be
+>> generic over `Deref<TagSet>` in the future. Bottom line is that we need
+>> to hold on to that `TagSet` reference until the `GenDisk` is dropped.
+>
+> I see, thanks for the elaborate explanation! I now think that using `Arc`
+> makes sense.
+>
+>> `struct tag_set` is not reference counted on the C side. C
+>> implementations just take care to keep it alive, for instance by storing
+>> it next to a pointer to `struct gendisk` that it is servicing.
+>
+> This is interesting, is this also done in the case where it is shared
+> among multiple `struct gendisk`s?
 
-Don't think that'd work :-)
+Yes. The architecture is really quite flexible. For instance C NVMe uses
+one tag set for the admin queue of a nvme controller, and one tag set
+shared for all IO queues of a controller. The admin queue tag set is not
+actually attached to a `struct gendisk` and does not appear as a block
+device to the user. The IO queue tag set serves a number `struct
+gendisk`, one for each name space of the controller.
 
-> +       if (tsk->flags & PF_BLOCK_TS)
-> +               blk_plug_invalidate_ts(tsk);
-> +       if (tsk->flags & PF_WQ_WORKER)
-> +               wq_worker_running(tsk);
-> +       else if (tsk->flags & PF_IO_WORKER)
-> +               io_wq_worker_running(tsk);
->    }
-> 
-> But yep, that's bikeshedding I admit
+> Does this have some deeper reason? Or am I right to assume that creating
+> `Gendisk`/`TagSet` is done rarely (i.e. only at initialization of the
+> driver)?
 
-But agree, it'd accomplish the same. The patch is cleaner just keeping
-the existing setup, however, rather than rewrite it like the above.
+I am not sure. It could probably be reference counted on C side. Perhaps
+nobody felt the need for it, since the lifetime of it is not that
+complex. And yes, it is relatively rare as it is only as part of
+initialization and tear down that you would create or destroy this
+structure.
 
--- 
-Jens Axboe
+Best regards,
+Andreas
 
