@@ -1,22 +1,22 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E404481A8
-	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 06:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1964CB28
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 06:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706508963; cv=none; b=XOizHgTZu1YTeGqc0zgYuMzpir2G2MIwmTiOtYyMQrmEfmD+4tnAthkOJyNgC0QMQrIzRl4n8/Z0+WpbIToZR5R0TDTo/ZSQE0kPa/9SK7PTyMMvEdWjYSZ3l0piUavpk9Xk0t2vZP2NNKAD/i1mTsqnjI6z816/54bhVEwmzhU=
+	t=1706508991; cv=none; b=Z0aVpsLLF0yUmv/BDC3PP63Y/PU/AD+Xy88pYacvxZPxrwG+TBPo1DULC8PU/CRzv0qppI2FQ+qTO3cNC5RvjXN4iKV8p+E8qXfgai8AKNZyln8g2gM6jDxdVBAa9nmKBH5u5uVLRNdZ2uTBP+QmjW9rDJpChUZ6cOXbEM+72bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706508963; c=relaxed/simple;
-	bh=ieuFyRk0AzIW931GqByvWNx31HIOL29T6r74fJkxttA=;
+	s=arc-20240116; t=1706508991; c=relaxed/simple;
+	bh=OF0sJltC44PyE9cdFwZFEGux4PkfWITdIsqJkeFEOHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cJTXJ/MN/bxWTlGOKZWlHjooUcsqiW1sGRy8vzWZcBbOTj/QW2cG42NEIQz7gK5rnZ9XIgvEwMXVrm7Ts6CoYH2/7PidsCFFmbqnTaHGGNusdJUg0OkK1ErJIV3kDd890I47bV0Nz+7ga/dLesrxT3gho9MUxoGLzcjx4LdDKWA=
+	 Content-Type:Content-Disposition:In-Reply-To; b=GbsgOuDHzuGXt9jx/s+yl4nJEE5Cl61piU3tQOS8X4Jse/+Xqt6sfiXC/NsJfkcX9YDaE+DlPe/qDuwFUnMMtOU9wsPvDW7xKoaCsr6OT/TxQrATcHcJKUAEvq3jDR+3G0hMJ2Q8B32lQBMJj0QtcF2FaHv7Rp9cUKL9E1kxbFc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8584968B05; Mon, 29 Jan 2024 07:15:54 +0100 (CET)
-Date: Mon, 29 Jan 2024 07:15:53 +0100
+	id CBDDC68B05; Mon, 29 Jan 2024 07:16:26 +0100 (CET)
+Date: Mon, 29 Jan 2024 07:16:26 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
@@ -30,10 +30,9 @@ Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
 	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
 	virtualization@lists.linux.dev, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 01/14] block: move max_{open,active}_zones to struct
- queue_limits
-Message-ID: <20240129061553.GA19581@lst.de>
-References: <20240128165813.3213508-1-hch@lst.de> <20240128165813.3213508-2-hch@lst.de> <a0d499e7-ec2d-44f8-9b13-b1ef857e4c14@acm.org>
+Subject: Re: [PATCH 02/14] block: refactor disk_update_readahead
+Message-ID: <20240129061626.GB19581@lst.de>
+References: <20240128165813.3213508-1-hch@lst.de> <20240128165813.3213508-3-hch@lst.de> <df263948-07e0-4aab-a645-ea401d4d413b@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,24 +41,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a0d499e7-ec2d-44f8-9b13-b1ef857e4c14@acm.org>
+In-Reply-To: <df263948-07e0-4aab-a645-ea401d4d413b@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, Jan 28, 2024 at 03:32:32PM -0800, Bart Van Assche wrote:
->> @@ -307,6 +305,8 @@ struct queue_limits {
->>   	unsigned char		discard_misaligned;
->>   	unsigned char		raid_partial_stripes_expensive;
->>   	bool			zoned;
->> +	unsigned int		max_open_zones;
->> +	unsigned int		max_active_zones;
+On Sun, Jan 28, 2024 at 06:59:31PM -0800, Bart Van Assche wrote:
+>> +	/*
+>> +	 * For read-ahead of large files to be effective, we need to read ahead
+>> +	 * at least twice the optimal I/O size.
+>> +	 */
+>> +	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
+>> +	bdi->io_pages = lim->max_sectors >> (PAGE_SHIFT - 9);
+>> +}
 >
-> Not all struct queue_limits instances are associated with a gendisk. Do we need
-> a way to separate the limits that apply to all request queues from the limits
-> that only apply to disks in struct queue_limits, e.g. a comment that separates
-> the two?
+> Would this be a good opportunity to change (PAGE_SHIFT - 9) into
+> PAGE_SECTORS_SHIFT?
 
-I've actually been thinking about that for a while.  It does sound like
-a good idea but I wonder how practical it is.  But that is on the table
-for after we've sorted out the basic API problems, as that makes
-splitting it much easier if we do that eventually.
+If I have to respin for some reason I'll include it.  Otherwise feel
+free to send a trivial follow on patch.
 
