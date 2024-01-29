@@ -1,90 +1,99 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE9F53E32;
-	Mon, 29 Jan 2024 08:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABF154BCF
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 08:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706516790; cv=none; b=lyD+WlxPeB6IJrGn1VBQS/l0v1wp53mmYDf/MT7Ka+dOpARuQew4hfMiYUrqyPQGmKu1M5OveBCJNfhRRSjRFp44BtbUh0DGpPbJ5FM1oC6lUvWwL+NMgPgLvIQ9nZCAaVUi5xo7FZc5OxV03bNvmo/Uzl/8xRQ2zZLeYrzWUf8=
+	t=1706518400; cv=none; b=QIFVhU+uXiZKQRQR3ITEy1MY4is06ueNp4lyDI8oQh2t5UxdCAS8kV/7IsDaDNBRdI8ezKMcopD731fjlGQUNXyXEvwdeR+xOpHKMhT8zIHhC5WwHOQM9rN911gClLpNLShgYkJ6bvM28GJoD9PispnHdYjHf2LSS4Boo/PdVTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706516790; c=relaxed/simple;
-	bh=3PR8Y8m3tugXwkqNMqV/kiMMLnyu4yH9Jpk2m83Y71U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U3K8VQOAvDPrrEYIZ86EM5R1rLabB4iyP5H/1ivjNNV2X5NazCXD9CThKgOyn9ykdl1G/GWuCju7FLmnt1hlQebXp4XEb7811bxTBiLgGYNJTyaDNP24xBSo6VGLfSO+y9f64oKtPIGyiLgh88D/B7iR6OgQq3Vc+f9ZkXoVfXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fTfrYi/4; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fTfrYi/4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=PEMJ6pLy+aMTn3PQXV89uVlWkRqf0t6m9okigCBbbrc=; b=fTfrYi/4YtfsjbGCHm0iVK7CV5
-	XZpCGqDcn5gY4O7II5GrXuaJTZ/iXga82fm+TiykLzRLKBas0v2u/nLS4YfxyrGw6p61WJni/kl8N
-	ctxDsvsmZO7V7LohAcgdjvjXOVo2EKAbKYzgUd5yfemC3oeWs8rgzDR6b5MVFA6q3hHPwUQyai6Pm
-	B8VyDDTqcHn6SVvCHxcU8Wz8fqiZl2m/72P8jKwco/PAvaGd+8J94pupYf9I13k7zz3Ke1UAC1/24
-	fuXG4bYVIym3dqm9U240lg7uP7Yg+VO8PCkRTEFPSSuwyX1IqtqZr8EtPqXjPpbMDP76oDdqxA269
-	pK6+zVtg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rUMyK-0000000BlbR-2RmV;
-	Mon, 29 Jan 2024 08:26:28 +0000
-Date: Mon, 29 Jan 2024 00:26:28 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
-	Mike Snitzer <msnitzer@redhat.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
-Subject: request based dm-multipath, was Re: [PATCH] softirq: fix memory
- corruption when freeing tasklet_struct
-Message-ID: <ZbdhNEkEfqWsE1yy@infradead.org>
-References: <82b964f0-c2c8-a2c6-5b1f-f3145dc2c8e5@redhat.com>
- <CAHk-=wjDW53w4-YcSmgKC5RruiRLHmJ1sXeYdp_ZgVoBw=5byA@mail.gmail.com>
- <586ca4dd-f191-9ada-1bc3-e5672f17f7c@redhat.com>
- <5e2b5f23-94f0-4bf0-80a6-48380c7dc730@kernel.org>
- <d390d7ee-f142-44d3-822a-87949e14608b@suse.de>
+	s=arc-20240116; t=1706518400; c=relaxed/simple;
+	bh=Ey0T0NpVcUZVPAB7X0i7MndAEhRfLqJyUuHr9Wwueak=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=M7996c5e+R9XmQFpRYRtATHBE92LEz6QMjTwSghkCPd4QKx8Fcjm1J3ZWZD+1ByG+yiSmZw+vZgo21UEumivIEqn6ptUJ9sMYp5hgBiDdPT4yX3TGTxHlP674i7Yzz0MvmLF2bFsjRFIBzndodJELpDqX7sOAeglSl6DtC4AVSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 40T8quam034189;
+	Mon, 29 Jan 2024 16:52:56 +0800 (+08)
+	(envelope-from Yi.Sun@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4TNhhL73qlz2S36N9;
+	Mon, 29 Jan 2024 16:45:22 +0800 (CST)
+Received: from tj10379pcu.spreadtrum.com (10.5.32.15) by
+ BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Mon, 29 Jan 2024 16:52:53 +0800
+From: Yi Sun <yi.sun@unisoc.com>
+To: <stefanha@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
+        <axboe@kernel.dk>
+CC: <yi.sun@unisoc.com>, <sunyibuaa@gmail.com>, <hongyu.jin@unisoc.com>,
+        <zhiguo.niu@unisoc.com>, <xuanzhuo@linux.alibaba.com>,
+        <pbonzini@redhat.com>, <virtualization@lists.linux.dev>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH V2] virtio-blk: Ensure no requests in virtqueues before deleting vqs.
+Date: Mon, 29 Jan 2024 16:52:50 +0800
+Message-ID: <20240129085250.1550594-1-yi.sun@unisoc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d390d7ee-f142-44d3-822a-87949e14608b@suse.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX01.spreadtrum.com (10.0.64.7)
+X-MAIL:SHSQR01.spreadtrum.com 40T8quam034189
 
-On Fri, Jan 26, 2024 at 07:56:39AM +0100, Hannes Reinecke wrote:
-> DM-multipath schedules based on request (if you use the request-based
-> interface) or bios (if you use the bio-based interface).
-> Any merge decision is typically done by the block layer when combining bios
-> into requests; and you can only merge bios if the bvecs are adjacent.
-> So if you use bio-based multipathing you will spread sequential bios
-> across all paths, leaving the block layer unable to merge requests.
+Ensure no remaining requests in virtqueues before resetting vdev and
+deleting virtqueues. Otherwise these requests will never be completed.
+It may cause the system to become unresponsive.
 
-While I think the current code would do that, there is nothing inherent
-in the interface forcing it to do that.  The blk_plug allows drivers
-to attach callbacks to batch up plugged bios, and the md raid code makes
-use of that to get larger I/O, which is rather essential for partity
-RAID.
+Function blk_mq_quiesce_queue() can ensure that requests have become
+in_flight status, but it cannot guarantee that requests have been
+processed by the device. Virtqueues should never be deleted before
+all requests become complete status.
 
-> Another thing is timeouts; bios don't do timeouts, so a bio can run
-> for an arbitrary time with no chance of interrupting it.
-> Requests do have a timeout, and will be aborted from the driver when
-> the timeout is hit.
-> Seeing that 99% of all I/O issues I've seen _are_ timeouts it becomes
-> a crucial feature if you want dm-multipath to control failover time.
+Function blk_mq_freeze_queue() ensure that all requests in virtqueues
+become complete status. And no requests can enter in virtqueues.
 
-This does not matter - a timeout bio will return an error to the
-submitter even on a request based driver unless the timeout handler
-fixed it up.  And there is nothing preventing a bio based driver from
-having it's own timeout.  We had quite a few in the past.  But dm-rq
-doesn't even set a timeout, so for the current situation this is
-100% irrelevant.
+Signed-off-by: Yi Sun <yi.sun@unisoc.com>
+---
+ drivers/block/virtio_blk.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-So while I'm not sure if using the existing bio based mpath code with
-plugging would be enough to suite all users of dm-multipath, I'd
-really love to see someone actually trying it.  Removing the request
-based path would significantly simplify dm, and also remove a fair
-amount of hacks from the block layer.
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 3b6b9abb8ce1..14ecc14ce8db 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -1595,14 +1595,15 @@ static int virtblk_freeze(struct virtio_device *vdev)
+ {
+ 	struct virtio_blk *vblk = vdev->priv;
+ 
++	/* Ensure no requests in virtqueues before deleting vqs. */
++	blk_mq_freeze_queue(vblk->disk->queue);
++
+ 	/* Ensure we don't receive any more interrupts */
+ 	virtio_reset_device(vdev);
+ 
+ 	/* Make sure no work handler is accessing the device. */
+ 	flush_work(&vblk->config_work);
+ 
+-	blk_mq_quiesce_queue(vblk->disk->queue);
+-
+ 	vdev->config->del_vqs(vdev);
+ 	kfree(vblk->vqs);
+ 
+@@ -1620,7 +1621,7 @@ static int virtblk_restore(struct virtio_device *vdev)
+ 
+ 	virtio_device_ready(vdev);
+ 
+-	blk_mq_unquiesce_queue(vblk->disk->queue);
++	blk_mq_unfreeze_queue(vblk->disk->queue);
+ 	return 0;
+ }
+ #endif
+-- 
+2.25.1
+
