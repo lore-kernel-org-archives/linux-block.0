@@ -1,62 +1,112 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C43A4BABE;
-	Mon, 29 Jan 2024 06:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C949752F80;
+	Mon, 29 Jan 2024 07:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706509243; cv=none; b=jBNiESgIhefzXuVHaz/dmCZdXx471c2h8nt0EE/IMxpDYoN7MB/CJFHGzbpIMtYbjrZhMH1xQn52uelbGNcyG/kBwYfviJvszYebJwEfHJ/SKxOQFVrou5MwGqk/D73S8Ic0tmnw2q+YYQxdzT7AY5YX2HiSeQ4oC87pP9CDJ9U=
+	t=1706514757; cv=none; b=hD7tQ5YH7pFkUO+lQdNlVQJPDMWNPrKldnhjOCPczT+4wWOnxSpdVzFTMt4aM+Wd8TJv0ItDaRuIwZunLhK77ahkGxMN3sk0bYu8Y24rrS4Z2Q45YF++1k4KiAKrjlgHSpm2MJj7lpdZ/GJZnEp+XoDEssB3xSEwmguj4aDSzmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706509243; c=relaxed/simple;
-	bh=a3ABtJCzIyYgu9Y0K7TLjoHutY0PL9Nh7ra7xgZiwb4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OiFXPqE1frxXp7p6hj25V3Go63XbrKIkR0L69FTxxskll67ow6MDlZNakiiC0JqYEqt6twCUs+DSqQFPJ1HGMZxJESlkzBiXI4JSgDH8Kw4BWlClrlvZBHKhR/nYoDKZdowXf/mxO4/17stK+4XSgtOtWNnukjjKxLdAAgUiqAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 95A9768B05; Mon, 29 Jan 2024 07:20:35 +0100 (CET)
-Date: Mon, 29 Jan 2024 07:20:35 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Keith Busch <kbusch@kernel.org>, axboe@kernel.dk, hch@lst.de,
-	sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
-	djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	dchinner@redhat.com, jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-	ming.lei@redhat.com, ojaswin@linux.ibm.com, bvanassche@acm.org,
-	Alan Adamson <alan.adamson@oracle.com>
-Subject: Re: [PATCH v3 15/15] nvme: Ensure atomic writes will be executed
- atomically
-Message-ID: <20240129062035.GB19796@lst.de>
-References: <20240124113841.31824-1-john.g.garry@oracle.com> <20240124113841.31824-16-john.g.garry@oracle.com> <ZbGwv4uFdJyfKtk5@kbusch-mbp.dhcp.thefacebook.com> <dbb3ad13-7524-4861-8006-b2ea426fbacd@oracle.com>
+	s=arc-20240116; t=1706514757; c=relaxed/simple;
+	bh=eGx4McY1FmrYKhrAp3TTxFkfkbSfbNbdZDzzsYbn3SA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=cQvk44QC1tEXNENt9JmSUaoE5bmPpF3WhkF49UHROPf9SvGoAkWgi2sSf/YYGdHMDT0xcsb33ZpWT3ALc98Aj3YZsFni9f/AcU4MKH4l+6ws4xZjLlizyt8jYdRvsfa8Di3govmuiwZey6V4Gt+j7xsULc6UxvnZyLNkYrstCOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=b0kdW2sE; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="b0kdW2sE"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1706514755; x=1738050755;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=eGx4McY1FmrYKhrAp3TTxFkfkbSfbNbdZDzzsYbn3SA=;
+  b=b0kdW2sE4ONRfs8jGwY/v4nA1WUCksxaIE0iQy/LAjNIWbXBQBPxhSf7
+   iyMVK/Ayn7Z1K1Od9nac2bmF4TgczIKpyI3Ngpw3YFWHFZdb8tz3iZg4x
+   Kik5mzwv711q6Do0soiCSMy+4dpNA6p6cdISQ05vq+xESEdDwHnpTZIsP
+   K296N3XM8WytmOHF8q/ZeVQ9nRK8bffKMPVAixf0atxclhayucyHxzjme
+   EkgPL2HexsGMHHJxF95YSwqIvaeIEt5Z5syfgrPKyMGsliBznIl7zo0ux
+   oksxYJAzrVvDq8s5KJwB85ItIEcDMrpH4ypXqmNyF/smdKfFsoj27lWQg
+   g==;
+X-CSE-ConnectionGUID: SX9cJwP2TQOalpS9SLaRMg==
+X-CSE-MsgGUID: m4iXc/eRRye5LfRgd4HTLA==
+X-IronPort-AV: E=Sophos;i="6.05,226,1701100800"; 
+   d="scan'208";a="8194611"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Jan 2024 15:52:31 +0800
+IronPort-SDR: cAR7V5dWRuCGGVUIC2Yz+9GQPP42jhwBXAf7VvylpX8W6shxDYvaEPOxq2giVJt+i7d8JMw3gv
+ VZ6B58gXqE9g==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Jan 2024 22:56:46 -0800
+IronPort-SDR: TgaA8LrWz4JmksfFMd9XbYuIoWjMlrDoGLua+Pb607OI4wE3Fe9/wAPKrNdtSrWLoefyzcMDAc
+ YY+ofLHHgnnA==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.6])
+  by uls-op-cesaip02.wdc.com with ESMTP; 28 Jan 2024 23:52:27 -0800
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Date: Sun, 28 Jan 2024 23:52:16 -0800
+Subject: [PATCH v3 1/5] zonefs: pass GFP_KERNEL to blkdev_zone_mgmt() call
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dbb3ad13-7524-4861-8006-b2ea426fbacd@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240128-zonefs_nofs-v3-1-ae3b7c8def61@wdc.com>
+References: <20240128-zonefs_nofs-v3-0-ae3b7c8def61@wdc.com>
+In-Reply-To: <20240128-zonefs_nofs-v3-0-ae3b7c8def61@wdc.com>
+To: Damien Le Moal <dlemoal@kernel.org>, 
+ Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, 
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+ Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
+ Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
+ David Sterba <dsterba@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>, 
+ Chao Yu <chao@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+ Chaitanya Kulkarni <kch@nvidia.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-btrfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706514743; l=1041;
+ i=johannes.thumshirn@wdc.com; s=20230613; h=from:subject:message-id;
+ bh=eGx4McY1FmrYKhrAp3TTxFkfkbSfbNbdZDzzsYbn3SA=;
+ b=t4wcaJhs6oV11H9tXDjzJ4heS84olNEuvuiMDoCT7kiC4VWqi/UCfvHK0WP330iTVs0p8G2QQ
+ 0WRameby5F7DGgOvyyko8FG4gi9vkmFaf+HGZUlvOWp9nymIgGBuC/o
+X-Developer-Key: i=johannes.thumshirn@wdc.com; a=ed25519;
+ pk=TGmHKs78FdPi+QhrViEvjKIGwReUGCfa+3LEnGoR2KM=
 
-On Thu, Jan 25, 2024 at 11:28:22AM +0000, John Garry wrote:
-> We have limits checks in XFS iomap and fops.c, but we would also want to 
-> ensure that the the block layer is not doing anything it shouldn't be doing 
-> after submit_bio_noacct(), like merging atomic write BIOs which straddle a 
-> boundary or exceed atomic_max (if there were any merging).
->
-> The SCSI standard already has provision for error'ing an atomic write 
-> command which exceeds the target atomic write capabilities, while NVMe 
-> doesn't.
+Pass GFP_KERNEL instead of GFP_NOFS to the blkdev_zone_mgmt() call in
+zonefs_zone_mgmt().
 
-Can you get Oracle to propose this for NVMe?  It always helps if these
-suggestions come from a large buyer of NVMe equipment.
+As as zonefs_zone_mgmt() and zonefs_inode_zone_mgmt() are never called
+from a place that can recurse back into the filesystem on memory reclaim,
+it is save to call blkdev_zone_mgmt() with GFP_KERNEL.
 
-> BTW, Christoph did mention that he would like to see this:
-> https://lore.kernel.org/linux-nvme/20231109153603.GA2188@lst.de/
+Link: https://lore.kernel.org/all/ZZcgXI46AinlcBDP@casper.infradead.org/
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ fs/zonefs/super.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I can probably live with a sufficiently low-level block layer check.
+diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
+index 93971742613a..63fbac018c04 100644
+--- a/fs/zonefs/super.c
++++ b/fs/zonefs/super.c
+@@ -113,7 +113,7 @@ static int zonefs_zone_mgmt(struct super_block *sb,
+ 
+ 	trace_zonefs_zone_mgmt(sb, z, op);
+ 	ret = blkdev_zone_mgmt(sb->s_bdev, op, z->z_sector,
+-			       z->z_size >> SECTOR_SHIFT, GFP_NOFS);
++			       z->z_size >> SECTOR_SHIFT, GFP_KERNEL);
+ 	if (ret) {
+ 		zonefs_err(sb,
+ 			   "Zone management operation %s at %llu failed %d\n",
+
+-- 
+2.43.0
+
