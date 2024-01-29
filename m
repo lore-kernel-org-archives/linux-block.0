@@ -1,188 +1,83 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32150EAE5;
-	Mon, 29 Jan 2024 02:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7422EFBF7
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 02:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706496412; cv=none; b=FcUxAjtryvzowv/CXqG2pDN50WcxBsFfMrdkk9nQfbZQ7sH5/jGDCA4Of3NrUDJIIUOmn0wK6ZXAYAo9C49EnsiTz+iPbaEC6Sp4yfEfe9s7/xRgU1WSA/V4O2Nzk0MvpiV1nsZW0vBr/rkp4UtAIYndK6KgeOMOC7WGaoIoNhE=
+	t=1706497176; cv=none; b=I34bHbTsF9XIkQEhtUoubcFH9qfqvy811oJzESOTMdlVLD1khNutP0OsFBncHJjax6nMd9eKl9FrHHXLw4vL6uY81Pkx5Oi04xJx/YP3sQZijNmLGkfuJLnLEUhDyzbWZaeUcD//lEmggF7qqYFx9n0FIql96InRjSBhc8lJ274=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706496412; c=relaxed/simple;
-	bh=iaSgUztFO5WOp4UT/o/uqEJVRgKzC2Jwlx1CmOVnOHw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uOavq1cQPh2gviglEQMquOzo3ltlzOr41s4C8ky/EeuPR3AX5DwtiUS+abdfQauDN6pUSwQRR0H/ZQFvm0X9DOjiyFaxb2nB08gVh/6L4V81hWaFeIazqKY4eRM85pNswDdkpAr6zR8YW8EIkPuJVaLujnBMOq2tYLOTibZlnvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LtapYc8I; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1706497176; c=relaxed/simple;
+	bh=DZUg1XoT8wokjq4uWFSKm1U2glAHD2r08GSBb58s88Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gwbAP0JfkFomMOoXdBuaGFor5ar+DtgiJhf3cSayH8dTG1k9o0OhsCzfMW0fj6MHU1ybFe9uG2h79VSW0yDD685VHQM3c4b9CSI08iRzTtBkztCFMNA6NZyjbPuVIbj+xIH4fh103F/hmzfpqdGDbLDvO8Y8QEJ0hU0SYTHvEgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LtapYc8I"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4bdb8de8f45so296111e0c.2;
-        Sun, 28 Jan 2024 18:46:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706496410; x=1707101210; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wkSsYsgeCfvXg023esX0wGiHDDtxSyHiSZX003ccu0w=;
-        b=LtapYc8I43iun3J21CnaXRfpWGuimy4s54+Ahx47uerNH9m2K+2o6WzUEydi0qgoT2
-         6BDK3nOarMzZFYJ0+rU6yrZejriWudB2MqW30eTcF7LfjC9pbwHT+0d0kqMPfQ2HVzCa
-         d/ojC0RgiDxJ0ISVjt8pmV5j4PmbewfuP2HOZM1R2EitcyhzP0xKdUh5wlwrIOilTBlO
-         O2AOYB4xY/roysdEit8S6GiC5PetGQpzAC+vOp4ubcCztgzvrMLng5vop7UEiMAqCiiI
-         2mg0KrVyPyL7AP6wS2wz6vgcqiAHUw4ZbMHGXshJkXFb7xvIAxDfWSusXBRspsHNoezH
-         DR9w==
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d7393de183so8666715ad.3
+        for <linux-block@vger.kernel.org>; Sun, 28 Jan 2024 18:59:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706496410; x=1707101210;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wkSsYsgeCfvXg023esX0wGiHDDtxSyHiSZX003ccu0w=;
-        b=RMX3YX3km7QSLcmRUkK8LwZyABNybe5V/ZwCsqcMuEn56nRYFEt9JModbXrZ7Ycu4N
-         BX5B5J/JOAK/Ho+ZKicyvOjxJ+XFhJJcgXYwMsKmRTz8LFTP6ZhYvFZ1n/inFumu3G+A
-         iRmwwFuQkV6lSamLgH2wwtOZhdREdwMxTI6Irwi4pHLnBmMk+PfHsKu+0QxEnSo52ZLZ
-         WxAhOp4nVMHgfhN3JegVnNRg4BnX8+TbvZve53SthXnQaZ01oQ4pgddYkIzBaNXAlCJN
-         S0KDxnUEXyKSl2xTOZLf5sdndW2DzhoCPi3w8uYWOx7mTbqLTTNOkycGTeSdFhPmENs3
-         xg6A==
-X-Gm-Message-State: AOJu0YyLfyPV17zazCjETjDr/IMEy+1WOXAHMVWwG1A4HOs5vE823BFQ
-	9xg7kygsEQVwlsndJJpRHmH/SZMkIX5W9NBUmUPYbtd1bYOxno+xgQ3ybcfMtUhkf84ElYZ183N
-	9F4aX31hrijWqJNiJC4B4JIqAB64=
-X-Google-Smtp-Source: AGHT+IH0zMD8/RxEXU7DsKKvbZcRPlZ+NXTTVYciwEjaHLt8FIDrEdayUKibhNYJXdonblSwQWcwh1Rta0f8Sgjksi8=
-X-Received: by 2002:a05:6122:9a7:b0:4bd:4cf4:335f with SMTP id
- g39-20020a05612209a700b004bd4cf4335fmr970651vkd.26.1706496409986; Sun, 28 Jan
- 2024 18:46:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706497174; x=1707101974;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g2srdy/gEkxZEQX8yqvPWjPa+KiI9RaTtwGAFirYHPc=;
+        b=F4Jx4kOBptm41hpXpF32BS1V+JDfzeDHlb3u1/6H23CKgEM1c758kZZeTitmxDLheI
+         lOjrs3ye4W2iev2+aV+8upXsrblwMTpI8oaQLvmmWjJqM2p+IpJSJjlGDBeaydgOCeae
+         kcqGEllX3O31IIQSM9iH+IRxfnVLmrkseWjmd2OkRX+dbkVK5oovRT/1M8EdKjEMc9w0
+         AKj0D8xCqxdSFYO+QUrcvLsI7hdbIzU31Em9q0Us72D0aQrV2Sj7RnBpV2jsWTiVu1+c
+         622W8hKqbSa3rzMIMizoUP5Eq7/TafS+Cr6EF9Qd9izThaZaUsmT0tLZZtZgVoqRXXw1
+         Lx9A==
+X-Gm-Message-State: AOJu0Yyegruh2CSxvSoLVxUs82Exfn193A4MxKXs0YnRNLv+p8v8+2+T
+	mz28obRum//vVbqmKu4Vj6YE0aairfahDjniAuZkVBzC2KeDiC9W
+X-Google-Smtp-Source: AGHT+IHLzWKpOpr3cILvZHyHMjuA82VdDmKya3ofyHQ2fh7NkcXPc/ZbcxRl9w9fzz4kk68FVx7Wdw==
+X-Received: by 2002:a17:903:246:b0:1d7:147d:6a1d with SMTP id j6-20020a170903024600b001d7147d6a1dmr2077904plh.55.1706497174501;
+        Sun, 28 Jan 2024 18:59:34 -0800 (PST)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
+        by smtp.gmail.com with ESMTPSA id z2-20020a170902708200b001d89ed2d651sm4239317plk.102.2024.01.28.18.59.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 28 Jan 2024 18:59:34 -0800 (PST)
+Message-ID: <df263948-07e0-4aab-a645-ea401d4d413b@acm.org>
+Date: Sun, 28 Jan 2024 18:59:31 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103003011.211382-1-v-songbaohua@oppo.com>
- <20240106013021.GA123449@google.com> <CAGsJ_4xp7HFuYbDp3UjMqFKSuz2HJn+5JnJdB-PP_GmucQqOpg@mail.gmail.com>
- <20240115023457.GA1504420@google.com>
-In-Reply-To: <20240115023457.GA1504420@google.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Mon, 29 Jan 2024 10:46:38 +0800
-Message-ID: <CAGsJ_4x6e7=tWVKfauJaGMRmJ3tz7GymKosYcHrxoxEnAHyX6g@mail.gmail.com>
-Subject: Re: [PATCH] zram: easy the allocation of zcomp_strm's buffers with 2 pages
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, Barry Song <v-songbaohua@oppo.com>, 
-	Andrew Morton <akpm@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/14] block: refactor disk_update_readahead
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, virtualization@lists.linux.dev,
+ Hannes Reinecke <hare@suse.de>
+References: <20240128165813.3213508-1-hch@lst.de>
+ <20240128165813.3213508-3-hch@lst.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240128165813.3213508-3-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 15, 2024 at 10:35=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (24/01/06 15:38), Barry Song wrote:
-> > On Sat, Jan 6, 2024 at 9:30=E2=80=AFAM Sergey Senozhatsky
-> > <senozhatsky@chromium.org> wrote:
-> > >
-> > > On (24/01/03 13:30), Barry Song wrote:
-> > > > There is no need to keep zcomp_strm's buffers contiguous physically=
-.
-> > > > And rarely, 1-order allocation can fail while buddy is seriously
-> > > > fragmented.
-> > >
-> > > Dunno. Some of these don't sound like convincing reasons, I'm afraid.
-> > > We don't allocate compression streams all the time, we do it once
-> > > per-CPU. And if the system is under such a terrible memory pressure
-> >
-> > We actually do it many times actually because we free it while unpluggi=
-ng and
-> > re-allocate it during hotplugging. this can happen quite often for syst=
-ems like
-> > Android using hotplug for power management.
->
-> Okay, makes sense.
-> Do you see these problems in real life? I don't recall any reports.
+On 1/28/24 08:58, Christoph Hellwig wrote:
+> +static void blk_apply_bdi_limits(struct backing_dev_info *bdi,
+> +		struct queue_limits *lim)
+> +{
+> +	/*
+> +	 * For read-ahead of large files to be effective, we need to read ahead
+> +	 * at least twice the optimal I/O size.
+> +	 */
+> +	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
+> +	bdi->io_pages = lim->max_sectors >> (PAGE_SHIFT - 9);
+> +}
 
-i don't have problems with the current zram which supports normal pages onl=
-y.
+Would this be a good opportunity to change (PAGE_SHIFT - 9) into PAGE_SECTORS_SHIFT?
 
-but  in our out-of-tree code, we have enhanced zram/zsmalloc to support lar=
-ge
-folios compression/decompression, which will make zram work much better
-with large anon folios/mTHP things on which Ryan Roberts is working on.
+Thanks,
 
-I mean, a large folio with for example 16 normal pages can be saved as
-one object in zram.
-In millions of phones, we have deployed this approach and seen huge improve=
-ment
-on compression ratio and cpu consumption decrease. in that case, we
-need a larger
-per-cpu buffer, and have seen frequent failure on allocation. that
-inspired me to send
-this patch in advance.
-
->
-> > > then one probably should not use zram at all, because zsmalloc needs
-> > > pages for its pool.
-> >
-> > In my humble opinion, 1-order allocation and 0-order allocation are dif=
-ferent
-> > things, 1-order is still more difficult though it is easier than
-> > 2-order which was
-> > a big pain causing allocation latency for tasks' kernel stacks and nega=
-tively
-> > affecting user experience. it has now been replaced by vmalloc and make=
-s
-> > life easier :-)
->
-> Sure.
->
-> > > I also wonder whether Android uses HW compression, in which case we
-> > > may need to have physically contig pages. Not to mention TLB shootdow=
-ns
-> > > that virt contig pages add to the picture.
-> >
-> > I don't understand how HW compression and TLB shootdown are related as =
-zRAM
-> > is using a traditional comp API.
->
-> Oh, those are not related. TLB shootdowns are what now will be added to
-> all compressions/decompressions, so it's sort of extra cost.
-
-i am sorry i still don't understand where the tlb shootdowns come
-from. we don't unmap
-this per-cpu buffers during compression and decompression, do we ?
-
-am i missing something?
-
-> HW compression (which android may be doing?) is another story.
->
-> Did you run any perf tests on zram w/ and w/o the patch?
->
-> > We are always passing a virtual address, traditional HW drivers use the=
-ir own
-> > buffers to do DMA.
-> >
-> > int crypto_comp_compress(struct crypto_comp *comp,
-> > const u8 *src, unsigned int slen,
-> > u8 *dst, unsigned int *dlen);
-> > int crypto_comp_decompress(struct crypto_comp *comp,
-> >   const u8 *src, unsigned int slen,
-> >   u8 *dst, unsigned int *dlen);
-> >
-> > In new acomp API, we are passing a sg - users' buffers to drivers direc=
-tly,
-> > sg_init_one(&input, src, entry->length);
-> > sg_init_table(&output, 1);
-> > sg_set_page(&output, page, PAGE_SIZE, 0);
-> > acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length=
-, dlen);
-> > ret =3D crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req),
-> > &acomp_ctx->wait);
-> >
-> > but i agree one-nents sg might have some advantage in scompress case
->
-> Right.
->
-> > after we move
-> > to new acomp APIs if we have this patch I sent recently [patch 3/3],
-> > https://lore.kernel.org/linux-mm/20240103095006.608744-1-21cnbao@gmail.=
-com/
->
-> Nice.
-
-Thanks
-Barry
+Bart.
