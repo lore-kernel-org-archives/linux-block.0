@@ -1,204 +1,147 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07BB4594F
-	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 05:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB79845976
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 06:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706505326; cv=none; b=rtwRqr+2dKbrrUuCjWQdkZfrb8vj415kVCXLGZBx58lIHpdsVLEH8I2CH4iU/Nw6uM32uvxzzcQ5ZRoHbSMXY+CWL19eG3F03wwOt7IXuPTh86uOFeLzOlo39CBz6fq5ZuQxDqsEDZBErOOx5OAsEWv7kHuUJCnA/PdFB/gstnc=
+	t=1706508717; cv=none; b=P1q5DVKPAswOEqOkOsou5RvB+3Dnw3fMeIvcZ5KXhCodawwDyQfMt3NKfhC7jRFB3L6UsGDjUMfHR7/KE+j/NxVK3a2tmAFdbNrKGOnDMOLq7HfdFf3oJLLufAfYTjJLY1TwzFY4scqvu7lnvw7zgY9P6yuLlA70TwxVmjTSoJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706505326; c=relaxed/simple;
-	bh=sYJ01KRgJ0qUN+iB6Hi1omRu6ElpgexbhZcFP/ArE/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FvA556hKEYjxVcZNOn+8HQhe2Eo4pt6hH6/UV8mMBCLZThhbBmZwUKMpmGoSe+WLusoaVqguSznNm98dlPK+xnPZZAHXBtzj4CwUlYY0KfC8Kr4LMnGaJZlTD6tMXdRnyAmdG63bwihirCnF5U+0F11sXmH3QgNYQaKM0TQ8snc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=BkKYq7pr; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	s=arc-20240116; t=1706508717; c=relaxed/simple;
+	bh=UaQkEnMYi2BN4m5wBJSKGXubqymmzIm+30VvqRYvpak=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VzacejathJM60Ku9sXgNs1MSpNGWrtF+G3EUqOtBb5SJqRBFWGIHSJZxCJpB1LU8UdwokEJegkQRNVXXAXrNf3fso2PpeCYw7PPIQTotnPFGNZ7v/2268rvQ041yYz7nIZAsNyUZW3VnfuOXrt/AupFsdmapTAMEHJB2elShKhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ewk8koO/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=prVrk2pb; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=v50bw1YI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3KIONblc; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="BkKYq7pr"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ddcfbc5a5fso2100740b3a.2
-        for <linux-block@vger.kernel.org>; Sun, 28 Jan 2024 21:15:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1706505324; x=1707110124; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MzCJhbr94fRn8OFzgvOn2yQbiBfC+VkQTRw5GLu7Xvk=;
-        b=BkKYq7prexFZDQBmHAkBmKfyxskixXIXFPIm0Ua1IJ+LgqeYdjFwAfbAYuQa44o7Xd
-         8JmCMp9KDPptuGlrhZBH67jD48OMmxiHJVVRzG4lqGPBTKF5Je9QFP/Xl8gtmbFtrpu5
-         7GwHloDJDRIid+Kwr86iB4+IojWymz73JuQZ3TShCIk0SEIAbMaeZ8NOR2JguJpt6U9n
-         Qh9o5FeKaIvbAAbJ9yPnCsJ41tlR6kxN6c4M1bsonE9vZjbaqllbzlnaBT4XfoZuVtJg
-         kM7EXa1sEF6MvH9R9/afMNqa822D0fCTo2seAyf737/k6kvKHzpjF7jAMtSz85fPBp4W
-         LN2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706505324; x=1707110124;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MzCJhbr94fRn8OFzgvOn2yQbiBfC+VkQTRw5GLu7Xvk=;
-        b=uLCshZPfFXkA47TZcA1OWgKMNPz+PYGhlLlxEBsFWs4ESEe8Dkw/GShLLwM7+qL6Nf
-         J4NroHpvHn3KEn8GTbexolqnSujrD2EVxBrYlokmppA8+NZTPqe/bD9sakGszjFiwtpo
-         IC8tJtMLqNWMcXjH26wqdYf71aAhyiR3qNqD1AUPQgpyeFK51OJAHwo6lkXtC8zTr9Xm
-         5XLCKETbY0G1La2G/EPSOzWJ1n5oXYhem7TM/muzG9hIFW2JP851UI6AcHhfyB5C2dHU
-         xklWxJ2Cb8udsTyMKGOPkObAwkJL/lGUrB94kKHgr6kOtBsXcpsA/zljBo9zYm4HM5fr
-         L7ug==
-X-Gm-Message-State: AOJu0YzexUFgVYNk18bPF169tpqxqI8BYWbtRoRoQg79fSA59eN4HxVl
-	s2r351f511DR7XnMO9PZkuioGpoGd1Hg8sCOKigcriPDNnoJbw878Ze5IFbyQsY=
-X-Google-Smtp-Source: AGHT+IGANgJ4Z2U1cic1qfkdu+LrVftCh5DoXKhkXGOBg6TiBffjvJTExqp//91HJcFTxKSobu8QBQ==
-X-Received: by 2002:a05:6a00:d74:b0:6dd:8a25:e167 with SMTP id n52-20020a056a000d7400b006dd8a25e167mr3050277pfv.34.1706505323985;
-        Sun, 28 Jan 2024 21:15:23 -0800 (PST)
-Received: from dread.disaster.area (pa49-181-38-249.pa.nsw.optusnet.com.au. [49.181.38.249])
-        by smtp.gmail.com with ESMTPSA id h10-20020a056a00218a00b006dbd1b13d29sm4911312pfi.208.2024.01.28.21.15.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jan 2024 21:15:23 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1rUJzI-00GjMK-2X;
-	Mon, 29 Jan 2024 16:15:16 +1100
-Date: Mon, 29 Jan 2024 16:15:16 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Mike Snitzer <snitzer@kernel.org>, Matthew Wilcox <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Don Dutile <ddutile@redhat.com>,
-	Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org
-Subject: Re: [RFC PATCH] mm/readahead: readahead aggressively if read drops
- in willneed range
-Message-ID: <Zbc0ZJceZPyt8m7q@dread.disaster.area>
-References: <20240128142522.1524741-1-ming.lei@redhat.com>
- <ZbbPCQZdazF7s0_b@casper.infradead.org>
- <ZbbfXVg9FpWRUVDn@redhat.com>
- <ZbbvfFxcVgkwbhFv@casper.infradead.org>
- <CAH6w=aw_46Ker0w8HmSA41vUUDKGDGC3gxBFWAhd326+kEtrNg@mail.gmail.com>
- <ZbcDvTkeDKttPfJ4@dread.disaster.area>
- <ZbciOba1h3V9mmup@fedora>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ewk8koO/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="prVrk2pb";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="v50bw1YI";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3KIONblc"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E83761F7D1;
+	Mon, 29 Jan 2024 06:11:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706508714; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ddu+U64xtjg+pkz7EZ+7fFB4LAA/cmY94lZh0HXlHC8=;
+	b=ewk8koO/0sGWLzAM9bQL8rMrAnXh/dCf6YqaWb76tQvXw761iumRQ2T/ZhkFT8aHspE89K
+	+eg/yinl9qkirzwXEhNUNsE3d/sUp6zOBThju34q/0v/CaZSt3T1gA/m56u3fSFootdQ9O
+	G9uRr0iWPvIc2rTPsLUdNS03jEIxMWs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706508714;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ddu+U64xtjg+pkz7EZ+7fFB4LAA/cmY94lZh0HXlHC8=;
+	b=prVrk2pb8+gAD/sGtmV0qM1MLb0eG111iocGHPng6QGyJDLmxxPOpgZhaFVwABMbWJ7/nQ
+	q+vLeD9bbm5vN7Aw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706508713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ddu+U64xtjg+pkz7EZ+7fFB4LAA/cmY94lZh0HXlHC8=;
+	b=v50bw1YIXZ0qKkQDnruORo23f1hev5+UteKCs38hyyi6V5+5gYKmYoKbkXpfP0K3xG6N3/
+	k0gzYsTv59mQ5eXMPRhibX6No9gWDHCw4DK7V/vIrVH30/MZVTkOxj4ZT3a7ygHGOo4hN8
+	2ta6q4+Mkl04bWyiKN5TB/jZPXR2yfM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706508713;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ddu+U64xtjg+pkz7EZ+7fFB4LAA/cmY94lZh0HXlHC8=;
+	b=3KIONblcoMtJoNUZBgp2/bxEOBlHDpaj4IB0MKfQp2LfHXul++OTZV4myxzSVSdeB/dWeQ
+	v/mcVuJuHJaqofDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 546B512FF7;
+	Mon, 29 Jan 2024 06:11:53 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id lDlPEqlBt2UVRQAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 29 Jan 2024 06:11:53 +0000
+Message-ID: <4b4c9b22-a2f0-4727-8238-90b73a70828b@suse.de>
+Date: Mon, 29 Jan 2024 07:11:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/14] block: add an API to atomically update queue limits
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, virtualization@lists.linux.dev
+References: <20240128165813.3213508-1-hch@lst.de>
+ <20240128165813.3213508-4-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240128165813.3213508-4-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZbciOba1h3V9mmup@fedora>
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spamd-Result: default: False [-0.10 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-0.01)[49.10%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[14];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,suse.de:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -0.10
 
-On Mon, Jan 29, 2024 at 11:57:45AM +0800, Ming Lei wrote:
-> On Mon, Jan 29, 2024 at 12:47:41PM +1100, Dave Chinner wrote:
-> > On Sun, Jan 28, 2024 at 07:39:49PM -0500, Mike Snitzer wrote:
-> > > On Sun, Jan 28, 2024 at 7:22 PM Matthew Wilcox <willy@infradead.org> wrote:
-> > > >
-> > > > On Sun, Jan 28, 2024 at 06:12:29PM -0500, Mike Snitzer wrote:
-> > > > > On Sun, Jan 28 2024 at  5:02P -0500,
-> > > > > Matthew Wilcox <willy@infradead.org> wrote:
-> > > > Understood.  But ... the application is asking for as much readahead as
-> > > > possible, and the sysadmin has said "Don't readahead more than 64kB at
-> > > > a time".  So why will we not get a bug report in 1-15 years time saying
-> > > > "I put a limit on readahead and the kernel is ignoring it"?  I think
-> > > > typically we allow the sysadmin to override application requests,
-> > > > don't we?
-> > > 
-> > > The application isn't knowingly asking for readahead.  It is asking to
-> > > mmap the file (and reporter wants it done as quickly as possible..
-> > > like occurred before).
-> > 
-> > ... which we do within the constraints of the given configuration.
-> > 
-> > > This fix is comparable to Jens' commit 9491ae4aade6 ("mm: don't cap
-> > > request size based on read-ahead setting") -- same logic, just applied
-> > > to callchain that ends up using madvise(MADV_WILLNEED).
-> > 
-> > Not really. There is a difference between performing a synchronous
-> > read IO here that we must complete, compared to optimistic
-> > asynchronous read-ahead which we can fail or toss away without the
-> > user ever seeing the data the IO returned.
+On 1/28/24 17:58, Christoph Hellwig wrote:
+> Add a new queue_limits_{start,commit}_update pair of functions that
+> allows taking an atomic snapshot of queue limits, update it, and
+> commit it if it passes validity checking.
 > 
-> Yeah, the big readahead in this patch happens when user starts to read
-> over mmaped buffer instead of madvise().
-
-Yes, that's how it is intended to work :/
-
-> > We want required IO to be done in as few, larger IOs as possible,
-> > and not be limited by constraints placed on background optimistic
-> > IOs.
-> > 
-> > madvise(WILLNEED) is optimistic IO - there is no requirement that it
-> > complete the data reads successfully. If the data is actually
-> > required, we'll guarantee completion when the user accesses it, not
-> > when madvise() is called.  IOWs, madvise is async readahead, and so
-> > really should be constrained by readahead bounds and not user IO
-> > bounds.
-> > 
-> > We could change this behaviour for madvise of large ranges that we
-> > force into the page cache by ignoring device readahead bounds, but
-> > I'm not sure we want to do this in general.
-> > 
-> > Perhaps fadvise/madvise(willneed) can fiddle the file f_ra.ra_pages
-> > value in this situation to override the device limit for large
-> > ranges (for some definition of large - say 10x bdi->ra_pages) and
-> > restore it once the readahead operation is done. This would make it
-> > behave less like readahead and more like a user read from an IO
-> > perspective...
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/blk-core.c       |   1 +
+>   block/blk-settings.c   | 182 +++++++++++++++++++++++++++++++++++++++++
+>   block/blk.h            |   1 +
+>   include/linux/blkdev.h |  23 ++++++
+>   4 files changed, 207 insertions(+)
 > 
-> ->ra_pages is just one hint, which is 128KB at default, and either
-> device or userspace can override it.
-> 
-> fadvise/madvise(willneed) already readahead bytes from bdi->io_pages which
-> is the max device sector size(often 10X of ->ra_pages), please see
-> force_page_cache_ra().
-
-Yes, but if we also change vma->file->f_ra->ra_pages during the
-WILLNEED operation (as we do for FADV_SEQUENTIAL) then we get a
-larger readahead window for the demand-paged access portion of the
-WILLNEED access...
-
-> 
-> Follows the current report:
-> 
-> 1) usersapce call madvise(willneed, 1G)
-> 
-> 2) only the 1st part(size is from bdi->io_pages, suppose it is 2MB) is
-> readahead in madvise(willneed, 1G) since commit 6d2be915e589
-> 
-> 3) the other parts(2M ~ 1G) is readahead by unit of bdi->ra_pages which is
-> set as 64KB by userspace when userspace reads the mmaped buffer, then
-> the whole application becomes slower.
-
-It gets limited by file->f_ra->ra_pages being initialised to
-bdi->ra_pages and then never changed as the advice for access
-methods to the file are changed.
-
-But the problem here is *not the readahead code*. The problem is
-that the user has configured the device readahead window to be far
-smaller than is optimal for the storage. Hence readahead is slow.
-The fix for that is to either increase the device readahead windows,
-or to change the specific readahead window for the file that has
-sequential access patterns.
-
-Indeed, we already have that - FADV_SEQUENTIAL will set
-file->f_ra.ra_pages to 2 * bdi->ra_pages so that readahead uses
-larger IOs for that access.
-
-That's what should happen here - MADV_WILLNEED does not imply a
-specific access pattern so the application should be running
-MADV_SEQUENTIAL (triggers aggressive readahead) then MADV_WILLNEED
-to start the readahead, and then the rest of the on-demand readahead
-will get the higher readahead limits.
-
-> This patch changes 3) to use bdi->io_pages as readahead unit.
-
-I think it really should be changing MADV/FADV_SEQUENTIAL to set
-file->f_ra.ra_pages to bdi->io_pages, not bdi->ra_pages * 2, and the
-mem.load() implementation in the application converted to use
-MADV_SEQUENTIAL to properly indicate it's access pattern to the
-readahead algorithm.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
 
-Dave.
+Hannes
 -- 
-Dave Chinner
-david@fromorbit.com
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Ivo Totev, Andrew McDonald,
+Werner Knoblich
+
