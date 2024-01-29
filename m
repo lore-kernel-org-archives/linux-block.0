@@ -1,487 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2047.outbound.protection.outlook.com [40.107.95.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9BF5B5C5;
-	Mon, 29 Jan 2024 10:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706525845; cv=none; b=fdEnYlJina87D7K+RX4Rs41Sv4yoJnnbst/GA4MzfAHna+PeiqboB8Q9wQNRpDgpJjbGs/hsm2RbM3Zxo6dbxZODer13W7b/PsDpCRYyoo9Lj+3nBARe4nTdkc2EfVLk6L4Dt5WfjRd29PLxYKcXeffk43z94TSSf0CISsXWBpE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706525845; c=relaxed/simple;
-	bh=Q1sSgJzPsnW2c/w1RrW1Rt/ULg82b7kgvOY8rPIDf9E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H8hPPCPDjMf6Fe+ZKmAxF91wq1Qlsz3gx7GvhMdfL8CN7PkDdu6tiCcpN6Cu4vPBAufVc4LOODYDZksiu/5G1m3JaNUBD7NDLGpe2CIWXyCssUs4+NxPC/tIT/KGhGROJNsGkFwWIPq7LrDtWqUuEGaARFWrzR7lAp8N0el1ADI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYZH1Goy; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A635D745
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 11:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706526842; cv=fail; b=qJ0sXqqnGH3wd6X7SaSjEQeqzGRZ527kvcicoVfA6kPn4/2DbXK8gIa+JsW2Zekdn+ra5xXKHOAv7F6s8gNEEOY8vb7eyHZE+jlfQaPP9KZB3Re+NdfG7Sc/cVkVdNfM+N3t1KUDUQQE8wrzRnc8LncoDrB2DuZS7UFNtWP/iyY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706526842; c=relaxed/simple;
+	bh=6XweYhY20PAEJkYXSlXC7n+DrR9Wvx6/VD4dRvlpFZ8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=He012Fps2GVLomeSFAskDYT/aM3WwkIqHjIaUtPifqu64EWRfg00L9/aaNplqLrOPP0TdJCdsvL9H7RDGkHmE52vGrmjrMWZ/1v2lvwVfGtW9nqvtgna9iFFTm+Uitvnm4A630IOT7pOBS0I8gSJYxO0iB8ysu2NYlHMzR5Ck9E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G0xqMNVy; arc=fail smtp.client-ip=40.107.95.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYZH1Goy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24388C433C7;
-	Mon, 29 Jan 2024 10:57:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706525845;
-	bh=Q1sSgJzPsnW2c/w1RrW1Rt/ULg82b7kgvOY8rPIDf9E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IYZH1GoyFvfa60aNq+OLcVfZcXpOhPT8fUgMkjXHyQNRq9Bn0cR8IRmMXgEbduFzh
-	 dUs7IQGU2vRYOX09bfAzauwMQRkPpqDgSaiY9NFUOStVROXSmM7/66t494/621MCRO
-	 nKq33SovYrWiZazJ76+IGgP5cZiRGxk6id5Cly5BDl6F6qEwFakPmpf8iajSoXcr4j
-	 UxnzmVLaIxOyEPiJPGSsIm9XsoAxKs/gPZIXhA8cuIuBlfOs3wyDANeuJr3v+CtzVY
-	 wQfipQj7iH/89UalW+jEwpzQAnxvXZSiYU/T46RsDyhD3/OASAzv3LT2NMthbWOfC/
-	 iYTfU9mbUNUvA==
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH RFC 2/2] fs,drivers: remove bdev_inode() usage outside of block layer and drivers
-Date: Mon, 29 Jan 2024 11:56:42 +0100
-Message-ID: <20240129-vfs-bdev-file-bd_inode-v1-2-42eb9eea96cf@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240129-vfs-bdev-file-bd_inode-v1-0-42eb9eea96cf@kernel.org>
-References: <20240129-vfs-bdev-file-bd_inode-v1-0-42eb9eea96cf@kernel.org>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G0xqMNVy"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OuCP+4mXXcsko7wW00TS1yjrUVsnXbXFfzxPvbFlicdE7ER7jTD9X2pknNOyCXA8pYkZ9g9u/BVcfj5FCGfsy0XPSTb+4rj9JfdOLLmVnJ54ersxbvA9n3lqsEIQ8rja0q6nteUPOLPyj+jszNhicWsPjs2b3Q0qK+OAveArHcRPdRodbbGBjeWfmEJzDhyZ+6cgX3SoBeKztm+QGcPdUrgU/boBlThprW+vklpkrRUvbhYJzpZPGYvgg6cIxvLyQE8dMUV8m5ICEIQI2dkN/rUY6R8c3CfvbC3wxpH5lSdyaBFN+E0aX3ThJhdAnQ9n7CtMMU0+eUXOPGyb9ycWZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6XweYhY20PAEJkYXSlXC7n+DrR9Wvx6/VD4dRvlpFZ8=;
+ b=LeZZAs6mBz6NSENBLyOQ5gqtZWG9OmbdGOmqY8Al3n0T05eJEVg5LNCYEaSUa2+UNZRjamg6TVW3Nx8wH6QFUuuDaCaZAo/fVh8UgLDmph5t8FPV77reDdbXxawrK0wF5vYjpIB8/DagFKEyGyjQfz9Mkygtr6YGmQxosBuj499sol6ZycktDWzro2vokaLqdDOaDsz1Q1hTetvZ+CK25BMljIUBCsKKp4FHEMbWBk/+8xAVUxU1zvDpupZxZR0V3v9Z1zOKnhQKucX7ue0XHTX9CjJLXETcZnHRyUqZlppSrgYc4hFFNNZir7EFo8yhyt3ofbd8Ubht4Q7dywbWzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6XweYhY20PAEJkYXSlXC7n+DrR9Wvx6/VD4dRvlpFZ8=;
+ b=G0xqMNVyuixNY2A3BBRj0AW9URiCW1da/D2oqt6x0VRaeu0sNGrBNLJ+I7ZhYSmg6yWlQ6WCoqZ+gZ//W2bk3omo1x7GoMeMOsDByW0LvvqdwFvpu1B6XBDt3xiT0GJ7V171pWKF4LAb7s/Fki6OeotvAncMXJZ8PmSpM3XOREcdnhcx+2MXKjVnvscmBp4s1DB7hpAgrCQh0KWi4UKs0GIx3SSFTe6nFmzVU2k9TaFpU0JrRQgrLO0zKQHFPx4YRH2LxL/DN8lsUZ1ZEiEVNYjxrEbFG8EhAcXyWfRUJuDkHCCMlOCpLIzfGSAh8UZ2mf3bXELswE3q52c9DQXUHQ==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by SJ0PR12MB6925.namprd12.prod.outlook.com (2603:10b6:a03:483::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 29 Jan
+ 2024 11:13:58 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed%4]) with mapi id 15.20.7228.029; Mon, 29 Jan 2024
+ 11:13:58 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+CC: "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>, Chaitanya
+ Kulkarni <chaitanyak@nvidia.com>
+Subject: Re: [PATCH blktests V3] nvme: add nvme pci timeout testcase
+Thread-Topic: [PATCH blktests V3] nvme: add nvme pci timeout testcase
+Thread-Index: AQHaTk9e4i/cjK9iXUuT16SWhY6WWLDwq+KA
+Date: Mon, 29 Jan 2024 11:13:58 +0000
+Message-ID: <863833c7-3414-4012-a138-3d44ea44dde7@nvidia.com>
+References: <20240123225547.10221-1-kch@nvidia.com>
+In-Reply-To: <20240123225547.10221-1-kch@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SJ0PR12MB6925:EE_
+x-ms-office365-filtering-correlation-id: 3fc54f76-1f15-489f-28b9-08dc20bb63a4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ IG4N6Y6c1CdnZ1np4wfQx3j1zJocIwZNH2UwcpB1FQfWYmQGLt8TbKORzjYGleORLrB7RJUsd0jTAr3gd/URVjt/OfzvOorAVxeMwlEA+8CgS/BxuCUjMNdaiZGy9Om5v3M2UEbrKlderjg/xBDOHcEE+J1mGIScQTGTEEEmys8TNoSvffm8MWoJXDiOjC3udzrjTAyJ0jQKgWNvSJcGoEzCKLc4j8PYMxHE5jNSOWg9n2x9emocP2aF85u04/bvHQrFCTW9+dUpJH8UwNDZfVvB9inXfp6Vd2YGMn7JWZyclzz3VpT1q7M66brmqzcVkmwM06j7AZcD13YjGbjZDaeCcFmEsgTMkzvBzbPtUkyHOz+WJT2ZpKsVbz3BVNQdjsHB7ZhNM+2B4vhV8H6YQB3ngRSGwrZ0TuQwjAzmYEucP4+5L+yjsJNs2IBZjsF0BevCe1UJpsHWnJzWmPBN04OfctShKMkw+HnVmwk7z7Cre5Xm1jthwyBaGhJH0n18tD33OdnL+eR5TXS0r/VRXOxWR+KBWr9KK3Tozi1ADe4yjKTOq/tvSI3i4eyAKXi/rLN+00TGczmANTFKVSlyWXaNJMLsnlqEgkD1r9UPE+Ryzgm956kofkqzcTA4ovq7GSX17VGZBeVdLPoN5/Su6TkJKhCzaT05Iw7PNY2rjWVNMrPNFwJX/c9uk514LJmq
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(376002)(396003)(136003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(6512007)(107886003)(2616005)(38100700002)(122000001)(8676002)(8936002)(5660300002)(4326008)(4744005)(2906002)(478600001)(6486002)(6506007)(53546011)(66946007)(71200400001)(54906003)(64756008)(66446008)(66476007)(66556008)(91956017)(76116006)(316002)(110136005)(41300700001)(38070700009)(86362001)(31696002)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?RVY2UU9oTWZoQjRrbEUza0tOanJtMVNBQXFYL29CTGpGTDE4SHpsTVpmWXRH?=
+ =?utf-8?B?clNXSm9sY0R0NStWWnJ4NHFpSGpCN3l5WGJyTUZIc0hwM1pjVEJOR01xREZs?=
+ =?utf-8?B?ejFWS0RpaVJOc2FTK1h0VmxZVU5BakVZM0JMRlN4Y28wR1NtVGVSckIyLzc1?=
+ =?utf-8?B?b2t5ODhhSXZlU01kWWhsdDJZUDZveWZsT0dPYW5WVlVxc2dVanBsckNyVkpE?=
+ =?utf-8?B?RUQ0Mm5FRURRZmFURFJiZytYYWMwYTNtWjJHUVhSSUVvdm9NUi9WQllMMGxF?=
+ =?utf-8?B?ZXg5Q1RCVko4MHExV0VGNDJIUGptN3h6YzFpalZZMXNiUVEvdVVyV3R0Z3l5?=
+ =?utf-8?B?aGF0bE5zZEF1K2NnQlJQbjBBN2lQbVR2eW1jZWI0Q3ZEUjVMQm5IZiswWkFZ?=
+ =?utf-8?B?UFFpSFZ1aE5qZGZyRHdaWXl2bVNaMUZZRUlpU2drVW9BNW1BbllpRVJpTEFp?=
+ =?utf-8?B?NVZEWkpoTmxpbjU3Smc4bUczdU9DVVVncTdtN04wQkhvaEtFelVjWDNxY3J2?=
+ =?utf-8?B?UVZOWXltdVFOYWRDdGFSdERQMWNqekkvcE14SmdiOGJ6VFRSdmZOdklKLzh3?=
+ =?utf-8?B?dTI5bkh2ZXdubS8zY2tyUC9PTmp3TGthTllIaDlmTGVRZEp3RUh6Zm0vR3A2?=
+ =?utf-8?B?QzhiQzFjZ2RYSW5TMmcxbmM2bW9RQ0VUeklkSjE3ZmlicWZ5UzBiOG9DWDJo?=
+ =?utf-8?B?SnNJdE0xdmFqc0tGc2MwbVBDcjRBc3hsRVRYVUxLSWJmLy9BRnoyUlVGck9S?=
+ =?utf-8?B?Tmo3dUZoSDVuMlZXWkIyNzNRcG1GNnpVUWxUdnd5RVhCWFAzbzllME4yZ1Qy?=
+ =?utf-8?B?anQ1S3dwZkVPNy9BYnE0a0xma1duWmtXNmt6NjRjanN6bGpPcCtyTlBBZlNv?=
+ =?utf-8?B?eHZSWnRPYkEyaXp3aVEvSy9FTDNoVkFDbGxEajRPRTFUSWppZ0hRQzVIMWhP?=
+ =?utf-8?B?M1pFK1hkTEdHVStMMEJHU09HUzI0ZXRVZHZtc1NQeWpmSnpHaU9FYzNtd0Va?=
+ =?utf-8?B?S1NxT04rUFk2ejZaVmh3L2F1NmI2NHpPc2w5QzN1c21QcFIrLytWdXZIQUM4?=
+ =?utf-8?B?aWVDbGJ6WUluVnUzMVU4RThFMUpzT0NHck9aL1d2eGFkdHEvOUc5cElhekNU?=
+ =?utf-8?B?aXlDajB2ZHNvbWkwK0JNRlU4SGMvRXcwMzg2T0lBZWFqaUZPQzlkN1hCK0U3?=
+ =?utf-8?B?MDZTTXZRSmZOQzBOd3ZiSTJKMHl5Z3Nvb0pyMkdQczFYNzZIbGpqaDJpTWhY?=
+ =?utf-8?B?c2RPeHZCK3hRVDROVEY4OFYyTlBSUUxpcGp0UFdiMkRoUk8xWkVMVkFWajA1?=
+ =?utf-8?B?Nkc3WDcrNmprRXkzNkptUEJMSVZYcytyQjBzM3VGU3gzVCtIbGQyY1Z6RUhS?=
+ =?utf-8?B?Znp1cGhuRFV2blJjSWdORTMvWmZQYXR0aUYrZDVxSXovNHhQQ3RiNTE3T1dM?=
+ =?utf-8?B?ZUMvZ21OUGtDWUlSR1orYzB4RGtyQ0R0ZnM3bHI3NmdXRE4xYjRkci9oa1lv?=
+ =?utf-8?B?OC8zMVBkRDZpUDJoSmRyMnVoMGlNRi9PdDJFbU8yUmxaWHZhdE4yOFZiUDhH?=
+ =?utf-8?B?QU96NHpCRzQrbE1Xc0VWZFZ4d3o3T1laUFFmVTFsOTc5YXFPYUR3VG9DT3d4?=
+ =?utf-8?B?Q1QwTHBUamV0WmNUMk55NFBBQ0tkbi9pNmhnZnRuRHVmSTZOeFZ4UUp3U2RB?=
+ =?utf-8?B?ZDVGeThmNkZIZTZoKzcxZkZrNk9HeVI2Y1hYSFArY1FrWnBKbDJoR1NqUDVj?=
+ =?utf-8?B?WnZVQzNOdi9WaUdEb2VMWDFuMzlaczNhcm9jdDRWc3VvNU1ZbjY3YzRDTEs1?=
+ =?utf-8?B?UnJMc1hDUEx3allPbUJTYnVEbFM0c0hsTEt1MTZ5blhJb1BQVi9FRjVVUVh1?=
+ =?utf-8?B?TTBUREVJanB2RXRZUnpLV1draU13SmZJZDEvVCtKRUJWcXNWR09vdGU4dHZE?=
+ =?utf-8?B?VjRGODR6VG05L3dRQ0UrTHo5eWoxaWJoeWE1NnE4VE5wRENwMUhucm5meVpQ?=
+ =?utf-8?B?TW1EUWpZWlFHd3pVOUdROVczZVVKQUx2Rk5EeXBYNXNiS2E5MG1UNFd5SjBq?=
+ =?utf-8?B?U3BFS1RjYStDb1dWSHhQaHZYcHBxN0pCZDZrWS9jWDdMOWxtUHhWZnJzOFNO?=
+ =?utf-8?B?TllWVHNvSVRONm9xUCtlbXRDbkI5MjJWYjhzTEZBTHA5UEdtbWdFT05GS3dW?=
+ =?utf-8?Q?qvy+8Ana7XYmkjrV3cUAg87GkrCnfPIFIQVogTm07Gly?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <143D72957BF3B641951906DE8FD8710B@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.13-dev-4e032
-X-Developer-Signature: v=1; a=openpgp-sha256; l=17033; i=brauner@kernel.org; h=from:subject:message-id; bh=Q1sSgJzPsnW2c/w1RrW1Rt/ULg82b7kgvOY8rPIDf9E=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaRubyk4+YTpdVvgwpc/ZE49+hF5Q+jqTgvHvfavapLvF xxWKXG91FHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCR8tmMDO/uVRSq+O7oqgpO 1bSVuSQ22+Derf79s1pu9K2cumNdmAHDP4O+ss3CnxvP9s3svM99Z/l8LZOo/fHfzXsDUsvkl+k v4wYA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3fc54f76-1f15-489f-28b9-08dc20bb63a4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2024 11:13:58.1901
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5+wKMffytjjoxJmpiSglebK0EyBtv3TkFNYiG/ItEAOaxTZtXc4NvTRJVRCrY8mEfU0awYB/2SK175iUfqiAHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6925
 
-There are a few places that use bdev->bd_inode. They don't need to
-anymore as they can use the bdev file and bdev_file_inode().
-
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- drivers/md/bcache/super.c       |  7 ++++---
- drivers/mtd/devices/block2mtd.c |  4 ++--
- fs/bcachefs/util.h              |  5 -----
- fs/btrfs/dev-replace.c          |  2 +-
- fs/btrfs/disk-io.c              | 17 +++++++++--------
- fs/btrfs/disk-io.h              |  4 ++--
- fs/btrfs/super.c                |  2 +-
- fs/btrfs/volumes.c              | 26 ++++++++++++++------------
- fs/btrfs/volumes.h              |  2 +-
- fs/btrfs/zoned.c                | 18 ++++++++++--------
- fs/btrfs/zoned.h                |  4 ++--
- 11 files changed, 46 insertions(+), 45 deletions(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8971e769d5e7..48af785d8cd7 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -163,15 +163,16 @@ static const char *read_super_common(struct cache_sb *sb,  struct block_device *
- }
- 
- 
--static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
-+static const char *read_super(struct cache_sb *sb, struct bdev_file *bdev_file,
- 			      struct cache_sb_disk **res)
- {
- 	const char *err;
- 	struct cache_sb_disk *s;
- 	struct page *page;
- 	unsigned int i;
-+	struct block_device *bdev = file_bdev(bdev_file);
- 
--	page = read_cache_page_gfp(bdev_inode(bdev)->i_mapping,
-+	page = read_cache_page_gfp(bdev_file->f_mapping,
- 				   SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
- 	if (IS_ERR(page))
- 		return "IO error";
-@@ -2557,7 +2558,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 	if (set_blocksize(file_bdev(bdev_file), 4096))
- 		goto out_blkdev_put;
- 
--	err = read_super(sb, file_bdev(bdev_file), &sb_disk);
-+	err = read_super(sb, bdev_file, &sb_disk);
- 	if (err)
- 		goto out_blkdev_put;
- 
-diff --git a/drivers/mtd/devices/block2mtd.c b/drivers/mtd/devices/block2mtd.c
-index dc3df3a600cf..b8c224bf4b66 100644
---- a/drivers/mtd/devices/block2mtd.c
-+++ b/drivers/mtd/devices/block2mtd.c
-@@ -291,7 +291,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 		goto err_free_block2mtd;
- 	}
- 
--	if ((long)bdev_inode(bdev)->i_size % erase_size) {
-+	if ((long)bdev_file_inode(bdev_file)->i_size % erase_size) {
- 		pr_err("erasesize must be a divisor of device size\n");
- 		goto err_free_block2mtd;
- 	}
-@@ -309,7 +309,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 
- 	dev->mtd.name = name;
- 
--	dev->mtd.size = bdev_inode(bdev)->i_size & PAGE_MASK;
-+	dev->mtd.size = bdev_file_inode(bdev_file)->i_size & PAGE_MASK;
- 	dev->mtd.erasesize = erase_size;
- 	dev->mtd.writesize = 1;
- 	dev->mtd.writebufsize = PAGE_SIZE;
-diff --git a/fs/bcachefs/util.h b/fs/bcachefs/util.h
-index 5ab765d056d6..ed869d67bd85 100644
---- a/fs/bcachefs/util.h
-+++ b/fs/bcachefs/util.h
-@@ -552,11 +552,6 @@ static inline unsigned fract_exp_two(unsigned x, unsigned fract_bits)
- void bch2_bio_map(struct bio *bio, void *base, size_t);
- int bch2_bio_alloc_pages(struct bio *, size_t, gfp_t);
- 
--static inline sector_t bdev_sectors(struct block_device *bdev)
--{
--	return bdev_inode(bdev)->i_size >> 9;
--}
--
- #define closure_bio_submit(bio, cl)					\
- do {									\
- 	closure_get(cl);						\
-diff --git a/fs/btrfs/dev-replace.c b/fs/btrfs/dev-replace.c
-index 2eb11fe4bd05..bd5498d2a187 100644
---- a/fs/btrfs/dev-replace.c
-+++ b/fs/btrfs/dev-replace.c
-@@ -984,7 +984,7 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
- 	btrfs_sysfs_remove_device(src_device);
- 	btrfs_sysfs_update_devid(tgt_device);
- 	if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &src_device->dev_state))
--		btrfs_scratch_superblocks(fs_info, src_device->bdev,
-+		btrfs_scratch_superblocks(fs_info, src_device->bdev_file,
- 					  src_device->name->str);
- 
- 	/* write back the superblocks */
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 7d5d022b0bde..8a652374fa51 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -3222,7 +3222,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
- 	/*
- 	 * Read super block and check the signature bytes only
- 	 */
--	disk_super = btrfs_read_dev_super(fs_devices->latest_dev->bdev);
-+	disk_super = btrfs_read_dev_super(fs_devices->latest_dev->bdev_file);
- 	if (IS_ERR(disk_super)) {
- 		ret = PTR_ERR(disk_super);
- 		goto fail_alloc;
-@@ -3633,17 +3633,18 @@ static void btrfs_end_super_write(struct bio *bio)
- 	bio_put(bio);
- }
- 
--struct btrfs_super_block *btrfs_read_dev_one_super(struct block_device *bdev,
-+struct btrfs_super_block *btrfs_read_dev_one_super(struct file *bdev_file,
- 						   int copy_num, bool drop_cache)
- {
- 	struct btrfs_super_block *super;
-+	struct block_device *bdev = file_bdev(bdev_file);
- 	struct page *page;
- 	u64 bytenr, bytenr_orig;
--	struct address_space *mapping = bdev_inode(bdev)->i_mapping;
-+	struct address_space *mapping = bdev_file->f_mapping;
- 	int ret;
- 
- 	bytenr_orig = btrfs_sb_offset(copy_num);
--	ret = btrfs_sb_log_location_bdev(bdev, copy_num, READ, &bytenr);
-+	ret = btrfs_sb_log_location_bdev(bdev_file, copy_num, READ, &bytenr);
- 	if (ret == -ENOENT)
- 		return ERR_PTR(-EINVAL);
- 	else if (ret)
-@@ -3684,7 +3685,7 @@ struct btrfs_super_block *btrfs_read_dev_one_super(struct block_device *bdev,
- }
- 
- 
--struct btrfs_super_block *btrfs_read_dev_super(struct block_device *bdev)
-+struct btrfs_super_block *btrfs_read_dev_super(struct file *bdev_file)
- {
- 	struct btrfs_super_block *super, *latest = NULL;
- 	int i;
-@@ -3696,7 +3697,7 @@ struct btrfs_super_block *btrfs_read_dev_super(struct block_device *bdev)
- 	 * later supers, using BTRFS_SUPER_MIRROR_MAX instead
- 	 */
- 	for (i = 0; i < 1; i++) {
--		super = btrfs_read_dev_one_super(bdev, i, false);
-+		super = btrfs_read_dev_one_super(bdev_file, i, false);
- 		if (IS_ERR(super))
- 			continue;
- 
-@@ -3726,7 +3727,7 @@ static int write_dev_supers(struct btrfs_device *device,
- 			    struct btrfs_super_block *sb, int max_mirrors)
- {
- 	struct btrfs_fs_info *fs_info = device->fs_info;
--	struct address_space *mapping = bdev_inode(device->bdev)->i_mapping;
-+	struct address_space *mapping = device->bdev_file->f_mapping;
- 	SHASH_DESC_ON_STACK(shash, fs_info->csum_shash);
- 	int i;
- 	int errors = 0;
-@@ -3843,7 +3844,7 @@ static int wait_dev_supers(struct btrfs_device *device, int max_mirrors)
- 		    device->commit_total_bytes)
- 			break;
- 
--		page = find_get_page(bdev_inode(device->bdev)->i_mapping,
-+		page = find_get_page(device->bdev_file->f_mapping,
- 				     bytenr >> PAGE_SHIFT);
- 		if (!page) {
- 			errors++;
-diff --git a/fs/btrfs/disk-io.h b/fs/btrfs/disk-io.h
-index 9413726b329b..0e4494ffd7a1 100644
---- a/fs/btrfs/disk-io.h
-+++ b/fs/btrfs/disk-io.h
-@@ -48,8 +48,8 @@ int btrfs_validate_super(struct btrfs_fs_info *fs_info,
- 			 struct btrfs_super_block *sb, int mirror_num);
- int btrfs_check_features(struct btrfs_fs_info *fs_info, bool is_rw_mount);
- int write_all_supers(struct btrfs_fs_info *fs_info, int max_mirrors);
--struct btrfs_super_block *btrfs_read_dev_super(struct block_device *bdev);
--struct btrfs_super_block *btrfs_read_dev_one_super(struct block_device *bdev,
-+struct btrfs_super_block *btrfs_read_dev_super(struct file *bdev_file);
-+struct btrfs_super_block *btrfs_read_dev_one_super(struct file *bdev_file,
- 						   int copy_num, bool drop_cache);
- int btrfs_commit_super(struct btrfs_fs_info *fs_info);
- struct btrfs_root *btrfs_read_tree_root(struct btrfs_root *tree_root,
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index 896acfda1789..ffa4d0ea6b62 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -2280,7 +2280,7 @@ static int check_dev_super(struct btrfs_device *dev)
- 		return 0;
- 
- 	/* Only need to check the primary super block. */
--	sb = btrfs_read_dev_one_super(dev->bdev, 0, true);
-+	sb = btrfs_read_dev_one_super(dev->bdev_file, 0, true);
- 	if (IS_ERR(sb))
- 		return PTR_ERR(sb);
- 
-diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-index 1f12122ae7ce..50d43a0deafe 100644
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -490,7 +490,7 @@ btrfs_get_bdev_and_sb(const char *device_path, blk_mode_t flags, void *holder,
- 		goto error;
- 	}
- 	invalidate_bdev(bdev);
--	*disk_super = btrfs_read_dev_super(bdev);
-+	*disk_super = btrfs_read_dev_super(*bdev_file);
- 	if (IS_ERR(*disk_super)) {
- 		ret = PTR_ERR(*disk_super);
- 		fput(*bdev_file);
-@@ -1246,10 +1246,11 @@ void btrfs_release_disk_super(struct btrfs_super_block *super)
- 	put_page(page);
- }
- 
--static struct btrfs_super_block *btrfs_read_disk_super(struct block_device *bdev,
-+static struct btrfs_super_block *btrfs_read_disk_super(struct file *bdev_file,
- 						       u64 bytenr, u64 bytenr_orig)
- {
- 	struct btrfs_super_block *disk_super;
-+	struct block_device *bdev = file_bdev(bdev_file);
- 	struct page *page;
- 	void *p;
- 	pgoff_t index;
-@@ -1268,7 +1269,7 @@ static struct btrfs_super_block *btrfs_read_disk_super(struct block_device *bdev
- 		return ERR_PTR(-EINVAL);
- 
- 	/* pull in the page with our super */
--	page = read_cache_page_gfp(bdev_inode(bdev)->i_mapping, index, GFP_KERNEL);
-+	page = read_cache_page_gfp(bdev_file->f_mapping, index, GFP_KERNEL);
- 
- 	if (IS_ERR(page))
- 		return ERR_CAST(page);
-@@ -1344,14 +1345,13 @@ struct btrfs_device *btrfs_scan_one_device(const char *path, blk_mode_t flags,
- 		return ERR_CAST(bdev_file);
- 
- 	bytenr_orig = btrfs_sb_offset(0);
--	ret = btrfs_sb_log_location_bdev(file_bdev(bdev_file), 0, READ, &bytenr);
-+	ret = btrfs_sb_log_location_bdev(bdev_file, 0, READ, &bytenr);
- 	if (ret) {
- 		device = ERR_PTR(ret);
- 		goto error_bdev_put;
- 	}
- 
--	disk_super = btrfs_read_disk_super(file_bdev(bdev_file), bytenr,
--					   bytenr_orig);
-+	disk_super = btrfs_read_disk_super(bdev_file, bytenr, bytenr_orig);
- 	if (IS_ERR(disk_super)) {
- 		device = ERR_CAST(disk_super);
- 		goto error_bdev_put;
-@@ -2011,14 +2011,15 @@ static u64 btrfs_num_devices(struct btrfs_fs_info *fs_info)
- }
- 
- static void btrfs_scratch_superblock(struct btrfs_fs_info *fs_info,
--				     struct block_device *bdev, int copy_num)
-+				     struct file *bdev_file, int copy_num)
- {
-+	struct block_device *bdev = file_bdev(bdev_file);
- 	struct btrfs_super_block *disk_super;
- 	const size_t len = sizeof(disk_super->magic);
- 	const u64 bytenr = btrfs_sb_offset(copy_num);
- 	int ret;
- 
--	disk_super = btrfs_read_disk_super(bdev, bytenr, bytenr);
-+	disk_super = btrfs_read_disk_super(bdev_file, bytenr, bytenr);
- 	if (IS_ERR(disk_super))
- 		return;
- 
-@@ -2033,10 +2034,11 @@ static void btrfs_scratch_superblock(struct btrfs_fs_info *fs_info,
- }
- 
- void btrfs_scratch_superblocks(struct btrfs_fs_info *fs_info,
--			       struct block_device *bdev,
-+			       struct file *bdev_file,
- 			       const char *device_path)
- {
- 	int copy_num;
-+	struct block_device *bdev = file_bdev(bdev_file);
- 
- 	if (!bdev)
- 		return;
-@@ -2045,7 +2047,7 @@ void btrfs_scratch_superblocks(struct btrfs_fs_info *fs_info,
- 		if (bdev_is_zoned(bdev))
- 			btrfs_reset_sb_log_zones(bdev, copy_num);
- 		else
--			btrfs_scratch_superblock(fs_info, bdev, copy_num);
-+			btrfs_scratch_superblock(fs_info, bdev_file, copy_num);
- 	}
- 
- 	/* Notify udev that device has changed */
-@@ -2187,7 +2189,7 @@ int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 	 *  just flush the device and let the caller do the final bdev_release.
- 	 */
- 	if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state)) {
--		btrfs_scratch_superblocks(fs_info, device->bdev,
-+		btrfs_scratch_superblocks(fs_info, device->bdev_file,
- 					  device->name->str);
- 		if (device->bdev) {
- 			sync_blockdev(device->bdev);
-@@ -2301,7 +2303,7 @@ void btrfs_destroy_dev_replace_tgtdev(struct btrfs_device *tgtdev)
- 
- 	mutex_unlock(&fs_devices->device_list_mutex);
- 
--	btrfs_scratch_superblocks(tgtdev->fs_info, tgtdev->bdev,
-+	btrfs_scratch_superblocks(tgtdev->fs_info, tgtdev->bdev_file,
- 				  tgtdev->name->str);
- 
- 	btrfs_close_bdev(tgtdev);
-diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
-index a11854912d53..8b2a98a0459f 100644
---- a/fs/btrfs/volumes.h
-+++ b/fs/btrfs/volumes.h
-@@ -781,7 +781,7 @@ struct list_head * __attribute_const__ btrfs_get_fs_uuids(void);
- bool btrfs_check_rw_degradable(struct btrfs_fs_info *fs_info,
- 					struct btrfs_device *failing_dev);
- void btrfs_scratch_superblocks(struct btrfs_fs_info *fs_info,
--			       struct block_device *bdev,
-+			       struct file *bdev_file,
- 			       const char *device_path);
- 
- enum btrfs_raid_types __attribute_const__ btrfs_bg_flags_to_raid_index(u64 flags);
-diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
-index 42893771532f..d5d200f1a078 100644
---- a/fs/btrfs/zoned.c
-+++ b/fs/btrfs/zoned.c
-@@ -83,7 +83,7 @@ static int copy_zone_info_cb(struct blk_zone *zone, unsigned int idx, void *data
- 	return 0;
- }
- 
--static int sb_write_pointer(struct block_device *bdev, struct blk_zone *zones,
-+static int sb_write_pointer(struct file *bdev_file, struct blk_zone *zones,
- 			    u64 *wp_ret)
- {
- 	bool empty[BTRFS_NR_SB_LOG_ZONES];
-@@ -120,7 +120,7 @@ static int sb_write_pointer(struct block_device *bdev, struct blk_zone *zones,
- 		return -ENOENT;
- 	} else if (full[0] && full[1]) {
- 		/* Compare two super blocks */
--		struct address_space *mapping = bdev_inode(bdev)->i_mapping;
-+		struct address_space *mapping = bdev_file->f_mapping;
- 		struct page *page[BTRFS_NR_SB_LOG_ZONES];
- 		struct btrfs_super_block *super[BTRFS_NR_SB_LOG_ZONES];
- 		int i;
-@@ -564,7 +564,7 @@ int btrfs_get_dev_zone_info(struct btrfs_device *device, bool populate_cache)
- 		    BLK_ZONE_TYPE_CONVENTIONAL)
- 			continue;
- 
--		ret = sb_write_pointer(device->bdev,
-+		ret = sb_write_pointer(device->bdev_file,
- 				       &zone_info->sb_zones[sb_pos], &sb_wp);
- 		if (ret != -ENOENT && ret) {
- 			btrfs_err_in_rcu(device->fs_info,
-@@ -800,18 +800,19 @@ int btrfs_check_mountopts_zoned(struct btrfs_fs_info *info, unsigned long *mount
- 	return 0;
- }
- 
--static int sb_log_location(struct block_device *bdev, struct blk_zone *zones,
-+static int sb_log_location(struct file *bdev_file, struct blk_zone *zones,
- 			   int rw, u64 *bytenr_ret)
- {
- 	u64 wp;
- 	int ret;
-+	struct block_device *bdev = file_bdev(bdev_file);
- 
- 	if (zones[0].type == BLK_ZONE_TYPE_CONVENTIONAL) {
- 		*bytenr_ret = zones[0].start << SECTOR_SHIFT;
- 		return 0;
- 	}
- 
--	ret = sb_write_pointer(bdev, zones, &wp);
-+	ret = sb_write_pointer(bdev_file, zones, &wp);
- 	if (ret != -ENOENT && ret < 0)
- 		return ret;
- 
-@@ -858,10 +859,11 @@ static int sb_log_location(struct block_device *bdev, struct blk_zone *zones,
- 
- }
- 
--int btrfs_sb_log_location_bdev(struct block_device *bdev, int mirror, int rw,
-+int btrfs_sb_log_location_bdev(struct file *bdev_file, int mirror, int rw,
- 			       u64 *bytenr_ret)
- {
- 	struct blk_zone zones[BTRFS_NR_SB_LOG_ZONES];
-+	struct block_device *bdev = file_bdev(bdev_file);
- 	sector_t zone_sectors;
- 	u32 sb_zone;
- 	int ret;
-@@ -895,7 +897,7 @@ int btrfs_sb_log_location_bdev(struct block_device *bdev, int mirror, int rw,
- 	if (ret != BTRFS_NR_SB_LOG_ZONES)
- 		return -EIO;
- 
--	return sb_log_location(bdev, zones, rw, bytenr_ret);
-+	return sb_log_location(bdev_file, zones, rw, bytenr_ret);
- }
- 
- int btrfs_sb_log_location(struct btrfs_device *device, int mirror, int rw,
-@@ -919,7 +921,7 @@ int btrfs_sb_log_location(struct btrfs_device *device, int mirror, int rw,
- 	if (zone_num + 1 >= zinfo->nr_zones)
- 		return -ENOENT;
- 
--	return sb_log_location(device->bdev,
-+	return sb_log_location(device->bdev_file,
- 			       &zinfo->sb_zones[BTRFS_NR_SB_LOG_ZONES * mirror],
- 			       rw, bytenr_ret);
- }
-diff --git a/fs/btrfs/zoned.h b/fs/btrfs/zoned.h
-index f573bda496fb..225d1c26d955 100644
---- a/fs/btrfs/zoned.h
-+++ b/fs/btrfs/zoned.h
-@@ -46,7 +46,7 @@ void btrfs_destroy_dev_zone_info(struct btrfs_device *device);
- struct btrfs_zoned_device_info *btrfs_clone_dev_zone_info(struct btrfs_device *orig_dev);
- int btrfs_check_zoned_mode(struct btrfs_fs_info *fs_info);
- int btrfs_check_mountopts_zoned(struct btrfs_fs_info *info, unsigned long *mount_opt);
--int btrfs_sb_log_location_bdev(struct block_device *bdev, int mirror, int rw,
-+int btrfs_sb_log_location_bdev(struct file *bdev_file, int mirror, int rw,
- 			       u64 *bytenr_ret);
- int btrfs_sb_log_location(struct btrfs_device *device, int mirror, int rw,
- 			  u64 *bytenr_ret);
-@@ -127,7 +127,7 @@ static inline int btrfs_check_mountopts_zoned(struct btrfs_fs_info *info,
- 	return 0;
- }
- 
--static inline int btrfs_sb_log_location_bdev(struct block_device *bdev,
-+static inline int btrfs_sb_log_location_bdev(struct file *bdev_file,
- 					     int mirror, int rw, u64 *bytenr_ret)
- {
- 	*bytenr_ret = btrfs_sb_offset(mirror);
-
--- 
-2.43.0
-
+T24gMS8yMy8yNCAxNDo1NSwgQ2hhaXRhbnlhIEt1bGthcm5pIHdyb3RlOg0KPiBUcmlnZ2VyIGFu
+ZCB0ZXN0IG52bWUtcGNpIHRpbWVvdXQgd2l0aCBjb25jdXJyZW50IGZpbyBqb2JzLg0KPg0KPiBT
+aWduZWQtb2ZmLWJ5OiBDaGFpdGFueWEgS3Vsa2FybmkgPGtjaEBudmlkaWEuY29tPg0KPiAtLS0N
+Cj4gVjM6LQ0KPg0KPiAxLiBBZGQgQ0FOX0JFX1pPTkVELg0KPiAyLiBBZGQgRkFVTFRfSU5KRUNU
+SU9OX0RFQlVHX0ZTIGNoZWNrIGluIHJlcXVpcmVzLg0KPiAzLiBSZW1vdmUgX3JlcXVpcmVfbnZt
+ZV90cnR5cGUgcGNpIGluIHJlcXVpcmVzKCkuDQo+IDQuIFJlbW92ZSBkZXZpY2VfcmVxdWlyZXMo
+KS4NCj4gNS4gU3RvcmUgZmlvIG91dHB1dCBpbiBGVUxMLg0KPiA2LiBSZXZtb2Ugc2hlbGxjaGVj
+ayBhbmQgdXNlIGdyZXAgSS9PIGVycm9yIHZhbHVlIHRvIHBhc3MvZmFpbCB0ZXN0Y2FzZS4NCj4N
+Cj4gLS0tDQo+DQoNCmlzIHRoZXJlIGFueSBvYmplY3Rpb25zIG9uIHRoaXMgcGF0Y2ggPw0KDQot
+Y2sNCg0KDQo=
