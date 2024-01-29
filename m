@@ -1,87 +1,103 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD293F9CF
-	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 17:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A833F9E0
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 18:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706550163; cv=none; b=XKnbJ6ObhlJmZv5ghFyMRMHxPb3rYC4ycd7JWYXIC8tP2g/k7GIrffYOIvN5ch/511Up4NLfmhm3BRwAu3Jopog1xZW6SqwFgYQoS9f33Q3iHHr1934OsSo9UQ611R4E56CPAxpNSefe6WM88954udHxnrsC5zBkzO8Wbrn2PH0=
+	t=1706551727; cv=none; b=ko7Fs7fdNG/UGnMUTqWPAuXzhwvI0BehFxejCerW9oIsWkf8Apyp0/ImeGsUI80zjIc/QgyWGzRQLD/Jw+8D7vmJyOUHL4Rf31aJKSdubiLY/iXbhMfvQwnPDuR42sr+EmswyEjuRU0CSSGxRkeg+T4EAN2In3mAh8F3wHtrnKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706550163; c=relaxed/simple;
-	bh=TosvVxwquqInZxOX0CZp6UFQe750GXHzXLT2bzJ8KRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UfaLXQ734r5fr3vZFT9xgC5WINTgbBsl5mt5xaeax7i1F4dur8Fplunw8vXYEZIHrCqcueWwpOgTSb4oNEjD92M+HrFPfHBaEXWgBheJGoq246fELm8ccJbKNvZYNeM4bO+m4/eJ6IdCqkaX9wvpeDcEQCNdDzobikcLg1b/FF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-68c41c070efso11685926d6.0
-        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 09:42:41 -0800 (PST)
+	s=arc-20240116; t=1706551727; c=relaxed/simple;
+	bh=RTsZO6M5NcQC5PSLsg7Lt9twSdXgN7IEDDrtjnJDfEg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WjcGGf5HOcSOCjJR4HM+UsJMACKdMINu2AjoiD3L95UU/ZazwuoUQEwCSTnAedO9HEI7ytMRq60jcBwEoEPVrHJdnDs0Pzc4FRrmtjIqB76nh/CGc9/7GR+EJ9r5+PSr6/nckdf7vjmLOaATPqewN8qVCHsJdF/9LfIg8D78tII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AnztSMEp; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnztSMEp"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33af2823edbso569705f8f.0
+        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 10:08:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706551724; x=1707156524; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DYAvQ7VsTVTnkYy4EIaJk+5ZEg4vidmMfkjz6PX3l1g=;
+        b=AnztSMEpjdkMsyBtwA4/yknp3UIDGWk9CAB8IPcH7DClqdRNYdTbBzMaZdmUlf67aQ
+         VCwFp13AW3wwV0Pl3gNhVFNds+VsItSkdnY5KHxWGpkk6iz47LWO/HE0YWEickbEIXOF
+         AiDbm5dj+l8RTgHAEI+Hf260rKNowxJw0ax22ZWdRGlRdTovfhdMHuk+2RYa+xPcKy7a
+         mSSmMtjkO6CV2F5/vSuL8Py18TobCWAaQdVhKtWvAPtKwnZbot1TzjcolkFO7g7ofCbo
+         GuRjUTrr5Lzx3IUurtlcqK/t+POOVugafheExd8HFmcvTJ4RS64VZ3WIInrjiDcyyokI
+         OFHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706550160; x=1707154960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bGSfs+oLah5p8atiIFDkPtIIBxDhbFoFkuAT3N8FnRs=;
-        b=M6wLUPw29TD6sf36W3lOFK97xfmGaE28DjrWPBOR5Q99ey90gsjdlKd7iglCcx+QFT
-         gFD2h+4EUIQtK4L5E8L6lFnv7cmq4NY/xay+dtw6N9235MbNrLF5CgZpvHOOgyvwV64h
-         HZhbdTfD0Q0OVDSO81JFlBnqBRQM+NGCbweWdtUCGEI0pLGleRzWyOZxAadtSbaNrSlD
-         UgVSv+wa1/gmLM9jYskEX5MB9MDvtmSILp4Ops4B2eNoGrEPLYTImlPxXm+83zeYhXmR
-         EnuihYwRzS7Guq0wtnknIunvmjeqqBvmbnpfRoVU4rgaLnm2rysx5akmU7B+GhbdzbJO
-         gIBw==
-X-Gm-Message-State: AOJu0Yz5J1n4Z1zFNdT3MicKPdTImanT77kHmKMjEUbTWv7ILAvmEV48
-	+qtqz/GLVkYqT0r0U44pTEZ9nWNfO+CiOrf2VQ1JMlbPNA9Gjr9rUNcqeowOjg==
-X-Google-Smtp-Source: AGHT+IGROYSRd+aTFKXf01w8ewa6J639byauVRJVy14CUWOtG5LUP0MzE9zts2MzsVEEracFsaYmiQ==
-X-Received: by 2002:a05:6214:4008:b0:67f:26c9:ffdb with SMTP id kd8-20020a056214400800b0067f26c9ffdbmr6347580qvb.22.1706550160222;
-        Mon, 29 Jan 2024 09:42:40 -0800 (PST)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id s17-20020ad44b31000000b0068c523609e6sm777249qvw.20.2024.01.29.09.42.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 09:42:39 -0800 (PST)
-Date: Mon, 29 Jan 2024 12:42:38 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>, Dave Chinner <david@fromorbit.com>,
-	Matthew Wilcox <willy@infradead.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Don Dutile <ddutile@redhat.com>,
-	Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org
-Subject: Re: [RFC PATCH] mm/readahead: readahead aggressively if read drops
- in willneed range
-Message-ID: <ZbfjjmlvPrbdKIjX@redhat.com>
-References: <ZbenbtEXY82N6tHt@casper.infradead.org>
- <Zbc0ZJceZPyt8m7q@dread.disaster.area>
- <20240128142522.1524741-1-ming.lei@redhat.com>
- <ZbfeBrKVMaeSwtYm@redhat.com>
+        d=1e100.net; s=20230601; t=1706551724; x=1707156524;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DYAvQ7VsTVTnkYy4EIaJk+5ZEg4vidmMfkjz6PX3l1g=;
+        b=BgN9AcOrg3IQ2jw+G4c14ucDsIcNXcq6WZn6zzQmPEVBGsCeDp3zZqS/Iue49dNawe
+         ATGYsQsKsNREetzOcJdth/8CZvdZKJZQJoY7LwyS51yKh/xKCA4UX2CFHYUTyvzfD9e+
+         eTG/XMUy/n+Sg6KMDDAraQWRsC9z1RxdXsz+7DtTjiErvejf5tf6x2pJeFl4CE2Lj3gl
+         KV8PRsKhZnmMe4VDsbZ6bK6589lT3SXFDJRrEz2um19DUJL8tX5dyhRIoGagKW1xYjPA
+         AZLk+93IvjckZP9dq0FdS9UK8YGAt3vQc9AiI62IygojJGShu0w3v5roU24vbb39PmHx
+         Yz/Q==
+X-Gm-Message-State: AOJu0Yx48ftZ0ncQN9UYmERPrNLNWUbQdwQJ8zgcF8svBzyq25LYTeh7
+	CLRq4lhfOq95geA9zXOUcFVGxhTsgazk+blXDCzj3vX6wbw/x8CP
+X-Google-Smtp-Source: AGHT+IFswGN297cme87mCijJCItXEFQgR7CqZ0Nkjtsr1fhfCmJO8f/trDjX4MojirSp1lsSgX4SDQ==
+X-Received: by 2002:a05:6000:1849:b0:33a:ee10:cb87 with SMTP id c9-20020a056000184900b0033aee10cb87mr3080112wri.53.1706551724210;
+        Mon, 29 Jan 2024 10:08:44 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCX3kEJL+KAfuCjgQa3ZljCqzNGOEEl+kXhQtLTDb437XLP9WSa24Pc6iIgwiPWeB8C+trQycPTJB5WUSUF6boY=
+Received: from [192.168.8.100] ([148.252.128.211])
+        by smtp.gmail.com with ESMTPSA id bw11-20020a0560001f8b00b00337af95c1d2sm1563900wrb.14.2024.01.29.10.08.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jan 2024 10:08:44 -0800 (PST)
+Message-ID: <5336cae7-05a6-40b6-b8c6-7586b741bea7@gmail.com>
+Date: Mon, 29 Jan 2024 18:00:28 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZbfeBrKVMaeSwtYm@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] block: optimise in irq bio put caching
+Content-Language: en-US
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <dc78cadc0a057509dfb0f7fb2ce31affaefeb0c7.1705627291.git.asml.silence@gmail.com>
+ <ef594ed3-e9b2-46de-a729-b0de03b92c28@gmail.com>
+ <ZbffN7htVJQvSsZI@infradead.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZbffN7htVJQvSsZI@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 29 2024 at 12:19P -0500,
-Mike Snitzer <snitzer@kernel.org> wrote:
- 
-> While I'm sure this legacy application would love to not have to
-> change its code at all, I think we can all agree that we need to just
-> focus on how best to advise applications that have mixed workloads
-> accomplish efficient mmap+read of both sequential and random.
+On 1/29/24 17:24, Christoph Hellwig wrote:
+> On Mon, Jan 29, 2024 at 02:36:57PM +0000, Pavel Begunkov wrote:
+>> Let me know if there are any concerns with the patch
 > 
-> To that end, I heard Dave clearly suggest 2 things:
-> 
-> 1) update MADV/FADV_SEQUENTIAL to set file->f_ra.ra_pages to
->    bdi->io_pages, not bdi->ra_pages * 2
-> 
-> 2) Have the application first issue MADV_SEQUENTIAL to convey that for
->    the following MADV_WILLNEED is for sequential file load (so it is
->    desirable to use larger ra_pages)
-> 
-> This overrides the default of bdi->io_pages and _should_ provide the
-> required per-file duality of control for readahead, correct?
+> This seems to lose the case where non-polled bios are freed
+> form process context, which can be true with threadead interrupts
+> or various block remappers that defer I/O completions to workqueues,
+> and also a lot of file systems (but currentl the alloc cache isn't
+> used by file systems).
 
-I meant "This overrides the default of bdi->ra_pages ..." ;)
+For the task context I can generalise the poll branch
+
+if (in_task()) { // previously if (REQ_POLLED)
+	// ->free_list;
+} else if (in_hardirq()) {
+	// ->free_list_irq;
+} else {
+	bio_free();
+}
+
+> Also jumping backward for non-loop code flow is a nasty pattern.
+
+How come considering it's jumping to a return? I can switch
+the bio_free() and goto blocks so it's a jump forward, if
+that's a preference
+
+-- 
+Pavel Begunkov
