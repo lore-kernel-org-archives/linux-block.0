@@ -1,117 +1,103 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17E1657AE
-	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 13:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE772657B3
+	for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 14:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706535883; cv=none; b=EW/PW1YDO3x/5gPr0W+vXqTe2oT61kwXGCAVB7TwslIyTjWMktJ6q391tx2N92lbyQs7LXyOVFjkOsgsCxSuE3mGQj2wef3NhBMfZEhpLgJnlAlyMwoC6glmm5R7jgiwjhmISsXu+UbiIlA1WuJj92YoX4vDpAu664c0vc8rXQI=
+	t=1706536935; cv=none; b=mlqyCkxSF/ydQ5bhl5pT7H+gi8Q/jzzP1RG1QHtTsPp8llXe58OQeoIEfcBglyORAUWLRjWt794zMfRv45KiX5eslB73bDmBPgwYRtUM06Ti2LbjF3UOgxAAdirSg9YfqTIckKzNpcF6vzhoGS12v8PMNp3fYg9m7o9WU2le79I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706535883; c=relaxed/simple;
-	bh=fxpr0jfLJ1BZoumvzLNGtLFQyDCHp+0ZqHuTDBKxtD0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ttDwS6qtUOdujJIuHngqgzM2PJMSYFb/GbU7vR/QBIkcqj2bhECS8otwtLKvmxu4dRea1f/l6bi2MDqIBrXdc5UTvF7C55pIz+e8s7J+uctjPm/pftCKez4aFVR8vGwxhRua/nDl71j3xZzSUBqEZcLJ3VzrE/KOHAXBn5bYWV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=GosVN6dy; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1706536935; c=relaxed/simple;
+	bh=C7FE8e5ozjHtbhqoIxgDVbRkYxlr4MDb7tmKMTA79E4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PwsCXXIykcM9VGBmtLNOOYvR82eYwhzgggXLvmHRoLmQzXoQ4onlAfyM8+biOP0MvQghZp1I/Eths4P6ew3wA5HfyOw4KoQfjhuOo4B4hYIJWZnFhG+XTiLQHlFUJ3DlgAnMYWo5SOkUKFV89d4B654dYR28AfwTMz7AmurwGWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Hqp5puvy; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="GosVN6dy"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5102b00c2cdso1858789e87.3
-        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 05:44:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Hqp5puvy"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d722740622so5517565ad.0
+        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2024 06:02:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1706535878; x=1707140678; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:user-agent:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fxpr0jfLJ1BZoumvzLNGtLFQyDCHp+0ZqHuTDBKxtD0=;
-        b=GosVN6dy+OX1VciJaSAN0x2LRZjKHIAetG8CGcQCoDn21RniL6Z+SwVxFx81HHn33f
-         TQ03v1meR3B4v0gVG6lMJd1321WhvHAA8x2GxDgr0PytveeVMaexXyzangHCB+KXALbo
-         ozt8bwl3izzazhIUjF8HX9PmAj39HCmU2X9ZogQ+eHHJM2Bqnxz7LjAH7HPlFd+Fz3Vw
-         8CkamVp/h5Jy8XnklKiX3MgAmXioq508aiiCxThRRiQW0ZQmT+eDlbleG1b3vudBHf1+
-         XGLoGsxfoZ/Jboqxu986ksZ+6mzMJ4UfxdVAo93yzAXig5PECfpQo1L8pUmFokF0cEfW
-         EW9A==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706536932; x=1707141732; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5OvI/vtJ7Gu4DNDpcEZjkOEK0ci3i770elMXPHcH2do=;
+        b=Hqp5puvycMxpC4i0gkQxwum3RPLwtMe1r1CDN0wTwv1/IbCCfzAeC4cy9/AN74Tk7v
+         mZldnJkciBBgj/9w1bARTvp0FDQFZ5DZLTIWwachAePSrTtenNqDX0Hi8JPMMZ0jK2XC
+         Th5dn/ZbheOPD0MPWBRiSaDMZZjkDgSlEW03HkvNBC0vcotDibXk2QIJXwEvDZ6g/k5/
+         9qysUrQZlxk0V76H3OOv34sAcjZJuQs8o4Jj/dgd2Bi8Iv+2uoXCRakau77rvGh3LzPF
+         T1E9NwK4EjGnj6zEvQzr/IBJbEyZcKjuZTeBjzo7ufxBuuZsxrXn/ErB7hv7k2PH2QDj
+         V9Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706535878; x=1707140678;
-        h=mime-version:message-id:date:subject:cc:to:from:user-agent
+        d=1e100.net; s=20230601; t=1706536932; x=1707141732;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxpr0jfLJ1BZoumvzLNGtLFQyDCHp+0ZqHuTDBKxtD0=;
-        b=clFwbUiztxd033H3fp2HCf9w4VKIPj4rG0E/glnxkYV1VYPhvOZ8FK4dVa0NKYexg9
-         FmEAa9m4S7oOsJlXAbB+9um1eXBNBh8mjDw+KRT8hNKPU6EPtMNgSKtFYZa+4Bbhp90o
-         HCRP9PQkBnOYHPRgClbiKz+Phk+ElEDKc1a/eRxNc16ydlNHUiInsVMPZL+7lX0u25AB
-         hC8uFulHBzZEWYqZ/I2tkOxPG+qNvAYfQ/ow5OadBojEdWHuMJVQI+21QYJ54VRCI4Qy
-         4N6EAyHWJ7PcRfmxBZx5BTeu+ot7REYlOO+M8qx7NzLRgSABQH4bm44eAeoXKY6cxGgI
-         rdnQ==
-X-Gm-Message-State: AOJu0YxsbnWGTwedZKCEplBib7TzA005ET4I4MUqevy10NLdwvsUOYF8
-	GAsB4jjKHyvQWdKErqr6ODRUT9mP3bBmjq0+9WSBFT5MrxGF6etjr2xiIte1mZ8=
-X-Google-Smtp-Source: AGHT+IFVqsBbwdgj7EewY8BkGYY23wg0krUJF4qWKa5Y+t5wC7jhahZ9dzmN9BzQNYTV+0Xi1GcBKw==
-X-Received: by 2002:a05:6512:b83:b0:511:1790:e3dd with SMTP id b3-20020a0565120b8300b005111790e3ddmr27625lfv.54.1706535878523;
-        Mon, 29 Jan 2024 05:44:38 -0800 (PST)
-Received: from localhost ([147.161.155.108])
-        by smtp.gmail.com with ESMTPSA id fb4-20020a05600c520400b0040ebf340759sm10232554wmb.21.2024.01.29.05.44.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 05:44:38 -0800 (PST)
-User-agent: mu4e 1.10.8; emacs 29.2
-From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-block@vger.kernel.org,
-    rust-for-linux@vger.kernel.org,
-    Jens Axboe <axboe@kernel.dk>,
-    Keith Busch <kbusch@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Damien Le Moal <dlemoal@kernel.org>,
-    Daniel Wagner <dwagner@suse.de>,
-    Hannes Reinecke <hare@suse.de>,
-    Christoph Hellwig <hch@lst.de>,
-    Wedson Almeida Filho <wedsonaf@gmail.com>,
-    Boqun Feng <boqun.feng@gmail.com>,
-    Andreas Hindborg <a.hindborg@samsung.com>,
-    gost.dev@samsung.com
-Subject: [LSF/MM/BPF TOPIC] Rust block device driver APIs
-Date: Mon, 29 Jan 2024 14:17:22 +0100
-Message-ID: <87v87cgsp8.fsf@metaspace.dk>
+        bh=5OvI/vtJ7Gu4DNDpcEZjkOEK0ci3i770elMXPHcH2do=;
+        b=VOzFXmzvUQQlRi5kmKbbFw10xMiFHwdsGSvEU8CXltbbAV0DD1IGeYo+w9nKOlawT3
+         tOjaqUjZ+tmqFhFUJ29UekFk4Nqg0TBrAomvwAlX1YqcAY1onHV5OXDKbIcxlKmwjefS
+         oi8LzQxdM444KemW47YgDzPZF0n+n9lj+xUs0s8hYAvM9+w8osO3+WNgN8tU+cNxNPv2
+         RgCIePFAjFvg6cHfm78s2KGuhVIYCFBizEZADIavb07NyAVoN3wdJzBnk0f17g7sO3so
+         PnizOH4RMCDUZs2MJQcKTSXbEzbfcFJOVy17FZTAkMagqHOUE/BXj29N9Sf8dTLloNNC
+         Sx5Q==
+X-Gm-Message-State: AOJu0YySYu/W7zsZgNvR/FpNjHygqP2hS8pYztpOJGjBD6KRF9QLGolM
+	HvdpN7ujpKGQ9Apmi8odKibvBO4AnpmbONxMBmVQryfu1v6mOzwLBINWyQ9htqFrfvUyYBZSmPq
+	MNz0=
+X-Google-Smtp-Source: AGHT+IH19rbjQyINdyYGdboqVlc7s2qA2AY+21ML0xbxRKwng2e/bPSkSO5BEA2l4M7YYBx1ma6WdQ==
+X-Received: by 2002:a17:902:ea09:b0:1d8:eac8:5e00 with SMTP id s9-20020a170902ea0900b001d8eac85e00mr2158632plg.4.1706536931862;
+        Mon, 29 Jan 2024 06:02:11 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id x5-20020a1709029a4500b001d5d736d1b2sm5354692plv.261.2024.01.29.06.02.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jan 2024 06:02:11 -0800 (PST)
+Message-ID: <1b0c9f7f-9b1b-484b-a9fb-bf2c42d9a18d@kernel.dk>
+Date: Mon, 29 Jan 2024 07:02:10 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] block: update cached timestamp post
+ schedule/preemption
+Content-Language: en-US
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20240126213827.2757115-1-axboe@kernel.dk>
+ <20240126213827.2757115-5-axboe@kernel.dk>
+ <9e13afd4-d073-4822-92ff-936788f0c2a1@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <9e13afd4-d073-4822-92ff-936788f0c2a1@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi All,
+On 1/29/24 1:01 AM, Johannes Thumshirn wrote:
+> On 26.01.24 22:39, Jens Axboe wrote:
+>>   static void sched_update_worker(struct task_struct *tsk)
+>>   {
+>> -	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
+>> +	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER | PF_BLOCK_TS)) {
+>> +		if (tsk->flags & PF_BLOCK_TS)
+>> +			blk_plug_invalidate_ts(tsk);
+>>   		if (tsk->flags & PF_WQ_WORKER)
+>>   			wq_worker_running(tsk);
+>> -		else
+>> +		else if (tsk->flags & PF_IO_WORKER)
+>>   			io_wq_worker_running(tsk);
+>>   	}
+>>   }
+> 
+> 
+> Why the nested if? Isn't that more readable:
 
-I would like to propose a session on the Rust block device driver APIs.
+It's so that we can keep it at a single branch for the fast case of none
+of them being true, which is also how it was done before this change.
+This one just adds one more flag to check. With your change, it's 3
+branches instead of one for the fast case.
 
-I submitted the APIs along with a simple null block driver as an RFC last year
-[1]. Since then I have kept the code in sync with latest mainline release [2],
-cleaned up the code, and added a few features.
-
-After talking to some of you at various meetups over the past year, I think we
-have reached a point where we can potentially agree on merging initial Rust
-block layer support, along with the null block driver. To that end, I plan to
-send a few iterations of the patch set before LSF in May, so that we can use the
-session to discuss any remaining details.
-
-Since Kent has also proposed a dedicated Rust session, we might find some
-synergy with this topic [3].
-
-I also maintain an NVMe driver based on the Rust block APIs [4]. Due to
-community feedback, I have no plans for upstreaming this driver at the moment.
-However, it is a valuable tool for designing a sensible Rust block device API
-that is suitable real hardware.
-
-Part of the NVMe patches are abstractions for PCI. Other users (drm) have
-expressed interest in these, so I plan to separate these in their own tree to
-make them easier to pick up for those users.
-
-As a last note, I have recently become aware of ongoing work on
-implementing nbd in Rust. The work looks promising, and I hope the
-author will decide to send the patches, when they are ready to be
-shared.
-
-Best regards
-Andreas Hindborg
-
-
-[1] https://lore.kernel.org/all/20230503090708.2524310-1-nmi@metaspace.dk/
-[2] https://rust-for-linux.com/null-block-driver
-[3] https://lore.kernel.org/all/wjtuw2m3ojn7m6gx2ozyqtvlsetzwxv5hdhg2hocal3gyou3ue@34e37oox4d5m/
-[4] https://rust-for-linux.com/nvme-driver
+-- 
+Jens Axboe
 
