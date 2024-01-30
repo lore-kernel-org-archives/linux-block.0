@@ -1,245 +1,216 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AACF37162
-	for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 03:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791EF37704
+	for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 04:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706584447; cv=none; b=W3P/EKS3zPRC/48nXRSgltRcfkJYYgvJ2vp/uLmt6YF72v8dzUPLWMDesCy/2mtrrLvE2+bzLV4BGoyoyZVojDSenrZzd0NOQ3SiwpFrMQYacF+OGskBQYN9okdMMiLsBoaqTYwbP6l6qPn4VjjPpchZvpOIxJOB8I7EtkDSag0=
+	t=1706588504; cv=none; b=iRrG42c0wVf8VKgiGG6cX1qq/KUUH7InHlN53cwlNeuHpzfAR+yeHICnSehFZy4v6se2hMrtcCV1wnVuQq0uWci8UfDdRQG4765TT/BOuARNQduZOB6SwIDQGlXp6pdiDlREPcsMqmelP2YyW2/qTPcrkn9HHt5n0c/uV9A3xMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706584447; c=relaxed/simple;
-	bh=Anlnndisu3bRGr1jkNZYWNrE2DXFkUmm2x7ykjyJC6c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ofu6yBV93iYKsn7SYvMYAXBy1gl4XjrzPu6P0wQJCWcGv1EMRlyKLktYm9DZyN4w0cufzZR1Go/fZBYdwfMHWyYXx9DqWZSmuHvgZJTgwe3whqKge+QnyCLlpUoZHCvJ4ci9/v9DZEWQis6Zk/7z9gPocXJ2LC8WYaVUnvwhnrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bkCxXnGg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1706588504; c=relaxed/simple;
+	bh=XL0yLKPcLZfYzwxKHMm5T8KPZZEeMdkZu8MYjRsdbns=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hf5cgQUVGAkFwVHRQmDTaoVdxLOb43FbGmgB+27w1Jx41LPuPcT9/eRMlPpB2jle+iKGJ4mBSlmNpBqIi5/CvnZnj4ClseMKrJWe34ckLF2ZE6ufixDKlpXCYeUUu2C8WlHEy4K5hsTi9+qKfkAQiwCF6Q7t/dnoxGq1a62hLAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=nxhtAmo5; arc=none smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bkCxXnGg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706584444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TVq1ppYllNcIlWc84EaU++Ss7ViF/DGHakMDrtuX2ZM=;
-	b=bkCxXnGgtYnoDo3RmqzlScZrhT2t6WiIVCaFsAhhgozdr5oJjcbHzEA9UMqbaVZfEncFo5
-	BDRw7GKbP4AIfd7ibCCaNbe5ohPi7udWkVkrdlUiedWtuWL/70hX3KlgK8uLsMLJTgMap0
-	JXXfmG1ACnsJfv0C2bceZMNcSzteX5c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-511-x79AmTViNf6sV6skR12ArA-1; Mon, 29 Jan 2024 22:14:00 -0500
-X-MC-Unique: x79AmTViNf6sV6skR12ArA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 140B883FC23;
-	Tue, 30 Jan 2024 03:14:00 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.118])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 72727492BE2;
-	Tue, 30 Jan 2024 03:13:54 +0000 (UTC)
-Date: Tue, 30 Jan 2024 11:13:50 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Mike Snitzer <snitzer@kernel.org>, Matthew Wilcox <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Don Dutile <ddutile@redhat.com>,
-	Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org,
-	ming.lei@redhat.com
-Subject: Re: [RFC PATCH] mm/readahead: readahead aggressively if read drops
- in willneed range
-Message-ID: <ZbhpbpeV6ChPD9NT@fedora>
-References: <20240128142522.1524741-1-ming.lei@redhat.com>
- <ZbbPCQZdazF7s0_b@casper.infradead.org>
- <ZbbfXVg9FpWRUVDn@redhat.com>
- <ZbbvfFxcVgkwbhFv@casper.infradead.org>
- <CAH6w=aw_46Ker0w8HmSA41vUUDKGDGC3gxBFWAhd326+kEtrNg@mail.gmail.com>
- <ZbcDvTkeDKttPfJ4@dread.disaster.area>
- <ZbciOba1h3V9mmup@fedora>
- <Zbc0ZJceZPyt8m7q@dread.disaster.area>
- <ZbdhBaXkXm6xyqgC@fedora>
- <ZbghnK+Hs+if6vEz@dread.disaster.area>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nxhtAmo5"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1706588502; x=1738124502;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XL0yLKPcLZfYzwxKHMm5T8KPZZEeMdkZu8MYjRsdbns=;
+  b=nxhtAmo5A5hHMpPPcVaGRNbIhyS9sXbLayJuFzDWoAc49Fd5i+fbtwcO
+   KAb/RPcw8euDiigZ3ewPTK18Cg5YBrctfyx0X14xo7+pokQaiel/mbxFB
+   uJeMAb0kpP0vx0lSzWaTmUypmyACh0s4Q0Au0HSVNc9oy6aYoU6u7aFom
+   KikNaCxMsMn5yJGvxmMc2vZ6qpCNMtVOc9c/yVUTBaQYd/SPDW+CX6pp1
+   aa5U1KRiiOpxuM4/rnaYlEHI6Tfz1fb6KMP70IB6ao3TBCqDfCv3w96oQ
+   TNNvFHzhY7iL6+itxwiMzam5yZ2F7ZikaaFhSbJtWVMvJwUcozKdUO1Xu
+   w==;
+X-CSE-ConnectionGUID: WtdmG60JTfKgBBoi11np1w==
+X-CSE-MsgGUID: yD5fX8L5Q6SyIMKgfQYIuA==
+X-IronPort-AV: E=Sophos;i="6.05,707,1701100800"; 
+   d="scan'208";a="8102354"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Jan 2024 12:21:35 +0800
+IronPort-SDR: QxZdbpfXm8Vaf2vYDDy1Osd/5ZTM7YmbWtIFGiNNeq6ov/55sXL7VqXcHd2pO3GxoKW2g3q549
+ rGQ7gX7iulcg==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jan 2024 19:31:30 -0800
+IronPort-SDR: OLK5y4xUffi0RdFXBZW0iDBuiTXQKkE9gBfaUFlcHwrBOtxkVh/95iNMcMhpDIMLdlz6EqCSev
+ 1XeuBfBMy6cw==
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Jan 2024 20:21:33 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Chaitanya Kulkarni <kch@nvidia.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH for-next v3] null_blk: add configfs variable shared_tags
+Date: Tue, 30 Jan 2024 13:21:34 +0900
+Message-ID: <20240130042134.2463659-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZbghnK+Hs+if6vEz@dread.disaster.area>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On Tue, Jan 30, 2024 at 09:07:24AM +1100, Dave Chinner wrote:
-> On Mon, Jan 29, 2024 at 04:25:41PM +0800, Ming Lei wrote:
-> > On Mon, Jan 29, 2024 at 04:15:16PM +1100, Dave Chinner wrote:
-> > > On Mon, Jan 29, 2024 at 11:57:45AM +0800, Ming Lei wrote:
-> > > > On Mon, Jan 29, 2024 at 12:47:41PM +1100, Dave Chinner wrote:
-> > > > > On Sun, Jan 28, 2024 at 07:39:49PM -0500, Mike Snitzer wrote:
-> > > > Follows the current report:
-> > > > 
-> > > > 1) usersapce call madvise(willneed, 1G)
-> > > > 
-> > > > 2) only the 1st part(size is from bdi->io_pages, suppose it is 2MB) is
-> > > > readahead in madvise(willneed, 1G) since commit 6d2be915e589
-> > > > 
-> > > > 3) the other parts(2M ~ 1G) is readahead by unit of bdi->ra_pages which is
-> > > > set as 64KB by userspace when userspace reads the mmaped buffer, then
-> > > > the whole application becomes slower.
-> > > 
-> > > It gets limited by file->f_ra->ra_pages being initialised to
-> > > bdi->ra_pages and then never changed as the advice for access
-> > > methods to the file are changed.
-> > > 
-> > > But the problem here is *not the readahead code*. The problem is
-> > > that the user has configured the device readahead window to be far
-> > > smaller than is optimal for the storage. Hence readahead is slow.
-> > > The fix for that is to either increase the device readahead windows,
-> > > or to change the specific readahead window for the file that has
-> > > sequential access patterns.
-> > > 
-> > > Indeed, we already have that - FADV_SEQUENTIAL will set
-> > > file->f_ra.ra_pages to 2 * bdi->ra_pages so that readahead uses
-> > > larger IOs for that access.
-> > > 
-> > > That's what should happen here - MADV_WILLNEED does not imply a
-> > > specific access pattern so the application should be running
-> > > MADV_SEQUENTIAL (triggers aggressive readahead) then MADV_WILLNEED
-> > > to start the readahead, and then the rest of the on-demand readahead
-> > > will get the higher readahead limits.
-> > > 
-> > > > This patch changes 3) to use bdi->io_pages as readahead unit.
-> > > 
-> > > I think it really should be changing MADV/FADV_SEQUENTIAL to set
-> > > file->f_ra.ra_pages to bdi->io_pages, not bdi->ra_pages * 2, and the
-> > > mem.load() implementation in the application converted to use
-> > > MADV_SEQUENTIAL to properly indicate it's access pattern to the
-> > > readahead algorithm.
-> > 
-> > Here the single .ra_pages may not work, that is why this patch stores
-> > the willneed range in maple tree, please see the following words from
-> > the original RH report:
-> 
-> > "
-> > Increasing read ahead is not an option as it has a mixed I/O workload of
-> > random I/O and sequential I/O, so that a large read ahead is very counterproductive
-> > to the random I/O and is unacceptable.
-> > "
-> 
-> Yes, I've read the bug. There's no triage that tells us what the
-> root cause of the application perofrmance issue might be. Just an
-> assertion that "this is how we did it 10 years ago, it's been
-> unchanged for all this time, the new kernel we are upgrading
-> to needs to behave exactly like pre-3.10 era kernels did.
-> 
-> And to be totally honest, my instincts tell me this is more likely a
-> problem with a root cause in poor IO scheduling decisions than be a
-> problem with the page cache readahead implementation. Readahead has
-> been turned down to stop the bandwidth it uses via background async
-> read IO from starving latency dependent foreground random IO
-> operation, and then we're being asked to turn readahead back up
-> in specific situations because it's actually needed for performance
-> in certain access patterns. This is the sort of thing bfq is
-> intended to solve.
+Allow setting shared_tags through configfs, which could only be set as a
+module parameter. For that purpose, delay tag_set initialization from
+null_init() to null_add_dev(). Refer tag_set.ops as the flag to check if
+tag_set is initialized or not.
 
-Reading mmaped buffer in userspace is sync IO, and page fault just
-readahead 64KB. I don't understand how block IO scheduler makes a
-difference in this single 64KB readahead in case of cache miss.
+The following parameters can not be set through configfs yet:
 
-> 
-> 
-> > Also almost all these advises(SEQUENTIA, WILLNEED, NORMAL, RANDOM)
-> > ignore the passed range, and the behavior becomes all or nothing,
-> > instead of something only for the specified range, which may not
-> > match with man, please see 'man posix_fadvise':
-> 
-> The man page says:
-> 
-> 	The advice is not binding; it merely constitutes an
-> 	expectation on behalf of the application.
-> 
-> > It is even worse for readahead() syscall:
-> > 
-> > 	``` DESCRIPTION readahead()  initiates readahead on a file
-> > 	so that subsequent reads from that file will be satisfied
-> > 	from the cache, and not block on disk I/O (assuming the
-> > 	readahead was initiated early enough and that other activity
-> > 	on the system did not in the meantime flush pages from the
-> > 	cache).  ```
-> 
-> Yes, that's been "broken" for a long time (since the changes to cap
-> force_page_cache_readahead() to ra_pages way back when), but the
-> assumption documented about when readahead(2) will work goes to the
-> heart of why we don't let user controlled readahead actually do much
-> in the way of direct readahead. i.e. too much readahead is
-> typically harmful to IO and system performance and very, very few
-> applications actually need files preloaded entirely into memory.
+    timeout
+    requeue
+    init_hctx
 
-It is true for normal readahead, but not sure if it is for
-advise(willneed) or readahead().
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+This patch will allow running the blktests test cases block/010 and block/022
+using the built-in null_blk driver. Corresponding blktests side changes are
+drafted here [1].
 
-> 
-> ----
-> 
-> All said, I'm starting to think that there isn't an immediate
-> upstream kernel change needed right now.  I just did a quick check
-> through the madvise() man page to see if I'd missed anything, and I
-> most definitely did miss what is a relatively new addition to it:
-> 
-> MADV_POPULATE_READ (since Linux 5.14)
->      "Populate (prefault) page tables readable, faulting in all
->      pages in the range just as if manually reading from each page;
->      however, avoid the actual memory access that would have been
->      performed after handling the fault.
-> 
->      In contrast to MAP_POPULATE, MADV_POPULATE_READ does not hide
->      errors, can be applied to (parts of) existing mappings and will
->      al‐ ways  populate (prefault) page tables readable.  One
->      example use case is prefaulting a file mapping, reading all
->      file content from disk; however, pages won't be dirtied and
->      consequently won't have to be written back to disk when
->      evicting the pages from memory.
-> 
-> That's exactly what the application is apparently wanting
-> MADV_WILLNEED to do.
+[1] https://github.com/kawasaki/blktests/tree/shared_tags
 
-Indeed, it works as expected(all mmapped pages are load in
-madvise(MADV_POPULATE_READ)) in my test code except for 16 ra_pages, but
-it is less important now.
+Changes from v2:
+* Used tag_set.ops instead of tag_set_initialized
 
-Thanks for this idea!
+Changes from v1:
+* Removed unnecessary global variable initializer
 
-> 
-> Please read the commit message for commit 4ca9b3859dac ("mm/madvise:
-> introduce MADV_POPULATE_(READ|WRITE) to prefault page tables"). It
-> has some relevant commentary on why MADV_WILLNEED could not be
-> modified to meet the pre-population requirements of the applications
-> that required this pre-population behaviour from the kernel.
-> 
-> With this, I suspect that the application needs to be updated to
-> use MADV_POPULATE_READ rather than MADV_WILLNEED, and then we can go
-> back and do some analysis of the readahead behaviour of the
-> application and the MADV_POPULATE_READ operation. We may need to
-> tweak MADV_POPULATE_READ for large readahead IO, but that's OK
-> because it's no longer "optimistic speculation" about whether the
-> data is needed in cache - the operation being performed guarantees
-> that or it fails with an error. IOWs, MADV_POPULATE_READ is
-> effectively user data IO at this point, not advice about future
-> access patterns...
+ drivers/block/null_blk/main.c     | 38 ++++++++++++++++---------------
+ drivers/block/null_blk/null_blk.h |  1 +
+ 2 files changed, 21 insertions(+), 18 deletions(-)
 
-BTW, in this report, MADV_WILLNEED is used by java library[1], and I
-guess it could be difficult to update to MADV_POPULATE_READ.
-
-[1] https://docs.oracle.com/javase/8/docs/api/java/nio/MappedByteBuffer.html
-
-
-
-Thanks,
-Ming
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 36755f263e8e..4281371c81fe 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -165,8 +165,8 @@ static bool g_blocking;
+ module_param_named(blocking, g_blocking, bool, 0444);
+ MODULE_PARM_DESC(blocking, "Register as a blocking blk-mq driver device");
+ 
+-static bool shared_tags;
+-module_param(shared_tags, bool, 0444);
++static bool g_shared_tags;
++module_param_named(shared_tags, g_shared_tags, bool, 0444);
+ MODULE_PARM_DESC(shared_tags, "Share tag set between devices for blk-mq");
+ 
+ static bool g_shared_tag_bitmap;
+@@ -426,6 +426,7 @@ NULLB_DEVICE_ATTR(zone_max_open, uint, NULL);
+ NULLB_DEVICE_ATTR(zone_max_active, uint, NULL);
+ NULLB_DEVICE_ATTR(virt_boundary, bool, NULL);
+ NULLB_DEVICE_ATTR(no_sched, bool, NULL);
++NULLB_DEVICE_ATTR(shared_tags, bool, NULL);
+ NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
+ 
+ static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+@@ -571,6 +572,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
+ 	&nullb_device_attr_zone_offline,
+ 	&nullb_device_attr_virt_boundary,
+ 	&nullb_device_attr_no_sched,
++	&nullb_device_attr_shared_tags,
+ 	&nullb_device_attr_shared_tag_bitmap,
+ 	NULL,
+ };
+@@ -653,10 +655,11 @@ static ssize_t memb_group_features_show(struct config_item *item, char *page)
+ 			"badblocks,blocking,blocksize,cache_size,"
+ 			"completion_nsec,discard,home_node,hw_queue_depth,"
+ 			"irqmode,max_sectors,mbps,memory_backed,no_sched,"
+-			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
+-			"submit_queues,use_per_node_hctx,virt_boundary,zoned,"
+-			"zone_capacity,zone_max_active,zone_max_open,"
+-			"zone_nr_conv,zone_offline,zone_readonly,zone_size\n");
++			"poll_queues,power,queue_mode,shared_tag_bitmap,"
++			"shared_tags,size,submit_queues,use_per_node_hctx,"
++			"virt_boundary,zoned,zone_capacity,zone_max_active,"
++			"zone_max_open,zone_nr_conv,zone_offline,zone_readonly,"
++			"zone_size\n");
+ }
+ 
+ CONFIGFS_ATTR_RO(memb_group_, features);
+@@ -738,6 +741,7 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->zone_max_active = g_zone_max_active;
+ 	dev->virt_boundary = g_virt_boundary;
+ 	dev->no_sched = g_no_sched;
++	dev->shared_tags = g_shared_tags;
+ 	dev->shared_tag_bitmap = g_shared_tag_bitmap;
+ 	return dev;
+ }
+@@ -2124,7 +2128,14 @@ static int null_add_dev(struct nullb_device *dev)
+ 		goto out_free_nullb;
+ 
+ 	if (dev->queue_mode == NULL_Q_MQ) {
+-		if (shared_tags) {
++		if (dev->shared_tags) {
++			if (!tag_set.ops) {
++				rv = null_init_tag_set(NULL, &tag_set);
++				if (rv) {
++					tag_set.ops = NULL;
++					goto out_cleanup_queues;
++				}
++			}
+ 			nullb->tag_set = &tag_set;
+ 			rv = 0;
+ 		} else {
+@@ -2311,18 +2322,12 @@ static int __init null_init(void)
+ 		g_submit_queues = 1;
+ 	}
+ 
+-	if (g_queue_mode == NULL_Q_MQ && shared_tags) {
+-		ret = null_init_tag_set(NULL, &tag_set);
+-		if (ret)
+-			return ret;
+-	}
+-
+ 	config_group_init(&nullb_subsys.su_group);
+ 	mutex_init(&nullb_subsys.su_mutex);
+ 
+ 	ret = configfs_register_subsystem(&nullb_subsys);
+ 	if (ret)
+-		goto err_tagset;
++		return ret;
+ 
+ 	mutex_init(&lock);
+ 
+@@ -2349,9 +2354,6 @@ static int __init null_init(void)
+ 	unregister_blkdev(null_major, "nullb");
+ err_conf:
+ 	configfs_unregister_subsystem(&nullb_subsys);
+-err_tagset:
+-	if (g_queue_mode == NULL_Q_MQ && shared_tags)
+-		blk_mq_free_tag_set(&tag_set);
+ 	return ret;
+ }
+ 
+@@ -2370,7 +2372,7 @@ static void __exit null_exit(void)
+ 	}
+ 	mutex_unlock(&lock);
+ 
+-	if (g_queue_mode == NULL_Q_MQ && shared_tags)
++	if (tag_set.ops)
+ 		blk_mq_free_tag_set(&tag_set);
+ }
+ 
+diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
+index 929f659dd255..7bcfc0922ae8 100644
+--- a/drivers/block/null_blk/null_blk.h
++++ b/drivers/block/null_blk/null_blk.h
+@@ -119,6 +119,7 @@ struct nullb_device {
+ 	bool zoned; /* if device is zoned */
+ 	bool virt_boundary; /* virtual boundary on/off for the device */
+ 	bool no_sched; /* no IO scheduler for the device */
++	bool shared_tags; /* share tag set between devices for blk-mq */
+ 	bool shared_tag_bitmap; /* use hostwide shared tags */
+ };
+ 
+-- 
+2.43.0
 
