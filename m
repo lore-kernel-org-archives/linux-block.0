@@ -1,128 +1,194 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A0A762C3;
-	Tue, 30 Jan 2024 21:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8351E78661;
+	Tue, 30 Jan 2024 21:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706649356; cv=none; b=U1TSrTdYHV+zEGsPOZfQ2e0qvaJvOYpOuvu0ZdjAUOVQjrB9Uo2gup01w1mSTnIstDF7bYWgoPPzvgar9loSfWpRHibbnhP/EVJ3OSx3CnDuAbEeiAagxVeCt4BkULfuhDIu9NWrF2BNFsmirLJa5GzbAykQSKluBz6AehoGUrI=
+	t=1706651360; cv=none; b=me4diK8A0tp2IGO7v6H5GNVVzzsmST+l3XaBgHP3LsKtM5HgE9uSDZlE3nShG5HG7oG7hRQ4lGDLW5gYfUx0zbwpIV1FHwpFwfmI2QHcmJeU4fRpbrwMS0FWosZaf9JfAs8RKLbEc4A5nWuX5PHQVzoChD7wTqkWzO4iKozhNW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706649356; c=relaxed/simple;
-	bh=2J6sAooCk62fHjWrW7YUBlLRP5OyzMo31VVLNDHdhWQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tBy0jYT80DoJM2c0rCct2TVpDMm/+jyRiL6T5fGul5ZBbdjQqCw/A+rP/pVT6ezo4lw7ZC/zb0n5i2n9ZgSYPgVCNiJHB3Xz3qQDy/ZvKEO7PGBePzIQbPnxHzMFUDS/93lfXSbozc4vBy7/YzRl5Mc6N69CRiODCON41xgfMCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dUYmH0xF; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1706651360; c=relaxed/simple;
+	bh=AgOZ8fS0ZdeWrSTK60qllKoZj76EK5/uWgQudX6Oj2M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YkfZxD4AYBXWv+LnJM+3V5L184tDbga5RqHI9yqBwIjYI+9t9iHUS2HAn5YmCe6Ft6NrGZ4R6p1p9N03fRd9Vu7DsSAkxUdx5n9gnT1y7rFSFqd3niX/ILWJ1nJkrdUrf/mjDBy2/iuhWzsWUho9wYz0Vjl/VVO89cYcHzwm8h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dUYmH0xF"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2185d5f4366so1584420fac.2;
-        Tue, 30 Jan 2024 13:15:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706649354; x=1707254154; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7uVaLbUp0zV3Lqp8SjRyaTBacDGvqyOGhA2F/OG5J9Q=;
-        b=dUYmH0xFW1MRjJUyf9mRScCLFOVBMtyPuRC9hhr2s6lPOYptyJgeAqN20q257sFvdq
-         ViPL1MAMMfZUwuPWMfftIZrTZfR6P4RndSdxiU4/u0r0Jl41yInWeonk/wXF0P89fu6O
-         AReLoUPoGiPbQAa1971UXSj2Mp+VWRfYntiT1Vbx7uNO4lMXpnpk3ud10NM9x4ohxsa2
-         MsGbSUZWoDLNzXvjiHjBd/xuej/qklA+5l21Ng2caIP28gRC4QFGkqbEOKcVQzcad1R/
-         8klams3C/iiKQ6sg5YtjwBdZaS9ZIkb3TI4GwYXkdmedmD/qCyNkALb66KFZTpDwcNAB
-         ybLA==
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-59a27fbe832so1213545eaf.3;
+        Tue, 30 Jan 2024 13:49:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706649354; x=1707254154;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1706651357; x=1707256157;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7uVaLbUp0zV3Lqp8SjRyaTBacDGvqyOGhA2F/OG5J9Q=;
-        b=MwpfXOepPDEeJfDz6QX30PW33f1REIEcWsr7fQpJGLNGniWyyaLlGZLVYuS/V4k8mZ
-         abTrQYu11UmZ+6cEz3ahT1PIzFwC2KHo+qNWrp+Lvc8acxv0R7QswwktIoXyvVBt65Lp
-         YTPk2YVqUFvgqEGYItvPw/aPHUyXBN86tL0vrkJdeY3Cn8VAxnRPM/EBAv5BxX8qHAkb
-         aGBox3DX6hwQGeBWME2w2B745jbrevV7vgucSgo17UcTLevyzuh81SzrZ+dz3sQmOiOH
-         xGiqILwj6Ig4ORYdRXONyLl3/g/pNu0YNM/bdp5AwpnOSB4P3fNM+Tqcd6s6OE1ZT2sx
-         i3SA==
-X-Gm-Message-State: AOJu0Yy90GXEovmjupnf3+5/j1zfCgq4s+zUQKCmGi8Ch1ptT4+rbU5M
-	GYam3iYqmqAjY6svd/KV5Cs7ERxBnBDha2fX6SGFighvOhc/aQsUlUj5l3zYtqZxHvnDDMIhjwu
-	OtuaTCyQEK50i9OMNcJqa94MQhzM4oygJ
-X-Google-Smtp-Source: AGHT+IGH9PpeiWaqfEAXJVURKEkRwkn0w1eqpTcew158AuIabqXuAJ+Md2qP4etm6tpr/3laTRZT+arssHuDHEtrV9w=
-X-Received: by 2002:a05:6871:3415:b0:218:7597:2018 with SMTP id
- nh21-20020a056871341500b0021875972018mr5405415oac.16.1706649354251; Tue, 30
- Jan 2024 13:15:54 -0800 (PST)
+        bh=ZNhb5l1JXYTb2I8/W+Qyh+QKu+mFvWiZEOhzArQ2/u8=;
+        b=bqxXriexJKWdRQVmKrjIe8EIamYE5pAl5DNDUj+HwwU08LAI7ZO0S6rHDt7Ip3foNe
+         hHGJo0DH1S2RadeWwjyGGjkQQPerVmjCozhFBsVLZAUmsJXZW5caf/eoL+6dTaMqxKpd
+         mHsAvhnCEjFjXdogBcJOJJD0ZIGNKJMkWaPv8GkPGLQ2CdJIoCKxvoqtpP5gnwT+ojGB
+         elent+Q444sw1pb2Yq2L3dl3I5PMAGtp4URbsjMSjcBwD+n4jVbs5yj5Njxso//5tpCb
+         SdptT/2+9LIOhbzMW3ZRpE3EoWx1Gdo+l4oF06mOzM89LEXYzKquea+SsPKFjN1x09mP
+         Q/ug==
+X-Gm-Message-State: AOJu0Yz0XhXei6/EJ5YfJG/xrt6II06eTARg+D8j77/E7g8lUfXGXHWE
+	z/zAIicVgtkL9kpAlMtw14qYGlVDSZrGPwlbiudXhaTtADsma3Xq
+X-Google-Smtp-Source: AGHT+IEgy65EbP6py6rz5ikA4+OBWxrA6CRGeW1iLiLTTD595r2Ic67amu7jX5sNlp1OuqovGmu6aw==
+X-Received: by 2002:a05:6358:1203:b0:178:6e53:ed4a with SMTP id h3-20020a056358120300b001786e53ed4amr5349451rwi.8.1706651357374;
+        Tue, 30 Jan 2024 13:49:17 -0800 (PST)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:f45c:fd18:bfa0:e084])
+        by smtp.gmail.com with ESMTPSA id k14-20020aa7998e000000b006db87354a8fsm8285597pfh.119.2024.01.30.13.49.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 13:49:16 -0800 (PST)
+From: Bart Van Assche <bvanassche@acm.org>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Daejun Park <daejun7.park@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v9 00/19] Pass data lifetime information to SCSI disk devices
+Date: Tue, 30 Jan 2024 13:48:26 -0800
+Message-ID: <20240130214911.1863909-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240129085250.1550594-1-yi.sun@unisoc.com>
-In-Reply-To: <20240129085250.1550594-1-yi.sun@unisoc.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 30 Jan 2024 16:15:41 -0500
-Message-ID: <CAJSP0QWLk_=Nm2aw+rwgg6L4CJPy6w--=SyF4vCU_sDCyQdosQ@mail.gmail.com>
-Subject: Re: [PATCH V2] virtio-blk: Ensure no requests in virtqueues before
- deleting vqs.
-To: Yi Sun <yi.sun@unisoc.com>
-Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk, 
-	sunyibuaa@gmail.com, hongyu.jin@unisoc.com, zhiguo.niu@unisoc.com, 
-	xuanzhuo@linux.alibaba.com, pbonzini@redhat.com, 
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 29 Jan 2024 at 03:54, Yi Sun <yi.sun@unisoc.com> wrote:
->
-> Ensure no remaining requests in virtqueues before resetting vdev and
-> deleting virtqueues. Otherwise these requests will never be completed.
-> It may cause the system to become unresponsive.
->
-> Function blk_mq_quiesce_queue() can ensure that requests have become
-> in_flight status, but it cannot guarantee that requests have been
-> processed by the device. Virtqueues should never be deleted before
-> all requests become complete status.
->
-> Function blk_mq_freeze_queue() ensure that all requests in virtqueues
-> become complete status. And no requests can enter in virtqueues.
->
-> Signed-off-by: Yi Sun <yi.sun@unisoc.com>
-> ---
->  drivers/block/virtio_blk.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+Hi Martin,
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+UFS vendors need the data lifetime information to achieve good performance.
+Providing data lifetime information to UFS devices can result in up to 40%
+lower write amplification. Hence this patch series that adds support in F2FS
+and also in the block layer for data lifetime information. The SCSI disk (sd)
+driver is modified such that it passes write hint information to SCSI devices
+via the GROUP NUMBER field.
 
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 3b6b9abb8ce1..14ecc14ce8db 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -1595,14 +1595,15 @@ static int virtblk_freeze(struct virtio_device *vdev)
->  {
->         struct virtio_blk *vblk = vdev->priv;
->
-> +       /* Ensure no requests in virtqueues before deleting vqs. */
-> +       blk_mq_freeze_queue(vblk->disk->queue);
-> +
->         /* Ensure we don't receive any more interrupts */
->         virtio_reset_device(vdev);
->
->         /* Make sure no work handler is accessing the device. */
->         flush_work(&vblk->config_work);
->
-> -       blk_mq_quiesce_queue(vblk->disk->queue);
-> -
->         vdev->config->del_vqs(vdev);
->         kfree(vblk->vqs);
->
-> @@ -1620,7 +1621,7 @@ static int virtblk_restore(struct virtio_device *vdev)
->
->         virtio_device_ready(vdev);
->
-> -       blk_mq_unquiesce_queue(vblk->disk->queue);
-> +       blk_mq_unfreeze_queue(vblk->disk->queue);
->         return 0;
->  }
->  #endif
-> --
-> 2.25.1
->
->
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Changes compared to v8:
+ - Removed the .apply_whint() function pointer member from struct
+   file_operations.
+ - Made this patch series compatible with 'sparse' via the following change:
++/* Sparse ignores __packed annotations on enums, hence the #ifndef below. */
++#ifndef __CHECKER__
+ static_assert(sizeof(enum rw_hint) == 1);
++#endif
+
+Changes compared to v7:
+ - As requested by Dave Chinner, changed one occurrence of
+   file_inode(dio->iocb->ki_filp)->i_write_hint into inode->i_write_hint.
+ - Modified the description of patch 03/19 since the patch that restores
+   F_[GS]ET_FILE_RW_HINT has been removed.
+ - Added Reviewed-by tags from v6 of this patch series and that were missing
+   when v7 was posted.
+
+Changes compared to v6:
+ - Dropped patch "fs: Restore F_[GS]ET_FILE_RW_HINT support".
+
+Changes compared to v5:
+ - Added compile-time tests that compare the WRITE_LIFE_* and RWH_* constants.
+ - Split the F_[GS]ET_RW_HINT handlers.
+ - Removed the structure member kiocb.ki_hint again. Instead, copy the data
+   lifetime information directly from struct file into a bio.
+ - Together with Doug Gilbert, fixed multiple bugs in the scsi_debug patches.
+   Added Doug's Tested-by.
+ - Changed the type of "rscs:1" from bool into unsigned.
+ - Added unit tests for the new SCSI protocol data structures.
+ - Improved multiple patch descriptions.
+ 
+Changes compared to v4:
+ - Dropped the patch that renames the WRITE_LIFE_* constants.
+ - Added a fix for an argument check in fcntl_rw_hint().
+ - Reordered the patches that restore data lifetime support.
+ - Included a fix for data lifetime support for buffered I/O to raw block
+   devices.
+
+Changes compared to v3:
+ - Renamed the data lifetime constants (WRITE_LIFE_*).
+ - Fixed a checkpatch complaint by changing "unsigned" into "unsigned int".
+ - Rebased this patch series on top of kernel v6.7-rc1.
+ 
+Changes compared to v2:
+ - Instead of storing data lifetime information in bi_ioprio, introduce the
+   new struct bio member bi_lifetime and also the struct request member
+   'lifetime'.
+ - Removed the bio_set_data_lifetime() and bio_get_data_lifetime() functions
+   and replaced these with direct assignments.
+ - Dropped all changes related to I/O priority.
+ - Improved patch descriptions.
+
+Changes compared to v1:
+ - Use six bits from the ioprio field for data lifetime information. The
+   bio->bi_write_hint / req->write_hint / iocb->ki_hint members that were
+   introduced in v1 have been removed again.
+ - The F_GET_FILE_RW_HINT and F_SET_FILE_RW_HINT fcntls have been removed.
+ - In the SCSI disk (sd) driver, query the stream status and check the PERM bit.
+ - The GET STREAM STATUS command has been implemented in the scsi_debug driver.
+
+Bart Van Assche (19):
+  fs: Fix rw_hint validation
+  fs: Verify write lifetime constants at compile time
+  fs: Split fcntl_rw_hint()
+  fs: Move enum rw_hint into a new header file
+  fs: Propagate write hints to the struct block_device inode
+  block, fs: Restore the per-bio/request data lifetime fields
+  fs/f2fs: Restore the whint_mode mount option
+  fs/f2fs: Restore support for tracing data lifetimes
+  scsi: core: Query the Block Limits Extension VPD page
+  scsi: scsi_proto: Add structures and constants related to I/O groups
+    and streams
+  scsi: sd: Translate data lifetime information
+  scsi: scsi_debug: Reduce code duplication
+  scsi: scsi_debug: Support the block limits extension VPD page
+  scsi: scsi_debug: Rework page code error handling
+  scsi: scsi_debug: Rework subpage code error handling
+  scsi: scsi_debug: Allocate the MODE SENSE response from the heap
+  scsi: scsi_debug: Implement the IO Advice Hints Grouping mode page
+  scsi: scsi_debug: Implement GET STREAM STATUS
+  scsi: scsi_debug: Maintain write statistics per group number
+
+ Documentation/filesystems/f2fs.rst |  70 +++++++
+ block/bio.c                        |   2 +
+ block/blk-crypto-fallback.c        |   1 +
+ block/blk-merge.c                  |   8 +
+ block/blk-mq.c                     |   2 +
+ block/bounce.c                     |   1 +
+ block/fops.c                       |   3 +
+ drivers/scsi/Kconfig               |   5 +
+ drivers/scsi/Makefile              |   2 +
+ drivers/scsi/scsi.c                |   2 +
+ drivers/scsi/scsi_debug.c          | 293 ++++++++++++++++++++++-------
+ drivers/scsi/scsi_proto_test.c     |  56 ++++++
+ drivers/scsi/scsi_sysfs.c          |  10 +
+ drivers/scsi/sd.c                  | 111 ++++++++++-
+ drivers/scsi/sd.h                  |   3 +
+ fs/buffer.c                        |  12 +-
+ fs/direct-io.c                     |   2 +
+ fs/f2fs/data.c                     |   2 +
+ fs/f2fs/f2fs.h                     |  10 +
+ fs/f2fs/segment.c                  |  95 ++++++++++
+ fs/f2fs/super.c                    |  32 +++-
+ fs/fcntl.c                         |  64 ++++---
+ fs/inode.c                         |   1 +
+ fs/iomap/buffered-io.c             |   2 +
+ fs/iomap/direct-io.c               |   1 +
+ fs/mpage.c                         |   1 +
+ include/linux/blk-mq.h             |   2 +
+ include/linux/blk_types.h          |   2 +
+ include/linux/fs.h                 |  16 +-
+ include/linux/rw_hint.h            |  24 +++
+ include/scsi/scsi_device.h         |   1 +
+ include/scsi/scsi_proto.h          |  78 ++++++++
+ include/trace/events/f2fs.h        |   6 +-
+ 33 files changed, 808 insertions(+), 112 deletions(-)
+ create mode 100644 drivers/scsi/scsi_proto_test.c
+ create mode 100644 include/linux/rw_hint.h
+
