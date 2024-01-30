@@ -1,204 +1,203 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D4560EDB
-	for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 10:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDBE66B5C
+	for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 11:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706611409; cv=none; b=WD3/A6TA7mah9hXKaaDEU0mc0TgzqDb/wk1W/PD7GhmT4voLlnt1ZcLBh861L7CXd9quKD3RYCICM3b8DX4hNrSIaLumAs5Ok/9HjIwSwuDVYJ/8b2FV0VphDDRl4dhuN/Wo0ESQeDL+WwR+sSOaaCIWTjokJ3BBM46Oo6hNkIU=
+	t=1706614516; cv=none; b=W54uDwviniJP5AstfJda0jwAhuvev4efDGZkfxPaJiIiGxCFV5fI9eJOsAILHxuT8GKrnISmt2yaIRyRs64ybUKyGRsKQF2NRQMH2YAECb7DLJDesS9OS7byuhl1kQN5p3F9aDeSwyiCM3PWNfb7jCQ2TgYC2ZeRnfIsQ44BoqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706611409; c=relaxed/simple;
-	bh=owkU35HiBe4EUW9bL/iY9553g7P8YyHRpTmmFYvFxTA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aM3fzjLX+U5Ax7S6dDE5a4E4sX8M2E2W+DbMSDsilfLNzbWrIvkXrZuWRbDklL1H799esqcJdqIHg24l3KlOJyl50Ks+8JZu0ZM5F61ktmGE0jOGiPvcM78TcHvSjgQ2BPF0pyPZhUZlCHI+NUzzWx1lKk6tVW0PDijk1Iu/0bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JbsS9ZAN; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1706614516; c=relaxed/simple;
+	bh=qqxjh81NRRMyKVrTNcIoz7Y+jhPc6WPwBiL26RCpQ8o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hVO95fg/4fOQwV/uq3wVcTmm+mKSBNCWGXZa15n/SS2PCJlpaI6wrn+PXgU0daXu8+ugJKGbqXLYnCKlQj2qa0TpW9TjZPBHjd+0LNwKcvkXVVPq4+4k1WPScxafE5eKO+rxjy9MnBkrfLOg2Y2iYq1X8Xv/LKqxl8lNaS6CpUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dLiUE3N7; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbsS9ZAN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dLiUE3N7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706611406;
+	s=mimecast20190719; t=1706614513;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2HONVDKuSZ2w2l05+cN156w2V56GzzGmZ9dXonpaH9I=;
-	b=JbsS9ZANWadul27lgkJdXIZ8mnwUbHiVB3maQCo4ChmFj2VI7b+6umJ1epgFYrRPCWKMaH
-	NtdyZLx0OENAuezVxmzIfNJVZ5jOdhVpaSpfIwOKdUoQ0DyoTekXiyXo52V0434aJM2qy6
-	Dd9+oW18hbBq4LVbIwGDFKK3gvDewg4=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-187-mv_-oZ3ANBi16YV2D1ulig-1; Tue, 30 Jan 2024 05:43:25 -0500
-X-MC-Unique: mv_-oZ3ANBi16YV2D1ulig-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5110bf1635eso1703780e87.0
-        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 02:43:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706611403; x=1707216203;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2HONVDKuSZ2w2l05+cN156w2V56GzzGmZ9dXonpaH9I=;
-        b=CIdAPCvTurm6x8eZvp+NebmbjqB/NFcNHJk34k3FQAYLCs0+JP6kgN6GFNEO6ocxWL
-         R1dSjnOhE548/PNcYsaHJvofDapEsc6sUSGFHAlb2h68ENrgx28JCWcOrzDQ7f9yosjI
-         MPsjiuXJIRxRBE6SR2114v6Ut8tmgPa/nYLUJV0/wRBxAQUeQfCO2+/7WdVAP6DOp5Xs
-         7ha+yEZjfpCo685QQaaW0NNDVY/XdS8Q1I6Vb5xfdaAp/qU+2vFdOvHg/aQCKmaKcvw+
-         n01DVVIM7HFGgccCr24ECTGunli8EYlmUZLM/N5Dkep3Pc4fBIIGOxytcjD/iYC1JGPE
-         1Abg==
-X-Gm-Message-State: AOJu0YxznzM/K7mj2dZ9WABBdFGUqXS556FZPRsBupBJGtssiUl0MGyS
-	okoOhfIb6ukQn7GeNYkE+IRR8yn2JwF3Qtm4xI172M97WhGg5jdgH+rZzE1mVPwX8+N/6CqBCAt
-	Al2dl425nfWStAMtn3uby/Wvt7BDloKGM6suB+0lcTwPai8Kp42ZrZ60c6hnDURaMDdP9
-X-Received: by 2002:a05:6512:2209:b0:50e:4098:3798 with SMTP id h9-20020a056512220900b0050e40983798mr6360909lfu.60.1706611403673;
-        Tue, 30 Jan 2024 02:43:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG0hoFT/mbW3gfNLOSpHj4kn6LMJFHpVVvm57xwFbQxEZ1sjrCGkbHqCeqLjjgjqBok32zPQw==
-X-Received: by 2002:a05:6512:2209:b0:50e:4098:3798 with SMTP id h9-20020a056512220900b0050e40983798mr6360892lfu.60.1706611403250;
-        Tue, 30 Jan 2024 02:43:23 -0800 (PST)
-Received: from ?IPV6:2003:cb:c708:2700:bdf6:739b:9f9d:862f? (p200300cbc7082700bdf6739b9f9d862f.dip0.t-ipconnect.de. [2003:cb:c708:2700:bdf6:739b:9f9d:862f])
-        by smtp.gmail.com with ESMTPSA id b16-20020a05600c4e1000b0040fafc8bb3asm204081wmq.9.2024.01.30.02.43.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jan 2024 02:43:22 -0800 (PST)
-Message-ID: <a754add2-de29-4c91-b4f4-cbd7eb888cb6@redhat.com>
-Date: Tue, 30 Jan 2024 11:43:21 +0100
+	 in-reply-to:in-reply-to:references:references;
+	bh=kR0xiXlTgctwy0ZOXXh3w90idhtmWLxzB6iSAte8Lhs=;
+	b=dLiUE3N7+IvO/V2YP5ZmnGoNurlVMpFvLI1V24+ofc2b8hPU33Uj6TwSqFkZMMiPmmO6CR
+	94e0pOPG3QV4pzd550gpYU2t2XVerlqmgKzlFliL3EhhBU5rNzHRsP4hUJkF5rdXvGecXw
+	9YgRb47fGZBa9UV3L61GMugCFHymxu8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-672-6-0lTcvCMgW8wdlU2BLhIA-1; Tue,
+ 30 Jan 2024 06:35:10 -0500
+X-MC-Unique: 6-0lTcvCMgW8wdlU2BLhIA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C24A11C0513C;
+	Tue, 30 Jan 2024 11:35:09 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.143])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E9CAF8B;
+	Tue, 30 Jan 2024 11:35:03 +0000 (UTC)
+Date: Tue, 30 Jan 2024 19:34:59 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Mike Snitzer <snitzer@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, Don Dutile <ddutile@redhat.com>,
+	Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org,
+	ming.lei@redhat.com
+Subject: Re: [RFC PATCH] mm/readahead: readahead aggressively if read drops
+ in willneed range
+Message-ID: <Zbje4/789Zs1Ia1t@fedora>
+References: <ZbbfXVg9FpWRUVDn@redhat.com>
+ <ZbbvfFxcVgkwbhFv@casper.infradead.org>
+ <CAH6w=aw_46Ker0w8HmSA41vUUDKGDGC3gxBFWAhd326+kEtrNg@mail.gmail.com>
+ <ZbcDvTkeDKttPfJ4@dread.disaster.area>
+ <ZbciOba1h3V9mmup@fedora>
+ <Zbc0ZJceZPyt8m7q@dread.disaster.area>
+ <ZbdhBaXkXm6xyqgC@fedora>
+ <ZbghnK+Hs+if6vEz@dread.disaster.area>
+ <ZbhpbpeV6ChPD9NT@fedora>
+ <ZbiJP3Dhjkh6Dz4x@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] mm/readahead: readahead aggressively if read drops in
- willneed range
-Content-Language: en-US
-To: Mike Snitzer <snitzer@kernel.org>, Dave Chinner <david@fromorbit.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Matthew Wilcox <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Don Dutile <ddutile@redhat.com>,
- Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org
-References: <ZbenbtEXY82N6tHt@casper.infradead.org>
- <Zbc0ZJceZPyt8m7q@dread.disaster.area>
- <20240128142522.1524741-1-ming.lei@redhat.com> <ZbfeBrKVMaeSwtYm@redhat.com>
- <Zbgi6wajZlEkWISO@dread.disaster.area> <Zbgq3B8nmMuJooEl@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <Zbgq3B8nmMuJooEl@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZbiJP3Dhjkh6Dz4x@dread.disaster.area>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 29.01.24 23:46, Mike Snitzer wrote:
-> On Mon, Jan 29 2024 at  5:12P -0500,
-> Dave Chinner <david@fromorbit.com> wrote:
+On Tue, Jan 30, 2024 at 04:29:35PM +1100, Dave Chinner wrote:
+> On Tue, Jan 30, 2024 at 11:13:50AM +0800, Ming Lei wrote:
+> > On Tue, Jan 30, 2024 at 09:07:24AM +1100, Dave Chinner wrote:
+> > > On Mon, Jan 29, 2024 at 04:25:41PM +0800, Ming Lei wrote:
+> > > > On Mon, Jan 29, 2024 at 04:15:16PM +1100, Dave Chinner wrote:
+> > > > > On Mon, Jan 29, 2024 at 11:57:45AM +0800, Ming Lei wrote:
+> > > > > > On Mon, Jan 29, 2024 at 12:47:41PM +1100, Dave Chinner wrote:
+> > > > > > > On Sun, Jan 28, 2024 at 07:39:49PM -0500, Mike Snitzer wrote:
+> > > > > > Follows the current report:
+> > > > > > 
+> > > > > > 1) usersapce call madvise(willneed, 1G)
+> > > > > > 
+> > > > > > 2) only the 1st part(size is from bdi->io_pages, suppose it is 2MB) is
+> > > > > > readahead in madvise(willneed, 1G) since commit 6d2be915e589
+> > > > > > 
+> > > > > > 3) the other parts(2M ~ 1G) is readahead by unit of bdi->ra_pages which is
+> > > > > > set as 64KB by userspace when userspace reads the mmaped buffer, then
+> > > > > > the whole application becomes slower.
+> > > > > 
+> > > > > It gets limited by file->f_ra->ra_pages being initialised to
+> > > > > bdi->ra_pages and then never changed as the advice for access
+> > > > > methods to the file are changed.
+> > > > > 
+> > > > > But the problem here is *not the readahead code*. The problem is
+> > > > > that the user has configured the device readahead window to be far
+> > > > > smaller than is optimal for the storage. Hence readahead is slow.
+> > > > > The fix for that is to either increase the device readahead windows,
+> > > > > or to change the specific readahead window for the file that has
+> > > > > sequential access patterns.
+> > > > > 
+> > > > > Indeed, we already have that - FADV_SEQUENTIAL will set
+> > > > > file->f_ra.ra_pages to 2 * bdi->ra_pages so that readahead uses
+> > > > > larger IOs for that access.
+> > > > > 
+> > > > > That's what should happen here - MADV_WILLNEED does not imply a
+> > > > > specific access pattern so the application should be running
+> > > > > MADV_SEQUENTIAL (triggers aggressive readahead) then MADV_WILLNEED
+> > > > > to start the readahead, and then the rest of the on-demand readahead
+> > > > > will get the higher readahead limits.
+> > > > > 
+> > > > > > This patch changes 3) to use bdi->io_pages as readahead unit.
+> > > > > 
+> > > > > I think it really should be changing MADV/FADV_SEQUENTIAL to set
+> > > > > file->f_ra.ra_pages to bdi->io_pages, not bdi->ra_pages * 2, and the
+> > > > > mem.load() implementation in the application converted to use
+> > > > > MADV_SEQUENTIAL to properly indicate it's access pattern to the
+> > > > > readahead algorithm.
+> > > > 
+> > > > Here the single .ra_pages may not work, that is why this patch stores
+> > > > the willneed range in maple tree, please see the following words from
+> > > > the original RH report:
+> > > 
+> > > > "
+> > > > Increasing read ahead is not an option as it has a mixed I/O workload of
+> > > > random I/O and sequential I/O, so that a large read ahead is very counterproductive
+> > > > to the random I/O and is unacceptable.
+> > > > "
+> > > 
+> > > Yes, I've read the bug. There's no triage that tells us what the
+> > > root cause of the application perofrmance issue might be. Just an
+> > > assertion that "this is how we did it 10 years ago, it's been
+> > > unchanged for all this time, the new kernel we are upgrading
+> > > to needs to behave exactly like pre-3.10 era kernels did.
+> > > 
+> > > And to be totally honest, my instincts tell me this is more likely a
+> > > problem with a root cause in poor IO scheduling decisions than be a
+> > > problem with the page cache readahead implementation. Readahead has
+> > > been turned down to stop the bandwidth it uses via background async
+> > > read IO from starving latency dependent foreground random IO
+> > > operation, and then we're being asked to turn readahead back up
+> > > in specific situations because it's actually needed for performance
+> > > in certain access patterns. This is the sort of thing bfq is
+> > > intended to solve.
+> > 
+> > Reading mmaped buffer in userspace is sync IO, and page fault just
+> > readahead 64KB. I don't understand how block IO scheduler makes a
+> > difference in this single 64KB readahead in case of cache miss.
 > 
->> On Mon, Jan 29, 2024 at 12:19:02PM -0500, Mike Snitzer wrote:
->>> While I'm sure this legacy application would love to not have to
->>> change its code at all, I think we can all agree that we need to just
->>> focus on how best to advise applications that have mixed workloads
->>> accomplish efficient mmap+read of both sequential and random.
->>>
->>> To that end, I heard Dave clearly suggest 2 things:
->>>
->>> 1) update MADV/FADV_SEQUENTIAL to set file->f_ra.ra_pages to
->>>     bdi->io_pages, not bdi->ra_pages * 2
->>>
->>> 2) Have the application first issue MADV_SEQUENTIAL to convey that for
->>>     the following MADV_WILLNEED is for sequential file load (so it is
->>>     desirable to use larger ra_pages)
->>>
->>> This overrides the default of bdi->ra_pages and _should_ provide the
->>> required per-file duality of control for readahead, correct?
->>
->> I just discovered MADV_POPULATE_READ - see my reply to Ming
->> up-thread about that. The applicaiton should use that instead of
->> MADV_WILLNEED because it gives cache population guarantees that
->> WILLNEED doesn't. Then we can look at optimising the performance of
->> MADV_POPULATE_READ (if needed) as there is constrained scope we can
->> optimise within in ways that we cannot do with WILLNEED.
-> 
-> Nice find! Given commit 4ca9b3859dac ("mm/madvise: introduce
-> MADV_POPULATE_(READ|WRITE) to prefault page tables"), I've cc'd David
-> Hildenbrand just so he's in the loop.
+> I think you've misunderstood what I said. I was refering to the
+> original customer problem of "too much readahead IO causes problems
+> for latency sensitive IO" issue that lead to the customer setting
+> 64kB readahead device limits in the first place.
 
-Thanks for CCing me.
-
-MADV_POPULATE_READ is indeed different; it doesn't give hints (not 
-"might be a good idea to read some pages" like MADV_WILLNEED documents), 
-it forces swapin/read/.../.
-
-In a sense, MADV_POPULATE_READ is similar to simply reading one byte 
-from each PTE, triggering page faults. However, without actually reading 
-from the target pages.
-
-MADV_POPULATE_READ has a conceptual benefit: we know exactly how much 
-memory user space wants to have populated (which range). In contrast, 
-page faults contain no such hints and we have to guess based on 
-historical behavior. One could use that range information to *not* do 
-any faultaround/readahead when we come via MADV_POPULATE_READ, and 
-really only popoulate the range of interest.
-
-Further, one can use that range information to allocate larger folios, 
-without having to guess where placement of a large folio is reasonable, 
-and which size we should use.
+Looks we are not in same page, I never see words of "latency sensitive IO"
+in this report(RHEL-22476).
 
 > 
-> FYI, I proactively raised feedback and questions to the reporter of
-> this issue:
->   
-> CONTEXT: madvise(WILLNEED) doesn't convey the nature of the access,
-> sequential vs random, just the range that may be accessed.
+> That is, if reducing readahead for sequential IO suddenly makes
+> synchronous random IO perform a whole lot better and the application
+> goes faster, then it indicates the problem is IO dispatch
+> prioritisation, not that there is too much readahead. Deprioritising
+> readahead will educe it's impact on other IO, without having to
+> reduce the readahead windows that provide decent sequential IO
+> perofrmance...
+> 
+> I really think the customer needs to retune their application from
+> first principles. Start with the defaults, measure where things are
+> slow, address the worst issue by twiddling knobs. Repeat until
+> performance is either good enough or they hit on actual problems
+> that need code changes.
 
-Indeed. The "problem" with MADV_SEQUENTIAL/MADV_RANDOM is that it will 
-fragment/split VMAs. So applying it to smaller chunks (like one would do 
-with MADV_WILLNEED) is likely not a good option.
+io priority is set in blkcg/process level, we even don't know if the random IO
+and sequential IO are submitted from different process.
 
--- 
-Cheers,
+Also io priority is only applied when IOs with different priority are
+submitted concurrently.
 
-David / dhildenb
+The main input from the report is that iostat shows that read IO request size is
+reduced to 64K from 1MB, which isn't something io priority can deal with.
+
+Here from my understanding the problem is that advise(ADV_RANDOM, ADV_SEQUENTIAL,
+ADV_WILLNEED) are basically applied on file level instead of range level, even
+though range is passed in from these syscalls.
+
+So sequential and random advise are actually exclusively on the whole file.
+
+That is why the customer don't want to set bigger ra_pages because they
+are afraid(or have tested) that bigger ra_pages hurts performance of random
+IO workload because unnecessary data may be readahead. But readahead
+algorithm is supposed to be capable of dealing with it, maybe still not
+well enough.
+
+But yes, more details are needed for understand the issue further.
+
+thanks, 
+Ming
 
