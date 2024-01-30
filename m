@@ -1,171 +1,133 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7D92E40E;
-	Tue, 30 Jan 2024 01:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC06D36AE9;
+	Tue, 30 Jan 2024 02:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706577295; cv=none; b=g0RHkyOy3Xc3jXmQgtZyC3RmWV09JiOoRpYTFTeNqpEK9cy8I+J+ZFV+Bgt2JFuMaAiMBdhJ1OMwdUVd2DSvrIMb3J+kQblj9FdLhNyrp6qBZIohlosRA4vIl0ndBx9/i49KYV8vFbR5nmQ0q2bwe7k2nbexiGzgwXuU/v7KjC4=
+	t=1706583530; cv=none; b=HBarTKCqYR6Y61lDLKYeCnYE/CxI/wsxcDbh3hvYd8BwiGJOKGSdK7MyLoSP5+sYY87bIpj5mRoGf3Ep8VfsQ4QWRQlKxAG6jKDyuoOfY4gJjqeb7mO1D9FfR1aWk9WBzgVIr1khnQhrUy6tC4i8jSaDv41XSAn7MIqhFkjTlY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706577295; c=relaxed/simple;
-	bh=eoJyiGl4ayk4YTXbAr04VCd2Mc9MYdaEbukUT9Fp/5M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jesIxSfQhveixhW8jNA3rps5mS4Y1aIyADNR4b5SUTYicHTcS1/cuhPyDOeRG1PHadhgzF+EirhS3I+MadHmWRNHBQksicPROU/9VmyLdft+9ZlBLbItLaOVZZ52/nDSqfAGFfN2PT0/EoJWgMuT2cpIXIY+pZbOtDqSRVHuWSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CWgVHKIk; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWgVHKIk"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-68c53ed6c56so7121016d6.3;
-        Mon, 29 Jan 2024 17:14:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706577292; x=1707182092; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e/aCaBG7yhYrHtqXVGKsvyj5q1AeIV6pyFfNUjCo8V0=;
-        b=CWgVHKIk/VW7wfXH/cwif1edm7P8YOyaKMHjp2kCgWEDQDSoUKCvwCapx44xkO/BnU
-         mDsAY/jSOvBr/TJ0JyBGQcHhbC7Wdz2OyTVS7qBxHSQqsBdoFQmwqW8og/VZulpeigkq
-         og9TjG3GHJxuYAeWK7yMwOAv8vtaCxF0qjS+dn3OGVMTLkvcLUnfCxQvrUg5LiullXBg
-         OiDxrRLi7JKbs/gdRFYGQMMmfAbnRRAEcYmljszHiTV0PhWjnHQp6wFMh4p89frACKsl
-         SCwwNy3GRdeTLTFBcSdZDn7N2Hm8E6ppHdOHt5E0XMoJtXhUnCAf4ihFdlSvj7nBCf+b
-         8DiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706577292; x=1707182092;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e/aCaBG7yhYrHtqXVGKsvyj5q1AeIV6pyFfNUjCo8V0=;
-        b=uY68Y1eJMYQNaw58RGozCjm0zhitJvbV6FRfmboxOx1PQ8n8ZkSTgwVktWQZyF9OIs
-         aeVag1rTKPPYu4Nqpi8NNHhM+qJSPvfx8+4uwnckXDtFkjzEOyLi61fSXC3jyDVk66cc
-         knbSuQEaLG+JUF78U7CSpTNqxmZDn3LjhuY57FFHWj8Kb9RRG7x7mNf7vJ9iDVKskNcU
-         Y8JKAVLkUrb7AuttcuGUiGfLwBgubAIl8wOcRNWsrD+koJsDR+FltJnfaEVV1T1unFGo
-         +ikkMphayR+7q6nrZI2mpHP6hIM+d+XIeUDralBIvMT98fXawpKnLdN5hwY0WDn3pZcc
-         HrDw==
-X-Gm-Message-State: AOJu0YwyD+AS8rosRoIFnS4EF8o6t2bpMYT/ooHbvf5fCXn6bJiVcr50
-	F3PZpnr5VQBUg5ecxa7DxerP4ziZdaFqo9jdxmunj6A93LYwFL8Z
-X-Google-Smtp-Source: AGHT+IEBL+y9RmTTPRXJWgmfIA3BgVl8nyNgmtSI7JAEYrZpS3GHYTxtiPjQdbBKmwD1Km5HR3U4nA==
-X-Received: by 2002:a05:6214:1d0d:b0:681:7ad3:db0a with SMTP id e13-20020a0562141d0d00b006817ad3db0amr7727553qvd.103.1706577292452;
-        Mon, 29 Jan 2024 17:14:52 -0800 (PST)
-Received: from [10.56.180.189] (184-057-057-014.res.spectrum.com. [184.57.57.14])
-        by smtp.gmail.com with ESMTPSA id om8-20020a0562143d8800b0068c3d2ee00fsm3001919qvb.40.2024.01.29.17.14.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jan 2024 17:14:52 -0800 (PST)
-Message-ID: <5b498690-5641-4070-97da-90a6a12c7b7f@gmail.com>
-Date: Mon, 29 Jan 2024 20:14:50 -0500
+	s=arc-20240116; t=1706583530; c=relaxed/simple;
+	bh=AbZE0B3FO5+TtB5HOi5ZjpCgzTcHcZXFvQyGWmlwlXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YtIBHI26ClMrkER7F2wcUdoPaXPSvejAaDbRP2mwpUECXQS/WP6cy9BfCqqfy7CpWJsnnIxZgt+Q37F+yqCu6tuU3PdCo0hO7FnFq+wXB0Q+AVyo22BPQZMAxkPxwbKIajViFHTmceNq2xiG8dc+a++F2VR8Yenl+/A3nWVvPRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-d85ff70000001748-1d-65b865e1c3ac
+Date: Tue, 30 Jan 2024 11:58:36 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, rostedt@goodmis.org, joel@joelfernandes.org,
+	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+	willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+	gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org,
+	akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
+	hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
+	jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org,
+	dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+	melissa.srw@gmail.com, hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, hdanton@sina.com, her0gyugyu@gmail.com
+Subject: Re: [PATCH v11 14/26] locking/lockdep, cpu/hotplus: Use a weaker
+ annotation in AP thread
+Message-ID: <20240130025836.GA49173@system.software.com>
+References: <20240124115938.80132-1-byungchul@sk.com>
+ <20240124115938.80132-15-byungchul@sk.com>
+ <87il3ggfz9.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
-Content-Language: en-US
-To: Theodore Ts'o <tytso@mit.edu>, Dave Chinner <david@fromorbit.com>
-Cc: Christian Brauner <brauner@kernel.org>,
- lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
- linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
- Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
-References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
- <ZabtYQqakvxJVYjM@dread.disaster.area> <20240117061742.GM911245@mit.edu>
-From: Adrian Vovk <adrianvovk@gmail.com>
-In-Reply-To: <20240117061742.GM911245@mit.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87il3ggfz9.ffs@tglx>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUyTVxTHc5/3NpQ8VpxX+LCsC9PB5nBqPFmWxSx7uXEz0bgv02VblSfS
+	jbcVqJTMBbQwBsq0C3YUYlo0tSlMZtttbBNXwIKdE4sQVhgSxS6jCmKoZVZqWQsx88vNL+f8
+	7++cD0eglYtsuqApLJW0hep8FSdn5DMp1hcnpU4pp29EgONHciByv5aBlo52Dvxn2xC0u6so
+	CHnfhj/npxEsXLlKg6nRj8B68zoN7r4JBF32QxwMBVNhODLLga+xnoPDpzo4GLwTo2D8hJGC
+	Nud2uHyslQJP9B8GTCEOmk2HqcQzRUHU5uDBVpkJk3YzD7GbG8A3McJC11g2NJ0c5+B8l4+B
+	vs5JCoZ+aeFgon2Rhct9lxjwHz/Kwnd3Wzm4M2+jwRaZ5eGax0LB94aEqCYcZ6H/qIeCmtPn
+	KBge/RXBhdobFDjbRzjojUxT4HI20vDwjBfBZMMMD9VHojw0VzUgqK8+wcDVR/0sGMY3w8KD
+	Fm7rK6R3epYmBtcB0jVvYcjvrZj8bL7OE8OFMZ5YnGXEZc8ip86HKGKdi7DE6fiKI845I0/q
+	ZoYpcndggCeXvl1gSHDYRO3I2C1/NVfK1+gk7UuvfSzPcw3+RRd3p5Rbw9V0Jbonq0MyAYub
+	sNMTZB+zK77AJ5kRM7G9d4BLMieuxYFAlE5ymrgOn7s2tsS06JNjf+vrSV4p7sOjt7qXPAoR
+	8MXTxkRGEJRiBXbXrVour8C+piCz/DULB+IhKhmhxQx8Ji4kyzJRhY21hqWpq8RnsefH/kRE
+	ntisQ4b9oSv88pprcLc9wBxDovkJrfkJrfl/rQXRDqTUFOoK1Jr8Tevz9IWa8vX7igqcKHGW
+	toOxPZ1ozr+rB4kCUqUotn7zk6Rk1boSfUEPwgKtSlNEn/9BUipy1foKSVv0kbYsXyrpQRkC
+	o1qteHn+QK5S3K8ulT6VpGJJ+7hLCbL0SpRb1Rwsf2YwJruo8bLjK3ZY20rveZ9+v+E5t3Hx
+	S1LfkOri15l22d3Zu7/eaGI9D9+JWbaVvbFx76OAThdO1R+6PSHu/eK+VJO+sujzs+Bw7Nz2
+	4VvvZW9Rr3kTvbB/9JOndPp4TmZ46I/V4c9++9vbnNb9oOnd7VP/xocq9ox8UDyVomJK8tQb
+	smhtifo/4an4aJIDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbWxLYRTH8zz33ufeNjpXDTf4IPU+8TJZOUFEJOwSb5GIIGLFjdXeaPdK
+	JJt1zDaLlSo1spV0y4zRDhsms9mmFrNZw1SNzYTFGKOL6oyVCF9Ofjnn/zvny+EoZQczltPG
+	xku6WE20ishp+ZqF6TM7pAppzufcaZCXMwe8XzNpyC8rJdB8+SKC0vI0DN114fC0vweB/+Ej
+	CsymZgSFHS8oKK9vR1BVfJBAa1cQuLy9BJymbALp58sItLwfwOA5acRw0b4aGo9ZMVT73tJg
+	7iZwxpyOh8o7DD5bCQu21MnQWWxhYaAjFJztTxioPetkoMo9A06f8xC4XeWkob6iE0PrzXwC
+	7aU/GWisv09Dc95RBi59tBJ432+jwObtZeFxdQGGK4ahbYe+DDLQcLQaw6ELVzG4nt1CcCfz
+	FQZ76RMCtd4eDA67iYLvRXUIOnM/sJCR42PhTFouguyMkzQ8+tHAgMGjBv+3fLJkoVjb00uJ
+	BkeSWNVfQIsPrIJYaXnBioY7blYssCeIjuIQ8fztbiwW9nkZ0V5yhIj2PiMrZn1wYfFjUxMr
+	3j/lp8UulxmvG79ZvminFK1NlHSzF0fIIx0tz6k9d4clF37JoFLRJ1kWknECHyY4Bv1sgGl+
+	slBc20QCTPipQlubjwpwMD9NuPrY/Zsp3ikXmq1LAzyS3yE8e32XCbCCB+HeBeNQhuOU/D6h
+	PGvUn/YIwXm6i/6jhghtg904EKH4cULRIBdoy3iVYMw0/L46ip8oVF9vwMeQwvKfbfnPtvyz
+	CxBVgoK1sYkxGm20epY+KjIlVps8a0dcjB0NPZ7twEBeBfraGl6DeA6phikiym5ISkaTqE+J
+	qUECR6mCFb7p1ySlYqcmZZ+ki9umS4iW9DVoHEerxihWbpQilPwuTbwUJUl7JN3fKeZkY1NR
+	BZq7KmjE/LLWz3u3h8q2MhGHE/wqtTotrCfM44p8+ZzoutatGGk6xSTvJhPW7zdV2pOS9C19
+	87xr47a5N0yZsfxa0M2ZR7ae+2llFTlbohKWhS8wjSbzh9c5DjcqTxjy47M3tRuk40y/uSj0
+	8gH3JPWYeKPnbdAJf+Wb10l0i05F6yM1oSGUTq/5Bd0J6+p0AwAA
+X-CFilter-Loop: Reflected
 
-On 1/17/24 01:17, Theodore Ts'o wrote:
-> What is the threat model that you are trying to protect against?  If
-> the attacker has access to the memory of the suspended processor, then
-> number of things you need to protect against becomes *vast*.  For one
-> thing, if you're going to blow away the LUKS encryption on suspend,
-> then during the resume process, *before* you allow general user
-> processes to start running again (when they might try to read from the
-> file system whose encryption key is no longer available, and thus will
-> be treated to EIO errors), you're going to have to request that user
-> to provide the encryption key, either directly or indirectly.
+On Fri, Jan 26, 2024 at 06:30:02PM +0100, Thomas Gleixner wrote:
+> On Wed, Jan 24 2024 at 20:59, Byungchul Park wrote:
+> 
+> Why is lockdep in the subsystem prefix here? You are changing the CPU
+> hotplug (not hotplus) code, right?
+> 
+> > cb92173d1f0 ("locking/lockdep, cpu/hotplug: Annotate AP thread") was
+> > introduced to make lockdep_assert_cpus_held() work in AP thread.
+> >
+> > However, the annotation is too strong for that purpose. We don't have to
+> > use more than try lock annotation for that.
+> 
+> This lacks a proper explanation why this is too strong.
+> 
+> > Furthermore, now that Dept was introduced, false positive alarms was
+> > reported by that. Replaced it with try lock annotation.
+> 
+> I still have zero idea what this is about.
 
-The threat we have in mind are cold-boot attacks, same as the threat 
-that dm-crypt protects against when it lets us wipe the LUKS volume 
-key.We want to limit the amount of plain-text user data an attacker can 
-acquire from a suspended system.
+1. can track PG_locked that is a potential deadlock trigger.
 
-As I mention elsewhere in this thread, the key word for me is "limit". 
-I'm not expecting perfect security, but I'd like most plaintext file 
-contents to be removed from memory on suspend so that an attacker cannot 
-access most recently accessed files. Ideally it would be "all" not 
-"most", of course, but I'll happily take what's feasible
+   https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byungchul.park@lge.com/
 
-> And if the attacker has access to the suspended memory, is it
-> read-only access, or can the attacker modify the memory image to
-> include a trojan that records the encryption once it is demanded of
-> the user, and then mails it off to Moscow or Beijing or Fort Meade?
+2. can track any waits/events e.g. wait_for_xxx(), dma fence and so on.
 
-Yes, it's read-only access.
+3. easy to annotate using dept_wait() on waits, dept_event() on events.
 
-If the attacker has write access to the memory image while the system is 
-suspended then it's complete game-over on all fronts. At that point they 
-can completely replace the kernel if they so choose. This is not 
-something I expect to be able to defend against outside of the solutions 
-you mention, but those are not feasible on commodity consumer hardware. 
-I'm looking to achieve the best we can with what we have. This is also 
-not an attack I've heard of in the wild against consumer hardware; I 
-know it's possible because I know people who've done it, but it takes 
-many weeks (at least) of research and effort to prepare for a given chip 
-- definitely not as easy as a cold-boot attack which can take seconds 
-and works pretty universally.
+4. track read lock better way instead of the ugly way, by assinging wait
+   or event annotations onto read lock and write lock. For instrance, a
+   read lock is annotated as a potential waiter for its write unlock,
+   and a write lock is annotated as a potential waiter for either write
+   unlock or read unlock.
 
-> To address the whole set of problems, it might be that the answer
-> might lie in something like confidential compute, where the all of the
-> memory encrypted.  Now you don't need to worry about wiping the page
-> cache, since it's all encrypted.  Of course, you still need to solve
-> the problem of how to restablish the confidential compute keys after
-> it has been wiped as part of the suspend, but you needed to solve that
-> with the LUKS key anyway.
+I'd like to remove unnecessary complexity on deadlock detection and add
+additional functionality by making it do what the type of tool exactly
+should do.
 
-Without special hardware support you'll need to re-establish keys via 
-unencrypted software, and unencrypted software can be replaced by an 
-attacker if they're able to write to RAM. So it doesn't solve the 
-problem you bring up. But anyway I feel this part of the discussion is 
-starting to border on theoretical...
+	Byungchul
 
-Though I suppose encrypting all the memory belonging to just the one 
-user with that user's LUKS volume key could be an alternative solution. 
-That way wiping out the key has the effect of "wiping out" all the 
-user's related memory, at least until we can re-authenticate and bring 
-it all back. But I suspect this would not only be extremely difficult to 
-implement in the kernel but would also have huge performance cost 
-without special hardware
-
-> Anoter potential approach is a bit more targetted, which is to mark
-> certain files as containing keying information, so the system can
-> focus on making sure those pages are wiped at suspend time.  It still
-> has issues, such as how the desire to wipe them from the memory at
-> suspend time interacts with mlock(), which is often done by programs
-> to prevent them from getting written to swap.  And of course, we still
-> need to worry about what to do if the file is pinned because it's
-> being accessed by RDMA or by sendfile(2) --- but perhaps a keyfile has
-> no business of being accessed via RDMA or blasted out (unencrypted!)
-> at high speed to a network connection via sendfile(2) --- and so
-> perhaps those sorts of things should be disallowed if the file is
-> marked as "this file contains secret keys --- treat it specially".
-
-Secret keys are not what we're trying to protect here necessarily. 
-Random user documents are often sensitive. People store tax documents, 
-corporate secrets, or any number of other sensitive things on their 
-computers. If an attacker can perform a cold boot attack on the device 
-then depending on how recently these tax documents or corporate secrets 
-were accessed they might just be in memory in plain text, which is not 
-good. No amount of protecting the keys prevents this.
-
-That said, having an extra security layer for secret keys would be 
-useful. There are definitely files that contain sensitive data, and it 
-would be useful to tell the kernel which files those are so that it can 
-treat them extra carefully in the ways you suggest. Maybe even avoid 
-putting them in plain text into the page cache? But this would have to 
-be an extra step, since it's not feasible to make the user mark all the 
-files that they consider to be sensitive
-
-Adrian
-
+> Thanks,
+> 
+>         tglx
