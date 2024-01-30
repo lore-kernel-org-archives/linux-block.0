@@ -1,77 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D9C6BB32;
-	Tue, 30 Jan 2024 13:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B102F7CF1B
+	for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 14:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706622831; cv=none; b=ApjgnNSD3PkQrQq5y4rR0erBWeWjo/xhAzIJiT4tbTZ4+xovmZY/0/5P65vXa4JtKeJnvwQQlDtV/GyNN2Z8bHnOCJYGc7bCnvnkFzZXOZEwPbvJb8DGUSrUk3ZgdR7vrVaxjTsz/CQCTIXZCEQO14OFQ9D4WKsRjmnerxe/Jcg=
+	t=1706625712; cv=none; b=vEaVbWVG7CZIkVnJa6HRmzCS808mUJj40EMItR4cgVp5CA4v81HgaTY2CzXREnAMNpwqo7MREcFDqNuEO1qgNx1wbF6P7zl8fWBSatl9WujwVGOE59IcdPaE8xzRfP2nxY7+G1ZlyuUnUWZrdT7pngEX0RjlTxxRSdyHHS21vNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706622831; c=relaxed/simple;
-	bh=Rbw0bjfu1YktFDI3J38DN6TV3tsl1n6Ebrxsm9br8vc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DIIiysiDSG2SKcR1eb1bJqZ28HtBzfiriuAnW7cjwkH7us+FCNCBVER8NfBanZjsDE815aKigtTIl+gSrJC6HDTZ+eP0luOd83RRCt+nYDCRg0VFZ8Q4vYOGuciqa9csmw4UFLL+UYV1/9+rCl1MwF7t0f/gFrMJ1ivY6ud+98w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFU7CFNo; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFU7CFNo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DFFFC433C7;
-	Tue, 30 Jan 2024 13:53:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706622830;
-	bh=Rbw0bjfu1YktFDI3J38DN6TV3tsl1n6Ebrxsm9br8vc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OFU7CFNorhBVGsTPusWn+2sB59iM24W5vkZAelhW2wpuZbetl9L3u54yCOub2dJNr
-	 4tR1g6rPlZAcL3IbMmvOpicB5iUYFwNPTt3zuEXOuckwfjU4q92d9YbEJU4W/+vJg0
-	 yT4sbK1J2OlRyJyPWINGU8yABBlFPqvJHesziCxX2i9Dg/pdNyYVISyPtXOocB6K8P
-	 HhTsWJKCHgBOBKZWmKHpUr9kdTuYLufJ3J0qIQW8kucynqyYgc1WrPtZCaLsT0O5J/
-	 4CEC8NxeW5fU0wNp3GsuuaZD0/Dw/oLlo0Ci4Zd0/7wqV8Rj5gGG+pYi5PVYUjug57
-	 3OJbAaIpsws4Q==
-Message-ID: <b8be6eb7-05de-49a0-bdc0-b4d16dfe2966@kernel.org>
-Date: Tue, 30 Jan 2024 22:53:45 +0900
+	s=arc-20240116; t=1706625712; c=relaxed/simple;
+	bh=iydZ0rk2gIoR4xHHBuhY2l4GOCJB9/obAaUcMY7Flhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IxqOtk+kFKNYuVOTmpvk8VcjvbC59obnPAhR0G1BZelbrkfuN6wjUTMvd2GnlSPCTFVPr69SE5wqS2jEaR0EY8fiEDkIwLBPn/oJG9rBeuCMvc0ysZbiBZjUJoK3cAEIwgeWOBVF0SsqLcclT1+5JGxjan9Tnl/ji0HmvuaTIf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id EE095227A87; Tue, 30 Jan 2024 15:41:44 +0100 (CET)
+Date: Tue, 30 Jan 2024 15:41:44 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 03/14] block: add an API to atomically update queue
+ limits
+Message-ID: <20240130144144.GA32125@lst.de>
+References: <20240128165813.3213508-1-hch@lst.de> <20240128165813.3213508-4-hch@lst.de> <c489e14c-aea7-4d76-88cd-f60026477c68@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv5 1/1] block: introduce content activity based ioprio
-Content-Language: en-US
-To: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
- Matthew Wilcox <willy@infradead.org>, Yu Zhao <yuzhao@google.com>,
- Niklas Cassel <niklas.cassel@wdc.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Hannes Reinecke <hare@suse.de>, Linus Walleij <linus.walleij@linaro.org>,
- linux-mm@kvack.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- steve.kang@unisoc.com
-References: <20240130084207.3760518-1-zhaoyang.huang@unisoc.com>
- <aa307901-d20a-4301-8774-97287d7192e9@kernel.org>
- <CAGWkznFG003aQ3-XAzdmGev7FP6x5pvp=xS8Z9sZknUHZEGHow@mail.gmail.com>
- <a538044b-5fc2-4259-9cad-3fc67feaae6d@kernel.org>
- <CAGWkznHk2GBrpc6w1az5Q59xj5BoVNrCoD4c=BQ4Jqe2QmkoVg@mail.gmail.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <CAGWkznHk2GBrpc6w1az5Q59xj5BoVNrCoD4c=BQ4Jqe2QmkoVg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c489e14c-aea7-4d76-88cd-f60026477c68@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 1/30/24 22:28, Zhaoyang Huang wrote:
->> That information does not belong to the ioprio. And which scheduler acts on a
->> number of pages anyway ? The scheduler sees requests and BIOs. It can determine
->> the number of pages they have if that is an information it needs to make
->> scheduling decisison. Using ioprio to pass that information down is a dirty hack.
-> No. IO scheduler acts on IOPRIO_CLASS which is transferred from the
-> page's activity by the current method. I will implement another
-> version of iterating pages before submit_bio and feed back to the list
+On Tue, Jan 30, 2024 at 11:46:24AM +0000, John Garry wrote:
+>> +{
+>> +	if (!lim->zoned) {
+>> +		if (WARN_ON_ONCE(lim->max_open_zones) ||
+>> +		    WARN_ON_ONCE(lim->max_active_zones) ||
+>> +		    WARN_ON_ONCE(lim->zone_write_granularity) ||
+>> +		    WARN_ON_ONCE(lim->max_zone_append_sectors))
+>
+> nit: some - like me - prefer {} for multi-line if statements, but that's 
+> personal taste
+>
+>> +			return -EINVAL;
 
-Then why are you modifying the ioprio user API to add the 7 bits of activity ?
-If the scheduler only needs the priority class, then only set that and do not
-touch the user facing API.
+That would be really weird and contrary to the normal Linux style.
 
--- 
-Damien Le Moal
-Western Digital Research
+>> +	if (!lim->logical_block_size)
+>> +		lim->logical_block_size = SECTOR_SIZE;
+>> +	if (lim->physical_block_size < lim->logical_block_size)
+>> +		lim->physical_block_size = lim->physical_block_size;
+>
+> I guess that should really be:
+> lim->physical_block_size = lim->logical_block_size;
+
+Thanks, that does need fixing.
+
+>> +	lim->max_hw_sectors = round_down(lim->max_hw_sectors,
+>> +			lim->logical_block_size >> SECTOR_SHIFT);
+>> +
+>> +	/*
+>> +	 * The actual max_sectors value is a complex beast and also takes the
+>> +	 * max_dev_sectors value (set by SCSI ULPs) and a user configurable
+>> +	 * value into account.  The ->max_sectors value is always calculated
+>> +	 * from these, so directly setting it won't have any effect.
+>> +	 */
+>> +	max_hw_sectors = min_not_zero(lim->max_hw_sectors,
+>> +				lim->max_dev_sectors);
+>
+> nit: maybe we should use a different variable for this for sake of clarity
+
+What variable name would work better for you?
+
+>> +	/*
+>> +	 * We require drivers to at least do logical block aligned I/O, but
+>> +	 * historically could not check for that due to the separate calls
+>> +	 * to set the limits.  Once the transition is finished the check
+>> +	 * below should be narrowed down to check the logical block size.
+>> +	 */
+>> +	if (!lim->dma_alignment)
+>> +		lim->dma_alignment = SECTOR_SIZE - 1;
+>
+> It would be also nice to update blk_set_default_limits to use this (and not 
+> '511') or also any other instances of hard-coding SECTOR_SIZE for 512
+
+That would be nice, but defintively not in scope for this patch.
 
