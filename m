@@ -1,44 +1,58 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DF4D26A;
-	Tue, 30 Jan 2024 00:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05C33D68;
+	Tue, 30 Jan 2024 00:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706572996; cv=none; b=ssKT50G0AQrMw173+yrABaKIg+ZTHXOMDiUYKN7xvI2o9M4SGd846jCbXiCAsqI92I0hrOu9oadddST8oZ+zi08D1La7FlrrEc9MboLn+6CfDPPVhHLY2UvQIQb/ydZtT8lXpNM6Q1Dx9d3Mphhz0tY2fOazKjmA3CfBfVXDdIo=
+	t=1706573602; cv=none; b=t76giQfeESYxQlsNDqkqGhzV/jGSd1DxKcLXnZOYJDVkzLmAvSsC08A2ORPYPpKsKqoa7Xou2eC2C+ZeGqP9BfpA0qPSEKVT9Y3XqNeNl7JxaU0MDgncrtUfSHQVNYwzN8UnurXmY0krB2SrJs9qLYWUbAuNfDuO/TCpqGfLpYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706572996; c=relaxed/simple;
-	bh=YzvajipgNDVEfpV012P54OSNxMk6P5hJCmxp0VDmoG8=;
+	s=arc-20240116; t=1706573602; c=relaxed/simple;
+	bh=/v4k9c7z0s5BJeRduspOMCH/i8kwYiHyfA6vcz9EGVA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DeoplMG3bcZCSkNJMB2RYACgsMyju7SjD3el6FD6u9IC9djb3+53P0LvZhyqAsJrwJ6ncucq3gnseq/Ta9P3E/kzNboDNl2EtITv0YGUlDGdHuNbj7xnTyTLYk2cLybGgeFzGpq1cldzkDp8jMQQMuPBTJgGTpNXhe1wNVSmweQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+	 In-Reply-To:Content-Type; b=pndIBV0KCN3RP5NpDPx1BBf9SX1o5W13FpOndvQZBUB3xkQdzBUEDcF7fhSjtltcCdfW7Otf5WZgGKifA+NEjaQnUm83tSQ5fAy0q2M7k47crAysOdfEuz7PDfYbewpGBePvFjnxO1JrlZtkNrr0nDfjZYHmvgt6WO5o94yPiew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGd7BBnP; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2901ceb0d33so3284303a91.1;
-        Mon, 29 Jan 2024 16:03:15 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGd7BBnP"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-68c4673eff5so14836616d6.1;
+        Mon, 29 Jan 2024 16:13:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706573600; x=1707178400; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1cTjgRUa/OuT1Zow9lfJR4BHRyRrTMnOxetbaBI0D7k=;
+        b=gGd7BBnP1ovzMLeIFOVjWahSnrScTQ3qZ/FPzE+dlc3NiQDrhgYOL0xGmkWS1h7YZP
+         uzRRvO7+7IgtDHp6vAtOusgdPY453ulPmNCML1s0vYp3imx2y/M0+KGUCbTUyrRIMOwX
+         2i71rYiBVwInmWySueJTUhRRSs75udSh9/uR98+ukgWHeKO5LFu+bKkA71tSYTBuokd1
+         GrMpUE6VSiOCEk+Wxfa32dtSYEvQs9LqIBuNv8Lcwf6tDzKiRH7SJfHEv2aTlYybsT5k
+         ezG/+8HK0KFlpuctDff1FvVdtbKUS8kItZ4CM/RvIZ+RdOwRibryoyM+pXhU9WFeUcMP
+         LL1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706572995; x=1707177795;
+        d=1e100.net; s=20230601; t=1706573600; x=1707178400;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tlYacdDh0BjD03SBQ9Jr1hkagZ9LSai4GApM8/5GKd4=;
-        b=A0xMWVEsYzuV5dcM11sxiZ87/Rq6mnqgLGFyqN+W3avoXC+HDgY1rDtmd8i0+Tg0S1
-         5F56Gxn2g6tTiBcy+pE+T0RMU+ieWu+zrnbyTOATD/Y/9jrw7EVi0vckLKISYUQvhtL5
-         TlzDfcLc3p0L+W8ITI3bs7A3+fru/qs1x5erwpmuckxTT6KAqCiYtERqq68+so7c6YZ7
-         n4UYULFG9T36cw5kwMjW73pHXcCpz0VNpzjhgA7Lazfgd6ePjGt1hKNuepWXHxE+wZaX
-         EM0b0RfQAl7APUPtfHb+BQZhyVWzrTaybe+o9XXz1pyaGb8ty63cEHvQlmH8d3BLXXj2
-         C66Q==
-X-Gm-Message-State: AOJu0YwamnoQfyQH9rBsyvismxI1T48Pd9ZN7zDfMm4vNJs7dag6lV2G
-	stiPXB9+iKfFWwcfGuforl9icDAIX3oaEnhkLf+snuB1WRoV0at4
-X-Google-Smtp-Source: AGHT+IHfpNql38wpyMimcnPMqNnzWLmwZdoT3L7uTwHHV7vRDKz5IUejFZzahrLt6DU2RgGeumEXDA==
-X-Received: by 2002:a17:90a:d3d8:b0:290:6de6:5721 with SMTP id d24-20020a17090ad3d800b002906de65721mr122119pjw.32.1706572994472;
-        Mon, 29 Jan 2024 16:03:14 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:be5c:5016:50bb:1469? ([2620:0:1000:8411:be5c:5016:50bb:1469])
-        by smtp.gmail.com with ESMTPSA id t18-20020a17090a5d9200b002958775b061sm2136639pji.56.2024.01.29.16.03.12
+        bh=1cTjgRUa/OuT1Zow9lfJR4BHRyRrTMnOxetbaBI0D7k=;
+        b=ddaU31QVA38ojGBBMlGxlj/O9Z1ts4wfzoxK3F4T05F333CJjXLeGkdpvMQQNylpKk
+         5GXl6TlZB+np3NHsRqVVewGKeQBcXb9qGKLiJex3TGo2E71AmAZSklasNCuEvz5w95Fe
+         lRRrfyX9jpeEx5mVyIR4E5ac8a79M0HSLdntvqjYuSLN7n4sXPbeDeClZFEI7/USQ/dd
+         gzLDTXt7l/2MtlUdo005teC9BZr2W3TZRYkPlAw5HsvZh+Z64d8Zcve3l3od8SNe4P4p
+         9n18uA8gP47bOgV9UL9BZtnQDmnIwGrGH3+Ah7bn7rH5aigR6SwEAPKr0ISl8eJheSIR
+         nBcg==
+X-Gm-Message-State: AOJu0YwjM01aH4KmSbEZ3aB8GjGMt9NBMIrTeOJOo9CJukSZWoURK+8I
+	JoPm2ZF4MWIhhcHUAEvbIbrh56LoZndzdN7oBYJINCmEvAQEtql6oHpRYiPreTTTIQ==
+X-Google-Smtp-Source: AGHT+IHH6hHDKm4nySIae5BxK+drQrnCA8T5/9zdN7Htn1zRhndn0EHzWb/IXqtzANbIwtv738w6VQ==
+X-Received: by 2002:a05:6214:2a8b:b0:68c:5e87:7032 with SMTP id jr11-20020a0562142a8b00b0068c5e877032mr387571qvb.40.1706573599739;
+        Mon, 29 Jan 2024 16:13:19 -0800 (PST)
+Received: from [10.56.180.189] (184-057-057-014.res.spectrum.com. [184.57.57.14])
+        by smtp.gmail.com with ESMTPSA id pf1-20020a056214498100b0067f53e25d1esm3931087qvb.14.2024.01.29.16.13.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jan 2024 16:03:13 -0800 (PST)
-Message-ID: <38676388-4c32-414c-a468-5f82a2e9dda4@acm.org>
-Date: Mon, 29 Jan 2024 16:03:11 -0800
+        Mon, 29 Jan 2024 16:13:19 -0800 (PST)
+Message-ID: <3107a023-3173-4b3d-9623-71812b1e7eb6@gmail.com>
+Date: Mon, 29 Jan 2024 19:13:17 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,59 +60,55 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
+Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
 Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Ed Tsai <ed.tsai@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <2d83fcb3-06e6-4a7c-9bd7-b8018208b72f@huaweicloud.com>
- <20240115055940.GA745@lst.de>
- <0d23e3d3-1d7a-f76b-307b-7d74b3f91e05@huaweicloud.com>
- <f1cac818-8fc8-4f24-b445-d10aa99c04ba@acm.org>
- <e0305a2c-20c1-7e0f-d25d-003d7a72355f@huaweicloud.com>
- <aedc82bc-ef10-4bc6-b76c-bf239f48450f@acm.org>
- <20240118073151.GA21386@lst.de>
- <434b771a-7873-4c53-9faa-c5dbc4296495@acm.org>
- <20240123091316.GA32130@lst.de>
- <ac240189-d889-448b-b5f7-7d5a13d4316d@acm.org>
- <20240124090843.GA28180@lst.de>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240124090843.GA28180@lst.de>
+To: Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>
+Cc: Christian Brauner <brauner@kernel.org>,
+ lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+ <20240116114519.jcktectmk2thgagw@quack3>
+ <20240117-tupfen-unqualifiziert-173af9bc68c8@brauner>
+ <20240117143528.idmyeadhf4yzs5ck@quack3>
+ <ZafpsO3XakIekWXx@casper.infradead.org>
+From: Adrian Vovk <adrianvovk@gmail.com>
+In-Reply-To: <ZafpsO3XakIekWXx@casper.infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/24/24 01:08, Christoph Hellwig wrote:
-> On Tue, Jan 23, 2024 at 07:16:05AM -0800, Bart Van Assche wrote:
->> On 1/23/24 01:13, Christoph Hellwig wrote:
->>> The point is why you think fair sharing is not actually required for
->>> these particular setups only.
->>
->> Do you perhaps want me to move the SCSI host sysfs attribute that controls
->> fair sharing to the /sys/block/${bdev}/queue directory?
-> 
-> No.  I want an explanation from you why you think your use case is so
-> snowflake special that you and just you need to fisable fair sharing.
+Hello! I'm the "GNOME people" who Christian is referring to
 
-Hi Christoph,
+On 1/17/24 09:52, Matthew Wilcox wrote:
+> I feel like we're in an XY trap [1].  What Christian actually wants is
+> to not be able to access the contents of a file while the device it's
+> on is suspended, and we've gone from there to "must drop the page cache".
 
-Would you agree with disabling fair sharing entirely? The use cases that
-need fair sharing most are those were different storage types (e.g. hard
-disk and SSDs) are connected to the same storage controller. This scenario
-often occurs in a cloud computing context. There are better solutions for
-cloud computing contexts than fair sharing, e.g. associating different
-storage types with different storage controllers. The same approach works
-for storage-over-network since storage arrays that have a network connection
-usually support to establish multiple connections from a storage initiator
-to the storage server.
+What we really want is for the plaintext contents of the files to be 
+gone from memory while the dm-crypt device backing them is suspended.
 
-Thanks,
+Ultimately my goal is to limit the chance that an attacker with access 
+to a user's suspended laptop will be able to access the user's encrypted 
+data. I need to achieve this without forcing the user to completely log 
+out/power off/etc their system; it must be invisible to the user. The 
+key word here is limit; if we can remove _most_ files from memory _most_ 
+of the time Ithink luksSuspend would be a lot more useful against cold 
+boot than it is today.
 
-Bart.
+I understand that perfectly wiping all the files out of memory without 
+completely unmounting the filesystem isn't feasible, and that's probably 
+OK for our use-case. As long as most files can be removed from memory 
+most of the time, anyway...
 
+> We have numerous ways to intercept file reads and make them either
+> block or fail.  The obvious one to me is security_file_permission()
+> called from rw_verify_area().  Can we do everything we need with an LSM?
+>
+> [1] https://meta.stackexchange.com/questions/66377/what-is-the-xy-problem
+
+As Christian mentioned: the LSM may be a good addition, but it would 
+have to be in addition to wiping the data out of the page cache, not 
+instead of. An LSM will not help against a cold boot attack
+
+Adrian
 
