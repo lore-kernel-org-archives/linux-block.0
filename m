@@ -1,33 +1,44 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109F153E09;
-	Mon, 29 Jan 2024 23:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DF4D26A;
+	Tue, 30 Jan 2024 00:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706570948; cv=none; b=UNIYTUobrs/YwKh8gvX1BIuLKElGyYEX9vdRyF1/rzayvFT4yGBrdavNhaE0uquPUnvUZVFq6o1ucryTRCEIaOcNMx7FQFM1W9LhPEYWx4AKyaEtaB91N51xIaedIag6mJ8UxsqTcaNfgrZEmqQr8N9MxZvafGSTh8l3Ans87U0=
+	t=1706572996; cv=none; b=ssKT50G0AQrMw173+yrABaKIg+ZTHXOMDiUYKN7xvI2o9M4SGd846jCbXiCAsqI92I0hrOu9oadddST8oZ+zi08D1La7FlrrEc9MboLn+6CfDPPVhHLY2UvQIQb/ydZtT8lXpNM6Q1Dx9d3Mphhz0tY2fOazKjmA3CfBfVXDdIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706570948; c=relaxed/simple;
-	bh=ndf2vLbvZIQYQNE9pREjH50tsvV7CWwMiqHG6sTVNIc=;
+	s=arc-20240116; t=1706572996; c=relaxed/simple;
+	bh=YzvajipgNDVEfpV012P54OSNxMk6P5hJCmxp0VDmoG8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bR6dpmPdpS6CoI5K3w8U6gJmtP7cJtroLRgJfJ8rvPPO6lsKpVzrTf1tHSZ1BzXObmWsSj94WSu8Ndby3+k7++EQTnYcsQc5lIp9B5dSFOkBiXSbjPuT+6KsVyHr2GP4V1z3NHo2spoY1QDr9RLZ0A1Josy7sZWqGUOT0VMuZH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpBD0pkA; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpBD0pkA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E688AC433C7;
-	Mon, 29 Jan 2024 23:29:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706570947;
-	bh=ndf2vLbvZIQYQNE9pREjH50tsvV7CWwMiqHG6sTVNIc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JpBD0pkApJsK1Lg9ekUAGkwlA0Sbgqlz2H8WvXFr8iKhHM0b0IKbSZ6wD1tcoj01C
-	 DAovaEmy1aQXXzXMi2eQqUicPt4RfmG+am5adv7Qi73Q/sVjaPYxdHLM/Rpp9YOQON
-	 YTdmRNVd6ARkl6PESrOQRGLy3l7DrYzuvUwDAYFGOee7U+d69xlAmHUwcC6ekt+ocA
-	 V3sVhjRDUyF3KKAXV5sARfdzPALFpWl/tHwOykZZOkrIIIvezVsidD0NjebjuOmDUV
-	 +my52WioNda7fDaQyJSmIRUSaQKuHEje67Ngc6C13QyBYk96LdB9iPoJR7+jxg8N7w
-	 bB/k4NsdipxfQ==
-Message-ID: <100af933-2253-45df-9045-5bd8e273df12@kernel.org>
-Date: Tue, 30 Jan 2024 08:29:04 +0900
+	 In-Reply-To:Content-Type; b=DeoplMG3bcZCSkNJMB2RYACgsMyju7SjD3el6FD6u9IC9djb3+53P0LvZhyqAsJrwJ6ncucq3gnseq/Ta9P3E/kzNboDNl2EtITv0YGUlDGdHuNbj7xnTyTLYk2cLybGgeFzGpq1cldzkDp8jMQQMuPBTJgGTpNXhe1wNVSmweQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2901ceb0d33so3284303a91.1;
+        Mon, 29 Jan 2024 16:03:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706572995; x=1707177795;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tlYacdDh0BjD03SBQ9Jr1hkagZ9LSai4GApM8/5GKd4=;
+        b=A0xMWVEsYzuV5dcM11sxiZ87/Rq6mnqgLGFyqN+W3avoXC+HDgY1rDtmd8i0+Tg0S1
+         5F56Gxn2g6tTiBcy+pE+T0RMU+ieWu+zrnbyTOATD/Y/9jrw7EVi0vckLKISYUQvhtL5
+         TlzDfcLc3p0L+W8ITI3bs7A3+fru/qs1x5erwpmuckxTT6KAqCiYtERqq68+so7c6YZ7
+         n4UYULFG9T36cw5kwMjW73pHXcCpz0VNpzjhgA7Lazfgd6ePjGt1hKNuepWXHxE+wZaX
+         EM0b0RfQAl7APUPtfHb+BQZhyVWzrTaybe+o9XXz1pyaGb8ty63cEHvQlmH8d3BLXXj2
+         C66Q==
+X-Gm-Message-State: AOJu0YwamnoQfyQH9rBsyvismxI1T48Pd9ZN7zDfMm4vNJs7dag6lV2G
+	stiPXB9+iKfFWwcfGuforl9icDAIX3oaEnhkLf+snuB1WRoV0at4
+X-Google-Smtp-Source: AGHT+IHfpNql38wpyMimcnPMqNnzWLmwZdoT3L7uTwHHV7vRDKz5IUejFZzahrLt6DU2RgGeumEXDA==
+X-Received: by 2002:a17:90a:d3d8:b0:290:6de6:5721 with SMTP id d24-20020a17090ad3d800b002906de65721mr122119pjw.32.1706572994472;
+        Mon, 29 Jan 2024 16:03:14 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:be5c:5016:50bb:1469? ([2620:0:1000:8411:be5c:5016:50bb:1469])
+        by smtp.gmail.com with ESMTPSA id t18-20020a17090a5d9200b002958775b061sm2136639pji.56.2024.01.29.16.03.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jan 2024 16:03:13 -0800 (PST)
+Message-ID: <38676388-4c32-414c-a468-5f82a2e9dda4@acm.org>
+Date: Mon, 29 Jan 2024 16:03:11 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,43 +46,59 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] block: remove gfp_flags from blkdev_zone_mgmt
+Subject: Re: [PATCH v6 1/4] block: Make fair tag sharing configurable
 Content-Language: en-US
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
- Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
- David Sterba <dsterba@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
- Chao Yu <chao@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <20240128-zonefs_nofs-v3-0-ae3b7c8def61@wdc.com>
- <20240128-zonefs_nofs-v3-5-ae3b7c8def61@wdc.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20240128-zonefs_nofs-v3-5-ae3b7c8def61@wdc.com>
-Content-Type: text/plain; charset=UTF-8
+To: Christoph Hellwig <hch@lst.de>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ Ed Tsai <ed.tsai@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <2d83fcb3-06e6-4a7c-9bd7-b8018208b72f@huaweicloud.com>
+ <20240115055940.GA745@lst.de>
+ <0d23e3d3-1d7a-f76b-307b-7d74b3f91e05@huaweicloud.com>
+ <f1cac818-8fc8-4f24-b445-d10aa99c04ba@acm.org>
+ <e0305a2c-20c1-7e0f-d25d-003d7a72355f@huaweicloud.com>
+ <aedc82bc-ef10-4bc6-b76c-bf239f48450f@acm.org>
+ <20240118073151.GA21386@lst.de>
+ <434b771a-7873-4c53-9faa-c5dbc4296495@acm.org>
+ <20240123091316.GA32130@lst.de>
+ <ac240189-d889-448b-b5f7-7d5a13d4316d@acm.org>
+ <20240124090843.GA28180@lst.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240124090843.GA28180@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/29/24 16:52, Johannes Thumshirn wrote:
-> Now that all callers pass in GFP_KERNEL to blkdev_zone_mgmt() and use
-> memalloc_no{io,fs}_{save,restore}() to define the allocation scope, we can
-> drop the gfp_mask parameter from blkdev_zone_mgmt() as well as
-> blkdev_zone_reset_all() and blkdev_zone_reset_all_emulated().
+On 1/24/24 01:08, Christoph Hellwig wrote:
+> On Tue, Jan 23, 2024 at 07:16:05AM -0800, Bart Van Assche wrote:
+>> On 1/23/24 01:13, Christoph Hellwig wrote:
+>>> The point is why you think fair sharing is not actually required for
+>>> these particular setups only.
+>>
+>> Do you perhaps want me to move the SCSI host sysfs attribute that controls
+>> fair sharing to the /sys/block/${bdev}/queue directory?
 > 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> No.  I want an explanation from you why you think your use case is so
+> snowflake special that you and just you need to fisable fair sharing.
 
-Looks good to me.
+Hi Christoph,
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Would you agree with disabling fair sharing entirely? The use cases that
+need fair sharing most are those were different storage types (e.g. hard
+disk and SSDs) are connected to the same storage controller. This scenario
+often occurs in a cloud computing context. There are better solutions for
+cloud computing contexts than fair sharing, e.g. associating different
+storage types with different storage controllers. The same approach works
+for storage-over-network since storage arrays that have a network connection
+usually support to establish multiple connections from a storage initiator
+to the storage server.
 
-But let me check zonefs (patch 1).
+Thanks,
 
--- 
-Damien Le Moal
-Western Digital Research
+Bart.
+
 
