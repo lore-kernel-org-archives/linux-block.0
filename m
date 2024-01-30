@@ -1,247 +1,345 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F0C7C597;
-	Tue, 30 Jan 2024 21:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C25178682;
+	Tue, 30 Jan 2024 22:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706651408; cv=none; b=AwVPbNwxf/FJjeFS098yXRvkv5gnDksUUjj0wDyaahZdaRmAqt/nJ4uGx90SpgMvdGki0BAwIvMuIYFPZDTTWYcnq3SYgZIhV245umKnxUkj75FL4bIql8HHUCas7fXkRI8BWqgi8J03ifjKKPBViB2GsIOVXVFjESBEdE82lB0=
+	t=1706654244; cv=none; b=fl+puoN/ufWjkEPIPGKyqt2BxjlNewcBUSxSCjAYIGAyO5EixAw07pp15qBzaWxyslYkYo8pDLekSpnUAg4xaWmXoIeRaTQcU5cXusWcEIZ0gSEd4y1qRIP0vxM13nJASTJpT1Hey0Py1fagGzXxsgXrB2CjHQjoRtNBA+ksG5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706651408; c=relaxed/simple;
-	bh=QM3pj8RymkvttqcCJVdupGcih6w4z7Gl+b93y9il9A8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Aidbhzjw0gK24YdoCPTbjM+6YVnKcHw/N9nTFygvRQd8fNE1avBMeznsiEsC95zTsq/psaVzZ6ZUq9ePiLKcXGKLQP42jVQ1k/aBDr1ubFHT00eId5kfw4sf79TiZW6tLODPzjCIMYmIug+pEthSqLDx+z4djjItzl45blOtKFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6de3141f041so1289512b3a.0;
-        Tue, 30 Jan 2024 13:50:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706651406; x=1707256206;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V0Xmdm/OHLZ7BZpyv4wwjqwC83xCcMmBotSHyQroMK0=;
-        b=aggGO4gYJcId1kzxDOYKiyRc1nNrkJOf1n4mxPIaUP+txU6gwNeVW1chdmEODbGrxg
-         pC3szxn4NWwK88OotvFd0VSdfNEtM02KqM+zT3r2cUDV5wPFI5yF5PdjFPuOAYqHs0il
-         cMjNK98G/kYAxH1sGmDEcWRIgHUfFIfsYP1SWaUvJRtc71l6mP3TvrRG5xly48Xh4QJh
-         h3mhxNLeFvyTaQ/90l0v7OY3AIzDLibtVzMB1DTUHBfkmDX0DAnr/kKrixMIzgvmJ0/t
-         fKKrJ4rEcS9IG338sjJRzopNKWGahYeukEMBMFEd+uwnCuFlT4FhFzrzLwTLduB2YzKq
-         dAJg==
-X-Gm-Message-State: AOJu0YwIn5aE/8v7ItXaouT7tiBhuu7lX0gt3n/rIZ2A93jnFE8g83g9
-	g1KjTk7aboPQTpj1cSj9LjfZpCSjlTcWzjSt3UOMAemv9bdy3b5k
-X-Google-Smtp-Source: AGHT+IE3l95exmzo4xzcf9SV3+WTBkm0AxrDmT8qQEj+2UXu9rtXdQ9pO89f6gQbjmaTJIDIFUekrw==
-X-Received: by 2002:a05:6a00:2da8:b0:6db:af73:bd9a with SMTP id fb40-20020a056a002da800b006dbaf73bd9amr6548715pfb.30.1706651405641;
-        Tue, 30 Jan 2024 13:50:05 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:0:1000:8411:f45c:fd18:bfa0:e084])
-        by smtp.gmail.com with ESMTPSA id k14-20020aa7998e000000b006db87354a8fsm8285597pfh.119.2024.01.30.13.50.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 13:50:05 -0800 (PST)
-From: Bart Van Assche <bvanassche@acm.org>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org,
+	s=arc-20240116; t=1706654244; c=relaxed/simple;
+	bh=xL1nKpqZLIeKliSD+xQUyqVmzNy5OAxU8KbgLk6atAg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=jGTaVumcNovGuNXgPImLD8jBJ6H0QqaeNxH/18KWFAqssnG5EzWyC4g6DnLgCd7d9/MqW9oGltu92OjyCCb0+HvVLC07dMZwANt49eiQDnBzZo5onsoLdWRhJ2YGgaiZdgWYu66v5Ac74l8WJ5zwbkpWF+c/ZGbsFH++B5bP+ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=BqjUiSZR; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="BqjUiSZR"
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+	id EDCF92057C0D; Tue, 30 Jan 2024 14:37:21 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EDCF92057C0D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1706654241;
+	bh=LTiRam5npkgbf4mW3Q6pe+eqiBaI/QeBWCFrYaYQye8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=BqjUiSZRBllytXv9UqRaC+AZ8XVuBP3HM6l7O2tBVekjaOh2Q1XOt0skhjXgGLlsJ
+	 2AmcKnicqHjQr8u3uT48oFJufl+2RuZyVr27tofxY14l5Z8f/zLoE3GZ+ccAq6EQ5l
+	 rUaX5oMTq3QYtnQIy68R8ilndLM87Z7LI0BlujFI=
+From: Fan Wu <wufan@linux.microsoft.com>
+To: corbet@lwn.net,
+	zohar@linux.ibm.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	tytso@mit.edu,
+	ebiggers@kernel.org,
+	axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@kernel.org,
+	eparis@redhat.com,
+	paul@paul-moore.com
+Cc: linux-doc@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Daejun Park <daejun7.park@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Douglas Gilbert <dgilbert@interlog.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH v9 19/19] scsi: scsi_debug: Maintain write statistics per group number
-Date: Tue, 30 Jan 2024 13:48:45 -0800
-Message-ID: <20240130214911.1863909-20-bvanassche@acm.org>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-In-Reply-To: <20240130214911.1863909-1-bvanassche@acm.org>
-References: <20240130214911.1863909-1-bvanassche@acm.org>
+	dm-devel@lists.linux.dev,
+	audit@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Deven Bowers <deven.desai@linux.microsoft.com>,
+	Fan Wu <wufan@linux.microsoft.com>
+Subject: [RFC PATCH v12 01/20] security: add ipe lsm
+Date: Tue, 30 Jan 2024 14:36:49 -0800
+Message-Id: <1706654228-17180-2-git-send-email-wufan@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1706654228-17180-1-git-send-email-wufan@linux.microsoft.com>
+References: <1706654228-17180-1-git-send-email-wufan@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Track per GROUP NUMBER how many write commands have been processed. Make
-this information available in sysfs. Reset these statistics if any data
-is written into the sysfs attribute.
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Note: SCSI devices should only interpret the information in the GROUP
-NUMBER field as a stream identifier if the ST_ENBLE bit has been set to
-one. This patch follows a simpler approach: count the number of writes
-per GROUP NUMBER whether or not the group number represents a stream
-identifier.
+Integrity Policy Enforcement (IPE) is an LSM that provides an
+complimentary approach to Mandatory Access Control than existing LSMs
+today.
 
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
-Tested-by: Douglas Gilbert <dgilbert@interlog.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Existing LSMs have centered around the concept of access to a resource
+should be controlled by the current user's credentials. IPE's approach,
+is that access to a resource should be controlled by the system's trust
+of a current resource.
+
+The basis of this approach is defining a global policy to specify which
+resource can be trusted.
+
+Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 ---
- drivers/scsi/scsi_debug.c | 49 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 45 insertions(+), 4 deletions(-)
+v2:
+  + Split evaluation loop, access control hooks,
+    and evaluation loop from policy parser and userspace
+    interface to pass mailing list character limit
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 497045e54300..ce52d580d1aa 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -902,6 +902,8 @@ static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
- static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
- static int poll_queues; /* iouring iopoll interface.*/
+v3:
+  + Move ipe_load_properties to patch 04.
+  + Remove useless 0-initializations
+  + Prefix extern variables with ipe_
+  + Remove kernel module parameters, as these are
+    exposed through sysctls.
+  + Add more prose to the IPE base config option
+    help text.
+  + Use GFP_KERNEL for audit_log_start.
+  + Remove unnecessary caching system.
+  + Remove comments from headers
+  + Use rcu_access_pointer for rcu-pointer null check
+  + Remove usage of reqprot; use prot only.
+  + Move policy load and activation audit event to 03/12
+
+v4:
+  + Remove sysctls in favor of securityfs nodes
+  + Re-add kernel module parameters, as these are now
+    exposed through securityfs.
+  + Refactor property audit loop to a separate function.
+
+v5:
+  + fix minor grammatical errors
+  + do not group rule by curly-brace in audit record,
+    reconstruct the exact rule.
+
+v6:
+  + No changes
+
+v7:
+  + Further split lsm creation into a separate commit from the
+    evaluation loop and audit system, for easier review.
+
+  + Introduce the concept of an ipe_context, a scoped way to
+    introduce execution policies, used initially for allowing for
+    kunit tests in isolation.
+
+v8:
+  + Follow lsmname_hook_name convention for lsm hooks.
+  + Move LSM blob accessors to ipe.c and mark LSM blobs as static.
+
+v9:
+  + Remove ipe_context for simplification
+
+v10:
+  + Add github url
+
+v11:
+  + Correct github url
+  + Move ipe before bpf
+
+v12:
+  + Switch to use lsm_id instead of string for lsm name
+---
+ MAINTAINERS              |  7 +++++++
+ include/uapi/linux/lsm.h |  1 +
+ security/Kconfig         | 11 ++++++-----
+ security/Makefile        |  1 +
+ security/ipe/Kconfig     | 17 +++++++++++++++++
+ security/ipe/Makefile    |  9 +++++++++
+ security/ipe/ipe.c       | 41 ++++++++++++++++++++++++++++++++++++++++
+ security/ipe/ipe.h       | 16 ++++++++++++++++
+ security/security.c      |  3 ++-
+ 9 files changed, 100 insertions(+), 6 deletions(-)
+ create mode 100644 security/ipe/Kconfig
+ create mode 100644 security/ipe/Makefile
+ create mode 100644 security/ipe/ipe.c
+ create mode 100644 security/ipe/ipe.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8999497011a2..51464982297b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10644,6 +10644,13 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/zohar/linux-integrity.git
+ F:	security/integrity/
+ F:	security/integrity/ima/
  
-+static atomic_long_t writes_by_group_number[64];
++INTEGRITY POLICY ENFORCEMENT (IPE)
++M:	Fan Wu <wufan@linux.microsoft.com>
++L:	linux-security-module@vger.kernel.org
++S:	Supported
++T:	git https://github.com/microsoft/ipe.git
++F:	security/ipe/
 +
- static char sdebug_proc_name[] = MY_NAME;
- static const char *my_name = MY_NAME;
+ INTEL 810/815 FRAMEBUFFER DRIVER
+ M:	Antonino Daplas <adaplas@gmail.com>
+ L:	linux-fbdev@vger.kernel.org
+diff --git a/include/uapi/linux/lsm.h b/include/uapi/linux/lsm.h
+index f8aef9ade549..43e2fb32745a 100644
+--- a/include/uapi/linux/lsm.h
++++ b/include/uapi/linux/lsm.h
+@@ -62,6 +62,7 @@ struct lsm_ctx {
+ #define LSM_ID_LOCKDOWN		108
+ #define LSM_ID_BPF		109
+ #define LSM_ID_LANDLOCK		110
++#define LSM_ID_IPE		111
  
-@@ -3377,7 +3379,8 @@ static inline struct sdeb_store_info *devip2sip(struct sdebug_dev_info *devip,
+ /*
+  * LSM_ATTR_XXX definitions identify different LSM attributes
+diff --git a/security/Kconfig b/security/Kconfig
+index 52c9af08ad35..cc7adfbb6b96 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -194,6 +194,7 @@ source "security/yama/Kconfig"
+ source "security/safesetid/Kconfig"
+ source "security/lockdown/Kconfig"
+ source "security/landlock/Kconfig"
++source "security/ipe/Kconfig"
  
- /* Returns number of bytes copied or -1 if error. */
- static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
--			    u32 sg_skip, u64 lba, u32 num, bool do_write)
-+			    u32 sg_skip, u64 lba, u32 num, bool do_write,
-+			    u8 group_number)
- {
- 	int ret;
- 	u64 block, rest = 0;
-@@ -3396,6 +3399,10 @@ static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
- 		return 0;
- 	if (scp->sc_data_direction != dir)
- 		return -1;
+ source "security/integrity/Kconfig"
+ 
+@@ -233,11 +234,11 @@ endchoice
+ 
+ config LSM
+ 	string "Ordered list of enabled LSMs"
+-	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
+-	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
+-	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
+-	default "landlock,lockdown,yama,loadpin,safesetid,bpf" if DEFAULT_SECURITY_DAC
+-	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,bpf"
++	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,ipe,bpf" if DEFAULT_SECURITY_SMACK
++	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,ipe,bpf" if DEFAULT_SECURITY_APPARMOR
++	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,ipe,bpf" if DEFAULT_SECURITY_TOMOYO
++	default "landlock,lockdown,yama,loadpin,safesetid,ipe,bpf" if DEFAULT_SECURITY_DAC
++	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,ipe,bpf"
+ 	help
+ 	  A comma-separated list of LSMs, in initialization order.
+ 	  Any LSMs left off this list, except for those with order
+diff --git a/security/Makefile b/security/Makefile
+index 59f238490665..cc0982214b84 100644
+--- a/security/Makefile
++++ b/security/Makefile
+@@ -25,6 +25,7 @@ obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
+ obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
+ obj-$(CONFIG_BPF_LSM)			+= bpf/
+ obj-$(CONFIG_SECURITY_LANDLOCK)		+= landlock/
++obj-$(CONFIG_SECURITY_IPE)		+= ipe/
+ 
+ # Object integrity file lists
+ obj-$(CONFIG_INTEGRITY)			+= integrity/
+diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+new file mode 100644
+index 000000000000..e4875fb04883
+--- /dev/null
++++ b/security/ipe/Kconfig
+@@ -0,0 +1,17 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Integrity Policy Enforcement (IPE) configuration
++#
 +
-+	if (do_write && group_number < ARRAY_SIZE(writes_by_group_number))
-+		atomic_long_inc(&writes_by_group_number[group_number]);
++menuconfig SECURITY_IPE
++	bool "Integrity Policy Enforcement (IPE)"
++	depends on SECURITY && SECURITYFS
++	select PKCS7_MESSAGE_PARSER
++	select SYSTEM_DATA_VERIFICATION
++	help
++	  This option enables the Integrity Policy Enforcement LSM
++	  allowing users to define a policy to enforce a trust-based access
++	  control. A key feature of IPE is a customizable policy to allow
++	  admins to reconfigure trust requirements on the fly.
 +
- 	fsp = sip->storep;
- 
- 	block = do_div(lba, sdebug_store_sectors);
-@@ -3769,7 +3776,7 @@ static int resp_read_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, false);
-+	ret = do_device_access(sip, scp, 0, lba, num, false, 0);
- 	sdeb_read_unlock(sip);
- 	if (unlikely(ret == -1))
- 		return DID_ERROR << 16;
-@@ -3954,6 +3961,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- {
- 	bool check_prot;
- 	u32 num;
-+	u8 group = 0;
- 	u32 ei_lba;
- 	int ret;
- 	u64 lba;
-@@ -3965,11 +3973,13 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be64(cmd + 2);
- 		num = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case WRITE_10:
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x3f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = true;
- 		break;
-@@ -3984,15 +3994,18 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
- 		num = get_unaligned_be32(cmd + 6);
-+		group = cmd[6] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case 0x53:	/* XDWRITEREAD(10) */
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x1f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = false;
- 		break;
- 	default:	/* assume WRITE(32) */
-+		group = cmd[6] & 0x3f;
- 		lba = get_unaligned_be64(cmd + 12);
- 		ei_lba = get_unaligned_be32(cmd + 20);
- 		num = get_unaligned_be32(cmd + 28);
-@@ -4047,7 +4060,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, true);
-+	ret = do_device_access(sip, scp, 0, lba, num, true, group);
- 	if (unlikely(scsi_debug_lbp()))
- 		map_region(sip, lba, num);
- 	/* If ZBC zone then bump its write pointer */
-@@ -4099,12 +4112,14 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 	u32 lb_size = sdebug_sector_size;
- 	u32 ei_lba;
- 	u64 lba;
-+	u8 group;
- 	int ret, res;
- 	bool is_16;
- 	static const u32 lrd_size = 32; /* + parameter list header size */
- 
- 	if (cmd[0] == VARIABLE_LENGTH_CMD) {
- 		is_16 = false;
-+		group = cmd[6] & 0x3f;
- 		wrprotect = (cmd[10] >> 5) & 0x7;
- 		lbdof = get_unaligned_be16(cmd + 12);
- 		num_lrd = get_unaligned_be16(cmd + 16);
-@@ -4115,6 +4130,7 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 		lbdof = get_unaligned_be16(cmd + 4);
- 		num_lrd = get_unaligned_be16(cmd + 8);
- 		bt_len = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		if (unlikely(have_dif_prot)) {
- 			if (sdebug_dif == T10_PI_TYPE2_PROTECTION &&
- 			    wrprotect) {
-@@ -4203,7 +4219,7 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 			}
- 		}
- 
--		ret = do_device_access(sip, scp, sg_off, lba, num, true);
-+		ret = do_device_access(sip, scp, sg_off, lba, num, true, group);
- 		/* If ZBC zone then bump its write pointer */
- 		if (sdebug_dev_is_zoned(devip))
- 			zbc_inc_wp(devip, lba, num);
-@@ -7298,6 +7314,30 @@ static ssize_t tur_ms_to_ready_show(struct device_driver *ddp, char *buf)
- }
- static DRIVER_ATTR_RO(tur_ms_to_ready);
- 
-+static ssize_t group_number_stats_show(struct device_driver *ddp, char *buf)
++	  If unsure, answer N.
+diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+new file mode 100644
+index 000000000000..f7a80d0f18f8
+--- /dev/null
++++ b/security/ipe/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (C) Microsoft Corporation. All rights reserved.
++#
++# Makefile for building the IPE module as part of the kernel tree.
++#
++
++obj-$(CONFIG_SECURITY_IPE) += \
++	ipe.o \
+diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+new file mode 100644
+index 000000000000..b013aed15e73
+--- /dev/null
++++ b/security/ipe/ipe.c
+@@ -0,0 +1,41 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++#include <uapi/linux/lsm.h>
++
++#include "ipe.h"
++
++static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
++};
++
++static const struct lsm_id ipe_lsmid = {
++	.name = "ipe",
++	.id = LSM_ID_IPE,
++};
++
++static struct security_hook_list ipe_hooks[] __ro_after_init = {
++};
++
++/**
++ * ipe_init - Entry point of IPE.
++ *
++ * This is called at LSM init, which happens occurs early during kernel
++ * start up. During this phase, IPE registers its hooks and loads the
++ * builtin boot policy.
++ * Return:
++ * * 0		- OK
++ * * -ENOMEM	- Out of memory
++ */
++static int __init ipe_init(void)
 +{
-+	char *p = buf, *end = buf + PAGE_SIZE;
-+	int i;
++	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), &ipe_lsmid);
 +
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		p += scnprintf(p, end - p, "%d %ld\n", i,
-+			       atomic_long_read(&writes_by_group_number[i]));
-+
-+	return p - buf;
++	return 0;
 +}
 +
-+static ssize_t group_number_stats_store(struct device_driver *ddp,
-+					const char *buf, size_t count)
-+{
-+	int i;
++DEFINE_LSM(ipe) = {
++	.name = "ipe",
++	.init = ipe_init,
++	.blobs = &ipe_blobs,
++};
+diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
+new file mode 100644
+index 000000000000..a1c68d0fc2e0
+--- /dev/null
++++ b/security/ipe/ipe.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
 +
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		atomic_long_set(&writes_by_group_number[i], 0);
++#ifndef _IPE_H
++#define _IPE_H
 +
-+	return count;
-+}
-+static DRIVER_ATTR_RW(group_number_stats);
++#ifdef pr_fmt
++#undef pr_fmt
++#endif
++#define pr_fmt(fmt) "IPE: " fmt
 +
- /* Note: The following array creates attribute files in the
-    /sys/bus/pseudo/drivers/scsi_debug directory. The advantage of these
-    files (over those found in the /sys/module/scsi_debug/parameters
-@@ -7344,6 +7384,7 @@ static struct attribute *sdebug_drv_attrs[] = {
- 	&driver_attr_cdb_len.attr,
- 	&driver_attr_tur_ms_to_ready.attr,
- 	&driver_attr_zbc.attr,
-+	&driver_attr_group_number_stats.attr,
- 	NULL,
- };
- ATTRIBUTE_GROUPS(sdebug_drv);
++#include <linux/lsm_hooks.h>
++
++#endif /* _IPE_H */
+diff --git a/security/security.c b/security/security.c
+index 0144a98d3712..ddf2e69cf8f2 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -50,7 +50,8 @@
+ 	(IS_ENABLED(CONFIG_SECURITY_SAFESETID) ? 1 : 0) + \
+ 	(IS_ENABLED(CONFIG_SECURITY_LOCKDOWN_LSM) ? 1 : 0) + \
+ 	(IS_ENABLED(CONFIG_BPF_LSM) ? 1 : 0) + \
+-	(IS_ENABLED(CONFIG_SECURITY_LANDLOCK) ? 1 : 0))
++	(IS_ENABLED(CONFIG_SECURITY_LANDLOCK) ? 1 : 0) + \
++	(IS_ENABLED(CONFIG_SECURITY_IPE) ? 1 : 0))
+ 
+ /*
+  * These are descriptions of the reasons that can be passed to the
+-- 
+2.43.0
+
