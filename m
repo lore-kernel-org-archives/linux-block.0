@@ -1,33 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C090B56B9E;
-	Tue, 30 Jan 2024 09:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D4560EDB
+	for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 10:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706606275; cv=none; b=uIUPV5eINQlQ69RvdH5PSj1jmB2Yra42Yjn6msxn7WrQJzRlVyMStBrTc7ylqzHF8kwMiEj3UUO9//i0H8L5c4Pwp9z9f6avGXw8cqLRHmp6cDSvk+8YnMbtUYJugsCNj/ZMv8AVqmO3cpZUzXKnpIjJ52eLiwFqXCrE2xoSH4o=
+	t=1706611409; cv=none; b=WD3/A6TA7mah9hXKaaDEU0mc0TgzqDb/wk1W/PD7GhmT4voLlnt1ZcLBh861L7CXd9quKD3RYCICM3b8DX4hNrSIaLumAs5Ok/9HjIwSwuDVYJ/8b2FV0VphDDRl4dhuN/Wo0ESQeDL+WwR+sSOaaCIWTjokJ3BBM46Oo6hNkIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706606275; c=relaxed/simple;
-	bh=o5o7p/UCx3XB1t0QRp4KktVXT9ivgdBfuDago6NCk+U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=I0BGSEfgoXanpggI6k5ffgtiJpt7OZ5geExLHI1rOoSA2vLS6B+jTqSk0GN3UD/crZJqNgomxrR6Ija+YnclyifmmgzzJXunq/XHccigw6JgOn3KeoFUvcUiV8mEiNhRvzEpOELljIuxf572NR6HnTcc91y9SokXki8Jh74LNHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BwU9RxYj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706611409; c=relaxed/simple;
+	bh=owkU35HiBe4EUW9bL/iY9553g7P8YyHRpTmmFYvFxTA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aM3fzjLX+U5Ax7S6dDE5a4E4sX8M2E2W+DbMSDsilfLNzbWrIvkXrZuWRbDklL1H799esqcJdqIHg24l3KlOJyl50Ks+8JZu0ZM5F61ktmGE0jOGiPvcM78TcHvSjgQ2BPF0pyPZhUZlCHI+NUzzWx1lKk6tVW0PDijk1Iu/0bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JbsS9ZAN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BwU9RxYj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C16B7C433C7;
-	Tue, 30 Jan 2024 09:17:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706606275;
-	bh=o5o7p/UCx3XB1t0QRp4KktVXT9ivgdBfuDago6NCk+U=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=BwU9RxYj6vMt9AlMZuI7or6bmdUH4QEAVH/SLMuIYmKr+9kh1QGulgItIz8yBlCqs
-	 GTWgwy+/EQw5Z+i8z+6EFDYK7IFVS1ZXCwDUww6FItZ+c8hJ7gZY+XuDwgxwkAi+02
-	 bAe0J1QSoT2jknF6NMnObFB68faWzQTvhqZtPnaPYAvgqVuzv+CZJeLeoUwMxyXswY
-	 gwoTm/2UP93TkzRXlzuK14atd8pxJ3thzSt3a08jIgUs618KxvZ+ehcom4xC9jKB3R
-	 kGGczQCxn/KFDVBLx6Kp+MfcKXQJkhvUP3MlpnzEhAZ0kzj/irE7q9bXsc35LMU6ho
-	 P8uA975OBjCLw==
-Message-ID: <aa307901-d20a-4301-8774-97287d7192e9@kernel.org>
-Date: Tue, 30 Jan 2024 18:17:51 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbsS9ZAN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706611406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2HONVDKuSZ2w2l05+cN156w2V56GzzGmZ9dXonpaH9I=;
+	b=JbsS9ZANWadul27lgkJdXIZ8mnwUbHiVB3maQCo4ChmFj2VI7b+6umJ1epgFYrRPCWKMaH
+	NtdyZLx0OENAuezVxmzIfNJVZ5jOdhVpaSpfIwOKdUoQ0DyoTekXiyXo52V0434aJM2qy6
+	Dd9+oW18hbBq4LVbIwGDFKK3gvDewg4=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-187-mv_-oZ3ANBi16YV2D1ulig-1; Tue, 30 Jan 2024 05:43:25 -0500
+X-MC-Unique: mv_-oZ3ANBi16YV2D1ulig-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5110bf1635eso1703780e87.0
+        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2024 02:43:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706611403; x=1707216203;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2HONVDKuSZ2w2l05+cN156w2V56GzzGmZ9dXonpaH9I=;
+        b=CIdAPCvTurm6x8eZvp+NebmbjqB/NFcNHJk34k3FQAYLCs0+JP6kgN6GFNEO6ocxWL
+         R1dSjnOhE548/PNcYsaHJvofDapEsc6sUSGFHAlb2h68ENrgx28JCWcOrzDQ7f9yosjI
+         MPsjiuXJIRxRBE6SR2114v6Ut8tmgPa/nYLUJV0/wRBxAQUeQfCO2+/7WdVAP6DOp5Xs
+         7ha+yEZjfpCo685QQaaW0NNDVY/XdS8Q1I6Vb5xfdaAp/qU+2vFdOvHg/aQCKmaKcvw+
+         n01DVVIM7HFGgccCr24ECTGunli8EYlmUZLM/N5Dkep3Pc4fBIIGOxytcjD/iYC1JGPE
+         1Abg==
+X-Gm-Message-State: AOJu0YxznzM/K7mj2dZ9WABBdFGUqXS556FZPRsBupBJGtssiUl0MGyS
+	okoOhfIb6ukQn7GeNYkE+IRR8yn2JwF3Qtm4xI172M97WhGg5jdgH+rZzE1mVPwX8+N/6CqBCAt
+	Al2dl425nfWStAMtn3uby/Wvt7BDloKGM6suB+0lcTwPai8Kp42ZrZ60c6hnDURaMDdP9
+X-Received: by 2002:a05:6512:2209:b0:50e:4098:3798 with SMTP id h9-20020a056512220900b0050e40983798mr6360909lfu.60.1706611403673;
+        Tue, 30 Jan 2024 02:43:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG0hoFT/mbW3gfNLOSpHj4kn6LMJFHpVVvm57xwFbQxEZ1sjrCGkbHqCeqLjjgjqBok32zPQw==
+X-Received: by 2002:a05:6512:2209:b0:50e:4098:3798 with SMTP id h9-20020a056512220900b0050e40983798mr6360892lfu.60.1706611403250;
+        Tue, 30 Jan 2024 02:43:23 -0800 (PST)
+Received: from ?IPV6:2003:cb:c708:2700:bdf6:739b:9f9d:862f? (p200300cbc7082700bdf6739b9f9d862f.dip0.t-ipconnect.de. [2003:cb:c708:2700:bdf6:739b:9f9d:862f])
+        by smtp.gmail.com with ESMTPSA id b16-20020a05600c4e1000b0040fafc8bb3asm204081wmq.9.2024.01.30.02.43.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jan 2024 02:43:22 -0800 (PST)
+Message-ID: <a754add2-de29-4c91-b4f4-cbd7eb888cb6@redhat.com>
+Date: Tue, 30 Jan 2024 11:43:21 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,293 +67,138 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv5 1/1] block: introduce content activity based ioprio
+Subject: Re: [RFC PATCH] mm/readahead: readahead aggressively if read drops in
+ willneed range
 Content-Language: en-US
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
- Matthew Wilcox <willy@infradead.org>, Yu Zhao <yuzhao@google.com>,
- Niklas Cassel <niklas.cassel@wdc.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Hannes Reinecke <hare@suse.de>, Linus Walleij <linus.walleij@linaro.org>,
- linux-mm@kvack.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- Zhaoyang Huang <huangzhaoyang@gmail.com>, steve.kang@unisoc.com
-References: <20240130084207.3760518-1-zhaoyang.huang@unisoc.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20240130084207.3760518-1-zhaoyang.huang@unisoc.com>
-Content-Type: text/plain; charset=UTF-8
+To: Mike Snitzer <snitzer@kernel.org>, Dave Chinner <david@fromorbit.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Don Dutile <ddutile@redhat.com>,
+ Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org
+References: <ZbenbtEXY82N6tHt@casper.infradead.org>
+ <Zbc0ZJceZPyt8m7q@dread.disaster.area>
+ <20240128142522.1524741-1-ming.lei@redhat.com> <ZbfeBrKVMaeSwtYm@redhat.com>
+ <Zbgi6wajZlEkWISO@dread.disaster.area> <Zbgq3B8nmMuJooEl@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <Zbgq3B8nmMuJooEl@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/30/24 17:42, zhaoyang.huang wrote:
-> From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+On 29.01.24 23:46, Mike Snitzer wrote:
+> On Mon, Jan 29 2024 at  5:12P -0500,
+> Dave Chinner <david@fromorbit.com> wrote:
 > 
-> Currently, request's ioprio are set via task's schedule priority(when no
-> blkcg configured), which has high priority tasks possess the privilege on
-> both of CPU and IO scheduling.
-> This commit works as a hint of original policy by promoting the request ioprio
-> based on the page/folio's activity. The original idea comes from LRU_GEN
-> which provides more precised folio activity than before. This commit try
-> to adjust the request's ioprio when certain part of its folios are hot,
-> which indicate that this request carry important contents and need be
-> scheduled ealier.
+>> On Mon, Jan 29, 2024 at 12:19:02PM -0500, Mike Snitzer wrote:
+>>> While I'm sure this legacy application would love to not have to
+>>> change its code at all, I think we can all agree that we need to just
+>>> focus on how best to advise applications that have mixed workloads
+>>> accomplish efficient mmap+read of both sequential and random.
+>>>
+>>> To that end, I heard Dave clearly suggest 2 things:
+>>>
+>>> 1) update MADV/FADV_SEQUENTIAL to set file->f_ra.ra_pages to
+>>>     bdi->io_pages, not bdi->ra_pages * 2
+>>>
+>>> 2) Have the application first issue MADV_SEQUENTIAL to convey that for
+>>>     the following MADV_WILLNEED is for sequential file load (so it is
+>>>     desirable to use larger ra_pages)
+>>>
+>>> This overrides the default of bdi->ra_pages and _should_ provide the
+>>> required per-file duality of control for readahead, correct?
+>>
+>> I just discovered MADV_POPULATE_READ - see my reply to Ming
+>> up-thread about that. The applicaiton should use that instead of
+>> MADV_WILLNEED because it gives cache population guarantees that
+>> WILLNEED doesn't. Then we can look at optimising the performance of
+>> MADV_POPULATE_READ (if needed) as there is constrained scope we can
+>> optimise within in ways that we cannot do with WILLNEED.
 > 
-> This commit is verified on a v6.6 6GB RAM android14 system via 4 test cases
-> by changing the bio_add_page/folio API in erofs, ext4 and f2fs in
-> another commit.
-> 
-> Case 1:
-> script[a] which get significant improved fault time as expected[b]
-> where dd's cost also shrink from 55s to 40s.
-> (1). fault_latency.bin is an ebpf based test tool which measure all task's
->    iowait latency during page fault when scheduled out/in.
-> (2). costmem generate page fault by mmaping a file and access the VA.
-> (3). dd generate concurrent vfs io.
-> 
-> [a]
-> ./fault_latency.bin 1 5 > /data/dd_costmem &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> dd if=/dev/block/sda of=/data/ddtest bs=1024 count=2048000 &
-> dd if=/dev/block/sda of=/data/ddtest1 bs=1024 count=2048000 &
-> dd if=/dev/block/sda of=/data/ddtest2 bs=1024 count=2048000 &
-> dd if=/dev/block/sda of=/data/ddtest3 bs=1024 count=2048000
-> [b]
->                        mainline		commit
-> io wait                836us            156us
-> 
-> Case 2:
-> fio -filename=/dev/block/by-name/userdata -rw=randread -direct=0 -bs=4k -size=2000M -numjobs=8 -group_reporting -name=mytest
-> mainline: 513MiB/s
-> READ: bw=531MiB/s (557MB/s), 531MiB/s-531MiB/s (557MB/s-557MB/s), io=15.6GiB (16.8GB), run=30137-30137msec
-> READ: bw=543MiB/s (569MB/s), 543MiB/s-543MiB/s (569MB/s-569MB/s), io=15.6GiB (16.8GB), run=29469-29469msec
-> READ: bw=474MiB/s (497MB/s), 474MiB/s-474MiB/s (497MB/s-497MB/s), io=15.6GiB (16.8GB), run=33724-33724msec
-> READ: bw=535MiB/s (561MB/s), 535MiB/s-535MiB/s (561MB/s-561MB/s), io=15.6GiB (16.8GB), run=29928-29928msec
-> READ: bw=523MiB/s (548MB/s), 523MiB/s-523MiB/s (548MB/s-548MB/s), io=15.6GiB (16.8GB), run=30617-30617msec
-> READ: bw=492MiB/s (516MB/s), 492MiB/s-492MiB/s (516MB/s-516MB/s), io=15.6GiB (16.8GB), run=32518-32518msec
-> READ: bw=533MiB/s (559MB/s), 533MiB/s-533MiB/s (559MB/s-559MB/s), io=15.6GiB (16.8GB), run=29993-29993msec
-> READ: bw=524MiB/s (550MB/s), 524MiB/s-524MiB/s (550MB/s-550MB/s), io=15.6GiB (16.8GB), run=30526-30526msec
-> READ: bw=529MiB/s (554MB/s), 529MiB/s-529MiB/s (554MB/s-554MB/s), io=15.6GiB (16.8GB), run=30269-30269msec
-> READ: bw=449MiB/s (471MB/s), 449MiB/s-449MiB/s (471MB/s-471MB/s), io=15.6GiB (16.8GB), run=35629-35629msec
-> 
-> commit: 633MiB/s
-> READ: bw=668MiB/s (700MB/s), 668MiB/s-668MiB/s (700MB/s-700MB/s), io=15.6GiB (16.8GB), run=23952-23952msec
-> READ: bw=589MiB/s (618MB/s), 589MiB/s-589MiB/s (618MB/s-618MB/s), io=15.6GiB (16.8GB), run=27164-27164msec
-> READ: bw=638MiB/s (669MB/s), 638MiB/s-638MiB/s (669MB/s-669MB/s), io=15.6GiB (16.8GB), run=25071-25071msec
-> READ: bw=714MiB/s (749MB/s), 714MiB/s-714MiB/s (749MB/s-749MB/s), io=15.6GiB (16.8GB), run=22409-22409msec
-> READ: bw=600MiB/s (629MB/s), 600MiB/s-600MiB/s (629MB/s-629MB/s), io=15.6GiB (16.8GB), run=26669-26669msec
-> READ: bw=592MiB/s (621MB/s), 592MiB/s-592MiB/s (621MB/s-621MB/s), io=15.6GiB (16.8GB), run=27036-27036msec
-> READ: bw=691MiB/s (725MB/s), 691MiB/s-691MiB/s (725MB/s-725MB/s), io=15.6GiB (16.8GB), run=23150-23150msec
-> READ: bw=569MiB/s (596MB/s), 569MiB/s-569MiB/s (596MB/s-596MB/s), io=15.6GiB (16.8GB), run=28142-28142msec
-> READ: bw=563MiB/s (590MB/s), 563MiB/s-563MiB/s (590MB/s-590MB/s), io=15.6GiB (16.8GB), run=28429-28429msec
-> READ: bw=712MiB/s (746MB/s), 712MiB/s-712MiB/s (746MB/s-746MB/s), io=15.6GiB (16.8GB), run=22478-22478msec
-> 
-> Case 3:
-> This commit is also verified by the case of launching camera APP which is
-> usually considered as heavy working load on both of memory and IO, which
-> shows 12%-24% improvement.
-> 
-> 		ttl = 0		ttl = 50	ttl = 100
-> mainline        2267ms		2420ms		2316ms
-> commit          1992ms          1806ms          1998ms
-> 
-> case 4:
-> androbench has no improvment as well as regression which supposed to be
-> its test time is short which MGLRU hasn't take effect yet.
-> 
-> Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
-> ---
-> change of v2: calculate page's activity via helper function
-> change of v3: solve layer violation by move API into mm
-> change of v4: keep block clean by removing the page related API
-> change of v5: introduce the macros of bio_add_folio/page for read dir.
-> ---
-> ---
->  include/linux/act_ioprio.h  | 60 +++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/ioprio.h | 38 +++++++++++++++++++++++
->  mm/Kconfig                  |  8 +++++
->  3 files changed, 106 insertions(+)
->  create mode 100644 include/linux/act_ioprio.h
-> 
-> diff --git a/include/linux/act_ioprio.h b/include/linux/act_ioprio.h
-> new file mode 100644
-> index 000000000000..ca7309b85758
-> --- /dev/null
-> +++ b/include/linux/act_ioprio.h
-> @@ -0,0 +1,60 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +#ifndef _ACT_IOPRIO_H
-> +#define _ACT_IOPRIO_H
-> +
-> +#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-> +#include <linux/bio.h>
-> +
-> +static __maybe_unused
-> +bool act_bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
-> +		size_t off)
-> +{
-> +	int class, level, hint, activity;
-> +	bool ret;
-> +
-> +	ret = bio_add_folio(bio, folio, len, off);
-> +	if (bio_op(bio) == REQ_OP_READ && ret) {
-> +		class = IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +		level = IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +		hint = IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +		activity = IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-> +		activity += (activity < IOPRIO_NR_ACTIVITY &&
-> +				folio_test_workingset(folio)) ? 1 : 0;
-> +		if (activity >= bio->bi_vcnt / 2)
-> +			class = IOPRIO_CLASS_RT;
-> +		else if (activity >= bio->bi_vcnt / 4)
-> +			class = max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IOPRIO_CLASS_BE);
-> +		activity = min(IOPRIO_NR_ACTIVITY - 1, activity);
-> +		bio->bi_ioprio = IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint, activity);
-> +	}
-> +	return ret;
-> +}
+> Nice find! Given commit 4ca9b3859dac ("mm/madvise: introduce
+> MADV_POPULATE_(READ|WRITE) to prefault page tables"), I've cc'd David
+> Hildenbrand just so he's in the loop.
 
-Big non-inline functions in a header file... That is unusual, to say the least.
-So every FS that includes this will get its own copy of the binary for these
-functions. That is not exactly optimal.
+Thanks for CCing me.
 
-> +
-> +static __maybe_unused
-> +int act_bio_add_page(struct bio *bio, struct page *page,
-> +		unsigned int len, unsigned int offset)
-> +{
-> +	int class, level, hint, activity;
-> +	int ret = 0;
-> +
-> +	ret = bio_add_page(bio, page, len, offset);
-> +	if (bio_op(bio) == REQ_OP_READ && ret > 0) {
-> +		class = IOPRIO_PRIO_CLASS(bio->bi_ioprio);
-> +		level = IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +		hint = IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +		activity = IOPRIO_PRIO_ACTIVITY(bio->bi_ioprio);
-> +		activity += (activity < IOPRIO_NR_ACTIVITY &&
-> +				PageWorkingset(page)) ? 1 : 0;
-> +		if (activity >= bio->bi_vcnt / 2)
-> +			class = IOPRIO_CLASS_RT;
-> +		else if (activity >= bio->bi_vcnt / 4)
-> +			class = max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IOPRIO_CLASS_BE);
-> +		activity = min(IOPRIO_NR_ACTIVITY - 1, activity);
-> +		bio->bi_ioprio = IOPRIO_PRIO_VALUE_ACTIVITY(class, level, hint, activity);
-> +	}
-> +	return ret;
-> +}
-> +#define bio_add_folio(bio, folio, len, off)     act_bio_add_folio(bio, folio, len, off)
-> +#define bio_add_page(bio, page, len, offset)    act_bio_add_page(bio, page, len, offset)
+MADV_POPULATE_READ is indeed different; it doesn't give hints (not 
+"might be a good idea to read some pages" like MADV_WILLNEED documents), 
+it forces swapin/read/.../.
 
-These functions are *NOT* part of the block layer. So please do not pretend they
-are. Why don't you simply write a function equivalent to what you have inside
-the "if" above and have the FS call that after bio_add_Page() ?
+In a sense, MADV_POPULATE_READ is similar to simply reading one byte 
+from each PTE, triggering page faults. However, without actually reading 
+from the target pages.
 
-And I seriously doubt that all compilers will be happy with these macro names
-clashing with real function names...
+MADV_POPULATE_READ has a conceptual benefit: we know exactly how much 
+memory user space wants to have populated (which range). In contrast, 
+page faults contain no such hints and we have to guess based on 
+historical behavior. One could use that range information to *not* do 
+any faultaround/readahead when we come via MADV_POPULATE_READ, and 
+really only popoulate the range of interest.
 
-> +#endif
-> +#endif
-> diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-> index bee2bdb0eedb..64cf5ff0ac5f 100644
-> --- a/include/uapi/linux/ioprio.h
-> +++ b/include/uapi/linux/ioprio.h
-> @@ -71,12 +71,24 @@ enum {
->   * class and level.
->   */
->  #define IOPRIO_HINT_SHIFT		IOPRIO_LEVEL_NR_BITS
-> +#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-> +#define IOPRIO_HINT_NR_BITS		3
-> +#else
->  #define IOPRIO_HINT_NR_BITS		10
-> +#endif
->  #define IOPRIO_NR_HINTS			(1 << IOPRIO_HINT_NR_BITS)
->  #define IOPRIO_HINT_MASK		(IOPRIO_NR_HINTS - 1)
->  #define IOPRIO_PRIO_HINT(ioprio)	\
->  	(((ioprio) >> IOPRIO_HINT_SHIFT) & IOPRIO_HINT_MASK)
->  
-> +#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
-> +#define IOPRIO_ACTIVITY_SHIFT		(IOPRIO_HINT_NR_BITS + IOPRIO_LEVEL_NR_BITS)
-> +#define IOPRIO_ACTIVITY_NR_BITS		7
+Further, one can use that range information to allocate larger folios, 
+without having to guess where placement of a large folio is reasonable, 
+and which size we should use.
 
-I already told you that taking all the free hint bits for yourself, leaving no
-room fo future IO hints, is not nice. Do you really need 7 bits for your thing ?
-Why does the activity even need to be part of the IO priority ? From the rather
-short explanation in the commit message, it seems that activity should simply
-raise the priority (either class or level or both). I do not see why that
-activity number needs to be in the ioprio. Who in the kernel will look at it ?
-IO scheduler ? the storage device ?
+> 
+> FYI, I proactively raised feedback and questions to the reporter of
+> this issue:
+>   
+> CONTEXT: madvise(WILLNEED) doesn't convey the nature of the access,
+> sequential vs random, just the range that may be accessed.
 
-> +#define IOPRIO_NR_ACTIVITY		(1 << IOPRIO_ACTIVITY_NR_BITS)
-> +#define IOPRIO_ACTIVITY_MASK		(IOPRIO_NR_ACTIVITY - 1)
-> +#define IOPRIO_PRIO_ACTIVITY(ioprio)	\
-> +	(((ioprio) >> IOPRIO_ACTIVITY_SHIFT) & IOPRIO_ACTIVITY_MASK)
-> +#endif
->  /*
->   * I/O hints.
->   */
-> @@ -104,6 +116,7 @@ enum {
->  
->  #define IOPRIO_BAD_VALUE(val, max) ((val) < 0 || (val) >= (max))
->  
-> +#ifndef CONFIG_CONTENT_ACT_BASED_IOPRIO
->  /*
->   * Return an I/O priority value based on a class, a level and a hint.
->   */
-> @@ -123,5 +136,30 @@ static __always_inline __u16 ioprio_value(int prioclass, int priolevel,
->  	ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE)
->  #define IOPRIO_PRIO_VALUE_HINT(prioclass, priolevel, priohint)	\
->  	ioprio_value(prioclass, priolevel, priohint)
-> +#else
-> +/*
-> + * Return an I/O priority value based on a class, a level, a hint and
-> + * content's activities
-> + */
-> +static __always_inline __u16 ioprio_value(int prioclass, int priolevel,
-> +		int priohint, int activity)
-> +{
-> +	if (IOPRIO_BAD_VALUE(prioclass, IOPRIO_NR_CLASSES) ||
-> +			IOPRIO_BAD_VALUE(priolevel, IOPRIO_NR_LEVELS) ||
-> +			IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS) ||
-> +			IOPRIO_BAD_VALUE(activity, IOPRIO_NR_ACTIVITY))
-> +		return IOPRIO_CLASS_INVALID << IOPRIO_CLASS_SHIFT;
->  
-> +	return (prioclass << IOPRIO_CLASS_SHIFT) |
-> +		(activity << IOPRIO_ACTIVITY_SHIFT) |
-> +		(priohint << IOPRIO_HINT_SHIFT) | priolevel;
-> +}
-> +
-> +#define IOPRIO_PRIO_VALUE(prioclass, priolevel)			\
-> +	ioprio_value(prioclass, priolevel, IOPRIO_HINT_NONE, 0)
-> +#define IOPRIO_PRIO_VALUE_HINT(prioclass, priolevel, priohint)	\
-> +	ioprio_value(prioclass, priolevel, priohint, 0)
-> +#define IOPRIO_PRIO_VALUE_ACTIVITY(prioclass, priolevel, priohint, activity)	\
-> +	ioprio_value(prioclass, priolevel, priohint, activity)
-> +#endif
->  #endif /* _UAPI_LINUX_IOPRIO_H */
-> diff --git a/mm/Kconfig b/mm/Kconfig
-> index 264a2df5ecf5..e0e5a5a44ded 100644
-> --- a/mm/Kconfig
-> +++ b/mm/Kconfig
-> @@ -1240,6 +1240,14 @@ config LRU_GEN_STATS
->  	  from evicted generations for debugging purpose.
->  
->  	  This option has a per-memcg and per-node memory overhead.
-> +
-> +config CONTENT_ACT_BASED_IOPRIO
-> +	bool "Enable content activity based ioprio"
-> +	depends on LRU_GEN
-> +	default n
-> +	help
-> +	  This item enable the feature of adjust bio's priority by
-> +	  calculating its content's activity.
->  # }
->  
->  config ARCH_SUPPORTS_PER_VMA_LOCK
+Indeed. The "problem" with MADV_SEQUENTIAL/MADV_RANDOM is that it will 
+fragment/split VMAs. So applying it to smaller chunks (like one would do 
+with MADV_WILLNEED) is likely not a good option.
 
 -- 
-Damien Le Moal
-Western Digital Research
+Cheers,
+
+David / dhildenb
 
