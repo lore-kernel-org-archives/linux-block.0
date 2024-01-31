@@ -1,181 +1,214 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5F969D33;
-	Wed, 31 Jan 2024 10:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6EA6EB66;
+	Wed, 31 Jan 2024 11:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706698144; cv=none; b=Gz8nh1etyQD6QOJrumU1II9UIuFkCzUu2lW4KnskaBSKLuhOgE4WXashn2/zNM3hKkB2u1eM201uTPj5hjIB9bptAmI44j1s+XUip63qwe7q4LOUntQE537sNh/8UFjYgD5MRBECQQiLuYclHRdY11JAkgmY+SVVeEWBaX/k95g=
+	t=1706698949; cv=none; b=h5qGujd2l9uDxXfi0VVfvsZ6GfNRe18EHQ+bvedG2SqRXPRropQmAen+ywMJAhdPiM8/QIEzA/TtF+0gkD4Ipy3d8ACAol/sg77WY6lEdPbYA4bZcugBqTIJXODCIp8s3zjF7SYU+I19F1Kv6XtUFS+ywQuHF/fsAZ+7t00FjdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706698144; c=relaxed/simple;
-	bh=ZS7DCNrK4MeeDcEInBcRCtWRMAYhbBhA2JBsyyckf5w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nyPABVnIsnjC0b4BQR4lpfFXBOm4Ui0dutRMr1uQpOT21NgWc03er97eU6GPKBZH6lCC2gHjCJQ3vtc7F0KxBULZNiUfETT4IE/UPB3X2gzwre0QfM/wPoEXWC+nm0lHrqjITpSkLT8qe3oml7LkSM8/sl05OEHsURPyJsnoAuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 59443DA7;
-	Wed, 31 Jan 2024 02:49:45 -0800 (PST)
-Received: from [10.57.88.75] (unknown [10.57.88.75])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16D293F762;
-	Wed, 31 Jan 2024 02:48:59 -0800 (PST)
-Message-ID: <01234ac0-f96d-4a18-8dfa-557020818215@arm.com>
-Date: Wed, 31 Jan 2024 10:48:52 +0000
+	s=arc-20240116; t=1706698949; c=relaxed/simple;
+	bh=GwdHJedowxMYfa/OQlb6Jxhq7XuL1egOIohA03EK7FY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bvBhENWNsaiFRxdVXMuQv4B6gvwo6MuNxwG0pgGvrHtmC8GY1o5hHCULx55jnJ4ePHx5wlVMDwnHx8beEgBymcSe0FHvoNcTvuSxkfbS+HqhzjpDnrrlD8oRy442lz9sEaVl53SDutKLsrRQaAWcpLswxXKYom1SknHBWMKSTc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 40VAxH5X019223;
+	Wed, 31 Jan 2024 18:59:17 +0800 (+08)
+	(envelope-from zhaoyang.huang@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4TPzP76bvWz2Shwd6;
+	Wed, 31 Jan 2024 18:51:39 +0800 (CST)
+Received: from bj03382pcu01.spreadtrum.com (10.0.73.40) by
+ BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Wed, 31 Jan 2024 18:59:14 +0800
+From: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+To: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>, Yu Zhao <yuzhao@google.com>,
+        Damien Le
+ Moal <dlemoal@kernel.org>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        "Martin K .
+ Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Linus
+ Walleij <linus.walleij@linaro.org>, <linux-mm@kvack.org>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Zhaoyang Huang <huangzhaoyang@gmail.com>, <steve.kang@unisoc.com>
+Subject: [PATCHv6 1/1] block: introduce content activity based ioprio
+Date: Wed, 31 Jan 2024 18:59:12 +0800
+Message-ID: <20240131105912.3849767-1-zhaoyang.huang@unisoc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [mainline] [linux-next] [6.8-rc1] [FC] [DLPAR] OOps kernel crash
- after performing dlpar remove test
-To: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Cc: iommu@lists.linux.dev, will@kernel.org, joro@8bytes.org,
- "sachinp@linux.vnet.com" <sachinp@linux.vnet.com>,
- "abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>,
- "mputtash@linux.vnet.com" <mputtash@linux.vnet.com>
-References: <b7e18415-c04d-412e-8129-22a144d736b9@linux.vnet.ibm.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <b7e18415-c04d-412e-8129-22a144d736b9@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX01.spreadtrum.com (10.0.64.7)
+X-MAIL:SHSQR01.spreadtrum.com 40VAxH5X019223
 
-On 2024-01-31 9:19 am, Tasmiya Nalatwad wrote:
-> Greetings,
-> 
-> [mainline] [linux-next] [6.8-rc1] [DLPAR] OOps kernel crash after 
-> performing dlpar remove test
-> 
-> --- Traces ---
-> 
-> [58563.146236] BUG: Unable to handle kernel data access at 
-> 0x6b6b6b6b6b6b6b83
-> [58563.146242] Faulting instruction address: 0xc0000000009c0e60
-> [58563.146248] Oops: Kernel access of bad area, sig: 11 [#1]
-> [58563.146252] LE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=8192 NUMA pSeries
-> [58563.146258] Modules linked in: isofs cdrom dm_snapshot dm_bufio 
-> dm_round_robin dm_queue_length exfat vfat fat btrfs blake2b_generic xor 
-> raid6_pq zstd_compress loop xfs libcrc32c raid0 nvram rpadlpar_io rpaphp 
-> nfnetlink xsk_diag bonding tls rfkill sunrpc dm_service_time 
-> dm_multipath dm_mod pseries_rng vmx_crypto binfmt_misc ext4 mbcache jbd2 
-> sd_mod sg ibmvscsi scsi_transport_srp ibmveth lpfc nvmet_fc nvmet 
-> nvme_fc nvme_fabrics nvme_core t10_pi crc64_rocksoft crc64 
-> scsi_transport_fc fuse
-> [58563.146326] CPU: 0 PID: 1071247 Comm: drmgr Kdump: loaded Not tainted 
-> 6.8.0-rc1-auto-gecb1b8288dc7 #1
-> [58563.146332] Hardware name: IBM,9009-42A POWER9 (raw) 0x4e0202 
-> 0xf000005 of:IBM,FW950.A0 (VL950_141) hv:phyp pSeries
-> [58563.146337] NIP:  c0000000009c0e60 LR: c0000000009c0e28 CTR: 
-> c0000000009c1584
-> [58563.146342] REGS: c00000007960f260 TRAP: 0380   Not tainted 
-> (6.8.0-rc1-auto-gecb1b8288dc7)
-> [58563.146347] MSR:  8000000000009033 <SF,EE,ME,IR,DR,RI,LE>  CR: 
-> 24822424  XER: 20040006
-> [58563.146360] CFAR: c0000000009c0e74 IRQMASK: 0
-> [58563.146360] GPR00: c0000000009c0e28 c00000007960f500 c000000001482600 
-> c000000003050540
-> [58563.146360] GPR04: 0000000000000000 c00000089a6870c0 0000000000000001 
-> fffffffffffe0000
-> [58563.146360] GPR08: c000000002bac020 6b6b6b6b6b6b6b6b 6b6b6b6b6b6b6b6b 
-> 0000000000000220
-> [58563.146360] GPR12: 0000000000002000 c000000003080000 0000000000000000 
-> 0000000000000000
-> [58563.146360] GPR16: 0000000000000000 0000000000000000 0000000000000000 
-> 0000000000000001
-> [58563.146360] GPR20: c000000001281478 0000000000000000 c000000001281490 
-> c000000002bfed80
-> [58563.146360] GPR24: c00000089a6870c0 0000000000000000 0000000000000000 
-> c000000002b9ffb8
-> [58563.146360] GPR28: 0000000000000000 c000000002bac0e8 0000000000000000 
-> 0000000000000000
-> [58563.146421] NIP [c0000000009c0e60] iommu_ops_from_fwnode+0x68/0x118
-> [58563.146430] LR [c0000000009c0e28] iommu_ops_from_fwnode+0x30/0x118
+From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
 
-This implies that iommu_device_list has become corrupted. Looks like 
-spapr_tce_setup_phb_iommus_initcall() registers an iommu_device which 
-pcibios_free_controller() could free if a PCI controller is removed, but 
-there's no path anywhere to ever unregister any of those IOMMUs. 
-Presumably this also means that is a PCI controller is dynamically added 
-after init, its IOMMU won't be set up properly either.
+Currently, request's ioprio are set via task's schedule priority(when no
+blkcg configured), which has high priority tasks possess the privilege on
+both of CPU and IO scheduling.
+This commit works as a hint of original policy by promoting the request ioprio
+based on the page/folio's activity. The original idea comes from LRU_GEN
+which provides more precised folio activity than before. This commit try
+to adjust the request's ioprio when certain part of its folios are hot,
+which indicate that this request carry important contents and need be
+scheduled ealier.
 
-Thanks,
-Robin.
+This commit just provide the mechanism(a subsitution maro) which need to
+be replaced by each fs for the file page's bio while keep others use the
+legacy one.
 
-> [58563.146437] Call Trace:
-> [58563.146439] [c00000007960f500] [c00000007960f560] 0xc00000007960f560 
-> (unreliable)
-> [58563.146446] [c00000007960f530] [c0000000009c0fd0] 
-> __iommu_probe_device+0xc0/0x5c0
-> [58563.146454] [c00000007960f5a0] [c0000000009c151c] 
-> iommu_probe_device+0x4c/0xb4
-> [58563.146462] [c00000007960f5e0] [c0000000009c15d0] 
-> iommu_bus_notifier+0x4c/0x8c
-> [58563.146469] [c00000007960f600] [c00000000019e3d0] 
-> notifier_call_chain+0xb8/0x1a0
-> [58563.146476] [c00000007960f660] [c00000000019eea0] 
-> blocking_notifier_call_chain+0x64/0x94
-> [58563.146483] [c00000007960f6a0] [c0000000009d3c5c] bus_notify+0x50/0x7c
-> [58563.146491] [c00000007960f6e0] [c0000000009cfba4] device_add+0x774/0x9bc
-> [58563.146498] [c00000007960f7a0] [c0000000008abe9c] 
-> pci_device_add+0x2f4/0x864
-> [58563.146506] [c00000007960f850] [c00000000007d5a0] 
-> of_create_pci_dev+0x390/0xa08
-> [58563.146514] [c00000007960f930] [c00000000007de68] 
-> __of_scan_bus+0x250/0x328
-> [58563.146520] [c00000007960fa10] [c00000000007a680] 
-> pcibios_scan_phb+0x274/0x3c0
-> [58563.146527] [c00000007960fae0] [c000000000105d58] 
-> init_phb_dynamic+0xb8/0x110
-> [58563.146535] [c00000007960fb50] [c0080000217b0380] 
-> dlpar_add_slot+0x170/0x3b4 [rpadlpar_io]
-> [58563.146544] [c00000007960fbf0] [c0080000217b0ca0] 
-> add_slot_store+0xa4/0x140 [rpadlpar_io]
-> [58563.146551] [c00000007960fc80] [c000000000f3dbec] 
-> kobj_attr_store+0x30/0x4c
-> [58563.146559] [c00000007960fca0] [c0000000006931fc] 
-> sysfs_kf_write+0x68/0x7c
-> [58563.146566] [c00000007960fcc0] [c000000000691b2c] 
-> kernfs_fop_write_iter+0x1c8/0x278
-> [58563.146573] [c00000007960fd10] [c000000000599f54] vfs_write+0x340/0x4cc
-> [58563.146580] [c00000007960fdc0] [c00000000059a2bc] ksys_write+0x7c/0x140
-> [58563.146587] [c00000007960fe10] [c000000000035d74] 
-> system_call_exception+0x134/0x330
-> [58563.146595] [c00000007960fe50] [c00000000000d6a0] 
-> system_call_common+0x160/0x2e4
-> [58563.146602] --- interrupt: c00 at 0x200004470cb4
-> [58563.146606] NIP:  0000200004470cb4 LR: 00002000043e7d04 CTR: 
-> 0000000000000000
-> [58563.146611] REGS: c00000007960fe80 TRAP: 0c00   Not tainted 
-> (6.8.0-rc1-auto-gecb1b8288dc7)
-> [58563.146616] MSR:  800000000280f033 
-> <SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 24000282  XER: 00000000
-> [58563.146632] IRQMASK: 0
-> [58563.146632] GPR00: 0000000000000004 00007fffd3993420 0000200004557300 
-> 0000000000000007
-> [58563.146632] GPR04: 000001000d8a5270 0000000000000006 fffffffffbad2c80 
-> 000001000d8a02a0
-> [58563.146632] GPR08: 0000000000000001 0000000000000000 0000000000000000 
-> 0000000000000000
-> [58563.146632] GPR12: 0000000000000000 000020000422bb50 0000000000000000 
-> 0000000000000000
-> [58563.146632] GPR16: 0000000000000000 0000000000000000 0000000000000000 
-> 0000000000000000
-> [58563.146632] GPR20: 0000000000000000 0000000000000000 0000000000000000 
-> 0000000000000000
-> [58563.146632] GPR24: 0000000106b41668 0000000000000000 0000000000000006 
-> 000001000d8a5270
-> [58563.146632] GPR28: 0000000000000006 000001000d8a02a0 000001000d8a5270 
-> 0000000000000006
-> [58563.146690] NIP [0000200004470cb4] 0x200004470cb4
-> [58563.146694] LR [00002000043e7d04] 0x2000043e7d04
-> [58563.146698] --- interrupt: c00
-> [58563.146701] Code: e9299a20 3d020173 39089a20 7fa94000 419e0038 
-> e9490018 7fbf5000 409e0020 48000070 60000000 60000000 60000000 
-> <e9490018> 7faaf840 419e0058 e9290000
-> [58563.146722] ---[ end trace 0000000000000000 ]---
-> 
+This commit is verified on a v6.6 6GB RAM android14 system via 4 test cases
+by changing the bio_add_page/folio API in erofs, ext4 and f2fs in
+another commit.
+
+Case 1:
+script[a] which get significant improved fault time as expected[b]
+where dd's cost also shrink from 55s to 40s.
+(1). fault_latency.bin is an ebpf based test tool which measure all task's
+   iowait latency during page fault when scheduled out/in.
+(2). costmem generate page fault by mmaping a file and access the VA.
+(3). dd generate concurrent vfs io.
+
+[a]
+./fault_latency.bin 1 5 > /data/dd_costmem &
+costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
+dd if=/dev/block/sda of=/data/ddtest bs=1024 count=2048000 &
+dd if=/dev/block/sda of=/data/ddtest1 bs=1024 count=2048000 &
+dd if=/dev/block/sda of=/data/ddtest2 bs=1024 count=2048000 &
+dd if=/dev/block/sda of=/data/ddtest3 bs=1024 count=2048000
+[b]
+                       mainline		commit
+io wait                836us            156us
+
+Case 2:
+fio -filename=/dev/block/by-name/userdata -rw=randread -direct=0 -bs=4k -size=2000M -numjobs=8 -group_reporting -name=mytest
+mainline: 513MiB/s
+READ: bw=531MiB/s (557MB/s), 531MiB/s-531MiB/s (557MB/s-557MB/s), io=15.6GiB (16.8GB), run=30137-30137msec
+READ: bw=543MiB/s (569MB/s), 543MiB/s-543MiB/s (569MB/s-569MB/s), io=15.6GiB (16.8GB), run=29469-29469msec
+READ: bw=474MiB/s (497MB/s), 474MiB/s-474MiB/s (497MB/s-497MB/s), io=15.6GiB (16.8GB), run=33724-33724msec
+READ: bw=535MiB/s (561MB/s), 535MiB/s-535MiB/s (561MB/s-561MB/s), io=15.6GiB (16.8GB), run=29928-29928msec
+READ: bw=523MiB/s (548MB/s), 523MiB/s-523MiB/s (548MB/s-548MB/s), io=15.6GiB (16.8GB), run=30617-30617msec
+READ: bw=492MiB/s (516MB/s), 492MiB/s-492MiB/s (516MB/s-516MB/s), io=15.6GiB (16.8GB), run=32518-32518msec
+READ: bw=533MiB/s (559MB/s), 533MiB/s-533MiB/s (559MB/s-559MB/s), io=15.6GiB (16.8GB), run=29993-29993msec
+READ: bw=524MiB/s (550MB/s), 524MiB/s-524MiB/s (550MB/s-550MB/s), io=15.6GiB (16.8GB), run=30526-30526msec
+READ: bw=529MiB/s (554MB/s), 529MiB/s-529MiB/s (554MB/s-554MB/s), io=15.6GiB (16.8GB), run=30269-30269msec
+READ: bw=449MiB/s (471MB/s), 449MiB/s-449MiB/s (471MB/s-471MB/s), io=15.6GiB (16.8GB), run=35629-35629msec
+
+commit: 633MiB/s
+READ: bw=668MiB/s (700MB/s), 668MiB/s-668MiB/s (700MB/s-700MB/s), io=15.6GiB (16.8GB), run=23952-23952msec
+READ: bw=589MiB/s (618MB/s), 589MiB/s-589MiB/s (618MB/s-618MB/s), io=15.6GiB (16.8GB), run=27164-27164msec
+READ: bw=638MiB/s (669MB/s), 638MiB/s-638MiB/s (669MB/s-669MB/s), io=15.6GiB (16.8GB), run=25071-25071msec
+READ: bw=714MiB/s (749MB/s), 714MiB/s-714MiB/s (749MB/s-749MB/s), io=15.6GiB (16.8GB), run=22409-22409msec
+READ: bw=600MiB/s (629MB/s), 600MiB/s-600MiB/s (629MB/s-629MB/s), io=15.6GiB (16.8GB), run=26669-26669msec
+READ: bw=592MiB/s (621MB/s), 592MiB/s-592MiB/s (621MB/s-621MB/s), io=15.6GiB (16.8GB), run=27036-27036msec
+READ: bw=691MiB/s (725MB/s), 691MiB/s-691MiB/s (725MB/s-725MB/s), io=15.6GiB (16.8GB), run=23150-23150msec
+READ: bw=569MiB/s (596MB/s), 569MiB/s-569MiB/s (596MB/s-596MB/s), io=15.6GiB (16.8GB), run=28142-28142msec
+READ: bw=563MiB/s (590MB/s), 563MiB/s-563MiB/s (590MB/s-590MB/s), io=15.6GiB (16.8GB), run=28429-28429msec
+READ: bw=712MiB/s (746MB/s), 712MiB/s-712MiB/s (746MB/s-746MB/s), io=15.6GiB (16.8GB), run=22478-22478msec
+
+Case 3:
+This commit is also verified by the case of launching camera APP which is
+usually considered as heavy working load on both of memory and IO, which
+shows 12%-24% improvement.
+
+		ttl = 0		ttl = 50	ttl = 100
+mainline        2267ms		2420ms		2316ms
+commit          1992ms          1806ms          1998ms
+
+case 4:
+androbench has no improvment as well as regression in RD/WR test item
+while make a 3% improvement in sqlite items.
+
+Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+---
+change of v2: calculate page's activity via helper function
+change of v3: solve layer violation by move API into mm
+change of v4: keep block clean by removing the page related API
+change of v5: introduce the macros of bio_add_folio/page for read dir.
+change of v6: replace the macro of bio_add_xxx by submit_bio which
+		iterating the bio_vec before launching bio to block layer
+---
+---
+ include/linux/act_ioprio.h | 35 +++++++++++++++++++++++++++++++++++
+ mm/Kconfig                 |  8 ++++++++
+ 2 files changed, 43 insertions(+)
+ create mode 100644 include/linux/act_ioprio.h
+
+diff --git a/include/linux/act_ioprio.h b/include/linux/act_ioprio.h
+new file mode 100644
+index 000000000000..797304acdabc
+--- /dev/null
++++ b/include/linux/act_ioprio.h
+@@ -0,0 +1,35 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++#ifndef _ACT_IOPRIO_H
++#define _ACT_IOPRIO_H
++
++#ifdef CONFIG_CONTENT_ACT_BASED_IOPRIO
++#include <linux/bio.h>
++
++static __maybe_unused
++void act_submit_bio(struct bio *bio)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++	struct page *page;
++	int class, level, hint;
++	int activity = 0;
++	int cnt = 0;
++
++	class = IOPRIO_PRIO_CLASS(bio->bi_ioprio);
++	level = IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
++	hint = IOPRIO_PRIO_HINT(bio->bi_ioprio);
++	bio_for_each_bvec(bv, bio, iter) {
++		page = bv.bv_page;
++		activity += PageWorkingset(page) ? 1 : 0;
++		cnt++;
++	}
++	if (activity >= cnt / 2)
++		class = IOPRIO_CLASS_RT;
++	else if (activity >= cnt / 4)
++		class = max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IOPRIO_CLASS_BE);
++	bio->bi_ioprio = IOPRIO_PRIO_VALUE_HINT(class, level, hint);
++	submit_bio(bio);
++}
++#define submit_bio(bio) act_submit_bio(bio)
++#endif
++#endif
+diff --git a/mm/Kconfig b/mm/Kconfig
+index 264a2df5ecf5..e0e5a5a44ded 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -1240,6 +1240,14 @@ config LRU_GEN_STATS
+ 	  from evicted generations for debugging purpose.
+ 
+ 	  This option has a per-memcg and per-node memory overhead.
++
++config CONTENT_ACT_BASED_IOPRIO
++	bool "Enable content activity based ioprio"
++	depends on LRU_GEN
++	default n
++	help
++	  This item enable the feature of adjust bio's priority by
++	  calculating its content's activity.
+ # }
+ 
+ config ARCH_SUPPORTS_PER_VMA_LOCK
+-- 
+2.25.1
+
