@@ -1,59 +1,44 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC68210FE
-	for <linux-block@vger.kernel.org>; Wed, 31 Jan 2024 18:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B5738F97;
+	Wed, 31 Jan 2024 21:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706726572; cv=none; b=VV8q43EKfBe7Yqgf+MsMnY+IqB6as25irKHZAhbTY24BzROsMqh3uL4RkGKMgTUKulKfjrgKGXR42P1NfjgekUTOCnqWUGceTtimez6ffLWvl1ALalK1ONAt1fukdKwjDwSLkBSv8yg/OncvKHfi3O8OSd+NhBTFB2D8jaC0lT4=
+	t=1706735243; cv=none; b=skGPblt6Ad/TGFIkALukBCB6IX0TxQrJ/8PscdTXLtWoFZQDJlVJGbo65Gf9OCg6tmBUrMPz1A86LR9V/XvAqP63o4d9PAw0Ee0deFwbArX4m4ig0/Uz31UF68NqwCl7XM3MLt/tf/4xLtNxhfx68gPeYia863j25iQp7pXKICg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706726572; c=relaxed/simple;
-	bh=g+95offPxJ64LZzxB+gaQvWSHhG4N0spr/h/1jn42UQ=;
+	s=arc-20240116; t=1706735243; c=relaxed/simple;
+	bh=g0HPUuyc3xA8aBRoniQjl8dvJBE/1NIN42R2oj0Ub9s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GjnOrgjRp8R7aaHKcI/J4gvO5Wo/q1Ij4slvom2rMajh4p7XQzGlvZdXQK74UCrsKf4qfdx0hOLNpkvOcezZiI5og6e5fX2bEqPrffEGJH0oJ0M6ZDW2u1X6I7EFDobeXpS4I8tRzmwngqbUAAsUOk+vi5+lSPa5l1YQiKWNHtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EOqqUYF3; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EOqqUYF3"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7bf3283c18dso425539f.0
-        for <linux-block@vger.kernel.org>; Wed, 31 Jan 2024 10:42:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706726568; x=1707331368; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZgL5P8g30IZu5klPkGNY/NRSwCJ5aP7SFCOzIS4LR8E=;
-        b=EOqqUYF3FSvkF4oAIUpMEjFqWFGisXdOy5lC57N4wmWXSrck6FUpNCYMVMnz1eQjs/
-         L8z3zz+++7/bkIn2auTgYC6QT9eeOM0743CiYTeaKQHeOR65cTofUuApD/i3uP4JDYQO
-         CVcvKB9fmagZL6JD8LFSxvN8ca+wvCM8O13T9GcBzqqUDscDWcFrxosLaVZTprxkECbW
-         IqjAjc3tWVhuFy/qSG9DnsVWQoidj6+paauWPS//mXB+8Ed/QNf0JBwpZkfMyVIsFYra
-         58b5PugXY0a1nNNiQ6igHGguhNtGnQUhgvQh7zPYLJNvjwEovgyD1qjxN5g1WasuC99Z
-         dHeQ==
+	 In-Reply-To:Content-Type; b=fUJQ4Sp99GoC4lxqTQ/skmiAMLQ9NI0/JARKe74B0ReIw578dN/V8pG2KeOwuAsz30TSXcXQWRmgZAJveNJZ/iYpZC8bLc9nlzZ9nWqh+0Cu1nOTJVAfEXm89KdaW0cyuRpleUl+KRZmK4slzxlrCiuuSgjuwwBzFS3CnZ0PLzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6dc8b280155so114182a34.0;
+        Wed, 31 Jan 2024 13:07:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706726568; x=1707331368;
+        d=1e100.net; s=20230601; t=1706735241; x=1707340041;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZgL5P8g30IZu5klPkGNY/NRSwCJ5aP7SFCOzIS4LR8E=;
-        b=wuSDOZdeTH1VsRTNr5iEed2cF8saFx2+hpi8x4SUnmk04iV7lq6eZJRzphdu8VoeVE
-         A+6C9TO8e1QTRkyVQttVndZR9NNeHPo70LoyKwA4vbfbESgZHY8RAOUEYRA2BMfTMAt3
-         Pkvim0H2b/B/nzyRuWyfXSCupFTfjTQxHcwFUUSRZHT+AdjKXUpTs937WHSZTz3Tne6k
-         BAHuvE07U1o+hhfOfXIghubX+os0UnhW0Y2aBZEUGBfqQVzy2J3LtR34bI7YSTW8dC/m
-         MY7qc/HIwB9YUN5cOkp+LGr8wIjIvfeXOcTTEOkUA7wKxJytnW73KiohyQBwszUDRw8t
-         UzRg==
-X-Gm-Message-State: AOJu0Yw9EYtz3J5RDwDUwgD5ebybGLHhEoy0YuQ6DqAAW/rc6/z5uHTk
-	S/+6qAoHPZs4X2KN/BnPEmBlScpaaOW25Iy1/RZIrUjlQuWTFqyRRF1ZBHPA4zuN6UyQ/GuFlMN
-	qqT8=
-X-Google-Smtp-Source: AGHT+IFDK/JhsIHBaCKUbglY7f+q7PzhFMFkcVFU4b2TomNZpKjKx05Soo4VP27ZNNL1f2oQZHc+4w==
-X-Received: by 2002:a5e:db49:0:b0:7bf:b18e:fccc with SMTP id r9-20020a5edb49000000b007bfb18efcccmr444783iop.1.1706726568053;
-        Wed, 31 Jan 2024 10:42:48 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id a14-20020a6b660e000000b007bf7be3dd69sm3327513ioc.7.2024.01.31.10.42.47
+        bh=g0HPUuyc3xA8aBRoniQjl8dvJBE/1NIN42R2oj0Ub9s=;
+        b=Ri/vSUhUqT3Q8rR6Yt1KqnKa6HANX0YRihyEvI3sGHWmXUlnHClX4d0qRLLbT1aEoT
+         KWTpboaPosf+yGq/xNyO1CCDbmJKauh9EzfczJI8LZOqBiaoJujXT8Re8M8ys/9goAZM
+         8kDzI4GE4wSUecsl/O5MWqx0nxUWTQwV0bCKmqiSmJbzWOfju3nJ+ZXbjikkb9flZWW8
+         E9qjzh0MHsWff77/1Zxn5jtzPeDElMce94cQ33WJkt93uLOjOke684YNWPqx0ZR/fUqg
+         IwhJXIMRg4ZOwruRXrL0VLMdQYNvYlKkKrUI10fwtpX+ATQJVwJ0Vy9TfMvGvYH+8wHD
+         kDNA==
+X-Gm-Message-State: AOJu0YzgQpMqIkpVJeybB16g3TtIbUcPligu/7q0OhtJvcP4XGWAUT2X
+	1iBc6+fF1CFDbMIoKQdUj/pHptHalcfOVddjYZHJMgUASOutxVC7mbCr93SR
+X-Google-Smtp-Source: AGHT+IF8jsH6w3Jrntxyz+UTAWJ653bvPjVu0dKPaui3DiBTjcn0sucTjygP5Sr18Y8MIV0p0r4HxQ==
+X-Received: by 2002:a05:6870:f61e:b0:215:d046:8c62 with SMTP id ek30-20020a056870f61e00b00215d0468c62mr3315922oab.9.1706735241172;
+        Wed, 31 Jan 2024 13:07:21 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:8411:1d95:ca94:1cbe:1409? ([2620:0:1000:8411:1d95:ca94:1cbe:1409])
+        by smtp.gmail.com with ESMTPSA id p16-20020a63e650000000b005d553239b16sm10865231pgj.20.2024.01.31.13.07.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jan 2024 10:42:47 -0800 (PST)
-Message-ID: <9d2f99d8-ecd2-413e-b910-18e05239a2b8@kernel.dk>
-Date: Wed, 31 Jan 2024 11:42:46 -0700
+        Wed, 31 Jan 2024 13:07:20 -0800 (PST)
+Message-ID: <5eb49324-5c03-4eae-84ff-dcbea494c262@acm.org>
+Date: Wed, 31 Jan 2024 13:07:18 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,66 +46,32 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [linux-next:master] [block/mq] 574e7779cf: fio.write_iops -72.9%
- regression
+Subject: Re: [PATCH v9 01/19] fs: Fix rw_hint validation
 Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>,
- kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
- Linux Memory Management List <linux-mm@kvack.org>,
- Oleksandr Natalenko <oleksandr@natalenko.name>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- linux-block@vger.kernel.org, ying.huang@intel.com, feng.tang@intel.com,
- fengwei.yin@intel.com
-References: <202401312320.a335db14-oliver.sang@intel.com>
- <da4c78c1-a9d4-4a57-9765-2e6c35fa1062@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <da4c78c1-a9d4-4a57-9765-2e6c35fa1062@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To: Christian Brauner <brauner@kernel.org>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, Jeff Layton <jlayton@kernel.org>,
+ Chuck Lever <chuck.lever@oracle.com>, Stephen Rothwell
+ <sfr@canb.auug.org.au>, Alexander Viro <viro@zeniv.linux.org.uk>
+References: <20240130214911.1863909-1-bvanassche@acm.org>
+ <20240130214911.1863909-2-bvanassche@acm.org>
+ <20240131-skilift-decken-cf3d638ce40c@brauner>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240131-skilift-decken-cf3d638ce40c@brauner>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/31/24 11:17 AM, Bart Van Assche wrote:
-> On 1/31/24 07:42, kernel test robot wrote:
->> kernel test robot noticed a -72.9% regression of fio.write_iops on:
->>
->>
->> commit: 574e7779cf583171acb5bf6365047bb0941b387c ("block/mq-deadline: use separate insertion lists")
->> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
->>
->> testcase: fio-basic
->> test machine: 64 threads 2 sockets Intel(R) Xeon(R) Gold 6346 CPU @ 3.10GHz (Ice Lake) with 256G memory
->> parameters:
->>
->>     runtime: 300s
->>     disk: 1HDD
->>     fs: xfs
->>     nr_task: 100%
->>     test_size: 128G
->>     rw: write
->>     bs: 4k
->>     ioengine: io_uring
->>     direct: direct
->>     cpufreq_governor: performance
-> 
-> The actual test is available in this file:
-> https://download.01.org/0day-ci/archive/20240131/202401312320.a335db14-oliver.sang@intel.com/repro-script
-> 
-> I haven't found anything in that file for disabling merging. Merging
-> requests decreases IOPS. Does this perhaps mean that this test is
-> broken?
+On 1/31/24 05:56, Christian Brauner wrote:
+> The fs parts of this should go through a vfs tree as this is vfs infra.
+> I can then give you a stable tag that you can merge and base the big
+> block and scsci bits on. It'll minimize merge conflicts and makes it
+> easier to coordinate imho.
+The fs parts have been posted on the fs-devel mailing list. See also
+https://lore.kernel.org/all/20240131205237.3540210-1-bvanassche@acm.org/
 
-It's hard to know as nothing in this email or links include the actual
-output of the job...
+Thanks,
 
-But if it's fio IOPS, then those are application side and don't
-necessarily correlate to drive IOPS due to merging. Eg for fio iops, if
-it does 4k sequential and we merge to 128k, then the fio perceived iops
-will be 32 times larger than the device side.
-
-I'll take a look, but seems like there might be something there. By
-inserting into the other list, the request is also not available for
-merging. And the test in question does single IOs at the time.
-
--- 
-Jens Axboe
-
+Bart.
