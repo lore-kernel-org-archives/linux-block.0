@@ -1,154 +1,214 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2042.outbound.protection.outlook.com [40.107.93.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82963A8CA
-	for <linux-block@vger.kernel.org>; Wed, 31 Jan 2024 23:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706744033; cv=fail; b=fRLo6bi5RoANYu+NaBtQjku5dD5rvE+x9qfO99vqTC2fSDSLaLZYDxpvrA6VYtKL1iZz455EnwKPuhfXXdk4DnTf8htMbKhO1ZOrEPj+PMYzcUTRPfswAAja/us+SmbUA/NTV2o+EfRD2ALNL4zl6ogC/wosnPIKS8GufQi8YpI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706744033; c=relaxed/simple;
-	bh=wRO1/vpMbwG55hJkkha2mAVJf6w3SsCduArHofpFk7Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bT/DMdmIHJdEj0srgZCfo8tuKlEXJtBaSMENaNNm9rVoFL94AQCuo+/uOGqe/mtQ4cF5aryCLwCbYmUQDFAlW7mnlQ1NZ1ZwRFbV41m35vA1JxcrJXJJ3GI6bQwdPlRTnAB6BmBaeVsaybjTuoT2g+5fj74jndg/paLlSq7rzgA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RMZNiffK; arc=fail smtp.client-ip=40.107.93.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68E63A8D5;
+	Wed, 31 Jan 2024 23:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706744075; cv=none; b=cQB1iwc0oHe/ThV2D8PqqPKXPWpiRS4QsP2JlcDfkH2ewDhn8b+MU1prmK6AtrlG6kpY4ueeEq3Fx8y4nKMLXX1YAMUrdqm5R7PGKMZMnLtQexb0KQ7WPABKu9tV/InzUf7y+9dTYPFuX42qRN/xCDI2fnfVkhAtcGyxhMbQjoo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706744075; c=relaxed/simple;
+	bh=qfht1C6NSBw92JVrsp/o2tHHimy/202Geo/YeJ4z3r4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NFeD6JmIxNX7sDcyuirBfoiX2bnGu2htRxCvMhw4h7+0PybiZ1ifthkY0yholmxHJgTDK0O2V/OjiCL2mpwy39A86zP1eqlqu5VgBLBHpzVfZ3Nj4n4PxBHtJjdwqxsrlnJ8AODnQ7Arf93LkM/NBOMm3w3dBcjiof9g3LTyQEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KdyFr3d+; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RMZNiffK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gWawmIqLIKuWFLue8Lj3yjXfCwI29wHmcjwmJ0NKpcwYP4je95W1PvtyA6W1f6bB2211QQPnlnFmOxfEMuL596q4CLMnxJpHsG84UkxarJB9pbZ1mzAoQb++L9TiJ9IK2aPYQXE31sHgBLMwlEXI3Oe9788LwIXXiARTz/Pq1+zDJc6cNyUjC9a1EvXJSDeJM0DDiaTL70PB9A09TNtRlhKFbvBqar6Emy/4CiyK1Gysak2hPGiiiN0siCR+JXWbBMRYY6IMcXs5LuXX/wUEwEdz5AugWNdebwxVQ6hxvPQAXdeqCHcY/MAc9MRfazwzoGg9alRqQI92pFgTAE14xw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wRO1/vpMbwG55hJkkha2mAVJf6w3SsCduArHofpFk7Q=;
- b=Z7nyFcriLDwKqlGE3hf6pJbewbx6gEF6bugUnN26MN0KBQKNgOLn4dBkkpqlR2hPqIKobAArsO0C8gOLs2oz9UcWplb/rKOLcoGk9d9o+/F7D1aymZzZ30JbQE39E6EmtqN5maO8EqP4jD5Hu3fW/j++9du+4AHI8v2JyiwQAPQARUAwwJPSst72BLTZhJbSKR1PyDwnNbLWZgjBQSqg3eryiTO3d952LKOEpOTqbPHGH+l8dGdFzi75WdMbl6ifJf88nUjTnmR2aYAs4bsHd2Cud2quwVUPGRUZ2kFK3c3IFK+sUuPnG4d53VT21gQYJzfYdDu3gcZwDcoa+qnp2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wRO1/vpMbwG55hJkkha2mAVJf6w3SsCduArHofpFk7Q=;
- b=RMZNiffK+dZBZHMlnSwrHr6is9D222oUyrBU0ayPMFt73ZhrgHBiGIZ6C+M6vxMFWsSt/isGr1E/NmHiS3SOkdkRLdEuUn5RAmoBXm/Pz2BiFJdoA9kpoJmlRhJsMJwzEye3P8UqEqDpepNsYeWluhoIvE97zryXgZsrjesN+4dbH8ZGtdqLz3S+rF2y+imL0xwm+xdc1s1mRPD9rpQd8hylGlYFS4ASr6FXZ/Gzhuy/W2vJaSe+fLmIpEDN4ZayJbpEszun4e6FoVdRj6pDKfY9aqjzu17M1SEI+PSABjBDM0RIngMYTrL4e4sUXZY4ALn6RmdneKGYhjOa866wrg==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by CH3PR12MB9027.namprd12.prod.outlook.com (2603:10b6:610:120::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.34; Wed, 31 Jan
- 2024 23:33:49 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::ffce:bbde:c1ca:39ed]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::ffce:bbde:c1ca:39ed%4]) with mapi id 15.20.7228.029; Wed, 31 Jan 2024
- 23:33:49 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Damien Le Moal <dlemoal@kernel.org>, Keith
- Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, John Garry
-	<john.g.garry@oracle.com>, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 08/14] block: pass a queue_limits argument to
- blk_mq_init_queue
-Thread-Topic: [PATCH 08/14] block: pass a queue_limits argument to
- blk_mq_init_queue
-Thread-Index: AQHaVEYXBH/7vyXEPUGRmktW9uOUMbD0k1QA
-Date: Wed, 31 Jan 2024 23:33:49 +0000
-Message-ID: <3f12f290-0d20-4ba5-bf16-6492c245e7a2@nvidia.com>
-References: <20240131130400.625836-1-hch@lst.de>
- <20240131130400.625836-9-hch@lst.de>
-In-Reply-To: <20240131130400.625836-9-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|CH3PR12MB9027:EE_
-x-ms-office365-filtering-correlation-id: 98167b7e-fab4-4db7-7dcb-08dc22b51380
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- ocT3T1m9cXO88xGyQyvPWArYripA2TDyZ9/IqsrkAbph1X/Nj328dJa/i373aDTxbJCzQb2jGwwviIPwG4iPcQAnKca/c3tsy7G5bau9NtNRFl1mR6w5gOhZGVOsVcXk6hPBX7BcquCXDdCN8hzd4K/ZqW4Q031QV4hqV4tNEwTZxDtsNO7MgM6GXaXhxWmAljjxui7Tee7AjP9EkBGumReyNGHAPW8lORMG8fjwyyKY/oXbDTQw6wDQzmkwysw4K96+YsTQIAdSZRFkDMWwdr656vLLnuaRah2gZ9m1Vw9FiCiM2QgRCpBVy5PT4Al9bCm14JzE0B5PEbM/2y65dpjk8nsDFesgoPxxzYNzqy5oSZugmQOsX9UlFhJEVy1eaHUUgZLLGH8tNh+DXjqwx/sRipw1v1xk9a5DIY9I4Hb4CbbRty8/ZjR3/Jb7Ohn3B6WxV4oCf7qKaiGTsr79OBbD6ZdhAHalmloFsWuM0zYxLSR2iSWK2vVjoAcVnviqo8qtbT6daTtuPMhIAZ1gRbkwfnzGH39B+RmXbWl6+YAaVCAeSywCbwaLdPlV3trPGsEqNyBHCTgXg0EqPFvIRIKDEtqw5B0xVL5pL/Uj3z/rCZ2Vb820np/M0MB0xqDJtdz7/lj9yFF2P7O69yAsmiJXm75/5Q+wq764fdPlsuS5CqsjMlT0Z9WAqwb2K851
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(376002)(396003)(346002)(136003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(31686004)(83380400001)(38070700009)(86362001)(36756003)(31696002)(6512007)(4326008)(76116006)(38100700002)(2616005)(6486002)(2906002)(53546011)(6506007)(91956017)(41300700001)(110136005)(71200400001)(66556008)(478600001)(122000001)(316002)(54906003)(66946007)(8676002)(8936002)(5660300002)(66476007)(66446008)(64756008)(7416002)(4744005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dS9WTDZjRzNuUkQzNnZIQ21GWWJEL3N3S0VvNGo4cjZ3RGdxTS8rcDdMWXJi?=
- =?utf-8?B?bEdQZnVHbml4bnFyd2pIc1dpd1hlbFBDMHVXZlB4RlhKRisxc0VqblJkZzVY?=
- =?utf-8?B?WnFxMXg0Q0pEaGdYSEttMFNOQTQ2dEpEY3RtL25lYzhZWExGVXd5cys0S1NH?=
- =?utf-8?B?dTBQZHkveGptYk9seENheVFuOVZwSGVZeEphQ2VhemhRTGZNYi9CaFREZURq?=
- =?utf-8?B?TmFaQlg0c0doVnhUWWpKRXJ3RFhIcWxWUEF1WDUyRjF0bFJIRllqS0N1eDYx?=
- =?utf-8?B?eEVwMENvVWx5UUhnV2MrNWFjU1FBYUZXMzdOVVNpZ2ZwSHZXcVV0ZmxIZlF4?=
- =?utf-8?B?Tk16cjJadnlwbXlzUS9UM2piblNmcUxpVDdCWW5uZFNEdUp5Z2RqS01Rbkxm?=
- =?utf-8?B?ODZ3TlVVcFpaWTA4a3NzQ3gzSDdnUldjS0ZNZzcxU25CTG1DQnNwRkJmUWFl?=
- =?utf-8?B?ZzY2ZGcvVkk4TmRXU0xWRUZMeldSRjZod3Rna2tuaVMreE5lVUlHdStoRERz?=
- =?utf-8?B?eGRRUnNyb0pEdC85S01CRVFYR0YzdHFNdTV0T2gvbFVjVHV6Ukp1dnJoK1Zj?=
- =?utf-8?B?ZW93WXBRcng0S0Rta1psS1RxYitEYUFhSXpDV0hveDRJR1A0ZVdzU3ZKMHgr?=
- =?utf-8?B?MG1wRzFQREkzL1V2RmoxUmcrRVcvR09vSFNTcEtpUDEwS01xQ2Z0bVhSZkVQ?=
- =?utf-8?B?d1QyOVJkNGNHWjN2anR1WHJZVFhTc1N0NlRIRGxaK01rbDlpYitHYm5hRmxL?=
- =?utf-8?B?Q042ckZpSllubHlxS0lBaVUvVFJQRFV2SmdWNzAwWC9JS0tyVWQ0bE96MzBy?=
- =?utf-8?B?ZEFMcjRrUVRGN0Q1N1I4alpzaXlDdnBtZTVtWXJXTUg3UlFkL0ZEekNLbXpD?=
- =?utf-8?B?bzIyN1cybDgxZ01QT2luTmtMQUpsL0taMGl4T08xbmdaUHJiZTVaNmtGcUF0?=
- =?utf-8?B?WUVZTlpITzQvcXcyVzZaMWJjTjZyMFRVN0xlRkprZjFGUHFuSXBVdTRZV2x5?=
- =?utf-8?B?RnZjN25EK3VJUFZxNnduYnhUdkJVbG5nbVJURXFVcFVGTThFNnlUbldzZC84?=
- =?utf-8?B?Z3RZcUZFNjJSV1lsbWxtanExdmxZbWR4MXp1dzFWUk9kbU14SDEwUnVnaVRv?=
- =?utf-8?B?dWovQ0NZRkJ6NER5RGNyNW5zV2tRQ0IzK1pDMFFsazQ2N2ZYYlpRazUzczhC?=
- =?utf-8?B?UEN5bzRLTUJTS3pFQXdSZ3QzSUkvMERmQmg4d29Pc2lvRWQ4OWlDQ1ZLR0hj?=
- =?utf-8?B?dFJwSi9kaGxJNHRrRFlJM2dISDRXU1dzMUNRUDRlY1d5WTlqQ1Vqd1hmVkVP?=
- =?utf-8?B?S2lUYWFzeW5icnFlYTlJUllYSUZTVjV5Z2ZBNUFPUDNLTnU5eHFyckxNbXdG?=
- =?utf-8?B?eFVvZzcrVFArL09mZVVBQlFDWHViQmIrczVIZm1KaEpyY2VXR0lpMVRKb21X?=
- =?utf-8?B?QW9tUHlGNWQ5VDBLYVp2STdSRGVVaXM5anN4ZnBKcko3SllLSTAyajVmMnU0?=
- =?utf-8?B?L29jbjg4amk0SHRRaTRIMjVTVHFqUXJqTFVKZ1RsdVF0a0owSUc2OVhrY2pO?=
- =?utf-8?B?NlZ5Q0owKzNwSUdoSjZGMDFXdmVjZE5FNklySTFuVGhTc0NPMm93NTNIY050?=
- =?utf-8?B?NndxRlNUMlVNVFQ4cm1IL2dPY2JTSHhmb1RwZ2JEanBWamUrUVdPd0tCSXJi?=
- =?utf-8?B?UDRtS2hkY2p4WHJlRFVzcEVQQ2hIV0tGT1BUL0I2aCthbU16ZWoydlUybEVo?=
- =?utf-8?B?cG1rSnlrOUFWaXlDQ0hNZXcwNzdYbTFmQUkzMWxtSXZYSkVVVDVmRHQ3QlhH?=
- =?utf-8?B?VmFDZTAxaTB2V0NJWTZTMWgxa3l3cGIyMWRWZ2JsRjJkVHJaZ1ZvemxWTXJi?=
- =?utf-8?B?L0Rsa3VXNWVPOHEyckM3aE94dThmNk9sdU5LSGhVRy9Oci81emxUR1NGUmh2?=
- =?utf-8?B?WkdESG00eHR2anlQY2dYQzNwdmxpUlh4YmdqY1NHNEdCNGRLRnZuOFc5end0?=
- =?utf-8?B?MnZqcXY5Z2VWWElhK0h4UnA5c3hoUVlhSWZ4WlBwR2hETWdRT3hNWnlwaHpj?=
- =?utf-8?B?S0FSV1FxTTByVzNtTktaSFlocjBQTHlUTk1KT2UrNEpNc0V0Ujk4Z2pyZ1dJ?=
- =?utf-8?B?VEpmU0pFKzdqYys3TlQ1dVRrVHQ2d2pQamNCUHVJZVhyUTZhWjFzMkxDZWhS?=
- =?utf-8?Q?TD7ZOPmskHI3dOMpAWtNBsBiEGmdiDQWw6ogbLXwndWF?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <693EE69A7D8CB2448D46F53E7BE888D3@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdyFr3d+"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-50eabbc3dccso359634e87.2;
+        Wed, 31 Jan 2024 15:34:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706744071; x=1707348871; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NxjSro3Runrd4nhOZ0rX84YSrCsjDrDSEl79olWjpJI=;
+        b=KdyFr3d+kaiMRI6bM8U2ll04k3mP8OY/9IyX+XDO8eUYmD0awiGdqDldSoYE3Rrf3+
+         NTRfhp5ZZu4aQzd976xd8oLcw2l43K8XsWVe2Sur/6zob3umV8X0IolFbl5KXqUrLG6i
+         AoqXvgfqMZXvIXX5oDemkZEuJ/XlscZGEX3T/jl/t6uFi6qtS6HnP/drSMtJzrAlny7D
+         0A0T+7zH57B/kJ1ejJAe0HLqdoMGaQyRH7fL2vlg1CmgBB1fMb0fnt9H27SGZ/8wxLsJ
+         RA6g1+0LZ4FS1Ib6BHgoXSEFtWpJcV6FvyYHbXzbdmnZt6b0B5VODldAIdMvxDkj+pdy
+         gK5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706744071; x=1707348871;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NxjSro3Runrd4nhOZ0rX84YSrCsjDrDSEl79olWjpJI=;
+        b=LGcU8vfFSQ5vdhnATDB/giDch5Y6RuNLHhmoAux7+cfJMC8iSPeAno9wUpmf6rtxYl
+         niPPe8VxHq6RQWTtXCGvu1a88TphG5/cvKGY3GPDLrWGZQFwXASj+nO5flvPZTFA6+iB
+         /c/SL4Yv9fjLChpVlGBhD4Y9+Qf4oBLpH7xOG6y9vB1S7oE3g01jRyo3k6de2cREJBac
+         279vm2HcfPTFGGyTFdM4yLHNPxgKXtkY5J1VtXiQPCB5ZYXpzHIUZEhwePaUfPN1KDo4
+         /I0bNCuMOzr6oE8Jz18CDHc/CUt4fqsfbJd1HkJwbHx8py85Q5sHhLnO18DkxszXrsV4
+         /EWA==
+X-Gm-Message-State: AOJu0YwvUNcagqYcw0BxDYLnFCQBrMwDEdGfH1SHjhfek+VAti6Hmh3V
+	xmJtyBqwTjd8E/eiVo4ZnFYYOLZJx4q2Ju4/E+UjUJX0T1V+sR45DShrCzfopw6RgzeP/HLVTyg
+	munQz2ksA9Y6Bg5S3dNyABS4w/tg=
+X-Google-Smtp-Source: AGHT+IFKaFQTkLSLrUeuA89DDrnX1NNDob7TLm+Odb3MD4aaiIY7kg2LUFkAmCqGjvrfZBHsJ7CtW5yg553/kNEvR/0=
+X-Received: by 2002:a05:6512:5cd:b0:510:b5d:ec0b with SMTP id
+ o13-20020a05651205cd00b005100b5dec0bmr684679lfo.66.1706744071100; Wed, 31 Jan
+ 2024 15:34:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98167b7e-fab4-4db7-7dcb-08dc22b51380
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2024 23:33:49.1109
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Eecx1QhFHzNaurPD5UNDBx0yCzPeVotYtK5nMCKdY+63Py7GN2t086vejdrvIZAZlddf0t46bWYCFqizzUkwFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9027
+References: <20240131121401.3898735-1-zhaoyang.huang@unisoc.com>
+ <ZbpCo+90OsXJwFWV@x1-carbon> <ZbpGDFUGQoaRQWHq@x1-carbon>
+In-Reply-To: <ZbpGDFUGQoaRQWHq@x1-carbon>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Thu, 1 Feb 2024 07:34:19 +0800
+Message-ID: <CAGWkznGOjsA3eGRt4i-1XAt=39ce7vaN7=zciimLJOMg=HD7Zw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] block: print warning when invalid domain set to ioprio
+To: Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	"Martin K . Petersen" <martin.petersen@oracle.com>, Hannes Reinecke <hare@suse.de>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"steve.kang@unisoc.com" <steve.kang@unisoc.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Bart Van Assche <bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gMS8zMS8yNCAwNTowMywgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IFBhc3MgYSBxdWV1
-ZV9saW1pdHMgdG8gYmxrX21xX2luaXRfcXVldWUgYW5kIGFwcGx5IGl0IGlmIG5vbi1OVUxMLiAg
-VGhpcw0KPiB3aWxsIGFsbG93IGFsbG9jYXRpbmcgcXVldWVzIHdpdGggdmFsaWQgcXVldWUgbGlt
-aXRzIGluc3RlYWQgb2Ygc2V0dGluZw0KPiB0aGUgdmFsdWVzIG9uZSBhdCBhIHRpbWUgbGF0ZXIu
-DQo+DQo+IEFsc28gcmVuYW1lIHRoZSBmdW5jdGlvbiB0byBibGtfbXFfYWxsb2NfcXVldWUgYXMg
-dGhhdCBpcyBhIG11Y2ggYmV0dGVyDQo+IG5hbWUgZm9yIGEgZnVuY3Rpb24gdGhhdCBhbGxvY2F0
-ZXMgYSBxdWV1ZSBhbmQgYWx3YXlzIHBhc3MgdGhlIHF1ZXVlZGF0YQ0KPiBhcmd1bWVudCBpbnN0
-ZWFkIG9mIGhhdmluZyBhIHNlcGFyYXRlIHZlcnNpb24gZm9yIHRoZSBleHRyYSBhcmd1bWVudC4N
-Cj4NCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+IFJl
-dmlld2VkLWJ5OiBKb2huIEdhcnJ5IDxqb2huLmcuZ2FycnlAb3JhY2xlLmNvbT4NCj4gUmV2aWV3
-ZWQtYnk6IERhbWllbiBMZSBNb2FsIDxkbGVtb2FsQGtlcm5lbC5vcmc+DQo+IFJldmlld2VkLWJ5
-OiBIYW5uZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5kZT4NCj4gLS0tDQo+DQoNCkZvciBOVk1lL1ND
-U0kgcGFydCA6LQ0KDQpMb29rcyBnb29kLg0KDQpSZXZpZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGth
-cm5pIDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNrDQoNCg0K
+On Wed, Jan 31, 2024 at 9:07=E2=80=AFPM Niklas Cassel <Niklas.Cassel@wdc.co=
+m> wrote:
+>
+> On Wed, Jan 31, 2024 at 01:52:51PM +0100, Niklas Cassel wrote:
+> > On Wed, Jan 31, 2024 at 08:14:01PM +0800, zhaoyang.huang wrote:
+> > > From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+> > >
+> > > Since few caller check IOPRIO_PRIO_VALUE's return value and bio_set_p=
+rio
+> > > is a open macro to set bio->ioprio directly.It is confused for the de=
+veloper
+> > > who run across kernel panic[1] but can find nothing in previous kerne=
+l log.
+> > > Add a pr_err here to dump the information.
+> > >
+> > > [1]
+> > > Here is the kernel panic I run across which caused by a out of bounds=
+ check
+> > > introduced by CONFIG_FOTIFY_SOURCE.
+> > >
+> > > [exception_serialno]:
+> > > [exception_kernel_version]:
+> > > [exception_reboot_reason]: kernel_crash
+> > > [exception_panic_reason]: UBSAN: array index out of bounds: Fatal exc=
+eption
+> > > [exception_time]: 1970-01-01_08-00-23
+> > > [exception_file_info]: not-bugon
+> > > [exception_task_id]: 409
+> > > [exception_task_family]: [f2fs_ckpt-254:4, 409][kthreadd, 2]
+> > > [exception_pc_symbol]: [<ffffffc080736974>] dd_request_merge+0x100/0x=
+110
+> > > [exception_stack_info]: [<ffffffc07a27e274>] get_exception_stack_info=
++0x124/0x2d8 [sysdump]gc
+> > > [<ffffffc07a27e670>] prepare_exception_info+0x158/0x1d4 [sysdump]gc
+> > > [<ffffffc07a280128>] sysdump_panic_event+0x5d8/0x748 [sysdump]gc
+> > > [<ffffffc08016a508>] notifier_call_chain+0x98/0x17cgc
+> > > [<ffffffc08016a9b4>] atomic_notifier_call_chain+0x44/0x68gc
+> > > [<ffffffc0810f0eb4>] panic+0x194/0x37cgc
+> > > [<ffffffc0800a638c>] die+0x300/0x310gc
+> > > [<ffffffc0800a77e8>] ubsan_handler+0x34/0x4cgc
+> > > [<ffffffc0800960a8>] brk_handler+0x9c/0x11cgc
+> > > [<ffffffc0800bf998>] do_debug_exception+0xb0/0x140gc
+> > > [<ffffffc0810f8bf0>] el1_dbg+0x58/0x74gc
+> > > [<ffffffc0810f89f4>] el1h_64_sync_handler+0x3c/0x90gc
+> > > [<ffffffc080091298>] el1h_64_sync+0x68/0x6cgc
+> > > [<ffffffc080736974>] dd_request_merge+0x100/0x110gc   //out of bound
+> > > here caused by the value of class transferred from ioprio
+> > > [<ffffffc080707f28>] elv_merge+0x248/0x270gc
+> > > [<ffffffc0807146e8>] blk_mq_sched_try_merge+0x4c/0x20cgc
+> > > [<ffffffc080736824>] dd_bio_merge+0x64/0xb4gc
+> > > [<ffffffc080723e3c>] blk_mq_sched_bio_merge+0x68/0x144gc
+> > > [<ffffffc08071b944>] blk_mq_submit_bio+0x2e8/0x6c0gc
+> > > [<ffffffc08070dd3c>] __submit_bio+0xbc/0x1b0gc
+> > > [<ffffffc08070c440>] submit_bio_noacct_nocheck+0xe4/0x2f0gc
+> > > [<ffffffc08070c8e4>] submit_bio_noacct+0x298/0x3d8gc
+> > > [<ffffffc08070caf8>] submit_bio+0xd4/0xf0gc
+> > > [<ffffffc080642644>] f2fs_submit_write_bio+0xcc/0x49cgc
+> > > [<ffffffc0806442d4>] __submit_merged_bio+0x48/0x13cgc
+> > > [<ffffffc080641de4>] __submit_merged_write_cond+0x18c/0x1f8gc
+> > > [<ffffffc080641c4c>] f2fs_submit_merged_write+0x2c/0x38
+> > > [<ffffffc080655724>] f2fs_sync_node_pages+0x6e0/0x740gc
+> > > [<ffffffc08063946c>] f2fs_write_checkpoint+0x4c0/0x97cgc
+> > > [<ffffffc08063b37c>] __checkpoint_and_complete_reqs+0x88/0x248gc
+> > > [<ffffffc08063ad70>] issue_checkpoint_thread+0x94/0xf4gc
+> > > [<ffffffc080167c20>] kthread+0x110/0x1b8gc
+> > >
+> > > Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+> > > ---
+> > >  include/uapi/linux/ioprio.h | 5 ++++-
+> > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.=
+h
+> > > index bee2bdb0eedb..73c420a0df72 100644
+> > > --- a/include/uapi/linux/ioprio.h
+> > > +++ b/include/uapi/linux/ioprio.h
+> > > @@ -112,8 +112,11 @@ static __always_inline __u16 ioprio_value(int pr=
+ioclass, int priolevel,
+> > >  {
+> > >     if (IOPRIO_BAD_VALUE(prioclass, IOPRIO_NR_CLASSES) ||
+> > >         IOPRIO_BAD_VALUE(priolevel, IOPRIO_NR_LEVELS) ||
+> > > -       IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS))
+> > > +       IOPRIO_BAD_VALUE(priohint, IOPRIO_NR_HINTS)) {
+> > > +           pr_err("%s: get a invalid domain in class %d, level %d, h=
+int %d\n",
+> > > +                   __func__, prioclass, priolevel, priohint);
+> > >             return IOPRIO_CLASS_INVALID << IOPRIO_CLASS_SHIFT;
+> > > +   }
+> > >
+> > >     return (prioclass << IOPRIO_CLASS_SHIFT) |
+> > >             (priohint << IOPRIO_HINT_SHIFT) | priolevel;
+> > > --
+> > > 2.25.1
+> > >
+> >
+> > Adding linux-block to CC.
+> >
+> > pr_err() is a kernel function for printing.
+> > ioprio_value() is a function in a uapi header, so this function will be
+> > used by user space programs.
+> >
+> > There is a reason:
+> > $ git grep pr_err include/uapi/
+> >
+> > Gives no results.
+> >
+> >
+> >
+> > I think you should fix mq-deadline instead.
+> > It looks like the problem comes from:
+> > ioprio_value() will set class to IOPRIO_CLASS_INVALID (value 7),
+> > if the user specified an class/level/hint that was invalid.
+> >
+> > ioprio_class_to_prio[] array in mq-deadline.c does currently not have a=
+n
+> > entry in to translate IOPRIO_CLASS_INVALID (7) to a valid DD_*_PRIO val=
+ue.
+> >
+> > Although, why does this I/O even reach the scheduler, shouldn't this I/=
+O
+> > get rejected even earlier?
+> >
+> > Both io_uring and libaio will call ioprio_check_cap(), which should fai=
+l
+> > the I/O before it reaches the I/O scheduler, but in your case, you are
+> > submitting the I/O from the filesystem.
+> >
+> > Should we perhaps add a call to ioprio_check_cap() or similar in some
+> > path used to submit I/O by filesystems?
+>
+> On second thought, how can the FS have a ioprio class stored that would
+> have been rejected at I/O submission time by the user?
+>
+> This sound like either a bug in the FS or by some of your local changes
+> that you did for your other patch (ioprio based on activity).
+Yes. That's why I would like to suggest adding some information here
+to help developers find the clue quickly.
+>
+>
+> Kind regards,
+> Niklas
