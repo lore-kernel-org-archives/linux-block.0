@@ -1,103 +1,109 @@
-Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61C77BB10;
-	Wed, 31 Jan 2024 13:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A1A80C17;
+	Wed, 31 Jan 2024 13:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706708075; cv=none; b=TMSTKXnJCR9Myxf9VuP6EPzT+b+Xi3TDz8LfPEnL56D8oV+LrvdPrWyxEHgk5g97HsnoN8tdHfD4M+r1PJqcfzKkGLZ2xY5RetctGKJ2iv6FoCcbbh0KTtdtrfbgRsp39Zkrsz9+3WGTBpX4B421WS8a2VK8M9h4AiL5uXsJg9o=
+	t=1706709418; cv=none; b=U0/EtVMkuRDMepgGZXocWEEOhh+VCXd5cBLCS6OuI2uDPRbLYxkJKk+jl1wBYraUl2vR/VomjSk0YgcehH3jc7WkLWu76D2C6xFA+78cmfbG2gq06r+V4m+FJ8xpMLuNxhhsE2wN+kg/zmH6U5a8jxg65F/BSLz+YheJqDlaT/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706708075; c=relaxed/simple;
-	bh=ipB51S4ayXjPdAjDFJrXZRnPCOCc58tiHGNoK3XtmJo=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=QM5aDUBUji2q/WsGOzqON4pEt/knbxk/e0txPJx83/MZHTBmdLBoLVcL1jltbwXU9NkRrvPYYLNlIk720gpqYP4XZO6ylx4WSiN85m3UAvTRJ0KRRnwNYRfhWgYfLQ45Yv9UP+4iLmYtjBKx4QPSZV0F2TKjlNbifGFjAGgLtso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=i2aCGLJz; arc=none smtp.client-ip=162.62.57.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1706709418; c=relaxed/simple;
+	bh=HuuAyQQ12q3DA4tE1JpaaSXKtPB7sv8TvPPlcbuuvXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G4tLUbx/ezEaJ+jneS2Sc/Y3qHpicJCJhwq/aT5qq3nfjqN5YkOLzhvivwum70rqxBvC+5vYAz0X9uQ9o5tgDERrwGOdsrCqYVSu23zVd/R7irLh1X5Je0yRtG/7LV0R2xnS1/oRQ+2gJS7tEab4oObvkWfoD4Hrq+RS7Mn+2VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ja5+l7rC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="i2aCGLJz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1706707765; bh=3LvlDGqVp2dR5tHsbeJj41RdmcLcttRB0AeyEWvvGzI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=i2aCGLJzWyXKRhu4uyL11CKjUakJspzaoyW0rKL4NkUI3m+lwIXdqNTAw2IQeXbGV
-	 6CXEmfuk3SwD0zVJ3cHMfw3lXaCOFIDjH2aHxIEG1oNxjqNXrTKPVIz7M9ijMscHc3
-	 i2RoBStwbjpB8z/B5G2RB8r37bVSGphEFbVWhxJU=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.215])
-	by newxmesmtplogicsvrszc5-0.qq.com (NewEsmtp) with SMTP
-	id 7039203E; Wed, 31 Jan 2024 21:28:03 +0800
-X-QQ-mid: xmsmtpt1706707683t170w99ch
-Message-ID: <tencent_6D33089EBD1B9C4BEE1B2425C6BAB4BB9F08@qq.com>
-X-QQ-XMAILINFO: OW4JKxETGMY27nXxRGBgayPGLZPP931PdTQSzQ1zill1Akyt95iEkXs+ChWv2F
-	 n/HpM4S8NTgrbmkEw81HUfzwMbV3QyRN88d61pS4hhgxXYxwlki1m+FCzR/7uohYdAL3e+rcAwpu
-	 XjWW0mLSZNmhdhZJlcWWRrYPEbmwGncPjqt3ccGAQ4VOUtCrlq+J/v7Wka+kTtFwQyzDHPFOmrpn
-	 86/yyJ0tMqEeIzoOzCfks+VOzYC+amIaujQAY/SsL6N1lb/uso+i4LenVzJGACPj68Q0e04IbUKG
-	 pMx2ZQnCPv9QulEQnstzSmUBouq+B/gj7u/lA9XbV+ThgFkVC5HdfcRFjgY/hFPpHINMY1pDKeVv
-	 FyqT9TTPYe0knHqoWuIjp63PtOfKcgfKUiEZJty311vKqCW+GiYihART3eEU3bUTpeV+FfK5T1yi
-	 SlSICnN+aWkrVyXDmzY/tlHLwn9X2oLt9uOTjGEpHz1s4vqwfYoL+/9ymeNPkgOzOQ21nFQgf3ia
-	 ZpsbGGvWpSAIIFXsoAMZgU6ft5LcAcJ5iX9xxnLrIA2HtppDlvi5bvzliJT/Ne1tjJj3aPwmDB/+
-	 DQtHj45SSkTMbatqpOCv0xgEkOLdv5CR6z7KTdb+kmSk7TpYzeRhXXUscJpUdqVab7dH7eQ2QGJ/
-	 PPez3v1z80UgHA5G1uDZ3PMbC2x9D4TDj/SoZpvL+6M+PD7Q/a1mSGUhwHq8cosBN3p1VH8iTc19
-	 25O3CKulz7AqwjvIcE016grLq0/rkcqYrfqVXmsNx6ayaViMr2mQmCYKka14DiyMUh1pjtKHG3PA
-	 EdN6VQD4UZG3iAps4umrYFljISA9iW+UprIl84wat4JXoWLxCQYb9y2TLEwyVN4CE13n2U/XcQ38
-	 2QoeA4gBLg2jmII106Xi58Eo3WKzS7jVbq1NXfWwYULy/KZ+b+HkpUyy/fUf3HRn0oitvlfbF3YH
-	 ReEJKvVRI=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+2373f6be3e6de4f92562@syzkaller.appspotmail.com
-Cc: akpm@linux-foundation.org,
-	axboe@kernel.dk,
-	dvyukov@google.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	mathieu.desnoyers@efficios.com,
-	mhiramat@kernel.org,
-	pengfei.xu@intel.com,
-	rostedt@goodmis.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] trace/blktrace: fix task hung in blk_trace_remove
-Date: Wed, 31 Jan 2024 21:28:04 +0800
-X-OQ-MSGID: <20240131132803.1350049-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <0000000000002b1fc7060fca3adf@google.com>
-References: <0000000000002b1fc7060fca3adf@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ja5+l7rC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95936C433C7;
+	Wed, 31 Jan 2024 13:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706709417;
+	bh=HuuAyQQ12q3DA4tE1JpaaSXKtPB7sv8TvPPlcbuuvXM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ja5+l7rC1shfB5lStw+89OxcqylF41IzuOefT55OIVsYzovyWPz8eHPvKJE9OxP4Z
+	 qD/UHcr0aJqH66/X74Lm+FfmNnXRpaAqjISwGHft8SHxwQcPTJC6ug6vmT9cG+GgkQ
+	 Xb+mMEU2zTTsjj+aNjtJK6kd2BsYktsJLYGxztpsL+1Kvc+LYJQ6KZkKHb2avewDGy
+	 IJk6zRH3o6KFgzCsdj/I9N2TD+zqkL145bO1x3DRRAZRf6Q/qjjfI+qy0WSaNuXFwa
+	 hNa6GiFehD4jFapcDE0D5f8FZ5r9RBPS/aQugX5YPXhLyp6W14MeCy7/Vw/zXrGUaw
+	 iixrDJ5YKtVvA==
+Date: Wed, 31 Jan 2024 14:56:51 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>, 
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
+	Daejun Park <daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, 
+	Jeff Layton <jlayton@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
+	Stephen Rothwell <sfr@canb.auug.org.au>, Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH v9 01/19] fs: Fix rw_hint validation
+Message-ID: <20240131-skilift-decken-cf3d638ce40c@brauner>
+References: <20240130214911.1863909-1-bvanassche@acm.org>
+ <20240130214911.1863909-2-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240130214911.1863909-2-bvanassche@acm.org>
 
-Delete critical sections that are time-consuming and protected by other mutexes
-to avoid this issue.
+On Tue, Jan 30, 2024 at 01:48:27PM -0800, Bart Van Assche wrote:
+> Reject values that are valid rw_hints after truncation but not before
+> truncation by passing an untruncated value to rw_hint_valid().
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Jeff Layton <jlayton@kernel.org>
+> Cc: Chuck Lever <chuck.lever@oracle.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+> Fixes: 5657cb0797c4 ("fs/fcntl: use copy_to/from_user() for u64 types")
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
 
-Reported-and-tested-by: syzbot+2373f6be3e6de4f92562@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- kernel/trace/blktrace.c | 2 ++
- 1 file changed, 2 insertions(+)
+The fs parts of this should go through a vfs tree as this is vfs infra.
+I can then give you a stable tag that you can merge and base the big
+block and scsci bits on. It'll minimize merge conflicts and makes it
+easier to coordinate imho.
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index d5d94510afd3..4543be718362 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -313,6 +313,7 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
- 
- static void blk_trace_free(struct request_queue *q, struct blk_trace *bt)
- {
-+	mutex_unlock(&q->debugfs_mutex);
- 	relay_close(bt->rchan);
- 
- 	/*
-@@ -325,6 +326,7 @@ static void blk_trace_free(struct request_queue *q, struct blk_trace *bt)
- 	} else {
- 		debugfs_remove(bt->dir);
- 	}
-+	mutex_lock(&q->debugfs_mutex);
- 	free_percpu(bt->sequence);
- 	free_percpu(bt->msg_data);
- 	kfree(bt);
--- 
-2.43.0
-
+>  fs/fcntl.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/fs/fcntl.c b/fs/fcntl.c
+> index c80a6acad742..3ff707bf2743 100644
+> --- a/fs/fcntl.c
+> +++ b/fs/fcntl.c
+> @@ -268,7 +268,7 @@ static int f_getowner_uids(struct file *filp, unsigned long arg)
+>  }
+>  #endif
+>  
+> -static bool rw_hint_valid(enum rw_hint hint)
+> +static bool rw_hint_valid(u64 hint)
+>  {
+>  	switch (hint) {
+>  	case RWH_WRITE_LIFE_NOT_SET:
+> @@ -288,19 +288,17 @@ static long fcntl_rw_hint(struct file *file, unsigned int cmd,
+>  {
+>  	struct inode *inode = file_inode(file);
+>  	u64 __user *argp = (u64 __user *)arg;
+> -	enum rw_hint hint;
+> -	u64 h;
+> +	u64 hint;
+>  
+>  	switch (cmd) {
+>  	case F_GET_RW_HINT:
+> -		h = inode->i_write_hint;
+> -		if (copy_to_user(argp, &h, sizeof(*argp)))
+> +		hint = inode->i_write_hint;
+> +		if (copy_to_user(argp, &hint, sizeof(*argp)))
+>  			return -EFAULT;
+>  		return 0;
+>  	case F_SET_RW_HINT:
+> -		if (copy_from_user(&h, argp, sizeof(h)))
+> +		if (copy_from_user(&hint, argp, sizeof(hint)))
+>  			return -EFAULT;
+> -		hint = (enum rw_hint) h;
+>  		if (!rw_hint_valid(hint))
+>  			return -EINVAL;
+>  
