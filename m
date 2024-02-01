@@ -1,161 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49661608E1;
-	Thu,  1 Feb 2024 17:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0785C04A;
+	Thu,  1 Feb 2024 17:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706807314; cv=none; b=huhPu1xgej7iHxBTYkgyBVwWoxXMSlxqbgiixu8fMwuoiU1I5u/iHf3Ccg5Z3vX1mM09S3oPkhQ6qRmHsjYvW/ftuByk0aA8O+X+zo7euXYD4cWrQxje7cB06GkAGhCu9lVd/HwJoIjU7ALv2XnHe/KuD0VUy7w94segPZWBRzY=
+	t=1706808995; cv=none; b=Hf6K73UkW4d9m9V/vqRO+6lCNeQPfw5OcTgHhogBVjf3zOsuPI+28WCH7ZhnrWaXYrUsL3qAZnuwuTFnDYaIMaBN9o+d4IUxv7W4VkSvCk3xhe3nNpIA9kIxJTwa5RFURoxb92dPVonSmFJS0dqhBoqSQyiURjN8pAbzULMyx98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706807314; c=relaxed/simple;
-	bh=W+bZPY9kaX5gm8ZK9DWmwVsBxj19zA8nfyKDN8FCYhM=;
+	s=arc-20240116; t=1706808995; c=relaxed/simple;
+	bh=TBmGaKe0krDiygVUYxtlPNQ4KktkWuvWJWggeWjjYo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u1HZNK0/2ahw4n/g/IUq0t0difpWdzE9mPppMcnCQLMEWrih/IZSQNzdfwOrl/JsZ5lKfuuzM/PFVC2phhje/8URrw3u1v086A6kEMg9ETNMizMe5iXMc08L0NH5M1laeOkT35OHNOK/KKXnggYUlFMpGR/ohQu4fGpBFgWY43A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AiPQAlPo; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=GbCx7nLQocxGgCpcvP1qb78ATDYnsvSB/5Ry5MZzAdvYmHfvDzG/tzEIXvh5ZBlP9x2NRqD/MI/sSQhmPe9GTH28PDEzRpBnkXde3ni3p8yN53+W51LT3D4HnQxfGeVZGofHUx1fLCwEsOHHh1yr7L9USb9j4E1rqPrGBJe8pTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=nY399TsQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=RT/Q78Yj; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=nY399TsQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=RT/Q78Yj; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AiPQAlPo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E0AAC433F1;
-	Thu,  1 Feb 2024 17:08:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706807314;
-	bh=W+bZPY9kaX5gm8ZK9DWmwVsBxj19zA8nfyKDN8FCYhM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AiPQAlPo7JSDOhGAAt8FDSIXniDqo8dQjuom0qvi/H1aZY+oEkeIgEtG9/IQ8OVKW
-	 2fT/jJu4h06T+J2OsdIsctPr0wODXti2tH0H3cgI+NZYyEA6XLZrEyw/htX5zoq+El
-	 IR/N3NXfkr5zNhUp9b49zi+Ka0id65WgQRbVJooSGK8OWs+6ps2QdBckEkeWPvoiIr
-	 lTEsLUsBGzFp3aXkOZ2i2Z7aQNd5j5uAvZesb7ogdpaMTODIM6P0+NQdlhG0KiLDwn
-	 IsX71BMTbqehCoWtRNEsLdMhoWHVMJdgOXu8eu+4j0prntFqNrV7ei1+MCGpoCOJh+
-	 pqtrHa40WjBog==
-Date: Thu, 1 Feb 2024 18:08:29 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 01/34] bdev: open block device as files
-Message-ID: <20240201-rational-wurfgeschosse-73ca66259263@brauner>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="nY399TsQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RT/Q78Yj";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="nY399TsQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RT/Q78Yj"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 38E731FBF0;
+	Thu,  1 Feb 2024 17:36:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1706808992; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jihreb443vt7QH9UloB81ix+EeA28Som6yjedwgNsXw=;
+	b=nY399TsQbZYg6Eye277HGPLHR5bngfIgDjWBq0V47Vy2sqLmgF13MTi37VwpOVA06ah1Lf
+	/o8n7BSe1dgZKAl82SdSwCjaxB3OQOB2v5iLzYQA5CQy6Xq4U4Q6kRYJ6Ey9AMXEAtMTFS
+	oXkxTrwOUsKlq5MpllbMJA+IdmSS3zI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1706808992;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jihreb443vt7QH9UloB81ix+EeA28Som6yjedwgNsXw=;
+	b=RT/Q78YjpbrMkr8vBhVbumrldMjonPivcaxo+h+q7wUr3Sg/mX7AaDcmu/5X0vWviC+yRo
+	JQr+nQwwabV9yCCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1706808992; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jihreb443vt7QH9UloB81ix+EeA28Som6yjedwgNsXw=;
+	b=nY399TsQbZYg6Eye277HGPLHR5bngfIgDjWBq0V47Vy2sqLmgF13MTi37VwpOVA06ah1Lf
+	/o8n7BSe1dgZKAl82SdSwCjaxB3OQOB2v5iLzYQA5CQy6Xq4U4Q6kRYJ6Ey9AMXEAtMTFS
+	oXkxTrwOUsKlq5MpllbMJA+IdmSS3zI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1706808992;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jihreb443vt7QH9UloB81ix+EeA28Som6yjedwgNsXw=;
+	b=RT/Q78YjpbrMkr8vBhVbumrldMjonPivcaxo+h+q7wUr3Sg/mX7AaDcmu/5X0vWviC+yRo
+	JQr+nQwwabV9yCCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2E85D139AB;
+	Thu,  1 Feb 2024 17:36:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ylViC6DWu2W3JwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 01 Feb 2024 17:36:32 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id B184BA0809; Thu,  1 Feb 2024 18:36:31 +0100 (CET)
+Date: Thu, 1 Feb 2024 18:36:31 +0100
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 31/34] block: use file->f_op to indicate restricted
+ writes
+Message-ID: <20240201173631.pda5jvi573hevpil@quack3>
 References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
- <20240123-vfs-bdev-file-v2-1-adbd023e19cc@kernel.org>
- <20240129160241.GA2793@lst.de>
+ <20240123-vfs-bdev-file-v2-31-adbd023e19cc@kernel.org>
+ <20240201110858.on47ef4cmp23jhcv@quack3>
+ <20240201-lauwarm-kurswechsel-75ed33e41ba2@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240129160241.GA2793@lst.de>
+In-Reply-To: <20240201-lauwarm-kurswechsel-75ed33e41ba2@brauner>
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spamd-Result: default: False [0.29 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-0.11)[66.33%]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: 0.29
 
-On Mon, Jan 29, 2024 at 05:02:41PM +0100, Christoph Hellwig wrote:
-> > +static unsigned blk_to_file_flags(blk_mode_t mode)
-> > +{
-> > +	unsigned int flags = 0;
-> > +
-> 
-> ...
-> 
-> > +	/*
-> > +	 * O_EXCL is one of those flags that the VFS clears once it's done with
-> > +	 * the operation. So don't raise it here either.
-> > +	 */
-> > +	if (mode & BLK_OPEN_NDELAY)
-> > +		flags |= O_NDELAY;
-> 
-> O_EXCL isn't dealt with in this helper at all.
+On Thu 01-02-24 17:16:02, Christian Brauner wrote:
+> On Thu, Feb 01, 2024 at 12:08:58PM +0100, Jan Kara wrote:
+> > On Tue 23-01-24 14:26:48, Christian Brauner wrote:
+> > > Make it possible to detected a block device that was opened with
+> > > restricted write access solely based on its file operations that it was
+> > > opened with. This avoids wasting an FMODE_* flag.
+> > > 
+> > > def_blk_fops isn't needed to check whether something is a block device
+> > > checking the inode type is enough for that. And def_blk_fops_restricted
+> > > can be kept private to the block layer.
+> > > 
+> > > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> > 
+> > I don't think we need def_blk_fops_restricted. If we have BLK_OPEN_WRITE
+> > file against a bdev with bdev_writes_blocked() == true, we are sure this is
+> > the handle blocking other writes so we can unblock them in
+> > bdev_yield_write_access()...
 
-Yeah, on purpose was my point bc we can just rely on @holder and passing
-_EXCL without holder is invalid. But I could add it.
+...
 
-> 
-> > +	/*
-> > +	 * If BLK_OPEN_WRITE_IOCTL is set then this is a historical quirk
-> > +	 * associated with the floppy driver where it has allowed ioctls if the
-> > +	 * file was opened for writing, but does not allow reads or writes.
-> > +	 * Make sure that this quirk is reflected in @f_flags.
-> > +	 */
-> > +	if (mode & BLK_OPEN_WRITE_IOCTL)
-> > +		flags |= O_RDWR | O_WRONLY;
-> 
-> .. and BLK_OPEN_WRITE_IOCTL will never be passed to it.  It only comes
-> from open block devices nodes.
-> 
-> That being said, passing BLK_OPEN_* to bdev_file_open_by_* actually
-> feels wrong.  They deal with files and should just take normal
-> O_* flags instead of translating from BLK_OPEN_* to O_* back to
-> BLK_OPEN_* for the driver (where they make sense as the driver
-> flags are pretty different from what is passed to open).
-> 
-> Now of course changing that would make a mess of the whole series,
-> so maybe that can go into a new patch at the end?
+> -       if (mode & BLK_OPEN_RESTRICT_WRITES)
+> +       if (mode & BLK_OPEN_WRITE) {
+> +               if (bdev_writes_blocked(bdev))
+> +                       bdev_unblock_writes(bdev);
+> +               else
+> +                       bdev->bd_writers--;
+> +       }
+> +       if (bdev_file->f_op == &def_blk_fops_restricted)
 
-Yes, I had considered that and it would work but there's the issue that
-we need to figure out how to handle BLK_OPEN_RESTRICT_WRITES. It has no
-corresponding O_* flag that would let us indicate this. So I had
-considered:
+Uh, why are you leaving def_blk_fops_restricted check here? I'd expect you
+can delete def_blk_fops_restricted completely...
 
-1/ Expose bdev_file_open_excl() so callers don't need to pass any
-   specific flags. Nearly all filesystems would effectively use this
-   helper as sb_open_mode() adds it implicitly. That would have the
-   side-effect of introducing another open helper ofc; possibly two if
-   we take _by_dev() and _by_path() into account.
+								Honza
 
-2/ Abuse an O_* flag to mean BLK_OPEN_RESTRICT_WRITES. For example,
-   O_TRUNC or O_NOCTTY which is pretty yucky.
-
-3/ Introduce an internal O_* flag which is also ugly. Vomitorious and my
-   co-maintainers would likely chop off my hands so I can't go near a
-   computer again.
-
-3/ Make O_EXCL when passed together with bdev_file_open_by_*() always
-   imply BLK_OPEN_RESTRICT_WRITES.
-
-The 3/ option would probably be the cleanest one and I think that all
-filesystems now pass at least a holder and holder ops so this _should_
-work.
-
-Thoughts?
-
-> 
-> > + * @noaccount: whether this is an internal open that shouldn't be counted
-> >   */
-> >  static struct file *alloc_file(const struct path *path, int flags,
-> > -		const struct file_operations *fop)
-> > +		const struct file_operations *fop, bool noaccount)
-> 
-> Just a suggestion as you are the maintainer here, but I always find
-> it hard to follow when infrastructure in subsystem A is changed in
-> a patch primarily changing subsystem B.  Can the file_table.c
-> changes go into a separate patch or patches with commit logs
-> documenting their semantics?
-> 
-> And while we're at the semantics I find this area already a bit of a
-> a mess and this doesn't make it any better..
-> 
-> How about the following:
-> 
->  - alloc_file loses the actual file allocation and gets a new name
->    (unfortunatel init_file is already taken), callers call
->    alloc_empty_file_noaccount or alloc_empty_file plus the
->    new helper.
->  - similarly __alloc_file_pseudo is split into a helper creating
->    a path for mnt and inode, and callers call that plus the
->    file allocation
-> 
-> ?
-
-Ok, let me see how far I get.
-
-> 
-> > +extern struct file *alloc_file_pseudo_noaccount(struct inode *, struct vfsmount *,
-> 
-> no need for the extern here.
-> 
-> > +	struct block_device	*s_bdev;	/* can go away once we use an accessor for @s_bdev_file */
-> 
-> can you put the comment into a separate line to make it readable.
-> 
-> But I'm not even sure it should go away.  s_bdev is used all over the
-> data and metadata I/O path, so caching it and avoiding multiple levels
-> of pointer chasing would seem useful.
-
-Fair.
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
