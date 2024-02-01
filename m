@@ -1,183 +1,157 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E984F51A;
-	Thu,  1 Feb 2024 11:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47442134F
+	for <linux-block@vger.kernel.org>; Thu,  1 Feb 2024 13:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706787270; cv=none; b=NOGdEU9VJuJFyRY5K66+TTnO8CznbMxNauc3uBvUTmn+Hv3BEuUe7ytGvxXawCuZbLaFwkICm4j+lV6oyWsqwJBFn5rAwwWQy0t01cwoePboDaSlCXY7ln6sGNPmGSu96dCmH0oSXzEFUg+7ZfgLh/iowKhGq9Tr5OvVPzZlGRY=
+	t=1706792922; cv=none; b=C1jDbzk9ELl3YxkqeXWam+fbUMyhZvVI1y7nvaJasDaIv53ilRD1S9n6xkX1TUHxTDnRPQYUzv4uU9hBo/o1YADqhqEzLlzc6uuaFUFGF0IDbZbf/Ry5/GBar085xQRzyx6hvjdPnUn82N854zvlm9GZ7QZ1ErBtmhT/e6UqETw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706787270; c=relaxed/simple;
-	bh=aXpAK4tj1EFfMG7ih98fawOOmK4LJe8i5Ppug0n+TKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jqzHyLzWoHh6K507uAzkvPcc7DXzBrl5d8aT/FItEAP5p0gyPkyDI/0UgM6BwUElJbzrTo0sgF87CzynMaZ4EuYhZPv2AHt+sBapFNBmUBdKASFZXPlDLapQCToh2scBX9ZYiiWEhleAGVcVhtzCXGwCeT5OflreJG5xLeblFi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=OSBoJz5G; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=HsGmnHL1; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=t0TpuvFv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Zidozr88; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1706792922; c=relaxed/simple;
+	bh=4+H0p9SQtNEqrCrIryOaLUlRf1MJtevuOOiBa/BoBBU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=iuJYb9AgVfGIP+BSGfSdANi0J74f7LMqrS9yktrv6RUOtE/hJ33Z+kQyhV2agG3cok+LRu9TpUsiMDseBgIbqNXraG8QLi6mxyaT2N5Sg7oHggKlPtWutZhY8mV6J96KCBb/hXW09FiMl3sT4WASGIYR1ZabIR9chfyn6Qn39ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=BEAW0Q9e; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="OSBoJz5G";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="HsGmnHL1";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="t0TpuvFv";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Zidozr88"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3DB77221C1;
-	Thu,  1 Feb 2024 11:34:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706787266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a78fyv5096pBiP+VBS0+j2E+pgVQnv+5/ICuN/FGT/w=;
-	b=OSBoJz5Gh7IZRXaxCF8tWFYwafM8hukAMDSs8YOKyt4E2ckPdUIRQpYURYczHrsWL0mHcS
-	ZyaGDbjiGi19JmN21dFQ3crFKALIO2SOx95PIyyjF/0keptLpFvbzw6EK3/qkbBArp2kt9
-	V1ZKX0WrYfFe9qpzZDvkn/6bQTGshSc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706787266;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a78fyv5096pBiP+VBS0+j2E+pgVQnv+5/ICuN/FGT/w=;
-	b=HsGmnHL16qYRn4BADkgaGEUgaFt5/RlZE4wOn7JL739xzL0HSfZvVkleCk6sJeilt+r4TK
-	2OqTaQjU/DGPsVBA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706787265; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a78fyv5096pBiP+VBS0+j2E+pgVQnv+5/ICuN/FGT/w=;
-	b=t0TpuvFvXcTjkpATCrzQVRir0/enkS9AR97ONdQ+1kbTmXWguwRosOpipuWOyDQ6cFw6G4
-	u7BfO5ct954RedwibTFU2GnWwyQzogPol52MMU6SHih1tpAM0d3k3ZbdinIpwdojQ8PJV4
-	E5nBg5jiUXIHcGR/EZC0vKUdAoyO00I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706787265;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a78fyv5096pBiP+VBS0+j2E+pgVQnv+5/ICuN/FGT/w=;
-	b=Zidozr88bVAS2CmwEMGf3hzltFDgCPoO5fGB7LTNXTLf34Rfz/+HPsKYpsMFQ7D22RcHr3
-	qpfucOD3MoWAlCAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2B464139B1;
-	Thu,  1 Feb 2024 11:34:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XPRMCsGBu2WAJwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 01 Feb 2024 11:34:25 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id A502BA0809; Thu,  1 Feb 2024 12:34:24 +0100 (CET)
-Date: Thu, 1 Feb 2024 12:34:24 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 34/34] ext4: rely on sb->f_bdev only
-Message-ID: <20240201113424.xyoeubrywa3vdgxt@quack3>
-References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
- <20240123-vfs-bdev-file-v2-34-adbd023e19cc@kernel.org>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="BEAW0Q9e"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240201130831epoutp03809241f88b51497811b75df2787feb0f~vvxwrhLmJ3113831138epoutp03c
+	for <linux-block@vger.kernel.org>; Thu,  1 Feb 2024 13:08:31 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240201130831epoutp03809241f88b51497811b75df2787feb0f~vvxwrhLmJ3113831138epoutp03c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1706792911;
+	bh=UJSP0vaanNwikG01nXvwMCU7tRROo2e99p0nU1Uum3g=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=BEAW0Q9enyvuc1FFzwcqHPeqWqhrMU/9df2cBrj96E3r67xrHdIy8ZWwX7hcKYcxp
+	 AAadOB+CjmSfCPOyIC2ddPy7woqcdR+5Ci3c3znL0Kwq9kUQql4SxZLMrjEgTpTDe/
+	 F909cHny8lAYfZfow8oI0+AHEixx8aRVo215BDeA=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240201130831epcas5p3aeb0257db71d5dffd692d1a676562770~vvxwOtfKO1587615876epcas5p3x;
+	Thu,  1 Feb 2024 13:08:31 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4TQfNY1hVNz4x9Pq; Thu,  1 Feb
+	2024 13:08:29 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	91.4E.10009.DC79BB56; Thu,  1 Feb 2024 22:08:29 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240201130828epcas5p10bd98bcb6b8e9444603e347c2a910c44~vvxuIiYPU2255222552epcas5p13;
+	Thu,  1 Feb 2024 13:08:28 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240201130828epsmtrp1a7908ec15bd3ab9d4784e44b53e7dd64~vvxuH1G-o2514325143epsmtrp1Q;
+	Thu,  1 Feb 2024 13:08:28 +0000 (GMT)
+X-AuditID: b6c32a4a-ff1ff70000002719-db-65bb97cdd11b
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	1B.2C.08755.CC79BB56; Thu,  1 Feb 2024 22:08:28 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240201130825epsmtip19275d0154f5ec41decaaac9259ea2538~vvxrecTdI2208822088epsmtip1F;
+	Thu,  1 Feb 2024 13:08:25 +0000 (GMT)
+From: Kanchan Joshi <joshi.k@samsung.com>
+To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de,
+	martin.petersen@oracle.com, sagi@grimberg.me
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH v2 0/3] Block integrity with flexible-offset PI
+Date: Thu,  1 Feb 2024 18:31:23 +0530
+Message-Id: <20240201130126.211402-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123-vfs-bdev-file-v2-34-adbd023e19cc@kernel.org>
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spamd-Result: default: False [-2.60 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -2.60
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmk+LIzCtJLcpLzFFi42LZdlhTU/fs9N2pBl/nc1isvtvPZnHzwE4m
+	i5WrjzJZHP3/ls1i0qFrjBZ7b2lbzF/2lN1i+fF/TBbrXr9nceD0OH9vI4vH5bOlHptWdbJ5
+	bF5S77H7ZgObx8ent1g8+rasYvT4vEkugCMq2yYjNTEltUghNS85PyUzL91WyTs43jne1MzA
+	UNfQ0sJcSSEvMTfVVsnFJ0DXLTMH6DglhbLEnFKgUEBicbGSvp1NUX5pSapCRn5xia1SakFK
+	ToFJgV5xYm5xaV66Xl5qiZWhgYGRKVBhQnbGoblNjAW7uCqOvzvI3sA4gaOLkZNDQsBE4unO
+	fsYuRi4OIYHdjBLHNr5hg3A+MUpMfPoeyvnGKLHhzxRGmJY9M5cxgdhCAnuBEq0WEEWfGSWW
+	PfzH3MXIwcEmoClxYXIpSI2IQJLEx77zYL3MAjUSl++eBusVFrCX2Np8nQ3EZhFQlVj1oAWs
+	hlfAUuLNp8VsELvkJWZe+s4OEReUODnzCQvEHHmJ5q2zmUH2Sgh8ZZfoWvqBGaLBRWL/ofdQ
+	zcISr45vYYewpSRe9rdB2ckSl2aeY4KwSyQe7zkIZdtLtJ7qB7ufGej+9bv0IXbxSfT+fsIE
+	EpYQ4JXoaBOCqFaUuDfpKSuELS7xcMYSKNtDYvrR6+yQ4ImVuLv6KPMERrlZSD6YheSDWQjL
+	FjAyr2KUTC0ozk1PLTYtMMpLLYdHZXJ+7iZGcKrU8trB+PDBB71DjEwcjIcYJTiYlUR4V8rt
+	TBXiTUmsrEotyo8vKs1JLT7EaAoM1onMUqLJ+cBknVcSb2hiaWBiZmZmYmlsZqgkzvu6dW6K
+	kEB6YklqdmpqQWoRTB8TB6dUA1PgxP7V3U8FG+dxX3n0ZWegqv0Wm/WTWPZN8L7LNXHBAZ7D
+	u5+KVv46NiV6/ra4mtI1XRxpnXebkxlbZh56vebdi8POv6NVkxquOGinX1l8psZl3xFzhodL
+	vq5LCJrStvB62D5tf6P0/l2/FzHKzHeMUvXYx7Kn/gnH+se/L/Mv2H5qRfcU4zLRW4GX3igo
+	B03PWvDD3fB0n9DNU43xHI9Tau/NErdS/RQiPeVLFVOySNjjBBduu+p8hlna9ULLfvxtOic0
+	c8EqwbMa7ws9f+5uuNBZMzM4qpr7adqmGR2MNny/s/Lqso2OdmY7Puw6trrHLiV1+6xJiQEe
+	VavXNr+5FsmiUWvUXfPzzFbxY0uVWIozEg21mIuKEwEYjqx/HgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKLMWRmVeSWpSXmKPExsWy7bCSnO6Z6btTDd62q1qsvtvPZnHzwE4m
+	i5WrjzJZHP3/ls1i0qFrjBZ7b2lbzF/2lN1i+fF/TBbrXr9nceD0OH9vI4vH5bOlHptWdbJ5
+	bF5S77H7ZgObx8ent1g8+rasYvT4vEkugCOKyyYlNSezLLVI3y6BK+PQ3CbGgl1cFcffHWRv
+	YJzA0cXIySEhYCKxZ+Yypi5GLg4hgd2MEm8fnWKCSIhLNF/7wQ5hC0us/PecHaLoI6PEtt3d
+	QEUcHGwCmhIXJpeC1IgIZEh0/J7BDFLDLNDAKLHu9S6wQcIC9hJbm6+zgdgsAqoSqx60MILY
+	vAKWEm8+LWaDWCAvMfPSd3aIuKDEyZlPWEBsZqB489bZzBMY+WYhSc1CklrAyLSKUTK1oDg3
+	PbfYsMAwL7Vcrzgxt7g0L10vOT93EyM4pLU0dzBuX/VB7xAjEwfjIUYJDmYlEd6VcjtThXhT
+	EiurUovy44tKc1KLDzFKc7AoifOKv+hNERJITyxJzU5NLUgtgskycXBKNTB17hfSUlzsZLcj
+	YKpV34Xl5nNt3FTrnLlZs3da+/6PML1cPPGqm/JJxsl/7zmUPTOyCbc8ninX+L237KRr1erm
+	U5MKDI5mHFnvy1rw4f4/jo0+sZwO3xbtm/l8xSL3XVtjigUbBZM9+KJ63Hh/Zd90PS+ruvPc
+	l4awxJ9tLHoCTxZvfCfdqKaXLnPExCM/InbFqw1hbDM5jJ7fkuy4PaFb5Yl2zMGispybL/8q
+	zky9tvFVduVdJ/aMQwnyDx5emPQj58eTIwvc9rIUe2y91fnrr+Utp6tdB0sNtlmcTu75ssr6
+	c8J5ldhfxbtjJfmiXj67H9C7IiK6eg6j3fppdg3LCnffs9ih48N5y0rtf5USS3FGoqEWc1Fx
+	IgAd4DER2AIAAA==
+X-CMS-MailID: 20240201130828epcas5p10bd98bcb6b8e9444603e347c2a910c44
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240201130828epcas5p10bd98bcb6b8e9444603e347c2a910c44
+References: <CGME20240201130828epcas5p10bd98bcb6b8e9444603e347c2a910c44@epcas5p1.samsung.com>
 
-On Tue 23-01-24 14:26:51, Christian Brauner wrote:
-> (1) Instead of bdev->bd_inode->i_mapping we do f_bdev->f_mapping
-> (2) Instead of bdev->bd_inode we could do f_bdev->f_inode
-> 
-> I mention this explicitly because (1) is dependent on how the block
-> device is opened while (2) isn't. Consider:
-> 
-> mount -t tmpfs tmpfs /mnt
-> mknod /mnt/foo b <minor> <major>
-> open("/mnt/foo", O_RDWR);
-> 
-> then (1) doesn't work because f_bdev->f_inode is a tmpfs inode _not_ the
-> actual bdev filesystem inode. But (2) is still the bd_inode->i_mapping
-> as that's set up during bdev_open().
-> 
-> IOW, I'm explicitly _not_ going via f_bdev->f_inode but via
-> f_bdev->f_mapping->host aka bdev_file_inode(f_bdev). Currently this
-> isn't a problem because sb->s_bdev_file stashes the a block device file
-> opened via bdev_open_by_*() which is always a file on the bdev
-> filesystem.
-> 
-> _If_ we ever wanted to allow userspace to pass a block device file
-> descriptor during superblock creation. Say:
-> 
-> fsconfig(fs_fd, FSCONFIG_CMD_CREATE_EXCL, "source", bdev_fd);
-> 
-> then using f_bdev->f_inode would be very wrong. Another thing to keep in
-> mind there would be that this would implicitly pin another filesystem.
-> Say:
-> 
-> mount -t ext4 /dev/sda /mnt
-> mknod /mnt/foo b <minor> <major>
-> bdev_fd = open("/mnt/foo", O_RDWR);
-> 
-> fd_fs = fsopen("xfs")
-> fsconfig(fd_fs, FSCONFIG_CMD_CREATE, "source", bdev_fd);
-> fd_mnt = fsmount(fd_fs);
-> move_mount(fd_mnt, "/mnt2");
-> 
-> umount /mnt # EBUSY
-> 
-> Because the xfs filesystem now pins the ext4 filesystem via the
-> bdev_file we're keeping. In other words, this is probably a bad idea and
-> if we allow userspace to do this then we should only use the provided fd
-> to lookup the block device and open our own handle to it.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+The block integrity subsystem can only work with PI placed in the first
+bytes of the metadata buffer.
 
-I suppose this is more or less a sample how to get rid of sb->s_bdev /
-bd_inode dereferences AFAICT? Because otherwise I'm not sure why it was
-included in this series...
+The series makes block-integrity support the flexible placement of PI.
+And changes NVMe driver to make use of the new capability.
 
-> @@ -5576,7 +5576,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
->  	 * used to detect the metadata async write error.
->  	 */
->  	spin_lock_init(&sbi->s_bdev_wb_lock);
-> -	errseq_check_and_advance(&sb->s_bdev->bd_inode->i_mapping->wb_err,
-> +	errseq_check_and_advance(&sb->s_bdev_file->f_mapping->wb_err,
->  				 &sbi->s_bdev_wb_err);
+This helps to
+(i) enable the more common case for NVMe (PI in last bytes is the norm)
+(ii) reduce nop profile users (tried by Jens recently [1]).
 
-So when we have struct file, it would be actually nicer to drop
-EXT4_SB(sb)->s_bdev_wb_err completely and instead use
-file_check_and_advance_wb_err(sb->s_bdev_file). But that's a separate
-cleanup I suppose.
+/* For NS 4K+16b, 8b PI, last bytes */
+Before:
+# cat /sys/block/nvme0n1/integrity/format
+nop
 
-								Honza
+After:
+# cat /sys/block/nvme0n1/integrity/format
+T10-DIF-TYPE1-CRC
+
+Changes since v1:
+- Reworded commit messsage in patch 2 and 3 (hch)
+- Variable initialization order change (hch)
+- Collect reviewed-by
+
+[1] https://lore.kernel.org/linux-block/20240111160226.1936351-1-axboe@kernel.dk/
+
+
+
+Kanchan Joshi (3):
+  block: refactor guard helpers
+  block: support PI at non-zero offset within metadata
+  nvme: allow integrity when PI is not in first bytes
+
+ block/bio-integrity.c         |  1 +
+ block/blk-integrity.c         |  1 +
+ block/t10-pi.c                | 72 +++++++++++++++++++++++------------
+ drivers/nvme/host/core.c      |  8 +++-
+ drivers/nvme/host/nvme.h      |  1 +
+ include/linux/blk-integrity.h |  1 +
+ include/linux/blkdev.h        |  1 +
+ 7 files changed, 60 insertions(+), 25 deletions(-)
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.25.1
+
