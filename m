@@ -1,76 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE983A8DA;
-	Wed, 31 Jan 2024 23:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C1C1FD7;
+	Thu,  1 Feb 2024 00:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706745580; cv=none; b=lV3yVKgZiAooncIt/GgnlTZzH2kZkJHaRulWDKT15Au7uXwRWIpgGplfxfNvzSsoHmVxt1gZvqRjdlW3UyuN3VRqU2e9Y9ZBVrEDksQi1XPv0HPo2nKubpwHA0fuJoSl+Q2Db6FEZ8xkkmCHd8oZ8oNz2MhnhrtWevbmolM9FJU=
+	t=1706747782; cv=none; b=Ut/0pp8SDqX5aHC8Q6dI5XJLSXQ5oh6IPCxS/jxtEBcPUS3kJKD+5x3QkrPjViiUm2DcbFSrMQ719IxaIWjX+ro0qcun+nr0RS08BntAS5kOYDmcPDFUqX/NxK7wuPQVCL2cag6Iq0O3gHr5GqpHvzLQwwoxxqLHuq0JMnjJxOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706745580; c=relaxed/simple;
-	bh=BqQioyDl6ZFsyJQQi44W0KmQtj2xwsLFchj24A3uE2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kn/2feCEndWtbEVmyez7NWV73k93BmxTHV6pmWQwnyFdQpGDYKhbohTtfh0Ma+z+dRnlhsC+LricpLLHMep9i+vceIhD70V2Icb9yMmTxhzlacjaX3dysXrtIt6HNnvB2zQprL3ECu5MuUlfAE4pCH/6su1b1gV8hKW/ws0kgZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5hG0CSS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706747782; c=relaxed/simple;
+	bh=0JtscoZzimQzp2qkEcWvxbxxzEjKJfAvKpp5ErN+JRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VLXPeMm61T/gjvcT6yfIuiCPoQTZmbGaAUL1MtMAHBa5FSuu2MINLYFEz2Jf4GUiGQsXKtHkhgtdgQQpMqVX8+FqeFYjXvPU4TzyY0b3tF28YdTxkQDWa8jcDBxCWk1Yyoe8dnoisVhqN3GdK3Zs8prHGsM2NUoEhVqweDnXWr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hdj1O3eT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m5hG0CSS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12311C43390;
-	Wed, 31 Jan 2024 23:59:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hdj1O3eT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93251C433F1;
+	Thu,  1 Feb 2024 00:36:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706745579;
-	bh=BqQioyDl6ZFsyJQQi44W0KmQtj2xwsLFchj24A3uE2U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=m5hG0CSSZS9PDVuqao99NoSzc8nXYfQ4NLyoPNJZk1VCfY09xGnTRbHuZPcptd3i/
-	 lJWj8PGLo+7/NJuM25NJTxTSjRgUB+iwHko4ZoTbM4NMYOXnXjjKSxA4ylk54g60tu
-	 ZIPHcC2nT/RZhrgDaluBdwt28J2Kh1IsokptEDNOZRbfjsp+Xfh+8wdHYTMAjm0mQO
-	 dfLqIZQ0OYKphA5odW5GmtEx20atfN5AOZv06/5LGiR5hRmFJPAtCNyJWnty/F6g81
-	 vSqU+qNBXbnvz1l/c9IGoirSy+qgKz+KQYAaF+9bi7vl8WyxyplOaxgZ6k53s2ED76
-	 OqpgEAU6IgUMg==
-Message-ID: <487ac3ad-2343-451b-a84e-153d0b01dee4@kernel.org>
-Date: Thu, 1 Feb 2024 08:59:36 +0900
+	s=k20201202; t=1706747781;
+	bh=0JtscoZzimQzp2qkEcWvxbxxzEjKJfAvKpp5ErN+JRw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Hdj1O3eTlMJ5bNCLIljTMwhz4Ww4bqYUMvrHtpjmot/k5qbNGF93N1onIpUznJnrO
+	 IDiPQsEdl5HfbfFEXnJLRN5YhAYMvgEExsGwNC2xH26C3zwYrnE51VGmkLnZbLkhO6
+	 agMEGfcAZjUvB+EdBye9rmc3W9mTqLPwifIi1FYb5h/Ea/WqpHmSZ1o0FwrZuHMC9w
+	 SXmURZUVXViiBF49/ionbkWJ81ktopVaeqppc3Qh6F/kkGxu9ua8C+nmutT+Gmy7uy
+	 zANJK1OLoEkjbjwuXhnVOMdJATbKPqLFserhHWxntsKFLkWFI5uHhPicWpgTMkCtCg
+	 YBy4P1/MEwX9g==
+Date: Wed, 31 Jan 2024 17:36:18 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, virtualization@lists.linux.dev,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 05/14] block: add a max_user_discard_sectors queue limit
+Message-ID: <ZbrngpaAisIJGQ0T@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240131130400.625836-1-hch@lst.de>
+ <20240131130400.625836-6-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] block: print warning when invalid domain set to
- ioprio
-Content-Language: en-US
-To: Zhaoyang Huang <huangzhaoyang@gmail.com>,
- Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Hannes Reinecke <hare@suse.de>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "steve.kang@unisoc.com" <steve.kang@unisoc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Bart Van Assche <bvanassche@acm.org>
-References: <20240131121401.3898735-1-zhaoyang.huang@unisoc.com>
- <ZbpCo+90OsXJwFWV@x1-carbon> <ZbpGDFUGQoaRQWHq@x1-carbon>
- <CAGWkznGOjsA3eGRt4i-1XAt=39ce7vaN7=zciimLJOMg=HD7Zw@mail.gmail.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <CAGWkznGOjsA3eGRt4i-1XAt=39ce7vaN7=zciimLJOMg=HD7Zw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240131130400.625836-6-hch@lst.de>
 
-On 2/1/24 08:34, Zhaoyang Huang wrote:
-> On Wed, Jan 31, 2024 at 9:07 PM Niklas Cassel <Niklas.Cassel@wdc.com> wrote:
->> This sound like either a bug in the FS or by some of your local changes
->> that you did for your other patch (ioprio based on activity).
-> Yes. That's why I would like to suggest adding some information here
-> to help developers find the clue quickly.
+On Wed, Jan 31, 2024 at 02:03:51PM +0100, Christoph Hellwig wrote:
+>  static ssize_t queue_discard_max_store(struct request_queue *q,
+>  				       const char *page, size_t count)
+>  {
+> -	unsigned long max_discard;
+> -	ssize_t ret = queue_var_store(&max_discard, page, count);
+> +	unsigned long max_discard_bytes;
+> +	ssize_t ret;
+>  
+> +	ret = queue_var_store(&max_discard_bytes, page, count);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	if (max_discard & (q->limits.discard_granularity - 1))
+> +	if (max_discard_bytes & (q->limits.discard_granularity - 1))
+>  		return -EINVAL;
+>  
+> -	max_discard >>= 9;
+> -	if (max_discard > UINT_MAX)
+> +	if ((max_discard_bytes >> SECTOR_SHIFT) > UINT_MAX)
+>  		return -EINVAL;
+>  
+> -	if (max_discard > q->limits.max_hw_discard_sectors)
+> -		max_discard = q->limits.max_hw_discard_sectors;
+> -
+> -	q->limits.max_discard_sectors = max_discard;
+> +	q->limits.max_user_discard_sectors = max_discard_bytes >> SECTOR_SHIFT;
+> +	q->limits.max_discard_sectors =
+> +		min_not_zero(q->limits.max_hw_discard_sectors,
+> +			     q->limits.max_user_discard_sectors);
 
-The backtrace was not clear enough ?
+s/min_not_zero/min
 
-When a request reaches mq-deadline, the request priority is supposed to be
-correct already. Your changes had a bug and broke that assumption. Please fix
-that instead of adding error messages for errors that should never happen in the
-first place.
+Otherwise the whole series looks pretty good! And with that:
 
--- 
-Damien Le Moal
-Western Digital Research
-
+Reviewed-by: Keith Busch <kbusch@kernel.org>
