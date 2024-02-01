@@ -1,91 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C1C1FD7;
-	Thu,  1 Feb 2024 00:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D342101D2;
+	Thu,  1 Feb 2024 02:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706747782; cv=none; b=Ut/0pp8SDqX5aHC8Q6dI5XJLSXQ5oh6IPCxS/jxtEBcPUS3kJKD+5x3QkrPjViiUm2DcbFSrMQ719IxaIWjX+ro0qcun+nr0RS08BntAS5kOYDmcPDFUqX/NxK7wuPQVCL2cag6Iq0O3gHr5GqpHvzLQwwoxxqLHuq0JMnjJxOM=
+	t=1706755207; cv=none; b=us7G+NOJrYNeZtXh6O16+rfIv5mftKrLiUkvMOx/gCEbO80mEOEjCSeXCgy0QI1Sj9wQjIrobbSDgGyk3xExaemfpNg8tfn1QM2mw5VVkv1KXqKYyUkg5/JwS5PaVXjQvKzrabSCndvSFQs7lj+cI1MChuQPWYlkZRWRw5/RgUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706747782; c=relaxed/simple;
-	bh=0JtscoZzimQzp2qkEcWvxbxxzEjKJfAvKpp5ErN+JRw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VLXPeMm61T/gjvcT6yfIuiCPoQTZmbGaAUL1MtMAHBa5FSuu2MINLYFEz2Jf4GUiGQsXKtHkhgtdgQQpMqVX8+FqeFYjXvPU4TzyY0b3tF28YdTxkQDWa8jcDBxCWk1Yyoe8dnoisVhqN3GdK3Zs8prHGsM2NUoEhVqweDnXWr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hdj1O3eT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706755207; c=relaxed/simple;
+	bh=LPpZdySx2W/ZIxGVAEs34b1jtJV9q9VGPAnbd7UvT+Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ArKic/oKz7z7oAPmAxk77K6sdU335/zWikWkpuRbkuYFEiJX4LDBVpJJwbHS0wOWJrv7F+TTG4PEE3bG6UgknCZHAn+1UbH1OZXtUsiivwm0nPdJs57vGhe7GdbVL2jv1MyIFtT0/FVUxqwVljOLoqhMeuQE7FbhS3qbBphdlRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VaR0XplI; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hdj1O3eT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93251C433F1;
-	Thu,  1 Feb 2024 00:36:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706747781;
-	bh=0JtscoZzimQzp2qkEcWvxbxxzEjKJfAvKpp5ErN+JRw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hdj1O3eTlMJ5bNCLIljTMwhz4Ww4bqYUMvrHtpjmot/k5qbNGF93N1onIpUznJnrO
-	 IDiPQsEdl5HfbfFEXnJLRN5YhAYMvgEExsGwNC2xH26C3zwYrnE51VGmkLnZbLkhO6
-	 agMEGfcAZjUvB+EdBye9rmc3W9mTqLPwifIi1FYb5h/Ea/WqpHmSZ1o0FwrZuHMC9w
-	 SXmURZUVXViiBF49/ionbkWJ81ktopVaeqppc3Qh6F/kkGxu9ua8C+nmutT+Gmy7uy
-	 zANJK1OLoEkjbjwuXhnVOMdJATbKPqLFserhHWxntsKFLkWFI5uHhPicWpgTMkCtCg
-	 YBy4P1/MEwX9g==
-Date: Wed, 31 Jan 2024 17:36:18 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, virtualization@lists.linux.dev,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 05/14] block: add a max_user_discard_sectors queue limit
-Message-ID: <ZbrngpaAisIJGQ0T@kbusch-mbp.dhcp.thefacebook.com>
-References: <20240131130400.625836-1-hch@lst.de>
- <20240131130400.625836-6-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VaR0XplI"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-511234430a4so683559e87.3;
+        Wed, 31 Jan 2024 18:40:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706755203; x=1707360003; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IXWwSoZre+3koEZnxFdbxmNFgGH19wNuOnkGx1zO/uo=;
+        b=VaR0XplIH/0m+a3msiUn/1QKoOKjnoJoLNsI/tYCscCPKiiuQFzSQ6oNfLQAuu+TKf
+         ebR99ReLfy8UtoEwAPNpqWcKTQznVeMOAuZ5ctKd7ml2JbY5UJfoIBT7kOE9fKurS1Z3
+         2z92KbgADy4WAUVow4KwYh30oJaAm3lYY1c2Aaijwvcrm7Nw7e0/Ngve4MbYnct0tZ3U
+         ghv4aDP8dFMWUt4cTP5ou1RLTTqgUgKj+FDgkFYhd3WGnp+8wP/BnIAtJsXisrWMW/7I
+         SqDJdi20LClFGhkP5X3ae+RVqNHaK7pRUBs7OigdEDhZv8SjOhDAtMB/uM3NwSvzIhCe
+         NhXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706755203; x=1707360003;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IXWwSoZre+3koEZnxFdbxmNFgGH19wNuOnkGx1zO/uo=;
+        b=Q6+nG+BwMopuraGEBQWzR/7nHLSJ9ZdbIwe3J4E4D9kRW0y2IcnkNDjE+k/DpHTltb
+         D8jLF1jNxI4K824ebvkst+KWWziCSsn44f6PN/wgGhKzEXGsWB6tzLcOt7VWhY5Yg2j+
+         h8XeAtaMOF/IuoLqEmpOCuGfX8FyAvU5Lqh3Iv97Bcw0DRSw4VMARN+bnYzaRZW/0pjO
+         pcmHy0e36zSlub3gj94N7YlKn1vpF1yvZpbBfLvAy+EBlt9+ZhMlC8AuAI/RCFZJRsMj
+         O1Yu02I7o3hvn6+J1lV7G0udC5+i9/872sXctJtwJV/DHw5ffMF1+bE74Ruohw7AtodS
+         +A6Q==
+X-Gm-Message-State: AOJu0YzZRvdV2aDW4DASJAA+hDbOMbvIJN57gug3Kdd8PR2j/5ewt0bz
+	bhkzT85Y90rY/I/Sjx2w5BEwWa9UwI3d0L3rFZKQDF3xmD3HUSkzitMxiNsQvDMqX7ZqZCNhRWY
+	oPebrFZ6D5z2HcLfYMtBE5yo5MDk=
+X-Google-Smtp-Source: AGHT+IHhiubWEPUZz6obhjsoWIzt66BkqGcoVMY/N2K7pJstetjvqMcWLLVQcprzBQwAdKduriiDI+IglB8rF/dJCRk=
+X-Received: by 2002:ac2:4d10:0:b0:510:e05:435a with SMTP id
+ r16-20020ac24d10000000b005100e05435amr759072lfi.26.1706755203061; Wed, 31 Jan
+ 2024 18:40:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131130400.625836-6-hch@lst.de>
+References: <20240131105912.3849767-1-zhaoyang.huang@unisoc.com> <ZbpJqYvkoGM7fvbC@casper.infradead.org>
+In-Reply-To: <ZbpJqYvkoGM7fvbC@casper.infradead.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Thu, 1 Feb 2024 10:39:51 +0800
+Message-ID: <CAGWkznGLt-T1S7_BM8-2eLhxVYktYYLmdfMbRKRK88Ami-mEdg@mail.gmail.com>
+Subject: Re: [PATCHv6 1/1] block: introduce content activity based ioprio
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, Yu Zhao <yuzhao@google.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Niklas Cassel <niklas.cassel@wdc.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, 
+	Hannes Reinecke <hare@suse.de>, Linus Walleij <linus.walleij@linaro.org>, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 31, 2024 at 02:03:51PM +0100, Christoph Hellwig wrote:
->  static ssize_t queue_discard_max_store(struct request_queue *q,
->  				       const char *page, size_t count)
->  {
-> -	unsigned long max_discard;
-> -	ssize_t ret = queue_var_store(&max_discard, page, count);
-> +	unsigned long max_discard_bytes;
-> +	ssize_t ret;
->  
-> +	ret = queue_var_store(&max_discard_bytes, page, count);
->  	if (ret < 0)
->  		return ret;
->  
-> -	if (max_discard & (q->limits.discard_granularity - 1))
-> +	if (max_discard_bytes & (q->limits.discard_granularity - 1))
->  		return -EINVAL;
->  
-> -	max_discard >>= 9;
-> -	if (max_discard > UINT_MAX)
-> +	if ((max_discard_bytes >> SECTOR_SHIFT) > UINT_MAX)
->  		return -EINVAL;
->  
-> -	if (max_discard > q->limits.max_hw_discard_sectors)
-> -		max_discard = q->limits.max_hw_discard_sectors;
-> -
-> -	q->limits.max_discard_sectors = max_discard;
-> +	q->limits.max_user_discard_sectors = max_discard_bytes >> SECTOR_SHIFT;
-> +	q->limits.max_discard_sectors =
-> +		min_not_zero(q->limits.max_hw_discard_sectors,
-> +			     q->limits.max_user_discard_sectors);
+On Wed, Jan 31, 2024 at 9:23=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
+> wrote:
+>
+> On Wed, Jan 31, 2024 at 06:59:12PM +0800, zhaoyang.huang wrote:
+> > change of v6: replace the macro of bio_add_xxx by submit_bio which
+> >               iterating the bio_vec before launching bio to block layer
+>
+> Still wrong.
+I did some research on bio operations in the system and state my
+understanding here. I would like to have you review it and give me
+more details of the fault. thanks
 
-s/min_not_zero/min
+1. REQ_OP_ZONE_xxx
+a. These operations are from driver/block layer/fs where we can keep
+driver/block layer using the legacy submit_bio by not including
+act_prio.h.
+b. most of fs's REQ_OP_ZONE_xxx will be handled by blkdev_zone_mgmt
+which is the same as 'a'
+c. __submit_zone_reset_cmd within f2fs use no page for REQ_OP_ZONE_RESET
 
-Otherwise the whole series looks pretty good! And with that:
+2. other REQ_OP_<none>_READ/WRITE except REQ_OP_ZONE_xxx
+These operations all comes from driver and block layer as same as 1.a
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
+3. direct_io
+keep fs/direct-io.c and fs/iomap/direct-io.c using legacy submit_bio
+
+4. metadata, dentry
+Are these data also file pages?
+
+5. normal REQ_OP_READ/WRITE/SYNC
+fs choose to use act based submit_bio by including act_ioprio.h in
+corresponding c file
