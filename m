@@ -1,393 +1,296 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05841774E;
-	Fri,  2 Feb 2024 07:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C812E17998;
+	Fri,  2 Feb 2024 07:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706857954; cv=none; b=lHckl5bmxz+hew5nJbcd94kWi0CBhvod3UuYUNbimrOucqGrAglm0NihvTD/1j7en1PnnNkChWrYyHVKu867sVfSY7uo0JkXzQy0bu513VqEfuWw9s0DADD/eFOisVxa++EmoY1bGyD4qiwpkulDUWCZu20wkkxjtqgliGrOtPc=
+	t=1706859067; cv=none; b=i5AQPs9sSQuzoDthrGkJp7zFul/fM4hi+9/y7PiwQ6dnNeYYn347hEnFqsGyEcXRYrq/y5NPjznYr45Qicfnczbe7vcJq0Xj0jma/uiCKhV/xSsoq3ZQC8mQrNQoGi3wZdMUGMgihVRTnJKGki/f8VgyN5jl1eUaHNrgej0mCUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706857954; c=relaxed/simple;
-	bh=2ndIOo4dz39N8cfPZUVmr/uUpT7HyLVecz4QxHeRM1c=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XNdVBQmduOYvYDrqiownO2XS3+dToyKIVznjmEPsiuh8azbb+MRnDhvGgRopxwEXqBEsY4ooSLS2sK7AX37zsvcYGGG4/ce+9+Sqcf7RN8vW/YawCql7rlHkQxBooYeOTTSCsHGAxQt7PKpzHdKZsfqs1V+K1wMT0ajQqCmuGhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tJ3YRqvO; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+	s=arc-20240116; t=1706859067; c=relaxed/simple;
+	bh=c5GTW7wgpfIZkih7w/OJt9S4JHy6Bb+j837pYNdKZHw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Beh+N8kC9hHQGuDdgjk7Ol2Dr/+vVND/gCHzstuXcvifR3XtQNqKm54mOW+P6kp3lTv1gIPVcg22AgRTotzt9oEQKhhZ81GzPqqh1osI86DxYKB8PqkIrV0/5eadyeFnFaxmvlCe8J127I8JyC6Lz/zrfCFMQrevRatou21tYAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B9vw+rPS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tJ3YRqvO"
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4126b7GM028627;
-	Fri, 2 Feb 2024 07:12:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=5fFvED8ovugYDHfdqALce2nQfCQVcglfqjLqvKLd6ME=;
- b=tJ3YRqvOwI5f+LdTMluTOfYn5aML6N3hJLPBrL9mDl+HMoI/OVj5e/Zu/d9ds4nQJno1
- odRayBoTHH0HTKY6WVbMgpTWHB25WdLAc8agv2dG1uBJCkPMcsGHvV0+omq3fnByV9eH
- IC/rZlu2mpzFN1tu3De9Agj50SibYu74+TIiCfGhE3haXRUZVlkS1sj/mLb6dC6BoSj5
- ZLWNv0SsuqiDQmsVPNk4pbjvMmkEDS5HAFWSCSxf+TnbzIGCNeS3gmLEOdQNNSkpSulB
- ZVddGk539u2620auXrzFzA3QfuQhqE8UrMtD2gcLRA24N/XitPG9C1sxrH3oUcVsrNYR fA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0u9erxd2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 07:12:09 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4126c01N029658;
-	Fri, 2 Feb 2024 07:12:08 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0u9erxas-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 07:12:08 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4124aupW007295;
-	Fri, 2 Feb 2024 07:12:01 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vwev2sb9s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 07:12:01 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4127C0089306706
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 2 Feb 2024 07:12:00 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8A9945804E;
-	Fri,  2 Feb 2024 07:12:00 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AAF3958056;
-	Fri,  2 Feb 2024 07:11:54 +0000 (GMT)
-Received: from [9.43.107.173] (unknown [9.43.107.173])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  2 Feb 2024 07:11:54 +0000 (GMT)
-Message-ID: <37666b87-0065-4717-b825-387a2bb96d82@linux.vnet.ibm.com>
-Date: Fri, 2 Feb 2024 12:41:53 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [mainline] [linux-next] [6.8-rc1] [FC] [DLPAR] OOps kernel crash
- after performing dlpar remove test
-Content-Language: en-US
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        iommu@lists.linux.dev
-Cc: will@kernel.org, joro@8bytes.org,
-        "sachinp@linux.vnet.com" <sachinp@linux.vnet.com>,
-        "abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>,
-        "mputtash@linux.vnet.com" <mputtash@linux.vnet.com>,
-        rafael.j.wysocki@intel.com, hch@lst.de, gregkh@linuxfoundation.org,
-        baolu.lu@linux.intel.com, Jason Gunthorpe <jgg@nvidia.com>,
-        jsnitsel@redhat.com, Robin Murphy <robin.murphy@arm.com>
-References: <b7e18415-c04d-412e-8129-22a144d736b9@linux.vnet.ibm.com>
- <01234ac0-f96d-4a18-8dfa-557020818215@arm.com>
-From: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-In-Reply-To: <01234ac0-f96d-4a18-8dfa-557020818215@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IjMS4gbgQ4TnmfbHm25ohwNIZ_i-mstN
-X-Proofpoint-ORIG-GUID: DVKvbpkcqYffpQOkoOzm0u4j1v3Eta_7
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B9vw+rPS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34F21C433C7;
+	Fri,  2 Feb 2024 07:31:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706859067;
+	bh=c5GTW7wgpfIZkih7w/OJt9S4JHy6Bb+j837pYNdKZHw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=B9vw+rPSDNZ6fkDXgTli3gico951GoLYrXv26zvB1qDP2uKx6EUJd1+O8tDbh5ywA
+	 JITIsYPmbwesDUDwAJoOPFCiHtB+3/U1l7mMJ14uDUpVnw21rEUYPvTkmSKc1xtuRE
+	 tCTl1ZAsFAHfcm3nRhIvnTL4qsO6yraOQ+OfkoNpAq1kNqoxQrwyL83sx2aCJ6Fu7G
+	 snCkkX0LtHGQ/tWsvDRb6UPwOLwUIfIbpMDfYcgKmfR8H5hG+lGWgsZOR0dK3EfoTU
+	 cI868wSwKCVSg+A2UCmwMRFIvqv7HfAlIsCCTBnySd1L9PPYysa8V3Fua2fp2I71yl
+	 IbRrmLrBqpTow==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@lists.linux.dev,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 00/26] Zone write plugging
+Date: Fri,  2 Feb 2024 16:30:38 +0900
+Message-ID: <20240202073104.2418230-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-02_01,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
- bulkscore=0 priorityscore=1501 phishscore=0 mlxscore=0 clxscore=1011
- impostorscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402020051
+Content-Transfer-Encoding: 8bit
 
-Greetings,
+The patch series introduces zone write plugging (ZWP) as the new
+mechanism to control the ordering of writes to zoned block devices.
+ZWP replaces zone write locking (ZWL) which is implemented only by
+mq-deadline today. ZWP also allows emulating zone append operations
+using regular writes for zoned devices that do not natively support this
+operation (e.g. SMR HDDs). This patch series removes the scsi disk
+driver and device mapper zone append emulation to use ZWP emulation.
 
-I have tried reverting some latest commits and tested the issue. I see
-reverting below commit hits to some other problem which was reported
-earlier and the patch for fixing that issue is under review
+Unlike ZWL which operates on requests, ZWP operates on BIOs. A zone
+write plug is simply a BIO list that is atomically manipulated using a
+spinlock and a kblockd submission work. A write BIO to a zone is
+"plugged" to delay its execution if a write BIO for the same zone was
+already issued, that is, if a write request for the same zone is being
+executed. The next plugged BIO is unplugged and issued once the write
+request completes.
 
-1. Reverted commit :
+This mechanism allows to:
+ - Untangle zone write ordering from the block IO schedulers. This
+   allows removing the restriction on using only mq-deadline for zoned
+   block devices. Any block IO scheduler, including "none" can be used.
+ - Zone write plugging operates on BIOs instead of requests. Plugged
+   BIOs waiting for execution thus do not hold scheduling tags and thus
+   do not prevent other BIOs from being submitted to the device (reads
+   or writes to other zones). Depending on the workload, this can
+   significantly improve the device use and the performance.
+ - Both blk-mq (request) based zoned devices and BIO-based devices (e.g.
+   device mapper) can use ZWP. It is mandatory for the
+   former but optional for the latter: BIO-based driver can use zone
+   write plugging to implement write ordering guarantees, or the drivers
+   can implement their own if needed.
+ - The code is less invasive in the block layer and in device drivers.
+   ZWP implementation is mostly limited to blk-zoned.c, with some small
+   changes in blk-mq.c, blk-merge.c and bio.c.
 
-      commit 17de3f5fdd35676b0e3d41c7c9bf4e3032eb3673
-      iommu: Retire bus ops
+Performance evaluation results are shown below.
 
-2. Below are the traces of other issue that was seen after reverting
-above commit, And below is the patch which fixes this issue is that is 
-under review
+The series is organized as follows:
 
-Patch :
-https://www.mail-archive.com/linuxppc-dev@lists.ozlabs.org/msg225210.html
+ - Patch 1 to 5 are preparatory changes for patch 6.
+ - Patch 6 introduce ZWP
+ - Patch 7 and 8 add zone append emulation to ZWP.
+ - Patch 9 to 16 modify zoned block device drivers to use ZWP and
+   prepare for the removal of ZWL.
+ - Patch 17 to 24 remove zone write locking
+ - Finally, Patch 24 and 25 improve ZWP (memory usage reduction and
+   debugfs attributes).
 
---- Traces ---
+Overall, these changes do not increase the amount of code (small
+reduction achieved looking at the diff-stat, but in fact, the reduction
+is much larger if comments are ignored).
 
-[  981.124047] Kernel attempted to read user page (30) - exploit
-attempt? (uid: 0)
-[  981.124053] BUG: Kernel NULL pointer dereference on read at 0x00000030
-[  981.124056] Faulting instruction address: 0xc000000000689864
-[  981.124060] Oops: Kernel access of bad area, sig: 11 [#1]
-[  981.124063] LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=8192 NUMA pSeries
-[  981.124067] Modules linked in: sit tunnel4 ip_tunnel rpadlpar_io
-rpaphp xsk_diag nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
-nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct
-nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 bonding
-tls ip_set rfkill nf_tables libcrc32c nfnetlink pseries_rng vmx_crypto
-binfmt_misc ext4 mbcache jbd2 dm_service_time sd_mod t10_pi
-crc64_rocksoft crc64 sg ibmvfc scsi_transport_fc ibmveth mlx5_core mlxfw
-psample dm_multipath dm_mirror dm_region_hash dm_log dm_mod fuse
-[  981.124111] CPU: 24 PID: 78294 Comm: drmgr Kdump: loaded Not tainted
-6.5.0-rc6-next-20230817-auto #1
-[  981.124115] Hardware name: IBM,9080-HEX POWER10 (raw) 0x800200
-0xf000006 of:IBM,FW1030.30 (NH1030_062) hv:phyp pSeries
-[  981.124118] NIP:  c000000000689864 LR: c0000000009bd05c CTR:
-c00000000005fb90
-[  981.124121] REGS: c0000000a878b1e0 TRAP: 0300   Not tainted
-(6.5.0-rc6-next-20230817-auto)
-[  981.124125] MSR:  8000000000009033 <SF,EE,ME,IR,DR,RI,LE>  CR:
-44822422  XER: 20040006
-[  981.124132] CFAR: c0000000009bd058 DAR: 0000000000000030 DSISR:
-40000000 IRQMASK: 0
-[  981.124132] GPR00: c0000000009bd05c c0000000a878b480 c000000001451400
-0000000000000000
-[  981.124132] GPR04: c00000000128d510 0000000000000000 c00000000eeccf50
-c0000000a878b420
-[  981.124132] GPR08: 0000000000000001 c00000000eed76e0 c000000002c24c28
-0000000000000220
-[  981.124132] GPR12: c00000000005fb90 c000001837969300 0000000000000000
-0000000000000000
-[  981.124132] GPR16: 0000000000000000 0000000000000000 0000000000000000
-0000000000000000
-[  981.124132] GPR20: c00000000125cef0 0000000000000000 c00000000125cf08
-c000000002bce500
-[  981.124132] GPR24: c0000000573e90c0 fffffffffffff000 c0000000573e93c0
-c0000000a877d2a0
-[  981.124132] GPR28: c00000000128d510 c00000000eeccf50 c0000000a877d2a0
-c0000000573e90c0
-[  981.124171] NIP [c000000000689864] sysfs_add_link_to_group+0x34/0x90
-[  981.124178] LR [c0000000009bd05c] iommu_device_link+0x5c/0x110
-[  981.124184] Call Trace:
-[  981.124186] [c0000000a878b480] [c00000000048d630]
-kmalloc_trace+0x50/0x140 (unreliable)
-[  981.124193] [c0000000a878b4c0] [c0000000009bd05c]
-iommu_device_link+0x5c/0x110
-[  981.124198] [c0000000a878b500] [c0000000009ba050]
-__iommu_probe_device+0x250/0x5c0
-[  981.124203] [c0000000a878b570] [c0000000009ba9e0]
-iommu_probe_device_locked+0x30/0x90
-[  981.124207] [c0000000a878b5a0] [c0000000009baa80]
-iommu_probe_device+0x40/0x70
-[  981.124212] [c0000000a878b5d0] [c0000000009baaf0]
-iommu_bus_notifier+0x40/0x80
-[  981.124217] [c0000000a878b5f0] [c00000000019aad0]
-notifier_call_chain+0xc0/0x1b0
-[  981.124221] [c0000000a878b650] [c00000000019b604]
-blocking_notifier_call_chain+0x64/0xa0
-[  981.124226] [c0000000a878b690] [c0000000009cd870] bus_notify+0x50/0x80
-[  981.124230] [c0000000a878b6d0] [c0000000009c8f04] device_add+0x744/0x9b0
-[  981.124235] [c0000000a878b790] [c00000000089f2ec]
-pci_device_add+0x2fc/0x880
-[  981.124240] [c0000000a878b840] [c00000000007ef90]
-of_create_pci_dev+0x390/0xa10
-[  981.124245] [c0000000a878b920] [c00000000007f858]
-__of_scan_bus+0x248/0x320
-[  981.124249] [c0000000a878ba00] [c00000000007c1f0]
-pcibios_scan_phb+0x2d0/0x3c0
-[  981.124254] [c0000000a878bad0] [c000000000107f08]
-init_phb_dynamic+0xb8/0x110
-[  981.124259] [c0000000a878bb40] [c008000002cc03b4]
-dlpar_add_slot+0x18c/0x380 [rpadlpar_io]
-[  981.124265] [c0000000a878bbe0] [c008000002cc0bec]
-add_slot_store+0xa4/0x150 [rpadlpar_io]
-[  981.124270] [c0000000a878bc70] [c000000000f2f800]
-kobj_attr_store+0x30/0x50
-[  981.124274] [c0000000a878bc90] [c000000000687368]
-sysfs_kf_write+0x68/0x80
-[  981.124278] [c0000000a878bcb0] [c000000000685d3c]
-kernfs_fop_write_iter+0x1cc/0x280
-[  981.124283] [c0000000a878bd00] [c0000000005909c8] vfs_write+0x358/0x4b0
-[  981.124288] [c0000000a878bdc0] [c000000000590cfc] ksys_write+0x7c/0x140
-[  981.124293] [c0000000a878be10] [c000000000036554]
-system_call_exception+0x134/0x330
-[  981.124298] [c0000000a878be50] [c00000000000d6a0]
-system_call_common+0x160/0x2e4
-[  981.124303] --- interrupt: c00 at 0x200013f21594
-[  981.124306] NIP:  0000200013f21594 LR: 0000200013e97bf4 CTR:
-0000000000000000
-[  981.124309] REGS: c0000000a878be80 TRAP: 0c00   Not tainted
-(6.5.0-rc6-next-20230817-auto)
-[  981.124312] MSR:  800000000280f033
-<SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 22000282  XER: 00000000
-[  981.124321] IRQMASK: 0
-[  981.124321] GPR00: 0000000000000004 00007ffff3a55c70 0000200014007300
-0000000000000007
-[  981.124321] GPR04: 000000013aff5750 0000000000000008 fffffffffbad2c80
-000000013afd02a0
-[  981.124321] GPR08: 0000000000000001 0000000000000000 0000000000000000
-0000000000000000
-[  981.124321] GPR12: 0000000000000000 0000200013b7bc30 0000000000000000
-0000000000000000
-[  981.124321] GPR16: 0000000000000000 0000000000000000 0000000000000000
-0000000000000000
-[  981.124321] GPR20: 0000000000000000 0000000000000000 0000000000000000
-0000000000000000
-[  981.124321] GPR24: 000000010ef61668 0000000000000000 0000000000000008
-000000013aff5750
-[  981.124321] GPR28: 0000000000000008 000000013afd02a0 000000013aff5750
-0000000000000008
-[  981.124356] NIP [0000200013f21594] 0x200013f21594
-[  981.124358] LR [0000200013e97bf4] 0x200013e97bf4
-[  981.124361] --- interrupt: c00
-[  981.124362] Code: 38427bd0 7c0802a6 60000000 7c0802a6 fba1ffe8
-fbc1fff0 fbe1fff8 7cbf2b78 38a00000 7cdd3378 f8010010 f821ffc1
-<e8630030> 4bff95d1 60000000 7c7e1b79
-[  981.124374] ---[ end trace 0000000000000000 ]---
+Many thanks must go to Christoph Hellwig for comments and suggestions
+he provided on earlier versions of these patches.
 
+Performance evaluation results
+==============================
 
-Thanks and Regards
+Environments:
+ - Xeon 8-cores/16-threads, 128GB of RAM
+ - Kernel:
+   - Baseline: 6.8-rc2, Linus tree as of 2024-02-01
+   - Baseline-next: Jens block/for-next branch as of 2024-02-01
+   - ZWP: Jens block/for-next patched to add zone write plugging
+   (all kernels were compiled with the same configuration turning off
+   most heavy debug features)
 
-On 1/31/24 16:18, Robin Murphy wrote:
-> On 2024-01-31 9:19 am, Tasmiya Nalatwad wrote:
->> Greetings,
->>
->> [mainline] [linux-next] [6.8-rc1] [DLPAR] OOps kernel crash after 
->> performing dlpar remove test
->>
->> --- Traces ---
->>
->> [58563.146236] BUG: Unable to handle kernel data access at 
->> 0x6b6b6b6b6b6b6b83
->> [58563.146242] Faulting instruction address: 0xc0000000009c0e60
->> [58563.146248] Oops: Kernel access of bad area, sig: 11 [#1]
->> [58563.146252] LE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=8192 NUMA pSeries
->> [58563.146258] Modules linked in: isofs cdrom dm_snapshot dm_bufio 
->> dm_round_robin dm_queue_length exfat vfat fat btrfs blake2b_generic 
->> xor raid6_pq zstd_compress loop xfs libcrc32c raid0 nvram rpadlpar_io 
->> rpaphp nfnetlink xsk_diag bonding tls rfkill sunrpc dm_service_time 
->> dm_multipath dm_mod pseries_rng vmx_crypto binfmt_misc ext4 mbcache 
->> jbd2 sd_mod sg ibmvscsi scsi_transport_srp ibmveth lpfc nvmet_fc 
->> nvmet nvme_fc nvme_fabrics nvme_core t10_pi crc64_rocksoft crc64 
->> scsi_transport_fc fuse
->> [58563.146326] CPU: 0 PID: 1071247 Comm: drmgr Kdump: loaded Not 
->> tainted 6.8.0-rc1-auto-gecb1b8288dc7 #1
->> [58563.146332] Hardware name: IBM,9009-42A POWER9 (raw) 0x4e0202 
->> 0xf000005 of:IBM,FW950.A0 (VL950_141) hv:phyp pSeries
->> [58563.146337] NIP:  c0000000009c0e60 LR: c0000000009c0e28 CTR: 
->> c0000000009c1584
->> [58563.146342] REGS: c00000007960f260 TRAP: 0380   Not tainted 
->> (6.8.0-rc1-auto-gecb1b8288dc7)
->> [58563.146347] MSR:  8000000000009033 <SF,EE,ME,IR,DR,RI,LE>  CR: 
->> 24822424  XER: 20040006
->> [58563.146360] CFAR: c0000000009c0e74 IRQMASK: 0
->> [58563.146360] GPR00: c0000000009c0e28 c00000007960f500 
->> c000000001482600 c000000003050540
->> [58563.146360] GPR04: 0000000000000000 c00000089a6870c0 
->> 0000000000000001 fffffffffffe0000
->> [58563.146360] GPR08: c000000002bac020 6b6b6b6b6b6b6b6b 
->> 6b6b6b6b6b6b6b6b 0000000000000220
->> [58563.146360] GPR12: 0000000000002000 c000000003080000 
->> 0000000000000000 0000000000000000
->> [58563.146360] GPR16: 0000000000000000 0000000000000000 
->> 0000000000000000 0000000000000001
->> [58563.146360] GPR20: c000000001281478 0000000000000000 
->> c000000001281490 c000000002bfed80
->> [58563.146360] GPR24: c00000089a6870c0 0000000000000000 
->> 0000000000000000 c000000002b9ffb8
->> [58563.146360] GPR28: 0000000000000000 c000000002bac0e8 
->> 0000000000000000 0000000000000000
->> [58563.146421] NIP [c0000000009c0e60] iommu_ops_from_fwnode+0x68/0x118
->> [58563.146430] LR [c0000000009c0e28] iommu_ops_from_fwnode+0x30/0x118
->
-> This implies that iommu_device_list has become corrupted. Looks like 
-> spapr_tce_setup_phb_iommus_initcall() registers an iommu_device which 
-> pcibios_free_controller() could free if a PCI controller is removed, 
-> but there's no path anywhere to ever unregister any of those IOMMUs. 
-> Presumably this also means that is a PCI controller is dynamically 
-> added after init, its IOMMU won't be set up properly either.
->
-> Thanks,
-> Robin.
->
->> [58563.146437] Call Trace:
->> [58563.146439] [c00000007960f500] [c00000007960f560] 
->> 0xc00000007960f560 (unreliable)
->> [58563.146446] [c00000007960f530] [c0000000009c0fd0] 
->> __iommu_probe_device+0xc0/0x5c0
->> [58563.146454] [c00000007960f5a0] [c0000000009c151c] 
->> iommu_probe_device+0x4c/0xb4
->> [58563.146462] [c00000007960f5e0] [c0000000009c15d0] 
->> iommu_bus_notifier+0x4c/0x8c
->> [58563.146469] [c00000007960f600] [c00000000019e3d0] 
->> notifier_call_chain+0xb8/0x1a0
->> [58563.146476] [c00000007960f660] [c00000000019eea0] 
->> blocking_notifier_call_chain+0x64/0x94
->> [58563.146483] [c00000007960f6a0] [c0000000009d3c5c] 
->> bus_notify+0x50/0x7c
->> [58563.146491] [c00000007960f6e0] [c0000000009cfba4] 
->> device_add+0x774/0x9bc
->> [58563.146498] [c00000007960f7a0] [c0000000008abe9c] 
->> pci_device_add+0x2f4/0x864
->> [58563.146506] [c00000007960f850] [c00000000007d5a0] 
->> of_create_pci_dev+0x390/0xa08
->> [58563.146514] [c00000007960f930] [c00000000007de68] 
->> __of_scan_bus+0x250/0x328
->> [58563.146520] [c00000007960fa10] [c00000000007a680] 
->> pcibios_scan_phb+0x274/0x3c0
->> [58563.146527] [c00000007960fae0] [c000000000105d58] 
->> init_phb_dynamic+0xb8/0x110
->> [58563.146535] [c00000007960fb50] [c0080000217b0380] 
->> dlpar_add_slot+0x170/0x3b4 [rpadlpar_io]
->> [58563.146544] [c00000007960fbf0] [c0080000217b0ca0] 
->> add_slot_store+0xa4/0x140 [rpadlpar_io]
->> [58563.146551] [c00000007960fc80] [c000000000f3dbec] 
->> kobj_attr_store+0x30/0x4c
->> [58563.146559] [c00000007960fca0] [c0000000006931fc] 
->> sysfs_kf_write+0x68/0x7c
->> [58563.146566] [c00000007960fcc0] [c000000000691b2c] 
->> kernfs_fop_write_iter+0x1c8/0x278
->> [58563.146573] [c00000007960fd10] [c000000000599f54] 
->> vfs_write+0x340/0x4cc
->> [58563.146580] [c00000007960fdc0] [c00000000059a2bc] 
->> ksys_write+0x7c/0x140
->> [58563.146587] [c00000007960fe10] [c000000000035d74] 
->> system_call_exception+0x134/0x330
->> [58563.146595] [c00000007960fe50] [c00000000000d6a0] 
->> system_call_common+0x160/0x2e4
->> [58563.146602] --- interrupt: c00 at 0x200004470cb4
->> [58563.146606] NIP:  0000200004470cb4 LR: 00002000043e7d04 CTR: 
->> 0000000000000000
->> [58563.146611] REGS: c00000007960fe80 TRAP: 0c00   Not tainted 
->> (6.8.0-rc1-auto-gecb1b8288dc7)
->> [58563.146616] MSR:  800000000280f033 
->> <SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 24000282  XER: 00000000
->> [58563.146632] IRQMASK: 0
->> [58563.146632] GPR00: 0000000000000004 00007fffd3993420 
->> 0000200004557300 0000000000000007
->> [58563.146632] GPR04: 000001000d8a5270 0000000000000006 
->> fffffffffbad2c80 000001000d8a02a0
->> [58563.146632] GPR08: 0000000000000001 0000000000000000 
->> 0000000000000000 0000000000000000
->> [58563.146632] GPR12: 0000000000000000 000020000422bb50 
->> 0000000000000000 0000000000000000
->> [58563.146632] GPR16: 0000000000000000 0000000000000000 
->> 0000000000000000 0000000000000000
->> [58563.146632] GPR20: 0000000000000000 0000000000000000 
->> 0000000000000000 0000000000000000
->> [58563.146632] GPR24: 0000000106b41668 0000000000000000 
->> 0000000000000006 000001000d8a5270
->> [58563.146632] GPR28: 0000000000000006 000001000d8a02a0 
->> 000001000d8a5270 0000000000000006
->> [58563.146690] NIP [0000200004470cb4] 0x200004470cb4
->> [58563.146694] LR [00002000043e7d04] 0x2000043e7d04
->> [58563.146698] --- interrupt: c00
->> [58563.146701] Code: e9299a20 3d020173 39089a20 7fa94000 419e0038 
->> e9490018 7fbf5000 409e0020 48000070 60000000 60000000 60000000 
->> <e9490018> 7faaf840 419e0058 e9290000
->> [58563.146722] ---[ end trace 0000000000000000 ]---
->>
->
+Workoads:
+ - seqw4K1: 4KB sequential write, qd=1
+ - seqw4K16: 4KB sequential write, qd=16
+ - seqw1M16: 1MB sequential write, qd=16
+ - rndw4K16: 4KB random write, qd=16
+ - rndw128K16: 128KB random write, qd=16
+ - btrfs workoad: Single fio job writing 128 MB files using 128 KB
+   direct IOs at qd=16.
+
+Devices:
+ - nullblk (zoned): 4096 zones of 256 MB, no zone resource limits.
+ - NVMe ZNS drive: 1 TB ZNS drive with 2GB zone size, 14 max open/active
+   zones.
+ - SMR HDD: 26 TB disk with 256MB zone size and 128 max open zones.
+
+For ZWP, the result show the performance percentage increase (or
+decrease) against current for-next.
+
+1) null_blk zoned device:
+
+               +---------+----------+----------+----------+------------+
+               | seqw4K1 | seqw4K16 | seqw1M16 | rndw4K16 | rndw128K16 |
+               | (MB/s)  |  (MB/s)  |  (MB/s)  |  (KIOPS) |   (KIOPS)  |
++--------------+---------+----------+----------+----------+------------+
+|   Baseline   | 1005    | 881      | 15600    | 564      | 217        |
+|  mq-deadline |         |          |          |          |            |
++--------------+---------+----------+----------+----------+------------+
+| Baseline-next| 921     | 813      | 14300    | 817      | 330        |
+|  mq-deadline |         |          |          |          |            |
++--------------+---------+----------+----------+----------+------------+
+|      ZWP     | 946     | 826      | 15000    | 935      | 358        |
+|  mq-deadline |(+2%)    | (+1%)    | (+4%)    | (+14%)   | (+8%)      |
++--------------+---------+----------+----------+----------+------------+
+|      ZWP     | 2937    | 1882     | 19900    | 2286     | 709        |
+|     none     | (+218%) | (+131%)  | (+39%)   | (+179%)  | (+114%)    |
++--------------+---------+----------+----------+----------+------------+
+
+For-next mq-deadline changes and ZWP significantly increase random write
+performance but slightly reduce sequential write performance compared to
+ZWL.  However, ZWP ability to run fast block devices with the none
+scheduler result in very large performance increase for all workloads.
+
+2) NVMe ZNS drive:
+
+               +---------+----------+----------+----------+------------+
+               | seqw4K1 | seqw4K16 | seqw1M16 | rndw4K16 | rndw128K16 |
+               | (MB/s)  |  (MB/s)  |  (MB/s)  |  (KIOPS) |   (KIOPS)  |
++--------------+---------+----------+----------+----------+------------+
+|   Baseline   | 183     | 798      | 1104     | 53.5     | 14.6       |
+|  mq-deadline |         |          |          |          |            |
++--------------+---------+----------+----------+----------+------------+
+| Baseline-next| 180     | 261      | 1113     | 51.6     | 14.9       |
+|  mq-deadline |         |          |          |          |            |
++--------------+---------+----------+----------+----------+------------+
+|      ZWP     | 181     | 671      | 1109     | 51.7     | 14.7       |
+|  mq-deadline |(+0%)    | (+157%)  | (+0%)    | (+0%)    | (-1%)      |
++--------------+---------+----------+----------+----------+------------+
+|      ZWP     | 190     | 660      | 1106     | 51.4     | 15.1       |
+|     none     | (+5%)   | (+152%)  | (+0%)    | (-0%)    | (+1%)      |
++--------------+---------+----------+----------+----------+------------+
+
+The current block/for-next significantly regress sequential small write
+performace at high queue depth due to lost BIO merge oportunities.
+ZWP corrects this but is not as efficient as ZWL for this workload.
+
+3) SMR SATA HDD:
+
+               +---------+----------+----------+----------+------------+
+               | seqw4K1 | seqw4K16 | seqw1M16 | rndw4K16 | rndw128K16 |
+               | (MB/s)  |  (MB/s)  |  (MB/s)  |  (IOPS)  |   (IOPS)   |
++--------------+---------+----------+----------+----------+------------+
+|   Baseline   | 121     | 251      | 251      | 2471     | 664        |
+|  mq-deadline |         |          |          |          |            |
++--------------+---------+----------+----------+----------+------------+
+| Baseline-next| 121     | 137      | 249      | 2428     | 649        |
+|  mq-deadline |         |          |          |          |            |
++--------------+---------+----------+----------+----------+------------+
+|      ZWP     | 118     | 137      | 251      | 2415     | 651        |
+|  mq-deadline |(-2%)    | (+0%)    | (+0%)    | (+0%)    | (+0%)      |
++--------------+---------+----------+----------+----------+------------+
+|      ZWP     | 117     | 238      | 251      | 2400     | 666        |
+|     none     | (-3%)   | (+73%)   | (+0%)    | (-1%)    | (+2%)      |
++--------------+---------+----------+----------+----------+------------+
+
+Same observation as for ZNS: for-next regress sequential high QD
+performance but ZWP brings back better performance, still slightly lower
+than with ZWL.
+
+4) Zone append tests using btrfs:
+
+                +-------------+-------------+-----------+-------------+
+                |  null-blk   |  null_blk   |    ZNS    |     SMR     |
+                |  native ZA  | emulated ZA | native ZA | emulated ZA |
+                |    (MB/s)   |   (MB/s)    |   (MB/s)  |    (MB/s)   |
++---------------+-------------+-------------+-----------+-------------+
+|    Baseline   | 2412        | N/A         | 1080      | 203         |
+|   mq-deadline |             |             |           |             |
++---------------+-------------+-------------+-----------+-------------+
+| Baseline-next | 2471        | N/A         | 1084      | 209         |
+|  mq-deadline  |             |             |           |             |
++---------------+-------------+-------------+-----------+-------------+
+|      ZWP      | 2397        | 3025        | 1085      | 245         |
+|  mq-deadline  | (-2%)       |             | (+0%)     | (+17%)      |
++---------------+-------------+-------------+-----------+-------------+
+|      ZWP      | 2614        | 3301        | 1082      | 247         |
+|      none     | (+5%)       |             | (-0%)     | (+18%)      |
++---------------+-------------+-------------+-----------+-------------+
+
+With a more realistic use of the device by the FS, ZWP significantly
+improves SMR HDD performance thanks to the more efficient zone append
+emulation compared to ZWL.
+
+Damien Le Moal (26):
+  block: Restore sector of flush requests
+  block: Remove req_bio_endio()
+  block: Introduce bio_straddle_zones() and bio_offset_from_zone_start()
+  block: Introduce blk_zone_complete_request_bio()
+  block: Allow using bio_attempt_back_merge() internally
+  block: Introduce zone write plugging
+  block: Allow zero value of max_zone_append_sectors queue limit
+  block: Implement zone append emulation
+  block: Allow BIO-based drivers to use blk_revalidate_disk_zones()
+  dm: Use the block layer zone append emulation
+  scsi: sd: Use the block layer zone append emulation
+  ublk_drv: Do not request ELEVATOR_F_ZBD_SEQ_WRITE elevator feature
+  null_blk: Do not request ELEVATOR_F_ZBD_SEQ_WRITE elevator feature
+  null_blk: Introduce zone_append_max_sectors attribute
+  null_blk: Introduce fua attribute
+  nvmet: zns: Do not reference the gendisk conv_zones_bitmap
+  block: Remove BLK_STS_ZONE_RESOURCE
+  block: Simplify blk_revalidate_disk_zones() interface
+  block: mq-deadline: Remove support for zone write locking
+  block: Remove elevator required features
+  block: Do not check zone type in blk_check_zone_append()
+  block: Move zone related debugfs attribute to blk-zoned.c
+  block: Remove zone write locking
+  block: Do not special-case plugging of zone write operations
+  block: Reduce zone write plugging memory usage
+  block: Add zone_active_wplugs debugfs entry
+
+ block/Kconfig                     |    4 -
+ block/Makefile                    |    1 -
+ block/bio.c                       |    7 +
+ block/blk-core.c                  |   13 +-
+ block/blk-flush.c                 |    1 +
+ block/blk-merge.c                 |   22 +-
+ block/blk-mq-debugfs-zoned.c      |   22 -
+ block/blk-mq-debugfs.c            |    4 +-
+ block/blk-mq-debugfs.h            |   11 +-
+ block/blk-mq.c                    |  134 ++--
+ block/blk-mq.h                    |   31 -
+ block/blk-settings.c              |   51 +-
+ block/blk-sysfs.c                 |    2 +-
+ block/blk-zoned.c                 | 1143 ++++++++++++++++++++++++++---
+ block/blk.h                       |   69 +-
+ block/elevator.c                  |   46 +-
+ block/elevator.h                  |    1 -
+ block/genhd.c                     |    2 +-
+ block/mq-deadline.c               |  176 +----
+ drivers/block/null_blk/main.c     |   52 +-
+ drivers/block/null_blk/null_blk.h |    2 +
+ drivers/block/null_blk/zoned.c    |   32 +-
+ drivers/block/ublk_drv.c          |    4 +-
+ drivers/block/virtio_blk.c        |    2 +-
+ drivers/md/dm-core.h              |   11 +-
+ drivers/md/dm-zone.c              |  470 ++----------
+ drivers/md/dm.c                   |   44 +-
+ drivers/md/dm.h                   |    7 -
+ drivers/nvme/host/zns.c           |    2 +-
+ drivers/nvme/target/zns.c         |   10 +-
+ drivers/scsi/scsi_lib.c           |    1 -
+ drivers/scsi/sd.c                 |    8 -
+ drivers/scsi/sd.h                 |   19 -
+ drivers/scsi/sd_zbc.c             |  335 +--------
+ include/linux/blk-mq.h            |   85 +--
+ include/linux/blk_types.h         |   30 +-
+ include/linux/blkdev.h            |  102 ++-
+ 37 files changed, 1453 insertions(+), 1503 deletions(-)
+ delete mode 100644 block/blk-mq-debugfs-zoned.c
+
 -- 
-Regards,
-Tasmiya Nalatwad
-IBM Linux Technology Center
+2.43.0
 
