@@ -1,96 +1,94 @@
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD30684FB0
-	for <linux-block@vger.kernel.org>; Thu,  1 Feb 2024 18:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D414119479;
+	Fri,  2 Feb 2024 06:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706810424; cv=none; b=pOEkmY7NeOUVEotWTZr2jVK8GZXsKvjjj8OlC8Yaqtz94BjPPlLtFNn35M0Ihj7z8i1W0ZI3YX6iVSW1b44ygPoJjKp+aneVe3BH4fVyq5bkPT5/qnDY8+ZH9oVBNpPV4mZUzvlAeuIkTA9OsDFH7ztrYL93SBsrCEaYq8QfuRM=
+	t=1706856217; cv=none; b=KNXVRPjrbeZ//9J3psLy62BsM4BsLhSjXRef69oX0a/de8Etupvl61b2IfFTjN+cwWjsyd7VTIASqos+jxSnOnnf47qr5A86PjFhsexbQq557+IeKOhL32oLuNzGvfH3/tAvpuDd68tWPDNefAvWLuLE0qexNbTnXNYoshVGXfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706810424; c=relaxed/simple;
-	bh=tggWUAivVyJhHb3WLH9fYfPCLVXtiXbZt06E4ruadzg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=GGOQ92V1QAPm6DyyB0xBKbEkStrKAGp2pkSnRsdFeJ17TvF/fAFbeS8i5Zq6L6yrRKngC35Um/C/hn1yfmsApacXzEixzutMyjUzAa46XIF+NvLmXh7Rmhi25WfVuOtsxzyeVvOnFzSsfkLKIsDPjoClVon7O7PZYBmBV3lVd6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2LTv9N4h; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2LTv9N4h"
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-361a8f20e22so354405ab.0
-        for <linux-block@vger.kernel.org>; Thu, 01 Feb 2024 10:00:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706810421; x=1707415221; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xuXs00SouWU+bfUEvdSrCjdAuWK9g2pMKfreEo+/SA8=;
-        b=2LTv9N4heP3zy4/IGtLMcWNTfn8ff09NWuAu/hSXrUA9D+A7StyyEKfVlaMB1P99db
-         0EHoOUms/+cg+2QtkuUH5EiPG0PUz33eIK6dhPF65IU7inalZTBl4549DaDP5y6gHO1v
-         l6u83RYhX0JeSA6I5tYvxTuWv0Yzue/EB1yodQtQpoLDUVKEzYOxEqQrp3xa8yAQSt/Z
-         JbGBPk457R4kI/oM6JGd6nSUwiNjERcopZM6EIE2eaHjGJ9gfeeGLqoVevvB92LS5tCR
-         41Cifhww/MmWTgiulwcv5jvgCB8dLXcdryvEvWRoJFCEwGdWwy1Ve1QoXLvhfve+/yPQ
-         Vz+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706810421; x=1707415221;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xuXs00SouWU+bfUEvdSrCjdAuWK9g2pMKfreEo+/SA8=;
-        b=M95ymC8LGUxWWxn9/20Z3STQLgFo8GF8/eOfH5T2wwwiwGwRqMFzQx8VPFGZo9K6yc
-         HFnfS/1fzHoi6ZmKJbU3vY16LOB7FVxYMWmCgKznhAxxOlBN9U6rcIhGn5LbGyF6pvH7
-         /w/yzuPb23BOg+AkMpJrCD4B5r/u5FPFTlY2YmtDboXoqIuy72pRujbh32dUY2gDELbd
-         SpyJAK1McRc4vVpty5vxCjodA/Yol8FGjYg8heI/ZY0LpWwePqUCkAX3HiotlgOodGaa
-         Np35MNJd0X/c2iUKGm7lPrnOvWesGylKmcJz91nU0rhcWYxRQAFipkca/5g/g8dqvrQo
-         ljFQ==
-X-Gm-Message-State: AOJu0YxyYeI1wWIS6XFPLHcio7LaYmqruok+GTfPfsYIwmkv5AKXSxFn
-	tMrd5WXMhl/UsnOT8myMj51NFNHkSa5SyAkv3TGUrPbBTqTGnXS8oi/bpd+C0iQ=
-X-Google-Smtp-Source: AGHT+IHFGMCDx/rCwfIbzWpWJzB8ZT69Ezk9RJWEnazXn7AI05wsEpCY8hFKJqRYkJQrNa2d8Dd6RA==
-X-Received: by 2002:a6b:ef13:0:b0:7c0:374a:dbd2 with SMTP id k19-20020a6bef13000000b007c0374adbd2mr609538ioh.1.1706810420863;
-        Thu, 01 Feb 2024 10:00:20 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVEu2AcV1cc6clQ9bxFiZCjuSibYqUr+oawrqsuMmBSYqbKtSam92vJM+1k6MJ+Gvz0gP2RclcgsuqZ6fOvH0SdoZUS3BQeY4ZgSDKRwaGxbS8SdfPTZwEnrnwFWSMHL037IRAfootBfFt0ZwE7rP+SEKjC4VP++RUT
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id x1-20020a02ac81000000b0046f3f0622b9sm14729jan.84.2024.02.01.10.00.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 10:00:19 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: hongyu.jin.cn@gmail.com, Mike Snitzer <snitzer@kernel.org>
-Cc: ebiggers@kernel.org, dm-devel@lists.linux.dev, 
- linux-block@vger.kernel.org
-In-Reply-To: <20240130202638.62600-1-snitzer@kernel.org>
-References: <20240130202638.62600-1-snitzer@kernel.org>
-Subject: Re: (subset) [PATCH v9 0/5] Fix I/O priority lost in device-mapper
-Message-Id: <170681041965.31162.2641020095015336621.b4-ty@kernel.dk>
-Date: Thu, 01 Feb 2024 11:00:19 -0700
+	s=arc-20240116; t=1706856217; c=relaxed/simple;
+	bh=gmq4QpCe0BDa3b1XQk4Jqzcnz1BCJ95fhWBkHtT/Vc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ar2e6/4Rig/HCjIs3NYVibfb11TzJYLg7x78yoTBIc7ZJDHmRObHyBp8jnFQp4S0sPyUyUP9fWWgeiWZXzNM+Xbm/3HzZbloF3Yy34sOzxNKNniAKZfL2zDxc93gpnAd2bGkIdW5GCS2WG13oM47GIlL0NbUEfq45yrhsuMhxbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id ED426227A88; Fri,  2 Feb 2024 07:43:24 +0100 (CET)
+Date: Fri, 2 Feb 2024 07:43:24 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 01/34] bdev: open block device as files
+Message-ID: <20240202064324.GA4350@lst.de>
+References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org> <20240123-vfs-bdev-file-v2-1-adbd023e19cc@kernel.org> <20240129160241.GA2793@lst.de> <20240201-rational-wurfgeschosse-73ca66259263@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240201-rational-wurfgeschosse-73ca66259263@brauner>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-
-On Tue, 30 Jan 2024 15:26:33 -0500, Mike Snitzer wrote:
-> I've revised the patch headers a bit (patch 1 more so than others).
+On Thu, Feb 01, 2024 at 06:08:29PM +0100, Christian Brauner wrote:
+> > > +	/*
+> > > +	 * O_EXCL is one of those flags that the VFS clears once it's done with
+> > > +	 * the operation. So don't raise it here either.
+> > > +	 */
+> > > +	if (mode & BLK_OPEN_NDELAY)
+> > > +		flags |= O_NDELAY;
+> > 
+> > O_EXCL isn't dealt with in this helper at all.
 > 
-> Jens, please let me know how you'd like to see patch 1 land
-> upstream. I feel like it should probably go as a fix for 6.8-rcX; I
-> have some DM fixes I will be sending Linus this week and can include
-> it (with your Ack of course). But you're welcome to pick it up just
-> like any other block fix.
+> Yeah, on purpose was my point bc we can just rely on @holder and passing
+> _EXCL without holder is invalid. But I could add it.
+
+Ok.  I found it weird to have the comment next to BLK_OPEN_NDELAY
+as it looked like it sneaked through.  Especially as BLK_OPEN_EXCL
+has literally nothing to do with O_EXCL at all as the latter is a
+namespace operation flag.  So even if the comment was intentional
+I think we're probably better off without it.
+
+> Yes, I had considered that and it would work but there's the issue that
+> we need to figure out how to handle BLK_OPEN_RESTRICT_WRITES. It has no
+> corresponding O_* flag that would let us indicate this.
+
+Oh, indeed.
+
+>
+> So I had
+> considered:
 > 
-> [...]
+> 1/ Expose bdev_file_open_excl() so callers don't need to pass any
+>    specific flags. Nearly all filesystems would effectively use this
+>    helper as sb_open_mode() adds it implicitly. That would have the
+>    side-effect of introducing another open helper ofc; possibly two if
+>    we take _by_dev() and _by_path() into account.
+> 
+> 2/ Abuse an O_* flag to mean BLK_OPEN_RESTRICT_WRITES. For example,
+>    O_TRUNC or O_NOCTTY which is pretty yucky.
+> 
+> 3/ Introduce an internal O_* flag which is also ugly. Vomitorious and my
+>    co-maintainers would likely chop off my hands so I can't go near a
+>    computer again.
+> 
+> 3/ Make O_EXCL when passed together with bdev_file_open_by_*() always
+>    imply BLK_OPEN_RESTRICT_WRITES.
+> 
+> The 3/ option would probably be the cleanest one and I think that all
+> filesystems now pass at least a holder and holder ops so this _should_
+> work.
 
-Applied, thanks!
+2 and 3 sound pretty horrible.  3 would work and look clean for the
+block side, but O_ flags are mess so I wouldn't go there.
 
-[1/5] block: Fix where bio IO priority gets set
-      commit: f3c89983cb4fc00be64eb0d5cbcfcdf2cacb965e
+Maybe  variant of 1 that allows for a non-exclusive open and clearly
+marks that?
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+Or just leave it as-is for now and look into that later.
