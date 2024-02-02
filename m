@@ -1,115 +1,114 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5511D45BF3
-	for <linux-block@vger.kernel.org>; Fri,  2 Feb 2024 18:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B020415F302;
+	Fri,  2 Feb 2024 18:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706896843; cv=none; b=e8XpvanwyScS45okMHzU7hzYDiZcEdCVD7ccN9u95poauNlKozVYYTek3VIDxmD0v4voOM7zLuN9QvC+X72MdmsQ014dC6lnhppVsrv4p+XruMjW3EWhZhpOnB0ce2aR109uDh3+7AXSl9R6ldzyO94IOOXXGyC1cNAmJUbGI70=
+	t=1706899182; cv=none; b=iWJ3UVaBF8fXdlFZoq0SiD3lK8fe3Iu447+Zqv0dlYD6vu4x4rrtpiJSY4jt2j+1fOtKWk3Jn1+vbzrlkIFfeJrGT9RSq06HeM9TtfZ75W7M3TbTqA9q2MvPVvc/sZhEiqTrYOtvZ8wHFp1ho9S1Pur4p+hReQN8fCr9oW6xii0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706896843; c=relaxed/simple;
-	bh=91UoMQHdvKhLLV+iS2XlYfjN49Un9UdaXKx0pSuvHUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=CWK/82rqpB0g6XxElEsgKE8cPt6O4GjkhyKwNi7VtL5hMcr7KReyJ4qT9j3nIyk2GDdZXh7f4Ex8Ac56aBtlPWnw4Bs58njNqs+WpmrZDZ27zpVxwkk8MdaFhlVUPk5rHEtpv6lgHlFP7norjdnPDJbyndXxv+2+s1MNB1jf3hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-599f5e71d85so1495775eaf.3
-        for <linux-block@vger.kernel.org>; Fri, 02 Feb 2024 10:00:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706896840; x=1707501640;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uxe0Pox3nCPQeYCGVFRmgrhBPsjnwvAw8Cx+/7NHlm8=;
-        b=Pgjy7fJQQ7o85cmWv7N4sLZLMcY23gFG1JkMtE6f1ILbFfH6XKaVz0ChWTFqR42tqO
-         yd+X4QdT7ap6kPqdAt0oLYmfqGepZ6j9IShHuAc3h6NKxKO0b737KFxFWyBmaytsPoEe
-         hGLMhnWr8XBn4nWDGYGi2txE/vdZ1yn9aXPapo8X3DF+qqMCLIEH6SGI3bEUBHV3DM76
-         dtcdFlmHkHOrI05NRulIwOz6wy32DGn0pm2GNvOfMDOjf3gUenvuah9ZPEfdnB6oHoEs
-         1utBKwS9UeeeI0XQPR5EjY3cLI0gMedbyRVxW3hz8chWaPjf5LLdWfuRzVCvy8dXJRIu
-         bZzQ==
-X-Gm-Message-State: AOJu0Yzjk7yJcGUIodc2eZclQ/tHjcQ2k9ATzNyoC/Q85lEnL8RJqMVq
-	OR9lvja4vsmcTyz92bNzw8ML0FIhr4OqT0A/+suu3tU6dL12sogi1gRSLsUdqQ==
-X-Google-Smtp-Source: AGHT+IEyl1ZAh4nsb4iyLjSb5vsiuy+bj3K4FAazNzFmrILUmFuiokvB5W25XiTwE2f10RIdXCbnlQ==
-X-Received: by 2002:a05:6358:704:b0:176:4e7d:f30e with SMTP id e4-20020a056358070400b001764e7df30emr8602483rwj.14.1706896840111;
-        Fri, 02 Feb 2024 10:00:40 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXZtjzYo9hdxAB20P+0xZzuTje9iJLYb3hQ0WQRJrYnlnMP9nj0/mDMUZ+RHsDxPiSHTtDZvi7QROu1TejyVIG7Z9qf1MukyG/fUgI6/mhYc8wFxx6AxFNi/4krqFPKe4qDFkL0yn7TshG7YDRArNpeWdHbrobUOPULuhkJUnRDL74adHcC
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id of6-20020a056214434600b0068c87e3c7c4sm304761qvb.2.2024.02.02.10.00.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 10:00:39 -0800 (PST)
-Date: Fri, 2 Feb 2024 13:00:38 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	Alasdair G Kergon <agk@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: [git pull] device mapper fixes for 6.8-rc3
-Message-ID: <Zb0txmt9K4MMHst3@redhat.com>
+	s=arc-20240116; t=1706899182; c=relaxed/simple;
+	bh=gDdzGJEE3xcGXYIzrKSx8hMOKEYOPXPiM9IDmwdOJ3Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Yv4tDRS1/WcFbDduYkGUyq4k829CKqeHBLwwSaDckx7igBpB+tAuIe5HzGMK/eYCvDCSSBd/r175WIEAg9sW4PVx3SAx13z1365MDxoCYccQSw1EZtZw8X9/0fWSkHidJ48XGo+uvZAZ88k5S8bCH6XW1qLJxq/TLZ9z20zGuVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FrtVG04s; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FrtVG04s"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80DEDC433C7;
+	Fri,  2 Feb 2024 18:39:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706899182;
+	bh=gDdzGJEE3xcGXYIzrKSx8hMOKEYOPXPiM9IDmwdOJ3Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FrtVG04saa6jIO5gee/nA7FN+wL8OVLAOuzugh7e3JMjx5zZYFD7lJbuuF+5pJV80
+	 Ht51S/ef/kg80ooiiMhFzTjbruJRVBOXBG99tRRPDZAEiGCZ2SzhAI2p0zmzwFwa0X
+	 CQUHHbh9X1Krof/DceIKpsyKDreDwe0vObciU7pcCJ9hywTYRvQU0mJMBsXyGI++K6
+	 R1PgMx2nr4tDqjZxSHzpxMywiGdnAVszdbzMLHe6Qy69xP1UjnIlipf2PT6U2dSyl8
+	 6Ep4CRgBxLs/vLI4wlLfJlLkd0NRZp0IjbkIPgggKjsz+zGRMLOaMav/gdqmk/2W+Z
+	 6Jk2xCTiLhH6g==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: "Christian A. Ehrhardt" <lk@c--e.de>,
+	syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com,
+	syzbot+63dec323ac56c28e644f@syzkaller.appspotmail.com,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.7 10/23] block: Fix WARNING in _copy_from_iter
+Date: Fri,  2 Feb 2024 13:39:06 -0500
+Message-ID: <20240202183926.540467-10-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240202183926.540467-1-sashal@kernel.org>
+References: <20240202183926.540467-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7.3
+Content-Transfer-Encoding: 8bit
 
-Hi Linus,
+From: "Christian A. Ehrhardt" <lk@c--e.de>
 
-The following changes since commit 41bccc98fb7931d63d03f326a746ac4d429c1dd3:
+[ Upstream commit 13f3956eb5681a4045a8dfdef48df5dc4d9f58a6 ]
 
-  Linux 6.8-rc2 (2024-01-28 17:01:12 -0800)
+Syzkaller reports a warning in _copy_from_iter because an
+iov_iter is supposedly used in the wrong direction. The reason
+is that syzcaller managed to generate a request with
+a transfer direction of SG_DXFER_TO_FROM_DEV. This instructs
+the kernel to copy user buffers into the kernel, read into
+the copied buffers and then copy the data back to user space.
 
-are available in the Git repository at:
+Thus the iovec is used in both directions.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.8/dm-fixes
+Detect this situation in the block layer and construct a new
+iterator with the correct direction for the copy-in.
 
-for you to fetch changes up to 0a9bab391e336489169b95cb0d4553d921302189:
+Reported-by: syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/0000000000009b92c10604d7a5e9@google.com/t/
+Reported-by: syzbot+63dec323ac56c28e644f@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/0000000000003faaa105f6e7c658@google.com/T/
+Signed-off-by: Christian A. Ehrhardt <lk@c--e.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20240121202634.275068-1-lk@c--e.de
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-map.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-  dm-crypt, dm-verity: disable tasklets (2024-02-02 12:33:50 -0500)
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 8584babf3ea0..71210cdb3442 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -205,12 +205,19 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
+ 	/*
+ 	 * success
+ 	 */
+-	if ((iov_iter_rw(iter) == WRITE &&
+-	     (!map_data || !map_data->null_mapped)) ||
+-	    (map_data && map_data->from_user)) {
++	if (iov_iter_rw(iter) == WRITE &&
++	     (!map_data || !map_data->null_mapped)) {
+ 		ret = bio_copy_from_iter(bio, iter);
+ 		if (ret)
+ 			goto cleanup;
++	} else if (map_data && map_data->from_user) {
++		struct iov_iter iter2 = *iter;
++
++		/* This is the copy-in part of SG_DXFER_TO_FROM_DEV. */
++		iter2.data_source = ITER_SOURCE;
++		ret = bio_copy_from_iter(bio, &iter2);
++		if (ret)
++			goto cleanup;
+ 	} else {
+ 		if (bmd->is_our_pages)
+ 			zero_fill_bio(bio);
+-- 
+2.43.0
 
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Fix DM ioctl interface to avoid INT_MAX overflow warnings from
-  kvmalloc by limiting the number of targets and parameter size area.
-
-- Fix DM stats to avoid INT_MAX overflow warnings from kvmalloc by
-  limiting the number of entries supported.
-
-- Fix DM writecache to support mapping devices larger than 1 TiB by
-  switching from using kvmalloc_array to vmalloc_array -- which avoids
-  INT_MAX overflow in kvmalloc_node and associated warnings.
-
-- Remove the (ab)use of tasklets from both the DM crypt and verity
-  targets. They will be converted to use BH workqueue in future.
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmW9LCsACgkQxSPxCi2d
-A1qILwgAmL9XOtavSKJ/8o9scJygutYpNSLE0f6mdkdCgJB2nknJ1vR38bXyDpNr
-X3s6QC5TqKTtG7DtRTfnZc8zgtBHajjUZTFBu1NUF9kgNQcrjG3jW+quZ51pxkV0
-1rvzOiYts6ca8csbFViMPS9FJVq1h3PnAyrkhI0SUS7+jEvDZy/QIX4DP20ye9SX
-wKguOSK544haSLHPNYuZqqCEoTBF+Vh1k1gDkxr594NwjsIJJK0+HGelamjzN/96
-/jr88P4bm/6OIVdvwTUefnpIhNIum1Dfa8QWciKOzuct0jqsub65+SUSoTLmoiY4
-/3AZDvp0ZMEwpMAvCIyvHnm81K72MA==
-=sioN
------END PGP SIGNATURE-----
-
-----------------------------------------------------------------
-Mikulas Patocka (4):
-      dm: limit the number of targets and parameter size area
-      dm stats: limit the number of entries
-      dm writecache: allow allocations larger than 2GiB
-      dm-crypt, dm-verity: disable tasklets
-
- drivers/md/dm-core.h          |  2 ++
- drivers/md/dm-crypt.c         | 38 ++------------------------------------
- drivers/md/dm-ioctl.c         |  3 ++-
- drivers/md/dm-stats.c         |  9 +++++++++
- drivers/md/dm-table.c         |  9 +++++++--
- drivers/md/dm-verity-target.c | 26 ++------------------------
- drivers/md/dm-verity.h        |  1 -
- drivers/md/dm-writecache.c    |  8 ++++----
- 8 files changed, 28 insertions(+), 68 deletions(-)
