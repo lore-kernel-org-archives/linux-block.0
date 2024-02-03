@@ -1,130 +1,232 @@
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CD75D8F8
-	for <linux-block@vger.kernel.org>; Sat,  3 Feb 2024 12:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D933C5F865
+	for <linux-block@vger.kernel.org>; Sat,  3 Feb 2024 17:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706962313; cv=none; b=fzBQv5lrV/Gh2bv0PLId4dblI2DlKwhv6xPm7CmvTJggjYT32Ikt2aRgXt6TL+6O/+4xhvP4IudQBFMG9T3LhK9cErWsRuPqu+3CwAyq0bx5uNKc1NK6ypJ9A40oaDPvM3QZK2esqksWF+BmOXtepyyd6MXdMh4ama2Jbsk0OzI=
+	t=1706983134; cv=none; b=NSY0yE5XS0TuebuBtzDzjP4tEroP8KqghC2TE4WLDkxEBY1zqQG5/rkTtGjdXL+520Tx+RvnUXPZVPRsxniJadq68F4nEZOqKwvw6KfeaaZ6vtZCPlFhaQtdZ+J7jI4CiuqHN6vkkShL4os4Y8YRm+vw5A0zm9JWHPTEhb01zk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706962313; c=relaxed/simple;
-	bh=NKqKivxBa1UrOQdEFxuztVX+NR+bchaWhMeL9Kg6RHc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gmZexVshHHh41Yvz8BoX4dt68OG9Eiu4hQ8B0Aou8rT8x5lzzhCCLPcYHbVlXkcAs8ofynsc6tvKWOJWRwGUtbmxrROI8xfvAVLhaYv9s1Xlj/P7PKR4v9yhzILbRAeemhBgATD+Cquxs8jeJ8Cq15dnA2dSJK3rdd/MeqM+HBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=06yBGLqe; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="06yBGLqe"
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3bc21303a35so912745b6e.0
-        for <linux-block@vger.kernel.org>; Sat, 03 Feb 2024 04:11:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706962310; x=1707567110; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W6At8w3BY+bHriEibzEnUgO2+DI0oRR4cvw0MljHLkA=;
-        b=06yBGLqeHFw4mSGiacaeJNTR2oRDBrJ4z/lfOSjnU8WD3Gxu4j3TKz5pJ34XjRxB0E
-         uPbyJ7LpxLyYtdVyXT5b5J2/BQXn/Ds6g0EWVkpOu0g/V3Hl1D5JHViMG9RDs1eVNn2T
-         K+UZInWXohWBA30YZGuPnz4fTjXjsfeGNivmUUs2eh5SqBglIRlPBahE/qoXG7EVwWER
-         DKF7q44T+Zk1B3j5UHsCGhGwFgAM6r2245Zo/sojBP4UU277oNuKXFehXCdG5sKZOvWB
-         2Oask9QIYvaT6XUF4U/elkqaOGiULRrqEXUKczUXesl69LXjuNgNnBPZ2FXgg5ugET+o
-         L5uA==
+	s=arc-20240116; t=1706983134; c=relaxed/simple;
+	bh=GMR9eTy07E8pepEiT1I2Ci94pv1fx2XZ3jo3DIztS5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iZyZvqyqyBaKHNGECItnYIboxtmmyL2FNsXVKJudEiVK8WisrxVkKog66JROSMclElrIPQb9e/ovoVcu54THgJrgcp3ZbwXmTk1PlGbiPPnE9/jWaycA6MMm30QoiTU75ygsJjiA4Y04CDymaWs9qpSUmTzJOFGl2ueAHoc1wtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6e0f43074edso1931856a34.1
+        for <linux-block@vger.kernel.org>; Sat, 03 Feb 2024 09:58:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706962310; x=1707567110;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6At8w3BY+bHriEibzEnUgO2+DI0oRR4cvw0MljHLkA=;
-        b=Abona0mrVouc3H02oMOgRw0OvwnOiLqXS3iGSeR5CLAXsuHw/p4VZeoje1naDG1rE8
-         gFiT+Z42G5LM0Vjz1Wm9LVS2IbhZx6ZFpLyuXauEO/O6F3U+SK0w7XwmukjSEwMwMl5l
-         Eurx+AogUWM1gLLT/1Fl83glRSEeW+R2m3LfDSxwB0YZhunwNipN7Ih8wtmSeEZhl6YL
-         sLw1UAQVKpucrk5CkUBXe+M/9MlUhAXqa92buyl3JPdDgZSran4YkYDPtkSvUFAMGvBx
-         T/Oi0TPqFe6BQKac/LaktF8TGnE3tVG2KQ0ZZGdFsc/CvjN6RjX+iSJ5ifYsLRZSbQUa
-         +neg==
-X-Forwarded-Encrypted: i=0; AJvYcCVvqyAbCTQaml1+9ILLl7sOb0N+iASmdQyDX+RHHkrslwZefuoeptI2owkCzcXgei29IiX0kjn8YaLnHn8NK1ipaSo8zeUDQbt0BSs=
-X-Gm-Message-State: AOJu0YzbcR4nnD/NZ9m4UjcXL/cJD6afsdez7RRitg2KfBvyCHCkB7Xl
-	gbN1rSz0htfNv95Z2KcPqhIYMUJTZHZz12hOBH7SMCvpIAyuezPljGS4VfQtuAA=
-X-Google-Smtp-Source: AGHT+IHqU4+fGOqr+6hwk36/z50UDpr7B1lwfquHREOClNc/Ohn+gEBSJJY/qwk/nminNs/414tyZA==
-X-Received: by 2002:a4a:a787:0:b0:59c:7c63:928f with SMTP id l7-20020a4aa787000000b0059c7c63928fmr8736332oom.0.1706962310299;
-        Sat, 03 Feb 2024 04:11:50 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWw+Y7AW9dyMB0A0M0XJRjY7ktYhP9Rs6oOd4pjM3Nn23QgvIv2kdSR8OtCYTZbFONZNotZbS/djXmBPiB5wK8MshAwqwVzOHXqYP3QikyM9c5lEiOO9fkF9xPMfdQ8gKSpyPao5UBzBEKLARyyNp9OGzklmYmjlsJC5duJwSmlDhvH7tEAGdm52Cs1CVEXwgwEL8GgSSx7foRnA0CQU/6FpNZedtv8nWbAM/0cIzgWin8=
-Received: from ?IPV6:2600:380:9b5a:c5dd:b564:550c:8958:e9dc? ([2600:380:9b5a:c5dd:b564:550c:8958:e9dc])
-        by smtp.gmail.com with ESMTPSA id y6-20020a4ab406000000b0059a9652eee4sm814630oon.25.2024.02.03.04.11.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 04:11:49 -0800 (PST)
-Message-ID: <a387f08c-05c1-4c47-8ba1-27493b7853ef@kernel.dk>
-Date: Sat, 3 Feb 2024 05:11:47 -0700
+        d=1e100.net; s=20230601; t=1706983131; x=1707587931;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DOliNUqI71qLaQZn8VZTphk7egJbvCAyLqPvDh9Lh3w=;
+        b=oVCPWtma4VtvQ5PbcOcxwawKEzBuUDpowlkppT7rRyFlTjaM1HuMGKDegnQwyeKoWv
+         VnYRAlU0WKgKYwlyilqUF8G7jcQFIEuYl7VdVt8pcKyu1D01Bl+Cs7ifz1x8rbVYabO4
+         vew+/V/LZ+4Bv8CnNDGGDtWuvX+dtQUu+cGEuY7NOyGaiW9AXnflGHSCeD+ncxmp6pO/
+         r9MH7+8s8e6gfVnesdbqbnocLSNwHCRseNfk6/A6ppBYptzoRrqU1Wem/TWpvBVBd3yU
+         Lu4w/mKLkjPKvjZGt6+QtN8Ppe3wnJktt1Zuqr0EI2ExpWfhHtbJhMd/GZjHkxPKMJ1E
+         71cg==
+X-Gm-Message-State: AOJu0Yx6nRfc67+zdDVqeqf/If7pegrLEDJEKzB/cYnYCsDabHZvEFJZ
+	RHEVaZZxzY/ebvQtIMJPhKxs2A18LMV4ppgLwkktGezUEliL0Eup7CClGGxwpw==
+X-Google-Smtp-Source: AGHT+IGTtt7bhSSQCWu93iUoruII8M21I1KuWYt41Al2/26tOAVs7IfkYmE1K/wOoyn5Wimk46x5RQ==
+X-Received: by 2002:a05:6870:2006:b0:219:44bb:ba93 with SMTP id o6-20020a056870200600b0021944bbba93mr2442939oab.17.1706983129580;
+        Sat, 03 Feb 2024 09:58:49 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUSr51JqyMhwRKWtGx14yO6OQu0fv9MTwI870NV93oAbFWcKw3iTQxO8+vfSVxwYWzVvUIdlZ5E04renrZVX8eL037w8l7kFY4K7N6/XfLArJ42kF2g+uHTZ4KE5qOLqHiht2k2hXkfHZ7WifloEBRtkDYr27GdO0P8v4bPpfownyxiHvvFXHD7xA+eU6c7AOL13B+LjLFSMY3oLEBy
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id l22-20020ac87256000000b0042bf0b37b5csm1974371qtp.28.2024.02.03.09.58.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Feb 2024 09:58:49 -0800 (PST)
+Date: Sat, 3 Feb 2024 12:58:48 -0500
+From: Mike Snitzer <snitzer@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@lists.linux.dev, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 10/26] dm: Use the block layer zone append emulation
+Message-ID: <Zb5-2LsnQtJHV2mL@redhat.com>
+References: <20240202073104.2418230-1-dlemoal@kernel.org>
+ <20240202073104.2418230-11-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/26] Zone write plugging
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <147de7c4-7050-4b1d-a48c-c0316a81baee@kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <147de7c4-7050-4b1d-a48c-c0316a81baee@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202073104.2418230-11-dlemoal@kernel.org>
 
-On 2/2/24 12:37 AM, Damien Le Moal wrote:
-> On 2/2/24 16:30, Damien Le Moal wrote:
->> The patch series introduces zone write plugging (ZWP) as the new
->> mechanism to control the ordering of writes to zoned block devices.
->> ZWP replaces zone write locking (ZWL) which is implemented only by
->> mq-deadline today. ZWP also allows emulating zone append operations
->> using regular writes for zoned devices that do not natively support this
->> operation (e.g. SMR HDDs). This patch series removes the scsi disk
->> driver and device mapper zone append emulation to use ZWP emulation.
->>
->> Unlike ZWL which operates on requests, ZWP operates on BIOs. A zone
->> write plug is simply a BIO list that is atomically manipulated using a
->> spinlock and a kblockd submission work. A write BIO to a zone is
->> "plugged" to delay its execution if a write BIO for the same zone was
->> already issued, that is, if a write request for the same zone is being
->> executed. The next plugged BIO is unplugged and issued once the write
->> request completes.
->>
->> This mechanism allows to:
->>  - Untangle zone write ordering from the block IO schedulers. This
->>    allows removing the restriction on using only mq-deadline for zoned
->>    block devices. Any block IO scheduler, including "none" can be used.
->>  - Zone write plugging operates on BIOs instead of requests. Plugged
->>    BIOs waiting for execution thus do not hold scheduling tags and thus
->>    do not prevent other BIOs from being submitted to the device (reads
->>    or writes to other zones). Depending on the workload, this can
->>    significantly improve the device use and the performance.
->>  - Both blk-mq (request) based zoned devices and BIO-based devices (e.g.
->>    device mapper) can use ZWP. It is mandatory for the
->>    former but optional for the latter: BIO-based driver can use zone
->>    write plugging to implement write ordering guarantees, or the drivers
->>    can implement their own if needed.
->>  - The code is less invasive in the block layer and in device drivers.
->>    ZWP implementation is mostly limited to blk-zoned.c, with some small
->>    changes in blk-mq.c, blk-merge.c and bio.c.
->>
->> Performance evaluation results are shown below.
->>
->> The series is organized as follows:
+On Fri, Feb 02 2024 at  2:30P -0500,
+Damien Le Moal <dlemoal@kernel.org> wrote:
+
+> For targets requiring zone append operation emulation with regular
+> writes (e.g. dm-crypt), we can use the block layer emulation provided by
+> zone write plugging. Remove DM implemented zone append emulation and
+> enable the block layer one.
 > 
-> I forgot to mention that the patches are against Jens block/for-next
-> branch with the addition of Christoph's "clean up blk_mq_submit_bio"
-> patches [1] and my patch "null_blk: Always split BIOs to respect queue
-> limits" [2].
+> This is done by setting the max_zone_append_sectors limit of the
+> mapped device queue to 0 for mapped devices that have a target table
+> that cannot support native zone append operations. These includes
+> mixed zoned and non-zoned targets, or targets that explicitly requested
+> emulation of zone append (e.g. dm-crypt). For these mapped devices, the
+> new field emulate_zone_append is set to true. dm_split_and_process_bio()
+> is modified to call blk_zone_write_plug_bio() for such device to let the
+> block layer transform zone append operations into regular writes. This
+> is done after ensuring that the submitted BIO is split if it straddles
+> zone boundaries.
+> 
+> dm_revalidate_zones() is also modified to use the block layer provided
+> function blk_revalidate_disk_zones() so that all zone resources needed
+> for zone append emulation are allocated and initialized by the block
+> layer without DM core needing to do anything. Since the device table is
+> not yet live when dm_revalidate_zones() is executed, enabling the use of
+> blk_revalidate_disk_zones() requires adding a pointer to the device
+> table in struct mapped_device. This avoids errors in
+> dm_blk_report_zones() trying to get the table with dm_get_live_table().
+> The mapped device table pointer is set to the table passed as argument
+> to dm_revalidate_zones() before calling blk_revalidate_disk_zones() and
+> reset to NULL after this function returns to restore the live table
+> handling for user call of report zones.
+> 
+> All the code related to zone append emulation is removed from
+> dm-zone.c. This leads to simplifications of the functions __map_bio()
+> and dm_zone_endio(). This later function now only needs to deal with
+> completions of real zone append operations for targets that support it.
+> 
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 
-I figured that was the case, I'll get both of these properly setup in a
-for-6.9/block branch, just wanted -rc3 to get cut first. JFYI that they
-are coming tomorrow.
+Love the overall improvement to the DM core code and the broader block
+layer by switching to this bio-based ZWP approach.
 
--- 
-Jens Axboe
+Reviewed-by: Mike Snitzer <snitzer@kernel.org>
 
+But one incremental suggestion inlined below.
+
+> ---
+>  drivers/md/dm-core.h |  11 +-
+>  drivers/md/dm-zone.c | 470 ++++---------------------------------------
+>  drivers/md/dm.c      |  44 ++--
+>  drivers/md/dm.h      |   7 -
+>  4 files changed, 68 insertions(+), 464 deletions(-)
+> 
+
+<snip>
+
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index 8dcabf84d866..92ce3b2eb4ae 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -1419,25 +1419,12 @@ static void __map_bio(struct bio *clone)
+>  		down(&md->swap_bios_semaphore);
+>  	}
+>  
+> -	if (static_branch_unlikely(&zoned_enabled)) {
+> -		/*
+> -		 * Check if the IO needs a special mapping due to zone append
+> -		 * emulation on zoned target. In this case, dm_zone_map_bio()
+> -		 * calls the target map operation.
+> -		 */
+> -		if (unlikely(dm_emulate_zone_append(md)))
+> -			r = dm_zone_map_bio(tio);
+> -		else
+> -			goto do_map;
+> -	} else {
+> -do_map:
+> -		if (likely(ti->type->map == linear_map))
+> -			r = linear_map(ti, clone);
+> -		else if (ti->type->map == stripe_map)
+> -			r = stripe_map(ti, clone);
+> -		else
+> -			r = ti->type->map(ti, clone);
+> -	}
+> +	if (likely(ti->type->map == linear_map))
+> +		r = linear_map(ti, clone);
+> +	else if (ti->type->map == stripe_map)
+> +		r = stripe_map(ti, clone);
+> +	else
+> +		r = ti->type->map(ti, clone);
+>  
+>  	switch (r) {
+>  	case DM_MAPIO_SUBMITTED:
+> @@ -1774,19 +1761,33 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+>  	struct clone_info ci;
+>  	struct dm_io *io;
+>  	blk_status_t error = BLK_STS_OK;
+> -	bool is_abnormal;
+> +	bool is_abnormal, need_split;
+>  
+>  	is_abnormal = is_abnormal_io(bio);
+> -	if (unlikely(is_abnormal)) {
+> +	if (likely(!md->emulate_zone_append))
+> +		need_split = is_abnormal;
+> +	else
+> +		need_split = is_abnormal || bio_straddle_zones(bio);
+> +	if (unlikely(need_split)) {
+>  		/*
+>  		 * Use bio_split_to_limits() for abnormal IO (e.g. discard, etc)
+>  		 * otherwise associated queue_limits won't be imposed.
+> +		 * Also split the BIO for mapped devices needing zone append
+> +		 * emulation to ensure that the BIO does not cross zone
+> +		 * boundaries.
+>  		 */
+>  		bio = bio_split_to_limits(bio);
+>  		if (!bio)
+>  			return;
+>  	}
+>  
+> +	/*
+> +	 * Use the block layer zone write plugging for mapped devices that
+> +	 * need zone append emulation (e.g. dm-crypt).
+> +	 */
+> +	if (md->emulate_zone_append && blk_zone_write_plug_bio(bio, 0))
+> +		return;
+> +
+>  	/* Only support nowait for normal IO */
+>  	if (unlikely(bio->bi_opf & REQ_NOWAIT) && !is_abnormal) {
+>  		io = alloc_io(md, bio, GFP_NOWAIT);
+
+Would prefer to see this incremental change included from the start:
+
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 92ce3b2eb4ae..1fd9bbf35db3 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1763,11 +1763,10 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+ 	blk_status_t error = BLK_STS_OK;
+ 	bool is_abnormal, need_split;
+ 
+-	is_abnormal = is_abnormal_io(bio);
+-	if (likely(!md->emulate_zone_append))
+-		need_split = is_abnormal;
+-	else
++	need_split = is_abnormal = is_abnormal_io(bio);
++	if (static_branch_unlikely(&zoned_enabled) && unlikely(md->emulate_zone_append))
+ 		need_split = is_abnormal || bio_straddle_zones(bio);
++
+ 	if (unlikely(need_split)) {
+ 		/*
+ 		 * Use bio_split_to_limits() for abnormal IO (e.g. discard, etc)
+@@ -1781,12 +1780,14 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+ 			return;
+ 	}
+ 
+-	/*
+-	 * Use the block layer zone write plugging for mapped devices that
+-	 * need zone append emulation (e.g. dm-crypt).
+-	 */
+-	if (md->emulate_zone_append && blk_zone_write_plug_bio(bio, 0))
+-		return;
++	if (static_branch_unlikely(&zoned_enabled)) {
++		/*
++		 * Use the block layer zone write plugging for mapped devices that
++		 * need zone append emulation (e.g. dm-crypt).
++		 */
++		if (unlikely(md->emulate_zone_append) && blk_zone_write_plug_bio(bio, 0))
++			return;
++	}
+ 
+ 	/* Only support nowait for normal IO */
+ 	if (unlikely(bio->bi_opf & REQ_NOWAIT) && !is_abnormal) {
