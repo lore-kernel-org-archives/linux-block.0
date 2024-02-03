@@ -1,143 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD46B134C1;
-	Sat,  3 Feb 2024 04:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E031714F8C;
+	Sat,  3 Feb 2024 04:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706933368; cv=none; b=jjA8WPp/7qw0BrAxF+zGfwZLvK/OlnsEDJbQXD2H6jphxCl2eJGoAPISfcIcPDC0RwTzNiP0P4lq4MeQMN94Wj6GAVTPGr6/q1eDhbLJvKqn2Ums3OSdt3PNcHW9Ot8qHBUw6v1WiM2UDoFfyiNAeh9hRzpV3G555NwttZXdZNA=
+	t=1706933496; cv=none; b=b5h+cEIWzehUqwryoC0c3u1gZHLyYcLQN0kN6NceyfhLjXDIoVoOOowEutA9zIUbHo/0XHMvtHUkKHURLLDqP3iTPMplvzJrz4rx6CpTII4GW6VsKcYKcrIozI7NANQ2aVC3vILDG4duClTPrTqT2YbBTraCfBFmZuInpqw6960=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706933368; c=relaxed/simple;
-	bh=E65ZQWj9d7qoRpfMa8Jzb593JJBcZ7p4ukRtey2e9I0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WVDMBi27LdpPTH5TJ4ywaJ5pHOnE5CFx+PbA3se5GHarOsYiySTDbeas65cG2QGFvlonW7nEWNQRH6d8zArnOm5x6Gni6sCgwgUWuqYyU6yNpaaLolqfMPuN8eX1f68aMTFLY51M8yflrVc+4YlSnjBMcoHUsTgGZ7RNCBrPqWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Se0PVhJP; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Se0PVhJP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95092C433C7;
-	Sat,  3 Feb 2024 04:09:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1706933368;
-	bh=E65ZQWj9d7qoRpfMa8Jzb593JJBcZ7p4ukRtey2e9I0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Se0PVhJPI3bwnNO9dTgQJyjsMQ3DHjzFD5YhrlSkwP2fe2flSvGxlSclYHLMsq4gS
-	 +UDKxAdqtmXKosRzSS3JSZCjtCRaxTsrkbbRYWUn6UR5xlFg0AMmaVKcaVUYadi1yb
-	 prpwwZslios40PAbn28NXzjzoTM23BTUVf90HTsQ=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	kernel test robot <lkp@intel.com>,
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Jack Wang <jinpu.wang@ionos.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>,
-	Guoqing Jiang <guoqing.jiang@linux.dev>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 076/219] block/rnbd-srv: Check for unlikely string overflow
-Date: Fri,  2 Feb 2024 20:04:09 -0800
-Message-ID: <20240203035327.793760130@linuxfoundation.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240203035317.354186483@linuxfoundation.org>
-References: <20240203035317.354186483@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	s=arc-20240116; t=1706933496; c=relaxed/simple;
+	bh=B/CO6BWQJAUUY+ERXajfKk0gMicjG6ssUvDWGMYRyIU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OIWDqEyzQ+ds4bknur7xiW75WvZZh6XstmXv9CthaMWOnqCC3ZxK9yInMnMylRKciDrNFYj3ldDtFDkaCotH7c57236dKu3aP9SwOJGdi0MdkXj4csdNpAg38YzvNPgb8FoEgoNlyoUgfLsgzgYtu7wi2Vd+T9PE/XwO7P2b0Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6ddb129350cso2090133b3a.3;
+        Fri, 02 Feb 2024 20:11:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706933494; x=1707538294;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yQr/DlZ+2VCTsXdSflVpS2G3BtwxEe3N/+eH1UzREmI=;
+        b=EA0p1CtUGep09705E0R6whtzLoxwx4r1dZsK5QzSYg35LB8UmIKPb4jgj+eWDcqnqK
+         62r/b694ccClctYLiia1efNuAZg33a89EZFVTbKDz87skQbR1TYu2kdV6J6jdIVPwdeY
+         dvp/K8LkzIPVBGz31cwYYSDyp3xhLaoxvLhobrXiAqaZABC5+9ATDp3PiZsMVTrdL9Fz
+         rN/0dpOtNGKCQS5n73qZiGFoithvnihOddt2bha0B/7rjceuXBjfWVQFvh9vMCN4xm15
+         K5Q5l372S53awygw7Ac0ZuyLJwDPTCB2gr9yP/s0Qho/6to++9kxCqz0oPnFfC5V3LqW
+         /BDQ==
+X-Gm-Message-State: AOJu0Ywqr/7qxxUgva6YcX9eKlU+KhIP5EH0fjfUa0E7o0wmBSCmKRUV
+	Bgrn7NzXx7Pb3oXDX4CWmLumV3Z9KhPUW+MPbolnxR++5wsM3V73UohKbzO4
+X-Google-Smtp-Source: AGHT+IHX5Et9x7nMIgkyTbDegGPONZwCy1F8OPHEVc8Y90kiF7mcWWw4mUUPoSUNvHkeIxHnvdTqoA==
+X-Received: by 2002:a05:6a20:9398:b0:19e:3a8e:e723 with SMTP id x24-20020a056a20939800b0019e3a8ee723mr10189182pzh.17.1706933494124;
+        Fri, 02 Feb 2024 20:11:34 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXIs2ElHxFvwnd4vV50hYTNDvH0W61loC2pvhjAQg9c6g2HdEcZg5VvfZa0czX3V1LtbqZB7znG2V58sFLz5KTipScqQTsrtZxf+zPa/oaHDZ7HWmFXf5SlwjnX6JGmwBmLa0T1ZasR/AxKy5Bdbu8yBaX+vE0OBex39Zf3nMJWGm13LQ7A/2NhEmSAsrxBuPXnOUy9c0vKOVtjiIv+R/cdnxzfxHzAbtaEsCNgL+EjbcgtOMsCrip6LCWXN1R5c2QT5g==
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
+        by smtp.gmail.com with ESMTPSA id pm14-20020a17090b3c4e00b00295f900f38fsm865716pjb.11.2024.02.02.20.11.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Feb 2024 20:11:33 -0800 (PST)
+Message-ID: <a0158ca3-b908-44b5-a6ea-117b1f8ca1e7@acm.org>
+Date: Fri, 2 Feb 2024 20:11:32 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/26] block: Allow using bio_attempt_back_merge()
+ internally
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20240202073104.2418230-1-dlemoal@kernel.org>
+ <20240202073104.2418230-6-dlemoal@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240202073104.2418230-6-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+On 2/1/24 23:30, Damien Le Moal wrote:
+> Remove the static definition of bio_attempt_back_merge() to allow using
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To me this suggests that the function definition is removed entirely but
+that is not what this patch does ...
 
-------------------
+Otherwise this patch looks good to me.
 
-From: Kees Cook <keescook@chromium.org>
+Thanks,
 
-[ Upstream commit 9e4bf6a08d1e127bcc4bd72557f2dfafc6bc7f41 ]
-
-Since "dev_search_path" can technically be as large as PATH_MAX,
-there was a risk of truncation when copying it and a second string
-into "full_path" since it was also PATH_MAX sized. The W=1 builds were
-reporting this warning:
-
-drivers/block/rnbd/rnbd-srv.c: In function 'process_msg_open.isra':
-drivers/block/rnbd/rnbd-srv.c:616:51: warning: '%s' directive output may be truncated writing up to 254 bytes into a region of size between 0 and 4095 [-Wformat-truncation=]
-  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
-      |                                                   ^~
-In function 'rnbd_srv_get_full_path',
-    inlined from 'process_msg_open.isra' at drivers/block/rnbd/rnbd-srv.c:721:14: drivers/block/rnbd/rnbd-srv.c:616:17: note: 'snprintf' output between 2 and 4351 bytes into a destination of size 4096
-  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  617 |                          dev_search_path, dev_name);
-      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To fix this, unconditionally check for truncation (as was already done
-for the case where "%SESSNAME%" was present).
-
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202312100355.lHoJPgKy-lkp@intel.com/
-Cc: Md. Haris Iqbal <haris.iqbal@ionos.com>
-Cc: Jack Wang <jinpu.wang@ionos.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc:  <linux-block@vger.kernel.org>
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Acked-by: Guoqing Jiang <guoqing.jiang@linux.dev>
-Acked-by: Jack Wang <jinpu.wang@ionos.com>
-Link: https://lore.kernel.org/r/20231212214738.work.169-kees@kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/rnbd/rnbd-srv.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index 2cfed2e58d64..ad451224e663 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -587,6 +587,7 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
- {
- 	char *full_path;
- 	char *a, *b;
-+	int len;
- 
- 	full_path = kmalloc(PATH_MAX, GFP_KERNEL);
- 	if (!full_path)
-@@ -598,19 +599,19 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
- 	 */
- 	a = strnstr(dev_search_path, "%SESSNAME%", sizeof(dev_search_path));
- 	if (a) {
--		int len = a - dev_search_path;
-+		len = a - dev_search_path;
- 
- 		len = snprintf(full_path, PATH_MAX, "%.*s/%s/%s", len,
- 			       dev_search_path, srv_sess->sessname, dev_name);
--		if (len >= PATH_MAX) {
--			pr_err("Too long path: %s, %s, %s\n",
--			       dev_search_path, srv_sess->sessname, dev_name);
--			kfree(full_path);
--			return ERR_PTR(-EINVAL);
--		}
- 	} else {
--		snprintf(full_path, PATH_MAX, "%s/%s",
--			 dev_search_path, dev_name);
-+		len = snprintf(full_path, PATH_MAX, "%s/%s",
-+			       dev_search_path, dev_name);
-+	}
-+	if (len >= PATH_MAX) {
-+		pr_err("Too long path: %s, %s, %s\n",
-+		       dev_search_path, srv_sess->sessname, dev_name);
-+		kfree(full_path);
-+		return ERR_PTR(-EINVAL);
- 	}
- 
- 	/* eliminitate duplicated slashes */
--- 
-2.43.0
-
-
-
+Bart.
