@@ -1,110 +1,92 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F71C286BC
-	for <linux-block@vger.kernel.org>; Sun,  4 Feb 2024 21:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A0433995;
+	Sun,  4 Feb 2024 21:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707080791; cv=none; b=hkccPh7r9NeDSRLjokFtQWPv+eb2aOPFaw+ILMxtKH+/KbfaeVe1tPvu02CM1VsxxYCWpfLyA6tIqIqMtGyPx5RZDfR0ltzilXpe3wijJryX34h5rG7iJgOetgrfPcTg1PsOZaWR12I75DQH6Ehn77kMN9mIdKxDhgpruWFzvdY=
+	t=1707082454; cv=none; b=SBnzcenzeogRVGpaOdNtzAytnTsf8O0HG3ahflPf2PHTtetTZVu7XGx/QtLqTzGvU8GmyF3tYRt4KCsNOiH9oWyZSSGPRj3wunC/uvzOtpixqeFNziBAb+PbKy2hnKP+64X1isV8ASjs18fsi/34BXayBMmo6dpN5dpfxLzaHLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707080791; c=relaxed/simple;
-	bh=PTpkAQYaiEd/H/K1pEJCdiG03wTlBPR/xvUqZnaKzc0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mzr7rl5JEeRS8MfgaFU53+qNuTKXgmrTRQfv4gi895s8Cg+VCUrCBBuqcFCUMk1OFvv61WWWk8YQvnWARoQqISf9Rh2BD+K3Ji3HsKtcjgKn+X7DWLpOB9UbA/++Fdwv9d3nnM9MXSKrY11KOzEKlJzbojERjpWz9i0Zs1uxNlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=Lg3Mqzm4; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+	s=arc-20240116; t=1707082454; c=relaxed/simple;
+	bh=lsCB2VcRgo9zfs5ZsYcXyaJzIxWS69uxiBljQAreJqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YpCJpEEGnEyVAg/eHbkHlraER/yR64wi0M9K8HxJ+UQLX77ZuBTTjAOGteS/Fge67RZE/GZ/1iQxFlltE0NcTle4qfcuaT//bePE4qgusjZucFefXq/KG9wSkP7jDTPqoXNlrgYyg9NinPG4+hwBQSiUI/4zHDAndCxL70M1b4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kjlY18EM; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="Lg3Mqzm4"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a28a6cef709so516467866b.1
-        for <linux-block@vger.kernel.org>; Sun, 04 Feb 2024 13:06:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1707080786; x=1707685586; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wIBefr9jY7okRpcwBBo6tcStVqxml+OF8xjJACWyuys=;
-        b=Lg3Mqzm4WzfQFGhaQV7dhSQzdFhfvPtZFdlMePwUtZ6xuJm1XRh41ZOGdCj+aWTzFj
-         3saA9+S5jaa/vfqEYxVFc5e32mEzkvvwIKVkaXybEoH91lWy3DWTfmuTepaia4phvUFY
-         zXPdJwk2pUMjsnenipIOvB9cg5fCpeCrYFFAI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707080786; x=1707685586;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wIBefr9jY7okRpcwBBo6tcStVqxml+OF8xjJACWyuys=;
-        b=RBKbwUBiyLWhNvQb+TaDsLt44OQ3Nt5wLlyGOmLko9Lj3VzDS7BhC8nlKWSS1I21mu
-         HpOuv6QQ/a6uJWI6FhkEHNkk4ZyHW+zqTnftB0q9xxWZaTxgKzZ4fW0mqnE063DEUo3x
-         EaaZLhfpGmaSxh/t2tgLmjafqMygky7Dg7DUlYO1SXiC5goPfKAbQhp/erKbjEHTP1l3
-         VmBkji1niLGJp0qAOdMZjd9FfZklHvKVZowYcVLkkg2iy15gGFWnw2pwb9XbwGsfn5lR
-         EXpMexRD6wX5VqeIjJFZhMXDiuIqyeJGfAqHWnJN2koRRBnXrkxca1UuLqskGnxNXhvN
-         HUlw==
-X-Gm-Message-State: AOJu0YzoFlp4mSBnoo4S6Yj4gmmJCRZ/rjK3VWN15jcFZSfF52+ikpec
-	8IBdIx1vvP0iCWOZM4t0DWVyi3sepAB/oMzP7T7VM2213GmhGOiAlk3TrgF3sg==
-X-Google-Smtp-Source: AGHT+IGkokpPEnIXbIHAoQGWdATZZl6xxNcxvTGj+iXBZGdRkSBb+EOhzYTxOFZwHRqw5vByITGcig==
-X-Received: by 2002:a17:906:d554:b0:a2f:b9be:66df with SMTP id cr20-20020a170906d55400b00a2fb9be66dfmr6807154ejc.17.1707080786682;
-        Sun, 04 Feb 2024 13:06:26 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWYQQKl7q9Vn/UAOvmcfLyfIm/GrO4H0ab7oKfZi3tiJb5xm9pQBy5eKYEK9Y5UtIAYZIiIf7GPnT7ICt9fZB2Gbj1S9tYBufvayaV0UNZT7lNjuRgwC6md504LsmvAcMIQA5qokHZxyioBRVAeeTFnwaAdxlnq4wdOr4e6h/5vEz5PBUFUF99x3BEC1i/PQkn8l6rbSNa8OVrqFws9eByrURodsF5OINMhSc9H1CIrIYAciSrS/r1TkGwklgb0A1yoPBFgyZ78
-Received: from [10.211.55.3] ([94.107.229.70])
-        by smtp.googlemail.com with ESMTPSA id hw16-20020a170907a0d000b00a372330e834sm2872890ejc.102.2024.02.04.13.06.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 04 Feb 2024 13:06:26 -0800 (PST)
-Message-ID: <fccd3a15-b3a1-4ea2-ad0f-a6c0d3a8e134@ieee.org>
-Date: Sun, 4 Feb 2024 15:06:25 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kjlY18EM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=oUPc0T9g01EBpJOFoKdeHugi9gR06zfpezwQo4Xu2qY=; b=kjlY18EMquQO4rPsntbj3dj6j9
+	N1MmlpTUgmNoPzoUvDd3yGgPhXrBQRJwzwP9CxdAQiv7He8LE68yVAwI0Ei7Njjzmr82gTLKKf8Pj
+	OhHhUhmf64OYQIYOD9kQjgngDF2oZqlaFY9KIpl6FzJxtDqbkVND2v1/fSWqDSviYl0TAfWR7vr4+
+	MdfTEJIheGzRRQTlMu7dALld7MDz2YZvG5gf2oUm8746PYZm3GwxQfsR0z6xFR0QWxUPKUBPydhlN
+	qhT+IXfYIR/q13gE/7DFyxuWDFTtEL4Twt6TiMLpUpn6hGz/oAXBB/WzDAjUs4QcoctYYWO0YXsGr
+	q6jzPD5g==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rWk7l-00000007dDv-24V5;
+	Sun, 04 Feb 2024 21:34:01 +0000
+Date: Sun, 4 Feb 2024 21:34:01 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] Reclaiming & documenting page flags
+Message-ID: <ZcACya-MJr_fNRSH@casper.infradead.org>
+References: <Zbcn-P4QKgBhyxdO@casper.infradead.org>
+ <Zb9pZTmyb0lPMQs8@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: rbd: make rbd_bus_type const
-Content-Language: en-US
-To: "Ricardo B. Marliere" <ricardo@marliere.net>,
- Ilya Dryomov <idryomov@gmail.com>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>
-Cc: ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20240204-bus_cleanup-block-v1-1-fc77afd8d7cc@marliere.net>
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20240204-bus_cleanup-block-v1-1-fc77afd8d7cc@marliere.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zb9pZTmyb0lPMQs8@kernel.org>
 
-On 2/4/24 9:31 AM, Ricardo B. Marliere wrote:
-> Now that the driver core can properly handle constant struct bus_type,
-> move the rbd_bus_type variable to be a constant structure as well,
-> placing it into read-only memory which can not be modified at runtime.
+On Sun, Feb 04, 2024 at 11:39:33AM +0100, Mike Rapoport wrote:
+> On Mon, Jan 29, 2024 at 04:32:03AM +0000, Matthew Wilcox wrote:
+> > Our documentation of the current page flags is ... not great.  I think
+> > I can improve it for the page cache side of things; I understand the
+> > meanings of locked, writeback, uptodate, dirty, head, waiters, slab,
+> > mlocked, mappedtodisk, error, hwpoison, readahead, anon_exclusive,
+> > has_hwpoisoned, hugetlb and large_remappable.
+> > 
+> > Where I'm a lot more shaky is the meaning of the more "real MM" flags,
+> > like active, referenced, lru, workingset, reserved, reclaim, swapbacked,
+> > unevictable, young, idle, swapcache, isolated, and reported.
+> > 
+> > Perhaps we could have an MM session where we try to explain slowly and
+> > carefully to each other what all these flags actually mean, talk about
+> > what combinations of them make sense, how we might eliminate some of
+> > them to make more space in the flags word, and what all this looks like
+> > in a memdesc world.
+> > 
+> > And maybe we can get some documentation written about it!  Not trying
+> > to nerd snipe Jon into attending this session, but if he did ...
 > 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
-
-Great!
-
-Reviewed-by: Alex Elder <elder@linaro.org>
-
-> ---
->   drivers/block/rbd.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> I suspect Jon will be there anyway, but not sure he'd be willing to do the
+> writing :)
 > 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index 0202a4e5d6cf..21f2b9e9b9ff 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -575,7 +575,7 @@ static const struct attribute_group rbd_bus_group = {
->   };
->   __ATTRIBUTE_GROUPS(rbd_bus);
->   
-> -static struct bus_type rbd_bus_type = {
-> +static const struct bus_type rbd_bus_type = {
->   	.name		= "rbd",
->   	.bus_groups	= rbd_bus_groups,
->   };
-> 
-> ---
-> base-commit: aa826a9b19b93bf8aabc462381ae436a60b2a320
-> change-id: 20240204-bus_cleanup-block-9986bfea7975
-> 
-> Best regards,
+> I was going to propose the "mm docs" session again, but this one seems more
+> useful than talking yet again about how hard it is to get MM documentation
+> done.
 
+I'm doing my best to write documentation as I go.  I think we're a bit
+better off than we were last year.  Do we have scripts to tell us which
+public functions (ie EXPORT_SYMBOL and static inline functions in header
+files) have kernel-doc?  And could we run them against kernels from, say,
+April 2023, 2022, 2021, 2020, 2019 (and in two months against April 2024)
+and see how we're doing in terms of percentage undocumented functions?
+
+There's also the problem of getting long-form documentation done.
+But I think that's a different problem from getting kernel-doc written.
+Looking at the 55 commits in the last year to Documentation/mm, we seems
+to be doing a pretty good job of keeping the documentation we have up
+to date.  Just not a great job of adding new documentation.
