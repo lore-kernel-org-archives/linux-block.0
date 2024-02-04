@@ -1,152 +1,125 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8FD224CA;
-	Sun,  4 Feb 2024 12:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C70C225CD;
+	Sun,  4 Feb 2024 15:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707050600; cv=none; b=heQkWnqSi5xTIILmOXUQGCvVHuiGPIat88gR0F+Y12U+grRF/NQ3HT6VRUF4hjx+vnH0GwnZiA3NA6TNvsiaY56QKQSmroZlhq4JCc6nF6FlDA2cFKJoXJ3XaDBOEil7aszTpca0csRNFUD3n7CJvKpa4fZZ1GCGUxVxoDGprwU=
+	t=1707060679; cv=none; b=UvwiXmiAACABwEML3kpWz7imxWpI5kXyeozsOCcgjusBQMYI2QVHEIaoV4RUcQ9c/uaBDLtOxElZ0C+L6jlf2FQyF3pJm/8VLPqxAdtY7QC/zAzaSqXlzybAldn8VpdMKdpM7KjRKasQbCfB3sLCK7IRzbgi8ct37XghOewc4PE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707050600; c=relaxed/simple;
-	bh=H+8ZOD+EV6874ewenOL63UDBI8WotOeUisntd9Ftmg0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p5jVj7DlpDWyrtpbpCJ5Qxvfqy3MT7JntzHtHq6g5gCvPNpz6hlgU4vQ9QCyl7oE59e/Nays9C3koxA1j/tm7RJ6LnatQc69Qp9qYS+ixyYZgiczvMvVvGgAUvC0BuirR86X+/ZG/MAAr5bm05Np4osy9k2bRkkZzd5BAuH6Luk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Nm2OVEOQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F721itGG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vcte8JUC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cX27UzCq; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1707060679; c=relaxed/simple;
+	bh=S/ZIXKaYCzBvSHAb0bgIk6ZHFhlKGdCf+UMP2fmktpc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=o1DQn11nzqMq02zK13i2E+sbeXCBQaTMA1UpNRIK1+wRJadW02yaQQwcsWyHeDPEYR58D8gZeVuXgpg+ycuvviPttd8mCwJ7xLN9ZPIx3CONO+oz5U+glOeddUNKIxe0WkAZCRdd3XUG+1AmDDjyLxvP5pe/nBs5NvhnwrqmXZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=marliere.net; spf=pass smtp.mailfrom=gmail.com; dkim=fail (0-bit key) header.d=marliere.net header.i=@marliere.net header.b=HCkR48wm reason="key not found in DNS"; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=marliere.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Nm2OVEOQ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F721itGG";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vcte8JUC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cX27UzCq"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D8C2121FC4;
-	Sun,  4 Feb 2024 12:43:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707050597; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nQU0P0YHrG/zkvEwd8pWtpr4BRZxXW4b+snrTHeFCbQ=;
-	b=Nm2OVEOQKmVBoD81Lpu0auvf9Nj43Xg0GP5HNB0TFqbKwNNfkSBjHFbrhBz8viyuP99BEE
-	paRApGDomBA0qUxetkr7n5PNzcp9BEYJEzVcHQBxmXDw1OHD+/9kekk8u2j0SUK107z6hk
-	3e8ruCdFFp3FI0oSQ8uV4/ZzQ1odzQk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707050597;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nQU0P0YHrG/zkvEwd8pWtpr4BRZxXW4b+snrTHeFCbQ=;
-	b=F721itGGJKYCnyGbO+jgXWtJ3O37yeNQX8UiJMH70DI9QnolqfLkRtCnmY/2iB4By8eh22
-	oNfLIyED7kUEHtDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707050596; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nQU0P0YHrG/zkvEwd8pWtpr4BRZxXW4b+snrTHeFCbQ=;
-	b=vcte8JUCveqPK4LIwPLMUtVVBn5jOShewOx9dAK5fRqkvzKMngJu68fY3EYOsvz567avN7
-	9J+T1DZDIUmykyqNsq9SEEggNX8CZeL72dwLDe1xhwau7RpYn3zqqDXWCSD4hjG5J7sh5s
-	EkQ6SNoAU9lqTh+F7Ac4gLbvrTbcz2A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707050596;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nQU0P0YHrG/zkvEwd8pWtpr4BRZxXW4b+snrTHeFCbQ=;
-	b=cX27UzCqZg/RCv5qfbzCCaBic/UxBilwz3c5YcomJWvjiHyRyzi50ZDu9ukh5Px+d4xvLZ
-	QWcrw8me4f/cL5Bg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E695E132DD;
-	Sun,  4 Feb 2024 12:43:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 0IL/G2GGv2WuKQAAD6G6ig
-	(envelope-from <hare@suse.de>); Sun, 04 Feb 2024 12:43:13 +0000
-Message-ID: <d22e276d-ab29-4963-8596-8add32310209@suse.de>
-Date: Sun, 4 Feb 2024 20:43:13 +0800
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=marliere.net header.i=@marliere.net header.b="HCkR48wm"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-290ec261a61so2058053a91.0;
+        Sun, 04 Feb 2024 07:31:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707060677; x=1707665477;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:dkim-signature:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o22UdR34yn0ACUyhPkPi4SkDUzpZs8sy4/iVZx/uUJQ=;
+        b=neBvweghmYMQa7H1mFIjg5utoYDBAVjhSwwP+WCqsadfhFgQI/L4i+jSpDGTYzXFyj
+         lhmh+lsiMQ6FAKOoRD9gbMRr5DGDr/AmW0qDlmHuRcY4JawLgLZO/xTosYVMgKkRBhpi
+         Ye0YMV04ugnEPt/R+RiwN20T3i7+qi2aMabDDD7lkjRuvUNa7XGY/fZYQqGWyL9BPyMb
+         T0pZL2jPGzsXe4bIgsPttQd/GhHtPr7hXCRvkW+2Om0xtSFA72kzWJY1IeP9veNxNh7o
+         sO1dhQ+dmQ4pevzPq/Nkx8J6wywmUS1p8u405OPBGDTVe2uKWRiSh3HdXH8ZeEdOIUlb
+         +tkA==
+X-Gm-Message-State: AOJu0Yymsgfvd47wcyiMOZfAuMWMOfzqJvSgA/xyhHC4ySNs/yLUKTi+
+	QVpv2zBDMgr9zeEgLEQQnlNC3T5QPdL3lv4dlUPuDcIfPZO7HxRE
+X-Google-Smtp-Source: AGHT+IHSpzQVUU3HI2CWfeDuARDPDX/tZOTNAL4H2cyLVAjZRoIDVJVFWM49DOD9Uwj0u+S6KbPVPQ==
+X-Received: by 2002:a17:90a:9a7:b0:296:68c4:9348 with SMTP id 36-20020a17090a09a700b0029668c49348mr1979636pjo.37.1707060677318;
+        Sun, 04 Feb 2024 07:31:17 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW1xMCtChTbJvqtDxJ9w2qTs/PRj3pku8bljQRLephaQdE2CHv1uk4mWtuCU6Jo+Lo3uA0fKaIsdD92DCAUnyzbxLjrc3OeTN5Cv7OJr+VqSvHLbw4n8RNH+uIKxCoPhiSSniRdbwfZ953oVH4g0eW/mfLW2ZzMwKadu3xkLrt9+LF5596h7ywQdN6SYkBbV8A/Af1DVPOqBAq0qz6KvTu22Pk9SRsj2tJoYySwv7QEgbhoUg==
+Received: from mail.marliere.net ([24.199.118.162])
+        by smtp.gmail.com with ESMTPSA id a1-20020a17090a854100b002964ce7d420sm3227908pjw.42.2024.02.04.07.31.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Feb 2024 07:31:16 -0800 (PST)
+From: "Ricardo B. Marliere" <ricardo@marliere.net>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marliere.net;
+	s=2023; t=1707060674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=o22UdR34yn0ACUyhPkPi4SkDUzpZs8sy4/iVZx/uUJQ=;
+	b=HCkR48wmXBe53W/gbe3s16Ay0NBppkbWXV6bMu9zKSgZVt390RF7GIX0NCo/xvacyjE1bu
+	5kzQg57FCAxSzpfO/SZY19veHJHzhaWo7+b0tu/PHmSnShVgnc6gRvSC8Dp41r2tnEpt+O
+	w7ILGR7/0VxHuuwxWO7TWKOJ/W19zbj9OufIJPQ1OUYhYntnlKghndYAlHiRtj7vlGiYK/
+	hHas5pLipvEWejZcj8VQ162xYzL445+XqAQkzZvjkFn2eSkmUciGtq9nmjMg+qC1Z/9NLb
+	wMaTbDdB2pUoYoy0F90LbrGz+rmX3FjDFnCjwjVG7h0YVc4tQNKEITOBRUcA4w==
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=ricardo@marliere.net smtp.mailfrom=ricardo@marliere.net
+Date: Sun, 04 Feb 2024 12:31:42 -0300
+Subject: [PATCH] block: rbd: make rbd_bus_type const
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 26/26] block: Add zone_active_wplugs debugfs entry
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-27-dlemoal@kernel.org>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20240202073104.2418230-27-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=vcte8JUC;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=cX27UzCq
-X-Spamd-Result: default: False [-1.08 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-0.78)[84.47%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[8];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: D8C2121FC4
-X-Spam-Level: 
-X-Spam-Score: -1.08
-X-Spam-Flag: NO
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240204-bus_cleanup-block-v1-1-fc77afd8d7cc@marliere.net>
+X-B4-Tracking: v=1; b=H4sIAN2tv2UC/x3MQQqAIBBA0avErBNMKrOrRITaWENhoRhBdPek5
+ Vv8/0DEQBihLx4IeFGkw2dUZQF21X5BRnM2CC5qLnjNTIqT3VH7dDKzH3ZjSnWtcailkg3k7gz
+ o6P6fw/i+H/HDShxjAAAA
+To: Ilya Dryomov <idryomov@gmail.com>, 
+ Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>
+Cc: ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Ricardo B. Marliere" <ricardo@marliere.net>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1065; i=ricardo@marliere.net;
+ h=from:subject:message-id; bh=S/ZIXKaYCzBvSHAb0bgIk6ZHFhlKGdCf+UMP2fmktpc=;
+ b=owEBbQKS/ZANAwAKAckLinxjhlimAcsmYgBlv63fKH7qtQOL6Z1EP/0HwYmkgsBtA7OM8Hx4s
+ LCyC4T6mPWJAjMEAAEKAB0WIQQDCo6eQk7jwGVXh+HJC4p8Y4ZYpgUCZb+t3wAKCRDJC4p8Y4ZY
+ ppSuEACZkoFB2BqC6sK4RoRgd6I4hKOQt+aQjKjrDxe7iL7MT9J6jMU9Jc6JXh5DQGpnk7Kk+Vs
+ BilMZT2Sukxr2PVNwl9RUA2+eM5IXmy0Xfi14BqOfiL/1kHrXdWQCEYAPmHxPB7zulNVXa+j4Gm
+ kyC/kaqk7HIKDJlNIK4ksbtfPUe4afRx71lTBYyPubdUPhfIOG9JBqT0jBAhBuml/nigF8ydgCJ
+ GHPKW94FVcCz7CeXJHDBgaO2flviEpv5aEvCblBmjid7n0strgSjmY+JDqf1Xn21pZRPxqy4IxE
+ oiBy7EaHx1Nx114fvvhv+zvYuewZrnjyv++cg6ue7+x2qwsMs9nOwLFaxGeDymq1YiOArENtI6W
+ Yle+V/7PXFrZuTggM6UUiMFDbUkdQNyyPuTyk5DRr5jFg6Ew8Ct2Iulj6JuUBQGFSkX/tadmdPq
+ 2OdbOV7PVzBEVjIF4OrPS/igatJ2wqctyfG3CENuxxF03qW5hunQdotJPx4qjzDajX1NbYHJ4vN
+ TI9sujGRzmAnEEie+kLmwvt+disVc6qEkMZofGh/uK2UwuhUyETbxq1F1kBFIiXsoRzrvl7EtyK
+ hAyzvONVxKBX1mpfr85n3CN+lj72fi2mOBeT1eWtyIsoOKW34zizr0isgg65yJBrPLU/9GDYnnI
+ yBMJZ3KqhazSrHw==
+X-Developer-Key: i=ricardo@marliere.net; a=openpgp;
+ fpr=030A8E9E424EE3C0655787E1C90B8A7C638658A6
 
-On 2/2/24 15:31, Damien Le Moal wrote:
-> Add the zone_active_wplugs debugfs entry to list the zone number and
-> write pointer offset of zones that have an active zone write plug.
-> 
-> This helps ensure that struct blk_zone_active_wplug are reclaimed as
-> zones become empty or full and allows observing which zones are being
-> written by the block device user.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   block/blk-mq-debugfs.c |  1 +
->   block/blk-mq-debugfs.h |  5 +++++
->   block/blk-zoned.c      | 27 +++++++++++++++++++++++++++
->   3 files changed, 33 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Now that the driver core can properly handle constant struct bus_type,
+move the rbd_bus_type variable to be a constant structure as well,
+placing it into read-only memory which can not be modified at runtime.
 
-Cheers,
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+---
+ drivers/block/rbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hannes
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 0202a4e5d6cf..21f2b9e9b9ff 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -575,7 +575,7 @@ static const struct attribute_group rbd_bus_group = {
+ };
+ __ATTRIBUTE_GROUPS(rbd_bus);
+ 
+-static struct bus_type rbd_bus_type = {
++static const struct bus_type rbd_bus_type = {
+ 	.name		= "rbd",
+ 	.bus_groups	= rbd_bus_groups,
+ };
+
+---
+base-commit: aa826a9b19b93bf8aabc462381ae436a60b2a320
+change-id: 20240204-bus_cleanup-block-9986bfea7975
+
+Best regards,
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Ivo Totev, Andrew McDonald,
-Werner Knoblich
+Ricardo B. Marliere <ricardo@marliere.net>
 
