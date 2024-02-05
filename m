@@ -1,178 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4E513FEB
-	for <linux-block@vger.kernel.org>; Mon,  5 Feb 2024 10:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D9518EB1;
+	Mon,  5 Feb 2024 11:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707127612; cv=none; b=C8tfd8yMtkgs1ru6J+uyagz+pOrjW2eqlWrEMnQ/jKUNS+NIO9koCbWWsxsdkxS7gYtNnKxgwQnm1Q5TQuH5i3RoP8kC/KN+6v81Kf78pyQj25sup81Gj5PFHd0yFxAbIi25StRXLPnWlHFHRUGsISLx7tqjuT8Q2VFvZNoM/i4=
+	t=1707134123; cv=none; b=dKvHHlFsRiyvk1xywk7K4nW8cMSfDz4louqfPnlVNdkTNVAOC1llOfNprd6ADlCxfENX/squBRKhR8XDn/ynOpKZAP/9wtBJeDgju63Sw3jXBu7PDZnZLPrfg/GEsNSU+IA6iq5m5+uXGm+XzkPQilthl12rUrtJgEp3Dr0iZPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707127612; c=relaxed/simple;
-	bh=tXqUfbfbTPxlRaRUJ/MLjCbJOHNA1pZq5PhRen0F0l0=;
+	s=arc-20240116; t=1707134123; c=relaxed/simple;
+	bh=vcTcw3QZM+FJ9OhHdU1Dr3k5mD5XU60j9QSyLvBtwqk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n6PDAEVHebROkPENYf3AQosmBdFZEDgOhraZp8iTPHUWUnoIV0YNGfmKsVoMl36W//LM2SaSbR7LM8KQiqgONoJA5VBrCuxmeT5rOzfyxcyjAOllJTxwdTtp8FXYXi9tXa2fE0JaMjy4BkBpX9vZf7PHBBHI82UG9xWb7tAVzbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lhi35Ii9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=hOPhJ8Dy88KFVutDy7ab8f6VQv0GLi7WEEr076KZTJHDiwg1OVrSQkrYFra6vVcOBZzM78az1BdUWNf43UHEDwkClSxy/8JeeUuup1CpH5WwrrWanIPAjcLL1M2yyhiH9Kca2DD0AVdPtnPSD1NJk6NmV2d98g9YaZIYeTmovcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iuep7jpG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lhi35Ii9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707127609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u9ctPd0Qw1QM513nDTJvhPLi5Y7m0SlsDszmPq/msBA=;
-	b=Lhi35Ii9MwVJzEqn0/01w7KSaIdY+eJPdPZgeZQdq457EOgI7LU7HSodq8rSEVmVYZ2PXj
-	b+2iI59I6mn5nC9W9ubtTHut0dlyGztMUGKaNsWKmq/nYC6flr8IUUgYUi9/0bk7T4s1xw
-	plQQQ3TBCEjCOv/ZjdAs3kewG6AAxw4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-616-ihPUgAKNPRiMSCyIlHEM-A-1; Mon,
- 05 Feb 2024 05:06:45 -0500
-X-MC-Unique: ihPUgAKNPRiMSCyIlHEM-A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 50ECB1C04335;
-	Mon,  5 Feb 2024 10:06:45 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.6])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E0321121313;
-	Mon,  5 Feb 2024 10:06:41 +0000 (UTC)
-Date: Mon, 5 Feb 2024 18:06:37 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 06/26] block: Introduce zone write plugging
-Message-ID: <ZcCzLfocp4VcScOb@fedora>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-7-dlemoal@kernel.org>
- <Zb8K4uSN3SNeqrPI@fedora>
- <a3f17ffb-872b-49cf-a1a7-553ca4a272c0@kernel.org>
- <ZcBFoqweG+okoTN6@fedora>
- <58fa0123-e884-4321-9b9b-8575cc7b4e1d@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iuep7jpG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5BC9C433F1;
+	Mon,  5 Feb 2024 11:55:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707134122;
+	bh=vcTcw3QZM+FJ9OhHdU1Dr3k5mD5XU60j9QSyLvBtwqk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iuep7jpGUmwYnp+IAvBhI6OUhEXB5j3ByEQl6CEXYsS8XNJbw/qqV3jCR+PQILklZ
+	 m60PSoaP1A5tGPFSnfDSiYVSFsyqyB89ForvQiedsBUD1mPl0CEw0dgEfU9XvHMWI3
+	 JonFJtvpFcKTH+CroZu8nfB+lkbtzszkoBIldVU52wrE+RhNUAiURyzCs/JzJuvHqF
+	 FPFfY8dMvYRyGjiUt81ChbA5SfLJ3ciJnknXEgQl7JE78Q4lpwBUbrxk2k0OWu8rlr
+	 Qs5ku2ig9e3p/Gp5QX+rPx8RJliZcurZ5XjOfFov0dTs9o0NLpsegWR7+6GoBlbuai
+	 j0PM/BTSDyCSA==
+Date: Mon, 5 Feb 2024 12:55:18 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Jens Axboe <axboe@kernel.dk>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 00/34] Open block devices as files
+Message-ID: <20240205-biotechnologie-korallen-d2b3a7138ec0@brauner>
+References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <58fa0123-e884-4321-9b9b-8575cc7b4e1d@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+In-Reply-To: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
 
-On Mon, Feb 05, 2024 at 11:41:04AM +0900, Damien Le Moal wrote:
-> On 2/5/24 11:19, Ming Lei wrote:
-> >>>> +static inline void blk_zone_wplug_add_bio(struct blk_zone_wplug *zwplug,
-> >>>> +					  struct bio *bio, unsigned int nr_segs)
-> >>>> +{
-> >>>> +	/*
-> >>>> +	 * Keep a reference on the BIO request queue usage. This reference will
-> >>>> +	 * be dropped either if the BIO is failed or after it is issued and
-> >>>> +	 * completes.
-> >>>> +	 */
-> >>>> +	percpu_ref_get(&bio->bi_bdev->bd_disk->queue->q_usage_counter);
-> >>>
-> >>> It is fragile to get nested usage_counter, and same with grabbing/releasing it
-> >>> from different contexts or even functions, and it could be much better to just
-> >>> let block layer maintain it.
-> >>>
-> >>> From patch 23's change:
-> >>>
-> >>> +	 * Zoned block device information. Reads of this information must be
-> >>> +	 * protected with blk_queue_enter() / blk_queue_exit(). Modifying this
-> >>>
-> >>> Anytime if there is in-flight bio, the block device is opened, so both gendisk and
-> >>> request_queue are live, so not sure if this .q_usage_counter protection
-> >>> is needed.
-> >>
-> >> Hannes also commented about this. Let me revisit this.
-> > 
-> > I think only queue re-configuration(blk_revalidate_zone) requires the
-> > queue usage counter. Otherwise, bdev open()/close() should work just
-> > fine.
+On Tue, Jan 23, 2024 at 02:26:17PM +0100, Christian Brauner wrote:
+> Hey Christoph,
+> Hey Jan,
+> Hey Jens,
 > 
-> I want to check FS case though. No clear if mounting FS that supports zone
-> (btrfs) also uses bdev open ?
+> This opens block devices as files. Instead of introducing a separate
+> indirection into bdev_open_by_*() vis struct bdev_handle we can just
+> make bdev_file_open_by_*() return a struct file. Opening and closing a
+> block device from setup_bdev_super() and in all other places just
+> becomes equivalent to opening and closing a file.
+> 
+> This has held up in xfstests and in blktests so far and it seems stable
+> and clean. The equivalence of opening and closing block devices to
+> regular files is a win in and of itself imho. Added to that is the
+> ability to do away with struct bdev_handle completely and make various
+> low-level helpers private to the block layer.
+> 
+> All places were we currently stash a struct bdev_handle we just stash a
+> file and use an accessor such as file_bdev() akin to I_BDEV() to get to
+> the block device.
+> 
+> It's now also possible to use file->f_mapping as a replacement for
+> bdev->bd_inode->i_mapping and file->f_inode or file->f_mapping->host as
+> an alternative to bdev->bd_inode allowing us to significantly reduce or
+> even fully remove bdev->bd_inode in follow-up patches.
+> 
+> In addition, we could get rid of sb->s_bdev and various other places
+> that stash the block device directly and instead stash the block device
+> file. Again, this is follow-up work.
+> 
+> Thanks!
+> Christian
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
 
-I feel the following delta change might be cleaner and easily documented:
-
-- one IO takes single reference for both bio based and blk-mq,
-- no drop & re-grab
-- only grab extra reference for bio based
-- two code paths share same pattern
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9520ccab3050..118dd789beb5 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -597,6 +597,10 @@ static void __submit_bio(struct bio *bio)
- 
- 	if (!bio->bi_bdev->bd_has_submit_bio) {
- 		blk_mq_submit_bio(bio);
-+	} else if (bio_zone_write_plugging(bio)) {
-+		struct gendisk *disk = bio->bi_bdev->bd_disk;
-+
-+		disk->fops->submit_bio(bio);
- 	} else if (likely(bio_queue_enter(bio) == 0)) {
- 		struct gendisk *disk = bio->bi_bdev->bd_disk;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f0fc61a3ec81..fc6d792747dc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3006,8 +3006,12 @@ void blk_mq_submit_bio(struct bio *bio)
- 	if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
- 		goto queue_exit;
- 
-+	/*
-+	 * Grab one reference for plugged zoned write and it will be reused in
-+	 * next real submission
-+	 */
- 	if (blk_queue_is_zoned(q) && blk_zone_write_plug_bio(bio, nr_segs))
--		goto queue_exit;
-+		return;
- 
- 	if (!rq) {
- new_request:
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index f6d4f511b664..87abb3f7ef30 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -514,7 +514,8 @@ static inline void blk_zone_wplug_add_bio(struct blk_zone_wplug *zwplug,
- 	 * be dropped either if the BIO is failed or after it is issued and
- 	 * completes.
- 	 */
--	percpu_ref_get(&bio->bi_bdev->bd_disk->queue->q_usage_counter);
-+	if (bio->bi_bdev->bd_has_submit_bio)
-+		percpu_ref_get(&bio->bi_bdev->bd_disk->queue->q_usage_counter);
- 
- 	/*
- 	 * The BIO is being plugged and thus will have to wait for the on-going
-@@ -760,15 +761,10 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
- 
- 	blk_zone_wplug_unlock(zwplug, flags);
- 
--	/*
--	 * blk-mq devices will reuse the reference on the request queue usage
--	 * we took when the BIO was plugged, but the submission path for
--	 * BIO-based devices will not do that. So drop this reference here.
--	 */
-+	submit_bio_noacct_nocheck(bio);
-+
- 	if (bio->bi_bdev->bd_has_submit_bio)
- 		blk_queue_exit(bio->bi_bdev->bd_disk->queue);
--
--	submit_bio_noacct_nocheck(bio);
- }
- 
- static struct blk_zone_wplug *blk_zone_alloc_write_plugs(unsigned int nr_zones)
-
-Thanks,
-Ming
-
+With all fixes applied I've moved this into vfs.super on vfs/vfs.git so
+this gets some exposure in -next asap. Please let me know if you have
+quarrels with that.
