@@ -1,124 +1,155 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141F51DFEC
-	for <linux-block@vger.kernel.org>; Mon,  5 Feb 2024 20:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDC01AB807;
+	Mon,  5 Feb 2024 21:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707165214; cv=none; b=djZ0MZETxp/37guSJhDHXEXmKQ2M2YRXvSla92mqAmM2eA+DQG+cAtgAixEQtis6ZEs/As3SZdZ7p5ZJ7qRTHZuL8rem00xZIZDNHDHbYmmwkvuYdd04Qq1mwIvvxIJc1Ro8pezpkqCOlKOpRJ7OgHC3KX/GGqi3sa7uvatvwgk=
+	t=1707167885; cv=none; b=NXr3hwdCHpzIW+fj6a1pQ1myxallHAiuK7AYuVvi0Gk2kXxaQPCdC7QzLCTDiFKhMDHUn91kctFgJCpTL2BH4Hi3U6yOz7uU/EFk7976CtlYEol28YuNCmHiGbjdTDXquPCVS/uUIN7qwaxmM++GMl3PIy/+eym2oj0x1P+Dzu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707165214; c=relaxed/simple;
-	bh=84Wm144yxI0sZofGqvnmYxOwUFfZYp+YlTK1wrMQHm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ge2cX5FDxuCt5GPmStY4XOnIlKgRGJnKyT6Qxe3+vgbs3Glk8vEXoaFG03EQE2w0urvqN0weGNd3aUNmcOFi0LS5POcaKYsZXbhE/29xm2mzpK49gTjHwm5UwTqE7PQK9HhchpTPDFMsQ+kFa01AgNA7rXyPYRNIzj6KBfAbYiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-783f1fba0a8so255020185a.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Feb 2024 12:33:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707165212; x=1707770012;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VJ2cCZbNVBFr5QmyQ/zTTglXqJrVq+6u2SzrmewGqmQ=;
-        b=GtobpsPCX3xbjhWe9UdLSsVVk9I3M+zhf/oDsXGG8YC130fVQXXv07+sQXmA7efwRa
-         SS1svr3DU7yA/Et5wpgNdIXD8QVRnpd3Jvd23rTd/Zu9mpWSosKA/x3zk4oP1+YwXXaP
-         2Xe4p4T0IkgT/7xakASjLS3rE1DHdiXJTCHfG3t35lmdPdcRozZEnVCA/5wmD4kZ/R/v
-         Fve8jWmrAaaDnI3sZ+LkyWtf8uVf/lf2LJmAN6RqV4VkybLuEbGypjeORE1S19SI80Q8
-         KqSBTFTLgVU0Oy6jBDSeNcpKmXt6Wp8S+ZZlTidn1AAfm4mbItFJ0vt0nvHuhm7ju+/i
-         sPJQ==
-X-Gm-Message-State: AOJu0YwZx+iMHrEvS2wjkjHGt9YBot5FOxT1TMIzey0Qr7ELwoAsd/tw
-	IKedDjYqWi3F2DbzaOUrZ+GttADRz6J9mRruuxNwTPJmUg+MUsMJaZ+NZYWRSw==
-X-Google-Smtp-Source: AGHT+IHBXkIeNQaapkhCjHyXPeHg1bTz2aBwFDuTf9dxryTz4T5dBqE8FpYpmOYY8ldwibiuYeFjwA==
-X-Received: by 2002:a05:620a:6891:b0:785:6c4e:9dba with SMTP id rv17-20020a05620a689100b007856c4e9dbamr770972qkn.15.1707165212033;
-        Mon, 05 Feb 2024 12:33:32 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVKi4aPNpuyJ1vujjM8XuK2yKmpRPRK8VbQvN/P0iWYja4uart6X+bQvEpC6NC+xXWZEik/okNcI+71R4qXnqUpolSBaumh+I8RCQ65p85vWVgbONVq3e226Ymeme5+BaPMtb4V6LJpJ+ICxQmcfa+e8lxSSuLuyJwO3gWELyxq1EJ4MatpE+gkzfaRwK6LfG/8ZM+KyKlh0QpOp1sf
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id m15-20020a05620a220f00b0078560085d6bsm261189qkh.100.2024.02.05.12.33.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 12:33:30 -0800 (PST)
-Date: Mon, 5 Feb 2024 15:33:29 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@lists.linux.dev, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 10/26] dm: Use the block layer zone append emulation
-Message-ID: <ZcFGGdVc7mqCpU7a@redhat.com>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-11-dlemoal@kernel.org>
- <Zb5-2LsnQtJHV2mL@redhat.com>
- <4eb920d7-e2fc-49d0-9eec-5fc152fa21de@kernel.org>
+	s=arc-20240116; t=1707167885; c=relaxed/simple;
+	bh=/Enu6bwQmdx49axHA/1lmJJgKYU6G8zyTZPbq9OH+ck=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CH7Uxpf3Cez8k7ZdIDuPUiiMg1kLZg5cecEHRLfRZ7OEIDG4p/8d5BYOvoOxnO9ebiuiBCez4yzN0H7+C9rP2x9koyqw/0Iz5sRxCbwgnXPwMryetGmJ1XlScJNKjJx/WDTPlDZTPff+sbwZ7Xn7w5VdP6NWOFKbwJOqid+IFX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=W8TAC/No; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="W8TAC/No"
+Received: from [10.137.106.151] (unknown [131.107.8.87])
+	by linux.microsoft.com (Postfix) with ESMTPSA id B65FB20B2000;
+	Mon,  5 Feb 2024 13:18:03 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B65FB20B2000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1707167883;
+	bh=H595nLqKN1iU7O92UiJT9PEuwtk7Rd1yCbWBC1ZA8Dk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=W8TAC/No1VdGRZqMNpbRyarbJ0N1ksbo6q9VDwms6JAikfNWLiPh8pBpJItN4CS23
+	 IfusA0S7VmJXlzwz6fInL7nOKKj4xPLnLwKrHbC0DxeKFY9uDlKLJYrmJTNL3IsRxQ
+	 NhwWoikC1Q5N62rvYtOFqHGPmfxebEyKNmpVRN1s=
+Message-ID: <13daca32-ee3f-46f5-a6ca-66bb02726e5c@linux.microsoft.com>
+Date: Mon, 5 Feb 2024 13:18:03 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4eb920d7-e2fc-49d0-9eec-5fc152fa21de@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v12 5/20] initramfs|security: Add security hook to
+ initramfs unpack
+To: Paul Moore <paul@paul-moore.com>, corbet@lwn.net, zohar@linux.ibm.com,
+ jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+ axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
+Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ audit@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1706654228-17180-6-git-send-email-wufan@linux.microsoft.com>
+ <b9ca171301d5abeb78922dd79d65136a@paul-moore.com>
+Content-Language: en-US
+From: Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <b9ca171301d5abeb78922dd79d65136a@paul-moore.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 05 2024 at 12:38P -0500,
-Damien Le Moal <dlemoal@kernel.org> wrote:
 
-> On 2/4/24 02:58, Mike Snitzer wrote:
-> > Love the overall improvement to the DM core code and the broader block
-> > layer by switching to this bio-based ZWP approach.
-> > 
-> > Reviewed-by: Mike Snitzer <snitzer@kernel.org>
-> 
-> Thanks Mike !
-> 
-> > But one incremental suggestion inlined below.
-> 
-> I made this change, but in a lightly different form as I noticed that I was
-> getting compile errors when CONFIG_BLK_DEV_ZONED is disabled.
-> The change look like this now:
-> 
-> static void dm_split_and_process_bio(struct mapped_device *md,
-> 				     struct dm_table *map, struct bio *bio)
-> {
-> 	...
-> 	need_split = is_abnormal = is_abnormal_io(bio);
-> 	if (static_branch_unlikely(&zoned_enabled))
-> 		need_split = is_abnormal || dm_zone_bio_needs_split(md, bio);
-> 
-> 	...
-> 
-> 	/*
-> 	 * Use the block layer zone write plugging for mapped devices that
-> 	 * need zone append emulation (e.g. dm-crypt).
-> 	 */
-> 	if (static_branch_unlikely(&zoned_enabled) &&
-> 	    dm_zone_write_plug_bio(md, bio))
-> 		return;
-> 
-> 	...
-> 
-> with these added to dm-core.h:
-> 
-> static inline bool dm_zone_bio_needs_split(struct mapped_device *md,
-> 					   struct bio *bio)
-> {
-> 	return md->emulate_zone_append && bio_straddle_zones(bio);
-> }
-> static inline bool dm_zone_write_plug_bio(struct mapped_device *md,
-> 					  struct bio *bio)
-> {
-> 	return md->emulate_zone_append && blk_zone_write_plug_bio(bio, 0);
-> }
-> 
-> These 2 helpers define to "return false" for !CONFIG_BLK_DEV_ZONED.
-> I hope this works for you. Otherwise, I will drop your review tag when posting V2.
 
-Why expose them in dm-core.h ?
+On 2/3/2024 2:25 PM, Paul Moore wrote:
+> On Jan 30, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
+>>
+>> This patch introduces a new hook to notify security system that the
+>> content of initramfs has been unpacked into the rootfs.
+>>
+>> Upon receiving this notification, the security system can activate
+>> a policy to allow only files that originated from the initramfs to
+>> execute or load into kernel during the early stages of booting.
+>>
+>> This approach is crucial for minimizing the attack surface by
+>> ensuring that only trusted files from the initramfs are operational
+>> in the critical boot phase.
+>>
+>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+>> ---
+>> v1-v11:
+>>    + Not present
+>>
+>> v12:
+>>    + Introduced
+>> ---
+>>   include/linux/lsm_hook_defs.h |  4 ++++
+>>   include/linux/security.h      | 10 ++++++++++
+>>   init/initramfs.c              |  3 +++
+>>   security/security.c           | 12 ++++++++++++
+>>   4 files changed, 29 insertions(+)
+>>
+>> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+>> index 185924c56378..b247388786a9 100644
+>> --- a/include/linux/lsm_hook_defs.h
+>> +++ b/include/linux/lsm_hook_defs.h
+>> @@ -425,3 +425,7 @@ LSM_HOOK(int, 0, uring_override_creds, const struct cred *new)
+>>   LSM_HOOK(int, 0, uring_sqpoll, void)
+>>   LSM_HOOK(int, 0, uring_cmd, struct io_uring_cmd *ioucmd)
+>>   #endif /* CONFIG_IO_URING */
+>> +
+>> +#ifdef CONFIG_BLK_DEV_INITRD
+>> +LSM_HOOK(void, LSM_RET_VOID, unpack_initramfs_security, void)
+>> +#endif /* CONFIG_BLK_DEV_INITRD */
+> 
+> Let's just call it "unpack_initramfs", the "_security" part is somewhat
+> implied since we are talking about a LSM hook ;)
+> 
+>> diff --git a/init/initramfs.c b/init/initramfs.c
+>> index 76deb48c38cb..075a5794cde5 100644
+>> --- a/init/initramfs.c
+>> +++ b/init/initramfs.c
+>> @@ -18,6 +18,7 @@
+>>   #include <linux/init_syscalls.h>
+>>   #include <linux/task_work.h>
+>>   #include <linux/umh.h>
+>> +#include <linux/security.h>
+>>   
+>>   static __initdata bool csum_present;
+>>   static __initdata u32 io_csum;
+>> @@ -720,6 +721,8 @@ static void __init do_populate_rootfs(void *unused, async_cookie_t cookie)
+>>   #endif
+>>   	}
+>>   
+>> +	security_unpack_initramfs();
+> 
+> Given the caller, what do you think of changing the hook name to
+> "security_initramfs_populated()"?  I think this not only matches up
+> better with the caller, "do_populate_rootfs()", but since in using the
+> past tense we help indicate that this hook happens *after* the rootfs
+> is populated with the initramfs data.
+> 
 
-Just have what you point in dm-core.h above dm_split_and_process_bio in dm.c ?
+Yeah, I agree this sounds better. I will update this part.
 
-And yes, you can retain my Reviewed-by.
-
-Thanks,
-Mike
+-Fan
+>>   done:
+>>   	/*
+>>   	 * If the initrd region is overlapped with crashkernel reserved region,
+>> diff --git a/security/security.c b/security/security.c
+>> index ddf2e69cf8f2..2a527d4c69bc 100644
+>> --- a/security/security.c
+>> +++ b/security/security.c
+>> @@ -5581,3 +5581,15 @@ int security_uring_cmd(struct io_uring_cmd *ioucmd)
+>>   	return call_int_hook(uring_cmd, 0, ioucmd);
+>>   }
+>>   #endif /* CONFIG_IO_URING */
+>> +
+>> +#ifdef CONFIG_BLK_DEV_INITRD
+>> +/**
+>> + * security_unpack_initramfs() - Notify LSM that initramfs has been loaded
+>> + *
+>> + * Tells the LSM the initramfs has been unpacked into the rootfs.
+>> + */
+>> +void security_unpack_initramfs(void)
+>> +{
+>> +	call_void_hook(unpack_initramfs_security);
+>> +}
+>> +#endif /* CONFIG_BLK_DEV_INITRD */
+>> -- 
+>> 2.43.0
+> 
+> --
+> paul-moore.com
