@@ -1,177 +1,98 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C1B2C183;
-	Mon,  5 Feb 2024 14:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6863F8DA
+	for <linux-block@vger.kernel.org>; Mon,  5 Feb 2024 17:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707142760; cv=none; b=nfGY7R1isPLSWt14H6SEwW56jhiHxwa6OB7ToQV6TmELepAJ7x6OPiQQsDf7gY3pRKrG+x2Ku/8lbQMNfEsfzc5A7B/nnhMyzeAg6ywRIn+miZ8ChZcZhNP9mDWHTTNHzrfkQ1Mpp0rc58tVaV23shNlwvSyZ1gK7Ai96rVsk6s=
+	t=1707152903; cv=none; b=DbuK1OxXvwkrQ8NV3lVcKoJKTumcTA8wMaZoHk8tLSrjYOaaTSHBq46ypakE8Zpg+Ot5qQb9tlLvWZ6W/VZFgtt2gG6nX5rJrnYCAYxHAYPq8fglWg6AyKz452l+afP0D6qi/ASbZ7Z48a04J05COD3v2Xpnq7g6f/RX5AMd5BQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707142760; c=relaxed/simple;
-	bh=wL7f3/q9wLuR8kbR26+8p0Wa2ib3IFx0iIqAMfT3Ab0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T45lufXx1B8OUbHcXPFA+zi58oXhy0m3KlTKh45LaGvnVmbtvQzYcytxWts0caIjvWmseWK4e/3qU8m48HbmJMaWd55O0svqGT6j8+JjGRRH3zJEXEqTYJ93Iz64xiEmXxAJLrcG1lnR35ES5NffkytLHgabGvoaXrmEpuZ3akk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2nMsNcPL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WjICKJUx; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2nMsNcPL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WjICKJUx; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1707152903; c=relaxed/simple;
+	bh=8AefJ4FpqeftLJ0655AIGPLXfD8D13NEQMdqGyv0tEw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=gwanck3Mo/UKHj+l73ln9tRj1DDbTH2D9ln8JpMSnpWt4B1kq1hWLS9m67dLtQkVkM9NqD2Ldp5RbtTCPClqVU4MVv9P+l2W+oO6Py2/QBMlaPExgSBBbMefoePsjjOvhJrtxqkapPdet0cSLFoYCoZodkEGshbd34Z2rDw/nb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WDE7Mozj; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2nMsNcPL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WjICKJUx";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2nMsNcPL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WjICKJUx"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 48E181F37C;
-	Mon,  5 Feb 2024 14:19:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1707142756; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
-	b=2nMsNcPLTbESKwOSwuBRBjkuQZCfhXPPtG5XrVhmc+xHHTROjNGwJqqC8kj1ufY8DO3xJ3
-	6CI1AGmYnFE/8Q2R8uRniKNwa/nFEWjv/CzqT7jXQw507c2rxKJf5xilzYsxvQUKsj/M+F
-	MpjMo0ouKB9kei6xJ0XyGNveWISpKKk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1707142756;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
-	b=WjICKJUxp0x5vEfN56Af6YLEk07IiHzPlqJl8Qoi3n9yLk/1QJb7uVqKvsbzVLttbxYdPM
-	LaWBsN1KKtPaHjCg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1707142756; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
-	b=2nMsNcPLTbESKwOSwuBRBjkuQZCfhXPPtG5XrVhmc+xHHTROjNGwJqqC8kj1ufY8DO3xJ3
-	6CI1AGmYnFE/8Q2R8uRniKNwa/nFEWjv/CzqT7jXQw507c2rxKJf5xilzYsxvQUKsj/M+F
-	MpjMo0ouKB9kei6xJ0XyGNveWISpKKk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1707142756;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
-	b=WjICKJUxp0x5vEfN56Af6YLEk07IiHzPlqJl8Qoi3n9yLk/1QJb7uVqKvsbzVLttbxYdPM
-	LaWBsN1KKtPaHjCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3D847136F5;
-	Mon,  5 Feb 2024 14:19:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ChoAD2TuwGVJbAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 05 Feb 2024 14:19:16 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id D5627A0809; Mon,  5 Feb 2024 15:19:11 +0100 (CET)
-Date: Mon, 5 Feb 2024 15:19:11 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 00/34] Open block devices as files
-Message-ID: <20240205141911.vbuqvjdbjw5pq2wc@quack3>
-References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
- <20240205-biotechnologie-korallen-d2b3a7138ec0@brauner>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WDE7Mozj"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7c3e06c8608so16362039f.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Feb 2024 09:08:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707152897; x=1707757697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/zzveQN84z7FAXQD8qzua9lNHvTtJuTssKVm3UoyZLc=;
+        b=WDE7MozjXnoNXFtj4MJOkqyN7COrzfY+gS4sSxHOgjsS5Cw00FyfBaeYBtvR/lf2zU
+         vGoaZOKZt9zdjfAuEIMpJzdAE0UpngKgSuCMoqaXWpMlRfss+PIng4UJQw9pu/I1/Owd
+         JekKGUGy9n7XmCM04+tZ2Dv4hh0r3ByenmwPU0Jqt6gXU59F/hNlXY7jpsdGthcqSyPD
+         dauiNlnnUz8+MzqaszNGD1HTNngB2hncX9GbMvRoI3dcn/Uxnt5+xgDJMmcMDEWD7wH8
+         DGkL3tOvzKnCb8b8/Q0pQwl0KMfyCcv2XsEYL1HxAAvbGm0Jd73bz24J5F2JRlIo5cNk
+         vKJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707152897; x=1707757697;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/zzveQN84z7FAXQD8qzua9lNHvTtJuTssKVm3UoyZLc=;
+        b=WfCGDqC9cVWN/P0z+WXyqtuEUT0zEn9ytLtwL1zvkSo98nBztxU+yEhKb4ZgnoxlYQ
+         aUG9fL9BFpg2FNFKue6vpmv+XB9m7VkZc5tKG+Ecfkx+QzYXAy8K13yQFE+QsJ8ziPgw
+         9MfrEM9/zdm41euziAvlmijW6HZRVxp6Gkq8B+tyWd6J0N7ETAcobea3bDPwGa+qHZ0+
+         EiY8MwTVrfCT5TlQ0MAHDrbDdx5SSscU7Y38XTebLQWmCtmgeVF9xiu9WHAWqk4ITqqE
+         4mFzcIO5qHmKklmiaxG8lYIKHR+HGH97MFwkhZOQEOUGSrJC43IjH3ZWfp94PzB+judb
+         eX9A==
+X-Gm-Message-State: AOJu0YwTTZleh1XSGpfc/RN2QX6FgVRUqn21s1TBlo4PifP/VuPoTtkn
+	0xn1nyivqYFXqTDO+USH6Uuo+7OfiXRWK30STpCRBKxZyU5gf/ogs/h8V1sxvJ4EgtXLBMk1sYE
+	dtls=
+X-Google-Smtp-Source: AGHT+IHtLRB5EY/fY3LFPUZ4j6jvDc4zFox84EDUoCb1lP7bxUg+yq+I5iRZiZz8uxejTZkArVqJsA==
+X-Received: by 2002:a92:c266:0:b0:35f:bc09:c56b with SMTP id h6-20020a92c266000000b0035fbc09c56bmr440521ild.2.1707152897178;
+        Mon, 05 Feb 2024 09:08:17 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id l5-20020a92d8c5000000b00363c8049f30sm22479ilo.50.2024.02.05.09.08.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 09:08:16 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20240124092658.2258309-1-hch@lst.de>
+References: <20240124092658.2258309-1-hch@lst.de>
+Subject: Re: clean up blk_mq_submit_bio
+Message-Id: <170715289604.491374.17992244784908429544.b4-ty@kernel.dk>
+Date: Mon, 05 Feb 2024 10:08:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205-biotechnologie-korallen-d2b3a7138ec0@brauner>
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=2nMsNcPL;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=WjICKJUx
-X-Spamd-Result: default: False [-2.81 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 48E181F37C
-X-Spam-Level: 
-X-Spam-Score: -2.81
-X-Spam-Flag: NO
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-Hi!
 
-On Mon 05-02-24 12:55:18, Christian Brauner wrote:
-> On Tue, Jan 23, 2024 at 02:26:17PM +0100, Christian Brauner wrote:
-> > Hey Christoph,
-> > Hey Jan,
-> > Hey Jens,
-> > 
-> > This opens block devices as files. Instead of introducing a separate
-> > indirection into bdev_open_by_*() vis struct bdev_handle we can just
-> > make bdev_file_open_by_*() return a struct file. Opening and closing a
-> > block device from setup_bdev_super() and in all other places just
-> > becomes equivalent to opening and closing a file.
-> > 
-> > This has held up in xfstests and in blktests so far and it seems stable
-> > and clean. The equivalence of opening and closing block devices to
-> > regular files is a win in and of itself imho. Added to that is the
-> > ability to do away with struct bdev_handle completely and make various
-> > low-level helpers private to the block layer.
-> > 
-> > All places were we currently stash a struct bdev_handle we just stash a
-> > file and use an accessor such as file_bdev() akin to I_BDEV() to get to
-> > the block device.
-> > 
-> > It's now also possible to use file->f_mapping as a replacement for
-> > bdev->bd_inode->i_mapping and file->f_inode or file->f_mapping->host as
-> > an alternative to bdev->bd_inode allowing us to significantly reduce or
-> > even fully remove bdev->bd_inode in follow-up patches.
-> > 
-> > In addition, we could get rid of sb->s_bdev and various other places
-> > that stash the block device directly and instead stash the block device
-> > file. Again, this is follow-up work.
-> > 
-> > Thanks!
-> > Christian
-> > 
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > ---
+On Wed, 24 Jan 2024 10:26:55 +0100, Christoph Hellwig wrote:
+> this series tries to make the cached rq handling in blk_mq_submit_bio
+> a little less messy and better documented.  Let me know what you think.
 > 
-> With all fixes applied I've moved this into vfs.super on vfs/vfs.git so
-> this gets some exposure in -next asap. Please let me know if you have
-> quarrels with that.
+> Diffstat:
+>  blk-mq.c |  105 +++++++++++++++++++++++++++++++++------------------------------
+>  1 file changed, 56 insertions(+), 49 deletions(-)
+> 
+> [...]
 
-No quarrels really. I went through the patches and all of them look fine to
-me to feel free to add:
+Applied, thanks!
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+[1/3] blk-mq: move blk_mq_attempt_bio_merge out blk_mq_get_new_requests
+      commit: 0f299da55ac3d28bc9de23a84fae01a85c4e253a
+[2/3] blk-mq: introduce a blk_mq_peek_cached_request helper
+      commit: 337e89feb7c29043dacd851b6ac28542a9a8aacf
+[3/3] blk-mq: special case cached requests less
+      commit: 72e84e909eb5354e1e405c968dfdc4dcc23d41cc
 
-I have just noticed that in "bdev: make struct bdev_handle private to the
-block layer" in bdev_open() we are still leaking the handle in case of
-error. This is however temporary (until the end of the series when we get
-rid of handles altogether) so whatever.
-
-								Honza
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
+
