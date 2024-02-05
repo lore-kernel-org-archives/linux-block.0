@@ -1,102 +1,109 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B9C47F53;
-	Mon,  5 Feb 2024 17:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6834547A61;
+	Mon,  5 Feb 2024 17:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707155158; cv=none; b=uLtmoCvk9EXkEkLJODkj1PeMKw5TpPTRV6L9ycYXNDdQX1UJ9Ay/c0RsGj4BhD3acQqELOlUblSBmIvzMJvuMs9jibd1c7IxyOiX+9kWt5DuzyvpOs8OxrPRJkBUzVnH5if0LdDk/oCEGeywDSOtoJwMDw5jUPDgPGBU+1y46oU=
+	t=1707155290; cv=none; b=tnJcxAUOT0Yzg5z/mHX76pSzDCyPXGFUVxbDUxyUKIbaD52urIIJNr3jyD02SRTKFFBYcaztL4V5iQ8xijOik7b32UtXZNkFDjzPSvccDzVbth4CkTIPP9piyC0aCAx+mkQf46rFnVmY30JD9pG/bTlwf+5bfOazUH7PltVoxRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707155158; c=relaxed/simple;
-	bh=wfjuJDCo9ikop915DTLcUPjxvweOFqYhpNnxU+fUtKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mZhI1z8UfNjlICU5Awbe/sQau1R5zwEkCeAXWNHdAbAhlNAV7CHN1rxnuzKARW7/ymgLeIXupeoOxKOrtz4pxkf0rcJDX6sb/htKfyruRq29OrWI31PLjZlVpJUtlQMFP0J0A7nu0S2Kb8KCWB/fOz/6ey+qYgSOBXfmZw1B0k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KV5sY6cN; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	s=arc-20240116; t=1707155290; c=relaxed/simple;
+	bh=vkzFtbQdZjZispo3UhXXd/LLFzbR7QJ0hX/0RA5jzWc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uaWbE3U/heDV6j3+PFcpNskAabAnGBw1eEK1+NR6beCP7eQRA/7npMNYMfb80RIrzPD8jNRkEBwxprDusAI634i62UJUA86t7Txno7fnXAMt9GBzDXs2MVtLIkBqTlopsM9Mnu2Fy9QPdEeMk+zRWoUmIz7ZxEcuW+t5rieQ4Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KV5sY6cN"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-29685114bc3so918653a91.3;
-        Mon, 05 Feb 2024 09:45:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707155156; x=1707759956; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tWpkA0adWfJg/N96ugMkWhlTX4/Zx12uY2WHwPaeRnA=;
-        b=KV5sY6cNWaCCNRShIkvNPAO0T8x+prCIilt1FNV9S8N262Oq7jgMyoyd40QwZrfAWF
-         Mz/6LHIh59F27KGxaPomrn+TZD2nB7let5nMRtR3xLd3pBb47odc7E+0Dds79IE55+GJ
-         CfPrRzH3UHnEXaZRnYQTU6AzlgfHw9SnSm+iLQsMxPqnnjguNR/tIAl9wbvN/W2guxiU
-         RTmbIkhSWa9TObXSweooQUVQsFT8Swg96t0xoTPnR8IKbNm3XWyu9jttHoDAbIYQeSyo
-         lvS8xP1Z9RumNEA+FsldaWTHAtkJGw34eWK01rrCw/etlaD6DvUFUMMD+yDd65tiqfzx
-         E4yA==
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5c229dabbb6so3024346a12.0;
+        Mon, 05 Feb 2024 09:48:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707155156; x=1707759956;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
+        d=1e100.net; s=20230601; t=1707155289; x=1707760089;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tWpkA0adWfJg/N96ugMkWhlTX4/Zx12uY2WHwPaeRnA=;
-        b=THGyNCckFp9VGCGDHFFSt61hybo2HhzITs9PqItDhYHNiFO23SGYW1WO89JdAFdSTF
-         apfw3n63VRQ5D51NBmeVt7+dZ+0ueoRiIwSLN07Udh9mwsqE0poIf8KAFWlK0szwr1Vj
-         TR1Ay0jAcfgZnnCvACzmPegqQ3MiZNft7FOTvZCDLcY0UJnpTvTcN9ytLU2gOrUYWqgY
-         flrI7tlOEEvq6bVR66pTxD9sqjLsjNZyBMn6nvPCwVNYZ5u7rqlxuBrudX76fFWvX1ro
-         0vQdopQvfG17xiaUapEb5d9XBLc7uF7rsmAmdI/KVE0NImP45pDyn3TTllTsXlmB0hKf
-         gASw==
-X-Gm-Message-State: AOJu0Ywp+LJq5iTV82+NWmasEjlu4z8a8LDy++VVvwZxjDEznU7ih7MJ
-	vatINLJyWBIh43DYoehGYxH6gD1aNdyHCh7ukZkqqfUPNSmypzXO
-X-Google-Smtp-Source: AGHT+IEqEmWKxapPmLXYmOp2uW9MmgZudDXICGNoo85jUNcxH4rxgZoagf5UZXbl3QwCCMxY73PBsw==
-X-Received: by 2002:a17:90b:3647:b0:296:3a5:6fb8 with SMTP id nh7-20020a17090b364700b0029603a56fb8mr140155pjb.25.1707155156241;
-        Mon, 05 Feb 2024 09:45:56 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUUTj4d9BneUR8TZxAaWCjiW0qPu4NyC9O0WiMqD0EHnQyDK/qEVa141FY7qkYuJnDqIDgdelFh/eE6OODkrU1xkP6MwGo1Rt4S8atEe92QUmNAC4qwcKL6NjLrhFpAbdAtuF4tZ0iSPFhZcNJvztJ+Oif6QDoKQP+woOxB+gNeACViotwAWvKQ0yEAcmkFw6aRy0M9Ahg5aX4o4dnA7tXBTiZpTGFAGhd8wEkpw6VdnFx9tIorsXqvjsSZM3byxJdSkfgWlHNoa2Rt7mZHKCmZd8B0Rl3ygArty1j/RFdt8876/3tNc2YGX3rrQMJvrU0/rpAaTe9J7N8PErxAllclAaSxa8IWv3bbiamB+yG6CkYt8W/2bY/qXRTgYWOTC7IJNdON29VtTP5MmAeDIzalabi2qUF44plo4wSA44LtuJfXkg==
-Received: from localhost (dhcp-141-239-144-21.hawaiiantel.net. [141.239.144.21])
-        by smtp.gmail.com with ESMTPSA id lc4-20020a170902fa8400b001d8e41b3f95sm141669plb.51.2024.02.05.09.45.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 09:45:55 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 5 Feb 2024 07:45:54 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	jiangshanlai@gmail.com,
-	"abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>,
-	"mputtash@linux.vnet.com" <mputtash@linux.vnet.com>,
-	"sachinp@linux.vnet.com" <sachinp@linux.vnet.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [Bisected] [commit dd6c3c544126] [linux-next] [6.8.0-rc2] Task
- hungs for infinite time call traces
-Message-ID: <ZcEe0q8Bg5zca1nA@slm.duckdns.org>
-References: <a95f5bcd-3c49-4ebd-b1b3-a688c5b6727c@linux.vnet.ibm.com>
+        bh=8KQNkaBYtky5goRSRqnguxMPyZfEM+iuBXnubHYKQgQ=;
+        b=ZT7NpSt8Jk1jlzjTBeeM2QNJmhC+ErjDkCddNoxsIt3haaB/RyvpXN9W9EB5zYeLCY
+         qoPIMNYFb5AToYmnASIQrhLSPMqvIRNh9eWui3UHjp/Y/IRfOgYDuzNRgROMdpzb3wuy
+         tf2tJ2/e3MKQ0wWSwMdhzRaJM+zL82i9ZojMGNqNfL5XM/s0E7ldJaqJsq5+fbgJrXFy
+         L4Do5h+Kxzpp33Q3CG8ekpkMnyeR11YMN9IZCVS7tIWzWKbIJBrYINMQdvjJ/FpJ9h/L
+         kmuTFJ4D0jDoXIk8rfAxf6zMv1Gm4gC+mFbElqDSIYMlPgsGOmn+S3c/toUNQgAOCLSO
+         6NWw==
+X-Gm-Message-State: AOJu0YzHVqA01bmnYndFFvURJRZtnM/rM0mghVz94+9Xx5dPNAndQAIQ
+	es/WZy6FycwDeuypLJHYi6pNKUlNtSpiKx0JgVAyqAmmEhg5e4Ej
+X-Google-Smtp-Source: AGHT+IHJ6X721LPg5ymb106McyTY3TAqyEhjwf8OoCqL3uFxp9vZq3y33y8cNUFTPur97MHRgILPvA==
+X-Received: by 2002:a17:90a:1783:b0:296:36d9:eefe with SMTP id q3-20020a17090a178300b0029636d9eefemr148467pja.14.1707155288649;
+        Mon, 05 Feb 2024 09:48:08 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXp9H2B9362zCrRqE+aCiaIyQmDdtmgVlEEttzF4TzrvV+FUdGUg2IgG0N8HNjRoOTwihRwOWD4iKuLYRSb0Wxyi56dhFmKLPDySsPP0suKmLXmf2tnF7a0wOgmKcr4cIJEEbnLG/iMJXMK/OvK6JlCtv4YxUAGKUZ0B4qa+/r9UReMEYNW2bvMaumxKiS04uAZCg8NSNzM9bLM80jYuzaN5PBeroDMLYnQxOuvJEGWWZxl1Mbq75DcTz31D3bsL8LGsg==
+Received: from ?IPV6:2620:0:1000:8411:be2a:6ac0:4203:7316? ([2620:0:1000:8411:be2a:6ac0:4203:7316])
+        by smtp.gmail.com with ESMTPSA id jx15-20020a17090b46cf00b00296540086a5sm5488814pjb.23.2024.02.05.09.48.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Feb 2024 09:48:08 -0800 (PST)
+Message-ID: <12bbbfe9-6304-495b-a60b-821becd1f326@acm.org>
+Date: Mon, 5 Feb 2024 09:48:06 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a95f5bcd-3c49-4ebd-b1b3-a688c5b6727c@linux.vnet.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/26] block: Introduce zone write plugging
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20240202073104.2418230-1-dlemoal@kernel.org>
+ <20240202073104.2418230-7-dlemoal@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240202073104.2418230-7-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 2/1/24 23:30, Damien Le Moal wrote:
+> The next plugged BIO is unplugged and issued once the write request completes.
 
-On Mon, Feb 05, 2024 at 03:24:17PM +0530, Tasmiya Nalatwad wrote:
-> Greetings,
-> 
-> [Linux-next] [6.8.0-rc2-next-20240130] [FC / XFS] Task hangs for infinite
-> time while running bonnie test XFS filesystem
-> 
-> Bisected the issue. Git bisect points to the below commit
-> commit dd6c3c5441263723305a9c52c5ccc899a4653000
->           workqueue: Move pwq_dec_nr_in_flight() to the end of work item
-> handling
+So this patch series is orthogonal to my patch series that implements zoned
+write pipelining?
 
-This should be fixed by c70e1779b73a ("Fix pwq->nr_in_flight corruption in
-try_to_grab_pending()").
+> This mechanism allows to:
+>   - Untangles zone write ordering from block IO schedulers. This allows
 
-Thanks.
+Untangles -> Untangle
 
--- 
-tejun
+> Zone write plugging is implemented using struct blk_zone_wplug. This
+> structurei includes a spinlock, a BIO list and a work structure to
+
+structurei -> structure
+
+> This ensures that at any time, at most one request (blk-mq devices) or
+> one BIO (BIO-based devices) are being executed for any zone. The
+> handling of zone write plug using a per-zone plug spinlock maximizes
+> parrallelism and device usage by allowing multiple zones to be writen
+
+parrallelism -> parallelism
+
+> simultaneously without lock contention.
+
+This is not correct. Device usage is not maximized since zone write bios
+are serialized. Pipelining zoned writes results in higher device
+utilization.
+
+> +	/*
+> +	 * For BIOs handled through a zone write plugs, signal the end of the
+
+plugs -> plug
+
+> +#define blk_zone_wplug_lock(zwplug, flags) \
+> +	spin_lock_irqsave(&zwplug->lock, flags)
+> +
+> +#define blk_zone_wplug_unlock(zwplug, flags) \
+> +	spin_unlock_irqrestore(&zwplug->lock, flags)
+
+Hmm ... these macros may make code harder to read rather than improve
+readability of the code.
+
+Thanks,
+
+Bart.
