@@ -1,195 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279F41CA84;
-	Mon,  5 Feb 2024 12:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C1B2C183;
+	Mon,  5 Feb 2024 14:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707136997; cv=none; b=DJThBelrkn6LcnYv3s5vl+y8n4GrOM8foUZkt7CdJB0buVHNze2PjJW47dAqHIHuloN0X1QVdIrvJKr6u8apYWOBEu/yuoKpfriy03BRnxznLzoIT9A9v74qK1g8apkm0lZpUshrru4BVFKa9LgvnqYjOzzE51U4L47hufypovI=
+	t=1707142760; cv=none; b=nfGY7R1isPLSWt14H6SEwW56jhiHxwa6OB7ToQV6TmELepAJ7x6OPiQQsDf7gY3pRKrG+x2Ku/8lbQMNfEsfzc5A7B/nnhMyzeAg6ywRIn+miZ8ChZcZhNP9mDWHTTNHzrfkQ1Mpp0rc58tVaV23shNlwvSyZ1gK7Ai96rVsk6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707136997; c=relaxed/simple;
-	bh=FnVbhOqZgLm2kMDLTxNYG44F87BpohHkM7/k1t9mA30=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=eOwjzJfJbdPWkC4Hw7YhxCIeAGdsMIbdGdaCz+bBtE8ejchN1JlGcqJmBgltpMDB4ZFYtKL0ezEUg+FRmYYp8J5tgKUmmdMLxWv5/WevA7Tt94QBZ59f5m6hAJmlC905Mz33A5rx8YjASO24RUvjoNyQfkjRd9J8CfpAdkM+Bzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JdeG1Dtd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707142760; c=relaxed/simple;
+	bh=wL7f3/q9wLuR8kbR26+8p0Wa2ib3IFx0iIqAMfT3Ab0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T45lufXx1B8OUbHcXPFA+zi58oXhy0m3KlTKh45LaGvnVmbtvQzYcytxWts0caIjvWmseWK4e/3qU8m48HbmJMaWd55O0svqGT6j8+JjGRRH3zJEXEqTYJ93Iz64xiEmXxAJLrcG1lnR35ES5NffkytLHgabGvoaXrmEpuZ3akk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2nMsNcPL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WjICKJUx; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2nMsNcPL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WjICKJUx; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JdeG1Dtd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 529F5C433F1;
-	Mon,  5 Feb 2024 12:43:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707136996;
-	bh=FnVbhOqZgLm2kMDLTxNYG44F87BpohHkM7/k1t9mA30=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=JdeG1DtdRGOw0HS1f8QNsNsCE7pYfqnjQSt5B0xTAabbXpIaCZFIz7UeG/rE+5dVg
-	 X5RfIkTdi2SrwWWXkv09+f7r19dPWjM0SqjmZVFs9pjD5NQst6hy3HhV2TmDdBFY50
-	 eXNcl83FKC1A/Su8OjeRJTCDywxitdnVtIh5NE/LP6DDaDtH4p4xYN7nCz9pxfV2Dm
-	 YZtY04/6GlCmLOA9AAjxN2+p8pro4B/Aq3hLDQa1L5InGNNVoHWYBThC1uJiGZ6IZ4
-	 Tm5FBTydKliWfGhzugozL07ID5BrUcUo41Yks7k7LLN0VqwsIovpeFzIBoDFCwD6wI
-	 nBm1sLpXAx03A==
-Message-ID: <93aa5cdd-0ab4-413c-bb18-b1109c7f4f9d@kernel.org>
-Date: Mon, 5 Feb 2024 21:43:14 +0900
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2nMsNcPL";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WjICKJUx";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2nMsNcPL";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WjICKJUx"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 48E181F37C;
+	Mon,  5 Feb 2024 14:19:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1707142756; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
+	b=2nMsNcPLTbESKwOSwuBRBjkuQZCfhXPPtG5XrVhmc+xHHTROjNGwJqqC8kj1ufY8DO3xJ3
+	6CI1AGmYnFE/8Q2R8uRniKNwa/nFEWjv/CzqT7jXQw507c2rxKJf5xilzYsxvQUKsj/M+F
+	MpjMo0ouKB9kei6xJ0XyGNveWISpKKk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1707142756;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
+	b=WjICKJUxp0x5vEfN56Af6YLEk07IiHzPlqJl8Qoi3n9yLk/1QJb7uVqKvsbzVLttbxYdPM
+	LaWBsN1KKtPaHjCg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1707142756; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
+	b=2nMsNcPLTbESKwOSwuBRBjkuQZCfhXPPtG5XrVhmc+xHHTROjNGwJqqC8kj1ufY8DO3xJ3
+	6CI1AGmYnFE/8Q2R8uRniKNwa/nFEWjv/CzqT7jXQw507c2rxKJf5xilzYsxvQUKsj/M+F
+	MpjMo0ouKB9kei6xJ0XyGNveWISpKKk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1707142756;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XBuD2w214FrX4bQ1rAZNvdA6it7oOTmTdw3JUrl60T0=;
+	b=WjICKJUxp0x5vEfN56Af6YLEk07IiHzPlqJl8Qoi3n9yLk/1QJb7uVqKvsbzVLttbxYdPM
+	LaWBsN1KKtPaHjCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3D847136F5;
+	Mon,  5 Feb 2024 14:19:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ChoAD2TuwGVJbAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 05 Feb 2024 14:19:16 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id D5627A0809; Mon,  5 Feb 2024 15:19:11 +0100 (CET)
+Date: Mon, 5 Feb 2024 15:19:11 +0100
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 00/34] Open block devices as files
+Message-ID: <20240205141911.vbuqvjdbjw5pq2wc@quack3>
+References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
+ <20240205-biotechnologie-korallen-d2b3a7138ec0@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/26] block: Introduce zone write plugging
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-7-dlemoal@kernel.org> <Zb8K4uSN3SNeqrPI@fedora>
- <a3f17ffb-872b-49cf-a1a7-553ca4a272c0@kernel.org> <ZcBFoqweG+okoTN6@fedora>
- <58fa0123-e884-4321-9b9b-8575cc7b4e1d@kernel.org> <ZcCzLfocp4VcScOb@fedora>
- <ac52010e-c97b-43cf-baa7-0566185bc410@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <ac52010e-c97b-43cf-baa7-0566185bc410@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205-biotechnologie-korallen-d2b3a7138ec0@brauner>
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=2nMsNcPL;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=WjICKJUx
+X-Spamd-Result: default: False [-2.81 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.cz:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 48E181F37C
+X-Spam-Level: 
+X-Spam-Score: -2.81
+X-Spam-Flag: NO
 
-On 2/5/24 21:20, Damien Le Moal wrote:
-> On 2/5/24 19:06, Ming Lei wrote:
->> On Mon, Feb 05, 2024 at 11:41:04AM +0900, Damien Le Moal wrote:
->>> On 2/5/24 11:19, Ming Lei wrote:
->>>>>>> +static inline void blk_zone_wplug_add_bio(struct blk_zone_wplug *zwplug,
->>>>>>> +					  struct bio *bio, unsigned int nr_segs)
->>>>>>> +{
->>>>>>> +	/*
->>>>>>> +	 * Keep a reference on the BIO request queue usage. This reference will
->>>>>>> +	 * be dropped either if the BIO is failed or after it is issued and
->>>>>>> +	 * completes.
->>>>>>> +	 */
->>>>>>> +	percpu_ref_get(&bio->bi_bdev->bd_disk->queue->q_usage_counter);
->>>>>>
->>>>>> It is fragile to get nested usage_counter, and same with grabbing/releasing it
->>>>>> from different contexts or even functions, and it could be much better to just
->>>>>> let block layer maintain it.
->>>>>>
->>>>>> From patch 23's change:
->>>>>>
->>>>>> +	 * Zoned block device information. Reads of this information must be
->>>>>> +	 * protected with blk_queue_enter() / blk_queue_exit(). Modifying this
->>>>>>
->>>>>> Anytime if there is in-flight bio, the block device is opened, so both gendisk and
->>>>>> request_queue are live, so not sure if this .q_usage_counter protection
->>>>>> is needed.
->>>>>
->>>>> Hannes also commented about this. Let me revisit this.
->>>>
->>>> I think only queue re-configuration(blk_revalidate_zone) requires the
->>>> queue usage counter. Otherwise, bdev open()/close() should work just
->>>> fine.
->>>
->>> I want to check FS case though. No clear if mounting FS that supports zone
->>> (btrfs) also uses bdev open ?
->>
->> I feel the following delta change might be cleaner and easily documented:
->>
->> - one IO takes single reference for both bio based and blk-mq,
->> - no drop & re-grab
->> - only grab extra reference for bio based
->> - two code paths share same pattern
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 9520ccab3050..118dd789beb5 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -597,6 +597,10 @@ static void __submit_bio(struct bio *bio)
->>  
->>  	if (!bio->bi_bdev->bd_has_submit_bio) {
->>  		blk_mq_submit_bio(bio);
->> +	} else if (bio_zone_write_plugging(bio)) {
->> +		struct gendisk *disk = bio->bi_bdev->bd_disk;
->> +
->> +		disk->fops->submit_bio(bio);
+Hi!
 
-Actually, no, that is not correct. This would not stop BIO submission if
-blk_queue_freeze() was called by another context. So we cannot do that here
-without calling blk_queue_enter()...
-
->>  	} else if (likely(bio_queue_enter(bio) == 0)) {
->>  		struct gendisk *disk = bio->bi_bdev->bd_disk;
->>  
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index f0fc61a3ec81..fc6d792747dc 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -3006,8 +3006,12 @@ void blk_mq_submit_bio(struct bio *bio)
->>  	if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
->>  		goto queue_exit;
->>  
->> +	/*
->> +	 * Grab one reference for plugged zoned write and it will be reused in
->> +	 * next real submission
->> +	 */
->>  	if (blk_queue_is_zoned(q) && blk_zone_write_plug_bio(bio, nr_segs))
->> -		goto queue_exit;
->> +		return;
-
-...and this one is not correct because of the cached request: if there was a
-cached request, blk_mq_submit_bio() did not call blk_queue_enter() because the
-cached request already had a reference. But we cannot reuse that reference as
-the next BIO may be a read or a write to a zone that is not plugged, and these
-would use the cached request and so need the usage counter reference. So we
-would still need to grab an extra reference in such case.
-
-So in the end, it feels a lot simpler to keep the reference counting as it was
-as it makes things a lot less messier in blk_mq_submit_bio(). I will though try
-to improve the comments to make it clear how this is working.
-
->>  
->>  	if (!rq) {
->>  new_request:
->> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->> index f6d4f511b664..87abb3f7ef30 100644
->> --- a/block/blk-zoned.c
->> +++ b/block/blk-zoned.c
->> @@ -514,7 +514,8 @@ static inline void blk_zone_wplug_add_bio(struct blk_zone_wplug *zwplug,
->>  	 * be dropped either if the BIO is failed or after it is issued and
->>  	 * completes.
->>  	 */
->> -	percpu_ref_get(&bio->bi_bdev->bd_disk->queue->q_usage_counter);
->> +	if (bio->bi_bdev->bd_has_submit_bio)
->> +		percpu_ref_get(&bio->bi_bdev->bd_disk->queue->q_usage_counter);
->>  
->>  	/*
->>  	 * The BIO is being plugged and thus will have to wait for the on-going
->> @@ -760,15 +761,10 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
->>  
->>  	blk_zone_wplug_unlock(zwplug, flags);
->>  
->> -	/*
->> -	 * blk-mq devices will reuse the reference on the request queue usage
->> -	 * we took when the BIO was plugged, but the submission path for
->> -	 * BIO-based devices will not do that. So drop this reference here.
->> -	 */
->> +	submit_bio_noacct_nocheck(bio);
->> +
->>  	if (bio->bi_bdev->bd_has_submit_bio)
->>  		blk_queue_exit(bio->bi_bdev->bd_disk->queue);
+On Mon 05-02-24 12:55:18, Christian Brauner wrote:
+> On Tue, Jan 23, 2024 at 02:26:17PM +0100, Christian Brauner wrote:
+> > Hey Christoph,
+> > Hey Jan,
+> > Hey Jens,
+> > 
+> > This opens block devices as files. Instead of introducing a separate
+> > indirection into bdev_open_by_*() vis struct bdev_handle we can just
+> > make bdev_file_open_by_*() return a struct file. Opening and closing a
+> > block device from setup_bdev_super() and in all other places just
+> > becomes equivalent to opening and closing a file.
+> > 
+> > This has held up in xfstests and in blktests so far and it seems stable
+> > and clean. The equivalence of opening and closing block devices to
+> > regular files is a win in and of itself imho. Added to that is the
+> > ability to do away with struct bdev_handle completely and make various
+> > low-level helpers private to the block layer.
+> > 
+> > All places were we currently stash a struct bdev_handle we just stash a
+> > file and use an accessor such as file_bdev() akin to I_BDEV() to get to
+> > the block device.
+> > 
+> > It's now also possible to use file->f_mapping as a replacement for
+> > bdev->bd_inode->i_mapping and file->f_inode or file->f_mapping->host as
+> > an alternative to bdev->bd_inode allowing us to significantly reduce or
+> > even fully remove bdev->bd_inode in follow-up patches.
+> > 
+> > In addition, we could get rid of sb->s_bdev and various other places
+> > that stash the block device directly and instead stash the block device
+> > file. Again, this is follow-up work.
+> > 
+> > Thanks!
+> > Christian
+> > 
+> > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> > ---
 > 
-> Hmm... As-is, this is a potential use-after-free of the bio. But I get the idea.
-> This is indeed a little better. I will integrate this.
-> 
->> -
->> -	submit_bio_noacct_nocheck(bio);
->>  }
->>  
->>  static struct blk_zone_wplug *blk_zone_alloc_write_plugs(unsigned int nr_zones)
->>
->> Thanks,
->> Ming
->>
->>
-> 
+> With all fixes applied I've moved this into vfs.super on vfs/vfs.git so
+> this gets some exposure in -next asap. Please let me know if you have
+> quarrels with that.
 
+No quarrels really. I went through the patches and all of them look fine to
+me to feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+I have just noticed that in "bdev: make struct bdev_handle private to the
+block layer" in bdev_open() we are still leaking the handle in case of
+error. This is however temporary (until the end of the series when we get
+rid of handles altogether) so whatever.
+
+								Honza
 -- 
-Damien Le Moal
-Western Digital Research
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
