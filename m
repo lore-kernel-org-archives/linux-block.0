@@ -1,82 +1,131 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106271361;
-	Tue,  6 Feb 2024 01:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7634656754
+	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 01:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707182749; cv=none; b=XCXddGxZUM2Xl47SINIiaFPD/0rZw0LnxWDycncMP9RjeQMWqHvAygpPzrIS+BCfQ/GEdots4C5cVNOVXepZZiCtlF1r5+MT1+PFkqBdVwcv/lh03x/fSN9dt05I0XaL3wAbFkNH8P0fwJ7UBeYknFzXeIXNn1nIoTxE3YIZm8M=
+	t=1707184551; cv=none; b=jpLwCFmw+lBD75IVr0+5LevLjKX4hj8AVb+8I8zFeofXOmDTwQI6hgP5rjFQDXH5mHMp6HlUVqEdH+UIxkWOCP7/nQWZAq/hnqZHU89DsbHiqFN4qb4cQlD4pYqVsxcA1CVtc0JYjkhpf58fbta52pcuoUbOZvlCfBvF4MGG9KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707182749; c=relaxed/simple;
-	bh=xPhVl2iyOivm3Z8E/ftGw19JdA9+2hfmNugZ8ePuDhY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uo+KxHvsFl8v6fiNYaIMlNeaqjWw1+HKoU9d+BXz0kbQJYgS7dzij0b0SavdO/OjOu3NLbijimRGVxWJFVwk9h15LOAfWFayFb6uqAwSek3JvyMzo+9pvi6nQTkwzo7CX5qacbI/CbvjAxuc2LxqX/XJZU90vhJwS5Ciupr1D8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d93edfa76dso43259235ad.1;
-        Mon, 05 Feb 2024 17:25:47 -0800 (PST)
+	s=arc-20240116; t=1707184551; c=relaxed/simple;
+	bh=zjqhSeU5bHrLPNJ26BVaNrbCJCjPBdE2Vajc5aa42Z8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GeTF/W+x2/D/pS7jQYXN7RQLBQE8LWrtBl+gGM7bpX44IUV4ZoTq1DZtsQru/U+kiM1zS5oXibttOd1U5B3nAHsV+Cg9P/exOXgv2fYbdLkGfFbGXn2Qa5g/cfBWiN+kpwUoEgZpEIr2UCbkBsMcmdpSO9oIb7cHwEfIyZxhZiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=mAxplvRZ; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="mAxplvRZ"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e055baec89so84348b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Feb 2024 17:55:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1707184549; x=1707789349; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=F1MmYgIIiFSm7MBjhDY3RYdnKBzOdKpnmP/HxKDxl5M=;
+        b=mAxplvRZ6Koad0lLiJY2+TYz3+dRoR9BhZh5swfn9fQBCfVY1SAIvISvkTI8R5xGmW
+         CU+zNboRaK+WpgRsYuDos0fL/4hRshe0SP+rBvvuxgLlwcs7ViqYo5I3Egzc/bGfnj1T
+         quZY3Wztc/knFEmZpjqi54nUi5AocWRz14ie4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707182747; x=1707787547;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1707184549; x=1707789349;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EfH74TYuZGZBD3gnqL6oIjRHEvMXzZ6fQIQB4Pz4Ego=;
-        b=kF1flErdx+3HzgoCbn2ZqL6N8bQMc1cnbeIDPzGebFi10HbCqR568nmfSdLNUQoYmV
-         tWeqBkyfcGEBjuejGiSyDyQ1b4l1aryVBl+xrlnPV03x7jfzgFCJ07cBk8nJrKQwWV2m
-         GJNe90fb1jTWRZ0wRmILjtLTtprK40fc+IOYMpSsFdeshzydLzPMAsN9FVc0X9Wka+1w
-         jSK4BuFPpkiu9eUvcSpbNnOuVm73wcGIhhDNtpaOqsitKS6zhj4+idSirUL6xPxD+iEV
-         j7zsTFsnlQhzGIdUvBhwEDkMystZHvsxD4hG0YL2XfAwkuetTuCBPqeltn0j3PHGB9PQ
-         a8Vw==
-X-Gm-Message-State: AOJu0YygrJJoy26f12udp754FNVckRIZzmqx07gDzINkNuZJmPM9q0sN
-	0vvWXPEcTZ5LvL2Nj9U8J1SCZQydSBmfgNACe4oE4Fr58TKP7HoKg2bHax3t
-X-Google-Smtp-Source: AGHT+IGeXKRtT9W1LJG6mPRgiHjBJ4zC8hNfCDVBubWzCzv6teg3jEEUa51cp9v1QpDpzST//Kmftw==
-X-Received: by 2002:a17:902:7ec2:b0:1d9:ca7e:f0b4 with SMTP id p2-20020a1709027ec200b001d9ca7ef0b4mr233109plb.16.1707182747168;
-        Mon, 05 Feb 2024 17:25:47 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU9x8L+y+lWN/r9zFUjKzGBPv9YXMGwNjJzW3oy8qIiBoJWDTsmispFFCYlcLYR1sAiYqqQJ0WJsFHMlfW3RKzpB3W9aIDQpgK9dP7/crIJ3PJEX9TDM8DAXz9WiNdg6gVYxtfzI4xeCHULYhC08XODtY85eARSYOmJlSoN31aMs0eJp540BUpzQHGE7efN/YWOQ3MYBh6kFVuNjPaX5skz/XkNIMLyDoC5HREP+XvKw1/frqAlnqPRedln62lT0AKH6A==
-Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
-        by smtp.gmail.com with ESMTPSA id o9-20020a17090323c900b001d94a3f3987sm522408plh.184.2024.02.05.17.25.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Feb 2024 17:25:46 -0800 (PST)
-Message-ID: <04fb99e4-3e67-4c69-b1ff-d8563dc3098d@acm.org>
-Date: Mon, 5 Feb 2024 17:25:45 -0800
+        bh=F1MmYgIIiFSm7MBjhDY3RYdnKBzOdKpnmP/HxKDxl5M=;
+        b=EhV9os24iNnUn243XOVIN8pulRKB2EmRHnnw0VXfq/XT0YtRc+zVoBqkHVEHlWrS5v
+         o5s7vzYt17SQ067fMWfQj90FbCEwkJkfFVeuF1d0fXMUjRYzr1aCYtmetAIIgWNZ536c
+         UwCx6qwXFayTY5WmEoOVSn9mR0oQ5ebr5Rz1f1SLZd0JVdIcquzbVbqQvBaEOLvEU7pX
+         SWvOESTJX/jtwyMNkDX51UHougqCb4iZUzpDX5KzlI3yZmBkwTJjZGDJKnj9FePcXeHn
+         Y58qp7stj55y4Pcy2JuUVQD7j4ptguGtXQN8aXGBqzV7YxHV0YCdjhs5Iv0Po7w/nuwp
+         jf4Q==
+X-Gm-Message-State: AOJu0YzeBsEOMt33IufR8EXJwV3TnCABu2Y6NeYQITZ5reCcNZRMWWvJ
+	D68qjLNeBbctlb9d5LoXnY1Cb9AosnwJOQgjmyvG0KeLGN6WJBzHIMsAYDZSovnz2VdXlxL4qSg
+	=
+X-Google-Smtp-Source: AGHT+IEJZHwKFKfhWsv/YJOH+FEVByjE/nUG20+E2uvsJDgNZUHiIQzkE9Fu4POV3j2ObLvkj7HHDA==
+X-Received: by 2002:a05:6a00:d4a:b0:6e0:3894:998f with SMTP id n10-20020a056a000d4a00b006e03894998fmr1834728pfv.17.1707184548772;
+        Mon, 05 Feb 2024 17:55:48 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXbQjhm2Kn5naCHuCXWbrIJf8Ikj1Jsjs+8Y2/Iee+7aY6PgKU6TOy0QKx6QMjswRZf5K8oYhPFDOyJ6YGBVSEDnST1c4WEKqfDHeZpQahCJgGercp5H0jKvDAAAhbtMrMmmamC9o6VV8UkUY+wDzVNVKNx9+BaeFXfOjXKi9K6ljRMVC/ltpONPBUPGUsSV/vt5v8Uf2p9JFe4jj/lb+UqlbWAlcytBX9HSzaUeWwKQ+A1gJbRXenfe2YjIvNpgzs=
+Received: from google.com (KD124209171220.ppp-bb.dion.ne.jp. [124.209.171.220])
+        by smtp.gmail.com with ESMTPSA id n10-20020a056a000d4a00b006dd8985e7c6sm581433pfv.1.2024.02.05.17.55.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 17:55:48 -0800 (PST)
+Date: Tue, 6 Feb 2024 10:55:43 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Barry Song <21cnbao@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org,
+	axboe@kernel.dk, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, Barry Song <v-songbaohua@oppo.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] zram: easy the allocation of zcomp_strm's buffers with 2
+ pages
+Message-ID: <20240206015543.GH69174@google.com>
+References: <20240103003011.211382-1-v-songbaohua@oppo.com>
+ <20240106013021.GA123449@google.com>
+ <CAGsJ_4xp7HFuYbDp3UjMqFKSuz2HJn+5JnJdB-PP_GmucQqOpg@mail.gmail.com>
+ <20240115023457.GA1504420@google.com>
+ <CAGsJ_4x6e7=tWVKfauJaGMRmJ3tz7GymKosYcHrxoxEnAHyX6g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/26] Zone write plugging
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <fc7ab626-58ed-49bd-b692-4875d17c6556@acm.org>
- <548aa284-6c80-4f01-a5ce-bb16f64e9c85@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <548aa284-6c80-4f01-a5ce-bb16f64e9c85@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGsJ_4x6e7=tWVKfauJaGMRmJ3tz7GymKosYcHrxoxEnAHyX6g@mail.gmail.com>
 
-On 2/5/24 16:07, Damien Le Moal wrote:
-> On 2/6/24 03:18, Bart Van Assche wrote:
->> Are there numbers available about the performance differences (bandwidth
->> and latency) between plugging zoned write bios and zoned write plugging
->> requests?
+On (24/01/29 10:46), Barry Song wrote:
+> On Mon, Jan 15, 2024 at 10:35 AM Sergey Senozhatsky
+> <senozhatsky@chromium.org> wrote:
+> >
+> > On (24/01/06 15:38), Barry Song wrote:
+> > > On Sat, Jan 6, 2024 at 9:30 AM Sergey Senozhatsky
+> > > <senozhatsky@chromium.org> wrote:
+> > > >
+> > > > On (24/01/03 13:30), Barry Song wrote:
+> > > > > There is no need to keep zcomp_strm's buffers contiguous physically.
+> > > > > And rarely, 1-order allocation can fail while buddy is seriously
+> > > > > fragmented.
+> > > >
+[..]
+> > Okay, makes sense.
+> > Do you see these problems in real life? I don't recall any reports.
 > 
-> Finish reading the cover letter. It has lots of measurements with rc2, Jens
-> block/for-next and ZWP...
-Hmm ... as far as I know nobody ever implemented zoned write plugging
-for requests in the block layer core so these numbers can't be in the
-cover letter.
+> i don't have problems with the current zram which supports normal pages only.
+> 
+> but  in our out-of-tree code, we have enhanced zram/zsmalloc to support large
+> folios compression/decompression, which will make zram work much better
+> with large anon folios/mTHP things on which Ryan Roberts is working on.
+> 
+> I mean, a large folio with for example 16 normal pages can be saved as
+> one object in zram.
+> In millions of phones, we have deployed this approach and seen huge improvement
+> on compression ratio and cpu consumption decrease. in that case, we
+> need a larger
+> per-cpu buffer, and have seen frequent failure on allocation. that
+> inspired me to send
+> this patch in advance.
 
-Has the bio plugging approach perhaps been chosen because it works
-better for bio-based device mapper drivers?
+May I please ask you to resend this patch with updated commit mesasge?
+E.g. mention cpu offlinig/onlining, etc.
 
-Thanks,
+[..]
+> > > > I also wonder whether Android uses HW compression, in which case we
+> > > > may need to have physically contig pages. Not to mention TLB shootdowns
+> > > > that virt contig pages add to the picture.
+> > >
+> > > I don't understand how HW compression and TLB shootdown are related as zRAM
+> > > is using a traditional comp API.
+> >
+> > Oh, those are not related. TLB shootdowns are what now will be added to
+> > all compressions/decompressions, so it's sort of extra cost.
+> 
+> i am sorry i still don't understand where the tlb shootdowns come
+> from. we don't unmap
+> this per-cpu buffers during compression and decompression, do we ?
+> 
+> am i missing something?
 
-Bart.
+No, I guess you are right.
