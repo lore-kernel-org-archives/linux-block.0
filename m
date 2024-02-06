@@ -1,126 +1,135 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC5D17BAE;
-	Tue,  6 Feb 2024 20:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3881B942
+	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 20:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707251134; cv=none; b=s/W26JN1QSHAa58ZahqL+mctTEZ2y60/lZwq5vXRCaHqmnIC3G/K/ebFP9g8DSYoIaVYZFxhgpH051Lk1tkPfxfSL7ado0Nz4E8yVI7YO4q5EnRTJ5MNKTtS3+AK8+j1I5eS9FUqBL0idnJHlMBnNjkjGOYol7whIIA1cqD3IRc=
+	t=1707252100; cv=none; b=YhRXAe6S19Ol458VhC4vnZ30+IIEFBTTRas3EWbyGrni8hpVIItmE3DTg+gAZwkioldKn5IdXaJuhizW5Kr4RFoyE3azde9DDjT3Hwxs3Km2IBk3OJi78lhjK80Cjq6gGbeZideGYnHQycEM8DVS1muPgUlT3J98ihUbRVwJzGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707251134; c=relaxed/simple;
-	bh=myAxlBcAAYqHNe+fmEvkZ0s4GJom+6nvVRiWnx0/Raw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RX2hHaVpt5uhvwzYXsL75C7BjV9/NyN556xT6oWORz3YDgCusmsnuHH/6e8YA4vPTM7iWdj9FXsHTR0oKw8n4YetNoWUxI/HlgAvOdbt5CKTJ4rzQDagiTZCh/G+cjja6/ZmQRNYqkszATgXPurBmlp5Jpbk2WQs1QUlcrQsvEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hPrhRIjn; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hPrhRIjn"
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5dc13cbce45so2545267a12.2;
-        Tue, 06 Feb 2024 12:25:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707251131; x=1707855931; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ErQyw3q1yXVP0Ncex+AHp1fqkTGZvWT7VIYuvafQego=;
-        b=hPrhRIjnGOS7QRlpaI0cXK5U8ereEz7TKqfh7o3iWnycP6GhMwDkjEhmkCEX5lQR+x
-         0lhAh2GjEYoYGdo33xcrHZUfJxpUdBFZibMpQLAifWjupOcLLQe5iW/YtmfanK3EI0UO
-         v+IgfvuokSNx1XI0hG2pEpBUxiSS4SD3BBlPAAojmcSU3dIBbiLZRwm2C+hZSk+pLg5K
-         qdDYBmzhPRQCq/DPuvggN1ULmLCdPLAQgIU1AMH883OufUZPdGM1k32XRTQ71SpAAhMO
-         Djcc2Nn6moehlUq/PMJ73I/R5zxQeyuJr2RKaIyuL6veItn+YM4qiss25w95IRg6gclE
-         KEkg==
+	s=arc-20240116; t=1707252100; c=relaxed/simple;
+	bh=zRebTIjsaUf0Ub4DudPfuaj5E5yA9aiK7hFyGAJ1y+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LqZIxMJUGGgCVY1l3dLI4MvLXmCPchFlSyiznB6VEOKQJuL8PCpUk/NJISUJdmfPUo593e6HEwbEI+bnmPBEQ0ytK2gsWrMvVhyoCfqkKovdbCUBnpliKuNw0Ln/C00JTz+MXkcTEDcoavTjvd3lqPRrj1YUvC+1qDcIfOJKpoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bbbc6bcc78so870750b6e.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 12:41:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707251131; x=1707855931;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ErQyw3q1yXVP0Ncex+AHp1fqkTGZvWT7VIYuvafQego=;
-        b=wyvu1SmouEKWN/wRBZnqxtlE0vSJRjaKuWhxhI69HTnyHoiCDDKD9zoYo6Ats0lxUi
-         7xCONDt6uyygEdHI3Lp97671EoWRenpks+Z5RJDOtkWpK7t/0yHZWnY3V4zxEsjfojk5
-         /vKyBJpS/5gzb6DFneYofjx/TZp22sjItdkCAvEb0uQTIO0ZDiU2He5N+Mwy2UUn4oGK
-         2IWbkH86+ytz5SyWOPfxh1+NZjPDf0v3dt8JQFSzQFfwD/H8YSSS7BQ2ulv4F8kKCC0C
-         ahxBaBXqo7D8+Y7cmSO4BSf2bISlefWLGrx/Mzak9/b3CSnytG0RVEpiOLol1fgB00YX
-         o2fw==
-X-Gm-Message-State: AOJu0Yx1xq4GqYaHpk/OVxjnuTqoeX6JlLznbqS9QDBo202iwALwCR+r
-	yxLIYN/se8jWmzcnW5RI5JRtpnVKgg+l9cV+870BWCTP50BAO+SQ
-X-Google-Smtp-Source: AGHT+IHrxeWL4PNn0erWEy/zfrew41Tx9xSAIXGmq0aCza1yK8mlFfdYt9ZXHSq5ZGdZkPnma1GdLw==
-X-Received: by 2002:a17:90a:d443:b0:296:a13c:8f84 with SMTP id cz3-20020a17090ad44300b00296a13c8f84mr642729pjb.33.1707251131107;
-        Tue, 06 Feb 2024 12:25:31 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXX1KERzDsG+KIcsVpucZrWB1OSpeeuWlvHE1rORsA5tI2oTekpquyBIOFuscF4sj/ywA3BOQnUsGdW7nipH3rZk6Nw4ATflP8nzfL+UT+kDD3F55uOEsVtArCX3uhQHQSxpqZ4A/AmoArcOOL11YQAZ5MYT8unpyV5fSgPW4IuMYp/kY0c6NJ8oV/mdhtMujm/KeaMQgFUJl45l5/qnW/+Eonxx4Yfi/Ailof2i0Ii+nxvMqRDdeL/hAuIBlSq+6XnOsH6wuI=
-Received: from barry-desktop.hub ([2407:7000:8942:5500:f8bb:67cf:8c3f:c7bd])
-        by smtp.gmail.com with ESMTPSA id sn15-20020a17090b2e8f00b00296b57ac914sm2165557pjb.38.2024.02.06.12.25.27
+        d=1e100.net; s=20230601; t=1707252098; x=1707856898;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BK3tYW6CKwmcWEiVIKa8enrUi4F8IUfBPb681tY1iZI=;
+        b=nhmWDwpT7mwOIpNhDaK7FbjkEfoXCGMnqVVOiSnVMz0dDwqqQK7fygZEyv30peMPni
+         5xfpXDpiNlhUnV0QSb5YPDuwUqG/X16fdUdgurVoZNiPTDrMJ+YthoQGIX+B5jcMHktw
+         5+oRn2EH6bFEaS2pAsn5vdZ5iuR9NkUPryPeozcGHR6NraJs9rM5jlPBZBdeydYEugO7
+         HFEjDDsJaBtBfC8rjue2AEXT8RH8ZQcbyyWDesOlmlwrMCwjYJgHRi0amlNsWtJKKB8p
+         cnyXr9O1IueARUTBShn4yyCrhaBZdSkJUsOZqSQUe/xkDSfSQO7RoMO0dirdApaKAMWz
+         08Iw==
+X-Gm-Message-State: AOJu0YzkPJt6h/c9HZk4/somj03SBIv6C+MhZQdipUYOYNDPEtsc9sUr
+	HF8hsOD6gIJQtfqEq/nL11DTFyZ5Agwq+JKQ+fkvSr8f7nxc8tc+xOFZaEb7mIMy6ZlrQifG0EQ
+	=
+X-Google-Smtp-Source: AGHT+IGqpcz7w8gXYKBU6CYEiwFCfJ+MsnXv3yBYJ560ReaFJUvziCmQspI4RUDkDIP0eDtLZ5OnjA==
+X-Received: by 2002:a05:6808:3199:b0:3bf:e478:6f41 with SMTP id cd25-20020a056808319900b003bfe4786f41mr3251032oib.14.1707252098199;
+        Tue, 06 Feb 2024 12:41:38 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW6elav5x43l40JoZ/qbnlSpl7WyDCyC8xP7h8/eU3zyk2T/cv8T2ZFK38QbX5hQyt5i1lV+/7NKt3vEl2DpDFyAPRWYDoqker0dELGNpdlLqguk+ArDfehQDo2DJ0P7n8AgRRPZFb6qxnbPZO+w5j3NbMSyMe6gnuw4ehqsaoUAEc8U2Gr6nmDT3c8GCG1S0bjDyyHWPkehbtc5jCK
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id j25-20020ac874d9000000b0042994b3c20dsm1215094qtr.29.2024.02.06.12.41.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 12:25:30 -0800 (PST)
-From: Barry Song <21cnbao@gmail.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	minchan@kernel.org,
-	senozhatsky@chromium.org
-Cc: akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	zhengtangquan@oppo.com,
-	Barry Song <v-songbaohua@oppo.com>
-Subject: [PATCH v2] zram: easy the allocation of zcomp_strm's buffers through vmalloc
-Date: Wed,  7 Feb 2024 09:25:11 +1300
-Message-Id: <20240206202511.4799-1-21cnbao@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Tue, 06 Feb 2024 12:41:37 -0800 (PST)
+Date: Tue, 6 Feb 2024 15:41:36 -0500
+From: Mike Snitzer <snitzer@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@lists.linux.dev, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 10/26] dm: Use the block layer zone append emulation
+Message-ID: <ZcKZgKIRhQGRHrG5@redhat.com>
+References: <20240202073104.2418230-1-dlemoal@kernel.org>
+ <20240202073104.2418230-11-dlemoal@kernel.org>
+ <Zb5-2LsnQtJHV2mL@redhat.com>
+ <4eb920d7-e2fc-49d0-9eec-5fc152fa21de@kernel.org>
+ <ZcFGGdVc7mqCpU7a@redhat.com>
+ <ce23dd28-50d3-4650-993d-351cbcb45a80@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce23dd28-50d3-4650-993d-351cbcb45a80@kernel.org>
 
-From: Barry Song <v-songbaohua@oppo.com>
+On Mon, Feb 05 2024 at  6:40P -0500,
+Damien Le Moal <dlemoal@kernel.org> wrote:
 
-Firstly, there is no need to keep zcomp_strm's buffers contiguous
-physically.
+> On 2/6/24 05:33, Mike Snitzer wrote:
+> > On Mon, Feb 05 2024 at 12:38P -0500,
+> > Damien Le Moal <dlemoal@kernel.org> wrote:
+> > 
+> >> On 2/4/24 02:58, Mike Snitzer wrote:
+> >>> Love the overall improvement to the DM core code and the broader block
+> >>> layer by switching to this bio-based ZWP approach.
+> >>>
+> >>> Reviewed-by: Mike Snitzer <snitzer@kernel.org>
+> >>
+> >> Thanks Mike !
+> >>
+> >>> But one incremental suggestion inlined below.
+> >>
+> >> I made this change, but in a lightly different form as I noticed that I was
+> >> getting compile errors when CONFIG_BLK_DEV_ZONED is disabled.
+> >> The change look like this now:
+> >>
+> >> static void dm_split_and_process_bio(struct mapped_device *md,
+> >> 				     struct dm_table *map, struct bio *bio)
+> >> {
+> >> 	...
+> >> 	need_split = is_abnormal = is_abnormal_io(bio);
+> >> 	if (static_branch_unlikely(&zoned_enabled))
+> >> 		need_split = is_abnormal || dm_zone_bio_needs_split(md, bio);
+> >>
+> >> 	...
+> >>
+> >> 	/*
+> >> 	 * Use the block layer zone write plugging for mapped devices that
+> >> 	 * need zone append emulation (e.g. dm-crypt).
+> >> 	 */
+> >> 	if (static_branch_unlikely(&zoned_enabled) &&
+> >> 	    dm_zone_write_plug_bio(md, bio))
+> >> 		return;
+> >>
+> >> 	...
+> >>
+> >> with these added to dm-core.h:
+> >>
+> >> static inline bool dm_zone_bio_needs_split(struct mapped_device *md,
+> >> 					   struct bio *bio)
+> >> {
+> >> 	return md->emulate_zone_append && bio_straddle_zones(bio);
+> >> }
+> >> static inline bool dm_zone_write_plug_bio(struct mapped_device *md,
+> >> 					  struct bio *bio)
+> >> {
+> >> 	return md->emulate_zone_append && blk_zone_write_plug_bio(bio, 0);
+> >> }
+> >>
+> >> These 2 helpers define to "return false" for !CONFIG_BLK_DEV_ZONED.
+> >> I hope this works for you. Otherwise, I will drop your review tag when posting V2.
+> > 
+> > Why expose them in dm-core.h ?
+> > 
+> > Just have what you put in dm-core.h above dm_split_and_process_bio in dm.c ?
+> 
+> I wanted to avoid "#ifdef CONFIG_BLK_DEV_ZONED" in the .c files. But if you are
+> OK with that, I can move these inline functions in dm.c.
 
-Secondly, The recent mTHP project has provided the possibility to
-swapout and swapin large folios. Compressing/decompressing large
-blocks can hugely decrease CPU consumption and improve compression
-ratio. This requires us to make zRAM support the compression and
-decompression for large objects.
-With the support of large objects in zRAM of our out-of-tree code,
-we have observed many allocation failures during CPU hotplug as
-large objects need larger buffers. So this change is also more
-future-proof once we begin to bring up multiple sizes in zRAM.
+I'm OK with it, dm.c already does something like this for
+dm_queue_destroy_crypto_profile() by checking if
+CONFIG_BLK_INLINE_ENCRYPTION defined.
 
-Signed-off-by: Barry Song <v-songbaohua@oppo.com>
----
- drivers/block/zram/zcomp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 55af4efd7983..8237b08c49d8 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -11,6 +11,7 @@
- #include <linux/sched.h>
- #include <linux/cpu.h>
- #include <linux/crypto.h>
-+#include <linux/vmalloc.h>
- 
- #include "zcomp.h"
- 
-@@ -37,7 +38,7 @@ static void zcomp_strm_free(struct zcomp_strm *zstrm)
- {
- 	if (!IS_ERR_OR_NULL(zstrm->tfm))
- 		crypto_free_comp(zstrm->tfm);
--	free_pages((unsigned long)zstrm->buffer, 1);
-+	vfree(zstrm->buffer);
- 	zstrm->tfm = NULL;
- 	zstrm->buffer = NULL;
- }
-@@ -53,7 +54,7 @@ static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
- 	 * allocate 2 pages. 1 for compressed data, plus 1 extra for the
- 	 * case when compressed size is larger than the original one
- 	 */
--	zstrm->buffer = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, 1);
-+	zstrm->buffer = vzalloc(2 * PAGE_SIZE);
- 	if (IS_ERR_OR_NULL(zstrm->tfm) || !zstrm->buffer) {
- 		zcomp_strm_free(zstrm);
- 		return -ENOMEM;
--- 
-2.34.1
-
+Mike
