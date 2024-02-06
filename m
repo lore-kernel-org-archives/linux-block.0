@@ -1,195 +1,96 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978338F4E;
-	Tue,  6 Feb 2024 16:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A1F4C69
+	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 16:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707237341; cv=none; b=YFiHDXnu0hFq34h4EoQ9dXrZfj6D7BXdNPRJk/IMyuNMK6M2MAy05sAGntiM6zDtnGOeRzIjmJK8WtvXyy9BwoRwouD6KwZfidUO9mVOnsMy0Q60fZ3JPjuzWUZozBTKOyfrUVdGpnxxPBolf6a7Y3cbWoDbPI04OiZUSzXlzt0=
+	t=1707237866; cv=none; b=HODP3WXc3Gf1jMKjwDuluzEpXI5q4sLuxIl+v3XYmpIBYDSMDdztZUti7RjGfrvAOxgoFdhMakkKqioJiudLwd5Jq2oCe6bo0xxhxjgqacrBeWjStoaRCkysKrveptNxPcS6OlO6iHfjzXPXm/FflLNTOrG31TisIE9LXSKV3ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707237341; c=relaxed/simple;
-	bh=2jaTxy897HSNhvuo0scMIqWlSeWhphdBTeyqW2FVe8c=;
-	h=Message-ID:Date:MIME-Version:From:Subject:Cc:To:Content-Type; b=IYTNivN49zfMO3xLlTrFHeQUXj05UKNaDpCccG/w/io41fwyev3JCzg3DJJLzNMDWp60HyEXLLnWCTYxzPMxD/KMvJEGrF3yJpzKUUIZRqb9gi6nS8R9I2hqyQsrfOmeEm+1merWa/mXa2kanlJoGp57pGSm3NaNPQ2cSQaNIds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ECQqCXpv; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+	s=arc-20240116; t=1707237866; c=relaxed/simple;
+	bh=Ci5gwbrSM7cmnUZjQU3RB0yI/1+Eq7LqAgTZ83suCgc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=CRh641DAFZO0jsRQSWBi5bZidpGDJRnMSbLRG6yfD0BRNlcZ4g1kl15UHe/W+vAJOEI/kt3Km1EyCGzPUdtsw5xJNQ86LXSu0h0gPtnfzkw7ch7tnsnGcDKIkaKPdedi8lS2xy5mp/e3nX8+ZcGe0ZFOHpNa1Fq4MzlbyP3HrWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KRQFwn5k; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ECQqCXpv"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 416FqRtR008291;
-	Tue, 6 Feb 2024 16:35:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : from : subject : cc : to : content-type :
- content-transfer-encoding; s=pp1;
- bh=mF1bxTg83JCcbT2p2VNjnSZdKXCMHgjUucY1HXSBHp4=;
- b=ECQqCXpvGIsdxNYSso/q56Ake+eF2U2THTENgPB6fP/yIAPTqxuH2UXxeBrmZtiWSVX7
- 5hkWFgbphxRWWr7OsvtoPNs9NxuYC5hgXpZ2XrW7jveVuThfnb1lJsBXizcQPg+9h3Bj
- f8nIYyoUnP/dsnkdHGZ1Kttqs1QkTWDm2GDo5mMSChOiVY3V7gzmVxMMfT8wUY6d93Ut
- fZ5u2NVeeRTbUS+8C9m5rAxGRs11PZwMJv7oTypv1kGrGKdj+jVJtO8R15UCPX6FWIx7
- ZLENj8XpLYEn/xY+NfUlFb0qsKe5iOoS6gCnLL+LJSZ7ZKmW0DtQF3cU3dBu28hpFjxa Cg== 
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w3qsw98jx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Feb 2024 16:35:26 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 416EtUPZ008770;
-	Tue, 6 Feb 2024 16:35:25 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w206ygbyx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Feb 2024 16:35:25 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 416GZO4H2622116
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 Feb 2024 16:35:25 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DC1865805D;
-	Tue,  6 Feb 2024 16:35:24 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CF2E958057;
-	Tue,  6 Feb 2024 16:35:21 +0000 (GMT)
-Received: from [9.43.109.155] (unknown [9.43.109.155])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  6 Feb 2024 16:35:21 +0000 (GMT)
-Message-ID: <a54c8860-18c7-474d-95e2-a0153a2da885@linux.vnet.ibm.com>
-Date: Tue, 6 Feb 2024 22:05:20 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KRQFwn5k"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso98929939f.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 08:44:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707237863; x=1707842663; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dQcEl2yXnIh9XZWtfFgTdh1YAJ2nWzHZ9qOn3KNYSqE=;
+        b=KRQFwn5k22dhb3NV0WTSWzkkrlUMs1IJPp9U/18DFuLTAZfK9VfDYX6XEtYhD2jD1v
+         2nuVBUjghNwSIHv8rbbA7JjQPNYE8dJNtNrqIWqNV3XjY44KxKKoPLpVW++AYoANwBVn
+         IBmMDMFpPvyVQYSEQbmIdgFaNjs5TuuybzqWO59JHOWObWr6i8PAPuYBgqCFtTG2tOdn
+         QS5JAWa77rlrgBcn3GJuZwcsazo1IXF/YwgcbDXm7YcKl+2+46ONDsZcv1cf7VP30i4j
+         r+6xz/9rHUUYehcjQh4T7MCk+vMHS/t1QRzSY0MbNm7h4ylYt3hckL69HjEMIiE3B69P
+         0qiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707237863; x=1707842663;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dQcEl2yXnIh9XZWtfFgTdh1YAJ2nWzHZ9qOn3KNYSqE=;
+        b=oNba7AL20WFZqEuBqJ63gvdDjV7gCKReCCVrPZptkIUhiSyP0U5zhijbgAbfj1AAqX
+         362dMzibsqEHP7lH5UXnzKUe1oXvw0C5pdfqiVaKOXqREhFI928kx0jnpluMAK+6agQw
+         qaOdL6lpssOWgmmdUiNjeypNxDk/+gdzO3vm/Vj10yfOH46ReHprkN41QjQkUfi8HLio
+         Wo0MltVFNjxmAqjyd+EFp4FhOCqz2bAFmtDbKlJQt+72hFuGhHwIRrRcDTjfY+MA4OYd
+         U0yFxOogx8t/44ML9L7x52jB7gEXyl/EYnW4yv5e9nwOg7S83YIFHqaKLMBbAyfQwy61
+         LHRg==
+X-Gm-Message-State: AOJu0YwZ3ZQ4vIaP8Kiwve8LxfrVOyPgKgPVDpXb+eAfZvfbYRd5n/7F
+	OazMkmcByObTAeMMlADQ5b0YS+gZyjY9WhmgPldeSbh0qkjxbAL5eW0zDrHf1pM=
+X-Google-Smtp-Source: AGHT+IHZcEs7aDBPkKePRyf15PFF2B8+VP6+6XCTuENUCVBVzCXkDyrXenAcuFqRY39ol7B/hYJTww==
+X-Received: by 2002:a92:c248:0:b0:363:b624:6304 with SMTP id k8-20020a92c248000000b00363b6246304mr3743736ilo.0.1707237863190;
+        Tue, 06 Feb 2024 08:44:23 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXbAW8t4ckd3AZqia0sjMAtxuucZtqgd9p1TKGWqFHopEeROfOeib5LPZvgU5noh22po3h7Z3oSEhEDoSDr8ba7eM0U0+C8KnplV2tM64wikCdkKojirvUn4us=
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id bq9-20020a056e02238900b00363a91effdbsm164701ilb.76.2024.02.06.08.44.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 08:44:22 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-block@vger.kernel.org, linux-mm@kvack.org, stable@vger.kernel.org
+In-Reply-To: <20240123175826.21452-1-jack@suse.cz>
+References: <20240123175826.21452-1-jack@suse.cz>
+Subject: Re: [PATCH] blk-wbt: Fix detection of dirty-throttled tasks
+Message-Id: <170723786248.650796.10431002551375769170.b4-ty@kernel.dk>
+Date: Tue, 06 Feb 2024 09:44:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Subject: [revert commit 9f079dda1433] [mainline] [6.8.0-rc3] [NVME] OOPS
- kernel crash while booting
-Cc: alan.adamson@oracle.com, kch@nvidia.com, hch@lst.de, kbusch@kernel.org,
-        "sachinp@linux.vnet.com" <sachinp@linux.vnet.com>,
-        "mputtash@linux.vnet.com" <mputtash@linux.vnet.com>,
-        "abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eRSAn1IgLACeoIXaugRY1X-ApsOlxI6z
-X-Proofpoint-ORIG-GUID: eRSAn1IgLACeoIXaugRY1X-ApsOlxI6z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-06_10,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- spamscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=635 priorityscore=1501 adultscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402060116
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-Greetings,
 
-[revert commit 9f079dda1433] [mainline] [6.8.0-rc3] [NVME] OOPS kernel 
-crash while booting to kernel
+On Tue, 23 Jan 2024 18:58:26 +0100, Jan Kara wrote:
+> The detection of dirty-throttled tasks in blk-wbt has been subtly broken
+> since its beginning in 2016. Namely if we are doing cgroup writeback and
+> the throttled task is not in the root cgroup, balance_dirty_pages() will
+> set dirty_sleep for the non-root bdi_writeback structure. However
+> blk-wbt checks dirty_sleep only in the root cgroup bdi_writeback
+> structure. Thus detection of recently throttled tasks is not working in
+> this case (we noticed this when we switched to cgroup v2 and suddently
+> writeback was slow).
+> 
+> [...]
 
-Reverting below commit fixes the problem
+Applied, thanks!
 
-commit 9f079dda14339ee87d864306a9dc8c6b4e4da40b
-     nvme: allow passthru cmd error logging
+[1/1] blk-wbt: Fix detection of dirty-throttled tasks
+      commit: f814bdda774c183b0cc15ec8f3b6e7c6f4527ba5
 
---- Traces ---
-
-[   15.639835] BUG: Kernel NULL pointer dereference on read at 0x000003d8
-[   15.639840] Faulting instruction address: 0xc0080000215b01dc
-[   15.639845] Oops: Kernel access of bad area, sig: 11 [#1]
-[   15.639849] LE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=8192 NUMA pSeries
-[   15.639855] Modules linked in: xsk_diag bonding tls nft_compat 
-nf_tables nfnetlink rfkill binfmt_misc dm_multipath dm_mod pseries_rng 
-dax_pmem drm drm_panel_orientation_quirks ext4 mbcache jbd2 ibmvfc 
-nd_pmem nd_btt scsi_transport_fc ibmveth nvme papr_scm bnx2x nvme_core 
-t10_pi vmx_crypto libnvdimm crc64_rocksoft_generic crc64_rocksoft mdio 
-crc64 libcrc32c fuse
-[   15.639901] CPU: 1 PID: 3289 Comm: udevadm Not tainted 
-6.8.0-rc3-auto-g99bd3cb0d12e #1
-[   15.639907] Hardware name: IBM,9009-42A POWER9 (raw) 0x4e0202 
-0xf000005 of:IBM,FW950.A0 (VL950_141) hv:phyp pSeries
-[   15.639913] NIP:  c0080000215b01dc LR: c000000000a197bc CTR: 
-c0080000215b01b8
-[   15.639918] REGS: c00000006f3177f0 TRAP: 0300   Not tainted 
-(6.8.0-rc3-auto-g99bd3cb0d12e)
-[   15.639923] MSR:  8000000000009033 <SF,EE,ME,IR,DR,RI,LE>  CR: 
-84888480  XER: 20040000
-[   15.639936] CFAR: c00000000000dbbc DAR: 00000000000003d8 DSISR: 
-40000000 IRQMASK: 0
-[   15.639936] GPR00: c000000000a197bc c00000006f317a90 c0080000215d8200 
-c000000092810000
-[   15.639936] GPR04: c0080000215d2570 c000000092810000 c000000092820000 
-0000000000000000
-[   15.639936] GPR08: c000000092810000 0000000000000000 0000000000010000 
-0000000022888482
-[   15.639936] GPR12: c0080000215b01b8 c00000000f8cf300 0000000000000000 
-0000000000000000
-[   15.639936] GPR16: 0000000000000000 0000000000000000 0000000000000000 
-0000000000000001
-[   15.639936] GPR20: 0000000000000000 0000000000400cc0 c000000086d14c28 
-000000007fff0000
-[   15.639936] GPR24: fffffffffffff000 0000000000000000 c000000086d14c18 
-0000000000010000
-[   15.639936] GPR28: c00000007509c180 c000000005bc1448 c0080000215d2570 
-c000000086d14bf0
-[   15.639999] NIP [c0080000215b01dc] 
-nvme_io_passthru_err_log_enabled_show+0x24/0x80 [nvme_core]
-[   15.640013] LR [c000000000a197bc] dev_attr_show+0x40/0xac
-[   15.640020] Call Trace:
-[   15.640023] [c00000006f317a90] [c00000006f317b10] 0xc00000006f317b10 
-(unreliable)
-[   15.640030] [c00000006f317af0] [c000000000a197bc] dev_attr_show+0x40/0xac
-[   15.640037] [c00000006f317b60] [c0000000006c11a0] 
-sysfs_kf_seq_show+0xcc/0x1f0
-[   15.640045] [c00000006f317bf0] [c0000000006be224] 
-kernfs_seq_show+0x44/0x58
-[   15.640052] [c00000006f317c10] [c00000000060882c] 
-seq_read_iter+0x254/0x69c
-[   15.640060] [c00000006f317cf0] [c0000000006bed60] 
-kernfs_fop_read_iter+0x4c/0x60
-[   15.640067] [c00000006f317d10] [c0000000005bf61c] vfs_read+0x2bc/0x390
-[   15.640074] [c00000006f317dc0] [c0000000005c040c] ksys_read+0x84/0x144
-[   15.640081] [c00000006f317e10] [c000000000033358] 
-system_call_exception+0x138/0x330
-[   15.640088] [c00000006f317e50] [c00000000000d05c] 
-system_call_vectored_common+0x15c/0x2ec
-[   15.640096] --- interrupt: 3000 at 0x7fff87d342e4
-[   15.640101] NIP:  00007fff87d342e4 LR: 0000000000000000 CTR: 
-0000000000000000
-[   15.640106] REGS: c00000006f317e80 TRAP: 3000   Not tainted 
-(6.8.0-rc3-auto-g99bd3cb0d12e)
-[   15.640110] MSR:  800000000280f033 
-<SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 42884482  XER: 00000000
-[   15.640126] IRQMASK: 0
-[   15.640126] GPR00: 0000000000000003 00007fffea617e80 00007fff87e47200 
-0000000000000003
-[   15.640126] GPR04: 0000010009494f20 0000000000010008 00007fff87e40e18 
-00000100094a4f20
-[   15.640126] GPR08: 0000000000010008 0000000000000000 0000000000000000 
-0000000000000000
-[   15.640126] GPR12: 0000000000000000 00007fff88434ba0 0000000000000000 
-0000000000000000
-[   15.640126] GPR16: 0000000000000000 000000013e082f48 00007fffea618290 
-00007fffea617ee8
-[   15.640126] GPR20: 00000000003ffffe 00007fffea618108 00007fffea618110 
-0000000000008000
-[   15.640126] GPR24: 0000000000000000 0000000000000002 00000000003ffffe 
-ffffffffffffffff
-[   15.640126] GPR28: 0000000000010007 0000000000010008 0000010009494f20 
-0000000000000003
-[   15.640185] NIP [00007fff87d342e4] 0x7fff87d342e4
-[   15.640189] LR [0000000000000000] 0x0
-[   15.640193] --- interrupt: 3000
-[   15.640196] Code: e8410018 00028048 00000000 3c4c0003 38428048 
-7c0802a6 60000000 7c0802a6 f8010010 f821ffa1 e9230078 7ca32b78 
-<892903d8> 2c090000 4082002c 3d220000
-[   15.640217] ---[ end trace 0000000000000000 ]---
-
+Best regards,
 -- 
-Regards,
-Tasmiya Nalatwad
-IBM Linux Technology Center
+Jens Axboe
+
+
 
