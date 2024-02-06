@@ -1,99 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F21E63B;
-	Tue,  6 Feb 2024 00:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4D11362;
+	Tue,  6 Feb 2024 00:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707178073; cv=none; b=pHOuOpj9/LbHmGggqSqiln2LJcBkA+eOewOcJWUbjkAZ+qyuV8DC9rBIvDs8AhNM5FKftLisL7p8eVDEaid/d/yEhEx9VKwveEmrkhMINuE7iuKY+Xu+PwHf+yZgGvzVnQMISrylgfU37aGRYiD3yHcD51is5pSC1ulV4HWDUAk=
+	t=1707180264; cv=none; b=OVmTDbTE584WxTdcpjOCbucsGmmgBvU1SAtNrS2aFUdJUBjyTV9GushPc9mhz/qgUO6sdM4H9wlUfh2jF6Z4zNhtPY30sy7RwEh0eYGaVxb6ULKOuctTmc4DLgFT9lKDjpjVVmb+g9BBB5Ml06i8bLTYTeosDzmtVg+1v7Dfx/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707178073; c=relaxed/simple;
-	bh=LHVAb8c/glKRgQdSgG3vaEe4H8FRHd+rnW5Xuzxk3+w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VpibDhBfD7nFUMQ4VVgKQl8shbYuVothIp4E/jXawtZBxJ1FTKPia/D9rEYlVIGZBbthft3XrPqsX5A7DJQ5k2s9RYrmj8xr51vpufyY2ihlsYb5hDBdI20467oibLv6Gg67uwhSKILl2jKgTF66+O7+yEk1cKEcifE9A/5yChM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e3q0dTK5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707180264; c=relaxed/simple;
+	bh=/yyAqzHQD4b67rx9jlayctNJKLPz13q9fnIllnfVOC8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tn7Qlb0x1g/sJYYv2yiSMgr8vEly8xFB1OzlZcuTgPRGCiJ8vtX00m9SkJByseOnXuaGBF8eLfchRXtdnce2SSGQLTd2jkr/exh48eeBEBPx9Esy4iUAYz/nzmsBkLtzCiwq/8bFnDRkRvmfH+s6FUJU8eYY1gZ4e0RTvadNHnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ILDeD9bl; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e3q0dTK5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D79C433F1;
-	Tue,  6 Feb 2024 00:07:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707178073;
-	bh=LHVAb8c/glKRgQdSgG3vaEe4H8FRHd+rnW5Xuzxk3+w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e3q0dTK51/vEWjlqKNYNZg4Y813QwSJzFIpwcbu+zrYJFYQfyihiw2MeI/VCUEvKX
-	 wSF3RJpxJEpFE7Whcp49WJ1ftUdSn0ntTeGf1fAA9XYMCfbrZG5KL78VAcR3zifcL/
-	 zM/I/hdWVAYqt0C0rA0heM5fcVEGH8jLb7Dqp+2GjQAtusxfjG7WIB1n0iJXU5Jcxt
-	 WA8bDtUXL8w0tzuwZSxi14OGMVzvZfGnLQdsDOgDRo9ciLUNdd0B40e6L3pxPJFbEK
-	 eTQMXBeBJCYTDLQ2b/kRYP48q3Uk1ByAlOQ3P2o3cOi7tN3/yfJYjBwqZa+UJk+jdQ
-	 TjgXLYf7e6fgA==
-Message-ID: <548aa284-6c80-4f01-a5ce-bb16f64e9c85@kernel.org>
-Date: Tue, 6 Feb 2024 09:07:50 +0900
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ILDeD9bl"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d09faadba5so27947441fa.1;
+        Mon, 05 Feb 2024 16:44:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707180261; x=1707785061; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8OFn31jen0blVfvFsWJzTrRwpe7OQng5QeVgbQtEl5o=;
+        b=ILDeD9bl1rcHHwEgAvs8ELVaduxaTW8pHSi8ansRG4k5aAOKhUmw9nbLOzyrVScZEC
+         KglZ0D/sHP1B8ujRgpzDWmPCPRRKZw/Ge1z6Q7g2RalmCHRT3rQ3ZSRD2tOmtVcM7N++
+         SuhoEUstEkGwYhtpG4QdvCyY9Gc3kAKdt0cwJUJ7Lv9EETnkHGINXZzQkwXnxSaOgLME
+         eYDbsZSYYEfNMIo80NrQd0rtiDR23Z96brXc20stISggIPl82Fsvag3lNHNLfBCcyUIG
+         7fiqhAiuRePxsai2G/oxIjWnrfj2WOzj2cgcDELMAHps4kNzWfXtHtVC4WaIRMZfuLVc
+         d2qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707180261; x=1707785061;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8OFn31jen0blVfvFsWJzTrRwpe7OQng5QeVgbQtEl5o=;
+        b=ZNdB9eDM7rck0NvMuTILwSomlGMt99/5PTutmH8PtkywYFioeDKHOBedqyUVvtCAs0
+         1YTJk+MQZDlpPzhX3CkdENZxf5oG+olS7EpaeryJf4YR+bIgPXz6AAV6MeHHYSbUbAIn
+         6h9F82DM8htQY6xbrZDxNtcTcpbVMAgYC+9M2OXp8hqYj36+sTLbWsYoc1o3jtYEBW0f
+         2CvpUtqCG1B2NEKiI7E09qnXwmMvHJAqxdxrzjuEMzJUM1NgthDysDX1kxeRQKG9dT4S
+         ndhZjhQIGU2UPjnvuGBNllrBBYkH4PL3kMU7ct7KiouNckjjhVrMnuH4eboMl+E7sitD
+         q3BA==
+X-Gm-Message-State: AOJu0Yx2CTuCObeeAkGG36pyMVd31vw/ZmDYCz8X5akMOVe1fnk6/o+a
+	znZBULp1VSfCsaw+jgxFUYuYdPHJh+6fvvfKYb+L9MffDLyoNJlrfbPfg+zmWXlLA/b7DQLby/L
+	STkQRCoskWq7qaocE25Hy0XSyeSU=
+X-Google-Smtp-Source: AGHT+IEVdSuNJJf4BhE+PzKe7H+47Ni2/ANUXOeqBOiT89cpWJWmEd3e6PND6g24dphWUU51GE8YqFTE8DlfLcxRYlc=
+X-Received: by 2002:a2e:700e:0:b0:2d0:a2bd:2a3c with SMTP id
+ l14-20020a2e700e000000b002d0a2bd2a3cmr776621ljc.26.1707180260465; Mon, 05 Feb
+ 2024 16:44:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/26] Zone write plugging
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <fc7ab626-58ed-49bd-b692-4875d17c6556@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <fc7ab626-58ed-49bd-b692-4875d17c6556@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240205090552.40567-1-zhaoyang.huang@unisoc.com> <ZcFbl0zP2pK6vEmh@casper.infradead.org>
+In-Reply-To: <ZcFbl0zP2pK6vEmh@casper.infradead.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Tue, 6 Feb 2024 08:44:09 +0800
+Message-ID: <CAGWkznGzWW6yORWvKt5p=2O4S1FtkNe4W42SwYduE70hVkiuBg@mail.gmail.com>
+Subject: Re: [PATCHv8 1/1] block: introduce content activity based ioprio
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe <axboe@kernel.dk>, 
+	Yu Zhao <yuzhao@google.com>, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/6/24 03:18, Bart Van Assche wrote:
-> On 2/1/24 23:30, Damien Le Moal wrote:
->>   - Zone write plugging operates on BIOs instead of requests. Plugged
->>     BIOs waiting for execution thus do not hold scheduling tags and thus
->>     do not prevent other BIOs from being submitted to the device (reads
->>     or writes to other zones). Depending on the workload, this can
->>     significantly improve the device use and the performance.
-> 
-> Deep queues may introduce performance problems. In Android we had to
-> restrict the number of pending writes to the device queue depth because
-> otherwise read latency is too high (e.g. to start the camera app).
-
-With zone write plugging, BIOS are delayed well above the scheduler and device.
-BIOs that are plugged/delayed by ZWP do not hold tags, not even a scheduler tag,
-so that allows reads (which are never plugged) to proceed. That is actually
-unlike zone write locking which can hold on to all scheduler tags thus
-preventing reads to proceed.
-
-> I'm not convinced that queuing zoned write bios is a better approach than
-> queuing zoned write requests.
-
-Well, I do not see why not. The above point on its own is actually to me a good
-argument enough. And various tests with btrfs showed that even with a slow HDD I
-can see better overall thoughtput with ZWP compared to zone write locking.
-And for fast sloid state zoned device (NVMe/UFS), you do not even need an IO
-scheduler anymore.
-
-> 
-> Are there numbers available about the performance differences (bandwidth
-> and latency) between plugging zoned write bios and zoned write plugging
-> requests?
-
-Finish reading the cover letter. It has lots of measurements with rc2, Jens
-block/for-next and ZWP...
-
-I actually reran all these perf tests over the weekend, but this time did 10
-runs and took the average for comparison. Overall, I confirmed the results
-showed in the cover letter: performance is generally on-par with ZWP or better,
-but there is one exception: small sequential writes at high qd. There seem to be
-an issue with regular plugging (current->plug) which result in lost merging
-opportunists, causing the performance regression. I am digging into that to
-understand what is happening.
-
--- 
-Damien Le Moal
-Western Digital Research
-
+On Tue, Feb 6, 2024 at 6:05=E2=80=AFAM Matthew Wilcox <willy@infradead.org>=
+ wrote:
+>
+> On Mon, Feb 05, 2024 at 05:05:52PM +0800, zhaoyang.huang wrote:
+> > +void bio_set_active_ioprio(struct bio *bio)
+>
+> why does this still exist?  i said no.
+I supplied two sets of APIs in v8, this one is for iterating the bio.
+The reason is bio_add_page/folio could return success without adding a
+page which can not be dealt with bio_set_active_ioprio_folio
+>
+> > +void bio_set_active_ioprio_page(struct bio *bio, struct page *page)
+>
+> this function should not exist.
+>
+> > +void bio_set_active_ioprio_folio(struct bio *bio, struct folio *folio)
+>
+> this is the only one which should.  did you even look at the
+> implementation of PageWorkingset?
+>
+> > +extern void bio_set_active_ioprio(struct bio *bio);
+> > +extern void bio_set_active_ioprio_folio(struct bio *bio, struct folio =
+*folio);
+> > +extern void bio_set_active_ioprio_page(struct bio *bio, struct page *p=
+age);
+>
+> do not mark function prototypes with extern.
+>
+> > +#ifdef CONFIG_BLK_CONT_ACT_BASED_IOPRIO
+> > +     /*
+> > +      * bi_cont_act record total activities of bi_io_vec->pages
+> > +      */
+> > +     u64                     bi_cont_act;
+> > +#endif
+>
+> what?
+>
+> look, you just don't understand.  i've spent too much time replying to
+> you trying to help you.  i give up.  everything to do with this idea is
+> NAKed.  go away.
+Sorry for the confusion, but I have to find a place to record the
+historic bio's activities for bio_set_active_ioprio_folio. There could
+be many bio_add_folios before submit_bio
