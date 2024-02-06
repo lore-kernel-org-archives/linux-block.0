@@ -1,275 +1,142 @@
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2070.outbound.protection.outlook.com [40.107.223.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7381B972
-	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 21:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707256418; cv=none; b=lO/r8gpjvEqRfGgnQy8BdAaQek4KNjoxrK1T7KFjit3hse8bWwuogynzDmg6qozDob+7t6ncqiKUss3DdfLfCXFHzqBHDT+uXHbtVOTVkhwcKPV1RhLSOJPM/vZ22V7Jx8+WxlVGBf7r1LaU81v9PY1Q+MkIGzk2oBJShfVt/bg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707256418; c=relaxed/simple;
-	bh=lEXEftvc8USQ5Sq5o5lp81iZXZA1RVqdMSS6fDyVwYE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QI0zYDO3DGEpRk9Z1V/McBEUcROgmNpCdE51o+L4TzlXmbjxdjrQuKBANSpYtGiKjl/F8BCTMfIKUbR1YSZxOxiFeolhtc4nYpXNFfFxltC28y6S+jvfob2EQJWT7GB7oY+MJLXNhaZfKwKKdRNNL8wP7hVhpYqU7VI0XqjaqH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=YOrekqBm; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A101B1C2A6
+	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 22:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707260078; cv=fail; b=oRp1jbcq9UvsS8HPJ4Rw+MfWoighwxq5Rlvdt9JdC+1VRShX+ZQh1MM6lc3d7dQiLBFzYWSxuKkLv23vhusZHQld46aEFsFBu8HTvZPy4YX82OTQzmnm5sac7C/ssEWITxzF5cQ9j2xDFynln6v4p9EM/7b1dZQZ8zMxH23StrA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707260078; c=relaxed/simple;
+	bh=mGeAkX8LVBIUcRDOhbzEETMM4FxwBTjYev/ePpeoBuc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZS6ltj692PMcNH8b6b7DwhqSujqD5dGLiU3NShpjthUfhAvQDO2HjmpJABsgeXhOceXlbqQ3+cEUwqq+/AAdQ5JFTWntCYMyyEx25OX6TB4EjvgPPPCmMoVTG9PJlhwOSRAtthGXzKQ5E7f9pOlOIzllSRfj5A6OKHCOuqaWDTs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rOrCcjOf; arc=fail smtp.client-ip=40.107.223.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="YOrekqBm"
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dc6d5206f18so1449114276.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 13:53:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1707256414; x=1707861214; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E8VjUURyKl+tDea7fU1YfuA8k7lBdd08O4dfl2Z6+qs=;
-        b=YOrekqBm7lRAevzM7cbTxu7osqs2uDDeEc+pFoXzn6QV6lAHr5CJaplibVG95IRdb6
-         Oy9lnWMptMvSAPHlgft41NfLh1N82vAIq0NALTLUtBy+mH/pLPUyJ0U2FnG319MVRWn4
-         FQs0pFRzTBvCfvvQdWiL9On/vfy2VzY98dpCMKZah75NKlhcmjTcQdeipJhjQyb2fKPG
-         wUSsoubF8VN0j9ABnsWTbKrzE5Bakh5l/wlknLPQaCqqBrD1SYJhyh0gArJWIsw5gQZa
-         FygjWFOUMrPno6A4Uxw79yjVj7MdmSVerDZUXxGqz7dVMvQ63vyTAz7N5ROtznAzhNLO
-         l8Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707256414; x=1707861214;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E8VjUURyKl+tDea7fU1YfuA8k7lBdd08O4dfl2Z6+qs=;
-        b=FHOHRm761HPqthfAAUBJ0+B2+QyqkjxWP+a4cysRXTLP8vcVA4JK7jr2CmvXbYZzzv
-         zwulMKc2GZaZBZwnHe/RaMyA6C2TNeGNvWaRWnDv8sLWgIYyESoY2WNA5Bj6qtb6DVeg
-         skQsal+KoR5xEqqdO6uRQ5Rny14UYaVF0RZM22QHJvFKPqrQSM3+beAnplAd484vh1Xa
-         U1RS65WvKQUW4OKxSlj25z4i781MqCIGJ2qz7i/F0a5hfHQyo+RC4skOi9tM9US8kF++
-         aXbEFmdI6Kii0/ibNBRTYZ+1eyB6/JDIr01z9DjA7ik5/pvtJGdfSLyZ//OhTEzief1x
-         M6BA==
-X-Gm-Message-State: AOJu0Ywf+fsfReyUlc73VMOZGraQuH3LDx+Fp+zxCpXHTba12HEkhxOy
-	cMbys6sIpi2vNhrM0/umfzou1OBVCv33rpMNRFPkSZ5iOmsUqRI3xCS2eOEWjZ1TMuICjELjCnH
-	n4Xoyu9mWUICwhX8WT7yh4+9IFNBTyQHmvaQ2
-X-Google-Smtp-Source: AGHT+IEO4hTUbTAAn40GVh6bVY5MjCMuUK0Go+sNf1Zs+luw8FRTbTUb/aYdCk/1t8fccmSNm68UjpBMUgzFkT5lF5I=
-X-Received: by 2002:a25:84d2:0:b0:dc2:32e6:d1b1 with SMTP id
- x18-20020a2584d2000000b00dc232e6d1b1mr2686889ybm.18.1707256414268; Tue, 06
- Feb 2024 13:53:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rOrCcjOf"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UzLEa7mLoD6D3KWIm0KOD+bEfmITc6TrQxdYmFOQnSQjORL07MDW1ZWujIe3XBx9gwW6Xu3ZfUOIedmm4ExfTjJOoDzv7cbLaA777Zq1FIKYyBhO439ULY3p7qb42zIS2YwjkZi3BZyaoo2oeMo8me6t/SLKpBTcAo9yeUXSM5Hsft1XMeJU0gNZZUufdz86eL0GrU/zu7k/K8lUJdcWm2A61Iqcyc7kWEjdj75m1fAui2T1u8idSmwAjAew76jixYKDQN3ZxsHxX6jnjp8IuAbg+rwLoMYtqIJkG9/IY4OcPLw8tYkeDNKv54SSRp07upWTRZ1mA4m+9BC1ClSSqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mGeAkX8LVBIUcRDOhbzEETMM4FxwBTjYev/ePpeoBuc=;
+ b=hCyVBjztGqOz5plMvmcbOTAckd2L8v9qKsrx2fi1xQHvvhkPCoTYImXu92owUEDXF7HV3/hPykoPCWOJyerYANlOj/FoIvacewmDIAAdci0ITki1JSz+UKL/Ta6sBMnEF/lyJnByp8iQTp4pnHfkpbXVnVxIXc+El8UsLh7/Kzn8uECwJOshi7f3nKCkqfdxFGrU5ONHIroQwIUnP6c3kyzUiYQntEqWHmUpipz2jvKBM6YVLoe8K4x7DcAZTW3G0dvxYW7vQ4kE36qHJmxRN2o3lNbPpvasbwq67xB1KtLkTKINdkv1K2Njdc10eC41CDj4LsdTkpPVYFRXpduK1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mGeAkX8LVBIUcRDOhbzEETMM4FxwBTjYev/ePpeoBuc=;
+ b=rOrCcjOfLFKSaH5zocAXRvx84D0mxO5se6uvYpzvL5XzKo5idxoXtw1AYudOZf10nM39Si6q+1nPpPNkSgJYSUrfun9mf7JPKhmvfV02pFPsUB2ulHHB4WBWGkj791AubrCzr7gWhktFmLZMx5yUQAEp3jT+b+YBwlWf2MYRSvIgQr0nwWJ/bHTtwOghZZof61P/3QOttLZQSJ0r14DKhXK9gx3eq6O01F/Ug0dXSKN2Sj3IqHf+imM9D/5NAnpgcY3s2xMZCJz0iuXRKRwiJiNEqqNvw20hpZKKcneaGtIBv9ADhn6T345VI9XnCuACAcQRXXO41fktn5Bq4LIWZg==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by MW4PR12MB5642.namprd12.prod.outlook.com (2603:10b6:303:187::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.17; Tue, 6 Feb
+ 2024 22:54:32 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed%4]) with mapi id 15.20.7270.012; Tue, 6 Feb 2024
+ 22:54:32 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Daniel Wagner <dwagner@suse.de>, Shin'ichiro Kawasaki
+	<shinichiro.kawasaki@wdc.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH blktests v1 1/5] nvme/029: fix local variable declarations
+Thread-Topic: [PATCH blktests v1 1/5] nvme/029: fix local variable
+ declarations
+Thread-Index: AQHaWP7VWyL7Sd+5KUWovevlZeTeZLD97OcA
+Date: Tue, 6 Feb 2024 22:54:32 +0000
+Message-ID: <61e70897-7118-4e81-b63d-c37c7493a6c5@nvidia.com>
+References: <20240206131655.32050-1-dwagner@suse.de>
+ <20240206131655.32050-2-dwagner@suse.de>
+In-Reply-To: <20240206131655.32050-2-dwagner@suse.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|MW4PR12MB5642:EE_
+x-ms-office365-filtering-correlation-id: 6469ce06-7e4a-410d-442b-08dc2766956e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ pKTIIhTg541JlxTZzR6XLVZ1ohy2BuwtdzpAuUl6KCEA8g/wiMWWzBHbvUGCO3VXpgxmYf8CKbOvk3ZSbXtLre1pE+beDQFGBBlSkfEy11QeAkhTvvu7RXrjcEGGNU5iWv8eI20EKpmFsI37/jszTyHVGC6JcuL4yOscudb2segRQVmFnh/pPhr3Ll4JyFYZCswOXQwv1JRMYA5mcqx2vC0YYScLy5Qw0ufeMKGRbwMdaoHnjcCaKfiUA+enohl4dnv8BaQiHhHJp3ILaiP87F939uJifz0wmOZPt49MILgHg8LlDctomWD2ITiMaehmpAnHkLK0dXYAPNmK8RbDGzQXhAsO0jnQoSVu3qd3acsjy1NIED8T7QdquO6bi1hzRvX+JCo3E9dfLnfr0fTwcz5Y9DjXLIk5FKht2EKYORi0IVU6tOYQTEYTmWZrdWRKbqgcRM5AegwkSXGoymSjqVsJIVmm/esDXkGvJfp3yEZkHYd5VISqFqsYY+OtLk2nBtU5aerIHs7cAu/n8EVkHlJ74kKHnZr7+QC4xhnC9ebk7umHRbB86YOd7rGcIbngSPNjVmyqCqrq1QxwNTmwmcEA5onR/yBgdxbStmW6gPOig9CXk0c1FrteUQOZ66Z9vIpE9SO5HfI3SjCtn/2gAHaEhWZsbDGBw+MeS/B1Z7XLq+psMacUXCJ/R5dYDj+n
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(346002)(136003)(396003)(376002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(316002)(66946007)(122000001)(5660300002)(91956017)(110136005)(4326008)(38100700002)(2616005)(478600001)(8676002)(66476007)(6486002)(64756008)(8936002)(76116006)(54906003)(66556008)(66446008)(4744005)(71200400001)(6506007)(6512007)(2906002)(41300700001)(38070700009)(36756003)(53546011)(31686004)(31696002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ZjhsaUtYMnVoeDN5TjdmUHNJaUhaeE5pS3VpbXpQbVhET1FsLzZRZy9KRzdi?=
+ =?utf-8?B?UXNVQmkyWXV3MmhMbXNSTjlCNm8xeWMyTUpjQ1JyWElTM1I0RnNYdW1xMS83?=
+ =?utf-8?B?ZHVCWktRL29vUGg1RmQ4anozWWJBNm0wUnJGbGViRmVFN2phcnQwbGVmOERT?=
+ =?utf-8?B?WjBQcVZjZjk3ZXF1V0k5ZWZ4MEo0clJsMGdkV3VaamZYaWpFWnp3M1ZpMmxV?=
+ =?utf-8?B?OHNtMkxWZHB5cXpkZUI5dFFrUW9HYzZBb1dadW1BSWhpVEt1a0E3TlVZZk85?=
+ =?utf-8?B?Wk93S2Y1NVlNRFNnUUZKdk5sVHgrTXV3S09XZVROWmk2RUR1cjdqUlNobFVm?=
+ =?utf-8?B?NkNWdGEyQ051L1g1bjVuMmhrRWo5dVNKOXozKysvblNOT05ET0tsTWlITmwx?=
+ =?utf-8?B?VU02MWJKNVR4MlBsWFQvSS9weUt6eERlU05mNVgvNWJCSFNTcFdodUNsUjJy?=
+ =?utf-8?B?TDVQdEFOVmxuMGE0MDNrbU1vWWRMN3ljZ0tlWkpzQTZyN2dCVmpZM3E1Vlh1?=
+ =?utf-8?B?MXN6a0l3WXpvRzh0dHBvaGM4SHRxRnhuaDMwR0xBeDQ1VHlodmNWSzRQRUUz?=
+ =?utf-8?B?eVdEdHp4TmtPdG1Pd1NhazNmZHIwWkozVHQvV3Yyd3B0MVp1OGRQK2M4bFRh?=
+ =?utf-8?B?R1U4ZXhqUW5naDQ1WHUxM3RYU1MweHRIY1pkdERvUGlraGxNMHZnQS8wOHp0?=
+ =?utf-8?B?VHVCR1hhUE9uWWRRWGZRS1Q2YjZaOVJ6UHJCWHpMYUFLUS9CNVVLRHI0M3Zr?=
+ =?utf-8?B?bVp3YU1xZUlmaVVSZC96ZmRsYndCSjFidlV5dkVuTUVLaXdQb2dPWVc0YjQ0?=
+ =?utf-8?B?aGZXTWJjTEJIUHh6aHdRd3RQMFkxWUxLWlY5YTlHMkVXYmFENENnVnlCai9w?=
+ =?utf-8?B?aG50SzNIWWQyMkxIUDJFNzFyN2M0c0t6ZkpNT0ExSHFtTFZXWmhneU1Ob293?=
+ =?utf-8?B?OHl0Q2lnL3hrVUQ5WktndU9PRnIyNk9hUFVkdTU2S1J4dXFPVW8yRkY1WlBh?=
+ =?utf-8?B?K2xXY1ZnMDc3eUJiSzE5b3YyMWRUOEZGWUJSTFhyT01QcVZ6WjlweURLR3Jx?=
+ =?utf-8?B?Z1U5aERFWUh3NEdZY3VtQmhNU1VqUGt1dGdjYTNtTFhqRk5MZUZrc2lWWnJI?=
+ =?utf-8?B?U1dMWVJQZmw1SkJlNlVyUlh4VDRFTVNRVmRjaEM3djBBY2FObWVZOTRxakdW?=
+ =?utf-8?B?MUVGazhMdko5a21zdXVkVldoV0F1MUNZcEd0azF2TE9vYVNkdDJVSjRFT0lJ?=
+ =?utf-8?B?R0xIbnhuWE1pczZsU2dod244TEdCM2IvRDFkQkVtYXpDdlllTjErNmZWNk43?=
+ =?utf-8?B?Y0h3QzcwTEhQRFZsOG1ac1J6RU1aY05JcVpIdm55SXBqalN3MjdFMElRTzhP?=
+ =?utf-8?B?M0ZwRitSSnU2RnRkaVVrd0xBdWdEOTk1QkJPeEZCWFNlV1Mwd2poajFpL0VF?=
+ =?utf-8?B?N0NyOGRLSzlWZ28zd05UYW4rWGRPVVltNCtCMlhNdzlXQWhZeiszVUs4TVFU?=
+ =?utf-8?B?aytUVmdoOThKVHRXeWZVOVdUeGhRYWNDUEJmbExNZVV0V2xrS2xPeXdyWWkw?=
+ =?utf-8?B?Q3I1cVQ1dG5jdWJNdm90T3JUT3NNUWxudnVIMEFNckJSWEJSNkVERlVmZE9G?=
+ =?utf-8?B?Y1RyUS9rWERBT0NBNWIxMy9PaXppSDdQV1R1akE2REFJalJSWFJ1cnJMdlhp?=
+ =?utf-8?B?SUtqK0dxeHBFUGs3ZW52ckY5TWxENUhucHNEd0YyNkVkQjJ3OUIxRmlDUDJS?=
+ =?utf-8?B?dmljOEZLWnJISHJhMkk1NkpERitnemdKZ0tHN1VrNzIxMmZ6STlTNHFvbE5y?=
+ =?utf-8?B?NWRxTzBXN2ExVmZJdDRJWXRDMitLaVl1RUt3V0Qyd1U0eGtsb1BLUzhSUm92?=
+ =?utf-8?B?VzdBUXBycG1LTCtJeVA1L1VPYXpiUmlXN3BPVUFOZGxITXU3UnkxUHY5Wjcy?=
+ =?utf-8?B?THlwc0hFS3ZPYkVETkZGckFsdS9tcWVzeGMveHhQenZKcTBva0FabWdrVDNl?=
+ =?utf-8?B?MzhzaHlqWVgzbllKeWdiZUlKdlRLckpXdVRPSUV3SFpXeDBiV1ZDNDlOUHN4?=
+ =?utf-8?B?OHliRWgxVUV3dEtDb1l6aVdzMWQ2Q1V3SnNZYjNVd2RITVJSTjJjaG9QS0ZE?=
+ =?utf-8?B?Mnpmb2U4dUhZMDhaUGdjVmhKaTZaRFhtS1ZVbjNlRE1Zb2ROUGZRdVZOV3F1?=
+ =?utf-8?Q?toXBYepbPV3fbyKpyb/VtqwkADW4rNjRc+GwmLFKYMru?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <84F5466870796B42B6E00163BD9D3D24@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1706654228-17180-16-git-send-email-wufan@linux.microsoft.com>
- <6ac3cca9d1d3505f3ed9c7196512f2db@paul-moore.com> <05cb5f03-9236-47b7-8dd4-1741c289efdc@linux.microsoft.com>
-In-Reply-To: <05cb5f03-9236-47b7-8dd4-1741c289efdc@linux.microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 6 Feb 2024 16:53:23 -0500
-Message-ID: <CAHC9VhS3Yb9QE3spJjFn2Mef-6m5Jxk6Yr80O1VkLp-yudp62w@mail.gmail.com>
-Subject: Re: [PATCH RFC v12 15/20] ipe: add support for dm-verity as a trust provider
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, 
-	tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, 
-	snitzer@kernel.org, eparis@redhat.com, linux-doc@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org, 
-	dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6469ce06-7e4a-410d-442b-08dc2766956e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2024 22:54:32.6316
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DR2b1jZlbptZTriJboj1vIZU9bfizYXYvsYGw1CAc28yFzKiOdbPkXnHfZA2Wkl2GfBo/fHdyRBtjnsjJfZzPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5642
 
-On Mon, Feb 5, 2024 at 6:11=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> w=
-rote:
-> On 2/3/2024 2:25 PM, Paul Moore wrote:
-> > On Jan 30, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
-> >>
-> >> Allows author of IPE policy to indicate trust for a singular dm-verity
-> >> volume, identified by roothash, through "dmverity_roothash" and all
-> >> signed dm-verity volumes, through "dmverity_signature".
-> >>
-> >> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> >> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> >> ---
-> >> v2:
-> >>    + No Changes
-> >>
-> >> v3:
-> >>    + No changes
-> >>
-> >> v4:
-> >>    + No changes
-> >>
-> >> v5:
-> >>    + No changes
-> >>
-> >> v6:
-> >>    + Fix an improper cleanup that can result in
-> >>      a leak
-> >>
-> >> v7:
-> >>    + Squash patch 08/12, 10/12 to [11/16]
-> >>
-> >> v8:
-> >>    + Undo squash of 08/12, 10/12 - separating drivers/md/ from securit=
-y/
-> >>      & block/
-> >>    + Use common-audit function for dmverity_signature.
-> >>    + Change implementation for storing the dm-verity digest to use the
-> >>      newly introduced dm_verity_digest structure introduced in patch
-> >>      14/20.
-> >>
-> >> v9:
-> >>    + Adapt to the new parser
-> >>
-> >> v10:
-> >>    + Select the Kconfig when all dependencies are enabled
-> >>
-> >> v11:
-> >>    + No changes
-> >>
-> >> v12:
-> >>    + Refactor to use struct digest_info* instead of void*
-> >>    + Correct audit format
-> >> ---
-> >>   security/ipe/Kconfig         |  18 ++++++
-> >>   security/ipe/Makefile        |   1 +
-> >>   security/ipe/audit.c         |  37 ++++++++++-
-> >>   security/ipe/digest.c        | 120 +++++++++++++++++++++++++++++++++=
-++
-> >>   security/ipe/digest.h        |  26 ++++++++
-> >>   security/ipe/eval.c          |  90 +++++++++++++++++++++++++-
-> >>   security/ipe/eval.h          |  10 +++
-> >>   security/ipe/hooks.c         |  67 +++++++++++++++++++
-> >>   security/ipe/hooks.h         |   8 +++
-> >>   security/ipe/ipe.c           |  15 +++++
-> >>   security/ipe/ipe.h           |   4 ++
-> >>   security/ipe/policy.h        |   3 +
-> >>   security/ipe/policy_parser.c |  26 +++++++-
-> >>   13 files changed, 421 insertions(+), 4 deletions(-)
-> >>   create mode 100644 security/ipe/digest.c
-> >>   create mode 100644 security/ipe/digest.h
-> >>
-> >> diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
-> >> index ac4d558e69d5..7afb1ce0cb99 100644
-> >> --- a/security/ipe/Kconfig
-> >> +++ b/security/ipe/Kconfig
-> >> @@ -8,6 +8,7 @@ menuconfig SECURITY_IPE
-> >>      depends on SECURITY && SECURITYFS && AUDIT && AUDITSYSCALL
-> >>      select PKCS7_MESSAGE_PARSER
-> >>      select SYSTEM_DATA_VERIFICATION
-> >> +    select IPE_PROP_DM_VERITY if DM_VERITY && DM_VERITY_VERIFY_ROOTHA=
-SH_SIG
-> >>      help
-> >>        This option enables the Integrity Policy Enforcement LSM
-> >>        allowing users to define a policy to enforce a trust-based acce=
-ss
-> >> @@ -15,3 +16,20 @@ menuconfig SECURITY_IPE
-> >>        admins to reconfigure trust requirements on the fly.
-> >>
-> >>        If unsure, answer N.
-> >> +
-> >> +if SECURITY_IPE
-> >> +menu "IPE Trust Providers"
-> >> +
-> >> +config IPE_PROP_DM_VERITY
-> >> +    bool "Enable support for dm-verity volumes"
-> >> +    depends on DM_VERITY && DM_VERITY_VERIFY_ROOTHASH_SIG
-> >> +    help
-> >> +      This option enables the properties 'dmverity_signature' and
-> >> +      'dmverity_roothash' in IPE policy. These properties evaluates
-> >> +      to TRUE when a file is evaluated against a dm-verity volume
-> >> +      that was mounted with a signed root-hash or the volume's
-> >> +      root hash matches the supplied value in the policy.
-> >> +
-> >> +endmenu
-> >> +
-> >> +endif
-> >> diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-> >> index 2279eaa3cea3..66de53687d11 100644
-> >> --- a/security/ipe/Makefile
-> >> +++ b/security/ipe/Makefile
-> >> @@ -6,6 +6,7 @@
-> >>   #
-> >>
-> >>   obj-$(CONFIG_SECURITY_IPE) +=3D \
-> >> +    digest.o \
-> >>      eval.o \
-> >>      hooks.o \
-> >>      fs.o \
-> >> diff --git a/security/ipe/audit.c b/security/ipe/audit.c
-> >> index ed390d32c641..a4ad8e888df0 100644
-> >> --- a/security/ipe/audit.c
-> >> +++ b/security/ipe/audit.c
-> >> @@ -13,6 +13,7 @@
-> >>   #include "hooks.h"
-> >>   #include "policy.h"
-> >>   #include "audit.h"
-> >> +#include "digest.h"
-> >>
-> >>   #define ACTSTR(x) ((x) =3D=3D IPE_ACTION_ALLOW ? "ALLOW" : "DENY")
-> >>
-> >> @@ -54,8 +55,30 @@ static const char *const audit_prop_names[__IPE_PRO=
-P_MAX] =3D {
-> >>      "boot_verified=3DFALSE",
-> >>      "boot_verified=3DTRUE",
-> >>   #endif /* CONFIG_BLK_DEV_INITRD */
-> >> +#ifdef CONFIG_IPE_PROP_DM_VERITY
-> >> +    "dmverity_roothash=3D",
-> >> +    "dmverity_signature=3DFALSE",
-> >> +    "dmverity_signature=3DTRUE",
-> >> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
-> >>   };
-> >>
-> >> +#ifdef CONFIG_IPE_PROP_DM_VERITY
-> >> +/**
-> >> + * audit_dmv_roothash - audit a roothash of a dmverity volume.
-> >> + * @ab: Supplies a pointer to the audit_buffer to append to.
-> >> + * @rh: Supplies a pointer to the digest structure.
-> >> + */
-> >> +static void audit_dmv_roothash(struct audit_buffer *ab, const void *r=
-h)
-> >> +{
-> >> +    audit_log_format(ab, "%s", audit_prop_names[IPE_PROP_DMV_ROOTHASH=
-]);
-> >> +    ipe_digest_audit(ab, rh);
-> >> +}
-> >> +#else
-> >> +static void audit_dmv_roothash(struct audit_buffer *ab, const void *r=
-h)
-> >> +{
-> >> +}
-> >> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
-> >
-> > I talked about this back in my review of the v11 patchset and I'm
-> > guessing you may have missed it ... the problem with the above code is
-> > that the fields in an audit record should remain constant, even if
-> > there is no data for that particular field.  In cases where there is no
-> > data to record for a given field, a "?" should be used as the field's
-> > value, for example:
-> >
-> >    dmverify_roothash=3D?
-> >
-> > My guess is that you would want to do something like this:
-> >
-> >    #else  /* !CONFIG_IPE_PROP_DM_VERITY */
-> >    static void audit_dmv_roothash(...)
-> >    {
-> >      audit_log_format(ab, "%s=3D?", audit_prop_names[...]);
-> >    }
-> >    #endif /* CONFIG_IPE_PROP_DM_VERITY */
-> >
-> > --
-> > paul-moore.com
->
-> These code are used for auditing a policy rule, which the parser will
-> guarantee the property will always have a valid value. The comments
-> might be misleading which sounds like it's auditing a file's state. I
-> will correct them.
->
-> Also as we previously discussed, the policy grammar shouldn't depend on
-> any kernel switch so these preprocessor statement will be removed.
->
-> However, as an audit record should remain constant, I guess we should do
-> some special treatment to anonymous files? Like audit record for them
-> should include "path=3D? dev=3D? ino=3D?"
-
-Yes, if the record type includes those fields just once, the record
-type should *always* include those fields.
-
---=20
-paul-moore.com
+T24gMi82LzIwMjQgNToxNiBBTSwgRGFuaWVsIFdhZ25lciB3cm90ZToNCj4gVGhlIHN5bnRheCBm
+b3IgbG9jYWwgdmFyaWFibGVzIGRlY2xhcmF0aW9ucyB1c2VzIHdoaXRlc3BhY2UgYXMgc2VwYXJh
+dG9yDQo+IGFuZCBub3QgY29tbWFzOg0KPiANCj4gdGVzdHMvbnZtZS8wMjk6IGxpbmUgMjQ6IGxv
+Y2FsOiBgYnMsJzogbm90IGEgdmFsaWQgaWRlbnRpZmllcg0KPiB0ZXN0cy9udm1lLzAyOTogbGlu
+ZSAyNDogbG9jYWw6IGBzaXplLCc6IG5vdCBhIHZhbGlkIGlkZW50aWZpZXINCj4gdGVzdHMvbnZt
+ZS8wMjk6IGxpbmUgMjQ6IGxvY2FsOiBgaW1nLCc6IG5vdCBhIHZhbGlkIGlkZW50aWZpZXINCj4g
+DQo+IFNpZ25lZC1vZmYtYnk6IERhbmllbCBXYWduZXIgPGR3YWduZXJAc3VzZS5kZT4NCg0KTG9v
+a3MgZ29vZC4NCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBLdWxrYXJuaSA8a2NoQG52aWRpYS5j
+b20+DQoNCi1jaw0KDQoNCg==
