@@ -1,86 +1,275 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2BA1BF2A;
-	Tue,  6 Feb 2024 21:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7381B972
+	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 21:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707254416; cv=none; b=orziJtgSYSY9ksbYbu67V61zhJzR70vTOE/Gq3coPDBbyQs1XFMiXdq15O0FpNPEnxijDR1YEaaoKYRmllusNsUhaWmUNt/x+/GZ02mbalolBW01w7eMgjqQhyLPPiIGyTxUf7RIGxnPP0AtQubeEwVmaVWBo131iLlpbVA3lz8=
+	t=1707256418; cv=none; b=lO/r8gpjvEqRfGgnQy8BdAaQek4KNjoxrK1T7KFjit3hse8bWwuogynzDmg6qozDob+7t6ncqiKUss3DdfLfCXFHzqBHDT+uXHbtVOTVkhwcKPV1RhLSOJPM/vZ22V7Jx8+WxlVGBf7r1LaU81v9PY1Q+MkIGzk2oBJShfVt/bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707254416; c=relaxed/simple;
-	bh=VmSgp+63oRXrwJQrAP0cd+6cguoeR3YBtDiu9iIrJYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y0e44rzKUcL6HJkMAn7zs/aEvKU1pXHEVuHTkXlsNNPoqAgo9qKlallPL7wjvx9vTi20ByAorygqe5StQt3a27M9f/u3oHkoFyQpTTb1P/fFOTPecCAmTpLTr7yoEO5+17cC5vFHyA7bP01F0Z00gEGzIhbyE5U5enj6gYL3Y60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5ca29c131ebso5514941a12.0;
-        Tue, 06 Feb 2024 13:20:15 -0800 (PST)
+	s=arc-20240116; t=1707256418; c=relaxed/simple;
+	bh=lEXEftvc8USQ5Sq5o5lp81iZXZA1RVqdMSS6fDyVwYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QI0zYDO3DGEpRk9Z1V/McBEUcROgmNpCdE51o+L4TzlXmbjxdjrQuKBANSpYtGiKjl/F8BCTMfIKUbR1YSZxOxiFeolhtc4nYpXNFfFxltC28y6S+jvfob2EQJWT7GB7oY+MJLXNhaZfKwKKdRNNL8wP7hVhpYqU7VI0XqjaqH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=YOrekqBm; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="YOrekqBm"
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dc6d5206f18so1449114276.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 13:53:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1707256414; x=1707861214; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E8VjUURyKl+tDea7fU1YfuA8k7lBdd08O4dfl2Z6+qs=;
+        b=YOrekqBm7lRAevzM7cbTxu7osqs2uDDeEc+pFoXzn6QV6lAHr5CJaplibVG95IRdb6
+         Oy9lnWMptMvSAPHlgft41NfLh1N82vAIq0NALTLUtBy+mH/pLPUyJ0U2FnG319MVRWn4
+         FQs0pFRzTBvCfvvQdWiL9On/vfy2VzY98dpCMKZah75NKlhcmjTcQdeipJhjQyb2fKPG
+         wUSsoubF8VN0j9ABnsWTbKrzE5Bakh5l/wlknLPQaCqqBrD1SYJhyh0gArJWIsw5gQZa
+         FygjWFOUMrPno6A4Uxw79yjVj7MdmSVerDZUXxGqz7dVMvQ63vyTAz7N5ROtznAzhNLO
+         l8Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707254415; x=1707859215;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VmSgp+63oRXrwJQrAP0cd+6cguoeR3YBtDiu9iIrJYE=;
-        b=au7k6UTsDsJ/Pkceidn5uDhl4zy3v6s9Uo0rZI/I1Tg2oQheapVd+LlYZo3FYLWdmP
-         va9c6jXDaWaHlslGlaDoPnHl0Xwgy6/y4e5peWGvSl5umr0o8p8JsD30DnvGt08CcZYJ
-         PuikQrdmq29GY3a5tWHUa7eKW/F/06xuV7vxcYsovcLFYEAXSaOLG06puGaeOub5MbgJ
-         dYm3iW39XAW0ijsB0+Onna7oKBiN1cubf5mSuGjkjP0Kv5tlyxMDCCfcwwA9pxEuNTQ2
-         NVKkSDmWXUe04Vn7arXoSWLGhz7AgjyJ0jJKqJr+S88hfNF8ar7BQpxAF3cRyZRR58LK
-         AqpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+A0SeMoox3Y0+mqwQDU1Q6fIlFHBkLIXswlShaQYJTp+HcSQ/z14CaPsGN1fc2xSQcgPVeFqa7PKVJNuwOs7jFrR38+J++Vd6ZA3p9OMZDxdh33eNMQTdOq+fwPUZDiKpShrOYq0/
-X-Gm-Message-State: AOJu0Ywz3rEQMPg9JB7OEg4R0jdqPBoSymbemYyUg9LGXkjE5qXNy3mk
-	8ORwcMoRFsi9Q6GVijCjTyhBTEKbk/FsiQdK8luUCijNn/s+xO98
-X-Google-Smtp-Source: AGHT+IE1dmlg1DJBfQqr1jxNrF1zBsdEDx8lkYpwaHXAhDXDyTCYrU6/HXa2sJ2t2VmI74L9DJJoOQ==
-X-Received: by 2002:a17:90b:480b:b0:295:a8b8:97b3 with SMTP id kn11-20020a17090b480b00b00295a8b897b3mr745099pjb.40.1707254414489;
-        Tue, 06 Feb 2024 13:20:14 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCW7XBAhxFuEe3PaxPzBa6pxXcvoCqeRNLsMRYKp/5Nd90UPdqU0nIMDtSmpc1Ofh4ffG2Cb1tjyVAxPzzUSFejEzf2N/bt9JK3kPiPU6MzweT1sj0tXgS53miUtMPdo8f7w+e3dZonPMTPdCWpy8tb04IjlJXpNSGWGLJOPoRJyAS9WhUyrFHE41rh692JAhkh7rnc0bRReRJyBobicuSKWAlhGCe7DJU5jVD+RgD364QUWM64mqvqT0Tws18BtvRnd/zDQENPJYpq9+8t8Wq49
-Received: from ?IPV6:2620:0:1000:8411:8633:8b18:c51e:4bae? ([2620:0:1000:8411:8633:8b18:c51e:4bae])
-        by smtp.gmail.com with ESMTPSA id nd8-20020a17090b4cc800b00296dd7eff41sm224974pjb.9.2024.02.06.13.20.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Feb 2024 13:20:13 -0800 (PST)
-Message-ID: <2e246189-a450-4061-b94c-73637859d073@acm.org>
-Date: Tue, 6 Feb 2024 13:20:12 -0800
+        d=1e100.net; s=20230601; t=1707256414; x=1707861214;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E8VjUURyKl+tDea7fU1YfuA8k7lBdd08O4dfl2Z6+qs=;
+        b=FHOHRm761HPqthfAAUBJ0+B2+QyqkjxWP+a4cysRXTLP8vcVA4JK7jr2CmvXbYZzzv
+         zwulMKc2GZaZBZwnHe/RaMyA6C2TNeGNvWaRWnDv8sLWgIYyESoY2WNA5Bj6qtb6DVeg
+         skQsal+KoR5xEqqdO6uRQ5Rny14UYaVF0RZM22QHJvFKPqrQSM3+beAnplAd484vh1Xa
+         U1RS65WvKQUW4OKxSlj25z4i781MqCIGJ2qz7i/F0a5hfHQyo+RC4skOi9tM9US8kF++
+         aXbEFmdI6Kii0/ibNBRTYZ+1eyB6/JDIr01z9DjA7ik5/pvtJGdfSLyZ//OhTEzief1x
+         M6BA==
+X-Gm-Message-State: AOJu0Ywf+fsfReyUlc73VMOZGraQuH3LDx+Fp+zxCpXHTba12HEkhxOy
+	cMbys6sIpi2vNhrM0/umfzou1OBVCv33rpMNRFPkSZ5iOmsUqRI3xCS2eOEWjZ1TMuICjELjCnH
+	n4Xoyu9mWUICwhX8WT7yh4+9IFNBTyQHmvaQ2
+X-Google-Smtp-Source: AGHT+IEO4hTUbTAAn40GVh6bVY5MjCMuUK0Go+sNf1Zs+luw8FRTbTUb/aYdCk/1t8fccmSNm68UjpBMUgzFkT5lF5I=
+X-Received: by 2002:a25:84d2:0:b0:dc2:32e6:d1b1 with SMTP id
+ x18-20020a2584d2000000b00dc232e6d1b1mr2686889ybm.18.1707256414268; Tue, 06
+ Feb 2024 13:53:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 25/26] block: Reduce zone write plugging memory usage
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-26-dlemoal@kernel.org>
- <09d99780-8311-4ea9-8f48-cf84043d23f6@suse.de>
- <f3a2f8b8-32d2-4e42-ba78-1f668d69033f@acm.org>
- <a324beda-7651-4881-aea9-99a339e2b9eb@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <a324beda-7651-4881-aea9-99a339e2b9eb@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <1706654228-17180-16-git-send-email-wufan@linux.microsoft.com>
+ <6ac3cca9d1d3505f3ed9c7196512f2db@paul-moore.com> <05cb5f03-9236-47b7-8dd4-1741c289efdc@linux.microsoft.com>
+In-Reply-To: <05cb5f03-9236-47b7-8dd4-1741c289efdc@linux.microsoft.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 6 Feb 2024 16:53:23 -0500
+Message-ID: <CAHC9VhS3Yb9QE3spJjFn2Mef-6m5Jxk6Yr80O1VkLp-yudp62w@mail.gmail.com>
+Subject: Re: [PATCH RFC v12 15/20] ipe: add support for dm-verity as a trust provider
+To: Fan Wu <wufan@linux.microsoft.com>
+Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, 
+	tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, 
+	snitzer@kernel.org, eparis@redhat.com, linux-doc@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org, 
+	dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Deven Bowers <deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/5/24 15:55, Damien Le Moal wrote:
-> The array of struct blk_zone_wplug for the disk is sized for the total number of
-> zones of the drive. The reason for that is that we want to retain the wp_offset
-> value for all zones, even if they are not being written. Otherwise, everytime we
-> start writing a zone, we would need to do a report zones to be able to emulate
-> zone append operations if the drive requested that.
+On Mon, Feb 5, 2024 at 6:11=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> w=
+rote:
+> On 2/3/2024 2:25 PM, Paul Moore wrote:
+> > On Jan 30, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
+> >>
+> >> Allows author of IPE policy to indicate trust for a singular dm-verity
+> >> volume, identified by roothash, through "dmverity_roothash" and all
+> >> signed dm-verity volumes, through "dmverity_signature".
+> >>
+> >> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> >> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> >> ---
+> >> v2:
+> >>    + No Changes
+> >>
+> >> v3:
+> >>    + No changes
+> >>
+> >> v4:
+> >>    + No changes
+> >>
+> >> v5:
+> >>    + No changes
+> >>
+> >> v6:
+> >>    + Fix an improper cleanup that can result in
+> >>      a leak
+> >>
+> >> v7:
+> >>    + Squash patch 08/12, 10/12 to [11/16]
+> >>
+> >> v8:
+> >>    + Undo squash of 08/12, 10/12 - separating drivers/md/ from securit=
+y/
+> >>      & block/
+> >>    + Use common-audit function for dmverity_signature.
+> >>    + Change implementation for storing the dm-verity digest to use the
+> >>      newly introduced dm_verity_digest structure introduced in patch
+> >>      14/20.
+> >>
+> >> v9:
+> >>    + Adapt to the new parser
+> >>
+> >> v10:
+> >>    + Select the Kconfig when all dependencies are enabled
+> >>
+> >> v11:
+> >>    + No changes
+> >>
+> >> v12:
+> >>    + Refactor to use struct digest_info* instead of void*
+> >>    + Correct audit format
+> >> ---
+> >>   security/ipe/Kconfig         |  18 ++++++
+> >>   security/ipe/Makefile        |   1 +
+> >>   security/ipe/audit.c         |  37 ++++++++++-
+> >>   security/ipe/digest.c        | 120 +++++++++++++++++++++++++++++++++=
+++
+> >>   security/ipe/digest.h        |  26 ++++++++
+> >>   security/ipe/eval.c          |  90 +++++++++++++++++++++++++-
+> >>   security/ipe/eval.h          |  10 +++
+> >>   security/ipe/hooks.c         |  67 +++++++++++++++++++
+> >>   security/ipe/hooks.h         |   8 +++
+> >>   security/ipe/ipe.c           |  15 +++++
+> >>   security/ipe/ipe.h           |   4 ++
+> >>   security/ipe/policy.h        |   3 +
+> >>   security/ipe/policy_parser.c |  26 +++++++-
+> >>   13 files changed, 421 insertions(+), 4 deletions(-)
+> >>   create mode 100644 security/ipe/digest.c
+> >>   create mode 100644 security/ipe/digest.h
+> >>
+> >> diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+> >> index ac4d558e69d5..7afb1ce0cb99 100644
+> >> --- a/security/ipe/Kconfig
+> >> +++ b/security/ipe/Kconfig
+> >> @@ -8,6 +8,7 @@ menuconfig SECURITY_IPE
+> >>      depends on SECURITY && SECURITYFS && AUDIT && AUDITSYSCALL
+> >>      select PKCS7_MESSAGE_PARSER
+> >>      select SYSTEM_DATA_VERIFICATION
+> >> +    select IPE_PROP_DM_VERITY if DM_VERITY && DM_VERITY_VERIFY_ROOTHA=
+SH_SIG
+> >>      help
+> >>        This option enables the Integrity Policy Enforcement LSM
+> >>        allowing users to define a policy to enforce a trust-based acce=
+ss
+> >> @@ -15,3 +16,20 @@ menuconfig SECURITY_IPE
+> >>        admins to reconfigure trust requirements on the fly.
+> >>
+> >>        If unsure, answer N.
+> >> +
+> >> +if SECURITY_IPE
+> >> +menu "IPE Trust Providers"
+> >> +
+> >> +config IPE_PROP_DM_VERITY
+> >> +    bool "Enable support for dm-verity volumes"
+> >> +    depends on DM_VERITY && DM_VERITY_VERIFY_ROOTHASH_SIG
+> >> +    help
+> >> +      This option enables the properties 'dmverity_signature' and
+> >> +      'dmverity_roothash' in IPE policy. These properties evaluates
+> >> +      to TRUE when a file is evaluated against a dm-verity volume
+> >> +      that was mounted with a signed root-hash or the volume's
+> >> +      root hash matches the supplied value in the policy.
+> >> +
+> >> +endmenu
+> >> +
+> >> +endif
+> >> diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+> >> index 2279eaa3cea3..66de53687d11 100644
+> >> --- a/security/ipe/Makefile
+> >> +++ b/security/ipe/Makefile
+> >> @@ -6,6 +6,7 @@
+> >>   #
+> >>
+> >>   obj-$(CONFIG_SECURITY_IPE) +=3D \
+> >> +    digest.o \
+> >>      eval.o \
+> >>      hooks.o \
+> >>      fs.o \
+> >> diff --git a/security/ipe/audit.c b/security/ipe/audit.c
+> >> index ed390d32c641..a4ad8e888df0 100644
+> >> --- a/security/ipe/audit.c
+> >> +++ b/security/ipe/audit.c
+> >> @@ -13,6 +13,7 @@
+> >>   #include "hooks.h"
+> >>   #include "policy.h"
+> >>   #include "audit.h"
+> >> +#include "digest.h"
+> >>
+> >>   #define ACTSTR(x) ((x) =3D=3D IPE_ACTION_ALLOW ? "ALLOW" : "DENY")
+> >>
+> >> @@ -54,8 +55,30 @@ static const char *const audit_prop_names[__IPE_PRO=
+P_MAX] =3D {
+> >>      "boot_verified=3DFALSE",
+> >>      "boot_verified=3DTRUE",
+> >>   #endif /* CONFIG_BLK_DEV_INITRD */
+> >> +#ifdef CONFIG_IPE_PROP_DM_VERITY
+> >> +    "dmverity_roothash=3D",
+> >> +    "dmverity_signature=3DFALSE",
+> >> +    "dmverity_signature=3DTRUE",
+> >> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+> >>   };
+> >>
+> >> +#ifdef CONFIG_IPE_PROP_DM_VERITY
+> >> +/**
+> >> + * audit_dmv_roothash - audit a roothash of a dmverity volume.
+> >> + * @ab: Supplies a pointer to the audit_buffer to append to.
+> >> + * @rh: Supplies a pointer to the digest structure.
+> >> + */
+> >> +static void audit_dmv_roothash(struct audit_buffer *ab, const void *r=
+h)
+> >> +{
+> >> +    audit_log_format(ab, "%s", audit_prop_names[IPE_PROP_DMV_ROOTHASH=
+]);
+> >> +    ipe_digest_audit(ab, rh);
+> >> +}
+> >> +#else
+> >> +static void audit_dmv_roothash(struct audit_buffer *ab, const void *r=
+h)
+> >> +{
+> >> +}
+> >> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+> >
+> > I talked about this back in my review of the v11 patchset and I'm
+> > guessing you may have missed it ... the problem with the above code is
+> > that the fields in an audit record should remain constant, even if
+> > there is no data for that particular field.  In cases where there is no
+> > data to record for a given field, a "?" should be used as the field's
+> > value, for example:
+> >
+> >    dmverify_roothash=3D?
+> >
+> > My guess is that you would want to do something like this:
+> >
+> >    #else  /* !CONFIG_IPE_PROP_DM_VERITY */
+> >    static void audit_dmv_roothash(...)
+> >    {
+> >      audit_log_format(ab, "%s=3D?", audit_prop_names[...]);
+> >    }
+> >    #endif /* CONFIG_IPE_PROP_DM_VERITY */
+> >
+> > --
+> > paul-moore.com
+>
+> These code are used for auditing a policy rule, which the parser will
+> guarantee the property will always have a valid value. The comments
+> might be misleading which sounds like it's auditing a file's state. I
+> will correct them.
+>
+> Also as we previously discussed, the policy grammar shouldn't depend on
+> any kernel switch so these preprocessor statement will be removed.
+>
+> However, as an audit record should remain constant, I guess we should do
+> some special treatment to anonymous files? Like audit record for them
+> should include "path=3D? dev=3D? ino=3D?"
 
-We do not need to track wp_offset for empty zones nor for full zones. The data
-structure with plug information would become a lot smaller if it only tracks
-information for zones that are neither empty nor full. If a zone append is
-submitted to a zone and no information is being tracked for that zone, we can
-initialize wp_offset to zero. That may not match the actual write pointer if
-the zone is full but that shouldn't be an issue since write appends submitted
-to a zone that is full fail anyway.
+Yes, if the record type includes those fields just once, the record
+type should *always* include those fields.
 
-Thanks,
-
-Bart.
+--=20
+paul-moore.com
