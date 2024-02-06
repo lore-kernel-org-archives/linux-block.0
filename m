@@ -1,93 +1,145 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FCF12E1E4
-	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 10:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975E31EA6E
+	for <linux-block@vger.kernel.org>; Tue,  6 Feb 2024 11:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707215028; cv=none; b=jx2SsBfqm48vvQhjUuPJzuDFV2TrdFIbjOnqSjVNujQ97vSu8GRN2nx97NsTcteCE3PM4eOfd+WOek/CTPS9zcasfTJyJK9fimmajBg4ewKdVP4ZK8NeY4gpGVRMbZYdccGvIwate9ySpIS/i+12IJzb7HDceBXsVadgZ8x0Irc=
+	t=1707218060; cv=none; b=ilA64yUHhJf22kEZpr+chnF1zp6cf2VQNeTJhI09sDMee+BASJEWcFfd1aTLMrucvwT0o/apGg4Z4O2Nxg4aG1NOZsHo7vmH4hMfO3BqsgydTcB30eIw9jYIezyXypLigcF2hj6/sWyfXg9colJ+dIER/V9kLZZBme5Qj5At2H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707215028; c=relaxed/simple;
-	bh=JQc7I9dtacgIh6dzApcTtL71VyIWn4aWCD9+Rsus/uU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OIqSoo4tjjX9Mow8PZmwEV9QbDx93TDg8r6IfuhOdW7odKiuag7cgCDAUxXDoAt/BEf3gypT+luDeJlzWN/RPOdEvdNPJMtLrggLTDDPOqzZPijqZ3E3LqoHDaydNoO1J/YcnEPDQ2a1s2IEmfySrAuwOtjPjneL0YCyheFecJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AfwUCx/D; arc=none smtp.client-ip=209.85.221.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1707218060; c=relaxed/simple;
+	bh=y6F0YZtvx+4ZqKYpfCHwiZ4vBkwy8kELU1jZ2jjQgvU=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=DnYWXOM4IZIW2gUtVLDStHs4l7CExLfnexM0oJMSfdQsTGkB+Ih/K8Bvz8y8Bcxt0dRFI5yGpUI1jYq6ei9WL/h/v3utTNBLKHRqylB4DyPJwNAFJULumwZrg41+FLSAai6BmLz+xUXN2Cn2WEuZmWnwajmFmJCilkxaj5ZuVus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gtuMpZuT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AfwUCx/D"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4c02bdc2892so183254e0c.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 02:23:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707215026; x=1707819826; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DvZiY9ihexG/Lq+UzYShBWDLaHBQcaLwobbBS4o9zoI=;
-        b=AfwUCx/DJRNaiaKS1iipnlPsd5rZMmrz3I0s+8EEhKEvO4fZfrHxyhbJE3BovUA43g
-         9tpanRMVnVovsVs3uMjdIu3BWWQRlDzKwCEQa8NaLkKDHYmX+l4DiEJscEkTeSynMpdq
-         OOoiFliI+RBOdL6G2hSQpVC9qiI8wPPo+sNZeHE5Ebp+V5AiUEcHGcFQXl8dJylkzs2l
-         Gogs5RDRwN09qnCUXn9vG32/kXPxcO78z+ipLk8WsqQvi9Knni5kArfFxxxWkndCrdDH
-         Ugju7rBdGrXx5U4xXLXZPUydxBc27pQKhw1DvuXULYMuTlmqPVLF/DG+A+3lo7CJ0Cuh
-         rf6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707215026; x=1707819826;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DvZiY9ihexG/Lq+UzYShBWDLaHBQcaLwobbBS4o9zoI=;
-        b=f4Izq1TtE/zQXTyteFiqao1C9lda//T0K3/J8jObiOQpdaS1HBHt+IbyZYbcDgvRm2
-         SRZZOKsY4gj8A/5lZhy+2ZVoj+toiebdqFOU5+kCuD9ygcp8ZwX4uMs1GZl3jPsqL5qQ
-         Eaz5lMbE1kj7VV9m8bIJOwQcSYK1K7EWPrEjzYiuqsF/ZlPaFfhkMl5JMH/jEl6nSuj5
-         OGYlXao2Aam9/TLi/IExm6DoR2mXgse6eyeP+t4wX2r17WuOhR7qFOT2Q6zxcyXyVSZf
-         OecPdZy3VtvaxNiQug6HWY0nwnywlEdwZukpwW2Jac0YeHXqohhxkRKPIXQLxiJ7Nz7A
-         Z84g==
-X-Gm-Message-State: AOJu0Yzxn41osfY7lF4DCVB0KgQJWU2VwQUtLYXzHOSj+KXYfYvm+/8U
-	kMS/yL/ZpEZdl86NsGYXwY/LX924tKkTEtkk59q5Lmj6Q6C4X25n+prVnobPMt33l/rMqXrrvhc
-	kP43nLx7e/FF69+nfd20KlBkx4c6DrXC+wVPlzw==
-X-Google-Smtp-Source: AGHT+IGfDOnd2EhP4TWByrQOkcid9KL+1EpEAi8LxcA+nJejScdKhoTZckC004/fc+VBarRks/cvEIzLg7CHcNC2TZ8=
-X-Received: by 2002:a05:6122:17a8:b0:4b9:e8bd:3b2 with SMTP id
- o40-20020a05612217a800b004b9e8bd03b2mr1876525vkf.2.1707215025681; Tue, 06 Feb
- 2024 02:23:45 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtuMpZuT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707218057;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=/ntzNpz+6Sgq7AVWsy2aHZ0gba7Y0+eYt9MHdhSDVMs=;
+	b=gtuMpZuTsyRz2pdKFG74K9yVvF8onQZFRjCUb68T+Ng7fJdeWS5Ge937pALZtIQ5lLAd3u
+	JoBtoRjHZl44Nbi68RbbngJYW6qTm7v1/Yzazkpuk+WdKWA60QCfG+UVODW3fPEfwLw/WM
+	yh0+yI0xtxDvviflR6J4JyrwbTMbSiA=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-504-nT3IX-KJNZ-FglI_WAgiAw-1; Tue,
+ 06 Feb 2024 06:14:16 -0500
+X-MC-Unique: nT3IX-KJNZ-FglI_WAgiAw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3CEFA1C068D6;
+	Tue,  6 Feb 2024 11:14:15 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B5B94AC18;
+	Tue,  6 Feb 2024 11:14:14 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id 9437530C1B8F; Tue,  6 Feb 2024 11:14:14 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 901703FB4E;
+	Tue,  6 Feb 2024 12:14:14 +0100 (CET)
+Date: Tue, 6 Feb 2024 12:14:14 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
+    Christoph Hellwig <hch@lst.de>
+cc: Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>, 
+    Mark Wunderlich <mark.wunderlich@intel.com>, 
+    "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+    Helge Deller <deller@gmx.de>, John David Anglin <dave.anglin@bell.net>, 
+    linux-block@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: [PATCH] block: use the __packed attribute only on architectures
+ where it is efficient
+Message-ID: <78172b8-74bc-1177-6ac7-7a7e7a44d18@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+G9fYttTwsbFuVq10igbSvP5xC6bf_XijM=mpUqrJV=uvUirQ@mail.gmail.com>
- <20240206101529.orwe3ofwwcaghqvz@quack3>
-In-Reply-To: <20240206101529.orwe3ofwwcaghqvz@quack3>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 6 Feb 2024 15:53:34 +0530
-Message-ID: <CA+G9fYup=QzTAhV2Bh_p8tujUGYNzGYKBHXkcW7jhhG6QFUo_g@mail.gmail.com>
-Subject: Re: next: /dev/root: Can't open blockdev
-To: Jan Kara <jack@suse.cz>
-Cc: linux-block <linux-block@vger.kernel.org>, 
-	Linux-Next Mailing List <linux-next@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	Linux Regressions <regressions@lists.linux.dev>, linux-fsdevel@vger.kernel.org, 
-	lkft-triage@lists.linaro.org, Arnd Bergmann <arnd@arndb.de>, 
-	Christian Brauner <brauner@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On Tue, 6 Feb 2024 at 15:45, Jan Kara <jack@suse.cz> wrote:
->
-> On Tue 06-02-24 14:41:17, Naresh Kamboju wrote:
-> > All qemu's mount rootfs failed on Linux next-20230206 tag due to the following
-> > kernel crash.
-> >
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> >
-> > Crash log:
-> > ---------
-> > <3>[    3.257960] /dev/root: Can't open blockdev
-> > <4>[    3.258940] VFS: Cannot open root device "/dev/sda" or
-> > unknown-block(8,0): error -16
->
-> Uhuh, -16 is EBUSY so it seems Christian's block device opening changes are
-> suspect? Do you have some sample kconfig available somewhere?
+The __packed macro (expanding to __attribute__((__packed__))) specifies
+that the structure has an alignment of 1. Therefore, it may be arbitrarily
+misaligned. On architectures that don't have hardware support for
+unaligned accesses, gcc generates very inefficient code that accesses the
+structure fields byte-by-byte and assembles the result using shifts and
+ors.
 
-All build information is in this url,
-https://storage.tuxsuite.com/public/linaro/lkft/builds/2byqguFVp7MYAEjKo6nJGba2FcP/
+For example, on PA-RISC, this function is compiled to 23 instructions with
+the __packed attribute and only 2 instructions without the __packed
+attribute.
 
-- Naresh
+This commit changes the definition of 'struct bvec_iter', so that it only
+uses the __packed attribute on architectures where unaligned access is
+efficient.
+
+sector_t get_sector(struct bvec_iter *iter)
+{
+        return iter->bi_sector;
+}
+
+with __packed:
+
+0000000000000000 <get_sector>:
+   0:   0f 40 10 1f     ldb 0(r26),r31
+   4:   0f 42 10 1c     ldb 1(r26),ret0
+   8:   f3 ff 0b 18     depd,z,* r31,7,8,r31
+   c:   f3 9c 0a 10     depd,z,* ret0,15,16,ret0
+  10:   0b fc 02 5c     or ret0,r31,ret0
+  14:   0f 44 10 15     ldb 2(r26),r21
+  18:   0f 46 10 14     ldb 3(r26),r20
+  1c:   f2 b5 09 08     depd,z,* r21,23,24,r21
+  20:   0f 48 10 13     ldb 4(r26),r19
+  24:   0b 95 02 55     or r21,ret0,r21
+  28:   0f 4a 10 1f     ldb 5(r26),r31
+  2c:   f2 94 08 00     depd,z,* r20,31,32,r20
+  30:   0f 4c 10 1c     ldb 6(r26),ret0
+  34:   0f 4e 10 16     ldb 7(r26),r22
+  38:   0a b4 02 54     or r20,r21,r20
+  3c:   f2 73 13 18     depd,z,* r19,39,40,r19
+  40:   f3 ff 12 10     depd,z,* r31,47,48,r31
+  44:   0a 93 02 53     or r19,r20,r19
+  48:   f3 9c 11 08     depd,z,* ret0,55,56,ret0
+  4c:   0a 7f 02 5f     or r31,r19,r31
+  50:   0b fc 02 5c     or ret0,r31,ret0
+  54:   e8 40 d0 00     bve (rp)
+  58:   0b 96 02 5c     or r22,ret0,ret0
+  5c:   00 00 00 00     break 0,0
+
+without __packed:
+
+0000000000000000 <get_sector>:
+   0:   e8 40 d0 00     bve (rp)
+   4:   0f 40 10 dc     ldd 0(r26),ret0
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Fixes: 19416123ab3e ("block: define 'struct bvec_iter' as packed")
+Cc: stable@vger.kernel.org	# v5.16+
+
+---
+ include/linux/bvec.h |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+Index: linux-2.6/include/linux/bvec.h
+===================================================================
+--- linux-2.6.orig/include/linux/bvec.h	2023-09-05 14:46:02.000000000 +0200
++++ linux-2.6/include/linux/bvec.h	2024-02-06 11:49:56.000000000 +0100
+@@ -83,7 +83,11 @@ struct bvec_iter {
+ 
+ 	unsigned int            bi_bvec_done;	/* number of bytes completed in
+ 						   current bvec */
+-} __packed;
++}
++#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
++__packed
++#endif
++;
+ 
+ struct bvec_iter_all {
+ 	struct bio_vec	bv;
+
