@@ -1,103 +1,162 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078C6208B2
-	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 09:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EACF20DFA;
+	Wed,  7 Feb 2024 09:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707296945; cv=none; b=lYyQ5a07p0/3v7l1eb+pD+NgAQNypFeM01AOtSW8h/z/zdgLxIqg6jvrlpRcI+1SB6apJLJDWPJLyKmCeOWJh3A3MFyhClTDPkZShFnTbunk2zULnGqzuSpGF5oAhV+dw30L1Lgog9p1YlQpZUZlQHz1SUT1HHOwK65JUSyHbB8=
+	t=1707298374; cv=none; b=tzSbRHUNkc1Gt9RoQYIC8V/T+mAZPCsMXqTClxtPUqLkhRzZq/62pM8wIygUQfTUlSB+yIheLTS+iit2Aj+RepSdAXSRDNcVmfF/amB8gNjphF0DG7VNDFPNKQaIoTBjsxbdIpaIaxLi5cGHlwTGff9ibmFIaxcYES/A0i301hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707296945; c=relaxed/simple;
-	bh=xyb6XSX2rw0cO0dtyv7Tbh7XPxohWY4se8HFD4IGFIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gnj+X727msrIXsMzfqrS+da+uBFvkbg5W7WwoRASs293g7bpSSkIsw2dk9fAYCdrWrJnWfFL0187whzWvuQFaWdKTjhyUjYCSZ0yjcmqzAcWzPdFLuhItQ21dxBaokGqAu8AumAkBMXFqyMToGpvqgFiulxEJ1appTBAmXfUcj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=iuJEcJah; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iuJEcJah"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d911c2103aso2562895ad.0
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2024 01:09:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1707296943; x=1707901743; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jODr6cxPYhr2AZCIthfN0oFS1GjHga/6A2oQsTBVDlI=;
-        b=iuJEcJahA3BvGqzogWjxgZg1evb0QA2s7V7K6hu7UP0zV0PqNaMVpIGNRvRQoYndTd
-         xwJlBuoBBGSvfMQ2wCIlrf7KkYTPSIjFtVgMkbUd1kjHAf4xET1eNn6vrS0G9kob4LuC
-         EjaK+lHQ/raUhQaDahpuCEKhEEwdJQxxC8BH8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707296943; x=1707901743;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jODr6cxPYhr2AZCIthfN0oFS1GjHga/6A2oQsTBVDlI=;
-        b=jZdH++gxyFINYRcMuddzx6IkQx545OfDXJycI876Zi2k1jSPD34RdN4+Ho3wEOJz/N
-         iQuWrv9d/uBrjOb7nDAeE3CamDU6HGYje1SLvPZndS2TkHVIkngHPZUbgIqHYpkyyY5O
-         nLMXAKoyeA2aco3RkrzLEMfyQSpcA96qIOmIn9Jsurr9N1IIGWW3gM8yMWSMFNnCY402
-         Vwn33uQ7WA3MdthsV4DBUT7flvGyvWYJRiflPGbsgc1JsgELaU+XSTnS+6jT+uIKk+E5
-         i2DynokTzmMEmatP4Q6xrWFUO9HvPRW7kqORC5IErBZlg33QOVFawmIPHHzsjcQNZvfC
-         8Kvw==
-X-Gm-Message-State: AOJu0YwKRXVYz3aOn8jW3HKQHd43OuURf8S352lFTdKnUX3zQSHNrI+b
-	E5jMZWQcAPIE3lELiAOVxEu5ROK77gtX5EnysiJBlgWsVde/6SGyO8Q2m7nsNUribyp2d2VrMOo
-	=
-X-Google-Smtp-Source: AGHT+IHS2CFIdwOHhuBcp3CA1c4A6wHnklyZqC1U439w2hPuYbtkiza2h5WLqp/UlUMqrIJ16jGjqg==
-X-Received: by 2002:a17:903:22c5:b0:1d9:5b75:4602 with SMTP id y5-20020a17090322c500b001d95b754602mr5345746plg.7.1707296943271;
-        Wed, 07 Feb 2024 01:09:03 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXueprT99MxCl6fPyLLsM0pD2V1QJ/Jjq9t6icKQjmqSBE7nz6TP3tP08CmvX/zK9QmIKQGCOA7ZuFZnuOi5AYtn+sSP1X/S2xVWRcu3bQ++a463OLOm00pSM+RYLQRgOafePSydzSfvJms/Ad4xQ+FcSgllRc1+RU8V/Y5qRj6Jiw/dQ==
-Received: from google.com ([2401:fa00:8f:203:aa4c:2868:935:7ac6])
-        by smtp.gmail.com with ESMTPSA id jb6-20020a170903258600b001d8d04a4fa8sm918072plb.300.2024.02.07.01.09.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 01:09:02 -0800 (PST)
-Date: Wed, 7 Feb 2024 18:08:59 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Minchan Kim <minchan@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-block@vger.kernel.org,
+	s=arc-20240116; t=1707298374; c=relaxed/simple;
+	bh=7u+z3q+4Hs3vIsnTCgfHn67LCKeRoHsrK3+hSZEaDt0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kHfmuE0nCQe9eIW5fU+oYG2Wgo9bSpVVlAOVuqadVQI0gaGRrh1paPv1OW5UxHQTeM8dKEofRixX6UBz9hhOh916lI122Cr9a3cGTpAwjUo14YIXI0uWFCPh4HZ6VWW7zCcx+JXcM4PgJ9hz4OZLeJxu4vtJHo8GQ6BcCFps58Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TVFJh5RQmz4f3jsm;
+	Wed,  7 Feb 2024 17:32:36 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 394401A0A9A;
+	Wed,  7 Feb 2024 17:32:41 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxA3TsNl4_n7DA--.43370S4;
+	Wed, 07 Feb 2024 17:32:41 +0800 (CST)
+From: linan666@huaweicloud.com
+To: axboe@kernel.dk
+Cc: linux-raid@vger.kernel.org,
+	song@kernel.org,
+	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [RFC][PATCH 0/2] zram: decouple comp stream and comp buffer
-Message-ID: <20240207090859.GE489524@google.com>
-References: <20240207065751.1908939-1-senozhatsky@chromium.org>
- <20240207084720.GD489524@google.com>
+	linan666@huaweicloud.com,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	houtao1@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH] block: fix deadlock between bd_link_disk_holder and partition scan
+Date: Wed,  7 Feb 2024 17:27:56 +0800
+Message-Id: <20240207092756.2087888-1-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240207084720.GD489524@google.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDHlxA3TsNl4_n7DA--.43370S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxZFy8KF45WF43KryfWr4rKrg_yoW5Cr4fpF
+	Z0gFZ7try8ta1Dur4Dt3y7Zr4UKw18Wa1xJr97KFy29rZrArs29r12yFy7uFy8KrWIyF4D
+	tF1UX3yYvF40k3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9E14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwACI402YVCY1x02628vn2kIc2xKxwAKzVCY07xG64k0F24l42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbSApUUUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On (24/02/07 17:47), Sergey Senozhatsky wrote:
-> On (24/02/07 15:57), Sergey Senozhatsky wrote:
-> > 	RFC
-> > 
-> > 	We keep compression work memory buffer per-comp stream (which
-> > is per-CPU), but we don't need that many buffers, because on each
-> > CPU only one compression backend can access work memory at any given
-> > time. Hence the patch series moves compression work memory to a
-> > dedicated per-CPU area, reducing the amount of memory we allocate
-> > for those buffers.
-> > 
-> > For instance, assume a 12 CPUs system, 2 compression streams
-> > per-CPU (a default and one for deferred recompression). Before
-> > we'd allocate 12 * 2 * 2 pages, after we'll allocate 12 * 2 pages.
-> > 
-> > NOTE:
-> > The series stops short of moving comp buffers to a global per-CPU
-> > area, which all zram devices can share. Compression backends use
-> > CPUs exclusively (disable migration and CPU hotplug), so in theory
-> > comp work memory can be in global per-CPU data. This can reduce
-> > memory usage on systems that init numerous zram devices.
-> > E.g. instead of num-zram-devices * num-cpus buffers we'll allocate
-> > only num-cpus buffers.
-> 
-> And this is the patch that moves comp buffers to global per-CPU
-> area, so that *all* zram devices and *all* comp backends share
-> them. It also moves local_lock (which disables migration/preemption
-> and CPU-hotplug once taken) to global comp mem per-CPU buffer.
+From: Li Nan <linan122@huawei.com>
 
-That's a squashed patch. I also have an incremental one, atop of 0002
-in the series. So first move comp buffers to device per-CPU, then to
-global per-CPU.
+'open_mutex' of gendisk is used to protect open/close block devices. But
+in bd_link_disk_holder(), it is used to protect the creation of symlink
+between holding disk and slave bdev, which introduces some issues.
+
+When bd_link_disk_holder() is called, the driver is usually in the process
+of initialization/modification and may suspend submitting io. At this
+time, any io hold 'open_mutex', such as scanning partitions, can cause
+deadlocks. For example, in raid:
+
+T1                              T2
+bdev_open_by_dev
+ lock open_mutex [1]
+ ...
+  efi_partition
+  ...
+   md_submit_bio
+				md_ioctl mddev_syspend
+				  -> suspend all io
+				 md_add_new_disk
+				  bind_rdev_to_array
+				   bd_link_disk_holder
+				    try lock open_mutex [2]
+    md_handle_request
+     -> wait mddev_resume
+
+T1 scan partition, T2 add a new device to raid. T1 waits for T2 to resume
+mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
+
+Fix it by introducing a local mutex 'holder_mutex' to replace 'open_mutex'.
+
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/holder.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/block/holder.c b/block/holder.c
+index 37d18c13d958..5bfb0a674cc7 100644
+--- a/block/holder.c
++++ b/block/holder.c
+@@ -8,6 +8,8 @@ struct bd_holder_disk {
+ 	int			refcnt;
+ };
+ 
++static DEFINE_MUTEX(holder_mutex);
++
+ static struct bd_holder_disk *bd_find_holder_disk(struct block_device *bdev,
+ 						  struct gendisk *disk)
+ {
+@@ -80,7 +82,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	kobject_get(bdev->bd_holder_dir);
+ 	mutex_unlock(&bdev->bd_disk->open_mutex);
+ 
+-	mutex_lock(&disk->open_mutex);
++	mutex_lock(&holder_mutex);
+ 	WARN_ON_ONCE(!bdev->bd_holder);
+ 
+ 	holder = bd_find_holder_disk(bdev, disk);
+@@ -108,7 +110,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 		goto out_del_symlink;
+ 	list_add(&holder->list, &disk->slave_bdevs);
+ 
+-	mutex_unlock(&disk->open_mutex);
++	mutex_unlock(&holder_mutex);
+ 	return 0;
+ 
+ out_del_symlink:
+@@ -116,7 +118,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ out_free_holder:
+ 	kfree(holder);
+ out_unlock:
+-	mutex_unlock(&disk->open_mutex);
++	mutex_unlock(&holder_mutex);
+ 	if (ret)
+ 		kobject_put(bdev->bd_holder_dir);
+ 	return ret;
+@@ -140,7 +142,7 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	if (WARN_ON_ONCE(!disk->slave_dir))
+ 		return;
+ 
+-	mutex_lock(&disk->open_mutex);
++	mutex_lock(&holder_mutex);
+ 	holder = bd_find_holder_disk(bdev, disk);
+ 	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
+ 		del_symlink(disk->slave_dir, bdev_kobj(bdev));
+@@ -149,6 +151,6 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 		list_del_init(&holder->list);
+ 		kfree(holder);
+ 	}
+-	mutex_unlock(&disk->open_mutex);
++	mutex_unlock(&holder_mutex);
+ }
+ EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
+-- 
+2.39.2
+
