@@ -1,304 +1,120 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A884A1B;
-	Wed,  7 Feb 2024 00:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564D4F9EA
+	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 01:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707267083; cv=none; b=GCoVEkO5hd8GxPm1GGIDw4+bNp02EROoic5W6TRe3H62kyuVW0zrHySCFu2Olh6Yqb84jJBS7UTYdfNek8W/ZALMIv+9tor0fdotYPilvGcPMPvKlwdvY4Qw2npLT9CTbJJNcVkYgJwxSzPAX+3i1JDzYRcyoyzRQ81TK7v3gvA=
+	t=1707270289; cv=none; b=Wr5k/OPq7pvppHpBNh9O9kxMGd6wWI+n3C+Tw9SEDZPHvyDdY7+nPnVbNB/BgezftbiqITigBqVkEiLebOZM6KHoDzFjbeku0tlPm+lK2zL6DAiD5mzBhy9hpNsheydPTjU2U5l5E4GGYSFz0LxdjefssyCzxab9hOR/UHUk7dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707267083; c=relaxed/simple;
-	bh=4AO/+UsepqAx8tpPjNVWsbXWuvjnjCrfhVLpqhMoGcE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZOUyyJC9A6eK33C2+Xp1rayrKTN1+TGo7q9kt2maVqSpx9kacWBKy6xblba1Nl+FTCGLV4xcYt7eWvA+/3hgCIussgC4UfBHgnFM6871YCBTkHBWruMaPr/d4cFDXtrtte4TzFOGXvsgzu5V+0XQJ6dY4hWDEBGpEDD7+KnY+Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZlMfGoxO; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707270289; c=relaxed/simple;
+	bh=IPRdW2Nq/kBnNQmgFtqfLx4rMNeGj8stoeMb4OYyzHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UUSbHPUHKFSfyQ0sTRIieay2KAvdzRiMq2MCS/4JW0Bz6oc2Zs9N9gPUVphQpgSgeRA4eY47TFK8bV+JLm/hPSgPg5uJLH5gwMC1W+v1o7bEORg5BlWr4MKLLNTcbCGsoRYCFO4+L/W4iVLYEJrzyiKynOeFRS6xcEfmlrYAm+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=X5MO7plA; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZlMfGoxO"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cf4d2175b2so1058381fa.0;
-        Tue, 06 Feb 2024 16:51:20 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="X5MO7plA"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3bbbc6bcc78so128313b6e.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 17:44:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707267078; x=1707871878; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h1B+J6u5jhg4RLeG3CC53Y7+wHzqP87W36OesHElAkc=;
-        b=ZlMfGoxOJPLffGfWFU786GXz+nB+2czZ2mOk1Ul+NLENHgoCSLIfZycv4NihouHJTk
-         Llol4aUDWyBWGtZi2akSCB2sg46gSlwQx5taaGweS9Qdc4kQ7RZLcy3PDAhbj+VT6AWl
-         CQPOMWWrI60rTwFzkJ3Jbra5Q/fKg5AP0mZ9I4c/DyQi4tRL9864TdAAgttTFyX1Q2QG
-         DI9Is61mE96/IaMX7dJi0Z8Ivjb25QpJOv8CWWGXB1Sfc/ra/aiOELnMum625N5BP4rU
-         1m4VnCCiOWHajDCglUoxSpzowTsAHP3T9w8b5PXMBpMa1u1FoUJqJ9SCkDqCiSk6TfrT
-         41TA==
+        d=chromium.org; s=google; t=1707270287; x=1707875087; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5rxXK+ENB15+cBUK8jk8L71LtIFkIUbhV2tF6desBF0=;
+        b=X5MO7plAzCyeY4r8WGHUwUrssg9ecq1ViBu0fM3lsQCQxfGphhHuvzWwzEGs+4bxXk
+         g7yHfuhO1FGMkjbYdUUtW5D+UTtbOz8OZovUcYd7bGjSQBcujnuZp0saSVhuavW8ZaFx
+         6Dt4yKob8hFoqQlX86BsPuSnmR6igt4jE0H1U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707267078; x=1707871878;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h1B+J6u5jhg4RLeG3CC53Y7+wHzqP87W36OesHElAkc=;
-        b=LHuuR+vK9Cax6G9BM6cYwdJCcGtk5zt3wzLr4s01sK3kAWx/XTdt4GLVmOxMqI0vah
-         kLtCUJMP2YuRxSvzAoPlWHF9ZmOX11Xt81qMz09wETIKnnvL36FmIolh2dBI4FXxJWNY
-         jk2AvcfOlVG4nxJ+Pfg54aCnH94dbRANuqN6V7FoZOy41yxyr/0S65OP8jD6EVv5HT26
-         lYBxbQtyMhVyCQdvqsYHjEd5GpfHK21VJjwk0iS+aC/na3nLTC/7elnmh7RHheH6aHjO
-         9CCBDervgUBg6XojLXMgzIeNL9WNPXAKzKtdcdnzc91xFL5mjQseYQHUAGUfFy8TR8GX
-         09sg==
-X-Gm-Message-State: AOJu0Yx3+wn/+i1i/Fnt2skFw5XRLqOGJd7dsXZR9ntMZ3VQ9nEi/p2D
-	Cs8bieEOrRjtbxlcax44WIIG1f4FTZyi9st00MnNt7Jl1OQ50JPa0HyQDzc4h98muXKRn2vK4Jk
-	RCEoGZMGNpCaE6wYpstMzMBER8DA=
-X-Google-Smtp-Source: AGHT+IGGeMHFUyqeCOF6yL8wa0QoHskikr5vyK/TGm3rz7xqTeKUcnLH7NVLUwjVyA3iN5nfb77SnbV/uWZTlm0u9pI=
-X-Received: by 2002:a2e:b903:0:b0:2d0:b3c4:5113 with SMTP id
- b3-20020a2eb903000000b002d0b3c45113mr2537860ljb.11.1707267077915; Tue, 06 Feb
- 2024 16:51:17 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707270287; x=1707875087;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5rxXK+ENB15+cBUK8jk8L71LtIFkIUbhV2tF6desBF0=;
+        b=ay24xyAvG5nR435Je+fGs4IwElzC86Y4x9F3V50CCEFvQzGSLOVy0C6xUxU6dbKliT
+         6SKoyYp+Ot2E2IJEVL8l5CziX2WTt0Z6iX2zBNQJ/FMS3wI0EI4OY5tYkunmECStYi1W
+         ED+GDi3XIMM6T01h4PfodQiWBnjVYOTbrKlDM2XUkzW15ucL81aBzQ3UfBQOdF2fa4Ml
+         WC1EVR4p6u2DU1m9cye1LbQ5YO2LYkiScoQTLGXQ79k3nes+bxwLWsH3bZivrR/QYGmY
+         z5Ahhs/SJtmkbFYL0NaoXkrGat6HhuzKKZF1IbJ4F4Ix4di6Ru8vctyY74kRC0We92jB
+         hSkQ==
+X-Gm-Message-State: AOJu0Yxo+d5VHe0xE58Pqh+jFZJSQRbAq/akmUhYzaweZUuBFv3k3GtK
+	hzLHy6xmdSLu1edOcJ8tl/nJ+PHdPSjv2ANbSM0umf7M2/k/3v+gBmUNWLSz+Q==
+X-Google-Smtp-Source: AGHT+IHbD6DZgnSsP+W4UVUlpKqeyLthk4r12WassXSdeYtHLIu5gD4K5ebM5iJ/a5LbYrzBduzvlQ==
+X-Received: by 2002:a05:6808:e82:b0:3bf:e29e:ed81 with SMTP id k2-20020a0568080e8200b003bfe29eed81mr5149290oil.22.1707270287313;
+        Tue, 06 Feb 2024 17:44:47 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWGYJo8tVZSlqHTkwn6ZXM5gEsHJybA0a13Vvaba/9Ckq2LU8IYja+jNFtQe/qzXV2sR/Bbgd3+QfPD6k7s7Pw1jleLC0jTQpAbcslYy+Uwj6kweb4a5+f1pphfb4XtwuPBAQX67GKVr5PailydsKbtjVmerbpoa4YolGwsU9Wi6y6N4Mz0Xailbm5hykyOy5b4hVFWTCJIrWP5FFfzPSPOsyvUDAaceMBQUU2yrza7CrfCYj/0XVfphB+toGQbAwGLmncpjdY94b9jUhKVrhCMhLfDC2PK4Qx99TB4++BlE2w=
+Received: from google.com (KD124209171220.ppp-bb.dion.ne.jp. [124.209.171.220])
+        by smtp.gmail.com with ESMTPSA id fn20-20020a056a002fd400b006de050cf904sm169822pfb.22.2024.02.06.17.44.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 17:44:46 -0800 (PST)
+Date: Wed, 7 Feb 2024 10:44:42 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Barry Song <21cnbao@gmail.com>, Minchan Kim <minchan@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, senozhatsky@chromium.org,
+	linux-kernel@vger.kernel.org, zhengtangquan@oppo.com,
+	Barry Song <v-songbaohua@oppo.com>
+Subject: Re: [PATCH v2] zram: easy the allocation of zcomp_strm's buffers
+ through vmalloc
+Message-ID: <20240207014442.GI69174@google.com>
+References: <20240206202511.4799-1-21cnbao@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206023740.81351-1-zhaoyang.huang@unisoc.com>
-In-Reply-To: <20240206023740.81351-1-zhaoyang.huang@unisoc.com>
-From: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Date: Wed, 7 Feb 2024 08:51:06 +0800
-Message-ID: <CAGWkznFPjKKUeTbzVwSbihK7KWo_duhNL++MLGfvjvHK-2vYQw@mail.gmail.com>
-Subject: Re: [PATCHv9 1/1] block: introduce content activity based ioprio
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>, Yu Zhao <yuzhao@google.com>, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, steve.kang@unisoc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240206202511.4799-1-21cnbao@gmail.com>
 
-I would like to state more thoughts here. That is, the RT tasks have
-had privilege on CPU resources as more cpu time and scheduled earlier
-via which they could generally launch the bio earlier than CFS tasks
-do. This commit just wants to improve this a little by letting CFS
-tasks have the opportunity to raise their bio's ioprio by judging the
-content's activities.
+On (24/02/07 09:25), Barry Song wrote:
+> From: Barry Song <v-songbaohua@oppo.com>
+> 
+> Firstly, there is no need to keep zcomp_strm's buffers contiguous
+> physically.
+> 
+> Secondly, The recent mTHP project has provided the possibility to
+> swapout and swapin large folios. Compressing/decompressing large
+> blocks can hugely decrease CPU consumption and improve compression
+> ratio. This requires us to make zRAM support the compression and
+> decompression for large objects.
+> With the support of large objects in zRAM of our out-of-tree code,
+> we have observed many allocation failures during CPU hotplug as
+> large objects need larger buffers. So this change is also more
+> future-proof once we begin to bring up multiple sizes in zRAM.
+> 
+> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
 
-On Tue, Feb 6, 2024 at 10:40=E2=80=AFAM zhaoyang.huang
-<zhaoyang.huang@unisoc.com> wrote:
->
-> From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
->
-> Currently, request's ioprio are set via task's schedule priority(when no
-> blkcg configured), which has high priority tasks possess the privilege on
-> both of CPU and IO scheduling. Furthermore, most of the write requestes
-> are launched asynchronosly from kworker which can't know the submitter's
-> priorities.
-> This commit works as a hint of original policy by promoting the request
-> ioprio based on the page/folio's activity. The original idea comes from
-> LRU_GEN which provides more precised folio activity than before. This
-> commit try to adjust the request's ioprio when certain part of its folios
-> are hot, which indicate that this request carry important contents and
-> need be scheduled ealier.
->
-> The filesystem should call bio_set_active_ioprio_folio() after
-> calling bio_add_folio. Please be noted that this set of API can not
-> handle bvec_try_merge_page cases.
->
-> This commit is verified on a v6.6 6GB RAM android14 system via 4 test cas=
-es
-> by calling bio_set_active_ioprio in erofs, ext4, f2fs and blkdev(raw
-> partition of gendisk)
->
-> Case 1:
-> script[a] which get significant improved fault time as expected[b]*
-> where dd's cost also shrink from 55s to 40s.
-> (1). fault_latency.bin is an ebpf based test tool which measure all task'=
-s
->    iowait latency during page fault when scheduled out/in.
-> (2). costmem generate page fault by mmaping a file and access the VA.
-> (3). dd generate concurrent vfs io.
->
-> [a]
-> ./fault_latency.bin 1 5 > /data/dd_costmem &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-> dd if=3D/dev/block/sda of=3D/data/ddtest bs=3D1024 count=3D2048000 &
-> dd if=3D/dev/block/sda of=3D/data/ddtest1 bs=3D1024 count=3D2048000 &
-> dd if=3D/dev/block/sda of=3D/data/ddtest2 bs=3D1024 count=3D2048000 &
-> dd if=3D/dev/block/sda of=3D/data/ddtest3 bs=3D1024 count=3D2048000
-> [b]
->                        mainline         commit
-> io wait                736us            523us
->
-> * provide correct result for test case 1 in v7 which was compared between
-> EMMC and UFS wrongly.
->
-> Case 2:
-> fio -filename=3D/dev/block/by-name/userdata -rw=3Drandread -direct=3D0 -b=
-s=3D4k -size=3D2000M -numjobs=3D8 -group_reporting -name=3Dmytest
-> mainline: 513MiB/s
-> READ: bw=3D531MiB/s (557MB/s), 531MiB/s-531MiB/s (557MB/s-557MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30137-30137msec
-> READ: bw=3D543MiB/s (569MB/s), 543MiB/s-543MiB/s (569MB/s-569MB/s), io=3D=
-15.6GiB (16.8GB), run=3D29469-29469msec
-> READ: bw=3D474MiB/s (497MB/s), 474MiB/s-474MiB/s (497MB/s-497MB/s), io=3D=
-15.6GiB (16.8GB), run=3D33724-33724msec
-> READ: bw=3D535MiB/s (561MB/s), 535MiB/s-535MiB/s (561MB/s-561MB/s), io=3D=
-15.6GiB (16.8GB), run=3D29928-29928msec
-> READ: bw=3D523MiB/s (548MB/s), 523MiB/s-523MiB/s (548MB/s-548MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30617-30617msec
-> READ: bw=3D492MiB/s (516MB/s), 492MiB/s-492MiB/s (516MB/s-516MB/s), io=3D=
-15.6GiB (16.8GB), run=3D32518-32518msec
-> READ: bw=3D533MiB/s (559MB/s), 533MiB/s-533MiB/s (559MB/s-559MB/s), io=3D=
-15.6GiB (16.8GB), run=3D29993-29993msec
-> READ: bw=3D524MiB/s (550MB/s), 524MiB/s-524MiB/s (550MB/s-550MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30526-30526msec
-> READ: bw=3D529MiB/s (554MB/s), 529MiB/s-529MiB/s (554MB/s-554MB/s), io=3D=
-15.6GiB (16.8GB), run=3D30269-30269msec
-> READ: bw=3D449MiB/s (471MB/s), 449MiB/s-449MiB/s (471MB/s-471MB/s), io=3D=
-15.6GiB (16.8GB), run=3D35629-35629msec
->
-> commit: 633MiB/s
-> READ: bw=3D668MiB/s (700MB/s), 668MiB/s-668MiB/s (700MB/s-700MB/s), io=3D=
-15.6GiB (16.8GB), run=3D23952-23952msec
-> READ: bw=3D589MiB/s (618MB/s), 589MiB/s-589MiB/s (618MB/s-618MB/s), io=3D=
-15.6GiB (16.8GB), run=3D27164-27164msec
-> READ: bw=3D638MiB/s (669MB/s), 638MiB/s-638MiB/s (669MB/s-669MB/s), io=3D=
-15.6GiB (16.8GB), run=3D25071-25071msec
-> READ: bw=3D714MiB/s (749MB/s), 714MiB/s-714MiB/s (749MB/s-749MB/s), io=3D=
-15.6GiB (16.8GB), run=3D22409-22409msec
-> READ: bw=3D600MiB/s (629MB/s), 600MiB/s-600MiB/s (629MB/s-629MB/s), io=3D=
-15.6GiB (16.8GB), run=3D26669-26669msec
-> READ: bw=3D592MiB/s (621MB/s), 592MiB/s-592MiB/s (621MB/s-621MB/s), io=3D=
-15.6GiB (16.8GB), run=3D27036-27036msec
-> READ: bw=3D691MiB/s (725MB/s), 691MiB/s-691MiB/s (725MB/s-725MB/s), io=3D=
-15.6GiB (16.8GB), run=3D23150-23150msec
-> READ: bw=3D569MiB/s (596MB/s), 569MiB/s-569MiB/s (596MB/s-596MB/s), io=3D=
-15.6GiB (16.8GB), run=3D28142-28142msec
-> READ: bw=3D563MiB/s (590MB/s), 563MiB/s-563MiB/s (590MB/s-590MB/s), io=3D=
-15.6GiB (16.8GB), run=3D28429-28429msec
-> READ: bw=3D712MiB/s (746MB/s), 712MiB/s-712MiB/s (746MB/s-746MB/s), io=3D=
-15.6GiB (16.8GB), run=3D22478-22478msec
->
-> Case 3:
-> This commit is also verified by the case of launching camera APP which is
-> usually considered as heavy working load on both of memory and IO, which
-> shows 12%-24% improvement.
->
->                 ttl =3D 0         ttl =3D 50        ttl =3D 100
-> mainline        2267ms          2420ms          2316ms
-> commit          1992ms          1806ms          1998ms
->
-> case 4:
-> androbench has no improvment as well as regression in RD/WR test item
-> while make a 3% improvement in sqlite items.
->
-> Suggested-by: Matthew Wilcox <willy@infradead.org>
-> Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
-> ---
-> change of v2: calculate page's activity via helper function
-> change of v3: solve layer violation by move API into mm
-> change of v4: keep block clean by removing the page related API
-> change of v5: introduce the macros of bio_add_folio/page for read dir.
-> change of v6: replace the macro of bio_add_xxx by submit_bio which
->                 iterating the bio_vec before launching bio to block layer
-> change of v7: introduce the function bio_set_active_ioprio
->               provide updated test result
-> change of v8: provide two sets of APIs for bio_set_active_ioprio_xxx
-> change of v9: modify the code according to Matthew's opinion, leave
->               bio_set_active_ioprio_folio only
-> ---
-> ---
->  block/Kconfig       | 15 +++++++++++++++
->  block/bio.c         | 33 +++++++++++++++++++++++++++++++++
->  include/linux/bio.h |  1 +
->  3 files changed, 49 insertions(+)
->
-> diff --git a/block/Kconfig b/block/Kconfig
-> index f1364d1c0d93..fb3a888194c0 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -228,6 +228,21 @@ config BLOCK_HOLDER_DEPRECATED
->  config BLK_MQ_STACKING
->         bool
->
-> +config BLK_CONT_ACT_BASED_IOPRIO
-> +       bool "Enable content activity based ioprio"
-> +       depends on LRU_GEN
-> +       default n
-> +       help
-> +         This item enable the feature of adjust bio's priority by
-> +         calculating its content's activity.
-> +         This feature works as a hint of original bio_set_ioprio
-> +         which means rt task get no change of its bio->bi_ioprio
-> +         while other tasks have the opportunity to raise the ioprio
-> +         if the bio take certain numbers of active pages.
-> +         The file system should use the API after bio_add_folio for
-> +         their buffered read/write/sync function to adjust the
-> +         bio->bi_ioprio.
-> +
->  source "block/Kconfig.iosched"
->
->  endif # BLOCK
-> diff --git a/block/bio.c b/block/bio.c
-> index 816d412c06e9..2c0b8f2ae4d4 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1476,6 +1476,39 @@ void bio_set_pages_dirty(struct bio *bio)
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+
+Note:
+Taking it in NOT because of the out-of-tree code (we don't really
+do that), but because this is executed from CPU offline/online
+paths, which can happen on devices with fragmented memory (a valid
+concern IMHO).
+
+Minchan, if you have any objections, please chime in.
+
+> @@ -37,7 +38,7 @@ static void zcomp_strm_free(struct zcomp_strm *zstrm)
+>  {
+>  	if (!IS_ERR_OR_NULL(zstrm->tfm))
+>  		crypto_free_comp(zstrm->tfm);
+> -	free_pages((unsigned long)zstrm->buffer, 1);
+> +	vfree(zstrm->buffer);
+>  	zstrm->tfm = NULL;
+>  	zstrm->buffer = NULL;
 >  }
->  EXPORT_SYMBOL_GPL(bio_set_pages_dirty);
->
-> +/*
-> + * bio_set_active_ioprio_folio is helper function to count the bio's
-> + * content's activities which measured by MGLRU.
-> + * The file system should call this function after bio_add_page/folio fo=
-r
-> + * the buffered read/write/sync.
-> + */
-> +#ifdef CONFIG_BLK_CONT_ACT_BASED_IOPRIO
-> +void bio_set_active_ioprio_folio(struct bio *bio, struct folio *folio)
-> +{
-> +       int class, level, hint;
-> +       int activities;
-> +
-> +       /*
-> +        * use bi_ioprio to record the activities, assume no one will set=
- it
-> +        * before submit_bio
-> +        */
-> +       bio->bi_ioprio +=3D folio_test_workingset(folio) ? 1 : 0;
-> +       activities =3D IOPRIO_PRIO_DATA(bio->bi_ioprio);
-> +       level =3D IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-> +       hint =3D IOPRIO_PRIO_HINT(bio->bi_ioprio);
-> +
-> +       if (activities > bio->bi_vcnt / 2)
-> +               class =3D IOPRIO_CLASS_RT;
-> +       else if (activities > bio->bi_vcnt / 4)
-> +               class =3D max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IO=
-PRIO_CLASS_BE);
-> +
-> +       bio->bi_ioprio =3D IOPRIO_PRIO_VALUE_HINT(class, level, hint);
-> +}
-> +#else
-> +void bio_set_active_ioprio_folio(struct bio *bio, struct folio *folio) {=
-}
-> +#endif
-> +EXPORT_SYMBOL_GPL(bio_set_active_ioprio_folio);
-> +
->  /*
->   * bio_check_pages_dirty() will check that all the BIO's pages are still=
- dirty.
->   * If they are, then fine.  If, however, some pages are clean then they =
-must
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 41d417ee1349..6c36546f6b9b 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -487,6 +487,7 @@ void bio_iov_bvec_set(struct bio *bio, struct iov_ite=
-r *iter);
->  void __bio_release_pages(struct bio *bio, bool mark_dirty);
->  extern void bio_set_pages_dirty(struct bio *bio);
->  extern void bio_check_pages_dirty(struct bio *bio);
-> +void bio_set_active_ioprio_folio(struct bio *bio, struct folio *folio);
->
->  extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_it=
-er,
->                                struct bio *src, struct bvec_iter *src_ite=
-r);
-> --
-> 2.25.1
->
+> @@ -53,7 +54,7 @@ static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
+>  	 * allocate 2 pages. 1 for compressed data, plus 1 extra for the
+>  	 * case when compressed size is larger than the original one
+>  	 */
+> -	zstrm->buffer = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, 1);
+> +	zstrm->buffer = vzalloc(2 * PAGE_SIZE);
+>  	if (IS_ERR_OR_NULL(zstrm->tfm) || !zstrm->buffer) {
+>  		zcomp_strm_free(zstrm);
+>  		return -ENOMEM;
+> -- 
+> 2.34.1
+> 
