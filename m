@@ -1,116 +1,143 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C49200A4;
-	Wed,  7 Feb 2024 07:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3580E20319
+	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 08:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707292209; cv=none; b=AZeBSoOincufOKKZjtjj68GGQmBLdZzbBwttl2KUuzHP0rZ8EkLtFF06NWKZoBMT6hxeX2Q3mEJMmii567cS+nhblx75L5KwWzLNoRXCnr1KCZZRchZRm3igUi1s9nNlMipFR1v69tmPxQxSJsr1eZ0qk/Mh+WAKTB46wHPgB5s=
+	t=1707293997; cv=none; b=twnpA+TwPyx6YZR/BlDUYeHt1uzgx1rcV9Krh7cVOABCWblRkzd7UCy/MfULkvfyWgn69GZ1SRPBetrp0S6oIwBhwYXtrGWJ/pm0LeJp5XSOynAuYjWNE4a31IHxeYddtdWh7g624xqKfgRQTwC5Rmh6XMqTwEWLuGAdR1T2LRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707292209; c=relaxed/simple;
-	bh=zYFI4otJsxqIeo9wFv+WZfxk8yKS5kcgys/lkebUR2I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=scKgk1CgS3ijaKMMqPngdKyEDu12rN2ciK24mKLxuv1zG6rX39xoL6Ra1ectzwqr8MFDmYxDpXHJUASHiWDvr0n9SjPlFFc6aCI1PrjrU3mc50o473erKofC6ocOwd/+75ZicfziIKapZnEIFvpuNnQUypMRugG/q1Y4rS8ZoPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=e89edPGm; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+	s=arc-20240116; t=1707293997; c=relaxed/simple;
+	bh=gqfJ175z/DNOnqOb4ZJkRUR2jHupp3/Tf1663NQC3sA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HwtSGPHhY3YKjo82m6h3/l4fwRZh0OoSe9QZDckDrU48KPh37XRKvQ++fHavH7PUkEqqkeLg+8EbooWhGSlseIXPagPjxKaJrA+3mwd7NWfUUXys+MmnZhNhNBLTgFXRv2fz5k4LuUtRE+Xmz6L0TIL0GjhNC17QyglEmbm+EPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=izgKoDsj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sFc1cyLX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=izgKoDsj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sFc1cyLX; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="e89edPGm"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4177d02q007093;
-	Wed, 7 Feb 2024 07:49:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Zv4rk/tiCoZ67nGNpsfw66RthfCklXJyCIeO3u1G998=;
- b=e89edPGmEtvWUmxERDtDpuOiLmpWHimqV8dLPqYh6whxTHbuk3kBF++MmqQ3N9mOwQ8S
- ah320dUGwH2occpXQtu09cSEOlhe88FPzfRInIuEPfCBsmSrocCpmPZTvrQrwSt9Fitn
- UP+HuDDvyge7X8sxOhh+hc1MvOI2Neo6mkMEyD5y4fAV0Vmfc2sCR6EjR8q+JSE+L3IR
- AbMAl3FFtiA1XZ77QWVhyslNUEASURwstuOhgh4xTK/KlozD2nrwOeCANbZ0k6T1HjeR
- j2m+2/oyMcFXcbZ6eaEAMnrQudUABCYzcJwFE2tBzwvp+VowHrm/LDcIAmYVSSGDToI8 AA== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w45fxger0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Feb 2024 07:49:50 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4175KHGF008494;
-	Wed, 7 Feb 2024 07:49:49 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w221k4167-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Feb 2024 07:49:49 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4177nl7M39059976
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 7 Feb 2024 07:49:48 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A11525805A;
-	Wed,  7 Feb 2024 07:49:47 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7025B58051;
-	Wed,  7 Feb 2024 07:49:44 +0000 (GMT)
-Received: from [9.43.10.191] (unknown [9.43.10.191])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  7 Feb 2024 07:49:44 +0000 (GMT)
-Message-ID: <6d9c66ea-3ec0-40b9-a0f1-14734d5b221f@linux.vnet.ibm.com>
-Date: Wed, 7 Feb 2024 13:19:43 +0530
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="izgKoDsj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sFc1cyLX";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="izgKoDsj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sFc1cyLX"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 496FD1FBAF;
+	Wed,  7 Feb 2024 08:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707293994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HswcgD+wF+zsYPW9Tr0zNAl//DMHo/KNPL/L085dsGw=;
+	b=izgKoDsjz7VZ0Us5vxfjTnNTz5eIMxiy5LUrJSAtNl/vtdAcRJEHRbYgWW6x9E3q8P6PFL
+	Y5DxP9JJzWR9sgpb83vTNbQyo9GjMJqJ5s/e8h9mRsPyrf+OjfjOgJ59l2tzg6CGgoj2TW
+	bCY9jNb/0Jh9Nj2ZvZSgTvUy9grr6M4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707293994;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HswcgD+wF+zsYPW9Tr0zNAl//DMHo/KNPL/L085dsGw=;
+	b=sFc1cyLXrCfG5H2Bm4BEhr7BSBpxYQukJ0XZtSSOpCXw0mjIJ3pbSi/seqnq+YZ/YjZOe6
+	WYh8LzA2jRxud3BQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707293994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HswcgD+wF+zsYPW9Tr0zNAl//DMHo/KNPL/L085dsGw=;
+	b=izgKoDsjz7VZ0Us5vxfjTnNTz5eIMxiy5LUrJSAtNl/vtdAcRJEHRbYgWW6x9E3q8P6PFL
+	Y5DxP9JJzWR9sgpb83vTNbQyo9GjMJqJ5s/e8h9mRsPyrf+OjfjOgJ59l2tzg6CGgoj2TW
+	bCY9jNb/0Jh9Nj2ZvZSgTvUy9grr6M4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707293994;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HswcgD+wF+zsYPW9Tr0zNAl//DMHo/KNPL/L085dsGw=;
+	b=sFc1cyLXrCfG5H2Bm4BEhr7BSBpxYQukJ0XZtSSOpCXw0mjIJ3pbSi/seqnq+YZ/YjZOe6
+	WYh8LzA2jRxud3BQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3746E13931;
+	Wed,  7 Feb 2024 08:19:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id mNgSDCo9w2WSPQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 07 Feb 2024 08:19:54 +0000
+Date: Wed, 7 Feb 2024 09:19:53 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH blktests v1 2/5] nvme/rc: filter out errors from cat when
+ reading files
+Message-ID: <v3vntta4ddcecc5oobzq47hy6o5lgsfjxhuxkrakzkmjltxf3j@b56sgoqrory4>
+References: <20240206131655.32050-1-dwagner@suse.de>
+ <20240206131655.32050-3-dwagner@suse.de>
+ <3bac2a80-fb9d-4e79-a2a3-2ecac14812ef@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [revert commit 9f079dda1433] [mainline] [6.8.0-rc3] [NVME] OOPS
- kernel crash while booting
-Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        alan.adamson@oracle.com, kch@nvidia.com, hch@lst.de,
-        "sachinp@linux.vnet.com" <sachinp@linux.vnet.com>,
-        "mputtash@linux.vnet.com" <mputtash@linux.vnet.com>,
-        "abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>
-References: <a54c8860-18c7-474d-95e2-a0153a2da885@linux.vnet.ibm.com>
- <ZcJxyjfBniERIWiq@kbusch-mbp.mynextlight.net>
-From: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-In-Reply-To: <ZcJxyjfBniERIWiq@kbusch-mbp.mynextlight.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LG8PRONSo3pif8ImlHncm7EYDh3fW3nx
-X-Proofpoint-GUID: LG8PRONSo3pif8ImlHncm7EYDh3fW3nx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-07_02,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=762 adultscore=0 malwarescore=0 clxscore=1015 impostorscore=0
- mlxscore=0 priorityscore=1501 spamscore=0 suspectscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402070057
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3bac2a80-fb9d-4e79-a2a3-2ecac14812ef@nvidia.com>
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=izgKoDsj;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=sFc1cyLX
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.71 / 50.00];
+	 ARC_NA(0.00)[];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-1.70)[93.13%]
+X-Spam-Score: -4.71
+X-Rspamd-Queue-Id: 496FD1FBAF
+X-Spam-Flag: NO
 
-Thanks Keith for the patch. I have tested the patch without reverting 
-old commits. The patch fixes the issue.
+On Tue, Feb 06, 2024 at 11:07:06PM +0000, Chaitanya Kulkarni wrote:
+> >   	for dev in /sys/class/nvme/nvme*; do
+> >   		dev="$(basename "$dev")"
+> > -		transport="$(cat "/sys/class/nvme/${dev}/transport")"
+> > +		transport="$(cat "/sys/class/nvme/${dev}/transport" 2>/dev/null)"
+> 
+> do we have to do anything if there is in error ?
 
-Tested-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+In this case transport will be '' and not match with '${nvme_trtype}'.
+So we already handle this properly.
 
-On 2/6/24 23:22, Keith Busch wrote:
-> On Tue, Feb 06, 2024 at 10:05:20PM +0530, Tasmiya Nalatwad wrote:
->> Greetings,
->>
->> [revert commit 9f079dda1433] [mainline] [6.8.0-rc3] [NVME] OOPS kernel crash
->> while booting to kernel
->>
->> Reverting below commit fixes the problem
->>
->> commit 9f079dda14339ee87d864306a9dc8c6b4e4da40b
->>      nvme: allow passthru cmd error logging
-> Thanks for the report. Let's take a shot at fixing it before considering
-> a revert. I copied you on the patch proposal.
->
--- 
-Regards,
-Tasmiya Nalatwad
-IBM Linux Technology Center
-
+> >   		if [[ "$transport" == "${nvme_trtype}" ]]; then
+> >   			echo "WARNING: Test did not clean up ${nvme_trtype} device: ${dev}"
+> >   			_nvme_disconnect_ctrl "${dev}"
+> > @@ -840,7 +840,7 @@ _find_nvme_dev() {
+> >   	for dev in /sys/class/nvme/nvme*; do
+> >   		[ -e "$dev" ] || continue
+> >   		dev="$(basename "$dev")"
+> > -		subsysnqn="$(cat "/sys/class/nvme/${dev}/subsysnqn")"
+> > +		subsysnqn="$(cat "/sys/class/nvme/${dev}/subsysnqn" 2>/dev/null)"
