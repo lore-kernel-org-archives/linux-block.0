@@ -1,95 +1,121 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2701CF8D
-	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 04:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8378E12E78;
+	Wed,  7 Feb 2024 05:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707280603; cv=none; b=Z7C+IGu/X9mIJGIwyzy7qVQTgNJ/nEzl0S5m1M5nTnvgSaKfKF40TjJ3gml/z3U55qNy2f0i5w4/4vKFUX1geXjInxvval+t1RMANU2qnXiiqWQzj0inNU8XMce4RW1Sedok0duHQlQGbr+Tz81QBFw9VcvnkRIf6Y4DYnq2VA0=
+	t=1707282070; cv=none; b=Um1HSCDkcVKYEN38vwJD/MZ+kWLkzmzrZE4AJOALRPs09/YhSkJz7vVVXmzRasWFQ7wRmM1CChJ02q+99Xg8FFN5ZJYxhBaIeh7vlJ6WUn3MeIrZoo5Oathj69hkiHqZ42kLUiExu/NrgSdEcuRgm861ADbQojhOvdTD1r3LqN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707280603; c=relaxed/simple;
-	bh=RtSqp1JYFTovf2zthsrQ+F52HyZRz9QN+jvAQn9sieM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nXIQEJhT2YimumUrYFnkbbk3VSOjyQC7+MV2+WFr4a+dM3hIlFkvloBjbAPuqfUr3RsZiRvAGC/AV6ZdRcHnvjwosLBP3g4pgokSoi6obXQGaPzFeU6TCy13X21mcLPtVgKj79ueIKpbIMhwakyyHB6yKAOCeLjrNEcCmq9TvOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=allp2fdJ; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1707282070; c=relaxed/simple;
+	bh=tsFpYrFr6qvE492BrqJFsG8ASeO8HQ1Nge9WRSOJCsE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PBy1wojOI7Mqj7YL9odb/g2s2a4NINQ1ZwIksbnz0vaRDbc8MS3W4F/fm2XSWLpfg+dYOoDOMLMdoDLD4N8dQHVZoLx3B0SdDyfjaQI/xaGl6xv2Q8Cr0mmhDk8PdImitw06Q0DZughp6CvOgnN38S2JgpW4S90ehYeQHpPJ+ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hz6evOHY; arc=none smtp.client-ip=209.85.222.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="allp2fdJ"
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2193ccbb885so125944fac.2
-        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 20:36:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hz6evOHY"
+Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-7d5bbbe5844so121794241.0;
+        Tue, 06 Feb 2024 21:01:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1707280601; x=1707885401; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xXmL2187gHpmL0np47Ze2nLt0jvODGEfenOxk5qwPvE=;
-        b=allp2fdJrCH1so/XYtPVyopJmQCgAhOWERuy44idtWPR+ZmynH64rCiT+YEaFsfUWr
-         RukTGHIw468X0MM2rV+LzqQZX08LS8uk/mffxx07kGWQnUZYbtG5ogbqAMkyhZ8fqARN
-         3KGbx3xkbN+URHua85nN/KVRCg363DLh500+E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707280601; x=1707885401;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1707282067; x=1707886867; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xXmL2187gHpmL0np47Ze2nLt0jvODGEfenOxk5qwPvE=;
-        b=vsteozIuWQgeISg4OZs5uEZ4BGHIKKPGqb3aF5hV/6h0RUMJoYYc5Dg8IdgVs32c6R
-         wQtFJiooE4ZK0GIDpGeXXN069WWI1Q3e511sc2JFflJ3LaaLN2Q3b0y5Z1c0LkHGJrhi
-         QeM9POWMMCOOz5zTC62Bnc+k3gAFyBJZRzhnVxrPVHxPF2ppEXrAcT2ntmnIZMv2A2cx
-         OTQMPnxyExsIu53DKRZXREuVS0t/J6Eyg9TCIyH+2O9kudDUq3VG0flU79BW6YG0IDoH
-         FJokyXUju61POkLBfDbjF31sLcu/SX13Z3LmBHIAwoC+MYHneKDQjSc7PRANN2zllz4W
-         kKTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqQpTNMgVCnWOUYdyv6WZ/ZOTfqUkf6dVP07UCZYto75edKU2qTgue26W3iBK7hkqcGkuPryffEwX6CEZ4roxKfvSpcxRfqViKXEE=
-X-Gm-Message-State: AOJu0YzzGZIPun4/yZVgoDdQjFhnWtttBty8HTRZBbf13Hay/GOoAnqB
-	CNqqilE/AdMmRTaOZqAdl3T/cyYaaWtWom+Q5tQP4NhtF2Crb9R4xg1QYRDBNk/uLkfxIXK7OK4
-	=
-X-Google-Smtp-Source: AGHT+IFO44dKQJIbmf1HaMA+xo1RI3yTOS1ects1dva6gr08BhW/p1aXM5wyZ+X6kTGvy+2n7wGkoQ==
-X-Received: by 2002:a05:6870:390e:b0:219:92e5:8b4 with SMTP id b14-20020a056870390e00b0021992e508b4mr5403115oap.5.1707280601380;
-        Tue, 06 Feb 2024 20:36:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWPDLtqg4P2TGcdbEEvcr7bpsaydM1bkhMm0f34M1al3KjlWR9Rv6wHLukrXyyJiiB5rsjok7PGeZOdUw54EV9O1QsM/Roo2Pw6pQRxSfColdcfKWorGDXJLP0VkbGPlPsOBIM/DdjvJ0i2kdch5s/XIv3/hiyVGpymPGih6CwH0WFboBO0mkOuo5kX5wtDt0mt0/KjQO7piZY7yfVcWOxsgMS16F5lyrwi713ajRc1Z6Upof8fTsOU3XsQJuvSq9TF2ROBGkO34MqLhIRVZoDrk9WzeneQ47f07w==
-Received: from google.com ([2401:fa00:8f:203:679b:7168:b5c0:a415])
-        by smtp.gmail.com with ESMTPSA id s133-20020a63778b000000b005d3bae243bbsm371606pgc.4.2024.02.06.20.36.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 20:36:40 -0800 (PST)
-Date: Wed, 7 Feb 2024 13:36:36 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Barry Song <21cnbao@gmail.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	zhengtangquan@oppo.com, Barry Song <v-songbaohua@oppo.com>
-Subject: Re: [PATCH v2] zram: easy the allocation of zcomp_strm's buffers
- through vmalloc
-Message-ID: <20240207043636.GC489524@google.com>
-References: <20240206202511.4799-1-21cnbao@gmail.com>
- <20240207014442.GI69174@google.com>
- <41226c84-e780-4408-b7d2-bd105f4834f5@kernel.dk>
- <20240207031447.GA489524@google.com>
+        bh=tsFpYrFr6qvE492BrqJFsG8ASeO8HQ1Nge9WRSOJCsE=;
+        b=Hz6evOHYtsHwHjxWnIi3xgFfER+h4/jRxPZaKugMARiTiaKSTGANoIjhN62XWHa1c9
+         yZpuuVevJeaQBworTq955avheeCHs6GyPqoWMbw+ZbhwIfEbO2G2oRpZBSYYIwNHtzYt
+         wVZU187/uqSfaKZX1XivC0ROnPZeiW1kVD2AENt8ahJKvDB0ISkEOf7qVIIY0itNvqvD
+         n5gdYs9UcVBXyvsfTOAWJV1RkNTs5vQO0//snaADTvew9+1htHFIeuFMANJnTOFbzis2
+         sGzGqcdGM8sBPpiTHfSVtZeqzjRwHgBZYj40u0O1+fK9JvfGSDJhnNHezDXKPNNz5aIE
+         WvZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707282067; x=1707886867;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tsFpYrFr6qvE492BrqJFsG8ASeO8HQ1Nge9WRSOJCsE=;
+        b=mJR81xizu5YR+IHMhzaNL+BFbVPoRKmfD65vt1ynu0hN3zqoRnpiescK4IpvQMiGOH
+         jxqIDDgToTbkiNuHCKzMwADlPvPfno2aZuR0YCiPrLVsx+3NjyiWK+WjaPT223GE96bZ
+         7VJY8rYXoJ24OgLqS2Tk+Fu/oArajCgwgBew1SveZ9eBY16sGa3gXwd6CWC5HKt5yNP1
+         H/WsXxtOaVYMeqPPyM/OfezD1x6TWGdITBC+DaJg+ofE8w2Mvbk7NcyBlu6nBhUTLd3K
+         l9BdDCV2JFFklT7EYQFf5wnx5LjDkBTjHKAb74CkUKLZkF+cO6+aaTsWBBZI58Z/dFNx
+         yS6A==
+X-Gm-Message-State: AOJu0Yxobe3ONeiXZtv+MtwVttTCbwCHX42H5lEpsmzp+38uTduXrB+o
+	fQ96kgRgB0CGlS/ZrdY9AbZu6XDO1hmFw3zxWUhSQIdLN+qITpSjIg6fgryQPzxK585fgwrLMhw
+	mPEzy7jmbRHQqJp0gBNzmO2CK3M4=
+X-Google-Smtp-Source: AGHT+IG6OPhTyogu+ZqMppV8mfeNLy/Li51MZcTjoNGa0IAJPsuv+evtuXtnCGeM50wngAwfH4Gz047VCcACFOrg8tg=
+X-Received: by 2002:a05:6102:3944:b0:46d:25e4:df10 with SMTP id
+ f4-20020a056102394400b0046d25e4df10mr1580033vsu.30.1707282067271; Tue, 06 Feb
+ 2024 21:01:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240207031447.GA489524@google.com>
+References: <20240206202511.4799-1-21cnbao@gmail.com> <20240207014442.GI69174@google.com>
+ <41226c84-e780-4408-b7d2-bd105f4834f5@kernel.dk> <20240207031447.GA489524@google.com>
+ <79926b88-c1ef-4042-a871-61752d29c838@kernel.dk> <20240207032148.GB489524@google.com>
+In-Reply-To: <20240207032148.GB489524@google.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Wed, 7 Feb 2024 18:00:55 +1300
+Message-ID: <CAGsJ_4yPChtForHNqqT_C7Yge6-0KvDDs=oNqqDuDXNwOeuXoA@mail.gmail.com>
+Subject: Re: [PATCH v2] zram: easy the allocation of zcomp_strm's buffers
+ through vmalloc
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhengtangquan@oppo.com, 
+	Barry Song <v-songbaohua@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (24/02/07 12:14), Sergey Senozhatsky wrote:
-> ---
-> 
-> zram: do not allocate physically contiguous strm buffers
-> 
-> Currently zram allocates 2 physically contigous pages per-CPU's
-> compression stream (we may have up to 3 streams per-CPU). Since
+On Wed, Feb 7, 2024 at 4:21=E2=80=AFPM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> On (24/02/06 20:17), Jens Axboe wrote:
+> [..]
+> > >>> Minchan, if you have any objections, please chime in.
+> > >>
+> > >> Not Minchan, but I do have an issue with the title of the commit, it
+> > >> doesn't make any sense. Can the maintainer please re-write that to b=
+e
+> > >> something that is appropriate and actually describes what the patch
+> > >> does?
+> > >
+> > > Thanks Jens. I fully agree, I requested a better commit message in
+> > > v1 feedback, we probably still can improve on this.
+> > >
+> > >
+> > > Something like this?
+> > >
+> > > ---
+> > >
+> > > zram: do not allocate physically contiguous strm buffers
+> > >
+> > > Currently zram allocates 2 physically contigous pages per-CPU's
+> > > compression stream (we may have up to 3 streams per-CPU). Since
+> > > those buffers are per-CPU we allocate them from CPU hotplug path,
+> > > which may have higher risks of failed allocations on devices with
+> > > fragmented memory.
+> > >
+> > > Switch to virtually contiguos allocations - crypto comp does not
+> > > seem impose requirements on compression working buffers to be
+> > > physically contiguous.
+> >
+> > Yep, this is much better! Thanks.
+>
+> Thanks.
+>
 
-Correction:
-								^ up to 4
+Hi Sergey, Jens,
 
-> those buffers are per-CPU we allocate them from CPU hotplug path,
-> which may have higher risks of failed allocations on devices with
-> fragmented memory.
-> 
-> Switch to virtually contiguos allocations - crypto comp does not
-> seem impose requirements on compression working buffers to be
-> physically contiguous.
+> Barry, can you please send v3 with the suggested subject and commit
+> message?
+
+Thanks for your comments and improvements. will send v3 accordingly.
+
+Best regard
+Barry
