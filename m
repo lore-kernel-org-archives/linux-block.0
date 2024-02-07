@@ -1,82 +1,95 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAAF12E5D
-	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 04:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2701CF8D
+	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 04:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707280095; cv=none; b=ZsRh76dG5CfuVGW6quvXWgggbd49tRjzfKU+OUjdGNiiPl6yVD46Yli5zVrkWvqSKNQ+6lQH80NCV+d2psq0FxEuocxGfBflTfA66iUorw0qDBvmLVzKZhIULUBHjolfEgm2CjhQPJuVzE26BFeBZsOYW1k4TPUfC2zV4lgEV6s=
+	t=1707280603; cv=none; b=Z7C+IGu/X9mIJGIwyzy7qVQTgNJ/nEzl0S5m1M5nTnvgSaKfKF40TjJ3gml/z3U55qNy2f0i5w4/4vKFUX1geXjInxvval+t1RMANU2qnXiiqWQzj0inNU8XMce4RW1Sedok0duHQlQGbr+Tz81QBFw9VcvnkRIf6Y4DYnq2VA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707280095; c=relaxed/simple;
-	bh=IJ9dVlzhmp3vXtUeuj7z9BmGg75344UiTJkb4f5/HZA=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=F9ykOoz/oc4w86zKpX+ftuAj2KU7vXRovXZ1j6d4KfJGWOQQwp7wozDJqSsgthRG7sYXMxeEZYumBiVr5DFoxMkPOdSXocNWHKAW5Mn7oTDY+e0TyNpTJ3mKuMCmHOKLFKuHjY8fmDbki93AAovHmjRV+Eq/PnjU1nwGb+qr5yI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4IvkfkDf; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1707280603; c=relaxed/simple;
+	bh=RtSqp1JYFTovf2zthsrQ+F52HyZRz9QN+jvAQn9sieM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nXIQEJhT2YimumUrYFnkbbk3VSOjyQC7+MV2+WFr4a+dM3hIlFkvloBjbAPuqfUr3RsZiRvAGC/AV6ZdRcHnvjwosLBP3g4pgokSoi6obXQGaPzFeU6TCy13X21mcLPtVgKj79ueIKpbIMhwakyyHB6yKAOCeLjrNEcCmq9TvOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=allp2fdJ; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4IvkfkDf"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-42a7765511bso6551cf.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 20:28:13 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="allp2fdJ"
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2193ccbb885so125944fac.2
+        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 20:36:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707280092; x=1707884892; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IJ9dVlzhmp3vXtUeuj7z9BmGg75344UiTJkb4f5/HZA=;
-        b=4IvkfkDfProeZPnEK7XEToy4+UlEJPDuO8PKMHZy1aPTeOlWIB8JQSUomj9jEsKM+z
-         vVokZ7yWQt0i4Yvfvq1UXLgKghcbrD0JNLsW3KcEoRrGDrjgb4RLQBt1H47LKYnIIL7K
-         qLejxILVhIf6Bvdhf3BI/GuIDUCBdiBca4rC/blZ8AbUWaPYG7x+iBuG9vM4ZOleszvr
-         dGI9e37SXiT8v9VNwSYoePE9GLeizEWXkKZvddDD/8juhggGel6flokD17OLdOBXcJc7
-         MZf4ByhhoedlaZU+FvWmifr6zfeKejywhuooFKQKz4zCCpGX5myq+tOseA86pA5VwMSk
-         hTJw==
+        d=chromium.org; s=google; t=1707280601; x=1707885401; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xXmL2187gHpmL0np47Ze2nLt0jvODGEfenOxk5qwPvE=;
+        b=allp2fdJrCH1so/XYtPVyopJmQCgAhOWERuy44idtWPR+ZmynH64rCiT+YEaFsfUWr
+         RukTGHIw468X0MM2rV+LzqQZX08LS8uk/mffxx07kGWQnUZYbtG5ogbqAMkyhZ8fqARN
+         3KGbx3xkbN+URHua85nN/KVRCg363DLh500+E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707280092; x=1707884892;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IJ9dVlzhmp3vXtUeuj7z9BmGg75344UiTJkb4f5/HZA=;
-        b=uLDvUPUn20Qsjg3pvM4znCNOMqA76SFeSmw2ZAWEp6MnPVYQDGUpe19fnOcctA+12D
-         K5IDwmcXqzYPdNf8zaMKhmmgWw/gCVmPdLcOX+WPTy8Uq3SWgftB5OJZCOqYT5DsVZdd
-         9LRSw6D6GDu2VSz5aSrOKAHvb4xh3gzIa9UdbX9VY75/HVs0nekl2cmNhH3cDtP8HBjX
-         kpNd1epc+Bq9zsitb2XcCf1V4AWMTFBk4/D7u+O/aXVTM7vQVv64q7OnIlXij8/9q667
-         zwgbE+NoF+U2KfDA/lRcClvZJ08g/VAfrI3uoggtjkBwn6BuabvT6Avy0zY2x6GHc+ut
-         8iGw==
-X-Gm-Message-State: AOJu0YyMwQm+eTr1E+HdJk35vow21kaJPnt/eUEzcY73HLG+Ja9zn5A+
-	hpXwNBVtb0r22J+BGqmYFsZELmG0xNMXbqOQtikJuQMo5+qDsafwoWyrc169KFOByQ6FHxCnU9x
-	fEKGfWWAAnuL5C5i2EH0NeqletkV9FULZvF/Zborckx1/49JoctaZ
-X-Google-Smtp-Source: AGHT+IExXgVDoLcBMnmblo8/R1cJu7OqCSsI+lm3PdpMwaSqehPPnx1J6xlAG2RTGlqeP742S9RNm6NaoJ7nNpLeG9o=
-X-Received: by 2002:a05:622a:268a:b0:42c:42e2:4ca9 with SMTP id
- kd10-20020a05622a268a00b0042c42e24ca9mr383qtb.10.1707280092105; Tue, 06 Feb
- 2024 20:28:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707280601; x=1707885401;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xXmL2187gHpmL0np47Ze2nLt0jvODGEfenOxk5qwPvE=;
+        b=vsteozIuWQgeISg4OZs5uEZ4BGHIKKPGqb3aF5hV/6h0RUMJoYYc5Dg8IdgVs32c6R
+         wQtFJiooE4ZK0GIDpGeXXN069WWI1Q3e511sc2JFflJ3LaaLN2Q3b0y5Z1c0LkHGJrhi
+         QeM9POWMMCOOz5zTC62Bnc+k3gAFyBJZRzhnVxrPVHxPF2ppEXrAcT2ntmnIZMv2A2cx
+         OTQMPnxyExsIu53DKRZXREuVS0t/J6Eyg9TCIyH+2O9kudDUq3VG0flU79BW6YG0IDoH
+         FJokyXUju61POkLBfDbjF31sLcu/SX13Z3LmBHIAwoC+MYHneKDQjSc7PRANN2zllz4W
+         kKTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWqQpTNMgVCnWOUYdyv6WZ/ZOTfqUkf6dVP07UCZYto75edKU2qTgue26W3iBK7hkqcGkuPryffEwX6CEZ4roxKfvSpcxRfqViKXEE=
+X-Gm-Message-State: AOJu0YzzGZIPun4/yZVgoDdQjFhnWtttBty8HTRZBbf13Hay/GOoAnqB
+	CNqqilE/AdMmRTaOZqAdl3T/cyYaaWtWom+Q5tQP4NhtF2Crb9R4xg1QYRDBNk/uLkfxIXK7OK4
+	=
+X-Google-Smtp-Source: AGHT+IFO44dKQJIbmf1HaMA+xo1RI3yTOS1ects1dva6gr08BhW/p1aXM5wyZ+X6kTGvy+2n7wGkoQ==
+X-Received: by 2002:a05:6870:390e:b0:219:92e5:8b4 with SMTP id b14-20020a056870390e00b0021992e508b4mr5403115oap.5.1707280601380;
+        Tue, 06 Feb 2024 20:36:41 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWPDLtqg4P2TGcdbEEvcr7bpsaydM1bkhMm0f34M1al3KjlWR9Rv6wHLukrXyyJiiB5rsjok7PGeZOdUw54EV9O1QsM/Roo2Pw6pQRxSfColdcfKWorGDXJLP0VkbGPlPsOBIM/DdjvJ0i2kdch5s/XIv3/hiyVGpymPGih6CwH0WFboBO0mkOuo5kX5wtDt0mt0/KjQO7piZY7yfVcWOxsgMS16F5lyrwi713ajRc1Z6Upof8fTsOU3XsQJuvSq9TF2ROBGkO34MqLhIRVZoDrk9WzeneQ47f07w==
+Received: from google.com ([2401:fa00:8f:203:679b:7168:b5c0:a415])
+        by smtp.gmail.com with ESMTPSA id s133-20020a63778b000000b005d3bae243bbsm371606pgc.4.2024.02.06.20.36.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 20:36:40 -0800 (PST)
+Date: Wed, 7 Feb 2024 13:36:36 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Barry Song <21cnbao@gmail.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zhengtangquan@oppo.com, Barry Song <v-songbaohua@oppo.com>
+Subject: Re: [PATCH v2] zram: easy the allocation of zcomp_strm's buffers
+ through vmalloc
+Message-ID: <20240207043636.GC489524@google.com>
+References: <20240206202511.4799-1-21cnbao@gmail.com>
+ <20240207014442.GI69174@google.com>
+ <41226c84-e780-4408-b7d2-bd105f4834f5@kernel.dk>
+ <20240207031447.GA489524@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Saranya Muruganandam <saranyamohan@google.com>
-Date: Tue, 6 Feb 2024 20:28:01 -0800
-Message-ID: <CAP9s-SrvNZROseNkpSL-p-qsO0RT6H+81xX4gg-TV71gQ_UbYA@mail.gmail.com>
-Subject: regression on BLKRRPART ioctl for EIO
-To: linux-block@vger.kernel.org, hch@lst.de, Jens Axboe <axboe@kernel.dk>, 
-	sashal@kernel.org, Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240207031447.GA489524@google.com>
 
-Hi,
+On (24/02/07 12:14), Sergey Senozhatsky wrote:
+> ---
+> 
+> zram: do not allocate physically contiguous strm buffers
+> 
+> Currently zram allocates 2 physically contigous pages per-CPU's
+> compression stream (we may have up to 3 streams per-CPU). Since
 
-I am noticing a regression on the BLKRRPART ioctl after we changed the
-blkdev_reread_part() logic to reopen the device with commit
-68e6582e8f2dc32fd2458b9926564faa1fb4560e["reopen the device in
-blkdev_reread_part"]
+Correction:
+								^ up to 4
 
-We now ignore the errors that used to be returned for
-bdev_disk_changed(). I see that this was explicitly fixed for -EBUSY
-(commit 68e6582e8f2dc32fd2458b9926564faa1fb4560e: block: return -EBUSY
-when there are open partitions in blkdev_reread_part)
-
-The regression I am particularly interested in is when we get an -EIO
-error from the disk and BLKRRPART incorrectly reports success when it
-actually failed to reread partitions.
-
-Looking for advice.
-
-Thanks,
-Saranya
+> those buffers are per-CPU we allocate them from CPU hotplug path,
+> which may have higher risks of failed allocations on devices with
+> fragmented memory.
+> 
+> Switch to virtually contiguos allocations - crypto comp does not
+> seem impose requirements on compression working buffers to be
+> physically contiguous.
