@@ -1,121 +1,104 @@
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8378E12E78;
-	Wed,  7 Feb 2024 05:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38171CD3A
+	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 06:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707282070; cv=none; b=Um1HSCDkcVKYEN38vwJD/MZ+kWLkzmzrZE4AJOALRPs09/YhSkJz7vVVXmzRasWFQ7wRmM1CChJ02q+99Xg8FFN5ZJYxhBaIeh7vlJ6WUn3MeIrZoo5Oathj69hkiHqZ42kLUiExu/NrgSdEcuRgm861ADbQojhOvdTD1r3LqN8=
+	t=1707289082; cv=none; b=isQrlLEk7AHPGciLZL+Hz6kyVuMMm/k72A9XKqCdJoPgLYyDIc3utMz8CE3ZxzysCtwCxcfQurzGNiujZtMGELuEPKGBaqJHOVgh4rsisWWnGJSoa3UVP7BvWSq7hWxoZDGxHXbR264i4AtiuyxcEV6MTVX6l7PnvBL/9wunzIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707282070; c=relaxed/simple;
-	bh=tsFpYrFr6qvE492BrqJFsG8ASeO8HQ1Nge9WRSOJCsE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PBy1wojOI7Mqj7YL9odb/g2s2a4NINQ1ZwIksbnz0vaRDbc8MS3W4F/fm2XSWLpfg+dYOoDOMLMdoDLD4N8dQHVZoLx3B0SdDyfjaQI/xaGl6xv2Q8Cr0mmhDk8PdImitw06Q0DZughp6CvOgnN38S2JgpW4S90ehYeQHpPJ+ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hz6evOHY; arc=none smtp.client-ip=209.85.222.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707289082; c=relaxed/simple;
+	bh=rCZ9HSGtLLD4caLOi+C1H8AptWnr7xurWcFkoFTjU1w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a0M+BuU61IXAsFjNSWoZR1y/uWJnF9xBBXGaio1xfe4R2x78I6UFn2M2Y/hzu8fmoIkxs9QswBtUU69rFaY/v6/+qFbbGjDDaXpXOa6FgPC5TI3Sz1/ux+QfeLyopBtQXv4OCtU9Bjyi/hYEGdsrLjKbDatXRIZoFXWWPqr22VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MfeQX4J+; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hz6evOHY"
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-7d5bbbe5844so121794241.0;
-        Tue, 06 Feb 2024 21:01:08 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MfeQX4J+"
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dc6d8f19ab3so276846276.3
+        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2024 22:58:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707282067; x=1707886867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tsFpYrFr6qvE492BrqJFsG8ASeO8HQ1Nge9WRSOJCsE=;
-        b=Hz6evOHYtsHwHjxWnIi3xgFfER+h4/jRxPZaKugMARiTiaKSTGANoIjhN62XWHa1c9
-         yZpuuVevJeaQBworTq955avheeCHs6GyPqoWMbw+ZbhwIfEbO2G2oRpZBSYYIwNHtzYt
-         wVZU187/uqSfaKZX1XivC0ROnPZeiW1kVD2AENt8ahJKvDB0ISkEOf7qVIIY0itNvqvD
-         n5gdYs9UcVBXyvsfTOAWJV1RkNTs5vQO0//snaADTvew9+1htHFIeuFMANJnTOFbzis2
-         sGzGqcdGM8sBPpiTHfSVtZeqzjRwHgBZYj40u0O1+fK9JvfGSDJhnNHezDXKPNNz5aIE
-         WvZg==
+        d=chromium.org; s=google; t=1707289080; x=1707893880; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tjfy54B6+Jm7MlmeoV5+p4SaY3yr3KlOWnWh/R3pw/Q=;
+        b=MfeQX4J+50Q+ag2o5vzzyEtnDwVDIINPiKv4QiLy11lxUI83QtjeWW1+AMOA6jN4r0
+         jsSgFnJsuh1RtTwjsR7mIcesGHpSIqnT7Nmkrmsaf+HB+nsrIxuow1vT0mPU96zkyN8Z
+         w6azVL2BzPEHxB28B4dWbKXPgWUMiMSjQXg/Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707282067; x=1707886867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tsFpYrFr6qvE492BrqJFsG8ASeO8HQ1Nge9WRSOJCsE=;
-        b=mJR81xizu5YR+IHMhzaNL+BFbVPoRKmfD65vt1ynu0hN3zqoRnpiescK4IpvQMiGOH
-         jxqIDDgToTbkiNuHCKzMwADlPvPfno2aZuR0YCiPrLVsx+3NjyiWK+WjaPT223GE96bZ
-         7VJY8rYXoJ24OgLqS2Tk+Fu/oArajCgwgBew1SveZ9eBY16sGa3gXwd6CWC5HKt5yNP1
-         H/WsXxtOaVYMeqPPyM/OfezD1x6TWGdITBC+DaJg+ofE8w2Mvbk7NcyBlu6nBhUTLd3K
-         l9BdDCV2JFFklT7EYQFf5wnx5LjDkBTjHKAb74CkUKLZkF+cO6+aaTsWBBZI58Z/dFNx
-         yS6A==
-X-Gm-Message-State: AOJu0Yxobe3ONeiXZtv+MtwVttTCbwCHX42H5lEpsmzp+38uTduXrB+o
-	fQ96kgRgB0CGlS/ZrdY9AbZu6XDO1hmFw3zxWUhSQIdLN+qITpSjIg6fgryQPzxK585fgwrLMhw
-	mPEzy7jmbRHQqJp0gBNzmO2CK3M4=
-X-Google-Smtp-Source: AGHT+IG6OPhTyogu+ZqMppV8mfeNLy/Li51MZcTjoNGa0IAJPsuv+evtuXtnCGeM50wngAwfH4Gz047VCcACFOrg8tg=
-X-Received: by 2002:a05:6102:3944:b0:46d:25e4:df10 with SMTP id
- f4-20020a056102394400b0046d25e4df10mr1580033vsu.30.1707282067271; Tue, 06 Feb
- 2024 21:01:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707289080; x=1707893880;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Tjfy54B6+Jm7MlmeoV5+p4SaY3yr3KlOWnWh/R3pw/Q=;
+        b=ixu2wsgjFQbuSxyl0LQxuHINUkg64rZouE/oW6qehIDWPR6Vh2akVHcX9IiNhf8x2F
+         4yQzzh1Yx4T85kqsiTjYDIcIPZTv+MnPIzMEDzJRDvki/0nlT1J25qfHgUUmecAerNNi
+         QNfIquU5ZlzJnyS7fXSAQCFDZgpkQacGvzIFcwjD6Ww74b19lzvuoUEI6RNlLhnm849r
+         QaSnmsR1bfrKNctQE2OJU1u97WiSdu2K9IgK8JJdl+Z9sbeCUx8h2SOPDhTMVvMg3MlY
+         DGLtjYopTVNuhwIXmIdTw8jzpoSrqXYA3kTNJ0uURlQh7pXwmNlyAWNCqetFRfMJF8XY
+         LxBg==
+X-Gm-Message-State: AOJu0YxuizB0ayMQ4NyaBN2zPfEktK3Oi1PqtlwVzpzJer9f0qzmLyW7
+	kzOHoXs3ZQxlDHKhouMvsh7fd9BGHuCUl9TsgLd1YtXprz/ur81/gSmu+n/rOgQZ5n3TG60/cBk
+	=
+X-Google-Smtp-Source: AGHT+IHYzKqvu7XWwdPK9IPIQeA91PTLPU/0wlPyf2K/JsBCamw5GLYRhxdxFWHdSc6dKa3lYE3i8w==
+X-Received: by 2002:a05:6902:1a45:b0:dc6:b8f5:50ae with SMTP id cy5-20020a0569021a4500b00dc6b8f550aemr4421214ybb.32.1707289079959;
+        Tue, 06 Feb 2024 22:57:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW0zpFxQmjQG8MCNugXs8T9eOKOGkwr3Fe3UTCLKl3sSP4+a0vNh1XuKHHW5agD9D1LTYrg91AHdng2rpQiRJrzXdZtQgTITvaLSFetHFjk3/ZfKxeHMU5IowymtMTkelrCsGTsxATuh03xQ8S6SsQA/3oGqqy8hL92FGaz0Ubl0zw=
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:aa4c:2868:935:7ac6])
+        by smtp.gmail.com with ESMTPSA id jw15-20020a056a00928f00b006e03ac84d53sm672576pfb.193.2024.02.06.22.57.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 22:57:59 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Minchan Kim <minchan@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [RFC][PATCH 0/2] zram: decouple comp stream and comp buffer
+Date: Wed,  7 Feb 2024 15:57:10 +0900
+Message-ID: <20240207065751.1908939-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206202511.4799-1-21cnbao@gmail.com> <20240207014442.GI69174@google.com>
- <41226c84-e780-4408-b7d2-bd105f4834f5@kernel.dk> <20240207031447.GA489524@google.com>
- <79926b88-c1ef-4042-a871-61752d29c838@kernel.dk> <20240207032148.GB489524@google.com>
-In-Reply-To: <20240207032148.GB489524@google.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Wed, 7 Feb 2024 18:00:55 +1300
-Message-ID: <CAGsJ_4yPChtForHNqqT_C7Yge6-0KvDDs=oNqqDuDXNwOeuXoA@mail.gmail.com>
-Subject: Re: [PATCH v2] zram: easy the allocation of zcomp_strm's buffers
- through vmalloc
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhengtangquan@oppo.com, 
-	Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 7, 2024 at 4:21=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (24/02/06 20:17), Jens Axboe wrote:
-> [..]
-> > >>> Minchan, if you have any objections, please chime in.
-> > >>
-> > >> Not Minchan, but I do have an issue with the title of the commit, it
-> > >> doesn't make any sense. Can the maintainer please re-write that to b=
-e
-> > >> something that is appropriate and actually describes what the patch
-> > >> does?
-> > >
-> > > Thanks Jens. I fully agree, I requested a better commit message in
-> > > v1 feedback, we probably still can improve on this.
-> > >
-> > >
-> > > Something like this?
-> > >
-> > > ---
-> > >
-> > > zram: do not allocate physically contiguous strm buffers
-> > >
-> > > Currently zram allocates 2 physically contigous pages per-CPU's
-> > > compression stream (we may have up to 3 streams per-CPU). Since
-> > > those buffers are per-CPU we allocate them from CPU hotplug path,
-> > > which may have higher risks of failed allocations on devices with
-> > > fragmented memory.
-> > >
-> > > Switch to virtually contiguos allocations - crypto comp does not
-> > > seem impose requirements on compression working buffers to be
-> > > physically contiguous.
-> >
-> > Yep, this is much better! Thanks.
->
-> Thanks.
->
+	RFC
 
-Hi Sergey, Jens,
+	We keep compression work memory buffer per-comp stream (which
+is per-CPU), but we don't need that many buffers, because on each
+CPU only one compression backend can access work memory at any given
+time. Hence the patch series moves compression work memory to a
+dedicated per-CPU area, reducing the amount of memory we allocate
+for those buffers.
 
-> Barry, can you please send v3 with the suggested subject and commit
-> message?
+For instance, assume a 12 CPUs system, 2 compression streams
+per-CPU (a default and one for deferred recompression). Before
+we'd allocate 12 * 2 * 2 pages, after we'll allocate 12 * 2 pages.
 
-Thanks for your comments and improvements. will send v3 accordingly.
+NOTE:
+The series stops short of moving comp buffers to a global per-CPU
+area, which all zram devices can share. Compression backends use
+CPUs exclusively (disable migration and CPU hotplug), so in theory
+comp work memory can be in global per-CPU data. This can reduce
+memory usage on systems that init numerous zram devices.
+E.g. instead of num-zram-devices * num-cpus buffers we'll allocate
+only num-cpus buffers.
 
-Best regard
-Barry
+Sergey Senozhatsky (2):
+  zram: do not allocate buffer if crypto comp allocation failed
+  zram: move comp buffer to a dedicate per-CPU area
+
+ drivers/block/zram/zcomp.c    | 118 +++++++++++++++++++++++++++++-----
+ drivers/block/zram/zcomp.h    |  24 +++++--
+ drivers/block/zram/zram_drv.c |  32 +++++++--
+ drivers/block/zram/zram_drv.h |   1 +
+ include/linux/cpuhotplug.h    |   1 +
+ 5 files changed, 151 insertions(+), 25 deletions(-)
+
+-- 
+2.43.0.594.gd9cf4e227d-goog
+
