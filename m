@@ -1,130 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F369E7FBD9;
-	Wed,  7 Feb 2024 15:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1003A81AC6
+	for <linux-block@vger.kernel.org>; Wed,  7 Feb 2024 16:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707321125; cv=none; b=rzwMcSxkdI+S6o7jSrlyGaRsuUGKS+LIRyTghzFY5ueqVs2BWzoiDv/OdiIiYonA7dFyyWo5dvsf2kESW3B5ZGfmM/iGZh84/wZS/lU1ajEedyWdWnzlxWppNXIUW3QO20I1C5EUJnSYvvbcWF0TKiKSnC/c1BzJbHXLeEszP2o=
+	t=1707323834; cv=none; b=iAFzBFPxrRfVVO3bz3Kbgj3N3Zi38xSKkWk5QGc2/sHqxbFCF74fLQfZobr5HOK4f6e5TnN3Ikh49sfMzhTgzTwn4CrFHvI5N+zuDaW4UFzSYQraFW42SDY25CPUmd48SKKE6olibIYDGqRHWzhKh5RoBC2B7bdWDSW2ibaOnRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707321125; c=relaxed/simple;
-	bh=/1x7h2DpHjWcd/k76A8g5THiTurxMbwv+SYlEW+93sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q6hng+cGwy959ErJkpp6V5JzKjivlCDbLsPZ4feC9upV8jiSDOZlxwE8ClUV9Zj7zNhF14PwfG3SOHaDr/hg3vsuxuZgI5RKUDKlRN9/O3/VErZ1PpqJ8sboLE9DzqFKfRCRS7BB8MdDX8QLurUbfXGD1mPn87+HQH2sz3QxcA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4roDxo8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707323834; c=relaxed/simple;
+	bh=RYSO2FbsyUtFSzUQTCXFk2Hq2fLA6/1JXzENsM9trWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=RQSZaZC+gTqV52B6PgmEgXbIeYnXNKemk7/M9BAmrAldQ3hC6bjQsLkQXXWBqLcnU8Fi4qgmDTyZefIMKQo3YkXF3JqbWz91t/4xrrECy3xV9wpB1+6/djmQAQGEIK6Kvl6FQKDpooEiFYBIUUd/LqAX5wlHu66jLv5egN+Xfm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Vq77BLc1; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4roDxo8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D9B4C43394;
-	Wed,  7 Feb 2024 15:52:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707321123;
-	bh=/1x7h2DpHjWcd/k76A8g5THiTurxMbwv+SYlEW+93sc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S4roDxo8tVqC2GezTlb3cfXFcp6weQcwLaiGZmdf1pdhhuOhtMsuGhDXsDCMV8GbO
-	 RLxAo3vtpqHJdWUBeO1ZdBUc+YJEiBqPKnzeW10gKgdzx5yAj262qNEjatFr2oewA5
-	 U96gkG8+cuJWYr/hLXC31VNHfddrz7/y70HWgLAxw3ppS44aI4YAdO6JffVBmwOlG8
-	 XU9HW6HuV+8zPXv4xQ3gBEg6Ps5noXk7cufMK2v4qV4yePWova47vaD8FNN7s7EdTb
-	 NB9oCYbsmwivsZGgDOIpD/iQoZTqpkGenaDhqgpVnREaQgX0b1oUD9pyX7pTlppedD
-	 uLYLbPbnYYeQg==
-Date: Wed, 7 Feb 2024 17:51:44 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org, bpf@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Reclaiming & documenting page flags
-Message-ID: <ZcOnEGyr6y3jei68@kernel.org>
-References: <Zbcn-P4QKgBhyxdO@casper.infradead.org>
- <Zb9pZTmyb0lPMQs8@kernel.org>
- <ZcACya-MJr_fNRSH@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Vq77BLc1"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-7c3d923f7cbso534039f.0
+        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2024 08:37:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707323831; x=1707928631; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wY2HuCa4eOpym238h592uLbJ56WIqRtYGY5h38Z5DHw=;
+        b=Vq77BLc1/C8hXiIdYY7IHT6/VEoXF2vtHqUl9CXa51b3SPexCFq4lcZ5mJyF2wJWIu
+         FSLx4k19lBzV4pK5+baqToh050oIHR1EZUSLo45JiOk2IcWAXx8zQxFm/VFn9+uClEGY
+         kkuuRLEVX0MWrVb7fdY58o+H0uUfi/qgjzP1dqwMU76oUq5GH3/U+15bs1kAxaId1+6M
+         YEewi1XbeNsWglSThVgV1e/HfBVvBPNFP6nYaHZxbPC85we5gfrR+3UlN2NuG0I/uQmX
+         2mDCFzmKSrCX8PZPN5jlHgeA4Er8bxH+pHPK2wab2JIHFYcd8q39IV9WY2PocvC0RIEp
+         ogRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707323831; x=1707928631;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wY2HuCa4eOpym238h592uLbJ56WIqRtYGY5h38Z5DHw=;
+        b=ZhWdWraYPxrgkVDdOMec1ExdOXtEKwEFHZM9ktRGpAZUQebQPAYVZKmNOS5pp0K2TG
+         R05MsAhQa0L4C5B2h4FlHWajvpLypRJJmSBqR0Nj9cHc8uM0F79ibZedFeSRFIVI5XIo
+         PIGEX+QvVI83Y0/unCFyPAFlrLURNPjg+K9ozCKmfoxWylS2GeAIZ72urj2kelsiS/2O
+         exIn4EqdQYvGqgddU0Z/rglnQGy1cDG68iXWf2p7NtvIAVes/JZTJnG/Kk0gCj6gtN2B
+         oWRWWqMLwUQV0tDFvhiNF2Lbvns2Kbm8PNX8ZOwVe3S6Alt52EQbhmbk+w7tEStRpCxf
+         MGew==
+X-Forwarded-Encrypted: i=1; AJvYcCV6Fw49zVnEiJUMSqsnOEW2E7dlqqwtinNhgylLcn78IzFDtSRhTQJZVN5vW9ua916T4/Eut2HYP8dmw3UmirhUCopKOXTZ3hK2VLg=
+X-Gm-Message-State: AOJu0YwzT49cE+JR34Yy8Kr134e1eCkS9tmNI643jfPRA6xhuqXI/NUW
+	lJcSqUpS00qp6DC37jawDz7rAlSs/zApwtHj5GkyvCZ82Ahc7zQuh0H0fo1rkgY=
+X-Google-Smtp-Source: AGHT+IHBekYriwzFUTmIs2HuOvJpILsbppgD4OcQlP8S9YNmgxXVN3UyHD4Ag57kljwURqP1sLZ4Cg==
+X-Received: by 2002:a6b:3e42:0:b0:7c4:606:6501 with SMTP id l63-20020a6b3e42000000b007c406066501mr484657ioa.2.1707323830176;
+        Wed, 07 Feb 2024 08:37:10 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCX6R1qbJwxbKZcTPkOsFeXY98TBMZKhJmbLCybteGMar+zmb9vBZvWn3Q7539N8D3y4EbiyR6A+g18QfVjfQq/liMbjDzqIw5AldPvT5SqGZ+IpqAJf0W75xD6GO4x75tE3U7TcnN45szS9xsvpxRCu1LbeajMaFBRkVG/Hbo0Rn362pSeMrGAv/zSDN8o=
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id x4-20020a029704000000b00471294696e4sm400268jai.38.2024.02.07.08.37.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Feb 2024 08:37:09 -0800 (PST)
+Message-ID: <b1668ac2-3fa3-45e6-ae79-a127cb095eba@kernel.dk>
+Date: Wed, 7 Feb 2024 09:37:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcACya-MJr_fNRSH@casper.infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] BUG: unable to handle page fault for address:
+ 00000002de3ac841
+Content-Language: en-US
+To: Guangwu Zhang <guazhang@redhat.com>, linux-block@vger.kernel.org,
+ Ming Lei <ming.lei@redhat.com>, Jeff Moyer <jmoyer@redhat.com>,
+ io-uring@vger.kernel.org
+References: <CAGS2=Yr7_h6ZiOSjRNXjDeXDQJrcDE+4LW5cJYAuB_2WnZYGSw@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAGS2=Yr7_h6ZiOSjRNXjDeXDQJrcDE+4LW5cJYAuB_2WnZYGSw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Feb 04, 2024 at 09:34:01PM +0000, Matthew Wilcox wrote:
-> On Sun, Feb 04, 2024 at 11:39:33AM +0100, Mike Rapoport wrote:
-> > On Mon, Jan 29, 2024 at 04:32:03AM +0000, Matthew Wilcox wrote:
-> > > Our documentation of the current page flags is ... not great.  I think
-> > > I can improve it for the page cache side of things; I understand the
-> > > meanings of locked, writeback, uptodate, dirty, head, waiters, slab,
-> > > mlocked, mappedtodisk, error, hwpoison, readahead, anon_exclusive,
-> > > has_hwpoisoned, hugetlb and large_remappable.
-> > > 
-> > > Where I'm a lot more shaky is the meaning of the more "real MM" flags,
-> > > like active, referenced, lru, workingset, reserved, reclaim, swapbacked,
-> > > unevictable, young, idle, swapcache, isolated, and reported.
-> > > 
-> > > Perhaps we could have an MM session where we try to explain slowly and
-> > > carefully to each other what all these flags actually mean, talk about
-> > > what combinations of them make sense, how we might eliminate some of
-> > > them to make more space in the flags word, and what all this looks like
-> > > in a memdesc world.
-> > > 
-> > > And maybe we can get some documentation written about it!  Not trying
-> > > to nerd snipe Jon into attending this session, but if he did ...
-> > 
-> > I suspect Jon will be there anyway, but not sure he'd be willing to do the
-> > writing :)
-> > 
-> > I was going to propose the "mm docs" session again, but this one seems more
-> > useful than talking yet again about how hard it is to get MM documentation
-> > done.
+On 2/7/24 12:19 AM, Guangwu Zhang wrote:
+> HI,
+> Found the kernel issue with linux-block/for-next branch.
+> kernel repo https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
 > 
-> I'm doing my best to write documentation as I go.  I think we're a bit
-> better off than we were last year.  Do we have scripts to tell us which
-> public functions (ie EXPORT_SYMBOL and static inline functions in header
-> files) have kernel-doc?  And could we run them against kernels from, say,
-> April 2023, 2022, 2021, 2020, 2019 (and in two months against April 2024)
-> and see how we're doing in terms of percentage undocumented functions?
+> Reproducer :
+> 1. offline_online_cpu_in_bg
+> 2. some_io_in_bg
 
-We didn't have such script, but it was easy to compare "grep
-EXPORT_SYMBOL\|static inline" with ".. c:function" in kernel-doc.
-We do improve slowly, but we are still below 50% with kernel-doc for
-EXPORT_SYMBOL functions and slightly above 10% for static inlines.
-
-Although with static inlines it's quite possible that the percentage of
-actual public API documentation is higher because some of the functions in
-inlcude/linux/ are only used inside mm.
-
-There are also APIs that are not EXPORT_SYMBOL, but I didn't find an easy
-way to check how well there are documented.
-
-EXPORT_SYMBOL
-version     	funcs	docs	percent
-v5.0        	514	177	34
-v5.6        	538	208	38
-v5.12       	550	209	38
-v5.17       	580	228	39
-v6.3        	580	235	40
-v6.8-rc1    	565	238	42
-
-static inline
-version     	funcs	docs	percent
-v5.0        	581	33	5
-v5.6        	596	41	6
-v5.12       	629	42	6
-v5.17       	746	74	9
-v6.3        	867	95	10
-v6.8-rc1    	944	116	12
-
- 
-> There's also the problem of getting long-form documentation done.
-> But I think that's a different problem from getting kernel-doc written.
-> Looking at the 55 commits in the last year to Documentation/mm, we seems
-> to be doing a pretty good job of keeping the documentation we have up
-> to date.  Just not a great job of adding new documentation.
-
-I agree that long-form documentation is a different problem from getting
-kernel-doc written and we are not doing a great job in writing new
-documentation.
+I don't know what these two things are. Would be nice with an actual
+reproducer. I can trivially write something that offline and onlines CPU
+in the background, and I did, but I cannot reproduce this issue. Ditto
+on "some_io_in_bg", what does that mean??
 
 -- 
-Sincerely yours,
-Mike.
+Jens Axboe
+
