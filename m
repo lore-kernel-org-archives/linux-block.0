@@ -1,127 +1,115 @@
-Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842F46BB2F
-	for <linux-block@vger.kernel.org>; Thu,  8 Feb 2024 09:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA687BAE7;
+	Thu,  8 Feb 2024 16:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707384727; cv=none; b=KOSH3Wm0E9vJJDloKSe8lKVt/125OUrD1LTnaD4wP726tzz3KoDdOgCKOHmqVEGTSjmBL70vGIowfKgUhUr7u+9b9++xIC1RUIc9jeSKEzVm+RWgVmVZhGpvtwA8lP3rw82QzMsF9ndYBn1EQjTLwZrXTDQfVE1s9zSzRv22VKg=
+	t=1707408132; cv=none; b=tm73EUf2c7KKNmiiEjDpnJdgIbSkl3+4Ous3G0wxKuXobv7EWxUIZMuMufVf3BAYp6SbALHP9z0kzjkoyhyVAbYFI5fNV+818e6IXtQXyft18gKIo7IDh2ajSnDaeb4XeL8UM7s0dFO3CU7HAPDnnRRPOTaqcRV4UhaP5WPthWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707384727; c=relaxed/simple;
-	bh=Z43mwuX48ZWWYGQscTT9lPoGr9fJEhXO9dvSyk7+URw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j2zG0lRej+TSqyMxbx1QQCWT5ojZYe3UeCweLpY6nRa/qFeJUbQSEnmcxFVaxmDpLjyI9rbH96N0bjNHB2K0hemwNEatU29Fhgnxy5lj5+d1iFFrk5JPJsfL+SDzkOTJemoVA+T7HxRBCdPfoBGz5taNKjPbQGHzK0JaoCW0Xf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 4189VqAL048943;
-	Thu, 8 Feb 2024 17:31:52 +0800 (+08)
-	(envelope-from zhaoyang.huang@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4TVsFB4n1fz2K4gjP;
-	Thu,  8 Feb 2024 17:31:42 +0800 (CST)
-Received: from bj03382pcu01.spreadtrum.com (10.0.73.40) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Thu, 8 Feb 2024 17:31:49 +0800
-From: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-To: Jens Axboe <axboe@kernel.dk>, Peter Zijlstra <peterz@infradead.org>,
-        Ingo
- Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
-        Vincent
- Guittot <vincent.guittot@linaro.org>,
-        Yu Zhao <yuzhao@google.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Zhaoyang Huang
-	<huangzhaoyang@gmail.com>, <steve.kang@unisoc.com>
-Subject: [PATCH 3/3] block: introducing a bias over deadline's fifo_time
-Date: Thu, 8 Feb 2024 17:31:36 +0800
-Message-ID: <20240208093136.178797-3-zhaoyang.huang@unisoc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240208093136.178797-1-zhaoyang.huang@unisoc.com>
-References: <20240208093136.178797-1-zhaoyang.huang@unisoc.com>
+	s=arc-20240116; t=1707408132; c=relaxed/simple;
+	bh=uTFe5CG7oWonbpeVbz5UaAiaJEjR9X1sZYLpZSCrroE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RpalCi3Iba9l+gDTQVQ3cBC1tUMXBk160Y1LAnXyH40zfhFpUWCpc8ji+oNx+4O1gknE2g4gk8wKste4qnzOATOhpTU/EgHMB1vf+nr0TU668cjzTKpKdUL9DdLen97lP2o8Dt4lFcKVJ/akmTIPH14w0C5G/V6D6u9exhV9VTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obJpFnU3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obJpFnU3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC76CC433C7;
+	Thu,  8 Feb 2024 16:02:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707408132;
+	bh=uTFe5CG7oWonbpeVbz5UaAiaJEjR9X1sZYLpZSCrroE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=obJpFnU3wW/7vWnQ2T7KbJTN1o0DhsaGAsrrj2BVE8zioOEqxNl2MiXnaak9whqbt
+	 OIDJi1LDw4Ob4TOyMXecgyYlB0ULe8cbKEYD18dH7iv2VOYpw90ipR40HRow6soWvg
+	 DkCTi37Z6twlWFr7xB9SDcp4WUYNmxbMlDbECEGxFl+2eUYoaRKZIyH7IwHvpQ9BQu
+	 nNUhloOm8p60q6R9WsjvEZT4tnO900WaEIv/prTxnu+YOB1xTOPKTTYP8o7TuhLlr2
+	 Ljl07+/LdqTtHEHadWQ3k0UZK64B9xF+oq5GtFxTc70ZUxMclN84FsAWvnJLmt4GnN
+	 Cj4n/P6UyVT+g==
+Message-ID: <3ba0dffa-beea-478f-bb6e-777b6304fb69@kernel.org>
+Date: Thu, 8 Feb 2024 17:02:07 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL:SHSQR01.spreadtrum.com 4189VqAL048943
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
+Content-Language: en-US
+To: Dave Chinner <david@fromorbit.com>, Matthew Wilcox <willy@infradead.org>
+Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Kent Overstreet <kent.overstreet@gmail.com>, Michal Hocko <mhocko@kernel.org>
+References: <ZZcgXI46AinlcBDP@casper.infradead.org>
+ <ZZzP6731XwZQnz0o@dread.disaster.area>
+From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+In-Reply-To: <ZZzP6731XwZQnz0o@dread.disaster.area>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+On 1/9/24 05:47, Dave Chinner wrote:
+> On Thu, Jan 04, 2024 at 09:17:16PM +0000, Matthew Wilcox wrote:
+>> This is primarily a _FILESYSTEM_ track topic.  All the work has already
+>> been done on the MM side; the FS people need to do their part.  It could
+>> be a joint session, but I'm not sure there's much for the MM people
+>> to say.
+>> 
+>> There are situations where we need to allocate memory, but cannot call
+>> into the filesystem to free memory.  Generally this is because we're
+>> holding a lock or we've started a transaction, and attempting to write
+>> out dirty folios to reclaim memory would result in a deadlock.
+>> 
+>> The old way to solve this problem is to specify GFP_NOFS when allocating
+>> memory.  This conveys little information about what is being protected
+>> against, and so it is hard to know when it might be safe to remove.
+>> It's also a reflex -- many filesystem authors use GFP_NOFS by default
+>> even when they could use GFP_KERNEL because there's no risk of deadlock.
+>> 
+>> The new way is to use the scoped APIs -- memalloc_nofs_save() and
+>> memalloc_nofs_restore().  These should be called when we start a
+>> transaction or take a lock that would cause a GFP_KERNEL allocation to
+>> deadlock.  Then just use GFP_KERNEL as normal.  The memory allocators
+>> can see the nofs situation is in effect and will not call back into
+>> the filesystem.
+> 
+> So in rebasing the XFS kmem.[ch] removal patchset I've been working
+> on, there is a clear memory allocator function that we need to be
+> scoped: __GFP_NOFAIL.
+> 
+> All of the allocations done through the existing XFS kmem.[ch]
+> interfaces (i.e just about everything) have __GFP_NOFAIL semantics
+> added except in the explicit cases where we add KM_MAYFAIL to
+> indicate that the allocation can fail.
+> 
+> The result of this conversion to remove GFP_NOFS is that I'm also
+> adding *dozens* of __GFP_NOFAIL annotations because we effectively
+> scope that behaviour.
+> 
+> Hence I think this discussion needs to consider that __GFP_NOFAIL is
+> also widely used within critical filesystem code that cannot
+> gracefully recover from memory allocation failures, and that this
+> would also be useful to scope....
+> 
+> Yeah, I know, mm developers hate __GFP_NOFAIL. We've been using
+> these semantics NOFAIL in XFS for over 2 decades and the sky hasn't
+> fallen. So can we get memalloc_nofail_{save,restore}() so that we
+> can change the default allocation behaviour in certain contexts
+> (e.g. the same contexts we need NOFS allocations) to be NOFAIL
+> unless __GFP_RETRY_MAYFAIL or __GFP_NORETRY are set?
 
-According to current policy, RT tasks possess the privilege for both of
-CPU and IO scheduler which could have the preempted CFS tasks suffer big
-IO-latency unfairly. This commit introduce an approximate method to
-deduct the preempt affection.
+Your points and Kent's proposal of scoped GFP_NOWAIT [1] suggests to me this
+is no longer FS-only topic as this isn't just about converting to the scoped
+apis, but also how they should be improved.
 
-TaskA
-sched in
-|
-|
-|
-submit_bio
-|
-|
-|
-fifo_time = jiffies + expire
-(insert_request)
+[1] http://lkml.kernel.org/r/Zbu_yyChbCO6b2Lj@tiehlicka
 
-TaskB
-sched in
-|
-|
-preempted by RT task
-|\
-| This period time is unfair to TaskB's IO request, should be adjust
-|/
-submit_bio
-|
-|
-|
-fifo_time = jiffies + expire * CFS_PROPORTION(rq)
-(insert_request)
-
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
----
- block/mq-deadline.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index f958e79277b8..43c08c3d6f18 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -15,6 +15,7 @@
- #include <linux/compiler.h>
- #include <linux/rbtree.h>
- #include <linux/sbitmap.h>
-+#include "../kernel/sched/sched.h"
- 
- #include <trace/events/block.h>
- 
-@@ -802,6 +803,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	u8 ioprio_class = IOPRIO_PRIO_CLASS(ioprio);
- 	struct dd_per_prio *per_prio;
- 	enum dd_prio prio;
-+	int fifo_expire;
- 
- 	lockdep_assert_held(&dd->lock);
- 
-@@ -840,7 +842,9 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 		/*
- 		 * set expire time and add to fifo list
- 		 */
--		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
-+		fifo_expire = task_is_realtime(current) ? dd->fifo_expire[data_dir] :
-+			CFS_PROPORTION(current, dd->fifo_expire[data_dir]);
-+		rq->fifo_time = jiffies + fifo_expire;
- 		insert_before = &per_prio->fifo_list[data_dir];
- #ifdef CONFIG_BLK_DEV_ZONED
- 		/*
--- 
-2.25.1
+> We already have memalloc_noreclaim_{save/restore}() for turning off
+> direct memory reclaim for a given context (i.e. equivalent of
+> clearing __GFP_DIRECT_RECLAIM), so if we are going to embrace scoped
+> allocation contexts, then we should be going all in and providing
+> all the contexts that filesystems actually need....
+> 
+> -Dave.
 
