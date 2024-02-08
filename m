@@ -1,176 +1,170 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF04679E4;
-	Thu,  8 Feb 2024 06:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7F86A354;
+	Thu,  8 Feb 2024 08:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707375058; cv=none; b=EBSUKIsQTkNTwATCOLZ8uPY2eXDwLDX+6gqVouL0T8swD8huNzN10I2704pdgR23tvzBM2KLjaAiqoEnEaGqYRns8PqXvhZlDoTd12Pcyqo1v06utVZAc0RTPmvszp0Ul6zVCg92GLlHzSP6brDVK3IgAzR/tezaTT/D54h4cIs=
+	t=1707381884; cv=none; b=c5VqnMJUfkwmgsQgOAs6ucDy33xakW/t72suetOgPijmPpcXhI8KlRHQkQFE4C+dO1c2Tn/EKhYHuoHzVl8cjFTUXf9v8AKlGg4+ZW1k8J/fAZmdfRD8NOW8tJuB+4H22YJkWqHcJdzmdw7NiRKJRtiJT4WsR08IKXM8/ZAd/1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707375058; c=relaxed/simple;
-	bh=Blq7rU4mZ+SoYBWemZfo+nUsAY0ljuEyn+/YGvZ2zAs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r67egsUBv0hRFLYrMWt8HHsBtLNRXhSfxbEDUVxpXss5fbZnGWXTeE67yFoloOiPxAJ/fw3b5XmbrHhXe+zz+Y79yIT9rFNR1+4YZ2QDPJ+9Ke5PRqU44cUCiGDNk/9hysDSQMapS/Bu34vvNwMsdH2Vf0LcTyMHUiCrnKYhdjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBw3ANuL; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBw3ANuL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86CF2C433A6;
-	Thu,  8 Feb 2024 06:50:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707375057;
-	bh=Blq7rU4mZ+SoYBWemZfo+nUsAY0ljuEyn+/YGvZ2zAs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=iBw3ANuLjTJlE+pfEJR8ExuAYxb5XFZ6EG8wFB0Yn1/I7H47a4muQxzRfE29+2ZiD
-	 myT4mNcogzX1c+OWIlTNy0OeLD8ztUO4hkaCxcErugQZ07AC0JSkBFG32QB/tBgsHr
-	 RQtjSsD05Z9LFnNJl+NlFE+JPgdL8u+BcUq/P0Hdv9KEBw6apAJpaHw1B61grzgH3S
-	 bPilqEplu3v/SxIbGP1BCm7qcdaplhUP/Uou+wEg19X/SgvBx99Km221bvu9EamSvU
-	 AxT6iC4x7KoI8RFla4Uho2IQSi/599k2g4zdqFJoFHahdGUPGHvutHhZiO8UFquivD
-	 UyQBlVVEW+2sw==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d09fefabc1so16091591fa.1;
-        Wed, 07 Feb 2024 22:50:57 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVcyEE9jWs9SuBb1PSlOyEwfykxlv/QKu/lHZFOQYfxGnXQYBp4wDpwkz1IFC3BJJiv2PgGMEHPc5j2Dyl1oxYGUF/c6p/tgpSdRwcQDULJxa/04BXhI45lys6DwFzQb4M/8pfqEQpNkc0UqaT7iofpXH3MHB1rP8AkAqxliGIXujh6UlxY
-X-Gm-Message-State: AOJu0YxK9l5LKW3YsZL1VC8eebvkwqvLtJEuAtGgDxIe4yVk3Z3nPzxn
-	n/sdBEB28Ck9UYJQpwFefoBO1s5VUfYRYi+ieiiKCrFS2leRuHG7g1Hy7PxMhxAxL76BVul+XYX
-	lxNJ+fYXO+oH92wQlLQSZJbAVCh0=
-X-Google-Smtp-Source: AGHT+IHy8Qpcwq8yq9sbhJtqtqNBBtvyBZ0GYcTZFVmxDS9u6BeF4978MZaFEycIsX6/uag1SqonCtdwPENndeM181Y=
-X-Received: by 2002:a05:651c:1250:b0:2d0:ce72:570b with SMTP id
- h16-20020a05651c125000b002d0ce72570bmr1828377ljh.48.1707375055731; Wed, 07
- Feb 2024 22:50:55 -0800 (PST)
+	s=arc-20240116; t=1707381884; c=relaxed/simple;
+	bh=EhlFipOy96RVlNZ4H7qLDNCbp4auRS9QP+coSjkWbHg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Svy9AddDFV1M6Hg/x22urpiG+luTdKUtG4IkXSaoP2sCkBs7UY9+qiyxDV4B/UP2a2BDa0PXQH3x0LKWXeH4HM0HCU7q6F+LXUV3wa75mu05mCPj+4/MvAsT0HEkh7GypneH+h4pArSMOpuM335g1OXb0aonPRr9KGWRElawpXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TVrBm37HPz4f3jcs;
+	Thu,  8 Feb 2024 16:44:32 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id E70251A0392;
+	Thu,  8 Feb 2024 16:44:36 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP2 (Coremail) with SMTP id Syh0CgBHaw5vlMRlv+eUDQ--.36837S3;
+	Thu, 08 Feb 2024 16:44:35 +0800 (CST)
+Message-ID: <6849835d-a3ac-e840-09e9-8539e7953fe4@huaweicloud.com>
+Date: Thu, 8 Feb 2024 16:44:31 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240207092756.2087888-1-linan666@huaweicloud.com>
-In-Reply-To: <20240207092756.2087888-1-linan666@huaweicloud.com>
-From: Song Liu <song@kernel.org>
-Date: Wed, 7 Feb 2024 22:50:43 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW74hLiW_KTv3xohwMAcPZ9gp2TvLST4tY7H3O8cA26TTg@mail.gmail.com>
-Message-ID: <CAPhsuW74hLiW_KTv3xohwMAcPZ9gp2TvLST4tY7H3O8cA26TTg@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
 Subject: Re: [PATCH] block: fix deadlock between bd_link_disk_holder and
  partition scan
-To: linan666@huaweicloud.com
-Cc: axboe@kernel.dk, linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
-	houtao1@huawei.com, yangerkun@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Song Liu <song@kernel.org>, linan666@huaweicloud.com
+Cc: axboe@kernel.dk, linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+ houtao1@huawei.com, yangerkun@huawei.com
+References: <20240207092756.2087888-1-linan666@huaweicloud.com>
+ <CAPhsuW74hLiW_KTv3xohwMAcPZ9gp2TvLST4tY7H3O8cA26TTg@mail.gmail.com>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <CAPhsuW74hLiW_KTv3xohwMAcPZ9gp2TvLST4tY7H3O8cA26TTg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgBHaw5vlMRlv+eUDQ--.36837S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAFyfurykKF17tF47Zr1kKrg_yoW5Zw13pF
+	W7t3ZxKw47JFs8W3yDta4xZF1rKa1kK3y7tFy3G34ay3ZF9rnY9F1ag3y5uFyqkF4xAF9F
+	qF1UXa47Ww1IyrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
+	M4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbHa0DUUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On Wed, Feb 7, 2024 at 1:32=E2=80=AFAM <linan666@huaweicloud.com> wrote:
->
-> From: Li Nan <linan122@huawei.com>
->
-> 'open_mutex' of gendisk is used to protect open/close block devices. But
-> in bd_link_disk_holder(), it is used to protect the creation of symlink
-> between holding disk and slave bdev, which introduces some issues.
->
-> When bd_link_disk_holder() is called, the driver is usually in the proces=
-s
-> of initialization/modification and may suspend submitting io. At this
-> time, any io hold 'open_mutex', such as scanning partitions, can cause
-> deadlocks. For example, in raid:
->
-> T1                              T2
-> bdev_open_by_dev
->  lock open_mutex [1]
->  ...
->   efi_partition
->   ...
->    md_submit_bio
->                                 md_ioctl mddev_syspend
->                                   -> suspend all io
->                                  md_add_new_disk
->                                   bind_rdev_to_array
->                                    bd_link_disk_holder
->                                     try lock open_mutex [2]
->     md_handle_request
->      -> wait mddev_resume
->
-> T1 scan partition, T2 add a new device to raid. T1 waits for T2 to resume
-> mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
->
-> Fix it by introducing a local mutex 'holder_mutex' to replace 'open_mutex=
-'.
 
-Is this to fix [1]? Do we need some Fixes and/or Closes tags?
 
-Could you please add steps to reproduce this issue?
+在 2024/2/8 14:50, Song Liu 写道:
+> On Wed, Feb 7, 2024 at 1:32 AM <linan666@huaweicloud.com> wrote:
+>>
+>> From: Li Nan <linan122@huawei.com>
+>>
+>> 'open_mutex' of gendisk is used to protect open/close block devices. But
+>> in bd_link_disk_holder(), it is used to protect the creation of symlink
+>> between holding disk and slave bdev, which introduces some issues.
+>>
+>> When bd_link_disk_holder() is called, the driver is usually in the process
+>> of initialization/modification and may suspend submitting io. At this
+>> time, any io hold 'open_mutex', such as scanning partitions, can cause
+>> deadlocks. For example, in raid:
+>>
+>> T1                              T2
+>> bdev_open_by_dev
+>>   lock open_mutex [1]
+>>   ...
+>>    efi_partition
+>>    ...
+>>     md_submit_bio
+>>                                  md_ioctl mddev_syspend
+>>                                    -> suspend all io
+>>                                   md_add_new_disk
+>>                                    bind_rdev_to_array
+>>                                     bd_link_disk_holder
+>>                                      try lock open_mutex [2]
+>>      md_handle_request
+>>       -> wait mddev_resume
+>>
+>> T1 scan partition, T2 add a new device to raid. T1 waits for T2 to resume
+>> mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
+>>
+>> Fix it by introducing a local mutex 'holder_mutex' to replace 'open_mutex'.
+> 
+> Is this to fix [1]? Do we need some Fixes and/or Closes tags?
+> 
 
+No. Just use another way to fix [2], and both [2] and this patch can fix
+the issue. I am not sure about the root cause of [1] yet.
+
+[2] https://patchwork.kernel.org/project/linux-raid/list/?series=812045
+
+> Could you please add steps to reproduce this issue?
+
+We need to modify the kernel, add sleep in md_submit_bio() and md_ioctl()
+as below, and then:
+   1. mdadm -CR /dev/md0 -l1 -n2 /dev/sd[bc]  #create a raid
+   2. echo 1 > /sys/module/md_mod/parameters/error_inject  #enable sleep
+   3. 'mdadm --add /dev/md0 /dev/sda'  #add a disk to raid
+   4. submit ioctl BLKRRPART to raid within 10s.
+
+
+Changes of kernel:
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 350f5b22ba6f..ce16d319edf2 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -76,6 +76,8 @@ static DEFINE_SPINLOCK(pers_lock);
+
+  static const struct kobj_type md_ktype;
+
++static bool error_inject = false;
++
+  struct md_cluster_operations *md_cluster_ops;
+  EXPORT_SYMBOL(md_cluster_ops);
+  static struct module *md_cluster_mod;
+@@ -372,6 +374,8 @@ static bool is_suspended(struct mddev *mddev, struct 
+bio *bio)
+
+  void md_handle_request(struct mddev *mddev, struct bio *bio)
+  {
++       if (error_inject)
++               ssleep(10);
+  check_suspended:
+         if (is_suspended(mddev, bio)) {
+                 DEFINE_WAIT(__wait);
+@@ -7752,6 +7756,8 @@ static int md_ioctl(struct block_device *bdev, 
+blk_mode_t mode,
+                  */
+                 if (mddev->pers) {
+                         mdu_disk_info_t info;
++                       if (error_inject)
++                               ssleep(10);
+                         if (copy_from_user(&info, argp, sizeof(info)))
+                                 err = -EFAULT;
+                         else if (!(info.state & (1<<MD_DISK_SYNC)))
+@@ -10120,6 +10126,7 @@ module_param_call(start_ro, set_ro, get_ro, NULL, 
+S_IRUSR|S_IWUSR);
+  module_param(start_dirty_degraded, int, S_IRUGO|S_IWUSR);
+  module_param_call(new_array, add_named_array, NULL, NULL, S_IWUSR);
+  module_param(create_on_open, bool, S_IRUSR|S_IWUSR);
++module_param(error_inject, bool, S_IRUSR|S_IWUSR);
+
+  MODULE_LICENSE("GPL");
+  MODULE_DESCRIPTION("MD RAID framework");
+
+
+-- 
 Thanks,
-Song
+Nan
 
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=3D218459
-
->
-> Signed-off-by: Li Nan <linan122@huawei.com>
-> ---
->  block/holder.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->
-> diff --git a/block/holder.c b/block/holder.c
-> index 37d18c13d958..5bfb0a674cc7 100644
-> --- a/block/holder.c
-> +++ b/block/holder.c
-> @@ -8,6 +8,8 @@ struct bd_holder_disk {
->         int                     refcnt;
->  };
->
-> +static DEFINE_MUTEX(holder_mutex);
-> +
->  static struct bd_holder_disk *bd_find_holder_disk(struct block_device *b=
-dev,
->                                                   struct gendisk *disk)
->  {
-> @@ -80,7 +82,7 @@ int bd_link_disk_holder(struct block_device *bdev, stru=
-ct gendisk *disk)
->         kobject_get(bdev->bd_holder_dir);
->         mutex_unlock(&bdev->bd_disk->open_mutex);
->
-> -       mutex_lock(&disk->open_mutex);
-> +       mutex_lock(&holder_mutex);
->         WARN_ON_ONCE(!bdev->bd_holder);
->
->         holder =3D bd_find_holder_disk(bdev, disk);
-> @@ -108,7 +110,7 @@ int bd_link_disk_holder(struct block_device *bdev, st=
-ruct gendisk *disk)
->                 goto out_del_symlink;
->         list_add(&holder->list, &disk->slave_bdevs);
->
-> -       mutex_unlock(&disk->open_mutex);
-> +       mutex_unlock(&holder_mutex);
->         return 0;
->
->  out_del_symlink:
-> @@ -116,7 +118,7 @@ int bd_link_disk_holder(struct block_device *bdev, st=
-ruct gendisk *disk)
->  out_free_holder:
->         kfree(holder);
->  out_unlock:
-> -       mutex_unlock(&disk->open_mutex);
-> +       mutex_unlock(&holder_mutex);
->         if (ret)
->                 kobject_put(bdev->bd_holder_dir);
->         return ret;
-> @@ -140,7 +142,7 @@ void bd_unlink_disk_holder(struct block_device *bdev,=
- struct gendisk *disk)
->         if (WARN_ON_ONCE(!disk->slave_dir))
->                 return;
->
-> -       mutex_lock(&disk->open_mutex);
-> +       mutex_lock(&holder_mutex);
->         holder =3D bd_find_holder_disk(bdev, disk);
->         if (!WARN_ON_ONCE(holder =3D=3D NULL) && !--holder->refcnt) {
->                 del_symlink(disk->slave_dir, bdev_kobj(bdev));
-> @@ -149,6 +151,6 @@ void bd_unlink_disk_holder(struct block_device *bdev,=
- struct gendisk *disk)
->                 list_del_init(&holder->list);
->                 kfree(holder);
->         }
-> -       mutex_unlock(&disk->open_mutex);
-> +       mutex_unlock(&holder_mutex);
->  }
->  EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
-> --
-> 2.39.2
->
