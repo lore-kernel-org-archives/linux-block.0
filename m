@@ -1,68 +1,68 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2910283CAB
-	for <linux-block@vger.kernel.org>; Thu,  8 Feb 2024 17:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890BD80058
+	for <linux-block@vger.kernel.org>; Thu,  8 Feb 2024 17:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707412370; cv=none; b=PNHRRAFiv4cEUb8eKEtHPrRF322q+3btjJKHFzr4ignsQB68kcrYG/Zor0Y/F1f7gLF7EViUI7K5el9+4KACK0jU7V/RW/c1QDrEpZdi8fdjJg+oRgzuAqe6R355hNU7Hl5ql/V9qctx7iC0wt6KtA0NpMGeglFjsohWGuidRss=
+	t=1707412371; cv=none; b=K8J2ao9i+RUOzqbkgHuDFS4iTdSIk1XCT8bB+sdo0t+g9H7FbicqR4DL63O2vpQ94jEAL+b65pxUkSN3MZUmSDhquB3tXX8tI3Oulihjg9vqFifvJjEtY4OEpmh+APpwLPv3KhswgzzBZMD/n57khMyhBR8IHwoZMvOesjBPViI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707412370; c=relaxed/simple;
-	bh=AIEgU0V1g1nSho2UWkRURvPzJPm9oPVlHGX6wRLgm6E=;
+	s=arc-20240116; t=1707412371; c=relaxed/simple;
+	bh=GGnpdvKFnsrJRcVaLIVdd4QMhMW4+moxJRBEa+tk0p8=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=O4WnNAy6lBnoMmLAxmxfVRxW/c11SqTz6TW3ypxzzt6I6NIiKG7bob2ZIHDCM3sqL+WsChHQprCHyYBxxdIrTlSGHYLz+xE6g7JAWIGCD+pU5PMSPWNBgNPJUTbztocasvghj8SgJPQ1vZypow/sS7+50Bgic1JzxSmaDjr7Ns0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NCkfAQFd; arc=none smtp.client-ip=209.85.166.53
+	 MIME-Version:Content-Type; b=DFpsPGJil8BHglOGaWlDrdoutdW6Q0ra5NVBJMJWocn5X6TXyjiSg+b1YBaAp/nJOLL5egSPB5/oryXAUMXLKOMW3U7vLTSF8VdkOtd36VRV8YamQ+phP6RFJ3k4LF/QngkEIVRRplsAcPL9IqDyfTv0DhndMPKS2pw63WDUd2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VfuZErpL; arc=none smtp.client-ip=209.85.166.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NCkfAQFd"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7bf3283c18dso9889339f.0
-        for <linux-block@vger.kernel.org>; Thu, 08 Feb 2024 09:12:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VfuZErpL"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-363acc3bbd8so546735ab.1
+        for <linux-block@vger.kernel.org>; Thu, 08 Feb 2024 09:12:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707412367; x=1708017167; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707412368; x=1708017168; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nsCIZkl0nmR84Phg+akbf2xIXLOesyEDRMsbgKsDjIo=;
-        b=NCkfAQFdqMH9ohzyEphPAE2XdnKgwOnqg3lFy9X1l1AcYjXq8XWw75LsOCGOwMcBFh
-         M0wuCnuSLfgELfIKmxOONPNxlOwBU+5LZMTXR735BvRSIBJCQRV0L6eVtweVeuZxx6MP
-         dnfeVNsn3/n21on4WaRPk1aSzgfnIU7ohWdxtdXOYb5BrxV8z9S1FYQBqZQ/a3SkFM2E
-         FqJFYbOey5BSaMFCKSPamrkoCS6/shD1bXgv4Ed0GqnkJ9i6ARj2a/IBieQra7i3m1/Y
-         oGb02vihDIsgfrSH5dro+FtE1f8dCBVnwC/3n3gji+HfjV9saqvmTMBI5shapfRBCcb4
-         hlqw==
+        bh=tjRxbDcqKY++6B9sBRg0ywAO6+22ec0EvOww7ZTGUEU=;
+        b=VfuZErpLSX8qfuecrXGgZexlxvSIyiYKTFvYUaGrIS4ZnYXArpTbeZmDcxdyBeCUaf
+         Mfqp5GlLUq26IWFlmHXuz5dI6HSuaec0aLS8JRwayY2u7wlfS9P7ltdM84nLEQt/Fut4
+         Fl/Devd+rNUIikkdXafDyqrrrCat1eGi8kO9Xk9wkU7fwOrYJnYVyTjAV5asaVOWwu6a
+         0pxI/mk5x6ypUsVM1B/vY2EYwUk7Jt/Xowi7BVFM0lJHV0RNfQLO1CI8cTZDzEhE76n6
+         U+IulNkkRcAtfD6vHrIwIGCso/zEDt7CRF2e8mInYxQdiTZa+1rWxHEvYLY5PvuNu3kf
+         e8ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707412367; x=1708017167;
+        d=1e100.net; s=20230601; t=1707412368; x=1708017168;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nsCIZkl0nmR84Phg+akbf2xIXLOesyEDRMsbgKsDjIo=;
-        b=iGvFblNzoko+8yJno6woOpJls/T0oyVY83pQeWPdNfSHSzEGg3f+C5z46CQA3CilIS
-         2Vjmo1lCKPUWNS72ZwJWtAIq/e9iN9Zs7SjgyDNj0+gdHrhz2K4eh389u52A+MFv73If
-         JMowHk11XqUV6CBdOwa5gF5KMoPTY3pupqCySePwhbb7bRQ9dKmy2YgrzFQnDUl5lAWM
-         01e7LSHTbhDdoSFEborIBW8YyufpTRaS91BqQUgZijBDrLUhbCAdU1ekY7+vEnqtlbTZ
-         A9lLc+VK3ygGj5OJPHw5a8AP4kxC0YbBGHF4749Nymm99gm2RA3qjEpDEo0L4j6AFjg4
-         Z5Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1gJhRvNvem1iwJt2OlBxoFqneRlhI4j51pEl7jA4JHGtQQTsaLwcE7J16J9Z77cfZ6JOB+O0iIyNI8zvFBBjsuqNul0dNYlfpCC0=
-X-Gm-Message-State: AOJu0YzX4bHZv9cnKN6x1bCetEPRiMvZehIx139E3+xKoXc6CkXauOLT
-	BDDJgKUrjnteFoxGNUkTsDlyewL/ijwMDLBe5jSkyjIsD/L+9vg0RKtgiC8pMYEhszLF1gdp093
-	4oL0=
-X-Google-Smtp-Source: AGHT+IHTeFLLa4+D4qPa0huYZiUSegoj8zJfG3N22QhdohjlsQlehD4ZYeolut4A2dGViw77zuv9yg==
-X-Received: by 2002:a6b:671c:0:b0:7c3:f955:ada6 with SMTP id b28-20020a6b671c000000b007c3f955ada6mr245680ioc.1.1707412366769;
-        Thu, 08 Feb 2024 09:12:46 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV0zKLtzwp/gGBW9veUdkDIdKwee5n7OzI3gMx5Q9bg40rPF69E8Bm9vIFHoLqjjYIl7jEQ+5PndyCFlXnS0JYJa5qhRvtoP7vF8F5Ds4ZhCrxwwXPDjZ7qlIhjDMDG/wb2Y21heBXXuEM=
+        bh=tjRxbDcqKY++6B9sBRg0ywAO6+22ec0EvOww7ZTGUEU=;
+        b=uQRBP2Pe+iL6KSKQdf1YUpt5N7rMtgJkZdcfMsD5EpKSVbdj91J9wISZ71REpGcJ2+
+         r61bN65Nh15q73/pZRF8A32s4UzGK2YLY6qU9le/RyhR8VRO5othr1z1MHqGT82NUKe7
+         HSg+JDXqyW2cumD49XakhlUx0iAqIZ2M7w+rG1NyPI/+0Fc/42WMZomV4UuW4DApjyS5
+         rGTcRzf8QZOF8X93+7ujysNUeSNtgum1sNlHPMIX9W7QPV8lLncbcn/Wt2p4hqHGI8So
+         VLVwPK9iLEnNCVIsZkpaCA8ud3TOKUjuFhfHz3xHKEHd0PWwPOoWMoGYYZ/hdLmHSrU2
+         Byzw==
+X-Gm-Message-State: AOJu0YxUMMOT1Eu3N/Nh/4zY11iZTM1Vh9rJ13zPTF2K7R2Nh5Gawg2L
+	PoaGiymYq9422No/eO2Fu5sXEJv9MUD1FidOHpYuOxTsP7Ip9+YcxOLdE7d+4jUV73pEIMSN+DB
+	MQC8=
+X-Google-Smtp-Source: AGHT+IELBZX3WwQ7vkAiN26yd2iLHBjLAq3uYSOHWbHc7iD32gst2rPRTha59n5UBHRLNiyaeWiWiA==
+X-Received: by 2002:a5e:9204:0:b0:7c4:2a52:c2a6 with SMTP id y4-20020a5e9204000000b007c42a52c2a6mr192704iop.2.1707412368205;
+        Thu, 08 Feb 2024 09:12:48 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVd9KHTSAz4BmHnhPJwTgIrcKgGJ1xgvtnJUNN4ncO7GWmToqIjTFb1v3BO8jmWQ/DPXp9/C+FkA3vAWyi/6YQ3e+Y8J455dvNs2qB41RRf+uGF6HR/+j7DT0ztFePoy4o0t6Qee0SC/k9O4QutJyT3VlCOoei1n9BK6tNI8p/RLMWRcpZIgh7kTQgWLFWnR3/CxpQBIGAS7/C3vDqzXzj5nn9RFVSyIpnGcm8hgTaSPFHtrQ==
 Received: from [127.0.0.1] ([96.43.243.2])
         by smtp.gmail.com with ESMTPSA id b23-20020a05663801b700b004713f3c2831sm993173jaq.61.2024.02.08.09.12.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 09:12:46 -0800 (PST)
+        Thu, 08 Feb 2024 09:12:47 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Tejun Heo <tj@kernel.org>
-Cc: =?utf-8?q?Breno_Leit=C3=A3o?= <leitao@debian.org>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <ZVvc9L_CYk5LO1fT@slm.duckdns.org>
-References: <ZVvc9L_CYk5LO1fT@slm.duckdns.org>
-Subject: Re: [PATCH block-6.7] blk-iocost: Fix an UBSAN shift-out-of-bounds
- warning
-Message-Id: <170741236605.1366825.11529079339239149351.b4-ty@kernel.dk>
+To: Stefan Haberland <sth@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
+ linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
+ Vasily Gorbik <gor@linux.ibm.com>, Miroslav Franc <mfranc@suse.cz>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20240208164248.540985-1-sth@linux.ibm.com>
+References: <20240208164248.540985-1-sth@linux.ibm.com>
+Subject: Re: [PATCH RESEND 00/11] s390/dasd: string handling cleanups
+Message-Id: <170741236688.1366825.9301760269550901204.b4-ty@kernel.dk>
 Date: Thu, 08 Feb 2024 10:12:46 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -75,33 +75,36 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Mon, 20 Nov 2023 12:25:56 -1000, Tejun Heo wrote:
-> When iocg_kick_delay() is called from a CPU different than the one which set
-> the delay, @now may be in the past of @iocg->delay_at leading to the
-> following warning:
+On Thu, 08 Feb 2024 17:42:39 +0100, Stefan Haberland wrote:
+> looks like the patchset was not applied for the last merge window.
+> So I am resending it rebased to the current for-next branch.
+> Please apply the patches for the upcomming merge window.
+> They clean up the string handling in the DASD driver.
 > 
->   UBSAN: shift-out-of-bounds in block/blk-iocost.c:1359:23
->   shift exponent 18446744073709 is too large for 64-bit type 'u64' (aka 'unsigned long long')
->   ...
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x79/0xc0
->    __ubsan_handle_shift_out_of_bounds+0x2ab/0x300
->    iocg_kick_delay+0x222/0x230
->    ioc_rqos_merge+0x1d7/0x2c0
->    __rq_qos_merge+0x2c/0x80
->    bio_attempt_back_merge+0x83/0x190
->    blk_attempt_plug_merge+0x101/0x150
->    blk_mq_submit_bio+0x2b1/0x720
->    submit_bio_noacct_nocheck+0x320/0x3e0
->    __swap_writepage+0x2ab/0x9d0
+> In addition there is a patch that fixes double module refcount decrement.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] blk-iocost: Fix an UBSAN shift-out-of-bounds warning
-      (no commit info)
+[01/11] s390/dasd: Simplify uid string generation
+        commit: e5de34db1e95ef549236f9a2630d396a41c208a2
+[02/11] s390/dasd: Use sysfs_emit() over sprintf()
+        commit: 9c386d0f6e04fee1b4161e49f8e9f5756bcab04c
+[03/11] s390/dasd: Remove unnecessary errorstring generation
+        commit: 8d7ac904c90be7a1ed1aafa34953c40270c30bd0
+[04/11] s390/dasd: Move allocation error message to DBF
+        commit: 4849494f05994f411c9cc0504843c6adefd1f2de
+[05/11] s390/dasd: Remove unused message logging macros
+        commit: 32312cf229117b781bd02d93b0b11c8b47dfcc0a
+[06/11] s390/dasd: Use dev_err() over printk()
+        commit: 0b3644b475e2564abe26a916af8447beb7c4966b
+[07/11] s390/dasd: Remove %p format specifier from error messages
+        commit: 4ba6366dbb03c2a58d0e7cbe140942bcf715006c
+[08/11] s390/dasd: Remove PRINTK_HEADER and KMSG_COMPONENT definitions
+        commit: c6c6c69df6598aacf3921f26f89b12d5e321ea83
+[09/11] s390/dasd: Use dev_*() for device log messages
+        commit: 79ae56fc475869d636071f66d9e4ef2a3819eee6
 
 Best regards,
 -- 
