@@ -1,96 +1,124 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D912A25566
-	for <linux-block@vger.kernel.org>; Thu,  8 Feb 2024 18:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC6D37711;
+	Thu,  8 Feb 2024 19:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707417173; cv=none; b=UWiSfhLMwsjhf0hwomObO+RB9o8ZxKXiB/8JISWIqdOeiWuRUd8qHImuvgAJeLgPbMUMPBzXA+ARr0tUohHiFBRkZZSGXUcK+7ySnOjPBR38/2QXJkX2UwGVSVFGaYXMGOnuMV+rtjxcJ1gkB+fwPYy/wcYPZWIAGMTiNuK7eSM=
+	t=1707422110; cv=none; b=Gy8Cy24bRqg8NleDnrFkX4UXYDLxNRcUqTzzl1gS6hvzXcxgaqY0uxD0OrZUhV5Yvj7C6eNg/HHo1WNvGRSzLX70QnIEIbwkX5fQlUTq4qvICYKQKm2vW8yoUsXprm8Ay9ZyUOS+y6JLgWyxjnFWTzFmO9hnN0j7xpfGA1TbEZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707417173; c=relaxed/simple;
-	bh=et0/tcKqv4OjukO/wlzilEs/NLE4dHHwM7paCdfbTwo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Cer2soSPuJINQC0hRMNVnZVX5axTnFD42AIIcD9dwthEFoJvOExAK868n3cuBSP0WLXv5xZ9N/djEDICY63B1QfndAUaPEHZgllk41/+/nn/rLpXE2bpkMgF7R3PVR7zzI61bYu4Ea6sa+gOqXcW0cu4iu0phrA10C/Nk3ITaDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UDqOm7CC; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1707422110; c=relaxed/simple;
+	bh=lOfJwpXUdnEs4NdD2l4UxOLwSgcIGRsZp7hL7KAWBwk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bEKbI34yHN4R2eSAXGVCN+35wrxOf5XMT8u3xJZEOe9d15i4MlMX2wqP/CGmpqF9wvLUZu7BgtwNCJBJWbcfrhAPpvQqA7bCkPLDJpTb8c7nloE6/hxXetrOQcJI3xWBudJ50m6ahNjjXSh9/mUfmb3mZ30maymzTIQyViu2kYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHFRsg6W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UDqOm7CC"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso755739f.1
-        for <linux-block@vger.kernel.org>; Thu, 08 Feb 2024 10:32:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707417171; x=1708021971; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7AMYCnkNAeWqR3OZOrLtWcFnZIPd0BbcDf6ZXB/5DiE=;
-        b=UDqOm7CCSeEYk34dWxJUiXxYnbZ5GucK6poKy1j4pLTGpuVJWotaUTbE6v/dkzwnkY
-         Ra7dR6Trm4XDA6iUgJxFxytbYEsi9aqbgWX12dGBJQQ41GxJxII/XCh7XSAz0LeQwZna
-         OSkQOabqP2QzmLMJVno8ODRuCC+fgX4FyDbwXeuZPJRmB7k/7zZiNgfvMLv7uMR1bVgt
-         I3wSReOR2kmLBNqWSk1z81nIHx1ww80VFpAU+ncJ1ac8F78OJpcUUqsajz+d6gyC2PN2
-         JgbFnRnmQ5Y4I4e1BLau2dJECeTdXbEcgmmyrBKd5ABeXKiSQIKg0k9IUfZUl3h76gXU
-         qhTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707417171; x=1708021971;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7AMYCnkNAeWqR3OZOrLtWcFnZIPd0BbcDf6ZXB/5DiE=;
-        b=g7L0NOAZlk5hANffMc1aKEPI3Or68JQVx/TdFpvCxwkGyPn6ej4/kLGHDxNUQy8Bf8
-         FUJt8QrT/VfCYNbg+SxvS0WpXaxwWiHq6eRJ0F3M8tc+E0z5CVMx8W2Sf+z8tzTT9JaH
-         EXKdV9zPxGD3rvGNhneDrYM+nlYWiwKpc/c/2Fz1H7SfUXoRkt3JuAiNEt4/VYAiHN3E
-         A/DQA4pvQRHSNhcC8xQHzV86T09/T0YTYU51radHMvfDbl2MSSaf4WX++76FrsEG4MQL
-         y5BenGACgO/wC2aOCQD+Kxob35l56xPum8NB/yQJciALUaDiiV7C4CZjDN3551+U6lSl
-         94NA==
-X-Gm-Message-State: AOJu0Yz5GR6e+Fgpys5Enk6VCnWlu0jepfom5do6mf3VY/fwhh/CABN1
-	5joA09aXIt70Koj+PcbnXo1k/VrTMxEo5oQgPnwm52qcDsNavuv/T8OCHjqQfyc=
-X-Google-Smtp-Source: AGHT+IEP5En2kvqX46Jkt9st7Hi7arU8KkVgrl8uEuqgwi8cDOknhdvB7B5Sjg1wTD8cubvn67jNXA==
-X-Received: by 2002:a6b:dc1a:0:b0:7c0:2ea0:b046 with SMTP id s26-20020a6bdc1a000000b007c02ea0b046mr453669ioc.1.1707417170893;
-        Thu, 08 Feb 2024 10:32:50 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU0ef+rIZK7uAZMbywMxiTQ477OE+BF+n8ftmFZfNroPnDUSx8NbnmmFSoTGjDCgasZHmOA4x5eaWvwYCfXl3jOexrWt78t4Lr8Lqw=
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id t13-20020a6bdb0d000000b007c3fbe781f2sm50823ioc.5.2024.02.08.10.32.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 10:32:49 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>
-In-Reply-To: <20240130042134.2463659-1-shinichiro.kawasaki@wdc.com>
-References: <20240130042134.2463659-1-shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH for-next v3] null_blk: add configfs variable
- shared_tags
-Message-Id: <170741716951.1391883.17733703768547012457.b4-ty@kernel.dk>
-Date: Thu, 08 Feb 2024 11:32:49 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHFRsg6W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C640C433F1;
+	Thu,  8 Feb 2024 19:55:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707422110;
+	bh=lOfJwpXUdnEs4NdD2l4UxOLwSgcIGRsZp7hL7KAWBwk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fHFRsg6WccEchUFyrMTDbpsND8UtEeB7G2dQt7WSwW8EOSdvsfxtiFUpL1Bdc8Bek
+	 mh+UH3E7pdkOXekpzAzB2Pte0DAjqeQI7oJCq5r591oq0M4sd/i3vPYbBzncVnNDqg
+	 VdQaxpWDwOL96HRfsQNAt52NDO1G0JOuNMlGofKNd9hhSd8oBzVG7s6bJ8A8fR5LBJ
+	 yysBINVtEdH6Xnc0eqoSx/ALVkQLvXDJRAk7TG96ukqW5tcoESko0YM4DQ9pryNltg
+	 B7qluL+vCL/+79c0MwGCki1auhtFUIYmiLQZ3ztfxrpEONfxrA79RQpZ5zr/curMdQ
+	 h/meCLWH4APjQ==
+Message-ID: <3aa399bb-5007-4d12-88ae-ed244e9a653f@kernel.org>
+Date: Thu, 8 Feb 2024 20:55:05 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
+Content-Language: en-US
+To: Michal Hocko <mhocko@suse.com>
+Cc: Dave Chinner <david@fromorbit.com>, Matthew Wilcox <willy@infradead.org>,
+ lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Kent Overstreet <kent.overstreet@gmail.com>
+References: <ZZcgXI46AinlcBDP@casper.infradead.org>
+ <ZZzP6731XwZQnz0o@dread.disaster.area>
+ <3ba0dffa-beea-478f-bb6e-777b6304fb69@kernel.org>
+ <ZcUQfzfQ9R8X0s47@tiehlicka>
+From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+In-Reply-To: <ZcUQfzfQ9R8X0s47@tiehlicka>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
 
-
-On Tue, 30 Jan 2024 13:21:34 +0900, Shin'ichiro Kawasaki wrote:
-> Allow setting shared_tags through configfs, which could only be set as a
-> module parameter. For that purpose, delay tag_set initialization from
-> null_init() to null_add_dev(). Refer tag_set.ops as the flag to check if
-> tag_set is initialized or not.
+On 2/8/24 18:33, Michal Hocko wrote:
+> On Thu 08-02-24 17:02:07, Vlastimil Babka (SUSE) wrote:
+>> On 1/9/24 05:47, Dave Chinner wrote:
+>> > On Thu, Jan 04, 2024 at 09:17:16PM +0000, Matthew Wilcox wrote:
+>> 
+>> Your points and Kent's proposal of scoped GFP_NOWAIT [1] suggests to me this
+>> is no longer FS-only topic as this isn't just about converting to the scoped
+>> apis, but also how they should be improved.
 > 
-> The following parameters can not be set through configfs yet:
+> Scoped GFP_NOFAIL context is slightly easier from the semantic POV than
+> scoped GFP_NOWAIT as it doesn't add a potentially unexpected failure
+> mode. It is still tricky to deal with GFP_NOWAIT requests inside the
+> NOFAIL scope because that makes it a non failing busy wait for an
+> allocation if we need to insist on scope NOFAIL semantic. 
 > 
-> [...]
+> On the other hand we can define the behavior similar to what you
+> propose with RETRY_MAYFAIL resp. NORETRY. Existing NOWAIT users should
+> better handle allocation failures regardless of the external allocation
+> scope.
+> 
+> Overriding that scoped NOFAIL semantic with RETRY_MAYFAIL or NORETRY
+> resembles the existing PF_MEMALLOC and GFP_NOMEMALLOC semantic and I do
+> not see an immediate problem with that.
+> 
+> Having more NOFAIL allocations is not great but if you need to
+> emulate those by implementing the nofail semantic outside of the
+> allocator then it is better to have those retries inside the allocator
+> IMO.
 
-Applied, thanks!
+I see potential issues in scoping both the NOWAIT and NOFAIL
 
-[1/1] null_blk: add configfs variable shared_tags
-      commit: 14509b748ff58df3f0980b1cd70ade0e4a805e99
+- NOFAIL - I'm assuming Dave is adding __GFP_NOFAIL to xfs allocations or
+adjacent layers where he knows they must not fail for his transaction. But
+could the scope affect also something else underneath that could fail
+without the failure propagating in a way that it affects xfs? Maybe it's a
+high-order allocation with a low-order fallback that really should not be
+__GFP_NOFAIL? We would need to hope it has something like RETRY_MAYFAIL or
+NORETRY already. But maybe it just relies on >costly order being more likely
+to fail implicitly, and those costly orders should be kept excluded from the
+scoped NOFAIL? Maybe __GFP_NOWARN should also override the scoped nofail?
 
-Best regards,
--- 
-Jens Axboe
+- NOWAIT - as said already, we need to make sure we're not turning an
+allocation that relied on too-small-to-fail into a null pointer exception or
+BUG_ON(!page). It's probably not feasible to audit everything that can be
+called underneath when adding a new scoped NOWAIT. Static analysis probably
+won't be powerful enough as well. Kent suggested fault injection [1]. We
+have the framework for a system-wide one but I don't know if anyone is
+running it and how successful it is. But maybe we could have a special fault
+injection mode (CONFIG_ option or something) for the NOWAIT scoped
+allocations only. If everything works as expected, there are no crashes and
+the pattern Kent described in [1] has a fallback that's slower but still
+functional. If not, we get a report and known which place to fix, and the
+testing only focuses on the relevant parts. When a new scoped NOWAIT is
+added and bots/CIs running this fault injection config report no issues, we
+can be reasonably sure it's fine?
 
+[1]
+https://lore.kernel.org/all/zup5yilebkgkrypis4g6zkbft7pywqi57k5aztoio2ufi5ujsd@mfnqu4rarort/
 
+>> [1] http://lkml.kernel.org/r/Zbu_yyChbCO6b2Lj@tiehlicka
+>> 
+>> > We already have memalloc_noreclaim_{save/restore}() for turning off
+>> > direct memory reclaim for a given context (i.e. equivalent of
+>> > clearing __GFP_DIRECT_RECLAIM), so if we are going to embrace scoped
+>> > allocation contexts, then we should be going all in and providing
+>> > all the contexts that filesystems actually need....
+>> > 
+>> > -Dave.
+> 
 
