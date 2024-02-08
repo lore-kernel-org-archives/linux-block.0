@@ -1,69 +1,65 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890BD80058
-	for <linux-block@vger.kernel.org>; Thu,  8 Feb 2024 17:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA83C7FBA3
+	for <linux-block@vger.kernel.org>; Thu,  8 Feb 2024 17:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707412371; cv=none; b=K8J2ao9i+RUOzqbkgHuDFS4iTdSIk1XCT8bB+sdo0t+g9H7FbicqR4DL63O2vpQ94jEAL+b65pxUkSN3MZUmSDhquB3tXX8tI3Oulihjg9vqFifvJjEtY4OEpmh+APpwLPv3KhswgzzBZMD/n57khMyhBR8IHwoZMvOesjBPViI=
+	t=1707412747; cv=none; b=O3/lt84pVfeN99DZHW6WmBzasZM5XVrJUobKTnOOKwiKNEuKtJ8VK96vGEIRCT3yjs8xMKLsssmevVmQuujLYDKq/5cXje6K2086Gzok2RJ4n2AkiTfQybOpCnRicyVaL/wBz6tCwjNh2PG/ke+JLK2qo/dYFG8W+DVkrJvf9xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707412371; c=relaxed/simple;
-	bh=GGnpdvKFnsrJRcVaLIVdd4QMhMW4+moxJRBEa+tk0p8=;
+	s=arc-20240116; t=1707412747; c=relaxed/simple;
+	bh=OYdekK2Em/cYF0miUMzoflzw3gSJoqWAFVuQcaQLOxc=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DFpsPGJil8BHglOGaWlDrdoutdW6Q0ra5NVBJMJWocn5X6TXyjiSg+b1YBaAp/nJOLL5egSPB5/oryXAUMXLKOMW3U7vLTSF8VdkOtd36VRV8YamQ+phP6RFJ3k4LF/QngkEIVRRplsAcPL9IqDyfTv0DhndMPKS2pw63WDUd2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VfuZErpL; arc=none smtp.client-ip=209.85.166.171
+	 MIME-Version:Content-Type; b=rKzdVO4SITVFxjd3F7eWWQ3MG0FEt3toRRmsStL9F+Lv0rtfmtHc0dUJVl1n1aMm9V+oFTXadX/I1dGE5eVJY63BHx9xoApKgDWAjY27jcE22k8Vq8q+JVcsdAfJqNvqTNtCmUtQudv4urVMc7XNOdhvHGGWfGPFTmXv7FWQenk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iLS+o+tu; arc=none smtp.client-ip=209.85.166.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VfuZErpL"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-363acc3bbd8so546735ab.1
-        for <linux-block@vger.kernel.org>; Thu, 08 Feb 2024 09:12:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iLS+o+tu"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-363e7d542f4so110825ab.0
+        for <linux-block@vger.kernel.org>; Thu, 08 Feb 2024 09:19:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707412368; x=1708017168; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707412745; x=1708017545; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tjRxbDcqKY++6B9sBRg0ywAO6+22ec0EvOww7ZTGUEU=;
-        b=VfuZErpLSX8qfuecrXGgZexlxvSIyiYKTFvYUaGrIS4ZnYXArpTbeZmDcxdyBeCUaf
-         Mfqp5GlLUq26IWFlmHXuz5dI6HSuaec0aLS8JRwayY2u7wlfS9P7ltdM84nLEQt/Fut4
-         Fl/Devd+rNUIikkdXafDyqrrrCat1eGi8kO9Xk9wkU7fwOrYJnYVyTjAV5asaVOWwu6a
-         0pxI/mk5x6ypUsVM1B/vY2EYwUk7Jt/Xowi7BVFM0lJHV0RNfQLO1CI8cTZDzEhE76n6
-         U+IulNkkRcAtfD6vHrIwIGCso/zEDt7CRF2e8mInYxQdiTZa+1rWxHEvYLY5PvuNu3kf
-         e8ag==
+        bh=bfxuFvECaBraf1c5hZUbS2f+Y45DtoHwXuGRaiKkoVk=;
+        b=iLS+o+tucgIhttByBCMpl3xGXPvwjkg6DdMPyMGMtcdp+uQMOXTL0PYiBHfg86ewQ1
+         3Kuv9cM8+O9Uyj06heea9yHGNh4m3sgP4uj5R1yT3Hrrc04sc0vDZfjJ4woyUcrycXKS
+         gkEt8njqRLLxo20Ke30zuFRxHGJn9ZLlz9w/oqaU6AzM9dS81CFXPOJBpnSwT8UACHFR
+         OW6kY3CC2moCnp36IeMgrDY64l1wI7PeVy3r9BuMUkuoduewumlTUlOm9/KnK8zVrGm1
+         C+4bZ26t5PfG2cbyQK67Iq+XP+extvvDjrPlUjjrmtw0wdYStEyprZfOWcgSm9IJ0WQp
+         47RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707412368; x=1708017168;
+        d=1e100.net; s=20230601; t=1707412745; x=1708017545;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tjRxbDcqKY++6B9sBRg0ywAO6+22ec0EvOww7ZTGUEU=;
-        b=uQRBP2Pe+iL6KSKQdf1YUpt5N7rMtgJkZdcfMsD5EpKSVbdj91J9wISZ71REpGcJ2+
-         r61bN65Nh15q73/pZRF8A32s4UzGK2YLY6qU9le/RyhR8VRO5othr1z1MHqGT82NUKe7
-         HSg+JDXqyW2cumD49XakhlUx0iAqIZ2M7w+rG1NyPI/+0Fc/42WMZomV4UuW4DApjyS5
-         rGTcRzf8QZOF8X93+7ujysNUeSNtgum1sNlHPMIX9W7QPV8lLncbcn/Wt2p4hqHGI8So
-         VLVwPK9iLEnNCVIsZkpaCA8ud3TOKUjuFhfHz3xHKEHd0PWwPOoWMoGYYZ/hdLmHSrU2
-         Byzw==
-X-Gm-Message-State: AOJu0YxUMMOT1Eu3N/Nh/4zY11iZTM1Vh9rJ13zPTF2K7R2Nh5Gawg2L
-	PoaGiymYq9422No/eO2Fu5sXEJv9MUD1FidOHpYuOxTsP7Ip9+YcxOLdE7d+4jUV73pEIMSN+DB
-	MQC8=
-X-Google-Smtp-Source: AGHT+IELBZX3WwQ7vkAiN26yd2iLHBjLAq3uYSOHWbHc7iD32gst2rPRTha59n5UBHRLNiyaeWiWiA==
-X-Received: by 2002:a5e:9204:0:b0:7c4:2a52:c2a6 with SMTP id y4-20020a5e9204000000b007c42a52c2a6mr192704iop.2.1707412368205;
-        Thu, 08 Feb 2024 09:12:48 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVd9KHTSAz4BmHnhPJwTgIrcKgGJ1xgvtnJUNN4ncO7GWmToqIjTFb1v3BO8jmWQ/DPXp9/C+FkA3vAWyi/6YQ3e+Y8J455dvNs2qB41RRf+uGF6HR/+j7DT0ztFePoy4o0t6Qee0SC/k9O4QutJyT3VlCOoei1n9BK6tNI8p/RLMWRcpZIgh7kTQgWLFWnR3/CxpQBIGAS7/C3vDqzXzj5nn9RFVSyIpnGcm8hgTaSPFHtrQ==
+        bh=bfxuFvECaBraf1c5hZUbS2f+Y45DtoHwXuGRaiKkoVk=;
+        b=pmjDeis5oLdxojCBXcj99HbeseOUJBHK5xiXaBNnSkbv6BLl/ryWdLz0MYU5jI013P
+         lcT4sXOa1Z39hMdFFySW2tGPn8964yO6+e62vQNBLFwEFDb3Ci8R0tiBiWEvTsDjmSjH
+         ERMRYUmJ02arsYkUKb1cw+DCB/fPIbVAZyGXsQM+8pyMl6pK2d2MdADymXFLAX2tKJV3
+         noOEVGdU5JeW+yG3yW52XlCjqyUu7pdsWNEnhnzdwIlmKi8o0vfn5QSbsYeMGJs/YB/4
+         hOio366LQ0JuUnr4e2vIbmJxFD7XVAR0xRTgHnJg3jeIqSBKn1rUQycWTcbjk+F5MQql
+         7jCQ==
+X-Gm-Message-State: AOJu0Yy4dpQ74Ho0QE68HrvftTukGElu6KXF9sicu7j7tmZj6bt19MqF
+	xX32v+jn3FfEfX89Htf4gACUTIv1An7APRjskzP9mcNUHmJIOPTRdIN2EkLx6RE=
+X-Google-Smtp-Source: AGHT+IGrtYjmUqatNjmm0WDMnOH631o+OAhntraBWoO6vS2EuInD6t2Wtz+AIyo5SFX2jXSn0HOhZA==
+X-Received: by 2002:a05:6e02:1aaa:b0:363:c82e:57d9 with SMTP id l10-20020a056e021aaa00b00363c82e57d9mr173121ilv.3.1707412744752;
+        Thu, 08 Feb 2024 09:19:04 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWyP1mWH+SizUOH8w4DG/ms6mSkE/1o3h+BvU2XT8Krrfb437Z0nMu8Ls/JGtny4zrcgdt20bXMk+1jm737hY3K5Yo5wsXx
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id b23-20020a05663801b700b004713f3c2831sm993173jaq.61.2024.02.08.09.12.46
+        by smtp.gmail.com with ESMTPSA id bm9-20020a056e02330900b00363c664cfeasm1143599ilb.61.2024.02.08.09.19.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 09:12:47 -0800 (PST)
+        Thu, 08 Feb 2024 09:19:04 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Stefan Haberland <sth@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
- Vasily Gorbik <gor@linux.ibm.com>, Miroslav Franc <mfranc@suse.cz>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20240208164248.540985-1-sth@linux.ibm.com>
-References: <20240208164248.540985-1-sth@linux.ibm.com>
-Subject: Re: [PATCH RESEND 00/11] s390/dasd: string handling cleanups
-Message-Id: <170741236688.1366825.9301760269550901204.b4-ty@kernel.dk>
-Date: Thu, 08 Feb 2024 10:12:46 -0700
+To: linux-block@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: hch@lst.de
+In-Reply-To: <cover.1707314970.git.asml.silence@gmail.com>
+References: <cover.1707314970.git.asml.silence@gmail.com>
+Subject: Re: [PATCH v2 0/2] bio put in-IRQ caching optimisation
+Message-Id: <170741274409.1369019.5049430143936300007.b4-ty@kernel.dk>
+Date: Thu, 08 Feb 2024 10:19:04 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,36 +71,23 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Thu, 08 Feb 2024 17:42:39 +0100, Stefan Haberland wrote:
-> looks like the patchset was not applied for the last merge window.
-> So I am resending it rebased to the current for-next branch.
-> Please apply the patches for the upcomming merge window.
-> They clean up the string handling in the DASD driver.
+On Wed, 07 Feb 2024 14:14:27 +0000, Pavel Begunkov wrote:
+> Patch 1 is a preparation patch, which enables caching of !IOPOLL bios
+> for the task context execution.
 > 
-> In addition there is a patch that fixes double module refcount decrement.
+> Patch 2 optimise out local_irq_{save,restore}() from bio_put_percpu_cache()
+> for in-IRQ completions.
+> 
+> v2: Extend caching to the task context
 > 
 > [...]
 
 Applied, thanks!
 
-[01/11] s390/dasd: Simplify uid string generation
-        commit: e5de34db1e95ef549236f9a2630d396a41c208a2
-[02/11] s390/dasd: Use sysfs_emit() over sprintf()
-        commit: 9c386d0f6e04fee1b4161e49f8e9f5756bcab04c
-[03/11] s390/dasd: Remove unnecessary errorstring generation
-        commit: 8d7ac904c90be7a1ed1aafa34953c40270c30bd0
-[04/11] s390/dasd: Move allocation error message to DBF
-        commit: 4849494f05994f411c9cc0504843c6adefd1f2de
-[05/11] s390/dasd: Remove unused message logging macros
-        commit: 32312cf229117b781bd02d93b0b11c8b47dfcc0a
-[06/11] s390/dasd: Use dev_err() over printk()
-        commit: 0b3644b475e2564abe26a916af8447beb7c4966b
-[07/11] s390/dasd: Remove %p format specifier from error messages
-        commit: 4ba6366dbb03c2a58d0e7cbe140942bcf715006c
-[08/11] s390/dasd: Remove PRINTK_HEADER and KMSG_COMPONENT definitions
-        commit: c6c6c69df6598aacf3921f26f89b12d5e321ea83
-[09/11] s390/dasd: Use dev_*() for device log messages
-        commit: 79ae56fc475869d636071f66d9e4ef2a3819eee6
+[1/2] block: extend bio caching to task context
+      commit: c9f5f3aa19c617fe85085b19abbf7a9a077336d0
+[2/2] block: optimise in irq bio put caching
+      commit: e516c3fc6c182736aec5418a73f15199640491e2
 
 Best regards,
 -- 
