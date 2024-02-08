@@ -1,199 +1,96 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C970823A0;
-	Thu,  8 Feb 2024 17:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE67786124;
+	Thu,  8 Feb 2024 17:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707413644; cv=none; b=BsBOgOO8s7XmABC1ZwtGAyVji/UYxSw6pFxunfTslks9RmtqPesdNem8V2nmCEvyQK+6olDZH3HKtR7VMD8JUbFpWo7Ve681AaoYYvnf28NnnZxk5hO16tD+BMbLxMuAdoENqo/+Wnds7Jz9ukBCyOCmZieB59xYnN3db86+fUw=
+	t=1707414371; cv=none; b=KlGWABkOq4lE2oSX+PLeXgfj5MosQdErITssC9/zLZAxbDMQvaJMZv+ebVIUo0UXI7wUdU3nw2OWkGF2uh4nJSKIlJNy1gehk2PfvFHCUmj/dexjhAXd0lmHSMklE9yQxth72w6uyYoYexqGgZm/fbI88eRznXrMrBrzXLMZ/QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707413644; c=relaxed/simple;
-	bh=HnXjnbgKicph7V1VdO85ucEbEZHWUNgzF4rtQ9rqLXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hLn5IU6hvvlXAg1YPk+irBzkZkXfk2S53ebPIEyuOiBAllQtxivUTFN6TRFi3hSoTmwjciixr1Z1MiKT1Pvvvg0TbI79RXPKlRaz61V3Tj8nn6ynXrPyjLa3MF15yCmrCj2F+JVBT/UxZpyx/z4qcZzHcEXvuy7i14c16xiAQb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=PVo85f/e; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=PVo85f/e; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="PVo85f/e";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="PVo85f/e"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B4EE31FCF9;
-	Thu,  8 Feb 2024 17:34:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1707413640; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h+0yrZSpModLNFXQZ0NEsCQ5tcdSJqQ6dM1FajfCnoo=;
-	b=PVo85f/e969ansHigCZ/BOT2nRHWSGTtyW7NhAYAtWxIm5uDdmmXtqnXuglrPVa8S7yKQa
-	ETmZvxkSepFS893Tiks6wNVWNNAyQDFyA8kfnKIX9N7ofuAkTGF8lW0NfTwYfL34Q2NuXo
-	Zw65V8TjJ6szvDqKcrQlAb1m/0JDwSU=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1707413640; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h+0yrZSpModLNFXQZ0NEsCQ5tcdSJqQ6dM1FajfCnoo=;
-	b=PVo85f/e969ansHigCZ/BOT2nRHWSGTtyW7NhAYAtWxIm5uDdmmXtqnXuglrPVa8S7yKQa
-	ETmZvxkSepFS893Tiks6wNVWNNAyQDFyA8kfnKIX9N7ofuAkTGF8lW0NfTwYfL34Q2NuXo
-	Zw65V8TjJ6szvDqKcrQlAb1m/0JDwSU=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 98F9513984;
-	Thu,  8 Feb 2024 17:34:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id qh9aIogQxWUQHwAAD6G6ig
-	(envelope-from <mhocko@suse.com>); Thu, 08 Feb 2024 17:34:00 +0000
-Date: Thu, 8 Feb 2024 18:33:51 +0100
-From: Michal Hocko <mhocko@suse.com>
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
-Cc: Dave Chinner <david@fromorbit.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Kent Overstreet <kent.overstreet@gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
-Message-ID: <ZcUQfzfQ9R8X0s47@tiehlicka>
-References: <ZZcgXI46AinlcBDP@casper.infradead.org>
- <ZZzP6731XwZQnz0o@dread.disaster.area>
- <3ba0dffa-beea-478f-bb6e-777b6304fb69@kernel.org>
+	s=arc-20240116; t=1707414371; c=relaxed/simple;
+	bh=KaV20q0GQfGnGgavViyz5KXHwueNCiLVGhY7BqMMw18=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=eeWf1FbkJj6mmlRROpKughQtIEHxJShf6MPQUP/9oYPCzeuBKbJ2SFHNIo3dz1qxoeecJmFd7ZXm2kfFSpqU13ANIDQ9V7N8y0UomuEDDIw/qBw7R9WpeeK1+//3Ul0ZptG4oqHPZ3lTm/iVXN71z30YuZ5uWc0/ParHN9bHuXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e071953676so58776b3a.2;
+        Thu, 08 Feb 2024 09:46:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707414369; x=1708019169;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tKfd7lmWIbfcamrHQWTBL8dnYP6EtyRFZjlbeDKgg2E=;
+        b=D/u2En/7VGG18JgEx6/K1bTJpOLXZQTuoi3Db3q2WN8p4DSPSTFeVLVWLF0NP9cfC6
+         HftiVg8VHXtjQFeko78gLWRBRvxOre20efyjifuWM7eqDxNw3LI+fD3Os6ahXnvt2QR0
+         xqBVlsOBEbacblQj2pFd2BzjZR2cTkDIgVpEY3dY4RRXZriloWnLMsT+dUyOVfPbxZOx
+         rvERYE+q/pJHbtNqUPSiKz1cXW5ox4dEheS27scmn2zOAqXM5u3H7/M49E8AfAjq1h/R
+         4bIsUnz8vv5GxuHouLMDlEEF3wK4NC3oRtTeDHwjK4mC9QqZauGQlNoPqIwEAWON3bAl
+         2msA==
+X-Gm-Message-State: AOJu0Yz3B6aX4iqXnCoqn6QJ+eCz7DQcMb/tD8ILQ8H4+bGkgtceYz6j
+	dhAlogssvjliN7Wi66hyHFiiC7uHusU0jLj5HrnbKcCg2p9WaL5oj7oFtBM7
+X-Google-Smtp-Source: AGHT+IFVXx5yprIFcXZZD+ButXoyZPkAGls4X6oQz0IhSiK88IfZJ0OdctI53Zra3OMb1YxpO2j1Ag==
+X-Received: by 2002:aa7:8745:0:b0:6e0:7308:7325 with SMTP id g5-20020aa78745000000b006e073087325mr3041016pfo.1.1707414368915;
+        Thu, 08 Feb 2024 09:46:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWiuVCKqUeskch1J4BBFbTjt+/A6f91D69wHp0wQEmpUQK1Jglrx6TUKHvJlM3AL20Bs6pd6Cbc32x1vVoMC7cWPDro0Fe+1Ege1XPRm0uY2WsFa9eYGAs2AvNGRqjdCoRbPgmco9StnyXAfV9fEg+4upNpFtubxuSwSt2aS45pDxbHRvnPH/vEVugf6QrP2mTkLpFdv8IdIfQJdXhPvnXAQFLpyhFhwZzureT0XU6wTIIZUeBLSjrMxMYAJx0nE7ZWyNBfDVZtrgC0A2aBoge4CumVLRmuHyy3HF5UpiLPtTd3FTdZsFMt/QOH/LC+aeaUlTW9rta4skTOoWq9ENLyfuGNkhR2KGEI5QrSHI21VkgZBFJBRbbT
+Received: from ?IPV6:2620:0:1000:8411:6ab9:a725:60e:97d2? ([2620:0:1000:8411:6ab9:a725:60e:97d2])
+        by smtp.gmail.com with ESMTPSA id lp20-20020a056a003d5400b006e04c3b3b58sm4191879pfb.179.2024.02.08.09.46.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Feb 2024 09:46:08 -0800 (PST)
+Message-ID: <5f934ebf-4e2a-44f9-993f-8b2c8d358370@acm.org>
+Date: Thu, 8 Feb 2024 09:46:06 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3ba0dffa-beea-478f-bb6e-777b6304fb69@kernel.org>
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b="PVo85f/e"
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 TO_DN_SOME(0.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_TRACE(0.00)[suse.com:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[11];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 BAYES_HAM(-3.00)[100.00%];
-	 ARC_NA(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	 FROM_HAS_DN(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 FREEMAIL_CC(0.00)[fromorbit.com,infradead.org,lists.linux-foundation.org,vger.kernel.org,kvack.org,lists.infradead.org,gmail.com];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[];
-	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from]
-X-Spam-Score: -2.51
-X-Rspamd-Queue-Id: B4EE31FCF9
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block: introducing a bias over deadline's fifo_time
+Content-Language: en-US
+To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe
+ <axboe@kernel.dk>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Yu Zhao <yuzhao@google.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Zhaoyang Huang <huangzhaoyang@gmail.com>, steve.kang@unisoc.com
+References: <20240208093136.178797-1-zhaoyang.huang@unisoc.com>
+ <20240208093136.178797-3-zhaoyang.huang@unisoc.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240208093136.178797-3-zhaoyang.huang@unisoc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu 08-02-24 17:02:07, Vlastimil Babka (SUSE) wrote:
-> On 1/9/24 05:47, Dave Chinner wrote:
-> > On Thu, Jan 04, 2024 at 09:17:16PM +0000, Matthew Wilcox wrote:
-> >> This is primarily a _FILESYSTEM_ track topic.  All the work has already
-> >> been done on the MM side; the FS people need to do their part.  It could
-> >> be a joint session, but I'm not sure there's much for the MM people
-> >> to say.
-> >> 
-> >> There are situations where we need to allocate memory, but cannot call
-> >> into the filesystem to free memory.  Generally this is because we're
-> >> holding a lock or we've started a transaction, and attempting to write
-> >> out dirty folios to reclaim memory would result in a deadlock.
-> >> 
-> >> The old way to solve this problem is to specify GFP_NOFS when allocating
-> >> memory.  This conveys little information about what is being protected
-> >> against, and so it is hard to know when it might be safe to remove.
-> >> It's also a reflex -- many filesystem authors use GFP_NOFS by default
-> >> even when they could use GFP_KERNEL because there's no risk of deadlock.
-> >> 
-> >> The new way is to use the scoped APIs -- memalloc_nofs_save() and
-> >> memalloc_nofs_restore().  These should be called when we start a
-> >> transaction or take a lock that would cause a GFP_KERNEL allocation to
-> >> deadlock.  Then just use GFP_KERNEL as normal.  The memory allocators
-> >> can see the nofs situation is in effect and will not call back into
-> >> the filesystem.
-> > 
-> > So in rebasing the XFS kmem.[ch] removal patchset I've been working
-> > on, there is a clear memory allocator function that we need to be
-> > scoped: __GFP_NOFAIL.
-> > 
-> > All of the allocations done through the existing XFS kmem.[ch]
-> > interfaces (i.e just about everything) have __GFP_NOFAIL semantics
-> > added except in the explicit cases where we add KM_MAYFAIL to
-> > indicate that the allocation can fail.
-> > 
-> > The result of this conversion to remove GFP_NOFS is that I'm also
-> > adding *dozens* of __GFP_NOFAIL annotations because we effectively
-> > scope that behaviour.
-> > 
-> > Hence I think this discussion needs to consider that __GFP_NOFAIL is
-> > also widely used within critical filesystem code that cannot
-> > gracefully recover from memory allocation failures, and that this
-> > would also be useful to scope....
-> > 
-> > Yeah, I know, mm developers hate __GFP_NOFAIL. We've been using
-> > these semantics NOFAIL in XFS for over 2 decades and the sky hasn't
-> > fallen. So can we get memalloc_nofail_{save,restore}() so that we
-> > can change the default allocation behaviour in certain contexts
-> > (e.g. the same contexts we need NOFS allocations) to be NOFAIL
-> > unless __GFP_RETRY_MAYFAIL or __GFP_NORETRY are set?
-> 
-> Your points and Kent's proposal of scoped GFP_NOWAIT [1] suggests to me this
-> is no longer FS-only topic as this isn't just about converting to the scoped
-> apis, but also how they should be improved.
+On 2/8/24 01:31, zhaoyang.huang wrote:
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index f958e79277b8..43c08c3d6f18 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -15,6 +15,7 @@
+>   #include <linux/compiler.h>
+>   #include <linux/rbtree.h>
+>   #include <linux/sbitmap.h>
+> +#include "../kernel/sched/sched.h"
 
-Scoped GFP_NOFAIL context is slightly easier from the semantic POV than
-scoped GFP_NOWAIT as it doesn't add a potentially unexpected failure
-mode. It is still tricky to deal with GFP_NOWAIT requests inside the
-NOFAIL scope because that makes it a non failing busy wait for an
-allocation if we need to insist on scope NOFAIL semantic. 
+Is kernel/sched/sched.h perhaps a private scheduler kernel header file? Shouldn't
+block layer code only include public scheduler header files?
 
-On the other hand we can define the behavior similar to what you
-propose with RETRY_MAYFAIL resp. NORETRY. Existing NOWAIT users should
-better handle allocation failures regardless of the external allocation
-scope.
+> @@ -840,7 +842,9 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>   		/*
+>   		 * set expire time and add to fifo list
+>   		 */
+> -		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
+> +		fifo_expire = task_is_realtime(current) ? dd->fifo_expire[data_dir] :
+> +			CFS_PROPORTION(current, dd->fifo_expire[data_dir]);
+> +		rq->fifo_time = jiffies + fifo_expire;
+>   		insert_before = &per_prio->fifo_list[data_dir];
+>   #ifdef CONFIG_BLK_DEV_ZONED
+>   		/*
 
-Overriding that scoped NOFAIL semantic with RETRY_MAYFAIL or NORETRY
-resembles the existing PF_MEMALLOC and GFP_NOMEMALLOC semantic and I do
-not see an immediate problem with that.
+Making the mq-deadline request expiry time dependent on the task priority seems wrong
+to me.
 
-Having more NOFAIL allocations is not great but if you need to
-emulate those by implementing the nofail semantic outside of the
-allocator then it is better to have those retries inside the allocator
-IMO.
+Thanks,
 
-> [1] http://lkml.kernel.org/r/Zbu_yyChbCO6b2Lj@tiehlicka
-> 
-> > We already have memalloc_noreclaim_{save/restore}() for turning off
-> > direct memory reclaim for a given context (i.e. equivalent of
-> > clearing __GFP_DIRECT_RECLAIM), so if we are going to embrace scoped
-> > allocation contexts, then we should be going all in and providing
-> > all the contexts that filesystems actually need....
-> > 
-> > -Dave.
-
--- 
-Michal Hocko
-SUSE Labs
+Bart.
