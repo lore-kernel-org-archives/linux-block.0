@@ -1,102 +1,260 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6074666B4D
-	for <linux-block@vger.kernel.org>; Fri,  9 Feb 2024 14:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E507602A
+	for <linux-block@vger.kernel.org>; Fri,  9 Feb 2024 16:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707489214; cv=none; b=XsSpnsWTg2ReR6V9IfQKhX4f7Zrcm+d5ikiKcT9WTyb9dtEOLsZNcHb7/YR4+r/XuXT2PqapJoAWIOrlSbzfca8p6cGC8S6yfD4OZTFgniM4n2fVhWx3p1PhjfpXi7Fazjecff4jB9Vw5D4n162KD+3X6b6qt717gxcUykLS4fw=
+	t=1707494605; cv=none; b=lNMHiBau5BskQe6ejKKUf+Xg0aWIoCcQ5iV4PmX9X3mKjHnQWsNKoCgHSLWgdMTKK2k3V4E1Fk+up+5umSHAZRL6UhOBk8sM1z7TiRC1k3VZ7k/GYAnaYP9dZPHgKZuKYB6IkqOOBHdchkLziHVksBOTmNkmqbzUqIWx8eY7gEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707489214; c=relaxed/simple;
-	bh=SjpiHYMiN7o4SN7WUyGlvg2LmukCSiKd6iLytN3gO8c=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=QfvimcWyairIFmLKUOB5Dvc74bz4EvZIqfDnSkHeShXMsZDXBgBVqfD8ta4eV/DctdaGzArxKqzbXTGKEAx66NOzRJX1Qt/OAH6Xc5XkVkDJKAsx1AHuz70jnuokDDO0ntMoQrpHkPHjfnHhDtjwhEuBJ5/Hfo1J7qBwWIi5XIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lDGx6p9G; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1707494605; c=relaxed/simple;
+	bh=vlQD8ZEEeMI1Uu1eigZ4Z6Cvst12jN+Wj4JCBQxSfU4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rHDlc0RF3vWRsfor5critqYHAGCeD21f0cAwCJ50A3xaEnJ1nXJoPo7L99SE39f0UDKkz7oZUa6GW/s65iQ9ldr6D5D8+fBJnZwI/iBXLoaQi3olfjfpLsvoiwskHHrmhg5yWuY4KdQSxOF4uNBeZSs5Me1utkxTRx5vawjzG7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=czUBZDRI; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lDGx6p9G"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7bf3283c18dso7343239f.0
-        for <linux-block@vger.kernel.org>; Fri, 09 Feb 2024 06:33:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707489210; x=1708094010; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BVgFKAYhfQn+nElwnbqj47hUJTVhtfwCN1H+BTLsvpU=;
-        b=lDGx6p9GHOB2RCLurtRipI9oNG1QHOocXinNbW5GwfMO+dVvIY6XfD1XH+fvZkDtjS
-         N0cEzoJAzrmzsum2Ial1Bj+DbCfqlaHk6zFlrsOY8QF80Mv843D/8HmZtwHbN4bS3zQj
-         Tau5vgGDiIG35oLzpGL3+4NZ0SZzg6sIFNHoT6mqXjIwerkMexDDuP4rrepQoLt4i8KZ
-         YkBIk4jgWS/979gkqMZ+0MG1S6lrvvvurz08zrVuRyU2vx8/Z94atn5yZulljb50RIMz
-         KHvdCK0/lL3UNwmkkfhjqsw5zdS+gC0Q3R54CQqz3Locy4kEPdumTXDJN95SoqFHq//k
-         b4fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707489210; x=1708094010;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BVgFKAYhfQn+nElwnbqj47hUJTVhtfwCN1H+BTLsvpU=;
-        b=Kk4ZxM7K9w4nLn99BhdX4c6zc5jtUpxzcfCXJk4X9aEsUp87K5b+RYTBbWN01VsIZW
-         o/9ppx0R1RwB7EG/ZPmutwVmeYDT55c9SR7/8FYITYECpWjso1V9Q6pDj4av0OYZNcgN
-         tRZMov5yZcoSHKfC9xf3QT8eYW0LpVVZ1bPHK2hXVc1y/uKO3R6dZZ4EgOcbsfg/+T9B
-         G6i8/qYqxZ4U9zXgA0Ht02DpRg1RXTj+u2bteVC00GrJaSzenDhJ14ij98Z4QRk/aVfY
-         +JrKsOs5BkEoPAaywEkVbY7o/5KGuqEqiP/LlXcOejF1DPONXPVwMpShSsSlTfHiWSAn
-         cxDQ==
-X-Gm-Message-State: AOJu0YzQIxJJYY/LCYLPmZ1ImAC7kvgQbtj1EcuVcsJHdptT6MzbLVGc
-	ooxy8QU6QNFrXaopIzFg9tphZAlyig/RvhODliXQeUhjez9kU2D1l7CoowSXf0h+vOxXDNTOAHP
-	dF6A=
-X-Google-Smtp-Source: AGHT+IHz55nNkJNsbOp4/Q69jhvAB1qTFWFIBag13ent39Fzo8/uGE2VRanRwaUOQ8DPZNl3KHW4ug==
-X-Received: by 2002:a6b:e413:0:b0:7c4:3a7e:ccc with SMTP id u19-20020a6be413000000b007c43a7e0cccmr2103676iog.0.1707489209881;
-        Fri, 09 Feb 2024 06:33:29 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXMKe/hl5bEOrnSrYvP2WKEA4g66yDslPmViuOKEL6UA7pkDCwK7TDhnXHVutwzrTOU8sYgU1itj4Z66AsRo3J9rnuRAvTtkciEXgMM7Am6S2iyyJloY6V4XvjAwNhYzW04HPCsXPjSgs+5/HRrDP9f32vn8wSzswDK+fW3i8lGGk0k3SA9QNPMvEqQViwYcWboPZZaXtc6OJmqc0POMNQiFirgSuTuDLp4M0z9sODs8hmdAA==
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id x20-20020a02ac94000000b0047147018e96sm423579jan.11.2024.02.09.06.33.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 06:33:29 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Stefan Haberland <sth@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
- Vasily Gorbik <gor@linux.ibm.com>, Miroslav Franc <mfranc@suse.cz>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20240209124522.3697827-1-sth@linux.ibm.com>
-References: <20240209124522.3697827-1-sth@linux.ibm.com>
-Subject: Re: [PATCH RESEND 0/2] two missing patches
-Message-Id: <170748920879.1612996.819975947367482362.b4-ty@kernel.dk>
-Date: Fri, 09 Feb 2024 07:33:28 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="czUBZDRI"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707494599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=adgMAjwxJTvri5oreCpxlFPQcfsRb8fC7vO93bohN1g=;
+	b=czUBZDRIbXmVrKBOv/iLkm5x0j/EmEM4r+HKvCkX8ETTDyDtlN6Hx1zo2AHe8oOPHTMV4w
+	yjzDmbsbW+/Qmie5WWQk74AJBFBFamxLC+Er2CEmGPc1cFGyp8xeg1qSkhYSOveSZhFhGL
+	IvTZlRjpf/52zr9B7py6ybyV109nccs=
+From: Sergei Shtepa <sergei.shtepa@linux.dev>
+To: axboe@kernel.dk,
+	hch@infradead.org,
+	corbet@lwn.net,
+	snitzer@kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH v7 0/8] filtering and snapshots of a block devices
+Date: Fri,  9 Feb 2024 17:01:56 +0100
+Message-Id: <20240209160204.1471421-1-sergei.shtepa@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.12.5-dev-2aabd
+X-Migadu-Flow: FLOW_OUT
 
+Hi all.
 
-On Fri, 09 Feb 2024 13:45:20 +0100, Stefan Haberland wrote:
-> somehow two of the patches have not been sent with the patchset yesterday.
-> Sorry for this.
-> 
-> Here are the two missing patches.
-> Please apply for the upcomming merge window.
-> 
-> Jan Höppner (1):
->   s390/dasd: Improve ERP error messages
-> 
-> [...]
+I am happy to offer an improved version of the block device filtering 
+mechanism (blkfilter) and module for creating snapshots of block devices
+(blksnap).
 
-Applied, thanks!
+The filtering block device mechanism is implemented in the block layer.
+This allows to attach and detach block device filters. Filters extend the
+functionality of the block layer. See more in 
+Documentation/block/blkfilter.rst.
 
-[1/2] s390/dasd: Improve ERP error messages
-      commit: 1df0f512faa71f1e106f36529ceff52f48209e30
-[2/2] s390/dasd: fix double module refcount decrement
-      commit: c3116e62ddeff79cae342147753ce596f01fcf06
+The main purpose of snapshots of block devices is to provide backups of
+them. See more in Documentation/block/blksnap.rst. The tool, library and
+tests for working with blksnap can be found on github. 
+Link: https://github.com/veeam/blksnap/tree/stable-v2.0
+There is also documentation from which you can learn how to manage the
+module using the library and the console tool.
 
-Best regards,
+Based on LK v6.8-rc3 with Christoph's patchset "clean up blk_mq_submit_bio".
+Link: https://lore.kernel.org/linux-block/50fbe76b-d77d-4a7e-bda4-3a3b754fbd7e@kernel.org/T/#t
+
+I express my appreciation and gratitude to Christoph. Thanks to his
+attention to the project, it was possible to raise the quality of the code.
+I probably wouldn't have made version 7 if it wasn't for his help.
+I am sure that the blksnap module will improve the quality of backup tools
+for Linux.
+
+v7 changes:
+- The location of the filtering of I/O units has been changed. This made it
+  possible to remove the additional call bio_queue_enter().
+- Remove configs BLKSNAP_DIFF_BLKDEV and BLKSNAP_CHUNK_DIFF_BIO_SYNC.
+- To process the ioctl, the switch statement is used instead of a table
+  with functions.
+- Instead of a file descriptor, the module gets a path on the file system.
+  This allows the kernel module to correctly open a file or block device
+  with exclusive access rights.
+- Fixed a bio leaking bugs.
+
+v6 changes:
+- The difference storage has been changed.
+  In the previous version, the file was created only to reserve sector
+  ranges on a block device. The data was stored directly to the block
+  device in these sector ranges. Now saving and reading data is done using
+  'VFS' using vfs_iter_write() and vfs_iter_read() functions. This allows
+  not to depend on the filesystem and use, for example, tmpfs. Using an
+  unnamed temporary file allows hiding it from other processes and
+  automatically release it when the snapshot is closed.
+  However, now the module does not allow adding a block device to the
+  snapshot on which the difference storage is located. There is no way to
+  ensure the immutability of file metadata when writing data to a file.
+  This means that the metadata of the filesystem may change, which may
+  cause damage to the snapshot.
+- _IOW and _IOR were mixed up - fixed. 
+- Protection against the use of the snapshots for block devices with
+  hardware inline encryption and data integrity was implemented.
+  Compatibility with them was not planned and has not been tested at the
+  moment.
+
+v5 changes:
+- Rebase for "kernel/git/axboe/linux-block.git" branch "for-6.5/block".
+  Link: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-6.5/block
+
+v4 changes:
+- Structures for describing the state of chunks are allocated dynamically.
+  This reduces memory consumption, since the struct chunk is allocated only
+  for those blocks for which the snapshot image state differs from the
+  original block device.
+- The algorithm for calculating the chunk size depending on the size of the
+  block device has been changed. For large block devices, it is now
+  possible to allocate a larger number of chunks, and their size is smaller.
+- For block devices, a 'filter' file has been added to /sys/block/<device>.
+  It displays the name of the filter that is attached to the block device.
+- Fixed a problem with the lack of protection against re-adding a block
+  device to a snapshot.
+- Fixed a bug in the algorithm of allocating the next bio for a chunk.
+  This problem was occurred on large disks, for which a chunk consists of
+  at least two bio.
+- The ownership mechanism of the diff_area structure has been changed.
+  This fixed the error of prematurely releasing the diff_area structure
+  when destroying the snapshot.
+- Documentation corrected.
+- The Sparse analyzer is passed.
+- Use __u64 type instead pointers in UAPI.
+
+v3 changes:
+- New block device I/O controls BLKFILTER_ATTACH and BLKFILTER_DETACH allow
+  to attach and detach filters.
+- New block device I/O control BLKFILTER_CTL allow sending command to
+  attached block device filter.
+- The copy-on-write algorithm for processing I/O units has been optimized
+  and has become asynchronous.
+- The snapshot image reading algorithm has been optimized and has become
+  asynchronous.
+- Optimized the finite state machine for processing chunks.
+- Fixed a tracking block size calculation bug.
+
+v2 changes:
+- Added documentation for Block Device Filtering Mechanism.
+- Added documentation for Block Devices Snapshots Module (blksnap).
+- The MAINTAINERS file has been updated.
+- Optimized queue code for snapshot images.
+- Fixed comments, log messages and code for better readability.
+
+v1 changes:
+- Forgotten "static" declarations have been added.
+- The text of the comments has been corrected.
+- It is possible to connect only one filter, since there are no others in
+  upstream.
+- Do not have additional locks for attach/detach filter.
+- blksnap.h moved to include/uapi/.
+- #pragma once and commented code removed.
+- uuid_t removed from user API.
+- Removed default values for module parameters from the configuration file.
+- The debugging code for tracking memory leaks has been removed.
+- Simplified Makefile.
+- Optimized work with large memory buffers, CBT tables are now in virtual
+  memory.
+- The allocation code of minor numbers has been optimized.
+- The implementation of the snapshot image block device has been
+  simplified, now it is a bio-based block device.
+- Removed initialization of global variables with null values.
+- only one bio is used to copy one chunk.
+- Checked on ppc64le.
+
+Sergei Shtepa (8):
+  documentation: filtering and snapshots of a block devices
+  block: filtering of a block devices
+  block: header file of the blksnap module interface
+  block: module management interface functions
+  block: handling and tracking I/O units
+  block: difference storage implementation
+  block: snapshot and snapshot image block device
+  block: Kconfig, Makefile and MAINTAINERS files
+
+ Documentation/block/blkfilter.rst             |  66 ++
+ Documentation/block/blksnap.rst               | 351 ++++++++++
+ Documentation/block/index.rst                 |   2 +
+ .../userspace-api/ioctl/ioctl-number.rst      |   1 +
+ MAINTAINERS                                   |  17 +
+ block/Makefile                                |   3 +-
+ block/bdev.c                                  |   2 +
+ block/blk-core.c                              |  26 +-
+ block/blk-filter.c                            | 257 +++++++
+ block/blk-mq.c                                |   7 +-
+ block/blk-mq.h                                |   2 +-
+ block/blk.h                                   |  11 +
+ block/genhd.c                                 |  10 +
+ block/ioctl.c                                 |   7 +
+ block/partitions/core.c                       |   9 +
+ drivers/block/Kconfig                         |   2 +
+ drivers/block/Makefile                        |   2 +
+ drivers/block/blksnap/Kconfig                 |  12 +
+ drivers/block/blksnap/Makefile                |  15 +
+ drivers/block/blksnap/cbt_map.c               | 225 +++++++
+ drivers/block/blksnap/cbt_map.h               |  90 +++
+ drivers/block/blksnap/chunk.c                 | 631 ++++++++++++++++++
+ drivers/block/blksnap/chunk.h                 | 134 ++++
+ drivers/block/blksnap/diff_area.c             | 577 ++++++++++++++++
+ drivers/block/blksnap/diff_area.h             | 175 +++++
+ drivers/block/blksnap/diff_buffer.c           | 114 ++++
+ drivers/block/blksnap/diff_buffer.h           |  37 +
+ drivers/block/blksnap/diff_storage.c          | 290 ++++++++
+ drivers/block/blksnap/diff_storage.h          | 103 +++
+ drivers/block/blksnap/event_queue.c           |  81 +++
+ drivers/block/blksnap/event_queue.h           |  64 ++
+ drivers/block/blksnap/main.c                  | 481 +++++++++++++
+ drivers/block/blksnap/params.h                |  16 +
+ drivers/block/blksnap/snapimage.c             | 135 ++++
+ drivers/block/blksnap/snapimage.h             |  10 +
+ drivers/block/blksnap/snapshot.c              | 462 +++++++++++++
+ drivers/block/blksnap/snapshot.h              |  65 ++
+ drivers/block/blksnap/tracker.c               | 369 ++++++++++
+ drivers/block/blksnap/tracker.h               |  78 +++
+ include/linux/blk-filter.h                    |  72 ++
+ include/linux/blk_types.h                     |   1 +
+ include/linux/sched.h                         |   1 +
+ include/uapi/linux/blk-filter.h               |  35 +
+ include/uapi/linux/blksnap.h                  | 384 +++++++++++
+ include/uapi/linux/fs.h                       |   3 +
+ 45 files changed, 5430 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/block/blkfilter.rst
+ create mode 100644 Documentation/block/blksnap.rst
+ create mode 100644 block/blk-filter.c
+ create mode 100644 drivers/block/blksnap/Kconfig
+ create mode 100644 drivers/block/blksnap/Makefile
+ create mode 100644 drivers/block/blksnap/cbt_map.c
+ create mode 100644 drivers/block/blksnap/cbt_map.h
+ create mode 100644 drivers/block/blksnap/chunk.c
+ create mode 100644 drivers/block/blksnap/chunk.h
+ create mode 100644 drivers/block/blksnap/diff_area.c
+ create mode 100644 drivers/block/blksnap/diff_area.h
+ create mode 100644 drivers/block/blksnap/diff_buffer.c
+ create mode 100644 drivers/block/blksnap/diff_buffer.h
+ create mode 100644 drivers/block/blksnap/diff_storage.c
+ create mode 100644 drivers/block/blksnap/diff_storage.h
+ create mode 100644 drivers/block/blksnap/event_queue.c
+ create mode 100644 drivers/block/blksnap/event_queue.h
+ create mode 100644 drivers/block/blksnap/main.c
+ create mode 100644 drivers/block/blksnap/params.h
+ create mode 100644 drivers/block/blksnap/snapimage.c
+ create mode 100644 drivers/block/blksnap/snapimage.h
+ create mode 100644 drivers/block/blksnap/snapshot.c
+ create mode 100644 drivers/block/blksnap/snapshot.h
+ create mode 100644 drivers/block/blksnap/tracker.c
+ create mode 100644 drivers/block/blksnap/tracker.h
+ create mode 100644 include/linux/blk-filter.h
+ create mode 100644 include/uapi/linux/blk-filter.h
+ create mode 100644 include/uapi/linux/blksnap.h
+
 -- 
-Jens Axboe
-
-
+2.34.1
 
