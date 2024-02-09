@@ -1,54 +1,54 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97541E883;
-	Thu,  8 Feb 2024 23:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EF823CB;
+	Fri,  9 Feb 2024 00:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707436356; cv=none; b=la15E18EcX6vkFM3pqrBZlVLnmEflK5V4U4K5Pj7dVez3lIbcB3pfFMAvTtkGesBaq0A1Zzn8ffk+Wh4RO087yqgOBRD980kYiTb0ceaGCDc6AOi0CRLDgkANjUgmqu86zJwR8Loax0b6UlxD9DSTwL6QKYYXMd/3NQ93j8osCA=
+	t=1707436962; cv=none; b=hufA5aatS+mSb+NjZ4rAy4xHaOp9gVtGcWbzY3jh6xtdCYdJBQzWJIe+qQXFCslQ9Ou3e3stfe33EjU+4zZ48y6U+K+0ZXLU1m7u4wekipnf7r1NxWCq59TPX2UnP3ivCF+n4fWKLGNMZc/0sbW0+KdVyKj0OWBXjspn/sf9p74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707436356; c=relaxed/simple;
-	bh=0TuJ81rwQVLgk6bEkwPrrgalWDSWS4LrIpoBucqU9M8=;
+	s=arc-20240116; t=1707436962; c=relaxed/simple;
+	bh=FisFr5Y6c/oPOlBwdDGJu3BWMqSFmvw6cnye1shtkPg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E8o4Y1bBt9KD1/qKMbjlyllmVTWl5CawhRQygGVRgvZLcaMmTUah8c88ilZ3OL1/Zf+aPMyEfXNLJN6yEKdrTY5Yc8sCMDN4JKykhsFjpDR+Yw/oQOxDaKVQkBgJ3hjONFvDD1zqfhUfd2AMH3sd6EyCwgC67wGpI5A0shTjMxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cH4ZUeii; arc=none smtp.client-ip=209.85.208.171
+	 To:Cc:Content-Type; b=UTiW/jFIh3uoONw0Ql2T3ZyNpTXnkZFuSnZ8ww3KTVYiUFawBLFiWxEAhD45T96+g5k7mJmmIMi7eKU1RMKxqQEExuDOztAqeCH1YzY1BNkLyRivJHAgaPongx6AtppLqYmbdPvCP/6EWxX45hWWlkAepAucp8m1ib8eFN1c5vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BmP820gE; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cH4ZUeii"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d09cf00214so4980671fa.0;
-        Thu, 08 Feb 2024 15:52:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmP820gE"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cf4fafa386so6073501fa.1;
+        Thu, 08 Feb 2024 16:02:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707436353; x=1708041153; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707436959; x=1708041759; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m6wMFe6NQrnI4rL+5ph8w/QElo3FYa1DxN0fAFRr46I=;
-        b=cH4ZUeiiWrerqbW+vDPe10V8AziGwv2IS5ecDT3/EXRM60hEdkycCfcJi+Urz/h7j0
-         0IqEWja/nfaO9T0LeaR991lmUKpEF4K1T5evKL9o/+t4X69qLFTF4+Y1auA/MjsR7Gcu
-         eYutEAkt9lhP7TKnHAVgnrizEAyGNXUyLF87/UzICmvzu/DXNexxl+AKSOHQC9IEI1h5
-         Cbi6Z/DvmmliO+8J/riVvgnGNq+W+n8MA8j9ZXiXAKJgXQvkRRQOR2OTqPXHWb149HVr
-         FfMtAHCnyRuWKRT564kEmC8aICiunDHizU6cTUbXEJMeHy9Sjsbf33HFqlC0S/wJAcTs
-         LX5g==
+        bh=/MN7qUrCvpfzMejtNGOLudK1J8Ct+G2fviTUgl85LWU=;
+        b=BmP820gEpU/UpFZEldqoVEDQz4ucctclnqLO+xSpnTCadc9mXVxPK48iDnJSgliXkW
+         nQ1sllvki8xlKK6VEZ5HDX6lLduIQJ8arJ5DLMBljg91bxGTeYi8dB7ZOq9adHHLV9zx
+         asHs6+/aXpBU9Lg5+0XvxFJmO/yAiuNB7g/hD1uYQrDq6esiB/0ZkvbPKtV7OFyXSqp4
+         eWl0YcyHCPpl95VBLU0WugeUpbrQDg9NwUFZvuulhcmjxJTFL3MckgUHtP8psc9CEQPh
+         zjSG4Fb/dXsN2/TOoyA3dbhfldbBamh4rZP8/87zJYDwkziiIywm9TPJDU5mcRQJnQ4c
+         G8dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707436353; x=1708041153;
+        d=1e100.net; s=20230601; t=1707436959; x=1708041759;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m6wMFe6NQrnI4rL+5ph8w/QElo3FYa1DxN0fAFRr46I=;
-        b=PZ6x4iW1Mx5j3p8r8qq/yFIUGDnub2RWuFi8cmeMPCsSZq1EgK92tKbfxNQbVOq5Bm
-         WItbP3fG3BzHXg3F6bp0fBv+J2JhkF3DxMsOALZbz2XGO0uiYUc10R83ExulntXBQNIN
-         ZnKa17Untc9xbSt3Bjw+cVA1JPr8qK1grqNauqUIkqeQD1qK8trAyeuhYZM311rI/F45
-         8nBHqFVXOZ4n7pGwEk78DWbEZq4aQivu+heixfRA4XgYT0g63y9zIUozFV3hlE422Bib
-         eFYD/N7MtezcKx2ztDy5i++WZgPstuRDJIrP8x+axIMovkG32UXU7uK/Z9NVsMDND1Gl
-         YfKw==
-X-Gm-Message-State: AOJu0YwlDSYmLMXNy+mHpekWkl9fVyaSQ/oE5XaDfqr17BpEDcqhz6jo
-	pScGXYECC6ET2ra8sgOaTpGE+zVCZHEAPCmKLZ7exH3Jo3RdWparR+GqDuQZA6rtluR5qLL1mQy
-	YmuSkgHIgHonkxHhW9Bv3BXC9/eg=
-X-Google-Smtp-Source: AGHT+IFPcxdRVAxjhMcMjYR3MMd5br9sMGHnjaUL+RmdGQeL+yFqdWj56QUVnvIu5llXHFQLjelSsJmy6JIpifSUWS0=
-X-Received: by 2002:a2e:a9a2:0:b0:2d0:c0d0:d4ed with SMTP id
- x34-20020a2ea9a2000000b002d0c0d0d4edmr94867ljq.0.1707436352580; Thu, 08 Feb
- 2024 15:52:32 -0800 (PST)
+        bh=/MN7qUrCvpfzMejtNGOLudK1J8Ct+G2fviTUgl85LWU=;
+        b=sub9+41fNT42slD6NZpkWI2A1qnQkff+R9ZuauaCPGzLiV01+Une9aZfjFmhKB37yD
+         OHQuwdEeNOmv8YvNXh/ViWPfIjPPxZWyxy2OBtxaTOLB+IgNmzn908NBar7XXeROWMWB
+         xwhVcYV6jpFcEK6mDXGs+YcGuE6BTymUjnsyygT+aEVVkZ+GNefT1eTeF/ksR/DavQVa
+         vbtEfCV0dT/gGqK1eOtsn6C/lTJXK1+1rr9hGPHGfHjJIdL9vpQT2zzPjuHM1q1yXP8O
+         0vwNnmxdWke2RgKBnvkwz0fmffV4zaaNscjtoc/2Ufd6vmYrFYsz62aRaH0fvQ3kadsY
+         iSrg==
+X-Gm-Message-State: AOJu0YxTWBr8e5Wyo+ERfSLYgZq4eh3GiwDmC/o9obLFErM6f5AoILyr
+	cSnbs40G+ZiYimt34TJO9aYMKb5apM0fp96kVm8/jYVAVcGlBAhESdo/YoXvWpkZL+BvjRX/zgK
+	e0WZtGdVwK3tj9iWNVz28OyZa8sE=
+X-Google-Smtp-Source: AGHT+IFPQsKzLG22PNSWQLxElsi73Fq3Nqu3C6JLq9s0cOD5Oi/toZlY2O4Z1f2M/MHycvukxOBeUTkFU4nJLadMsUY=
+X-Received: by 2002:a05:651c:4c9:b0:2d0:b644:57ba with SMTP id
+ e9-20020a05651c04c900b002d0b64457bamr103794lji.35.1707436958585; Thu, 08 Feb
+ 2024 16:02:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,39 +56,45 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240208093136.178797-1-zhaoyang.huang@unisoc.com>
- <20240208093136.178797-3-zhaoyang.huang@unisoc.com> <5f934ebf-4e2a-44f9-993f-8b2c8d358370@acm.org>
-In-Reply-To: <5f934ebf-4e2a-44f9-993f-8b2c8d358370@acm.org>
+ <20240208093136.178797-3-zhaoyang.huang@unisoc.com> <ca00ff75-e98d-4652-9c52-94b2e876901e@kernel.dk>
+In-Reply-To: <ca00ff75-e98d-4652-9c52-94b2e876901e@kernel.dk>
 From: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Date: Fri, 9 Feb 2024 07:52:21 +0800
-Message-ID: <CAGWkznGvwBZWv+g7=0JxRpeQ+chMoN27TDmuSAVU2O37fGNCDg@mail.gmail.com>
+Date: Fri, 9 Feb 2024 08:02:27 +0800
+Message-ID: <CAGWkznH6Y8u7PsoHWid0uQ+ceRK_qzSn6=eWn4dvDhK+DzSXzg@mail.gmail.com>
 Subject: Re: [PATCH 3/3] block: introducing a bias over deadline's fifo_time
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Jens Axboe <axboe@kernel.dk>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Yu Zhao <yuzhao@google.com>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, steve.kang@unisoc.com
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Yu Zhao <yuzhao@google.com>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 9, 2024 at 1:46=E2=80=AFAM Bart Van Assche <bvanassche@acm.org>=
- wrote:
+On Fri, Feb 9, 2024 at 1:49=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
 >
-> On 2/8/24 01:31, zhaoyang.huang wrote:
+> On 2/8/24 2:31 AM, zhaoyang.huang wrote:
 > > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
 > > index f958e79277b8..43c08c3d6f18 100644
 > > --- a/block/mq-deadline.c
 > > +++ b/block/mq-deadline.c
 > > @@ -15,6 +15,7 @@
-> >   #include <linux/compiler.h>
-> >   #include <linux/rbtree.h>
-> >   #include <linux/sbitmap.h>
+> >  #include <linux/compiler.h>
+> >  #include <linux/rbtree.h>
+> >  #include <linux/sbitmap.h>
 > > +#include "../kernel/sched/sched.h"
->
-> Is kernel/sched/sched.h perhaps a private scheduler kernel header file? S=
-houldn't
-> block layer code only include public scheduler header files?
->
+> >
+> >  #include <trace/events/block.h>
+> >
+> > @@ -802,6 +803,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx =
+*hctx, struct request *rq,
+> >       u8 ioprio_class =3D IOPRIO_PRIO_CLASS(ioprio);
+> >       struct dd_per_prio *per_prio;
+> >       enum dd_prio prio;
+> > +     int fifo_expire;
+> >
+> >       lockdep_assert_held(&dd->lock);
+> >
 > > @@ -840,7 +842,9 @@ static void dd_insert_request(struct blk_mq_hw_ctx =
 *hctx, struct request *rq,
 > >               /*
@@ -101,14 +107,20 @@ re[data_dir] :
 );
 > > +             rq->fifo_time =3D jiffies + fifo_expire;
 > >               insert_before =3D &per_prio->fifo_list[data_dir];
-> >   #ifdef CONFIG_BLK_DEV_ZONED
+> >  #ifdef CONFIG_BLK_DEV_ZONED
 > >               /*
 >
-> Making the mq-deadline request expiry time dependent on the task priority=
- seems wrong
-> to me.
-But bio_set_ioprio has done this before
+> Hard pass on this blatant layering violation. Just like the priority
+> changes, this utterly fails to understand how things are properly
+> designed.
+IMHO, I don't think this is a layering violation. bio_set_ioprio is
+the one which introduces the scheduler thing into the block layer,
+this commit just wants to do a little improvement based on that. This
+commit helps CFS task save some IO time when preempted by RT heavily.
+
+PS: [PATCHv9 1/1] block: introduce content activity based ioprio has
+solved layering violation issue. Could you please have a look.
 >
-> Thanks,
+> --
+> Jens Axboe
 >
-> Bart.
