@@ -1,126 +1,83 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0299716410
-	for <linux-block@vger.kernel.org>; Fri,  9 Feb 2024 21:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2224028DDE;
+	Fri,  9 Feb 2024 22:34:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707512768; cv=none; b=XG0oI5kMgfv6nA+wlh7mh1HMALnSsiA4sTp6GXOjkZPKj0GqOJKYnPOT67rRoFvQX5OBC/hPe0AmBGXagGRdSDI8S0hqT+6P6YHRtK/MTVwF3/4jffbpMnHGXpBq51m/AEK9kdejDROvnp4x+DahBVoO2FGDBg8VOiN4hNuezyA=
+	t=1707518055; cv=none; b=Cdofu/oEGM4poXUXsFTSpPBeBJRMJA/Uc/CHi++NFnyttwjdWSwDrJcMTdb3kW1q0nbkt1rJ0t0OBdbHkfyQYabhTBLA1PUjD1ywRjHE4Zr3BT+6Ael8nkVQhAM84sWzG94GrVrry5RP1oV04qw322+T1+Gt+/lEaz+11KB1rr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707512768; c=relaxed/simple;
-	bh=UO1A3Fct17+/hJd8or2MUtzr0RTkRI4EFJgLeSzlNSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MVVlZVx2U6N+0IG0NvgK8S8om2EqKNq19lnP/+Zsau+n2NuK+PpB66L8/caR470asynvel17hw5au5vPRVIHfvnR8wf1XlW8wm1h15JT1Q3xpq4+tWZ+f8hMv+w25tCnLDRsM5yJ4aW6le1Mm1goIxdURPGjAp8iv98zExfmqXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=G59mhzld; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1707518055; c=relaxed/simple;
+	bh=MJMnfC3Jy9W+p+cWdsxJEhZatZy4o1wyduGBxQD91zw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EPy7T5RcEye05tGAYj9whu78RS8pqmy+bD3yDwnZ3XzbLjXOZMuCfs5+LpbV0Vc2CeaeezLIvVGcrYhAtBW/rTfzZbu+rc8d8SOOqTE5raGqsazTvouODbiG5ziqfPEkbwE9VBJ3UL4vYNWU1y7toMnIFfdixuUyde1g33WXkbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyJHb8uw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="G59mhzld"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7bff8f21b74so13698539f.0
-        for <linux-block@vger.kernel.org>; Fri, 09 Feb 2024 13:06:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707512765; x=1708117565; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TX8kZJ4jfhuvDuckYH8MKVN4C0WBzbq4xbrMJJT/w90=;
-        b=G59mhzldhT80ykhotACpYyYb+Y8E2GiYInZvA60j84FDmrs7AJHxQO2O0xv2STrdJT
-         itL5cQzybxEIzfVASXU1ivYuMGuYJDkm5NOpQk6FI3Os0Agpy8/cDG4iKbwEWoR5nsXT
-         KR2ikz5DWEfZvXQ3l/Otl0ZNlwXkF31Q+xjQG6IOxCb5OV3WUk6kvz992VVMOGjNpBTR
-         O36kkxvMHbnjTROqQNHNr4SxwIYg/k0ecmgDHy5D0HBjcr6i4+sRTVB58onLHgis3EfF
-         7u5jKp682BF79733gMvSeiZ/MsVvnUSMw2+iQWhMBZWtK5YLQnL0Y+sLWBTMFEA4OH8N
-         uYkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707512765; x=1708117565;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TX8kZJ4jfhuvDuckYH8MKVN4C0WBzbq4xbrMJJT/w90=;
-        b=dI52seVBxDLRhExXz4R7aiNKnudGh547kPAXj04smjws7NgRbSpUwXwBOYSFVBIUlT
-         Ijickxbbj8ARzIoDMZJYs/F1S3ibkhf4Zn5uITqjQhoR7zAbZkkr1x6QZVb1tQFj8eB+
-         uK6DegZpR24gk+vV3iIPp9Fi+vaqDSoFozdXAetYMfCzywX8n2gLkQuh6o0+xvdmUKzM
-         8UPovNXuIJBB947Ej6A7fV5CJ4ftf5RHwkiG5aqbCVW+4bGmrg5DID9rDhLrEX8lviz8
-         7om34oULcWZaH2t4MfxOjJ+f1PJWyMud1CrbA91xgtUwjcsL+f0OsCuU2aoynHJ/oUE5
-         mwGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUaLb1P5bfX5F15k1P1EJcowydwziImYXK1BIP5K403IMJkhQfwuZVhWZ8+KeNnKtSGvtWjoPqBdfbH6+5bAksyBtXqv8MyY/OS+7k=
-X-Gm-Message-State: AOJu0Yz09zGagFne7sZQ6eMUAMV6lH0PDrDJoZUfnFd2B6wjXld0lquG
-	acFG+9zGfpvrAU7nvawKcEatL5zFZvcLgn2s3FXoWoF+KGnpa9hxNXCJMZw+Mp4=
-X-Google-Smtp-Source: AGHT+IG95+JDEa+gHhRbNQy0UP1KGGwCed76qGySgxKJ2T/oR18AoeRQqXBNBZUT4wqRzIG9cGuscA==
-X-Received: by 2002:a6b:3f08:0:b0:7c4:655:6e05 with SMTP id m8-20020a6b3f08000000b007c406556e05mr514508ioa.2.1707512765133;
-        Fri, 09 Feb 2024 13:06:05 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW07vEn8HZ60Z4H7r5mCWcnVCXKNpcE4FhapsNAyty8vDlL29suKKWuje2252Pawcm034h3sOQ4+Tj7plSU2eol0G+VMUvqLgMSuJtL89jsB3LjjXv7kfgFSjufmRFudTbgNgkiAIKKWWmqhzxJJzXco18yKIUFwR9cfrMP9M0rSOPp1mHDdsU3J1vdpvucWbdzRidA5/V3DaCIpvSBZqaTeObWpGytGSRNcVYpqAIcD6EatbetMt6LKYQKIZAmvFXc78Ou9dT/tJtMfQG4417ma38ogHxJ/WMxLl8xWJwPJeMSQas5CabR+fitrHREYBuUdpeJdnezXwHP
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id n8-20020a02a908000000b0047153f09f83sm62054jam.13.2024.02.09.13.06.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 13:06:04 -0800 (PST)
-Message-ID: <35989f82-3c6b-4c91-ae9b-db8791895b19@kernel.dk>
-Date: Fri, 9 Feb 2024 14:06:03 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyJHb8uw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A2C9C433F1;
+	Fri,  9 Feb 2024 22:34:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707518054;
+	bh=MJMnfC3Jy9W+p+cWdsxJEhZatZy4o1wyduGBxQD91zw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PyJHb8uw9dF0TAt6IYEqCnyQJ0x9gOHKRj8qsE2xu0cuCx9I8Wm793wwPKAgTRFXw
+	 5tPZFdVZPiWGROi9itR87GBjsJ2jOjcgHBp6Fn5d6I7Xd/zLzFYVpq0mFtZ8s2QVbi
+	 0fPfgQM0ax00AHvOFTiHiZ2SJmqtfWlC2Pm7I9S8gCsIeFPBC+hPb8y+fFGAmhyObQ
+	 ZIkFAZyn4pURT7+paQ7HwVO+pkwur5/njGn0fH6VLg3a021bQThJEdjXoiMX50TlnI
+	 pfr+M1XgXwPVDj/y+BE1zdSZlX2yR8yiHavJC3LAoIbaEbyH1Weaqn2Xh8GgcXVPYM
+	 f3ZF9VvY1id0Q==
+Date: Fri, 9 Feb 2024 23:34:10 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: syzbot <syzbot+96f61f1ad84e33cee93e@syzkaller.appspotmail.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [block?] WARNING in bdev_file_open_by_dev
+Message-ID: <20240209-dreidimensional-bauordnung-91b85c6f50a3@brauner>
+References: <0000000000008ca4ed0610f6d017@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [linux-next:master] [block/mq] 574e7779cf: fio.write_iops -72.9%
- regression
-Content-Language: en-US
-To: kernel test robot <oliver.sang@intel.com>,
- Bart Van Assche <bvanassche@acm.org>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
- Linux Memory Management List <linux-mm@kvack.org>,
- Oleksandr Natalenko <oleksandr@natalenko.name>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- linux-block@vger.kernel.org, ying.huang@intel.com, feng.tang@intel.com,
- fengwei.yin@intel.com
-References: <202401312320.a335db14-oliver.sang@intel.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <202401312320.a335db14-oliver.sang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0000000000008ca4ed0610f6d017@google.com>
 
-On 1/31/24 8:42 AM, kernel test robot wrote:
-> 
-> 
+On Fri, Feb 09, 2024 at 10:08:27AM -0800, syzbot wrote:
 > Hello,
 > 
-> kernel test robot noticed a -72.9% regression of fio.write_iops on:
+> syzbot found the following issue on:
 > 
+> HEAD commit:    445a555e0623 Add linux-next specific files for 20240209
+> git tree:       linux-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=147c85b8180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=85aa3388229f9ea9
+> dashboard link: https://syzkaller.appspot.com/bug?extid=96f61f1ad84e33cee93e
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178b1e20180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=143db9f4180000
 > 
-> commit: 574e7779cf583171acb5bf6365047bb0941b387c ("block/mq-deadline: use separate insertion lists")
-> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/9188bb84c998/disk-445a555e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/3ce0c98eabb2/vmlinux-445a555e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/ab801b1c1d6d/bzImage-445a555e.xz
 > 
-> testcase: fio-basic
-> test machine: 64 threads 2 sockets Intel(R) Xeon(R) Gold 6346 CPU @ 3.10GHz (Ice Lake) with 256G memory
-> parameters:
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+96f61f1ad84e33cee93e@syzkaller.appspotmail.com
 > 
-> 	runtime: 300s
-> 	disk: 1HDD
-> 	fs: xfs
-> 	nr_task: 100%
-> 	test_size: 128G
-> 	rw: write
-> 	bs: 4k
-> 	ioengine: io_uring
-> 	direct: direct
-> 	cpufreq_governor: performance
+> ------------[ cut here ]------------
+> WARNING: CPU: 1 PID: 5075 at block/bdev.c:930 blk_to_file_flags block/bdev.c:930 [inline]
+> WARNING: CPU: 1 PID: 5075 at block/bdev.c:930 bdev_file_open_by_dev+0x112/0x270 block/bdev.c:963
+> Modules linked in:
+> CPU: 1 PID: 5075 Comm: syz-executor215 Not tainted 6.8.0-rc3-next-20240209-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> RIP: 0010:blk_to_file_flags block/bdev.c:930 [inline]
 
-I looked into this, and I think I see what is happening. We do still do
-insertion merges, but it's now postponed to dispatch time. This means
-that for this crazy case, where you have 64 threads doing sequential
-writes, we run out of tags (which is 64 by default) and hence dispatch
-sooner than we would've before. Before, we would've queued one request,
-then allocated a new one, and queued that. When that queue event
-happened, we would merge with the previous - either upfront, or when the
-request is inserted. In any case, we now have 1 bigger request, rather
-than two smaller ones that still need merging.
-
-This leaves more requests free.
-
-I think we can solve this by doing smarter merging at insertion time.
-I've dropped the series from my for-next branch for now, will need
-revisiting and then I'll post it again.
-
--- 
-Jens Axboe
-
+So, the gist is O_* flags are annoying. The longer story is that you can
+open any file with int fd = open("bla", O_RDWR | O_WRONLY). That's
+mostly nonsensical. But the VFS layer will record file->f_flags |=
+O_RDWR | O_WRONLY. And for the block layer this translates to
+BLK_OPEN_WRITE_IOCTL. Which is meaningless except for the floppy driver
+from When The West Was One. So we need to account for that nonsense when
+we translate block flags bag into O_* flags. Fix pushed.
