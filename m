@@ -1,143 +1,134 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C21F1370;
-	Fri,  9 Feb 2024 00:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746CD15D4;
+	Fri,  9 Feb 2024 01:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707439767; cv=none; b=ABFLy5ozdli6XhUksCuSA41aXKN8nEIKrHXxNZOBi/h3BwdeFaSQupyrncXsyFc7WyIgglVuABl/hVx8osh/703G0JWYCNhe00XWUcCUZpCYjQY5Hcn+8tRM0LKdafFRfQKOOf0zvZCh5jawMcSwNTD31ES5dtPV3HZINxSphC8=
+	t=1707443924; cv=none; b=NWpJaLzMi/P0pDc5V4UOB0lJmCnIOyPiYd42eWuTXQIVWCkv7fV4PxaIzY5OCdfwE/ZJmWCLw8OTtZHdv5xkqa5f7tjmyQrGkyh51bJq2yUvR14Kl23m8zPnOUv2qPABByukgZQxK025er0snoqFVhUFisvFYiiih94DfKlMy8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707439767; c=relaxed/simple;
-	bh=RC69OmraJjdcQEs+JowyAepisEthltjssiKo71cIqjk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gzR/nri9aIekRYT1e2qIf8bMnBkMLK5DmCMz+Do8+li8od8H2eOGWrqbOGmzdxiunUI1I9i7m4D/iETTlsdx/75HP7NmIeQd5cgK64NDhDp+nbVow5krR0m/JzaIo5RFfFAmmWT7AVtd3NVyX+XvoZba1WYsshAuRAOfFWdYJj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwt5+aHo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707443924; c=relaxed/simple;
+	bh=fhyg5jBDizytO6x3hZXyQa4pHMLhM/GRB9tg0/a7aZE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MCP+9xTxjmMNvxRvENPrzVz4kTNdaU7tBNiXoSJEHfQRsvoSXPvd6dbveSXQGkkJ7vVNpp2Co7OpbNIbcX17NPQgXEbkow7NalB5Nr7CP2cKMHLrUIk1Jjz/QhzGDkm173DeNtiDmIkH6A1rIq4rj8nxgrnvfZ69UF45F6zShjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mwNkCvof; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwt5+aHo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29DFCC43394;
-	Fri,  9 Feb 2024 00:49:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mwNkCvof"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1481DC433C7;
+	Fri,  9 Feb 2024 01:58:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707439767;
-	bh=RC69OmraJjdcQEs+JowyAepisEthltjssiKo71cIqjk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kwt5+aHoe3eDM7jIbPPWQI9E+qqmeI7UAekcLrr5YC+FeaAym3uVETANNfkniEcG7
-	 o9C8fSRxXsFuWl/F4a+snxSbsMJ+DMrGkeYHBhFlaTaHxDXl/FjFXSDufWaetpEsZX
-	 naJcqAba7hew0do1A6IdT+bMYXHzinh4qs7fziWBx52+SpKm1wW+Pm/z9AYd8oNvzy
-	 Hzp1Vv4mx0ROucili1Rxq9ECpfVvtReWeo+8eQjsmKCMoeU0awZC9y+q6Qa17SoChE
-	 4JOMtFFUmDVy6ksUKphQ+4Pp/ZxoZGXZkRI0XsbEUCeNYmm2JtwKBUsSdCCySCeEO1
-	 UoCuJdzuM345g==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d0512f6e32so5948801fa.1;
-        Thu, 08 Feb 2024 16:49:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXhSpNZM/J+Z4b0MRlFRPira8HWEZiHp7QxYZbAPiOLMjvv0foElK++iJ7TrxqrSPTCYtWJYZA6M5akw89aV/xxyVh5F9LuDKp5mbya/WpjaIOP+APTlSw6FTPTPEPEBTVHiENapqKykygVOkqUSZbsT7CT019cKxVQ4zxI3E9M6cXmogJh
-X-Gm-Message-State: AOJu0YxGFu2UDtXaUuMbUyD4ryOeuaNf1Mk4cCT+J22VfWW8zNuaZRuP
-	Pn2BIwh0ngmbYSAr70epdNCjg8gOXqDOniiJzRXGBdBJhl1CUiIJcwcebL1gdth8Ze2jPl4Av3C
-	wWPmUNobzdB4hdP+6rt02nqF13Jo=
-X-Google-Smtp-Source: AGHT+IFRVkWW5q39EprGlwVcuAq11QSUYjK4Mr3CsLeDBH1ucV0r4bBS07Q8ApUlxOmqFodrziGBADpM4smfFaTgn1Q=
-X-Received: by 2002:a05:6512:3e03:b0:511:6436:66bc with SMTP id
- i3-20020a0565123e0300b00511643666bcmr743595lfv.4.1707439765288; Thu, 08 Feb
- 2024 16:49:25 -0800 (PST)
+	s=k20201202; t=1707443924;
+	bh=fhyg5jBDizytO6x3hZXyQa4pHMLhM/GRB9tg0/a7aZE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mwNkCvofzO6gMxI2qcdtN8md9csh2uCkP/J0eHFdHTB4dLVWyLHZ3aiYlQJM/jduZ
+	 +hryoxuATnyhBUk/vVVCkwJsVtM5o+K9SeXc33ObfsubUvnxZGA2bWHr0aA19uBPfV
+	 dYl5ozEtRoRfx35lUC9EOh99D57uk/k+w660bE0O3dHEJWEzQIIPW7k+dBY8OmSRqT
+	 IxriGWy0bd3IYLrE88cJMjkUjyHYbKtv0kBhyirD62VatmfDIu9cZzSivIO0mAdgwY
+	 7aXkwrwgw9SvkzG5X7IKVcJa1psfjfaF4noxrt1HDpWD+q39x5noI7hsS3invtHjuE
+	 hvgT7gF8VQPPg==
+Message-ID: <e4078b85-5675-4fdb-a01f-7112342ec501@kernel.org>
+Date: Fri, 9 Feb 2024 10:58:40 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240207092756.2087888-1-linan666@huaweicloud.com>
- <CAPhsuW74hLiW_KTv3xohwMAcPZ9gp2TvLST4tY7H3O8cA26TTg@mail.gmail.com> <6849835d-a3ac-e840-09e9-8539e7953fe4@huaweicloud.com>
-In-Reply-To: <6849835d-a3ac-e840-09e9-8539e7953fe4@huaweicloud.com>
-From: Song Liu <song@kernel.org>
-Date: Thu, 8 Feb 2024 16:49:13 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW4k_C=UxwESU4t7R+fpoAJ_HE8g_PpCJXSUGWOdbpCEoQ@mail.gmail.com>
-Message-ID: <CAPhsuW4k_C=UxwESU4t7R+fpoAJ_HE8g_PpCJXSUGWOdbpCEoQ@mail.gmail.com>
-Subject: Re: [PATCH] block: fix deadlock between bd_link_disk_holder and
- partition scan
-To: Li Nan <linan666@huaweicloud.com>
-Cc: axboe@kernel.dk, linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
-	houtao1@huawei.com, yangerkun@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block: introducing a bias over deadline's fifo_time
+Content-Language: en-US
+To: Zhaoyang Huang <huangzhaoyang@gmail.com>, Jens Axboe <axboe@kernel.dk>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Yu Zhao <yuzhao@google.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ steve.kang@unisoc.com
+References: <20240208093136.178797-1-zhaoyang.huang@unisoc.com>
+ <20240208093136.178797-3-zhaoyang.huang@unisoc.com>
+ <ca00ff75-e98d-4652-9c52-94b2e876901e@kernel.dk>
+ <CAGWkznH6Y8u7PsoHWid0uQ+ceRK_qzSn6=eWn4dvDhK+DzSXzg@mail.gmail.com>
+ <da41bac4-015f-4df0-b8cc-6c8b2f468e12@kernel.dk>
+ <CAGWkznGnyPXM_DyyUxxZFoW=3K0B3Nh8sRZ8Lnsvm7WfES_fmA@mail.gmail.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <CAGWkznGnyPXM_DyyUxxZFoW=3K0B3Nh8sRZ8Lnsvm7WfES_fmA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 8, 2024 at 12:44=E2=80=AFAM Li Nan <linan666@huaweicloud.com> w=
-rote:
->
->
->
-> =E5=9C=A8 2024/2/8 14:50, Song Liu =E5=86=99=E9=81=93:
-> > On Wed, Feb 7, 2024 at 1:32=E2=80=AFAM <linan666@huaweicloud.com> wrote=
-:
-> >>
-> >> From: Li Nan <linan122@huawei.com>
-> >>
-> >> 'open_mutex' of gendisk is used to protect open/close block devices. B=
-ut
-> >> in bd_link_disk_holder(), it is used to protect the creation of symlin=
-k
-> >> between holding disk and slave bdev, which introduces some issues.
-> >>
-> >> When bd_link_disk_holder() is called, the driver is usually in the pro=
-cess
-> >> of initialization/modification and may suspend submitting io. At this
-> >> time, any io hold 'open_mutex', such as scanning partitions, can cause
-> >> deadlocks. For example, in raid:
-> >>
-> >> T1                              T2
-> >> bdev_open_by_dev
-> >>   lock open_mutex [1]
-> >>   ...
-> >>    efi_partition
-> >>    ...
-> >>     md_submit_bio
-> >>                                  md_ioctl mddev_syspend
-> >>                                    -> suspend all io
-> >>                                   md_add_new_disk
-> >>                                    bind_rdev_to_array
-> >>                                     bd_link_disk_holder
-> >>                                      try lock open_mutex [2]
-> >>      md_handle_request
-> >>       -> wait mddev_resume
-> >>
-> >> T1 scan partition, T2 add a new device to raid. T1 waits for T2 to res=
-ume
-> >> mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
-> >>
-> >> Fix it by introducing a local mutex 'holder_mutex' to replace 'open_mu=
-tex'.
-> >
-> > Is this to fix [1]? Do we need some Fixes and/or Closes tags?
-> >
->
-> No. Just use another way to fix [2], and both [2] and this patch can fix
-> the issue. I am not sure about the root cause of [1] yet.
->
-> [2] https://patchwork.kernel.org/project/linux-raid/list/?series=3D812045
->
-> > Could you please add steps to reproduce this issue?
->
-> We need to modify the kernel, add sleep in md_submit_bio() and md_ioctl()
-> as below, and then:
->    1. mdadm -CR /dev/md0 -l1 -n2 /dev/sd[bc]  #create a raid
->    2. echo 1 > /sys/module/md_mod/parameters/error_inject  #enable sleep
->    3. 'mdadm --add /dev/md0 /dev/sda'  #add a disk to raid
->    4. submit ioctl BLKRRPART to raid within 10s.
+On 2/9/24 09:28, Zhaoyang Huang wrote:
+> On Fri, Feb 9, 2024 at 8:11 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 2/8/24 5:02 PM, Zhaoyang Huang wrote:
+>>> On Fri, Feb 9, 2024 at 1:49?AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>
+>>>> On 2/8/24 2:31 AM, zhaoyang.huang wrote:
+>>>>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+>>>>> index f958e79277b8..43c08c3d6f18 100644
+>>>>> --- a/block/mq-deadline.c
+>>>>> +++ b/block/mq-deadline.c
+>>>>> @@ -15,6 +15,7 @@
+>>>>>  #include <linux/compiler.h>
+>>>>>  #include <linux/rbtree.h>
+>>>>>  #include <linux/sbitmap.h>
+>>>>> +#include "../kernel/sched/sched.h"
+>>>>>
+>>>>>  #include <trace/events/block.h>
+>>>>>
+>>>>> @@ -802,6 +803,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>>>>>       u8 ioprio_class = IOPRIO_PRIO_CLASS(ioprio);
+>>>>>       struct dd_per_prio *per_prio;
+>>>>>       enum dd_prio prio;
+>>>>> +     int fifo_expire;
+>>>>>
+>>>>>       lockdep_assert_held(&dd->lock);
+>>>>>
+>>>>> @@ -840,7 +842,9 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>>>>>               /*
+>>>>>                * set expire time and add to fifo list
+>>>>>                */
+>>>>> -             rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
+>>>>> +             fifo_expire = task_is_realtime(current) ? dd->fifo_expire[data_dir] :
+>>>>> +                     CFS_PROPORTION(current, dd->fifo_expire[data_dir]);
+>>>>> +             rq->fifo_time = jiffies + fifo_expire;
+>>>>>               insert_before = &per_prio->fifo_list[data_dir];
+>>>>>  #ifdef CONFIG_BLK_DEV_ZONED
+>>>>>               /*
+>>>>
+>>>> Hard pass on this blatant layering violation. Just like the priority
+>>>> changes, this utterly fails to understand how things are properly
+>>>> designed.
+>>> IMHO, I don't think this is a layering violation. bio_set_ioprio is
+>>> the one which introduces the scheduler thing into the block layer,
+>>> this commit just wants to do a little improvement based on that. This
+>>> commit helps CFS task save some IO time when preempted by RT heavily.
+>>
+>> Listen, both this and the previous content ioprio thing show a glaring
+>> misunderstanding of how to design these kinds of things. You have no
+>> grasp of what the different layers do, or how they interact. I'm not
+>> sure how to put this kindly, but it's really an awful idea to hardcore
+>> some CFS helper into the IO scheduler. The fact that you had to fiddle
+>> around with headers to make it work was the first warning sign, and the
+>> fact that you didn't stop at that point to consider how it could be
+>> properly done makes it even worse.
+>>
+>> You need to stop sending kernel patches until you understand basic
+>> software design. Neither of these patches are going anywhere until this
+>> happens. There's been plenty of feedback to telling you that, but you
+>> seem to just ignore it and plow on ahead. Stop.
+> Ok, thanks for pointing this out, I will follow your advice. But I
+> have to say that '[PATCHv9 1/1] block: introduce content activity
+> based ioprio' really solved layering violation things. I would like to
+> humbly ask for your kindly patient to have a look, as it is really
+> helpful.
 
-The analysis makes sense. I also hit the issue a couple times without addin=
-g
-extra delays. But I am not sure whether this is the best fix (I didn't find=
- real
-issues with it either).
+If properly designed, that patch would *not* be a block layer API/function and
+so does not need review by block layer folks/Jens as it would simply set an IO
+prio for a BIO issued by an FS. So that patch needs to be accepted by FS
+people, for the FS you are interested in.
 
-Maybe we don't need to suspend the array for ADD_NEW_DISK? So that
-something like the following might just work?
 
-Thanks,
-Song
+-- 
+Damien Le Moal
+Western Digital Research
 
-@@ -7573,7 +7577,6 @@ static inline bool md_ioctl_valid(unsigned int cmd)
- static bool md_ioctl_need_suspend(unsigned int cmd)
- {
-        switch (cmd) {
--       case ADD_NEW_DISK:
-        case HOT_ADD_DISK:
-        case HOT_REMOVE_DISK:
-        case SET_BITMAP_FILE:
