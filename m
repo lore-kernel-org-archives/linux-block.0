@@ -1,105 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D2B365;
-	Sat, 10 Feb 2024 00:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4020365
+	for <linux-block@vger.kernel.org>; Sat, 10 Feb 2024 00:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707523618; cv=none; b=sXehWZ+J/xVJ2xO4mtj9L0JgiXPHjB56foXbP8U0Vv5GrV6p4BkCIw3aU+X2JjvZUj9aorsFlL4m6YoeHiZXlh7LDdN49hZhnEH0AllxhCiOSrlEGsqz7PvsRvWI7QuBLeomMmGAAehLE+TKuyk1eq3dqjOvXlyMgoAvPAvpeWM=
+	t=1707524226; cv=none; b=ccKdUEBIrMxXTIbOeQwLmdbml/hEvrfVtIJa+2X/VX3/bHrLQNO+1V6NK0QpPyqxdvsp/Hjb7vhmINXfu4ji6EjaHgWMp3Q5bE7VK2AYNIXzh01Wl7i2GDxkDV1NuMRr9KfgYL5uiVI3+oZosL5rs0WDwzN0y8WsljH7rRN4lL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707523618; c=relaxed/simple;
-	bh=2Zw5SzbJLhz1l16efyBAgdXp5PCq1WwBZxnR19de37U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h5um7paKTSsKag68flHAICJhZyrjCD0fy4TtjuRXWOq3iq8fD1m4QBMp3wNWaTYJXJIcRnHEbWn9kUj69WTEWXzBmwGGBmw4WUxOuMhxA6LIqqPhRUfOz9jdmf5XHca1e1q1oIik1DXe3ggtrgbbsZconiC+6+flodpi8CnUELU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VB8cxc+T; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VB8cxc+T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F182C433F1;
-	Sat, 10 Feb 2024 00:06:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707523617;
-	bh=2Zw5SzbJLhz1l16efyBAgdXp5PCq1WwBZxnR19de37U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VB8cxc+TYRhkfc+O6h5ij5L/vLQCo0jtjx3wlcNC4YVpl7+WtQcSC0U5DWP2YHy3k
-	 taQklacNMoSR6BOEaEJXpIGvbqiJ1qmW7D6H5pBn7VTh98iR6iCBBMiPVA6rFeJ/oX
-	 Q6EzpjGhpHCAERU4dXf1wcHY+enVxaQUwOL/GyS6Sv7okORFZKGyOINVxTD+CPq8Lt
-	 1bwkROckISr/6bhLtHquTH+zOl/vMt3vEtI7D4L6OZqmPYcpbbuAm7qDscoEjdSd0G
-	 QOIlKMoKT31h//cqF39QIvzSqNRj1x4LMWq73W+h/lgzWwKyFzSJQdlmBilC0B2Tga
-	 OpaiGSvS4Tuug==
-Message-ID: <c03735f3-c036-4f78-ac0b-8f394e947d86@kernel.org>
-Date: Sat, 10 Feb 2024 09:06:54 +0900
+	s=arc-20240116; t=1707524226; c=relaxed/simple;
+	bh=NpdXnujk8uz7fyDvZkKu93W5CtUqe0+jwrGTxj/TXPw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=qhtmUCz15Z4BNaEggbhvDMnh8+cQzwmVAiPBN/HwIvpk4edMphIf06M8rcnoJ1JmnTt1xTHLIRDZc+yJKBGp913nXqa74KUzmLOaNryV9LZuNTEfEY+6HUy9ZhB0RqcG2U7bSCmtizMUzO1jNM5SoFlg8x1BsOxNnfGLeNsZE/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363d7d5821cso12399665ab.3
+        for <linux-block@vger.kernel.org>; Fri, 09 Feb 2024 16:17:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707524224; x=1708129024;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Ho2u/4j61/FIneEGCKP7KoT1wGfcKHFvYYyBQNKibs=;
+        b=Aah4af/Y5HXRAM6XJTqJY7//UkMDMwPeorVcz28lQQT5WegT3JqNaU4Y1PvMuSRI4F
+         mID8/BMvztawe0DSLyLMPQBoHABh8hrOmoP8LTAN7AHrfyJj5vnFV8+BexS7BpICPdwI
+         kL+JDRtu6kBf16SaBNDzSNIlFqBApeaIdn9BywmpGnZZjm4OZevNSOK/UCxf1DuXOS9C
+         QHQWMdHuZjuAoRmsq0Q2fZbFinzeoZVGyL85PmU47CMksvX9ucnGEBZgkYzdUkY2+LMW
+         PxBAtZNOHQw/dIrlzZSuIOG6qn0JNQgLruWzQA3/NsUjI8vudSRP4PYdPmzGkCyNgzKm
+         At/Q==
+X-Gm-Message-State: AOJu0YwZVZmkYF10a7Kkop30QWKGTCPehBLieQkIJVK3AU66Hh9MRwyd
+	Qoq3zuXEvDJX9eTcT6FFhFxURhuRnTn3umF7uaKxg4xAMQIdX6hTD+ZOJiiKi5vg4seXjliOM/n
+	6tK0eYnlWCy9uxV1nTVzy5xlVzk4wVktt6+0v+2Hm8dUGUsXERfTS9U0=
+X-Google-Smtp-Source: AGHT+IHVwO1+Ok3Qs2xKgOA7VWr2yJxR61qKMQapUl1jOQtA/TDgElhaWMT1cLj+MV1sfU9WjvC3v/3ChfrWUnCgOgwH1ugEQChT
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 25/26] block: Reduce zone write plugging memory usage
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-26-dlemoal@kernel.org>
- <09d99780-8311-4ea9-8f48-cf84043d23f6@suse.de>
- <f3a2f8b8-32d2-4e42-ba78-1f668d69033f@acm.org>
- <a324beda-7651-4881-aea9-99a339e2b9eb@kernel.org>
- <2e246189-a450-4061-b94c-73637859d073@acm.org>
- <75240a9d-1862-4d09-9721-fd5463c5d4e5@kernel.org>
- <e2a1a020-39e3-4b02-a841-3d53bd854106@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <e2a1a020-39e3-4b02-a841-3d53bd854106@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1a82:b0:363:c8ba:ea5a with SMTP id
+ k2-20020a056e021a8200b00363c8baea5amr48953ilv.6.1707524224116; Fri, 09 Feb
+ 2024 16:17:04 -0800 (PST)
+Date: Fri, 09 Feb 2024 16:17:04 -0800
+In-Reply-To: <20240209-notdienst-watscheln-4ca4930cb089@brauner>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d2f71f0610fbf6d3@google.com>
+Subject: Re: [syzbot] [block?] WARNING in bdev_file_open_by_dev
+From: syzbot <syzbot+96f61f1ad84e33cee93e@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, brauner@kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/10/24 04:36, Bart Van Assche wrote:
-> On 2/8/24 19:58, Damien Le Moal wrote:
->> We still need to keep in memory the write pointer offset of zones that are not
->> being actively written to but have been previously partially written. So I do
->> not see how excluding empty and full zones from that tracking simplifies
->> anything at all. And the union of wp offset+zone capacity with a pointer to the
->> active zone plug structure is not *that* complicated to handle...
-> 
-> Multiple zoned storage device have 1000 or more zones. The number of partially
+Hello,
 
-Try multiplying that by 100... 28TB SMR drives have 104000 zones.
+syzbot tried to test the proposed patch but the build/boot failed:
 
-> written zones is typically less than 10. Hence, tracking the partially written
+failed to checkout kernel repo git@gitlab.com:brauner/linux.git/vfs.super: failed to run ["git" "fetch" "--force" "81e322358ba96b4e95306c1d79b01e0c61095de5" "vfs.super"]: exit status 128
+Host key verification failed.
+fatal: Could not read from remote repository.
 
-That is far from guaranteed, especially with devices that have no active zone
-limits like SMR drives.
+Please make sure you have the correct access rights
+and the repository exists.
 
-> zones only will result in significantly less memory being used, fewer CPU cache
-> misses and fewer MMU TLB lookup misses. I expect that this will matter since the
-> zone information data structure will be accessed every time a zoned write bio is
-> processed.
 
-May be. The performance numbers I have suggest that this is not an issue.
 
-But in any case, what exactly is your idea here ? Can you actually suggest
-something ? Are you suggesting that a sparse array of zone plugs be used, with
-an rb-tree or an xarray ? If that is what you are thinking, I can already tell
-you that this is the first thing I tried to do. Early versions of this work used
-a sparse xarray of zone plugs. But the problem with such approach is that it is
-a lot more complicated and there is a need for a single lock to manage that
-structure (which is really not good for performance).
+Tested on:
 
-Hence this series which used a statically allocated array of zone plugs to
-simplify things. Overall, this series is a significant change to the zone write
-path and I wanted something simple/reliable that is not a nightmare to debug and
-test. I believe that an xarray based optimization can be re-tried as an
-incremental change on top of this series. The nice thing about it is that the
-API should not need to change, meaning that all changes can be contained within
-blk-zone.c.
+commit:         [unknown 
+git tree:       git@gitlab.com:brauner/linux.git vfs.super
+kernel config:  https://syzkaller.appspot.com/x/.config?x=85aa3388229f9ea9
+dashboard link: https://syzkaller.appspot.com/bug?extid=96f61f1ad84e33cee93e
+compiler:       
 
-But I may be missing entirely your point. So clarify please.
-
--- 
-Damien Le Moal
-Western Digital Research
-
+Note: no patches were applied.
