@@ -1,70 +1,73 @@
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829CE33CE7
-	for <linux-block@vger.kernel.org>; Sat, 10 Feb 2024 09:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF253DBA9
+	for <linux-block@vger.kernel.org>; Sat, 10 Feb 2024 12:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707556985; cv=none; b=qTLt2Boz/C5LcqVqb0Rj0eUpN+SjWx8PI1NwnEOn721l0BE0la1u9Vg8fbu8vT/8928dqsLm9UJFFeoRrGPhbOCZRH8gtO4YSS/1RlKpUI16ajvz8sepydbh8AV7LfbsACkd+JTzVagStZ31Cm9vVYrZe4nXbM6taRNZqQTWLww=
+	t=1707567187; cv=none; b=WcRZMObtG8hEsy3M431VR4/Mar83eEli5l+tYPv6wzyRZO0rH+BqrsUa8QZUQ1slCkkoUp6FmfrEnK7l/i0WZJVj+hs/nI9FFGL1s6vjR1s6hnRnXi/NnDBVSS9G9VJJseKSSPqg3DOHbZVvxkox09wXRlMCAvTYgHHtFr/iyq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707556985; c=relaxed/simple;
-	bh=3r3XMRsm9E2/82rvdkdZixYcLy7dHpfiFRvdLE6tp1Y=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=UezKEWuNHyReDZxt9h6Kl8TSeCJ7MJmh0QK8a6cVgXIZe9EhUPXwoW0BjnLUSSeP7n3Q+ETc/cbGYIBvrAcLGkx7xERGpMkzQ/QhzJwMMN6azqojcaEpISkLGOiEdMCaWARiVLgVq1rwLjTEX+geLHvJl6ui4Lglo4KHyuyTxSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7bbb3de4dcbso213627839f.1
-        for <linux-block@vger.kernel.org>; Sat, 10 Feb 2024 01:23:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707556983; x=1708161783;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GqCsyr+HbbKsXAANM7RDwJf0XiYCIX6FiahqV8RdlFI=;
-        b=FXF6zTeqHbeH/IE/sYureJW+XcQ8lalFS6ouMvxJ/v/EJUPb6i4k7ODnzgcps6GMAW
-         JL60ATQ+Sp+uWdKcJPGiNE5TJzISrguQBGCdAFL+uPqwFvTSTHiFhWEex0Zg7x4EqYv/
-         FmIsOpjU1DffzoOAluHNOZ/vtBEwLiBQnK0EaffcHpzk/1cHIiSISKF+XKxaWDH50Eyq
-         K7Vhyf9z4CXbCcGGXcZnME1uyum6UMz01BlfICJ5WTCerBv8o3fy2Daq9ynS9jcYPKnz
-         P/5eDA/weDngWZS0vyCH1u0cIrb5dKyCHCl6vVadATJ0AxvH0QsjtaxJ2ZtnmP6rTFVt
-         4rZg==
-X-Gm-Message-State: AOJu0YxyBsfLukwe3tFC0GHJKUq7tvN6BFXPcN40ay9wr27va/zBUd5N
-	xGlktlruPb8ie2YEYwIYryolU20IpS8LZt7sWxsgCH/e/rkcchAcPo+lrfZerQKhjCjUld3CGLq
-	xU4EWHyqelLDMBCP5dfA1lOd6ger6WKaos/Nkh5xOdWmlmZoslyI5CLE=
-X-Google-Smtp-Source: AGHT+IEENhUIL8V8bhMbxxhXr1L245/BaAsWAlkUA6s3NzTp92+K8tCQ31DYFl7ZNlJoeeFvGQKJSr5nsX7yo3j+A1LYCCvpyHpA
+	s=arc-20240116; t=1707567187; c=relaxed/simple;
+	bh=eTKKCRVzP1Y6N+8sXUxJFdEE3i1c7vbnIzYg3l82Xh0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=PfxIPtMQ1pFmbUTHmsesxQSk7lIzXIAv5qz08VSej9VyMnH2a1HSa+cePu4tGXyi8+biRDN96AYvlapxkS/jo8S+6eRu1QXOrXwwJLUcTQYNMJ9RPBtXyeqViD4ojULg2Y1t8MmmBLq/rSb+zIbIGwmvrGmZC+Qkd/AN4hHuIZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-200-vIU3xCq1MRabbdi4Cu8-TQ-1; Sat, 10 Feb 2024 12:12:56 +0000
+X-MC-Unique: vIU3xCq1MRabbdi4Cu8-TQ-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 10 Feb
+ 2024 12:12:35 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Sat, 10 Feb 2024 12:12:35 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'John Garry' <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
+CC: "axboe@kernel.dk" <axboe@kernel.dk>, "kbusch@kernel.org"
+	<kbusch@kernel.org>, "sagi@grimberg.me" <sagi@grimberg.me>,
+	"jejb@linux.ibm.com" <jejb@linux.ibm.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "djwong@kernel.org" <djwong@kernel.org>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "brauner@kernel.org"
+	<brauner@kernel.org>, "dchinner@redhat.com" <dchinner@redhat.com>,
+	"jack@suse.cz" <jack@suse.cz>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-xfs@vger.kernel.org"
+	<linux-xfs@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "tytso@mit.edu" <tytso@mit.edu>,
+	"jbongio@google.com" <jbongio@google.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"ojaswin@linux.ibm.com" <ojaswin@linux.ibm.com>, "bvanassche@acm.org"
+	<bvanassche@acm.org>
+Subject: RE: [PATCH v3 00/15] block atomic writes
+Thread-Topic: [PATCH v3 00/15] block atomic writes
+Thread-Index: AQHaWS09K2I7bFfzB0C0GPvnJtedS7EDgm/g
+Date: Sat, 10 Feb 2024 12:12:35 +0000
+Message-ID: <da8f0dc3475746da8f612de6f7c72ad6@AcuMS.aculab.com>
+References: <20240124113841.31824-1-john.g.garry@oracle.com>
+ <20240129061839.GA19796@lst.de>
+ <12718838-7038-4d47-9287-e699e8808143@oracle.com>
+In-Reply-To: <12718838-7038-4d47-9287-e699e8808143@oracle.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20ee:b0:363:c288:f8d5 with SMTP id
- q14-20020a056e0220ee00b00363c288f8d5mr127626ilv.3.1707556983767; Sat, 10 Feb
- 2024 01:23:03 -0800 (PST)
-Date: Sat, 10 Feb 2024 01:23:03 -0800
-In-Reply-To: <20240210-bekunden-glasvitrine-9c43d2672a55@brauner>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000738b7906110397e8@google.com>
-Subject: Re: [syzbot] [block?] WARNING in bdev_file_open_by_dev
-From: syzbot <syzbot+96f61f1ad84e33cee93e@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, brauner@kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-Hello,
+Q2FuIHNvbWVvbmUgYWRkIGEgOiBhZnRlciBibG9jaz8NCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNz
+IExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAx
+UFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
-
-Reported-and-tested-by: syzbot+96f61f1ad84e33cee93e@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         672cf418 Merge series 'Open block devices as files' of..
-git tree:       https://gitlab.com/brauner/linux vfs.super
-console output: https://syzkaller.appspot.com/x/log.txt?x=157f9cec180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1ee6536d236103ff
-dashboard link: https://syzkaller.appspot.com/bug?extid=96f61f1ad84e33cee93e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
