@@ -1,77 +1,63 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C67436AFB
-	for <linux-block@vger.kernel.org>; Sat, 10 Feb 2024 15:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD57F5C8F0
+	for <linux-block@vger.kernel.org>; Sat, 10 Feb 2024 16:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707579125; cv=none; b=A3A8nCJLhYS1QsA42M0MBzRiD1H0wR5HNDhWCg9FxAS5Jnu220T1BClbivgAl+sa05WjS7oOqtP7vgvfTVFXjoZx913/ej3MlVnuAyZzjn6ollW7r692f/FWeTVxcqzxzTs4/1RVfIZRnbNwsbSqPI0+dKIxlPi9LBbzySgwkxg=
+	t=1707582375; cv=none; b=mgPSkhdlHuyioAxFrdHHdmO7xWgbFw+2uOQmOshenfwTEyeVKcGGJvnvbwecUwAmnwX3MEsYQQUWnPedNej7jQuRXlh7juTyT25v91UeVtNG7e4o3TJ/NFOpdrFfm5h5k9kni/dFFGaRpxmcni6m7M/hi27vOFmFaHlWEbLgUFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707579125; c=relaxed/simple;
-	bh=yd5Q1bNL3wVsXKQVoggLF1WFQ+ztPWjj6nCxqsQAfPc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=YnBjSbBikE7rqJagDN/7sQj5Be1U7asft8ikSGQQBN/sgZGO93+yGDibB77r7TCKBWpjO7bJxVDBqCuowqjXXXcecvliqv97Vt995oe/G6KG7um9gG7fSx+XSuTT+AjiEl5D4kdPm372UO1BLXxxrP3H4TXgnQ+udiFgynEXBtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363ec32bca3so14451695ab.2
-        for <linux-block@vger.kernel.org>; Sat, 10 Feb 2024 07:32:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707579123; x=1708183923;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iW/fdzhN655e76oqp6FV6OT5SDqBKN4BWEe6vzxQRIk=;
-        b=kpzeRbWfDrztDinU5le0W6CDmcMqOKkPmOVrx+w/eCpmIzmHLDjSX+j4fiCKQ0eBe+
-         9pfza6w0uGoQDBGBUXyV+mzJJ1mvLzPyheeKKa2vj4gpTFRoF/tx5NezoNhF2GSFOv86
-         A3YSRguiZga8zvGuDdRzoJfKZ11LZ6PNGR2mN7bo5IBxWLhc4KuUQM6U7m60A3y5LqQV
-         V6a7ZbTDL2BEy5tmBkpUflel25WvNP4ooq8gnEFNvd9Svwuq3prBSu4s6Y7hVZGuO84W
-         G/U2RgdMJ9FnGvJLuItXJ2BkuZqQhygmMYCnWNLxYlk/hTpO4Ula/M7OYXrE66gjR4EA
-         CWDA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9xe63nMMLR4E0xdZhz1dVYIQouKbAjdlwlc+JMoUs2KcsX4T1EooceBjJkRCfWLnf3IACXWjNVm4sXUjDErIlb2dVrjPI9edOVdc=
-X-Gm-Message-State: AOJu0Yyrfgvhrd4H49QBsBY/GARN6yPjp0cFHR98WzXV/PJiPwEuc24H
-	x2Av2L0eP3cgN14+8URJdOnHplNdQF7FEVcRb799NdFJVwTOg4E2zHXpTFGP8h7Hw0tl2qWJSKY
-	481yaY7EpCznZoJUsVCuaPC84WS10jo36UpEk+Y16dcLFnoPZNml1YHY=
-X-Google-Smtp-Source: AGHT+IFaNAgr90nVgqByDRoV2YWYs+Q6Nvsd3PVBvPhWzfpkYUQjEDRjvU3oAgaTUkssN1JVEVSmjwAwnfWSvE+EplRu8KwdEHs+
+	s=arc-20240116; t=1707582375; c=relaxed/simple;
+	bh=c+KjeAjfZIKQhoXTBRt4PipR3yahZdYBEzTJkzg5D74=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=S3XB7vw/kCpFwYE2C7p/eCUgeeh4a/5rZ4/iDdz5LlFUoVMS1CAsvQrt6KCR6Aj2XT+svDM57ejM5Dl3bUHpwUYd5Ejelcm8yT/5eLsNglVtYO1WN3V8pbbyAINKLfhM+XyUPlcXVRsBCNrVs95G4H+ig66MCi47+ZhMwrFJzmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azvLY9I5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azvLY9I5"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A411DC433A6;
+	Sat, 10 Feb 2024 16:26:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707582375;
+	bh=c+KjeAjfZIKQhoXTBRt4PipR3yahZdYBEzTJkzg5D74=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=azvLY9I5x+ma41J7KrGFRtZjr/qz1NVhb+v/mKzM4GE2DZY219oozliVLTZvor8KQ
+	 GDSKde6ZtHBHHhTrd+FpysP//qdodMGpAom1h04W7IiKaRycN6e5HyVaz1ohmAorp7
+	 JuzjhSpZxF/bOpT1koxaLZtufjoXrwNLEObddElHeY+LuLr6Hs+DOZAkvmX7FfU+al
+	 O3N2nnQPoJ9bSuTELCBMcCqKBOOyu2RtUhV3pRtCgwiK7MF+yN6I3PKxHOaoIm9Akh
+	 EQ781eX9zQMlgibFpS543MlUTPfIO582jhYd+P69evE19QWS726Fj9UeVDuhlIN2bc
+	 pd4BdwCip4XQQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89C65E2F2F0;
+	Sat, 10 Feb 2024 16:26:15 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.8-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <d020ae53-c231-4a8b-ac6e-b7ca9788073c@kernel.dk>
+References: <d020ae53-c231-4a8b-ac6e-b7ca9788073c@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <d020ae53-c231-4a8b-ac6e-b7ca9788073c@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.8-2024-02-10
+X-PR-Tracked-Commit-Id: 5f63a493b99c848ad5200402bebe26211e00025a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a5b6244cf87c50358f5562b8f07f7ac35fc7f6b0
+Message-Id: <170758237554.1913.6344985720683488683.pr-tracker-bot@kernel.org>
+Date: Sat, 10 Feb 2024 16:26:15 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2162:b0:363:cc38:db1c with SMTP id
- s2-20020a056e02216200b00363cc38db1cmr136461ilv.6.1707579123468; Sat, 10 Feb
- 2024 07:32:03 -0800 (PST)
-Date: Sat, 10 Feb 2024 07:32:03 -0800
-In-Reply-To: <0000000000008ca4ed0610f6d017@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001493e2061108bfd4@google.com>
-Subject: Re: [syzbot] [block?] WARNING in bdev_file_open_by_dev
-From: syzbot <syzbot+96f61f1ad84e33cee93e@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, brauner@kernel.org, hch@lst.de, jack@suse.cz, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-syzbot has bisected this issue to:
+The pull request you sent on Sat, 10 Feb 2024 07:16:47 -0700:
 
-commit e6d7c6cd8e6aeb8b4add207d31dff240680ff573
-Author: Christian Brauner <brauner@kernel.org>
-Date:   Tue Jan 23 13:26:20 2024 +0000
+> git://git.kernel.dk/linux.git tags/block-6.8-2024-02-10
 
-    block/genhd: port disk_scan_partitions() to file
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a5b6244cf87c50358f5562b8f07f7ac35fc7f6b0
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15805cec180000
-start commit:   445a555e0623 Add linux-next specific files for 20240209
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=17805cec180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13805cec180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=85aa3388229f9ea9
-dashboard link: https://syzkaller.appspot.com/bug?extid=96f61f1ad84e33cee93e
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178b1e20180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=143db9f4180000
+Thank you!
 
-Reported-by: syzbot+96f61f1ad84e33cee93e@syzkaller.appspotmail.com
-Fixes: e6d7c6cd8e6a ("block/genhd: port disk_scan_partitions() to file")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
