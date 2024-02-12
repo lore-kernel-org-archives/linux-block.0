@@ -1,134 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D692F9FD;
-	Mon, 12 Feb 2024 08:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0F52BAE7
+	for <linux-block@vger.kernel.org>; Mon, 12 Feb 2024 10:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707727663; cv=none; b=OujSjDxiC7fTdCM++nmLi5sgWNRR11WHfwklRqyN9wZG4/g0InCFf9EFcpRpw7y7g+46SC/bO8jGHKCM8IjJOiOD11szhi7rXwzyts8lraLfgmOjC8wWCSaffM8+5U3JTbjcZ4fd6Umn5fOBjS2M9nDDEkWLMqbJv0ZHU1ZFRJM=
+	t=1707734453; cv=none; b=EwqW+r0f0L7RQ+bKPW2MkvlznwW3/jiIJtKD6nKMAKfm07upAH3Hoj2vtMouumYONXpiMCbS/cCGudi07EEyDzS5jg6kKkRRRJs64JQH+LLl2XHUGl+twbZA+n8VtgsO9DU9+aMxJJbs0RwgWiTGCtZoSvRc8rEN4ideoxblzuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707727663; c=relaxed/simple;
-	bh=uVOkGeLMsd1+ZjKq4LCkAfBtM1q49YLd4xP4VmnYMDo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kiV9PFwdFQSCyiIa031yZjBaO5FqyC7YoN988UEwjvWtyO0F/v4iNCl8uY8OKwsXA9v1Oh/EmlCFLLwYEBrEAStkT+qydC31jjjlF90GNi2EXRpX0HPEQiPJEeVpnN6eEpFJlJ3kjSp/hvPz/eIuRPGC87kDYi2QAIkLIYQxTfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JI5zQavR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707734453; c=relaxed/simple;
+	bh=dgKa9VDQvHYsZfOETtM98F0usTw6EuwcSDbuNfLp/vQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gDbNvgecUccQp/LfppLyhD5/945ZMjm4OwFe8lPM+XpDhTGzlsYhNVlips0bn1JvAxyw/WPhrr3K01j69AoJIXiSbs6DhssR7bDrurGpwCRmAbGG2wyAvus+Nr/HM9nYYr9SgUilR3AxU+hdtBOgbapLIlqNwURimnTR/zYPEZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ufejVy7Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BCacqDln; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ufejVy7Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BCacqDln; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JI5zQavR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96BC6C43390;
-	Mon, 12 Feb 2024 08:47:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707727663;
-	bh=uVOkGeLMsd1+ZjKq4LCkAfBtM1q49YLd4xP4VmnYMDo=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=JI5zQavRULhgL/JgzNPhtfv/eojP0u55mJLvtoEul5fwp9IO5XYjhVpD87EXzzP1j
-	 dQOFg7eVHhZAQRg7kTVwkM4ZDeDa5o/oLwIRvIYIXnynbDIspzZcRRvWGXM+UviL+c
-	 9boJuF07K3NcuAHVLO2WN+fP6CC9FQzrnkmPE7590bG419zDCown0i+yAvIPfhadT/
-	 YFLL07+DqtJ8b+y3ULE4Ouhgx7SeZ12opUvuz6humQ/D8u4cDq50bc6HA6HypoAgwM
-	 pXIaC3qoHJhXJ0WwNjn1s+ByAN4P+aHa0ygizuRoXYgPVLhUZp22Aw/3qUGiUsQeDY
-	 mFC1g/IB25NVw==
-Message-ID: <2b45ee45-5f2e-4923-9ef6-a7f03bcb65bf@kernel.org>
-Date: Mon, 12 Feb 2024 17:47:40 +0900
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ufejVy7Z";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BCacqDln";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ufejVy7Z";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BCacqDln"
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 85C311F460;
+	Mon, 12 Feb 2024 10:40:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707734450; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bfIsHwXpWLEWMKfGhN2ivFAAbKUNepkGa9IJPENRoo0=;
+	b=ufejVy7ZIvTZaDzyuEX6PxUwFi2xLrfLRTTePAWqABKsRUCnPF05vZ5V1ZGDkYyxqKs/YQ
+	x0KniUUABVBjXM7Wgl9lEBwCC04egVzXUzF6OUhqmoPjDTviSK1k05j2ET9qBnDb9mEuI4
+	NAkutl8aQXMVrzTMDFBzNHOVEbhFzKU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707734450;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bfIsHwXpWLEWMKfGhN2ivFAAbKUNepkGa9IJPENRoo0=;
+	b=BCacqDln6eNA6ZYEkFoUhxX5QXaIQgVJOhq7qvQDpKB21XOIqVVaWZEGA+bnVREaI3+gjD
+	iLbXbYC+V1UgezCQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707734450; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bfIsHwXpWLEWMKfGhN2ivFAAbKUNepkGa9IJPENRoo0=;
+	b=ufejVy7ZIvTZaDzyuEX6PxUwFi2xLrfLRTTePAWqABKsRUCnPF05vZ5V1ZGDkYyxqKs/YQ
+	x0KniUUABVBjXM7Wgl9lEBwCC04egVzXUzF6OUhqmoPjDTviSK1k05j2ET9qBnDb9mEuI4
+	NAkutl8aQXMVrzTMDFBzNHOVEbhFzKU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707734450;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bfIsHwXpWLEWMKfGhN2ivFAAbKUNepkGa9IJPENRoo0=;
+	b=BCacqDln6eNA6ZYEkFoUhxX5QXaIQgVJOhq7qvQDpKB21XOIqVVaWZEGA+bnVREaI3+gjD
+	iLbXbYC+V1UgezCQ==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 730E513A0E;
+	Mon, 12 Feb 2024 10:40:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id T9mfGrL1yWXoCwAAn2gu4w
+	(envelope-from <dwagner@suse.de>); Mon, 12 Feb 2024 10:40:50 +0000
+From: Daniel Wagner <dwagner@suse.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v2 0/5] fc transport cleanups
+Date: Mon, 12 Feb 2024 11:40:41 +0100
+Message-ID: <20240212104046.13127-1-dwagner@suse.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 25/26] block: Reduce zone write plugging memory usage
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-26-dlemoal@kernel.org>
- <09d99780-8311-4ea9-8f48-cf84043d23f6@suse.de>
- <f3a2f8b8-32d2-4e42-ba78-1f668d69033f@acm.org>
- <a324beda-7651-4881-aea9-99a339e2b9eb@kernel.org>
- <2e246189-a450-4061-b94c-73637859d073@acm.org>
- <75240a9d-1862-4d09-9721-fd5463c5d4e5@kernel.org>
- <e2a1a020-39e3-4b02-a841-3d53bd854106@acm.org>
- <c03735f3-c036-4f78-ac0b-8f394e947d86@kernel.org>
- <a1531631-dce4-49a6-a589-76fa86e88aeb@acm.org>
- <c582fc6c-618e-4052-9f15-3045df819389@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <c582fc6c-618e-4052-9f15-3045df819389@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Bar: /
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ufejVy7Z;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=BCacqDln
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [0.99 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 R_MISSING_CHARSET(2.50)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 BROKEN_CONTENT_TYPE(1.50)[];
+	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	 RCPT_COUNT_FIVE(0.00)[5];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 MID_CONTAINS_FROM(1.00)[];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-0.50)[79.97%]
+X-Spam-Score: 0.99
+X-Rspamd-Queue-Id: 85C311F460
+X-Spam-Flag: NO
 
-On 2/12/24 17:23, Damien Le Moal wrote:
-> On 2/11/24 12:40, Bart Van Assche wrote:
->> On 2/9/24 16:06, Damien Le Moal wrote:
->>> On 2/10/24 04:36, Bart Van Assche wrote:
->>>> written zones is typically less than 10. Hence, tracking the partially written
->>>
->>> That is far from guaranteed, especially with devices that have no active zone
->>> limits like SMR drives.
->>
->> Interesting. The zoned devices I'm working with try to keep data in memory
->> for all zones that are neither empty nor full and hence impose an upper limit
->> on the number of open zones.
->>
->>> But in any case, what exactly is your idea here ? Can you actually suggest
->>> something ? Are you suggesting that a sparse array of zone plugs be used, with
->>> an rb-tree or an xarray ? If that is what you are thinking, I can already tell
->>> you that this is the first thing I tried to do. Early versions of this work used
->>> a sparse xarray of zone plugs. But the problem with such approach is that it is
->>> a lot more complicated and there is a need for a single lock to manage that
->>> structure (which is really not good for performance).
->>
->> Hmm ... since the xarray data structure supports RCU I think that locking the
->> entire xarray is only required if the zone condition changes from empty into
->> not empty or from neither empty nor full into full?
->>
->> For the use cases I'm interested in a hash table implementation that supports
->> RCU-lookups probably will work better than an xarray. I think that the hash
->> table implementation in <linux/hashtable.h> supports RCU for lookups, insertion
->> and removal.
-> 
-> I spent some time digging into this and also revisiting the possibility of using
-> an xarray. Conclusion is that this does not work well, at least in no way not
-> better than what I did, and most of the time much worse. The reason is that we
-> need at the very least to keep this information around:
-> 1) If the zone is conventional or not
-> 2) The zone capacity of sequential write required zones
-> 
-> Unless we keep this information, a report zone would be needed before starting
-> writing to a zone that does not yet have a zone write plug allocated.
-> 
-> (1) and (2) above can be trivially combined into a single 32-bits value. But
-> that value must exist for all zones. So at the very least, we need nr_zones * 4B
-> of memory allocated at all time. For such case (i.e. non-sparse structure),
-> xarray or hash table would be more costly in memory than a simple static array.
-> 
-> Given that we want to allocate/free zone write plugs dynamically as needed, we
-> essentially need an array of pointers, so 8B * nr_zones for the base structure.
-> From there, ideally, we should be able to use rcu to safely dereference/modify
-> the array entries. However, static arrays are not supported by the rcu code from
-> what I read.
-> 
-> Given this, my current approach that uses 16B per zone is the next best thing I
-> can think of without introducing a single lock for modifying the array entries.
-> 
-> If you have any other idea, please share.
+Fixed the typos and collected the RB tags. 
 
-Replying to myself as I had an idea:
-1) Store the zone capacity in a separate array: 4B * nr_zones needed. Storing
-"0" as a value for a zone in that array would indicate that the zone is
-conventional. No additional zone bitmap needed.
-2) Use a sparse xarray for managing allocated zone write plugs: 64B per
-allocated zone write plug needed, which for an SMR drive would generally be at
-most 128 * 64B = 8K.
+changes:
+v2:
+  - typo fixes
+  - collected RB tags
+  
+v1:
+  - initial version
+  - https://lore.kernel.org/linux-nvme/20240206131655.32050-1-dwagner@suse.de/
 
-So for an SMR drive with 100,000 zones, that would be a total of 408 KB, instead
-of the current 1.6 MB. Will try to prototype this to see how performance goes (I
-am worried about the xarray lookup overhead in the hot path).
+Daniel Wagner (5):
+  nvme/029: fix local variable declarations
+  nvme/rc: filter out errors from cat when reading files
+  nvme/rc: do not issue warnings on cleanup when using fc transport
+  nvme/rc: do not issue errors when disconnecting when using fc
+    transport
+  nvme/rc: revert nvme-cli context tracking
+
+ tests/nvme/029 |  2 +-
+ tests/nvme/rc  | 73 +++++---------------------------------------------
+ 2 files changed, 8 insertions(+), 67 deletions(-)
 
 -- 
-Damien Le Moal
-Western Digital Research
+2.43.0
 
