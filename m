@@ -1,103 +1,176 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C61D3FE44;
-	Mon, 12 Feb 2024 18:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9074654D
+	for <linux-block@vger.kernel.org>; Mon, 12 Feb 2024 19:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707764297; cv=none; b=cS3IVajjrpobKKskvOn2g1kCXV0Isz0ZY38LsE2BCvrH/NZQeBVe98coVf4B5zYEzac8vYRLeeSZVGRtAAqVhxjdUc2uzk+O9BoHtCGDZA1A814hqxShduzf4Hg55f0WBSQEZs1JmrcSxQdbfukbT4Bc8h3GKAm/oh5WAx7NRAQ=
+	t=1707766213; cv=none; b=TyEjcxl+1nfhOKQrDwu7tzEJRBK0IKtqozcz3v90wbw9D4GPyUqIeqVJaxZH71q0W4Q2dRP/ETHPRKsr7z8xuwiZ0leg7voVEzZncNOOpiFo3JbES698/4WQ3YoTDeHr6m8rPSzWFEvKVnJFqY2Qc8aR5ky4PGgfL/zqy4O8rLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707764297; c=relaxed/simple;
-	bh=oBORXUPQB4yrjvrk+2g91gv98knQnBzlsSlJv9Oz4Vo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BAuGJY2N4weLCfXvdU1Y+vdKWYWNiubotGOqigL8BzMS+MXQu9chh6bn16Rt6qdNCzc441ix/V7D91HRqgfEdrdx0zxKzSQD+PRNVQTgqxaUSmJRHWAhe34yHS165x80wLLxhkVx8AHtdMAYy1h5pnedAQMQJu5bPGo4KuISnzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5d81b08d6f2so2726855a12.0;
-        Mon, 12 Feb 2024 10:58:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707764296; x=1708369096;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FMiKDshhm4Ns7d1XVPONNwU0zO4lYi41plmErazUVpQ=;
-        b=Dx/BQFcmBQzOf2NDZBr3CsSfoAA6xAR+yZgM6pbdgliYt6M/yhC83c+LVGX7TEVcXC
-         SfdIA1lY+nNYZaIx6//ZFq+NKPEhNKtnEaj/1NVRBKZe2VjXnctMuHy4UTxrpVFPUYAM
-         YC/E9SmqEVueysUcuVY4wzKYC+FXud0qP7CaGIgVKtToCKujWLl7QC3Zi/psrT9vxN23
-         dRqtAP+pewT8Ftkf5C7oCJ9tnG7ZdmsESAK7ZMJ3rBurBegvHsnaShNZs6QeKUGSmMbn
-         P0+zQsiO6s2HacLwfu+FkhkoxrUY47Ocaf7OvUn2yXrqkoU6mAxVypK7qeDAEc8nLvNw
-         h9Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLOMh2Z7PTgGcSu7dMlXNYlnp6EhagvoU+9vsu2hDTlSsShJuQi1Dj8JlzsmeSbWq+fNgUajAYPqeifDYyeAEqve3s7sw8QShFwV2LwRy2y9qBYp7ma1Rc0AvZXgNQI1tYnjYAjI2m
-X-Gm-Message-State: AOJu0YwaoZOZTkLtiQUFvaUPZX/Sh2HkUbH2NoDB2tGpHsu3QWPySO0b
-	QD/dmuPfLVWQCKpNwrw58X6c8zcl5Thb8bWKvam5O25CU8+Il6WC
-X-Google-Smtp-Source: AGHT+IHj+V0InCmmwC3gd1/7mIX2MORi4sT6njdKxQe6B6o4ScdwOLvKUrib+HycVmyBoj444q5hDA==
-X-Received: by 2002:a05:6a21:3993:b0:19e:c777:5c60 with SMTP id ad19-20020a056a21399300b0019ec7775c60mr9251719pzc.21.1707764295685;
-        Mon, 12 Feb 2024 10:58:15 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXAbMmvukj5Tps4Q/3BK2orBYiT9Qa5/0zMcijZHtkn56W+UhN/UKDUyFsdydY7rqbpdoV3APLzkDMBSQUx3x3IQWVH/RV5gmPctO/49tu+GNh4RX8HigfH6t7juTfPe8+51qendpWMZ99sR1AobSi4ty8hhJ37DCcdIWzWEYY1AuKuA26W1Xa3Kr63oKpdzFcWz9Zd2IVGXgQupRs1usOCc+MC8TKIYDiVPAI9NRu/pkznJFL+svGcbCuhkzWsKBtBSDhWZoBHNWF309UNh4zk
-Received: from ?IPV6:2620:0:1000:8411:dfc4:6edd:16dd:210a? ([2620:0:1000:8411:dfc4:6edd:16dd:210a])
-        by smtp.gmail.com with ESMTPSA id u18-20020a62d452000000b006da1d9f4adcsm6122771pfl.127.2024.02.12.10.58.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 10:58:15 -0800 (PST)
-Message-ID: <25d2f9b4-113d-4967-bbdb-24cb6ca62c2b@acm.org>
-Date: Mon, 12 Feb 2024 10:58:14 -0800
+	s=arc-20240116; t=1707766213; c=relaxed/simple;
+	bh=FkxTJSO+33GpN+suj4JefqxDZgPdW8qomujZLe4SOyc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aPI7L5P2NVsBLoRB0oEIcGdeOZLk2m9hTeV6DtjPJIbXTuh69o5zA7S59ouoR/ovGaxLq+Bi1+Wr3ociReAq23T3Ugc6RlP6UiEj+2J5CTL2S9CDb4wdsraxDaJSWBPfvyOCGE5PxwCLFKBJjsE6wN4s6D52bzhRPFnzlxbh5jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qlAJEgm/; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qlAJEgm/"
+Date: Mon, 12 Feb 2024 14:30:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707766207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rn+g3POrCt16v7JX8rOl/Zs5Xf7fDMrrf9BRGk2OghE=;
+	b=qlAJEgm/CtrwPB/nNjb/vD8B55ZNOWsm5jV92wK+E5nqfANbsMzyK1sF+vJMb50sKllkDV
+	soOrFT4O6IJ7Ik/CqAfSvHUWFGw1xEuigZ7G+ivDvjSoDAMh8kTuZdpM0mIWsj5f1+wh6M
+	lJ2xYc5vs/HXrMgJ8ngbq2VC/Igqep4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Dave Chinner <david@fromorbit.com>
+Cc: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, 
+	Michal Hocko <mhocko@suse.com>, Matthew Wilcox <willy@infradead.org>, 
+	lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, Kent Overstreet <kent.overstreet@gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
+Message-ID: <cepmpv7vdq7i6277wheqqnqsniqnkomvh7sn3535rcacvorkuu@5caayyz44qzr>
+References: <ZZcgXI46AinlcBDP@casper.infradead.org>
+ <ZZzP6731XwZQnz0o@dread.disaster.area>
+ <3ba0dffa-beea-478f-bb6e-777b6304fb69@kernel.org>
+ <ZcUQfzfQ9R8X0s47@tiehlicka>
+ <3aa399bb-5007-4d12-88ae-ed244e9a653f@kernel.org>
+ <ZclyYBO0vcQHZ5dV@dread.disaster.area>
+ <5p4zwxtfqwm3wgvzwqfg6uwy5m3lgpfypij4fzea63gu67ve4t@77to5kukmiic>
+ <ZcmgFThkhh9HYsXh@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 25/26] block: Reduce zone write plugging memory usage
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20240202073104.2418230-1-dlemoal@kernel.org>
- <20240202073104.2418230-26-dlemoal@kernel.org>
- <09d99780-8311-4ea9-8f48-cf84043d23f6@suse.de>
- <f3a2f8b8-32d2-4e42-ba78-1f668d69033f@acm.org>
- <a324beda-7651-4881-aea9-99a339e2b9eb@kernel.org>
- <2e246189-a450-4061-b94c-73637859d073@acm.org>
- <75240a9d-1862-4d09-9721-fd5463c5d4e5@kernel.org>
- <e2a1a020-39e3-4b02-a841-3d53bd854106@acm.org>
- <c03735f3-c036-4f78-ac0b-8f394e947d86@kernel.org>
- <a1531631-dce4-49a6-a589-76fa86e88aeb@acm.org>
- <028b77ed-d6a9-44e6-a603-3558914381a1@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <028b77ed-d6a9-44e6-a603-3558914381a1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZcmgFThkhh9HYsXh@dread.disaster.area>
+X-Migadu-Flow: FLOW_OUT
 
-On 2/11/24 17:09, Damien Le Moal wrote:
-> On 2/11/24 12:40, Bart Van Assche wrote:
->> For the use cases I'm interested in a hash table implementation that supports
->> RCU-lookups probably will work better than an xarray. I think that the hash
->> table implementation in <linux/hashtable.h> supports RCU for lookups, insertion
->> and removal.
+On Mon, Feb 12, 2024 at 03:35:33PM +1100, Dave Chinner wrote:
+> On Sun, Feb 11, 2024 at 09:06:33PM -0500, Kent Overstreet wrote:
+> > That's because in general most code in the IO path knows how to make
+> > effective use of biosets and mempools (which may take some work! you
+> > have to ensure that you're always able to make forward progress when
+> > memory is limited, and in particular that you don't double allocate from
+> > the same mempool if you're blocking the first allocation from
+> > completing/freeing).
 > 
-> It does, but the API for it is not the easiest, and I do not see how that could
-> be faster than an xarray, especially as the number of zones grows with high
-> capacity devices (read: potentially more collisions which will slow zone plug
-> lookups).
+> Yes, I understand this, and that's my point: NOIO context tends to
+> be able to use mempools and other mechanisms to prevent memory
+> allocation failure, not NOFAIL.
+> 
+> The IO layers are request based and that enables one-in, one out
+> allocation pools that can guarantee single IO progress. That's all
+> the IO layers need to guarantee to the filesystems so that forwards
+> progress can always be made until memory pressure.
+> 
+> However, filesystems cannot guarantee "one in, one out" allocation
+> behaviour. A transaction can require a largely unbound number of
+> memory allocations to succeed to make progress through to
+> completion, and so things like mempools -cannot be used- to prevent
+> memory allocation failures whilst providing a forwards progress
+> guarantee.
 
- From the xarray documentation: "The XArray implementation is efficient when the
-indices used are densely clustered". I think we are dealing with a sparse array
-and hence that an xarray may not be the best suited data structure. How about
-using a hash table and making the hash table larger if the number of open zones
-equals the hash table size? That is possible as follows:
-* Instead of using DEFINE_HASHTABLE() or DECLARE_HASHTABLE(), allocate the hash
-   table dynamically and use the  struct hlist_head __rcu * data type.
-* Use rcu_assign_pointer() to modify that pointer and kfree_rcu() to free old
-   versions of the hash table.
-* Use rcu_dereference_protected() for hash table lookups.
+I don't see that that's actually true. There's no requirement that
+arbitrarily large IOs must be done atomically, within a single
+transaction: there's been at most talk of eventually doing atomic writes
+through the pagecache, but the people on that can't even finish atomic
+writes through the block layer, so who knows when that'll happen.
 
-For an example, see also the output of the following command:
-$ git grep -nHw state_bydst
+I generally haven't been running into filesyste operations that require
+an unbounded number of memory allocations (reflink is a bit of an
+exception in the current bcachefs code, and even that is just a
+limitation I could solve if I really wanted to...)
 
-Thanks,
+> Hence a NOFAIL scope if useful at the filesystem layer for
+> filesystem objects to ensure forwards progress under memory
+> pressure, but it is compeltely unnecessary once we transition to the
+> IO layer where forwards progress guarantees ensure memory allocation
+> failures don't impede progress.
+> 
+> IOWs, we only need NOFAIL at the NOFS layers, not at the NOIO
+> layers. The entry points to the block layer should transition the
+> task to NOIO context and restore the previous context on exit. Then
+> it becomes relatively trivial to apply context based filtering of
+> allocation behaviour....
+> 
+> > > i.e NOFAIL scopes are not relevant outside the subsystem that sets
+> > > it.  Hence we likely need helpers to clear and restore NOFAIL when
+> > > we cross an allocation context boundaries. e.g. as we cross from
+> > > filesystem to block layer in the IO stack via submit_bio(). Maybe
+> > > they should be doing something like:
+> > > 
+> > > 	nofail_flags = memalloc_nofail_clear();
+> > 
+> > NOFAIL is not a scoped thing at all, period; it is very much a
+> > _callsite_ specific thing, and it depends on whether that callsite has a
+> > fallback.
+> 
+> *cough*
+> 
+> As I've already stated, NOFAIL allocation has been scoped in XFS for
+> the past 20 years.
+> 
+> Every memory allocation inside a transaction *must* be NOFAIL unless
+> otherwise specified because memory allocation inside a dirty
+> transaction is a fatal error.
 
-Bart.
+Say you start to incrementally mempoolify your allocations inside a
+transaction - those mempools aren't going to do anything if there's a
+scoped NOFAIL, and sorting that out is going to get messy fast.
+
+> However, that scoping has never been
+> passed to the NOIO contexts below the filesytsem - it's scoped
+> purely within the filesystem itself and doesn't pass on to other
+> subsystems the filesystem calls into.
+
+How is that managed?
+> 
+> > The most obvious example being, as mentioned previously, mempools.
+> 
+> Yes, they require one-in, one-out guarantees to avoid starvation and
+> ENOMEM situations. Which, as we've known since mempools were
+> invented, these guarantees cannot be provided by most filesystems.
+> 
+> > > > - NOWAIT - as said already, we need to make sure we're not turning an
+> > > > allocation that relied on too-small-to-fail into a null pointer exception or
+> > > > BUG_ON(!page).
+> > > 
+> > > Agreed. NOWAIT is removing allocation failure constraints and I
+> > > don't think that can be made to work reliably. Error injection
+> > > cannot prove the absence of errors  and so we can never be certain
+> > > the code will always operate correctly and not crash when an
+> > > unexepected allocation failure occurs.
+> > 
+> > You saying we don't know how to test code?
+> 
+> Yes, that's exactly what I'm saying.
+> 
+> I'm also saying that designing algorithms that aren't fail safe is
+> poor design. If you get it wrong and nothing bad can happen as a
+> result, then the design is fine.
+> 
+> But if the result of missing something accidentally is that the
+> system is guaranteed to crash when that is hit, then failure is
+> guaranteed and no amount of testing will prevent that failure from
+> occurring.
+> 
+> And we suck at testing, so we absolutely need to design fail
+> safe algorithms and APIs...
+
+GFP_NOFAIL dosen't magically make your algorithm fail safe, though.
+
+Suren and I are trying to get memory allocation profiling into 6.9, and
+I'll be posting the improved fault injection immediately afterwards -
+this is what I used to use to make sure every allocation failure path in
+the bcachefs predecessor was tested. Hopefully that'll make things
+easier...
