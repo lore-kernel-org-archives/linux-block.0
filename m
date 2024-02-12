@@ -1,176 +1,132 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9074654D
-	for <linux-block@vger.kernel.org>; Mon, 12 Feb 2024 19:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3541DDCE
+	for <linux-block@vger.kernel.org>; Mon, 12 Feb 2024 20:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707766213; cv=none; b=TyEjcxl+1nfhOKQrDwu7tzEJRBK0IKtqozcz3v90wbw9D4GPyUqIeqVJaxZH71q0W4Q2dRP/ETHPRKsr7z8xuwiZ0leg7voVEzZncNOOpiFo3JbES698/4WQ3YoTDeHr6m8rPSzWFEvKVnJFqY2Qc8aR5ky4PGgfL/zqy4O8rLE=
+	t=1707770553; cv=none; b=YUn4H2Ub/9VnqXG1jyinV/7m6wDFmY92Uqp14pZ/t8P89EE02Jd4ObMflCg7U5a4TPO74KW3rJATWAKKkIrsSO/24eRNpmuf/D/x9bzxFcFPKSJ+iIc00nOaIcBk3i3rwsfl/LkfWwH1ZbFMel+MnykW7g7RPujk0gxEMBMbPPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707766213; c=relaxed/simple;
-	bh=FkxTJSO+33GpN+suj4JefqxDZgPdW8qomujZLe4SOyc=;
+	s=arc-20240116; t=1707770553; c=relaxed/simple;
+	bh=AkzjM/MFik3gQffQSPfJIif8jEQKCQAulCjbf4PA/lY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aPI7L5P2NVsBLoRB0oEIcGdeOZLk2m9hTeV6DtjPJIbXTuh69o5zA7S59ouoR/ovGaxLq+Bi1+Wr3ociReAq23T3Ugc6RlP6UiEj+2J5CTL2S9CDb4wdsraxDaJSWBPfvyOCGE5PxwCLFKBJjsE6wN4s6D52bzhRPFnzlxbh5jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qlAJEgm/; arc=none smtp.client-ip=95.215.58.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=QBx39qXAaoxntFnCnp8X1B0kUWP6T26lFmAjGpxvOWA7kucW5siQpYgM3XGIhAX+tWlScmfUxDewoGWphm76amqyHUnDUWvjPvh9s5Jdp+BrWixtd2Af+GSDaetBeJa+duC/psRsIqYJkgmGfovS0S42AupVsKWuczfDm7am3aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=abzzEBuw; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qlAJEgm/"
-Date: Mon, 12 Feb 2024 14:30:02 -0500
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="abzzEBuw"
+Date: Mon, 12 Feb 2024 15:42:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707766207;
+	t=1707770549;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rn+g3POrCt16v7JX8rOl/Zs5Xf7fDMrrf9BRGk2OghE=;
-	b=qlAJEgm/CtrwPB/nNjb/vD8B55ZNOWsm5jV92wK+E5nqfANbsMzyK1sF+vJMb50sKllkDV
-	soOrFT4O6IJ7Ik/CqAfSvHUWFGw1xEuigZ7G+ivDvjSoDAMh8kTuZdpM0mIWsj5f1+wh6M
-	lJ2xYc5vs/HXrMgJ8ngbq2VC/Igqep4=
+	bh=wk5/3LiMu1qZi5/LfqpfNetrRAwSWbOpLB6vhC/S/Z0=;
+	b=abzzEBuw28TfrE7mwtg2kz5RRM0VVFREAfxvkuNQimtrOJgtDawQToSlM4Co2Xn5o1N9TE
+	YhB8ryqzTAlS1sJgX0CcP25XaFEmKP+enHui78SN5lDgf6/pVx73FOwS5Zni2WBtZ9NaVA
+	tb4gM58fcwO09h78OJm+YzcuT8/eXVA=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Dave Chinner <david@fromorbit.com>
-Cc: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, 
-	Michal Hocko <mhocko@suse.com>, Matthew Wilcox <willy@infradead.org>, 
-	lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, Kent Overstreet <kent.overstreet@gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Removing GFP_NOFS
-Message-ID: <cepmpv7vdq7i6277wheqqnqsniqnkomvh7sn3535rcacvorkuu@5caayyz44qzr>
-References: <ZZcgXI46AinlcBDP@casper.infradead.org>
- <ZZzP6731XwZQnz0o@dread.disaster.area>
- <3ba0dffa-beea-478f-bb6e-777b6304fb69@kernel.org>
- <ZcUQfzfQ9R8X0s47@tiehlicka>
- <3aa399bb-5007-4d12-88ae-ed244e9a653f@kernel.org>
- <ZclyYBO0vcQHZ5dV@dread.disaster.area>
- <5p4zwxtfqwm3wgvzwqfg6uwy5m3lgpfypij4fzea63gu67ve4t@77to5kukmiic>
- <ZcmgFThkhh9HYsXh@dread.disaster.area>
+To: Martin Steigerwald <martin@lichtvoll.de>
+Cc: stable@vger.kernel.org, regressions@lists.linux.dev, 
+	linux-usb@vger.kernel.org, 
+	Holger =?utf-8?Q?Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>, linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: I/O errors while writing to external Transcend XS-2000 4TB SSD
+Message-ID: <ypeck262h6ccdnsxzo46vydzygh2y6coe3d4mvgermaaeo5ygg@4nvailbg7ay3>
+References: <1854085.atdPhlSkOF@lichtvoll.de>
+ <5444405.Sb9uPGUboI@lichtvoll.de>
+ <mqlu3q3npll5wxq5cfuxejcxtdituyydkjdz3pxnpqqmpbs2cl@tox3ulilhaq2>
+ <6599603.G0QQBjFxQf@lichtvoll.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZcmgFThkhh9HYsXh@dread.disaster.area>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6599603.G0QQBjFxQf@lichtvoll.de>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 12, 2024 at 03:35:33PM +1100, Dave Chinner wrote:
-> On Sun, Feb 11, 2024 at 09:06:33PM -0500, Kent Overstreet wrote:
-> > That's because in general most code in the IO path knows how to make
-> > effective use of biosets and mempools (which may take some work! you
-> > have to ensure that you're always able to make forward progress when
-> > memory is limited, and in particular that you don't double allocate from
-> > the same mempool if you're blocking the first allocation from
-> > completing/freeing).
-> 
-> Yes, I understand this, and that's my point: NOIO context tends to
-> be able to use mempools and other mechanisms to prevent memory
-> allocation failure, not NOFAIL.
-> 
-> The IO layers are request based and that enables one-in, one out
-> allocation pools that can guarantee single IO progress. That's all
-> the IO layers need to guarantee to the filesystems so that forwards
-> progress can always be made until memory pressure.
-> 
-> However, filesystems cannot guarantee "one in, one out" allocation
-> behaviour. A transaction can require a largely unbound number of
-> memory allocations to succeed to make progress through to
-> completion, and so things like mempools -cannot be used- to prevent
-> memory allocation failures whilst providing a forwards progress
-> guarantee.
-
-I don't see that that's actually true. There's no requirement that
-arbitrarily large IOs must be done atomically, within a single
-transaction: there's been at most talk of eventually doing atomic writes
-through the pagecache, but the people on that can't even finish atomic
-writes through the block layer, so who knows when that'll happen.
-
-I generally haven't been running into filesyste operations that require
-an unbounded number of memory allocations (reflink is a bit of an
-exception in the current bcachefs code, and even that is just a
-limitation I could solve if I really wanted to...)
-
-> Hence a NOFAIL scope if useful at the filesystem layer for
-> filesystem objects to ensure forwards progress under memory
-> pressure, but it is compeltely unnecessary once we transition to the
-> IO layer where forwards progress guarantees ensure memory allocation
-> failures don't impede progress.
-> 
-> IOWs, we only need NOFAIL at the NOFS layers, not at the NOIO
-> layers. The entry points to the block layer should transition the
-> task to NOIO context and restore the previous context on exit. Then
-> it becomes relatively trivial to apply context based filtering of
-> allocation behaviour....
-> 
-> > > i.e NOFAIL scopes are not relevant outside the subsystem that sets
-> > > it.  Hence we likely need helpers to clear and restore NOFAIL when
-> > > we cross an allocation context boundaries. e.g. as we cross from
-> > > filesystem to block layer in the IO stack via submit_bio(). Maybe
-> > > they should be doing something like:
+On Mon, Feb 12, 2024 at 04:52:09PM +0100, Martin Steigerwald wrote:
+> Kent Overstreet - 11.02.24, 19:51:32 CET:
+> > On Sun, Feb 11, 2024 at 06:06:27PM +0100, Martin Steigerwald wrote:
+> […]
+> > > CC'ing BCacheFS mailing list.
 > > > 
-> > > 	nofail_flags = memalloc_nofail_clear();
-> > 
-> > NOFAIL is not a scoped thing at all, period; it is very much a
-> > _callsite_ specific thing, and it depends on whether that callsite has a
-> > fallback.
-> 
-> *cough*
-> 
-> As I've already stated, NOFAIL allocation has been scoped in XFS for
-> the past 20 years.
-> 
-> Every memory allocation inside a transaction *must* be NOFAIL unless
-> otherwise specified because memory allocation inside a dirty
-> transaction is a fatal error.
-
-Say you start to incrementally mempoolify your allocations inside a
-transaction - those mempools aren't going to do anything if there's a
-scoped NOFAIL, and sorting that out is going to get messy fast.
-
-> However, that scoping has never been
-> passed to the NOIO contexts below the filesytsem - it's scoped
-> purely within the filesystem itself and doesn't pass on to other
-> subsystems the filesystem calls into.
-
-How is that managed?
-> 
-> > The most obvious example being, as mentioned previously, mempools.
-> 
-> Yes, they require one-in, one-out guarantees to avoid starvation and
-> ENOMEM situations. Which, as we've known since mempools were
-> invented, these guarantees cannot be provided by most filesystems.
-> 
-> > > > - NOWAIT - as said already, we need to make sure we're not turning an
-> > > > allocation that relied on too-small-to-fail into a null pointer exception or
-> > > > BUG_ON(!page).
+> > > My original mail is here:
 > > > 
-> > > Agreed. NOWAIT is removing allocation failure constraints and I
-> > > don't think that can be made to work reliably. Error injection
-> > > cannot prove the absence of errors  and so we can never be certain
-> > > the code will always operate correctly and not crash when an
-> > > unexepected allocation failure occurs.
+> > > https://lore.kernel.org/linux-usb/5264d425-fc13-6a77-2dbf-6853479051a0
+> > > @applied-asynchrony.com/T/ #m5ec9ecad1240edfbf41ad63c7aeeb6aa6ea38a5e
+> > > 
+> > > Holger Hoffstätte - 11.02.24, 17:02:29 CET:
+> > > > On 2024-02-11 16:42, Martin Steigerwald wrote:
+> > > > > Hi!
+> > > > > I am trying to put data on an external Kingston XS-2000 4 TB SSD
+> > > > > using
+> > > > > self-compiled Linux 6.7.4 kernel and encrypted BCacheFS. I do not
+> > > > > think BCacheFS has any part in the errors I see, but if you
+> > > > > disagree
+> > > > > feel free to CC the BCacheFS mailing list as you reply.
+> > > > 
+> > > > This is indeed a known bug with bcachefs on USB-connected devices.
+> > > > Apply the following commit:
+> > > > 
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/c
+> > > > ommi t/fs/bcachefs?id=3e44f325f6f75078cdcd44cd337f517ba3650d05
+> > > > 
+> > > > This and some other commits are already scheduled for -stable.
+> > > 
+> > > Thanks!
+> > > 
+> > > Oh my. I was aware of some bug fixes coming for stable. I briefly
+> > > looked through them, but now I did not make a connection.
+> > > 
+> > > I will wait for 6.7.5 and retry then I bet.
 > > 
-> > You saying we don't know how to test code?
+> > That doesn't look related - the device claims to not support flush or
+> > fua, and the bug resulted in us not sending flush/fua devices; the main
+> > thing people would see without that patch, on 6.8, would be an immediate
+> > -EOPNOTSUP on the first flush journal write.
+> > 
+> > He only got errors after an hour or so, or 10 minutes with UAS disabled;
+> > we send flushes once a second. Sounds like a screwy device.
 > 
-> Yes, that's exactly what I'm saying.
+> Thanks for that explanation, Kent.
 > 
-> I'm also saying that designing algorithms that aren't fail safe is
-> poor design. If you get it wrong and nothing bad can happen as a
-> result, then the design is fine.
+> I am the one with that external Transcend XS 2000 4 TB SSD and I
+> specifically did not CC bcachefs mailing list at the beginning as after
+> seeing things like
 > 
-> But if the result of missing something accidentally is that the
-> system is guaranteed to crash when that is hit, then failure is
-> guaranteed and no amount of testing will prevent that failure from
-> occurring.
+> [33963.462694] sd 0:0:0:0: [sda] tag#10 uas_zap_pending 0 uas-tag 1 inflight: CMD 
+> [33963.462708] sd 0:0:0:0: [sda] tag#10 CDB: Write(16) 8a 00 00 00 00 00 82 c1 bc 00 00 00 04 00 00 00
+> […]
+> [33963.592872] sd 0:0:0:0: [sda] tag#10 FAILED Result: hostbyte=DID_RESET driverbyte=DRIVER_OK cmd_age=182s
 > 
-> And we suck at testing, so we absolutely need to design fail
-> safe algorithms and APIs...
+> I thought some quirks in the device to be at fault.
+> 
+> However while Sandisk Extreme Pro 2 TB claims to support DPO and FUA I see
+> 
+> Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+> 
+> also with other devices like external Toshiba Canvio 4 TB hard disks. Using
+> LUKS encrypted BTRFS on those I never saw any timeout while writing out
+> data issue with any of those hard disks. Also with disabled write cache
+> any cache flush / FUA request should be a no-op anyway? These hard disks
+> have been doing a ton of backup workloads without any issues, but so far
+> only with BTRFS.
+> 
+> I may test the Transcend XS2000 with BTRFS to see whether it makes a
+> difference, however I really like to use it with BCacheFS and I do not really
+> like to use LUKS for external devices. According to the kernel log I still
+> don't really think those errors at the block layer were about anything
+> filesystem specific, but what  do I know?
 
-GFP_NOFAIL dosen't magically make your algorithm fail safe, though.
+It's definitely not unheard of for one specific filesystem to be
+tickling driver/device bugs and not others.
 
-Suren and I are trying to get memory allocation profiling into 6.9, and
-I'll be posting the improved fault injection immediately afterwards -
-this is what I used to use to make sure every allocation failure path in
-the bcachefs predecessor was tested. Hopefully that'll make things
-easier...
+I wonder what it would take to dump the outstanding requests on device
+timeout.
