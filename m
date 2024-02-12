@@ -1,105 +1,104 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C8D3CF6C
-	for <linux-block@vger.kernel.org>; Mon, 12 Feb 2024 15:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F993FE24;
+	Mon, 12 Feb 2024 18:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707753457; cv=none; b=chhjMtHZjVIxGPyz02d1EBBWsQVOjuF90edm901r40tNkpLUyGwxGcQWrrKPLr/Oxpl77ZVsjWtAQnSn2UljY+4/vKCFTtwZGgCS62WhawYhqFbgjirD9X+89KDM1aymb6NRahhGkkypXuMiOkVcn4HV8iSzIhacER1Fk6YIF4Q=
+	t=1707763247; cv=none; b=TvXiOtU62PK88F1YsVCFV/rRPNlCryfUlECjAkjQMGxmoWl7GwjAiFtzJHvKDKMEiXOlZi8Bmaf6QP+LGjGLUJXlzvNiGCSnJB4rnr040z64oiz/TdVDP+5d6ejbntSDK/R32KccV8qRB+rO1QRtRH/CP0nJ1vUGz9PzsiKlCP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707753457; c=relaxed/simple;
-	bh=e6R/iPNI3hQSc4/ZfaypT+HmeA9j0H3vnXa/ahf/PvA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lNO8BcscZKFmNg3sElC/UgLxlr6sBk6SGjN8ggYpsNF/Rd4yCSBxYfzMDMf9DSzkLoeVT2PtVlLjf/gaOBAAvL+44A3S0ZbiKjDvNOIx6hVXzaU+modwzvBupOvY0lQ7fLBv1cnQkLLTQ7UYvCMU4Vs2j1hzlCpjlyiXLS/y05o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2jUqRZcc; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2jUqRZcc"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-363f0a9cf87so5442105ab.0
-        for <linux-block@vger.kernel.org>; Mon, 12 Feb 2024 07:57:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707753454; x=1708358254; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BaynTH9pMydfhvq1EdD/6Y3LrUBXYd3m2w1fILaHNjE=;
-        b=2jUqRZccORffYC5wO4HHH23l4elshWjGa22OTq2K1a/Bx2vgBXy7ZPjxB8am3o+OkS
-         XliVnZHH+QSQiybzpDnjiIqm1WikKgnyffO+PUKE3wVHv9E+tmzRCVPuENTf2cEksq1k
-         4rQo5oIDY+PXqkYqEZFZU7goiqJWuK2TqN8IrO2W2z6f5hSq0iScrIdwO4+O4jY8fPY2
-         LvuXlexPgQ2UULWzCrNJCmSQhPKtpfS9Cbs/Ye7blFZMoMhAqfJxniVhok1R8C+b5GJ9
-         we+dnadIasH7IJn0BwK4SgsY/YaJ7dxSB0Cg+w8KTZZfNaggJW7j0CasO6HQF1opHAdh
-         8OSw==
+	s=arc-20240116; t=1707763247; c=relaxed/simple;
+	bh=0EWHPQzyjvpkDP7Vq129ZoEDQO02WGyEBKILyGceJ9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=knVtF8MExvc65BSwanq/K9+sEQwybszElCtFmw0eifgECHcRJOfCm4wZskcl12KYDeSc/yHrbLSgQX0Z9gbwQQLIHb1ZS93FyccB+lGmkXIxj0M/E1+Bffwbq2lQJKAcWzDTSyZu3rSrth9qlt1vU8Z0BCN3pwQdr2ccb7LGcpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d71cb97937so33311165ad.3;
+        Mon, 12 Feb 2024 10:40:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707753454; x=1708358254;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BaynTH9pMydfhvq1EdD/6Y3LrUBXYd3m2w1fILaHNjE=;
-        b=gq/NUVl4sf/PT8Ve8FHEiltkbACn5ABqRmLQOdVSUnYID6+AFZTsSNYYSkgiWa/W6I
-         xUSgvX+XzjS4prOW3PdHFNtYgFNhrXtPRzk0V8JUCQLIZOVaTAphuHY8P6+SdeyY4AxR
-         wb+mzCQ2xC5jvzsRhkQ+4QuDiCUjLfIK2SWdD1dB9736j2heT0r0I+5aHvWWgUSeciej
-         e3fncOEY7aPhVT0JOPT6Kae74WdDZXfwIhUjOyHOcTN1qAXWU7UCdsK7Pp4iQkTokX3X
-         orgkcS4sxLHVa2w3UBVIdnt8LR4FBuzNfdvpHZ4Vh1oahK5wkrm2MCUtMmAQOp9Nj8XL
-         1lMw==
-X-Forwarded-Encrypted: i=1; AJvYcCWeXSKoHn683Dynaxn8nZ/RMqniJoqlgzmcVtMzlnY7pE/SPd7iLIgrT3M9IU3FrTCS4pmnsix3IWQ3bV7frGMkzw9Y9uASifUS570=
-X-Gm-Message-State: AOJu0YwLeYwuXMskWhYLYHQWaglPTcMHONtrbIMXVQQe9GNXtZzvxBeC
-	xJ6D7/jbUkCF1Jt5KhfWMmKJOftWhJNemCVTMuGW0bjI4ke/8Dp8KJIV5kfVRaY=
-X-Google-Smtp-Source: AGHT+IEfRx3FWxgGHWmntgqJQoFE7HENnxyzWuguASDfqyWZ7rcmJVU1YUwn3EUOd3+i552Y0c8+2Q==
-X-Received: by 2002:a05:6e02:1d93:b0:363:d7d2:1ddb with SMTP id h19-20020a056e021d9300b00363d7d21ddbmr7164162ila.0.1707753454127;
-        Mon, 12 Feb 2024 07:57:34 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVfxKtYa15lRVvNjy/1m9LMda5eb/rXCMv14SY9YWAJBPanw/6EKSm3pJDzUnNRU/XrSy5iO5trXAPgLbUYhG5+HAeg1/PdYVWyfE9THwyyYUqOyUkj9BNBrByLgRjbzwQwhkRhdIOu38wYONYxmSP9nEOjLJ85L0v4cnWNhTnP3yXDu1ZVmziLlJv+aS8vpPWb7xwrOhgIXZJPQPz0Xgle5WuNrI7xqeLMDiJcWokSMQ==
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id bs19-20020a056e02241300b00363f1de3813sm1960211ilb.53.2024.02.12.07.57.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Feb 2024 07:57:33 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: kbusch@kernel.org, hch@lst.de, martin.petersen@oracle.com, 
- sagi@grimberg.me, Kanchan Joshi <joshi.k@samsung.com>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, 
- gost.dev@samsung.com
-In-Reply-To: <20240201130126.211402-1-joshi.k@samsung.com>
-References: <CGME20240201130828epcas5p10bd98bcb6b8e9444603e347c2a910c44@epcas5p1.samsung.com>
- <20240201130126.211402-1-joshi.k@samsung.com>
-Subject: Re: [PATCH v2 0/3] Block integrity with flexible-offset PI
-Message-Id: <170775345334.1919824.14569482933790271087.b4-ty@kernel.dk>
-Date: Mon, 12 Feb 2024 08:57:33 -0700
+        d=1e100.net; s=20230601; t=1707763246; x=1708368046;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PGslitScMSVc81UDgVXb8aGeYEXh6I3P5siRBkvzHMc=;
+        b=h/YiFSW7KA0LnvYHppN1RXm3P53qHxVJvCX/55K++IlHExj9It82BOUAt36OCBFe1j
+         lYKxWkyllEKRnk2eeJkG3ZkfI+GnGbERDz5N66L+JgpyJsYRK4mlF7npuYYDCbMXwxh0
+         a5Z2SJX2xU4PjJGbcKmYT+ArUgZ0bh7Uv8D8ArKVK/RZvTPxAbLZ8ikhPrTKG7YA8Y++
+         1KB9tIl7577lAjwvafqIr/5MgJ4TDg8EgSovupgW3ANAWbzNm6S6ErVVK0JlZdXUlSll
+         d+tzZFtXE8Uf4YUxfw+gazE8jM6Zoix8bwA1oHzX1SguX89RIBtcga7+3EBKedlKOm8O
+         72gg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzYV8j6TFEgdtMXTIp3hDvjcISOcTmrfnSlfOMh/pylXKjyAZ7Ilm5BiZmzH3SHaKW9wnBUtW7xmU3Sc2623LF2xEU5SaYdC3f/cP/emGzixHtY0KQMpxgj8HFcLBBqDORLEDnbyXU
+X-Gm-Message-State: AOJu0YyVQV+IsbB9VQfCmauXr+EO9e5n5LuWBz1faN1gwQ/PtvOKjYlN
+	veJtX0XkZHgsWr/VaQCXAy65TD9pDBjZZiKzOJn3wTGxwZtl4zzK
+X-Google-Smtp-Source: AGHT+IFkRZxtDzzX+Ggs3f7xckQrNiAEiUzUixbR7Z9lCO/KwbdCkkRG9d9r1bdUD1cTxygB7tpgVw==
+X-Received: by 2002:a17:902:b906:b0:1da:1e83:b961 with SMTP id bf6-20020a170902b90600b001da1e83b961mr5753240plb.63.1707763245668;
+        Mon, 12 Feb 2024 10:40:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWrXQ/KEXcGeiEx5uc2tl4aoNelzoOV58sUi2AYC+c2XRDy90hDtWiSDrnNTrKRQlijDVc2tXY5hG0aICU3lj47jmU+BmUpgduWcm7HkewVO9FNlVoUYa30IHStunl+cfxc18OyC3amddo1O/lUVBzMo8vJ8vC7EO12sCsstMX0Gb55GjGqACDNg1TsTgX3idRqskHFYmgURVc/7M9/hZQpyWb9693TQ9pet+zV5yvNdhZgJTOzs3bTW+xnmgz1bcpzvLN0mEuzo/fqw7uIXTe4
+Received: from ?IPV6:2620:0:1000:8411:dfc4:6edd:16dd:210a? ([2620:0:1000:8411:dfc4:6edd:16dd:210a])
+        by smtp.gmail.com with ESMTPSA id g12-20020a170902c98c00b001d9fcd344afsm648352plc.222.2024.02.12.10.40.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Feb 2024 10:40:44 -0800 (PST)
+Message-ID: <768a184f-c921-40fc-8405-2777f03e1668@acm.org>
+Date: Mon, 12 Feb 2024 10:40:43 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 25/26] block: Reduce zone write plugging memory usage
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ linux-scsi@vger.kernel.org, "Martin K . Petersen"
+ <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20240202073104.2418230-1-dlemoal@kernel.org>
+ <20240202073104.2418230-26-dlemoal@kernel.org>
+ <09d99780-8311-4ea9-8f48-cf84043d23f6@suse.de>
+ <f3a2f8b8-32d2-4e42-ba78-1f668d69033f@acm.org>
+ <a324beda-7651-4881-aea9-99a339e2b9eb@kernel.org>
+ <2e246189-a450-4061-b94c-73637859d073@acm.org>
+ <75240a9d-1862-4d09-9721-fd5463c5d4e5@kernel.org>
+ <e2a1a020-39e3-4b02-a841-3d53bd854106@acm.org>
+ <c03735f3-c036-4f78-ac0b-8f394e947d86@kernel.org>
+ <a1531631-dce4-49a6-a589-76fa86e88aeb@acm.org>
+ <c582fc6c-618e-4052-9f15-3045df819389@kernel.org>
+ <2b45ee45-5f2e-4923-9ef6-a7f03bcb65bf@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <2b45ee45-5f2e-4923-9ef6-a7f03bcb65bf@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
 
-
-On Thu, 01 Feb 2024 18:31:23 +0530, Kanchan Joshi wrote:
-> The block integrity subsystem can only work with PI placed in the first
-> bytes of the metadata buffer.
+On 2/12/24 00:47, Damien Le Moal wrote:
+> Replying to myself as I had an idea:
+> 1) Store the zone capacity in a separate array: 4B * nr_zones needed. Storing
+> "0" as a value for a zone in that array would indicate that the zone is
+> conventional. No additional zone bitmap needed.
+> 2) Use a sparse xarray for managing allocated zone write plugs: 64B per
+> allocated zone write plug needed, which for an SMR drive would generally be at
+> most 128 * 64B = 8K.
 > 
-> The series makes block-integrity support the flexible placement of PI.
-> And changes NVMe driver to make use of the new capability.
-> 
-> This helps to
-> (i) enable the more common case for NVMe (PI in last bytes is the norm)
-> (ii) reduce nop profile users (tried by Jens recently [1]).
-> 
-> [...]
+> So for an SMR drive with 100,000 zones, that would be a total of 408 KB, instead
+> of the current 1.6 MB. Will try to prototype this to see how performance goes (I
+> am worried about the xarray lookup overhead in the hot path).
 
-Applied, thanks!
+Hi Damien,
 
-[1/3] block: refactor guard helpers
-      commit: 6b5c132a3f0d3b7c024ae98f0ace07c04d32cf73
-[2/3] block: support PI at non-zero offset within metadata
-      commit: 60d21aac52e26531affdadb7543fe5b93f58b450
-[3/3] nvme: allow integrity when PI is not in first bytes
-      commit: 921e81db524d17db683cc29aed7ff02f06ea3f96
+Are there any zoned devices where the sequential write required zones occur before
+the conventional zones? If not, does this mean that the conventional zones always
+occur before the write pointer zones and also that storing the number of conventional
+zones is sufficient?
 
-Best regards,
--- 
-Jens Axboe
+Are there zoned storage devices where each zone has a different capacity? I have
+not yet encountered any such device. I'm wondering whether a single capacity
+variable would be sufficient for the entire device.
 
+Thank you,
+
+Bart.
 
 
