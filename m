@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553F22B9C5;
-	Mon, 12 Feb 2024 07:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F1A6FCA;
+	Mon, 12 Feb 2024 07:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707722092; cv=none; b=Xwk+AHGsh+n8SMTZUTj0fgIp490rTx18M2Z6L2eH96R234lSbQj9c6WopaHoZ30WryvdSFKZabOvUyEz+JNWtJNes/Qjxt1NX4muBGzxQzpKnMIfF37YKBavucMorHIfCiNCet3WLoRBdH9oKIqQerwxfvn4Ykb1ujKFlCemqkc=
+	t=1707722683; cv=none; b=FiiKQBlmLYgy0DeJuU/oQcatv7y7nvYepv2GamWnBrxZ6re2+Jlw2+iBG4ZO91dzSLvL8D+ohgXANwbpY/RELVtaOkLtmR3GRAsCLBVxplDfl8ItziUU7Oq/Ltmct5Ee7eAZWlcWtCKXIJMm1u5+zDaS2ow4yO8i+DY01n76fuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707722092; c=relaxed/simple;
-	bh=Ruyp/aqRGVYf/y+pWuf+666gtKrZkHSIarRGzQGsj/c=;
+	s=arc-20240116; t=1707722683; c=relaxed/simple;
+	bh=+Gv/VC5NcWqqN18JSwFFw7Fat9gAWSXTSwmPjBcFj+w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rdgTf3/KNH/V+PSLNX7gZiDU9Qn4ZsVcDoNRsEgyDRqR4DjN2ggPm4M3q3JeflTPBG7yXLSBi2caIhHxLMAtbRG1CqU3sIoE+N0lDysazdOX1jmR5nKPjZdl7HC0mFEsEKWdqu3d2N90qAZcsG9mR9/fuN8LImX5UyJJ5U3Cunk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=py7dt9Et; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=ozFf9rVDzDGdvC00I1HYjkZfFaD0lle0dxGUMRrKbZYOrhV+BFRYN+ZduYYN40jWzJ6yjl3XsC539x71qzm7fuVlPdIYQmSz7cgzDvSXHuXInpmr/vmQpQ9O7IXsi/cDGPanSYu17eeaLam2dRsUyB6lkKmYWHnvdDAtsxuOAo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOzqJq7M; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="py7dt9Et"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2AD4C433C7;
-	Mon, 12 Feb 2024 07:14:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOzqJq7M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EDDEC433C7;
+	Mon, 12 Feb 2024 07:24:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707722091;
-	bh=Ruyp/aqRGVYf/y+pWuf+666gtKrZkHSIarRGzQGsj/c=;
+	s=k20201202; t=1707722683;
+	bh=+Gv/VC5NcWqqN18JSwFFw7Fat9gAWSXTSwmPjBcFj+w=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=py7dt9Et5yXvGNkxG1iq0OW3q95ZGtQaQb+zaXDEgLf0RUUSS0NBywYfAVFuZY2WD
-	 AkqG0aOxRv24zvBQ0AxHUE4QcA1l6c4zwVRhOG9Q+G8tZbkS3oo5zZoqT31iGtJYC0
-	 w7xjdc5EWzT4j3ingzLRUsf38DQFK6PTPQEoD9sMafQ1vNna1ZAH9pFe81rrnFQX/2
-	 838JWWqlnYmvfGuKMN0rEG+naPZW/Azp0ob5JMcdTYKxDuAm/yzFoyhn1irzFydu8Y
-	 VH/oYaryQitAD7NZKLHHoqQmbo49mlkMnkH3K9L1Vomb3HjwYawBhL6+vz+PQQzFO1
-	 K0V4SLwdmN1fA==
-Message-ID: <74b1ddcc-4249-4b5f-89ef-6ebca70100a2@kernel.org>
-Date: Mon, 12 Feb 2024 16:14:48 +0900
+	b=YOzqJq7MEx89Uid+NYxhbdV1hR2XUZyL1Eu2D+0iew02XLCVIrBFKA48KU7p/2Xq7
+	 LfJDC8aB5S/gqjyI5SOyyjBZxqWxYascqCl8IeXn6OtKUTaKYCBGORy3OxSP2NxiGm
+	 i/Pesv0hmYvVy+viEmNoi1pPtvyeWcF49iVYc4EZKm4Bvf+T9td4H0yQPcT3HIlCNU
+	 /4vd6yiqDGQ+JPTLnRafemp9y8GPein7GNeYRCRi15yUDAcbZQlSBbYefQO4ObZKRV
+	 rQtwsK7SID+p/05V1tKvAXC9F542GXMecBO9T9IZSAtL6Ixl/wRxKb56WdWuFNhBqT
+	 HDeCfqi+NLWkg==
+Message-ID: <e1061d81-ca74-4b56-b87d-4f6660340093@kernel.org>
+Date: Mon, 12 Feb 2024 16:24:39 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,8 +35,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/15] block: decouple blk_set_stacking_limits from
- blk_set_default_limits
+Subject: Re: [PATCH 04/15] block: add an API to atomically update queue limits
 Content-Language: en-US
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
@@ -47,51 +46,41 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
  virtualization@lists.linux.dev
 References: <20240212064609.1327143-1-hch@lst.de>
- <20240212064609.1327143-4-hch@lst.de>
+ <20240212064609.1327143-5-hch@lst.de>
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20240212064609.1327143-4-hch@lst.de>
+In-Reply-To: <20240212064609.1327143-5-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2/12/24 15:45, Christoph Hellwig wrote:
-> blk_set_stacking_limits uses very little from blk_set_default_limits.
-> Open code these initializations in preparation for rewriting
-> blk_set_default_limits.
+> Add a new queue_limits_{start,commit}_update pair of functions that
+> allows taking an atomic snapshot of queue limits, update it, and
+> commit it if it passes validity checking.  Also use the low-level
+> validation helper to implement blk_set_default_limits instead of
+> duplicating the initialization.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/blk-settings.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index f16d3fec6658e5..1cae2db41490d2 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -65,13 +65,16 @@ void blk_set_default_limits(struct queue_limits *lim)
->   * blk_set_stacking_limits - set default limits for stacking devices
->   * @lim:  the queue_limits structure to reset
->   *
-> - * Description:
-> - *   Returns a queue_limit struct to its default state. Should be used
-> - *   by stacking drivers like DM that have no internal limits.
-> + * Prepare queue limits for applying limits from underlying devices using
-> + * blk_stack_limits().
->   */
->  void blk_set_stacking_limits(struct queue_limits *lim)
->  {
-> -	blk_set_default_limits(lim);
-> +	memset(lim, 0, sizeof(*lim));
-> +	lim->logical_block_size = lim->physical_block_size = lim->io_min = 512;
-> +	lim->discard_granularity = 512;
+>  block/blk-core.c       |   1 +
+>  block/blk-settings.c   | 228 ++++++++++++++++++++++++++++++++++-------
+>  block/blk.h            |   4 +-
+>  include/linux/blkdev.h |  23 +++++
+>  4 files changed, 218 insertions(+), 38 deletions(-)
 
-Super minor nit: SECTOR_SIZE would be nice here.
+[...]
 
-> +	lim->dma_alignment = 511;
-> +	lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
->  
->  	/* Inherit limits from component devices */
->  	lim->max_segments = USHRT_MAX;
+> +	/*
+> +	 * Random default for the maximum number of sectors.  Driver should not
+
+s/sectors/segments ?
+
+> +	 * rely on this and set their own.
+> +	 */
+> +	if (!lim->max_segments)
+> +		lim->max_segments = BLK_MAX_SEGMENTS;
+
+Other than the above, looks OK to me.
 
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
