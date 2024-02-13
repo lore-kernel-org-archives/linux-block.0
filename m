@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAC818026;
-	Tue, 13 Feb 2024 07:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D2C17574;
+	Tue, 13 Feb 2024 07:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707809691; cv=none; b=HCPV1LXLUVXYx/r77vUJKtGd7YhO9Mc9bNbwBt7g8Yfnfb9ajFRtrxs2BAsBPvX7wrTS66zhOektkGgfUGNtjnwT2XcL6XBizdTAYsXa1grvBngu1nmVD3hALjmO7iHQ8DFkohpUAXR5dB3qDhJtD2O8ZChYSbIyljJ8CWaq4TU=
+	t=1707809699; cv=none; b=DroobdQd0fZ8CJ6VloO+9jf0+YqPdSLC3p7V/xgyRJHNQdqXbvC6n+2z1qJ0Yu1oaJy5A4Uv6hRvQ828Rl7QowNkic4giwwB/GVNxdJYOTh1bC6t+wHTYnn5uTNAsqYZbF98OcDKBzr3nq3ucA8hD+b/W74WlA+9b4T7/Evh6gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707809691; c=relaxed/simple;
-	bh=eO2PLTqZJFLMgRmRGZ2al0YjEjClo+ry2KNvmaSM1Mk=;
+	s=arc-20240116; t=1707809699; c=relaxed/simple;
+	bh=IZV14AC9WwvOfBgvKoE5zSJC6qsCUd0KkQWOerLZHXM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Cbu1Fdeyxd6XDJGWw9X07S4OIekHwFqh16yRSlADnugId7d0uq+40X9p+/37bA2UHXewLdps+QmgqnnR2ZGa/DuEVDKZaSMlZnKKCW9gqiidJRVYbLjwztWsxxHwflXfB51CPzyb7TNluUBdCeTIUZWD+6CzXC7oKpO71y//Cvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=2+/K7Gl8; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=N2D8t1iVOI1IfuUox8hXjzUwqqjp138GXp1+nCaBu25FD6zkfo1hvEfXtCIdBep8qAB65F0rysFf7AtI7DSpKGbGjl7xNaQk0fzPHWqr8v7bGGiVTkeJQEXmxFPCCbjl0+G5ABv49fQLr5Buuk0NKcmE286muWqwAAaqcHTEdyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sBKDAHIh; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2+/K7Gl8"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sBKDAHIh"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=FdBZZfIe4Gg0+XVL+ZZDzEMtykzHbZrexnu46bVVgBY=; b=2+/K7Gl8TNw+EcDvWrHpP26CCi
-	+cDOfdaZnDEJ/4Y060uwgRsTkAoSqyv6kb6e7zwizhISrYHLo5ZIgfymBBYcb4942XEK+4ocT+8tH
-	+Q0+PFSLeJLIJ+pU6vqNUdiicgmCKteVbrU+4OsL37nfgMmRTMY3Gohq/v3G31Teo9PIZPVy8Vazk
-	DxEhGxE4F031gloukoe92dKLCLbp6fRfetYuwLzGThD4ZJeGnmvhAsj6gMJ+r5bgfW47zjGzT0oU9
-	N+NnzkHKe6MjaxiW46jjonr3mwqyxUL8ynxnf3nV+aUfWbLlbvB8Ji61XV4wya67OFZYCtyfWx9su
-	9nfjYsDQ==;
+	bh=6gmEEgchAPPO8mcnoSMt3cYSx4rpjOlnGmkpMNUkCUI=; b=sBKDAHIheJja6mqT3EZ/HQ3Xt5
+	va9K8jdDEIxPTKQj06IGRFu+sa0y/bG4kBdsXdvrmV/+DIh+tjpgLrHqFxL0s/NNsmeC34ri3450C
+	BrD65ahbd2VQptODQiUSbsTMK0aIjclLp8vZ4TikONGtQy84E2CbQG7P39q/SnyiP+bCZSjFuI2xi
+	B/QncuC0nu5oc4Wlv97MYABYIWTorMWHgTu8zidbbsD9l5dBvr+j3m9MW3ZG4toeR+YEboovXQcKo
+	ghqc9rgwnNq7I55eRqfxAzdjNFi9Q3eF3u9LjgYrxzvfif43WSTCj8AZ2WubltOutPueS0XM1r+CQ
+	rv1yiSLg==;
 Received: from [2001:4bb8:190:6eab:b680:8f97:4b38:866d] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rZnJW-00000008G8Q-0tDm;
-	Tue, 13 Feb 2024 07:34:47 +0000
+	id 1rZnJc-00000008GAm-1TaA;
+	Tue, 13 Feb 2024 07:34:53 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -44,12 +44,10 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	virtualization@lists.linux.dev,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Ming Lei <ming.lei@redhat.com>,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 02/15] block: refactor disk_update_readahead
-Date: Tue, 13 Feb 2024 08:34:12 +0100
-Message-Id: <20240213073425.1621680-3-hch@lst.de>
+Subject: [PATCH 03/15] block: decouple blk_set_stacking_limits from blk_set_default_limits
+Date: Tue, 13 Feb 2024 08:34:13 +0100
+Message-Id: <20240213073425.1621680-4-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240213073425.1621680-1-hch@lst.de>
 References: <20240213073425.1621680-1-hch@lst.de>
@@ -62,59 +60,44 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Factor out a blk_apply_bdi_limits limits helper that can be used with
-an explicit queue_limits argument, which will be useful later.
+blk_set_stacking_limits uses very little from blk_set_default_limits.
+Open code these initializations in preparation for rewriting
+blk_set_default_limits.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- block/blk-settings.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ block/blk-settings.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 06ea91e51b8b2e..f16d3fec6658e5 100644
+index f16d3fec6658e5..24042f6b33d54e 100644
 --- a/block/blk-settings.c
 +++ b/block/blk-settings.c
-@@ -85,6 +85,17 @@ void blk_set_stacking_limits(struct queue_limits *lim)
- }
- EXPORT_SYMBOL(blk_set_stacking_limits);
- 
-+static void blk_apply_bdi_limits(struct backing_dev_info *bdi,
-+		struct queue_limits *lim)
-+{
-+	/*
-+	 * For read-ahead of large files to be effective, we need to read ahead
-+	 * at least twice the optimal I/O size.
-+	 */
-+	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
-+	bdi->io_pages = lim->max_sectors >> PAGE_SECTORS_SHIFT;
-+}
-+
- /**
-  * blk_queue_bounce_limit - set bounce buffer limit for queue
-  * @q: the request queue for the device
-@@ -393,15 +404,7 @@ EXPORT_SYMBOL(blk_queue_alignment_offset);
- 
- void disk_update_readahead(struct gendisk *disk)
+@@ -65,13 +65,18 @@ void blk_set_default_limits(struct queue_limits *lim)
+  * blk_set_stacking_limits - set default limits for stacking devices
+  * @lim:  the queue_limits structure to reset
+  *
+- * Description:
+- *   Returns a queue_limit struct to its default state. Should be used
+- *   by stacking drivers like DM that have no internal limits.
++ * Prepare queue limits for applying limits from underlying devices using
++ * blk_stack_limits().
+  */
+ void blk_set_stacking_limits(struct queue_limits *lim)
  {
--	struct request_queue *q = disk->queue;
--
--	/*
--	 * For read-ahead of large files to be effective, we need to read ahead
--	 * at least twice the optimal I/O size.
--	 */
--	disk->bdi->ra_pages =
--		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
--	disk->bdi->io_pages = queue_max_sectors(q) >> (PAGE_SHIFT - 9);
-+	blk_apply_bdi_limits(disk->bdi, &disk->queue->limits);
- }
- EXPORT_SYMBOL_GPL(disk_update_readahead);
+-	blk_set_default_limits(lim);
++	memset(lim, 0, sizeof(*lim));
++	lim->logical_block_size = SECTOR_SIZE;
++	lim->physical_block_size = SECTOR_SIZE;
++	lim->io_min = SECTOR_SIZE;
++	lim->discard_granularity = SECTOR_SIZE;
++	lim->dma_alignment = SECTOR_SIZE - 1;
++	lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
  
+ 	/* Inherit limits from component devices */
+ 	lim->max_segments = USHRT_MAX;
 -- 
 2.39.2
 
