@@ -1,34 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186751775F;
-	Tue, 13 Feb 2024 07:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363C91799B;
+	Tue, 13 Feb 2024 07:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707809686; cv=none; b=cJgt706pLvhObOit6GS/BMyOFy86Kz+y1AFcR4LlhKASauzY5Zr7+15SEDrYOy4BaQc0grkJ0yrrA1alHQmY0aMPV50xbL2CdhsgLGEbUfzt/UBJWnskfBiPSMLWxSOI2H2t7E4M7HJaMq0zRFyhcI+bNb9vi6EB31pnDSdHlpY=
+	t=1707809688; cv=none; b=I82CwjRrDtVfjzzKjtgj5Cuw+bYVgIFMM6FE17sGCrC+S2b9HijRzyU7axF+pk7w3bGl0iOwRYpVijgUbGbptc11NgbwZ8eNOURXywIRZNmnfC2I+b/AJWsQ8CtQvSzywVarFN/YclC2qRAEJNd87j36LAdiUDvNe6TcwAk8cLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707809686; c=relaxed/simple;
-	bh=GosNS6bS0QqmkIDibxBb2m45k6G2AKCuc1R4Bfk6WD8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ETXFZyaWSj/DIUxh7at33iPjxGZ4d4v8vcMjJ25TVz8g2blxrcCsQJvcIurOlRKZOHE27QYHlXKUqWEPaVcoElBXPawhy33QNzJqsvjIjrKX/Nn3ak+0mzqAzbonRwlm4BgJ3ezO9c6ahWasC/WsctyB5xJzAGA5L4zzgtjBlto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=v/lsW1my; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1707809688; c=relaxed/simple;
+	bh=hBoJNGEEHIzaeJWLOssrOaGf/w4bHc/POjOcrEfqOE0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=UKG4TnalR00eHwQOYEpWsJJo9RiD//EPa65kL+7a4LApPNrXtwka5C8qEw7dNcCqeUetZueD5h9u1G0xxDNyoYHp3U2FxaF592CGvcLKJBxwUCOFGK3TfByRnPYIjO03lT7+4Au6okm3dd/sYZ6FAPOLYrlUe6a5c9YeQ6yHjDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MwfmVKO+; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="v/lsW1my"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MwfmVKO+"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=+iEKU64k/Wy9pGmHH/amHKNHnYWdcEjBLzza3jjQ5fI=; b=v/lsW1myAkxkKfuQ0vKxPP5hRG
-	aOzFyL09xxfKI0vUm5b5NmDZya6iqMd/ZDojJR+RWMGjz/fU2uxqEHki+ljHllSY9SfFaUwSqIj7+
-	JXgQiEEMgFVPZd8VD4UOdMO7R+L9i+7IrIxxqLtPqOn+uvd5vGENAyjLaylPVXN9IAxMHgtseNMrL
-	rSUQtQMR0eAQeEmokRhOu/7+v/TjaDRTYW0oPwy3V4mqhxL2ajCdLEbwvKQDJnRrzu1H1+BPWa3KB
-	gpwLGEoB1xFKShcHn+gNcuWjGcDoK0/P0FUGCjaxqOdju2DRtJDYYIBWa+9CaemK3tqGDITAwWizn
-	PPl3AWTw==;
+	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=H9Wj+b7KsDjx1VPGQrIpkrbMrDtHeaNDVuqUScfk9Zc=; b=MwfmVKO+6Qg8pjdqQsgha3yp+9
+	rAMFi4/5JYqm1hrAC+e4sWoWc2u0G4rV9gq12YcxIX/9vOQDSdQLQpVNvoI5nmHNRMIGD2y2OmxtU
+	Ds+VHGHuI1R8qw7+z9sVr0L0ISFOZ9TQizrBePwUC55UrS1Ng3NUyDDw4PjgubO0edgs+LgD9USVO
+	hj0RPo3yxfV0t/hB7P9LswSEPw6AZNlQjJZbMW0LVCmSV6uKq+4UYjJecna+XwUt63BWuOhwmS70g
+	a+34iwdhFH61bqPo4hF3iccr/brxOL8dai5ga4W2tb3vBywV+NCqyvAkqHrxstnMJzZD+qemwY6z6
+	m9inCPrA==;
 Received: from [2001:4bb8:190:6eab:b680:8f97:4b38:866d] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rZnJO-00000008G7g-07Zh;
-	Tue, 13 Feb 2024 07:34:38 +0000
+	id 1rZnJR-00000008G7n-2UV5;
+	Tue, 13 Feb 2024 07:34:42 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -42,11 +43,16 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
-	virtualization@lists.linux.dev
-Subject: atomic queue limits updates v5
-Date: Tue, 13 Feb 2024 08:34:10 +0100
-Message-Id: <20240213073425.1621680-1-hch@lst.de>
+	virtualization@lists.linux.dev,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 01/15] block: move max_{open,active}_zones to struct queue_limits
+Date: Tue, 13 Feb 2024 08:34:11 +0100
+Message-Id: <20240213073425.1621680-2-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240213073425.1621680-1-hch@lst.de>
+References: <20240213073425.1621680-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,93 +62,71 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi Jens,
+The maximum number of open and active zones is a limit on the queue
+and should be places there so that we can including it in the upcoming
+queue limits batch update API.
 
-currently queue limits updates are a mess in that they are updated one
-limit at a time, which makes both cross-checking them against other
-limits hard, and also makes it hard to provide atomicy.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ include/linux/blkdev.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-This series tries to change this by updating the whole set of queue
-limits atomically.   This in done in two ways:
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 0058783a4c4351..251a11d2d2aeff 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -190,8 +190,6 @@ struct gendisk {
+ 	 * blk_mq_unfreeze_queue().
+ 	 */
+ 	unsigned int		nr_zones;
+-	unsigned int		max_open_zones;
+-	unsigned int		max_active_zones;
+ 	unsigned long		*conv_zones_bitmap;
+ 	unsigned long		*seq_zones_wlock;
+ #endif /* CONFIG_BLK_DEV_ZONED */
+@@ -308,6 +306,8 @@ struct queue_limits {
+ 	unsigned char		discard_misaligned;
+ 	unsigned char		raid_partial_stripes_expensive;
+ 	bool			zoned;
++	unsigned int		max_open_zones;
++	unsigned int		max_active_zones;
+ 
+ 	/*
+ 	 * Drivers that set dma_alignment to less than 511 must be prepared to
+@@ -640,23 +640,23 @@ static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
+ static inline void disk_set_max_open_zones(struct gendisk *disk,
+ 		unsigned int max_open_zones)
+ {
+-	disk->max_open_zones = max_open_zones;
++	disk->queue->limits.max_open_zones = max_open_zones;
+ }
+ 
+ static inline void disk_set_max_active_zones(struct gendisk *disk,
+ 		unsigned int max_active_zones)
+ {
+-	disk->max_active_zones = max_active_zones;
++	disk->queue->limits.max_active_zones = max_active_zones;
+ }
+ 
+ static inline unsigned int bdev_max_open_zones(struct block_device *bdev)
+ {
+-	return bdev->bd_disk->max_open_zones;
++	return bdev->bd_disk->queue->limits.max_open_zones;
+ }
+ 
+ static inline unsigned int bdev_max_active_zones(struct block_device *bdev)
+ {
+-	return bdev->bd_disk->max_active_zones;
++	return bdev->bd_disk->queue->limits.max_active_zones;
+ }
+ 
+ #else /* CONFIG_BLK_DEV_ZONED */
+-- 
+2.39.2
 
- - for the initial setup the queue_limits structure is simply passed to
-   the queue/disk allocation helpers and applies there after validation.
- - for the (relatively few) cases that update limits at runtime a pair
-   of helpers to take a snapshot of the current limits and to commit it
-   after picking up the callers changes are provided.
-
-As the series is big enough it only converts two drivers - virtio_blk as
-a heavily used driver in virtualized setups, and loop as one that actually
-does runtime updates while being fairly simple.  I plan to update most
-drivers for this merge window, although SCSI will probably have to wait
-for the next one given that it will need extensive API changes in the
-LLDD and ULD interfaces.
-
-Chances since v4:
- - fix a newly added bisection hazard
- - fix a comment
- - moar SECTOR_SIZE
-
-Chances since v3:
- - fix a max_user_discard_sectors bisection hazard
- - fix the max_user_discard_sectors initialization for the new API.
-   This led to some major refactoring, so there is a new patch and
-   I've dropped the reviews for two existing ones that have major
-   modifications
-
-Chances since v2:
- - fix the physical block size default
- - use PAGE_SECTORS_SHIFT more 
-
-Chances since v1:
- - remove a spurious NULL return in blk_alloc_queue
- - keep the existing max_discard_sectors == 0 behavior
- - drop the patch nvme discard limit update hack - it will go into
-   the series updating nvme instead
- - drop a chunk_sector check
- - use PAGE_SECTORS in a few places
- - document the checks and defaults in blk_validate_limits
- - various spelling fixes
-
-Diffstat:
- arch/um/drivers/ubd_kern.c          |    2 
- block/blk-core.c                    |   27 ++-
- block/blk-mq.c                      |   27 +--
- block/blk-settings.c                |  276 +++++++++++++++++++++++++++------
- block/blk-sysfs.c                   |   59 +++----
- block/blk.h                         |    4 
- block/bsg-lib.c                     |    2 
- block/genhd.c                       |    5 
- drivers/block/amiflop.c             |    2 
- drivers/block/aoe/aoeblk.c          |    2 
- drivers/block/ataflop.c             |    2 
- drivers/block/floppy.c              |    2 
- drivers/block/loop.c                |   75 ++++-----
- drivers/block/mtip32xx/mtip32xx.c   |    2 
- drivers/block/nbd.c                 |    2 
- drivers/block/null_blk/main.c       |    2 
- drivers/block/ps3disk.c             |    2 
- drivers/block/rbd.c                 |    2 
- drivers/block/rnbd/rnbd-clt.c       |    2 
- drivers/block/sunvdc.c              |    2 
- drivers/block/swim.c                |    2 
- drivers/block/swim3.c               |    2 
- drivers/block/ublk_drv.c            |    2 
- drivers/block/virtio_blk.c          |  299 ++++++++++++++++++------------------
- drivers/block/xen-blkfront.c        |    2 
- drivers/block/z2ram.c               |    2 
- drivers/cdrom/gdrom.c               |    2 
- drivers/memstick/core/ms_block.c    |    2 
- drivers/memstick/core/mspro_block.c |    2 
- drivers/mmc/core/queue.c            |    2 
- drivers/mtd/mtd_blkdevs.c           |    2 
- drivers/mtd/ubi/block.c             |    2 
- drivers/nvme/host/apple.c           |    2 
- drivers/nvme/host/core.c            |    8 
- drivers/s390/block/dasd_genhd.c     |    2 
- drivers/s390/block/scm_blk.c        |    2 
- drivers/scsi/scsi_scan.c            |    2 
- drivers/ufs/core/ufshcd.c           |    2 
- include/linux/blk-mq.h              |   10 -
- include/linux/blkdev.h              |   36 +++-
- 40 files changed, 547 insertions(+), 337 deletions(-)
