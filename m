@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816A118633
-	for <linux-block@vger.kernel.org>; Wed, 14 Feb 2024 11:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3581D1946C
+	for <linux-block@vger.kernel.org>; Wed, 14 Feb 2024 11:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707910015; cv=none; b=CIf96Fc/Clso7H1QHpX2vELtiuS5b7qQwwn4QETIW98bMmtbquisU/Uc7qyaRNm20yAuyPuH8eNVFrB98lvqhGDEk7nGnhnsqCuZ16z3dInq35iW/vhkt+w51KlhCiDnGxegEGTSfijrMPXzqzLuTSv16xHwOKQ5AhYjwpk9Xes=
+	t=1707910177; cv=none; b=eWbGKN20fW4iVDbU1J7P1znob0TEJWiv+pVfMCGi3EALFMgnQKg2QkxqdAB+u9u4ODwanzRrpm+3IHkRGz2mG0MMU8CeefISn4Ij2JV0uWlZ3S0RG1BsW6dNTHggO50FhNRLMHtvE3OLGib0QwRlRyA4vamH+LFX4oSDIZiJJ/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707910015; c=relaxed/simple;
-	bh=FGqSmwr/xZzdEidc2ugLvnSPrmPEarKodxHQZ8fpABE=;
+	s=arc-20240116; t=1707910177; c=relaxed/simple;
+	bh=qorJ2faBobJZxD7xFFq7reEJL0r1JNE7FwfezvL3u/Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TXa7W3lt1Ic1xzG4QLdS5pYePGTX+wMDv9LpUdb51HywAnw2qKnJTpqYiNMal+dcNfU3ebaJfzyren6cwjIe/5cXyD5gC5JZK+cg064Q+gIQbrKqTTPYveQz8xdIg0ElqBjBOghg1+vZc1Kn4ZcFwQQ6sxm4LfEC6Q+ad/h+/6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1lLxxB9; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=ezqcR45IfvV1VzhWxObWLYH8CzYntRiA96thUip4fze9FA+9a+O7VOVuhXvdz/n6U9rsBN+4rVumsMKkjfccA2IMBrn4n2zd0mvjR1WXGgbdJLuC1s+muGvRskUL9Vs8R0m5k/NWSM/5siTkyGnVHGZbz+6Qvwoc3sVw/8o4EnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jB8K+yMa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1lLxxB9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40523C433F1;
-	Wed, 14 Feb 2024 11:26:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jB8K+yMa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B882CC433F1;
+	Wed, 14 Feb 2024 11:29:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707910014;
-	bh=FGqSmwr/xZzdEidc2ugLvnSPrmPEarKodxHQZ8fpABE=;
+	s=k20201202; t=1707910176;
+	bh=qorJ2faBobJZxD7xFFq7reEJL0r1JNE7FwfezvL3u/Q=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=b1lLxxB9vamVA6gHTebJouTzxF+ClIafOd63TbEJyjsOTfN3SqZ/11RrqdR0B/ndB
-	 fJmtMzppaDSeQY6Ce1P+nYsqa81IDnejzFCG5PAihE+Bg/lwLe7+b1hJYUYLWH1+y3
-	 SQfUNbEecvvklhntaTKqa4RPgBvgwSCLJpilYciQNWxPFaaMcD7lEa5ZHwvgboxwAo
-	 GopCesDFAghXZc4umDm50yjRQ9mp39sYr5eASE/lR4KtFGaADMcI9eUj+/hA5Gr6JV
-	 T4gkY0o8kwqxAkqEMJqy+Jj+6hhg3jtMYSevU/qMrycRvDB7ubchHDJLuQE67jluGJ
-	 tXTZ7JP9SnYEA==
-Message-ID: <f600ea47-4a98-41f8-84bb-1689377d49e5@kernel.org>
-Date: Wed, 14 Feb 2024 20:26:53 +0900
+	b=jB8K+yMa5h3v2DC/stZZdIsv5DtNjLFrZj/r7lF5X7yz3ILIeuoCTgXMvs+AyF4nk
+	 vxIIJ7OD2VvMyeQWmgrJbxTHeiV60+O+QI6DZnMi+aYWT/atRJbe7NSiVcIoWXxaux
+	 xP96ACQ4PYjw4hTB/2VE+elqAC4mROsI3XfbFhHfBpzI656fkSa/k3HlzaoRF4q1mT
+	 Ejyobt2QMXdg1Z78ENpIHiAQ7G1sqVdF5xW3k7iGrZddtX5VSoUD8iEuld5N9USXkI
+	 ksYSoC10k0v6VFdWdk7K8W0+tGIuInDGUSVuj6wYloDly7pE33dgU70Z5rc4qwkEMJ
+	 U94ZHieI8CTZA==
+Message-ID: <ded648ac-6747-4226-a0f3-8de4c1a67792@kernel.org>
+Date: Wed, 14 Feb 2024 20:29:34 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,22 +35,22 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] null_blk: initialize the tag_set timeout in
- null_init_tag_set
+Subject: Re: [PATCH 3/5] null_blk: refactor tag_set setup
 Content-Language: en-US
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
 References: <20240214095501.1883819-1-hch@lst.de>
- <20240214095501.1883819-3-hch@lst.de>
+ <20240214095501.1883819-4-hch@lst.de>
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20240214095501.1883819-3-hch@lst.de>
+In-Reply-To: <20240214095501.1883819-4-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2/14/24 18:54, Christoph Hellwig wrote:
-> Otherwise it will be reset to the always same value when initializing a
-> device using the shared tag_set.
+> Move the tagset initialization out of null_add_dev into a new
+> null_setup_tagset helper, and move the shared vs local differences
+> out of null_init_tag_set into the callers.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
