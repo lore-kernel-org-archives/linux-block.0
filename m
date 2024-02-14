@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB091B7F8
-	for <linux-block@vger.kernel.org>; Wed, 14 Feb 2024 11:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558F41CA86
+	for <linux-block@vger.kernel.org>; Wed, 14 Feb 2024 11:32:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707910239; cv=none; b=FycpLhL9Eczc9VtH6KoZpARXdzLj1MjRZbXp8gZ2V/dTANiGT0X+YwHFlYWUhQLMDVz5zUl6b4dX+zkSzRwBUBtonQZ4mvvMQVKT3MeESKtHR1alzI6zUT+GAbnlLss7ZBkZotCPUas6HD7tACxTfh32gf3zpFzSHTCTgFNU+kI=
+	t=1707910370; cv=none; b=oEVZme/AR2/8TvRSSaBNzlBRH6VRAf45SuAg8ajADGFgMOsU5JujcBe9nKmTlEkTfA2QsY+jcxZ2TVABMN0aDfiOvK5w3YS3r8vW7pta1yp/t+1/aLspobNyXBr7Vg7DytWsVXFzTgotAVae4HlDIv0AFxKf/LIPwmeMYt+v1DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707910239; c=relaxed/simple;
-	bh=t3ID9M/oqfQ0gNRgQNobZ++m8H/v2qL3qQ398BbktkU=;
+	s=arc-20240116; t=1707910370; c=relaxed/simple;
+	bh=hW5I/Ir+d46s9Ohf6XOV2MX7kI5E51Zbh3Rykkfl+pU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o1/LATl3Vvabs9ItPOCLzTVirXO2xzL94xMXDbSaIGZ+g/NYepWKs4MT/ob1Q4layKnUdxDGaFtoB0c83BknjiOPa6ehLiKoSfHE2sSZElwMzuo0TUEtSnYS9wKtfZMETWlwGI1AOpzX450d9E9EUWSMne775t4oU/9pB4Nz094=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGgM7oiW; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=a/3NFZolDv4GzvIWu2VDzV+O/RWtN5tJ0XfXImQaanKarphMlcYoWHyrXKjqR4WuuN12mq0Vmg/0Tf4dFNvrNcuIKP6cWjD6oJfe/Xb6Z8vS1JSUsPD6ou/D3XOvsl/ODCUKhz8Buf58hQyUeJKAZkCNJF4cvTPlCtLDsbsVoXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rwcGMGCl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGgM7oiW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03CFEC433C7;
-	Wed, 14 Feb 2024 11:30:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rwcGMGCl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 784F6C433F1;
+	Wed, 14 Feb 2024 11:32:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707910238;
-	bh=t3ID9M/oqfQ0gNRgQNobZ++m8H/v2qL3qQ398BbktkU=;
+	s=k20201202; t=1707910370;
+	bh=hW5I/Ir+d46s9Ohf6XOV2MX7kI5E51Zbh3Rykkfl+pU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EGgM7oiWdF2lErwqVlRZrawy9DiKVomkHtepIo1wKKM3Xm2foupkJceOKCvTDXUXE
-	 tUfeC0mQJyE7RWFifO26yveBic6z1XsnrbyWUf57Djrsy9B1vbdgbNIQb+e2PqWciQ
-	 V2khSjKWq1BubetAbYnuGp8hGthxLEDXP5KT+xxa3Gno8q2l1euf4enm0Nmx21Y7AP
-	 XXMQXMwVh7ZJKNxeeT9L9Ajm6KjqHQEmp1Vastznfm+REEPwIkrWx/Ej37orTt9KjE
-	 jw90z14HEIfidiwcjD8IDJt/pLkjsvicZ27Eql+mSENkQ2Pa6VXoy7JSp9N8uB+N/H
-	 F1eWB9yg9aPTw==
-Message-ID: <764c5522-6fe2-471f-aaa5-3dc43793b3d0@kernel.org>
-Date: Wed, 14 Feb 2024 20:30:37 +0900
+	b=rwcGMGClMbRgGbLkOY5WBcOMDJ/UuHBXdU9GQl31W9HF9pgg4EeJb6fmu/usE7NAx
+	 T9W3QL4iPIvPkQjMbgcxs+yomMhzy4cJbyezuPLTRInF/v3n3ZA9S1epgQ+wksbErq
+	 XqQw3yuvuqkZJzUtb5qvAKsTsYoj0qcCFimL678kOb6kl5IW1p3ugwAWp7ioV/SFyc
+	 52jqB3wKMXefTvn5IT5qf8jb+Or1OsLqnOm4njqzH9NxMigXeF3xkUMgfQ8LiRub9C
+	 sZGUjhQ0xAo1Aq9h+fuszfpfEHY+jJbCfBEtD6Kh61FSPGvTSMf6wFVo22szrRSp2Q
+	 /ZD3JxBxiLe5w==
+Message-ID: <3156a69e-796d-4513-950e-963cb54647ab@kernel.org>
+Date: Wed, 14 Feb 2024 20:32:47 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,22 +35,21 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] null_blk: remove null_gendisk_register
+Subject: Re: [PATCH 5/5] null_blk: pass queue_limits to blk_mq_alloc_disk
 Content-Language: en-US
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
 References: <20240214095501.1883819-1-hch@lst.de>
- <20240214095501.1883819-5-hch@lst.de>
+ <20240214095501.1883819-6-hch@lst.de>
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20240214095501.1883819-5-hch@lst.de>
+In-Reply-To: <20240214095501.1883819-6-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2/14/24 18:55, Christoph Hellwig wrote:
-> null_gendisk_register isn't a very useful abstraction given that it
-> doesn't even allocate the gendisk.  Merge it into the only caller
-> instead.
+> Pass the queue limits directly to blk_mq_alloc_disk instead of
+> setting them one at a time.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
