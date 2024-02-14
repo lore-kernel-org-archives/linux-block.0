@@ -1,86 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5324113F003
-	for <linux-block@vger.kernel.org>; Wed, 14 Feb 2024 23:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D318B1419A2
+	for <linux-block@vger.kernel.org>; Wed, 14 Feb 2024 23:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707952581; cv=none; b=Z+YPhzrCslV3ZpMqniXWZ0pHKk5yDDjcOohBCLj5Tus+pSVJCz7UFrauZhQtgOAIjhNE8tJPBeAVMyM3TkF/FT9spBMylDdvzp8/6HeN/Z6zdSLmJFp8pTprRWMXqO2h21uQYo0rWeYjw1A1904S1ZdjzylM23a988xxkpvzcUg=
+	t=1707953664; cv=none; b=U5qBkpSasi4gSVsB6/ocNnnJBN/tPnEuGefQgN5h/r6cWfFuUeRnDJqv2nWeI/B5UZ61BRJSOTTUVUyxE+QeTH3JbxL7zb8T3+RYlhe1a/06TTRY4qO74cZ77IOXrw3xMGy5YkF9TRFgHoP15JQ8eLVjkobwdAWDYsd56jnMMyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707952581; c=relaxed/simple;
-	bh=WLPjJ8QmGm2nLRNm1y8f/NBBqzZnlfSv+jM1qew4lMk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jTR9BXbDCMEJztFkmZ6+73W4J5XKJjkKaCIbrfolu8CFB4tR9TTl5qkd8WPd3Xk5JmJQsrb83rBWB5pgtnWRvozdnCs9X6baetuJNbzVPIjjRDZXbjbZuKn2M1V2UFlsfFq965WIsrSrZ5Van09UXcKAEAbYGZNmxOso42C9KuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvaa4pdh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707953664; c=relaxed/simple;
+	bh=6WlYbn1JOD2gdhAfQFtFraEP74/usBDF/FoLj79EgJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VYW2B1P7kNSgP+UdmI22C7uso6KmaXzMKc1BaiNHNuj+r56MdmV5rLzDERfB3E102YwrcgHVdlhYxLWK756B5NSgD0oGjrYTqYK3MACP55lGHgCM07kyzAon8ikhvWKSsib0Zq2YmH5fKlfFxVVIx4xjkDxHMnm/QL2Qu8mfWAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnxbsKqg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvaa4pdh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52000C433C7;
-	Wed, 14 Feb 2024 23:16:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnxbsKqg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 099DDC433C7;
+	Wed, 14 Feb 2024 23:34:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707952580;
-	bh=WLPjJ8QmGm2nLRNm1y8f/NBBqzZnlfSv+jM1qew4lMk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uvaa4pdheiB12+E8EVUEu0UHyIeWpoWLm5sKXv9UOCAcURRWUYj0SOKRI5gcRIoDS
-	 KIAIIp000KYOCVh5iU4AliRnXgjrZ4XGF2KB3l4KlY4B2bjh26yVP6JLu9hXDLOYTB
-	 ZLtjWA1tX8H5oaFAxPuExF9LumSE3Xdn+9Zxg598k2RPYH1k/ouuEpBNsh5WyLoW//
-	 gWBhfCXJmwGNiSNpqHNjvgW7bfQNnFnVJ5RqJVcvkiuCvJqOuCjSbugsHZaWEsIT/J
-	 0mbzj+ctpSAM/DDpjt7dkIOJrI/J34AJ5qZ+BFPdQVbTfY87+MP+tku7/JvjeAYNNq
-	 Ib4WRniiUJicg==
-Message-ID: <0a5497e2-87f1-481a-9948-bd9e68b3bb79@kernel.org>
-Date: Thu, 15 Feb 2024 08:16:19 +0900
+	s=k20201202; t=1707953664;
+	bh=6WlYbn1JOD2gdhAfQFtFraEP74/usBDF/FoLj79EgJA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SnxbsKqgR3UWJmQ+J83h8YHr4LMVGG3HFNAa6bjzHSgKtwjT7GpZ/oHCqn7Q2JoI6
+	 uQid/8uiLnuyInKQvY/1V52iTHq20T6r6+gguMBu369R09ilrVeGvz9pVP8BykfLQ8
+	 NC+gFBQaiAjo9DekH01gVc7+iS0KhBy7RW0ZWJpJuJt0QQy3z4zEJrrDPwfBVCC1GE
+	 TRgacDscVJYJ9hmJdfRmgdVpjEa3zc74eSmLWgrw3PssQYU8HzhqpykTDz7pjd06w5
+	 +1UMyOKRtb+/5QU/r18Lklte6hx1WEopFNsxR57cOvmqImnpfXnZYFJoYWNVxqOEFJ
+	 d2/bRRdD1mnCw==
+Date: Wed, 14 Feb 2024 16:34:21 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/5] null_blk: remove the bio based I/O path
+Message-ID: <Zc1N_fjAozmbD7-_@kbusch-mbp>
+References: <20240214095501.1883819-1-hch@lst.de>
+ <20240214095501.1883819-2-hch@lst.de>
+ <Zcz3pd3A09dJScHH@kbusch-mbp>
+ <0a5497e2-87f1-481a-9948-bd9e68b3bb79@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] null_blk: remove the bio based I/O path
-Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20240214095501.1883819-1-hch@lst.de>
- <20240214095501.1883819-2-hch@lst.de> <Zcz3pd3A09dJScHH@kbusch-mbp>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <Zcz3pd3A09dJScHH@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0a5497e2-87f1-481a-9948-bd9e68b3bb79@kernel.org>
 
-On 2/15/24 02:25, Keith Busch wrote:
-> On Wed, Feb 14, 2024 at 10:54:57AM +0100, Christoph Hellwig wrote:
->> @@ -2036,11 +1813,15 @@ static int null_validate_conf(struct nullb_device *dev)
->>  		pr_err("legacy IO path is no longer available\n");
->>  		return -EINVAL;
->>  	}
->> +	if (dev->queue_mode == NULL_Q_BIO) {
->> +		pr_err("BIO-based IO path is no longer available, using blk-mq instead.\n");
->> +		dev->queue_mode = NULL_Q_MQ;
->> +	}
+On Thu, Feb 15, 2024 at 08:16:19AM +0900, Damien Le Moal wrote:
+> On 2/15/24 02:25, Keith Busch wrote:
+> > On Wed, Feb 14, 2024 at 10:54:57AM +0100, Christoph Hellwig wrote:
+> >> @@ -2036,11 +1813,15 @@ static int null_validate_conf(struct nullb_device *dev)
+> >>  		pr_err("legacy IO path is no longer available\n");
+> >>  		return -EINVAL;
+> >>  	}
+> >> +	if (dev->queue_mode == NULL_Q_BIO) {
+> >> +		pr_err("BIO-based IO path is no longer available, using blk-mq instead.\n");
+> >> +		dev->queue_mode = NULL_Q_MQ;
+> >> +	}
+> > 
+> > Seems pointless to keep dev->queue_mode around if only one value is
+> > valid.
+> > 
+> > Instead of checking the param here once per device, could we do it just
+> > once for the module in null_set_queue_mode()?
 > 
-> Seems pointless to keep dev->queue_mode around if only one value is
-> valid.
-> 
-> Instead of checking the param here once per device, could we do it just
-> once for the module in null_set_queue_mode()?
+> We need the check for the configfs path as well...
 
-We need the check for the configfs path as well...
+Yeah, my snippet suggestion wasn't a fully flushed out idea. The
+configfs part would just be this:
 
-> 
-> ---
-> @@ -134,7 +134,7 @@ static int null_param_store_val(const char *str, int *val, int min, int max)
-> 
->  static int null_set_queue_mode(const char *str, const struct kernel_param *kp)
->  {
-> -	return null_param_store_val(str, &g_queue_mode, NULL_Q_BIO, NULL_Q_MQ);
-> +	return null_param_store_val(str, &g_queue_mode, NULL_Q_MQ, NULL_Q_MQ);
->  }
-> 
->  static const struct kernel_param_ops null_queue_mode_param_ops = {
-> --
-> 
+---
+@@ -401,12 +401,20 @@ static int nullb_apply_poll_queues(struct nullb_device *dev,
+        return nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
+ }
 
--- 
-Damien Le Moal
-Western Digital Research
-
++static int nullb_apply_queue_mode(struct nullb_device *dev,
++                                 unsigned int queue_mode)
++{
++	if (queue_mode != NULL_Q_MQ)
++		return -EINVAL;
++	return 0;
++}
++
+ NULLB_DEVICE_ATTR(size, ulong, NULL);
+ NULLB_DEVICE_ATTR(completion_nsec, ulong, NULL);
+ NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
+ NULLB_DEVICE_ATTR(poll_queues, uint, nullb_apply_poll_queues);
+ NULLB_DEVICE_ATTR(home_node, uint, NULL);
+-NULLB_DEVICE_ATTR(queue_mode, uint, NULL);
++NULLB_DEVICE_ATTR(queue_mode, uint, nullb_apply_queue_mode);
+ NULLB_DEVICE_ATTR(blocksize, uint, NULL);
+ NULLB_DEVICE_ATTR(max_sectors, uint, NULL);
+ NULLB_DEVICE_ATTR(irqmode, uint, NULL);
+--
