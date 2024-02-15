@@ -1,104 +1,189 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7A0137C5A
-	for <linux-block@vger.kernel.org>; Thu, 15 Feb 2024 16:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF25E1384AB
+	for <linux-block@vger.kernel.org>; Thu, 15 Feb 2024 16:54:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708016062; cv=none; b=ixITD0vfQyDaDrRqiExDhNBFahKrq9chsDVN6BtPfmaP1E6ga9fplakqIKJd3fiaIzOJKrBbKn2aKIfGuhawV7iL2PdY/6k8hsUT5T3ihWKCTTQiED8FtfBv0lSW/xFSsZ3QR+YHiILBlF0DlIytvzkHcR7l3HqizVpB5IFkjBg=
+	t=1708016067; cv=none; b=olZLiq+KMLNM4zWMWg3mp5sXC+CUopMmkUcKtSQTqJEQnv5l28xw75BIpWge93BHYyNGuqbjIsrQYrKAPZYSS0/e9whyK9byKZkxebrhd3aLLepv0C62SoTKk6C2MDZZd1f+vQQutRcbwCkFVLrQLBlpMD3Aa03UBqKX0AqfjhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708016062; c=relaxed/simple;
-	bh=Qz4PPFUkifJGyaRWPKT8EHaiOM/kn2UbDqOefUgZCmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UFOyJ8RVf3Ed22sm3UqoCtcFFphUOtTaUGa8FbTvwzQpO/7dS4RDln3du/3KRNGpwtqO3kYZOtp9dLkh6XgNxXzVPHGYJI45Z3kHS+mmnqXizAJY3s2NCm6LwXa3qQ/DjPwcI1RdGqyC4LNqAMJz19HeTIB5YeMah9H9nj6mScU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pre7Mcfz; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1708016067; c=relaxed/simple;
+	bh=pKmkmQYvDtH14ogUV3CxiYaijYTYsJV+1R2/gHp8mNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RpDsMiQi7YbI7ioEbYUJ/B2YfYpqkSna52NBtUgIef/hxJ0KQ3MATjX6tvs5BrLJsGYcbEiDyTVvy50ieatMvaZvkzAsuUdQVBAQhQ1pAkWKhMq81YPdXUNvENcEo6KH9zAZJmtpHxpPqT7F1S1Lh1ZZ4utUJ76hjEx08jPJ53s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O1YpcyVw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pre7Mcfz"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-607eefeea90so1845977b3.1
-        for <linux-block@vger.kernel.org>; Thu, 15 Feb 2024 08:54:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708016059; x=1708620859; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vEQiCmvhKfS0/A0znECfTzFjRTV/dZsqotvM6rEKanU=;
-        b=pre7McfzotVVLA5sRjwMy2EQnVCLSkXeRtOFWwJdhon6KseboIF957xeL8jvjEQbuC
-         83P48RFGgvSLKtcvW8Faxk/3+hpwiNc2E26f2oM4oWWVgW3yqy3FzsPRqi8rklqZ8il5
-         sJIBJmfC476mwH3QuRT2sx6zo8YzUeqiHTOsz+EczCsA++VJX3CWBTFTNfWnLJlK49X+
-         vyfS4aEYNO5eYd4NGkBL1YEHDiCJW1LdR4RR/xaWNpFHmvQXIwH0x6bC0wB2Wnu5NgvM
-         MXu9+6r6mlPvmIBWs9oNpChgrhT0C0Xmob4klZmQRrjjNdemKJNRieQFabOeTfbbhU/v
-         yyEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708016059; x=1708620859;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vEQiCmvhKfS0/A0znECfTzFjRTV/dZsqotvM6rEKanU=;
-        b=o8CHGrQxtsNDRU2e5tYI+ipsBRB21yee2JHRUGa8Iskrm6JPSr7D1fQynD3YVl4ued
-         /EGZiUUR3fqlDElYuq2y/jxQDarveEXvsiCUDd+XQdtoBiMvvJfDmWvKEBtatGUjIk1+
-         SB2pORZCJzLoWTRXfXpPEt9zl0UlTXDcVCgSGmN9jJKqvXenplafLvc5AJ7Y8RKGSzeo
-         rIOx3Pm1tFgimivCZnCbz/0cAqVISTr1otJQ5MjvgCKcf/HzfVNSdFzzFfYnFSRqbmP6
-         Oxl5bQbciSJUvmiuHcxYramhRluQhbxOVkQX2mh0UvlGhsWRHQmDJRFYhZuvQwliNu64
-         gT4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWDh3XUjNDD4+pngawSQz48Z8uAqyxe1CJqytbGTtTo7y2+8OS0s+tCGSBmjgNx1bMLENRSNnghc149KoIaaJhVDnYv9ngsEWJYeYI=
-X-Gm-Message-State: AOJu0YxzPgw7X7yQkW396ffpeb1zODXQRImuOGJb++W1VNl3g0CYfrrX
-	3OBBXnvlB5adLluPS1KV8aPF+rC4sZv+TDg0S5FZ6tu1xMP9w3R0mrxHLFbSySd/neJuRG/Hgco
-	UiM9kr9R3fhctuSKgWHEnWUeRbQJzEj2PnKtaRA==
-X-Google-Smtp-Source: AGHT+IF28WiAUAxb9BXDQ9j656YBYmKEubg2qRwCcoIKEiRoMN+j/rX1+ioqB8yOfGTSrxa8mYZDRwHKLR7BN/dl2kA=
-X-Received: by 2002:a81:b717:0:b0:607:c65a:ba02 with SMTP id
- v23-20020a81b717000000b00607c65aba02mr1752372ywh.17.1708016059449; Thu, 15
- Feb 2024 08:54:19 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O1YpcyVw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708016064;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cy2r2DEV8jxfxwJOwctAJV9YGNcipYjA1gOnyH3MDrQ=;
+	b=O1YpcyVwamm/jamLmN/+uMUML7doBEmwPyhof2Jr8eIBChhCVc54AjIGehE08d6Shc/Fhq
+	CZlwbctqIhs4dweOiid83uNl77lV89DDAaG8N5cnHpjgcmoGsQ6LaEc/EFyrmRuvuoeBPh
+	WSDHsdlz/nvTJ5zNmDC7V+DgNSopiLM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-344-tUdq89DUOVqNVjxyF7rURg-1; Thu, 15 Feb 2024 11:54:23 -0500
+X-MC-Unique: tUdq89DUOVqNVjxyF7rURg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0826F185A782;
+	Thu, 15 Feb 2024 16:54:23 +0000 (UTC)
+Received: from bfoster (unknown [10.22.16.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CD0F2492BC6;
+	Thu, 15 Feb 2024 16:54:22 +0000 (UTC)
+Date: Thu, 15 Feb 2024 11:55:59 -0500
+From: Brian Foster <bfoster@redhat.com>
+To: Tony Asleson <tasleson@redhat.com>
+Cc: linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: kernel oops on bcachefs umount, 6.7 kernel
+Message-ID: <Zc5CH7rzhzbrLzyV@bfoster>
+References: <CAPmdA5YK_RuKpAtnfFrfcgZZReR2p1Q+A_DOMnFFrYm1QvrYnQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215070300.2200308-1-hch@lst.de> <20240215070300.2200308-18-hch@lst.de>
- <CAPDyKFqPnC9jwWnoVz+UVJJ_SGYnB4CrB8jmJOSxCnT7AYQrKg@mail.gmail.com> <20240215164942.GA19722@lst.de>
-In-Reply-To: <20240215164942.GA19722@lst.de>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 15 Feb 2024 17:53:43 +0100
-Message-ID: <CAPDyKFpSNL28sWqNMY9Y2+tP9VMd_Wabnw1hVjQ-g0RfKCUVgQ@mail.gmail.com>
-Subject: Re: [PATCH 17/17] mmc: pass queue_limits to blk_mq_alloc_disk
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Justin Sanders <justin@coraid.com>, Denis Efremov <efremov@linux.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Geoff Levand <geoff@infradead.org>, 
-	Ilya Dryomov <idryomov@gmail.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
-	Jack Wang <jinpu.wang@ionos.com>, Ming Lei <ming.lei@redhat.com>, 
-	Maxim Levitsky <maximlevitsky@gmail.com>, Alex Dubov <oakad@yahoo.com>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
-	Vineeth Vijayan <vneethv@linux.ibm.com>, linux-block@vger.kernel.org, nbd@other.debian.org, 
-	ceph-devel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPmdA5YK_RuKpAtnfFrfcgZZReR2p1Q+A_DOMnFFrYm1QvrYnQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Thu, 15 Feb 2024 at 17:49, Christoph Hellwig <hch@lst.de> wrote:
->
-> On Thu, Feb 15, 2024 at 05:40:37PM +0100, Ulf Hansson wrote:
-> > Looks like $subject patch, patch11 and patch12  have already been
-> > queued up as they are cooking linux-next. Normally I prefer to funnel
-> > these via my mmc tree, to avoid potential conflicts (mostly for mmc,
-> > where more active developments are ongoing).
->
-> None of this is in my fresh linux-next pull, which would be rather
-> surprising anyway as I've just sent them out and Jens isn't that
-> quick to merge unreviewed series :)
+cc linux-block
 
-Weird. :-)
+On Thu, Feb 01, 2024 at 03:52:56PM -0600, Tony Asleson wrote:
+> Fedora 39 with 6.7 kernel with bcachefs support
+> 
+> Steps
+> 1. I created the bcachefs (using locally compiled git repo
+> f15633cce1b79e708e9debc21c7b8772df7c7a29)
+> # bcachefs format --replicas=2 /dev/sd[bcdej]
+> 2. mounted FS and wrote some files to it
+> 3. I removed one of the virtual disk drives from the VM, (/dev/sdj)
+> while the VM was running
+> 4. I wrote some more data to bcachefs FS
+> 5. unmounted the bcachefs FS
+> 
+> Got the following oops
+> 
+> ....
+> [90806.970165] bcachefs (sdj): error writing journal entry 429: I/O
+...
+> [90850.012743] umount: attempt to access beyond end of device
+>                sdj: rw=6144, sector=8, nr_sectors = 8 limit=0
+> [90850.012747] bcachefs (sdj): superblock read error: I/O
+> [90850.013664] ------------[ cut here ]------------
+> [90850.013666] kernfs: can not remove 'bcachefs', no directory
+> [90850.013671] WARNING: CPU: 4 PID: 6892 at fs/kernfs/dir.c:1662
+> kernfs_remove_by_name_ns+0xba/0xc0
 
->
-> That being said it depends on prep patches in the block tree and thus
-> I'd prefer merging this entire series through that tree.
+Hi Tony,
 
-Okay, in that case, np! Next time, it would be nice to get that
-information upfront in a cover-letter or similar.
+Firstly note that this is a warning, not necessarily an oops or crash.
+That aside, I am able to reproduce this pretty easily running a similar
+test as above on one of my local VMs.
 
-If not too late, feel free to add my acks on the three patches for mmc
-and memstick.
+It looks like the cause of this is that bcachefs creates a
+/sys/block/<dev>/bcachefs symlink on each block device associated with
+the mount. We attempt to remove the link at unmount time, but the async
+device removal has caused the sysfs parent dir to disappear and so the
+removal codepath warns about a NULL parent dir/node.
 
-Kind regards
-Uffe
+It looks like the warning could be avoided in bcachefs by checking for
+whether the parent dir/node still exists at cleanup time, but I'm not
+familiar enough with kobj management to say whether that's the
+right/best solution. It also looks a little odd to me to see a
+/sys/block/<dev>/bcachefs dir when I've not seen any other fs or driver
+do such a thing in the block sysfs dir(s).
+
+Any thoughts on this from the block subsystem folks? Is it reasonable to
+leave this link around and just fix the removal check, or is another
+behavior preferred? Thanks.
+
+Brian
+
+
+> [90850.013678] Modules linked in: binfmt_misc bcachefs lz4hc_compress
+> lz4_compress bcache nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
+> nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct
+> nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 rfkill
+> ip_set nf_tables nfnetlink vfat fat snd_pcm snd_timer intel_rapl_msr
+> snd intel_rapl_common soundcore hv_netvsc hv_utils pcspkr hv_balloon
+> joydev fuse loop zram xfs crct10dif_pclmul crc32_pclmul crc32c_intel
+> polyval_clmulni serio_raw hv_storvsc polyval_generic scsi_transport_fc
+> hyperv_drm hyperv_keyboard hid_hyperv ghash_clmulni_intel sha512_ssse3
+> hv_vmbus sha256_ssse3 sha1_ssse3
+> [90850.013725] CPU: 4 PID: 6892 Comm: umount Not tainted 6.7.0 #4
+> [90850.013727] Hardware name: Microsoft Corporation Virtual
+> Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 04/06/2022
+> [90850.013728] RIP: 0010:kernfs_remove_by_name_ns+0xba/0xc0
+> [90850.013731] Code: bc 00 48 89 ef e8 26 a4 c5 ff 5b b8 fe ff ff ff
+> 5d 41 5c 41 5d e9 b1 7c bc 00 0f 0b eb a6 48 c7 c7 20 cf 8e ac e8 66
+> 3e bd ff <0f> 0b eb dc 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+> 90 90
+> [90850.013733] RSP: 0018:ffffbd6c4cbb7de0 EFLAGS: 00010286
+> [90850.013734] RAX: 0000000000000000 RBX: 0000000000000004 RCX: 0000000000000000
+> [90850.013736] RDX: 0000000000000002 RSI: 0000000000000027 RDI: 00000000ffffffff
+> [90850.013737] RBP: ffff9b2d65fc0000 R08: 0000000000000000 R09: ffffbd6c4cbb7c68
+> [90850.013738] R10: 0000000000000003 R11: ffffffffad3443e8 R12: ffffffffc0c910fb
+> [90850.013739] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+> [90850.013740] FS:  00007fe8fbdb6800(0000) GS:ffff9b3427b00000(0000)
+> knlGS:0000000000000000
+> [90850.013742] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [90850.013743] CR2: 00007ffd7b335f98 CR3: 00000000d6512004 CR4: 0000000000370ef0
+> [90850.013746] Call Trace:
+> [90850.013748]  <TASK>
+> [90850.013749]  ? kernfs_remove_by_name_ns+0xba/0xc0
+> [90850.013751]  ? __warn+0x7d/0x130
+> [90850.013757]  ? kernfs_remove_by_name_ns+0xba/0xc0
+> [90850.013759]  ? report_bug+0x18d/0x1c0
+> [90850.013763]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [90850.013765]  ? console_unlock+0x74/0x120
+> [90850.013769]  ? handle_bug+0x3c/0x80
+> [90850.013772]  ? exc_invalid_op+0x13/0x60
+> [90850.013774]  ? asm_exc_invalid_op+0x16/0x20
+> [90850.013780]  ? kernfs_remove_by_name_ns+0xba/0xc0
+> [90850.013783]  __bch2_fs_stop+0xc6/0x280 [bcachefs]
+> [90850.013819]  generic_shutdown_super+0x7c/0x110
+> [90850.013824]  bch2_kill_sb+0x12/0x20 [bcachefs]
+> [90850.013857]  deactivate_locked_super+0x2f/0xb0
+> [90850.013860]  cleanup_mnt+0xba/0x150
+> [90850.013863]  task_work_run+0x59/0x90
+> [90850.013867]  exit_to_user_mode_prepare+0x1e3/0x1f0
+> [90850.013871]  syscall_exit_to_user_mode+0x17/0x40
+> [90850.013874]  do_syscall_64+0x6c/0xe0
+> [90850.013876]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [90850.013878]  ? syscall_exit_to_user_mode+0x27/0x40
+> [90850.013880]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [90850.013882]  ? do_syscall_64+0x6c/0xe0
+> [90850.013883]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [90850.013885]  ? exc_page_fault+0x7b/0x180
+> [90850.013887]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+> [90850.013890] RIP: 0033:0x7fe8fbfd652b
+> [90850.013899] Code: c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 f3
+> 0f 1e fa 31 f6 e9 05 00 00 00 0f 1f 44 00 00 f3 0f 1e fa b8 a6 00 00
+> 00 0f 05 <48> 3d 00 f0 ff ff 77 05 c3 0f 1f 40 00 48 8b 15 d1 18 0c 00
+> f7 d8
+> [90850.013900] RSP: 002b:00007ffd7b337748 EFLAGS: 00000246 ORIG_RAX:
+> 00000000000000a6
+> [90850.013902] RAX: 0000000000000000 RBX: 000055d8e3eab690 RCX: 00007fe8fbfd652b
+> [90850.013903] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000055d8e3eb0010
+> [90850.013904] RBP: 00007ffd7b337820 R08: 000055d8e3ea6010 R09: 0000000000000007
+> [90850.013905] R10: 0000000000000000 R11: 0000000000000246 R12: 000055d8e3eab790
+> [90850.013906] R13: 0000000000000000 R14: 000055d8e3eb0010 R15: 000055d8e3eaffd0
+> [90850.013910]  </TASK>
+> [90850.013911] ---[ end trace 0000000000000000 ]---
+> 
+> Please CC as I'm not subscribed to this mailing list
+> -Tony
+> 
+> 
+
