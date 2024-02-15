@@ -1,46 +1,59 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217FD135A40;
-	Thu, 15 Feb 2024 18:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8F313699A;
+	Thu, 15 Feb 2024 19:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708021007; cv=none; b=FozY4oYtyNc33Ux6QVh3pO+VcpwMiYGzBnsLGHQSQjRIPM0eAxrw+H2XyxRthz6Myoh2u8rrsGwfXGPkNOUbhseGnMJ0y0IkCeV3W0cAdsNrrmqMNQxRcS754TMXawzuLi0mJBytrWC6G0Up2ioi9peTqBoKqo5VVoNUVshTcGw=
+	t=1708026417; cv=none; b=PtTGBN8pNdhjlFewM3dk8cJ22B48m+8jogmRUDC6JDKzUmSBv3NrPhQHODfhW1AU3Jgfj/Lap3P2LaWDnUZtYvc0cuIiNc5it3/vyDLEkxFBL0i41B+lKOUp+UpjQ9OMEDk4M0JcnJnwc/PLUvHyOkW6/lzL+MBQR/haz609AH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708021007; c=relaxed/simple;
-	bh=aaZk5/CFK8e/X6U94sy44+Dc46NyneCUtz1mF/gusDs=;
+	s=arc-20240116; t=1708026417; c=relaxed/simple;
+	bh=SvNJx9ibctbQXoy8zzAv4TWr8cJ8eTvpaV2PlD9kGZI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eq5jHaANaDZuwPaSGkobZ46vLeHgKfl7LG3k8FXuZd6X4ObRNDsYA8fetbPHuJGUfH9M0K5kL7FuVcDtreW2lqu1RJ0abdsOwSZvlZayprHHXYHscFhwgyKSUpfB+qte8GPvdAPv8z/tmudN2XPwc6o2Z7jRymL2jhcyB3D2fe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hzsNSikN; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 In-Reply-To:Content-Type; b=ZXYx6mLADD7uXbO+cRU2phyU7cjktrnRng0EfLCpHy0VTmEpff/WZos01zIOln8D9KUM7+HFPlZLqvBE0ttq5JyhjrewnSV4Jo9FePXWNkOczWzkwv7Ae0Yz0eKZV7sEmm5NECxVHAgrM9b2nzRMEH3YddnharMTTyHcZFnbUmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S7qJ/RpN; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hzsNSikN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708021007; x=1739557007;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aaZk5/CFK8e/X6U94sy44+Dc46NyneCUtz1mF/gusDs=;
-  b=hzsNSikN4Fwn+MMuMqtJDzYDYg0PI559H6gm5Jn7vs54qeBp1qoa5lXe
-   ygxioP6nP1C6qlr4KDMBin324S8GjGgQNRw4utzHQuD3YwkJLYnsT/WMO
-   zHzKQeWH7Mdx8TCDbyNyupu+xVJ+cZlFHWAoy51im6vNgdTpWtNMO4RL6
-   u48qUXXZyfiuvq8NZ80xLmk++iNnj0GqqMBPeWxmBENlHc4TF6ex6Xzo4
-   V07zmVN4nj+/Yupw958VQlUySoAyFMxPz3Qj6jDI6ZU21jGQnt3NnKZo/
-   osxZhTBQ6As5sMTeP4TFJSghSQWUXRKLdYO5I3BfDqKxcOg3Zgc6NjsPS
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10985"; a="5958642"
-X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
-   d="scan'208";a="5958642"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 10:16:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
-   d="scan'208";a="8210870"
-Received: from djiang5-mobl3.amr.corp.intel.com (HELO [10.246.113.87]) ([10.246.113.87])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 10:16:44 -0800
-Message-ID: <a6ec8c90-3d62-418b-96de-bc262783f5e6@intel.com>
-Date: Thu, 15 Feb 2024 11:16:43 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S7qJ/RpN"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-68873473ce6so7464436d6.0;
+        Thu, 15 Feb 2024 11:46:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708026415; x=1708631215; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0a9EFonqMBn2eHbLHRvN6s4nh6pQCa5EAdO92aYTphs=;
+        b=S7qJ/RpNM0gy/KaCy3biAl6HWtM4rqsdcPnB/YH9ruIPIVcYUXUrmLhleYjk3QkJoV
+         v9/s7T+LnuvmwZbsmFXf+7K7yO2uvnSZ4eYcA5XTxVdqbzK9ewTKIPVQdg85EkpcqVzl
+         aknkR6wPxin6kyR+vc/8stG93q0rYTEayUV5ydy0nS/SltBHUuwXnDwBOYdZXhiUhm7O
+         EGHyTnoIYo9ZRqB8lvrNJOboBWIhbuqZJgkRKqMmOheMbax7NlvJMWqpXFMo4hqMk47F
+         yJTY0LjfV2i1cwgoWkr2jZVSZyV042djwAzEDIWEz2oLMpVYg29//0TkebfBGSKj36ar
+         ZLBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708026415; x=1708631215;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0a9EFonqMBn2eHbLHRvN6s4nh6pQCa5EAdO92aYTphs=;
+        b=Up/D3sB2rgK7FKKWo13QtrdusJKRXjrHQx8qvuETFCcykMXlm9MK0n9u4CiHzMnPVF
+         9kdPAr7+5nUWNkbUWF+0qyz8aLpzfhxEesEktCj5voAQ3u5qhcLsYgHJBhkpPc6zzfEX
+         PwG65k32jvUJv/41fjjIHZe60/yZWluTidSRZajvVjj646Am0JgjK65gkvzguJ9Vv/BI
+         Td7b5L+cD+jhoIMW29A1AiZn9bFLOyBUwrsrebefxLLt9XpuB8SHaIl5rZx3l783JmX4
+         tgTaEOfX3ZBgX8u3/X9rKaInpfrXuPc+WmgfsCw6HF8C1F5mpivL0cK4Do2J2XbULNmA
+         ov5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWw/GIEoW9E6ZvIh+Btku6EMFefuIclZgk9wOslmteXC+CzqPr37wZ7K4M5IrmZzuyIo1yJLHXQVgQm60/TShMSAyBpb6zdPjl4hom0nqNEMa9u5GKVtcstbcUOyDuQ1RNgkVWsvu/vftMGwIH2xsm3vkipZ092NyPR2Mn1mwo+ZtMcnxfTdGA=
+X-Gm-Message-State: AOJu0Yz0xDN3SprO38la5PNsdNAthoYl9JRNfC2MaLiXSCJgHj8BS113
+	gjTBUJHNrC41jseBPC2ICqbkUSthykt+sflPKNxg3XtiSQdnMyehIuDt3VVNWHD6Rw==
+X-Google-Smtp-Source: AGHT+IFUlCyEzpVqAiRhaKG/YKslsjBvW/1ZGIwwpMuMpyt9VGtgXczGDx9ymu2IxKEw8fJvFKJiLQ==
+X-Received: by 2002:ad4:5c8f:0:b0:686:a185:dc11 with SMTP id o15-20020ad45c8f000000b00686a185dc11mr3520139qvh.55.1708026414655;
+        Thu, 15 Feb 2024 11:46:54 -0800 (PST)
+Received: from [10.56.180.189] (184-057-057-014.res.spectrum.com. [184.57.57.14])
+        by smtp.gmail.com with ESMTPSA id og11-20020a056214428b00b0068f2b1d9415sm413691qvb.23.2024.02.15.11.46.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Feb 2024 11:46:54 -0800 (PST)
+Message-ID: <da1e04bf-7dcc-46c8-af30-d1f92941740d@gmail.com>
+Date: Thu, 15 Feb 2024 14:46:52 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,61 +61,92 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/9] btt: pass queue_limits to blk_mq_alloc_disk
+Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
+To: Jan Kara <jack@suse.cz>
+Cc: Matthew Wilcox <willy@infradead.org>,
+ Christian Brauner <brauner@kernel.org>, lsf-pc@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+ <20240116114519.jcktectmk2thgagw@quack3>
+ <20240117-tupfen-unqualifiziert-173af9bc68c8@brauner>
+ <20240117143528.idmyeadhf4yzs5ck@quack3>
+ <ZafpsO3XakIekWXx@casper.infradead.org>
+ <3107a023-3173-4b3d-9623-71812b1e7eb6@gmail.com>
+ <20240215135709.4zmfb7qlerztbq6b@quack3>
 Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
- Minchan Kim <minchan@kernel.org>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Coly Li <colyli@suse.de>,
- Vishal Verma <vishal.l.verma@intel.com>,
- Dan Williams <dan.j.williams@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- linux-m68k@lists.linux-m68k.org, linux-bcache@vger.kernel.org,
- nvdimm@lists.linux.dev, linux-block@vger.kernel.org
-References: <20240215071055.2201424-1-hch@lst.de>
- <20240215071055.2201424-8-hch@lst.de>
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20240215071055.2201424-8-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
+From: Adrian Vovk <adrianvovk@gmail.com>
+In-Reply-To: <20240215135709.4zmfb7qlerztbq6b@quack3>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 2/15/24 08:57, Jan Kara wrote:
+> On Mon 29-01-24 19:13:17, Adrian Vovk wrote:
+>> Hello! I'm the "GNOME people" who Christian is referring to
+> Got back to thinking about this after a while...
+>
+>> On 1/17/24 09:52, Matthew Wilcox wrote:
+>>> I feel like we're in an XY trap [1].  What Christian actually wants is
+>>> to not be able to access the contents of a file while the device it's
+>>> on is suspended, and we've gone from there to "must drop the page cache".
+>> What we really want is for the plaintext contents of the files to be gone
+>> from memory while the dm-crypt device backing them is suspended.
+>>
+>> Ultimately my goal is to limit the chance that an attacker with access to a
+>> user's suspended laptop will be able to access the user's encrypted data. I
+>> need to achieve this without forcing the user to completely log out/power
+>> off/etc their system; it must be invisible to the user. The key word here is
+>> limit; if we can remove _most_ files from memory _most_ of the time Ithink
+>> luksSuspend would be a lot more useful against cold boot than it is today.
+> Well, but if your attack vector are cold-boot attacks, then how does
+> freeing pages from the page cache help you? I mean sure the page allocator
+> will start tracking those pages with potentially sensitive content as free
+> but unless you also zero all of them, this doesn't help anything against
+> cold-boot attacks? The sensitive memory content is still there...
+>
+> So you would also have to enable something like zero-on-page-free and
+> generally the cost of this is going to be pretty big?
 
+Yes you are right. Just marking pages as free isn't enough.
 
-On 2/15/24 12:10 AM, Christoph Hellwig wrote:
-> Pass the queue limits directly to blk_alloc_disk instead of setting them
-> one at a time.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+I'm sure it's reasonable enough to zero out the pages that are getting 
+free'd at our request. But the difficulty here is to try and clear pages 
+that were freed previously for other reasons, unless we're zeroing out 
+all pages on free. So I suppose that leaves me with a couple questions:
 
-> ---
->  drivers/nvdimm/btt.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-> index 9a0eae01d5986e..4d0c527e857678 100644
-> --- a/drivers/nvdimm/btt.c
-> +++ b/drivers/nvdimm/btt.c
-> @@ -1496,9 +1496,13 @@ static int btt_blk_init(struct btt *btt)
->  {
->  	struct nd_btt *nd_btt = btt->nd_btt;
->  	struct nd_namespace_common *ndns = nd_btt->ndns;
-> +	struct queue_limits lim = {
-> +		.logical_block_size	= btt->sector_size,
-> +		.max_hw_sectors		= UINT_MAX,
-> +	};
->  	int rc;
->  
-> -	btt->btt_disk = blk_alloc_disk(NULL, NUMA_NO_NODE);
-> +	btt->btt_disk = blk_alloc_disk(&lim, NUMA_NO_NODE);
->  	if (IS_ERR(btt->btt_disk))
->  		return PTR_ERR(btt->btt_disk);
->  
-> @@ -1507,8 +1511,6 @@ static int btt_blk_init(struct btt *btt)
->  	btt->btt_disk->fops = &btt_fops;
->  	btt->btt_disk->private_data = btt;
->  
-> -	blk_queue_logical_block_size(btt->btt_disk->queue, btt->sector_size);
-> -	blk_queue_max_hw_sectors(btt->btt_disk->queue, UINT_MAX);
->  	blk_queue_flag_set(QUEUE_FLAG_NONROT, btt->btt_disk->queue);
->  	blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, btt->btt_disk->queue);
->  
+- As far as I know, the kernel only naturally frees pages from the page 
+cache when they're about to be given to some program for imminent use. 
+But then in the case the page isn't only free'd, but also zero'd out 
+before it's handed over to the program (because giving a program access 
+to a page filled with potentially sensitive data is a bad idea!). Is 
+this correct?
+
+- Are there other situations (aside from drop_caches) where the kernel 
+frees pages from the page cache? Especially without having to zero them 
+anyway? In other words, what situations would turning on some 
+zero-pages-on-free setting actually hurt performance?
+
+- Does dismounting a filesystem completely zero out the removed fs's 
+pages from the page cache?
+
+- I remember hearing somewhere of some Linux support for zeroing out all 
+pages in memory if they're free'd from the page cache. However, I spent 
+a while trying to find this (how to turn it on, benchmarks) and I 
+couldn't find it. Do you know if such a thing exists, and if so how to 
+turn it on? I'm curious of the actual performance impact of it.
+
+>> I understand that perfectly wiping all the files out of memory without
+>> completely unmounting the filesystem isn't feasible, and that's probably OK
+>> for our use-case. As long as most files can be removed from memory most of
+>> the time, anyway...
+> OK, understood. I guess in that case something like BLKFLSBUF ioctl on
+> steroids (to also evict filesystem caches, not only the block device) could
+> be useful for you.
+>
+> 								Honza
+
+Best,
+
+Adrian
+
