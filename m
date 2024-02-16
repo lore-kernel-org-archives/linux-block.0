@@ -1,210 +1,207 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496F6C8F3;
-	Fri, 16 Feb 2024 01:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9FB171AD
+	for <linux-block@vger.kernel.org>; Fri, 16 Feb 2024 07:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708046091; cv=none; b=OI/CcrZHLuAb5inrLwSl3SOBBWWQkPfsQZLn5kJWjd5PFoujfy28xUymSYqu1HLt7Q/a4C4vp/kjbuq0Ol7v+GA5CdS5FRg6VNqYCe0r115Dd/b6zjd2yEeAsWA6sZmOycauNKev1HisW7EfdCVbWdRkAKYcSbW2atiHOppoN5Y=
+	t=1708069786; cv=none; b=nW0fwySJ/PddF+58WUkdbodij69DVcEgNQ4nxgB6XuqzmtoOmJXrWKmEMoi4x4fAXD/wG5oCqLm72NSZNI6Gu3za2D7BFFk3KfjgKbF6hiFMKyWyg2jj9FGk6AElQLHw6ddKP8/aQJiJs+04NPRS7k8IfJRJcRjpDMFtZZI4kgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708046091; c=relaxed/simple;
-	bh=0IDaMqxP1WyWFDW5gv3rNdlal7L1KrrbX0rXqzFhPF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uAEjiv85piTzYBGyGIDsUQbo/5GY5rYhLXx11ccMMfWJzIsE8vOgvpqKobRZmUsPqen93iNIWIEFI4mHYxJX47qlBSCeQEmABnbAov7SZu4Q4M7pYyzVa7CBYZpL688+6tH+coDqdbrmp398E1CERE8pJ73PnvENY4pgYLDwnt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mU+pg5dz; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708069786; c=relaxed/simple;
+	bh=V2EdJjvqxAqCtw18lO2fEH+iEeksTk/mBimlO53/O40=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nECvaOZ+ocBI6b6gB+s2QJxuWYRhXaAHk5IjZ2XQfbQF5pZ4zSym3d23s5b8nVom8u0Hnwq/vsbvhSLyV8b9zb3YZyDD8Hw79VreNSFJZnGIj3OCij7EKqo+8LgXsARWAIugZ66blrvssssHvx5vAUs9bRQ71kGXy8Oz/+MpWj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=MYeVffNE; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mU+pg5dz"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7872bc61fd2so86563285a.0;
-        Thu, 15 Feb 2024 17:14:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="MYeVffNE"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5639c8cc449so508683a12.2
+        for <linux-block@vger.kernel.org>; Thu, 15 Feb 2024 23:49:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708046088; x=1708650888; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LAwVF1tQAgkiQs6VC4XwdL3cIIETDwNdapFNON843rI=;
-        b=mU+pg5dz5Ib8YeRfiOW1jzmyB2xKd3eaWTnH/Ij6ummF2xeSQZCO6koWWlztGwwrXc
-         MesKntQdkqAb4c3QZqLC2hn2X3zNsyLuoGm+JuOK68J7JQVeQ8SyLnpGJK0SfOevnr32
-         MjXfn7e9GVyfkP5+Y43JxHy4r8l/zfe55svyKlCwKZKPlAEyTCGts8ZdjB2C9Vpk1vB9
-         qnHQE8iOTg056ei5mpw8Y7XDI4Vwj/lEe8IsyYkcjFXZckQqSmqPsVhuTQ5S4yVJihMY
-         BYGRL8W8bVII/OThLkZ1Ea/Zl3TgabPoAOzO3Tr/sL0OwXnCnZIqbAWX/jNJCB0DlyUU
-         nygQ==
+        d=ionos.com; s=google; t=1708069782; x=1708674582; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FKtrR0GptUvN+scEUpBPwjTH5qrhKCgtCeXIuRBm1rE=;
+        b=MYeVffNEmZUTahVi/A4kJeB/m1pFJlznUyhAFsFFTT5b3esiD5FrC0EuBHJX4QvWC1
+         KER7CWomH96ZhR3MwL5pZhZ5w+iv51BNlP44YJ+LsFRY+MOcsDG93lGCieDX0BsmX7hk
+         1eVrAXEWh+/bx1SZ4E2l61VXyvBBfDXLm3VfWpSg23XQjwpHqbhcd2iKWdDsshoKIuSF
+         8pbfeKkfasgl78V7yN71gUlLlwaBG2nfG3LsS0fKTj4s0+N1I5Z477pTdvbBcnFBYpJD
+         O8TpvrEOMZlpnK+WV/mXfz5uOfVFs6IqHSJqQZd55NVhu14JcDxy/0jl2B46EPtF2v5t
+         VjCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708046088; x=1708650888;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LAwVF1tQAgkiQs6VC4XwdL3cIIETDwNdapFNON843rI=;
-        b=UtWUI3sSiVi1ZC3C5NRpkPGUxI2O1D198NHxYcSirHgsVLtlEJKRkhU+eTOVojGoET
-         HV8E2M4vLLC/zBfTUJvzfS3HJ/jpGXgWLzrL0OXPXOYO6VbSwdWcBg1u3jZh+TdTWpqh
-         8zO2BYEI1n5qbrqQ2xlPANhT/zP8JchjaVnGskMJFnG1xbUuuaLqC4cfchCwbN7bOtua
-         WrQcyqIwBwDqhxA57LQf1fQqi6/bxD9q3/LX3oXWdtEdOQwUD2FsEnuiHXbBYViFhd7i
-         H8DDTKbCovj8WP1fp5SVbs40BTu68g4Al7NcIkhSe5whppov3eZU8J7dAwbW4xXIocLS
-         TqnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUfy+b3BqeiSktmiaHMdmVgWmHbEXKR8mlu6QJR27uTfBxcud5nNS3ORzZkXrsJufA4i13WdZvDkXPRZkrI3r1wcBdwfagpgpUY0cIpvQNWjBZeLVckPgWK7N5t9U2122yw2zbCwS6rumd/GBey1iiG2KirW6E5FbjzxRDs9tpB0vP+3rKMVx4=
-X-Gm-Message-State: AOJu0YxUyVYhQRZV1nmLpySzKWvw8lf+9RJOQk3++rETUQQLWBDCsxHU
-	9v/u1HrlVWgU4kRqAT2OpnQHwJ6pPrCPt6F57fTXOTAsFCHJ6WN4
-X-Google-Smtp-Source: AGHT+IFTIPFX/aldqDQnn8FSCTGBtF7yMrYQ3jPPSPF9wbOoD4o9sTw5ozAoIT+lnanhrjUS36X0vA==
-X-Received: by 2002:a05:620a:14ad:b0:785:86e7:ed9c with SMTP id x13-20020a05620a14ad00b0078586e7ed9cmr3694198qkj.2.1708046087868;
-        Thu, 15 Feb 2024 17:14:47 -0800 (PST)
-Received: from [10.56.180.189] (184-057-057-014.res.spectrum.com. [184.57.57.14])
-        by smtp.gmail.com with ESMTPSA id bs38-20020a05620a472600b00787288b22desm1083459qkb.79.2024.02.15.17.14.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Feb 2024 17:14:47 -0800 (PST)
-Message-ID: <10c3b162-265b-442b-80e9-8563c0168a8b@gmail.com>
-Date: Thu, 15 Feb 2024 20:14:46 -0500
+        d=1e100.net; s=20230601; t=1708069782; x=1708674582;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FKtrR0GptUvN+scEUpBPwjTH5qrhKCgtCeXIuRBm1rE=;
+        b=P/UQe24R6Mx18aJnH26dlgKZ1CikQanHG0gJpKLaF6RCMEZcSU9MKsONaqAtF0H+lB
+         ll2pdcZ9OflyJNgdYcBXzKD26EW4ssOHfvBNtIXBsgd3FLrjn6JNoCU6WsN/qj0h0zC7
+         Es7vWRIEiQjo1jgdd8vxjpfhzbl/Eeuovj2Z7PB/PkYvSUGlvhaajcQ31o1NZdHwSjhH
+         bAIwuEJLog4rrCoUZiukABnOLbcePlEaQi+qKo4pyDoMaxcekksZF95/F99On9QZJrxS
+         NqNpeND1pK2x10eTvwNlbI+sZ3OTem0ZDv6BF92O1NE1305U97zLHo4rFSv3IzwA+uyg
+         PGpg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtsyUNyA/d+0M6nzZSQzpn1t6PD3KphgLrYhg9xSrorvSrNrDrMwh4P9mIhlT7Jg72//QF+LfBeAKqcam8R/AMWsyui6JRb+dq/AI=
+X-Gm-Message-State: AOJu0YwpHTiulY+y9hsxFUw6V6llkkzA+ITflmUoIjFDtfWDQtCqDZrw
+	f32LSbXlRMvwoy9t3AP6ZsZRXorsaESoETJZzI+QXdxxwb7PL9APuX7LoQO/CiOFmN5LPmq0/hj
+	iJHrl6tAbjVgmrNwLyjSXmAa6BFme95gnX9jeQg==
+X-Google-Smtp-Source: AGHT+IEz+DOqbldxdx8VWXCWP6/6fTdJY+pnjm4uq4NWwzDh2gUwnQ0y3y2rNodnC/dPtB2uhZ02GJwHr8oI/OyBPSQ=
+X-Received: by 2002:a05:6402:3593:b0:563:fc1d:4568 with SMTP id
+ y19-20020a056402359300b00563fc1d4568mr440920edc.10.1708069782007; Thu, 15 Feb
+ 2024 23:49:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
-Content-Language: en-US
-To: Dave Chinner <david@fromorbit.com>
-Cc: Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
- Christian Brauner <brauner@kernel.org>, lsf-pc@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
- <20240116114519.jcktectmk2thgagw@quack3>
- <20240117-tupfen-unqualifiziert-173af9bc68c8@brauner>
- <20240117143528.idmyeadhf4yzs5ck@quack3>
- <ZafpsO3XakIekWXx@casper.infradead.org>
- <3107a023-3173-4b3d-9623-71812b1e7eb6@gmail.com>
- <20240215135709.4zmfb7qlerztbq6b@quack3>
- <da1e04bf-7dcc-46c8-af30-d1f92941740d@gmail.com>
- <Zc6biamtwBxICqWO@dread.disaster.area>
-From: Adrian Vovk <adrianvovk@gmail.com>
-In-Reply-To: <Zc6biamtwBxICqWO@dread.disaster.area>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240215070300.2200308-1-hch@lst.de> <20240215070300.2200308-9-hch@lst.de>
+In-Reply-To: <20240215070300.2200308-9-hch@lst.de>
+From: Jinpu Wang <jinpu.wang@ionos.com>
+Date: Fri, 16 Feb 2024 08:49:30 +0100
+Message-ID: <CAMGffE=cpyWvxWwdmhyxhgBr7zxvqHS2BQwx-zm2=cm3VjRFxQ@mail.gmail.com>
+Subject: Re: [PATCH 08/17] rnbd-clt: pass queue_limits to blk_mq_alloc_disk
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Justin Sanders <justin@coraid.com>, Denis Efremov <efremov@linux.com>, 
+	Josef Bacik <josef@toxicpanda.com>, Geoff Levand <geoff@infradead.org>, 
+	Ilya Dryomov <idryomov@gmail.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
+	Ming Lei <ming.lei@redhat.com>, Maxim Levitsky <maximlevitsky@gmail.com>, 
+	Alex Dubov <oakad@yahoo.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	Vineeth Vijayan <vneethv@linux.ibm.com>, linux-block@vger.kernel.org, nbd@other.debian.org, 
+	ceph-devel@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/15/24 18:17, Dave Chinner wrote:
-> On Thu, Feb 15, 2024 at 02:46:52PM -0500, Adrian Vovk wrote:
->> On 2/15/24 08:57, Jan Kara wrote:
->>> On Mon 29-01-24 19:13:17, Adrian Vovk wrote:
->>>> Hello! I'm the "GNOME people" who Christian is referring to
->>> Got back to thinking about this after a while...
->>>
->>>> On 1/17/24 09:52, Matthew Wilcox wrote:
->>>>> I feel like we're in an XY trap [1].  What Christian actually wants is
->>>>> to not be able to access the contents of a file while the device it's
->>>>> on is suspended, and we've gone from there to "must drop the page cache".
->>>> What we really want is for the plaintext contents of the files to be gone
->>>> from memory while the dm-crypt device backing them is suspended.
->>>>
->>>> Ultimately my goal is to limit the chance that an attacker with access to a
->>>> user's suspended laptop will be able to access the user's encrypted data. I
->>>> need to achieve this without forcing the user to completely log out/power
->>>> off/etc their system; it must be invisible to the user. The key word here is
->>>> limit; if we can remove _most_ files from memory _most_ of the time Ithink
->>>> luksSuspend would be a lot more useful against cold boot than it is today.
->>> Well, but if your attack vector are cold-boot attacks, then how does
->>> freeing pages from the page cache help you? I mean sure the page allocator
->>> will start tracking those pages with potentially sensitive content as free
->>> but unless you also zero all of them, this doesn't help anything against
->>> cold-boot attacks? The sensitive memory content is still there...
->>>
->>> So you would also have to enable something like zero-on-page-free and
->>> generally the cost of this is going to be pretty big?
->> Yes you are right. Just marking pages as free isn't enough.
->>
->> I'm sure it's reasonable enough to zero out the pages that are getting
->> free'd at our request. But the difficulty here is to try and clear pages
->> that were freed previously for other reasons, unless we're zeroing out all
->> pages on free. So I suppose that leaves me with a couple questions:
->>
->> - As far as I know, the kernel only naturally frees pages from the page
->> cache when they're about to be given to some program for imminent use.
-> Memory pressure does cause cache reclaim. Not just page cache, but
-> also slab caches and anything else various subsystems can clean up
-> to free memory..
+On Thu, Feb 15, 2024 at 8:03=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
 >
->> But
->> then in the case the page isn't only free'd, but also zero'd out before it's
->> handed over to the program (because giving a program access to a page filled
->> with potentially sensitive data is a bad idea!). Is this correct?
-> Memory exposed to userspace is zeroed before userspace can access
-> it.  Kernel memory is not zeroed unless the caller specifically asks
-> for it to be zeroed.
+> Pass the limits rnbd-clt imposes directly to blk_mq_alloc_disk instead
+> of setting them one at a time.
 >
->> - Are there other situations (aside from drop_caches) where the kernel frees
->> pages from the page cache? Especially without having to zero them anyway? In
-> truncate(), fallocate(), direct IO, fadvise(), madvise(), etc. IOWs,
-> there are lots of runtime vectors that cause page cache to be freed.
+> While at it don't set an explicit number of discard segments, as 1 is
+> the default (which most drivers rely on).
 >
->> other words, what situations would turning on some zero-pages-on-free
->> setting actually hurt performance?
-> Lots.  page contents are typically cold when the page is freed so
-> the zeroing is typically memory latency and bandwidth bound. And
-> doing it on free means there isn't any sort of "cache priming"
-> performance benefits that we get with zeroing at allocation because
-> the page contents are not going to be immediately accessed by the
-> kernel or userspace.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+lgtm, thx!
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+> ---
+>  drivers/block/rnbd/rnbd-clt.c | 64 ++++++++++++++---------------------
+>  1 file changed, 25 insertions(+), 39 deletions(-)
 >
->> - Does dismounting a filesystem completely zero out the removed fs's pages
->> from the page cache?
-> No. It just frees them. No explicit zeroing.
-I see. So even dismounting a filesystem and removing the device 
-completely doesn't fully protect from a cold-boot attack. Good to know.
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.=
+c
+> index d51be4f2df61a3..b7ffe03c61606d 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -1329,43 +1329,6 @@ static void rnbd_init_mq_hw_queues(struct rnbd_clt=
+_dev *dev)
+>         }
+>  }
 >
->> - I remember hearing somewhere of some Linux support for zeroing out all
->> pages in memory if they're free'd from the page cache. However, I spent a
->> while trying to find this (how to turn it on, benchmarks) and I couldn't
->> find it. Do you know if such a thing exists, and if so how to turn it on?
->> I'm curious of the actual performance impact of it.
-> You can test it for yourself: the init_on_free kernel command line
-> option controls whether the kernel zeroes on free.
+> -static void setup_request_queue(struct rnbd_clt_dev *dev,
+> -                               struct rnbd_msg_open_rsp *rsp)
+> -{
+> -       blk_queue_logical_block_size(dev->queue,
+> -                                    le16_to_cpu(rsp->logical_block_size)=
+);
+> -       blk_queue_physical_block_size(dev->queue,
+> -                                     le16_to_cpu(rsp->physical_block_siz=
+e));
+> -       blk_queue_max_hw_sectors(dev->queue,
+> -                                dev->sess->max_io_size / SECTOR_SIZE);
+> -
+> -       /*
+> -        * we don't support discards to "discontiguous" segments
+> -        * in on request
+> -        */
+> -       blk_queue_max_discard_segments(dev->queue, 1);
+> -
+> -       blk_queue_max_discard_sectors(dev->queue,
+> -                                     le32_to_cpu(rsp->max_discard_sector=
+s));
+> -       dev->queue->limits.discard_granularity =3D
+> -                                       le32_to_cpu(rsp->discard_granular=
+ity);
+> -       dev->queue->limits.discard_alignment =3D
+> -                                       le32_to_cpu(rsp->discard_alignmen=
+t);
+> -       if (le16_to_cpu(rsp->secure_discard))
+> -               blk_queue_max_secure_erase_sectors(dev->queue,
+> -                                       le32_to_cpu(rsp->max_discard_sect=
+ors));
+> -       blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, dev->queue);
+> -       blk_queue_flag_set(QUEUE_FLAG_SAME_FORCE, dev->queue);
+> -       blk_queue_max_segments(dev->queue, dev->sess->max_segments);
+> -       blk_queue_io_opt(dev->queue, dev->sess->max_io_size);
+> -       blk_queue_virt_boundary(dev->queue, SZ_4K - 1);
+> -       blk_queue_write_cache(dev->queue,
+> -                             !!(rsp->cache_policy & RNBD_WRITEBACK),
+> -                             !!(rsp->cache_policy & RNBD_FUA));
+> -       blk_queue_max_write_zeroes_sectors(dev->queue,
+> -                                          le32_to_cpu(rsp->max_write_zer=
+oes_sectors));
+> -}
+> -
+>  static int rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev,
+>                                    struct rnbd_msg_open_rsp *rsp, int idx=
+)
+>  {
+> @@ -1403,18 +1366,41 @@ static int rnbd_clt_setup_gen_disk(struct rnbd_cl=
+t_dev *dev,
+>  static int rnbd_client_setup_device(struct rnbd_clt_dev *dev,
+>                                     struct rnbd_msg_open_rsp *rsp)
+>  {
+> +       struct queue_limits lim =3D {
+> +               .logical_block_size     =3D le16_to_cpu(rsp->logical_bloc=
+k_size),
+> +               .physical_block_size    =3D le16_to_cpu(rsp->physical_blo=
+ck_size),
+> +               .io_opt                 =3D dev->sess->max_io_size,
+> +               .max_hw_sectors         =3D dev->sess->max_io_size / SECT=
+OR_SIZE,
+> +               .max_hw_discard_sectors =3D le32_to_cpu(rsp->max_discard_=
+sectors),
+> +               .discard_granularity    =3D le32_to_cpu(rsp->discard_gran=
+ularity),
+> +               .discard_alignment      =3D le32_to_cpu(rsp->discard_alig=
+nment),
+> +               .max_segments           =3D dev->sess->max_segments,
+> +               .virt_boundary_mask     =3D SZ_4K - 1,
+> +               .max_write_zeroes_sectors =3D
+> +                       le32_to_cpu(rsp->max_write_zeroes_sectors),
+> +       };
+>         int idx =3D dev->clt_device_id;
 >
-> Typical distro configuration is:
+>         dev->size =3D le64_to_cpu(rsp->nsectors) *
+>                         le16_to_cpu(rsp->logical_block_size);
 >
-> $ sudo dmesg |grep auto-init
-> [    0.018882] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
-> $
+> -       dev->gd =3D blk_mq_alloc_disk(&dev->sess->tag_set, NULL, dev);
+> +       if (rsp->secure_discard) {
+> +               lim.max_secure_erase_sectors =3D
+> +                       le32_to_cpu(rsp->max_discard_sectors);
+> +       }
+> +
+> +       dev->gd =3D blk_mq_alloc_disk(&dev->sess->tag_set, &lim, dev);
+>         if (IS_ERR(dev->gd))
+>                 return PTR_ERR(dev->gd);
+>         dev->queue =3D dev->gd->queue;
+>         rnbd_init_mq_hw_queues(dev);
 >
-> So this kernel zeroes all stack memory, page and heap memory on
-> allocation, and does nothing on free...
-
-I see. Thank you for all the information.
-
-So ~5% performance penalty isn't trivial, especially to protect against 
-something rare/unlikely like a cold-boot attack, but it would be quite 
-nice if we could have some semblance of effort put into making sure the 
-data is actually out of memory if we claim that we've done our best to 
-harden the system against this scenario. Again, I'm all for best-effort 
-solutions here; doing 90% is better than doing 0%...
-
-I've got an alternative idea. How feasible would a second API be that 
-just goes through free regions of memory and zeroes them out? This would 
-be something we call immediately after we tell the kernel to drop 
-everything it can relating to a given filesystem. So the flow would be 
-something like follows:
-
-1, user puts systemd-homed into this "locked" mode, homed wipes the 
-dm-crypt key out of memory and suspends the block device (this already 
-exists)
-2. homed asks the kernel to drop whatever caches it can relating to that 
-filesystem (the topic of this email thread)
-3. homed asks the kernel to zero out all unallocated memory to make sure 
-that the data is really gone (the second call I'm proposing now).
-
-Sure this operation can take a while, but for our use-cases it's 
-probably fine. We would do this only in response to a direct user action 
-(and we can show a nice little progress spinner on screen), or right 
-before suspend. A couple of extra seconds of work while entering suspend 
-isn't going to be noticed by the user. If the hardware supports 
-something faster/better to mitigate cold-boot attacks, like memory 
-encryption / SEV, then we'd prefer to use that instead of course, but 
-for unsupported hardware I think just zeroing out all the memory that 
-has been marked free should do the trick just fine.
-
-By the way, something like cryptsetup might want to use this second API 
-too to ensure data is purged from memory after it closes a LUKS volume, 
-for instance. So for example if you have an encrypted USB stick you use 
-on your computer, the data really gets wiped after you unplug it.
-
-> -Dave.
+> -       setup_request_queue(dev, rsp);
+> +       blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, dev->queue);
+> +       blk_queue_flag_set(QUEUE_FLAG_SAME_FORCE, dev->queue);
+> +       blk_queue_write_cache(dev->queue,
+> +                             !!(rsp->cache_policy & RNBD_WRITEBACK),
+> +                             !!(rsp->cache_policy & RNBD_FUA));
+> +
+>         return rnbd_clt_setup_gen_disk(dev, rsp, idx);
+>  }
+>
+> --
+> 2.39.2
+>
