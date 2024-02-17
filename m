@@ -1,215 +1,143 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB78A1487C1
-	for <linux-block@vger.kernel.org>; Fri, 16 Feb 2024 23:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708126177; cv=none; b=SxR2yU+fwVjQI2KC0xMLZRSawG3KRwbzSagGbBNo87AOfRo8Ve6VZCrjUsYe7wxyUt5uUYNk4bBnMOkc0x5FdcioNUchwK3jc0j0p8P2U5S+IIlfSQ2yCD9juQMjzgPPbxy/W9AQhda+Wd2pTZn68lHO6PJ+ShQmuZOtIyPx1MU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708126177; c=relaxed/simple;
-	bh=xWlK/PJ4C4EYMrAvTQjQbPE7HcsmjidOIkzUzwufSeE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SBrHHi8nNipofCyRDonrjCz0yaQQLWO8e5j828KfXaF+HcICT48zjBuPM2QIxBBHxvCJKHT9SZnL+1l92lI8KmsCVKAn3RCbCYRqbBmJ9LuJu5o3tufrBnS4kZtOp5odH60vXBcYBPimGJTn/1bOA6nILHTKfAHUDjXYauHf5oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=c+uij9Wv; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433EAEC4;
+	Sat, 17 Feb 2024 00:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708130574; cv=fail; b=pssLsBBrPsgmUsNbrgMVCccZT9Bq44q9X2i6/HJEmoQJCVAl53PX9m/Tsrgo/be8WJdYAXb1AA1j0R8sXhHYVgO+X5Y4hMDIyNB8nPh3YMjaUeLrEz/kW4n6SjmBV8pCG8OmuLaoTc6ixBlkDXxPlmpxpgPmrKGfrVCdkKYCQIo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708130574; c=relaxed/simple;
+	bh=WrTcxKwqLjU+lEim/9DWgWQgXtJWHXD75Rdo3+QkT4E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fgbdVxG3D+oNzbNDYhlSA9ZstftfWWSWj1Nbi/4I61Tup4VAf3xlFGZI6Q37tnfMeuuLQHiJcV92AG5nRxs2tbS7yDR81t20QphDPvKR5rScuGa+hvyaBwzgoHDFPNvJFpjLLr5O3NYbHZK7mvsHcRMVQyAjRLoqjTQLunD/Txw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=f08ShUVH; arc=fail smtp.client-ip=40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="c+uij9Wv"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41GKEGPG009241;
-	Fri, 16 Feb 2024 23:29:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-11-20; bh=KWRxmexjxRAwEdHggpUpLdmDcN6dwwiaTa/57ju/x7I=;
- b=c+uij9WvdluU/1tApg5U6V62mKlbhPOnQ5Hbwx25rY1/sItuGKgwiqcQVmTlhgNDQs24
- PJA+oQHiieLv92fonLVS0KbjT9765g4/FcjF0rdd06xN5PahigSJ0fp99Dwyn7uJzx4q
- 3C+fl9Pf/dj+pKStBISbDOA9c6VL1nxPgG6YbJqeCKoJokR7XUvxmB5wyPEUyPyOlqrC
- sRoWIrS/LzNmwNLtbX9acr0HElkHmw39MiMetqMZ6a0N3xmNv7pSbr0hk4KS5BeEBzHT
- +jpN0tqzCH4L8v1Z7VK1894DtWf95bwd+8AJt2TSaAZxEChHeyNsCvitHaefZO7s8z1J zw== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92j0pe85-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Feb 2024 23:29:27 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41GMtFjh024016;
-	Fri, 16 Feb 2024 23:29:27 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w5ykk52ae-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Feb 2024 23:29:27 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41GNTQ6Y011465;
-	Fri, 16 Feb 2024 23:29:26 GMT
-Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3w5ykk529s-1;
-	Fri, 16 Feb 2024 23:29:26 +0000
-From: Alan Adamson <alan.adamson@oracle.com>
-To: linux-block@vger.kernel.org
-Cc: alan.adamson@oracle.com, chaitanyak@nvidia.com,
-        linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com
-Subject: [PATCH blktests] nvme: Add passthru error logging tests to nvme/039
-Date: Fri, 16 Feb 2024 15:30:53 -0800
-Message-Id: <20240216233053.2795930-1-alan.adamson@oracle.com>
-X-Mailer: git-send-email 2.39.3
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="f08ShUVH"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=io1+juykPMNa7BaVIqTFefl01u2zhD1I4KKYygxBOjTKtyq/Xq8+wEkT+slsfr3Yn/D11Dle/+oU42Cs8FGyG3k06kaJJSou80czRR6PnYX4fnGUBLOJYkfbb59JjBA1NhddMyDYgi8Y7fhqOo7fNPOCr2SlAkIzMnoSBpDSA5UE3R1E+NKqCEioF/JVvU4+ymYCD/e86MKbYIYv8Q9C9//BgqzwvuudEhI0TXmDoWhdQEeu8z7hiCxahPlF0zHAnlkI5rmjPGy1elC20yEzLdAyGsmjXnhQyKdrwIW+hXDVO9oMhyNxhJZN5LGePq971erpYAybyEgDQonDLQ0qmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WrTcxKwqLjU+lEim/9DWgWQgXtJWHXD75Rdo3+QkT4E=;
+ b=Xi48fEq/uIEAyumJR2vJ2oiuRHlhCBaOJfesLNKv7xspm4yFKty2vMwUwrDzkmq/pFJvzTqQwy6U7Vu8gAgu5rP7z0cWb/IqKL8d0344mdAKPXd2B7PPZ1PsjVFpUOJD53fVzIwtRPNdW1ZuJNON68tKfPB6s8va2fJ/TULYNjqC+qbIR3e5L37XEtsYwKMdCYybHJgcMhHpxivap+7kRlhrVTqFWOVgrPgZxVnyyoFYyQqSMqnu1291MDrzZ1PCau09gqM5o+ZBrkl7Tm7izV3/vS1FPBdm6HFzwMg3ZiLAleHbRkcIJqRO/PPcV67IVjkAi+wboJw/W1leShnibA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WrTcxKwqLjU+lEim/9DWgWQgXtJWHXD75Rdo3+QkT4E=;
+ b=f08ShUVHUS2VMbd4rxujILsOiLlP29dtxvpKR48cQab4/XUHrtw0Xf0BVCVncQxWnDdeYS0LUDqvtLn1tv7MsD+doFaGt2c3BSV8pfGZfjIzbUfeg5nrPhGdrWpKZRaw8LAEdRkGg2sqqvkHknWSuf+1iIme572suI2/MdOiRO3BFnkeqmVVcrSzwuzWmt05G3O4JyUgkJt+wjKgYlDdl574QefTveXtkfCbMK6jVUqeGl1Ix9lwR4seZP6Svnawx7fWBL6ReieAM7nUtZXrFKuNf7cJyeK83UT3ghLRV1kimvUA8Q24E1xBe6fagN0RTVJLaLsjaQkZUap2OKeSqQ==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by MW4PR12MB6732.namprd12.prod.outlook.com (2603:10b6:303:1ea::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.14; Sat, 17 Feb
+ 2024 00:42:48 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed%4]) with mapi id 15.20.7316.012; Sat, 17 Feb 2024
+ 00:42:48 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC: Geert Uytterhoeven <geert@linux-m68k.org>, Minchan Kim
+	<minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, Coly Li
+	<colyli@suse.de>, Vishal Verma <vishal.l.verma@intel.com>, Dan Williams
+	<dan.j.williams@intel.com>, Dave Jiang <dave.jiang@intel.com>, Ira Weiny
+	<ira.weiny@intel.com>, "linux-m68k@lists.linux-m68k.org"
+	<linux-m68k@lists.linux-m68k.org>, "linux-bcache@vger.kernel.org"
+	<linux-bcache@vger.kernel.org>, "nvdimm@lists.linux.dev"
+	<nvdimm@lists.linux.dev>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>
+Subject: Re: [PATCH 3/9] brd: pass queue_limits to blk_mq_alloc_disk
+Thread-Topic: [PATCH 3/9] brd: pass queue_limits to blk_mq_alloc_disk
+Thread-Index: AQHaX943QkSnpIoTF0+bdo9KyhkirbENtLeA
+Date: Sat, 17 Feb 2024 00:42:47 +0000
+Message-ID: <e003dffc-3b3a-43dd-985f-a6147889bd15@nvidia.com>
+References: <20240215071055.2201424-1-hch@lst.de>
+ <20240215071055.2201424-4-hch@lst.de>
+In-Reply-To: <20240215071055.2201424-4-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|MW4PR12MB6732:EE_
+x-ms-office365-filtering-correlation-id: 0616f4bb-94cf-4b61-9977-08dc2f515d1a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Mui6zhGPf2UGysNENX7yczqdRsEaZZUxC30pcDyslsJyEGW1wlJHzksrcxa+Mm9qRJlGzZMXjKDU2qmk5MdkyedJkDCsfEHpN+vuob0hnHHJzaC9IJ3awm9+Nxzjb0DU8k8cVhPg0blSgALAOJntQ70WhdwjgBuBTfBR08NzfgWjc3eKikcfLwV9sDayNzihrtFJfjex1jRJPMvVbhEOOec3MIcSquDJkPBzrQ/WTEY6wZqMVycnySktd2IZoqdns+2N/Fy39kzqED9qS7pI75M012WOhF29cnfMfCQMtx4mmEC/92qj5a1nmQLdyiZKz3IiBMyzNKCqllzswTK9noW5iXwZFm+m/EZfV8/FYzgKjfCtOnf0hLP4WJKNXQmo6xJwydnrHfyhyBSJKa4ULTiVMwzUCL9zHPyFdNBe3Cuuy2MfiIjzt2GmTjXwfEfAwOEAWVqrOOZsJHk0WkpqqKEOc3n+i0twOHBZeytiSLD1cza3iXWwCyFwkwLdecaIVrnDwZAL+bJQtam55KpGLGsZ8f06xzw6W1GhNQmxEVmyy+jtLnskEFq1flJYy9tWQECMUB1KKT1aS0D2vg11PUitYTlbGZp/FhjJ38wR1nh+zmCKjW28gOM7bBWRjfzS
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(366004)(136003)(376002)(396003)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(478600001)(71200400001)(36756003)(6486002)(31696002)(2616005)(558084003)(122000001)(6512007)(86362001)(38070700009)(6506007)(83380400001)(38100700002)(53546011)(8936002)(7416002)(110136005)(316002)(8676002)(4326008)(54906003)(66946007)(66476007)(76116006)(91956017)(64756008)(66556008)(5660300002)(66446008)(2906002)(31686004)(41300700001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ZllNZk5TaDAzU2kwa0JtUGswbUR2NzZoQnRjamNzZ2VNMS9obzF0cU9nN3Jr?=
+ =?utf-8?B?RXlqbjdwT0drZjZXYWQwNmxxVFh6QUtzdjJseTRuWldLZlg4bkpmMTFybFli?=
+ =?utf-8?B?TFR5MGFSZXZEK2pQeUxrSTE0aFIrTkxGWDU3TjkzWDVDK3BsTjk5aWJpQ0Ex?=
+ =?utf-8?B?MWd4TWFrSUVNWXdtWmZFRzVTRG15b0hvME16djRTZkQ2Q2h6ejlFRHR6TTZa?=
+ =?utf-8?B?RXNjQjNWVFozNG1lelptL0R3b0ZVcFJYTWdJNllkZ3Z5cEV3cnUrQktFN3I4?=
+ =?utf-8?B?UUtqWXhJc0ZEUS9GQkRiTE9IQUZjdkpTUHJzNTZNNnJGT0pqU1NGUkwwYzdR?=
+ =?utf-8?B?RDE3ZTNYLzcxRjRibklsemFXQlZZN3hxdUxLaEFpYUg1d3NSV3puREYzVmxL?=
+ =?utf-8?B?REVmWmxCd3htQ1BuVHVmOUV0a085UUZGMTVHVnVEUTZNZzJicjBWZjI5Q1dq?=
+ =?utf-8?B?bVlEQ3RqWWxkYUdUd1pHLy9pSkQ4Yms5WmptaFkwaWFicGxBQmtkRXpJeXZj?=
+ =?utf-8?B?d3dsL3FMMWUxNzRmVUZvSW02bTE1VTAvTTltUEJnRmplVlJremd1NVRNNU1F?=
+ =?utf-8?B?K0pqaFpaTm11UDFjcWZwVGhXZnl0OFZxRTZucnpBakFFbEZxU2Qyc25MbUFh?=
+ =?utf-8?B?ZWNGSmFtWmI2M0RhaHczVWxhSkVwNHpTbTZXbzY4dS9SSVJFQUNxemRvQllN?=
+ =?utf-8?B?dGRXdXh0WWtwL1JqR0wxdnRNN0VuenRVRjNQK2pYcXhUaGlQcnhxUnJrY0ky?=
+ =?utf-8?B?V1NBYVBWYlZMZENHYXRmSlpXdXEzdTBvaGVQMnpwYlJqMTBWRHR1Tyt5SThl?=
+ =?utf-8?B?SjlTZ2h4dWxQRVBOY0ZCQm1CZTBGVjBBdzNBRXNRMlZaU1l3bFBxOFVLUGdH?=
+ =?utf-8?B?bEZFTFNIMldwVk9rdUF3RlgyNmo1YTZFcUp1Z3BIZnF1VmE0ZTQwdHBsYlpB?=
+ =?utf-8?B?K1FOSjVXeThOcVBYZUtpeXZuZGM2UXZUQ1VuUzVJOGtlbWEyVFYvMlk3Y0xE?=
+ =?utf-8?B?TGR6VlBUaW9wZ0xQb2VWWGlKaG9jUndmajMySUg0NmxWS0VROXMyYk1tQUJO?=
+ =?utf-8?B?VENIS1JQbHFFVWxlSXFZZDQrRFNjdXdhTklnUm9PQ2kyZEdCdXFtOWdlOSt6?=
+ =?utf-8?B?VXQ3VHBOMXU5RjNOeVFadVBUL3BMcy82QVRKVGZwZG9maFlQOWE0aGpsTHFa?=
+ =?utf-8?B?SjFTbitXYUorM3FySklSZ0ZzZ1VXams3RTZ2VVQza25UakpMZlpKYzVieDdD?=
+ =?utf-8?B?cmVBSUJNLzVIVCtySHdxZGc5VTlkeGZkRTR2YWZzRlVIZVNWaGk4YWRkdHdm?=
+ =?utf-8?B?Z1haQW5ZZThUWjNicVlDNkd6VkdtUDZONkVxVEJpZXZjYXIxbFY1QXFIckho?=
+ =?utf-8?B?bk9Kc0Vwank5NEZYODV0QWhVSW1qMzNQcVdpcHMrQ3E0aURtL1VvNWk4L09y?=
+ =?utf-8?B?K0dMZ2REcnl4QU0ydU95MDBiVjRxanQzOGpvVUlnbWRWZWV2SmhRT3htVWFR?=
+ =?utf-8?B?NHF3dHpBTzRKdDhBRDRrSUtRQ1ZGWDBJNlNxNHBKOThDTGJSVXkzblUvbzU3?=
+ =?utf-8?B?eEpYdjZWQXZqYU1HbkNuU1ljMUQyTzNjNzNxcnZ2RjBiUEgxUWZudFdXOVR3?=
+ =?utf-8?B?d00xODQrVWN4VkRrcmI1VmhKWWVhT3Q5akF5Y1c1Y2VLaC8zQlZmTG1hdVY3?=
+ =?utf-8?B?QmZ6QnAzeEZIZi9pS013bGRYUUljVnlwazJVNWNlZzhNbktkUkxuV3kvZnFO?=
+ =?utf-8?B?Tmx5WWR3V0xLUlJKVGRRUnd2WmxyRjVEajFyVHAvY2hmUEh5YVNMQ2RRWTBR?=
+ =?utf-8?B?UVVmVUlvdXpaUGU2RDVtczVjU1dpT1FSZkx3RzQ2MUNzOFhyKzB3djJTMVdu?=
+ =?utf-8?B?SlJPbUxIYzVIcTdBQzhOTDFkNHBCcEJEQlJjdEJGLzdYNkVPZDhJeHNXN1Z0?=
+ =?utf-8?B?NUprYUk2YlRNcEZhVEtIM0Yxa0RjdjFjR0I4NlMvMy9NRUQ3VVFpWENtb25X?=
+ =?utf-8?B?VVlubEpjQVAwNiszTHV3eUh4aytyUnFnYWJMUFhDcmhoamR3dnVQQzRxczR5?=
+ =?utf-8?B?OGhLNUJhU1c2b1ZYTWlHeHNEdDl1bUliVjhLMWxIRkN1SGoyRUNITHVwZENJ?=
+ =?utf-8?B?bjZMK3gzY0JtbktKbGRuVWhZb1U0UU1WeStXQWZySG9LRzY1dzJCc3A4RWlH?=
+ =?utf-8?Q?Lg4e9zHgrjXIn5NFGgMU2efkQWrZWQv44u4F+/nB6S6R?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8ED39D8057117E4CA2E2AC76E2843801@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-16_23,2024-02-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402160184
-X-Proofpoint-GUID: vRaHQTal2QzNdadErdDkTDQ2zp1kpugm
-X-Proofpoint-ORIG-GUID: vRaHQTal2QzNdadErdDkTDQ2zp1kpugm
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0616f4bb-94cf-4b61-9977-08dc2f515d1a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Feb 2024 00:42:48.0043
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: l6l98E0rPj3wiAHMrK322602igj0z4cm1ztt4HsukD9j9d1TIqXK+SAtLmQ/HlcUo+hWTrWlrycvNse9qbZb8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6732
 
-Tests the ability to enable and disable error logging for passthru admin commands issued to
-the controller and passthru IO commands issued to a namespace.
-
-Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
----
- tests/nvme/039     | 41 +++++++++++++++++++++++++++++++++++++++++
- tests/nvme/039.out |  2 ++
- tests/nvme/rc      | 37 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 80 insertions(+)
-
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index 73b53d0b949c..7cf7638ed4c8 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -130,6 +130,33 @@ inject_invalid_admin_cmd()
- 	fi
- }
- 
-+inject_invalid_io_cmd_passthru()
-+{
-+	local ns_dev
-+	local ctrl_dev
-+	local ns
-+
-+	ns_dev="$1"
-+	ctrl_dev=${ns_dev%n*}
-+	ns=$(echo "$ns_dev" |  cut -d "n" -f3)
-+
-+	# Inject a 'Invalid Command Opcode' (0x1) on a read (0x02)
-+	_nvme_enable_err_inject "$ns_dev" 0 100 1 0x1 1
-+
-+	nvme io-passthru /dev/"$ctrl_dev" --opcode=0x02 --namespace-id="$ns" \
-+		--data-len=512 --read --cdw10=0 --cdw11=0 --cdw12="$2" 2> /dev/null 1>&2
-+
-+	_nvme_disable_err_inject "$1"
-+	if ${nvme_verbose_errors}; then
-+		last_dmesg 2 | grep "Invalid Command Opcode (" | \
-+		    sed 's/nvme.*://g'
-+	else
-+		last_dmesg 2 | grep "Cmd(0x2" | sed 's/I\/O Cmd/Read/g' | \
-+		    sed 's/I\/O Error/Invalid Command Opcode/g' | \
-+		    sed 's/nvme.*://g'
-+	fi
-+}
-+
- test_device() {
- 	echo "Running ${TEST_NAME}"
- 
-@@ -147,6 +174,7 @@ test_device() {
- 	ctrl_dev=${ns_dev%n*}
- 
- 	_nvme_err_inject_setup "${ns_dev}" "${ctrl_dev}"
-+	_nvme_passthru_logging_setup "${ns_dev}" "${ctrl_dev}"
- 
- 	# wait DEFAULT_RATELIMIT_INTERVAL=5 seconds to ensure errors are printed
- 	sleep 5
-@@ -155,6 +183,19 @@ test_device() {
- 	inject_invalid_status_on_read "${ns_dev}"
- 	inject_write_fault_on_write "${ns_dev}"
- 
-+	# Test Pass Thru Admin Logging
-+	_nvme_disable_passthru_admin_error_logging "${ctrl_dev}"
-+	inject_invalid_admin_cmd "${ctrl_dev}"
-+	_nvme_enable_passthru_admin_error_logging "${ctrl_dev}"
-+	inject_access_denied_on_identify "${ctrl_dev}"
-+
-+	# Test Pass Thru IO Logging
-+	_nvme_disable_passthru_io_error_logging "${ns_dev}" "${ctrl_dev}"
-+	inject_invalid_io_cmd_passthru "${ns_dev}" 0
-+	_nvme_enable_passthru_io_error_logging "${ns_dev}" "${ctrl_dev}"
-+	inject_invalid_io_cmd_passthru "${ns_dev}" 1
-+
-+	_nvme_passthru_logging_cleanup "${ns_dev}" "${ctrl_dev}"
- 	_nvme_err_inject_cleanup "${ns_dev}" "${ctrl_dev}"
- 
- 	echo "Test complete"
-diff --git a/tests/nvme/039.out b/tests/nvme/039.out
-index 139070d22240..fea76cfd1245 100644
---- a/tests/nvme/039.out
-+++ b/tests/nvme/039.out
-@@ -2,4 +2,6 @@ Running nvme/039
-  Read(0x2) @ LBA 0, 1 blocks, Unrecovered Read Error (sct 0x2 / sc 0x81) DNR 
-  Read(0x2) @ LBA 0, 1 blocks, Unknown (sct 0x3 / sc 0x75) DNR 
-  Write(0x1) @ LBA 0, 1 blocks, Write Fault (sct 0x2 / sc 0x80) DNR 
-+ Identify(0x6), Access Denied (sct 0x2 / sc 0x86) DNR cdw10=0x1 cdw11=0x0 cdw12=0x0 cdw13=0x0 cdw14=0x0 cdw15=0x0
-+ Read(0x2), Invalid Command Opcode (sct 0x0 / sc 0x1) DNR cdw10=0x0 cdw11=0x0 cdw12=0x1 cdw13=0x0 cdw14=0x0 cdw15=0x0
- Test complete
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index dfc4c1ef1975..2d6ebeab2f6f 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -943,6 +943,23 @@ _check_uuid() {
- 
- declare -A NS_DEV_FAULT_INJECT_SAVE
- declare -A CTRL_DEV_FAULT_INJECT_SAVE
-+ns_dev_passthru_logging=off
-+ctrl_dev_passthru_logging=off
-+
-+_nvme_passthru_logging_setup()
-+{
-+	ctrl_dev_passthru_logging=$(cat /sys/class/nvme/"$2"/passthru_err_log_enabled)
-+	ns_dev_passthru_logging=$(cat /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled)
-+
-+	_nvme_disable_passthru_admin_error_logging "$2"
-+	_nvme_disable_passthru_io_error_logging "$1" "$2"
-+}
-+
-+_nvme_passthru_logging_cleanup()
-+{
-+	echo $ctrl_dev_passthru_logging > /sys/class/nvme/"$2"/passthru_err_log_enabled
-+	echo $ns_dev_passthru_logging > /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled
-+}
- 
- _nvme_err_inject_setup()
- {
-@@ -985,6 +1002,26 @@ _nvme_disable_err_inject()
-         echo 0 > /sys/kernel/debug/"$1"/fault_inject/times
- }
- 
-+_nvme_enable_passthru_admin_error_logging()
-+{
-+	echo on > /sys/class/nvme/"$1"/passthru_err_log_enabled
-+}
-+
-+_nvme_enable_passthru_io_error_logging()
-+{
-+	echo on > /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled
-+}
-+
-+_nvme_disable_passthru_admin_error_logging()
-+{
-+	echo off > /sys/class/nvme/"$1"/passthru_err_log_enabled
-+}
-+
-+_nvme_disable_passthru_io_error_logging()
-+{
-+	echo off > /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled
-+}
-+
- _nvme_reset_ctrl() {
- 	echo 1 > /sys/class/nvme/"$1"/reset_controller
- }
--- 
-2.39.3
-
+T24gMi8xNC8yNCAyMzoxMCwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IFBhc3MgdGhlIHF1
+ZXVlIGxpbWl0cyBkaXJlY3RseSB0byBibGtfYWxsb2NfZGlzayBpbnN0ZWFkIG9mIHNldHRpbmcg
+dGhlbQ0KPiBvbmUgYXQgYSB0aW1lLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBDaHJpc3RvcGggSGVs
+bHdpZyA8aGNoQGxzdC5kZT4NCj4gLS0tDQo+ICAgDQoNCkxvb2tzIGdvb2QuDQoNClJldmlld2Vk
+LWJ5OiBDaGFpdGFueWEgS3Vsa2FybmkgPGtjaEBudmlkaWEuY29tPg0KDQotY2sNCg0KDQo=
