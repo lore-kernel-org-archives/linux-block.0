@@ -1,140 +1,103 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8CB1C693
-	for <linux-block@vger.kernel.org>; Sat, 17 Feb 2024 04:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AE069DE4;
+	Sat, 17 Feb 2024 11:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708142682; cv=none; b=JphQf0Ql6Axz+TBjfwnKPny2XchDQDroxQTc4kxU38vv4dUPhADEjQOt+rtEp0KkmD25sj88p97Fc5diquN0Yo5ws9p+alqw+f16K0Y3tQfrKfAEMV3tbANtoUsNBTWmmfCyRK42ykBGL7VCMqOwOcHcT3Z5K2DGM1qhGutatbI=
+	t=1708171053; cv=none; b=UsPL2Ug8kL4ZIAqsKb/IWcMty9alzqIn1XSwUgBbLj/CF+Wu1VbTRY0kK/HFfgc8OO5lhuryUR6FJbxKz/HA+feYwkTRwKg8scakOPD6+7W4AkkI/VrMH6JKNRJdZnIVeGHYO+mPun61b5clqkw3IMFMrRctIZE40N5duCOSpvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708142682; c=relaxed/simple;
-	bh=2JsnIW9Dfqx/Kpyym0cyn0LZDbDtWBPrNM0fZ46Ie2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vDy8Eg66Qt/J8fxef9GrNLmLq7ua9PzOw35Quuy7KRLBCh3FtWKORKufoZtVmeB/20vYjq/q4tBv/uGlSWIaVUpDx2qKVd7Q8XedJZ+dgybG1Fa156+uTK+mdHKgJdxmq0pOu/6Gux/fFY7f6MKq8c5YnemdXIxRUD48lHQhhqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v2eKsfr4; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1708171053; c=relaxed/simple;
+	bh=DYE5MHoB4iU6UqVOI9xCwDqXRm2zS5gEUdWLduWrELE=;
+	h=From:Message-ID:Subject:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Xzc4gTCmQQEKM2OBwPUSTgoxuIwtBBgN5Z/t7G9S9EV9DNkpf34Eb1FTWJmkNKzr5wf2ld8vWAGYlA+P8JJTis3nNcSZCjLzaLpDwsc8xTCEHYPloebcdppjSlFkRLSrR/gCWhnQ8Pfrh+7h6jrSEwT41wx7p5N+gws0OQUmZzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kqeokdX0; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v2eKsfr4"
-Date: Fri, 16 Feb 2024 23:04:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708142677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A4r5aIV7VuIBs+wO/sCkDN27DEyy8EZefu5EInHNYN4=;
-	b=v2eKsfr4RqJiPyoh2Vo0edhLedLN1wz4yD9ORWOpRo9yJFXqX4BKGIZpRKN+FPclQD/Enc
-	Q32XVIPBwxtM+OUDrbBQc1VlgMToH0H5+lxWd7l7rEFIXmYoqzJRTFkh9PKsjgMd+RXgYd
-	ZILDKHzg/QofJ0EzNQR7JGLKUctiiKQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Christian Brauner <brauner@kernel.org>
-Cc: lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org, 
-	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Dropping page cache of individual fs
-Message-ID: <h5wq7dsi6r7cjjmkpo2dvn5x662eseluzd2kmzbkzegntzlptd@ncjzyaurmiwb>
-References: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kqeokdX0"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4125f065ed6so856825e9.2;
+        Sat, 17 Feb 2024 03:57:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708171050; x=1708775850; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:subject:message-id:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vUsOgHzp8r6kWIn49FLfR/dfD+6UhIXiD2CyZpx4J48=;
+        b=kqeokdX0ny9ziPwGVPJ7GXnOwcQ96fAr/D4Nwu7C7dDbswCWQi6gwnhZ6hpeg0wLhH
+         7pOBLu0d+zllb8XclBVUaDlBAiSZXwB5wU/GrC4OF8pTh0YvCmT7x05J2afB+FRGy2K/
+         m1HFHLPi7n7RWK+Z0T7QfNuzUYEtQgWJYx+yMR0m5Oo3kXjUUO0tGDuZ23OS8cZxqBh5
+         rpObjSqMmDYFCN5jCKYE4bWOsHpIQe78vykXOhhb7nz3RahnEpVmws4vrQY5GOLAyYWh
+         zd0+h9YPw0SbUcJbJCqWAKouz7A8jpVHNDFrBRafKqkBr71E4CJgTZJjqOqFRjHhTDBU
+         /0BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708171050; x=1708775850;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:subject:message-id:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vUsOgHzp8r6kWIn49FLfR/dfD+6UhIXiD2CyZpx4J48=;
+        b=j0CZHGM9jMc+MQ9qmBYv+up9rT9pWIKI9ZH8SYvoVauer4nDvREyDjJO+OIS/8ZiLX
+         oknPJ5dQMQip6VKEXqXRlFC65ZdsiBjeW4HDELnbYkWMOzKT6QyuD7DD/PWGx0sOWoHg
+         qSb+16P+pGz0p3LEc4eQCQsnki6hiOdoLDOW7JLLlSD5zLdHGVvSTU7z2RSHwvUzlULL
+         Nv58EB62fSwF0+AmrxCbyuN/H8GXuUNMlHUj/d6i0B06B2zUi3gxr7PZeWMkOGr8Byd0
+         Jbliaxk/HqsIOeWWFE3PXUkg2YwXveTajlrwWD4iDrcP/QEw46lWk0CFL/4kKiyupt01
+         q8mw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYsE0aGjN85ZaTnsQ4KidKGVV5vwRrBvDQRNowHZ93XOa5OlXwUrc1r4oH9flf+16DjBspv5uV9e9jbqnrMquQ9hnerzL4ULatVO1EWNrppZqz670CDKsz9VD0tiWRHM6DUWs9M7KgajttlPUQhZBX856xuAp23Kar0vyy4qld4fHLTH5/z3pBo3Q4sw9+mz9Nv7+tuOsP
+X-Gm-Message-State: AOJu0Yx/LNoTlkVh0eCGw/RsSbEjMQIQpTg42mSC5hclSnL9FzUeozZG
+	JOZ26K2KE0aZgCCxI+6UlwH687CN1cYGiu1Ot7RzvHaOyGnHBVcv
+X-Google-Smtp-Source: AGHT+IEgt4lASuS58P85SkCYtQ+4L6sOssHAkGTZm9qejp+87GdqbxGLue1Q9HifEME4xc7jobqShQ==
+X-Received: by 2002:a05:600c:3ba6:b0:411:d89d:d7ba with SMTP id n38-20020a05600c3ba600b00411d89dd7bamr6456069wms.7.1708171049914;
+        Sat, 17 Feb 2024 03:57:29 -0800 (PST)
+Received: from 192.168.10.34 ([39.45.172.107])
+        by smtp.gmail.com with ESMTPSA id je11-20020a05600c1f8b00b0040fdf5e6d40sm5096840wmb.20.2024.02.17.03.57.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Feb 2024 03:57:29 -0800 (PST)
+From: Muhammad Usama Anjum <musamaanjum@gmail.com>
+X-Google-Original-From: Muhammad Usama Anjum <MUsamaAnjum@gmail.com>
+Message-ID: <0e96289fdbda200b9608284c7d5fb72546ce4267.camel@gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Reclaiming & documenting page flags
+To: Matthew Wilcox <willy@infradead.org>, lsf-pc@lists.linux-foundation.org
+Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+ linux-block@vger.kernel.org, linux-ide@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+ bpf@vger.kernel.org
+Date: Sat, 17 Feb 2024 16:57:51 +0500
+In-Reply-To: <Zbcn-P4QKgBhyxdO@casper.infradead.org>
+References: <Zbcn-P4QKgBhyxdO@casper.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.0-1 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240116-tagelang-zugnummer-349edd1b5792@brauner>
-X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 16, 2024 at 11:50:32AM +0100, Christian Brauner wrote:
-> Hey,
-> 
-> I'm not sure this even needs a full LSFMM discussion but since I
-> currently don't have time to work on the patch I may as well submit it.
-> 
-> Gnome recently got awared 1M Euro by the Sovereign Tech Fund (STF). The
-> STF was created by the German government to fund public infrastructure:
-> 
-> "The Sovereign Tech Fund supports the development, improvement and
->  maintenance of open digital infrastructure. Our goal is to sustainably
->  strengthen the open source ecosystem. We focus on security, resilience,
->  technological diversity, and the people behind the code." (cf. [1])
-> 
-> Gnome has proposed various specific projects including integrating
-> systemd-homed with Gnome. Systemd-homed provides various features and if
-> you're interested in details then you might find it useful to read [2].
-> It makes use of various new VFS and fs specific developments over the
-> last years.
-> 
-> One feature is encrypting the home directory via LUKS. An approriate
-> image or device must contain a GPT partition table. Currently there's
-> only one partition which is a LUKS2 volume. Inside that LUKS2 volume is
-> a Linux filesystem. Currently supported are btrfs (see [4] though),
-> ext4, and xfs.
-> 
-> The following issue isn't specific to systemd-homed. Gnome wants to be
-> able to support locking encrypted home directories. For example, when
-> the laptop is suspended. To do this the luksSuspend command can be used.
-> 
-> The luksSuspend call is nothing else than a device mapper ioctl to
-> suspend the block device and it's owning superblock/filesystem. Which in
-> turn is nothing but a freeze initiated from the block layer:
-> 
-> dm_suspend()
-> -> __dm_suspend()
->    -> lock_fs()
->       -> bdev_freeze()
-> 
-> So when we say luksSuspend we really mean block layer initiated freeze.
-> The overall goal or expectation of userspace is that after a luksSuspend
-> call all sensitive material has been evicted from relevant caches to
-> harden against various attacks. And luksSuspend does wipe the encryption
-> key and suspend the block device. However, the encryption key can still
-> be available clear-text in the page cache. To illustrate this problem
-> more simply:
-> 
-> truncate -s 500M /tmp/img
-> echo password | cryptsetup luksFormat /tmp/img --force-password
-> echo password | cryptsetup open /tmp/img test
-> mkfs.xfs /dev/mapper/test
-> mount /dev/mapper/test /mnt
-> echo "secrets" > /mnt/data
-> cryptsetup luksSuspend test
-> cat /mnt/data
-> 
-> This will still happily print the contents of /mnt/data even though the
-> block device and the owning filesystem are frozen because the data is
-> still in the page cache.
-> 
-> To my knowledge, the only current way to get the contents of /mnt/data
-> or the encryption key out of the page cache is via
-> /proc/sys/vm/drop_caches which is a big hammer.
-> 
-> My initial reaction is to give userspace an API to drop the page cache
-> of a specific filesystem which may have additional uses. I initially had
-> started drafting an ioctl() and then got swayed towards a
-> posix_fadvise() flag. I found out that this was already proposed a few
-> years ago but got rejected as it was suspected this might just be
-> someone toying around without a real world use-case. I think this here
-> might qualify as a real-world use-case.
-> 
-> This may at least help securing users with a regular dm-crypt setup
-> where dm-crypt is the top layer. Users that stack additional layers on
-> top of dm-crypt may still leak plaintext of course if they introduce
-> additional caching. But that's on them.
-> 
-> Of course other ideas welcome.
+On Mon, 2024-01-29 at 04:32 +0000, Matthew Wilcox wrote:
+> Our documentation of the current page flags is ... not great.  I think
+> I can improve it for the page cache side of things; I understand the
+> meanings of locked, writeback, uptodate, dirty, head, waiters, slab,
+> mlocked, mappedtodisk, error, hwpoison, readahead, anon_exclusive,
+> has_hwpoisoned, hugetlb and large_remappable.
+>=20
+> Where I'm a lot more shaky is the meaning of the more "real MM" flags,
+> like active, referenced, lru, workingset, reserved, reclaim, swapbacked,
+> unevictable, young, idle, swapcache, isolated, and reported.
+>=20
+> Perhaps we could have an MM session where we try to explain slowly and
+> carefully to each other what all these flags actually mean, talk about
+> what combinations of them make sense, how we might eliminate some of
+> them to make more space in the flags word, and what all this looks like
+> in a memdesc world.
+>=20
+> And maybe we can get some documentation written about it!  Not trying
+> to nerd snipe Jon into attending this session, but if he did ...
+This is great idea. Instead of having a session to write
+documentation, we can have a session which would be documentation
+itself even if nobody translates it to text.
 
-This isn't entirely unlike snapshot deletion, where we also need to
-shoot down the pagecache.
+>=20
+> [thanks to Amir for reminding me that I meant to propose this topic]
+>=20
 
-Technically, the code I have now for snapshot deletion isn't quite what
-I want; snapshot deletion probably wants something closer to revoke()
-instead of waiting for files to be closed. But maybe the code I have is
-close to what you need - maybe we could turn this into a common shared
-API?
-
-https://evilpiepirate.org/git/bcachefs.git/tree/fs/bcachefs/fs.c#n1569
-
-The need for page zeroing is pretty orthogonal; if you want page zeroing
-you want that enabled for all page cache folios at all times.
