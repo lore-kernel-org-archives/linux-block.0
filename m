@@ -1,93 +1,132 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214B063407
-	for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 13:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EC56BB59
+	for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 13:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708261319; cv=none; b=GOX4TU7zA9lNRbEfgupFnLe4ZwOT3odAYakglknLNDMX7W+wV3nP9ZDdQPUh9BxTh6NNKev4VTuI2jkFM+iEQoJ7LJWb4OeGULG+dhBn37ntthOjkndjcbZHclUbD384hFJtR57ACnFmc2fqUUkakw/P6xtcwkHM8Frj1e4Rx7c=
+	t=1708262842; cv=none; b=tLqoJchgx4atEj6HnXkCU1jLDRrWbKGMn99lC0v5zYeNnu7AyS8uxww6g1dj4KiG+dOzmuAqx4WbmRXmhunh3zi9EBQxr5vx8LQEHpcBB0aXNsmO9x/qRwRGMPPkKFJdShP52sl0GvMObjxKXgBQue2fZrkFIDDJhtyNfxrqUDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708261319; c=relaxed/simple;
-	bh=CArwFe0qu0rUAkzUEv7P8qSaBIOWCLLpZlpvdXeYt0g=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=kpgt4itUl8O82QZf2xzMpUiJJcnJwVbb/ohkYM/VrS8MPuW0s5BbNT+VtUoHPcJEvF6jOhWUNUzu3OEB7IkUSmQUVyOUZ3WOWyWBE9jeVBxZ8D2zNcFKyrBKG4caBR7PmXG2vAWUs2b8Cxg7rd4uV6qf+0j/e1mFjFtp2Z4NOxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JhVbExaK; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1708262842; c=relaxed/simple;
+	bh=f4Dx6hvqZVzIEqQf6wpvnSgfrPOvqhsMyQ1fiFTV+4k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rmjVRx1z7KkpCpB+H4OugCIcru36W747vFW951T/y2y8DcmiAo0OvU7lt82uu9puvSEbv9MboLxUJYxwNJsclDDzN8AFpxgmc+NtpZf29r+ez/RjXl55Z6LUywMHq3+2YQlJORFJsGOVoQ6CeSzpNaa9lnxmdaZnnD0/Z8m6Qsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ia1yFTX9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JhVbExaK"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-29593a27fcaso988295a91.1
-        for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 05:01:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1708261317; x=1708866117; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iIYyy/W1tr/0bAEhThJxXh8k4ZWLMBlLPwt2pJ+jp6Y=;
-        b=JhVbExaKZAiiOrbb7iq5oKT+m7TBI48oaaFxNzw5jUtVohmspPtBQEtdabTwMWaWXK
-         xxhsWqfEuWeab9foLvASxXZxlnsbOuRePBQVlfRdlJsm07Y8v2mbct2j2O/3YO0+M91W
-         fAY8AqC6yjSvJ8rUrkXCMMsWTVHdGE3gUCTMdW4M5MQ1NkSZaRZ3oPnbkRYK1scD5fpk
-         jSXDckj0opFoK4QV088xAW2wiLTiTrpNnwIZXoV6o5+HTfHf2W7L7bY1C+Bpj2e4kypA
-         syWWSNbMYvyvOMXk7vYO6/fyBJbm4agCqTHbtWiR/YdjXbH3WOwTtgz52yU+WdY8Z5xJ
-         uKGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708261317; x=1708866117;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iIYyy/W1tr/0bAEhThJxXh8k4ZWLMBlLPwt2pJ+jp6Y=;
-        b=LoTUzzM/YIkeZgXn0xA6aSDRGq2h7ig9+etPkItrWHMaalZ6dhpKLL+BGIQkrfSL3L
-         DiWSKeOzE0Lj7Pcg1+HQatNJO4GjtHTNaQ6nZ6RlWUivHt0kHz8bWAd2GvkIYKRyfHtC
-         hyr2z8SCOU+0UJYLBMM5xgEVYDfjNMWLFcfY65MWxXzSJTh76YWfydrUwFPRqsQAUfxU
-         H/9fYcVuWaQT92+tXhZrci+KpUPxjdXh3ZiFkkwePwC6sEKwGBqZyzLmPR/WvSNfOTaB
-         GNdJ3aqenvwrG7P1DDgwS52bCJyXV++rI/O2+MbAjBvkMxUqwUpXONc1GKhU8+22DM1K
-         njAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWow+Dh5rwQL1vUaWOAvBDVtjpnioyGk4Wyn0dWNKOdBAyvyhPaaqG3G2vGc7or9erXzljlEBa8zRxfb5bXc5ykQF7R4ycnp/rCkHo=
-X-Gm-Message-State: AOJu0Ywr8OQFaKk+BNmQvduffRqBygddCSPyo3YJ5yt5d2t8Lz+WWlxA
-	uyJsvO8KXYHa+F3jl6m/qZMGdk82W3+KBL2dVawKjUurQGdMulEKuX8NXfesSjY=
-X-Google-Smtp-Source: AGHT+IFOVa6oJdPekL8bCPtPXjepHYdheq4ZXbm6St90f/I+EkgW0h8RafEA/oyz36xEGT9oV83dCg==
-X-Received: by 2002:a17:902:bb81:b0:1d8:ca3a:9d2a with SMTP id m1-20020a170902bb8100b001d8ca3a9d2amr10414358pls.4.1708261317334;
-        Sun, 18 Feb 2024 05:01:57 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id kn14-20020a170903078e00b001d9a91af8a4sm2685725plb.28.2024.02.18.05.01.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Feb 2024 05:01:56 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Josef Bacik <josef@toxicpanda.com>, Kees Cook <keescook@chromium.org>
-Cc: Navid Emamdoost <navid.emamdoost@gmail.com>, 
- Michal Kubecek <mkubecek@suse.cz>, linux-kernel@vger.kernel.org, 
- linux-block@vger.kernel.org, nbd@other.debian.org, 
- linux-hardening@vger.kernel.org
-In-Reply-To: <20240218042534.it.206-kees@kernel.org>
-References: <20240218042534.it.206-kees@kernel.org>
-Subject: Re: [PATCH v4] nbd: null check for nla_nest_start
-Message-Id: <170826131614.3482432.1638173744340292313.b4-ty@kernel.dk>
-Date: Sun, 18 Feb 2024 06:01:56 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ia1yFTX9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708262838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4zI+zR2XXQW/D9aVyc+pEnd2ISuA9VtHk+evsQZEFp4=;
+	b=ia1yFTX9HNerb/UkwDVwc2L2m/GLliASFIIXyqhlbq0Gl3BYLHiLehUpiOStqhK1u7ipGD
+	t4MROtfmil38ZsYD18e1MMQjhlPQFCyxxQUG5KXGA3IwvnLztjMzDlDFZObhDw5kS4sdoI
+	htAathujX5F0vJiGfAiycmNZFRz1s6I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-163--lTrF3NLMiec6SA7GiSFdQ-1; Sun, 18 Feb 2024 08:27:14 -0500
+X-MC-Unique: -lTrF3NLMiec6SA7GiSFdQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF9F9185A780;
+	Sun, 18 Feb 2024 13:27:13 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.16])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E38471C060AF;
+	Sun, 18 Feb 2024 13:27:06 +0000 (UTC)
+Date: Sun, 18 Feb 2024 21:27:02 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Parav Pandit <parav@nvidia.com>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	pbonzini@redhat.com, stefanha@redhat.com, axboe@kernel.dk,
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
+	stable@vger.kernel.org, lirongqing@baidu.com,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH] virtio_blk: Fix device surprise removal
+Message-ID: <ZdIFpqa23YHwJACh@fedora>
+References: <20240217180848.241068-1-parav@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240217180848.241068-1-parav@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-
-On Sat, 17 Feb 2024 20:25:38 -0800, Kees Cook wrote:
-> nla_nest_start() may fail and return NULL. Insert a check and set errno
-> based on other call sites within the same source code.
+On Sat, Feb 17, 2024 at 08:08:48PM +0200, Parav Pandit wrote:
+> When the PCI device is surprise removed, requests won't complete from
+> the device. These IOs are never completed and disk deletion hangs
+> indefinitely.
 > 
+> Fix it by aborting the IOs which the device will never complete
+> when the VQ is broken.
 > 
+> With this fix now fio completes swiftly.
+> An alternative of IO timeout has been considered, however
+> when the driver knows about unresponsive block device, swiftly clearing
+> them enables users and upper layers to react quickly.
+> 
+> Verified with multiple device unplug cycles with pending IOs in virtio
+> used ring and some pending with device.
+> 
+> In future instead of VQ broken, a more elegant method can be used. At the
+> moment the patch is kept to its minimal changes given its urgency to fix
+> broken kernels.
+> 
+> Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of virtio pci device")
+> Cc: stable@vger.kernel.org
+> Reported-by: lirongqing@baidu.com
+> Closes: https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73ca9b4741@baidu.com/
+> Co-developed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> Signed-off-by: Parav Pandit <parav@nvidia.com>
+> ---
+>  drivers/block/virtio_blk.c | 54 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 54 insertions(+)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 2bf14a0e2815..59b49899b229 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -1562,10 +1562,64 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	return err;
+>  }
+>  
+> +static bool virtblk_cancel_request(struct request *rq, void *data)
+> +{
+> +	struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+> +
+> +	vbr->in_hdr.status = VIRTIO_BLK_S_IOERR;
+> +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
+> +		blk_mq_complete_request(rq);
+> +
+> +	return true;
+> +}
+> +
+> +static void virtblk_cleanup_reqs(struct virtio_blk *vblk)
+> +{
+> +	struct virtio_blk_vq *blk_vq;
+> +	struct request_queue *q;
+> +	struct virtqueue *vq;
+> +	unsigned long flags;
+> +	int i;
+> +
+> +	vq = vblk->vqs[0].vq;
+> +	if (!virtqueue_is_broken(vq))
+> +		return;
+> +
 
-Applied, thanks!
-
-[1/1] nbd: null check for nla_nest_start
-      commit: 31edf4bbe0ba27fd03ac7d87eb2ee3d2a231af6d
-
-Best regards,
--- 
-Jens Axboe
+What if the surprise happens after the above check?
 
 
+Thanks,
+Ming
 
