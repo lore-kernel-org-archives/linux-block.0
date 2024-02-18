@@ -1,1044 +1,125 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E934815C8;
-	Sun, 18 Feb 2024 03:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0EA610D
+	for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 04:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708226019; cv=none; b=PpthfPcllDQwLBd6b+3PAj/KwXad2V7wGleUuxHd+O+PT0xG5gMbkkhdzUnyEEt0JyxDaDj5JQ0HewBaDaWxsJOyiOGZBYfZnKQzgHPV1nqlrcbn06dbV89zFLwpPy+O1FOPA9qBhDD5hQM5rT7NRGKYn8+2ad1ERvKskaoeU4E=
+	t=1708230344; cv=none; b=ANKR3IjNpu9M1ahV9rPkBEv4OcB3HkddQqpp/7v01iIrAEE4SUqUuAQ5eQr/0dq/dIPgHPRofk5G/zegeHNO9yKVToT0Dvp6FtjfhggLyvLRzmFi8sRN2j52zD0iuxb1+LVn7DF89I5rX3AM+BWj1vtrsy8gfRylJLTziElLb+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708226019; c=relaxed/simple;
-	bh=9PA84v9pzYDldV05l4PGP/Ofdp6nm/gY83fp9dEkKAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TB0WhufJrzpd3rPA4TiGXIX2d+T4cBgRQfd/fRz3yzkLVQAFPE5bCuSdoX1+JcZv2HiqbvRwugkioJg/6uWKeZ9U/nqiEk+uETlmLXUyfpl0zMQ+WzQs9L8BCpq7SlVikzwXFTYV27v1AIDBw2WSdb2UDzJqUTvJtPGgEu6IUwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4TcrKp3JBsz1Q8PS;
-	Sun, 18 Feb 2024 11:11:26 +0800 (CST)
-Received: from kwepemm600017.china.huawei.com (unknown [7.193.23.234])
-	by mail.maildlp.com (Postfix) with ESMTPS id AAE7718001B;
-	Sun, 18 Feb 2024 11:13:32 +0800 (CST)
-Received: from [10.174.179.234] (10.174.179.234) by
- kwepemm600017.china.huawei.com (7.193.23.234) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 18 Feb 2024 11:13:31 +0800
-Message-ID: <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com>
-Date: Sun, 18 Feb 2024 11:13:30 +0800
+	s=arc-20240116; t=1708230344; c=relaxed/simple;
+	bh=8X2LbBluiP62PhY4yTx2Vm7OR5mhIBYACk5drh7CJDM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SvLIVyZlVduojm9UKNH6IRup899JRl6sF0y8seajVhV65roxN/ZhwTU9UnV+2FjUCMipVFpXccbnR86ryN1EzXaJQqtZcaJqqz3037NffC7AcZ/PcmRGRXGQrFl8nNdu5dwMTIyI/nNVOsJd+e/MxLOPTqz5hZU9H+IqtGWE4Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hAjeusk3; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hAjeusk3"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5d3912c9a83so2455055a12.3
+        for <linux-block@vger.kernel.org>; Sat, 17 Feb 2024 20:25:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1708230342; x=1708835142; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PPPOVToP9KvYFFYAhd+euhiEp/R/1IO3VQIxg89zLZk=;
+        b=hAjeusk3a+b3Tdepb9qBRtSsPMYj6LSe1dil95hBwTw4/eFeSzYzwIz5A11Zj45vMO
+         br/EkBaWN1hyMcgEnDyagfI4Ye7UDtLdUnkZWife3JCcf6xODHgL6woJarTXY1rYcqFa
+         h6LHzIRQa+NRk9a42IvT2WvKrMMbz3+6iKUe4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708230342; x=1708835142;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PPPOVToP9KvYFFYAhd+euhiEp/R/1IO3VQIxg89zLZk=;
+        b=KC/3wMK0B1f5lSMe4js3FhxVjQwWc8iA5om4vrbL5hcckIqgiq8WOsZxar4KbSIj+G
+         agy91SKqk0ipo+zveoN7S8JpQZlpFFsaqaQGvK0Wwk7088lOmg1rIvyj6jM2isgCgGKG
+         hhBTpedpAoDdqzD2lmZcl+0NUGJx/AF1DhXhAqXx9Ji/QydiUKANmIb6Z6fjtf+cpM5+
+         2a/88KrOApS0H2d5TpzRGmP9OUbjTdq6PzJsIiXH7AlKydKfdL48pI17f9bb0rugyd4F
+         SZOUXcZwCGNBHFyKfFoa2t3ltHCZnnSXX/V2YeV57pst2BKtX5y5CjzJg/nsktschA8D
+         AHPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdJiCBW/2cr4y2aCKFTVX/C+vZQe7cExaz5b6iEr+IkDmpsX/ZVFgyF1J/1T5TIgFvftOfzHpOc+LMqMGbaUAbnrIERSghvErnQrA=
+X-Gm-Message-State: AOJu0Yz3IN40kPEasJjj2e6wY4lMU7md/AUFCB1h9HCAflHjBhZB2F7J
+	+/60vD7PiHcVvwuyh619DLDB9hj3Yu7NEg7ADfDHqrPPt8ZPnB7Ix3oEROe0V1MvnnEZj6ON2RQ
+	=
+X-Google-Smtp-Source: AGHT+IFjk09QrySxOgBtDCo76+mGw+pZNd0U5JFGwf/tqqImzzxQdPNFpc9iNKIfio5NAiR63Hw3VQ==
+X-Received: by 2002:a17:902:b20b:b0:1db:4b23:f97b with SMTP id t11-20020a170902b20b00b001db4b23f97bmr7487589plr.59.1708230342654;
+        Sat, 17 Feb 2024 20:25:42 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id jc15-20020a17090325cf00b001db54324488sm2142726plb.38.2024.02.17.20.25.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Feb 2024 20:25:41 -0800 (PST)
+From: Kees Cook <keescook@chromium.org>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: Kees Cook <keescook@chromium.org>,
+	Navid Emamdoost <navid.emamdoost@gmail.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH v4] nbd: null check for nla_nest_start
+Date: Sat, 17 Feb 2024 20:25:38 -0800
+Message-Id: <20240218042534.it.206-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
- 07/12] iov_iter: Convert iterate*() to inline funcs
-To: David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>
-CC: Al Viro <viro@zeniv.linux.org.uk>, Linus Torvalds
-	<torvalds@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, Christian
- Brauner <christian@brauner.io>, David Laight <David.Laight@ACULAB.COM>,
-	Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-mm@kvack.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Kefeng Wang <wangkefeng.wang@huawei.com>
-References: <20230925120309.1731676-1-dhowells@redhat.com>
- <20230925120309.1731676-8-dhowells@redhat.com>
-From: Tong Tiangen <tongtiangen@huawei.com>
-In-Reply-To: <20230925120309.1731676-8-dhowells@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1211; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=0R8zCu0X/ARVuSqlyl7fu4di67hYDgO+9WqGqz+HaEc=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBl0YbBPe25EqmI5l5nzuL7+soJkeVhsbtCpCkDH
+ ubGmi/BvUiJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZdGGwQAKCRCJcvTf3G3A
+ Jm4SD/4k25Oc6EkBmLy4hVwdpNNdRv+uyAuAXQKD7aOBOpyDpt8qh8Wjxpe+PkBlP8wDVT7g+hi
+ SDxOzbm7NvrlnYL6aF9fyDUz1W2tmTVvVnTJuDOIxdMRT4Z9Eer9IhO+LEXmuY8WevRZrbFgnKl
+ /n+ZC3HYgck0RexH2TJBbMulSVwwh/rgxqbY4NPz19YLMRs1W4k+artJg6buZ9B+VEFT1WYoNU3
+ r33Kr5nru90Yd1QyCEAV28QqD37LynEdBgkUj58fmnzWx5hYluvUR+cSDvtt+ov7Ie5/bcBOoXG
+ lArRTlM6G3GMBDcPWXs8AZ3jJPc3YnyK/N9yvyL0VKqfJQcErqJy2RhCS0PbLZkKjQW1ofg3cm8
+ 3QKhCRRkRDKTCx6FOL7fNT+P5ealU0YBNhatm4gAUl/+9Bn7vTXqWt3NQ8XyPm8TYgf0R3assGN
+ NRnf4P/0HkcKTOIx9w7FC7BA2jMXJJAxXxVUPlFNuznghWXsPQQccfjqxjibsjY7bJBa05ljLo8
+ 7rLaFHTHiVQe8oVL5RR8joZAmlHLGgQjUxLAVm+VoJrP4QMKUOW6wCAGzHWJnFEPupswbmlV/eZ
+ rwitO9926hht8LZtRlvZNm2vco0tFIvBmFgkJ0nO2ZuhY3cWZ9sOA1zf70bgn5re+XXe2oYEpFe
+ Qx6xzOa L6H7WvAw==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600017.china.huawei.com (7.193.23.234)
 
-Hi David, Jens:
+From: Navid Emamdoost <navid.emamdoost@gmail.com>
 
-Recently, I tested the x86 coredump function of the user process in the
-mainline (6.8-rc1) and found an deadloop issue related to this patch.
+nla_nest_start() may fail and return NULL. Insert a check and set errno
+based on other call sites within the same source code.
 
-Let's discuss it.
+Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
+Reviewed-by: Michal Kubecek <mkubecek@suse.cz>
+Fixes: 47d902b90a32 ("nbd: add a status netlink command")
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+v3- https://lore.kernel.org/lkml/20190911164013.27364-1-navid.emamdoost@gmail.com/
+Resending on behalf of the author. This seems to have gotten lost and
+has been getting tracked as CVE-2019-16089 ever since. For example:
+https://ubuntu.com/security/CVE-2019-16089
+---
+ drivers/block/nbd.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-1. Test step:
-----------------------------
-   a. Start a user process.
-   b. Use EINJ to inject a hardware memory error into a page of
-      the this user process.
-   c. Send SIGBUS to this user process.
-   d. After receiving the signal, a coredump file is configured to be
-      written to tmpfs.
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 33a8f37bb6a1..b7c332528ed7 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2433,6 +2433,12 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ 	dev_list = nla_nest_start_noflag(reply, NBD_ATTR_DEVICE_LIST);
++	if (!dev_list) {
++		nlmsg_free(reply);
++		ret = -EMSGSIZE;
++		goto out;
++	}
++
+ 	if (index == -1) {
+ 		ret = idr_for_each(&nbd_index_idr, &status_cb, reply);
+ 		if (ret) {
+-- 
+2.34.1
 
-2. Root cause:
-----------------------------
-The deadloop occurs in generic_perform_write(), the call path:
-
-elf_core_dump()
-   -> dump_user_range()
-     -> dump_emit_page()
-       -> iov_iter_bvec()  //iter type set to BVEC
-         -> iov_iter_set_copy_mc(&iter);  //support copy mc
-           -> __kernel_write_iter()
-             -> shmem_file_write_iter()
-               -> generic_perform_write()
-
-ssize_t generic_perform_write(...)
-{
-	[...]
-	do {
-		[...]
-	again:
-		//[4]
-		if (unlikely(fault_in_iov_iter_readable(i, bytes) ==
-                              bytes)) {
-			status = -EFAULT;
-			break;
-		}
-		//[5]
-		if (fatal_signal_pending(current)) {
-			status = -EINTR;
-			break;
-		}
-		
-	        [...]
-		
-		//[1]
-		copied = copy_page_from_iter_atomic(page, offset, bytes,
-                          i);
-		[...]
-		
-		//[2]
-		status = a_ops->write_end(...);
-		if (unlikely(status != copied)) {
-			iov_iter_revert(i, copied - max(status, 0L));
-			if (unlikely(status < 0))
-				break;
-		}
-		cond_resched();
-		
-		if (unlikely(status == 0)) {
-			/*
-			* A short copy made ->write_end() reject the
-			* thing entirely.  Might be memory poisoning
-			* halfway through, might be a race with munmap,
-			* might be severe memory pressure.
-			*/
-			if (copied)
-				bytes = copied;
-			//----[3]
-			goto again;
-		}
-		[...]
-	} while (iov_iter_count(i));
-	[...]
-}
-
-[1]Before this patch:
-   copy_page_from_iter_atomic()
-     -> iterate_and_advance()
-        -> __iterate_and_advance(..., ((void)(K),0))
-          ->iterate_bvec macro
-            -> left = ((void)(K),0)
-
-With CONFIG_ARCH_HAS_COPY_MC, the K() is copy_mc_to_kernel() which
-return "bytes not copied".
-
-When a memory error occurs during K(), the value of "left" must be 0.
-Therefore, the value of "copied" returned by
-copy_page_from_iter_atomic() is not 0, and the loop of
-generic_perform_write() can be ended normally.
-
-
-After this patch:
-   copy_page_from_iter_atomic()
-     -> iterate_and_advance2()
-       -> iterate_bvec()
-         -> remain = step()
-
-With CONFIG_ARCH_HAS_COPY_MC, the step() is copy_mc_to_kernel() which
-return "bytes not copied".
-
-When a memory error occurs during step(), the value of "left" equal to
-the value of "part" (no one byte is copied successfully). In this case,
-iterate_bvec() returns 0, and copy_page_from_iter_atomic() also returns
-0. The callback shmem_write_end()[2] also returns 0. Finally,
-generic_perform_write() goes to "goto again"[3], and the loop restarts.
-4][5] cannot enter and exit the loop, then deadloop occurs.
-
-Thanks.
-Tong
-
-
-在 2023/9/25 20:03, David Howells 写道:
-> Convert the iov_iter iteration macros to inline functions to make the code
-> easier to follow.
-> 
-> The functions are marked __always_inline as we don't want to end up with
-> indirect calls in the code.  This, however, leaves dealing with ->copy_mc
-> in an awkard situation since the step function (memcpy_from_iter_mc())
-> needs to test the flag in the iterator, but isn't passed the iterator.
-> This will be dealt with in a follow-up patch.
-> 
-> The variable names in the per-type iterator functions have been harmonised
-> as much as possible and made clearer as to the variable purpose.
-> 
-> The iterator functions are also moved to a header file so that other
-> operations that need to scan over an iterator can be added.  For instance,
-> the rbd driver could use this to scan a buffer to see if it is all zeros
-> and libceph could use this to generate a crc.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Christoph Hellwig <hch@lst.de>
-> cc: Christian Brauner <christian@brauner.io>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: Linus Torvalds <torvalds@linux-foundation.org>
-> cc: David Laight <David.Laight@ACULAB.COM>
-> cc: linux-block@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> Link: https://lore.kernel.org/r/3710261.1691764329@warthog.procyon.org.uk/ # v1
-> Link: https://lore.kernel.org/r/855.1692047347@warthog.procyon.org.uk/ # v2
-> Link: https://lore.kernel.org/r/20230816120741.534415-1-dhowells@redhat.com/ # v3
-> ---
-> 
-> Notes:
->      Changes
->      =======
->      ver #5)
->       - Merge in patch to move iteration framework to a header file.
->       - Move "iter->count - progress" into individual iteration subfunctions.
-> 
->   include/linux/iov_iter.h | 274 ++++++++++++++++++++++++++
->   lib/iov_iter.c           | 416 ++++++++++++++++-----------------------
->   2 files changed, 449 insertions(+), 241 deletions(-)
->   create mode 100644 include/linux/iov_iter.h
-> 
-> diff --git a/include/linux/iov_iter.h b/include/linux/iov_iter.h
-> new file mode 100644
-> index 000000000000..270454a6703d
-> --- /dev/null
-> +++ b/include/linux/iov_iter.h
-> @@ -0,0 +1,274 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/* I/O iterator iteration building functions.
-> + *
-> + * Copyright (C) 2023 Red Hat, Inc. All Rights Reserved.
-> + * Written by David Howells (dhowells@redhat.com)
-> + */
-> +
-> +#ifndef _LINUX_IOV_ITER_H
-> +#define _LINUX_IOV_ITER_H
-> +
-> +#include <linux/uio.h>
-> +#include <linux/bvec.h>
-> +
-> +typedef size_t (*iov_step_f)(void *iter_base, size_t progress, size_t len,
-> +			     void *priv, void *priv2);
-> +typedef size_t (*iov_ustep_f)(void __user *iter_base, size_t progress, size_t len,
-> +			      void *priv, void *priv2);
-> +
-> +/*
-> + * Handle ITER_UBUF.
-> + */
-> +static __always_inline
-> +size_t iterate_ubuf(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-> +		    iov_ustep_f step)
-> +{
-> +	void __user *base = iter->ubuf;
-> +	size_t progress = 0, remain;
-> +
-> +	remain = step(base + iter->iov_offset, 0, len, priv, priv2);
-> +	progress = len - remain;
-> +	iter->iov_offset += progress;
-> +	iter->count -= progress;
-> +	return progress;
-> +}
-> +
-> +/*
-> + * Handle ITER_IOVEC.
-> + */
-> +static __always_inline
-> +size_t iterate_iovec(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-> +		     iov_ustep_f step)
-> +{
-> +	const struct iovec *p = iter->__iov;
-> +	size_t progress = 0, skip = iter->iov_offset;
-> +
-> +	do {
-> +		size_t remain, consumed;
-> +		size_t part = min(len, p->iov_len - skip);
-> +
-> +		if (likely(part)) {
-> +			remain = step(p->iov_base + skip, progress, part, priv, priv2);
-> +			consumed = part - remain;
-> +			progress += consumed;
-> +			skip += consumed;
-> +			len -= consumed;
-> +			if (skip < p->iov_len)
-> +				break;
-> +		}
-> +		p++;
-> +		skip = 0;
-> +	} while (len);
-> +
-> +	iter->nr_segs -= p - iter->__iov;
-> +	iter->__iov = p;
-> +	iter->iov_offset = skip;
-> +	iter->count -= progress;
-> +	return progress;
-> +}
-> +
-> +/*
-> + * Handle ITER_KVEC.
-> + */
-> +static __always_inline
-> +size_t iterate_kvec(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-> +		    iov_step_f step)
-> +{
-> +	const struct kvec *p = iter->kvec;
-> +	size_t progress = 0, skip = iter->iov_offset;
-> +
-> +	do {
-> +		size_t remain, consumed;
-> +		size_t part = min(len, p->iov_len - skip);
-> +
-> +		if (likely(part)) {
-> +			remain = step(p->iov_base + skip, progress, part, priv, priv2);
-> +			consumed = part - remain;
-> +			progress += consumed;
-> +			skip += consumed;
-> +			len -= consumed;
-> +			if (skip < p->iov_len)
-> +				break;
-> +		}
-> +		p++;
-> +		skip = 0;
-> +	} while (len);
-> +
-> +	iter->nr_segs -= p - iter->kvec;
-> +	iter->kvec = p;
-> +	iter->iov_offset = skip;
-> +	iter->count -= progress;
-> +	return progress;
-> +}
-> +
-> +/*
-> + * Handle ITER_BVEC.
-> + */
-> +static __always_inline
-> +size_t iterate_bvec(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-> +		    iov_step_f step)
-> +{
-> +	const struct bio_vec *p = iter->bvec;
-> +	size_t progress = 0, skip = iter->iov_offset;
-> +
-> +	do {
-> +		size_t remain, consumed;
-> +		size_t offset = p->bv_offset + skip, part;
-> +		void *kaddr = kmap_local_page(p->bv_page + offset / PAGE_SIZE);
-> +
-> +		part = min3(len,
-> +			   (size_t)(p->bv_len - skip),
-> +			   (size_t)(PAGE_SIZE - offset % PAGE_SIZE));
-> +		remain = step(kaddr + offset % PAGE_SIZE, progress, part, priv, priv2);
-> +		kunmap_local(kaddr);
-> +		consumed = part - remain;
-> +		len -= consumed;
-> +		progress += consumed;
-> +		skip += consumed;
-> +		if (skip >= p->bv_len) {
-> +			skip = 0;
-> +			p++;
-> +		}
-> +		if (remain)
-> +			break;
-> +	} while (len);
-> +
-> +	iter->nr_segs -= p - iter->bvec;
-> +	iter->bvec = p;
-> +	iter->iov_offset = skip;
-> +	iter->count -= progress;
-> +	return progress;
-> +}
-> +
-> +/*
-> + * Handle ITER_XARRAY.
-> + */
-> +static __always_inline
-> +size_t iterate_xarray(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-> +		      iov_step_f step)
-> +{
-> +	struct folio *folio;
-> +	size_t progress = 0;
-> +	loff_t start = iter->xarray_start + iter->iov_offset;
-> +	pgoff_t index = start / PAGE_SIZE;
-> +	XA_STATE(xas, iter->xarray, index);
-> +
-> +	rcu_read_lock();
-> +	xas_for_each(&xas, folio, ULONG_MAX) {
-> +		size_t remain, consumed, offset, part, flen;
-> +
-> +		if (xas_retry(&xas, folio))
-> +			continue;
-> +		if (WARN_ON(xa_is_value(folio)))
-> +			break;
-> +		if (WARN_ON(folio_test_hugetlb(folio)))
-> +			break;
-> +
-> +		offset = offset_in_folio(folio, start + progress);
-> +		flen = min(folio_size(folio) - offset, len);
-> +
-> +		while (flen) {
-> +			void *base = kmap_local_folio(folio, offset);
-> +
-> +			part = min_t(size_t, flen,
-> +				     PAGE_SIZE - offset_in_page(offset));
-> +			remain = step(base, progress, part, priv, priv2);
-> +			kunmap_local(base);
-> +
-> +			consumed = part - remain;
-> +			progress += consumed;
-> +			len -= consumed;
-> +
-> +			if (remain || len == 0)
-> +				goto out;
-> +			flen -= consumed;
-> +			offset += consumed;
-> +		}
-> +	}
-> +
-> +out:
-> +	rcu_read_unlock();
-> +	iter->iov_offset += progress;
-> +	iter->count -= progress;
-> +	return progress;
-> +}
-> +
-> +/*
-> + * Handle ITER_DISCARD.
-> + */
-> +static __always_inline
-> +size_t iterate_discard(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-> +		      iov_step_f step)
-> +{
-> +	size_t progress = len;
-> +
-> +	iter->count -= progress;
-> +	return progress;
-> +}
-> +
-> +/**
-> + * iterate_and_advance2 - Iterate over an iterator
-> + * @iter: The iterator to iterate over.
-> + * @len: The amount to iterate over.
-> + * @priv: Data for the step functions.
-> + * @priv2: More data for the step functions.
-> + * @ustep: Function for UBUF/IOVEC iterators; given __user addresses.
-> + * @step: Function for other iterators; given kernel addresses.
-> + *
-> + * Iterate over the next part of an iterator, up to the specified length.  The
-> + * buffer is presented in segments, which for kernel iteration are broken up by
-> + * physical pages and mapped, with the mapped address being presented.
-> + *
-> + * Two step functions, @step and @ustep, must be provided, one for handling
-> + * mapped kernel addresses and the other is given user addresses which have the
-> + * potential to fault since no pinning is performed.
-> + *
-> + * The step functions are passed the address and length of the segment, @priv,
-> + * @priv2 and the amount of data so far iterated over (which can, for example,
-> + * be added to @priv to point to the right part of a second buffer).  The step
-> + * functions should return the amount of the segment they didn't process (ie. 0
-> + * indicates complete processsing).
-> + *
-> + * This function returns the amount of data processed (ie. 0 means nothing was
-> + * processed and the value of @len means processes to completion).
-> + */
-> +static __always_inline
-> +size_t iterate_and_advance2(struct iov_iter *iter, size_t len, void *priv,
-> +			    void *priv2, iov_ustep_f ustep, iov_step_f step)
-> +{
-> +	if (unlikely(iter->count < len))
-> +		len = iter->count;
-> +	if (unlikely(!len))
-> +		return 0;
-> +
-> +	if (likely(iter_is_ubuf(iter)))
-> +		return iterate_ubuf(iter, len, priv, priv2, ustep);
-> +	if (likely(iter_is_iovec(iter)))
-> +		return iterate_iovec(iter, len, priv, priv2, ustep);
-> +	if (iov_iter_is_bvec(iter))
-> +		return iterate_bvec(iter, len, priv, priv2, step);
-> +	if (iov_iter_is_kvec(iter))
-> +		return iterate_kvec(iter, len, priv, priv2, step);
-> +	if (iov_iter_is_xarray(iter))
-> +		return iterate_xarray(iter, len, priv, priv2, step);
-> +	return iterate_discard(iter, len, priv, priv2, step);
-> +}
-> +
-> +/**
-> + * iterate_and_advance - Iterate over an iterator
-> + * @iter: The iterator to iterate over.
-> + * @len: The amount to iterate over.
-> + * @priv: Data for the step functions.
-> + * @ustep: Function for UBUF/IOVEC iterators; given __user addresses.
-> + * @step: Function for other iterators; given kernel addresses.
-> + *
-> + * As iterate_and_advance2(), but priv2 is always NULL.
-> + */
-> +static __always_inline
-> +size_t iterate_and_advance(struct iov_iter *iter, size_t len, void *priv,
-> +			   iov_ustep_f ustep, iov_step_f step)
-> +{
-> +	return iterate_and_advance2(iter, len, priv, NULL, ustep, step);
-> +}
-> +
-> +#endif /* _LINUX_IOV_ITER_H */
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index 227c9f536b94..65374ee91ecd 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -13,189 +13,69 @@
->   #include <net/checksum.h>
->   #include <linux/scatterlist.h>
->   #include <linux/instrumented.h>
-> +#include <linux/iov_iter.h>
->   
-> -/* covers ubuf and kbuf alike */
-> -#define iterate_buf(i, n, base, len, off, __p, STEP) {		\
-> -	size_t __maybe_unused off = 0;				\
-> -	len = n;						\
-> -	base = __p + i->iov_offset;				\
-> -	len -= (STEP);						\
-> -	i->iov_offset += len;					\
-> -	n = len;						\
-> -}
-> -
-> -/* covers iovec and kvec alike */
-> -#define iterate_iovec(i, n, base, len, off, __p, STEP) {	\
-> -	size_t off = 0;						\
-> -	size_t skip = i->iov_offset;				\
-> -	do {							\
-> -		len = min(n, __p->iov_len - skip);		\
-> -		if (likely(len)) {				\
-> -			base = __p->iov_base + skip;		\
-> -			len -= (STEP);				\
-> -			off += len;				\
-> -			skip += len;				\
-> -			n -= len;				\
-> -			if (skip < __p->iov_len)		\
-> -				break;				\
-> -		}						\
-> -		__p++;						\
-> -		skip = 0;					\
-> -	} while (n);						\
-> -	i->iov_offset = skip;					\
-> -	n = off;						\
-> -}
-> -
-> -#define iterate_bvec(i, n, base, len, off, p, STEP) {		\
-> -	size_t off = 0;						\
-> -	unsigned skip = i->iov_offset;				\
-> -	while (n) {						\
-> -		unsigned offset = p->bv_offset + skip;		\
-> -		unsigned left;					\
-> -		void *kaddr = kmap_local_page(p->bv_page +	\
-> -					offset / PAGE_SIZE);	\
-> -		base = kaddr + offset % PAGE_SIZE;		\
-> -		len = min(min(n, (size_t)(p->bv_len - skip)),	\
-> -		     (size_t)(PAGE_SIZE - offset % PAGE_SIZE));	\
-> -		left = (STEP);					\
-> -		kunmap_local(kaddr);				\
-> -		len -= left;					\
-> -		off += len;					\
-> -		skip += len;					\
-> -		if (skip == p->bv_len) {			\
-> -			skip = 0;				\
-> -			p++;					\
-> -		}						\
-> -		n -= len;					\
-> -		if (left)					\
-> -			break;					\
-> -	}							\
-> -	i->iov_offset = skip;					\
-> -	n = off;						\
-> -}
-> -
-> -#define iterate_xarray(i, n, base, len, __off, STEP) {		\
-> -	__label__ __out;					\
-> -	size_t __off = 0;					\
-> -	struct folio *folio;					\
-> -	loff_t start = i->xarray_start + i->iov_offset;		\
-> -	pgoff_t index = start / PAGE_SIZE;			\
-> -	XA_STATE(xas, i->xarray, index);			\
-> -								\
-> -	len = PAGE_SIZE - offset_in_page(start);		\
-> -	rcu_read_lock();					\
-> -	xas_for_each(&xas, folio, ULONG_MAX) {			\
-> -		unsigned left;					\
-> -		size_t offset;					\
-> -		if (xas_retry(&xas, folio))			\
-> -			continue;				\
-> -		if (WARN_ON(xa_is_value(folio)))		\
-> -			break;					\
-> -		if (WARN_ON(folio_test_hugetlb(folio)))		\
-> -			break;					\
-> -		offset = offset_in_folio(folio, start + __off);	\
-> -		while (offset < folio_size(folio)) {		\
-> -			base = kmap_local_folio(folio, offset);	\
-> -			len = min(n, len);			\
-> -			left = (STEP);				\
-> -			kunmap_local(base);			\
-> -			len -= left;				\
-> -			__off += len;				\
-> -			n -= len;				\
-> -			if (left || n == 0)			\
-> -				goto __out;			\
-> -			offset += len;				\
-> -			len = PAGE_SIZE;			\
-> -		}						\
-> -	}							\
-> -__out:								\
-> -	rcu_read_unlock();					\
-> -	i->iov_offset += __off;					\
-> -	n = __off;						\
-> -}
-> -
-> -#define __iterate_and_advance(i, n, base, len, off, I, K) {	\
-> -	if (unlikely(i->count < n))				\
-> -		n = i->count;					\
-> -	if (likely(n)) {					\
-> -		if (likely(iter_is_ubuf(i))) {			\
-> -			void __user *base;			\
-> -			size_t len;				\
-> -			iterate_buf(i, n, base, len, off,	\
-> -						i->ubuf, (I)) 	\
-> -		} else if (likely(iter_is_iovec(i))) {		\
-> -			const struct iovec *iov = iter_iov(i);	\
-> -			void __user *base;			\
-> -			size_t len;				\
-> -			iterate_iovec(i, n, base, len, off,	\
-> -						iov, (I))	\
-> -			i->nr_segs -= iov - iter_iov(i);	\
-> -			i->__iov = iov;				\
-> -		} else if (iov_iter_is_bvec(i)) {		\
-> -			const struct bio_vec *bvec = i->bvec;	\
-> -			void *base;				\
-> -			size_t len;				\
-> -			iterate_bvec(i, n, base, len, off,	\
-> -						bvec, (K))	\
-> -			i->nr_segs -= bvec - i->bvec;		\
-> -			i->bvec = bvec;				\
-> -		} else if (iov_iter_is_kvec(i)) {		\
-> -			const struct kvec *kvec = i->kvec;	\
-> -			void *base;				\
-> -			size_t len;				\
-> -			iterate_iovec(i, n, base, len, off,	\
-> -						kvec, (K))	\
-> -			i->nr_segs -= kvec - i->kvec;		\
-> -			i->kvec = kvec;				\
-> -		} else if (iov_iter_is_xarray(i)) {		\
-> -			void *base;				\
-> -			size_t len;				\
-> -			iterate_xarray(i, n, base, len, off,	\
-> -							(K))	\
-> -		}						\
-> -		i->count -= n;					\
-> -	}							\
-> -}
-> -#define iterate_and_advance(i, n, base, len, off, I, K) \
-> -	__iterate_and_advance(i, n, base, len, off, I, ((void)(K),0))
-> -
-> -static int copyout(void __user *to, const void *from, size_t n)
-> +static __always_inline
-> +size_t copy_to_user_iter(void __user *iter_to, size_t progress,
-> +			 size_t len, void *from, void *priv2)
->   {
->   	if (should_fail_usercopy())
-> -		return n;
-> -	if (access_ok(to, n)) {
-> -		instrument_copy_to_user(to, from, n);
-> -		n = raw_copy_to_user(to, from, n);
-> +		return len;
-> +	if (access_ok(iter_to, len)) {
-> +		from += progress;
-> +		instrument_copy_to_user(iter_to, from, len);
-> +		len = raw_copy_to_user(iter_to, from, len);
->   	}
-> -	return n;
-> +	return len;
->   }
->   
-> -static int copyout_nofault(void __user *to, const void *from, size_t n)
-> +static __always_inline
-> +size_t copy_to_user_iter_nofault(void __user *iter_to, size_t progress,
-> +				 size_t len, void *from, void *priv2)
->   {
-> -	long res;
-> +	ssize_t res;
->   
->   	if (should_fail_usercopy())
-> -		return n;
-> -
-> -	res = copy_to_user_nofault(to, from, n);
-> +		return len;
->   
-> -	return res < 0 ? n : res;
-> +	from += progress;
-> +	res = copy_to_user_nofault(iter_to, from, len);
-> +	return res < 0 ? len : res;
->   }
->   
-> -static int copyin(void *to, const void __user *from, size_t n)
-> +static __always_inline
-> +size_t copy_from_user_iter(void __user *iter_from, size_t progress,
-> +			   size_t len, void *to, void *priv2)
->   {
-> -	size_t res = n;
-> +	size_t res = len;
->   
->   	if (should_fail_usercopy())
-> -		return n;
-> -	if (access_ok(from, n)) {
-> -		instrument_copy_from_user_before(to, from, n);
-> -		res = raw_copy_from_user(to, from, n);
-> -		instrument_copy_from_user_after(to, from, n, res);
-> +		return len;
-> +	if (access_ok(iter_from, len)) {
-> +		to += progress;
-> +		instrument_copy_from_user_before(to, iter_from, len);
-> +		res = raw_copy_from_user(to, iter_from, len);
-> +		instrument_copy_from_user_after(to, iter_from, len, res);
->   	}
->   	return res;
->   }
->   
-> +static __always_inline
-> +size_t memcpy_to_iter(void *iter_to, size_t progress,
-> +		      size_t len, void *from, void *priv2)
-> +{
-> +	memcpy(iter_to, from + progress, len);
-> +	return 0;
-> +}
-> +
-> +static __always_inline
-> +size_t memcpy_from_iter(void *iter_from, size_t progress,
-> +			size_t len, void *to, void *priv2)
-> +{
-> +	memcpy(to + progress, iter_from, len);
-> +	return 0;
-> +}
-> +
->   /*
->    * fault_in_iov_iter_readable - fault in iov iterator for reading
->    * @i: iterator
-> @@ -312,23 +192,29 @@ size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
->   		return 0;
->   	if (user_backed_iter(i))
->   		might_fault();
-> -	iterate_and_advance(i, bytes, base, len, off,
-> -		copyout(base, addr + off, len),
-> -		memcpy(base, addr + off, len)
-> -	)
-> -
-> -	return bytes;
-> +	return iterate_and_advance(i, bytes, (void *)addr,
-> +				   copy_to_user_iter, memcpy_to_iter);
->   }
->   EXPORT_SYMBOL(_copy_to_iter);
->   
->   #ifdef CONFIG_ARCH_HAS_COPY_MC
-> -static int copyout_mc(void __user *to, const void *from, size_t n)
-> -{
-> -	if (access_ok(to, n)) {
-> -		instrument_copy_to_user(to, from, n);
-> -		n = copy_mc_to_user((__force void *) to, from, n);
-> +static __always_inline
-> +size_t copy_to_user_iter_mc(void __user *iter_to, size_t progress,
-> +			    size_t len, void *from, void *priv2)
-> +{
-> +	if (access_ok(iter_to, len)) {
-> +		from += progress;
-> +		instrument_copy_to_user(iter_to, from, len);
-> +		len = copy_mc_to_user(iter_to, from, len);
->   	}
-> -	return n;
-> +	return len;
-> +}
-> +
-> +static __always_inline
-> +size_t memcpy_to_iter_mc(void *iter_to, size_t progress,
-> +			 size_t len, void *from, void *priv2)
-> +{
-> +	return copy_mc_to_kernel(iter_to, from + progress, len);
->   }
->   
->   /**
-> @@ -361,22 +247,20 @@ size_t _copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
->   		return 0;
->   	if (user_backed_iter(i))
->   		might_fault();
-> -	__iterate_and_advance(i, bytes, base, len, off,
-> -		copyout_mc(base, addr + off, len),
-> -		copy_mc_to_kernel(base, addr + off, len)
-> -	)
-> -
-> -	return bytes;
-> +	return iterate_and_advance(i, bytes, (void *)addr,
-> +				   copy_to_user_iter_mc, memcpy_to_iter_mc);
->   }
->   EXPORT_SYMBOL_GPL(_copy_mc_to_iter);
->   #endif /* CONFIG_ARCH_HAS_COPY_MC */
->   
-> -static void *memcpy_from_iter(struct iov_iter *i, void *to, const void *from,
-> -				 size_t size)
-> +static size_t memcpy_from_iter_mc(void *iter_from, size_t progress,
-> +				  size_t len, void *to, void *priv2)
->   {
-> -	if (iov_iter_is_copy_mc(i))
-> -		return (void *)copy_mc_to_kernel(to, from, size);
-> -	return memcpy(to, from, size);
-> +	struct iov_iter *iter = priv2;
-> +
-> +	if (iov_iter_is_copy_mc(iter))
-> +		return copy_mc_to_kernel(to + progress, iter_from, len);
-> +	return memcpy_from_iter(iter_from, progress, len, to, priv2);
->   }
->   
->   size_t _copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
-> @@ -386,30 +270,46 @@ size_t _copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
->   
->   	if (user_backed_iter(i))
->   		might_fault();
-> -	iterate_and_advance(i, bytes, base, len, off,
-> -		copyin(addr + off, base, len),
-> -		memcpy_from_iter(i, addr + off, base, len)
-> -	)
-> -
-> -	return bytes;
-> +	return iterate_and_advance2(i, bytes, addr, i,
-> +				    copy_from_user_iter,
-> +				    memcpy_from_iter_mc);
->   }
->   EXPORT_SYMBOL(_copy_from_iter);
->   
-> +static __always_inline
-> +size_t copy_from_user_iter_nocache(void __user *iter_from, size_t progress,
-> +				   size_t len, void *to, void *priv2)
-> +{
-> +	return __copy_from_user_inatomic_nocache(to + progress, iter_from, len);
-> +}
-> +
->   size_t _copy_from_iter_nocache(void *addr, size_t bytes, struct iov_iter *i)
->   {
->   	if (WARN_ON_ONCE(!i->data_source))
->   		return 0;
->   
-> -	iterate_and_advance(i, bytes, base, len, off,
-> -		__copy_from_user_inatomic_nocache(addr + off, base, len),
-> -		memcpy(addr + off, base, len)
-> -	)
-> -
-> -	return bytes;
-> +	return iterate_and_advance(i, bytes, addr,
-> +				   copy_from_user_iter_nocache,
-> +				   memcpy_from_iter);
->   }
->   EXPORT_SYMBOL(_copy_from_iter_nocache);
->   
->   #ifdef CONFIG_ARCH_HAS_UACCESS_FLUSHCACHE
-> +static __always_inline
-> +size_t copy_from_user_iter_flushcache(void __user *iter_from, size_t progress,
-> +				      size_t len, void *to, void *priv2)
-> +{
-> +	return __copy_from_user_flushcache(to + progress, iter_from, len);
-> +}
-> +
-> +static __always_inline
-> +size_t memcpy_from_iter_flushcache(void *iter_from, size_t progress,
-> +				   size_t len, void *to, void *priv2)
-> +{
-> +	memcpy_flushcache(to + progress, iter_from, len);
-> +	return 0;
-> +}
-> +
->   /**
->    * _copy_from_iter_flushcache - write destination through cpu cache
->    * @addr: destination kernel address
-> @@ -431,12 +331,9 @@ size_t _copy_from_iter_flushcache(void *addr, size_t bytes, struct iov_iter *i)
->   	if (WARN_ON_ONCE(!i->data_source))
->   		return 0;
->   
-> -	iterate_and_advance(i, bytes, base, len, off,
-> -		__copy_from_user_flushcache(addr + off, base, len),
-> -		memcpy_flushcache(addr + off, base, len)
-> -	)
-> -
-> -	return bytes;
-> +	return iterate_and_advance(i, bytes, addr,
-> +				   copy_from_user_iter_flushcache,
-> +				   memcpy_from_iter_flushcache);
->   }
->   EXPORT_SYMBOL_GPL(_copy_from_iter_flushcache);
->   #endif
-> @@ -508,10 +405,9 @@ size_t copy_page_to_iter_nofault(struct page *page, unsigned offset, size_t byte
->   		void *kaddr = kmap_local_page(page);
->   		size_t n = min(bytes, (size_t)PAGE_SIZE - offset);
->   
-> -		iterate_and_advance(i, n, base, len, off,
-> -			copyout_nofault(base, kaddr + offset + off, len),
-> -			memcpy(base, kaddr + offset + off, len)
-> -		)
-> +		n = iterate_and_advance(i, bytes, kaddr,
-> +					copy_to_user_iter_nofault,
-> +					memcpy_to_iter);
->   		kunmap_local(kaddr);
->   		res += n;
->   		bytes -= n;
-> @@ -554,14 +450,25 @@ size_t copy_page_from_iter(struct page *page, size_t offset, size_t bytes,
->   }
->   EXPORT_SYMBOL(copy_page_from_iter);
->   
-> -size_t iov_iter_zero(size_t bytes, struct iov_iter *i)
-> +static __always_inline
-> +size_t zero_to_user_iter(void __user *iter_to, size_t progress,
-> +			 size_t len, void *priv, void *priv2)
->   {
-> -	iterate_and_advance(i, bytes, base, len, count,
-> -		clear_user(base, len),
-> -		memset(base, 0, len)
-> -	)
-> +	return clear_user(iter_to, len);
-> +}
->   
-> -	return bytes;
-> +static __always_inline
-> +size_t zero_to_iter(void *iter_to, size_t progress,
-> +		    size_t len, void *priv, void *priv2)
-> +{
-> +	memset(iter_to, 0, len);
-> +	return 0;
-> +}
-> +
-> +size_t iov_iter_zero(size_t bytes, struct iov_iter *i)
-> +{
-> +	return iterate_and_advance(i, bytes, NULL,
-> +				   zero_to_user_iter, zero_to_iter);
->   }
->   EXPORT_SYMBOL(iov_iter_zero);
->   
-> @@ -586,10 +493,9 @@ size_t copy_page_from_iter_atomic(struct page *page, size_t offset,
->   		}
->   
->   		p = kmap_atomic(page) + offset;
-> -		iterate_and_advance(i, n, base, len, off,
-> -			copyin(p + off, base, len),
-> -			memcpy_from_iter(i, p + off, base, len)
-> -		)
-> +		n = iterate_and_advance2(i, n, p, i,
-> +					 copy_from_user_iter,
-> +					 memcpy_from_iter_mc);
->   		kunmap_atomic(p);
->   		copied += n;
->   		offset += n;
-> @@ -1180,32 +1086,64 @@ ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
->   }
->   EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
->   
-> +static __always_inline
-> +size_t copy_from_user_iter_csum(void __user *iter_from, size_t progress,
-> +				size_t len, void *to, void *priv2)
-> +{
-> +	__wsum next, *csum = priv2;
-> +
-> +	next = csum_and_copy_from_user(iter_from, to + progress, len);
-> +	*csum = csum_block_add(*csum, next, progress);
-> +	return next ? 0 : len;
-> +}
-> +
-> +static __always_inline
-> +size_t memcpy_from_iter_csum(void *iter_from, size_t progress,
-> +			     size_t len, void *to, void *priv2)
-> +{
-> +	__wsum *csum = priv2;
-> +
-> +	*csum = csum_and_memcpy(to + progress, iter_from, len, *csum, progress);
-> +	return 0;
-> +}
-> +
->   size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
->   			       struct iov_iter *i)
->   {
-> -	__wsum sum, next;
-> -	sum = *csum;
->   	if (WARN_ON_ONCE(!i->data_source))
->   		return 0;
-> -
-> -	iterate_and_advance(i, bytes, base, len, off, ({
-> -		next = csum_and_copy_from_user(base, addr + off, len);
-> -		sum = csum_block_add(sum, next, off);
-> -		next ? 0 : len;
-> -	}), ({
-> -		sum = csum_and_memcpy(addr + off, base, len, sum, off);
-> -	})
-> -	)
-> -	*csum = sum;
-> -	return bytes;
-> +	return iterate_and_advance2(i, bytes, addr, csum,
-> +				    copy_from_user_iter_csum,
-> +				    memcpy_from_iter_csum);
->   }
->   EXPORT_SYMBOL(csum_and_copy_from_iter);
->   
-> +static __always_inline
-> +size_t copy_to_user_iter_csum(void __user *iter_to, size_t progress,
-> +			      size_t len, void *from, void *priv2)
-> +{
-> +	__wsum next, *csum = priv2;
-> +
-> +	next = csum_and_copy_to_user(from + progress, iter_to, len);
-> +	*csum = csum_block_add(*csum, next, progress);
-> +	return next ? 0 : len;
-> +}
-> +
-> +static __always_inline
-> +size_t memcpy_to_iter_csum(void *iter_to, size_t progress,
-> +			   size_t len, void *from, void *priv2)
-> +{
-> +	__wsum *csum = priv2;
-> +
-> +	*csum = csum_and_memcpy(iter_to, from + progress, len, *csum, progress);
-> +	return 0;
-> +}
-> +
->   size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *_csstate,
->   			     struct iov_iter *i)
->   {
->   	struct csum_state *csstate = _csstate;
-> -	__wsum sum, next;
-> +	__wsum sum;
->   
->   	if (WARN_ON_ONCE(i->data_source))
->   		return 0;
-> @@ -1219,14 +1157,10 @@ size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *_csstate,
->   	}
->   
->   	sum = csum_shift(csstate->csum, csstate->off);
-> -	iterate_and_advance(i, bytes, base, len, off, ({
-> -		next = csum_and_copy_to_user(addr + off, base, len);
-> -		sum = csum_block_add(sum, next, off);
-> -		next ? 0 : len;
-> -	}), ({
-> -		sum = csum_and_memcpy(base, addr + off, len, sum, off);
-> -	})
-> -	)
-> +	
-> +	bytes = iterate_and_advance2(i, bytes, (void *)addr, &sum,
-> +				     copy_to_user_iter_csum,
-> +				     memcpy_to_iter_csum);
->   	csstate->csum = csum_shift(sum, csstate->off);
->   	csstate->off += bytes;
->   	return bytes;
-> 
-> 
