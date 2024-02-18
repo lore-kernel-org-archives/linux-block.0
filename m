@@ -1,236 +1,96 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A47D294;
-	Sun, 18 Feb 2024 07:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0D9EAD6
+	for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 13:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708242443; cv=none; b=ePhboZEsATNCu7vJrfTxud5YGoU588jmYItXs1cIKFx/syfm27yNrl+DpoYdn/h9uHpCNigYQ9AJ1fqDU5T0qcbCVZd41+XJfo/bunxh/6m7wuh5v0ua6qOVJ05QKPOQtpAcAIcpULCTy31Rj1Ef9SHtf4Ya0NrUrNXWZJX8Rzk=
+	t=1708261318; cv=none; b=D09/xwmRhtj7wJ5280YsfUY+hGdICujvzFFaJ41BWH2xlLlPxoP6UiZvvVc4/XS/h774sbtRbMpTWUHsxpzUqSyOqRwHyAQ1BmY/AtyDAzXie7PtyfYCg5SyarBUTHlGVa+Ic2+wtBXvdQifRhiWH5YFn3fTC06GMsrdPSsq4vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708242443; c=relaxed/simple;
-	bh=tiqzXuBxTbUFsemp1dU5cIN58mwX4m/IRncxJKZ6RiM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=XHgQl5ir9jAJ7ZcqWx4huq3v1H2ayxa/u6ilQBoW6d+RPmYCXt9MorZMtCThF1s2BqvjHhWXXIBZOLPm9VnoB8gY2jGWsfxbuQcu9lq3Xv2McTTysf2NzOF8LkyuuLiUxAKFhBRdjM9w+asupf5DIHGOBkAU8oKPfOZnncPqdv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TcyRx3dvbz4f3lDW;
-	Sun, 18 Feb 2024 15:47:09 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 863E31A0199;
-	Sun, 18 Feb 2024 15:47:16 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+REAttFlmUSBEQ--.9016S3;
-	Sun, 18 Feb 2024 15:47:13 +0800 (CST)
-Subject: Re: [PATCH] block: fix deadlock between bd_link_disk_holder and
- partition scan
-To: Song Liu <song@kernel.org>, Li Nan <linan666@huaweicloud.com>
-Cc: axboe@kernel.dk, linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, houtao1@huawei.com,
- yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240207092756.2087888-1-linan666@huaweicloud.com>
- <CAPhsuW74hLiW_KTv3xohwMAcPZ9gp2TvLST4tY7H3O8cA26TTg@mail.gmail.com>
- <6849835d-a3ac-e840-09e9-8539e7953fe4@huaweicloud.com>
- <CAPhsuW4k_C=UxwESU4t7R+fpoAJ_HE8g_PpCJXSUGWOdbpCEoQ@mail.gmail.com>
- <CAPhsuW4H=ehc1UiuFdhBXZUfU_okQ=-rbti1oEWHcs7ajT89iw@mail.gmail.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <6211cd80-6573-656d-e198-befe074030d8@huaweicloud.com>
-Date: Sun, 18 Feb 2024 15:47:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1708261318; c=relaxed/simple;
+	bh=zbnL6TDcSK6AC/D2F07Yjgf53xB66w+9AFFNx1ks/W8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=DGJKvZuN1yj1/KZlivS/sLCCVx2UhDBBjOg3/c9shi4mQ318wuCdMjqu1kkwjxWcYJUkCefHaTyaFnxF1u9QlFxFHoODgASG9llz7qzcoSgjV4ucPNFnnKZ4OmWlk21WS5YeSV2lloPQ+0VK93/N+6c7MieDXqZiQ6gkfD5Ttao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gLDbvUzA; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gLDbvUzA"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-58962bf3f89so1133381a12.0
+        for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 05:01:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1708261316; x=1708866116; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RuYePQZG9giieDNYVsec9OIcCA3TVx+bwOo9N5SvsvA=;
+        b=gLDbvUzA57vUh5GtfLeVcMLk35FQkWSXw+81G6ZWwS8eZdDEVU9uzvnWuLod1cM5WB
+         SFDPPel9C3xdleZDATiqig3zONAIUB9Cd1dzWeiZQNmkLM1h91RN4Gtadicl18xNWgi9
+         0l1ZlyZnGtkxPtCdpHeaYfd4rbsZc/IV2g0mDRvU50LVqOsoBNLtn5te9DrhqsybddoO
+         XjbK0sPrgVs0CvLm7OOALrnQLGrAFqbD3IeoACUvg5tCM6WdQLyT6lxwFoq0VDeaSGOd
+         JzsQJDS+nzMkSC/pYL7D5p+Snur7WwRHfDHteps7jY+WgfqmAN79o+4dv3+Vk8BHiWHY
+         EbHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708261316; x=1708866116;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RuYePQZG9giieDNYVsec9OIcCA3TVx+bwOo9N5SvsvA=;
+        b=n1em9sfFqzchQ5RVnmgEddpeerg+VKhM9t16VK4C4MIoFlp0yaDTj4EDxmqn40/a9e
+         aRiu10cXIrLnInsgUlxWlsVZ/9RTyupq6BNy9MMYmEPpjY1pgU6JCUnIjRUVjmOPe35h
+         SRsG29S67M2unxo/92x8rKvy91D7d8aoh2w+qcptLw87qKhv4RQmTsv3Y0Qz8fCMICWD
+         jA7nmCT6ZExemg559pb1AD0urhpWBchum/tYI+65XmT4z2sSgre4srqT0R0/Z1R2jLLO
+         5461VROdphk6/O6LcF2oYlmfc4BjD7I/9ATeJEM2yDMQJHg0ETNvhJXqFSgLKrydSvM4
+         ReKQ==
+X-Gm-Message-State: AOJu0YxPxvLvSNeTQFoW+RmT1WexHqK6rHHAZYXuI2LV0r3G9LmvAZ8B
+	FS6fj7NUVUioKadXSTH9G5mwdzFP0QMSlueDb+RGMzeVygbUqFCazVbYLVNfO78=
+X-Google-Smtp-Source: AGHT+IEKX3t6Kj/HgmMYWJJaz/LJxic/c2Y15drX2IZ4kjfplvpusLpca3ojazyvGc3w8OY/xUecVg==
+X-Received: by 2002:a17:902:ac88:b0:1db:94a9:f9f0 with SMTP id h8-20020a170902ac8800b001db94a9f9f0mr8166917plr.2.1708261315996;
+        Sun, 18 Feb 2024 05:01:55 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id kn14-20020a170903078e00b001d9a91af8a4sm2685725plb.28.2024.02.18.05.01.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Feb 2024 05:01:55 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, gjoyce@linux.ibm.com
+Cc: jonathan.derrick@linux.dev, brking@linux.ibm.com, msuchanek@suse.de, 
+ akpm@linux-foundation.org, okozina@redhat.com, hch@lst.de, dwagner@suse.de
+In-Reply-To: <20240216210417.3526064-1-gjoyce@linux.ibm.com>
+References: <20240216210417.3526064-1-gjoyce@linux.ibm.com>
+Subject: Re: [PATCH 0/1] add empty atom support to SED Opal parser
+Message-Id: <170826131482.3482432.14386325887775454180.b4-ty@kernel.dk>
+Date: Sun, 18 Feb 2024 06:01:54 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAPhsuW4H=ehc1UiuFdhBXZUfU_okQ=-rbti1oEWHcs7ajT89iw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+REAttFlmUSBEQ--.9016S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxtFWUtrWDWryftrW3JF4xJFb_yoW7Wr13pr
-	Z7tanxtr1UJFnxu3y7ta4kuF10qw1UKr42qr9xW3y7ZwnFyrn3WF1F9r45uF1Ykw1xJFyD
-	Ja1UWa47Gw10krUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-	Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x0JUq38nUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-Hi,
 
-在 2024/02/17 3:03, Song Liu 写道:
-> On Thu, Feb 8, 2024 at 4:49 PM Song Liu <song@kernel.org> wrote:
->>
->> On Thu, Feb 8, 2024 at 12:44 AM Li Nan <linan666@huaweicloud.com> wrote:
->>>
->>>
->>>
->>> 在 2024/2/8 14:50, Song Liu 写道:
->>>> On Wed, Feb 7, 2024 at 1:32 AM <linan666@huaweicloud.com> wrote:
->>>>>
->>>>> From: Li Nan <linan122@huawei.com>
->>>>>
->>>>> 'open_mutex' of gendisk is used to protect open/close block devices. But
->>>>> in bd_link_disk_holder(), it is used to protect the creation of symlink
->>>>> between holding disk and slave bdev, which introduces some issues.
->>>>>
->>>>> When bd_link_disk_holder() is called, the driver is usually in the process
->>>>> of initialization/modification and may suspend submitting io. At this
->>>>> time, any io hold 'open_mutex', such as scanning partitions, can cause
->>>>> deadlocks. For example, in raid:
->>>>>
->>>>> T1                              T2
->>>>> bdev_open_by_dev
->>>>>    lock open_mutex [1]
->>>>>    ...
->>>>>     efi_partition
->>>>>     ...
->>>>>      md_submit_bio
->>>>>                                   md_ioctl mddev_syspend
->>>>>                                     -> suspend all io
->>>>>                                    md_add_new_disk
->>>>>                                     bind_rdev_to_array
->>>>>                                      bd_link_disk_holder
->>>>>                                       try lock open_mutex [2]
->>>>>       md_handle_request
->>>>>        -> wait mddev_resume
->>>>>
->>>>> T1 scan partition, T2 add a new device to raid. T1 waits for T2 to resume
->>>>> mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
->>>>>
->>>>> Fix it by introducing a local mutex 'holder_mutex' to replace 'open_mutex'.
->>>>
->>>> Is this to fix [1]? Do we need some Fixes and/or Closes tags?
->>>>
->>>
->>> No. Just use another way to fix [2], and both [2] and this patch can fix
->>> the issue. I am not sure about the root cause of [1] yet.
->>>
->>> [2] https://patchwork.kernel.org/project/linux-raid/list/?series=812045
->>>
->>>> Could you please add steps to reproduce this issue?
->>>
->>> We need to modify the kernel, add sleep in md_submit_bio() and md_ioctl()
->>> as below, and then:
->>>     1. mdadm -CR /dev/md0 -l1 -n2 /dev/sd[bc]  #create a raid
->>>     2. echo 1 > /sys/module/md_mod/parameters/error_inject  #enable sleep
->>>     3. 'mdadm --add /dev/md0 /dev/sda'  #add a disk to raid
->>>     4. submit ioctl BLKRRPART to raid within 10s.
->>
->> The analysis makes sense. I also hit the issue a couple times without adding
->> extra delays. But I am not sure whether this is the best fix (I didn't find real
->> issues with it either).
+On Fri, 16 Feb 2024 15:04:16 -0600, gjoyce@linux.ibm.com wrote:
+> Some SED Opal compliant NVMe drives generate "empty atoms" that cause
+> the message response parser to fail. The TCG spec indicates that
+> empty atoms are for alignment and should be ignored. This change
+> adds recognition of empty atoms and ignores them if found. This
+> allows the parser to corectly process the response message.
 > 
-> To be extra safe and future proof, we can do something like the
-> following to only
-> suspend the array for ADD_NEW_DISK on not-running arrays.
+> Greg Joyce (1):
+>   block: sed-opal: handle empty atoms when parsing response
 > 
-> This appear to solve the problem reported in
-> 
-> https://bugzilla.kernel.org/show_bug.cgi?id=218459
-> 
-> Thanks,
-> Song
-> 
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index 9e41a9aaba8b..395911d5f4d6 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -7570,10 +7570,11 @@ static inline bool md_ioctl_valid(unsigned int cmd)
->          }
->   }
-> 
-> -static bool md_ioctl_need_suspend(unsigned int cmd)
-> +static bool md_ioctl_need_suspend(struct mddev *mddev, unsigned int cmd)
->   {
->          switch (cmd) {
->          case ADD_NEW_DISK:
-> +               return mddev->pers != NULL;
+> [...]
 
-Did you check already that this problem is not related that 'active_io'
-is leaked for flush IO?
+Applied, thanks!
 
-I don't understand the problem reported yet. If 'mddev->pers' is not set
-yet, md_submit_bio() will return directly, and 'active_io' should not be
-grabbed in the first place.
+[1/1] block: sed-opal: handle empty atoms when parsing response
+      (no commit info)
 
-md_run() is the only place to convert 'mddev->pers' from NULL to a real
-personality, and it's protected by 'reconfig_mutex', however,
-md_ioctl_need_suspend() is called without 'reconfig_mutex', hence there
-is a race condition:
+Best regards,
+-- 
+Jens Axboe
 
-md_ioctl_need_suspend		array_state_store
-  // mddev->pers is NULL, return false
-				 mddev_lock
-				 do_md_run
-				  mddev->pers = xxx
-				 mddev_unlock
 
-  // mddev_suspend is not called
-  mddev_lock
-  md_add_new_disk
-   if (mddev->pers)
-    md_import_device
-    bind_rdev_to_array
-    add_bound_rdev
-     mddev->pers->hot_add_disk
-     -> hot add disk without suspending
-
-Thanks,
-Kuai
-
->          case HOT_ADD_DISK:
->          case HOT_REMOVE_DISK:
->          case SET_BITMAP_FILE:
-> @@ -7625,6 +7626,7 @@ static int md_ioctl(struct block_device *bdev,
-> blk_mode_t mode,
->          void __user *argp = (void __user *)arg;
->          struct mddev *mddev = NULL;
->          bool did_set_md_closing = false;
-> +       bool need_suspend;
-> 
->          if (!md_ioctl_valid(cmd))
->                  return -ENOTTY;
-> @@ -7716,8 +7718,11 @@ static int md_ioctl(struct block_device *bdev,
-> blk_mode_t mode,
->          if (!md_is_rdwr(mddev))
->                  flush_work(&mddev->sync_work);
-> 
-> -       err = md_ioctl_need_suspend(cmd) ? mddev_suspend_and_lock(mddev) :
-> -                                          mddev_lock(mddev);
-> +       need_suspend = md_ioctl_need_suspend(mddev, cmd);
-> +       if (need_suspend)
-> +               err = mddev_suspend_and_lock(mddev);
-> +       else
-> +               err = mddev_lock(mddev);
->          if (err) {
->                  pr_debug("md: ioctl lock interrupted, reason %d, cmd %d\n",
->                           err, cmd);
-> @@ -7846,8 +7851,10 @@ static int md_ioctl(struct block_device *bdev,
-> blk_mode_t mode,
->              err != -EINVAL)
->                  mddev->hold_active = 0;
-> 
-> -       md_ioctl_need_suspend(cmd) ? mddev_unlock_and_resume(mddev) :
-> -                                    mddev_unlock(mddev);
-> +       if (need_suspend)
-> +               mddev_unlock_and_resume(mddev);
-> +       else
-> +               mddev_unlock(mddev);
-> 
->   out:
->          if(did_set_md_closing)
-> .
-> 
 
