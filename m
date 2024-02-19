@@ -1,210 +1,229 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2060.outbound.protection.outlook.com [40.107.100.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1102B9A7
-	for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 16:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708275557; cv=none; b=OfPWo5h65a1LDrYhVIur3fJdvI8ow7jrq0HyGWohcABnRcbKXIA0lgjcjQufczjAYe4/HDQZ0JLHVSkpQIUVXYQA6/6fBQ1QTulXGTbQFXr1FAOPWZDxE9TuUW7aVMcrJYC4ymJyWeOvYbDFQy+VsaAfdvjeKzKd20uFQ81KAGc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708275557; c=relaxed/simple;
-	bh=pVxgXzf4srax5aePZx9aVMjl3WEMBrskPFZmVaGEe6k=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=d12NsC9gjc+ckMipLE9dtgfEM6IfIbIikRNDfJvqjVkjFDu2GZXVO47Dg/kLLYGz4xs9TAyeszElVI1dgkwaZWZbTlpaH/I6dTZuRZh8OKVSHRe+RfsAc4kmiUlNjT8uSgK0Sn09YpvUF1ggFafNLTS3cQGccmVtK4qupu2sZDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DBqsrYdA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A222103;
+	Mon, 19 Feb 2024 03:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708312500; cv=fail; b=QvbZ+rcup7XFSbXWGv9CmqqB7h4T7o/GYOiv5pV/Qv+sXwEeDin3Ewy+A43ULdaun3sI5f3duYNKx3DHLUfzZPJqerlpPyC7WnaXGgVvSxfIMtWbnaV6+whOGnWAzKysrkkw9OLz2I3EYc00JmAzPwPmNHmrmdzn7HiRLwU1Ml0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708312500; c=relaxed/simple;
+	bh=EL13OiB+NYNU1ruf0QI+AGo34/fMOufoZxjalAWs7Ok=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RkJPLCTtcdkhIiowBWQgMddDVFtYkh7+ehrGD8AyPV/y+SjcdsIjn8BpsMfAt4SJtfiYTaKyO923UnLVVIf3QcyIyMqIvxRMHH90zITl9ZAAoa6r+Z5dlkqWpyWFV5ARwR5lxoikydYGLgwH5pYSliqcsa8X9KZuDQOAo995I10=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=L43vAIZq; arc=fail smtp.client-ip=40.107.100.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DBqsrYdA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708275554;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=eAhMKfhDa1o15gK+6j+rX/Nt1dGSvpN0TmM5Ge4jmDw=;
-	b=DBqsrYdAH5M+ODnYOM18jbQKXV7jak8vJmO0amPDzmX+iR/drVhZQupv10WpM/mqzAkW3q
-	UVadcMynhDkSMyfwmhrh60W8/UJ1aZdihIjWWRGe5vFUIn5W/U9frVaFd5sQoQmODlx5Sm
-	51GOA96b22yKjLs/0ko85BpXoPEWlvg=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-346-Zb5r81NrPJ6yfpI-NqPF_A-1; Sun, 18 Feb 2024 11:59:13 -0500
-X-MC-Unique: Zb5r81NrPJ6yfpI-NqPF_A-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2993035cd15so2137401a91.0
-        for <linux-block@vger.kernel.org>; Sun, 18 Feb 2024 08:59:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708275551; x=1708880351;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eAhMKfhDa1o15gK+6j+rX/Nt1dGSvpN0TmM5Ge4jmDw=;
-        b=eFt7j4P8vxuNLzj6BDKytwUue1WVz/fvZfYb9ELO0BvweGV241khnFGwmoGqoHQzxc
-         FPySaFJIVQAWQDlBAilxdkM0+PiRRyJPHLY79YwPeJ82uoEQv/Qj5NMIYCpGz9a6+6yT
-         YAaGtaXDP7yd9xkglAP9rRUFxpR4thrYPlkQD/v4jmsswNZaHDzhLquJxVWHiOyHNzs/
-         Cgec/YQmdVTLg7Z9XQxnG84V8+h74wsEZ8zX8cPYFFFyUnUm+dyvqsCI09k9f4vhiuZ6
-         G0LPK0/Ehf+Zgz8G2CxCYahx9/4zS0hE9Vb+bHyQ3v4Akp6VSGD1NrfwFCb+RbNJjLOX
-         LwBw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7NPDPPSwXSiLprksje2MD+6zZGBtoBjgpJqpHF4n+klCG1bSxHg/bfSFcmfuTCqaKCA/fuNP6M8IdkLR0txlQ6Sss6yz2LXMalK8=
-X-Gm-Message-State: AOJu0YwbEp2ZGCutlzs3l03LoDnQ3lCX+1nne2NvB1dVnxP1hHCFJEGN
-	Zk/puetaSXdp6V8SWYCb6r3TXfZoDWy79k4y/f7KH3sWbZH4hCkWb/0nKOdzISh9LZ11m/98Aul
-	y0VGrfrPzIu19oHVi19X2XUkbJdGI3EmxWjlc41yUfeXdQWCF3biYZMWAkaEYyzZE0tPCgJS+BN
-	kkJW2USTeuIN3aL90wradvhIlXEwxH4P+UZC4FEy071HwO/L1fSBs=
-X-Received: by 2002:a17:90b:3749:b0:299:7f49:234e with SMTP id ne9-20020a17090b374900b002997f49234emr2293511pjb.0.1708275550884;
-        Sun, 18 Feb 2024 08:59:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFmpIFaFm6JbpqTGBYwshc3asKKFufYcn7uwIgQKQcqAW7efUApZPGHSkj6Bs/Wg8IDmm8gImJ1lfIzfKG+Oys=
-X-Received: by 2002:a17:90b:3749:b0:299:7f49:234e with SMTP id
- ne9-20020a17090b374900b002997f49234emr2293496pjb.0.1708275550492; Sun, 18 Feb
- 2024 08:59:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="L43vAIZq"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M5rMQWr0iL7/8opKbx4ZRhxwwiWCybRRIPBg9G37kIS3TZRa5k7ZpdX1JJXlIjEyeCqPlU+PXF0iXIOHx288IM8H3hdDbCv+JYCm2SxCy5S+rw5Fbw2v/FkmsxvDRWRvIJArEXjVwdemiF81NQno5kROxIcS1jPDgZU9djUa6B5ezFfNoWPZCrJih8y+b2F67UJTbO/T1MH7A7KDpFv83bdGy6tMLn4VxBALyrOFLtvLDhnVk/g9+BxcNpdam6EcPgxbPE3uNZnH01xsLPzeO+Rk5pOlkexs+x/rpMXtX6lKD1Nv6U0YV/sOzTv/QiOD5Lj34cvyeoFEZf8nmbu7aQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I8H/CHWgq2Ah0vxvrBC/etkmeh63YuvGW3dh7CcHN7A=;
+ b=NvR4M32k9ivCI9RfAsBodLFgua3zkGPeEk5Z7oCOG8YTM7PvL1K2xHoLFh3jIdUhoNjmEPWGLk8n9j+ZO1Q3tipPrPDQZwRl1UwkU3QZdgKmz3W5a3Zd7DtSLtN1Jh/XUGSCQAX9UivELWZQxjRfkLVMhWSZZIt5/1PgBwrrlwf+fEyt50VDrYi4xtxvTcYl4wqLsCZbp+0qSgHoX11/k8yCciBCIM4jNHumFAg1+D1zc1rOhH1VCXuU5S0d2UXWgDdy7eJU5sU3qA4AvSpGNVHItJ/vZUEPjOu1BObCa+I0JwkJNYQWAn4gy+p8C5+7SnvB4E3Az2EgFlhOy7Z/Zg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I8H/CHWgq2Ah0vxvrBC/etkmeh63YuvGW3dh7CcHN7A=;
+ b=L43vAIZqX8871c/JdWReX9WlyyMDrYdcjwoYLDpRSnM9ZIm7z7xVgKYsiqBHzahbVt2Pi7vr3VpPeaEKzxC4yDcolWW5eEC7iH1RByo708UmnOVOLh1Mi6iDUZhBK/W6J1ughwwF3xz4iq7W+389iH+HgX0FlIdaYaexQFbPtrddDATffCZ4FCj6Hm/8iIaUF+tGhrCfVvQ50HlILkID/ZpjJljMA1mLkfVZB6xxQuM5Tq7qZebffxXzu84uxj4abvtTHmvXkLsicgK2o/0reaPsXQrMGdN96d88eCdZBwbnVEp3X0t1PNa309WUNyXx1YkuCtVdsgcTyLwA6gWtsw==
+Received: from PH0PR12MB5481.namprd12.prod.outlook.com (2603:10b6:510:d4::15)
+ by SA1PR12MB8161.namprd12.prod.outlook.com (2603:10b6:806:330::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.19; Mon, 19 Feb
+ 2024 03:14:54 +0000
+Received: from PH0PR12MB5481.namprd12.prod.outlook.com
+ ([fe80::5b85:d575:fac1:71c0]) by PH0PR12MB5481.namprd12.prod.outlook.com
+ ([fe80::5b85:d575:fac1:71c0%4]) with mapi id 15.20.7316.016; Mon, 19 Feb 2024
+ 03:14:54 +0000
+From: Parav Pandit <parav@nvidia.com>
+To: Ming Lei <ming.lei@redhat.com>
+CC: "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com"
+	<jasowang@redhat.com>, "xuanzhuo@linux.alibaba.com"
+	<xuanzhuo@linux.alibaba.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"stefanha@redhat.com" <stefanha@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "virtualization@lists.linux.dev"
+	<virtualization@lists.linux.dev>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "NBU-Contact-Li Rongqing (EXTERNAL)"
+	<lirongqing@baidu.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Subject: RE: [PATCH] virtio_blk: Fix device surprise removal
+Thread-Topic: [PATCH] virtio_blk: Fix device surprise removal
+Thread-Index: AQHaYcxqVM2rFvg5t0SfQayLG6csArEQGLcAgADkkjA=
+Date: Mon, 19 Feb 2024 03:14:54 +0000
+Message-ID:
+ <PH0PR12MB5481DCCE8127FB12C24EF74DDC512@PH0PR12MB5481.namprd12.prod.outlook.com>
+References: <20240217180848.241068-1-parav@nvidia.com>
+ <ZdIFpqa23YHwJACh@fedora>
+In-Reply-To: <ZdIFpqa23YHwJACh@fedora>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR12MB5481:EE_|SA1PR12MB8161:EE_
+x-ms-office365-filtering-correlation-id: 02ee078c-1bba-44c8-125d-08dc30f8f1d3
+x-ld-processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 24VyClpD8+bTLb0cYU0/d7ftBEg5xLJTe6cgFvh2GH/X2x6i/Tnh2XChNYLac6NEIeB+bdPILpqQmnGmZxgnyaNmWN8EPQ0i4cKV6XKDsKj12F1FLgW4YbR1Y04BQJ1EadZvijNXkNS16ySPMeTEKU7OzXPm8oWnv1ntfUxoX3TUMFlgkDgRXHPOihJ1jsc7Yc3u4HDVcfYUYakeNSInchrXDZTtI2DIxYSzFpGVmEZGeGMXQVrsn2PmwLkbTu9sB6fzwS9M7uMyRyv9dwYesc/VXTFwpOVarqIaJR0pU4W9clcXBJ5PsdRvuEOCSrtAK0GIvOsirf0r03F1rmor7W+wAR1OBVTuyhWw8uvDUvwB1OXEKCvZBUmBnJNWLG4Qgc/I5253XnA1Klkr3j0w8yASGfpWKm8ariFGCcMiK21YFJ90pHLngHOD/lY8FPqZR4RcDtbN4+Yl1ezeofQKzM/qDaf5CNhe0vElosF+edo1tc55J/zr54hqhxEO/C7z3rFcOgnAcCCP8uUREA5/OWP98505vdigYgR1vczfwgdVBfc+/QXna60VYKg91gYIyEC+LYm4swUHAOrkps45/032grHkeCJ4ecstnJvxezCdzc//a23MvAzJfIsxJaXFMloI4wFwO6XUKZrnKeNaqZigjzSwj/90FnGo8LhWWK4=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB5481.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(366004)(136003)(346002)(39860400002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(122000001)(26005)(83380400001)(55016003)(8676002)(7416002)(66946007)(8936002)(76116006)(64756008)(66446008)(66476007)(66556008)(2906002)(4326008)(6916009)(52536014)(6506007)(9686003)(7696005)(316002)(966005)(478600001)(71200400001)(54906003)(33656002)(38070700009)(107886003)(41300700001)(5660300002)(38100700002)(86362001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?I/zsoDPnPjDmjuY6Jbsxf/UyIzYRmBqQeUz3kBDbwZa/YQL1hgv4hJiLEwSs?=
+ =?us-ascii?Q?cyNSFOOtzhtkYH1XnhismxpWCX8ZQXBEx8Td0qw73ZIwQrLV43n23HHfvniV?=
+ =?us-ascii?Q?pyyrMjhyGHklaOEty0mRmD/gSAUXiRqSeXbzLYgMeCNKYebzQFa3VBvRQNk7?=
+ =?us-ascii?Q?wzALPCBwghVDW40gfDPUNZF9EF24hE+asK2As64ME9JVVuLCU1nyciIBM5hc?=
+ =?us-ascii?Q?WjCSXEMCfG3/z2p4spRejUY50S7b4mAhCI2blp5W/uGuUZPJav8St4VaDgkx?=
+ =?us-ascii?Q?fKyr6xwviDRFDjVdRTJZeN8NaID4r5nOxtIq0chX5WD2X6Ty54UH3Nv4y0HQ?=
+ =?us-ascii?Q?m/ZURAFUWKrhda3uIQIyq8XpXmau5jkKsZuEKoffyLe+YJj83CDdBMwUHSNU?=
+ =?us-ascii?Q?G3yEFc8DHJrafm7dNkhhNULSlRAPGJ8nYQU73Yv9LExLCxf0yp7eev0aftvi?=
+ =?us-ascii?Q?UoMdglU1Ndl2QOWwbN3RR2bj8wyoACyBiunf4mlRYojJ9YPCtl4aJtp5nkXm?=
+ =?us-ascii?Q?ALWzT1UGz36XsdafUfFVFD/ANhgDv6zW6F2kjgGEnnaGmnWASVvbNK189hdF?=
+ =?us-ascii?Q?6L+l+QalHQXo2+l56Iy1ENshPzNO0V0Cu7iKsE46Lu1s4l1SzktL79JKL752?=
+ =?us-ascii?Q?BNzepzqLlaLuSge/eZ6oO8eKKEaznmJPgeOblgnvqRCtbVTo1alMI6bhKpMd?=
+ =?us-ascii?Q?3FHM89McpamVbo4M++hMekTZLcQxUuDWv0mtdKl68vVQTbf/gjnE5HY7PorA?=
+ =?us-ascii?Q?ke5Mw2Mt7fDivFN/3TZVNKVUB9BgWDfpzUMuvp/GSSW3/HSs1J1zdwKKm7cm?=
+ =?us-ascii?Q?wRemLANkCLo4L4CCnDNc+sCVlE+BSbpIJjrtgy/R3E3GjXrOTkmA50ExPUuP?=
+ =?us-ascii?Q?iuaA5gcLVmZdyH8of+2kj6BipmWF1ANRl7u7AMzWzWyav/5nv+s6z4PpRu+b?=
+ =?us-ascii?Q?7CdCoSAyCxynkYNg81JWHVYco4JN32VkNpz0x+UFkCpjEWaabY6gDKHU6ar/?=
+ =?us-ascii?Q?7QAxHyYveXQZtXU46tRdj4KWEdAlz/n+LspOetxP/tOdF6bYqRStc+ZSE7Jd?=
+ =?us-ascii?Q?4Oz5DOGD/RCcwKaccBMWrxu+eEeaS3wOIi8vgqYbGD4QlQ6eZIOy6rglutEK?=
+ =?us-ascii?Q?q9jjVpSwnr6rfY/vTJRtbcGAnbj8RD6Q61RY3cHc0clmTPCECCvSnw2oV0Cy?=
+ =?us-ascii?Q?kvCiM1jiH454lU2NzcrMu0M4E8eBylR6hvxS5VnO6O7yFN727ijTUwf9IxUN?=
+ =?us-ascii?Q?oL7q94IygvySAqnakKM0ZdgUJSCBIesktY+9zq5r9TCmrJmZHwNtbBMvM9PR?=
+ =?us-ascii?Q?zmCX/GPrjX4ARFW8NFeWO8XxNt3yXjN5hm/X5bXEop4oZE+1WyAlwcGQefmQ?=
+ =?us-ascii?Q?ePnWYSJx/8AR1Z2e74CY0Z4xsYrP2Gyk5HwuNbANXmxkvTGt4fJmCroEaSPe?=
+ =?us-ascii?Q?b/IXf1IZ5LdECuhnzUHjN6OnGCY4LWlBPH8uhj5gmNYb/vsDyFAFlTR5sFWj?=
+ =?us-ascii?Q?W4it0Iu+GFTeY8QeNP7S9eU3J7GH1fmJDNP+hdBB1Iixw6xJzBQh1kC3xppD?=
+ =?us-ascii?Q?fKX098DoY8darP9AYUU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Mon, 19 Feb 2024 00:58:58 +0800
-Message-ID: <CAHj4cs-kfojYC9i0G73PRkYzcxCTex=-vugRFeP40g_URGvnfQ@mail.gmail.com>
-Subject: [bug report]WARNING: CPU: 22 PID: 44011 at fs/iomap/iter.c:51
- iomap_iter+0x32b observed with blktests zbd/010
-To: linux-f2fs-devel@lists.sourceforge.net, 
-	linux-block <linux-block@vger.kernel.org>
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>, chao@kernel.org, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB5481.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02ee078c-1bba-44c8-125d-08dc30f8f1d3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2024 03:14:54.6693
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QD1KvY/j0UC6goqSISUHV/obpcVd6m4Qe82IGzdL5AdMvp3xORMjUWEuQoPT4jpkGt/SpUP64aw5d8DL04t4Rw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8161
 
-Hello
-I reproduced this issue on the latest linux-block/for-next, please
-help check it and let me know if you need more info/test, thanks.
+Hi Ming,
 
-# ./check zbd/010
-zbd/010 (test gap zone support with F2FS)                    [failed]
-    runtime    ...  3.752s
-    something found in dmesg:
-    [ 4378.146781] run blktests zbd/010 at 2024-02-18 11:31:13
-    [ 4378.192349] null_blk: module loaded
-    [ 4378.209860] null_blk: disk nullb0 created
-    [ 4378.413285] scsi_debug:sdebug_driver_probe: scsi_debug: trim
-poll_queues to 0. poll_q/nr_hw = (0/1)
-    [ 4378.422334] scsi host15: scsi_debug: version 0191 [20210520]
-                     dev_size_mb=1024, opts=0x0, submit_queues=1, statistics=0
-    [ 4378.434922] scsi 15:0:0:0: Direct-Access-ZBC Linux
-scsi_debug       0191 PQ: 0 ANSI: 7
-    [ 4378.443343] scsi 15:0:0:0: Power-on or device reset occurred
-    [ 4378.449371] sd 15:0:0:0: Attached scsi generic sg5 type 20
-    [ 4378.449418] sd 15:0:0:0: [sdf] Host-managed zoned block device
-    ...
-    (See '/mnt/tests/gitlab.com/api/v4/projects/19168116/repository/archive.zip/storage/blktests/blk/blktests/results/nodev/zbd/010.dmesg'
-for the entire message)
-# uname -r
-6.8.0-rc3+
+> From: Ming Lei <ming.lei@redhat.com>
+> Sent: Sunday, February 18, 2024 6:57 PM
+>=20
+> On Sat, Feb 17, 2024 at 08:08:48PM +0200, Parav Pandit wrote:
+> > When the PCI device is surprise removed, requests won't complete from
+> > the device. These IOs are never completed and disk deletion hangs
+> > indefinitely.
+> >
+> > Fix it by aborting the IOs which the device will never complete when
+> > the VQ is broken.
+> >
+> > With this fix now fio completes swiftly.
+> > An alternative of IO timeout has been considered, however when the
+> > driver knows about unresponsive block device, swiftly clearing them
+> > enables users and upper layers to react quickly.
+> >
+> > Verified with multiple device unplug cycles with pending IOs in virtio
+> > used ring and some pending with device.
+> >
+> > In future instead of VQ broken, a more elegant method can be used. At
+> > the moment the patch is kept to its minimal changes given its urgency
+> > to fix broken kernels.
+> >
+> > Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of virtio
+> > pci device")
+> > Cc: stable@vger.kernel.org
+> > Reported-by: lirongqing@baidu.com
+> > Closes:
+> > https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73ca9b474
+> > 1@baidu.com/
+> > Co-developed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> > Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> > Signed-off-by: Parav Pandit <parav@nvidia.com>
+> > ---
+> >  drivers/block/virtio_blk.c | 54
+> > ++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 54 insertions(+)
+> >
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index 2bf14a0e2815..59b49899b229 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -1562,10 +1562,64 @@ static int virtblk_probe(struct virtio_device
+> *vdev)
+> >  	return err;
+> >  }
+> >
+> > +static bool virtblk_cancel_request(struct request *rq, void *data) {
+> > +	struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(rq);
+> > +
+> > +	vbr->in_hdr.status =3D VIRTIO_BLK_S_IOERR;
+> > +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
+> > +		blk_mq_complete_request(rq);
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +static void virtblk_cleanup_reqs(struct virtio_blk *vblk) {
+> > +	struct virtio_blk_vq *blk_vq;
+> > +	struct request_queue *q;
+> > +	struct virtqueue *vq;
+> > +	unsigned long flags;
+> > +	int i;
+> > +
+> > +	vq =3D vblk->vqs[0].vq;
+> > +	if (!virtqueue_is_broken(vq))
+> > +		return;
+> > +
+>=20
+> What if the surprise happens after the above check?
+>=20
+>=20
+In that small timing window, the race still exists.
 
-[ 4378.146781] run blktests zbd/010 at 2024-02-18 11:31:13
-[ 4378.192349] null_blk: module loaded
-[ 4378.209860] null_blk: disk nullb0 created
-[ 4378.413285] scsi_debug:sdebug_driver_probe: scsi_debug: trim
-poll_queues to 0. poll_q/nr_hw = (0/1)
-[ 4378.422334] scsi host15: scsi_debug: version 0191 [20210520]
-                 dev_size_mb=1024, opts=0x0, submit_queues=1, statistics=0
-[ 4378.434922] scsi 15:0:0:0: Direct-Access-ZBC Linux    scsi_debug
-   0191 PQ: 0 ANSI: 7
-[ 4378.443343] scsi 15:0:0:0: Power-on or device reset occurred
-[ 4378.449371] sd 15:0:0:0: Attached scsi generic sg5 type 20
-[ 4378.449418] sd 15:0:0:0: [sdf] Host-managed zoned block device
-[ 4378.460718] sd 15:0:0:0: [sdf] 262144 4096-byte logical blocks:
-(1.07 GB/1.00 GiB)
-[ 4378.468292] sd 15:0:0:0: [sdf] Write Protect is off
-[ 4378.473172] sd 15:0:0:0: [sdf] Mode Sense: 5b 00 10 08
-[ 4378.473179] sd 15:0:0:0: [sdf] Write cache: enabled, read cache:
-enabled, supports DPO and FUA
-[ 4378.481796] sd 15:0:0:0: [sdf] Preferred minimum I/O size 4096 bytes
-[ 4378.488146] sd 15:0:0:0: [sdf] Optimal transfer size 4194304 bytes
-[ 4378.494366] sd 15:0:0:0: [sdf] 256 zones of 1024 logical blocks
-[ 4378.500895] sd 15:0:0:0: [sdf] Attached SCSI disk
-[ 4378.591696] F2FS-fs (nullb0): Mount Device [ 0]:
-/dev/nullb0,      510,        0 -    3ffff
-[ 4378.600903] F2FS-fs (nullb0): Mount Device [ 1]:
-/dev/sdf,      512,    40000 -    7ffff (zone: Host-managed)
-[ 4378.611858] F2FS-fs (nullb0): IO Block Size:        4 KB
-[ 4378.617811] F2FS-fs (nullb0): Found nat_bits in checkpoint
-[ 4378.630242] F2FS-fs (nullb0): Mounted with checkpoint version = 2ddce711
-[ 4381.278858] ------------[ cut here ]------------
-[ 4381.283484] WARNING: CPU: 22 PID: 44011 at fs/iomap/iter.c:51
-iomap_iter+0x32b/0x350
-[ 4381.291231] Modules linked in: scsi_debug null_blk f2fs
-crc32_generic lz4hc_compress lz4_compress rfkill sunrpc intel_rapl_msr
-vfat fat intel_rapl_common intel_uncore_frequency
-intel_uncore_frequency_common isst_if_common skx_edac nfit libnvdimm
-x86_pkg_temp_thermal ipmi_ssif intel_powerclamp spi_nor coretemp
-kvm_intel bnxt_en kvm iTCO_wdt irqbypass intel_pmc_bxt acpi_ipmi
-iTCO_vendor_support ipmi_si rapl i2c_i801 mtd mei_me tg3 intel_cstate
-intel_pch_thermal dell_smbios intel_uncore ipmi_devintf spi_intel_pci
-i2c_smbus dell_wmi_descriptor dcdbas spi_intel ipmi_msghandler
-wmi_bmof mei pcspkr acpi_power_meter lpc_ich loop fuse nfnetlink zram
-xfs crct10dif_pclmul crc32_pclmul crc32c_intel polyval_clmulni
-polyval_generic nvme ghash_clmulni_intel nvme_core sha512_ssse3
-mgag200 sha256_ssse3 sha1_ssse3 megaraid_sas nvme_auth i2c_algo_bit
-wmi [last unloaded: null_blk]
-[ 4381.367409] CPU: 22 PID: 44011 Comm: fio Not tainted 6.8.0-rc3+ #1
-[ 4381.373588] Hardware name: Dell Inc. PowerEdge R740xd/0YNX56, BIOS
-2.20.1 09/13/2023
-[ 4381.381327] RIP: 0010:iomap_iter+0x32b/0x350
-[ 4381.385599] Code: e9 c2 fe ff ff 89 d0 4c 8d 63 28 4c 8d 6b 78 85
-d2 0f 8e b5 fe ff ff e9 46 fe ff ff 0f 0b e9 71 fe ff ff 0f 0b e9 77
-fe ff ff <0f> 0b e9 7c fe ff ff 0f 0b e9 7f fe ff ff 0f 0b b8 fb ff ff
-ff e9
-[ 4381.404346] RSP: 0018:ffffb6650558fa40 EFLAGS: 00010206
-[ 4381.409569] RAX: 0000000000000000 RBX: ffffb6650558fad0 RCX: fffffffffff4a000
-[ 4381.416702] RDX: 00000000000b6000 RSI: 00000000000000b6 RDI: ffff9e301c126b18
-[ 4381.423834] RBP: ffffffffc112e900 R08: ffff9e33872c1000 R09: 000000000003fc00
-[ 4381.430969] R10: 0000000000000004 R11: 0000000000000004 R12: ffffb6650558faf8
-[ 4381.438098] R13: ffffb6650558fb48 R14: ffff9e301c126b18 R15: ffffffffc112e900
-[ 4381.445229] FS:  00007eff7a09b080(0000) GS:ffff9e336fec0000(0000)
-knlGS:0000000000000000
-[ 4381.453316] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 4381.459062] CR2: 00007eff71c37004 CR3: 000000010d1c0001 CR4: 00000000007706f0
-[ 4381.466193] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[ 4381.473326] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[ 4381.480456] PKRU: 55555554
-[ 4381.483170] Call Trace:
-[ 4381.485623]  <TASK>
-[ 4381.487729]  ? iomap_iter+0x32b/0x350
-[ 4381.491393]  ? __warn+0x81/0x130
-[ 4381.494639]  ? iomap_iter+0x32b/0x350
-[ 4381.498311]  ? report_bug+0x16f/0x1a0
-[ 4381.501984]  ? handle_bug+0x3c/0x80
-[ 4381.505476]  ? exc_invalid_op+0x17/0x70
-[ 4381.509314]  ? asm_exc_invalid_op+0x1a/0x20
-[ 4381.513502]  ? iomap_iter+0x32b/0x350
-[ 4381.517167]  __iomap_dio_rw+0x1df/0x830
-[ 4381.521009]  f2fs_file_read_iter+0x156/0x3d0 [f2fs]
-[ 4381.525937]  ? selinux_file_permission+0x151/0x180
-[ 4381.530729]  aio_read+0x138/0x210
-[ 4381.534051]  ? io_submit_one+0x188/0x8c0
-[ 4381.537974]  io_submit_one+0x188/0x8c0
-[ 4381.541727]  ? do_io_getevents+0x89/0xe0
-[ 4381.545652]  __x64_sys_io_submit+0x8c/0x1a0
-[ 4381.549838]  do_syscall_64+0x86/0x170
-[ 4381.553504]  ? syscall_exit_to_user_mode+0x89/0x230
-[ 4381.558383]  ? do_syscall_64+0x95/0x170
-[ 4381.562222]  ? do_syscall_64+0x95/0x170
-[ 4381.566061]  ? do_syscall_64+0x95/0x170
-[ 4381.569897]  ? do_syscall_64+0x95/0x170
-[ 4381.573738]  ? __irq_exit_rcu+0x4b/0xc0
-[ 4381.577578]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-[ 4381.582631] RIP: 0033:0x7eff7a1b215d
-[ 4381.586209] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e
-fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24
-08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 8b cc 0c 00 f7 d8 64 89
-01 48
-[ 4381.604953] RSP: 002b:00007fff421d86c8 EFLAGS: 00000246 ORIG_RAX:
-00000000000000d1
-[ 4381.612519] RAX: ffffffffffffffda RBX: 00007eff7a09aff8 RCX: 00007eff7a1b215d
-[ 4381.619651] RDX: 0000564e55cae8f8 RSI: 0000000000000001 RDI: 00007eff71c84000
-[ 4381.626784] RBP: 00007fff421d8700 R08: 0000564e55cc2000 R09: 00007fff421d86f0
-[ 4381.633914] R10: 0000000000000000 R11: 0000000000000246 R12: 00007eff71c84000
-[ 4381.641046] R13: 0000000000000000 R14: 0000000000000001 R15: 0000564e55cae8f8
-[ 4381.648181]  </TASK>
-[ 4381.650371] ---[ end trace 0000000000000000 ]---
-[ 4381.769895] sd 15:0:0:0: [sdf] Synchronizing SCSI cache
+I think, blk_mq_quiesce_queue(q); should move up before cleanup_reqs() rega=
+rdless of surprise case along with other below changes.
 
--- 
-Best Regards,
-  Yi Zhang
+Additionally, for non-surprise case, better to have a graceful timeout to c=
+omplete already queued requests.
+In absence of timeout scheme for this regression, shall we only complete th=
+e requests which the device has already completed (instead of waiting for t=
+he grace time)?
+There was past work from Chaitanaya, for the graceful timeout.
+
+The sequence for the fix I have in mind is:
+1. quiesce the queue
+2. complete all requests which has completed, with its status
+3. stop the transport (queues)
+4. complete remaining pending requests with error status
+
+This should work regardless of surprise case.
+An additional/optional graceful timeout on non-surprise case can be helpful=
+ for #2.
+
+WDYT?
+
+> Thanks,
+> Ming
 
