@@ -1,229 +1,212 @@
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2060.outbound.protection.outlook.com [40.107.100.60])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A222103;
-	Mon, 19 Feb 2024 03:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708312500; cv=fail; b=QvbZ+rcup7XFSbXWGv9CmqqB7h4T7o/GYOiv5pV/Qv+sXwEeDin3Ewy+A43ULdaun3sI5f3duYNKx3DHLUfzZPJqerlpPyC7WnaXGgVvSxfIMtWbnaV6+whOGnWAzKysrkkw9OLz2I3EYc00JmAzPwPmNHmrmdzn7HiRLwU1Ml0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708312500; c=relaxed/simple;
-	bh=EL13OiB+NYNU1ruf0QI+AGo34/fMOufoZxjalAWs7Ok=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RkJPLCTtcdkhIiowBWQgMddDVFtYkh7+ehrGD8AyPV/y+SjcdsIjn8BpsMfAt4SJtfiYTaKyO923UnLVVIf3QcyIyMqIvxRMHH90zITl9ZAAoa6r+Z5dlkqWpyWFV5ARwR5lxoikydYGLgwH5pYSliqcsa8X9KZuDQOAo995I10=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=L43vAIZq; arc=fail smtp.client-ip=40.107.100.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54357200AB;
+	Mon, 19 Feb 2024 05:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708319669; cv=none; b=pDkQzJzJsoZI1OBxvTHYzU/5vGE5nkyG8Bc6pryTEAE6RcrVjgeRxSaT6V2u5J5uuRAUxzyc/Aui5Ifmpp6qH+QJb4d6OiR+s+UYcCpTbccCarou9fU6t+ceDpiW6vcv8ERiEjtFlEgFZhJvLJyp+ajOEq0bO5VmInHxFoDJyD4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708319669; c=relaxed/simple;
+	bh=z4idcdiF/V/G2dzC4JCbN56aiWbN2ggIAFpdC/RrtSo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gswjQ0+va/9Ynjz33Pwxz/+GlJE6/xP9rT2mSovS5UYJta13SzKHAbz2hWpFMV1anlozgSNKPuWA+UaoyzbmdC48DXaeow8YBTGgkNUJ9lq8sYVO++qQcL7SPtADfRevI8zyoDkftLDIo93heLW/8aRy6hFNKIeVN2UMDmRkPqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkuA1cn/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="L43vAIZq"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M5rMQWr0iL7/8opKbx4ZRhxwwiWCybRRIPBg9G37kIS3TZRa5k7ZpdX1JJXlIjEyeCqPlU+PXF0iXIOHx288IM8H3hdDbCv+JYCm2SxCy5S+rw5Fbw2v/FkmsxvDRWRvIJArEXjVwdemiF81NQno5kROxIcS1jPDgZU9djUa6B5ezFfNoWPZCrJih8y+b2F67UJTbO/T1MH7A7KDpFv83bdGy6tMLn4VxBALyrOFLtvLDhnVk/g9+BxcNpdam6EcPgxbPE3uNZnH01xsLPzeO+Rk5pOlkexs+x/rpMXtX6lKD1Nv6U0YV/sOzTv/QiOD5Lj34cvyeoFEZf8nmbu7aQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I8H/CHWgq2Ah0vxvrBC/etkmeh63YuvGW3dh7CcHN7A=;
- b=NvR4M32k9ivCI9RfAsBodLFgua3zkGPeEk5Z7oCOG8YTM7PvL1K2xHoLFh3jIdUhoNjmEPWGLk8n9j+ZO1Q3tipPrPDQZwRl1UwkU3QZdgKmz3W5a3Zd7DtSLtN1Jh/XUGSCQAX9UivELWZQxjRfkLVMhWSZZIt5/1PgBwrrlwf+fEyt50VDrYi4xtxvTcYl4wqLsCZbp+0qSgHoX11/k8yCciBCIM4jNHumFAg1+D1zc1rOhH1VCXuU5S0d2UXWgDdy7eJU5sU3qA4AvSpGNVHItJ/vZUEPjOu1BObCa+I0JwkJNYQWAn4gy+p8C5+7SnvB4E3Az2EgFlhOy7Z/Zg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I8H/CHWgq2Ah0vxvrBC/etkmeh63YuvGW3dh7CcHN7A=;
- b=L43vAIZqX8871c/JdWReX9WlyyMDrYdcjwoYLDpRSnM9ZIm7z7xVgKYsiqBHzahbVt2Pi7vr3VpPeaEKzxC4yDcolWW5eEC7iH1RByo708UmnOVOLh1Mi6iDUZhBK/W6J1ughwwF3xz4iq7W+389iH+HgX0FlIdaYaexQFbPtrddDATffCZ4FCj6Hm/8iIaUF+tGhrCfVvQ50HlILkID/ZpjJljMA1mLkfVZB6xxQuM5Tq7qZebffxXzu84uxj4abvtTHmvXkLsicgK2o/0reaPsXQrMGdN96d88eCdZBwbnVEp3X0t1PNa309WUNyXx1YkuCtVdsgcTyLwA6gWtsw==
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com (2603:10b6:510:d4::15)
- by SA1PR12MB8161.namprd12.prod.outlook.com (2603:10b6:806:330::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.19; Mon, 19 Feb
- 2024 03:14:54 +0000
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::5b85:d575:fac1:71c0]) by PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::5b85:d575:fac1:71c0%4]) with mapi id 15.20.7316.016; Mon, 19 Feb 2024
- 03:14:54 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: Ming Lei <ming.lei@redhat.com>
-CC: "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, "xuanzhuo@linux.alibaba.com"
-	<xuanzhuo@linux.alibaba.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "NBU-Contact-Li Rongqing (EXTERNAL)"
-	<lirongqing@baidu.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Subject: RE: [PATCH] virtio_blk: Fix device surprise removal
-Thread-Topic: [PATCH] virtio_blk: Fix device surprise removal
-Thread-Index: AQHaYcxqVM2rFvg5t0SfQayLG6csArEQGLcAgADkkjA=
-Date: Mon, 19 Feb 2024 03:14:54 +0000
-Message-ID:
- <PH0PR12MB5481DCCE8127FB12C24EF74DDC512@PH0PR12MB5481.namprd12.prod.outlook.com>
-References: <20240217180848.241068-1-parav@nvidia.com>
- <ZdIFpqa23YHwJACh@fedora>
-In-Reply-To: <ZdIFpqa23YHwJACh@fedora>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR12MB5481:EE_|SA1PR12MB8161:EE_
-x-ms-office365-filtering-correlation-id: 02ee078c-1bba-44c8-125d-08dc30f8f1d3
-x-ld-processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 24VyClpD8+bTLb0cYU0/d7ftBEg5xLJTe6cgFvh2GH/X2x6i/Tnh2XChNYLac6NEIeB+bdPILpqQmnGmZxgnyaNmWN8EPQ0i4cKV6XKDsKj12F1FLgW4YbR1Y04BQJ1EadZvijNXkNS16ySPMeTEKU7OzXPm8oWnv1ntfUxoX3TUMFlgkDgRXHPOihJ1jsc7Yc3u4HDVcfYUYakeNSInchrXDZTtI2DIxYSzFpGVmEZGeGMXQVrsn2PmwLkbTu9sB6fzwS9M7uMyRyv9dwYesc/VXTFwpOVarqIaJR0pU4W9clcXBJ5PsdRvuEOCSrtAK0GIvOsirf0r03F1rmor7W+wAR1OBVTuyhWw8uvDUvwB1OXEKCvZBUmBnJNWLG4Qgc/I5253XnA1Klkr3j0w8yASGfpWKm8ariFGCcMiK21YFJ90pHLngHOD/lY8FPqZR4RcDtbN4+Yl1ezeofQKzM/qDaf5CNhe0vElosF+edo1tc55J/zr54hqhxEO/C7z3rFcOgnAcCCP8uUREA5/OWP98505vdigYgR1vczfwgdVBfc+/QXna60VYKg91gYIyEC+LYm4swUHAOrkps45/032grHkeCJ4ecstnJvxezCdzc//a23MvAzJfIsxJaXFMloI4wFwO6XUKZrnKeNaqZigjzSwj/90FnGo8LhWWK4=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB5481.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(366004)(136003)(346002)(39860400002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(122000001)(26005)(83380400001)(55016003)(8676002)(7416002)(66946007)(8936002)(76116006)(64756008)(66446008)(66476007)(66556008)(2906002)(4326008)(6916009)(52536014)(6506007)(9686003)(7696005)(316002)(966005)(478600001)(71200400001)(54906003)(33656002)(38070700009)(107886003)(41300700001)(5660300002)(38100700002)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?I/zsoDPnPjDmjuY6Jbsxf/UyIzYRmBqQeUz3kBDbwZa/YQL1hgv4hJiLEwSs?=
- =?us-ascii?Q?cyNSFOOtzhtkYH1XnhismxpWCX8ZQXBEx8Td0qw73ZIwQrLV43n23HHfvniV?=
- =?us-ascii?Q?pyyrMjhyGHklaOEty0mRmD/gSAUXiRqSeXbzLYgMeCNKYebzQFa3VBvRQNk7?=
- =?us-ascii?Q?wzALPCBwghVDW40gfDPUNZF9EF24hE+asK2As64ME9JVVuLCU1nyciIBM5hc?=
- =?us-ascii?Q?WjCSXEMCfG3/z2p4spRejUY50S7b4mAhCI2blp5W/uGuUZPJav8St4VaDgkx?=
- =?us-ascii?Q?fKyr6xwviDRFDjVdRTJZeN8NaID4r5nOxtIq0chX5WD2X6Ty54UH3Nv4y0HQ?=
- =?us-ascii?Q?m/ZURAFUWKrhda3uIQIyq8XpXmau5jkKsZuEKoffyLe+YJj83CDdBMwUHSNU?=
- =?us-ascii?Q?G3yEFc8DHJrafm7dNkhhNULSlRAPGJ8nYQU73Yv9LExLCxf0yp7eev0aftvi?=
- =?us-ascii?Q?UoMdglU1Ndl2QOWwbN3RR2bj8wyoACyBiunf4mlRYojJ9YPCtl4aJtp5nkXm?=
- =?us-ascii?Q?ALWzT1UGz36XsdafUfFVFD/ANhgDv6zW6F2kjgGEnnaGmnWASVvbNK189hdF?=
- =?us-ascii?Q?6L+l+QalHQXo2+l56Iy1ENshPzNO0V0Cu7iKsE46Lu1s4l1SzktL79JKL752?=
- =?us-ascii?Q?BNzepzqLlaLuSge/eZ6oO8eKKEaznmJPgeOblgnvqRCtbVTo1alMI6bhKpMd?=
- =?us-ascii?Q?3FHM89McpamVbo4M++hMekTZLcQxUuDWv0mtdKl68vVQTbf/gjnE5HY7PorA?=
- =?us-ascii?Q?ke5Mw2Mt7fDivFN/3TZVNKVUB9BgWDfpzUMuvp/GSSW3/HSs1J1zdwKKm7cm?=
- =?us-ascii?Q?wRemLANkCLo4L4CCnDNc+sCVlE+BSbpIJjrtgy/R3E3GjXrOTkmA50ExPUuP?=
- =?us-ascii?Q?iuaA5gcLVmZdyH8of+2kj6BipmWF1ANRl7u7AMzWzWyav/5nv+s6z4PpRu+b?=
- =?us-ascii?Q?7CdCoSAyCxynkYNg81JWHVYco4JN32VkNpz0x+UFkCpjEWaabY6gDKHU6ar/?=
- =?us-ascii?Q?7QAxHyYveXQZtXU46tRdj4KWEdAlz/n+LspOetxP/tOdF6bYqRStc+ZSE7Jd?=
- =?us-ascii?Q?4Oz5DOGD/RCcwKaccBMWrxu+eEeaS3wOIi8vgqYbGD4QlQ6eZIOy6rglutEK?=
- =?us-ascii?Q?q9jjVpSwnr6rfY/vTJRtbcGAnbj8RD6Q61RY3cHc0clmTPCECCvSnw2oV0Cy?=
- =?us-ascii?Q?kvCiM1jiH454lU2NzcrMu0M4E8eBylR6hvxS5VnO6O7yFN727ijTUwf9IxUN?=
- =?us-ascii?Q?oL7q94IygvySAqnakKM0ZdgUJSCBIesktY+9zq5r9TCmrJmZHwNtbBMvM9PR?=
- =?us-ascii?Q?zmCX/GPrjX4ARFW8NFeWO8XxNt3yXjN5hm/X5bXEop4oZE+1WyAlwcGQefmQ?=
- =?us-ascii?Q?ePnWYSJx/8AR1Z2e74CY0Z4xsYrP2Gyk5HwuNbANXmxkvTGt4fJmCroEaSPe?=
- =?us-ascii?Q?b/IXf1IZ5LdECuhnzUHjN6OnGCY4LWlBPH8uhj5gmNYb/vsDyFAFlTR5sFWj?=
- =?us-ascii?Q?W4it0Iu+GFTeY8QeNP7S9eU3J7GH1fmJDNP+hdBB1Iixw6xJzBQh1kC3xppD?=
- =?us-ascii?Q?fKX098DoY8darP9AYUU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkuA1cn/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D64F7C433F1;
+	Mon, 19 Feb 2024 05:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708319668;
+	bh=z4idcdiF/V/G2dzC4JCbN56aiWbN2ggIAFpdC/RrtSo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=KkuA1cn/g3B0W03242S+dyZ4xulDy1Yc+CzPBkUWirDOk/5zx/8cr9OvH/KgkIe2u
+	 1HFr3yNUhubojkbjWZve2FQyV84Iwyns6bAhzrQdL85Hi32peO9bKQwTwmjfz7PL9v
+	 6u3ogGF+GaxnMNWkWmcqMXkAkFNVCPBIhROv+Eu5OfEOXsr9I1HnANb/O0rvigpAKV
+	 KrDu9C0fEy4bAAH2EpWaTeeVUnxHJrdA97DK0DkuXe/jQMO90SvnvmJP4hYCcnKuHs
+	 H7K1ZnHA01YbVn68KFZAzJsFt1zi8SDuW3CfpAutmfEgwe1gDAhL/3k8tpajEhVZa3
+	 5+uZdyEIuv5Ww==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51181d8f52fso4976922e87.3;
+        Sun, 18 Feb 2024 21:14:28 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXhZRdmCMtaMFluJXL76OlCNMwBCW+uq749jHPgiOcL5J2Wbcie4CUfO12bXCGWlu8TRyfu3kB3zGfHQLj7A64ZR4Cmzh9vjiLMqEq8t7eAc5svr2Y0UmpCZgdYjh4faL/iU1he0ad3VVesdjPAwED3Kp+VyudPR1HHhCkUv3Oi6ZY85OJ0
+X-Gm-Message-State: AOJu0YxogTV28qmn45oTEg+5A0C7W2a/RCqYLZ/1PR2v1AsXtLf9QO5a
+	6ig3/U+qoZYmoyM/gl9iGL9xeXZVdvojrpucfvjhPWI4yWmun/r2ly9BVuFJjkHQSvGz6eo7svJ
+	HyBtwsjxGCNFLI5HlIboOzQiFtW4=
+X-Google-Smtp-Source: AGHT+IHP0dlnJUlayhW2vHdNTwFmGK3q7309DdLzwwG1sbb0VcE+YBn293oz0kclgJ7xu4Z8sZIKEobhsBKmAOUZz3o=
+X-Received: by 2002:a19:5e19:0:b0:512:b92a:be02 with SMTP id
+ s25-20020a195e19000000b00512b92abe02mr244978lfb.15.1708319667012; Sun, 18 Feb
+ 2024 21:14:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB5481.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02ee078c-1bba-44c8-125d-08dc30f8f1d3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2024 03:14:54.6693
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QD1KvY/j0UC6goqSISUHV/obpcVd6m4Qe82IGzdL5AdMvp3xORMjUWEuQoPT4jpkGt/SpUP64aw5d8DL04t4Rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8161
+References: <20240207092756.2087888-1-linan666@huaweicloud.com>
+ <CAPhsuW74hLiW_KTv3xohwMAcPZ9gp2TvLST4tY7H3O8cA26TTg@mail.gmail.com>
+ <6849835d-a3ac-e840-09e9-8539e7953fe4@huaweicloud.com> <CAPhsuW4k_C=UxwESU4t7R+fpoAJ_HE8g_PpCJXSUGWOdbpCEoQ@mail.gmail.com>
+ <CAPhsuW4H=ehc1UiuFdhBXZUfU_okQ=-rbti1oEWHcs7ajT89iw@mail.gmail.com> <6211cd80-6573-656d-e198-befe074030d8@huaweicloud.com>
+In-Reply-To: <6211cd80-6573-656d-e198-befe074030d8@huaweicloud.com>
+From: Song Liu <song@kernel.org>
+Date: Sun, 18 Feb 2024 21:14:15 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW7T3r4_9PYHrQYPmzhA2t0MVepo-d-6Q922wfyZtB+cpg@mail.gmail.com>
+Message-ID: <CAPhsuW7T3r4_9PYHrQYPmzhA2t0MVepo-d-6Q922wfyZtB+cpg@mail.gmail.com>
+Subject: Re: [PATCH] block: fix deadlock between bd_link_disk_holder and
+ partition scan
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Li Nan <linan666@huaweicloud.com>, axboe@kernel.dk, linux-raid@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com, 
+	"yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ming,
-
-> From: Ming Lei <ming.lei@redhat.com>
-> Sent: Sunday, February 18, 2024 6:57 PM
->=20
-> On Sat, Feb 17, 2024 at 08:08:48PM +0200, Parav Pandit wrote:
-> > When the PCI device is surprise removed, requests won't complete from
-> > the device. These IOs are never completed and disk deletion hangs
-> > indefinitely.
+On Sat, Feb 17, 2024 at 11:47=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> =
+wrote:
+>
+> Hi,
+>
+> =E5=9C=A8 2024/02/17 3:03, Song Liu =E5=86=99=E9=81=93:
+> > On Thu, Feb 8, 2024 at 4:49=E2=80=AFPM Song Liu <song@kernel.org> wrote=
+:
+> >>
+> >> On Thu, Feb 8, 2024 at 12:44=E2=80=AFAM Li Nan <linan666@huaweicloud.c=
+om> wrote:
+> >>>
+> >>>
+> >>>
+> >>> =E5=9C=A8 2024/2/8 14:50, Song Liu =E5=86=99=E9=81=93:
+> >>>> On Wed, Feb 7, 2024 at 1:32=E2=80=AFAM <linan666@huaweicloud.com> wr=
+ote:
+> >>>>>
+> >>>>> From: Li Nan <linan122@huawei.com>
+> >>>>>
+> >>>>> 'open_mutex' of gendisk is used to protect open/close block devices=
+. But
+> >>>>> in bd_link_disk_holder(), it is used to protect the creation of sym=
+link
+> >>>>> between holding disk and slave bdev, which introduces some issues.
+> >>>>>
+> >>>>> When bd_link_disk_holder() is called, the driver is usually in the =
+process
+> >>>>> of initialization/modification and may suspend submitting io. At th=
+is
+> >>>>> time, any io hold 'open_mutex', such as scanning partitions, can ca=
+use
+> >>>>> deadlocks. For example, in raid:
+> >>>>>
+> >>>>> T1                              T2
+> >>>>> bdev_open_by_dev
+> >>>>>    lock open_mutex [1]
+> >>>>>    ...
+> >>>>>     efi_partition
+> >>>>>     ...
+> >>>>>      md_submit_bio
+> >>>>>                                   md_ioctl mddev_syspend
+> >>>>>                                     -> suspend all io
+> >>>>>                                    md_add_new_disk
+> >>>>>                                     bind_rdev_to_array
+> >>>>>                                      bd_link_disk_holder
+> >>>>>                                       try lock open_mutex [2]
+> >>>>>       md_handle_request
+> >>>>>        -> wait mddev_resume
+> >>>>>
+> >>>>> T1 scan partition, T2 add a new device to raid. T1 waits for T2 to =
+resume
+> >>>>> mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
+> >>>>>
+> >>>>> Fix it by introducing a local mutex 'holder_mutex' to replace 'open=
+_mutex'.
+> >>>>
+> >>>> Is this to fix [1]? Do we need some Fixes and/or Closes tags?
+> >>>>
+> >>>
+> >>> No. Just use another way to fix [2], and both [2] and this patch can =
+fix
+> >>> the issue. I am not sure about the root cause of [1] yet.
+> >>>
+> >>> [2] https://patchwork.kernel.org/project/linux-raid/list/?series=3D81=
+2045
+> >>>
+> >>>> Could you please add steps to reproduce this issue?
+> >>>
+> >>> We need to modify the kernel, add sleep in md_submit_bio() and md_ioc=
+tl()
+> >>> as below, and then:
+> >>>     1. mdadm -CR /dev/md0 -l1 -n2 /dev/sd[bc]  #create a raid
+> >>>     2. echo 1 > /sys/module/md_mod/parameters/error_inject  #enable s=
+leep
+> >>>     3. 'mdadm --add /dev/md0 /dev/sda'  #add a disk to raid
+> >>>     4. submit ioctl BLKRRPART to raid within 10s.
+> >>
+> >> The analysis makes sense. I also hit the issue a couple times without =
+adding
+> >> extra delays. But I am not sure whether this is the best fix (I didn't=
+ find real
+> >> issues with it either).
 > >
-> > Fix it by aborting the IOs which the device will never complete when
-> > the VQ is broken.
+> > To be extra safe and future proof, we can do something like the
+> > following to only
+> > suspend the array for ADD_NEW_DISK on not-running arrays.
 > >
-> > With this fix now fio completes swiftly.
-> > An alternative of IO timeout has been considered, however when the
-> > driver knows about unresponsive block device, swiftly clearing them
-> > enables users and upper layers to react quickly.
+> > This appear to solve the problem reported in
 > >
-> > Verified with multiple device unplug cycles with pending IOs in virtio
-> > used ring and some pending with device.
+> > https://bugzilla.kernel.org/show_bug.cgi?id=3D218459
 > >
-> > In future instead of VQ broken, a more elegant method can be used. At
-> > the moment the patch is kept to its minimal changes given its urgency
-> > to fix broken kernels.
+> > Thanks,
+> > Song
 > >
-> > Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of virtio
-> > pci device")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: lirongqing@baidu.com
-> > Closes:
-> > https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73ca9b474
-> > 1@baidu.com/
-> > Co-developed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> > Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> > Signed-off-by: Parav Pandit <parav@nvidia.com>
-> > ---
-> >  drivers/block/virtio_blk.c | 54
-> > ++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 54 insertions(+)
+> > diff --git a/drivers/md/md.c b/drivers/md/md.c
+> > index 9e41a9aaba8b..395911d5f4d6 100644
+> > --- a/drivers/md/md.c
+> > +++ b/drivers/md/md.c
+> > @@ -7570,10 +7570,11 @@ static inline bool md_ioctl_valid(unsigned int =
+cmd)
+> >          }
+> >   }
 > >
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index 2bf14a0e2815..59b49899b229 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -1562,10 +1562,64 @@ static int virtblk_probe(struct virtio_device
-> *vdev)
-> >  	return err;
-> >  }
-> >
-> > +static bool virtblk_cancel_request(struct request *rq, void *data) {
-> > +	struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(rq);
-> > +
-> > +	vbr->in_hdr.status =3D VIRTIO_BLK_S_IOERR;
-> > +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
-> > +		blk_mq_complete_request(rq);
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static void virtblk_cleanup_reqs(struct virtio_blk *vblk) {
-> > +	struct virtio_blk_vq *blk_vq;
-> > +	struct request_queue *q;
-> > +	struct virtqueue *vq;
-> > +	unsigned long flags;
-> > +	int i;
-> > +
-> > +	vq =3D vblk->vqs[0].vq;
-> > +	if (!virtqueue_is_broken(vq))
-> > +		return;
-> > +
->=20
-> What if the surprise happens after the above check?
->=20
->=20
-In that small timing window, the race still exists.
+> > -static bool md_ioctl_need_suspend(unsigned int cmd)
+> > +static bool md_ioctl_need_suspend(struct mddev *mddev, unsigned int cm=
+d)
+> >   {
+> >          switch (cmd) {
+> >          case ADD_NEW_DISK:
+> > +               return mddev->pers !=3D NULL;
+>
+> Did you check already that this problem is not related that 'active_io'
+> is leaked for flush IO?
+>
+> I don't understand the problem reported yet. If 'mddev->pers' is not set
+> yet, md_submit_bio() will return directly, and 'active_io' should not be
+> grabbed in the first place.
 
-I think, blk_mq_quiesce_queue(q); should move up before cleanup_reqs() rega=
-rdless of surprise case along with other below changes.
+AFAICT, this is not related to the active_io issue.
 
-Additionally, for non-surprise case, better to have a graceful timeout to c=
-omplete already queued requests.
-In absence of timeout scheme for this regression, shall we only complete th=
-e requests which the device has already completed (instead of waiting for t=
-he grace time)?
-There was past work from Chaitanaya, for the graceful timeout.
+>
+> md_run() is the only place to convert 'mddev->pers' from NULL to a real
+> personality, and it's protected by 'reconfig_mutex', however,
+> md_ioctl_need_suspend() is called without 'reconfig_mutex', hence there
+> is a race condition:
+>
+> md_ioctl_need_suspend           array_state_store
+>   // mddev->pers is NULL, return false
+>                                  mddev_lock
+>                                  do_md_run
+>                                   mddev->pers =3D xxx
+>                                  mddev_unlock
+>
+>   // mddev_suspend is not called
+>   mddev_lock
+>   md_add_new_disk
+>    if (mddev->pers)
+>     md_import_device
+>     bind_rdev_to_array
+>     add_bound_rdev
+>      mddev->pers->hot_add_disk
+>      -> hot add disk without suspending
 
-The sequence for the fix I have in mind is:
-1. quiesce the queue
-2. complete all requests which has completed, with its status
-3. stop the transport (queues)
-4. complete remaining pending requests with error status
+Yeah, this race condition exists. We probably need some
+trick with suspend and lock here.
 
-This should work regardless of surprise case.
-An additional/optional graceful timeout on non-surprise case can be helpful=
- for #2.
-
-WDYT?
-
-> Thanks,
-> Ming
-
+Thanks,
+Song
