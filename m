@@ -1,152 +1,84 @@
-Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0AF67C56
-	for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 11:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4F665190
+	for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 11:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708429565; cv=none; b=EHnEt4+4U9licDs7K4ZPkdX86ADOqMUy0/cjFm/qL73ftCgmXvXOXt7qgvlrk4vtpe/fmEAhRGT3DWq/sdTo5ZKnas+EydNrzWB7+hLZ3Q8a/SQgGK93c0ghOetNKcGvtjdn7CuxVKlRp39caogkuMfFIww2CGatazPUM7msYdc=
+	t=1708429813; cv=none; b=D6sfIzMoKG5AHt7cFwRP6SJ0MmUAOgtcbAp1HrTb0VVdd9xtnM9Vy3y5gcmPH0UNvggShYiiAlWDCYPyPWAmX/Ap9Xf8hfFJNQIPn2PcAZ9fezOWhVcgE2XrGY3FQVQoCBsL5clhled2cDZzUOGCWBGFGDc622y8iuJX4JomxYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708429565; c=relaxed/simple;
-	bh=vNZkqBTjlTdoeDozES2fdOqPQvfg/df6N1nv+ImGzOk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nLXd9gcguOAFI4C768Al5VP2/An2Th6bWU6IhayK6w66J6HLfJ2JNLkc0ZBmKLIBgjWsdlqy0Hl+4zebdAN3v//7XCWZHmFnCfGtXUqF/t7gn/bAqPEKBrnUSWm2GwMgtQ3Yl+i4T09EtQ4iykT6WmnUhrAoFwJGUsWdiUVKL6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 41KBjlSv037342;
-	Tue, 20 Feb 2024 19:45:47 +0800 (+08)
-	(envelope-from zhaoyang.huang@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4TfHdk5cQxz2KGMyM;
-	Tue, 20 Feb 2024 19:45:14 +0800 (CST)
-Received: from bj03382pcu01.spreadtrum.com (10.0.73.40) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Tue, 20 Feb 2024 19:45:46 +0800
-From: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot
-	<vincent.guittot@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Zhaoyang Huang
-	<huangzhaoyang@gmail.com>, <steve.kang@unisoc.com>
-Subject: [PATCHv2 2/2] block: adjust CFS request expire time
-Date: Tue, 20 Feb 2024 19:45:36 +0800
-Message-ID: <20240220114536.513494-1-zhaoyang.huang@unisoc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1708429813; c=relaxed/simple;
+	bh=bc0S6cIFBA2vA26HXceNFNmVnRSVc2vKRlJ3HDDEU5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H2NjxCHcS4cfFBEDA8PJDcytkwBLS8XUWRhzC07g5Lj665vEeu4Xj8VywTD0m4+BsRLapzbDejlTWeaOUgACCfxdxs11kPRVbdd8AjD/ffwmU6/Ir3VbiyyTZLntJb4va2sGgHcY5/F+DGf118gdEPvgmJlB3e2a0pj24MbbAcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=sk5Hj+kN; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="sk5Hj+kN"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-512aafb3ca8so2207657e87.3
+        for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 03:50:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1708429809; x=1709034609; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=L48l2hpsjGRvCKL00qVAvQZynCjle73QSMbq61LuMbw=;
+        b=sk5Hj+kNeqKp0neNl4yP7buVytIYy0v9yAxxU8uI/zFuN4H0LUfJEQw1N/ny7Q+foj
+         1YPJqARSiqNqIUNZkdTsF2BO9BqBWHhcM0f+i5/6p9iBCGrZU3DvRsDemchIbyWR1BW5
+         A8YSzyI1pPzC65G77VoiW+ANU7gF0QF4Ky0oU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708429809; x=1709034609;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L48l2hpsjGRvCKL00qVAvQZynCjle73QSMbq61LuMbw=;
+        b=KSHhoEqBENXEbFTSXDMytzPx5Qm4PYEQpAhYnrYGzXiH7Z1XyREsZb4KmRbT7ENdlG
+         OM4lthpZu6kiIDVACEuCSyM9CCgkArLOrD1xWahJU07hw50/hDOAUGqC5B6Ksvi89r6+
+         DWSBhr+7Woki2yN0pa8yhLe+LYUpPDYAkr197Y48nv1PLkCGX46lSOyahka2YMmW+L+W
+         V7gUl//I1Kp3G01sV1I6uC5m9negO2gRLRZJYjkH7cA9NK86nC7+6Ku7hl07mcsczKZ5
+         O0lUvGT1VVXuvvEGZ23E5Rv3jR0DW66dxCwcjkCoo/NNDx50jcecMST5OeL2WJeXr9hN
+         LzDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVXMh5qa+zfQ0V1QBaCkvGunGEDpCq5ZLphJA+MEzV4yHZhR1Xdzi+P8gCfmtrppttziYOS1fRkNR1EMTTTedVT9BuVyMNuKJhowhA=
+X-Gm-Message-State: AOJu0YzpDihGtBjSZWQ+fzaiVy+6DmEpEaA9qnIQttJZz7nOZbbZ2M0r
+	gy8fBcQzTtVb05+ufgbV1GLKxXBLDZLhM4gnYJ3JvwBjhA8EFC7q67FT+Gp71hM=
+X-Google-Smtp-Source: AGHT+IHUZ8iQeWiuL3aFeiidpOcUFxCSR6QyScwRy5qnJiOguqCxJ4LpXQwdFCaOwM+JubG1vE+kxQ==
+X-Received: by 2002:a05:6512:1088:b0:512:c9bc:f491 with SMTP id j8-20020a056512108800b00512c9bcf491mr971397lfg.47.1708429809506;
+        Tue, 20 Feb 2024 03:50:09 -0800 (PST)
+Received: from localhost ([213.195.118.74])
+        by smtp.gmail.com with ESMTPSA id b7-20020a05622a020700b0042e124c7b17sm1679254qtx.60.2024.02.20.03.50.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 03:50:09 -0800 (PST)
+Date: Tue, 20 Feb 2024 12:50:07 +0100
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] xen-blkfront: rely on the default discard granularity
+Message-ID: <ZdSR75QHen-omYCZ@macbook>
+References: <20240220084935.3282351-1-hch@lst.de>
+ <20240220084935.3282351-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL:SHSQR01.spreadtrum.com 41KBjlSv037342
+In-Reply-To: <20240220084935.3282351-3-hch@lst.de>
 
-From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+On Tue, Feb 20, 2024 at 09:49:33AM +0100, Christoph Hellwig wrote:
+> The block layer now sets the discard granularity to the physical
+> block size default.  Take advantage of that in xen-blkfront and only
+> set the discard granularity if explicitly specified.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-According to current policy, CFS's may suffer involuntary IO-latency by
-being preempted by RT/DL tasks or IRQ since they possess the privilege for
-both of CPU and IO scheduler. This commit introduce an approximate and
-light method to decrease these affection by adjusting the expire time
-via the CFS's proportion among the whole cpu active time.
-The average utilization of cpu's run queue could reflect the historical
-active proportion of different types of task that can be proved valid for
-this goal from belowing three perspective,
+Acked-by: Roger Pau Monné <roger.apu@citrix.com>
 
-1. All types of sched class's load(util) are tracked and calculated in the
-same way(using a geometric series which known as PELT)
-2. Keep the legacy policy by NOT adjusting rq's position in fifo_list
-but only make changes over expire_time.
-3. The fixed expire time(hundreds of ms) is in the same range of cpu
-avg_load's account series(the utilization will be decayed to 0.5 in 32ms)
-
-TaskA
-sched in
-|
-|
-|
-submit_bio
-|
-|
-|
-fifo_time = jiffies + expire
-(insert_request)
-
-TaskB
-sched in
-|
-|
-vfs_xxx
-|
-|preempted by RT,DL,IRQ
-|\
-| This period time is unfair to TaskB's IO request, should be adjust
-|/
-|
-submit_bio
-|
-|
-|
-fifo_time = jiffies + expire * CFS_PROPORTION(rq)
-(insert_request)
-
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
----
-change of v2: introduce direction and threshold to make the hack working
-as a guard for CFS's over-preempted.
----
----
- block/mq-deadline.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index f958e79277b8..b5aa544d69a3 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -54,6 +54,7 @@ enum dd_prio {
- 
- enum { DD_PRIO_COUNT = 3 };
- 
-+#define CFS_PROP_THRESHOLD 60
- /*
-  * I/O statistics per I/O priority. It is fine if these counters overflow.
-  * What matters is that these counters are at least as wide as
-@@ -802,6 +803,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	u8 ioprio_class = IOPRIO_PRIO_CLASS(ioprio);
- 	struct dd_per_prio *per_prio;
- 	enum dd_prio prio;
-+	int fifo_expire;
- 
- 	lockdep_assert_held(&dd->lock);
- 
-@@ -839,8 +841,20 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 
- 		/*
- 		 * set expire time and add to fifo list
-+		 * The expire time is adjusted when current CFS task is
-+		 * over-preempted by RT/DL/IRQ which is calculated by the
-+		 * proportion of CFS's activation among whole cpu time during
-+		 * last several dozen's ms.Whearas, this would NOT affect the
-+		 * rq's position in fifo_list but only take effect when this
-+		 * rq is checked for its expire time when at head.
- 		 */
--		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
-+		fifo_expire = dd->fifo_expire[data_dir];
-+		if (data_dir == DD_READ &&
-+			(cfs_prop_by_util(current, 100) < CFS_PROP_THRESHOLD))
-+			fifo_expire = cfs_prop_by_util(current, dd->fifo_expire[data_dir]);
-+
-+		rq->fifo_time = jiffies + fifo_expire;
-+
- 		insert_before = &per_prio->fifo_list[data_dir];
- #ifdef CONFIG_BLK_DEV_ZONED
- 		/*
--- 
-2.25.1
-
+Thanks, Roger.
