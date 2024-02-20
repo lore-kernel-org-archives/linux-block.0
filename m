@@ -1,119 +1,85 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39241154425
-	for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 23:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB23B154451
+	for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 23:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708470065; cv=none; b=jAImzo4CbnYdWYoN9U1o6h3AP+jelkEuCXtYQr4VHb6PR0NfIyPNAz6MFAjdRBBj6dk9IFyi5o7ic6fF0lfXVaQlRtYrtdEHdG4fSbnsn3TGKI81yr75AmF11osExyWZyL6AFgxzlVJnIyyXSrvyE8BeM/43VRe85gs9oaJRUgo=
+	t=1708471761; cv=none; b=VV3954KK5U5gkdoI3dTMYykaUzAz1vUEBHcKlM1TdVKbx38jkuG+NeAEaldu8dyBYZNBpOr8OZYtdY4aGowtDpbsFbCS/SwH5eSQTixRPYwuvPbvz8UdVuvu4Bh/IfBrpipqlIhYiQJaS8zsdmiun/mD6JKVXkTtR4+Jhx0z834=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708470065; c=relaxed/simple;
-	bh=0nJssCnVqUtLLrgbcTA5mzUlsmakm/CsmHiqgH3hL9Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iyFID0iICXyGSjhN0oJZdrmipYT1Mz0BQepyrixsgbMkfzOnKCM0KNnARFsWlGia23kug5tBAUwy6vHf8FhZF/u2H3uMQYRqF2KCH7JDvDzjTmrHZsUsRlCPrjJT9WxgS7KSr2wp1vwfAASAbF6ceW4+MibgqWzEyW/bkZ8Pocw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=B4IdbgTC; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1708471761; c=relaxed/simple;
+	bh=XjDnNvLFnTr8MBnSjeTz86l8/+tXMc65nUaY6XjwILI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U0HAUR/yv88AZyQx/xZnpBTNYfOOOkJK937abt019oAQB1JtLi+x4pH2aX036FOUZ1UbcLvrKyiey4ybtmJFkggap8LHriNTm4khkupv6xaQC2b6sbQHeCLk6SAIvo7aM9WNBk8KjFd1HrzyLk4htZYl7EVGSaNP3cL4KStfNjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=chdKGdin; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B4IdbgTC"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6080a3eecd4so40577377b3.2
-        for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 15:01:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708470062; x=1709074862; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1A3zr3xkjkMF8lRpEIOZJ9IYJxQ1uIKjo+R7IGHgj8k=;
-        b=B4IdbgTCN+7QDRLHWUZdbmwjRop3NkEX7LLiph1qSD2K4iefoo8u/gylMJ9Nnc1zbH
-         M+y31kHZ2ETlNrs0Sx2ddu+9TARagzi5KaJbZLHby43xOKhxy/M6MLp6roapSSeUX5U+
-         +CGe/OfClOcqAz1Xps0rIFxnK0S2xHGR0xL2JKrQioOMRVHHlq5i5LmMY2VgknQ9eQIR
-         O9SNinXAVLIpYesm0kUzdJlPQZU1IPi2HqBYneK6vsgH4+sZS8GMLij7mrs0buvUarTR
-         ydwrm+JkL7hEVxv4kTpzUSTa9NS7LSSgvvJYIsHSAVoh4OX6bZhZZqXTeK4ktSFlTsmi
-         boug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708470062; x=1709074862;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1A3zr3xkjkMF8lRpEIOZJ9IYJxQ1uIKjo+R7IGHgj8k=;
-        b=RuwUPxiztwiSTBjVoGEDMDql/Hc3bnCCFvUvLNqG2aa8vr1DBwPLuTjvF8okAzjgPl
-         5q0EKUkoBmwo2oAtcyJbkY/9Fkyx6+K0XHT3Yl57wACA+KVcle0br11gLpf5AEVcxEyH
-         KlKVtTuVot/U11hwVGX4Z9081RaIS2S005uw9CRea2V6kAtF41HumCvrHscmaFurzscA
-         KHT+hlpjubXI2CQcuzFhmoKQQqQaM+x0sMI2+GmDxiuVG47EQtr++Fmm4txQC1pbLZmY
-         KgZjYAooGbF/8cqN9kwtyP1dX6FBHb8qNpZc14mPI5zYqdAuv2g1ff6vy0gKRVCogjoP
-         wkIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGVmSP5/WdNoPSZPyycg9cxvwL569wIp0I7q7jbGe/110/HfrsXDUG8SrOiswJWdJYYkDWlxRbe8t/om+ICHN021ToJO7GbQURCj4=
-X-Gm-Message-State: AOJu0YyOEG9Bv35wudsEvGdu7fTh7VFhVInWi70fIbTlXYA8eGfWsP0Z
-	qYaPYI/2lfzaKGSxNdlcKsrlHSJEL2zahTMx6kDzb70TrKlh585NU6GxRBX5s9LKUTaTxPTucFu
-	GNYI687O3taDvdzqFKvMeqh4moRl66MR8nJAO2w==
-X-Google-Smtp-Source: AGHT+IGS1rjbIbqwa2FUKNvXF4Dn5+e0RlJyXxF6trqxXbZrLHNf6jVVcW1tvydeSHAyFS/jHob425YDo6DrXyKhUs8=
-X-Received: by 2002:a25:838c:0:b0:dcd:3f82:e803 with SMTP id
- t12-20020a25838c000000b00dcd3f82e803mr12702286ybk.39.1708470061794; Tue, 20
- Feb 2024 15:01:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="chdKGdin"
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41KKXcGL004113;
+	Tue, 20 Feb 2024 23:29:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=bqGCULEBWiOTsXd46lhnk+JCijZWOS5tGdu1mCkkVVM=;
+ b=chdKGdinGEbGPd8U2R/wizhhGu5B0kkT7of5YhPF5dcdGKQo1zAvvj0zgULaaCyxS7bB
+ rycVL8yUqHVoUBpXz3By3MVlNvdn6WVW1D6hR/7XxLi/nxT9CoKGoenqVgAirMu3Ats2
+ JTen7oBTcIFrhf6SL6pczeMIPpRFp8iBGxC75RkO+/DqxUiG+OdERvX5khk5wf+aAZ/B
+ xlX05BJ9BMqu+ZxIFbj7uMebEbyuzQawRQW5JXs2UdcEHTl3KePf+Z+I38Nci//VsYsA
+ i55JT/C8nKkocHHP4Diqw3bX3LGlyu1i0hPuYCUjG7V23EmMTEdkDLm7IYY3BGobdPak bg== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wakqc8bfx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 Feb 2024 23:29:17 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41KN3woj006646;
+	Tue, 20 Feb 2024 23:29:15 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wak88b8cv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 Feb 2024 23:29:15 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41KNTFFN021792;
+	Tue, 20 Feb 2024 23:29:15 GMT
+Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3wak88b8c5-1;
+	Tue, 20 Feb 2024 23:29:15 +0000
+From: Alan Adamson <alan.adamson@oracle.com>
+To: linux-block@vger.kernel.org
+Cc: alan.adamson@oracle.com, chaitanyak@nvidia.com,
+        linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com
+Subject: [PATCH blktests V2 0/1] nvme: Add passthru error logging tests to nvme/039
+Date: Tue, 20 Feb 2024 15:30:41 -0800
+Message-Id: <20240220233042.2895330-1-alan.adamson@oracle.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
- <20240127-mmc-proper-kmap-v2-9-d8e732aa97d1@linaro.org> <7f40cb40-1a1-532-75fc-d3376ed27a@linux-m68k.org>
-In-Reply-To: <7f40cb40-1a1-532-75fc-d3376ed27a@linux-m68k.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 21 Feb 2024 00:00:49 +0100
-Message-ID: <CACRpkdZpyefnTyKEJXru_HZG8xcJF66Eb2pZhbk+HVvfzdh4yw@mail.gmail.com>
-Subject: Re: [PATCH v2 9/9] mmc: sh_mmcif: Use sg_miter for PIO
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Ulf Hansson <ulf.hansson@linaro.org>, Nicolas Pitre <nico@fluxnic.net>, 
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Angelo Dureghello <angelo.dureghello@timesys.com>, linux-mmc@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-20_06,2024-02-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402200168
+X-Proofpoint-GUID: RR6VnzOfvjebOi04zV0ojA82cVV4mBhI
+X-Proofpoint-ORIG-GUID: RR6VnzOfvjebOi04zV0ojA82cVV4mBhI
 
-Hi Geert,
+v2: - Pass namespace (/dev/nvme0n1) to nvme io-passthru rather than controller (/dev/nvme0).
+      This resolves a issue when testing with multi-namespace devices.
+    - Only run the passthru tests on kernels 6.8.0 and greater.
 
-sorry for the mess!
+Alan Adamson (1):
+  nvme: Add passthru error logging tests to nvme/039
 
-On Tue, Feb 20, 2024 at 10:03=E2=80=AFPM Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
+ tests/nvme/039     | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/039.out |  2 ++
+ tests/nvme/rc      | 37 +++++++++++++++++++++++++++
+ 3 files changed, 102 insertions(+)
 
->      sh_mobile_sdhi ee120000.mmc: mmc1 base at 0xee120000, max clock rate=
- 12 MHz
->      mmc2: new high speed MMC card at address 0001
->      sh_mobile_sdhi ee100000.mmc: mmc0 base at 0xee100000, max clock rate=
- 88 MHz
->      mmcblk2: mmc2:0001 MMC08G 7.33 GiB
+-- 
+2.39.3
 
-Hey it reads some blocks...
-
->      BUG: sleeping function called from invalid context at kernel/workque=
-ue.c:3347
->      in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 35, name: irq=
-/151-ee20000
-(...)
->       __might_resched from __flush_work+0x20c/0x2e4
->       __flush_work from __cancel_work_timer+0x118/0x198
->       __cancel_work_timer from sh_mmcif_irqt+0x38/0x8f8
->       sh_mmcif_irqt from irq_thread_fn+0x1c/0x58
-
-Actually that is the thread so the message is a bit confusing, the irq thre=
-ad
-isn't atomic.
-
-I wonder if it is caused by this:
-
-> > +     sg_miter_start(&host->sg_miter, data->sg, data->sg_len,
-> > +                    SG_MITER_ATOMIC | SG_MITER_TO_SG);
-
-...because I don't need to ask for atomic miter here, since the poll
-functions are actually called in process context.
-
-I've sent a patch, can you test?
-https://lore.kernel.org/linux-mmc/20240220-fix-sh-mmcif-v1-1-b9d08a787c1f@l=
-inaro.org/T/#u
-
-Yours,
-Linus Walleij
