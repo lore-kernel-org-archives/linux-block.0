@@ -1,44 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DC15F875
-	for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 09:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF95E6026A
+	for <linux-block@vger.kernel.org>; Tue, 20 Feb 2024 09:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708421573; cv=none; b=WxJatn6w5yM8dbWsPeam2uo5ZeRuJNY1zaVO6VpK2y0BbvmXLrwejD/rP5NrpdZVW04xi/dZbG1S9l50o7OnCwl6ovukWWeQ7FOVTE/zQMnH6gu+Qyee9DKRhN/d+ktRVxwSqreUdUqwP6vCiiNxG0//K4dw0gnhIq36yDuohX0=
+	t=1708421576; cv=none; b=ZLgRA/uTNMa7Pcccj0h+yGz0J6xspQ6surhP4LodXgxKplEisg4JmaS9FAnVst5b7qydATbqdJN9RChu+y40r+TEjVmmXF+crMw57P1rEen1TZSRWEqXhiwVg7gMvYuhaEnx6xD0poh4BUe5sG7+U3SMMzauQ07HXT4u5YvN1xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708421573; c=relaxed/simple;
-	bh=EoB3dFniLP93GqpVRrYnj06/AjKiEa8E5EBEHX0p5fI=;
+	s=arc-20240116; t=1708421576; c=relaxed/simple;
+	bh=qOc8yK2XoYuN355qY3DKG83Gac8TnCY+o48npqTEeZk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=elKMYy67Vu4j7g/R4z4IJEzlDXqyxA2fxGwKfRRzCXNKhGHiNzDOS68ke0AX8MCty9kaI4uJ7k4ZL2074+pHvnUkTM7mSdqpZgcSFQP7617Cxtj6pVM594d1V28JO+jBjAZlmeF1oqfHyg+57HJnbqrqEX7J3T9ZS03t7hsYqQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SJQFdd9n; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=mTfDwb/YRMnorTnVN92K2kG2hqbQam3764BflxS0IkmRbvUyhfvqu0zUe0SPO4TZtyEFZIErSf9HVVjXpcWo7QRGKu7dVd6yzV9pJX+YGbEAEK9J6wGm3nSRglEY+K6BUE/+OL4/XbxD2TJgkJs7AT+DPuBGvAybRfIIoBrpNs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=B+4JJHgA; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SJQFdd9n"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B+4JJHgA"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=SiwCmZIrVBDlyAqOExow7jAA6e3nPCc/pXmzxzy9TZg=; b=SJQFdd9nwY5IT3tBGopdq1wr+P
-	samtOY94Num/cJWDJdl5eXg0afA973AywCEXlLKh45xbagzNn41+J5XCThjKlcqpx+kuUL3P5rGu0
-	8LhdEUYRqpJpV0bWaeR8aPqQ+7lXXgOeXnljQMcsNThXFpZTVVjGrjCPxqBZc0lCmG9MMtIKyjmjU
-	NOAtxie7543cVnHT8eXIqo5B729ziFIDiHJpbLy9AKjRpkP2a9a5Ore2ytPg4BkfsgRNr+FWcpyF0
-	nYS7W6QlsMAVDiyHrwIc6CDXQU+xWg1gLFgM7Uyp72G2PifNpQWeFDQRIdIF5hllMkxEhCdXM8mvp
-	XQ+0aEbQ==;
+	bh=kb6QErPf8EM/+aQV/fGOSOnfYzS+RdK4iWwwPj6UkDg=; b=B+4JJHgAJnhbIRYvtI15WXg2ix
+	KpXAHwYM6HnHxpEMl/yWloP8qVQkBZ8Lkri/0HldTagAql6+EUh3BxOYu6NqV6f+TPPg4GnffSSKL
+	TFPbS8vvgKBoiim4MPhOCx2cLxGbqWuW+vpmYBxLz6xMcfF+mJ2a2Zn66su2XxkJ+Ir5YEdYWUgzJ
+	rMhmqIIVtSuS7woNcjL7biRJgqzPzXIwfOMsfahH2lynIjMXWlyV8YiYiDgVCludAAIP1BEI1HANj
+	PBmmVkzSv2Yelb+NKd+hDSvfHUTC4NbFWVb9bmPYaScczQLO5VhKJmScp307dsVLON/TkhJAdxQMq
+	Zij0X5UA==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rcMUc-0000000E0kf-2Zu4;
-	Tue, 20 Feb 2024 09:32:51 +0000
+	id 1rcMUg-0000000E0lk-0Ox5;
+	Tue, 20 Feb 2024 09:32:54 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Hannes Reinecke <hare@suse.de>,
 	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 3/5] null_blk: refactor tag_set setup
-Date: Tue, 20 Feb 2024 10:32:46 +0100
-Message-Id: <20240220093248.3290292-4-hch@lst.de>
+Subject: [PATCH 4/5] null_blk: remove null_gendisk_register
+Date: Tue, 20 Feb 2024 10:32:47 +0100
+Message-Id: <20240220093248.3290292-5-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240220093248.3290292-1-hch@lst.de>
 References: <20240220093248.3290292-1-hch@lst.de>
@@ -51,9 +51,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Move the tagset initialization out of null_add_dev into a new
-null_setup_tagset helper, and move the shared vs local differences
-out of null_init_tag_set into the callers.
+null_gendisk_register isn't a very useful abstraction given that it
+doesn't even allocate the gendisk.  Merge it into the only caller
+instead.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
@@ -61,141 +61,67 @@ Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Tested-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- drivers/block/null_blk/main.c | 106 ++++++++++++++++------------------
- 1 file changed, 51 insertions(+), 55 deletions(-)
+ drivers/block/null_blk/main.c | 41 ++++++++++++++---------------------
+ 1 file changed, 16 insertions(+), 25 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 89e63d1c610362..03c3917a56fa28 100644
+index 03c3917a56fa28..0c8d5042321302 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -1759,55 +1759,65 @@ static int null_gendisk_register(struct nullb *nullb)
- 	return add_disk(disk);
+@@ -1735,30 +1735,6 @@ static int setup_queues(struct nullb *nullb)
+ 	return 0;
  }
  
--static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
-+static int null_init_tag_set(struct blk_mq_tag_set *set, int poll_queues)
- {
--	unsigned int flags = BLK_MQ_F_SHOULD_MERGE;
--	int hw_queues, numa_node;
--	unsigned int queue_depth;
--	int poll_queues;
+-static int null_gendisk_register(struct nullb *nullb)
+-{
+-	sector_t size = ((sector_t)nullb->dev->size * SZ_1M) >> SECTOR_SHIFT;
+-	struct gendisk *disk = nullb->disk;
 -
--	if (nullb) {
--		hw_queues = nullb->dev->submit_queues;
--		poll_queues = nullb->dev->poll_queues;
--		queue_depth = nullb->dev->hw_queue_depth;
--		numa_node = nullb->dev->home_node;
--		if (nullb->dev->no_sched)
--			flags |= BLK_MQ_F_NO_SCHED;
--		if (nullb->dev->shared_tag_bitmap)
--			flags |= BLK_MQ_F_TAG_HCTX_SHARED;
--		if (nullb->dev->blocking)
--			flags |= BLK_MQ_F_BLOCKING;
--	} else {
--		hw_queues = g_submit_queues;
--		poll_queues = g_poll_queues;
--		queue_depth = g_hw_queue_depth;
--		numa_node = g_home_node;
--		if (g_no_sched)
--			flags |= BLK_MQ_F_NO_SCHED;
--		if (g_shared_tag_bitmap)
--			flags |= BLK_MQ_F_TAG_HCTX_SHARED;
--		if (g_blocking)
--			flags |= BLK_MQ_F_BLOCKING;
+-	set_capacity(disk, size);
+-
+-	disk->major		= null_major;
+-	disk->first_minor	= nullb->index;
+-	disk->minors		= 1;
+-	disk->fops		= &null_ops;
+-	disk->private_data	= nullb;
+-	strscpy_pad(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
+-
+-	if (nullb->dev->zoned) {
+-		int ret = null_register_zoned_dev(nullb);
+-
+-		if (ret)
+-			return ret;
 -	}
 -
- 	set->ops = &null_mq_ops;
--	set->cmd_size	= sizeof(struct nullb_cmd);
--	set->flags = flags;
--	set->driver_data = nullb;
--	set->nr_hw_queues = hw_queues;
--	set->queue_depth = queue_depth;
--	set->numa_node = numa_node;
-+	set->cmd_size = sizeof(struct nullb_cmd);
- 	set->timeout = 5 * HZ;
-+	set->nr_maps = 1;
- 	if (poll_queues) {
- 		set->nr_hw_queues += poll_queues;
--		set->nr_maps = 3;
--	} else {
--		set->nr_maps = 1;
-+		set->nr_maps += 2;
- 	}
+-	return add_disk(disk);
+-}
 -
- 	return blk_mq_alloc_tag_set(set);
- }
+ static int null_init_tag_set(struct blk_mq_tag_set *set, int poll_queues)
+ {
+ 	set->ops = &null_mq_ops;
+@@ -1972,7 +1948,22 @@ static int null_add_dev(struct nullb_device *dev)
+ 		sprintf(nullb->disk_name, "nullb%d", nullb->index);
+ 	}
  
-+static int null_init_global_tag_set(void)
-+{
-+	int error;
+-	rv = null_gendisk_register(nullb);
++	set_capacity(nullb->disk,
++		((sector_t)nullb->dev->size * SZ_1M) >> SECTOR_SHIFT);
++	nullb->disk->major = null_major;
++	nullb->disk->first_minor = nullb->index;
++	nullb->disk->minors = 1;
++	nullb->disk->fops = &null_ops;
++	nullb->disk->private_data = nullb;
++	strscpy_pad(nullb->disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
 +
-+	if (tag_set.ops)
-+		return 0;
-+
-+	tag_set.nr_hw_queues = g_submit_queues;
-+	tag_set.queue_depth = g_hw_queue_depth;
-+	tag_set.numa_node = g_home_node;
-+	tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+	if (g_no_sched)
-+		tag_set.flags |= BLK_MQ_F_NO_SCHED;
-+	if (g_shared_tag_bitmap)
-+		tag_set.flags |= BLK_MQ_F_TAG_HCTX_SHARED;
-+	if (g_blocking)
-+		tag_set.flags |= BLK_MQ_F_BLOCKING;
-+
-+	error = null_init_tag_set(&tag_set, g_poll_queues);
-+	if (error)
-+		tag_set.ops = NULL;
-+	return error;
-+}
-+
-+static int null_setup_tagset(struct nullb *nullb)
-+{
-+	if (nullb->dev->shared_tags) {
-+		nullb->tag_set = &tag_set;
-+		return null_init_global_tag_set();
++	if (nullb->dev->zoned) {
++		rv = null_register_zoned_dev(nullb);
++		if (rv)
++			goto out_ida_free;
 +	}
 +
-+	nullb->tag_set = &nullb->__tag_set;
-+	nullb->tag_set->driver_data = nullb;
-+	nullb->tag_set->nr_hw_queues = nullb->dev->submit_queues;
-+	nullb->tag_set->queue_depth = nullb->dev->hw_queue_depth;
-+	nullb->tag_set->numa_node = nullb->dev->home_node;
-+	nullb->tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
-+	if (nullb->dev->no_sched)
-+		nullb->tag_set->flags |= BLK_MQ_F_NO_SCHED;
-+	if (nullb->dev->shared_tag_bitmap)
-+		nullb->tag_set->flags |= BLK_MQ_F_TAG_HCTX_SHARED;
-+	if (nullb->dev->blocking)
-+		nullb->tag_set->flags |= BLK_MQ_F_BLOCKING;
-+	return null_init_tag_set(nullb->tag_set, nullb->dev->poll_queues);
-+}
-+
- static int null_validate_conf(struct nullb_device *dev)
- {
- 	if (dev->queue_mode == NULL_Q_RQ) {
-@@ -1904,21 +1914,7 @@ static int null_add_dev(struct nullb_device *dev)
++	rv = add_disk(nullb->disk);
  	if (rv)
- 		goto out_free_nullb;
- 
--	if (dev->shared_tags) {
--		if (!tag_set.ops) {
--			rv = null_init_tag_set(NULL, &tag_set);
--			if (rv) {
--				tag_set.ops = NULL;
--				goto out_cleanup_queues;
--			}
--		}
--		nullb->tag_set = &tag_set;
--		rv = 0;
--	} else {
--		nullb->tag_set = &nullb->__tag_set;
--		rv = null_init_tag_set(nullb, nullb->tag_set);
--	}
--
-+	rv = null_setup_tagset(nullb);
- 	if (rv)
- 		goto out_cleanup_queues;
+ 		goto out_ida_free;
  
 -- 
 2.39.2
