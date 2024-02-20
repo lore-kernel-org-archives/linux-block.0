@@ -1,218 +1,198 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2831485959
-	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 18:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B2B8615F
+	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 20:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708540529; cv=none; b=XX5/S1gG4pgrCw2LIaMd7kB4BEVRvrM66EKq4ZkaQrJBfYB/YUz+VtBhDrgQCsouXe/f+TgNI1jW4S8z7qxrgH8c0fgPoD73scp7VaituIE0kRF9OZjxRV+PaZV58spFpEwy8zUOUeokDUmENyeXQhPpCdXZpczHx8Z+huewva4=
+	t=1708548755; cv=none; b=Y16FZ+90Jmj1L5Yf/tx+hNniUhqr4vzyMglg3Y9YZDvt5AHyloS7HEJuikdx/OmPQBhprxOlzypeeGKea4fhvSU0UqKTfvU6MHtB4dYrDhtMuGBvFEGGYFMl7cNw1N6aBk7DpWDOCQK4k4h/1c/A2nf/m17wADw36UV65NvVzSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708540529; c=relaxed/simple;
-	bh=Gf/PEvEezzrSCXss/2Vd6eZNXpQyb7M6BAJ1NR/WtY0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gFDP8SmQCALc0IeLPI567olcWZjjr6qaWVYbImH5uZSi1fCm6NaFNGB+6NJ4PA7EU6IUVsI4QCBZV+y2xUzwkEeXRGKZ+eGLc5J+Xxlw1oua+ZAx/ml1tGUisPjOe2O7ILAQOrWEvNK4GAHEgKmjoAT4KEodynJZOv8gZEjTVdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=KYrWYROP; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1708548755; c=relaxed/simple;
+	bh=xgfDMafDUcmEBN6Xo15ORL3SUF/WL2NkQNR5tvM/WDM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wy5XC7JvTMWwxaR87/yET6qrxOUvWm7RUnn2owP6U0yftuheLa0XgiajD36SV5nk2pt+Zxtk3hcI0R2BlUPwagLIn5gK7AxquiQZJ3aMEos/hUXunEw2SbeOEh4xRnCzAJZ39OzIBjRKCzvApVSTCVHe71Jhy9MtySAkEaDJzIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hzOJhZDS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KYrWYROP"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41LDiW3V017568;
-	Wed, 21 Feb 2024 18:35:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2023-11-20;
- bh=J/jSPxsrSvPZBNaszGXLbUeROhgl5r3nVBSlOeQx3eY=;
- b=KYrWYROPxujjpapWei/5UiLlluPLWWdlD9QCRk46uV2xbyuNVB5ZmC3i42AQ6zxazDlm
- ptIHe10pfY1P2Xzx+zTBAZcGT9gru2FzjAtMkegT7m+ZTa6AjGR5xBhksUQRAXyT3FHZ
- sYj77qjtEMut4/5y7HoWPzs+ASiR2AbZBkPnMN73Sk0nsFSiESx/c6xthKXEZzjEZBpU
- 85L4PxGPQqWZ/8lVlf+v/sLFM5egGc7xdLvG/4CgHnggtvwyRkQYhMLVyt3GA/xG0XND
- zB+S4ZbY2o/QEz5tEVvU5ZhaB54+hkLT4V+eZE0+rM8CTgJLnhaDpXtEJIhH3/CHNuBE 3g== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wd4kntavn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Feb 2024 18:35:15 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41LHDwhq039661;
-	Wed, 21 Feb 2024 18:35:14 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wak89evh3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Feb 2024 18:35:14 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41LIVkxf039971;
-	Wed, 21 Feb 2024 18:35:14 GMT
-Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3wak89evfs-2;
-	Wed, 21 Feb 2024 18:35:14 +0000
-From: Alan Adamson <alan.adamson@oracle.com>
-To: linux-block@vger.kernel.org
-Cc: alan.adamson@oracle.com, chaitanyak@nvidia.com,
-        linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com
-Subject: [PATCH blktests V3 1/1] nvme: Add passthru error logging tests to nvme/039
-Date: Wed, 21 Feb 2024 10:36:40 -0800
-Message-Id: <20240221183640.3432605-2-alan.adamson@oracle.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240221183640.3432605-1-alan.adamson@oracle.com>
-References: <20240221183640.3432605-1-alan.adamson@oracle.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hzOJhZDS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708548752;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j71ZkCWNeOZ8wnhrOdzBq48RrBBlOjjlQIEtqH+HmBA=;
+	b=hzOJhZDSvZoPmgGTxGsiF5XawLP2gKsn/BtAMvQCuxP+zV1PZxMhLFWmOwzjpY13bUYSJt
+	g1zkFhc09Ziq/+saqxfQh9JHQr7Q2D5j53uJh5YSGd0v1g4agWS1aYhHIEuLqGFTvzb0Mk
+	MOfYgqwMNjI/vNDA+hyZ1w96f1Tobk8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-586-Hfy4fv_pOVGT2Sf18fPwYQ-1; Wed, 21 Feb 2024 15:52:30 -0500
+X-MC-Unique: Hfy4fv_pOVGT2Sf18fPwYQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF37185A58E;
+	Wed, 21 Feb 2024 20:52:29 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.69])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 603602BE;
+	Wed, 21 Feb 2024 20:52:28 +0000 (UTC)
+Date: Tue, 20 Feb 2024 17:05:01 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Parav Pandit <parav@nvidia.com>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	pbonzini@redhat.com, axboe@kernel.dk,
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
+	stable@vger.kernel.org, lirongqing@baidu.com,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH] virtio_blk: Fix device surprise removal
+Message-ID: <20240220220501.GA1515311@fedora>
+References: <20240217180848.241068-1-parav@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-21_06,2024-02-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- suspectscore=0 mlxscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402210145
-X-Proofpoint-ORIG-GUID: eaEa0hZpsPaInQOjTbUljV3gLUOK0iLE
-X-Proofpoint-GUID: eaEa0hZpsPaInQOjTbUljV3gLUOK0iLE
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="+EsB9gUsZRuxclQv"
+Content-Disposition: inline
+In-Reply-To: <20240217180848.241068-1-parav@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Tests the ability to enable and disable error logging for passthru admin commands issued to
-the controller and passthru IO commands issued to a namespace.
 
-These tests will only be run on kernels that export the passthru_err_log_enabled
-attribute.
+--+EsB9gUsZRuxclQv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- tests/nvme/039     | 43 +++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/039.out |  2 ++
- tests/nvme/rc      | 37 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 82 insertions(+)
+On Sat, Feb 17, 2024 at 08:08:48PM +0200, Parav Pandit wrote:
+> When the PCI device is surprise removed, requests won't complete from
+> the device. These IOs are never completed and disk deletion hangs
+> indefinitely.
+>=20
+> Fix it by aborting the IOs which the device will never complete
+> when the VQ is broken.
+>=20
+> With this fix now fio completes swiftly.
+> An alternative of IO timeout has been considered, however
+> when the driver knows about unresponsive block device, swiftly clearing
+> them enables users and upper layers to react quickly.
+>=20
+> Verified with multiple device unplug cycles with pending IOs in virtio
+> used ring and some pending with device.
+>=20
+> In future instead of VQ broken, a more elegant method can be used. At the
+> moment the patch is kept to its minimal changes given its urgency to fix
+> broken kernels.
+>=20
+> Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of virtio pci =
+device")
+> Cc: stable@vger.kernel.org
+> Reported-by: lirongqing@baidu.com
+> Closes: https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73ca=
+9b4741@baidu.com/
+> Co-developed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> Signed-off-by: Parav Pandit <parav@nvidia.com>
+> ---
+>  drivers/block/virtio_blk.c | 54 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 54 insertions(+)
+>=20
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 2bf14a0e2815..59b49899b229 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -1562,10 +1562,64 @@ static int virtblk_probe(struct virtio_device *vd=
+ev)
+>  	return err;
+>  }
+> =20
+> +static bool virtblk_cancel_request(struct request *rq, void *data)
+> +{
+> +	struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(rq);
+> +
+> +	vbr->in_hdr.status =3D VIRTIO_BLK_S_IOERR;
+> +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
+> +		blk_mq_complete_request(rq);
+> +
+> +	return true;
+> +}
+> +
+> +static void virtblk_cleanup_reqs(struct virtio_blk *vblk)
+> +{
+> +	struct virtio_blk_vq *blk_vq;
+> +	struct request_queue *q;
+> +	struct virtqueue *vq;
+> +	unsigned long flags;
+> +	int i;
+> +
+> +	vq =3D vblk->vqs[0].vq;
+> +	if (!virtqueue_is_broken(vq))
+> +		return;
+> +
+> +	q =3D vblk->disk->queue;
+> +	/* Block upper layer to not get any new requests */
+> +	blk_mq_quiesce_queue(q);
+> +
+> +	for (i =3D 0; i < vblk->num_vqs; i++) {
+> +		blk_vq =3D &vblk->vqs[i];
+> +
+> +		/* Synchronize with any ongoing virtblk_poll() which may be
+> +		 * completing the requests to uppper layer which has already
+> +		 * crossed the broken vq check.
+> +		 */
+> +		spin_lock_irqsave(&blk_vq->lock, flags);
+> +		spin_unlock_irqrestore(&blk_vq->lock, flags);
+> +	}
+> +
+> +	blk_sync_queue(q);
+> +
+> +	/* Complete remaining pending requests with error */
+> +	blk_mq_tagset_busy_iter(&vblk->tag_set, virtblk_cancel_request, vblk);
 
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index 73b53d0b949c..f92f852cd56f 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -130,6 +130,29 @@ inject_invalid_admin_cmd()
- 	fi
- }
- 
-+inject_invalid_io_cmd_passthru()
-+{
-+	local ns
-+
-+	ns=$(echo "$1" |  cut -d "n" -f3)
-+
-+	# Inject a 'Invalid Command Opcode' (0x1) on a read (0x02)
-+	_nvme_enable_err_inject "$ns_dev" 0 100 1 0x1 1
-+
-+	nvme io-passthru /dev/"$1" --opcode=0x02 --namespace-id="$ns" \
-+		--data-len=512 --read --cdw10=0 --cdw11=0 --cdw12="$2" 2> /dev/null 1>&2
-+
-+	_nvme_disable_err_inject "$1"
-+	if ${nvme_verbose_errors}; then
-+		last_dmesg 2 | grep "Invalid Command Opcode (" | \
-+		    sed 's/nvme.*://g'
-+	else
-+		last_dmesg 2 | grep "Cmd(0x2" | sed 's/I\/O Cmd/Read/g' | \
-+		    sed 's/I\/O Error/Invalid Command Opcode/g' | \
-+		    sed 's/nvme.*://g'
-+	fi
-+}
-+
- test_device() {
- 	echo "Running ${TEST_NAME}"
- 
-@@ -155,6 +178,26 @@ test_device() {
- 	inject_invalid_status_on_read "${ns_dev}"
- 	inject_write_fault_on_write "${ns_dev}"
- 
-+	if [ -e "$TEST_DEV_SYSFS/passthru_err_log_enabled" ]; then
-+		_nvme_passthru_logging_setup "${ns_dev}" "${ctrl_dev}"
-+
-+		# Test Pass Thru Admin Logging
-+		_nvme_disable_passthru_admin_error_logging "${ctrl_dev}"
-+		inject_invalid_admin_cmd "${ctrl_dev}"
-+		_nvme_enable_passthru_admin_error_logging "${ctrl_dev}"
-+		inject_access_denied_on_identify "${ctrl_dev}"
-+
-+		# Test Pass Thru IO Logging
-+		_nvme_disable_passthru_io_error_logging "${ns_dev}" "${ctrl_dev}"
-+		inject_invalid_io_cmd_passthru "${ns_dev}" 0
-+		_nvme_enable_passthru_io_error_logging "${ns_dev}" "${ctrl_dev}"
-+		inject_invalid_io_cmd_passthru "${ns_dev}" 1
-+
-+		_nvme_passthru_logging_cleanup "${ns_dev}" "${ctrl_dev}"
-+	else
-+		echo " Identify(0x6), Access Denied (sct 0x2 / sc 0x86) DNR cdw10=0x1 cdw11=0x0 cdw12=0x0 cdw13=0x0 cdw14=0x0 cdw15=0x0"
-+		echo " Read(0x2), Invalid Command Opcode (sct 0x0 / sc 0x1) DNR cdw10=0x0 cdw11=0x0 cdw12=0x1 cdw13=0x0 cdw14=0x0 cdw15=0x0"
-+	fi
- 	_nvme_err_inject_cleanup "${ns_dev}" "${ctrl_dev}"
- 
- 	echo "Test complete"
-diff --git a/tests/nvme/039.out b/tests/nvme/039.out
-index 139070d22240..fea76cfd1245 100644
---- a/tests/nvme/039.out
-+++ b/tests/nvme/039.out
-@@ -2,4 +2,6 @@ Running nvme/039
-  Read(0x2) @ LBA 0, 1 blocks, Unrecovered Read Error (sct 0x2 / sc 0x81) DNR 
-  Read(0x2) @ LBA 0, 1 blocks, Unknown (sct 0x3 / sc 0x75) DNR 
-  Write(0x1) @ LBA 0, 1 blocks, Write Fault (sct 0x2 / sc 0x80) DNR 
-+ Identify(0x6), Access Denied (sct 0x2 / sc 0x86) DNR cdw10=0x1 cdw11=0x0 cdw12=0x0 cdw13=0x0 cdw14=0x0 cdw15=0x0
-+ Read(0x2), Invalid Command Opcode (sct 0x0 / sc 0x1) DNR cdw10=0x0 cdw11=0x0 cdw12=0x1 cdw13=0x0 cdw14=0x0 cdw15=0x0
- Test complete
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index dfc4c1ef1975..2d6ebeab2f6f 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -943,6 +943,23 @@ _check_uuid() {
- 
- declare -A NS_DEV_FAULT_INJECT_SAVE
- declare -A CTRL_DEV_FAULT_INJECT_SAVE
-+ns_dev_passthru_logging=off
-+ctrl_dev_passthru_logging=off
-+
-+_nvme_passthru_logging_setup()
-+{
-+	ctrl_dev_passthru_logging=$(cat /sys/class/nvme/"$2"/passthru_err_log_enabled)
-+	ns_dev_passthru_logging=$(cat /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled)
-+
-+	_nvme_disable_passthru_admin_error_logging "$2"
-+	_nvme_disable_passthru_io_error_logging "$1" "$2"
-+}
-+
-+_nvme_passthru_logging_cleanup()
-+{
-+	echo $ctrl_dev_passthru_logging > /sys/class/nvme/"$2"/passthru_err_log_enabled
-+	echo $ns_dev_passthru_logging > /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled
-+}
- 
- _nvme_err_inject_setup()
- {
-@@ -985,6 +1002,26 @@ _nvme_disable_err_inject()
-         echo 0 > /sys/kernel/debug/"$1"/fault_inject/times
- }
- 
-+_nvme_enable_passthru_admin_error_logging()
-+{
-+	echo on > /sys/class/nvme/"$1"/passthru_err_log_enabled
-+}
-+
-+_nvme_enable_passthru_io_error_logging()
-+{
-+	echo on > /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled
-+}
-+
-+_nvme_disable_passthru_admin_error_logging()
-+{
-+	echo off > /sys/class/nvme/"$1"/passthru_err_log_enabled
-+}
-+
-+_nvme_disable_passthru_io_error_logging()
-+{
-+	echo off > /sys/class/nvme/"$2"/"$1"/passthru_err_log_enabled
-+}
-+
- _nvme_reset_ctrl() {
- 	echo 1 > /sys/class/nvme/"$1"/reset_controller
- }
--- 
-2.39.3
+Interrupts can still occur here. What prevents the race between
+virtblk_cancel_request() and virtblk_request_done()?
+
+> +	blk_mq_tagset_wait_completed_request(&vblk->tag_set);
+> +
+> +	/*
+> +	 * Unblock any pending dispatch I/Os before we destroy device. From
+> +	 * del_gendisk() -> __blk_mark_disk_dead(disk) will set GD_DEAD flag,
+> +	 * that will make sure any new I/O from bio_queue_enter() to fail.
+> +	 */
+> +	blk_mq_unquiesce_queue(q);
+> +}
+> +
+>  static void virtblk_remove(struct virtio_device *vdev)
+>  {
+>  	struct virtio_blk *vblk =3D vdev->priv;
+> =20
+> +	virtblk_cleanup_reqs(vblk);
+> +
+>  	/* Make sure no work handler is accessing the device. */
+>  	flush_work(&vblk->config_work);
+> =20
+> --=20
+> 2.34.1
+>=20
+
+--+EsB9gUsZRuxclQv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmXVIg0ACgkQnKSrs4Gr
+c8gbcAgAgsyhOzrXjnJK+mvJY7ajiqTKGi8aBCVwdk4Xcjj7ctqtgP8KmGiz7otl
+hjf5i+SxIyeAJ6/F4n0osHVEZ0ZSpKjge9xvyInFn/dnEc0PNBnQIA8NUcuGPjBG
+EDbK3R5lz8Ew3GViJdNSEbGD1ie1JpYPldJkKOGLECGo3F5HEiRHUdS89IoavyZT
+XPrfkIiHOUVDYJl7Yxp8SdPRzOZ/IUNIvSBISpjYCg84tW8lZPPkccC/ME2WcSxf
+oHnPD+r0L3JplBUDLZ+CLHO2bfDRlEbnfoIIZ5HdxjKxxbWd6mdOhtmibF1S3JkR
++qbM9oB3ynjledSslS8vMh5DkWXAaw==
+=gNYy
+-----END PGP SIGNATURE-----
+
+--+EsB9gUsZRuxclQv--
 
