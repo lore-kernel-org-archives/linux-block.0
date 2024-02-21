@@ -1,238 +1,158 @@
-Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8786F3A1DC;
-	Wed, 21 Feb 2024 05:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708493293; cv=none; b=HMOKPC8Ocq3xuLKG6DCaS+qV9kBD7V20CQu0ywblaLUsHbE5hvhWrWiXkMA0n/jKvtsloypBGllL5l5LDvZNFMI+IVW9II2ncHnElTkIKeUmnFNd1hh5eR1cj2NZ+3i+VZgpvC5rN2sM2RnHi0fGjnFYMlJVEcNo/v1i0hCgS3U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708493293; c=relaxed/simple;
-	bh=S1LPkD1zVFw+vz21yQyas58+xNSibstH42xUDB9/azk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j9csyyhYPbt6D4PxihQhrPWzkEEXkrL5mftm+1VJJp3MEIgoXJ95apEVIJyEINeRd3BTiN19m0N3DrUXFCC1ImdYqmFyZEhw7EvhEAU2sm98O2pUTiApNYvFhotY4VAXSuP/K74+4vkqUM9IFPt0q8jnXwdtx57kDocSNfLI1b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 41L5QYYH066544;
-	Wed, 21 Feb 2024 13:26:34 +0800 (+08)
-	(envelope-from zhaoyang.huang@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4Tfl9g0vYkz2KGhPK;
-	Wed, 21 Feb 2024 13:25:59 +0800 (CST)
-Received: from bj03382pcu01.spreadtrum.com (10.0.73.40) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Wed, 21 Feb 2024 13:26:31 +0800
-From: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-To: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Zhaoyang Huang <huangzhaoyang@gmail.com>, <steve.kang@unisoc.com>
-Subject: [Resend PATCHv9 1/1] block: introduce content activity based ioprio
-Date: Wed, 21 Feb 2024 13:26:24 +0800
-Message-ID: <20240221052624.573287-1-zhaoyang.huang@unisoc.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F241B39AF1
+	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 05:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708493572; cv=fail; b=sEmkHGvwhXICFbXMH895O/4vgLcgn03mqgvYPaihaOkrH68huHkOQDXcjCa+fUMhw07WuHTjh/XFbdhhRVSoecWljSQtKffW990kjZ+kLQBwhO1d58oOWJ6ba35xH+WM3wVV93jj5P5n1kKM5sk3kB8Nrt8llJY/iS2iGthHXSY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708493572; c=relaxed/simple;
+	bh=ttbcoE3nFRUh2AWoR9Di4KmT0Fnc5Aq0ZkDODK45iD4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=evufaeyjKCkj5M5WllKaf/RveSiQ1E89KD8Pkc8lQtn75ladV0AuZrX9bYsgoUtLP1Fu7+rIuAnn0YFUp0zDJosFw8YXvRlkintpuItxLUCU6CGDAc/XZf1HFW01+7oJgZNhsNqyQD61cjocvHo2jkEGW/VPaLcYlLc4gQpTWqk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AxzSyaaA; arc=fail smtp.client-ip=40.107.237.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AxzSyaaA"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B45T3ToG3HoynIXCsua1MnhmjRnAVaYQPh7Ok5BN2EgjUAbAvlneVSwfQaodUWQIIYgYjcPpAPFWfB54zGMjfVcl82Xz5zqynmSUHYSE0Ba1QqbPGkLJp+amXekfSU+Yj/rG1vF29Vckoqkm3seBYqi3zppqgN0PT2zDrLX0nZ6In/Cm59E0G0zBDszqx0YN+EFcqNIexvelesr1tNKPYZ5sLGJEEIu3bjA2HGRgPuh35Naq9dKsQDb/EaXgS/JADrAi3wavC9fPmzW+l7XnND12YqVYyzpLr2HNLhc2hnaV5B/daTmCnHqGdXg6P+NhiW1zOggP0XBt6pBV/Z7bNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ttbcoE3nFRUh2AWoR9Di4KmT0Fnc5Aq0ZkDODK45iD4=;
+ b=NO1pAPYhE0lOYeLxRXCQNpfHioNY2QGXyvPil7zfudiw8VPJuoNGE3J9ElR9snUy0zWbLdGEGBfkwflrx2g7PSqqlJ/Va0Spcjvy/iXhYqZPvgjIQ1KzE1VwdEEfD76lqcw/WJeQd7/9KtHileXhIjTVRtssDyIpPJpW11t0qf4BA2LbB2vxXBz4Z1ZFfozKJls20N6HZqihVpoew/DxAEvIdc9k3pjka+frTzJwzufcYS0BM8OkG1ZetWe9WncfrSehBvRHrDmhg/yVE0fioqBYlagxpzeQeJuce5wCJVLhbReU5UrWvPu6IQ9VL86qsH9wkvVtDiZL8iDOtDmrNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ttbcoE3nFRUh2AWoR9Di4KmT0Fnc5Aq0ZkDODK45iD4=;
+ b=AxzSyaaApo7e5AwWgHJYDE/hwJKg0x6AJzACpnQo0skLauAFuOSAimocjP2ExGc7AR3MjOmnu9VlxePevkYPnIeZJgERkh29kEagHh5WIMEMHFc3kjcvgppAvhMENR3vKpK61cfiGLlZXS5487784xvIi+vuU9LaiDo7rPxmkdVHaoQTWwRx9+w3FHn8ZrR3l9IELGAFTyfCSOcCOFg6nrH/2hY6GNINRMESon8juYVvxdUzIgMJpEx/VqZNYz+hBzJUI/pKbUZeW50dgL4z2lvHOW3FHPc/Brd+wBkBoI76aStYK5miwLHXk7MQqQridRlbf3xIgZlxX6dAVxh7xA==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by SA1PR12MB8723.namprd12.prod.outlook.com (2603:10b6:806:385::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.20; Wed, 21 Feb
+ 2024 05:32:44 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::ffce:bbde:c1ca:39ed%4]) with mapi id 15.20.7316.018; Wed, 21 Feb 2024
+ 05:32:43 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Keith Busch <kbusch@kernel.org>
+CC: Keith Busch <kbusch@meta.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.org" <axboe@kernel.org>
+Subject: Re: [PATCH] blk-lib: let user kill a zereout process
+Thread-Topic: [PATCH] blk-lib: let user kill a zereout process
+Thread-Index: AQHaZD06sUSdY4lj2Ee2Ig44LaIhIrEUHSwAgAADEoCAAAGGAIAAJIqA
+Date: Wed, 21 Feb 2024 05:32:43 +0000
+Message-ID: <926339b1-e4b9-4aa8-8fab-3576fcd912b8@nvidia.com>
+References: <20240220204127.1937085-1-kbusch@meta.com>
+ <132449a7-634c-41b6-b14c-863cb198133e@nvidia.com>
+ <ZdVrDbaQ2DbSKQtL@kbusch-mbp> <ZdVsVFQk38v7-zaz@kbusch-mbp>
+In-Reply-To: <ZdVsVFQk38v7-zaz@kbusch-mbp>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SA1PR12MB8723:EE_
+x-ms-office365-filtering-correlation-id: b55dd8d5-08ed-4402-3ec9-08dc329e8782
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ r0mh8bkHsiwueeC+ljT3UsVoAd6w9AW0cbrtPNFfE/lCWvyh2TwhsUhRBM8nKFVjTEXRP/EXoSkVX6Vt3Icg5S/FAW1Dbqr41uTdR0zXx82F6o/WTn29Kr8zYD/RR/vjDI+JVCLBlf9gjq9vjMKP/TbPMRIWocm//e+qrNpFb28YFxtJDxxdgH8JFxtsOvj+MKARSlT7IXYbkQWkhoAz3PcSB0vFJeBCkAPzjsaROJcEHY18DUfV8Rb7sAYyT2lWu4d+PwTNe71imBwzmsmJLKRCQLQfBrScF8+yCUZB1R9DDMSYTnuRduzRkRMV/M9Cdsce4/or6FzFTIMJSpbAgFZ3441B5s5KzTAn6alBh3Xk2KkmWaR3vfS76gEb3dJwJ4hCqb+2mhO0E+h3RvOOKZpiRSBwYGqPLv1tt5rAQnT4+1ATdHXMwRbIFj81Qc84kwxPqYbQjEO/G2wLeOpsSUemu9qrGdQiX/GwccrHxMedEXFkRyCMMchw6PduxtgOYg09V8NdOgi7GshFMoGRjFBbE7DL9RNl0MHFiqDV3BLlXynH5izStWfcFRMEc6pewCiXnMFHSZtPPJJk4wOKjDLXOn12YbcQ95vylpJhf2rrrwjE6S0vaql4I5L0Hhu6
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bEszRHJkTmdQM3BzTUkzby96VWVOamtUNTgvM24xR0o2aFlhTGVndVRYSWZj?=
+ =?utf-8?B?dFcwaXI4b01DT09BRDdjV0NhVk9FVENsZVB1U0J0WVBZaDFQL3VPclBkcEs2?=
+ =?utf-8?B?WmpDcWh3bDBYWEhXZEkweGIxNFZ6NVM1dVFDZm8yM21HZWdCYk9DTXV0cFRx?=
+ =?utf-8?B?NWlIbnBMVVJpczFxZmwxbEJvbjQwd2pud2VlZW1FUzJUOURTYVNSNGZnQ2Nh?=
+ =?utf-8?B?ckdTN1dhbFFja1dXL1ovY3JUc3FzWGQ3WU9nV3p5UXVvWStiZE1VS0NpMThY?=
+ =?utf-8?B?MzM1d1huY3JBTW9qMnMxSm05alBzOU0ybFhJcGZjcW00NFpSbURuNkJkQ2cx?=
+ =?utf-8?B?WklNajlwWXdIRWxZNm0zSUEwK0tvNC9OSGhVSTh0QlVuVmxIREZrUTBQSnBL?=
+ =?utf-8?B?Y2NNcmtaNSsyRVpOVmtKM01zT2tRa0Q2cWd6MUFBZVRrTzhKUVBJdTk0bmNq?=
+ =?utf-8?B?RjVUekpVMTV5c1BkVHlhMEpmakZmZG5aeTJFNk45SEIzNVpvdWNYb2ZQUzBR?=
+ =?utf-8?B?MjA3enZTTCtkS3hqK2RZOWsxRGVDZUJ3cTA1RzE0NVJhYWhxK3VQTkRpYXJE?=
+ =?utf-8?B?WXh4dnNSS1hEVXRNYjJ0ek9RUVpHanoyY1grcmdoRHU2UDVRdXVZQ2luakxP?=
+ =?utf-8?B?SDkvWjY0ODlKNzljRUREZlFmaFlTMWJWTVFDVlpYRDE2K25YSUd3d0NvQ05B?=
+ =?utf-8?B?MC9wREYzbDUzNEFXZUhQcW5pZmpmQ1FIQmlzeldHM2xuQ2VOekw2a1VGV0NQ?=
+ =?utf-8?B?eDg3R0FKSDlaaTYvVkgvcm5HWDJURlpWYkRqZ1VyWEFIL2c1dFJLOXlOUDV2?=
+ =?utf-8?B?bm0rNUpKcmJqU0VFV2tTdDVkTTdBMjV6ZmUwaWVHaExmUmVKRWl0R2hyZzd2?=
+ =?utf-8?B?dVlLWWFzZkVWVXVWK1V1OGlMVGN1OGFPQm1veFcvQ3dxdUg0eGNNQ1J4bVBo?=
+ =?utf-8?B?bnVKNWluaGppalNsK0JHVW9xOXZoSmM5Z0k4bDh1ODN2c21aTkFVSXdlZ3kv?=
+ =?utf-8?B?RlJXUEErL1U4N3lSK29DWlhqY2s1aEZrTU9UNTRaVmZRbld3bkQvY2lnR1o1?=
+ =?utf-8?B?UG9WM3JDRGhydWdoa2JQL0xSRWI3dS83R09SS3dhUGZ6dWh2b0J5Wm5CT1gv?=
+ =?utf-8?B?V3Ewc1ZVMi9oMkU2V1JqVUVnU0s4SXI4RjgvRk1JNksvNkZrMmtBUnRFNmx5?=
+ =?utf-8?B?UHNNWTdDTHMxRHYyTkdUM2dDZUtMaWFRSk8wdXdqQU5VbFZCTVVIdHl3RXNl?=
+ =?utf-8?B?RkdwVHlKS2VmelZ1UWlndU1UNFd4UkgzZk0vc0RkczJkeWtDR3pObWVpWE1H?=
+ =?utf-8?B?SHBMYk9VV3dxYkdESGVIVmgwd0dKdlpQRXNTVFZSTVF0cW1mWTA5UDRSRUkv?=
+ =?utf-8?B?TjYyYVZNWTZtTmlaUHBudHR4NEh2eUFIbEJYRS91dGZwRGNjQUU5OWZmQksx?=
+ =?utf-8?B?QTNPR2htSzdPbTREWW9EdHZvU2NPZkprY1VYUVFVeTJ4Yk1UWEE2dlNIY3ht?=
+ =?utf-8?B?eFZsdVltSVhwdzQvNFVJQVJINWxVMjNTZ1dnK05udkNWcGtoWEMyVUdOdERo?=
+ =?utf-8?B?V1k3UDBXRktQR1IxWFp2UVpDdzRidVJ6YmVDeERwNEJiQ2M4ME0vaFdtSmFC?=
+ =?utf-8?B?cGRRTWRBZ1BXS1l0Ni9IV3pDMXNwNllsMkFFWTJuR2l2MTFQKzZhbjJQU2J5?=
+ =?utf-8?B?WDc2aTdzWFRFZUFrQ2dCcTZyWXBMVFJ4MXduZkxEczBBMWg2RXhBUXkxb3pU?=
+ =?utf-8?B?akNvcTAyQi8zU3VIU1h1b3A3SDdtTGxOeWFxN0dGL0JHS004RU5RMWJJZDJI?=
+ =?utf-8?B?MHpzMWdlL2JZWTRSampkRVBNWjk3ZWEzZmdUNm90WEREVFVpaHFZWlJ5NjdE?=
+ =?utf-8?B?MkVCUGNMbUQyR1EyRWVBclVJWG05OURIRVlRcHJMSDdDdlExYXI2ckIya1Jm?=
+ =?utf-8?B?bHViakFkdkMwVmoxbTZkRmlxMDBJODBMZHNCUm1nd1pFU2JXV0xlK1VueFBV?=
+ =?utf-8?B?K3RyUGR6Q2c1d3haWldxNWJFaFF2NU55dm5IRVlaQnlCeTI5akhabXBpMCtN?=
+ =?utf-8?B?WCtWQStiektGaURRWXZLSmtBQzZYZVFIVWp3b016aEtPdVl3Um1kZFVMbHA5?=
+ =?utf-8?B?N3g3cUoyN3F5Z2RsQnI0U3FPQ0lVVjZBMURIWnY4NDNrVGVhWmdYMzRYblhG?=
+ =?utf-8?Q?x6AL4hTcIJS+SAN2qk549jjhokmpqad56q8hkVMHLeJr?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EEBA620BF8FCF6498E085894BD01F0D5@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL:SHSQR01.spreadtrum.com 41L5QYYH066544
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b55dd8d5-08ed-4402-3ec9-08dc329e8782
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2024 05:32:43.9373
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3daJr4I59HNHXh5Ydm1qACHp0ym53+AMeXdLNNML3D7mwkd/rVYFiPTqBOw//p8hqSZWS7lSvWNZEahYpZ08PQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8723
 
-From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
-
-Currently, request's ioprio are set via task's schedule priority(when no
-blkcg configured), which has high priority tasks possess the privilege on
-both of CPU and IO scheduling. Furthermore, most of the write requestes
-are launched asynchronosly from kworker which can't know the submitter's
-priorities.
-This commit works as a hint of original policy by promoting the request
-ioprio based on the page/folio's activity. The original idea comes from
-LRU_GEN which provides more precised folio activity than before. This
-commit try to adjust the request's ioprio when certain part of its folios
-are hot, which indicate that this request carry important contents and
-need be scheduled ealier.
-
-The filesystem should call bio_set_active_ioprio_folio() after
-calling bio_add_folio. Please be noted that this set of API can not
-handle bvec_try_merge_page cases.
-
-This commit is verified on a v6.6 6GB RAM android14 system via 4 test cases
-by calling bio_set_active_ioprio in erofs, ext4, f2fs and blkdev(raw
-partition of gendisk)
-
-Case 1:
-script[a] which get significant improved fault time as expected[b]*
-where dd's cost also shrink from 55s to 40s.
-(1). fault_latency.bin is an ebpf based test tool which measure all task's
-   iowait latency during page fault when scheduled out/in.
-(2). costmem generate page fault by mmaping a file and access the VA.
-(3). dd generate concurrent vfs io.
-
-[a]
-./fault_latency.bin 1 5 > /data/dd_costmem &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-costmem -c0 -a2048000 -b128000 -o0 1>/dev/null &
-dd if=/dev/block/sda of=/data/ddtest bs=1024 count=2048000 &
-dd if=/dev/block/sda of=/data/ddtest1 bs=1024 count=2048000 &
-dd if=/dev/block/sda of=/data/ddtest2 bs=1024 count=2048000 &
-dd if=/dev/block/sda of=/data/ddtest3 bs=1024 count=2048000
-[b]
-                       mainline		commit
-io wait                736us            523us
-
-* provide correct result for test case 1 in v7 which was compared between
-EMMC and UFS wrongly.
-
-Case 2:
-fio -filename=/dev/block/by-name/userdata -rw=randread -direct=0 -bs=4k -size=2000M -numjobs=8 -group_reporting -name=mytest
-mainline: 513MiB/s
-READ: bw=531MiB/s (557MB/s), 531MiB/s-531MiB/s (557MB/s-557MB/s), io=15.6GiB (16.8GB), run=30137-30137msec
-READ: bw=543MiB/s (569MB/s), 543MiB/s-543MiB/s (569MB/s-569MB/s), io=15.6GiB (16.8GB), run=29469-29469msec
-READ: bw=474MiB/s (497MB/s), 474MiB/s-474MiB/s (497MB/s-497MB/s), io=15.6GiB (16.8GB), run=33724-33724msec
-READ: bw=535MiB/s (561MB/s), 535MiB/s-535MiB/s (561MB/s-561MB/s), io=15.6GiB (16.8GB), run=29928-29928msec
-READ: bw=523MiB/s (548MB/s), 523MiB/s-523MiB/s (548MB/s-548MB/s), io=15.6GiB (16.8GB), run=30617-30617msec
-READ: bw=492MiB/s (516MB/s), 492MiB/s-492MiB/s (516MB/s-516MB/s), io=15.6GiB (16.8GB), run=32518-32518msec
-READ: bw=533MiB/s (559MB/s), 533MiB/s-533MiB/s (559MB/s-559MB/s), io=15.6GiB (16.8GB), run=29993-29993msec
-READ: bw=524MiB/s (550MB/s), 524MiB/s-524MiB/s (550MB/s-550MB/s), io=15.6GiB (16.8GB), run=30526-30526msec
-READ: bw=529MiB/s (554MB/s), 529MiB/s-529MiB/s (554MB/s-554MB/s), io=15.6GiB (16.8GB), run=30269-30269msec
-READ: bw=449MiB/s (471MB/s), 449MiB/s-449MiB/s (471MB/s-471MB/s), io=15.6GiB (16.8GB), run=35629-35629msec
-
-commit: 633MiB/s
-READ: bw=668MiB/s (700MB/s), 668MiB/s-668MiB/s (700MB/s-700MB/s), io=15.6GiB (16.8GB), run=23952-23952msec
-READ: bw=589MiB/s (618MB/s), 589MiB/s-589MiB/s (618MB/s-618MB/s), io=15.6GiB (16.8GB), run=27164-27164msec
-READ: bw=638MiB/s (669MB/s), 638MiB/s-638MiB/s (669MB/s-669MB/s), io=15.6GiB (16.8GB), run=25071-25071msec
-READ: bw=714MiB/s (749MB/s), 714MiB/s-714MiB/s (749MB/s-749MB/s), io=15.6GiB (16.8GB), run=22409-22409msec
-READ: bw=600MiB/s (629MB/s), 600MiB/s-600MiB/s (629MB/s-629MB/s), io=15.6GiB (16.8GB), run=26669-26669msec
-READ: bw=592MiB/s (621MB/s), 592MiB/s-592MiB/s (621MB/s-621MB/s), io=15.6GiB (16.8GB), run=27036-27036msec
-READ: bw=691MiB/s (725MB/s), 691MiB/s-691MiB/s (725MB/s-725MB/s), io=15.6GiB (16.8GB), run=23150-23150msec
-READ: bw=569MiB/s (596MB/s), 569MiB/s-569MiB/s (596MB/s-596MB/s), io=15.6GiB (16.8GB), run=28142-28142msec
-READ: bw=563MiB/s (590MB/s), 563MiB/s-563MiB/s (590MB/s-590MB/s), io=15.6GiB (16.8GB), run=28429-28429msec
-READ: bw=712MiB/s (746MB/s), 712MiB/s-712MiB/s (746MB/s-746MB/s), io=15.6GiB (16.8GB), run=22478-22478msec
-
-Case 3:
-This commit is also verified by the case of launching camera APP which is
-usually considered as heavy working load on both of memory and IO, which
-shows 12%-24% improvement.
-
-		ttl = 0		ttl = 50	ttl = 100
-mainline        2267ms		2420ms		2316ms
-commit          1992ms          1806ms          1998ms
-
-case 4:
-androbench has no improvment as well as regression in RD/WR test item
-while make a 3% improvement in sqlite items.
-
-Suggested-by: Matthew Wilcox <willy@infradead.org>
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
----
-change of v2: calculate page's activity via helper function
-change of v3: solve layer violation by move API into mm
-change of v4: keep block clean by removing the page related API
-change of v5: introduce the macros of bio_add_folio/page for read dir.
-change of v6: replace the macro of bio_add_xxx by submit_bio which
-                iterating the bio_vec before launching bio to block layer
-change of v7: introduce the function bio_set_active_ioprio
-              provide updated test result
-change of v8: provide two sets of APIs for bio_set_active_ioprio_xxx
-change of v9: modify the code according to Matthew's opinion, leave
-	      bio_set_active_ioprio_folio only
----
----
- block/Kconfig       | 15 +++++++++++++++
- block/bio.c         | 33 +++++++++++++++++++++++++++++++++
- include/linux/bio.h |  1 +
- 3 files changed, 49 insertions(+)
-
-diff --git a/block/Kconfig b/block/Kconfig
-index f1364d1c0d93..fb3a888194c0 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -228,6 +228,21 @@ config BLOCK_HOLDER_DEPRECATED
- config BLK_MQ_STACKING
- 	bool
- 
-+config BLK_CONT_ACT_BASED_IOPRIO
-+	bool "Enable content activity based ioprio"
-+	depends on LRU_GEN
-+	default n
-+	help
-+	  This item enable the feature of adjust bio's priority by
-+	  calculating its content's activity.
-+	  This feature works as a hint of original bio_set_ioprio
-+	  which means rt task get no change of its bio->bi_ioprio
-+	  while other tasks have the opportunity to raise the ioprio
-+	  if the bio take certain numbers of active pages.
-+	  The file system should use the API after bio_add_folio for
-+	  their buffered read/write/sync function to adjust the
-+	  bio->bi_ioprio.
-+
- source "block/Kconfig.iosched"
- 
- endif # BLOCK
-diff --git a/block/bio.c b/block/bio.c
-index 816d412c06e9..2c0b8f2ae4d4 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1476,6 +1476,39 @@ void bio_set_pages_dirty(struct bio *bio)
- }
- EXPORT_SYMBOL_GPL(bio_set_pages_dirty);
- 
-+/*
-+ * bio_set_active_ioprio_folio is helper function to count the bio's
-+ * content's activities which measured by MGLRU.
-+ * The file system should call this function after bio_add_page/folio for
-+ * the buffered read/write/sync.
-+ */
-+#ifdef CONFIG_BLK_CONT_ACT_BASED_IOPRIO
-+void bio_set_active_ioprio_folio(struct bio *bio, struct folio *folio)
-+{
-+	int class, level, hint;
-+	int activities;
-+
-+	/*
-+	 * use bi_ioprio to record the activities, assume no one will set it
-+	 * before submit_bio
-+	 */
-+	bio->bi_ioprio += folio_test_workingset(folio) ? 1 : 0;
-+	activities = IOPRIO_PRIO_DATA(bio->bi_ioprio);
-+	level = IOPRIO_PRIO_LEVEL(bio->bi_ioprio);
-+	hint = IOPRIO_PRIO_HINT(bio->bi_ioprio);
-+
-+	if (activities > bio->bi_vcnt / 2)
-+		class = IOPRIO_CLASS_RT;
-+	else if (activities > bio->bi_vcnt / 4)
-+		class = max(IOPRIO_PRIO_CLASS(get_current_ioprio()), IOPRIO_CLASS_BE);
-+
-+	bio->bi_ioprio = IOPRIO_PRIO_VALUE_HINT(class, level, hint);
-+}
-+#else
-+void bio_set_active_ioprio_folio(struct bio *bio, struct folio *folio) {}
-+#endif
-+EXPORT_SYMBOL_GPL(bio_set_active_ioprio_folio);
-+
- /*
-  * bio_check_pages_dirty() will check that all the BIO's pages are still dirty.
-  * If they are, then fine.  If, however, some pages are clean then they must
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 41d417ee1349..6c36546f6b9b 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -487,6 +487,7 @@ void bio_iov_bvec_set(struct bio *bio, struct iov_iter *iter);
- void __bio_release_pages(struct bio *bio, bool mark_dirty);
- extern void bio_set_pages_dirty(struct bio *bio);
- extern void bio_check_pages_dirty(struct bio *bio);
-+void bio_set_active_ioprio_folio(struct bio *bio, struct folio *folio);
- 
- extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
- 			       struct bio *src, struct bvec_iter *src_iter);
--- 
-2.25.1
-
+T24gMi8yMC8yNCAxOToyMSwgS2VpdGggQnVzY2ggd3JvdGU6DQo+IE9uIFR1ZSwgRmViIDIwLCAy
+MDI0IGF0IDA4OjE2OjI5UE0gLTA3MDAsIEtlaXRoIEJ1c2NoIHdyb3RlOg0KPj4gT24gV2VkLCBG
+ZWIgMjEsIDIwMjQgYXQgMDM6MDU6MzBBTSArMDAwMCwgQ2hhaXRhbnlhIEt1bGthcm5pIHdyb3Rl
+Og0KPj4+IE9uIDIvMjAvMjQgMTI6NDEsIEtlaXRoIEJ1c2NoIHdyb3RlOg0KPj4+PiBGcm9tOiBL
+ZWl0aCBCdXNjaCA8a2J1c2NoQGtlcm5lbC5vcmc+DQo+Pj4+IEBAIC0xOTAsNiArMTkwLDggQEAg
+c3RhdGljIGludCBfX2Jsa2Rldl9pc3N1ZV96ZXJvX3BhZ2VzKHN0cnVjdCBibG9ja19kZXZpY2Ug
+KmJkZXYsDQo+Pj4+ICAgIAkJCQlicmVhazsNCj4+Pj4gICAgCQl9DQo+Pj4+ICAgIAkJY29uZF9y
+ZXNjaGVkKCk7DQo+Pj4+ICsJCWlmIChmYXRhbF9zaWduYWxfcGVuZGluZyhjdXJyZW50KSkNCj4+
+Pj4gKwkJCWJyZWFrOw0KPj4+PiAgICAJfQ0KPj4+PiAgICANCj4+Pj4gICAgCSpiaW9wID0gYmlv
+Ow0KPj4+IFdlIGFyZSBleGl0aW5nIGJlZm9yZSBjb21wbGV0aW9uIG9mIHRoZSB3aG9sZSBJL08g
+cmVxdWVzdCwgZG9lcyBpdCBtYWtlcw0KPj4+IHNlbnNlIHRvIHJldHVybiAwID09IHN1Y2Nlc3Mg
+aWYgSS9PIGlzIGludGVycnVwdGVkIGJ5IHRoZSBzaWduYWwgPw0KPj4+IHRoYXQgbWVhbnMgSS9P
+IG5vdCBjb21wbGV0ZWQsIGhlbmNlIGl0IGlzIGFjdHVhbGx5IGFuIGVycm9yLCBjYW4gd2UgcmV0
+dXJuDQo+Pj4gdGhlIC1FSU5UUiB3aGVuIHlvdSBhcmUgaGFuZGxpbmcgb3V0c3RhbmRpbmcgc2ln
+bmFsID8NCj4+IEkgaW5pdGlhbGx5IHRob3VnaHQgc28gdG9vLCBidXQgaXQgZG9lc24ndCBtYXR0
+ZXIuIE9uY2UgdGhlIHByb2Nlc3MNCj4+IHJldHVybnMgdG8gdXNlciBzcGFjZSwgdGhlIHNpZ25h
+bCBraWxscyBpdCBhbmQgdGhlIGV4aXQgc3RhdHVzIHJlZmxlY3RzDQo+PiBhY2NvcmRpbmdseS4g
+VGhhdCdzIHRydWUgZXZlbiBiZWZvcmUgdGhpcyBwYXRjaCwgYnV0IGl0IHdvdWxkIGp1c3QgdGFr
+ZQ0KPj4gbG9uZ2VyIGZvciB0aGUgZXhpdC4NCj4gQWxzbyBjb25zaWRlciB0aGF0IHdlIGhhdmUg
+YmlvJ3MgaW4gZmxpZ2h0IGhlcmUsIGFuZCBhbiBlcnJvciByZXR1cm4NCj4gd2lsbCBza2lwIHdh
+aXRpbmcgZm9yIHRoZW0uIFRoZSBraWxsIHNpZ25hbCBoYW5kbGluZyBoZXJlIGRvZXNuJ3QgYWJv
+cnQNCj4gaW5mbGlnaHQgcmVxdWVzdHMgKHRoYXQncyB0b28gaGFyZCk7IGl0IGp1c3QgcHJldmVu
+dHMgY3JlYXRpbmcgYW5kDQo+IHdhaXRpbmcgZm9yIHRoZSByZXN0IG9mIHRoZW0sIHdoaWNoIGNv
+dWxkIGJlIG1pbGxpb25zLg0KDQpjb21tZW50IHdvdWxkIGJlIG5pY2UgYnV0IG5vdCBuZWNlc3Nh
+cnksIGlycmVzcGVjdGl2ZSBvZiB0aGF0LA0KbG9va3MgZ29vZCA6LQ0KDQpSZXZpZXdlZC1ieTog
+Q2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNrDQoNCg0K
