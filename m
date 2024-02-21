@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B809D7C0AB;
-	Wed, 21 Feb 2024 13:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBD978B4F;
+	Wed, 21 Feb 2024 14:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708522524; cv=none; b=BNo7C9EmxTKXFo7aS8Vh5+QubcZjN0Y93jfmVRG9dXkNXlMrGw7/pvJJY6M5n4yLAI/n8RlEsEnvK6/anMJsuDBVjpkAW50uakE3wPZHUW0GRyk+1x1XO/zS8092OTPqr7xWfc8GVLWmj6JgUaiNWOKGu/d28aqtY1lofcfhqIk=
+	t=1708524238; cv=none; b=q9k3spx8ZpTgOD41epxoPBV7dkODCLa8+z9jmZSda/1YVvPjaKnpAnxVaWJCfsDqkoCk1a2kjBomsJ3kw5y/mUmS5DOR4DpY0be2fEt3mO3ltTV86RcKjeF2M6LjBQwUhMfWLG1NnP3v+Xs844obAMPCJMHCKbzHtCq4TNRuhYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708522524; c=relaxed/simple;
-	bh=Y6OXLAXD6LhLVeja5kzBouDU9W/5eGJ4t7J2Zt9sJZY=;
+	s=arc-20240116; t=1708524238; c=relaxed/simple;
+	bh=aieXPrLwbpuTZqBpQLAQBpu4XBzDuJWDyNF141QjgB8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F+PEYU2L2GC0/Ghnn670EnVPj3nt+iG1efgYqM8SDKNxYoLYkPzwTNCg1MNPPeJkmLhGnWf3arCKPxWWy5Pxa9y3wjtJt0AGTtjbWOJe2cvIiFOENxtWiKpCFmn7cmgr9GTd9amIv1ynA4xDtChJP3KQG+wIgblcEhPnnm0YE6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OlkM4Xyu; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=mInAMiFjdoMmqhTiPqajC6PMW69VOeIAVt+1OxCOxr/6magreJJL3pI8UOuyOQXhFgH9QKQ/nqX0z56upuUslA43zn7XkBBGec6KcxwRgWRvKb2YiHKh/eb+l5xumizY82zAHSTziEExYU6u9PIgHma2Lh50A0L36uUlyCofcl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ZMcQ0VrI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OlkM4Xyu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A78FC433F1;
-	Wed, 21 Feb 2024 13:35:23 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZMcQ0VrI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70FE0C433C7;
+	Wed, 21 Feb 2024 14:03:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1708522523;
-	bh=Y6OXLAXD6LhLVeja5kzBouDU9W/5eGJ4t7J2Zt9sJZY=;
+	s=korg; t=1708524237;
+	bh=aieXPrLwbpuTZqBpQLAQBpu4XBzDuJWDyNF141QjgB8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OlkM4XyuwPjpqGfXB1SEWM5eafDfTQC7D1dC2ZQfNxiDmpJ5f+IXVNDgVvO+YARqF
-	 ExpfP8puQb8E0Er0B71YbQK3Ip3RepeMdRJfreAHxS9eFltTnjO6+lQycORWzoPFqN
-	 7ZJXIcXuNMmE7yRrqa9qhwbyV6budFnn3yuxmgBg=
+	b=ZMcQ0VrIP3Dn9s3hstwA8m6QOlHhBPwe7KACZD4yN/mmbHPQ+nCn+vA8US/9aaF16
+	 5TO16xDghZLiLoDitBA+0VdRRletYX2NgDcU8ISno+Mzp/9+x2+78XfwrlngnuzkBZ
+	 NxiTUxX+L/UHut/PaL37LMXAvMVGeYMOGWa1dshA=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,12 +35,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Kees Cook <keescook@chromium.org>,
 	Guoqing Jiang <guoqing.jiang@linux.dev>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.15 187/476] block/rnbd-srv: Check for unlikely string overflow
-Date: Wed, 21 Feb 2024 14:03:58 +0100
-Message-ID: <20240221130014.800475929@linuxfoundation.org>
+Subject: [PATCH 5.10 158/379] block/rnbd-srv: Check for unlikely string overflow
+Date: Wed, 21 Feb 2024 14:05:37 +0100
+Message-ID: <20240221125959.591916770@linuxfoundation.org>
 X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240221130007.738356493@linuxfoundation.org>
-References: <20240221130007.738356493@linuxfoundation.org>
+In-Reply-To: <20240221125954.917878865@linuxfoundation.org>
+References: <20240221125954.917878865@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-5.15-stable review patch.  If anyone has any objections, please let me know.
+5.10-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -96,10 +96,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index 1896cde8135e..86a6242d9c20 100644
+index e1bc8b4cd592..9c5d52335e17 100644
 --- a/drivers/block/rnbd/rnbd-srv.c
 +++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -606,6 +606,7 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+@@ -591,6 +591,7 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
  {
  	char *full_path;
  	char *a, *b;
@@ -107,7 +107,7 @@ index 1896cde8135e..86a6242d9c20 100644
  
  	full_path = kmalloc(PATH_MAX, GFP_KERNEL);
  	if (!full_path)
-@@ -617,19 +618,19 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+@@ -602,19 +603,19 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
  	 */
  	a = strnstr(dev_search_path, "%SESSNAME%", sizeof(dev_search_path));
  	if (a) {
