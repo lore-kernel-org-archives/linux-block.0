@@ -1,419 +1,136 @@
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABD35823C;
-	Wed, 21 Feb 2024 09:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C1D627F3;
+	Wed, 21 Feb 2024 09:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708509012; cv=none; b=fKhI1kznNddmLqpfHop+N4q99eDpL6ti3EWnWWVqlvZxwEBuSSBgKMg+Y+v/d90eKr5sxnnFbE0sUtUXBqn28cRTif5DHhIp4pvgtBJWvAiZMTUkD8H2Ofxr5AKwzaRpNvBPW7ip680XuraIR2d2s4TMVolJ2g/9eg2gjG55f+s=
+	t=1708509037; cv=none; b=YJVnFa+VjOjXrsaEogTsFWejDr+zGCHNm2qnda3OJ6zdFS60N3LjpF/A0ZiS+B39KJNEBYcNRoF5i2fBkS3qZMkLtLRCFsHNxhghzPFhqiFQwjomrya2IyWGv/KI9DPYk19f6CyadLYh6lZdmaYWsajQjbXjwbUHqfBTVqzo72U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708509012; c=relaxed/simple;
-	bh=1CF3fT+0y7rY0XzqAKz8iCCaEnPZ1j3P7N8n5p5eJns=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=UjKn5dBPkqjWzWosd3qQ3Z35QmJazWgKpQUkD0AKLlxAtI1VYpdMVPnw/9EeXqsWvgH0mhPirrOxCn93jTTCrydl7N8E8gN8KF73iqnYJLEVZv10PeLJhOQ/DTG7R5T9fV10e6QtnxjoA7r084Jk/W91Do/mGAcNVpYikuIdREQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-d85ff70000001748-39-65d5c73b28e7
-From: Byungchul Park <byungchul@sk.com>
-To: linux-kernel@vger.kernel.org
-Cc: kernel_team@skhynix.com,
-	torvalds@linux-foundation.org,
-	damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org,
-	adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	will@kernel.org,
-	tglx@linutronix.de,
-	rostedt@goodmis.org,
-	joel@joelfernandes.org,
-	sashal@kernel.org,
-	daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com,
-	johannes.berg@intel.com,
-	tj@kernel.org,
-	tytso@mit.edu,
-	willy@infradead.org,
-	david@fromorbit.com,
-	amir73il@gmail.com,
-	gregkh@linuxfoundation.org,
-	kernel-team@lge.com,
-	linux-mm@kvack.org,
-	akpm@linux-foundation.org,
-	mhocko@kernel.org,
-	minchan@kernel.org,
-	hannes@cmpxchg.org,
-	vdavydov.dev@gmail.com,
-	sj@kernel.org,
-	jglisse@redhat.com,
-	dennis@kernel.org,
-	cl@linux.com,
-	penberg@kernel.org,
-	rientjes@google.com,
-	vbabka@suse.cz,
-	ngupta@vflare.org,
-	linux-block@vger.kernel.org,
-	josef@toxicpanda.com,
-	linux-fsdevel@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	jack@suse.cz,
-	jlayton@kernel.org,
-	dan.j.williams@intel.com,
-	hch@infradead.org,
-	djwong@kernel.org,
-	dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com,
-	melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com,
-	42.hyeyoo@gmail.com,
-	chris.p.wilson@intel.com,
-	gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com,
-	boqun.feng@gmail.com,
-	longman@redhat.com,
-	hdanton@sina.com,
-	her0gyugyu@gmail.com
-Subject: [PATCH v12 27/27] dept: Add 'Dept' documentation
-Date: Wed, 21 Feb 2024 18:49:33 +0900
-Message-Id: <20240221094933.36348-28-byungchul@sk.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240221094933.36348-1-byungchul@sk.com>
-References: <20240221094933.36348-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0yTZxTHfZ73SrX4ppr4Tkw0TRSnUUFBj4aZGW+PRqOJyT64LVrlVRoL
-	aLlZEw1qqaUV4yUFFdQCpnaFTXyLERQMQgCRqKDlogGizKjEIhfXuo46bDF+Ofnl/z/n9+nw
-	lKqamclrU9IlfYpGp2YVtGJwSvGihOYOKSZQo4Bzp2PA94+ZhqKb5Sy0/VWGoLzyOIaBxo3Q
-	5fciGHv8lIICWxuC4te9FFQ29SGodZ5g4fmbSPD4hlhosVlZOFl6k4X2D0EMPfnnMZTJW6H1
-	bAmGusA7GgoGWCgsOIlD4z2GgMPFgSN7LvQ7L3MQfB0LLX2dDNS+XAiXrvawUFPbQkNTVT+G
-	53eLWOgrH2egtekhDW3n8hj482MJCx/8DgocviEOntXZMVQYQyLTp/8ZaM6rw2C6fguD58U9
-	BPfNrzDI5Z0sNPi8GNyyjYL/bjQi6D8zyEHO6QAHhcfPILDm5NPw9EszA8aeeBj7t4j9eRVp
-	8A5RxOjOIrV+O00elYik+nIvR4z3X3LELmcQt3MBKa0ZwKR41McQ2ZXLEnn0PEcsgx5MPj55
-	wpGHF8do8sZTgLdH7VQkJEo6baakX7J6tyLJbsvhDl5JOFz2aYzKRv75FhTBi0Kc+O5EF2tB
-	/AT33tgVjlkhWuzuDlBhni7MEd15bxkLUvCUcGqy6Bx+zIaLacJKsaG7kQkzLcwV3WYbFfYo
-	heXiSNDwTT9bLKuom/BEhOI/Cr0T6yohXuxov02FnaJgjRCDX4LMt4MfxAfObvosUtrRJBdS
-	aVMykzVaXdziJEOK9vDivanJMgo9lONo8NcqNNq2ox4JPFJPUSbd8UgqRpOZZkiuRyJPqacr
-	6axQpEzUGI5I+tRd+gydlFaPonhaPUO51J+VqBL2a9KlA5J0UNJ/bzEfMTMbWa3pOuO63MgX
-	yzrhWK7DZP5pXqTBFF3zi4tq31waG1c1Lm8iK9S/Y8ucuGXT/OmpFZptJRuK46fuyV+zNnl9
-	QsaI9UhFx7PhWzuv7Zv/+ULPYGrr+G8xZmZ0+Me/7V3qjspFs2YsbdZbho9dz66WmY2ZnUf3
-	ZXk/LxyZbDrkitqSqKbTkjSxCyh9muYrda9QDUwDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTcRjG+5/L/xxXi8M0PHShGEplZUZab2jXD3WIjAgqsg866uCW17ay
-	DALzUmZZai0tLTarZWqlm91TlkvnutjMeUnU0qQSV+u2kWmXLejLy8Pvefh9ellSVkpPZVXJ
-	e0V1siJRjiWUZGNk1oJIa4cYVtAdAoUnwsD9PZeCspvVGOw3qhBU1x0mYLhpHXR5nAjGnr8g
-	oVhrR6Af6COhrrkfQX1FJob2ocngcLsw2LTHMWRduomhbWScgN6zRQRUGaPhaUE5AebR9xQU
-	D2MoLc4ivOcDAaOGSgYMGcEwWHGegfGBRWDr76TBcsFGQ33PPDh3sRfDw3obBc13Bwlov1+G
-	ob/6Dw1Pm1sosBfm03D9UzmGEY+BBIPbxcBLs46Ammyv7ci33zRY880EHLlcS4Dj1QMEDblv
-	CDBWd2KwuJ0EmIxaEn5ebUIwePIjAzknRhkoPXwSwfGcsxS8+GWlIbs3AsZ+lOFVkYLF6SKF
-	bNN+od6jo4Qn5bxw73wfI2Q39DCCzrhPMFWECJceDhOC/qubFoyVx7Bg/FrECHkfHYTwqbWV
-	EVpKxihhyFFMbJoeI4naJSaq0kT1whVxEqVOm8OkXog6UPVtjMxAnjl5iGV5Lpzvuxqbh/xY
-	zM3mu7tHSV8O4Gbxpvx3dB6SsCR3dCJf8fk59hX+3DLe0t1E+zLFBfOmXC3p80i5JfyX8XQf
-	5rmZfFWN+Z/Hz4uvlTr/zWVcBN/RdossQBIdmlCJAlTJaUkKVWJEqCZBmZ6sOhC6MyXJiLwv
-	Yzg0XngXfW9f14g4FsknSZV3HKKMVqRp0pMaEc+S8gAptd+LpLsU6QdFdUqsel+iqGlE01hK
-	Hihdv02Mk3Hxir1igiimiur/LcH6Tc1At/ccTIr3hEWx5dH2GF2tNefU0pYdrctbn1Hro+ML
-	uWDnmgHuypTw0BlKw7z78wNjUiKCFk/yo3dbA7Uul/6aJXBD0Gv/npIZNtPcrCsjAz+3rDwz
-	f1rDlu2bM1eTRTsrgx6/HXqvV5q/RIfiTP3prV11a2NluCShJffBoyZ7nP8POaVRKhaFkGqN
-	4i+4H0qqLgMAAA==
-X-CFilter-Loop: Reflected
+	s=arc-20240116; t=1708509037; c=relaxed/simple;
+	bh=l0w5pmYRrOPkhcpKfMC4HaFIRK3kaxhmE3uyDOQg1uI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vAr8Nzv6Ny9gWAtVL5UlLVES626P0YVf64oyUR4w+cLIquXNkwij/ctXhDTK+9db6btu+SdMYoXWrpMHYa4RMdBhVewMy76MA5539k22PNJYMoNwu9uCFCNrJWktpoWjsRo8gmXDa5sEJw/NabbLxq/UfZUm6QepunnR8S5QLPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-607f8482b88so48091567b3.0;
+        Wed, 21 Feb 2024 01:50:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708509033; x=1709113833;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6K6KfUK6UGxSBqRQLdjgANnoggkUhjVRWn4dxIyu/w0=;
+        b=cSnqyXw2rB0j2/EwCFmXXbu7Bli3SzD57djaGnAubI94Bo418ryB519HPWJUeAwzhV
+         GvcOR9Bcf9BC7BFHYdnHuewPY+OdYhBaEZAO97iMixDLa6S+u1PFq/S+cFpV1jKzKIZs
+         X/cQ7Kt2i6GmDgEo+7wVnxY9MqspdjmT4I33zXmtIF6VDu89qfiJqS8kID1YkUP0WwHm
+         A+R9IvBaFIgNHRt6/OfSDE60P88GJaRo9+W1KGR7LkzUTczJjzctn6BSi7bA2tX4TzlH
+         V9wA3hTw6uDrPpRSDOcZ6nyBjbeuYrCE70dwVyjEUFxXBC/Z6NDC/t9UApnNaDUFgOMm
+         jX5g==
+X-Forwarded-Encrypted: i=1; AJvYcCXGgaH42fcvCZXhgGE+V5Zw0XiupXPyNUoirMDYt2UkzG9qCu8WinxLictTqmN1x12XeivBuGbk/Us5zVPBXG1XUK4WxRIS4iUv24/avAiqRWLP/btPgir6zu7VUau+EODcYM9V0ZbUI8d70KJeOKrm8+4quOWLPEg2xZRi9eoM++mjAbzUFwhNTaTdBVL/nAhb8inbG1YqYAnkW/Acvz27ebu0ATg=
+X-Gm-Message-State: AOJu0YzkMtx4HHhxMTI2x3G+ZOJskB1l+tx7TTR1PxRlBI5t0nhLc7cH
+	NW5SLxl8M9hOJ7/oL9wFGyPzC/E5bZyZDHKNWEgT//fmBUtC7MPNTACgy0dhd30=
+X-Google-Smtp-Source: AGHT+IELfkHruk8SJrgkNQMURvLpsZm6/qQnoKWk3zsivCcBYeIsn95WbfIAKukImCcFhSIwu+bmlQ==
+X-Received: by 2002:a81:494b:0:b0:608:6e94:9855 with SMTP id w72-20020a81494b000000b006086e949855mr3400171ywa.26.1708509032748;
+        Wed, 21 Feb 2024 01:50:32 -0800 (PST)
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com. [209.85.128.170])
+        by smtp.gmail.com with ESMTPSA id h11-20020a81b64b000000b00607f8df2097sm2451657ywk.104.2024.02.21.01.50.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Feb 2024 01:50:31 -0800 (PST)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-60869c68926so16167047b3.3;
+        Wed, 21 Feb 2024 01:50:31 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUqfG7HunQ4lJjDOoGPmBE5VWnYy6sIoI2cKxuASkuPbQu2Bp6t1zHyEGRoJ4MkhrM1CAC1xwo1d6wzuj0rWKO0XexjnvaUBRwghLXiTYHJZS38h9UOzEWm2Q2LV4SavvPbFjIjOLoYXPUKzqcBm18A8oDaeBUqZRWCWSLHTeYe/zmA+cHfzbLiJaaXRvNmx/Sx2lWLC9dO4iQBznjLkXRZwXLKiFM=
+X-Received: by 2002:a25:f903:0:b0:dc6:c617:7ca with SMTP id
+ q3-20020a25f903000000b00dc6c61707camr16048280ybe.29.1708509031694; Wed, 21
+ Feb 2024 01:50:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
+ <20240127-mmc-proper-kmap-v2-9-d8e732aa97d1@linaro.org> <7f40cb40-1a1-532-75fc-d3376ed27a@linux-m68k.org>
+ <CACRpkdZpyefnTyKEJXru_HZG8xcJF66Eb2pZhbk+HVvfzdh4yw@mail.gmail.com>
+In-Reply-To: <CACRpkdZpyefnTyKEJXru_HZG8xcJF66Eb2pZhbk+HVvfzdh4yw@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 21 Feb 2024 10:50:20 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWwuH-mPm1TJTfvf3FXSd_zj+yP7OL6uB=-TrqNOT+W_Q@mail.gmail.com>
+Message-ID: <CAMuHMdWwuH-mPm1TJTfvf3FXSd_zj+yP7OL6uB=-TrqNOT+W_Q@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] mmc: sh_mmcif: Use sg_miter for PIO
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Ulf Hansson <ulf.hansson@linaro.org>, Nicolas Pitre <nico@fluxnic.net>, 
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Angelo Dureghello <angelo.dureghello@timesys.com>, linux-mmc@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This document describes the concept of Dept.
+Hi Linus,
 
-Signed-off-by: Byungchul Park <byungchul@sk.com>
----
- Documentation/dependency/dept.txt | 283 ++++++++++++++++++++++++++++++
- 1 file changed, 283 insertions(+)
- create mode 100644 Documentation/dependency/dept.txt
+On Wed, Feb 21, 2024 at 12:01=E2=80=AFAM Linus Walleij <linus.walleij@linar=
+o.org> wrote:
+> On Tue, Feb 20, 2024 at 10:03=E2=80=AFPM Geert Uytterhoeven
+> <geert@linux-m68k.org> wrote:
+>
+> >      sh_mobile_sdhi ee120000.mmc: mmc1 base at 0xee120000, max clock ra=
+te 12 MHz
+> >      mmc2: new high speed MMC card at address 0001
+> >      sh_mobile_sdhi ee100000.mmc: mmc0 base at 0xee100000, max clock ra=
+te 88 MHz
+> >      mmcblk2: mmc2:0001 MMC08G 7.33 GiB
+>
+> Hey it reads some blocks...
+>
+> >      BUG: sleeping function called from invalid context at kernel/workq=
+ueue.c:3347
+> >      in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 35, name: i=
+rq/151-ee20000
+> (...)
+> >       __might_resched from __flush_work+0x20c/0x2e4
+> >       __flush_work from __cancel_work_timer+0x118/0x198
+> >       __cancel_work_timer from sh_mmcif_irqt+0x38/0x8f8
+> >       sh_mmcif_irqt from irq_thread_fn+0x1c/0x58
+>
+> Actually that is the thread so the message is a bit confusing, the irq th=
+read
+> isn't atomic.
+>
+> I wonder if it is caused by this:
+>
+> > > +     sg_miter_start(&host->sg_miter, data->sg, data->sg_len,
+> > > +                    SG_MITER_ATOMIC | SG_MITER_TO_SG);
+>
+> ...because I don't need to ask for atomic miter here, since the poll
+> functions are actually called in process context.
+>
+> I've sent a patch, can you test?
+> https://lore.kernel.org/linux-mmc/20240220-fix-sh-mmcif-v1-1-b9d08a787c1f=
+@linaro.org/T/#u
 
-diff --git a/Documentation/dependency/dept.txt b/Documentation/dependency/dept.txt
-new file mode 100644
-index 000000000000..7efe3bc59b2d
---- /dev/null
-+++ b/Documentation/dependency/dept.txt
-@@ -0,0 +1,283 @@
-+DEPT(DEPendency Tracker)
-+========================
-+
-+Started by Byungchul Park <max.byungchul.park@sk.com>
-+
-+How lockdep works
-+-----------------
-+
-+Lockdep tries to detect a deadlock by checking lock acquisition order.
-+For example, consider a graph built by lockdep like:
-+
-+   A -> B -
-+           \
-+            -> E
-+           /
-+   C -> D -
-+
-+   where 'A -> B' means that acquisition A is prior to acquisition B
-+   with A still held.
-+
-+Lockdep keeps adding each new acquisition order into the graph in
-+runtime. For example, 'E -> C' will be added when it's recognized that
-+the two locks have been acquired in that order like:
-+
-+       A -> B -
-+               \
-+                -> E -
-+               /      \
-+    -> C -> D -        \
-+   /                   /
-+   \                  /
-+    ------------------
-+
-+   where 'A -> B' means that acquisition A is prior to acquisition B
-+   with A still held.
-+
-+This graph contains a subgraph that demonstrates a loop like:
-+
-+                -> E -
-+               /      \
-+    -> C -> D -        \
-+   /                   /
-+   \                  /
-+    ------------------
-+
-+   where 'A -> B' means that acquisition A is prior to acquisition B
-+   with A still held.
-+
-+Lockdep reports it as a deadlock on detection of a loop.
-+
-+CONCLUSION
-+
-+Lockdep detects a deadlock by checking if a loop has been created after
-+expanding the graph.
-+
-+
-+Limitation of lockdep
-+---------------------
-+
-+Lockdep works on typical lock e.g. spinlock and mutex, that are supposed
-+to be released within the acquisition context. However, a deadlock by
-+folio lock or other synchronization mechanisms cannot be detected by
-+lockdep that basically tracks lock acquisition order.
-+
-+Can we detect the following deadlock?
-+
-+   CONTEXT X	   CONTEXT Y	   CONTEXT Z
-+
-+		   mutex_lock A
-+   folio_lock B
-+		   folio_lock B
-+				   mutex_lock A /* DEADLOCK */
-+				   folio_unlock B
-+		   folio_unlock B
-+		   mutex_unlock A
-+				   mutex_unlock A
-+
-+No, we can't. What about the following?
-+
-+   CONTEXT X		   CONTEXT Y
-+
-+			   mutex_lock A
-+   mutex_lock A
-+			   wait_for_complete B /* DEADLOCK */
-+   complete B
-+			   mutex_unlock A
-+   mutex_unlock A
-+
-+No, we can't.
-+
-+CONCLUSION
-+
-+Given the limitation, lockdep cannot detect a deadlock by folio lock or
-+other synchronization mechanisms.
-+
-+
-+What leads a deadlock
-+---------------------
-+
-+A deadlock occurs when one or multi contexts are waiting for events that
-+will never happen. For example:
-+
-+   CONTEXT X	   CONTEXT Y	   CONTEXT Z
-+
-+   |		   |		   |
-+   v		   |		   |
-+   (1) wait for A  v		   |
-+   .		   (2) wait for C  v
-+   event C	   .		   (3) wait for B
-+		   event B	   .
-+				   event A
-+
-+Event C cannot be triggered because context X is stuck at (1), event B
-+cannot be triggered because context Y is stuck at (2), and event A
-+cannot be triggered because context Z is stuck at (3). All the contexts
-+are stuck. We call the situation a *deadlock*.
-+
-+If an event occurrence is a prerequisite to reaching another event, we
-+call it *dependency*. In the example above:
-+
-+   Event A occurrence is a prerequisite to reaching event C.
-+   Event C occurrence is a prerequisite to reaching event B.
-+   Event B occurrence is a prerequisite to reaching event A.
-+
-+In terms of dependency:
-+
-+   Event C depends on event A.
-+   Event B depends on event C.
-+   Event A depends on event B.
-+
-+Dependencies in a graph look like:
-+
-+    -> C -> A -> B -
-+   /                \
-+   \                /
-+    ----------------
-+
-+   where 'A -> B' means that event A depends on event B.
-+
-+A circular dependency exists. Such a circular dependency leads a
-+deadlock since no waiters can have desired events triggered.
-+
-+CONCLUSION
-+
-+A circular dependency leads a deadlock.
-+
-+
-+Introduce DEPT
-+--------------
-+
-+DEPT(DEPendency Tracker) tracks wait and event instead of lock
-+acquisition order so as to recognize the following situation:
-+
-+   CONTEXT X	   CONTEXT Y	   CONTEXT Z
-+
-+   |		   |		   |
-+   v		   |		   |
-+   wait for A	   v		   |
-+   .		   wait for C	   v
-+   event C	   .		   wait for B
-+		   event B	   .
-+				   event A
-+
-+and builds up a dependency graph in runtime, similar to lockdep. The
-+graph would look like:
-+
-+    -> C -> A -> B -
-+   /                \
-+   \                /
-+    ----------------
-+
-+   where 'A -> B' means that event A depends on event B.
-+
-+DEPT keeps adding each new dependency into the graph in runtime. For
-+example, 'B -> D' will be added when it's recognized that event D
-+occurrence is a prerequisite to reaching event B, in other words, event
-+B depends on event D like:
-+
-+   |
-+   v
-+   wait for D
-+   .
-+   event B
-+
-+After adding 'B -> D' dependency into the graph, the graph would look
-+like:
-+
-+                     -> D
-+                    /
-+    -> C -> A -> B -
-+   /                \
-+   \                /
-+    ----------------
-+
-+   where 'A -> B' means that event A depends on event B.
-+
-+DEPT is going to report a deadlock on detection of a new loop.
-+
-+CONCLUSION
-+
-+DEPT works on wait and event so as to theoretically detect all the
-+potential deadlocks.
-+
-+
-+How DEPT works
-+--------------
-+
-+Let's take a look how DEPT works with an example that was mentioned in
-+the section 'Limitation of lockdep'.
-+
-+   CONTEXT X	   CONTEXT Y	   CONTEXT Z
-+
-+		   mutex_lock A
-+   folio_lock B
-+		   folio_lock B
-+				   mutex_lock A /* DEADLOCK */
-+				   folio_unlock B
-+		   folio_unlock B
-+		   mutex_unlock A
-+				   mutex_unlock A
-+
-+Add comments to describe DEPT's view using terms of wait and event.
-+
-+   CONTEXT X	   CONTEXT Y	   CONTEXT Z
-+
-+		   mutex_lock A
-+		   /* start to take into account event A context */
-+   folio_lock B
-+   /* start to take into account event B context */
-+
-+		   folio_lock B
-+		   /* wait for B */
-+		   (1)
-+				   mutex_lock A /* DEADLOCK */
-+				   /* wait for A */
-+				   (2)
-+
-+				   folio_unlock B
-+				   /* event B */
-+		   folio_unlock B
-+		   /* not interest until reaching (1) */
-+
-+		   mutex_unlock A
-+		   /* event A */
-+				   mutex_unlock A
-+				   /* not interest until reaching (2) */
-+
-+Focusing on wait and event, the example can be simplified like:
-+
-+   CONTEXT X	   CONTEXT Y	   CONTEXT Z
-+
-+		   |		   |
-+		   |		   |
-+		   v		   |
-+		   wait for B	   v
-+		   .		   wait for A
-+		   .		   .
-+		   .		   event B
-+		   event A
-+
-+Event A occurrence is a prerequisite to reaching event B, and event B
-+occurrence is a prerequisite to reaching event A.
-+
-+In terms of dependency:
-+
-+   Event B depends on event A.
-+   Event A depends on event B.
-+
-+Dependencies in the dependency graph look like:
-+
-+    -> A -> B -
-+   /           \
-+   \           /
-+    -----------
-+
-+   where 'A -> B' means that event A depends on event B.
-+
-+A loop has been created. So DEPT can report it as a deadlock.
-+
-+CONCLUSION
-+
-+DEPT works well with any synchronization mechanisms by focusing on wait
-+and event.
--- 
-2.17.1
+While that patch fixes the BUG, it does not make the eMMC work fully.
+It spews:
 
+    sh_mmcif ee200000.mmc: Timeout waiting for 2 on CMD18
+
+and no or limited data is read ("hd /dev/mmcblk..." blocks after no
+or two lines of output).
+
+I still need to revert 27b57277d9ba to restore proper operation.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
