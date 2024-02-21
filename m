@@ -1,102 +1,97 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FEA1272B8
-	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 21:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765EC3C099;
+	Wed, 21 Feb 2024 22:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708550726; cv=none; b=Cb76h96/qnTLKzuMykt9bcFfPAjuebMyR9HqOkXhEz2SyXWsTum84nJJzwuZ5sqNj0hKqOs9fRazmaSdpotJKvH2OVaSaN1HvoVzSURS19zpPFvXCt51yvk9OG9lMor2mTlz46iheo/4xBjLSPN3odQOY4zsPqQxYnxBX+POE7Q=
+	t=1708552930; cv=none; b=djXMwfbmRugKDMoP13YLuviLizh2jkdaDprdCX+Xo6UjGToYTFtv1xNp7Ojg0ArPDBaBsrCKECX/gqlhf5VjSfG/vjc/MVSzlOCXsCq1U0MTQIumi2MoF5rxO0bZOtzH17J74qPW5aeqm/zEDlcFqlDEHdzmHiy6JK4sQ7AhyRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708550726; c=relaxed/simple;
-	bh=vwcCEdPIttWiNnK38OUvrS0LIv8EPoiVoGqCGSZN+Ig=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aG0NSZilQzrojYvb1vmJlnhShJYzyp2yzQZ/uU2gwJkU7kqNpy277cTn+ihZ8Ynid1b2NR9TZCQFN6GWQE0vZeT+WFezhDET6FfLsfUAoaMbXha7c86X812aJsIOqN2ZuRL30r5CyN9hTPr5Wd85ersmnmvcF83immOR/vJLo60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KYtTh/tM; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1708552930; c=relaxed/simple;
+	bh=8MGCt+P4gH2QpzJLHo5gIAZpKB2OaAAWxWUcX9wLNUw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F545RLRrsUbj9ahY7rRgK5KwfZPqgj1yVDruc5RaAN82p7LWSGtdyAHzKzwfwRzQ1pBztpatGvR81i4fvdiWwHlL63YZAbD1mYyST39aitkHqYL/TOtolqDjaBLoxT8j8BkRRcf+M9KNfjygtACV8Rm/ih9HxKWd+f9exiGR7wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wz44TZGm; arc=none smtp.client-ip=209.85.161.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KYtTh/tM"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-607f8482b88so55587707b3.0
-        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 13:25:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wz44TZGm"
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-59a1a03d067so1450087eaf.1;
+        Wed, 21 Feb 2024 14:02:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708550722; x=1709155522; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eQcwsvUVgzwUHzVYq2OUwFRsg7S9zwWdnAGogtH5/+c=;
-        b=KYtTh/tMfJTsTc1y6dP8tFA/q548E6QS1sFLhJInyi8VYfynZHFK8Nmr5B/8YTrVRp
-         gRMX3VJjb8bT5xnFExOW7JYcyqaCPkg6llkwW5eLB4dMbmgpj01Vdc+TEi51KkBiuoDi
-         fElxgHErKjwrUtdeM8OYUJD1u/c4s6PU2E4YYIc123pgMXVggCLhFxxkT3884vqEd2hW
-         CUclIIQDBKJHc+rfYbfmZdyfGCgFBsZ/SFqy3RFrej0rGhlH1KZ8Otj+u32NIcev7G/i
-         VjRu0jrbHJa6UdHvxahSeqXtYWlO6Vlj1ydMLsL1XLGPt5Ci1sK5BWBveSUgvR0vcRf3
-         DOVA==
+        d=gmail.com; s=20230601; t=1708552928; x=1709157728; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ahCz42898xX1WCFynstOUHFEqWmdicda2jxA9WNrI+Q=;
+        b=Wz44TZGmIkEJevaCIL4DdUYEbeKVwjvojcr6sDbegH1erFg0H7zKM0uBKr/HMN+9RU
+         mH00oNZiZDP5KPbVMOVlb2WHNQdndqhoRfWa02Pf2LmLt5bJu90XmKFFMGrD8KQ1bg9g
+         5q5QJ/qscZ6VFdWfjQs6oQOYWRCDYysPdTxeGsKgdh6rInvLykWAVApKvrUcRK0YbN6I
+         Mh+4oJ5ta4cIW7a1/XHPQqs3PvIegFly50cqDAUwN051w/cYlU+jHXh/JVJB4hltoEqs
+         2zm4JiaNhxEkdYdvuPT2DTlFA1y8JFmipNkYJCBh8o7VMjSvefOcLNK5yTqRanT/zTwN
+         zTjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708550722; x=1709155522;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQcwsvUVgzwUHzVYq2OUwFRsg7S9zwWdnAGogtH5/+c=;
-        b=uDOLljVYeFq6LgKZUeFOk8b0+huFWFhUnhX4g4c3QeSZDBgLcapqZm4zJk06BP9xdT
-         fBz5q72QjBou+TmAwxCUx4Tmh4RJqfcy0Mf5Ara46EWp9ICDNhFObIeyHjrgLESzFtOq
-         2JsD+JJm0ei/0q6CqVWXXdPyJfW6QsI2ASlH7y4AANkC5eVyYR3uanxLi4PPw2gxUTwC
-         aBVZGAgl+HHe6jvACVu7syQC03ZpXwpAjgkLDe93JPoV5quamv1/5O+zsGgXc+NHwO+V
-         G0xFSPMhOOArKcnqRCOD0twKboWxGywW0NIN+flHC/9nUU8b5zFwXjYeb78sEkGPzJCC
-         2mFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVxoE9ATlQjMeZIeQAYT5kRfncnyHKyJ0jmbZJukkKu4LimsXUxU5MDdv+vugzcbL6XamF/cK55am9YHnQl5RovGXB0V0fbLV8A858=
-X-Gm-Message-State: AOJu0YypYbRrUsaDEKZ4wdK//G/ekh0jaUUWQWmbo51MrD0NdNGhpGas
-	Rk8NcAkAPrDdyxUlrc/ZUV5hpp6/tM98Vc7a2EwIFExMYcPF8IhJKMGYARRocO8R3i2FpzI6Zo5
-	nYuLnqVBRWIIOHbkTC4fE5E31Xm7XFyqABjiyuw==
-X-Google-Smtp-Source: AGHT+IH4UPI5wpOTg15rGTFngizg01v5P2orm8RiQzbgP6QMedeTpOkK8y3JHAR2cnL/aWUbEuMgAt7gdxYB8HxLYEo=
-X-Received: by 2002:a81:b614:0:b0:607:f4b9:11aa with SMTP id
- u20-20020a81b614000000b00607f4b911aamr17260454ywh.21.1708550722698; Wed, 21
- Feb 2024 13:25:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708552928; x=1709157728;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ahCz42898xX1WCFynstOUHFEqWmdicda2jxA9WNrI+Q=;
+        b=UhVzKDzX7mmhq9BJ8F7IYPWcxi/dzxKI8zntApAgRMsZtRBUAcxz23Va/DCFvEKH8t
+         yVxKJyudBYiSQF2XTI7pJOGyvFASSErddeS2pR4N4cEq/0MmriWkoVK3sz46P9PJnw8J
+         ceReGI4MFOmtGZV3zhSxXQr3iC+opYbgiPEs+qHOJawV7kXqoAmdem8LGJtbDfFsVYBj
+         0aE9PG4x/FuZRs4fwaDdNDIsz3drDLO9uzsiHOUDYhFcmUFteJOGlwtbYD14uX2VV6O+
+         RckCQP+gnFLMlVOvXCP3qnyHOX2ZvBe060pLu4VzD534kQES4Afo7vN44xxFVDp3AddM
+         IGFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbXDK7o8O+gK5eCX455QdQbAUrGbL0zd8U/kJJNfTbfELaFHKRJbYrfXLNbruRFR4xMdeOXUGKLThs+KzuwNK0C2BF21zsSseh58kNZm/D0Ql5IWlFeV+oBnD8VFhVm0Ggh8ed1j3QjXY=
+X-Gm-Message-State: AOJu0YyGopsyc8RMtjfZ/hKg24+qDnNaej/JtLQg9GxPfRnx4m9FsrU+
+	eyLht9KzBar2uLzjvq1GKYEeiX74nLfbfOyWSwo9kV3/iCeLZ/rWlTDfN6O5qA==
+X-Google-Smtp-Source: AGHT+IELvTZ+XcitZ0rXJc4Qh4F8SDtv4VZO8EdsZgt3m1h7Hx+uhDcRaXrInSVx7/UkjE45Fy8/sw==
+X-Received: by 2002:a4a:dfac:0:b0:59f:e26f:fb1a with SMTP id k12-20020a4adfac000000b0059fe26ffb1amr9379137ook.3.1708552928506;
+        Wed, 21 Feb 2024 14:02:08 -0800 (PST)
+Received: from FreeCalypso.domain_not_set.invalid ([2806:106e:19:4bb8:77c:948e:6b1f:1907])
+        by smtp.gmail.com with ESMTPSA id l15-20020a4a350f000000b0059d7a60e4a6sm139ooa.44.2024.02.21.14.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 14:02:08 -0800 (PST)
+From: Alfredo Cruz <alfredo.carlon@gmail.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Alfredo Cruz <alfredo.carlon@gmail.com>
+Subject: [PATCH] block: add put_device() call when device_add() fails in device_add_disk()
+Date: Wed, 21 Feb 2024 23:01:41 +0100
+Message-ID: <20240221220141.32316-1-alfredo.carlon@gmail.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
- <20240127-mmc-proper-kmap-v2-9-d8e732aa97d1@linaro.org> <7f40cb40-1a1-532-75fc-d3376ed27a@linux-m68k.org>
- <CACRpkdZpyefnTyKEJXru_HZG8xcJF66Eb2pZhbk+HVvfzdh4yw@mail.gmail.com> <CAMuHMdWwuH-mPm1TJTfvf3FXSd_zj+yP7OL6uB=-TrqNOT+W_Q@mail.gmail.com>
-In-Reply-To: <CAMuHMdWwuH-mPm1TJTfvf3FXSd_zj+yP7OL6uB=-TrqNOT+W_Q@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 21 Feb 2024 22:25:11 +0100
-Message-ID: <CACRpkdaks_7PWpXF=wssP2x+tZce5SFsGTCddgxjJQ9erHp-6Q@mail.gmail.com>
-Subject: Re: [PATCH v2 9/9] mmc: sh_mmcif: Use sg_miter for PIO
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Ulf Hansson <ulf.hansson@linaro.org>, Nicolas Pitre <nico@fluxnic.net>, 
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Angelo Dureghello <angelo.dureghello@timesys.com>, linux-mmc@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 21, 2024 at 10:50=E2=80=AFAM Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
+When device_add() fails, put_device() should called for cleanup.
+Added this call before the jump to out_free_ext_minor to not
+interfere with device_del() on error paths where deivce_add() succeeded
 
-> > I've sent a patch, can you test?
-> > https://lore.kernel.org/linux-mmc/20240220-fix-sh-mmcif-v1-1-b9d08a787c=
-1f@linaro.org/T/#u
->
-> While that patch fixes the BUG, it does not make the eMMC work fully.
-> It spews:
->
->     sh_mmcif ee200000.mmc: Timeout waiting for 2 on CMD18
->
-> and no or limited data is read ("hd /dev/mmcblk..." blocks after no
-> or two lines of output).
->
-> I still need to revert 27b57277d9ba to restore proper operation.
+Signed-off-by: Alfredo Cruz <alfredo.carlon@gmail.com>
+---
+ block/genhd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Halfway there. I looked at the code again and now I think I found the
-problem causing CMD18 to time out.
+diff --git a/block/genhd.c b/block/genhd.c
+index d74fb5b4ae68..5a231fb075bd 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -456,8 +456,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 	if (!(disk->flags & GENHD_FL_HIDDEN))
+ 		ddev->devt = MKDEV(disk->major, disk->first_minor);
+ 	ret = device_add(ddev);
+-	if (ret)
++	if (ret) {
++		put_device(ddev);
+ 		goto out_free_ext_minor;
++	}
+ 
+ 	ret = disk_alloc_events(disk);
+ 	if (ret)
+-- 
+2.43.2
 
-I've send a new 2-patch series:
-https://lore.kernel.org/linux-mmc/20240221-fix-sh-mmcif-v2-0-5e521eb25ae4@l=
-inaro.org/
-
-Yours,
-Linus Walleij
