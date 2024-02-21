@@ -1,198 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B2B8615F
-	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 20:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FEA1272B8
+	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 21:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708548755; cv=none; b=Y16FZ+90Jmj1L5Yf/tx+hNniUhqr4vzyMglg3Y9YZDvt5AHyloS7HEJuikdx/OmPQBhprxOlzypeeGKea4fhvSU0UqKTfvU6MHtB4dYrDhtMuGBvFEGGYFMl7cNw1N6aBk7DpWDOCQK4k4h/1c/A2nf/m17wADw36UV65NvVzSA=
+	t=1708550726; cv=none; b=Cb76h96/qnTLKzuMykt9bcFfPAjuebMyR9HqOkXhEz2SyXWsTum84nJJzwuZ5sqNj0hKqOs9fRazmaSdpotJKvH2OVaSaN1HvoVzSURS19zpPFvXCt51yvk9OG9lMor2mTlz46iheo/4xBjLSPN3odQOY4zsPqQxYnxBX+POE7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708548755; c=relaxed/simple;
-	bh=xgfDMafDUcmEBN6Xo15ORL3SUF/WL2NkQNR5tvM/WDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wy5XC7JvTMWwxaR87/yET6qrxOUvWm7RUnn2owP6U0yftuheLa0XgiajD36SV5nk2pt+Zxtk3hcI0R2BlUPwagLIn5gK7AxquiQZJ3aMEos/hUXunEw2SbeOEh4xRnCzAJZ39OzIBjRKCzvApVSTCVHe71Jhy9MtySAkEaDJzIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hzOJhZDS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1708550726; c=relaxed/simple;
+	bh=vwcCEdPIttWiNnK38OUvrS0LIv8EPoiVoGqCGSZN+Ig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aG0NSZilQzrojYvb1vmJlnhShJYzyp2yzQZ/uU2gwJkU7kqNpy277cTn+ihZ8Ynid1b2NR9TZCQFN6GWQE0vZeT+WFezhDET6FfLsfUAoaMbXha7c86X812aJsIOqN2ZuRL30r5CyN9hTPr5Wd85ersmnmvcF83immOR/vJLo60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KYtTh/tM; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hzOJhZDS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708548752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j71ZkCWNeOZ8wnhrOdzBq48RrBBlOjjlQIEtqH+HmBA=;
-	b=hzOJhZDSvZoPmgGTxGsiF5XawLP2gKsn/BtAMvQCuxP+zV1PZxMhLFWmOwzjpY13bUYSJt
-	g1zkFhc09Ziq/+saqxfQh9JHQr7Q2D5j53uJh5YSGd0v1g4agWS1aYhHIEuLqGFTvzb0Mk
-	MOfYgqwMNjI/vNDA+hyZ1w96f1Tobk8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-586-Hfy4fv_pOVGT2Sf18fPwYQ-1; Wed, 21 Feb 2024 15:52:30 -0500
-X-MC-Unique: Hfy4fv_pOVGT2Sf18fPwYQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF37185A58E;
-	Wed, 21 Feb 2024 20:52:29 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 603602BE;
-	Wed, 21 Feb 2024 20:52:28 +0000 (UTC)
-Date: Tue, 20 Feb 2024 17:05:01 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Parav Pandit <parav@nvidia.com>
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	pbonzini@redhat.com, axboe@kernel.dk,
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
-	stable@vger.kernel.org, lirongqing@baidu.com,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH] virtio_blk: Fix device surprise removal
-Message-ID: <20240220220501.GA1515311@fedora>
-References: <20240217180848.241068-1-parav@nvidia.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KYtTh/tM"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-607f8482b88so55587707b3.0
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 13:25:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708550722; x=1709155522; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eQcwsvUVgzwUHzVYq2OUwFRsg7S9zwWdnAGogtH5/+c=;
+        b=KYtTh/tMfJTsTc1y6dP8tFA/q548E6QS1sFLhJInyi8VYfynZHFK8Nmr5B/8YTrVRp
+         gRMX3VJjb8bT5xnFExOW7JYcyqaCPkg6llkwW5eLB4dMbmgpj01Vdc+TEi51KkBiuoDi
+         fElxgHErKjwrUtdeM8OYUJD1u/c4s6PU2E4YYIc123pgMXVggCLhFxxkT3884vqEd2hW
+         CUclIIQDBKJHc+rfYbfmZdyfGCgFBsZ/SFqy3RFrej0rGhlH1KZ8Otj+u32NIcev7G/i
+         VjRu0jrbHJa6UdHvxahSeqXtYWlO6Vlj1ydMLsL1XLGPt5Ci1sK5BWBveSUgvR0vcRf3
+         DOVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708550722; x=1709155522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eQcwsvUVgzwUHzVYq2OUwFRsg7S9zwWdnAGogtH5/+c=;
+        b=uDOLljVYeFq6LgKZUeFOk8b0+huFWFhUnhX4g4c3QeSZDBgLcapqZm4zJk06BP9xdT
+         fBz5q72QjBou+TmAwxCUx4Tmh4RJqfcy0Mf5Ara46EWp9ICDNhFObIeyHjrgLESzFtOq
+         2JsD+JJm0ei/0q6CqVWXXdPyJfW6QsI2ASlH7y4AANkC5eVyYR3uanxLi4PPw2gxUTwC
+         aBVZGAgl+HHe6jvACVu7syQC03ZpXwpAjgkLDe93JPoV5quamv1/5O+zsGgXc+NHwO+V
+         G0xFSPMhOOArKcnqRCOD0twKboWxGywW0NIN+flHC/9nUU8b5zFwXjYeb78sEkGPzJCC
+         2mFg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxoE9ATlQjMeZIeQAYT5kRfncnyHKyJ0jmbZJukkKu4LimsXUxU5MDdv+vugzcbL6XamF/cK55am9YHnQl5RovGXB0V0fbLV8A858=
+X-Gm-Message-State: AOJu0YypYbRrUsaDEKZ4wdK//G/ekh0jaUUWQWmbo51MrD0NdNGhpGas
+	Rk8NcAkAPrDdyxUlrc/ZUV5hpp6/tM98Vc7a2EwIFExMYcPF8IhJKMGYARRocO8R3i2FpzI6Zo5
+	nYuLnqVBRWIIOHbkTC4fE5E31Xm7XFyqABjiyuw==
+X-Google-Smtp-Source: AGHT+IH4UPI5wpOTg15rGTFngizg01v5P2orm8RiQzbgP6QMedeTpOkK8y3JHAR2cnL/aWUbEuMgAt7gdxYB8HxLYEo=
+X-Received: by 2002:a81:b614:0:b0:607:f4b9:11aa with SMTP id
+ u20-20020a81b614000000b00607f4b911aamr17260454ywh.21.1708550722698; Wed, 21
+ Feb 2024 13:25:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+EsB9gUsZRuxclQv"
-Content-Disposition: inline
-In-Reply-To: <20240217180848.241068-1-parav@nvidia.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
-
-
---+EsB9gUsZRuxclQv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
+ <20240127-mmc-proper-kmap-v2-9-d8e732aa97d1@linaro.org> <7f40cb40-1a1-532-75fc-d3376ed27a@linux-m68k.org>
+ <CACRpkdZpyefnTyKEJXru_HZG8xcJF66Eb2pZhbk+HVvfzdh4yw@mail.gmail.com> <CAMuHMdWwuH-mPm1TJTfvf3FXSd_zj+yP7OL6uB=-TrqNOT+W_Q@mail.gmail.com>
+In-Reply-To: <CAMuHMdWwuH-mPm1TJTfvf3FXSd_zj+yP7OL6uB=-TrqNOT+W_Q@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 21 Feb 2024 22:25:11 +0100
+Message-ID: <CACRpkdaks_7PWpXF=wssP2x+tZce5SFsGTCddgxjJQ9erHp-6Q@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] mmc: sh_mmcif: Use sg_miter for PIO
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Ulf Hansson <ulf.hansson@linaro.org>, Nicolas Pitre <nico@fluxnic.net>, 
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Angelo Dureghello <angelo.dureghello@timesys.com>, linux-mmc@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 17, 2024 at 08:08:48PM +0200, Parav Pandit wrote:
-> When the PCI device is surprise removed, requests won't complete from
-> the device. These IOs are never completed and disk deletion hangs
-> indefinitely.
->=20
-> Fix it by aborting the IOs which the device will never complete
-> when the VQ is broken.
->=20
-> With this fix now fio completes swiftly.
-> An alternative of IO timeout has been considered, however
-> when the driver knows about unresponsive block device, swiftly clearing
-> them enables users and upper layers to react quickly.
->=20
-> Verified with multiple device unplug cycles with pending IOs in virtio
-> used ring and some pending with device.
->=20
-> In future instead of VQ broken, a more elegant method can be used. At the
-> moment the patch is kept to its minimal changes given its urgency to fix
-> broken kernels.
->=20
-> Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of virtio pci =
-device")
-> Cc: stable@vger.kernel.org
-> Reported-by: lirongqing@baidu.com
-> Closes: https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73ca=
-9b4741@baidu.com/
-> Co-developed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> Signed-off-by: Parav Pandit <parav@nvidia.com>
-> ---
->  drivers/block/virtio_blk.c | 54 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
->=20
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 2bf14a0e2815..59b49899b229 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -1562,10 +1562,64 @@ static int virtblk_probe(struct virtio_device *vd=
-ev)
->  	return err;
->  }
-> =20
-> +static bool virtblk_cancel_request(struct request *rq, void *data)
-> +{
-> +	struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(rq);
-> +
-> +	vbr->in_hdr.status =3D VIRTIO_BLK_S_IOERR;
-> +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
-> +		blk_mq_complete_request(rq);
-> +
-> +	return true;
-> +}
-> +
-> +static void virtblk_cleanup_reqs(struct virtio_blk *vblk)
-> +{
-> +	struct virtio_blk_vq *blk_vq;
-> +	struct request_queue *q;
-> +	struct virtqueue *vq;
-> +	unsigned long flags;
-> +	int i;
-> +
-> +	vq =3D vblk->vqs[0].vq;
-> +	if (!virtqueue_is_broken(vq))
-> +		return;
-> +
-> +	q =3D vblk->disk->queue;
-> +	/* Block upper layer to not get any new requests */
-> +	blk_mq_quiesce_queue(q);
-> +
-> +	for (i =3D 0; i < vblk->num_vqs; i++) {
-> +		blk_vq =3D &vblk->vqs[i];
-> +
-> +		/* Synchronize with any ongoing virtblk_poll() which may be
-> +		 * completing the requests to uppper layer which has already
-> +		 * crossed the broken vq check.
-> +		 */
-> +		spin_lock_irqsave(&blk_vq->lock, flags);
-> +		spin_unlock_irqrestore(&blk_vq->lock, flags);
-> +	}
-> +
-> +	blk_sync_queue(q);
-> +
-> +	/* Complete remaining pending requests with error */
-> +	blk_mq_tagset_busy_iter(&vblk->tag_set, virtblk_cancel_request, vblk);
+On Wed, Feb 21, 2024 at 10:50=E2=80=AFAM Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
 
-Interrupts can still occur here. What prevents the race between
-virtblk_cancel_request() and virtblk_request_done()?
+> > I've sent a patch, can you test?
+> > https://lore.kernel.org/linux-mmc/20240220-fix-sh-mmcif-v1-1-b9d08a787c=
+1f@linaro.org/T/#u
+>
+> While that patch fixes the BUG, it does not make the eMMC work fully.
+> It spews:
+>
+>     sh_mmcif ee200000.mmc: Timeout waiting for 2 on CMD18
+>
+> and no or limited data is read ("hd /dev/mmcblk..." blocks after no
+> or two lines of output).
+>
+> I still need to revert 27b57277d9ba to restore proper operation.
 
-> +	blk_mq_tagset_wait_completed_request(&vblk->tag_set);
-> +
-> +	/*
-> +	 * Unblock any pending dispatch I/Os before we destroy device. From
-> +	 * del_gendisk() -> __blk_mark_disk_dead(disk) will set GD_DEAD flag,
-> +	 * that will make sure any new I/O from bio_queue_enter() to fail.
-> +	 */
-> +	blk_mq_unquiesce_queue(q);
-> +}
-> +
->  static void virtblk_remove(struct virtio_device *vdev)
->  {
->  	struct virtio_blk *vblk =3D vdev->priv;
-> =20
-> +	virtblk_cleanup_reqs(vblk);
-> +
->  	/* Make sure no work handler is accessing the device. */
->  	flush_work(&vblk->config_work);
-> =20
-> --=20
-> 2.34.1
->=20
+Halfway there. I looked at the code again and now I think I found the
+problem causing CMD18 to time out.
 
---+EsB9gUsZRuxclQv
-Content-Type: application/pgp-signature; name="signature.asc"
+I've send a new 2-patch series:
+https://lore.kernel.org/linux-mmc/20240221-fix-sh-mmcif-v2-0-5e521eb25ae4@l=
+inaro.org/
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmXVIg0ACgkQnKSrs4Gr
-c8gbcAgAgsyhOzrXjnJK+mvJY7ajiqTKGi8aBCVwdk4Xcjj7ctqtgP8KmGiz7otl
-hjf5i+SxIyeAJ6/F4n0osHVEZ0ZSpKjge9xvyInFn/dnEc0PNBnQIA8NUcuGPjBG
-EDbK3R5lz8Ew3GViJdNSEbGD1ie1JpYPldJkKOGLECGo3F5HEiRHUdS89IoavyZT
-XPrfkIiHOUVDYJl7Yxp8SdPRzOZ/IUNIvSBISpjYCg84tW8lZPPkccC/ME2WcSxf
-oHnPD+r0L3JplBUDLZ+CLHO2bfDRlEbnfoIIZ5HdxjKxxbWd6mdOhtmibF1S3JkR
-+qbM9oB3ynjledSslS8vMh5DkWXAaw==
-=gNYy
------END PGP SIGNATURE-----
-
---+EsB9gUsZRuxclQv--
-
+Yours,
+Linus Walleij
