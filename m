@@ -1,175 +1,143 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFBF6996E
-	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 12:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B809D7C0AB;
+	Wed, 21 Feb 2024 13:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708520345; cv=none; b=U0UtT5rC19BkhAPg72DenGISqj+KDAiHkuTE7/6KcvrlwslsFQ3zHCFnV2e+AQmCsoG1PbUUC9r3ADpyPb63BVNd0OM3YrQ5vu9uYkX4JNeAIyf1+0JThqWUyY2pJ82kxZ9dsmwcKEzHYnHkeRhUpQKDY25fhWMVcEet2jXWoW8=
+	t=1708522524; cv=none; b=BNo7C9EmxTKXFo7aS8Vh5+QubcZjN0Y93jfmVRG9dXkNXlMrGw7/pvJJY6M5n4yLAI/n8RlEsEnvK6/anMJsuDBVjpkAW50uakE3wPZHUW0GRyk+1x1XO/zS8092OTPqr7xWfc8GVLWmj6JgUaiNWOKGu/d28aqtY1lofcfhqIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708520345; c=relaxed/simple;
-	bh=TOgbjfiIJA/1NIwRbBdfXCloME38qlBTdMipceOEa88=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lEZyAIfNa0BlgvYSheYP8B61OmXyJDevN7PhSj195zEIAouH1fhcW6Nl0XkUV47wOkIwTg/hnPGa2CGoCOAD8/x+vawIRR97s9SKlT6vQka1TvXs/XHY0MNJocUEd7VL3yTzMgJLqHETw29IxN3uXzC6bcl5gsKaXI90345xE38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ry/Nuscq; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1708522524; c=relaxed/simple;
+	bh=Y6OXLAXD6LhLVeja5kzBouDU9W/5eGJ4t7J2Zt9sJZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=F+PEYU2L2GC0/Ghnn670EnVPj3nt+iG1efgYqM8SDKNxYoLYkPzwTNCg1MNPPeJkmLhGnWf3arCKPxWWy5Pxa9y3wjtJt0AGTtjbWOJe2cvIiFOENxtWiKpCFmn7cmgr9GTd9amIv1ynA4xDtChJP3KQG+wIgblcEhPnnm0YE6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OlkM4Xyu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ry/Nuscq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:To:
-	From:Sender:Reply-To:Cc:Content-ID:Content-Description;
-	bh=ClBF4HdQdZoudt8WElKT+rvsm/9JyMAWyPnUsdGhZ5c=; b=ry/NuscqMOGf4bi5P73rmAi3BH
-	HPoTpm+PFte7RXlBzNZupzOIuXurSaaiEbm7qy2KuV5KMgJL3CPZuQMX1HLYQyx/jVc+0q+oXo8fo
-	Nh2XDSwkDhKLq7tbFoWLG3kjAQH9wMcD73ZcKyntH/or0abk3OAITizpF0SN9pdXfOeWQ54zRv5CQ
-	DPgkDcE6AjceQ9WSGqjn65FdYSPyX9yfkdIUQXV0t3IW9gUy9aNDzxLlYjGDsAADdGNpJScdisyXl
-	r/WFMicA2TDsJU1Wmk49a8HpuK1aXbcTK24bvDfDQcI1BmbfauN+fS4N4/BSWPNHMjmO/jDL3yAFv
-	eJI5G3hA==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rcmBi-00000000wH4-0Pli;
-	Wed, 21 Feb 2024 12:59:02 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OlkM4Xyu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A78FC433F1;
+	Wed, 21 Feb 2024 13:35:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1708522523;
+	bh=Y6OXLAXD6LhLVeja5kzBouDU9W/5eGJ4t7J2Zt9sJZY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OlkM4XyuwPjpqGfXB1SEWM5eafDfTQC7D1dC2ZQfNxiDmpJ5f+IXVNDgVvO+YARqF
+	 ExpfP8puQb8E0Er0B71YbQK3Ip3RepeMdRJfreAHxS9eFltTnjO6+lQycORWzoPFqN
+	 7ZJXIcXuNMmE7yRrqa9qhwbyV6budFnn3yuxmgBg=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	kernel test robot <lkp@intel.com>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
 	Jens Axboe <axboe@kernel.dk>,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 4/4] xen-blkfront: atomically update queue limits
-Date: Wed, 21 Feb 2024 13:58:45 +0100
-Message-Id: <20240221125845.3610668-5-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240221125845.3610668-1-hch@lst.de>
-References: <20240221125845.3610668-1-hch@lst.de>
+	linux-block@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>,
+	Guoqing Jiang <guoqing.jiang@linux.dev>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.15 187/476] block/rnbd-srv: Check for unlikely string overflow
+Date: Wed, 21 Feb 2024 14:03:58 +0100
+Message-ID: <20240221130014.800475929@linuxfoundation.org>
+X-Mailer: git-send-email 2.43.2
+In-Reply-To: <20240221130007.738356493@linuxfoundation.org>
+References: <20240221130007.738356493@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Pass the initial queue limits to blk_mq_alloc_disk and use the
-blkif_set_queue_limits API to update the limits on reconnect.
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Roger Pau Monné <roger.pau@citrix.com>
+------------------
+
+From: Kees Cook <keescook@chromium.org>
+
+[ Upstream commit 9e4bf6a08d1e127bcc4bd72557f2dfafc6bc7f41 ]
+
+Since "dev_search_path" can technically be as large as PATH_MAX,
+there was a risk of truncation when copying it and a second string
+into "full_path" since it was also PATH_MAX sized. The W=1 builds were
+reporting this warning:
+
+drivers/block/rnbd/rnbd-srv.c: In function 'process_msg_open.isra':
+drivers/block/rnbd/rnbd-srv.c:616:51: warning: '%s' directive output may be truncated writing up to 254 bytes into a region of size between 0 and 4095 [-Wformat-truncation=]
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                                                   ^~
+In function 'rnbd_srv_get_full_path',
+    inlined from 'process_msg_open.isra' at drivers/block/rnbd/rnbd-srv.c:721:14: drivers/block/rnbd/rnbd-srv.c:616:17: note: 'snprintf' output between 2 and 4351 bytes into a destination of size 4096
+  616 |                 snprintf(full_path, PATH_MAX, "%s/%s",
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  617 |                          dev_search_path, dev_name);
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To fix this, unconditionally check for truncation (as was already done
+for the case where "%SESSNAME%" was present).
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202312100355.lHoJPgKy-lkp@intel.com/
+Cc: Md. Haris Iqbal <haris.iqbal@ionos.com>
+Cc: Jack Wang <jinpu.wang@ionos.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc:  <linux-block@vger.kernel.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+Link: https://lore.kernel.org/r/20231212214738.work.169-kees@kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/xen-blkfront.c | 41 ++++++++++++++++++++----------------
- 1 file changed, 23 insertions(+), 18 deletions(-)
+ drivers/block/rnbd/rnbd-srv.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 7664638a0abbfa..fd7c0ff2139cee 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -941,37 +941,35 @@ static const struct blk_mq_ops blkfront_mq_ops = {
- 	.complete = blkif_complete_rq,
- };
- 
--static void blkif_set_queue_limits(struct blkfront_info *info)
-+static void blkif_set_queue_limits(const struct blkfront_info *info,
-+		struct queue_limits *lim)
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 1896cde8135e..86a6242d9c20 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -606,6 +606,7 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
  {
--	struct request_queue *rq = info->rq;
- 	unsigned int segments = info->max_indirect_segments ? :
- 				BLKIF_MAX_SEGMENTS_PER_REQUEST;
+ 	char *full_path;
+ 	char *a, *b;
++	int len;
  
--	blk_queue_flag_set(QUEUE_FLAG_VIRT, rq);
--
- 	if (info->feature_discard) {
--		blk_queue_max_discard_sectors(rq, UINT_MAX);
-+		lim->max_hw_discard_sectors = UINT_MAX;
- 		if (info->discard_granularity)
--			rq->limits.discard_granularity = info->discard_granularity;
--		rq->limits.discard_alignment = info->discard_alignment;
-+			lim->discard_granularity = info->discard_granularity;
-+		lim->discard_alignment = info->discard_alignment;
- 		if (info->feature_secdiscard)
--			blk_queue_max_secure_erase_sectors(rq, UINT_MAX);
-+			lim->max_secure_erase_sectors = UINT_MAX;
+ 	full_path = kmalloc(PATH_MAX, GFP_KERNEL);
+ 	if (!full_path)
+@@ -617,19 +618,19 @@ static char *rnbd_srv_get_full_path(struct rnbd_srv_session *srv_sess,
+ 	 */
+ 	a = strnstr(dev_search_path, "%SESSNAME%", sizeof(dev_search_path));
+ 	if (a) {
+-		int len = a - dev_search_path;
++		len = a - dev_search_path;
+ 
+ 		len = snprintf(full_path, PATH_MAX, "%.*s/%s/%s", len,
+ 			       dev_search_path, srv_sess->sessname, dev_name);
+-		if (len >= PATH_MAX) {
+-			pr_err("Too long path: %s, %s, %s\n",
+-			       dev_search_path, srv_sess->sessname, dev_name);
+-			kfree(full_path);
+-			return ERR_PTR(-EINVAL);
+-		}
+ 	} else {
+-		snprintf(full_path, PATH_MAX, "%s/%s",
+-			 dev_search_path, dev_name);
++		len = snprintf(full_path, PATH_MAX, "%s/%s",
++			       dev_search_path, dev_name);
++	}
++	if (len >= PATH_MAX) {
++		pr_err("Too long path: %s, %s, %s\n",
++		       dev_search_path, srv_sess->sessname, dev_name);
++		kfree(full_path);
++		return ERR_PTR(-EINVAL);
  	}
  
- 	/* Hard sector size and max sectors impersonate the equiv. hardware. */
--	blk_queue_logical_block_size(rq, info->sector_size);
--	blk_queue_physical_block_size(rq, info->physical_sector_size);
--	blk_queue_max_hw_sectors(rq, (segments * XEN_PAGE_SIZE) / 512);
-+	lim->logical_block_size = info->sector_size;
-+	lim->physical_block_size = info->physical_sector_size;
-+	lim->max_hw_sectors = (segments * XEN_PAGE_SIZE) / 512;
- 
- 	/* Each segment in a request is up to an aligned page in size. */
--	blk_queue_segment_boundary(rq, PAGE_SIZE - 1);
--	blk_queue_max_segment_size(rq, PAGE_SIZE);
-+	lim->seg_boundary_mask = PAGE_SIZE - 1;
-+	lim->max_segment_size = PAGE_SIZE;
- 
- 	/* Ensure a merged request will fit in a single I/O ring slot. */
--	blk_queue_max_segments(rq, segments / GRANTS_PER_PSEG);
-+	lim->max_segments = segments / GRANTS_PER_PSEG;
- 
- 	/* Make sure buffer addresses are sector-aligned. */
--	blk_queue_dma_alignment(rq, 511);
-+	lim->dma_alignment = 511;
- }
- 
- static const char *flush_info(struct blkfront_info *info)
-@@ -1068,6 +1066,7 @@ static int xlvbd_alloc_gendisk(blkif_sector_t capacity,
- 		struct blkfront_info *info, u16 sector_size,
- 		unsigned int physical_sector_size)
- {
-+	struct queue_limits lim = {};
- 	struct gendisk *gd;
- 	int nr_minors = 1;
- 	int err;
-@@ -1134,11 +1133,13 @@ static int xlvbd_alloc_gendisk(blkif_sector_t capacity,
- 	if (err)
- 		goto out_release_minors;
- 
--	gd = blk_mq_alloc_disk(&info->tag_set, NULL, info);
-+	blkif_set_queue_limits(info, &lim);
-+	gd = blk_mq_alloc_disk(&info->tag_set, &lim, info);
- 	if (IS_ERR(gd)) {
- 		err = PTR_ERR(gd);
- 		goto out_free_tag_set;
- 	}
-+	blk_queue_flag_set(QUEUE_FLAG_VIRT, gd->queue);
- 
- 	strcpy(gd->disk_name, DEV_NAME);
- 	ptr = encode_disk_name(gd->disk_name + sizeof(DEV_NAME) - 1, offset);
-@@ -1160,7 +1161,6 @@ static int xlvbd_alloc_gendisk(blkif_sector_t capacity,
- 	info->gd = gd;
- 	info->sector_size = sector_size;
- 	info->physical_sector_size = physical_sector_size;
--	blkif_set_queue_limits(info);
- 
- 	xlvbd_flush(info);
- 
-@@ -2004,14 +2004,19 @@ static int blkfront_probe(struct xenbus_device *dev,
- 
- static int blkif_recover(struct blkfront_info *info)
- {
-+	struct queue_limits lim;
- 	unsigned int r_index;
- 	struct request *req, *n;
- 	int rc;
- 	struct bio *bio;
- 	struct blkfront_ring_info *rinfo;
- 
-+	lim = queue_limits_start_update(info->rq);
- 	blkfront_gather_backend_features(info);
--	blkif_set_queue_limits(info);
-+	blkif_set_queue_limits(info, &lim);
-+	rc = queue_limits_commit_update(info->rq, &lim);
-+	if (rc)
-+		return rc;
- 
- 	for_each_rinfo(info, rinfo, r_index) {
- 		rc = blkfront_setup_indirect(rinfo);
+ 	/* eliminitate duplicated slashes */
 -- 
-2.39.2
+2.43.0
+
+
 
