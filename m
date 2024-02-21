@@ -1,168 +1,100 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EF33D576;
-	Wed, 21 Feb 2024 09:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534513D0C8
+	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 09:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708506445; cv=none; b=O78TAYCRh69oZIy+LQJudGI10j7Fe/rXGtQ9a6oGcaSQlf6Gn2wTppcLXyq0lshY/plvLhVlT795BJg08hBXeSmiZTS97rg5Fa5DYSW9D1IkUzvYKCVQ8H5ZNl0An71HkTKtwlBJb/LTU3k4lPQC5kmapxaQJl08A+L3Wr2G/PQ=
+	t=1708507813; cv=none; b=po7WcMI+12fOS6+mwfvx/uQkVApKCm5PdPKHMojLajEofhkHEjCb/s631Jj9aIXwrRXCiasydCCge0dJSwgMOu+9vcb1qFVbR3F1JUyZH6tuQ4bdlQOg8qGrHlZH+ecAKseZCyRblpA05L1Hh0QyLii08Lq+eJa+Q4HNVFrsiF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708506445; c=relaxed/simple;
-	bh=YYB5LvmnN6Hst4z0XRzNTIaIeLr1z5XlifL/wMlc+bo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QgaFjnS929WYrvAqRIGPUbkTHb/6JmFnl3fiowSgxhGBMxcdhVVnkOTfnk0HWvT7Bn3pOlSONXbbXT3sJJWenmC4zY/Sxziw9IaSJbRiZD00/SWVSX5vu/2j7Gw5pvU/GHNa7hYZGqIoVjZ1Lu3dBdCq1HIuwAQmQ5pY3cJmsYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Tfr4d34rCz4f3jdL;
-	Wed, 21 Feb 2024 17:06:57 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 653541A0568;
-	Wed, 21 Feb 2024 17:07:02 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgDHlxAsvdVlKPi+Eg--.18486S4;
-	Wed, 21 Feb 2024 17:06:54 +0800 (CST)
-From: linan666@huaweicloud.com
-To: axboe@kernel.dk,
-	song@kernel.org,
-	yukuai3@huawei.com
-Cc: linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linan666@huaweicloud.com,
-	yi.zhang@huawei.com,
-	houtao1@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH v2] block: fix deadlock between bd_link_disk_holder and partition scan
-Date: Wed, 21 Feb 2024 17:01:22 +0800
-Message-Id: <20240221090122.1281868-1-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708507813; c=relaxed/simple;
+	bh=nJDvNRnCHO0W6kka+FAavHGHLfb0qEsB5Cywd7hyRYE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nTjvd+W/RfXrHqmSc9wXWVzlqbU0Tsrt1Z44rsObTz+fQZlQgGVgW9kTvvtGLmdb8YWwBOlmRgDaTtAl7gRDxkDjQhcXO8cYKDvjte+nlHVsL0bL3do/EFxUDzARdvTQUs6ytmkM7nVyJzspH5KPJKzWzmv39sI5MIwbEFaKtOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMhK5LfZ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMhK5LfZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE537C433F1;
+	Wed, 21 Feb 2024 09:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708507812;
+	bh=nJDvNRnCHO0W6kka+FAavHGHLfb0qEsB5Cywd7hyRYE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=pMhK5LfZEWKt5b29Lv2PN1zIzxTetEpwbyg4YP/287Doxc7muAIxS1bDC15kdqtsb
+	 Qb5rDFQRTd1A3nOhbZYsaOQZvGpNeMZyLd9wEblZDzPFrn7GmkVJnthqy9Jqt7fWVS
+	 8hSWzQTj/zm/b+drtISAFWN8bqPYKnYgYoePAvqjMyPky5RBlkH2KKzROcKctPtMuO
+	 Jkt5BJPxl+QJcKEN1YbzF2R/VlPToT1ivJdSKPlz+evf8umMUQzvX/7KFf4Fh5EBrf
+	 RXMdiCjo0tqTazSx5bk49zwyWy4TdiYwem0DTNuthc0pu4BCRkrFaaZYGnVT857VlN
+	 p+W7yZyrhcHfA==
+Message-ID: <99bba6e6-1ae3-49d2-842b-680257cedbad@kernel.org>
+Date: Wed, 21 Feb 2024 18:30:10 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDHlxAsvdVlKPi+Eg--.18486S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxZFy8KF45WF43KryfXFyftFb_yoW5uF48pF
-	Z8KFWktry8tF4DuF4Dt3y7ur4UKw18Wa1xJr97KrWS9rZrAr4v9Fy2yFy7uFy8KrWIyFWD
-	tF1UX3yYva10k3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAKI4
-	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
-	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
-	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20E
-	Y4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUBSoJUUUUU=
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v0] nvme/029: reserve hugepages for lager
+ allocations
+Content-Language: en-US
+To: Daniel Wagner <dwagner@suse.de>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Keith Busch <kbusch@kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Yi Zhang <yi.zhang@redhat.com>
+References: <20240220081327.2678-1-dwagner@suse.de>
+ <6xxslyeuaetammpqcsekkmzmuz5vmtscrhczi6inwoj2ne52se@mh2zrp6kxgiv>
+ <eo2iqix7vzrjgjs6bhx44s3rxblxorc4za62rrzaw5hqb5xqlh@uad7uc4lx35z>
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <eo2iqix7vzrjgjs6bhx44s3rxblxorc4za62rrzaw5hqb5xqlh@uad7uc4lx35z>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Li Nan <linan122@huawei.com>
+On 2/21/24 16:37, Daniel Wagner wrote:
+> On Wed, Feb 21, 2024 at 06:22:29AM +0000, Shinichiro Kawasaki wrote:
+>> I found this changes makes the test case fail when the kernel does not have
+>> CONFIG_HUGETLBFS. Without the config, /proc/sys/vm/nr_hugepages does not
+>> exist.
+>>
+>> When CONFIG_HUGETLBFS is not defined, should we skip this test case?
+> 
+> Obviously, we should aim for really solid test cases. Though it is not
+> guaranteed that the test will pass even with CONFIG_HUGETLBS enabled. I
+> suspect we would need to make some more preparation steps that the
+> allocation has a high change to pass. Though I haven't really looked
+> into what the necessary steps would be. The sysfs exposes a few more
+> knobs to play with.
 
-'open_mutex' of gendisk is used to protect open/close block devices. But
-in bd_link_disk_holder(), it is used to protect the creation of symlink
-between holding disk and slave bdev, which introduces some issues.
+"echo 3 > /proc/sys/vm/drop_caches" before mounting hugetlbfs should allow for
+the big pages to fit... Still no guarantees but likely that will lower setup
+failure frequency.
 
-When bd_link_disk_holder() is called, the driver is usually in the process
-of initialization/modification and may suspend submitting io. At this
-time, any io hold 'open_mutex', such as scanning partitions, can cause
-deadlocks. For example, in raid:
+> 
+>> If this is
+>> the case, we can add "_have_kernel_option HUGETLBFS" in requires(). If not, we
+>> should check existence of /proc/sys/vm/nr_hugepages before touching it, like:
+>>
+>>        if [[ -r /proc/sys/vm/nr_hugepages &&
+>>                      "$(cat /proc/sys/vm/nr_hugepages)" -eq 0 ]]; then
+> 
+> Sure, I'll add this and also fix the typos in the commit message.
+> 
+>>
+>> Also I suggest to add in-line comment to help understanding why nr_hugepages
+>> sysfs needs change. Something like,
+>>
+>> # nvme-cli may fail to allocate linear memory for rather large IO buffers.
+>> # Increase nr_hugepages to allow nvme-cli to try the linear memory allocation
+>> # from HugeTLB pool.
+> 
+> Ok.
+> 
 
-T1                              T2
-bdev_open_by_dev
- lock open_mutex [1]
- ...
-  efi_partition
-  ...
-   md_submit_bio
-				md_ioctl mddev_syspend
-				  -> suspend all io
-				 md_add_new_disk
-				  bind_rdev_to_array
-				   bd_link_disk_holder
-				    try lock open_mutex [2]
-    md_handle_request
-     -> wait mddev_resume
-
-T1 scan partition, T2 add a new device to raid. T1 waits for T2 to resume
-mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
-
-Fix it by introducing a local mutex 'blk_holder_mutex' to replace
-'open_mutex'.
-
-Fixes: 1b0a2d950ee2 ("md: use new apis to suspend array for ioctls involed array reconfiguration")
-Reported-by: mgperkow@gmail.com
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218459
-Signed-off-by: Li Nan <linan122@huawei.com>
----
-v2: add a blk_ prefix to 'holder_mutex'.
-
- block/holder.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/block/holder.c b/block/holder.c
-index 37d18c13d958..791091a7eac2 100644
---- a/block/holder.c
-+++ b/block/holder.c
-@@ -8,6 +8,8 @@ struct bd_holder_disk {
- 	int			refcnt;
- };
- 
-+static DEFINE_MUTEX(blk_holder_mutex);
-+
- static struct bd_holder_disk *bd_find_holder_disk(struct block_device *bdev,
- 						  struct gendisk *disk)
- {
-@@ -80,7 +82,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	kobject_get(bdev->bd_holder_dir);
- 	mutex_unlock(&bdev->bd_disk->open_mutex);
- 
--	mutex_lock(&disk->open_mutex);
-+	mutex_lock(&blk_holder_mutex);
- 	WARN_ON_ONCE(!bdev->bd_holder);
- 
- 	holder = bd_find_holder_disk(bdev, disk);
-@@ -108,7 +110,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 		goto out_del_symlink;
- 	list_add(&holder->list, &disk->slave_bdevs);
- 
--	mutex_unlock(&disk->open_mutex);
-+	mutex_unlock(&blk_holder_mutex);
- 	return 0;
- 
- out_del_symlink:
-@@ -116,7 +118,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- out_free_holder:
- 	kfree(holder);
- out_unlock:
--	mutex_unlock(&disk->open_mutex);
-+	mutex_unlock(&blk_holder_mutex);
- 	if (ret)
- 		kobject_put(bdev->bd_holder_dir);
- 	return ret;
-@@ -140,7 +142,7 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	if (WARN_ON_ONCE(!disk->slave_dir))
- 		return;
- 
--	mutex_lock(&disk->open_mutex);
-+	mutex_lock(&blk_holder_mutex);
- 	holder = bd_find_holder_disk(bdev, disk);
- 	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
- 		del_symlink(disk->slave_dir, bdev_kobj(bdev));
-@@ -149,6 +151,6 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 		list_del_init(&holder->list);
- 		kfree(holder);
- 	}
--	mutex_unlock(&disk->open_mutex);
-+	mutex_unlock(&blk_holder_mutex);
- }
- EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
 -- 
-2.39.2
+Damien Le Moal
+Western Digital Research
 
