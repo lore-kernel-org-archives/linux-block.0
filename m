@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E956F69954
-	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 12:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFD96995B
+	for <linux-block@vger.kernel.org>; Wed, 21 Feb 2024 12:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708520339; cv=none; b=NQ6G/uHRFm+5jqapG6miB3x7jOaokU/Mbc3/hlTOI5AINe7gwJ6JGgWWnPmrsMQEU1VkeZGIlSZuEnXVcyaBAwNvrSXsbFomRrWdbjAk/3MthnX2w++M9VxBvwiYGLzVuvZ23MaaOu4ohPQsN6ZvnyTaE8yZkIpzE2I5liJAUMQ=
+	t=1708520342; cv=none; b=RX/5GKGwGdUcMkjOl+6eghiyU8AMsyl/CWQTHyBFz7wCo6zZLN+lPACtiezicW/zj861OwYOJ1tam2Wj1iRLJ2CRavfa07DwOeCvyXfJ06fi0jHyFrTnX8ZX7Xo4NmLHRPBvyKvapHzUYtONHhmm5lYRTw+d78h8WkReysNjMfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708520339; c=relaxed/simple;
-	bh=4XFEk3nVvCghzXJMY0GVsVrHIYMwBXx0hwRR88dczOc=;
+	s=arc-20240116; t=1708520342; c=relaxed/simple;
+	bh=5od+8AwIZ4zR2rY/yfqZmOpexzIBbzNIhrsqln3L/mw=;
 	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kZq+g2ikfgHz5wugQb+WWknYqkayR0ffjCMBa9F9k4JYNACtg++WyA12W0tSHNl9Pp7iY+h2IZl7i9lpuBas1HySc674d23PNeyd34tKmxOh6LqaDIZEx1MNfYw5cYI7NugAYjEp7YVn4Zim55LWSN5/bkAnLkQyxVWjD1fK/dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0UI5+v3R; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version:Content-Type; b=aN77jDKpCgatmZMwd2jdrGpGSWs74jFRLW5ZX3B1WL+sCETqzYx7ZLf9lLKii0Hu7cgFH2leWPYr9iX75/K23f8GjPfh9auru6jlBOXEoGOYJAPqSDafVTiyOPY0d4K4SeDCMo6FLEIH9ARjWPdPbWf/rkNE5fGaMlciLO2CggY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XeCr1flD; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0UI5+v3R"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XeCr1flD"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:To:
 	From:Sender:Reply-To:Cc:Content-ID:Content-Description;
-	bh=AJ2bO5DndZrmPq3Dd1zge+YVJmxcGzOjpW+1dV9o8hU=; b=0UI5+v3RaoEG0RwA7cWThgCcBh
-	esLhJcrhMRUggkzC3n/4WDY0UPLEB3eIPfNGc5SfzVyCRwnouge7req2d+k03fvIdw33zXtgsi5N4
-	SZGC0hXnZr/F5F7mVsOi7dpCqpk+Mq9cOndOQxcfPMFQ4ASMLkvPk1XrXCqxdTVSraaJ9eTxWDEWs
-	EKoQDODwTqxpDQD+A+1HdUu6hSb8QnA+pWAlYPN2+tlhTtdm2dQrPOCI335+Xq60VKFT0y1pGHBZC
-	pJh9NMBWck+arfFAIvRkghaw/C0wKXw5g2H2GBmr5DGLBJexBghbC6ZrNWRZOQYDcbqnNl3e2Qlz2
-	OUPaQu3g==;
+	bh=2bzGn47cjUdgN+x/FL0i0dqH9SVUpthf30bI0lT03/8=; b=XeCr1flD8EXP6yvVh2cqn3wx1r
+	cpqVTcboC5Q7w6b9DjTaqoQQVy2vjQ3SsPPdLq6P1FpHNVzOqrR4WOj9+RIbWgwbJKzs9DjwHhOog
+	dR8jo0Q5bmgAuH/eqJD6sZYXkafMp8LYbF7U8VtO/5NwXtQymU6GqHIouoYxytvNIFpYv7NbtKiH/
+	ScPvL4Yn1BCrYfXn4CYGc2DDSZf8IlB4rASU66L3wde0FZtfA7WCGheu9dnmYxoO6q5v+cAFUJPkJ
+	o5LWzv45IGz7c9Asx7N53BismN8ObaC/zgUuaCaBFQXvIdGE5FzHNdGJCLSNr3ISXDED+Hi0HZoZL
+	jE5LCtYQ==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rcmBb-00000000wEZ-31In;
-	Wed, 21 Feb 2024 12:58:56 +0000
+	id 1rcmBf-00000000wFJ-0P7d;
+	Wed, 21 Feb 2024 12:58:59 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Juergen Gross <jgross@suse.com>,
 	Stefano Stabellini <sstabellini@kernel.org>,
@@ -38,9 +38,9 @@ To: Juergen Gross <jgross@suse.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	xen-devel@lists.xenproject.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 2/4] xen-blkfront: rely on the default discard granularity
-Date: Wed, 21 Feb 2024 13:58:43 +0100
-Message-Id: <20240221125845.3610668-3-hch@lst.de>
+Subject: [PATCH 3/4] xen-blkfront: don't redundantly set max_sements in blkif_recover
+Date: Wed, 21 Feb 2024 13:58:44 +0100
+Message-Id: <20240221125845.3610668-4-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240221125845.3610668-1-hch@lst.de>
 References: <20240221125845.3610668-1-hch@lst.de>
@@ -54,31 +54,46 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-The block layer now sets the discard granularity to the physical
-block size default.  Take advantage of that in xen-blkfront and only
-set the discard granularity if explicitly specified.
+blkif_set_queue_limits already sets the max_sements limits, so don't do
+it a second time.  Also remove a comment about a long fixe bug in
+blk_mq_update_nr_hw_queues.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 ---
- drivers/block/xen-blkfront.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/xen-blkfront.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index f78167cd5a6333..1258f24b285500 100644
+index 1258f24b285500..7664638a0abbfa 100644
 --- a/drivers/block/xen-blkfront.c
 +++ b/drivers/block/xen-blkfront.c
-@@ -951,8 +951,8 @@ static void blkif_set_queue_limits(struct blkfront_info *info)
+@@ -2008,14 +2008,10 @@ static int blkif_recover(struct blkfront_info *info)
+ 	struct request *req, *n;
+ 	int rc;
+ 	struct bio *bio;
+-	unsigned int segs;
+ 	struct blkfront_ring_info *rinfo;
  
- 	if (info->feature_discard) {
- 		blk_queue_max_discard_sectors(rq, UINT_MAX);
--		rq->limits.discard_granularity = info->discard_granularity ?:
--						 info->physical_sector_size;
-+		if (info->discard_granularity)
-+			rq->limits.discard_granularity = info->discard_granularity;
- 		rq->limits.discard_alignment = info->discard_alignment;
- 		if (info->feature_secdiscard)
- 			blk_queue_max_secure_erase_sectors(rq, UINT_MAX);
+ 	blkfront_gather_backend_features(info);
+-	/* Reset limits changed by blk_mq_update_nr_hw_queues(). */
+ 	blkif_set_queue_limits(info);
+-	segs = info->max_indirect_segments ? : BLKIF_MAX_SEGMENTS_PER_REQUEST;
+-	blk_queue_max_segments(info->rq, segs / GRANTS_PER_PSEG);
+ 
+ 	for_each_rinfo(info, rinfo, r_index) {
+ 		rc = blkfront_setup_indirect(rinfo);
+@@ -2035,7 +2031,9 @@ static int blkif_recover(struct blkfront_info *info)
+ 	list_for_each_entry_safe(req, n, &info->requests, queuelist) {
+ 		/* Requeue pending requests (flush or discard) */
+ 		list_del_init(&req->queuelist);
+-		BUG_ON(req->nr_phys_segments > segs);
++		BUG_ON(req->nr_phys_segments >
++		       (info->max_indirect_segments ? :
++			BLKIF_MAX_SEGMENTS_PER_REQUEST));
+ 		blk_mq_requeue_request(req, false);
+ 	}
+ 	blk_mq_start_stopped_hw_queues(info->rq, true);
 -- 
 2.39.2
 
