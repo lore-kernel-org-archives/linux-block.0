@@ -1,163 +1,171 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1D25491E;
-	Thu, 22 Feb 2024 18:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F6B14B814
+	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 19:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708627532; cv=none; b=bQ34cPKPi5Hngche0zPvMEATLDBLJ8V0Q3kcRdXQTsvOpBp55gMHpjOI7x+xmuvcDbnaH0NWxewaXQA8N2xRulgIt7I8aoASssen/X3ofcIsEyW/PmRUKF4aJS5zhi0VmMuYr0gW5g6ibagu1+eklWRywPcbH9ByB2Ad9bWQN/k=
+	t=1708629493; cv=none; b=lEiHDX31DkM/tC8i6IX9xBuo+7X47fScrK78idUcxFTkSHk8vc4mZc6hp5y3FfmeSnyoFqxjdhDFhgbXgw9uuabstopAEjac4tOKNTRRNeJSck2U3VOjYcVIMlrioLh57o4WTK6oqkQn3Jy9sEmsy/AxvW2ZfRuzS5DR56ava8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708627532; c=relaxed/simple;
-	bh=4QzDmPnJPwLAYY0Yqwj6a6KbkfRhgeRzj8uLh37vfXE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NcqSylggApU/BCAf7SNfdv92h0B1aDM1+J0AwgXWauz+IVYa+p4samLzrILuL0QDx1cIsmOHGOqoSREjEAMqCEierdPKUhSRkne2486HSoB1JKM9wh8E8e1rkLvKFjrMXfjDR2iUYYQs+CVVnFrg00dvgLhlDTR1sm8iEI/bCyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MxFhswDv; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1708629493; c=relaxed/simple;
+	bh=GTNLFmm3zSrAiw+/8ruvkmFgBJz9PDfJHEvYMLBWM1I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Aly63KFwN1cj1ZPhrKCC0aDRAxYO1nWpgppc4qOIh+sEKxHaM0caDPZQAWgZCWIpthggwXliu02Uqc3JqmxqdQSN9JAj54PFl6osqS0HC6rFP8mCzbQX5MapQdg7CXaG3AODUeB+o14c70SURAcxhNu34pk2BfbzFvwREs1Autw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=eZdSEXzL; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MxFhswDv"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=yOb/RuraypnITZK8K9KciUvMA2gEcSTBZFoeNPrttlI=; b=MxFhswDvkHyRV7RHnWx9NwBoLF
-	PDrA5t0NaBjPqvKPE5EAs3kqS2oxzymCZmmhkAVMj+U9WosFENX4nPaUyhem9xmIrlHpZ07yKuKtX
-	PPeA7e9q35WOPGZOjHBJAlN9pS8rJtPDNM/8bcZoX8iUhpsYwiqeCREPoSLA4ZTjpg9tFaqnI+Tqf
-	o5IGges+gMK+G+Txdt7QH1nSxamVljMm92X9RUDPrvPt031BrkXle53KCDjiyDT0BZjqfTLtp1z93
-	zp9JiKd6/8pwZV/6ziscsJGh4ZY1nYmTjVsN3ETepLXFG3kdQDSf13JPMW+FusNwB5Pf2HyhFcxMZ
-	ykbZRvWg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rdE4T-00000006BTO-2hLZ;
-	Thu, 22 Feb 2024 18:45:25 +0000
-Date: Thu, 22 Feb 2024 10:45:25 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linuxfoundation.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
-Message-ID: <ZdeWRaGQo1IX18pL@bombadil.infradead.org>
-References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
- <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
- <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
- <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
- <ZYUbB3brQ0K3rP97@casper.infradead.org>
- <ZYUgo0a51nCgjLNZ@infradead.org>
- <9b46c48f-d7c4-4ed3-a644-fba90850eab8@acm.org>
- <ZZxOdWoHrKH4ImL7@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="eZdSEXzL"
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41MIcp8Y020541
+	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 11:18:10 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=FYPP14wOGwImFdVv0bGM8zHLAcXFJe+OiZVFfSMfO9g=;
+ b=eZdSEXzLnHxAws2zoPcBcRPUXRlwaMTyeGTDQUdAG5x7B7+6k/b01YT0Q+A4yG42zh8r
+ P0eYWObIng+sA05iQPmWK/kFLBy3n4hux8Q16z9daMwF7N9UXCJKoNwuMh/S0VpszAvf
+ SR2ESkpEoifLGIllCMzK6ro/2dZyYepsJYBZOgAQyjbY9t3WJ0NXUHhf7qK4bSRxtoxw
+ RfGhQo5Ww7/9guSiQhuT9JKy39E0bIWe8KWWhjKbbrU8dh42dLDmoPlyc5XkjkgtzhLi
+ +ar8PlIWxTCw5dqmGVb9SMepO5u3THH+wlZEcaVWQ6leis1g8qZmaDHRTlKLkPnsbeaO 8A== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3we9519pa8-6
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 11:18:10 -0800
+Received: from twshared24822.14.frc2.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 22 Feb 2024 11:18:08 -0800
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+	id 6B19B256D94B9; Thu, 22 Feb 2024 11:18:04 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>
+CC: <axboe@kernel.org>, <ming.lei@redhat.com>, <nilay@linux.ibm.com>,
+        <chaitanyak@nvidia.com>, Keith Busch <kbusch@kernel.org>,
+        Conrad Meyer
+	<conradmeyer@meta.com>
+Subject: [PATCHv2] blk-lib: check for kill signal
+Date: Thu, 22 Feb 2024 11:18:02 -0800
+Message-ID: <20240222191802.2125909-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZxOdWoHrKH4ImL7@casper.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: 20_Vy-2jwc5cJt8rC896_S7O1bpbFFYn
+X-Proofpoint-ORIG-GUID: 20_Vy-2jwc5cJt8rC896_S7O1bpbFFYn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-22_14,2024-02-22_01,2023-05-22_02
 
-On Mon, Jan 08, 2024 at 07:35:17PM +0000, Matthew Wilcox wrote:
-> On Mon, Jan 08, 2024 at 11:30:10AM -0800, Bart Van Assche wrote:
-> > On 12/21/23 21:37, Christoph Hellwig wrote:
-> > > On Fri, Dec 22, 2023 at 05:13:43AM +0000, Matthew Wilcox wrote:
-> > > > It clearly solves a problem (and the one I think it's solving is the
-> > > > size of the FTL map).  But I can't see why we should stop working on it,
-> > > > just because not all drive manufacturers want to support it.
-> > > 
-> > > I don't think it is drive vendors.  It is is the SSD divisions which
-> > > all pretty much love it (for certain use cases) vs the UFS/eMMC
-> > > divisions which tends to often be fearful and less knowledgeable (to
-> > > say it nicely) no matter what vendor you're talking to.
-> > 
-> > Hi Christoph,
-> > 
-> > If there is a significant number of 4 KiB writes in a workload (e.g.
-> > filesystem metadata writes), and the logical block size is increased from
-> > 4 KiB to 16 KiB, this will increase write amplification no matter how the
-> > SSD storage controller has been designed, isn't it? Is there perhaps
-> > something that I'm misunderstanding?
-> 
-> You're misunderstanding that it's the _drive_ which gets to decide the
-> logical block size. Filesystems literally can't do 4kB writes to these
-> drives; you can't do a write smaller than a block.  If your clients
-> don't think it's a good tradeoff for them, they won't tell Linux that
-> the minimum IO size is 16kB.
+From: Keith Busch <kbusch@kernel.org>
 
-Yes, but its perhaps good to review how flexible this might be or not.
-I can at least mention what I know of for NVMe. Getting a lay of the
-land of this for other storage media would be good.
+Some of these block operations can access the entire device capacity,
+and can take a lot longer than the user expected. The user may change
+their mind about wanting to run that command and attempt to kill the
+process, but we're running uninterruptable, so they have to wait for it
+to finish, which could be hours.
 
-Some of the large capacity NVMe drives have NPWG as 16k, that just means
-the Indirection Unit is 16k, the mapping table, so the drive is hinting
-*we prefer 16k* but you can still do 4k writes, it just means for all
-these drives that a 4k write will be a RMW.
+Check for a fatal signal at each iteration so the user doesn't have to
+wait for their regretted operation to complete.
 
-Users who *want* to help avoid RMWs on these drives and want to increase the
-writes to be at least 16k can enable a 16k or larger block size so to
-align the writes. The experimentation we have done using Daniel Gomez's
-eBPF blkalgn tool [0] reveal (as discussed at last year's Plumbers) that
-there were still some 4k writes, this was in turn determined to be due
-to XFS's buffer cache usage for metadata. Dave recently posted patches to allow
-to use large folios on the xfs buffer cache [1], and Daniel has started making
-further observations on this which he'll be revealing soon.
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Reported-by: Conrad Meyer <conradmeyer@meta.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+Changes from v1:
 
-[0] https://github.com/dagmcr/bcc/tree/blkalgn-dump
-[1] https://lore.kernel.org/all/20240118222216.4131379-1-david@fromorbit.com/
+  Check the kill signal on all the long operations, not just the
+  zero-out fallback.
 
-For large capacity NVMe drives with large atomics (NAUWPF), the
-nvme block driver will allow for the physical block size to be 16k too,
-thus allowing the sector size to be set to 16k when creating the
-filesystem, that would *optionally* allow for users to force the
-filesystem to not allow *any* writes to the device to be 4k. Note
-then that there are two ways to be able to use a sector size of 16k
-for NVMe today then, one is if your drive supported 16 LBA format and
-another is with these two parameters set to 16k. The later allows you
-to stick with 512 byte or 4k LBA format and still use a 16k sector size.
-That allows you to remain backward compatible.
+  Be sure to return -EINTR on the condition.
 
-Jan Kara's patches "block: Add config option to not allow writing to
-mounted devices" [2] should allow us to remove the set_blocksize() call
-in xfs_setsize_buftarg() since XFS does not use the block device cache
-at all, and his pathces ensure once a filesystem is mounted userspace
-won't muck with the block device directly.
+  After the kill signal is observered, instead of submitting and waiting
+  for the current parent bio in the chain, abort it by ending it
+  immediately and do the final bio_put() after every previously submitted
+  chained bio completes.
 
-As for the impact of this for 4k writes, if you create the filesystem
-with a 16 sector size then we're strict, and it means at minimum 16k is
-needed. It is no different than what is done for 4k where the logical
-block size is 512 bytes and we use a 4k sector size as the physical
-block size is 4k. If using buffered IO then we can leverage the page
-cache for modifications. Either way, you should do your WAF homework
-too. Even if you *do* have 4k workloads, underneath the hood you may see
-that as of matter of fact the number of IOs which are 4k are very likely
-small in count. In so far as WAF is concerned, the *IO volume* is what
-matters.  Luca Bert has a great write up on his team's findings when
-evaluating some real world workload's WAF estimates when considering
-IO volume [3].
+ block/blk-lib.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-[2] https://lkml.kernel.org/r/20231101173542.23597-1-jack@suse.cz
-[3] https://www.micron.com/about/blog/2023/october/real-life-workloads-allow-more-efficient-data-granularity-and-enable-very-large-ssd-capacities
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index e59c3069e8351..88f6a4aebe75e 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -35,6 +35,17 @@ static sector_t bio_discard_limit(struct block_device =
+*bdev, sector_t sector)
+ 	return round_down(UINT_MAX, discard_granularity) >> SECTOR_SHIFT;
+ }
+=20
++static void abort_bio_endio(struct bio *bio)
++{
++	bio_put(bio);
++}
++
++static void abort_bio(struct bio *bio)
++{
++	bio->bi_end_io =3D abort_bio_endio;
++	bio_endio(bio);
++}
++
+ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop)
+ {
+@@ -77,6 +88,10 @@ int __blkdev_issue_discard(struct block_device *bdev, =
+sector_t sector,
+ 		 * is disabled.
+ 		 */
+ 		cond_resched();
++		if (fatal_signal_pending(current)) {
++			abort_bio(bio);
++			return -EINTR;
++		}
+ 	}
+=20
+ 	*biop =3D bio;
+@@ -146,6 +161,10 @@ static int __blkdev_issue_write_zeroes(struct block_=
+device *bdev,
+ 			nr_sects =3D 0;
+ 		}
+ 		cond_resched();
++		if (fatal_signal_pending(current)) {
++			abort_bio(bio);
++			return -EINTR;
++		}
+ 	}
+=20
+ 	*biop =3D bio;
+@@ -190,6 +209,10 @@ static int __blkdev_issue_zero_pages(struct block_de=
+vice *bdev,
+ 				break;
+ 		}
+ 		cond_resched();
++		if (fatal_signal_pending(current)) {
++			abort_bio(bio);
++			return -EINTR;
++		}
+ 	}
+=20
+ 	*biop =3D bio;
+@@ -337,6 +360,11 @@ int blkdev_issue_secure_erase(struct block_device *b=
+dev, sector_t sector,
+ 			break;
+ 		}
+ 		cond_resched();
++		if (fatal_signal_pending(current)) {
++			abort_bio(bio);
++			ret =3D -EINTR;
++			bio =3D NULL;
++		}
+ 	}
+ 	blk_finish_plug(&plug);
+=20
+--=20
+2.34.1
 
-We were not aware of public open source tools to do what they did,
-so we worked on a tool that allows just that. You can measure your
-workload WAF using Daniel Gomez's WAF tool for NVMe [4] and decide if
-the tradeoffs are acceptable. It would be good for us to automate
-generic workloads, slap it on kdevops, and compute WAF, for instance.
-
-[4] https://github.com/dagmcr/bcc/tree/nvmeiuwaf
-
-> Some workloads are better with a 4kB block size, no doubt.  Others are
-> better with a 512 byte block size.  That doesn't prevent vendors from
-> offering 4kB LBA size drives.
-
-Indeed, using large block sizes by no not meant for all workloads. But
-it's a good time to also remind folks that larger IOs tend to just be
-good for flash storage in general too. So if your WAF measurements check
-out, using large block sizes is something to evaluate.
-
- Luis
