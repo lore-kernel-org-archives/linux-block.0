@@ -1,163 +1,93 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487591509A7;
-	Thu, 22 Feb 2024 16:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDE4153BD5
+	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 17:09:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618596; cv=none; b=EvY6OdLabufg8VGVoSDpHq7FeCGX9vAYbYXeW3rzCqD5Wozt7xTOJwyQVUTt7GcLBI6Hp51dXTyeKsxI4oAz0lx5QEWukPCTfyCGK0FBgd7B4JTMx0IukD9EJNXjuvBM234kMq9ZANOb/YFzNGSkT7ReS1fqfdfbXIgXJJrUx+M=
+	t=1708621770; cv=none; b=Fw0h9w1xuFtdmz9N6kaUuqk1sFKyk5dc60oX849PVUUL5lDmzsjj2tsHxpVuWu3U2hehQi5z4nsJPtalYNOVkOc+H+CRNIBd3F1gqJ43YMgddmLkiuxNoVv0xjZCbtsVlh7juQ5YX6hqFNvZk1sCxOWFfSX4xjs7hVRR9+S+F8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618596; c=relaxed/simple;
-	bh=lUjzPL2Rn/vckbm9GFQABCjyaKVvEJJPfyMuWnZrp4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h+diUzOTo+kvMGTDfguz88UZQBvB6ZnmQzK4qcfFowo6W33TgiC8/NokWj4bUAGwexD5j1gZZgqxGc15tAHonohzHl5VK6gWHvMWjl6sJwVE7CnfaW2BKJuGAf+mSlk27OX9fFAg2hq0r9xb+wxZl8/jK1Fh88QEt+OckkFu5FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1IPtTC1B; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=s5rnFZTL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1IPtTC1B; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=s5rnFZTL; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1708621770; c=relaxed/simple;
+	bh=celCtcEPOo2fHHqBOz3nSdK/i7RCfiSVSuhe9wgbjnU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=igMojQV/wdPdh2EN0FskfrDY4pgoEF9COpMxwweWBmQCxc+UuKJVg1dYRJDIFrR8clGFc/OObwfcVkpC8wX2Oh3+H4XWWQ59dfkUjLc725taaW/ymvkst3PQu5/Mil9ty/tuSkDrEDEzYlCYB99BMozzW1lxaDWg8S6iVlj31JY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NdnYy3M8; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1IPtTC1B";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="s5rnFZTL";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1IPtTC1B";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="s5rnFZTL"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 4ABE41FB9A;
-	Thu, 22 Feb 2024 16:16:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1708618591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WxAylS37KlSMxqz30UlWrIOlrte9S7xx+OkJa4dyaF4=;
-	b=1IPtTC1BlUpNz+Rkqo4Yxv3I+yStxpqoMioqayy1m4KZWUa/XPFfAtd7oBX0vSUu8MlhIn
-	fBjyF96Y1tc4QXQNkBOSksngMIJX7o+eSxopjZAqMCOp3DYezazk5qWC31vpDVKN45c7fV
-	tMnLvrxcoaK/jfLAWKY1Jp+mk+Yhvyg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1708618591;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WxAylS37KlSMxqz30UlWrIOlrte9S7xx+OkJa4dyaF4=;
-	b=s5rnFZTLttmF3tC9S5WDuuKboJl7/2Sq8PlCDfBYFRpVr1Ts17KrRiwYn3MiCz0ePNSfju
-	xhppSBXF+Ym+LmAg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1708618591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WxAylS37KlSMxqz30UlWrIOlrte9S7xx+OkJa4dyaF4=;
-	b=1IPtTC1BlUpNz+Rkqo4Yxv3I+yStxpqoMioqayy1m4KZWUa/XPFfAtd7oBX0vSUu8MlhIn
-	fBjyF96Y1tc4QXQNkBOSksngMIJX7o+eSxopjZAqMCOp3DYezazk5qWC31vpDVKN45c7fV
-	tMnLvrxcoaK/jfLAWKY1Jp+mk+Yhvyg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1708618591;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WxAylS37KlSMxqz30UlWrIOlrte9S7xx+OkJa4dyaF4=;
-	b=s5rnFZTLttmF3tC9S5WDuuKboJl7/2Sq8PlCDfBYFRpVr1Ts17KrRiwYn3MiCz0ePNSfju
-	xhppSBXF+Ym+LmAg==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 2CAE613A6B;
-	Thu, 22 Feb 2024 16:16:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id FXYpCl9z12XIfAAAn2gu4w
-	(envelope-from <dwagner@suse.de>); Thu, 22 Feb 2024 16:16:31 +0000
-Date: Thu, 22 Feb 2024 17:16:30 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, 
-	"linux-fsdevel@vger.kernel.org >> linux-fsdevel" <linux-fsdevel@vger.kernel.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>, 
-	"josef@toxicpanda.com" <josef@toxicpanda.com>, Amir Goldstein <amir73il@gmail.com>, 
-	Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>, 
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>, "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>, 
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, "jack@suse.com" <jack@suse.com>, Ming Lei <ming.lei@redhat.com>, 
-	Sagi Grimberg <sagi@grimberg.me>, Theodore Ts'o <tytso@mit.edu>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>
-Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
- expansion plan for the storage stack test framework
-Message-ID: <6spltrohwisctoeowctyyneyrqolzyvcd3riozbczj2c2o5pcw@lmtrghutbgwx>
-References: <e5d8cd68-b3f2-4d7b-b323-b13d18199256@nvidia.com>
- <bh5s6a4fhhlje42bzj2t22k3jpmruzkx234ks4ytuhd62tonzj@zn6h5foaqrof>
- <jfydrbb277d7ad2ypu5dottiqh4rtzm5ipf72wcjo34mmpvnl7@mjlqomulsq3q>
- <ZdZBpb4vMMVoLfhs@bombadil.infradead.org>
- <g5c3kwbalxru7gykmzdymrzf43fkriofiqtgdgcswbf4hrg65r@wdduaccaswhe>
- <ZdduKnjJx3tJsQGY@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NdnYy3M8"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1db9cb6dcb5so8209675ad.1
+        for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 09:09:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1708621767; x=1709226567; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VsB2Fa2MB2AKFmE4QgPHpTanl2i0CQHMOV8hh32bbjQ=;
+        b=NdnYy3M8jr4uc0Y5b9SraXjzlZj0RVtt8tIzyyC0Yy4ENKCjXe+dK3jkJQ+mTJQXRr
+         /l28m5GD0/TVVRI8UWHMrA36CNmiJP3LdEIonrDSBbA1QSU2wCJzXiAbr/H7UIVpFRcs
+         vVigSN3zNghgElceMbm8KIUrwMd4+HLE83qQIgqBSqDkyigIiRNkX8okNeBnbNl74EfX
+         e9ONxLKho9qfnxRTI0c9Urndr+pRm543RHsp4zMhB/bGlsPvpEl+feIJgObEaHW1FJFh
+         ZyXXeTJoA335TMPkqKE5ZdMlFWVnUBWTkj0CywKB1aMPapZn99nWdncy0uvKpfKWbhRt
+         xcSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708621767; x=1709226567;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VsB2Fa2MB2AKFmE4QgPHpTanl2i0CQHMOV8hh32bbjQ=;
+        b=EOGJMuhIetn9HHXQZtrpM5hw/jLsW8B0+1vznA0QFpxXmM2b1jHNcDjwS5o53F7ZUR
+         nBhTNNu8mHLZP70SICSuCT08W8j8PgBLQYlWXsQxkG9cmWzhQ9CvwMgqP2dTbE8lKK6p
+         lZvqcIccoxhUi5gsYecBi49vpgsNXkYre3F3ZWLjDxXxNzSgjlMETGYcpbHmCL4JhH9z
+         ZMo4FIdQA7nyI/Gty7qcwqo/wCxj7TYQKS83hvXnhSaAjX9cU3GpVCUNML0uCL10+LzZ
+         AXj+2TZr8RIyZPTLPdFSiOOLocEe6E5fGbdNYA2EKgDHvCXN1/i4CU/OH7sWkU7pVMC/
+         c9Ng==
+X-Gm-Message-State: AOJu0Yy4+S4nwXg9q0vMj//jNma5ac/bmeOmzwR2Ecdbje8XS1nAGNoe
+	94x14B+qkOfk2Jzx7OuMasKGtT2mH71R2eqcDeTJD/g2otEXwX7QYeP7ew6XKFM=
+X-Google-Smtp-Source: AGHT+IEQORPQqdSdKH5gSaxLmE90VNhie4CuVf5II+5mIvejOfv3ilBZL0Bs6AFZ+F2bWnN20Uf/qg==
+X-Received: by 2002:a17:902:f689:b0:1db:c3b8:4620 with SMTP id l9-20020a170902f68900b001dbc3b84620mr3184232plg.5.1708621766846;
+        Thu, 22 Feb 2024 09:09:26 -0800 (PST)
+Received: from [127.0.0.1] (071-095-160-189.biz.spectrum.com. [71.95.160.189])
+        by smtp.gmail.com with ESMTPSA id w19-20020a170902c79300b001db839b9e80sm10253745pla.286.2024.02.22.09.09.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 09:09:26 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20240222073647.3776769-1-hch@lst.de>
+References: <20240222073647.3776769-1-hch@lst.de>
+Subject: Re: pass queue limits to alloc_disk for pktcdvd
+Message-Id: <170862176605.8813.6292201088013363148.b4-ty@kernel.dk>
+Date: Thu, 22 Feb 2024 10:09:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZdduKnjJx3tJsQGY@bombadil.infradead.org>
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spamd-Result: default: False [0.40 / 50.00];
-	 ARC_NA(0.00)[];
-	 TO_DN_EQ_ADDR_SOME(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 RCPT_COUNT_TWELVE(0.00)[24];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 FREEMAIL_CC(0.00)[nvidia.com,lists.linux-foundation.org,vger.kernel.org,lists.infradead.org,kernel.dk,acm.org,toxicpanda.com,gmail.com,javigon.com,intel.com,lst.de,kernel.org,suse.de,opensource.wdc.com,wdc.com,suse.com,redhat.com,grimberg.me,mit.edu,iogearbox.net];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[27.99%]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: 0.40
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Thu, Feb 22, 2024 at 07:54:18AM -0800, Luis Chamberlain wrote:
-> > I should have been more precise here, I was trying to say supporting
-> > real fabrics targets. blktests already has some logic for PCI targets
-> > with $TEST_DEV but I haven't really looked into this part yet.
+
+On Thu, 22 Feb 2024 08:36:45 +0100, Christoph Hellwig wrote:
+> this series has the queue limits conversion for pktcdvd.
 > 
-> Do fabric targets have a symlink which remains static?
+> Diffstat:
+>  pktcdvd.c |   25 +++++++++----------------
+>  1 file changed, 9 insertions(+), 16 deletions(-)
+> 
 
-A pretty typical nvme fabric test is:
+Applied, thanks!
 
-setup phase target side:
- - create backing device (file/block)
- - create loopback device
- - create nvme subsystem
+[1/2] pktcdvd: stop setting q->queuedata
+      commit: 6f420d6a2dd8d4a795eab2839b0e08663269f9f8
+[2/2] pktcdvd: set queue limits at disk allocation time
+      commit: 4068550870360410261638479ffaf8364c366dd8
 
-setup phase host side:
- - discover
- - connect to the target
+Best regards,
+-- 
+Jens Axboe
 
-test phase
- do something like reading/writing from '/dev/nvmeX'
- or 'nvme id-ctrl /dev/nvmeX', etc.
 
-cleanup phase host side:
- - disconnect from the target
 
-cleanup phase target side:
- - remove nvme subsystem
- - remove loopback device
- - remove backing device
-
-I'd like to make the setup and cleanup target side more flexible. The
-host side will not be affected at all by exchanging the current soft
-target side (aka nvmet) with something else. This means it's not about
-any device links in /dev.
-
-Hope this makes it a bit clearer.
