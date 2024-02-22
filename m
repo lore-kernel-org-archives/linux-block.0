@@ -1,28 +1,28 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4F8133284;
-	Thu, 22 Feb 2024 12:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E0412E1EC;
+	Thu, 22 Feb 2024 12:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708606304; cv=none; b=rvMSADZRkEZ0cY5uD0fohoh9eY8Z9ZvU0ZCuTdQlAW5XRfHHLEMJoBYlEL08GFJ1Wy63ovHBGKR6Jx95RHB9kXuH2argJxsa57uyKnIaSH6KDytvroT4RDCv8EifTFOOwfylvKvsP9D9MXAHlehUQ6BUhCUxh79myyZ/aXO590U=
+	t=1708606304; cv=none; b=ciERzSsB17DCmBC8fR1jekqsdrZxAorqoIsMbhbliu/QfwUFYxWPiFK38+tys3FdWDSxIciDoJ8Gx25Ylv+6HX3kXd6vLCDhAvcULAgpGQUisb7gCCoYnFKpZGAzzxmYp3bqfPJtKzO9cvkXov78PDekSHpyg5skLlVNGnB28XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708606304; c=relaxed/simple;
-	bh=xjyl/1cavLEq+V5ZCncirBLNYpaJ8kI5IdQABm/iF74=;
+	bh=T/li1KZ7mAB1qklkOdDWB5/infXOvg8r1jChHCyBWI0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V8IJBuBDwjOvAJIV4o1dLT23Dn9s1LfAracqGMku/9Z1C+TkJ8v+n2CjoGPu4EkNTaiqsi5pxErRW9sCKKfIumKWkz9cwlTjnSM6WASNd449iFCMkhADR2+QplU+/9OgG3X2ZCNZLaGL8pyS0fryampTjQsi3PaCloyFxgTEymo=
+	 MIME-Version; b=St9m5hjjUUKX+Spl6Bf400Mv908Czt+cMzy4VvErrh8K2Qj6qBZtsBuB9RrBkbvF//TAs7A8C0HXzDgXT0/X9CPCEXvCmTeSiR7Co3uBDo3QE9I4HNxufqD6A2djNqUOIoohjyvBogl/SjqpWGaeH0wF4eygs05ZgMuMfqvhCXM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TgY1N2V9Nz4f3kkS;
-	Thu, 22 Feb 2024 20:51:36 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TgY1C3wgHz4f3m7D;
+	Thu, 22 Feb 2024 20:51:27 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 8C1911A016E;
-	Thu, 22 Feb 2024 20:51:39 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id AFD981A016E;
+	Thu, 22 Feb 2024 20:51:34 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgBHGBFSQ9dlQ382Ew--.47909S20;
-	Thu, 22 Feb 2024 20:51:39 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgBHGBFSQ9dlQ382Ew--.47909S9;
+	Thu, 22 Feb 2024 20:51:34 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: jack@suse.cz,
 	hch@lst.de,
@@ -34,9 +34,9 @@ Cc: linux-fsdevel@vger.kernel.org,
 	yukuai1@huaweicloud.com,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com
-Subject: [RFC v4 linux-next 16/19] block2mtd: prevent direct access of bd_inode
-Date: Thu, 22 Feb 2024 20:45:52 +0800
-Message-Id: <20240222124555.2049140-17-yukuai1@huaweicloud.com>
+Subject: [RFC v4 linux-next 05/19] bcachefs: remove dead function bdev_sectors()
+Date: Thu, 22 Feb 2024 20:45:41 +0800
+Message-Id: <20240222124555.2049140-6-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
 References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
@@ -47,67 +47,51 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHGBFSQ9dlQ382Ew--.47909S20
-X-Coremail-Antispam: 1UD129KBjvJXoW7ur15Ww1DJFW8Wr4rCFW3KFg_yoW8GF1fpa
-	sxuFW5A34jkr17Way8X3WDXFyFq3Wqva1xuryUA34fKr93XrW2ka98tas8J34FqFZrCrW5
-	ZF1DKrW8Cr4kurJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr
-	0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQ
-	SdkUUUUU=
+X-CM-TRANSID:cCh0CgBHGBFSQ9dlQ382Ew--.47909S9
+X-Coremail-Antispam: 1UD129KBjvdXoWrZFyrKrWkuF1fAw4fZrWUurg_yoW3Wrc_KF
+	n29F1UWw4xXFnY9asIqr1vvr4jv34DXrW2gFs0v3WUJ3WDArZ5XFZ5KrZ8Xrs7W3ykuFy7
+	X34xJrZF9ryFkjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbDAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2
+	IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28E
+	F7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr
+	1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1l
+	e2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI
+	8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwAC
+	jcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0x
+	kIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQSdkU
+	UUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Now that block2mtd stash the file of opened bdev, it's ok to get inode
-from the file.
+bdev_sectors() is not used hence remove it.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- drivers/mtd/devices/block2mtd.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ fs/bcachefs/util.h | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/mtd/devices/block2mtd.c b/drivers/mtd/devices/block2mtd.c
-index 97a00ec9a4d4..e9ecb3286dcb 100644
---- a/drivers/mtd/devices/block2mtd.c
-+++ b/drivers/mtd/devices/block2mtd.c
-@@ -265,6 +265,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 	struct file *bdev_file;
- 	struct block_device *bdev;
- 	struct block2mtd_dev *dev;
-+	loff_t size;
- 	char *name;
+diff --git a/fs/bcachefs/util.h b/fs/bcachefs/util.h
+index 1b3aced8d83c..e2d7f22df618 100644
+--- a/fs/bcachefs/util.h
++++ b/fs/bcachefs/util.h
+@@ -443,11 +443,6 @@ static inline unsigned fract_exp_two(unsigned x, unsigned fract_bits)
+ void bch2_bio_map(struct bio *bio, void *base, size_t);
+ int bch2_bio_alloc_pages(struct bio *, size_t, gfp_t);
  
- 	if (!devname)
-@@ -291,7 +292,8 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 		goto err_free_block2mtd;
- 	}
- 
--	if ((long)bdev->bd_inode->i_size % erase_size) {
-+	size = i_size_read(file_inode(bdev_file));
-+	if ((long)size % erase_size) {
- 		pr_err("erasesize must be a divisor of device size\n");
- 		goto err_free_block2mtd;
- 	}
-@@ -309,7 +311,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 
- 	dev->mtd.name = name;
- 
--	dev->mtd.size = bdev->bd_inode->i_size & PAGE_MASK;
-+	dev->mtd.size = size & PAGE_MASK;
- 	dev->mtd.erasesize = erase_size;
- 	dev->mtd.writesize = 1;
- 	dev->mtd.writebufsize = PAGE_SIZE;
+-static inline sector_t bdev_sectors(struct block_device *bdev)
+-{
+-	return bdev->bd_inode->i_size >> 9;
+-}
+-
+ #define closure_bio_submit(bio, cl)					\
+ do {									\
+ 	closure_get(cl);						\
 -- 
 2.39.2
 
