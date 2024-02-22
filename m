@@ -1,235 +1,174 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C8210A05
-	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 21:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B5E12D1F8;
+	Thu, 22 Feb 2024 21:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708635734; cv=none; b=WeRIvyW+8e8nWI5tVYMTvFaei8wj7QEFUMxrxuRPUifGSY9wWN9u2uoKBdXH8XSgUDZzAAefbkk637pZFselqPoe5TrllMn/vEIaXOLVGP1Qbh7YaAblvka0vujDF0JkHk9WoEk6hPPf1/3N2x7sRCXTkhChcYq211wbHXvpNCg=
+	t=1708639192; cv=none; b=h9oTd42lchuQTk40J9jxULSEXXqMWBV7Yn6fGFTkMyA+WyLzKwOBkaE4qS/dvskpzEjp1SxRfyVhnn8Le2NsvqCweDp6FebyGcMJyDw5IL2mY7x3zAXi/qkzTFGchtVqoju4VIkbuXN/NLwwpCMzzEdnIdgH0+bVBP/jAfdOaaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708635734; c=relaxed/simple;
-	bh=ZwmrNSK/T1GHYFznxRefHq86thJpwxeMPqHhYLRVJJE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:Mime-Version; b=qUBB635CIA6t30bPEqW3THQqGfcKVsal8lE4Tnr3UaslHbFQiB0X+WEDBV3+HAxIiM8MdkwRKKxeIP605R/oLLPV7J4O859u2XbEOGneO2LhAcw7+7LpaHDSUlk0bcuYZfmQi1582Y/rApQybZS97dYIbQsuKpJ4PJaPRusJSz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DDCTiXDJ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1708639192; c=relaxed/simple;
+	bh=1x+Bqaxaykfznlyo9yGS74P6CmhQYmfn9H/hXcPVVOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=MJxwY2zKqBU66HmTuwn/5/yj/jB0dHfHb6Cezu1lZWs1Cz6USON0704bnjmpcuVfkVF88YdIqO0ETSFw6auBX3JJ1oIR5v94cYiNoTC+OOQ5Ju4mGT5zw7mK37en5mpNwpWm/x/tD44vTgVzccxBaV0e+4gkR3yEJt3zJwumq00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Fm/twIxk; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DDCTiXDJ"
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41MKpRXP031444;
-	Thu, 22 Feb 2024 21:00:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=iHmgRUT9SX+zZV5/hhMnuKRLOmXEIyuIC4dh2jZnQF0=;
- b=DDCTiXDJdjokUhXZNQt5vpF9Gf7uwiI8+5bmVNBnGHjWkKMpopfNw4HslrueKXiny4gG
- xZbDUEDPAsajTSwAkifkevcW2zD1JQXm5td8wfbnfXrmIv6dIC1nRXCECIAjfw6Cw8nu
- ve9q2slU39TKW6NHn4lo1XMi8KyfnErYoUTZyH5SaYp2b1aCL6pk+v6FtJOZWWnJBG6d
- NPHZ0Hfgmk7ochLWjOGNfca0uYEYaeso8FC2symwWuCDtZIQFX+YF1g7OLE7rAvxzDqZ
- b8LwENNgioAaNKFQjjzjEcuXBvYN6e0Vhd9n1f5pC+eG8LWLL4kuaOrvTc4qYXOk3FJp Qw== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wedcx8k56-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Feb 2024 21:00:20 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41MKB72o017265;
-	Thu, 22 Feb 2024 21:00:15 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wb8mmrrjp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Feb 2024 21:00:15 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41ML0BQE29622738
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 Feb 2024 21:00:13 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A44BF5809B;
-	Thu, 22 Feb 2024 21:00:09 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 374C458065;
-	Thu, 22 Feb 2024 21:00:09 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.61.141.127])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 22 Feb 2024 21:00:09 +0000 (GMT)
-Message-ID: <14c739bedccbf5a4cf21cf3fec724bc17fa265b6.camel@linux.ibm.com>
-Subject: Re: [PATCH RESEND] nvme-pci: Fix EEH failure on ppc after subsystem
- reset
-From: Greg Joyce <gjoyce@linux.ibm.com>
-Reply-To: gjoyce@linux.ibm.com
-To: Nilay Shroff <nilay@linux.ibm.com>, kbusch@kernel.org, axboe@fb.com,
-        hch@lst.de, sagi@grimberg.me, hare@suse.de, dwagner@suse.de,
-        Wendy Xiong
-	 <wenxiong@linux.ibm.com>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Date: Thu, 22 Feb 2024 15:00:08 -0600
-In-Reply-To: <20240209050342.406184-1-nilay@linux.ibm.com>
-References: <20240209050342.406184-1-nilay@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Fm/twIxk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=Kh7etTWBnizty3utnv9wERJ2i8f07gzHlZck1w7FtLY=; b=Fm/twIxknGlVLiYGrsTX9mply2
+	bOCDrzxN3mCOQcXH5BKNfXYoVHa7asG+SrtTyt7iQSdj3EsgCKZpESJU++kblnDLcmM09bJFqHWRZ
+	niA1lGhaYpfGXgS8dRs0dqYU22BNfUlMMIalU/DsO/CHj4AF4KpfwgWiOjG8AvL6KTHGiliNo6dQ6
+	qxH6zbu2yATzyADzz+OcT+gbWzqGxVe8bTxira//UABuUSOli6afgy+tDGHcqJ3VkNBfRLLv9Idfk
+	VHOYDWakREF1/Ksq5Pk6t/DoIR7ABxToKtMGy+NNkqjI2gHhMUCNxdwPD4s3r7bqH4DUTSJOTueBq
+	wZf4rZgg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rdH6K-00000006l65-1NGG;
+	Thu, 22 Feb 2024 21:59:33 +0000
+Date: Thu, 22 Feb 2024 13:59:32 -0800
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: lsf-pc@lists.linux-foundation.org, John Garry <john.g.garry@oracle.com>,
+	Tso Ted <tytso@mit.edu>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	"kbus >> Keith Busch" <kbusch@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Dave Chinner <david@fromorbit.com>, hch@lst.de, mcgrof@kernel.org
+Cc: djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	jack@suse.cz, chandan.babu@oracle.com, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, jbongio@google.com,
+	ojaswin@linux.ibm.com
+Subject: [LSF/MM/BPF TOPIC] no tears atomics & LBS
+Message-ID: <ZdfDxN26VOFaT_Tv@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rkaLANrPWZs_7kUFTmK9QCt-7wfu_52Z
-X-Proofpoint-ORIG-GUID: rkaLANrPWZs_7kUFTmK9QCt-7wfu_52Z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-22_15,2024-02-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 mlxscore=0 spamscore=0
- suspectscore=0 bulkscore=0 impostorscore=0 clxscore=1011 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402220164
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-On Fri, 2024-02-09 at 10:32 +0530, Nilay Shroff wrote:
-> If the nvme subsyetm reset causes the loss of communication to the
-> nvme
-> adapter then EEH could potnetially recover the adapter. The detection
-> of
-> comminication loss to the adapter only happens when the nvme driver
-> attempts to read an MMIO register.
-> 
-> The nvme subsystem reset command writes 0x4E564D65 to NSSR register
-> and
-> schedule adapter reset.In the case nvme subsystem reset caused the
-> loss
-> of communication to the nvme adapter then either IO timeout event or
-> adapter reset handler could detect it. If IO timeout even could
-> detect
-> loss of communication then EEH handler is able to recover the
-> communication to the adapter. This change was implemented in
-> 651438bb0af5
-> (nvme-pci: Fix EEH failure on ppc). However if the adapter
-> communication
-> loss is detected in nvme reset work handler then EEH is unable to
-> successfully finish the adapter recovery.
-> 
-> This patch ensures that,
-> - nvme driver reset handler would observer pci channel was offline
-> after
->   a failed MMIO read and avoids marking the controller state to DEAD
-> and
->   thus gives a fair chance to EEH handler to recover the nvme
-> adapter.
-> 
-> - if nvme controller is already in RESETTNG state and pci channel
-> frozen
->   error is detected then  nvme driver pci-error-handler code sends
-> the
->   correct error code (PCI_ERS_RESULT_NEED_RESET) back to the EEH
-> handler
->   so that EEH handler could proceed with the pci slot reset.
-> 
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+At last year's LSFMM we learned through Ted Ts'o about the interest by
+cloud providers in large atomics [0]. It is a good example where cloud
+providers innovated in an area perhaps before storage vendors were
+providing hardware support for such features. An example use case was
+databases. In short, with large atomics databases can disable their own version
+of journaling so to increase TPS. Large atomics lets you  disabling things like
+MySQL innodb_doublewrite. The feature to allow you to disable this and use
+large atomcis is known as torn write prevention [1]. At least for MySQL the
+default page size for the database (used for columns) is 16k, and so enabling
+for example a 16k atomic can allow you to take advantage of this. It was also
+mentioned how PostgreSQL only supports buffered-IO and so it would be desirable
+for a solution to support buffered-IO with large atomics as well. The way
+cloud providers enable torn write protection, is by using direct IO.
 
-Note that while in this case the issue was discovered via the Power EEH
-handler, this is not a Power specific issue. The problem and fix is
-applicable to all architectures.
- 
+John Garry has been working on adding an API for atomic writes, it would
+seem some folks refer to this as the no-tears atomic API. It consists of
+two parts, one for the block layer [2] and another set of changes for
+XFS [3]. It enables Direct IO support with large atomics.  It includes
+a userspace API which lets you peg a FS_XFLAG_ATOMICWRITES flag onto a
+file, and you then create an XFS filesystem using the XFS realtime
+subvolume with with an extent alignment. The current users of this API
+seems to be SCSI, but obviously this can grow to support others. A neat
+feature of this effort is you can have two separate directories with
+separate aligment requirements. There is no generic filesystem solution
+yet.
 
-> 
-> [  131.415601] EEH: Recovering PHB#40-PE#10000
-> [  131.415619] EEH: PE location: N/A, PHB location: N/A
-> [  131.415623] EEH: Frozen PHB#40-PE#10000 detected
-> [  131.415627] EEH: Call Trace:
-> [  131.415629] EEH: [c000000000051078]
-> __eeh_send_failure_event+0x7c/0x15c
-> [  131.415782] EEH: [c000000000049bdc]
-> eeh_dev_check_failure.part.0+0x27c/0x6b0
-> [  131.415789] EEH: [c000000000cb665c] nvme_pci_reg_read32+0x78/0x9c
-> [  131.415802] EEH: [c000000000ca07f8] nvme_wait_ready+0xa8/0x18c
-> [  131.415814] EEH: [c000000000cb7070] nvme_dev_disable+0x368/0x40c
-> [  131.415823] EEH: [c000000000cb9970] nvme_reset_work+0x198/0x348
-> [  131.415830] EEH: [c00000000017b76c] process_one_work+0x1f0/0x4f4
-> [  131.415841] EEH: [c00000000017be2c] worker_thread+0x3bc/0x590
-> [  131.415846] EEH: [c00000000018a46c] kthread+0x138/0x140
-> [  131.415854] EEH: [c00000000000dd58] start_kernel_thread+0x14/0x18
-> [  131.415864] EEH: This PCI device has failed 1 times in the last
-> hour and will be permanently disabled after 5 failures.
-> [  131.415874] EEH: Notify device drivers to shutdown
-> [  131.415882] EEH: Beginning: 'error_detected(IO frozen)'
-> [  131.415888] PCI 0040:01:00.0#10000: EEH: Invoking nvme-
-> >error_detected(IO frozen)
-> [  131.415891] nvme nvme1: frozen state error detected, reset
-> controller
-> [  131.515358] nvme 0040:01:00.0: enabling device (0000 -> 0002)
-> [  131.515778] nvme nvme1: Disabling device after reset failure: -19
-> [  131.555336] PCI 0040:01:00.0#10000: EEH: nvme driver reports:
-> 'disconnect'
-> [  131.555343] EEH: Finished:'error_detected(IO frozen)' with
-> aggregate recovery state:'disconnect'
-> [  131.555371] EEH: Unable to recover from failure from PHB#40-
-> PE#10000.
-> [  131.555371] Please try reseating or replacing it
-> [  131.556296] EEH: of node=0040:01:00.0
-> [  131.556351] EEH: PCI device/vendor: 00251e0f
-> [  131.556421] EEH: PCI cmd/status register: 00100142
-> [  131.556428] EEH: PCI-E capabilities and status follow:
-> [  131.556678] EEH: PCI-E 00: 0002b010 10008fe3 00002910 00436044
-> [  131.556859] EEH: PCI-E 10: 10440000 00000000 00000000 00000000
-> [  131.556869] EEH: PCI-E 20: 00000000
-> [  131.556875] EEH: PCI-E AER capability register set follows:
-> [  131.557115] EEH: PCI-E AER 00: 14820001 00000000 00400000 00462030
-> [  131.557294] EEH: PCI-E AER 10: 00000000 0000e000 000002a0 00000000
-> [  131.557469] EEH: PCI-E AER 20: 00000000 00000000 00000000 00000000
-> [  131.557523] EEH: PCI-E AER 30: 00000000 00000000
-> [  131.558807] EEH: Beginning: 'error_detected(permanent failure)'
-> [  131.558815] PCI 0040:01:00.0#10000: EEH: Invoking nvme-
-> >error_detected(permanent failure)
-> [  131.558818] nvme nvme1: failure state error detected, request
-> disconnect
-> [  131.558839] PCI 0040:01:00.0#10000: EEH: nvme driver reports:
-> 'disconnect'
-> ---
->  drivers/nvme/host/pci.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index c1d6357ec98a..a6ba46e727ba 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -2776,6 +2776,14 @@ static void nvme_reset_work(struct work_struct
-> *work)
->   out_unlock:
->  	mutex_unlock(&dev->shutdown_lock);
->   out:
-> +	/*
-> +	 * If PCI recovery is ongoing then let it finish first
-> +	 */
-> +	if (pci_channel_offline(to_pci_dev(dev->dev))) {
-> +		dev_warn(dev->ctrl.device, "PCI recovery is ongoing so
-> let it finish\n");
-> +		return;
-> +	}
-> +
->  	/*
->  	 * Set state to deleting now to avoid blocking
-> nvme_wait_reset(), which
->  	 * may be holding this pci_dev's device lock.
-> @@ -3295,9 +3303,11 @@ static pci_ers_result_t
-> nvme_error_detected(struct pci_dev *pdev,
->  	case pci_channel_io_frozen:
->  		dev_warn(dev->ctrl.device,
->  			"frozen state error detected, reset
-> controller\n");
-> -		if (!nvme_change_ctrl_state(&dev->ctrl,
-> NVME_CTRL_RESETTING)) {
-> -			nvme_dev_disable(dev, true);
-> -			return PCI_ERS_RESULT_DISCONNECT;
-> +		if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING)
-> {
-> +			if (!nvme_change_ctrl_state(&dev->ctrl,
-> NVME_CTRL_RESETTING)) {
-> +				nvme_dev_disable(dev, true);
-> +				return PCI_ERS_RESULT_DISCONNECT;
-> +			}
->  		}
->  		nvme_dev_disable(dev, false);
->  		return PCI_ERS_RESULT_NEED_RESET;
+Meanwhile we're now at a v2 RFC for LBS support [4]. Although the LBS
+effort originally was a completely orthogonal effort to large atomics, it
+would seem there is a direct relationship here now worth discussing.
+In short LBS enables buffered-IO large atomic support if the hardware
+support its. We get both alignment constraints gauranteed and now ensure
+we use contigous memory for the IOs for DMA too it is built on using large
+folios. We expect NVMe drives which support support large atomics can
+easily profit from this without any userspace modification other than
+when you create the filesystem.
 
+We reviewed the possible intersection of both efforts at our last LBS cabal
+with LBS interested folks and Martin Peterson and John Garry. It is somewhat
+unclear exactly how to follow up on some aspects of the no-tear API [5]
+but there was agreement about the possible intersection of both efforts,
+and that we should discuss this at LSFMM. The goal would be to try to reach
+consensus on how no-tear API and how LBS could help with those
+interested in leveraging large atomics.
 
+Some things to evaluate or for us to discuss:
+
+ * no-tear API:
+   - allows directories to have separate alignment requirements
+     - this might be useful for folks who want to use large IOs with
+       large atomics for some workloads but smaller IOs for another
+       directory on the same drive. It this a viable option to some
+       users for large atomics with concerns of being forced to use
+       only large writes with LBS?
+   - statx is modified so to display new alignment considerations
+   - atomics are power of 2
+   - there seems to be some interest in supporting no-hardware-accel atomic
+     solution, so a software implemented atomic solution, could someone
+     clarify if that's accurate? How is the double write avoided? What are
+     the use cases? Do databases use that today?
+   - How do we generalize a solution per file? Would extending a min
+     order per file be desirable? Is that even tenable?
+
+  * LBS:
+    - stat will return the block size set, so userspace applications
+      using stat / statx will use the larger block size to ensure
+      alignment
+    - a drive with support for a large atomic but supporting smaller
+      logical block sizes will still allow writes to the logical block
+      size. If a block driver has a "preference" (in NVMe this would
+      be the NPWG for the IU) to write above the logical block size,
+      do we want the option to lift the logical block size? In
+      retrospect I don't think this is needed given Jan Kara's patches
+      to prevent allowing writes to to mounted devices [4], that should
+      ensure that if a filesystem takes advantage of a larger physical
+      block size and creates a filesystem with it as the sector size,
+      userspace won't be mucking around with lower IOs to the drive
+      while it is mounted. But, are there any applications which would
+      get the block device logical block size instead for DIO?
+    - LBS is transparent to to userspace applications
+    - We've verified *most* IOs are aligned if you use a 16k block size
+      but a smaller sector size, the lower IOs were verified to come
+      from the XFS buffer cache. If your drive supports a large atomic
+      you can avoid these as you can lift the sector size set as the
+      physical block size will be larger than the logical block size.
+      For NVMe today this is possible for drives with a large
+      NPWG (the IU) and NAWUFP (the large atomic), for example.
+
+Tooling:
+
+  - Both efforts stand to gain from a shared verification set of tools
+    for alignment and atomic use
+  - We have a block layer eBPF alignent tool written by Daniel Gomez [6]
+    however there is lack of interested parties to help review a simpler
+    version of this tool this tool so we merge it [7], we can benefit from more
+    eyeablls from experienced eBPF / block layer folks.
+  - More advanced tools are typically not encouraged, and this leaves us
+    wondering what a better home would be other than side forks
+  - Other than preventing torn writes, do users of the no-tear API care
+    about WAF? While we have one for NVMe for WAF [8] would
+    collaborating on a generic tool be of interest ?
+
+Any other things folks want to get out of this as a session, provided
+there is interest?
+
+[0] https://lwn.net/Articles/932900/
+[1] https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/storage-twp.html
+[2] https://lore.kernel.org/linux-nvme/20240124113841.31824-1-john.g.garry@oracle.com/T/#m4ad28b480a8e12eb51467e17208d98ca50041ff2
+[3] https://lore.kernel.org/all/20240124142645.9334-1-john.g.garry@oracle.com/
+[4] https://lore.kernel.org/all/20240213093713.1753368-1-kernel@pankajraghav.com/T/#u
+[5] https://lkml.kernel.org/r/20231101173542.23597-1-jack@suse.cz
+[6] https://github.com/dagmcr/bcc/tree/blkalgn-dump
+[7] https://github.com/iovisor/bcc/pull/4813
+[8] https://github.com/dagmcr/bcc/tree/nvmeiuwaf
+
+  Luis
