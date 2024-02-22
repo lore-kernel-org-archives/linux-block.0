@@ -1,164 +1,251 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667F4131E5C
-	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 13:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB80B1419A4
+	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 15:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708608118; cv=none; b=fnMNC1qCQLywelU9EeYDCe3RQWQ25FT1EnSefrI019aEzABqvtZbop6/xRCeBAH+u67nUhxWOkqAHncAc+nttQ9FOGIawXvmOH78dDR4Yp6y6kHrt7MrbLRDZhX5qowm8sXRtHpjcjv7TrxDXlfXoTwlXbJQprMg74tkX2k/npQ=
+	t=1708615421; cv=none; b=tbw01c63I2/LSGT78uBLJ1TmWWkYlNI3ub/ZCyy4pciVsCypqIFmSyaw0o1nWRm6hg7JS/gO7kHkXfnzPk/v0QXskD1VqXaV35VsJPGHbpGXD6p0OVb2dTaScNxmVMt/z45Y+OvNj9flG6R/qkiAQln1Am/h2YuG08662/4LZhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708608118; c=relaxed/simple;
-	bh=r9pchHV/VKVdQAsNxN4FRRok863wUbwJ2ZFTGYRsVyU=;
+	s=arc-20240116; t=1708615421; c=relaxed/simple;
+	bh=bydGYe1ufBIWX+7NTKXJIMHoWFfqIXP9vPqnaDiAdqg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EVKZ78EFC3ykbPgBAdvbvrI0BZ1UPRplD/z6mmfaVDDbyTv0MKjvttvEEWXQkZxWWaE+vczQ0tUGj1WLW6t4tiSAcWuLiDzk4XtPdFOcu+sx4z0GGW1nONsnr8hHJUi9pkPV+Af4oAVP2gC1tPAChCPdJg78bdivHcQ4TGxvDos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A1zwG5cQ; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=LhfLCCr53yPcSPUrtzJZySTzzhjPhw18dF4+QChfS9puUgS+vCR+2Svr7MzeE3PeP1mdpNy3miScDSWYmxVD01Wn19vTF4xGlxdQ7KaVsk6e0eiql5FB8NEZ69AKirrntd1otVR3dmoigabMTBT/Q4ul9S/Bu66vIH9H9QtlEd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O2u3qeAf; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A1zwG5cQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2u3qeAf"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708608115;
+	s=mimecast20190719; t=1708615418;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vvnoi3gxxb5piLgIp9jCALAJ4khy9KvaO5KQ84qQBNM=;
-	b=A1zwG5cQT/WhsAbjt9S4XbDGFUlfRjD9EKW6KiMJCCzZ3v7G5LypkT1Y0Bf7iqjw4BA5LG
-	UuX8VfAZ8dsXDlrMRRY40FfH+RaMWg2udYf9RE+l17pHjtciRKMU6G/5zd+5qYhAKFXbG2
-	CbIfDoVux7bpOIioHox86AquJSSGOgM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-201-A_pRdYkJOqu-zRNzv1HWeA-1; Thu, 22 Feb 2024 08:21:52 -0500
-X-MC-Unique: A_pRdYkJOqu-zRNzv1HWeA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	bh=zaczx+p/VxOU0s8VdA81k7yBin/ne6WtMzqxEmtWJak=;
+	b=O2u3qeAfkw/uaKybzpNl7RCuqjfWQiZ6NU51qTTjU6v+ZsLaHXxwutBJlsvVs5ilJhu5Nq
+	wLfloH5SFRTtQSeTKHrRkq/i+Y/3hf7qiHflFjNgFvg5nG3YtqR0KgEhSgxrKrmseZBMlr
+	h3G2+MWxCbn9FfByT6lsEnjdWOWa1kc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-610-ZwHuT3CPO8eBT5z6vZixxw-1; Thu,
+ 22 Feb 2024 10:23:34 -0500
+X-MC-Unique: ZwHuT3CPO8eBT5z6vZixxw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73B3710AFD62;
-	Thu, 22 Feb 2024 13:21:51 +0000 (UTC)
-Received: from bfoster (unknown [10.22.32.149])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B3F01492BE7;
-	Thu, 22 Feb 2024 13:21:50 +0000 (UTC)
-Date: Thu, 22 Feb 2024 08:23:09 -0500
-From: Brian Foster <bfoster@redhat.com>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Christoph Hellwig <hch@lst.de>, Tony Asleson <tasleson@redhat.com>,
-	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Darrick J. Wong" <djwong@kernel.org>, Tejun Heo <tj@kernel.org>
-Subject: Re: kernel oops on bcachefs umount, 6.7 kernel
-Message-ID: <ZddKvWVjyOg1ENz+@bfoster>
-References: <CAPmdA5YK_RuKpAtnfFrfcgZZReR2p1Q+A_DOMnFFrYm1QvrYnQ@mail.gmail.com>
- <Zc5CH7rzhzbrLzyV@bfoster>
- <6ozksyyljs4hzwcbitk3pqu3pbqttai42hbghwwww2rgdbnxzy@iz3cqxjgkfmn>
- <20240216080017.GA11646@lst.de>
- <Zc9XwqqDk/NC2j4b@bfoster>
- <iv32eaej2g7fgkaaq4ghe7ekt52degs43vecwdsd56gvzwteyr@hhdjqokbki4o>
- <ZdXvFT+Rl439kUMo@bfoster>
- <w4uqoqykzazwyqcmlz4bamxpqloxfbitipgigzxmccqczlixp2@yr4bizgz5kqk>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9C87329AB411;
+	Thu, 22 Feb 2024 15:23:33 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.233])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BC07E2022AAA;
+	Thu, 22 Feb 2024 15:23:31 +0000 (UTC)
+Date: Thu, 22 Feb 2024 10:23:28 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Parav Pandit <parav@nvidia.com>
+Cc: "mst@redhat.com" <mst@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"NBU-Contact-Li Rongqing (EXTERNAL)" <lirongqing@baidu.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Subject: Re: [PATCH] virtio_blk: Fix device surprise removal
+Message-ID: <20240222152328.GA1810574@fedora>
+References: <20240217180848.241068-1-parav@nvidia.com>
+ <20240220220501.GA1515311@fedora>
+ <PH0PR12MB54812D3772181FEAA46054BEDC562@PH0PR12MB5481.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="JM6DPXOyemwbe1nU"
+Content-Disposition: inline
+In-Reply-To: <PH0PR12MB54812D3772181FEAA46054BEDC562@PH0PR12MB5481.namprd12.prod.outlook.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+
+
+--JM6DPXOyemwbe1nU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <w4uqoqykzazwyqcmlz4bamxpqloxfbitipgigzxmccqczlixp2@yr4bizgz5kqk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 21, 2024 at 07:07:37PM -0500, Kent Overstreet wrote:
-> On Wed, Feb 21, 2024 at 07:39:49AM -0500, Brian Foster wrote:
-> > On Fri, Feb 16, 2024 at 10:57:24AM -0500, Kent Overstreet wrote:
-> > > On Fri, Feb 16, 2024 at 07:40:34AM -0500, Brian Foster wrote:
-> > > > On Fri, Feb 16, 2024 at 09:00:17AM +0100, Christoph Hellwig wrote:
-> > > > > On Thu, Feb 15, 2024 at 07:24:23PM -0500, Kent Overstreet wrote:
-> > > > > > > It looks like the warning could be avoided in bcachefs by checking for
-> > > > > > > whether the parent dir/node still exists at cleanup time, but I'm not
-> > > > > > > familiar enough with kobj management to say whether that's the
-> > > > > > > right/best solution. It also looks a little odd to me to see a
-> > > > > > > /sys/block/<dev>/bcachefs dir when I've not seen any other fs or driver
-> > > > > > > do such a thing in the block sysfs dir(s).
-> > > > > > > 
-> > > > > > > Any thoughts on this from the block subsystem folks? Is it reasonable to
-> > > > > > > leave this link around and just fix the removal check, or is another
-> > > > > > > behavior preferred? Thanks.
-> > > > > 
-> > > > > This is the general problem with random cross-subsystem sysfs reference,
-> > > > > and why they are best avoided.  The block layer tears down all the sysfs
-> > > > > objects at del_gendisk time as no one should start using the sysfs files
-> > > > > at that point, but a mounted file system or other opener will of course
-> > > > > keep the bdev itself alive.
-> > > > > 
-> > > > 
-> > > > Yeah, makes sense. The fact that the dir goes away despite having the
-> > > > bdev open is partly what made this seem a little odd to me.
-> > > > 
-> > > > > I'm not sure why bcachefs is doing this, but no one really should be
-> > > > > using the block layer sysfs structures and pointers except for the block
-> > > > > layer itself.  
-> > > > > 
-> > > > 
-> > > > From Kent's comments it sounds like it was just some loose carryover
-> > > > from old bcache stuff. I had poked around a bit for anything similar and
-> > > > it looked to me that current bcache doesn't do this either, but I could
-> > > > have missed something.
-> > > > 
-> > > > > > so there's an existing bd_holder mechanism that e.g. device mapper uses
-> > > > > > for links between block devices. I think the "this block device is going
-> > > > > > away" code knows how to clean those up.
-> > > > > > 
-> > > > > > We're not using that mechanism - and perhaps we should have been, I'd
-> > > > > > need a time machine to ask myself why I did it that way 15 years back.
-> > > > > 
-> > > > > Well, at least Tejun had a very strong opinion that no one should be
-> > > > > abusing sysfs symlinks for linking up subsystems at all, see commit
-> > > > > 49731baa41df404c2c3f44555869ab387363af43, which is also why this code
-> > > > > is marked deprecated and we've not added additional users.
-> > > > > 
-> > > > 
-> > > > Thanks. I'll send a patch to remove this once I'm back from vacation.
-> > > 
-> > > No, we can't remove it - userspace needs to know this topology. When
-> > > we've got one sysfs node with a direct relationship to another sysfs
-> > > node, that needs to be reflected in syfs.
-> > > 
-> > 
-> > Do you mean that some related userspace tool relies on this to function,
-> > or generally disagreeing with the statement(s) above around links from
-> > /sys/block/<dev>/?
-> 
-> I would have to do some digging to give a definitive answer to that
-> question.
-> 
-> bcache definitely needed those links (IIRC in udev rules?) - bcachefs
-> may not, but we haven't even started on integrating bcachefs with all
-> the userspace disk management tooling out there.
-> 
+On Thu, Feb 22, 2024 at 04:46:38AM +0000, Parav Pandit wrote:
+>=20
+>=20
+> > From: Stefan Hajnoczi <stefanha@redhat.com>
+> > Sent: Wednesday, February 21, 2024 3:35 AM
+> > To: Parav Pandit <parav@nvidia.com>
+> >=20
+> > On Sat, Feb 17, 2024 at 08:08:48PM +0200, Parav Pandit wrote:
+> > > When the PCI device is surprise removed, requests won't complete from
+> > > the device. These IOs are never completed and disk deletion hangs
+> > > indefinitely.
+> > >
+> > > Fix it by aborting the IOs which the device will never complete when
+> > > the VQ is broken.
+> > >
+> > > With this fix now fio completes swiftly.
+> > > An alternative of IO timeout has been considered, however when the
+> > > driver knows about unresponsive block device, swiftly clearing them
+> > > enables users and upper layers to react quickly.
+> > >
+> > > Verified with multiple device unplug cycles with pending IOs in virtio
+> > > used ring and some pending with device.
+> > >
+> > > In future instead of VQ broken, a more elegant method can be used. At
+> > > the moment the patch is kept to its minimal changes given its urgency
+> > > to fix broken kernels.
+> > >
+> > > Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of virtio
+> > > pci device")
+> > > Cc: stable@vger.kernel.org
+> > > Reported-by: lirongqing@baidu.com
+> > > Closes:
+> > > https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73ca9b474
+> > > 1@baidu.com/
+> > > Co-developed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> > > Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> > > Signed-off-by: Parav Pandit <parav@nvidia.com>
+> > > ---
+> > >  drivers/block/virtio_blk.c | 54
+> > > ++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 54 insertions(+)
+> > >
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index 2bf14a0e2815..59b49899b229 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -1562,10 +1562,64 @@ static int virtblk_probe(struct virtio_device
+> > *vdev)
+> > >  	return err;
+> > >  }
+> > >
+> > > +static bool virtblk_cancel_request(struct request *rq, void *data) {
+> > > +	struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(rq);
+> > > +
+> > > +	vbr->in_hdr.status =3D VIRTIO_BLK_S_IOERR;
+> > > +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
+> > > +		blk_mq_complete_request(rq);
+> > > +
+> > > +	return true;
+> > > +}
+> > > +
+> > > +static void virtblk_cleanup_reqs(struct virtio_blk *vblk) {
+> > > +	struct virtio_blk_vq *blk_vq;
+> > > +	struct request_queue *q;
+> > > +	struct virtqueue *vq;
+> > > +	unsigned long flags;
+> > > +	int i;
+> > > +
+> > > +	vq =3D vblk->vqs[0].vq;
+> > > +	if (!virtqueue_is_broken(vq))
+> > > +		return;
+> > > +
+> > > +	q =3D vblk->disk->queue;
+> > > +	/* Block upper layer to not get any new requests */
+> > > +	blk_mq_quiesce_queue(q);
+> > > +
+> > > +	for (i =3D 0; i < vblk->num_vqs; i++) {
+> > > +		blk_vq =3D &vblk->vqs[i];
+> > > +
+> > > +		/* Synchronize with any ongoing virtblk_poll() which may be
+> > > +		 * completing the requests to uppper layer which has already
+> > > +		 * crossed the broken vq check.
+> > > +		 */
+> > > +		spin_lock_irqsave(&blk_vq->lock, flags);
+> > > +		spin_unlock_irqrestore(&blk_vq->lock, flags);
+> > > +	}
+> > > +
+> > > +	blk_sync_queue(q);
+> > > +
+> > > +	/* Complete remaining pending requests with error */
+> > > +	blk_mq_tagset_busy_iter(&vblk->tag_set, virtblk_cancel_request,
+> > > +vblk);
+> >=20
+> > Interrupts can still occur here. What prevents the race between
+> > virtblk_cancel_request() and virtblk_request_done()?
+> >
+> The PCI device which generates the interrupt is already removed so interr=
+upt shouldn't arrive when executing cancel_request.
+> (This is ignoring the race that Ming pointed out. I am preparing the v1 t=
+hat eliminates such condition.)
+>=20
+> If there was ongoing virtblk_request_done() is synchronized by the for lo=
+op above.
 
-I don't know bcache that well, but I didn't see anything obviously
-putting links in the bdev dir when I last looked. It did look like it
-created some links between its own sysfs dirs, but maybe I
-misinterpreted the code.
+Ah, I see now that:
 
-I don't think that any other fs with its own /sys/fs/ presence (i.e.,
-XFS, ext4, btrfs) does this sort of thing, so I'm a little skeptical of
-the idea that userspace currently needs it (not necessarily that it
-couldn't use it for the better in the future).
++if (!virtqueue_is_broken(vq))
++    return;
 
-> And this is stuff that userspace does in general need; if we're getting
-> by without it for other filesystems right now it's probably by doing
-> something horrid like parsing /proc/mounts; if we could get filesystems
-> using the same bd_holder stuff that other block layer stuff uses, that
-> would be _amazing_
-> 
+relates to:
 
-Ok, but that sounds contradictory to what the block layer folks want.
+static void virtio_pci_remove(struct pci_dev *pci_dev)
+{
+	struct virtio_pci_device *vp_dev =3D pci_get_drvdata(pci_dev);
+	struct device *dev =3D get_device(&vp_dev->vdev.dev);
 
-I dunno, it seems to me that the notions of better general coordination
-between /sys/block and /sys/fs and that of bcachefs' current behavior
-being wrong are not mutually exclusive things. But I'll just leave it
-alone until there's some more clarity here..
+	/*
+	 * Device is marked broken on surprise removal so that virtio upper
+	 * layers can abort any ongoing operation.
+	 */
+	if (!pci_device_is_present(pci_dev))
+		virtio_break_device(&vp_dev->vdev);
 
-Brian
+Please rename virtblk_cleanup_reqs() to virtblk_cleanup_broken_device()
+or similar so it's clear that this function only applies when the device
+is broken? For example, it won't handle ACPI hot unplug requests because
+the device will still be present.
+
+Thanks,
+Stefan
+
+>=20
+> =20
+> > > +	blk_mq_tagset_wait_completed_request(&vblk->tag_set);
+> > > +
+> > > +	/*
+> > > +	 * Unblock any pending dispatch I/Os before we destroy device. From
+> > > +	 * del_gendisk() -> __blk_mark_disk_dead(disk) will set GD_DEAD
+> > flag,
+> > > +	 * that will make sure any new I/O from bio_queue_enter() to fail.
+> > > +	 */
+> > > +	blk_mq_unquiesce_queue(q);
+> > > +}
+> > > +
+> > >  static void virtblk_remove(struct virtio_device *vdev)  {
+> > >  	struct virtio_blk *vblk =3D vdev->priv;
+> > >
+> > > +	virtblk_cleanup_reqs(vblk);
+> > > +
+> > >  	/* Make sure no work handler is accessing the device. */
+> > >  	flush_work(&vblk->config_work);
+> > >
+> > > --
+> > > 2.34.1
+> > >
+>=20
+
+--JM6DPXOyemwbe1nU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmXXZvAACgkQnKSrs4Gr
+c8g8ywf/fxxNuXQ8G5t9KZBuJov1HTZvmDWU+gMRNN1uzbwttv1Y/L7Hx7J5GsV9
+WKDp5Dgw84LzYVtoERdkHFJfYEv9t3xsb3qOmhWrIxBF9kiHsSk25N7OnV9GE1l8
+qrj0uD2/E4WrtwTnPQGlIqpJrnspbJYvQjD8KQwga9LxE+KChvdplxIzIww8Zh50
+2TikWB71u+ZojLnClIp8EdzG9O3lAczY+eHDko4xLPK/V1X7PiTXXNoo6A56cgVB
+4RUQ4FJytf7t252lIfQ1cJauEtWCay0u0ia+Z+GtCoTfXZ8k7NPNXsYBdrYJjcc5
+ZcHUv9/XGqCEUY0i95OguCaTFdgs1w==
+=ncG4
+-----END PGP SIGNATURE-----
+
+--JM6DPXOyemwbe1nU--
 
