@@ -1,63 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DD3548FD
-	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 20:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C086AF9D;
+	Thu, 22 Feb 2024 20:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708632217; cv=none; b=LCRo0VjqK1vX1h1nrgpFCu+jkYZUquaWgqh3woXKRIgrLXZWCShn/ZACBQHMquYyDinys/BI99tUxFQTLVrljLN+MEKe6Pj4Ay2VosOdJ73PvgJHDZBbnkaIcqfFCuOBvjyGTSo1nAfjRuF7nC8LPBH1adkop5U7CmPxroT+r3c=
+	t=1708632537; cv=none; b=jXP684LweuDJRBNzAGXbmB1ypszDmUeqMEVswhXKF8ycH+q6dL1yNrRzxD7LKZNteAo1tNV7kfvBKjSCSmlcsUFQeI5VDSm86fyXvJa8oSaWbWR2IZqifFK0Qr3M0788nNFtkb9Pq2oAB0OERd/5HzWkZv4w26H2h2sJs0C5okM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708632217; c=relaxed/simple;
-	bh=Hxd9mm2h1IQHah8v0Fw0MTHm2RdgDRxOycRWSJpBQSE=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=TZm5qa/OxCLixTLr0XCth4ShxUZ0Zfoa72pu61yFUl3e3flXSKB25EvKerEfcq097sybuqaYauJdj99nz+W9v65p12ZxVRH9OGMX6RIB8tTkNzWamd/RYSEFqXVWrobZwEaTeQYDhcl4+lAPqr/cn9BJUq2+lWN5URnJlEBQjFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbBFri6v; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708632537; c=relaxed/simple;
+	bh=ODDgjF35NrPnOPh5UsQdm3X39Cv4Un/MqteXmplihbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BcqAXFq2Yy9TMYrhkpBlmoiER/3W/chQhCSkWZoJZsWK6E4y4lsX7dEzOelHoOF776QHnGV1X+QgOup4qTltn08w+n56VVszd0fJXT9B8ZSV09qxlVVQjNdQv8RsnuWKCCxu75pL+w1ke0XtZkuTesvGcqlOSStiUPnTuwVTe8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGZlahkU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbBFri6v"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D99E8C433C7;
-	Thu, 22 Feb 2024 20:03:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGZlahkU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C08E1C433F1;
+	Thu, 22 Feb 2024 20:08:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708632216;
-	bh=Hxd9mm2h1IQHah8v0Fw0MTHm2RdgDRxOycRWSJpBQSE=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=NbBFri6vUHEsMphaBBSpKUieDpcrv2ceqUPBX3aDkBvtvFfwEyevb5FLWgNg7VNk4
-	 fPdyW4VARnjbOt3RDxUCFuQmCQsHJa68ZtDFcUUzOfgmmnGUg/MaCNmnQBzviJpdAp
-	 vSx40NyGUichoMcDVh/lOL6hHF3WDgxR3d0CVTQy7GBhbpuocRlq13kblMeGNBPFsq
-	 8wOBLkiLeIJebmD3nDiMybcuva0gudkp4vEdFh9SWAPLsgO/+cLmow3H8z64nPiofC
-	 H9krxS/prQGcJjd4dPbsQCsjedyqEU+0+eq6Q3m5yvXuVShXN4Vsjjn6B6iwobKwDr
-	 WPWn56OAxa5tQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C840DC04E32;
-	Thu, 22 Feb 2024 20:03:36 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.8-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <a9ffa3a2-2b49-409a-a256-a70f8f38b8e5@kernel.dk>
-References: <a9ffa3a2-2b49-409a-a256-a70f8f38b8e5@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <a9ffa3a2-2b49-409a-a256-a70f8f38b8e5@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.8-2024-02-22
-X-PR-Tracked-Commit-Id: 5429c8de56f6b2bd8f537df3a1e04e67b9c04282
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ffd2cb6b718e189e7e2d5d0c19c25611f92e061a
-Message-Id: <170863221681.18444.5264527444355130334.pr-tracker-bot@kernel.org>
-Date: Thu, 22 Feb 2024 20:03:36 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	s=k20201202; t=1708632537;
+	bh=ODDgjF35NrPnOPh5UsQdm3X39Cv4Un/MqteXmplihbk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nGZlahkURajbySZDKt0JTcONpb/baq3R5TlEo+BM8oc5nkaRHWZWkc86XHHbSHmRi
+	 IsnYpdQi+yAJvSOc34fziXx/vY8IuN1uvbBM/4UEiprg/PAh3T/4sZ2ZI2+XWfLfro
+	 CZMASoar3AhHiJxj+R9AYzamkaZ5+Kih0n/YBjE8eGLo3gApeVjeafId4y5fKJgWHo
+	 pWyYz/B6SSmtMFhVO8ZOboXFyAF+XH+SKQiHHF5zinDqN5EovCMPNU+KcFMUVqwvs1
+	 ZBNQ4vPw8l/c5ly1U/iBDLwctAa1LhKbdNnsTJ/Oz8MY49CackDKqsUwmhaZ7r7zyb
+	 m2rIx7ZwNXpiQ==
+Date: Thu, 22 Feb 2024 13:08:54 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: lsf-pc@lists.linux-foundation.org,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, josef@toxicpanda.com,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] Meta/Integrity/PI
+ improvements
+Message-ID: <Zdep1jEY4kFFxxk8@kbusch-mbp>
+References: <CGME20240222193304epcas5p318426c5267ee520e6b5710164c533b7d@epcas5p3.samsung.com>
+ <aca1e970-9785-5ff4-807b-9f892af71741@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aca1e970-9785-5ff4-807b-9f892af71741@samsung.com>
 
-The pull request you sent on Thu, 22 Feb 2024 10:46:14 -0700:
+On Fri, Feb 23, 2024 at 01:03:01AM +0530, Kanchan Joshi wrote:
+> With respect to the current state of Meta/Block-integrity, there are
+> some missing pieces.
+> I can improve some of it. But not sure if I am up to speed on the
+> history behind the status quo.
+> 
+> Hence, this proposal to discuss the pieces.
+> 
+> Maybe people would like to discuss other points too, but I have the 
+> following:
+> 
+> - Generic user interface that user-space can use to exchange meta. A
+> new io_uring opcode IORING_OP_READ/WRITE_META - seems feasible for
+> direct IO. Buffered IO seems non-trivial as a relatively smaller meta
+> needs to be written into/read from the page cache. The related
+> metadata must also be written during the writeback (of data).
+> 
+> 
+> - Is there interest in filesystem leveraging the integrity capabilities 
+> that almost every enterprise SSD has.
+> Filesystems lacking checksumming abilities can still ask the SSD to do
+> it and be more robust.
+> And for BTRFS - there may be value in offloading the checksum to SSD.
+> Either to save the host CPU or to get more usable space (by not
+> writing the checksum tree). The mount option 'nodatasum' can turn off
+> the data checksumming, but more needs to be done to make the offload
+> work.
 
-> git://git.kernel.dk/linux.git tags/block-6.8-2024-02-22
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ffd2cb6b718e189e7e2d5d0c19c25611f92e061a
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+As I understand it, btrfs's checksums are on a variable extent size, but
+offloading it to the SSD would do it per block, so it's forcing a new
+on-disk format. It would be cool to use it, though: you could atomically
+update data and checksums without stable pages.
+ 
+> NVMe SSD can do the offload when the host sends the PRACT bit. But in
+> the driver, this is tied to global integrity disablement using
+> CONFIG_BLK_DEV_INTEGRITY.
+> So, the idea is to introduce a bio flag REQ_INTEGRITY_OFFLOAD
+> that the filesystem can send. The block-integrity and NVMe driver do
+> the rest to make the offload work.
+> 
+> - Currently, block integrity uses guard and ref tags but not application 
+> tags.
+> As per Martin's paper [*]:
+> 
+> "Work is in progress to implement support for the data
+> integrity extensions in btrfs, enabling the filesystem
+> to use the application tag."
