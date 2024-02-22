@@ -1,157 +1,145 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C163717C;
-	Thu, 22 Feb 2024 09:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D8836AED;
+	Thu, 22 Feb 2024 09:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708594003; cv=none; b=qVUyxXEGv8sx7kRliB/GlEKkWIU/NCmhNRYGc5dETY+rEssPkpamheDtEcw9G3p/ax4+GxchIoU7negdYej3fwj+xvlJirxPwK5tUN7GBDV6UP3h+MSI4McsH46HceC7R0Jy0ovtOdha1UZeZCeOrRQ74iY4NIWaSY1C2i80JQ8=
+	t=1708594318; cv=none; b=H+Dd0GUdk+s8cc6c/lON9+iISJT37RAzEy9CGxfC3J0P6Ce9jZDMrh8leV3LCUxfXMK31oGJyP/pBaITZLti00ruIbWxtdXeZvedLKIIKPxrtVZZnWIKl3TSchlb+5QIelNa0omMVvWfrF4k77J+HiarrfDXVPbpOO1nOAtD09Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708594003; c=relaxed/simple;
-	bh=kGPhBtLA7fOjhIpyW24MDCbxh7JdZBMP1iVR46NnC44=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FvriNrNcPEcppNvE1F7Ec3XWOe5z0jUTc7DWlQVQRzb/fYH8dy4N5f51NrweGFaPaR61cAK0NPaIGZvOI/eYKid+alYCHL6sFg3Fkxc8fO7UT8He0P0sntj85Mqg64N2HLYq54XUfmXsA9aq5Zyul6cZ9Fry/VHtzI+Swo2dKJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TgSQx32sQzWv29;
-	Thu, 22 Feb 2024 17:24:57 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (unknown [7.193.23.164])
-	by mail.maildlp.com (Postfix) with ESMTPS id 39356140153;
-	Thu, 22 Feb 2024 17:26:38 +0800 (CST)
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 22 Feb 2024 17:26:37 +0800
-Subject: Re: [PATCH v2] block: fix deadlock between bd_link_disk_holder and
- partition scan
-To: <linan666@huaweicloud.com>, <axboe@kernel.dk>, <song@kernel.org>,
-	Christoph Hellwig <hch@lst.de>
-CC: <linux-raid@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>, <houtao1@huawei.com>,
-	<yangerkun@huawei.com>
-References: <20240221090122.1281868-1-linan666@huaweicloud.com>
-From: Yu Kuai <yukuai3@huawei.com>
-Message-ID: <9b4c511b-5ab1-7ba2-8ccc-5538c4672eb4@huawei.com>
-Date: Thu, 22 Feb 2024 17:26:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1708594318; c=relaxed/simple;
+	bh=3NC2JFWUwUaKfvx89610bLmkWiiZCuu/S/semy0WzBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dv4+InJNf7lc3qLugZoVz0Num3AcYWjK9JJwdKnm4/y8vUG0YFvDdR+RstAlOmJczz6g+ahhhoaYNE0OKBmsmQb6cRxlGNTwG5az9u2z/kclkS4hjO4Rb9RJe7xp1PLhnW7zHCPtW1OyyG+pVYguROSpzr5M382h0+Qz3SDJcso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Auj3nCYb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8P71PZvf; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Auj3nCYb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8P71PZvf; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Auj3nCYb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8P71PZvf";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Auj3nCYb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8P71PZvf"
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 602DC1F452;
+	Thu, 22 Feb 2024 09:31:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1708594314; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JyST72IAHa1gwE0JzbLVOSJaR7ARzsfKSjPlAFyXYSE=;
+	b=Auj3nCYbyfzn3C+J5lEUtdrxnsnSwqPyxqZBPi7vz5mDYASxc2bmkliMZ9KgLv+1CD2YIP
+	fnYssxjk2keTd+MAvjI27G8apoen6uBX2sCBE5XU/QmliXED5GAiFW5BcMY0x34nIVBWQo
+	gActl/kAoGwiGer1JyJd9Ou+4yBvYVI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1708594314;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JyST72IAHa1gwE0JzbLVOSJaR7ARzsfKSjPlAFyXYSE=;
+	b=8P71PZvf2kH7oAeqPBPWGNbtn1aQ42d3yD88rWaBqOoSBLp59C2CpHSdYvAayzxUKzGUPz
+	IF+fGimQleP9xDDw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1708594314; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JyST72IAHa1gwE0JzbLVOSJaR7ARzsfKSjPlAFyXYSE=;
+	b=Auj3nCYbyfzn3C+J5lEUtdrxnsnSwqPyxqZBPi7vz5mDYASxc2bmkliMZ9KgLv+1CD2YIP
+	fnYssxjk2keTd+MAvjI27G8apoen6uBX2sCBE5XU/QmliXED5GAiFW5BcMY0x34nIVBWQo
+	gActl/kAoGwiGer1JyJd9Ou+4yBvYVI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1708594314;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JyST72IAHa1gwE0JzbLVOSJaR7ARzsfKSjPlAFyXYSE=;
+	b=8P71PZvf2kH7oAeqPBPWGNbtn1aQ42d3yD88rWaBqOoSBLp59C2CpHSdYvAayzxUKzGUPz
+	IF+fGimQleP9xDDw==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 4506313A6B;
+	Thu, 22 Feb 2024 09:31:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id oa75D4oU12XQIQAAn2gu4w
+	(envelope-from <dwagner@suse.de>); Thu, 22 Feb 2024 09:31:54 +0000
+Date: Thu, 22 Feb 2024 10:31:53 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, 
+	"linux-fsdevel@vger.kernel.org >> linux-fsdevel" <linux-fsdevel@vger.kernel.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>, 
+	"josef@toxicpanda.com" <josef@toxicpanda.com>, Amir Goldstein <amir73il@gmail.com>, 
+	Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>, 
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>, "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>, 
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, "jack@suse.com" <jack@suse.com>, Ming Lei <ming.lei@redhat.com>, 
+	Sagi Grimberg <sagi@grimberg.me>, Theodore Ts'o <tytso@mit.edu>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
+ expansion plan for the storage stack test framework
+Message-ID: <g5c3kwbalxru7gykmzdymrzf43fkriofiqtgdgcswbf4hrg65r@wdduaccaswhe>
+References: <e5d8cd68-b3f2-4d7b-b323-b13d18199256@nvidia.com>
+ <bh5s6a4fhhlje42bzj2t22k3jpmruzkx234ks4ytuhd62tonzj@zn6h5foaqrof>
+ <jfydrbb277d7ad2ypu5dottiqh4rtzm5ipf72wcjo34mmpvnl7@mjlqomulsq3q>
+ <ZdZBpb4vMMVoLfhs@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240221090122.1281868-1-linan666@huaweicloud.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZdZBpb4vMMVoLfhs@bombadil.infradead.org>
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -0.92
+X-Spamd-Result: default: False [-0.92 / 50.00];
+	 ARC_NA(0.00)[];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCPT_COUNT_TWELVE(0.00)[24];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 FREEMAIL_CC(0.00)[nvidia.com,lists.linux-foundation.org,vger.kernel.org,lists.infradead.org,kernel.dk,acm.org,toxicpanda.com,gmail.com,javigon.com,intel.com,lst.de,kernel.org,suse.de,opensource.wdc.com,wdc.com,suse.com,redhat.com,grimberg.me,mit.edu,iogearbox.net];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-0.12)[66.79%]
+X-Spam-Flag: NO
 
-+CC Christoph
+On Wed, Feb 21, 2024 at 10:32:05AM -0800, Luis Chamberlain wrote:
+> > One discussion point I'd like to add is
+> > 
+> >   - running blktest against real hardare/target
+> 
+> We've resolved this in fstests with canonicalizing device symlinks, and
+> through kdevops its possible to even use PCIe passthrough onto a guest
+> using dynamic kconfig (ie, specific to the host).
+> 
+> It should be possible to do that in blktests too, but the dynamic
+> kconfig thing is outside of scope, but this is a long winded way of
+> suggestin that if we extend blktests to add a canonon-similar device
+> function, then since kdevops supports blktests you get that pcie
+> passthrough for free too.
 
-ÔÚ 2024/02/21 17:01, linan666@huaweicloud.com Ð´µÀ:
-> From: Li Nan <linan122@huawei.com>
-> 
-> 'open_mutex' of gendisk is used to protect open/close block devices. But
-> in bd_link_disk_holder(), it is used to protect the creation of symlink
-> between holding disk and slave bdev, which introduces some issues.
-> 
-> When bd_link_disk_holder() is called, the driver is usually in the process
-> of initialization/modification and may suspend submitting io. At this
-> time, any io hold 'open_mutex', such as scanning partitions, can cause
-> deadlocks. For example, in raid:
-> 
-> T1                              T2
-> bdev_open_by_dev
->   lock open_mutex [1]
->   ...
->    efi_partition
->    ...
->     md_submit_bio
-> 				md_ioctl mddev_syspend
-> 				  -> suspend all io
-> 				 md_add_new_disk
-> 				  bind_rdev_to_array
-> 				   bd_link_disk_holder
-> 				    try lock open_mutex [2]
->      md_handle_request
->       -> wait mddev_resume
-> 
-> T1 scan partition, T2 add a new device to raid. T1 waits for T2 to resume
-> mddev, but T2 waits for open_mutex held by T1. Deadlock occurs.
-> 
-> Fix it by introducing a local mutex 'blk_holder_mutex' to replace
-> 'open_mutex'.
-> 
-> Fixes: 1b0a2d950ee2 ("md: use new apis to suspend array for ioctls involed array reconfiguration")
-> Reported-by: mgperkow@gmail.com
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218459
-> Signed-off-by: Li Nan <linan122@huawei.com>
-
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-> ---
-> v2: add a blk_ prefix to 'holder_mutex'.
-> 
->   block/holder.c | 12 +++++++-----
->   1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/holder.c b/block/holder.c
-> index 37d18c13d958..791091a7eac2 100644
-> --- a/block/holder.c
-> +++ b/block/holder.c
-> @@ -8,6 +8,8 @@ struct bd_holder_disk {
->   	int			refcnt;
->   };
->   
-> +static DEFINE_MUTEX(blk_holder_mutex);
-> +
->   static struct bd_holder_disk *bd_find_holder_disk(struct block_device *bdev,
->   						  struct gendisk *disk)
->   {
-> @@ -80,7 +82,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
->   	kobject_get(bdev->bd_holder_dir);
->   	mutex_unlock(&bdev->bd_disk->open_mutex);
->   
-> -	mutex_lock(&disk->open_mutex);
-> +	mutex_lock(&blk_holder_mutex);
->   	WARN_ON_ONCE(!bdev->bd_holder);
->   
->   	holder = bd_find_holder_disk(bdev, disk);
-> @@ -108,7 +110,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
->   		goto out_del_symlink;
->   	list_add(&holder->list, &disk->slave_bdevs);
->   
-> -	mutex_unlock(&disk->open_mutex);
-> +	mutex_unlock(&blk_holder_mutex);
->   	return 0;
->   
->   out_del_symlink:
-> @@ -116,7 +118,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
->   out_free_holder:
->   	kfree(holder);
->   out_unlock:
-> -	mutex_unlock(&disk->open_mutex);
-> +	mutex_unlock(&blk_holder_mutex);
->   	if (ret)
->   		kobject_put(bdev->bd_holder_dir);
->   	return ret;
-> @@ -140,7 +142,7 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
->   	if (WARN_ON_ONCE(!disk->slave_dir))
->   		return;
->   
-> -	mutex_lock(&disk->open_mutex);
-> +	mutex_lock(&blk_holder_mutex);
->   	holder = bd_find_holder_disk(bdev, disk);
->   	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
->   		del_symlink(disk->slave_dir, bdev_kobj(bdev));
-> @@ -149,6 +151,6 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
->   		list_del_init(&holder->list);
->   		kfree(holder);
->   	}
-> -	mutex_unlock(&disk->open_mutex);
-> +	mutex_unlock(&blk_holder_mutex);
->   }
->   EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
-> 
+I should have been more precise here, I was trying to say supporting
+real fabrics targets. blktests already has some logic for PCI targets
+with $TEST_DEV but I haven't really looked into this part yet.
