@@ -1,82 +1,191 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EDE12E4A;
-	Thu, 22 Feb 2024 02:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E944111A1;
+	Thu, 22 Feb 2024 02:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708570016; cv=none; b=pRAGK48YHg0YNK9GIS3jtggO6IDBlkPu1qTCgSAFEz2W5j8TulQrkOWiWbxrRmS3c034UHxpgntK11A18SjVKXtLwjAZgFZrRCJDm2+/lmpqxz/sbH5vrnFbJU3DHq0a1+BDkaN4Q0j5/AHVgXlAEvay6ZOyrB9II1J0dOjxHRE=
+	t=1708570716; cv=none; b=TwOLrkfa2rPOQYBVtIIoB5P6Kb4SiPLkEHBC6triiAcpX/RBAY+bDhXl0ae8VEM40qo6r9EKnkFBbiZMbZKJdCo2DWOiFfFfudYexCWLouFbr902qjaRR2YdMQHeMR6FBSUeziadO1U+7LpiMmegtxgHKJifyiNCrDMMXCna5vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708570016; c=relaxed/simple;
-	bh=EJKVkFOUVFpW2TTGCpRGaLNLmRck4XEaonpMaAbW2bc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YgkSNe8mka5+LLHDqKT23sAPZv6Zr0o9b/obbL9s+cK9ag+qwqzyzcqUr+NuSUNyXfR3dZ/PPfPJCge+/ns2p+vXp1K2WuU9YCnnO68O1RCVfhS8br3Hhwq/hJYZtsE9sEXZA1z36ssC1EkN71tag1r1eZe+mQhHH33XrH17r7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+	s=arc-20240116; t=1708570716; c=relaxed/simple;
+	bh=0nphF7usZZqKN3VylhoEAkqBD0TzM+Qs06c7S6NXi1Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XCkD9p6APDy4QYcPs9KOeC9gJVcuQ0Hk8l3oHaZWLaun6/nu880A/OIyMy9XyVEKPGz3MEUpiCgMoI6KZEQOfSoIApGtve1Y0kf5N3uIZjZrvv1pREKp+WYadkZ50W64vk7gavcOyGsw3oHbOy9q4i3/Ca7syI0XvuOE9p9nHpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AO95sFbv; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3c13410a319so685153b6e.3;
-        Wed, 21 Feb 2024 18:46:54 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AO95sFbv"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-51197ca63f5so8505258e87.1;
+        Wed, 21 Feb 2024 18:58:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708570712; x=1709175512; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kefti/WKSkVD/+jrlXZpB2qb7waWkiA61t1W1mx7oHU=;
+        b=AO95sFbviXM547cKPR+NwymE2U15GnRMQYvH5XNrTdKZu5EFdqDtBxsGSRc4/B1ALs
+         P5xAn6LmTv9qa4i4UnOiQtrCIYD8FEpXSIhMN5HJSnVWhm07Z+0RPC6oS7dm/uN0ccJU
+         4P/2nm0xZDtWFraXk6MHPxOyQQ6B6uLSXFdmPYgfkG1C7HrkL82qNHJKGXu2KztN8spj
+         atmJ7qgdBAF/7iqXZrZm4G46pypy6KRMppNYY/sxgQ/JbELYYxUExTlG+O+GRY47dREI
+         pvGaq08Mc6B7n/LoWQt8ywgPdbHpKlxOU1/tdnxG52dFmp+Ze/CTEN7FBrSOOje8ONJD
+         s+2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708570014; x=1709174814;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EJKVkFOUVFpW2TTGCpRGaLNLmRck4XEaonpMaAbW2bc=;
-        b=TfpSUl5W3q8X3wWz8iPh7bUIEPZpi6RGjqp0G9anBtKMGR3P53CLdRuYPIaDyPhQ3O
-         VPNXNlqutf1m/VRSK5Ne+ta0Rp8Cl0bQF/hfZCt63978Z5P+qFdRafu0Mw7g+wp6fv7P
-         DWTShNtBuaodgXcCbd/LX+WTdMg/UPuhCFsPKt9I7SpRjZ/ox0W74LFX0/A7QfMsL1py
-         U5oF89c4/WPx32xP2WBg3Y2OC8crLOGsgpIY2d2BPq9ghILE9IzF56ydHjj3xBqoKgFe
-         QiF+jg9H0jkDvXJfxXEFU4ONXoWoN1lkNfoPy0A1y6IK0uXtxLrNfiD1Mvao+RsjBGWo
-         jOog==
-X-Forwarded-Encrypted: i=1; AJvYcCV0x06Z9c5OOIpgFWd0CZPymVk69/Y4GKu05NdvFx4gBTXxmzi/chBG7wOVm24WA4UabsMDu7nq21ESLo3Lcwl8mIt5xqmh0hazoYqcqatWIV9Dp2P9k2ZDCd50Oh5t36YApqeqjMGLpQxWFTTenpebgaRQDc2xAFUfmyH5JNsGoZJ9irwdeQ==
-X-Gm-Message-State: AOJu0YyD3uEvhAWmXpGYbS4XmopzGJk5/5uJQrFO6RR1v9bBneASgQ2Q
-	ch6qrnmbkigCafvmvn+e0saMdTdI/vGyZqYbh4XCwHbdDDjKysgDR0BWHJcs
-X-Google-Smtp-Source: AGHT+IGE4LzStzjy3+p85RFLZ1atlgGrMtQhjfPxzPxLnZ4RWfQOIWvXmhT2mGmjwvdo86Ag09pgBA==
-X-Received: by 2002:a05:6808:1b1e:b0:3c1:7886:3699 with SMTP id bx30-20020a0568081b1e00b003c178863699mr941755oib.3.1708570014165;
-        Wed, 21 Feb 2024 18:46:54 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id r6-20020aa78b86000000b006e2f9f007b0sm9431452pfd.92.2024.02.21.18.46.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Feb 2024 18:46:53 -0800 (PST)
-Message-ID: <fafab67c-f87d-4684-98d5-6d9f82804bba@acm.org>
-Date: Wed, 21 Feb 2024 18:46:51 -0800
+        d=1e100.net; s=20230601; t=1708570712; x=1709175512;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kefti/WKSkVD/+jrlXZpB2qb7waWkiA61t1W1mx7oHU=;
+        b=s88mOcIsQFaZFXioX4UTyTK8pnTgVZVI7hFQtof0ptSYYv6NNVXH71yHmDkm1Bk+2X
+         4fGAq74NKaceJMfSQ5g3HfLx51b7TkUAo0X7qDiwf2Bxumjx+7wJmmelPXFfYlQZ1xt9
+         1BvCbGZcjkJNj80y5G3nckbXqRAGR6DrQl81jFWTed2tR7GoJ42bdElumA7FDOS/l/tx
+         Y3PeM1n/l7ErxPzp+jUO7dptMlvlCJIlM475o/uFVqWm5mc69axP3eRQjkkmntb8Xf0M
+         3I91JRGlKiRaFva2X/83IUHCWaN5Nz1a9UrsAPAomP+ZK8OEH+KuqaJz76Y1VxP3bfSC
+         Vxeg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMHq/uYZrbwfwcfY9BqVurYOTHwPi5dGqcLryMnwdoObf3wCPpu8lmLlehfxsXvC37hLejco/Kv6VXGDPOTpQZ8ZqUxbgMsUYrv1TXL7vpZBcZpzjyD4WmoPkTIk9XuuB1TsJP5JDvG5I=
+X-Gm-Message-State: AOJu0Yxc2sBAuUAEQ5jzZMd0vUp/qQdcuODE2JAZwXk+PKK79QUUclgB
+	ub77oITYywDfa1NU1icmfRQHnzHkdwNPIxT6enby7aJhFsxrz1vHcvr4ZwgOwuIVuknzZH0T+H1
+	AGMC4gkxPhwse0ntItd1qssLbxds=
+X-Google-Smtp-Source: AGHT+IEskMN7jjVczkBYTgDpp3w7MAtrqaOErGgIls3EVSnsOx3K0j4so1rTvyuRo3iHw2N4dOxWTiX6OmHHDrVbNQQ=
+X-Received: by 2002:a05:6512:2242:b0:512:ae95:d6cd with SMTP id
+ i2-20020a056512224200b00512ae95d6cdmr9932769lfu.2.1708570711918; Wed, 21 Feb
+ 2024 18:58:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 01/19] fs: Fix rw_hint validation
-Content-Language: en-US
-To: Christian Brauner <brauner@kernel.org>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>,
- Kanchan Joshi <joshi.k@samsung.com>, Jeff Layton <jlayton@kernel.org>,
- Chuck Lever <chuck.lever@oracle.com>, Stephen Rothwell
- <sfr@canb.auug.org.au>, Alexander Viro <viro@zeniv.linux.org.uk>
-References: <20240130214911.1863909-1-bvanassche@acm.org>
- <20240130214911.1863909-2-bvanassche@acm.org>
- <20240131-skilift-decken-cf3d638ce40c@brauner>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240131-skilift-decken-cf3d638ce40c@brauner>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240220061542.489922-1-zhaoyang.huang@unisoc.com> <CAKfTPtCbxk4_pAwi_+0ROo52f7R4+kZawe=OFEcOc2bTCYfsHw@mail.gmail.com>
+In-Reply-To: <CAKfTPtCbxk4_pAwi_+0ROo52f7R4+kZawe=OFEcOc2bTCYfsHw@mail.gmail.com>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Thu, 22 Feb 2024 10:58:20 +0800
+Message-ID: <CAGWkznHj=kt-7X+eeU-HrvWnokdDZKVeLQEV1zAAe+1iXc75jg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] sched: introduce helper function to calculate
+ distribution over sched class
+To: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/31/24 05:56, Christian Brauner wrote:
-> The fs parts of this should go through a vfs tree as this is vfs infra.
-> I can then give you a stable tag that you can merge and base the big
-> block and scsci bits on. It'll minimize merge conflicts and makes it
-> easier to coordinate imho.
-
-Hi Christian,
-
-It would be appreciated if such a stable tag could be created on the vfs.rw
-branch.
-
-Thanks,
-
-Bart.
-
+On Thu, Feb 22, 2024 at 1:51=E2=80=AFAM Vincent Guittot
+<vincent.guittot@linaro.org> wrote:
+>
+> On Tue, 20 Feb 2024 at 07:16, zhaoyang.huang <zhaoyang.huang@unisoc.com> =
+wrote:
+> >
+> > From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+> >
+> > As RT, DL, IRQ time could be deemed as lost time of CFS's task, some
+>
+> It's lost only if cfs has been actually preempted
+Yes. Actually, I just want to get the approximate proportion of how
+CFS tasks(whole runq) is preempted. The preemption among CFS is not
+considered.
+>
+> > timing value want to know the distribution of how these spread
+> > approximately by using utilization account value (nivcsw is not enough
+> > sometimes). This commit would like to introduce a helper function to
+> > achieve this goal.
+> >
+> > eg.
+> > Effective part of A =3D Total_time * cpu_util_cfs / cpu_util
+> >
+> > Timing value A
+> > (should be a process last for several TICKs or statistics of a repeadte=
+d
+> > process)
+> >
+> > Timing start
+> > |
+> > |
+> > preempted by RT, DL or IRQ
+> > |\
+> > | This period time is nonvoluntary CPU give up, need to know how long
+> > |/
+>
+> preempted means that a cfs task stops running on the cpu and lets
+> another rt/dl task or an irq run on the cpu instead. We can't know
+> that. We know an average ratio of time spent in rt/dl and irq contexts
+> but not if the cpu was idle or running cfs task
+ok, will take idle into consideration and as explained above,
+preemption among cfs tasks is not considered on purpose
+>
+> > sched in again
+> > |
+> > |
+> > |
+> > Timing end
+> >
+> > Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+> > ---
+> >  include/linux/sched.h |  1 +
+> >  kernel/sched/core.c   | 20 ++++++++++++++++++++
+> >  2 files changed, 21 insertions(+)
+> >
+> > diff --git a/include/linux/sched.h b/include/linux/sched.h
+> > index 77f01ac385f7..99cf09c47f72 100644
+> > --- a/include/linux/sched.h
+> > +++ b/include/linux/sched.h
+> > @@ -2318,6 +2318,7 @@ static inline bool owner_on_cpu(struct task_struc=
+t *owner)
+> >
+> >  /* Returns effective CPU energy utilization, as seen by the scheduler =
+*/
+> >  unsigned long sched_cpu_util(int cpu);
+> > +unsigned long cfs_prop_by_util(struct task_struct *tsk, unsigned long =
+val);
+> >  #endif /* CONFIG_SMP */
+> >
+> >  #ifdef CONFIG_RSEQ
+> > diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> > index 802551e0009b..217e2220fdc1 100644
+> > --- a/kernel/sched/core.c
+> > +++ b/kernel/sched/core.c
+> > @@ -7494,6 +7494,26 @@ unsigned long sched_cpu_util(int cpu)
+> >  {
+> >         return effective_cpu_util(cpu, cpu_util_cfs(cpu), ENERGY_UTIL, =
+NULL);
+> >  }
+> > +
+> > +/*
+> > + * Calculate the approximate proportion of timing value consumed in cf=
+s.
+> > + * The user must be aware of this is done by avg_util which is tracked=
+ by
+> > + * the geometric series as decaying the load by y^32 =3D 0.5 (unit is =
+1ms).
+> > + * That is, only the period last for at least several TICKs or the sta=
+tistics
+> > + * of repeated timing value are suitable for this helper function.
+> > + */
+> > +unsigned long cfs_prop_by_util(struct task_struct *tsk, unsigned long =
+val)
+> > +{
+> > +       unsigned int cpu =3D task_cpu(tsk);
+> > +       struct rq *rq =3D cpu_rq(cpu);
+> > +       unsigned long util;
+> > +
+> > +       if (tsk->sched_class !=3D &fair_sched_class)
+> > +               return val;
+> > +       util =3D cpu_util_rt(rq) + cpu_util_cfs(cpu) + cpu_util_irq(rq)=
+ + cpu_util_dl(rq);
+>
+> This is not correct as irq is not on the same clock domain: look at
+> effective_cpu_util()
+>
+> You don't care about idle time ?
+ok, will check. thanks
+>
+> > +       return min(val, cpu_util_cfs(cpu) * val / util);
+> > +}
+> > +
+> >  #endif /* CONFIG_SMP */
+> >
+> >  /**
+> > --
+> > 2.25.1
+> >
