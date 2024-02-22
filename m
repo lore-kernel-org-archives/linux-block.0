@@ -1,114 +1,100 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B1B3838C;
-	Thu, 22 Feb 2024 09:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805AB17BA5;
+	Thu, 22 Feb 2024 09:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708593670; cv=none; b=P7E+ILjWjGzv6djuXoP10lmnGrcbbWCQo52V9FMcs4jxKzVQpkSxtvim50ft9GFyAOoatH1bHvaOb5rE2GrvYbwUihk+919p1JhRFkGPK1bUYw4mZqbXUbgSLNscZAO9jPlswjjd2DEhO7aGjtclpSeUu3o7Thg+V8nUENIYqKE=
+	t=1708593749; cv=none; b=r5yKCdthcY6ce2YhnjxeMaYZ2u7YKndYd/e/tBY1XncXsaUBiGWb3rP4lzygEUjZlJZxAV2eEOtSUutGjsKPEUfocWhj0tbBBiSABLBwTZN5+QhWQIpwnRHQk2jY/00qAS7dHUZkOAL6z2wiqmStNMH4nOxTVE4cpT/dvBi4Auc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708593670; c=relaxed/simple;
-	bh=NKtzE7BIM06brClL6md3g/GK1JCKVFr64lTcGZ/YHVU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IcSC2ZlXqtAzSacMcRGdRxQRdhlnYnwPrpomo6XQQ8YNjJTFS8m8XAzuZ8Ve7qaYvPSjPSAzvpp841ckpfHv0iABkSSbntEp2J04wz1W0aLl1SXP/spGA4BrZRnZ7dY5qnxJ59c/IpZnthCbCTJsUn5m5tzC7pO/zXsuol3W3vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-60884277a6dso16472737b3.1;
-        Thu, 22 Feb 2024 01:21:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708593666; x=1709198466;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JYRdRsGICKVhHBscyhl69gwGxFN1Rh3mKKhBPHRcx2c=;
-        b=jFR1LhkuVyTvsYmdaTSUWBpH1AeXNXXgHsR0sAEINv99K1PZWY4twTpqPlXEzvoxWF
-         gm3UaLXPGS0lm8c5LjCAndKKsCXs5POLhWTamdr2pZzIx+BTdwqQQ7XGlrWj1n90liyc
-         cOmghsHIZcm4+HYxjjXFm7RuXOH9ih2O7gKyns+hFPmo4e6/PJPs7zSGkDTflPaJJmfG
-         Rm1oOLRftXZkGmL5XgNKVCdGJZIlxpVLInqG2ajzJCoCzfvT4/L23GSxQEUL6KwYIU+V
-         KLiLOEDvVsoG6hb2mbWDU4h9OhiMyFRZ8KBFzv2X1oQzbOxkKkDU3LqmkRhAEoL7azeT
-         RYOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVIdsA6ez/dq6syigZ81FwOI7BSgScnIWGXtUdBBKOPhS2W/D1ddcO6mbun2mRyq+viPsi3xsmRAfM58ofG1QUZZ15qa53g7MdmkaS4FjzvlYivgnL/cXB9Vi8YF+1R3+VYcW5un/IPmeeTupy8oiW37uaiMH/I7jxYpCi3m8OyAaoXPr59tfJgRQW7k9BDHYZ5Srm9Znp5xm/xQapk3GUBG8AOQMo=
-X-Gm-Message-State: AOJu0YxGMkAzuj0lXUgrTPBzT2N33TEjD6eIwEyWzJ7thyhLZzVW7TX2
-	TffhjZbz6KRFCkg/yWLapfpWmzKKgzMrBkVibdYvqhVH8iKy5xvFnsxU5vmzONI=
-X-Google-Smtp-Source: AGHT+IFyNTz5D/3JTZfEGul+SQRNih7/F0SvBP3aTCgZL+AiwgAuRTIraMHcJ7gtOqT0GYGlzIyCGQ==
-X-Received: by 2002:a05:690c:d:b0:608:af6:afa4 with SMTP id bc13-20020a05690c000d00b006080af6afa4mr17275422ywb.39.1708593666151;
-        Thu, 22 Feb 2024 01:21:06 -0800 (PST)
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com. [209.85.128.182])
-        by smtp.gmail.com with ESMTPSA id z144-20020a0dd796000000b006089c027c18sm150090ywd.94.2024.02.22.01.21.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 01:21:05 -0800 (PST)
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-607dec82853so72108057b3.3;
-        Thu, 22 Feb 2024 01:21:05 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXxbAF977hluj+q5uSfri2JcR6eF7d0iceqKWRThUvewtD6mhpTgh2J4K6wNmreph4XPKiSGJQ1PZyyL8c6+cdtqBL+rOpAJKRLN0D9CTMFiaSEBL+Xliumzk1UIpwxPkuioxCUum4+L/Lw1DdrqGOTDSHhOZDIvvZEvqAWwxsLWL/OxmxDE2tAEPX6HUEu9tHr4otZl8ZcblVab/G49x34qYLBvuI=
-X-Received: by 2002:a81:9945:0:b0:607:d9fb:5144 with SMTP id
- q66-20020a819945000000b00607d9fb5144mr18717240ywg.13.1708593665557; Thu, 22
- Feb 2024 01:21:05 -0800 (PST)
+	s=arc-20240116; t=1708593749; c=relaxed/simple;
+	bh=jGKNly6F5h90kehyDssDVfUuSAoQ4RIiQ6MOk2EJz/A=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VSrFXnU5LAMUI0EISasoqC+faHzn4UdKvu5mOMooO7JRpaknNh9qcihPThungYIDLjZrgrG+UwWn8C/4qUVuemVQHMRdFwBP6Y8eKuZWvqiLNOGyfiBG8Bx8rGfDb5Rx7Vc+K9q5JE8d+rCj45cb/2/rDq6964gLPX+h4QB8xWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TgSMv4bHdz4f3k5c;
+	Thu, 22 Feb 2024 17:22:19 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id D39141A0C2A;
+	Thu, 22 Feb 2024 17:22:22 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxBNEtdlwV0nEw--.33761S3;
+	Thu, 22 Feb 2024 17:22:22 +0800 (CST)
+Subject: Re: [PATCH] block: add put_device() call when device_add() fails in
+ device_add_disk()
+To: Alfredo Cruz <alfredo.carlon@gmail.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240221220141.32316-1-alfredo.carlon@gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <bf8659c5-8cfe-fd0e-3b59-c07cf1f48a87@huaweicloud.com>
+Date: Thu, 22 Feb 2024 17:22:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240127-mmc-proper-kmap-v2-0-d8e732aa97d1@linaro.org>
- <20240127-mmc-proper-kmap-v2-9-d8e732aa97d1@linaro.org> <7f40cb40-1a1-532-75fc-d3376ed27a@linux-m68k.org>
- <CACRpkdZpyefnTyKEJXru_HZG8xcJF66Eb2pZhbk+HVvfzdh4yw@mail.gmail.com>
- <CAMuHMdWwuH-mPm1TJTfvf3FXSd_zj+yP7OL6uB=-TrqNOT+W_Q@mail.gmail.com> <CACRpkdaks_7PWpXF=wssP2x+tZce5SFsGTCddgxjJQ9erHp-6Q@mail.gmail.com>
-In-Reply-To: <CACRpkdaks_7PWpXF=wssP2x+tZce5SFsGTCddgxjJQ9erHp-6Q@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 22 Feb 2024 10:20:54 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdV=GhAuh3fNBM_0_d+cGkcsK9FTVOVYHp1=PqMJigR4gQ@mail.gmail.com>
-Message-ID: <CAMuHMdV=GhAuh3fNBM_0_d+cGkcsK9FTVOVYHp1=PqMJigR4gQ@mail.gmail.com>
-Subject: Re: [PATCH v2 9/9] mmc: sh_mmcif: Use sg_miter for PIO
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Ulf Hansson <ulf.hansson@linaro.org>, Nicolas Pitre <nico@fluxnic.net>, 
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Angelo Dureghello <angelo.dureghello@timesys.com>, linux-mmc@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240221220141.32316-1-alfredo.carlon@gmail.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDHlxBNEtdlwV0nEw--.33761S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw1fWF4kKF4UWw13Aw4DCFg_yoWDZrb_C3
+	4j9F97uw1fAws3Ar909w1UAr10kwsFq3yfWFy0qFn3Xa43JF90v3s7JryrWr9rWay8Cr13
+	Cw48Zr4xtr4SgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb7kYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+	wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04
+	k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUrNtxDUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi Linus,
+Hi,
 
-On Wed, Feb 21, 2024 at 10:25=E2=80=AFPM Linus Walleij <linus.walleij@linar=
-o.org> wrote:
-> On Wed, Feb 21, 2024 at 10:50=E2=80=AFAM Geert Uytterhoeven
-> <geert@linux-m68k.org> wrote:
-> > > I've sent a patch, can you test?
-> > > https://lore.kernel.org/linux-mmc/20240220-fix-sh-mmcif-v1-1-b9d08a78=
-7c1f@linaro.org/T/#u
-> >
-> > While that patch fixes the BUG, it does not make the eMMC work fully.
-> > It spews:
-> >
-> >     sh_mmcif ee200000.mmc: Timeout waiting for 2 on CMD18
-> >
-> > and no or limited data is read ("hd /dev/mmcblk..." blocks after no
-> > or two lines of output).
-> >
-> > I still need to revert 27b57277d9ba to restore proper operation.
->
-> Halfway there. I looked at the code again and now I think I found the
-> problem causing CMD18 to time out.
->
-> I've send a new 2-patch series:
-> https://lore.kernel.org/linux-mmc/20240221-fix-sh-mmcif-v2-0-5e521eb25ae4=
-@linaro.org/
+ÔÚ 2024/02/22 6:01, Alfredo Cruz Ð´µÀ:
+> When device_add() fails, put_device() should called for cleanup.
+> Added this call before the jump to out_free_ext_minor to not
+> interfere with device_del() on error paths where deivce_add() succeeded
+> 
+> Signed-off-by: Alfredo Cruz <alfredo.carlon@gmail.com>
+> ---
+>   block/genhd.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index d74fb5b4ae68..5a231fb075bd 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -456,8 +456,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>   	if (!(disk->flags & GENHD_FL_HIDDEN))
+>   		ddev->devt = MKDEV(disk->major, disk->first_minor);
+>   	ret = device_add(ddev);
+> -	if (ret)
+> +	if (ret) {
+> +		put_device(ddev);
+>   		goto out_free_ext_minor;
+> +	}
 
-Thanks, life's good again ;-)
+This is wrong, gendisk is allocated by caller, and caller is responsible
+to free the gendisk, as you can see in many callers.
 
-Gr{oetje,eeting}s,
+Thanks,
+Kuai
 
-                        Geert
+>   
+>   	ret = disk_alloc_events(disk);
+>   	if (ret)
+> 
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
