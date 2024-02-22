@@ -1,63 +1,63 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDE4153BD5
-	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 17:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B68A1E488
+	for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 17:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708621770; cv=none; b=Fw0h9w1xuFtdmz9N6kaUuqk1sFKyk5dc60oX849PVUUL5lDmzsjj2tsHxpVuWu3U2hehQi5z4nsJPtalYNOVkOc+H+CRNIBd3F1gqJ43YMgddmLkiuxNoVv0xjZCbtsVlh7juQ5YX6hqFNvZk1sCxOWFfSX4xjs7hVRR9+S+F8Q=
+	t=1708621771; cv=none; b=GJZjL32C2u/U3qGdOUSzYFzAHfAEJ2jUzijxejTRJ3Jm68r+YccylOA6RYf+/MT7AFFh1pYeyV/X9VAmiP0j6u0ehRB64aOyalh7TtvLk5kH6eES+rqWK/rOUdAH/1IjGbZpGxaxSk8crmaqzNa0r6jf172meSnrcgRna6m2Tdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708621770; c=relaxed/simple;
-	bh=celCtcEPOo2fHHqBOz3nSdK/i7RCfiSVSuhe9wgbjnU=;
+	s=arc-20240116; t=1708621771; c=relaxed/simple;
+	bh=Z1GskjClhquD1XZu5l3BrsicrOLmznGF3BV92ZWk+sM=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=igMojQV/wdPdh2EN0FskfrDY4pgoEF9COpMxwweWBmQCxc+UuKJVg1dYRJDIFrR8clGFc/OObwfcVkpC8wX2Oh3+H4XWWQ59dfkUjLc725taaW/ymvkst3PQu5/Mil9ty/tuSkDrEDEzYlCYB99BMozzW1lxaDWg8S6iVlj31JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NdnYy3M8; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version:Content-Type; b=dgrF1cHkHRbs1xDeLHGYIWSKVz9PLcPqlkrm6r04eB/ny+f/ShfZAWTcsY/t1smdN/LAMdtTPhTQheFXrLx6gYDFk4Pm8rq0BfeQLi7ZmqBT+RfaKKwvnLv46WCmMdDH3Gvuu10qySFNmGl+azVD1qXYWeubcRlDP+6PZoUKaRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WNzxAmoh; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NdnYy3M8"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1db9cb6dcb5so8209675ad.1
-        for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 09:09:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WNzxAmoh"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1db9cb6dcb5so8209775ad.1
+        for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 09:09:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1708621767; x=1709226567; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1708621768; x=1709226568; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VsB2Fa2MB2AKFmE4QgPHpTanl2i0CQHMOV8hh32bbjQ=;
-        b=NdnYy3M8jr4uc0Y5b9SraXjzlZj0RVtt8tIzyyC0Yy4ENKCjXe+dK3jkJQ+mTJQXRr
-         /l28m5GD0/TVVRI8UWHMrA36CNmiJP3LdEIonrDSBbA1QSU2wCJzXiAbr/H7UIVpFRcs
-         vVigSN3zNghgElceMbm8KIUrwMd4+HLE83qQIgqBSqDkyigIiRNkX8okNeBnbNl74EfX
-         e9ONxLKho9qfnxRTI0c9Urndr+pRm543RHsp4zMhB/bGlsPvpEl+feIJgObEaHW1FJFh
-         ZyXXeTJoA335TMPkqKE5ZdMlFWVnUBWTkj0CywKB1aMPapZn99nWdncy0uvKpfKWbhRt
-         xcSg==
+        bh=wOZrMjyUcQo5lrNPbgsjeePit/IKSLB+Nm61h+OnLec=;
+        b=WNzxAmohVlEWCqX36HPP0NWQS5t7fpP8drb5QZXNQOvK0E//af/8FzORIttiVc05Un
+         sLNkFKv2vS7PH/pYOdMm5ibijQpLXiXJ9QGIYnI4avczMJflpZGSuC/i8zu6xcqmrtV5
+         8d+EkflZBuhG72vwIJARXIfCMsiyN3T9q25MnDPBazmh1bmLrPOLEu8Qh+QN1uRMwZAC
+         JGm5FpDZ1lMiex4VizREFQpx/zYlf/QO9xIzFNepbul9LmveL3FdeoumIBing4xbXp2J
+         dfqo0wY8OxXMQkyskx9c82p6XRe7c8X0Xi58rAno4xxPf/fT52e9rSlGMtvFhN0kyith
+         52Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708621767; x=1709226567;
+        d=1e100.net; s=20230601; t=1708621768; x=1709226568;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VsB2Fa2MB2AKFmE4QgPHpTanl2i0CQHMOV8hh32bbjQ=;
-        b=EOGJMuhIetn9HHXQZtrpM5hw/jLsW8B0+1vznA0QFpxXmM2b1jHNcDjwS5o53F7ZUR
-         nBhTNNu8mHLZP70SICSuCT08W8j8PgBLQYlWXsQxkG9cmWzhQ9CvwMgqP2dTbE8lKK6p
-         lZvqcIccoxhUi5gsYecBi49vpgsNXkYre3F3ZWLjDxXxNzSgjlMETGYcpbHmCL4JhH9z
-         ZMo4FIdQA7nyI/Gty7qcwqo/wCxj7TYQKS83hvXnhSaAjX9cU3GpVCUNML0uCL10+LzZ
-         AXj+2TZr8RIyZPTLPdFSiOOLocEe6E5fGbdNYA2EKgDHvCXN1/i4CU/OH7sWkU7pVMC/
-         c9Ng==
-X-Gm-Message-State: AOJu0Yy4+S4nwXg9q0vMj//jNma5ac/bmeOmzwR2Ecdbje8XS1nAGNoe
-	94x14B+qkOfk2Jzx7OuMasKGtT2mH71R2eqcDeTJD/g2otEXwX7QYeP7ew6XKFM=
-X-Google-Smtp-Source: AGHT+IEQORPQqdSdKH5gSaxLmE90VNhie4CuVf5II+5mIvejOfv3ilBZL0Bs6AFZ+F2bWnN20Uf/qg==
-X-Received: by 2002:a17:902:f689:b0:1db:c3b8:4620 with SMTP id l9-20020a170902f68900b001dbc3b84620mr3184232plg.5.1708621766846;
-        Thu, 22 Feb 2024 09:09:26 -0800 (PST)
+        bh=wOZrMjyUcQo5lrNPbgsjeePit/IKSLB+Nm61h+OnLec=;
+        b=HSfIzSXI4aUxWqIPNRMsx+iymFIzTw4hPFzuLJ4fXRRuAB3RgLxQfQIuTSLHhmUmXJ
+         dP9THIUQMctwHcCbCwrL1PhZW1ON2AM7KxkuTN/zyAQ+kZ5XtnYYQRKRCihyQZGliZNi
+         qYWviVy6tbrX+sjx3VWmxp/NLs9bf5/arzUWM0u1pAgOVRPkf734UtfUF17ToeX+rJwZ
+         1KK0/ximPuhqBhwQCDaaDffqCV/2R4ZnNrR++fn5NUyzXD0XQBgfTT/+3spFX2xYEEch
+         Zu1LDSnEEZiUcfjs0/W6abIMG93KhC9EQVVTfRUblASCAqR7Qz4O5+OML1crhmcZQnSd
+         5sKQ==
+X-Gm-Message-State: AOJu0YxPXxPrNtEYfzYX1/Ez0RHnJqvBZJ5DkvT1gAo5s1NPmG3ceHTL
+	2h+Sa66KhpkEJ9qsU1TxSX5bZRN50Lsp3kHujricX/t84q3zj3ldZ7cNfKzv/Us=
+X-Google-Smtp-Source: AGHT+IGRol6/6PHs9fyf4vSpFmqKkAbEqktu+wXWnxKsziokb9SKYPGvs2VZy49eIXTcCIXisyQKAQ==
+X-Received: by 2002:a17:902:d389:b0:1db:d32c:f4c0 with SMTP id e9-20020a170902d38900b001dbd32cf4c0mr3204585pld.3.1708621768321;
+        Thu, 22 Feb 2024 09:09:28 -0800 (PST)
 Received: from [127.0.0.1] (071-095-160-189.biz.spectrum.com. [71.95.160.189])
-        by smtp.gmail.com with ESMTPSA id w19-20020a170902c79300b001db839b9e80sm10253745pla.286.2024.02.22.09.09.26
+        by smtp.gmail.com with ESMTPSA id w19-20020a170902c79300b001db839b9e80sm10253745pla.286.2024.02.22.09.09.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 09:09:26 -0800 (PST)
+        Thu, 22 Feb 2024 09:09:27 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20240222073647.3776769-1-hch@lst.de>
-References: <20240222073647.3776769-1-hch@lst.de>
-Subject: Re: pass queue limits to alloc_disk for pktcdvd
-Message-Id: <170862176605.8813.6292201088013363148.b4-ty@kernel.dk>
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de
+In-Reply-To: <20240222083420.6026-1-john.g.garry@oracle.com>
+References: <20240222083420.6026-1-john.g.garry@oracle.com>
+Subject: Re: [PATCH] null_blk: Delete nullb.{queue_depth, nr_queues}
+Message-Id: <170862176698.8813.5426505320214942854.b4-ty@kernel.dk>
 Date: Thu, 22 Feb 2024 10:09:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -70,20 +70,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Thu, 22 Feb 2024 08:36:45 +0100, Christoph Hellwig wrote:
-> this series has the queue limits conversion for pktcdvd.
+On Thu, 22 Feb 2024 08:34:20 +0000, John Garry wrote:
+> Since commit 8b631f9cf0b8 ("null_blk: remove the bio based I/O path"),
+> struct nullb members queue_depth and nr_queues are only ever written, so
+> delete them.
 > 
-> Diffstat:
->  pktcdvd.c |   25 +++++++++----------------
->  1 file changed, 9 insertions(+), 16 deletions(-)
+> With that, null_exit_hctx() can also be deleted.
 > 
+> 
+> [...]
 
 Applied, thanks!
 
-[1/2] pktcdvd: stop setting q->queuedata
-      commit: 6f420d6a2dd8d4a795eab2839b0e08663269f9f8
-[2/2] pktcdvd: set queue limits at disk allocation time
-      commit: 4068550870360410261638479ffaf8364c366dd8
+[1/1] null_blk: Delete nullb.{queue_depth, nr_queues}
+      commit: 0f225f87873ee95dd4cf94dfc6a3249d4289e4ea
 
 Best regards,
 -- 
