@@ -1,49 +1,51 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3AF3FF1;
-	Fri, 23 Feb 2024 16:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F31122329
+	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 17:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708706515; cv=none; b=BBH7EkhBsfw+kDhlIkPm4ZGQTMdOrEnueo+Xfts7DAOWyX6ZKL0A77ZXE/OR36IrJpuwqKXwcm9cl/w3aUj5rSvykjRbRMnXbU1b/ugvTs9JcCLrem11h3iqLdnr0ngYGugNVW+fItro22W4ClR4Syl6sNYhtorgnseStj1gxws=
+	t=1708708663; cv=none; b=RVPiOp/i8YKvz/gxcgjFwkgLduTJSay4RRKC5SQE6FiyPY/hizUVvZ8yUZpbuANoYR2+f53s68xy9CyUnVpPZO5OcmM0oUlpHLLMwuVvoSveuneYkNe1CiBNZgjHWvqUjUgXgmY/i4HcBfmorbvP8Mphezx7u4QLDJG53v8f/LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708706515; c=relaxed/simple;
-	bh=iPePdpshC6aNZbH2wWpmV8JeUEGAIvwSRLY0Bq2AEX0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jk9R48zJP5kZb+euMJABfwLRPSpIjn+TGl+D7AY3BQ8wYm48CPAV1IMbw60jhrWfuxJPmKcpArMwiA1UwEVeRtv2RuEvPPlm2s0LRmOTA+XM4Q+gjvB3TpP5D2swc0TtQrZM3uMFH4KO1q6ZjSWGxulbwj2Kk4vcxNhhEjnQrM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=e8+lqrCe; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="e8+lqrCe"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4ThG4Y4khgz9srX;
-	Fri, 23 Feb 2024 17:41:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1708706509;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UZzVY1rE4nuBeeTGJE+eDzU+/KFUPmhj+EbPbIqSZ4c=;
-	b=e8+lqrCeUGLoeWHdMU2NT7TaFTqF+HMvYcUIDjJsltURgi0xQ/bx7qGFNQsEJYhQHMZsNe
-	nMoOe/X4Lct1Kp4ZiNdvtgX///gTTodyn0euqKyxAR7nCtXXLqUkxJ4S6LcCfYb5MPWsbE
-	Rhgy7btRp3nuFVbDEv4hzdAXPkCO/cP1DErzN/0zPuDj1jQMe2i570+hF9/d34b6dBh1tH
-	yNSN17DLBKPXBt9MtVGwcWkbRDh8qYbWXR5/lkabo3HBYOUrAbkaXGgi6calsgTdR9vUW1
-	y4NXoSKSDxK0oZOw1bVwbG+TOCepPI0Xw5TwgT8KYbcGt0kuAYfnQojkef5EPg==
-Date: Fri, 23 Feb 2024 17:41:46 +0100
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: lsf-pc@lists.linuxfoundation.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, mcgrof@kernel.org, p.raghav@samsung.com
-Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
-Message-ID: <43yvte5buxg4jv7nlguiz5eu5l26lkzz6cpa4snnvjqokbyg7i@42s52upzhrdi>
-References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
- <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
- <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+	s=arc-20240116; t=1708708663; c=relaxed/simple;
+	bh=uUh/WyYIbYsAfpy4+L2U+5AEMxonwfCxCyyaq0K7Xfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=NAcXYQiCv9wH6ncXR9IDVurTMVL6ddHZba15p593cA0QHie7pp5aIpW/ubHi4Gp6J3utQl7EqzBxVJsvj63/fB6hukW7T2y+4Nm1hvXdYYHhAUYpQ7fDHB4xeM8/S0FVj8a05amjYbx6BVtp7YqqzWAU4R7dH7K7LoaB5bTThwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-787a8cc7d95so102015485a.0
+        for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 09:17:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708708659; x=1709313459;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7d5bEzl4Pfk/hPSxARER9ZRkgxcRli8GERqXAK0ZBGo=;
+        b=BgqP2YANgrg6BRS4XgxBWiRkCcTH/9GtWDCJx7C/PpBbitw4b/Ydq1I+4vDDwnXcY5
+         +4mX0N4iwt1leLwMazH/KOg39E1s3hqmhsnkY1R2bEo+1mW+ZCUis/XnvGODZcMK56Al
+         EmpKrqSV4FUEDgS6gEg/Zga967wCeHq5YZf91JNSqz9W0VYyAieuyIB8SDHAulFzCEsF
+         ZtXKqowxmmVm3H8DGHydHn3FSh2RSk+fWfaTUaoE3d4+c8yOxo0a5DQln4WoE87O/fjY
+         31/uRDvwESe3qkfZK9OGNIwSsyfcEX0jOi88s+yNDjuzGnAAL5ug49sbdf/rDfUAUiem
+         oJgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWCKeh+T9TllgBwNMy54BDe73m4A9SLDxJtrgKi2hAyoR8/atO97CjUjs+lD6dbkLuqaRMUw9IKzWJzH5GToUW8ip69MHNrDze/mo=
+X-Gm-Message-State: AOJu0Yw+OlnECYRuy+45r2YZk4rX1ifZB9Y6G2uNTSJSwCr21LrdA2NL
+	Y2haooFZSFUSf30e59bHzuerbVzqef3r8o7Vztvj44pXM4K6NJjZAABe8oUj1g==
+X-Google-Smtp-Source: AGHT+IF5G0gsP29p/juoIFVDXB5cyHaaiyFCO/QrSTWgfFcIFkXe8vBN5FaTxKZTDDbYfaAi2puOVg==
+X-Received: by 2002:a05:620a:f88:b0:787:a9af:d6b8 with SMTP id b8-20020a05620a0f8800b00787a9afd6b8mr659327qkn.8.1708708659302;
+        Fri, 23 Feb 2024 09:17:39 -0800 (PST)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id v9-20020ae9e309000000b007877cc523f3sm3585957qkf.127.2024.02.23.09.17.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 09:17:38 -0800 (PST)
+Date: Fri, 23 Feb 2024 12:17:37 -0500
+From: Mike Snitzer <snitzer@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	Alasdair G Kergon <agk@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: [git pull] device mapper fixes for 6.8-rc6
+Message-ID: <ZdjTMZRwZ_9GjCmc@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,40 +54,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
-X-Rspamd-Queue-Id: 4ThG4Y4khgz9srX
 
-On Wed, Dec 20, 2023 at 04:03:43PM +0100, Hannes Reinecke wrote:
-> Hi all,
-> 
-> I would like to discuss
-> 
-> Large blocks for I/O
-> 
-> Since the presentation last year there has been quite some developments
-> and improvements in some areas, but at the same time a lack of progress
-> in other areas.
-> In this presentation/discussion I would like to highlight the current
-> state of affairs, existing pain points, and future directions of
-> development.
-> It might be an idea to co-locate it with the MM folks as we do have
-> quite some overlap with page-cache improvements and hugepage handling.
+Hi Linus,
 
-I am interested in attending this session. As we are getting closer to
-having LBS in XFS[1], we could then have the LBS support for block
-devices for free if we use the iomap to interact with the block cache 
-(!CONFIG_BUFFER_HEAD).
+The following changes since commit 54be6c6c5ae8e0d93a6c4641cb7528eb0b6ba478:
 
-So one of the focus points for this discussion could be on adding the LBS
-support to the buffer_head path for block devices and blockers (if any).
+  Linux 6.8-rc3 (2024-02-04 12:20:36 +0000)
 
-Another important discussion point is testing. xfstests helped iron out
-bugs in page cache and iomap while adding the LBS support for XFS. If we
-add support to buffer_heads, then how are we going to stress test the changes?
-I doubt just blktests would be enough to test the changes in page cache
-and buffer_heads.
+are available in the Git repository at:
 
-[1] https://lore.kernel.org/linux-xfs/20240213093713.1753368-1-kernel@pankajraghav.com/
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.8/dm-fixes-2
 
---
-Pankaj
+for you to fetch changes up to 0e0c50e85a364bb7f1c52c84affe7f9e88c57da7:
+
+  dm-crypt, dm-integrity, dm-verity: bump target version (2024-02-20 13:35:47 -0500)
+
+Please pull, thanks.
+Mike
+
+----------------------------------------------------------------
+- Stable fixes for 3 DM targets (integrity, verity and crypt) to
+  address systemic failure that can occur if user provided pages map
+  to the same block.
+
+- Fix DM crypt to not allow modifying data that being encrypted for
+  authenticated encryption.
+
+- Fix DM crypt and verity targets to align their respective bvec_iter
+  struct members to avoid the need for byte level access (due to
+  __packed attribute) that is costly on some arches (like RISC).
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmXY0iwACgkQxSPxCi2d
+A1oG3Qf/WE0T5qyBnDZ7irhvJmSLVx4oAwzB0PmMtELZ3Tkyn7BBAxq1Q2I2UT3x
+r90d1uy/pz6Y+kZkAPZjYuYLctukEa1swpfFe0Sn01dBrbgGU/p2vi3fkF+ZK6/t
+n5EN8S5dkf6rIDmp8R56iP8mP4OEultYjLugxc6ROohFgHZicoqv+Pye9kHp0Y19
+HSW2eueag/s2nMa9HKjIEd3+NBgmGb0qMMf3M6CXpRLNi/f/cyHbPzq83+eW3gcg
+jl480w5YHk2nOUSqrO8UfIaP4BpD3SEXQxVqIzdkVX4cEBO4yRcBNrQpsT89GsXj
+sg5zinkq3g7SThEpQWdpkeZMR/6q/A==
+=n0nQ
+-----END PGP SIGNATURE-----
+
+----------------------------------------------------------------
+Mike Snitzer (1):
+      dm-crypt, dm-integrity, dm-verity: bump target version
+
+Mikulas Patocka (5):
+      dm-integrity: recheck the integrity tag after a failure
+      dm-verity: recheck the hash after a failure
+      dm-crypt: don't modify the data when using authenticated encryption
+      dm-crypt: recheck the integrity tag after a failure
+      dm-verity, dm-crypt: align "struct bvec_iter" correctly
+
+ drivers/md/dm-crypt.c         | 101 ++++++++++++++++++++++++++++++++++--------
+ drivers/md/dm-integrity.c     |  95 ++++++++++++++++++++++++++++++++++-----
+ drivers/md/dm-verity-target.c |  88 +++++++++++++++++++++++++++++++++---
+ drivers/md/dm-verity.h        |  10 ++++-
+ 4 files changed, 256 insertions(+), 38 deletions(-)
