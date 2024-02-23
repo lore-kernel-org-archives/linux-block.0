@@ -1,66 +1,66 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A059D67E8A
-	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 11:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA7579DDC
+	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 11:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708686149; cv=none; b=NO/UMOoK9UN3Jn6SnGBmRs0BtfTgtVJ/2m9oLXbJh6M02pPOAKcAEz6jMoxspTQfk74Ip0D1czw4PP/TwOm6624pZWaMmfLjuRDUuKI9hPgCPz5GjQLtyodtag8spyv+xfiaYNlDo+RCULUiou0V5CgviV2i6nBk7tYHW6l65So=
+	t=1708688972; cv=none; b=lqX4thXzLZ0HVVDI/KdkSW4MhiTyRmhh1jGLKTkOnDvtUxtB71omWQBoB3q/DdbbB79Y+X/2/ymVg4HcBL8l2I1ahDIduz6S6/1mUVcKsEU8LRieE/uv1k6JbhoVb7lp+PkM6NDtc+dHP8+AG04h0UB0bgod/AghR5P8Qalpsbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708686149; c=relaxed/simple;
-	bh=w63yswG8lGrkf2M87zGIE16vi99FM/aje6Ew5jN1v/k=;
+	s=arc-20240116; t=1708688972; c=relaxed/simple;
+	bh=LIU7ZwH2LxKHaOVl/nXw+ot3M1oDUr/PXjzC8M99ShU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I1Y+T0jhFWBzbBnzcBTxUe1sxGSQSIUhzmr4kSxqiZrwjrgUAbkcEJC9tgJNV5UGhN0mfE9nMJyEmNhRUZsf5Y+kPaNHCOXyAbh+4ZqbfbIPu1ardE0d0vDD/GgCkc6mH1IcLdP1sL7rlVzAmDHsxB5+3qnMtJpDAT470Twb36A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J7VHH3kb; arc=none smtp.client-ip=148.163.156.1
+	 In-Reply-To:Content-Type; b=fgaOtvG29Qf7VB2KHS1GUShLgqliEoMg8K2BTb489o7VgKDn46goeYQnQRKaJCbvbG7OExoHFomtFe/0hS44ctslFatniFZ1GeJKDqXW3xZ4paGnUZ91ehYR6woTCBMFF8fVG20boxT/n5oEDpqE6W731cJs4TOVqgSJ808LuCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HKFwG7V4; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J7VHH3kb"
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41NAvRSG012354;
-	Fri, 23 Feb 2024 11:02:20 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HKFwG7V4"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41NBR5mW029496;
+	Fri, 23 Feb 2024 11:49:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=5WRc2gTyI5CWluuu1yTf9ff0mo1UJm9yTlV2dIupfY0=;
- b=J7VHH3kbELZo8yzHtAp1sF/sGSZ7RwxaGiCuX7T/cyisYmKd8eGQuuJBm50SfxAtG+Ie
- uHeTPEn+Jy0t+UzcyFjLzYWDIvXc8QArYr7UtcxlV51sdVBKgz0SUDzio3eLv7dfeVvj
- 3FltNFFwMHM4+DYWOazDBwqmoTgrtHOkENoxESqzQmyllGDLtqtwqfVWCkY66/s7nJwO
- Ox9ReZXI4T5aNV14AzYAky/TwaCMXPwIh+aAZqYJM4uLBWpG+GDvkFeVsliiXuGZvkpp
- x0CgRak4PsIp+Txd971P0rkncGvYi2tyHbtgeScR3DzR+5ePAEuqWhhIbyxofBx8LeGC aQ== 
+ bh=sFD2eZnC3tk/j2TaPXyLNAKg8WTUz+YtR7YTCrrixr4=;
+ b=HKFwG7V4akcl/TrxxFAnqdAxO249KwY5huH8Qy1ch/6ctiGuNKGM/K624Unm/hTwzo5g
+ KDSGw1qOLxePqjdMz6wFxby39HjHkXsZ/Sf7BjkCxIxlfNZOLyqd0DsqS/pn2jdULoQU
+ vpev9P80J6saEcthibccHiYb26AgrsbeWPOGDSCqLil/nN5E5ovKstM/QSJq2K/IpUCl
+ hgql1ugFk/VbzKr5o2r1TaBu/UFdN/4pkk1nLwdkJD0iex6p1YfHNUo5mTAzO2g5Hzvm
+ loxZ3SDAcTrh4NjtbDl3XpYjKt287NyB/yCFcoBJ8qVhe3F1k82yT4S0ZSxWwYFfxnTs kQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wet2drbp3-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wet9ngvn8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Feb 2024 11:02:19 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41NAvagE013321;
-	Fri, 23 Feb 2024 11:01:13 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wet2dr9wm-1
+	Fri, 23 Feb 2024 11:49:24 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41NBRBMH030352;
+	Fri, 23 Feb 2024 11:49:23 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wet9ngvmm-3
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Feb 2024 11:01:13 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41N9bd58031153;
-	Fri, 23 Feb 2024 11:00:23 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wb9bmce45-1
+	Fri, 23 Feb 2024 11:49:23 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41N8jOaT009577;
+	Fri, 23 Feb 2024 11:25:57 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wb84pvysv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Feb 2024 11:00:23 +0000
+	Fri, 23 Feb 2024 11:25:57 +0000
 Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41NB0KMp20710058
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41NBPt8i28901868
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 23 Feb 2024 11:00:22 GMT
+	Fri, 23 Feb 2024 11:25:57 GMT
 Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D4B9B58063;
-	Fri, 23 Feb 2024 11:00:18 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 316BE58064;
+	Fri, 23 Feb 2024 11:25:55 +0000 (GMT)
 Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 968EF58065;
-	Fri, 23 Feb 2024 11:00:16 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 257A258052;
+	Fri, 23 Feb 2024 11:25:53 +0000 (GMT)
 Received: from [9.109.198.202] (unknown [9.109.198.202])
 	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 23 Feb 2024 11:00:16 +0000 (GMT)
-Message-ID: <50f7c805-d562-4084-8f4f-4bf0e223ddde@linux.ibm.com>
-Date: Fri, 23 Feb 2024 16:30:14 +0530
+	Fri, 23 Feb 2024 11:25:52 +0000 (GMT)
+Message-ID: <a17a6587-7565-46ee-a321-2ffce9ce7d86@linux.ibm.com>
+Date: Fri, 23 Feb 2024 16:55:51 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,134 +68,104 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 4/4] blk-lib: check for kill signal
+Subject: Re: [PATCHv3 0/4] block: make long runnint operations killable
 Content-Language: en-US
 To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org
 Cc: axboe@kernel.org, ming.lei@redhat.com, chaitanyak@nvidia.com,
-        Keith Busch <kbusch@kernel.org>, Conrad Meyer <conradmeyer@meta.com>
+        Keith Busch <kbusch@kernel.org>
 References: <20240222191922.2130580-1-kbusch@meta.com>
- <20240222191922.2130580-5-kbusch@meta.com>
 From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20240222191922.2130580-5-kbusch@meta.com>
+In-Reply-To: <20240222191922.2130580-1-kbusch@meta.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 85qhkmu3EA1_LTC4hRazysYrPjxBdpve
-X-Proofpoint-ORIG-GUID: oW_bM5d0Av-mJZNjCRVmn3UeiZq0u0Fu
+X-Proofpoint-GUID: NR3BDJNO-GQvdKjoi6aQhMMtkgEYKKNO
+X-Proofpoint-ORIG-GUID: 83RuZ10oiZlaISzcCtKSeco-QwEwadIh
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-02-22_15,2024-02-23_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
- mlxlogscore=999 suspectscore=0 bulkscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 malwarescore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402230078
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ mlxscore=0 bulkscore=0 clxscore=1015 adultscore=0 phishscore=0
+ priorityscore=1501 mlxlogscore=999 suspectscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402230084
 
 
 
 On 2/23/24 00:49, Keith Busch wrote:
 > From: Keith Busch <kbusch@kernel.org>
 > 
-> Some of these block operations can access a significant capacity and
-> take longer than the user expected. A user may change their mind about
-> wanting to run that command and attempt to kill the process and do
-> something else with their device. But since the task is uninterruptable,
-> they have to wait for it to finish, which could be many hours.
+> Changes from v2:
 > 
-> Check for a fatal signal at each iteration so the user doesn't have to
-> wait for their regretted operation to complete naturally.
+>   Wait for chained bio's to complete before returning from kill signal.
 > 
-> Reported-by: Conrad Meyer <conradmeyer@meta.com>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  block/blk-lib.c | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
+>   Miscellaneous cleanup patches for style and consistency.
 > 
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index d4c476cf3784a..9e594f641ce72 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -35,6 +35,23 @@ static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
->  	return round_down(UINT_MAX, discard_granularity) >> SECTOR_SHIFT;
->  }
->  
-> +static void abort_bio_endio(struct bio *bio)
-> +{
-> +	complete(bio->bi_private);
-> +	bio_put(bio);
-> +}
-> +
-> +static void abort_bio(struct bio *bio)
-> +{
-> +	DECLARE_COMPLETION_ONSTACK_MAP(done,
-> +			bio->bi_bdev->bd_disk->lockdep_map);
-> +
-> +	bio->bi_private = &done;
-> +	bio->bi_end_io = abort_bio_endio;
-> +	bio_endio(bio);
-> +	blk_wait_io(&done);
-> +}
-> +
+> Keith Busch (4):
+>   block: blkdev_issue_secure_erase loop style
+>   block: cleanup __blkdev_issue_write_zeroes
+>   block: io wait hang check helper
+>   blk-lib: check for kill signal
+> 
+>  block/bio.c     | 12 +----------
+>  block/blk-lib.c | 57 ++++++++++++++++++++++++++++++++++++++-----------
+>  block/blk-mq.c  | 19 +++--------------
+>  block/blk.h     | 13 +++++++++++
+>  4 files changed, 61 insertions(+), 40 deletions(-)
+> 
 
-> @@ -143,6 +164,10 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
->  		nr_sects -= len;
->  		sector += len;
->  		cond_resched();
-> +		if (fatal_signal_pending(current)) {
-> +			abort_bio(bio);
-> +			return -EINTR;
-> +		}
->  	}
->  
->  	*biop = bio;
-> @@ -187,6 +212,10 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
->  				break;
->  		}
->  		cond_resched();
-> +		if (fatal_signal_pending(current)) {
-> +			abort_bio(bio);
-> +			return -EINTR;
-> +		}
->  	}
->  
+I tried applying patchset using "git am" but it failed to apply. Was the patchset 
+created against the latest v6.8-rc5? Latter I applied the patchet manually. 
 
-If a device with large capacity supports write zero offload and user kills that
-long outstanding write zero operation then it appears we run through the fatal_signal_pending()
-and abort_bio() twice: once under __blkdev_issue_write_zeroes() and then latter under 
-__blkdev_issue_zero_pages(). The entry to __blkdev_issue_zero_pages() happens if 
-__blkdev_issue_write_zeroes() returns the error code and BLKDEV_ZERO_NOFALLBACK is NOT 
-specified in flags.
+I have tested the changes on my NVMe with ~1.5 TB capacity and verified that
+the patch fixed the reported issue.
 
-I think if fatal signal is intercepted while running __blkdev_issue_write_zeroes() then we 
-shouldn't need to re-enter the __blkdev_issue_zero_pages(). We may want to add following code:
+NVMe details:
 
-@@ -280,7 +306,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
-                bio_put(bio);
-        }
-        blk_finish_plug(&plug);
--       if (ret && try_write_zeroes) {
-+       if (ret && ret != -EINTR && try_write_zeroes) {
-                if (!(flags & BLKDEV_ZERO_NOFALLBACK)) {
-                        try_write_zeroes = false;
-                        goto retry;
+# nvme id-ns /dev/nvme0n1 -H 
+NVME Identify Namespace 1:
+nsze    : 0x1749a956
+ncap    : 0x1749a956
+nuse    : 0x1749a956
+<snip>
+nvmcap  : 1600321314816
+<snip>
+LBA Format  0 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0 Best (in use)
+<snip>
+
+# cat /sys/block/nvme0n1/queue/write_zeroes_max_bytes 
+8388608
+# cat /sys/block/nvme0n1/queue/discard_granularity 
+4096
+# cat /sys/block/nvme0n1/queue/discard_max_bytes 
+2199023255040
+ 
+I tested following cases:
+1) Zero-fill all sectors of NVMe using blkdiscard; While test is running 
+   kill the 'blkdiscard' from other terminal and check the return status
+
+   # blkdiscars -z /dev/nvme0n1
+   Killed
+   # echo $?
+   137
+
+2) Discard all sectors of NVMe using blkdiscard, While test is running kill 
+   the 'blkdiscard' from other terminal
+
+   # blkdiscard /dev/nvme0n1
+   Killed
+   #echo $?
+   137
+
+The bash return the status code 137 which signifies that 'blkdiscard' is killed.
+
+My NVMe doesn't support secure erase operation so I couldn't test it. 
+   # blkdiscard -s /dev/nvme0n1 
+   blkdiscard: /dev/nvme0n1: BLKSECDISCARD ioctl failed: Operation not supported
+
+Feel free to add:
+
+Tested-by: Nilay Shroff<nilay@linux.ibm.com>
 
 Thanks,
 --Nilay
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
