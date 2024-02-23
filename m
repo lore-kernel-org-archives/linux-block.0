@@ -1,72 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914BABE66
-	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 03:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9082CA5
+	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 03:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708658994; cv=none; b=qH7C1kt2sZXxeEk1426pUrl13a5jNTODnAH6MCERsPnOwY/SkRXrkNqoRz1czqaDQWcmvy9Lzv39Ygx9Gk0zC66rgG+qLKoxkp1lCHp/HZyMqFd6klksx4vqkYar3hQj/mEwMh/19+sUPf1QU0UMvJFQO+CBdxadOToOzXJ302A=
+	t=1708659120; cv=none; b=Apy/9ekEwCD8oQvDk4ynyVloG4aYahhDQDOpAbIo1sovOiQK4M7s9eSijkXqcJr8VLlhQQj4tc7Cb7hJxkKo6zJwjudb1110bVnbGOeFSYFjokacrvw7ADF2JW0WntCW6Zr3znkEG29OzPdpLZL8qaF643S7Q2cZ1HaJOoeASu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708658994; c=relaxed/simple;
-	bh=eyCvpH46gDlTVfcQVm2lpTL/PC0lTWSfRNbdJZ+i3F8=;
+	s=arc-20240116; t=1708659120; c=relaxed/simple;
+	bh=lHuaSWhDR6kAJ8Ml1lqortESYbdtZsahgJoQKaK0ppo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JcRCLhjEBmFxCdw/E5D/3T4Kvmj0/Xvbd0jpv1aoRNxIWUxi083Axs8MD25z4jnJOrSHGsHkbnWsXTlAd24ZuadSbqgAyMBpCOowA0yXXrqXGA6GDhoe71QsiHvik88Z8UpWC8MuLr8mcy7R8RvdDQtuKp63ea9lExJ3uYw3PdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gb4yIEN5; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=ZsRniUwzgDHhicou6bUZJK00ypDNgEKRmoC1IG9UWMMKR7dKD+yqPY8ex7qfX6VvJQghDZR7kA/ubTH44DYW1yjDwgnHaGrfKKtsbVU3gTs9EZcRNUOUuD4UZ4IhL4rVu3sJH71A65qev/rf2VBB9T1S2abSEXAwjM7ntDl8q+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E3DYNsYT; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gb4yIEN5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E3DYNsYT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708658991;
+	s=mimecast20190719; t=1708659117;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eyCvpH46gDlTVfcQVm2lpTL/PC0lTWSfRNbdJZ+i3F8=;
-	b=Gb4yIEN5nNB2dpmpQXMpfqEpCqdcd/8IFEJ910/uX7qmNpzCRiMthB1Qar9HT7omNTX/XN
-	vi8CSYBPXDIG/NeMlYS99UmqRjCKATjbr3iNOvHwH5SXvSh5rgSEnoUCtGyf4/i8sRoCHN
-	a0PiaqrSu3RjA+3SiMZBunTGjXrARe0=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=lHuaSWhDR6kAJ8Ml1lqortESYbdtZsahgJoQKaK0ppo=;
+	b=E3DYNsYTq9oZNWvQ9ZXpUVTzlyk3DYbNVA5eu8VFRFnjOSTW5M1WkCaXnljXNtBCFwMB8h
+	WtqVC7XbYw2ryItMJpS5ekU+Rx6JRrRC71Fyi9yE9S2aRteg0zHAqKaIp5z4bACM4xZE5Z
+	Owi4KH9ytNAFM0a7gONfq3UR1QpGLFA=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-495-ieq6YlgYNKuLonylxXF8cQ-1; Thu, 22 Feb 2024 22:29:49 -0500
-X-MC-Unique: ieq6YlgYNKuLonylxXF8cQ-1
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-47066db30d6so2350137.1
-        for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 19:29:49 -0800 (PST)
+ us-mta-438-QYN-KZjBPfWpp_JQng5BEg-1; Thu, 22 Feb 2024 22:31:56 -0500
+X-MC-Unique: QYN-KZjBPfWpp_JQng5BEg-1
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-47054e3c8d9so2657137.0
+        for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 19:31:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708658989; x=1709263789;
+        d=1e100.net; s=20230601; t=1708659115; x=1709263915;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eyCvpH46gDlTVfcQVm2lpTL/PC0lTWSfRNbdJZ+i3F8=;
-        b=CJpxjiY17uAT5CEsoiCK8NGQskO4gRTiWuiac/CwMbcT0tD22h4qndiLljUBX2j5di
-         4iZF/tgM9pIMK1HR9luYRI3EMFsCwcFTap8jV/FCFq5AEYNokkmTSnvo0KKMsL5h3/HH
-         6BIbg+Xz+eLRZacNNgYwyOBS9bGhXGDYUG3/n/LsdB0bUTpABh9a/SK6A7LlHUzRHuhQ
-         dwU6bx+W+9pQYd4iXfBDqn+E8iszYk5e81oiyypD/n6+oomlLNScoX4kFg0u7bwAo2kJ
-         LAq6xJkAbLZ5R7vv04MGhV9ygWStwETJuYK1geaSi7Ob6mQnbM2cTklSgBId9qRTr9ox
-         SBnw==
-X-Gm-Message-State: AOJu0Yz6bbkz6hSwpKOzkMkYec6ETNLmPaMaD//ebyqN8dtpGwbTb336
-	27yNoUrUKJyoxolioCoIDLURpxu1jSdbSv+0uxGWhxnEqz9iHNpkp0g0bTPmtlLLu3wLRDM9hC4
-	h0sRw6s73bvB0WRlRtu4bzircvHRsgCMwDoI3eqlzugvFKp3i9JJ5H32VXoQDGNcageOUJOG7Rl
-	KOGuyqlg5lrPwBJ2Wj1EQoLk1Cwp838sdvtMg=
-X-Received: by 2002:a05:6102:2366:b0:470:5648:6f39 with SMTP id o6-20020a056102236600b0047056486f39mr717761vsa.2.1708658989169;
-        Thu, 22 Feb 2024 19:29:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEmhkAtIKKZnvjgYIbDIM7ZBAnYEwwjvMguMPLADOMxp/sHA/pm0p7XBtNn6wvHUiWLXyYF40noAEPNRSvGFDM=
-X-Received: by 2002:a05:6102:2366:b0:470:5648:6f39 with SMTP id
- o6-20020a056102236600b0047056486f39mr717756vsa.2.1708658988916; Thu, 22 Feb
- 2024 19:29:48 -0800 (PST)
+        bh=lHuaSWhDR6kAJ8Ml1lqortESYbdtZsahgJoQKaK0ppo=;
+        b=fN6cdb01iFHYXWAIwn3dutig+qWO1cM2fOcuey4fArLixGS2yG7hXe3VO/PrQBmQfL
+         27iUmO6n6KKfByyq3b6zh48LB/g0pX8t4P8l4d/iLl6T2SdGBxxdWTeTBoEC96+tXdD8
+         leCmoenmD56CQz8kvAX+xhDZ4Fe9ldF8+ITBO9VaGF5qNmHswrHXkL+DlihxvPuUwCQ0
+         33I7H4SKt2SWyDjMjT4K5lTJjkvUHfYUJprr1zEUQYBupCu8QK8Ercg4HvN6wxdODoYN
+         LebomPnGMZLQboh+lMVK1vROX2Ds0olnf6gYnnxhcA4MJePUFazfmkNoEfwQEe+w4E7N
+         cEbQ==
+X-Gm-Message-State: AOJu0YzbGfGVgD3sb79DG+zvec0mLWOaWj2wTcxsyL+y38OTxafltlA0
+	SWAJcCSYa2B/dYPl+Bh1EZFyNGmqsoXEsGSK+0ep1IT950C6VgE+rqZ3DMo8WsHpDaqwliDkNJZ
+	SPDqycIFU7ut5UVg9BSMvWjAiug8RzLRF0kA7vJxLOKAQIRde+0MguJPLmH+uN+cDThGU9nCi7h
+	1OF9fAvYt25SMPV1GJ9/RmbiwxT7gy6ONHakfRAHMTpLHHRG/H
+X-Received: by 2002:a05:6102:2431:b0:470:3f0f:9e68 with SMTP id l17-20020a056102243100b004703f0f9e68mr771451vsi.0.1708659115423;
+        Thu, 22 Feb 2024 19:31:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHhZpTnKdyBE02Th2xU8OFUt38MTzgdY0MVc3gSRyFbwWuRT1NcVzxmUH8LrPjJu38YvUgnctY/nRkctOFp8gA=
+X-Received: by 2002:a05:6102:2431:b0:470:3f0f:9e68 with SMTP id
+ l17-20020a056102243100b004703f0f9e68mr771444vsi.0.1708659115195; Thu, 22 Feb
+ 2024 19:31:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222191922.2130580-1-kbusch@meta.com> <20240222191922.2130580-3-kbusch@meta.com>
-In-Reply-To: <20240222191922.2130580-3-kbusch@meta.com>
+References: <20240222191922.2130580-1-kbusch@meta.com> <20240222191922.2130580-4-kbusch@meta.com>
+In-Reply-To: <20240222191922.2130580-4-kbusch@meta.com>
 From: Ming Lei <ming.lei@redhat.com>
-Date: Fri, 23 Feb 2024 11:29:38 +0800
-Message-ID: <CAFj5m9Kmu_z6qORsri=DidxEnbgaLkP4g4Y418wK3D40oVSYjA@mail.gmail.com>
-Subject: Re: [PATCHv3 2/4] block: __blkdev_issue_write_zeroes cleanup
+Date: Fri, 23 Feb 2024 11:31:44 +0800
+Message-ID: <CAFj5m9+46VnnYNiFRgM2gn-bb14S4_Vsf9MN65K7j4kL5M00jQ@mail.gmail.com>
+Subject: Re: [PATCHv3 3/4] block: introduce io wait hang check helper
 To: Keith Busch <kbusch@meta.com>
 Cc: linux-block@vger.kernel.org, axboe@kernel.org, nilay@linux.ibm.com, 
 	chaitanyak@nvidia.com, Keith Busch <kbusch@kernel.org>
@@ -78,7 +78,8 @@ On Fri, Feb 23, 2024 at 3:20=E2=80=AFAM Keith Busch <kbusch@meta.com> wrote=
 >
 > From: Keith Busch <kbusch@kernel.org>
 >
-> Use min to calculate the next number of sectors like everyone else.
+> This is the same in two places, and another will be added soon.
+> Create a helper for it.
 >
 > Signed-off-by: Keith Busch <kbusch@kernel.org>
 
