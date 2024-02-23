@@ -1,73 +1,78 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6093405C7;
-	Fri, 23 Feb 2024 16:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB7E84A49;
+	Fri, 23 Feb 2024 16:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708704727; cv=none; b=d4n8TCdBl5+StkLpiCzBwTGwZB8R86+ksItWKkw/RQFqPeu8Uq90RrpthvmZScYnfXMToobS8Obxy55xhHm2KKgKAeYO1dqu3lxfan2JluV21QZ3h66pL9OPkmGP4y/ApSdR+8f8KizL1qZdT0jzLHGaiw2azCyBjqSwBU3L0dY=
+	t=1708704779; cv=none; b=SgmZU+5MqXPkVMAeA/Qc+2Q2h6ajpFnpyaD5g3Bj/DAeRKWQBAybcDa2edV86ULe8yPMXNSeUSHnv2v975c2L0tPgN8THMm5obflhS9fRBAb6J6Ta3+mBSMHZNsXLpwAEyptFKSzjATdH3UZ/ZtwCNPrKcxVpPQZbhhzwU7C7Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708704727; c=relaxed/simple;
-	bh=IYZqpnDB3Z2+5OZRzz3nhcxs9MGkwIv0jltubSu1ZvA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QW7JDYsl+HDLXdAeeX7rzyk0jzfx90KF8ov716x/wxGWCo/XLeOTLYnk1cdgcDR0MuL+K3TblI/ZqCUDXMDIXu89baK7Dlrh+lSbCL2JfHz6r+G51CfdxHtseevXYZoZv14oqqaUdrduRa0P2yztlGKLIWRUIhEsnhizBBWgVrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e47c503fb5so703238b3a.2;
-        Fri, 23 Feb 2024 08:12:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708704725; x=1709309525;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IYZqpnDB3Z2+5OZRzz3nhcxs9MGkwIv0jltubSu1ZvA=;
-        b=roLdd85Bv8xTcnyoKQZE5NWzYzLElKQMAjtIFUgn5Yjx32FSAD0QIuZW+ttcz5CS3B
-         86JDfG5qrU5XuenY7Hi9xZyZrcJM3mhDgBaVELwn7Rve+xKDepSBvsk5yKDh2vjpZtph
-         uKNnubWZqUGvzpcwKIJ1h/av7e0otmOi9LYxaoW1otG2rBPeZvMOVYkrEPe7100O+jEG
-         yb8qlahu4Bhdi/QHfqoOQvaKgUtCPCEpOX15kiPmBjlE2t1t3hCRPjxF/L+NEC0IRR5Y
-         zNcMk/aRbfW3kKKTcK/ddsUIRN1/qrl2NWw5X52HcTEptkM8G7EyN4LQv+CLJEq9OYwY
-         KwhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLNDVOR9gr1buL6CMNVPbZydbWY4isv16mR+lyZvbKEhXqSWInm7QBJzvJrfeOmZkA8RXcIgs1sP98jV015r4Aj9wTi2el/KyOTU0=
-X-Gm-Message-State: AOJu0YwGgkCS/qF1UvdAO6oYGctC1Sg73yHzPOV21prmIIbflfRlZgr2
-	mmtixusGr67NI9QNYA5iwuWISicIrh+j9CHPtQ32TAZepP7ciozt
-X-Google-Smtp-Source: AGHT+IHzpuQcMVcAUWd8AjHuQZlT1DFNC2jSXD7wC37QFNhWnipL/1e5mN9eWMwtB7J/g5vvfb7brw==
-X-Received: by 2002:a05:6a00:929f:b0:6e4:d868:ac35 with SMTP id jw31-20020a056a00929f00b006e4d868ac35mr298726pfb.19.1708704724846;
-        Fri, 23 Feb 2024 08:12:04 -0800 (PST)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id d24-20020aa78158000000b006e053e98e1csm12993655pfn.136.2024.02.23.08.12.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Feb 2024 08:12:04 -0800 (PST)
-Message-ID: <e079f55d-9e4c-49e5-8389-ac2c2c4ad7c5@acm.org>
-Date: Fri, 23 Feb 2024 08:12:03 -0800
+	s=arc-20240116; t=1708704779; c=relaxed/simple;
+	bh=iQyOkottnsrAwDoRlhsKzDtzCHTrvfsby3H8Wp/Af64=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M8XucyWbdD1qevn5LwR5fwsRE5WY1Q/kMcp3xJ4kBBNoa8CtcU/EsVRsVL43AVm1qpB/0Cqeq7HBSgFGjnbBXGJS4fOYM3J16dc7wrlfhjNOTWqC833ev6/ZL0GFh9EU90+mEVFK1+wbnizr+runKAAEDcp3nwjOx7NihcisIg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=26+axJut; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="26+axJut"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=k3HOQnbWtGh3BvZkNVjW58+PG2/qlXYQEbUShSEwg/A=; b=26+axJutulMlpbxUK89etwpfKi
+	k4WJiaojYBAaRMrpEI+P9ZApbx13xNEPJHobtXfKhD28rTyePdjhQbE4QYUzxxhb9bUWgkXjgWlro
+	FTpdqDBZiyiTXnm4tlmI1j0lgUsr1UNUe/TQt8QKg0LPeJhU+A5RKOekO52GX26mwxhHIbLEXLq5K
+	gbIK/Zg931ZkYvZhkxzQgxc8w09VHbFhDHlVPfNpXa6+rAeyT+66yZuSiCuR/sdhAiuT0eA1sN3go
+	QA2CYd/kLNVdqrvL6+njEmPMZ6X84H3wGUCAPrZkgn7hkoCzqFMdBjTz1g8suSedKaW0zyMtYxOnM
+	lfBYH1/w==;
+Received: from [2001:4bb8:19a:62b2:c70:4a89:bc61:3] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rdYAL-0000000AAdM-46Ca;
+	Fri, 23 Feb 2024 16:12:50 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai3@huawei.com>
+Cc: dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Subject: atomic queue limit updates for stackable devices
+Date: Fri, 23 Feb 2024 17:12:38 +0100
+Message-Id: <20240223161247.3998821-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] sched: Add a new function to compare if two cpus
- have the same capacity
-Content-Language: en-US
-To: Qais Yousef <qyousef@layalina.io>, Jens Axboe <axboe@kernel.dk>,
- Ingo Molnar <mingo@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>, Wei Wang <wvw@google.com>,
- Jaegeuk Kim <jaegeuk@kernel.org>, Christoph Hellwig <hch@infradead.org>
-References: <20240223155749.2958009-1-qyousef@layalina.io>
- <20240223155749.2958009-2-qyousef@layalina.io>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240223155749.2958009-2-qyousef@layalina.io>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 2/23/24 07:57, Qais Yousef wrote:
-> The new helper function is needed to help blk-mq check if it needs to
-> dispatch the softirq on another CPU to match the performance level the
-> IO requester is running at. This is important on HMP systems where not
-> all CPUs have the same compute capacity.
+Hi all,
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+this series adds new helpers for the atomic queue limit update
+functionality and then switches dm and md over to it.  The dm switch is
+pretty trivial as it was basically implementing the model by hand
+already, md is a bit more work.
+
+I've run the mdadm testsuite, and it has the same (rather large) number
+of failures as the baseline.  I've still not managed to get the dm
+testuite running unfortunately, but it survives xfstests which exercises
+quite a few dm targets and blktests.
+
+drbd and nvme-multipath will be handled separately.
+
+Diffstat:
+ block/blk-settings.c   |   46 ++++++++++++------
+ drivers/md/dm-table.c  |   27 ++++------
+ drivers/md/md.c        |   37 ++++++++++++++
+ drivers/md/md.h        |    3 +
+ drivers/md/raid0.c     |   35 ++++++-------
+ drivers/md/raid1.c     |   24 +++------
+ drivers/md/raid10.c    |   52 +++++++++-----------
+ drivers/md/raid5.c     |  123 ++++++++++++++++++++++---------------------------
+ include/linux/blkdev.h |    5 +
+ 9 files changed, 193 insertions(+), 159 deletions(-)
