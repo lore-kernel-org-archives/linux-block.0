@@ -1,97 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B3853A1
-	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 03:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAD3B67F
+	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 03:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708659540; cv=none; b=UGl9ei4sSbzHF8YcIKWKX8ZYiAJNtgm3qexr0e7MxPokun2CA7SgR4R7BYL+3zv3gCn7bTlh3uj2pqtj/DCL156Zh6FImWxYfSnnFPxKpBOmaT69sAwoAxSkoJNVMcxEwuayqmXYJqZ0BphiqrhLdj5DMwD5lkTS+eUUmM2VEdA=
+	t=1708660566; cv=none; b=lN/doA7+YJl+QWxe7T0BHYr4/JNs1k3DTz/2KgzoO1oATKZ5cupUCdwUbfQn0ylPyDXIPMqZImTo3Yqim7qep9vdmt7v1gc9aHwUzN/5ozFGgYCayrT78bkfuRX4PWuwaVOVHpbbN2U5JKFr7pAaJvdo7kaNH+KHlnr/vbR0JvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708659540; c=relaxed/simple;
-	bh=B0i0+nxfozszHhNkVrDf9L8PZfAFfrk7N7ZDM0M5HBg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p+J2dS+cAT+fA8oCKs/vqEfxm5IB3mIdT3YQvWUAMXl4eh+L7ulsDZvH1r3U+RklMAlOi+dlPpIsF1EQdRAd2z1Kf5JOV8nQg9wGrBEljSDAmdSdVu92ckRrIRhtUntUJdCNzpUtxTLboH5m2HWaEQiB5eq040r8Du25SbxE1pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dlJ/6Xnd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dlJ/6Xnd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708659534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B0i0+nxfozszHhNkVrDf9L8PZfAFfrk7N7ZDM0M5HBg=;
-	b=dlJ/6XndNUyXQhOboEYV6IYp7qL6BnH1e089NkTmdYRsg2d94aW579W6a9fJ8whpEoNy3I
-	VJC03Gb/LNWvHOqnulC3PuDJKuq88+juSOdXzgf56fPgwYDTTdW5jt2CYBoIEhSubrDu+5
-	tBTModpFVT3PXCR1P7feJV00sgYjePM=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-ILOQd3zBMUqLcaWds6YPNw-1; Thu, 22 Feb 2024 22:38:53 -0500
-X-MC-Unique: ILOQd3zBMUqLcaWds6YPNw-1
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-46d1e3394a0so100537137.0
-        for <linux-block@vger.kernel.org>; Thu, 22 Feb 2024 19:38:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708659533; x=1709264333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B0i0+nxfozszHhNkVrDf9L8PZfAFfrk7N7ZDM0M5HBg=;
-        b=HrwTGjcn5BcH/Gzzzf6IYEcqZFOyPtYHBeN7ckG9Ym+1ikCXo2bBNYk1WT9w5lJdvt
-         sEOc7Fj7FbaPie4xcrW2UBRHk97BTvQwpU5bODO+zoFdgjYnYmRAEArMyrUoQkd7788q
-         j8BaauEBuXF6k3zE2MSjUq0PKZ9pUyh71pDpOMkWSo8blGH2TSQdREW2kOccMqh0uNAa
-         jn33HavdMObL/8azRGtvfrEo1zQOKcVckrqpVtTACexIeE3ve8DIT10K+UtJGhQXg2XU
-         AbChpiVwOO6t+u0e/rLiY4JCJQk69binDENs0meS7iWwj7l6ypOihyz81dS5ICqdwtDt
-         yOmw==
-X-Gm-Message-State: AOJu0YxwXXPQm+IJHNb+kZmd/DXQTndY18agWuUBJ5pc4MT9+ApCZc/L
-	Jz85ypB4jXcQyXvh/mu5r9wGP512Mo5pizkWxFpAaW4wCD5JMvmNREcY8U5/6yzlHSgu/m3njiT
-	n1BTzxD2TEjqEaJeolxMc7wyY2IFflP7OiIAW+04je4Y/N+ktrQH0xRc2wwfDrw4dm1NlyxCF/l
-	fw1Ch8SNTYoiV16Y4s2FEX8FfrMHT/kcXjMwM=
-X-Received: by 2002:a05:6102:3bd5:b0:470:5f0b:5d52 with SMTP id a21-20020a0561023bd500b004705f0b5d52mr733520vsv.1.1708659532838;
-        Thu, 22 Feb 2024 19:38:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFCi7Nly8NrzpaEv3afvqfYVJQF08wqstMO58fqKSzSDKgfROkvjK/2ZA4uqLhyGi/Nv8V2C/TTinOemxNC/5U=
-X-Received: by 2002:a05:6102:3bd5:b0:470:5f0b:5d52 with SMTP id
- a21-20020a0561023bd500b004705f0b5d52mr733513vsv.1.1708659532596; Thu, 22 Feb
- 2024 19:38:52 -0800 (PST)
+	s=arc-20240116; t=1708660566; c=relaxed/simple;
+	bh=brGBZ9P1VPb4XpFtJMfvT/hhEfEYKxqN4etRyOQiKfQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L9+9wF/TVB5hvcDv9qVPh9mPZDtFY0qnWTJfJosxAzVkBCGzlDhROJrQoVX0gARfXsOX+xQAZg1cvlbBfM11F/ZzhfRifm/WqHdHsPAFd1MI2vBgvEYOzp/6mNKpDBFmneySu9OfK8E2350dRiOALs+w9tu3wqbQrNhDPcGc5Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Tgx4G1kvhz1vtxj;
+	Fri, 23 Feb 2024 11:55:26 +0800 (CST)
+Received: from dggpemm100001.china.huawei.com (unknown [7.185.36.93])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2A7911A016C;
+	Fri, 23 Feb 2024 11:56:01 +0800 (CST)
+Received: from localhost.localdomain (10.175.112.125) by
+ dggpemm100001.china.huawei.com (7.185.36.93) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 23 Feb 2024 11:56:00 +0800
+From: Kefeng Wang <wangkefeng.wang@huawei.com>
+To: Johannes Weiner <hannes@cmpxchg.org>, Yosry Ahmed <yosryahmed@google.com>,
+	Nhat Pham <nphamcs@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
+CC: Chengming Zhou <chengming.zhou@linux.dev>, Huacai Chen
+	<chenhuacai@kernel.org>, Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
+	<senozhatsky@chromium.org>, <linux-mm@kvack.org>,
+	<linux-block@vger.kernel.org>, Kefeng Wang <wangkefeng.wang@huawei.com>
+Subject: [PATCH 2/5] zram: make zram depends on SWAP
+Date: Fri, 23 Feb 2024 11:55:45 +0800
+Message-ID: <20240223035548.2591882-3-wangkefeng.wang@huawei.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20240223035548.2591882-1-wangkefeng.wang@huawei.com>
+References: <20240223035548.2591882-1-wangkefeng.wang@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222191922.2130580-1-kbusch@meta.com> <20240222191922.2130580-5-kbusch@meta.com>
-In-Reply-To: <20240222191922.2130580-5-kbusch@meta.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Fri, 23 Feb 2024 11:38:41 +0800
-Message-ID: <CAFj5m9JAZ1UMnWkpvR31LUG-Ym76Hkc1dWhc8ta-8wZLWPOOMg@mail.gmail.com>
-Subject: Re: [PATCHv3 4/4] blk-lib: check for kill signal
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.org, nilay@linux.ibm.com, 
-	chaitanyak@nvidia.com, Keith Busch <kbusch@kernel.org>, 
-	Conrad Meyer <conradmeyer@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm100001.china.huawei.com (7.185.36.93)
 
-On Fri, Feb 23, 2024 at 3:20=E2=80=AFAM Keith Busch <kbusch@meta.com> wrote=
-:
->
-> From: Keith Busch <kbusch@kernel.org>
->
-> Some of these block operations can access a significant capacity and
-> take longer than the user expected. A user may change their mind about
-> wanting to run that command and attempt to kill the process and do
-> something else with their device. But since the task is uninterruptable,
-> they have to wait for it to finish, which could be many hours.
->
-> Check for a fatal signal at each iteration so the user doesn't have to
-> wait for their regretted operation to complete naturally.
->
-> Reported-by: Conrad Meyer <conradmeyer@meta.com>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+The zram is useless when SWAP is disabled, make zram depends on SWAP.
 
-Looks fine,
+Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+---
+ drivers/block/zram/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index 7b29cce60ab2..0cee425da0f5 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ config ZRAM
+ 	tristate "Compressed RAM block device support"
+-	depends on BLOCK && SYSFS && MMU
++	depends on SWAP && SYSFS
+ 	depends on CRYPTO_LZO || CRYPTO_ZSTD || CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842
+ 	select ZSMALLOC
+ 	help
+-- 
+2.27.0
 
