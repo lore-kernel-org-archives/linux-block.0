@@ -1,29 +1,29 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1896DDB1
-	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 03:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D2610971
+	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 03:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708660568; cv=none; b=SKPQoclzLdWiJ3mVNDX9FejxC6/bfIDTYuaqtngyJ9DCwnlzhbEV9aoWXE5st5b3H9enCH5tVs4YFZ+Y2R0DjBP8O/dBb7uW/XnbbChB7gSYZAOjfKfeVa03+heGQXkPI3wiz1U2vLSbu9HRyQEUMW0lWkGrgIw4sToTGRL8KaY=
+	t=1708660570; cv=none; b=sdxYGXLYt+fW9p0RwBADpAqAf3YZb95Xlp3frpUZoyQh6eQLE60QmGbtCvQkHmU3hj8q4PoQDkjZAnClMug7k8v1ULvNWfuICK4hIDOrIht7vc6CCc8jWy4a3niH/SO27TTa1hKet1Z4SpSvtJqRr5tm3ZiQQ5OuMf5frSJ2TMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708660568; c=relaxed/simple;
-	bh=KiOu5h3IDER5dAH5Zs/e4rFZ9RBxGacT4w9BAMy7iTk=;
+	s=arc-20240116; t=1708660570; c=relaxed/simple;
+	bh=d/R/4aR4gC50xsS9lw/06sGRWh/mHdlq/aSZyPL2FnQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qBDqGXESXa+9PpgcV11D3qWB511ODApy0CuFZ0qs5hgPzxzTG2vxx6tgt3SJN/dFcq9Mr1V96vjN1oDRCY2jB2Ud4fwbo4UaKn9ZT7cBJk6GEqiopLh4FlKXu3qpxKTJgO8x6dLhwbvT/K+RpnDwpQ/xBzYzdBNYUpaJLQPVEXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 MIME-Version:Content-Type; b=nDB6gxXmf+bRxXlEDLD+KoNFiTZKR4EjtfuE0vJoZjPcyqLhzTgs0aHBbcWbPqpdqc8UDz5NSu+riGi72oXC9+qnO52UhxeJSsrjwjV8qkU8ySASeh3vTXsLyEO9IlURp+kSY07Hdw/cXqXdmPYXVT6LPFoKIqmt7VvTYADP7TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tgx2S18Rwz1gyhf;
-	Fri, 23 Feb 2024 11:53:52 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Tgx3J0qT7z1xpBD;
+	Fri, 23 Feb 2024 11:54:36 +0800 (CST)
 Received: from dggpemm100001.china.huawei.com (unknown [7.185.36.93])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5AC04140155;
-	Fri, 23 Feb 2024 11:56:02 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 92D6C140136;
+	Fri, 23 Feb 2024 11:56:00 +0800 (CST)
 Received: from localhost.localdomain (10.175.112.125) by
  dggpemm100001.china.huawei.com (7.185.36.93) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 23 Feb 2024 11:56:01 +0800
+ 15.1.2507.35; Fri, 23 Feb 2024 11:55:59 +0800
 From: Kefeng Wang <wangkefeng.wang@huawei.com>
 To: Johannes Weiner <hannes@cmpxchg.org>, Yosry Ahmed <yosryahmed@google.com>,
 	Nhat Pham <nphamcs@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
@@ -31,9 +31,9 @@ CC: Chengming Zhou <chengming.zhou@linux.dev>, Huacai Chen
 	<chenhuacai@kernel.org>, Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
 	<senozhatsky@chromium.org>, <linux-mm@kvack.org>,
 	<linux-block@vger.kernel.org>, Kefeng Wang <wangkefeng.wang@huawei.com>
-Subject: [PATCH 4/5] mm: zswap: default to lzo-rle instead of lzo
-Date: Fri, 23 Feb 2024 11:55:47 +0800
-Message-ID: <20240223035548.2591882-5-wangkefeng.wang@huawei.com>
+Subject: [PATCH 1/5] zram: zcomp: remove zcomp_set_max_streams() declaration
+Date: Fri, 23 Feb 2024 11:55:44 +0800
+Message-ID: <20240223035548.2591882-2-wangkefeng.wang@huawei.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20240223035548.2591882-1-wangkefeng.wang@huawei.com>
 References: <20240223035548.2591882-1-wangkefeng.wang@huawei.com>
@@ -48,58 +48,24 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  dggpemm100001.china.huawei.com (7.185.36.93)
 
-Since lzo-rle performance is better than lzo, see commit ce82f19fd580
-("zram: default to lzo-rle instead of lzo"), converting zswap to use
-lze-rle too.
+The zcomp_set_max_streams() is removed from commit 43209ea2d17a
+("zram: remove max_comp_streams internals"), remove the declaration.
 
 Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
 ---
- mm/Kconfig | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ drivers/block/zram/zcomp.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/mm/Kconfig b/mm/Kconfig
-index b1448aa81e15..f41a28b74efd 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -62,7 +62,7 @@ config ZSWAP_SHRINKER_DEFAULT_ON
- choice
- 	prompt "Default compressor"
- 	depends on ZSWAP
--	default ZSWAP_COMPRESSOR_DEFAULT_LZO
-+	default ZSWAP_COMPRESSOR_DEFAULT_LZORLE
- 	help
- 	  Selects the default compression algorithm for the compressed cache
- 	  for swap pages.
-@@ -72,7 +72,7 @@ choice
- 	  available at the following LWN page:
- 	  https://lwn.net/Articles/751795/
+diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+index cdefdef93da8..e9fe63da0e9b 100644
+--- a/drivers/block/zram/zcomp.h
++++ b/drivers/block/zram/zcomp.h
+@@ -39,5 +39,4 @@ int zcomp_compress(struct zcomp_strm *zstrm,
+ int zcomp_decompress(struct zcomp_strm *zstrm,
+ 		const void *src, unsigned int src_len, void *dst);
  
--	  If in doubt, select 'LZO'.
-+	  If in doubt, select 'LZO-RLE'.
- 
- 	  The selection made here can be overridden by using the kernel
- 	  command line 'zswap.compressor=' option.
-@@ -83,6 +83,12 @@ config ZSWAP_COMPRESSOR_DEFAULT_DEFLATE
- 	help
- 	  Use the Deflate algorithm as the default compression algorithm.
- 
-+config ZSWAP_COMPRESSOR_DEFAULT_LZORLE
-+	bool "LZO-RLE"
-+	select CRYPTO_LZO
-+	help
-+	  Use the LZO algorithm as the default compression algorithm.
-+
- config ZSWAP_COMPRESSOR_DEFAULT_LZO
- 	bool "LZO"
- 	select CRYPTO_LZO
-@@ -118,6 +124,7 @@ config ZSWAP_COMPRESSOR_DEFAULT
-        string
-        depends on ZSWAP
-        default "deflate" if ZSWAP_COMPRESSOR_DEFAULT_DEFLATE
-+       default "lzo-rle" if ZSWAP_COMPRESSOR_DEFAULT_LZORLE
-        default "lzo" if ZSWAP_COMPRESSOR_DEFAULT_LZO
-        default "842" if ZSWAP_COMPRESSOR_DEFAULT_842
-        default "lz4" if ZSWAP_COMPRESSOR_DEFAULT_LZ4
+-bool zcomp_set_max_streams(struct zcomp *comp, int num_strm);
+ #endif /* _ZCOMP_H_ */
 -- 
 2.27.0
 
