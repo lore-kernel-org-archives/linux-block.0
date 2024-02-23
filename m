@@ -1,79 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FA414263E;
-	Fri, 23 Feb 2024 18:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A310141999
+	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 18:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708711506; cv=none; b=dqsRPXUhBgflnNQnAJg8h2CQcKaCCgoGoTAKoQs48//AYlFjz7Qs2O+6lhHNnhCBYxuyThH4Hq5hr8rcInzvTo0BpWeiK1uii8wIKsYJ0OaI16TSkUpibTSFXVv2r3hKW5mhUMIuLnkB52NWyI9eE3yR25DZXiLP3NqqFin1TxY=
+	t=1708712280; cv=none; b=XSs/3zCu2Oblw5kSE3hA/dd3KZ3zX4Wnl5/fjAuBRr0bMR1Ro37jL8RXrC3zPIgjD38QtvKfIxWyv6qkVFbDWQyD0YnkU62u/UXy5OxTUrAihrbbicZ6K7AT8DlIXsDp2sNxY72tjNyCIDU0SLdveJadhWnEWJVduYRqWpwb+b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708711506; c=relaxed/simple;
-	bh=LnhjvqUeq0CK0kIwGNY2StqDTPb27nbR7qd6jVWv0QA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WMSzBA10+2Z3T90xbs5EiUSeTqNg7jmyGmiZQOxZXuOFM1nATIvRraeF0YyclHdUwGpK8Ggz0K5mWr53bADO5hQ6lcWXK8E/ZBr/Z92x1oO9dVw+5KByebqUx5GQNBVnqbc3fBCHbRlfBDigxw9Ro+tFUroYHpKhqigrVFFAMPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 370BEC433C7;
-	Fri, 23 Feb 2024 18:05:01 +0000 (UTC)
-Date: Fri, 23 Feb 2024 13:06:53 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Linus Torvalds
- <torvalds@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, linux-block@vger.kernel.org,
- linux-cxl@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
- virtualization@lists.linux.dev, linux-rdma@vger.kernel.org,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
- selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org,
- linux-wpan@vger.kernel.org, dev@openvswitch.org,
- linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
- Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <20240223130653.2cc317a8@gandalf.local.home>
-In-Reply-To: <20240223125634.2888c973@gandalf.local.home>
-References: <20240223125634.2888c973@gandalf.local.home>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708712280; c=relaxed/simple;
+	bh=s1J3yxJJmHAT7tpjiN+ReLmhK0Jn7qywHUyIzFNWgKM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cRXqyHRC7C2UEU0f714NtKwTgs9reGB/YzG5bkdeg1PTOPQ+em+83cDJdOJAWWpUtWUsfg2c+zcm/g7m1qdzkaMWkW3pDtil+2qysahUF908fFOoW+eTRZppX6j1VcALFxQeiSgwBVXfK3vVuHVDxvAMIi2/nx/6HgdryvWQ4fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=HO5Z+gHZ; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="HO5Z+gHZ"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a3fd9063261so95561266b.1
+        for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 10:17:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1708712276; x=1709317076; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SMw6mgHykaNOkD9F2veVqYVpqjqdsgVrDzeEVTrgN9E=;
+        b=HO5Z+gHZA3i0pf1J1M1lDNdvmtXo9v9MZcPAV3B+cYA+CRPcfbSsJuIN3nHUkjN9ze
+         frZNTRPqBQKdgowsLcH1rL7rudZ6ggP+jmAkbfdVG6n8CdAPjZSxqzWgahZnLgBc7+BQ
+         FrSwT1VCz09HjNQ+ommxaz5giJDIgIuIa5kWo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708712276; x=1709317076;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SMw6mgHykaNOkD9F2veVqYVpqjqdsgVrDzeEVTrgN9E=;
+        b=gBPBwziX6kKm5eIybgE/CcSdmTJg+bSh5BPZcGJOk907QPUQIaddHekVMBoiRygRw0
+         P6vZ6w8QFG3MyBp4KHjshTar8+suB7WS6o+6gVk8bp6DGGOCejKIONaPWcZhUfI3Znel
+         fHgH7p792LjeCcndvTliaFdIssdUefz8uSrTzjmJiBeVhfxcRaIfONHhCqKlJBhtJqYn
+         RZLOTYu3BkGjWeBWheZ9o3TGpBG26/m6MwGv0xi7Kuq5fapXj/BIhYX7Y7/xwuuKlctA
+         N8VvSB+oxzVYY4TXZSpzYR/agCFL0a6jzWnm+uNTf/LJWAnyjAehkKaydUE3EwIDCLjb
+         YOrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3Byk4HEKKjyCJJzVfSY+lVzr5Vje5eU5ljYi4wQB1GZDu4t7FZp4nFh+Zu3gDrIp8qgMpPojGA2HHavDMPYZL9x4VuQid2CcZGPg=
+X-Gm-Message-State: AOJu0YysR9IYwHWQhFk77N1gtkYCaGieJxeWe8yVD0CjtpNxLkAhtdk4
+	hkLDTmipDwpJWAaHc1dIYKOFPWTTaKJ/Dofb2KGx+7WA95p6QBygYlnG0167u3VoQJpKUAo7IXi
+	U8C8=
+X-Google-Smtp-Source: AGHT+IG5a6odsK5c2+GA0dD165GEUGC8/EwnkF4/PfgG/puYqXMQb8LUIT0G+84kcTfCBExzvkgPSw==
+X-Received: by 2002:a17:906:b7d3:b0:a3d:993e:ad24 with SMTP id fy19-20020a170906b7d300b00a3d993ead24mr343236ejb.59.1708712276153;
+        Fri, 23 Feb 2024 10:17:56 -0800 (PST)
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com. [209.85.218.42])
+        by smtp.gmail.com with ESMTPSA id k25-20020a1709065fd900b00a4136d1899esm321041ejv.102.2024.02.23.10.17.55
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Feb 2024 10:17:55 -0800 (PST)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a3f829cde6dso135797666b.0
+        for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 10:17:55 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVRyscM0192f9UcF/hAaQxliqMv3zr6CzGPxofhgypDAUSXwtqxHmor47Sd2hIcH5XyiD7Q11Ce61cVun5tNiexi/ejj2Ly0zec9Og=
+X-Received: by 2002:a17:906:40ca:b0:a3f:2259:da62 with SMTP id
+ a10-20020a17090640ca00b00a3f2259da62mr384294ejk.52.1708712274991; Fri, 23 Feb
+ 2024 10:17:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <ZdjTMZRwZ_9GjCmc@redhat.com> <CAHk-=whmiQC_F1s1bWmOhM8csz_zxL32B=sPGgaz1kiTK_T2iA@mail.gmail.com>
+ <20240223174629.GB5743@lst.de>
+In-Reply-To: <20240223174629.GB5743@lst.de>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 23 Feb 2024 10:17:38 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wjU-9SAYOWWJbAsEW3fwSXggB=KGWFjYCtmu1yAURM-iw@mail.gmail.com>
+Message-ID: <CAHk-=wjU-9SAYOWWJbAsEW3fwSXggB=KGWFjYCtmu1yAURM-iw@mail.gmail.com>
+Subject: Re: [git pull] device mapper fixes for 6.8-rc6
+To: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+	Alasdair G Kergon <agk@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, 
+	Mikulas Patocka <mpatocka@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 23 Feb 2024 12:56:34 -0500
-Steven Rostedt <rostedt@goodmis.org> wrote:
+On Fri, 23 Feb 2024 at 09:46, Christoph Hellwig <hch@lst.de> wrote:
+>
+> I'll let Ming speak, but I think the idea was to remove the padding
+> at the end of the structure when embedded into the bio.
 
-> Note, the same updates will need to be done for:
-> 
->   __assign_str_len()
->   __assign_rel_str()
->   __assign_rel_str_len()
+It's not horribly obvious if the beginning is aligned there either.
 
-Correction: The below macros do not pass in their source to the entry
-macros, so they will not need to be updated.
+> Does __aligned also work on struct members?  If so we could add a
+> __aligned(8) to bi_sector an get exactly what we want..
 
--- Steve
+Hmm. I'm not sure that works. I think sizeof may always end up being
+aligned to alignof (because otherwise arrays cannot work)
 
->   __assign_bitmask()
->   __assign_rel_bitmask()
->   __assign_cpumask()
->   __assign_rel_cpumask()
+And looking at
 
+    struct bio_integrity_payload {
+
+there's odd padding both before _and_ after the struct bvec_iter due
+to having three 16-bit fields in between.
+
+So right now I think that packing ends up actually horrid. I don't see
+any *reason* for that odd setup, but right now it might have actually
+end up being 2-byte aligned with a two-byte padding hole at the end.
+
+             Linus
