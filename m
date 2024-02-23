@@ -1,43 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F79179A8
-	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 19:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA47E1448FF
+	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 19:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708716723; cv=none; b=uRh3POaUTVL3xVlh+EKhP+319cErJpkB2hW8oQKYBWY7VAG05ySZiMbrfsPVJs4TDnZSlekmRDdPnj6t7Qb1ZaRft2EY/UhuytACSO5l4qMdiwoIxrvTA5kz6wf8qW54ZiaH1fN6EjaE4P4GIMd5jPIy4D0Jeiuy3UfR8psEZOE=
+	t=1708717871; cv=none; b=GdsN9WENgREnlwIZsd6m2m9PRYOHr4xOBIIlhrhI4Eh7lOnePU9rue9BPp0mncKvtVIF+OJ4x5zjrgS+by+ZMJgShQbTDnwBcZrbeep5VnKWteMh2n4OW01jFLXez+/pau+LFz0U5cVAQSILtDwca8dZ9/KGC8Fbh/Ue2QzNg5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708716723; c=relaxed/simple;
-	bh=iNuAbsejRr50TqSupnntWNJNUtUNgOgz9Lm/O+Ecqv8=;
+	s=arc-20240116; t=1708717871; c=relaxed/simple;
+	bh=YaVgMmCZccAOj2rhCfHdyWTcmqoRE1LJqZeVBmFLeSU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k11aZpRvRfPvb2luHKO44WS0p5a9XkSSjfCF9MqZwCoIEGI/4NnE1qFBp8c6mwYkNV9L0q3xZ2aM3DGDX5yKqOsNhZfT0w0dDQ4nNLwg7W0TWcc5qQMFLkH22T6Kal6DBtC52qCNm77zbAL6CKHzzaa578jzJkVFRemQphDHZOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MthDhzNc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=jopwIebqvkwwBE/i175fQdJ3GozQ7EiwAXHYfWjDG+b2ZCr3ZjKR7ldki4G7O1nT39zBFVHaNgkZ8FY7UzY47mWsYktnXY3iDGRyIicjeRIbNBHgWniMUaRT4VxV6ubDKAhzMeRR52ETflEbNhWgSe4xv/+iJ7CjCtQz6Dxgrj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uWxPu15j; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MthDhzNc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A645C433C7;
-	Fri, 23 Feb 2024 19:32:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708716722;
-	bh=iNuAbsejRr50TqSupnntWNJNUtUNgOgz9Lm/O+Ecqv8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MthDhzNcyIQXxaYO0A+XNgskkqby1RyKtQ6X8IH7iGfh2vlcOX+XJu6iSod0Kd50h
-	 1cimj6o5QfErd7o8sKMtfsZ4OjuMO0D7u69G+nYp/T3JuRZTOoN9WOGmLKveHnmqtB
-	 g8E8HHGdJSkq+6yKtA7XaUaxPjiHTpe7OJWyJwwiafiHpbz33TZE0+Qi/8lqBJF8Up
-	 tEp7BfJ0KnWLBkv4H5sABKEA4iYbkJLXh3xTIXE096hfjsFVWR51AFipfkaqZc6b/p
-	 O2H2dGxnUBP6nMjkxWfrh/f4QFSz9iXF1bobD6ceiY/tK9nDgn9ze8JXIB2Zr9USyb
-	 sirTu7bUFq8Qw==
-Date: Fri, 23 Feb 2024 12:31:58 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Keith Busch <kbusch@meta.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.org" <axboe@kernel.org>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"nilay@linux.ibm.com" <nilay@linux.ibm.com>
-Subject: Re: [PATCHv4 0/4] block: make long running operations killable
-Message-ID: <Zdjyrvfy7aELykoS@kbusch-mbp>
-References: <20240223155910.3622666-1-kbusch@meta.com>
- <1a81ef8d-023b-4a87-a71d-a31dddf3106c@nvidia.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uWxPu15j"
+Date: Fri, 23 Feb 2024 14:50:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708717865;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G9nEEkfFGj8WFYt7yvHDxsoouHxXt+6aC7E5xhimc9A=;
+	b=uWxPu15jxbBy5Qv8sUU4/FKz9vhwMVdq24ex7AxwdBDTkpdTty7N4oFt5H+WpItVhn5h2q
+	QhDNbk6QMiXNrrlkBl7kMfsoV81d2NhOFvXWC0sVWqoHMtRJN5Tm42Zzvb2Qci9w4QIV6Q
+	wpkGE4FwRbb7rZDimmKQkBl02FYhYXk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+	intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org, 
+	virtualization@lists.linux.dev, linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-tegra@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
+	ath11k@lists.infradead.org, ath12k@lists.infradead.org, brcm80211@lists.linux.dev, 
+	brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org, linux-bcachefs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org, selinux@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org, 
+	linux-sound@vger.kernel.org, bpf@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	dev@openvswitch.org, linux-s390@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, Julia Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <qsksxrdinia3cxr52tfe4p3pafsy4biktnodlfn4vyzud73p2j@6ycnhrhzwsv6>
+References: <20240223125634.2888c973@gandalf.local.home>
+ <0aed6cf2-17ae-45aa-b7ff-03da932ea4e0@quicinc.com>
+ <20240223134653.524a5c9e@gandalf.local.home>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,28 +62,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1a81ef8d-023b-4a87-a71d-a31dddf3106c@nvidia.com>
+In-Reply-To: <20240223134653.524a5c9e@gandalf.local.home>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Feb 23, 2024 at 07:16:30PM +0000, Chaitanya Kulkarni wrote:
-> On 2/23/24 07:59, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> >
-> > Changes from v3:
-> >
-> >   Added reviewed and tested by tags
-> >
-> >   More formatting cleanups in patch 2 (Christoph)
-> >
-> >   A more descriptive name for the bio chain wait helper (Christoph)
-> >
-> >   Don't fallback to the zero page on fatal signal error (Nilay)
-> >
+On Fri, Feb 23, 2024 at 01:46:53PM -0500, Steven Rostedt wrote:
+> On Fri, 23 Feb 2024 10:30:45 -0800
+> Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
 > 
-> we need a blktests for this, for whole series :-
+> > On 2/23/2024 9:56 AM, Steven Rostedt wrote:
+> > > From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> > > 
+> > > [
+> > >    This is a treewide change. I will likely re-create this patch again in
+> > >    the second week of the merge window of v6.9 and submit it then. Hoping
+> > >    to keep the conflicts that it will cause to a minimum.
+> > > ]
+> > > 
+> > > With the rework of how the __string() handles dynamic strings where it
+> > > saves off the source string in field in the helper structure[1], the
+> > > assignment of that value to the trace event field is stored in the helper
+> > > value and does not need to be passed in again.  
+> > 
+> > Just curious if this could be done piecemeal by first changing the
+> > macros to be variadic macros which allows you to ignore the extra
+> > argument. The callers could then be modified in their separate trees.
+> > And then once all the callers have be merged, the macros could be
+> > changed to no longer be variadic.
+> 
+> I weighed doing that, but I think ripping off the band-aid is a better
+> approach. One thing I found is that leaving unused parameters in the macros
+> can cause bugs itself. I found one case doing my clean up, where an unused
+> parameter in one of the macros was bogus, and when I made it a used
+> parameter, it broke the build.
+> 
+> I think for tree-wide changes, the preferred approach is to do one big
+> patch at once. And since this only affects TRACE_EVENT() macros, it
+> hopefully would not be too much of a burden (although out of tree users may
+> suffer from this, but do we care?)
 
-How would you know know if the device completed the operation before the
-fatal signal or not? This is a quick test script off the top of my head,
-but whether or not it shows a difference with this patch series depends
-on your device.
+Agreed on doing it all at once, it'll be way less spam for people to
+deal with.
 
-  # time sh -c "blkdiscard -z /dev/nvme0n1 & sleep 1 && kill %1 && wait"
+Tangentially related though, what would make me really happy is if we
+could create the string with in the TP__fast_assign() section. I have to
+have a bunch of annoying wrappers right now because the string length
+has to be known when we invoke the tracepoint.
