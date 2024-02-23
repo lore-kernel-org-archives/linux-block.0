@@ -1,25 +1,25 @@
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1856D2E6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1896DDB1
 	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 03:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708660567; cv=none; b=roJtIfJO2garm58R8DvZzaBGymqAnKOrq4TwMVKcADbr9dlZQ3N0+mPR3H+mv7p803A6LmvU8A1mal30l/GTwMofSmy5/lsePgmzW4ejYt9S5+H1AkNqNyDZgKXLiLRsCbCUMzjpQeSZkoy9thCKLsZFLbbXCLjCFGmDiwQyLng=
+	t=1708660568; cv=none; b=SKPQoclzLdWiJ3mVNDX9FejxC6/bfIDTYuaqtngyJ9DCwnlzhbEV9aoWXE5st5b3H9enCH5tVs4YFZ+Y2R0DjBP8O/dBb7uW/XnbbChB7gSYZAOjfKfeVa03+heGQXkPI3wiz1U2vLSbu9HRyQEUMW0lWkGrgIw4sToTGRL8KaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708660567; c=relaxed/simple;
-	bh=p440YFG9lPgSq8HFwoKWlaFAhsV5uzvTMX4KQdrHDRk=;
+	s=arc-20240116; t=1708660568; c=relaxed/simple;
+	bh=KiOu5h3IDER5dAH5Zs/e4rFZ9RBxGacT4w9BAMy7iTk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m52n40J9//YQa6+KfSsmS9QF9FgYVsF2W1fkW9ZVTqkiz2PDIkf4xrBJSohLKiaQHxMn607zYcVhrA5sJd0Usx4mTHFYmkwvFzgrttqP0aZtlM4qqfNFmEdsdDANXnzOUyknUyxV1Zpn/4cohPsfJsopRtIZJBkb/jfpwlsMLcY=
+	 MIME-Version:Content-Type; b=qBDqGXESXa+9PpgcV11D3qWB511ODApy0CuFZ0qs5hgPzxzTG2vxx6tgt3SJN/dFcq9Mr1V96vjN1oDRCY2jB2Ud4fwbo4UaKn9ZT7cBJk6GEqiopLh4FlKXu3qpxKTJgO8x6dLhwbvT/K+RpnDwpQ/xBzYzdBNYUpaJLQPVEXk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TgwzJ1DHHz1FKW7;
-	Fri, 23 Feb 2024 11:51:08 +0800 (CST)
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tgx2S18Rwz1gyhf;
+	Fri, 23 Feb 2024 11:53:52 +0800 (CST)
 Received: from dggpemm100001.china.huawei.com (unknown [7.185.36.93])
-	by mail.maildlp.com (Postfix) with ESMTPS id BB1EA140155;
-	Fri, 23 Feb 2024 11:56:01 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 5AC04140155;
+	Fri, 23 Feb 2024 11:56:02 +0800 (CST)
 Received: from localhost.localdomain (10.175.112.125) by
  dggpemm100001.china.huawei.com (7.185.36.93) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -31,9 +31,9 @@ CC: Chengming Zhou <chengming.zhou@linux.dev>, Huacai Chen
 	<chenhuacai@kernel.org>, Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
 	<senozhatsky@chromium.org>, <linux-mm@kvack.org>,
 	<linux-block@vger.kernel.org>, Kefeng Wang <wangkefeng.wang@huawei.com>
-Subject: [PATCH 3/5] zram: support deflate compressor
-Date: Fri, 23 Feb 2024 11:55:46 +0800
-Message-ID: <20240223035548.2591882-4-wangkefeng.wang@huawei.com>
+Subject: [PATCH 4/5] mm: zswap: default to lzo-rle instead of lzo
+Date: Fri, 23 Feb 2024 11:55:47 +0800
+Message-ID: <20240223035548.2591882-5-wangkefeng.wang@huawei.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20240223035548.2591882-1-wangkefeng.wang@huawei.com>
 References: <20240223035548.2591882-1-wangkefeng.wang@huawei.com>
@@ -48,61 +48,58 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  dggpemm100001.china.huawei.com (7.185.36.93)
 
-Add deflate compressor support, also it is prepare for unifying the
-default compressor compressor for zram and zswap.
+Since lzo-rle performance is better than lzo, see commit ce82f19fd580
+("zram: default to lzo-rle instead of lzo"), converting zswap to use
+lze-rle too.
 
 Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
 ---
- drivers/block/zram/Kconfig | 7 ++++++-
- drivers/block/zram/zcomp.c | 3 +++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ mm/Kconfig | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
-index 0cee425da0f5..b007dda16430 100644
---- a/drivers/block/zram/Kconfig
-+++ b/drivers/block/zram/Kconfig
-@@ -2,7 +2,7 @@
- config ZRAM
- 	tristate "Compressed RAM block device support"
- 	depends on SWAP && SYSFS
--	depends on CRYPTO_LZO || CRYPTO_ZSTD || CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842
-+	depends on CRYPTO_LZO || CRYPTO_ZSTD || CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842 || CRYPTO_DEFLATE
- 	select ZSMALLOC
+diff --git a/mm/Kconfig b/mm/Kconfig
+index b1448aa81e15..f41a28b74efd 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -62,7 +62,7 @@ config ZSWAP_SHRINKER_DEFAULT_ON
+ choice
+ 	prompt "Default compressor"
+ 	depends on ZSWAP
+-	default ZSWAP_COMPRESSOR_DEFAULT_LZO
++	default ZSWAP_COMPRESSOR_DEFAULT_LZORLE
  	help
- 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
-@@ -20,6 +20,10 @@ choice
- 	default ZRAM_DEF_COMP_LZORLE
- 	depends on ZRAM
+ 	  Selects the default compression algorithm for the compressed cache
+ 	  for swap pages.
+@@ -72,7 +72,7 @@ choice
+ 	  available at the following LWN page:
+ 	  https://lwn.net/Articles/751795/
  
-+config ZRAM_DEF_COMP_DEFLATE
-+	bool "Deflate"
-+	depends on CRYPTO_DEFLATE
+-	  If in doubt, select 'LZO'.
++	  If in doubt, select 'LZO-RLE'.
+ 
+ 	  The selection made here can be overridden by using the kernel
+ 	  command line 'zswap.compressor=' option.
+@@ -83,6 +83,12 @@ config ZSWAP_COMPRESSOR_DEFAULT_DEFLATE
+ 	help
+ 	  Use the Deflate algorithm as the default compression algorithm.
+ 
++config ZSWAP_COMPRESSOR_DEFAULT_LZORLE
++	bool "LZO-RLE"
++	select CRYPTO_LZO
++	help
++	  Use the LZO algorithm as the default compression algorithm.
 +
- config ZRAM_DEF_COMP_LZORLE
- 	bool "lzo-rle"
- 	depends on CRYPTO_LZO
-@@ -48,6 +52,7 @@ endchoice
- 
- config ZRAM_DEF_COMP
- 	string
-+	default "deflate" if ZRAM_DEF_COMP_DEFLATE
- 	default "lzo-rle" if ZRAM_DEF_COMP_LZORLE
- 	default "zstd" if ZRAM_DEF_COMP_ZSTD
- 	default "lz4" if ZRAM_DEF_COMP_LZ4
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 8237b08c49d8..1f9a431f771e 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -16,6 +16,9 @@
- #include "zcomp.h"
- 
- static const char * const backends[] = {
-+#if IS_ENABLED(CONFIG_CRYPTO_DEFLATE)
-+	"deflate",
-+#endif
- #if IS_ENABLED(CONFIG_CRYPTO_LZO)
- 	"lzo",
- 	"lzo-rle",
+ config ZSWAP_COMPRESSOR_DEFAULT_LZO
+ 	bool "LZO"
+ 	select CRYPTO_LZO
+@@ -118,6 +124,7 @@ config ZSWAP_COMPRESSOR_DEFAULT
+        string
+        depends on ZSWAP
+        default "deflate" if ZSWAP_COMPRESSOR_DEFAULT_DEFLATE
++       default "lzo-rle" if ZSWAP_COMPRESSOR_DEFAULT_LZORLE
+        default "lzo" if ZSWAP_COMPRESSOR_DEFAULT_LZO
+        default "842" if ZSWAP_COMPRESSOR_DEFAULT_842
+        default "lz4" if ZSWAP_COMPRESSOR_DEFAULT_LZ4
 -- 
 2.27.0
 
