@@ -1,45 +1,49 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB1D82D80
-	for <linux-block@vger.kernel.org>; Fri, 23 Feb 2024 16:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3AF3FF1;
+	Fri, 23 Feb 2024 16:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708705183; cv=none; b=R6P16RhcIikxTRpQ6i+BxyZjWHQD0JIQ+XHBhzZNVNcNrsqGqlZOgCUak+H5yJZEele9YG0h5cAT8kAq62Sab2sN8j7xkg0cTQLq5hGqu6n9NKSoQsT9O+lebA+4iVx9mrxGUNMKZneYSM22axA/3Inf2hcw+LAnkx/8YXQV2jE=
+	t=1708706515; cv=none; b=BBH7EkhBsfw+kDhlIkPm4ZGQTMdOrEnueo+Xfts7DAOWyX6ZKL0A77ZXE/OR36IrJpuwqKXwcm9cl/w3aUj5rSvykjRbRMnXbU1b/ugvTs9JcCLrem11h3iqLdnr0ngYGugNVW+fItro22W4ClR4Syl6sNYhtorgnseStj1gxws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708705183; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1708706515; c=relaxed/simple;
+	bh=iPePdpshC6aNZbH2wWpmV8JeUEGAIvwSRLY0Bq2AEX0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YJZ7SJeDA5eFA3yL6sY7WDfrWPeBOWlrU7DsQmAEItPT8XwleP6qqxc+6tpYO/aCdSQYwoSdDU4zukMoRDWsBk4X9qj2SNwZSRX4YRjFp5SRlZ0ZSoobNN6uyvuiTqvTDo3sLHRMXTHaSUilNxVNPQy/ePvVaxEwPLmGQljGg1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=uYyLiW7K; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jk9R48zJP5kZb+euMJABfwLRPSpIjn+TGl+D7AY3BQ8wYm48CPAV1IMbw60jhrWfuxJPmKcpArMwiA1UwEVeRtv2RuEvPPlm2s0LRmOTA+XM4Q+gjvB3TpP5D2swc0TtQrZM3uMFH4KO1q6ZjSWGxulbwj2Kk4vcxNhhEjnQrM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=e8+lqrCe; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uYyLiW7K"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=uYyLiW7KXJ/n8Z+J7+1nIsNKrJ
-	QEwaXIdOCRphR890j1yO2NzPRelEvIY79ahoxK/MJzWXX6odo00UuwIrEYmyCYO7MyTfBPbUGKmdj
-	s2g327M/hib2JRIbVKwqpgHJe/Kz/fg9FL39DtPqeXc7tQ5DqK8XHX9qibd0depfBz+y7Eobpykp9
-	Jm3EyR7Rd7SwghQhnM44q1G6l62TaD2RKpA4KoqcfLDsHVbDwRkkR+SzXj3wNW8BrsAIuuS/fZ8pk
-	m/9HjfMVrnKC50k/R7C61EqIS7gyBgxQnT8ZsZCeiHSuHyBOG4A7B9nXptaoKCx+ulzwFehKpbdDC
-	i5mz3LOQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rdYGy-0000000ACYm-3leG;
-	Fri, 23 Feb 2024 16:19:40 +0000
-Date: Fri, 23 Feb 2024 08:19:40 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.org, ming.lei@redhat.com,
-	nilay@linux.ibm.com, chaitanyak@nvidia.com,
-	Keith Busch <kbusch@kernel.org>,
-	Conrad Meyer <conradmeyer@meta.com>
-Subject: Re: [PATCHv4 4/4] blk-lib: check for kill signal
-Message-ID: <ZdjFnN6mN-rFHkL9@infradead.org>
-References: <20240223155910.3622666-1-kbusch@meta.com>
- <20240223155910.3622666-5-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="e8+lqrCe"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4ThG4Y4khgz9srX;
+	Fri, 23 Feb 2024 17:41:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1708706509;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UZzVY1rE4nuBeeTGJE+eDzU+/KFUPmhj+EbPbIqSZ4c=;
+	b=e8+lqrCeUGLoeWHdMU2NT7TaFTqF+HMvYcUIDjJsltURgi0xQ/bx7qGFNQsEJYhQHMZsNe
+	nMoOe/X4Lct1Kp4ZiNdvtgX///gTTodyn0euqKyxAR7nCtXXLqUkxJ4S6LcCfYb5MPWsbE
+	Rhgy7btRp3nuFVbDEv4hzdAXPkCO/cP1DErzN/0zPuDj1jQMe2i570+hF9/d34b6dBh1tH
+	yNSN17DLBKPXBt9MtVGwcWkbRDh8qYbWXR5/lkabo3HBYOUrAbkaXGgi6calsgTdR9vUW1
+	y4NXoSKSDxK0oZOw1bVwbG+TOCepPI0Xw5TwgT8KYbcGt0kuAYfnQojkef5EPg==
+Date: Fri, 23 Feb 2024 17:41:46 +0100
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: lsf-pc@lists.linuxfoundation.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, mcgrof@kernel.org, p.raghav@samsung.com
+Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
+Message-ID: <43yvte5buxg4jv7nlguiz5eu5l26lkzz6cpa4snnvjqokbyg7i@42s52upzhrdi>
+References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+ <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+ <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,9 +52,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240223155910.3622666-5-kbusch@meta.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+X-Rspamd-Queue-Id: 4ThG4Y4khgz9srX
 
-Looks good:
+On Wed, Dec 20, 2023 at 04:03:43PM +0100, Hannes Reinecke wrote:
+> Hi all,
+> 
+> I would like to discuss
+> 
+> Large blocks for I/O
+> 
+> Since the presentation last year there has been quite some developments
+> and improvements in some areas, but at the same time a lack of progress
+> in other areas.
+> In this presentation/discussion I would like to highlight the current
+> state of affairs, existing pain points, and future directions of
+> development.
+> It might be an idea to co-locate it with the MM folks as we do have
+> quite some overlap with page-cache improvements and hugepage handling.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I am interested in attending this session. As we are getting closer to
+having LBS in XFS[1], we could then have the LBS support for block
+devices for free if we use the iomap to interact with the block cache 
+(!CONFIG_BUFFER_HEAD).
+
+So one of the focus points for this discussion could be on adding the LBS
+support to the buffer_head path for block devices and blockers (if any).
+
+Another important discussion point is testing. xfstests helped iron out
+bugs in page cache and iomap while adding the LBS support for XFS. If we
+add support to buffer_heads, then how are we going to stress test the changes?
+I doubt just blktests would be enough to test the changes in page cache
+and buffer_heads.
+
+[1] https://lore.kernel.org/linux-xfs/20240213093713.1753368-1-kernel@pankajraghav.com/
+
+--
+Pankaj
