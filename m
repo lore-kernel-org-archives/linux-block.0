@@ -1,72 +1,67 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281F34C634
-	for <linux-block@vger.kernel.org>; Sat, 24 Feb 2024 19:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4C7481A5
+	for <linux-block@vger.kernel.org>; Sat, 24 Feb 2024 20:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708804140; cv=none; b=Ywi9v8YUS6dUlRQOueTNqdCL0Vsipzw6eaT0afSUauVJLIr/FfJEF/cRhYjU6Ay102EZglzuvH87APizdjdKdgdwGNeZ6GeOrwHi5beoIV2p+Z4tmeWDXlxwXsRnpEFBC7A0b5RPh5NcDUTlNeCoh6f5fFyGfMFZE1goYGWIh8g=
+	t=1708805803; cv=none; b=NsUZyV4jNEmV/TfkyHdU6+9SLpU70p8M7XEmIzalAFl9J/YElKFrZmvbnqAhsFDOA9aWGrVF1p7pvKFZKoWUU8jb3vN0VPAwRSe/uLNAl9D0HF/d6CbEOC0Tulutk6x1Q4hNhkpmDeriVlYGR5Kn9VtIOMWNVC0KHEnR/sFVCYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708804140; c=relaxed/simple;
-	bh=o7Jjs3TaAPlouujgnP/cSfzC6OWeJ7UN9H1QdYLOBSE=;
+	s=arc-20240116; t=1708805803; c=relaxed/simple;
+	bh=58rI6Lh5A3zmVIcZXAoo36bnf+BziOp//zU0TJUV+lo=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Xvb1As4XfDhnumCH8o2YkqpohkygTQ46Rpdsp7ogi4HN3hQNRmyMAHj/VlI2gFOtgfP5kitp6MRTzm9WSj4lGoUekFCr2VIoRdnMcJlhwnp1Xwts3mnIO9h4yighniO5wAfgyqs8xwpr+DLx38F2o/cAkKxoPCS8GR4+Ivw5qm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yE3DBTUM; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version:Content-Type; b=UnIbHbCcYxGtnYHBEmGBAppI9yFT+hMRrnRNRjIBlmzLUE/eu2yn8GJCHkZyQ6B0GmehhWi3JaCCZTYz3u78msG96fxterk75zQNZpbXg89p/fJymP7JZYAAcLZMqIFEzfKNF3tSCShTxiEDuklJrYACs2Ov78PJOUF60fjN9pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xFrxbTiv; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yE3DBTUM"
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5d862e8b163so738159a12.1
-        for <linux-block@vger.kernel.org>; Sat, 24 Feb 2024 11:48:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xFrxbTiv"
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so810294a12.0
+        for <linux-block@vger.kernel.org>; Sat, 24 Feb 2024 12:16:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1708804137; x=1709408937; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1708805800; x=1709410600; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EUpB8lafalL38sJImqCa3LAl1ysZO9xWvK8Dx/nTsgQ=;
-        b=yE3DBTUMjVDVD9OLGD9dLMXEk9MvPtZatr/oeyaLvoZGNkKpiDQan1vLZZZ0KnNpTO
-         OBBGog7/tDJinexi2FtVS65v63BNPPJHOsGqKOFyJDEXdeDm4ljQRoYvtpB3Frwm27B9
-         rBYEj92TOe1dsgCLyI5ZXL2Fpp5XUsBqPlvgBF52hQysz7NDT31eclF/vsB9P4HfgfBA
-         qLGz80jc1/BunDiiwAYagcHWED97Nj2ihG2zdLO5+6k5j7QTc7adhA6SLdP7KlZBnHWU
-         Imoo38Y5bM9S0hl64V/RTt4gW17HmD/aci6A9LPO+F8RKEXl1tpiiHIqdoJ+Na6WGifr
-         U14g==
+        bh=ox3kbDdE+VVlFfRSV4KRbxjd8Vtf638HvV83l5cQ8zw=;
+        b=xFrxbTivycoPaFT57zcw1LA+QUnoPtUv24FCLXEbGcJsEjK5mm3uh7wFZ9ZdchyYav
+         Aai2J+HrSGvM9bvupIJEQ4xR/e9B9kYQfA9dInE0wx1/VUeDEqZfiXXVQzu0N41wAONh
+         EudoanuqZo0759HiKiL4R6i9b6a9qo4NPybPKkC2qLA/+72acRN2OP9MCKSvFoZohjle
+         DlunLEZCALes3dbFaDzfxo0imo5szoI+g9lZaFdi9sRWKCY8edBhrtGF79ez8PvgI0Bi
+         MCVnDZb9p0fFxix5LOzmiIWeYssGQGHMw0bBm/evEFLGNmG/lk75OVUJTo2Gt9hMN0BY
+         GH8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708804137; x=1709408937;
+        d=1e100.net; s=20230601; t=1708805800; x=1709410600;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EUpB8lafalL38sJImqCa3LAl1ysZO9xWvK8Dx/nTsgQ=;
-        b=tDwqJjwS4XFqfvyrdQoTApcqbwht2DIzWBrJmc+R/UUeyZ9aH+X3EJslqllH+68KQC
-         F3Yp6dejQCRIBo/TFoxPTJiunfYqGA+Ov4l/RS2nZxctsDlmh7C+1kOVKVTgDKq1QnLZ
-         VDJl4KdLaB3+pjcnsrVGNS1XQPw/iwJK+aFqKtfBjRtM7xrRjsRr4FCW+fYci3pkBM2y
-         Lxn+YgosSVUt+wLTsVXZgcd4K2EtI/hSqibdUsSq/cvDzyBJ+mcmT6WQROwQgl73Itou
-         7WFaKhE9Eu181FEHh9WYkFEXm0R4jYzjPstnRSbu8oV1UM9XPNpbXA+W1ymlMDCdJynS
-         oXPg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4RNjsaTkKoqY601sgFWm0yWppbErykucvoWPgXi/PYonXNBQdrE4fied2oPfVoXKrFfM0dZI8D8Wu3EMxB5rujhwlqI6sfRqmJFk=
-X-Gm-Message-State: AOJu0Yxbh/WM5POjL6hoA/aZWHiQS59oARPQoXz0pn6/GGU8BJq3n55e
-	EQ7z9Cgbc71vg8MFV+gmjxFZS+trsn1IzxHqK/7PFqCkU2IISl8FvRM5NpGnTvQ=
-X-Google-Smtp-Source: AGHT+IFVUPzXTU160JAO8/8pMC3SuLnUckq25tDL2fnU6xkHvxBiLRbMM/oZSCdQET0JtNFc7OofYw==
-X-Received: by 2002:a17:902:eb15:b0:1db:5b21:dcef with SMTP id l21-20020a170902eb1500b001db5b21dcefmr3556474plb.5.1708804137356;
-        Sat, 24 Feb 2024 11:48:57 -0800 (PST)
+        bh=ox3kbDdE+VVlFfRSV4KRbxjd8Vtf638HvV83l5cQ8zw=;
+        b=DhHiNvpy+DK5ZTIZKFFAkQBe5Ido3XD0knlydmrtsi1MPE+/gv/Ip0um2AhAoRnOFN
+         evLsyN7UI3ZUWq9sqEazaSAXhzyyoNOg3wtOQ3a9JoExOnv9P/DqoInPL4gfOnCkL5rD
+         3RzPLwldr6DYzeQ7+QXRQ62+lY8llTsQfH9PiXsCzz15UmpAeENEG9hmuWLwQNa5+tkz
+         4DvZNEHZQvIpfI7w41W/xlRTmik38j+/RIWmNwjqo7C0+Q5XYtHV92G8Sjow/jiOYv4R
+         azVGiOArFpsADTJpnAcAR5TQdSXX32Vh1Lj2OWMtYWkWy8MFHkzevP8L2+6d8t0VBJtO
+         PgLw==
+X-Gm-Message-State: AOJu0YzO+DdGlh0OSerReTtLxcd1F8RPoILpDOA9oNW6F2liNtQ3ZZpI
+	+PV71T8iiyowPVzdAQ/f/mxqP4PCWnOTjpnJilRVztzihoHo9LOPA0/1Z4u0/NN8eWkB+M+XQqs
+	Z
+X-Google-Smtp-Source: AGHT+IHAqqPQV7N8XB40psZopiUBgLNcHzyDcaUPaIezq1Iy+VTdgSYeS2XJGE1v3VAia/J5jEvp2w==
+X-Received: by 2002:a17:90a:5e08:b0:299:6b94:4165 with SMTP id w8-20020a17090a5e0800b002996b944165mr2478612pjf.3.1708805800372;
+        Sat, 24 Feb 2024 12:16:40 -0800 (PST)
 Received: from [127.0.0.1] ([2600:380:7472:2249:6d10:d981:9c6f:5d24])
-        by smtp.gmail.com with ESMTPSA id jk23-20020a170903331700b001dc35d22081sm1345691plb.50.2024.02.24.11.48.55
+        by smtp.gmail.com with ESMTPSA id n15-20020a17090ade8f00b002995e9aca72sm1598967pjv.29.2024.02.24.12.16.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Feb 2024 11:48:56 -0800 (PST)
+        Sat, 24 Feb 2024 12:16:39 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Ingo Molnar <mingo@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
- Vincent Guittot <vincent.guittot@linaro.org>, 
- Dietmar Eggemann <dietmar.eggemann@arm.com>, 
- Qais Yousef <qyousef@layalina.io>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- Sudeep Holla <sudeep.holla@arm.com>, Wei Wang <wvw@google.com>, 
- Jaegeuk Kim <jaegeuk@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
- Christoph Hellwig <hch@infradead.org>
-In-Reply-To: <20240223155749.2958009-1-qyousef@layalina.io>
-References: <20240223155749.2958009-1-qyousef@layalina.io>
-Subject: Re: [PATCH v2 0/2] sched: blk: Handle HMP systems when completing
- IO
-Message-Id: <170880413600.87395.3583257732140064720.b4-ty@kernel.dk>
-Date: Sat, 24 Feb 2024 12:48:56 -0700
+To: chengming.zhou@linux.dev
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-mm@kvack.org, vbabka@suse.cz, roman.gushchin@linux.dev, 
+ Xiongwei.Song@windriver.com, Chengming Zhou <zhouchengming@bytedance.com>
+In-Reply-To: <20240224134646.829105-1-chengming.zhou@linux.dev>
+References: <20240224134646.829105-1-chengming.zhou@linux.dev>
+Subject: Re: [PATCH] bdev: remove SLAB_MEM_SPREAD flag usage
+Message-Id: <170880579918.88310.13620256646819841520.b4-ty@kernel.dk>
+Date: Sat, 24 Feb 2024 13:16:39 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,24 +73,16 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Fri, 23 Feb 2024 15:57:47 +0000, Qais Yousef wrote:
-> Due to recent changes in how topology is represented on asymmetric multi
-> processing systems like big.LITTLE where all cpus share the last LLC, there is
-> a performance regression as cpus with different compute capacities appear under
-> the same LLC and we no longer send an IPI when the requester is running on
-> a different cluster with different compute capacity.
+On Sat, 24 Feb 2024 13:46:46 +0000, chengming.zhou@linux.dev wrote:
+> The SLAB_MEM_SPREAD flag is already a no-op as of 6.8-rc1, remove
+> its usage so we can delete it from slab. No functional change.
 > 
-> Restore the old behavior by adding a new cpus_equal_capacity() function to help
-> check for the new condition for these systems.
 > 
-> [...]
 
 Applied, thanks!
 
-[1/2] sched: Add a new function to compare if two cpus have the same capacity
-      commit: b361c9027b4e4159e7bcca4eb64fd26507c19994
-[2/2] block/blk-mq: Don't complete locally if capacities are different
-      commit: af550e4c968294398fc76b075f12d51c76caf753
+[1/1] bdev: remove SLAB_MEM_SPREAD flag usage
+      commit: 82c6515d8a970f471eeb8a5ceeaa04c3e5e1b45c
 
 Best regards,
 -- 
