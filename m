@@ -1,211 +1,209 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBE0D2FE;
-	Sun, 25 Feb 2024 20:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1A89450
+	for <linux-block@vger.kernel.org>; Sun, 25 Feb 2024 23:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708893562; cv=none; b=MicigFZlOn3vk0xdy2kltyz4j1FIieGCER8IHCrd1cuGE1yhlRro0XCFUZNqYMjQN90nwo9YV5J10RZJK3HmPmeal3YWEsBztN4DcWoVJrq6al5mzd4P6x9FypXA4lZaG8vFh/P13W30jxiLbiKuiVXHFP2vtc5I4bqXYB4lHGg=
+	t=1708902554; cv=none; b=NnaTrB70q8pkfWhX32E7TmYTKk+qdDS9ep5O2oXfbXH0CtRyhsSTWlW2WcLZVVYzUZzaaMPbhaZBFKFpE9mfRZkbHKA96XcSCjJW3kbqCcjKuscE3KDDw3kiGWpPP1mJaQQ3kBrWSsO4mJNx/IJ/w6KZQ9Ls27VkikK4CdfxrfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708893562; c=relaxed/simple;
-	bh=5EN/yKNU81PtFf6tvQJh71XpD/XYpS/ePIcyFbrR5XY=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tpS/gCVbg31cdCrmCHJvrYTL3b8jGcV44+BePuhCx7+LIU+7xXSWE9y9HHMMgyjJv8oDNR/70M97mr+bm7cjWJIArXR0Nd9YiEPqsbUoKfeu60zKvhNj8ngWF2QGdFR7b5IDbZ3VjP+h599sUghxLSb3U2c8UaqAUBiDTQB5FO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWwN08Nl; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708902554; c=relaxed/simple;
+	bh=MLksRqOA0tGt2uFoSX/LuRF3RmS1RwzPLzua2ZbwEuA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ff2LtScr7t/HFziXXK9BlJkeXjbhUSLwrk+a5UT/Qzn9QbMhsIQ6tS8vEziPeEG/PT4CFs2tZxj0q2B9ICKppjZhyjjTvdp74Q4i2f9hh64/gmtXpaI5KR0qgoeP48HUu9NuI/ZAZUu03R1Gjc83dP1hnGErbn5zpR3KgNJ+A0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=V+tW7/Ck; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWwN08Nl"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a3e75e30d36so475313366b.1;
-        Sun, 25 Feb 2024 12:39:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="V+tW7/Ck"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d94b222a3aso26189395ad.2
+        for <linux-block@vger.kernel.org>; Sun, 25 Feb 2024 15:09:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708893559; x=1709498359; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9JoULKHtWSwPeUYkzOnkXwPrzHWypX1iQARjIU+FggE=;
-        b=OWwN08NlPIJPjZ8erTFermoJ9i6kPQaNyMlJ/jUCQWZfzyupvIuavDFpYZl/Bdb9U2
-         fy3iXT6GtnOvSAvigBHz2LgOuWBnlndca2DXLzkQ6FtF7ydBW5jslRCgBoVznfHgsB6k
-         P7r+GERalIX0ch9leX5ebGHeTW+Q7N1xXeufrIAGv6yjru88VJ6Ey6RBEKctLbTu0PPE
-         uJTxyjj7L7AD209lh92DaZ8Fq67W0qxqB4DkkYDWq+zcJsdmZorhhQ6oEkB2K0TyclIO
-         wb8tDsUimPk0aqL55O+isKczaSKpkhMojF4ztVua8oC8uCsL/je4kV7S6ODeYvwAu7AR
-         MvJA==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1708902552; x=1709507352; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l7a9pYx80wW5C+0OOLf7V/OKZTSHuwOcmWS8SrHVorg=;
+        b=V+tW7/CkOfTuaA41Q3OvSLTO9z/C+sBq8gwdm3QfgiGA22sBKZ9qtasxgIHVrApFs+
+         Jbqmj5KevnJ8qKSa7/Lqv9Nc/wHvH8N3VkJRr2sPZN8sFwjtSMe0hNhF2nn5kaXb0e/e
+         1H7CR4SSMc6f8HAKFb4ztSJswnVT9Lse+Z6hoHUzzUcZupSmA16YxrgrkY0SFJbiSIvs
+         fJrYK9Sn7j3Cjrppcx0n85WK7nWYr9LcO2N04eKZUbWFp6Bf9cJj6H++XB8KxtZOWzps
+         utjkIGdahmoI/B0OP87tSPOqT4DSNmGGmtLGAyz3NUlT6QLTb9wDASJGYW4+ukgLL5gG
+         HTrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708893559; x=1709498359;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9JoULKHtWSwPeUYkzOnkXwPrzHWypX1iQARjIU+FggE=;
-        b=CPHmFGqFezC86rO/wM+njXLFnwVWxK2IXt5kOC8qW9RaOrTFIjKEsREMWFn+hJltNi
-         qLND1CALqAPMQ0TvxCxznQkdMiwW0Aol7VZn4ku9bS/zS+V3s3s+bCZ2guDlmhxDAkNu
-         GiHsfrGFfLRkYNpDgzmMYUrz5AMoC+g8BfQQ2CZ+SG0aF2hZAOOqGzgjjqX/moyNZ4El
-         fw+5yJhMZoOvX53hA3odUSvA4X02lyRWmSe2UvO7qD3NPfsdxJWSbsnvRrblMaoVAtZT
-         6xl3xOYNsBOgxAdakZ6WjTA23qXgtDi0H07beqyN1o01CNucKv2NFn58Ssrz46FiDWnC
-         ti1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWhS6j3+fWEP0yCiK4yqPrkpdeH39xNQ2mB1DGoqqPsISUb8UiuPQtUCauHsMwP2XY6bXZdUl06TT3HyT0GkdpwUMsfLEPLQIs734JPi90SHEioGXNNqJCGIsFCA+OZeCBIzpHxSXGmlRi+gbUxDFpbM3elIdKSexsHZGaNRbRZWVwxMOlPwJhOl3dcc8KDNY4rAv1gXHtA6sj+9IcZPJA=
-X-Gm-Message-State: AOJu0YwaUIF8HZ1ufwjT+/ILYpdPwmAYeo2QSFMsJcVcQJpzpUMfPicr
-	OqyLpQRiDCsPS3NkCSQy2ft1rhpP6mZTVl+vzZX/S2VvD3LqtLTXZd0dsnhiOSc=
-X-Google-Smtp-Source: AGHT+IHHhfR3vl5a/K2tkoxrkoOFfn5RYcuhD0Rzj60dk8q/gZV6fIu//iVJgH6ytZCgdlIdyC4ftg==
-X-Received: by 2002:a17:906:fcb7:b0:a43:5499:6ac8 with SMTP id qw23-20020a170906fcb700b00a4354996ac8mr487054ejb.20.1708893558554;
-        Sun, 25 Feb 2024 12:39:18 -0800 (PST)
-Received: from bhlegrsu.conti.de ([2a02:908:2525:6ea0:4f31:d36d:f841:198e])
-        by smtp.gmail.com with ESMTPSA id jw4-20020a17090776a400b00a434cae86ebsm323331ejc.219.2024.02.25.12.39.17
+        d=1e100.net; s=20230601; t=1708902552; x=1709507352;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l7a9pYx80wW5C+0OOLf7V/OKZTSHuwOcmWS8SrHVorg=;
+        b=PhboJ8DL/X0vEcbj5g8c3Hno9nJm/he/AOs8yHnh/Y5/1zb2cfvLDURCr+/pdfkIB7
+         wVF0YglR+i972MFd4sIRT8ysVSiL/GKGA+SgWJ/ZdnUSK6UZQoJgwfCsWYA1q9IU2s0U
+         HvAJq0VHNbGWPaEuh6Zu8zgPg12K/U34gQjS9NFPmRYeiFsF+NppXA1l+aWL+hTs7imk
+         f8xAoYqqH7uKl7qM0Z74QmqhxogicJRHTTS+00WvT4Fn6XN9Jb4dwhq7DnldJ8BE5dpq
+         sOeXfH+y/LaOq+/RLuZDbeyRaMK4Ye8/mlfUsV8F6fu+zogRBJaPU6rRFzY+ZWMxPvZg
+         sZBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbvLS0L0vojSdU37yVAIsg360RULvIzSbQMpkgl7ljsSexdKv7LPTRpMc/XzgCb7O1W8YTd3hN4Lgnmsdo5c3FPd7t21VfsnqOM2Q=
+X-Gm-Message-State: AOJu0YwmXm63QYAr2QJCBfITzdq21Qe1wVquBrLnXSqkcd2H9igj4Lpk
+	9Re7M6fVxuifIMIvelPW3FWn7/BXmpU+HeuYsdASFdNCyJ44xyNHDkT45x6ntns=
+X-Google-Smtp-Source: AGHT+IF7Q1OsYYh07q3WF9Mui45ZkhG22+fhtpowOBILiP+qRKRpg66hFJe8Zc3/frwdBVhcPIiQGA==
+X-Received: by 2002:a17:902:dac9:b0:1dc:623d:1c3f with SMTP id q9-20020a170902dac900b001dc623d1c3fmr8618092plx.6.1708902552513;
+        Sun, 25 Feb 2024 15:09:12 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-247-196.pa.nsw.optusnet.com.au. [49.181.247.196])
+        by smtp.gmail.com with ESMTPSA id jj5-20020a170903048500b001dca9316374sm26662plb.147.2024.02.25.15.09.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Feb 2024 12:39:18 -0800 (PST)
-From: Wadim Mueller <wafgo01@gmail.com>
-X-Google-Original-From: Wadim Mueller <wadim.mueller@continental.com>
-Date: Sun, 25 Feb 2024 21:39:17 +0100
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Cc: Wadim Mueller <wafgo01@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>, Shunsuke Mie <mie@igel.co.jp>,
-	linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/3] Add support for Block Passthrough Endpoint function
- driver
-Message-ID: <20240225203917.GA4678@bhlegrsu.conti.de>
-References: <20240224210409.112333-1-wafgo01@gmail.com>
- <20240225160926.GA58532@thinkpad>
+        Sun, 25 Feb 2024 15:09:11 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1reNcK-00BVIu-0x;
+	Mon, 26 Feb 2024 10:09:08 +1100
+Date: Mon, 26 Feb 2024 10:09:08 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Matthew Wilcox <willy@infradead.org>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Pankaj Raghav <p.raghav@samsung.com>, Jan Kara <jack@suse.cz>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linuxfoundation.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
+Message-ID: <ZdvIlLbhtb7+1CTx@dread.disaster.area>
+References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+ <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+ <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+ <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
+ <ZYUbB3brQ0K3rP97@casper.infradead.org>
+ <ZYUgo0a51nCgjLNZ@infradead.org>
+ <9b46c48f-d7c4-4ed3-a644-fba90850eab8@acm.org>
+ <ZZxOdWoHrKH4ImL7@casper.infradead.org>
+ <ZdeWRaGQo1IX18pL@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240225160926.GA58532@thinkpad>
+In-Reply-To: <ZdeWRaGQo1IX18pL@bombadil.infradead.org>
 
-On Sun, Feb 25, 2024 at 09:39:26PM +0530, Manivannan Sadhasivam wrote:
-> On Sat, Feb 24, 2024 at 10:03:59PM +0100, Wadim Mueller wrote:
-> > Hello,
+On Thu, Feb 22, 2024 at 10:45:25AM -0800, Luis Chamberlain wrote:
+> On Mon, Jan 08, 2024 at 07:35:17PM +0000, Matthew Wilcox wrote:
+> > On Mon, Jan 08, 2024 at 11:30:10AM -0800, Bart Van Assche wrote:
+> > > On 12/21/23 21:37, Christoph Hellwig wrote:
+> > > > On Fri, Dec 22, 2023 at 05:13:43AM +0000, Matthew Wilcox wrote:
+> > > > > It clearly solves a problem (and the one I think it's solving is the
+> > > > > size of the FTL map).  But I can't see why we should stop working on it,
+> > > > > just because not all drive manufacturers want to support it.
+> > > > 
+> > > > I don't think it is drive vendors.  It is is the SSD divisions which
+> > > > all pretty much love it (for certain use cases) vs the UFS/eMMC
+> > > > divisions which tends to often be fearful and less knowledgeable (to
+> > > > say it nicely) no matter what vendor you're talking to.
+> > > 
+> > > Hi Christoph,
+> > > 
+> > > If there is a significant number of 4 KiB writes in a workload (e.g.
+> > > filesystem metadata writes), and the logical block size is increased from
+> > > 4 KiB to 16 KiB, this will increase write amplification no matter how the
+> > > SSD storage controller has been designed, isn't it? Is there perhaps
+> > > something that I'm misunderstanding?
 > > 
-> > This series adds support for the Block Passthrough PCI(e) Endpoint functionality.
-> > PCI Block Device Passthrough allows one Linux Device running in EP mode to expose its Block devices to the PCI(e) host (RC). The device can export either the full disk or just certain partitions.
-> > Also an export in readonly mode is possible. This is useful if you want to share the same blockdevice between different SoCs, providing each SoC its own partition(s).
-> > 
-> > 
-> > Block Passthrough
-> > ==================
-> > The PCI Block Passthrough can be a useful feature if you have multiple SoCs in your system connected
-> > through a PCI(e) link, one running in RC mode, the other in EP mode.
-> > If the block devices are connected to one SoC (SoC2 in EP Mode from the diagramm below) and you want to access
-> > those from the other SoC (SoC1 in RC mode below), without having any direct connection to
-> > those block devices (e.g. if you want to share an NVMe between two SoCs). An simple example of such a configurationis is shown below:
-> > 
-> > 
-> >                                                            +-------------+
-> >                                                            |             |
-> >                                                            |   SD Card   |
-> >                                                            |             |
-> >                                                            +------^------+
-> >                                                                   |
-> >                                                                   |
-> >     +--------------------------+                +-----------------v----------------+
-> >     |                          |      PCI(e)    |                                  |
-> >     |         SoC1 (RC)        |<-------------->|            SoC2 (EP)             |
-> >     | (CONFIG_PCI_REMOTE_DISK) |                |(CONFIG_PCI_EPF_BLOCK_PASSTHROUGH)|
-> >     |                          |                |                                  |
-> >     +--------------------------+                +-----------------^----------------+
-> >                                                                   |
-> >                                                                   |
-> >                                                            +------v------+
-> >                                                            |             |
-> >                                                            |    NVMe     |
-> >                                                            |             |
-> >                                                            +-------------+
-> > 
-> > 
-> > This is to a certain extent a similar functionality which NBD exposes over Network, but on the PCI(e) bus utilizing the EPC/EPF Kernel Framework.
-> > 
-> > The Endpoint Function driver creates parallel Queues which run on seperate CPU Cores using percpu structures. The number of parallel queues is limited
-> > by the number of CPUs on the EP device. The actual number of queues is configurable (as all other features of the driver) through CONFIGFS.
-> > 
-> > A documentation about the functional description as well as a user guide showing how both drivers can be configured is part of this series.
-> > 
-> > Test setup
-> > ==========
-> > 
-> > This series has been tested on an NXP S32G2 SoC running in Endpoint mode with a direct connection to an ARM64 host machine.
-> > 
-> > A performance measurement on the described setup shows good performance metrics. The S32G2 SoC has a 2xGen3 link which has a maximum Bandwidth of ~2GiB/s.
-> > With the explained setup a Read Datarate of 1.3GiB/s (with DMA ... without DMA the speed saturated at ~200MiB/s) was achieved using an 512GiB Kingston NVMe
-> > when accessing the NVMe from the ARM64 (SoC1) Host. The local Read Datarate accessing the NVMe dirctly from the S32G2 (SoC2) was around 1.5GiB.
-> > 
-> > The measurement was done through the FIO tool [1] with 4kiB Blocks.
-> > 
-> > [1] https://linux.die.net/man/1/fio
-> > 
+> > You're misunderstanding that it's the _drive_ which gets to decide the
+> > logical block size. Filesystems literally can't do 4kB writes to these
+> > drives; you can't do a write smaller than a block.  If your clients
+> > don't think it's a good tradeoff for them, they won't tell Linux that
+> > the minimum IO size is 16kB.
 > 
-> Thanks for the proposal! We are planning to add virtio function support to
-> endpoint subsystem to cover usecases like this. I think your usecase can be
-> satisfied using vitio-blk. Maybe you can add the virtio-blk endpoint function
-> support once we have the infra in place. Thoughts?
+> Yes, but its perhaps good to review how flexible this might be or not.
+> I can at least mention what I know of for NVMe. Getting a lay of the
+> land of this for other storage media would be good.
 > 
-> - Mani
->
+> Some of the large capacity NVMe drives have NPWG as 16k, that just means
+> the Indirection Unit is 16k, the mapping table, so the drive is hinting
+> *we prefer 16k* but you can still do 4k writes, it just means for all
+> these drives that a 4k write will be a RMW.
 
-Hi Mani,
-I initially had the plan to implement the virtio-blk as an endpoint
-function driver instead of a self baked driver. 
+That's just a 4kb logical sector, 16kB physical sector block device,
+yes?
 
-This for sure is more elegant as we could reuse the
-virtio-blk pci driver instead of implementing a new one (as I did) 
+Maybe I'm missing something, but we already handle cases like that
+just fine thanks to all the work that went into supporting 512e
+devices...
 
-But I initially had some concerns about the feasibility, especially
-that the virtio-blk pci driver is expecting immediate responses to some
-register writes which I would not be able to satisfy, simply because we
-do not have any kind of interrupt/event which would be triggered on the
-EP side when the RC is accessing some BAR Registers (at least there is
-no machanism I know of). As virtio is made mainly for Hypervisor <->
-Guest communication I was afraid that a Hypersisor is able to Trap every
-Register access from the Guest and act accordingly, which I would not be
-able to do. I hope this make sense to you.
+> Users who *want* to help avoid RMWs on these drives and want to increase the
+> writes to be at least 16k can enable a 16k or larger block size so to
+> align the writes. The experimentation we have done using Daniel Gomez's
+> eBPF blkalgn tool [0] reveal (as discussed at last year's Plumbers) that
+> there were still some 4k writes, this was in turn determined to be due
+> to XFS's buffer cache usage for metadata.
 
-But to make a long story short, yes I agree with you that virtio-blk
-would satisfy my usecase, and I generally think it would be a better
-solution, I just did not know that you are working on some
-infrastructure for that. And yes I would like to implement the endpoint
-function driver for virtio-blk. Is there already an development tree you
-use to work on the infrastructre I could have a look at?
+As I've explained several times, XFS AG headers are sector sized
+metadata. If you are exposing a 4kB logical sector size on a 16kB
+physical sector device, this is what you'll get. It's been that way
+with 512e devices for a long time, yes?
 
-- Wadim
+Also, direct IO will allow sector sized user data IOs, too, so it's
+not just XFS metadata that will be issuing 4kB IO in this case...
 
+> Dave recently posted patches to allow
+> to use large folios on the xfs buffer cache [1],
 
+This has nothing to do with supporting large block sizes - it's
+purely an internal optimisation to reduce the amount of vmap
+(vmalloc) work we have to do for buffers that are larger than
+PAGE_SIZE on 4kB block size filesystems.
 
-> > Wadim Mueller (3):
-> >   PCI: Add PCI Endpoint function driver for Block-device passthrough
-> >   PCI: Add PCI driver for a PCI EP remote Blockdevice
-> >   Documentation: PCI: Add documentation for the PCI Block Passthrough
-> > 
-> >  .../function/binding/pci-block-passthru.rst   |   24 +
-> >  Documentation/PCI/endpoint/index.rst          |    3 +
-> >  .../pci-endpoint-block-passthru-function.rst  |  331 ++++
-> >  .../pci-endpoint-block-passthru-howto.rst     |  158 ++
-> >  MAINTAINERS                                   |    8 +
-> >  drivers/block/Kconfig                         |   14 +
-> >  drivers/block/Makefile                        |    1 +
-> >  drivers/block/pci-remote-disk.c               | 1047 +++++++++++++
-> >  drivers/pci/endpoint/functions/Kconfig        |   12 +
-> >  drivers/pci/endpoint/functions/Makefile       |    1 +
-> >  .../functions/pci-epf-block-passthru.c        | 1393 +++++++++++++++++
-> >  include/linux/pci-epf-block-passthru.h        |   77 +
-> >  12 files changed, 3069 insertions(+)
-> >  create mode 100644 Documentation/PCI/endpoint/function/binding/pci-block-passthru.rst
-> >  create mode 100644 Documentation/PCI/endpoint/pci-endpoint-block-passthru-function.rst
-> >  create mode 100644 Documentation/PCI/endpoint/pci-endpoint-block-passthru-howto.rst
-> >  create mode 100644 drivers/block/pci-remote-disk.c
-> >  create mode 100644 drivers/pci/endpoint/functions/pci-epf-block-passthru.c
-> >  create mode 100644 include/linux/pci-epf-block-passthru.h
-> > 
-> > -- 
-> > 2.25.1
-> > 
-> 
-> -- 
-> மணிவண்ணன் சதாசிவம்
+> For large capacity NVMe drives with large atomics (NAUWPF), the
+> nvme block driver will allow for the physical block size to be 16k too,
+> thus allowing the sector size to be set to 16k when creating the
+> filesystem, that would *optionally* allow for users to force the
+> filesystem to not allow *any* writes to the device to be 4k.
+
+Just present it as a 16kB logical/physical sector block device. Then
+userspace and the filesystem will magically just do the right thing.
+
+We've already solved these problems, yes?
+
+> Note
+> then that there are two ways to be able to use a sector size of 16k
+> for NVMe today then, one is if your drive supported 16 LBA format and
+> another is with these two parameters set to 16k. The later allows you
+> to stick with 512 byte or 4k LBA format and still use a 16k sector size.
+> That allows you to remain backward compatible.
+
+Yes, that's an emulated small logical sector size block device.
+We've been supporting this for years - how are these NVMe drives in
+any way different? Configure the drive this way, it presents as a
+512e or 4096e device, not a 16kB sector size device, yes?
+
+> Jan Kara's patches "block: Add config option to not allow writing to
+> mounted devices" [2] should allow us to remove the set_blocksize() call
+> in xfs_setsize_buftarg() since XFS does not use the block device cache
+> at all, and his pathces ensure once a filesystem is mounted userspace
+> won't muck with the block device directly.
+
+That patch is completely irrelevant to how the block device presents
+sector sizes to userspace and the filesystem. It's also completely
+irrelevant to large block size support in filesystems. Why do you
+think it is relevant at all?
+
+<snip irrelevant WAF stuff that we already know all about>
+
+I'm not sure exactly what is being argued about here, but if the
+large sector size support requires filesystem utilities to treat
+4096e NVMe devices differently to existing 512e devices then the
+large sector size support stuff has gone completely off the rails.
+
+We already have all the mechanisms needed for optimising layouts for
+large physical sector sizes w/ small emulated sector sizes and we
+have widespread userspace support for that. If this new large block
+device sector stuff doesn't work the same way, then you need to go
+back to the drawing board and make it work transparently with all
+the existing userspace infrastructure....
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
