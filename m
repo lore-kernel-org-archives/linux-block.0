@@ -1,121 +1,92 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A003F4DA1C
-	for <linux-block@vger.kernel.org>; Sat, 24 Feb 2024 23:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15897460
+	for <linux-block@vger.kernel.org>; Sun, 25 Feb 2024 03:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708816338; cv=none; b=omY88aq1Aug79K8gOPV5Y//Obc3lRlqBkgNtNwY7k9x/Dwc1zJ3I8cG45sltM9UYftvU/0TfHalXoRSVp9Cg9ixpqRiQ4kAaUfMF9b+0fcNtpk5tCT1GW0WXx8ntLz31FS5gMmU6yc/i8O6isvIzSx4FyA978bcuiL6Jomoit6c=
+	t=1708830117; cv=none; b=QttLfSWbvVX2eOTJmRq0v0qDpKRabqJTqgCCsf3Hdbqu99m6rEecLUa62U10NNeoP7Rda2ojq66XdvL+NbuIFHlTHhdsIJgUB9zqmyjtciXAFlkb2nPeLxOLGaiNbR1+n4nXoi9Rzi/T1rkONeAcAHh4+8+v3Tw5B9teifOwGyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708816338; c=relaxed/simple;
-	bh=1G6UBPQOt1jMUOLwIKI1YddODQf7olQpZNiocdqVRrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MhqOthT9b6CBgiAPE53RUVx4hs6z9ujDksxbDMkdv7lusZ+muq6+e6QXVMoP75bTbnP/+gv5RL+I1L3Tq/Gqkz1AL9QzrqhYN0ZsSX1ErYJcHc8X9CKCDzbA/DPK3aw4I1oYpSW/J8JtREI2CvEVr4Ce3zuPFirasPInz1RdqT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=Wz/SoFsQ; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
+	s=arc-20240116; t=1708830117; c=relaxed/simple;
+	bh=MlQH2SlK6j1W0Tg+eGb9FJi6RqtWhY6zdq7da4RTKnw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FYfkCHTTo+AmBCFRsFqGMmd6v85CSMeemmIqUgpo2lrlA+FWVkJSYtXEkvKJhoongtqb/zENVInFihsKiNfyOiQzrQWjj/R/0DeV1jJiQvVe5GpvdNHuPlyRnnWideVYanTow6+cDUMJz74rMGD39X3WBqI6Yw14KY6xuKUzBYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=heqKZMyv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="Wz/SoFsQ"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d2770e44d0so15758701fa.2
-        for <linux-block@vger.kernel.org>; Sat, 24 Feb 2024 15:12:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1708816335; x=1709421135; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Uyo66Ikrhwk+3TAWwFJQUJfWyVOGzjT5F7h+oNDShA=;
-        b=Wz/SoFsQaBL3n4nG90Pm3wvoxP9OHLi0Hw0BbBN7gBqZPsakZpmVuqimcYuauMH1Ro
-         +gaDE+zV9HWHgwo84BLD3Dz2DPjc2bRDrzhjzNUEcvQ7Wsb3vwEkDkdc/DReBTHRwkAH
-         llzVfBgbimy2XU4zPLCXBKlYjDPpwOSLAquO+xtDQ0eQmGO+iB7NvB+qezXmkJosRLA8
-         aKOAdF1CyMwN0w5ue1UznfYQqO2iWiikxSF9nbWDwqmwXWooXZcObAOMnlv6ctP5Vjql
-         0v9O9acJKltnVbRprAVY2I4LRTKDW/KarRqKj9fk2XLbRCZsjZuWyYNs0gznKB6DlYIQ
-         1oKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708816335; x=1709421135;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+Uyo66Ikrhwk+3TAWwFJQUJfWyVOGzjT5F7h+oNDShA=;
-        b=Ux8b5Sa8OUxlk5pXfh4/XYe52cRtfVUMnOHNqP03ySJgxkRuLtd5M56xeAZDjr6CAt
-         AMi7av8qy3iMT/SHs/GigAXT+9mYZ6IHBdZ78UVvlY4DQ/ZgOd+rJfDC3TU+iqsvtSjb
-         ZGswEOIo5RTjjKu2FmCKeF9ChbnmSMm+IdAZMczwR7Dc88NI9a9PMjQnL90a1nEXK+UN
-         dimhEapZHAwXfVEn5CSaLSeYZ0HE0MuzLqQc+3fUC+ZvgFJITZ1T7ITCZU1xvsCy0tro
-         02PNftBtlaterXK3Sf5bgagNfHPWSOyXxfI1ho9dTOOyflSC2ewjm+9nV9mCVbS+kI6j
-         tm3g==
-X-Forwarded-Encrypted: i=1; AJvYcCX5LNERxz3A04R99cOkHjnj+pj66mZPG1G6q1tlePerySQtYngCw+dJBsESYxXnl5Kn+BzsnnTGYOfqm8H+h4SiUzRJ15Qmf6dEMek=
-X-Gm-Message-State: AOJu0Yw2w71+YGK72FCZzLPA+g4sTRxY9j/X8mz10wi+BRkJnRNyEr2i
-	S9RQSHSdcyurd3k0QLW/MC5FpxRMo3yFSlBtNHZ45Yld+PSO2YHeTIXWyj1iGwE=
-X-Google-Smtp-Source: AGHT+IEGUEiM1Td2l08D5DZPTBAcbK/Z5mNG2Kxs7gu0Tbs6Fv0kqittUkx1PuvP4tyHOX3WN3jUgw==
-X-Received: by 2002:a2e:9209:0:b0:2d2:3a8e:e2b4 with SMTP id k9-20020a2e9209000000b002d23a8ee2b4mr1581862ljg.42.1708816334594;
-        Sat, 24 Feb 2024 15:12:14 -0800 (PST)
-Received: from airbuntu (host109-154-46-208.range109-154.btcentralplus.com. [109.154.46.208])
-        by smtp.gmail.com with ESMTPSA id t8-20020a05600c198800b00412a218a68fsm379464wmq.31.2024.02.24.15.12.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Feb 2024 15:12:14 -0800 (PST)
-Date: Sat, 24 Feb 2024 23:12:13 +0000
-From: Qais Yousef <qyousef@layalina.io>
-To: Shrikanth Hegde <sshegde@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Sudeep Holla <sudeep.holla@arm.com>, Wei Wang <wvw@google.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>
-Subject: Re: [PATCH v2 0/2] sched: blk: Handle HMP systems when completing IO
-Message-ID: <20240224231213.7zszol4lfq2zc7ey@airbuntu>
-References: <20240223155749.2958009-1-qyousef@layalina.io>
- <1bb797ef-573b-4bda-98bf-1eb63f6f4ffe@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="heqKZMyv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708830114;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TjhB/2HBHI7aWNqsXerNT/dGQ+MuEXL8ljwItunv9x0=;
+	b=heqKZMyvSvweTUtsXz5MSMdTasT7rr5OzW2r20XjQ4ZHmTeSHM2OVBBFzG+cEmcp0BA4dA
+	uShoJwn+vCHhr0/ObEgdYwHG3/GIi4+RY64hJfBU6/s2cOJZAAVE+OsV10Ti24hQpCYRE5
+	2JeIVy+CEF2ycdOxDDeIslxZ45/FbDg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-cAVvGm_dM-OuXVNEfBF9Dg-1; Sat, 24 Feb 2024 22:01:50 -0500
+X-MC-Unique: cAVvGm_dM-OuXVNEfBF9Dg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B6A0A83B82A;
+	Sun, 25 Feb 2024 03:01:49 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 54733492BD7;
+	Sun, 25 Feb 2024 03:01:47 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH] block: define bvec_iter as __packed __aligned(4)
+Date: Sun, 25 Feb 2024 11:01:41 +0800
+Message-ID: <20240225030141.8364-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1bb797ef-573b-4bda-98bf-1eb63f6f4ffe@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On 02/24/24 19:13, Shrikanth Hegde wrote:
-> 
-> 
-> On 2/23/24 9:27 PM, Qais Yousef wrote:
-> > Due to recent changes in how topology is represented on asymmetric multi
-> > processing systems like big.LITTLE where all cpus share the last LLC, there is
-> > a performance regression as cpus with different compute capacities appear under
-> > the same LLC and we no longer send an IPI when the requester is running on
-> > a different cluster with different compute capacity.
-> > 
-> > Restore the old behavior by adding a new cpus_equal_capacity() function to help
-> > check for the new condition for these systems.
-> > 
-> > Changes since v1:
-> > 
-> > 	* Split the patch per subsystem.
-> > 	* Convert cpus_gte_capacity() to cpus_equal_capacity()
-> > 	* Make cpus_equal_capacity() return immediately for SMP systems.
-> > 
-> 
-> nit: Did you mean !SMP systems here? 
-> Because in changes i see its returning true directly if its in !CONFIG_SMP path. 
+In commit 19416123ab3e ("block: define 'struct bvec_iter' as packed"),
+what we need is to save the 4byte padding, and avoid `bio` to spread on
+one extra cache line.
 
-I was referring to this hunk
+It is enough to define it as __packed __aligned(4), especially
+__packed means byte aligned, and can cause compiler to generate
+too horrible code on ARCHs which don't support unaligned access
+in case that bvec_iter is embedded in other structures.
 
-+       if (!sched_asym_cpucap_active())
-+               return true;
+Cc: Mikulas Patocka <mpatocka@redhat.com>
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Fixes: 19416123ab3e ("block: define 'struct bvec_iter' as packed")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/bvec.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-in cpus_equal_capacity(). In SMP system the condition is always true and
-there's a static key that tells us if the system is asymmetric.
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 555aae5448ae..bd1e361b351c 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -83,7 +83,7 @@ struct bvec_iter {
+ 
+ 	unsigned int            bi_bvec_done;	/* number of bytes completed in
+ 						   current bvec */
+-} __packed;
++} __packed __aligned(4);
+ 
+ struct bvec_iter_all {
+ 	struct bio_vec	bv;
+-- 
+2.41.0
 
-> 
-> > Qais Yousef (2):
-> >   sched: Add a new function to compare if two cpus have the same
-> >     capacity
-> >   block/blk-mq: Don't complete locally if capacities are different
-> > 
-> >  block/blk-mq.c                 |  5 +++--
-> >  include/linux/sched/topology.h |  6 ++++++
-> >  kernel/sched/core.c            | 11 +++++++++++
-> >  3 files changed, 20 insertions(+), 2 deletions(-)
-> > 
