@@ -1,213 +1,235 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19001EEE7;
-	Mon, 26 Feb 2024 09:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708940242; cv=fail; b=gnbnJqK5fYDnXdEljCq5veAPhzEaDLNrzM1aQ2agDhqgbD/LzP4Gz/kResNwLyU6tpFglKS4+/7bIBlmMqww3ZiMhRus9XeOecjdsV9egEAtG6ZfJNbsTUaTi55rQWsc7Fio297HQKrpNhMUBpj9VsO2ixBPKjHtelfM3h+bTvg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708940242; c=relaxed/simple;
-	bh=GtKo/bWsWB6KfXfQRB872elJmJDr3mVYBB48ntnxjE8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RRw7vbGICdCTXka6eAP3fEV2ddSbOKlBX8ASq+mxi+9szS/J4vEUkD7lczDUmr9I0Y+bXD9g5yNPfvWzneg44hRD4RQS4ypqaYJS9/PMQhHAY09bTgxBEv67+KoVBhiwYr4eV3jUJJPeS8+EslgQBD3L1CmTd/rvpxULFhsxKUQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=oYLwh52t; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=zi+/LFED; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559DB60DCB
+	for <linux-block@vger.kernel.org>; Mon, 26 Feb 2024 09:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708940740; cv=none; b=pjs68HjlmUfpWhULMKuq9UNW5rEvgc0df1BZ/O3vWbwZmlgIioFRneC/8HpmjpFO/Mo1LHA7Ehw7KoRcBvejUw7Tv4KdvSqwvy0D5Fyc6FWGSdGgs9mZTvZbEi0k8jOyFYL0HFxAzdZ7Fn4Sa2+32tpGAXIqCcB8pVaQr5UXF/E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708940740; c=relaxed/simple;
+	bh=UKGeuGL4yIVcITrKfL8y8e9ey+C67RqmPaEtrVyDjMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dplw6Vcd0TBmb8bd9iudIHtM+37FZXKnO0HC7sXEaxP6iGp0bQ6BMsH9PZGEodq4HlxWgbkvOUvLwYSehOEH6AJztDaMg1C7c7t+/HywoDjg5S88IkXQSi1jOxd+zHSbnffFq9gV9nIm4UA/lgztVUSx+bSzLvaDtfAhcyZ3sTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cB9M2pEY; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oYLwh52t";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="zi+/LFED"
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41PLPouD023296;
-	Mon, 26 Feb 2024 09:36:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=3TRYWIfNGS6y4XOJ1V919ZQwqQr5DaAFS93+LgKgjeI=;
- b=oYLwh52tmAD/LhTVtVidsI068CwYreGGjBLOJhUEvXWxNtwzPBfb9Wbj5M1UjWSOQM5L
- x654+jiLXUpHrsyYr9EiQiC8BGx6me6pwpTU8fkkzCo0H3n8Zs2eSUr9a6pj8Y2IOHqN
- 3vHiMUIlsG2kWqYU27cLpSxFpZYdkaImaK8g09t9HZaSSX9VVskHD0R+6y5OX11M2w+s
- n37z33vWNAsgGvqxA+PRo5ZDunmxmO7h9Sl9Yl11Bu7l23QViQC95h9TLnJxExLsaxwg
- fmQuau/Yt1+hTYNwBk+fR3qoEnY88QqfUYTWNC00FHCzRS4/WqyFN1chQg7OkMFToOoe tw== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wf7ccc3hu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 26 Feb 2024 09:36:47 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41Q898ED013413;
-	Mon, 26 Feb 2024 09:36:46 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wgbdh4xy3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 26 Feb 2024 09:36:46 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=amVp4qAkT1MJHeri/jlDR6n8kcKSVmFPW10axgE7FhW182MV1R1ePJ+OVGtgeqoifP3JkYFcNdujgQwsAAlCjaFHrm1ulgJO1lVVAJMRddFz/swNRd37j9Jz4psNVt1zvY4B+sshab/sLEiNjVCNVA/KRJNs2kI/g3QrS3w4pb6hM7P2bqq6Sv8nTVuT7bnfLkb1D7Ndr09UyAlvTedbDGJ1D/mwcw0saKYqNNTc/urFegPUqbgINmveFEWh4BGWwAcyQg+nFVUahggfVxoN4/hgQvJhKrX8wnNMCQbg9D1jRoJ3VDt0E5Cwt1TR7pf2ytkR8vm8ljkVCCCRuL8lig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3TRYWIfNGS6y4XOJ1V919ZQwqQr5DaAFS93+LgKgjeI=;
- b=GphS3jidmaeexMiPX+jhlKqLgA4GvlFT9sDUgXk6MAjqkUNBLYjeWwVTMv2LLNPBu4ZWLLoUoXK+OH/0J6eEY+d39bcHWSr9ezBpTX9GAsriPLoAXR5JVAXJdV2PkU+vGwiRNfQyAdQGeW2z7f03D6hLS7b9+xuaZE/WEMyAfbWlMbRNJnZxxa+O/JGqPOtx8ma09wPEsd9D7ZoP5nnuSaFhm0UcaDgDw3q03Hmamv9TBHIZ6ZHpl/WnLdzFpmTN6kmiN9Oy+EmwZJtjh/S8GNYIuRiKN6uG2xqU35wJ7O68tbl8e+7Bz8HzCo0qioRxnnhyiPCsD5Tbp0XIo+6Hbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cB9M2pEY"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e08dd0fa0bso2431700b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Feb 2024 01:45:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3TRYWIfNGS6y4XOJ1V919ZQwqQr5DaAFS93+LgKgjeI=;
- b=zi+/LFEDlmNV4/HIuuD+a+90HRR4U1UuV3IREziAx7IRD6wQ8wS+WKgqmV8CGpancoJDlj18lb7FM53rH+IAwwVy1iduoULhX5Z4K8X0JS7gPQKlrT2UjNYYjXHfQwkZvNqyHijvCrucG4v2VIZletQE+XyfAvPQRx8HbriIy30=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by BY5PR10MB4369.namprd10.prod.outlook.com (2603:10b6:a03:204::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.36; Mon, 26 Feb
- 2024 09:36:43 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::97a0:a2a2:315e:7aff]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::97a0:a2a2:315e:7aff%3]) with mapi id 15.20.7316.034; Mon, 26 Feb 2024
- 09:36:43 +0000
-Message-ID: <85d2aef9-b966-4c90-8602-ba5961efc23a@oracle.com>
-Date: Mon, 26 Feb 2024 09:36:37 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 06/11] block: Add atomic write support for statx
-Content-Language: en-US
-To: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
-        brauner@kernel.org, dchinner@redhat.com, jack@suse.cz
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-        ojaswin@linux.ibm.com, linux-aio@kvack.org,
-        linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org,
-        nilay@linux.ibm.com,
-        Prasad Singamsetty <prasad.singamsetty@oracle.com>
-References: <87frxg1v8p.fsf@doe.com>
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <87frxg1v8p.fsf@doe.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO3P265CA0018.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:bb::23) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+        d=linaro.org; s=google; t=1708940737; x=1709545537; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sHy902ePgHndMGk5vbn4XQy6mpWY8JgyR/RL2u0FDHM=;
+        b=cB9M2pEY9QuoTTcvG9yIYaiP5m2b/kgiNrvlg8RcnQwaVr+psI85mEegSF/fYwX+eW
+         YB+x2jS94qG3Lq1KuDlj9OXZUEnS2talwqRPPZSbcR0Sgrbc0hKcEnEgg5t72FVkxxkz
+         KeWnWdrQLai3v2l2Fhn9yOQHTvCGNQtUp5IuK3sDoJl0ph3m1t2LfH5I75730Dy0EVu3
+         Z18Ntuu59XYnsapT8qoJQPd8DQkCE4L7iWxbVdM+5UKuge83194klS1r/5DndtZ+Sn9W
+         2bF38TWuiuyPIcaMfupKnuSMHcthUuDUr3EOtovZ1InhklQuCFtFgrZOqTSbX1OKTBXr
+         h31g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708940737; x=1709545537;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sHy902ePgHndMGk5vbn4XQy6mpWY8JgyR/RL2u0FDHM=;
+        b=ukjg355Dxi4rOpcpp+6U+kLz88Aayw2F/i6qWEHgyI9zXb/hn6gT+Xsshvbj7wD1NK
+         DzrYMoYGBO60vqk//KzaXLuqsg/FKY1UJpWlxndoLjDomT3fQ9/YekLqIX6IinHQgI08
+         u7uHSpU3Nc16q3EMhMystSG2VdQeUeFpCNkSIomVNRor2f6gYBtFh9PcdZG95apXdHPQ
+         KniXb0W64JwrgLe+5OkKd0ExeUiAzVDKwz4A78iXdAkQJ5eXftQSN3a5uJAdVEo01NDZ
+         QY9iIsC6FODqmRwstFpx47ldc7xLmBdhRAncsRVeb9y2sER/4rBFpjTjuu5c3Gqr7lTA
+         Ud+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV7TczK0TtWvo7cx4A2IRbiyG5e0IP2KOLcn/8DCDEUERvBhpZlHkCvxsESnFywZLwvEbrCj309JqLcbSrwWZbGuX+m7TgPrFvPB2s=
+X-Gm-Message-State: AOJu0YyutYCSQTnpTmlg/JTQTHxrxEaxuS0XhkSWSwMh2Ao++Qdy2QKu
+	TTCu3ww+Az7lP7l+QEHYgJp5Xfg5UFZTzTvumw3+ZmEplwAvXtCxCzjUOcxPHg==
+X-Google-Smtp-Source: AGHT+IFXlaNw0JCugkNOQ0EpFfmvZyXGMlTCC0o4iE2RH+aWxXtSPiLWMdPNi2mgamRjo21u5P7FKA==
+X-Received: by 2002:a05:6a00:6c87:b0:6e3:2727:42a0 with SMTP id jc7-20020a056a006c8700b006e3272742a0mr8879728pfb.10.1708940737069;
+        Mon, 26 Feb 2024 01:45:37 -0800 (PST)
+Received: from thinkpad ([117.202.184.81])
+        by smtp.gmail.com with ESMTPSA id b17-20020a631b11000000b005d67862799asm3516108pgb.44.2024.02.26.01.45.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 01:45:36 -0800 (PST)
+Date: Mon, 26 Feb 2024 15:15:30 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Wadim Mueller <wafgo01@gmail.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, Jonathan Corbet <corbet@lwn.net>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>, Shunsuke Mie <mie@igel.co.jp>,
+	linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/3] Add support for Block Passthrough Endpoint function
+ driver
+Message-ID: <20240226094530.GA2778@thinkpad>
+References: <20240224210409.112333-1-wafgo01@gmail.com>
+ <20240225160926.GA58532@thinkpad>
+ <20240225203917.GA4678@bhlegrsu.conti.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|BY5PR10MB4369:EE_
-X-MS-Office365-Filtering-Correlation-Id: f434f809-47a3-40ad-d153-08dc36ae716a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	GA7HQAmzZ5EMOTK9vPU21wGWgRojJx5frvtE4KbSetBGAuqpvFFUYSz7x/3D9zeMNpBMfB1Wbqa6GxKC2lS3suYyPeUgmAVrD/IIBCsD2GGvCVSKnrVoBhNGysC3arYxI8NxS5OSYCG15h1xUFfeAqE8OU6bSvmaOJn5Fjyfh3fiW6ydHKdDM9PkV1hfecPXBIuFRWRrgWXIE2lOM5R6bEexqVwjkyZkRzEQCs02eVNDP2WJSXJo7fuQA6zC9X/3ux7WIPeRoPWxQCeY6f8sIhnU52jhsOXyppDButbBHm84evfZKzODEfTEX1Xqa+jv+QaDeDTWU+MS6s70pFPXrpNkFQdYOYbdWugfIvO6Bk8fpj5ZAhe9WmWhtEsC9DX7EPuG/LqVTNxTHVkDkYIUIFMeD8gMFUakSTPFBKcSjVbQredYEBqQxtXhC7F+zKSN8v5eKGaXvffIMYqCnXi41GSh0RBQ6vuRYg5UPxP1qbUUU8ERjYOyvRZ0LpeHZFLS1dGmgaphxHfGisNfKDu9PiECGyloJ0nsPSTt+ipJrhREM7bHvAYWMIcXK1ZHsVPjtomni2BlZDzwiue/UKtoRDb3OCqMWlDfAEHERpILQ2SMyzRvbsu11wMCUoyiOVpCiX18Bg4DtC01E8E/oqQgISzPy71huULIqvK2fdXZNMz/SMTLWJ1OcS2GdUJVnk2M5hwLDDwSjKz++inZuSmvHg==
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(921011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?STJzbXVqWm5DTXBUWElGYWhkMW9ESlZSKzRtY2RhWi9VYkFES0dzTlMxd201?=
- =?utf-8?B?ekdYN29RanVBeWplM3FLbENTS05CVDlaSVNsRDVUNFFSallnZTZ1UHJ3NndR?=
- =?utf-8?B?Y3hPVWEyNmZGalBvZFdJM0tyV2pKUjVzbGgzSjVmZERSeHpDVFd1YlVSbDNN?=
- =?utf-8?B?V3lURjgrdVJNNitaS3hHWEc3M2ZQSCtTZDVXZ2hNVW9hWjl0aWp6WG51ZXVO?=
- =?utf-8?B?NkNjb3NVaVlrR2lHREpQR3l6Y3ZJNERaenJHZVdvMXJSR3haRVFxYm54VG4r?=
- =?utf-8?B?TGpDWVgydUpUbFVTZElybERxY0h6dlVWcytyN2pLMnRoNHlrY0RZUVNNUk56?=
- =?utf-8?B?Y1lhWFFSRzdOWFNLTGFLbFFkVU9aRHZRWUpUVmpZQjJkeUFBdmlDOG9DZ0NK?=
- =?utf-8?B?TERoNXV4YVZMODRtb2JtdWNob3VrcWthalIvdDRjT2lJM2dwd2E4QWRsd1lM?=
- =?utf-8?B?bEJHWCtJLzRlZWVLenliM1JRZjgzaDBLRjVycElaczI5WHJoRXEwKytDdGNq?=
- =?utf-8?B?ZWtoeWttYmpuL05mS3F3S2FxbmVmZy9zbjFRQnZkYS9Sa0RNaU02Z0JTQkw2?=
- =?utf-8?B?RkZreVRiN2I2bkswbE85ZjBXUk9xM0FTSDBHK2FKUEN2dll3c1pqMmo4b3N6?=
- =?utf-8?B?b3ZYbkxoTzJLblRpT3NyRnNaa1pLZ1Zxei9qaFNpWTI1Rllnd3NHN2lSS21z?=
- =?utf-8?B?RVUrbkhnWTFUc2FUSnZjbEpTbW9JeitJdWxIKzhVaVFGY2hXKzBqWnMvZk5z?=
- =?utf-8?B?aW1CQ05oSkk4djN5U0Q4Y1MxWGtZcEU4bUlNaEQwZklmcW1TOEd6UVByQWJ3?=
- =?utf-8?B?ZytueE1TUUxzdit2dnR6S04yN1ErdWU5cVdNU05kVmtZcGFNTlRxY0E3blpN?=
- =?utf-8?B?M082eHhBQ29RSzVlemdUU09TcVptU0drTXBpYWtFeWk1ZUd2Q2NxNU9Mbkpj?=
- =?utf-8?B?a2JPMkdwdDMweXdueVJLdDJpS1BwYitLb1EvSmovekhHWWFDUXJUNHhEZ0x0?=
- =?utf-8?B?b1E3ZmlleGZHSDlwZFJyTDc2b0phbnJ6TGp4TVJ6SWRLOEVybVNUcDVReURl?=
- =?utf-8?B?dUttMGRpUkVHM2RleE5EMVFuMk45NmN1YWFHanhmU2tYYVdOZWVIYXZmWUtZ?=
- =?utf-8?B?WHRRYkpua0ZOLzl2MTU0WmdoOW9RbVpkRXBtSjNYQnFNak9MUUhLaG53bWxz?=
- =?utf-8?B?dE12YnhCR05WUnJyUnV3M1ZsZ0Z4U2s0TDF1UG93Qk5mWGI4Y0VidWhoU016?=
- =?utf-8?B?R0xQbmFjbTVKZHRDNXpsajR2bitzMUhYSlJVdGt1UmlCR1Y1SEg1bS8rRnlE?=
- =?utf-8?B?akxlQlNGWUZNNXFoMzRsbUFlTUNoTmJ6cmVtN1JwZ0NGUkJDQzVFRVRndUli?=
- =?utf-8?B?OVIxcHZIWDVjMU5TS2sraE9rUHA2U3FZaGFPY1MzWU5iTEloYlFvWFl5c09R?=
- =?utf-8?B?R2dEckVlRElvUzIwc1pXajM2c0ZBNFVndjAybS92SzRNY3VFOWh5ejZHdmJm?=
- =?utf-8?B?YzIzM09yWWV6Nk50YjVKV2tQN2FwWUhyb2FQY29oVEpYUm9aWnJMRzgwSDhN?=
- =?utf-8?B?b01PNE1ERG9IZ0Z5T3ErSCtFb1puUDBNNlVhK3BCUTRYWHJQRFIvaWtCWWVh?=
- =?utf-8?B?M2lmRUFTSVhSc1ZKZVFsQmJXc2RKeVRURmVVZnNkeUJOa3UxVGZaa3ZqK3VU?=
- =?utf-8?B?a3ZweWdESyt0c2VqNUhDOUFMelhORzJpSnNma0MwZXpMYjJqZGduWXYvSm1x?=
- =?utf-8?B?Q1Q2QnBUZFVWbk5zR2hYWFhPc0xiaWxKbWMzQ3pjYTN4SEFFU3BlazZRdU5k?=
- =?utf-8?B?TGZOREttdit2V3o5T1paR2JvQjVtV1A0SHdtdWZXZUpNZ3lhaDVkOVpzVWMx?=
- =?utf-8?B?UjR2YnNqZ3FRUG9IeGRXUEdFdVZZdnJUdElaU01OR1NGYll5cTV0OE4xbnE3?=
- =?utf-8?B?SzNra3krMGRtSHc5VVNWRGl1L2NhNGVaMHFqcENpaVAwcFhkc3hGejIyZkZ6?=
- =?utf-8?B?Z3pVSVR1SkxtbTF1RW5XUzZSakI0emVLa2t2Mk1YTVF4SG8zUkExeExwR09G?=
- =?utf-8?B?TGNkcmhLU2xOWncyclR3TTR3Mk5hRkVoWUdta29yb1NQN1UvK2tPa0FPUlA2?=
- =?utf-8?B?TnZFcXdqSjQ2WnlIYWRFcjczU1ZueURCTHRITTJCU0JqM3R0STd1V1pLRGx5?=
- =?utf-8?B?eVE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	cRjW46JyVq1nyfTPRgiqIGu290f/ZudVZwdAkzRHnPuhyktyXc8EHCc0i609B7Rj3WVydEm6EAXRA1vmq4GPPmGZ8U6b10u4NiDqezoUFV8fEkTOHWN1tlrqv8qJW9FVjSMyHxU1I26tUzEXjKW6DlO+ZiKyURmsj9L2bcR7950t4+Om88dhrw5wfsMK23erpAytRCMiMatufsQeC5WZlMQgEYjo9bIogTWZGqz6diGm6gCDBIuCtHNy28BesUpWcP09UWK7JjoURm/qLEo3tW1PePMCMVYb8YV/7FRsN0EcV0dewdnwYJWBV0jjJh8NFOyIZVqIbkMghylj4swI8biuZN6Qts/iVqjLlp2Y/w0n7WWJ8QAP+slvYdIUtW5LZMGQEFCo0HGinDlKebUuB3Ka0KNLZ1ub2bGNiFkC6jYwemK7NngN2BcH4KvTdKNhtyg56T6LIZaT2CQYSkCovq0lhdNoCoMJ7/SVT9L7/cF3Yt7fELYIJDW8BBP+JHGuIndmQ+9QZqSNFW29wpp3lL0JKVQI0wv5s/dEy4pQkZn+fNoIRPW3xRdB4G0Tt1zG5CEfgGMtfj///8tFQNRPxTqtOkuDlhWVLg+3YbWM+KE=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f434f809-47a3-40ad-d153-08dc36ae716a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2024 09:36:43.6623
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mXb88wENguKtA0A1TSSjMezPTqPWZ+sZHUx1afRcUWiNacraFacI7z+pxSKoFKvdUgY2m2t7/ytlWVH753jLwA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4369
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-26_07,2024-02-23_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0
- mlxlogscore=999 malwarescore=0 phishscore=0 mlxscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402260072
-X-Proofpoint-ORIG-GUID: h_N4ZjsXTDfNWxYmC7LWkOSPhdJfF_Jw
-X-Proofpoint-GUID: h_N4ZjsXTDfNWxYmC7LWkOSPhdJfF_Jw
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240225203917.GA4678@bhlegrsu.conti.de>
 
-On 25/02/2024 14:20, Ritesh Harjani (IBM) wrote:
-> John Garry <john.g.garry@oracle.com> writes:
+On Sun, Feb 25, 2024 at 09:39:17PM +0100, Wadim Mueller wrote:
+> On Sun, Feb 25, 2024 at 09:39:26PM +0530, Manivannan Sadhasivam wrote:
+> > On Sat, Feb 24, 2024 at 10:03:59PM +0100, Wadim Mueller wrote:
+> > > Hello,
+> > > 
+> > > This series adds support for the Block Passthrough PCI(e) Endpoint functionality.
+> > > PCI Block Device Passthrough allows one Linux Device running in EP mode to expose its Block devices to the PCI(e) host (RC). The device can export either the full disk or just certain partitions.
+> > > Also an export in readonly mode is possible. This is useful if you want to share the same blockdevice between different SoCs, providing each SoC its own partition(s).
+> > > 
+> > > 
+> > > Block Passthrough
+> > > ==================
+> > > The PCI Block Passthrough can be a useful feature if you have multiple SoCs in your system connected
+> > > through a PCI(e) link, one running in RC mode, the other in EP mode.
+> > > If the block devices are connected to one SoC (SoC2 in EP Mode from the diagramm below) and you want to access
+> > > those from the other SoC (SoC1 in RC mode below), without having any direct connection to
+> > > those block devices (e.g. if you want to share an NVMe between two SoCs). An simple example of such a configurationis is shown below:
+> > > 
+> > > 
+> > >                                                            +-------------+
+> > >                                                            |             |
+> > >                                                            |   SD Card   |
+> > >                                                            |             |
+> > >                                                            +------^------+
+> > >                                                                   |
+> > >                                                                   |
+> > >     +--------------------------+                +-----------------v----------------+
+> > >     |                          |      PCI(e)    |                                  |
+> > >     |         SoC1 (RC)        |<-------------->|            SoC2 (EP)             |
+> > >     | (CONFIG_PCI_REMOTE_DISK) |                |(CONFIG_PCI_EPF_BLOCK_PASSTHROUGH)|
+> > >     |                          |                |                                  |
+> > >     +--------------------------+                +-----------------^----------------+
+> > >                                                                   |
+> > >                                                                   |
+> > >                                                            +------v------+
+> > >                                                            |             |
+> > >                                                            |    NVMe     |
+> > >                                                            |             |
+> > >                                                            +-------------+
+> > > 
+> > > 
+> > > This is to a certain extent a similar functionality which NBD exposes over Network, but on the PCI(e) bus utilizing the EPC/EPF Kernel Framework.
+> > > 
+> > > The Endpoint Function driver creates parallel Queues which run on seperate CPU Cores using percpu structures. The number of parallel queues is limited
+> > > by the number of CPUs on the EP device. The actual number of queues is configurable (as all other features of the driver) through CONFIGFS.
+> > > 
+> > > A documentation about the functional description as well as a user guide showing how both drivers can be configured is part of this series.
+> > > 
+> > > Test setup
+> > > ==========
+> > > 
+> > > This series has been tested on an NXP S32G2 SoC running in Endpoint mode with a direct connection to an ARM64 host machine.
+> > > 
+> > > A performance measurement on the described setup shows good performance metrics. The S32G2 SoC has a 2xGen3 link which has a maximum Bandwidth of ~2GiB/s.
+> > > With the explained setup a Read Datarate of 1.3GiB/s (with DMA ... without DMA the speed saturated at ~200MiB/s) was achieved using an 512GiB Kingston NVMe
+> > > when accessing the NVMe from the ARM64 (SoC1) Host. The local Read Datarate accessing the NVMe dirctly from the S32G2 (SoC2) was around 1.5GiB.
+> > > 
+> > > The measurement was done through the FIO tool [1] with 4kiB Blocks.
+> > > 
+> > > [1] https://linux.die.net/man/1/fio
+> > > 
+> > 
+> > Thanks for the proposal! We are planning to add virtio function support to
+> > endpoint subsystem to cover usecases like this. I think your usecase can be
+> > satisfied using vitio-blk. Maybe you can add the virtio-blk endpoint function
+> > support once we have the infra in place. Thoughts?
+> > 
+> > - Mani
+> >
 > 
->> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
->>
->> Extend statx system call to return additional info for atomic write support
->> support if the specified file is a block device.
->>
->> Signed-off-by: Prasad Singamsetty <prasad.singamsetty@oracle.com>
->> Signed-off-by: John Garry <john.g.garry@oracle.com>
->> ---
->>   block/bdev.c           | 37 +++++++++++++++++++++++++++----------
->>   fs/stat.c              | 13 ++++++-------
->>   include/linux/blkdev.h |  5 +++--
->>   3 files changed, 36 insertions(+), 19 deletions(-)
->>
->> diff --git a/block/bdev.c b/block/bdev.c
->> index e9f1b12bd75c..0dada9902bd4 100644
->> --- a/block/bdev.c
->> +++ b/block/bdev.c
->> @@ -1116,24 +1116,41 @@ void sync_bdevs(bool wait)
->>   	iput(old_inode);
->>   }
->>   
->> +#define BDEV_STATX_SUPPORTED_MASK (STATX_DIOALIGN | STATX_WRITE_ATOMIC)
->> +
->>   /*
->> - * Handle STATX_DIOALIGN for block devices.
->> - *
->> - * Note that the inode passed to this is the inode of a block device node file,
->> - * not the block device's internal inode.  Therefore it is *not* valid to use
->> - * I_BDEV() here; the block device has to be looked up by i_rdev instead.
->> + * Handle STATX_{DIOALIGN, WRITE_ATOMIC} for block devices.
->>    */
->> -void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
->> +void bdev_statx(struct dentry *dentry, struct kstat *stat, u32 request_mask)
+> Hi Mani,
+> I initially had the plan to implement the virtio-blk as an endpoint
+> function driver instead of a self baked driver. 
 > 
-> why change this to dentry? Why not keep it as inode itself?
+> This for sure is more elegant as we could reuse the
+> virtio-blk pci driver instead of implementing a new one (as I did) 
+> 
+> But I initially had some concerns about the feasibility, especially
+> that the virtio-blk pci driver is expecting immediate responses to some
+> register writes which I would not be able to satisfy, simply because we
+> do not have any kind of interrupt/event which would be triggered on the
+> EP side when the RC is accessing some BAR Registers (at least there is
+> no machanism I know of). As virtio is made mainly for Hypervisor <->
 
-I suppose that I could do that.
+Right. There is a limitation currently w.r.t triggering doorbell from the host
+to endpoint. But I believe that could be addressed later by repurposing the
+endpoint MSI controller [1].
 
-Thanks,
-John
+> As virtio is made mainly for Hypervisor <->
+> Guest communication I was afraid that a Hypersisor is able to Trap every
+> Register access from the Guest and act accordingly, which I would not be
+> able to do. I hope this make sense to you.
+> 
+
+I'm not worrying about the hypervisor right now. Here the endpoint is exposing
+the virtio devices and host is consuming it. There is no virtualization play
+here. I talked about this in the last plumbers [2].
+
+> But to make a long story short, yes I agree with you that virtio-blk
+> would satisfy my usecase, and I generally think it would be a better
+> solution, I just did not know that you are working on some
+> infrastructure for that. And yes I would like to implement the endpoint
+> function driver for virtio-blk. Is there already an development tree you
+> use to work on the infrastructre I could have a look at?
+> 
+
+Shunsuke has a WIP branch [3], that I plan to co-work in the coming days.
+You can use it as a reference in the meantime.
+
+- Mani
+
+[1] https://lore.kernel.org/all/20230911220920.1817033-1-Frank.Li@nxp.com/
+[2] https://www.youtube.com/watch?v=1tqOTge0eq0
+[3] https://github.com/ShunsukeMie/linux-virtio-rdma/tree/v6.6-rc1-epf-vcon
+
+> - Wadim
+> 
+> 
+> 
+> > > Wadim Mueller (3):
+> > >   PCI: Add PCI Endpoint function driver for Block-device passthrough
+> > >   PCI: Add PCI driver for a PCI EP remote Blockdevice
+> > >   Documentation: PCI: Add documentation for the PCI Block Passthrough
+> > > 
+> > >  .../function/binding/pci-block-passthru.rst   |   24 +
+> > >  Documentation/PCI/endpoint/index.rst          |    3 +
+> > >  .../pci-endpoint-block-passthru-function.rst  |  331 ++++
+> > >  .../pci-endpoint-block-passthru-howto.rst     |  158 ++
+> > >  MAINTAINERS                                   |    8 +
+> > >  drivers/block/Kconfig                         |   14 +
+> > >  drivers/block/Makefile                        |    1 +
+> > >  drivers/block/pci-remote-disk.c               | 1047 +++++++++++++
+> > >  drivers/pci/endpoint/functions/Kconfig        |   12 +
+> > >  drivers/pci/endpoint/functions/Makefile       |    1 +
+> > >  .../functions/pci-epf-block-passthru.c        | 1393 +++++++++++++++++
+> > >  include/linux/pci-epf-block-passthru.h        |   77 +
+> > >  12 files changed, 3069 insertions(+)
+> > >  create mode 100644 Documentation/PCI/endpoint/function/binding/pci-block-passthru.rst
+> > >  create mode 100644 Documentation/PCI/endpoint/pci-endpoint-block-passthru-function.rst
+> > >  create mode 100644 Documentation/PCI/endpoint/pci-endpoint-block-passthru-howto.rst
+> > >  create mode 100644 drivers/block/pci-remote-disk.c
+> > >  create mode 100644 drivers/pci/endpoint/functions/pci-epf-block-passthru.c
+> > >  create mode 100644 include/linux/pci-epf-block-passthru.h
+> > > 
+> > > -- 
+> > > 2.25.1
+> > > 
+> > 
+> > -- 
+> > மணிவண்ணன் சதாசிவம்
+
+-- 
+மணிவண்ணன் சதாசிவம்
