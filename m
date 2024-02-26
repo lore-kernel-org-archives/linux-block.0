@@ -1,103 +1,62 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86130249F5;
-	Mon, 26 Feb 2024 10:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A101CD30;
+	Mon, 26 Feb 2024 11:08:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708944519; cv=none; b=iw8Gh15pucQiWOaIP1Feio39uhrh0Q5vM3iZyNkxEdKEagf6k+u6BZ953uCwNKgsnejMV4hAWXZMdX9XAHBgGToS0Yk16b58UDgy96U+RfFM2rEht1dDd0vQx3y1zEZF/evhJlYo6BQonmmE0INDbUdwXK3atOgVXVHoEgwa4yc=
+	t=1708945703; cv=none; b=j/lzty9WfUbB6DriATsJ0GrZ2m/KvQqlNKcqRt4IKuxoOxtL6d/EKIRJYRcA6+a30VgCtmXKWPubj9AVhKvET10l6PowuaoXLEDFr5dNSAyzkLcJVjMBcGFad2cCBtU+cINymb4dhfc4XbpSGZ1Zw/tVfVOlA2ebw6hcM6oC2cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708944519; c=relaxed/simple;
-	bh=+gGz51qE5Pq4E6kzViPKONB/i+EPyesCW0Ui+8XJdyY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NKZY7V6lWTPbUjg4Rzv7yj7PA6wVAmDxqSxyM3Nb/Sx+ltQuc56o6/KzauBjvFqSroIA+p4HspadKkZ4ZNvmhPvDCCZJp9kqoWx5pnBKwpeZjAX4Mgy0EZY9O85KLTXf73Hjq0PXiRLtn08UVsd+1i27BBe/cRqSONf3xOcuzd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SVmnw1MM; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+	s=arc-20240116; t=1708945703; c=relaxed/simple;
+	bh=MH3NkRJlLsr92n8XmE7uUhNlrOYcMau2VISmVPiEn7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mdmhzCuFQrCkKScpd73xNSeoirHp33RO7QUUJZPwZyUlGiNKzegvXhqHWIp6zjlX62EDRXaS+ukKtI3/oKVp34+a/BwrLpoYxaXiFaTlkeSPCUkEAxgCkj4vwdNB/i64lxLpesjfE+l0syLHTFdGnvpdgLfPKo9/cuARZWfkGGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UlTvyCKR; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SVmnw1MM"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UlTvyCKR"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=m2jGMssjsOQHvy4pK6/58foE8FkgoR+leWrTYNZRDYc=; b=SVmnw1MMLyWlzIsT5gMWhCyNqs
-	dtoiP0R8+oacc7n6v/D/h9gYhROVD9eNFvJ6wilYx0jy12VTHgRGWNARB9X23Ak5oJQJ3+3Xk42PN
-	NmRypNDTzy7Qs8Wp+Z89XRU0wMognJysG8PkUDx6nmdnDPENLQC98KvboPyIwH09hklLRaNxhTy3l
-	Rdt0RSLilGlG8gaV44ZFdcn97yXsgN3pOJuJooQSlgsri9DNvNbDRXHM6wW2/1oBGmf9qIUqSwVVL
-	ua6XgISbYbFKvNhqlcJBpViWroPWwR1DjOY5cxzy5ow1/feVx0be0jdxTmAahSVW6V9FQCMnLhV+V
-	w/krNmtQ==;
-Received: from 213-147-167-65.nat.highway.webapn.at ([213.147.167.65] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1reYXE-00000000BOV-3pp6;
-	Mon, 26 Feb 2024 10:48:37 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Coly Li <colyli@suse.de>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] bcache: move calculation of stripe_size and io_opt into bcache_device_init
-Date: Mon, 26 Feb 2024 11:48:26 +0100
-Message-Id: <20240226104826.283067-2-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240226104826.283067-1-hch@lst.de>
-References: <20240226104826.283067-1-hch@lst.de>
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=oj61w1EtZvU5zXErbswMW0jEIMEss4/Kn4pcmzNb168=; b=UlTvyCKRizAl9mcUNVH9wzWNh+
+	admk3vNpmvpsGmhf5Ff9vy2+atxJhnGlMY1w7eweWoSfbMInJK32TAw6YIEI54cIHOPk7jX3m0EJM
+	FCKDpecaX8Hd05q3enPumxLA5vAPJ4Py/nS+sh81DhcFA2arUv0Zo46xSp07wFVkLNN4CTBUQaWr8
+	ifro4rtJ+6gB0lSL+/K0RzIuRXcSpEgAL9pbsN8CjfoMqdUibIrF/F9pZFPEWDVuEAsYp5WfK76BX
+	B7pruLi30yTDCZpZp1MsrS1r2kxzzCraJGzi8sma7qaxMV/CxIg5xjzB7E1pUEBgCOihYKj9gbcVx
+	8Wrh1Nvg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1reYqJ-00000000HTi-0SxK;
+	Mon, 26 Feb 2024 11:08:19 +0000
+Date: Mon, 26 Feb 2024 03:08:19 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Wadim Mueller <wafgo01@gmail.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, Jonathan Corbet <corbet@lwn.net>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>, Shunsuke Mie <mie@igel.co.jp>,
+	linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/3] Add support for Block Passthrough Endpoint function
+ driver
+Message-ID: <ZdxxI7bqdajK3Hb7@infradead.org>
+References: <20240224210409.112333-1-wafgo01@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240224210409.112333-1-wafgo01@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-bcache currently calculates the stripe size for the non-cached_dev
-case directly in bcache_device_init, but for the cached_dev case it does
-it in the caller.  Consolidate it in one places, which also enables
-setting the io_opt queue_limit before allocating the gendisk so that it
-can be passed in instead of changing the limit just after the allocation.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/bcache/super.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d06a9649d30269..f716c3265f5cf0 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -913,6 +913,10 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
- 	uint64_t n;
- 	int idx;
- 
-+	if (cached_bdev) {
-+		d->stripe_size = bdev_io_opt(cached_bdev) >> SECTOR_SHIFT;
-+		lim.io_opt = umax(block_size, bdev_io_opt(cached_bdev));
-+	}
- 	if (!d->stripe_size)
- 		d->stripe_size = 1 << 31;
- 	else if (d->stripe_size < BCH_MIN_STRIPE_SZ)
-@@ -1418,9 +1422,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
- 		hlist_add_head(&io->hash, dc->io_hash + RECENT_IO);
- 	}
- 
--	dc->disk.stripe_size = q->limits.io_opt >> 9;
--
--	if (dc->disk.stripe_size)
-+	if (bdev_io_opt(dc->bdev))
- 		dc->partial_stripes_expensive =
- 			q->limits.raid_partial_stripes_expensive;
- 
-@@ -1430,9 +1432,6 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
- 	if (ret)
- 		return ret;
- 
--	blk_queue_io_opt(dc->disk.disk->queue,
--		max(queue_io_opt(dc->disk.disk->queue), queue_io_opt(q)));
--
- 	atomic_set(&dc->io_errors, 0);
- 	dc->io_disable = false;
- 	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
--- 
-2.39.2
-
+Please don't just create a new (and as far as I can tell underspecified)
+new "hardware" interface for this.  If the nvme endpoint work is too
+much for your use case maybe just implement a minimal virtio_blk
+interface.
