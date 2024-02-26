@@ -1,280 +1,314 @@
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2075.outbound.protection.outlook.com [40.107.6.75])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0675760BBB;
-	Mon, 26 Feb 2024 16:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.6.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708966071; cv=fail; b=UGep9KDFX+3j+541ZM6Rhhst7k0oMA4ssqhUOm14OcFUtJzNdyCg1kn36T+GJs91/F7Hx1BQVOrIPpyoCvEPcqRFwEC36WmtetDzdp/Q/oTUhXnyGo1ZffJ+S/8CgLvDL5G1ldaCi2ATjG7UKIulRM6T/eq/SLDhGohnpvBAagk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708966071; c=relaxed/simple;
-	bh=23kjBBx7CBKV8nCj3Dj2CRrPXaxjROxzjAYe43192d4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Bq71bHG99f5+i9mI/5FOklS0ibUFMUWPlTFABJQPk1tJ5dFj5mcHUxhixenOKRCBhfDD00zHggl4s35BbzwEJL0TgTrZlpuB+jMK5mKPeZYmZOYI/fboPATbLoAdKHNXwvSx94l5uGW3UGf+PxRuID9z7YHLWk3yHoirD/scDPM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=Hbaz9giU; arc=fail smtp.client-ip=40.107.6.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689EA12DD8A;
+	Mon, 26 Feb 2024 16:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708966187; cv=none; b=FJ9G61Fis5Aq2vfQzbJOnXBe6gcfcQVryyA3E9HbfnboVGDHV4Za2/ciLWMGsgm2oGl+M64bKTS/SeGjTEQhOGTyzM1BJ+E/egvJjP8X/wztk2hXgwuaaJDyH7vaRKN8boGhWnXZPdzMT2UiC3uwW9g4UvJzvcauyjqHCMeU1dY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708966187; c=relaxed/simple;
+	bh=rRwp3y1UoEUs1ENBOBzN6Gkda+Yxv9jf7eRMUiz/BEE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vEwWN68j7tfFkXir6ypko+eW2oIkBLzPCKcugro2vAsoD7sWb3fdaU3FJ7F2/hr38wHJBD74ZGv6JCOjHCKPAgAJu/ez4+2513hRz5r5wvXTWqLM31ozf8C4PFtT8MxF7Jfk5c+tgL59s6aNRDRSpMDXqO28kKJ7MPb9tYIhdAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Cz2sY0Ch; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Hbaz9giU"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lGFRycfiukb1OmvtmtZVCiX9auqL2RhRE9fhR0gztLHrPwq0b8e/6X7LtL3pV+eJ/Oj6OTfr+HynJmNSgHSft49tnPzotaw8Crr2fjmLvvLEzMkdJkb50t9fywYHMjUEvjilfL0ysrzyPIP/NlEH/kv6WzusL2NxNRpc3Pn9DFNJhmSxDmFZD30Dn+5xeUBR9yvB90uBZKJygZV8WphMhjETGHQPLcu5nFrtJbd2azTAmHp5TbeS9Vy64hppJW9GTnNnesUpwgaiCSQDUff7nRnqlc1wgLZ+j38WUiAw24z0OvBTCiWrb+3+tBkgjdJ3oy7nTgVBM0LCIhmg1VUmoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4UxhsnAw/ru5t4Lv5++VZ2xJHAq/SReysrgdu7apBAk=;
- b=d7LWCcQKoMk/7h9SmKm/0tc8QPO1HHfdMMllkGKKueC3u+lL8VgDNY3s6Pue6+n/39i3dy02MPPAuikUWbGIoaj5LVcsQgY45TOPtx6fHQPk7IJKjlR920AlBQW4iP7yLLwt4FApzndfCd3EBFIV2mIhHvZhpe5LdE1X3K8eXut1IQkY8FyBA3u1LTuMYZZEnmplj83i7HP1nkL3la9fDybM9/P0uvNVbpElo4RiHkpYZgsj+qz0mLduN0tXx7Uw4Ri6EPKzeM+T0atkqglIxuKVA0pH7AQjAu0T5EhsRi91ElqeW94HMnLPw9UMnr5OR5eB6Hb3UpfQ//uGM2y6Mg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4UxhsnAw/ru5t4Lv5++VZ2xJHAq/SReysrgdu7apBAk=;
- b=Hbaz9giU9By0zgmuV/lZfFmg/rEx4qBKVlazDAkOPkyEY3JjWn9H3l2XuKTTDUzl3BEn95JjCF8HIj9xUdAVlPL6mH8Sg9RaeKwO27gJWllXyQpkxeQQHwGMknpliRFR5Khkq3Hrp5tubzx9/grmygv3huOvfXBHxO+VIbdGxlM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by PA4PR04MB7966.eurprd04.prod.outlook.com (2603:10a6:102:c1::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.34; Mon, 26 Feb
- 2024 16:47:45 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9af4:87e:d74:94aa]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9af4:87e:d74:94aa%7]) with mapi id 15.20.7316.032; Mon, 26 Feb 2024
- 16:47:45 +0000
-Date: Mon, 26 Feb 2024 11:47:37 -0500
-From: Frank Li <Frank.li@nxp.com>
-To: Wadim Mueller <wafgo01@gmail.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>, Shunsuke Mie <mie@igel.co.jp>,
-	linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/3] Add support for Block Passthrough Endpoint function
- driver
-Message-ID: <ZdzAqUIIXHtVM+3x@lizhi-Precision-Tower-5810>
-References: <20240224210409.112333-1-wafgo01@gmail.com>
- <20240225160926.GA58532@thinkpad>
- <20240225203917.GA4678@bhlegrsu.conti.de>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240225203917.GA4678@bhlegrsu.conti.de>
-X-ClientProxiedBy: BYAPR07CA0103.namprd07.prod.outlook.com
- (2603:10b6:a03:12b::44) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Cz2sY0Ch"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41QGgaeQ003155;
+	Mon, 26 Feb 2024 16:49:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3G6oUB+OUrj8xjbE8pP7v+uZ/8Jkd4n2ak6J1iB/nos=;
+ b=Cz2sY0ChQkuVSZBdEEsgZ9WPeck2WQ2x5E9Kyju0LfE1FEyOoT3JsZiTE2Os8jkcpK8w
+ X6XHMt9HOy5OYrnrIJ3qXpBs96XOu9S7+na8P1QzOLEZqBtw+940SS+of2lP5M3zI0CE
+ 94g6koaTqD9ZH930MmgOd74z5m8Nj/6aj/XMiTX8UAMM3ItRcFElSMbQCJaVGQdo47da
+ r8fdE57ABEX4iBRvX817D69T5dxGuPNwZfXyZ8IZixv8X7xgdsm0GQ20UvppzE0GR0s2
+ 4J1lGwhJRKSz31n5G9DWnoEX5R6djRtTPo5+oeENlE/fqAvbEKjubZpuskgSmmoI537r sQ== 
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wgxd4g683-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Feb 2024 16:49:37 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41QFAF2q008170;
+	Mon, 26 Feb 2024 16:49:36 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wfv9m299r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Feb 2024 16:49:36 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41QGnXqY18743628
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 Feb 2024 16:49:35 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E402F5805D;
+	Mon, 26 Feb 2024 16:49:32 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5519058061;
+	Mon, 26 Feb 2024 16:49:31 +0000 (GMT)
+Received: from [9.171.88.168] (unknown [9.171.88.168])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 26 Feb 2024 16:49:31 +0000 (GMT)
+Message-ID: <14bad51d-734e-4d4e-b47a-3f6af6794a40@linux.ibm.com>
+Date: Mon, 26 Feb 2024 17:49:30 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|PA4PR04MB7966:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf120df1-a275-46eb-974e-08dc36eaa848
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	nnw1Z3XGRyRZD2KgXO8DILNpPcBq0epVmUlXOF9hhQs0Ptiy6c2ajVjRAf8v+gW1ehILinx1ZSoAnfHXelCkn3AWKKROCeeOYzXb8Mv+z17xv0sdxgkKREC2NKy+sH8BJtuFRPETiEuO1KiThUjomdPyEe8ao+FW7xMKXmZ6qS9QVmHpNlanS8mkpqJVu4A8hFZB9rWt0MXDGCiWIHY8X+xjdM5CkUcPuVgMJcMhgb2VvTeCDBWVgNvy7DkpeeR1ppnft+URt0Mobg10bcubNs+mhVAm/Dh8wsma6dYUG9sbalqtZPHnr1n1TaoMdo3o5H/7OTEsvfjfm5mW2wSO9J8yMFfFHj8TVTv5CQ55ulmRu2AipBo/jd/g/IV1q1zmxqQevK5PY+H1bpR28qegSdVJMMfPqvDbrTxib7nJMdy1P8ESYOzExaqz4NAXazcIJX4UTlwEcjg4Tk7jZNkxQ9biLynpSGzukHk88O/MZkyMN3M0R1/LzAvyIbo+EmH4mi/Eefcbhdk3TfWNXnU0z3AepJz/hRu56ch/ZXW1BSch7Ly6V0DvHEdZwDhwfY/NnuRSDaGT4pajoGySxEIvNlFvB6KbFCpgN7WKYD+kXNv6b9fxvMKZuj8QohwlEpJWkKSLT9DOoXQ3CzG/Ywz0Ka+M6I8ZPwaM4uZDkLFp2J+7cYNzc8iKdXirBqVsWxoFq0wPZjV4JSmux9uwIGNosw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38350700005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?K01zTGZpbWVJTERSSGsyVjNla2pWNm04eFJZR1hrTk8xWnNPbFNaNVJvbjlY?=
- =?utf-8?B?N3RrdWdiZk03eCsvbjFQWXNsMysyUmxpY0dha1hEQWlSa014UkxpNkJYRkhj?=
- =?utf-8?B?WndoZ21mdmhVc1lqdmtJdW1WWWdFVTNWWE13SzZGbWF3QUtyR0JKSm9WMzNF?=
- =?utf-8?B?T0dGRUl4R1ZCNCswZlQ4SVI5Z2IwUnliRUdNSXYwMjE2djRRUCtuUVlZTGVL?=
- =?utf-8?B?T0ZwNm11WE9iSHQ4ZGl0Ymx6N1RXbTlvbXFabEg4dVhPNSt4U0kzdWpZNStT?=
- =?utf-8?B?MlVqMm5yd3c3MEhFdko5eUxxZ3NOWUQrSkdaanNNSTZHUU5lQzNQempFaWZG?=
- =?utf-8?B?cWxUYzN4OEtzRGlWck9NVnd2c1R3djdRbjU2VGt0RmpnZXI0bWJNMlhSeEZk?=
- =?utf-8?B?VWxTUzV2cDZQL1VsNldqc0V4WFRUWTFvMGlNakw5Sjk3aTh5TWdoQjd4Sk9T?=
- =?utf-8?B?aXI4N1UzRXMxenFQK0ZFNDN6RFgvc1pVUHBvTndSenJuZUFIaW41VmVaL2dQ?=
- =?utf-8?B?Vms1L2ZCL1pEek9kL3dlbDZVR1psRFo5RUlWcnAzR0QyaUMxMm1vUnh2bXhO?=
- =?utf-8?B?cTRHOFl2RE9FWlpRM0VNSXBZdXo4S1AwRnRrenRReUl3MmJjbklmYkxkTktZ?=
- =?utf-8?B?dGVMNk9NMExESDZWN2dIOE1DaVZjTWxXMGVuNkZKTVRLM3RhOWZBZS8xQ09m?=
- =?utf-8?B?QWhsWEhVQzV5dFNwYi9Oa1lsdWNkRGtMVThUSG80L0NpRVloanBtbDVDWSsv?=
- =?utf-8?B?TkVZeW5pZ0hwUVd0WUM4VE9RaUJDQm1KMDVaZ0JvSWVMcmFwN2RsOUFkWDhw?=
- =?utf-8?B?cFV3aVAzMjRnTUg1WU10OTJHcUptb1FDNGtXRlIrVm9YS1IzMnFzSkRmOGdG?=
- =?utf-8?B?Y2RIVGViRXNIM3EyRUVYUGE5ejZ0a2xOZVFFcks0OUVWeTNSaHNXVEhpQWly?=
- =?utf-8?B?MURBVXcvbkY2SHpXekZHclZiV2lFekZnMk1ZcmMvQVlGUlV3TGdSakxHOXJC?=
- =?utf-8?B?NXprcGpqcVVVZzhyUmtNaVBEOUVOK2hXU3FWU2kvZmRILzRkSENIbzFpZHBV?=
- =?utf-8?B?WUdUektXblRTenpQRmgzZXZWSGdyQ2pTR1hBbWNnTUNBdWJPc1B0dnorMjVs?=
- =?utf-8?B?OENna3kvN1hHMWF6bHZXZGVLVW1aUW5KYjIzUUczdXRxblZ0a1pYVjYycWJD?=
- =?utf-8?B?MVJjaUVkZm81ZnA0a0tQWFZHZG5GcVhhQ1ovWmV5cTZ6K1J6a0RIc0RSUG95?=
- =?utf-8?B?Y2dtQ3hNMllzNUtwblFQSU9seUpEcUlrTERBREpsMFc1eWNZb2FMcWlZcjN2?=
- =?utf-8?B?M0NwRDkrc04yanNRT25uTmVhUVlHemtmTXVyZWxXR0hod1l6dWI2ODBKL2tW?=
- =?utf-8?B?ZjBDYzRWd1Eyb0d4VWdFRnRvOXFOVGl4MnVDR3J4Q3daUlQvdnRGVHFIb1p6?=
- =?utf-8?B?WmZTakxzWmtsTlQrck1DcmNuWlFMemIxQlBRSit3MG5mQUlKWEFPTkxrcnNh?=
- =?utf-8?B?WHp4Nk0vSTlYSXlaaUE2M3ZHRm9nd3F0b2pISktiamdXa0tJN1NSMVlYOXF1?=
- =?utf-8?B?S0I5V1ZCNERHQStoWTk0ZjBpWVRVVXNpY3EwR3JLNmVOQ0xTbzRrYlZzNm1Q?=
- =?utf-8?B?OTE1VEU2L2pVKzNCekhUL0hzQzRJUXlMYlpvcHVNbUJvSXFBODM2U0RIRXZE?=
- =?utf-8?B?MWNKZGJWUFNKVERXRHVEbFhNSm5SQ2NZWWluRUNGZ2lBNm8xM2JQTmlIYlZ4?=
- =?utf-8?B?cGtBOERiY212K3hneDc0ekVKalZzWk4zY1B2aFBtSDEyY2ZacFI1c0VJczF4?=
- =?utf-8?B?QmpRZGtIb2tZYjhoSzNWU1N0NjNXbWY0UjNoT214eGZWKzYzanFIVUhxZXBP?=
- =?utf-8?B?NjAvQmZ4dk1KM082Wmt6amxBeTRYd1d6bk9Bdk4yRWVoa1BNNGpGblVCcVVL?=
- =?utf-8?B?MUVnb3Zrek1hRFZsOFFnVEVKdHI1QTlJK29BbGFUckwzSVV1YmdDZ1BKWDJ3?=
- =?utf-8?B?dnpaaUJDNjFPQVpra1MvYjJRRWZJUG9Ram9qbWo2cklnWTY5Y2llMm5LaklU?=
- =?utf-8?B?WVA5ZlhnalhacElYMklpNXl3b1lRakVjWEJmNGFHRmpYN0lOakgySjVvdW93?=
- =?utf-8?Q?6n1ZtsIZEy/dXoGzf2DfGvcS1?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf120df1-a275-46eb-974e-08dc36eaa848
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2024 16:47:45.4326
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L8QjGdDyfk3zhbbLWZtibus6pxh33y4/IRZXVp9N/Y8mmR461xGd71rCebRWFZ6oN0hg6IC5frdccNI2locr9Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7966
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] dasd: move queue setup to common code
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20240221125438.3609762-1-hch@lst.de>
+ <20240221125438.3609762-3-hch@lst.de>
+From: Stefan Haberland <sth@linux.ibm.com>
+In-Reply-To: <20240221125438.3609762-3-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Nz_7OR4cA67KLw0xPcCFlhsi_An089km
+X-Proofpoint-ORIG-GUID: Nz_7OR4cA67KLw0xPcCFlhsi_An089km
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-26_11,2024-02-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 clxscore=1011 mlxscore=0 lowpriorityscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402260127
 
-On Sun, Feb 25, 2024 at 09:39:17PM +0100, Wadim Mueller wrote:
-> On Sun, Feb 25, 2024 at 09:39:26PM +0530, Manivannan Sadhasivam wrote:
-> > On Sat, Feb 24, 2024 at 10:03:59PM +0100, Wadim Mueller wrote:
-> > > Hello,
-> > > 
-> > > This series adds support for the Block Passthrough PCI(e) Endpoint functionality.
-> > > PCI Block Device Passthrough allows one Linux Device running in EP mode to expose its Block devices to the PCI(e) host (RC). The device can export either the full disk or just certain partitions.
-> > > Also an export in readonly mode is possible. This is useful if you want to share the same blockdevice between different SoCs, providing each SoC its own partition(s).
-> > > 
-> > > 
-> > > Block Passthrough
-> > > ==================
-> > > The PCI Block Passthrough can be a useful feature if you have multiple SoCs in your system connected
-> > > through a PCI(e) link, one running in RC mode, the other in EP mode.
-> > > If the block devices are connected to one SoC (SoC2 in EP Mode from the diagramm below) and you want to access
-> > > those from the other SoC (SoC1 in RC mode below), without having any direct connection to
-> > > those block devices (e.g. if you want to share an NVMe between two SoCs). An simple example of such a configurationis is shown below:
-> > > 
-> > > 
-> > >                                                            +-------------+
-> > >                                                            |             |
-> > >                                                            |   SD Card   |
-> > >                                                            |             |
-> > >                                                            +------^------+
-> > >                                                                   |
-> > >                                                                   |
-> > >     +--------------------------+                +-----------------v----------------+
-> > >     |                          |      PCI(e)    |                                  |
-> > >     |         SoC1 (RC)        |<-------------->|            SoC2 (EP)             |
-> > >     | (CONFIG_PCI_REMOTE_DISK) |                |(CONFIG_PCI_EPF_BLOCK_PASSTHROUGH)|
-> > >     |                          |                |                                  |
-> > >     +--------------------------+                +-----------------^----------------+
-> > >                                                                   |
-> > >                                                                   |
-> > >                                                            +------v------+
-> > >                                                            |             |
-> > >                                                            |    NVMe     |
-> > >                                                            |             |
-> > >                                                            +-------------+
-> > > 
-> > > 
-> > > This is to a certain extent a similar functionality which NBD exposes over Network, but on the PCI(e) bus utilizing the EPC/EPF Kernel Framework.
-> > > 
-> > > The Endpoint Function driver creates parallel Queues which run on seperate CPU Cores using percpu structures. The number of parallel queues is limited
-> > > by the number of CPUs on the EP device. The actual number of queues is configurable (as all other features of the driver) through CONFIGFS.
-> > > 
-> > > A documentation about the functional description as well as a user guide showing how both drivers can be configured is part of this series.
-> > > 
-> > > Test setup
-> > > ==========
-> > > 
-> > > This series has been tested on an NXP S32G2 SoC running in Endpoint mode with a direct connection to an ARM64 host machine.
-> > > 
-> > > A performance measurement on the described setup shows good performance metrics. The S32G2 SoC has a 2xGen3 link which has a maximum Bandwidth of ~2GiB/s.
-> > > With the explained setup a Read Datarate of 1.3GiB/s (with DMA ... without DMA the speed saturated at ~200MiB/s) was achieved using an 512GiB Kingston NVMe
-> > > when accessing the NVMe from the ARM64 (SoC1) Host. The local Read Datarate accessing the NVMe dirctly from the S32G2 (SoC2) was around 1.5GiB.
-> > > 
-> > > The measurement was done through the FIO tool [1] with 4kiB Blocks.
-> > > 
-> > > [1] https://linux.die.net/man/1/fio
-> > > 
-> > 
-> > Thanks for the proposal! We are planning to add virtio function support to
-> > endpoint subsystem to cover usecases like this. I think your usecase can be
-> > satisfied using vitio-blk. Maybe you can add the virtio-blk endpoint function
-> > support once we have the infra in place. Thoughts?
-> > 
-> > - Mani
-> >
-> 
-> Hi Mani,
-> I initially had the plan to implement the virtio-blk as an endpoint
-> function driver instead of a self baked driver. 
-> 
-> This for sure is more elegant as we could reuse the
-> virtio-blk pci driver instead of implementing a new one (as I did) 
-> 
-> But I initially had some concerns about the feasibility, especially
-> that the virtio-blk pci driver is expecting immediate responses to some
-> register writes which I would not be able to satisfy, simply because we
-> do not have any kind of interrupt/event which would be triggered on the
-> EP side when the RC is accessing some BAR Registers (at least there is
-> no machanism I know of). As virtio is made mainly for Hypervisor <->
+Please see comments below.
 
-A possible solution is use ITS MSI to triggger at irq at EP side.
-https://lore.kernel.org/linux-pci/20230911220920.1817033-1-Frank.Li@nxp.com/
-Any ways, virtio layer need some modify. 
+Am 21.02.24 um 13:54 schrieb Christoph Hellwig:
+> Most of the code in setup_blk_queue is shared between all disciplines.
+> Move it to common code and leave a method to query the maximum number
+> of transferable blocks, and a flag to indicate discard support.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/s390/block/dasd.c      | 29 +++++++++++++++++++++++++++--
+>   drivers/s390/block/dasd_diag.c | 22 +++-------------------
+>   drivers/s390/block/dasd_eckd.c | 29 ++++++-----------------------
+>   drivers/s390/block/dasd_fba.c  | 33 ++++-----------------------------
+>   drivers/s390/block/dasd_int.h  |  6 ++----
+>   5 files changed, 42 insertions(+), 77 deletions(-)
+>
+> diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+> index e754e4f81b2dff..665f69dbb9eab1 100644
+> --- a/drivers/s390/block/dasd.c
+> +++ b/drivers/s390/block/dasd.c
+> @@ -308,6 +308,7 @@ static int dasd_state_basic_to_known(struct dasd_device *device)
+>   static int dasd_state_basic_to_ready(struct dasd_device *device)
+>   {
+>   	struct dasd_block *block = device->block;
+> +	struct request_queue *q;
+>   	int rc = 0;
+>   
+>   	/* make disk known with correct capacity */
+> @@ -327,8 +328,32 @@ static int dasd_state_basic_to_ready(struct dasd_device *device)
+>   		goto out;
+>   	}
+>   
+> -	if (device->discipline->setup_blk_queue)
+> -		device->discipline->setup_blk_queue(block);
+> +	q = block->gdp->queue;
+> +	blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
+> +	q->limits.max_dev_sectors = device->discipline->max_transfer(block);
+> +	blk_queue_max_hw_sectors(q, q->limits.max_dev_sectors);
+> +	blk_queue_logical_block_size(q, block->bp_block);
+> +	blk_queue_max_segments(q, USHRT_MAX);
+> +
+> +	/* With page sized segments each segment can be translated into one idaw/tidaw */
+> +	blk_queue_max_segment_size(q, PAGE_SIZE);
+> +	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
+> +	blk_queue_dma_alignment(q, PAGE_SIZE - 1);
+> +
+> +	if (device->discipline->has_discard) {
+> +		unsigned int max_bytes, max_discard_sectors;
+> +
+> +		q->limits.discard_granularity = block->bp_block;
+> +
+> +		/* Calculate max_discard_sectors and make it PAGE aligned */
+> +		max_bytes = USHRT_MAX * block->bp_block;
+> +		max_bytes = ALIGN_DOWN(max_bytes, PAGE_SIZE);
+> +		max_discard_sectors = max_bytes / block->bp_block;
+> +
+> +		blk_queue_max_discard_sectors(q, max_discard_sectors);
+> +		blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
+> +	}
+> +
+>   	set_capacity(block->gdp, block->blocks << block->s2b_shift);
+>   	device->state = DASD_STATE_READY;
+>   
+> diff --git a/drivers/s390/block/dasd_diag.c b/drivers/s390/block/dasd_diag.c
+> index 041088c7e90915..688097036c6a37 100644
+> --- a/drivers/s390/block/dasd_diag.c
+> +++ b/drivers/s390/block/dasd_diag.c
+> @@ -617,25 +617,9 @@ dasd_diag_dump_sense(struct dasd_device *device, struct dasd_ccw_req * req,
+>   		    "dump sense not available for DIAG data");
+>   }
+>   
+> -/*
+> - * Initialize block layer request queue.
+> - */
+> -static void dasd_diag_setup_blk_queue(struct dasd_block *block)
+> +static unsigned int dasd_diag_max_transfer(struct dasd_block *block)
 
-> Guest communication I was afraid that a Hypersisor is able to Trap every
-> Register access from the Guest and act accordingly, which I would not be
-> able to do. I hope this make sense to you.
-> 
-> But to make a long story short, yes I agree with you that virtio-blk
-> would satisfy my usecase, and I generally think it would be a better
-> solution, I just did not know that you are working on some
-> infrastructure for that. And yes I would like to implement the endpoint
-> function driver for virtio-blk. Is there already an development tree you
-> use to work on the infrastructre I could have a look at?
+Could we call this dasd_*_max_sectors() or something like this?
+We have a storage server value 'transfer length factor' (referred as 
+'unsigned int tlf' in the code).
+This might be a little bit misleading for someone reading it with this 
+background.
 
-There are many one try this
-https://patchew.org/linux/20230427104428.862643-1-mie@igel.co.jp/
-https://lore.kernel.org/linux-pci/796eb893-f7e2-846c-e75f-9a5774089b8e@igel.co.jp/
-https://lore.kernel.org/imx/d098a631-9930-26d3-48f3-8f95386c8e50@ti.com/T/#t
-https://lore.kernel.org/linux-pci/20200702082143.25259-1-kishon@ti.com/
+>   {
+> -	unsigned int logical_block_size = block->bp_block;
+> -	struct request_queue *q = block->gdp->queue;
+> -	int max;
+> -
+> -	max = DIAG_MAX_BLOCKS << block->s2b_shift;
+> -	blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
+> -	q->limits.max_dev_sectors = max;
+> -	blk_queue_logical_block_size(q, logical_block_size);
+> -	blk_queue_max_hw_sectors(q, max);
+> -	blk_queue_max_segments(q, USHRT_MAX);
+> -	/* With page sized segments each segment can be translated into one idaw/tidaw */
+> -	blk_queue_max_segment_size(q, PAGE_SIZE);
+> -	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
+> -	blk_queue_dma_alignment(q, PAGE_SIZE - 1);
+> +	return DIAG_MAX_BLOCKS;
 
-With EDMA support and ITS MSI, it should be possible now.
+You are dropping the shift here (and in the other discipline cases). 
+This might lead to smaller request sizes and decreased performance.
+Should be:
 
-Frank
+return DIAG_MAX_BLOCKS << block->s2b_shift;
 
-> 
-> - Wadim
-> 
-> 
-> 
-> > > Wadim Mueller (3):
-> > >   PCI: Add PCI Endpoint function driver for Block-device passthrough
-> > >   PCI: Add PCI driver for a PCI EP remote Blockdevice
-> > >   Documentation: PCI: Add documentation for the PCI Block Passthrough
-> > > 
-> > >  .../function/binding/pci-block-passthru.rst   |   24 +
-> > >  Documentation/PCI/endpoint/index.rst          |    3 +
-> > >  .../pci-endpoint-block-passthru-function.rst  |  331 ++++
-> > >  .../pci-endpoint-block-passthru-howto.rst     |  158 ++
-> > >  MAINTAINERS                                   |    8 +
-> > >  drivers/block/Kconfig                         |   14 +
-> > >  drivers/block/Makefile                        |    1 +
-> > >  drivers/block/pci-remote-disk.c               | 1047 +++++++++++++
-> > >  drivers/pci/endpoint/functions/Kconfig        |   12 +
-> > >  drivers/pci/endpoint/functions/Makefile       |    1 +
-> > >  .../functions/pci-epf-block-passthru.c        | 1393 +++++++++++++++++
-> > >  include/linux/pci-epf-block-passthru.h        |   77 +
-> > >  12 files changed, 3069 insertions(+)
-> > >  create mode 100644 Documentation/PCI/endpoint/function/binding/pci-block-passthru.rst
-> > >  create mode 100644 Documentation/PCI/endpoint/pci-endpoint-block-passthru-function.rst
-> > >  create mode 100644 Documentation/PCI/endpoint/pci-endpoint-block-passthru-howto.rst
-> > >  create mode 100644 drivers/block/pci-remote-disk.c
-> > >  create mode 100644 drivers/pci/endpoint/functions/pci-epf-block-passthru.c
-> > >  create mode 100644 include/linux/pci-epf-block-passthru.h
-> > > 
-> > > -- 
-> > > 2.25.1
-> > > 
-> > 
-> > -- 
-> > மணிவண்ணன் சதாசிவம்
+
+>   }
+>   
+>   static int dasd_diag_pe_handler(struct dasd_device *device,
+> @@ -648,10 +632,10 @@ static struct dasd_discipline dasd_diag_discipline = {
+>   	.owner = THIS_MODULE,
+>   	.name = "DIAG",
+>   	.ebcname = "DIAG",
+> +	.max_transfer = dasd_diag_max_transfer,
+>   	.check_device = dasd_diag_check_device,
+>   	.pe_handler = dasd_diag_pe_handler,
+>   	.fill_geometry = dasd_diag_fill_geometry,
+> -	.setup_blk_queue = dasd_diag_setup_blk_queue,
+>   	.start_IO = dasd_start_diag,
+>   	.term_IO = dasd_diag_term_IO,
+>   	.handle_terminated_request = dasd_diag_handle_terminated_request,
+> diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
+> index 8aade17d885cc9..8574516bf66e01 100644
+> --- a/drivers/s390/block/dasd_eckd.c
+> +++ b/drivers/s390/block/dasd_eckd.c
+> @@ -6826,17 +6826,9 @@ static void dasd_eckd_handle_hpf_error(struct dasd_device *device,
+>   	dasd_schedule_requeue(device);
+>   }
+>   
+> -/*
+> - * Initialize block layer request queue.
+> - */
+> -static void dasd_eckd_setup_blk_queue(struct dasd_block *block)
+> +static unsigned int dasd_eckd_max_transfer(struct dasd_block *block)
+>   {
+> -	unsigned int logical_block_size = block->bp_block;
+> -	struct request_queue *q = block->gdp->queue;
+> -	struct dasd_device *device = block->base;
+> -	int max;
+> -
+> -	if (device->features & DASD_FEATURE_USERAW) {
+> +	if (block->base->features & DASD_FEATURE_USERAW) {
+>   		/*
+>   		 * the max_blocks value for raw_track access is 256
+>   		 * it is higher than the native ECKD value because we
+> @@ -6844,19 +6836,10 @@ static void dasd_eckd_setup_blk_queue(struct dasd_block *block)
+>   		 * so the max_hw_sectors are
+>   		 * 2048 x 512B = 1024kB = 16 tracks
+>   		 */
+> -		max = DASD_ECKD_MAX_BLOCKS_RAW << block->s2b_shift;
+> -	} else {
+> -		max = DASD_ECKD_MAX_BLOCKS << block->s2b_shift;
+> +		return DASD_ECKD_MAX_BLOCKS_RAW;
+>   	}
+> -	blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
+> -	q->limits.max_dev_sectors = max;
+> -	blk_queue_logical_block_size(q, logical_block_size);
+> -	blk_queue_max_hw_sectors(q, max);
+> -	blk_queue_max_segments(q, USHRT_MAX);
+> -	/* With page sized segments each segment can be translated into one idaw/tidaw */
+> -	blk_queue_max_segment_size(q, PAGE_SIZE);
+> -	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
+> -	blk_queue_dma_alignment(q, PAGE_SIZE - 1);
+> +
+> +	return DASD_ECKD_MAX_BLOCKS;
+
+same here
+
+>   }
+>   
+>   static struct ccw_driver dasd_eckd_driver = {
+> @@ -6888,7 +6871,7 @@ static struct dasd_discipline dasd_eckd_discipline = {
+>   	.basic_to_ready = dasd_eckd_basic_to_ready,
+>   	.online_to_ready = dasd_eckd_online_to_ready,
+>   	.basic_to_known = dasd_eckd_basic_to_known,
+> -	.setup_blk_queue = dasd_eckd_setup_blk_queue,
+> +	.max_transfer = dasd_eckd_max_transfer,
+>   	.fill_geometry = dasd_eckd_fill_geometry,
+>   	.start_IO = dasd_start_IO,
+>   	.term_IO = dasd_term_IO,
+> diff --git a/drivers/s390/block/dasd_fba.c b/drivers/s390/block/dasd_fba.c
+> index 045e548630dfb1..d075e70d3796bd 100644
+> --- a/drivers/s390/block/dasd_fba.c
+> +++ b/drivers/s390/block/dasd_fba.c
+> @@ -748,35 +748,9 @@ dasd_fba_dump_sense(struct dasd_device *device, struct dasd_ccw_req * req,
+>   	free_page((unsigned long) page);
+>   }
+>   
+> -/*
+> - * Initialize block layer request queue.
+> - */
+> -static void dasd_fba_setup_blk_queue(struct dasd_block *block)
+> +static unsigned int dasd_fba_max_transfer(struct dasd_block *block)
+>   {
+> -	unsigned int logical_block_size = block->bp_block;
+> -	struct request_queue *q = block->gdp->queue;
+> -	unsigned int max_bytes, max_discard_sectors;
+> -	int max;
+> -
+> -	max = DASD_FBA_MAX_BLOCKS << block->s2b_shift;
+> -	blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
+> -	q->limits.max_dev_sectors = max;
+> -	blk_queue_logical_block_size(q, logical_block_size);
+> -	blk_queue_max_hw_sectors(q, max);
+> -	blk_queue_max_segments(q, USHRT_MAX);
+> -	/* With page sized segments each segment can be translated into one idaw/tidaw */
+> -	blk_queue_max_segment_size(q, PAGE_SIZE);
+> -	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
+> -
+> -	q->limits.discard_granularity = logical_block_size;
+> -
+> -	/* Calculate max_discard_sectors and make it PAGE aligned */
+> -	max_bytes = USHRT_MAX * logical_block_size;
+> -	max_bytes = ALIGN_DOWN(max_bytes, PAGE_SIZE);
+> -	max_discard_sectors = max_bytes / logical_block_size;
+> -
+> -	blk_queue_max_discard_sectors(q, max_discard_sectors);
+> -	blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
+> +	return DASD_FBA_MAX_BLOCKS;
+
+and here
+
+[...]
+
