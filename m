@@ -1,69 +1,67 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E984151C4C
-	for <linux-block@vger.kernel.org>; Tue, 27 Feb 2024 21:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF45A14EFDF
+	for <linux-block@vger.kernel.org>; Tue, 27 Feb 2024 21:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709068915; cv=none; b=LH7abNj52grFHv9Q2QnftI9J409xKS/Wj0hT3kWECvwx+6Lju2IwLkUEDawVULPQ9Rda/OK9h3jbTXNC0uUcKy8xYoFPR+1AMzJwGOLyDlvjGjNebySqk2D36zS9BibZOKnEom6fhDqKX2t69t0FAPQoFvu1rh8QIIKhnttkwMo=
+	t=1709068917; cv=none; b=TWjd6F68TF715f/1E2yacUoUwsMXIBigyBdfyhjWsV4EyL0HRR+D32huME2/Zod09bnI8QMeP8FTlRDvOEdkosiI7pTGADlw7cY7y8rD+gmFHNub4EiVuvC8+4wWw96HTR6OL1v1MLMvXycaRNqnO5RpYmukwjcgfSUiliyYZ1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709068915; c=relaxed/simple;
-	bh=/x+HoFJBoEPs8vQ+7AplVXTf0kNDUWgaUzi+AZtV7cQ=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=upW7eJXLOAnrdSuDWBpnU3nCQqBLok2UN29Gp22bWhh3HWjgYxrvAjG44EZzTwJkrHlGYOB4pTZA1omOozj0e6auV3g5xM4w1rxMhVDwWssgiBrKypKRjV0EJKp5J46y0sWpWU05mY2eMw6kBI801CLvntdAkwUWUaXq7x1EWJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2sJRLcWq; arc=none smtp.client-ip=209.85.215.176
+	s=arc-20240116; t=1709068917; c=relaxed/simple;
+	bh=QjcDl2yYldkbyheJ6SXeNJ3eM6601ARCvTosX7wbXFo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=ApgqBNLlThf/sHEHHAIm0vG73qJ67Tbr35gx13TuHr+2ryyIBv+SrR3TxCKrFI6YYX/2f+RUr+BO9ja+rWlX2vp9R9xuW87NZGomIQyPuE/dlNeyipZ2GIBCsSnGwVcvwLV80DN1QVvEXdH98m5zYEFKD1LDWSBqxQKW7RpLkNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=RdaD7irK; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2sJRLcWq"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-58962bf3f89so1651537a12.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2024 13:21:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RdaD7irK"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5cfcf509fbdso2207489a12.1
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2024 13:21:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709068913; x=1709673713; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709068915; x=1709673715; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UANm1dgS5T0WOHSiSrzCuBbRubRxDNMtxNP78En/ilQ=;
-        b=2sJRLcWqhSir15jew9knqtpTxex6Td4AMF0HJPBzubva/j6kEnl5KFGjjq1X85lkiH
-         ouECc0BuN+WbdNE+SgYCsqWxFhD6vVImTge/GcUG/opDP4+syGnfoJdg5MndPshEx++k
-         6JRae2E8cjDJGp0o03nsUGmVq9tJTuz5ujkFBOgiVrBOpTmAmxdXMxPtbuZfm9BXHZ7P
-         1De6/pKPtD8iz9vAlFiTkSXX5NERWFlZGca6Zo33wUTni/nqdO+wCs0HjDukL/j5EBPV
-         2x0J3koJTnSPjiX+ivDbHTUn+ZrFqvQAzclPs4zDRtOp5XciRokyB/40L1OIIEHYodsz
-         KpaQ==
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FjjMr/gBxFj+dMQL3GVk8vDb+wPW9nf9Ij7pdIMqb9w=;
+        b=RdaD7irKBEt1TVY7tZVfPpQLhh0j0j+ZNy9xKjk8kskVF3IGWiNcnTeMs4tnHxadsX
+         nFtSIYTxh9CSLHuQjiZOXnWw6FB2ZUs5k/Nc3NN2lNlFVMFXVkGiHfZ+x3T7ZbpBCo+F
+         mx1FJXPYa+z+8NkBZELpgRB2lKjjGlfLPQbhCqVmB3Qs2McIjHbT4m9l1fpIyEtEIh1e
+         j6HmpP4UkAmm/QU3Iv+TZ2zreUwrhghVp/bkLrC1ctp4wNFn9AwgAmqRU/9LCVHbltm6
+         XfGntBcl2ATFsmU+e7OJHVdQMZcL8LtAWkxBQaDWB3hIlsqUlh+EML5mtGip+jkj2DNf
+         2irQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709068913; x=1709673713;
+        d=1e100.net; s=20230601; t=1709068915; x=1709673715;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UANm1dgS5T0WOHSiSrzCuBbRubRxDNMtxNP78En/ilQ=;
-        b=Un96DBfeuTAZJpKc+ThrPxZ0tAltCpgUbpDYHHcdyOV4xARkGgdKza1aCGV67Iy57h
-         i3T0ryuFMl8z9cpb9s7M/saK2L1SeEd7UW8JuwnLAwfaGf5l8T5TnJE5mzaazbUB0sDp
-         x47KzI6fXEvZU63M8irCZZ04COE7QHV4Ef2tXaLOe9NiyfN53ieevvP+gb2an1L+OU92
-         MfzdRrplnFVvBKZuid/ww58njrLdaX4x4HkD3peeSf3e0+T+0Q0rwNdhYwC2s+zB06hk
-         aDTIx+G3+pWvSdIt4bEqoTSyPPo+WcAGFq2YuQcQ7YZXPNJ288dPtKe4IeMjIAT103O/
-         vixw==
-X-Forwarded-Encrypted: i=1; AJvYcCVaJGJrI9rmH9oEwfEhCo0yoOLlpyTqf2Du528NKIOx9KeCMffefxvH3OBIOOs7vqw2yQ3AaylgE7mF2bPDDu872D1lcecD5Am/lkU=
-X-Gm-Message-State: AOJu0YyqelChd0FdnOaLuvxZqLVNSQZx7F4f16ikVHSZTJDymKNcUHl1
-	Rh2R/RkKtu4VJGPudEVAEA8IMwdnA8wosdyx3MaUqwXOJwHyJQ74yvqQjicjnLk=
-X-Google-Smtp-Source: AGHT+IF8ppKk3qSRiiw1IL2DaiUC6GURziSEFqA+jG8dpM8Ewv32Uofv42ldLmpmg5FLD3yIW5RJVg==
-X-Received: by 2002:a05:6a20:4283:b0:1a0:e557:7ec3 with SMTP id o3-20020a056a20428300b001a0e5577ec3mr14434749pzj.1.1709068913195;
-        Tue, 27 Feb 2024 13:21:53 -0800 (PST)
+        bh=FjjMr/gBxFj+dMQL3GVk8vDb+wPW9nf9Ij7pdIMqb9w=;
+        b=u3O8EfN1MJ/m9CAhdJ+ldKuhZeIlzcugIa5mpO/JmQK+Ct2mtcNGocpyyw9gEh2ljR
+         bUhIOEg2xhu85m8aqqwe+wCsBxinXIQRYtp2/W4hlpCDItVewfBXtxfjFnRsvVHxUBt9
+         gyAoXAO+pA/fF0VAhY/AxH+zXinrl0RhaP/iWGI94/y+BlBX8e0b3zbl4Q3RjF/4nF0w
+         MeyAx+g2IfT0TxddnMN4Br0QK3HvU5DR6GSbRmtfAhoeya1waSBpAVFcoL3qTX11kjZv
+         2ALqqlDiAGENzLXv+OigVULnIezG+Q894ivv6i9PFtuNESE1nxZYSZPuCirge+UJ2fc/
+         /Ycg==
+X-Forwarded-Encrypted: i=1; AJvYcCXVs/7iXFnD6hzH+yvJ9PLiPXbP5nyzeLZ7oa35w3ga9Dg7uTS8D1dAcCTptLq7/nyTEwtDEbdmdwVXKlXU0JmpEZR8NnFnJD6fOpk=
+X-Gm-Message-State: AOJu0YzZK1+TkiPcpfB21Wxegt1oXKpk1VCJG/+1IxEORiBkqbX9hoj4
+	mBNvlsFH3GOG/NySnoTCMQkcaOHKDSJrChmRTAG95nWSTFL2GOxe2gUJaKET4bU=
+X-Google-Smtp-Source: AGHT+IEZAGavcZZtXdcIkiylMu4LEvh2cNN62sm+yVcp6Yc3JZRc/+EsVnsDUENSeCCwb7KDsy9F7A==
+X-Received: by 2002:a05:6a21:33a5:b0:1a1:5:e8de with SMTP id yy37-20020a056a2133a500b001a10005e8demr6800533pzb.4.1709068915052;
+        Tue, 27 Feb 2024 13:21:55 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id r10-20020a635d0a000000b005dc36279d6dsm6125145pgb.73.2024.02.27.13.21.52
+        by smtp.gmail.com with ESMTPSA id r10-20020a635d0a000000b005dc36279d6dsm6125145pgb.73.2024.02.27.13.21.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 13:21:52 -0800 (PST)
+        Tue, 27 Feb 2024 13:21:53 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Juergen Gross <jgross@suse.com>, 
- Stefano Stabellini <sstabellini@kernel.org>, 
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, 
- =?utf-8?q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
- xen-devel@lists.xenproject.org, linux-block@vger.kernel.org, 
- Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20240221125845.3610668-1-hch@lst.de>
-References: <20240221125845.3610668-1-hch@lst.de>
-Subject: Re: convert xen-blkfront to atomic queue limit updates v2
-Message-Id: <170906891213.1104664.4203607989260212614.b4-ty@kernel.dk>
-Date: Tue, 27 Feb 2024 14:21:52 -0700
+To: Richard Weinberger <richard@nod.at>, 
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+ Johannes Berg <johannes@sipsolutions.net>, Christoph Hellwig <hch@lst.de>
+Cc: linux-um@lists.infradead.org, linux-block@vger.kernel.org
+In-Reply-To: <20240222072417.3773131-1-hch@lst.de>
+References: <20240222072417.3773131-1-hch@lst.de>
+Subject: Re: ubd cleanups
+Message-Id: <170906891332.1104664.7977100251649709745.b4-ty@kernel.dk>
+Date: Tue, 27 Feb 2024 14:21:53 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,27 +73,32 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Wed, 21 Feb 2024 13:58:41 +0100, Christoph Hellwig wrote:
-> this series converts xen-blkfront to the new atomic queue limits update
-> API in the block tree.  I don't have a Xen setup so this is compile
-> tested only.
+On Thu, 22 Feb 2024 08:24:10 +0100, Christoph Hellwig wrote:
+> this series cleans up the uml ubd drivers and gets rid of more blk_queue_*
+> calls.  It is a against Jens' for-6.9/block branch.
 > 
-> Changes since v1:
->  - constify the info argument to blkif_set_queue_limits
->  - remove a spurious word from a commit message
+> Diffstat:
+>  ubd_kern.c |  127 +++++++++++++++++++++----------------------------------------
+>  1 file changed, 44 insertions(+), 83 deletions(-)
 > 
 > [...]
 
 Applied, thanks!
 
-[1/4] xen-blkfront: set max_discard/secure erase limits to UINT_MAX
-      commit: 4a718d7dbab873bc24034fc865d3a5442632d1fd
-[2/4] xen-blkfront: rely on the default discard granularity
-      commit: 738be136327a56e5a67e1942a2c318fb91914a3f
-[3/4] xen-blkfront: don't redundantly set max_sements in blkif_recover
-      commit: 4f81b87d91be2a00195f85847d040c2276cac2ae
-[4/4] xen-blkfront: atomically update queue limits
-      commit: ba3f67c1163812b5d7ec33705c31edaa30ce6c51
+[1/7] ubd: remove the ubd_gendisk array
+      commit: 32621ad7a7ea4c3add1dd6bd27b62c2b22500d54
+[2/7] ubd: remove ubd_disk_register
+      commit: 0267e9cac6de0c25ec1b6e3fef4fd8a87a4774a2
+[3/7] ubd: move setting the nonrot flag to ubd_add
+      commit: b8b364d2af7483ad82975cf35d5201efe1efa29f
+[4/7] ubd: move setting the variable queue limits to ubd_add
+      commit: 58ebe3e748353960fcc3b2661273737f45d197b1
+[5/7] ubd: move set_disk_ro to ubd_add
+      commit: 5e4e1ff820e855a328cf2efb795c079f3a58abbe
+[6/7] ubd: remove the queue pointer in struct ubd
+      commit: f3c17dcc43e207e4fba511e9e63d52f7098ad6f3
+[7/7] ubd: open the backing files in ubd_add
+      commit: fb5d1d389c9e78d68f1f71f926d6251017579f5b
 
 Best regards,
 -- 
