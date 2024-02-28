@@ -1,276 +1,111 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FDC70055;
-	Wed, 28 Feb 2024 22:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA89413D2E3
+	for <linux-block@vger.kernel.org>; Wed, 28 Feb 2024 23:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709161027; cv=none; b=uieJpi0FVyOQkSkItl7KVK8KlmTeu505o2C1C1BV3gaxFEajhrcnR2mbxz79jmCqaRJxEt6LmQ5q3T2dgSu1NlElBMFOQL74gkaljDuDmol6A0k7+GapbFEVgTFJMnHduTLy0GjhQ7PvCJRLjhcTmZi6BsQr48DJ9w4siAoXFZI=
+	t=1709161346; cv=none; b=UVTFfoChHzbESXqnF4nBQBHlJuk/sEX6bb9Q4QMSeXGN2sPJsxlBAF1pZvZU09lMV2hh/UwUn2lnY0tkV8iF3EDDLO8mbK82ehSeE5ctjwJAGZHOFTVu2vfhUfgb/KKXCeWP/q2F614IYvUK4VMSas92aIV1kBaq997OjOEXrnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709161027; c=relaxed/simple;
-	bh=t0hwZwpfttp69/uGay6s716nZ8N7x7chnpzvYiDxo5s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=agEWPZXvyHl4B4wYx81/T4zu4pCOpXA0CB2ImGvN0hD5lDuX68QXlA3NqNtv2FRf9Ga0QvFJvW7Rw9nXI0crCfOabIAGdR35zrhe2/dmHHduwbE36h9RCqFzVtpL2bEtEUCf/O/ejCzV8MMV687P1msE7rsCMNkW/EAIBRHm6kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JRRv1kkI; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1709161346; c=relaxed/simple;
+	bh=rFdeaF8OvHp8ycIMfjI32IqX3BMfkKmkCnOldjcHl/g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DO8STOASaiEgMEcMpvCyyvnL5D7IVGUL34sugrz6RJn72NBxzVx9B8ue1RzqvkwveZeIk81ydjp5US2mSQtX5t0Htfj/z4bZU4l/na0eXGk5jGyjESTVAqFoAUcNIs6sjFEt6gC6L2qFtApJLgfuH3NpwNEhCCyKpiGu4KXfm7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Pnq2tk02; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JRRv1kkI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=J8BtlSqCftL8iclcmwg13p3hmHP0z6D21Rkm/rVP9ZM=; b=JRRv1kkI3KbMrspccO64WdGn5V
-	V4oO4xue2FnQecEETp7QQPplb/ntkineJ7d3/OfewBAXYjHpINw4z0ufWJSMmBJ3raBhJNWRsczpT
-	6g9FGzWo/bj8P58vIjutCKD110LuUYq6kCPHBga4Y0PsMbQe6aKDNgYNaI0L3fQecvvI0lz+xe14Q
-	zTpOhzCeuaUYHY0fZStrgxvaiRqwNTb84XjbLzMZhbQCtmXk27Xg4r40D3zmEXM1jImJAP68dhUpV
-	174gNESRxCvBHdhwY3alaJIAr4NPH9eaMwmmsQBlrIu2lufSlItkn+98Eb8PV0Yu/BU49iV8JDLu/
-	GKkqUzhA==;
-Received: from [4.28.11.157] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rfSrI-0000000BCPs-2JP9;
-	Wed, 28 Feb 2024 22:57:04 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>
-Cc: dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 13/14] md: remove mddev->queue
-Date: Wed, 28 Feb 2024 14:56:52 -0800
-Message-Id: <20240228225653.947152-14-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240228225653.947152-1-hch@lst.de>
-References: <20240228225653.947152-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Pnq2tk02"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5640fef9fa6so449141a12.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Feb 2024 15:02:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1709161343; x=1709766143; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XmDUVGJ7uYNuJQyRX/NAFGYz0phL9n1ekfsCjXQN9T0=;
+        b=Pnq2tk029hp2DbW9wkG6Ttyi0a4B7u0XS89VdZHBYs7YNjJFmMuUm8JnIMRX+y/z6H
+         j0kZL8TCzfachEc0eI36IGzZRWuDMpoCNfEvJy3xRlEJVr0pqEf7noUIRUujyaRNVOVR
+         YIF3UKbPKXsJ47h/5zLOBDTaR/W+FrqYzqnmY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709161343; x=1709766143;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XmDUVGJ7uYNuJQyRX/NAFGYz0phL9n1ekfsCjXQN9T0=;
+        b=qRbUSVy38Dv51V92ulUMOXAvqr5M7K/NVmz4tbfA8xpAcHcl9IFj1vL1++hRVA81/y
+         9amrGo/NBoW2EgH7iimygE2isJG8QusS0psIZoo5+svxc2c5c/5dMbanhSKUz9f9OO8s
+         dndnx3l5pwWF2CGbOx+E0d+vyb1ueD4vgD4ZxZ7P3KLzR9HvH79AsetFHPH+bNHBUTxb
+         eJBhkX8FsOqAfwDtdu5w4SHP7d68RSaH5LatMoxR8QFS3RaMaZ10WavZoIczfomL+Q8Y
+         rPWJuWVqfqIq1fG0bSw6qO4IRwDepmSKIqzBwkcdd1a1BKwzptZ1pYS+17lV2BZ3EGfm
+         Hu7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVyjFT6X3E9K1WNJj9gkjtBED5560ygHZQIrESy7JRtuqhXjKc+eGVddhxlmYdwvWwMdGon+GSxWjU7Xkshoi+s5SLTBO4C7f/lRJ4=
+X-Gm-Message-State: AOJu0Yx1b/+7g25KtI+Tkn5nHw3DUQSNclIP47esXRdpPR6Hang2mMxS
+	AZzTYSlbByO3nwgc/rf5xAiPJOhKNdKDAIu4J0+6e0VmZkhIWDfTE1DSNSZb4fKxOm3QFOUjhb7
+	ARoZe+g==
+X-Google-Smtp-Source: AGHT+IGKZTRd9qanFauWGlS6Uhq91ejSfg08JELqw+dFT3g9OTWLiGOzS/FnK/j7g1rLJgQ43NIZYA==
+X-Received: by 2002:a05:6402:1e87:b0:565:9fff:6046 with SMTP id f7-20020a0564021e8700b005659fff6046mr212728edf.3.1709161342762;
+        Wed, 28 Feb 2024 15:02:22 -0800 (PST)
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com. [209.85.128.52])
+        by smtp.gmail.com with ESMTPSA id fd14-20020a056402388e00b005663bf7e207sm6959edb.1.2024.02.28.15.02.22
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Feb 2024 15:02:22 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-412b246b386so2126775e9.3
+        for <linux-block@vger.kernel.org>; Wed, 28 Feb 2024 15:02:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUkwvvqnSdHQ97KE55af7RRpE1DSpqegrEgT0CxlwkiUU4fnn3UbHInGObdHR6hO/9IL9OF9ELi/5UYF0X5OAzCJeoLR6OpM/d/2Y0=
+X-Received: by 2002:a17:906:b7d4:b0:a44:f89:8104 with SMTP id
+ fy20-20020a170906b7d400b00a440f898104mr218606ejb.42.1709161037880; Wed, 28
+ Feb 2024 14:57:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20230925120309.1731676-1-dhowells@redhat.com> <20230925120309.1731676-8-dhowells@redhat.com>
+ <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com> <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
+In-Reply-To: <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 28 Feb 2024 14:57:00 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
+Message-ID: <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
+Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
+ 07/12] iov_iter: Convert iterate*() to inline funcs
+To: Tong Tiangen <tongtiangen@huawei.com>
+Cc: David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@lst.de>, 
+	Christian Brauner <christian@brauner.io>, David Laight <David.Laight@aculab.com>, 
+	Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kefeng Wang <wangkefeng.wang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Just use the request_queue from the gendisk pointer in the relatively
-few places that sill need it.
+On Wed, 28 Feb 2024 at 13:21, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> Hmm. If the copy doesn't succeed and make any progress at all, then
+> the code in generic_perform_write() after the "goto again"
+>
+>                 //[4]
+>                 if (unlikely(fault_in_iov_iter_readable(i, bytes) ==
+>                               bytes)) {
+>
+> should break out of the loop.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/md.c        | 22 ++++++++++++----------
- drivers/md/md.h        |  5 ++---
- drivers/md/raid0.c     |  2 +-
- drivers/md/raid1.c     |  2 +-
- drivers/md/raid10.c    |  2 +-
- drivers/md/raid5-ppl.c |  3 ++-
- drivers/md/raid5.c     | 13 +++++++------
- 7 files changed, 26 insertions(+), 23 deletions(-)
+Ahh. I see the problem. Or at least part of it.
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index eab1b36c1d02ef..1cb4a33148aac9 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -5716,10 +5716,10 @@ int mddev_stack_new_rdev(struct mddev *mddev, struct md_rdev *rdev)
- 	if (mddev_is_dm(mddev))
- 		return 0;
- 
--	lim = queue_limits_start_update(mddev->queue);
-+	lim = queue_limits_start_update(mddev->gendisk->queue);
- 	queue_limits_stack_bdev(&lim, rdev->bdev, rdev->data_offset,
- 				mddev->gendisk->disk_name);
--	return queue_limits_commit_update(mddev->queue, &lim);
-+	return queue_limits_commit_update(mddev->gendisk->queue, &lim);
- }
- EXPORT_SYMBOL_GPL(mddev_stack_new_rdev);
- 
-@@ -5823,8 +5823,7 @@ struct mddev *md_alloc(dev_t dev, char *name)
- 	disk->fops = &md_fops;
- 	disk->private_data = mddev;
- 
--	mddev->queue = disk->queue;
--	blk_queue_write_cache(mddev->queue, true, true);
-+	blk_queue_write_cache(disk->queue, true, true);
- 	disk->events |= DISK_EVENT_MEDIA_CHANGE;
- 	mddev->gendisk = disk;
- 	error = add_disk(disk);
-@@ -6126,6 +6125,7 @@ int md_run(struct mddev *mddev)
- 	}
- 
- 	if (!mddev_is_dm(mddev)) {
-+		struct request_queue *q = mddev->gendisk->queue;
- 		bool nonrot = true;
- 
- 		rdev_for_each(rdev, mddev) {
-@@ -6137,14 +6137,14 @@ int md_run(struct mddev *mddev)
- 		if (mddev->degraded)
- 			nonrot = false;
- 		if (nonrot)
--			blk_queue_flag_set(QUEUE_FLAG_NONROT, mddev->queue);
-+			blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
- 		else
--			blk_queue_flag_clear(QUEUE_FLAG_NONROT, mddev->queue);
--		blk_queue_flag_set(QUEUE_FLAG_IO_STAT, mddev->queue);
-+			blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
-+		blk_queue_flag_set(QUEUE_FLAG_IO_STAT, q);
- 
- 		/* Set the NOWAIT flags if all underlying devices support it */
- 		if (nowait)
--			blk_queue_flag_set(QUEUE_FLAG_NOWAIT, mddev->queue);
-+			blk_queue_flag_set(QUEUE_FLAG_NOWAIT, q);
- 	}
- 	if (pers->sync_request) {
- 		if (mddev->kobj.sd &&
-@@ -6381,8 +6381,10 @@ static void mddev_detach(struct mddev *mddev)
- 		mddev->pers->quiesce(mddev, 0);
- 	}
- 	md_unregister_thread(mddev, &mddev->thread);
-+
-+	/* the unplug fn references 'conf' */
- 	if (!mddev_is_dm(mddev))
--		blk_sync_queue(mddev->queue); /* the unplug fn references 'conf'*/
-+		blk_sync_queue(mddev->gendisk->queue);
- }
- 
- static void __md_stop(struct mddev *mddev)
-@@ -7110,7 +7112,7 @@ static int hot_add_disk(struct mddev *mddev, dev_t dev)
- 	if (!bdev_nowait(rdev->bdev)) {
- 		pr_info("%s: Disabling nowait because %pg does not support nowait\n",
- 			mdname(mddev), rdev->bdev);
--		blk_queue_flag_clear(QUEUE_FLAG_NOWAIT, mddev->queue);
-+		blk_queue_flag_clear(QUEUE_FLAG_NOWAIT, mddev->gendisk->queue);
- 	}
- 	/*
- 	 * Kick recovery, maybe this spare has to be added to the
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 5db58d076256d3..dc7d3dc1569934 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -469,7 +469,6 @@ struct mddev {
- 	struct timer_list		safemode_timer;
- 	struct percpu_ref		writes_pending;
- 	int				sync_checkers;	/* # of threads checking writes_pending */
--	struct request_queue		*queue;	/* for plugging ... */
- 
- 	struct bitmap			*bitmap; /* the bitmap for the device */
- 	struct {
-@@ -822,7 +821,7 @@ static inline void mddev_check_write_zeroes(struct mddev *mddev, struct bio *bio
- {
- 	if (bio_op(bio) == REQ_OP_WRITE_ZEROES &&
- 	    !bio->bi_bdev->bd_disk->queue->limits.max_write_zeroes_sectors)
--		mddev->queue->limits.max_write_zeroes_sectors = 0;
-+		mddev->gendisk->queue->limits.max_write_zeroes_sectors = 0;
- }
- 
- static inline int mddev_suspend_and_lock(struct mddev *mddev)
-@@ -885,7 +884,7 @@ static inline void mddev_trace_remap(struct mddev *mddev, struct bio *bio,
- #define mddev_add_trace_msg(mddev, fmt, args...)			\
- do {									\
- 	if (!mddev_is_dm(mddev))					\
--		blk_add_trace_msg((mddev)->queue, fmt, ##args);		\
-+		blk_add_trace_msg((mddev)->gendisk->queue, fmt, ##args); \
- } while (0)
- 
- #endif /* _MD_MD_H */
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index f65aa6ecec0482..c5d4aeb68404c9 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -389,7 +389,7 @@ static int raid0_set_limits(struct mddev *mddev)
- 	lim.io_min = mddev->chunk_sectors << 9;
- 	lim.io_opt = lim.io_min * mddev->raid_disks;
- 	mddev_stack_rdev_limits(mddev, &lim);
--	return queue_limits_set(mddev->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim);
- }
- 
- static int raid0_run(struct mddev *mddev)
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 75329ab2dbd8de..445e3d3ff9ff7d 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -3083,7 +3083,7 @@ static int raid1_set_limits(struct mddev *mddev)
- 	blk_set_stacking_limits(&lim);
- 	lim.max_write_zeroes_sectors = 0;
- 	mddev_stack_rdev_limits(mddev, &lim);
--	return queue_limits_set(mddev->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim);
- }
- 
- static void raid1_free(struct mddev *mddev, void *priv);
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 692a3bd94100e2..fd960a5b29fe49 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -4012,7 +4012,7 @@ static int raid10_set_queue_limits(struct mddev *mddev)
- 	lim.io_min = mddev->chunk_sectors << 9;
- 	lim.io_opt = lim.io_min * raid10_nr_stripes(conf);
- 	mddev_stack_rdev_limits(mddev, &lim);
--	return queue_limits_set(mddev->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim);
- }
- 
- static int raid10_run(struct mddev *mddev)
-diff --git a/drivers/md/raid5-ppl.c b/drivers/md/raid5-ppl.c
-index da4ba736c4f0c9..a70cbec12ed017 100644
---- a/drivers/md/raid5-ppl.c
-+++ b/drivers/md/raid5-ppl.c
-@@ -1393,7 +1393,8 @@ int ppl_init_log(struct r5conf *conf)
- 		ppl_conf->signature = ~crc32c_le(~0, mddev->uuid, sizeof(mddev->uuid));
- 		ppl_conf->block_size = 512;
- 	} else {
--		ppl_conf->block_size = queue_logical_block_size(mddev->queue);
-+		ppl_conf->block_size =
-+			queue_logical_block_size(mddev->gendisk->queue);
- 	}
- 
- 	for (i = 0; i < ppl_conf->count; i++) {
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index 8d2e3f9419a7f3..651fc4d603dc59 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -4279,9 +4279,10 @@ static int handle_stripe_dirtying(struct r5conf *conf,
- 			}
- 		}
- 		if (rcw && !mddev_is_dm(conf->mddev))
--			blk_add_trace_msg(conf->mddev->queue, "raid5 rcw %llu %d %d %d",
--					  (unsigned long long)sh->sector,
--					  rcw, qread, test_bit(STRIPE_DELAYED, &sh->state));
-+			blk_add_trace_msg(conf->mddev->gendisk->queue,
-+				"raid5 rcw %llu %d %d %d",
-+				(unsigned long long)sh->sector, rcw, qread,
-+				test_bit(STRIPE_DELAYED, &sh->state));
- 	}
- 
- 	if (rcw > disks && rmw > disks &&
-@@ -5693,7 +5694,7 @@ static void raid5_unplug(struct blk_plug_cb *blk_cb, bool from_schedule)
- 	release_inactive_stripe_list(conf, cb->temp_inactive_list,
- 				     NR_STRIPE_HASH_LOCKS);
- 	if (!mddev_is_dm(mddev))
--		trace_block_unplug(mddev->queue, cnt, !from_schedule);
-+		trace_block_unplug(mddev->gendisk->queue, cnt, !from_schedule);
- 	kfree(cb);
- }
- 
-@@ -7073,7 +7074,7 @@ raid5_store_skip_copy(struct mddev *mddev, const char *page, size_t len)
- 	if (!conf)
- 		err = -ENODEV;
- 	else if (new != conf->skip_copy) {
--		struct request_queue *q = mddev->queue;
-+		struct request_queue *q = mddev->gendisk->queue;
- 
- 		conf->skip_copy = new;
- 		if (new)
-@@ -7731,7 +7732,7 @@ static int raid5_set_limits(struct mddev *mddev)
- 	/* No restrictions on the number of segments in the request */
- 	lim.max_segments = USHRT_MAX;
- 
--	return queue_limits_set(mddev->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim);
- }
- 
- static int raid5_run(struct mddev *mddev)
--- 
-2.39.2
+The iter is an ITER_BVEC.
 
+And fault_in_iov_iter_readable() "knows" that an ITER_BVEC cannot
+fail. Because obviously it's a kernel address, so no user page fault.
+
+But for the machine check case, ITER_BVEC very much can fail.
+
+This should never have worked in the first place.
+
+What a crock.
+
+Do we need to make iterate_bvec() always succeed fully, and make
+copy_mc_to_kernel() zero out the end?
+
+                   Linus
