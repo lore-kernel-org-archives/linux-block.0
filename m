@@ -1,30 +1,42 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2023B1E493
-	for <linux-block@vger.kernel.org>; Wed, 28 Feb 2024 13:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E26B1E493;
+	Wed, 28 Feb 2024 13:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709126658; cv=none; b=sk95WAnJc97KvRfpuexE7wj1yg+y/XViQZ1wdWMeIEPBChpcRhTMy7VhTqLXcmauSDYHp2241tgGLFxDKEvLPYs2WipQUNlGFATWRiGoRhFfKnsCN4UWWp/5zBi5Xb1AU56i1yYqpa8POQ2Vo/ttKUq0ZzR2yoynCtd0mNnQz38=
+	t=1709126939; cv=none; b=kXb5sln6SoR0LVefME47NxZ65EBa7a7bQ+/vI2n+oIBMiQkjgU7LwZgH3G1lWwl/Lr1Af+Onx+95HmzS0YoQfC8jBa51cInXkDBQ48UURcup4NepCDkSsvhqx91Mu16Tuo0WuEnHNN25S/q59AULPNe8OV2+EwZuChl/hRWgWg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709126658; c=relaxed/simple;
-	bh=qBCVAO/wTUmaxl8RF4eulplhO1Reo4sEQp4BEjJpAqQ=;
+	s=arc-20240116; t=1709126939; c=relaxed/simple;
+	bh=JT52S9g7j/kEijySVLsE8fq6O3F0OsyWivHrbOm/DPM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W2tMeT++Z8aYqSwKf7nrcGh63pJXmiw00XIXUbRgR+5nW5kYjWsYHLd8tHTLZltJ9eqDExZ15G6r8FiCtPKjzMuAoQMCCaYjNO5n4I4iRJn4rSQb816bqKeXM4KgVzObDTs5aM3QVEZ2UKbOi8PyIlRnKkz586q7ZyWZ4HCS6tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8A15268D05; Wed, 28 Feb 2024 14:24:11 +0100 (CET)
-Date: Wed, 28 Feb 2024 14:24:11 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Wen Xiong <wenxiong@us.ibm.com>
-Subject: Re: [PATCH] blk-mq: don't change nr_hw_queues and nr_maps for
- kdump kernel
-Message-ID: <20240228132411.GA11497@lst.de>
-References: <20240228040857.306483-1-ming.lei@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AfN2HLERRYLzFJhXByVbTtNeYBrxnJhk+KWIBnlmitpfwbeksnOsOXNYM2mSAAW6yGwRIZhjY17X3V2tKhyfl1yUStvJ4YxInEMBM9r25NkPQ10uN3znkzGlJ6dWqYFs9ICfab5k/iRlYCT67Wv743jhm8fjMJ+ZYX0bEFesR6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HOWjpnD3; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HOWjpnD3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=IMpRJRX95zgFjbDJJkVo3LiXZsjgsaeBXPMKkkKcq9s=; b=HOWjpnD3YrDgccps2LwDtdjK7U
+	jsFvYTyniWQXf2XSHwVNo9AWHZqyk8q/pHMbqmTW263OFNeZuH5lJT3BeqNocdSZPdV7zJJFRrFy4
+	vQErZsPI0aCh8tOcgobDavwQduR8fCgqsdzOlzg9wK570CTysPhxIEQU3pZU1UuzSpTwYwRUh6Sjl
+	fCAnA8sS6qNS+mKDg/g9AuzWWueyJkYUS2yQ8+RXE/JESltI89+wFri8TfDb/sTVnkyqeruNUwa01
+	jUJvBO6dQCuVpMNJ8/zHh4YHCQVoJJXKPINHzhoq06She7ib+9AL7ICukoVwsSN1ICDj1vSTcxVJ4
+	qVOHm10Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rfJzU-00000009TRi-3nIU;
+	Wed, 28 Feb 2024 13:28:56 +0000
+Date: Wed, 28 Feb 2024 05:28:56 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+Subject: Re: [PATCH] bdev: make blockdev_mnt static
+Message-ID: <Zd81GHuI7y9s0iuu@infradead.org>
+References: <20240227081958.89092-1-jiapeng.chong@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,19 +45,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240228040857.306483-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240227081958.89092-1-jiapeng.chong@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Feb 28, 2024 at 12:08:57PM +0800, Ming Lei wrote:
-> For most of ARCHs, 'nr_cpus=1' is passed for kdump kernel, so
-> nr_hw_queues for each mapping is supposed to be 1 already.
+On Tue, Feb 27, 2024 at 04:19:58PM +0800, Jiapeng Chong wrote:
+> The blockdev_mnt are not used outside the file bdev.c, so the modification
+> is defined as static.
 > 
-> More importantly, this way may cause trouble for driver, because blk-mq and
-> driver see different queue mapping since driver should setup hardware
-> queue setting before calling into allocating blk-mq tagset.
+> block/bdev.c:377:17: warning: symbol 'blockdev_mnt' was not declared. Should it be static?
 > 
-> So not overriding nr_hw_queues and nr_maps for kdump kernel.
 
-Great to see this hack retired.
+The patch looks good:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=8341
+
+But I don't think kernel commit should close random bugzillas?
+
