@@ -1,120 +1,113 @@
-Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CDD13E7DD
-	for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 20:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027BC15F124;
+	Thu, 29 Feb 2024 20:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709239237; cv=none; b=WFrx5PSB+qxVtSDNJQ2TPhFcue8fOyvptpySS3KYDKC1120o/37sXx3K5gp3I6oa/SEO16h4jao66TRVr/QWHUJnTjMShI9arTIhnrgCQvWm+vFHU2nqI50GVc8YzwuC/OMh0fZQq+QtzWtcujfdfthnOsJakdhv8U4xNYtIj+s=
+	t=1709239256; cv=none; b=gklcxtMzzZeSCkdmpMrbZfKU53vTDonySl+55ozt721uLgt1hp3/mzg9hJhGjUVBjWRRUhtasA2D+k/xxGU4JeNIgXmzyfMhnXTV+DdwZjAdrWpzTO4uWBGeWYFWM/4Qhx8AVZ/7GdaAVKhqzhPj/j4W7ifYNAsbcCJIi1rD7hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709239237; c=relaxed/simple;
-	bh=d2Jnd4yjkGkEApv48eNzr6PHo1ck9eCm1SggiXIqMu4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dHRI6iwUtpkM65TMl7fM6Tt+YgXNp0SwbkyiXs/gcxZ5RX7bZSCfdCtdYuAOLymFjF/flefFA2GgQ+q+AChBwshRrwmuoyxg8miV0QSZrBLch9sst6pcH43KFZFNXPBi3HwXsL972ELzsYm0yJGg0XHVWQhqUMgKJ2UQIkQXQ28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=oND8RtnD; arc=none smtp.client-ip=72.215.153.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cybernetics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
+	s=arc-20240116; t=1709239256; c=relaxed/simple;
+	bh=vIYxEkfgTpOst8IRDB0xL9ewxCjd8NxYDv27uR59C3c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OF9iGR3zU9QP3+79YRisb9mkxNAYRAP/hJOkpQO9w+i5cmoIST/7IZmmxLJTiCO9Ajx3ytUnzTdL5L8QVRjBiu+k7C7QGgdgBK5sJYbx6hwPSAgqxjx79RGMVh0GN17RiJelVq8mr0pIJILqAFcxx43YIQTyEyuJviZ+6VSRJfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O8eXuqPW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="oND8RtnD"
-X-ASG-Debug-ID: 1709239210-1cf4391a1c513a0001-Cu09wu
-Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id HEvayFu8xC0yrdsC; Thu, 29 Feb 2024 15:40:32 -0500 (EST)
-X-Barracuda-Envelope-From: tonyb@cybernetics.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
-X-ASG-Whitelist: Client
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
-	bh=KGdwz7goRECtYGm5sOnk6GBz6zSl4J5s0wT/cSLJdMw=;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:
-	Content-Language:Subject:MIME-Version:Date:Message-ID; b=oND8RtnDJqAi9sA80RB4
-	sb4XkMRRCvNMjh6iERzlbrwrBvsjIOrbs14Fav2aVqBlrnTByQSS+hxqeGim5/aVdLcGaeyzzFjAt
-	NXzreOxVb4kMcqOJ2IsQTScZkRwbiu5reQ7c8yHiEMiU44bqKuGSJgsmQLeCuBABcbFTPk8IMY=
-Received: from [10.157.2.224] (HELO [192.168.200.1])
-  by cybernetics.com (CommuniGate Pro SMTP 7.1.1)
-  with ESMTPS id 13109217; Thu, 29 Feb 2024 15:40:10 -0500
-Message-ID: <2dbe097c-a4b8-4f22-8c39-1bdecbee4581@cybernetics.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
-Date: Thu, 29 Feb 2024 15:40:09 -0500
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O8eXuqPW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F255C433C7;
+	Thu, 29 Feb 2024 20:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709239255;
+	bh=vIYxEkfgTpOst8IRDB0xL9ewxCjd8NxYDv27uR59C3c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=O8eXuqPWU1sOuZYahrBx6hsNHCODbSZx9ZYeh5ly5/vR8dBFc0xSEYSvOCHYo0yKE
+	 AW8nHLHSogNx0cAmq2ABJupQfG7Enzi12zy8cTSIyu0VSyUpyroa3dZGgGbsxHGmTr
+	 exnNVxvlNOBk/xzeWPvRaLi4cUxaLOG5kQmQ0egxMB0pp32i3Bzj1JRLWcYk9vcnA0
+	 MVSAxBt5gO2QvUFSIKf3hiohsyrH8OPWe3q5dPGmnEhYY8nfqwseW1UFLgHkurbZN5
+	 etuAVJ8TahrJEGCqeMrGcm2iHXhYRaJgEXY3YduTB4JTnDcYeKPVgn1nph/BNKgUVp
+	 WsUODlPa7oG6g==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Greg Joyce <gjoyce@linux.ibm.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	jonathan.derrick@linux.dev,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 09/12] block: sed-opal: handle empty atoms when parsing response
+Date: Thu, 29 Feb 2024 15:40:31 -0500
+Message-ID: <20240229204039.2861519-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240229204039.2861519-1-sashal@kernel.org>
+References: <20240229204039.2861519-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix page refcounts for unaligned buffers in
- __bio_release_pages()
-Content-Language: en-US
-X-ASG-Orig-Subj: Re: [PATCH] block: Fix page refcounts for unaligned buffers in
- __bio_release_pages()
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Hugh Dickins <hughd@google.com>, Hannes Reinecke <hare@suse.de>,
- Keith Busch <kbusch@kernel.org>, linux-mm <linux-mm@kvack.org>,
- linux-block@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com>
- <ZeDguZujxets0KtD@casper.infradead.org>
-From: Tony Battersby <tonyb@cybernetics.com>
-In-Reply-To: <ZeDguZujxets0KtD@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.1.79
 Content-Transfer-Encoding: 8bit
-X-Barracuda-Connect: UNKNOWN[10.10.4.126]
-X-Barracuda-Start-Time: 1709239232
-X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at cybernetics.com
-X-Barracuda-Scan-Msg-Size: 1861
-X-Barracuda-BRTS-Status: 0
 
-On 2/29/24 14:53, Matthew Wilcox wrote:
-> On Thu, Feb 29, 2024 at 01:08:09PM -0500, Tony Battersby wrote:
->> Fix an incorrect number of pages being released for buffers that do not
->> start at the beginning of a page.
-> Oh, I see what I did.  Wouldn't a simpler fix be to just set "done" to
-> offset_in_page(fi.offset)?
+From: Greg Joyce <gjoyce@linux.ibm.com>
 
-Actually it would be:
+[ Upstream commit 5429c8de56f6b2bd8f537df3a1e04e67b9c04282 ]
 
-ssize_t done = -offset_in_page(offset);
+The SED Opal response parsing function response_parse() does not
+handle the case of an empty atom in the response. This causes
+the entry count to be too high and the response fails to be
+parsed. Recognizing, but ignoring, empty atoms allows response
+handling to succeed.
 
-But then you have signed vs. unsigned comparison in the while(), or you
-could rearrange the loop to avoid the negative, but then it gets clunky.
+Signed-off-by: Greg Joyce <gjoyce@linux.ibm.com>
+Link: https://lore.kernel.org/r/20240216210417.3526064-2-gjoyce@linux.ibm.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/opal_proto.h | 1 +
+ block/sed-opal.c   | 6 +++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
->
->> @@ -1152,7 +1152,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
->>  
->>  	bio_for_each_folio_all(fi, bio) {
->>  		struct page *page;
->> -		size_t done = 0;
->> +		size_t nr_pages;
->>  
->>  		if (mark_dirty) {
->>  			folio_lock(fi.folio);
->> @@ -1160,10 +1160,11 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
->>  			folio_unlock(fi.folio);
->>  		}
->>  		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
->> +		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
->> +			   fi.offset / PAGE_SIZE + 1;
->>  		do {
->>  			bio_release_page(bio, page++);
->> -			done += PAGE_SIZE;
->> -		} while (done < fi.length);
->> +		} while (--nr_pages != 0);
->>  	}
->>  }
->>  EXPORT_SYMBOL_GPL(__bio_release_pages);
-> The long-term path here, I think, is to replace this bio_release_page()
-> with a bio_release_folio(folio, offset, length) which calls into
-> a new unpin_user_folio(folio, nr) which calls gup_put_folio().
-
-I developed the patch with the 6.1 stable series, which just has:
-
-nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
-	   fi.offset / PAGE_SIZE + 1;
-folio_put_refs(fi.folio, nr_pages);
-
-Which is another reason that I went for the direct nr_pages
-calculation.  Would you still prefer the negative offset_in_page() approach?
-
-Tony
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index 7152aa1f1a49e..7f306b08a0fe7 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -71,6 +71,7 @@ enum opal_response_token {
+ #define SHORT_ATOM_BYTE  0xBF
+ #define MEDIUM_ATOM_BYTE 0xDF
+ #define LONG_ATOM_BYTE   0xE3
++#define EMPTY_ATOM_BYTE  0xFF
+ 
+ #define OPAL_INVAL_PARAM 12
+ #define OPAL_MANUFACTURED_INACTIVE 0x08
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 9bdb833e5817d..25e4ce452c1d3 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -935,16 +935,20 @@ static int response_parse(const u8 *buf, size_t length,
+ 			token_length = response_parse_medium(iter, pos);
+ 		else if (pos[0] <= LONG_ATOM_BYTE) /* long atom */
+ 			token_length = response_parse_long(iter, pos);
++		else if (pos[0] == EMPTY_ATOM_BYTE) /* empty atom */
++			token_length = 1;
+ 		else /* TOKEN */
+ 			token_length = response_parse_token(iter, pos);
+ 
+ 		if (token_length < 0)
+ 			return token_length;
+ 
++		if (pos[0] != EMPTY_ATOM_BYTE)
++			num_entries++;
++
+ 		pos += token_length;
+ 		total -= token_length;
+ 		iter++;
+-		num_entries++;
+ 	}
+ 
+ 	resp->num = num_entries;
+-- 
+2.43.0
 
