@@ -1,169 +1,262 @@
-Received: from outgoing.selfhost.de (mordac.selfhost.de [82.98.82.6])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37284F205
-	for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 08:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.98.82.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CED27CF05
+	for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 12:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709194877; cv=none; b=CAM7w0+KLcaP+10wuuqofTaR1te4xdLzKZfVHt9m7kMwd3NKcUPs5l3swJWCsaaNkFMvb4byM4Iisw7na+uUZqHOyd0/GtmB5OwJ3xc/Ft3qzIn8WwX+9xmTZ+hzwSxlj1O2Sgscdm8fC9bOC9hlhhic2SJEi5yBDFUaeGwaQhA=
+	t=1709209703; cv=none; b=nIGdBHSRnNuk2rtquW4gyZ5VVFrzH905YR1GFo4PsrrlJxhS62Md1kLvyA5E04HCws3T0ANN7GzRvxOFVRkx3Qde2lMqZ0260QCrXgkHzmP18Db+nxbvPNf9Ojc+g7XG8KvdxYMGKw611DGoFQwVwH9drfVlESLSpraXTCq0Ulc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709194877; c=relaxed/simple;
-	bh=c3/1KWXdvm/MBju6h/jrIHxJ8idnwvwGpTR00gWFSzg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=hTx/rz3Fj04+PMEOlZC6fk0eWgCIoSUa7kb/2PS0ec/Lm+LYQzfbiKNobEyNwRzOzBwIKifmilzEEUDHupLCjLf4tn3ZgaVBs1QWtVV1Bie32otpzhOe4zmCG27FBuZkCpmdEFDfdVRQ0yqnu6qOrUb5P5c9iNmuJcTQyBZsuMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=afaics.de; spf=none smtp.mailfrom=afaics.de; arc=none smtp.client-ip=82.98.82.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=afaics.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=afaics.de
-Received: (qmail 15066 invoked from network); 29 Feb 2024 08:21:12 -0000
-Received: from unknown (HELO mailhost.afaics.de) (postmaster@xqrsonfo.mail.selfhost.de@79.192.199.18)
-  by mailout.selfhost.de with ESMTPA; 29 Feb 2024 08:21:12 -0000
-X-Spam-Level: ****
-X-Spam-Report: 
-	*  4.0 RCVD_IN_PBL RBL: Last ext relay in Spamhaus PBL (Non-MTA IPs)
-	*      [2003:e3:1f31:6503:8865:8fff:feb7:694d listed in]
-	[zen.spamhaus.org]
-	*  0.0 HELO_NO_DOMAIN Relay reports its domain incorrectly
-	*  0.0 KHOP_HELO_FCRDNS Relay HELO differs from its IP's reverse DNS
-	*  0.0 DMARC_MISSING Missing DMARC policy
-Received: from [IPV6:2003:e3:1f31:6503:8865:8fff:feb7:694d] (p200300e31f31650388658ffffeb7694d.dip0.t-ipconnect.de [2003:e3:1f31:6503:8865:8fff:feb7:694d])
-	by marvin.afaics.de (OpenSMTPD) with ESMTP id db5b7ac1;
-	Thu, 29 Feb 2024 09:21:08 +0100 (CET)
-Message-ID: <633b4ae2-408c-469a-8df1-7530de9f7a97@afaics.de>
-Date: Thu, 29 Feb 2024 09:21:08 +0100
+	s=arc-20240116; t=1709209703; c=relaxed/simple;
+	bh=nDXxWTGefPDdWRyLxw2dWB5iMDiL+3kPzS/uaeEWIFg=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ncm8z2PhKnEWFEDa3y002EBGpe4+GeR8OC+x2I9KjYDunKk/FIRlfxdCQiQHC1toLRDD1Oynv6Vie2U+m05QHEYVnodWecN3Z+L9jjIzLmwQuQHXApUiXvK4oAWPeerQByPLRtO/amSq/85UzakoMNzy5lyxzS714aw/vN5b6yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aDWRKj/Y; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aDWRKj/Y"
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41TCRF9F000975;
+	Thu, 29 Feb 2024 12:28:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=rpwE6tprDgf1a9XkPC8twTrnewmme0GULdhPyewoo/g=;
+ b=aDWRKj/Y1ewoB1ox2ZchbOzGEyR/fs/IS8mDvbStrElYQc2s+1Vuxj4hoz0jTZ0/feZ2
+ pOjIoIZun3gYmy9Phch7jmrWx5NE2aAiOAVqfxHs1vA6OLrsJPDWb+aozIapuP7NCfc1
+ e3BmkOW18oNNRJ0Mzv9DxVBqEQTH/Md91XXQ6mYQXUqmKXaQCyOH/e8P61TGIR4l9Vs8
+ Mfk1iMm0DihFO0mhqH52DVULpotkrcvCZrvd8hFqctZGUTUzVuPHFXhaX1SAH4lpFQ5F
+ K0cbufhsIObNs4Tw/irtOFDhFImxLmocauefF87r+tWJe4xShMFHKbWryk5/wliHdBld 9Q== 
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wjsxmr0um-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Feb 2024 12:28:04 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41TCQp9t023777;
+	Thu, 29 Feb 2024 12:28:04 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wfw0kmwpa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Feb 2024 12:28:04 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41TCS1sg9437742
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 29 Feb 2024 12:28:03 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 39EAF58073;
+	Thu, 29 Feb 2024 12:28:01 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8132F5806C;
+	Thu, 29 Feb 2024 12:27:58 +0000 (GMT)
+Received: from [9.109.198.202] (unknown [9.109.198.202])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 29 Feb 2024 12:27:58 +0000 (GMT)
+Message-ID: <2fc14fe8-7d39-42b4-b963-415714ece38c@linux.ibm.com>
+Date: Thu, 29 Feb 2024 17:57:56 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] nvme-pci: Fix EEH failure on ppc after subsystem
+ reset
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: axboe@fb.com, hch@lst.de, sagi@grimberg.me, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gjoyce@linux.ibm.com,
+        Srimannarayana Murthy Maram <msmurthy@imap.linux.ibm.com>
+References: <20240209050342.406184-1-nilay@linux.ibm.com>
+ <Zd4p_E8cPFpr1M--@kbusch-mbp>
+ <07b92c25-d0dd-455c-8fb9-a4f2709677ba@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <07b92c25-d0dd-455c-8fb9-a4f2709677ba@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: yS_zZrsRLcRUKPXCHUHIlsD4puBHKBLS
+X-Proofpoint-GUID: yS_zZrsRLcRUKPXCHUHIlsD4puBHKBLS
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Linux)
-Subject: Re: RIP on discard, JMicron USB adaptor
-From: Harald Dunkel <harri@afaics.de>
-To: Oliver Neukum <oneukum@suse.com>, Alan Stern <stern@rowland.harvard.edu>,
- Keith Busch <kbusch@kernel.org>
-Cc: Harald Dunkel <harald.dunkel@aixigo.com>, Jens Axboe <axboe@kernel.dk>,
- Bart Van Assche <bvanassche@acm.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-block@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-scsi@vger.kernel.org
-References: <70bc51d7-c8a2-4b06-ab7a-e321d20db49a@aixigo.com>
- <62296d89-f7e6-4f54-add8-35b531dc657c@rowland.harvard.edu>
- <Zd9Xbz3L6JEvBHHT@kbusch-mbp>
- <76fcb1b1-cdf2-45d0-aeab-c712ee517b34@rowland.harvard.edu>
- <4111f9ba-e1dc-4158-af6f-c048bcf8ccd2@suse.com>
- <81499610-bbac-4957-a2ab-331db68455f0@afaics.de>
- <5baf28bd-b89e-49aa-ad66-6725ba9a87f9@afaics.de>
-Content-Language: en-US
-Autocrypt: addr=harri@afaics.de; keydata=
- xsBNBFIHbdABCACYHRLHGdFRk7bWkgdPhDLin6jLIS0ppegsx0Vc9STFyiHFUW+6HU9ZYTpO
- f2qbcWlE3YJYacy6zOiiTjYX31quhvGrP3UJXKjXsAp7CFsMxRJUhm20Ph0nCl/Oed9SDNXN
- HQJwHoOVWrsu/sGxNTfjCWRJleBE11P+TuuLOAP9dbqFbWhmkTsE9Lp9d16Ak77MWmWWxBvD
- cBsUuC2GOYDfFOPM3j16w7aw4Y9GI2B5QzFiHvOR/hCazfDEMQAlaHMm6sH8uzrjNEtB5dvm
- vxF8j/IpvsuvWGhZ68rej2gPwoVrRTEBaYslW8/5dm8o1HuTkuLqxhNTcvYWyV8uKRtTABEB
- AAHNH0hhcmFsZCBEdW5rZWwgPGhhcnJpQGFmYWljcy5kZT7CwHoEEwEIACQCGwMCHgECF4AC
- GQEFAlQYLhUFCwkIBwMFFQoJCAsFFgIDAQAACgkQCp4qnmbTgcu7Fwf/RoWwNDxJPD96vBFb
- Jzfta9qVA0JpbKoMAnNY0tDWiF5Ur8UY/tv/RDVV44Vx3Ef0fzQZN0CtHsNfAKO+KXBMUiuT
- AP4AadpaIwYMo8v+SmPzJSUxWgBm6IsHwn1udXRdEgdR9guWkLPRGCK3x84sorAOUnUHJHkq
- UrDFQUNfNA9lqM7ttunfVtG4SaqcLEOpJ1s/aMUsEODlP/lws42VjubIVg403cMIgvqs5cT8
- EjLDNqCwEoWZRhfpg5x3D5uNDNWSW70Z+6Knicbi129QIu4HtSnfrxiuvHz2LLPFOVQuj8h4
- TPT6tkfIURKipFXoIC3YiK8f94rFO3q86oNJUs7ATQRSB23QAQgA27gQiXZ96pbJkGoz1RWX
- T8WSQJ5TWVJyf4eswoVI8Ffk5vLE+xPpAYEDkL7JYGCvBN1BKrcaZzDy8Irfys6bHI3JmVVi
- ZloSkVS8QL7pQGfp74VT3NvDjK6LDe9QMv8Rb45laSRD5XCGRMTxz9pwu3vNcOPCfV5nmbyB
- /6h4/bguFH1+6aGz6HyC8v/tjhL6+cY329inJ+vWVJYssweMIIYpssUtDaPKZO0080toLLrt
- KuVgiUb9llbmZgKGElRjwgGT8AUXDRFCzn0ws/nuGNw0L+EdCI3VdZSK5KMEO34vZq7iNeM1
- ZVnPVZAbHheR30NFKTgrwvlt8G7blHJPWwARAQABwsBfBBgBCAAJBQJSB23QAhsMAAoJEAqe
- Kp5m04HLiiEH/jlKumVyQrOxH58iQFzVDthDfJdBLmnDlfVx2Dzn60vc5To6yJ3fwO21s3xC
- /LW9aZSfDueV0nWU4/Wow/X5GEH90Vc1sFoeSZb/GW03vsO1n/OFIVlv9GQv+RviWMDEwKKx
- CMvdqUlVblWf1iT/ngPN0YawKGF0Dgn8TRzfL/Tq9muwNUaONzz8PWBUIm1+8JDZszYLzLoz
- YiY0usL4GH9BCeW6XG2Q6j4cpyOQZ0VKiBs1Rh+dmswn+iXLfi08Q0IxYAD6wjHdJTBD9pE9
- 5Uj8/1spt51FBAAIP+7sd2mpAvsNnojatuOgjBmBxFwiOKeyDNe1wvKr4dsRheOLV8M=
-In-Reply-To: <5baf28bd-b89e-49aa-ad66-6725ba9a87f9@afaics.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-29_02,2024-02-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ adultscore=0 bulkscore=0 mlxscore=0 spamscore=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 suspectscore=0 lowpriorityscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402290095
 
-On 2024-02-29 08:31:51, Harald Dunkel wrote:
-> Good news (sort of): I was able to reproduce the problem after a
-> power cycle. Full dmesg output is attached. Hope this helps.
+
+Hi Keith,
+
+On 2/28/24 16:49, Nilay Shroff wrote:
+> 
+> 
+> On 2/27/24 23:59, Keith Busch wrote:
+>> On Fri, Feb 09, 2024 at 10:32:16AM +0530, Nilay Shroff wrote:
+>>> If the nvme subsyetm reset causes the loss of communication to the nvme
+>>> adapter then EEH could potnetially recover the adapter. The detection of
+>>> comminication loss to the adapter only happens when the nvme driver
+>>> attempts to read an MMIO register.
+>>>
+>>> The nvme subsystem reset command writes 0x4E564D65 to NSSR register and
+>>> schedule adapter reset.In the case nvme subsystem reset caused the loss
+>>> of communication to the nvme adapter then either IO timeout event or
+>>> adapter reset handler could detect it. If IO timeout even could detect
+>>> loss of communication then EEH handler is able to recover the
+>>> communication to the adapter. This change was implemented in 651438bb0af5
+>>> (nvme-pci: Fix EEH failure on ppc). However if the adapter communication
+>>> loss is detected in nvme reset work handler then EEH is unable to
+>>> successfully finish the adapter recovery.
+>>>
+>>> This patch ensures that,
+>>> - nvme driver reset handler would observer pci channel was offline after
+>>>   a failed MMIO read and avoids marking the controller state to DEAD and
+>>>   thus gives a fair chance to EEH handler to recover the nvme adapter.
+>>>
+>>> - if nvme controller is already in RESETTNG state and pci channel frozen
+>>>   error is detected then  nvme driver pci-error-handler code sends the
+>>>   correct error code (PCI_ERS_RESULT_NEED_RESET) back to the EEH handler
+>>>   so that EEH handler could proceed with the pci slot reset.
+>>
+>> A subsystem reset takes the link down. I'm pretty sure the proper way to
+>> recover from it requires pcie hotplug support.
+>>
+> Yes you're correct. We require pcie hotplugging to recover. However powerpc EEH 
+> handler could able to recover the pcie adapter without physically removing and 
+> re-inserting the adapter or in another words, it could reset adapter without 
+> hotplug activity. In fact, powerpc EEH could isolate pcie slot and resets it 
+> (i.e. resetting the PCI device holding the PCI #RST line high for two seconds), 
+> followed by setting up the device config space (the base address registers 
+> (BAR's), latency timer, cache line size, interrupt line, and so on). 
+> 
+> You may find more information about EEH recovery here: 
+> https://www.kernel.org/doc/Documentation/powerpc/eeh-pci-error-recovery.txt
+> 
+> Typically when pcie error is detected and the EEH is able to recover the device, 
+> the EEH handler code goes through below sequence (assuming driver is EEH aware):
+> 
+> eeh_handle_normal_event()
+>   eeh_set_channel_state()-> set state to pci_channel_io_frozen 
+>      eeh_report_error() 
+>        nvme_error_detected() -> channel state "pci_channel_io_frozen"; returns PCI_ERS_RESULT_NEED_RESET
+>          eeh_slot_reset() -> recovery successful 
+>            nvme_slot_reset() -> returns PCI_ERS_RESULT_RECOVERED
+>              eeh_set_channel_state()-> set state to pci_channel_io_normal
+>                nvme_error_resume()
+> 
+> In case pcie erorr is detected and the EEH is unable to recover the device,
+> the EEH handler code goes through the below sequence:
+> 
+> eeh_handle_normal_event()
+>   eeh_set_channel_state()-> set state to pci_channel_io_frozen
+>     eeh_report_error()
+>       nvme_error_detected() -> channel state pci_channel_io_frozen; returns PCI_ERS_RESULT_NEED_RESET
+>         eeh_slot_reset() -> recovery failed
+>           eeh_report_failure()
+>             nvme_error_detected()-> channel state pci_channel_io_perm_failure; returns PCI_ERS_RESULT_DISCONNECT
+>               eeh_set_channel_state()-> set state to pci_channel_io_perm_failure
+>                 nvme_remove()
+> 
+>                                            
+> If we execute the command "nvme subsystem-reset ..." and adapter communication is
+> lost then in the current code (under nvme_reset_work()) we simply disable the device
+>  and mark the controller DEAD. However we may have a chance to recover the controller 
+> if driver is EEH aware and EEH recovery is underway. We already handle one such case 
+> in nvme_timeout(). So this patch ensures that if we fall through nvme_reset_work() 
+> post subsystem-reset and the EEH recovery is in progress then we give a chance to the
+> EEH mechanism to recover the adapter. If in case the EEH recovery is unsuccessful then
+> we'd anyway fall through code path I mentioned above where we invoke nvme_remove() at 
+> the end and delete the erring controller.
 > 
 
-And for 6.7.6:
+BTW, the similar issue was earlier fixed in 651438bb0af5(nvme-pci: Fix EEH failure on ppc).
+And that fix was needed due to the controller health check polling was removed in 
+b2a0eb1a0ac72869(nvme-pci: Remove watchdog timer). In fact, today we may be able to recover
+the NVMe adapter if subsystem-reset or any other PCI error occurs and at the same time some 
+I/O request is in flight. The recovery is possible due to the in flight I/O request would 
+eventually timeout and the nvme_timeout() has special code (added in 651438bb0af5)  that
+gives EEH a chance to recover the adapter. 
 
-```
-[Thu Feb 29 09:11:05 2024] usb 1-4: reset high-speed USB device number 3 using xhci_hcd
-[Thu Feb 29 09:11:10 2024] logitech-hidpp-device 0003:046D:4082.0007: HID++ 4.5 device connected.
-[Thu Feb 29 09:11:37 2024] usb 1-12.1: new high-speed USB device number 13 using xhci_hcd
-[Thu Feb 29 09:11:38 2024] usb 1-12.1: New USB device found, idVendor=152d, idProduct=0583, bcdDevice=31.08
-[Thu Feb 29 09:11:38 2024] usb 1-12.1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-[Thu Feb 29 09:11:38 2024] usb 1-12.1: Product: USB Storage Device
-[Thu Feb 29 09:11:38 2024] usb 1-12.1: Manufacturer: JMicron
-[Thu Feb 29 09:11:38 2024] usb 1-12.1: SerialNumber: DD56419885A7C
-[Thu Feb 29 09:11:38 2024] scsi host9: uas
-[Thu Feb 29 09:11:38 2024] scsi 9:0:0:0: Direct-Access     SAMSUNG  MZVLB1T0HALR     3108 PQ: 0 ANSI: 6
-[Thu Feb 29 09:11:38 2024] sd 9:0:0:0: Attached scsi generic sg5 type 0
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] 2000409264 512-byte logical blocks: (1.02 TB/954 GiB)
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] 4096-byte physical blocks
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] Write Protect is off
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] Mode Sense: 6b 00 00 08
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] Preferred minimum I/O size 4096 bytes
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] Optimal transfer size 33553920 bytes not a multiple of preferred minimum block size (4096 bytes)
-[Thu Feb 29 09:11:40 2024]  sdf: sdf1
-[Thu Feb 29 09:11:40 2024] sd 9:0:0:0: [sdf] Attached SCSI disk
-[Thu Feb 29 09:12:53 2024] ------------[ cut here ]------------
-[Thu Feb 29 09:12:53 2024] WARNING: CPU: 0 PID: 3290 at block/blk-lib.c:50 __blkdev_issue_discard+0x13e/0x180
-[Thu Feb 29 09:12:53 2024] Modules linked in: snd_seq_dummy snd_hrtimer snd_seq_midi snd_seq_midi_event snd_seq cpufreq_userspace cpufreq_conservative cpufreq_powersave cpufreq_ondemand cbc cts rpcsec_gss_krb5 nfsv4 dns_resolver nfs lockd grace fscache netfs scsi_transport_iscsi nvme_fabrics 
-dell_rbu rfkill qrtr dcdbas uinput binfmt_misc nls_utf8 nls_cp437 vfat fat nvidia_drm(PO) nvidia_modeset(PO) intel_rapl_msr intel_rapl_common snd_hda_codec_realtek intel_uncore_frequency snd_hda_codec_generic ledtrig_audio intel_uncore_frequency_common x86_pkg_temp_thermal intel_powerclamp coretemp 
-kvm_intel kvm snd_hda_codec_hdmi irqbypass mei_pxp mei_hdcp i915 snd_hda_intel rapl snd_intel_dspcfg snd_usb_audio cec snd_hda_codec snd_usbmidi_lib drm_buddy intel_cstate uvcvideo snd_hda_core snd_rawmidi videobuf2_vmalloc drm_display_helper snd_hwdep snd_seq_device uvc snd_pcm_oss videobuf2_memops 
-ttm snd_mixer_oss videobuf2_v4l2 snd_pcm tpm_crb videodev drm_kms_helper tpm_tis snd_timer videobuf2_common evdev tpm_tis_core snd intel_gtt intel_uncore
-[Thu Feb 29 09:12:53 2024]  wmi_bmof input_leds gigabyte_wmi pcspkr mc soundcore i2c_algo_bit tpm intel_hid rng_core sparse_keymap acpi_tad acpi_pad sg button mei_me mei nvidia(PO) bonding tls xt_recent br_netfilter overlay xt_comment xt_CHECKSUM nf_tables nfnetlink bridge 8021q garp stp mrp llc 
-macvlan veth iptable_nat iptable_mangle iptable_filter ip6table_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip6table_mangle ip6table_filter ip6_tables auth_rpcgss loop drm fuse efi_pstore agpgart configfs sunrpc ip_tables x_tables autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic 
-efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq libcrc32c crc32c_generic raid0 multipath linear hid_logitech_hidpp hid_logitech_dj uas usb_storage hid_generic usbhid hid cdc_ncm cdc_ether usbnet r8152 mii raid1 md_mod sd_mod dm_mod crct10dif_pclmul 
-crc32_pclmul crc32c_intel polyval_clmulni polyval_generic gf128mul ghash_clmulni_intel sha512_ssse3 sha512_generic sha256_ssse3 sha1_ssse3
-[Thu Feb 29 09:12:53 2024]  i2c_designware_platform i2c_designware_core nvme nvme_core t10_pi ahci xhci_pci crc64_rocksoft_generic aesni_intel crypto_simd r8169 libahci cryptd i2c_i801 crc64_rocksoft xhci_hcd i2c_smbus realtek crc64 libata intel_lpss_pci usbcore intel_lpss scsi_mod idma64 
-scsi_common virt_dma usb_common fan video pinctrl_alderlake pinctrl_intel wmi pwm_lpss
-[Thu Feb 29 09:12:53 2024] CPU: 0 PID: 3290 Comm: blkdiscard Tainted: P           O       6.7.6-raw #1
-[Thu Feb 29 09:12:53 2024] Hardware name: Gigabyte Technology Co., Ltd. Z790 GAMING X/Z790 GAMING X, BIOS F9b 11/10/2023
-[Thu Feb 29 09:12:53 2024] RIP: 0010:__blkdev_issue_discard+0x13e/0x180
-[Thu Feb 29 09:12:53 2024] Code: 48 39 d8 75 91 f7 da 89 d3 c1 eb 09 eb 8b 48 8b 04 24 4c 89 20 48 83 c4 08 31 c0 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc <0f> 0b 48 c7 c6 00 26 e8 93 48 c7 c7 60 91 50 94 e8 3d 7a 5b 00 85
-[Thu Feb 29 09:12:53 2024] RSP: 0018:ffffa7654119bd08 EFLAGS: 00010246
-[Thu Feb 29 09:12:53 2024] RAX: ffff8d8f4c5be0b0 RBX: ffff8d8f4add3e80 RCX: ffff8d8f4add12c0
-[Thu Feb 29 09:12:53 2024] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8d8f4add3e80
-[Thu Feb 29 09:12:53 2024] RBP: 0000000000000cc0 R08: ffffa7654119bd48 R09: 0000000000000000
-[Thu Feb 29 09:12:53 2024] R10: 000000000000081c R11: 0000000000000000 R12: 0000000000000000
-[Thu Feb 29 09:12:53 2024] R13: 00000000773bc800 R14: 000000ee77900000 R15: ffff8d8f4add3e80
-[Thu Feb 29 09:12:53 2024] FS:  00007fb69dc57740(0000) GS:ffff8d9ebf400000(0000) knlGS:0000000000000000
-[Thu Feb 29 09:12:53 2024] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[Thu Feb 29 09:12:53 2024] CR2: 00007ffefb8c6170 CR3: 000000017d8da000 CR4: 0000000000f50ef0
-[Thu Feb 29 09:12:53 2024] PKRU: 55555554
-[Thu Feb 29 09:12:53 2024] Call Trace:
-[Thu Feb 29 09:12:53 2024]  <TASK>
-[Thu Feb 29 09:12:53 2024]  ? __blkdev_issue_discard+0x13e/0x180
-[Thu Feb 29 09:12:53 2024]  ? __warn+0x7c/0x130
-[Thu Feb 29 09:12:53 2024]  ? __blkdev_issue_discard+0x13e/0x180
-[Thu Feb 29 09:12:53 2024]  ? report_bug+0x191/0x1c0
-[Thu Feb 29 09:12:53 2024]  ? handle_bug+0x3a/0x70
-[Thu Feb 29 09:12:53 2024]  ? exc_invalid_op+0x17/0x70
-[Thu Feb 29 09:12:53 2024]  ? asm_exc_invalid_op+0x1a/0x20
-[Thu Feb 29 09:12:53 2024]  ? __blkdev_issue_discard+0x13e/0x180
-[Thu Feb 29 09:12:53 2024]  blkdev_issue_discard+0x50/0xb0
-[Thu Feb 29 09:12:53 2024]  blkdev_common_ioctl+0x820/0x970
-[Thu Feb 29 09:12:53 2024]  ? do_fault+0x27c/0x690
-[Thu Feb 29 09:12:53 2024]  blkdev_ioctl+0xc7/0x260
-[Thu Feb 29 09:12:53 2024]  __x64_sys_ioctl+0x8f/0xd0
-[Thu Feb 29 09:12:53 2024]  do_syscall_64+0x61/0x120
-[Thu Feb 29 09:12:53 2024]  ? __count_memcg_events+0x6e/0xc0
-[Thu Feb 29 09:12:53 2024]  ? handle_mm_fault+0xb0/0x370
-[Thu Feb 29 09:12:53 2024]  ? __ct_user_enter+0x8d/0x100
-[Thu Feb 29 09:12:53 2024]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-[Thu Feb 29 09:12:53 2024] RIP: 0033:0x7fb69dd57c5b
-[Thu Feb 29 09:12:53 2024] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1c 48 8b 44 24 18 64 48 2b 04 25 28 00 00
-[Thu Feb 29 09:12:53 2024] RSP: 002b:00007ffefb889d70 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[Thu Feb 29 09:12:53 2024] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fb69dd57c5b
-[Thu Feb 29 09:12:53 2024] RDX: 00007ffefb889e30 RSI: 0000000000001277 RDI: 0000000000000003
-[Thu Feb 29 09:12:53 2024] RBP: 0000000000000000 R08: 0000000000000007 R09: 000055b80fbd32f0
-[Thu Feb 29 09:12:53 2024] R10: 00007ffefb889da0 R11: 0000000000000246 R12: 000000ee77900000
-[Thu Feb 29 09:12:53 2024] R13: 0000000000000003 R14: 000055b80fbd32f0 R15: 0000000000000000
-[Thu Feb 29 09:12:53 2024]  </TASK>
-[Thu Feb 29 09:12:53 2024] ---[ end trace 0000000000000000 ]---
-[Thu Feb 29 09:12:53 2024] sdf1: Error: discard_granularity is 0.
-```
+However later, in 1e866afd4bcdd(nvme: ensure subsystem reset is single threaded), the 
+nvme subsystem reset code was reworked so now when user executes command subsystem-reset, 
+kernel first writes 0x4E564D65 to nvme NSSR register and then schedules the adapter reset.  
+It's quite possible that when subsytem-reset is executed there were no I/O in flight and 
+hence we may never hit the nvme_timeout(). Later when the adapter reset code (under 
+nvme_reset_work()) start execution, it accesses MMIO registers. Hence, IMO, potentially 
+nvme_reset_work() would also need similar changes as implemented under nvme_timeout() so
+that EEH recovery could be possible.
+
+> With the proposed patch, we find that EEH recovery is successful post subsystem-reset. 
+> Please find below the relevant output:
+> # lspci 
+> 0524:28:00.0 Non-Volatile memory controller: KIOXIA Corporation NVMe SSD Controller CM7 2.5" (rev 01)
+> 
+> # nvme list-subsys
+> nvme-subsys0 - NQN=nqn.2019-10.com.kioxia:KCM7DRUG1T92:7DQ0A01206N3
+>                hostnqn=nqn.2014-08.org.nvmexpress:uuid:41528538-e8ad-4eaf-84a7-9c552917d988
+>                iopolicy=numa
+> \
+>  +- nvme0 pcie 0524:28:00.0 live
+> 
+> # nvme subsystem-reset /dev/nvme0
+> 
+> # nvme list-subsys
+> nvme-subsys0 - NQN=nqn.2019-10.com.kioxia:KCM7DRUG1T92:7DQ0A01206N3
+>                hostnqn=nqn.2014-08.org.nvmexpress:uuid:41528538-e8ad-4eaf-84a7-9c552917d988
+>                iopolicy=numa
+> \
+>  +- nvme0 pcie 0524:28:00.0 resetting
+> 
+> [10556.034082] EEH: Recovering PHB#524-PE#280000
+> [10556.034108] EEH: PE location: N/A, PHB location: N/A
+> [10556.034112] EEH: Frozen PHB#524-PE#280000 detected
+> [10556.034115] EEH: Call Trace:
+> [10556.034117] EEH: [c000000000051068] __eeh_send_failure_event+0x7c/0x15c
+> [10556.034304] EEH: [c000000000049bcc] eeh_dev_check_failure.part.0+0x27c/0x6b0
+> [10556.034310] EEH: [c008000004753d3c] nvme_pci_reg_read32+0x80/0xac [nvme]
+> [10556.034319] EEH: [c0080000045f365c] nvme_wait_ready+0xa4/0x18c [nvme_core]
+> [10556.034333] EEH: [c008000004754750] nvme_dev_disable+0x370/0x41c [nvme]
+> [10556.034338] EEH: [c008000004757184] nvme_reset_work+0x1f4/0x3cc [nvme]
+> [10556.034344] EEH: [c00000000017bb8c] process_one_work+0x1f0/0x4f4
+> [10556.034350] EEH: [c00000000017c24c] worker_thread+0x3bc/0x590
+> [10556.034355] EEH: [c00000000018a87c] kthread+0x138/0x140
+> [10556.034358] EEH: [c00000000000dd58] start_kernel_thread+0x14/0x18
+> [10556.034363] EEH: This PCI device has failed 1 times in the last hour and will be permanently disabled after 5 failures.
+> [10556.034368] EEH: Notify device drivers to shutdown
+> [10556.034371] EEH: Beginning: 'error_detected(IO frozen)'
+> [10556.034376] PCI 0524:28:00.0#280000: EEH: Invoking nvme->error_detected(IO frozen)
+> [10556.034379] nvme nvme0: frozen state error detected, reset controller
+> [10556.102654] nvme 0524:28:00.0: enabling device (0000 -> 0002)
+> [10556.103171] nvme nvme0: PCI recovery is ongoing so let it finish
+> [10556.142532] PCI 0524:28:00.0#280000: EEH: nvme driver reports: 'need reset'
+> [10556.142535] EEH: Finished:'error_detected(IO frozen)' with aggregate recovery state:'need reset'
+> [...]
+> [...]
+> [10556.148172] EEH: Reset without hotplug activity
+> [10558.298672] EEH: Beginning: 'slot_reset'
+> [10558.298692] PCI 0524:28:00.0#280000: EEH: Invoking nvme->slot_reset()
+> [10558.298696] nvme nvme0: restart after slot reset
+> [10558.301925] PCI 0524:28:00.0#280000: EEH: nvme driver reports: 'recovered'
+> [10558.301928] EEH: Finished:'slot_reset' with aggregate recovery state:'recovered'
+> [10558.301939] EEH: Notify device driver to resume
+> [10558.301944] EEH: Beginning: 'resume'
+> [10558.301947] PCI 0524:28:00.0#280000: EEH: Invoking nvme->resume()
+> [10558.331051] nvme nvme0: Shutdown timeout set to 10 seconds
+> [10558.356679] nvme nvme0: 16/0/0 default/read/poll queues
+> [10558.357026] PCI 0524:28:00.0#280000: EEH: nvme driver reports: 'none'
+> [10558.357028] EEH: Finished:'resume'
+> [10558.357035] EEH: Recovery successful.
+> 
+> # nvme list-subsys
+> nvme-subsys0 - NQN=nqn.2019-10.com.kioxia:KCM7DRUG1T92:7DQ0A01206N3
+>                hostnqn=nqn.2014-08.org.nvmexpress:uuid:41528538-e8ad-4eaf-84a7-9c552917d988
+>                iopolicy=numa
+> \
+>  +- nvme0 pcie 0524:28:00.0 live
+> 
+> 
+Thanks,
+--Nilay
