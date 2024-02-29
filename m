@@ -1,148 +1,200 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound-ip168a.ess.barracuda.com (outbound-ip168a.ess.barracuda.com [209.222.82.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FA270AFE
-	for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 17:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709227974; cv=none; b=s90GjspgCTqB16F/qCY0vgvgjPMTq7Lu6jtvVfaIsvhpahojkrEHKBrfZY8KMks2b7N4IcyzVYsajWslLqhK0Ufvsa7uG9MHYfDudm2kZGlMU5w20kZc7LkwXlh1+UoUjl6Y7pzS01+B+yoPzDor14900TgX/y6ygRRLRNZaNlA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709227974; c=relaxed/simple;
-	bh=jzGj5I4LRuYklOQyJfNOnG7oivOkxoCVa97TajgQgCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pPABH2insfbr7fp1uatLsZ+33z5NdZjz57CRPU8cXIrI6VfNDZLBllmui66x6pEqj3uRfDLPFyXLmyirSCO/w9qGjBUiMVUZ0cg0c9oe+vx24UIg3HQ8H9RnjAaA68zE2yAvERn3vfYxzBn2//BshsQN9Ag8pR41drKDO+KprAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Z2nu0BE0; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C9979DC5;
+	Thu, 29 Feb 2024 18:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=209.222.82.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709231154; cv=fail; b=NGKwOvYIkvc2ZN9lbRM6Oj/2JLyO15nL2aC6AwyZLhweCi/Y+A29KMDrB/Qefd9cU2/gVy/4d6XqgjpxaC/I1gnHpWy2BWVOGeuj4iEuo1rMmFheZ9NKsm7vopyDBCAk33nwwkLaML9mRr9a0dDSh4/EuiUnZ74qxIajWwBfmnw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709231154; c=relaxed/simple;
+	bh=jK690ajRMWftcc/eYIw7s0Is/wDx9JPYBPBY6k4Tz7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=vDS+zzF3Zl9eYo42XUxNYXEe9N0cUByBWzdjUm3RJkpYD6ivKLJHLPLAYsQQN6/UuDD1iMCs8ggtcU+jxM9t3EjdbjYpmsg12tyH2b4NM2L4YCJGXX+PI8wUp2artwpupVJwRn2HS9nCxGmBvZ8JizTfAWB2jWZEP3ApZ/PQphs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ddn.com; spf=pass smtp.mailfrom=ddn.com; dkim=pass (1024-bit key) header.d=ddn.com header.i=@ddn.com header.b=tPje1Tis; arc=fail smtp.client-ip=209.222.82.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ddn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ddn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Z2nu0BE0"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a446478b04bso70525166b.3
-        for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 09:32:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1709227970; x=1709832770; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JQrqXSOy2jKpIC5hjgybMDfk5pI8gvMKo0UOhxnaCp0=;
-        b=Z2nu0BE0b2qIues+0tbS6E5AL8obdL+PkIbExF4BJsmfByFxdn5EkWg9FQrOE/Okzd
-         8wDe/jEi5fxM4e7E9C+t00AhzyndVTjcvZjdQjN/1Daqc+qbRO6oLZ8nFgcViQx81hdF
-         ry4vmXpqCsLzv1jO9S9soDdIQqE3vWFiKL9jM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709227970; x=1709832770;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JQrqXSOy2jKpIC5hjgybMDfk5pI8gvMKo0UOhxnaCp0=;
-        b=TumpjBNCZOw3doDhnRhCB0z3Iq8ycuXunoieddpM0A1bbWSobdDnLuOjIO6SZhY7GE
-         29FWaHpdDq3tsExjPDUELebfqdjKhT8z+Rc1q8BSCXm6dOVTRSIsBTAj52xkRly27bTe
-         bA1xpYdJhQl8OvPT84IIvKp2IpfzohrRogKsb0k54Gs/ZjMuyfqpHDWOHvFR2pPX8ae5
-         LrywRuA5El9kYBeYGwDL0TXfmiWPyWesQH9Xr6rG3YrbAIbcEKoTLky/lKmb0ehGhkoK
-         UxkLLKATfMuVOgLVweE6SiVLaIqM2PiIk2Pzrbv0qsHv2rcNZgzFpUWOy7a0e2E9M1oJ
-         t7aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzhw0wRS9/tbMbmGAXuM4hfz/FZHVy+aNlT3XkKvfZvOBpqGqRlGHU4psLMzVGW+W/kTEeBHnLRprWVgBxkljwIE8+ZV64e5cH/2o=
-X-Gm-Message-State: AOJu0YyCP6sE2zAnSeD6jDZuYyj89cHOFwAVON+JsM5F8XEoJybmV1pA
-	UCrky0Lca1TqTNRW1GflzmN4Vv62KAcpRiOByao8jw5JmEQrkFm99HglykRdoAQh/rLNtEuvcnG
-	ksyMXOw==
-X-Google-Smtp-Source: AGHT+IHUIvIf/QWDZIXfvF+tbwexLOI+sH088EXRMB8FTC7OSlHrMOTkg/uPUS7AFA786LGV+jA8cw==
-X-Received: by 2002:a17:906:b84b:b0:a43:a628:ff31 with SMTP id ga11-20020a170906b84b00b00a43a628ff31mr1971142ejb.26.1709227969734;
-        Thu, 29 Feb 2024 09:32:49 -0800 (PST)
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
-        by smtp.gmail.com with ESMTPSA id k19-20020a170906a39300b00a3fb7cafad8sm883293ejz.39.2024.02.29.09.32.48
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Feb 2024 09:32:48 -0800 (PST)
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a26fa294e56so231250966b.0
-        for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 09:32:48 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXGoYJBmc44Ecz2VfYlrb//Pj0PuxoBIJowBp0cm5qVg3w09+aAtEWvGUNyflVjD7yH6duU5v8vk3wtgHTfBnc0Rfxki0KwxFOlqUg=
-X-Received: by 2002:a17:906:b78e:b0:a44:176e:410c with SMTP id
- dt14-20020a170906b78e00b00a44176e410cmr2046490ejb.5.1709227968058; Thu, 29
- Feb 2024 09:32:48 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=ddn.com header.i=@ddn.com header.b="tPje1Tis"
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2040.outbound.protection.outlook.com [104.47.74.40]) by mx-outbound11-93.us-east-2a.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Thu, 29 Feb 2024 18:25:20 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AxByWOGXdHXiDeFxqD1dlARtHZ8jr+Ha1ixJEG63rlVftsNZMBHIcfFjgZ1mN+c99tWwG6pNRUX5hC+RSfpO5umZWLPgFC73hqD/T5jwqPwSr9uidqXp9S7xs2/R7ak3pM4YmihEuSszqs8lb7Y2K9DPMMKMq6nKh2LNnP26dgnynXAsW6tfRBhGAHimBySAr0MyFRcs71xkKzjB5nwvjTxojy4qnQ4/A+2z7UZkszRrAfyYWvuCDYyz9JosXO8a8eONtkuMdQ/CN8N/nlXT4Fv5vHGjylHJIpstgc6ysT9Bml5Lneo59hjPoa6LuJQBbHbm4gIwUvprzVxa1jdOrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DJtk16Ss2FjHQvDW/owtHzqLtvOODoLKKdQgXaMar3Q=;
+ b=BKqBiTa8c3Gz8M+zjiEBTYKK4frjfnQ5mbFIAAo5bHHXtEKiwhrTNipc18x91Vx8ZMm/wzIrnKYhjywsJzvoLmVkHHXpNmfgiDpAA4h2EcPcDjE3aeHWIamN+Wn/Ch7PpveQCRZREK0an+j4p2SyAaluA43YTtVyC6t5ttV9LIQ5GHeR/8jjEKYU0b/5TT8wJdONJMUK/3YwkRUtOnDkja04xHn6m4oc7Q0kRTOs2mxsOxMnZzPnQgtm1GMkjVPn38rBATmFM9eKeuzRupb77y3myZ9kehp8c5gxRVrr+RN9cYw2vnakrMBxSzifYPbbTT2TjEwK87rXa7hSIzhpHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=ddn.com; dmarc=pass action=none header.from=ddn.com; dkim=pass
+ header.d=ddn.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ddn.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DJtk16Ss2FjHQvDW/owtHzqLtvOODoLKKdQgXaMar3Q=;
+ b=tPje1TisUl+tFykqAqZal8HyK5v/8v3d8SqVvDfGCNOIrN5ljs2rpiBzabGbNOBsS/BwQO09Rkb4liRpJYw+pWD6X9RfjTA1mLFJuNi5qxHJ0EWPEqYL8SEOZWFM6bSjQGwx/7+6GkGHsfMh68OqT5qui8MkN67Btt9wY9iCtaI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=ddn.com;
+Received: from SA3PR19MB8193.namprd19.prod.outlook.com (2603:10b6:806:37e::18)
+ by SA3PR19MB7588.namprd19.prod.outlook.com (2603:10b6:806:31f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
+ 2024 18:25:17 +0000
+Received: from SA3PR19MB8193.namprd19.prod.outlook.com
+ ([fe80::6eed:df87:b510:6c5]) by SA3PR19MB8193.namprd19.prod.outlook.com
+ ([fe80::6eed:df87:b510:6c5%7]) with mapi id 15.20.7316.039; Thu, 29 Feb 2024
+ 18:25:17 +0000
+Date: Thu, 29 Feb 2024 11:25:13 -0700
+From: Greg Edwards <gedwards@ddn.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Hugh Dickins <hughd@google.com>, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	qemu-devel@nongnu.org
+Subject: Re: [PATCH] block: Remove special-casing of compound pages
+Message-ID: <20240229182513.GA17355@bobdog.home.arpa>
+References: <20230814144100.596749-1-willy@infradead.org>
+ <170198306635.1954272.10907610290128291539.b4-ty@kernel.dk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <170198306635.1954272.10907610290128291539.b4-ty@kernel.dk>
+X-ClientProxiedBy: CYZPR05CA0027.namprd05.prod.outlook.com
+ (2603:10b6:930:a3::10) To SA3PR19MB8193.namprd19.prod.outlook.com
+ (2603:10b6:806:37e::18)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230925120309.1731676-1-dhowells@redhat.com> <20230925120309.1731676-8-dhowells@redhat.com>
- <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com> <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
- <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com> <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com>
-In-Reply-To: <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 29 Feb 2024 09:32:31 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
-Message-ID: <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
-Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
- 07/12] iov_iter: Convert iterate*() to inline funcs
-To: Tong Tiangen <tongtiangen@huawei.com>, Al Viro <viro@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
-	Christian Brauner <christian@brauner.io>, David Laight <David.Laight@aculab.com>, 
-	Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kefeng Wang <wangkefeng.wang@huawei.com>
-Content-Type: multipart/mixed; boundary="000000000000e07d49061288a5ca"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR19MB8193:EE_|SA3PR19MB7588:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32333872-1f7a-4e56-6390-08dc3953c754
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	wEXMgb6yWbEGepKpQOZ9mTC9RhMyIvyLV5b/hm3Mrl2Lvnvp1PeZd226MPu7DbmCZFGQdvSwIZSWCo9pzkPIPl7lJJPP/jSq5AX7sMbsdji3+/m4o8QuLDPw3RAWmVQJN9j9VCz6GEVY2Pn4Cz6x1nbb7syfDAvLNa96BQnVLl6KACRY3XYXvkrekD/0NLVcvBPU+aGlDtiW0iJW9Jr8q52dcCuCy7Wpt+tO9zYWxzV2kJVDDhZvSzu9Nnc2bzZ8tKzcqZaeD0QmPyLmRPvJ5oIIsnv0ns9heMMxVStry4NLVxUyktRAfbCAGwYKORf02vUexvYV8e0QnTNizfZpmNG9hPInoNUmRxdbi5+jAW3JM4pe/SVfth/AuN6DVlArszfCtqLNzdmQmhFMrexJmFEnJ6jZyeFUs33n13c93Pbab+GAHHz0VExIg7jpM8zPhs8OkXHfguxCuWrOcAJ0DdT2AEiS+FgCajDlgm4zpS8hOoExiTCsFIfDmfc8qBYJAH0/GLgIyjW8rx/YIewnSemEbnsfFBsZGF6yMcYadcXLFt6V+N/12LgwuChmo4/0wov0TGiQQZj3gSXHjZxl1/QIHJUtWAe+D0MiFpHqXCSKwRIGNiWSAPPhwexTBeTudcvIKvXrdYpl/LN4hFg0mA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR19MB8193.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tGV8uThtdu2XszHnQzzbq2mRCkKBX/alYZ4UUrleCeWrp5wI1s2/kaJ7zOT5?=
+ =?us-ascii?Q?0YUcoGPLLqp9rOisa3vUA5S+MX5+2ke2Fq0kZh6pZMiPkG5i8c+FSS11OsK2?=
+ =?us-ascii?Q?LngIbj52XEZm68blg8BL08FvvUW2aQU6AvDKgHmdIDeFfZKBQszBIxRatCHL?=
+ =?us-ascii?Q?BIJogVdkHmWWAIyBcK9D4BhRqXQr/C+bs9j09lpCiQlWmJL1r7PDBkWuaDvs?=
+ =?us-ascii?Q?oyvcgGLbZhllmZ3z/6/Q8OYKQLkKR5xlEmRbV+VgWqgU0EPwpDTjKIkBtG9z?=
+ =?us-ascii?Q?MrvW8+9B/VsQ6Eq24ZMKaZmJtKcKhLH8npGNiPII4blf3r7xXvW+ZKi38WDJ?=
+ =?us-ascii?Q?s5NDVtvCLbWuon5bRrAzLZaC2y42uIdO2AEv+6AhcvB2D+kVMkA+lOndTLa7?=
+ =?us-ascii?Q?ybH7EN4eBaD1xBZi/zdja2PjW3HxHEAKhA0wu6KpgX1gr1HiyZXY4rXzgPv8?=
+ =?us-ascii?Q?wwWTth0e3qCRBHg+Qs/jJqEtC/QkgU0Twt82dobiB1HwOroNW3+T3rrwir2J?=
+ =?us-ascii?Q?DEU3LaP1HhoWFYkKKZIr9ZDq9hXtzxRk5wUi5F4xaSoRdOaPAWN1ESMVeIXq?=
+ =?us-ascii?Q?hXHYbZrLjTspjR0Go2ehKZwXa0zJUJSr1LRcfF1lsJJs1K+zkBW8zf9pCtT0?=
+ =?us-ascii?Q?QdpdKIlZcbjEYta4upqs57/jwHU9bGVV6QhyQQrUDPbwm8X2gEJOrqHICZUC?=
+ =?us-ascii?Q?8K4eJ5L/OOPPioTvGtuzRsD6Q1/bKSAsyJ00eeEV5YZT40aw0bhn0yWVbouu?=
+ =?us-ascii?Q?LQmE5IWH9BsgWDt7TktDh1W2FfH7c4AbiCQmjkFJJ/Wc3jfQTdUMWx14ui5x?=
+ =?us-ascii?Q?Cjhi7wcWl5irmB4vO1nqRGcaNsfpoXbc5S8IjQV7CsTV+LZ01n8kpacr52XO?=
+ =?us-ascii?Q?TtYdwRIidvQo8ydaAGrw4y0oW/g8xMQqKa/EztWOXNPhv/18hd+KhPL1zSt0?=
+ =?us-ascii?Q?tJdrHM/SuQpv8Tce++noFTE1Gw/+DI1oNX/rAuI4MKr7nC9YNpZmJLaxsPtQ?=
+ =?us-ascii?Q?6KBtcssz2XfvgUZsbbAN4xsZgQLXEkQD35/ZlTIRVcki3MfLikSK/XlzDg9L?=
+ =?us-ascii?Q?sbWhEYAHOHDfb/Ul/dTlIt6R46Q+tUAzdYBn4Og4neySXqVMqqMX2WRbr7U5?=
+ =?us-ascii?Q?4LnOeiwDJxdiFriuMLsoYgweTgveXISBuOUDAPQhyV/zwXJ75Y9l0qjX4ZbO?=
+ =?us-ascii?Q?NYYkDc3YxZysr+AmcclsYtgP7fI4Rh58HUxZ70DN/cesbhZuwCwiMf9SewPk?=
+ =?us-ascii?Q?e0jlxVu0R8LsVdcAA4g/uC1mgQpn3ppizTILOyzra8GAiha5p+13Wj/2WtHT?=
+ =?us-ascii?Q?eaP5p+Vrsryys3lNxjZ2bc0yEUOpIVNEIo7EbHUAeTy6ZjbyJ3ocoXYAhgL5?=
+ =?us-ascii?Q?mNVTCtz/10BbwPycqlxJDUyDETbal9LHO9BwOfU1zES+vTRRCEJLCNX7ifPW?=
+ =?us-ascii?Q?m/RKXuPMk4pGYPII6SBq6OAxXx73J8VyREuEAbKjyQbOCdCOIlKrTy0Y5K8l?=
+ =?us-ascii?Q?OIYbQmhdUQy+9y0S4VZxPh6Ji6YqQS8FQ7N+yoREahUSVe5qRSU5y4N39Lre?=
+ =?us-ascii?Q?sKyzKYVveYSKiYvhbBkto+xh5PNbTiCvIvvivl+juj3NKR6375xzJRX3kMSO?=
+ =?us-ascii?Q?zg=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	TBjph9xbz8bLxv8DN88bwPsJxVkhz/6U736V3pKAI/c6poe0mXtB1tH6QBMu9AAPV9RgHomz2lA9T3enB4Zrtz00ImmH35xHC1MX07aRwfMWqhEemx5nz+1nXTOkoZYsQFRsGhOkBNv9mrtbPm6yhCN/5zvvRQlH704jYh4kUZttPv3vhNvDbcGArFvUwXt9noSTqp9UaSjkGs4Dkb06L5GYIGrcLDDtO/R9z3gHhl0OiLIhzgcth9QQzDUlb2nKEBsCWhTOuRVae2fa5+3ADAedlmW8nkWH+K1Ih3LaPzSuB5DJe1nWl/TKYtNPr6eu9M3/oE+5kM3uQTC2eKOf5txz4fprVGPh1SHGNe9mr9XM/rXzgEKOcw6z7IzZM/n05AItd1c25HZCHS1YYdYllHZpVNH4jbZoxwK900ADdKhJ+Vw5y9cBBj81JhVZN2m3GuIIe5jbhxQs/8oS7o56h3ua1hnixcUNPjkjXjvMaM2yVH1bPgFXok9QYCCNUSTXJw83eaE+Y5pDROctXgUmwavqffxv+21CpVSYErrs6MByXwMdaiN9ckNI2xXiBUapzLxCDrfan6FrlWZnFr1gvHV/e3JGt23XvmUv9jgT7qYjdi4kI0hX+iPBnBWe4a5scVRBaDb0UoRmIfZ/imdwTg==
+X-OriginatorOrg: ddn.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32333872-1f7a-4e56-6390-08dc3953c754
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR19MB8193.namprd19.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 18:25:17.0422
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 753b6e26-6fd3-43e6-8248-3f1735d59bb4
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ma4BOxL1qcPkrHr69mNgY3HK3mpKn1sbTlmjy5FVkkha7b6KXWpMlsTx4I1diRDxdT8LKrSAUEPmpAgtKTaKNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR19MB7588
+X-BESS-ID: 1709231120-102909-12414-11066-1
+X-BESS-VER: 2019.1_20240227.2356
+X-BESS-Apparent-Source-IP: 104.47.74.40
+X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKVkbGRhZAVgZQ0NQ41TAl1dQ42c
+	TEIDXN1CItzcQsNTXZPMki0cIk0cxCqTYWAO3T0Y1BAAAA
+X-BESS-Outbound-Spam-Score: 0.00
+X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.254555 [from 
+	cloudscan19-30.us-east-2b.ess.aws.cudaops.com]
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------
+	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
+X-BESS-Outbound-Spam-Status: SCORE=0.00 using account:ESS124931 scores of KILL_LEVEL=7.0 tests=BSF_BESS_OUTBOUND
+X-BESS-BRTS-Status:1
 
---000000000000e07d49061288a5ca
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 29 Feb 2024 at 00:13, Tong Tiangen <tongtiangen@huawei.com> wrote:
+On Thu, Dec 07, 2023 at 02:04:26PM -0700, Jens Axboe wrote:
+> On Mon, 14 Aug 2023 15:41:00 +0100, Matthew Wilcox (Oracle) wrote:
+>> The special casing was originally added in pre-git history; reproducing
+>> the commit log here:
+>>
+>>> commit a318a92567d77
+>>> Author: Andrew Morton <akpm@osdl.org>
+>>> Date:   Sun Sep 21 01:42:22 2003 -0700
+>>>
+>>>     [PATCH] Speed up direct-io hugetlbpage handling
+>>>
+>>>     This patch short-circuits all the direct-io page dirtying logic for
+>>>     higher-order pages.  Without this, we pointlessly bounce BIOs up to
+>>>     keventd all the time.
+>>
+>> [...]
 >
-> See the logic before this patch, always success (((void)(K),0)) is
-> returned for three types: ITER_BVEC, ITER_KVEC and ITER_XARRAY.
+> Applied, thanks!
+>
+> [1/1] block: Remove special-casing of compound pages
+>       commit: 1b151e2435fc3a9b10c8946c6aebe9f3e1938c55
 
-No, look closer.
+This commit results in a change of behavior for QEMU VMs backed by hugepages
+that open their VM disk image file with O_DIRECT (QEMU cache=none or
+cache.direct=on options).  When the VM shuts down and the QEMU process exits,
+one or two hugepages may fail to free correctly.  It appears to be a race, as
+it doesn't happen every time.
 
-Yes, the iterate_and_advance() macro does that "((void)(K),0)" to make
-the compiler generate better code for those cases (because then the
-compiler can see that the return value is a compile-time zero), but
-notice how _copy_mc_to_iter() didn't use that macro back then. It used
-the unvarnished __iterate_and_advance() exactly so that the MC copy
-case would *not* get that "always return zero" behavior.
+From debugging on 6.8-rc6, when it occurs, the hugepage that fails to free has
+a non-zero refcount when it hits the folio_put_testzero(folio) test in
+release_pages().  On a failure test iteration with 1 GiB hugepages, the failing
+folio had a mapcount of 0, refcount of 35, and folio_maybe_dma_pinned was true.
 
-That goes back to (in a different form) at least commit 1b4fb5ffd79b
-("iov_iter: teach iterate_{bvec,xarray}() about possible short
-copies").
+The problem only occurs when the VM disk image file is opened with O_DIRECT.
+When using QEMU cache=writeback or cache.direct=off options, it does not occur.
+We first noticed it on the 6.1.y stable kernel when this commit landed there
+(6.1.75).
 
-But hardly anybody ever tests this machine-check special case code, so
-who knows when it broke again.
+A very simple reproducer without KVM (just boot VM up, then shut it down):
 
-I'm just looking at the source code, and with all the macro games it's
-*really* hard to follow, so I may well be missing something.
+echo 512 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+qemu-system-x86_64 \
+	-cpu qemu64 \
+	-m 1024 \
+	-nographic \
+	-mem-path /dev/hugepages/vm00 \
+	-mem-prealloc \
+	-drive file=test.qcow2,if=none,cache=none,id=drive0 \
+	-device virtio-blk-pci,drive=drive0,id=disk0,bootindex=1
+rm -f /dev/hugepages/vm00
 
-> Maybe we're all gonna fix it back? as follows=EF=BC=9A
+Some testing notes:
 
-No. We could do it for the kvec and xarray case, just to get better
-code generation again (not that I looked at it, so who knows), but the
-one case that actually uses memcpy_from_iter_mc() needs to react to a
-short write.
+  * occurs with 6.1.75, 6.6.14, 6.8-rc6, and linux-next-20240229
+  * occurs with 1 GiB and 2 MiB huge pages, with both hugetlbfs and memfd
+  * occurs with QEMU 8.0.y, 8.1.y, 8.2.y, and master
+  * occurs with (-enable-kvm -cpu host) or without (-cpu qemu64) KVM
 
-One option might be to make a failed memcpy_from_iter_mc() set another
-flag in the iter, and then make fault_in_iov_iter_readable() test that
-flag and return 'len' if that flag is set.
+Thanks for your time!
 
-Something like that (wild handwaving) should get the right error handling.
-
-The simpler alternative is maybe something like the attached.
-COMPLETELY UNTESTED. Maybe I've confused myself with all the different
-indiraction mazes in the iov_iter code.
-
-                     Linus
-
---000000000000e07d49061288a5ca
-Content-Type: text/x-patch; charset="US-ASCII"; name="patch.diff"
-Content-Disposition: attachment; filename="patch.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lt7i5gtw0>
-X-Attachment-Id: f_lt7i5gtw0
-
-IGxpYi9pb3ZfaXRlci5jIHwgNSArKysrLQogMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygr
-KSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2xpYi9pb3ZfaXRlci5jIGIvbGliL2lvdl9p
-dGVyLmMKaW5kZXggZTBhYTZiNDQwY2E1Li41MjM2YzE2NzM0ZTAgMTAwNjQ0Ci0tLSBhL2xpYi9p
-b3ZfaXRlci5jCisrKyBiL2xpYi9pb3ZfaXRlci5jCkBAIC0yNDgsNyArMjQ4LDEwIEBAIHN0YXRp
-YyBfX2Fsd2F5c19pbmxpbmUKIHNpemVfdCBtZW1jcHlfZnJvbV9pdGVyX21jKHZvaWQgKml0ZXJf
-ZnJvbSwgc2l6ZV90IHByb2dyZXNzLAogCQkJICAgc2l6ZV90IGxlbiwgdm9pZCAqdG8sIHZvaWQg
-KnByaXYyKQogewotCXJldHVybiBjb3B5X21jX3RvX2tlcm5lbCh0byArIHByb2dyZXNzLCBpdGVy
-X2Zyb20sIGxlbik7CisJc2l6ZV90IG4gPSBjb3B5X21jX3RvX2tlcm5lbCh0byArIHByb2dyZXNz
-LCBpdGVyX2Zyb20sIGxlbik7CisJaWYgKG4pCisJCW1lbXNldCh0byArIHByb2dyZXNzIC0gbiwg
-MCwgbik7CisJcmV0dXJuIDA7CiB9CiAKIHN0YXRpYyBzaXplX3QgX19jb3B5X2Zyb21faXRlcl9t
-Yyh2b2lkICphZGRyLCBzaXplX3QgYnl0ZXMsIHN0cnVjdCBpb3ZfaXRlciAqaSkK
---000000000000e07d49061288a5ca--
+Greg
