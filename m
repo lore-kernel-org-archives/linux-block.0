@@ -1,117 +1,74 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AE17828A;
-	Thu, 29 Feb 2024 18:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F14813774B;
+	Thu, 29 Feb 2024 19:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709233169; cv=none; b=V9rAWC0Wivb9LbEyJMQrTyZUIsYXrtNQn5NENtoEViRgxOLyHjquLNc1gVbNf8Et6lOuDmhIFOVpHxqWxV5k4LWDN22o3ZSyQeRQVrRoFmHNXKqhw4/b9yCV/2ofbndmkfS49/8/l8Sa34LMSz0EkhPSOLdLoA9P57PZs9Bdvcs=
+	t=1709235443; cv=none; b=FvAwoAIkQUHv1hCNqD7/4Q0dhPpBkjSj4OHR9IfGZS0wbH2jjGpG4dB/Ir18N15PZWTqKkeX+44vvGporCabw1kjLJ7M5POpQokAe3+7IXDnA85927aVV1R06pMZPFqF3EEnoWCBN2+snJhZaUKmnpIbsEPDlkZdREHmb6Qe+bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709233169; c=relaxed/simple;
-	bh=03wrvTX4PmazfhRynJz8dIwWNCpXUtctCoHli5CWq3k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BSiHEnK1bdl+ZO+qo/qnoUUG9LdFoS69mI789yi1f9M4hbQlP3TwSgZ4QgZw1CoRcTC1YdEaJ0nHdnKXs7DNBqKU9nmfQH3VkmTrcvK8pDbKiasf/pkmrHecWZoQDAUZ0B6jEZODhMuABiCXqLDyvfZGtqsbP5IevGcsG/q6MCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Chwd/gWh; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1709235443; c=relaxed/simple;
+	bh=32yj74/3vEglgYQz1Og4De9ujIVTdpiMAur4jWBgQXU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=by0vYNNZLE0MOulOGqRAN0E9Z/ulZwWumEca1rd8gwJapHHC7mWbM537Q4KAENkPRT//4uTboAG9bQsnPjj5boukEFaBTZNXJQ9Duk6DrqyQ8ooOMYHSmRM3o6gKu9aSaXLB3O17igFg4Drq2kQCsjNo0pApez5elFA7+J4PA78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LfHiOuS3; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Chwd/gWh"
-Received: from [10.137.106.151] (unknown [131.107.8.87])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 67BEC20B74C1;
-	Thu, 29 Feb 2024 10:59:21 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 67BEC20B74C1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1709233161;
-	bh=JV+3tSiFvjDV+NVnRDenCsHCjaCafQUqnYHRslOz/Is=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Chwd/gWhaBwu6cGDHeTQLShmFSuRlHjpipSjMmiY+uPVfP9m8FVNjLOHiAxx+ZPF/
-	 mebhxmfmUfYNWYgKAjhshktx0kymWEOFVKFUkQGBgOaJ0lidTIXk/2OEIuZ/FtL46I
-	 mzpviYdU/EUUFj7yvd/zQgv5h89QqsFhP/icO91I=
-Message-ID: <b73e3387-558f-4f40-8741-c6ed7965b25f@linux.microsoft.com>
-Date: Thu, 29 Feb 2024 10:59:21 -0800
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LfHiOuS3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=8uNmGuKJqG0ZLwvelugqTwty9eAp95ps/IXd1VUbjRE=; b=LfHiOuS377ugSXr21HSPLjoGds
+	rRHRotHB6Z2K+UknnXnK+QSxqb+aTii8MgmSzXW1sRNBptAvRcgkCTNz6J+ZbnsCs2gOL69/7CQwh
+	HbpeH4t5yDhGvqmnlTjCTBFsDyp9akGVrkIGj6y3BedRK3Vygt5msrjSPEYVN6VtIWpZchOzssQ/V
+	WR1aOx0+dyY/SjdSpU3JUwI4U2i/3gjC67frvRbY1ZlyHhnna281LjFJ9s/SzckoOzX+rHWRnRD4q
+	DbfpzdwBNaELy6OKw8HL8OqWb7AQNPVnsIkMg3yiwsLXR6E9Xx/G6dwkxCxOWFcKJ/oDRVozID8PI
+	7uk/dp4Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rfmDP-00000008qqb-3bC7;
+	Thu, 29 Feb 2024 19:37:11 +0000
+Date: Thu, 29 Feb 2024 19:37:11 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Greg Edwards <gedwards@ddn.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Hugh Dickins <hughd@google.com>, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	qemu-devel@nongnu.org
+Subject: Re: [PATCH] block: Remove special-casing of compound pages
+Message-ID: <ZeDc50LQSItEeXY8@casper.infradead.org>
+References: <20230814144100.596749-1-willy@infradead.org>
+ <170198306635.1954272.10907610290128291539.b4-ty@kernel.dk>
+ <20240229182513.GA17355@bobdog.home.arpa>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v13 17/20] ipe: enable support for fs-verity as a
- trust provider
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
- tytso@mit.edu, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
- eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
- linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev, audit@vger.kernel.org,
- linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
-References: <1709168102-7677-1-git-send-email-wufan@linux.microsoft.com>
- <1709168102-7677-18-git-send-email-wufan@linux.microsoft.com>
- <20240229044625.GA1946@sol.localdomain>
-Content-Language: en-CA
-From: Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <20240229044625.GA1946@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229182513.GA17355@bobdog.home.arpa>
 
-
-
-On 2/28/2024 8:46 PM, Eric Biggers wrote:
-> On Wed, Feb 28, 2024 at 04:54:59PM -0800, Fan Wu wrote:
->> diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
->> index f5190a1347a6..ca1573ff21b7 100644
->> --- a/security/ipe/hooks.c
->> +++ b/security/ipe/hooks.c
->> @@ -254,3 +254,33 @@ int ipe_bdev_setsecurity(struct block_device *bdev, const char *key,
->>   	return -EOPNOTSUPP;
->>   }
->>   #endif /* CONFIG_IPE_PROP_DM_VERITY */
->> +
->> +#ifdef CONFIG_IPE_PROP_FS_VERITY
->> +/**
->> + * ipe_inode_setsecurity - Sets fields of a inode security blob from @key.
->> + * @inode: The inode to source the security blob from.
->> + * @name: The name representing the information to be stored.
->> + * @value: The value to be stored.
->> + * @size: The size of @value.
->> + * @flags: unused
->> + *
->> + * Saves fsverity signature & digest into inode security blob
->> + *
->> + * Return:
->> + * * 0	- OK
->> + * * !0	- Error
->> + */
->> +int ipe_inode_setsecurity(struct inode *inode, const char *name,
->> +			  const void *value, size_t size,
->> +			  int flags)
->> +{
->> +	struct ipe_inode *inode_sec = ipe_inode(inode);
->> +
->> +	if (!strcmp(name, FS_VERITY_INODE_SEC_NAME)) {
->> +		inode_sec->fs_verity_signed = size > 0 && value;
->> +		return 0;
->> +	}
->> +
->> +	return -EOPNOTSUPP;
->> +}
+On Thu, Feb 29, 2024 at 11:25:13AM -0700, Greg Edwards wrote:
+> > [1/1] block: Remove special-casing of compound pages
+> >       commit: 1b151e2435fc3a9b10c8946c6aebe9f3e1938c55
 > 
-> So IPE is interested in whether a file has an fsverity builtin signature, but it
-> doesn't care what the signature is or whether it has been checked.  What is the
-> point?
-> 
-> - Eric
+> This commit results in a change of behavior for QEMU VMs backed by hugepages
+> that open their VM disk image file with O_DIRECT (QEMU cache=none or
+> cache.direct=on options).  When the VM shuts down and the QEMU process exits,
+> one or two hugepages may fail to free correctly.  It appears to be a race, as
+> it doesn't happen every time.
 
-It does make sure the signature is checked. This hook call can only be 
-triggered after fsverity_verify_signature() succeed. Therefore, for 
-files that are marked with the security blob inode_sec->fs_verity_sign 
-as true, they must successfully pass the fsverity_verify_signature() check.
+Hi Greg,
 
-Regarding the other question, the current version does not support 
-defining policies to trust files based on the inner content of their 
-signatures because the current patch set is already too large.
+By sheer coincidence the very next email after this one was:
 
-We plan to introduce new policy grammars to enable the policy to define 
-which certificate of the signature can be trusted after this version is 
-accepted.
+https://lore.kernel.org/linux-mm/86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com/T/#u
 
--Fan
+Can you try Tony's patch and see if it fixes your problem?
+I haven't even begun to analyse either your email or his patch,
+but there's a strong likelihood that they're the same thing.
