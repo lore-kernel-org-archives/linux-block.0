@@ -1,112 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4612B2D638;
-	Thu, 29 Feb 2024 02:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA9E364D8;
+	Thu, 29 Feb 2024 04:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709172167; cv=none; b=NBZvG8GYPUfUYcubGt7YMa3kd6YIeRJ5hYK5Mtxvj0/ocIL1l/U+DeD1nNj4pJIgO3PwzX96WKy/x+8tIxxd4dSujCEitJ8v/D299YumQnTjeZ7wPLle7XwImyZEKUi2tgof6L6oLTvnI790oJwLjqT5B88vd4aq0btEL+OtjEg=
+	t=1709179288; cv=none; b=FZMkEqOMMWzfDzZrKtoZs0/LD4LwtfSFAJkHCuMGyFdxPam0x3y9hJhmWVQuHcKtmCtON5UCflpP9VpeXwJ2jBgmiSMDrXJEzc4S1yvHB4+kBb+Y4sl/o1raGBxhXFL86AUr5uVgsaF1a0wDN3JGTra3dSRWu/UYcg7E/Dg+pMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709172167; c=relaxed/simple;
-	bh=AAyTW9eIWug5bOe5GvlKrcB1mn0cXjvPHZrWdE4Zouk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oJaF/HjnkLkCNGMdI7X7yNAXn3xxkYPIDCfpDLzINGe3r8KDnIKJ/dXwjbcE/8dTxbdHuPEjGaqJgFMpS4mGr2O+i0Gg02jZI0fhsdAcsEFJ/45dsXgNuyHQXqmmqN5XmLye2tKHJfSBLBMS+VklcVrHGKtsLtoVAZ18NoyZyhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=plwzO2wL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709179288; c=relaxed/simple;
+	bh=jXQXz+PeGueyYtvLDE3yOIBci2d2WEXu0s/u7WCNEZ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AXVm8+sd0RB/YFPifLc5fIIgfreezUSap/w/vqXzaLUGlaolZXqEmTdqyt5O4BQ0lwLHxazltDJrnIHD40/vYYXZLSNY5B6YAKD7dbPBvNdiq+BwvZ/4pQV4uNTvL3WGURtM081N3XVq5lYi+5z5g8IkU8RaCJCYqszPZmP0Oqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kuP5Y7E0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="plwzO2wL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF0AAC433F1;
-	Thu, 29 Feb 2024 02:02:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709172166;
-	bh=AAyTW9eIWug5bOe5GvlKrcB1mn0cXjvPHZrWdE4Zouk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=plwzO2wLumif19xoPVvDhwHlHO/t/n5BZTdMN3HACJNHL6ZWsvihdowzV0+qo3C7L
-	 oUBbvup9rPeQ82h+xyBU8QOmV4zZhYVifigEXkD/hFxNr1Uq/ViWvg4ZjJRUGD9p0q
-	 y8iBz/BvKfiUocmUDN7x16W8elxa504EDyUl8fBiejWX0VBBEdfbAMlDl/XTWhbKRn
-	 dfKgI3Bm/bNpRUXs1GDMhhavO5SYMx+uEUIpG7SVvj5Tr+JE88yDftw7DwfXw9Y0ji
-	 jxiFkfmFJUeKAbo4ynwlwGEJFSMnoTjp8P1XNbfIlsE67yZKKp2jVzaocWtZvvjBuT
-	 FxHpM5zHLNWgw==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51318531af4so1523496e87.0;
-        Wed, 28 Feb 2024 18:02:46 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVBQ/FAoLA91M7+F0hTzUO4AlM88nLo+0UUgH3v79fleUG1eP17P5Ck7Lnne5sy69kFttcC5QZ1FV0B8qb7ieFKciW9qJaGjCOQfiBHaNz0G5Eq7MirvDIDykpHHWQlKoQ+hgng202N
-X-Gm-Message-State: AOJu0Yynp/ipUf7crcp+BkuCF1mrxy+X5LE42ZCLVJsuLFX6OgBcKcmR
-	x+IE3EHf/qOewNkOG6GLiHMrBa934sUSMgzBtsu0cSoQBbs6GYBBIba9aFyvgDEYqdyfcHK9Ut3
-	JVJI4/6mbHdPFCh4cupGDWFTNblI=
-X-Google-Smtp-Source: AGHT+IGmxKdSG3kJ4IDEg6gxeL8TqreGpHHwstO1UoR6gX7sqGEm+89EqGWLN8lB7Fse50dVYq+jL6R7NkL3BeNNRW8=
-X-Received: by 2002:a19:c514:0:b0:512:f4d6:7163 with SMTP id
- w20-20020a19c514000000b00512f4d67163mr178406lfe.6.1709172165035; Wed, 28 Feb
- 2024 18:02:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kuP5Y7E0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=IkaDFHzSJFvHKVuhr/vGVExR1dL16usQzaOTDa83SZU=; b=kuP5Y7E0UEVVvoc4oBQW9X5uCp
+	78BOH0TZU/YqS5GDK/mP3UJn1iH7u1777o24iLj1DiLnc+FW2KT1HTnoAZGjH/FLZ5Y5fq+04Dw/a
+	8ARxAHD5MksdRmCRZKP6DTdwpNNS95g8cDLdt3d9P39iOFm8rNjlvcdCOopxiw8KBDKOl8WqcWXJr
+	Y+iuI+pNr6CJ0noV1digXsts+JLu+IsxNjEl9Go0sRwhnsEHfLqi2Ldef34MzZ8HMhkqqKdDNimxU
+	Fi+Wx2Rsx7JeVSNJH+m0ceaasHOXSIAi3QWLUOenkUToasyCVbNPctbeQu/U+2mSk8XWb5+Y4k3Cb
+	290yUPhw==;
+Received: from [50.53.50.0] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rfXbh-0000000Bz2k-2ADm;
+	Thu, 29 Feb 2024 04:01:17 +0000
+Message-ID: <193bd5e5-2263-4e67-b7c6-bb25dc9a6854@infradead.org>
+Date: Wed, 28 Feb 2024 20:01:16 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240223161247.3998821-1-hch@lst.de> <ZdjXsm9jwQlKpM87@redhat.com>
- <ZdjYJrKCLBF8Gw8D@redhat.com> <20240227151016.GC14335@lst.de>
- <Zd38193LQCpF3-D0@redhat.com> <20240227151734.GA14628@lst.de>
- <Zd4BhQ66dC_d7Mn0@redhat.com> <CAPhsuW69mM3tEBR=SgKy_SYE+NUsNO+8H6toyk+5mKcSfGMjmg@mail.gmail.com>
- <20240228195632.GA20077@lst.de>
-In-Reply-To: <20240228195632.GA20077@lst.de>
-From: Song Liu <song@kernel.org>
-Date: Wed, 28 Feb 2024 18:02:33 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW5c5o8JS9T8CCGU811jpxrbepjJHnYpDbge+1rT6j8NbA@mail.gmail.com>
-Message-ID: <CAPhsuW5c5o8JS9T8CCGU811jpxrbepjJHnYpDbge+1rT6j8NbA@mail.gmail.com>
-Subject: Re: atomic queue limit updates for stackable devices
-To: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@kernel.org>, Benjamin Marzinski <bmarzins@redhat.com>, Xiao Ni <xni@redhat.com>, 
-	Zdenek Kabelac <zkabelac@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Mikulas Patocka <mpatocka@redhat.com>, Yu Kuai <yukuai3@huawei.com>, dm-devel@lists.linux.dev, 
-	linux-block@vger.kernel.org, linux-raid@vger.kernel.org, 
-	lvm-devel@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v13 17/20] ipe: enable support for fs-verity as a
+ trust provider
+Content-Language: en-US
+To: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com,
+ jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+ axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com,
+ paul@paul-moore.com
+Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1709168102-7677-1-git-send-email-wufan@linux.microsoft.com>
+ <1709168102-7677-18-git-send-email-wufan@linux.microsoft.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <1709168102-7677-18-git-send-email-wufan@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 28, 2024 at 11:56=E2=80=AFAM Christoph Hellwig <hch@lst.de> wro=
-te:
->
-> On Tue, Feb 27, 2024 at 01:50:19PM -0800, Song Liu wrote:
-> > I think we can do something like:
-> >
-> > make check S=3D<list of test to skip>
-> >
-> > I don't have a reliable list to skip at the moment, as some of the test=
-s
-> > fail on some systems but not on others. However, per early report,
-> > I guess we can start with the following skip list:
-> >
-> > shell/integrity-caching.sh
-> > shell/lvconvert-raid-reshape-linear_to_raid6-single-type.sh
-> > shell/lvconvert-raid-reshape.sh
->
-> Thanks.  I've been iterating over it this morning, eventually growing
-> to:
->
-> make check
-> S=3Dshell/integrity-caching.sh,shell/lvconvert-raid-reshape-linear_to_rai=
-d6-single-type.sh,shell/lvconvert-raid-reshape.sh,shell/lvconvert-raid-resh=
-ape-linear_to_striped-single-type.sh,shell/lvconvert-raid-reshape-linear_to=
-_striped.sh,shell/lvchange-raid456.sh,shell/component-raid.sh,shell/lvconve=
-rt-raid-reshape-load.sh,shell/lvchange-raid-transient-failures.sh,shell/lvc=
-onvert-raid-reshape-striped_to_linear-single-type.sh,shell/lvconvert-raid-r=
-eshape-striped_to_linear.sh,shell/lvconvert-raid-reshape-stripes-load-fail.=
-sh,shell/lvconvert-raid-reshape-stripes-load-reload.sh,shell/lvconvert-raid=
--reshape-stripes-load.sh,lvconvert-raid-reshape.sh,shell/lvconvert-raid-res=
-tripe-linear.sh,shell/lvconvert-raid-status-validation.sh,shell/lvconvert-r=
-aid-takeover-linear_to_raid4.sh,shell/lvconvert-raid-takeover-raid4_to_line=
-ar.sh,shell/lvconvert-raid-takeover-alloc-failure.sh
->
-> before giving up.  I then tried to run the md-6.9 branch that's
-> supposed to have the fixes, but I still see the same md_stop_writes
-> hangs.
 
-md-6.9 branch doesn't have all the fixes, as some recent fixes
-are routed via the md-6.8 branch. You can try on this branch, which
-should provide a better base line. The set applies cleanly on this
-branch.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/song/md.git/log/?h=3Dmd-6.9=
--for-hch
+On 2/28/24 16:54, Fan Wu wrote:
+> diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+> index 7afb1ce0cb99..9dd5c4769d79 100644
+> --- a/security/ipe/Kconfig
+> +++ b/security/ipe/Kconfig
+> @@ -30,6 +30,19 @@ config IPE_PROP_DM_VERITY
+>  	  that was mounted with a signed root-hash or the volume's
+>  	  root hash matches the supplied value in the policy.
+>  
+> +	  If unsure, answer Y.
+> +
+> +config IPE_PROP_FS_VERITY
+> +	bool "Enable property for fs-verity files"
+> +	depends on FS_VERITY && FS_VERITY_BUILTIN_SIGNATURES
+> +	help
+> +	  This option enables the usage of properties "fsverity_signature"
+> +	  and "fsverity_digest". These properties evaluates to TRUE when
+> +	  a file is fsverity enabled and with a signed digest or its
+> +	  diegst matches the supplied value in the policy.
 
-Thanks,
-Song
+	  digest
+
+> +
+> +	  if unsure, answer Y.
+
+-- 
+#Randy
