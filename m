@@ -1,37 +1,32 @@
-Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FE17A14E
-	for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 18:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AE17828A;
+	Thu, 29 Feb 2024 18:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709231238; cv=none; b=tnFtamNHNsFQP4Wj90wC/b0ok69XKJWKibq2oBsCk4wZLCkaqD0yMsuSv51DATs71eCEkUwvHpka2aaVUayEQPPLCHnHxCWeUR2+Cp2/1JBWTV+SKIqgZLIT4SUXmLYzYvg/siI5+6mBxDNXQIQXe3JBpwZFG7QYUGtpH9a43wY=
+	t=1709233169; cv=none; b=V9rAWC0Wivb9LbEyJMQrTyZUIsYXrtNQn5NENtoEViRgxOLyHjquLNc1gVbNf8Et6lOuDmhIFOVpHxqWxV5k4LWDN22o3ZSyQeRQVrRoFmHNXKqhw4/b9yCV/2ofbndmkfS49/8/l8Sa34LMSz0EkhPSOLdLoA9P57PZs9Bdvcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709231238; c=relaxed/simple;
-	bh=0ujY1W7EPTMDMv8Qjd/XFEAXcyl4EZ0O06CzvoVFYCc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=uwpQm0vw66nnO+cxAydzvS8hR8XppX6YV4cskIEUjFpBKWRAJ74Jbc0eGN86h4U6Lmipa6JzSJH58E5O5fjDmWkAYBKH57vNjaORpAaNi/9/04puBVA0nyv20OoWIG5jg1tCmJ4aJAgRzdDRKpzZFV1IT7FYlkTKvM3VUZbPKM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=EHNEAJpH; arc=none smtp.client-ip=72.215.153.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cybernetics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
+	s=arc-20240116; t=1709233169; c=relaxed/simple;
+	bh=03wrvTX4PmazfhRynJz8dIwWNCpXUtctCoHli5CWq3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BSiHEnK1bdl+ZO+qo/qnoUUG9LdFoS69mI789yi1f9M4hbQlP3TwSgZ4QgZw1CoRcTC1YdEaJ0nHdnKXs7DNBqKU9nmfQH3VkmTrcvK8pDbKiasf/pkmrHecWZoQDAUZ0B6jEZODhMuABiCXqLDyvfZGtqsbP5IevGcsG/q6MCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Chwd/gWh; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="EHNEAJpH"
-X-ASG-Debug-ID: 1709230070-1cf4391a1c4fcf0002-Cu09wu
-Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id OKH4L5BwQIJxnplq; Thu, 29 Feb 2024 13:08:13 -0500 (EST)
-X-Barracuda-Envelope-From: tonyb@cybernetics.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
-X-ASG-Whitelist: Client
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
-	bh=GyTYh7rZxyuaZxAK4E6INt0hy/oXnF2VsS983Qgm9WI=;
-	h=Content-Transfer-Encoding:Content-Type:Subject:From:Cc:To:Content-Language:
-	MIME-Version:Date:Message-ID; b=EHNEAJpH9NO6DGJeblalbgxMQVo9ZjLHP5lNuDo0CY5z+
-	3qRP6j8BSOQ1clNEfFa8V1xd1wyAxTkw7gIdJuf4r5DcXWB08/uQ/7qeVuc70mLwffJnHoNaXO4ro
-	5M6b7FYErqw/nqlHndEyRgwppLhJ5Aw8n43zpvTRnqCKTu0iA=
-Received: from [10.157.2.224] (HELO [192.168.200.1])
-  by cybernetics.com (CommuniGate Pro SMTP 7.1.1)
-  with ESMTPS id 13108803; Thu, 29 Feb 2024 13:08:10 -0500
-Message-ID: <86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
-Date: Thu, 29 Feb 2024 13:08:09 -0500
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Chwd/gWh"
+Received: from [10.137.106.151] (unknown [131.107.8.87])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 67BEC20B74C1;
+	Thu, 29 Feb 2024 10:59:21 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 67BEC20B74C1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1709233161;
+	bh=JV+3tSiFvjDV+NVnRDenCsHCjaCafQUqnYHRslOz/Is=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Chwd/gWhaBwu6cGDHeTQLShmFSuRlHjpipSjMmiY+uPVfP9m8FVNjLOHiAxx+ZPF/
+	 mebhxmfmUfYNWYgKAjhshktx0kymWEOFVKFUkQGBgOaJ0lidTIXk/2OEIuZ/FtL46I
+	 mzpviYdU/EUUFj7yvd/zQgv5h89QqsFhP/icO91I=
+Message-ID: <b73e3387-558f-4f40-8741-c6ed7965b25f@linux.microsoft.com>
+Date: Thu, 29 Feb 2024 10:59:21 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,72 +34,84 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Hugh Dickins <hughd@google.com>, Hannes Reinecke <hare@suse.de>,
- Keith Busch <kbusch@kernel.org>, linux-mm <linux-mm@kvack.org>,
- linux-block@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Tony Battersby <tonyb@cybernetics.com>
-Subject: [PATCH] block: Fix page refcounts for unaligned buffers in
- __bio_release_pages()
-Content-Type: text/plain; charset=UTF-8
-X-ASG-Orig-Subj: [PATCH] block: Fix page refcounts for unaligned buffers in
- __bio_release_pages()
+Subject: Re: [RFC PATCH v13 17/20] ipe: enable support for fs-verity as a
+ trust provider
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+ tytso@mit.edu, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+ eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, audit@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1709168102-7677-1-git-send-email-wufan@linux.microsoft.com>
+ <1709168102-7677-18-git-send-email-wufan@linux.microsoft.com>
+ <20240229044625.GA1946@sol.localdomain>
+Content-Language: en-CA
+From: Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <20240229044625.GA1946@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Barracuda-Connect: UNKNOWN[10.10.4.126]
-X-Barracuda-Start-Time: 1709230093
-X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
-X-Barracuda-BRTS-Status: 1
-X-Virus-Scanned: by bsmtpd at cybernetics.com
-X-Barracuda-Scan-Msg-Size: 1347
 
-Fix an incorrect number of pages being released for buffers that do not
-start at the beginning of a page.
 
-Fixes: 1b151e2435fc ("block: Remove special-casing of compound pages")
-Cc: stable@vger.kernel.org
-Signed-off-by: Tony Battersby <tonyb@cybernetics.com>
----
 
-Tested with 6.1.79.  The 6.1 backport can just use
-folio_put_refs(fi.folio, nr_pages) instead of do {...} while.
+On 2/28/2024 8:46 PM, Eric Biggers wrote:
+> On Wed, Feb 28, 2024 at 04:54:59PM -0800, Fan Wu wrote:
+>> diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
+>> index f5190a1347a6..ca1573ff21b7 100644
+>> --- a/security/ipe/hooks.c
+>> +++ b/security/ipe/hooks.c
+>> @@ -254,3 +254,33 @@ int ipe_bdev_setsecurity(struct block_device *bdev, const char *key,
+>>   	return -EOPNOTSUPP;
+>>   }
+>>   #endif /* CONFIG_IPE_PROP_DM_VERITY */
+>> +
+>> +#ifdef CONFIG_IPE_PROP_FS_VERITY
+>> +/**
+>> + * ipe_inode_setsecurity - Sets fields of a inode security blob from @key.
+>> + * @inode: The inode to source the security blob from.
+>> + * @name: The name representing the information to be stored.
+>> + * @value: The value to be stored.
+>> + * @size: The size of @value.
+>> + * @flags: unused
+>> + *
+>> + * Saves fsverity signature & digest into inode security blob
+>> + *
+>> + * Return:
+>> + * * 0	- OK
+>> + * * !0	- Error
+>> + */
+>> +int ipe_inode_setsecurity(struct inode *inode, const char *name,
+>> +			  const void *value, size_t size,
+>> +			  int flags)
+>> +{
+>> +	struct ipe_inode *inode_sec = ipe_inode(inode);
+>> +
+>> +	if (!strcmp(name, FS_VERITY_INODE_SEC_NAME)) {
+>> +		inode_sec->fs_verity_signed = size > 0 && value;
+>> +		return 0;
+>> +	}
+>> +
+>> +	return -EOPNOTSUPP;
+>> +}
+> 
+> So IPE is interested in whether a file has an fsverity builtin signature, but it
+> doesn't care what the signature is or whether it has been checked.  What is the
+> point?
+> 
+> - Eric
 
- block/bio.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+It does make sure the signature is checked. This hook call can only be 
+triggered after fsverity_verify_signature() succeed. Therefore, for 
+files that are marked with the security blob inode_sec->fs_verity_sign 
+as true, they must successfully pass the fsverity_verify_signature() check.
 
-diff --git a/block/bio.c b/block/bio.c
-index b9642a41f286..b52b56067e79 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1152,7 +1152,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
- 
- 	bio_for_each_folio_all(fi, bio) {
- 		struct page *page;
--		size_t done = 0;
-+		size_t nr_pages;
- 
- 		if (mark_dirty) {
- 			folio_lock(fi.folio);
-@@ -1160,10 +1160,11 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
- 			folio_unlock(fi.folio);
- 		}
- 		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
-+		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
-+			   fi.offset / PAGE_SIZE + 1;
- 		do {
- 			bio_release_page(bio, page++);
--			done += PAGE_SIZE;
--		} while (done < fi.length);
-+		} while (--nr_pages != 0);
- 	}
- }
- EXPORT_SYMBOL_GPL(__bio_release_pages);
+Regarding the other question, the current version does not support 
+defining policies to trust files based on the inner content of their 
+signatures because the current patch set is already too large.
 
-base-commit: d206a76d7d2726f3b096037f2079ce0bd3ba329b
--- 
-2.25.1
+We plan to introduce new policy grammars to enable the policy to define 
+which certificate of the signature can be trusted after this version is 
+accepted.
 
+-Fan
