@@ -1,89 +1,93 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6306D13442F;
-	Thu, 29 Feb 2024 19:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4255813C9DF;
+	Thu, 29 Feb 2024 19:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709236419; cv=none; b=V6S+Wx0de1LEKgrGTpWMteX/HP70LWPNJQHT7hvPS0JZR3JCwzbYDOT38TwgyBraKkA02KA4YSrhqIsTBB80A6V2Wil28An3FeWyHe6FleUaxXETQ+jr1U/3JOns5OV1QUDt+eJNifQUZNTTqUXS4Q9TV43PUsCRzs9cLdLtgDI=
+	t=1709236781; cv=none; b=qT9SCO+xHEYYHFYpA4vFqo8Sm/STK3cWt+LPHzRMH/90EQb04UEgNMhZ26A/R2rBSUvGissWSG2MfMW9JxDEOT3CPTSZuh7ENr3U3EJW5We8R6lvxp31nzPPJjlJSp1oDUkmK9EQ6fjUZHlppDQ77WSM64uMKtcUtNb3M09IQv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709236419; c=relaxed/simple;
-	bh=R1BZ2B3YZgTUGmT4mMT7KfnkAaZyyAG23JCeCS4OagM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HgFcxL5qZsP7WcCYtswefl4Y3HRrSHjB9yrssorWoPJ8gwB4a1gJKctVBxGPPRTq0IM2BqNc+uuAoESo+SkaeKgO5MrZGcYunlLAdFN6XDTsbtdXJHxWeRuu+HCO2UzeHHQIkWf2f+QgwokGaczs3n9B+G/K2sw/4i6R3/zZjAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kZk0KDwg; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1709236781; c=relaxed/simple;
+	bh=1iFRua+KRGwO6LXerMjQRyUEaPugQrsxR57ztwBXH+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MI/qSM61IOCROZ+jbsNSxoaf/s0DmiJbbs31ywe8DhB8kwUffALPy4G6Em/CrlWJewJcRqWu6uwC7C9yYr1jD7/J3EqLXSCMlh1brT+NAFzw8oDXqDzWqeWpFs8RwbH3aUt5klD16rqU2JitQln8DNUXZsHZixFRFxcwu1yFFZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=FAEOTZDG; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kZk0KDwg"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Bb0wm2nkTd/whNJaK5PnfQ4qYt8CNWiFcGX/Paukpmw=; b=kZk0KDwgDkN4bmFPAagPUbZC2G
-	sBTzbBpYG7E0r2P/i9p0uGtviBLPYrIcMiftyKU78jeLhFaPGFyMv8zxJrE+Z6YzMT4kj04Un7Zgj
-	h7ITshosnFYQ1n/W8eV2VYO0pVID6ghAUizomEF2pT2sxACIvx+oTbzoIwnaOZgslvwgIIJ4x6pCP
-	IJRnYitWHvGJEx/rWTVdtMWgiKwfrIwksn87VbFzuq/fCjeuGcjImN5eyrceaBjmObYg/u20wuSAL
-	LfbYtxmtm58zHi3o/k6B3DRdOurGOSgw4FimgiB/Z0kum0N5jbn0aFyYxXFZ9VMK+Kwzl42ZusQYy
-	g9Ks4m5A==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rfmTC-00000008t28-06bC;
-	Thu, 29 Feb 2024 19:53:30 +0000
-Date: Thu, 29 Feb 2024 19:53:29 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Tony Battersby <tonyb@cybernetics.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Hugh Dickins <hughd@google.com>, Hannes Reinecke <hare@suse.de>,
-	Keith Busch <kbusch@kernel.org>, linux-mm <linux-mm@kvack.org>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: Fix page refcounts for unaligned buffers in
- __bio_release_pages()
-Message-ID: <ZeDguZujxets0KtD@casper.infradead.org>
-References: <86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="FAEOTZDG"
+Received: from [10.137.106.151] (unknown [131.107.8.87])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 9622C20B74C0;
+	Thu, 29 Feb 2024 11:59:39 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9622C20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1709236779;
+	bh=G8RefpRZLqdFOepXMPPmDviGVAqIh+9z7ml3Ytz4pAw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FAEOTZDGgg7u1+aNsJy4wgD3dI4ZJ/MMnTMSY55caDEIorrF7oioQY7Fi2LzMWFSN
+	 RaR7XBcH8RrRiU+7ymQEq/w0Gw8ej/+0quxYw1hGfzOqRzW5lj9MAlatW88mfHeiHj
+	 mBTrAGBJg01GEvclsyNBG73rkqgfOzbUVfDuKv4o=
+Message-ID: <a6061c25-1f7d-4954-b5d3-5d21c6d6df82@linux.microsoft.com>
+Date: Thu, 29 Feb 2024 11:59:39 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v13 17/20] ipe: enable support for fs-verity as a
+ trust provider
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+ tytso@mit.edu, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+ eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, audit@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1709168102-7677-1-git-send-email-wufan@linux.microsoft.com>
+ <1709168102-7677-18-git-send-email-wufan@linux.microsoft.com>
+ <20240229044625.GA1946@sol.localdomain>
+ <b73e3387-558f-4f40-8741-c6ed7965b25f@linux.microsoft.com>
+ <20240229194237.GA1454@sol.localdomain>
+Content-Language: en-CA
+From: Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <20240229194237.GA1454@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 29, 2024 at 01:08:09PM -0500, Tony Battersby wrote:
-> Fix an incorrect number of pages being released for buffers that do not
-> start at the beginning of a page.
 
-Oh, I see what I did.  Wouldn't a simpler fix be to just set "done" to
-offset_in_page(fi.offset)?
 
-> @@ -1152,7 +1152,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
->  
->  	bio_for_each_folio_all(fi, bio) {
->  		struct page *page;
-> -		size_t done = 0;
-> +		size_t nr_pages;
->  
->  		if (mark_dirty) {
->  			folio_lock(fi.folio);
-> @@ -1160,10 +1160,11 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
->  			folio_unlock(fi.folio);
->  		}
->  		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
-> +		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
-> +			   fi.offset / PAGE_SIZE + 1;
->  		do {
->  			bio_release_page(bio, page++);
-> -			done += PAGE_SIZE;
-> -		} while (done < fi.length);
-> +		} while (--nr_pages != 0);
->  	}
->  }
->  EXPORT_SYMBOL_GPL(__bio_release_pages);
+On 2/29/2024 11:42 AM, Eric Biggers wrote:
+> On Thu, Feb 29, 2024 at 10:59:21AM -0800, Fan Wu wrote:
+>>>
+>>> So IPE is interested in whether a file has an fsverity builtin signature, but it
+>>> doesn't care what the signature is or whether it has been checked.  What is the
+>>> point?
+>>>
+>>> - Eric
+>>
+>> It does make sure the signature is checked. This hook call can only be
+>> triggered after fsverity_verify_signature() succeed. Therefore, for files
+>> that are marked with the security blob inode_sec->fs_verity_sign as true,
+>> they must successfully pass the fsverity_verify_signature() check.
+>>
+>> Regarding the other question, the current version does not support defining
+>> policies to trust files based on the inner content of their signatures
+>> because the current patch set is already too large.
+>>
+>> We plan to introduce new policy grammars to enable the policy to define
+>> which certificate of the signature can be trusted after this version is
+>> accepted.
+> 
+> Ah, I see, you're relying on the fact that fsverity_verify_signature() verifies
+> the signature (if present) even if fs.verity.require_signatures hasn't been set.
+> That does happen to be its behavior, but this isn't clearly documented since
+> there previously wasn't really a use case for the builtin signatures without
+> setting fs.verity.require_signatures.  Can you please make sure this behavior is
+> documented properly in Documentation/filesystems/fsverity.rst and in function
+> comments?  Otherwise I worry that it could get changed and break your code.
+> 
+> - Eric
 
-The long-term path here, I think, is to replace this bio_release_page()
-with a bio_release_folio(folio, offset, length) which calls into
-a new unpin_user_folio(folio, nr) which calls gup_put_folio().
+Thanks for the suggestion. I will add this info in the next version.
+-Fan
