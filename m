@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A395144047;
-	Thu, 29 Feb 2024 20:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF6C15E031;
+	Thu, 29 Feb 2024 20:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709239074; cv=none; b=HQ+S3/jawPICR9tRol1rA8JvnIV/R2qDlpG0NpFvYmN2jNpMZ/5TiTR3TcuA9BN+3tFxV8S9HCw5h5ioD5l7JgtdwNSurMl9euyYMw5IigcodKFQzyWns81T1Wt/Vgl9etcXeFZnSJ5kG9f45FM7as9PpUu2hovgwTyhcnEQgVY=
+	t=1709239198; cv=none; b=fVPlvrKZrWSxrtJ9THDdXZ2SbInm3mGr1xLY7NCmTiXaV/NPhlKFckJN8VbIVUS5yKaglXsupbhzU7aDfO1/eZRzoanxbU8q1ShQ2JViehGHEzv4XLFZ1f3sTkwXdnzvC5sQ69L/FbLkutXnfIOt3RKhkiEgV8o/gAWn7VM5X+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709239074; c=relaxed/simple;
-	bh=q0QfNTy7LCZMzM+Y77fnUYNSiw0FW0Vlv85XEPhFh5M=;
+	s=arc-20240116; t=1709239198; c=relaxed/simple;
+	bh=mxRUa5CthTVInxGr8kKOevfXkarA6jUudOI+9gLETuc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P9+v2dDvUsAv92gEqu9ZREA4r8H9NJ7nS2exS8a7kbWtxKBardDXTJcZl+JshWe8tuHR7gbhQAqTP4wTnJDrO3DCfZN9sxBZthirDLREdS5q5MR59nETSN4USLPzxoGwrmI1mvYgQ85R6hCsPwz4lmWymKbzuYhLCGT8/xLbDuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qwKd+IST; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=I4U7cBCQUtMHfL8g2CSd05/+7FZN3QS7O9V4D/QCpDO1R0cXnwpudqwfSDqm/EonrZjFOHUUot6f7k7BWxr7HF6VzUuzcBwvTH8S1AdzhvhgNxffPapk6tOBjkPUfdSDPaQXeh3i8U1sgE2l90B/NRKdqeYhRuuLEKTFe1o9uNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VWlgZ9uw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qwKd+IST"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9362FC43399;
-	Thu, 29 Feb 2024 20:37:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VWlgZ9uw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AC78C43399;
+	Thu, 29 Feb 2024 20:39:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709239073;
-	bh=q0QfNTy7LCZMzM+Y77fnUYNSiw0FW0Vlv85XEPhFh5M=;
+	s=k20201202; t=1709239197;
+	bh=mxRUa5CthTVInxGr8kKOevfXkarA6jUudOI+9gLETuc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qwKd+ISTcwHq9RQPcBz9CF0GmIO232wv3HO3thLZaPQg+s/KwHxE0/ie5DeP/AZT4
-	 WuzDxzWeJwcQg3440VCrmSaaI2OeobsPBi/PTkgvxrqtkPIfsDjHK1RYPGq+4QtXsX
-	 4z7geEgiV9D/O4CJ7p6TSFeWVvEWEBzxO9I8Zmnkf38NhZznNNh8RsB4/dvt1kcV+T
-	 bRk7olyFx0Npvuo0zVfMGAl7uVpwjTvsaGxdJtoL8LcVdhijqRESJnphkqMrcZeRH+
-	 DGzRdkmk3E01DzMZ2DmHMEBdE9GSZ4tQy1cQzguU5MmdrNXoAwLYcP7JRd+olNGkEN
-	 masL+A+X4efHA==
+	b=VWlgZ9uwITK9DReULcdDIrGZnQbvaNXe02VhOV4hyf1eZHKSMTh2zkpKqvsiHmoTK
+	 g3FVDN9mdYMlixtCtT5aG2r4Vp8JUdxU0QqPG6WjO4VSnih4VncP8KxvS36NHDAuwK
+	 8bXmAFOkDJYIlez7j3zq15r+Q87S8tN1FZZlrpHv85Pas/ISfb/o94t5yMdRH+uhB2
+	 s9bOswTgJxlfbwDL1wGfUNkjcMaoILeZJ4R0Bzsxgpt79Lw2VhfusEob5ZB96n285z
+	 fqDZcxGEDauB8sUe35VeEOzuqcaPb12DfUxhY/quvf/Hd0J6eg0fGD44dy1+lGowld
+	 4ztob6BTaFHZw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -34,12 +34,12 @@ Cc: Greg Joyce <gjoyce@linux.ibm.com>,
 	Sasha Levin <sashal@kernel.org>,
 	jonathan.derrick@linux.dev,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 12/24] block: sed-opal: handle empty atoms when parsing response
-Date: Thu, 29 Feb 2024 15:36:52 -0500
-Message-ID: <20240229203729.2860356-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 11/22] block: sed-opal: handle empty atoms when parsing response
+Date: Thu, 29 Feb 2024 15:39:04 -0500
+Message-ID: <20240229203933.2861006-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240229203729.2860356-1-sashal@kernel.org>
-References: <20240229203729.2860356-1-sashal@kernel.org>
+In-Reply-To: <20240229203933.2861006-1-sashal@kernel.org>
+References: <20240229203933.2861006-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,7 +48,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.7.6
+X-stable-base: Linux 6.6.18
 Content-Transfer-Encoding: 8bit
 
 From: Greg Joyce <gjoyce@linux.ibm.com>
@@ -83,10 +83,10 @@ index dec7ce3a3edb7..d247a457bf6e3 100644
  #define OPAL_INVAL_PARAM 12
  #define OPAL_MANUFACTURED_INACTIVE 0x08
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 3d9e9cd250bd5..fa4dba5d85319 100644
+index 04f38a3f5d959..e27109be77690 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -1056,16 +1056,20 @@ static int response_parse(const u8 *buf, size_t length,
+@@ -1055,16 +1055,20 @@ static int response_parse(const u8 *buf, size_t length,
  			token_length = response_parse_medium(iter, pos);
  		else if (pos[0] <= LONG_ATOM_BYTE) /* long atom */
  			token_length = response_parse_long(iter, pos);
