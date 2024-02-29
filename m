@@ -1,98 +1,112 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC80B364A0
-	for <linux-block@vger.kernel.org>; Thu, 29 Feb 2024 01:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4612B2D638;
+	Thu, 29 Feb 2024 02:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709171252; cv=none; b=mNSZYrfkiyQ+QXAFaxcSzcdl37BuN27C5lnN93qT7Dum1fyIpJKANAKGXxqNiF6Nd5I9JWyjOqPd7CP+LYOW16IJ78BZYJxuYjIvrRZgbPa8dLPZ5oXi44phHKCIzY6voydcmO6u4YVMkrY+s9AD5kVrpgFpE7af8ebPjmCRPLs=
+	t=1709172167; cv=none; b=NBZvG8GYPUfUYcubGt7YMa3kd6YIeRJ5hYK5Mtxvj0/ocIL1l/U+DeD1nNj4pJIgO3PwzX96WKy/x+8tIxxd4dSujCEitJ8v/D299YumQnTjeZ7wPLle7XwImyZEKUi2tgof6L6oLTvnI790oJwLjqT5B88vd4aq0btEL+OtjEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709171252; c=relaxed/simple;
-	bh=ST51FRZFul8YEBbDpxpTrFm5g6SSHferE2doQLVAfA4=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Smt1sUxmTPApIy8DAXZYSwYCpMM6aBhq3iCyDgGnJFOS1t89scXvjLZU1JF9zHvRfnDLiSj3gt5w7sXc1xUxFib5aInSkN/sh1z6po61KI4xk3bAvCCo2OC3zwMCXDdDGTuE7UVFsAa48krKyjUl2xU/sa97YFvbUN9ClZdkxdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=S1U6tIlA; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1709172167; c=relaxed/simple;
+	bh=AAyTW9eIWug5bOe5GvlKrcB1mn0cXjvPHZrWdE4Zouk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oJaF/HjnkLkCNGMdI7X7yNAXn3xxkYPIDCfpDLzINGe3r8KDnIKJ/dXwjbcE/8dTxbdHuPEjGaqJgFMpS4mGr2O+i0Gg02jZI0fhsdAcsEFJ/45dsXgNuyHQXqmmqN5XmLye2tKHJfSBLBMS+VklcVrHGKtsLtoVAZ18NoyZyhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=plwzO2wL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="S1U6tIlA"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5cfcf509fbdso43113a12.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Feb 2024 17:47:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709171249; x=1709776049; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TSvg2X7UpSUcSLtWToJuYyrvCTHFp7pFjg/Ys8rJdSo=;
-        b=S1U6tIlA7JPtbrFvHe3bXu4eKiXQbdlivwEY3RMZRCuBBK4NHt8AhPCRTibaKNkYkR
-         uB+p91hT1+zUr1K9jatL4Bos3u3SRkavmhpbmFby0GjI5H/tL9HSOLghR2mQZG6d+pXO
-         314TmZdB96dFae8l0MBw7sDI8m9M6tC5Fka5YL1XlgZjiC/TjnmNzVHpbg/S3XxjcuJV
-         uzk1YHX21M2sNE3AKXqTGJuN6Wp034ymWID2G0M86w6cE6QWtMjMzGD3dsr3Y51QGQpM
-         eXXEeEAeGghM4cgnRfSK3sebRdclnNFqcrqWcETa2YEay3fEUEnQsnFxr2ubC2o8efuv
-         AeVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709171249; x=1709776049;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TSvg2X7UpSUcSLtWToJuYyrvCTHFp7pFjg/Ys8rJdSo=;
-        b=jneaWGEUFXBGQcebOmf9lYgCOFxZpd9GGPfvlu+XSVStT9lpRmwFA6EAGPpk1XL7jL
-         awGWcBhs2pUHq++HpoUDhp8f6AWWTkfgtqoktGgARkSPInAFsMpGZU1/bVKZPAd20Lo5
-         2MdOTkjxlDaDHIhp7bko+AEkCr7txuGh9LtwTgD0W0Vf1oQsDC8IbOAOk9Dx2C/tIx6P
-         qd/7dduvtEZhhhwpoOZCQV/rgRfoMmiHv9wGdJEhkwOG4QZXF6OfoeqK3im8lCf11cCS
-         yELv3M9QmXBSzIXP78XZ4kDq2YgwiXX1pXrJypzLA+B33LUQMUosr4hvPsItVhNVDs+D
-         rNXg==
-X-Gm-Message-State: AOJu0YzXPrqVlkl6okoeguVX3/aJROhuBJijzj9UZmNP3epd/eg/PG+B
-	1jCSLc0yoaVEqAtrv010eowbkjCS1GaIpAKdQ2m/VGV1QXfTUDy0vxXU70I+eWAbPpCYmST/Qj3
-	E
-X-Google-Smtp-Source: AGHT+IHvLvOj0+dbw9qiIOmIt8rkDfRuYzKW2/EaW+Rzm89uFdRkfTiui9ae03ej6/BBQW1EErwq0A==
-X-Received: by 2002:a05:6a00:2d14:b0:6e4:8870:66ef with SMTP id fa20-20020a056a002d1400b006e4887066efmr967846pfb.2.1709171248807;
-        Wed, 28 Feb 2024 17:47:28 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id y133-20020a62ce8b000000b006e45a0101basm112654pfg.99.2024.02.28.17.47.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 17:47:28 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-In-Reply-To: <20240223075539.89945-1-ming.lei@redhat.com>
-References: <20240223075539.89945-1-ming.lei@redhat.com>
-Subject: Re: [PATCH 0/2] ublk: improve ublk device deletion
-Message-Id: <170917124785.401124.9457654868952302906.b4-ty@kernel.dk>
-Date: Wed, 28 Feb 2024 18:47:27 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="plwzO2wL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF0AAC433F1;
+	Thu, 29 Feb 2024 02:02:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709172166;
+	bh=AAyTW9eIWug5bOe5GvlKrcB1mn0cXjvPHZrWdE4Zouk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=plwzO2wLumif19xoPVvDhwHlHO/t/n5BZTdMN3HACJNHL6ZWsvihdowzV0+qo3C7L
+	 oUBbvup9rPeQ82h+xyBU8QOmV4zZhYVifigEXkD/hFxNr1Uq/ViWvg4ZjJRUGD9p0q
+	 y8iBz/BvKfiUocmUDN7x16W8elxa504EDyUl8fBiejWX0VBBEdfbAMlDl/XTWhbKRn
+	 dfKgI3Bm/bNpRUXs1GDMhhavO5SYMx+uEUIpG7SVvj5Tr+JE88yDftw7DwfXw9Y0ji
+	 jxiFkfmFJUeKAbo4ynwlwGEJFSMnoTjp8P1XNbfIlsE67yZKKp2jVzaocWtZvvjBuT
+	 FxHpM5zHLNWgw==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51318531af4so1523496e87.0;
+        Wed, 28 Feb 2024 18:02:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVBQ/FAoLA91M7+F0hTzUO4AlM88nLo+0UUgH3v79fleUG1eP17P5Ck7Lnne5sy69kFttcC5QZ1FV0B8qb7ieFKciW9qJaGjCOQfiBHaNz0G5Eq7MirvDIDykpHHWQlKoQ+hgng202N
+X-Gm-Message-State: AOJu0Yynp/ipUf7crcp+BkuCF1mrxy+X5LE42ZCLVJsuLFX6OgBcKcmR
+	x+IE3EHf/qOewNkOG6GLiHMrBa934sUSMgzBtsu0cSoQBbs6GYBBIba9aFyvgDEYqdyfcHK9Ut3
+	JVJI4/6mbHdPFCh4cupGDWFTNblI=
+X-Google-Smtp-Source: AGHT+IGmxKdSG3kJ4IDEg6gxeL8TqreGpHHwstO1UoR6gX7sqGEm+89EqGWLN8lB7Fse50dVYq+jL6R7NkL3BeNNRW8=
+X-Received: by 2002:a19:c514:0:b0:512:f4d6:7163 with SMTP id
+ w20-20020a19c514000000b00512f4d67163mr178406lfe.6.1709172165035; Wed, 28 Feb
+ 2024 18:02:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+References: <20240223161247.3998821-1-hch@lst.de> <ZdjXsm9jwQlKpM87@redhat.com>
+ <ZdjYJrKCLBF8Gw8D@redhat.com> <20240227151016.GC14335@lst.de>
+ <Zd38193LQCpF3-D0@redhat.com> <20240227151734.GA14628@lst.de>
+ <Zd4BhQ66dC_d7Mn0@redhat.com> <CAPhsuW69mM3tEBR=SgKy_SYE+NUsNO+8H6toyk+5mKcSfGMjmg@mail.gmail.com>
+ <20240228195632.GA20077@lst.de>
+In-Reply-To: <20240228195632.GA20077@lst.de>
+From: Song Liu <song@kernel.org>
+Date: Wed, 28 Feb 2024 18:02:33 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW5c5o8JS9T8CCGU811jpxrbepjJHnYpDbge+1rT6j8NbA@mail.gmail.com>
+Message-ID: <CAPhsuW5c5o8JS9T8CCGU811jpxrbepjJHnYpDbge+1rT6j8NbA@mail.gmail.com>
+Subject: Re: atomic queue limit updates for stackable devices
+To: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@kernel.org>, Benjamin Marzinski <bmarzins@redhat.com>, Xiao Ni <xni@redhat.com>, 
+	Zdenek Kabelac <zkabelac@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Mikulas Patocka <mpatocka@redhat.com>, Yu Kuai <yukuai3@huawei.com>, dm-devel@lists.linux.dev, 
+	linux-block@vger.kernel.org, linux-raid@vger.kernel.org, 
+	lvm-devel@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Feb 28, 2024 at 11:56=E2=80=AFAM Christoph Hellwig <hch@lst.de> wro=
+te:
+>
+> On Tue, Feb 27, 2024 at 01:50:19PM -0800, Song Liu wrote:
+> > I think we can do something like:
+> >
+> > make check S=3D<list of test to skip>
+> >
+> > I don't have a reliable list to skip at the moment, as some of the test=
+s
+> > fail on some systems but not on others. However, per early report,
+> > I guess we can start with the following skip list:
+> >
+> > shell/integrity-caching.sh
+> > shell/lvconvert-raid-reshape-linear_to_raid6-single-type.sh
+> > shell/lvconvert-raid-reshape.sh
+>
+> Thanks.  I've been iterating over it this morning, eventually growing
+> to:
+>
+> make check
+> S=3Dshell/integrity-caching.sh,shell/lvconvert-raid-reshape-linear_to_rai=
+d6-single-type.sh,shell/lvconvert-raid-reshape.sh,shell/lvconvert-raid-resh=
+ape-linear_to_striped-single-type.sh,shell/lvconvert-raid-reshape-linear_to=
+_striped.sh,shell/lvchange-raid456.sh,shell/component-raid.sh,shell/lvconve=
+rt-raid-reshape-load.sh,shell/lvchange-raid-transient-failures.sh,shell/lvc=
+onvert-raid-reshape-striped_to_linear-single-type.sh,shell/lvconvert-raid-r=
+eshape-striped_to_linear.sh,shell/lvconvert-raid-reshape-stripes-load-fail.=
+sh,shell/lvconvert-raid-reshape-stripes-load-reload.sh,shell/lvconvert-raid=
+-reshape-stripes-load.sh,lvconvert-raid-reshape.sh,shell/lvconvert-raid-res=
+tripe-linear.sh,shell/lvconvert-raid-status-validation.sh,shell/lvconvert-r=
+aid-takeover-linear_to_raid4.sh,shell/lvconvert-raid-takeover-raid4_to_line=
+ar.sh,shell/lvconvert-raid-takeover-alloc-failure.sh
+>
+> before giving up.  I then tried to run the md-6.9 branch that's
+> supposed to have the fixes, but I still see the same md_stop_writes
+> hangs.
 
-On Fri, 23 Feb 2024 15:55:37 +0800, Ming Lei wrote:
-> The 1st patch cleans up get/put device, and annotate them
-> via noline for trace purpose.
-> 
-> The 2nd patch adds UBLK_U_CMD_DEL_DEV_ASYNC so userspace device
-> deletion can be implemented easier.
-> 
-> Ming Lei (2):
->   ublk: improve getting & putting ublk device
->   ublk: add UBLK_CMD_DEL_DEV_ASYNC
-> 
-> [...]
+md-6.9 branch doesn't have all the fixes, as some recent fixes
+are routed via the md-6.8 branch. You can try on this branch, which
+should provide a better base line. The set applies cleanly on this
+branch.
 
-Applied, thanks!
+https://git.kernel.org/pub/scm/linux/kernel/git/song/md.git/log/?h=3Dmd-6.9=
+-for-hch
 
-[1/2] ublk: improve getting & putting ublk device
-      commit: 1221b9e982e181f1c37789c46fe5bfe32d97bec4
-[2/2] ublk: add UBLK_CMD_DEL_DEV_ASYNC
-      commit: 13fe8e6825e44129b6cbeee41d3012554bf8d687
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Thanks,
+Song
