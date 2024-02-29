@@ -1,48 +1,31 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F14813774B;
-	Thu, 29 Feb 2024 19:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C47313C9F5;
+	Thu, 29 Feb 2024 19:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709235443; cv=none; b=FvAwoAIkQUHv1hCNqD7/4Q0dhPpBkjSj4OHR9IfGZS0wbH2jjGpG4dB/Ir18N15PZWTqKkeX+44vvGporCabw1kjLJ7M5POpQokAe3+7IXDnA85927aVV1R06pMZPFqF3EEnoWCBN2+snJhZaUKmnpIbsEPDlkZdREHmb6Qe+bE=
+	t=1709235638; cv=none; b=rT66LxPMkgZVlD6ns9i+XmQXSgcNo4aewSwHbFgzs1u+6cFuQIGHE7gP5FajeC7IIrvMLrotHNQW94PaJPU7zFlnJ7payPArX0SNQlELC57Hy5PDafd6UxHwnRT1+r3vL3qYNk+pZAWoOEPCla1gsZX83j/7E25t3iLukV+JN4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709235443; c=relaxed/simple;
-	bh=32yj74/3vEglgYQz1Og4De9ujIVTdpiMAur4jWBgQXU=;
+	s=arc-20240116; t=1709235638; c=relaxed/simple;
+	bh=yK00L6WE5qS4GGI5HzxMo9ImkeiKQDvanPpfN7irD08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=by0vYNNZLE0MOulOGqRAN0E9Z/ulZwWumEca1rd8gwJapHHC7mWbM537Q4KAENkPRT//4uTboAG9bQsnPjj5boukEFaBTZNXJQ9Duk6DrqyQ8ooOMYHSmRM3o6gKu9aSaXLB3O17igFg4Drq2kQCsjNo0pApez5elFA7+J4PA78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LfHiOuS3; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LfHiOuS3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=8uNmGuKJqG0ZLwvelugqTwty9eAp95ps/IXd1VUbjRE=; b=LfHiOuS377ugSXr21HSPLjoGds
-	rRHRotHB6Z2K+UknnXnK+QSxqb+aTii8MgmSzXW1sRNBptAvRcgkCTNz6J+ZbnsCs2gOL69/7CQwh
-	HbpeH4t5yDhGvqmnlTjCTBFsDyp9akGVrkIGj6y3BedRK3Vygt5msrjSPEYVN6VtIWpZchOzssQ/V
-	WR1aOx0+dyY/SjdSpU3JUwI4U2i/3gjC67frvRbY1ZlyHhnna281LjFJ9s/SzckoOzX+rHWRnRD4q
-	DbfpzdwBNaELy6OKw8HL8OqWb7AQNPVnsIkMg3yiwsLXR6E9Xx/G6dwkxCxOWFcKJ/oDRVozID8PI
-	7uk/dp4Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rfmDP-00000008qqb-3bC7;
-	Thu, 29 Feb 2024 19:37:11 +0000
-Date: Thu, 29 Feb 2024 19:37:11 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Greg Edwards <gedwards@ddn.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Hugh Dickins <hughd@google.com>, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	qemu-devel@nongnu.org
-Subject: Re: [PATCH] block: Remove special-casing of compound pages
-Message-ID: <ZeDc50LQSItEeXY8@casper.infradead.org>
-References: <20230814144100.596749-1-willy@infradead.org>
- <170198306635.1954272.10907610290128291539.b4-ty@kernel.dk>
- <20240229182513.GA17355@bobdog.home.arpa>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vxys+S4bI9rZQZ8nUJZpRUtcW+wPTIMy3JaxwdBHvN4gZxxtO9QsWKNZ3au7XXVWh9VS3v5NF8hbcV6P+n1WBC19C4zL2QU1GHNI/NSIUVNswKhjD/5q3XPrerH4vPA9x+fsnxwrpGTlQOpxUPa5Xal9OWw0eMjf4RgVUVmYVpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A8C6D68D08; Thu, 29 Feb 2024 20:40:31 +0100 (CET)
+Date: Thu, 29 Feb 2024 20:40:31 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai3@huawei.com>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Subject: Re: atomic queue limit updates for stackable devices v3
+Message-ID: <20240229194031.GA15191@lst.de>
+References: <20240228225653.947152-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,24 +34,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240229182513.GA17355@bobdog.home.arpa>
+In-Reply-To: <20240228225653.947152-1-hch@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Feb 29, 2024 at 11:25:13AM -0700, Greg Edwards wrote:
-> > [1/1] block: Remove special-casing of compound pages
-> >       commit: 1b151e2435fc3a9b10c8946c6aebe9f3e1938c55
-> 
-> This commit results in a change of behavior for QEMU VMs backed by hugepages
-> that open their VM disk image file with O_DIRECT (QEMU cache=none or
-> cache.direct=on options).  When the VM shuts down and the QEMU process exits,
-> one or two hugepages may fail to free correctly.  It appears to be a race, as
-> it doesn't happen every time.
+On Wed, Feb 28, 2024 at 02:56:39PM -0800, Christoph Hellwig wrote:
+> I've run the mdadm testsuite, and it has the same (rather large) number
+> of failures as the baseline, and the lvm2 test suite goes as far as
+> the baseline before handing in __md_stop_writes.
 
-Hi Greg,
-
-By sheer coincidence the very next email after this one was:
-
-https://lore.kernel.org/linux-mm/86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com/T/#u
-
-Can you try Tony's patch and see if it fixes your problem?
-I haven't even begun to analyse either your email or his patch,
-but there's a strong likelihood that they're the same thing.
+When I pull in all the pending fixes, the lvm2 test suite works for
+the baseline and this series, and shows no regressions.
