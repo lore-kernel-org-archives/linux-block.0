@@ -1,67 +1,66 @@
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F1541C7A
-	for <linux-block@vger.kernel.org>; Fri,  1 Mar 2024 16:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494F370CB1
+	for <linux-block@vger.kernel.org>; Fri,  1 Mar 2024 16:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709309393; cv=none; b=fiPAy+5dmOEFGFSlWDtnpSOblTJ4V3plzO0yjQYajojcb0nwFp7BhQHJtsXQlOhEI5p1bQwWMESdQSvjVESnkj6csaBetyUIX4ayIQZn60ii4OJHpL1l4t1ZJ9H8BVwwdjDLBx8pcb5Kv3b7OKObWU12VASUSe4T6zrCUcJq9LU=
+	t=1709309407; cv=none; b=lJAqVAMJXO1v4nbSiGw7KwOK7TtRjzd4huLtVyUNNNb/3ivaIme+h9HUQwzUJECE0ZEWJOHWQEEGcPYjUMsj4URWvGwLoawfjXycecbVj9L3WTD32sZTtsdUh2ESANGqhRRhdjj9BMrTWw6UFLUY4QWtlHEyXEKIPoEB4BKGY18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709309393; c=relaxed/simple;
-	bh=OSir/lB0szIQY81vhGPvg5xRh8vdBZI7ODeONZVVdZc=;
+	s=arc-20240116; t=1709309407; c=relaxed/simple;
+	bh=Y6+jWBd/t6CiAA0kp9R8h7Cz6SqJvgjsnNxHqUyPW/o=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=goRu7caTS9QFHCfABpHIV9onLu1WzAlpz0rX9SfzUpAuBcL1Nx2UoThnOwauUyTtbnTXbTHGf4ahpk2QFBjMFhDZCFQhKPcEeLtv9eXE7nbjxJHUb2e+SwtSYt+ug29zF5vi+CXapXTFS8T0p6rFCEVM5DYxR2tZgQ6EhOmUoXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lsPwMc+N; arc=none smtp.client-ip=209.85.166.43
+	 MIME-Version:Content-Type; b=S+wA5KCABNn2lndn6l/72JLlLmOlTBb9DgH0RGqCaAfCq3yRrxxUEKqWHNYDZPLdAStx2gmC2OTEzf9YozyniiygEudyYji6y/8Pa/+de43f9upsWm/LDdSeGefuljaMLSsGMfSaYujXmi+Xnr29yNgTwVsmOdtlH7rw/A9f+Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xz7lX7By; arc=none smtp.client-ip=209.85.166.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lsPwMc+N"
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7bff8f21b74so24392439f.0
-        for <linux-block@vger.kernel.org>; Fri, 01 Mar 2024 08:09:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xz7lX7By"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7c787eee137so34014039f.0
+        for <linux-block@vger.kernel.org>; Fri, 01 Mar 2024 08:09:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709309390; x=1709914190; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709309396; x=1709914196; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Teu7cVnfzCMq0GtMqNcznhRFikj20rv7Z/X/ZRCczTw=;
-        b=lsPwMc+NLmY0K4fhiv4eK5YFlg1USL+GRt+x1i5M96Vb42c9ZYbU8HJAdcOphbAwLW
-         f9eC6RbB8Hnfk0YzvEbQOtxTrLN+YqDHiEPlNUS6F44sLUo72WkTD/omwzHLp9MQ/s67
-         ytQbdx/kjxaYjeDvw4smHSkBkhcbrJjdf52GJdkxZ7YdZo5IN3h78YY5HHPTOTQjmHO8
-         pyOu5w1ietftoFOaESreGTrvVgJ5Azj8RSJTMlyZ9bvAQOFUe8MlaABfThNfgPrwSpn6
-         UMK85PAwcM6qghPMCYGMJrU06NpNltVr7PhTB+ycPVxeSKOFibuJUhSMsfqNwnshOVOY
-         0uAQ==
+        bh=yJew46mGVrQcepDWbKAtHr/vU7a6ybvJN1TJ5Pc2mp4=;
+        b=xz7lX7By/LtONYtboBVYlKjTL9MXYNtmVNgXzc+GO0VzYElNtQh0ddvUhXQXEDfQup
+         hFkJB3kBuPgRI0lrW/B8n8t4VHg9/BoxEO/Nu3LLLJjuVuAHraQcS8vYHrn8cxS309jM
+         x2KgckGir6a0ZFvWK4vTpcxYazd6pjcchyu1KGmGgGwBdDXJFYyVoaMR34kc6gcJ/f52
+         adRUlNqPG3l82Eqa6zk2Od77yPGk3pf2tWUB84YwpyvncO2pI1n59kDffFGw1ZSAymU3
+         yCkgKN22OCL+VXNaHuYZW7UbSwhKsihXyvCbNysQ+jkt7thY4y9U4FMbTn3rRrxWfQBB
+         h+pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709309390; x=1709914190;
+        d=1e100.net; s=20230601; t=1709309396; x=1709914196;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Teu7cVnfzCMq0GtMqNcznhRFikj20rv7Z/X/ZRCczTw=;
-        b=jHcYTE+RP5BM8CirLrOCk7U4FsQvYuWeuSsadsyfQqNC1MreokfncTt4tzpBs91A7O
-         MIr1GC8notb0MnsOnSsSMQD4HV/USE5l/6r1kdiwLU2cMLDrCYbAv2kz9uUDHv11PwF0
-         q2pO5UkjO0RteU5eNIUm4Lyap4mC17rGiSAKfVuzAiNq5wANq9ngbV2yFAokHN9Hmfim
-         OyxPfLteBZmwfhkjjkYrhdocOxbTzjw164c0D6XlGsPJPcdpau/XPHaNi7fJujO6RzXv
-         rBEKwP/+iO96P1NgTnf7MlwV+mNBltZDndNBGnbuUwJfP3npzx9pwy2hXJDTqWcTqzj6
-         5ljA==
-X-Forwarded-Encrypted: i=1; AJvYcCUA2l6xPH4nJz/ZnZO5wwXy9l6PQznI3DNY0bJwVkLKUCUaFzO2KE/fmRLGOWRNERIZaU4g6VOxji4bqijxEX8RUocdD5aedY/wZoo=
-X-Gm-Message-State: AOJu0YzE4fWhHebCQ0AVPFpm2xYVr99/zwJnxN18g+qsmtYWRVwGBcE0
-	5TCVm745svafNuSHYqkfjLcQzGG/pNq2v2M2mkzEof1OpXYyoJqdMf7WKMj/3rDE5Ok2lHJS5q1
-	s
-X-Google-Smtp-Source: AGHT+IFtkOTGles2zTmi7oQgkvSykVxZ6EQxQeTqgEj4iIIQDhIs8bnSx0k6a+EDDeFArf7OdTf+iA==
-X-Received: by 2002:a6b:6b11:0:b0:7c7:acf8:54c6 with SMTP id g17-20020a6b6b11000000b007c7acf854c6mr2040545ioc.0.1709309390297;
-        Fri, 01 Mar 2024 08:09:50 -0800 (PST)
+        bh=yJew46mGVrQcepDWbKAtHr/vU7a6ybvJN1TJ5Pc2mp4=;
+        b=E/TzAVGrR9s4Hwfw7HGVSmyAnNEJmQGpI4NEaPHsLG4uO/Jsw04hDG7AR8gTYW5TRP
+         uCWFe0lB7uREOHz76tXPAKR6V7xkXLP8us/w6HYa9D+laMiDGJmkaEENLYpt5QKCGACp
+         xBVOh565hhm3VKUTwIFSoKgRD5gXggbClwqtRL81w8BPYpgd+VpHT1zryk3az4iaCaNz
+         vhvWTPeU6s5Oyq1AYKNjgtlAnbn0D5fWm5XjWRaBwdqlRnLDcxFw+HM2IKd3/kEeHt8Y
+         qq7fhaKgrURfyQzDwehaIFs+sWORLSAracySKTLnmGgZGi9WcjrLurHH7H2qBs1bGivI
+         CCOg==
+X-Gm-Message-State: AOJu0YykQs44grQXQj/PBuac9CtHXlsFNDhpN+t3QcuYnz95KNF7o3BG
+	PrHtRpGojlSQe2nrj+2s8baX1ILwcPFODnLfqqbA4Xc1aaaQ8t8/BC3Pqny5/+F0wdVaXo93898
+	k
+X-Google-Smtp-Source: AGHT+IHa+2XKvuX/YGHbVraqcL9Od3Ukf1I04lrjP8hK/gZGE1PtSs318j1J4WJuIZhddUhqNtg3Mg==
+X-Received: by 2002:a5e:950f:0:b0:7c8:2946:af83 with SMTP id r15-20020a5e950f000000b007c82946af83mr1066682ioj.1.1709309396427;
+        Fri, 01 Mar 2024 08:09:56 -0800 (PST)
 Received: from [127.0.0.1] ([99.196.129.26])
-        by smtp.gmail.com with ESMTPSA id j13-20020a02cc6d000000b00474ab85e3ebsm865136jaq.130.2024.03.01.08.09.45
+        by smtp.gmail.com with ESMTPSA id j13-20020a02cc6d000000b00474ab85e3ebsm865136jaq.130.2024.03.01.08.09.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 08:09:49 -0800 (PST)
+        Fri, 01 Mar 2024 08:09:55 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: pali@kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20240229144408.1047967-1-hch@lst.de>
-References: <20240229144408.1047967-1-hch@lst.de>
-Subject: Re: [PATCH] pktcdvd: don't set max_hw_sectors on the underlying
- device
-Message-Id: <170930938495.1106749.3472068230834361456.b4-ty@kernel.dk>
-Date: Fri, 01 Mar 2024 09:09:44 -0700
+To: Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, nbd@other.debian.org
+In-Reply-To: <20240229143846.1047223-2-hch@lst.de>
+References: <20240229143846.1047223-1-hch@lst.de>
+ <20240229143846.1047223-2-hch@lst.de>
+Subject: Re: [PATCH 1/3] nbd: don't clear discard_sectors in nbd_config_put
+Message-Id: <170930939076.1106749.1495501234832632960.b4-ty@kernel.dk>
+Date: Fri, 01 Mar 2024 09:09:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,22 +72,24 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Thu, 29 Feb 2024 06:44:08 -0800, Christoph Hellwig wrote:
-> pktcdvd sets max_hw_sectors on the queue of the underlying device that
-> it doesn't own (and doesn't reset it ever) since the driver was merged.
-> This can create all kinds of problems as the underlying driver doesn't
-> even know about it changing the limit.
-> 
-> As the state purpose is to not create I/Os larger than a single frame,
-> and pktcdvd never builds bios larger than that, just set REQ_NOMERGE
-> on the bios it submits so that largers I/Os never get built.
+On Thu, 29 Feb 2024 06:38:44 -0800, Christoph Hellwig wrote:
+> nbd_config_put currently clears discard_sectors when unusing a device.
+> This is pretty odd behavior and different from the sector size
+> configuration which is simply left in places and then reconfigured when
+> nbd_set_size is as part of configuring the device.  Change nbd_set_size
+> to clear discard_sectors if discard is not supported so that all the
+> queue limits changes are handled in one place.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] pktcdvd: don't set max_hw_sectors on the underlying device
-      commit: eabf5dfc2d6048d8415cd22d38d7d3e0bdb4dff9
+[1/3] nbd: don't clear discard_sectors in nbd_config_put
+      commit: 7ea201f2cc1da999b9a0a23ea20b64eb2c4719a9
+[2/3] nbd: freeze the queue for queue limits updates
+      commit: 242a49e5c8784e93a99e4dc4277b28a8ba85eac5
+[3/3] nbd: use the atomic queue limits API in nbd_set_size
+      commit: 268283244c0f018dec8bf4a9c69ce50684561f46
 
 Best regards,
 -- 
