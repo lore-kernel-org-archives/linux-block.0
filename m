@@ -1,116 +1,115 @@
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.9])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351AB8485;
-	Fri,  1 Mar 2024 01:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.9
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D903B2AF0D;
+	Fri,  1 Mar 2024 02:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709257719; cv=none; b=pbrYsGSqYeVprgGm6oQtS8yXdKUGNHOAsNsS21BB4JncOK8gXRcRwLVLoKdoDYyafb9jE31N2ebd9PR7YSua69JjYN5HMjG9ZPnFkw/HVLprhg3X3c4pSSgC0DtyL/HYHamfYzLCATKvJ+Y1/4/tWgm8a47KbucEPA9/C9FYuSE=
+	t=1709259221; cv=none; b=q+y9ccWTEWCyQtdx80k8ss7310sKU3NVfw1mLfrRou0LQcVCHBRELwGh3hkqmF95sbhJilJzwreHpBX7F7UmX5uvl2lxksJpuiu2uOJ0DtwRULDifIVifuPKr2TawwIxLCuNld1l9SpZnHXh5rrySqmmx4/eETLflgEQl6KqpiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709257719; c=relaxed/simple;
-	bh=ddO+vaPFr8wczH7Xw3KlmXH+rU3xHKclnerM9eMBgFQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mtaX1dfseg+cGn6lORxoNpDBZEr9s55Op9mx3DLLId2wORl/vcSZ8q2zcr1suC18KvOQA4PTfZ+d0TYTq1eb6JWtTg5DW5aLPDlVjnr5TosZkYRrw7NaEFxUrsH/qL3GmiuKxqjpcDZbauBjgjqwwRZh/QOwWp2VCCDaC1SbpEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=P+q56zxY; arc=none smtp.client-ip=117.135.210.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="P+q56zxY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=RQsxh
-	LQeP7zTe9uqV+xUV9NFx2bDBH1Lqec4fhz8SUY=; b=P+q56zxYZ6kAWP1DICpoV
-	qdFOzqJNfwmuXIGxDmSN7njlhUS9qfWI79YCpylKgbt4FlWPVYiR6u0P2To9IeHl
-	KpqH9tREyn4FJbk99ZXo0nUyb2g1Kb+PxR18Hv9pqiwwfLb6yYQ2MQSm+M3tKwwK
-	NEcHtQP0KiyxCSy7JXu1rI=
-Received: from localhost.localdomain (unknown [116.128.244.171])
-	by gzga-smtp-mta-g1-0 (Coremail) with SMTP id _____wDn7+APMOFlZSfbBA--.18054S12;
-	Fri, 01 Mar 2024 09:32:43 +0800 (CST)
-From: Genjian <zhanggenjian@126.com>
-To: stable@vger.kernel.org
-Cc: axboe@kernel.dk,
-	stable@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhanggenjian123@gmail.com,
-	Siddh Raman Pant <code@siddh.me>,
-	syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com,
-	Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Genjian Zhang <zhanggenjian@kylinos.cn>
-Subject: [PATCH 4.19.y 8/9] loop: Check for overflow while configuring loop
-Date: Fri,  1 Mar 2024 09:30:27 +0800
-Message-Id: <20240301013028.2293831-9-zhanggenjian@126.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240301013028.2293831-1-zhanggenjian@126.com>
-References: <20240301013028.2293831-1-zhanggenjian@126.com>
+	s=arc-20240116; t=1709259221; c=relaxed/simple;
+	bh=NPD/17SvfvonoQ1qrXhKNqN7Pwo5QKQggEW33QEBWeY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qfD0dyWxVn+SPVk1ebxteC5GsrBUqwysHXMd3MbH7JtV27pGD7vOfgnbfcVJbknQb3aZQIe2v2/9yebX/GJxLYKpZIYhVcJu4mcFInp8eyOBjPxbeO3mYXmS744bksf/iHp0yJDEMlEzImmECECN/PhmCkI7oKJCXiTLf15qZjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TmBQn5z23z1h142;
+	Fri,  1 Mar 2024 10:11:13 +0800 (CST)
+Received: from kwepemm600017.china.huawei.com (unknown [7.193.23.234])
+	by mail.maildlp.com (Postfix) with ESMTPS id 15F1D1A016B;
+	Fri,  1 Mar 2024 10:13:30 +0800 (CST)
+Received: from [10.174.179.234] (10.174.179.234) by
+ kwepemm600017.china.huawei.com (7.193.23.234) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 1 Mar 2024 10:13:28 +0800
+Message-ID: <8d49ad72-4d51-27b9-1c0e-0948942f8027@huawei.com>
+Date: Fri, 1 Mar 2024 10:13:28 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
+ 07/12] iov_iter: Convert iterate*() to inline funcs
+To: Linus Torvalds <torvalds@linux-foundation.org>, Al Viro <viro@kernel.org>
+CC: David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Christian Brauner <christian@brauner.io>,
+	David Laight <David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-mm@kvack.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Kefeng Wang
+	<wangkefeng.wang@huawei.com>
+References: <20230925120309.1731676-1-dhowells@redhat.com>
+ <20230925120309.1731676-8-dhowells@redhat.com>
+ <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com>
+ <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
+ <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
+ <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com>
+ <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
+From: Tong Tiangen <tongtiangen@huawei.com>
+In-Reply-To: <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDn7+APMOFlZSfbBA--.18054S12
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Zr1xur4Utw4DAF45AFW5Wrg_yoW8Kw18pF
-	43WryUZ3yrKF4UCFsrt34kXryrW3WDGFy3G39Fy345u390vrnavry7Cr93ur95JryUZFWS
-	gFn3Jry8Z3WUZrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UHCJQUUUUU=
-X-CM-SenderInfo: x2kd0wxjhqyxldq6ij2wof0z/1tbi5h+UfmVLY1IzzQAAsy
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600017.china.huawei.com (7.193.23.234)
 
-From: Siddh Raman Pant <code@siddh.me>
 
-[ Upstream commit c490a0b5a4f36da3918181a8acdc6991d967c5f3 ]
 
-The userspace can configure a loop using an ioctl call, wherein
-a configuration of type loop_config is passed (see lo_ioctl()'s
-case on line 1550 of drivers/block/loop.c). This proceeds to call
-loop_configure() which in turn calls loop_set_status_from_info()
-(see line 1050 of loop.c), passing &config->info which is of type
-loop_info64*. This function then sets the appropriate values, like
-the offset.
+在 2024/3/1 1:32, Linus Torvalds 写道:
+> On Thu, 29 Feb 2024 at 00:13, Tong Tiangen <tongtiangen@huawei.com> wrote:
+>>
+>> See the logic before this patch, always success (((void)(K),0)) is
+>> returned for three types: ITER_BVEC, ITER_KVEC and ITER_XARRAY.
+> 
+> No, look closer.
+> 
+> Yes, the iterate_and_advance() macro does that "((void)(K),0)" to make
+> the compiler generate better code for those cases (because then the
+> compiler can see that the return value is a compile-time zero), but
+> notice how _copy_mc_to_iter() didn't use that macro back then. It used
+> the unvarnished __iterate_and_advance() exactly so that the MC copy
+> case would *not* get that "always return zero" behavior.
+> 
+> That goes back to (in a different form) at least commit 1b4fb5ffd79b
+> ("iov_iter: teach iterate_{bvec,xarray}() about possible short
+> copies").
+> 
+> But hardly anybody ever tests this machine-check special case code, so
+> who knows when it broke again.
+> 
+> I'm just looking at the source code, and with all the macro games it's
+> *really* hard to follow, so I may well be missing something.
+> 
+>> Maybe we're all gonna fix it back? as follows：
+> 
+> No. We could do it for the kvec and xarray case, just to get better
+> code generation again (not that I looked at it, so who knows), but the
+> one case that actually uses memcpy_from_iter_mc() needs to react to a
+> short write.
+> 
+> One option might be to make a failed memcpy_from_iter_mc() set another
+> flag in the iter, and then make fault_in_iov_iter_readable() test that
+> flag and return 'len' if that flag is set.
+> 
+> Something like that (wild handwaving) should get the right error handling.
+> 
+> The simpler alternative is maybe something like the attached.
+> COMPLETELY UNTESTED. Maybe I've confused myself with all the different
+> indiraction mazes in the iov_iter code.
+> 
+>                       Linus
 
-loop_device has lo_offset of type loff_t (see line 52 of loop.c),
-which is typdef-chained to long long, whereas loop_info64 has
-lo_offset of type __u64 (see line 56 of include/uapi/linux/loop.h).
+Hi Linus:
 
-The function directly copies offset from info to the device as
-follows (See line 980 of loop.c):
-	lo->lo_offset = info->lo_offset;
+The method in the attachment i have tested before is feasible and can
+solve this deadloop problem. I also have some confusion about the
+iov_iter code. Let's take a look at manitainer's comments to see whether
+there are more comprehensive considerations.
 
-This results in an overflow, which triggers a warning in iomap_iter()
-due to a call to iomap_iter_done() which has:
-	WARN_ON_ONCE(iter->iomap.offset > iter->pos);
-
-Thus, check for negative value during loop_set_status_from_info().
-
-Bug report: https://syzkaller.appspot.com/bug?id=c620fe14aac810396d3c3edc9ad73848bf69a29e
-
-Reported-and-tested-by: syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com
-Cc: stable@vger.kernel.org
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-Signed-off-by: Siddh Raman Pant <code@siddh.me>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20220823160810.181275-1-code@siddh.me
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Genjian Zhang <zhanggenjian@kylinos.cn>
----
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0fefd21f0c71..c1caa3e2355f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1271,6 +1271,11 @@ loop_set_status_from_info(struct loop_device *lo,
- 
- 	lo->lo_offset = info->lo_offset;
- 	lo->lo_sizelimit = info->lo_sizelimit;
-+
-+	/* loff_t vars have been assigned __u64 */
-+	if (lo->lo_offset < 0 || lo->lo_sizelimit < 0)
-+		return -EOVERFLOW;
-+
- 	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
- 	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
- 	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
--- 
-2.25.1
-
+Thanks,
+Tong.
