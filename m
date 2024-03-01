@@ -1,99 +1,87 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494F370CB1
-	for <linux-block@vger.kernel.org>; Fri,  1 Mar 2024 16:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694CA1FAB
+	for <linux-block@vger.kernel.org>; Fri,  1 Mar 2024 16:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709309407; cv=none; b=lJAqVAMJXO1v4nbSiGw7KwOK7TtRjzd4huLtVyUNNNb/3ivaIme+h9HUQwzUJECE0ZEWJOHWQEEGcPYjUMsj4URWvGwLoawfjXycecbVj9L3WTD32sZTtsdUh2ESANGqhRRhdjj9BMrTWw6UFLUY4QWtlHEyXEKIPoEB4BKGY18=
+	t=1709310838; cv=none; b=AEd1VIh9UeNMsf98Y/AxkGiOYme35ZosDUiS2sgJx6RwBCWvv67tJdoFRucIt+bV8/bOR2QOcnVi8kr+jdU3lU/JfcsrLAAULBw4DevbVlU99I6slTumhjf+F8jN0cQ+xIxgkqC7v+YdNTkFOmnxnEksSC+KLKX2yxc8nHz9rdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709309407; c=relaxed/simple;
-	bh=Y6+jWBd/t6CiAA0kp9R8h7Cz6SqJvgjsnNxHqUyPW/o=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=S+wA5KCABNn2lndn6l/72JLlLmOlTBb9DgH0RGqCaAfCq3yRrxxUEKqWHNYDZPLdAStx2gmC2OTEzf9YozyniiygEudyYji6y/8Pa/+de43f9upsWm/LDdSeGefuljaMLSsGMfSaYujXmi+Xnr29yNgTwVsmOdtlH7rw/A9f+Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xz7lX7By; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xz7lX7By"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7c787eee137so34014039f.0
-        for <linux-block@vger.kernel.org>; Fri, 01 Mar 2024 08:09:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709309396; x=1709914196; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yJew46mGVrQcepDWbKAtHr/vU7a6ybvJN1TJ5Pc2mp4=;
-        b=xz7lX7By/LtONYtboBVYlKjTL9MXYNtmVNgXzc+GO0VzYElNtQh0ddvUhXQXEDfQup
-         hFkJB3kBuPgRI0lrW/B8n8t4VHg9/BoxEO/Nu3LLLJjuVuAHraQcS8vYHrn8cxS309jM
-         x2KgckGir6a0ZFvWK4vTpcxYazd6pjcchyu1KGmGgGwBdDXJFYyVoaMR34kc6gcJ/f52
-         adRUlNqPG3l82Eqa6zk2Od77yPGk3pf2tWUB84YwpyvncO2pI1n59kDffFGw1ZSAymU3
-         yCkgKN22OCL+VXNaHuYZW7UbSwhKsihXyvCbNysQ+jkt7thY4y9U4FMbTn3rRrxWfQBB
-         h+pA==
+	s=arc-20240116; t=1709310838; c=relaxed/simple;
+	bh=uZkYzVZRVMCYpz+mzsZ1ALFdiU6r7O1qSRdFWdrt5uo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A3CKG75KMktpGN87WJBt4XL/YNhzMD71qv0XpoA0EQTQZwtOw4GV61RO9O3/sdqbGmohNcY6mdAM1Y4rYSoNcTtEnDURDbDspU4y+Lq8CdvrP+wJoiQTjiGru91gpk7wOe5DGGqIpTy1NIPrb6qGh4oiyNc0ua1LfqEr9swvg5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5dbd519bde6so1948588a12.1
+        for <linux-block@vger.kernel.org>; Fri, 01 Mar 2024 08:33:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709309396; x=1709914196;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yJew46mGVrQcepDWbKAtHr/vU7a6ybvJN1TJ5Pc2mp4=;
-        b=E/TzAVGrR9s4Hwfw7HGVSmyAnNEJmQGpI4NEaPHsLG4uO/Jsw04hDG7AR8gTYW5TRP
-         uCWFe0lB7uREOHz76tXPAKR6V7xkXLP8us/w6HYa9D+laMiDGJmkaEENLYpt5QKCGACp
-         xBVOh565hhm3VKUTwIFSoKgRD5gXggbClwqtRL81w8BPYpgd+VpHT1zryk3az4iaCaNz
-         vhvWTPeU6s5Oyq1AYKNjgtlAnbn0D5fWm5XjWRaBwdqlRnLDcxFw+HM2IKd3/kEeHt8Y
-         qq7fhaKgrURfyQzDwehaIFs+sWORLSAracySKTLnmGgZGi9WcjrLurHH7H2qBs1bGivI
-         CCOg==
-X-Gm-Message-State: AOJu0YykQs44grQXQj/PBuac9CtHXlsFNDhpN+t3QcuYnz95KNF7o3BG
-	PrHtRpGojlSQe2nrj+2s8baX1ILwcPFODnLfqqbA4Xc1aaaQ8t8/BC3Pqny5/+F0wdVaXo93898
-	k
-X-Google-Smtp-Source: AGHT+IHa+2XKvuX/YGHbVraqcL9Od3Ukf1I04lrjP8hK/gZGE1PtSs318j1J4WJuIZhddUhqNtg3Mg==
-X-Received: by 2002:a5e:950f:0:b0:7c8:2946:af83 with SMTP id r15-20020a5e950f000000b007c82946af83mr1066682ioj.1.1709309396427;
-        Fri, 01 Mar 2024 08:09:56 -0800 (PST)
-Received: from [127.0.0.1] ([99.196.129.26])
-        by smtp.gmail.com with ESMTPSA id j13-20020a02cc6d000000b00474ab85e3ebsm865136jaq.130.2024.03.01.08.09.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 08:09:55 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org
-In-Reply-To: <20240229143846.1047223-2-hch@lst.de>
-References: <20240229143846.1047223-1-hch@lst.de>
- <20240229143846.1047223-2-hch@lst.de>
-Subject: Re: [PATCH 1/3] nbd: don't clear discard_sectors in nbd_config_put
-Message-Id: <170930939076.1106749.1495501234832632960.b4-ty@kernel.dk>
-Date: Fri, 01 Mar 2024 09:09:50 -0700
+        d=1e100.net; s=20230601; t=1709310837; x=1709915637;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+4tAl8o/EZq5bn0YeTj7EYMSrlJ3Bl+m9X12avWxbvE=;
+        b=Kb0ht9uMJd+LXyry1MJuxsjZZeEL89luFth13aIEBgyuA4J4xx4/jf+DeatMJxocBt
+         yNWNEV5rDW76SBrUlLaYB9YKpq26UT1FMASx4Auxh/tUDNeUVUPjPhJNBUSEGBDua5Id
+         6IaHkZXi3KcA2htXg43x1/O1hgsPHQ8+U6QetqIz+wCdg7i7ztJ7f1Ge891Jbe+UDT5A
+         q4c1QFLTCDSY/wtEvaoOtm/x4Tydt+1wcH5kNA/ufwBhxBecphBP/tVSzP3OCCK9Y/nc
+         XIwxj1jMyVj73nHO3LuLP5uc32R0Dyh0uOyVztJ2HwTn/fnEnG0d92LsnVRMdIQC9a3Z
+         hL9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUlb66imcP8ClwVuOcheuYiDozmVX/J1l8k4ChsJalEkg5p3pjkpYSvMymdkDZ6AP8X5jdmwHR8IxD37QToTIVvT8v686ypZih3Sg0=
+X-Gm-Message-State: AOJu0YwzwsR/JuZC2h3fO/KPrcOF1mnjEXrVgAcbUOcmsP3r2zRw5VsF
+	zgrRfFDfCzZNSyrI3EJIKkzKvI0HiqzCI5+5k8xhdegBrnT8l+ycIwv3nhYnkFU=
+X-Google-Smtp-Source: AGHT+IHdceNVpyQZsGCQCn1QEhLzR/NvShnqMky+vyWW6kRZoXif944dAjyAXytLg96tKLlrUOz+Bg==
+X-Received: by 2002:a17:90b:11c4:b0:299:61eb:c75e with SMTP id gv4-20020a17090b11c400b0029961ebc75emr2153875pjb.23.1709310836533;
+        Fri, 01 Mar 2024 08:33:56 -0800 (PST)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
+        by smtp.gmail.com with ESMTPSA id sn7-20020a17090b2e8700b00298ca131c75sm5582786pjb.24.2024.03.01.08.33.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Mar 2024 08:33:56 -0800 (PST)
+Message-ID: <399ee6af-c1da-40ab-a679-065aa82f41ab@acm.org>
+Date: Fri, 1 Mar 2024 08:33:54 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report]WARNING: CPU: 22 PID: 44011 at fs/iomap/iter.c:51
+ iomap_iter+0x32b observed with blktests zbd/010
+Content-Language: en-US
+To: eunhee83.rho@samsung.com, Yi Zhang <yi.zhang@redhat.com>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-f2fs-devel@lists.sourceforge.net"
+ <linux-f2fs-devel@lists.sourceforge.net>,
+ linux-block <linux-block@vger.kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
+ "chao@kernel.org" <chao@kernel.org>
+References: <CAHj4cs-kfojYC9i0G73PRkYzcxCTex=-vugRFeP40g_URGvnfQ@mail.gmail.com>
+ <esesb6dg5omj7e5sdnltnapuuzgmbdfmezcz6owsx2waqayc5q@36yhz4dmrxh6>
+ <CAHj4cs874FivTdmw=VMJwTzzLFZWb4OKqvNGRN0R0O+Oiv4aYA@mail.gmail.com>
+ <CAHj4cs_eOSafp0=cbwjNPR6X2342GF_cnUTcXf6RjrMnoOHSmQ@mail.gmail.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAHj4cs_eOSafp0=cbwjNPR6X2342GF_cnUTcXf6RjrMnoOHSmQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
 
-
-On Thu, 29 Feb 2024 06:38:44 -0800, Christoph Hellwig wrote:
-> nbd_config_put currently clears discard_sectors when unusing a device.
-> This is pretty odd behavior and different from the sector size
-> configuration which is simply left in places and then reconfigured when
-> nbd_set_size is as part of configuring the device.  Change nbd_set_size
-> to clear discard_sectors if discard is not supported so that all the
-> queue limits changes are handled in one place.
+On 2/29/24 23:49, Yi Zhang wrote:
+> Bisect shows it was introduced with the below commit:
 > 
-> [...]
+> commit dbf8e63f48af48f3f0a069fc971c9826312dbfc1
+> Author: Eunhee Rho <eunhee83.rho@samsung.com>
+> Date:   Mon Aug 1 13:40:02 2022 +0900
+> 
+>      f2fs: remove device type check for direct IO
 
-Applied, thanks!
+(+Eunhee)
 
-[1/3] nbd: don't clear discard_sectors in nbd_config_put
-      commit: 7ea201f2cc1da999b9a0a23ea20b64eb2c4719a9
-[2/3] nbd: freeze the queue for queue limits updates
-      commit: 242a49e5c8784e93a99e4dc4277b28a8ba85eac5
-[3/3] nbd: use the atomic queue limits API in nbd_set_size
-      commit: 268283244c0f018dec8bf4a9c69ce50684561f46
+Thank you Yi for having bisected this issue. I know this takes
+considerable effort.
 
-Best regards,
--- 
-Jens Axboe
+Eunhee, please take a look at this bug report:
+https://lore.kernel.org/all/CAHj4cs-kfojYC9i0G73PRkYzcxCTex=-vugRFeP40g_URGvnfQ@mail.gmail.com/
 
+Thanks,
 
-
+Bart.
