@@ -1,296 +1,130 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892E91754F
-	for <linux-block@vger.kernel.org>; Sat,  2 Mar 2024 16:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C064D2C683
+	for <linux-block@vger.kernel.org>; Sat,  2 Mar 2024 18:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709397444; cv=none; b=Gm6i9m8Zp3UdK4hVqkn1304w6qgDNcrHeAwJQEp4ROvAPGfID4v2p4wN6SFAq/ofYDbYEoUVMyqFx/M7EYVZTpXTfpGaXqw6OGZkPLw59Fq0foeQ2XC7WwrbY3B9mdeQIrpyIfwjmU6N/WmH6ywbauuU/UDUlccMl3uMTQbU2q4=
+	t=1709402837; cv=none; b=qyQOruENJtUXnfjRS495rCRnbgcdMEDyGU5//XGNb+hrardsTns/qa8aW5jQXsDWvP0j/blrlx66e6TlAT2Ohb5SezjVZ235edEXzkZBcL7Hf9n9EnQr3adk5SWYnLCS1qblc+J6nANYHTXgDSWMj1Cu9+X2zXwxFPpafoHeiQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709397444; c=relaxed/simple;
-	bh=9IC3fMEoEfXo3NNBOsCfC/33CDE0noCZBrsTmZNyk4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jzDvQpev3uHsW6bba0U35NFDiwFNgDvYI9kywWEqXF/LfwgbSDO6tv+UL2/gHDLItP111TiP0hDOAaSp3sp3jwU/ApEe3moH3V0BENbRMhPoRKIw4au+/cCc/qXeNmIvlPeumXNwhJe8DqcxgGK+R+jou05ssFaahdcXuhflJyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6869233d472so15187586d6.2
-        for <linux-block@vger.kernel.org>; Sat, 02 Mar 2024 08:37:22 -0800 (PST)
+	s=arc-20240116; t=1709402837; c=relaxed/simple;
+	bh=oPp+kEJm2yuQWRduHCnpZa6W+Rr0cKGzx+MpiFA+B7A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BC6Fj6Yo2wwSSyUkyiQbKlCbVBSx8IEUVn8L2brKiKSOzk4Xv2qW9DgyO0gVYZXjB19CeQh69aKW/VR+E6eU1tK8BPJNlRlC0cUTCM+h75l0BElv+NIYMSHUVNNIaRLiAta1VOM89dRXBDze9oO9vXT6y/y3tXSWZ0ZFBi/6UxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Va5mK1kk; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Va5mK1kk"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a43dba50bb7so456089166b.0
+        for <linux-block@vger.kernel.org>; Sat, 02 Mar 2024 10:07:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1709402834; x=1710007634; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tgHiAUIVGDD+1DgrVyftk8s8h5JugoTCX2MAvO9xGEU=;
+        b=Va5mK1kkShfJWAA5000tIo2BJtIjL+hFA5s1FL1F0n0/LSU6agWcql4CKyMLfAuXso
+         LjflulPGxe+td1IanUSb/ZAHRY1O7hye9Ky/3g5+AE29DMOifYoupGKPKy19HesvhUw3
+         57mLO4fPwvsIeqISDFUE5Y5MY7+FS5SUSs2zo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709397441; x=1710002241;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1bU93HGrxoKEjIsJ9NGLvb4RDQbkWY7Y2iFs9PS//8I=;
-        b=AjjAouX0QBuGGMKxY/svFlUt0zD1jgGqMggPAeovv0BJmuJR3yrZki4UN83NFdupOh
-         jqVM9O1X4zDP1MHmEnes4n4SQDPyX/MmWkg/ogBBhty5nNIml1Rwzg0NdObwRIbjpwXy
-         rSmFQV5nuq5OF2wFiBReWeVfpUXkZWEukWPtybnqMXEhql45S/1dwhUFydDFTp615EuQ
-         7uZdAyWPSxjmLCcAmLIalVf6cEaMVWpB94lIthNlL2ggZ5nClcI9KQzAAMFdG3qj+qSN
-         A1e+p3zZutYBIhZgHYyzrn1+eA44RbRlg/o/BWXxD0D+1aT7clCuLVBd70AinQ9nOJl2
-         FUCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXpfIO6MDa6vJOMGU0Bob8Cca8XMn28i90aH0qDtzw88tgzm4AFDPCRzGXTJ8i2KkNU+0JeYmVFOF3U2ZCz0eE6GrcAWU9h+FmJ074=
-X-Gm-Message-State: AOJu0YwGUbWKN7Wk/yPxvU1kAW9DwZxVaOAUTFPX3yLgKm1A680ge62+
-	/nZS1A0r1d6ROjqb17Xc5JvtTjKu5pDSBjygric0D4HCvgc2tX+b/DWhnRRDjA==
-X-Google-Smtp-Source: AGHT+IGWfJd4hsp4cquzrMgFaq/8ztZK/NQH0jQErvnt6KcdvzJSodCboJ3PnepuNNUxb0g3iW3fHA==
-X-Received: by 2002:a0c:f885:0:b0:690:4916:4de9 with SMTP id u5-20020a0cf885000000b0069049164de9mr4614368qvn.34.1709397441567;
-        Sat, 02 Mar 2024 08:37:21 -0800 (PST)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id ks30-20020a056214311e00b0068ffde5efb0sm3123189qvb.49.2024.03.02.08.37.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Mar 2024 08:37:21 -0800 (PST)
-Date: Sat, 2 Mar 2024 11:37:20 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-	serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-	axboe@kernel.dk, agk@redhat.com, eparis@redhat.com,
-	paul@paul-moore.com, linux-doc@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, audit@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [RFC PATCH v13 14/20] dm verity: consume root hash digest and
- signature data via LSM hook
-Message-ID: <ZeNVwBkbw2HlMRfa@redhat.com>
-References: <1709168102-7677-1-git-send-email-wufan@linux.microsoft.com>
- <1709168102-7677-15-git-send-email-wufan@linux.microsoft.com>
+        d=1e100.net; s=20230601; t=1709402834; x=1710007634;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tgHiAUIVGDD+1DgrVyftk8s8h5JugoTCX2MAvO9xGEU=;
+        b=KLkN0Leb+FFNDmg8pJT82UQwXrLxJ/oKQCKbbDoEIa/cOcfDVhTF6Wknmmn7jw2bRr
+         aJoPuOtiBoKfPuxBusrNNw43TgdTlQ5thG1ZsVjIRxE2SuXTaJmJLu+CmvesBt0lJJzb
+         EfStk+3m7FqB/dmNCqRzaWUoeM+5iPt12gRpLCcCfGLJXJbPsGoV8c2glf3VRAhtvjdE
+         wp/hj4DaGFDXVeDELwJCBeXh0NUhejDmMDNL7MrvzpDF8HkW7Z2EFu3GSGLejKd5ld9S
+         uBWKUaYzuNOKjs6shXK4zxxNWs5dRlCIoj/LjU+p2gafwRfKgF4KlX7MBh8cD0QDrvVr
+         I+cg==
+X-Forwarded-Encrypted: i=1; AJvYcCUir03ioR/GPkPHwe8w7Zs9K8mdwteAYDK5TWZx3S6lp1LPWrg0PYF8cq2vjrJnXmapO240Ko5+bqXqTzyJGcgGb3zK8BT4xl0F/SY=
+X-Gm-Message-State: AOJu0Yztryw9vd2+wIpHMGQ3ynvGVaVIIaHI20AEgaAY4kPFh5wqVpmN
+	aM4lcb8r1godKYuFqFojtMdzse6uQWvWHEEzpcw/1SjxzaAHorFjs5wqsnoVf1ixIH2EguS61ea
+	xBquoOQ==
+X-Google-Smtp-Source: AGHT+IHWAN70QxzACpgF2T9LDXGIPRImAzvsvRMOKLllGzAuN5GoEU98GoQHzXY/VUeWnyt1OeU21Q==
+X-Received: by 2002:a17:906:35c9:b0:a44:e3db:aaf0 with SMTP id p9-20020a17090635c900b00a44e3dbaaf0mr1072651ejb.52.1709402833810;
+        Sat, 02 Mar 2024 10:07:13 -0800 (PST)
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
+        by smtp.gmail.com with ESMTPSA id ub27-20020a170907c81b00b00a440ac20f06sm2961328ejc.167.2024.03.02.10.07.12
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Mar 2024 10:07:13 -0800 (PST)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a445587b796so338444466b.1
+        for <linux-block@vger.kernel.org>; Sat, 02 Mar 2024 10:07:12 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUDV+T+rA1AdLELd/ZvufOkK+Vm/wtQQ7Bdmsg9dHxkBKMVZC0bmWfX2kKXyOObe+U+dkoE3iCKv3BL7/YdiK9keP0NbpxYH5sj8PE=
+X-Received: by 2002:a17:906:2c53:b0:a44:f370:e2ce with SMTP id
+ f19-20020a1709062c5300b00a44f370e2cemr785292ejh.16.1709402832627; Sat, 02 Mar
+ 2024 10:07:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1709168102-7677-15-git-send-email-wufan@linux.microsoft.com>
+References: <20230925120309.1731676-1-dhowells@redhat.com> <20230925120309.1731676-8-dhowells@redhat.com>
+ <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com> <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
+ <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
+ <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com> <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
+ <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com> <f914a48b-741c-e3fe-c971-510a07eefb91@huawei.com>
+In-Reply-To: <f914a48b-741c-e3fe-c971-510a07eefb91@huawei.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 2 Mar 2024 10:06:56 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whBw1EtCgfx0dS4u5piViXA3Q2fuGO64ZuGfC1eH_HNKg@mail.gmail.com>
+Message-ID: <CAHk-=whBw1EtCgfx0dS4u5piViXA3Q2fuGO64ZuGfC1eH_HNKg@mail.gmail.com>
+Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
+ 07/12] iov_iter: Convert iterate*() to inline funcs
+To: Tong Tiangen <tongtiangen@huawei.com>
+Cc: Al Viro <viro@kernel.org>, David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@lst.de>, Christian Brauner <christian@brauner.io>, 
+	David Laight <David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>, 
+	Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kefeng Wang <wangkefeng.wang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 28 2024 at  7:54P -0500,
-Fan Wu <wufan@linux.microsoft.com> wrote:
+On Sat, 2 Mar 2024 at 01:37, Tong Tiangen <tongtiangen@huawei.com> wrote:
+>
+> I think this solution has two impacts:
+> 1. Although it is not a performance-critical path, the CPU usage may be
+> affected by one more memory copy in some large-memory applications.
 
-> From: Deven Bowers <deven.desai@linux.microsoft.com>
-> 
-> dm-verity provides a strong guarantee of a block device's integrity. As
-> a generic way to check the integrity of a block device, it provides
-> those integrity guarantees to its higher layers, including the filesystem
-> level.
-> 
-> An LSM that control access to a resource on the system based on the
-> available integrity claims can use this transitive property of
-> dm-verity, by querying the underlying block_device of a particular
-> file.
-> 
-> The digest and signature information need to be stored in the block
-> device to fulfill the next requirement of authorization via LSM policy.
-> This will enable the LSM to perform revocation of devices that are still
-> mounted, prohibiting execution of files that are no longer authorized
-> by the LSM in question.
-> 
-> This patch added two security hook calls in dm-verity to save the
-> dm-verity roothash and the roothash signature to the block device's
-> LSM blobs. The hook calls are depended on CONFIG_IPE_PROP_DM_VERITY,
-> which will be introduced in the next commit.
-> 
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> ---
-> v2:
->   + No Changes
-> 
-> v3:
->   + No changes
-> 
-> v4:
->   + No changes
-> 
-> v5:
->   + No changes
-> 
-> v6:
->   + Fix an improper cleanup that can result in
->     a leak
-> 
-> v7:
->   + Squash patch 08/12, 10/12 to [11/16]
->   + Use part0 for block_device, to retrieve the block_device, when
->     calling security_bdev_setsecurity
-> 
-> v8:
->   + Undo squash of 08/12, 10/12 - separating drivers/md/ from
->     security/ & block/
->   + Use common-audit function for dmverity_signature.
->   + Change implementation for storing the dm-verity digest to use the
->     newly introduced dm_verity_digest structure introduced in patch
->     14/20.
->   + Create new structure, dm_verity_digest, containing digest algorithm,
->     size, and digest itself to pass to the LSM layer. V7 was missing the
->     algorithm.
->   + Create an associated public header containing this new structure and
->     the key values for the LSM hook, specific to dm-verity.
->   + Additional information added to commit, discussing the layering of
->     the changes and how the information passed will be used.
-> 
-> v9:
->   + No changes
-> 
-> v10:
->   + No changes
-> 
-> v11:
->   + Add an optional field to save signature
->   + Move the security hook call to the new finalize hook
-> 
-> v12:
->   + No changes
-> 
-> v13:
->   + No changes
-> ---
->  drivers/md/dm-verity-target.c | 71 +++++++++++++++++++++++++++++++++++
->  drivers/md/dm-verity.h        |  6 +++
->  include/linux/dm-verity.h     | 19 ++++++++++
->  3 files changed, 96 insertions(+)
->  create mode 100644 include/linux/dm-verity.h
-> 
-> diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-> index a99ef30e45ca..e7bc6afae708 100644
-> --- a/drivers/md/dm-verity-target.c
-> +++ b/drivers/md/dm-verity-target.c
-> @@ -13,6 +13,7 @@
->   * access behavior.
->   */
->  
-> +#include "dm-core.h"
->  #include "dm-verity.h"
->  #include "dm-verity-fec.h"
->  #include "dm-verity-verify-sig.h"
+Compared to the IO, the extra memory copy is a non-issue.
 
-Why are you including dm-core.h? (DM targets really shouldn't need it).
+If anything, getting rid of the "copy_mc" flag removes extra code in a
+much more important path (ie the normal iov_iter code).
 
-And from that header:
+> 2. If a hardware memory error occurs in "good location" and the
+> ".copy_mc" is removed, the kernel will panic.
 
-/*
- * DM core internal structures used directly by dm.c, dm-rq.c and dm-table.c.
- * DM targets must _not_ deference a mapped_device or dm_table to directly
- * access their members!
- */
+That's always true. We do not support non-recoverable machine checks
+on kernel memory. Never have, and realistically probably never will.
 
-> @@ -22,6 +23,9 @@
->  #include <linux/scatterlist.h>
->  #include <linux/string.h>
->  #include <linux/jump_label.h>
-> +#include <linux/security.h>
-> +#include <linux/dm-verity.h>
-> +#include <crypto/hash_info.h>
->  
->  #define DM_MSG_PREFIX			"verity"
->  
-> @@ -990,6 +994,17 @@ static void verity_io_hints(struct dm_target *ti, struct queue_limits *limits)
->  	blk_limits_io_min(limits, limits->logical_block_size);
->  }
->  
-> +#ifdef CONFIG_IPE_PROP_DM_VERITY
-> +static void verity_free_sig(struct dm_verity *v)
-> +{
-> +	kfree(v->root_digest_sig);
-> +}
-> +#else
-> +static inline void verity_free_sig(struct dm_verity *v)
-> +{
-> +}
-> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
-> +
->  static void verity_dtr(struct dm_target *ti)
->  {
->  	struct dm_verity *v = ti->private;
-> @@ -1008,6 +1023,7 @@ static void verity_dtr(struct dm_target *ti)
->  	kfree(v->salt);
->  	kfree(v->root_digest);
->  	kfree(v->zero_digest);
-> +	verity_free_sig(v);
->  
->  	if (v->tfm)
->  		crypto_free_ahash(v->tfm);
-> @@ -1199,6 +1215,25 @@ static int verity_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
->  	return r;
->  }
->  
-> +#ifdef CONFIG_IPE_PROP_DM_VERITY
-> +static int verity_init_sig(struct dm_verity *v, const void *sig,
-> +			   size_t sig_size)
-> +{
-> +	v->sig_size = sig_size;
-> +	v->root_digest_sig = kmalloc(v->sig_size, GFP_KERNEL);
-> +	if (!v->root_digest)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
-> +#else
-> +static inline int verity_init_sig(struct dm_verity *v, const void *sig,
-> +				  size_t sig_size)
-> +{
-> +	return 0;
-> +}
-> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
-> +
->  /*
->   * Target parameters:
->   *	<version>	The current format is version 1.
-> @@ -1407,6 +1442,13 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  		ti->error = "Root hash verification failed";
->  		goto bad;
->  	}
-> +
-> +	r = verity_init_sig(v, verify_args.sig, verify_args.sig_size);
-> +	if (r < 0) {
-> +		ti->error = "Cannot allocate root digest signature";
-> +		goto bad;
-> +	}
-> +
->  	v->hash_per_block_bits =
->  		__fls((1 << v->hash_dev_block_bits) / v->digest_size);
->  
-> @@ -1557,6 +1599,32 @@ int dm_verity_get_root_digest(struct dm_target *ti, u8 **root_digest, unsigned i
->  	return 0;
->  }
->  
-> +#ifdef CONFIG_IPE_PROP_DM_VERITY
-> +static int verity_finalize(struct dm_target *ti)
-> +{
-> +	struct block_device *bdev;
-> +	struct dm_verity_digest root_digest;
-> +	struct dm_verity *v;
-> +	int r;
-> +
-> +	v = ti->private;
-> +	bdev = dm_table_get_md(ti->table)->disk->part0;
+In fact, as far as I know, the hardware that caused all this code in
+the first place no longer exists, and never really made it to wide
+production.
 
-Must be for dereferencing mapped_device struct here ^
+The machine checks in question happened on pmem, now killed by Intel.
+It's possible that somebody wants to use it for something else, but
+let's hope any future implementations are less broken than the
+unbelievable sh*tshow that caused all this code in the first place.
 
-Please remove the dm-core.h include and use this instead:
+The whole copy_mc_to_kernel() mess exists mainly due to broken pmem
+devices along with old and broken CPU's that did not deal correctly
+with machine checks inside the regular memory copy ('rep movs') code,
+and caused hung machines.
 
-struct gendisk *disk = dm_disk(dm_table_get_md(ti->table));
+IOW, notice how 'copy_mc_to_kernel()' just becomes a regular
+'memcpy()' on fixed hardware, and how we have that disgusting
+copy_mc_fragile_key that gets enabled for older CPU cores.
 
-Mike
+And yes, we then have copy_mc_enhanced_fast_string() which isn't
+*that* disgusting, and that actually handles machine checks properly
+on more modern hardware, but it's still very much "the hardware is
+misdesiged, it has no testing, and nobody sane should depend on this"
 
-> +	root_digest.digest = v->root_digest;
-> +	root_digest.digest_len = v->digest_size;
-> +	root_digest.alg = v->alg_name;
-> +
-> +	r = security_bdev_setsecurity(bdev, DM_VERITY_ROOTHASH_SEC_NAME, &root_digest,
-> +				      sizeof(root_digest));
-> +	if (r)
-> +		return r;
-> +
-> +	return security_bdev_setsecurity(bdev,
-> +					 DM_VERITY_SIGNATURE_SEC_NAME,
-> +					 v->root_digest_sig,
-> +					 v->sig_size);
-> +}
-> +#endif /* CONFIG_IPE_PROP_DM_VERITY */
-> +
->  static struct target_type verity_target = {
->  	.name		= "verity",
->  	.features	= DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
+In other words, it's the usual "Enterprise Hardware" situation. Looks
+fancy on paper, costs an arm and a leg, and the reality is just sad,
+sad, sad.
+
+               Linus
