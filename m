@@ -1,244 +1,114 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B911482DF
-	for <linux-block@vger.kernel.org>; Mon,  4 Mar 2024 16:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9354F7867F
+	for <linux-block@vger.kernel.org>; Mon,  4 Mar 2024 18:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709568792; cv=none; b=O0l8sdfpAP7YIG8v84nf/JC4J8/mT+7hoCGgBumL+OdSAuqFaduAosrnl8pjt8iwmrH4NNjhYbcX4lTmVd7XBoDe+tdK0n5mnZ1giZNbn4pD/gObMjfboQzB/U1okQ2n8mk1DMuG1DPN6Uk04EPXPM3bkM2qO9snh5teVICGa3w=
+	t=1709577166; cv=none; b=CVGRJyH7S8QLv8rrtXyW68lKIyAC+y9UUr6JrsQRbbk3UiD0kSzldtDwH+2OL7F2ykiRxC37nfkMZYP0CUE+QybSRge4/XsIg0v6OtLW0qGv5hl/h6TPvK+u6u2p8fKrgoJlyh4Rzyohuw2z0nZogNHfYeA5cLnwHCWe2XDI/6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709568792; c=relaxed/simple;
-	bh=aa79Ll025HQiq0/5SNE8/Bh6stG/qQCcoKDWY8HO9MQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kYHF8wOd3w0jymAkqoCR5u4J7xuPQbT6UR94jGRgbLDUxqkIOJOOxU3qbJz0uy0KNaM/IWr6MHWVRUX63tZO4RKRCz5VnRkw4XXa7O+xy6d6ZyzMdJc/UrVKFWMd28bO89YDpRkz0fa6KPEz/LL8EvQ9Qq05HsVxnIR7GfnqU58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gOV2qGcW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BszQ/32u; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gOV2qGcW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BszQ/32u; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1709577166; c=relaxed/simple;
+	bh=KtfWqAbL60dmDmNJlm82ls0DTRmdSK6fujqZ9REQ7jk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T/JfVU8w3z9EGWCmKbuQDeJJQvQf8S2psB8zc8swWS24TO5KmkiGGeKNk+2U6iKN42dECP92OfAWS3hTwVG1K9GxWM+59K57j77Km4WiMRhQsRuH2lYmTztjCKI4wPm+DAjFTvv04cLcfWX8UvWx8g57o+6AYF4/tgxSfrtj1ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=BbWTIXvV; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gOV2qGcW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BszQ/32u";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gOV2qGcW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BszQ/32u"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 666191FD86;
-	Mon,  4 Mar 2024 16:13:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1709568789; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HYr10uhGwyJhv2Bn7zavFpYfS5IaeB3cAS6xVvgTdDo=;
-	b=gOV2qGcW89d+1AGWnqB3UVmmKau9AgVQfy8CQ802t7Y5uyn5MDrz3YS1AQs7Mug/PSJJJ2
-	TBZGApNww8wDtqWG1ccHz8mhcQ7lwBeBEAsMhqNpbXAg4YuxPfp5YEjQlC0PtfeIse23mW
-	m6wmNdemGbj6lnWfbaGJDiI+lie+bqA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1709568789;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HYr10uhGwyJhv2Bn7zavFpYfS5IaeB3cAS6xVvgTdDo=;
-	b=BszQ/32uH7xm81KT9QKPwFair1gE6Gds3QFAa9l+G3nP1wFO3q6Z6hySQPKyn6XfvCm8Ne
-	DK3zWWn9ADyUPmBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1709568789; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HYr10uhGwyJhv2Bn7zavFpYfS5IaeB3cAS6xVvgTdDo=;
-	b=gOV2qGcW89d+1AGWnqB3UVmmKau9AgVQfy8CQ802t7Y5uyn5MDrz3YS1AQs7Mug/PSJJJ2
-	TBZGApNww8wDtqWG1ccHz8mhcQ7lwBeBEAsMhqNpbXAg4YuxPfp5YEjQlC0PtfeIse23mW
-	m6wmNdemGbj6lnWfbaGJDiI+lie+bqA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1709568789;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HYr10uhGwyJhv2Bn7zavFpYfS5IaeB3cAS6xVvgTdDo=;
-	b=BszQ/32uH7xm81KT9QKPwFair1gE6Gds3QFAa9l+G3nP1wFO3q6Z6hySQPKyn6XfvCm8Ne
-	DK3zWWn9ADyUPmBg==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 53BDB139C6;
-	Mon,  4 Mar 2024 16:13:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id VugDExXz5WUgewAAn2gu4w
-	(envelope-from <dwagner@suse.de>); Mon, 04 Mar 2024 16:13:09 +0000
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v1 2/2] nvme/048: add reconnect after ctrl key change
-Date: Mon,  4 Mar 2024 17:13:03 +0100
-Message-ID: <20240304161303.19681-3-dwagner@suse.de>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240304161303.19681-1-dwagner@suse.de>
-References: <20240304161303.19681-1-dwagner@suse.de>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="BbWTIXvV"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3fb8b0b7acso630195966b.2
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2024 10:32:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1709577163; x=1710181963; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=LczxhZqLEWu5Pcwo59Oo1yTNgbAQRYyUzuwaCxJZY78=;
+        b=BbWTIXvVXccjOIm6D8UrLPSNEOVbttfbMP1WZ4f0oou7KQSadyMmLEJjcYg6b35Rof
+         ArKb0L6JTwpK2zZZTd4V4+h4CdxqULG4VZ0zJMb2ytUQUYOxKqYf+I4LtYAblhvjvW59
+         1IOUrloYE4kqblgcXfSGJAjvn32ooaRHjFsMk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709577163; x=1710181963;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LczxhZqLEWu5Pcwo59Oo1yTNgbAQRYyUzuwaCxJZY78=;
+        b=fRqDjhE+TLMpB/INHIUNE11G44BuQ608sDth4XgKf0s0HbyZ8Ia868PPtnnB2lL2sR
+         3prYO/pmf+n6yzAsSY/AN7yzajdhWcJuntAl70/UEBQ9+bLHiiav1vF1VVek+QlPsRSW
+         3vIHlD6oYNeMXrqIafEJzY50zwWMu/njq+tUxHH/oodotnDVt93lOm6rcaybajuaw5qm
+         p1RAf9DP+YQhyVrffS2o8ZZKu+O0ARSpkIvq9o4RgeRE21EP7LYJo0ocVuRAb2j5DdVg
+         aRd33bT1C4bIeVmo5iJdc7yFGyYQs2+jTInNCE9LMdk1SouPabAsjSBs3lmmQMwWbD2q
+         ppkg==
+X-Forwarded-Encrypted: i=1; AJvYcCXGJFF4m+2pBALO3d8SJ671rkkER39x071P3BM7ha1KuO2e2yOEQBXqPM1GnR7iX26MDiMOtQ4VJpmXKM5rxAUPtRs9d75tQYPQ8Fo=
+X-Gm-Message-State: AOJu0YwQtEIhSkt4LZYo5ocbCPuQRpoSdtC1QtpKo7yJmMpWGtESGURX
+	mPCWFE/jflXbCiytuEBi7lC6B3tphf4HYUPzKiGVCVu7WhhdzTiPLhBSD/Sr2OhOgRI1gQSbtnG
+	gWEI=
+X-Google-Smtp-Source: AGHT+IFLlhJuQPg5b9akPFfqa28pmtNta85KTe/S5eaTadvWxN8IjWFjg036avmoBy9lrGsGEtgB9A==
+X-Received: by 2002:a17:906:3954:b0:a43:eeec:57b1 with SMTP id g20-20020a170906395400b00a43eeec57b1mr6331239eje.34.1709577162863;
+        Mon, 04 Mar 2024 10:32:42 -0800 (PST)
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com. [209.85.218.43])
+        by smtp.gmail.com with ESMTPSA id o26-20020a1709061d5a00b00a44f6ce3e7fsm2625722ejh.77.2024.03.04.10.32.42
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Mar 2024 10:32:42 -0800 (PST)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a3fb8b0b7acso630194266b.2
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2024 10:32:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUvUh8g+WBoy1Ykt3k2U8dKHig/nxWtTAIvXREc/Szuc3spx1qZAS3b/2xXoAxPmwd9iwuVPW090gaQJ4UnXCUb3Jew9/2J9LOBIWw=
+X-Received: by 2002:a17:906:8da:b0:a3f:ab4d:f7e3 with SMTP id
+ o26-20020a17090608da00b00a3fab4df7e3mr7570338eje.0.1709577161818; Mon, 04 Mar
+ 2024 10:32:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -3.30
-X-Spamd-Result: default: False [-3.30 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 R_MISSING_CHARSET(2.50)[];
-	 REPLY(-4.00)[];
-	 BROKEN_CONTENT_TYPE(1.50)[];
-	 RCPT_COUNT_FIVE(0.00)[6];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 BAYES_HAM(-3.00)[100.00%];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 MID_CONTAINS_FROM(1.00)[];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_TLS_ALL(0.00)[]
-X-Spam-Flag: NO
+References: <20230925120309.1731676-1-dhowells@redhat.com> <20230925120309.1731676-8-dhowells@redhat.com>
+ <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com> <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
+ <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
+ <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com> <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
+ <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com> <769021.1709553367@warthog.procyon.org.uk>
+In-Reply-To: <769021.1709553367@warthog.procyon.org.uk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 4 Mar 2024 10:32:25 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgrmt875HJNUY9a-ti0M6M1m6jHEGvCSjcOfXy_E7_X_w@mail.gmail.com>
+Message-ID: <CAHk-=wgrmt875HJNUY9a-ti0M6M1m6jHEGvCSjcOfXy_E7_X_w@mail.gmail.com>
+Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
+ 07/12] iov_iter: Convert iterate*() to inline funcs
+To: David Howells <dhowells@redhat.com>
+Cc: Tong Tiangen <tongtiangen@huawei.com>, Al Viro <viro@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Christian Brauner <christian@brauner.io>, 
+	David Laight <David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>, 
+	Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kefeng Wang <wangkefeng.wang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The re-authentication is a soft state, meaning unless the host has to
-reconnect a key change on the target side is not observed. Extend the
-current test with a forced reconnect after a key change. This
-exercises the DNR handling code of the host.
+On Mon, 4 Mar 2024 at 03:56, David Howells <dhowells@redhat.com> wrote:
+>
+> That said, I wonder if:
+>
+>         #ifdef copy_mc_to_kernel
+>
+> should be:
+>
+>         #ifdef CONFIG_ARCH_HAS_COPY_MC
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- tests/nvme/045     | 72 +++++++++++++++++++++++++++++++++++++++++++++-
- tests/nvme/045.out |  3 +-
- 2 files changed, 73 insertions(+), 2 deletions(-)
+Hmm. Maybe. We do have that
 
-diff --git a/tests/nvme/045 b/tests/nvme/045
-index be408b629771..b0527685f61f 100755
---- a/tests/nvme/045
-+++ b/tests/nvme/045
-@@ -21,6 +21,62 @@ requires() {
- 	_have_driver dh_generic
- }
- 
-+nvmf_wait_for_state() {
-+	local def_state_timeout=5
-+	local subsys_name="$1"
-+	local state="$2"
-+	local timeout="${3:-$def_state_timeout}"
-+	local nvmedev
-+	local state_file
-+	local start_time
-+	local end_time
-+
-+	nvmedev=$(_find_nvme_dev "${subsys_name}")
-+	state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
-+
-+	start_time=$(date +%s)
-+	while ! grep -q "${state}" "${state_file}"; do
-+		sleep 1
-+		end_time=$(date +%s)
-+		if (( end_time - start_time > timeout )); then
-+			echo "expected state \"${state}\" not " \
-+				"reached within ${timeout} seconds"
-+			return 1
-+		fi
-+	done
-+
-+	return 0
-+}
-+
-+nvmf_wait_for_ctrl_delete() {
-+	local def_state_timeout=5
-+	local nvmedev="$1"
-+	local timeout="${2:-$def_state_timeout}"
-+	local ctrl="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
-+	local start_time
-+	local end_time
-+
-+	start_time=$(date +%s)
-+	while [ -f "${ctrl}" ]; do
-+		sleep 1
-+		end_time=$(date +%s)
-+		if (( end_time - start_time > timeout )); then
-+			echo "controller \"${nvmedev}\" not deleted" \
-+				"within ${timeout} seconds"
-+			return 1
-+		fi
-+	done
-+
-+	return 0
-+}
-+
-+set_nvmet_attr_qid_max() {
-+	local nvmet_subsystem="$1"
-+	local qid_max="$2"
-+	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
-+
-+	echo "${qid_max}" > "${cfs_path}/attr_qid_max"
-+}
- 
- test() {
- 	echo "Running ${TEST_NAME}"
-@@ -55,7 +111,11 @@ test() {
- 			     --hostnqn "${def_hostnqn}" \
- 			     --hostid "${def_hostid}" \
- 			     --dhchap-secret "${hostkey}" \
--			     --dhchap-ctrl-secret "${ctrlkey}"
-+			     --dhchap-ctrl-secret "${ctrlkey}" \
-+			     --reconnect-delay 1
-+
-+	nvmf_wait_for_state "${def_subsysnqn}" "live"
-+	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
- 
- 	echo "Re-authenticate with original host key"
- 
-@@ -108,6 +168,16 @@ test() {
- 	rand_io_size="$(_nvme_calc_rand_io_size 4m)"
- 	_run_fio_rand_io --size="${rand_io_size}" --filename="/dev/${nvmedev}n1"
- 
-+	echo "Renew host key on the controller and force reconnect"
-+
-+	new_hostkey="$(nvme gen-dhchap-key -n ${def_subsysnqn} 2> /dev/null)"
-+
-+	_set_nvmet_hostkey "${def_hostnqn}" "${new_hostkey}"
-+
-+	# Force a reconnect
-+	set_nvmet_attr_qid_max "${def_subsysnqn}" 1
-+	nvmf_wait_for_ctrl_delete "${nvmedev}"
-+
- 	_nvme_disconnect_subsys "${def_subsysnqn}"
- 
- 	_nvmet_target_cleanup
-diff --git a/tests/nvme/045.out b/tests/nvme/045.out
-index 84a69ef5c4c6..3331304ef71a 100644
---- a/tests/nvme/045.out
-+++ b/tests/nvme/045.out
-@@ -8,5 +8,6 @@ Change DH group to ffdhe8192
- Re-authenticate with changed DH group
- Change hash to hmac(sha512)
- Re-authenticate with changed hash
--disconnected 1 controller(s)
-+Renew host key on the controller and force reconnect
-+disconnected 0 controller(s)
- Test complete
--- 
-2.44.0
+  #ifdef copy_mc_to_kernel
 
+pattern already in <linux/uaccess.h>, so clearly we've done it both ways.
+
+I personally like the "just test for the thing you are using" model,
+which is then why I did it that way, but I don't have hugely strong
+opinions on it.
+
+> and whether it's possible to find out dynamically if MCEs can occur at all.
+
+I really wanted to do something like that, and look at the source page
+to decide "is this a pmem page that can cause machine checks", but I
+didn't find any obvious way to do that.
+
+Improvement suggestions more than welcome.
+
+               Linus
