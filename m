@@ -1,177 +1,87 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEFC3F9EC
-	for <linux-block@vger.kernel.org>; Mon,  4 Mar 2024 13:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D626495EC
+	for <linux-block@vger.kernel.org>; Mon,  4 Mar 2024 15:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709560112; cv=none; b=LZ+HM4Aht6g38WYgmxKlF0ZygsD47/HRFDZXM3r1Myn9MGw4iqsVX1i1jdMJH9ox8qp8UgtYIXKh9x+h1JMECc4OmBuxYXAmJ9feQOLzPe88TWvJ1dacp42xPHCrcb2wvqKKUaIPI7iOA2gubRfXKpqmWuhZ9onWeLjpYoUmxxo=
+	t=1709566327; cv=none; b=RmIpCjNC7yX7dKu/e0hFAhw3Yx1oTUk8cI2m+RtKW+3A9O+BUfe8w5iDktY+kgO0RqU4SUMCnd6HST8QdTQKTawnmU9PQT1PKVT31LJswdl9ZfCqvauSz/G2u/kzWeuj2ngZ8JvMJDdff6xlNXzclOjtLaKfWy3MN3mBx35C1kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709560112; c=relaxed/simple;
-	bh=hgaBbvbo+0mgxP4QC+7wWAAa5uJIPz58RJN/7gCeoGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HyxkxazWjp1qfMxj6wiMsium6PzmQCYft+3evuytoXUJ2n1Lu5nVguC4svFJv0FAgGfvx5vHspFWvG9RODvYnoygyiVbSVsydNlLih7RfRDQ/g6rFxV+doSvHoCUnpVTp1XiPY4w6Piq2x049xoYqcELR3FoxeYmxve90GeRP/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bogOyDTO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YkHjq6L9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bogOyDTO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YkHjq6L9; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1709566327; c=relaxed/simple;
+	bh=jkZYHpu65nwrwTsuxM4amko09H/lzM/u/hvt7PWXRUs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ILpxyPldsl2lKL5h0/+17O3wv0VuHU8rq4bXoVqcU2oEWci+CsFZObtVUs0W/00sDwZmAofLTQa8XDppZLu+F4i+cgujOxwmhuJcBs4uB/MKYGbrEJyIq15dObZIKTLmeJ1skNdw3YcZE11KRIfb+n8+kREvsvSLchJ/TWJ/Nfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=APVbBsiC; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bogOyDTO";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YkHjq6L9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bogOyDTO";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YkHjq6L9"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 085FD76062;
-	Mon,  4 Mar 2024 13:48:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1709560109; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9dxdbCkVkX4T7z0yhU/0/V65EvjCfxxvaq6BgKKlMoI=;
-	b=bogOyDTO92rQxumAgFFVWmUwAt0G2SXjj8XyWkRDSvQ/XlfhknzRmFyLhIA8gcLpBuLtU6
-	9ckrz/akdIy/L+k6HjFHfmbqdaHcX1fMNwCziO6NLrENsmBO/MCIsakVJgyMkqKkPYcv2E
-	W7kq0sHQLZSjrQS6jTv7kuHXW1qmWH8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1709560109;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9dxdbCkVkX4T7z0yhU/0/V65EvjCfxxvaq6BgKKlMoI=;
-	b=YkHjq6L9M2yA/vrXrZW+jE6dS3rOC1qhmhoKpkfJjzgi+Zd3osTjYed5i0OcDrbZpPv1rT
-	pou7/VApKDXFCtBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1709560109; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9dxdbCkVkX4T7z0yhU/0/V65EvjCfxxvaq6BgKKlMoI=;
-	b=bogOyDTO92rQxumAgFFVWmUwAt0G2SXjj8XyWkRDSvQ/XlfhknzRmFyLhIA8gcLpBuLtU6
-	9ckrz/akdIy/L+k6HjFHfmbqdaHcX1fMNwCziO6NLrENsmBO/MCIsakVJgyMkqKkPYcv2E
-	W7kq0sHQLZSjrQS6jTv7kuHXW1qmWH8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1709560109;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9dxdbCkVkX4T7z0yhU/0/V65EvjCfxxvaq6BgKKlMoI=;
-	b=YkHjq6L9M2yA/vrXrZW+jE6dS3rOC1qhmhoKpkfJjzgi+Zd3osTjYed5i0OcDrbZpPv1rT
-	pou7/VApKDXFCtBg==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id E996E139C6;
-	Mon,  4 Mar 2024 13:48:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id ibSSNyzR5WUkUwAAn2gu4w
-	(envelope-from <dwagner@suse.de>); Mon, 04 Mar 2024 13:48:28 +0000
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Daniel Wagner <dwagner@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH blktests v2 2/2] nvme/048: make queue count check retry-able
-Date: Mon,  4 Mar 2024 14:48:26 +0100
-Message-ID: <20240304134826.31965-3-dwagner@suse.de>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240304134826.31965-1-dwagner@suse.de>
-References: <20240304134826.31965-1-dwagner@suse.de>
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="APVbBsiC"
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc25e12cc63so5319385276.0
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2024 07:32:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1709566324; x=1710171124; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jkZYHpu65nwrwTsuxM4amko09H/lzM/u/hvt7PWXRUs=;
+        b=APVbBsiC4r5Yh5f0trQCGYvtW7hQVgAgciZArgpTcKvs58dEcsKNfSm4f3xAf1qXQL
+         j1kwow8rFuh9L69nJw6ki1Gdd0VwwXZ8W7GizqXr4zyXRVYYz+tOWmCM7TP1qDpv+MKA
+         se8+Gx/RE4bR3IlXlAdcGSJ4aURzbvdA8BjGg4jdS+XRbUXWZSyZowHzTZgqAP0DKbOf
+         fTIMBCjOnX0tOtwjQqghSjSA7SlvIZSoZWQn7nsiEW66O2gxlbqwqavLy09L65wDxdt3
+         Mv/A7PlItYg0LAdCBpZeWyQ0XaxzWV+wJZUx4AyxkFq/kYFmpMawtD0EHI/HFWTZwIzj
+         uixQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709566324; x=1710171124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jkZYHpu65nwrwTsuxM4amko09H/lzM/u/hvt7PWXRUs=;
+        b=k7/kkSGAg9DDK2eGatmhaFz329r5TaXWQL48hbtX5U9sp7EYqezMf7mr/v124OtKs4
+         HQyyz/6PdgMO0wj6zYkR9jFV+LioAp9znIxFeRZ/7XcLl190nbhNnDLmMQTcd64X3XpI
+         lxUJpVL68IhMYk3paokmJ2rX3mm1Nkpce/X84tvmZ8YD+CgoI4+MnwJkMv+ltCs8racc
+         ufowtKsF0Rst2gld4T56Kk6cckwt5tPEpCUPxUntf4ACZBvhey8sw9TafgGs9EQq2zgX
+         HNf3BuB7E6ph4+puksykI85Fevasbeger1TLQjMw/tNCMiB5xVAmkaXHCOK+Lgd0Q8iX
+         eIoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJPwrO0ptONpFW3dl1ihdot36h0ylRkt9+DZXRiGXtnHljmKtBm4nHaj/FPs1V50MPr5YQQq46OMpAw/uOOBiKbV5GMYiJ0Owizhw=
+X-Gm-Message-State: AOJu0Yy/gwrdu1uS7AuAEI6T6W5FcQSw6f6d0qmbHNFG/VOP62azxOKh
+	GtjnrDkee4r5FIgExge9zvdBtb/b+AEVe1Ojc4kz3ZCCWYfiUQjXZXlEFFmoI0j7kiLodJ0GgXy
+	5e3qSb0bNWbKoF8zMbusb1rKv+5/20aMo8LpaQJ2pK/T6/noJ
+X-Google-Smtp-Source: AGHT+IHY1zzIo7EvQhjnMmC8zo2BroV2k0mHjtxSH3c9xuozB1/KwhGD5Fi33Ama/05oNzEzJ7bkxUgZDWr7JcM661E=
+X-Received: by 2002:a25:ac5e:0:b0:dc6:d1d7:c762 with SMTP id
+ r30-20020a25ac5e000000b00dc6d1d7c762mr8613958ybd.11.1709566324642; Mon, 04
+ Mar 2024 07:32:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -3.09
-X-Spamd-Result: default: False [-3.09 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 R_MISSING_CHARSET(2.50)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 REPLY(-4.00)[];
-	 BROKEN_CONTENT_TYPE(1.50)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 MID_CONTAINS_FROM(1.00)[];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-2.79)[99.07%]
-X-Spam-Flag: NO
+References: <20240226103004.281412-1-hch@lst.de> <20240226103004.281412-11-hch@lst.de>
+ <20240303151438.GB27512@lst.de>
+In-Reply-To: <20240303151438.GB27512@lst.de>
+From: Philipp Reisner <philipp.reisner@linbit.com>
+Date: Mon, 4 Mar 2024 16:31:53 +0100
+Message-ID: <CADGDV=XqJ_3biGx-rX0jMMue4-dTg=J8NjyHOU-Ufonv4QiJ-A@mail.gmail.com>
+Subject: Re: drbd queue limits conversion ping
+To: Christoph Hellwig <hch@lst.de>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	=?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>, 
+	drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We are racing with the reset path of the controller. That means, when we
-set a new queue count, we might not observe the resetting state in time.
-Thus, first check if we see the correct queue count and then the
-controller state.
+Hi Christoph,
 
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- tests/nvme/048 | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+thanks for the heads up, and sorry for not seeing it sooner. We test
+it overnight and review the patches tomorrow morning.
 
-diff --git a/tests/nvme/048 b/tests/nvme/048
-index 8c314fae9620..393dbc2a07d5 100755
---- a/tests/nvme/048
-+++ b/tests/nvme/048
-@@ -47,11 +47,25 @@ nvmf_check_queue_count() {
- 	local queue_count="$2"
- 	local nvmedev
- 	local queue_count_file
-+	local retries
- 
- 	nvmedev=$(_find_nvme_dev "${subsys_name}")
-+	queue_count=$((queue_count + 1))
-+	retries=5
-+
- 	queue_count_file=$(cat /sys/class/nvme-fabrics/ctl/"${nvmedev}"/queue_count)
-+	while [[ "${queue_count}" -ne "${queue_count_file}" ]]; do
-+		if [[ "${retries}" == 0 ]]; then
-+			echo "expected queue count ${queue_count} not set"
-+			return 1
-+		fi
-+
-+		sleep 1
-+
-+		retries=$((retries - 1))
-+		queue_count_file=$(cat /sys/class/nvme-fabrics/ctl/"${nvmedev}"/queue_count)
-+	done
- 
--	queue_count=$((queue_count + 1))
- 	if [[ "${queue_count}" -ne "${queue_count_file}" ]]; then
- 		echo "expected queue count ${queue_count} not set"
- 		return 1
-@@ -73,8 +87,8 @@ set_qid_max() {
- 	local qid_max="$2"
- 
- 	set_nvmet_attr_qid_max "${subsys_name}" "${qid_max}"
--	nvmf_wait_for_state "${subsys_name}" "live" || return 1
- 	nvmf_check_queue_count "${subsys_name}" "${qid_max}" || return 1
-+	nvmf_wait_for_state "${subsys_name}" "live" || return 1
- 
- 	return 0
- }
--- 
-2.44.0
 
+On Sun, Mar 3, 2024 at 4:14=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrote=
+:
+>
+> Dear RDBD maintainers,
+>
+> can you start the review on the drbd queue limits conversion?
+> This is the only big chunk of the queue limits conversion we haven't
+> even started reviews on, and the merge window is closing soon.
+>
