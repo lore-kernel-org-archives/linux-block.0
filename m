@@ -1,289 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007EA2C840;
-	Mon,  4 Mar 2024 20:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020A078B5E
+	for <linux-block@vger.kernel.org>; Mon,  4 Mar 2024 22:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709583449; cv=none; b=H9skxixbhDi04ii4VhbAu21gxaTSGd4GrzUYU51ioU8m7BT9oSOi1zOzU2w7w06ImbErxuZ5ocrAQSs0c13AEulkB8RBkwwzKJwdRSb2odpq670sY42c8FO7jYcZf/SfZ4tum02XUG8RahEtv4INSV8GVm3PaClPy7GYoFOEbVs=
+	t=1709590541; cv=none; b=tz7NEKEbNW2eh6m29LJ+CFQ0UJuUUh/q6+26lKzBj5xQ3q5+d1iU0JVoCJxz2DjZViC7E+bYqhGNuj4iX8Qjz/UNITinulLwopX9En9AaZJA1dbhIQG5oDmLpZ2w2bawOariD0BZfCBUr5ypTd0WDveTEfh1kZBb0Lun+gSEx64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709583449; c=relaxed/simple;
-	bh=clDidIhiTcDaNyPWQCdL6Rs1LruWiA738NpcAJs2/80=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fgNLZu8K7xoGjYp/tflv6lZkmF24UHRtcmOXv7yglnIcT2xzOW8yBU23blOtOqvVqfZzzAdsa4zjj+KfQGu+YqHAmgK7Y9iujimwd3o2MPv+yJEi0bco1OeABPPMVIFkBSD4lsQn0DTQ+RZP7UJWShe9/X4ZUdLcXlidjWgLnok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41B2C1576;
-	Mon,  4 Mar 2024 12:17:54 -0800 (PST)
-Received: from e133047.arm.com (unknown [10.57.95.7])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C84B13F738;
-	Mon,  4 Mar 2024 12:17:13 -0800 (PST)
-From: Christian Loehle <christian.loehle@arm.com>
-To: linux-kernel@vger.kernel.org
-Cc: peterz@infradead.org,
-	juri.lelli@redhat.com,
-	mingo@redhat.com,
-	rafael@kernel.org,
-	dietmar.eggemann@arm.com,
-	vschneid@redhat.com,
-	vincent.guittot@linaro.org,
-	Johannes.Thumshirn@wdc.com,
-	adrian.hunter@intel.com,
-	ulf.hansson@linaro.org,
-	andres@anarazel.de,
-	asml.silence@gmail.com,
-	linux-pm@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	Christian Loehle <christian.loehle@arm.com>
-Subject: [RFC PATCH 2/2] cpufreq/schedutil: Remove iowait boost
-Date: Mon,  4 Mar 2024 20:16:25 +0000
-Message-Id: <20240304201625.100619-3-christian.loehle@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240304201625.100619-1-christian.loehle@arm.com>
-References: <20240304201625.100619-1-christian.loehle@arm.com>
+	s=arc-20240116; t=1709590541; c=relaxed/simple;
+	bh=rSGFobPyTkrtYOKrWnakciYsu5Thh2UHXGCu4vHBxx4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kSQLuyacsAXzjl0BB27HX75jHpbGZ3wbNXUrZTYu0qJA48RcwEbeqEwvxw2pg4M7GuG1sE5cLfHr9Pa1ymRVBj2CfgKY/Cpe2HM9WhzCXoexmusZcpLsZZLYPVyvs9KHZhuo9OqhCmj7uQj+PQ4rvq5icjaIksenLEqbN38cWho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=nKE7NNwt; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="nKE7NNwt"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1dc49b00bdbso45209265ad.3
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2024 14:15:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1709590539; x=1710195339; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CARpH995S3Hk2OhajVVG/E9yFa4bHHeBmVGYbe1yvEM=;
+        b=nKE7NNwtDebQIvzwuNHl5MXrTWR1UYwV5rImMRz1fx4XP2MDAGkd2QtFgsPkmI1Du+
+         wXCtUsUKqskJFBoNfABQdyfii/cyc0e2lhvzqDeACTDNcUxB4rFIPDxRkHxlw4q/LBzE
+         KEHIEjVZskCndd0JygzSttr8UDvQWtOlI662N2fVlVAxc1y7ZQf6H9WH4JHpXNQIVscU
+         gBnbaIDCnr9enEdVG2l2qmplVGSy8wYbLigXTRwDwpA66xljxLSNE4ilcNSzcLbqqWzY
+         6nB1h4GnI52/dzRdr88JxXAZtmYHZshYZuxeEhN6ppCduLyn0g1ncwOd/iZ6gF1IJYnh
+         CPEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709590539; x=1710195339;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CARpH995S3Hk2OhajVVG/E9yFa4bHHeBmVGYbe1yvEM=;
+        b=Txsm4JhR7DWg0MKdt7eHl9nVTO7EW9kDZJpy4qzFbpDQQ0CP3slZ/6HMHlgqrAsOL+
+         LG4b14nPG6miwPzdbodczp0sfk3Hg0rA1NJVcZrmo4b3jR8XggDRdlKlfMqM0Ew8fmjE
+         C84ih6vc67NmVGNE6OfP1ZIfYRfzj4lZMT0VnAhuirWkDOi8mqNxPTcNq/sUpFt3DarT
+         tiV95NC2b8h3gh51hbRBTJoCnnc0GbnYvL9Cgvma92OY7477l1BkeT86sOiGgqjlRW+e
+         ICpE398I4+VcbKbnM4R2eFosbyncRPy8RmfrMV7scoAqbI1RkCwaMI9gI4v1XDLEyUAR
+         5H4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWo675Pe9iqgd8dv+wQV5XvV4D0XGPvPmhqZVtRS+gZNW1Azc0PpGGgOUx/sGMFsTQ/91XJzJ+PrzdUPxc7s5VBwmWbTK37eU9o2aQ=
+X-Gm-Message-State: AOJu0YwLSLl2a87xxfFcWaPqQ5OhXYWnLcnu1w71CklmkmK8rkMBA8nL
+	XHJAKkSwaDjGqf6MJc2rt0tEzXZnp12X+EoG7WblX7J8Hmt5c6p2OMLmpM3TpYA=
+X-Google-Smtp-Source: AGHT+IHjDF0RDc8u5rnaR/asbdM4SN8DQz/RLkAlmnt/uLBjLn0m2kj8Q8ebupgqkBNzu1lOIT8Y/Q==
+X-Received: by 2002:a17:902:64c9:b0:1d9:f5dd:2480 with SMTP id y9-20020a17090264c900b001d9f5dd2480mr80144pli.54.1709590539370;
+        Mon, 04 Mar 2024 14:15:39 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-192-230.pa.nsw.optusnet.com.au. [49.181.192.230])
+        by smtp.gmail.com with ESMTPSA id u12-20020a170902b28c00b001dc94fde843sm9007439plr.177.2024.03.04.14.15.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 14:15:38 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rhGat-00F5P7-2j;
+	Tue, 05 Mar 2024 09:15:35 +1100
+Date: Tue, 5 Mar 2024 09:15:35 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: djwong@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, jack@suse.cz, chandan.babu@oracle.com,
+	axboe@kernel.dk, martin.petersen@oracle.com,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 02/14] fs: xfs: Don't use low-space allocator for
+ alignment > 1
+Message-ID: <ZeZIB0G3zjaq7dWK@dread.disaster.area>
+References: <20240304130428.13026-1-john.g.garry@oracle.com>
+ <20240304130428.13026-3-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304130428.13026-3-john.g.garry@oracle.com>
 
-The previous commit provides a new cpu_util_cfs_boost_io interface for
-schedutil which uses the io boosted utilization of the per-task
-tracking strategy. Schedutil iowait boosting is therefore no longer
-necessary so remove it.
+On Mon, Mar 04, 2024 at 01:04:16PM +0000, John Garry wrote:
+> The low-space allocator doesn't honour the alignment requirement, so don't
+> attempt to even use it (when we have an alignment requirement).
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  fs/xfs/libxfs/xfs_bmap.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
+> index f362345467fa..60d100134280 100644
+> --- a/fs/xfs/libxfs/xfs_bmap.c
+> +++ b/fs/xfs/libxfs/xfs_bmap.c
+> @@ -3584,6 +3584,10 @@ xfs_bmap_btalloc_low_space(
+>  {
+>  	int			error;
+>  
+> +	/* The allocator doesn't honour args->alignment */
+> +	if (args->alignment > 1)
+> +		return 0;
 
-Signed-off-by: Christian Loehle <christian.loehle@arm.com>
----
- kernel/sched/cpufreq_schedutil.c | 152 +------------------------------
- 1 file changed, 5 insertions(+), 147 deletions(-)
+I think that's wrong.
 
-diff --git a/kernel/sched/cpufreq_schedutil.c b/kernel/sched/cpufreq_schedutil.c
-index cd0ca3cbd212..ed9fc88a74fc 100644
---- a/kernel/sched/cpufreq_schedutil.c
-+++ b/kernel/sched/cpufreq_schedutil.c
-@@ -6,8 +6,6 @@
-  * Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-  */
- 
--#define IOWAIT_BOOST_MIN	(SCHED_CAPACITY_SCALE / 8)
--
- struct sugov_tunables {
- 	struct gov_attr_set	attr_set;
- 	unsigned int		rate_limit_us;
-@@ -42,10 +40,6 @@ struct sugov_cpu {
- 	struct sugov_policy	*sg_policy;
- 	unsigned int		cpu;
- 
--	bool			iowait_boost_pending;
--	unsigned int		iowait_boost;
--	u64			last_update;
--
- 	unsigned long		util;
- 	unsigned long		bw_min;
- 
-@@ -195,141 +189,17 @@ unsigned long sugov_effective_cpu_perf(int cpu, unsigned long actual,
- 	return max(min, max);
- }
- 
--static void sugov_get_util(struct sugov_cpu *sg_cpu, unsigned long boost)
-+static void sugov_get_util(struct sugov_cpu *sg_cpu)
- {
- 	unsigned long min, max, util = cpu_util_cfs_boost(sg_cpu->cpu);
- 	unsigned long io_boost = cpu_util_io_boost(sg_cpu->cpu);
- 
--	/*
--	 * XXX: This already includes io boost now, makes little sense with
--	 * sugov iowait boost on top
--	 */
- 	util = max(util, io_boost);
- 	util = effective_cpu_util(sg_cpu->cpu, util, &min, &max);
--	util = max(util, boost);
- 	sg_cpu->bw_min = min;
- 	sg_cpu->util = sugov_effective_cpu_perf(sg_cpu->cpu, util, min, max);
- }
- 
--/**
-- * sugov_iowait_reset() - Reset the IO boost status of a CPU.
-- * @sg_cpu: the sugov data for the CPU to boost
-- * @time: the update time from the caller
-- * @set_iowait_boost: true if an IO boost has been requested
-- *
-- * The IO wait boost of a task is disabled after a tick since the last update
-- * of a CPU. If a new IO wait boost is requested after more then a tick, then
-- * we enable the boost starting from IOWAIT_BOOST_MIN, which improves energy
-- * efficiency by ignoring sporadic wakeups from IO.
-- */
--static bool sugov_iowait_reset(struct sugov_cpu *sg_cpu, u64 time,
--			       bool set_iowait_boost)
--{
--	s64 delta_ns = time - sg_cpu->last_update;
--
--	/* Reset boost only if a tick has elapsed since last request */
--	if (delta_ns <= TICK_NSEC)
--		return false;
--
--	sg_cpu->iowait_boost = set_iowait_boost ? IOWAIT_BOOST_MIN : 0;
--	sg_cpu->iowait_boost_pending = set_iowait_boost;
--
--	return true;
--}
--
--/**
-- * sugov_iowait_boost() - Updates the IO boost status of a CPU.
-- * @sg_cpu: the sugov data for the CPU to boost
-- * @time: the update time from the caller
-- * @flags: SCHED_CPUFREQ_IOWAIT if the task is waking up after an IO wait
-- *
-- * Each time a task wakes up after an IO operation, the CPU utilization can be
-- * boosted to a certain utilization which doubles at each "frequent and
-- * successive" wakeup from IO, ranging from IOWAIT_BOOST_MIN to the utilization
-- * of the maximum OPP.
-- *
-- * To keep doubling, an IO boost has to be requested at least once per tick,
-- * otherwise we restart from the utilization of the minimum OPP.
-- */
--static void sugov_iowait_boost(struct sugov_cpu *sg_cpu, u64 time,
--			       unsigned int flags)
--{
--	bool set_iowait_boost = flags & SCHED_CPUFREQ_IOWAIT;
--
--	/* Reset boost if the CPU appears to have been idle enough */
--	if (sg_cpu->iowait_boost &&
--	    sugov_iowait_reset(sg_cpu, time, set_iowait_boost))
--		return;
--
--	/* Boost only tasks waking up after IO */
--	if (!set_iowait_boost)
--		return;
--
--	/* Ensure boost doubles only one time at each request */
--	if (sg_cpu->iowait_boost_pending)
--		return;
--	sg_cpu->iowait_boost_pending = true;
--
--	/* Double the boost at each request */
--	if (sg_cpu->iowait_boost) {
--		sg_cpu->iowait_boost =
--			min_t(unsigned int, sg_cpu->iowait_boost << 1, SCHED_CAPACITY_SCALE);
--		return;
--	}
--
--	/* First wakeup after IO: start with minimum boost */
--	sg_cpu->iowait_boost = IOWAIT_BOOST_MIN;
--}
--
--/**
-- * sugov_iowait_apply() - Apply the IO boost to a CPU.
-- * @sg_cpu: the sugov data for the cpu to boost
-- * @time: the update time from the caller
-- * @max_cap: the max CPU capacity
-- *
-- * A CPU running a task which woken up after an IO operation can have its
-- * utilization boosted to speed up the completion of those IO operations.
-- * The IO boost value is increased each time a task wakes up from IO, in
-- * sugov_iowait_apply(), and it's instead decreased by this function,
-- * each time an increase has not been requested (!iowait_boost_pending).
-- *
-- * A CPU which also appears to have been idle for at least one tick has also
-- * its IO boost utilization reset.
-- *
-- * This mechanism is designed to boost high frequently IO waiting tasks, while
-- * being more conservative on tasks which does sporadic IO operations.
-- */
--static unsigned long sugov_iowait_apply(struct sugov_cpu *sg_cpu, u64 time,
--			       unsigned long max_cap)
--{
--	/* No boost currently required */
--	if (!sg_cpu->iowait_boost)
--		return 0;
--
--	/* Reset boost if the CPU appears to have been idle enough */
--	if (sugov_iowait_reset(sg_cpu, time, false))
--		return 0;
--
--	if (!sg_cpu->iowait_boost_pending) {
--		/*
--		 * No boost pending; reduce the boost value.
--		 */
--		sg_cpu->iowait_boost >>= 1;
--		if (sg_cpu->iowait_boost < IOWAIT_BOOST_MIN) {
--			sg_cpu->iowait_boost = 0;
--			return 0;
--		}
--	}
--
--	sg_cpu->iowait_boost_pending = false;
--
--	/*
--	 * sg_cpu->util is already in capacity scale; convert iowait_boost
--	 * into the same scale so we can compare.
--	 */
--	return (sg_cpu->iowait_boost * max_cap) >> SCHED_CAPACITY_SHIFT;
--}
--
- #ifdef CONFIG_NO_HZ_COMMON
- static bool sugov_cpu_is_busy(struct sugov_cpu *sg_cpu)
- {
-@@ -357,18 +227,12 @@ static inline bool sugov_update_single_common(struct sugov_cpu *sg_cpu,
- 					      u64 time, unsigned long max_cap,
- 					      unsigned int flags)
- {
--	unsigned long boost;
--
--	sugov_iowait_boost(sg_cpu, time, flags);
--	sg_cpu->last_update = time;
--
- 	ignore_dl_rate_limit(sg_cpu);
- 
- 	if (!sugov_should_update_freq(sg_cpu->sg_policy, time))
- 		return false;
- 
--	boost = sugov_iowait_apply(sg_cpu, time, max_cap);
--	sugov_get_util(sg_cpu, boost);
-+	sugov_get_util(sg_cpu);
- 
- 	return true;
- }
-@@ -458,7 +322,7 @@ static void sugov_update_single_perf(struct update_util_data *hook, u64 time,
- 	sg_cpu->sg_policy->last_freq_update_time = time;
- }
- 
--static unsigned int sugov_next_freq_shared(struct sugov_cpu *sg_cpu, u64 time)
-+static unsigned int sugov_next_freq_shared(struct sugov_cpu *sg_cpu)
- {
- 	struct sugov_policy *sg_policy = sg_cpu->sg_policy;
- 	struct cpufreq_policy *policy = sg_policy->policy;
-@@ -469,11 +333,8 @@ static unsigned int sugov_next_freq_shared(struct sugov_cpu *sg_cpu, u64 time)
- 
- 	for_each_cpu(j, policy->cpus) {
- 		struct sugov_cpu *j_sg_cpu = &per_cpu(sugov_cpu, j);
--		unsigned long boost;
--
--		boost = sugov_iowait_apply(j_sg_cpu, time, max_cap);
--		sugov_get_util(j_sg_cpu, boost);
- 
-+		sugov_get_util(j_sg_cpu);
- 		util = max(j_sg_cpu->util, util);
- 	}
- 
-@@ -489,13 +350,10 @@ sugov_update_shared(struct update_util_data *hook, u64 time, unsigned int flags)
- 
- 	raw_spin_lock(&sg_policy->update_lock);
- 
--	sugov_iowait_boost(sg_cpu, time, flags);
--	sg_cpu->last_update = time;
--
- 	ignore_dl_rate_limit(sg_cpu);
- 
- 	if (sugov_should_update_freq(sg_policy, time)) {
--		next_f = sugov_next_freq_shared(sg_cpu, time);
-+		next_f = sugov_next_freq_shared(sg_cpu);
- 
- 		if (!sugov_update_next_freq(sg_policy, time, next_f))
- 			goto unlock;
+The alignment argument here is purely a best effort consideration -
+we ignore it several different allocation situations, not just low
+space.
+
+e.g. xfs_bmap_btalloc_at_eof() will try exact block
+allocation regardless of whether an alignment parameter is set. It
+will then fall back to stripe alignment if exact block fails.
+
+If stripe aligned allocation fails, it will then set args->alignment
+= 1 and try a full filesystem allocation scan without alignment.
+
+And if that fails, then we finally get to the low space allocator
+with args->alignment = 1 even though we might be trying to allocate
+an aligned extent for an atomic IO....
+
+IOWs, I think this indicates deeper surgery is needed to ensure
+aligned allocations fail immediately and don't fall back to
+unaligned allocations and set XFS_TRANS_LOW_MODE...
+
+-Dave.
 -- 
-2.34.1
-
+Dave Chinner
+david@fromorbit.com
