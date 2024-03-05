@@ -1,201 +1,165 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F1F548F6
-	for <linux-block@vger.kernel.org>; Tue,  5 Mar 2024 11:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C0A548FB;
+	Tue,  5 Mar 2024 11:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637527; cv=none; b=rRRU6FOX0rECVd1l+HHg0mWdnAo4j3qBNdYY9P7hwtsjyjADiJwXlvu5qxbQjghPvqRB6dIdFz2qkHKSIDa7plg1s478IDa/ynqkeYiNt9PTf2IwQQ+zzQleoDEpWJtgzdksL3RJirhYuMPBkChswkXDD2mm0jsnRYaZcqb/mGE=
+	t=1709637534; cv=none; b=ImC5dSX2H4w9Zcji9Zg+ObiyXaPt8Y8jtnNhsU0qQKDwD7LhOwL+oWolbYqsisIZ4HZmINfJ+W/fLh33jFE/GVKO8x2cFeHZVUkkvZKCr6wzbKrIPIi58HoPiQ5nPCTtlghTT/GHiaKY0sz7H962jkAW+765kz7ezASlO3ZYWR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637527; c=relaxed/simple;
-	bh=Sl6vDjiP8ZdsPh+rmBCo/pgurmZdleSBeG3Miy+ixAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LG4BQvO69tn+kf3b/nmsIRUnVvlPCPQWS3gnln/7Gjw87KnkGCpyDksI3rLq7rQNGi4PoMBWLYhw4R66Y+F1w4P498NPmwgJ5JhMLHqvPE0M1/UiZRjx2ru6Fcmo0iJSI22xJlZR1LpS32VEXr0aXxmRapN2o7yuBlGCwkLh8+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NpxF39sY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TVacvBji; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NpxF39sY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TVacvBji; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1709637534; c=relaxed/simple;
+	bh=NxhQVbYsKSwyvGgGk5qfaF5a/Y1wAzitab7stbdLKEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VI9SaCC4Q8VqXbsinGVdNZrzh6IY88g73STuTSWR4u6Rl8j2LSfjq0TocVvhLuAHjkYgiepZp34bbds3d6H1MbAsXfIB5i/Jcv389rcvQPrzNVdnmF+mHxmjzRf0oSdPtgBQAiJySJ6vsw6no1d3TQhS/kgqb9fLLHjN0Fu7188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r002UdI0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NpxF39sY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TVacvBji";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NpxF39sY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TVacvBji"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 96C9176AF8;
-	Tue,  5 Mar 2024 11:18:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1709637517; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RCpNkeO38Vc6PYS+hznBwEQHFD/PUdYW47ZidYaWvc8=;
-	b=NpxF39sYIKrZNG2og1c7PQ2WbV9zLfnPlghYJIJ6VlSuCuw7N2xdc2q1P/AYYRwTvKn6aM
-	uJ1N1BxWSpzwKbzXRBHh0K+STPBM9fcnsg+dB2XJNseUUltnlzXnb2/fZ8xSQxuDLGkv+w
-	W6LZmBa08BgYCdjGPjiqXKtC7EY2BM4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1709637517;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RCpNkeO38Vc6PYS+hznBwEQHFD/PUdYW47ZidYaWvc8=;
-	b=TVacvBjiJXGSDpQPyd0O1D3nzt7WdYopgMgRP1Y8Xefm0KcI9lRHvUKj3YJdQ119GPEUN5
-	eTpwd7eCLe+hfgDw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1709637517; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RCpNkeO38Vc6PYS+hznBwEQHFD/PUdYW47ZidYaWvc8=;
-	b=NpxF39sYIKrZNG2og1c7PQ2WbV9zLfnPlghYJIJ6VlSuCuw7N2xdc2q1P/AYYRwTvKn6aM
-	uJ1N1BxWSpzwKbzXRBHh0K+STPBM9fcnsg+dB2XJNseUUltnlzXnb2/fZ8xSQxuDLGkv+w
-	W6LZmBa08BgYCdjGPjiqXKtC7EY2BM4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1709637517;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RCpNkeO38Vc6PYS+hznBwEQHFD/PUdYW47ZidYaWvc8=;
-	b=TVacvBjiJXGSDpQPyd0O1D3nzt7WdYopgMgRP1Y8Xefm0KcI9lRHvUKj3YJdQ119GPEUN5
-	eTpwd7eCLe+hfgDw==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 8049213466;
-	Tue,  5 Mar 2024 11:18:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id MU0AH43/5mVxEQAAn2gu4w
-	(envelope-from <dwagner@suse.de>); Tue, 05 Mar 2024 11:18:37 +0000
-Date: Tue, 5 Mar 2024 12:18:36 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
-	Keith Busch <kbusch@kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH blktests v1 0/2] extend nvme/045 to reconnect with
- invalid key
-Message-ID: <p5xkwz6i2lfy2a65pbpq3en6wh57y75qcoz3y3eio3ze5b7cm3@zgfn5so4yuig>
-References: <20240304161303.19681-1-dwagner@suse.de>
- <2ya2o6s6lyiezbjoqbr33oiae2l65e2nrc75g3c47maisbifyv@4kpdmolhkiwx>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r002UdI0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 531A2C433F1;
+	Tue,  5 Mar 2024 11:18:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709637534;
+	bh=NxhQVbYsKSwyvGgGk5qfaF5a/Y1wAzitab7stbdLKEk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=r002UdI01gg2rXuVaeOK/D1fhwvZco1HuVKXX0raiRp4PUfsfXV1wc5RAqWyZvJGK
+	 mRH29l4+teuQlcz7MYEH/XOhAk5fjO/D/+ObXI96O5zHSMTDzcXW1equc4uEnI9Kre
+	 2BcxvXeVYU69p4m+lD0jFj6BxZAVk5SYUzkfEQXMq9ZQADbWBmK/mOgQSEndSNXrmU
+	 N0zqFP6N8iRdWJolF3xUwGboWwTM+WK03mm/r/4T6jt0HRL4N+JZfELJzmdMuRU5c2
+	 3ntsHZLDUHj1RvDsUQibOL0qdzbtw4jvy9b1b8vryqWssRm+htmwj9BHKQEKphbBXH
+	 1E2fwP28bIgFw==
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Date: Tue,  5 Mar 2024 13:18:31 +0200
+Message-ID: <cover.1709635535.git.leon@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2ya2o6s6lyiezbjoqbr33oiae2l65e2nrc75g3c47maisbifyv@4kpdmolhkiwx>
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=NpxF39sY;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=TVacvBji
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-6.01 / 50.00];
-	 ARC_NA(0.00)[];
-	 TO_DN_EQ_ADDR_SOME(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
-	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	 RCPT_COUNT_FIVE(0.00)[5];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%]
-X-Spam-Score: -6.01
-X-Rspamd-Queue-Id: 96C9176AF8
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 05, 2024 at 09:44:45AM +0000, Shinichiro Kawasaki wrote:
-> On Mar 04, 2024 / 17:13, Daniel Wagner wrote:
-> > The is the test case for
-> > 
-> > https://lore.kernel.org/linux-nvme/20240304161006.19328-1-dwagner@suse.de/
-> >
-> > 
-> > Daniel Wagner (2):
-> >   nvme/rc: add reconnect-delay argument only for fabrics transports
-> >   nvme/048: add reconnect after ctrl key change
-> 
-> I apply the kernel patches in the link above to v6.8-rc7, then ran nvme/045
-> with the blktests patches in the series. And I observed failure of the test
-> case with various transports [1]. Is this failure expected?
+This is complimentary part to the proposed LSF/MM topic.
+https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
 
-If you have these patches applied, the test should pass. But we might
-have still some more stuff to unify between the transports. The nvme/045
-test passes in my setup. Though I have seen runs which were hang for
-some reason. Haven't figured out yet what's happening there. But I
-haven't seen failures, IIRC.
+This is posted as RFC to get a feedback on proposed split, but RDMA, VFIO and
+DMA patches are ready for review and inclusion, the NVMe patches are still in
+progress as they require agreement on API first.
 
-I am not really surprised we seeing some fallouts though. We start to
-test the error code paths with this test extension.
+Thanks
 
-> Also, I observed KASAN double-free [2]. Do you observe it in your environment?
-> I created a quick fix [3], and it looks resolving the double-free.
+-------------------------------------------------------------------------------
+The DMA mapping operation performs two steps at one same time: allocates
+IOVA space and actually maps DMA pages to that space. This one shot
+operation works perfectly for non-complex scenarios, where callers use
+that DMA API in control path when they setup hardware.
 
-No, I haven't seen this.
+However in more complex scenarios, when DMA mapping is needed in data
+path and especially when some sort of specific datatype is involved,
+such one shot approach has its drawbacks.
 
-> sudo ./check nvme/045
-> nvme/045 (Test re-authentication)                            [failed]
->     runtime  8.069s  ...  7.639s
->     --- tests/nvme/045.out      2024-03-05 18:09:07.267668493 +0900
->     +++ /home/shin/Blktests/blktests/results/nodev/nvme/045.out.bad     2024-03-05 18:10:07.735494384 +0900
->     @@ -9,5 +9,6 @@
->      Change hash to hmac(sha512)
->      Re-authenticate with changed hash
->      Renew host key on the controller and force reconnect
->     -disconnected 0 controller(s)
->     +controller "nvme1" not deleted within 5 seconds
->     +disconnected 1 controller(s)
->      Test complete
+That approach pushes developers to introduce new DMA APIs for specific
+datatype. For example existing scatter-gather mapping functions, or
+latest Chuck's RFC series to add biovec related DMA mapping [1] and
+probably struct folio will need it too.
 
-That means the host either successfully reconnected or never
-disconnected. We have another test case just for the disconnect test
-(number of queue changes), so if this test passes, it must be the
-former... Shouldn't really happen, this would mean the auth code has bug.
+These advanced DMA mapping APIs are needed to calculate IOVA size to
+allocate it as one chunk and some sort of offset calculations to know
+which part of IOVA to map.
 
-> diff --git a/drivers/nvme/host/sysfs.c b/drivers/nvme/host/sysfs.c
-> index f2832f70e7e0..4e161d3cd840 100644
-> --- a/drivers/nvme/host/sysfs.c
-> +++ b/drivers/nvme/host/sysfs.c
-> @@ -221,14 +221,10 @@ static int ns_update_nuse(struct nvme_ns *ns)
->  
->  	ret = nvme_identify_ns(ns->ctrl, ns->head->ns_id, &id);
->  	if (ret)
-> -		goto out_free_id;
-> +		return ret;
+Instead of teaching DMA to know these specific datatypes, let's separate
+existing DMA mapping routine to two steps and give an option to advanced
+callers (subsystems) perform all calculations internally in advance and
+map pages later when it is needed.
 
-Yes, this is correct.
->  
->  	ns->head->nuse = le64_to_cpu(id->nuse);
-> -
-> -out_free_id:
-> -	kfree(id);
-> -
-> -	return ret;
-> +	return 0;
->  }
->
+In this series, three users are converted and each of such conversion
+presents different positive gain:
+1. RDMA simplifies and speeds up its pagefault handling for
+   on-demand-paging (ODP) mode.
+2. VFIO PCI live migration code saves huge chunk of memory.
+3. NVMe PCI avoids intermediate SG table manipulation and operates
+   directly on BIOs.
 
-I think you still need to free the 'id' on the normal exit path though
+Thanks
 
-If you have these patches applied, the test should pass. But we might
-have still some more stuff to unify between the transports. The nvme/045
-test passes in my setup. Though I have seen runs which were hang for
-some reason. Haven't figured out yet what's happening there. But I
-haven't seen failures.
+[1] https://lore.kernel.org/all/169772852492.5232.17148564580779995849.stgit@klimt.1015granger.net
+
+Chaitanya Kulkarni (2):
+  block: add dma_link_range() based API
+  nvme-pci: use blk_rq_dma_map() for NVMe SGL
+
+Leon Romanovsky (14):
+  mm/hmm: let users to tag specific PFNs
+  dma-mapping: provide an interface to allocate IOVA
+  dma-mapping: provide callbacks to link/unlink pages to specific IOVA
+  iommu/dma: Provide an interface to allow preallocate IOVA
+  iommu/dma: Prepare map/unmap page functions to receive IOVA
+  iommu/dma: Implement link/unlink page callbacks
+  RDMA/umem: Preallocate and cache IOVA for UMEM ODP
+  RDMA/umem: Store ODP access mask information in PFN
+  RDMA/core: Separate DMA mapping to caching IOVA and page linkage
+  RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
+  vfio/mlx5: Explicitly use number of pages instead of allocated length
+  vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+  vfio/mlx5: Explicitly store page list
+  vfio/mlx5: Convert vfio to use DMA link API
+
+ Documentation/core-api/dma-attributes.rst |   7 +
+ block/blk-merge.c                         | 156 ++++++++++++++
+ drivers/infiniband/core/umem_odp.c        | 219 +++++++------------
+ drivers/infiniband/hw/mlx5/mlx5_ib.h      |   1 +
+ drivers/infiniband/hw/mlx5/odp.c          |  59 +++--
+ drivers/iommu/dma-iommu.c                 | 129 ++++++++---
+ drivers/nvme/host/pci.c                   | 220 +++++--------------
+ drivers/vfio/pci/mlx5/cmd.c               | 252 ++++++++++++----------
+ drivers/vfio/pci/mlx5/cmd.h               |  22 +-
+ drivers/vfio/pci/mlx5/main.c              | 136 +++++-------
+ include/linux/blk-mq.h                    |   9 +
+ include/linux/dma-map-ops.h               |  13 ++
+ include/linux/dma-mapping.h               |  39 ++++
+ include/linux/hmm.h                       |   3 +
+ include/rdma/ib_umem_odp.h                |  22 +-
+ include/rdma/ib_verbs.h                   |  54 +++++
+ kernel/dma/debug.h                        |   2 +
+ kernel/dma/direct.h                       |   7 +-
+ kernel/dma/mapping.c                      |  91 ++++++++
+ mm/hmm.c                                  |  34 +--
+ 20 files changed, 870 insertions(+), 605 deletions(-)
+
+-- 
+2.44.0
+
