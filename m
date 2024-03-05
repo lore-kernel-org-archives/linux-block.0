@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD421272CC;
-	Tue,  5 Mar 2024 20:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A081292C7;
+	Tue,  5 Mar 2024 20:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709670250; cv=none; b=TS4Yx3jb7wlZeNweop2d/sO4acxbTRXLP+y7t0d2AV0AKES6HxSeNxWst5h2MlCe7x+dLx9KEITwhpeucntOz3kUzvP232bF1iWDLVvnOyiP5RhASNRheY+sVz9AKSEMPqPJYfFQs7XqimHYQZhbPmw6IEF3ROIMw+D7w9ARH5Q=
+	t=1709670265; cv=none; b=eSelUpe/TzX/ejqYQe8tx/BXLUtUvCL8CA4k+CDt9B6r1L9OJuzbf3mwCx7gFezgfR3UZj5BjWIq9EDNcdk0azz/BuVj+8P5Ug+PXi/4gDF8KQ0D+311AIMc8QXjzh2FIbzoRBlm71w+48fP8C76hiS+bT/JaE/IqBAPzGofbq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709670250; c=relaxed/simple;
-	bh=B7sCKtL9SO97ATHX5/GObMMyjqJrNuWBY8nTqV2huAQ=;
+	s=arc-20240116; t=1709670265; c=relaxed/simple;
+	bh=iir94xWEFXfTEvOvBQYZ6cdGLKxLhVg9Jp/2Kfnbt34=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azUH4cMxAjeHF2gFcM0IxjBCwR7U2ARb1F2TX34Hc3AlKa14UbQynm5z7t525Nol51DfJUWbsCv8d+dB1E4NdpbQO4MMMkFpju9UL4iiXz7M6Im3HrU2NLYBACD7LTiPZSHo/J2cMt7wegz0ItASjuG37d1UOGLoOibn9jCvDwY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=hd/z9yRz2wO1uh3IbblZ/92/z/8qHKzM8Np14O/ON3zeGcbLsgsC0c95Wt0/OtP4P06nVu4ReZNU+OifR3mIQFi4BAKEDMWn/SISJh9qI9W+pqO1SfORSSAo2CpsURbJfjDTTIM6xBouJOQE3QeBBdSv5bDPnKwlf3XuQ7kthig=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1rhbK5-0001MZ-0F;
-	Tue, 05 Mar 2024 20:23:37 +0000
-Date: Tue, 5 Mar 2024 20:23:32 +0000
+	id 1rhbKQ-0001Np-2O;
+	Tue, 05 Mar 2024 20:23:58 +0000
+Date: Tue, 5 Mar 2024 20:23:54 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -48,8 +48,8 @@ Cc: Diping Zhang <diping.zhang@gl-inet.com>,
 	Jieying Zeng <jieying.zeng@gl-inet.com>,
 	Chad Monroe <chad.monroe@adtran.com>,
 	Adam Fox <adam.fox@adtran.com>, John Crispin <john@phrozen.org>
-Subject: [RFC PATCH v2 2/8] block: partitions: populate fwnode
-Message-ID: <feaffcb7461718d76070d98406aab2298da1bbe3.1709667858.git.daniel@makrotopia.org>
+Subject: [RFC PATCH v2 4/8] block: implement NVMEM provider
+Message-ID: <6061aa4201030b9bb2f8d03ef32a564fdb786ed1.1709667858.git.daniel@makrotopia.org>
 References: <cover.1709667858.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -61,79 +61,231 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1709667858.git.daniel@makrotopia.org>
 
-Let block partitions to be represented by a firmware node and hence
-allow them to being referenced e.g. for use with blk-nvmem.
+On embedded devices using an eMMC it is common that one or more partitions
+on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
+data. Allow referencing the partition in device tree for the kernel and
+Wi-Fi drivers accessing it via the NVMEM layer.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- block/partitions/core.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ block/Kconfig     |   9 +++
+ block/Makefile    |   1 +
+ block/blk-nvmem.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 185 insertions(+)
+ create mode 100644 block/blk-nvmem.c
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 5f5ed5c75f04d..48d7f01d76c6a 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -10,6 +10,8 @@
- #include <linux/ctype.h>
- #include <linux/vmalloc.h>
- #include <linux/raid/detect.h>
+diff --git a/block/Kconfig b/block/Kconfig
+index 1de4682d48ccb..b1d4c88c70040 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -229,6 +229,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+ 	  by falling back to the kernel crypto API when inline
+ 	  encryption hardware is not present.
+ 
++config BLK_NVMEM
++	bool "Block device NVMEM provider"
++	depends on OF
++	depends on NVMEM
++	help
++	  Allow block devices (or partitions) to act as NVMEM prodivers,
++	  typically used with eMMC to store MAC addresses or Wi-Fi
++	  calibration data on embedded devices.
++
+ source "block/partitions/Kconfig"
+ 
+ config BLK_MQ_PCI
+diff --git a/block/Makefile b/block/Makefile
+index 46ada9dc8bbfe..03c0bfa8642df 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -34,6 +34,7 @@ obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
+ obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
+ obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
+ obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
++obj-$(CONFIG_BLK_NVMEM)		+= blk-nvmem.o
+ obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
+ obj-$(CONFIG_BLK_PM)		+= blk-pm.o
+ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
+diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
+new file mode 100644
+index 0000000000000..6deb2f251d813
+--- /dev/null
++++ b/block/blk-nvmem.c
+@@ -0,0 +1,175 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * block device NVMEM provider
++ *
++ * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
++ *
++ * Useful on devices using a partition on an eMMC for MAC addresses or
++ * Wi-Fi calibration EEPROM data.
++ */
++
++#include "blk.h"
++#include <linux/nvmem-provider.h>
++#include <linux/of.h>
++#include <linux/pagemap.h>
 +#include <linux/property.h>
 +
- #include "check.h"
- 
- static int (*const check_part[])(struct parsed_partitions *) = {
-@@ -281,6 +283,43 @@ static ssize_t whole_disk_show(struct device *dev,
- }
- static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
- 
-+static struct fwnode_handle *find_partition_fwnode(struct block_device *bdev)
++/* List of all NVMEM devices */
++static LIST_HEAD(nvmem_devices);
++static DEFINE_MUTEX(devices_mutex);
++
++struct blk_nvmem {
++	struct nvmem_device	*nvmem;
++	struct device		*dev;
++	struct list_head	list;
++};
++
++static int blk_nvmem_reg_read(void *priv, unsigned int from,
++			      void *val, size_t bytes)
 +{
-+	struct fwnode_handle *fw_parts, *fw_part;
-+	struct device *ddev = disk_to_dev(bdev->bd_disk);
-+	const char *partname, *uuid;
-+	u32 partno;
++	blk_mode_t mode = BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
++	unsigned long offs = from & ~PAGE_MASK, to_read;
++	pgoff_t f_index = from >> PAGE_SHIFT;
++	struct blk_nvmem *bnv = priv;
++	size_t bytes_left = bytes;
++	struct file *bdev_file;
++	struct folio *folio;
++	void *p;
++	int ret = 0;
 +
-+	fw_parts = device_get_named_child_node(ddev, "partitions");
-+	if (!fw_parts)
-+		fw_parts = device_get_named_child_node(ddev->parent, "partitions");
++	bdev_file = bdev_file_open_by_dev(bnv->dev->devt, mode, priv, NULL);
++	if (!bdev_file)
++		return -ENODEV;
 +
-+	if (!fw_parts)
-+		return NULL;
++	if (IS_ERR(bdev_file))
++		return PTR_ERR(bdev_file);
 +
-+	fwnode_for_each_child_node(fw_parts, fw_part) {
-+		if (!fwnode_property_read_string(fw_part, "uuid", &uuid) &&
-+		    (!bdev->bd_meta_info || strncmp(uuid,
-+						    bdev->bd_meta_info->uuid,
-+						    PARTITION_META_INFO_UUIDLTH)))
-+			continue;
-+
-+		if (!fwnode_property_read_string(fw_part, "partname", &partname) &&
-+		    (!bdev->bd_meta_info || strncmp(partname,
-+						    bdev->bd_meta_info->volname,
-+						    PARTITION_META_INFO_VOLNAMELTH)))
-+			continue;
-+
-+		if (!fwnode_property_read_u32(fw_part, "partno", &partno) &&
-+		    bdev->bd_partno != partno)
-+			continue;
-+
-+		return fw_part;
++	while (bytes_left) {
++		folio = read_mapping_folio(bdev_file->f_mapping, f_index++, NULL);
++		if (IS_ERR(folio)) {
++			ret = PTR_ERR(folio);
++			goto err_release_bdev;
++		}
++		to_read = min_t(unsigned long, bytes_left, PAGE_SIZE - offs);
++		p = folio_address(folio) + offset_in_folio(folio, offs);
++		memcpy(val, p, to_read);
++		offs = 0;
++		bytes_left -= to_read;
++		val += to_read;
++		folio_put(folio);
 +	}
 +
-+	return NULL;
++err_release_bdev:
++	fput(bdev_file);
++
++	return ret;
 +}
 +
- /*
-  * Must be called either with open_mutex held, before a disk can be opened or
-  * after all disk users are gone.
-@@ -355,6 +394,8 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 			goto out_put;
- 	}
- 
-+	device_set_node(pdev, find_partition_fwnode(bdev));
++static int blk_nvmem_register(struct device *dev)
++{
++	struct device_node *np = dev_of_node(dev);
++	struct block_device *bdev = dev_to_bdev(dev);
++	struct nvmem_config config = {};
++	struct blk_nvmem *bnv;
 +
- 	/* delay uevent until 'holders' subdir is created */
- 	dev_set_uevent_suppress(pdev, 1);
- 	err = device_add(pdev);
++	/* skip devices which do not have a device tree node */
++	if (!np)
++		return 0;
++
++	/* skip devices without an nvmem layout defined */
++	if (!of_get_child_by_name(np, "nvmem-layout"))
++		return 0;
++
++	/*
++	 * skip devices which don't have GENHD_FL_NVMEM set
++	 *
++	 * This flag is used for mtdblock and ubiblock devices because
++	 * both, MTD and UBI already implement their own NVMEM provider.
++	 * To avoid registering multiple NVMEM providers for the same
++	 * device node, don't register the block NVMEM provider for them.
++	 */
++	if (!(bdev->bd_disk->flags & GENHD_FL_NVMEM))
++		return 0;
++
++	/*
++	 * skip block device too large to be represented as NVMEM devices
++	 * which are using an 'int' as address
++	 */
++	if (bdev_nr_bytes(bdev) > INT_MAX)
++		return -EFBIG;
++
++	bnv = kzalloc(sizeof(struct blk_nvmem), GFP_KERNEL);
++	if (!bnv)
++		return -ENOMEM;
++
++	config.id = NVMEM_DEVID_NONE;
++	config.dev = &bdev->bd_device;
++	config.name = dev_name(&bdev->bd_device);
++	config.owner = THIS_MODULE;
++	config.priv = bnv;
++	config.reg_read = blk_nvmem_reg_read;
++	config.size = bdev_nr_bytes(bdev);
++	config.word_size = 1;
++	config.stride = 1;
++	config.read_only = true;
++	config.root_only = true;
++	config.ignore_wp = true;
++	config.of_node = to_of_node(dev->fwnode);
++
++	bnv->dev = &bdev->bd_device;
++	bnv->nvmem = nvmem_register(&config);
++	if (IS_ERR(bnv->nvmem)) {
++		dev_err_probe(&bdev->bd_device, PTR_ERR(bnv->nvmem),
++			      "Failed to register NVMEM device\n");
++
++		kfree(bnv);
++		return PTR_ERR(bnv->nvmem);
++	}
++
++	mutex_lock(&devices_mutex);
++	list_add_tail(&bnv->list, &nvmem_devices);
++	mutex_unlock(&devices_mutex);
++
++	return 0;
++}
++
++static void blk_nvmem_unregister(struct device *dev)
++{
++	struct blk_nvmem *bnv_c, *bnv = NULL;
++
++	mutex_lock(&devices_mutex);
++	list_for_each_entry(bnv_c, &nvmem_devices, list) {
++		if (bnv_c->dev == dev) {
++			bnv = bnv_c;
++			break;
++		}
++	}
++
++	if (!bnv) {
++		mutex_unlock(&devices_mutex);
++		return;
++	}
++
++	list_del(&bnv->list);
++	mutex_unlock(&devices_mutex);
++	nvmem_unregister(bnv->nvmem);
++	kfree(bnv);
++}
++
++static struct class_interface blk_nvmem_bus_interface __refdata = {
++	.class = &block_class,
++	.add_dev = &blk_nvmem_register,
++	.remove_dev = &blk_nvmem_unregister,
++};
++
++static int __init blk_nvmem_init(void)
++{
++	int ret;
++
++	ret = class_interface_register(&blk_nvmem_bus_interface);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++device_initcall(blk_nvmem_init);
 -- 
 2.44.0
