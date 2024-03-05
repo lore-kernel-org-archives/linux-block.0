@@ -1,152 +1,119 @@
-Received: from mail.aixigo.de (mail.aixigo.de [5.145.142.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E4A4CB58;
-	Tue,  5 Mar 2024 08:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.145.142.10
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643B14DA1F;
+	Tue,  5 Mar 2024 09:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709628747; cv=none; b=cm4d1Wh0xULq0PmWG21M1er0i65237+UY0TL42R6bxcKQIrHZ03ZcUOKxNopAoC7uezSq8ldVpVt86xscM76UvGZ4FQWdOlG/4P5mEXEhHTNkSE+nZv80ERpHxYAu8cNgfCBz1WnACaD6S3QvwlWItLXVKQmZW0fXuVkgbSphdw=
+	t=1709630001; cv=none; b=ffZ7JDtOXu9dTItT/cYgUvBUdkuh5zHRTYpS9Zw/hfoLRaD+ikZBhv5j8LbzD/Jvmpeo6K2CuqLEwfPBKKgoiUHWZtzR1PREapbLDSSk7x1k6voAJ65J1RWNJNF94BuKWQnUTA0wi5WOQ1zqzGvw80q4akE3JSQwHz4lXGwB/j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709628747; c=relaxed/simple;
-	bh=fQfjSN3GrHCr7EmgsLNb1WTj1bVNcHKeybvX8+51GkY=;
+	s=arc-20240116; t=1709630001; c=relaxed/simple;
+	bh=8yEMbLlsXSdgz1MHS6KtgJSRcTWMl7TRJdDzd5wFNtg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nCTh//C3laYrxl7oWosl0O64sVcChum9KBDAwllVpcaEanDKjCisUDH0dSvVuXU9EE+3kj81DzdTntMg3OvvvFwo3zlkWnKw81zJ5WOODPkhAsxnjYYjSFKUb7GhTml4gHrKeEDhyWmNraimKKHvvGV3kcGj/1oIHoIQLvW0j/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aixigo.com; spf=pass smtp.mailfrom=aixigo.com; dkim=pass (1024-bit key) header.d=aixigo.com header.i=@aixigo.com header.b=vP5fwqOa; arc=none smtp.client-ip=5.145.142.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aixigo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aixigo.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=aixigo.com header.i=@aixigo.com header.b="vP5fwqOa"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; s=default; bh=fQfjSN3GrHCr
-	7EmgsLNb1WTj1bVNcHKeybvX8+51GkY=; h=in-reply-to:from:references:cc:to:
-	subject:date; d=aixigo.com; b=vP5fwqOaBDQQtkt7usW5j5roTVsB1yk7NqaEV7wT
-	8mfh948ibXZvsduo6rn1zEyz7AvnMtsEgBAe4t6OY7Dmq4hZOE9xcWCirvb2alSlVxAaGL
-	D9hBBakNI+oeJd+rRJn2sonqBxZKXANROdJSzb8oA2FcTPHfVqe2acQHOIk7o=
-Received: from mailhost.ac.aixigo.de (mailhost.ac.aixigo.de [172.19.96.11])
-	by mail.aixigo.de (OpenSMTPD) with ESMTPS id 12e58b84 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 5 Mar 2024 09:52:13 +0100 (CET)
-Received: from [172.19.97.128] (dpcl082.ac.aixigo.de [172.19.97.128])
-	by mailhost.ac.aixigo.de (8.17.1.9/8.17.1.9/Debian-2) with ESMTPS id 4258qCWP1098777
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT);
-	Tue, 5 Mar 2024 09:52:12 +0100
-Message-ID: <7f2bffbd-8ba4-4629-a318-5af95133c002@aixigo.com>
-Date: Tue, 5 Mar 2024 09:52:12 +0100
+	 In-Reply-To:Content-Type; b=q2OZvQAWZvdOwDOSCllBw2kXH6FK5Jg8rDrAPzGMOzoT6PvEn4qC07gvJI72kYVFbMM4sCQWXC5l4jmoBqT+Z3T8FmQpjTV7/k9fBiU2g1xDcxbADSmWz/9t2K34AVc70HjcnOljatjhU5cDuCIf4t7Tbs4N9fbLISVeMtkL+4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4DD8BDA7;
+	Tue,  5 Mar 2024 01:13:55 -0800 (PST)
+Received: from [10.1.29.29] (e133047.arm.com [10.1.29.29])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 305C03F762;
+	Tue,  5 Mar 2024 01:13:16 -0800 (PST)
+Message-ID: <0dc6a839-2922-40ac-8854-2884196da9b9@arm.com>
+Date: Tue, 5 Mar 2024 09:13:14 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Linux)
-Subject: Re: RIP on discard, JMicron USB adaptor
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Keith Busch <kbusch@kernel.org>, Alan Stern <stern@rowland.harvard.edu>,
-        Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-usb@vger.kernel.org,
-        Harald Dunkel <harri@afaics.de>
-References: <70bc51d7-c8a2-4b06-ab7a-e321d20db49a@aixigo.com>
- <62296d89-f7e6-4f54-add8-35b531dc657c@rowland.harvard.edu>
- <Zd9Xbz3L6JEvBHHT@kbusch-mbp> <yq1sf1c1h0x.fsf@ca-mkp.ca.oracle.com>
- <7a10ff3b-0c4c-4aa3-8218-02d5f27ab062@afaics.de>
- <029ff780-902e-42da-a5ed-6c306c6cb2e4@aixigo.com>
- <yq14jdlv3cv.fsf@ca-mkp.ca.oracle.com>
-From: Harald Dunkel <harald.dunkel@aixigo.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/2] Introduce per-task io utilization boost
+To: Bart Van Assche <bvanassche@acm.org>, linux-kernel@vger.kernel.org
+Cc: peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
+ rafael@kernel.org, dietmar.eggemann@arm.com, vschneid@redhat.com,
+ vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
+ adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de,
+ asml.silence@gmail.com, linux-pm@vger.kernel.org,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+ Qais Yousef <qyousef@layalina.io>
+References: <20240304201625.100619-1-christian.loehle@arm.com>
+ <86f0af00-8765-4481-9245-1819fb2c6379@acm.org>
 Content-Language: en-US
-In-Reply-To: <yq14jdlv3cv.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 1.0.3 at srvvm01.ac.aixigo.de
-X-Virus-Status: Clean
+From: Christian Loehle <christian.loehle@arm.com>
+In-Reply-To: <86f0af00-8765-4481-9245-1819fb2c6379@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2024-03-05 03:14:24, Martin K. Petersen wrote:
+Hi Bart,
+
+On 05/03/2024 00:20, Bart Van Assche wrote:
+> On 3/4/24 12:16, Christian Loehle wrote:
+>> Pixel 6 ufs Android 14 (7 runs for because device showed some variance)
+>> [6605, 6622, 6633, 6652, 6690, 6697, 6754] sugov mainline
+>> [7141, 7173, 7198, 7220, 7280, 7427, 7452] per-task tracking
+>> [2390, 2392, 2406, 2437, 2464, 2487, 2813] sugov no iowait boost
+>> [7812, 7837, 7837, 7851, 7900, 7959, 7980] performance governor
 > 
-> Well, the device reports that block provisioning is disabled (lbpme=0)
-> which explains why discard is not enabled by default.
+> Variance of performance results for Pixel devices can be reduced greatly
+> by disabling devfreq scaling, e.g. as follows (this may cause thermal
+> issues if the system load is high enough):
 > 
-> Oddly enough your device does not report an UNMAP granularity. I'm
-> trying to figure out how your discard granularity ends up being 0 given
-> that your device reports a physical block size of 4096.
+>      for d in $(adb shell echo /sys/class/devfreq/*); do
+>     adb shell "cat $d/available_frequencies |
+>         tr ' ' '\n' |
+>         sort -n |
+>         case $devfreq in
+>             min) head -n1;;
+>             max) tail -n1;;
+>         esac > $d/min_freq"
+>     done
 > 
 
-I have inserted 2 other m.2 SSDs into the adapter: There was no problem
-with these, esp there was no warning about discard_granularity, or a RIP.
-First SSD back in: RIP is back, too. I would guess the first SSD is bad.
+Thanks for the hint!
 
-Sorry for all the trouble. I should have tried another m.2 SSD first.
+>> Showcasing some different IO scenarios, again all random read,
+>> median out of 5 runs, all on rk3399 with NVMe.
+>> e.g. io_uring6x4 means 6 threads with 4 iodepth each, results can be
+>> obtained using:
+>> fio --minimal --time_based --name=test --filename=/dev/nvme0n1 --runtime=30 --rw=randread --bs=4k --ioengine=io_uring --iodepth=4 --numjobs=6 --group_reporting | cut -d \; -f 8
+> 
+> So buffered I/O was used during this test? Shouldn't direct I/O be used
+> for this kind of tests (--buffered=0)? Additionally, which I/O scheduler
+> was configured? I recommend --ioscheduler=none for this kind of tests.
 
-Just for the record, this is what smartctl -x reports about the bad SSD:
+Yes I opted for buffered I/O, I guess it's the eternal question if you
+should benchmark the device/stack (O_DIRECT) or be more realistic to actual
+use cases (probably). I opted for the latter, but since it's 4K randread
+on significantly large devices the results don't differ too much.
 
--------------------------------------------------------------------------------
-root@dpcl082:~# smartctl -x /dev/sdf
-smartctl 7.4 2023-08-01 r5530 [x86_64-linux-6.7.6-raw] (local build)
-Copyright (C) 2002-23, Bruce Allen, Christian Franke, www.smartmontools.org
 
-=== START OF INFORMATION SECTION ===
-Model Number:                       SAMSUNG MZVLB1T0HALR-000L7
-Serial Number:                      S3TPNX0K917992
-Firmware Version:                   5L2QEXA7
-PCI Vendor/Subsystem ID:            0x144d
-IEEE OUI Identifier:                0x002538
-Total NVM Capacity:                 1,024,209,543,168 [1.02 TB]
-Unallocated NVM Capacity:           0
-Controller ID:                      4
-NVMe Version:                       1.2
-Number of Namespaces:               1
-Namespace 1 Size/Capacity:          1,024,209,543,168 [1.02 TB]
-Namespace 1 Utilization:            1,015,982,354,432 [1.01 TB]
-Namespace 1 Formatted LBA Size:     512
-Namespace 1 IEEE EUI-64:            002538 8981be5959
-Local Time is:                      Tue Mar  5 08:29:01 2024 CET
-Firmware Updates (0x16):            3 Slots, no Reset required
-Optional Admin Commands (0x0017):   Security Format Frmw_DL Self_Test
-Optional NVM Commands (0x001f):     Comp Wr_Unc DS_Mngmt Wr_Zero Sav/Sel_Feat
-Log Page Attributes (0x03):         S/H_per_NS Cmd_Eff_Lg
-Maximum Data Transfer Size:         512 Pages
-Warning  Comp. Temp. Threshold:     81 Celsius
-Critical Comp. Temp. Threshold:     82 Celsius
+>> - Higher cap is not always beneficial, we might place the task away
+>> from the CPU where the interrupt handler is running, making it run
+>> on an unboosted CPU which may have a bigger impact than the difference
+>> between the CPU's capacity the task moved to. (Of course the boost will
+>> then be reverted again, but a ping-pong every interval is possible).
+> 
+> In the above I see "the interrupt handler". Does this mean that the NVMe
+> controller in the test setup only supports one completion interrupt for
+> all completion queues instead of one completion interrupt per completion
+> queue? There are already Android phones and developer boards available
+> that support the latter, namely the boards equipped with a UFSHCI 4.0 controller.
 
-Supported Power States
-St Op     Max   Active     Idle   RL RT WL WT  Ent_Lat  Ex_Lat
-  0 +     7.02W       -        -    0  0  0  0        0       0
-  1 +     6.30W       -        -    1  1  1  1        0       0
-  2 +     3.50W       -        -    2  2  2  2        0       0
-  3 -   0.0760W       -        -    3  3  3  3      210    1200
-  4 -   0.0050W       -        -    4  4  4  4     2000    8000
+No, both NVMe test setups have one completion interrupt per completion queue,
+so this caveat doesn't affect them, higher capacity CPU is strictly better.
+The UFS and both mmc setups (eMMC with CQE and sdcard) only have one completion
+interrupt (on CPU0 on my setup).
+The difference between the CPU capacities on the Pixel6 is able to make up for this.
+The big CPU is still the best to run these single-threaded fio benchmarks on in terms
+of throughput.
+FWIW you do gain an additional ~20% (in my specific setup) if you move the ufshcd
+interrupt to a big CPU, too. Similarly for the mmc.
+Unfortunately the infrastructure is far from being there for the scheduler to move the
+interrupt to the same performance domain as the task, which is often optimal both in
+terms of throughput and in terms of power.
+I'll go looking for a stable testing platform with UFS as you mentioned, benefits of this
+patch will of course be greatly increased.
+Thanks!
 
-Supported LBA Sizes (NSID 0x1)
-Id Fmt  Data  Metadt  Rel_Perf
-  0 +     512       0         0
-
-=== START OF SMART DATA SECTION ===
-SMART overall-health self-assessment test result: PASSED
-
-SMART/Health Information (NVMe Log 0x02)
-Critical Warning:                   0x00
-Temperature:                        24 Celsius
-Available Spare:                    100%
-Available Spare Threshold:          10%
-Percentage Used:                    4%
-Data Units Read:                    32,373,823 [16.5 TB]
-Data Units Written:                 59,721,865 [30.5 TB]
-Host Read Commands:                 848,557,454
-Host Write Commands:                1,025,191,828
-Controller Busy Time:               2,700
-Power Cycles:                       2,222
-Power On Hours:                     5,568
-Unsafe Shutdowns:                   666
-Media and Data Integrity Errors:    0
-Error Information Log Entries:      3,607
-Warning  Comp. Temperature Time:    0
-Critical Comp. Temperature Time:    0
-Temperature Sensor 1:               24 Celsius
-Temperature Sensor 2:               25 Celsius
-
-Error Information (NVMe Log 0x01, 16 of 64 entries)
-No Errors Logged
-
-Self-test Log (NVMe Log 0x06)
-Self-test status: No self-test in progress
-No Self-tests Logged
--------------------------------------------------------------------------------
-
-Regards
-Harri
+Best Regards,
+Christian
