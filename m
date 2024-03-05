@@ -1,149 +1,152 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.aixigo.de (mail.aixigo.de [5.145.142.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5847A7F482;
-	Tue,  5 Mar 2024 08:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E4A4CB58;
+	Tue,  5 Mar 2024 08:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.145.142.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709626855; cv=none; b=Oj9zI+luyOIeU5pJHWWdAYT7Z+K8/kqN5YUpibktCSgYUWHx7oTj8ngfLeEhI7mncfA5kZG4dxgoN0V6yWEMuXRBNiN+XfdLC5T44ZnCneTZEq6953eNdlYxFVP/C9J2NmOQWRVPgFI4TLxmPfyTnsge695SR/ZZSTTo9+yDkbY=
+	t=1709628747; cv=none; b=cm4d1Wh0xULq0PmWG21M1er0i65237+UY0TL42R6bxcKQIrHZ03ZcUOKxNopAoC7uezSq8ldVpVt86xscM76UvGZ4FQWdOlG/4P5mEXEhHTNkSE+nZv80ERpHxYAu8cNgfCBz1WnACaD6S3QvwlWItLXVKQmZW0fXuVkgbSphdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709626855; c=relaxed/simple;
-	bh=hZo+4VkfzgWJKPhG/ii63dRyDDI+/MxjXieNWDVvQMU=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=sQV9cXkBmkudgVIexQpOMt8/u7Wt/FkGvTRIbzf4feAyRe8FD7fcbYZhjgpZRYepMvNnfXx9ST8z0m9fvOhAKPNUMYPzHJpLgvDwNSd9977qSk0QFSTAvz+1XYY2bgy7ztkUWE7TI0lKs1Ii/W1dvzLwNUN3QYrAV2sklp4u38o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzNZC/Qi; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709628747; c=relaxed/simple;
+	bh=fQfjSN3GrHCr7EmgsLNb1WTj1bVNcHKeybvX8+51GkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nCTh//C3laYrxl7oWosl0O64sVcChum9KBDAwllVpcaEanDKjCisUDH0dSvVuXU9EE+3kj81DzdTntMg3OvvvFwo3zlkWnKw81zJ5WOODPkhAsxnjYYjSFKUb7GhTml4gHrKeEDhyWmNraimKKHvvGV3kcGj/1oIHoIQLvW0j/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aixigo.com; spf=pass smtp.mailfrom=aixigo.com; dkim=pass (1024-bit key) header.d=aixigo.com header.i=@aixigo.com header.b=vP5fwqOa; arc=none smtp.client-ip=5.145.142.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aixigo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aixigo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzNZC/Qi"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1dca160163dso51964535ad.3;
-        Tue, 05 Mar 2024 00:20:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709626853; x=1710231653; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ENVdbWViMNbdMsk2tYBUD+u8dUrBMYPUAx5W7hzKOFo=;
-        b=hzNZC/Qi8H/SscKrlapDWqj+mELUkXZz3MC4rkG8Pmm/xtiHz843DSJT/cDIL2o95B
-         XKA9hb3W+oP9/sPamtzhaFPCm6otIKNNUpY1Gbw8iDCVaAW5gRLFAC9uT3g20dMmwlsl
-         RSL/F6+TQ+kuyhdwO0AxccLsC3kCl0bPNBz6WWwJ+ETkBQ+WEMgIDQ0VaYt8qFokOuzU
-         l5fEy9F0G5nJUDdKaoqS8UvVpK8PfCmP6EYiDHbD9i0VFLIyNuzmk+SDUmcQf+NQsGZD
-         AjlADDeQXiAoKrfoUSurPuddBd14vfM+DZsqh+h9+dzNRlWLNF9TqEH9DUqlJ9BlNfBC
-         0V0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709626853; x=1710231653;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ENVdbWViMNbdMsk2tYBUD+u8dUrBMYPUAx5W7hzKOFo=;
-        b=gdUOowWt220pbCoDyAfGkAV2nwtz+1a1qzGQevh6UblcJFlNRSjntfe3kt9ZXcVrX4
-         tVO5F+IkhoIfbmTBPlkjxdd1whhD7iwvQklmHD0VUVh1ZpDnV1ugtf2ThPWDoFUNjsH/
-         pM4v/OPsA7zGHrguLkOLkux8UK6Y7B430IzQr0Zo5+Vy2amYO7EC/Ipv7zJvEf+NjN+S
-         StKNjkQfeYZOFzeKHa2Fkxpf6T0jOXZW/hpa7YKbSpEJFLhjnfUGPs3M2m4WvT0R1Vt6
-         ygsEhiL9mBmLif/jMOxCbPcSurOaPTR4UveVUnHMgAvDfT/tzvC380V63IT4QFimCgLQ
-         +OYw==
-X-Forwarded-Encrypted: i=1; AJvYcCWk2/ObfjFr8v0Dny/SnAJz5oLLrQYQfcf2NE9/pCjoUgOZKEpjvcN7XCMY5zBvNNbJUgD4LQNnQ/KYgyPtHyADeMy7qTg2z4+nIYaAkky/lQul11+uziW5i/OPDj1TiJ/j0bwxUelqQpk=
-X-Gm-Message-State: AOJu0YxTA9k9RAg+AYv8eiXQuuIUZLaof2Hzx/DBDkBvBgVElT6l4Wk5
-	Wi6l/3V6CwdCwO9jwh2ZfVyo7N1oP3Vba+YL3qZ1SdvCYyxtIrmW
-X-Google-Smtp-Source: AGHT+IGRIXT23C4Loa9kbMHMWmSzvg6b+GSBp7ilkDEE0aeiD2V7Hmv5vccuK/1kB+/XZYehRpgWHQ==
-X-Received: by 2002:a17:90a:c01:b0:299:39e0:98cb with SMTP id 1-20020a17090a0c0100b0029939e098cbmr9160055pjs.15.1709626853359;
-        Tue, 05 Mar 2024 00:20:53 -0800 (PST)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id mf12-20020a17090b184c00b002904cba0ffbsm11239864pjb.32.2024.03.05.00.20.51
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Mar 2024 00:20:53 -0800 (PST)
-From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To: Justin Sanders <justin@coraid.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Pavel Emelianov <xemul@openvz.org>,
-	Kirill Korotaev <dev@openvz.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chun-Yi Lee <jlee@suse.com>
-Subject: [PATCH] aoe: fix the potential use-after-free problem in aoecmd_cfg_pkts
-Date: Tue,  5 Mar 2024 16:20:48 +0800
-Message-Id: <20240305082048.25526-1-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
+	dkim=pass (1024-bit key) header.d=aixigo.com header.i=@aixigo.com header.b="vP5fwqOa"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; s=default; bh=fQfjSN3GrHCr
+	7EmgsLNb1WTj1bVNcHKeybvX8+51GkY=; h=in-reply-to:from:references:cc:to:
+	subject:date; d=aixigo.com; b=vP5fwqOaBDQQtkt7usW5j5roTVsB1yk7NqaEV7wT
+	8mfh948ibXZvsduo6rn1zEyz7AvnMtsEgBAe4t6OY7Dmq4hZOE9xcWCirvb2alSlVxAaGL
+	D9hBBakNI+oeJd+rRJn2sonqBxZKXANROdJSzb8oA2FcTPHfVqe2acQHOIk7o=
+Received: from mailhost.ac.aixigo.de (mailhost.ac.aixigo.de [172.19.96.11])
+	by mail.aixigo.de (OpenSMTPD) with ESMTPS id 12e58b84 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 5 Mar 2024 09:52:13 +0100 (CET)
+Received: from [172.19.97.128] (dpcl082.ac.aixigo.de [172.19.97.128])
+	by mailhost.ac.aixigo.de (8.17.1.9/8.17.1.9/Debian-2) with ESMTPS id 4258qCWP1098777
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT);
+	Tue, 5 Mar 2024 09:52:12 +0100
+Message-ID: <7f2bffbd-8ba4-4629-a318-5af95133c002@aixigo.com>
+Date: Tue, 5 Mar 2024 09:52:12 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Betterbird (Linux)
+Subject: Re: RIP on discard, JMicron USB adaptor
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Keith Busch <kbusch@kernel.org>, Alan Stern <stern@rowland.harvard.edu>,
+        Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-usb@vger.kernel.org,
+        Harald Dunkel <harri@afaics.de>
+References: <70bc51d7-c8a2-4b06-ab7a-e321d20db49a@aixigo.com>
+ <62296d89-f7e6-4f54-add8-35b531dc657c@rowland.harvard.edu>
+ <Zd9Xbz3L6JEvBHHT@kbusch-mbp> <yq1sf1c1h0x.fsf@ca-mkp.ca.oracle.com>
+ <7a10ff3b-0c4c-4aa3-8218-02d5f27ab062@afaics.de>
+ <029ff780-902e-42da-a5ed-6c306c6cb2e4@aixigo.com>
+ <yq14jdlv3cv.fsf@ca-mkp.ca.oracle.com>
+From: Harald Dunkel <harald.dunkel@aixigo.com>
+Content-Language: en-US
+In-Reply-To: <yq14jdlv3cv.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 1.0.3 at srvvm01.ac.aixigo.de
+X-Virus-Status: Clean
 
-From: Chun-Yi Lee <jlee@suse.com>
+On 2024-03-05 03:14:24, Martin K. Petersen wrote:
+> 
+> Well, the device reports that block provisioning is disabled (lbpme=0)
+> which explains why discard is not enabled by default.
+> 
+> Oddly enough your device does not report an UNMAP granularity. I'm
+> trying to figure out how your discard granularity ends up being 0 given
+> that your device reports a physical block size of 4096.
+> 
 
-This patch is against CVE-2023-6270. The description of cve is:
+I have inserted 2 other m.2 SSDs into the adapter: There was no problem
+with these, esp there was no warning about discard_granularity, or a RIP.
+First SSD back in: RIP is back, too. I would guess the first SSD is bad.
 
-  A flaw was found in the ATA over Ethernet (AoE) driver in the Linux
-  kernel. The aoecmd_cfg_pkts() function improperly updates the refcnt on
-  `struct net_device`, and a use-after-free can be triggered by racing
-  between the free on the struct and the access through the `skbtxq`
-  global queue. This could lead to a denial of service condition or
-  potential code execution.
+Sorry for all the trouble. I should have tried another m.2 SSD first.
 
-In aoecmd_cfg_pkts(), it always calls dev_put(ifp) when skb initial
-code is finished. But the net_device ifp will still be used in
-later tx()->dev_queue_xmit() in kthread. Which means that the
-dev_put(ifp) should NOT be called in the success path of skb
-initial code in aoecmd_cfg_pkts(). Otherwise tx() may run into
-use-after-free because the net_device is freed.
+Just for the record, this is what smartctl -x reports about the bad SSD:
 
-This patch removed the dev_put(ifp) in the success path in
-aoecmd_cfg_pkts(), and added dev_put() after skb xmit in tx().
+-------------------------------------------------------------------------------
+root@dpcl082:~# smartctl -x /dev/sdf
+smartctl 7.4 2023-08-01 r5530 [x86_64-linux-6.7.6-raw] (local build)
+Copyright (C) 2002-23, Bruce Allen, Christian Franke, www.smartmontools.org
 
-Link: https://nvd.nist.gov/vuln/detail/CVE-2023-6270
-Fixes: 7562f876cd93 ("[NET]: Rework dev_base via list_head (v3)")
-Signed-off-by: Chun-Yi Lee <jlee@suse.com>
----
- drivers/block/aoe/aoecmd.c | 12 ++++++------
- drivers/block/aoe/aoenet.c |  1 +
- 2 files changed, 7 insertions(+), 6 deletions(-)
+=== START OF INFORMATION SECTION ===
+Model Number:                       SAMSUNG MZVLB1T0HALR-000L7
+Serial Number:                      S3TPNX0K917992
+Firmware Version:                   5L2QEXA7
+PCI Vendor/Subsystem ID:            0x144d
+IEEE OUI Identifier:                0x002538
+Total NVM Capacity:                 1,024,209,543,168 [1.02 TB]
+Unallocated NVM Capacity:           0
+Controller ID:                      4
+NVMe Version:                       1.2
+Number of Namespaces:               1
+Namespace 1 Size/Capacity:          1,024,209,543,168 [1.02 TB]
+Namespace 1 Utilization:            1,015,982,354,432 [1.01 TB]
+Namespace 1 Formatted LBA Size:     512
+Namespace 1 IEEE EUI-64:            002538 8981be5959
+Local Time is:                      Tue Mar  5 08:29:01 2024 CET
+Firmware Updates (0x16):            3 Slots, no Reset required
+Optional Admin Commands (0x0017):   Security Format Frmw_DL Self_Test
+Optional NVM Commands (0x001f):     Comp Wr_Unc DS_Mngmt Wr_Zero Sav/Sel_Feat
+Log Page Attributes (0x03):         S/H_per_NS Cmd_Eff_Lg
+Maximum Data Transfer Size:         512 Pages
+Warning  Comp. Temp. Threshold:     81 Celsius
+Critical Comp. Temp. Threshold:     82 Celsius
 
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index d7317425be51..cc9077b588d7 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -419,13 +419,16 @@ aoecmd_cfg_pkts(ushort aoemajor, unsigned char aoeminor, struct sk_buff_head *qu
- 	rcu_read_lock();
- 	for_each_netdev_rcu(&init_net, ifp) {
- 		dev_hold(ifp);
--		if (!is_aoe_netif(ifp))
--			goto cont;
-+		if (!is_aoe_netif(ifp)) {
-+			dev_put(ifp);
-+			continue;
-+		}
- 
- 		skb = new_skb(sizeof *h + sizeof *ch);
- 		if (skb == NULL) {
- 			printk(KERN_INFO "aoe: skb alloc failure\n");
--			goto cont;
-+			dev_put(ifp);
-+			continue;
- 		}
- 		skb_put(skb, sizeof *h + sizeof *ch);
- 		skb->dev = ifp;
-@@ -440,9 +443,6 @@ aoecmd_cfg_pkts(ushort aoemajor, unsigned char aoeminor, struct sk_buff_head *qu
- 		h->major = cpu_to_be16(aoemajor);
- 		h->minor = aoeminor;
- 		h->cmd = AOECMD_CFG;
--
--cont:
--		dev_put(ifp);
- 	}
- 	rcu_read_unlock();
- }
-diff --git a/drivers/block/aoe/aoenet.c b/drivers/block/aoe/aoenet.c
-index c51ea95bc2ce..923a134fd766 100644
---- a/drivers/block/aoe/aoenet.c
-+++ b/drivers/block/aoe/aoenet.c
-@@ -63,6 +63,7 @@ tx(int id) __must_hold(&txlock)
- 			pr_warn("aoe: packet could not be sent on %s.  %s\n",
- 				ifp ? ifp->name : "netif",
- 				"consider increasing tx_queue_len");
-+		dev_put(ifp);
- 		spin_lock_irq(&txlock);
- 	}
- 	return 0;
--- 
-2.35.3
+Supported Power States
+St Op     Max   Active     Idle   RL RT WL WT  Ent_Lat  Ex_Lat
+  0 +     7.02W       -        -    0  0  0  0        0       0
+  1 +     6.30W       -        -    1  1  1  1        0       0
+  2 +     3.50W       -        -    2  2  2  2        0       0
+  3 -   0.0760W       -        -    3  3  3  3      210    1200
+  4 -   0.0050W       -        -    4  4  4  4     2000    8000
 
+Supported LBA Sizes (NSID 0x1)
+Id Fmt  Data  Metadt  Rel_Perf
+  0 +     512       0         0
+
+=== START OF SMART DATA SECTION ===
+SMART overall-health self-assessment test result: PASSED
+
+SMART/Health Information (NVMe Log 0x02)
+Critical Warning:                   0x00
+Temperature:                        24 Celsius
+Available Spare:                    100%
+Available Spare Threshold:          10%
+Percentage Used:                    4%
+Data Units Read:                    32,373,823 [16.5 TB]
+Data Units Written:                 59,721,865 [30.5 TB]
+Host Read Commands:                 848,557,454
+Host Write Commands:                1,025,191,828
+Controller Busy Time:               2,700
+Power Cycles:                       2,222
+Power On Hours:                     5,568
+Unsafe Shutdowns:                   666
+Media and Data Integrity Errors:    0
+Error Information Log Entries:      3,607
+Warning  Comp. Temperature Time:    0
+Critical Comp. Temperature Time:    0
+Temperature Sensor 1:               24 Celsius
+Temperature Sensor 2:               25 Celsius
+
+Error Information (NVMe Log 0x01, 16 of 64 entries)
+No Errors Logged
+
+Self-test Log (NVMe Log 0x06)
+Self-test status: No self-test in progress
+No Self-tests Logged
+-------------------------------------------------------------------------------
+
+Regards
+Harri
