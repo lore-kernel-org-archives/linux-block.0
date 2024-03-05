@@ -1,77 +1,50 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3B41292FC
-	for <linux-block@vger.kernel.org>; Tue,  5 Mar 2024 22:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC0C1862F;
+	Tue,  5 Mar 2024 23:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709677104; cv=none; b=a+FvPUahisawxH4NJNqJYfTIzFJUGjbBEfQ8r2BzpatCCyiNuQKmsHPAhz0i5UAnhFpO3FCNupe+r9sMhkYZSVOs5G/3KTsDai1wzzP7jU9fMAofHL+OWUZX1uUxzFIi91oJht8+qUr2aZrDfY1e+ipr1OUHhBBPtn66V50HAVU=
+	t=1709680250; cv=none; b=i1tHi4ayq1XS0Nd35eeJzQGIls0Q5KLCL2LDUxhgfh00XSH/kbiyQ81FUwW7btrL6ijeIhhelG8FKFNNg3kM729et8dEo6orwM5nsUZAR+ISdCvRcJ571jiOLDrUx+uUoxgA7V1cMmCviPqjNugaVgkcwGITfKbAomcBdeaMh8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709677104; c=relaxed/simple;
-	bh=9LNA1jHQRqYIJJpk0uYCr8Kb8Les4QGDI28QnUsM6eE=;
+	s=arc-20240116; t=1709680250; c=relaxed/simple;
+	bh=Fnc41JWcp8TTwdV5+CSs8TOdfZ7zF3uSK0ml0Rjhis8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Or+k2gLvq3eEW2oLi2OsDtQE7Zugv4oSEpQRukGzxVMPcoS/NbxYdfHF8Hw93hsqCmQ677DhXHNZKw0/bq1f911P78GDWaE27f/hbaz3Mzqu5VLAO4Gbva+HUp3LCH9XVNkBj9p37i+SUPAnM4X5E9xWqlsXcBQCITIMog7Yov4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=BFS4jd69; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=fRcHEyBZh0+9Nz3kAIYT6xcNQ2wYrbzI460DEtOYJqYNyE6o4no3bwATB7WE8QRo8X80uZc4i0CDgOXZEmu+2ihwcDE5Szmo1UQoKYspnOlGcSTmZba+O/BUhaSogJYDXMKkI/yfut3zBtghTNvdEudnH+xGIH6OPuU/OAp8LhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ALzypJ1Y; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="BFS4jd69"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6e5eb3dd2f8so2556695b3a.2
-        for <linux-block@vger.kernel.org>; Tue, 05 Mar 2024 14:18:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1709677102; x=1710281902; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZT0E+xfE6Is1penOGXY7BgtiBNf+i2fC3qJWRmlk8Ss=;
-        b=BFS4jd69etiy8e+I6URSYA682Vny1Eddas5uxxFrFsP8LcbOMt1pFtmBH9uzxIuTHx
-         7x+PvE4SR1iRwFONHSkrPHAXScC75P0VuKGdvpZcmQPimXzDdoJp9WRhvx1lF3udrImb
-         OJpuAwIuIIGU1VNlA7FT2AXLg2s/1AgOwbB1824T0Y6ZMvCzCCoUMNAZpVCSY6IQCXmv
-         PGEStm1wYoz7gQOCV5dk7nIqvgObyAHsbOrgvKn8TSCJpvobil+Wl6eSaV4pwo/oJopJ
-         jcjp460CW/wgTx4KheUjWdtgtAcfPRCR6AJ09bHL1mjuPOQfdWB9g5Joz9aGflNErJnY
-         Dtkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709677102; x=1710281902;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZT0E+xfE6Is1penOGXY7BgtiBNf+i2fC3qJWRmlk8Ss=;
-        b=Kirgo7kTVJnYLaef99Rqd1jMT6dE1Y20HPqBEunW15DMGo0M8g33HHSBzHnpfbXwDp
-         5BynO4u2GeszNDRhC9CWK4dXsaJhteUijhxJrGWHEiQ3GIhDqMX/empNzogLXXsUo/rf
-         5pM68tLRs8sJ/RmOsVf9Au6RBRwkU6zlalUQZrektO8ADxKTFyTNYKhHWoceHe4OA/YT
-         4BRYxAqSvQ+WiiZ/+KY1TZZZbLyhnPm9Hxgm63syg3RGVWPr4d4WbFEUbe8oF3dB4e49
-         GDiCw2mTcqyF1w/H728gXnekbii15tVrG3AB/YQLUkqKqWdWGUxnfjvOgITELm6q4wur
-         FsbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMMgNsJsuzFG06WbiXrtdFWgMXHuKldrmH+bganUCeHwam6GEHKxsiKtiCsFZrgI33cmjlVyC/ytLYoJ21XfwdRLbCIdKZK8R20TU=
-X-Gm-Message-State: AOJu0YwYfHgTeLZDtoq2Xd+3Vv64997gl6l6a3bIXxJDlpbQJ1YPGZy5
-	SPdg9YY07hrxhulSqVKQK8Wp294ZJD+k86VoQEcpBxJ4w/k0S7wHE+SEs5RXQAc=
-X-Google-Smtp-Source: AGHT+IHR0bYfjZNZ+IVZC/CMhYRQ0wwfWcjs6kg5rLZEnSmP6gWN+dGMC1lld5Hoz8sE/FQ74qoRFw==
-X-Received: by 2002:aa7:88c1:0:b0:6e5:5425:d914 with SMTP id k1-20020aa788c1000000b006e55425d914mr14317350pff.2.1709677101467;
-        Tue, 05 Mar 2024 14:18:21 -0800 (PST)
-Received: from dread.disaster.area (pa49-181-192-230.pa.nsw.optusnet.com.au. [49.181.192.230])
-        by smtp.gmail.com with ESMTPSA id fb26-20020a056a002d9a00b006e647059cccsm621041pfb.33.2024.03.05.14.18.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 14:18:21 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1rhd74-00FXJ3-0b;
-	Wed, 06 Mar 2024 09:18:18 +1100
-Date: Wed, 6 Mar 2024 09:18:18 +1100
-From: Dave Chinner <david@fromorbit.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ALzypJ1Y"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=AzfcVf2MD8/p0Amw/4NcH7l9FF7lH9l9bZ/XM70hcPY=; b=ALzypJ1YFStiacKMqydGBmTVlP
+	YTUVF1xHkoLghzjq7E/lbRgZid3uLJgiw49Sp1jQSAbYyCKb/gHZMWM7rMZZ/ONKXA2F5NEYs1r5D
+	8rRucP/IpKNjKJvvm/ETL/0cyT38RtE/zLgQMIkzWtVsfvdDVbGQOR6RbD6iml2tFlK5drIE+zn3u
+	HDMMCHitk0ECIe6gGAct543Vsjs58lZLCwbCkHGfUwjkxVC8Llrg7L34j7VDvW8OtAtTaNNVNAALm
+	vAUi8qtmJCzc4FlJFblT4FQx2Ur6z8c4WsYyG0tZ8NsFvpA010d5uBs3He6ENJnN7GLLTUPdpFV0N
+	hTuYo/4w==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rhdvh-00000005Saj-2rlV;
+	Tue, 05 Mar 2024 23:10:37 +0000
+Date: Tue, 5 Mar 2024 23:10:37 +0000
+From: Matthew Wilcox <willy@infradead.org>
 To: John Garry <john.g.garry@oracle.com>
-Cc: djwong@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, jack@suse.cz, chandan.babu@oracle.com,
-	axboe@kernel.dk, martin.petersen@oracle.com,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
 	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 04/14] fs: xfs: Make file data allocations observe the
- 'forcealign' flag
-Message-ID: <ZeeaKrmVEkcXYjbK@dread.disaster.area>
-References: <20240304130428.13026-1-john.g.garry@oracle.com>
- <20240304130428.13026-5-john.g.garry@oracle.com>
- <ZeZq0hRLeEV0PNd6@dread.disaster.area>
- <f569d971-222a-4824-b5fe-2e0d8dc400cc@oracle.com>
+	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
+	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+	io-uring@vger.kernel.org, nilay@linux.ibm.com,
+	ritesh.list@gmail.com
+Subject: Re: [PATCH v5 00/10] block atomic writes
+Message-ID: <ZeembVG-ygFal6Eb@casper.infradead.org>
+References: <20240226173612.1478858-1-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,121 +53,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f569d971-222a-4824-b5fe-2e0d8dc400cc@oracle.com>
+In-Reply-To: <20240226173612.1478858-1-john.g.garry@oracle.com>
 
-On Tue, Mar 05, 2024 at 03:22:52PM +0000, John Garry wrote:
-> On 05/03/2024 00:44, Dave Chinner wrote:
-> > On Mon, Mar 04, 2024 at 01:04:18PM +0000, John Garry wrote:
-....
-> > IOWs, these are static geometry constraints and so should be checked
-> > and rejected at the point where alignments are specified (i.e.
-> > mkfs, mount and ioctls). Then the allocator can simply assume that
-> > forced inode alignments are always stripe alignment compatible and
-> > we don't need separate handling of two possibly incompatible
-> > alignments.
-> 
-> ok, makes sense.
-> 
-> Please note in case missed, I am mandating extsize hint for forcealign needs
-> to be a power-of-2. It just makes life easier for all the sub-extent
-> zero'ing later on.
+On Mon, Feb 26, 2024 at 05:36:02PM +0000, John Garry wrote:
+> This series introduces a proposal to implementing atomic writes in the
+> kernel for torn-write protection.
 
-That's fine - that will need to be documented in the xfsctl man
-page...
+The API as documented will be unnecessarily complicated to implement
+for buffered writes, I believe.  What I would prefer is a chattr (or, I
+guess, setxattr these days) that sets the tearing boundary for the file.
+The page cache can absorb writes of arbitrary size and alignment, but
+will be able to guarantee that (if the storage supports it), the only
+write tearing will happen on the specified boundary.
 
-> Also we need to enforce that the AG count to be compliant with the extsize
-                                      ^^^^^ size?
+We _can_ support arbitrary power-of-two write sizes to the page cache,
+but if the requirement is no tearing inside a single write, then we
+will have to do a lot of work to make that true.  It isn't clear to me
+that anybody is asking for this; the databases I'm aware of are willing
+to submit 128kB writes and accept that there may be tearing at 16kB
+boundaries (or whatever).
 
-> hint for forcealign; but since the extsize hint for forcealign needs to be
-> compliant with stripe unit, above, and stripe unit would be compliant wth AG
-> count (right?), then this would be a given.
-
-We already align AG size to stripe unit when a stripe unit is set,
-and ensure that we don't place all the AG headers on the same stripe
-unit.
-
-However, if there is no stripe unit we don't align the AG to
-anything. So, yes, AG sizing by mkfs will need to ensure that all
-AGs are correctly aligned to the underlying storage (integer
-multiple of the max atomic write size, right?)...
-
-> > More below....
-> > 
-> > > +	} else {
-> > > +		args->alignment = 1;
-> > > +	}
-> > 
-> > Just initialise the allocation args structure with a value of 1 like
-> > we already do?
-> 
-> It was being done in this way to have just a single place where the value is
-> initialised. It can easily be kept as is.
-
-I'd prefer it as is, because then the value is always initialised
-correctly and we only override in the special cases....
-
-> > >   	args.minleft = ap->minleft;
-> > > @@ -3484,6 +3496,7 @@ xfs_bmap_btalloc_at_eof(
-> > >   {
-> > >   	struct xfs_mount	*mp = args->mp;
-> > >   	struct xfs_perag	*caller_pag = args->pag;
-> > > +	int			orig_alignment = args->alignment;
-> > >   	int			error;
-> > >   	/*
-> > > @@ -3558,10 +3571,10 @@ xfs_bmap_btalloc_at_eof(
-> > >   	/*
-> > >   	 * Allocation failed, so turn return the allocation args to their
-> > > -	 * original non-aligned state so the caller can proceed on allocation
-> > > -	 * failure as if this function was never called.
-> > > +	 * original state so the caller can proceed on allocation failure as
-> > > +	 * if this function was never called.
-> > >   	 */
-> > > -	args->alignment = 1;
-> > > +	args->alignment = orig_alignment;
-> > >   	return 0;
-> > >   }
-> > 
-> > As I said above, we can't set an alignment of > 1 here if we haven't
-> > accounted for that alignment in args->minalignslop above. This leads
-> > to unexpected ENOSPC conditions and filesystem shutdowns.
-> > 
-> > I suspect what we need to do is get rid of the separate stripe_align
-> > variable altogether and always just set args->alignment to what we
-> > need the extent start alignment to be, regardless of whether it is
-> > from stripe alignment or forced alignment.
-> 
-> ok, it sounds a bit simpler at least
-> 
-> > 
-> > Then the code in xfs_bmap_btalloc_at_eof() doesn't need to know what
-> > 'stripe_align' is - the exact EOF block allocation can simply save
-> > and restore the args->alignment value and use it for minalignslop
-> > calculations for the initial exact block allocation.
-> > 
-> > Then, if xfs_bmap_btalloc_at_eof() fails and xfs_inode_forcealign()
-> > is true, we can abort allocation immediately, and not bother to fall
-> > back on further aligned/unaligned attempts that will also fail or do
-> > the wrong them.
-> 
-> ok
-> 
-> > 
-> > Similarly, if we aren't doing EOF allocation, having args->alignment
-> > set means it will do the right thing for the first allocation
-> > attempt. Again, if that fails, we can check if
-> > xfs_inode_forcealign() is true and fail the aligned allocation
-> > instead of running the low space algorithm. This now makes it clear
-> > that we're failing the allocation because of the forced alignment
-> > requirement, and now the low space allocation code can explicitly
-> > turn off start alignment as it isn't required...
-> 
-> are you saying that low-space allocator can set args->alignment = 1 to be
-> explicit?
-
-Yes.
-
--Dave.
-
--- 
-Dave Chinner
-david@fromorbit.com
