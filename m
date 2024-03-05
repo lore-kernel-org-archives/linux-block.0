@@ -1,48 +1,31 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B90D8615A
-	for <linux-block@vger.kernel.org>; Tue,  5 Mar 2024 13:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98B55915D;
+	Tue,  5 Mar 2024 13:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709646050; cv=none; b=e4CLZwXWTtpPn7DmxJVu4HkY3UwO66L4EC1Ph2HVZqvqVZbc9+exjN0Uq+xfRhYGKnarr0W4uVBKhAbrSbyt4EivzFau1r3E8MNIzkrPRB7hv2rzGbJ2SC16H/6xdK97XMw+MzZfgNprW1QfRXTW3NfdIvubXmWM5eZLsXcxop0=
+	t=1709646355; cv=none; b=cQFhZ3j5OuaM27w3K6BA8YQaN+pTcz8przQ/JtmXi0CcXZqEKCxXzkn502BlDKOxfkrlCj46nmsaKXyJmL6CnlPD44SQgPKslvtmeGukpeqGIBVACc9Bu0ZB8mSzLwsDNPW/XkZ9BiJchmD2r0SMt3LYm0CDcjr0WLFJDsqakI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709646050; c=relaxed/simple;
-	bh=QyWcRrNxVgK384e9YKYldUdazeaevTm41k1lsqyTxkw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KGCdAlgysN1EGJtVTMnYL7em6mMT0FommshhI0+g2cBI7x+s7dDNVm8UROZN6ENCi9MbzJy0W+mcQK5vWm9XxxE8VAT/4Gh0K/uuyDIPbQALWuVqg3QgiIGArka3Z/7l1dghe72RHS+ibv+5Ahhh58zNtU0DevmDBfJHvUV5G9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RLgA+UhI; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RLgA+UhI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=fs+hHzeY50NjZ+wR6CygHlhg6UmFfdzm3awOpeO+YYg=; b=RLgA+UhInXIE1bKXuhC8w9AVUm
-	VqQ+Rqt84ukF0fJbaimZ03kclW6G8eHGodix2gT85jEX+UIFzR1qfqSgzgUUJTgF+Hl8NQVQvdwUr
-	T6YdOYhChJ7MRj0U4WjF/lkXC+6HRQWoap82E/wqiAOMnCJqbG5scpmJYHGWoYfsUWr+S98eOymPV
-	r0qdgrjTzvZfAakrxyp4O5bQhHasfXcu3roYA4WtzPcXp60sJrT1WECfzy0o5m6YwagUxNiL0nt+c
-	EMFdbYrswcJJNe6O4ZEhQWAki8yvY9giwmbJI9GmglQo/0Ce7EaNT4AEKGLAlK3SKQVYxLqstvO3o
-	6BcsEoOg==;
-Received: from [50.219.53.154] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rhV2G-0000000Dqyt-1SBp;
-	Tue, 05 Mar 2024 13:40:48 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 7/7] drbd: atomically update queue limits in drbd_reconsider_queue_parameters
-Date: Tue,  5 Mar 2024 06:40:41 -0700
-Message-Id: <20240305134041.137006-8-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240305134041.137006-1-hch@lst.de>
-References: <20240305134041.137006-1-hch@lst.de>
+	s=arc-20240116; t=1709646355; c=relaxed/simple;
+	bh=xfh49nxcNCMeozUYuhHg+aE7kDfXE3vNBO+UGPTu1fc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KdB+z7dEEdzrLEnI7QdSFZPQfmdLULFC8Bcqnaz7hpwei3K0BbMzX32X8+ZJU9ZF5Uhr4bvnlwozFPnsDTMTWOvRdQcBqt4q+vzH636huCLajpsI+HJ9HPLMamvloRTawAc+zVp3IhRKEkCbEY5ubJySPigkIglQk4dLC22ghGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (78.37.41.175) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 5 Mar
+ 2024 16:45:41 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: Jens Axboe <axboe@kernel.dk>
+CC: Roman Smirnov <r.smirnov@omp.ru>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Karina Yankevich <k.yankevich@omp.ru>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH] block: prevent division by zero in blk_rq_stat_sum()
+Date: Tue, 5 Mar 2024 16:45:09 +0300
+Message-ID: <20240305134509.23108-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,177 +33,68 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/05/2024 13:15:25
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183964 [Mar 05 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 8 0.3.8 4a99897b35b48c45ee5c877607d26a2d9f419920
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 78.37.41.175 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 78.37.41.175
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/05/2024 13:20:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 3/5/2024 11:10:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Switch drbd_reconsider_queue_parameters to set up the queue parameters
-in an on-stack queue_limits structure and apply the atomically.  Remove
-various helpers that have become so trivial that they can be folded into
-drbd_reconsider_queue_parameters.
+The expression dst->nr_samples + src->nr_samples may
+have zero value on overflow. It is necessary to add
+a check to avoid division by zero.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Found by Linux Verification Center (linuxtesting.org) with Svace.
+
+Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 ---
- drivers/block/drbd/drbd_nl.c | 119 ++++++++++++++---------------------
- 1 file changed, 46 insertions(+), 73 deletions(-)
+ block/blk-stat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index 94ed2b3ea6361d..fbd92803dc1da4 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1216,11 +1216,6 @@ static unsigned int drbd_max_peer_bio_size(struct drbd_device *device)
- 	return DRBD_MAX_BIO_SIZE;
- }
- 
--static void blk_queue_discard_granularity(struct request_queue *q, unsigned int granularity)
--{
--	q->limits.discard_granularity = granularity;
--}
--
- static unsigned int drbd_max_discard_sectors(struct drbd_connection *connection)
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index 7ff76ae6c76a..e42c263e53fb 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -27,7 +27,7 @@ void blk_rq_stat_init(struct blk_rq_stat *stat)
+ /* src is a per-cpu stat, mean isn't initialized */
+ void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
  {
- 	/* when we introduced REQ_WRITE_SAME support, we also bumped
-@@ -1247,62 +1242,6 @@ static bool drbd_discard_supported(struct drbd_connection *connection,
- 	return true;
- }
+-	if (!src->nr_samples)
++	if (dst->nr_samples + src->nr_samples <= dst->nr_samples)
+ 		return;
  
--static void decide_on_discard_support(struct drbd_device *device,
--		struct drbd_backing_dev *bdev)
--{
--	struct drbd_connection *connection =
--		first_peer_device(device)->connection;
--	struct request_queue *q = device->rq_queue;
--	unsigned int max_discard_sectors;
--
--	if (!drbd_discard_supported(connection, bdev))
--		goto not_supported;
--
--	/*
--	 * We don't care for the granularity, really.
--	 *
--	 * Stacking limits below should fix it for the local device.  Whether or
--	 * not it is a suitable granularity on the remote device is not our
--	 * problem, really. If you care, you need to use devices with similar
--	 * topology on all peers.
--	 */
--	blk_queue_discard_granularity(q, 512);
--	max_discard_sectors = drbd_max_discard_sectors(connection);
--	blk_queue_max_discard_sectors(q, max_discard_sectors);
--	return;
--
--not_supported:
--	blk_queue_discard_granularity(q, 0);
--	blk_queue_max_discard_sectors(q, 0);
--}
--
--static void fixup_write_zeroes(struct drbd_device *device, struct request_queue *q)
--{
--	/* Fixup max_write_zeroes_sectors after blk_stack_limits():
--	 * if we can handle "zeroes" efficiently on the protocol,
--	 * we want to do that, even if our backend does not announce
--	 * max_write_zeroes_sectors itself. */
--	struct drbd_connection *connection = first_peer_device(device)->connection;
--	/* If the peer announces WZEROES support, use it.  Otherwise, rather
--	 * send explicit zeroes than rely on some discard-zeroes-data magic. */
--	if (connection->agreed_features & DRBD_FF_WZEROES)
--		q->limits.max_write_zeroes_sectors = DRBD_MAX_BBIO_SECTORS;
--	else
--		q->limits.max_write_zeroes_sectors = 0;
--}
--
--static void fixup_discard_support(struct drbd_device *device, struct request_queue *q)
--{
--	unsigned int max_discard = device->rq_queue->limits.max_discard_sectors;
--	unsigned int discard_granularity =
--		device->rq_queue->limits.discard_granularity >> SECTOR_SHIFT;
--
--	if (discard_granularity > max_discard) {
--		blk_queue_discard_granularity(q, 0);
--		blk_queue_max_discard_sectors(q, 0);
--	}
--}
--
- /* This is the workaround for "bio would need to, but cannot, be split" */
- static unsigned int drbd_backing_dev_max_segments(struct drbd_device *device)
- {
-@@ -1320,8 +1259,11 @@ static unsigned int drbd_backing_dev_max_segments(struct drbd_device *device)
- void drbd_reconsider_queue_parameters(struct drbd_device *device,
- 		struct drbd_backing_dev *bdev, struct o_qlim *o)
- {
-+	struct drbd_connection *connection =
-+		first_peer_device(device)->connection;
- 	struct request_queue * const q = device->rq_queue;
- 	unsigned int now = queue_max_hw_sectors(q) << 9;
-+	struct queue_limits lim;
- 	struct request_queue *b = NULL;
- 	unsigned int new;
- 
-@@ -1348,24 +1290,55 @@ void drbd_reconsider_queue_parameters(struct drbd_device *device,
- 		drbd_info(device, "max BIO size = %u\n", new);
- 	}
- 
-+	lim = queue_limits_start_update(q);
- 	if (bdev) {
--		blk_set_stacking_limits(&q->limits);
--		blk_queue_max_segments(q,
--			drbd_backing_dev_max_segments(device));
-+		blk_set_stacking_limits(&lim);
-+		lim.max_segments = drbd_backing_dev_max_segments(device);
- 	} else {
--		blk_queue_max_segments(q, BLK_MAX_SEGMENTS);
-+		lim.max_segments = BLK_MAX_SEGMENTS;
- 	}
- 
--	blk_queue_max_hw_sectors(q, new >> SECTOR_SHIFT);
--	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
--	decide_on_discard_support(device, bdev);
-+	lim.max_hw_sectors = new >> SECTOR_SHIFT;
-+	lim.seg_boundary_mask = PAGE_SIZE - 1;
- 
--	if (bdev) {
--		blk_stack_limits(&q->limits, &b->limits, 0);
--		disk_update_readahead(device->vdisk);
-+	/*
-+	 * We don't care for the granularity, really.
-+	 *
-+	 * Stacking limits below should fix it for the local device.  Whether or
-+	 * not it is a suitable granularity on the remote device is not our
-+	 * problem, really. If you care, you need to use devices with similar
-+	 * topology on all peers.
-+	 */
-+	if (drbd_discard_supported(connection, bdev)) {
-+		lim.discard_granularity = 512;
-+		lim.max_hw_discard_sectors =
-+			drbd_max_discard_sectors(connection);
-+	} else {
-+		lim.discard_granularity = 0;
-+		lim.max_hw_discard_sectors = 0;
- 	}
--	fixup_write_zeroes(device, q);
--	fixup_discard_support(device, q);
-+
-+	if (bdev)
-+		blk_stack_limits(&lim, &b->limits, 0);
-+
-+	/*
-+	 * If we can handle "zeroes" efficiently on the protocol, we want to do
-+	 * that, even if our backend does not announce max_write_zeroes_sectors
-+	 * itself.
-+	 */
-+	if (connection->agreed_features & DRBD_FF_WZEROES)
-+		lim.max_write_zeroes_sectors = DRBD_MAX_BBIO_SECTORS;
-+	else
-+		lim.max_write_zeroes_sectors = 0;
-+
-+	if ((lim.discard_granularity >> SECTOR_SHIFT) >
-+	    lim.max_hw_discard_sectors) {
-+		lim.discard_granularity = 0;
-+		lim.max_hw_discard_sectors = 0;
-+	}
-+
-+	if (queue_limits_commit_update(q, &lim))
-+		drbd_err(device, "setting new queue limits failed\n");
- }
- 
- /* Starts the worker thread */
+ 	dst->min = min(dst->min, src->min);
 -- 
-2.39.2
+2.34.1
 
