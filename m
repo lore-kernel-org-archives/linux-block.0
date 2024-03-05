@@ -1,56 +1,77 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30366128827;
-	Tue,  5 Mar 2024 20:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3B41292FC
+	for <linux-block@vger.kernel.org>; Tue,  5 Mar 2024 22:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709670310; cv=none; b=ogALKf8LZCo7KOSlHJD5Ll1Mhzq3q9h7GptVcwt5KwjP+DkNSiblixy+pPVgl/Dj3bw1JqT86EadRCpeWkOoEw59B7C1bd0TdSfQA4Lbw9TazKIkgsGfHeVLZZD2cexqRsBYl4VsLgXNFeugCSSp8/h8Y4Tq2wujwVoVkyySifY=
+	t=1709677104; cv=none; b=a+FvPUahisawxH4NJNqJYfTIzFJUGjbBEfQ8r2BzpatCCyiNuQKmsHPAhz0i5UAnhFpO3FCNupe+r9sMhkYZSVOs5G/3KTsDai1wzzP7jU9fMAofHL+OWUZX1uUxzFIi91oJht8+qUr2aZrDfY1e+ipr1OUHhBBPtn66V50HAVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709670310; c=relaxed/simple;
-	bh=eCjR4mfI+AWqQXtiUhJgIvBVLRaJmzjFD41b5wteOLw=;
+	s=arc-20240116; t=1709677104; c=relaxed/simple;
+	bh=9LNA1jHQRqYIJJpk0uYCr8Kb8Les4QGDI28QnUsM6eE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NOQxzJ13L3u6Ctjztg8a5cgljYI6fbMWGK3C2aLg9joNSstBwurujTaiTyZ4xZmyv6Eg1U5UocAtrSI+lpKMyGEdXLCaFegLZ+6YPTNSW0fwx2Ofg60XQVCRs+Wt3AruFjURTQOMgLP03VOnQLXrcK40S59fEd+rAcsa1mf4arw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rhbLB-0001S5-24;
-	Tue, 05 Mar 2024 20:24:45 +0000
-Date: Tue, 5 Mar 2024 20:24:41 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Christian Brauner <brauner@kernel.org>,
-	Li Lingfeng <lilingfeng3@huawei.com>,
-	Damien Le Moal <dlemoal@kernel.org>, Min Li <min15.li@samsung.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Christian Loehle <CLoehle@hyperstone.com>,
-	Avri Altman <avri.altman@wdc.com>, Bean Huo <beanhuo@micron.com>,
-	Yeqi Fu <asuk4.q@gmail.com>,
-	Victor Shih <victor.shih@genesyslogic.com.tw>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Diping Zhang <diping.zhang@gl-inet.com>,
-	Jianhui Zhao <zhaojh329@gmail.com>,
-	Jieying Zeng <jieying.zeng@gl-inet.com>,
-	Chad Monroe <chad.monroe@adtran.com>,
-	Adam Fox <adam.fox@adtran.com>, John Crispin <john@phrozen.org>
-Subject: [RFC PATCH v2 8/8] mmc: block: set GENHD_FL_NVMEM
-Message-ID: <9315d06c7b286af445ff32e4db2e7a8c1c2d6ea4.1709667858.git.daniel@makrotopia.org>
-References: <cover.1709667858.git.daniel@makrotopia.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Or+k2gLvq3eEW2oLi2OsDtQE7Zugv4oSEpQRukGzxVMPcoS/NbxYdfHF8Hw93hsqCmQ677DhXHNZKw0/bq1f911P78GDWaE27f/hbaz3Mzqu5VLAO4Gbva+HUp3LCH9XVNkBj9p37i+SUPAnM4X5E9xWqlsXcBQCITIMog7Yov4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=BFS4jd69; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="BFS4jd69"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6e5eb3dd2f8so2556695b3a.2
+        for <linux-block@vger.kernel.org>; Tue, 05 Mar 2024 14:18:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1709677102; x=1710281902; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZT0E+xfE6Is1penOGXY7BgtiBNf+i2fC3qJWRmlk8Ss=;
+        b=BFS4jd69etiy8e+I6URSYA682Vny1Eddas5uxxFrFsP8LcbOMt1pFtmBH9uzxIuTHx
+         7x+PvE4SR1iRwFONHSkrPHAXScC75P0VuKGdvpZcmQPimXzDdoJp9WRhvx1lF3udrImb
+         OJpuAwIuIIGU1VNlA7FT2AXLg2s/1AgOwbB1824T0Y6ZMvCzCCoUMNAZpVCSY6IQCXmv
+         PGEStm1wYoz7gQOCV5dk7nIqvgObyAHsbOrgvKn8TSCJpvobil+Wl6eSaV4pwo/oJopJ
+         jcjp460CW/wgTx4KheUjWdtgtAcfPRCR6AJ09bHL1mjuPOQfdWB9g5Joz9aGflNErJnY
+         Dtkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709677102; x=1710281902;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZT0E+xfE6Is1penOGXY7BgtiBNf+i2fC3qJWRmlk8Ss=;
+        b=Kirgo7kTVJnYLaef99Rqd1jMT6dE1Y20HPqBEunW15DMGo0M8g33HHSBzHnpfbXwDp
+         5BynO4u2GeszNDRhC9CWK4dXsaJhteUijhxJrGWHEiQ3GIhDqMX/empNzogLXXsUo/rf
+         5pM68tLRs8sJ/RmOsVf9Au6RBRwkU6zlalUQZrektO8ADxKTFyTNYKhHWoceHe4OA/YT
+         4BRYxAqSvQ+WiiZ/+KY1TZZZbLyhnPm9Hxgm63syg3RGVWPr4d4WbFEUbe8oF3dB4e49
+         GDiCw2mTcqyF1w/H728gXnekbii15tVrG3AB/YQLUkqKqWdWGUxnfjvOgITELm6q4wur
+         FsbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVMMgNsJsuzFG06WbiXrtdFWgMXHuKldrmH+bganUCeHwam6GEHKxsiKtiCsFZrgI33cmjlVyC/ytLYoJ21XfwdRLbCIdKZK8R20TU=
+X-Gm-Message-State: AOJu0YwYfHgTeLZDtoq2Xd+3Vv64997gl6l6a3bIXxJDlpbQJ1YPGZy5
+	SPdg9YY07hrxhulSqVKQK8Wp294ZJD+k86VoQEcpBxJ4w/k0S7wHE+SEs5RXQAc=
+X-Google-Smtp-Source: AGHT+IHR0bYfjZNZ+IVZC/CMhYRQ0wwfWcjs6kg5rLZEnSmP6gWN+dGMC1lld5Hoz8sE/FQ74qoRFw==
+X-Received: by 2002:aa7:88c1:0:b0:6e5:5425:d914 with SMTP id k1-20020aa788c1000000b006e55425d914mr14317350pff.2.1709677101467;
+        Tue, 05 Mar 2024 14:18:21 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-192-230.pa.nsw.optusnet.com.au. [49.181.192.230])
+        by smtp.gmail.com with ESMTPSA id fb26-20020a056a002d9a00b006e647059cccsm621041pfb.33.2024.03.05.14.18.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 14:18:21 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rhd74-00FXJ3-0b;
+	Wed, 06 Mar 2024 09:18:18 +1100
+Date: Wed, 6 Mar 2024 09:18:18 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: djwong@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, jack@suse.cz, chandan.babu@oracle.com,
+	axboe@kernel.dk, martin.petersen@oracle.com,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 04/14] fs: xfs: Make file data allocations observe the
+ 'forcealign' flag
+Message-ID: <ZeeaKrmVEkcXYjbK@dread.disaster.area>
+References: <20240304130428.13026-1-john.g.garry@oracle.com>
+ <20240304130428.13026-5-john.g.garry@oracle.com>
+ <ZeZq0hRLeEV0PNd6@dread.disaster.area>
+ <f569d971-222a-4824-b5fe-2e0d8dc400cc@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,26 +80,121 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1709667858.git.daniel@makrotopia.org>
+In-Reply-To: <f569d971-222a-4824-b5fe-2e0d8dc400cc@oracle.com>
 
-Set flag to consider MMC block devices as NVMEM providers.
+On Tue, Mar 05, 2024 at 03:22:52PM +0000, John Garry wrote:
+> On 05/03/2024 00:44, Dave Chinner wrote:
+> > On Mon, Mar 04, 2024 at 01:04:18PM +0000, John Garry wrote:
+....
+> > IOWs, these are static geometry constraints and so should be checked
+> > and rejected at the point where alignments are specified (i.e.
+> > mkfs, mount and ioctls). Then the allocator can simply assume that
+> > forced inode alignments are always stripe alignment compatible and
+> > we don't need separate handling of two possibly incompatible
+> > alignments.
+> 
+> ok, makes sense.
+> 
+> Please note in case missed, I am mandating extsize hint for forcealign needs
+> to be a power-of-2. It just makes life easier for all the sub-extent
+> zero'ing later on.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/mmc/core/block.c | 1 +
- 1 file changed, 1 insertion(+)
+That's fine - that will need to be documented in the xfsctl man
+page...
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index c3e9477743515..8cd0400c9887d 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2514,6 +2514,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 	md->disk->major	= MMC_BLOCK_MAJOR;
- 	md->disk->minors = perdev_minors;
- 	md->disk->first_minor = devidx * perdev_minors;
-+	md->disk->flags = GENHD_FL_NVMEM;
- 	md->disk->fops = &mmc_bdops;
- 	md->disk->private_data = md;
- 	md->parent = parent;
+> Also we need to enforce that the AG count to be compliant with the extsize
+                                      ^^^^^ size?
+
+> hint for forcealign; but since the extsize hint for forcealign needs to be
+> compliant with stripe unit, above, and stripe unit would be compliant wth AG
+> count (right?), then this would be a given.
+
+We already align AG size to stripe unit when a stripe unit is set,
+and ensure that we don't place all the AG headers on the same stripe
+unit.
+
+However, if there is no stripe unit we don't align the AG to
+anything. So, yes, AG sizing by mkfs will need to ensure that all
+AGs are correctly aligned to the underlying storage (integer
+multiple of the max atomic write size, right?)...
+
+> > More below....
+> > 
+> > > +	} else {
+> > > +		args->alignment = 1;
+> > > +	}
+> > 
+> > Just initialise the allocation args structure with a value of 1 like
+> > we already do?
+> 
+> It was being done in this way to have just a single place where the value is
+> initialised. It can easily be kept as is.
+
+I'd prefer it as is, because then the value is always initialised
+correctly and we only override in the special cases....
+
+> > >   	args.minleft = ap->minleft;
+> > > @@ -3484,6 +3496,7 @@ xfs_bmap_btalloc_at_eof(
+> > >   {
+> > >   	struct xfs_mount	*mp = args->mp;
+> > >   	struct xfs_perag	*caller_pag = args->pag;
+> > > +	int			orig_alignment = args->alignment;
+> > >   	int			error;
+> > >   	/*
+> > > @@ -3558,10 +3571,10 @@ xfs_bmap_btalloc_at_eof(
+> > >   	/*
+> > >   	 * Allocation failed, so turn return the allocation args to their
+> > > -	 * original non-aligned state so the caller can proceed on allocation
+> > > -	 * failure as if this function was never called.
+> > > +	 * original state so the caller can proceed on allocation failure as
+> > > +	 * if this function was never called.
+> > >   	 */
+> > > -	args->alignment = 1;
+> > > +	args->alignment = orig_alignment;
+> > >   	return 0;
+> > >   }
+> > 
+> > As I said above, we can't set an alignment of > 1 here if we haven't
+> > accounted for that alignment in args->minalignslop above. This leads
+> > to unexpected ENOSPC conditions and filesystem shutdowns.
+> > 
+> > I suspect what we need to do is get rid of the separate stripe_align
+> > variable altogether and always just set args->alignment to what we
+> > need the extent start alignment to be, regardless of whether it is
+> > from stripe alignment or forced alignment.
+> 
+> ok, it sounds a bit simpler at least
+> 
+> > 
+> > Then the code in xfs_bmap_btalloc_at_eof() doesn't need to know what
+> > 'stripe_align' is - the exact EOF block allocation can simply save
+> > and restore the args->alignment value and use it for minalignslop
+> > calculations for the initial exact block allocation.
+> > 
+> > Then, if xfs_bmap_btalloc_at_eof() fails and xfs_inode_forcealign()
+> > is true, we can abort allocation immediately, and not bother to fall
+> > back on further aligned/unaligned attempts that will also fail or do
+> > the wrong them.
+> 
+> ok
+> 
+> > 
+> > Similarly, if we aren't doing EOF allocation, having args->alignment
+> > set means it will do the right thing for the first allocation
+> > attempt. Again, if that fails, we can check if
+> > xfs_inode_forcealign() is true and fail the aligned allocation
+> > instead of running the low space algorithm. This now makes it clear
+> > that we're failing the allocation because of the forced alignment
+> > requirement, and now the low space allocation code can explicitly
+> > turn off start alignment as it isn't required...
+> 
+> are you saying that low-space allocator can set args->alignment = 1 to be
+> explicit?
+
+Yes.
+
+-Dave.
+
 -- 
-2.44.0
+Dave Chinner
+david@fromorbit.com
