@@ -1,112 +1,315 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CB338F;
-	Tue,  5 Mar 2024 00:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C2B8F55
+	for <linux-block@vger.kernel.org>; Tue,  5 Mar 2024 00:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709598009; cv=none; b=dmtf132D2qTG54L2rbJ1MWcKAcfIFN+rRH9jRcfMefnAQ1QbGA9UrmpFpVKxhYfMgHXPocxsF3GFwHFLsRrw/ncQCDHfRbRz/94raECYTQDAXpslzQb9ZozgRwdPSS9Q56Jb1rxGj1g02k79o0NLZVE5dDwcR/FVLb2p68mn42s=
+	t=1709599448; cv=none; b=RcFXOOvO8x0+k52VzklfEeLGiu9fi/xls7B2i8dmuJ73HP5gxgYJcYwpnQQ4YHPlmC4UklsmVWPTFY1vmKesEM32FKCw09Ijv9cJ1ErgaYZEMCbVPUhiek5iw+SzEutMN+AQacx7qxT5gKJSS8xkLWc+lvmQpzvcEUBH1HHGLz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709598009; c=relaxed/simple;
-	bh=n2iJRsp0wDisq9D8A56Nk0XQND53SVEzey0fC0b0eoA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TfyIH01cLm9EnldVxllm24xxqtzdl/FJV0C1WdP71Lgyj9wdSCustdc1UYZZIMs1xfGFT4Hlm5udhfx9K64mRqrPB23BtQa0Y2wTtpD/imqUKhLbwjajjOVPh80Ht3r4tiinLH86FUYt5Srw1lpBhP6cQIMNE/eyF2lBtfGhlVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d944e8f367so34723125ad.0;
-        Mon, 04 Mar 2024 16:20:07 -0800 (PST)
+	s=arc-20240116; t=1709599448; c=relaxed/simple;
+	bh=FCSN2F3wTvR59J3Tc2+6hcLQYXRq7Q3JPDsJPrqBGTQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W4KjAIFuVr70gKG9ngxL+uFZkHWyaP4DEd2B6BVRoYmQdZaIdNhBvshMc5xiI4byHgxQZhfCzFuc/V/azBWV8uUsllWHDdsnMEroLGXg3qf7VyefL59cfLYvWBQD3i2u0eMoGhXz1swHPCJk7haEAB6U78ZAghhI2a51isyvicM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=YOGuIUGc; arc=none smtp.client-ip=209.85.160.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="YOGuIUGc"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2210865d962so1237778fac.3
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2024 16:44:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1709599446; x=1710204246; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xPeZoO0bALzx/m/oW1n+JeFHK8ZJCb569gkaMGduVZI=;
+        b=YOGuIUGcv56EbFSq1A5ahSwiITdCRhR1ddacMwqju3g1CyH8FPo864Mf/F5j94EyzC
+         2UXaNL6LvMhklSaZsCLE/Jd9/+Y6+6FC3GB6UhkSiD8kJbGv8G4AtrlCrUNSWoMWNu/8
+         uXpqLjDQsbqn8iyZi2M9Cdlgo2ropiiZ65mVnhFWwehRa4DEKL/1usjJSvPDbcoFEX01
+         3kkS2qliVzHhSn6115o0tMD47DsB1n0tIkisbMhMnppabIxLfvEqhMHPquh8puLdpeo2
+         bJgsiIY8Z4bGV6TXx/Ga8Tt0MPkmyD/rVtnPpA1/ZdlHhAyaHIoV0k6wsw5adzFsaGyF
+         YPPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709598007; x=1710202807;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cThLIQ7kVxrLe0hSQIUMvSBEyZArR8R8aoZjQ4ZGD9Y=;
-        b=was2wiNeEz3ikHkDbBksGf5yMmRdYmVqVM4mu7xJlO4oPr6IefrML0XBo3xdlJ8hD/
-         lFTMEU3VQV+fKnr+MDM3Ne4aWsf7O1s6TfH8A4jKZzHr/ZDSDKH2zpr9emaFNqkNUxe2
-         fTFIBa6SuCPQ8ZDxBtds1LuOACLJZeeqMxNKL8d9KkY1AwYkgNkVxDB1H1MO5snhknb7
-         zGwoUtCcvXFt3G0WGoPRZ6P25fnNZ4TGp4GG4SEUtGJZxi58fAryhDEf5QctkvFuklxY
-         LYRJCp9TdjfvV1t71viqA96ZSc9NuJpKxbPnd/S3VSY4P1OAwUy8n13H9OdiucA2l3Dx
-         Y03Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWo5yZ2rqTsNvmWjDrXOE3bp+6qWFBFUTDTKCLUG6dJlKUyKPPodDg6g1fcFEfFnpMM106QVBNdsDFPnBTdB5EVLf3xhNZszHhjCXhQHaeyqRyGRpjCBGLb6izavl/+fj4i7clEkrYqhulxSvJVSsr3+W9shsUYR0N4SoJBZGZBAzpluy9JT06UJ9n2ucHlCQKMRXhJjBRajvSGMyNl
-X-Gm-Message-State: AOJu0YxWKbf4rfs9qmSbZJ8rwm7NLQwvIB/HkbPYbpK4ApFE1eLM3c5+
-	I0raVJn8zAHcuJTOlSObgFuoY7k5P2/tacZqqlfsly/2sVb0/MzVKslNXvLk
-X-Google-Smtp-Source: AGHT+IGBK4qsXJ6u6xsgg6YtuRQ4ARl1MW9KjGEbxUYd3grb5H4MLJb1AFN9dYWTVfSXWKh/RmLRuw==
-X-Received: by 2002:a17:902:d50b:b0:1dc:d773:ac with SMTP id b11-20020a170902d50b00b001dcd77300acmr381569plg.7.1709598006843;
-        Mon, 04 Mar 2024 16:20:06 -0800 (PST)
-Received: from ?IPV6:2620:0:1000:8411:9ba8:35e8:4ec5:44d1? ([2620:0:1000:8411:9ba8:35e8:4ec5:44d1])
-        by smtp.gmail.com with ESMTPSA id b6-20020a170902d50600b001dd0d07b3d8sm3298602plg.201.2024.03.04.16.20.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Mar 2024 16:20:06 -0800 (PST)
-Message-ID: <86f0af00-8765-4481-9245-1819fb2c6379@acm.org>
-Date: Mon, 4 Mar 2024 16:20:03 -0800
+        d=1e100.net; s=20230601; t=1709599446; x=1710204246;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xPeZoO0bALzx/m/oW1n+JeFHK8ZJCb569gkaMGduVZI=;
+        b=v1YF3nDZrMSg4TD99G6WVcTaCijStKq+SF92SXK2x62alYBXd/RIpTWt+LUez7tIXJ
+         HNJJc4j8t5B2+0XM0Tj8Rv+7urcegug9d5ZCUmQ79vxXFvzdRl52NZkpBFOURjwXvqHQ
+         HFZFuuBa7SmzrRw5DmsqB6P0dYqGlOAUwosSAZz2qtorFQ8SUwE0K580gsVbDG82QSrk
+         MYsG4rqYpF3XN2t/2QS0rKcS+0O5XRq2fH+c5dKGqA5RDwtwseJEUCk2DuZeZ0+Bho6N
+         juOTv3TAqetEymTuXRyIrKbem8vFZfYXS0ys7IeiOuo7sB8z/GiBbDyW3WJBMOTIfWDy
+         0kqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXYgphF7urs618l55/oyfvlPbkH52IgPhoBe3g3lc/M862lk4kc54V16l+4Pz8UtGi3Div39UN16XR9enolh//qPZLCRmfE6EGLWMY=
+X-Gm-Message-State: AOJu0YwEkiFjwGT2cNzZ7BtTZ6HxGCF04gGt8VPmimxL2YmzfTBq1Zmt
+	G9sjObdjAdj6Zoqg4kbGpqgU2ilR+ospogfVrDu5rIf5HjwsH5Qf0iFnZonBbmU=
+X-Google-Smtp-Source: AGHT+IED5DlJm55+yeTSAP67lyXYzh7y9fJgoXg73PjeZWFq6cETXSAVBoBLcxVriWbUTUsN74HBvQ==
+X-Received: by 2002:a05:6871:328b:b0:21e:7a61:5a5a with SMTP id mp11-20020a056871328b00b0021e7a615a5amr334149oac.48.1709599445892;
+        Mon, 04 Mar 2024 16:44:05 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-192-230.pa.nsw.optusnet.com.au. [49.181.192.230])
+        by smtp.gmail.com with ESMTPSA id f42-20020a056a000b2a00b006e623357178sm2358453pfu.176.2024.03.04.16.44.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 16:44:05 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rhIuY-00F8Gg-1h;
+	Tue, 05 Mar 2024 11:44:02 +1100
+Date: Tue, 5 Mar 2024 11:44:02 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: djwong@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, jack@suse.cz, chandan.babu@oracle.com,
+	axboe@kernel.dk, martin.petersen@oracle.com,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 04/14] fs: xfs: Make file data allocations observe the
+ 'forcealign' flag
+Message-ID: <ZeZq0hRLeEV0PNd6@dread.disaster.area>
+References: <20240304130428.13026-1-john.g.garry@oracle.com>
+ <20240304130428.13026-5-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/2] Introduce per-task io utilization boost
-Content-Language: en-US
-To: Christian Loehle <christian.loehle@arm.com>, linux-kernel@vger.kernel.org
-Cc: peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
- rafael@kernel.org, dietmar.eggemann@arm.com, vschneid@redhat.com,
- vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
- adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de,
- asml.silence@gmail.com, linux-pm@vger.kernel.org,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org,
- Qais Yousef <qyousef@layalina.io>
-References: <20240304201625.100619-1-christian.loehle@arm.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240304201625.100619-1-christian.loehle@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304130428.13026-5-john.g.garry@oracle.com>
 
-On 3/4/24 12:16, Christian Loehle wrote:
-> Pixel 6 ufs Android 14 (7 runs for because device showed some variance)
-> [6605, 6622, 6633, 6652, 6690, 6697, 6754] sugov mainline
-> [7141, 7173, 7198, 7220, 7280, 7427, 7452] per-task tracking
-> [2390, 2392, 2406, 2437, 2464, 2487, 2813] sugov no iowait boost
-> [7812, 7837, 7837, 7851, 7900, 7959, 7980] performance governor
+On Mon, Mar 04, 2024 at 01:04:18PM +0000, John Garry wrote:
+> From: "Darrick J. Wong" <djwong@kernel.org>
+> 
+> The existing extsize hint code already did the work of expanding file
+> range mapping requests so that the range is aligned to the hint value.
+> Now add the code we need to guarantee that the space allocations are
+> also always aligned.
+> 
+> XXX: still need to check all this with reflink
+> 
+> Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
+> Co-developed-by: John Garry <john.g.garry@oracle.com>
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  fs/xfs/libxfs/xfs_bmap.c | 22 +++++++++++++++++-----
+>  fs/xfs/xfs_iomap.c       |  4 +++-
+>  2 files changed, 20 insertions(+), 6 deletions(-)
+> 
+> diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
+> index 60d100134280..8dee60795cf4 100644
+> --- a/fs/xfs/libxfs/xfs_bmap.c
+> +++ b/fs/xfs/libxfs/xfs_bmap.c
+> @@ -3343,6 +3343,19 @@ xfs_bmap_compute_alignments(
+>  		align = xfs_get_cowextsz_hint(ap->ip);
+>  	else if (ap->datatype & XFS_ALLOC_USERDATA)
+>  		align = xfs_get_extsz_hint(ap->ip);
+> +
+> +	/*
+> +	 * xfs_get_cowextsz_hint() returns extsz_hint for when forcealign is
+> +	 * set as forcealign and cowextsz_hint are mutually exclusive
+> +	 */
+> +	if (xfs_inode_forcealign(ap->ip) && align) {
+> +		args->alignment = align;
+> +		if (stripe_align % align)
+> +			stripe_align = align;
 
-Variance of performance results for Pixel devices can be reduced greatly
-by disabling devfreq scaling, e.g. as follows (this may cause thermal
-issues if the system load is high enough):
+This kinda does the right thing, but it strikes me as the wrong
+thing to be doing - it seems to conflates two different physical
+alignment properties in potentially bad ways, and we should never
+get this far into the allocator to discover these issues.
 
-      for d in $(adb shell echo /sys/class/devfreq/*); do
-	adb shell "cat $d/available_frequencies |
-		tr ' ' '\n' |
-		sort -n |
-		case $devfreq in
-			min) head -n1;;
-			max) tail -n1;;
-		esac > $d/min_freq"
-     done
+Stripe alignment is alignment to physical disks in a RAID array.
+Inode forced alignment is file offset alignment to specificly
+defined LBA address ranges.  The stripe unit/width is set at mkfs
+time, the inode extent size hint at runtime.
 
-> Showcasing some different IO scenarios, again all random read,
-> median out of 5 runs, all on rk3399 with NVMe.
-> e.g. io_uring6x4 means 6 threads with 4 iodepth each, results can be
-> obtained using:
-> fio --minimal --time_based --name=test --filename=/dev/nvme0n1 --runtime=30 --rw=randread --bs=4k --ioengine=io_uring --iodepth=4 --numjobs=6 --group_reporting | cut -d \; -f 8
+These can only work together in specific situations:
 
-So buffered I/O was used during this test? Shouldn't direct I/O be used
-for this kind of tests (--buffered=0)? Additionally, which I/O scheduler
-was configured? I recommend --ioscheduler=none for this kind of tests.
+	1. max sized RWF_ATOMIC IO must be the same or smaller size
+	   than the stripe unit. Alternatively: stripe unit must be
+	   an integer (power of 2?) multiple of max atomic IO size.
 
-> - Higher cap is not always beneficial, we might place the task away
-> from the CPU where the interrupt handler is running, making it run
-> on an unboosted CPU which may have a bigger impact than the difference
-> between the CPU's capacity the task moved to. (Of course the boost will
-> then be reverted again, but a ping-pong every interval is possible).
+	   IOWs, stripe unit vs atomic IO constraints must be
+	   resolved in a compatible manner at mkfs time. If they
+	   can't be resolved (e.g. non-power of 2 stripe unit) then
+	   atomic IO cannot be done on the filesystem at all. Stripe
+	   unit constraints always win over atomic IO.
 
-In the above I see "the interrupt handler". Does this mean that the NVMe
-controller in the test setup only supports one completion interrupt for
-all completion queues instead of one completion interrupt per completion
-queue? There are already Android phones and developer boards available
-that support the latter, namely the boards equipped with a UFSHCI 4.0 
-controller.
+	2. min sized RWF_ATOMIC IO must be an integer divider of
+	   stripe unit so that small atomic IOs are always correctly
+	   aligned to the stripe unit.
 
-Thanks,
+	3. Inode forced alignment constraints set at runtime (i.e.
+	   extsize hints) must fit within the above stripe unit vs
+	   min/max atomic IO requirements.
 
-Bart.
+	   i.e. extent size hint will typically need to an integer
+	   multiple of stripe unit size which will always be
+	   compatible with stripe unit and atomic IO size and
+	   alignments...
+
+IOWs, these are static geometry constraints and so should be checked
+and rejected at the point where alignments are specified (i.e.
+mkfs, mount and ioctls). Then the allocator can simply assume that
+forced inode alignments are always stripe alignment compatible and
+we don't need separate handling of two possibly incompatible
+alignments.
+
+Regardless, I think the code as it stands won't work correctly when
+a stripe unit is not set.
+
+The correct functioning of this code appears to be dependent on
+stripe_align being set >= the extent size hint. If stripe align is
+not set, then what does (0 % align) return? If my checks are
+correct, this will return 0, and so the above code will end up with
+stripe_align = 0.
+
+Now, consider that args->alignment is used to signal to the
+allocator what the -start alignment- of the allocation is supposed
+to be, whilst args->prod/args->mod are used to tell the allocator
+what the tail adjustment is supposed to be.
+
+Stripe alignment wants start alignment, extent size hints want tail
+adjustment and force aligned allocation wants both start alignment
+and tail adjustment.
+
+However, the allocator overrides these depending on what it is
+doing. e.g. exact block EOF allocation turns off start alignment but
+has to ensure space is reserved for start alignment if it fails.
+This reserves space for stripe_align in args->minalignslop, but if
+force alignment has a start alignment requirement larger than stripe
+unit alignment, this code fails to reserve the necessary alignment
+slop for the force alignment code.
+
+If we aren't doing exact block EOF allocation, then we do stripe
+unit alignment. Again, if this fails and the forced alignment is
+larger than stripe alignment, this code does not reserve space for
+the larger alignment in args->minalignslop, so it will also do the
+wrong when we fall back to an args->alignment > 1 allocation.
+
+Failing to correctly account for minalignslop is known to cause
+accounting problems when the AG is very near empty, and the usual
+result of that is cancelling of a dirty allocation transaction and a
+forced shutdown. So this is something we need to get right.
+
+More below....
+
+> +	} else {
+> +		args->alignment = 1;
+> +	}
+
+Just initialise the allocation args structure with a value of 1 like
+we already do?
+
+> +
+>  	if (align) {
+>  		if (xfs_bmap_extsize_align(mp, &ap->got, &ap->prev, align, 0,
+>  					ap->eof, 0, ap->conv, &ap->offset,
+> @@ -3438,7 +3451,6 @@ xfs_bmap_exact_minlen_extent_alloc(
+>  	args.minlen = args.maxlen = ap->minlen;
+>  	args.total = ap->total;
+>  
+> -	args.alignment = 1;
+>  	args.minalignslop = 0;
+
+This likely breaks the debug code. This isn't intended for testing
+atomic write capability, it's for exercising low space allocation
+algorithms with worst case fragmentation patterns. This is only
+called when error injection is turned on to trigger this path, so we
+shouldn't need to support forced IO alignment here.
+
+>  
+>  	args.minleft = ap->minleft;
+> @@ -3484,6 +3496,7 @@ xfs_bmap_btalloc_at_eof(
+>  {
+>  	struct xfs_mount	*mp = args->mp;
+>  	struct xfs_perag	*caller_pag = args->pag;
+> +	int			orig_alignment = args->alignment;
+>  	int			error;
+>  
+>  	/*
+> @@ -3558,10 +3571,10 @@ xfs_bmap_btalloc_at_eof(
+>  
+>  	/*
+>  	 * Allocation failed, so turn return the allocation args to their
+> -	 * original non-aligned state so the caller can proceed on allocation
+> -	 * failure as if this function was never called.
+> +	 * original state so the caller can proceed on allocation failure as
+> +	 * if this function was never called.
+>  	 */
+> -	args->alignment = 1;
+> +	args->alignment = orig_alignment;
+>  	return 0;
+>  }
+
+As I said above, we can't set an alignment of > 1 here if we haven't
+accounted for that alignment in args->minalignslop above. This leads
+to unexpected ENOSPC conditions and filesystem shutdowns.
+
+I suspect what we need to do is get rid of the separate stripe_align
+variable altogether and always just set args->alignment to what we
+need the extent start alignment to be, regardless of whether it is
+from stripe alignment or forced alignment.
+
+Then the code in xfs_bmap_btalloc_at_eof() doesn't need to know what
+'stripe_align' is - the exact EOF block allocation can simply save
+and restore the args->alignment value and use it for minalignslop
+calculations for the initial exact block allocation.
+
+Then, if xfs_bmap_btalloc_at_eof() fails and xfs_inode_forcealign()
+is true, we can abort allocation immediately, and not bother to fall
+back on further aligned/unaligned attempts that will also fail or do
+the wrong them.
+
+Similarly, if we aren't doing EOF allocation, having args->alignment
+set means it will do the right thing for the first allocation
+attempt. Again, if that fails, we can check if
+xfs_inode_forcealign() is true and fail the aligned allocation
+instead of running the low space algorithm. This now makes it clear
+that we're failing the allocation because of the forced alignment
+requirement, and now the low space allocation code can explicitly
+turn off start alignment as it isn't required...
+
+
+> diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+> index 18c8f168b153..70fe873951f3 100644
+> --- a/fs/xfs/xfs_iomap.c
+> +++ b/fs/xfs/xfs_iomap.c
+> @@ -181,7 +181,9 @@ xfs_eof_alignment(
+>  		 * If mounted with the "-o swalloc" option the alignment is
+>  		 * increased from the strip unit size to the stripe width.
+>  		 */
+> -		if (mp->m_swidth && xfs_has_swalloc(mp))
+> +		if (xfs_inode_forcealign(ip))
+> +			align = xfs_get_extsz_hint(ip);
+> +		else if (mp->m_swidth && xfs_has_swalloc(mp))
+>  			align = mp->m_swidth;
+>  		else if (mp->m_dalign)
+>  			align = mp->m_dalign;
+
+This doesn't work for files with a current size of less than
+"align". The next line of code does:
+
+	if (align && XFS_ISIZE(ip) < XFS_FSB_TO_B(mp, align))
+		align = 0;
+
+IOWs, the first aligned write allocation will occur with a file size
+of zero, and that will result in this function returning 0. i.e.
+speculative post EOF delalloc doesn't turn on and align the EOF
+until writes up to offset == align have already been completed.
+
+Essentially, this code wants to be:
+
+	if (xfs_inode_forcealign(ip))
+		return xfs_get_extsz_hint(ip);
+
+So that any write to the a force aligned inode will always trigger
+extent size hint EOF alignment.
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
