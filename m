@@ -1,43 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805781DA4C;
-	Wed,  6 Mar 2024 12:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D113E48E;
+	Wed,  6 Mar 2024 12:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709728511; cv=none; b=bJnS1TfNkW2IJsjKPY2/4zWqq9ik+2p8UrbQ/OzdPX8eWM+ycgp4qJMdzH6CNSF0us+deF/m98idZ7JBlrhoPpAkQjkgS1NkO8Tw4uEghhqcNnER2pVW3aW2YVk65ZyjW7aEpn9Sxm8/f2UoWaGW4iSsPWOnCE/KkcbhOcrbxDI=
+	t=1709729983; cv=none; b=c2Tbyne0cu0NGBM7W+BQJdIh4sEy14lZTGxoZ3C1KkYJ0BhFHlHIufDHSu+C7VwCK6V2Bu+zFzNdYXOwHMPLrriMbZL+I0uZzes3ALecdemeHuxXVq755FlTQAQuVLr1iAL/WF9JPfo2LpY2CnzEnjWnMGrblKXKJPFy5VeXNgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709728511; c=relaxed/simple;
-	bh=fWeI83M9SllzmmwRVoUzhdlwWDPbRvMJ0yYQPcjR+EA=;
+	s=arc-20240116; t=1709729983; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PtsvLjE3ISOy0KpvMjNFr75lo6qQ3ecJ88MFrPh5fEk7XvGTJLvWDPdEcdE8HDeOTu4tF5iRwzo0jODcvjzhoHO+pwkwhE9PPUtcJa3/eraMZgibX/97bVPFfmB3Qdp5Pf7DYml2S3XLR+aWErJuHQpMGumFmShPo6F2xAqy54c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JF9jcqfa; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=ETXJHEh+H3LcDdk9rAhWAF9aVb/WuUDhYtQwW6WOpZdqc5hmdgX/1HUke4yO3hVUlpTaBveK50HDdrpPyyXcG0BfL8CfFr7mgeUtHDVkEoJ5Lg8qwMa5xPi6t9Q2rnX0hFcPMZ/kCdM8LFoR67HL9TckaosMHzTl80DebV0d6Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=juwiqUy/; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JF9jcqfa"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="juwiqUy/"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=pMJt7ru71X7BbY61U1eDHHpqO7p3FsPHLnxlYmruOjE=; b=JF9jcqfaaC2ddl/O0kBHY770gq
-	PTLK9WRJ2F0/Ln+2tPiWuusv3joopQUUDWvqlh4SFnhkj6x712oz514ww/LVvcPeHQJ6BrYa5+hN0
-	kWXlqjO/qV9164Kszi9ntYN89/Apc2oK91nWovHMPw8zIsBGftTrOKoT1yPndScVmL7kNNQl5I8lO
-	dALMLuab8FS8gpk83kHqu0UCX9lQtMx1/C8GucLw0hw2T3wJeBrALtCkreXVXCnaiGpinkWu1m4qt
-	Mc6eTcZ/uQwUeau1tIbc7gPA4cKfYo95d3m0iJmS4vqMCFYRuPNp1kzx4b5kfS6ZX70QlHwQDgQEh
-	DpkJIhUg==;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=juwiqUy/ZNb9h4HpA3OgKzNpRW
+	nVf5v5EZQS4W3e3ZVdf0CbenJiH8xq4RahQyWTRq2oiJ4dZ3mk4mdjhlbIWKIUXLmoxUqFe4mcTZG
+	SWbUxW2UIgU4TttJZrmMCNUzQSf6seGaYReHK5UMCBsYs/WFNAeArHs1+58a6F7MFnnhEtz+qlD8L
+	+p0hZlUj7zv1LOjQAePjfX9yqA+68efbHGa8D0h4oRCTESrysxZlR/bOc3k6b9IZBkYDno4Gc3oTX
+	7NJYHTTFOfIAomBWw8ykKgFL1NaVLbNX/jCCCWG+7I7MsQ/HvLhH0OCufthbkMLxZ6Tlm7UAFpn4G
+	tYL/Qq9g==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rhqUH-00000000DRN-3lCk;
-	Wed, 06 Mar 2024 12:35:09 +0000
-Date: Wed, 6 Mar 2024 04:35:09 -0800
+	id 1rhqs1-00000000IZp-0Tzc;
+	Wed, 06 Mar 2024 12:59:41 +0000
+Date: Wed, 6 Mar 2024 04:59:41 -0800
 From: Christoph Hellwig <hch@infradead.org>
-To: Chandan Babu R <chandanbabu@kernel.org>
-Cc: kbusch@kernel.org, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [BUG REPORT] General protection fault while discarding extents
- on XFS on next-20240305
-Message-ID: <Zehi_bLuwz9PcbN9@infradead.org>
-References: <87y1avlsmw.fsf@debian-BULLSEYE-live-builder-AMD64>
+To: "Ricardo B. Marliere" <ricardo@marliere.net>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: make block_class constant
+Message-ID: <ZehovUwMXDaz59b1@infradead.org>
+References: <20240305-class_cleanup-block-v1-1-130bb27b9c72@marliere.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,28 +47,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87y1avlsmw.fsf@debian-BULLSEYE-live-builder-AMD64>
+In-Reply-To: <20240305-class_cleanup-block-v1-1-130bb27b9c72@marliere.net>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Mar 06, 2024 at 12:49:29PM +0530, Chandan Babu R wrote:
-> The above *probably* occured because __blkdev_issue_discard() noticed a pending
-> signal, processed the bio, freed the bio and returned a non-NULL bio pointer
-> to the caller (i.e. xfs_discard_extents()).
-> 
-> xfs_discard_extents() then tries to process the freed bio once again.
+Looks good:
 
-Yes, __blkdev_issue_discard really needs to clear *biop to NULL for
-this case, i.e.:
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index dc8e35d0a51d6d..26850d4895cdaf 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -99,6 +99,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		cond_resched();
- 		if (fatal_signal_pending(current)) {
- 			await_bio_chain(bio);
-+			*biop = NULL;
- 			return -EINTR;
- 		}
- 	}
+Reviewed-by: Christoph Hellwig <hch@lst.de>
