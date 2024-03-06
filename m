@@ -1,92 +1,138 @@
-Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801AC4DA1B
-	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 15:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C99134759
+	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 15:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709737434; cv=none; b=tiIGZke5WL0LV81AX1i1qKed6YW0bFqseM83adHXezlvwr9V3k4ndGfAoTFdx4HC2o23zSq9yp+qZp7T1I/2iwCahbLgALB6h9jRNyaQi2gG86HCnPWY4v1C5TmyMbJGj86UIYiwOyO6VUJYUo9I1eTqDLCl6JfCpTc9s5WZGIQ=
+	t=1709737524; cv=none; b=qZEnMUPCKITWcMWwrMcqd9dZUD+mL0jHDfLsNA+s1A3bItyuNDcWt5me3X6b7g3ix6z3g+GrK0kCgynTOzhcrOI0uqnrr7FpsHfeUVdw8pVY8ytsQtDde6NxlLS51JbNZQIvJZ+luccHX0mKdwMeTJlwR14aXMQ7+vKDCuGASgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709737434; c=relaxed/simple;
-	bh=l37PvbgjdurE3CHa9QnNHILZ3KXr3K0O8dJPZpkbpYo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fpi0l0TuCB5ETE5KaJ+BoZxIWn5bw42KXYJYAPPRajpOU6kauELB0lV23EuOaR5I6GXXSaoWKCg6Gn9k9B7WW+Kfam2ahDZgKX7WShxG6+VVNR6FRt2XJlTHVvEvsPxwRDeFhKe9uFMYEhhkrmUUmVQpHcO74eoSWoujlCQHtok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=W8ww5OEB; arc=none smtp.client-ip=72.215.153.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cybernetics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
+	s=arc-20240116; t=1709737524; c=relaxed/simple;
+	bh=FAE7tKzetJC0DRifXVvbyePo3HyTO0kdYHz5YfVi9U8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hBDg5lYy9Wtz2Wlo+v6sf3gZtoVsRM38YNp49mdsrOKCyAYWv0JcWqGES+t56/4ZQSD24+chLafJ6TBxS9YydQMWh2IwyTBtJ/ZLZ+z482sreDguQDVyeT9HFSJjdPDOtc81yncCrMBapqkGmWJkReQWp7KXH5QyripRpu+6Buc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=obAC/gG0; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="W8ww5OEB"
-X-ASG-Debug-ID: 1709737400-1cf4391a1c953b0002-Cu09wu
-Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id HUS1vVEvB72oJaDX; Wed, 06 Mar 2024 10:03:42 -0500 (EST)
-X-Barracuda-Envelope-From: tonyb@cybernetics.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
-X-ASG-Whitelist: Client
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
-	bh=7qc4ffRYNtvZccYs4/U0SMXhHZBv427Ly9EChqUIDts=;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:
-	Content-Language:Subject:MIME-Version:Date:Message-ID; b=W8ww5OEBmzs8NaHgEkoZ
-	7JNFDiLMMztKUdLXIcL/jSdNGT9JhIKQmG9mbb3+85HA/frx4z5JdSgfNArLSPFbzOKkZ/LjXeiYo
-	AMvEQeTqhnjGUnnl8aH1Jvb+Z+9Mj3gGIEnba//g5rLTdMt6+P2hhKTNxk+GA6yzXWGhhxf/Gk=
-Received: from [10.157.2.224] (HELO [192.168.200.1])
-  by cybernetics.com (CommuniGate Pro SMTP 7.1.1)
-  with ESMTPS id 13115879; Wed, 06 Mar 2024 10:03:26 -0500
-Message-ID: <dd86cf53-d884-4a5c-b5b5-eefe1d7641d7@cybernetics.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
-Date: Wed, 6 Mar 2024 10:03:25 -0500
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="obAC/gG0"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-42eff08e3f8so8053711cf.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 07:05:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1709737521; x=1710342321; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3q6XaWzdNlm5rZVTCa+MalaN5VSyURFchooXo3LCyRw=;
+        b=obAC/gG0vpO9hZAA/ZlPaT6q/O+SveoM5lvKr5eUJnO/2Kk+cACVDiNLrhy6GsrVL6
+         CbsuQfWDk0qw89/m83TPnEqiyuYGrAdXXk2aAIA4T+HfNonzyqD2/e3sWv5KHZEionZ/
+         kWcWW/BfCS++nlDBaIJZC/8ZYA6Jd5fgtPe8E6zW71FTEwoeBl0kNtGDFhr0jQTKhLRs
+         wiKx6rMrkXMIaf74ws6hR3WOqjkb+lpbOAK15DVCmI+Q9qiFOxOTRVKifCAjuxt8ubtr
+         85VzH9/VkRkMMJJkJqcwxa2DzMw/rjhXxgLHyBi1/OaDk8nYgj3UjdyOhxK/nBRpNWcx
+         qRUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709737521; x=1710342321;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3q6XaWzdNlm5rZVTCa+MalaN5VSyURFchooXo3LCyRw=;
+        b=AXkeqMQ0PAjDbZLMUeyF9GPkXDLsS/QJPQoi1C3SqWjgYwzacnnnlDLjw3dGoPWjaE
+         8Sef7+I60fr7R1XHA437yBzedxXClJd3/0ETYuN+hrmt2xkzo3+fVl44ABjW8++fvBdE
+         Q18BTss8BWJWF+aK+gnCL6qTaThOe4xfZUZD8Sex3Jj0s9EhG0SNxiVYqkkO77SXvWic
+         YOd2ZLiFnzN0YuxBN5fL9tbloi7/Q1xuOqPb2U3iFVTshjS288SBMaxpG5c8LtFdIKAQ
+         +1q7fvTB65t7dvRQDVgDzBIOHBxFOhoJKTb3ysCeyv0p5hKtPjMqk1fFzkKSU1QDvfjM
+         K8+g==
+X-Forwarded-Encrypted: i=1; AJvYcCVYVBJXsj1J0rF078ER6b1wsSf5XxJNvm9lm06i57Ls5AYgx9biB6vobuBs8NadN4GFgY4nUP7OfEWRMPUTwsyAzXTp0KYZDYEJiPU=
+X-Gm-Message-State: AOJu0YykgGdSAwui4Jucfkur5J6mCviaiA0bl+/DkKVysEcQvwJdyUfk
+	jacC32Uq+RHA/DJSaIHFO4+J+0yXcmqHHrSNlt3aeVWT4d5L1ZpM/2N87ns3AZo=
+X-Google-Smtp-Source: AGHT+IF3DD5YVqRayIYcxbWGOreOFw/mqikGG0c1CCT98Poz3twNOMiPHe1g+1Vg/YON1gYeWp1F9Q==
+X-Received: by 2002:a05:622a:1743:b0:42e:bcc4:2959 with SMTP id l3-20020a05622a174300b0042ebcc42959mr5571780qtk.4.1709737520530;
+        Wed, 06 Mar 2024 07:05:20 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id f5-20020a05622a1a0500b0042f01390d5csm1686793qtb.30.2024.03.06.07.05.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 07:05:19 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1rhspa-001WNB-Tx;
+	Wed, 06 Mar 2024 11:05:18 -0400
+Date: Wed, 6 Mar 2024 11:05:18 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
+Message-ID: <20240306150518.GL9225@ziepe.ca>
+References: <cover.1709635535.git.leon@kernel.org>
+ <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
+ <Zec_nAQn1Ft_ZTHH@kbusch-mbp.dhcp.thefacebook.com>
+ <20240306143321.GA19711@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix page refcounts for unaligned buffers in
- __bio_release_pages()
-Content-Language: en-US
-X-ASG-Orig-Subj: Re: [PATCH] block: Fix page refcounts for unaligned buffers in
- __bio_release_pages()
-To: Greg Edwards <gedwards@ddn.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Hugh Dickins <hughd@google.com>, Hannes Reinecke <hare@suse.de>,
- Keith Busch <kbusch@kernel.org>, linux-mm <linux-mm@kvack.org>,
- linux-block@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com>
- <20240229225630.GA460680@bobdog.home.arpa>
-From: Tony Battersby <tonyb@cybernetics.com>
-In-Reply-To: <20240229225630.GA460680@bobdog.home.arpa>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Barracuda-Connect: UNKNOWN[10.10.4.126]
-X-Barracuda-Start-Time: 1709737422
-X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at cybernetics.com
-X-Barracuda-Scan-Msg-Size: 785
-X-Barracuda-BRTS-Status: 1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306143321.GA19711@lst.de>
 
-On 2/29/24 17:56, Greg Edwards wrote:
-> On Thu, Feb 29, 2024 at 01:08:09PM -0500, Tony Battersby wrote:
->> Fix an incorrect number of pages being released for buffers that do not
->> start at the beginning of a page.
->>
->> Fixes: 1b151e2435fc ("block: Remove special-casing of compound pages")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Tony Battersby <tonyb@cybernetics.com>
->> ---
-> This resolves the QEMU hugetlb issue I noted earlier today here [1].
-> I tested it on 6.1.79, 6.8-rc6 and linux-next-20240229.  Thank you!
->
-> Feel free to add a:
->
-> Tested-by: Greg Edwards <gedwards@ddn.com>
->
-> [1] https://lore.kernel.org/linux-block/20240229182513.GA17355@bobdog.home.arpa/
+On Wed, Mar 06, 2024 at 03:33:21PM +0100, Christoph Hellwig wrote:
+> On Tue, Mar 05, 2024 at 08:51:56AM -0700, Keith Busch wrote:
+> > On Tue, Mar 05, 2024 at 01:18:47PM +0200, Leon Romanovsky wrote:
+> > > @@ -236,7 +236,9 @@ struct nvme_iod {
+> > >  	unsigned int dma_len;	/* length of single DMA segment mapping */
+> > >  	dma_addr_t first_dma;
+> > >  	dma_addr_t meta_dma;
+> > > -	struct sg_table sgt;
+> > > +	struct dma_iova_attrs iova;
+> > > +	dma_addr_t dma_link_address[128];
+> > > +	u16 nr_dma_link_address;
+> > >  	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
+> > >  };
+> > 
+> > That's quite a lot of space to add to the iod. We preallocate one for
+> > every request, and there could be millions of them. 
+> 
+> Yes.  And this whole proposal also seems clearly confused (not just
+> because of the gazillion reposts) but because it mixes up the case
+> where we can coalesce CPU regions into a single dma_addr_t range
+> (iommu and maybe in the future swiotlb) and one where we need a
 
-Jens, can I get this added to 6.8 (or 6.9 if it is too late)?
+I had the broad expectation that the DMA API user would already be
+providing a place to store the dma_addr_t as it has to feed that into
+the HW. That memory should simply last up until we do dma unmap and
+the cases that need dma_addr_t during unmap can go get it from there.
 
-Thanks,
-Tony
+If that is how things are organized, is there another reason to lean
+further into single-range case optimization?
 
+We can't do much on the map side as single range doesn't imply
+contiguous range, P2P and alignment create discontinuities in the
+dma_addr_t that still have to be delt with.
+
+Jason
