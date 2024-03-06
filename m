@@ -1,64 +1,67 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018FB137933
-	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 15:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7084B13A863
+	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 15:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709739331; cv=none; b=g35OTsV5cSyAbv8bwTaqB2Nvj7xVNtP7+IKb0sacNN+Vgdqx55/smZTYcI9K9agXqB033e5gWrjKPv6tsyUhlPhxuofSXHwCJJ+Ev1vA/eaWBi5Is9fF1ry47V9vMMWe1A2cmieFTdEkg0VJgAr3I6Ai+0fRU1uQvMr0awm1lBQ=
+	t=1709739332; cv=none; b=PhSgIAd7GunRQZgKeaiReULtRnyygkWVnaB4g7lh6ykn7+x9m91DIgeVsG+34FNRrQp34vv0KWrDOvZCzPpvwbMOLYKMmIwasw8tEOu+vlSQijVL71r5vNvY3aJCSisshYnP6fKubqjSiMLVkzbsle7WV8bUK89qncgAFuok4Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709739331; c=relaxed/simple;
-	bh=dZsHluELpxThA4ufzRXLg1tsWuDW0EQo81tF4SvlUgo=;
+	s=arc-20240116; t=1709739332; c=relaxed/simple;
+	bh=TwK6capiyfUQMZ1xgYBa5lRbR8pKF9uSWRpyW9JGPqE=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DCq4DvVeEYEBdpat127wgsGDCglJBj/2CD8eCtr/KdfRc3rJIiMJ5b2h9UZMHqv1DfB6skrT9v/bTPlZ0vsbwFeJQeejZixwPNwWWpdJxMfo2WKn6EeEs+1UfayBXBRWbyrOmsJgAPEAFUy9iiX3mhtkqKCXMaOKnkSaZwq5J0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qs21YGN0; arc=none smtp.client-ip=209.85.166.171
+	 MIME-Version:Content-Type; b=FND9itdfGCsmc/arHmpdlR3s80SYw4qUhmIi9DiVe2F51PQvDNo4xhc76ucQ+jDmoGusBeZbEpcAHNZLsp8FXxRbxnynnHucJ/6Dilgi4SFeRmhCTm1bni/jhshJzBTlD3XdWf23yC9ikGKyCxlr6KvFaqJGBXnjl28kCUEn320=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UCVMF9R8; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qs21YGN0"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-35d374bebe3so5646385ab.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 07:35:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UCVMF9R8"
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-35d374bebe3so5646465ab.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 07:35:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709739329; x=1710344129; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709739330; x=1710344130; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FSdm3xCNOw5L3H2ytBNDBWUHcL57v7ZuHcJR5VEh1eE=;
-        b=qs21YGN0dtshHxBrRyAEeniJksLrWeGfp8udtJJbn1A3j7eW87/aQipDtUHdVM4WAI
-         ktjGl7lcT05fjMw5MQN3de1AynoKhv7JoHWCdJpECdV4aAibNWU4ztUqauEFYJJCOkCO
-         gDkd+WTEsQ/jiqQx3ZUJNWUe7cbs8JwYtc5HhZyRcyS+HWNTr5B8/iu3HY4NPWMELVcf
-         Mmw7cR8OstCgjdwPh9ssqv5Hqg3zLBVtFHHd3Vn7IjlNm6RKRZp/AGgYiDiAeoLtdTRL
-         uTrIVTS1p7bRt+gaqptVChRA1k04mgKDC8w1SzLVk/A08JpG6O4AEKV5+u7D1rHhARRU
-         PNsQ==
+        bh=jX4nyne9Vjk99u0/ohdDAGsyHE7iZyQVnC8gHrggHOs=;
+        b=UCVMF9R8ADzCo5nIgriOaF6xOKx/0vcLpbLCgdFeJIeHjEUr4qvawHbVJsNNa9/FCD
+         YZBy4i+KahcLNG+uBiTyCGu6YHvwXwdKCMVoKdqxxsr0iCZCNLaW3dcoKzy4WfUTv5B/
+         mviEuEhYOeN7qkNbLa402U4fPItjjC8LO2lyjQWtWlyh+6NhkpNZMFTnRFcxt6kfBPlf
+         Mkjs3HgfMmzAyhbxWQDOp+uR5/X1rxCsaIdh61Qb+LNzAzCv4oNGjWpobghoez7m3GDh
+         O/mrlFXDkVii5s9GWQz1y9vt0fKS7NO9mzJzQxP3xEylCaoe/8aAo6b/5zV7U9qPjDoy
+         Xm5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709739329; x=1710344129;
+        d=1e100.net; s=20230601; t=1709739330; x=1710344130;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FSdm3xCNOw5L3H2ytBNDBWUHcL57v7ZuHcJR5VEh1eE=;
-        b=aWIPzNOdr/mnNaxkmCP+q9ePj0s92u9MBKP9e8lxvi+HqvGfZXcvaH6O9YYcpHbdgm
-         63pFNUU5dHMN1GQsNM9ZBXskgdM3WUr1NhFam9q3yfZ3XvA54ozie3c5F1y2LBom0e6h
-         c2GX/hUNoruJe4Nl1lsh9hayybDjbVqJdSvF5iqFJXAuFz1waFh1DzDDHJdFM4hieLXI
-         m4XtYgX3vMhdczunoYM67a34FhJgcRbCHgVbij/QUcOVv2rBcfgfmnSldKdndq2EVgmF
-         yB1QvfeGat0O+Ewpj/43iUoih+e3icEWYZIDZPBS4QY2pxckioseiG0z3MMYVGcLCPrg
-         9Y+Q==
-X-Gm-Message-State: AOJu0Yyp7zpeneJRFhPXioB4737N9YBgFI/f8KmrewjFbqH09CWT6ALp
-	htYv+XG1omXstQsfUeoBwKmZHn7ybaliljexX6tBbDV95EhVEKvyKw4zUv++s54=
-X-Google-Smtp-Source: AGHT+IEZTHfIPT4859zUUwoBO7opktZe1dXZGddcV+g22sdFWDq2aD+qE5us/9CWULIsvAEGwxSDkg==
-X-Received: by 2002:a05:6e02:152b:b0:365:a792:3749 with SMTP id i11-20020a056e02152b00b00365a7923749mr3880459ilu.3.1709739329270;
-        Wed, 06 Mar 2024 07:35:29 -0800 (PST)
+        bh=jX4nyne9Vjk99u0/ohdDAGsyHE7iZyQVnC8gHrggHOs=;
+        b=ryWe0nrJmFxl/cakDTWKxqDP6b0Buf4EeiWfjNBiwZKLCPKBWgZR1UW7NGiJmFEeZo
+         j69RyWPsoKeSSYgEijWnbh1jbyXUv0hrBQYlJpfSa/RJayu3zeGcn0iozP9xQKDiylNG
+         3qhn1yWw0F9otfv5OEZzO4xMtbRhT65aFwpnf6aUN02O7i8vYRki2cQUvc7vcSa7D9LG
+         wXd9wcCQyLlQh6Y7nqCzXhDN2nrGY+/OEW8r+Zw9G9w2vLfREcoXwU/QUPJZAntGQH4m
+         Cm5p0zdhZFzJzPyzDYu7Au9LYQtfpJBiFd3GT7kOEo6A2jw3OocyOvgbiuDM3O98OUFH
+         3BYA==
+X-Forwarded-Encrypted: i=1; AJvYcCX8zHbnABeaxfeHoo4bB9dnAkre6iRrzsse5EwWkJl3AM4EhlAZyDWlmJaD3I9uZostOaIKHs5Y8dpHZYg5CZnYpGKbseOmT3gwg7A=
+X-Gm-Message-State: AOJu0YzL7EOpA9PZSJbgAKqntJTluEHfhIRhbaxvmzXTNZlVkH55g1u6
+	GRZs0DnbIccGN1Ww665nuGM9YxtaKVQnFKOZUtpOYf6LJCGAC2n6fxuPu5NrbFc=
+X-Google-Smtp-Source: AGHT+IH1bcw4KhZiBlzy5h98P6a4jHCdS8o6jRQnommbMHMGdLVJEO3B9N/OVPPwu9nqf1K5rJA3RQ==
+X-Received: by 2002:a05:6e02:152b:b0:365:a792:3749 with SMTP id i11-20020a056e02152b00b00365a7923749mr3880536ilu.3.1709739330455;
+        Wed, 06 Mar 2024 07:35:30 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id t2-20020a92cc42000000b003660612cf73sm324467ilq.49.2024.03.06.07.35.27
+        by smtp.gmail.com with ESMTPSA id t2-20020a92cc42000000b003660612cf73sm324467ilq.49.2024.03.06.07.35.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 07:35:27 -0800 (PST)
+        Wed, 06 Mar 2024 07:35:29 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: jonathan.derrick@linux.dev, Li kunyu <kunyu@nfschina.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20240306101444.1244-1-kunyu@nfschina.com>
-References: <20240306101444.1244-1-kunyu@nfschina.com>
-Subject: Re: [PATCH] sed-opal: Remove the ret variable from the function
-Message-Id: <170973932758.23995.16246146995676914461.b4-ty@kernel.dk>
-Date: Wed, 06 Mar 2024 08:35:27 -0700
+To: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org, 
+ Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20240306140332.623759-1-philipp.reisner@linbit.com>
+References: <20240305134041.137006-1-hch@lst.de>
+ <20240306140332.623759-1-philipp.reisner@linbit.com>
+Subject: Re: [PATCH 0/7] drbd atomic queue limits conversion
+Message-Id: <170973932937.23995.12080568570430339256.b4-ty@kernel.dk>
+Date: Wed, 06 Mar 2024 08:35:29 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,16 +73,38 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Wed, 06 Mar 2024 18:14:44 +0800, Li kunyu wrote:
-> The ret variable in the function has not yet been effective and can be
-> removed.
+On Wed, 06 Mar 2024 15:03:25 +0100, Philipp Reisner wrote:
+> Here, with the Reviewed-by and Tested-by trailers.
 > 
+> Christoph Hellwig (7):
+>   drbd: pass the max_hw_sectors limit to blk_alloc_disk
+>   drbd: refactor drbd_reconsider_queue_parameters
+>   drbd: refactor the backing dev max_segments calculation
+>   drbd: merge drbd_setup_queue_param into
+>     drbd_reconsider_queue_parameters
+>   drbd: don't set max_write_zeroes_sectors in decide_on_discard_support
+>   drbd: split out a drbd_discard_supported helper
+>   drbd: atomically update queue limits in
+>     drbd_reconsider_queue_parameters
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] sed-opal: Remove the ret variable from the function
-      commit: 5f2ad31fbb18565645f121b413837f260748e963
+[1/7] drbd: pass the max_hw_sectors limit to blk_alloc_disk
+      commit: aa067325c05dc3a3aac588f40cacf8418f916cee
+[2/7] drbd: refactor drbd_reconsider_queue_parameters
+      commit: 342d81fde24152adf9747e6e126c8c3179d1a54c
+[3/7] drbd: refactor the backing dev max_segments calculation
+      commit: 2828908d5cc8396e7c91d04d67e03ed834234bcd
+[4/7] drbd: merge drbd_setup_queue_param into drbd_reconsider_queue_parameters
+      commit: e16344e506314e35b1a5a8ccd7b88f4b1844ebb0
+[5/7] drbd: don't set max_write_zeroes_sectors in decide_on_discard_support
+      commit: e3992e02c970f6eb803b98b9f733cad40f190161
+[6/7] drbd: split out a drbd_discard_supported helper
+      commit: 5eaee6e9c8f9940ecee93678972774fb8dd450d5
+[7/7] drbd: atomically update queue limits in drbd_reconsider_queue_parameters
+      commit: e6dfe748f09e37f77437bd337f891f5b57d5d5a2
 
 Best regards,
 -- 
