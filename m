@@ -1,69 +1,65 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66CD13BAE7
-	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 15:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B1E13D2F2
+	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 15:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709739338; cv=none; b=u6t3F8seDg5dqZ3t9AYGaWFjIqKRxIi96JCZq/WDAEn8iO3qQEV0KOnfGgPxyArEQEePC1o3VqVYNSBMZuQ5XD4buIghyUbh3mnlMo8VUlJkYjxGTsaeQF7/k/nhDAOb4An3cjufLwT8A98Z2RZ5c1UcKE6oIHrcueyeJOGlcPo=
+	t=1709739340; cv=none; b=dmXjyda4s5JYshrelB24nYtH/4K02ozx6Kps/HPKjtBq5Qa3CnyZaNXQJgY1y8shPYE0mJUtko3rPNeFrc8DQ1dKG1gfjCos/1/jXCiu+qo5HLpywZWAyJNfvMs/HGE2bMxxTY6ANbw2ACTEJfxfRrEHWAF4/Ifn0QdcpXCHaFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709739338; c=relaxed/simple;
-	bh=VBft5w8jsJHzEyBJ6P97EckERupZPHmyvdDoIbCDjQs=;
+	s=arc-20240116; t=1709739340; c=relaxed/simple;
+	bh=dlzFF8ObzsH/OfbzCxANapBstTJQr/v01oXqmmsQbFM=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=AvIvXnGiDLwXUVBpFpDaQ6RYlz8a2iqwYi23g7Uj+1RtETFhT0tXvieLW9ErUrE5yarQWmz6ABRdZF5/LAjY2SWn0ivJcVydNmMAYnUCvTZbmNYlXsjYu/lOCmIYI6eL8vO49hQoYhRXMJQyNqu0VlEtMnT2H4jnhjWN3+W0r0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=d8Fpz0Zy; arc=none smtp.client-ip=209.85.166.49
+	 MIME-Version:Content-Type; b=GeGGKyNtLorqnuyEQqH5ATQanOsJOkAnaQ3lkmgzWdLMkzpqJYJkQZLetdIdvcOnnaiAJR8Ic1BBU5DTZ1ZRQp+la8fPwcdp6W0pAwXntkf89Ud+50zbi2gYKiD5A9g71eNB18rpr64Q0VEbC88zPiH4PHs6RhlfuQoJQGho7gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vAlt2blH; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="d8Fpz0Zy"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7c495be1924so67153739f.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 07:35:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vAlt2blH"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-35d374bebe3so5646695ab.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 07:35:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709739336; x=1710344136; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709739337; x=1710344137; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZSixkOvyAGzPmQR/w8/wd4aDROkCteYD9fEs3nqiTTc=;
-        b=d8Fpz0Zy0b6wygN1q8Kl0tL/bmsMH2o4jySgbenFTg+/BwcRrSMoe47vJt8OP5PsOp
-         zSh5D96plXFBKplFMAPEXk9LpLGsQtan/9KauT9vWCQAHNZZoi+s8Ez3mMShwhUff/Ws
-         tASrgdWTTtBNO1l30UyAnn5dxXlIGn+o3HHfCnoaKoHT3X/cuTifh8npP32vmTV9Rxlw
-         Xg3B0sg137IUpqR3N10o0UfDCuTH1BEk7UFjqtUkwAiZDwGTQLqpQCD1VO4UAsJQqeBP
-         0gU1YuvXhHqNgX41y+Yb5kEBFsGDnMG47hje6o1dFWFI2ACEQxRsHNRg+HsdX+rxk7YG
-         u6Eg==
+        bh=/iXoKZxEz8wDbvy0Zd5wIeCfXYitdQjVAg5WmFnT5ts=;
+        b=vAlt2blHR2XbHGyS10R/eavclxlB85BXpjYOGcuQcEMGVWsaJf7X26QSNM118H1Hmb
+         sCMEMEyOxHOGnOMxcfxzzLfu9Llq6m7AbxouV/Gg3kH/VeY5borjV27dH5N9TnJXTOBi
+         7FNsMw+8UZ8fmZUxx/d9/7sPlF+BdqvK6LNbrGUncmg4Db7n/JbgdA6KVStgaKSZO14w
+         c0/PWMhxUQ2NKRIiMW3y7+iiDQA+LCzAY+A8ZAsZU0Z5t8Q1wsoYpRIuXVfaraFcwTld
+         X0XuO4+zGFOzzP1SJoOjni7MjniyweuZoJZmfcTyZwXtTcITV0/9JD3ivyAmFmw5hz+q
+         wmKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709739336; x=1710344136;
+        d=1e100.net; s=20230601; t=1709739337; x=1710344137;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZSixkOvyAGzPmQR/w8/wd4aDROkCteYD9fEs3nqiTTc=;
-        b=Jz74WgIA8Ltc2A4TUy7fObg/Xxsw7GEYgRY6t/hVUazrzvr1Z3Rrzx1BtzCmJB9jJl
-         qlIjm/T6smab/NfNGynbFRQUk+M0TEHmpKk7KC43POkZeEtj8G8EYPlnU46R9W4/9YBg
-         VCFDjtepF3O1DXOEsPDovN52/i21MpnETKEGA68vU8o/PQnXdolrxjbMhTZi4K6tklPT
-         thrIuspTmLpx1EHlwXJM3xQ+UfaCHnKviIONWdJAZGjaV2OqgdsZuJbU288nU9vjY/zm
-         qPLE4lRmxvKSHohO6BALBy7W3B/y0q5YzQ0CQNIalygxZ0IBfYyXsI9Puz47TARaA1hA
-         FrJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWOQSD2xhflg16RHbb30gUh2ON8C1ubcBQvuxlAv5Xd6xJ7Gz+q/7VUe/EveFs8vlw7vpSsRXMmuUoEmdrg3HK6whj9OFJjP/4Y9VU=
-X-Gm-Message-State: AOJu0YyoWRuQykpBXJscPmF2Cq5okMEw+N5XuVLg5vxOAFowRnaJUg7m
-	xZFzxW97WLRgeKB1OPdobvrxa0+DlIB8uI2uiNfuCbGAyAVzi2bKT80rsmBfOLo=
-X-Google-Smtp-Source: AGHT+IFSaGBg8sH10us0bskBsK7ms5bsiWhwU8fuVwlEdJVXM3oZMPq6CZjM3bs2N5+keLV24lzbqg==
-X-Received: by 2002:a05:6e02:1c46:b0:365:fe09:6431 with SMTP id d6-20020a056e021c4600b00365fe096431mr3733400ilg.3.1709739335996;
-        Wed, 06 Mar 2024 07:35:35 -0800 (PST)
+        bh=/iXoKZxEz8wDbvy0Zd5wIeCfXYitdQjVAg5WmFnT5ts=;
+        b=kPWDs4mH7xYXxMnhmJhE8aw/af5s7MCCw/Dh+OgNg37w32swpGm4bt3b8ozSaR8oOF
+         Gad4go7hG/j2iXJjUdamES43knlfhgkHKYd6SOUHBNf7Yf7YudUYZeFsuLsZMwEBFZqT
+         9bN8Aaz6h5PNL2e2aWkb6yoEOUZ057wdUT6XtWSsDo/rSM7k1DSHjQjYxh3loSp62G/j
+         gitDZeDastO4XtwAIy8+b1YpPo+pHYdo9hDA3LLF25yK8uSgyqj9AXOyeFcRNGhcWguW
+         TPATv0JuAZQ1qyyonH/4WRvUn/mGDcG/l4i0qAipRxf6yfrD0i98HXQdlYCAwb/FMLzh
+         7USg==
+X-Gm-Message-State: AOJu0Yxg6Jb/NPywOSjJMnX0Psujd36Ahkx/xWhUyF0NOa4Ye+n46Pu+
+	6+k5tyoKFC/jPrtCgRv96P4H46LGFXEheN3fGKgj9bQ/xjvI/Co7bbcCtHBY2ktoZbosal6+N+Y
+	U
+X-Google-Smtp-Source: AGHT+IE2N7ChpiYdsarGfua/ewvaYuPL3BGYLSBLHYvtNJF9V9zFMIPOVppWv6VW7e7XyjsVom8WUQ==
+X-Received: by 2002:a05:6e02:b22:b0:363:cec2:e344 with SMTP id e2-20020a056e020b2200b00363cec2e344mr3652519ilu.2.1709739337607;
+        Wed, 06 Mar 2024 07:35:37 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id t2-20020a92cc42000000b003660612cf73sm324467ilq.49.2024.03.06.07.35.34
+        by smtp.gmail.com with ESMTPSA id t2-20020a92cc42000000b003660612cf73sm324467ilq.49.2024.03.06.07.35.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 07:35:34 -0800 (PST)
+        Wed, 06 Mar 2024 07:35:36 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Justin Sanders <justin@coraid.com>, 
- "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-Cc: Pavel Emelianov <xemul@openvz.org>, Kirill Korotaev <dev@openvz.org>, 
- "David S . Miller" <davem@davemloft.net>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Chun-Yi Lee <jlee@suse.com>
-In-Reply-To: <20240305082048.25526-1-jlee@suse.com>
-References: <20240305082048.25526-1-jlee@suse.com>
-Subject: Re: (subset) [PATCH] aoe: fix the potential use-after-free problem
- in aoecmd_cfg_pkts
-Message-Id: <170973933432.23995.8994501180418490235.b4-ty@kernel.dk>
-Date: Wed, 06 Mar 2024 08:35:34 -0700
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20240301192639.410183-1-dlemoal@kernel.org>
+References: <20240301192639.410183-1-dlemoal@kernel.org>
+Subject: Re: (subset) [PATCH 0/3] queue limits cleanup
+Message-Id: <170973933610.23995.17893999177654098848.b4-ty@kernel.dk>
+Date: Wed, 06 Mar 2024 08:35:36 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,22 +71,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Tue, 05 Mar 2024 16:20:48 +0800, Lee, Chun-Yi wrote:
-> This patch is against CVE-2023-6270. The description of cve is:
+On Sat, 02 Mar 2024 04:26:36 +0900, Damien Le Moal wrote:
+> One fix and 2 cleanups to go on top of Christoph's queue limits work.
 > 
->   A flaw was found in the ATA over Ethernet (AoE) driver in the Linux
->   kernel. The aoecmd_cfg_pkts() function improperly updates the refcnt on
->   `struct net_device`, and a use-after-free can be triggered by racing
->   between the free on the struct and the access through the `skbtxq`
->   global queue. This could lead to a denial of service condition or
->   potential code execution.
+> Damien Le Moal (3):
+>   virtio_blk: Do not use disk_set_max_open/active_zones()
+>   block: Rename disk_set_zoned()
+>   block: Rename disk_set_max_open/active_zones()
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] aoe: fix the potential use-after-free problem in aoecmd_cfg_pkts
-      commit: f98364e926626c678fb4b9004b75cacf92ff0662
+[1/3] virtio_blk: Do not use disk_set_max_open/active_zones()
+      commit: 0e46064ebebb90b02c53283106f26600aa38c986
 
 Best regards,
 -- 
