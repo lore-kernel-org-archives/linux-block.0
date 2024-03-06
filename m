@@ -1,91 +1,84 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886CE134406;
-	Wed,  6 Mar 2024 14:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6BE7FBDC;
+	Wed,  6 Mar 2024 14:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709735268; cv=none; b=g69NM4WTYq6jX9Bf/uuofRcehbJHGcNCOXnptgMwiBZpcrf3D+e3slhEScsFDP3B0wX2jFkZHGe900Tc/e4qs0bdrsOVdTR8o5S6Vw9qq7Ip132/YDc/jpFMZtUkWQm3cm18jC1Wd3N/RvTzLLiFWzP0JSSu1OLQQXrAmC7Dnd8=
+	t=1709735616; cv=none; b=q97PFBI6ReOmQlg6l1dU/FDzmqnqKhycsmwuV6/YxYRH7LW031r8c7Q6MXl7WfAn7yDwNu/GT6EiTbPyX4zr3XFWZ1hnys/agyAvXTRNpn7QOgY+rUH71BNQghdjnXjgwbbDRfVuP2ZUuisCk8ZnkjIe0jp75N32TRsVtNjEcv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709735268; c=relaxed/simple;
-	bh=WKctsFuvD85D3fRuhGp6QYPq5a6g1pcdQ5RVJgdZ6ug=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EXLBe7ykZqDq2+TTDu5XuQNGxTUgZQH0LzmLgc0uwBS1yVyelrV0K3YCdP4YbMyY3jqfXuD7FzZ9UPLYS/HeUXIE7h+zm00w1UUGzKQMXgeIfU9sTofddpKKa4i4rMZo9N2KxxDyE55w6ItHhkqGJ68b+ZkXlSBACkTn+x3qSow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ROarDdF4; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1709735616; c=relaxed/simple;
+	bh=WWXYolFOYwBAJ/CdfPd6/jJ5gcZIPqiPh9G+qpwJ/Rw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mmP20bLAEemw2jng5Dqo0A5A+tj6rOXTDNFhxtBV42PChWJzW3eh1WD6wHFjfPpm7FglW1gyDQCXDpCebvIERcDGfQHr2Rl/hNyXskQv+gRfy/GlBMaz51EZ+NStzLmSGmIUnd5htWymED6y6VIgmCjjns4UVxb8lOS/yim6MGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ROarDdF4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=bBx9WnIjiiM48Ro1l0Aqdsfwar/iT/SNOe4p5i/wCH0=; b=ROarDdF4c2O7PInnKigIkM3beZ
-	tTRm+hfXSPLlJ2G/XF+DdFdlsn0YghfqVQHg6jkhl087lOsQap2P3dZcAc8paNbeG0EqMF6VSu9Qj
-	JBF1OnINlNj6/YrVNS4q5276YV1qf6Kp7odzC4e1SDgF6YJZSRmrMugl50AIpfI+VtmvQR1i11VaW
-	15P//coD5mHxno6oT8Y/NlvGqbmuJv+JgqJLP5wH694vK1Pi7h4XDboslB4sRh7F/V7eeYATdYVHT
-	1tbjw7NRldBRtb42NzOulTW27NceJBESnxf0n+cUsT1ly+bxyxguvZSI0d046mvPP/DHp2HzkAzTf
-	Tv9Wfvhw==;
-Received: from [66.60.99.14] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rhsFE-00000000ZZt-27Vq;
-	Wed, 06 Mar 2024 14:27:44 +0000
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 378F068C4E; Wed,  6 Mar 2024 15:33:22 +0100 (CET)
+Date: Wed, 6 Mar 2024 15:33:21 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
+To: Keith Busch <kbusch@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
 	Dan Williams <dan.j.williams@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>
-Cc: dm-devel@lists.linux.dev,
-	nvdimm@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/3] dm-integrity: set max_integrity_segments in dm_integrity_io_hints
-Date: Wed,  6 Mar 2024 07:27:39 -0700
-Message-Id: <20240306142739.237234-4-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240306142739.237234-1-hch@lst.de>
-References: <20240306142739.237234-1-hch@lst.de>
+	"jack@suse.com" <jack@suse.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
+Message-ID: <20240306143321.GA19711@lst.de>
+References: <cover.1709635535.git.leon@kernel.org> <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org> <Zec_nAQn1Ft_ZTHH@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zec_nAQn1Ft_ZTHH@kbusch-mbp.dhcp.thefacebook.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Set max_integrity_segments with the other queue limits instead
-of updating it later.  This also uncovered that the driver is trying
-to set the limit to UINT_MAX while max_integrity_segments is an
-unsigned short, so fix it up to use USHRT_MAX instead.
+On Tue, Mar 05, 2024 at 08:51:56AM -0700, Keith Busch wrote:
+> On Tue, Mar 05, 2024 at 01:18:47PM +0200, Leon Romanovsky wrote:
+> > @@ -236,7 +236,9 @@ struct nvme_iod {
+> >  	unsigned int dma_len;	/* length of single DMA segment mapping */
+> >  	dma_addr_t first_dma;
+> >  	dma_addr_t meta_dma;
+> > -	struct sg_table sgt;
+> > +	struct dma_iova_attrs iova;
+> > +	dma_addr_t dma_link_address[128];
+> > +	u16 nr_dma_link_address;
+> >  	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
+> >  };
+> 
+> That's quite a lot of space to add to the iod. We preallocate one for
+> every request, and there could be millions of them. 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-integrity.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-index c5f03aab455256..a2e5cfe84565ae 100644
---- a/drivers/md/dm-integrity.c
-+++ b/drivers/md/dm-integrity.c
-@@ -3419,6 +3419,7 @@ static void dm_integrity_io_hints(struct dm_target *ti, struct queue_limits *lim
- 		blk_limits_io_min(limits, ic->sectors_per_block << SECTOR_SHIFT);
- 		limits->dma_alignment = limits->logical_block_size - 1;
- 	}
-+	limits->max_integrity_segments = USHRT_MAX;
- }
- 
- static void calculate_journal_section_size(struct dm_integrity_c *ic)
-@@ -3586,7 +3587,6 @@ static void dm_integrity_set(struct dm_target *ti, struct dm_integrity_c *ic)
- 	bi.interval_exp = ic->sb->log2_sectors_per_block + SECTOR_SHIFT;
- 
- 	blk_integrity_register(disk, &bi);
--	blk_queue_max_integrity_segments(disk->queue, UINT_MAX);
- }
- 
- static void dm_integrity_free_page_list(struct page_list *pl)
--- 
-2.39.2
-
+Yes.  And this whole proposal also seems clearly confused (not just
+because of the gazillion reposts) but because it mixes up the case
+where we can coalesce CPU regions into a single dma_addr_t range
+(iommu and maybe in the future swiotlb) and one where we need a
+dma_addr_t range per cpu range (direct misc cruft).
