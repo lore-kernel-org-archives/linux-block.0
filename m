@@ -1,57 +1,57 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59933135415
-	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 14:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45057132C38
+	for <linux-block@vger.kernel.org>; Wed,  6 Mar 2024 14:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709733864; cv=none; b=LMgPR+3vbY8acsEW1mpUEv5tuMRE4x5yU+zMYhRyZgxeASrPH5hJzFLH0aQC7EOx7EaDt/JXXh4wat/2fAx5UF9GRw1ABzbu0jev0PqMVg4aAOpV548L7pwtq/DIp9fjVA2gdysdeusfb1on0BH/aYjg4QguwkipD5ryYQqcxko=
+	t=1709733865; cv=none; b=LOGn45NXQ67pch/WGrwHKHEFhywzUWN+imVfoKskiPvbGP7rgf5VDORUlAsgPuAEAcy0RTMRtX4gtE4fRZ8PAiKTeaxnTu1slF1P+iCYQYX9at0IvKzgu4Cvw3Sn6dGWHShMyQYxYuAmgMaxNKveRmEcL6JNVb6b4QHnn3dX0RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709733864; c=relaxed/simple;
-	bh=U7UnfI+RMecaJlJgcpcpWgNe991kEeQXv+g7n/Zh6K0=;
+	s=arc-20240116; t=1709733865; c=relaxed/simple;
+	bh=Xkg2NzJRzT7r6gFh0oaVGRxWlZcaFFGtb/MDW6upix4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J2WrvGKm7t963zM6KQtExsA8oEvh15EIOC1/haC+pmk0i89srmz3jT0/DXn81W4uFGbnE46MlsooWPTRvg2b/mmTc8vTqjHIZS4Lp3GK++hJ0v2jeyLAeNv7UVuSP7zMTmvwftC/co6n8F3oa9bZUbHDIVavZ46pWPJDm2LgQdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=WD2mcxQh; arc=none smtp.client-ip=209.85.208.42
+	 MIME-Version:Content-Type; b=DUFfzhDujn6ZSUfsL9ayP1ot+WiYcHIjnnFYyLCXRS8QDoyeUjxyxVSW8NV7nu7IYZXOjuov8rRzOQP84dRlKMzxT9CiP2RfrGdOVqiwinpff9IBGPdaFaX9ov/mbe+5JLw+8yTKuJKU5koTSSbnpttYpQ+/8Ch7ARkCXPUx8Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=aHRH7wNQ; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="WD2mcxQh"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-563d56ee65cso10293027a12.2
-        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 06:04:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="aHRH7wNQ"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-565ef8af2f5so8724556a12.3
+        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 06:04:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1709733861; x=1710338661; darn=vger.kernel.org;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1709733862; x=1710338662; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ddcEzANygbtc3ybmp2B4OrDAWMjMfbP+itxySdBOqeo=;
-        b=WD2mcxQheKBhwabjGCz0T7DGj3RmwpbFsZyuXUw7Pk79RGX+BH9qy/IVAyBF2UmwtY
-         sqM4/bB44zp599Mhe+9yKSUpoaTRxYuRiPdxECJl8kpwjQeteTjgtjKU/MTJvfyH/OfS
-         VlW3uHW2M02nez3F4p/Jykcui5LuOrZIMV4cboJNaJdm2Zi9hpRdoGD8HR/QJcJ0q2sV
-         CdtZa5dCzRIQtSP+ypsDo2JmHtqv++oVtjWane6fis1D/e7RikN5knYWfY5FNE6UzZqG
-         wxxb7omrG7aflbyMemNujJx1BmQXT3tootMgJN4bs3XgW9IDALzoMXsD71yqETm0GAAy
-         CTXA==
+        bh=+GmncMjG1GIDrKttEG+31/JHanom7hp+TnPpiKXoBMI=;
+        b=aHRH7wNQiqjKuG53APsW5B19r+wK8cMoe7YTOmpCmUoV3QVKqxAAX702VJ3vtr3/W1
+         60dm+/TR/m9pq38YA6Ovb1zuC/DRU3x9TNPJlESFwPqbw1SuQllj+QkBveMPNrqpzALs
+         GUlGO97V4uo2ehzLiWZESKowe8926objI8yJB2iSNdFH2X1zR/oipuUUlrMbyqcxcOpv
+         HX6MR5Sp9bzGMGVCPIf3AQqQACe5S9/CQ5H6mSNIELl0i6LchSIAnsUiPP8ed8cB1jEI
+         Z9UAIvrEXc+W9uLEWwuPALB018aJPLbIMEv44UFi833wVmZt4FHABbPZRDp0RMWTQ+qN
+         z/Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709733861; x=1710338661;
+        d=1e100.net; s=20230601; t=1709733862; x=1710338662;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ddcEzANygbtc3ybmp2B4OrDAWMjMfbP+itxySdBOqeo=;
-        b=wX9vrc4ECPzXEO/WcDNj9ezuUHQ1f0lFe20hW2bk9N8+urKZXVQQqIrzRu7q3lZPor
-         EjDZkChvCNuJyMB7UBEx1tTa11xmaRBpcoKhjDBSFLlwmD9Ja4pjl/CpJ7eBL09HbLZk
-         aCUIzcNLfXRe0dVFMWE757WeB3RCnCMXN7cBvB8SuXjNk7FZEUor4UFppkWcSSmC5PAQ
-         TBXJP8jcgqT+ysS/zZqNiGcpDvUpK/NtB+64oS1WQ4FPuqRmzAp+tfR1EVPjADvkb6di
-         H6RLHgcayppZ0SAOafUPoJmJctVGNN8On3U4vWQYLzcxtS+AOGpL20uzFgjnT7Sn65my
-         FgmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3wkKdwbWiLnXhzDWuelGCplz6scHk6RgY153DgxKk1694qwSESzOaD5vo253q+Tmi7g4SCsoSKzK3JIHaS9Nfh0T8T0H1sid9/bQ=
-X-Gm-Message-State: AOJu0YwmOqKpwN8m7J7Ox+8lAXP66yVMWX5PNK0XSYLDppi8sjcL2v1N
-	Y/4ATa0w1f1UgM5DBvaYFvijvSZjq8XwBSe2lhf14fwdF5nt5K40ntASPkOTiQM=
-X-Google-Smtp-Source: AGHT+IHUhpFjq3HzoKT3pD6jLwRx4Gr7Yp6Yi0B26xPnRLjrZL40RznfDozglRseSLyoU7bAr6UZKA==
-X-Received: by 2002:a05:6402:903:b0:566:95e3:1759 with SMTP id g3-20020a056402090300b0056695e31759mr9427437edz.26.1709733860883;
-        Wed, 06 Mar 2024 06:04:20 -0800 (PST)
+        bh=+GmncMjG1GIDrKttEG+31/JHanom7hp+TnPpiKXoBMI=;
+        b=g8IGM3zl4BVf8DGx8qpMeRCnbwc/tZJlYRSNAccDJz2FbnDxoadErY6HSL+TTQdGMC
+         6ETXGvYJQ8PkjDwMtdLkVLUFUCl94MQ0mhMOrlDxT58n3EameNuCR/nLd9m13s2oHkB6
+         SwgN5VtmEJTNiv4P/oxwNY8DleYIQS3NN7s6KFJhA/D7xptY1z/ITrf1opv2LoWy8Lv2
+         AB+cU6tAcOyHx56njJeJK5ekO5Wim53dNofmSriDjzC4bJ5OUK8Cn+FJ1TwFnjXTR5yP
+         9Y+bLPx1Tr2SyTW3pxLVwZAJjBjJEFwrf+DcMu5kLIh3Zzo+UUUd22E+6P8+4eISN+3j
+         eqiA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCYmmbWOPpNqEKXQF8W/82wO6eVScB4aPx9kb2xoZ5Y0JGX7bCz6sLoJ3dX3C0beQ2MJcIPAQuI1DfzMkMd8dbhybHn447C4r/Z0A=
+X-Gm-Message-State: AOJu0YzOL2rVHLW/45esiUAgSED4KfpyAoKnfanm3wtaJ9aDdukBNG1m
+	bKBntf+4n2mQFl/13X25llJzylGQUQYGiN2jtxuxtuLUquSUb70gPrK6Kk5r6mY=
+X-Google-Smtp-Source: AGHT+IE4Sgd2O5n0KeOZDMftBV4LfJrVCZIXfrzoDY2ETcKylWMmBMwZuuLmnebrOsGkxfNyK/He3A==
+X-Received: by 2002:a05:6402:5bc4:b0:566:6e4e:cb8c with SMTP id gy4-20020a0564025bc400b005666e4ecb8cmr9727452edb.38.1709733861928;
+        Wed, 06 Mar 2024 06:04:21 -0800 (PST)
 Received: from ryzen9.home (62-47-18-60.adsl.highway.telekom.at. [62.47.18.60])
-        by smtp.gmail.com with ESMTPSA id m18-20020aa7c492000000b005662d3418dfsm6924991edq.74.2024.03.06.06.04.19
+        by smtp.gmail.com with ESMTPSA id m18-20020aa7c492000000b005662d3418dfsm6924991edq.74.2024.03.06.06.04.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 06:04:20 -0800 (PST)
+        Wed, 06 Mar 2024 06:04:21 -0800 (PST)
 From: Philipp Reisner <philipp.reisner@linbit.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: drbd-dev@lists.linbit.com,
@@ -60,9 +60,9 @@ Cc: drbd-dev@lists.linbit.com,
 	Philipp Reisner <philipp.reisner@linbit.com>,
 	Lars Ellenberg <lars.ellenberg@linbit.com>,
 	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Subject: [PATCH 6/7] drbd: split out a drbd_discard_supported helper
-Date: Wed,  6 Mar 2024 15:03:31 +0100
-Message-Id: <20240306140332.623759-7-philipp.reisner@linbit.com>
+Subject: [PATCH 7/7] drbd: atomically update queue limits in drbd_reconsider_queue_parameters
+Date: Wed,  6 Mar 2024 15:03:32 +0100
+Message-Id: <20240306140332.623759-8-philipp.reisner@linbit.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240305134041.137006-1-hch@lst.de>
 References: <20240305134041.137006-1-hch@lst.de>
@@ -77,63 +77,178 @@ Content-Transfer-Encoding: 8bit
 
 From: Christoph Hellwig <hch@lst.de>
 
-Add a helper to check if discard is supported for a given connection /
-backing device combination.
+Switch drbd_reconsider_queue_parameters to set up the queue parameters
+in an on-stack queue_limits structure and apply the atomically.  Remove
+various helpers that have become so trivial that they can be folded into
+drbd_reconsider_queue_parameters.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Philipp Reisner <philipp.reisner@linbit.com>
 Reviewed-by: Lars Ellenberg <lars.ellenberg@linbit.com>
 Tested-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
 ---
- drivers/block/drbd/drbd_nl.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ drivers/block/drbd/drbd_nl.c | 119 ++++++++++++++---------------------
+ 1 file changed, 46 insertions(+), 73 deletions(-)
 
 diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index a79b7fe5335d..94ed2b3ea636 100644
+index 94ed2b3ea636..fbd92803dc1d 100644
 --- a/drivers/block/drbd/drbd_nl.c
 +++ b/drivers/block/drbd/drbd_nl.c
-@@ -1231,24 +1231,33 @@ static unsigned int drbd_max_discard_sectors(struct drbd_connection *connection)
- 	return AL_EXTENT_SIZE >> 9;
+@@ -1216,11 +1216,6 @@ static unsigned int drbd_max_peer_bio_size(struct drbd_device *device)
+ 	return DRBD_MAX_BIO_SIZE;
+ }
+ 
+-static void blk_queue_discard_granularity(struct request_queue *q, unsigned int granularity)
+-{
+-	q->limits.discard_granularity = granularity;
+-}
+-
+ static unsigned int drbd_max_discard_sectors(struct drbd_connection *connection)
+ {
+ 	/* when we introduced REQ_WRITE_SAME support, we also bumped
+@@ -1247,62 +1242,6 @@ static bool drbd_discard_supported(struct drbd_connection *connection,
+ 	return true;
  }
  
 -static void decide_on_discard_support(struct drbd_device *device,
-+static bool drbd_discard_supported(struct drbd_connection *connection,
- 		struct drbd_backing_dev *bdev)
- {
+-		struct drbd_backing_dev *bdev)
+-{
 -	struct drbd_connection *connection =
 -		first_peer_device(device)->connection;
 -	struct request_queue *q = device->rq_queue;
 -	unsigned int max_discard_sectors;
 -
- 	if (bdev && !bdev_max_discard_sectors(bdev->backing_bdev))
+-	if (!drbd_discard_supported(connection, bdev))
 -		goto not_supported;
-+		return false;
- 
- 	if (connection->cstate >= C_CONNECTED &&
- 	    !(connection->agreed_features & DRBD_FF_TRIM)) {
- 		drbd_info(connection,
- 			"peer DRBD too old, does not support TRIM: disabling discards\n");
--		goto not_supported;
-+		return false;
- 	}
- 
-+	return true;
-+}
-+
-+static void decide_on_discard_support(struct drbd_device *device,
-+		struct drbd_backing_dev *bdev)
-+{
+-
+-	/*
+-	 * We don't care for the granularity, really.
+-	 *
+-	 * Stacking limits below should fix it for the local device.  Whether or
+-	 * not it is a suitable granularity on the remote device is not our
+-	 * problem, really. If you care, you need to use devices with similar
+-	 * topology on all peers.
+-	 */
+-	blk_queue_discard_granularity(q, 512);
+-	max_discard_sectors = drbd_max_discard_sectors(connection);
+-	blk_queue_max_discard_sectors(q, max_discard_sectors);
+-	return;
+-
+-not_supported:
+-	blk_queue_discard_granularity(q, 0);
+-	blk_queue_max_discard_sectors(q, 0);
+-}
+-
+-static void fixup_write_zeroes(struct drbd_device *device, struct request_queue *q)
+-{
+-	/* Fixup max_write_zeroes_sectors after blk_stack_limits():
+-	 * if we can handle "zeroes" efficiently on the protocol,
+-	 * we want to do that, even if our backend does not announce
+-	 * max_write_zeroes_sectors itself. */
+-	struct drbd_connection *connection = first_peer_device(device)->connection;
+-	/* If the peer announces WZEROES support, use it.  Otherwise, rather
+-	 * send explicit zeroes than rely on some discard-zeroes-data magic. */
+-	if (connection->agreed_features & DRBD_FF_WZEROES)
+-		q->limits.max_write_zeroes_sectors = DRBD_MAX_BBIO_SECTORS;
+-	else
+-		q->limits.max_write_zeroes_sectors = 0;
+-}
+-
+-static void fixup_discard_support(struct drbd_device *device, struct request_queue *q)
+-{
+-	unsigned int max_discard = device->rq_queue->limits.max_discard_sectors;
+-	unsigned int discard_granularity =
+-		device->rq_queue->limits.discard_granularity >> SECTOR_SHIFT;
+-
+-	if (discard_granularity > max_discard) {
+-		blk_queue_discard_granularity(q, 0);
+-		blk_queue_max_discard_sectors(q, 0);
+-	}
+-}
+-
+ /* This is the workaround for "bio would need to, but cannot, be split" */
+ static unsigned int drbd_backing_dev_max_segments(struct drbd_device *device)
+ {
+@@ -1320,8 +1259,11 @@ static unsigned int drbd_backing_dev_max_segments(struct drbd_device *device)
+ void drbd_reconsider_queue_parameters(struct drbd_device *device,
+ 		struct drbd_backing_dev *bdev, struct o_qlim *o)
+ {
 +	struct drbd_connection *connection =
 +		first_peer_device(device)->connection;
-+	struct request_queue *q = device->rq_queue;
-+	unsigned int max_discard_sectors;
+ 	struct request_queue * const q = device->rq_queue;
+ 	unsigned int now = queue_max_hw_sectors(q) << 9;
++	struct queue_limits lim;
+ 	struct request_queue *b = NULL;
+ 	unsigned int new;
+ 
+@@ -1348,24 +1290,55 @@ void drbd_reconsider_queue_parameters(struct drbd_device *device,
+ 		drbd_info(device, "max BIO size = %u\n", new);
+ 	}
+ 
++	lim = queue_limits_start_update(q);
+ 	if (bdev) {
+-		blk_set_stacking_limits(&q->limits);
+-		blk_queue_max_segments(q,
+-			drbd_backing_dev_max_segments(device));
++		blk_set_stacking_limits(&lim);
++		lim.max_segments = drbd_backing_dev_max_segments(device);
+ 	} else {
+-		blk_queue_max_segments(q, BLK_MAX_SEGMENTS);
++		lim.max_segments = BLK_MAX_SEGMENTS;
+ 	}
+ 
+-	blk_queue_max_hw_sectors(q, new >> SECTOR_SHIFT);
+-	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
+-	decide_on_discard_support(device, bdev);
++	lim.max_hw_sectors = new >> SECTOR_SHIFT;
++	lim.seg_boundary_mask = PAGE_SIZE - 1;
+ 
+-	if (bdev) {
+-		blk_stack_limits(&q->limits, &b->limits, 0);
+-		disk_update_readahead(device->vdisk);
++	/*
++	 * We don't care for the granularity, really.
++	 *
++	 * Stacking limits below should fix it for the local device.  Whether or
++	 * not it is a suitable granularity on the remote device is not our
++	 * problem, really. If you care, you need to use devices with similar
++	 * topology on all peers.
++	 */
++	if (drbd_discard_supported(connection, bdev)) {
++		lim.discard_granularity = 512;
++		lim.max_hw_discard_sectors =
++			drbd_max_discard_sectors(connection);
++	} else {
++		lim.discard_granularity = 0;
++		lim.max_hw_discard_sectors = 0;
+ 	}
+-	fixup_write_zeroes(device, q);
+-	fixup_discard_support(device, q);
 +
-+	if (!drbd_discard_supported(connection, bdev))
-+		goto not_supported;
++	if (bdev)
++		blk_stack_limits(&lim, &b->limits, 0);
 +
- 	/*
- 	 * We don't care for the granularity, really.
- 	 *
++	/*
++	 * If we can handle "zeroes" efficiently on the protocol, we want to do
++	 * that, even if our backend does not announce max_write_zeroes_sectors
++	 * itself.
++	 */
++	if (connection->agreed_features & DRBD_FF_WZEROES)
++		lim.max_write_zeroes_sectors = DRBD_MAX_BBIO_SECTORS;
++	else
++		lim.max_write_zeroes_sectors = 0;
++
++	if ((lim.discard_granularity >> SECTOR_SHIFT) >
++	    lim.max_hw_discard_sectors) {
++		lim.discard_granularity = 0;
++		lim.max_hw_discard_sectors = 0;
++	}
++
++	if (queue_limits_commit_update(q, &lim))
++		drbd_err(device, "setting new queue limits failed\n");
+ }
+ 
+ /* Starts the worker thread */
 -- 
 2.40.1
 
