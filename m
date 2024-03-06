@@ -1,53 +1,47 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC6712FB31;
-	Wed,  6 Mar 2024 14:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3514B13440D;
+	Wed,  6 Mar 2024 14:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709736268; cv=none; b=LopTb/fKh34Npc6RH+aVljXKQu9LKnQxIKOKMWoJbAU09CeBdkWJC7Q8EE3Ah8ZNrZ0zg8v7blR49lzR0EeNi9IZz0vIFniPstE1OEOiqcpBaS1oSrTOE1c7DWdjdbES98Ql6S8yqpFs8/ldkd50uJR7LWElMOXdb1KXA5EKAAQ=
+	t=1709736346; cv=none; b=pecfBWN89e5ja6xH0T1khFwl8aQVCPxfjZ1gFUNBSNJLGkrAgS0uIH/OHGcmsmwcnnrFbnhlrDo6fL/+/6R/AQyWl4aEivfdQBOuKYzx3XYel4cJ8w4vAzz5fAmSiMscyOqYRUra6tivjziGg7ni79I9C2pmh3n94PdhFYsij20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709736268; c=relaxed/simple;
-	bh=Cg+/N+/d48kp+Bii6xwPc6Sv3b/fJs9pKZfyKHqumHo=;
+	s=arc-20240116; t=1709736346; c=relaxed/simple;
+	bh=ngbvudzA6VDuUQUJf3SQII680pki1OnsAS6IxtL20HU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ihvgbR0V/c/+G46kcT7Bcac8cuquZlRMadzCs1boqg+FblI1xFMXQnUOPOsjafPpPmu6fpSU/pgk80tmbucADUtbKT9gGPTp5fEwgKEw1CJaIz7PFpE6BXodGmpYwH5/ijMc+EDLE10issr+RjDPsHwhU8cfrbNF+/WouN1+KzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6727E68C4E; Wed,  6 Mar 2024 15:44:17 +0100 (CET)
-Date: Wed, 6 Mar 2024 15:44:16 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
- steps
-Message-ID: <20240306144416.GB19711@lst.de>
-References: <cover.1709635535.git.leon@kernel.org> <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com> <20240305122935.GB36868@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RBRfQcyRGbOf5PHXMsPeQJGhPW3mT7AwOLMO2m8bUu7wIHcMim6ZctxXMAA1DvybxeFlJps9teqJ+oDH1HsEmZ5j5wA4KeK2acuAPHPuiqbxzuU9ja5Eghm+1p/n+Yg+Nor+f5fCMfjwoBBNoEIRApwzuIJZRkcMt/FglRAbK3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gmH5SDUY; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gmH5SDUY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ngbvudzA6VDuUQUJf3SQII680pki1OnsAS6IxtL20HU=; b=gmH5SDUY7Sd+zKywayj4dBnbzD
+	SZsINypiyEAHjNjuLVoSXPRhTTuNK1nesp8Z4bcSYkCntwAkbB+MqTgE3LYDzktl0X78bhVTD2kMm
+	SXyFlB7PI9qqRsvybz2CKSehBE4JdDhcLGCJ9OjdAsosvRNSeOOOsdgHqbT81dKSfuig3ZU+OSpgx
+	C4Ml9aqZAZScJxvty/Wqejh8ptZi9ZKlzE4z0RYvxai/4Ad5vh9qXyrh0MxqUfH782GBRfQ3JbswZ
+	fNV2rvoVdfYHzg9cAzmMNN3fDp3dYgZ0DZSZEY7tYYHEnSyPO3rjMQR8dK7il9KTEb1vIWs7xviD2
+	c4BimzwA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rhsWe-00000000dcY-3CKr;
+	Wed, 06 Mar 2024 14:45:44 +0000
+Date: Wed, 6 Mar 2024 06:45:44 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Chandan Babu R <chandanbabu@kernel.org>,
+	linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [BUG REPORT] General protection fault while discarding extents
+ on XFS on next-20240305
+Message-ID: <ZeiBmGXgxNmgyjs4@infradead.org>
+References: <87y1avlsmw.fsf@debian-BULLSEYE-live-builder-AMD64>
+ <Zehi_bLuwz9PcbN9@infradead.org>
+ <Zeh_e2tUpx-HzCed@kbusch-mbp>
+ <ZeiAQv6ACQgIrsA-@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,79 +50,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240305122935.GB36868@unreal>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <ZeiAQv6ACQgIrsA-@kbusch-mbp>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Mar 05, 2024 at 02:29:35PM +0200, Leon Romanovsky wrote:
-> > > These advanced DMA mapping APIs are needed to calculate IOVA size to
-> > > allocate it as one chunk and some sort of offset calculations to know
-> > > which part of IOVA to map.
-> > 
-> > I don't follow this part at all - at *some* point, something must know a
-> > range of memory addresses involved in a DMA transfer, so that's where it
-> > should map that range for DMA. 
-> 
-> In all presented cases in this series, the overall DMA size is known in
-> advance. In RDMA case, it is known when user registers the memory, in
-> VFIO, when live migration is happening and in NVMe, when BIO is created.
-> 
-> So once we allocated IOVA, we will need to link ranges, which si the
-> same as map but without IOVA allocation.
+On Wed, Mar 06, 2024 at 07:40:02AM -0700, Keith Busch wrote:
+> Oh my mistake: xfs_discard_extents() does this in a loop and chains
+> along the previous iteration's bio. Your update is needed and looks
+> good.
 
-But above you say:
-
-"These advanced DMA mapping APIs are needed to calculate IOVA size to
-allocate it as one chunk and some sort of offset calculations to know
-which part of IOVA to map."
-
-this suggests you need helpers to calculate the len and offset.  I
-can't see where that would ever make sense.  The total transfer
-size should just be passed in by the callers and be known, and
-there should be no offset.
-
-> > > Instead of teaching DMA to know these specific datatypes, let's separate
-> > > existing DMA mapping routine to two steps and give an option to advanced
-> > > callers (subsystems) perform all calculations internally in advance and
-> > > map pages later when it is needed.
-> > 
-> > From a brief look, this is clearly an awkward reinvention of the IOMMU API.
-> > If IOMMU-aware drivers/subsystems want to explicitly manage IOMMU address
-> > spaces then they can and should use the IOMMU API. Perhaps there's room for
-> > some quality-of-life additions to the IOMMU API to help with common usage
-> > patterns, but the generic DMA mapping API is absolutely not the place for
-> > it.
-> 
-> DMA mapping gives nice abstraction from IOMMU, and allows us to have
-> same flow for IOMMU and non-IOMMU flows without duplicating code, while
-> you suggest to teach almost every part in the kernel to know about IOMMU.
-
-Except that the flows are fundamentally different for the "can coalesce"
-vs "can't coalesce" case.  In the former we have one dma_addr_t range,
-and in the latter as many as there are input vectors (this is ignoring
-the weird iommu merging case where we we coalesce some but not all
-segments, but I'd rather not have that in a new API).
-
-So if we want to efficiently be able to handle these cases we need
-two APIs in the driver and a good framework to switch between them.
-Robins makes a point here that the iommu API handles the can coalesce
-case and he has a point as that's exactly how the IOMMU API works.
-I'd still prefer to wrap it with dma callers to handle things like
-swiotlb and maybe Xen grant tables and to avoid the type confusion
-between dma_addr_t and then untyped iova in the iommu layer, but
-having this layer or not is probably worth a discussion.
-
-> 
-> In this series, we changed RDMA, VFIO and NVMe, and in all cases we
-> removed more code than added. From what I saw, VDPA and virito-blk will
-> benefit from proposed API too.
-> 
-> Even in this RFC, where Chaitanya did partial job and didn't convert
-> whole driver, the gain is pretty obvious:
-> https://lore.kernel.org/linux-rdma/016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org/T/#u
-> 
-
-I have no idea how that nvme patch is even supposed to work.  It removes
-the PRP path in nvme-pci, which not only is the most common I/O path
-but actually required for the admin queue as NVMe doesn't support
-SGLs for the admin queue.
-
+Yeah, the whole point for the in/out biop parameter is to allow
+this kind of chaining.
