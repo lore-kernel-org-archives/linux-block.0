@@ -1,30 +1,30 @@
 Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 7B85D23772;
-	Wed,  6 Mar 2024 10:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 49C275D8FF;
+	Wed,  6 Mar 2024 10:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709719349; cv=none; b=R5zXv9Dz+dwrd+sfnwIqXZyMBeS54+HuFbgtr1Ds5IuDmnIs69Hxhm5q/QBNFcfjBbKU9PDonn7rkVspRRYPmtnL2jTS7eedDzCp7/EVztF1idmF18vgpYpfg0EBeB1mA7GzCBq4B+eYPBC549U9/yFKbgje8cvCcHGF9GjB3HY=
+	t=1709719635; cv=none; b=pvlpWLkX91d+Rq6ne6+X4RR4MFFB4+rNah0GKBK+o6Sf450c1R5Pnpz0wBCltkN1cWpKrTq5ObiuhOGGWozRFc/4MSa+B/z07jjLzghdkzyP2jL1ftou2m5jlDk6ivrbac3nihOmcdOjhDzsl5/yL43kY7kpVwkplq9M4puDKB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709719349; c=relaxed/simple;
-	bh=Y/vw2m0mqKjUysumAhyd8tDimnylKASFxMqN+1uA76s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=lUa6i33Usd13nY+/xkUdjnHgW4xHojVevLPUxNMenswXl4PqP81hX70gwxhD2qZUSTI8NO/OWakavtUVrpuxouBvThvu1ydUo975qXQMmVSv8fYVfOurqbp7Ju2sQuvSW32JLQ9No1ZPj91fTeJvSJzsAdiuM5K3wFnx4G0EUpY=
+	s=arc-20240116; t=1709719635; c=relaxed/simple;
+	bh=SPyotqgd+ZQ+ck8sF39EEIx+dSieElGkiTrHdYt1FxE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=kbKeOqwoGzzPcEaOJMLsCq6JBEywpoJgOJnjyIiIC1z27XHFrrd9iehPTPcGE4hpOe0A/to3sIjRNoBLqzMguc6OkCeI0mcAwe0fQFQjBsTcBoCzTuGADQsH7DxcZly2UeFWyzPyI5ffz5iWbGL1aPxkn6p1fyIBg+iMA5CdhYg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
 Received: from localhost.localdomain (unknown [219.141.250.2])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 21F12602FFF41;
-	Wed,  6 Mar 2024 18:02:23 +0800 (CST)
-X-MD-Sfrom: zeming@nfschina.com
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id CDE2060301EE7;
+	Wed,  6 Mar 2024 18:07:06 +0800 (CST)
+X-MD-Sfrom: kunyu@nfschina.com
 X-MD-SrcIP: 219.141.250.2
-From: Li zeming <zeming@nfschina.com>
+From: Li kunyu <kunyu@nfschina.com>
 To: jonathan.derrick@linux.dev,
 	axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Li zeming <zeming@nfschina.com>
-Subject: [PATCH] =?UTF-8?q?sed-opal:=20Remove=20unnecessary=20=E2=80=980?= =?UTF-8?q?=E2=80=99=20values=20from=20err?=
-Date: Wed,  6 Mar 2024 18:02:16 +0800
-Message-Id: <20240306100216.69340-1-zeming@nfschina.com>
+	Li kunyu <kunyu@nfschina.com>
+Subject: [PATCH] =?UTF-8?q?sed-opal:=20Remove=20unnecessary=20=E2=80=980?= =?UTF-8?q?=E2=80=99=20values=20from=20ret?=
+Date: Wed,  6 Mar 2024 18:06:59 +0800
+Message-Id: <20240306100659.106521-1-kunyu@nfschina.com>
 X-Mailer: git-send-email 2.18.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -35,26 +35,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-err is assigned first, so it does not need to initialize the assignment.
+ret is assigned first, so it does not need to initialize the assignment.
 
-Signed-off-by: Li zeming <zeming@nfschina.com>
+Signed-off-by: Li kunyu <kunyu@nfschina.com>
 ---
- block/sed-opal.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/sed-opal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index e5b069dde905e..b6887920a84e9 100644
+index b6887920a84e9..f62b7ee933f7f 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -2153,7 +2153,7 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- 	u8 lr_buffer[OPAL_UID_LENGTH];
- 	struct opal_lock_unlock *lkul = data;
- 	u8 read_locked = 1, write_locked = 1;
--	int err = 0;
-+	int err;
+@@ -2576,7 +2576,7 @@ static int opal_get_discv(struct opal_dev *dev, struct opal_discovery *discv)
+ 	const struct opal_step discovery0_step = {
+ 		opal_discovery0, discv
+ 	};
+-	int ret = 0;
++	int ret;
  
- 	if (build_locking_range(lr_buffer, sizeof(lr_buffer),
- 				lkul->session.opal_key.lr) < 0)
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+@@ -3065,7 +3065,7 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+ {
+ 	struct opal_suspend_data *suspend;
+ 	bool was_failure = false;
+-	int ret = 0;
++	int ret;
+ 
+ 	if (!dev)
+ 		return false;
 -- 
 2.18.2
 
