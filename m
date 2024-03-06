@@ -1,55 +1,41 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6BE7FBDC;
-	Wed,  6 Mar 2024 14:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1927FBDC;
+	Wed,  6 Mar 2024 14:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709735616; cv=none; b=q97PFBI6ReOmQlg6l1dU/FDzmqnqKhycsmwuV6/YxYRH7LW031r8c7Q6MXl7WfAn7yDwNu/GT6EiTbPyX4zr3XFWZ1hnys/agyAvXTRNpn7QOgY+rUH71BNQghdjnXjgwbbDRfVuP2ZUuisCk8ZnkjIe0jp75N32TRsVtNjEcv4=
+	t=1709735807; cv=none; b=ISROkhWePIhCt+I5pN+4o9fa0fldcF5ah0bl55sRI/YlbdxD4P+xfCYrwPkI00RhrChDvhuaOUM3nGuKKM61IHnZMk/OXd4mxfxE6N4y+Jg4ubKogSK0f+ZAUCUKC5mGqsM0HF7koKE0pOE9RGKW90PgFdtgIGaXbGJoAF6qRp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709735616; c=relaxed/simple;
-	bh=WWXYolFOYwBAJ/CdfPd6/jJ5gcZIPqiPh9G+qpwJ/Rw=;
+	s=arc-20240116; t=1709735807; c=relaxed/simple;
+	bh=jOJY5zZ8mvtG66fKCffN8cwLOjFyGF6wcctejCjiG+I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mmP20bLAEemw2jng5Dqo0A5A+tj6rOXTDNFhxtBV42PChWJzW3eh1WD6wHFjfPpm7FglW1gyDQCXDpCebvIERcDGfQHr2Rl/hNyXskQv+gRfy/GlBMaz51EZ+NStzLmSGmIUnd5htWymED6y6VIgmCjjns4UVxb8lOS/yim6MGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 378F068C4E; Wed,  6 Mar 2024 15:33:22 +0100 (CET)
-Date: Wed, 6 Mar 2024 15:33:21 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
-Message-ID: <20240306143321.GA19711@lst.de>
-References: <cover.1709635535.git.leon@kernel.org> <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org> <Zec_nAQn1Ft_ZTHH@kbusch-mbp.dhcp.thefacebook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=N/TrCedGr5h4O8rfNqvD9CZ8FKYJ/f2G3vlweRkS8l0LrgKyTwBOu0okXoRp9Gwr6chzPwKugIkSvyCcKqGBBwVGOsyDgzEp6k5ibTWEj9DJDjHDRmOwLSX5F69KVZTLc/uCnzGw/2zre8Q4/jHLTzv+Ajw3IkmPxs8GFGFjyrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYqXczD2; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYqXczD2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52856C433C7;
+	Wed,  6 Mar 2024 14:36:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709735806;
+	bh=jOJY5zZ8mvtG66fKCffN8cwLOjFyGF6wcctejCjiG+I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EYqXczD2957eAx/7ueuQEGjIbo7gvWQteWEum6LBQqndtQuNfqJr552vcmfP8Pr2h
+	 IByelGi+NuRW0QOW/eJY45GQGOFOrt2KnwOYQAUwsI7QcXx4TtgI7E7x4gmM4ghggU
+	 UhfCzXrIg4gtFRxor+sKHCt20H+dJ0JaD8lDasCMBZyP9+joF64Dut6lEu8rLuERaj
+	 SUUnmU9RHSjyorTsUY+5Dq1tGMgm9SKqY/1NHSVRoAAOwks3E04L8c1tuYwgWs2iFw
+	 u9J14ybaDj3q+2o05zxLlt5GLne77aHINSjpFX9Lcf9npQ/0fdgo9PETaxAavKaqge
+	 jGGrQz5WqArSQ==
+Date: Wed, 6 Mar 2024 07:36:43 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Chandan Babu R <chandanbabu@kernel.org>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org
+Subject: Re: [BUG REPORT] General protection fault while discarding extents
+ on XFS on next-20240305
+Message-ID: <Zeh_e2tUpx-HzCed@kbusch-mbp>
+References: <87y1avlsmw.fsf@debian-BULLSEYE-live-builder-AMD64>
+ <Zehi_bLuwz9PcbN9@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,27 +44,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zec_nAQn1Ft_ZTHH@kbusch-mbp.dhcp.thefacebook.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <Zehi_bLuwz9PcbN9@infradead.org>
 
-On Tue, Mar 05, 2024 at 08:51:56AM -0700, Keith Busch wrote:
-> On Tue, Mar 05, 2024 at 01:18:47PM +0200, Leon Romanovsky wrote:
-> > @@ -236,7 +236,9 @@ struct nvme_iod {
-> >  	unsigned int dma_len;	/* length of single DMA segment mapping */
-> >  	dma_addr_t first_dma;
-> >  	dma_addr_t meta_dma;
-> > -	struct sg_table sgt;
-> > +	struct dma_iova_attrs iova;
-> > +	dma_addr_t dma_link_address[128];
-> > +	u16 nr_dma_link_address;
-> >  	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
-> >  };
+On Wed, Mar 06, 2024 at 04:35:09AM -0800, Christoph Hellwig wrote:
+> On Wed, Mar 06, 2024 at 12:49:29PM +0530, Chandan Babu R wrote:
+> > The above *probably* occured because __blkdev_issue_discard() noticed a pending
+> > signal, processed the bio, freed the bio and returned a non-NULL bio pointer
+> > to the caller (i.e. xfs_discard_extents()).
+> > 
+> > xfs_discard_extents() then tries to process the freed bio once again.
 > 
-> That's quite a lot of space to add to the iod. We preallocate one for
-> every request, and there could be millions of them. 
+> Yes, __blkdev_issue_discard really needs to clear *biop to NULL for
+> this case, i.e.:
+> 
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index dc8e35d0a51d6d..26850d4895cdaf 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -99,6 +99,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  		cond_resched();
+>  		if (fatal_signal_pending(current)) {
+>  			await_bio_chain(bio);
+> +			*biop = NULL;
+>  			return -EINTR;
+>  		}
+>  	}
 
-Yes.  And this whole proposal also seems clearly confused (not just
-because of the gazillion reposts) but because it mixes up the case
-where we can coalesce CPU regions into a single dma_addr_t range
-(iommu and maybe in the future swiotlb) and one where we need a
-dma_addr_t range per cpu range (direct misc cruft).
+But everyone who calls this already sets their local bio to NULL by
+default, and __blkdev_issue_discard updates *biop only on success, so
+'*biop' should already be NULL here. ?
