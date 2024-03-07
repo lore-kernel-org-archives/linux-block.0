@@ -1,167 +1,75 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2174E1DFC1;
-	Thu,  7 Mar 2024 15:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA6512DD99;
+	Thu,  7 Mar 2024 15:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709823918; cv=none; b=khZJ6v26ze6x/gyHQAtE9UYmuGAl4KlEHZmskMe44EHiAtEVnoChtuZiC/6DypaEEtt3e8a3aO+B7j4DUJNMfLdEtkVK+LF/Zs8VbZ2ruhltY00wnGTv1p6lsquI3QKMBSs4YTLmrWtbSHXX5357JQsozqNpTJt21YpY2DE5r20=
+	t=1709824321; cv=none; b=D6ADPrneRbEPyiY6E7DNYM5zF4SzkvECLP2sf+qUb4PKBKqwweU5Ifg73ejSgjrwu9C5YDULqbWcnwUj3Lh457aMibA0dEAdkdjrQ9JXxD3SJN4EAcllm9WvTZY3HX0koEzN46AYpkIgtWzNUiSYEPyjVFtAhQAdw/VjsMQSmKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709823918; c=relaxed/simple;
-	bh=KcbjcoK0enYuZVWxTVuA3A7m2RX5v0vJJmwup26L1hs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m/rkZhNRVb1YBGtGjoMLGPnUT1c0Rj+JaQ5tUtYIilNOa7HeuU+hbxeWrUtSpmDd3PIpcHp/vEdcjIbiBRcQihPddW1qIBT6IEuz6VjZY09hX8kgm7Kua6fwUJ5wr/HmofeSyNnjP6jcDksuUNqh6T1e8h0cHA1Veojxx3vEd6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+	s=arc-20240116; t=1709824321; c=relaxed/simple;
+	bh=Wl9TDpjbcsEQFTjNttax1/Zg+2GJ5Gq4ZNNeMgy5WZ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NMv4TGkEc9I5GFM48tTsF7HqNvAFFo2SQ0geEXOBe6R6NXeW9MaK17Q+KOsiFjepQrx7lwuqalS5megiJlA7tnZ2eiZo7txQeAghoxmLhvuZNMZjMxOu1xAb7OQsLrhI7/0jZE4affsMEPGUy2sCsM00swL+ZaisLSalsxUCniU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DVgNbQMz; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6CF2168CFE; Thu,  7 Mar 2024 16:05:05 +0100 (CET)
-Date: Thu, 7 Mar 2024 16:05:05 +0100
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DVgNbQMz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=K02DG2I21K2ObYxemDxzBjU+AOxsGZACg52CFCT18Zw=; b=DVgNbQMz9cKFU4BtYsYIlEp2DW
+	95jFOF7I7XdPf8FFUSY6qG3h3eaITd6gfl+IYHLVUPYXTyLMSBGeJLkjf5lE9K9SSgcLgpWehYtgk
+	OlMSWhtx0M5f85RRqkcolW2Ji8CMqkhJY/9uk55bk8akwPEFrb7Jilq+/GHNQsVwFdyhmaw6iiaLO
+	i6f+RQKdXlL1GLRlWi0fELclNfTm1dF1E8JzvmePbsRw1zOCqDoYNAmBPhyEbTpEcxOv5EkI7ejyP
+	MLSICM5i3l1e88V+o/c2GwccN0XovVrx9XzuqqONTivNPVG4/49ac2tJNin/gTszMLuxY0k0dgvaS
+	MadURxBQ==;
+Received: from [66.60.99.14] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1riFPa-00000005D6F-388x;
+	Thu, 07 Mar 2024 15:11:58 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
- steps
-Message-ID: <20240307150505.GA28978@lst.de>
-References: <cover.1709635535.git.leon@kernel.org> <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com> <20240305122935.GB36868@unreal> <20240306144416.GB19711@lst.de> <20240306154328.GM9225@ziepe.ca> <20240306162022.GB28427@lst.de> <20240306174456.GO9225@ziepe.ca> <20240306221400.GA8663@lst.de> <20240307000036.GP9225@ziepe.ca>
+To: Jens Axboe <axboe@kernel.dk>,
+	Chandan Babu R <chandanbabu@kernel.org>,
+	Keith Busch <kbusch@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org
+Subject: RFC: untangle and fix __blkdev_issue_discard
+Date: Thu,  7 Mar 2024 08:11:47 -0700
+Message-Id: <20240307151157.466013-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307000036.GP9225@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Mar 06, 2024 at 08:00:36PM -0400, Jason Gunthorpe wrote:
-> > 
-> > I don't think you can do without dma_addr_t storage.  In most cases
-> > your can just store the dma_addr_t in the LE/BE encoded hardware
-> > SGL, so no extra storage should be needed though.
-> 
-> RDMA (and often DRM too) generally doesn't work like that, the driver
-> copies the page table into the device and then the only reason to have
-> a dma_addr_t storage is to pass that to the dma unmap API. Optionally
-> eliminating long term dma_addr_t storage would be a worthwhile memory
-> savings for large long lived user space memory registrations.
+Hi all,
 
-It's just kinda hard to do.  For aligned IOMMU mapping you'd only
-have one dma_addr_t mappings (or maybe a few if P2P regions are
-involved), so this probably doesn't matter.  For direct mappings
-you'd have a few, but maybe the better answer is to use THP
-more aggressively and reduce the number of segments.
+this tries to address the block for-next oops Chandan reported on XFS.
+I can't actually reproduce it unfortunately, but this series should
+sort it out by movign the fatal_signal_pending check out of all but
+the ioctl path.  The write_zeroes and secure_erase path will need
+similar treatment eventually.
 
-> I wrote the list as from a single IO operation perspective, so all but
-> 5 need to store a single IOVA range that could be stored in some
-> simple non-dynamic memory along with whatever HW SGLs/etc are needed.
-> 
-> The point of 5 being different is because the driver has to provide a
-> dynamically sized list of dma_addr_t's as storage until unmap. 5 is
-> the only case that requires that full list.
+Test with blktests and the xfstests discard group for xfs only. Note that
+the latter has a pre-existing regression in generic/500 that I'll look
+into in a bit.
 
-No, all cases need to store one or more ranges.
-
-> > > So are you thinking something more like a driver flow of:
-> > > 
-> > >   .. extent IO and get # aligned pages and know if there is P2P ..
-> > >   dma_init_io(state, num_pages, p2p_flag)
-> > >   if (dma_io_single_range(state)) {
-> > >        // #2, #4
-> > >        for each io()
-> > > 	    dma_link_aligned_pages(state, io range)
-> > >        hw_sgl = (state->iova, state->len)
-> > >   } else {
-> > 
-> > I think what you have a dma_io_single_range should become before
-> > the dma_init_io.  If we know we can't coalesce it really just is a
-> > dma_map_{single,page,bvec} loop, no need for any extra state.
-> 
-> I imagine dma_io_single_range() to just check a flag in state.
-> 
-> I still want to call dma_init_io() for the non-coalescing cases
-> because all the flows, regardless of composition, should be about as
-> fast as dma_map_sg is today.
-
-If all flows includes multiple non-coalesced regions that just makes
-things very complicated, and that's exactly what I'd want to avoid.
-
-> That means we need to always pre-allocate the IOVA in any case where
-> the IOMMU might be active - even on a non-coalescing flow.
-> 
-> IOW, dma_init_io() always pre-allocates IOVA if the iommu is going to
-> be used and we can't just call today's dma_map_page() in a loop on the
-> non-coalescing side and pay the overhead of Nx IOVA allocations.
-> 
-> In large part this is for RDMA, were a single P2P page in a large
-> multi-gigabyte user memory registration shouldn't drastically harm the
-> registration performance by falling down to doing dma_map_page, and an
-> IOVA allocation, on a 4k page by page basis.
-
-But that P2P page needs to be handled very differently, as with it
-we can't actually use a single iova range.  So I'm not sure how that
-is even supposed to work.  If you have
-
- +-------+-----+-------+
- | local | P2P | local |
- +-------+-----+-------+
-
-you need at least 3 hw SGL entries, as the IOVA won't be contigous.
-
-> The other thing that got hand waved here is how does dma_init_io()
-> know which of the 6 states we are looking at? I imagine we probably
-> want to do something like:
-> 
->    struct dma_io_summarize summary = {};
->    for each io()
->         dma_io_summarize_range(&summary, io range)
->    dma_init_io(dev, &state, &summary);
->    if (state->single_range) {
->    } else {
->    }
->    dma_io_done_mapping(&state); <-- flush IOTLB once
-
-That's why I really just want 2 cases.  If the caller guarantees the
-range is coalescable and there is an IOMMU use the iommu-API like
-API, else just iter over map_single/page.
-
-> Enhancing the single sgl case is not a big change, I think. It does
-> seem simplifying for the driver to not have to coalesce SGLs to detect
-> the single-SGL fast-path.
-> 
-> > > This is not quite what you said, we split the driver flow based on
-> > > needing 1 HW SGL vs need many HW SGL.
-> > 
-> > That's at least what I intended to say, and I'm a little curious as what
-> > it came across.
-> 
-> Ok, I was reading the discussion more about as alignment than single
-> HW SGL, I think you ment alignment as implying coalescing behavior
-> implying single HW SGL..
-
-Yes.
+Diffstat:
+ block/blk-lib.c                   |   78 +++++++++++++-------------------------
+ block/ioctl.c                     |   13 ++++--
+ drivers/md/dm-thin.c              |    5 +-
+ drivers/md/md.c                   |    6 +-
+ drivers/nvme/target/io-cmd-bdev.c |   16 ++-----
+ fs/ext4/mballoc.c                 |   16 ++++---
+ fs/f2fs/segment.c                 |   10 ++--
+ fs/xfs/xfs_discard.c              |   47 +++++++---------------
+ fs/xfs/xfs_discard.h              |    2 
+ include/linux/blkdev.h            |    4 -
+ 10 files changed, 84 insertions(+), 113 deletions(-)
