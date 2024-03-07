@@ -1,116 +1,130 @@
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.7])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE331BC56;
-	Thu,  7 Mar 2024 04:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.7
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44C0E546
+	for <linux-block@vger.kernel.org>; Thu,  7 Mar 2024 05:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709785211; cv=none; b=WSsO9IhlQu4xtvRZHd1Qr5dMtv384ivr03f4prJRFTjzAQiByxWh7Pj4cd0I5D3hFbq8Az73l+2Af58rd7uhtZvc7OoDlt3SmVx8H0Lv8JIcpjhZ7/jtEtm473AOtDZZqgUC/qEDRG+lz2/FJ8bG7xBGHEzUn3MhenzUhtqZCCI=
+	t=1709789515; cv=none; b=LyuChXHv6mjxqI+CCF7/DYbj21zhQmP95PeyFREWsNZfqW7uG1jNGo7PmgfPClOtyC+raIKH4bIZTd8Ew7qW/eSm9hNtSxsgknRpIgBLEk2+W2yonKUVUdxEKzmGILslYkvwJq03ESwAEep7v0Jn9m9n0lV/fSPsTFIFt8qSfS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709785211; c=relaxed/simple;
-	bh=RVzCBWZL3Fs2lKVuMO+8HdbnbBEx+N+Ja88D9+iMXLI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E+uveaUxDTgpOPCEIIb5dl9ZWKTBvF+GbQNIVAcX7AEEjGylm6mQWaAsMQYhKuZN6rczkCQ1ccLItUTBqcnmRxPVg8jJo8L7HBD0HSfrnj454jjyw+QT8iWjhFDNSdmLoKbgkfpqYFacjd0pgaWRjdrIiDF1UvSO6K733GeUS/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=bdXFwwC+; arc=none smtp.client-ip=117.135.210.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+	s=arc-20240116; t=1709789515; c=relaxed/simple;
+	bh=d0Ufl4MibzFscR0K1VA6p6YEY6iaz+LmQ01k8l4gkOs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PB/RL3gxywnoYUr0go4oU5OF+jgqsBcPO442RRzP+qCUbtFKd43lAijyMSKyr5gwxF7L4jUEZ33N+gLh1olpgtyW2GUS4pF6qfNaxx5PtHS5W2Av+Z31tOVvI2VTD0SKYeMV33j5Znlvs4b5SkrZZ+DU6McBCcVEj28XPmXFJDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=cE/l1/at; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="bdXFwwC+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=VJTS0
-	wA0DvHHRitPTm1NT41xy31OCjf26nYLakxJP8U=; b=bdXFwwC+lx4GDms/G4slc
-	jAf0VBcp4OU0LAv6ytfWLXUNBjv23ZyGXndPK+aOhtCO5sY0bZoWUM9KJRgizZGC
-	LExB2L0VK7w5tS8v75AU/nVt6w9ecYDluGqR0TiYFpQ/2quKpF5z02SPlx3RNQ06
-	+fGEp2YrFDbjSA5IYraB0Y=
-Received: from localhost.localdomain (unknown [116.128.244.171])
-	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wBXrmdmP+llh0IFAA--.11885S11;
-	Thu, 07 Mar 2024 12:19:18 +0800 (CST)
-From: Genjian <zhanggenjian@126.com>
-To: stable@vger.kernel.org
-Cc: axboe@kernel.dk,
-	stable@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhanggenjian123@gmail.com,
-	Siddh Raman Pant <code@siddh.me>,
-	syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com,
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="cE/l1/at"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1dba177c596so3552785ad.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2024 21:31:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1709789513; x=1710394313; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L47MhA6RlNNWhsEXCUPqvDSxXvqi0AMkVxgVFxt+deE=;
+        b=cE/l1/at8BXkS8vq3j9a/XvN48Q84ehmiAJlit9Arfg0dF6ZWwNXIOSosfGJUOt5C1
+         R4jMOMfs4hOkd1xGPN9cwwSywv7K78TpYGYreL/iCDTk3iHY7M4Oe5Nmmug5mwFhlqwL
+         xK2+rlcIRNjUAizmDXNvkc0nkVHhxDTYCIx+tzrdfG4rsTqRaspik1hebeMF//v+HlVk
+         RblLtkOpOyJw6EmU1vlltEwYB7ZVAov+a5+tLOAVbm68r/d3z2dOyV8G2bsmaF3mGL8P
+         0aQzbK4YbJT+RhhOaT6LDKXNHy6CskSNvJK8ASXaHvN0Tw5FP5Qbe+kFmEDByG48a/8S
+         1WDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709789513; x=1710394313;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L47MhA6RlNNWhsEXCUPqvDSxXvqi0AMkVxgVFxt+deE=;
+        b=feAVRxATRD8u9RdiYmu5WXIrC2Bb461SoF4GBu80z6KFHgheYviqm6MD6YQI3Kkwq/
+         B6QGGZ6RjIvEIeFSVk8GASEDdOd8Fo2FVZMLAAGAW99HtA/8HEjabTV2n6f/78TblYSA
+         dhJmC3OK0dVDdm+psiSpPQJ9dJz8IPf9FWIfgoPCeDy70WIFRip5QEgz3S/7tDUS0Vcr
+         EqYJvdI7mkmdzJjCVLiAAaauGDg/3mAoqmL/ajZYCmdnm82TyH5L00m8WOh/8JN9uPnE
+         XKChsmyQM06j5/bpEM6t1knB+IK8gBXo++TbJkgrc5EOhJ5qyy53rir19rcfmdMo87R+
+         W9jA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3pEkTgdKHgRut8saNU6zmks0sKF7jmg0P37CMLIUKG+o/z4Ir67eZsceH/+snHGoK3OWZlrfiAmA2j8J32YctOq6f4qJ3Yz/RocM=
+X-Gm-Message-State: AOJu0YwfvTLMxZaw9VSRk5KEaKmU2gCvGUSlLz8pG10dsMRYcZzo7Jf3
+	5M3+2OXCQuxY0xk0fusflo5KVliYiCGWhedJwd6BpLMchQ78pmy5PzokpFSyzGs=
+X-Google-Smtp-Source: AGHT+IGz82Z2o57rsxo8MUUyj5kmz5ZD4c9J2gDw8Id8hGUA6zXaFrREbrxI/w7LJItZwwUPJP5S2w==
+X-Received: by 2002:a17:902:b494:b0:1dc:a836:19af with SMTP id y20-20020a170902b49400b001dca83619afmr523182plr.32.1709789512233;
+        Wed, 06 Mar 2024 21:31:52 -0800 (PST)
+Received: from dread.disaster.area (pa49-179-47-118.pa.nsw.optusnet.com.au. [49.179.47.118])
+        by smtp.gmail.com with ESMTPSA id lh13-20020a170903290d00b001dd58258d19sm127006plb.40.2024.03.06.21.31.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 21:31:51 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1ri6M8-00G7kw-1e;
+	Thu, 07 Mar 2024 16:31:48 +1100
+Date: Thu, 7 Mar 2024 16:31:48 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: "kbus @pop.gmail.com>> Keith Busch" <kbusch@kernel.org>,
+	NeilBrown <neilb@suse.de>, Tso Ted <tytso@mit.edu>,
 	Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Genjian Zhang <zhanggenjian@kylinos.cn>
-Subject: [PATCH linux-5.4.y 7/8] loop: Check for overflow while configuring loop
-Date: Thu,  7 Mar 2024 12:14:10 +0800
-Message-Id: <20240307041411.3792061-8-zhanggenjian@126.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240307041411.3792061-1-zhanggenjian@126.com>
-References: <20240307041411.3792061-1-zhanggenjian@126.com>
+	Daniel Gomez <da.gomez@samsung.com>,
+	Pankaj Raghav <p.raghav@samsung.com>, Jan Kara <jack@suse.cz>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+	lsf-pc@lists.linuxfoundation.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Large block for I/O
+Message-ID: <ZelRRFTBvpyXeVGD@dread.disaster.area>
+References: <03ebbc5f-2ff5-4f3c-8c5b-544413c55257@suse.de>
+ <5c356222-fe9e-41b0-b7fe-218fbcde4573@acm.org>
+ <ZYUbB3brQ0K3rP97@casper.infradead.org>
+ <ZYUgo0a51nCgjLNZ@infradead.org>
+ <9b46c48f-d7c4-4ed3-a644-fba90850eab8@acm.org>
+ <ZZxOdWoHrKH4ImL7@casper.infradead.org>
+ <ZdeWRaGQo1IX18pL@bombadil.infradead.org>
+ <ZdvIlLbhtb7+1CTx@dread.disaster.area>
+ <ZdytYs8W9o0CIu_C@bombadil.infradead.org>
+ <ZekfZdchUnRZoebo@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBXrmdmP+llh0IFAA--.11885S11
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Zr1xur4Utw4DAF45AFW5Wrg_yoW8Kw18pF
-	43WryUZ3yrKF4UCFsrt34kXry5WanrGFy3G39Fk345u390vrnavry7Cr93urykJry5ZFWS
-	gFn3try8Z3WUZrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jtR67UUUUU=
-X-CM-SenderInfo: x2kd0wxjhqyxldq6ij2wof0z/1tbiyBqafmWWf4vf8AAAse
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZekfZdchUnRZoebo@bombadil.infradead.org>
 
-From: Siddh Raman Pant <code@siddh.me>
+On Wed, Mar 06, 2024 at 05:59:01PM -0800, Luis Chamberlain wrote:
+> On Mon, Feb 26, 2024 at 07:25:23AM -0800, Luis Chamberlain wrote:
+> root@frag ~/bcc (git::blkalgn)# cat
+> /sys/block/vdh/queue/physical_block_size 
+> 4096
+> root@frag ~/bcc (git::blkalgn)# cat
+> /sys/block/vdh/queue/logical_block_size 
+> 512
 
-[ Upstream commit c490a0b5a4f36da3918181a8acdc6991d967c5f3 ]
+This device supports 512 byte aligned IOs.
 
-The userspace can configure a loop using an ioctl call, wherein
-a configuration of type loop_config is passed (see lo_ioctl()'s
-case on line 1550 of drivers/block/loop.c). This proceeds to call
-loop_configure() which in turn calls loop_set_status_from_info()
-(see line 1050 of loop.c), passing &config->info which is of type
-loop_info64*. This function then sets the appropriate values, like
-the offset.
+> mkfs.xfs -f -b size=4k -s size=4k /dev/vdh
 
-loop_device has lo_offset of type loff_t (see line 52 of loop.c),
-which is typdef-chained to long long, whereas loop_info64 has
-lo_offset of type __u64 (see line 56 of include/uapi/linux/loop.h).
+This sets the filesystem block size to 4k, and the smallest metadata
+block size to 4kB (sector size). It does not force user data direct
+IO alignment to be 4kB - that is determined by what the underlying
+block device supports, not the filesystem block size or metadata
+sector size is set to.
 
-The function directly copies offset from info to the device as
-follows (See line 980 of loop.c):
-	lo->lo_offset = info->lo_offset;
+Sure, doing 512 byte aligned/sized IO to a 4kB sector sizer device
+is not optimal. IO will to the file will be completely serialised
+because they are sub-fs-block DIO writes, but it does work because
+the underlying device allows it. Nobody wanting a performant
+application will want to do this, but there are cases where this
+case fulfils important functional requirements.
 
-This results in an overflow, which triggers a warning in iomap_iter()
-due to a call to iomap_iter_done() which has:
-	WARN_ON_ONCE(iter->iomap.offset > iter->pos);
+e.g. fs tools and loop devices that use direct IO to access file
+based filesystem images that have 512 byte sector size will just
+work on such a fs and storage setup, even though the host filesystem
+isn't configured to use 512 byte sector alignment directly
+itself....
 
-Thus, check for negative value during loop_set_status_from_info().
-
-Bug report: https://syzkaller.appspot.com/bug?id=c620fe14aac810396d3c3edc9ad73848bf69a29e
-
-Reported-and-tested-by: syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com
-Cc: stable@vger.kernel.org
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-Signed-off-by: Siddh Raman Pant <code@siddh.me>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20220823160810.181275-1-code@siddh.me
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Genjian Zhang <zhanggenjian@kylinos.cn>
----
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index eadb189be0cc..c999eef4e345 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1298,6 +1298,11 @@ loop_set_status_from_info(struct loop_device *lo,
- 
- 	lo->lo_offset = info->lo_offset;
- 	lo->lo_sizelimit = info->lo_sizelimit;
-+
-+	/* loff_t vars have been assigned __u64 */
-+	if (lo->lo_offset < 0 || lo->lo_sizelimit < 0)
-+		return -EOVERFLOW;
-+
- 	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
- 	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
- 	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
+-Dave.
 -- 
-2.25.1
-
+Dave Chinner
+david@fromorbit.com
