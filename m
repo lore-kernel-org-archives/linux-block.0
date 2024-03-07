@@ -1,199 +1,244 @@
-Received: from wfout3-smtp.messagingengine.com (wfout3-smtp.messagingengine.com [64.147.123.146])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943B06310B;
-	Thu,  7 Mar 2024 07:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD65823BF;
+	Thu,  7 Mar 2024 09:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709797978; cv=none; b=nbL/wYOzqPspGAbhJyagmYxezPzrY7Orxc13fYaRguDzvaONrHvzdgRZFmxGVgTe9H3eesr+rcO12B6u8SMaQ16fEM6AWW97Fk8F3EWU8enRfzkNdiNaZEnA5AuTLkVXLnaN6frT16Ynlov+16Tyr9VGZRuGS7ia/zBfMiXAMeE=
+	t=1709803347; cv=none; b=a9R9uFS0JFu4j6BRB/ZGdFYv8dTqYmVz7ndtk16ijJ5nzPyJCMeviPLuMwzktRzzAlfs7uHkwEk9AWTxgl4zwl0zCw8uWRpERkEEdERDOQHP4f3p/i/rdkn+aR87eanUIODQdyytzEOWEVje6UIy4lsjaAUkYbUUduoKPp+Dp8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709797978; c=relaxed/simple;
-	bh=2fjs0v2lhXf14YMF73sZlJKN1KHNF0BScIknj0t3qLY=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=EsxNCSoj0W4zuRbqJUcf0BdZv5JZVw5EdduOqjZgw1Ur44/3+PcdrUqO5Had3HBb8TsDC7bGlxnwWLhjLSTXu0kuImiz73Zh4N/inI8M6V4KwSxvVYQSu91CT16MsUaQF0KEecDz3hkyluPGatdMwPEeikc8zAgOEhQnWK77mus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=O67iqBrZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=S2cjqQWy; arc=none smtp.client-ip=64.147.123.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1709803347; c=relaxed/simple;
+	bh=nRTGRZJR+CJA2g+im+wvzNNH46i6JZY4UCMbEy3EXPk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uNlnjvhTTd22gDGYbWR0O2wy1AfckQQGu+YurRnC1vZmtd2lXo09SGZ7yXOzsDlqP4iUvS3YpFdGMnZxBfZ54joNgNOvV4UBn/T+By02IEAHXTVmPdg7rPNm7YaZdlL+L2yOoZk52tk5UKuIl9lZOgC7kVGR1o9Bsot+MGh4bKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FO+sgywv; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="O67iqBrZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="S2cjqQWy"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.west.internal (Postfix) with ESMTP id 46B471C0005B;
-	Thu,  7 Mar 2024 02:52:54 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Thu, 07 Mar 2024 02:52:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1709797973; x=1709884373; bh=afyLY/l9R7
-	0gs9c2KrRiUpws6jfz5mx+nYl8UbTp5B8=; b=O67iqBrZKpaHV9f/a0eC5OlCA0
-	kvni3QdUEAKVVe49BScYaENsrH2cr0ILUtEbLWtwItOaWdbJblTaesgY9AHlQ/95
-	y8oI0WINk+NBdahQDvNEGkPZU1+CGSeIIaXYLEGCtpdZKApnTdZ+/4kyfY4kt/k0
-	5RAG2PbqLlJ65xtBsAUCpk84uBcQ9HpNaRukIRnurUTYiHs/Eu3EwftCOHQlP9DD
-	jnuYLZZCqOM4wIoGMZviymtb5Xl4LPsbcKqtoX+aT9FVpfeRSFSVz1aVZc8NCZvc
-	IvdkvpAoQWPYnJFwVf/U71/Xmrtu+Yg8Jla/5bIloQ5L1dCoiOpr5KJ3hgnw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1709797973; x=1709884373; bh=afyLY/l9R70gs9c2KrRiUpws6jfz
-	5mx+nYl8UbTp5B8=; b=S2cjqQWyS0Z1vUaCffjTUB4Af2LcwLMQ7UgF1khKCljU
-	pi/W0f58t5OKenZmRPdONVXFqjC+U6GrIbrEfxbg3LNA+wzcEmCHMLs8FvMV0I6Q
-	I1PGAMVhL8QT6Mr7dy/UcPJ1p9NkX2UWLKssTrAa4Bvj8ZBD/VPQ9QxWgnJdJLkD
-	6ZA8l0a0eoev7HliGWgpHGlKsO8C9Gg9rn6hhIam9wDVoSvt3JeUES8ogBHYGg5X
-	F2Y8z6+/vsJ/Kb4fkOL1IPshidNsbQORjiBaf+mH9O0v4jRa4+cp3/NX/HrYWIK/
-	xGRmNQEl/oZ89qsO7AyeqT7QT4j6ugA/UUQ5PhaHAQ==
-X-ME-Sender: <xms:VHLpZd67YGruW1Bk9nU_QnbfKrNMW43go98P3uV1LrB_EEqChHtdeA>
-    <xme:VHLpZa6NlzCjV-v276oagp-PJRYdhbZAAgLAK6C-6VDwedRSa4-7UUF7nF7MinW-8
-    9vyPUQWMysqZrqPgXw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledriedvgdduudduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:VHLpZUf_mVG7eglPqsXPeRpiRs4l4Amse2apiXIb5OApW0gNP5VgHg>
-    <xmx:VHLpZWLnQkaqTHWNduucbgPZr_IbCK13YEyIeetiALQOCdJChSLD-w>
-    <xmx:VHLpZRJV-ozFC3xj3XF-Q5SW0cRy1YKofRek_6VA71mWTzRPsXnEHg>
-    <xmx:VXLpZa6uxoGRkGneynLHOLw9bClFEiDKqksPaqouNdWlCTu2vCJhC34ogSI>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 91795B6008D; Thu,  7 Mar 2024 02:52:52 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-251-g8332da0bf6-fm-20240305.001-g8332da0b
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FO+sgywv"
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4278Vh39002189;
+	Thu, 7 Mar 2024 09:22:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kyitMC0c8lijPK0qjojMJvc+SZYasLMZEIdem7xGTpw=;
+ b=FO+sgywvbI4+5uS0Z2tvn1QwNXt2xsqpQzB7d3HlaMoKEwu1sS88O7ZGA5/LhyF/LmPo
+ wZcSYmZ74A/sDCKqlDU9lFBpe5/mLcMRORDhkJ/3gU7bQH37KEi+bNfMwMKmj1Q33mzo
+ mpzjig1TBePevZckNxUYxQilR8JTAfGmlSppl78FJe61wzHIjgukin5WMh5/0OWTLHmD
+ j40XcByVS6Q05VO3QW19OyOVUE0asimM0N5dQVeqkCyfGiipmY02ftYjpmCG6Ea3Mhy2
+ p6ewklqPQdIK4kGp/WYUPfXkyRFABhZoD3nXsKw/WeXtyryOaW52d5YaPwW/kBdTfd53 1w== 
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wq9qs1g5x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:22:19 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4276NTtm025376;
+	Thu, 7 Mar 2024 09:22:18 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wmetyvs5e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:22:18 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4279MGtL22086292
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Mar 2024 09:22:18 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 143C258051;
+	Thu,  7 Mar 2024 09:22:16 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E5F55805A;
+	Thu,  7 Mar 2024 09:22:12 +0000 (GMT)
+Received: from [9.171.91.129] (unknown [9.171.91.129])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Mar 2024 09:22:11 +0000 (GMT)
+Message-ID: <574b1ec6-9f48-45b0-9bca-acb8c139764f@linux.ibm.com>
+Date: Thu, 7 Mar 2024 14:51:36 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <8896bcc5-09b1-4886-9081-c8ce0afc1c40@app.fastmail.com>
-In-Reply-To: <20240306232052.21317-1-semen.protsenko@linaro.org>
-References: <20240306232052.21317-1-semen.protsenko@linaro.org>
-Date: Thu, 07 Mar 2024 08:52:31 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Sam Protsenko" <semen.protsenko@linaro.org>,
- "Jaehoon Chung" <jh80.chung@samsung.com>,
- "Ulf Hansson" <ulf.hansson@linaro.org>, "Christoph Hellwig" <hch@lst.de>
-Cc: "Chris Ball" <cjb@laptop.org>, "Will Newton" <will.newton@gmail.com>,
- "Matt Fleming" <matt@console-pimps.org>,
- "Christian Brauner" <brauner@kernel.org>, "Jens Axboe" <axboe@kernel.dk>,
- "Sumit Semwal" <sumit.semwal@linaro.org>,
- "Dan Carpenter" <dan.carpenter@linaro.org>,
- "Anders Roxell" <anders.roxell@linaro.org>,
- "Naresh Kamboju" <naresh.kamboju@linaro.org>,
- "linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
- linux-block <linux-block@vger.kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] mmc: dw_mmc: Fix IDMAC operation with pages bigger than 4K
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG REPORT] General protection fault while discarding extents on
+ XFS on next-20240305
+Content-Language: en-US
+To: Christoph Hellwig <hch@infradead.org>, Dave Chinner <david@fromorbit.com>
+Cc: Keith Busch <kbusch@kernel.org>, Chandan Babu R <chandanbabu@kernel.org>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
+References: <87y1avlsmw.fsf@debian-BULLSEYE-live-builder-AMD64>
+ <Zehi_bLuwz9PcbN9@infradead.org> <Zeh_e2tUpx-HzCed@kbusch-mbp>
+ <ZeiAQv6ACQgIrsA-@kbusch-mbp> <ZeiBmGXgxNmgyjs4@infradead.org>
+ <ZeiJKmWQoE6ttn6L@infradead.org> <ZejXV1ll+sbgBP48@dread.disaster.area>
+ <ZejrR3-aLJy3ere7@infradead.org>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <ZejrR3-aLJy3ere7@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CpPUbddc6PBM2FSuXfoFrii7_KZvnIHe
+X-Proofpoint-ORIG-GUID: CpPUbddc6PBM2FSuXfoFrii7_KZvnIHe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-07_05,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ spamscore=0 suspectscore=0 phishscore=0 adultscore=0 priorityscore=1501
+ clxscore=1011 lowpriorityscore=0 mlxlogscore=999 impostorscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403070067
 
-On Thu, Mar 7, 2024, at 00:20, Sam Protsenko wrote:
-> Commit 616f87661792 ("mmc: pass queue_limits to blk_mq_alloc_disk") [1]
-> revealed the long living issue in dw_mmc.c driver, existing since the
-> time when it was first introduced in commit f95f3850f7a9 ("mmc: dw_mmc:
-> Add Synopsys DesignWare mmc host driver."), also making kernel boot
-> broken on platforms using dw_mmc driver with 16K or 64K pages enabled,
-> with this message in dmesg:
->
->     mmcblk: probe of mmc0:0001 failed with error -22
->
-> That's happening because mmc_blk_probe() fails when it calls
-> blk_validate_limits() consequently, which returns the error due to
-> failed max_segment_size check in this code:
->
->     /*
->      * The maximum segment size has an odd historic 64k default that
->      * drivers probably should override.  Just like the I/O size we
->      * require drivers to at least handle a full page per segment.
->      */
->     ...
->     if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
->         return -EINVAL;
->
-> In case when IDMAC (Internal DMA Controller) is used, dw_mmc.c always
-> sets .max_seg_size to 4 KiB:
->
->     mmc->max_seg_size = 0x1000;
->
-> The comment in the code above explains why it's incorrect. Arnd
-> suggested setting .max_seg_size to .max_req_size to fix it, which is
-> also what some other drivers are doing:
->
->    $ grep -rl 'max_seg_size.*=.*max_req_size' drivers/mmc/host/ | \
->      wc -l
->    18
 
-Nice summary!
 
-> This change is not only fixing the boot with 16K/64K pages, but also
-> leads to a better MMC performance. The linear write performance was
-> tested on E850-96 board (eMMC only), before commit [1] (where it's
-> possible to boot with 16K/64K pages without this fix, to be able to do
-> a comparison). It was tested with this command:
->
->     # dd if=/dev/zero of=somefile bs=1M count=500 oflag=sync
->
-> Test results are as follows:
->
->   - 4K pages,  .max_seg_size = 4 KiB:                   94.2 MB/s
->   - 4K pages,  .max_seg_size = .max_req_size = 512 KiB: 96.9 MB/s
->   - 16K pages, .max_seg_size = 4 KiB:                   126 MB/s
->   - 16K pages, .max_seg_size = .max_req_size = 2 MiB:   128 MB/s
->   - 64K pages, .max_seg_size = 4 KiB:                   138 MB/s
->   - 64K pages, .max_seg_size = .max_req_size = 8 MiB:   138 MB/s
+On 3/7/24 03:46, Christoph Hellwig wrote:
+> On Thu, Mar 07, 2024 at 07:51:35AM +1100, Dave Chinner wrote:
+>> On Wed, Mar 06, 2024 at 07:18:02AM -0800, Christoph Hellwig wrote:
+>>> Lookings at this a bit more I'm not sure my fix is enough as the error
+>>> handling is really complex.  Also given that some discard callers are
+>>> from kernel threads messing with interruptibility I'm not entirely
+>>> sure that having this check in the common helper is a good idea.
+>>
+>> Yeah, this seems like a problem. The only places that userspace
+>> should be issuing discards directly and hence be interruptible from
+>> are FITRIM, BLKDISCARD and fallocate() on block devices.
+> 
+> Yes.
+> 
+>> Filesystems already handle fatal signals in FITRIM (e.g. see
+>> xfs_trim_should_stop(), ext4_trim_interrupted(),
+>> btrfs_trim_free_extents(), etc), so it seems to me that the only
+>> non-interruptible call from userspace are operations directly on
+>> block devices which have no higher level iteration over the range to
+>> discard and the user controls the range directly.
+> 
+> Yeah.
+> 
+>> Perhaps the solution is to change BLKDISCARD/fallocate() on bdev to
+>> look more like xfs_discard_extents() where it breaks the range up
+>> into smaller chunks and intersperses bio chaining with signal
+>> checks.
+> 
+> Well, xfs_discard_extents has different extents from the higher
+> layers.  __blkdev_issue_discard than breaks it up based on what
+> fits into the bio (and does some alignment against our normal
+> rule of leaving that to the splitting code).  But I suspect moving
+> the loop in __blkdev_issue_discard into the callers could really
+> help with this.
+> 
+>>
+>> I suspect the same solution is necessary for blkdev_issue_zeroout()
+>> and blkdev_issue_secure_erase(), because both of them have user
+>> controlled lengths...
+> 
+> Yes.  (or rather two sub cases of the former and the latter)
+> 
+How about adding a new parameter named "interruptible" to __blkdev_issue_discard()
+and then using that parameter to deduce whether we need to intercept fatal
+signal or not? We can ensure that it's only when __blkdev_issue_discard() is
+invoked from the userspace (BLKDISCARD/fallocate()) we would have "interruptible"
+set to "1" otherwise for all other code path it could be set to "0".
 
-Thanks for sharing these results. From what I can see here, the
-performance changes significantly with the page size, but barely
-with the max_seg_size, so this does not have the effect I was
-hoping for. On a more positive note this likely means that we
-don't have to urgently backport your fix.
+Yes we may need one helper which would help set the "interruptible" to "1" 
+when invoked from BLKDISCARD/fallocate(). 
 
-This could mean that either there is not much coalescing across
-pages after all, or that the bottleneck is somewhere else.
+Probably the code should look as below (not tested):
 
-> diff --git a/drivers/mmc/host/dw_mmc.c b/drivers/mmc/host/dw_mmc.c
-> index 8e2d676b9239..cccd5633ff40 100644
-> --- a/drivers/mmc/host/dw_mmc.c
-> +++ b/drivers/mmc/host/dw_mmc.c
-> @@ -2951,8 +2951,8 @@ static int dw_mci_init_slot(struct dw_mci *host)
->  	if (host->use_dma == TRANS_MODE_IDMAC) {
->  		mmc->max_segs = host->ring_size;
->  		mmc->max_blk_size = 65535;
-> -		mmc->max_seg_size = 0x1000;
-> -		mmc->max_req_size = mmc->max_seg_size * host->ring_size;
-> +		mmc->max_req_size = DW_MCI_DESC_DATA_LENGTH * host->ring_size;
-> +		mmc->max_seg_size = mmc->max_req_size;
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index dc8e35d0a51d..4b17f8b9dec1 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -56,7 +56,7 @@ static void await_bio_chain(struct bio *bio)
+ }
+ 
+ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+-               sector_t nr_sects, gfp_t gfp_mask, struct bio **biop)
++               sector_t nr_sects, gfp_t gfp_mask, struct bio **biop, int interruptible)
+ {
+        struct bio *bio = *biop;
+        sector_t bs_mask;
+@@ -97,8 +97,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+                 * is disabled.
+                 */
+                cond_resched();
+-               if (fatal_signal_pending(current)) {
++               if (interruptible && fatal_signal_pending(current)) {
+                        await_bio_chain(bio);
++                       *biop = NULL;
+                        return -EINTR;
+                }
+        }
+@@ -126,7 +127,7 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+        int ret;
+ 
+        blk_start_plug(&plug);
+-       ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, &bio);
++       ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, &bio, 0);
+        if (!ret && bio) {
+                ret = submit_bio_wait(bio);
+                if (ret == -EOPNOTSUPP)
+@@ -139,6 +140,26 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ }
+ EXPORT_SYMBOL(blkdev_issue_discard);
+ 
++int blkdev_issue_discard_interruptible(struct block_device *bdev, sector_t sector,
++               sector_t nr_sects, gfp_t gfp_mask)
++{
++       struct bio *bio = NULL;
++       struct blk_plug plug;
++       int ret;
++
++       blk_start_plug(&plug);
++       ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, &bio, 1);
++       if (!ret && bio) {
++               ret = submit_bio_wait(bio);
++               if (ret == -EOPNOTSUPP)
++                       ret = 0;
++               bio_put(bio);
++       }
++       blk_finish_plug(&plug);
++
++       return ret;
++}
++
+ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+                sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+                struct bio **biop, unsigned flags)
+diff --git a/block/fops.c b/block/fops.c
+index 0cf8cf72cdfa..f9399a59cf4e 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -828,7 +828,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+                if (error)
+                        goto fail;
+ 
+-               error = blkdev_issue_discard(bdev, start >> SECTOR_SHIFT,
++               error = blkdev_issue_discard_interruptible(bdev, start >> SECTOR_SHIFT,
+                                             len >> SECTOR_SHIFT, GFP_KERNEL);
+                break;
+        default:
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 438f79c564cf..e869f2859eb1 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -117,7 +117,8 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+        err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+        if (err)
+                goto fail;
+-       err = blkdev_issue_discard(bdev, start >> 9, len >> 9, GFP_KERNEL);
++       err = blkdev_issue_discard_interruptible(bdev, start >> 9,
++                       len >> 9, GFP_KERNEL);
+ fail:
+        filemap_invalidate_unlock(inode->i_mapping);
+        return err;
 
-The change looks good to me.
 
-I see that the host->ring_size depends on PAGE_SIZE as well:
+And yes we would need similar changes for  blkdev_issue_zeroout() and 
+blkdev_issue_secure_erase().
 
-#define DESC_RING_BUF_SZ        PAGE_SIZE
-host->ring_size = DESC_RING_BUF_SZ / sizeof(struct idmac_desc_64addr);
-host->sg_cpu = dmam_alloc_coherent(host->dev,
-               DESC_RING_BUF_SZ, &host->sg_dma, GFP_KERNEL);
+Thanks,
+--Nilay
 
-I don't see any reason for the ring buffer size to be tied to
-PAGE_SIZE at all, it was probably picked as a reasonable
-default in the initial driver but isn't necessarily ideal.
 
-From what I can see, the number of 4KB elements in the
-ring can be as small as 128 (4KB pages, 64-bit addresses)
-or as big as 4096 (64KB pages, 32-bit addresses), which is
-quite a difference. If you are still motivated to drill
-down into this, could you try changing DESC_RING_BUF_SZ
-to a fixed size of either 4KB or 64KB and test again
-with the opposite page size, to see if that changes the
-throughput?
 
-If a larger ring buffer gives us significantly better
-throughput, we may want to always use a higher number
-independent of page size. On the other hand, if the
-64KB number (the 138MB/s) does not change with a smaller
-ring, we may as well reduce that in order to limit the
-maximum latency that is caused by a single I/O operation.
 
-     Arnd
+
