@@ -1,28 +1,28 @@
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.8])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376157484;
-	Thu,  7 Mar 2024 04:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.8
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.8])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF6E2134A;
+	Thu,  7 Mar 2024 04:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709785190; cv=none; b=U7keh4InqymvtlTV0d7QRb1vXJhMeWK9izB1cbMPaSQMhbhxXGvoa8fQakoex7b/x/84RptIlaVGVMiY/J4e9EEx7VjeaP93CKyYX5dQwLxHgbV5zcgJK6jO7TzgpoXNQ+NGEhygrBlF28CmzPqrLgf4CCkxlbnIwCevsSJMkxo=
+	t=1709785196; cv=none; b=beruyTKQhOo6oAocVyxExelUlMwYIsUOoZxalHtwab/Gjud+TQm8YaYpeNnsAyMvsjqXWHctNsd6ChABrfSfrvHHt2oNLQznPPeLp1YTaPuVQ8oGlf+3Ih4ge38HxAYxA6k0ylGN8vfj3LBqBa2m/azR0geyc2zgt+yPVftqaEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709785190; c=relaxed/simple;
-	bh=e2bhHrOwQeDgAKyoVc5WzHKd697WiF5XcMsoy1z5sI8=;
+	s=arc-20240116; t=1709785196; c=relaxed/simple;
+	bh=zCUCs9CUkcZ2INKZXClzeber7vQNZVCgFvKkZ7r+t7g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mKgsaL/Ju0OpIZg4DD8j4ZXbzcOW/0PHPaw/RyVFtNcBsbMZneouHrvGL3XRSlvM5mqd3AEQ5hgVAbsC0tBjiAvBopYgfkLQdqL6o6yc1UISk4F62ugUsBfcvAGiW9HJDLFhqBF10W7gELT7hTmRK02Z5m6peJera/r2ZYrLqW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=mJfe0h+P; arc=none smtp.client-ip=117.135.210.8
+	 MIME-Version; b=IVNqbq3T4+KT/cSGuus3LnBpMzCxGjOmGTOwvcmx183gX5pxZo8pTOB4cw2+okSn5iUQQMw+wj7GUsZmowYDew0KQLPbx1VuLdYPt826WFKP3jleWJK+XVPa1K+YcQvhx7StR18XuoTm+YYCUohPaAk0kDKlc82/WDTsHi22UsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=nNVNFLgd; arc=none smtp.client-ip=220.197.31.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="mJfe0h+P"
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="nNVNFLgd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=r/rBM
-	ENEVMoRhNYsxqvtzmdqWbZKq2KJxpW3M0pI9Po=; b=mJfe0h+P2YQjxD5GyXyLj
-	asaK2bP8Utt8vu7m8c2cSuFbsTa4bHcys2GsfJsjKSHAij+6tc+KX1Et3TsrjJIr
-	yvFXoEBLv7HmMoN4mimxKEbanOcR9AMQ8Nu4ML3r7aSCdHOr0+TOvRII/rXI8Jup
-	Cftbtn0orBLySWiFHyYDUU=
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=/2+K2
+	+TLNLt8Zt/Ms6VCHD4O/MJXQaq4q4Xpocy6olg=; b=nNVNFLgdzm/OQkKu06198
+	yobWGYVh9ZCaUfgelogti4u8zv+Fyu7ZekJlpPQR7wvejqihQnoHcP8ctI2YeWSm
+	XeZs05a9b9aBUx41mi06cb5VWxpObnMN/Uqf1DYBnYI+aNPxKsFyyV7vtf+es7mD
+	4de7E24QroHDgKj1oeDduw=
 Received: from localhost.localdomain (unknown [116.128.244.171])
-	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wBXrmdmP+llh0IFAA--.11885S10;
-	Thu, 07 Mar 2024 12:19:18 +0800 (CST)
+	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wBXrmdmP+llh0IFAA--.11885S6;
+	Thu, 07 Mar 2024 12:19:15 +0800 (CST)
 From: Genjian <zhanggenjian@126.com>
 To: stable@vger.kernel.org
 Cc: axboe@kernel.dk,
@@ -32,10 +32,12 @@ Cc: axboe@kernel.dk,
 	zhanggenjian123@gmail.com,
 	Martijn Coenen <maco@android.com>,
 	Christoph Hellwig <hch@lst.de>,
+	Bob Liu <bob.liu@oracle.com>,
+	Bart Van Assche <bvanassche@acm.org>,
 	Genjian Zhang <zhanggenjian@kylinos.cn>
-Subject: [PATCH linux-5.4.y 6/8] loop: Factor out configuring loop from status
-Date: Thu,  7 Mar 2024 12:14:09 +0800
-Message-Id: <20240307041411.3792061-7-zhanggenjian@126.com>
+Subject: [PATCH linux-5.4.y 2/8] loop: Call loop_config_discard() only after new config is applied
+Date: Thu,  7 Mar 2024 12:14:05 +0800
+Message-Id: <20240307041411.3792061-3-zhanggenjian@126.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240307041411.3792061-1-zhanggenjian@126.com>
 References: <20240307041411.3792061-1-zhanggenjian@126.com>
@@ -46,182 +48,55 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBXrmdmP+llh0IFAA--.11885S10
-X-Coremail-Antispam: 1Uf129KBjvJXoWxCF4xZr43Jw1UGr4DXF4kXrb_yoWrtF4rpF
-	sIgFyYyrWFqF4xWF45tw4kWFW5G3Wjk347Cry7J34jkr1jvr9Iq34akryjga97JryDua4Y
-	q390yF1ruryUCFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jtiSLUUUUU=
-X-CM-SenderInfo: x2kd0wxjhqyxldq6ij2wof0z/1tbiHgqafmV2z-5wPQAAsf
+X-CM-TRANSID:_____wBXrmdmP+llh0IFAA--.11885S6
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Ar43AryfuFy7try5Xr4xZwb_yoW8WrWxpF
+	nrXFyUtFWvgF48CFWUGrWkua45Gan7G3y3XFW7C3yY9r43Z3savr9Ika4xXr1ktFW8XFWY
+	vanakr10v3WUCa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07bjFAJUUUUU=
+X-CM-SenderInfo: x2kd0wxjhqyxldq6ij2wof0z/1tbi5h2afmVLY5SfTAABsU
 
 From: Martijn Coenen <maco@android.com>
 
-[ Upstream commit 0c3796c244598122a5d59d56f30d19390096817f ]
+[ Upstream commit 7c5014b0987a30e4989c90633c198aced454c0ec ]
 
-Factor out this code into a separate function, so it can be reused by
-other code more easily.
+loop_set_status() calls loop_config_discard() to configure discard for
+the loop device; however, the discard configuration depends on whether
+the loop device uses encryption, and when we call it the encryption
+configuration has not been updated yet. Move the call down so we apply
+the correct discard configuration based on the new configuration.
 
 Signed-off-by: Martijn Coenen <maco@android.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bob Liu <bob.liu@oracle.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Genjian Zhang <zhanggenjian@kylinos.cn>
 ---
- drivers/block/loop.c | 117 +++++++++++++++++++++++++------------------
- 1 file changed, 67 insertions(+), 50 deletions(-)
+ drivers/block/loop.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 54f0f592423d..eadb189be0cc 100644
+index fced67ab1068..eb7b9629f6dd 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1258,75 +1258,43 @@ static int loop_clr_fd(struct loop_device *lo)
- 	return __loop_clr_fd(lo, false);
- }
+@@ -1332,8 +1332,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		}
+ 	}
  
-+/**
-+ * loop_set_status_from_info - configure device from loop_info
-+ * @lo: struct loop_device to configure
-+ * @info: struct loop_info64 to configure the device with
-+ *
-+ * Configures the loop device parameters according to the passed
-+ * in loop_info64 configuration.
-+ */
- static int
--loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
-+loop_set_status_from_info(struct loop_device *lo,
-+			  const struct loop_info64 *info)
- {
- 	int err;
- 	struct loop_func_table *xfer;
- 	kuid_t uid = current_uid();
--	struct block_device *bdev;
--	bool partscan = false;
--	bool size_changed = false;
+-	loop_config_discard(lo);
 -
--	err = mutex_lock_killable(&loop_ctl_mutex);
--	if (err)
--		return err;
--	if (lo->lo_encrypt_key_size &&
--	    !uid_eq(lo->lo_key_owner, uid) &&
--	    !capable(CAP_SYS_ADMIN)) {
--		err = -EPERM;
--		goto out_unlock;
--	}
--	if (lo->lo_state != Lo_bound) {
--		err = -ENXIO;
--		goto out_unlock;
--	}
--	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE) {
--		err = -EINVAL;
--		goto out_unlock;
--	}
--
--	if (lo->lo_offset != info->lo_offset ||
--	    lo->lo_sizelimit != info->lo_sizelimit) {
--		size_changed = true;
--		sync_blockdev(lo->lo_device);
--		invalidate_bdev(lo->lo_device);
--	}
- 
--	/* I/O need to be drained during transfer transition */
--	blk_mq_freeze_queue(lo->lo_queue);
--
--	if (size_changed && lo->lo_device->bd_inode->i_mapping->nrpages) {
--		/* If any pages were dirtied after invalidate_bdev(), try again */
--		err = -EAGAIN;
--		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
--			__func__, lo->lo_number, lo->lo_file_name,
--			lo->lo_device->bd_inode->i_mapping->nrpages);
--		goto out_unfreeze;
--	}
-+	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
-+		return -EINVAL;
- 
- 	err = loop_release_xfer(lo);
- 	if (err)
--		goto out_unfreeze;
-+		return err;
- 
- 	if (info->lo_encrypt_type) {
- 		unsigned int type = info->lo_encrypt_type;
- 
--		if (type >= MAX_LO_CRYPT) {
--			err = -EINVAL;
--			goto out_unfreeze;
--		}
-+		if (type >= MAX_LO_CRYPT)
-+			return -EINVAL;
- 		xfer = xfer_funcs[type];
--		if (xfer == NULL) {
--			err = -EINVAL;
--			goto out_unfreeze;
--		}
-+		if (xfer == NULL)
-+			return -EINVAL;
- 	} else
- 		xfer = NULL;
- 
- 	err = loop_init_xfer(lo, xfer, info);
- 	if (err)
--		goto out_unfreeze;
-+		return err;
- 
- 	lo->lo_offset = info->lo_offset;
- 	lo->lo_sizelimit = info->lo_sizelimit;
-@@ -1353,6 +1321,55 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+ 	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
+ 	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
+@@ -1357,6 +1355,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
  		lo->lo_key_owner = uid;
  	}
  
-+	return 0;
-+}
++	loop_config_discard(lo);
 +
-+static int
-+loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
-+{
-+	int err;
-+	struct block_device *bdev;
-+	kuid_t uid = current_uid();
-+	bool partscan = false;
-+	bool size_changed = false;
-+
-+	err = mutex_lock_killable(&loop_ctl_mutex);
-+	if (err)
-+		return err;
-+	if (lo->lo_encrypt_key_size &&
-+	    !uid_eq(lo->lo_key_owner, uid) &&
-+	    !capable(CAP_SYS_ADMIN)) {
-+		err = -EPERM;
-+		goto out_unlock;
-+	}
-+	if (lo->lo_state != Lo_bound) {
-+		err = -ENXIO;
-+		goto out_unlock;
-+	}
-+
-+	if (lo->lo_offset != info->lo_offset ||
-+	    lo->lo_sizelimit != info->lo_sizelimit) {
-+		size_changed = true;
-+		sync_blockdev(lo->lo_device);
-+		invalidate_bdev(lo->lo_device);
-+	}
-+
-+	/* I/O need to be drained during transfer transition */
-+	blk_mq_freeze_queue(lo->lo_queue);
-+
-+	if (size_changed && lo->lo_device->bd_inode->i_mapping->nrpages) {
-+		/* If any pages were dirtied after invalidate_bdev(), try again */
-+		err = -EAGAIN;
-+		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-+			__func__, lo->lo_number, lo->lo_file_name,
-+			lo->lo_device->bd_inode->i_mapping->nrpages);
-+		goto out_unfreeze;
-+	}
-+
-+	err = loop_set_status_from_info(lo, info);
-+	if (err)
-+		goto out_unfreeze;
-+
- 	if (size_changed) {
- 		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
- 					   lo->lo_backing_file);
+ 	/* update dio if lo_offset or transfer is changed */
+ 	__loop_update_dio(lo, lo->use_dio);
+ 
 -- 
 2.25.1
 
