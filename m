@@ -1,76 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFBE12EBF6;
-	Thu,  7 Mar 2024 16:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40470131720;
+	Thu,  7 Mar 2024 17:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709827985; cv=none; b=FFnufvFdzioBHqXOIjEgcvL/DTumtzmFTKOK8qGQEjjjAmM1+dex+W0D79rTbPCfBI9vlXJ22nTVLIj0W6qn83B/xDPB6M/S3k79Zf3kZChgC4w+QYLBNoxrmlrArWXhkD/afex+C80/Nip6GugC+fV72jCH8a4VEIOi5Yp0LE4=
+	t=1709832763; cv=none; b=eMHgw2bc2O3Wvu3f1+O/kAFZUTrZeEIR1uuBvnCHYQv7R+b8rR/TB2+GmiBY/UcxomzMLNGLqpZ7wrrFxhmIZa0pXw67ImnJegO/FYxweLQgf6FMxOUna95bhNEeRBj1rn2g9Lx/VpHIzoPfxsA41t7d93tNocAbphmXaV1xIQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709827985; c=relaxed/simple;
-	bh=xC1nCyIdKfL4m5uxzrpTcUTAtu9QopfH5IwbC6GR/Jc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kHMUe9eJvH+9saNXF6z2bGcb79uU+ANyFzASogpxJPRZTG64RsI3ZKn6wo/xtvXOnya85hpsE3TYT9DQ3wx/kthtuwj6UEHLgToEZ30hSjRuENdcgqjIVuMe14nKWK62xxiC/L630A670PjztJQIFAkjzr9Yob/26pGSOibZSog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvRGLSAa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709832763; c=relaxed/simple;
+	bh=oWPUsnbZDOlxxLdfXs2o8PRtCjbbf+VNBb0sGJ8bFGM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YwJ0L/TmTCwPl7b2/REMBF0hqyDbt6BDBUL92V0L/PdfWsuEWW7IK7YhtIMaRiZN7Zj8ywgexkKDQCvC1VrHK4gRtn82fhMAJQf0u0v4PdzC1Rg+UqYUgTfYdx/BnExBjKrwI7XSY8nIH8FqbvTqxiOodRkhvsu9ONfIDDCPjSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=A7UbzPwL; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvRGLSAa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E22CC433F1;
-	Thu,  7 Mar 2024 16:13:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709827984;
-	bh=xC1nCyIdKfL4m5uxzrpTcUTAtu9QopfH5IwbC6GR/Jc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hvRGLSAaI+Dj1v8Ns8E2YMT/aIg2qkVtfF41SYs2ai/Lb+l4FNRN9zdrwfKA2fP+a
-	 JIMn/Zw4oX9/RtaPWJ6LCgN/u5/D0Usfs1Jeo78MwSebqSqIFbFmqaUWUEGJogQM10
-	 4ZGQLEJbtcWbaQ5sIM7jvdSYQr/M+TZmlXG5Kh4Zlt7agYYkpajiGg7PcgJfs+pKTA
-	 +DqlSsogpGznDgdfoTVj8kEzUNOJpiRVwSrEin//Pn52BowxeD7IcRCO1Bwd8XV+qO
-	 6C8xCwPl68C5746bJ0zNfF1Rzn2MnJqR9kawwW0PczkzAAMAVIsRLaMDBTliLIvWM4
-	 1PQ2Or2UF3N8g==
-Date: Thu, 7 Mar 2024 09:13:01 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Chandan Babu R <chandanbabu@kernel.org>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 06/10] ext4: switch to using blk_next_discard_bio directly
-Message-ID: <ZennjRhWR2PVtoGU@kbusch-mbp>
-References: <20240307151157.466013-1-hch@lst.de>
- <20240307151157.466013-7-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="A7UbzPwL"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4TrGbC3SFvz6Cl44X;
+	Thu,  7 Mar 2024 17:32:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1709832754; x=1712424755; bh=moZ9+5orZT+OYhKZAyxdvu5O
+	Nr7RA4cWiHxMkHcHcWU=; b=A7UbzPwLUvI5xkRJAWjK6KVDk6kivCCl0OrlXSZh
+	E13AYaRjteHDMVTKP44VG51CWI8Hj7nROECMWJJoXDzYhVP/FUGmc6YZWRULR4dY
+	9Lrpq0zzOM0ojpCpOUtXtCv1ikC9PhM/9wIrtkPD0cGs0fT6h3pQFptLRSbj3R1O
+	MNFNop1FB4LIWN+ee+kMBgJy3jF/nbLR5xC08y8aoDcvTqUQ8gqFQSziM1n3W34K
+	p6UW7kOEi2IUrbrd58vT0WWmrjpRuHWoTXaIErfZTCPgoeCZyegqrX/6/i61OBU5
+	SPBwphJxvpx1Tf3tQMLcxiyaVA4SFvnGva39x0zc/cG0RQ==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 1gW_8sGIy35B; Thu,  7 Mar 2024 17:32:34 +0000 (UTC)
+Received: from [100.96.154.173] (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4TrGb51T5gz6Cl44Z;
+	Thu,  7 Mar 2024 17:32:33 +0000 (UTC)
+Message-ID: <1181bcdd-1ff4-414b-bc0a-40e513fede08@acm.org>
+Date: Thu, 7 Mar 2024 09:32:31 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307151157.466013-7-hch@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: WinLink E850-96: WARNING: at block/blk-settings.c:204
+ blk_validate_limits
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: linux-block <linux-block@vger.kernel.org>, lkft-triage@lists.linaro.org,
+ open list <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Christian Brauner <brauner@kernel.org>, Ulf Hansson
+ <ulf.hansson@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ Anders Roxell <anders.roxell@linaro.org>
+References: <CA+G9fYtddf2Fd3be+YShHP6CmSDNcn0ptW8qg+stUKW+Cn0rjQ@mail.gmail.com>
+ <20240229142144.GA8348@lst.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240229142144.GA8348@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 07, 2024 at 08:11:53AM -0700, Christoph Hellwig wrote:
-> @@ -3840,12 +3840,16 @@ static inline int ext4_issue_discard(struct super_block *sb,
->  	trace_ext4_discard_blocks(sb,
->  			(unsigned long long) discard_block, count);
->  	if (biop) {
 
-Does this 'if' case even need to exist? It looks unreachable since there
-are only two callers of ext4_issue_discard(), and they both set 'biop'
-to NULL. It looks like the last remaining caller using 'biop' was
-removed with 55cdd0af2bc5ffc ("ext4: get discard out of jbd2 commit
-kthread contex")
+On 2/29/24 06:21, Christoph Hellwig wrote:
+> On Thu, Feb 29, 2024 at 07:44:01PM +0530, Naresh Kamboju wrote:
+>> The arm64 WinLink E850-96 Board boot failed with 16K and 64K page size builds
+>> Please find the below warning log on Linux next-20240229.
+>> First noticed on the next-20240220 tag.
+>>
+>> This issue arises only when one of these Kconfig options is enabled.
+>>    CONFIG_ARM64_16K_PAGES=y
+>>    CONFIG_ARM64_64K_PAGES=y
+> 
+> That means this device doesn't set a max_segment_size, or one smaller
+> than the page size.  This configurtio has never been supported by
+> Linux (Bart has some patches to try to make it work), but with the
+> new block limits API we now actively catch this and warn.
 
-> -		return __blkdev_issue_discard(sb->s_bdev,
-> -			(sector_t)discard_block << (sb->s_blocksize_bits - 9),
-> -			(sector_t)count << (sb->s_blocksize_bits - 9),
-> -			GFP_NOFS, biop);
-> -	} else
-> -		return sb_issue_discard(sb, discard_block, count, GFP_NOFS, 0);
-> +		unsigned int sshift = (sb->s_blocksize_bits - SECTOR_SHIFT);
-> +		sector_t sector = (sector_t)discard_block << sshift;
-> +		sector_t nr_sects = (sector_t)count << sshift;
-> +
-> +		while (blk_next_discard_bio(sb->s_bdev, biop, &sector,
-> +				&nr_sects, GFP_NOFS))
-> +			;
+Hi Christoph,
 
-This pattern is repeated often in this series, so perhaps a helper
-function for this common use case.
+Please let me know if you would like me to repost the patch series that
+adds support to the block layer for DMA segments that are smaller than
+the page size. Despite my requests to not support such hardware in the
+Android kernel, that patch series ended up as an out-of-tree series
+in the Android kernel and will continue to be maintained by the Android
+core team for considerable time.
+
+Thanks,
+
+Bart.
+
+
