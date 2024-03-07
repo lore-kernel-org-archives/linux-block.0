@@ -1,194 +1,249 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC4321A14
-	for <linux-block@vger.kernel.org>; Thu,  7 Mar 2024 18:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98212137C54
+	for <linux-block@vger.kernel.org>; Thu,  7 Mar 2024 21:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709835259; cv=none; b=jr6M692q/d1V8Ct1aDbIAISQF5/9KzaZvQEKMKGmo7+zWXzfXoadjCGxK0Lkt5yuEzFhbUxIVPEjbKKXJ+GFeQTYe4qNLx5kRR7SxtmX8iP+3x1bvtBtF4AxLA8QimE5/UD26h6zGqRF/prrME0nPE6ijnEpEvLjzV076Eoc9zo=
+	t=1709845282; cv=none; b=CP06BqxiHV75BpBJkzRKZClBQ6Ayg5YDnEMSvOnzJrv0KQks/ydUtvcoomCyt8jnt7MVQ4JZuD6gAroynixcxMWsPdI7BadtZ17aA5fUZf1sW1Y42xip6Zty6nYJt/3A60R8uA5/+RHxXCeKH24pgWfn2gAJEK7jOJCi0Nz7itA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709835259; c=relaxed/simple;
-	bh=ush2n6ZCUkwtqTDsLepiD2amdikGIA7J2+mciUIR1ug=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l6AmxxLIrFh8fKm/86Ezee5ZaVS95ty7f5BteSFRG2pjZ7WndAhaAq8PJTD8MMYuJgPRkVXHoEjCZQ9JPvrdEYbGbi4bfEeEnT9aoTZK3Xg5neq2YCGAr61fR3e1qIvOHOWJqhwpjPV1+eNw1z+TtR9M5cyIraHO/QbbUbQuwAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tscyrlJc; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1709845282; c=relaxed/simple;
+	bh=F39gQbFf5tQqliZeRzBOmtAU/EnGdgFMl0rx4muVbQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJyzrf09WQiLD9ds5RTbPGWkyduJMt1Fe/rMB3BGD5g+IqOXr8iXluQzmdN4/L7ES4N2phSlEEj+xL6cdA0YtCUw08fv3oMr2dyk5jzSw/usUqNotMY89UvvREwB08mToqY0/Vf76uW/kCvob62KeTlVoiJgUl58/rsfpAAHOjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Z/DCRVlM; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tscyrlJc"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-428405a0205so9051cf.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2024 10:14:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Z/DCRVlM"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6e4f1660493so650149a34.0
+        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2024 13:01:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709835256; x=1710440056; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ush2n6ZCUkwtqTDsLepiD2amdikGIA7J2+mciUIR1ug=;
-        b=tscyrlJcklZLW4gysqP47SDIIHDRWD5W/W8R0xkovhAmNye3lhaDdt4vpoxpoSVvTo
-         cnFbdFLxqjSno05YOzUCzXKaKvCjM8vp/eZO7xZVwlfoOV0V1eM/nycPIYllytzZwIXs
-         6YCP+WUNPzAVdm9KpxRuXqWdAR3T/nbrV0NpofsGJ4h6eFYvT4R06McfqfbRgueeSErW
-         70dBLifx1Umgu5NyxnkQ7eSdz4PZsVFu3VnXNY2lPb9OSwfAIsIXbFMf/d4pMsFeOQ6A
-         487os0Bz+l2AdkSD5ivKK3SL8rGK5X8CuOD9Vf9RqLGelchIic/43ZQH+w9oD3pmgiLM
-         2MTQ==
+        d=ziepe.ca; s=google; t=1709845279; x=1710450079; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=B2cqZbDJobgrAlQUN+X6Gc/N/G77Yt6hRBbHc0B6Byw=;
+        b=Z/DCRVlMpmpQcuUzR2NkHT1qn51xzEHPK3zhgcjSc4JoeYM0I7WsfUCBAd3Z4N2Gng
+         t3YZ7UPBpdOAALI+9SxH1JWOTo7sTEVxv7v4PPyDx6JKQaa0+VeOvlYLLz3JRUj9F8Iq
+         xTWIRun60w19TCHVpNqOWsFuGrG69UTKogbpV4SZ4zuIGGsbiqrPSUllOsosDY7gGKxe
+         K0KChnFbH/uomxDgbmSlCXtX90PzwXjBOy3Jzgcn3wRG9RMNxsNFpHDX81UtDO5upRDw
+         hMZdIhbyd2tUsmzgzxP93OBUy+PgLlja3qFZQycaXfOje2VcmPph+cXUWr05FQM0JMVB
+         eskw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709835256; x=1710440056;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ush2n6ZCUkwtqTDsLepiD2amdikGIA7J2+mciUIR1ug=;
-        b=SDDX+JF/ToJ6C+ckV3ucmOBEcr/iRW0Uk7NZWuVKj4Wy0U3VOxW3ymwLG8FlaQ1E/2
-         yekwmvOXf+69GWe39s+24m/qt+C9+NfNtOXxoxFAOJcpP+zYGK57FsKaEUbwrnpakHfM
-         U7Eq4+kIOeYh9qkYAR8XOdqAN4Os8qshckQtrssqKLAXzn6VVmmriVKeU7goCAh+qPyk
-         pJYZtKbpvCQ/iDnnHnewrmtcIfzbpjggYvBwuOY5AV1QXKRtd8UKBqdNZzvWEItiwBcI
-         pjLKhJMMiDFTZx5ZLjSZZoM0mg8rio16Jq614JOWmPoAymXGYjs2wvtICzPJ+9PWIfuK
-         oNnw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDZMnw6zExj99rEvhmJeLeunFgfc7VS2Uc2R0n4UMZu1+sIrCxfBP1lBchmOssdB+Yq/dW9PcSmr8IOfLqnnIdndv1SdPdbDmtnqQ=
-X-Gm-Message-State: AOJu0YwQoz+aThsGdRwpu8yD6WgldQV95u5p7kx49HSw3/8TUuBafOq9
-	pEGcWmTPKrwlmlTDBIi40mzR0dYazZwYkyU/2X2xXjU/KMh20qVEl0OxjZ2J4ER8xldFJ4q01DV
-	e3Fyaj37uCuOeZkTes4wwmgLdOsxw+JHvVYRO
-X-Google-Smtp-Source: AGHT+IHu0uPTL6/EGy0p7K3ug6czmdQyEoVz4ZC9Cz3oZZerlUx7PWc/16KGTccZuo6OQq4gNW4IkXm4N5wyJTNUcQE=
-X-Received: by 2002:a05:622a:13cf:b0:42f:a3c:2d54 with SMTP id
- p15-20020a05622a13cf00b0042f0a3c2d54mr333212qtk.21.1709835256039; Thu, 07 Mar
- 2024 10:14:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709845279; x=1710450079;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B2cqZbDJobgrAlQUN+X6Gc/N/G77Yt6hRBbHc0B6Byw=;
+        b=QvxNydOweG1KaKWTvTcTUB82se5lMq1MaLdLQVdA0k4p5GRTMZSs4eN7ySca3VlShO
+         ZkLY09Dy1j7TGOrohaowURwBpfayuYFaAQCcfeeSOl2od1sbMKiN6650sEKskQEJipKC
+         pH6YciqUPQmXqIf4cBOugfCuqYQrrYZ868qp9K5Gp8mlV/QsJ729T6TSPe3Jv/7o2/tP
+         2H/fV1FZj+sVurxZ+2EmudhMjuS81OwQ/HvdYeOgwdqRloMuLR1mtg1MRm6Gkn94+GNg
+         n47wPVrw2fpgdONAPZvl157B8CrRm1g01LoldVbSQpdgDP83SW+ITTNzc/BEatTaCaog
+         ZL4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUApx3UR2WWcF7qpsT45NvYuz88QH1A6VjaFDsP1U+ROVP9QHm3S/9aC7NaBBSYtn31qnhKe1MRcjYFKc8x8h3B5IwaMlJXEjEYjK4=
+X-Gm-Message-State: AOJu0Yyqmoi1NXIS+DxTxlS9JY8w+mHbR2PoNhTsa+B+MZ+nKigGlwoX
+	mFSRpyBVrWzMF3YhhF9plhxdlFz9u4Tsr76B4kYuZDUQygt71QzLEsL8Q0l6vWQ=
+X-Google-Smtp-Source: AGHT+IHVDDnrRb4IzGsRrjreYb2lzNqXBjfY5dZE5DynfGK6hFbMLsAKifeob/DJ0ED9qSx2chYugA==
+X-Received: by 2002:a05:6870:8a06:b0:21e:a40e:7465 with SMTP id p6-20020a0568708a0600b0021ea40e7465mr1134062oaq.24.1709845279574;
+        Thu, 07 Mar 2024 13:01:19 -0800 (PST)
+Received: from ziepe.ca ([12.97.180.36])
+        by smtp.gmail.com with ESMTPSA id mt9-20020a0568706b0900b00220b0891304sm3660721oab.1.2024.03.07.13.01.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 13:01:18 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1riKrc-004Zwv-Aq;
+	Thu, 07 Mar 2024 17:01:16 -0400
+Date: Thu, 7 Mar 2024 17:01:16 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240307210116.GQ9225@ziepe.ca>
+References: <cover.1709635535.git.leon@kernel.org>
+ <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com>
+ <20240305122935.GB36868@unreal>
+ <20240306144416.GB19711@lst.de>
+ <20240306154328.GM9225@ziepe.ca>
+ <20240306162022.GB28427@lst.de>
+ <20240306174456.GO9225@ziepe.ca>
+ <20240306221400.GA8663@lst.de>
+ <20240307000036.GP9225@ziepe.ca>
+ <20240307150505.GA28978@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAP9s-SrvNZROseNkpSL-p-qsO0RT6H+81xX4gg-TV71gQ_UbYA@mail.gmail.com>
- <20240212154411.GA28927@lst.de> <CAP9s-Sr3_GVYBv-XObPRC9L27jJoQqX40d8g3gysEmy6VdQS1Q@mail.gmail.com>
- <CAP9s-So3NkfexGOQ2ogt5duaCevbWXb3wJf_zyB2F+eotBmg6w@mail.gmail.com>
- <CAP9s-Sp+H8rBUyAURpKOu9ZuiU_GRTmqc+ksoiJx_xHdfFHqig@mail.gmail.com> <27bff287-049d-5bbb-2392-fd5f099bed3c@huaweicloud.com>
-In-Reply-To: <27bff287-049d-5bbb-2392-fd5f099bed3c@huaweicloud.com>
-From: Saranya Muruganandam <saranyamohan@google.com>
-Date: Thu, 7 Mar 2024 10:14:05 -0800
-Message-ID: <CAP9s-SrXvm5MfhXCMBYfsEv9xKWqvkkLp2ZjndYrJ65m5x8M_w@mail.gmail.com>
-Subject: Re: regression on BLKRRPART ioctl for EIO
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	sashal@kernel.org, Ming Lei <ming.lei@redhat.com>, "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240307150505.GA28978@lst.de>
 
-> I think we can fix this by returning error from bdev_get_whole() if
-> bdev_disk_changed() failed, this will cause that open disk to fail now,
-> however, I think this can be acceptable.
+On Thu, Mar 07, 2024 at 04:05:05PM +0100, Christoph Hellwig wrote:
+> On Wed, Mar 06, 2024 at 08:00:36PM -0400, Jason Gunthorpe wrote:
+> > > 
+> > > I don't think you can do without dma_addr_t storage.  In most cases
+> > > your can just store the dma_addr_t in the LE/BE encoded hardware
+> > > SGL, so no extra storage should be needed though.
+> > 
+> > RDMA (and often DRM too) generally doesn't work like that, the driver
+> > copies the page table into the device and then the only reason to have
+> > a dma_addr_t storage is to pass that to the dma unmap API. Optionally
+> > eliminating long term dma_addr_t storage would be a worthwhile memory
+> > savings for large long lived user space memory registrations.
+> 
+> It's just kinda hard to do.  For aligned IOMMU mapping you'd only
+> have one dma_addr_t mappings (or maybe a few if P2P regions are
+> involved), so this probably doesn't matter.  For direct mappings
+> you'd have a few, but maybe the better answer is to use THP
+> more aggressively and reduce the number of segments.
 
-Thanks for the response!
-I agree this would fix the regression for the ioctl.
-However, since returning an error from blkdev_get_whole is new
-behavior, I wasn't sure what all parts it affects.
+Right, those things have all been done. 100GB of huge pages is still
+using a fair amount of memory for storing dma_addr_t's.
 
-So this is just a ping to let you know that I am also waiting to hear
-from Christoph.
+It is hard to do perfectly, but I think it is not so bad if we focus
+on the direct only case and simple systems that can exclude swiotlb
+early on.
 
+> > > > So are you thinking something more like a driver flow of:
+> > > > 
+> > > >   .. extent IO and get # aligned pages and know if there is P2P ..
+> > > >   dma_init_io(state, num_pages, p2p_flag)
+> > > >   if (dma_io_single_range(state)) {
+> > > >        // #2, #4
+> > > >        for each io()
+> > > > 	    dma_link_aligned_pages(state, io range)
+> > > >        hw_sgl = (state->iova, state->len)
+> > > >   } else {
+> > > 
+> > > I think what you have a dma_io_single_range should become before
+> > > the dma_init_io.  If we know we can't coalesce it really just is a
+> > > dma_map_{single,page,bvec} loop, no need for any extra state.
+> > 
+> > I imagine dma_io_single_range() to just check a flag in state.
+> > 
+> > I still want to call dma_init_io() for the non-coalescing cases
+> > because all the flows, regardless of composition, should be about as
+> > fast as dma_map_sg is today.
+> 
+> If all flows includes multiple non-coalesced regions that just makes
+> things very complicated, and that's exactly what I'd want to avoid.
 
-On Mon, Feb 26, 2024 at 7:13=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
->
-> Hi,
->
-> =E5=9C=A8 2024/02/27 10:38, Saranya Muruganandam =E5=86=99=E9=81=93:
-> > Hi,
-> > Is there advice on how to fix this `blockdev --rereadpt` regression in
-> > the kernel?
-> > Would appreciate some advice.
-> >
-> > Thanks,
-> > Saranya
-> >
-> >
-> > On Mon, Feb 12, 2024 at 8:01=E2=80=AFPM Saranya Muruganandam
-> > <saranyamohan@google.com> wrote:
-> >>
-> >> When we fail to read from the disk, BLKRRPART used to be able to
-> >> capture and bubble this up to the caller.
-> >> It no longer does since we no longer capture the error from bdev_disk_=
-changed.
-> >>
-> >> Here is an example with fault-injection:
-> >>
-> >> # echo 0 > /sys/kernel/debug/fail_make_request/interval
-> >> # echo 100 > /sys/kernel/debug/fail_make_request/probability
-> >> # echo -1 > /sys/kernel/debug/fail_make_request/times
-> >> # echo 1 > /sys/block/sdc/make-it-fail
-> >> # blockdev --rereadpt /dev/sdc # no error
-> >> # echo $?
-> >> 0 # incorrectly reports success.
->
-> I take a look at this, and it's right the root cause is commit
-> 4601b4b130de ("block: reopen the device in blkdev_reread_part") ignore
-> errors from bdev_disk_changed() now.
->
-> I think we can fix this by returning error from bdev_get_whole() if
-> bdev_disk_changed() failed, this will cause that open disk to fail now,
-> however, I think this can be acceptable.
->
-> Christoph, do you think so? Or we should distinguish ioctl and open
-> device and only let ioctl to fail.
->
-> Thanks,
-> Kuai
->
->
-> >>
-> >> Whereas fdisk and sfdisk correctly report the issue :
-> >>
-> >> # sfdisk /dev/sdc
-> >> sfdisk: cannot open /dev/sdc: Input/output error
-> >> # fdisk /dev/sdc
-> >>
-> >> Welcome to fdisk (util-linux 2.28.2).
-> >> Changes will remain in memory only, until you decide to write them.
-> >> Be careful before using the write command.
-> >>
-> >> fdisk: cannot open /dev/sdc: Input/output error
-> >>
-> >> Best,
-> >> Saranya
-> >>
-> >>
-> >>
-> >> On Mon, Feb 12, 2024 at 8:00=E2=80=AFPM Saranya Muruganandam
-> >> <saranyamohan@google.com> wrote:
-> >>>
-> >>> When we fail to read from the disk, BLKRRPART used to be able to capt=
-ure and bubble this up to the caller.
-> >>> It no longer does since we no longer capture the error from bdev_disk=
-_changed.
-> >>>
-> >>> Here is an example with fault-injection:
-> >>>
-> >>> # echo 0 > /sys/kernel/debug/fail_make_request/interval
-> >>> # echo 100 > /sys/kernel/debug/fail_make_request/probability
-> >>> # echo -1 > /sys/kernel/debug/fail_make_request/times
-> >>> # echo 1 > /sys/block/sdc/make-it-fail
-> >>> # blockdev --rereadpt /dev/sdc # no error
-> >>> # echo $?
-> >>> 0 # incorrectly reports success.
-> >>>
-> >>> Whereas fdisk and sfdisk correctly report the issue :
-> >>>
-> >>> # sfdisk /dev/sdc
-> >>> sfdisk: cannot open /dev/sdc: Input/output error
-> >>> # fdisk /dev/sdc
-> >>>
-> >>> Welcome to fdisk (util-linux 2.28.2).
-> >>> Changes will remain in memory only, until you decide to write them.
-> >>> Be careful before using the write command.
-> >>>
-> >>> fdisk: cannot open /dev/sdc: Input/output error
-> >>>
-> >>> Best,
-> >>> Saranya
-> >>>
-> >>> On Mon, Feb 12, 2024 at 7:44=E2=80=AFAM Christoph Hellwig <hch@lst.de=
-> wrote:
-> >>>>
-> >>>> What scenario are you looking at?
-> >
-> > .
-> >
->
->
+I don't see how to avoid it unless we say RDMA shouldn't use this API,
+which is kind of the whole point from my perspective..
+
+I want an API that can handle all the same complexity as dma_map_sg()
+without forcing the use of scatterlist. Instead "bring your own
+datastructure". This is the essence of what we discussed.
+
+An API that is inferior to dma_map_sg() is really problematic to use
+with RDMA.
+
+> > That means we need to always pre-allocate the IOVA in any case where
+> > the IOMMU might be active - even on a non-coalescing flow.
+> > 
+> > IOW, dma_init_io() always pre-allocates IOVA if the iommu is going to
+> > be used and we can't just call today's dma_map_page() in a loop on the
+> > non-coalescing side and pay the overhead of Nx IOVA allocations.
+> > 
+> > In large part this is for RDMA, were a single P2P page in a large
+> > multi-gigabyte user memory registration shouldn't drastically harm the
+> > registration performance by falling down to doing dma_map_page, and an
+> > IOVA allocation, on a 4k page by page basis.
+> 
+> But that P2P page needs to be handled very differently, as with it
+> we can't actually use a single iova range.  So I'm not sure how that
+> is even supposed to work.  If you have
+> 
+>  +-------+-----+-------+
+>  | local | P2P | local |
+>  +-------+-----+-------+
+> 
+> you need at least 3 hw SGL entries, as the IOVA won't be contigous.
+
+Sure, 3 SGL entries is fine, that isn't what I'm pointing at
+
+I'm saying that today if you give such a scatterlist to dma_map_sg()
+it scans it and computes the IOVA space need, allocates one IOVA
+space, then subdivides that single space up into the 3 HW SGLs you
+show.
+
+If you don't preserve that then we are calling, 4k at a time, a
+dma_map_page() which is not anywhere close to the same outcome as what
+dma_map_sg did. I may not get contiguous IOVA, I may not get 3 SGLs,
+and we call into the IOVA allocator a huge number of times.
+
+It needs to work following the same basic structure of dma_map_sg,
+unfolding that logic into helpers so that the driver can provide
+the data structure:
+
+ - Scan the io ranges and figure out how much IOVA needed
+   (dma_io_summarize_range)
+ - Allocate the IOVA (dma_init_io)
+ - Scan the io ranges again generate the final HW SGL
+   (dma_io_link_page)
+ - Finish the iommu batch (dma_io_done_mapping)
+
+And you can make that pattern work for all the other cases too.
+
+So I don't see this as particularly worse, calling some other API
+instead of dma_map_page is not really a complexity on the
+driver. Calling dma_init_io every time is also not a complexity. The
+DMA API side is a bit more, but not substantively different logic from
+what dma_map_sg already does.
+
+Otherwise what is the alternative? How do I keep these complex things
+working in RDMA and remove scatterlist?
+
+> > The other thing that got hand waved here is how does dma_init_io()
+> > know which of the 6 states we are looking at? I imagine we probably
+> > want to do something like:
+> > 
+> >    struct dma_io_summarize summary = {};
+> >    for each io()
+> >         dma_io_summarize_range(&summary, io range)
+> >    dma_init_io(dev, &state, &summary);
+> >    if (state->single_range) {
+> >    } else {
+> >    }
+> >    dma_io_done_mapping(&state); <-- flush IOTLB once
+> 
+> That's why I really just want 2 cases.  If the caller guarantees the
+> range is coalescable and there is an IOMMU use the iommu-API like
+> API, else just iter over map_single/page.
+
+But how does the caller even know if it is coalescable? Other than the
+trivial case of a single CPU range, that is a complicated detail based
+on what pages are inside the range combined with the capability of the
+device doing DMA. I don't see a simple way for the caller to figure
+this out. You need to sweep every page and collect some information on
+it. The above is to abstract that detail.
+
+It was simpler before the confidential compute stuff :(
+
+Jason
