@@ -1,149 +1,86 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534EE20B38
-	for <linux-block@vger.kernel.org>; Thu,  7 Mar 2024 21:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6146A241EC;
+	Fri,  8 Mar 2024 01:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709847196; cv=none; b=bVmFuAmPrCtLZ+aP2N/kzktS3qtkkov2kanhsxizOpaCeoQAPH37Uap/4rtVqmgKYYyJheM+PQ2mO72jS5eFFeQ5nRUz79UsXCAhVBRlzNR1+O4tgnadsfH0lDOWhPpQf5nirTPsA5yGsu6KYvxzvzZR3vKGQhI5lepuXBelW2E=
+	t=1709860375; cv=none; b=m2XqGdY2lfG4hkoqk2doewHXz3m+pazooZ3bzqNtaG9rcUFnMKc2rG2phZ3ZaeU64HZ5l21ZOcMFTXdmVENiFO/0Rb21nH14x54SnZwsNH94gbWsvnyd8//dNp88MawHB7gm9/1S6YoG6TV9kXUDSs8GQbAFJNBc552wB2xjTVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709847196; c=relaxed/simple;
-	bh=OrH49QyuJiSLD8wpZ+NEcJdciRsA7upByfcAV0KkM/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ld6DYBrkUblsHHi+DCBJ/U89v6nVFviryL2mdrQ6vFB6KI8oJ1TtXKbuEqQpq6R574weLX0DFFOlAc9I/J3WfqtDveAEOZaVQnfs5cgpUhLdvnLqBNJLh9gEQL4Gfq4dmh66dKXCSi8psAq7jmWNpCOFXkTZ1AF3/FndHLnyJOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=nFcLEjSX; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="nFcLEjSX"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e66a3d492fso133737b3a.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2024 13:33:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1709847192; x=1710451992; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6KcRdxUsnfY4lrURoaAoZmnUMAtid4aFLe7flA5XXZs=;
-        b=nFcLEjSXyx+UieSDDc5PWCamyqPOXRYORs/6SbIuZHbMXcOc8H591ZF0Fy6YCejLSy
-         JICxWjM3MuvAjJjZS+8gexMGMj/tJBqBl7XHp0STJ9h/qa+sFtV9ytYxa/84nzHndkzQ
-         tzFdqf43gvxeR6BjIbuXuHKVXfaxMc3QUEzmVuZ3Od42xmGc1PMXjTfK2ofukk5QsFpU
-         T2E/42CfufcVI2Nn3aXlbSqqJAihC9Nc1W9z+A+2E1bAJ999EfDFqwRJAqzoX164pSeR
-         ulYWwNWFWmG8haoH7qz6LXzTA0Sq2R35EbkkzFJ7QmUMlKd6Zzbsjtr8l9BEyGaUAZsI
-         Y2WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709847192; x=1710451992;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6KcRdxUsnfY4lrURoaAoZmnUMAtid4aFLe7flA5XXZs=;
-        b=VxkOQw6N5OwSUKlmcYG8i8HSXNNF7DhvdbOZPQYwL2mdQLowtw1I5UEBaVYEL9wjUt
-         qJ3nPPT2+yNxOCvQjgxwgErCGkvbISialr27WOIpWLsmwkODlBKyVdg9TVEoDP0njHYl
-         aX94LPNuVF1686eBaMhDoFBOMOqgEm1LNzuYN+7Pxzz0L8WbTn306qJnXyOzk+EKiALN
-         Gsk35A2Hk6/75EYJFktrv1+/OMOlgEvz8MHgUJlVRqiPNJ0vcUC4x3gc6suir5p6u6aD
-         IIwqy0faivZfJ1nqP9wlXvupMbSezb+n0ShYQSIlHZcJmjyafm8RRuLMfUgmS8OcypbX
-         kfQw==
-X-Forwarded-Encrypted: i=1; AJvYcCUalGkjEG7/bMnkStYjgMaqgBPYqBjGkI5OD6BlIfuwnwEmtTZOOuItgWxTlC0mJ/yuUVgkdG9EWtTZJJYE+YsmXNX74HPCCdu9iaA=
-X-Gm-Message-State: AOJu0YwCeBk4RwpEza1XJOZfvYwlKTzjx0P+vzzwhoUeYhk+lGWApoDO
-	S8ajLRh/IRDwP43B6csiqqlV7JfABWbh3h5ndFlwuKVymfgBGU//EWFDtVge3nJwBOLnpm0/UrQ
-	H
-X-Google-Smtp-Source: AGHT+IEIZ5Bq0gUkg8eGb8dSnjmcn/yxs210qHWqUuXnY0jZp8AuB4DTJR7s1nyb0ByOyBua3WrKtA==
-X-Received: by 2002:a05:6a21:32aa:b0:1a1:77ed:5abc with SMTP id yt42-20020a056a2132aa00b001a177ed5abcmr2708513pzb.34.1709847192375;
-        Thu, 07 Mar 2024 13:33:12 -0800 (PST)
-Received: from dread.disaster.area (pa49-179-47-118.pa.nsw.optusnet.com.au. [49.179.47.118])
-        by smtp.gmail.com with ESMTPSA id y9-20020a62f249000000b006e535bf8da4sm12845551pfl.57.2024.03.07.13.33.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 13:33:11 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1riLMS-00GQUj-1Z;
-	Fri, 08 Mar 2024 08:33:08 +1100
-Date: Fri, 8 Mar 2024 08:33:08 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Chandan Babu R <chandanbabu@kernel.org>,
-	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 02/10] block: move discard checks into the ioctl handler
-Message-ID: <ZeoylEeVMt2fXT2R@dread.disaster.area>
-References: <20240307151157.466013-1-hch@lst.de>
- <20240307151157.466013-3-hch@lst.de>
+	s=arc-20240116; t=1709860375; c=relaxed/simple;
+	bh=1mVky2Uh3EgdkppjS1jKSHp4wA7DmzZlK7zrUMGhcrM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KSvJPYb0JadhfY1l4ZhUp8j5IXItXps9CKnJMfuHEK08PpYrC2PsSzSc3ITNMGFiEiN0cinblZDCJMEYEMFCuvTzrcWtIuBt6FSTuV9qS02cJ+HdS+7aCqCXS2Q6bmfaDjKbNiYkOMA07VG+lm5Trs3JWKLQIhKniuNP6OA8Z+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TrSny39Ghz4f3nT9;
+	Fri,  8 Mar 2024 09:12:38 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 040E11A016E;
+	Fri,  8 Mar 2024 09:12:46 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP2 (Coremail) with SMTP id Syh0CgC32w4MZuplPlyWGQ--.3947S3;
+	Fri, 08 Mar 2024 09:12:45 +0800 (CST)
+Message-ID: <1dec5d5d-fb4b-8203-82ca-dc1ee92132bb@huaweicloud.com>
+Date: Fri, 8 Mar 2024 09:12:44 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307151157.466013-3-hch@lst.de>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v4 0/2] md: fix is_mddev_idle()
+To: linan666@huaweicloud.com, song@kernel.org, axboe@kernel.dk
+Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+ houtao1@huawei.com, yangerkun@huawei.com
+References: <20240117031946.2324519-1-linan666@huaweicloud.com>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <20240117031946.2324519-1-linan666@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgC32w4MZuplPlyWGQ--.3947S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYA7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvE
+	ncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I
+	8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0E
+	jII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbI
+	xvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r
+	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbHa0DUU
+	UUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On Thu, Mar 07, 2024 at 08:11:49AM -0700, Christoph Hellwig wrote:
-> Most bio operations get basic sanity checking in submit_bio and anything
-> more complicated than that is done in the callers.  Discards are a bit
-> different from that in that a lot of checking is done in
-> __blkdev_issue_discard, and the specific errnos for that are returned
-> to userspace.  Move the checks that require specific errnos to the ioctl
-> handler instead, and just leave the basic sanity checking in submit_bio
-> for the other handlers.  This introduces two changes in behavior:
+friendly ping ...
+
+在 2024/1/17 11:19, linan666@huaweicloud.com 写道:
+> From: Li Nan <linan122@huawei.com>
 > 
->  1) the logical block size alignment check of the start and len is lost
->     for non-ioctl callers.
->     This matches what is done for other operations including reads and
->     writes.  We should probably verify this for all bios, but for now
->     make discards match the normal flow.
->  2) for non-ioctl callers all errors are reported on I/O completion now
->     instead of synchronously.  Callers in general mostly ignore or log
->     errors so this will actually simplify the code once cleaned up
+> Changes in v4:
+>   - patch 2, add the check of 'init', update last_events even if iostat
+>     is disabled.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-OK.
-
-> ---
->  block/blk-lib.c | 13 -------------
->  block/ioctl.c   | 13 +++++++++----
->  2 files changed, 9 insertions(+), 17 deletions(-)
+> Li Nan (2):
+>    md: Fix overflow in is_mddev_idle
+>    md: don't account sync_io if iostats of the disk is disabled
 > 
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index f873eb9a886f63..50923508a32466 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -59,19 +59,6 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop)
->  {
->  	struct bio *bio = *biop;
-> -	sector_t bs_mask;
-> -
-> -	if (bdev_read_only(bdev))
-> -		return -EPERM;
-> -	if (!bdev_max_discard_sectors(bdev))
-> -		return -EOPNOTSUPP;
-> -
-> -	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
-> -	if ((sector | nr_sects) & bs_mask)
-> -		return -EINVAL;
-> -
-> -	if (!nr_sects)
-> -		return -EINVAL;
->  
->  	while (nr_sects) {
->  		sector_t req_sects =
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index de0cc0d215c633..1d5de0a890c5e8 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -95,6 +95,8 @@ static int compat_blkpg_ioctl(struct block_device *bdev,
->  static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
->  		unsigned long arg)
->  {
-> +	sector_t bs_mask = (bdev_logical_block_size(bdev) >> SECTOR_SHIFT) - 1;
-> +	sector_t sector, nr_sects;
+>   drivers/md/md.h        |  5 +++--
+>   include/linux/blkdev.h |  2 +-
+>   drivers/md/md.c        | 11 ++++++++---
+>   3 files changed, 12 insertions(+), 6 deletions(-)
+> 
 
-This changes the alignment checks from a hard coded 512 byte sector
-to the logical block size of the device. I don't see a problem with
-this (it fixes a bug) but it should at least be mentioned in the
-commit message.
-
--Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+Nan
+
