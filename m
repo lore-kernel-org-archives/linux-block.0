@@ -1,103 +1,104 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B17F29CFB
-	for <linux-block@vger.kernel.org>; Fri,  8 Mar 2024 08:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0927217EF;
+	Fri,  8 Mar 2024 13:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709887913; cv=none; b=Qm5790pIXlfJ4xEd+9U2JeTXHd+DPnEB8mDRgQD+KxyVsEqtCHVKTE+/jkq9nl1gLNt3pleM8v0YSsFz1HKmRWiSX9H5p+avj+C4Sfwg4Yly/ZmkHJbxwjpcTliYV0NsKXf3++F81f4mjWyuC1zLIhtElRetLrWzeBXOQA61FeM=
+	t=1709905165; cv=none; b=jMBIhFv2MpDCz48653iD3QZ76jBZKACxcXJkegndVJRZgRSakCUFgdUwHePZKVu1BfaxyZmGQRZmFjXJhpvo8n1wEUX6CD7Mxl/cyKMvoEHNyOMWWzbcFUmfZn6V0GHDFFHDDDchv2jIs4YZWLtjqTIWXDLEAmVC4h7Op/7IZ7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709887913; c=relaxed/simple;
-	bh=VeBEKzTQ1q29WWwwEYXhpTgOHd5ZGN4TpM2lTAVw5Pg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RRlhwDp1pK64eqMHacGWuaJcicBu0fURwoRNVNVPwA/zM9uIRsQZqSycz0f7YOChGob2TlgoSGbQedGsZ2VZL0XD/VO2mgXHIujcmw1DEU7S7f0vwrgphC/HKOaEk/0nTaxZPzz6DjtxXbdtPJeYoiNK7TPi5lfwzilRv+u0AFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1riVxF-0006vL-AL; Fri, 08 Mar 2024 09:51:49 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1riVxE-0056Mx-QE; Fri, 08 Mar 2024 09:51:48 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1riVxE-00245J-2M;
-	Fri, 08 Mar 2024 09:51:48 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH] block/swim: Convert to platform remove callback returning void
-Date: Fri,  8 Mar 2024 09:51:04 +0100
-Message-ID:  <a00aea8201ea85ae726411bb0fb015ea026ff40a.1709886922.git.u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709905165; c=relaxed/simple;
+	bh=27ijGwAcHi4/OxMZhzEqyuP8A1bO1+mOagHVsZu6/LA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=cc+tbfV5AgsPBUDjdodFtI+9MPm9HUVXDonFYIQkdoFDuGw5/7olAdKluuNrvlLLqYqtOZBEmxEwZ8YhHv5olWIRbDPu5hNrPgTPL54faYdJH26v9/xczSoQ3G4cyYvYy2KqAzIxTy9asihUf4YxANPIx30UMMoWybEUhrmp9MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLJFRJ/4; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLJFRJ/4"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4131a5e3685so3669685e9.1;
+        Fri, 08 Mar 2024 05:39:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709905162; x=1710509962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zmSwf1GXNG8FcmTatGusE4kangHWWi5lffewaC7Q0+0=;
+        b=kLJFRJ/4hZUryTY2x+6EPxWic547FIja1SImiggjyuPjLSfpjw8WUrhYzwWZ8/H/1W
+         EOL15TGMkPYCe+L46mAJBxPzb64W2TOQdMTby0lWfVS931w57QDEKlBv7g5f0xIx2bcv
+         RWfKtQ1Gn1ODyeHszIQeWTNVAXlSWcqTS7J4FAy8KKb2OqwQEw0QX/UertCjCTtx23BF
+         NoX5pBrE2DJsGlHQDwG1uSNVdl3R4vOk19oj4eOIcl2fDLzFi3NRnWDMiSXy6kslmW9s
+         OYDe7xMEY1APdnyqb0jp2Y5KIH0A0qvVmr25ER1UsUWCCPRj+Id1s4FDykOay2CoMTix
+         0weQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709905162; x=1710509962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zmSwf1GXNG8FcmTatGusE4kangHWWi5lffewaC7Q0+0=;
+        b=xFfWgdIRqdYuwI/OgH6JZhKQyldwnDM/tLqXAUp6+4SJOiyvVLaIjBeC3CuB3dxRTA
+         rClSxP+X7x5eWy1ftK5n5p6tAuwxzb5kWGh4wbTCD1dAGWdLn1at4quvzgbu7c8glZ9A
+         z0lm2emqPPse941XaYGYXUd/6Gw/YNfBX+OGVuRS4XEZMSw7w0U0sGqfgEOundU3YR+x
+         VJFA2LjEkGEPtM4YQtnC6j5clCluEwVlwG8u1XHHsADjM6I4f4/hIZa6nGnqcDbc3Fl+
+         u+8V/NlikIiz+x6NT4GYxzuvY8ZakQ1CGn/EVnzVu2XtVMOHz9q53YA+Wm8AYGfNP9ZP
+         HbOw==
+X-Forwarded-Encrypted: i=1; AJvYcCXiZ6kuN7PjG5uqOg/IKA2w83fmdw93o9nRd8/3u48n05DhpKQ7mvAZD7FaGQgozFzAL9U8+27mJOe75krJFheOvVdm/j+WX+DKuExUPH3T02I3OIET5X0eXuWvjcifQv8+UnjTsUCEdHU=
+X-Gm-Message-State: AOJu0YwvVVwFIV00OjyCWweIZOTlMc6jE/vFUBBR2CGb+S9ou0h38jZS
+	lNUJY4b8dZxXAow0g0ObkwX/ak3F04cD7pAUEDmNitj9W4qbOQV+r1tOYo5QXSQ=
+X-Google-Smtp-Source: AGHT+IHV4nlHLhb/Hc0jjbbFGVfsp8Wa9NojsjwaQ+UHmL+O1QQPw2dQQDsm5KU5DG2ZSUv0O+m/HA==
+X-Received: by 2002:a05:600c:1e0e:b0:413:1438:cbd4 with SMTP id ay14-20020a05600c1e0e00b004131438cbd4mr2628577wmb.17.1709905162087;
+        Fri, 08 Mar 2024 05:39:22 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id bi19-20020a05600c3d9300b004131bb71c07sm948625wmb.11.2024.03.08.05.39.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 05:39:21 -0800 (PST)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] block: partitions: only define function mac_fix_string for CONFIG_PPC_PMAC
+Date: Fri,  8 Mar 2024 13:39:21 +0000
+Message-Id: <20240308133921.2058227-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1683; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=VeBEKzTQ1q29WWwwEYXhpTgOHd5ZGN4TpM2lTAVw5Pg=; b=owGbwMvMwMXY3/A7olbonx/jabUkhtRXFyutggUq70vzVqhyP2TYflCj5PpKLzcNs0il3XK6X 99PYubuZDRmYWDkYpAVU2Sxb1yTaVUlF9m59t9lmEGsTCBTGLg4BWAiAlvZ/1fx8V05yufZcLJs yr3ZyWmClQcm9cpcm3bnTMrRPcJltSKNi3qLulvjuQ8kbuNN6f3kK33+xZ39Pz/8UWCZ9tbHjXf zju8sTu4PHSJcHh4Qnvxx2pGm7ZekYnYwOSyuiFjAGKSi0hW3eVNhrN4pVxM5Ee6Vr1MrF6mu4H 9ZNoOH+eML88LGcqHtZec1md+pWVcaTp6xJ3J3ylV+4aiMj1udMkO+pxzw8n88SVRtk9HXTTptJ 1p8dE7mXnQ3SZksEM+V80+INy+/5+32kNxsd4NZs/5a/m2/s/P00cSYfZveHSzNXj6pPe3cdDsF TqNQa3ZBgz05fZyLnk1Pvtp+L3/Xd2EW5qaYdJdSBf0JAA==
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
 
-The .remove() callback for a platform driver returns an int which makes
-many driver authors wrongly assume it's possible to do error handling by
-returning an error code. However the value returned is ignored (apart
-from emitting a warning) and this typically results in resource leaks.
+The helper function mac_fix_string is only required with CONFIG_PPC_PMAC,
+add #if CONFIG_PPC_PMAC and #endif around the function.
 
-To improve here there is a quest to make the remove callback return
-void. In the first step of this quest all drivers are converted to
-.remove_new(), which already returns void. Eventually after all drivers
-are converted, .remove_new() will be renamed to .remove().
+Cleans up clang scan build warning:
+block/partitions/mac.c:23:20: warning: unused function 'mac_fix_string' [-Wunused-function]
 
-Trivially convert this driver from always returning zero in the remove
-callback to the void returning variant.
-
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
- drivers/block/swim.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ block/partitions/mac.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 16bdf62067d8..6731678f3a41 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -916,7 +916,7 @@ static int swim_probe(struct platform_device *dev)
- 	return ret;
- }
+diff --git a/block/partitions/mac.c b/block/partitions/mac.c
+index 7b521df00a39..c80183156d68 100644
+--- a/block/partitions/mac.c
++++ b/block/partitions/mac.c
+@@ -20,6 +20,7 @@ extern void note_bootable_part(dev_t dev, int part, int goodness);
+  * Code to understand MacOS partition tables.
+  */
  
--static int swim_remove(struct platform_device *dev)
-+static void swim_remove(struct platform_device *dev)
++#ifdef CONFIG_PPC_PMAC
+ static inline void mac_fix_string(char *stg, int len)
  {
- 	struct swim_priv *swd = platform_get_drvdata(dev);
- 	int drive;
-@@ -937,13 +937,11 @@ static int swim_remove(struct platform_device *dev)
- 		release_mem_region(res->start, resource_size(res));
- 
- 	kfree(swd);
--
--	return 0;
+ 	int i;
+@@ -27,6 +28,7 @@ static inline void mac_fix_string(char *stg, int len)
+ 	for (i = len - 1; i >= 0 && stg[i] == ' '; i--)
+ 		stg[i] = 0;
  }
++#endif
  
- static struct platform_driver swim_driver = {
- 	.probe  = swim_probe,
--	.remove = swim_remove,
-+	.remove_new = swim_remove,
- 	.driver   = {
- 		.name	= CARDNAME,
- 	},
-
-base-commit: 8ffc8b1bbd505e27e2c8439d326b6059c906c9dd
+ int mac_partition(struct parsed_partitions *state)
+ {
 -- 
-2.43.0
+2.39.2
 
