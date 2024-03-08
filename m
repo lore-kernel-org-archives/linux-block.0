@@ -1,111 +1,137 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5165615C8
-	for <linux-block@vger.kernel.org>; Fri,  8 Mar 2024 16:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72C01C295;
+	Fri,  8 Mar 2024 16:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709915672; cv=none; b=Y0r2pspjzjT3/YMbiWtia+xayJumvUIlm+4K/cIFGKaQ4NYzyp22sjpo6uAYbc2C9bPznjtJ+P99ABBQHpwro6FhDtWAzK7dCGLgLWRipto/2/8ZfNPKPFcSU1RFABuvbhySBJglFKhpEhDWnKRLALV7ZhBsU+7737wGrra2S4k=
+	t=1709916571; cv=none; b=GzBdn1IQXyzYqn6ErG7GRwTr+2VKV7HPJwYZgHM1g6llE4tjVuovQmya/5j7+ofYj1zMqje7vz4eiAWZEfUc0MpMSDbL1Ibhnj7NLTSPiXWO/tfmQK9K0QIIjPlEo8yxNzL4+frlqDWeJpeDOpEjh0Yl6srW0gOfsh6hOGqOX8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709915672; c=relaxed/simple;
-	bh=q5UNepVTPD1GH0+Tfc1vBatyguN++q7xlhg95NlQekM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qGBt3OyWqobI4/TocQAUDlgtP0j441XQD80Cp6yO9CLIfh/m/m8fRJURRfLctMwwxU5GV6tibSvsJQFkULQhvg4C07HFYqtD8ilCgsQbAiAp/+ITSWXnDo10xyaLVrkIFAewDh5MplMENLSZoV9zuunvM1YzOmboK6xiweHPGq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wyK1BX4n; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wyK1BX4n"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-365c0dfc769so1967265ab.1
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2024 08:34:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709915670; x=1710520470; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eVfdzVKpWpFj9kbUNOF1nqFeLYyQI1R525d/19YRQ4U=;
-        b=wyK1BX4nmUyi/9Fyhva6JrRyUVQMbvE3UbKW1DgbiZWlqZXlGEYkSdZLLh0Yd1u0ey
-         6VAUc3UBY5xn2ZhzXT+3cTHZl2f6cIEfmX2wBmsPfvL45NfClGxbHZZGeiUDIu52H5pK
-         ank2g9x6x/kx5bMwD6RazB9rWEBGWIXQU7gI1GlfLNyS/4Glws4IT455R7ezy7KfXzZK
-         x353FseBOHQYqiwEOJbPsSNLOdpErFCKlwUEqqlRkEUf9HaHZs5GKpAflo9dnSkZ+vlV
-         9+tF+LJcFWuKK/RiVXsjDZVAJCHLbjgEOSn6It04b0MlOH9qo6woPE9eAXokn7ZSaZwq
-         uWbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709915670; x=1710520470;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eVfdzVKpWpFj9kbUNOF1nqFeLYyQI1R525d/19YRQ4U=;
-        b=rEOkRSuTRs0O7TAwgsyE1vZd5dNyhuwx0KHL9RRDXRwC7mWB0pyhxetDLJEJCta94g
-         839EkGUeXuB+5BgUIv5zQ4yi867Wlf6N9BWkw4KJ+5Jtr/KRbUvoZfiOI42tgNLZ46Fq
-         XSDotUAH8YK319bfw5My4kROsKWrvxmrExSy1Ql9XLnPi2HmF5OEu3LILfnwMAPhmBoB
-         Uh32TRjNSJWTrph6ULE1EPoLNmGsMhPZ7l//r1LKfl7Fq5WhaRZxVlj1Tu7HUX46vNX1
-         f8hRHU2RvNPZTnrtckiwjmg7t1oKf4/ECPmAUlZeKbljzyReN6WBSCFwDeTA5+QMGjSr
-         l6AA==
-X-Gm-Message-State: AOJu0YwgoGNo8E/BvdybqXZVQ4uuInRgtewxYTsK2sWD9p+H7KVzR5Tu
-	X/LxjDZJ4TWLmVaTzpp/1fgTG8f1vT0hK/6ioLsttfVo0nIwhIo6fuOwUCtHAHU=
-X-Google-Smtp-Source: AGHT+IGHrfD8uH6blQDQ3mMFkxIIRnaWM2NuWN/1meHvgLTE8CRbEPUrNlq2AATapXrEb2fcNbN9CA==
-X-Received: by 2002:a6b:ee16:0:b0:7c8:718b:cff5 with SMTP id i22-20020a6bee16000000b007c8718bcff5mr2506789ioh.2.1709915670463;
-        Fri, 08 Mar 2024 08:34:30 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id b5-20020a029a05000000b00474dad114a6sm3654084jal.80.2024.03.08.08.34.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 08:34:29 -0800 (PST)
-Message-ID: <1f68ab8c-e8c2-4669-a59a-65a645e568a3@kernel.dk>
-Date: Fri, 8 Mar 2024 09:34:28 -0700
+	s=arc-20240116; t=1709916571; c=relaxed/simple;
+	bh=KzdKUekyi9rBF/gDC5z7G4GjeHKa0pomXxJxjC5D0Xc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dplyUU3oQ489ZG7EOUXb2fiNPGjdbyoe5PzKd8NYCCknNTHSWk6kYxj7XYZWVdGwpcUz55jWdkMBPWDwNbJHhposntsq9mj6JFIuvZ/VhYZsM/BOCqbKxcJXJk6HY0sSMUO2QEmwLUuOjUTrTUH1FIS4+BOhFOIXo8jNJHaSp1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id E414168BEB; Fri,  8 Mar 2024 17:49:20 +0100 (CET)
+Date: Fri, 8 Mar 2024 17:49:20 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
+ steps
+Message-ID: <20240308164920.GA17991@lst.de>
+References: <47afacda-3023-4eb7-b227-5f725c3187c2@arm.com> <20240305122935.GB36868@unreal> <20240306144416.GB19711@lst.de> <20240306154328.GM9225@ziepe.ca> <20240306162022.GB28427@lst.de> <20240306174456.GO9225@ziepe.ca> <20240306221400.GA8663@lst.de> <20240307000036.GP9225@ziepe.ca> <20240307150505.GA28978@lst.de> <20240307210116.GQ9225@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/10] fs: Initial atomic write support
-Content-Language: en-US
-To: John Garry <john.g.garry@oracle.com>, kbusch@kernel.org, hch@lst.de,
- sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
- djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
- dchinner@redhat.com, jack@suse.cz
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
- ojaswin@linux.ibm.com, linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
- io-uring@vger.kernel.org, nilay@linux.ibm.com, ritesh.list@gmail.com,
- Prasad Singamsetty <prasad.singamsetty@oracle.com>
-References: <20240226173612.1478858-1-john.g.garry@oracle.com>
- <20240226173612.1478858-4-john.g.garry@oracle.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240226173612.1478858-4-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240307210116.GQ9225@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 2/26/24 10:36 AM, John Garry wrote:
-> diff --git a/io_uring/rw.c b/io_uring/rw.c
-> index d5e79d9bdc71..099dda3ff151 100644
-> --- a/io_uring/rw.c
-> +++ b/io_uring/rw.c
-> @@ -719,7 +719,7 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode)
->  	struct kiocb *kiocb = &rw->kiocb;
->  	struct io_ring_ctx *ctx = req->ctx;
->  	struct file *file = req->file;
-> -	int ret;
-> +	int ret, rw_type = (mode == FMODE_WRITE) ? WRITE : READ;
->  
->  	if (unlikely(!file || !(file->f_mode & mode)))
->  		return -EBADF;
-> @@ -728,7 +728,7 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode)
->  		req->flags |= io_file_get_flags(file);
->  
->  	kiocb->ki_flags = file->f_iocb_flags;
-> -	ret = kiocb_set_rw_flags(kiocb, rw->flags);
-> +	ret = kiocb_set_rw_flags(kiocb, rw->flags, rw_type);
->  	if (unlikely(ret))
->  		return ret;
->  	kiocb->ki_flags |= IOCB_ALLOC_CACHE;
+On Thu, Mar 07, 2024 at 05:01:16PM -0400, Jason Gunthorpe wrote:
+> > 
+> > It's just kinda hard to do.  For aligned IOMMU mapping you'd only
+> > have one dma_addr_t mappings (or maybe a few if P2P regions are
+> > involved), so this probably doesn't matter.  For direct mappings
+> > you'd have a few, but maybe the better answer is to use THP
+> > more aggressively and reduce the number of segments.
+> 
+> Right, those things have all been done. 100GB of huge pages is still
+> using a fair amount of memory for storing dma_addr_t's.
+> 
+> It is hard to do perfectly, but I think it is not so bad if we focus
+> on the direct only case and simple systems that can exclude swiotlb
+> early on.
 
-Not sure why you took the lazy way out here rather than just pass it in,
-now there's another branhc in the hot path. NAK.
+Even with direct mappings only we still need to take care of
+cache synchronization.
 
--- 
-Jens Axboe
+> > If all flows includes multiple non-coalesced regions that just makes
+> > things very complicated, and that's exactly what I'd want to avoid.
+> 
+> I don't see how to avoid it unless we say RDMA shouldn't use this API,
+> which is kind of the whole point from my perspective..
+
+The DMA API callers really need to know what is P2P or not for
+various reasons.  And they should generally have that information
+available, either from pin_user_pages that needs to special case
+it or from the in-kernel I/O submitter that build it from P2P and
+normal memory.
+
+> Sure, 3 SGL entries is fine, that isn't what I'm pointing at
+> 
+> I'm saying that today if you give such a scatterlist to dma_map_sg()
+> it scans it and computes the IOVA space need, allocates one IOVA
+> space, then subdivides that single space up into the 3 HW SGLs you
+> show.
+> 
+> If you don't preserve that then we are calling, 4k at a time, a
+> dma_map_page() which is not anywhere close to the same outcome as what
+> dma_map_sg did. I may not get contiguous IOVA, I may not get 3 SGLs,
+> and we call into the IOVA allocator a huge number of times.
+
+Again, your callers must know what is a P2P region and what is not.
+I don't think it is a hard burdern to do mappings at that granularity,
+and we can encapsulate this in nice helpes for say the block layer
+and pin_user_pages callers to start.
+
+> 
+> It needs to work following the same basic structure of dma_map_sg,
+> unfolding that logic into helpers so that the driver can provide
+> the data structure:
+> 
+>  - Scan the io ranges and figure out how much IOVA needed
+>    (dma_io_summarize_range)
+
+That is in general a function of the upper layer and not the DMA code.
+
+>  - Allocate the IOVA (dma_init_io)
+
+And this step is only needed for the iommu case.
+
+> > That's why I really just want 2 cases.  If the caller guarantees the
+> > range is coalescable and there is an IOMMU use the iommu-API like
+> > API, else just iter over map_single/page.
+> 
+> But how does the caller even know if it is coalescable? Other than the
+> trivial case of a single CPU range, that is a complicated detail based
+> on what pages are inside the range combined with the capability of the
+> device doing DMA. I don't see a simple way for the caller to figure
+> this out. You need to sweep every page and collect some information on
+> it. The above is to abstract that detail.
+
+dma_get_merge_boundary already provides this information in terms
+of the device capabilities.  And given that the callers knows what
+is P2P and what is not we have all the information that is needed.
 
