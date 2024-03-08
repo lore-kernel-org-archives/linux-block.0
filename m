@@ -1,104 +1,193 @@
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4BB1D53C
-	for <linux-block@vger.kernel.org>; Fri,  8 Mar 2024 17:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6C75E063
+	for <linux-block@vger.kernel.org>; Fri,  8 Mar 2024 20:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709918291; cv=none; b=ukz+WneA8/EL8Gqu9Ck40+uKXJCAf+CKzQ+dfqhejdqL5JBIzf9J3I4ppNtJMpVdSWmMIxOvkqbu2JYSWF0ZkNi9NY82Gom3t4wHIXbwHP9ULLU4ZoUmsP8z4PQxrcu5ZEd/q3Vvc1MeUFArebXSnOg9w8S2Yxm//PeFdGJZozo=
+	t=1709929426; cv=none; b=brKTp48AZ94s8YklZUfvSSwo629/1/yartnOROS7J8sfDMZ1DzpAitPD+T7v8GYjpjXoeQGF3ei+8mmcVDRdM+SO5kpvifCKucznf+bA2rsVoasNEeoPQY/91h8J/iyCvodjzmW6ebSKN+Pw+gNohHWUzEDF0bVzpcC96juB1Hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709918291; c=relaxed/simple;
-	bh=4QZFZIY/kmodj4JF06VYmGkSZCD9gnX1+VV1k7bwbbM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aqvRVFLFkdWXRWHOzCKmXMxnh1K2H2veizzNfbfGrFAdlyXIEuF3ZuKpKaig/R/Vvw450ORMTpFlwNqbvBpcOUgqHRTYZmOU6fG5Ikx9PQVwnRFyKW/Sp1bH01EldLNzYlp6bXinoOc/5kJreR4lVj8IR4ISHg9CXz0l7a3/6rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yTo4HQNQ; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1709929426; c=relaxed/simple;
+	bh=rY0A8eHAZI5cB1A3V08JRigtUPLCemhE15iuR8N+mnw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=idam/7DfJMbg+iuU1zmHx5FOVrUVb6G6F0mXKObI8ejheCVaoLzQzTL17wkqqlB14tF7AA30xCANSf7BukTInavK4JZUx+1S0wpEgxnws6tPeYN/xiqS0zfEvCYrhqzbFQL8nUF7R7z30GTg+BNNd2YhFiD1HJLSgAzGg2NAvsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=JA++mUN6; arc=none smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yTo4HQNQ"
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-365c0dfc769so2049985ab.1
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2024 09:18:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="JA++mUN6"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-59fd6684316so1113458eaf.0
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2024 12:23:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709918288; x=1710523088; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OzUtklwPlJOuPJluAgACqxyTfZzplj9AthRwSYyjjp8=;
-        b=yTo4HQNQDwfnjLZWlMPcHvoibIB96tsEqA9VKV1rvfdWH3cFsJcwVHWxEtFgAaga+X
-         aKxk6r2GveOb1qd9TOhItsYIqtOXTWbjo4xsTZjRsMj4u51EhJLwJ5ugTebljVf0kda4
-         +3/O/F9HD/ynzyFE4iCXfFLx/gjSKcf35VHGDhNmOT3o7FETuf9gj0GvkY2LhmhGhLxB
-         de/ulcSmzTEbOuhG5BOxklup1aDj3cR4qUC6e0XzZSk15rTtANQ5rdJYgxz51jJhQvJ6
-         dRkiAW8s9HiD3+hA/6dTbGeNjGLIUZo4S37nxzsQxqJDkgj/qBDgU24FfOI2yrg7USYN
-         3RWA==
+        d=ziepe.ca; s=google; t=1709929424; x=1710534224; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LwAnb64EwkeKmrTREui8emTN6ZYCNogBTHISie/yQU0=;
+        b=JA++mUN6qf41+Xed6p4Z+H5PhtGQNIDEvXPgdgaIPFZELSI7wqn38/PePhxy879qVa
+         dxvja0Op082DnEjyrhAwgqIGSwEe1Z+iiA76lNBYh7zWqTNBPdJd/EXg21KmLtPdqwWU
+         w1JBMNk8sOCzFjKW/t5qyzJ31cKXQri3BrrE2w52j0hnWoz1ZDuTE5reXXgGN44KF6ct
+         YvuLwUjssC4rdjcP9SM6lAVDhjlqcQD0DfQ3ugh7PgeY21/eqmaynXx0fy/OS0oA2srm
+         rrMAlpE+MeXB7kp7BX2B6EKe7DQosXXKGixCM/qaWs9swVugGCsuRGw4FDmVB+tOcNC6
+         E1ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709918288; x=1710523088;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OzUtklwPlJOuPJluAgACqxyTfZzplj9AthRwSYyjjp8=;
-        b=PiJ5yz+NjhRCv0kHBrum/UdaTcl/ztWP70zLzD4UZO1oYdzlrOxR/xnI8Gvt4/qrHK
-         6bTCrvxJJCw3LbsWGq1WDI6AhiChs6gfi2zMDs60+/Wil1jFRWFhf/BmY2sk1FqU1szL
-         5yGZTMvRfg1U+QqYVwMlgBd29r8/S++jqpyPAPOaRuf/iBbgYJD2ZfcTCYbQSqSPK0ie
-         6BGuGYSUF5SuM6bXV7WTDJd01Z1HWsYNko2yiaShPq32TRMZYVbBf4i23NaCBPLaNnbi
-         dto/xpnI4fsYBR7cQ3WFSh2jA2bXhQlACTfE5nAeOPlGDbT7zh+iVFsMSOhWwI17iUHy
-         vQEw==
-X-Gm-Message-State: AOJu0YzSm9M7Sq+0zQG8oHTd2uE20SiHzxhsIZDpNflnIjZOUxq0NX+D
-	UVVdzPiyLrFS8DxF+jqDBmMs5Lj45r6UK+xXcbmsLNvMBH6OTAFgm0euMQd1kz0=
-X-Google-Smtp-Source: AGHT+IHxACDHwXpB1DRHc3vyvQVo+hhXIx+dv77eD2O+Lwu72LmdLkTlNoD1vGHkQjkQPAl9xihoxQ==
-X-Received: by 2002:a6b:7709:0:b0:7c8:7471:2f59 with SMTP id n9-20020a6b7709000000b007c874712f59mr2596113iom.0.1709918288476;
-        Fri, 08 Mar 2024 09:18:08 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id do32-20020a0566384ca000b004743bc59379sm4533416jab.59.2024.03.08.09.18.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 09:18:08 -0800 (PST)
-Message-ID: <30c3773b-4db3-4278-a127-df8c075e8109@kernel.dk>
-Date: Fri, 8 Mar 2024 10:18:06 -0700
+        d=1e100.net; s=20230601; t=1709929424; x=1710534224;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LwAnb64EwkeKmrTREui8emTN6ZYCNogBTHISie/yQU0=;
+        b=UKNpjXztXYcTTNA63sj4RAAJ9CHbO8UhSA7ht8+PLYC+ydYvN/5CktUhOixI4NwLr6
+         E1smCTe3ecrad/TE9q22Ymky4Xfe1mtl6fiuQG3rxucwwZT37MBVUXrpDirr+wUmDrtY
+         3ylJZuMQn+cR0Fet6qAtJF/AS4K4LZb45i4GbcTExUUc7RgFUdynhw7odKmSmMUZi5+V
+         zsvZWZGUHI0CcfUfKJlOwNGef83MEKaYF/KidSOH7JHODXd7WmW9A8RzD5rdDho/PL5+
+         +AK8vj+tvSSFvANdecCZXImvflnK6or2hAbH7AQ6B6+evxXnAgpAlz5Y6l92mtKs2FDE
+         y7Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCWuS/fE5o7nVY8K1ehLFrWiUryHCIOJR6+8FTYpcdMIoUxdwYYAptKkOP3TeeM1Xo61gEU7RGr69q17wK5Utc29wZP4BU24BIFNWWg=
+X-Gm-Message-State: AOJu0YzE/stoVs9YupKufwMk2m1MkSw/Vd+seVDGIgfD9/DJ+SZSObp/
+	q9eL6hFVY7lG3V8HqyDHrYmcBmTfFFvIdLKUfdF/p4prH4HnBkxf1fcSO0dGYpQ=
+X-Google-Smtp-Source: AGHT+IF/qfykmuaRb5uNoRhqiqioiMWJKv2ds3n4ZiUYzIpQ3ydAyGQZJUUw4tTE2mYtsW4uV3seEQ==
+X-Received: by 2002:a4a:311e:0:b0:5a1:c4b6:bb76 with SMTP id k30-20020a4a311e000000b005a1c4b6bb76mr357202ooa.5.1709929424080;
+        Fri, 08 Mar 2024 12:23:44 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id p14-20020a056830130e00b006e513edb0e3sm18031otq.17.2024.03.08.12.23.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 12:23:43 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1rigko-007vqd-D8;
+	Fri, 08 Mar 2024 16:23:42 -0400
+Date: Fri, 8 Mar 2024 16:23:42 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240308202342.GZ9225@ziepe.ca>
+References: <20240305122935.GB36868@unreal>
+ <20240306144416.GB19711@lst.de>
+ <20240306154328.GM9225@ziepe.ca>
+ <20240306162022.GB28427@lst.de>
+ <20240306174456.GO9225@ziepe.ca>
+ <20240306221400.GA8663@lst.de>
+ <20240307000036.GP9225@ziepe.ca>
+ <20240307150505.GA28978@lst.de>
+ <20240307210116.GQ9225@ziepe.ca>
+ <20240308164920.GA17991@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/10] fs: Initial atomic write support
-Content-Language: en-US
-To: John Garry <john.g.garry@oracle.com>, kbusch@kernel.org, hch@lst.de,
- sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
- djwong@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
- dchinner@redhat.com, jack@suse.cz
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
- ojaswin@linux.ibm.com, linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
- io-uring@vger.kernel.org, nilay@linux.ibm.com, ritesh.list@gmail.com,
- Prasad Singamsetty <prasad.singamsetty@oracle.com>
-References: <20240226173612.1478858-1-john.g.garry@oracle.com>
- <20240226173612.1478858-4-john.g.garry@oracle.com>
- <1f68ab8c-e8c2-4669-a59a-65a645e568a3@kernel.dk>
- <67aa0476-e449-414c-8953-a5d3d0fe6857@oracle.com>
- <eef12540-84b6-4591-a797-6cfea7b28d48@kernel.dk>
- <8fde7b95-fed0-4cfd-a47e-455cccf1a190@oracle.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <8fde7b95-fed0-4cfd-a47e-455cccf1a190@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240308164920.GA17991@lst.de>
 
-On 3/8/24 10:15 AM, John Garry wrote:
-> On 08/03/2024 17:05, Jens Axboe wrote:
->>> And the callers can hardcode rw_type?
->> Yep, basically making the change identical to the aio one. Not sure why
->> you did it differently in those two spots.
+On Fri, Mar 08, 2024 at 05:49:20PM +0100, Christoph Hellwig wrote:
+> On Thu, Mar 07, 2024 at 05:01:16PM -0400, Jason Gunthorpe wrote:
+> > > 
+> > > It's just kinda hard to do.  For aligned IOMMU mapping you'd only
+> > > have one dma_addr_t mappings (or maybe a few if P2P regions are
+> > > involved), so this probably doesn't matter.  For direct mappings
+> > > you'd have a few, but maybe the better answer is to use THP
+> > > more aggressively and reduce the number of segments.
+> > 
+> > Right, those things have all been done. 100GB of huge pages is still
+> > using a fair amount of memory for storing dma_addr_t's.
+> > 
+> > It is hard to do perfectly, but I think it is not so bad if we focus
+> > on the direct only case and simple systems that can exclude swiotlb
+> > early on.
 > 
-> In the aio code, rw_type was readily available. For io_uring it was
-> not, and I chose to derive from something locally available. But
-> that's a bit awkward and is not good for performance, so I'll follow
-> your suggestion.
+> Even with direct mappings only we still need to take care of
+> cache synchronization.
 
-It's literally just one caller back, it's not like you had to look hard
-to spot this. Don't take lazy shortcuts -  it's not very confidence
-inspiring if this is the level of attention to detail that went into
-this patchset.
+Yes, we still have to unmap, but the unmap for cache synchronization
+doesn't need the dma_addr_t to flush the CPU cache.
 
--- 
-Jens Axboe
+> > > If all flows includes multiple non-coalesced regions that just makes
+> > > things very complicated, and that's exactly what I'd want to avoid.
+> > 
+> > I don't see how to avoid it unless we say RDMA shouldn't use this API,
+> > which is kind of the whole point from my perspective..
+> 
+> The DMA API callers really need to know what is P2P or not for
+> various reasons.  And they should generally have that information
+> available, either from pin_user_pages that needs to special case
+> it or from the in-kernel I/O submitter that build it from P2P and
+> normal memory.
 
+I think that is a BIO thing. RDMA just calls with FOLL_PCI_P2PDMA and
+shoves the resulting page list into in a scattertable. It never checks
+if any returned page is P2P - it has no reason to care. dma_map_sg()
+does all the work.
+
+That is the kind of abstraction I am coming to this problem with.
+
+You are looking at BIO where you already needed to split things up for
+other reasons, but I think that is a uniquely block thing that will
+not be shared in other subsystems.
+
+> > If you don't preserve that then we are calling, 4k at a time, a
+> > dma_map_page() which is not anywhere close to the same outcome as what
+> > dma_map_sg did. I may not get contiguous IOVA, I may not get 3 SGLs,
+> > and we call into the IOVA allocator a huge number of times.
+> 
+> Again, your callers must know what is a P2P region and what is not.
+
+I don't see this at all. We don't do this today in RDMA. There is no
+"P2P region".
+
+> > > That's why I really just want 2 cases.  If the caller guarantees the
+> > > range is coalescable and there is an IOMMU use the iommu-API like
+> > > API, else just iter over map_single/page.
+> > 
+> > But how does the caller even know if it is coalescable? Other than the
+> > trivial case of a single CPU range, that is a complicated detail based
+> > on what pages are inside the range combined with the capability of the
+> > device doing DMA. I don't see a simple way for the caller to figure
+> > this out. You need to sweep every page and collect some information on
+> > it. The above is to abstract that detail.
+> 
+> dma_get_merge_boundary already provides this information in terms
+> of the device capabilities.  And given that the callers knows what
+> is P2P and what is not we have all the information that is needed.
+
+Encrypted memory too.
+
+RDMA also doesn't call dma_get_merge_boundary(). It doesn't keep track
+of P2P regions. It doesn't break out encrypted memory. It has no
+purpose to do any of those things.
+
+You fundamentally cannot subdivide a memory registration.
+
+So we could artificially introduce the concept of limited coalescing
+into RDMA, dmabuf and others just to drive this new API - but really
+that feels much much worse than just making the DMA API still able to
+do IOMMU coalescing in more cases.
+
+Even if we did that, it will still be less efficient than today where
+we just call dma_map_sg() on the jumble of pages.
+
+Jason
