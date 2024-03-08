@@ -1,108 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475DC15AF
-	for <linux-block@vger.kernel.org>; Fri,  8 Mar 2024 15:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07927250F3
+	for <linux-block@vger.kernel.org>; Fri,  8 Mar 2024 16:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709912495; cv=none; b=PR0y4w6Z4NYJTRrXae6LyEZHArsB03FMnxDNz2h5vbF7KapmKgfJ6b5zi2qH+9JPvNng9/LpStjqCO05xAEJmJLeh6QEVDYpQM0WsYIAdn8lxxubkceOIhSuI5EUhUmW9p3f4y9mfihP64s19YG+MXXjDjP2iN+DLbFxgDsv+/4=
+	t=1709915311; cv=none; b=HUMZQPJgq4Y3o9kxzx0+CbC35Fa67scs//Cu6rmsQOC+Xopx5OxUH8/dDhwqTVpfVJ06T/QCl3wKklD0eZACh+VPNDVvfybc8hS+ZQy8nmMbbVeARck4uzAxmj8xsPwtbBy67fvBqCEuLx2IL7XHNj/fPm0ug3M7YTikM261nAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709912495; c=relaxed/simple;
-	bh=qgXTjEzUbSTzezT+CcIL+WmyphEt5BFFhf/YzdxcgqE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L2ae2lJRYfWS4aySD6PeZs0toyu2A5He6F27r+WFIoMJ0VSAu/mXGoLfTvKJLkD+CKiA0u1aaQOb+zYslGv0PGNQKhRdcHexyt85NDwOpLlOt4A5adkZqAFQZK15cjdsuzlk0CAFIzCpjdS8O7pFTqwZ2C5SX1okbv/4kjZFQI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfHAwg2y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709915311; c=relaxed/simple;
+	bh=ErBlvQ4p7bEI1tO6f3RNzP2jColJ5qtRK/xB0hKj+wA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=QUsWenphmCz+J9okLBrxv1e+HQ6oAQlViMZ9pfU0gfrV5NrGQlM9M5gDdIZYM+wqxBi9AZLfb03/Hfyqax1x4fLqpFfv4vxlzoo/TK7/DjUtm/GcrEgGqHuKzCF1BPRITmwwsVdBsXw7RzLHyuDNeWLC7I0ntTZMu8wspazQukM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kMj1BYxM; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfHAwg2y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 450B0C433F1;
-	Fri,  8 Mar 2024 15:41:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709912494;
-	bh=qgXTjEzUbSTzezT+CcIL+WmyphEt5BFFhf/YzdxcgqE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hfHAwg2yH4N32Qj5Q2F+aPCXZiWcHTF46B79a6q9Yls/qI7a/I9caKdDaXn/ZomIO
-	 n2iKAnFhXOYVOkhBktvLEw3eJ8MLa2DwOkFnHrY58IwJYIEqdZ5v6hlLaaiea0BN/9
-	 yhDv3u0oSDKC2shoIyBKfTc2widgw5dLha7Bzzs1xaEyxleQk27aQilV2Uc/MKMipR
-	 8mmaJ7Sswjj2oqiSWPXrp7MQITjI1cwsOq76eIF4liF3u/P0tDe9vM9guYASI7t0fh
-	 JsoeNPtHgnTisBa6KGL9Ht9AZf0tkCWSoQwkKQ+lBe6BFDXhRrHY1W5r+0SeHtffM+
-	 5DC+wCSGNoR9A==
-Date: Fri, 8 Mar 2024 08:41:31 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: axboe@fb.com, hch@lst.de, sagi@grimberg.me,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gjoyce@linux.ibm.com
-Subject: Re: [PATCH RESEND] nvme-pci: Fix EEH failure on ppc after subsystem
- reset
-Message-ID: <Zesxq81eJTnOGniB@kbusch-mbp>
-References: <20240209050342.406184-1-nilay@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kMj1BYxM"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3652ab8766cso1493165ab.0
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2024 08:28:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1709915307; x=1710520107; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ntjVS42ftlHHWlmoi41RrRrZrTufP6VSPkdlhkH8HQ=;
+        b=kMj1BYxMoCIGVhZ8VANZ+OuLZkill0RwGWunOcI6otbS3ZgDFuqeOSKRtaNtbGUW2Q
+         u40jautysbhxLBSuAxSrSJ0FCvqabMZdsatUvWMuJ1ai/ADVHN0Fe5VmgNhqsVdHWcNt
+         J9jjo/EB2kGc6FQD2UAyLVS12xgEJ08NXcgZnbPNXINK8SlT/XQKSQfTztN1K13hXOug
+         SpAIdy56n7ACUZVpAaWClm85Wqr7bLiKDc1yGJLObymK2TqzoU95ZSOONFx/1n8AXeYu
+         qUPOa035FyFDw4klc4F9I7Lhx8aCf6xJQw+NUGRDsKQDvzgngOcDq1gnpsjA8N0NSzfD
+         k0gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709915307; x=1710520107;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+ntjVS42ftlHHWlmoi41RrRrZrTufP6VSPkdlhkH8HQ=;
+        b=NbEkbjMgwzl9GHNhdbpPWH1xfJXAdX4fpuZ7LR56JPxeLeNv91qufOpnhyk36hDaVW
+         6rErzHuFNpuv61amQ8grcv+MXf3yS2v5mBHWTUj4arHJVuiG+BG8SgzQEN1NeFeGv+RV
+         8JAcL3KUPDiiVkarXqjEioqbHws7Gomsv2e001xFBIoj0FmaepISSHhnrzCqASTOCZz2
+         F+QbAl26fJd1gJYTFaNw7tqxvd0MnKBrjW6AAUCEQIA1XwwudjG8GjzDL2AN/EXUiWlM
+         TlPhibFzZMj+mbXvKv4YX7JaAuHwnJeiOIa/HByGPVaLOV5FK6q5hLRaw2iObz35KXBj
+         X2qg==
+X-Gm-Message-State: AOJu0YzLytLwExS+XwNf+Aw1b8eg3eoRPAQsdpSkA6wFO/7VlsGcHuiL
+	lgkvq832o+/Kq8Zh/93RxxN9KJLI8/YxUhvEqKje+5H1pK2NibnftBc7UOVTra2kBZZMoe66vwL
+	r
+X-Google-Smtp-Source: AGHT+IGlmv+Xfz3FSUnrE/HlafWHMeCSnKK5su+cTLXywqGsEs2DLcu+CsOsjfsNoD5ACHUT49tW0w==
+X-Received: by 2002:a05:6602:4215:b0:7c8:814f:923b with SMTP id cb21-20020a056602421500b007c8814f923bmr2306902iob.1.1709915306647;
+        Fri, 08 Mar 2024 08:28:26 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id k22-20020a023356000000b00474f8940230sm2534947jak.11.2024.03.08.08.28.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 08:28:26 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: linux-block@vger.kernel.org, kernel@pengutronix.de
+In-Reply-To: <a00aea8201ea85ae726411bb0fb015ea026ff40a.1709886922.git.u.kleine-koenig@pengutronix.de>
+References: <a00aea8201ea85ae726411bb0fb015ea026ff40a.1709886922.git.u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH] block/swim: Convert to platform remove callback
+ returning void
+Message-Id: <170991530600.873480.10827635919569308902.b4-ty@kernel.dk>
+Date: Fri, 08 Mar 2024 09:28:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240209050342.406184-1-nilay@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Fri, Feb 09, 2024 at 10:32:16AM +0530, Nilay Shroff wrote:
-> @@ -2776,6 +2776,14 @@ static void nvme_reset_work(struct work_struct *work)
->   out_unlock:
->  	mutex_unlock(&dev->shutdown_lock);
->   out:
-> +	/*
-> +	 * If PCI recovery is ongoing then let it finish first
-> +	 */
-> +	if (pci_channel_offline(to_pci_dev(dev->dev))) {
-> +		dev_warn(dev->ctrl.device, "PCI recovery is ongoing so let it finish\n");
-> +		return;
-> +	}
-> +
->  	/*
->  	 * Set state to deleting now to avoid blocking nvme_wait_reset(), which
->  	 * may be holding this pci_dev's device lock.
-> @@ -3295,9 +3303,11 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
->  	case pci_channel_io_frozen:
->  		dev_warn(dev->ctrl.device,
->  			"frozen state error detected, reset controller\n");
-> -		if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
-> -			nvme_dev_disable(dev, true);
-> -			return PCI_ERS_RESULT_DISCONNECT;
-> +		if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING) {
-> +			if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
-> +				nvme_dev_disable(dev, true);
-> +				return PCI_ERS_RESULT_DISCONNECT;
-> +			}
->  		}
->  		nvme_dev_disable(dev, false);
->  		return PCI_ERS_RESULT_NEED_RESET;
 
-I get what you're trying to do, but it looks racy. The reset_work may
-finish before pci sets channel offline, or the error handling work
-happens to see RESETTING state, but then transitions to CONNECTING state
-after and deadlocks on the '.resume()' side. You are counting on a very
-specific sequence tied to the PCIe error handling module, and maybe you
-are able to count on that sequence for your platform in this unique
-scenario, but these link errors could happen anytime.
+On Fri, 08 Mar 2024 09:51:04 +0100, Uwe Kleine-König wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+> 
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+> 
+> [...]
 
-And nvme subsystem reset is just odd, it's not clear how it was intended
-to be handled. It takes the links down so seems like it requires
-re-enumeration from a pcie hotplug driver, and that's kind of how it was
-expected to work here, but your platform has a special way to contain
-the link event and bring things back up the way they were before. And
-the fact you *require* IO to be in flight just so the timeout handler
-can dispatch a non-posted transaction 30 seconds later to trigger EEH is
-also odd. Why can't EEH just detect the link down event directly?
+Applied, thanks!
 
-This driver unfortunately doesn't handle errors during a reset well.
-Trying to handle that has been problematic, so the driver just bails if
-anything goes wrong at this critical initialization point. Maybe we need
-to address the reset/initialization failure handling more generically
-and delegate the teardown or retry decision to something else. Messing
-with that is pretty fragile right now, though.
+[1/1] block/swim: Convert to platform remove callback returning void
+      (no commit info)
 
-Or you could just re-enumerate the slot.
+Best regards,
+-- 
+Jens Axboe
 
-I don't know, sorry my message is not really helping much to get this
-fixed.
+
+
