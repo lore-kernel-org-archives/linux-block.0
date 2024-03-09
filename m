@@ -1,97 +1,77 @@
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FE828E22;
-	Sat,  9 Mar 2024 12:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6004439F;
+	Sat,  9 Mar 2024 16:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709987466; cv=none; b=ppc8IZCHZ50tMmggnvTvfuGs7o+e4OpP4jlJuGGQ+U7erCO3MPQgA91QKlDGoVjS0i2brvRockw/zehd1pc25tFee1VLloDLa3R6ODGHAj1jE2D+Uv6AjbaMl//6YyIS3pqRptxSTL27sDZdKxDhm+MZT6B640NP0PGrZGnF8i4=
+	t=1710000873; cv=none; b=EEy1UtV9lfjqUe0EgZJYRs/DhmaoC1gMYPZ48tEwCHnLOmTWdSP+iB2x/dsibk17NvgxdW8jKrt0hYAv7hinNl3dQ4S5FDl+SVbzNVfTPXKVlpLIdvONPTFBgMt/Dn2Oj679gk4uG+3F2Lgw4LHrxJlE27ouqXEqQYD1XNSgXnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709987466; c=relaxed/simple;
-	bh=W7YTL00nz29DAGJaWkG4DPmr0d/GljxYJK7IQ9Pp/nU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aER59QFOaiOxlqtH/OF8MoBKC8rdUgDDAaMrERlNanKFARraOQyghjwxOpJhyWfbCH4IVacLUbo5Dax1CbYELvuLa3SOSi0PIM+UDaNVRbki3WbXc8acBxYGU1H1uQRx3OvL3FSfEgKWArzvTyQTDCaJFP2k3PR7ie+tj/A6wGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=PSBu2eQy; arc=none smtp.client-ip=185.70.43.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="PSBu2eQy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=m3froqkqbjc2pp2zduek3yuqkm.protonmail; t=1709987453; x=1710246653;
-	bh=05L/QFx4kyM1UqnbGE/ORzxwoDQ/tgXCO+v998Lwz+E=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=PSBu2eQyi/6Nk+GyUT6L1k3cKFcixgwyETajG2gV1Qeq02Ai/SwEMRGeqY1Kir5Gv
-	 9l3D5S1GZs+81EnrbegJQ2isiPgt8rEFXEx3HX4TMdsnbtpkFgAxMQiG62186QWHLz
-	 ggOhyc5Vlt3XCa7GbXUP3qdqapco38AckZE4pADWONbEK+ftVO9fewqVRvgN9JV1EH
-	 a6R2ugY1IRHaoaWhRjIMe0l5HSl9lG84yuSHohnPJ9rO6DfJADS0xHLjWAl0CRrzLh
-	 bop9NUyT8H59LU8gq1Wo5SR1SxVUopAiplXT2EAMZcsC/hDbPZPTOMCRggOgJt9ky/
-	 P0NwT+znhTzsA==
-Date: Sat, 09 Mar 2024 12:30:49 +0000
-To: Andreas Hindborg <nmi@metaspace.dk>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 04/11] rust: block: introduce `kernel::block::bio` module
-Message-ID: <6cd89162-a11f-4a2f-a609-b6d51caf6ba1@proton.me>
-In-Reply-To: <878r34aboo.fsf@metaspace.dk>
-References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-5-nmi@metaspace.dk> <-SiJ5paRDIUkH1WEWhGhEjhIgFbSo5PJAvac53bTnBZ5o41DR-kNWZEQBsnKeW1FRJh35siVFRrx54L0M6ebSzl0rzecgcDjqZFGRa9uypE=@proton.me> <87a5pcyqf8.fsf@metaspace.dk> <878r34aboo.fsf@metaspace.dk>
-Feedback-ID: 71780778:user:proton
+	s=arc-20240116; t=1710000873; c=relaxed/simple;
+	bh=I+7esQ6+7JWFVXLFfl3zXTTqxKwmpRLYFXlpXXMY+wg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tNXvnl+se3xWBiNr8gZyRkURdkWRoV9Lr9QdnxT7nfdaf7kTACbBYDedGdowGCkpOVKFGcIydJqlPRX3/goVbpQUkV26OSH7yXrovYXQWhFACjqAgx86vzZ7BSYsxdbQg/VuFzZScYA2WdQdCt2mqUEhBioll3Gf5LDdQcrwYdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id B0C9D68BFE; Sat,  9 Mar 2024 17:14:18 +0100 (CET)
+Date: Sat, 9 Mar 2024 17:14:18 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
+ steps
+Message-ID: <20240309161418.GA27113@lst.de>
+References: <20240306144416.GB19711@lst.de> <20240306154328.GM9225@ziepe.ca> <20240306162022.GB28427@lst.de> <20240306174456.GO9225@ziepe.ca> <20240306221400.GA8663@lst.de> <20240307000036.GP9225@ziepe.ca> <20240307150505.GA28978@lst.de> <20240307210116.GQ9225@ziepe.ca> <20240308164920.GA17991@lst.de> <20240308202342.GZ9225@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240308202342.GZ9225@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 2/28/24 15:31, Andreas Hindborg wrote:
->=20
-> Hi Benno,
->=20
-> "Andreas Hindborg (Samsung)" <nmi@metaspace.dk> writes:
->=20
-> <cut>
->=20
->>>> +);
->>>> +
->>>> +impl<'a> Bio<'a> {
->>>> +    /// Returns an iterator over segments in this `Bio`. Does not con=
-sider
->>>> +    /// segments of other bios in this bio chain.
->>>> +    #[inline(always)]
->>>
->>> Why are these `inline(always)`? The compiler should inline them
->>> automatically?
->>
->> No, the compiler would not inline into modules without them. I'll check
->> again if that is still the case.
->=20
-> I just tested this again. If I remove the attribute, the compiler will
-> inline some of the functions but not others. I guess it depends on the
-> inlining heuristics of rustc. The majority of the attributes I have put
-> is not necessary, since the compiler will inline by default. But for
-> instance `<BioIterator as Iterator>::next` is not inlined by default and
-> it really should be inlined.
->=20
-> Since most of the attributes do not change compiler default behavior, I
-> would rather tag all functions that I want inlined than have to
-> disassemble build outputs to check which functions actually need the
-> attribute. With this approach, we are not affected by changes to
-> compiler heuristics either.
->=20
-> What do you think?
+On Fri, Mar 08, 2024 at 04:23:42PM -0400, Jason Gunthorpe wrote:
+> > The DMA API callers really need to know what is P2P or not for
+> > various reasons.  And they should generally have that information
+> > available, either from pin_user_pages that needs to special case
+> > it or from the in-kernel I/O submitter that build it from P2P and
+> > normal memory.
+> 
+> I think that is a BIO thing. RDMA just calls with FOLL_PCI_P2PDMA and
+> shoves the resulting page list into in a scattertable. It never checks
+> if any returned page is P2P - it has no reason to care. dma_map_sg()
+> does all the work.
 
-I think that you should do whatever leads to the best results in
-practice. I know that the compiler developers spend considerable time
-coming up with smart algorithms for deciding when and when not to inline
-functions. But they aren't perfect, so if you find them necessary then
-please add them.
-What I want to avoid is that we end up tagging every function
-`inline(always)`, or at least we do not check if it makes a difference.
-
---=20
-Cheers,
-Benno
-
+Right now it does, but that's not really a good interface.  If we have
+a pin_user_pages variant that only pins until the next relevant P2P
+boundary and tells you about we can significantly simplify the overall
+interface.
