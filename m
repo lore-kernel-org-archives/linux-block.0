@@ -1,109 +1,97 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE2A20F1
-	for <linux-block@vger.kernel.org>; Sat,  9 Mar 2024 01:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FE828E22;
+	Sat,  9 Mar 2024 12:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709946871; cv=none; b=YE8tlw25yLbRo7renw50oBCJpsx8ZA/TSl4SoMRFUL8oXCTUnjDG0Ullx19ii82q1F8cqzkS6UQPvgisZ35hGV4+nVwE4NVWeCTKScKcMWK4VQvYiqDlqKoOKa677VEH8cbqef7JVCai9V+HiKYNEZn/KAlKHn/o05ut/8g3EMc=
+	t=1709987466; cv=none; b=ppc8IZCHZ50tMmggnvTvfuGs7o+e4OpP4jlJuGGQ+U7erCO3MPQgA91QKlDGoVjS0i2brvRockw/zehd1pc25tFee1VLloDLa3R6ODGHAj1jE2D+Uv6AjbaMl//6YyIS3pqRptxSTL27sDZdKxDhm+MZT6B640NP0PGrZGnF8i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709946871; c=relaxed/simple;
-	bh=PVSSW/TRZScbGAXptUtzNMhjOI0JAjP3o2LHf4YtFlE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ufZyJZWL/E8Tu+Y7TOfR3POfg4Z1BJh5pv5KpjavKrUSVf1zpgrfueCRsQhj7gboE1uXJEe071keJWfjo8BKsxyXIazCxWhtUFQuNi8Q3c1nYHIKPi9MuptStJezqSLmhJMOy0fcwYo4iAr22NnKANlIsb+M4ouifCYb4ZvvY18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Y1ZITEOE; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1709987466; c=relaxed/simple;
+	bh=W7YTL00nz29DAGJaWkG4DPmr0d/GljxYJK7IQ9Pp/nU=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aER59QFOaiOxlqtH/OF8MoBKC8rdUgDDAaMrERlNanKFARraOQyghjwxOpJhyWfbCH4IVacLUbo5Dax1CbYELvuLa3SOSi0PIM+UDaNVRbki3WbXc8acBxYGU1H1uQRx3OvL3FSfEgKWArzvTyQTDCaJFP2k3PR7ie+tj/A6wGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=PSBu2eQy; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Y1ZITEOE"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-607c5679842so27277487b3.2
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2024 17:14:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1709946868; x=1710551668; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KPz2z6DvnJxq/mvZY2AzEM7nepXgQps0sd3FnWYy8AY=;
-        b=Y1ZITEOEQMcPGo0IG+gwiGch8CnQXfEH4HEZKP2VNMxLUEtC0/XKnlmtFb01oTOAoM
-         bUlhF//VTz39WdyQJ4aNxBCGDXS2HHz8fRKSaeXfnzQg/WmzaJdmlHo4tS+0cUaCQBMS
-         pUqke+3r86nVSAScKNFYk/sFgex4OoZh72SHtjI0gIV2MIR72aHwQcSQLpNqlG92Vp3L
-         cdKjHiDqA44uJNzOECaQdtY14Z5kBvXFj6Q7wfZWgwbuYjW9o3QX6cQSt3btbzM7Tak3
-         mE7eNvUokKYai8U35gAQ+n09p7inXwVrvXZLcL7JCci6k5+Q2SDk1+MZ8k25c8zXXXre
-         CZHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709946868; x=1710551668;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KPz2z6DvnJxq/mvZY2AzEM7nepXgQps0sd3FnWYy8AY=;
-        b=viKbzcRoxDog4ICWQUZoLuGl5FWM0V8ar/3MJziNyczFLFqsEZRFGi5QwHBduLpzkX
-         u265QQwdymus06hzCQjvHv4OiHJvDZJXicvbp+mJ5Do+3u57DsrkwlF63zmxAfPJ19R6
-         FpUwM5jB4OJVKvwOvDZ8cynfqXm6G+3UkdaASQkk+rDhGgVLnBqirQ2nPcm2V5J4nSks
-         CJa/rtYySkPS0+Mx1OcHzDtmE0Y2kZFEUXa9cQgFnsN0Yun+ddUa/JJXUDL0L5ZwqmX3
-         YQSlWbXO5ohoLbSmQKz91YKbcjHyRmy0wujlCi9ySYN9YpQyLvo9nKOsk2fX04a5BVBl
-         7miw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUNHlRN1c133LgJDEUViwu04LUoMrCLcfZZF/kPMdAxKOHlSqOnE1M0zO49FeM0AjlwXv865f7R/YzMPXTq147xtQhCOtjOOD0SuQ=
-X-Gm-Message-State: AOJu0YwOUBTGIE3UQhPB7XZoSu2UAJtVZgIaVOyd4jO6bF8BR2YGMQ7j
-	jyEIptd0lH8Z9sNneVHWvso5dANklREUDiZcqkPji1hbgymr2sGEuOw+Vlf2vjir4plq4KTN3Ta
-	FiaOUfoZXQeE1j0HMG4Scx6t6MtBlMuNFhcRl
-X-Google-Smtp-Source: AGHT+IG/iVw0xp4cUGbrbuHW4JP6YIUG2WhfFnWUrnT+aZkEjbYKTgvQfRu4/7uLG7cpfDOqG4dr9VoK5RFcwZhesog=
-X-Received: by 2002:a25:b227:0:b0:dcd:1043:23c with SMTP id
- i39-20020a25b227000000b00dcd1043023cmr780907ybj.1.1709946868255; Fri, 08 Mar
- 2024 17:14:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="PSBu2eQy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=m3froqkqbjc2pp2zduek3yuqkm.protonmail; t=1709987453; x=1710246653;
+	bh=05L/QFx4kyM1UqnbGE/ORzxwoDQ/tgXCO+v998Lwz+E=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=PSBu2eQyi/6Nk+GyUT6L1k3cKFcixgwyETajG2gV1Qeq02Ai/SwEMRGeqY1Kir5Gv
+	 9l3D5S1GZs+81EnrbegJQ2isiPgt8rEFXEx3HX4TMdsnbtpkFgAxMQiG62186QWHLz
+	 ggOhyc5Vlt3XCa7GbXUP3qdqapco38AckZE4pADWONbEK+ftVO9fewqVRvgN9JV1EH
+	 a6R2ugY1IRHaoaWhRjIMe0l5HSl9lG84yuSHohnPJ9rO6DfJADS0xHLjWAl0CRrzLh
+	 bop9NUyT8H59LU8gq1Wo5SR1SxVUopAiplXT2EAMZcsC/hDbPZPTOMCRggOgJt9ky/
+	 P0NwT+znhTzsA==
+Date: Sat, 09 Mar 2024 12:30:49 +0000
+To: Andreas Hindborg <nmi@metaspace.dk>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, linux-kernel@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [RFC PATCH 04/11] rust: block: introduce `kernel::block::bio` module
+Message-ID: <6cd89162-a11f-4a2f-a609-b6d51caf6ba1@proton.me>
+In-Reply-To: <878r34aboo.fsf@metaspace.dk>
+References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-5-nmi@metaspace.dk> <-SiJ5paRDIUkH1WEWhGhEjhIgFbSo5PJAvac53bTnBZ5o41DR-kNWZEQBsnKeW1FRJh35siVFRrx54L0M6ebSzl0rzecgcDjqZFGRa9uypE=@proton.me> <87a5pcyqf8.fsf@metaspace.dk> <878r34aboo.fsf@metaspace.dk>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1709768084-22539-1-git-send-email-wufan@linux.microsoft.com>
-In-Reply-To: <1709768084-22539-1-git-send-email-wufan@linux.microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 8 Mar 2024 20:14:17 -0500
-Message-ID: <CAHC9VhQ90Z9HbSJWxNoH20_b92m6_5QWJAJ9ZkSR_1PWUAvCsw@mail.gmail.com>
-Subject: Re: [RFC PATCH v14 00/19] Integrity Policy Enforcement LSM (IPE)
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, 
-	tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, 
-	snitzer@kernel.org, eparis@redhat.com, linux-doc@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org, 
-	dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 6, 2024 at 6:34=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> w=
-rote:
->
-> Overview:
-> ---------
->
-> IPE is a Linux Security Module which takes a complimentary approach to
-> access control. Whereas existing mandatory access control mechanisms
-> base their decisions on labels and paths, IPE instead determines
-> whether or not an operation should be allowed based on immutable
-> security properties of the system component the operation is being
-> performed on.
->
-> IPE itself does not mandate how the security property should be
-> evaluated, but relies on an extensible set of external property providers
-> to evaluate the component. IPE makes its decision based on reference
-> values for the selected properties, specified in the IPE policy.
->
-> The reference values represent the value that the policy writer and the
-> local system administrator (based on the policy signature) trust for the
-> system to accomplish the desired tasks.
->
-> One such provider is for example dm-verity, which is able to represent
-> the integrity property of a partition (its immutable state) with a digest=
-.
->
-> IPE is compiled under CONFIG_SECURITY_IPE.
+On 2/28/24 15:31, Andreas Hindborg wrote:
+>=20
+> Hi Benno,
+>=20
+> "Andreas Hindborg (Samsung)" <nmi@metaspace.dk> writes:
+>=20
+> <cut>
+>=20
+>>>> +);
+>>>> +
+>>>> +impl<'a> Bio<'a> {
+>>>> +    /// Returns an iterator over segments in this `Bio`. Does not con=
+sider
+>>>> +    /// segments of other bios in this bio chain.
+>>>> +    #[inline(always)]
+>>>
+>>> Why are these `inline(always)`? The compiler should inline them
+>>> automatically?
+>>
+>> No, the compiler would not inline into modules without them. I'll check
+>> again if that is still the case.
+>=20
+> I just tested this again. If I remove the attribute, the compiler will
+> inline some of the functions but not others. I guess it depends on the
+> inlining heuristics of rustc. The majority of the attributes I have put
+> is not necessary, since the compiler will inline by default. But for
+> instance `<BioIterator as Iterator>::next` is not inlined by default and
+> it really should be inlined.
+>=20
+> Since most of the attributes do not change compiler default behavior, I
+> would rather tag all functions that I want inlined than have to
+> disassemble build outputs to check which functions actually need the
+> attribute. With this approach, we are not affected by changes to
+> compiler heuristics either.
+>=20
+> What do you think?
 
-All of this looks reasonable to me, I see there have been some minor
-spelling/grammar corrections made, but nothing too serious.  If we can
-get ACKs from the fsverity and device-mapper folks I can merge this
-once the upcoming merge window closes in a few weeks.
+I think that you should do whatever leads to the best results in
+practice. I know that the compiler developers spend considerable time
+coming up with smart algorithms for deciding when and when not to inline
+functions. But they aren't perfect, so if you find them necessary then
+please add them.
+What I want to avoid is that we end up tagging every function
+`inline(always)`, or at least we do not check if it makes a difference.
 
 --=20
-paul-moore.com
+Cheers,
+Benno
+
