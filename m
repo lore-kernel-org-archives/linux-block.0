@@ -1,202 +1,165 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A9B16FF22
-	for <linux-block@vger.kernel.org>; Sat,  9 Mar 2024 18:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CC24A2A
+	for <linux-block@vger.kernel.org>; Sat,  9 Mar 2024 19:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710009189; cv=none; b=LrNUIyrkbNCiUix4DktKvMjh1YAOl8CCRmv4QjY23PiNGOWd0zbpQi+PKuS0CNVrUkZhNi4ybCrK23HYGs+w6p3dvU8aTno3w4A3NkzICBj/lkc2P3lLUdrN68UQ86Jn+SHbzIpcrMmSQ6T6u6CStdV6Cm1A2qyGgrhDLtPtxHM=
+	t=1710011148; cv=none; b=hnwXL9sfST/A68i4l+pqJWXF5PIwVNAz5dGAxO5Xp98Htpo7vGJPHM603g10s+JtmVo1Z3Tcj22Eku5u9CA5cHt2exFhKEFTb7CSNCAFLMWMObL1fcf6DsTKCI1NDx0yQkWb4MrZicWXSVR9r6RLDAObxxJ+P5bKc9Yrk4X9aYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710009189; c=relaxed/simple;
-	bh=1fU0pKG8/0LFLNcPep/nKVA9KiACBo4yfO2ECL0zsQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m7FaJe7GfA7JUc385G4AAtTtDSaoBD50sMJk9D4yHotratUb+Y90YAjBnXabCehEL9ynNI5RRr4KLda7LT9axWvrTciaEwRxPEYL4eKLoN8ShDT4EGgEztxbsH6B1lL8+9CBVQr5M2oV874WekSrhQ1TpfVM37O6Vuwv8rm7WFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-690bddc83cfso7452766d6.3
-        for <linux-block@vger.kernel.org>; Sat, 09 Mar 2024 10:33:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710009186; x=1710613986;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7ekOfFtbKaJeQy59aa4hOBANuKC24c03ign7FqwJuFs=;
-        b=L405uEA1r2Plt1ADIQGh6JmQTgQ3ZQcly1WaS2QpqnkWHZMrhhgFOzs9lqrviLsNAy
-         8GUEcy9fdUpIVqSvODQxfoKjWVz41ygd8PUSo7n0bDucanY0qGuqrkn8eg2A+uaesUWI
-         jmgykd1u1FTf1tG1fIweSw3IeTQc1d1SMdj5yKGLpQfmSR3YbWfJ+hQhxmuTdTm0cdZV
-         5JKfb2OWJqGc+wjpHn6oDQxlhGVFPv8gVYTqmQwBnBYMbK+MY7gOmFPQVij2RVMU6wcs
-         06NzaIjAuWLCb2JdA9lteoHLSyOSPevDZdq1PZVEjjex4GImTFyERc7fRFwB+R4Sz1vR
-         L0Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCUU+sZM/f7Q+Yx+PaClRZHQqOCWozfpQMVyWY9sJIzc6b8meJplq5IHlkKBgqnjsc3iW0jn4f6trONSlydvIlCop/1NrxzDuciPpqc=
-X-Gm-Message-State: AOJu0YxEUw8ZJXaT+ScgK38Qxs/4TPHmdwOzU6Jea0SSA/u0XRSR44kD
-	8chGSFarsKBMBhqSX1ooX78SGfDTP6LVjqLNf56I8hrVa4ESImCna1X4s24t5H/S09GDnDOvLY0
-	=
-X-Google-Smtp-Source: AGHT+IGIDSHTMyTRxkLk6KxKccS5blwkrTouHauzSgk/zTy0xXE7hrVjqa547UsDNe+V3CdtxtBidw==
-X-Received: by 2002:a0c:fac1:0:b0:690:964e:9d6e with SMTP id p1-20020a0cfac1000000b00690964e9d6emr2601486qvo.25.1710009185702;
-        Sat, 09 Mar 2024 10:33:05 -0800 (PST)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id bp13-20020a05621407ed00b006903af52cbfsm1140440qvb.40.2024.03.09.10.33.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Mar 2024 10:33:05 -0800 (PST)
-Date: Sat, 9 Mar 2024 13:33:04 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, agk@redhat.com, mpatocka@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org
-Subject: Re: dm: set the correct discard_sectors limit
-Message-ID: <ZeyrYB-XKa08P-2F@redhat.com>
-References: <20240309164140.719752-1-hch@lst.de>
+	s=arc-20240116; t=1710011148; c=relaxed/simple;
+	bh=UhUKb3D9VBa0bXn3vZL+YanzX/g1iWS+nMH4/MQ8IcU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mX8wVaaksmqR1Bv3ZUGsMU7vJ1rjdL9pV7eZM4dxq7zaXqjZ7FSSNCzS22HpwAkfZZPxD+qn6PJv4s6UKGkG/M+zrAshxTSAfC9vc0+bQQL/OFVwaJ+ze5BYgMHXblkxI7fSakEvk675/dz8XKrmss16GJdceXtuUpc2NpxMEtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GDwE+pdh; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GDwE+pdh"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 429HR40w019788;
+	Sat, 9 Mar 2024 19:05:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=UZAFognNk+AYCGOevK2lWXxE6/LCjw8XeD/hiikS/DY=;
+ b=GDwE+pdhgPQLYmK1CiqZnA05pD0q813/PplQw2TdPOdGqdAVi4LdzjkyXp+PISydaRpJ
+ PsP0jEGmBZwUVFY7fpnKFKex9eEnUqsBu/egTLBLaCxL9F2WeQMbUkzEIgLAM28gvE5p
+ 3jMJb8LmoQtXX9CWvGAgoD1O/OXqnzcRQDZz6Iejfq9FzufSei1OhS47wbPQICF2g5jQ
+ g3kHSV7tAAEBAaqf/ILev5ORLEmAkPrhXHvC6kp0MvJSOC9gwKg+/QQVF8ZLPjGd25kJ
+ L0+7YZ3YuQp26eaH8PpHUcxBfWez/ESGguBw6cvwiTOPYL+02Zz81mUGHzZw4f62S9S3 zA== 
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wrv64rw5q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 09 Mar 2024 19:05:15 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 429HBnxG024204;
+	Sat, 9 Mar 2024 19:05:14 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wpjwsydfb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 09 Mar 2024 19:05:14 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 429J5BhC50332080
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 9 Mar 2024 19:05:13 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8D14558056;
+	Sat,  9 Mar 2024 19:05:11 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5F5D258052;
+	Sat,  9 Mar 2024 19:05:08 +0000 (GMT)
+Received: from [9.171.55.210] (unknown [9.171.55.210])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Sat,  9 Mar 2024 19:05:07 +0000 (GMT)
+Message-ID: <301b8f41-a146-497a-916f-97d91829d28c@linux.ibm.com>
+Date: Sun, 10 Mar 2024 00:35:06 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240309164140.719752-1-hch@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] nvme-pci: Fix EEH failure on ppc after subsystem
+ reset
+Content-Language: en-US
+To: Keith Busch <kbusch@kernel.org>
+Cc: linux-nvme@lists.infradead.org, axboe@fb.com, hch@lst.de, sagi@grimberg.me,
+        linux-block@vger.kernel.org, gjoyce@linux.ibm.com
+References: <20240209050342.406184-1-nilay@linux.ibm.com>
+ <Zesxq81eJTnOGniB@kbusch-mbp>
+ <039541c8-2e13-442e-bd5b-90a799a9851a@linux.ibm.com>
+ <ZeyD6xh0LGZyRBfO@kbusch-mbp>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <ZeyD6xh0LGZyRBfO@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3q-mfBjixf7DtrWo9FVDsDe3511wwCem
+X-Proofpoint-ORIG-GUID: 3q-mfBjixf7DtrWo9FVDsDe3511wwCem
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-09_03,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 lowpriorityscore=0 clxscore=1015 adultscore=0 spamscore=0
+ phishscore=0 impostorscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2403090157
 
-On Sat, Mar 09 2024 at 11:41P -0500,
-Christoph Hellwig <hch@lst.de> wrote:
 
-> Since commit 0034af036554 ("block: make
-> /sys/block/<dev>/queue/discard_max_bytes writeable") there are two
-> max_discard_sectors limits, one provided by the driver and one set by the
-> user to optionally reduce the size below the hardware or driver limits.
-> Usage of the extra hw limits has been a bit convoluted and both were
-> set by the same driver API, leading to potential overrides of the user
-> setting by the driver updating the limits.
+
+On 3/9/24 21:14, Keith Busch wrote:
+> On Sat, Mar 09, 2024 at 07:59:11PM +0530, Nilay Shroff wrote:
+>> On 3/8/24 21:11, Keith Busch wrote:
+>>> On Fri, Feb 09, 2024 at 10:32:16AM +0530, Nilay Shroff wrote:
+>>>> @@ -2776,6 +2776,14 @@ static void nvme_reset_work(struct work_struct *work)
+>>>>   out_unlock:
+>>>>  	mutex_unlock(&dev->shutdown_lock);
+>>>>   out:
+>>>> +	/*
+>>>> +	 * If PCI recovery is ongoing then let it finish first
+>>>> +	 */
+>>>> +	if (pci_channel_offline(to_pci_dev(dev->dev))) {
+>>>> +		dev_warn(dev->ctrl.device, "PCI recovery is ongoing so let it finish\n");
+>>>> +		return;
+>>>> +	}
+>>>> +
+>>>>  	/*
+>>>>  	 * Set state to deleting now to avoid blocking nvme_wait_reset(), which
+>>>>  	 * may be holding this pci_dev's device lock.
+>>>> @@ -3295,9 +3303,11 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
+>>>>  	case pci_channel_io_frozen:
+>>>>  		dev_warn(dev->ctrl.device,
+>>>>  			"frozen state error detected, reset controller\n");
+>>>> -		if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
+>>>> -			nvme_dev_disable(dev, true);
+>>>> -			return PCI_ERS_RESULT_DISCONNECT;
+>>>> +		if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING) {
+>>>> +			if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
+>>>> +				nvme_dev_disable(dev, true);
+>>>> +				return PCI_ERS_RESULT_DISCONNECT;
+>>>> +			}
+>>>>  		}
+>>>>  		nvme_dev_disable(dev, false);
+>>>>  		return PCI_ERS_RESULT_NEED_RESET;
+>>>
+>>> I get what you're trying to do, but it looks racy. The reset_work may
+>>> finish before pci sets channel offline, or the error handling work
+>>> happens to see RESETTING state, but then transitions to CONNECTING state
+>>> after and deadlocks on the '.resume()' side. You are counting on a very
+>>> specific sequence tied to the PCIe error handling module, and maybe you
+>>> are able to count on that sequence for your platform in this unique
+>>> scenario, but these link errors could happen anytime.
+>>>
+>> I am not sure about the deadlock in '.resume()' side you mentioned above.
+>> Did you mean that deadlock occur due to someone holding this pci_dev's device lock?
+>> Or deadlock occur due to the flush_work() from nvme_error_resume() would never 
+>> return?
 > 
-> With the new atomic queue limits API the driver should only set the hw
-> limit, but I forgot to convert dm over to that as it was already using
-> a scheme where the queue_limits are passed around.  Fix dm to update
-> the max_hw_discard_sectors limits.
+> Your patch may observe a ctrl in "RESETTING" state from
+> error_detected(), then disable the controller, which quiesces the admin
+> queue. Meanwhile, reset_work may proceed to CONNECTING state and try
+> nvme_submit_sync_cmd(), which blocks forever because no one is going to
+> unquiesce that admin queue.
 > 
-> Note that this still leaves the non-hw update in place, which should
-> be removed to not override the user settings.  As that is a behavior
-> change I do not want to do it at the very end of the merge window.
+OK I think I got your point. However, it seems that even without my patch
+the above mentioned deadlock could still be possible. 
+Without my patch, if error_detcted() observe a ctrl in "RESETTING" state then 
+it still invokes nvme_dev_disable(). The only difference with my patch is that 
+error_detected() returns the PCI_ERS_RESULT_NEED_RESET instead of PCI_ERS_RESULT_DISCONNECT.
 
-That 2015 commit (0034af036554) was really ham-handed, not sure how
-I've remained unaware of this duality (with soft and hard discard
-limits) until now BUT there is quite a bit of DM code that only
-concerns itself with max_discard_sectors and discard_granularity.
+Regarding the deadlock, it appears to me that reset_work races with nvme_dev_disable()
+and we may want to extend the shutdown_lock in reset_work so that nvme_dev_disable() 
+can't interfere with admin queue while reset_work accesses the admin queue. I think
+we can fix this case. I would send PATCH v2 with this fix for review, however, please let 
+me know if you have any other concern before I spin a new patch.
 
-Anyway, I'm not quite sure what you're referring to, only code that is
-still setting max_discard_sectors is drivers/md/dm.c:disable_discard
-
-> This fixes a regression where dm bio poison v1 warns about exceeding
-> the discard bio size when running xfstests generic/500.
-
-Meaning max_discard_sectors > max_hw_discard_sectors? What changed to
-expose this?
-
-Also, typo in above commit message: s/dm bio poison/dm bio prison/
+Thanks,
+--Nilay
 
 
-> Fixes: 8e0ef4128694 ("dm: use queue_limits_set")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/md/dm-cache-target.c | 5 +++--
->  drivers/md/dm-clone-target.c | 3 ++-
->  drivers/md/dm-log-writes.c   | 2 +-
->  drivers/md/dm-snap.c         | 2 +-
->  drivers/md/dm-thin.c         | 5 +++--
->  drivers/md/dm.c              | 1 +
->  6 files changed, 11 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/md/dm-cache-target.c b/drivers/md/dm-cache-target.c
-> index 911f73f7ebbaa0..71d7824c731862 100644
-> --- a/drivers/md/dm-cache-target.c
-> +++ b/drivers/md/dm-cache-target.c
-> @@ -3394,8 +3394,9 @@ static void set_discard_limits(struct cache *cache, struct queue_limits *limits)
->  
->  	if (!cache->features.discard_passdown) {
->  		/* No passdown is done so setting own virtual limits */
-> -		limits->max_discard_sectors = min_t(sector_t, cache->discard_block_size * 1024,
-> -						    cache->origin_sectors);
-> +		limits->max_hw_discard_sectors =
-> +			min_t(sector_t, cache->discard_block_size * 1024,
-> +					cache->origin_sectors);
->  		limits->discard_granularity = cache->discard_block_size << SECTOR_SHIFT;
->  		return;
->  	}
-> diff --git a/drivers/md/dm-clone-target.c b/drivers/md/dm-clone-target.c
-> index 94b2fc33f64be3..861a8ff524154f 100644
-> --- a/drivers/md/dm-clone-target.c
-> +++ b/drivers/md/dm-clone-target.c
-> @@ -2050,7 +2050,8 @@ static void set_discard_limits(struct clone *clone, struct queue_limits *limits)
->  	if (!test_bit(DM_CLONE_DISCARD_PASSDOWN, &clone->flags)) {
->  		/* No passdown is done so we set our own virtual limits */
->  		limits->discard_granularity = clone->region_size << SECTOR_SHIFT;
-> -		limits->max_discard_sectors = round_down(UINT_MAX >> SECTOR_SHIFT, clone->region_size);
-> +		limits->max_hw_discard_sectors =
-> +			round_down(UINT_MAX >> SECTOR_SHIFT, clone->region_size);
->  		return;
->  	}
->  
-> diff --git a/drivers/md/dm-log-writes.c b/drivers/md/dm-log-writes.c
-> index f17a6cf2284ecf..8d7df8303d0a18 100644
-> --- a/drivers/md/dm-log-writes.c
-> +++ b/drivers/md/dm-log-writes.c
-> @@ -871,7 +871,7 @@ static void log_writes_io_hints(struct dm_target *ti, struct queue_limits *limit
->  	if (!bdev_max_discard_sectors(lc->dev->bdev)) {
->  		lc->device_supports_discard = false;
->  		limits->discard_granularity = lc->sectorsize;
-> -		limits->max_discard_sectors = (UINT_MAX >> SECTOR_SHIFT);
-> +		limits->max_hw_discard_sectors = (UINT_MAX >> SECTOR_SHIFT);
->  	}
->  	limits->logical_block_size = bdev_logical_block_size(lc->dev->bdev);
->  	limits->physical_block_size = bdev_physical_block_size(lc->dev->bdev);
-> diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
-> index bf7a574499a34d..07961e7e8382ab 100644
-> --- a/drivers/md/dm-snap.c
-> +++ b/drivers/md/dm-snap.c
-> @@ -2408,7 +2408,7 @@ static void snapshot_io_hints(struct dm_target *ti, struct queue_limits *limits)
->  
->  		/* All discards are split on chunk_size boundary */
->  		limits->discard_granularity = snap->store->chunk_size;
-> -		limits->max_discard_sectors = snap->store->chunk_size;
-> +		limits->max_hw_discard_sectors = snap->store->chunk_size;
->  
->  		up_read(&_origins_lock);
->  	}
-> diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-> index 07c7f9795b107b..d6adccda966f92 100644
-> --- a/drivers/md/dm-thin.c
-> +++ b/drivers/md/dm-thin.c
-> @@ -4096,7 +4096,7 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
->  	if (pt->adjusted_pf.discard_enabled) {
->  		disable_discard_passdown_if_not_supported(pt);
->  		if (!pt->adjusted_pf.discard_passdown)
-> -			limits->max_discard_sectors = 0;
-> +			limits->max_hw_discard_sectors = 0;
->  		/*
->  		 * The pool uses the same discard limits as the underlying data
->  		 * device.  DM core has already set this up.
-> @@ -4493,7 +4493,8 @@ static void thin_io_hints(struct dm_target *ti, struct queue_limits *limits)
->  
->  	if (pool->pf.discard_enabled) {
->  		limits->discard_granularity = pool->sectors_per_block << SECTOR_SHIFT;
-> -		limits->max_discard_sectors = pool->sectors_per_block * BIO_PRISON_MAX_RANGE;
-> +		limits->max_hw_discard_sectors =
-> +			pool->sectors_per_block * BIO_PRISON_MAX_RANGE;
->  	}
->  }
->  
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index b5e6a10b9cfde3..de7703070905ff 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1077,6 +1077,7 @@ void disable_discard(struct mapped_device *md)
->  	struct queue_limits *limits = dm_get_queue_limits(md);
->  
->  	/* device doesn't really support DISCARD, disable it */
-> +	limits->max_hw_discard_sectors = 0;
->  	limits->max_discard_sectors = 0;
->  }
->  
-> -- 
-> 2.39.2
-> 
-> 
+
+
+
+
