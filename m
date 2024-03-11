@@ -1,103 +1,191 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C67112B7D
-	for <linux-block@vger.kernel.org>; Mon, 11 Mar 2024 08:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDADB39AE3
+	for <linux-block@vger.kernel.org>; Mon, 11 Mar 2024 12:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710147288; cv=none; b=TxscXhS8GHbAei6V6D6v9GTHTzBBPqhHS+LiG1C4Ht25cvD5GNDiMi3yCk4cSivis91rzaFITcqyqj9XRWIBi9AwSwSGEHGSRAVXn2E2GTLBbjsetfDV3sbt84CRgdnJDxtYKp9nXsby4lOs/Xs448C/XGV1jkzWtuyKihKUJIU=
+	t=1710161930; cv=none; b=gf/21aruLm28HxkBgxanqRCFJcMAfI1901jWX0bWrHPXxx8CJ8JyN59pPBRwA9EU4sYg4Sv7lnGvgih1e2sJEDg003pfNexCty8dHtWyh6kSLoB/kHJLvNnovB37OyYL6VEfevmwV+Dymf2NjwR2ujZI2i4kriWdwUwh7KZkUKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710147288; c=relaxed/simple;
-	bh=EQ3vlK7Pepp3yG2b/Z/Clid0ZJHgfF01hBZ/S/YmP1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gVBrQRYsEEVvr0hdY+WJONUAXaAcBsVVHF87RZ+BmoXp+1MMZK4772fu49LeMDmjLhR3Q7lrZodjLWbCclTWjAJhhQIiRm9PkrEcsVd1JKgyEc5Lhcho+LdDnHNJRC8akmGnOVZHxsAZ41/umw7AxzPeIwQ1GzxdXI48cie13Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBYIlbTO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710161930; c=relaxed/simple;
+	bh=tEplRxBEHOqcwB+BxwcqVj8w4qR0CiW7li14FQOMLLg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O2E3CZ3s948oYuy8G7B7bk32Ru90hGa4EiXB+pAB1pX3z6Rgc32D2VtCQYF32RM7uuYgNqEESkSbzn7KxAWQID4R/m8UX2yRq0vfsjx9QBMSc90FdsUd50qM3calqhMo7s4JK2B0ukv1S4GUx5LLrCjIuvEdqEAYG0P8bPDoeBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ouzmJKo5; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBYIlbTO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C97DC433C7;
-	Mon, 11 Mar 2024 08:54:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710147288;
-	bh=EQ3vlK7Pepp3yG2b/Z/Clid0ZJHgfF01hBZ/S/YmP1w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eBYIlbTOujcITNHGMtOutArU2I7b9oh4PSzQe546ksk2s5ijyB2vN9vBwVGYAHi/a
-	 Rv04yXMwnbLj26iCd81INE4ekRVMXpRWc7nFYAKXzNmyLhOGhuAq3Kfyn96TtwTM+G
-	 E6XQHgIXnSGZnzkJuWOlC7OSEgeRHYRuq0zPRpIS6LOoMB1MaplJc0a0ss/1yGGKv2
-	 TdsBNNTC/blQvjwBBS8Beb2ATJ8GMSLiYxiFDQivG2H9csJ28E79lvjtDXmYRn7mew
-	 9/bMKd5wRXIAsUA5jsuNGFA26lQg1jQ+UmdlSTjD+NbjjgCUbLA+sPt2YF0TJWl8hk
-	 EFRuwJRHDAU6A==
-User-agent: mu4e 1.10.8; emacs 27.1
-From: Chandan Babu R <chandanbabu@kernel.org>
-To: hch@lst.de
-Cc: linux-block@vger.kernel.org
-Subject: [BUG REPORT] generic/482 fails on XFS on next-20240308 kernel
-Date: Mon, 11 Mar 2024 14:20:31 +0530
-Message-ID: <87il1tqhbg.fsf@debian-BULLSEYE-live-builder-AMD64>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ouzmJKo5"
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42BCXKR0021390;
+	Mon, 11 Mar 2024 12:58:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ykVk8jWxGNEVliddlfYJYX7F0Y13BvDCU0/OONaHdVo=;
+ b=ouzmJKo59OGUi3R668mRnQivRzkrOLFk4IVXA8ZVCCrGJW/Vu8K9ZwtL1sbgm/Aan6Au
+ TS4jz7b6XBPT4hw2QKCkDyM1QBgb86yQFJq/i1ahBP2gTumBkP56/LmhQ2E6k3JNDZlh
+ MRhcFAG92rlnZw1nBHxjUzKYLyVamI2TkUaYA/1zWdVfE0rdqMfpICbg5EFX4MmKktD6
+ MocQP34bZKw9J01TSukM1mPlYV1WvOssnuz6OeOkW4gtnaRaOP2075pO9pPAEYzJGFG0
+ +Jhzb6BA/tT3EzS861R1OqsMz7YNndGYRte7Ap+U/tFUbcFVuUC48mP27Hz3iTeME9RC LQ== 
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wt2290drb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 12:58:28 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42B9jeha015501;
+	Mon, 11 Mar 2024 12:58:27 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ws2fygqwj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 12:58:27 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42BCwPKp20709918
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Mar 2024 12:58:27 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0E6F35805D;
+	Mon, 11 Mar 2024 12:58:25 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AB95558059;
+	Mon, 11 Mar 2024 12:58:22 +0000 (GMT)
+Received: from [9.109.198.202] (unknown [9.109.198.202])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 11 Mar 2024 12:58:22 +0000 (GMT)
+Message-ID: <ac294adc-a7be-49af-88cd-e3aabd9f7c3f@linux.ibm.com>
+Date: Mon, 11 Mar 2024 18:28:21 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] nvme-pci: Fix EEH failure on ppc after subsystem
+ reset
+Content-Language: en-US
+To: Keith Busch <kbusch@kernel.org>
+Cc: linux-nvme@lists.infradead.org, axboe@fb.com, hch@lst.de, sagi@grimberg.me,
+        linux-block@vger.kernel.org, gjoyce@linux.ibm.com
+References: <20240209050342.406184-1-nilay@linux.ibm.com>
+ <Zesxq81eJTnOGniB@kbusch-mbp>
+ <039541c8-2e13-442e-bd5b-90a799a9851a@linux.ibm.com>
+ <ZeyD6xh0LGZyRBfO@kbusch-mbp>
+ <301b8f41-a146-497a-916f-97d91829d28c@linux.ibm.com>
+ <Ze6LglWPqkHVFh-P@kbusch-mbp.mynextlight.net>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <Ze6LglWPqkHVFh-P@kbusch-mbp.mynextlight.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Z6AxxUxm8uiCZtocNblHIn06_I2JK3RM
+X-Proofpoint-ORIG-GUID: Z6AxxUxm8uiCZtocNblHIn06_I2JK3RM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-11_08,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 bulkscore=0
+ mlxlogscore=999 phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403110097
 
-Hi,
 
-Executing generic/482 on a XFS filesystem on next-20240308 kernel generates
-the following call trace,
 
-[   58.151570] ------------[ cut here ]------------
-[   58.155270] WARNING: CPU: 2 PID: 42 at drivers/md/dm-bio-prison-v1.c:128 dm_cell_key_has_valid_range+0x7c/0xa0 [dm_bio_prison]
-[   58.163851] Modules linked in: xfs nvme_tcp nvme_fabrics nvme_core sd_mod t10_pi crc64_rocksoft_generic crc64_rocksoft sg virtio_net net_failover virtio_scsi failover ata_generic pata_acpi crct10dif_pclmul crc32_pclmul ata_piix ghash_clmulni_intel libata sha512_ssse3 sha256_ssse3 sha1_ssse3 virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev serio_raw dm_multipath dm_thin_pool dm_persistent_data dm_bio_prison dm_bufio dm_log_writes dm_flakey loop ext4 mbcache jbd2 vfat fat btrfs blake2b_generic xor zstd_compress raid6_pq sunrpc dm_mirror dm_region_hash dm_log dm_mod be2iscsi bnx2i cnic uio cxgb4i cxgb4 tls cxgb3i cxgb3 mdio libcxgbi libcxgb qla4xxx iscsi_boot_sysfs iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi qemu_fw_cfg aesni_intel crypto_simd cryptd
-[   58.219177] CPU: 2 PID: 42 Comm: kworker/u8:3 Not tainted 6.8.0-rc3+ #10
-[   58.223368] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.6.6 08/22/2023
-[   58.229658] Workqueue: dm-thin do_worker [dm_thin_pool]
-[   58.234343] RIP: 0010:dm_cell_key_has_valid_range+0x7c/0xa0 [dm_bio_prison]
-[   58.239549] Code: 48 81 fa 00 04 00 00 77 21 48 83 ed 01 48 c1 e8 0a 41 b8 01 00 00 00 48 c1 ed 0a 48 39 e8 75 19 44 89 c0 5b 5d e9 f4 1c 3a e5 <0f> 0b 45 31 c0 5b 5d 44 89 c0 e9 e5 1c 3a e5 0f 0b 45 31 c0 eb e0
-[   58.251799] RSP: 0018:ffffc900002ffb10 EFLAGS: 00010202
-[   58.256006] RAX: 0000000000000000 RBX: ffffc900002ffb78 RCX: 0000000000000007
-[   58.261500] RDX: 0000000000000c80 RSI: 0000000000000080 RDI: ffffc900002ffb88
-[   58.266809] RBP: 0000000000000c80 R08: 0000000000000001 R09: fffff5200005ff77
-[   58.271203] R10: 0000000000000003 R11: 0000000000000008 R12: ffff8881144f9630
-[   58.276361] R13: ffff8881144f9600 R14: ffff88814cfa3eb8 R15: ffffc900002ffb78
-[   58.281945] FS:  0000000000000000(0000) GS:ffff8883e1300000(0000) knlGS:0000000000000000
-[   58.288928] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   58.293493] CR2: 00000000004f4548 CR3: 0000000113416000 CR4: 0000000000350ef0
-[   58.300031] Call Trace:
-[   58.302109]  <TASK>
-[   58.328491]  process_discard_bio+0x1b2/0x440 [dm_thin_pool]
-[   58.361890]  process_thin_deferred_bios+0x61c/0xbb0 [dm_thin_pool]
-[   58.395890]  process_deferred_bios+0xf7/0x800 [dm_thin_pool]
-[   58.402079]  do_worker+0x2a2/0x4e0 [dm_thin_pool]
-[   58.412853]  process_one_work+0x576/0xcf0
-[   58.418017]  worker_thread+0x88c/0x1420
-[   58.436903]  kthread+0x2ad/0x380
-[   58.445480]  ret_from_fork+0x34/0x70
-[   58.454180]  ret_from_fork_asm+0x1b/0x30
-[   58.458617]  </TASK>
-[   58.461353] ---[ end trace 0000000000000000 ]---
-[   58.465787] device-mapper: thin: Discard doesn't respect bio prison limits
+On 3/11/24 10:11, Keith Busch wrote:
+> On Sun, Mar 10, 2024 at 12:35:06AM +0530, Nilay Shroff wrote:
+>> On 3/9/24 21:14, Keith Busch wrote:
+>>> Your patch may observe a ctrl in "RESETTING" state from
+>>> error_detected(), then disable the controller, which quiesces the admin
+>>> queue. Meanwhile, reset_work may proceed to CONNECTING state and try
+>>> nvme_submit_sync_cmd(), which blocks forever because no one is going to
+>>> unquiesce that admin queue.
+>>>
+>> OK I think I got your point. However, it seems that even without my patch
+>> the above mentioned deadlock could still be possible. 
+> 
+> I sure hope not. The current design should guarnatee forward progress on
+> initialization failed devices.
+> 
+>> Without my patch, if error_detcted() observe a ctrl in "RESETTING" state then 
+>> it still invokes nvme_dev_disable(). The only difference with my patch is that 
+>> error_detected() returns the PCI_ERS_RESULT_NEED_RESET instead of PCI_ERS_RESULT_DISCONNECT.
+> 
+> There's one more subtle difference: that condition disables with the
+> 'shutdown' parameter set to 'true' which accomplishes a couple things:
+> all entered requests are flushed to their demise via the final
+> unquiesce, and all request_queue's are killed which forces error returns
+> for all new request allocations. No thread will be left waiting for
+> something that won't happen.
+> 
+Aaargh, I didn't notice that subtle difference. I got your all points..
+After thinking for a while (as you suggested) it seems that we potentially
+require to contain the race between reset_work and error_detected code path
+as both could run in parallel on different cpu when pci recovery initiates. 
+So I'm thinking that if we can hold on the error_detected() code path to proceed
+until reset_work is finished ? Particularly, in error_detcted() function if 
+we fall through the pci_channel_io_frozen case and the ctrl state is already
+RESETTING (so that means that reset_work shall be running) then hold on 
+invoking nvme_dev_diable(dev, false) until reset_work is finished. The changes
+should be something as below:
 
-Git bisect revealed the following to be the bad commit,
+@@ -3295,10 +3304,13 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
+        case pci_channel_io_frozen:
+                dev_warn(dev->ctrl.device,
+                        "frozen state error detected, reset controller\n");
+-               if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
+-                       nvme_dev_disable(dev, true);
+-                       return PCI_ERS_RESULT_DISCONNECT;
++               if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING) {
++                       if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
++                               nvme_dev_disable(dev, true);
++                               return PCI_ERS_RESULT_DISCONNECT;
++                       }
+                }
++               flush_work(&dev->ctrl.reset_work);
+                nvme_dev_disable(dev, false);
+                return PCI_ERS_RESULT_NEED_RESET;
+        case pci_channel_io_perm_failure:
 
-commit 8e0ef412869430d114158fc3b9b1fb111e247bd3
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Wed Feb 28 14:56:42 2024 -0800
+The flush_work() would ensure that we don't disable the ctrl if reset_work 
+is running. If the rest_work is *not* running currently then flush_work() should
+return immediately. Moreover, if reset_work is scheduled or start running after
+flush_work() returns then reset_work should not be able to get upto the CONNECTING
+state because pci recovery is in progress and so it should fail early.
 
-    dm: use queue_limits_set
-    
-    Use queue_limits_set which validates the limits and takes care of
-    updating the readahead settings instead of directly assigning them to
-    the queue.  For that make sure all limits are actually updated before
-    the assignment.
-    
-    Signed-off-by: Christoph Hellwig <hch@lst.de>
-    Reviewed-by: Mike Snitzer <snitzer@kernel.org>
-    Link: https://lore.kernel.org/r/20240228225653.947152-4-hch@lst.de
-    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+On the reset_work side other than detecting pci error recovery, I think we also 
+need one another change where in case the ctrl state is set to CONNECTING and we 
+detect the pci error recovery in progress then before returning from the reset_work
+we set the ctrl state to RESETTING so that error_detected() could forward progress.
+The changes should be something as below:
 
- block/blk-settings.c  |  2 +-
- drivers/md/dm-table.c | 27 ++++++++++++---------------
- 2 files changed, 13 insertions(+), 16 deletions(-)
+@@ -2776,6 +2776,16 @@ static void nvme_reset_work(struct work_struct *work)
+  out_unlock:
+        mutex_unlock(&dev->shutdown_lock);
+  out:
++       /*
++        * If PCI recovery is ongoing then let it finish first
++        */
++       if (pci_channel_offline(to_pci_dev(dev->dev))) {
++               dev_warn(dev->ctrl.device, "PCI recovery is ongoing so let it finish\n");
++               if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING)
++                       WRITE_ONCE(dev->ctrl.state, NVME_CTRL_RESETTING);
++               return;
++       }
++
+        /*
+         * Set state to deleting now to avoid blocking nvme_wait_reset(), which
+         * may be holding this pci_dev's device lock.
 
--- 
-Chandan
+Please let me know if you find anything not good with the above changes.
+
+Thanks,
+--Nilay
+
+
+
+
+
+
+
+
+
