@@ -1,51 +1,42 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D570715BF
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 16:39:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDED4139561
+	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 17:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710261556; cv=none; b=mc6ST72Oxpkglqh0xLNiDPZ5bLTvfLfECcbjYoUkkErF18LTbu8xem/ao5Ywnf9xDvdHsW4PB9geJYvE45b2LCv45RNp9Zm88/lCAg+U3TAtaq4Ev3g8n80/OD3UXdUqKnCfJVSjMDcAyv+XTu8tTu6Dki7BeFFX1hKJWlNVNXI=
+	t=1710265219; cv=none; b=vFsfW5GbBF3aPW69ld7H/Roba4InoWY22K5HIzazZZGRgMOtr6MS0mGGa93A7FEiLyqI4E11YFops/hYWRVjUUowQMhPGdIsa/ASb1horzi42oIoquknzfNuiswQH5uhKYCVQGzMjduD/zBEK7E4DYTjDj624tB+E89mLujwq9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710261556; c=relaxed/simple;
-	bh=WFffLCZ8i4MRi8huHhIMMgb8D1Fx/rSrU3BqScm3L3Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aDPpDe/LrbrWrjyXmvDWvZc+ORC4WjPHG/A3wwQcxhTzV7XSedEko0+k9T+3A5G5aCZ10+B9WHjD+X/dcDfBBuGbSWgX6198/wdu0AGG5RviZ+8wPAYKvSw/6jdlBT3ueqCa0cw7KSZas3TJIqOwT3WMxuY7Ohhp24uz+dm93n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gxVqCfRP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710265219; c=relaxed/simple;
+	bh=p88PjSuHMvSiaGd3Tm+j/bqmPqJOVDkKkHYaPNEuiek=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=SeZZm3MSf6kL4SXuW7IHdm3y8RH70UJPXmTiXrBgxDs4PCclllx9DeFLkwT5IQ/uEf8CZ5pz2d5rZb5mF4ZC7gP4tSZHrbEg3bnNtZOQAYGnf4XjwQQI4lDmrM3yVZuC/rYqu5pH8L/scZX7yRKrCkaMonV5ELRQ58dCCFko9Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UQWjCBko; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gxVqCfRP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E23B6C433F1;
-	Tue, 12 Mar 2024 16:39:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710261556;
-	bh=WFffLCZ8i4MRi8huHhIMMgb8D1Fx/rSrU3BqScm3L3Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gxVqCfRPIVplYYnhDow29DU6OjizIgLJfQ2zSvIlraVFJCri4Pd5RRF9ADhn5gwgm
-	 Oos9HwfXw/xo9xWxTIAMjS9yNMhuM6iKsj+ORVkqZsePBTWMId/NqLYo00EV4t/mNM
-	 YqVjEMZzijeQylMggOLr0MdjLP+lsKK87HkiOTA2ogO5puldi1VVSpkqW8JYp3cB+M
-	 T9/OGgC4FfY4OZJ9P+8YITTFfhlcG3TmBDnxJ1UOhshgqUM7aSEorsfzRcGDiRW4xc
-	 lDjoNq1LpbmoYR4GCiyCm/ODMXXTOtWzLZuEPrmvhO2e9v/FgVqsGwDOeJxzCgYPA2
-	 e/1hpzW5FH7aA==
-Date: Tue, 12 Mar 2024 10:39:13 -0600
-From: Keith Busch <kbusch@kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UQWjCBko"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=uiprbajIkx81C1BpAcArVOCqoHy/7DhppwCGLpEAJyI=; b=UQWjCBkodZ5NGq2YKxmwA1NzP1
+	PnplBTj80bWUhA6iSwBApPAbzM7D2TRfT5n0MES7uuiuqvc0Kol7gFzQ3E0hiqoT/ixRBEUqumq6z
+	06TuyV8WSKOyPJsYtvWXDAo9BrZbFCueBj6G1icEkLh9iCBJ9bt1xh3wz4nO8AKu3YQ0p3siStBAW
+	/tGNQoQWUeRzuDP92ESdQQwb77bBQcBhPtfny71nqk9bS+FLyMyAopO3T28Pvp5SNUqDvW9eh6MJW
+	pWpqkChmLaF5eBf8FW9+4hUSv4fR8yl2DaNLm1K771zzEWCEuVwkWTMAH+5BUa+KMzBDqRaUArLwz
+	jL/1H9Kg==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rk66n-00000003Xkd-1ARV;
+	Tue, 12 Mar 2024 17:40:13 +0000
+Date: Tue, 12 Mar 2024 17:40:13 +0000
+From: Matthew Wilcox <willy@infradead.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [GIT PULL] Block updates for 6.9-rc1
-Message-ID: <ZfCFMc0cNHvIB0Jz@kbusch-mbp.mynextlight.net>
-References: <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
- <e3fea6c3-7704-46cd-b078-0c6e8d966474@kernel.dk>
- <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
- <Ze-hwnd3ocfJc9xU@redhat.com>
- <Ze-rRvKpux44ueao@infradead.org>
- <07ab62c9-06af-4a4f-bae8-297b3e254ef5@kernel.dk>
- <CAHk-=wjtVMQQbez4ZhXBeu4gbrC+BxUf3gd8ypyR5BzV5ekfnA@mail.gmail.com>
- <01bc0f0d-c754-45af-b5a4-94e92f905f6e@kernel.dk>
- <CAHk-=wh1wS2fvZjWhLSR6t2h1g+PX-fp=zD9e-Fke3FPWtrGXg@mail.gmail.com>
- <9b957380-42c7-42d8-a95e-88ac083e3ffe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: brd in a memdesc world
+Message-ID: <ZfCTfa9gfZwnCie0@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,13 +45,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9b957380-42c7-42d8-a95e-88ac083e3ffe@kernel.dk>
 
-On Mon, Mar 11, 2024 at 07:37:06PM -0600, Jens Axboe wrote:
-> Summary is that this is obviously a pretty normal drive, and has the
-> 128K transfer limit that's common there. So doesn't really explain
-> anything in that regard. The segment size is also a bit odd at 33.
+Hi Jens,
 
-That's "max_segments" at 33, not segment size. Max payload is 128k,
-divide by 4k nvme page size = 32 nvme pages. +1 to allow a first segment
-offset, so 33 max segments for this device. 
+I'm looking for an architecture-level decision on what the brd driver
+should look like once struct page has been shrunk to a minimal size
+(more detail at https://kernelnewbies.org/MatthewWilcox/Memdescs )
+
+Currently brd uses page->index as a debugging check.  In the memdesc
+future, struct page has no members (you could store a small amount of
+information in it, but I'm not willing to commit to more than a few bits).
+
+brd doesn't use anything else from struct page, as far as I can tell.
+It just calls kmap_atomic() / __free_page() / flush_dcache_page() (and
+it doesn't need to call flush_dcache_page() because you can't mmap the
+pages in the brd's array).
+
+Now if you have plans to, eg, support page migration, you're going to need
+a bit more infrastructure than just allocating pages, but for what you
+have at the moment, just removing the debugging checks that page->index ==
+idx would make you entirely compatible with the memdesc future.
+
+Any problem with that?
