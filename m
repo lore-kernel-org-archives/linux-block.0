@@ -1,53 +1,41 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E425143736;
-	Tue, 12 Mar 2024 21:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD067A730;
+	Tue, 12 Mar 2024 22:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710278934; cv=none; b=c1Z2b7pizgN/32qSGZrAdtmKt4c9NG7AxCxsS2J3a4LEvV5pVQj8AjOm/119arXvRx0ilEdmAWWU+ZjVyHpKJWcuGnT9RJVrS2PXo2mcZ2+6E1fg/TsGVOhZKJO9hgEjOztRAwMkq+kCyUfQ+UUbGH0r8vdmMSFpIXgJVMcMJZ8=
+	t=1710281578; cv=none; b=W0oyxVzim0r2B1An1LQOFGhldxS/ONrZAWp89n8rkP3Eo8MY29R6ExNt0yZuyNaPQtdSHR5I5sxqzSKo7ZgHj3gLe4AtImSg7i68AkNxMH3Apg2bqYmhs/Rfn1Cp6z3psbm7YS/dd3thFZpvcLxE1h3hjccjSl4HH9YZEMqYZhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710278934; c=relaxed/simple;
-	bh=BRQTLaIPx6C1TH1fJOMUn+wWNHenNMsiGQ36m5L9rtA=;
+	s=arc-20240116; t=1710281578; c=relaxed/simple;
+	bh=9uq/j3Hgz3Vttrm8luZzODCRNkQqejQaOuzuZQeBZnc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nUaSLr3fMhCWL6/cnQGL7z8+tAZuUBAwPU0MfKC8Stmo5L2Unp0zoRK7urt13mG/M/+rJP0+qpcMy1xOKQ3ggtNf0ZrvVrO9sGDoGYOCbixIBbmWd6eXJrNoT/3vAOLO4l7kaXXlBW/yKU6W1FEtRkkdZOQdSTXygpuhT/saT1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 514BE68BFE; Tue, 12 Mar 2024 22:28:45 +0100 (CET)
-Date: Tue, 12 Mar 2024 22:28:44 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
- steps
-Message-ID: <20240312212844.GA3018@lst.de>
-References: <20240306162022.GB28427@lst.de> <20240306174456.GO9225@ziepe.ca> <20240306221400.GA8663@lst.de> <20240307000036.GP9225@ziepe.ca> <20240307150505.GA28978@lst.de> <20240307210116.GQ9225@ziepe.ca> <20240308164920.GA17991@lst.de> <20240308202342.GZ9225@ziepe.ca> <20240309161418.GA27113@lst.de> <20240310093513.GB12921@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMgL34GtXktYBiHPdaDPheyQOto3J6N2MMgYNLsUB6IUx++/mW2D+2GVA2mOyaNfoW9Qj2BszlqYlWk1hvgMXWRmC1nZWEjPCEED7/eQsVJPUV4AiBlilYjg1S+0XxIbfTW8Ckq0/19xO1m0TFbY0PAAsmt/jHvxpml49CHJy+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nT2NL4iy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nT2NL4iy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 549ACC433F1;
+	Tue, 12 Mar 2024 22:12:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710281577;
+	bh=9uq/j3Hgz3Vttrm8luZzODCRNkQqejQaOuzuZQeBZnc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nT2NL4iyCmA0WNjwMrhLBIK3E4V5hxU/npyfBL3ZpzgemrK+gfAzrwixATP1A9cMm
+	 lqfxnfHWZwbnKIE+e9ZzN5u34fAjg1bicAZ4fok8DUBLlUzRN04UQDVR9ydFeJVfQI
+	 R2/+op6Tldx3OO5Y+weXXltAsTS1Nsv7mZJ7ARSQ4ZlRUqFj+y2HNovyoChWMprOmw
+	 kZBTB4viIZakkq9mCZyoNIFXAFOrrkf7e7OPa4kaEWeMhnTWRry91/oGDEi1dVdUON
+	 qpDdN8FWb9ma7yVsUTnESw4SoCeFknMHGAKsRyc2GeCYJteWUSqv4l0shIlmUnt2qw
+	 zrfRatW5y/H2g==
+Date: Tue, 12 Mar 2024 16:12:54 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Chandan Babu R <chandanbabu@kernel.org>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 1/5] block: move discard checks into the ioctl handler
+Message-ID: <ZfDTZpuumZSn6oPp@kbusch-mbp.mynextlight.net>
+References: <20240312144532.1044427-1-hch@lst.de>
+ <20240312144532.1044427-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,17 +44,44 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240310093513.GB12921@unreal>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240312144532.1044427-2-hch@lst.de>
 
-On Sun, Mar 10, 2024 at 11:35:13AM +0200, Leon Romanovsky wrote:
-> And you will need to have a way to instruct that pin_user_pages() variant
-> to continue anyway, because you asked for FOLL_PCI_P2PDMA. Without that
-> force, you will have !FOLL_PCI_P2PDMA behaviour.
+On Tue, Mar 12, 2024 at 08:45:27AM -0600, Christoph Hellwig wrote:
+> @@ -95,6 +95,8 @@ static int compat_blkpg_ioctl(struct block_device *bdev,
+>  static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+>  		unsigned long arg)
+>  {
+> +	sector_t bs_mask = (bdev_logical_block_size(bdev) >> SECTOR_SHIFT) - 1;
+> +	sector_t sector, nr_sects;
+>  	uint64_t range[2];
+>  	uint64_t start, len;
+>  	struct inode *inode = bdev->bd_inode;
+> @@ -105,18 +107,21 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+>  
+>  	if (!bdev_max_discard_sectors(bdev))
+>  		return -EOPNOTSUPP;
+> +	if (bdev_read_only(bdev))
+> +		return -EPERM;
+>  
+>  	if (copy_from_user(range, (void __user *)arg, sizeof(range)))
+>  		return -EFAULT;
+>  
+>  	start = range[0];
+>  	len = range[1];
+> +	sector = start >> SECTOR_SHIFT;
+> +	nr_sects = len >> SECTOR_SHIFT;
+>  
+> -	if (start & 511)
+> +	if (!nr_sects)
+>  		return -EINVAL;
+> -	if (len & 511)
+> +	if ((sector | nr_sects) & bs_mask)
+>  		return -EINVAL;
+> -
+>  	if (start + len > bdev_nr_bytes(bdev))
+>  		return -EINVAL;
 
-I don't understand what you mean.
-
-> When you say "simplify the overall interface", which interface do you mean?
-
-Primarily the dma mapping interface.  Secondarily also everything around
-it.
+Maybe you want to shift lower bytes out of consideration, but it is
+different, right? For example, if I call this ioctl with start=5 and
+len=555, it would return EINVAL, but your change would let it succeed
+the same as if start=0, len=512.
