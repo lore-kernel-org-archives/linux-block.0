@@ -1,113 +1,175 @@
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDAA58AC4
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 13:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBA479DBD;
+	Tue, 12 Mar 2024 13:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710249139; cv=none; b=nMujt3kqHjYj7edYUz3QkfHIxijc+TsNqt7J33BCKxnBuUxt3IrGn4PWZrgOEpQMBQrmK8KyoUi0+PRq7bt9PwM9pGlrQ4AA/iNl58YQQI8LdgA9c/Zw5KYGw6fAAlR3mT7Jk0UoAfmFeAMrl78b+G2EchJ8PVT6OWYUCjMKmRs=
+	t=1710249164; cv=none; b=BUoIX7aerK0kmi80Q9z1H/35+Qv0eks4Og3H4CPXkPjAInu69lPMdVbZcRHyJpZAmZqcMqdhRKUUPo8obMRyA9pYjatT+ay30wu007YoFy2VhB/sUMkq5M78Rd/UGB7L7/zz5TLbPbfCmHFoVudgfi06NKBGBzEaVpnmvHEROhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710249139; c=relaxed/simple;
-	bh=5rt+RWbBJPhAUl1uqDwh5UWlve/OPz4PeCvfGqj3MHQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dYgnm0lD2Zf7jhg+FAvyTii+0yUXQ1pnYPVuKW7aLJX7/vLkfngdyLpRoQZZkSRylcygo1GBEohooamkBvi1LFTs/EPUhzITdxEATlII0D+BcsSyJXyzDAlw5KHntOjYPZN2YUWf950xq4LLezs4zCOxLVpkTHtD8CNPqTaRUdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=AeF5oxQS; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="AeF5oxQS"
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dc6cbe1ac75so4503531276.1
-        for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 06:12:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1710249136; x=1710853936; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xGm6l1YRLh5BPGXSeJhTa5Xkczn4uT6yuT0rED+ytkk=;
-        b=AeF5oxQSugPKh8jPGo1deH2heQlPo67Gx8uPfkXw+A6XRCMxKrmhop4RTi2Raye9w5
-         td3/8L7cAv6COx2n55EwL5JReK1i4P5PPiYypoSIGkwLVHIPPS/nIssVhO6EvVoiSdwa
-         25PWyN9KMeoyTR/gJFW6FP+77dd1uhGAFDEy7I0P298m/ZrujwVNmzfBJ57RnEVJRnz7
-         hFIHzsvn0BzaDpDVS99DEsWFQFKYhVbuQt8C8bZjIr3opLAh5ipZEgkQMXlkanYGp1ue
-         yhcJEtkhHMAz7ALFS6U3xG0xIZj2H6Bi1chBbMLE5wbZkq+AccKzNCXCc5KD/mfWZoRg
-         cqCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710249136; x=1710853936;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xGm6l1YRLh5BPGXSeJhTa5Xkczn4uT6yuT0rED+ytkk=;
-        b=mG4Ho38e6mpJd02ZprVgAfZXlw/PaJHpCaX0q6Vk3qLeOJ+eBxFUMeRGTgByMQN9po
-         +ri9ldlr7ThKx1S/vOZkdHtFaZ9gScSfI9/Mv6CNglmzRLJglH0SoQ8FuziSrERdjZoO
-         4TGL5WBqMf8Hu6ZyQ5JgebJDbxh1Ie8vbi6yZgABpZj0D+TLA8QY+i7dlHDNHB7gEMy4
-         r+nbRkctPp7pRXCTob46kU+7fsoWNWQ2iSABDiRq97POJ2Vc4DROIxnGUCceXsEwkNxB
-         U1jCyc9Kw6sI5FkW14BRMxcBO4GjF93Pp1UHkaiQbc63DJxJioVpIQqmhrOzRfVkeR4F
-         phfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCbTcCY8dTIUY78j6REEpRNzCqUc8IL9Uk4HAss6yW9nMBfISU030NaB16OcuSjJFaM7IPh/dmMZ++Andpdr1RRlnPCFxWRgaSMNU=
-X-Gm-Message-State: AOJu0YwqgbENrAwCVIj/JuXKrxN36XrtV53ixiI2/nAZMfvO5MKZCnNj
-	gwKTot0VPssnC+I9It/IgiNN0zzDaXrJVfKpvoUw6/esyaXk/S+sjQ1p5CGFjhOY1T24JNvOqpo
-	eVhLB3dzds043reylW5bdbloP5gunswEzLh16
-X-Google-Smtp-Source: AGHT+IEdiOBkJ+adeSqv+rNybEPwNkGGa7iFCLcf94f4++BXPp1TK3JUSZqCbU2Yvqne0MvrzB+F7Mt8oGlgCeTEfL8=
-X-Received: by 2002:a05:6902:2841:b0:dcd:b806:7446 with SMTP id
- ee1-20020a056902284100b00dcdb8067446mr6722695ybb.1.1710249136161; Tue, 12 Mar
- 2024 06:12:16 -0700 (PDT)
+	s=arc-20240116; t=1710249164; c=relaxed/simple;
+	bh=qw1Un7hVSUETXMazHe5VgTx1aM7+42G+J07xZ9g9/iY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qZKEkHeO/6ErnfPyHyvqfQTk2JAWBliNjoNgOUCjDY6xDUGmGPW2g4M+4mPSQkL9qwZ6PFmSQyjQiGm3l3HXTUTtdg3jD1j8tkGZNtdv3wfwAm87DE9hXDcFrvAJ21bmsnTILSECjFsIK/N36SH1QMPqk02bnvLcnEtGszKr2xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rk1vO-00056B-2t;
+	Tue, 12 Mar 2024 13:12:11 +0000
+Date: Tue, 12 Mar 2024 13:12:01 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Christian Brauner <brauner@kernel.org>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Damien Le Moal <dlemoal@kernel.org>, Min Li <min15.li@samsung.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Christian Loehle <CLoehle@hyperstone.com>,
+	Avri Altman <avri.altman@wdc.com>, Bean Huo <beanhuo@micron.com>,
+	Yeqi Fu <asuk4.q@gmail.com>,
+	Victor Shih <victor.shih@genesyslogic.com.tw>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+	Diping Zhang <diping.zhang@gl-inet.com>,
+	Jianhui Zhao <zhaojh329@gmail.com>,
+	Jieying Zeng <jieying.zeng@gl-inet.com>,
+	Chad Monroe <chad.monroe@adtran.com>,
+	Adam Fox <adam.fox@adtran.com>, John Crispin <john@phrozen.org>
+Subject: Re: [RFC PATCH v2 0/8] nvmem: add block device NVMEM provider
+Message-ID: <ZfBUoc5IjzxbEj7B@makrotopia.org>
+References: <cover.1709667858.git.daniel@makrotopia.org>
+ <CAPDyKFpQfue5Fi0fFSnqHNg2ytCxAYfORVP_Y86ucz2k5HRuDA@mail.gmail.com>
+ <ZfBK5qT_GO_FgtQP@makrotopia.org>
+ <CAPDyKFr7mMEZE5n=6kxxsj9P3oLjLyVx20O9q0-pmyXzXYk52A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1709768084-22539-1-git-send-email-wufan@linux.microsoft.com>
- <1709768084-22539-16-git-send-email-wufan@linux.microsoft.com>
- <20240312025712.GE1182@sol.localdomain> <20240312030712.GF1182@sol.localdomain>
-In-Reply-To: <20240312030712.GF1182@sol.localdomain>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 12 Mar 2024 09:12:05 -0400
-Message-ID: <CAHC9VhSSWNa1qwZrWtj-ERFjN9QKR7fz17yb9903P_a2k6ewaQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v14 15/19] fsverity: consume builtin signature via LSM hook
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, 
-	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk, 
-	agk@redhat.com, snitzer@kernel.org, eparis@redhat.com, 
-	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPDyKFr7mMEZE5n=6kxxsj9P3oLjLyVx20O9q0-pmyXzXYk52A@mail.gmail.com>
 
-On Mon, Mar 11, 2024 at 11:07=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
- wrote:
-> On Mon, Mar 11, 2024 at 07:57:12PM -0700, Eric Biggers wrote:
+On Tue, Mar 12, 2024 at 01:57:39PM +0100, Ulf Hansson wrote:
+> On Tue, 12 Mar 2024 at 13:30, Daniel Golle <daniel@makrotopia.org> wrote:
 > >
-> > As I've said before, this commit message needs some work.  It currently=
- doesn't
-> > say anything about what the patch actually does.
+> > Hi Ulf,
 > >
-> > BTW, please make sure you're Cc'ing the fsverity mailing list
-> > (fsverity@lists.linux.dev), not fscrypt (linux-fscrypt@vger.kernel.org)=
-.
->
-> Also, I thought this patch was using a new LSM hook, but I now see that y=
-ou're
-> actually abusing the existing security_inode_setsecurity() LSM hook.  Cur=
-rently
-> that hook is called when an xattr is set.  I don't see any precedent for
-> overloading it for other purposes.
+> > On Tue, Mar 12, 2024 at 01:22:49PM +0100, Ulf Hansson wrote:
+> > > On Tue, 5 Mar 2024 at 21:23, Daniel Golle <daniel@makrotopia.org> wrote:
+> > > >
+> > > > On embedded devices using an eMMC it is common that one or more (hw/sw)
+> > > > partitions on the eMMC are used to store MAC addresses and Wi-Fi
+> > > > calibration EEPROM data.
+> > > >
+> > > > Implement an NVMEM provider backed by block devices as typically the
+> > > > NVMEM framework is used to have kernel drivers read and use binary data
+> > > > from EEPROMs, efuses, flash memory (MTD), ...
+> > > >
+> > > > In order to be able to reference hardware partitions on an eMMC, add code
+> > > > to bind each hardware partition to a specific firmware subnode.
+> > > >
+> > > > This series is meant to open the discussion on how exactly the device
+> > > > tree schema for block devices and partitions may look like, and even
+> > > > if using the block layer to back the NVMEM device is at all the way to
+> > > > go -- to me it seemed to be a good solution because it will be reuable
+> > > > e.g. for (normal, software GPT or MBR) partitions of an NVMe SSD.
+> > > >
+> > > > This series has previously been submitted on July 19th 2023[1] and most of
+> > > > the basic idea did not change since.
+> > > >
+> > > > However, the recent introduction of bdev_file_open_by_dev() allow to
+> > > > get rid of most use of block layer internals which supposedly was the
+> > > > main objection raised by Christoph Hellwig back then.
+> > > >
+> > > > Most of the other comments received for in the first RFC have also
+> > > > been addressed, however, what remains is the use of class_interface
+> > > > (lacking an alternative way to get notifications about addition or
+> > > > removal of block devices from the system). As this has been criticized
+> > > > in the past I'm specifically interested in suggestions on how to solve
+> > > > this in another way -- ideally without having to implement a whole new
+> > > > way for in-kernel notifications of appearing or disappearing block
+> > > > devices...
+> > > >
+> > > > And, in a way just like in case of MTD and UBI, I believe acting as an
+> > > > NVMEM provider *is* a functionality which belongs to the block layer
+> > > > itself and, other than e.g. filesystems, is inconvenient to implement
+> > > > elsewhere.
+> > >
+> > > I don't object to the above, however to keep things scalable at the
+> > > block device driver level, such as the MMC subsystem, I think we
+> > > should avoid having *any* knowledge about the binary format at these
+> > > kinds of lower levels.
+> > >
+> > > Even if most of the NVMEM format is managed elsewhere, the support for
+> > > NVMEM partitions seems to be dealt with from the MMC subsystem too.
+> >
+> > In an earlier iteration of this RFC it was requested to make NVMEM
+> > support opt-in (instead of opt-out for mtdblock and ubiblock, which
+> > already got their own NVMEM provider implementation).
+> > Hence at least a change to opt-in for NVMEM support is required in the
+> > MMC subsystem, together with making sure that MMC devices have their
+> > fwnode assigned.
+> 
+> So, the NVMEM support needs to be turned on (opt-in) for each and
+> every block device driver?
+> 
+> It's not a big deal for me - and I would be happy to apply such a
+> change. On the other hand, it is just some binary data that is stored
+> on the flash, why should MMC have to opt-in or opt-out at all? It
+> should be the upper layers who decide what to store on the flash, not
+> the MMC subsystem, if you get my point.
+> 
 
-I'm not really bothered by this, and if it proves to be a problem in
-the future we can swap it for a new hook; we don't include the LSM
-in-kernel API in any stable API guarantees.
+I agree, and that's exactly how I originally wrote it. However, in the
+first round of rewiew it was requested to be in that way (ie. opt-in
+for each subsystem; rather than opt-out for subsystems already
+providing NVMEM in another way, such as MTD or UBI), see here:
 
-> This seems problematic, as it means that a
-> request to set an xattr with the name you chose ("fsverity.builtin-sig") =
-will be
-> interpreted by LSMs as the fsverity builtin signature.  A dedicated LSM h=
-ook may
-> be necessary to avoid issues with overloading the existing xattr hook lik=
-e this.
+https://patchwork.kernel.org/comment/25432948/
 
-Would you be more comfortable if the name was in an IPE related space,
-for example something like "ipe.fsverity-sig"?
+> >
+> > > Why can't NVMEM partitions be managed the usual way via the MBR/GPT?
+> >
+> > Absolutely, maybe my wording was not clear, but that's exactly what
+> > I'm suggesting here. There are no added parsers nor any knowledge
+> > about binary formats in this patchset.
+> 
+> Right, but there are new DT bindings added in the $subject series that
+> allows us to describe NVMEM partitions for an eMMC. Why isn't that
+> parsed from the MBR/GPT, etc, rather than encoded in DT?
 
---=20
-paul-moore.com
+The added dt-bindings merely allow to **identify** the partition by
+it's PARTNAME, PARTNO or PARTUUID, so we can reference them in DT.
+We'd still rely on MBR or GPT to do the actual parsing of the on-disk
+format.
+
+> 
+> >
+> > Or did I misunderstand your comment?
+> 
+> Maybe. I am just trying to understand this, so apologize if you find
+> my questions silly. :-)
+
+Let's make sure to all be on the same page and everything is fully
+understood by everyone. Everyone has to bare the noise, but I guess
+that's ok ;)
+
+
+Cheers
+
+
+Daniel
