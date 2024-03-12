@@ -1,69 +1,83 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDED4139561
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 17:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8311386D1;
+	Tue, 12 Mar 2024 18:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710265219; cv=none; b=vFsfW5GbBF3aPW69ld7H/Roba4InoWY22K5HIzazZZGRgMOtr6MS0mGGa93A7FEiLyqI4E11YFops/hYWRVjUUowQMhPGdIsa/ASb1horzi42oIoquknzfNuiswQH5uhKYCVQGzMjduD/zBEK7E4DYTjDj624tB+E89mLujwq9I=
+	t=1710267268; cv=none; b=ii6o9wR6T65P0zZx966Y/WiySMhdoCoA7KxmgoB7GTtnGB1N+YrrPLAVdYGNwQPu2x6XKffh8p9ZPig73ta4iIpXSdUKEozS8Wnqr8kPB0LNamzHFAb0BEYmr8VzW/6P88G1OFSD0xGaMbz4v1TRugz/vVEVagC43Ys8q4YlL7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710265219; c=relaxed/simple;
-	bh=p88PjSuHMvSiaGd3Tm+j/bqmPqJOVDkKkHYaPNEuiek=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=SeZZm3MSf6kL4SXuW7IHdm3y8RH70UJPXmTiXrBgxDs4PCclllx9DeFLkwT5IQ/uEf8CZ5pz2d5rZb5mF4ZC7gP4tSZHrbEg3bnNtZOQAYGnf4XjwQQI4lDmrM3yVZuC/rYqu5pH8L/scZX7yRKrCkaMonV5ELRQ58dCCFko9Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UQWjCBko; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1710267268; c=relaxed/simple;
+	bh=+Nv8FE2GFtnryYnuFjMt1J6p/3YJi1lq7lWALWFCNLU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nbeMscGtO2pS7tzkLpR05Jywxs2MDt5HsSKG67uBqgrwl4Ehq6JI2wWw4RaDB7L/0N06tKjolxDsvWm5BnFVuqFNNSfjfZOGnla4KzcYtlp+fUT8bzOVP6ezKZn64lYFmp0zwAE9KUP+o4o3VMesMnkJzviG+NjUpqCVr96FRv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AwsfC1qr; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UQWjCBko"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=uiprbajIkx81C1BpAcArVOCqoHy/7DhppwCGLpEAJyI=; b=UQWjCBkodZ5NGq2YKxmwA1NzP1
-	PnplBTj80bWUhA6iSwBApPAbzM7D2TRfT5n0MES7uuiuqvc0Kol7gFzQ3E0hiqoT/ixRBEUqumq6z
-	06TuyV8WSKOyPJsYtvWXDAo9BrZbFCueBj6G1icEkLh9iCBJ9bt1xh3wz4nO8AKu3YQ0p3siStBAW
-	/tGNQoQWUeRzuDP92ESdQQwb77bBQcBhPtfny71nqk9bS+FLyMyAopO3T28Pvp5SNUqDvW9eh6MJW
-	pWpqkChmLaF5eBf8FW9+4hUSv4fR8yl2DaNLm1K771zzEWCEuVwkWTMAH+5BUa+KMzBDqRaUArLwz
-	jL/1H9Kg==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rk66n-00000003Xkd-1ARV;
-	Tue, 12 Mar 2024 17:40:13 +0000
-Date: Tue, 12 Mar 2024 17:40:13 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: brd in a memdesc world
-Message-ID: <ZfCTfa9gfZwnCie0@casper.infradead.org>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AwsfC1qr"
+Received: from [10.137.106.151] (unknown [167.220.2.23])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 4696020B74C0;
+	Tue, 12 Mar 2024 11:14:26 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4696020B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1710267266;
+	bh=7A1zrZAVHXKGttwPdOtLQCc2bRvvqSB12WrZItI5omI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AwsfC1qrQaxGBl/fdJD2faD0hl9FFmeBlCLlRgyTQvlkdWZDaVw25t2K6lGQPegFI
+	 ykP/qN5yTVNTrsLADx0NdOTg2ngKpt+eyntjyybMaNeHjRlIHLVMavUDIz0AnD7mpo
+	 jkZW9SEWeZfy1Nfhg8NaYxMEU0DhvLjCIcb3CkWY=
+Message-ID: <51810153-eb6e-40f7-b5d0-5f72c2f4ee9b@linux.microsoft.com>
+Date: Tue, 12 Mar 2024 11:14:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v14 15/19] fsverity: consume builtin signature via LSM
+ hook
+Content-Language: en-CA
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+ tytso@mit.edu, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+ eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, audit@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1709768084-22539-1-git-send-email-wufan@linux.microsoft.com>
+ <1709768084-22539-16-git-send-email-wufan@linux.microsoft.com>
+ <20240312025712.GE1182@sol.localdomain>
+ <20240312030712.GF1182@sol.localdomain>
+From: Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <20240312030712.GF1182@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Jens,
 
-I'm looking for an architecture-level decision on what the brd driver
-should look like once struct page has been shrunk to a minimal size
-(more detail at https://kernelnewbies.org/MatthewWilcox/Memdescs )
 
-Currently brd uses page->index as a debugging check.  In the memdesc
-future, struct page has no members (you could store a small amount of
-information in it, but I'm not willing to commit to more than a few bits).
+On 3/11/2024 8:07 PM, Eric Biggers wrote:
+> On Mon, Mar 11, 2024 at 07:57:12PM -0700, Eric Biggers wrote:
+>>
+>> As I've said before, this commit message needs some work.  It currently doesn't
+>> say anything about what the patch actually does.
+>>
+>> BTW, please make sure you're Cc'ing the fsverity mailing list
+>> (fsverity@lists.linux.dev), not fscrypt (linux-fscrypt@vger.kernel.org).
+> 
+> Also, I thought this patch was using a new LSM hook, but I now see that you're
+> actually abusing the existing security_inode_setsecurity() LSM hook.  Currently
+> that hook is called when an xattr is set.  I don't see any precedent for
+> overloading it for other purposes.  This seems problematic, as it means that a
+> request to set an xattr with the name you chose ("fsverity.builtin-sig") will be
+> interpreted by LSMs as the fsverity builtin signature.  A dedicated LSM hook may
+> be necessary to avoid issues with overloading the existing xattr hook like this.
+> 
+> - Eric
 
-brd doesn't use anything else from struct page, as far as I can tell.
-It just calls kmap_atomic() / __free_page() / flush_dcache_page() (and
-it doesn't need to call flush_dcache_page() because you can't mmap the
-pages in the brd's array).
+Thanks for the suggestion. I found that using 
+security_inode_setsecurity() causes issues with SMACK's 
+inode_setsecurity() hook. I will crate a dedicated new hook like 
+security_inode_setsig() in the next version.
 
-Now if you have plans to, eg, support page migration, you're going to need
-a bit more infrastructure than just allocating pages, but for what you
-have at the moment, just removing the debugging checks that page->index ==
-idx would make you entirely compatible with the memdesc future.
-
-Any problem with that?
+-Fan
