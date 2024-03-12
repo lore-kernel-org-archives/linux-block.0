@@ -1,143 +1,100 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE907C099
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 15:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0209F7C0A2
+	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 15:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710256978; cv=none; b=gpiHCJZUjxUQ/KLU+RX7ikiATRE1MeLruVSiZk7ln8kTSeyPAXwB9vH3FIyoSAD8oeVU1VSdm7UIOr+5aD1JmvJ7qRwNG5aDuf87PbtBfMzaXl9Ht5gc1wTBi3GH1zws5own0SALfv/uLbtKgogFgr81q5IAGF8kC7u4G8lT2bQ=
+	t=1710257130; cv=none; b=IqFQzrgyp0xBlkLQVnp7404WFGhyA8ZDbbqhchjFnSsuV3NNfwrq0SrHVBEuZ8J97MHvRYZ+cvORpg+6VrXC6ZMJE26u5aZgh2FxZsoSQJpjNDUKT4uq1UfS+zSXu5oUo6cbSk3EcJmkapYi/d7wvfaz+J5+t3/YsKvQVd+UH40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710256978; c=relaxed/simple;
-	bh=0vAcxSLi4l6fH5H4bviOsVgBTA4mchz310ZUv7aGtbw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n5mXh65VV9x+bVTWhAiPO1Q+sMDZn/tfqbam32UmtAgdNIYb3HaAaw2JOrO1i/oWtD59ZZFaeRcc7UcACOZkvgOwSg33LS4/dTdIx87311vZokO+I/cRhrMKwbjdmpU2WDz6xN8TkpjoDSO49mENGMKfj0oA6BM6WP0HJSORsx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-68ee2c0a237so735206d6.1
-        for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 08:22:56 -0700 (PDT)
+	s=arc-20240116; t=1710257130; c=relaxed/simple;
+	bh=PEPmwln94NCGEcSeuFbj28c+FOxCUcenqNvHNwIUO28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gHTylZuJdcekgnaw0PhrJl/3979LrcnW0tPcUb/Nj3JOhFBaAmKebgi1ihGjaV3yDYbSuueGJGfcvqxOGrS7SAd6vUKYYe7/UPwCREr+F/ZMRZsvuTsISoEGyz/9/WbGEqZKU3A1wJocNCxcLHQHF/8l2X1EtjMR2y0DiXJVZxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=oGSr+zcJ; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="oGSr+zcJ"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e694337fffso189955b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 08:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710257128; x=1710861928; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=isqFkNkjh8M6xFgdr2JdEPP4vy/8+U7ze6WQ6bIRNPU=;
+        b=oGSr+zcJaljPHYdpRa0ftDSdJjxWefKWf+mW/QbiXI6qB8GXsov6ObWHfQ3Bt2QCv/
+         WR6nyCW3ooMzMhW2xVxDP0xAKQ97IjDsYy7/Iuaz8BrcilGUlEdlVJNnruB0/Bsr3nWt
+         IAnXx8/y+CYmY1Szm5ozr7A7ENyR10T4/EsQQbjSz1+gFVo/GEzZKQK+kAL3Pqka5cK1
+         8PYY5Kwjh+T6AbAOh3eUol7VwcXFuSyDN9mFCP+R9qwwMIAOJJasmN3xM2gojZpfp15G
+         ZXPuNtmLKSd9jA0OfYCndG+3FUUrBFWtqPui8w/YjnYX2KCllsepOVCy8MLO4HyzmWks
+         ZrjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710256975; x=1710861775;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NbU/Lvz7BQx5TO6vgoeKsNgZwne0imjTwQjOCDWQeDY=;
-        b=ZF8aSeFkbHRFdGFVTdjfn985rkgbnCQIiGw7vhDmbd3CsGxLaS4iBRMoqWcKLybm3z
-         n8SUkxAXGf85aV4ugq2yFEhpWFvTNPj7YkQN6jTNeFp60v9jj/szaDVulGog/JyrEUuU
-         SYLul/KFDMmSX8pRiH8uODBNS/wgRyxmgRGSmBbCizWvM4Qw6kwCWGH6QHmpgfqjf5mG
-         raSdWTpUmmZA2lAc6gy7hncm2KixzLq8SBsOsiB+OmGgCCw1nczSrifZpNjVuxdHo+Lf
-         Lnenz7p3avdIJQiRfHDKjjaAqQCNJVIt7HeSxfRAnBzlaeUdWvHzw89perY/7KCbJJLE
-         1u7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXTSytHC60k1wcPwZ7TGR7EMkUibuoSVHtI4Vf/Y0+JUvQbBnEEG/pCk+VVj55qktYzml5VJqH3e3RoZfiu75ZbmqsAEkztBPETpTE=
-X-Gm-Message-State: AOJu0Yze9hjl6c2a4j1po+GxafWS5pxNylgZTdwnnsDejZCZwjMl7YRP
-	6hDOBLsefHphDYLoGSfKxf19K1SoTF8b/SQG1iKQyh70DWor6pocVJTrpjDC4f0oTAPSdWwg8J5
-	UOw==
-X-Google-Smtp-Source: AGHT+IGtVWgFY7B4+YAvxT4k6duzuHD1e1UcI/bjxCc7plFQt62r5xk0tRu1KWZhE5pXeQVZsOUyYg==
-X-Received: by 2002:ad4:5de9:0:b0:690:2069:d413 with SMTP id jn9-20020ad45de9000000b006902069d413mr17952899qvb.6.1710256975288;
-        Tue, 12 Mar 2024 08:22:55 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id ek19-20020ad45993000000b006907e34d029sm3771891qvb.2.2024.03.12.08.22.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 08:22:54 -0700 (PDT)
-Date: Tue, 12 Mar 2024 11:22:53 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	dm-devel@lists.linux.dev
-Subject: Re: [GIT PULL] Block updates for 6.9-rc1
-Message-ID: <ZfBzTWM7NBbGymsY@redhat.com>
-References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
- <20240311235023.GA1205@cmpxchg.org>
- <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
- <e3fea6c3-7704-46cd-b078-0c6e8d966474@kernel.dk>
- <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
- <Ze-hwnd3ocfJc9xU@redhat.com>
- <Ze-rRvKpux44ueao@infradead.org>
+        d=1e100.net; s=20230601; t=1710257128; x=1710861928;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=isqFkNkjh8M6xFgdr2JdEPP4vy/8+U7ze6WQ6bIRNPU=;
+        b=nLwxu4nOWLQTSkhuKEm3Zx5+e5/wbrVrBrIkjZI4vNcny8SR5ZEtBct05ax/Z12a0g
+         YpiuTBrtiOHkgvHSOVmlwph/m9ypebFaOOkM1fMe3tuwUV6BaObwS26g+V2cKzNzk6WW
+         KnkZzdHoHvXZ9l5q+dwC6y1972IlFVfgJKZpa1H4rt0f4zu8rob6JLlzYzh+evDmOy6l
+         WGw7WDvW4hMbLS+sxDeopLVOtF5WNZJmFsscHSv1fi5SIutEFxCaeRweLQzJqVTig75v
+         GkqC958/SgiLkqq9S48Ze2trNFx+q99+qxRZAO+ZuuJvHTtD2Pt7BwTaXcTfCPlQcQaf
+         gxVw==
+X-Forwarded-Encrypted: i=1; AJvYcCX16zajTacOjpoVQMBwMod9RpohpbTAuM1Gi+1IlkKajjeYQKKTXDLue5pxW6vYFQ7PbaOMONIVDjDJ9ohZShcXu2/5Dqvuzu6og7E=
+X-Gm-Message-State: AOJu0Yy3yMSM39O65RHelfj7vEDbYws1uAu7JducmMZuF9kuXG1iwnyN
+	xfHiT6vsZ4bYOVnsbVzB2QNWNbiMLBgVVbVN7yHH16LsSKoCRte50HHIkeKm190=
+X-Google-Smtp-Source: AGHT+IF2AhyqUSRGn7ICt11M/QQCwt/RqZb/W44/6GVoQxONm4pbO/Z0Aru2fLn/NafWfmgdXF7Fpw==
+X-Received: by 2002:a05:6a20:9f98:b0:1a1:74c9:b66f with SMTP id mm24-20020a056a209f9800b001a174c9b66fmr13590443pzb.3.1710257128270;
+        Tue, 12 Mar 2024 08:25:28 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id z19-20020a62d113000000b006e6b2beb030sm320499pfg.48.2024.03.12.08.25.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Mar 2024 08:25:27 -0700 (PDT)
+Message-ID: <1d0f724d-2460-4cf4-a2c1-cd9813856547@kernel.dk>
+Date: Tue, 12 Mar 2024 09:25:26 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ze-rRvKpux44ueao@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Block updates for 6.9-rc1
+Content-Language: en-US
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ Mike Snitzer <snitzer@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
+ <20240311235023.GA1205@cmpxchg.org>
+ <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
+ <e3fea6c3-7704-46cd-b078-0c6e8d966474@kernel.dk>
+ <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
+ <Ze-hwnd3ocfJc9xU@redhat.com> <Ze-rRvKpux44ueao@infradead.org>
+ <07ab62c9-06af-4a4f-bae8-297b3e254ef5@kernel.dk>
+ <CAHk-=wjtVMQQbez4ZhXBeu4gbrC+BxUf3gd8ypyR5BzV5ekfnA@mail.gmail.com>
+ <01bc0f0d-c754-45af-b5a4-94e92f905f6e@kernel.dk>
+ <ZfBCM0YWewr_KYyn@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZfBCM0YWewr_KYyn@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 11 2024 at  9:09P -0400,
-Christoph Hellwig <hch@infradead.org> wrote:
-
-> On Mon, Mar 11, 2024 at 08:28:50PM -0400, Mike Snitzer wrote:
-> > All for Jens being made to suffer with dm-crypt but I think we need a
-> > proper root cause of what is happening for you and Johannes ;)
+On 3/12/24 5:53 AM, Christoph Hellwig wrote:
+> On Mon, Mar 11, 2024 at 07:23:41PM -0600, Jens Axboe wrote:
+>> Various NVMe devices do have different limits for things like max
+>> transfer size etc, so if it's related to that, then it is possible that
+>> nvme was used but just didn't trigger on that test case. Out of
+>> curiosity, on your box where it broken, what does:
 > 
-> I'm going to try to stay out of the cranking, but I think the reason is
-> that the limits stacking inherits the max_segment_size, nvme has weird
-> rules for them due their odd PRPs, and dm-crypt set it's own
-> max_segment_size to split out each page.  The regression here is
-> that we now actually verify that conflict.
-> 
-> So this happens only for dm-crypt on nvme.  The fix is probably
-> to not inherit low-level limits like max_segment_size, but I need
-> to think about it a bit more and come up with an automated test case
-> using say nvme-loop.
+> All nvme-pci setups with dm-crypt would trigger this.
 
-Yeah, I generally agree.
+This is most likely the key, basically all test suites are run in a vm
+these days, and not on raw nvme devices...
 
-I looked at the latest code to more fully understand why this failed.
+-- 
+Jens Axboe
 
-1) dm-crypt.c:crypt_io_hints() sets limits->max_segment_size = PAGE_SIZE;
 
-2) drivers/nvme/host/core.c:nvme_set_ctrl_limits() sets:
-   lim->virt_boundary_mask = NVME_CTRL_PAGE_SIZE - 1;
-   lim->max_segment_size = UINT_MAX;
-
-3) blk_stack_limits(t=dm-crypt, b=nvme-pci) will combine limits:
-        t->virt_boundary_mask = min_not_zero(t->virt_boundary_mask,
-                                            b->virt_boundary_mask);
-        t->max_segment_size = min_not_zero(t->max_segment_size,
-                                           b->max_segment_size);
-
-4) blk_validate_limits() will reject the limits that
-   blk_stack_limits() created:
-        /*
-         * Devices that require a virtual boundary do not support scatter/gather
-         * I/O natively, but instead require a descriptor list entry for each
-         * page (which might not be identical to the Linux PAGE_SIZE).  Because
-         * of that they are not limited by our notion of "segment size".
-         */
-	if (lim->virt_boundary_mask) {
-                if (WARN_ON_ONCE(lim->max_segment_size &&
-                                 lim->max_segment_size != UINT_MAX))
-                        return -EINVAL;
-                lim->max_segment_size = UINT_MAX;
-	} else {
-                /*
-                 * The maximum segment size has an odd historic 64k default that
-                 * drivers probably should override.  Just like the I/O size we
-                 * require drivers to at least handle a full page per segment.
-                 */
-		if (!lim->max_segment_size)
-                        lim->max_segment_size = BLK_MAX_SEGMENT_SIZE;
-                if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
-                	return -EINVAL;
-        }
-
-blk_validate_limits() is currently very pedantic. I discussed with Jens
-briefly and we're thinking it might make sense for blk_validate_limits()
-to be more forgiving by _not_ imposing hard -EINVAL failure.  That in
-the interim, during this transition to more curated and atomic limits, a
-WARN_ON_ONCE() splat should serve as enough notice to developers (be it
-lower level nvme or higher-level virtual devices like DM).
-
-BUT for this specific max_segment_size case, the constraints of dm-crypt
-are actually more conservative due to crypto requirements. Yet nvme's
-more general "don't care, but will care if non-nvme driver does" for
-this particular max_segment_size limit is being imposed when validating
-the combined limits that dm-crypt will impose at the top-level.
-
-All said, the above "if (lim->virt_boundary_mask)" check in
-blk_validate_limits() looks bogus for stacked device limits.
-
-Mike
