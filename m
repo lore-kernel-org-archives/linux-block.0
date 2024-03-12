@@ -1,69 +1,136 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F79D7A126
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 11:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D888BA28
+	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 12:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710244407; cv=none; b=YIL2rfEwuvNJfRw9q32pEBTW3wczf2oMb9zmCyZs8WFoYFZ87b27RvbgXfF60LjElxOsiX7UcoRGd1GzHt3aaoyenTA9evYDudRDMUkc+/KkaS76qAtxB5S5YLi8Z01Flus8U0bvj6swSoGddRVc3LsHd4MexKU2Sx8dOyjPviU=
+	t=1710246208; cv=none; b=LqJ9/p/XyZ65QRiULQUdjfXP0ZnIA7UxtHSPL7zglQ2W8UHMW6DN6YB+suX7bhsmusbSKJG8PctkgAeGMDgHb8b2LywCiVuTVc3Zjs+E4ORaxtVgU8QFxprDce6V2u3OUoUuk0p14Mm1mI9qj2m1nsEgyouY+FG7G8h+wx6MHx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710244407; c=relaxed/simple;
-	bh=B1cX7vPEUdJUR6ISffq06N70YvLEKpjuWUK2JDKB65k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jOonX16UGWGdkRue7hSUyQMxoCV8nKbpkUnOG7IaDS9oToXe1yvDfp1OxQBvPhBuBRqTpRB/CIAoycYK87C8BwSaHv/2eapHX8JAqkpkd0sWmZVXMgR5JDuHczgcYlgqNipAgQOVimlJGwPVsyFBx3X1t3E/QakV9weF6WLp3OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vZVVcpJq; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1710246208; c=relaxed/simple;
+	bh=qjZk8e0DXnxZ7D8c82te4o3kYapYLIZySjx9Aa/vAjY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B8olUgRQea4CnZKh+rUcdqF+9+hiaUUuxyPd4mnqSHFitDU4G5Gf7ouogr6GSgv3PR9o0oemFyqy9DIg5VPloY3D+WptB9Ap2v+U7NwliJjI6rWb6g3o1NRBkuFCfdCbCG4OMpEXrL64WS3C8MQShm1pcy4NOuFDiyS3U+ppTG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VezBtpf6; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vZVVcpJq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=B1cX7vPEUdJUR6ISffq06N70YvLEKpjuWUK2JDKB65k=; b=vZVVcpJqnMF+vewGa+p8t8GWFN
-	7svGR9x4Gu0sRJAk8gp9fevFVC6XbmUFCEWAxOI8BqYODsw1xCnfNkXRc8/gjlxgK0yxoz1ML6Bgn
-	aN0dHN/lqBdzV0AUcAQ8Cg/qf6aPiisDj0lCOhpkgabamARifSAEZWt94yD+UK3nslYK4q8zOflY1
-	KkY6P7PFufM77qpUJnmmX+WDDUkjz4aA9KwrauReR451r568oGDS0TadYpnCHOAlnXGWRFSepjLtg
-	4G1Nzet0e4qs+Zy2eulImcyAnTsnROS8qwbHkbXbpSxgmYGRGvfLupuJZ+bc1paRw8mmt+covvkN2
-	ghWmF0uQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rk0h9-00000005aeD-2abu;
-	Tue, 12 Mar 2024 11:53:23 +0000
-Date: Tue, 12 Mar 2024 04:53:23 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [GIT PULL] Block updates for 6.9-rc1
-Message-ID: <ZfBCM0YWewr_KYyn@infradead.org>
-References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
- <20240311235023.GA1205@cmpxchg.org>
- <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
- <e3fea6c3-7704-46cd-b078-0c6e8d966474@kernel.dk>
- <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
- <Ze-hwnd3ocfJc9xU@redhat.com>
- <Ze-rRvKpux44ueao@infradead.org>
- <07ab62c9-06af-4a4f-bae8-297b3e254ef5@kernel.dk>
- <CAHk-=wjtVMQQbez4ZhXBeu4gbrC+BxUf3gd8ypyR5BzV5ekfnA@mail.gmail.com>
- <01bc0f0d-c754-45af-b5a4-94e92f905f6e@kernel.dk>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VezBtpf6"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-609f1b77728so51317977b3.3
+        for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 05:23:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1710246205; x=1710851005; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qjZk8e0DXnxZ7D8c82te4o3kYapYLIZySjx9Aa/vAjY=;
+        b=VezBtpf6MbzmUquxNus+FxvG+Sd7Fvq4uQ3P1V7bQQtaST3ZQIW8DxiGN8MUa3diYW
+         XDGo9QUzoAfXoVqtQpoTp1/zd0eioavkEjPS+4/nV44rt9MnHWTFJ/bpUAYPXmXvjApn
+         Qe6tKe8hc7ZwoWbWJLm6touHZ66t6vbNA2f99QQqPQU7+/RQnQ+7fR9Swxr3N5BfNw09
+         vTGkn0O3H3pN+3qtEuhtd5XDEVQNC4YVgt/iidMW5X6kAWeDTuqSC2MpigezmZ6m6uQC
+         jbzk3rJHAzwYO8ciWdgGTM6YvihpeWlAGleSSvlW7Cid7wf+o0j/EPgIc2mYXHhT0gmM
+         BMOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710246205; x=1710851005;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qjZk8e0DXnxZ7D8c82te4o3kYapYLIZySjx9Aa/vAjY=;
+        b=HNNqRNBGOaBUcPo0/4cSHGbnpz+UhKn2CY7jXD7Zek/9dRhXACaoOZBeckrRjqD4ki
+         RC81z0dstzqV2YTNv/5khdbI+jzPMnP30AVXN4ky+7Bq8756RWoZ8LWpVXhOqKwFuSOi
+         WTTNcNkb5/2ROJkGJKHbyPxYrTgN1g1GI6DJvzCUbxOaIIhVf4kjjQsVxATWtdgtEhRt
+         MU0xfgbAIplFE0bh7Jwoo7DAiZlAXnOofROkSSFg6pdT+PhvsmXQ46/VN5VUP7fojVho
+         rlL9LV50FuGDr3IDoewC2/hGuCj225Ivz47DFDmv/Q+0VXn7gIsgCzXtwKOtFJYla6ns
+         0Wjw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/jPoPpia69sHBPIpO6xS/YyDOCcVUzxqops5tGGvttC0mATP9yg7FUsoYdPNGpc2jSqyMFefthz/6Zvxrx4ItTgDyCeUDiCpHCu4=
+X-Gm-Message-State: AOJu0YzY2u45eEH9Ud0q3nMF/jAzSYSfr7AaVyVxZpZxB6ksV4+o7lUb
+	ZeijlBrj7bPp9JHIBbjRIbhCraWVD0eMXuIsZHHhKloD6WhYI10OGpSoNPl5bC7p/JNgPNKfh8u
+	h8EHvl3y0zeuBjUQyacuH78MvhvI7JlssGEKlaA==
+X-Google-Smtp-Source: AGHT+IF2gNuqdneyeOK7heTOwlxyVd7ti+X+/+UyoI+K3w0WE6smlBrmYkyIybU+Ay4l6wMJhYPiybNO3wdfWJeM7CY=
+X-Received: by 2002:a25:6ed7:0:b0:dcb:38d3:3c6a with SMTP id
+ j206-20020a256ed7000000b00dcb38d33c6amr1438229ybc.46.1710246205535; Tue, 12
+ Mar 2024 05:23:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01bc0f0d-c754-45af-b5a4-94e92f905f6e@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <cover.1709667858.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1709667858.git.daniel@makrotopia.org>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 12 Mar 2024 13:22:49 +0100
+Message-ID: <CAPDyKFpQfue5Fi0fFSnqHNg2ytCxAYfORVP_Y86ucz2k5HRuDA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/8] nvmem: add block device NVMEM provider
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	Christian Brauner <brauner@kernel.org>, Li Lingfeng <lilingfeng3@huawei.com>, 
+	Damien Le Moal <dlemoal@kernel.org>, Min Li <min15.li@samsung.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Hannes Reinecke <hare@suse.de>, 
+	Christian Loehle <CLoehle@hyperstone.com>, Avri Altman <avri.altman@wdc.com>, 
+	Bean Huo <beanhuo@micron.com>, Yeqi Fu <asuk4.q@gmail.com>, 
+	Victor Shih <victor.shih@genesyslogic.com.tw>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	"Ricardo B. Marliere" <ricardo@marliere.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org, 
+	Diping Zhang <diping.zhang@gl-inet.com>, Jianhui Zhao <zhaojh329@gmail.com>, 
+	Jieying Zeng <jieying.zeng@gl-inet.com>, Chad Monroe <chad.monroe@adtran.com>, 
+	Adam Fox <adam.fox@adtran.com>, John Crispin <john@phrozen.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 11, 2024 at 07:23:41PM -0600, Jens Axboe wrote:
-> Various NVMe devices do have different limits for things like max
-> transfer size etc, so if it's related to that, then it is possible that
-> nvme was used but just didn't trigger on that test case. Out of
-> curiosity, on your box where it broken, what does:
+On Tue, 5 Mar 2024 at 21:23, Daniel Golle <daniel@makrotopia.org> wrote:
+>
+> On embedded devices using an eMMC it is common that one or more (hw/sw)
+> partitions on the eMMC are used to store MAC addresses and Wi-Fi
+> calibration EEPROM data.
+>
+> Implement an NVMEM provider backed by block devices as typically the
+> NVMEM framework is used to have kernel drivers read and use binary data
+> from EEPROMs, efuses, flash memory (MTD), ...
+>
+> In order to be able to reference hardware partitions on an eMMC, add code
+> to bind each hardware partition to a specific firmware subnode.
+>
+> This series is meant to open the discussion on how exactly the device
+> tree schema for block devices and partitions may look like, and even
+> if using the block layer to back the NVMEM device is at all the way to
+> go -- to me it seemed to be a good solution because it will be reuable
+> e.g. for (normal, software GPT or MBR) partitions of an NVMe SSD.
+>
+> This series has previously been submitted on July 19th 2023[1] and most of
+> the basic idea did not change since.
+>
+> However, the recent introduction of bdev_file_open_by_dev() allow to
+> get rid of most use of block layer internals which supposedly was the
+> main objection raised by Christoph Hellwig back then.
+>
+> Most of the other comments received for in the first RFC have also
+> been addressed, however, what remains is the use of class_interface
+> (lacking an alternative way to get notifications about addition or
+> removal of block devices from the system). As this has been criticized
+> in the past I'm specifically interested in suggestions on how to solve
+> this in another way -- ideally without having to implement a whole new
+> way for in-kernel notifications of appearing or disappearing block
+> devices...
+>
+> And, in a way just like in case of MTD and UBI, I believe acting as an
+> NVMEM provider *is* a functionality which belongs to the block layer
+> itself and, other than e.g. filesystems, is inconvenient to implement
+> elsewhere.
 
-All nvme-pci setups with dm-crypt would trigger this.
+I don't object to the above, however to keep things scalable at the
+block device driver level, such as the MMC subsystem, I think we
+should avoid having *any* knowledge about the binary format at these
+kinds of lower levels.
+
+Even if most of the NVMEM format is managed elsewhere, the support for
+NVMEM partitions seems to be dealt with from the MMC subsystem too.
+Why can't NVMEM partitions be managed the usual way via the MBR/GPT?
+
+[...]
+
+Kind regards
+Uffe
