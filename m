@@ -1,43 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEE579DA6
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 11:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F79D7A126
+	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 11:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710244338; cv=none; b=E42+NMfPD/xDPXb2jtOP48g9bffLqrvA2x1D73c2fJ3dKS0hSY16NFnWp0bAHb6BdyEvPLY0BfDf3L3RwjxpEtJicrKQfpAOIpzgzYfwrzgAti+r+N+9Se6+xsOowpE26oJWI8mBDBtQkpQvcelf0MQqmB4o5TEnXZpQszZ910k=
+	t=1710244407; cv=none; b=YIL2rfEwuvNJfRw9q32pEBTW3wczf2oMb9zmCyZs8WFoYFZ87b27RvbgXfF60LjElxOsiX7UcoRGd1GzHt3aaoyenTA9evYDudRDMUkc+/KkaS76qAtxB5S5YLi8Z01Flus8U0bvj6swSoGddRVc3LsHd4MexKU2Sx8dOyjPviU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710244338; c=relaxed/simple;
-	bh=8G+NqU8TAar8dDCyN0Z614DwQ2fQ+To+UP5LTwEXdqw=;
+	s=arc-20240116; t=1710244407; c=relaxed/simple;
+	bh=B1cX7vPEUdJUR6ISffq06N70YvLEKpjuWUK2JDKB65k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RXCgJlafiDnog1o3JRV1ZLQaIEJjkgcxGImgT7LR6XpbgXuborHzeN2w4M6u0zwktT8mEhs8jD5U0QMfCI6xkpvn+LHRKfkIG/pSzSukeYSqvDhEJJ6q33FGJuYxJCbcr/i2A3zZHgG9s9oxceE0MMxuoOCZzgbbtHxgqTzzXlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VdLnD0XY; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=jOonX16UGWGdkRue7hSUyQMxoCV8nKbpkUnOG7IaDS9oToXe1yvDfp1OxQBvPhBuBRqTpRB/CIAoycYK87C8BwSaHv/2eapHX8JAqkpkd0sWmZVXMgR5JDuHczgcYlgqNipAgQOVimlJGwPVsyFBx3X1t3E/QakV9weF6WLp3OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vZVVcpJq; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VdLnD0XY"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vZVVcpJq"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zJvsSA+JegeOGi0/Y4HrxMU/U+zv4tqEkaq1whY5MAA=; b=VdLnD0XYjoAgrsemtMUopGfA4V
-	531dczOCYpPUgMi/yFe5hr64AjVrP8658xGUacXcPEQCutY1YwpzBSA8ibHxym7FbSoMFPJAGDlm4
-	Ig9XiYAJH4MEwu4lUgf0175ZhX1Zy/itwHl+j3GZKbbEyEmMcLJdAzjjRpy5sL2Nk+eQ2aMEkfD+c
-	u0kZcvcNslSsQhMGe1Re+KEukVQq93pG0j3QbINHqbwY4X2DI8Lob3eJdahgAsypZhqqWceI+3jF6
-	7be/mAZGczY37pKOoxtRgfquSazSNu7mysgz/PbrDN9L7OorvwELMzy+4iYwF8n4VmpdENkukxxdf
-	5fN9BICg==;
+	bh=B1cX7vPEUdJUR6ISffq06N70YvLEKpjuWUK2JDKB65k=; b=vZVVcpJqnMF+vewGa+p8t8GWFN
+	7svGR9x4Gu0sRJAk8gp9fevFVC6XbmUFCEWAxOI8BqYODsw1xCnfNkXRc8/gjlxgK0yxoz1ML6Bgn
+	aN0dHN/lqBdzV0AUcAQ8Cg/qf6aPiisDj0lCOhpkgabamARifSAEZWt94yD+UK3nslYK4q8zOflY1
+	KkY6P7PFufM77qpUJnmmX+WDDUkjz4aA9KwrauReR451r568oGDS0TadYpnCHOAlnXGWRFSepjLtg
+	4G1Nzet0e4qs+Zy2eulImcyAnTsnROS8qwbHkbXbpSxgmYGRGvfLupuJZ+bc1paRw8mmt+covvkN2
+	ghWmF0uQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rk0g2-00000005aMx-2Df5;
-	Tue, 12 Mar 2024 11:52:14 +0000
-Date: Tue, 12 Mar 2024 04:52:14 -0700
+	id 1rk0h9-00000005aeD-2abu;
+	Tue, 12 Mar 2024 11:53:23 +0000
+Date: Tue, 12 Mar 2024 04:53:23 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
 	Mike Snitzer <snitzer@kernel.org>,
 	Johannes Weiner <hannes@cmpxchg.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [GIT PULL] Block updates for 6.9-rc1
-Message-ID: <ZfBB7reT7Di-DHDm@infradead.org>
+Message-ID: <ZfBCM0YWewr_KYyn@infradead.org>
 References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
  <20240311235023.GA1205@cmpxchg.org>
  <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
@@ -47,6 +48,7 @@ References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
  <Ze-rRvKpux44ueao@infradead.org>
  <07ab62c9-06af-4a4f-bae8-297b3e254ef5@kernel.dk>
  <CAHk-=wjtVMQQbez4ZhXBeu4gbrC+BxUf3gd8ypyR5BzV5ekfnA@mail.gmail.com>
+ <01bc0f0d-c754-45af-b5a4-94e92f905f6e@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,18 +57,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wjtVMQQbez4ZhXBeu4gbrC+BxUf3gd8ypyR5BzV5ekfnA@mail.gmail.com>
+In-Reply-To: <01bc0f0d-c754-45af-b5a4-94e92f905f6e@kernel.dk>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Mar 11, 2024 at 06:20:01PM -0700, Linus Torvalds wrote:
-> On Mon, 11 Mar 2024 at 18:17, Jens Axboe <axboe@kernel.dk> wrote:
-> >
-> > That does seem like the most plausible explanation, I'm just puzzled why
-> > nobody hit it before it landed in Linus's tree.
-> 
-> Yeah, who _doesn't_ have nvme drives in their system today?
-> 
-> What odd hardware are people running?
+On Mon, Mar 11, 2024 at 07:23:41PM -0600, Jens Axboe wrote:
+> Various NVMe devices do have different limits for things like max
+> transfer size etc, so if it's related to that, then it is possible that
+> nvme was used but just didn't trigger on that test case. Out of
+> curiosity, on your box where it broken, what does:
 
-Whatever shows up in the test VMs, or what is set up by the automated
-tests.
+All nvme-pci setups with dm-crypt would trigger this.
