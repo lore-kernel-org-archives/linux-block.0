@@ -1,96 +1,141 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9ED2365
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 00:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C9B653
+	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 01:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710203338; cv=none; b=oacr+RvDDQqLyH/pt0lnbFw+7d1GzgmBkuhxFTLbrOHu9ome2N94JVoGG9VUx3MrjM7Bs7hg38XMDWe4N5GTjh4WXI8RdJne9nyhnknB1ZVneT6CdPuKPyonQRvkdi08PLt6ZcdWW/2sZZKgLl4QAjufKD0o3h+R4aXP+LtBKK8=
+	t=1710205305; cv=none; b=IVuTHj6ybqKXS1BQ3Ae3M86q8dqh8rLcDTTr+/keoCpm7EbI3jj98hrHd0nsNWwd99X6T+LMkazyVJFLPzjqd/IWGX/qf9ICNmWm8O3ysnZ65cVjlj0D5OvXEefwnyspKOBAyiVRSObZxi4VITMtGn6CDP49ncBdOw1ico8xdQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710203338; c=relaxed/simple;
-	bh=bIEMZQSJ+VTf8lkIZGsjQrc+q1xSE1oT6q08tZQg5m8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c++vjQiKwPDherS4YiGXZfgCxJTxeeABpmwU9KXjFvJrAbw0yGyXVEVMlYCH4LrZDM9jO8+d6Ap7XePxjd3A9QJXS5AP7gnTtQZULSPnjlnxtGgndiiUcUXmd2oH9QXwy8zggNLLAAGR4+LHAhFgqyB0+0YM0kEbA5Pf8prOR10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1dd8f7d50c6so12685205ad.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Mar 2024 17:28:56 -0700 (PDT)
+	s=arc-20240116; t=1710205305; c=relaxed/simple;
+	bh=m1rGjQy77yw95mSf7US39oq2/B0oOuxoHVpSpHD8f/Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lBYV3OdaSviKRaoaGMqzkZ411je9MTszN37QtKJUgO++GXO2Yz1RXVYQbfHQpmz6RugM/0jlZ6UYCFg54Vg11WAJ3TD8wWfOdOp01bmRu780khxm8etmmJv4Izxzmqg+MxG5gw/R08i5jfrXUQKBlAOmVMMN4Zw1FTvQTOsJE4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BcbuBfA4; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BcbuBfA4"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5d862e8b163so1731044a12.1
+        for <linux-block@vger.kernel.org>; Mon, 11 Mar 2024 18:01:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710205301; x=1710810101; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZLmUbX7IyugukF5hApWgrsaqSNJ28iAYVTfA3RfKKmc=;
+        b=BcbuBfA4XfleDuUJ2sH46sKUQhG9dDYYaQiLcc5facrXKdslJEq+tyIdlfBD5eYC8e
+         SMQRn3VszDA3ADhQhWBFQWMLV5h11bBhJVsxFPeLo0fVVh0/nUWuH7vOT4jBvlz804IN
+         Vpx7sLoOJRYRCAjxCZOXlk/bhXhJBmKQ8zNmnl5VG/LjuQbsrdYs/lqWS/VGwPkhG9pS
+         aHgt2Vncvb4X69h1m0n6yoX6ZO6PkyZ4kPO7sU/Em8Kq/TRtJDVpteOUhd/VgPE2xOhg
+         MmYyAY5W4Pmkzz3Og3xarIg36a0lqNcPypMaXsY24seO47iKxCLddYTj7Hsm8mkdanFV
+         COrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710203336; x=1710808136;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lNiduUkWsDmsnxQfZflqFU2bptgIVV7MBusTsK18Jcw=;
-        b=qEQLOPQKuRPZ7I8hyiNXEf4lu7r9vA40cbX+OD6oXCIUApe1IOkEle4pZn9TnoM8LB
-         dMVcPeD8I821FulWcWBDWVq/ucu3Vdi+bq7/nhhDsvba4kOjLlbxC5A9SUGEKnNXfZXC
-         TwbLxxdvt2cbocktwBK6Pvexk8eWxYJsZfmcXps36L38tB9YKraHvrqI/JjgHj8r/X22
-         SuaRLc49+QXJfI1SkAaTDU9NsEva8qEtxI1D91S9MEM3kgvoar8E/1B6KPfk8+7Bqa6b
-         Ye2dqTRKxHBuFJJYrRlj6+G/k46nlf2B1/rdarKX68mz1tY5PEueotvd3hGgNgQ3apy9
-         ONoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWZ1iMrCWVJygI6dFpF44u1AwP088gT94nM7k6Pv7UKauwG7w0E12h85INOYM963o6JXtDIO9pBAp1hoN2WmBP1DrmKYEzKTykZAI=
-X-Gm-Message-State: AOJu0Yw5/ydWffQ5b6e7EbIhvrVZU2R2MVtQ4hZtgEoZLyrMwed5zjzP
-	xKMY6c5tsryccpvlpW+28YEZRjX28hPdM6JdoTy+IZKpEehjUoRWQc6kAAcmOA==
-X-Google-Smtp-Source: AGHT+IHynuQn1yMVRGYJdQwAHHEoKvYgkAT8o079s/hKcWAa7K9StlvXxaoDFNDt5QUzACuJW7rstg==
-X-Received: by 2002:a17:902:e9cc:b0:1dd:6285:b84a with SMTP id 12-20020a170902e9cc00b001dd6285b84amr9275992plk.9.1710203336085;
-        Mon, 11 Mar 2024 17:28:56 -0700 (PDT)
-Received: from localhost ([194.195.89.21])
-        by smtp.gmail.com with ESMTPSA id u11-20020a170903124b00b001d8f81ecea1sm5339478plh.172.2024.03.11.17.28.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 17:28:55 -0700 (PDT)
-Date: Mon, 11 Mar 2024 20:28:50 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@infradead.org>
-Subject: Re: [GIT PULL] Block updates for 6.9-rc1
-Message-ID: <Ze-hwnd3ocfJc9xU@redhat.com>
-References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
- <20240311235023.GA1205@cmpxchg.org>
- <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
- <e3fea6c3-7704-46cd-b078-0c6e8d966474@kernel.dk>
- <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1710205301; x=1710810101;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZLmUbX7IyugukF5hApWgrsaqSNJ28iAYVTfA3RfKKmc=;
+        b=RFJXEAfu/t5GCGIBNhKrejTOmjVD+JFILkfnEKZJGsbzotIpD4DgFEF6sLf5upI0YH
+         4A6NR6TyDPc03N2tE0UUYO1Y+h3iR8QgPdB6aEF2eFH2KLqv8bHjek2O683TSXA02PWC
+         qkRtY+sXgjbq/8tTBQ6XAO4jnVHKoGb7AHfiOHAcUPagACHUq+T9uRUnSTMSUkZCcpx8
+         2PqYUCQ3IfWUS89YjKPuIcYSS9jHWEZrfSMlGUr6KUhX6ZqMfah+58BkvjIMSSNWAORV
+         3Uzb4fjYesPRq2j/BiChrljRTwKp29I+SjBSHOtlH9PXCiIyvKn7ZQQMH7DRAJ3JFU2b
+         90VA==
+X-Forwarded-Encrypted: i=1; AJvYcCURqMbHoFwS+OqDbjrpl6GMnJpdHyiJH7XscxxyZ4uOZF6D1sh7ImNWZYI4CV99mRnExJ7rosTcuGWRDtqvKRHI4NvdSlA2XquE7ew=
+X-Gm-Message-State: AOJu0YyS+32u9PVn6HjzHy1asbTXjYEbb6f1WHVhzyExcEIrzuufECzQ
+	qDKcvuPpmE26QCNQY3Adp9XA0+QXuIDLYkgNQ9kh/9dYEvtEW8w1aDDF855bOnOvf0Rfzkolx/Y
+	y
+X-Google-Smtp-Source: AGHT+IFx4FgcKj2HztVcBXzWXiWr+Cafd2KIKKVpefTWtqHDm189BFjppwVxa2ql7VFQBS1b7RMk0Q==
+X-Received: by 2002:a17:902:ed53:b0:1db:3ee6:e432 with SMTP id y19-20020a170902ed5300b001db3ee6e432mr8722557plb.3.1710205300935;
+        Mon, 11 Mar 2024 18:01:40 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id 18-20020a170902c21200b001dd6290283fsm5323939pll.248.2024.03.11.18.01.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Mar 2024 18:01:40 -0700 (PDT)
+Message-ID: <9f07c344-d91f-46e0-b8b9-aa9db1d04b0a@kernel.dk>
+Date: Mon, 11 Mar 2024 19:01:39 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Block updates for 6.9-rc1
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@kernel.org>
+References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
+ <20240311235023.GA1205@cmpxchg.org>
+ <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
+ <e3fea6c3-7704-46cd-b078-0c6e8d966474@kernel.dk>
+ <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
 In-Reply-To: <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 11 2024 at  8:21P -0400,
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
-
+On 3/11/24 6:21 PM, Linus Torvalds wrote:
 > On Mon, 11 Mar 2024 at 17:02, Jens Axboe <axboe@kernel.dk> wrote:
-> >
-> > Just revert that commit it for now.
+>>
+>> Just revert that commit it for now.
 > 
 > Done.
-> 
+
+Thanks!
+
 > I have to say, this is *not* some odd config here. It's literally a
 > default Fedora setup with encrypted volumes.
-> 
+
+Oh I realize that, which is why I'm so puzzled why it was broken. It's
+probably THE most common laptop setup.
+
 > So the fact that this got reported after I merged this shows a
 > complete lack of testing.
 
-Please see my other reply just now.  This breakage is new.  Obviously
-cryptsetup's testsuite is lacking too because there wasn't any issue
-for weeks now.
+Mike reviewed AND tested the whole thing, so you are wrong. I see he's
+also responded with that. Why we had this fallout is as-of yet not
+known, but we'll certainly figure it out.
 
 > It also makes me suspect that you do all your performance-testing on
 > something that may show great performance, but isn't perhaps the best
 > thing to actually use.
-> 
+
+I do that on things that I use, and what's being used in production.
+This includes obvious the block core and bits that use it, and on the
+storage front mostly nvme these days. I tested dm scalability and
+performance with Mike some months ago, and md is a regular thing too. In
+fact some of the little tweaks in this current series benefit the distro
+configurations quite a bit, which is obviously what customers/users tend
+to run. It's all being worked up through the stack.
+
+crypt is fine and all for laptop usage, but I haven't otherwise seen it
+used.
+
 > May I suggest you start looking at encrypted volumes, and do your
 > performance work on those for a while?
 > 
 > Yes, it will suck to see the crypto overhead, but hey, it's also real
 > life for real loads, so...
 
-All for Jens being made to suffer with dm-crypt but I think we need a
-proper root cause of what is happening for you and Johannes ;)
+Honestly, my knee jerk reaction was "pfft I don't think so" as it's not
+an interesting use case to me. I'd be very surprised if it wasn't all
+lower hanging DM related fruits here, and maybe it's things like a
+single decrypt/encrypt pipeline. Maybe that's out of necessity, maybe
+it's an implementation detail that could get fixed.
 
-Mike
+That said, it certainly would be interesting to look at. But also
+probably something that require rewriting it from scratch, probably as a
+dm-crypt-v2 or something. Maybe? Pure handwaving.
+
+What would make me do that is if I had to use it myself. Without that
+motivation, there's not a lot of time leftover to throw at an area where
+I suspect performance is perhaps Good Enough that people don't complain
+about it, particularly because the use case is what it is.
+
+-- 
+Jens Axboe
+
