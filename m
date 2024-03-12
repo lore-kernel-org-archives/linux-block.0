@@ -1,123 +1,57 @@
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28301428EF
-	for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 20:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3471B13B2BF;
+	Tue, 12 Mar 2024 21:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710274075; cv=none; b=BrT6BLO7MUuSf0jMHwsWCIj8wW8qflHuUSGXSzXhgXkSjhXphMaeZrUi+DfGlb0Hg81scf5Su5vMQ80XgnXkYFp/ys5/eryHCfphbEJUKUixyC2gwCmeGocZeUsmGX+r9Oi4+/iqUX96Y30Ksl4r3/jl45FNjjhSCcmsMvqAVgo=
+	t=1710277578; cv=none; b=aSYPtqLGXtVC/fWK7n3vIW/Qukp45IQmXq/g2cERUVH+EozfsiI20ItK0pIBEj0k7rnY88N99UKrM6qMQ2rYYkrfiTROKepVeGiYq8OmOOuJteaivUxc9FI8lDx6hj1z6J9/oRybl0z06Ouju36pV/68t5Q6wKfVhmZUDCFdhJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710274075; c=relaxed/simple;
-	bh=KK3vfTC21FfD3a3vNi4VaniP6dAy7ashn5OtgY1y6Kc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YzZ1pUW4XY5q8YeI7P7GvAMCXCs1/KrBVJt9eNv7K8oVV84Vh3MUbzji5ABkhSPPX8FBgOo/CPZ9SsH9oGgDYhbRFcHx1yby1StaRxM8wVaEcIiGf050Vfg6nS13uY4pHNJZUgxcCNSBHIYX+h5dFoMol7T8e1fDeZmeAAPXQM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ElgnVr/3; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ElgnVr/3"
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dc25e12cc63so225518276.0
-        for <linux-block@vger.kernel.org>; Tue, 12 Mar 2024 13:07:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1710274073; x=1710878873; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dIM56byQCwYfF5RCflaFTltitkLV02ChrYWIQLMiS/Y=;
-        b=ElgnVr/3Q/zYk3p8cOr0srbGrwrn6SR+lC77XKGviNYk3F5Pp4ywOeBM4MexCiFGAb
-         K1JldP5PIG50cuVSCEjquhwrRdW1pHztVk5hQWrrQlPiOtHgMfw+F8fjjPybyawQHeKp
-         ZxyNdr8MI26Bj1AiSGBU6JkWMAFkvga9MPrGDq5CS+FiSwhZqZZb1peNgdyHRwBj1kM4
-         l9k3SECxSnTxmpzXoVifZzVrBdkUrGT+ZITUIt2GnyCZmREQM6Z7LYy6M4h0oHBRApMC
-         rXXmCc+zVuhcVCRcZsSBg/JWhX033y01J5x2vyxo0NS5vyCVyEcK20CHIOiuT6OGvjes
-         4Prg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710274073; x=1710878873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dIM56byQCwYfF5RCflaFTltitkLV02ChrYWIQLMiS/Y=;
-        b=BJg1BaQW0y3ffTChbah5/dvhAoeLNiMfxiebFdgHqPQoZw0d6ltCvkSDpiaRdl3e6L
-         A7pSVO4IKD1UpxnIR8BVUx7JyTwOqYdFmrSv2S6li6JSYi4bGCV4TrMF4wpkeO+yqbZg
-         O5Gv1ndZCP0zE1m86E5qApwjGPvoYLPOKMKLdPJLyqngzM5T52sRukurgvY7FBVUXujN
-         gY4/9zl6+LBM9WdXwCJsRUNVEFj9pkcelbYHXnEAgdZVXbubsBQy8+s+db4ke3klKzbO
-         jAbgEbjNay5nhqegzq5hlnJW3KpQo/3RFSN1kWo/gqZs+WpMsIINfCcEhYvK5YanKuBa
-         gyUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFaNCua2YJXwmD8a+h75At+btV4Qd/Bugyiw9B8lDz02sQXk44Up4oYxqxtAj6owhOMBVDG3wHfHvuq5cFJVwMjomzfWlXx22vnjE=
-X-Gm-Message-State: AOJu0YxLNw7saJc/F4X/CZzKGscrs9erQA0OhYZaVP79OilQ2PWkfo4t
-	ZisBlPSye6I+Rm+buIJ33o3SE0IfkCiNTn0qVUTtXX/QH4HwDtEbumFiukH9yKW6IoHPvWHznF2
-	50xfW5JDkfNY8TWejfWfJK+F3iCC9skgHm4Hu
-X-Google-Smtp-Source: AGHT+IFUO9loFBNfYwY2rilDGi4a1ZxrFKhf7gDp1B59xt2uvInDy15QqH6xxud+73LelILqgfwJCkTcRwHNX1HB0r4=
-X-Received: by 2002:a25:c714:0:b0:dcd:b806:7446 with SMTP id
- w20-20020a25c714000000b00dcdb8067446mr396824ybe.1.1710274072732; Tue, 12 Mar
- 2024 13:07:52 -0700 (PDT)
+	s=arc-20240116; t=1710277578; c=relaxed/simple;
+	bh=NZtNQe8FfSLe7l5huBX7qHg3m0jeJ/yz/2Nr1uH4Apw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TcTRKis85VFhJpJhR+QyNDZkd5/B599yRM1b2I/AYC4PBZ+3u2jQLSFtKkLYbTw2HPDlNkSUSIf7HBQYIrP4YVvEwnluBs/F+v11PdjlibZVnASUfQM0boeKXLORkWcru8x8dkq6FeYJUySGitEdmnahpf0Nq+Ye8y2d490olGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 9551768BFE; Tue, 12 Mar 2024 22:06:05 +0100 (CET)
+Date: Tue, 12 Mar 2024 22:06:05 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Chandan Babu R <chandanbabu@kernel.org>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 2/5] block: add a bio_chain_and_submit helper
+Message-ID: <20240312210605.GA1500@lst.de>
+References: <20240312144532.1044427-1-hch@lst.de> <20240312144532.1044427-3-hch@lst.de> <ZfBr91m4oQS_VYFg@kbusch-mbp.mynextlight.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1709768084-22539-1-git-send-email-wufan@linux.microsoft.com>
- <1709768084-22539-16-git-send-email-wufan@linux.microsoft.com>
- <20240312025712.GE1182@sol.localdomain> <20240312030712.GF1182@sol.localdomain>
- <51810153-eb6e-40f7-b5d0-5f72c2f4ee9b@linux.microsoft.com>
- <568fae5e-a6d4-4832-a1a1-ac3f4f93d650@schaufler-ca.com> <746a5548-0e98-4953-9e71-16b881c63aa8@linux.microsoft.com>
-In-Reply-To: <746a5548-0e98-4953-9e71-16b881c63aa8@linux.microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 12 Mar 2024 16:07:41 -0400
-Message-ID: <CAHC9VhTYoT-XrSp4h5QwT5tnzBS6NHG0XSQ=cKLueM0iM0DvJw@mail.gmail.com>
-Subject: Re: [RFC PATCH v14 15/19] fsverity: consume builtin signature via LSM hook
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: Casey Schaufler <casey@schaufler-ca.com>, Eric Biggers <ebiggers@kernel.org>, corbet@lwn.net, 
-	zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, 
-	axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com, 
-	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZfBr91m4oQS_VYFg@kbusch-mbp.mynextlight.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Mar 12, 2024 at 3:08=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
-wrote:
-> We could also make security_inode_setsecurity() more generic instead of
-> for xattr only, any suggestions?
+On Tue, Mar 12, 2024 at 08:51:35AM -0600, Keith Busch wrote:
+> > +
+> > +struct bio *blk_next_bio(struct bio *bio, struct block_device *bdev,
+> > +		unsigned int nr_pages, blk_opf_t opf, gfp_t gfp)
+> > +{
+> > +	return bio_chain_and_submit(bio, bio_alloc(bdev, nr_pages, opf, gfp));
+> > +}
+> 
+> I realize you're not changing any behavior here, but I want to ask, is
+> bio_alloc() always guaranteed to return a valid bio? It sure looks like
+> it can return NULL under some uncommon conditions, but I can't find
+> anyone checking the result. So I guess it's safe?
 
-For the sake of simplicity, since security_inode_setsecurity() doesn't
-work, it probably makes more sense to create a new LSM hook rather
-than make significant changes to security_inode_setsecurity().
+bio_alloc can only fail if we don't wait for allocations, that is if
+__GFP_DIRECT_RECLAIM isn't set.
 
-I'm looking at the fsverity hook usage in this patch as well as the
-device-mapper hook usage in 13/19 with security_bdev_setsecurity() and
-I'm wondering if we could adopt a similar hook as we do with block
-devices:
-
-/* NOTE: these are just example values, more granularity would likely
-be needed */
-enum {
-  LSM_INTGR_DIGEST,
-  LSM_INTGR_SIG,
-} lsm_intgr_type;
-
-/**
- * security_inode_integrity() - Set the inode's integrity data
- * @inode: the inode
- * @integrity_type: type of integrity, e.g. hash digest, signature, etc.
- * @value: the integrity value
- * @value: size of the integrity value
- *
- * Register a verified integrity measurement of an inode with the LSM.
- *
- * Return: Returns 0 on success, negative values on failure.
- */
-int security_inode_integrity(struct inode *inode,
-                             enum lsm_intgr_type type,
-                             const void *value, size_t size)
-
-... if the above makes sense, I'd probably adjust
-security_bdev_setsecurity() both to have a similar name, e.g.
-/inode/bdev/, as well as to take a lsm_intgr_type enum instead of the
-character string ... unless we really need a character string for some
-reason, in which case use a character string in both places.
-
---
-paul-moore.com
+We could an assert here.  Or work on killing the gfp_flags argument
+and just add a bio_alloc_nowait for the few cases that need it.
