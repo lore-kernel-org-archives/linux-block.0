@@ -1,87 +1,95 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5464247773
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 20:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951B64E1DB
+	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 20:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710360523; cv=none; b=Ww1J4+Jg90Y9V2FL9BzLYQ+CF+QddSxonI7ST3ZglhtTosoAqAXYnBbK1hjDMKqzRs2hNq25D60eRci0YEzd0Q0O3paxJ62Uo6oRNY9kVBtUsxpZEY4dgZhey4EJrtrcyEXWTRC+eX94k35upjC6wWAIw62B0Xqe7KYVs51F0yM=
+	t=1710361654; cv=none; b=shyiiI4+QAVcnLdMqsABEuisbkLGC1u/fqb5muSUufX7S7GcLLcq4ivmuW1y0murXNWKB65305qJSzTq0xj4f2FsinALYAAYl/6JDls4gxVIrDq+YPThI+g2U7iC00VWbML1vNLZat8Tm+vrjKPYDFq6rPybN+gDPz3zunLJ/Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710360523; c=relaxed/simple;
-	bh=r8/IlxEMTI4UoA0ZJiGSP8vpXu2Im/dgIkLMUWfYLCA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gSDRJP6PWYAdY4qwW+ToeVFvM3DYCBjy5FBtx8mno8rTPel8geuzSxMJg9d3yRqFmvd2CrtoMkUSdPF//95BuQ77O7YHqdL7WzAsVuBnGTJW4RakVF1oLD02bN0dutv0fs7ykaQ3gJp0OY+fnGj0rFwF96RCv0ntDGd+X1GdGdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hf3EFhSF; arc=none smtp.client-ip=209.85.166.180
+	s=arc-20240116; t=1710361654; c=relaxed/simple;
+	bh=6KYs3BQgjwZsV5TdSedJLoIrS+8iHieLsZx7y+UPnzA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=JDldH6SlKEAbTr8ob7ulNMPlDX8igq1LAoC8r4coQBPsPRuzHyfMWBLlm9LC8i5fEvT/U9cLF8clp8dmQpEhPXDCGkAeXmzOXcG5+Lg6HpQ2yScLQP4fLFpQNzBHP98m9KnjjcuWPm0iCHSoCgaMzJ2PO2/M9rJ2VojbaDNCylw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=a9W3afKE; arc=none smtp.client-ip=209.85.166.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hf3EFhSF"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3667b0bb83eso418675ab.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 13:08:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="a9W3afKE"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36649b5bee6so426945ab.1
+        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 13:27:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710360520; x=1710965320; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PYRKTZr+WkXIWH/qAlNrPKT3CFUoOmxa2ERFXSZxcE0=;
-        b=hf3EFhSFng5aUFVgMpc5rGgcRLkrRWLy7LO/I8l0bPlpNrl9pxCrSOkaLVU27eJhxK
-         RO19f2+M4mY7ukO1pkF6MW3RDVSv0IULAdY68bb7zMebePbFJnvJ1v5l58PwYKPsTFHg
-         oRrKtEJv4gUmUDiQg52GMWb/ZIhgwt/6RwpRj18zP0kZnt3C+B/g2xMh9hQycVXFGnar
-         3WNjYvhGZGqVxN0p8XlwpV0BzAMU65Ipss6217t3qUD/IlpnHuCY5rZsVx0CxVScDM/3
-         a97PIacjr2cvx2hsbzk3jJKG0F/+wA6VlEHgyhmr6kREffCPETgBvo1HujQSm1teMiaA
-         1n4g==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710361651; x=1710966451; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eF2DJ3K0vqdhNLJam1R2VnPzYiUW+uxIa0Tf2briAJ4=;
+        b=a9W3afKEOxvSY4kRgWoH8PtJzVJNFleJdFpn9old5/tP8Smm2aSsM0K0/N/2Hghx1q
+         uOR0RZpDk6mUtd2x4o63GtY6wSr2zWDtxIhmyEhkVaIV3re1VFSlu2+Sreuzaj0/Y0/x
+         Xrd8yc9wGEhoSDkHQqmY8G2YZ+kSETC66vzlPvagvvTvK07HAOR/TqVFRNFykAnysI8G
+         /a6ICiNZkNY6bTJfqeJ1Vn5SlkdqqkNDklV0tNPSl9GVS4LOEZVow3Pm65V1jO3qPcYi
+         ivclXmBUHerME7l2uLTyALkGXpOlZ44+Z7bHSE70cozdlLy3D9y6tsmtZmFpge9lEO1E
+         K+DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710360520; x=1710965320;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PYRKTZr+WkXIWH/qAlNrPKT3CFUoOmxa2ERFXSZxcE0=;
-        b=fOxr+Ep9GZHoWH1m/hLulqKSdlth8X9gCivfiwk/ucbVjyCW+baxw2cVS6jWkX9wNy
-         59hIqjCD92QKcTZe+u3s8lz/6TX0Gd7UYldGk7sygu5fxAl62UFKpZVXG0i+em5x1Fk0
-         /cQKlWKWKQIaBgxzf3A/0OdZJBUcI4DyoB8Q3wfogmqnx+WAZNdBe84xl0eZSxdLS2n1
-         jKipFRYvLrldG9uqYpsmjvAV4c9/TW6l2ahusm8i73xJQix5ppqb2UiDrGwrxX4AodQ1
-         05hxv2yfHtI4aHdl/Xr5Zh8cCmnNfFq32SKs5mkso1gz45fhE+JmF7T9gMAhNjWfwjvF
-         BLKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXneVzAoU2HTF1DlXJHS4XWCLbGfriQ9fdiThZD19Rlh1Fk8UZvDZJiS/Ra1OxLPtlepFQFc6jYljhLiH+7LqSNkzMcKiBW1ecEimw=
-X-Gm-Message-State: AOJu0Yz7opcEg9UgygSQZSIK0y9Qx25wr28zYstTiyc1lwHehnkxyvQY
-	YOavdiaDfoKvT7Y3JEhvglgU1EHrQ8AJoAvoWWizAy/0t5G9n6ZKsWpacNeOI9I=
-X-Google-Smtp-Source: AGHT+IGTEj4clyY6rU5vULjDfU20/b96kofSa2jdE2U03Aqzu4dOnkhxxtYL6A38VATDXsgzNgguhQ==
-X-Received: by 2002:a6b:7804:0:b0:7c8:789b:b3d8 with SMTP id j4-20020a6b7804000000b007c8789bb3d8mr35336iom.0.1710360520411;
-        Wed, 13 Mar 2024 13:08:40 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id i23-20020a02cc57000000b00476e8efd3f2sm1988895jaq.155.2024.03.13.13.08.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Mar 2024 13:08:39 -0700 (PDT)
-Message-ID: <fc81a1dd-8097-429c-8e96-86f2187cacb9@kernel.dk>
-Date: Wed, 13 Mar 2024 14:08:38 -0600
+        d=1e100.net; s=20230601; t=1710361651; x=1710966451;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eF2DJ3K0vqdhNLJam1R2VnPzYiUW+uxIa0Tf2briAJ4=;
+        b=iIRZ4/rfOC9MnvP0SeAeHwfNIjBz7AwhwHYqHNaxGxma1QTyIA+IhhC1gWXDHsr5+3
+         a0UqbK6t7CZBkdR8co6BFJM5fRyUu9ds9CL/bnl0UBI+0tamR1PhItjjJ8Wk2BkxYPFW
+         SBD9nSxquGWdFhAzKIIjTXAKMz3SFUdB0MQRb2FY3uZt4Rtyl4XmCckE4cogkdGmk51o
+         CY9yNUzuQ2e+EN+Rw9g5o/GxpLBqWQ1jMqSFzzMeZqPj2HPVawtnoWCmVHBKMlOecTVH
+         v4krgS+P+X1lp+eaDzmrXT3+57SW782qQUqV7x36+u9M4jstmS+UNwHFPR5fzt3l0YEA
+         HDpA==
+X-Gm-Message-State: AOJu0YyEPkNw2qAfKzfg2w9WZQeOiMOp9K0CbFfZ7FNDiKGOYNFJQ+R+
+	rP06mfMML+xHx9fVAMVZLir7yh83KEMJfzKEYZzLwdtT9pTBy6cxi5uFiDtL2KPZVIU+TglJrE2
+	R
+X-Google-Smtp-Source: AGHT+IHrpTG3IyrY66fdBdCSOtK8R6pRDlYafTxhW5d810MFfjPxeOohqUqtft8HGNclAFoVpU5ASg==
+X-Received: by 2002:a6b:e914:0:b0:7c8:bb03:a7a with SMTP id u20-20020a6be914000000b007c8bb030a7amr23560iof.2.1710361651366;
+        Wed, 13 Mar 2024 13:27:31 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id a42-20020a02942d000000b00476cca7d5b9sm3081057jai.166.2024.03.13.13.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 13:27:30 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20240308133921.2058227-1-colin.i.king@gmail.com>
+References: <20240308133921.2058227-1-colin.i.king@gmail.com>
+Subject: Re: [PATCH][next] block: partitions: only define function
+ mac_fix_string for CONFIG_PPC_PMAC
+Message-Id: <171036165065.297831.13967283119583163229.b4-ty@kernel.dk>
+Date: Wed, 13 Mar 2024 14:27:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] block: move discard checks into the ioctl handler
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc: Chandan Babu R <chandanbabu@kernel.org>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org
-References: <20240312144532.1044427-1-hch@lst.de>
- <20240312144532.1044427-2-hch@lst.de> <ZfHI5Vr7BOU6__rv@kbusch-mbp>
- <20240313200621.GA5756@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240313200621.GA5756@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 3/13/24 2:06 PM, Christoph Hellwig wrote:
-> Also I'm going to wait for more comments on the approach in this
-> series before resending it, but we really should get a fix in in
-> the next days for this regression.
 
-Yes please, sooner rather than later. Too much fallout this merge
-window, and I've got other items that should go out soon too.
+On Fri, 08 Mar 2024 13:39:21 +0000, Colin Ian King wrote:
+> The helper function mac_fix_string is only required with CONFIG_PPC_PMAC,
+> add #if CONFIG_PPC_PMAC and #endif around the function.
+> 
+> Cleans up clang scan build warning:
+> block/partitions/mac.c:23:20: warning: unused function 'mac_fix_string' [-Wunused-function]
+> 
+> 
+> [...]
 
+Applied, thanks!
+
+[1/1] block: partitions: only define function mac_fix_string for CONFIG_PPC_PMAC
+      commit: 5205a4aa8fc9454853b705b69611c80e9c644283
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
