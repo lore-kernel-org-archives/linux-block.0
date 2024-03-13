@@ -1,53 +1,45 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8863C53E07;
-	Wed, 13 Mar 2024 21:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B1E54919
+	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 21:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710366273; cv=none; b=Zp5ZBt5d1sKsBcn7AmDBluPf+bbW5sofsIvO3QDNsLWWwXB2M1PoZwbym8rp7wFY9grFwA8RA3pwR7jGx9eWY4bWxptERXLcUsgliHcrK+WoyNuQ9CQQCa8Gfwm77/T+DbRdFas66nP/HhYZTflWMEA1Jl3FL+BiCorWFbWWytU=
+	t=1710366592; cv=none; b=DHqiyPxEitpGxvOuAgpzZU/ptum2sJT6a2iACFQ1JedQqChYmC3gJUrNd8miRqrTAsKCGMacLhbhpQaYX6KYIhir96aJOp3xzMyhX0DmvdMB14rcYyn6EhMSgZDlmIqOfVUTd6g4RJRufiqN8aIT9djr0+tN84EpFjJpaYojxu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710366273; c=relaxed/simple;
-	bh=fHUHblIM4Ym+Lz04JBq2RDtEh1L4l5ZqXeh2B8Xe0mo=;
+	s=arc-20240116; t=1710366592; c=relaxed/simple;
+	bh=vjS/XOunIYT8DV2VBNmMM68F5wQtLWYTo3Mrq5AaulY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e6/KMea9e6puisxxWLSPC/vJeVAu6/QbaBvaLFyDp+9FvF8E77U3FX9yKud80Yi86BqU5raNoF8yXfI7GwRWJ5Vyz5CL+QJl3xfNZYCMKxeBjgiGUCyUK42fIpGjUlTAvQUho1sycFZboeV+4eN6F0611KjQ2vVJUI0gj5wAA2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8161568BFE; Wed, 13 Mar 2024 22:44:18 +0100 (CET)
-Date: Wed, 13 Mar 2024 22:44:18 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
- steps
-Message-ID: <20240313214418.GA9129@lst.de>
-References: <20240306221400.GA8663@lst.de> <20240307000036.GP9225@ziepe.ca> <20240307150505.GA28978@lst.de> <20240307210116.GQ9225@ziepe.ca> <20240308164920.GA17991@lst.de> <20240308202342.GZ9225@ziepe.ca> <20240309161418.GA27113@lst.de> <20240310093513.GB12921@unreal> <20240312212844.GA3018@lst.de> <20240313074636.GV12921@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gd+Z0f7iT5FMhSztFs3XBBfWQgHBxrH0JPcHJMR6+x7ql80i/Iw+a9A2N1gLNP8G0X2bguOv3s7yA7qYrdtYSWoPDz8vA+q+1W0eDKtTA+CH7vHu3M2TYR5bQO/v5YupOjea5Srz1bZXDyLYWACoImoWgPqjo0PG/3HKessPj9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sqbdzTDv; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sqbdzTDv"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=bcz8wX6ZmPPxzyepYvU5AC1XJTCZKSHiUBqofkHaOnE=; b=sqbdzTDvZVaBK+DGptBAeINcYy
+	vYtfk5r2POSff13omEbijFQ8YbWaWXPd6Eg0nzhu3dU+MFwFE4sw2+bxKsugq8Qve7BFGjm8TAujw
+	gXSssLIvtiKR6fQU2KLUrwcIkqyvHI2ELe7LQCYbFyZCS/JvUyHiey5telE9BNFUgJugKQwn1e6N8
+	ZLvzCl5aN/plVdGFVT4qOkk5HAuDyvMIkzIhwRE5AF9oSAHlbLq8w7tAbrMHweNiyRmAiDAR+lvt8
+	7UHWcMVnLiRbCVgV0HnPQa5Waqo8X2vlSI1MVGMKmMr+6xgQevuqknXj6fNpBY0kDumuIgAI3Z4/u
+	l5QAI+Yw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rkWTq-0000000C1gT-2nd7;
+	Wed, 13 Mar 2024 21:49:46 +0000
+Date: Wed, 13 Mar 2024 14:49:46 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Zhengxu Zhang <zhengxu.zhang@unisoc.com>
+Cc: axboe@kernel.dk, bvanassche@acm.org, linux-block@vger.kernel.org,
+	hongyu.jin.cn@gmail.com, zhiguo.niu@unisoc.com,
+	niuzhiguo84@gmail.com, hongyu.jin@unisoc.com,
+	yunlongxing23@gmail.com, char.zzx@gmail.com, ke.wang@unisoc.com
+Subject: Re: [PATCH] block: Minimize the number of requests in Direct I/O
+ when bio get pages.
+Message-ID: <ZfIfejdNTL8oassd@infradead.org>
+References: <20240313092346.1304889-1-zhengxu.zhang@unisoc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,20 +48,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240313074636.GV12921@unreal>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240313092346.1304889-1-zhengxu.zhang@unisoc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Mar 13, 2024 at 09:46:36AM +0200, Leon Romanovsky wrote:
-> On Tue, Mar 12, 2024 at 10:28:44PM +0100, Christoph Hellwig wrote:
-> > On Sun, Mar 10, 2024 at 11:35:13AM +0200, Leon Romanovsky wrote:
-> > > And you will need to have a way to instruct that pin_user_pages() variant
-> > > to continue anyway, because you asked for FOLL_PCI_P2PDMA. Without that
-> > > force, you will have !FOLL_PCI_P2PDMA behaviour.
-> > 
-> > I don't understand what you mean.
-> 
-> Jason talked about the need to call to pin_user_pages(..., gup_flags | FOLL_PCI_P2PDMA, ...),
-> but in your proposal this call won't be possible anymore.
+> +		request_max_size = queue_max_bytes(bdev_get_queue(bio->bi_bdev));
 
-Why?
+Besides all the coding style problems this is simply not how the bio
+interface works.  queue_max_bytes is a limit only available to the
+splitting routines and not to the upper layers submitting I/O.
+
+Please try to debug your scenarious a little more - just because a bio
+get split off it should not just turn into a request of it's own,
+but be merged with the next bio due to the plug.  If that doesn't happen
+we do have a problem somewhere.
 
