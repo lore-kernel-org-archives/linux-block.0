@@ -1,74 +1,105 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC8C21370
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 19:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2A233CE
+	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 19:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710357472; cv=none; b=FrmstpiXFjmWcW3whWGkzel8SL+zdiXbTNL91KjniD2FfB6UkInl090OXnQnISb8bMJTIN2WPNCziYvhXcKLQCIxGqVw+xDiOdrCECogcwNzFbo+q06kSLCeB6KDGeZ0eVxr6VZki6KVmSBDfoPWg5G0T4+SKNXo3KCYtMgFBqo=
+	t=1710358818; cv=none; b=V3T2xVjbRAaKZ+Hq+IaZEQMey2IBqQH0NI8HUs4l/5vKto2IROOGQL1RH4CBRUGnsmuMHJTnCtOvl0dk57iO4U+k0rzDtacn3wthYc3JrXjXME91hZth9alJ5NQzB6nl+bkhOboaju8yMBx8nayI/Z3ahTy9JmLLJm8rXVfQbBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710357472; c=relaxed/simple;
-	bh=NmfEK6L5+fopktxibmRTDPM9F2T+mchbo4YQ1kT1Blc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lH5lS8l1peoA1C81+Hrok9r03OaEcooAvTTzQJHoHRLm+n5HWYxckLSENxRItX1O98ofvzq92y3QzKr74JG3bm1VCt2GEVy2wmAiR5uXv2MX/A2P8DDaPWYyzEe7J0AgILWCNlLhn0kDzm7E8JPvFZK2Dg8uX7dy6JOIEpCeSfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PhmX1chm; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1710358818; c=relaxed/simple;
+	bh=dtGaLMmi+k0XPunMwQot+UNDGJLkHyYWVFXicGmQ+7k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dE1rdMaqTlay31C+DgL1huB4tjTteQM5VwXAQG7C/s/N5Eyb7ioHz14dMHrrL16WhzSnPQA+XTxSnBhfusP+hlQ2gHjM+ZRaSWl7qOmjwCERpWyJaczMYt+Iy0NYLXs+8hlqhcCiz/rVO/R1pVWVEg7STQFKccv+YgTqULgW6eI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gAd1O1K+; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PhmX1chm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Y7No5BwSBcNxAZE4T0od85sb/fUSBA4xSBUxPEwP8vU=; b=PhmX1chmLgkAVW3std5UqfdxDP
-	rwyCiSKjNl7ij3pV6kGYxMnljYFyCvXcI4tslQ2y88inn3vZJ1G13rc9rD9IFsIn37Mlhko44St52
-	8GOs/9TtkekpiUW5IupsRk+0m0r/wFZiFyOMLOA8yt9r6ktHwHEii+kleCKf0+LNwS5bPlQlBMN9I
-	9rq/GrjWGE3IPje6ExSR4G0BDf46vpMPcIUujVUq2VvHBftHGZ7nfDM2fvWYlljDOD7fOEwmOBzHn
-	4mesg1rIM7BGM5Q0vPwsfLa29GFYNlTXxiR25H3tH0Hj/1WyRRXViXRO9VdZtReSnCEx5Fi/LOsGb
-	PYa4WUCw==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rkU6m-000000064wa-18LU;
-	Wed, 13 Mar 2024 19:17:48 +0000
-Date: Wed, 13 Mar 2024 19:17:48 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Pankaj Raghav <p.raghav@samsung.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: brd in a memdesc world
-Message-ID: <ZfH73MgTAK2BOFK6@casper.infradead.org>
-References: <CGME20240312174020eucas1p29cf41360c934c674fd1f36a808078e25@eucas1p2.samsung.com>
- <ZfCTfa9gfZwnCie0@casper.infradead.org>
- <d470e16b-b7bf-451e-a6e2-eb68adcc2635@samsung.com>
- <ZfHwXLr54bWl1fns@casper.infradead.org>
- <4605ebb7-2fcf-4570-b849-7aaa80a21954@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gAd1O1K+"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-366326c6c0cso383235ab.1
+        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 12:40:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710358814; x=1710963614; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rWZmATEPK4fDfBCHZhSlkAhi3zzM8I9gdKhUeKMMIRg=;
+        b=gAd1O1K+8Zp4CK+RpxUyjKzAQU+FkoN4PF1MVD77yMtq6s+gmw68RCnExJNWnWgUDz
+         F/SKxrap8NdVxQ3kjEi/7B+VcQMHNGR6u++883qfgdMSa4zOP94Gm0Omhz930KCzhg7Y
+         mpO/U/RLmbUyQMQCzMtRDxio0hn0CAFPiqxVywsb93G+i/NhAAPJdJjxo9Coxc2r70pc
+         Km4OFcmV0qts/pbihQJ/G4M3OHTYfBcVMMnKpFJfVLldmQ+rzm+KnqWD/0EXH7XC2n1g
+         sHhKB4/VlWddQYVOjkIkG74GooWlshk3L/ZQ8eMBiMm7zqmDn4H46W7L9ANXahIkpqmw
+         WtxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710358814; x=1710963614;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rWZmATEPK4fDfBCHZhSlkAhi3zzM8I9gdKhUeKMMIRg=;
+        b=tkrNQuWF08iQpjEUIWyOYAR1JkmGuOJckcrv7vGgQB2j0HPSbaR+E4a7wYYY6n9/iQ
+         4Lfjkk3k3ybtq1+WFiE7ifb8JBm57AULaqHyRNjzejvnwwJVNWbnkUNS99riExDpwFZw
+         i2B7drNb5DUNNzCYNp7/9zzSSiaBEvNfexknAbYSqLfceOH/cVlLZlccKLoeYO+c7qVp
+         IFrltdZr4J2WnZqN7nftepx7js5FMz1bm1Lh//utzCUqRsHRnD1U1DVlq3kUH4JTy1pY
+         cTz5p9HXEFVGd6gYK3joEPrfaTcypWqb0AeVN8SuKyKO6CGkfUsK/+cRDfMHPyiNzgeN
+         nmiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUaAeG1xBB8WkF7xU3nxjs0vYi2aoq6+ZDRK9AqSEv9tYv3KXneZOECA8AcHniwU+twa8352SX47rnDq4Ptb+Biw7KyGoUCIzmbje0=
+X-Gm-Message-State: AOJu0YyNf1i4PA4LJLdgAwrcbSe8Fhzl+84OhVzKIl4pV0Wb47MudSdf
+	mzv1WjropXdGAm+jp/kUZVoqbDjxBbSkQ2FPfeQ/5tCHa83UwabKHzxoLpUwQCMBKmrjfZkYDrW
+	s
+X-Google-Smtp-Source: AGHT+IFH1AIy/7QctRVFBr2d16OquKkeqZSHYZCwH83jxFjNpHuXzdUulKBWnEmaOBuftKVbZ+FFFg==
+X-Received: by 2002:a05:6e02:1a2e:b0:363:cec2:e344 with SMTP id g14-20020a056e021a2e00b00363cec2e344mr2718705ile.2.1710358813639;
+        Wed, 13 Mar 2024 12:40:13 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id r11-20020a92c5ab000000b00363c90b1207sm1429ilt.55.2024.03.13.12.40.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Mar 2024 12:40:12 -0700 (PDT)
+Message-ID: <3429f79b-442c-4444-b592-85090e0e78cd@kernel.dk>
+Date: Wed, 13 Mar 2024 13:40:11 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4605ebb7-2fcf-4570-b849-7aaa80a21954@samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: brd in a memdesc world
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+ Pankaj Raghav <p.raghav@samsung.com>,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+References: <ZfCTfa9gfZwnCie0@casper.infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZfCTfa9gfZwnCie0@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 13, 2024 at 07:36:01PM +0100, Pankaj Raghav wrote:
-> Got it! Probably moving to folios just for the sake of retaining the
-> debugging checks is not enough.
-
-That would be my assessment, but maybe Jens has a different preference.
-
-> > None of those things are needed for brd's uses.  All brd needs is to
-> > be able to allocate, kmap and free chunks of memory.  Unless there are
-> > plans to do more than this.
+On 3/12/24 11:40 AM, Matthew Wilcox wrote:
+> Hi Jens,
 > 
-> I remember he mentioned he wanted to support bigger logical block sizes
-> in brd, in which case moving to folios might be justified.
+> I'm looking for an architecture-level decision on what the brd driver
+> should look like once struct page has been shrunk to a minimal size
+> (more detail at https://kernelnewbies.org/MatthewWilcox/Memdescs )
+> 
+> Currently brd uses page->index as a debugging check.  In the memdesc
+> future, struct page has no members (you could store a small amount of
+> information in it, but I'm not willing to commit to more than a few bits).
+> 
+> brd doesn't use anything else from struct page, as far as I can tell.
+> It just calls kmap_atomic() / __free_page() / flush_dcache_page() (and
+> it doesn't need to call flush_dcache_page() because you can't mmap the
+> pages in the brd's array).
+> 
+> Now if you have plans to, eg, support page migration, you're going to need
+> a bit more infrastructure than just allocating pages, but for what you
+> have at the moment, just removing the debugging checks that page->index ==
+> idx would make you entirely compatible with the memdesc future.
+> 
+> Any problem with that?
 
-Using folios (or some other data structure that embedded the order of
-the allocation) would be justified if there was a proposal on the table
-to support variable sized allocations in the brd XArray.  Hannes wasn't
-suggesting that; his patch series used a fixed size per block device
-(which honestly makes sense; I don't see the advantage to supporting
-variable sized allocations).
+As far as I can recall, I haven't seen that debugging trigger anything
+in forever. So fine to kill it, imho.
+
+-- 
+Jens Axboe
+
