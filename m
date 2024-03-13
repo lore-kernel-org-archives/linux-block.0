@@ -1,147 +1,130 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23873FB1C
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 18:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FEB5A4D8
+	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 19:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710354969; cv=none; b=A+tkqTd5sEWT+Hnnt7m0BvamggGj80ALVLqSHhpHuedlwD3dYdD0BC1TU1E5ckbF9301OTncs9wP2fMK8fruO5IeibZFktHeesR+IEpgI1Oz9FChr8UrznoJgqCXWTLLTTFrqtisohgpLuxEdKObln1jrcsfNr3LPISgIGYO3CE=
+	t=1710356603; cv=none; b=nMGZTYSKSR7K/HcMm8/6Jp9ZT3krk+/HQvz3xX0dmt3MI/PbnHBVVjFLrDePYMNNFzVE4to/KuriTJW8aMCUHOYUd0hAEDJDe6rVpZENdmVG1yzEPCzsLl1HpQsgYN1dQKWg1U3Qz8N+i4wR7zemmWS7i1u35Nb+lpq7TXyit+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710354969; c=relaxed/simple;
-	bh=Oxo1W9kG5RAbASm7DxJnevbhEVs13vlP7Lc5m7JZAgU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:From:In-Reply-To:
-	 Content-Type:References; b=QyXTn7J0smPOdh/rFPJu4no+HPgSlkGQLfUN0Q5jMR3EESrYUNiSohJRa3yRSWdG162l1vcg5/ZyqHJAmMHhoBDy6RQ7I8RL9MP5fgq78xagNkBHsH0Iy5UtbQqcd86kMeangsL114CP883x3+a8/O+mqsWjNXZ6T8yVF3JBxDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=J5qFpRZS; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1710356603; c=relaxed/simple;
+	bh=SX+fEPlUzQH+SDjF+fg9M0nYR4xU4g4PvaNbAOfrrho=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=eQUclu7hSfzv6EH58739meB5Li6GkilKIWgaNF0emaYHMLexolDDL+M7DBVe2Hd8q8hlQNc9lyMW6agsyvF+6SX7nMfOZsD/dJp4UcNwCO+FFZqMH/sa8d4fkUC9dtgJ4FdA2zCj1FNSn+JDxTMVKtx7bSQM3Ensvlpzcjk8OEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=L1pgeIkS; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="J5qFpRZS"
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240313183604euoutp01f0ea351ef7d581986b9c6f0c377a3ccf~8ZsdRHAvW1265612656euoutp01W
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 18:36:04 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240313183604euoutp01f0ea351ef7d581986b9c6f0c377a3ccf~8ZsdRHAvW1265612656euoutp01W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1710354964;
-	bh=/2K/PfDapXMcYwANgzoSU7yzxe6lrOxJb/DPgHQO6DM=;
-	h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-	b=J5qFpRZSCExIerPAIDvGqNVK1+dpk5r07bXMQqGqzyJxjJ+TKvtS8jPhiyvrp2ySS
-	 9pVpbl3orfqmB8gd15OjQhHEMmpL9kx/4ZhM/Way9DIVd7jQl6oE/Ar9t9g01co0RF
-	 UYj67UkltxzbH1eXMhQwP9nFdhLlg3jTwUPcxlT8=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240313183604eucas1p1b5fd989c953e8377aa55adc4f926a497~8Zscv5yoD2778227782eucas1p11;
-	Wed, 13 Mar 2024 18:36:04 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id CC.07.09814.412F1F56; Wed, 13
-	Mar 2024 18:36:04 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240313183603eucas1p240cbaaabe7f9a1fcabb9ecb3b92abb48~8Zsb_sjgB2578925789eucas1p2C;
-	Wed, 13 Mar 2024 18:36:03 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240313183603eusmtrp266d0e40807264b81d427bd1d8f3d738a~8Zsb_MEZm0572005720eusmtrp2W;
-	Wed, 13 Mar 2024 18:36:03 +0000 (GMT)
-X-AuditID: cbfec7f4-711ff70000002656-78-65f1f214b21b
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id 25.A8.10702.312F1F56; Wed, 13
-	Mar 2024 18:36:03 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240313183603eusmtip28228bf0829446b94c20a892901a286d7~8ZsbxxdH83064030640eusmtip2G;
-	Wed, 13 Mar 2024 18:36:03 +0000 (GMT)
-Received: from [192.168.8.209] (106.210.248.247) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Wed, 13 Mar 2024 18:36:02 +0000
-Message-ID: <4605ebb7-2fcf-4570-b849-7aaa80a21954@samsung.com>
-Date: Wed, 13 Mar 2024 19:36:01 +0100
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="L1pgeIkS"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5682ecd1f81so267663a12.0
+        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 12:03:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710356599; x=1710961399; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z0czGQahQJmLOhb1t7D6nFie7YcEp1Eo0BOuwVvzqhY=;
+        b=L1pgeIkSkB6oidxQZW6w0VEPRoHmSjDrbfQchntBbcZuaO7ElZW3FyTCpKsEtQY9OH
+         pU8d6ZfECLovqMLuWahuE32Lu33FenkpsBQ/AUteZf4j3h+QNcqdyG2qksNxIWVKKvdX
+         2ebRMxIzu8A2J3SLZ0O6/zXHuiF14s1TpFxx1GgAQAgXcWKesCFP6LDJaejcR35nGFeq
+         cGa7D/742K6iQHhk3J4qxSbLS54rPCBo92G3TsuVWKXeG977KRORTj6ZqmAh3kWEUqIO
+         HUIBInQVaiz3OvocMvgRGG8g/iSsq6fwfEf87L9CPEZ7hbz+dv2VaC/3LQ1Yb5Q8LCRi
+         4aFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710356599; x=1710961399;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z0czGQahQJmLOhb1t7D6nFie7YcEp1Eo0BOuwVvzqhY=;
+        b=S8iemIIp7yBPnia87Np+Ft+lGCztg12njCuw3e+evhzxuXcEY2phDtjvEl1m3PMyYa
+         fElOgiZiSicml1kEu8/FNppQsiIYKZVveMy3paot7Q9pNCurvMRRWA8E/WKP7P1uvJ+s
+         cbuQ2JvSOK1L/qA6JMwXcozloww7lTlknM3h3kEbLUkTZEvjp9VIvaWkk/t/LykdnscT
+         hPiW24AnDRvtdY5xubChsUHRauSbavBgo19JCRNX/slXpMKuvOmT3jxsKAwxUYIXBERK
+         kFLmTh5RsU7szFJ+3k75ZNs8d/31H4E8D9Tql3jJWsdlft7aL0PpUR9rsfRyuV39NCI8
+         g5Ng==
+X-Forwarded-Encrypted: i=1; AJvYcCXmBX1Wx1991YwyGffd/3D4tw+hqdXvqfQTkhSPKf+28gfNC3VxINlpxovNJnqyYOak9dN/jhGFtxga1nq0s++3QJJxN5wzUNdEmvA=
+X-Gm-Message-State: AOJu0YzpZ8xKn09IewrXPMvNz5Pn+o5OHKKPqvkwUQe5WEUuMv5ne/Mq
+	XSPjv6BZokVfJyNU6z5DZ2v4T5sDtIpjoD7q9a1qhCquw1q6+HvUekngLrBK+tI=
+X-Google-Smtp-Source: AGHT+IHlCY08CcHpJhARgnL+nVCYWz4gNBvKEftYoIsGP8VnUgwgLnr/RbwslLxE6aluPvisCaT/ug==
+X-Received: by 2002:a17:906:1308:b0:a46:60c6:98c9 with SMTP id w8-20020a170906130800b00a4660c698c9mr1283936ejb.68.1710356599394;
+        Wed, 13 Mar 2024 12:03:19 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id r1-20020a170906364100b00a4320e22b31sm5163914ejb.19.2024.03.13.12.03.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 12:03:19 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Bart Van Assche <bvanassche@acm.org>,  Jens Axboe <axboe@kernel.dk>,
+  Christoph Hellwig <hch@lst.de>,  Keith Busch <kbusch@kernel.org>,  Damien
+ Le Moal <Damien.LeMoal@wdc.com>, 	Hannes Reinecke <hare@suse.de>,
+  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
+ Hindborg <a.hindborg@samsung.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,
+  Greg KH <gregkh@linuxfoundation.org>,  Matthew Wilcox
+ <willy@infradead.org>, 	Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor
+ <alex.gaynor@gmail.com>,  Wedson Almeida Filho <wedsonaf@gmail.com>, 	Gary
+ Guo <gary@garyguo.net>,  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>,
+  Benno Lossin <benno.lossin@proton.me>, 	Alice Ryhl
+ <aliceryhl@google.com>,  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis
+ Chamberlain <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,
+  Sergio =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
+ Granados
+ <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
+ <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
+ list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
+ <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
+ <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
+ <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 0/5] Rust block device driver API and null block driver
+In-Reply-To: <ZfHu48NGktOx_uhG@boqun-archlinux> (Boqun Feng's message of "Wed,
+	13 Mar 2024 11:22:27 -0700")
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+	<855a006d-5afc-4f70-90a9-ec94c0414d4f@acm.org>
+	<ZfHu48NGktOx_uhG@boqun-archlinux>
+User-Agent: mu4e 1.12.0; emacs 29.2
+Date: Wed, 13 Mar 2024 20:03:07 +0100
+Message-ID: <87r0get0no.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: brd in a memdesc world
-Content-Language: en-US
-To: Matthew Wilcox <willy@infradead.org>
-CC: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	<linux-block@vger.kernel.org>, Tetsuo Handa
-	<penguin-kernel@i-love.sakura.ne.jp>, Hannes Reinecke <hare@suse.de>
-From: Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <ZfHwXLr54bWl1fns@casper.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFKsWRmVeSWpSXmKPExsWy7djP87oinz6mGtz5zGqx+m4/m8WeRZOY
-	LFauPspksfeWtsXslnesFr9/zGFzYPPYuXYVk8fmFVoel8+Weuy+2cDmsfl0tcfnTXIBbFFc
-	NimpOZllqUX6dglcGScPnGQqeMBZsWndFcYGxqvsXYycHBICJhIrtpwHsrk4hARWMEo8//+Y
-	FcL5wihxoWURG4TzmVHi+P4pLDAt6y8sYoRILGeUmLfhIiNc1bn2xawgVUICuxklpt9L6WLk
-	4OAVsJM40qwJEmYRUJVYPu0sE4jNKyAocXLmE7ChogLyEvdvzQC7SVhAWaKhaTEbiM0sIC5x
-	68l8JpAxIgIaEm+2GIGsYhbYxiixY8NPFpA4m4CWRGMnWCsn0G29T7ZBtWpKtG7/zQ5hy0ts
-	fzuHGeJ+ZYnTRxczQti1Eqe23GICmSkh0Mwp8e3+CyaIhIvE8k3voWEkLPHq+BYoW0bi/875
-	UDXVEk9v/GaGaG5hlOjfuZ4N5CAJAWuJvjM5EDWOEvOuHYEK80nceCsIcQ+fxKRt05knMKrO
-	QgqJWUg+noXkhVlIXljAyLKKUTy1tDg3PbXYKC+1XK84Mbe4NC9dLzk/dxMjMPmc/nf8yw7G
-	5a8+6h1iZOJgPMQowcGsJMJbp/gxVYg3JbGyKrUoP76oNCe1+BCjNAeLkjivaop8qpBAemJJ
-	anZqakFqEUyWiYNTqoEpZv6GGo6WKY57zFYs6e2ySrim1OTceKyDt+3w90LJuOafSy0C7xmf
-	TzoY9O9EVP/lB/cf3DtrZO5VqZDxwbpI6uDU5s0WsfvuJ8tZJ5t/8ZsTxKUh5OzBFs9qaJ2d
-	eJ0nuTbNk+9V6+YV3I5LrsZ/b2NbFhQUbHpIgH2FL59m6QOuDLk9wgU6Z1SulF9Zy6SeUTWt
-	6H9Hd9FB/xCDMw6ajA9e6LHvePtnuuLUm5WrYncZJGodnOP+JDbJ9q667b8sUamZustvMmt/
-	i7vfcHTiiXWWmfI7f+1da6xufuK5q2Og5LPsY+b2Ww0frU5cc0Sdt+bKO+13HxcrO0SoXNzJ
-	MH3N5a36J1ZJXzlpFq3EUpyRaKjFXFScCACW2HMlrQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPIsWRmVeSWpSXmKPExsVy+t/xe7rCnz6mGky+yW+x+m4/m8WeRZOY
-	LFauPspksfeWtsXslnesFr9/zGFzYPPYuXYVk8fmFVoel8+Weuy+2cDmsfl0tcfnTXIBbFF6
-	NkX5pSWpChn5xSW2StGGFkZ6hpYWekYmlnqGxuaxVkamSvp2NimpOZllqUX6dgl6GScPnGQq
-	eMBZsWndFcYGxqvsXYycHBICJhLrLyxi7GLk4hASWMooMfX0d1aIhIzExi9XoWxhiT/Xutgg
-	ij4ySkyc2M0CkhAS2M0ocXO1eBcjBwevgJ3EkWZNkDCLgKrE8mlnmUBsXgFBiZMzn4CViwrI
-	S9y/NQNssbCAskRD02I2EJtZQFzi1pP5TCBjRAQ0JN5sMQJZxSywjVFix4afLBB7nzFK3Dvf
-	zQxSxCagJdHYCTaHE+iB3ifboOZoSrRu/80OYctLbH87hxnifmWJ00cXM0LYtRKf/z5jnMAo
-	OgvJebOQnDELyahZSEYtYGRZxSiSWlqcm55bbKRXnJhbXJqXrpecn7uJERiz24793LKDceWr
-	j3qHGJk4GA8xSnAwK4nw1il+TBXiTUmsrEotyo8vKs1JLT7EaAoMo4nMUqLJ+cCkkVcSb2hm
-	YGpoYmZpYGppZqwkzutZ0JEoJJCeWJKanZpakFoE08fEwSnVwFRw4IdG6qkjDWLrWGeeORy3
-	Uv/PvB9fpZXdqoRq7025v2BBX2qugvfSe9EOeYv2huk4nmx0Uf65xvBqbJaN+pmvrxI3qFfE
-	bZy85dashTu+ZvC7H1NbufT6o8V2yUsMAnyje4+4KKw0+Jt/fcsc30m8Nq+nP+Fc+r+59+VR
-	lnNWLjdcPh/ZMiVoYqJjSNz2IwEb9Nd8kI785O2lH6jJJXKjIXN5nhXrjjWVIp/m5uRn7fmk
-	6XzsMP/SJfLn+TQ3GPHxVDSpJ4ne8dy/Q4lnrYy6WdLNd11t74T82z5O72AL6I3J81dab/z2
-	imtrrlPwLffc1ecu5nBY/L+bGqcUvPLi56Xxv/bmVGaVWXWwf1RiKc5INNRiLipOBAAQAqkT
-	YgMAAA==
-X-CMS-MailID: 20240313183603eucas1p240cbaaabe7f9a1fcabb9ecb3b92abb48
-X-Msg-Generator: CA
-X-RootMTR: 20240312174020eucas1p29cf41360c934c674fd1f36a808078e25
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240312174020eucas1p29cf41360c934c674fd1f36a808078e25
-References: <CGME20240312174020eucas1p29cf41360c934c674fd1f36a808078e25@eucas1p2.samsung.com>
-	<ZfCTfa9gfZwnCie0@casper.infradead.org>
-	<d470e16b-b7bf-451e-a6e2-eb68adcc2635@samsung.com>
-	<ZfHwXLr54bWl1fns@casper.infradead.org>
+Content-Type: text/plain
 
+Boqun Feng <boqun.feng@gmail.com> writes:
 
->>> Currently brd uses page->index as a debugging check.  In the memdesc
->>> future, struct page has no members (you could store a small amount of
->>> information in it, but I'm not willing to commit to more than a few bits).
->>>
->>
->> Shouldn't we change brd to use folios? Once we do that, this will not
->> be a problem any more right?
-> 
-> We certainly could change brd to use folios.  But why would we want to?
-> Hannes' work always allocates memory of a fixed size (a fixed multiple
-> of PAGE_SIZE).  Folios are a medium-weight data structure (probably
-> about 80 bytes once we get to memdescs).  They support a lot of things,
-> eg belonging to an inode, having an index, being mappable to userspace,
-> being lockable, accountable to memcgs, allowing extra private data,
-> knowing their own size, ...
-> 
+> On Wed, Mar 13, 2024 at 11:02:23AM -0700, Bart Van Assche wrote:
+>> On 3/13/24 04:05, Andreas Hindborg wrote:
+>> > This is the second version of the Rust block device driver API and the Rust null
+>> > block driver. The context and motivation can be seen in cover letter of the RFC
+>> > v1 [1]. If more context is required, a talk about this effort was recorded at
+>> > LPC [2]. I hope to be able to discuss this series at LSF this year [3].
+>> 
+>> Memory safety may land in C++ in the near future (see also
+>> https://herbsutter.com/2024/03/). If memory-safe C++ or memory-safe C
+>> would be adopted in the kernel, it would allow writing memory-safe
+>> drivers without having to add complicated bindings between existing C
+>
+> I honestly doubt it, memory-safe is not free, basically you will still
+> want unsafe part for the performance reason (or interacting with
+> hardware), and provide a safe API for driver development. I don't think
+> that part will be gone with a memory-safe C++. So the complication still
+> exists. But I'm happy to be proved wrong ;-)
 
-Got it! Probably moving to folios just for the sake of retaining the
-debugging checks is not enough.
+I think it is great that people are starting to realize that bringing
+memory safety to other systems languages is a good idea. But from one
+person blogging about it to things being ready for production is a long
+journey. Language designers have to design ways to express the new
+semantics, standards committees has to agree, compiler engineers have to
+build and test their compilers. Probably we need a few cycles of this to
+get things right. At any rate, it is going to take a while.
 
-> None of those things are needed for brd's uses.  All brd needs is to
-> be able to allocate, kmap and free chunks of memory.  Unless there are
-> plans to do more than this.
-> 
+Second, as Boqun is saying, interfacing the unsafe C part of the kernel
+with memory safe C++ is going to require the same complicated
+abstraction logic as the safe Rust APIs are bringing. The complexity in
+bringing Rust to the kernel is not coming from interfacing a foreign
+language. It stems from the inherent difficulty in designing memory safe
+wrappers around unsafe C APIs.
 
-I remember he mentioned he wanted to support bigger logical block sizes
-in brd, in which case moving to folios might be justified.
+Best regards,
+Andreas
