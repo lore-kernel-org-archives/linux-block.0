@@ -1,44 +1,70 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08FE263D5;
-	Wed, 13 Mar 2024 02:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C245B168A4;
+	Wed, 13 Mar 2024 07:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710297163; cv=none; b=B9gm+yE+sYQA1Ge+o6a1OxtwFiz2lgKQcFwK/X8qTYt9WwoW5hqAgRnjLhPsT/hiz2kJiae2o5x0sWmcyAOiVHaN7GqaQWRZEOeI/RQqORaVTMIA8Rc8rqpJagt9983418HQB0Orj29GUkrMgGkcgF9P0A5xgQ0f4coH+6SCwp4=
+	t=1710316002; cv=none; b=oUwc19y3TeOYw6Yz20UJ6ZoIP+uXcMsbzyW3rFc+14q/EqC+z3e6ZBAyUhnjX7hnXXDRv78eXvD5qxy+tyS945obQrvRyft8oAUpn3uGRIpWXwWrepS/NalFAd5pU94H8JY3HF1uzD9kW9UdRJN2M9rFBRyT1kO4UBsQtsAY3LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710297163; c=relaxed/simple;
-	bh=2rI8Vzx4uZjDKcKotiU8jXVfpvMLZ3NzGiQk4GUZ+pg=;
+	s=arc-20240116; t=1710316002; c=relaxed/simple;
+	bh=Kr6b9zwRiK0qe/FQtkWwwcr3AdM/iJQ3Tm5R/ItJ+kI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tux2R6zT8UPfSkWFWrlqlPDb2McPCNois4BOjpk3ekWlVAnR2bH3/q6yr1naQmrfa34xemWA0GV9LvoxhBUJlPx2nlAkKGznMfYT7a6jOqDDC1Fiu4L1BypQrE0C4TcInp/UwQJm1ezMLrAuxOWluFX6NRygoun1hegtgO+O6jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YGUrzQul; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZzzKYY6tdF986EFgY6aY8gXblb3HNNoadhdOnu2oRQ5GQ9fU95kmn5Xs/iuLlfcb5ow+69HBdBgG13Q+Y5CDGkDqQD9XYAsEvyIdKmKgQdDbjnwKAhvL51/P07Px3TStrYUAjGmUSIowENfClE/QrapjkFdF41UeguhEUW8PCRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LhEelchk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YGUrzQul"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=go09pGihhdBb65foe23c2aUUh/1SNf1G6H3P3z0HZOg=; b=YGUrzQul7KKhuzXl7VNOh2YV14
-	QcBgCDwBRE8vAJ9TzZoGwkwhcqOjolkzmVjHl2zauR73YmGmQy75k9pxZeUWGowAA7VMKD/rC3bIa
-	E6W74bncRKhaX/kwUog8akGnDVOVF2VIeLSzzC1cJbB2EksLgb7fMil87pDFMQ0wHI96ptZka3zDw
-	30cKNsqhIgWCU60HiTuw0wUDcMuH9mZDMRQj7kBtMCaXpVf4dh5PTecqgwBKvLJzr4GWWr/q9onUs
-	bHCGYqtPhkAVCHSuj7nrrGfzzHiGn8b7WO6QtT9pCVU9cdJ7ZEjLFdtgZJ90EQUggWCdhOgW2Hayu
-	lavXjO+A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rkEPz-00000008YqS-3ViQ;
-	Wed, 13 Mar 2024 02:32:35 +0000
-Date: Tue, 12 Mar 2024 19:32:35 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 01/34] bdev: open block device as files
-Message-ID: <ZfEQQ9jZZVes0WCZ@infradead.org>
-References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
- <20240123-vfs-bdev-file-v2-1-adbd023e19cc@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LhEelchk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F8EC433C7;
+	Wed, 13 Mar 2024 07:46:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710316001;
+	bh=Kr6b9zwRiK0qe/FQtkWwwcr3AdM/iJQ3Tm5R/ItJ+kI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LhEelchk241d2G+Q3NZ+eugtycNa64C11tlGZNDKxCvzTX75Q00BDeucxxI33dSuA
+	 4+eCRt8kMMEc5PKj3RKm6EMledYaAfqv5JZuQB7Y+lqGf4dv4bsr9x0TpKJG1q4wXj
+	 5wL8HqXvVMagJHMFg5lnkHWIqzUSGVvjZwviYWQ8IepvQMcWBnKkAG8KoyC2Qj/Dk9
+	 zhjs+9wAPOXEebb1i/MdTgpoDqE40AetcQZI0F5BBxVL9DwWbmHiXrd3y6wILhONqN
+	 9PPx8kGlpLaHCN3ApgnEaZsraA27U8tPpWQjwzmxyOAzAxTPkrSjUTlSjBaxCZCGej
+	 iazuJwD6oD4iQ==
+Date: Wed, 13 Mar 2024 09:46:36 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240313074636.GV12921@unreal>
+References: <20240306174456.GO9225@ziepe.ca>
+ <20240306221400.GA8663@lst.de>
+ <20240307000036.GP9225@ziepe.ca>
+ <20240307150505.GA28978@lst.de>
+ <20240307210116.GQ9225@ziepe.ca>
+ <20240308164920.GA17991@lst.de>
+ <20240308202342.GZ9225@ziepe.ca>
+ <20240309161418.GA27113@lst.de>
+ <20240310093513.GB12921@unreal>
+ <20240312212844.GA3018@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,116 +73,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240123-vfs-bdev-file-v2-1-adbd023e19cc@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20240312212844.GA3018@lst.de>
 
-Now that this is in mainline it seems to cause blktests to crash
-nbd/003 with a rather non-obvious oops for me:
+On Tue, Mar 12, 2024 at 10:28:44PM +0100, Christoph Hellwig wrote:
+> On Sun, Mar 10, 2024 at 11:35:13AM +0200, Leon Romanovsky wrote:
+> > And you will need to have a way to instruct that pin_user_pages() variant
+> > to continue anyway, because you asked for FOLL_PCI_P2PDMA. Without that
+> > force, you will have !FOLL_PCI_P2PDMA behaviour.
+> 
+> I don't understand what you mean.
 
-nbd/003 (mount/unmount concurrently with NBD_CLEAR_SOCK)    
-runtime  8.139s  ...
-[  802.941685] run blktests nbd/003 at 2024-03-12 14:51:20
-[  803.171958] nbd0: detected capacity change from 0 to 20971520
-[  803.183725] block nbd0: shutting down sockets
-[  803.184645] I/O error, dev nbd0, sector 2 op 0x0:(READ) flags 0x1000 phys_seg 1 prio class 0
-[  803.185156] EXT4-fs (nbd0): unable to read superblock
-[  803.186214] I/O error, dev nbd0, sector 20968432 op 0x0:(READ) flags
- 0x80700 phys_seg 1 prio clas0
-[  803.186770] I/O error, dev nbd0, sector 20968432 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[  803.187026] Buffer I/O error on dev nbd0, logical block 10484216, async page read
-[  803.187335] I/O error, dev nbd0, sector 20968434 op 0x0:(READ) flags 0x0 phys_seg 3 prio class 0
-[  803.187593] Buffer I/O error on dev nbd0, logical block 10484217, async page read
-[  803.187809] Buffer I/O error on dev nbd0, logical block 10484218, async page read
-[  803.188027] Buffer I/O error on dev nbd0, logical block 10484219, async page read
-[  803.194147] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[  803.194400] Buffer I/O error on dev nbd0, logical block 0, async page read
-[  803.194634] I/O error, dev nbd0, sector 2 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[  803.194880] Buffer I/O error on dev nbd0, logical block 1, async page read
-[  803.195296] I/O error, dev nbd0, sector 4 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[  803.195548] Buffer I/O error on dev nbd0, logical block 2, async page read
-[  803.195781] I/O error, dev nbd0, sector 6 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[  803.196015] Buffer I/O error on dev nbd0, logical block 3, async page read
-[  803.196246] Buffer I/O error on dev nbd0, logical block 0, async page read
-[  803.196743] ldm_validate_partition_table(): Disk read failed.
-[  803.197375] Dev nbd0: unable to read RDB block 0
-[  803.198007]  nbd0: unable to read partition table
-[  803.198467] EXT4-fs (nbd0): unable to read superblock
-[  803.199444] ldm_validate_partition_table(): Disk read failed.
-[  803.200487] Dev nbd0: unable to read RDB block 0
-[  803.201046]  nbd0: unable to read partition table
-[  803.207369] (udev-worker): attempt to access beyond end of device
-[  803.207369] nbd0: rw=0, sector=2, nr_sectors = 2 limit=0
-[  803.208100] (udev-worker): attempt to access beyond end of device
-[  803.208100] nbd0: rw=0, sector=4, nr_sectors = 2 limit=0
-[  803.208807] (udev-worker): attempt to access beyond end of device
-[  803.208807] nbd0: rw=0, sector=6, nr_sectors = 2 limit=0
-[  803.209197] ldm_validate_partition_table(): Disk read failed.
-[  803.209365] Dev nbd0: unable to read RDB block 0
-[  803.209506]  nbd0: unable to read partition table
-[  803.209679] nbd0: partition table beyond EOD, truncated
-[  803.210132] mount_clear_soc: attempt to access beyond end of device
-[  803.210132] nbd0: rw=4096, sector=2, nr_sectors = 2 limit=0
-[  803.210896] EXT4-fs (nbd0): unable to read superblock
-[  803.212990] mount_clear_soc: attempt to access beyond end of device
-[  803.212990] nbd0: rw=4096, sector=2, nr_sectors = 2 limit=0
-[  803.213374] EXT4-fs (nbd0): unable to read superblock
-[  803.221502] mount_clear_soc: attempt to access beyond end of device
-[  803.221502] nbd0: rw=4096, sector=2, nr_sectors = 2 limit=0
-[  803.221868] EXT4-fs (nbd0): unable to read superblock
-[  803.223990] mount_clear_soc: attempt to access beyond end of device
-[  803.223990] nbd0: rw=4096, sector=2, nr_sectors = 2 limit=0
-[  803.224334] EXT4-fs (nbd0): unable to read superblock
-[  803.229317] mount_clear_soc: attempt to access beyond end of device
-[  803.229317] nbd0: rw=4096, sector=2, nr_sectors = 2 limit=0
-[  803.229665] EXT4-fs (nbd0): unable to read superblock
-[  803.231698] mount_clear_soc: attempt to access beyond end of device
-[  803.231698] nbd0: rw=4096, sector=2, nr_sectors = 2 limit=0
-[  803.232068] EXT4-fs (nbd0): unable to read superblock
-[  803.233702] mount_clear_soc: attempt to access beyond end of device
-[  803.233702] nbd0: rw=4096, sector=2, nr_sectors = 2 limit=0
-[  803.234049] EXT4-fs (nbd0): unable to read superblock
-[  803.235263] general protection fault, maybe for address 0x0: 0000 [#1] PREEMPT SMP NOPTI
-[  803.235505] CPU: 1 PID: 53579 Comm: mount_clear_soc Not tainted 6.8.0+ #2288
-[  803.235712] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/014
-[  803.235973] RIP: 0010:srso_alias_safe_ret+0x5/0x7
-[  803.236118] Code: cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc
-[  803.236637] RSP: 0018:ffffc900000d4ef8 EFLAGS: 00010202
-[  803.236789] RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000001
-[  803.236991] RDX: 6b6b6b6b6b6b6b6b RSI: ffffffff833adc6a RDI: ffff888112581870
-[  803.237200] RBP: ffffffff8124ae64 R08: 00000000ffffffff R09: 00000000ffffffff
-[  803.237402] R10: 0000000000000002 R11: ffff8881130cb458 R12: ffff8881130caa40
-[  803.237605] R13: 0000000000000000 R14: 0000000000031688 R15: ffffffff8124adde
-[  803.237811] FS:  0000000000000000(0000) GS:ffff8881f9d00000(0000) knlGS:0000000000000000
-[  803.238038] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  803.238206] CR2: 00007f2bb5507740 CR3: 0000000110dd2000 CR4: 0000000000750ef0
-[  803.238412] PKRU: 55555554
-[  803.238496] Call Trace:
-[  803.238571]  <IRQ>
-[  803.238634]  ? die_addr+0x31/0x80
-[  803.238740]  ? exc_general_protection+0x24a/0x480
-[  803.238886]  ? asm_exc_general_protection+0x26/0x30
-[  803.239028]  ? rcu_core+0x34e/0xae0
-[  803.239141]  ? rcu_core+0x3d4/0xae0
-[  803.239255]  ? srso_alias_safe_ret+0x5/0x7
-[  803.239379]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  803.239523]  ? rcu_core+0x3d9/0xae0
-[  803.239636]  ? __do_softirq+0xec/0x481
-[  803.239757]  ? __irq_exit_rcu+0x89/0xe0
-[  803.239874]  ? irq_exit_rcu+0x9/0x30
-[  803.239982]  ? sysvec_apic_timer_interrupt+0xa1/0xd0
-[  803.240130]  </IRQ>
-[  803.240197]  <TASK>
-[  803.240265]  ? asm_sysvec_apic_timer_interrupt+0x1a/0x20
-[  803.240423]  ? __memcg_slab_free_hook+0x11e/0x230
-[  803.240566]  ? __memcg_slab_free_hook+0x68/0x230
-[  803.240705]  ? unlink_anon_vmas+0x78/0x200
-[  803.240833]  ? kmem_cache_free+0x2ca/0x310
-[  803.240960]  ? unlink_anon_vmas+0x78/0x200
-[  803.241086]  ? free_pgtables+0x141/0x260
-[  803.241218]  ? exit_mmap+0x194/0x440
-[  803.241337]  ? __mmput+0x3a/0x110
-[  803.241445]  ? do_exit+0x2bf/0xb10
-[  803.241553]  ? do_group_exit+0x31/0x90
-[  803.241669]  ? __x64_sys_exit_group+0x13/0x20
-[  803.241801]  ? do_syscall_64+0x75/0x150
-[  803.241921]  ? entry_SYSCALL_64_after_hwframe+0x6c/0x74
+Jason talked about the need to call to pin_user_pages(..., gup_flags | FOLL_PCI_P2PDMA, ...),
+but in your proposal this call won't be possible anymore.
+
+> 
+> > When you say "simplify the overall interface", which interface do you mean?
+> 
+> Primarily the dma mapping interface.  Secondarily also everything around
+> it.
+
+OK, thanks
