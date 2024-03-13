@@ -1,96 +1,75 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04D5535B7;
-	Wed, 13 Mar 2024 21:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8863C53E07;
+	Wed, 13 Mar 2024 21:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710366175; cv=none; b=YE9GCwmgsWbQYKQswUfwAIHO9OsCURpYKgA82GWngwm5GGaRIo6ylI7Zjlsbk3aYu2rTFRSK0MWhYQdVNXw5/fUjGCBeh/vxq95+lfbW1f/1KBGPdoEdKFgWZvVzwFZcx3C9K6OHyJt/QqolzvPgmw1DfzeosZemQzmiUEMMwA0=
+	t=1710366273; cv=none; b=Zp5ZBt5d1sKsBcn7AmDBluPf+bbW5sofsIvO3QDNsLWWwXB2M1PoZwbym8rp7wFY9grFwA8RA3pwR7jGx9eWY4bWxptERXLcUsgliHcrK+WoyNuQ9CQQCa8Gfwm77/T+DbRdFas66nP/HhYZTflWMEA1Jl3FL+BiCorWFbWWytU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710366175; c=relaxed/simple;
-	bh=xiohMvsrascjDVtTBsfkkdTLd00QtRp/eG3o/ZtjDv0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PPbpDNQL+EhF77Rt25idEbxaaP0mQA0sS+ofISEligKAAdcMrrDOawfx+x1UQ9yJxEUQJGUQ4R2UpUjLIhs/4kKxzgU3Xb2W37NnL2zbJjsUsAfSzk3198eOn08VhzQTmlEnwcc6Vj6+l6ykMyCSB9FbXR9353++UXb8iv22V1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=3WEJx/Y/; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="3WEJx/Y/"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Tw3s90Gh7zlgVnY;
-	Wed, 13 Mar 2024 21:42:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1710366170; x=1712958171; bh=QsRxIrFbAsE0tyCFnHMufAaG3Y3KZleW2Dr
-	XUuR1ry0=; b=3WEJx/Y/VzEfiI+nfFPMGGVjKy/EfxaPejYUTr8LrrTiCQSp3Ph
-	Jzb2J0OFeN0esH76c7u8OMlJn2dLTlSCzaaSdV94sTKvcYswIzY73/1FgXpwu+7a
-	3hxZraOOxzWQhJf1RWylDAjFve2o8A5djDFKcjzHyltbbqWXWtbF5ko3OfE3Ea3f
-	5JuheGK09few+WuoPiW0ZO/gBU9jcCY0hA+uPW/UYrA0QZvTA4QHhRWlEKregIFH
-	JgHMIH4QlsVzmwA/4SRd5u22kBSFjtVSMybMioyAk97DczQ8zcPseEcNZf8Um5gm
-	uT9Ipfm5HE4XOJ5rEDniJzG6nI3crZgYVuw==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id VR8FvFI4lSqx; Wed, 13 Mar 2024 21:42:50 +0000 (UTC)
-Received: from bvanassche-linux.mtv.corp.google.com (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Tw3s42RB1zlgVnN;
-	Wed, 13 Mar 2024 21:42:47 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
+	s=arc-20240116; t=1710366273; c=relaxed/simple;
+	bh=fHUHblIM4Ym+Lz04JBq2RDtEh1L4l5ZqXeh2B8Xe0mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e6/KMea9e6puisxxWLSPC/vJeVAu6/QbaBvaLFyDp+9FvF8E77U3FX9yKud80Yi86BqU5raNoF8yXfI7GwRWJ5Vyz5CL+QJl3xfNZYCMKxeBjgiGUCyUK42fIpGjUlTAvQUho1sycFZboeV+4eN6F0611KjQ2vVJUI0gj5wAA2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 8161568BFE; Wed, 13 Mar 2024 22:44:18 +0100 (CET)
+Date: Wed, 13 Mar 2024 22:44:18 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
 	Bart Van Assche <bvanassche@acm.org>,
-	stable@vger.kernel.org,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
-	Zhiguo Niu <Zhiguo.Niu@unisoc.com>
-Subject: [PATCH] Revert "block/mq-deadline: use correct way to throttling write requests"
-Date: Wed, 13 Mar 2024 14:42:18 -0700
-Message-ID: <20240313214218.1736147-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
+ steps
+Message-ID: <20240313214418.GA9129@lst.de>
+References: <20240306221400.GA8663@lst.de> <20240307000036.GP9225@ziepe.ca> <20240307150505.GA28978@lst.de> <20240307210116.GQ9225@ziepe.ca> <20240308164920.GA17991@lst.de> <20240308202342.GZ9225@ziepe.ca> <20240309161418.GA27113@lst.de> <20240310093513.GB12921@unreal> <20240312212844.GA3018@lst.de> <20240313074636.GV12921@unreal>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240313074636.GV12921@unreal>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-The code "max(1U, 3 * (1U << shift)  / 4)" comes from the Kyber I/O
-scheduler. The Kyber I/O scheduler maintains one internal queue per hwq
-and hence derives its async_depth from the number of hwq tags. Using
-this approach for the mq-deadline scheduler is wrong since the
-mq-deadline scheduler maintains one internal queue for all hwqs
-combined. Hence this revert.
+On Wed, Mar 13, 2024 at 09:46:36AM +0200, Leon Romanovsky wrote:
+> On Tue, Mar 12, 2024 at 10:28:44PM +0100, Christoph Hellwig wrote:
+> > On Sun, Mar 10, 2024 at 11:35:13AM +0200, Leon Romanovsky wrote:
+> > > And you will need to have a way to instruct that pin_user_pages() variant
+> > > to continue anyway, because you asked for FOLL_PCI_P2PDMA. Without that
+> > > force, you will have !FOLL_PCI_P2PDMA behaviour.
+> > 
+> > I don't understand what you mean.
+> 
+> Jason talked about the need to call to pin_user_pages(..., gup_flags | FOLL_PCI_P2PDMA, ...),
+> but in your proposal this call won't be possible anymore.
 
-Cc: stable@vger.kernel.org
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc: Zhiguo Niu <Zhiguo.Niu@unisoc.com>
-Fixes: d47f9717e5cf ("block/mq-deadline: use correct way to throttling wr=
-ite requests")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/mq-deadline.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Why?
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index f958e79277b8..02a916ba62ee 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -646,9 +646,8 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hc=
-tx)
- 	struct request_queue *q =3D hctx->queue;
- 	struct deadline_data *dd =3D q->elevator->elevator_data;
- 	struct blk_mq_tags *tags =3D hctx->sched_tags;
--	unsigned int shift =3D tags->bitmap_tags.sb.shift;
-=20
--	dd->async_depth =3D max(1U, 3 * (1U << shift)  / 4);
-+	dd->async_depth =3D max(1UL, 3 * q->nr_requests / 4);
-=20
- 	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
- }
