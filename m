@@ -1,95 +1,96 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951B64E1DB
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 20:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04D5535B7;
+	Wed, 13 Mar 2024 21:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710361654; cv=none; b=shyiiI4+QAVcnLdMqsABEuisbkLGC1u/fqb5muSUufX7S7GcLLcq4ivmuW1y0murXNWKB65305qJSzTq0xj4f2FsinALYAAYl/6JDls4gxVIrDq+YPThI+g2U7iC00VWbML1vNLZat8Tm+vrjKPYDFq6rPybN+gDPz3zunLJ/Ys=
+	t=1710366175; cv=none; b=YE9GCwmgsWbQYKQswUfwAIHO9OsCURpYKgA82GWngwm5GGaRIo6ylI7Zjlsbk3aYu2rTFRSK0MWhYQdVNXw5/fUjGCBeh/vxq95+lfbW1f/1KBGPdoEdKFgWZvVzwFZcx3C9K6OHyJt/QqolzvPgmw1DfzeosZemQzmiUEMMwA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710361654; c=relaxed/simple;
-	bh=6KYs3BQgjwZsV5TdSedJLoIrS+8iHieLsZx7y+UPnzA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=JDldH6SlKEAbTr8ob7ulNMPlDX8igq1LAoC8r4coQBPsPRuzHyfMWBLlm9LC8i5fEvT/U9cLF8clp8dmQpEhPXDCGkAeXmzOXcG5+Lg6HpQ2yScLQP4fLFpQNzBHP98m9KnjjcuWPm0iCHSoCgaMzJ2PO2/M9rJ2VojbaDNCylw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=a9W3afKE; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1710366175; c=relaxed/simple;
+	bh=xiohMvsrascjDVtTBsfkkdTLd00QtRp/eG3o/ZtjDv0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PPbpDNQL+EhF77Rt25idEbxaaP0mQA0sS+ofISEligKAAdcMrrDOawfx+x1UQ9yJxEUQJGUQ4R2UpUjLIhs/4kKxzgU3Xb2W37NnL2zbJjsUsAfSzk3198eOn08VhzQTmlEnwcc6Vj6+l6ykMyCSB9FbXR9353++UXb8iv22V1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=3WEJx/Y/; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="a9W3afKE"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36649b5bee6so426945ab.1
-        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 13:27:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710361651; x=1710966451; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eF2DJ3K0vqdhNLJam1R2VnPzYiUW+uxIa0Tf2briAJ4=;
-        b=a9W3afKEOxvSY4kRgWoH8PtJzVJNFleJdFpn9old5/tP8Smm2aSsM0K0/N/2Hghx1q
-         uOR0RZpDk6mUtd2x4o63GtY6wSr2zWDtxIhmyEhkVaIV3re1VFSlu2+Sreuzaj0/Y0/x
-         Xrd8yc9wGEhoSDkHQqmY8G2YZ+kSETC66vzlPvagvvTvK07HAOR/TqVFRNFykAnysI8G
-         /a6ICiNZkNY6bTJfqeJ1Vn5SlkdqqkNDklV0tNPSl9GVS4LOEZVow3Pm65V1jO3qPcYi
-         ivclXmBUHerME7l2uLTyALkGXpOlZ44+Z7bHSE70cozdlLy3D9y6tsmtZmFpge9lEO1E
-         K+DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710361651; x=1710966451;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eF2DJ3K0vqdhNLJam1R2VnPzYiUW+uxIa0Tf2briAJ4=;
-        b=iIRZ4/rfOC9MnvP0SeAeHwfNIjBz7AwhwHYqHNaxGxma1QTyIA+IhhC1gWXDHsr5+3
-         a0UqbK6t7CZBkdR8co6BFJM5fRyUu9ds9CL/bnl0UBI+0tamR1PhItjjJ8Wk2BkxYPFW
-         SBD9nSxquGWdFhAzKIIjTXAKMz3SFUdB0MQRb2FY3uZt4Rtyl4XmCckE4cogkdGmk51o
-         CY9yNUzuQ2e+EN+Rw9g5o/GxpLBqWQ1jMqSFzzMeZqPj2HPVawtnoWCmVHBKMlOecTVH
-         v4krgS+P+X1lp+eaDzmrXT3+57SW782qQUqV7x36+u9M4jstmS+UNwHFPR5fzt3l0YEA
-         HDpA==
-X-Gm-Message-State: AOJu0YyEPkNw2qAfKzfg2w9WZQeOiMOp9K0CbFfZ7FNDiKGOYNFJQ+R+
-	rP06mfMML+xHx9fVAMVZLir7yh83KEMJfzKEYZzLwdtT9pTBy6cxi5uFiDtL2KPZVIU+TglJrE2
-	R
-X-Google-Smtp-Source: AGHT+IHrpTG3IyrY66fdBdCSOtK8R6pRDlYafTxhW5d810MFfjPxeOohqUqtft8HGNclAFoVpU5ASg==
-X-Received: by 2002:a6b:e914:0:b0:7c8:bb03:a7a with SMTP id u20-20020a6be914000000b007c8bb030a7amr23560iof.2.1710361651366;
-        Wed, 13 Mar 2024 13:27:31 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id a42-20020a02942d000000b00476cca7d5b9sm3081057jai.166.2024.03.13.13.27.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 13:27:30 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20240308133921.2058227-1-colin.i.king@gmail.com>
-References: <20240308133921.2058227-1-colin.i.king@gmail.com>
-Subject: Re: [PATCH][next] block: partitions: only define function
- mac_fix_string for CONFIG_PPC_PMAC
-Message-Id: <171036165065.297831.13967283119583163229.b4-ty@kernel.dk>
-Date: Wed, 13 Mar 2024 14:27:30 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="3WEJx/Y/"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Tw3s90Gh7zlgVnY;
+	Wed, 13 Mar 2024 21:42:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1710366170; x=1712958171; bh=QsRxIrFbAsE0tyCFnHMufAaG3Y3KZleW2Dr
+	XUuR1ry0=; b=3WEJx/Y/VzEfiI+nfFPMGGVjKy/EfxaPejYUTr8LrrTiCQSp3Ph
+	Jzb2J0OFeN0esH76c7u8OMlJn2dLTlSCzaaSdV94sTKvcYswIzY73/1FgXpwu+7a
+	3hxZraOOxzWQhJf1RWylDAjFve2o8A5djDFKcjzHyltbbqWXWtbF5ko3OfE3Ea3f
+	5JuheGK09few+WuoPiW0ZO/gBU9jcCY0hA+uPW/UYrA0QZvTA4QHhRWlEKregIFH
+	JgHMIH4QlsVzmwA/4SRd5u22kBSFjtVSMybMioyAk97DczQ8zcPseEcNZf8Um5gm
+	uT9Ipfm5HE4XOJ5rEDniJzG6nI3crZgYVuw==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id VR8FvFI4lSqx; Wed, 13 Mar 2024 21:42:50 +0000 (UTC)
+Received: from bvanassche-linux.mtv.corp.google.com (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Tw3s42RB1zlgVnN;
+	Wed, 13 Mar 2024 21:42:47 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	stable@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
+	Zhiguo Niu <Zhiguo.Niu@unisoc.com>
+Subject: [PATCH] Revert "block/mq-deadline: use correct way to throttling write requests"
+Date: Wed, 13 Mar 2024 14:42:18 -0700
+Message-ID: <20240313214218.1736147-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Transfer-Encoding: quoted-printable
 
+The code "max(1U, 3 * (1U << shift)  / 4)" comes from the Kyber I/O
+scheduler. The Kyber I/O scheduler maintains one internal queue per hwq
+and hence derives its async_depth from the number of hwq tags. Using
+this approach for the mq-deadline scheduler is wrong since the
+mq-deadline scheduler maintains one internal queue for all hwqs
+combined. Hence this revert.
 
-On Fri, 08 Mar 2024 13:39:21 +0000, Colin Ian King wrote:
-> The helper function mac_fix_string is only required with CONFIG_PPC_PMAC,
-> add #if CONFIG_PPC_PMAC and #endif around the function.
-> 
-> Cleans up clang scan build warning:
-> block/partitions/mac.c:23:20: warning: unused function 'mac_fix_string' [-Wunused-function]
-> 
-> 
-> [...]
+Cc: stable@vger.kernel.org
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc: Zhiguo Niu <Zhiguo.Niu@unisoc.com>
+Fixes: d47f9717e5cf ("block/mq-deadline: use correct way to throttling wr=
+ite requests")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/mq-deadline.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Applied, thanks!
-
-[1/1] block: partitions: only define function mac_fix_string for CONFIG_PPC_PMAC
-      commit: 5205a4aa8fc9454853b705b69611c80e9c644283
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index f958e79277b8..02a916ba62ee 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -646,9 +646,8 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hc=
+tx)
+ 	struct request_queue *q =3D hctx->queue;
+ 	struct deadline_data *dd =3D q->elevator->elevator_data;
+ 	struct blk_mq_tags *tags =3D hctx->sched_tags;
+-	unsigned int shift =3D tags->bitmap_tags.sb.shift;
+=20
+-	dd->async_depth =3D max(1U, 3 * (1U << shift)  / 4);
++	dd->async_depth =3D max(1UL, 3 * q->nr_requests / 4);
+=20
+ 	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
+ }
