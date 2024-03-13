@@ -1,57 +1,57 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A6941232
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 11:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7E645BEF
+	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 11:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710327971; cv=none; b=cq2zwNbrTTyaZIdu3RbNCHoErE/8tcPIwjuXH8SV2GyRLjVwHVWWu7siKg1FbWyyOzuhERYn6ZTRawE40YjP+lY5B6wdGpCB1FimNJj4h0XNhs67AIMkakCPbR+e9l76URd/OZ1YahxM2xbB515YMfOrE0eugyU14g4aw3/JeLk=
+	t=1710327973; cv=none; b=ovvZljUBN7oiLwlK8f3WIt+qFyYA6DezLSgf8UZ5b+1xMNwTCwo4bK9vQzM5w5HGpWrL27ysaUOy6IxJiahfIIfwh8XUIpmVCDJEKPD/PHRRmPt4dqzuHA43JhgqeThX4FpAOm9qgL6Os5v0FpQZlLkdtH+0DHEiK4ZPAX2diI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710327971; c=relaxed/simple;
-	bh=poKb8VxBrFQtoK1H4oQ1UgXa3OWgewJdw+oLXHq0Dns=;
+	s=arc-20240116; t=1710327973; c=relaxed/simple;
+	bh=5GbuDkx/t3ca+1vsJKcxunbH6qs63waeRLqj2MYB5Ro=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cjFe2n4StlEAVqw8Eby4HSdT8yskZmB5lrwc+i5njJ8P4yMOX7/QiALl89ZWhTnSAXTiENxQm3g2dtqOlh0KBRyRWDM3zlhy7qFVBhbSpgRtPK2J7MV8UZK66Z+oaQAbpG62WB0A4zkmmlNJA6AlSV3G5moqCpz7RGd0zJfwsUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=TPwjM3jM; arc=none smtp.client-ip=209.85.218.49
+	 MIME-Version; b=m7QUBt2vsTPEqJz1VmBYC52oGvbKRcPl54MGpYKHezxNgSBhaknQb2+KH+B2wwPEubWM0Cskw0FGQPQI5R86ChuOjQIeaad1rbbgkgPkpIf2e6V6hKVo/Fc/uVWVNMjSW1359rqT9jVnKalhCH4BRNdT/sy4yCjeBrWQ6Rx/saQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=YMyqvaV/; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="TPwjM3jM"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a4661ed51c8so42776966b.3
-        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 04:06:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="YMyqvaV/"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a45f257b81fso629485766b.0
+        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 04:06:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710327968; x=1710932768; darn=vger.kernel.org;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710327969; x=1710932769; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZJhpLaBye+vDxABkGVxNk0R4/Je1BHTggYd+F9CS0JE=;
-        b=TPwjM3jMqw80NkaKsRfTJcf8kAhvMWN4NrwL/mKZKZBzeEAgNwWUAEH2UFzY1ZyFXZ
-         95PP6VA5FBk8NGCFWrMiLp16CF2UmGsZD1jK+R+JLTbxOfIR2Vwfe5F1dH3Dqo+HhMHn
-         DD1fvIA98FBH17Zqga8Axn7fuwA1xpTqo8pc2cBRDFDPbqTgw0Zyzl6PLQw/oma9M/pK
-         oR1guAO0pF+al7Z7EObuYOMOYhWuFljZuwULxSJEOKgCC+dLdD//C6Vt0PZnoFoOg4W9
-         1IcWM42+GtYqxJVpl+imHtn7MK/0ORqFThIS00vHmONRFldclB2xPughk+iFTdAxBwvF
-         xgvQ==
+        bh=02J+9loqch2JUjY1j89Pn56oCFWFFh5txriQBAftH6E=;
+        b=YMyqvaV/Iv9S0jEpsLdgxswKxB8JYgX1XANbrdRmBZIkCsi7b/mfoyCumU2FVpomz5
+         5IWzMZe3mC/DS/PypAX6TzxtaTySW7iqx1kPleAixDW0fatBuNQhsCUMYXPQdJwGUmgi
+         uFIgme1Y0OGg8tBpUXH19FGsUREWvxfYm1FWjLoZJlF1l0WYU2TVuFfTeG9gtBqU/6iK
+         Xl8JwkH55K5tuNS9rUaJ/KtRRxGX60bQ5TYktSkivhHKBY7z0zMb2IXjWLPIp36dLM6l
+         2KRH24Ftb0GpmY6Ia450eF5yOzwsVsvqsq3PsSN0iScRyNSnsPLo9gM+xoXSuzWe0Ncm
+         h9FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710327968; x=1710932768;
+        d=1e100.net; s=20230601; t=1710327969; x=1710932769;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZJhpLaBye+vDxABkGVxNk0R4/Je1BHTggYd+F9CS0JE=;
-        b=UyfJ4bWT5hfD9ZjPSuJWT3I3NRYlZUJfm+Wyrc8pmNyZzepkMgqQWdJIjGLkGMkdcu
-         +6TmoFsRHWiQB10+FyeIb17qspqjcRWvCud9aXw72GO5GOx55610FFrtpfIa8glOPY0N
-         fK0MAwCvHUJ89dC4xFauchGnJWAWjN2qrhEmSvYlfDbQEm3Bqlubu1k78TZSEB8lQwP/
-         fAHrZLsA7cePd2fRI0dJEHZvvW4ECR/AcQ11uno9VnUTKYf8vaDyeyw+1izAKoyEL1FW
-         iOmmNpiFueM4c11e+dmttpKbWeXwvs6WjYie/6/lww/t8Jfvygh60VLKOxofsA3XT3qI
-         +oVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU7HvuNqnD0ZcuoljWbHEHamD9MyYip8+NkizaPY2CJ5O2iFQB1/BgSMWNSS629BITU28nuNXzExVsmG/vMLCeKZ35kza96QjPM9OA=
-X-Gm-Message-State: AOJu0YwllrZfmz7vYXfh6LrRin5ZX3y+I1BiB65dCIrAAR9ttGEgcP6M
-	S7jbdcePC4OeLonyT3WPdaNCa6ogcDS7aee/o6R12zSJlf+rWelq5Fqs8fDW20M=
-X-Google-Smtp-Source: AGHT+IH2kW+8cJvn0ZC8fmOzX8cVltqW6h1KgZezqvXcb0+MfBFkrVtJmrcgIoAGxQxFO9AZ2LURKQ==
-X-Received: by 2002:a17:907:8a85:b0:a46:5dc4:dab9 with SMTP id sf5-20020a1709078a8500b00a465dc4dab9mr951325ejc.38.1710327968092;
-        Wed, 13 Mar 2024 04:06:08 -0700 (PDT)
+        bh=02J+9loqch2JUjY1j89Pn56oCFWFFh5txriQBAftH6E=;
+        b=dMYG2BwwyMExLnLEV9m05sgM/WoLvjYwUG6Oam5udSIVLkXgo6gqiIm1v/Taiy9DnO
+         pf7/Dm4zPhbrv39sLkZ45/sMRMlwnX0NT7pGXkh7rTVWZrtTqLLEIkdNendYH4p/QFFZ
+         HnwmjLdCscMnaVPFYhEXeYcpd7zaLlOp6rfAkTXZ0np/katDWKlE6QdpMa9vmzMRjMsG
+         3wGeTzAiVGGsaRN9RVXAeIQg0nEGwNCwGigZ/Asz7pYReD5bHnD5prO2dlb11lmabp3Z
+         ybSPELN86ALmwItRLREzGZ2fVfGIdpqWVUNloTmaNCL0UWgGsfru6iaPDTikJqNG//hf
+         KoAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWZXhEBdG8Q4qii1lVamCcRZonknvO5yJe7FPCUxUazP3LQsO5aXUTHt/JzzQ7h/agmSSIkTTwvyjN9ixN7CiEZ4j/zzmNGqKcq1os=
+X-Gm-Message-State: AOJu0Yyjot3bxcUnFdqBr0riJyYjSlmju6CwOBqTZzYdyHUcIfw4BrEu
+	2btK8H6xSwgGzPgyDdP1LNIblPn5YXUa0HAQ3BcTfRz1QmhvRUQmN+xUZo2jdiM=
+X-Google-Smtp-Source: AGHT+IEcThuL3vIoWtwKtXW9tSmz7xjNlpNKF5lpt2rzWBNXagbGz7lsNNxPgXrvJ1Nn9AxFGjtUgA==
+X-Received: by 2002:a17:907:972a:b0:a45:f4c2:38d7 with SMTP id jg42-20020a170907972a00b00a45f4c238d7mr8536226ejc.18.1710327969457;
+        Wed, 13 Mar 2024 04:06:09 -0700 (PDT)
 Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id bf2-20020a170907098200b00a461e206c00sm3397412ejc.20.2024.03.13.04.06.06
+        by smtp.gmail.com with ESMTPSA id jx15-20020a170907760f00b00a466591eaebsm55134ejc.194.2024.03.13.04.06.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 04:06:06 -0700 (PDT)
+        Wed, 13 Mar 2024 04:06:09 -0700 (PDT)
 From: Andreas Hindborg <nmi@metaspace.dk>
 To: Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
@@ -83,9 +83,9 @@ Cc: Andreas Hindborg <a.hindborg@samsung.com>,
 	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
 	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
 	"gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: [RFC PATCH 5/5] MAINTAINERS: add entry for Rust block device driver API
-Date: Wed, 13 Mar 2024 12:05:12 +0100
-Message-ID: <20240313110515.70088-6-nmi@metaspace.dk>
+Subject: [RFC PATCH 2/5] rust: block: introduce `kernel::block::bio` module
+Date: Wed, 13 Mar 2024 12:05:09 +0100
+Message-ID: <20240313110515.70088-3-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240313110515.70088-1-nmi@metaspace.dk>
 References: <20240313110515.70088-1-nmi@metaspace.dk>
@@ -99,36 +99,471 @@ Content-Transfer-Encoding: 8bit
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
+Add abstractions for working with `struct bio`.
+
 Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 ---
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ rust/kernel/block.rs            |   1 +
+ rust/kernel/block/bio.rs        | 112 +++++++++++++
+ rust/kernel/block/bio/vec.rs    | 279 ++++++++++++++++++++++++++++++++
+ rust/kernel/block/mq/request.rs |  22 +++
+ 4 files changed, 414 insertions(+)
+ create mode 100644 rust/kernel/block/bio.rs
+ create mode 100644 rust/kernel/block/bio/vec.rs
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1aabf1c15bb3..031198967782 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3623,6 +3623,20 @@ F:	include/linux/blk*
- F:	kernel/trace/blktrace.c
- F:	lib/sbitmap.c
+diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
+index 4c93317a568a..1797859551fd 100644
+--- a/rust/kernel/block.rs
++++ b/rust/kernel/block.rs
+@@ -2,4 +2,5 @@
  
-+BLOCK LAYER DEVICE DRIVER API [RUST]
-+M:	Andreas Hindborg <a.hindborg@samsung.com>
-+R:	Boqun Feng <boqun.feng@gmail.com>
-+L:	linux-block@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Supported
-+W:	https://rust-for-linux.com
-+B:	https://github.com/Rust-for-Linux/linux/issues
-+C:	https://rust-for-linux.zulipchat.com/#narrow/stream/Block
-+T:	git https://github.com/Rust-for-Linux/linux.git rust-block-next
-+F:	drivers/block/rnull.rs
-+F:	rust/kernel/block.rs
-+F:	rust/kernel/block/
+ //! Types for working with the block layer
+ 
++pub mod bio;
+ pub mod mq;
+diff --git a/rust/kernel/block/bio.rs b/rust/kernel/block/bio.rs
+new file mode 100644
+index 000000000000..0d4336cbe9c1
+--- /dev/null
++++ b/rust/kernel/block/bio.rs
+@@ -0,0 +1,112 @@
++// SPDX-License-Identifier: GPL-2.0
 +
- BLOCK2MTD DRIVER
- M:	Joern Engel <joern@lazybastard.org>
- L:	linux-mtd@lists.infradead.org
++//! Types for working with the bio layer.
++//!
++//! C header: [`include/linux/blk_types.h`](../../include/linux/blk_types.h)
++
++use core::fmt;
++use core::ptr::NonNull;
++
++mod vec;
++
++pub use vec::BioSegmentIterator;
++pub use vec::Segment;
++
++use crate::types::Opaque;
++
++/// A block device IO descriptor (`struct bio`)
++///
++/// # Invariants
++///
++/// Instances of this type is always reference counted. A call to
++/// `bindings::bio_get()` ensures that the instance is valid for read at least
++/// until a matching call to `bindings :bio_put()`.
++#[repr(transparent)]
++pub struct Bio(Opaque<bindings::bio>);
++
++impl Bio {
++    /// Returns an iterator over segments in this `Bio`. Does not consider
++    /// segments of other bios in this bio chain.
++    #[inline(always)]
++    pub fn segment_iter(&self) -> BioSegmentIterator<'_> {
++        BioSegmentIterator::new(self)
++    }
++
++    /// Get slice referencing the `bio_vec` array of this bio
++    #[inline(always)]
++    fn io_vec(&self) -> &[bindings::bio_vec] {
++        let this = self.0.get();
++
++        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
++        // `this` is valid for read.
++        let io_vec = unsafe { (*this).bi_io_vec };
++
++        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
++        // `this` is valid for read.
++        let length = unsafe { (*this).bi_vcnt };
++
++        // SAFETY: By C API contract, `io_vec` points to `length` consecutive
++        // and properly initialized `bio_vec` values. The array is properly
++        // aligned because it is #[repr(C)]. By C API contract and safety
++        // requirement of `from_raw()`, the elements of the `io_vec` array are
++        // not modified for the duration of the lifetime of `&self`
++        unsafe { core::slice::from_raw_parts(io_vec, length as usize) }
++    }
++
++    /// Return a copy of the `bvec_iter` for this `Bio`. This iterator always
++    /// indexes to a valid `bio_vec` entry.
++    #[inline(always)]
++    fn raw_iter(&self) -> bindings::bvec_iter {
++        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
++        // `self` is valid for read.
++        unsafe { (*self.0.get()).bi_iter }
++    }
++
++    /// Get the next `Bio` in the chain
++    #[inline(always)]
++    fn next(&self) -> Option<&Self> {
++        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
++        // `self` is valid for read.
++        let next = unsafe { (*self.0.get()).bi_next };
++        // SAFETY: By C API contract `bi_next` has nonzero reference count if it
++        // is not null, for at least the duration of the lifetime of &self.
++        unsafe { Self::from_raw(next) }
++    }
++
++    /// Create an instance of `Bio` from a raw pointer.
++    ///
++    /// # Safety
++    ///
++    /// If `ptr` is not null, caller must ensure positive refcount for the
++    /// pointee and immutability for the duration of the returned lifetime.
++    #[inline(always)]
++    pub(crate) unsafe fn from_raw<'a>(ptr: *mut bindings::bio) -> Option<&'a Self> {
++        Some(
++            // SAFETY: by the safety requirement of this funciton, `ptr` is
++            // valid for read for the duration of the returned lifetime
++            unsafe { &*NonNull::new(ptr)?.as_ptr().cast::<Bio>() },
++        )
++    }
++}
++
++impl core::fmt::Display for Bio {
++    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
++        write!(f, "Bio({:?})", self.0.get())
++    }
++}
++
++/// An iterator over `Bio`
++pub struct BioIterator<'a> {
++    pub(crate) bio: Option<&'a Bio>,
++}
++
++impl<'a> core::iter::Iterator for BioIterator<'a> {
++    type Item = &'a Bio;
++
++    #[inline(always)]
++    fn next(&mut self) -> Option<&'a Bio> {
++        let current = self.bio.take()?;
++        self.bio = current.next();
++        Some(current)
++    }
++}
+diff --git a/rust/kernel/block/bio/vec.rs b/rust/kernel/block/bio/vec.rs
+new file mode 100644
+index 000000000000..b61380807f38
+--- /dev/null
++++ b/rust/kernel/block/bio/vec.rs
+@@ -0,0 +1,279 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! Types for working with `struct bio_vec` IO vectors
++//!
++//! C header: [`include/linux/bvec.h`](../../include/linux/bvec.h)
++
++use super::Bio;
++use crate::error::Result;
++use crate::folio::UniqueFolio;
++use crate::page::Page;
++use core::fmt;
++use core::mem::ManuallyDrop;
++
++/// A wrapper around a `strutct bio_vec` - a contiguous range of physical memory addresses
++///
++/// # Invariants
++///
++/// `bio_vec` must always be initialized and valid for read and write
++pub struct Segment<'a> {
++    bio_vec: bindings::bio_vec,
++    _marker: core::marker::PhantomData<&'a ()>,
++}
++
++impl Segment<'_> {
++    /// Get he lenght of the segment in bytes
++    #[inline(always)]
++    pub fn len(&self) -> usize {
++        self.bio_vec.bv_len as usize
++    }
++
++    /// Returns true if the length of the segment is 0
++    #[inline(always)]
++    pub fn is_empty(&self) -> bool {
++        self.len() == 0
++    }
++
++    /// Get the offset field of the `bio_vec`
++    #[inline(always)]
++    pub fn offset(&self) -> usize {
++        self.bio_vec.bv_offset as usize
++    }
++
++    /// Copy data of this segment into `folio`.
++    ///
++    /// Note: Disregards `self.offset()`
++    #[inline(always)]
++    pub fn copy_to_folio(&self, dst_folio: &mut UniqueFolio) -> Result {
++        // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
++        // pointer to a `struct page`. We do not own the page, but we prevent
++        // drop by wrapping the `Page` in `ManuallyDrop`.
++        let src_page = ManuallyDrop::new(unsafe { Page::from_raw(self.bio_vec.bv_page) });
++
++        src_page.with_slice_into_page(|src| {
++            dst_folio.with_slice_into_page_mut(0, |dst| {
++                dst.copy_from_slice(src);
++                Ok(())
++            })
++        })
++    }
++
++    /// Copy data to the page of this segment from `src`.
++    ///
++    /// Note: Disregards `self.offset()`
++    pub fn copy_from_folio(&mut self, src_folio: &UniqueFolio) -> Result {
++        // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
++        // pointer to a `struct page`. We do not own the page, but we prevent
++        // drop by wrapping the `Page` in `ManuallyDrop`.
++        let mut dst_page = ManuallyDrop::new(unsafe { Page::from_raw(self.bio_vec.bv_page) });
++
++        dst_page.with_slice_into_page_mut(|dst| {
++            src_folio.with_slice_into_page(0, |src| {
++                dst.copy_from_slice(src);
++                Ok(())
++            })
++        })
++    }
++}
++
++impl core::fmt::Display for Segment<'_> {
++    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
++        write!(
++            f,
++            "Segment {:?} len: {}",
++            self.bio_vec.bv_page, self.bio_vec.bv_len
++        )
++    }
++}
++
++/// An iterator over `Segment`
++///
++/// # Invariants
++///
++/// If `iter.bi_size` > 0, `iter` must always index a valid `bio_vec` in `bio.io_vec()`.
++pub struct BioSegmentIterator<'a> {
++    bio: &'a Bio,
++    iter: bindings::bvec_iter,
++}
++
++impl<'a> BioSegmentIterator<'a> {
++    /// Creeate a new segemnt iterator for iterating the segments of `bio`. The
++    /// iterator starts at the beginning of `bio`.
++    #[inline(always)]
++    pub(crate) fn new(bio: &'a Bio) -> BioSegmentIterator<'_> {
++        // SAFETY: `bio.raw_iter()` returns an index that indexes into a valid
++        // `bio_vec` in `bio.io_vec()`.
++        Self {
++            bio,
++            iter: bio.raw_iter(),
++        }
++    }
++
++    // The accessors in this implementation block are modelled after C side
++    // macros and static functions `bvec_iter_*` and `mp_bvec_iter_*` from
++    // bvec.h.
++
++    /// Construct a `bio_vec` from the current iterator state.
++    ///
++    /// This will return a `bio_vec`of size <= PAGE_SIZE
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    unsafe fn io_vec(&self) -> bindings::bio_vec {
++        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
++        // greater than 0.
++        unsafe {
++            bindings::bio_vec {
++                bv_page: self.page(),
++                bv_len: self.len(),
++                bv_offset: self.offset(),
++            }
++        }
++    }
++
++    /// Get the currently indexed `bio_vec` entry.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn bvec(&self) -> &bindings::bio_vec {
++        // SAFETY: By the safety requirement of this function and the type
++        // invariant of `Self`, `self.iter.bi_idx` indexes into a valid
++        // `bio_vec`
++        unsafe { self.bio.io_vec().get_unchecked(self.iter.bi_idx as usize) }
++    }
++
++    /// Get the currently indexed page, indexing into pages of order > 0.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn page(&self) -> *mut bindings::page {
++        // SAFETY: By C API contract, the following offset cannot exceed pages
++        // allocated to this bio.
++        unsafe { self.mp_page().add(self.mp_page_idx()) }
++    }
++
++    /// Get the remaining bytes in the current page. Never more than PAGE_SIZE.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn len(&self) -> u32 {
++        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
++        // greater than 0.
++        unsafe { self.mp_len().min((bindings::PAGE_SIZE as u32) - self.offset()) }
++    }
++
++    /// Get the offset from the last page boundary in the currently indexed
++    /// `bio_vec` entry. Never more than PAGE_SIZE.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn offset(&self) -> u32 {
++        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
++        // greater than 0.
++        unsafe { self.mp_offset() % (bindings::PAGE_SIZE as u32) }
++    }
++
++    /// Return the first page of the currently indexed `bio_vec` entry. This
++    /// might be a multi-page entry, meaning that page might have order > 0.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn mp_page(&self) -> *mut bindings::page {
++        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
++        // greater than 0.
++        unsafe { self.bvec().bv_page }
++    }
++
++    /// Get the offset in whole pages into the currently indexed `bio_vec`. This
++    /// can be more than 0 is the page has order > 0.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn mp_page_idx(&self) -> usize {
++        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
++        // greater than 0.
++        (unsafe { self.mp_offset() } / (bindings::PAGE_SIZE as u32)) as usize
++    }
++
++    /// Get the offset in the currently indexed `bio_vec` multi-page entry. This
++    /// can be more than `PAGE_SIZE` if the page has order > 0.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn mp_offset(&self) -> u32 {
++        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
++        // greater than 0.
++        unsafe { self.bvec().bv_offset + self.iter.bi_bvec_done }
++    }
++
++    /// Get the number of remaining bytes for the currently indexed `bio_vec`
++    /// entry. Can be more than PAGE_SIZE for `bio_vec` entries with pages of
++    /// order > 0.
++    ///
++    /// # Safety
++    ///
++    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
++    /// method.
++    #[inline(always)]
++    unsafe fn mp_len(&self) -> u32 {
++        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
++        // greater than 0.
++        self.iter
++            .bi_size
++            .min(unsafe { self.bvec().bv_len } - self.iter.bi_bvec_done)
++    }
++}
++
++impl<'a> core::iter::Iterator for BioSegmentIterator<'a> {
++    type Item = Segment<'a>;
++
++    #[inline(always)]
++    fn next(&mut self) -> Option<Self::Item> {
++        if self.iter.bi_size == 0 {
++            return None;
++        }
++
++        // SAFETY: We checked that `self.iter.bi_size` > 0 above.
++        let bio_vec_ret = unsafe { self.io_vec() };
++
++        // SAFETY: By existence of reference `&bio`, `bio.0` contains a valid
++        // `struct bio`. By type invariant of `BioSegmentItarator` `self.iter`
++        // indexes into a valid `bio_vec` entry. By C API contracit, `bv_len`
++        // does not exceed the size of the bio.
++        unsafe {
++            bindings::bio_advance_iter_single(
++                self.bio.0.get(),
++                &mut self.iter as *mut bindings::bvec_iter,
++                bio_vec_ret.bv_len,
++            )
++        };
++
++        Some(Segment {
++            bio_vec: bio_vec_ret,
++            _marker: core::marker::PhantomData,
++        })
++    }
++}
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index b4dacac5e091..cccffde45981 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -12,6 +12,9 @@
+ };
+ use core::{ffi::c_void, marker::PhantomData, ops::Deref};
+ 
++use crate::block::bio::Bio;
++use crate::block::bio::BioIterator;
++
+ /// A wrapper around a blk-mq `struct request`. This represents an IO request.
+ ///
+ /// # Invariants
+@@ -84,6 +87,25 @@ pub fn complete(&self) {
+         }
+     }
+ 
++    /// Get a wrapper for the first Bio in this request
++    #[inline(always)]
++    pub fn bio(&self) -> Option<&Bio> {
++        // SAFETY: By type invariant of `Self`, `self.0` is valid and the deref
++        // is safe.
++        let ptr = unsafe { (*self.0.get()).bio };
++        // SAFETY: By C API contract, if `bio` is not null it will have a
++        // positive refcount at least for the duration of the lifetime of
++        // `&self`.
++        unsafe { Bio::from_raw(ptr) }
++    }
++
++    /// Get an iterator over all bio structurs in this request
++    #[inline(always)]
++    pub fn bio_iter(&self) -> BioIterator<'_> {
++        BioIterator { bio: self.bio() }
++    }
++
++    // TODO: Check if inline is still required for cross language LTO inlining into module
+     /// Get the target sector for the request
+     #[inline(always)]
+     pub fn sector(&self) -> usize {
 -- 
 2.44.0
 
