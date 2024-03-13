@@ -1,130 +1,101 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FEB5A4D8
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 19:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EFE604C5;
+	Wed, 13 Mar 2024 19:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710356603; cv=none; b=nMGZTYSKSR7K/HcMm8/6Jp9ZT3krk+/HQvz3xX0dmt3MI/PbnHBVVjFLrDePYMNNFzVE4to/KuriTJW8aMCUHOYUd0hAEDJDe6rVpZENdmVG1yzEPCzsLl1HpQsgYN1dQKWg1U3Qz8N+i4wR7zemmWS7i1u35Nb+lpq7TXyit+w=
+	t=1710357130; cv=none; b=rGOhxDibwM3HSs3gpvuR6m/rLgOv/yeJagRUV/iFNhMLD1mvjGGPp+L7msqVf8wr4kwFsjicDoj7Fi032tYIKJbO3VSL5j4SH1/CWYgr2YIKCdDUCzM0wkI3oaFHcXuMJp+YO4KPGymyLL0hGcS5nNae1AOYOrKh/U+idfHtcno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710356603; c=relaxed/simple;
-	bh=SX+fEPlUzQH+SDjF+fg9M0nYR4xU4g4PvaNbAOfrrho=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=eQUclu7hSfzv6EH58739meB5Li6GkilKIWgaNF0emaYHMLexolDDL+M7DBVe2Hd8q8hlQNc9lyMW6agsyvF+6SX7nMfOZsD/dJp4UcNwCO+FFZqMH/sa8d4fkUC9dtgJ4FdA2zCj1FNSn+JDxTMVKtx7bSQM3Ensvlpzcjk8OEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=L1pgeIkS; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1710357130; c=relaxed/simple;
+	bh=i1sWYvJRR67mPoxsHtNcMGdTsNgujrMd6hvVpbLYz74=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sff3nckbcLZ7YbWoOY7bNEYwYIjUFVUAIoxy/Jg8kXUDDpDNRChEO2Smno5cvxnmMdB0lwfv2h/AEmvhoHTqi6VYre7aaNepQjBuMp307z/pHJfgt7V07JfzoygnR8ATv5m8iUHraujz9Sy79IYDHwqhyiiNeSP3gnOUR0EA1nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=R15hv2mC; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="L1pgeIkS"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5682ecd1f81so267663a12.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 12:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710356599; x=1710961399; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z0czGQahQJmLOhb1t7D6nFie7YcEp1Eo0BOuwVvzqhY=;
-        b=L1pgeIkSkB6oidxQZW6w0VEPRoHmSjDrbfQchntBbcZuaO7ElZW3FyTCpKsEtQY9OH
-         pU8d6ZfECLovqMLuWahuE32Lu33FenkpsBQ/AUteZf4j3h+QNcqdyG2qksNxIWVKKvdX
-         2ebRMxIzu8A2J3SLZ0O6/zXHuiF14s1TpFxx1GgAQAgXcWKesCFP6LDJaejcR35nGFeq
-         cGa7D/742K6iQHhk3J4qxSbLS54rPCBo92G3TsuVWKXeG977KRORTj6ZqmAh3kWEUqIO
-         HUIBInQVaiz3OvocMvgRGG8g/iSsq6fwfEf87L9CPEZ7hbz+dv2VaC/3LQ1Yb5Q8LCRi
-         4aFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710356599; x=1710961399;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z0czGQahQJmLOhb1t7D6nFie7YcEp1Eo0BOuwVvzqhY=;
-        b=S8iemIIp7yBPnia87Np+Ft+lGCztg12njCuw3e+evhzxuXcEY2phDtjvEl1m3PMyYa
-         fElOgiZiSicml1kEu8/FNppQsiIYKZVveMy3paot7Q9pNCurvMRRWA8E/WKP7P1uvJ+s
-         cbuQ2JvSOK1L/qA6JMwXcozloww7lTlknM3h3kEbLUkTZEvjp9VIvaWkk/t/LykdnscT
-         hPiW24AnDRvtdY5xubChsUHRauSbavBgo19JCRNX/slXpMKuvOmT3jxsKAwxUYIXBERK
-         kFLmTh5RsU7szFJ+3k75ZNs8d/31H4E8D9Tql3jJWsdlft7aL0PpUR9rsfRyuV39NCI8
-         g5Ng==
-X-Forwarded-Encrypted: i=1; AJvYcCXmBX1Wx1991YwyGffd/3D4tw+hqdXvqfQTkhSPKf+28gfNC3VxINlpxovNJnqyYOak9dN/jhGFtxga1nq0s++3QJJxN5wzUNdEmvA=
-X-Gm-Message-State: AOJu0YzpZ8xKn09IewrXPMvNz5Pn+o5OHKKPqvkwUQe5WEUuMv5ne/Mq
-	XSPjv6BZokVfJyNU6z5DZ2v4T5sDtIpjoD7q9a1qhCquw1q6+HvUekngLrBK+tI=
-X-Google-Smtp-Source: AGHT+IHlCY08CcHpJhARgnL+nVCYWz4gNBvKEftYoIsGP8VnUgwgLnr/RbwslLxE6aluPvisCaT/ug==
-X-Received: by 2002:a17:906:1308:b0:a46:60c6:98c9 with SMTP id w8-20020a170906130800b00a4660c698c9mr1283936ejb.68.1710356599394;
-        Wed, 13 Mar 2024 12:03:19 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id r1-20020a170906364100b00a4320e22b31sm5163914ejb.19.2024.03.13.12.03.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 12:03:19 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Bart Van Assche <bvanassche@acm.org>,  Jens Axboe <axboe@kernel.dk>,
-  Christoph Hellwig <hch@lst.de>,  Keith Busch <kbusch@kernel.org>,  Damien
- Le Moal <Damien.LeMoal@wdc.com>, 	Hannes Reinecke <hare@suse.de>,
-  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
- Hindborg <a.hindborg@samsung.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,
-  Greg KH <gregkh@linuxfoundation.org>,  Matthew Wilcox
- <willy@infradead.org>, 	Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor
- <alex.gaynor@gmail.com>,  Wedson Almeida Filho <wedsonaf@gmail.com>, 	Gary
- Guo <gary@garyguo.net>,  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>,
-  Benno Lossin <benno.lossin@proton.me>, 	Alice Ryhl
- <aliceryhl@google.com>,  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis
- Chamberlain <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,
-  Sergio =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
- Granados
- <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
- <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
- list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
- <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
- <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 0/5] Rust block device driver API and null block driver
-In-Reply-To: <ZfHu48NGktOx_uhG@boqun-archlinux> (Boqun Feng's message of "Wed,
-	13 Mar 2024 11:22:27 -0700")
-References: <20240313110515.70088-1-nmi@metaspace.dk>
-	<855a006d-5afc-4f70-90a9-ec94c0414d4f@acm.org>
-	<ZfHu48NGktOx_uhG@boqun-archlinux>
-User-Agent: mu4e 1.12.0; emacs 29.2
-Date: Wed, 13 Mar 2024 20:03:07 +0100
-Message-ID: <87r0get0no.fsf@metaspace.dk>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="R15hv2mC"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4Tw0W63ZzRz6ClSr9;
+	Wed, 13 Mar 2024 19:12:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1710357113; x=1712949114; bh=35L+R0W2D8tp7YUdieD0FUY/
+	PiWMGSyPa2r6p64YId4=; b=R15hv2mCgKMSf2HTayPe5hejHC4E5N8a4yM4M9YX
+	IqB/0xusf+mTSKDES3Me+Qqt0pQr27rGGsQwTTn2j6ikk643vmT9p90RgDufN+Jv
+	wvkShwKwsLO6eHYn+6ZJVrZOGsdJS7zok9Sp8Hl7DrqL2WhwtmZa7pznVWcy+72q
+	/9u7F9ba0WuCL302Fo5wB7JHlq3dC+hgi6JEHdGj2GGqXVIHA19TIXccNuJBWB1E
+	zJ6M71FDuWoy+5cBD64C5kl56EZ7qBsIijZ+YvJZSXatHaCXbpWMpYG3iHlpQ4EZ
+	3Qf7YUZS0mB49aNU9Di3vqqcP0wyvuOGHui//WTUvXwifA==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id SCYItGCkl88g; Wed, 13 Mar 2024 19:11:53 +0000 (UTC)
+Received: from [100.96.154.173] (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4Tw0Vt6PD8z6ClTNc;
+	Wed, 13 Mar 2024 19:11:50 +0000 (UTC)
+Message-ID: <2212ce5f-940c-48aa-966d-2b4fa4a5ad8c@acm.org>
+Date: Wed, 13 Mar 2024 12:11:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/5] Rust block device driver API and null block
+ driver
+Content-Language: en-US
+To: Andreas Hindborg <nmi@metaspace.dk>, Boqun Feng <boqun.feng@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>,
+ Hannes Reinecke <hare@suse.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Andreas Hindborg <a.hindborg@samsung.com>,
+ Niklas Cassel <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>,
+ Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>,
+ Alex Gaynor <alex.gaynor@gmail.com>,
+ Wedson Almeida Filho <wedsonaf@gmail.com>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>,
+ Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>,
+ =?UTF-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>,
+ Joel Granados <j.granados@samsung.com>,
+ "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+ Daniel Gomez <da.gomez@samsung.com>, open list
+ <linux-kernel@vger.kernel.org>,
+ "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ "gost.dev@samsung.com" <gost.dev@samsung.com>
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+ <855a006d-5afc-4f70-90a9-ec94c0414d4f@acm.org>
+ <ZfHu48NGktOx_uhG@boqun-archlinux> <87r0get0no.fsf@metaspace.dk>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <87r0get0no.fsf@metaspace.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Boqun Feng <boqun.feng@gmail.com> writes:
 
-> On Wed, Mar 13, 2024 at 11:02:23AM -0700, Bart Van Assche wrote:
->> On 3/13/24 04:05, Andreas Hindborg wrote:
->> > This is the second version of the Rust block device driver API and the Rust null
->> > block driver. The context and motivation can be seen in cover letter of the RFC
->> > v1 [1]. If more context is required, a talk about this effort was recorded at
->> > LPC [2]. I hope to be able to discuss this series at LSF this year [3].
->> 
->> Memory safety may land in C++ in the near future (see also
->> https://herbsutter.com/2024/03/). If memory-safe C++ or memory-safe C
->> would be adopted in the kernel, it would allow writing memory-safe
->> drivers without having to add complicated bindings between existing C
->
-> I honestly doubt it, memory-safe is not free, basically you will still
-> want unsafe part for the performance reason (or interacting with
-> hardware), and provide a safe API for driver development. I don't think
-> that part will be gone with a memory-safe C++. So the complication still
-> exists. But I'm happy to be proved wrong ;-)
+On 3/13/24 12:03, Andreas Hindborg wrote:
+> I think it is great that people are starting to realize that bringing
+> memory safety to other systems languages is a good idea.
 
-I think it is great that people are starting to realize that bringing
-memory safety to other systems languages is a good idea. But from one
-person blogging about it to things being ready for production is a long
-journey. Language designers have to design ways to express the new
-semantics, standards committees has to agree, compiler engineers have to
-build and test their compilers. Probably we need a few cycles of this to
-get things right. At any rate, it is going to take a while.
+Totally agree :-)
 
-Second, as Boqun is saying, interfacing the unsafe C part of the kernel
-with memory safe C++ is going to require the same complicated
-abstraction logic as the safe Rust APIs are bringing. The complexity in
-bringing Rust to the kernel is not coming from interfacing a foreign
-language. It stems from the inherent difficulty in designing memory safe
-wrappers around unsafe C APIs.
+> But from one person blogging about it to things being ready for
+> production is a long journey.
+In case you wouldn't be aware of this, Herb Sutter is not a random 
+blogger - he is the chair of the ISO C++ standards committee since 2002.
 
-Best regards,
-Andreas
+Thanks,
+
+Bart.
+
