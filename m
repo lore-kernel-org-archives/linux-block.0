@@ -1,281 +1,117 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901813F9D5
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 11:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F3B225AD
+	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 13:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710331201; cv=none; b=IbCHpxO9uzWUOUWTiqrI/g7lqS625qaGRlKzGMmOVGSQUVC27nP82GSo8rwIfanWCeVFbcDf6hIybF37CNEbeUjoibc46YeVRb1k2gRV3OK0q2i/1PKUZ+XzqvOPcxTDk+sgA2n7ofvBgSszdstB/GFU4uEYk0xLqF+UjnLtXz4=
+	t=1710335490; cv=none; b=iCEhub3qkmSsRpB8rEG9IdJZbqj/qdvhAdsc3Xg1p22ukJPUOmYy6x2reSZ1Zoerfv8c+eoJFjwG1JhjltZ+GRlvNUP9eQRm163uWBN2h1Q4LvW2YVpNcGOVysnUYYSCZmh18cAcV4UGNAwzXgL+0n+R6Ss0Vr5oTIsDPPAqIIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710331201; c=relaxed/simple;
-	bh=4M+7OXb2xrHvW0r4vmAJiV00BBNH6vPbYLsFCC9fzrY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Noc5FX4sRL7peRofMsRK5eytkMEroyvhVNt6dFTU54uUAW3rRurXqrga/Ninx5P1A0nNnCpHU4iwcvibBt5PgnOuySfou9LK6bGwR0IfMO2kdlXzy9YvMJAU4i7Hh2TC7GQxv1y7S1sJjNxnQLSqwyMglLlkIvz8/+adqTvbi40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HUZgd5yF; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1710335490; c=relaxed/simple;
+	bh=WJmxgj6Qmd9I66vJdLMoCeGyd9Ni4X1SwXJFbgbeDHU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a6hcugXN58s/ZesbmW6pgUjvjETb6eaBCnd/UxwZD7OxTBuvlr7tsM3WZCTS+z7/7BpY3HGlaZjdz3A92gpj7yKNVxtLaBC68HkxPOBXa10iRnQrEWSTyZq9R/TMevKxmIZyPW/grTqnXhWqQDZoZQnc6QK+h4+76eV7BDkLxII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KF5KQQUn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HUZgd5yF"
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42DBbpc7016657;
-	Wed, 13 Mar 2024 11:59:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Tr6PJcYjFadw1eIBRwVRlMYUQn0uuS83HA+kDqe8X8w=;
- b=HUZgd5yFz3GFX4cXCxD1+nMjFA2b5PyN3FhETsyMKW+X15upof0YEs68ftmwVtSKij4+
- hi6kPH3b3AwmIK337ZLZqDJrOifpjnNimXwIsm1xIgD/LcvoJBIW4dri7GYpR+5xQrFo
- 2SHraxhZF3xsAwsmswquTHtbyyIXPXsRaFpYcUithK+H2f+UPI8uJ9KCJypCmDE2NUaj
- 5b1Jio20Dksf/qa5KhNrRFFZWcMgLvfz2DmQ5Dtq6EImWhtYBxeIqs8CudvRy3r1EXpR
- jocxZbqHa237JgYyzcaePC6bDwB43BNaALkBkXiedv0MQSGtroYAYrOZEBE/ppTDyjfb 9g== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wube6gay0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Mar 2024 11:59:43 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42DAR3oe020436;
-	Wed, 13 Mar 2024 11:59:42 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ws3km5fv3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Mar 2024 11:59:42 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42DBxdOE51708388
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 13 Mar 2024 11:59:42 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D51B258057;
-	Wed, 13 Mar 2024 11:59:39 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5B43858062;
-	Wed, 13 Mar 2024 11:59:37 +0000 (GMT)
-Received: from [9.109.198.202] (unknown [9.109.198.202])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 13 Mar 2024 11:59:37 +0000 (GMT)
-Message-ID: <af991867-02a3-4ff9-94fc-50955913f227@linux.ibm.com>
-Date: Wed, 13 Mar 2024 17:29:35 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KF5KQQUn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710335488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VbKExkfuK6A1U00MuCFHA4JLsXlU55tMN2WgLDlOoZA=;
+	b=KF5KQQUnze5V3VWeAJFXk6IZ9KsJeXzv4ZVLLUNS78A1kWQA0Atc66qER1vPs2NLb4cT6k
+	GFPj8+dcZa9dvM7tnwgPaG1nbcmdPgqMmSjZCMvZBQuxfgJ3vWHaC55KJ/zwRlHLt9eVYk
+	EkHx2X3q9BlT3Pqo0qtdGEeOtvCIzxQ=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-1XR3A94xOxWMKyCMirbtaQ-1; Wed,
+ 13 Mar 2024 09:11:21 -0400
+X-MC-Unique: 1XR3A94xOxWMKyCMirbtaQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C36E3C0253E;
+	Wed, 13 Mar 2024 13:11:21 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.65])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 723762166AE9;
+	Wed, 13 Mar 2024 13:11:16 +0000 (UTC)
+Date: Wed, 13 Mar 2024 21:11:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	dm-devel@lists.linux.dev, ming.lei@redhat.com
+Subject: Re: [GIT PULL] Block updates for 6.9-rc1
+Message-ID: <ZfGl8HzUpiOxCLm3@fedora>
+References: <eaeec3b6-75c2-4b65-8c50-2d37450ccdd9@kernel.dk>
+ <20240311235023.GA1205@cmpxchg.org>
+ <CAHk-=wgOfw8NBQ2Qyh8QUjhp5z4v--PuciLE7drn5LJkTtgPVw@mail.gmail.com>
+ <e3fea6c3-7704-46cd-b078-0c6e8d966474@kernel.dk>
+ <CAHk-=wgXZ6dE1yHK_jQmnSjbEbndyzZHC5dJNsmQYTD2K-m61w@mail.gmail.com>
+ <Ze-hwnd3ocfJc9xU@redhat.com>
+ <Ze-rRvKpux44ueao@infradead.org>
+ <ZfBzTWM7NBbGymsY@redhat.com>
+ <ZfDEtchBNeFLG-GV@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND] nvme-pci: Fix EEH failure on ppc after subsystem
- reset
-Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>
-Cc: linux-nvme@lists.infradead.org, axboe@fb.com, hch@lst.de, sagi@grimberg.me,
-        linux-block@vger.kernel.org, gjoyce@linux.ibm.com
-References: <20240209050342.406184-1-nilay@linux.ibm.com>
- <Zesxq81eJTnOGniB@kbusch-mbp>
- <039541c8-2e13-442e-bd5b-90a799a9851a@linux.ibm.com>
- <ZeyD6xh0LGZyRBfO@kbusch-mbp>
- <301b8f41-a146-497a-916f-97d91829d28c@linux.ibm.com>
- <Ze6LglWPqkHVFh-P@kbusch-mbp.mynextlight.net>
- <ac294adc-a7be-49af-88cd-e3aabd9f7c3f@linux.ibm.com>
- <ZfBm72xPozFN99GA@kbusch-mbp.mynextlight.net>
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <ZfBm72xPozFN99GA@kbusch-mbp.mynextlight.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SHICZkNxk0Hq4WiTRiv7FSRd9KagCRI0
-X-Proofpoint-ORIG-GUID: SHICZkNxk0Hq4WiTRiv7FSRd9KagCRI0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-13_07,2024-03-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- spamscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0
- mlxlogscore=999 bulkscore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403130089
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZfDEtchBNeFLG-GV@infradead.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-
-
-On 3/12/24 20:00, Keith Busch wrote:
-> On Mon, Mar 11, 2024 at 06:28:21PM +0530, Nilay Shroff wrote:
->> @@ -3295,10 +3304,13 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
->>         case pci_channel_io_frozen:
->>                 dev_warn(dev->ctrl.device,
->>                         "frozen state error detected, reset controller\n");
->> -               if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
->> -                       nvme_dev_disable(dev, true);
->> -                       return PCI_ERS_RESULT_DISCONNECT;
->> +               if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING) {
->> +                       if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
->> +                               nvme_dev_disable(dev, true);
->> +                               return PCI_ERS_RESULT_DISCONNECT;
->> +                       }
->>                 }
->> +               flush_work(&dev->ctrl.reset_work);
+On Tue, Mar 12, 2024 at 02:10:13PM -0700, Christoph Hellwig wrote:
+> On Tue, Mar 12, 2024 at 11:22:53AM -0400, Mike Snitzer wrote:
+> > blk_validate_limits() is currently very pedantic. I discussed with Jens
+> > briefly and we're thinking it might make sense for blk_validate_limits()
+> > to be more forgiving by _not_ imposing hard -EINVAL failure.  That in
+> > the interim, during this transition to more curated and atomic limits, a
+> > WARN_ON_ONCE() splat should serve as enough notice to developers (be it
+> > lower level nvme or higher-level virtual devices like DM).
 > 
-> I was messing with a similar idea. I wasn't sure if EEH calls the error
-> handler inline with the error, in which case this would try to flush the
-> work within the same work, which obviously doesn't work. As long as its
-> called from a different thread, then this should be fine.
-The EEH recovery happens from different thread and so flush work should 
-work here as expected.
-
->> @@ -2776,6 +2776,16 @@ static void nvme_reset_work(struct work_struct *work)
->>   out_unlock:
->>         mutex_unlock(&dev->shutdown_lock);
->>   out:
->> +       /*
->> +        * If PCI recovery is ongoing then let it finish first
->> +        */
->> +       if (pci_channel_offline(to_pci_dev(dev->dev))) {
->> +               dev_warn(dev->ctrl.device, "PCI recovery is ongoing so let it finish\n");
->> +               if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING)
->> +                       WRITE_ONCE(dev->ctrl.state, NVME_CTRL_RESETTING);
+> I guess.  And it more closely matches the status quo.  That being said
+> I want to move to hard rejection eventually to catch all the issues.
 > 
-> This may break the state machine, like if the device was hot removed
-> during all this error handling. This will force the state back to
-> RESETTING when it should be DEAD.
-Agreed, we shouldn't force reset state to RESETTING here.
+> > BUT for this specific max_segment_size case, the constraints of dm-crypt
+> > are actually more conservative due to crypto requirements.
 > 
-> I think what you need is just allow a controller to reset from a
-> connecting state. Have to be careful that wouldn't break any other
-> expectations, though.
-Yeah ok got your point, so I have reworked the ctrl state machine as you 
-suggested and tested the changes. The updated state machine code is shown
-below:
+> Honestly, to me the dm-crypt requirement actually doesn't make much
+> sense: max_segment_size is for hardware drivers that have requirements
+> for SGLs or equivalent hardware interfaces.  If dm-crypt never wants to
+> see more than a single page per bio_vec it should just always iterate
+> them using bio_for_each_segment.
+> 
+> > Yet nvme's
+> > more general "don't care, but will care if non-nvme driver does" for
+> > this particular max_segment_size limit is being imposed when validating
+> > the combined limits that dm-crypt will impose at the top-level.
+> 
+> The real problem is that we combine the limits while we shouldn't.
+> Every since we've supported immutable biovecs and do the splitting
+> down in blk-mq there is no point to even inherit such limits in the
+> upper drivers.
 
-@@ -546,10 +546,11 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
-                break;
-        case NVME_CTRL_RESETTING:
-                switch (old_state) {
-                case NVME_CTRL_NEW:
-                case NVME_CTRL_LIVE:
-+               case NVME_CTRL_CONNECTING:
-                        changed = true;
-                        fallthrough;
-                default:
-                        break;
-                }
+In theory, it is yes, DM even doesn't use the combined segment size
+& virt boundary, but MD uses that(maybe unnecessarily), however
+the two are often stacked.
 
-And accordingly updated reset_work function is show below. Here we ensure that
-even though the pci error recovery is in progress, if we couldn't move ctrl state
-to RESETTING then we would let rest_work forward progress and set the ctrl state
-to DEAD.
+There may be corner cases, and removing the two limits combination can
+be one big change for DM/MD since this way has been used long time.
 
-@@ -2774,10 +2774,19 @@ static void nvme_reset_work(struct work_struct *work)
-        return;
- 
-  out_unlock:
-        mutex_unlock(&dev->shutdown_lock);
-  out:
-+       /*
-+        * If PCI recovery is ongoing then let it finish first
-+        */
-+       if (pci_channel_offline(to_pci_dev(dev->dev))) {
-+               if (nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
-+                       dev_warn(dev->ctrl.device, "PCI recovery is ongoing, let it finish\n");
-+                       return;
-+               }
-+       }
-        /*
-         * Set state to deleting now to avoid blocking nvme_wait_reset(), which
-         * may be holding this pci_dev's device lock.
-         */
-        dev_warn(dev->ctrl.device, "Disabling device after reset failure: %d\n",
+The warning & failure in blk_validate_limits() can fail any MD/DM
+which is over scsi & nvme, so I'd suggest to remove the 'warning &
+-EINVAL' first, otherwise more complaints may follow.
 
-
-Now I have also included in my test the hot removal of NVMe adapter while EEH recovery
-is in progress. And the  EEH recovery code handles this case well : When EEH recovery 
-is in progress and if we hot removes the adapter (which is being recovered) then EEH
-handler would stop the recovery, set the PCI channel state to "pci_channel_io_perm_failure".
-
-
-Collected the logs of this case, (shown below):
------------------------------------------------
-# nvme list-subsys 
-nvme-subsys0 - NQN=nqn.1994-11.com.samsung:nvme:PM1735:2.5-inch:S6EUNA0R500358
-               hostnqn=nqn.2014-08.org.nvmexpress:uuid:12b49f6e-0276-4746-b10c-56815b7e6dc2
-               iopolicy=numa
-
-# lspci 
-0018:01:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller PM173X
-
-# dmesg
-[  561.639102] EEH: Recovering PHB#18-PE#10000
-[  561.639120] EEH: PE location: N/A, PHB location: N/A
-[  561.639128] EEH: Frozen PHB#18-PE#10000 detected
-<snip>
-<snip>
-[  561.639428] EEH: This PCI device has failed 2 times in the last hour and will be permanently disabled after 5 failures.
-[  561.639441] EEH: Notify device drivers to shutdown
-[  561.639450] EEH: Beginning: 'error_detected(IO frozen)'
-[  561.639458] PCI 0018:01:00.0#10000: EEH: Invoking nvme->error_detected(IO frozen)
-[  561.639462] nvme nvme0: frozen state error detected, reset controller
-[  561.719078] nvme 0018:01:00.0: enabling device (0000 -> 0002)
-[  561.719318] nvme nvme0: PCI recovery is ongoing so let it finish
-
-<!!!! WHILE EEH RECOVERY IS IN PROGRESS WE HOT REMOVE THE NVMe ADAPTER !!!!>
-
-[  563.850328] rpaphp: RPA HOT Plug PCI Controller Driver version: 0.1
-<snip>
-[  571.879092] PCI 0018:01:00.0#10000: EEH: nvme driver reports: 'need reset'
-[  571.879097] EEH: Finished:'error_detected(IO frozen)' with aggregate recovery state:'need reset'
-<snip>
-<snip>
-[  571.881761] EEH: Reset without hotplug activity
-[  574.039807] EEH: PHB#18-PE#10000: Slot inactive after reset: 0x2 (attempt 1)
-[  574.309091] EEH: Failure 2 resetting PHB#18-PE#10000 (attempt 2)
-[  574.309091] 
-[  574.579094] EEH: Failure 2 resetting PHB#18-PE#10000 (attempt 3)
-[  574.579094] 
-[  574.579101] eeh_handle_normal_event: Cannot reset, err=-5
-[  574.579104] EEH: Unable to recover from failure from PHB#18-PE#10000.
-[  574.579104] Please try reseating or replacing it
-<snip>
-<snip>
-[  574.581314] EEH: Beginning: 'error_detected(permanent failure)'
-[  574.581320] PCI 0018:01:00.0#10000: EEH: no device
-
-# lspci
-<empty>
-
-# nvme list-subsys
-<empty>
-
-
-Another case tested, when the reset_work is ongoing post subsystem-reset command
-and if user immediately hot removes the NVMe adapter then EEH recovery is *not* 
-triggered and ctrl forward progress to the "DEAD" state.
-
-Collected the logs of this case, (shown below):
------------------------------------------------
-# nvme list-subsys 
-nvme-subsys0 - NQN=nqn.1994-11.com.samsung:nvme:PM1735:2.5-inch:S6EUNA0R500358
-               hostnqn=nqn.2014-08.org.nvmexpress:uuid:12b49f6e-0276-4746-b10c-56815b7e6dc2
-               iopolicy=numa
-
-# lspci 
-0018:01:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller PM173X
-
-# nvme subsystem-reset /dev/nvme0
-
-<!!!! HOT REMOVE THE NVMe ADAPTER !!!!>
-
-# dmesg
-[ 9967.143886] eeh_handle_normal_event: Cannot find PCI bus for PHB#18-PE#10000
-[ 9967.224078] eeh_handle_normal_event: Cannot find PCI bus for PHB#18-PE#10000
-<snip>
-[ 9967.223858] nvme 0018:01:00.0: enabling device (0000 -> 0002)
-[ 9967.224140] nvme nvme0: Disabling device after reset failure: -19
-
-# lspci
-<empty>
-
-# nvme list-subsys
-<empty>
-
-
-Please let me know if the above changes look good to you. If it looks good then 
-I would spin a new version of the patch and send for a review.
 
 Thanks,
---Nilay
-
+Ming
 
