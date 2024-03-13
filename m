@@ -1,569 +1,281 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7E645BEF
-	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 11:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901813F9D5
+	for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 11:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710327973; cv=none; b=ovvZljUBN7oiLwlK8f3WIt+qFyYA6DezLSgf8UZ5b+1xMNwTCwo4bK9vQzM5w5HGpWrL27ysaUOy6IxJiahfIIfwh8XUIpmVCDJEKPD/PHRRmPt4dqzuHA43JhgqeThX4FpAOm9qgL6Os5v0FpQZlLkdtH+0DHEiK4ZPAX2diI4=
+	t=1710331201; cv=none; b=IbCHpxO9uzWUOUWTiqrI/g7lqS625qaGRlKzGMmOVGSQUVC27nP82GSo8rwIfanWCeVFbcDf6hIybF37CNEbeUjoibc46YeVRb1k2gRV3OK0q2i/1PKUZ+XzqvOPcxTDk+sgA2n7ofvBgSszdstB/GFU4uEYk0xLqF+UjnLtXz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710327973; c=relaxed/simple;
-	bh=5GbuDkx/t3ca+1vsJKcxunbH6qs63waeRLqj2MYB5Ro=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m7QUBt2vsTPEqJz1VmBYC52oGvbKRcPl54MGpYKHezxNgSBhaknQb2+KH+B2wwPEubWM0Cskw0FGQPQI5R86ChuOjQIeaad1rbbgkgPkpIf2e6V6hKVo/Fc/uVWVNMjSW1359rqT9jVnKalhCH4BRNdT/sy4yCjeBrWQ6Rx/saQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=YMyqvaV/; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1710331201; c=relaxed/simple;
+	bh=4M+7OXb2xrHvW0r4vmAJiV00BBNH6vPbYLsFCC9fzrY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Noc5FX4sRL7peRofMsRK5eytkMEroyvhVNt6dFTU54uUAW3rRurXqrga/Ninx5P1A0nNnCpHU4iwcvibBt5PgnOuySfou9LK6bGwR0IfMO2kdlXzy9YvMJAU4i7Hh2TC7GQxv1y7S1sJjNxnQLSqwyMglLlkIvz8/+adqTvbi40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HUZgd5yF; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="YMyqvaV/"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a45f257b81fso629485766b.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Mar 2024 04:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710327969; x=1710932769; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=02J+9loqch2JUjY1j89Pn56oCFWFFh5txriQBAftH6E=;
-        b=YMyqvaV/Iv9S0jEpsLdgxswKxB8JYgX1XANbrdRmBZIkCsi7b/mfoyCumU2FVpomz5
-         5IWzMZe3mC/DS/PypAX6TzxtaTySW7iqx1kPleAixDW0fatBuNQhsCUMYXPQdJwGUmgi
-         uFIgme1Y0OGg8tBpUXH19FGsUREWvxfYm1FWjLoZJlF1l0WYU2TVuFfTeG9gtBqU/6iK
-         Xl8JwkH55K5tuNS9rUaJ/KtRRxGX60bQ5TYktSkivhHKBY7z0zMb2IXjWLPIp36dLM6l
-         2KRH24Ftb0GpmY6Ia450eF5yOzwsVsvqsq3PsSN0iScRyNSnsPLo9gM+xoXSuzWe0Ncm
-         h9FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710327969; x=1710932769;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=02J+9loqch2JUjY1j89Pn56oCFWFFh5txriQBAftH6E=;
-        b=dMYG2BwwyMExLnLEV9m05sgM/WoLvjYwUG6Oam5udSIVLkXgo6gqiIm1v/Taiy9DnO
-         pf7/Dm4zPhbrv39sLkZ45/sMRMlwnX0NT7pGXkh7rTVWZrtTqLLEIkdNendYH4p/QFFZ
-         HnwmjLdCscMnaVPFYhEXeYcpd7zaLlOp6rfAkTXZ0np/katDWKlE6QdpMa9vmzMRjMsG
-         3wGeTzAiVGGsaRN9RVXAeIQg0nEGwNCwGigZ/Asz7pYReD5bHnD5prO2dlb11lmabp3Z
-         ybSPELN86ALmwItRLREzGZ2fVfGIdpqWVUNloTmaNCL0UWgGsfru6iaPDTikJqNG//hf
-         KoAA==
-X-Forwarded-Encrypted: i=1; AJvYcCWZXhEBdG8Q4qii1lVamCcRZonknvO5yJe7FPCUxUazP3LQsO5aXUTHt/JzzQ7h/agmSSIkTTwvyjN9ixN7CiEZ4j/zzmNGqKcq1os=
-X-Gm-Message-State: AOJu0Yyjot3bxcUnFdqBr0riJyYjSlmju6CwOBqTZzYdyHUcIfw4BrEu
-	2btK8H6xSwgGzPgyDdP1LNIblPn5YXUa0HAQ3BcTfRz1QmhvRUQmN+xUZo2jdiM=
-X-Google-Smtp-Source: AGHT+IEcThuL3vIoWtwKtXW9tSmz7xjNlpNKF5lpt2rzWBNXagbGz7lsNNxPgXrvJ1Nn9AxFGjtUgA==
-X-Received: by 2002:a17:907:972a:b0:a45:f4c2:38d7 with SMTP id jg42-20020a170907972a00b00a45f4c238d7mr8536226ejc.18.1710327969457;
-        Wed, 13 Mar 2024 04:06:09 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id jx15-20020a170907760f00b00a466591eaebsm55134ejc.194.2024.03.13.04.06.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 04:06:09 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>,
-	Niklas Cassel <Niklas.Cassel@wdc.com>,
-	Greg KH <gregkh@linuxfoundation.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Yexuan Yang <1182282462@bupt.edu.cn>,
-	=?UTF-8?q?Sergio=20Gonz=C3=A1lez=20Collado?= <sergio.collado@gmail.com>,
-	Joel Granados <j.granados@samsung.com>,
-	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	"gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: [RFC PATCH 2/5] rust: block: introduce `kernel::block::bio` module
-Date: Wed, 13 Mar 2024 12:05:09 +0100
-Message-ID: <20240313110515.70088-3-nmi@metaspace.dk>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240313110515.70088-1-nmi@metaspace.dk>
-References: <20240313110515.70088-1-nmi@metaspace.dk>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HUZgd5yF"
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42DBbpc7016657;
+	Wed, 13 Mar 2024 11:59:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Tr6PJcYjFadw1eIBRwVRlMYUQn0uuS83HA+kDqe8X8w=;
+ b=HUZgd5yFz3GFX4cXCxD1+nMjFA2b5PyN3FhETsyMKW+X15upof0YEs68ftmwVtSKij4+
+ hi6kPH3b3AwmIK337ZLZqDJrOifpjnNimXwIsm1xIgD/LcvoJBIW4dri7GYpR+5xQrFo
+ 2SHraxhZF3xsAwsmswquTHtbyyIXPXsRaFpYcUithK+H2f+UPI8uJ9KCJypCmDE2NUaj
+ 5b1Jio20Dksf/qa5KhNrRFFZWcMgLvfz2DmQ5Dtq6EImWhtYBxeIqs8CudvRy3r1EXpR
+ jocxZbqHa237JgYyzcaePC6bDwB43BNaALkBkXiedv0MQSGtroYAYrOZEBE/ppTDyjfb 9g== 
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wube6gay0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Mar 2024 11:59:43 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42DAR3oe020436;
+	Wed, 13 Mar 2024 11:59:42 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ws3km5fv3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Mar 2024 11:59:42 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42DBxdOE51708388
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Mar 2024 11:59:42 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D51B258057;
+	Wed, 13 Mar 2024 11:59:39 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5B43858062;
+	Wed, 13 Mar 2024 11:59:37 +0000 (GMT)
+Received: from [9.109.198.202] (unknown [9.109.198.202])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 13 Mar 2024 11:59:37 +0000 (GMT)
+Message-ID: <af991867-02a3-4ff9-94fc-50955913f227@linux.ibm.com>
+Date: Wed, 13 Mar 2024 17:29:35 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] nvme-pci: Fix EEH failure on ppc after subsystem
+ reset
+Content-Language: en-US
+To: Keith Busch <kbusch@kernel.org>
+Cc: linux-nvme@lists.infradead.org, axboe@fb.com, hch@lst.de, sagi@grimberg.me,
+        linux-block@vger.kernel.org, gjoyce@linux.ibm.com
+References: <20240209050342.406184-1-nilay@linux.ibm.com>
+ <Zesxq81eJTnOGniB@kbusch-mbp>
+ <039541c8-2e13-442e-bd5b-90a799a9851a@linux.ibm.com>
+ <ZeyD6xh0LGZyRBfO@kbusch-mbp>
+ <301b8f41-a146-497a-916f-97d91829d28c@linux.ibm.com>
+ <Ze6LglWPqkHVFh-P@kbusch-mbp.mynextlight.net>
+ <ac294adc-a7be-49af-88cd-e3aabd9f7c3f@linux.ibm.com>
+ <ZfBm72xPozFN99GA@kbusch-mbp.mynextlight.net>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <ZfBm72xPozFN99GA@kbusch-mbp.mynextlight.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SHICZkNxk0Hq4WiTRiv7FSRd9KagCRI0
+X-Proofpoint-ORIG-GUID: SHICZkNxk0Hq4WiTRiv7FSRd9KagCRI0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-13_07,2024-03-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ spamscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0
+ mlxlogscore=999 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403130089
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Add abstractions for working with `struct bio`.
 
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
- rust/kernel/block.rs            |   1 +
- rust/kernel/block/bio.rs        | 112 +++++++++++++
- rust/kernel/block/bio/vec.rs    | 279 ++++++++++++++++++++++++++++++++
- rust/kernel/block/mq/request.rs |  22 +++
- 4 files changed, 414 insertions(+)
- create mode 100644 rust/kernel/block/bio.rs
- create mode 100644 rust/kernel/block/bio/vec.rs
+On 3/12/24 20:00, Keith Busch wrote:
+> On Mon, Mar 11, 2024 at 06:28:21PM +0530, Nilay Shroff wrote:
+>> @@ -3295,10 +3304,13 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
+>>         case pci_channel_io_frozen:
+>>                 dev_warn(dev->ctrl.device,
+>>                         "frozen state error detected, reset controller\n");
+>> -               if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
+>> -                       nvme_dev_disable(dev, true);
+>> -                       return PCI_ERS_RESULT_DISCONNECT;
+>> +               if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING) {
+>> +                       if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
+>> +                               nvme_dev_disable(dev, true);
+>> +                               return PCI_ERS_RESULT_DISCONNECT;
+>> +                       }
+>>                 }
+>> +               flush_work(&dev->ctrl.reset_work);
+> 
+> I was messing with a similar idea. I wasn't sure if EEH calls the error
+> handler inline with the error, in which case this would try to flush the
+> work within the same work, which obviously doesn't work. As long as its
+> called from a different thread, then this should be fine.
+The EEH recovery happens from different thread and so flush work should 
+work here as expected.
 
-diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
-index 4c93317a568a..1797859551fd 100644
---- a/rust/kernel/block.rs
-+++ b/rust/kernel/block.rs
-@@ -2,4 +2,5 @@
+>> @@ -2776,6 +2776,16 @@ static void nvme_reset_work(struct work_struct *work)
+>>   out_unlock:
+>>         mutex_unlock(&dev->shutdown_lock);
+>>   out:
+>> +       /*
+>> +        * If PCI recovery is ongoing then let it finish first
+>> +        */
+>> +       if (pci_channel_offline(to_pci_dev(dev->dev))) {
+>> +               dev_warn(dev->ctrl.device, "PCI recovery is ongoing so let it finish\n");
+>> +               if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING)
+>> +                       WRITE_ONCE(dev->ctrl.state, NVME_CTRL_RESETTING);
+> 
+> This may break the state machine, like if the device was hot removed
+> during all this error handling. This will force the state back to
+> RESETTING when it should be DEAD.
+Agreed, we shouldn't force reset state to RESETTING here.
+> 
+> I think what you need is just allow a controller to reset from a
+> connecting state. Have to be careful that wouldn't break any other
+> expectations, though.
+Yeah ok got your point, so I have reworked the ctrl state machine as you 
+suggested and tested the changes. The updated state machine code is shown
+below:
+
+@@ -546,10 +546,11 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+                break;
+        case NVME_CTRL_RESETTING:
+                switch (old_state) {
+                case NVME_CTRL_NEW:
+                case NVME_CTRL_LIVE:
++               case NVME_CTRL_CONNECTING:
+                        changed = true;
+                        fallthrough;
+                default:
+                        break;
+                }
+
+And accordingly updated reset_work function is show below. Here we ensure that
+even though the pci error recovery is in progress, if we couldn't move ctrl state
+to RESETTING then we would let rest_work forward progress and set the ctrl state
+to DEAD.
+
+@@ -2774,10 +2774,19 @@ static void nvme_reset_work(struct work_struct *work)
+        return;
  
- //! Types for working with the block layer
- 
-+pub mod bio;
- pub mod mq;
-diff --git a/rust/kernel/block/bio.rs b/rust/kernel/block/bio.rs
-new file mode 100644
-index 000000000000..0d4336cbe9c1
---- /dev/null
-+++ b/rust/kernel/block/bio.rs
-@@ -0,0 +1,112 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Types for working with the bio layer.
-+//!
-+//! C header: [`include/linux/blk_types.h`](../../include/linux/blk_types.h)
-+
-+use core::fmt;
-+use core::ptr::NonNull;
-+
-+mod vec;
-+
-+pub use vec::BioSegmentIterator;
-+pub use vec::Segment;
-+
-+use crate::types::Opaque;
-+
-+/// A block device IO descriptor (`struct bio`)
-+///
-+/// # Invariants
-+///
-+/// Instances of this type is always reference counted. A call to
-+/// `bindings::bio_get()` ensures that the instance is valid for read at least
-+/// until a matching call to `bindings :bio_put()`.
-+#[repr(transparent)]
-+pub struct Bio(Opaque<bindings::bio>);
-+
-+impl Bio {
-+    /// Returns an iterator over segments in this `Bio`. Does not consider
-+    /// segments of other bios in this bio chain.
-+    #[inline(always)]
-+    pub fn segment_iter(&self) -> BioSegmentIterator<'_> {
-+        BioSegmentIterator::new(self)
-+    }
-+
-+    /// Get slice referencing the `bio_vec` array of this bio
-+    #[inline(always)]
-+    fn io_vec(&self) -> &[bindings::bio_vec] {
-+        let this = self.0.get();
-+
-+        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
-+        // `this` is valid for read.
-+        let io_vec = unsafe { (*this).bi_io_vec };
-+
-+        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
-+        // `this` is valid for read.
-+        let length = unsafe { (*this).bi_vcnt };
-+
-+        // SAFETY: By C API contract, `io_vec` points to `length` consecutive
-+        // and properly initialized `bio_vec` values. The array is properly
-+        // aligned because it is #[repr(C)]. By C API contract and safety
-+        // requirement of `from_raw()`, the elements of the `io_vec` array are
-+        // not modified for the duration of the lifetime of `&self`
-+        unsafe { core::slice::from_raw_parts(io_vec, length as usize) }
-+    }
-+
-+    /// Return a copy of the `bvec_iter` for this `Bio`. This iterator always
-+    /// indexes to a valid `bio_vec` entry.
-+    #[inline(always)]
-+    fn raw_iter(&self) -> bindings::bvec_iter {
-+        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
-+        // `self` is valid for read.
-+        unsafe { (*self.0.get()).bi_iter }
-+    }
-+
-+    /// Get the next `Bio` in the chain
-+    #[inline(always)]
-+    fn next(&self) -> Option<&Self> {
-+        // SAFETY: By the type invariant of `Bio` and existence of `&self`,
-+        // `self` is valid for read.
-+        let next = unsafe { (*self.0.get()).bi_next };
-+        // SAFETY: By C API contract `bi_next` has nonzero reference count if it
-+        // is not null, for at least the duration of the lifetime of &self.
-+        unsafe { Self::from_raw(next) }
-+    }
-+
-+    /// Create an instance of `Bio` from a raw pointer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// If `ptr` is not null, caller must ensure positive refcount for the
-+    /// pointee and immutability for the duration of the returned lifetime.
-+    #[inline(always)]
-+    pub(crate) unsafe fn from_raw<'a>(ptr: *mut bindings::bio) -> Option<&'a Self> {
-+        Some(
-+            // SAFETY: by the safety requirement of this funciton, `ptr` is
-+            // valid for read for the duration of the returned lifetime
-+            unsafe { &*NonNull::new(ptr)?.as_ptr().cast::<Bio>() },
-+        )
-+    }
-+}
-+
-+impl core::fmt::Display for Bio {
-+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-+        write!(f, "Bio({:?})", self.0.get())
-+    }
-+}
-+
-+/// An iterator over `Bio`
-+pub struct BioIterator<'a> {
-+    pub(crate) bio: Option<&'a Bio>,
-+}
-+
-+impl<'a> core::iter::Iterator for BioIterator<'a> {
-+    type Item = &'a Bio;
-+
-+    #[inline(always)]
-+    fn next(&mut self) -> Option<&'a Bio> {
-+        let current = self.bio.take()?;
-+        self.bio = current.next();
-+        Some(current)
-+    }
-+}
-diff --git a/rust/kernel/block/bio/vec.rs b/rust/kernel/block/bio/vec.rs
-new file mode 100644
-index 000000000000..b61380807f38
---- /dev/null
-+++ b/rust/kernel/block/bio/vec.rs
-@@ -0,0 +1,279 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Types for working with `struct bio_vec` IO vectors
-+//!
-+//! C header: [`include/linux/bvec.h`](../../include/linux/bvec.h)
-+
-+use super::Bio;
-+use crate::error::Result;
-+use crate::folio::UniqueFolio;
-+use crate::page::Page;
-+use core::fmt;
-+use core::mem::ManuallyDrop;
-+
-+/// A wrapper around a `strutct bio_vec` - a contiguous range of physical memory addresses
-+///
-+/// # Invariants
-+///
-+/// `bio_vec` must always be initialized and valid for read and write
-+pub struct Segment<'a> {
-+    bio_vec: bindings::bio_vec,
-+    _marker: core::marker::PhantomData<&'a ()>,
-+}
-+
-+impl Segment<'_> {
-+    /// Get he lenght of the segment in bytes
-+    #[inline(always)]
-+    pub fn len(&self) -> usize {
-+        self.bio_vec.bv_len as usize
-+    }
-+
-+    /// Returns true if the length of the segment is 0
-+    #[inline(always)]
-+    pub fn is_empty(&self) -> bool {
-+        self.len() == 0
-+    }
-+
-+    /// Get the offset field of the `bio_vec`
-+    #[inline(always)]
-+    pub fn offset(&self) -> usize {
-+        self.bio_vec.bv_offset as usize
-+    }
-+
-+    /// Copy data of this segment into `folio`.
-+    ///
-+    /// Note: Disregards `self.offset()`
-+    #[inline(always)]
-+    pub fn copy_to_folio(&self, dst_folio: &mut UniqueFolio) -> Result {
-+        // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
-+        // pointer to a `struct page`. We do not own the page, but we prevent
-+        // drop by wrapping the `Page` in `ManuallyDrop`.
-+        let src_page = ManuallyDrop::new(unsafe { Page::from_raw(self.bio_vec.bv_page) });
-+
-+        src_page.with_slice_into_page(|src| {
-+            dst_folio.with_slice_into_page_mut(0, |dst| {
-+                dst.copy_from_slice(src);
-+                Ok(())
-+            })
-+        })
-+    }
-+
-+    /// Copy data to the page of this segment from `src`.
-+    ///
-+    /// Note: Disregards `self.offset()`
-+    pub fn copy_from_folio(&mut self, src_folio: &UniqueFolio) -> Result {
-+        // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
-+        // pointer to a `struct page`. We do not own the page, but we prevent
-+        // drop by wrapping the `Page` in `ManuallyDrop`.
-+        let mut dst_page = ManuallyDrop::new(unsafe { Page::from_raw(self.bio_vec.bv_page) });
-+
-+        dst_page.with_slice_into_page_mut(|dst| {
-+            src_folio.with_slice_into_page(0, |src| {
-+                dst.copy_from_slice(src);
-+                Ok(())
-+            })
-+        })
-+    }
-+}
-+
-+impl core::fmt::Display for Segment<'_> {
-+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-+        write!(
-+            f,
-+            "Segment {:?} len: {}",
-+            self.bio_vec.bv_page, self.bio_vec.bv_len
-+        )
-+    }
-+}
-+
-+/// An iterator over `Segment`
-+///
-+/// # Invariants
-+///
-+/// If `iter.bi_size` > 0, `iter` must always index a valid `bio_vec` in `bio.io_vec()`.
-+pub struct BioSegmentIterator<'a> {
-+    bio: &'a Bio,
-+    iter: bindings::bvec_iter,
-+}
-+
-+impl<'a> BioSegmentIterator<'a> {
-+    /// Creeate a new segemnt iterator for iterating the segments of `bio`. The
-+    /// iterator starts at the beginning of `bio`.
-+    #[inline(always)]
-+    pub(crate) fn new(bio: &'a Bio) -> BioSegmentIterator<'_> {
-+        // SAFETY: `bio.raw_iter()` returns an index that indexes into a valid
-+        // `bio_vec` in `bio.io_vec()`.
-+        Self {
-+            bio,
-+            iter: bio.raw_iter(),
-+        }
-+    }
-+
-+    // The accessors in this implementation block are modelled after C side
-+    // macros and static functions `bvec_iter_*` and `mp_bvec_iter_*` from
-+    // bvec.h.
-+
-+    /// Construct a `bio_vec` from the current iterator state.
-+    ///
-+    /// This will return a `bio_vec`of size <= PAGE_SIZE
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    unsafe fn io_vec(&self) -> bindings::bio_vec {
-+        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
-+        // greater than 0.
-+        unsafe {
-+            bindings::bio_vec {
-+                bv_page: self.page(),
-+                bv_len: self.len(),
-+                bv_offset: self.offset(),
-+            }
-+        }
-+    }
-+
-+    /// Get the currently indexed `bio_vec` entry.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn bvec(&self) -> &bindings::bio_vec {
-+        // SAFETY: By the safety requirement of this function and the type
-+        // invariant of `Self`, `self.iter.bi_idx` indexes into a valid
-+        // `bio_vec`
-+        unsafe { self.bio.io_vec().get_unchecked(self.iter.bi_idx as usize) }
-+    }
-+
-+    /// Get the currently indexed page, indexing into pages of order > 0.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn page(&self) -> *mut bindings::page {
-+        // SAFETY: By C API contract, the following offset cannot exceed pages
-+        // allocated to this bio.
-+        unsafe { self.mp_page().add(self.mp_page_idx()) }
-+    }
-+
-+    /// Get the remaining bytes in the current page. Never more than PAGE_SIZE.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn len(&self) -> u32 {
-+        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
-+        // greater than 0.
-+        unsafe { self.mp_len().min((bindings::PAGE_SIZE as u32) - self.offset()) }
-+    }
-+
-+    /// Get the offset from the last page boundary in the currently indexed
-+    /// `bio_vec` entry. Never more than PAGE_SIZE.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn offset(&self) -> u32 {
-+        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
-+        // greater than 0.
-+        unsafe { self.mp_offset() % (bindings::PAGE_SIZE as u32) }
-+    }
-+
-+    /// Return the first page of the currently indexed `bio_vec` entry. This
-+    /// might be a multi-page entry, meaning that page might have order > 0.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn mp_page(&self) -> *mut bindings::page {
-+        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
-+        // greater than 0.
-+        unsafe { self.bvec().bv_page }
-+    }
-+
-+    /// Get the offset in whole pages into the currently indexed `bio_vec`. This
-+    /// can be more than 0 is the page has order > 0.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn mp_page_idx(&self) -> usize {
-+        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
-+        // greater than 0.
-+        (unsafe { self.mp_offset() } / (bindings::PAGE_SIZE as u32)) as usize
-+    }
-+
-+    /// Get the offset in the currently indexed `bio_vec` multi-page entry. This
-+    /// can be more than `PAGE_SIZE` if the page has order > 0.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn mp_offset(&self) -> u32 {
-+        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
-+        // greater than 0.
-+        unsafe { self.bvec().bv_offset + self.iter.bi_bvec_done }
-+    }
-+
-+    /// Get the number of remaining bytes for the currently indexed `bio_vec`
-+    /// entry. Can be more than PAGE_SIZE for `bio_vec` entries with pages of
-+    /// order > 0.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must ensure that `self.iter.bi_size` > 0 before calling this
-+    /// method.
-+    #[inline(always)]
-+    unsafe fn mp_len(&self) -> u32 {
-+        // SAFETY: By safety requirement of this function `self.iter.bi_size` is
-+        // greater than 0.
-+        self.iter
-+            .bi_size
-+            .min(unsafe { self.bvec().bv_len } - self.iter.bi_bvec_done)
-+    }
-+}
-+
-+impl<'a> core::iter::Iterator for BioSegmentIterator<'a> {
-+    type Item = Segment<'a>;
-+
-+    #[inline(always)]
-+    fn next(&mut self) -> Option<Self::Item> {
-+        if self.iter.bi_size == 0 {
-+            return None;
-+        }
-+
-+        // SAFETY: We checked that `self.iter.bi_size` > 0 above.
-+        let bio_vec_ret = unsafe { self.io_vec() };
-+
-+        // SAFETY: By existence of reference `&bio`, `bio.0` contains a valid
-+        // `struct bio`. By type invariant of `BioSegmentItarator` `self.iter`
-+        // indexes into a valid `bio_vec` entry. By C API contracit, `bv_len`
-+        // does not exceed the size of the bio.
-+        unsafe {
-+            bindings::bio_advance_iter_single(
-+                self.bio.0.get(),
-+                &mut self.iter as *mut bindings::bvec_iter,
-+                bio_vec_ret.bv_len,
-+            )
-+        };
-+
-+        Some(Segment {
-+            bio_vec: bio_vec_ret,
-+            _marker: core::marker::PhantomData,
-+        })
-+    }
-+}
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index b4dacac5e091..cccffde45981 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -12,6 +12,9 @@
- };
- use core::{ffi::c_void, marker::PhantomData, ops::Deref};
- 
-+use crate::block::bio::Bio;
-+use crate::block::bio::BioIterator;
-+
- /// A wrapper around a blk-mq `struct request`. This represents an IO request.
- ///
- /// # Invariants
-@@ -84,6 +87,25 @@ pub fn complete(&self) {
-         }
-     }
- 
-+    /// Get a wrapper for the first Bio in this request
-+    #[inline(always)]
-+    pub fn bio(&self) -> Option<&Bio> {
-+        // SAFETY: By type invariant of `Self`, `self.0` is valid and the deref
-+        // is safe.
-+        let ptr = unsafe { (*self.0.get()).bio };
-+        // SAFETY: By C API contract, if `bio` is not null it will have a
-+        // positive refcount at least for the duration of the lifetime of
-+        // `&self`.
-+        unsafe { Bio::from_raw(ptr) }
-+    }
-+
-+    /// Get an iterator over all bio structurs in this request
-+    #[inline(always)]
-+    pub fn bio_iter(&self) -> BioIterator<'_> {
-+        BioIterator { bio: self.bio() }
-+    }
-+
-+    // TODO: Check if inline is still required for cross language LTO inlining into module
-     /// Get the target sector for the request
-     #[inline(always)]
-     pub fn sector(&self) -> usize {
--- 
-2.44.0
+  out_unlock:
+        mutex_unlock(&dev->shutdown_lock);
+  out:
++       /*
++        * If PCI recovery is ongoing then let it finish first
++        */
++       if (pci_channel_offline(to_pci_dev(dev->dev))) {
++               if (nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
++                       dev_warn(dev->ctrl.device, "PCI recovery is ongoing, let it finish\n");
++                       return;
++               }
++       }
+        /*
+         * Set state to deleting now to avoid blocking nvme_wait_reset(), which
+         * may be holding this pci_dev's device lock.
+         */
+        dev_warn(dev->ctrl.device, "Disabling device after reset failure: %d\n",
+
+
+Now I have also included in my test the hot removal of NVMe adapter while EEH recovery
+is in progress. And the  EEH recovery code handles this case well : When EEH recovery 
+is in progress and if we hot removes the adapter (which is being recovered) then EEH
+handler would stop the recovery, set the PCI channel state to "pci_channel_io_perm_failure".
+
+
+Collected the logs of this case, (shown below):
+-----------------------------------------------
+# nvme list-subsys 
+nvme-subsys0 - NQN=nqn.1994-11.com.samsung:nvme:PM1735:2.5-inch:S6EUNA0R500358
+               hostnqn=nqn.2014-08.org.nvmexpress:uuid:12b49f6e-0276-4746-b10c-56815b7e6dc2
+               iopolicy=numa
+
+# lspci 
+0018:01:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller PM173X
+
+# dmesg
+[  561.639102] EEH: Recovering PHB#18-PE#10000
+[  561.639120] EEH: PE location: N/A, PHB location: N/A
+[  561.639128] EEH: Frozen PHB#18-PE#10000 detected
+<snip>
+<snip>
+[  561.639428] EEH: This PCI device has failed 2 times in the last hour and will be permanently disabled after 5 failures.
+[  561.639441] EEH: Notify device drivers to shutdown
+[  561.639450] EEH: Beginning: 'error_detected(IO frozen)'
+[  561.639458] PCI 0018:01:00.0#10000: EEH: Invoking nvme->error_detected(IO frozen)
+[  561.639462] nvme nvme0: frozen state error detected, reset controller
+[  561.719078] nvme 0018:01:00.0: enabling device (0000 -> 0002)
+[  561.719318] nvme nvme0: PCI recovery is ongoing so let it finish
+
+<!!!! WHILE EEH RECOVERY IS IN PROGRESS WE HOT REMOVE THE NVMe ADAPTER !!!!>
+
+[  563.850328] rpaphp: RPA HOT Plug PCI Controller Driver version: 0.1
+<snip>
+[  571.879092] PCI 0018:01:00.0#10000: EEH: nvme driver reports: 'need reset'
+[  571.879097] EEH: Finished:'error_detected(IO frozen)' with aggregate recovery state:'need reset'
+<snip>
+<snip>
+[  571.881761] EEH: Reset without hotplug activity
+[  574.039807] EEH: PHB#18-PE#10000: Slot inactive after reset: 0x2 (attempt 1)
+[  574.309091] EEH: Failure 2 resetting PHB#18-PE#10000 (attempt 2)
+[  574.309091] 
+[  574.579094] EEH: Failure 2 resetting PHB#18-PE#10000 (attempt 3)
+[  574.579094] 
+[  574.579101] eeh_handle_normal_event: Cannot reset, err=-5
+[  574.579104] EEH: Unable to recover from failure from PHB#18-PE#10000.
+[  574.579104] Please try reseating or replacing it
+<snip>
+<snip>
+[  574.581314] EEH: Beginning: 'error_detected(permanent failure)'
+[  574.581320] PCI 0018:01:00.0#10000: EEH: no device
+
+# lspci
+<empty>
+
+# nvme list-subsys
+<empty>
+
+
+Another case tested, when the reset_work is ongoing post subsystem-reset command
+and if user immediately hot removes the NVMe adapter then EEH recovery is *not* 
+triggered and ctrl forward progress to the "DEAD" state.
+
+Collected the logs of this case, (shown below):
+-----------------------------------------------
+# nvme list-subsys 
+nvme-subsys0 - NQN=nqn.1994-11.com.samsung:nvme:PM1735:2.5-inch:S6EUNA0R500358
+               hostnqn=nqn.2014-08.org.nvmexpress:uuid:12b49f6e-0276-4746-b10c-56815b7e6dc2
+               iopolicy=numa
+
+# lspci 
+0018:01:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller PM173X
+
+# nvme subsystem-reset /dev/nvme0
+
+<!!!! HOT REMOVE THE NVMe ADAPTER !!!!>
+
+# dmesg
+[ 9967.143886] eeh_handle_normal_event: Cannot find PCI bus for PHB#18-PE#10000
+[ 9967.224078] eeh_handle_normal_event: Cannot find PCI bus for PHB#18-PE#10000
+<snip>
+[ 9967.223858] nvme 0018:01:00.0: enabling device (0000 -> 0002)
+[ 9967.224140] nvme nvme0: Disabling device after reset failure: -19
+
+# lspci
+<empty>
+
+# nvme list-subsys
+<empty>
+
+
+Please let me know if the above changes look good to you. If it looks good then 
+I would spin a new version of the patch and send for a review.
+
+Thanks,
+--Nilay
+
 
