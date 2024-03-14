@@ -1,109 +1,119 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDA16FE10;
-	Thu, 14 Mar 2024 17:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CB9745EF;
+	Thu, 14 Mar 2024 17:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710436098; cv=none; b=Kl8yOh7l/Puyr+lyerMrKfMwLCCYREiwOgn4tRTh2HTCOlaCqi7Q4Ad3ivA0wVT1+rX3i1UtZL4bgJlm4HhtVXiWQii6rWrphx3ZehNPCH0tivEZDkALXWsthEyyu0P5uRKabwPFpHinwG+3VqkBqYommDIkj7oX6ZwNDzTJG1Q=
+	t=1710436579; cv=none; b=KAouChoGunhqSPf0baDwSYOCB3X4vPjCvZaQbI0kFK0MEZvlcOH7Y3slM+nWF3HfKfAF/7jomL7wHkhV7zw4NvbCmiktjaukkQ8wtE32hgXuFW3H8Y0s2S+H0fgQG5fEoKDctMyvdRs9y8hH+X7JEpR9maqnSTSoW06SfxC73cQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710436098; c=relaxed/simple;
-	bh=KC56MJSNa0tlT6Fq7JOrWXDdPZMxnawzUzvFV5t+9NI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DCbrFK5KR4YebJZoHGACjb9TXUb5dHaKzmejilu1ORmKtTFT/dtC9v1l1sPqsmR9PppsIH4ZZpcfmnZttAWejxCuGnIVdo5NHI1mXuC0O4di2eAIQxWCHD0X5G5SmWO0JiP4YwCDXqoKPnLvbeIMEC7cx+qxv2avbnmsWzbiNiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=KKvXOOfC; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1710436579; c=relaxed/simple;
+	bh=pGyhDtx7U38/KEVxI7oHYe+wiEczizknyEbNsI4Y7yc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FQkthoVT5kXm4Vi8XXCelTG0YybVa75BR15iPuGg4wy6rRglwOaU7wc/YQ/zrYVx673+yNzsxTV9Y9PPEsX3km5RmPMFfHIu1t+vtJmPEq8AQ9hm1DHTIuha2oNDD4me4odfdtHNMH/B3GXd8bU62ZNOwAlgzma6bTaGadC/XvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVU8DRaO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="KKvXOOfC"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4TwYjr2tj0zlgVnf;
-	Thu, 14 Mar 2024 17:08:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:references:content-language:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1710436093; x=1713028094; bh=wNCX0W7TCjDPfMrpCKXRDDoj
-	AVEQk7pec9rqlF/vD64=; b=KKvXOOfCG3MvTQ4/rqE8S+tViGS+L0oaAw4x4b0V
-	QmEXAtqb9LsAOCftFCotaP/ouNp3mmmbljvmxCe1ronWqIjfrC+O0SndsYa+/wLn
-	C4QN3Lua7BfRdxWy2T1kldRO9Y5WaaWAfipPFywuA6rFtDnvcVSDasMVz3utxnRR
-	zvsCreLB7FRidUcAA1S81nQDOM6RXObmWdRVYoa7gosbwyqWOPcmXhFZ/7QgDyNm
-	cf9203r05ZpT28f1VvslRyQbs6UfEop7qxN8GvkOKTJm3EBGg14UefMZeWOyvV+a
-	fhW1ijPvY0/YAg28MqbcK/RqWe3g5HlWfnOKHit86lFNbg==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 6h4US87tAIbd; Thu, 14 Mar 2024 17:08:13 +0000 (UTC)
-Received: from [100.96.154.173] (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4TwYjm5yn4zlgVnW;
-	Thu, 14 Mar 2024 17:08:12 +0000 (UTC)
-Message-ID: <cf7e6d94-63fd-4ef5-bbdb-9c3877d8560a@acm.org>
-Date: Thu, 14 Mar 2024 10:08:10 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVU8DRaO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F910C43390;
+	Thu, 14 Mar 2024 17:16:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710436578;
+	bh=pGyhDtx7U38/KEVxI7oHYe+wiEczizknyEbNsI4Y7yc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mVU8DRaOFCUY4k7U5k79+C+zLjmY6l1d31ADpOQkNocdVJ4iDCIuVqoeoxJKm56b6
+	 7sH9uuQqkv4BDr01c9D7pLz+3pvAQ+JEH6bgq+yzKTkQZh7OD3SPbz/UbHaWlDobiz
+	 RArtKW+vbBRzVDaewD8ItVe7CQFcqA/nz3sw7BPOpCU2ofOAis7G3wyIwh8TTNEhle
+	 T4Y1fVaw1fkl58IUO039KtyoPwBkpU4DJBqMi/JbRUNnT6lbEscsUExTe9eJQudta7
+	 aMGalX9wD8ETIk/acxc8aRMIuhlb1RXij3FRNPZRoVETAKRA0kj8WRpuhTiVsnWtaO
+	 T5239dJQfxdBw==
+Date: Thu, 14 Mar 2024 17:16:10 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Philipp Stanner <pstanner@redhat.com>,
+	Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Niklas Cassel <Niklas.Cassel@wdc.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Yexuan Yang <1182282462@bupt.edu.cn>,
+	Sergio =?iso-8859-1?Q?Gonz=E1lez?= Collado <sergio.collado@gmail.com>,
+	Joel Granados <j.granados@samsung.com>,
+	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 0/5] Rust block device driver API and null block
+ driver
+Message-ID: <20240314-capped-creole-7b11c1563f86@spud>
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+ <855a006d-5afc-4f70-90a9-ec94c0414d4f@acm.org>
+ <c38358c418d4db11221093d7c38c080e4c2d737f.camel@redhat.com>
+ <5f502f91-0450-454d-ae8f-36223920532e@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?B?UmU6IOetlOWkjTogW1BBVENIXSBSZXZlcnQgImJsb2NrL21xLWRlYWRs?=
- =?UTF-8?Q?ine=3A_use_correct_way_to_throttling_write_requests=22?=
-Content-Language: en-US
-To: =?UTF-8?B?54mb5b+X5Zu9IChaaGlndW8gTml1KQ==?= <Zhiguo.Niu@unisoc.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Damien Le Moal <dlemoal@kernel.org>,
- Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
- =?UTF-8?B?6YeR57qi5a6HIChIb25neXUgSmluKQ==?= <hongyu.jin@unisoc.com>
-References: <20240313214218.1736147-1-bvanassche@acm.org>
- <cf8127b0fa594169a71f3257326e5bec@BJMBX02.spreadtrum.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <cf8127b0fa594169a71f3257326e5bec@BJMBX02.spreadtrum.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Pk7WrlyY/BqNsZtB"
+Content-Disposition: inline
+In-Reply-To: <5f502f91-0450-454d-ae8f-36223920532e@acm.org>
+
+
+--Pk7WrlyY/BqNsZtB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 3/13/24 18:03, =E7=89=9B=E5=BF=97=E5=9B=BD (Zhiguo Niu) wrote:
-> Just as mentioned in original patch, "dd->async_depth =3D max(1UL, 3 * =
-q->nr_requests / 4);", this limitation methods look likes won't have a li=
-mit effect, because tag allocated is based on sbitmap, not based the whol=
-e nr_requests.
-> Right?
-> Thanks!
->=20
-> For write requests, when we assign a tags from sched_tags,
-> data->shallow_depth will be passed to sbitmap_find_bit,
-> see the following code:
->=20
-> nr =3D sbitmap_find_bit_in_word(&sb->map[index],
-> 			min_t (unsigned int,
-> 			__map_depth(sb, index),
-> 			depth),
-> 			alloc_hint, wrap);
->=20
-> The smaller of data->shallow_depth and __map_depth(sb, index)
-> will be used as the maximum range when allocating bits.
->=20
-> For a mmc device (one hw queue, deadline I/O scheduler):
-> q->nr_requests =3D sched_tags =3D 128, so according to the previous
-> calculation method, dd->async_depth =3D data->shallow_depth =3D 96,
-> and the platform is 64bits with 8 cpus, sched_tags.bitmap_tags.sb.shift=
-=3D5,
-> sb.maps[]=3D32/32/32/32, 32 is smaller than 96, whether it is a read or
-> a write I/O, tags can be allocated to the maximum range each time,
-> which has not throttling effect.
-Whether or not the code in my patch effectively performs throttling,
-we need this revert to be merged. The patch that is being reverted
-("block/mq-deadline: use correct way to throttling write requests")
-ended up in Greg KH's stable branches. Hence, the first step is to
-revert that patch and tag it with "Cc: stable" such that the revert
-lands in the stable branches.
+Just a passer-by here, but I noticed the link to Laurent's talk..
 
-Thanks,
+On Thu, Mar 14, 2024 at 10:03:28AM -0700, Bart Van Assche wrote:
+> On 3/14/24 05:14, Philipp Stanner wrote:
+>=20
+> > The Kernel's C already has more memory safety than standardized C:
+> > There's devres, and since last year there's the __cleanup attribute.
+> > =E2=80=93 but the thing is, you can just ignore it and do it the old wa=
+y.
+>=20
+> devres is controversial - see also Laurent Pinchart, "Why is
+> devm_kzalloc() harmful and what can we do about it", LPC, 2022
+> (https://lpc.events/event/16/contributions/1227/).
 
-Bart.
+I don't think that's a great thing to cite, that talk prompted a series
+of others with (AFAIK*) the most recent being from Bart at LPC this year:
+https://lpc.events/event/17/contributions/16f
+The TL;DR is that it's not actually problem caused by devres.
+
+* I think Wolfram also talked about it at an automotive conference, but
+  that seemed like a bit of a pitch for funding from the safety
+  conscious=20
+
+
+--Pk7WrlyY/BqNsZtB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZfMwxgAKCRB4tDGHoIJi
+0j+gAP9WfX58/nQt3jltC+8M270HUvjPJmZyrK0+DRah8vD2VgEA5wxGAnUDrSFD
+yKkVFD4fjcc2jhvn2r53fjz7GEACpwk=
+=z+PJ
+-----END PGP SIGNATURE-----
+
+--Pk7WrlyY/BqNsZtB--
