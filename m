@@ -1,243 +1,202 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF272E410;
-	Thu, 14 Mar 2024 16:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6584D1EB34;
+	Thu, 14 Mar 2024 16:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710434756; cv=none; b=F3d7fIwRPmqzjq1wW2f4+Hyiyhs/YlW2LGdcT9w4lQRBX24LQDI1m/BYEmUHqghh5hkjKhqj11IiIxjn9bk+URNaJo+M6qo1xniJBUwlG0h11PjOtPg7UQ02BPbnxF20fdtcGu1gkUxykZngs+5NnwvLabmwLpuiUdK4s52X8EY=
+	t=1710435486; cv=none; b=Vcs77zsqIn9OruxtzeUdAOrJhUYLw+iYoFLIzWGw/W1n/H2zKqN5I1yG9u5alCNlf3pNPTfHuREtZOlBEzJS0fzW7a9v20Ko9xJfnrzJbAb1Is7iRYCAwb5GtlzMLZLZdG1Fn3cHee7QZ7COTyOrYZxE6RDu4X1820poWEiZfbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710434756; c=relaxed/simple;
-	bh=NLxFUDFlSW048LSrziNhhj0DOcSDerk7IC7uGJ/zd0Q=;
+	s=arc-20240116; t=1710435486; c=relaxed/simple;
+	bh=fcf8GvnNI2NlxwWa/BLBUBs674hhRLyrkoAa66D2RKo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=myxVF5ZBZlHgz3zYHQ7xH4t4VBzO/ifNXfQK7Vlz+7yNaPO4rV+YhjD6b23orJLyPyvBNa+E7RSe22LFBAAYUSM7gVlufYJ8N42LHpTYPYSSt6w1auCyrs5SD+os6Q7k5SRa5CuSkdxhW+/oidQ69JTqjVY01GDFTeiFxxXNUSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=amqymsOp; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=nE9Dvb4jlx6h5vXrX4A9HOeg58e+rGh2c7tkkgerxTH4oqbOienOHOVPcy/KYUA6XDZf6V+m6gCBjqy5QTyf7NcGJc9/rDTvrPmiASibu9GsfnMNXtwivmFvh9LqXtIIbs5WA4+yEvd/cAiOkfmsi8qZbL7NfrNIwdhyRUBBxTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Upxp6VnM; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="amqymsOp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D45A8C433F1;
-	Thu, 14 Mar 2024 16:45:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710434755;
-	bh=NLxFUDFlSW048LSrziNhhj0DOcSDerk7IC7uGJ/zd0Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=amqymsOpC+ttCp/5WgGktKW7lf92iAmd5H4VKEpQXnKI2xZrdSxOyL6jx/g1ojUo6
-	 /PyKdNJBOR2updRw5z9oaDoPPRLf0AcsNxYHMbpbBRFvXuO9dx8n5trVkUUxXnuxTJ
-	 lhwJWj6yXjvg67wyz2iti9rsYDAHu1tlDtOqTHOA0nxjbewYaSaHIz3sOd/4hlKgA7
-	 oCdfRrYzmlLiO0zXS1TCkJ4yott0poISior6qOvrnSdpki6xDTIC/dE6NmG71cvchm
-	 HxVTKsEzc7jS7aaPmOVGZz/eIEn7xtE4by5KFKxx2kyEGAhy2VTKtaUoW2zFEKOGbv
-	 GTAdVxd76u2Sg==
-Date: Thu, 14 Mar 2024 17:45:50 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
-	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 01/34] bdev: open block device as files
-Message-ID: <20240314-tauben-hinkt-7e0bbd6d35fc@brauner>
-References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
- <20240123-vfs-bdev-file-v2-1-adbd023e19cc@kernel.org>
- <ZfEQQ9jZZVes0WCZ@infradead.org>
- <20240314-anfassen-teilnahm-20890c4a22c3@brauner>
- <20240314-entbehren-folglich-8c8fef0cd49b@brauner>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Upxp6VnM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710435484; x=1741971484;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fcf8GvnNI2NlxwWa/BLBUBs674hhRLyrkoAa66D2RKo=;
+  b=Upxp6VnMtVVIh5OrjLy1m4x53O33vUT82Px9mA1yIg4XVcMfwTQJFixh
+   7LgJMYtNRqx/gFI4UZaFZANBwyUZ2125tyWFO/h/8aNJY3Ssz6Q5mTtSq
+   z2Rj4kEpS4nJkn25okzKvdQv4rbbJF9HCHjqQ9B/Jb64bwio9XG/KBlJp
+   J699SnKSz1nj/E2RkWAJaF9YVeUpsaCsOXlpHs5uHkESF9K3aOaQpXess
+   FCsbM8DPR2tGCmMJCjBmNp+30GvOQOM0FuzvdY/0Dl1c7H5pm+EbBsxtB
+   SWZno7PLV95EK9E7rTZWvtAMKbMAY13rhlzTtvMhwYJfdAqn3LBycbVbu
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="22731667"
+X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
+   d="scan'208";a="22731667"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 09:58:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
+   d="scan'208";a="16952403"
+Received: from aschofie-mobl2.amr.corp.intel.com (HELO aschofie-mobl2) ([10.209.72.214])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 09:57:59 -0700
+Date: Thu, 14 Mar 2024 09:57:57 -0700
+From: Alison Schofield <alison.schofield@intel.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+	freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
+	linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
+	iommu@lists.linux.dev, linux-tegra@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+	ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+	linux-usb@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-edac@vger.kernel.org, selinux@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-hwmon@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-sound@vger.kernel.org,
+	bpf@vger.kernel.org, linux-wpan@vger.kernel.org,
+	dev@openvswitch.org, linux-s390@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	Julia Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <ZfMslbCmCtyEaEWN@aschofie-mobl2>
+References: <20240223125634.2888c973@gandalf.local.home>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240314-entbehren-folglich-8c8fef0cd49b@brauner>
+In-Reply-To: <20240223125634.2888c973@gandalf.local.home>
 
-On Thu, Mar 14, 2024 at 03:47:52PM +0100, Christian Brauner wrote:
-> On Thu, Mar 14, 2024 at 12:10:59PM +0100, Christian Brauner wrote:
-> > On Tue, Mar 12, 2024 at 07:32:35PM -0700, Christoph Hellwig wrote:
-> > > Now that this is in mainline it seems to cause blktests to crash
-> > > nbd/003 with a rather non-obvious oops for me:
-> > 
-> > Ok, will be looking into that next.
+On Fri, Feb 23, 2024 at 12:56:34PM -0500, Steven Rostedt wrote:
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
 > 
-> Ok, I know what's going on. Basically, fput() on the block device runs
-> asynchronously which means that bdev->bd_holder can still be set to @sb
-> after it has already been freed. Let me illustrate what I mean:
+> [
+>    This is a treewide change. I will likely re-create this patch again in
+>    the second week of the merge window of v6.9 and submit it then. Hoping
+>    to keep the conflicts that it will cause to a minimum.
+> ]
 > 
-> P1                                                 P2
-> mount(sb)                                          fd = open("/dev/nbd", ...)
-> -> file = bdev_file_open_by_dev(..., sb, ...)
->    bdev->bd_holder = sb;
+> With the rework of how the __string() handles dynamic strings where it
+> saves off the source string in field in the helper structure[1], the
+> assignment of that value to the trace event field is stored in the helper
+> value and does not need to be passed in again.
 > 
-> // Later on:
+> This means that with:
 > 
-> umount(sb)
-> ->kill_block_super(sb)
-> |----> [fput() -> deferred via task work]
-> -> put_super(sb) -> frees the sb via rcu
-> |
-> |                                                 nbd_ioctl(NBD_CLEAR_SOCK)
-> |                                                 -> disk_force_media_change()
-> |                                                    -> bdev_mark_dead()
-> |                                                       -> fs_mark_dead()
-> |                                                          // Finds bdev->bd_holder == sb
-> |-> file->release::bdev_release()                          // Tries to get reference to it but it's freed; frees it again
->    bdev->bd_holder = NULL;
+>   __string(field, mystring)
 > 
-> Two solutions that come to my mind:
+> Which use to be assigned with __assign_str(field, mystring), no longer
+> needs the second parameter and it is unused. With this, __assign_str()
+> will now only get a single parameter.
 > 
-> [1] Indicate to fput() that this is an internal block devices open and
->     thus just close it synchronously. This is fine. First, because the block
->     device superblock is never unmounted or anything so there's no risk
->     from hanging there for any reason. Second, bdev_release() also ran
->     synchronously so any issue that we'd see from calling
->     file->f_op->release::bdev_release() we would have seen from
->     bdev_release() itself. See [1.1] for a patch.
+> There's over 700 users of __assign_str() and because coccinelle does not
+> handle the TRACE_EVENT() macro I ended up using the following sed script:
 > 
-> (2) Take a temporary reference to the holder when opening the block
->     device. This is also fine afaict because we differentiate between
->     passive and active references on superblocks and what we already do
->     in fs_bdev_mark_dead() and friends. This mean we don't have to mess
->     around with fput(). See [1.2] for a patch.
+>   git grep -l __assign_str | while read a ; do
+>       sed -e 's/\(__assign_str([^,]*[^ ,]\) *,[^;]*/\1)/' $a > /tmp/test-file;
+>       mv /tmp/test-file $a;
+>   done
 > 
-> (3) Revert and cry. No patch.
+> I then searched for __assign_str() that did not end with ';' as those
+> were multi line assignments that the sed script above would fail to catch.
 > 
-> Personally, I think (2) is more desirable because we don't lose the
-> async property of fput() and we don't need to have a new FMODE_* flag.
-> I'd like to do some more testing with this. Thoughts?
+> Note, the same updates will need to be done for:
 > 
-> [1.1]:
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+>   __assign_str_len()
+>   __assign_rel_str()
+>   __assign_rel_str_len()
+>   __assign_bitmask()
+>   __assign_rel_bitmask()
+>   __assign_cpumask()
+>   __assign_rel_cpumask()
+> 
+> [1] https://lore.kernel.org/linux-trace-kernel/20240222211442.634192653@goodmis.org/
+> 
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 > ---
->  block/bdev.c       | 1 +
->  fs/file_table.c    | 5 +++++
->  include/linux/fs.h | 3 +++
->  3 files changed, 9 insertions(+)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index e7adaaf1c219..d0c208a04b04 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -969,6 +969,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
->  		return bdev_file;
->  	}
->  	ihold(bdev->bd_inode);
-> +	bdev_file->f_mode |= FMODE_BLOCKDEV;
->  
->  	ret = bdev_open(bdev, mode, holder, hops, bdev_file);
->  	if (ret) {
-> diff --git a/fs/file_table.c b/fs/file_table.c
-> index 4f03beed4737..48d35dd67020 100644
-> --- a/fs/file_table.c
-> +++ b/fs/file_table.c
-> @@ -473,6 +473,11 @@ void fput(struct file *file)
->  	if (atomic_long_dec_and_test(&file->f_count)) {
->  		struct task_struct *task = current;
->  
-> +		if (unlikely((file->f_mode & FMODE_BLOCKDEV))) {
-> +			__fput(file);
-> +			return;
-> +		}
-> +
->  		if (unlikely(!(file->f_mode & (FMODE_BACKING | FMODE_OPENED)))) {
->  			file_free(file);
->  			return;
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index d5d5a4ee24f0..ceac9c0316a6 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -121,6 +121,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
->  #define FMODE_PWRITE		((__force fmode_t)0x10)
->  /* File is opened for execution with sys_execve / sys_uselib */
->  #define FMODE_EXEC		((__force fmode_t)0x20)
-> +
-> +/* File is opened as block device. */
-> +#define FMODE_BLOCKDEV		((__force fmode_t)0x100)
->  /* 32bit hashes as llseek() offset (for directories) */
->  #define FMODE_32BITHASH         ((__force fmode_t)0x200)
->  /* 64bit hashes as llseek() offset (for directories) */
-> -- 
-> 2.43.0
-> 
-> [1.2]:
-> Sketched-by: Christian Brauner <brauner@kernel.org>
-> ---
->  block/bdev.c           |  4 ++++
->  fs/super.c             | 17 +++++++++++++++++
->  include/linux/blkdev.h |  3 +++
->  3 files changed, 24 insertions(+)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index e7adaaf1c219..a0d5960dc2b9 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -627,6 +627,8 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
->  		whole->bd_holder = NULL;
->  	mutex_unlock(&bdev_lock);
->  
-> +	if (bdev->bd_holder_ops && bdev->bd_holder_ops->put_holder)
-> +		bdev->bd_holder_ops->put_holder(holder);
+>  arch/arm64/kernel/trace-events-emulation.h    |   2 +-
+>  arch/powerpc/include/asm/trace.h              |   4 +-
+>  arch/x86/kvm/trace.h                          |   2 +-
+>  drivers/base/regmap/trace.h                   |  18 +--
+>  drivers/base/trace.h                          |   2 +-
+>  drivers/block/rnbd/rnbd-srv-trace.h           |  12 +-
+>  drivers/cxl/core/trace.h                      |  24 ++--
 
-That should move into bdev_release() obviously so it mirrors
-bdev_open(). Plus, currently it's a nop because we just NULLed
-bdev->bd_holder_ops above. But you get the idea, I hope.
+snip to CXL
 
->  	/*
->  	 * If this was the last claim, remove holder link and unblock evpoll if
->  	 * it was a write holder.
-> @@ -902,6 +904,8 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
->  		bdev_file->f_mode |= FMODE_NOWAIT;
->  	bdev_file->f_mapping = bdev->bd_inode->i_mapping;
->  	bdev_file->f_wb_err = filemap_sample_wb_err(bdev_file->f_mapping);
-> +	if (hops && hops->get_holder)
-> +		hops->get_holder(holder);
->  	bdev_file->private_data = holder;
+
+> diff --git a/drivers/cxl/core/trace.h b/drivers/cxl/core/trace.h
+> index bdf117a33744..07ba4e033347 100644
+> --- a/drivers/cxl/core/trace.h
+> +++ b/drivers/cxl/core/trace.h
+
+snip to poison
+
+> @@ -668,8 +668,8 @@ TRACE_EVENT(cxl_poison,
+>  	    ),
 >  
->  	return 0;
-> diff --git a/fs/super.c b/fs/super.c
-> index ee05ab6b37e7..64dbbdbed93a 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -1515,11 +1515,28 @@ static int fs_bdev_thaw(struct block_device *bdev)
->  	return error;
->  }
->  
-> +static void fs_bdev_super_get(void *data)
-> +{
-> +	struct super_block *sb = data;
-> +
-> +	spin_lock(&sb_lock);
-> +	sb->s_count++;
-> +	spin_unlock(&sb_lock);
-> +}
-> +
-> +static void fs_bdev_super_put(void *data)
-> +{
-> +	struct super_block *sb = data;
-> +	put_super(sb);
-> +}
-> +
->  const struct blk_holder_ops fs_holder_ops = {
->  	.mark_dead		= fs_bdev_mark_dead,
->  	.sync			= fs_bdev_sync,
->  	.freeze			= fs_bdev_freeze,
->  	.thaw			= fs_bdev_thaw,
-> +	.get_holder		= fs_bdev_super_get,
-> +	.put_holder		= fs_bdev_super_put,
->  };
->  EXPORT_SYMBOL_GPL(fs_holder_ops);
->  
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index f9b87c39cab0..d919e8bcb2c1 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1505,6 +1505,9 @@ struct blk_holder_ops {
->  	 * Thaw the file system mounted on the block device.
->  	 */
->  	int (*thaw)(struct block_device *bdev);
-> +
-> +	void (*get_holder)(void *holder);
-> +	void (*put_holder)(void *holder);
->  };
->  
->  /*
-> -- 
-> 2.43.0
-> 
+>  	TP_fast_assign(
+> -		__assign_str(memdev, dev_name(&cxlmd->dev));
+> -		__assign_str(host, dev_name(cxlmd->dev.parent));
+> +		__assign_str(memdev);
+> +		__assign_str(host);
+
+I think I get that the above changes work because the TP_STRUCT__entry for
+these did:
+	__string(memdev, dev_name(&cxlmd->dev))
+	__string(host, dev_name(cxlmd->dev.parent))
+
+>  		__entry->serial = cxlmd->cxlds->serial;
+>  		__entry->overflow_ts = cxl_poison_overflow(flags, overflow_ts);
+>  		__entry->dpa = cxl_poison_record_dpa(record);
+> @@ -678,12 +678,12 @@ TRACE_EVENT(cxl_poison,
+>  		__entry->trace_type = trace_type;
+>  		__entry->flags = flags;
+>  		if (region) {
+> -			__assign_str(region, dev_name(&region->dev));
+> +			__assign_str(region);
+>  			memcpy(__entry->uuid, &region->params.uuid, 16);
+>  			__entry->hpa = cxl_trace_hpa(region, cxlmd,
+>  						     __entry->dpa);
+>  		} else {
+> -			__assign_str(region, "");
+> +			__assign_str(region);
+>  			memset(__entry->uuid, 0, 16);
+>  			__entry->hpa = ULLONG_MAX;
+
+For the above 2, there was no helper in TP_STRUCT__entry. A recently
+posted patch is fixing that up to be __string(region, NULL) See [1],
+with the actual assignment still happening in TP_fast_assign.
+
+Does that assign logic need to move to the TP_STRUCT__entry definition
+when you merge these changes? I'm not clear how much logic is able to be
+included, ie like 'C' style code in the TP_STRUCT__entry.
+
+[1]
+https://lore.kernel.org/linux-cxl/20240314044301.2108650-1-alison.schofield@intel.com/
+
+Thanks for helping,
+Alison
+
+
+>  		}
+
+
+
