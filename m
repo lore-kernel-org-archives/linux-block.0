@@ -1,77 +1,236 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1AA5811C
-	for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 14:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D346558104;
+	Thu, 14 Mar 2024 14:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710425759; cv=none; b=HZyx+V1hdDXPFzzpPhnAjtLVaUNsVppony7jioS26LsmZPtLPOTrPJRHNP8d3h3eCv0ol+siOs6ACGs89GsulrMe6A8ArBItUw+o4YnusBy8FRQquoZTg3p8mflUSbz4XlcLIW90sGmVTITcWc5m+WFI9kUwYNh5dGoA1PhCEMQ=
+	t=1710427676; cv=none; b=tsVFUU/N0bxvWY5menQxf+9elXRPX/9QHa8ZUW29wzw+eIUsIaopZPk/zC2wSqKYjAg9T84UN2mbt5AzNXxoSFPYg1hmfDiFJGFu2M/Vo48V+dLaMdeCEGRbNDgcMjRqg6DmdNtmaJyucMufqBZ03WYVtTyrVsG/8Sg2hZZqpfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710425759; c=relaxed/simple;
-	bh=M6667Wh2li32mzjwCOvp/fptR+/dW71OKBrRDGYVuiU=;
+	s=arc-20240116; t=1710427676; c=relaxed/simple;
+	bh=d8NWfY0GhHJyd0+xMMvY88LD3k6G8Y5qwteiUz8SGYM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VY+WJrYTt/D2Fus2gJ8lIiYue2gSTJUXScRS6NZtaKsi8Vk5bzbJZpL/IYt11M2Vw1bKR5ZAc3HgW9BwcJ5PdcWBmbYTNlmXWydi8VfhFTHBbsXR0ovHUBBlKLnA+SWaSJhQqvICgp1GrE7dj02h41tbrwoRxoUzuFiLf2Dvt3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=N1kusd6t; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y8obXgp0WLKquNVBP6Drj1eHMn7dJIALW2xdffmui5F+vFaTzfUhqFYfe/pv2izX1Lv7jLWPrDnllLaK5ehSkzftoOIT6N9fWi/2Rm7wc/ddHl5FjoJnrlLFYKPB0xuFGcKXIzA9/JmXQp+vZVhfl6qrGhFsCAwK+r+gI5mx/cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=taAbA3gy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="N1kusd6t"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=w2R7s8qU3kXnWekYLwTAxzb3rS1apBQsRtsNFnXuR2M=; b=N1kusd6tXe9gkjSaKuUeJDBVs8
-	Lv2rA+JgMQU+Bzu1u9asTuYVB8tLfRDKKKvQsVKdpqz1Q7cm9rWE7k1fgfBVeH8wc5V2lsTV4hQBS
-	BlsDX4L8FTzbhTjI8ROPpH28T/oQncPG+2x9mXQttkicKz4+5DLZ/8Maf5lWyfGQm2HbJTx1cZM5c
-	Oesj3ImCD/zEmR0WQjqGizpS/aHxdnc5+5S63WGEnYz4fDfzkrE8ot2Wft1LiF796Sgp9tBC884wp
-	MFpchma2MylzgJ1x3AppbW29TGkC3J6zP0je9a2Uq00jDqkEAQu+Jh93GcsnaJxXWJHTkmV7Slp+S
-	t+Qg3A7Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rkls3-0000000806t-1Lnf;
-	Thu, 14 Mar 2024 14:15:47 +0000
-Date: Thu, 14 Mar 2024 14:15:47 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Pankaj Raghav <p.raghav@samsung.com>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: brd in a memdesc world
-Message-ID: <ZfMGk_bu4wFRWJUZ@casper.infradead.org>
-References: <CGME20240312174020eucas1p29cf41360c934c674fd1f36a808078e25@eucas1p2.samsung.com>
- <ZfCTfa9gfZwnCie0@casper.infradead.org>
- <d470e16b-b7bf-451e-a6e2-eb68adcc2635@samsung.com>
- <ZfHwXLr54bWl1fns@casper.infradead.org>
- <886d8bde-e608-4e15-b13d-c891b4689b4f@suse.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="taAbA3gy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C266C433F1;
+	Thu, 14 Mar 2024 14:47:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710427676;
+	bh=d8NWfY0GhHJyd0+xMMvY88LD3k6G8Y5qwteiUz8SGYM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=taAbA3gypO+K/rNSO5jHsRe68pQ2T2YfNkw+KH4gw4qYH62mXpFzlo1aFmmISUDYn
+	 ANGWrV8XJnZhLD6R/wvakydrpqt+8DRkmE+F4xjD2WXR4WjReYcIBDL+vlDbqVSY1n
+	 UQ5PqU9BZbxnd210+0UVpzug1HuGkI8sRM/l5goOGf7JlbBTUteaahuxCeI6tWmTCs
+	 BIwowu78VrnCRa4+wriVFa+7rRp7RyEOmJj4ZbK9aIqnmoxzhLxzqwutKxWDuvs/KD
+	 zXuW0y0vGx/9L/11j971XG7F7k0JDShAmIyMFbVRi3OXH1Du4KHynG346f2fm+5ejW
+	 g7zQYBEA6wgDw==
+Date: Thu, 14 Mar 2024 15:47:52 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 01/34] bdev: open block device as files
+Message-ID: <20240314-entbehren-folglich-8c8fef0cd49b@brauner>
+References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
+ <20240123-vfs-bdev-file-v2-1-adbd023e19cc@kernel.org>
+ <ZfEQQ9jZZVes0WCZ@infradead.org>
+ <20240314-anfassen-teilnahm-20890c4a22c3@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <886d8bde-e608-4e15-b13d-c891b4689b4f@suse.de>
+In-Reply-To: <20240314-anfassen-teilnahm-20890c4a22c3@brauner>
 
-On Thu, Mar 14, 2024 at 12:11:18PM +0100, Hannes Reinecke wrote:
-> On 3/13/24 19:28, Matthew Wilcox wrote:
-> > None of those things are needed for brd's uses.  All brd needs is to
-> > be able to allocate, kmap and free chunks of memory.  Unless there are
-> > plans to do more than this.
+On Thu, Mar 14, 2024 at 12:10:59PM +0100, Christian Brauner wrote:
+> On Tue, Mar 12, 2024 at 07:32:35PM -0700, Christoph Hellwig wrote:
+> > Now that this is in mainline it seems to cause blktests to crash
+> > nbd/003 with a rather non-obvious oops for me:
 > 
-> The primary goal of my patchset is to make brd a test-bed for the LBS work;
-> devices with a sector size larger than 4k are really hard to come
-> by. But really, it's just a testbed, and I'm not sure whether there's
-> a need for that in the general audience.
-> I can resubmit if you want ...
-> 
-> As for the memory overhead, I guess it only makes a noticable difference
-> when moving to hugepages, and have brd allocate hugepages only.
-> But that is future work for sure.
+> Ok, will be looking into that next.
 
-As I said, this is talking about a memdesc future where struct page is a
-mere 8 bytes and most of its contents are reserved to the MM.  At this
-point, there's no extra overhead to your patch, but there would be when
-we get there.
+Ok, I know what's going on. Basically, fput() on the block device runs
+asynchronously which means that bdev->bd_holder can still be set to @sb
+after it has already been freed. Let me illustrate what I mean:
 
-So I don't think the folio conversion is necessary, but I think
-supporting larger sector sizes in brd is a worthwhile extension.
+P1                                                 P2
+mount(sb)                                          fd = open("/dev/nbd", ...)
+-> file = bdev_file_open_by_dev(..., sb, ...)
+   bdev->bd_holder = sb;
+
+// Later on:
+
+umount(sb)
+->kill_block_super(sb)
+|----> [fput() -> deferred via task work]
+-> put_super(sb) -> frees the sb via rcu
+|
+|                                                 nbd_ioctl(NBD_CLEAR_SOCK)
+|                                                 -> disk_force_media_change()
+|                                                    -> bdev_mark_dead()
+|                                                       -> fs_mark_dead()
+|                                                          // Finds bdev->bd_holder == sb
+|-> file->release::bdev_release()                          // Tries to get reference to it but it's freed; frees it again
+   bdev->bd_holder = NULL;
+
+Two solutions that come to my mind:
+
+[1] Indicate to fput() that this is an internal block devices open and
+    thus just close it synchronously. This is fine. First, because the block
+    device superblock is never unmounted or anything so there's no risk
+    from hanging there for any reason. Second, bdev_release() also ran
+    synchronously so any issue that we'd see from calling
+    file->f_op->release::bdev_release() we would have seen from
+    bdev_release() itself. See [1.1] for a patch.
+
+(2) Take a temporary reference to the holder when opening the block
+    device. This is also fine afaict because we differentiate between
+    passive and active references on superblocks and what we already do
+    in fs_bdev_mark_dead() and friends. This mean we don't have to mess
+    around with fput(). See [1.2] for a patch.
+
+(3) Revert and cry. No patch.
+
+Personally, I think (2) is more desirable because we don't lose the
+async property of fput() and we don't need to have a new FMODE_* flag.
+I'd like to do some more testing with this. Thoughts?
+
+[1.1]:
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+ block/bdev.c       | 1 +
+ fs/file_table.c    | 5 +++++
+ include/linux/fs.h | 3 +++
+ 3 files changed, 9 insertions(+)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index e7adaaf1c219..d0c208a04b04 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -969,6 +969,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 		return bdev_file;
+ 	}
+ 	ihold(bdev->bd_inode);
++	bdev_file->f_mode |= FMODE_BLOCKDEV;
+ 
+ 	ret = bdev_open(bdev, mode, holder, hops, bdev_file);
+ 	if (ret) {
+diff --git a/fs/file_table.c b/fs/file_table.c
+index 4f03beed4737..48d35dd67020 100644
+--- a/fs/file_table.c
++++ b/fs/file_table.c
+@@ -473,6 +473,11 @@ void fput(struct file *file)
+ 	if (atomic_long_dec_and_test(&file->f_count)) {
+ 		struct task_struct *task = current;
+ 
++		if (unlikely((file->f_mode & FMODE_BLOCKDEV))) {
++			__fput(file);
++			return;
++		}
++
+ 		if (unlikely(!(file->f_mode & (FMODE_BACKING | FMODE_OPENED)))) {
+ 			file_free(file);
+ 			return;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index d5d5a4ee24f0..ceac9c0316a6 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -121,6 +121,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+ #define FMODE_PWRITE		((__force fmode_t)0x10)
+ /* File is opened for execution with sys_execve / sys_uselib */
+ #define FMODE_EXEC		((__force fmode_t)0x20)
++
++/* File is opened as block device. */
++#define FMODE_BLOCKDEV		((__force fmode_t)0x100)
+ /* 32bit hashes as llseek() offset (for directories) */
+ #define FMODE_32BITHASH         ((__force fmode_t)0x200)
+ /* 64bit hashes as llseek() offset (for directories) */
+-- 
+2.43.0
+
+[1.2]:
+Sketched-by: Christian Brauner <brauner@kernel.org>
+---
+ block/bdev.c           |  4 ++++
+ fs/super.c             | 17 +++++++++++++++++
+ include/linux/blkdev.h |  3 +++
+ 3 files changed, 24 insertions(+)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index e7adaaf1c219..a0d5960dc2b9 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -627,6 +627,8 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+ 		whole->bd_holder = NULL;
+ 	mutex_unlock(&bdev_lock);
+ 
++	if (bdev->bd_holder_ops && bdev->bd_holder_ops->put_holder)
++		bdev->bd_holder_ops->put_holder(holder);
+ 	/*
+ 	 * If this was the last claim, remove holder link and unblock evpoll if
+ 	 * it was a write holder.
+@@ -902,6 +904,8 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
+ 		bdev_file->f_mode |= FMODE_NOWAIT;
+ 	bdev_file->f_mapping = bdev->bd_inode->i_mapping;
+ 	bdev_file->f_wb_err = filemap_sample_wb_err(bdev_file->f_mapping);
++	if (hops && hops->get_holder)
++		hops->get_holder(holder);
+ 	bdev_file->private_data = holder;
+ 
+ 	return 0;
+diff --git a/fs/super.c b/fs/super.c
+index ee05ab6b37e7..64dbbdbed93a 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1515,11 +1515,28 @@ static int fs_bdev_thaw(struct block_device *bdev)
+ 	return error;
+ }
+ 
++static void fs_bdev_super_get(void *data)
++{
++	struct super_block *sb = data;
++
++	spin_lock(&sb_lock);
++	sb->s_count++;
++	spin_unlock(&sb_lock);
++}
++
++static void fs_bdev_super_put(void *data)
++{
++	struct super_block *sb = data;
++	put_super(sb);
++}
++
+ const struct blk_holder_ops fs_holder_ops = {
+ 	.mark_dead		= fs_bdev_mark_dead,
+ 	.sync			= fs_bdev_sync,
+ 	.freeze			= fs_bdev_freeze,
+ 	.thaw			= fs_bdev_thaw,
++	.get_holder		= fs_bdev_super_get,
++	.put_holder		= fs_bdev_super_put,
+ };
+ EXPORT_SYMBOL_GPL(fs_holder_ops);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f9b87c39cab0..d919e8bcb2c1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1505,6 +1505,9 @@ struct blk_holder_ops {
+ 	 * Thaw the file system mounted on the block device.
+ 	 */
+ 	int (*thaw)(struct block_device *bdev);
++
++	void (*get_holder)(void *holder);
++	void (*put_holder)(void *holder);
+ };
+ 
+ /*
+-- 
+2.43.0
+
