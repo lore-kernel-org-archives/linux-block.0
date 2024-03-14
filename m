@@ -1,122 +1,127 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432E72BB13
-	for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 19:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9444273180
+	for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 19:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710444708; cv=none; b=NTU5LyAaW/OzLSk2He6CjSxG8nWKbht97eg5K3e42EZpJp52x3rvujMIOPPaaHHlyMdN+F6l6vYiBsLPHxCiSw17sKfC5PA/+V6FzXA6tnyjVdhYRY1Arqx8Wgq23ze7K77bl0+8J4+Hr/17uMw84iM8YSCEHmXzP3oUzMut/1g=
+	t=1710445282; cv=none; b=syEP5iQrRGEAYhFXsMc0f/oFaCb2j4Bi7AoqJH1W0DjGireqjO8ZnAwiMHGFfEkxIY4qO0kwIVHTbi+P2w1rqvMDBRGBD33FoT5kWk3Al1WbV/OU44fG2hzLESFfKoIBrMlrOElX/vWuzJn2IOW/ppHwVlpgaEUOJRrhIp4gMDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710444708; c=relaxed/simple;
-	bh=aB4H10YZKwGckj93TxrwTiRM/bnShEwil9MnpJZzo64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WDCeO8gzYeDsi62183CndJbn5Kr0FitzEKOWoCRWEagGIkq+mj3pRt84SFkrGGqg7oRWm5c7NayEp8vxCGNO4akyoBl6NDWGNxdjlSOCEsGu6bBbr6GSPM1wvDUPj3WL0VDZdV53kEKNu4gQoyhy6Rq9Y9MnzNys3J+/SZn2Fo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=XvjAuUia; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1710445282; c=relaxed/simple;
+	bh=onEktwJBHB2eXNJMOcrh4ORRowNVQ4kkEBJ7zXW9BpA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MwDqUKlLsHwiKf92PqPO8hILoNqhutle7yWiDzzJRpVojNS9rKEg2x+dLo1OilbdlYoVv5vovKololQgs3xLo7f23LzIjq9elr6WJ5h5uU8V8MB8R9IzZZaxn7r5PC8qblCbj75SrYeGZZO67cSZ+XRiRFFHyOyCP8/8+xcQLzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=oelIcVXH; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XvjAuUia"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-366427fa029so2038205ab.0
-        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 12:31:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="oelIcVXH"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a36126ee41eso167410666b.2
+        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 12:41:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710444706; x=1711049506; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YNdWzucTbA2b4HqU2AzZHwnzmQsiogETbnj1c0h9bsY=;
-        b=XvjAuUia5yJSs0S18Besb9E8WI2dhiPmP6c5xpcb2THOoRqKLN5j/3NYcSDYmuGGz2
-         ECb0rZN6cfU17Naz4e6NLkDPOW/h1DMxbqWBFvmMv6KdOMoJhCAsF/jfJGWVsOL5XCjt
-         s21fkUvSymmO68aI4HAiAFuTc0kgG0YjCdq+EV54inObBpJgILOfs2n42uoDFwrVE1nc
-         SxaDiSd1fP/P5PVnc9zUF+jV6vIG5EImv+DlB+US8cUUT+QOKmoDPWE+C7Gyfi1d0mmt
-         Yk/m9Yv/iZ2Ezl60dghFuA38eUAr4DIGbaA83rc3LgG2q2MMvjZjTwxMn1Bx3nkOCgIx
-         FkFw==
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710445279; x=1711050079; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=onEktwJBHB2eXNJMOcrh4ORRowNVQ4kkEBJ7zXW9BpA=;
+        b=oelIcVXHmAxAgJy++hRkxCKVyUb5JZiFiSwX6PT+K54sa6aWdq6+QmNCPY2vjzOxVB
+         BImHM41VK05Bc3zhxrNYknDQNjth5ZliXoGozxhwA59IZSy1CBuAR6XYnT7CT2fL6jCM
+         V3sbwrtJ5Z5NJ1KIhyEzbilcM0EBtXbCAV5/BEsvzGnPk9W0bqSGRIVyJT5+dQEf+00D
+         d2X/8F/SqKPztERzQ2A8CndAXCWMcPcHc+R54eaVrRYaFCvtXsPNio9ENcThnMzTmhY+
+         /9E8VctpEGb384dNrS242BoPCBSlkHE61f/8fB6eO7PPZS/KhTt2IfJ9T4KT7A5fjmmg
+         mMuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710444706; x=1711049506;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YNdWzucTbA2b4HqU2AzZHwnzmQsiogETbnj1c0h9bsY=;
-        b=e11aAbl8MjGMjUYfE0V2g3sN0uXS5oWMcnc6zohA7goLx89qKNyMGdEEL112RYAhEN
-         Adr5yFIaQe97PB62RkorTxMjl9jSX1qlQcYpsiyoTMuYamg9ycTPmd8HHXalyRS1M1Zn
-         SOY9//Fsnv2tKGSpna71J3PtcUexA5RYy3Fv7TxOMAlA8kc5F2XlUD19qXiG6JDugj3s
-         +gsqfllqR4HHIJIt/F/LAylvHAbaI/mxF8yMMajDS2QSfsubJF/j1BiwB0NQwfIlUzYl
-         PvJ50SFVo8VLgK7ZYUYtPJFyprCqJdqvcvVInPSJvrgSaqR73krgzTeJQDuFCmtuKoa+
-         RUdg==
-X-Gm-Message-State: AOJu0YxL6TsM7t8JTb9I6SKhz6T15W2pGwFCT9EPWnsqLCJTAxXA9wUD
-	978vh8avtKKtbjZhpQy/b1X/ehn53YxyII5fQOt7GxTXzys14GAzkPQyByzyZUYvjryO57YVnOm
-	g
-X-Google-Smtp-Source: AGHT+IHeaQ9qFZyGKBuJMivY/uPhDQofowiVjTFuuY9C8fVTgO6bVZJ7BAjko8vp41VVWZLeQrxGVQ==
-X-Received: by 2002:a05:6e02:142:b0:363:cec2:e344 with SMTP id j2-20020a056e02014200b00363cec2e344mr2641654ilr.2.1710444706399;
-        Thu, 14 Mar 2024 12:31:46 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id y15-20020a92d0cf000000b00365d7fcf12bsm306364ila.14.2024.03.14.12.31.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Mar 2024 12:31:45 -0700 (PDT)
-Message-ID: <32af3475-8e36-4d18-8b5d-0b6c00b0258e@kernel.dk>
-Date: Thu, 14 Mar 2024 13:31:44 -0600
+        d=1e100.net; s=20230601; t=1710445279; x=1711050079;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=onEktwJBHB2eXNJMOcrh4ORRowNVQ4kkEBJ7zXW9BpA=;
+        b=WttEW3Y167hDinyITV3q4MbJdIGiP8iuIjdXm2wvrr037WgizdDB1GJw0tIrD3mW12
+         WqGzKT66VQAwh/8mjfj2e0j5skACk+AfPpsS3vmQzxy1fel5bLluPod0TtKAg2d95bhP
+         ENRb0+mb2tLZv5/j2BwYKRqcQYIgSxJHKrmNm6u3Qf7j0EFSASIplx9chov71QwGD0Ek
+         jPWiWM831A1ZR5jcb+hgFAgunPVA7HDAfSNSuApErmjrO5WLd49rs3Rh6O1L3DA1W93P
+         ZpPWl76+s7S44OFNNstne2aC6/eLTRFGXlGxQ+920rxPkydiM92VSxJntB2A58hbOMaC
+         1wPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAREY9h8L6mrKaHmX7qgd1xIR4h8OmWuNSFU6LHO9iksdbHdd5l46tdYMXhD+dnUYUs4UUiVeCrFeZHmp3PWE+6myYbYoHjpLcqlI=
+X-Gm-Message-State: AOJu0Yxo/OOW4GrDIOq+AJRD+qLyG/woO9T7YNb/V0TkFSjHwtd5OAhU
+	6G87gKKJYpPrsGfR8sefBAAbkXeQPDnD2TauB2N2cjlz4uyCE5gjfPMepKvtlWU=
+X-Google-Smtp-Source: AGHT+IH8czNlNagx2kXUJ8xAoaQoY9sfM4cx5YqDd4DehyKpFMZ6MjCDM1M528wBaOxegt8hCWznIQ==
+X-Received: by 2002:a17:906:c0cc:b0:a46:2100:da56 with SMTP id bn12-20020a170906c0cc00b00a462100da56mr1804417ejb.55.1710445278810;
+        Thu, 14 Mar 2024 12:41:18 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id o11-20020a1709061b0b00b00a3fb9f1f10csm972383ejg.161.2024.03.14.12.41.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 12:41:18 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>,  Jens Axboe <axboe@kernel.dk>,
+  Christoph Hellwig <hch@lst.de>,  Keith Busch <kbusch@kernel.org>,  Damien
+ Le Moal <Damien.LeMoal@wdc.com>,  Bart Van Assche <bvanassche@acm.org>,
+  Hannes Reinecke <hare@suse.de>,  "linux-block@vger.kernel.org"
+ <linux-block@vger.kernel.org>,  Andreas Hindborg <a.hindborg@samsung.com>,
+  Wedson Almeida Filho <wedsonaf@gmail.com>,  Niklas Cassel
+ <Niklas.Cassel@wdc.com>,  Greg KH <gregkh@linuxfoundation.org>,  Matthew
+ Wilcox <willy@infradead.org>,  Miguel Ojeda <ojeda@kernel.org>,  Alex
+ Gaynor <alex.gaynor@gmail.com>,  Gary Guo <gary@garyguo.net>,
+  =?utf-8?Q?Bj=C3=B6rn?= Roy
+ Baron <bjorn3_gh@protonmail.com>,  Benno Lossin <benno.lossin@proton.me>,
+  Alice Ryhl <aliceryhl@google.com>,  Chaitanya Kulkarni
+ <chaitanyak@nvidia.com>,  Luis Chamberlain <mcgrof@kernel.org>,  Yexuan
+ Yang <1182282462@bupt.edu.cn>,  Sergio =?utf-8?Q?Gonz=C3=A1lez?= Collado
+ <sergio.collado@gmail.com>,  Joel Granados <j.granados@samsung.com>,
+  "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,  Daniel Gomez
+ <da.gomez@samsung.com>,  open list <linux-kernel@vger.kernel.org>,
+  "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+  "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+  "gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+In-Reply-To: <87plvwsjn5.fsf@metaspace.dk> (Andreas Hindborg's message of
+	"Thu, 14 Mar 2024 20:22:54 +0100")
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+	<20240313110515.70088-2-nmi@metaspace.dk> <ZfI8-14RUqGqoRd-@boqun-archlinux>
+	<87il1ptck0.fsf@metaspace.dk>
+	<CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com>
+	<87plvwsjn5.fsf@metaspace.dk>
+User-Agent: mu4e 1.12.0; emacs 29.2
+Date: Thu, 14 Mar 2024 20:41:10 +0100
+Message-ID: <87h6h8sisp.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?B?UmU6IOetlOWkjTogW1BBVENIXSBSZXZlcnQgImJsb2NrL21xLWRlYWRs?=
- =?UTF-8?Q?ine=3A_use_correct_way_to_throttling_write_requests=22?=
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>,
- =?UTF-8?B?54mb5b+X5Zu9IChaaGlndW8gTml1KQ==?= <Zhiguo.Niu@unisoc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Damien Le Moal <dlemoal@kernel.org>,
- Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
- =?UTF-8?B?6YeR57qi5a6HIChIb25neXUgSmluKQ==?= <hongyu.jin@unisoc.com>
-References: <20240313214218.1736147-1-bvanassche@acm.org>
- <cf8127b0fa594169a71f3257326e5bec@BJMBX02.spreadtrum.com>
- <cf7e6d94-63fd-4ef5-bbdb-9c3877d8560a@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <cf7e6d94-63fd-4ef5-bbdb-9c3877d8560a@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/14/24 11:08 AM, Bart Van Assche wrote:
-> On 3/13/24 18:03, ??? (Zhiguo Niu) wrote:
->> Just as mentioned in original patch, "dd->async_depth = max(1UL, 3 * q->nr_requests / 4);", this limitation methods look likes won't have a limit effect, because tag allocated is based on sbitmap, not based the whole nr_requests.
->> Right?
->> Thanks!
->>
->> For write requests, when we assign a tags from sched_tags,
->> data->shallow_depth will be passed to sbitmap_find_bit,
->> see the following code:
->>
->> nr = sbitmap_find_bit_in_word(&sb->map[index],
->>             min_t (unsigned int,
->>             __map_depth(sb, index),
->>             depth),
->>             alloc_hint, wrap);
->>
->> The smaller of data->shallow_depth and __map_depth(sb, index)
->> will be used as the maximum range when allocating bits.
->>
->> For a mmc device (one hw queue, deadline I/O scheduler):
->> q->nr_requests = sched_tags = 128, so according to the previous
->> calculation method, dd->async_depth = data->shallow_depth = 96,
->> and the platform is 64bits with 8 cpus, sched_tags.bitmap_tags.sb.shift=5,
->> sb.maps[]=32/32/32/32, 32 is smaller than 96, whether it is a read or
->> a write I/O, tags can be allocated to the maximum range each time,
->> which has not throttling effect.
-> Whether or not the code in my patch effectively performs throttling,
-> we need this revert to be merged. The patch that is being reverted
-> ("block/mq-deadline: use correct way to throttling write requests")
-> ended up in Greg KH's stable branches. Hence, the first step is to
-> revert that patch and tag it with "Cc: stable" such that the revert
-> lands in the stable branches.
+Andreas Hindborg <nmi@metaspace.dk> writes:
 
-Indeed, no amount of arguing is going to change that fact. Zhiguo, it
-caused a regression. Rather than argue on why the change is correct,
-it'd be much more productive to figure out a future solution.
+> Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> writes:
+>
+>> On Thu, Mar 14, 2024 at 9:58=E2=80=AFAM Andreas Hindborg <nmi@metaspace.=
+dk> wrote:
+>>>
+>>> Yes, good point. Another option suggested by Miguel is that
+>>> `__blk_mq_free_request` need not be exported at all. We can make it
+>>> non-static and then call it from
+>>> `rust_helper_blk_mq_free_request_internal()`. Then only the latter will
+>>> be in the kernel image symbol table, which might be better in terms of
+>>> not exposing `__blk_mq_free_request()` directly.
+>>
+>> The helper is not needed, i.e. what I meant was to make it non-static
+>> and add it to `include/linux/blk-mq.h`.
+>
+> The way the current code compiles, <kernel::block::mq::Request as
+> kernel::types::AlwaysRefCounted>::dec_ref` is inlined into the `rnull`
+> module. A relocation for `rust_helper_blk_mq_free_request_internal`
+> appears in `rnull_mod.ko`. I didn't test it yet, but if
+> `__blk_mq_free_request` (or the helper) is not exported, I don't think
+> this would be possible?
+>
 
--- 
-Jens Axboe
+I just tested what you suggested Miguel, and I get a link error for
+`__blk_mq_free_request` being undefined when the module is linked. This
+is even though the code that calls this function lives in the `kernel`
+crate, because it is inlined.
 
+BR Andreas
