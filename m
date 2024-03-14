@@ -1,168 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39117350B;
-	Thu, 14 Mar 2024 18:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89AA74E0C;
+	Thu, 14 Mar 2024 18:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710441121; cv=none; b=EZoUVEHF++UUYYt9fb4/hpjdkwvysB7w0VUIEI9O2BDkfjP0eTCf6ipD2zul41ZM0Vay59ZbvyxbNemQA6K2KZ/JiceRnVHizaFGaAt7qQxyvwHP8orXEaXHYptopGpdU5Qq6kM/b2cyAyj/DouG1jAfxb0+2g+ND+dPzIeYFjc=
+	t=1710442563; cv=none; b=Or0uC0MkYbZK0BKLs8ezbJv1VwOSXcS8HqnsHl+m/LM0xc887vcx6QprLlOMEuCloT6RTTeCkZMmc+5bYtSVgxEa6mHXrJd1ZYRjMAaCDhzYGzkzCNaGpgZ7jxqL9On73aKzrw3AT/CgaoBUzSS5wTDUM/WG2SurMtszRIsanZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710441121; c=relaxed/simple;
-	bh=mvdnoLfy3ROkxmfR7t2H/wROfPIdheF/nBqPtCWPX4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=caLa/U/pxbHZR3c2cgLYTWNfRiA+6oquCYVT0Zmwd3BR/OrkH/rbhZk1lY5pP3oWRjph2JZwAmOZLHBdGaQYp7AYEQdESRFcyNEAwWBKfS3IFbfttuB+96ugNrUdTjPMYwMOfjTBCQ7G8BRIlMWMFp5hWA2G/VbK2/563kweVw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A243FC43390;
-	Thu, 14 Mar 2024 18:31:55 +0000 (UTC)
-Date: Thu, 14 Mar 2024 14:34:06 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Alison Schofield <alison.schofield@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
- linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
- iommu@lists.linux.dev, linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
- selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org,
- linux-wpan@vger.kernel.org, dev@openvswitch.org,
- linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
- Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <20240314143406.6289a060@gandalf.local.home>
-In-Reply-To: <ZfMslbCmCtyEaEWN@aschofie-mobl2>
-References: <20240223125634.2888c973@gandalf.local.home>
-	<ZfMslbCmCtyEaEWN@aschofie-mobl2>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1710442563; c=relaxed/simple;
+	bh=lXCDCtLjliLRIDCwXgxxcrhvVk5QMWTHOJ5iNfcya/Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p2aLyKEgeoMLvZNqJllz8UrZmuz+rQf+j+g2Cu+6onOTl/lgVwxTgRZ2AASkUJmj8p1XZsjp4zL1OlZK1r4ZYcWsgd7cQPbsYnzdqZMh4kBVxEZi/QMo54hFHy000G1/9ynKx4cYC0ZgSuLyuN9Phv5fXSFwAEL1GfrsT8BPFVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wd1TFFLy; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wd1TFFLy"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6e6b5831bc8so1326351b3a.0;
+        Thu, 14 Mar 2024 11:56:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710442561; x=1711047361; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lXCDCtLjliLRIDCwXgxxcrhvVk5QMWTHOJ5iNfcya/Q=;
+        b=Wd1TFFLyOeHSF/XO1RBto/Fwk4d1G88e6p28Fj6SiD8WG1B/FhK4cGTKX6eKqdp6QX
+         UwOXe6VOhVuCfkhOOAS0sweAZPr5J2n1KVSo0Bb8Yeers6HglXyKpudQrLBCcLORNw07
+         Cki86xVd24WY72snZfo4MTsX8/UD7yT/C3gPOO/BkmIVA4qQ6UBnjvoAzzziIDzXPW/l
+         cL1zegk3wCa6WeEeZYP3plU0BWIksL3Gj2R50NHxzcumR/AmpngPCY8s9Y31shaWDqKE
+         M/xX7fv3pUYLjW0FbXEeJ38GL/wEpbvtqSv4l3Pkd2pyohrygX4cxtxJsdJSta5SxtsE
+         Kw6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710442561; x=1711047361;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lXCDCtLjliLRIDCwXgxxcrhvVk5QMWTHOJ5iNfcya/Q=;
+        b=mAjmlWakjp3C0pD0v0gx2nFR3rAaxtPYvrSi64YN7wtSso5XcCbT0pLRtQXMz4+4as
+         g+QUeUqLm8O68b5WYheLRmqS6g9Y4SD3XS2Ey81CNSs/FB9oResiieYk1iUY+oefYprk
+         XDxXJnr7QTFJnaCEqAdrMn6HDmCfldEHQcBuuERVFsnxeTZKOG8DzScGSv/QXQOzH7dA
+         V+4L/7O6xJH5DaHQUREIBsfj/NbXtaTqGOoQv1yaFHwwTDhdyGim8TpA5UgjFDAAph2O
+         eLHmQq3vJGLLLM2PETxN9QYAt76NXZQB/64aZHb8cglUuGTdHlrNBnnATWnWC3w0jRrH
+         dfUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFMLJgXMlo5W5IcCjn5hKyZRX2MHfPzM3wCaOwBkx3zzGWoF+tJCWMDbORoxRPWIBDWgBwX4ko9BQFdI6Xs/9pUw7ZpJYQq6BSFb2Pd889PyE/HBoTMCfMgZ3KmUc3iLHBK4xcwr10wv4ex9Cq5uFZC2sBtzuOHy1UlO5jksj9NATpgaGBXLxDKw==
+X-Gm-Message-State: AOJu0YxUU6xI5qoPgpZXFBmarP3Zy4dhHtVJpMqALRzasKIzDyYvnVsC
+	F42GEXHeP5tk9v5JnocTMgBL8K0MyggQ5wLKL0WtYS0OVQtiF/GhyA3PVL6GEHz3Rfke8QePH1c
+	gxTSN9vS9G2joXCkt8pdR691ctLk=
+X-Google-Smtp-Source: AGHT+IEnu03FR8JFSQifycdpZdIBld8Nxy1K+eVI2/iw75BYuHlS1IUh/3pjIIQrZ4L7UK2XEJZc66O8iR5FIsCb+Z8=
+X-Received: by 2002:a17:90b:290:b0:29b:9e72:8ade with SMTP id
+ az16-20020a17090b029000b0029b9e728ademr2608700pjb.13.1710442561101; Thu, 14
+ Mar 2024 11:56:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240313110515.70088-1-nmi@metaspace.dk> <20240313110515.70088-2-nmi@metaspace.dk>
+ <ZfI8-14RUqGqoRd-@boqun-archlinux> <87il1ptck0.fsf@metaspace.dk>
+In-Reply-To: <87il1ptck0.fsf@metaspace.dk>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 14 Mar 2024 19:55:49 +0100
+Message-ID: <CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+To: Andreas Hindborg <nmi@metaspace.dk>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, 
+	Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, 
+	Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Yexuan Yang <1182282462@bupt.edu.cn>, 
+	=?UTF-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, 
+	Joel Granados <j.granados@samsung.com>, 
+	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez <da.gomez@samsung.com>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, 
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, 
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 14 Mar 2024 09:57:57 -0700
-Alison Schofield <alison.schofield@intel.com> wrote:
+On Thu, Mar 14, 2024 at 9:58=E2=80=AFAM Andreas Hindborg <nmi@metaspace.dk>=
+ wrote:
+>
+> Yes, good point. Another option suggested by Miguel is that
+> `__blk_mq_free_request` need not be exported at all. We can make it
+> non-static and then call it from
+> `rust_helper_blk_mq_free_request_internal()`. Then only the latter will
+> be in the kernel image symbol table, which might be better in terms of
+> not exposing `__blk_mq_free_request()` directly.
 
-> On Fri, Feb 23, 2024 at 12:56:34PM -0500, Steven Rostedt wrote:
-> > From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
-> > 
-> > [
-> >    This is a treewide change. I will likely re-create this patch again in
-> >    the second week of the merge window of v6.9 and submit it then. Hoping
-> >    to keep the conflicts that it will cause to a minimum.
-> > ]
+The helper is not needed, i.e. what I meant was to make it non-static
+and add it to `include/linux/blk-mq.h`.
 
-Note, change of plans. I plan on sending this in the next merge window, as
-this merge window I have this patch:
-
-  https://lore.kernel.org/linux-trace-kernel/20240312113002.00031668@gandalf.local.home/
-
-That will warn if the source string of __string() is different than the
-source string of __assign_str(). I want to make sure they are identical
-before just dropping one of them.
-
-
-> 
-> > diff --git a/drivers/cxl/core/trace.h b/drivers/cxl/core/trace.h
-> > index bdf117a33744..07ba4e033347 100644
-> > --- a/drivers/cxl/core/trace.h
-> > +++ b/drivers/cxl/core/trace.h  
-> 
-> snip to poison
-> 
-> > @@ -668,8 +668,8 @@ TRACE_EVENT(cxl_poison,
-> >  	    ),
-> >  
-> >  	TP_fast_assign(
-> > -		__assign_str(memdev, dev_name(&cxlmd->dev));
-> > -		__assign_str(host, dev_name(cxlmd->dev.parent));
-> > +		__assign_str(memdev);
-> > +		__assign_str(host);  
-> 
-> I think I get that the above changes work because the TP_STRUCT__entry for
-> these did:
-> 	__string(memdev, dev_name(&cxlmd->dev))
-> 	__string(host, dev_name(cxlmd->dev.parent))
-
-That's the point. They have to be identical or you will likely bug.
-
-The __string(name, src) is used to find the string length of src which
-allocates the necessary length on the ring buffer. The __assign_str(name, src)
-will copy src into the ring buffer.
-
-Similar to:
-
-	len = strlen(src);
-	buf = malloc(len);
-	strcpy(buf, str);
-
-Where __string() is strlen() and __assign_str() is strcpy(). It doesn't
-make sense to use two different strings, and if you did, it would likely be
-a bug.
-
-But the magic behind __string() does much more than just get the length of
-the string, and it could easily save the pointer to the string (along with
-its length) and have it copy that in the __assign_str() call, making the
-src parameter of __assign_str() useless.
-
-> 
-> >  		__entry->serial = cxlmd->cxlds->serial;
-> >  		__entry->overflow_ts = cxl_poison_overflow(flags, overflow_ts);
-> >  		__entry->dpa = cxl_poison_record_dpa(record);
-> > @@ -678,12 +678,12 @@ TRACE_EVENT(cxl_poison,
-> >  		__entry->trace_type = trace_type;
-> >  		__entry->flags = flags;
-> >  		if (region) {
-> > -			__assign_str(region, dev_name(&region->dev));
-> > +			__assign_str(region);
-> >  			memcpy(__entry->uuid, &region->params.uuid, 16);
-> >  			__entry->hpa = cxl_trace_hpa(region, cxlmd,
-> >  						     __entry->dpa);
-> >  		} else {
-> > -			__assign_str(region, "");
-> > +			__assign_str(region);
-> >  			memset(__entry->uuid, 0, 16);
-> >  			__entry->hpa = ULLONG_MAX;  
-> 
-> For the above 2, there was no helper in TP_STRUCT__entry. A recently
-> posted patch is fixing that up to be __string(region, NULL) See [1],
-> with the actual assignment still happening in TP_fast_assign.
-
-__string(region, NULL) doesn't make sense. It's like:
-
-	len = strlen(NULL);
-	buf = malloc(len);
-	strcpy(buf, NULL);
-
-??
-
-I'll reply to that email.
-
--- Steve
-
-> 
-> Does that assign logic need to move to the TP_STRUCT__entry definition
-> when you merge these changes? I'm not clear how much logic is able to be
-> included, ie like 'C' style code in the TP_STRUCT__entry.
-> 
-> [1]
-> https://lore.kernel.org/linux-cxl/20240314044301.2108650-1-alison.schofield@intel.com/
+Cheers,
+Miguel
