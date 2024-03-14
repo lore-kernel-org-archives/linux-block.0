@@ -1,177 +1,150 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64C36BB2F
-	for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 11:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27DB6F060
+	for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 12:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710414683; cv=none; b=JDukJKXCDIUzy85FoFswgYmnI0B5Ichynn1k3dcsXmJWMhDKNlgiFEAiC+cLCL8lgAeJE9/P+Zk+X/wTa0TyiEYGOd1L14zL6kx/gzr8GqqbqmDeI/D5i0qnGZeZwxpJdV8MkAA+ITWLO+I2SNcm02BBI5AxtIs5dbKwdWh5d1w=
+	t=1710418473; cv=none; b=b3RRN2ADtS4BWOHUiPRDoLhi53MaMCWaFQMjdUTVoAWmGjFrh07qb1xjuZIsk3VUYOR3jwHxaIpeHa3FlHkLzpdtgn0gh9dBFqc0dlb9GFdjM45ZZA1vfytuDTTAts1YQlMVmLUrEylJxvdC4kwyx1laDJ60LKHGFVQXSsI5prs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710414683; c=relaxed/simple;
-	bh=P+m+O7sV8DJGBecxlDsA/ZgtdEhvWYPqlNa0vOf+KOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JEKAHb6tnSDprCOjIcvu8vTOaifzzOhxFxU05EuB7Eq88yIeRGR+b2H45snh/LhSRbUT+OwYhee9cFQIs3WBcRradcNOlowTnjRLd391AuSc/s2CnkMb0zWhZChRCf0Z3UDFyEISiMFsHAlSMLlx4Jc1mYpowzmKkuEbAp5x0M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dA3hZZsb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ZvCMRLuf; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nMAuxX+V; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lr6ZdZWu; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1710418473; c=relaxed/simple;
+	bh=dYc6f0exUqcPfUdHJH+EyAtgZLzfz/x37SqOqu03g6E=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fz9xwytb+rjsqOlGXgdfBIpQh+tmjjVWOx0xs5oDYphgWZ0xT2nM++z82FZhavFrPwFe5izsiKlLbOyPTyqa7NH1ZIkKzcqvaciNii8zxIhN5DQ5fL5ihmh96orNlM6MVgp79J9fhyHMlTfkI5jWBezotLpVTT/OR9/ZuI52Ui8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QZIn9zRY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dA3hZZsb";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ZvCMRLuf";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nMAuxX+V";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lr6ZdZWu"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id C227921940;
-	Thu, 14 Mar 2024 11:11:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710414680; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZIn9zRY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710418470;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=x+0GCPTxz5vbimKHK5Ubp44Hcp2QBp7tdBrr4d8qZUw=;
-	b=dA3hZZsbLnTduYtbPU5Xy1LWBT5ZL0idRwcdyxniTK1dsexH9N1pyV1+OQ5Y2PKL8BNIkk
-	Xv9yz8JLRgUuNdgRg1ko1Jl4wnTd0QqmY0Yq3a0t2TYzX9A6KvLXqsmDnbrXPCrp1GBl8l
-	xes9u8s/oO8ZnJQmmuWv951tGrJbH1E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710414680;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x+0GCPTxz5vbimKHK5Ubp44Hcp2QBp7tdBrr4d8qZUw=;
-	b=ZvCMRLufTxpjpqhxF2LIVnHQTgl1A/b7ptkThp11sf98XCacoFvD1P+i9f9ZEo0o5XpVC8
-	qp8vX4iYfYiDGSCQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710414679; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x+0GCPTxz5vbimKHK5Ubp44Hcp2QBp7tdBrr4d8qZUw=;
-	b=nMAuxX+VBbTHqa7aEbYVL1TD1QGlFHl14fbKlqdLbxwOmDkVbjyCzEIeVHLReNy3kf7weG
-	GPuhEur0hcswZhHnRhL0NfCoD4StpdbTv0GP8HiuOmYgBJ3Zxgzai4HGfDbLuzPcZB6s+4
-	CgpH/qwIpVi09wncPEm7KeSNDaQ+Dzo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710414679;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x+0GCPTxz5vbimKHK5Ubp44Hcp2QBp7tdBrr4d8qZUw=;
-	b=lr6ZdZWuwwA5D7DJL801T9EuiAIKmy3oe1a8KPPoryPpZJ1GXMBuK7OoLUKz/t6m2hui9O
-	tTkYs1wbFLrUc4Cg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 890371386E;
-	Thu, 14 Mar 2024 11:11:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id HvxkH1fb8mViXQAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 14 Mar 2024 11:11:19 +0000
-Message-ID: <886d8bde-e608-4e15-b13d-c891b4689b4f@suse.de>
-Date: Thu, 14 Mar 2024 12:11:18 +0100
+	bh=mlOOg1k7Te+LxzN88lGdQ/vUh9O6lwZLPkMDl/ywJH0=;
+	b=QZIn9zRYWYTWqX6Hz4s7qGkcrO7tek16VeHGFFdsMPjxcwUMh2AHYBw8QIPO/83P6ztNCo
+	cXiOG0CvMsOzYVr3D+JYBqg9edaZRaiWvV1/TNcQ6oSkV+J8ShHiqud05Glevhd6EgfpA0
+	+wuaU63J2dqKqmAdOqJa6v5pc8MUzhg=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-398-1HXjuefLNeuDq3v4frOEzg-1; Thu, 14 Mar 2024 08:14:29 -0400
+X-MC-Unique: 1HXjuefLNeuDq3v4frOEzg-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-29c74083a99so365812a91.0
+        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 05:14:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710418468; x=1711023268;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mlOOg1k7Te+LxzN88lGdQ/vUh9O6lwZLPkMDl/ywJH0=;
+        b=BKEW59iqevx2iO9RL5c0OiGJm0rqbI+t5U5f7IHTPG6YslH/fu9ePs4RGNFuYChVrK
+         1Z1UOL2MrRu3WcwpH0ZO1GaG/6m1wdPnpMHQ8aTVJMV7zRN6EseCEWw4SQfrzNZ1g3ld
+         Gq1XjuD8nXBSLczgI9ISHD99K1lESqJTnCbxNOEHn0toW7M/4w32JkAQYI5YDy08NfhA
+         wnkqDoVdaVNlMkTSKqb5JHqGgSc/rvlCn+4vRTvg1sMJINYbLGhgiBcg5qb7XCxgTaeg
+         kU7+NW6z8ConypDsZW0JTKPoxDdva3+E3L8e+ifb59lOPPBzo9N/n8hDXO3xjUZe7Rrh
+         fzTA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnLJmw27OVZqoh70WRDdqKdzaeUolMX3MUp8peebApH+Uoazf7zPTeB5HahpO2WjfmzLoAzOfgMQPel4mcXCQcvjlmHDWC76kPFuM=
+X-Gm-Message-State: AOJu0Yx3rLGJc72vQREHFIETE88cxe8qc22YetY1E816iRAeTyV/tx2v
+	JGhSvm7RURhx3ukpF4Vw3Inv0cl5QThiNxZcZC+CzNPI8ZL4sl/HxESo1+6Z+39gx7Ss+sM8s4i
+	2mYAoBtb1Hipn2lhP2xkuq+9ryPSoCUGPHsoWsg1fG13c1djjw0B2WTbNh/gP
+X-Received: by 2002:a17:902:d501:b0:1dd:5a49:7a98 with SMTP id b1-20020a170902d50100b001dd5a497a98mr1640043plg.3.1710418468364;
+        Thu, 14 Mar 2024 05:14:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHu1lypda1SV+Aw1YsnOcyfZmjXmrL3YHG/ruzVs1Q49QJ8abqSFdoRXbnSQERHu40ZJxaIAw==
+X-Received: by 2002:a17:902:d501:b0:1dd:5a49:7a98 with SMTP id b1-20020a170902d50100b001dd5a497a98mr1640004plg.3.1710418467916;
+        Thu, 14 Mar 2024 05:14:27 -0700 (PDT)
+Received: from pstanner-thinkpadt14sgen1.remote.csb (nat-pool-muc-u.redhat.com. [149.14.88.27])
+        by smtp.gmail.com with ESMTPSA id lh6-20020a170903290600b001db40866e09sm1522844plb.260.2024.03.14.05.14.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 05:14:27 -0700 (PDT)
+Message-ID: <c38358c418d4db11221093d7c38c080e4c2d737f.camel@redhat.com>
+Subject: Re: [RFC PATCH 0/5] Rust block device driver API and null block
+ driver
+From: Philipp Stanner <pstanner@redhat.com>
+To: Bart Van Assche <bvanassche@acm.org>, Andreas Hindborg
+ <nmi@metaspace.dk>,  Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
+ <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal
+ <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>, Niklas Cassel
+ <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew
+ Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
+ <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun
+ Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?ISO-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin
+ <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, Chaitanya
+ Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Yexuan Yang <1182282462@bupt.edu.cn>, Sergio =?ISO-8859-1?Q?Gonz=E1lez?=
+ Collado <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>,
+ "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
+ <da.gomez@samsung.com>, open list <linux-kernel@vger.kernel.org>,
+ "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ "gost.dev@samsung.com" <gost.dev@samsung.com>
+Date: Thu, 14 Mar 2024 13:14:05 +0100
+In-Reply-To: <855a006d-5afc-4f70-90a9-ec94c0414d4f@acm.org>
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+	 <855a006d-5afc-4f70-90a9-ec94c0414d4f@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: brd in a memdesc world
-To: Matthew Wilcox <willy@infradead.org>, Pankaj Raghav <p.raghav@samsung.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- linux-block@vger.kernel.org,
- Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-References: <CGME20240312174020eucas1p29cf41360c934c674fd1f36a808078e25@eucas1p2.samsung.com>
- <ZfCTfa9gfZwnCie0@casper.infradead.org>
- <d470e16b-b7bf-451e-a6e2-eb68adcc2635@samsung.com>
- <ZfHwXLr54bWl1fns@casper.infradead.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ZfHwXLr54bWl1fns@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nMAuxX+V;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=lr6ZdZWu
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.50 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 RCPT_COUNT_FIVE(0.00)[6];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 NEURAL_HAM_SHORT(-0.20)[-0.997];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Score: -4.50
-X-Rspamd-Queue-Id: C227921940
-X-Spam-Flag: NO
 
-On 3/13/24 19:28, Matthew Wilcox wrote:
-> On Wed, Mar 13, 2024 at 06:15:26PM +0100, Pankaj Raghav wrote:
->> On 12/03/2024 18:40, Matthew Wilcox wrote:
->>> Hi Jens,
->>>
->>> I'm looking for an architecture-level decision on what the brd driver
->>> should look like once struct page has been shrunk to a minimal size
->>> (more detail at https://protect2.fireeye.com/v1/url?k=fdf5d9a0-9c7ecc9a-fdf452ef-74fe4860008a-d5306bf365c2b9b6&q=1&e=cbceae8b-61fb-4e3e-8f7c-6717d9b2431d&u=https%3A%2F%2Fkernelnewbies.org%2FMatthewWilcox%2FMemdescs )
->>>
->>> Currently brd uses page->index as a debugging check.  In the memdesc
->>> future, struct page has no members (you could store a small amount of
->>> information in it, but I'm not willing to commit to more than a few bits).
->>>
->>
->> Shouldn't we change brd to use folios? Once we do that, this will not
->> be a problem any more right?
-> 
-> We certainly could change brd to use folios.  But why would we want to?
-> Hannes' work always allocates memory of a fixed size (a fixed multiple
-> of PAGE_SIZE).  Folios are a medium-weight data structure (probably
-> about 80 bytes once we get to memdescs).  They support a lot of things,
-> eg belonging to an inode, having an index, being mappable to userspace,
-> being lockable, accountable to memcgs, allowing extra private data,
-> knowing their own size, ...
-> 
-> None of those things are needed for brd's uses.  All brd needs is to
-> be able to allocate, kmap and free chunks of memory.  Unless there are
-> plans to do more than this.
-> 
-The primary goal of my patchset is to make brd a test-bed for the LBS 
-work; devices with a sector size larger than 4k are really hard to come
-by. But really, it's just a testbed, and I'm not sure whether there's
-a need for that in the general audience.
-I can resubmit if you want ...
+On Wed, 2024-03-13 at 11:02 -0700, Bart Van Assche wrote:
+> On 3/13/24 04:05, Andreas Hindborg wrote:
+> > This is the second version of the Rust block device driver API and
+> > the Rust null
+> > block driver. The context and motivation can be seen in cover
+> > letter of the RFC
+> > v1 [1]. If more context is required, a talk about this effort was
+> > recorded at
+> > LPC [2]. I hope to be able to discuss this series at LSF this year
+> > [3].
+>=20
+> Memory safety may land in C++ in the near future (see also
+> https://herbsutter.com/2024/03/). If memory-safe C++ or memory-safe C
+> would be adopted in the kernel, it would allow writing memory-safe
+> drivers without having to add complicated bindings between existing C
+> code and new Rust code.
 
-As for the memory overhead, I guess it only makes a noticable difference
-when moving to hugepages, and have brd allocate hugepages only.
-But that is future work for sure.
+Correct, but it would also most likely allow to just arbitrarily ignore
+the "modern, memory safe C" (or C++) and write it the old way.
 
-Cheers,
+Those discussions are, below the surface, frequently in truth about the
+question: Can you (and do you want to) _force_ people?
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Ivo Totev, Andrew McDonald,
-Werner Knoblich
+The Kernel's C already has more memory safety than standardized C:
+There's devres, and since last year there's the __cleanup attribute.
+=E2=80=93 but the thing is, you can just ignore it and do it the old way.
+
+Once you give people freedom (which is necessary frequently), you'll
+get people who ignore "the right way to do it". You certainly get them
+once thousands of people are participating in your project.
+Actually, Rust in userspace has a similar problem: Your coprogrammers
+can call unwrap(), just ignoring those neat Result types and blow up
+your thread. So you have to review and reject that.
+
+One of the stronger arguments behind the push for Rust is that the
+language by design forces you to obey, because otherwise the compiler
+will just reject building.
+
+
+P.
+
+
+>  Please do not take this as personal criticism -
+> I appreciate the effort that has been spent on coming up with great
+> Rust bindings for the Linux kernel block layer.
+>=20
+> Thanks,
+>=20
+> Bart.
+>=20
+>=20
 
