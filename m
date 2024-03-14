@@ -1,111 +1,118 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47176763F3;
-	Thu, 14 Mar 2024 20:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F239E175A1
+	for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 23:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710449805; cv=none; b=TXa9RnzJC1BpBik4so3sxnM7H+Z7sIJZQ1ufXVa7VXvgvzMvhAauhpkZtxiUoQP22iI1kU8R9VotaF5t1Et0XfJJcJwBSfEP26s5JWNiG3EB3HizcebcqF+pYIAdZXWglNLYQhHOf0cJPojhXEQWfMB0EYLcd504tYE1645O82Q=
+	t=1710459315; cv=none; b=l/toagJqOUS68TYT23zq2cdeU1Qt7fq8YzB7DYGJHv4RSvUcHLCvwqeBwZGlzQ2aWpC3DQyydjD7N113xE96bwVyvhoOQOnWwXgCIg38zSD1fo7JswhD/iSxAVbniDNIRfwH8vNwhDKbEtJX/ufTGAH2reAigL762dz83uyAa2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710449805; c=relaxed/simple;
-	bh=vVexG+y35tQ9uiNulQsBhDXB6JraRtnHZp6M/RG+asg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QEkMQuH5vGHB+zpmlDRkl9A+09NCb2Aqv9iKce2ckDFaQCuOWbh06WavVv0kGf0Vw193+PZLJvJD3J4ZbxjUILMyWB4aie25LW+fKwhjKrUk2dXNkZWbm0uQPjk0HvmUqkbA5jQ8HnhkqA1R6Xtf9e6TSZt4D0ZnnlFZoBQeabo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ArR2IdJa; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1710459315; c=relaxed/simple;
+	bh=O1Pff7eAihB48Bz8XaabnNfcFgNRo7LQ5mqmWeDX7ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fkc01p1sCt7fJ5UJP7hCcDV1E/3rn62P/wgDgkhTzuA/Ka6i8n2wZKGmqrrevFQwmPJP/BX/Xz3PgcfoEwyCqfvF7cAp6LCIT5cKIqiRaA/weg5p/xqvNO1X22SnNIYCu49CnO67FkIQhS1Pj5SvHy2OZQZuweoTz052fbC75O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=niDgSi84; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArR2IdJa"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-29c731ba369so1156382a91.3;
-        Thu, 14 Mar 2024 13:56:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="niDgSi84"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dddbeac9f9so11118965ad.3
+        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 16:35:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710449803; x=1711054603; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vVexG+y35tQ9uiNulQsBhDXB6JraRtnHZp6M/RG+asg=;
-        b=ArR2IdJaBNB6LDskwV1CvU0y3BCddnsUJ15ZQea5mhdl7HVHeBJRHhocwskvkAvXXe
-         qBvoUfuOsQiVhjhHP5XviKFca454LBq9X+5i5tfeX6pumPU73Rs6TiNktmE3X0SgPRPS
-         DBt0/e9LJPsSZ8YXe3Bn4akZSlNtlusudo04KjDOGX2FrURlekhQbaGOJrAAenmEVya5
-         Z2ojscwHEZSjHMgVEQ84R1j4bw0YkDRjlPpGYPmH+NwS7lXYuXIgm+w1TWCEXRriM3B7
-         MN+5git9hsrT4varHBvm0kvKypVo57gH19mYR6zTX8C0KxX0WRkHfig1DeJV8P35RljF
-         8cvA==
+        d=gmail.com; s=20230601; t=1710459313; x=1711064113; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W6Xw2waQfNCPf/M5RAIMX7gnuEX08ICVGrEBe0UGAx0=;
+        b=niDgSi84WUb0I+gFj0Ymx1udyjPwWBViN1p4EIUeRiM9W83xOU3vconegwNN//rFh+
+         2MKRbnWswmVrXtcQJlWDacN1MZV35tMm/OnS0MGFyzYdNkeI/Zv3yEDXbIjRv5KzldBs
+         rZjCMQAr9I3BiztAac+v2oxwKtbNatuRPgGRoSAjyyTPVxOXYTZiftw9Hy/ZSbwYeLa7
+         0ol/f278i7IoZsaGciEizZ3G99SHrkbr83gDlguUqh5Z6CzmmrTBLY6wzfSlbGJvVTpv
+         OoMOvspzTryReh2rcTTpI6XZbJz1ReND5KNwiQqILWnSdvEQ+u56U9Lk4FZ/BHXyPfxl
+         GcaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710449803; x=1711054603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1710459313; x=1711064113;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vVexG+y35tQ9uiNulQsBhDXB6JraRtnHZp6M/RG+asg=;
-        b=ZyBysuIFfrncaJz1Il8NT2/4Iwrlynu6sez/MsZVzKrUmE0LuaJWgdhb5ZN9wsu7F2
-         dBdfKs0jpchXD7/cOVmEOAoQudOTcvk02gq0svwdjEhN/3EEHmGcp+DP3CvkuKnoTKEb
-         a8L+lTxfJ+4DiqFS5xyT0dvpm3JretDgD0PGAPyFMngnaSTUf54KGKnmVNIMlJajQf/i
-         P5aqCbwcS9VaDfNLW5KoW7oSXm1mKMInKO1/Tv3LV1Vzer178H/sPkQofem+P6lMWNlr
-         DCIHJwX8s4FZicC+R12/eHtj3AsErjhgoI7bngSIlSn4MCRZbF+4scZIMlbg0/eEGzo7
-         r1KA==
-X-Forwarded-Encrypted: i=1; AJvYcCWapOBqqoIcYdP6w4WpsOTttTH5uyaNdDMhwdtytTp76wLc4g+kUq5x05C6bzDlOce6H4qCTKehtonb+1f2RRpza6omA/KAiCM3BL9SMFNEHG9uaHNPDmsrRYRMwWzaUcGfjri0zLh/X4VJyDnHB3Xay2uzYJJxT1AoGy/j+xPff21+ZzN3Nv8ytg==
-X-Gm-Message-State: AOJu0YwvP3tjm8Y4kvTfixOqi/OPEsIp921MhOc4dzALu3kK68F6Vf0g
-	Lmkcp27Udat9h6os2GS8HSRkVKbrKSl7SC+83bBgx5UIRXnIVU5IOTEPXORFq/44JhDls2PnZSS
-	w2CtTDJ2sza1BqK+ZnoqDjy/Wvk8=
-X-Google-Smtp-Source: AGHT+IG4wxqkAxjdwKlg1zhlT5ni1nrZhArv7cmYlou+sBdAxdO9JwjEtP6sfS1qBKW4ZUbRHqGkBMyDjHAU8zKgLeM=
-X-Received: by 2002:a17:90a:ce12:b0:29b:f2b1:6973 with SMTP id
- f18-20020a17090ace1200b0029bf2b16973mr2930051pju.20.1710449803547; Thu, 14
- Mar 2024 13:56:43 -0700 (PDT)
+        bh=W6Xw2waQfNCPf/M5RAIMX7gnuEX08ICVGrEBe0UGAx0=;
+        b=DpWw3JdaQiusPpYrBpG9XMt7psnujx/NTFtznnb7e2v7p2EkGEKBx4Jf81SyJUt1aH
+         zXwPJaKG/IU3NX5wFyj+dGpcSUiF7qyb922edRWGzkxB8OA6XYQyNwLtg3VA7nreGw11
+         +vrnDKXdUjwpySRQyRXCKXQFeaEIUR7EYBIlVVDrjNcF6NqqGPrBh4OUSne1qbkqv+5X
+         Bv7OmE+dxcktmcZMjN2wwdZ2B3IRzFeHYjg3UWoPz0WGQgcSAdRS7QgqAEThEd6e423O
+         fuPvWxHu6vhRJxXONh+qaC29eY4WpSh76z5Nvu/Zv60GEo4CBlsVBntdD6HOLEBhBiwJ
+         1LnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUGYyBBT0QUcF/xuuyeTqyXLbH5gujtuRQmzW55dpVThpA5xLH5XE0doWUVQNLLU2UGEjm2/5v4RYIIeqZ0yA45DvPk6wcGMwYj0mE=
+X-Gm-Message-State: AOJu0Yyr7TOE+XKVf6diAPd+0JdVXbRA9TH7GJNkkqg9G5Zdnzi+Zql5
+	jncrW7E1RS/dMd9ssHfKzUwBh8POoD45tsNZ1zYSYgowvAMAJRjt
+X-Google-Smtp-Source: AGHT+IFu17ZuKR7DK43CijnrmYB1eppOiMpA8+39kWpLCxZM8OpG8tgYl+e7xkSytpOsl3aA211JyA==
+X-Received: by 2002:a17:903:32c1:b0:1de:c6d:ce1e with SMTP id i1-20020a17090332c100b001de0c6dce1emr4032164plr.50.1710459313262;
+        Thu, 14 Mar 2024 16:35:13 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id u9-20020a170902bf4900b001deeac592absm509322pls.180.2024.03.14.16.35.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 16:35:12 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 14 Mar 2024 16:35:11 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Matthew Sakai <msakai@redhat.com>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: [PATCH v4 02/39] dm vdo: add the MurmurHash3 fast hashing
+ algorithm
+Message-ID: <ea57f231-f78e-4a55-bf85-c5d50e17237e@roeck-us.net>
+References: <20231026214136.1067410-1-msakai@redhat.com>
+ <20231026214136.1067410-3-msakai@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240313110515.70088-1-nmi@metaspace.dk> <20240313110515.70088-2-nmi@metaspace.dk>
- <ZfI8-14RUqGqoRd-@boqun-archlinux> <87il1ptck0.fsf@metaspace.dk>
- <CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com>
- <87plvwsjn5.fsf@metaspace.dk> <CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
-In-Reply-To: <CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 14 Mar 2024 21:56:31 +0100
-Message-ID: <CANiq72noqwU9_wC28Emc2LNyD70JFcS+4MXWuwYUTUWq8ragCg@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
-To: Andreas Hindborg <nmi@metaspace.dk>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, 
-	Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, 
-	Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Yexuan Yang <1182282462@bupt.edu.cn>, 
-	=?UTF-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, 
-	Joel Granados <j.granados@samsung.com>, 
-	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez <da.gomez@samsung.com>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, 
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, 
-	"gost.dev@samsung.com" <gost.dev@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231026214136.1067410-3-msakai@redhat.com>
 
-On Thu, Mar 14, 2024 at 8:41=E2=80=AFPM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> In any case, if we really want to avoid exporting the original symbol
-> (perhaps so that "only Rust" can use it -- or someone trying hard to
-> bypass things on purpose), then we could still avoid the helper and
-> instead write a non-generic `kernel`-private Rust function instead.
+On Thu, Oct 26, 2023 at 05:40:59PM -0400, Matthew Sakai wrote:
+> MurmurHash3 is a fast, non-cryptographic, 128-bit hash. It was originally
+> written by Austin Appleby and placed in the public domain. This version has
+> been modified to produce the same result on both big endian and little
+> endian processors, making it suitable for use in portable persistent data.
+> 
+> Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
+> Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
+> Co-developed-by: Ken Raeburn <raeburn@redhat.com>
+> Signed-off-by: Ken Raeburn <raeburn@redhat.com>
+> Co-developed-by: John Wiele <jwiele@redhat.com>
+> Signed-off-by: John Wiele <jwiele@redhat.com>
+> Signed-off-by: Matthew Sakai <msakai@redhat.com>
+> ---
+[ ... ]
+> +
+> +#define ROTL64(x, y) rotl64(x, y)
+> +static __always_inline u64 getblock64(const u64 *p, int i)
+> +{
+> +#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+> +	return p[i];
+> +#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+> +	return __builtin_bswap64(p[i]);
+> +#else
+> +#error "can't figure out byte order"
+> +#endif
+> +}
+> +
+> +static __always_inline void putblock64(u64 *p, int i, u64 value)
+> +{
+> +#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+> +	p[i] = value;
+> +#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+> +	p[i] = __builtin_bswap64(value);
+> +#else
+> +#error "can't figure out byte order"
+> +#endif
+> +}
 
-The advantages would be that we get the export done automatically and
-that we could write in Rust, e.g. with restricted visibility.
+On sparc64, with gcc 11.4, the above code results in:
 
-But we could need `#[inline(never)]` (or ideally `#[used]` if it could
-go on functions) or `#[no_mangle]` (but we would lose the mangling).
+ERROR: modpost: "__bswapdi2" [drivers/md/dm-vdo/dm-vdo.ko] undefined!
 
-Anyway, the simplest is to export the original symbol, but we could
-consider to provide support one way or another for this kind of
-"helpers" (i.e. leaving the current helpers as those for macros and
-inline functions), so that it is clear what symbols are only exported
-for Rust use (and not other C code).
-
-Cheers,
-Miguel
+Guenter
