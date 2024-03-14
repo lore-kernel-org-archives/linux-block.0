@@ -1,209 +1,169 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D435CDD0;
-	Thu, 14 Mar 2024 07:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710403169; cv=fail; b=oJ3GDxiTdyIadrXtN2kytKtHWPVwfv7MKB3H6gDZDiUFVzVa+PLEDEVVEv79Sn6uFW+vNE/0ZN5Ymfk2qDOeBCXUyjbtQ13KViamnVEkN3ZN+8upUYXLeHeYG8/VjYUjBrIxSPiFLceKTQpmIBvmGYcuDpLZIgmaNGfqXqpLo1s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710403169; c=relaxed/simple;
-	bh=lcJyxJ0j0aZkJOpVcUzCaDOZELRbwVJ1V2vCCCJl0K8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BE1Me20HRA4kRgb3r9iPNaBBAb2oRlVFIRfNG9NdQ2PYU6DjZ6IibP5U6zANXJY8e/YNNwHLn9ssfRcBjdCAKe8UPEV31601gM8O/4oKJxIbuTqrP8bNGrBp2RrdcfyxuteeKGJqalKM1ZRHUNgzyt5iKrBSArmw66c3RzTwye8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=N3yA9KbG; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=IbsuDwBP; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739416BB56
+	for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 08:58:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710406713; cv=none; b=Wot5jMs5Zvj+Nz1EkOPIpANRssPxVRHCpZ17g25MQy2pwMpjPn9ncNc4DM9Lo5LcsQYKE9/FKPOYqpTo4hnzCeQ8SX3LfaXT/W8gkQN4QLY69xeriyDRQiPdUPVRSS+dbReExSzWgiKmyu+QhDdbd9uQSBZHccQhhJi4HtvU4vc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710406713; c=relaxed/simple;
+	bh=jkjR2w3eWbGlskRSUh2BEg4E8O6gDXTWPhByDoL1bi0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=azOrfAbrSjz7WbSsNQgl/aoxisrkhn7lVglYl9eEyU0BRcBPrCXN7Qz8Y8Yrc+4a7MiH06RU7LBIOVYnMqbE8ztH00Ol5MVHCAov9zPjdZIU59UJD6Ce7t95VajpLY3mmRg0wKmhPFX1jX9dSh6n6FFTS7pKvvWSoQN7645JW7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=wxNpqt70; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="N3yA9KbG";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="IbsuDwBP"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42E7mqR4011544;
-	Thu, 14 Mar 2024 07:59:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=XqNPNg/tbOY85lpeRSB8z+V6muy32f7mWZQOj/4/4Co=;
- b=N3yA9KbGutXBe9gJ5O/xsm5zrlz9DDxA5dfzjOmXWm3QV0A4o3zdgt5utx11cqAC8FM+
- TmJRGCXBd1102na2kzysFmE0nHLOZhcOk1UvrP1J1SeMtT6RIA3ffWRLcbKzD8M//WH/
- 8E4cFSMJveD3TwJCkwM03gXaLD7QV4wicleRH9+yDkrNTn8iqCNdrqevRj3sMdgYW/mc
- rtsl9CLqpYQlCU/h52rfsT1GoEe/ZOBundCcIWYTFeW5+aef5Zx/WBN68X1s+bCYAd8q
- KMcfLA6CFAqubOI4Y4ZvvZFC3OUpZOO+kdHjVEUH3vGmuTfp7aCx4fXqFK9Q6vFg8+/T cQ== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wrfcujy6a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Mar 2024 07:59:04 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42E7FJPO009104;
-	Thu, 14 Mar 2024 07:58:49 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wre7g85ec-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Mar 2024 07:58:49 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zv3Z63Ffx2VeUNk0jgaRrcgkVqKtBv2veA4Fx2g4FXJaTH1j8Zpd//7Dnn2gYhyWpxlMdLxdB86sLYmgN0hSueNglNNfX4qwi+doqhw7Jm+iDUxGdyMFNGXLsNgsmz2MKsIqtgn/LdXey8d9fpUX3jV1qTuWrqrEGcM9cfSqeVchNc3knQHyUCqekG4EXzAopickSVKaHW6Ys89WVLkPH/N7SaWeoOO1QM8K5nPO7sZbBuVC79MDmN1Y/4kxrhGyfkdLotcN6nweaGW6OiPRYrRSOh2Gpi6Zxa75byAJnXV9e/RDtpr5RMulxaast54sigaubjswpYU7CQNPmCBreQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XqNPNg/tbOY85lpeRSB8z+V6muy32f7mWZQOj/4/4Co=;
- b=IwxpwMntrNekCSpH6BoPJeOAuPIKQdCp9NWtc3MFg1ci1HN0PUdWacirc0eOrQdY/xLoymEGM/K/NFhVFfGrlhTorsYMz9RNbEP9UvMBBImrRojxIbz0NYSvauG6klqtqDx650cZKa9EZOqLd5q9rpfc0xNkpclbWY3a5XUb+7QqYjNi0nJqscTgR9vjb7WgmPB/Uge2fLYHDxtEJ5csWLETD7EBDlxfOy4SiuyiINfnVcK9ff++ZoUopwHuk16Uu608r63awd2Y2jE1+fKKCSLfMG/t5RxcHkUu/MELd3WeBCRA0fpnHUIHMTUcAim7BUdt7y0eZo3eNjjR5W/xFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="wxNpqt70"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a28a6cef709so89801966b.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2024 01:58:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XqNPNg/tbOY85lpeRSB8z+V6muy32f7mWZQOj/4/4Co=;
- b=IbsuDwBPmzVejNGDdhgUlXpe4FEwAnIAEIY8oJhfCS3D3O/ONVs3hTLexQ5Y3Y7ovaAKn+rtRS5//z2HnawEjoqIFcmWn3GrqxCjtktoPZaJGpKj0kszIHyR4RQBEHuepRiatRPrkBZ58YvB5YF+kjU2dFapiYUqUuuuQd2lW8E=
-Received: from PH8PR10MB6290.namprd10.prod.outlook.com (2603:10b6:510:1c1::7)
- by CY8PR10MB6537.namprd10.prod.outlook.com (2603:10b6:930:5b::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36; Thu, 14 Mar
- 2024 07:58:46 +0000
-Received: from PH8PR10MB6290.namprd10.prod.outlook.com
- ([fe80::7fc:f926:8937:183]) by PH8PR10MB6290.namprd10.prod.outlook.com
- ([fe80::7fc:f926:8937:183%6]) with mapi id 15.20.7362.035; Thu, 14 Mar 2024
- 07:58:46 +0000
-Message-ID: <0197fbc8-41ac-4b85-a523-5e5bbe02f3ca@oracle.com>
-Date: Thu, 14 Mar 2024 13:28:38 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Revert "block/mq-deadline: use correct way to throttling
- write requests"
-Content-Language: en-US
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        stable@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>,
-        Zhiguo Niu <Zhiguo.Niu@unisoc.com>
-References: <20240313214218.1736147-1-bvanassche@acm.org>
-From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-In-Reply-To: <20240313214218.1736147-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TYAPR01CA0162.jpnprd01.prod.outlook.com
- (2603:1096:404:7e::30) To PH8PR10MB6290.namprd10.prod.outlook.com
- (2603:10b6:510:1c1::7)
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710406709; x=1711011509; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JfJRdvNmTUKtc18a61BTNZaQgzgnNE8vdtGOTX+Hn14=;
+        b=wxNpqt70cIc14ItKxiTJTKI355oQBzEXo0VvZZIyYPKth8rkRCIzw0pGAJt17ph+Ku
+         39ic6+0jg4YfdVPzSRQAq0zF+rlo9Jk8RsT0a++ZUCmDDCAPM030Ei4i16DhurXDk7SD
+         6G9pHY7Gjcejnsi3prPlH69vMrWaiiFdv24qcSKpcuJMjGq3EqMr4XmIbT5jMO1uidZd
+         gyHb10GLTNHIe0WQN76n7C3XjZPVaYjcQXoyl1Ml6qJV4CCtHgshrh++j+L5shDgZuFp
+         2WfKOgRihHrDyxPeVnISocJIVXd/31aG3PNq6iYt4Ju+x2zTi5Co1cj0pQDv0WpVggxi
+         PNUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710406709; x=1711011509;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JfJRdvNmTUKtc18a61BTNZaQgzgnNE8vdtGOTX+Hn14=;
+        b=pqRqH3K34bR2JbeLHVEGfO6lAe/q0GbktC73VAqgxTSsMGed/U7NTNAdzoe3RgLYgN
+         xQeBYepWsPqit7btKuvdCb+AQZOMkhZxQwilLBxa1GC/frkEW80xC397rUCekgOuN6Wv
+         mRFyU7haGzMb4JSUGhyYxy1cpwJRsInwAbQuZ5kVIlP1/TEfxJvKvwOkOyf5BiUCbYRT
+         sIwMNqj4yaomaSZ1rE7S7KHoUkzmTRBNsZcG9MljGUpG19L5Eb6VJvF9h9hzl68l09vD
+         m6wmRG/8uqDpFWecNQd9NFLx/ebS8cOZ2SlBEXCDbUvu4loKAi3+d67uvWYwtdd5ZW/8
+         ZfbA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8jYDJe+KDlFMAvg9wWH5j7gdln+Q6iFelbMB2faZyIM75yA3CdBVIKDzoAM/KwkvrVylmF+XiWAj2Ica8/v3s9qok2OnbNt2W1PI=
+X-Gm-Message-State: AOJu0YwM3jJmDxxuH/XTsJ4HmSUst2MESZLIrD+Y2LSTKzq5kA1tGt3F
+	ullAp2UnSxqLyV+LNrugx4MbkUZZ98DAdJR8XN5n7BxLRaDfpLdY+vPgXXtFr6Y=
+X-Google-Smtp-Source: AGHT+IGDNDCN5CCMaL99FT0i0uR6q6MMaRkgS+4KGrsnIavL/ICpH3WKWV3WV4mufqGGK2bFBpuXwA==
+X-Received: by 2002:a17:906:7ccf:b0:a46:2649:16f9 with SMTP id h15-20020a1709067ccf00b00a46264916f9mr28844ejp.2.1710406709328;
+        Thu, 14 Mar 2024 01:58:29 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id dn21-20020a17090794d500b00a465ee3d2cesm484705ejc.218.2024.03.14.01.58.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 01:58:28 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
+ Busch <kbusch@kernel.org>, 	Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart
+ Van Assche <bvanassche@acm.org>, 	Hannes Reinecke <hare@suse.de>,
+  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
+ Hindborg <a.hindborg@samsung.com>,  Wedson Almeida Filho
+ <wedsonaf@gmail.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,  Greg KH
+ <gregkh@linuxfoundation.org>,  Matthew Wilcox <willy@infradead.org>,
+ 	Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
+  Gary Guo <gary@garyguo.net>,  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>,
+  Benno Lossin <benno.lossin@proton.me>, 	Alice Ryhl
+ <aliceryhl@google.com>,  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis
+ Chamberlain <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,
+  Sergio =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
+ Granados
+ <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
+ <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
+ list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
+ <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
+ <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
+ <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+In-Reply-To: <ZfI8-14RUqGqoRd-@boqun-archlinux> (Boqun Feng's message of "Wed,
+	13 Mar 2024 16:55:39 -0700")
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+	<20240313110515.70088-2-nmi@metaspace.dk> <ZfI8-14RUqGqoRd-@boqun-archlinux>
+User-Agent: mu4e 1.12.0; emacs 29.2
+Date: Thu, 14 Mar 2024 09:58:23 +0100
+Message-ID: <87il1ptck0.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR10MB6290:EE_|CY8PR10MB6537:EE_
-X-MS-Office365-Filtering-Correlation-Id: de6ba68b-d8c4-4780-9662-08dc43fc9381
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	dXatfrntZFuyz/SMdkL7LI+Q0Ciooltuvhg9SBembFbHITMpUUSFWs6ttTIMJkcENchypjg2gQKDOHgIhQ7UQ8sbE8c9Mubrabf5n260KleSR1KdlD2tMlLKqoYJe4CioTfKdl0JbCWmsYikT5CV/p97QAv3kp3vOSrU6ts3VuAbyPlbpJxFiQDyAol+wtS0ByuEZYoSEm+7c6eiNv3YQoEuc6ofABgAiaEiA2bQamHy+AwbDPIZ56mJs1HC46j4rj3C7yJrjw+pi+jdKX95pgNJ0jT9yuZByKC4IQH37NY/lhRel2eCL9owcZf9BoC3CEfOwa35OfQX5uTVS9yHJWDxmI3gKAbbQKJxTkxxuxrZnobJ4yvBGG09QN+1oqC9bIUowd7rsHzByOu5rNbZye7xAp6bWD7vlatJCDO4fmQv8uaerRRv/pfXldEtvK4NDHTkk6iNtW/7QNMD9K2AnGd1Ia95V1yg1lvfBw/HO4x2ttgQSGxJE2cv8MiZBHw8M0YpxfaywjDNZSttF/ERv7eKdfry0T6mYBdbgIT9MmGyuBqV4yjGSLsv4d2maueZGagcuaz+T6icodTcmygA6IAvSE5wrM41umO5eRdX06A=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR10MB6290.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?WlR2QU1OQi85Vis0VE9LLyswRUhuSWx1eUdBUVhFN0EzR1BXYkZ1NFRwaW9S?=
- =?utf-8?B?cW42ZEpoSWNpdDFpRU15TlNHRkduWWxVMXJFcnFHeHdrZkF3M1NxL3psNGdk?=
- =?utf-8?B?V2RJOVBYUHNVTnA3ZG0xem03MWxtYllWNmVlb3h2Zzc5M2ErYWJUUE9yUHNm?=
- =?utf-8?B?dlkwSU9tZmhhYzFsWnFTQUM5Yi81SmdFLzl3S2YvMHViaStKOW1ZUTJ0RHh6?=
- =?utf-8?B?eUJwTmJST2dQVGc4eHNjbFBDOFgvcTB6dWhrZml4U1EzWFNURVIxVmRkeWph?=
- =?utf-8?B?MnN3cmM4SUNIbkdpYlIyOGt6MDJWRVNwYTF1ck9hb3lDRW9ZYThwTWhWQm9G?=
- =?utf-8?B?d0I1aW90ajlDTmx4d2d6VjVTU25RWGlRZlVwQTlXM1ovWFJxOGhTUWMvR3I2?=
- =?utf-8?B?U3JwdVVsTWR3TXBWT29zeVBKallGV1NCWXdlSkYwd2U4dlk0WW9BeXg1T2lq?=
- =?utf-8?B?RVRxekE2Z2ZCVXh1WlJsa2t4OTZkT2g2dnk5OElTR1l4TW9Kc0dNTi91d2o3?=
- =?utf-8?B?clF5dDdkMEVibUhqSXllemdZcVNvZjNXNXhWVGZmR0NURGgwVVhjb0xPanc3?=
- =?utf-8?B?WThmT0M4YWFhWlNtTmFlS1V0SlkydEJuYXRTM1pibGxvZC9sRWZodFMxUDd3?=
- =?utf-8?B?MnFKWkx6a1Zkd1dxOG1kZnhiSFJXNTJIeG9xZmhxRk1ySFJGNTArNmVpTmg3?=
- =?utf-8?B?ZHk1VDJCZnluckY0K0xoTEFHNHFnbG9IN1J3TE5va3Y2a3o2alJYMTRPWEVO?=
- =?utf-8?B?Z05OdHBUeEJvYVE0bjhHcldKVEFKampOaW1OV0VrbEt5NFhiSzVjdlF6UmxT?=
- =?utf-8?B?RUlCN0VGaEx5TDFrTlN3OU52Q3RrM28rRFdocWxQdjEvOURBbVdEV3V3MmZS?=
- =?utf-8?B?TEdyU0x5eElIM2xZSTY1Wnp5T3pYeVVsMnh1cnFWT1MrR3NpQVhBZWdSMkdm?=
- =?utf-8?B?RW9KY1NuWldkM1k2enMrdzRhUjZMK3BIc05Fc3VzVFFYOWdqZk9kVDZQeTFH?=
- =?utf-8?B?dXB5RlpnbkJERXFrSHpyeWsvK2FoSm9nOElMYjUzYkptWnI0OC9VNlRIVjAv?=
- =?utf-8?B?V1ppbzFYMEp3Wnc4M0h0Ui9qeEx5dFdMRHYvWDF3Q1pUTFd4ckxaK2lyaWZH?=
- =?utf-8?B?akxiTFFUNE5hTWVZTFpYV3Z6a1hCc0N2TGNWSEI1c283WUh1S1JHY09QNmtT?=
- =?utf-8?B?UDFnVnY2U1QrclEwaUJrUWhZd3BpYmpoZlJIVnB4Uzlib25sdy8xN0lYY1U2?=
- =?utf-8?B?dmZZK2NhWDRhWjlWOUZCaWdEWTkrN0dkUXFRSGh1OWRScTQ4K0lRRGVaM09J?=
- =?utf-8?B?aWdVaUswM0ZlSkV6U2l5VWU1NlVNYTB3ejFzU0ZLSnIzaE9OUVdDK2psMDBG?=
- =?utf-8?B?QTE4bjEyb05GUXkzaUFDbzlDRVZDOXFsWTBUdWRuMjEzRnVodWZUaWlIR1Yx?=
- =?utf-8?B?MEQ1MUIyVGhVbk9zdnNQZnZNU1JBR0xXOGk1VlNBVTh6dWxSNG9NNWhiNWk4?=
- =?utf-8?B?c1krZnhjRlduaFhIUkhaRStPV1BsVWE3UnMvK2xDYXoyN2xhY0VRRE1RbVh4?=
- =?utf-8?B?U21hS2JjSk1aek5XVStWWldCV2tnckxIOFlabDl0WkFNalkzRHFBRmxXT0dG?=
- =?utf-8?B?SnZXYVJuZzJkNjdWaXZPRDVlZkd2N3FETjNIWE0veW9zYU00S2FsVG1pdnFS?=
- =?utf-8?B?M0VqRlliUTgxM24rRDU4ZnVMRE9SeVZuUDJ1eWNtaGdYZ21NOVBaWTdIeTht?=
- =?utf-8?B?c1paL2pzWkpYT1pUZDBiWWhSMjJ6SmZtOHJvY3JsdCt5RFlCc3JMM0ZvcXFn?=
- =?utf-8?B?a1Q3OW1lNUxsRTZhVEZocXR6Y1E0dGhUZEJqQUhocURtQ2owdzVwWDZQNXJY?=
- =?utf-8?B?aGxMZFdJZ0g1OEhLRllMd2tDaGltR1lYUGdWejV2TzNhK0dvWDI2bXRZSmhs?=
- =?utf-8?B?NTN5dmdvelJjTFpFWXdmQXBEOVY4U2tGYXNMOXpnNlR1dU01TWNYcy9sR0xT?=
- =?utf-8?B?YXVwK3hwSTVIL2ZrdmxKRUlIT1UzVm1BQ3owL2JCblBObDBsNEhubEhwbUo1?=
- =?utf-8?B?elR4SllPeUZ1M2dBaVlwR2xhUnp2QTFaMTVUOXZjNStYSUVRQkNLOVpiZ2hk?=
- =?utf-8?B?eUNtRnZHdVd4ZnFPMU94NzZnWGM4Zm5ST1d1Nzh2UDdaMjJORW0reXZJQjMv?=
- =?utf-8?Q?L6bTaoa7w4bSfdsX4sR0bek=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	xUkrbfV+B3eSjZGCHV80x1EQOfOC7l0vBNKOvMK0fYgjaYjzdZtgjxTmjfuoTDtAPjFREcWOv9SequDb7ICZb+dAq0UvsEB3fxQsN6DYzuT+s+xXNI2eVnQlJ3LryVZOqIdAEqlBzabWznfMuZ43UmxoTmZrzHsPcMSZBQpQ9E78GTZf4CP2X+Ot85yLqNeU7d5vLATH2ZzLD2fPwKAGGdmTUDbO1Q0o7o3CxOygtL6n59RhNd9Qo2alLeP3UlxwFe46lLi4PhHViLaAvqQCDg5h8Ua+tRYgSOZ8k1K32IKtymAyUN/qnJd/pYNhIBePelrGnzeam3tqE2yqUlPY+sW4lrOmA3s78sJvGeUm87IsELhXrQbdL+Z2Qak8MMMsmdg+U5P605m4f4V/stTj2lqWb9L1eSAKJ7uY+1rlwraEuACDnGqzw/MgXXEt+cO4kkyifigGfiLOnaCp4lNHUOsYnSBmFyXiFUiE2CLqBcZ4r3Hq8IRtdRGrgdcDlFgOGiTAKSO/O0GM/INdC6PTWXUZBNnpLppdQt2LNUINjpKnzf4uQLElgFCa03t3yQl1tQ/7sHC8IXv0JJKvQzhmhaDMAcA0JyRU7pLeVMXNgvQ=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de6ba68b-d8c4-4780-9662-08dc43fc9381
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR10MB6290.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 07:58:46.7603
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5LEErGF+IDmJrLkABNntO5g/fJUGyuf/wl7+fRvsOfknYF5OINpEaX6NWFV8RibWjtJcRo1HnIr6g2/4thV0d1ZvbfCFKVcNSWpMk9RDuKAWIzNgEbN6oRy6sKsYU1zx
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6537
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-14_05,2024-03-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0
- mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403140053
-X-Proofpoint-ORIG-GUID: eSDSYFUjoF-T3UE8TlB8CD3Tqpmsyt2G
-X-Proofpoint-GUID: eSDSYFUjoF-T3UE8TlB8CD3Tqpmsyt2G
+Content-Type: text/plain
 
-Hi Bart, Jens and Zhiguo,
+Boqun Feng <boqun.feng@gmail.com> writes:
 
-On 14/03/24 03:12, Bart Van Assche wrote:
-> The code "max(1U, 3 * (1U << shift)  / 4)" comes from the Kyber I/O
-> scheduler. The Kyber I/O scheduler maintains one internal queue per hwq
-> and hence derives its async_depth from the number of hwq tags. Using
-> this approach for the mq-deadline scheduler is wrong since the
-> mq-deadline scheduler maintains one internal queue for all hwqs
-> combined. Hence this revert.
-> 
+> On Wed, Mar 13, 2024 at 12:05:08PM +0100, Andreas Hindborg wrote:
+>> From: Andreas Hindborg <a.hindborg@samsung.com>
+>> 
+>> Add initial abstractions for working with blk-mq.
+>> 
+>> This patch is a maintained, refactored subset of code originally published by
+>> Wedson Almeida Filho <wedsonaf@gmail.com> [1].
+>> 
+>> [1] https://github.com/wedsonaf/linux/tree/f2cfd2fe0e2ca4e90994f96afe268bbd4382a891/rust/kernel/blk/mq.rs
+>> 
+>> Cc: Wedson Almeida Filho <wedsonaf@gmail.com>
+>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>> ---
+>>  block/blk-mq.c                     |   3 +-
+>>  include/linux/blk-mq.h             |   1 +
+>>  rust/bindings/bindings_helper.h    |   2 +
+>>  rust/helpers.c                     |  45 ++++
+>>  rust/kernel/block.rs               |   5 +
+>>  rust/kernel/block/mq.rs            | 131 +++++++++++
+>>  rust/kernel/block/mq/gen_disk.rs   | 174 +++++++++++++++
+>>  rust/kernel/block/mq/operations.rs | 346 +++++++++++++++++++++++++++++
+>>  rust/kernel/block/mq/raw_writer.rs |  60 +++++
+>>  rust/kernel/block/mq/request.rs    | 182 +++++++++++++++
+>>  rust/kernel/block/mq/tag_set.rs    | 117 ++++++++++
+>>  rust/kernel/error.rs               |   5 +
+>>  rust/kernel/lib.rs                 |   1 +
+>>  13 files changed, 1071 insertions(+), 1 deletion(-)
+>>  create mode 100644 rust/kernel/block.rs
+>>  create mode 100644 rust/kernel/block/mq.rs
+>>  create mode 100644 rust/kernel/block/mq/gen_disk.rs
+>>  create mode 100644 rust/kernel/block/mq/operations.rs
+>>  create mode 100644 rust/kernel/block/mq/raw_writer.rs
+>>  create mode 100644 rust/kernel/block/mq/request.rs
+>>  create mode 100644 rust/kernel/block/mq/tag_set.rs
+>> 
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 2dc01551e27c..a531f664bee7 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -702,7 +702,7 @@ static void blk_mq_finish_request(struct request *rq)
+>>  	}
+>>  }
+>>  
+>> -static void __blk_mq_free_request(struct request *rq)
+>> +void __blk_mq_free_request(struct request *rq)
+>>  {
+>>  	struct request_queue *q = rq->q;
+>>  	struct blk_mq_ctx *ctx = rq->mq_ctx;
+>> @@ -722,6 +722,7 @@ static void __blk_mq_free_request(struct request *rq)
+>>  	blk_mq_sched_restart(hctx);
+>>  	blk_queue_exit(q);
+>>  }
+>> +EXPORT_SYMBOL_GPL(__blk_mq_free_request);
+>>  
+>
+> Note that for an EXPORT_SYMBOL_GPL() symbol, you can just add the
+> corresponding header file in rust/bindings/bindings_helper.h:
+>
+> +#include <linux/blk-mq.h>
+>
+> and you will be able to call it from Rust via:
+>
+> 	bindings::__blk_mq_free_request()
+>
+> in other words, rust_helper_blk_mq_free_request_internal() is probably
+> not necessary.
 
-Thanks a lot for helping with this performance regression[1].
+Yes, good point. Another option suggested by Miguel is that
+`__blk_mq_free_request` need not be exported at all. We can make it
+non-static and then call it from
+`rust_helper_blk_mq_free_request_internal()`. Then only the latter will
+be in the kernel image symbol table, which might be better in terms of
+not exposing `__blk_mq_free_request()` directly.
 
-
-Regards,
-Harshit
-
-[1] 
-https://lore.kernel.org/all/5ce2ae5d-61e2-4ede-ad55-551112602401@oracle.com/
-
-> Cc: stable@vger.kernel.org
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-> Cc: Zhiguo Niu <Zhiguo.Niu@unisoc.com>
-> Fixes: d47f9717e5cf ("block/mq-deadline: use correct way to throttling write requests")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   block/mq-deadline.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index f958e79277b8..02a916ba62ee 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -646,9 +646,8 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
->   	struct request_queue *q = hctx->queue;
->   	struct deadline_data *dd = q->elevator->elevator_data;
->   	struct blk_mq_tags *tags = hctx->sched_tags;
-> -	unsigned int shift = tags->bitmap_tags.sb.shift;
->   
-> -	dd->async_depth = max(1U, 3 * (1U << shift)  / 4);
-> +	dd->async_depth = max(1UL, 3 * q->nr_requests / 4);
->   
->   	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
->   }
-
+BR Andreas
