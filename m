@@ -1,55 +1,55 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62265757E4;
-	Thu, 14 Mar 2024 19:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47176763F3;
+	Thu, 14 Mar 2024 20:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710445306; cv=none; b=kMV59j2RYgq+8dWtA8j7bBGRALxWq2MqMM22/DAinLnkZQhdEU/v+JgEpe09sM0Dl/I+h3lN2eohWkSwUVeS8Z9fq/rHnsSabPyIa1TCAsggV+LX3PNVPNY+wL6NI8u2v1Sxg3hPo0s9mboKiDtOfMRnwYhZ9xe+1JkK2lEpIp0=
+	t=1710449805; cv=none; b=TXa9RnzJC1BpBik4so3sxnM7H+Z7sIJZQ1ufXVa7VXvgvzMvhAauhpkZtxiUoQP22iI1kU8R9VotaF5t1Et0XfJJcJwBSfEP26s5JWNiG3EB3HizcebcqF+pYIAdZXWglNLYQhHOf0cJPojhXEQWfMB0EYLcd504tYE1645O82Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710445306; c=relaxed/simple;
-	bh=Ec/8nrm/d7FLFDatEQHA6MtRCtdWILB72zpzpZwxGvE=;
+	s=arc-20240116; t=1710449805; c=relaxed/simple;
+	bh=vVexG+y35tQ9uiNulQsBhDXB6JraRtnHZp6M/RG+asg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mjd4gMh+/Nupl8DyKgwRSjR00u/YsIsmylUFO/GsYpyFXRjSW/JFM3Tb22umxH1dX1sLR0PmGUSTPRm6FLv7y3iedqtd/747NH2UYe6R7I0Wqa2nV8XV/Kco2uakEPhd5UCzs1d1pto1a0cTskmNEto6kcll/UXWl1Q2wlTkEs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k+5X+orP; arc=none smtp.client-ip=209.85.210.182
+	 To:Cc:Content-Type; b=QEkMQuH5vGHB+zpmlDRkl9A+09NCb2Aqv9iKce2ckDFaQCuOWbh06WavVv0kGf0Vw193+PZLJvJD3J4ZbxjUILMyWB4aie25LW+fKwhjKrUk2dXNkZWbm0uQPjk0HvmUqkbA5jQ8HnhkqA1R6Xtf9e6TSZt4D0ZnnlFZoBQeabo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ArR2IdJa; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+5X+orP"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e4d48a5823so1161294b3a.1;
-        Thu, 14 Mar 2024 12:41:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArR2IdJa"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-29c731ba369so1156382a91.3;
+        Thu, 14 Mar 2024 13:56:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710445305; x=1711050105; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710449803; x=1711054603; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ec/8nrm/d7FLFDatEQHA6MtRCtdWILB72zpzpZwxGvE=;
-        b=k+5X+orPMDKbuu/LvTu50T87yp55zXRuA0AkYSCIc+NYBOcQmky2XnrObyqnPG/N4+
-         Ilwml1sisYhf3X6d8Pijy8sjyU0f/tTUPnrgRwZicqVJJS/B0twe5menX/BWemSl4Ybh
-         6q07JXyLFJtu2Afjo/Sv51gWtENV2WY54V2uhgtTESiY8NdyD6jM3+GoldxL4lCdqTp4
-         auuxS6t+foWOzYHbZEgV++DhePR2l8GKB7xTgJzAuKffrvRTa0mM+pXHNYjXJASVDoev
-         E80hVYPo1XZycW9TiSBWhkwu0k8/Kf7P1lQnzaBw21s/Lup6kNmrJEor6VPFPJSiwt8z
-         2nyQ==
+        bh=vVexG+y35tQ9uiNulQsBhDXB6JraRtnHZp6M/RG+asg=;
+        b=ArR2IdJaBNB6LDskwV1CvU0y3BCddnsUJ15ZQea5mhdl7HVHeBJRHhocwskvkAvXXe
+         qBvoUfuOsQiVhjhHP5XviKFca454LBq9X+5i5tfeX6pumPU73Rs6TiNktmE3X0SgPRPS
+         DBt0/e9LJPsSZ8YXe3Bn4akZSlNtlusudo04KjDOGX2FrURlekhQbaGOJrAAenmEVya5
+         Z2ojscwHEZSjHMgVEQ84R1j4bw0YkDRjlPpGYPmH+NwS7lXYuXIgm+w1TWCEXRriM3B7
+         MN+5git9hsrT4varHBvm0kvKypVo57gH19mYR6zTX8C0KxX0WRkHfig1DeJV8P35RljF
+         8cvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710445305; x=1711050105;
+        d=1e100.net; s=20230601; t=1710449803; x=1711054603;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ec/8nrm/d7FLFDatEQHA6MtRCtdWILB72zpzpZwxGvE=;
-        b=tcxT/4MgCEJlHdhvj6gs4V2S4ilYbETQY9KYSb51k6V8bgk6NFXk2f1Epx/ZspmwsU
-         Kz8nvNznepzGwqC7pvjGh0db6K38g5s8toeOuuYkHrgJjbx8jEQKZ2E1YciSk6HzkD4A
-         zwHmB2bi3DQ3/S4PMLwG7dkw0IivgwGgvxveF/IJ+MDiSxUa1/+2iTxCS2VIM26XgZP/
-         opu3BFyGCR6paVoZp5cZEUx1pjTXF49d2GYnz2t5vqZ+dLK8kdHuPVIJJbeUvwNyb7/O
-         /NrY5qogn47eL6gri1JW0pzrdm03oaOKD/Uz9em7QAaTH4FfbLVsCrd6ocumkpcAsDAh
-         fbIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWx2TWF5TX5o5uzrJ+gXhv/A78ccTd2IxIY/edluc0glhGwO1x76QyG2jOzbd4lHsH4NkPxsHWr3Ssg2XpgW0NVYOjWQyzsY/n9+DNdeMKLXjdGNxJV2GiMZ39Rynjv1eUWSink0eIJyujSN9S683NnlHm+ACtOj0AxMJduFHvz0BqrgBzUTB4UFQ==
-X-Gm-Message-State: AOJu0Yz2AhlWVJn64xlUHnJI59oC56Axyn9+QbQ5nu8cmjaTMEvbSqS0
-	r7Zh1Sq/D54FGwIxJ7oQrGf6nL1xSSRonbLm2tzIg/gKLnuq7r6HNF6wE9wJdWOSrZinMW96m0U
-	k/TH26jOa89nb64XFGmQpBMQuH/E=
-X-Google-Smtp-Source: AGHT+IFOSZ/BRo9o5hwPJ2i90uLPIBo7QjcsgkSMOH+JW2YA4Z2jy8DI5Ewt+DLbqHEvgd/sSIjeV6dPBQFXSW0bpSs=
-X-Received: by 2002:a05:6a00:3d56:b0:6e4:890a:7af with SMTP id
- lp22-20020a056a003d5600b006e4890a07afmr1259464pfb.26.1710445304659; Thu, 14
- Mar 2024 12:41:44 -0700 (PDT)
+        bh=vVexG+y35tQ9uiNulQsBhDXB6JraRtnHZp6M/RG+asg=;
+        b=ZyBysuIFfrncaJz1Il8NT2/4Iwrlynu6sez/MsZVzKrUmE0LuaJWgdhb5ZN9wsu7F2
+         dBdfKs0jpchXD7/cOVmEOAoQudOTcvk02gq0svwdjEhN/3EEHmGcp+DP3CvkuKnoTKEb
+         a8L+lTxfJ+4DiqFS5xyT0dvpm3JretDgD0PGAPyFMngnaSTUf54KGKnmVNIMlJajQf/i
+         P5aqCbwcS9VaDfNLW5KoW7oSXm1mKMInKO1/Tv3LV1Vzer178H/sPkQofem+P6lMWNlr
+         DCIHJwX8s4FZicC+R12/eHtj3AsErjhgoI7bngSIlSn4MCRZbF+4scZIMlbg0/eEGzo7
+         r1KA==
+X-Forwarded-Encrypted: i=1; AJvYcCWapOBqqoIcYdP6w4WpsOTttTH5uyaNdDMhwdtytTp76wLc4g+kUq5x05C6bzDlOce6H4qCTKehtonb+1f2RRpza6omA/KAiCM3BL9SMFNEHG9uaHNPDmsrRYRMwWzaUcGfjri0zLh/X4VJyDnHB3Xay2uzYJJxT1AoGy/j+xPff21+ZzN3Nv8ytg==
+X-Gm-Message-State: AOJu0YwvP3tjm8Y4kvTfixOqi/OPEsIp921MhOc4dzALu3kK68F6Vf0g
+	Lmkcp27Udat9h6os2GS8HSRkVKbrKSl7SC+83bBgx5UIRXnIVU5IOTEPXORFq/44JhDls2PnZSS
+	w2CtTDJ2sza1BqK+ZnoqDjy/Wvk8=
+X-Google-Smtp-Source: AGHT+IG4wxqkAxjdwKlg1zhlT5ni1nrZhArv7cmYlou+sBdAxdO9JwjEtP6sfS1qBKW4ZUbRHqGkBMyDjHAU8zKgLeM=
+X-Received: by 2002:a17:90a:ce12:b0:29b:f2b1:6973 with SMTP id
+ f18-20020a17090ace1200b0029bf2b16973mr2930051pju.20.1710449803547; Thu, 14
+ Mar 2024 13:56:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,11 +58,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240313110515.70088-1-nmi@metaspace.dk> <20240313110515.70088-2-nmi@metaspace.dk>
  <ZfI8-14RUqGqoRd-@boqun-archlinux> <87il1ptck0.fsf@metaspace.dk>
- <CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com> <87plvwsjn5.fsf@metaspace.dk>
-In-Reply-To: <87plvwsjn5.fsf@metaspace.dk>
+ <CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com>
+ <87plvwsjn5.fsf@metaspace.dk> <CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
+In-Reply-To: <CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
 From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 14 Mar 2024 20:41:32 +0100
-Message-ID: <CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
+Date: Thu, 14 Mar 2024 21:56:31 +0100
+Message-ID: <CANiq72noqwU9_wC28Emc2LNyD70JFcS+4MXWuwYUTUWq8ragCg@mail.gmail.com>
 Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
 To: Andreas Hindborg <nmi@metaspace.dk>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -86,26 +87,25 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 14, 2024 at 8:23=E2=80=AFPM Andreas Hindborg <nmi@metaspace.dk>=
- wrote:
+On Thu, Mar 14, 2024 at 8:41=E2=80=AFPM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
 >
-> The way the current code compiles, <kernel::block::mq::Request as
-> kernel::types::AlwaysRefCounted>::dec_ref` is inlined into the `rnull`
-> module. A relocation for `rust_helper_blk_mq_free_request_internal`
-> appears in `rnull_mod.ko`. I didn't test it yet, but if
-> `__blk_mq_free_request` (or the helper) is not exported, I don't think
-> this would be possible?
+> In any case, if we really want to avoid exporting the original symbol
+> (perhaps so that "only Rust" can use it -- or someone trying hard to
+> bypass things on purpose), then we could still avoid the helper and
+> instead write a non-generic `kernel`-private Rust function instead.
 
-Yeah, something needs to be exported since there is a generic
-involved, but even if you want to go the route of exporting only a
-different symbol, you would still want to put it in the C header so
-that you don't get the C missing declaration warning and so that we
-don't have to write the declaration manually in the helper.
+The advantages would be that we get the export done automatically and
+that we could write in Rust, e.g. with restricted visibility.
 
-In any case, if we really want to avoid exporting the original symbol
-(perhaps so that "only Rust" can use it -- or someone trying hard to
-bypass things on purpose), then we could still avoid the helper and
-instead write a non-generic `kernel`-private Rust function instead.
+But we could need `#[inline(never)]` (or ideally `#[used]` if it could
+go on functions) or `#[no_mangle]` (but we would lose the mangling).
+
+Anyway, the simplest is to export the original symbol, but we could
+consider to provide support one way or another for this kind of
+"helpers" (i.e. leaving the current helpers as those for macros and
+inline functions), so that it is clear what symbols are only exported
+for Rust use (and not other C code).
 
 Cheers,
 Miguel
