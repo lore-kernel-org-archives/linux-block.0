@@ -1,169 +1,226 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5644B4AEC6;
-	Fri, 15 Mar 2024 17:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3714CB2B
+	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 17:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710523673; cv=none; b=Hq7Nq7r8zdtS4IR5waZkHhF7rD5CQj63sD3M58CEkNV1RXr1cnVcg6CNGc+0qENf00d2vPEF8KJoT72RtsiHV421letVAO1/sp2mLHiPDAw0sXwPpUv6pd5SOA4vuhwDpZ/HEhDgB78YCPmME+cfszGyB0LveDVDDMQw86vd/0Q=
+	t=1710524993; cv=none; b=FXFYrC90n/IwtzdhjxjXelrDJoOUwe38zaDX4KKpjYzsfTkgzL2CZdRP11gQWxS3gdoHmCcBqFB08uzy6ab795/npFWW7r0UNXqDUQ2WPfeOJ3bFBNu3oFzmiQ9Y7tnTWYhb7YUbGl0pzm+CzE1iDaZk5p4riDX7D70ycd9OKc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710523673; c=relaxed/simple;
-	bh=aNTEH84txPyaDXOeeEu2URaqXrwSyYq4eQl7ZotGFvs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dNO9lf8VDxIrkj6GvWml8yWMGla2f2JpzJV5rRNcsn+2INmlPkrSB2R9Hpa+bmMcHKYZz4WxUuKSORsMB+BklkylK5QGBYd7r3bsfJ9xlETBXqa6VrcgAmVbTkG/Jy9NEF25gdVm+4Y70ESRaMQ4vzljC+PaLEmxI41DjipWzAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4d0gUfE; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1710524993; c=relaxed/simple;
+	bh=AgjuwmLizdLncxaEVdxa5G6gYOJ9fxm5TNQBPG1v8Pk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=odAgmqqCNWir7qJl7/V2FVKUHIAFUpJw+k4eza/EZuiG6g0FYI3keDwPvT0JmNAyLfyR9aSjcMCgrGa/cB85v16BEIDpxEEB6SEw/soAYq0smdtYkekkHSdwzBEbAfo0vyGeFfdMTQJ0RI4EQx1kdXyQlOa0xImDz9r8zMeNhTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=EEW3XFZU; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4d0gUfE"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-568b7350397so752646a12.1;
-        Fri, 15 Mar 2024 10:27:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="EEW3XFZU"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a44665605f3so266783466b.2
+        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 10:49:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710523669; x=1711128469; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WGggEgdevfwKLnOQ1PP/dwEqPnd5YH/YUXOFssVPSNA=;
-        b=P4d0gUfE3Yr4hLNOmQ+yrXk77KiZMJrjP8WAmL4w4dNTbuFYa7GxWThDCjTcWR9VLT
-         Wbj8ERyVPlJlRbc+bkeK+F7z6JfLMRK8hl8sAjpMpt7IT922zkX7L+9Sddfd6Agog8Bo
-         sHy5o4ja7dPIOF6ftYIGJ2IB+jMjbmgscW1BP+9H05d6Y2MYElTZ60i3I0FFbscruljR
-         liI9IGEdOdru/8l4Vj5FGHTSK9EcJbEVquEqs8gwuw0LTT0s3ZrSKfse43vF+Q4Klwdd
-         deSGhi+OuGFOMf7jxUDHIF+NepREBHbBfpm11kFpWgzwQ2Wqwd7LUVZWuwoYmMzQpkzI
-         /EOg==
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710524988; x=1711129788; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IBckmq0lRrEdCK7ZRxBGutF7hwnT74BhLWa7MU2ofao=;
+        b=EEW3XFZUMgkENhdaG3SlSaViTKdfB9Fw+trI7OiyEhCofJ4rZyP0fuFddhCd4KXPsi
+         L610aS6XpVttuTuS5P/Ysm3EaUMoZygbNSI3+fQts/WrLn9YKTQMio8YLuLZ+T+6BuIE
+         Q9MAM2vh66PpH6/bAxXIhlTD+Otg8dMGMxwPFisAjxItw3HGnBJQnFKvfoCR6eNMq61r
+         Y2sb+O97Ya8qdLXv4R/iWQH5hm12RnqhxWikm/wW7geeJpVJS3XNQMA3I38aY1vglqIa
+         nUVk7YtKCk8eHe72eL8GJJbAzGeGOI9MgoGMqLjtZZXMMnB4hcdLryNhGfHeY40GJy/H
+         3Bfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710523669; x=1711128469;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WGggEgdevfwKLnOQ1PP/dwEqPnd5YH/YUXOFssVPSNA=;
-        b=TjaO+vkHXdBNNL0R8tkeQZAgAMp4l+mq555t8PfSmGO6JXZxkVhS196iH7cn1Nhwgo
-         mbpc9Uu9Tm6bMoZGBYRa7KquXmkI6XdF/uZvtag1HTONtXfIWpvuu0Tx9X3N4Q31Ff4F
-         Sn4r6EQMdYoSgrx6qjH/SsxnPRF+kikOppzYtTEsGfkaxWxfT6CRYAJQbSZgudIGL69p
-         +ExselFMM6cq8ncE6U3PS4hmbR89BbZTgPNeckl7HqMqpFsp88s1kOCuJMbOSK1nw/rv
-         OnwI1iSkGeYjDwfzg0yLLcA8hdqwcNK2/5y/dVH4e7RqCzk1eYZ3KYKas1AZIOucmzQv
-         dsFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWj+gkviEDXBNo8WVWpCJR5T8CypvJcbptgdUHmCOC7wM5Q2+jxa/qsCjWvdUlsxztvi3blIilWYwBj5PSVCDVGNyhn8IyOL7w=
-X-Gm-Message-State: AOJu0YynxKxwUzbFGiWB797AdiepYe6UrDrpnpL4iNyaQ4QDlPTJUsHp
-	YtrmN0Sar5lyouryGPX1gFBp1HUt3QtXxmDoC4Jf46PGEjgTBeWxb4RJfEKw
-X-Google-Smtp-Source: AGHT+IEPbWIB/azYXSq7seUwpVk1tgUedRyZODmpya8nJWmzeScCgPIQPyRn0P2JOdXVHjowA0oiRw==
-X-Received: by 2002:a17:906:d8ac:b0:a46:4c8e:18a8 with SMTP id qc12-20020a170906d8ac00b00a464c8e18a8mr2795162ejb.51.1710523669310;
-        Fri, 15 Mar 2024 10:27:49 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.141.58])
-        by smtp.gmail.com with ESMTPSA id a11-20020a170906190b00b00a44e2f3024bsm1881004eje.68.2024.03.15.10.27.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 10:27:49 -0700 (PDT)
-Message-ID: <d82a07b8-a65d-4551-8516-5e50e0fab2fe@gmail.com>
-Date: Fri, 15 Mar 2024 17:26:43 +0000
+        d=1e100.net; s=20230601; t=1710524988; x=1711129788;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IBckmq0lRrEdCK7ZRxBGutF7hwnT74BhLWa7MU2ofao=;
+        b=Wc0rzxY8l1IylZvvalUUvHPNges14JMT34yZyZVItWgQpzxyQS3zesZGCnk3rAGg7q
+         rsK5Xo4kUkRqu/P34+2VXvAM939mXw4sTNfV3oxG3Fb/4Gl/GaPWLRKyabL3Mq5Kn9cb
+         WFHieEqU3cxKvNiC0nEaXs+uqPjMGc9Yj7IfGSKPYumowuu6179mndjdlm0LTZSokA4d
+         ppZfmzHzJfj3oFgjZHYW3Ya+yCl577DsXcmFyKnEr2pgYP9NydY3041jCjW8Dw88asLv
+         p1ZVuLHSwbR4vH+KAZ4iH03o4OdBexgsrYqwOZSQgua02F732O6aE6qpX3Hvyw6qSvqY
+         ODcw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDDGNf2vmxlkOWZuZS9RCt4OgW3TUBQYNMCI+J6DnDan4UIZuFRrPD+K/tBh23LexG/5kHzMsKFQ26h8CzOxFfzWwZrAKJDWm22aI=
+X-Gm-Message-State: AOJu0YwkaEBdamYXRKabhxyoTfBmOypTyd9Fpj/owNIkUT5hN3h3MavP
+	U+Ti/Eqzg61kFnuhsLsbz8PHjrVcoBq/QQINGpWY1kVyPuqDXMwvcAIrhleU4RdtjpFuW+1PeuK
+	F
+X-Google-Smtp-Source: AGHT+IE6q+BbYIVJVQW18ZUeWJfNw8Na4IPiPm+TxOTb4Agzzdp7H6s0s02T0AtxVs3F1j7ksAoPsg==
+X-Received: by 2002:a17:907:6d24:b0:a46:707b:8ff6 with SMTP id sa36-20020a1709076d2400b00a46707b8ff6mr2491257ejc.62.1710524988440;
+        Fri, 15 Mar 2024 10:49:48 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id gx27-20020a1709068a5b00b00a465fd3977esm1941238ejc.143.2024.03.15.10.49.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Mar 2024 10:49:47 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,  Jens Axboe
+ <axboe@kernel.dk>,  Keith Busch <kbusch@kernel.org>,  Boqun Feng
+ <boqun.feng@gmail.com>,  Christoph Hellwig <hch@lst.de>,  Damien Le Moal
+ <Damien.LeMoal@wdc.com>,  Bart Van Assche <bvanassche@acm.org>,  Hannes
+ Reinecke <hare@suse.de>,  "linux-block@vger.kernel.org"
+ <linux-block@vger.kernel.org>,  Andreas Hindborg <a.hindborg@samsung.com>,
+  Wedson Almeida Filho <wedsonaf@gmail.com>,  Niklas Cassel
+ <Niklas.Cassel@wdc.com>,  Greg KH <gregkh@linuxfoundation.org>,  Matthew
+ Wilcox <willy@infradead.org>,  Miguel Ojeda <ojeda@kernel.org>,  Alex
+ Gaynor <alex.gaynor@gmail.com>,  Gary Guo <gary@garyguo.net>,
+  =?utf-8?Q?Bj=C3=B6rn?= Roy
+ Baron <bjorn3_gh@protonmail.com>,  Benno Lossin <benno.lossin@proton.me>,
+  Alice Ryhl <aliceryhl@google.com>,  Chaitanya Kulkarni
+ <chaitanyak@nvidia.com>,  Luis Chamberlain <mcgrof@kernel.org>,  Yexuan
+ Yang <1182282462@bupt.edu.cn>,  Sergio =?utf-8?Q?Gonz=C3=A1lez?= Collado
+ <sergio.collado@gmail.com>,  Joel Granados <j.granados@samsung.com>,
+  "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,  Daniel Gomez
+ <da.gomez@samsung.com>,  open list <linux-kernel@vger.kernel.org>,
+  "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+  "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+  "gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+In-Reply-To: <ZfRoJxzOLZEIaQK7@fedora> (Ming Lei's message of "Fri, 15 Mar
+	2024 23:24:23 +0800")
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+	<20240313110515.70088-2-nmi@metaspace.dk> <ZfI8-14RUqGqoRd-@boqun-archlinux>
+	<87il1ptck0.fsf@metaspace.dk>
+	<CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com>
+	<87plvwsjn5.fsf@metaspace.dk>
+	<CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
+	<8734ssrkxd.fsf@metaspace.dk> <ZfQ8Wz9gMqsN02Mv@fedora>
+	<87o7bfr7bt.fsf@metaspace.dk> <ZfRoJxzOLZEIaQK7@fedora>
+User-Agent: mu4e 1.12.0; emacs 29.2
+Date: Fri, 15 Mar 2024 18:49:39 +0100
+Message-ID: <87il1nqtak.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/11] io_uring: get rid of intermediate aux cqe caches
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
- Ming Lei <ming.lei@redhat.com>
-References: <cover.1710514702.git.asml.silence@gmail.com>
- <0eb3f55722540a11b036d3c90771220eb082d65e.1710514702.git.asml.silence@gmail.com>
- <6e5d55a8-1860-468f-97f4-0bd355be369a@kernel.dk>
- <7a6b4d7f-8bbd-4259-b1f1-e026b5183350@gmail.com>
- <70e18e4c-6722-475d-818b-dc739d67f7e7@kernel.dk>
- <dfdfcafe-199f-4652-9e79-7fb0e7b2ab4f@kernel.dk>
- <e40448f1-11b4-41a8-81ab-11b4ffc1b717@gmail.com>
- <0f164d26-e4da-4e96-b413-ec66cf16e3d7@kernel.dk>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <0f164d26-e4da-4e96-b413-ec66cf16e3d7@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/15/24 16:49, Jens Axboe wrote:
-> On 3/15/24 10:44 AM, Pavel Begunkov wrote:
->> On 3/15/24 16:27, Jens Axboe wrote:
->>> On 3/15/24 10:25 AM, Jens Axboe wrote:
->>>> On 3/15/24 10:23 AM, Pavel Begunkov wrote:
->>>>> On 3/15/24 16:20, Jens Axboe wrote:
->>>>>> On 3/15/24 9:30 AM, Pavel Begunkov wrote:
->>>>>>> io_post_aux_cqe(), which is used for multishot requests, delays
->>>>>>> completions by putting CQEs into a temporary array for the purpose
->>>>>>> completion lock/flush batching.
->>>>>>>
->>>>>>> DEFER_TASKRUN doesn't need any locking, so for it we can put completions
->>>>>>> directly into the CQ and defer post completion handling with a flag.
->>>>>>> That leaves !DEFER_TASKRUN, which is not that interesting / hot for
->>>>>>> multishot requests, so have conditional locking with deferred flush
->>>>>>> for them.
->>>>>>
->>>>>> This breaks the read-mshot test case, looking into what is going on
->>>>>> there.
->>>>>
->>>>> I forgot to mention, yes it does, the test makes odd assumptions about
->>>>> overflows, IIRC it expects that the kernel allows one and only one aux
->>>>> CQE to be overflown. Let me double check
->>>>
->>>> Yeah this is very possible, the overflow checking could be broken in
->>>> there. I'll poke at it and report back.
->>>
->>> It does, this should fix it:
->>>
->>>
->>> diff --git a/test/read-mshot.c b/test/read-mshot.c
->>> index 8fcb79857bf0..501ca69a98dc 100644
->>> --- a/test/read-mshot.c
->>> +++ b/test/read-mshot.c
->>> @@ -236,7 +236,7 @@ static int test(int first_good, int async, int overflow)
->>>            }
->>>            if (!(cqe->flags & IORING_CQE_F_MORE)) {
->>>                /* we expect this on overflow */
->>> -            if (overflow && (i - 1 == NR_OVERFLOW))
->>> +            if (overflow && i >= NR_OVERFLOW)
->>
->> Which is not ideal either, e.g. I wouldn't mind if the kernel stops
->> one entry before CQ is full, so that the request can complete w/o
->> overflowing. Not supposing the change because it's a marginal
->> case, but we shouldn't limit ourselves.
-> 
-> But if the event keeps triggering we have to keep posting CQEs,
-> otherwise we could get stuck. 
+Ming Lei <ming.lei@redhat.com> writes:
 
-Or we can complete the request, then the user consumes CQEs
-and restarts as usual
+> On Fri, Mar 15, 2024 at 01:46:30PM +0100, Andreas Hindborg wrote:
+>> Ming Lei <ming.lei@redhat.com> writes:
+>> > On Fri, Mar 15, 2024 at 08:52:46AM +0100, Andreas Hindborg wrote:
+>> >> Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> writes:
+>> >>=20
+>> >> > On Thu, Mar 14, 2024 at 8:23=E2=80=AFPM Andreas Hindborg <nmi@metas=
+pace.dk> wrote:
+>> >> >>
+>> >> >> The way the current code compiles, <kernel::block::mq::Request as
+>> >> >> kernel::types::AlwaysRefCounted>::dec_ref` is inlined into the `rn=
+ull`
+>> >> >> module. A relocation for `rust_helper_blk_mq_free_request_internal`
+>> >> >> appears in `rnull_mod.ko`. I didn't test it yet, but if
+>> >> >> `__blk_mq_free_request` (or the helper) is not exported, I don't t=
+hink
+>> >> >> this would be possible?
+>> >> >
+>> >> > Yeah, something needs to be exported since there is a generic
+>> >> > involved, but even if you want to go the route of exporting only a
+>> >> > different symbol, you would still want to put it in the C header so
+>> >> > that you don't get the C missing declaration warning and so that we
+>> >> > don't have to write the declaration manually in the helper.
+>> >>=20
+>> >> That is what I did:
+>> >>=20
+>> >> @@ -703,6 +703,7 @@ int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set=
+ *set,
+>> >>  		unsigned int set_flags);
+>> >>  void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
+>> >>=20=20
+>> >> +void __blk_mq_free_request(struct request *rq);
+>> >>  void blk_mq_free_request(struct request *rq);
+>> >>  int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
+>> >>  		unsigned int poll_flags);
+>> >
+>> > Can you explain in detail why one block layer internal helper is
+>> > called into rnull driver directly? It never happens in C driver code.
+>>=20
+>> It is not the rust null block driver that calls this symbol directly. It
+>> is called by the Rust block device driver API. But because of inlining,
+>> the symbol is referenced from the loadable object.
+>
+> What is the exact Rust block device driver API? The key point is that how
+> the body of one exported kernel C API(EXPORT_SYMBOL) becomes inlined
+> with Rust driver.
 
-> As far as I'm concerned, the behavior with
-> the patch looks correct. The last CQE is overflown, and that terminates
-> it, and it doesn't have MORE set. The one before that has MORE set, but
-> it has to, unless you aborted it early. But that seems impossible,
-> because what if that was indeed the last current CQE, and we reap CQEs
-> before the next one is posted.
-> 
-> So unless I'm missing something, I don't think we can be doing any
-> better.
+This happens when `ARef<Request<_>>` is dropped. The drop method
+(destructor) of this smart pointer decrements the refcount and
+potentially calls `__blk_mq_free_request`.
 
-You can opportunistically try to avoid overflows, unreliably
+>>=20
+>> The reason we have to call this symbol directly is to ensure proper
+>> lifetime of the `struct request`. For example in C, when a driver
+>
+> Sounds Rust API still calls into __blk_mq_free_request() directly, right?
 
-bool io_post_cqe() {
-	// Not enough space in the CQ left, so if there is a next
-	// completion pending we'd have to overflow. Avoid that by
-	// terminating it now.
-	//
-	// If there are no more CQEs after this one, we might
-	// terminate a bit earlier, but that better because
-	// overflows are so expensive and unhandy and so on.
-	if (cq_space_left() <= 1)
-		return false;
-	fill_cqe();
-	return true;
-}
+Yes, the Rust block device driver API will call this request if an
+`ARef<Request<_>>` is dropped and the refcount goes to 0.
 
-some_multishot_function(req) {
-	if (!io_post_cqe(res))
-		complete_req(req, res);
-}
+> If that is the case, the usecase need to be justified, and you need
+> to write one standalone patch with the exact story for exporting
+> __blk_mq_free_request().
 
-Again, not suggesting the change for all the obvious reasons, but
-I think semantically we should be able to do it.
+Ok, I can do that.
 
--- 
-Pavel Begunkov
+>
+>> converts a tag to a request, the developer makes sure to only ask for
+>> requests which are outstanding in the driver. In Rust, for the API to be
+>> sound, we must ensure that the developer cannot write safe code that
+>> obtains a reference to a request that is not owned by the driver.
+>>=20
+>> A similar issue exists in the null block driver when timer completions
+>> are enabled. If the request is cancelled and the timer fires after the
+>> request has been recycled, there is a problem because the timer holds a
+>> reference to the request private data area.
+>>=20
+>> To that end, I use the `atomic_t ref` field of the C `struct request`
+>> and implement the `AlwaysRefCounted` Rust trait for the request type.
+>> This is a smart pointer that owns a reference to the pointee. In this
+>> way, the request is not freed and recycled until the smart pointer is
+>> dropped. But if the smart pointer holds the last reference when it is
+>> dropped, it must be able to free the request, and hence it has to call
+>> `__blk_mq_free_request`.
+>
+> For callbacks(queue_rq, timeout, complete) implemented by driver, block
+> layer core guaranteed that the passed request reference is live.
+>
+> So driver needn't to worry about request lifetime, same with Rust
+> driver, I think smart pointer isn't necessary for using request in
+> Rust driver.
+
+Using the C API, there is nothing preventing a driver from using the
+request after the lifetime ends. With Rust, we have to make it
+impossible. Without the refcount and associated call to
+`__blk_mq_free_request`, it would be possible to write Rust code that
+access the request after the lifetime ends. This is not sound, and it is
+something we need to avoid in the Rust abstractions.
+
+One concrete way to do write unsound code with a Rust API where lifetime
+is not tracked with refcount, is if the null block timer completion
+callback fires after the request is completed. Perhaps the driver
+cancels the request but forgets to cancel the timer. When the timer
+fires, it will access the request via the context pointer, but the
+request will be invalid. In C we have to write the driver code so this
+cannot happen. In Rust, the API must prevent this from happening. So any
+driver written in the safe subset of Rust using this API can never
+trigger this behavior.
+
+By using the refcount, we ensure that the request is alive until all
+users who hold a reference to it are dropped.
+
+Another concrete example is when a driver calls `blk_mq_tag_to_rq` with
+an invalid tag. This can return a reference to an invalid tag, if the
+driver is not implemented correctly. By using `req_ref_inc_not_zero` we
+can assert that the request is live before we create a Rust reference to
+it, and even if the driver code has bugs, it can never access an invalid
+request, and thus it can be memory safe.
+
+We move the responsibility of correctness, in relation to memory safety,
+from the driver implementation to the API implementation.
+
+Best regards,
+Andreas
