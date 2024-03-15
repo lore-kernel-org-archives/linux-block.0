@@ -1,125 +1,198 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7246F3BB28;
-	Fri, 15 Mar 2024 16:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764724AECA;
+	Fri, 15 Mar 2024 16:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710521110; cv=none; b=p3V8ogb+1VC0+ogDa9tAjWMDyjg/SsNZFqz1q/zFECdl2dNdyjhotG8A/ws0/+TZWp3uneT/clmLHAsUZX+VawCOzgUHiYcKVgle05mktA/x3n5cqWefgj9tOpxJ9yEhvDxSNJgNuRx2U5Sc9xHcSakh9GWaDMX3XA7P7XYKQbQ=
+	t=1710521174; cv=none; b=bTwzzodKyetBZEPrfMnrr/Jp1gevxwoDV0s0aeG7KEVsIF95n+AR+Yi/pKU7ZCwJNwtSw0F0M8qOfcWb9Q7C4rieqeNHVf1kcL/inSRNqRCl93giRdaBX7kfbeLf32dKKmBDIeqOT9DuLJiqJko0OZBwbsmmsmKx0Cr+sa35WlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710521110; c=relaxed/simple;
-	bh=6ocWOhxuFBCbWoaCNynzwb5vX0ZTvIO65y+LKbV0DD0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PHgo8W1tLZHBtf0nqnlQx0z0sRWRg2lFlTeBX5NKPhzQdOkXqUJGiKA2sv5U3SQ6Sq5svsobvjgCcTsq669Hhc+5WN8NG7CHDUzen6H5lrsEflc2jXhGPdZO5nsJJlUpPCkAhn0NWrhMMFkc2J6AkCkvp+z6BmY+J2TLRWBesl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DuXrsHhm; arc=none smtp.client-ip=209.85.208.47
+	s=arc-20240116; t=1710521174; c=relaxed/simple;
+	bh=PpEhH4GqBsauzs6ODWAzUA/PTPNGnpyFFKUoPIpq/Ag=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GFS0p3EHWk7gPyQbrACEhL41r2hDteN5SX2VEUGxEnFN7f0XGRFzPL/PE0TC77rahfT3AHtIR53LnqougUuES0+AocTxVoCjr5tS1/yMvNB6wxqiDV/zCNtn5WSkK7u/B02pDYxZCnvRyXF0EU5N+1sasn0I/stOI8Y4u/x1vow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jKokrbdU; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DuXrsHhm"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-566e869f631so2699210a12.0;
-        Fri, 15 Mar 2024 09:45:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKokrbdU"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e6eb891db9so1863047b3a.3;
+        Fri, 15 Mar 2024 09:46:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710521107; x=1711125907; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Pn1N9hdh/92IjJvyEpoRwaBX67+5A1Da617ojNcO94=;
-        b=DuXrsHhm0uQE0yeIqv7CBUu8OgY/YwcDswC64kKp3kK2XE2l+QXiXkhQwNZkQzHMJ8
-         YQ6wGy7sg+BZ5Ue7rmyF74Qn9rTe1oOp89013UNYhlYsdzwBeo/oxt1qoKQ4bPDzVO5f
-         qwANQ9M+A/enBrqS+QTbJbIEKCI5l0UNELJNRGaQdoNFyXobu6KpbMVY6ujiCH78k+Jm
-         OxPunZuYmE+t1JgHQt5YAkkQWUtKlOxFyAxkNR+xMeQnAHH+xDdwZdExD9AEUtrMi8Ok
-         OBD/b24suB20bjpGH1K8jsRrXnVldCs5cKcgSINGKEgrdNeNVe09Hj+oy6ZIfb1zPs0g
-         5b1g==
+        d=gmail.com; s=20230601; t=1710521172; x=1711125972; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AZOX6485f2YWoIfffYyPIciWIsiQeBaoKCVT6/JJ1iI=;
+        b=jKokrbdUGpZv5G8s6VykVFOKLJpAiLdelVO4mVTfv1zcQNQ7gzQ8gKkOwYHE1wwle+
+         m4fxotOU0yltQKpA9EtAHp2zcZSMZ3TGQFuyJiP2db6bkwhTgM4HzQtQHXQY6ZGfKoqi
+         Z/lSM+viEkrwG6fJwxtmNORqp+uvMjD8QDfKdEfTjqXMF6xNU3udRweWVb4SVpX9ty7x
+         Z4JZr5JZRafi+4XVZCKD/hMPLJodV9BNt7ajQjK+UBqDC1DyWlExs4xrIqRXnjIRzW5d
+         FqAkb/NEa+2sci3dFk64Pf4rBdcKTaOrUuPdDq92m0L8Jt8EWZmc0+n9WTCsO0ZoFFhG
+         a6jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710521107; x=1711125907;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Pn1N9hdh/92IjJvyEpoRwaBX67+5A1Da617ojNcO94=;
-        b=XzQU7wAhEr6Nth3xI5Fw26Siv71MDvQITvWQDfS+STKJz0KiVD7HF6GLSIkWQ5Cgnh
-         +81qBLz8u/ayYhWGHfGdiSGVZAfGopcSalmuqK5dRvrkbTwFLqVhlEx6+ffJYIc22O3h
-         uNL1SzG4xg59W/OKo3foO/czl8PiY/9nXoYmtClUOKNa+Enr75WzQpBiUKsdZK0m2Fhp
-         hIIynHTJfCTEw5FL/FoW8OyiLbaa3gbslcRBUMzHorc8rIgY3JIGZgXz7Es0JVSgdYmN
-         2MkYLchuJm1lCarLqJ6JiUbHVHW7ymsEHHINbvvkcHKOoWoFDRfJJoB59ub5FKTZBAMQ
-         7jcA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+sWGXv/XsV5E291JcNcE4nOYSb9SFfJ4fnfOVI8bdWAoMZfwqbCjq3NUWHsUN95IL0J0RuEdB0hkqd/Ox4W/+tMJXwqhrI1Q=
-X-Gm-Message-State: AOJu0Yw0IDo3zcJD+TMob+dzgcIrsc8lfN+QRLwuuhYU7u4yhRYJtAFu
-	TTUjrl/J2BlUwpJigK2QgRv15lMe4NSmOD2PHJJVEgGDyA0JeJnF
-X-Google-Smtp-Source: AGHT+IG533g1xrlq+qyxGCNfLR+U3QZGsTLakzHI4bemWrpGt2WXan496MoA1lwDtMDi9pxIOV2iBw==
-X-Received: by 2002:a05:6402:28cc:b0:568:b447:163d with SMTP id ef12-20020a05640228cc00b00568b447163dmr1564280edb.9.1710521106742;
-        Fri, 15 Mar 2024 09:45:06 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.141.58])
-        by smtp.gmail.com with ESMTPSA id 6-20020a0564021f4600b005682a0e915fsm1825340edz.76.2024.03.15.09.45.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 09:45:06 -0700 (PDT)
-Message-ID: <e40448f1-11b4-41a8-81ab-11b4ffc1b717@gmail.com>
-Date: Fri, 15 Mar 2024 16:44:01 +0000
+        d=1e100.net; s=20230601; t=1710521172; x=1711125972;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AZOX6485f2YWoIfffYyPIciWIsiQeBaoKCVT6/JJ1iI=;
+        b=L5lUTZ3Og+xKCHUFUpq4piSR0wO7azXy0A0DhECDEIsX5t7HTo1kQXmBWcapwZyPsA
+         7uoI8GYTvTyqXWhjfy2kSl4IDHWZ9uiLU24TNeU/g8mvI6dAiS2pPxOz32Ix1UWNelXA
+         7NI7+5nCCUD4pmKEb19hLNYRUrizbvpVT3aF+J8qbooBTf0QAvgzrKRhYVqNm5WoHhAg
+         BGsmT4DW/Cvzw0OueS9w4/ZilT9GdC7QAO1h0vjyQGkdkrJXs8VQ9czYokdYgKNO4j65
+         m8JCvxSxm+KdAxy+AXYMfv8HIK516M8mgAbnb/P4BFIEp8TXI/xuNNscwvMKkphnwsIU
+         fi+A==
+X-Forwarded-Encrypted: i=1; AJvYcCX0++6AhUMHYDp+/z2QYmSMvzaUaLt6Qb7xFg1aTx7VvS9liGXSHP1T7L8usq7yCbLK9zD+aAkeTDSaxKy95ZLlL3G+tbdihnzA+iZ+s7UD84IM2Sev1Aa+qXTbi0DREKMIdCXWdQDG3c/Q2yh6qalsEJs0FFrbnuTsb9nTF50=
+X-Gm-Message-State: AOJu0YxADBltOeY5I5ImWB052R7Fc+xdvljpzHQjjzotCanxWIWQ54v8
+	HcM+g3az3oGnYyGZcRT+v/4dI5vEC0QyiOt/LfhM8PF28m0RlZb2uaX1+abQFqphG+p0gJOBATC
+	cn1S7EM4Pg4UC0bZA4MNpCx+llOPdZ5PZ
+X-Google-Smtp-Source: AGHT+IFIU7jP06uCSEgXyzplvCTBrSSs+Qaju6dpK+T6gLdLY6C5EtagC5SC8hsgKq7e8HnNEV0OMeFo+GSklwcnSQQ=
+X-Received: by 2002:a05:6a20:12c6:b0:1a2:b33b:d6e0 with SMTP id
+ v6-20020a056a2012c600b001a2b33bd6e0mr6414408pzg.59.1710521171702; Fri, 15 Mar
+ 2024 09:46:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/11] io_uring: get rid of intermediate aux cqe caches
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
- Ming Lei <ming.lei@redhat.com>
-References: <cover.1710514702.git.asml.silence@gmail.com>
- <0eb3f55722540a11b036d3c90771220eb082d65e.1710514702.git.asml.silence@gmail.com>
- <6e5d55a8-1860-468f-97f4-0bd355be369a@kernel.dk>
- <7a6b4d7f-8bbd-4259-b1f1-e026b5183350@gmail.com>
- <70e18e4c-6722-475d-818b-dc739d67f7e7@kernel.dk>
- <dfdfcafe-199f-4652-9e79-7fb0e7b2ab4f@kernel.dk>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <dfdfcafe-199f-4652-9e79-7fb0e7b2ab4f@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240315113828.258005-1-cgzones@googlemail.com> <20240315113828.258005-2-cgzones@googlemail.com>
+In-Reply-To: <20240315113828.258005-2-cgzones@googlemail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 15 Mar 2024 09:45:59 -0700
+Message-ID: <CAEf4BzZF0A9qEzmRigHFLQ4vBQshGUQWZVG5L0q2_--kx4=AXA@mail.gmail.com>
+Subject: Re: [PATCH 02/10] capability: add any wrappers to test for multiple
+ caps with exactly one audit message
+To: =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>
+Cc: linux-security-module@vger.kernel.org, linux-block@vger.kernel.org, 
+	Serge Hallyn <serge@hallyn.com>, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/15/24 16:27, Jens Axboe wrote:
-> On 3/15/24 10:25 AM, Jens Axboe wrote:
->> On 3/15/24 10:23 AM, Pavel Begunkov wrote:
->>> On 3/15/24 16:20, Jens Axboe wrote:
->>>> On 3/15/24 9:30 AM, Pavel Begunkov wrote:
->>>>> io_post_aux_cqe(), which is used for multishot requests, delays
->>>>> completions by putting CQEs into a temporary array for the purpose
->>>>> completion lock/flush batching.
->>>>>
->>>>> DEFER_TASKRUN doesn't need any locking, so for it we can put completions
->>>>> directly into the CQ and defer post completion handling with a flag.
->>>>> That leaves !DEFER_TASKRUN, which is not that interesting / hot for
->>>>> multishot requests, so have conditional locking with deferred flush
->>>>> for them.
->>>>
->>>> This breaks the read-mshot test case, looking into what is going on
->>>> there.
->>>
->>> I forgot to mention, yes it does, the test makes odd assumptions about
->>> overflows, IIRC it expects that the kernel allows one and only one aux
->>> CQE to be overflown. Let me double check
->>
->> Yeah this is very possible, the overflow checking could be broken in
->> there. I'll poke at it and report back.
-> 
-> It does, this should fix it:
-> 
-> 
-> diff --git a/test/read-mshot.c b/test/read-mshot.c
-> index 8fcb79857bf0..501ca69a98dc 100644
-> --- a/test/read-mshot.c
-> +++ b/test/read-mshot.c
-> @@ -236,7 +236,7 @@ static int test(int first_good, int async, int overflow)
->   		}
->   		if (!(cqe->flags & IORING_CQE_F_MORE)) {
->   			/* we expect this on overflow */
-> -			if (overflow && (i - 1 == NR_OVERFLOW))
-> +			if (overflow && i >= NR_OVERFLOW)
+On Fri, Mar 15, 2024 at 4:39=E2=80=AFAM Christian G=C3=B6ttsche
+<cgzones@googlemail.com> wrote:
+>
+> Add the interfaces `capable_any()` and `ns_capable_any()` as an
+> alternative to multiple `capable()`/`ns_capable()` calls, like
+> `capable_any(CAP_SYS_NICE, CAP_SYS_ADMIN)` instead of
+> `capable(CAP_SYS_NICE) || capable(CAP_SYS_ADMIN)`.
+>
+> `capable_any()`/`ns_capable_any()` will in particular generate exactly
+> one audit message, either for the left most capability in effect or, if
+> the task has none, the first one.
+>
+> This is especially helpful with regard to SELinux, where each audit
+> message about a not allowed capability request will create a denial
+> message.  Using this new wrapper with the least invasive capability as
+> left most argument (e.g. CAP_SYS_NICE before CAP_SYS_ADMIN) enables
+> policy writers to only grant the least invasive one for the particular
+> subject instead of both.
+>
+> CC: linux-block@vger.kernel.org
+> Signed-off-by: Christian G=C3=B6ttsche <cgzones@googlemail.com>
+> ---
+> v5:
+>    - add check for identical passed capabilities
+>    - rename internal helper according to flag rename to
+>      ns_capable_noauditondeny()
+> v4:
+>    Use CAP_OPT_NODENYAUDIT via added ns_capable_nodenyaudit()
+> v3:
+>    - rename to capable_any()
+>    - fix typo in function documentation
+>    - add ns_capable_any()
+> v2:
+>    avoid varargs and fix to two capabilities; capable_or3() can be added
+>    later if needed
+> ---
+>  include/linux/capability.h | 10 ++++++
+>  kernel/capability.c        | 73 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 83 insertions(+)
+>
 
-Which is not ideal either, e.g. I wouldn't mind if the kernel stops
-one entry before CQ is full, so that the request can complete w/o
-overflowing. Not supposing the change because it's a marginal
-case, but we shouldn't limit ourselves.
+[...]
 
--- 
-Pavel Begunkov
+>
+> +/**
+> + * ns_capable_any - Determine if the current task has one of two superio=
+r capabilities in effect
+> + * @ns:  The usernamespace we want the capability in
+> + * @cap1: The capabilities to be tested for first
+> + * @cap2: The capabilities to be tested for secondly
+> + *
+> + * Return true if the current task has at least one of the two given sup=
+erior
+> + * capabilities currently available for use, false if not.
+> + *
+> + * In contrast to or'ing capable() this call will create exactly one aud=
+it
+> + * message, either for @cap1, if it is granted or both are not permitted=
+,
+> + * or @cap2, if it is granted while the other one is not.
+> + *
+> + * The capabilities should be ordered from least to most invasive, i.e. =
+CAP_SYS_ADMIN last.
+> + *
+> + * This sets PF_SUPERPRIV on the task if the capability is available on =
+the
+> + * assumption that it's about to be used.
+> + */
+> +bool ns_capable_any(struct user_namespace *ns, int cap1, int cap2)
+> +{
+> +       if (cap1 =3D=3D cap2)
+> +               return ns_capable(ns, cap1);
+> +
+> +       if (ns_capable_noauditondeny(ns, cap1))
+> +               return true;
+> +
+> +       if (ns_capable_noauditondeny(ns, cap2))
+> +               return true;
+> +
+> +       return ns_capable(ns, cap1);
+
+this will incur an extra capable() check (with all the LSMs involved,
+etc), and so for some cases where capability is expected to not be
+present, this will be a regression. Is there some way to not redo the
+check, but just audit the failure? At this point we do know that cap1
+failed before, so might as well just log that.
+
+> +}
+> +EXPORT_SYMBOL(ns_capable_any);
+> +
+> +/**
+> + * capable_any - Determine if the current task has one of two superior c=
+apabilities in effect
+> + * @cap1: The capabilities to be tested for first
+> + * @cap2: The capabilities to be tested for secondly
+> + *
+> + * Return true if the current task has at least one of the two given sup=
+erior
+> + * capabilities currently available for use, false if not.
+> + *
+> + * In contrast to or'ing capable() this call will create exactly one aud=
+it
+> + * message, either for @cap1, if it is granted or both are not permitted=
+,
+> + * or @cap2, if it is granted while the other one is not.
+> + *
+> + * The capabilities should be ordered from least to most invasive, i.e. =
+CAP_SYS_ADMIN last.
+> + *
+> + * This sets PF_SUPERPRIV on the task if the capability is available on =
+the
+> + * assumption that it's about to be used.
+> + */
+> +bool capable_any(int cap1, int cap2)
+> +{
+> +       return ns_capable_any(&init_user_ns, cap1, cap2);
+> +}
+> +EXPORT_SYMBOL(capable_any);
+> +
+>  /**
+>   * capable - Determine if the current task has a superior capability in =
+effect
+>   * @cap: The capability to be tested for
+> --
+> 2.43.0
+>
+>
