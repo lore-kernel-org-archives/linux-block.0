@@ -1,137 +1,80 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E954350A69
-	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 18:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F434487AE
+	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 18:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710526341; cv=none; b=gQjxXxlnUaXpPgy6IkvuwengMIQ0rEtlQgzASThAQu9KWtrdcRyAABdZQtq2KOwDKL/mi2nzxaRYrTcJHElaE1UGxo/nLMNdDgzNo46Wrmy/i96JuKdyue9KR49RucWG3OS5wTzw6o3g5k26lXpG7RPEH/KRUFh45m2VukmTKuI=
+	t=1710527007; cv=none; b=r951yEUS5VTyasuP9QhzyddmKGje70+cfR9NCDKmBQQuWsja6c7tuvEOgVuWjR5iP5N8lqfC8K2P2pEwg53YqOEs5hKNxa5R+k1PchG3s1yv2HJQZPRtRwvk5016PRr/och3LrksyQJkA/LGoQjpE3pE0Rl665Lva8kMEvL8oB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710526341; c=relaxed/simple;
-	bh=IEpGNHUTEUKHjWNajftL/6DaDENrQvVc2dmKQjeTmdo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lx0IgSU3y/ZDza6eY0IEgZkumbcbB61mgNgRtO9T6d4He+tZZJsOG8vfM+79x7z3cRvRiD07AwC9xG2nc6Rc1J/5AJOU99GGIw7kgIJLs2XomsbAiLN2lP8XIwwcJdJY37kPTh0iwjwVSIrnOCrgM0Q8n+0UJhPAywa7ojZ+qTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DXkmbcnw; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1710527007; c=relaxed/simple;
+	bh=lub1QRO2Lskgp8R2IQAkrUw5puAP1pp27pLk2YXuaQY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cbwWWpSOsm7jt6VKx+WuxhWjf38voDSNf/AKtqcBpeXbOzH5OU/B3EIEXG/ZdeJ7NJM3+PiO0O84OzIjAuMMeqkGTGZ6Jat+PHqmZnqClmbUqR2NrHXCbKfo4L3Dno2nKm2+prPWYgmc+GW/q5P7OHYowj00D7NWXIWR4Ohaed0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMWNtBwH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DXkmbcnw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=tpT0TnjYK9MafbE4hhmfMjmjyPGY/+5cWvckZ49u59w=; b=DXkmbcnwHrHGAS8UZcsZOBL1pT
-	wwyVvIgygvr0q4v76vGLWsSVefgrSWfBRA2KAvUgaPLf8d7zEdd45LamMnjaIkQPr133ft1OLGG6U
-	tdIzyQeZ19qUOlKZXzUeq5sFbbVJHqYQx6p2yIBFIXYHejOV4NjF+m4rL1TkdDs9/9IDF9VCFwV94
-	BIMkIpOn6vLVARMzvhWOAzfqvr37h0LSdI5+ilPUFTb4QUWc6KeiEYmL3FCFka5r5ebsO9+QhesPQ
-	/oRGY/9ZH1mAeqrRm9DE8D8UMF4edshFx86PTV/SdcEY+5jWvFTeYhvJhvWjh6pHVZOiiRVYdh7Vk
-	d/m7EQbA==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rlC2Q-0000000AnYO-2GJG;
-	Fri, 15 Mar 2024 18:12:14 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	linux-block@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMWNtBwH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933DCC433F1;
+	Fri, 15 Mar 2024 18:23:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710527007;
+	bh=lub1QRO2Lskgp8R2IQAkrUw5puAP1pp27pLk2YXuaQY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vMWNtBwHk1gSxEjRF/dTgFBQDdEu+qVBSL/H52oG901jWq/DzDpmVLkYLESKaeDXd
+	 Gz6erIQJaKZIW7mI7Oo8AT/CvV6VyKx+pn8L6v9yadIU87BgTsP5GhR08f+wg7jitm
+	 +i1iqYvQRBWx11DNLJWPfss2hQZ/PC/BbXKwVgXj84swvHBdtxDBWg1RkFN5WAmJjK
+	 SBCsmF5ywINK7j3kVbtamieGw2DzOKuL0g1ks92PdOx79A+RcPAbKBaCkeftqdyJqH
+	 dvjViKROn5jcq5e+DOQuBijGNXtJqUPXnL44tlpfo7PeN3KbkDnKm/54QcMxUt4oow
+	 VPeD0sn8irpuA==
+Date: Fri, 15 Mar 2024 12:23:23 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Pankaj Raghav <p.raghav@samsung.com>,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH] brd: Remove use of page->index
-Date: Fri, 15 Mar 2024 18:12:09 +0000
-Message-ID: <20240315181212.2573753-1-willy@infradead.org>
-X-Mailer: git-send-email 2.44.0
+Subject: Re: [PATCH] brd: Remove use of page->index
+Message-ID: <ZfSSG3z0rQffkwGy@kbusch-mbp>
+References: <20240315181212.2573753-1-willy@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240315181212.2573753-1-willy@infradead.org>
 
-This debugging check will become more costly in the future when we shrink
-struct page.  It has not proven to be useful, so simply remove it.
+On Fri, Mar 15, 2024 at 06:12:09PM +0000, Matthew Wilcox (Oracle) wrote:
+>  static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
+>  {
+> -	pgoff_t idx;
+> -	struct page *page;
+> -
+> -	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to page index */
+> -	page = xa_load(&brd->brd_pages, idx);
+> -
+> -	BUG_ON(page && page->index != idx);
+> -
+> -	return page;
+> +	return xa_load(&brd->brd_pages, sector >> PAGE_SECTORS_SHIFT);
+>  }
+>  
+>  /*
+> @@ -67,8 +56,8 @@ static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
+>   */
+>  static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
+>  {
+> -	pgoff_t idx;
+> -	struct page *page, *cur;
+> +	pgoff_t idx = sector >> PAGE_SECTORS_SHIFT;
+> +	struct page *page;
+>  	int ret = 0;
+>  
+>  	page = brd_lookup_page(brd, sector);
 
-This lets us use __xa_insert instead of __xa_cmpxchg() as we no longer
-need to know about the page that is currently stored in the XArray.
+This looks good. Unnecessary suggestion, but since you're already
+changing these, might as well replace "sector" with "idx" here and skip
+the duplicated shift in brd_lookup_page().
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- drivers/block/brd.c | 40 +++++++++++-----------------------------
- 1 file changed, 11 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index e322cef6596b..b900fe9e0030 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -29,10 +29,7 @@
- 
- /*
-  * Each block ramdisk device has a xarray brd_pages of pages that stores
-- * the pages containing the block device's contents. A brd page's ->index is
-- * its offset in PAGE_SIZE units. This is similar to, but in no way connected
-- * with, the kernel's pagecache or buffer cache (which sit above our block
-- * device).
-+ * the pages containing the block device's contents.
-  */
- struct brd_device {
- 	int			brd_number;
-@@ -51,15 +48,7 @@ struct brd_device {
-  */
- static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
- {
--	pgoff_t idx;
--	struct page *page;
--
--	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to page index */
--	page = xa_load(&brd->brd_pages, idx);
--
--	BUG_ON(page && page->index != idx);
--
--	return page;
-+	return xa_load(&brd->brd_pages, sector >> PAGE_SECTORS_SHIFT);
- }
- 
- /*
-@@ -67,8 +56,8 @@ static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
-  */
- static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
- {
--	pgoff_t idx;
--	struct page *page, *cur;
-+	pgoff_t idx = sector >> PAGE_SECTORS_SHIFT;
-+	struct page *page;
- 	int ret = 0;
- 
- 	page = brd_lookup_page(brd, sector);
-@@ -80,23 +69,16 @@ static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
- 		return -ENOMEM;
- 
- 	xa_lock(&brd->brd_pages);
--
--	idx = sector >> PAGE_SECTORS_SHIFT;
--	page->index = idx;
--
--	cur = __xa_cmpxchg(&brd->brd_pages, idx, NULL, page, gfp);
--
--	if (unlikely(cur)) {
--		__free_page(page);
--		ret = xa_err(cur);
--		if (!ret && (cur->index != idx))
--			ret = -EIO;
--	} else {
-+	ret = __xa_insert(&brd->brd_pages, idx, page, gfp);
-+	if (!ret)
- 		brd->brd_nr_pages++;
--	}
--
- 	xa_unlock(&brd->brd_pages);
- 
-+	if (ret < 0) {
-+		__free_page(page);
-+		if (ret == -EBUSY)
-+			ret = 0;
-+	}
- 	return ret;
- }
- 
--- 
-2.43.0
-
+Reviewed-by: Keith Busch <kbusch@kernel.org>
