@@ -1,213 +1,151 @@
-Received: from mail.hallyn.com (mail.hallyn.com [178.63.66.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EEF182C3;
-	Fri, 15 Mar 2024 20:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.63.66.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB00C548F0;
+	Fri, 15 Mar 2024 21:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710533965; cv=none; b=In/VPsmqPENLDOYkRPthwJXX83gn/Hq6ALBNIruWfEDGy5TEzzIIEQkAXAhmFZM3YIAZWo9dc2qqlrA1VPEDyFqPy8o1a7yZmS2+aUxe1HIII8OuRH2xMpg5DTtUB7SUU8VE5tADaISUvfjcCYdmw5uJ++vjeAPsJNhpDlfMqEY=
+	t=1710537432; cv=none; b=oSnymNfDzb020l9NOeeXZT/FrhOrWXtzr5hQTU9Lxy+e1dLFV7HRCHno/Kz+mPbymGXc/6Juli3ovfod5FthB69OUQlIuSPuJ7Kst0xEIRlp2MF6+g+XxoNv3lI58Eu7ZL89OY/bTa+JRkuYmojczb0GWHRlq2dX1yerRgtXi0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710533965; c=relaxed/simple;
-	bh=d0hcUXTqOSZ8R8NjxE6s8I/KYB0WW7tkiEpvuiIH2kk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CzfqGl9D99QMIEFUpxLAK1IMKmrrQOE+OAFLFw1ROD01Kbx85K+hJ1ypUTHMC++INRyWBa+Ntf8DxSu347pVTiJ7u+fP2Gehs/7NRJdE6DlDEdwtp4qFdz2rYm8kjzfJxA7wdbzIyOMk9YTcAqapael3QR9WtdgqrBBh/63M+Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com; spf=pass smtp.mailfrom=hallyn.com; arc=none smtp.client-ip=178.63.66.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hallyn.com
-Received: from serge-l-PF3DENS3 (unknown [72.163.2.238])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: serge)
-	by mail.hallyn.com (Postfix) with ESMTPSA id 5F8DB888;
-	Fri, 15 Mar 2024 15:19:18 -0500 (CDT)
-Date: Fri, 15 Mar 2024 15:19:16 -0500
-From: Serge Hallyn <serge@hallyn.com>
-To: Christian =?iso-8859-1?Q?G=F6ttsche?= <cgzones@googlemail.com>
-Cc: linux-security-module@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH 02/10] capability: add any wrappers to test for multiple
- caps with exactly one audit message
-Message-ID: <ZfStRK6Z6Rm/KTJj@serge-l-PF3DENS3>
-References: <20240315113828.258005-1-cgzones@googlemail.com>
- <20240315113828.258005-2-cgzones@googlemail.com>
+	s=arc-20240116; t=1710537432; c=relaxed/simple;
+	bh=hwD/lGz/VzatlOJGLNO2bM+DjLMZEkNqMUkR6QXjBvk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EmKZ/0zBU5JIcy+mcbEoRyI53l+J2EZXBMeF7QvaEl212I6eO6XaXzzTzD1M7vbyJI/x3GWnp9sGfPmNeWCeifu46rHWOYi5sKqAFxV7UFXclb3xtAJFcJJ4yZ8NsZaFnPgeCDrkl0cJwadGATnk3jjJk/H0YerOqv6SExCltAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WASBOIO/; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WASBOIO/"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dd9b6098aeso19215645ad.0;
+        Fri, 15 Mar 2024 14:17:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710537429; x=1711142229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dbw37BmJsQeVdqK1E7BHtnCUQp5XmW43FRTZzRfLqog=;
+        b=WASBOIO/mk8BOl/FGa78H6u+IUALpPqN0Qt30t5ECct3HdZ2wqtwhtbXDrna/n3cGk
+         pjkV2cgD+E4iIS7AWk0dZK4cbRBKGCew5xYlHuZBhU5TDuQGpQxJmbjjgTaRuSiWJcO8
+         1W52bLKcN7cutPxLcPNiE3iaZqCqfdncGMBjnvRPS4uGwcsGvldPD2uhiMUbwgz922cv
+         +kftX/2jr4wZVspG8EM6NeiYBnjCF36rooC3Uv9BIMjcmwYoPSlE2TpqMen9Ea4Us+2j
+         nXnAo7ZLQjBRfdDiFjEEfs/yw0wJ5hUlEipiKTa13lOSUMgpPIQ2L9F01DIfBdVEizyE
+         wQww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710537429; x=1711142229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dbw37BmJsQeVdqK1E7BHtnCUQp5XmW43FRTZzRfLqog=;
+        b=PGDhIhJV4YAlspWfXXC/d5bmOLA7U1z5aOHgzFqMa7UPaQg12iQNGsMHTau5Fg43zY
+         tJFwVfeH8tmEO1j9uhK78PqCACITHBWAEJYY0GFxEYOumkVgH4lv/xR4oX+qvctmXxF/
+         zvBu80oL6k5QngESVgi/IX8PH4u06e5YUEsSxKjnvYjZKdPn8nlsLf32wyTyzKn5EjNS
+         5mnitQd/spRNEZugvyo//rJhG3TdYVcLAXkfMUTbhMozblLG8o9b+BIrNdRjEhGNs8m8
+         y7Bho6R5r0daRuRqL28/5ZlKXzO/AkJ633CTLtCNeGGO/A3zuGomJ+6FddmnuKelmt92
+         KnUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUt5opfCpfN8eT27H5L4ewgTcJdG9ZfmtqSKhC+W6KrBvqntatXtqmdbv0idSB7/CQZadO2Z+LtFlrCJ1tbGP+jslygs74lgwHQWxsxj/Jxs+DgJDRYldMwstjK/m/XdUszVqqE92yT1dyDstEYtE4yuXS68OX3ISHOoRjhTp290Zwt6z8nU0XGbcJxT5TgNYQjpRLbrvtDZi4vfdzVlKUDVETK1Mo=
+X-Gm-Message-State: AOJu0YxkEMw31ZKbxzXmWGOQt2SgtTNAaXZie8deiejH08uOYTdoDbmA
+	2m0JLl78RDINLPjjHNG+Ctc9vMgHgrxO8H/iwZ/s0SndIQs5csEl0IaLLnAZ/oSbvAlnRUL7A5p
+	fuCXdUF2iPoOdZSAdNL3V2SrS+FEAxM+n
+X-Google-Smtp-Source: AGHT+IGbDe8TDqWhW7fOhXA2CHqs3losvmxFx7BFSa9/+mgxC9s6/F3YiXoF2pn+xPEHeBz0lVW6B8iNIstOBbhkgns=
+X-Received: by 2002:a17:902:6e16:b0:1dc:ca1b:279b with SMTP id
+ u22-20020a1709026e1600b001dcca1b279bmr5438447plk.1.1710537428873; Fri, 15 Mar
+ 2024 14:17:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240315113828.258005-2-cgzones@googlemail.com>
+References: <20240315113828.258005-1-cgzones@googlemail.com>
+ <20240315113828.258005-2-cgzones@googlemail.com> <CAEf4BzZF0A9qEzmRigHFLQ4vBQshGUQWZVG5L0q2_--kx4=AXA@mail.gmail.com>
+ <0f8291f7-48b1-4be1-8a57-dbad5d0ab28c@kernel.dk>
+In-Reply-To: <0f8291f7-48b1-4be1-8a57-dbad5d0ab28c@kernel.dk>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 15 Mar 2024 14:16:56 -0700
+Message-ID: <CAEf4BzbgQrYDMma=NbW6A-qikA693eSnz9-RwjkF3xPLRE8qqg@mail.gmail.com>
+Subject: Re: [PATCH 02/10] capability: add any wrappers to test for multiple
+ caps with exactly one audit message
+To: Jens Axboe <axboe@kernel.dk>
+Cc: =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>, 
+	linux-security-module@vger.kernel.org, linux-block@vger.kernel.org, 
+	Serge Hallyn <serge@hallyn.com>, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 15, 2024 at 12:37:23PM +0100, Christian Göttsche wrote:
-> Add the interfaces `capable_any()` and `ns_capable_any()` as an
-> alternative to multiple `capable()`/`ns_capable()` calls, like
-> `capable_any(CAP_SYS_NICE, CAP_SYS_ADMIN)` instead of
-> `capable(CAP_SYS_NICE) || capable(CAP_SYS_ADMIN)`.
-> 
-> `capable_any()`/`ns_capable_any()` will in particular generate exactly
-> one audit message, either for the left most capability in effect or, if
-> the task has none, the first one.
-> 
-> This is especially helpful with regard to SELinux, where each audit
-> message about a not allowed capability request will create a denial
-> message.  Using this new wrapper with the least invasive capability as
-> left most argument (e.g. CAP_SYS_NICE before CAP_SYS_ADMIN) enables
-> policy writers to only grant the least invasive one for the particular
-> subject instead of both.
-> 
-> CC: linux-block@vger.kernel.org
-> Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+On Fri, Mar 15, 2024 at 11:41=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote=
+:
+>
+> On 3/15/24 10:45 AM, Andrii Nakryiko wrote:
+> >> +/**
+> >> + * ns_capable_any - Determine if the current task has one of two supe=
+rior capabilities in effect
+> >> + * @ns:  The usernamespace we want the capability in
+> >> + * @cap1: The capabilities to be tested for first
+> >> + * @cap2: The capabilities to be tested for secondly
+> >> + *
+> >> + * Return true if the current task has at least one of the two given =
+superior
+> >> + * capabilities currently available for use, false if not.
+> >> + *
+> >> + * In contrast to or'ing capable() this call will create exactly one =
+audit
+> >> + * message, either for @cap1, if it is granted or both are not permit=
+ted,
+> >> + * or @cap2, if it is granted while the other one is not.
+> >> + *
+> >> + * The capabilities should be ordered from least to most invasive, i.=
+e. CAP_SYS_ADMIN last.
+> >> + *
+> >> + * This sets PF_SUPERPRIV on the task if the capability is available =
+on the
+> >> + * assumption that it's about to be used.
+> >> + */
+> >> +bool ns_capable_any(struct user_namespace *ns, int cap1, int cap2)
+> >> +{
+> >> +       if (cap1 =3D=3D cap2)
+> >> +               return ns_capable(ns, cap1);
+> >> +
+> >> +       if (ns_capable_noauditondeny(ns, cap1))
+> >> +               return true;
+> >> +
+> >> +       if (ns_capable_noauditondeny(ns, cap2))
+> >> +               return true;
+> >> +
+> >> +       return ns_capable(ns, cap1);
+> >
+> > this will incur an extra capable() check (with all the LSMs involved,
+> > etc), and so for some cases where capability is expected to not be
+> > present, this will be a regression. Is there some way to not redo the
+> > check, but just audit the failure? At this point we do know that cap1
+> > failed before, so might as well just log that.
+>
+> Not sure why that's important - if it's a failure case, and any audit
+> failure should be, then why would we care if that's now doing a bit of
+> extra work?
 
-Reviewed-by: Serge Hallyn <serge@hallyn.com>
+Lack of capability doesn't necessarily mean "failure". E.g., in FUSE
+there are at least few places where the code checks
+capable(CAP_SYS_ADMIN), and based on that decides on some limit values
+or extra checks. So if !capable(CAP_SYS_ADMIN), operation doesn't
+necessarily fail outright, it just has some more restricted resources
+or something.
 
-> ---
-> v5:
->    - add check for identical passed capabilities
->    - rename internal helper according to flag rename to
->      ns_capable_noauditondeny()
-> v4:
->    Use CAP_OPT_NODENYAUDIT via added ns_capable_nodenyaudit()
-> v3:
->    - rename to capable_any()
->    - fix typo in function documentation
->    - add ns_capable_any()
-> v2:
->    avoid varargs and fix to two capabilities; capable_or3() can be added
->    later if needed
-> ---
->  include/linux/capability.h | 10 ++++++
->  kernel/capability.c        | 73 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 83 insertions(+)
-> 
-> diff --git a/include/linux/capability.h b/include/linux/capability.h
-> index 0c356a517991..eeb958440656 100644
-> --- a/include/linux/capability.h
-> +++ b/include/linux/capability.h
-> @@ -146,7 +146,9 @@ extern bool has_capability_noaudit(struct task_struct *t, int cap);
->  extern bool has_ns_capability_noaudit(struct task_struct *t,
->  				      struct user_namespace *ns, int cap);
->  extern bool capable(int cap);
-> +extern bool capable_any(int cap1, int cap2);
->  extern bool ns_capable(struct user_namespace *ns, int cap);
-> +extern bool ns_capable_any(struct user_namespace *ns, int cap1, int cap2);
->  extern bool ns_capable_noaudit(struct user_namespace *ns, int cap);
->  extern bool ns_capable_setid(struct user_namespace *ns, int cap);
->  #else
-> @@ -172,10 +174,18 @@ static inline bool capable(int cap)
->  {
->  	return true;
->  }
-> +static inline bool capable_any(int cap1, int cap2)
-> +{
-> +	return true;
-> +}
->  static inline bool ns_capable(struct user_namespace *ns, int cap)
->  {
->  	return true;
->  }
-> +static inline bool ns_capable_any(struct user_namespace *ns, int cap1, int cap2)
-> +{
-> +	return true;
-> +}
->  static inline bool ns_capable_noaudit(struct user_namespace *ns, int cap)
->  {
->  	return true;
-> diff --git a/kernel/capability.c b/kernel/capability.c
-> index dac4df77e376..73358abfe2e1 100644
-> --- a/kernel/capability.c
-> +++ b/kernel/capability.c
-> @@ -402,6 +402,23 @@ bool ns_capable_noaudit(struct user_namespace *ns, int cap)
->  }
->  EXPORT_SYMBOL(ns_capable_noaudit);
->  
-> +/**
-> + * ns_capable_noauditondeny - Determine if the current task has a superior capability
-> + * (unaudited when unauthorized) in effect
-> + * @ns:  The usernamespace we want the capability in
-> + * @cap: The capability to be tested for
-> + *
-> + * Return true if the current task has the given superior capability currently
-> + * available for use, false if not.
-> + *
-> + * This sets PF_SUPERPRIV on the task if the capability is available on the
-> + * assumption that it's about to be used.
-> + */
-> +static bool ns_capable_noauditondeny(struct user_namespace *ns, int cap)
-> +{
-> +	return ns_capable_common(ns, cap, CAP_OPT_NOAUDIT_ONDENY);
-> +}
-> +
->  /**
->   * ns_capable_setid - Determine if the current task has a superior capability
->   * in effect, while signalling that this check is being done from within a
-> @@ -421,6 +438,62 @@ bool ns_capable_setid(struct user_namespace *ns, int cap)
->  }
->  EXPORT_SYMBOL(ns_capable_setid);
->  
-> +/**
-> + * ns_capable_any - Determine if the current task has one of two superior capabilities in effect
-> + * @ns:  The usernamespace we want the capability in
-> + * @cap1: The capabilities to be tested for first
-> + * @cap2: The capabilities to be tested for secondly
-> + *
-> + * Return true if the current task has at least one of the two given superior
-> + * capabilities currently available for use, false if not.
-> + *
-> + * In contrast to or'ing capable() this call will create exactly one audit
-> + * message, either for @cap1, if it is granted or both are not permitted,
-> + * or @cap2, if it is granted while the other one is not.
-> + *
-> + * The capabilities should be ordered from least to most invasive, i.e. CAP_SYS_ADMIN last.
-> + *
-> + * This sets PF_SUPERPRIV on the task if the capability is available on the
-> + * assumption that it's about to be used.
-> + */
-> +bool ns_capable_any(struct user_namespace *ns, int cap1, int cap2)
-> +{
-> +	if (cap1 == cap2)
-> +		return ns_capable(ns, cap1);
-> +
-> +	if (ns_capable_noauditondeny(ns, cap1))
-> +		return true;
-> +
-> +	if (ns_capable_noauditondeny(ns, cap2))
-> +		return true;
-> +
-> +	return ns_capable(ns, cap1);
-> +}
-> +EXPORT_SYMBOL(ns_capable_any);
-> +
-> +/**
-> + * capable_any - Determine if the current task has one of two superior capabilities in effect
-> + * @cap1: The capabilities to be tested for first
-> + * @cap2: The capabilities to be tested for secondly
-> + *
-> + * Return true if the current task has at least one of the two given superior
-> + * capabilities currently available for use, false if not.
-> + *
-> + * In contrast to or'ing capable() this call will create exactly one audit
-> + * message, either for @cap1, if it is granted or both are not permitted,
-> + * or @cap2, if it is granted while the other one is not.
-> + *
-> + * The capabilities should be ordered from least to most invasive, i.e. CAP_SYS_ADMIN last.
-> + *
-> + * This sets PF_SUPERPRIV on the task if the capability is available on the
-> + * assumption that it's about to be used.
-> + */
-> +bool capable_any(int cap1, int cap2)
-> +{
-> +	return ns_capable_any(&init_user_ns, cap1, cap2);
-> +}
-> +EXPORT_SYMBOL(capable_any);
-> +
->  /**
->   * capable - Determine if the current task has a superior capability in effect
->   * @cap: The capability to be tested for
-> -- 
-> 2.43.0
-> 
-> 
+Luckily in FUSE's case it's singular capable() check, so capable_any()
+won't incur extra overhead. But I was just wondering if it would be
+possible to avoid this with capable_any() as well, so that no one has
+to do these trade-offs.
+
+We also had cases in production of some BPF applications tracing
+cap_capable() calls, so each extra triggering of it would be a bit of
+added overhead, as a general rule.
+
+Having said the above, I do like capable_any() changes (which is why I
+acked BPF side of things).
+
+>
+> I say this not knowing the full picture, as I unhelpfully was only CC'ed
+> on two of the patches... Please don't do that when sending patchsets.
+>
+> --
+> Jens Axboe
+>
