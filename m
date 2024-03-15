@@ -1,206 +1,131 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5191C683;
-	Fri, 15 Mar 2024 12:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345CC1C298
+	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 12:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710504540; cv=none; b=t5tkdRLtpmBX+fTXIHOT5P/JhETPLX+cCFeDilYiDhnqZ915bZh2uexGPFtvN/h3498CMj0+r1NrwTlE9Vxc9Bl6eZIVd1y4LDU5biPtWNJyj0OzF1nPzM52fdsergqRX4yXD4bZ26r/t1CB0JN1wUQ6gt58E9Q/Nel/fMDR7Co=
+	t=1710505075; cv=none; b=jfqSmfUC9ThdzpnBKfZVUpHoHwPlK6nStAZvN6/SHbH9ZNqXNTo4JY1WKGEEdMRvBCdWij4c0pgMEZWC6iZSwQZmHMCY4PaVP/MBYwrWuPcp24N8r05+i8Koy8FNLAe3pYOzR0hF6XZ22vc9gvTM/Xy3kqfuYNj6fkAyESKEW2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710504540; c=relaxed/simple;
-	bh=BoxHO+NQNUivX0dnzc7jAksKWZjd5aXdu6wr0adXOqo=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=mKh7sVoMJdFZjzLx1ECT0Kv11GyoK/MITHX6cncQu3MFWN4a2q22M4jzf1UecvDUlp/h/tlPVPY8ulkcwfyxwdWG7YUA1e4CcuxoV5dTn+DolxxaMW+sXpM9h26Yh3SfvsfnO3NNI6m2pR6DAMb60wYKQN4StxJIFXhOCXDxFMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tx31Y2yxDz1FMPL;
-	Fri, 15 Mar 2024 20:08:33 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (unknown [7.193.23.164])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5113D140124;
-	Fri, 15 Mar 2024 20:08:51 +0800 (CST)
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 15 Mar 2024 20:08:50 +0800
-Subject: Re: [RFC v4 linux-next 00/19] fs & block: remove bdev->bd_inode
-To: Yu Kuai <yukuai1@huaweicloud.com>, <jack@suse.cz>, <hch@lst.de>,
-	<brauner@kernel.org>, <axboe@kernel.dk>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<yi.zhang@huawei.com>, <yangerkun@huawei.com>
-References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
-From: Yu Kuai <yukuai3@huawei.com>
-Message-ID: <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
-Date: Fri, 15 Mar 2024 20:08:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1710505075; c=relaxed/simple;
+	bh=OXBEZqhs7kDse6BVOLPyb/0TPxks7Uu4zNmjP25UPs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lKYljHJ0mquIG91yIyCqGuj2NFIkgucSLHsxOvMww4RlbBJx7B1mQxvHSYpCd0QvWRdP+Twa5ncyyUHItFcdKlDehZPNqLsKLGq3uWB2CrMW3WBGkhmHK6N4xe0uzZtCwuOeekLg/OmLVIRV8P6EJqgw6JR/8SdIylVAWz2zeKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PpPvRFp9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PpPvRFp9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710505073;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RkV+0UDwdwnEtpTzSiYVVxf6L/nYIk2GiTDZOWrLMLA=;
+	b=PpPvRFp9DSQGFbh/lC9lLqdnxeuoDTVmdTjboYdMN1lCaL3H9HRZhFMA26re76SFQwlqMQ
+	NWuJ6QZ/r1DTeTaIc/CerRoosQYj//At0X/yc2Ag/h4sBqUcJf55griiyqRYoicdB4QFtR
+	69cWsiTEeqpH0j2vxKZMdv/6DTmJhYM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-423-2P5q7AxxOZCO0dI-vc4yOw-1; Fri, 15 Mar 2024 08:17:50 -0400
+X-MC-Unique: 2P5q7AxxOZCO0dI-vc4yOw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E5F5185A781;
+	Fri, 15 Mar 2024 12:17:49 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.52])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D18562166B4F;
+	Fri, 15 Mar 2024 12:17:35 +0000 (UTC)
+Date: Fri, 15 Mar 2024 20:17:31 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Andreas Hindborg <nmi@metaspace.dk>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Hannes Reinecke <hare@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>,
+	Niklas Cassel <Niklas.Cassel@wdc.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Yexuan Yang <1182282462@bupt.edu.cn>,
+	Sergio =?iso-8859-1?Q?Gonz=E1lez?= Collado <sergio.collado@gmail.com>,
+	Joel Granados <j.granados@samsung.com>,
+	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+Message-ID: <ZfQ8Wz9gMqsN02Mv@fedora>
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+ <20240313110515.70088-2-nmi@metaspace.dk>
+ <ZfI8-14RUqGqoRd-@boqun-archlinux>
+ <87il1ptck0.fsf@metaspace.dk>
+ <CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com>
+ <87plvwsjn5.fsf@metaspace.dk>
+ <CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
+ <8734ssrkxd.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
+In-Reply-To: <8734ssrkxd.fsf@metaspace.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Hi, Christian
-Hi, Christoph
-Hi, Jan
+On Fri, Mar 15, 2024 at 08:52:46AM +0100, Andreas Hindborg wrote:
+> Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> writes:
+> 
+> > On Thu, Mar 14, 2024 at 8:23â€¯PM Andreas Hindborg <nmi@metaspace.dk> wrote:
+> >>
+> >> The way the current code compiles, <kernel::block::mq::Request as
+> >> kernel::types::AlwaysRefCounted>::dec_ref` is inlined into the `rnull`
+> >> module. A relocation for `rust_helper_blk_mq_free_request_internal`
+> >> appears in `rnull_mod.ko`. I didn't test it yet, but if
+> >> `__blk_mq_free_request` (or the helper) is not exported, I don't think
+> >> this would be possible?
+> >
+> > Yeah, something needs to be exported since there is a generic
+> > involved, but even if you want to go the route of exporting only a
+> > different symbol, you would still want to put it in the C header so
+> > that you don't get the C missing declaration warning and so that we
+> > don't have to write the declaration manually in the helper.
+> 
+> That is what I did:
+> 
+> @@ -703,6 +703,7 @@ int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set *set,
+>  		unsigned int set_flags);
+>  void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
+>  
+> +void __blk_mq_free_request(struct request *rq);
+>  void blk_mq_free_request(struct request *rq);
+>  int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
+>  		unsigned int poll_flags);
 
-Perhaps now is a good time to send a formal version of this set.
-However, I'm not sure yet what branch should I rebase and send this set.
-Should I send to the vfs tree?
+Can you explain in detail why one block layer internal helper is
+called into rnull driver directly? It never happens in C driver code.
+
 
 Thanks,
-Kuai
+Ming
 
-ÔÚ 2024/02/22 20:45, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Changes in v4:
->   - respin on the top of linux-next, based on Christian's patchset to
->   open bdev as file. Most of patches from v3 is dropped and change to use
->   file_inode(bdev_file) to get bd_inode or bdev_file->f_mapping to get
->   bd_inode->i_mapping.
-> 
-> Changes in v3:
->   - remove bdev_associated_mapping() and patch 12 from v1;
->   - add kerneldoc comments for new bdev apis;
->   - rename __bdev_get_folio() to bdev_get_folio;
->   - fix a problem in erofs that erofs_init_metabuf() is not always
->   called.
->   - add reviewed-by tag for patch 15-17;
-> 
-> Changes in v2:
->   - remove some bdev apis that is not necessary;
->   - pass in offset for bdev_read_folio() and __bdev_get_folio();
->   - remove bdev_gfp_constraint() and add a new helper in fs/buffer.c to
->   prevent access bd_indoe() directly from mapping_gfp_constraint() in
->   ext4.(patch 15, 16);
->   - remove block_device_ejected() from ext4.
-> 
-> Yu Kuai (19):
->    block: move two helpers into bdev.c
->    block: remove sync_blockdev_nowait()
->    block: remove sync_blockdev_range()
->    block: prevent direct access of bd_inode
->    bcachefs: remove dead function bdev_sectors()
->    cramfs: prevent direct access of bd_inode
->    erofs: prevent direct access of bd_inode
->    nilfs2: prevent direct access of bd_inode
->    gfs2: prevent direct access of bd_inode
->    s390/dasd: use bdev api in dasd_format()
->    btrfs: prevent direct access of bd_inode
->    ext4: remove block_device_ejected()
->    ext4: prevent direct access of bd_inode
->    jbd2: prevent direct access of bd_inode
->    bcache: prevent direct access of bd_inode
->    block2mtd: prevent direct access of bd_inode
->    dm-vdo: prevent direct access of bd_inode
->    scsi: factor out a helper bdev_read_folio() from scsi_bios_ptable()
->    fs & block: remove bdev->bd_inode
-> 
->   block/bdev.c                              | 108 +++++++++++++++-------
->   block/blk-zoned.c                         |   4 +-
->   block/blk.h                               |   2 +
->   block/fops.c                              |   4 +-
->   block/genhd.c                             |   9 +-
->   block/ioctl.c                             |   8 +-
->   block/partitions/core.c                   |   8 +-
->   drivers/md/bcache/super.c                 |   7 +-
->   drivers/md/dm-vdo/dedupe.c                |   3 +-
->   drivers/md/dm-vdo/dm-vdo-target.c         |   5 +-
->   drivers/md/dm-vdo/indexer/config.c        |   1 +
->   drivers/md/dm-vdo/indexer/config.h        |   3 +
->   drivers/md/dm-vdo/indexer/index-layout.c  |   6 +-
->   drivers/md/dm-vdo/indexer/index-layout.h  |   2 +-
->   drivers/md/dm-vdo/indexer/index-session.c |  13 +--
->   drivers/md/dm-vdo/indexer/index.c         |   4 +-
->   drivers/md/dm-vdo/indexer/index.h         |   2 +-
->   drivers/md/dm-vdo/indexer/indexer.h       |   4 +-
->   drivers/md/dm-vdo/indexer/io-factory.c    |  13 ++-
->   drivers/md/dm-vdo/indexer/io-factory.h    |   4 +-
->   drivers/md/dm-vdo/indexer/volume.c        |   4 +-
->   drivers/md/dm-vdo/indexer/volume.h        |   2 +-
->   drivers/md/md-bitmap.c                    |   2 +-
->   drivers/mtd/devices/block2mtd.c           |   6 +-
->   drivers/s390/block/dasd_ioctl.c           |   5 +-
->   drivers/scsi/scsicam.c                    |   3 +-
->   fs/affs/file.c                            |   2 +-
->   fs/bcachefs/util.h                        |   5 -
->   fs/btrfs/dev-replace.c                    |   2 +-
->   fs/btrfs/disk-io.c                        |  17 ++--
->   fs/btrfs/disk-io.h                        |   4 +-
->   fs/btrfs/inode.c                          |   2 +-
->   fs/btrfs/super.c                          |   2 +-
->   fs/btrfs/volumes.c                        |  32 ++++---
->   fs/btrfs/volumes.h                        |   2 +-
->   fs/btrfs/zoned.c                          |  20 ++--
->   fs/btrfs/zoned.h                          |   4 +-
->   fs/buffer.c                               | 103 ++++++++++++---------
->   fs/cramfs/inode.c                         |   2 +-
->   fs/direct-io.c                            |   4 +-
->   fs/erofs/data.c                           |   5 +-
->   fs/erofs/internal.h                       |   1 +
->   fs/erofs/zmap.c                           |   2 +-
->   fs/exfat/fatent.c                         |   2 +-
->   fs/ext2/inode.c                           |   4 +-
->   fs/ext2/xattr.c                           |   2 +-
->   fs/ext4/dir.c                             |   2 +-
->   fs/ext4/ext4_jbd2.c                       |   2 +-
->   fs/ext4/inode.c                           |   8 +-
->   fs/ext4/mmp.c                             |   2 +-
->   fs/ext4/page-io.c                         |   5 +-
->   fs/ext4/super.c                           |  30 ++----
->   fs/ext4/xattr.c                           |   2 +-
->   fs/f2fs/data.c                            |   7 +-
->   fs/f2fs/f2fs.h                            |   1 +
->   fs/fat/inode.c                            |   2 +-
->   fs/fuse/dax.c                             |   2 +-
->   fs/gfs2/aops.c                            |   2 +-
->   fs/gfs2/bmap.c                            |   2 +-
->   fs/gfs2/glock.c                           |   2 +-
->   fs/gfs2/meta_io.c                         |   2 +-
->   fs/gfs2/ops_fstype.c                      |   2 +-
->   fs/hpfs/file.c                            |   2 +-
->   fs/iomap/buffered-io.c                    |   8 +-
->   fs/iomap/direct-io.c                      |  11 ++-
->   fs/iomap/swapfile.c                       |   2 +-
->   fs/iomap/trace.h                          |   2 +-
->   fs/jbd2/commit.c                          |   2 +-
->   fs/jbd2/journal.c                         |  34 ++++---
->   fs/jbd2/recovery.c                        |   8 +-
->   fs/jbd2/revoke.c                          |  13 +--
->   fs/jbd2/transaction.c                     |   8 +-
->   fs/mpage.c                                |  26 ++++--
->   fs/nilfs2/btnode.c                        |   4 +-
->   fs/nilfs2/gcinode.c                       |   2 +-
->   fs/nilfs2/mdt.c                           |   2 +-
->   fs/nilfs2/page.c                          |   4 +-
->   fs/nilfs2/recovery.c                      |  27 ++++--
->   fs/nilfs2/segment.c                       |   2 +-
->   fs/ntfs3/fsntfs.c                         |   8 +-
->   fs/ntfs3/inode.c                          |   4 +-
->   fs/ntfs3/super.c                          |   2 +-
->   fs/ocfs2/journal.c                        |   2 +-
->   fs/reiserfs/fix_node.c                    |   2 +-
->   fs/reiserfs/journal.c                     |  10 +-
->   fs/reiserfs/prints.c                      |   4 +-
->   fs/reiserfs/reiserfs.h                    |   6 +-
->   fs/reiserfs/stree.c                       |   2 +-
->   fs/reiserfs/tail_conversion.c             |   2 +-
->   fs/sync.c                                 |   9 +-
->   fs/xfs/xfs_iomap.c                        |   4 +-
->   fs/zonefs/file.c                          |   4 +-
->   include/linux/blk_types.h                 |   1 -
->   include/linux/blkdev.h                    |  21 +----
->   include/linux/buffer_head.h               |  73 ++++++++++-----
->   include/linux/iomap.h                     |  14 ++-
->   include/linux/jbd2.h                      |  18 +++-
->   include/trace/events/block.h              |   2 +-
->   98 files changed, 491 insertions(+), 376 deletions(-)
-> 
