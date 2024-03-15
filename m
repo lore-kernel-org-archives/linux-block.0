@@ -1,58 +1,58 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB1F3D96E
-	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 15:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBCAE321B4
+	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 15:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710517208; cv=none; b=lHV1G5PeqULl/f2j1hzpYwZD7Ak3bq9jtf2t3eMWjXfpA4d3wOPF9Pnu75HQhSV4ClzWzIEAqZeKonmoy6QjgIL3IAH/dpszxktbZmJ08+duV+Bd3cnG64lm2z3jykWSNpawIs738gV1nlvJMQmm/wNCjr3sJWpb3i7UOSSyVrg=
+	t=1710517335; cv=none; b=l36aaYoHlk2LlnbtSX1F9HgEJPS2jgI9T0z873YFOSDKZhrLSKP1VA3P0bbgdOGS2WZ+2LOUF2KuCmPRWU/7OnxJcC1WchojCsc0VmfiR0ePtdW8AGOpmBENW03GX2izEfx3j7a73d7Da/vuyV056WqUhH6lpPt0/ySNBcu/s5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710517208; c=relaxed/simple;
-	bh=LSs2S3iuowRG/48fRT/eg0jSeSR2vSLJ6zBJRPMIMw0=;
+	s=arc-20240116; t=1710517335; c=relaxed/simple;
+	bh=C1ZUs3gG5z72f6eX94YNHIEUFRExkj3puBeJ7GC/KqQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uA3uB92NiekeIimaET7EqJCUvK3SbFaSk9YuciKgY0g+JmZA2fNkc8JKBBodV3UtWjF8QRH2Fs8hJY4axl5PIZHcFOBkqg+WgdklisSRN9EQ51Dgt1DfrcPwV7oT0WQtZttKKmaaWox3y8AWrncgi+CtLaimVt/Fsn0e969DpVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=POIkxaCt; arc=none smtp.client-ip=209.85.214.176
+	 In-Reply-To:Content-Type; b=LQJ2JQIrdCA9+aa5YW8emezpl6wWO8Be5kbali0dehmv39lhhUrZK6xf69vB+OihlpmpG4ebzwZLojULzqDlrqpe8vHOXyXOloN0l0CQ0wvkBy9Gqe/OeAMCTSRf1k77B5cUzZR/rWoN4utniiD6pI3x04RsOGThG0QgMkLYknM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=J/Qdu9wH; arc=none smtp.client-ip=209.85.160.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="POIkxaCt"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1dee6672526so1942425ad.1
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 08:40:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="J/Qdu9wH"
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-221b9142995so234582fac.1
+        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 08:42:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710517206; x=1711122006; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710517333; x=1711122133; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gKy+mz/n2AeaUmS60C/0BdHqWiGBx9scJyuqhc9AJ7w=;
-        b=POIkxaCtDbSR9NK1rlTmI8XYiRLSEyRoAbMAimsoe2DLMgLRiV+kR/x4Fv0JMcenDk
-         IFHZIgZOrSeNNUQPhYao3vou4CJC7miDDxfZnkkmfOfu6BApZKl/ozGsEKchZZ7saHXa
-         5ZvvTpmShQ6uvigxmV3LjuJb+gbDk9cOPukIZMx4SpMDzivLxufOTc/rKaYj76wrLUoW
-         dgZqb67MpgwYpp2A6F6qGYtUY/qophflbkm6IkWd2UCgB1odwreMFHFjE9Ey6pvnYKu5
-         6H1httR8wvdj60zokEh6OtGZZqybG84xl8K7Ur5sDYJCYyUMrr+bde6TXm6OZu2EiV84
-         ju7A==
+        bh=GKgmBazvbnm7o03uwKfBQxmOXAQWmFLuSuJB3oyuKNI=;
+        b=J/Qdu9wHGGOIyLThwQN8vniL0Wu5JyXnAT1+fHBmj5Lvs7n1dx/as8BbBXzD7uMyHl
+         xiv4uh2kS7G9E7DCwLDSQGt0AZbF1wb092u96JV7cSH8QNPXP2nbso86EPGFs72eAgAd
+         UOYvYLFaYXimdgHjhjDLK9fSkrnfHl9vJW4NB+2V23/TN4W4QvE8ECLFjiogZ/9qK51Q
+         npcog/5J3/IZWkdNKyBfiYfhpWAAYdDVDh1ILbxDiJjS03HvBHzOb0vrXZt39zOllqGX
+         wb/vk8RxKfg0879fEdVyEzK+6ux4gg5Z6LgVd9L/2O136M0a/8Hl9VVRf/c6N/VMMKL+
+         +xhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710517206; x=1711122006;
+        d=1e100.net; s=20230601; t=1710517333; x=1711122133;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKy+mz/n2AeaUmS60C/0BdHqWiGBx9scJyuqhc9AJ7w=;
-        b=AjHIibtYJk+sQ0BYBWuZeYxWHwH7G9ViXxEsirkgcALc7EkG3EGy+pft/GVnbuQZ0t
-         iBYXncveMZwG5uGqYmFxNHlvKMXmXLPkDR20wpjIHucgDXFjW5NujCNddKKYttfBFQQN
-         /axCtSm6ayJRRANhInj7uDWlNsi8EVzW3vQalrgiYlDdxEt6MVtbO41SaY2bBay12S3+
-         GDIbYWNrGabAZIpDrixVMhxdtzx5Jq/glXzt+GB0z40GTek2JoMBthfg/vR+YC5NiLv7
-         on5VN3iSD4WMnC2YHh9c9MNGa3L9wn2J+SFSyWrVrwuJ6SED480EunHvVUXxa40vv29j
-         A0Ug==
-X-Gm-Message-State: AOJu0YxEHGG7tmPuruHT0XyxTfs57eURvz9uulaS51L+nmWAvMUqGo7k
-	Cfwqs6kjK3fMoDOmS08A9hgbYJ6GkMvFasTrq9npxt2BjFPyfr5JxeUsU1aWk3Y=
-X-Google-Smtp-Source: AGHT+IGJMgzqT5Yv4qdF0V+oJspuarS7ZOrFgxWlz1kvGziclUJc6KPFNH0hTwulRTcTH0bqmuYPpg==
-X-Received: by 2002:a17:902:e84e:b0:1dc:82bc:c072 with SMTP id t14-20020a170902e84e00b001dc82bcc072mr3752707plg.1.1710517205799;
-        Fri, 15 Mar 2024 08:40:05 -0700 (PDT)
+        bh=GKgmBazvbnm7o03uwKfBQxmOXAQWmFLuSuJB3oyuKNI=;
+        b=SrR9GRyXoX3woQ/zgyVbyDPwhA4IjbUpySt6U/gfguxDT+XS9ExLYBHym3OiBVRfFV
+         sQdnGpv7NIqM0LDonbBZVBZRQb2RRTHYMntK5ccwwGP1LfATuGHJfpnvhkhZol1RcSOh
+         KNxvhxTt/AM75eNaR+h1Loy4t68GV0yL5DXD8HgAa1a3ZGD5wCcODFXdvOWPRdr1k+hV
+         Veg8MgXkCITN5/OlK5L9YlEQj+j7csrE5PdD3H2afCy7WgAlGJifKIFT1qIHwiDW+roL
+         tVV5mbm1JB6pKOX8tsSx4OOX864J4jILMsATZdEqnXHmYC/1S0sAifA2EjZyzc97cSeL
+         hxNQ==
+X-Gm-Message-State: AOJu0YxlecXUV/EfLnRFfcllXBEmvyrlcmdzSZupJJvbN72mbTr2LyjS
+	tcUmYt+p2CH8lRs0aNgd1u6W2mLObuZaE8sH6G/jx+SnADgttyjhdbLPbooFlqI=
+X-Google-Smtp-Source: AGHT+IGCO4xlveh6PNk9Ql5h4c88u4v6ykwH7rivIkrx9dkeGvcXYhP2xvmB/AXUquAuIuZL41P/yg==
+X-Received: by 2002:a05:6870:51cb:b0:221:b2a:3beb with SMTP id b11-20020a05687051cb00b002210b2a3bebmr5253185oaj.2.1710517333075;
+        Fri, 15 Mar 2024 08:42:13 -0700 (PDT)
 Received: from ?IPV6:2620:10d:c085:21e8::129e? ([2620:10d:c090:400::5:d882])
-        by smtp.gmail.com with ESMTPSA id w3-20020a170902d10300b001ddb73e719dsm4010197plw.27.2024.03.15.08.40.04
+        by smtp.gmail.com with ESMTPSA id n45-20020a056a000d6d00b006e6ff8ba817sm827430pfv.16.2024.03.15.08.42.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 08:40:05 -0700 (PDT)
-Message-ID: <6d100f51-9afd-47ba-8280-51f841f9de3d@kernel.dk>
-Date: Fri, 15 Mar 2024 09:40:03 -0600
+        Fri, 15 Mar 2024 08:42:12 -0700 (PDT)
+Message-ID: <9b9f2053-2b07-47bb-a63f-c766f0c2d30e@kernel.dk>
+Date: Fri, 15 Mar 2024 09:42:11 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,32 +60,30 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/11] io_uring: force tw ctx locking
+Subject: Re: [PATCH 00/11] remove aux CQE caches
 Content-Language: en-US
 To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
 Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
  Ming Lei <ming.lei@redhat.com>
 References: <cover.1710514702.git.asml.silence@gmail.com>
- <1f7f31f4075e766343055ff0d07482992038d467.1710514702.git.asml.silence@gmail.com>
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <1f7f31f4075e766343055ff0d07482992038d467.1710514702.git.asml.silence@gmail.com>
+In-Reply-To: <cover.1710514702.git.asml.silence@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 3/15/24 9:29 AM, Pavel Begunkov wrote:
-> We can run normal task_work without locking the ctx, however we try to
-> lock anyway and most handlers prefer or require it locked. It might have
-> been interesting to multi-submitter ring with high contention completing
-> async read/write requests via task_work, however that will still need to
-> go through io_req_complete_post() and potentially take the lock for
-> rsrc node putting or some other case.
+> Patch 1 is a fix.
 > 
-> In other words, it's hard to care about it, so alawys force the locking.
-> The case described would also because of various io_uring caches.
+> Patches 2-7 are cleanups mainly dealing with issue_flags conversions,
+> misundertsandings of the flags and of the tw state. It'd be great to have
+> even without even w/o the rest.
+> 
+> 8-11 mandate ctx locking for task_work and finally removes the CQE
+> caches, instead we post directly into the CQ. Note that the cache is
+> used by multishot auxiliary completions.
 
-This is a good idea, I've had that thought myself too. The conditional
-aspect of it is annoying, and by far the most interesting use cases will
-do the locking anyway.
+I love this series! I'll push patch 1 for 6.9, and then run some testing
+with the rest for 6.10.
 
 -- 
 Jens Axboe
