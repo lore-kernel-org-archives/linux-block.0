@@ -1,58 +1,78 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807B84DA1F
-	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 18:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AA24F1F8
+	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 18:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710527222; cv=none; b=aFpsJj3nqHYhD9COxmlrJKJhWeaVxiC0LTojFOArMlWiCQY8PoF7wcSmYK39leIBhbmK6/xpsqORP+Iip4Ox03gKIHu7eFjTGbi4L0i441J3byetXKaVHEAOQL2+QinvhimmQqex19IVxfA3VPHBpOQC2sPBkQyFlUzBObtpmBQ=
+	t=1710527229; cv=none; b=fDmHqsLpOZy1GohnCRPHvZtg78FrmEYdPkKLihymzK+Cg6i6AYnl0KgIGMCkfZF8D1WSNDoCiT1+Z1g1w0FlwlcCkuZ4HuWXgq5q2H+7kLh6d8a6lU+a7Cc5UzhbIXraNgKw/ibBpL/vHCriH1P9vgZDlVXkJdpUSaaP2s4VkHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710527222; c=relaxed/simple;
-	bh=FcY+VRirWnU1Ol2e0GYoMsDgxmwDeVmjIWYEaGeRtOU=;
+	s=arc-20240116; t=1710527229; c=relaxed/simple;
+	bh=+3P91a6YJLKQ78DxQAocSynqpaP5mzawBLeC6btfyBU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uEBiQOKS4RMdjb+r3+Ie2CVd0uW6srxInS9LxQ4gGkVGdMJyxynJ9PxE5yJ7njspPe08ngCPXOlrG+g0oX0CURQkgvfX7ejUpc0T7SByHRsL9bBY0kgoMAGhMwqxB/+V5LcpNgIdW7srSModiTjEL5Iku54PVqB1s9MrjNAqWSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1CMVgeew; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=cLbWUwPC/id1KEFIs1uVdVpD8T1Tn+BGP+KHzR584q2cD98kuiayzIxRbkueHJ8pI0k6OmJOpYifiMD4Saf6uq+NirhmocRWJye1EBM2jYD8Xo4ub0wkUxDrfNQNhm2mzEVFrcZQ8EVnwyx2AjxeO4wXJhkCf6/xLdfSZA3tntQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hefHwerd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=V3Hk8GPN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hefHwerd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=V3Hk8GPN; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1CMVgeew"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5a46b30857bso330852eaf.1
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 11:27:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710527219; x=1711132019; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=23OrLcxLDxWvP8ctyHWVIeXpKDHsE6jft/6XM7K55hY=;
-        b=1CMVgeewB5BKuIJx1GeSMLIgoaXaSXOyG10jTBVaCDfA02UWWWXWm0b0hunYJS6d2d
-         akpTk2f+rDLT4Yb6q5VZa3ZBS5koy0Q3akK7u/Cg+mj9d6WCYNdULwwEPs7RsH/Zc2YI
-         dDcCyfbeGlyFRaP3YMqc9DVvXriuMdCChT8MKwmLGRjl7YXcur2ZTnTq+RjrdPK2Xs5I
-         6nPD4a8zDgipDhYSMipvcCG3u3qeUZeXazl/2w5//+ZG1mw9xrgLeQ82nhsmomKEM636
-         8WOcaTDcbbzI32x6uowBWma2Ur0DQTty9tiANyv+P4APZYbqI6fT9FExkm4543DpSN8F
-         xNBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710527219; x=1711132019;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=23OrLcxLDxWvP8ctyHWVIeXpKDHsE6jft/6XM7K55hY=;
-        b=ZcFX7h/RizguKfMjgXftcJfpo5jxs+uaQTXWN4rDqGhqjxJvdu5RQtPBnv0itgTVue
-         w0Cf6lwX8dhIQydKsnSshCG7wDGn/C51GTAPmBEubQr8cRVYL63x+lxvh424JE5R5HqI
-         wyOv4TmdiASC7/aFsixHioh4JxhTAcscOWteHBvGmyO4mczHAq11/eviwfAyn+C8Z/Ps
-         Ki/EH33jbE+0v0uClXKWya2EjWmEBBv51Bu4pN6kcQQ1DhFjg5kbb1VsidW+l8et7H7R
-         tPu98WUToWp/ewJISrdLHAGrjCV0ulDkJLB83QwlTeSMEGvWRaZ7pZFJbzTh+1R1EV1H
-         BAcA==
-X-Gm-Message-State: AOJu0YxjLGkh1n+MlPUxLGAM2rGUGR4DO4wVI+04Lcl5YTSDxZ2DtHu6
-	ApRPUGLvfdeNJEoEdqm1hiJWVfI1UxX/KJB/Xb3l5/QG+J2aJr7ZX+C3Ucr/t1k=
-X-Google-Smtp-Source: AGHT+IE2wt3Ca0cSemGgx6ZlZKrjy2DSpcqRW3JFt5NDyyCIlmPEGKVDj3sdfJK+ECrvJuhT8PB+JQ==
-X-Received: by 2002:a05:6359:458c:b0:17e:bbaf:4060 with SMTP id no12-20020a056359458c00b0017ebbaf4060mr3433889rwb.2.1710527219231;
-        Fri, 15 Mar 2024 11:26:59 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id f35-20020a635563000000b005dc884e9f5bsm2768927pgm.38.2024.03.15.11.26.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 11:26:58 -0700 (PDT)
-Message-ID: <47ab135e-af1c-4492-8807-d0bc434da253@kernel.dk>
-Date: Fri, 15 Mar 2024 12:26:57 -0600
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hefHwerd";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="V3Hk8GPN";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hefHwerd";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="V3Hk8GPN"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3AA5D21DF4;
+	Fri, 15 Mar 2024 18:27:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710527222; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F39mLGMroywL6C3XW5hd53XHtA0UOkK913HkL0rO37g=;
+	b=hefHwerdjopjWLfEOj1vhPJ6Hlh7SZ9tlEKdc6n3FDzZf+4AbM+DJPoKy3OUjrm3LWh9Uv
+	T9j5M63Wf4VkpG0119d+1oBxrtNPTEqLPLLrwCucrIu21hvNU0tWzShbnljh4ypDIElgRS
+	ibyrTNsmERdz/TRQoQr6fK6pEdJtQKw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710527222;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F39mLGMroywL6C3XW5hd53XHtA0UOkK913HkL0rO37g=;
+	b=V3Hk8GPN+ecWS3hHii6VRY1FDQy+7mXhxJi5e3ViRBrborp6VtxtrYvrfPhzBpKf7c2CcQ
+	Pto9plFn3wGlEXBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710527222; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F39mLGMroywL6C3XW5hd53XHtA0UOkK913HkL0rO37g=;
+	b=hefHwerdjopjWLfEOj1vhPJ6Hlh7SZ9tlEKdc6n3FDzZf+4AbM+DJPoKy3OUjrm3LWh9Uv
+	T9j5M63Wf4VkpG0119d+1oBxrtNPTEqLPLLrwCucrIu21hvNU0tWzShbnljh4ypDIElgRS
+	ibyrTNsmERdz/TRQoQr6fK6pEdJtQKw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710527222;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F39mLGMroywL6C3XW5hd53XHtA0UOkK913HkL0rO37g=;
+	b=V3Hk8GPN+ecWS3hHii6VRY1FDQy+7mXhxJi5e3ViRBrborp6VtxtrYvrfPhzBpKf7c2CcQ
+	Pto9plFn3wGlEXBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EB1FA13460;
+	Fri, 15 Mar 2024 18:27:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id lXRpNvWS9GWUCwAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 15 Mar 2024 18:27:01 +0000
+Message-ID: <b9e5c71d-4d3a-4d1f-8956-68a6d2537e4b@suse.de>
+Date: Fri, 15 Mar 2024 19:27:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,122 +80,137 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/11] io_uring: get rid of intermediate aux cqe caches
+Subject: Re: [PATCH] brd: Remove use of page->index
 Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
- Ming Lei <ming.lei@redhat.com>
-References: <cover.1710514702.git.asml.silence@gmail.com>
- <0eb3f55722540a11b036d3c90771220eb082d65e.1710514702.git.asml.silence@gmail.com>
- <6e5d55a8-1860-468f-97f4-0bd355be369a@kernel.dk>
- <7a6b4d7f-8bbd-4259-b1f1-e026b5183350@gmail.com>
- <70e18e4c-6722-475d-818b-dc739d67f7e7@kernel.dk>
- <dfdfcafe-199f-4652-9e79-7fb0e7b2ab4f@kernel.dk>
- <e40448f1-11b4-41a8-81ab-11b4ffc1b717@gmail.com>
- <0f164d26-e4da-4e96-b413-ec66cf16e3d7@kernel.dk>
- <d82a07b8-a65d-4551-8516-5e50e0fab2fe@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <d82a07b8-a65d-4551-8516-5e50e0fab2fe@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Pankaj Raghav <p.raghav@samsung.com>
+References: <20240315181212.2573753-1-willy@infradead.org>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240315181212.2573753-1-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.28
+X-Spamd-Result: default: False [-4.28 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 BAYES_HAM(-3.00)[100.00%];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.19)[-0.938];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,infradead.org:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Flag: NO
 
-On 3/15/24 11:26 AM, Pavel Begunkov wrote:
-> On 3/15/24 16:49, Jens Axboe wrote:
->> On 3/15/24 10:44 AM, Pavel Begunkov wrote:
->>> On 3/15/24 16:27, Jens Axboe wrote:
->>>> On 3/15/24 10:25 AM, Jens Axboe wrote:
->>>>> On 3/15/24 10:23 AM, Pavel Begunkov wrote:
->>>>>> On 3/15/24 16:20, Jens Axboe wrote:
->>>>>>> On 3/15/24 9:30 AM, Pavel Begunkov wrote:
->>>>>>>> io_post_aux_cqe(), which is used for multishot requests, delays
->>>>>>>> completions by putting CQEs into a temporary array for the purpose
->>>>>>>> completion lock/flush batching.
->>>>>>>>
->>>>>>>> DEFER_TASKRUN doesn't need any locking, so for it we can put completions
->>>>>>>> directly into the CQ and defer post completion handling with a flag.
->>>>>>>> That leaves !DEFER_TASKRUN, which is not that interesting / hot for
->>>>>>>> multishot requests, so have conditional locking with deferred flush
->>>>>>>> for them.
->>>>>>>
->>>>>>> This breaks the read-mshot test case, looking into what is going on
->>>>>>> there.
->>>>>>
->>>>>> I forgot to mention, yes it does, the test makes odd assumptions about
->>>>>> overflows, IIRC it expects that the kernel allows one and only one aux
->>>>>> CQE to be overflown. Let me double check
->>>>>
->>>>> Yeah this is very possible, the overflow checking could be broken in
->>>>> there. I'll poke at it and report back.
->>>>
->>>> It does, this should fix it:
->>>>
->>>>
->>>> diff --git a/test/read-mshot.c b/test/read-mshot.c
->>>> index 8fcb79857bf0..501ca69a98dc 100644
->>>> --- a/test/read-mshot.c
->>>> +++ b/test/read-mshot.c
->>>> @@ -236,7 +236,7 @@ static int test(int first_good, int async, int overflow)
->>>>            }
->>>>            if (!(cqe->flags & IORING_CQE_F_MORE)) {
->>>>                /* we expect this on overflow */
->>>> -            if (overflow && (i - 1 == NR_OVERFLOW))
->>>> +            if (overflow && i >= NR_OVERFLOW)
->>>
->>> Which is not ideal either, e.g. I wouldn't mind if the kernel stops
->>> one entry before CQ is full, so that the request can complete w/o
->>> overflowing. Not supposing the change because it's a marginal
->>> case, but we shouldn't limit ourselves.
->>
->> But if the event keeps triggering we have to keep posting CQEs,
->> otherwise we could get stuck. 
+On 3/15/24 19:12, Matthew Wilcox (Oracle) wrote:
+> This debugging check will become more costly in the future when we shrink
+> struct page.  It has not proven to be useful, so simply remove it.
 > 
-> Or we can complete the request, then the user consumes CQEs
-> and restarts as usual
+> This lets us use __xa_insert instead of __xa_cmpxchg() as we no longer
+> need to know about the page that is currently stored in the XArray.
+> 
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> ---
+>   drivers/block/brd.c | 40 +++++++++++-----------------------------
+>   1 file changed, 11 insertions(+), 29 deletions(-)
+> 
+> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+> index e322cef6596b..b900fe9e0030 100644
+> --- a/drivers/block/brd.c
+> +++ b/drivers/block/brd.c
+> @@ -29,10 +29,7 @@
+>   
+>   /*
+>    * Each block ramdisk device has a xarray brd_pages of pages that stores
+> - * the pages containing the block device's contents. A brd page's ->index is
+> - * its offset in PAGE_SIZE units. This is similar to, but in no way connected
+> - * with, the kernel's pagecache or buffer cache (which sit above our block
+> - * device).
+> + * the pages containing the block device's contents.
+>    */
+>   struct brd_device {
+>   	int			brd_number;
+> @@ -51,15 +48,7 @@ struct brd_device {
+>    */
+>   static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
+>   {
+> -	pgoff_t idx;
+> -	struct page *page;
+> -
+> -	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to page index */
+> -	page = xa_load(&brd->brd_pages, idx);
+> -
+> -	BUG_ON(page && page->index != idx);
+> -
+> -	return page;
+> +	return xa_load(&brd->brd_pages, sector >> PAGE_SECTORS_SHIFT);
+>   }
+>   
+>   /*
+> @@ -67,8 +56,8 @@ static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
+>    */
+>   static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
+>   {
+> -	pgoff_t idx;
+> -	struct page *page, *cur;
+> +	pgoff_t idx = sector >> PAGE_SECTORS_SHIFT;
+> +	struct page *page;
+>   	int ret = 0;
+>   
+>   	page = brd_lookup_page(brd, sector);
+> @@ -80,23 +69,16 @@ static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
+>   		return -ENOMEM;
+>   
+>   	xa_lock(&brd->brd_pages);
+> -
+> -	idx = sector >> PAGE_SECTORS_SHIFT;
+> -	page->index = idx;
+> -
+> -	cur = __xa_cmpxchg(&brd->brd_pages, idx, NULL, page, gfp);
+> -
+> -	if (unlikely(cur)) {
+> -		__free_page(page);
+> -		ret = xa_err(cur);
+> -		if (!ret && (cur->index != idx))
+> -			ret = -EIO;
+> -	} else {
+> +	ret = __xa_insert(&brd->brd_pages, idx, page, gfp);
+> +	if (!ret)
+>   		brd->brd_nr_pages++;
+> -	}
+> -
+>   	xa_unlock(&brd->brd_pages);
+>   
+> +	if (ret < 0) {
+> +		__free_page(page);
+> +		if (ret == -EBUSY)
+> +			ret = 0;
+> +	}
+>   	return ret;
+>   }
+>   
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-So you'd want to track if we'd overflow, wait for overflow to clear, and
-then restart that request? I think that sounds a bit involved, no?
-Particularly for a case like overflow, which generally should not occur.
-If it does, just terminate it, and have the user re-issue it. That seems
-like the simpler and better solution to me.
+Cheers,
 
->> As far as I'm concerned, the behavior with
->> the patch looks correct. The last CQE is overflown, and that terminates
->> it, and it doesn't have MORE set. The one before that has MORE set, but
->> it has to, unless you aborted it early. But that seems impossible,
->> because what if that was indeed the last current CQE, and we reap CQEs
->> before the next one is posted.
->>
->> So unless I'm missing something, I don't think we can be doing any
->> better.
-> 
-> You can opportunistically try to avoid overflows, unreliably
-> 
-> bool io_post_cqe() {
->     // Not enough space in the CQ left, so if there is a next
->     // completion pending we'd have to overflow. Avoid that by
->     // terminating it now.
->     //
->     // If there are no more CQEs after this one, we might
->     // terminate a bit earlier, but that better because
->     // overflows are so expensive and unhandy and so on.
->     if (cq_space_left() <= 1)
->         return false;
->     fill_cqe();
->     return true;
-> }
-> 
-> some_multishot_function(req) {
->     if (!io_post_cqe(res))
->         complete_req(req, res);
-> }
-> 
-> Again, not suggesting the change for all the obvious reasons, but
-> I think semantically we should be able to do it.
-
-Yeah not convinced this is worth looking at. If it was the case that the
-hot path would often see overflows and it'd help to avoid it, then
-probably it'd make sense. But I don't think that's the case.
-
+Hannes
 -- 
-Jens Axboe
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
