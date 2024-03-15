@@ -1,58 +1,59 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D50A1A38CB
-	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 16:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7246F3BB28;
+	Fri, 15 Mar 2024 16:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710520427; cv=none; b=sONL85QWOjRPe8LIZsB+0SwFyem4Hp5H4fQlvPH1XSl6dk1JyZUKV7a7oHVpdio+KO/Y5f4mUMqglbYOrtfaEU7wRK7FZ1AGIr2JIldn2Kgf2d7jhigiURDqeTVv+T4lDaOBwOiqTbDctp7hPwfoksWBFZQeMb73H+CljhG4dTI=
+	t=1710521110; cv=none; b=p3V8ogb+1VC0+ogDa9tAjWMDyjg/SsNZFqz1q/zFECdl2dNdyjhotG8A/ws0/+TZWp3uneT/clmLHAsUZX+VawCOzgUHiYcKVgle05mktA/x3n5cqWefgj9tOpxJ9yEhvDxSNJgNuRx2U5Sc9xHcSakh9GWaDMX3XA7P7XYKQbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710520427; c=relaxed/simple;
-	bh=x4nCNFQVwr44iuG36GP8T1elKSwdqZxBj28qZs2HMeI=;
+	s=arc-20240116; t=1710521110; c=relaxed/simple;
+	bh=6ocWOhxuFBCbWoaCNynzwb5vX0ZTvIO65y+LKbV0DD0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zzv5hbPsAxiNfYfmvHUXHsToHEVQAYJw22UgQcF23dS62VUq+LAcKdaJrlMpHR8yNcCeZNZnw1WXQTHTLRzlHyXn4uT2InvIs9tqx76KGzCILf5zlccXfGvS5Pf1kWMIgFLDkZlXqIE6C8zeYwm2ibPMp42CBsXq/VkbLTSENyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ic5jhXty; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=PHgo8W1tLZHBtf0nqnlQx0z0sRWRg2lFlTeBX5NKPhzQdOkXqUJGiKA2sv5U3SQ6Sq5svsobvjgCcTsq669Hhc+5WN8NG7CHDUzen6H5lrsEflc2jXhGPdZO5nsJJlUpPCkAhn0NWrhMMFkc2J6AkCkvp+z6BmY+J2TLRWBesl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DuXrsHhm; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ic5jhXty"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7cbf1751c8fso9816239f.0
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 09:33:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DuXrsHhm"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-566e869f631so2699210a12.0;
+        Fri, 15 Mar 2024 09:45:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710520425; x=1711125225; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710521107; x=1711125907; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=O7O7WCB2CJS7drVXMRwdZs06+iuCdTc/rL4uil+HyIo=;
-        b=ic5jhXtyziIVQ3QekvfhiSyqNsWlAHnCZFtFoWXy0NAyuQYTcKrkYrVzvNZQQI4+e/
-         cWz1SHHB9G7wrxDniAjS3MraSxHoL0MWt3ZjHHIY3pRAviX+S2AZDXzXTypdezw8Zu1A
-         hIk/T75gAAh4fkMO1K69IYYMq0liJcmDYxNgqk15gZG+J/EjSBF4/NcKlGFf2JqCVjTo
-         s7enlW27+IBMdWsEROcLhkQuXqYqzixKMuDtCqx2gmZHt34mfnIMhQimz5r+C8qxCWTA
-         fhbIVPz/kkRPPYjNI0BQBxlz0k+kpD8nUOn6mmksAOXpuQW+oEhPDKMK7TZjvkfS6Czu
-         4WTQ==
+        bh=1Pn1N9hdh/92IjJvyEpoRwaBX67+5A1Da617ojNcO94=;
+        b=DuXrsHhm0uQE0yeIqv7CBUu8OgY/YwcDswC64kKp3kK2XE2l+QXiXkhQwNZkQzHMJ8
+         YQ6wGy7sg+BZ5Ue7rmyF74Qn9rTe1oOp89013UNYhlYsdzwBeo/oxt1qoKQ4bPDzVO5f
+         qwANQ9M+A/enBrqS+QTbJbIEKCI5l0UNELJNRGaQdoNFyXobu6KpbMVY6ujiCH78k+Jm
+         OxPunZuYmE+t1JgHQt5YAkkQWUtKlOxFyAxkNR+xMeQnAHH+xDdwZdExD9AEUtrMi8Ok
+         OBD/b24suB20bjpGH1K8jsRrXnVldCs5cKcgSINGKEgrdNeNVe09Hj+oy6ZIfb1zPs0g
+         5b1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710520425; x=1711125225;
+        d=1e100.net; s=20230601; t=1710521107; x=1711125907;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O7O7WCB2CJS7drVXMRwdZs06+iuCdTc/rL4uil+HyIo=;
-        b=B0Mc/7ZwrOfjtojPKH5BD4Y3tZyUDRcC5b333xNWzbKl5J7DSH+zB9gnzDAJS7SXvN
-         vvu/FtCLffKr/zrSRW+eGHl5Yq+hS7sgXTeoGm/EmkLCqLxG4CaE/dKa1Vqxv2QVQz7U
-         QN1/l3+GoHpei0MNazW+eEwOr43VIF9RTizCIniLeVbTu0IqlY557WGNo9coqUJdtiCp
-         lUfeHY0qp93AYGcSIba2hPM939HkccrY+31mMLxIl1cWDPuIOdHO92Pln5CBZqsLKjeU
-         XEYSUIiZx7J/VYx4kYWfzYu/cxcKIwN4ROwe0ZK/77ZSZWXgpcUvPOzoLbw7AYRVAV6A
-         1vuw==
-X-Gm-Message-State: AOJu0Yy2KGjr74lVeFXNRGZkdy9JaVtfSeDOAkhd7PitvY2z8Tnc8KSQ
-	+8ct1mRp/UF0bEK4c1TBwcuiNd1mOeEEjbpi3fsb51ZfIIsFZ5Uc2B1IFxbd6rQ=
-X-Google-Smtp-Source: AGHT+IHL4cYcOxxIzREL5AI79qW5dIzo4Vo+jixAeG8G3Zn8y6TEh51w48tt8FOtnf0ezuAvMuQUMA==
-X-Received: by 2002:a6b:c505:0:b0:7cb:f18d:4fe6 with SMTP id v5-20020a6bc505000000b007cbf18d4fe6mr2600903iof.0.1710520424764;
-        Fri, 15 Mar 2024 09:33:44 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id eq15-20020a0566384e2f00b004773a5341casm404951jab.177.2024.03.15.09.33.43
+        bh=1Pn1N9hdh/92IjJvyEpoRwaBX67+5A1Da617ojNcO94=;
+        b=XzQU7wAhEr6Nth3xI5Fw26Siv71MDvQITvWQDfS+STKJz0KiVD7HF6GLSIkWQ5Cgnh
+         +81qBLz8u/ayYhWGHfGdiSGVZAfGopcSalmuqK5dRvrkbTwFLqVhlEx6+ffJYIc22O3h
+         uNL1SzG4xg59W/OKo3foO/czl8PiY/9nXoYmtClUOKNa+Enr75WzQpBiUKsdZK0m2Fhp
+         hIIynHTJfCTEw5FL/FoW8OyiLbaa3gbslcRBUMzHorc8rIgY3JIGZgXz7Es0JVSgdYmN
+         2MkYLchuJm1lCarLqJ6JiUbHVHW7ymsEHHINbvvkcHKOoWoFDRfJJoB59ub5FKTZBAMQ
+         7jcA==
+X-Forwarded-Encrypted: i=1; AJvYcCW+sWGXv/XsV5E291JcNcE4nOYSb9SFfJ4fnfOVI8bdWAoMZfwqbCjq3NUWHsUN95IL0J0RuEdB0hkqd/Ox4W/+tMJXwqhrI1Q=
+X-Gm-Message-State: AOJu0Yw0IDo3zcJD+TMob+dzgcIrsc8lfN+QRLwuuhYU7u4yhRYJtAFu
+	TTUjrl/J2BlUwpJigK2QgRv15lMe4NSmOD2PHJJVEgGDyA0JeJnF
+X-Google-Smtp-Source: AGHT+IG533g1xrlq+qyxGCNfLR+U3QZGsTLakzHI4bemWrpGt2WXan496MoA1lwDtMDi9pxIOV2iBw==
+X-Received: by 2002:a05:6402:28cc:b0:568:b447:163d with SMTP id ef12-20020a05640228cc00b00568b447163dmr1564280edb.9.1710521106742;
+        Fri, 15 Mar 2024 09:45:06 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.141.58])
+        by smtp.gmail.com with ESMTPSA id 6-20020a0564021f4600b005682a0e915fsm1825340edz.76.2024.03.15.09.45.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 09:33:44 -0700 (PDT)
-Message-ID: <bc6f1f3b-3a88-43bc-b3a9-992f4f6ce580@kernel.dk>
-Date: Fri, 15 Mar 2024 10:33:43 -0600
+        Fri, 15 Mar 2024 09:45:06 -0700 (PDT)
+Message-ID: <e40448f1-11b4-41a8-81ab-11b4ffc1b717@gmail.com>
+Date: Fri, 15 Mar 2024 16:44:01 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,7 +63,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 11/11] io_uring: get rid of intermediate aux cqe caches
 Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
 Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
  Ming Lei <ming.lei@redhat.com>
 References: <cover.1710514702.git.asml.silence@gmail.com>
@@ -70,14 +71,14 @@ References: <cover.1710514702.git.asml.silence@gmail.com>
  <6e5d55a8-1860-468f-97f4-0bd355be369a@kernel.dk>
  <7a6b4d7f-8bbd-4259-b1f1-e026b5183350@gmail.com>
  <70e18e4c-6722-475d-818b-dc739d67f7e7@kernel.dk>
- <62daf66f-39b9-4458-a233-2db2553c784f@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <62daf66f-39b9-4458-a233-2db2553c784f@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+ <dfdfcafe-199f-4652-9e79-7fb0e7b2ab4f@kernel.dk>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <dfdfcafe-199f-4652-9e79-7fb0e7b2ab4f@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/15/24 10:29 AM, Pavel Begunkov wrote:
-> On 3/15/24 16:25, Jens Axboe wrote:
+On 3/15/24 16:27, Jens Axboe wrote:
+> On 3/15/24 10:25 AM, Jens Axboe wrote:
 >> On 3/15/24 10:23 AM, Pavel Begunkov wrote:
 >>> On 3/15/24 16:20, Jens Axboe wrote:
 >>>> On 3/15/24 9:30 AM, Pavel Begunkov wrote:
@@ -101,25 +102,24 @@ On 3/15/24 10:29 AM, Pavel Begunkov wrote:
 >> Yeah this is very possible, the overflow checking could be broken in
 >> there. I'll poke at it and report back.
 > 
-> test() {
->     if (!(cqe->flags & IORING_CQE_F_MORE)) {
->         /* we expect this on overflow */
->         if (overflow && (i - 1 == NR_OVERFLOW))
->             break;
->         fprintf(stderr, "no more cqes\n");
->         return 1;
->     }
->     ...
-> }
+> It does, this should fix it:
 > 
-> It's this chunk. I think I silenced it with
 > 
-> s/i - 1 == NR_OVERFLOW/i == NR_OVERFLOW/
-> 
-> but it should probably be i >= NR_OVERFLOW or so
+> diff --git a/test/read-mshot.c b/test/read-mshot.c
+> index 8fcb79857bf0..501ca69a98dc 100644
+> --- a/test/read-mshot.c
+> +++ b/test/read-mshot.c
+> @@ -236,7 +236,7 @@ static int test(int first_good, int async, int overflow)
+>   		}
+>   		if (!(cqe->flags & IORING_CQE_F_MORE)) {
+>   			/* we expect this on overflow */
+> -			if (overflow && (i - 1 == NR_OVERFLOW))
+> +			if (overflow && i >= NR_OVERFLOW)
 
-Yeah see other email, I did the latter. It's pushed out.
+Which is not ideal either, e.g. I wouldn't mind if the kernel stops
+one entry before CQ is full, so that the request can complete w/o
+overflowing. Not supposing the change because it's a marginal
+case, but we shouldn't limit ourselves.
 
 -- 
-Jens Axboe
-
+Pavel Begunkov
