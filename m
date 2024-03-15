@@ -1,143 +1,185 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854E81401B
-	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 07:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4332A1B7E1;
+	Fri, 15 Mar 2024 11:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710489181; cv=none; b=Fd1rMNAoeWFcGjX2WMavBxEoqtWWwftkyl9a4fSw4Z5PyoxbsYZW7k5T7ePkoFCy+WXGcJRwJXVoEnrIibZpt33pjujy18mwKO36CZFENvTc4jvo+z/8pXGxkrv4tJqjBKs6uYR58nYSAXrJpQ5PcR4HSrHvWAXK0aUYkFMEbbE=
+	t=1710502741; cv=none; b=pjOuI7u4gVZifmoaTNV0oK/mWk8iquHe/ySDvFcP14hOi2dbl3t2NPyVacW6sBnEyRIv1zXCCxoCip2+pWQyZuxt2yiSyfKSvyQz5yoURBX/lduNmfJ7pXPWq5MN7+9m58XNdy75Z62/L/RWfXlDQklIAi3Gh11P8/B6BnUYDSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710489181; c=relaxed/simple;
-	bh=fKPj1XO0uWZHux7BrNWQJTo/4+56D+wBsGix9OTtOtQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=W5StMUUy6r+cihMXMzHNirEPHJujJV+uLFB/Mz11Tk7QfXYeqnhRlC1CXWOsM3ISlUT7LmP+EAR2YyX22HgVlBe4AFRh42+6jjxr6R4n+W5siugD8wu+xsBGtmKabjCWhQvueI2V/pKnvGgA7ulufvsOLhsp0qpCFX3bHRLzTEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=FpDoodmo; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1710502741; c=relaxed/simple;
+	bh=YhK/jnk1sN0Eu2k73vdEasVnkAA21VPShol4SbhmQDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AigQL+p0k9xR64d7kScCl9sY/XShtfoyniyE0HcHQNI4ap1dvUMmQG2lH6PL4MI3h3r4TP4tepeWkHdyLFKkgO0XSFGnhr5NGX1EGZ7AH63bpUrUD8J/TvHLqfQeX0Muye8zOC9/tccoaOzG4EPgPviJqUUWDUcXKdCry4ONHR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=KUfLwR3Y; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="FpDoodmo"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a45f257b81fso221156466b.0
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 00:52:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="KUfLwR3Y"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-568a3292916so1984175a12.1;
+        Fri, 15 Mar 2024 04:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1710489176; x=1711093976; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zXPP3lJYG4o/agsHuJCSdDmnxTSG2DCox+x3uG23L18=;
-        b=FpDoodmoXqEe6hPy6+1y5/Dr+WNp/Q7zvhg11e+5fSfMqPwe6yhhGoGlPyq5r8gaDt
-         fuSqsroJsqtMUHZYqptnunmNuGpZbSvCG+FMrLsj3h7vLHUQhOHiIYe7ZOpOXmpt7kQe
-         Df6EzyDtEvE/k1U+TKR94osfjbl5k4y2zjXmTBJQA/7L6Bj/dVSpKrDJOovXtxbgeVAJ
-         Evr7NSqSbAo5nRt7XDKAbwKQXRXZwKC18Fd3JL0EjLio4WZVc/m+Pg6VT06HDXsrHvrn
-         1w0lFma0CpAyLYVcBzKWDuudhNaV8HOopQHEA+vNGdVt75Qwd2gbIg1FnD50mwes5GnB
-         lP2A==
+        d=googlemail.com; s=20230601; t=1710502738; x=1711107538; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ret+NQ/Tw5LK56vjyJDNxqW8M+4jtEPqZMI9umR9cCI=;
+        b=KUfLwR3YydJAheGuADHmPCFzOmeuutYh+cPx3pAcCH1JXoYknT4HVT9fGpGQHhLJDi
+         olBOT21+QWtaOksGCZZ8CHd6EMVD8QEJg4918AHNhf2I62E5flo7lL4zqJRsMDU7tSkI
+         /KjLHhFQ3LP3wzTAq9iTpNJKHaTZeFHWPLaYFzQS6+mtrg4S3DEG2suKfDmG7En7mxhc
+         Yll27I7dKJujo45T8mZwgFHw8iEAhJm92aNa3iQzb/IFiwXvwqqCsR/8Pw6SplacDztV
+         N+9d6NozKyapLVifsnOheV49lTQZGZjObh9/llKi/FIhSOFBYJdC+nf5erbPQW8rhuao
+         V40Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710489176; x=1711093976;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zXPP3lJYG4o/agsHuJCSdDmnxTSG2DCox+x3uG23L18=;
-        b=PHIRlFwAC2BIOX3hcLqgcVnVhPtkpbHLTBcyPKFekbtpQx4jdoQx7+WYmahFKwZv2T
-         OxMOSZdOcrP4tCNPyuwS7cfmeehsEolqlc/F99NIbePSb9cMVz4A3tV3ov/xzbo2Drng
-         sx+6F57uBqUccTPm9aszJ8sRdn7OwVXeh3ZLsVTfyx1Cyo870rrxw9W3TZ6K9e/I1PgW
-         7p0ZZw44vHFyTxYQ9jRomypRbXooMpNNj3LZ4Lvf+oSeK3fDDPmbkXU4VBygYFS5dPAu
-         ddu0KTlrJX3P7S8aKM1MbWwcnUaiou10NoN173J+7rvGXGIj9gJZu38sNTo4vCihV5E0
-         nu6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXBuBiUifLu3j6UpGfMvzjnHQUmXymB1P1OX5RDMtPD7EjX8Vik7X4g9AToVdOKPh3FwlpFbWDgNDQhdLhcAzbncGODMxGayHHxv+w=
-X-Gm-Message-State: AOJu0Yz36vFmjJnTge+CxIAQDDARutPBMyQglc+Pz8vgmTEA8jw4cCcL
-	iJKhrENl+8gtG6wLUvn55ha1rSpOkz4vwIY3LlBBMr8GSXdTgpVQU+Vv2uB35SY=
-X-Google-Smtp-Source: AGHT+IFTO2DYaoVAjSu0M3KgKLmvykW5UhcvX3tBlSuDHByvqa85Ukxe2YkzMKaS2gKC+1a2E1+wEQ==
-X-Received: by 2002:a17:907:c244:b0:a46:66d4:6d24 with SMTP id tj4-20020a170907c24400b00a4666d46d24mr3647427ejc.37.1710489176432;
-        Fri, 15 Mar 2024 00:52:56 -0700 (PDT)
-Received: from localhost ([194.62.217.2])
-        by smtp.gmail.com with ESMTPSA id wr6-20020a170907700600b00a466c66804bsm1436273ejb.49.2024.03.15.00.52.55
+        d=1e100.net; s=20230601; t=1710502738; x=1711107538;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ret+NQ/Tw5LK56vjyJDNxqW8M+4jtEPqZMI9umR9cCI=;
+        b=er0RKIzF0IcU+kWC90ZhsiiCBSbhUkp2gA5VaqtcF2On1rKBtbSs1mQqtkmD0zvV1Y
+         cqxNAKCjrWRra/Zo1WagShjBECx7tJsGMbm8s0e+iJkhu+AJug6VbHmLMF9iyirBqIjr
+         ueeon/g/EYndS3y1pM5Efjjw0eAvybhA23DNVaaVrLDjSrT1PWVvxUZRL3pD0TA5vH5M
+         PNSjCrjt69l2mMZBqcEOVpLgFlAkoTp6YSkYnWj49PGME05TccHUqiuI8obX0/LqDfcV
+         9z/ZcA/jd03Mmq637BbxTxK0p9koyNzLR705XgJ+QbgocOaoa9/PF0hUMev6jNXvpfUg
+         y7EQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTWCZDE67T9IvmI0YS4CbbuhFeKCMu6uUu1Zg9qo+Z8onEHrZknnbxYsBA+Pbs5O3h2UVy5ZIAdhCyc+QqDYjPvsp77hQ4qYAIU6kb91XS6xVeH9MzljrD0ODBA8UsYfRULFOKuFhVXwyX1n4+qDo8H0DqxqozFaUC1A==
+X-Gm-Message-State: AOJu0Ywzp54EqvzcF+2uV6FJxeco5CfEWjSddoxAOHAJXAk1QRjZ7rAs
+	ZQshyNSg7RA1BJS464uoBN4fZqaPA7dXXo75oGC8IzDJQUKBAWDAKKSqAO/B++3GPQ==
+X-Google-Smtp-Source: AGHT+IHxB7FB377TOoio0unYbfIwnkxt4g5n3Z4MDqCqa7L7No5w/MvY3FrF55UMKEirChoiUMRGJg==
+X-Received: by 2002:a05:6402:530a:b0:568:797a:f2d with SMTP id eo10-20020a056402530a00b00568797a0f2dmr2968341edb.27.1710502737191;
+        Fri, 15 Mar 2024 04:38:57 -0700 (PDT)
+Received: from ddev.DebianHome (dynamic-095-119-217-226.95.119.pool.telefonica.de. [95.119.217.226])
+        by smtp.gmail.com with ESMTPSA id fg3-20020a056402548300b005682f47aea7sm1610024edb.94.2024.03.15.04.38.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 00:52:56 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Jens Axboe
- <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, Keith Busch
- <kbusch@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>,  Christoph Hellwig <hch@lst.de>,
-    Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart Van Assche
- <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
-  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
- Hindborg <a.hindborg@samsung.com>,  Wedson Almeida Filho
- <wedsonaf@gmail.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,  Greg KH
- <gregkh@linuxfoundation.org>,  Matthew Wilcox <willy@infradead.org>,
-  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
-  Gary Guo <gary@garyguo.net>,  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>,
-  Benno Lossin <benno.lossin@proton.me>,  Alice Ryhl
- <aliceryhl@google.com>,  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis
- Chamberlain <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,
-  Sergio =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
- Granados
- <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
- <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
- list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
- <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
- <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
-In-Reply-To: <CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
- (Miguel
-	Ojeda's message of "Thu, 14 Mar 2024 20:41:32 +0100")
-References: <20240313110515.70088-1-nmi@metaspace.dk>
-	<20240313110515.70088-2-nmi@metaspace.dk> <ZfI8-14RUqGqoRd-@boqun-archlinux>
-	<87il1ptck0.fsf@metaspace.dk>
-	<CANiq72mzBe2npLo=CVR=ShyMuDmr0+TW4Gy0coPFQOBQZ_VnwQ@mail.gmail.com>
-	<87plvwsjn5.fsf@metaspace.dk>
-	<CANiq72neNUL1m0AbY78eXWJMov4fgjnNcQ_16SoT=ikJ3K7bZQ@mail.gmail.com>
-User-Agent: mu4e 1.12.0; emacs 29.2
-Date: Fri, 15 Mar 2024 08:52:46 +0100
-Message-ID: <8734ssrkxd.fsf@metaspace.dk>
+        Fri, 15 Mar 2024 04:38:56 -0700 (PDT)
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+To: linux-security-module@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Paul Moore <paul@paul-moore.com>,
+	John Johansen <john.johansen@canonical.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Khadija Kamran <kamrankhadijadj@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	apparmor@lists.ubuntu.com,
+	selinux@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH 01/10] capability: introduce new capable flag CAP_OPT_NOAUDIT_ONDENY
+Date: Fri, 15 Mar 2024 12:37:22 +0100
+Message-ID: <20240315113828.258005-1-cgzones@googlemail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> writes:
+Introduce a new capable flag, CAP_OPT_NOAUDIT_ONDENY, to not generate
+an audit event if the requested capability is not granted.  This will be
+used in a new capable_any() functionality to reduce the number of
+necessary capable calls.
 
-> On Thu, Mar 14, 2024 at 8:23=E2=80=AFPM Andreas Hindborg <nmi@metaspace.d=
-k> wrote:
->>
->> The way the current code compiles, <kernel::block::mq::Request as
->> kernel::types::AlwaysRefCounted>::dec_ref` is inlined into the `rnull`
->> module. A relocation for `rust_helper_blk_mq_free_request_internal`
->> appears in `rnull_mod.ko`. I didn't test it yet, but if
->> `__blk_mq_free_request` (or the helper) is not exported, I don't think
->> this would be possible?
->
-> Yeah, something needs to be exported since there is a generic
-> involved, but even if you want to go the route of exporting only a
-> different symbol, you would still want to put it in the C header so
-> that you don't get the C missing declaration warning and so that we
-> don't have to write the declaration manually in the helper.
+Handle the flag accordingly in AppArmor and SELinux.
 
-That is what I did:
+CC: linux-block@vger.kernel.org
+Suggested-by: Paul Moore <paul@paul-moore.com>
+Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+---
+v5:
+   rename flag to CAP_OPT_NOAUDIT_ONDENY, suggested by Serge:
+     https://lore.kernel.org/all/20230606190013.GA640488@mail.hallyn.com/
+---
+ include/linux/security.h       |  2 ++
+ security/apparmor/capability.c |  8 +++++---
+ security/selinux/hooks.c       | 14 ++++++++------
+ 3 files changed, 15 insertions(+), 9 deletions(-)
 
-@@ -703,6 +703,7 @@ int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set *set,
- 		unsigned int set_flags);
- void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
-=20
-+void __blk_mq_free_request(struct request *rq);
- void blk_mq_free_request(struct request *rq);
- int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
- 		unsigned int poll_flags);
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 41a8f667bdfa..c60cae78ff8b 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -70,6 +70,8 @@ struct lsm_ctx;
+ #define CAP_OPT_NOAUDIT BIT(1)
+ /* If capable is being called by a setid function */
+ #define CAP_OPT_INSETID BIT(2)
++/* If capable should audit the security request for authorized requests only */
++#define CAP_OPT_NOAUDIT_ONDENY BIT(3)
+ 
+ /* LSM Agnostic defines for security_sb_set_mnt_opts() flags */
+ #define SECURITY_LSM_NATIVE_LABELS	1
+diff --git a/security/apparmor/capability.c b/security/apparmor/capability.c
+index 9934df16c843..08c9c9a0fc19 100644
+--- a/security/apparmor/capability.c
++++ b/security/apparmor/capability.c
+@@ -108,7 +108,8 @@ static int audit_caps(struct apparmor_audit_data *ad, struct aa_profile *profile
+  * profile_capable - test if profile allows use of capability @cap
+  * @profile: profile being enforced    (NOT NULL, NOT unconfined)
+  * @cap: capability to test if allowed
+- * @opts: CAP_OPT_NOAUDIT bit determines whether audit record is generated
++ * @opts: CAP_OPT_NOAUDIT/CAP_OPT_NOAUDIT_ONDENY bit determines whether audit
++ *	record is generated
+  * @ad: audit data (MAY BE NULL indicating no auditing)
+  *
+  * Returns: 0 if allowed else -EPERM
+@@ -126,7 +127,7 @@ static int profile_capable(struct aa_profile *profile, int cap,
+ 	else
+ 		error = -EPERM;
+ 
+-	if (opts & CAP_OPT_NOAUDIT) {
++	if ((opts & CAP_OPT_NOAUDIT) || ((opts & CAP_OPT_NOAUDIT_ONDENY) && error)) {
+ 		if (!COMPLAIN_MODE(profile))
+ 			return error;
+ 		/* audit the cap request in complain mode but note that it
+@@ -143,7 +144,8 @@ static int profile_capable(struct aa_profile *profile, int cap,
+  * @subj_cred: cred we are testing capability against
+  * @label: label being tested for capability (NOT NULL)
+  * @cap: capability to be tested
+- * @opts: CAP_OPT_NOAUDIT bit determines whether audit record is generated
++ * @opts: CAP_OPT_NOAUDIT/CAP_OPT_NOAUDIT_ONDENY bit determines whether audit
++ *	record is generated
+  *
+  * Look up capability in profile capability set.
+  *
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index 3448454c82d0..1a2c7c1a89be 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -1624,7 +1624,7 @@ static int cred_has_capability(const struct cred *cred,
+ 	u16 sclass;
+ 	u32 sid = cred_sid(cred);
+ 	u32 av = CAP_TO_MASK(cap);
+-	int rc;
++	int rc, rc2;
+ 
+ 	ad.type = LSM_AUDIT_DATA_CAP;
+ 	ad.u.cap = cap;
+@@ -1643,11 +1643,13 @@ static int cred_has_capability(const struct cred *cred,
+ 	}
+ 
+ 	rc = avc_has_perm_noaudit(sid, sid, sclass, av, 0, &avd);
+-	if (!(opts & CAP_OPT_NOAUDIT)) {
+-		int rc2 = avc_audit(sid, sid, sclass, av, &avd, rc, &ad);
+-		if (rc2)
+-			return rc2;
+-	}
++	if ((opts & CAP_OPT_NOAUDIT) || ((opts & CAP_OPT_NOAUDIT_ONDENY) && rc))
++		return rc;
++
++	rc2 = avc_audit(sid, sid, sclass, av, &avd, rc, &ad);
++	if (rc2)
++		return rc2;
++
+ 	return rc;
+ }
+ 
+-- 
+2.43.0
 
-> In any case, if we really want to avoid exporting the original symbol
-> (perhaps so that "only Rust" can use it -- or someone trying hard to
-> bypass things on purpose), then we could still avoid the helper and
-> instead write a non-generic `kernel`-private Rust function instead.
-
-Let's see what the block layer experts say first. Perhaps it is OK to
-expose this symbol like this or maybe it can be made more generic
-somehow.
-
-Jens, Ming, Keith, do you have any comments?
-
-Best regards,
-Andreas
