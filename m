@@ -1,58 +1,236 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA402E62F;
-	Fri, 15 Mar 2024 13:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE5D25543;
+	Fri, 15 Mar 2024 14:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710510872; cv=none; b=gZURBcACcmcXzxx0Vm3ibSLdXJ5y4+4Om3duo5d11s3U9EOtkxkb9f8GHZaaWE46htZWivSvz2qHUT9FsEbuP1WdqUmptLWZg/e5pxLVcti/5A432xpgNij1K8gZ63FORrDbeTP0/mtqBk3mTUiU1wEaaP4qeOOnvA1j/uppxak=
+	t=1710512886; cv=none; b=eauNNy+HFAvwQvM/t0fU9ujg2tgRw28ZoWvA20IlEKx74EdOAs54WoCdGyRrdqfK0ZeNfcb6dPGlWE4RnVYohwM7IN2tU6X2asHZZ9Fht98diMlaieuD39+3Yix/nSdTDZikunMTyP7NGW6gv4YxLjJoNlgbeuND2QUpGyFKl+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710510872; c=relaxed/simple;
-	bh=s5tlyQ3TQ92cp3zmv6WhJU0WhcyMs03/Vt56LrZyZP4=;
+	s=arc-20240116; t=1710512886; c=relaxed/simple;
+	bh=ptKcQGvNLExqOhWDrtAimTpFjorljsqetWFvr5qfxag=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nTQQDInt/S2R74fCGjShPmowqrzPopQVwQHhUllJZ8dMKuz6CCBqekVhoQBhENSKcTlqPvx6jkk7K5Qeo9MuSS1aX/XVuozuuUytZdEo3KBPSBjcB++Q03tKERNl4ngezCofZCwFHvOZMmcGJ1WevTzUebBv5e2A6G6P8BC0CXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kreJIIP8; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8Dirc/Qi1HBdr8DV6kANlp/1quHAuzsbgqNTBXOz4d2hXvtU13rMh1sXLTrkI5jd1PR0DlAFmoSbhNfNTsdE375GKH/luk1cVDNPRTp03hIQguPea8S/sqOMFOHJEfEuH/dzTBiriSCe2oue5faxKGnBkiSuLOlBedwE/xVmLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=KppBX0Ui; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PgpUIW3t; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=KppBX0Ui; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PgpUIW3t; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kreJIIP8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5130C433C7;
-	Fri, 15 Mar 2024 13:54:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710510872;
-	bh=s5tlyQ3TQ92cp3zmv6WhJU0WhcyMs03/Vt56LrZyZP4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kreJIIP8JrjAHNDdkuowy06oj0Iwlu4NtzzGXp7ds7sLDxdg7VzHgI6Zycgasxnnc
-	 mMbA1s695y3UMU45bEpqxwvcFqyT4NdCFt+oxNt0Jd21duw0H8jIyPuW6O7jMOADZJ
-	 Z46JW1piH1hiNaDqU3n8QMuK1r1QwMQow+M7dZBYFpjKVrnZNAmS4sBi4lGOZZ06F9
-	 kJAHcdIPuzD6ZmSZGJ+V1om6fwCm34RZ16gR7A3QIQNYAAKPL2JKXkw6wAkBd8xFA7
-	 LCiUrYqU/Bcd3LJ3HcDoIN4JRkxCxh9SAy845bUZeXOBRB/rLCzeUu2VLptzAG0To/
-	 edjvfwCE2X/kw==
-Date: Fri, 15 Mar 2024 14:54:27 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Yu Kuai <yukuai3@huawei.com>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de, 
-	axboe@kernel.dk, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
-	yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [RFC v4 linux-next 00/19] fs & block: remove bdev->bd_inode
-Message-ID: <20240315-assoziieren-hacken-b43f24f78970@brauner>
-References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
- <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="KppBX0Ui";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PgpUIW3t";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="KppBX0Ui";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PgpUIW3t"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A96B41FB6E;
+	Fri, 15 Mar 2024 14:28:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1710512882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5qcP3WTXoxRhAHwlYfBjFyJGoKiUMi4+gC0JUW+zVvY=;
+	b=KppBX0UivD4PuOE4zhwUFMF9p4+T3UIi2G4kMtA8DK5u58cqlX07hs0NQlo86xeYEKmDQU
+	eC5v+Iggp+AD7JSmGHvJOlDMimspS0nKVekk17igIaDZEgbKxDO5g0dM0OqKxxOObhnwwr
+	sYlRHaLrN5Z8IEIeYltb7wpVlgVvOrM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1710512882;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5qcP3WTXoxRhAHwlYfBjFyJGoKiUMi4+gC0JUW+zVvY=;
+	b=PgpUIW3tv+/la6mofkVRiS4LmyzUtuU24as4Sv3XYT5+PxC3DrwY+gLwPf0q2JZYUkGkUI
+	g5cQUUsZTRqVMBBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1710512882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5qcP3WTXoxRhAHwlYfBjFyJGoKiUMi4+gC0JUW+zVvY=;
+	b=KppBX0UivD4PuOE4zhwUFMF9p4+T3UIi2G4kMtA8DK5u58cqlX07hs0NQlo86xeYEKmDQU
+	eC5v+Iggp+AD7JSmGHvJOlDMimspS0nKVekk17igIaDZEgbKxDO5g0dM0OqKxxOObhnwwr
+	sYlRHaLrN5Z8IEIeYltb7wpVlgVvOrM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1710512882;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5qcP3WTXoxRhAHwlYfBjFyJGoKiUMi4+gC0JUW+zVvY=;
+	b=PgpUIW3tv+/la6mofkVRiS4LmyzUtuU24as4Sv3XYT5+PxC3DrwY+gLwPf0q2JZYUkGkUI
+	g5cQUUsZTRqVMBBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9F3BE1383D;
+	Fri, 15 Mar 2024 14:28:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id fMzbJvJa9GX+PgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 15 Mar 2024 14:28:02 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 46625A07D9; Fri, 15 Mar 2024 15:28:02 +0100 (CET)
+Date: Fri, 15 Mar 2024 15:28:02 +0100
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] fs,block: get holder during claim
+Message-ID: <20240315142802.i3ja63b4b7l3akeb@quack3>
+References: <20240314165814.tne3leyfmb4sqk2t@quack3>
+ <20240315-freibad-annehmbar-ca68c375af91@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
+In-Reply-To: <20240315-freibad-annehmbar-ca68c375af91@brauner>
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -3.80
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Spam-Flag: NO
 
-On Fri, Mar 15, 2024 at 08:08:49PM +0800, Yu Kuai wrote:
-> Hi, Christian
-> Hi, Christoph
-> Hi, Jan
+On Fri 15-03-24 14:23:07, Christian Brauner wrote:
+> Now that we open block devices as files we need to deal with the
+> realities that closing is a deferred operation. An operation on the
+> block device such as e.g., freeze, thaw, or removal that runs
+> concurrently with umount, tries to acquire a stable reference on the
+> holder. The holder might already be gone though. Make that reliable by
+> grabbing a passive reference to the holder during bdev_open() and
+> releasing it during bdev_release().
 > 
-> Perhaps now is a good time to send a formal version of this set.
-> However, I'm not sure yet what branch should I rebase and send this set.
-> Should I send to the vfs tree?
+> Fixes: f3a608827d1f ("bdev: open block device as files") # mainline only
+> Reported-by: Christoph Hellwig <hch@infradead.org>
+> Link: https://lore.kernel.org/r/ZfEQQ9jZZVes0WCZ@infradead.org
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+> Hey all,
+> 
+> I ran blktests with nbd enabled which contains a reliable repro for the
+> issue. Thanks to Christoph for pointing in that direction. The
+> underlying issue is not reproducible anymore with this patch applied.
+> xfstests and blktests pass.
 
-Nearly all of it is in fs/ so I'd say yes.
+Thanks for the fix! It looks good to me. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+
+> diff --git a/block/bdev.c b/block/bdev.c
+> index e7adaaf1c219..7a5f611c3d2e 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -583,6 +583,9 @@ static void bd_finish_claiming(struct block_device *bdev, void *holder,
+>  	mutex_unlock(&bdev->bd_holder_lock);
+>  	bd_clear_claiming(whole, holder);
+>  	mutex_unlock(&bdev_lock);
+> +
+> +	if (hops && hops->get_holder)
+> +		hops->get_holder(holder);
+>  }
+>  
+>  /**
+> @@ -605,6 +608,7 @@ EXPORT_SYMBOL(bd_abort_claiming);
+>  static void bd_end_claim(struct block_device *bdev, void *holder)
+>  {
+>  	struct block_device *whole = bdev_whole(bdev);
+> +	const struct blk_holder_ops *hops = bdev->bd_holder_ops;
+>  	bool unblock = false;
+>  
+>  	/*
+> @@ -627,6 +631,9 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
+>  		whole->bd_holder = NULL;
+>  	mutex_unlock(&bdev_lock);
+>  
+> +	if (hops && hops->put_holder)
+> +		hops->put_holder(holder);
+> +
+>  	/*
+>  	 * If this was the last claim, remove holder link and unblock evpoll if
+>  	 * it was a write holder.
+> diff --git a/fs/super.c b/fs/super.c
+> index ee05ab6b37e7..71d9779c42b1 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -1515,11 +1515,29 @@ static int fs_bdev_thaw(struct block_device *bdev)
+>  	return error;
+>  }
+>  
+> +static void fs_bdev_super_get(void *data)
+> +{
+> +	struct super_block *sb = data;
+> +
+> +	spin_lock(&sb_lock);
+> +	sb->s_count++;
+> +	spin_unlock(&sb_lock);
+> +}
+> +
+> +static void fs_bdev_super_put(void *data)
+> +{
+> +	struct super_block *sb = data;
+> +
+> +	put_super(sb);
+> +}
+> +
+>  const struct blk_holder_ops fs_holder_ops = {
+>  	.mark_dead		= fs_bdev_mark_dead,
+>  	.sync			= fs_bdev_sync,
+>  	.freeze			= fs_bdev_freeze,
+>  	.thaw			= fs_bdev_thaw,
+> +	.get_holder		= fs_bdev_super_get,
+> +	.put_holder		= fs_bdev_super_put,
+>  };
+>  EXPORT_SYMBOL_GPL(fs_holder_ops);
+>  
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index f9b87c39cab0..c3e8f7cf96be 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1505,6 +1505,16 @@ struct blk_holder_ops {
+>  	 * Thaw the file system mounted on the block device.
+>  	 */
+>  	int (*thaw)(struct block_device *bdev);
+> +
+> +	/*
+> +	 * If needed, get a reference to the holder.
+> +	 */
+> +	void (*get_holder)(void *holder);
+> +
+> +	/*
+> +	 * Release the holder.
+> +	 */
+> +	void (*put_holder)(void *holder);
+>  };
+>  
+>  /*
+> -- 
+> 2.43.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
