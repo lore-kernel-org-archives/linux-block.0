@@ -1,58 +1,58 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A69238DD1
-	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 18:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAB852F62
+	for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 19:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710528920; cv=none; b=kBZSnzHgLU3lrfLPC1wv4dB41AiI5W3/O90JbH/r8rwRB5CZCd8KkD9w1nROSIPUmK7tCeixpEE7i8m35ozNlZkMrKZ4a8rrh4IFYAxQq261R7ymZyAdBRICPzNAvYkclvasE8BBlShxoK/7VQ8QhVYossAGkH7z7m9f44whL+0=
+	t=1710529337; cv=none; b=jFzZRkucFXwE0yjNtDhiA+MhSMWR/yBAimNfqEou00N7+yyiaVIYlSiORi4diIOIGajsWZyUqXFJQ45vJTeCn3GBkAjQn7cwc7maDI/zUVYzGoX/Qw9a/Lk6/LRnT3UAAZVLOyFrLYLa6FZTs03/V85KXWebieA+SmLL/7gjAow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710528920; c=relaxed/simple;
-	bh=5l2DsbuHQaizghK7BFt2Nv04PeEJ3f3oDWJrl5UEJO4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=OJZOI6J0kEeOjyfktIzbDjkOhC6SC6bfpe/y8Zc3JvL9xtmwiHMlVImbxG27udYD2bVNlfdtlJZi7tt9jf8QAQATcx4x+47XVB72N89LG/wqzXEokMpFpNVuTLVvn5fSSVlNLN+mdHhgCLl29pRaZBkS4xJtZXd/E0ubvTJI7JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jmeK5ypR; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1710529337; c=relaxed/simple;
+	bh=TG3tmA7bXchxJD1xvLU6smvS9nW3sDt3aeLwVgPR6Z0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LJx/psXp+Kg9zYMkkypSoz18xZCcQaGrWUDvQx+JQCBTFm3RLP+zt1/JIqTexv1pj5dRn7J8To21ucNPsw6kYRGpg8Kk+n8lMUN0r2Lgbx9kKylNmEK1qXyZs53qTNgJcK4o8xFWi5Iutnh/Ac/yX85HwoyoX3VzUaRkQOg+aCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xR8OcZC4; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jmeK5ypR"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-29d51cdde7eso671442a91.0
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 11:55:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xR8OcZC4"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e6c18e9635so533675b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 12:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710528916; x=1711133716; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ORtMChK1dM5bEirIl3afhpoV1LzkhXnlNBlXIKlewQU=;
-        b=jmeK5ypR8TFKjUtJJlFKZS+u0by9HtCuBtszqCUDPZiLhrqFACsrkSnJ0pxGVpKJl6
-         kNalo3Ph0/RQEJXIYcacGim5Cqi5RxJsmcwWbte+kLj94Z+jfnffJp+emi4QPfZ7P5Td
-         yV/kVrGUpxQ9ouzj4HuW63x1vTtA2Tr2/cBJUYLcfm/Me6tPTIIAN3cqtzx2hxMmphwV
-         n21W8ZNuRXafczvVW5FZIWqLoN5WPceP2cERvhkPO7Y+2fIa7emh3Uy59peeoOE6S0rA
-         hcu/d7V1gJm+mG+/kShNUlIPAHnZKQojMO3JFv5Bw6+1ob6B6bx0Rh5V9DZl7So7gKR7
-         v9ag==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710529334; x=1711134134; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=it/z+RqqCKmSoeiz7X95yFC04XjqPpL5LXqSDjefUFQ=;
+        b=xR8OcZC4UQTo/mVpao1xxWSeIx9iL/QTz3pHgGCLZaginncUse/KSTzj8uMNTj/spg
+         gzKoj4C2PujsLuO6dsnf+D0f9Lt8tLw9FvuK0FgzOXHqoXjq43Cmf5JdIUIp+VIGf+SJ
+         zVF1H2Upj9H9FvCCyZ1jWfhtDBjcUG6pK9Q7G5LOcFmlsCgaVqYnBGacRvuYYnqCia2M
+         2+mrafmPcNjhqwByu+Kyo3AVpJewgcJPqh6QNWShZW0/I6q7MpslCCX4sAL9NyruNCy+
+         cfHI9twq1xTPJi7S/sW1FCVACtx8Xhxn4lZgDZDPt24Ps+VhFHDeSFoWT3cGnnW4pBmY
+         f5KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710528916; x=1711133716;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ORtMChK1dM5bEirIl3afhpoV1LzkhXnlNBlXIKlewQU=;
-        b=nIg1E99C9nhvXU2wn29ePu0wtQSUPQsGcO9QImC5TP6rZkGcUKJrgF0Kl8NQozmFfl
-         BxgxuFv34FzPXoQY1DDepLJ3/Bq92h5B6//NWKlXACzd/rAcsKda6xVI1jCaLv89mG4e
-         NFhmodKcySt20mbliSW8c0VflTYI0a0NOYM80cvzAvmNJbIr2NKbane/bahPdWnu3T0P
-         DEKzJROsJy8jekIqUfqjBLMv8p4XvJzLkEXHlTqecSIJgfdHSb1HpnSuXDSFa3F7wfi6
-         YZOmppznlskpsu6XaxfGzBuWfGKBIAvJLZJzxofYhzVFyL0LyDmA7f4MsBgP8v5JQWje
-         tWjw==
-X-Gm-Message-State: AOJu0Yz9qPRqSNXrawmEvgZtzT20mDkS/JKl+dsLu8OrSP1zo1PR9DlJ
-	PyCOFIavTLDjTTERh2yhJuOghsMg9Ampoq8uw2Do588FLkryAhtxuvlkFuAOVi33AIWbou41olw
-	Q
-X-Google-Smtp-Source: AGHT+IE3D8Q4cRPoPRWU8g+Jwn17ssVqKeY9BnQB8u0hZgOMd6mXsXxSfQUs0vWXricTOujUkTodHw==
-X-Received: by 2002:a05:6a00:23c6:b0:6e6:8b98:721f with SMTP id g6-20020a056a0023c600b006e68b98721fmr6360822pfc.1.1710528914821;
-        Fri, 15 Mar 2024 11:55:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710529334; x=1711134134;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=it/z+RqqCKmSoeiz7X95yFC04XjqPpL5LXqSDjefUFQ=;
+        b=ClyjE9JWptR56o+IoFtB51I2QKn4bj7GrKzxM6yB8azZZx3W7wdCiHPLQFhLD27f6K
+         FEzNTiQ2hrkyxICoy2NqKMYNHoij5+jUNSosfokPVPbJmtVRO1Y5saV3JHrdmvRx2xE8
+         g3COLn4cTaoJk6pSLvdpR4tdtJE57EacXagHqheZKM1J4Pc2Yy/dFpMONJtPGTRqiUvy
+         Vs3es0AVcX1GTn7GFRY/lzfUQJrm8AVmIMBnTr580S/0uWavbcYsukgW943zejyC7WS4
+         yKBC+uEjZ7H6E95xINBQ7H5xf1g99sip9ztuzjVrdN4GOsU+70BHDEh135MYOY0m4JWe
+         2sbQ==
+X-Gm-Message-State: AOJu0Yx0LIuZp8BAnvou+55P01vQNcLBwLPRKURNl9atA9s6x2QKbtV2
+	RAXqC4xHYt7JwYqIk27I7Ct4HrYkaiaSLlF5q3AimJoJFqMf6T7TTsbIApLRd8o=
+X-Google-Smtp-Source: AGHT+IF0oVdOWebbUUGmX/a0wl7i3VglTJMsjuN5eoJgBXm9tCMGYOQRZl809pEw2dMAEBvKoCLWvw==
+X-Received: by 2002:a17:903:1386:b0:1de:ddc6:27a6 with SMTP id jx6-20020a170903138600b001deddc627a6mr5469489plb.2.1710529334038;
+        Fri, 15 Mar 2024 12:02:14 -0700 (PDT)
 Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id y30-20020a056a00181e00b006e6c88d7690sm3726123pfa.160.2024.03.15.11.55.13
+        by smtp.gmail.com with ESMTPSA id z7-20020a170903018700b001def777afc5sm1308432plg.77.2024.03.15.12.02.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 11:55:14 -0700 (PDT)
-Message-ID: <83595457-f418-4aab-a578-274a78817d44@kernel.dk>
-Date: Fri, 15 Mar 2024 12:55:13 -0600
+        Fri, 15 Mar 2024 12:02:13 -0700 (PDT)
+Message-ID: <345dbcd8-777c-4619-90ec-c7424c4f2b1a@kernel.dk>
+Date: Fri, 15 Mar 2024 13:02:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,70 +60,174 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/11] io_uring: get rid of intermediate aux cqe caches
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <cover.1710514702.git.asml.silence@gmail.com>
+ <0eb3f55722540a11b036d3c90771220eb082d65e.1710514702.git.asml.silence@gmail.com>
+ <6e5d55a8-1860-468f-97f4-0bd355be369a@kernel.dk>
+ <7a6b4d7f-8bbd-4259-b1f1-e026b5183350@gmail.com>
+ <70e18e4c-6722-475d-818b-dc739d67f7e7@kernel.dk>
+ <dfdfcafe-199f-4652-9e79-7fb0e7b2ab4f@kernel.dk>
+ <e40448f1-11b4-41a8-81ab-11b4ffc1b717@gmail.com>
+ <0f164d26-e4da-4e96-b413-ec66cf16e3d7@kernel.dk>
+ <d82a07b8-a65d-4551-8516-5e50e0fab2fe@gmail.com>
+ <47ab135e-af1c-4492-8807-d0bc434da253@kernel.dk>
+ <e3e3496b-244c-4fb9-ab37-a032b178b485@gmail.com>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.9-rc1
+In-Reply-To: <e3e3496b-244c-4fb9-ab37-a032b178b485@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 3/15/24 12:51 PM, Pavel Begunkov wrote:
+> On 3/15/24 18:26, Jens Axboe wrote:
+>> On 3/15/24 11:26 AM, Pavel Begunkov wrote:
+>>> On 3/15/24 16:49, Jens Axboe wrote:
+>>>> On 3/15/24 10:44 AM, Pavel Begunkov wrote:
+>>>>> On 3/15/24 16:27, Jens Axboe wrote:
+>>>>>> On 3/15/24 10:25 AM, Jens Axboe wrote:
+>>>>>>> On 3/15/24 10:23 AM, Pavel Begunkov wrote:
+>>>>>>>> On 3/15/24 16:20, Jens Axboe wrote:
+>>>>>>>>> On 3/15/24 9:30 AM, Pavel Begunkov wrote:
+>>>>>>>>>> io_post_aux_cqe(), which is used for multishot requests, delays
+>>>>>>>>>> completions by putting CQEs into a temporary array for the purpose
+>>>>>>>>>> completion lock/flush batching.
+>>>>>>>>>>
+>>>>>>>>>> DEFER_TASKRUN doesn't need any locking, so for it we can put completions
+>>>>>>>>>> directly into the CQ and defer post completion handling with a flag.
+>>>>>>>>>> That leaves !DEFER_TASKRUN, which is not that interesting / hot for
+>>>>>>>>>> multishot requests, so have conditional locking with deferred flush
+>>>>>>>>>> for them.
+>>>>>>>>>
+>>>>>>>>> This breaks the read-mshot test case, looking into what is going on
+>>>>>>>>> there.
+>>>>>>>>
+>>>>>>>> I forgot to mention, yes it does, the test makes odd assumptions about
+>>>>>>>> overflows, IIRC it expects that the kernel allows one and only one aux
+>>>>>>>> CQE to be overflown. Let me double check
+>>>>>>>
+>>>>>>> Yeah this is very possible, the overflow checking could be broken in
+>>>>>>> there. I'll poke at it and report back.
+>>>>>>
+>>>>>> It does, this should fix it:
+>>>>>>
+>>>>>>
+>>>>>> diff --git a/test/read-mshot.c b/test/read-mshot.c
+>>>>>> index 8fcb79857bf0..501ca69a98dc 100644
+>>>>>> --- a/test/read-mshot.c
+>>>>>> +++ b/test/read-mshot.c
+>>>>>> @@ -236,7 +236,7 @@ static int test(int first_good, int async, int overflow)
+>>>>>>             }
+>>>>>>             if (!(cqe->flags & IORING_CQE_F_MORE)) {
+>>>>>>                 /* we expect this on overflow */
+>>>>>> -            if (overflow && (i - 1 == NR_OVERFLOW))
+>>>>>> +            if (overflow && i >= NR_OVERFLOW)
+>>>>>
+>>>>> Which is not ideal either, e.g. I wouldn't mind if the kernel stops
+>>>>> one entry before CQ is full, so that the request can complete w/o
+>>>>> overflowing. Not supposing the change because it's a marginal
+>>>>> case, but we shouldn't limit ourselves.
+>>>>
+>>>> But if the event keeps triggering we have to keep posting CQEs,
+>>>> otherwise we could get stuck.
+>>>
+>>> Or we can complete the request, then the user consumes CQEs
+>>> and restarts as usual
+>>
+>> So you'd want to track if we'd overflow, wait for overflow to clear, and
+>> then restart that request?
+> 
+> No, the 2 line change in io_post_cqe() from the last email's
+> snippet is the only thing you'd need.
 
-Usually send one later towards the end of week 2 of the merge window,
-but since the timestamp caching fix didn't get pulled up directly, and
-since there's a few other fixes that should go in sooner rather than
-later, sending this one now.
+Ah now I follow, so you're still terminating it, just one before
+overflow rather than letting it overflow. Yes I agree that makes more
+sense! It could still terminate early though, if the application reaps
+CQEs before another one is posted. So I think the opportunistic early
+termination is probably best ignored.
 
-A few fixes for the 6.9 merge window:
+Or the app could always be using the full size of the CQ ring, and never
+above. With the change, it'd still terminate every CQ-ring-size
+requests, even though it need not.
 
-- Revert of a change for mq-deadline that went into the 6.8 release,
-  causing a performance regression for some (Bart)
+IOW, I think we just leave it as-is, no? Neither of these should cause
+an app issue, as CQE_F_MORE is the one driving terminations. But you
+could have more unneeded terminations, even if that may be far fetched.
+Though you never know, an opportunistically terminating with a known
+racy check seems like something we should not do.
 
-- Revert of the interruptible discard handling. This needs more work
-  since the ioctl and fs path aren't properly split, and will happen for
-  the 6.10 kernel release. For 6.9, do the minimal revert. (Christoph)
+> I probably don't understand why and what tracking you mean, but
+> fwiw we currently do track and account for overflows.
 
-- Fix for an issue with the timestamp caching code (me)
+Misunderstanding, I thought you'd still post with CQE_F_MORE and need to
+restart it. But that wasn't the case.
 
-- kerneldoc fix (Jiapeng)
+>> I think that sounds a bit involved, no?
+>> Particularly for a case like overflow, which generally should not occur.
+>> If it does, just terminate it, and have the user re-issue it. That seems
+>> like the simpler and better solution to me.
+>>
+>>>> As far as I'm concerned, the behavior with
+>>>> the patch looks correct. The last CQE is overflown, and that terminates
+>>>> it, and it doesn't have MORE set. The one before that has MORE set, but
+>>>> it has to, unless you aborted it early. But that seems impossible,
+>>>> because what if that was indeed the last current CQE, and we reap CQEs
+>>>> before the next one is posted.
+>>>>
+>>>> So unless I'm missing something, I don't think we can be doing any
+>>>> better.
+>>>
+>>> You can opportunistically try to avoid overflows, unreliably
+>>>
+>>> bool io_post_cqe() {
+>>>      // Not enough space in the CQ left, so if there is a next
+>>>      // completion pending we'd have to overflow. Avoid that by
+>>>      // terminating it now.
+>>>      //
+>>>      // If there are no more CQEs after this one, we might
+>>>      // terminate a bit earlier, but that better because
+>>>      // overflows are so expensive and unhandy and so on.
+>>>      if (cq_space_left() <= 1)
+>>>          return false;
+>>>      fill_cqe();
+>>>      return true;
+>>> }
+>>>
+>>> some_multishot_function(req) {
+>>>      if (!io_post_cqe(res))
+>>>          complete_req(req, res);
+>>> }
+>>>
+>>> Again, not suggesting the change for all the obvious reasons, but
+>>> I think semantically we should be able to do it.
+>>
+>> Yeah not convinced this is worth looking at. If it was the case that the
+>> hot path would often see overflows and it'd help to avoid it, then
+>> probably it'd make sense. But I don't think that's the case.
+> 
+> We're talking about different things. Seems you're discussing a
+> particular implementation, its constraints and performance. I care
+> purely about the semantics, the implicit uapi. And I define it as
+> "multishot requests may decide to terminate at any point, the user
+> should expect it and reissue when appropriate", not restricting it
+> to "can only (normally) terminate when CQ is full".
 
-Please pull!
+Yep fully agree, I think it was largely a talking past each other on
+exactly what it'd do.
 
+> We're changing tests from time to time, but the there is that
+> "behaviour defines semantics", especially when it wasn't clear
+> in advance and breaks someone's app, and people might be using
+> assumptions in tests as the universal truth.
 
-The following changes since commit 259f7d5e2baf87fcbb4fabc46526c9c47fed1914:
-
-  Merge tag 'thermal-6.9-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm (2024-03-13 12:03:57 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.9-20240315
-
-for you to fetch changes up to 4c4ab8ae416350ce817339f239bdaaf351212f15:
-
-  block: fix mismatched kerneldoc function name (2024-03-14 09:40:47 -0600)
-
-----------------------------------------------------------------
-block-6.9-20240315
-
-----------------------------------------------------------------
-Bart Van Assche (1):
-      Revert "block/mq-deadline: use correct way to throttling write requests"
-
-Christoph Hellwig (1):
-      Revert "blk-lib: check for kill signal"
-
-Jens Axboe (1):
-      block: limit block time caching to in_task() context
-
-Jiapeng Chong (1):
-      block: fix mismatched kerneldoc function name
-
- block/blk-lib.c      | 40 +---------------------------------------
- block/blk-settings.c |  2 +-
- block/blk.h          |  2 +-
- block/mq-deadline.c  |  3 +--
- 4 files changed, 4 insertions(+), 43 deletions(-)
+Agree, any time a test needs changing, it should be cause for extra
+thinking in terms of whether this will have application impacts as well.
+In general, the tests are overly anal, and sometimes they do end up
+testing implementation details. The API is pretty clear in this regard,
+if you see CQE_F_MORE, then you get more completions. If you don't, the
+request has terminated. The change doesn't really impact that.
 
 -- 
 Jens Axboe
