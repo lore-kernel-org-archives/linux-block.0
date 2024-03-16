@@ -1,87 +1,119 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF501C36;
-	Sat, 16 Mar 2024 02:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A6D393;
+	Sat, 16 Mar 2024 02:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710557388; cv=none; b=MvXniuMxJUY44sFocM9i0GXF1xuoaS71jhYfzJtdZwvLFZkplSzXgJ7t4+kM2/vy8Lj3rAvHVt0uzc0fOor0V0wsARoIQKRBa+tXLIFIScsn5hzaUdVoalEpomqABloF+efrL06BBQR/K+EVj4uqtDSxgZmpa2znxV2WlRiGVpY=
+	t=1710557734; cv=none; b=os8pqdZKD7mvxkMaP9D5vz6CDj94mH5nv1m5kK7fBNUUrAllErPg6v5Cf+bK4kyWJWRrCTcIkpvyoLGJ44YalN0DhJ8H5t3353md4lXpB5bf03JJd6NhQbuRYuVH0R+Y/1ppaysRiWi2h7pyj8gMVRkOKPMI/c1ccpT0dve8Yys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710557388; c=relaxed/simple;
-	bh=zd1ZRWGAMcuMlmsNsFTXLgzIr7rlDB7RWUiQwBjAdSI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=c1W2zG+E07taxKOaeUxCYb6nAAX4D/2CVt7c+CPaWYqTNKGDQdzoqPQiPqgUt0++R2faqeFWCOuFn0EnrA3hs82/+JWn4QgidNCoeX+BeY00HpIc0QUKM8CMdoQWWXtZYcZBqNqvv836CvgDysgMXKTN8QTq1MZ3ZtGFJvaNW0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TxQZ14SW3z4f3kFF;
-	Sat, 16 Mar 2024 10:49:29 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 6F21B1A0B46;
-	Sat, 16 Mar 2024 10:49:35 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+RG9CPVlFadbHA--.20779S3;
-	Sat, 16 Mar 2024 10:49:35 +0800 (CST)
-Subject: Re: [RFC v4 linux-next 00/19] fs & block: remove bdev->bd_inode
-To: Christian Brauner <brauner@kernel.org>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
- axboe@kernel.dk, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
- <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
- <20240315-assoziieren-hacken-b43f24f78970@brauner>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ac0eb132-c604-9761-bce5-69158e73f256@huaweicloud.com>
-Date: Sat, 16 Mar 2024 10:49:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1710557734; c=relaxed/simple;
+	bh=/ncSNOISJXYLMQBt907owyxgmUI5ot+qzXLFZYSWwHM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=io8/FGJBrvAZ2qdQWxr/yZGMghRX6zXG8mPw06+r0n+rVYE242CiiIDLXMvlpQJtJEuG1XbKBtoDNeXrqJNHTSgrx+H/77/3ZiZ67v8Z+T5CEazdPexZB4uXS+71x/O7FxO3+E397420nxD7GtU+JIKt8b9JkHNF6FTRLRhlJ4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LjBU9i/2; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjBU9i/2"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33ed7ba1a42so339171f8f.2;
+        Fri, 15 Mar 2024 19:55:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710557731; x=1711162531; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bBeJQdj8sVU38HiwxRAqBNideRlWYRjrGmK9XL6SCio=;
+        b=LjBU9i/2ZHV6+ttimTiPTpBVTlPy6Bu96ks9IhHxl3hNoodRmWfe5crN7AlyCovozv
+         WQSyWXcrCoGfYn4OMAPIIfiqaswegTW/aUIC6eFMllOWMDtueXVfYRhM5yEkR4iqlfuo
+         2lV43eJcby/Op/cpAsVtXGgqqPtc5Rp2lAp8HSORUKxwLJGrzA1oyYWXzSl1quhcSGWh
+         woGD6s84XweSqO6jLPFcREjAzLI8aDH3+SkXL2brQWlp7cR4tdR+BaIPpWmq/VZHQGt9
+         bLxfv4be1Xj7CFpDG4AUZm29ADHNI/8T9mtpJG1B8ova4fRCQJzRlnRT/Q7i8fPbCQtP
+         YCRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710557731; x=1711162531;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bBeJQdj8sVU38HiwxRAqBNideRlWYRjrGmK9XL6SCio=;
+        b=eNEpQNGrT/DiDNInIWS6Bs3d4icKpPCwcxlqdYyu2MyrsSN7JrrW1Yl9w3Rud9xbeT
+         GVyjxylqVbo1mmjuq467f5knUtx2aiAXNDYuyQoFTre2VCunkIukmWAyfuXrc2Pgzcbg
+         NtIjY5vlq/UFvin3alHM1t39o9Yjx5i2SaYMVXYNvpC3qj0k9B3R1hrKfmWXKCXKkS0o
+         e+TVCcmymO2ywfRYRIWRML28F6NT+kI7lNXzdKGlmyVOTOJWsMslUUoT1Xpe4jcMHxq3
+         9UG36YHpC+/QY1sLv2YBdm8YqywEca6x0EFDLDAwRRQhNyg1EhjBek5gMF/J9Kj6CzVp
+         gPNg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4ChsQh5myCeWPBHMyYIQF+RZb5VgNqUhYELrbpuMIIVqQrcF7bburnClK4fuKRdw66kA9Ti2dP7FRjtYPaax5ha78qpZzcsicnIU=
+X-Gm-Message-State: AOJu0YzdS8gep+3y3HAnVLSEEwDyKwcXuW9ZtlOG+CKh8rwDnwIgwXmF
+	G27JgoFOuycMkXHBoiAQAQZD6jZgz/FINJ8JOefeXAmdxiRHNzW3nthLivlG
+X-Google-Smtp-Source: AGHT+IFL6G1jd0obgRCT6FHpfvsSchERX99ZLCMGeAxeC5I+xnE7tN5CnfRi2uequnzyHdfCHg12dA==
+X-Received: by 2002:a5d:5910:0:b0:33e:ce0f:5c79 with SMTP id v16-20020a5d5910000000b0033ece0f5c79mr4125247wrd.9.1710557730302;
+        Fri, 15 Mar 2024 19:55:30 -0700 (PDT)
+Received: from [192.168.8.100] ([185.69.144.99])
+        by smtp.gmail.com with ESMTPSA id n16-20020adffe10000000b0033de2f2a88dsm4366159wrr.103.2024.03.15.19.55.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Mar 2024 19:55:30 -0700 (PDT)
+Message-ID: <6dcd9e5d-f5c7-4c05-aa48-1fab7b0072ea@gmail.com>
+Date: Sat, 16 Mar 2024 02:54:19 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240315-assoziieren-hacken-b43f24f78970@brauner>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: (subset) [PATCH 00/11] remove aux CQE caches
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+ Kanchan Joshi <joshi.k@samsung.com>
+References: <cover.1710514702.git.asml.silence@gmail.com>
+ <171054320158.386037.13510354610893597382.b4-ty@kernel.dk>
+ <ZfT+CDCl+07rlRIp@fedora>
+ <CAFj5m9LXFxaeVyWgPGMiJLaueXkpcLz=506Bp_mhpjKU59eEnw@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAFj5m9LXFxaeVyWgPGMiJLaueXkpcLz=506Bp_mhpjKU59eEnw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+RG9CPVlFadbHA--.20779S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYg7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
-	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
-	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAv
-	wI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi, Christian
-
-在 2024/03/15 21:54, Christian Brauner 写道:
-> On Fri, Mar 15, 2024 at 08:08:49PM +0800, Yu Kuai wrote:
->> Hi, Christian
->> Hi, Christoph
->> Hi, Jan
+On 3/16/24 02:24, Ming Lei wrote:
+> On Sat, Mar 16, 2024 at 10:04 AM Ming Lei <ming.lei@redhat.com> wrote:
 >>
->> Perhaps now is a good time to send a formal version of this set.
->> However, I'm not sure yet what branch should I rebase and send this set.
->> Should I send to the vfs tree?
+>> On Fri, Mar 15, 2024 at 04:53:21PM -0600, Jens Axboe wrote:
+>>>
+>>> On Fri, 15 Mar 2024 15:29:50 +0000, Pavel Begunkov wrote:
+>>>> Patch 1 is a fix.
+>>>>
+>>>> Patches 2-7 are cleanups mainly dealing with issue_flags conversions,
+>>>> misundertsandings of the flags and of the tw state. It'd be great to have
+>>>> even without even w/o the rest.
+>>>>
+>>>> 8-11 mandate ctx locking for task_work and finally removes the CQE
+>>>> caches, instead we post directly into the CQ. Note that the cache is
+>>>> used by multishot auxiliary completions.
+>>>>
+>>>> [...]
+>>>
+>>> Applied, thanks!
+>>
+>> Hi Jens and Pavel,
+>>
+>> Looks this patch causes hang when running './check ublk/002' in blktests.
 > 
-> Nearly all of it is in fs/ so I'd say yes.
-> .
-
-I see that you just create a new branch vfs.fixes, perhaps can I rebase
-this set against this branch?
-
-Thanks,
-Kuai
-
+> Not take close look, and  I guess it hangs in
 > 
+> io_uring_cmd_del_cancelable() -> io_ring_submit_lock
 
+Thanks, the trace doesn't completely explains it, but my blind spot
+was io_uring_cmd_done() potentially grabbing the mutex. They're
+supposed to be irq safe mimicking io_req_task_work_add(), that's how
+nvme passthrough uses it as well (but at least it doesn't need the
+cancellation bits).
+
+One option is to replace it with a spinlock, the other is to delay
+the io_uring_cmd_del_cancelable() call to the task_work callback.
+The latter would be cleaner and more preferable, but I'm lacking
+context to tell if that would be correct. Ming, what do you think?
+
+
+-- 
+Pavel Begunkov
