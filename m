@@ -1,134 +1,87 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BB446AF
-	for <linux-block@vger.kernel.org>; Sat, 16 Mar 2024 02:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF501C36;
+	Sat, 16 Mar 2024 02:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710556215; cv=none; b=Gi9pFWpLXMuEWVLBucxZ3E5BKNIEw8+xrvHWHtYhTiO/U+oCybEBzSyR9zC6OoB1sg85YULHFQmQnzb9+fL6hCJQKo4PNPQSvxPcVUFxz3Hyfb6jSPiBR25s8my5qXZqzEv8okz1nBCsNeUZl7afkbW9w1avMHH2/vKnKkNc9W4=
+	t=1710557388; cv=none; b=MvXniuMxJUY44sFocM9i0GXF1xuoaS71jhYfzJtdZwvLFZkplSzXgJ7t4+kM2/vy8Lj3rAvHVt0uzc0fOor0V0wsARoIQKRBa+tXLIFIScsn5hzaUdVoalEpomqABloF+efrL06BBQR/K+EVj4uqtDSxgZmpa2znxV2WlRiGVpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710556215; c=relaxed/simple;
-	bh=9/jjR3U5q/i59Ny9aGyCYLFbY6vTcnXGlOKdKAfuHxI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jkHdHNJ+cZbv7TOkrrmi/JRV9PY8OZlJtK8BuzmEnFOaNs3pHcEyKsPeJMviIAyBoH6SGPWu1Rj4W/9imq8xS1ZNKIVdGiS3AvmVvpKB14dfarsC/lbVg8CmLbGO+WAmA00R+sh5duytT6GMhlLTK3L4/HUGVXU9k54HSaQHIPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SHhXSa4k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHhXSa4k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710556212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LL2aiOudT2QmtdIqb/ELukW8Oe9P5VE/7KMlCFGljw4=;
-	b=SHhXSa4kHvYp4TKiIl0Vq7DsbDgCTc37sUHK+ESYQGAmQRn+8CkX4Qv6/0gYFrIExiMHa+
-	8p1n/j70GnJHpM3zcY2W9maVbT3dZpcZZwAUBczIe42xgU7IXFld4n40XaauOfo1ctWioJ
-	ATP7FTnqOVcBrBztwsgSEZRshh6S+jY=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-98-oCFFfNeQOz63PRLK0HtgFw-1; Fri, 15 Mar 2024 22:30:10 -0400
-X-MC-Unique: oCFFfNeQOz63PRLK0HtgFw-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6912513fc7bso14262756d6.1
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2024 19:30:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710556210; x=1711161010;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LL2aiOudT2QmtdIqb/ELukW8Oe9P5VE/7KMlCFGljw4=;
-        b=qXXoL9hb4XzJdwYsdL7MMRxBJMj764Azvm20EbuOERf2UyPEHFRAfWO+80r1FS7GFg
-         V9sfhQg+qNQI6G2q/jn7ZHydXxvyxbo3VmIY7ZvDnk+0fMwUl0b3yLUb6lKx20Jrfngc
-         lq702AXB4YQQsBXKtk6FAFZm9Xaa3j6Q/jOYQMRBaYXhLpnmpQLBlLBJyzY+VNg8GGuP
-         M2TZPAZVMP2xC0gzB2YCYD5YdUR0QdDgf4eajC4kfSwK4sBmGoMV7jVpGqZRi5h8cG8P
-         RofDAEuebdwB0Ohnp2c1JIJg9kUM51kr36KloknWeLg9nWiXY9QWC4pOrkogHjeyGwHa
-         dDrw==
-X-Forwarded-Encrypted: i=1; AJvYcCX0v9kz82KQ8kUrnr/i8N+3tn2c0xAoyHqCU0IsEoHdzt/Ltku4pi0BHGn0+mWzvswe9UdY4LUCd/ScaqcTpYSvK3wuHNnC0wEhwck=
-X-Gm-Message-State: AOJu0Yz1pVXyEi5H10VyV6V+YFWNsV8PNqaNah0lKaLI4E5/GKXwn/aV
-	kjGXSUOJ6GHfyTOq705qmV2E73oOSspBfuOoxBnxytr2hJmZal7+M/o2R1yw/CJn7+DniORVNst
-	QPn7DYuKfi2k+UtBWBICDQTBB1qvHpNxIjUpFTxTH2PYh/iY+y9Npio5PSmo64Yjk+qB6MaHvhm
-	3GsEbOw0f54FBbw7qFu5dDxOD4uSovajMJC28=
-X-Received: by 2002:a05:620a:1a27:b0:789:d106:1dae with SMTP id bk39-20020a05620a1a2700b00789d1061daemr7394681qkb.5.1710555879672;
-        Fri, 15 Mar 2024 19:24:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHykChZCjA10Rbu6b79SKOfaxiB0J3C+wqart0s2xWfsFik70q8LOk3+PFj74HrJ2XySwQA9h3yebMNvJG8A60=
-X-Received: by 2002:a05:620a:1a27:b0:789:d106:1dae with SMTP id
- bk39-20020a05620a1a2700b00789d1061daemr7394673qkb.5.1710555879326; Fri, 15
- Mar 2024 19:24:39 -0700 (PDT)
+	s=arc-20240116; t=1710557388; c=relaxed/simple;
+	bh=zd1ZRWGAMcuMlmsNsFTXLgzIr7rlDB7RWUiQwBjAdSI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=c1W2zG+E07taxKOaeUxCYb6nAAX4D/2CVt7c+CPaWYqTNKGDQdzoqPQiPqgUt0++R2faqeFWCOuFn0EnrA3hs82/+JWn4QgidNCoeX+BeY00HpIc0QUKM8CMdoQWWXtZYcZBqNqvv836CvgDysgMXKTN8QTq1MZ3ZtGFJvaNW0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TxQZ14SW3z4f3kFF;
+	Sat, 16 Mar 2024 10:49:29 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 6F21B1A0B46;
+	Sat, 16 Mar 2024 10:49:35 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgAn+RG9CPVlFadbHA--.20779S3;
+	Sat, 16 Mar 2024 10:49:35 +0800 (CST)
+Subject: Re: [RFC v4 linux-next 00/19] fs & block: remove bdev->bd_inode
+To: Christian Brauner <brauner@kernel.org>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
+ axboe@kernel.dk, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
+ <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
+ <20240315-assoziieren-hacken-b43f24f78970@brauner>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ac0eb132-c604-9761-bce5-69158e73f256@huaweicloud.com>
+Date: Sat, 16 Mar 2024 10:49:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1710514702.git.asml.silence@gmail.com> <171054320158.386037.13510354610893597382.b4-ty@kernel.dk>
- <ZfT+CDCl+07rlRIp@fedora>
-In-Reply-To: <ZfT+CDCl+07rlRIp@fedora>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 16 Mar 2024 10:24:28 +0800
-Message-ID: <CAFj5m9LXFxaeVyWgPGMiJLaueXkpcLz=506Bp_mhpjKU59eEnw@mail.gmail.com>
-Subject: Re: (subset) [PATCH 00/11] remove aux CQE caches
-To: Jens Axboe <axboe@kernel.dk>
-Cc: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, 
-	linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240315-assoziieren-hacken-b43f24f78970@brauner>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAn+RG9CPVlFadbHA--.20779S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYg7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sat, Mar 16, 2024 at 10:04=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
-te:
->
-> On Fri, Mar 15, 2024 at 04:53:21PM -0600, Jens Axboe wrote:
-> >
-> > On Fri, 15 Mar 2024 15:29:50 +0000, Pavel Begunkov wrote:
-> > > Patch 1 is a fix.
-> > >
-> > > Patches 2-7 are cleanups mainly dealing with issue_flags conversions,
-> > > misundertsandings of the flags and of the tw state. It'd be great to =
-have
-> > > even without even w/o the rest.
-> > >
-> > > 8-11 mandate ctx locking for task_work and finally removes the CQE
-> > > caches, instead we post directly into the CQ. Note that the cache is
-> > > used by multishot auxiliary completions.
-> > >
-> > > [...]
-> >
-> > Applied, thanks!
->
-> Hi Jens and Pavel,
->
-> Looks this patch causes hang when running './check ublk/002' in blktests.
+Hi, Christian
 
-Not take close look, and  I guess it hangs in
+在 2024/03/15 21:54, Christian Brauner 写道:
+> On Fri, Mar 15, 2024 at 08:08:49PM +0800, Yu Kuai wrote:
+>> Hi, Christian
+>> Hi, Christoph
+>> Hi, Jan
+>>
+>> Perhaps now is a good time to send a formal version of this set.
+>> However, I'm not sure yet what branch should I rebase and send this set.
+>> Should I send to the vfs tree?
+> 
+> Nearly all of it is in fs/ so I'd say yes.
+> .
 
-io_uring_cmd_del_cancelable() -> io_ring_submit_lock
-
-[root@ktest-36 ~]# cat /proc/1420/stack
-[<0>] io_uring_cmd_done+0x161/0x1c0
-[<0>] ublk_stop_dev+0x10e/0x1b0 [ublk_drv]
-[<0>] ublk_ctrl_uring_cmd+0xbc9/0x11e0 [ublk_drv]
-[<0>] io_uring_cmd+0x9e/0x130
-[<0>] io_issue_sqe+0x2d3/0x730
-[<0>] io_wq_submit_work+0xd2/0x350
-[<0>] io_worker_handle_work+0x12a/0x4b0
-[<0>] io_wq_worker+0x101/0x390
-[<0>] ret_from_fork+0x31/0x50
-[<0>] ret_from_fork_asm+0x1a/0x30
-
-(gdb) l *(io_uring_cmd_done+0x161)
-0xffffffff817ed241 is in io_uring_cmd_done (./include/linux/list.h:985).
-980 return !READ_ONCE(h->first);
-981 }
-982
-983 static inline void __hlist_del(struct hlist_node *n)
-984 {
-985 struct hlist_node *next =3D n->next;
-986 struct hlist_node **pprev =3D n->pprev;
-987
-988 WRITE_ONCE(*pprev, next);
-989 if (next)
-
+I see that you just create a new branch vfs.fixes, perhaps can I rebase
+this set against this branch?
 
 Thanks,
+Kuai
+
+> 
 
