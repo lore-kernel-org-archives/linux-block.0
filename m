@@ -1,28 +1,28 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D12B4C6D;
-	Sat, 16 Mar 2024 03:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA41CA62;
+	Sat, 16 Mar 2024 03:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710560162; cv=none; b=Mdgv81rJ6T1pUgWJyRvN9KLYPqaZ0pwksI2HQa4adQ7trJZNX20uuSc61kCk/IlZzi90jHabDhIBxtYaQOiIwgnxe4i5/jusRwIdblpAclakGQq5gH/k/d0bqT+wu2NngxOh6nPUZ/iGrdTMmCiWXQZdfmCNf9ZBhEFf0P8Rmx8=
+	t=1710560161; cv=none; b=lTWt8RwPs6TmLNVYpXO6XihAU8WAbBMc9nZF2DEzhWAV+7K2rYVMmhHglH0wHsYK15u06arR6HoBK1s175xl5oLkEMX4Lxa/tCRQ79rW3CUQxMzprrVLR3kNlSZ+rwNyQY5xpo74gfGV7M1zAwj+94T4r09Qv1ZRgUpqQIwPBUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710560162; c=relaxed/simple;
-	bh=glnPdVbPqA/K/O6HeGrVIZ53TO8yvHaNOYlxwjnfREI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=QQ01I6pjRnY1NxauKUQy7sSxA3a3eDGR5E+nv+n3sAFlO5bBelNHnzLOeLxvokmjAOlFfpAdMXCtd71W52MaFc4e/iDD95YDi+x+LGfyOCe+q6iGiGGalvUnCJFpjoKPlbBXUscOqDlPTHR6fd08mcBt3w840Kyk8hIdI/3vpZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ZaWMA5G2; arc=none smtp.client-ip=13.77.154.182
+	s=arc-20240116; t=1710560161; c=relaxed/simple;
+	bh=6t9BEvWaMcIaCVEeeGnUIPJ/mMudkG4bOr8epzDYiq4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=g+Ge0gTyLmabjG0riuRP/6AM/DpSTvw+Vq+IsoXqa50HhXaelhpiYXSdAf46b/wklOJnwaVfplQeotnxyLSwbDc9kYUu/7kOoaAD5wgETXRQRtZ6B50mo+zKCeqtEDnMQhhCIOF8hGorZSqvCpvhHYUBWfVLW/t2zIwHsfaZIVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=kj14USb0; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ZaWMA5G2"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="kj14USb0"
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-	id 3D79720B74E2; Fri, 15 Mar 2024 20:35:53 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3D79720B74E2
+	id BED1220B74D3; Fri, 15 Mar 2024 20:35:53 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BED1220B74D3
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1710560154;
-	bh=m6UdS+cMIbT4dpIYK+CiFLWHi/wtd3ZV9Ytkxxvwp1c=;
+	s=default; t=1710560153;
+	bh=j1PJ7f2wNKceGww3zk5/9GSWDNHp/DvwLwbB4Saq6ck=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZaWMA5G2lHWAiTJOJ8k3YGy3R6/FIUZ9Hrwgq7wM7okfSLugDjQqPHEYRqZRnXBFE
-	 9V/S4OtEAZQSZ/Xsc3Fh5KjMCfOVKNLnR9JLxgqFb4UdaDZCkX5zcbOVW5sZcjERHr
-	 z3MDsjYmHZpZY5LPQsMmusQnyXnJt6rp9J4LLqQk=
+	b=kj14USb0VgJPgjVyOVbWyMD9AY/fyOB8nEfr4zh1gT1b4SSh2j9hvJxIPXDXwdIw3
+	 NxxidVJX9VoKlVkevd32I0EjCchCta4I73c3AJcf67ZHtmX1WzIQAF/KfkoigoFZLq
+	 N2XaFJHD2d2hXi/tcOArkRPEtw95ULqf+z1R/31o=
 From: Fan Wu <wufan@linux.microsoft.com>
 To: corbet@lwn.net,
 	zohar@linux.ibm.com,
@@ -43,11 +43,11 @@ Cc: linux-doc@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	audit@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Fan Wu <wufan@linux.microsoft.com>,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: [RFC PATCH v15 18/21] ipe: enable support for fs-verity as a trust provider
-Date: Fri, 15 Mar 2024 20:35:48 -0700
-Message-Id: <1710560151-28904-19-git-send-email-wufan@linux.microsoft.com>
+	Deven Bowers <deven.desai@linux.microsoft.com>,
+	Fan Wu <wufan@linux.microsoft.com>
+Subject: [RFC PATCH v15 10/21] ipe: add permissive toggle
+Date: Fri, 15 Mar 2024 20:35:40 -0700
+Message-Id: <1710560151-28904-11-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1710560151-28904-1-git-send-email-wufan@linux.microsoft.com>
 References: <1710560151-28904-1-git-send-email-wufan@linux.microsoft.com>
@@ -57,482 +57,328 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Enable IPE policy authors to indicate trust for a singular fsverity
-file, identified by the digest information, through "fsverity_digest"
-and all files using fsverity's builtin signatures via
-"fsverity_signature".
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-This enables file-level integrity claims to be expressed in IPE,
-allowing individual files to be authorized, giving some flexibility
-for policy authors. Such file-level claims are important to be expressed
-for enforcing the integrity of packages, as well as address some of the
-scalability issues in a sole dm-verity based solution (# of loop back
-devices, etc).
+IPE, like SELinux, supports a permissive mode. This mode allows policy
+authors to test and evaluate IPE policy without it effecting their
+programs. When the mode is changed, a 1404 AUDIT_MAC_STATUS
+be reported.
 
-This solution cannot be done in userspace as the minimum threat that
-IPE should mitigate is an attacker downloads malicious payload with
-all required dependencies. These dependencies can lack the userspace
-check, bypassing the protection entirely. A similar attack succeeds if
-the userspace component is replaced with a version that does not
-perform the check. As a result, this can only be done in the common
-entry point - the kernel.
+This patch adds the following audit records:
+
+    audit: MAC_STATUS enforcing=0 old_enforcing=1 auid=4294967295
+      ses=4294967295 enabled=1 old-enabled=1 lsm=ipe res=1
+    audit: MAC_STATUS enforcing=1 old_enforcing=0 auid=4294967295
+      ses=4294967295 enabled=1 old-enabled=1 lsm=ipe res=1
+
+The audit record only emit when the value from the user input is
+different from the current enforce value.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 
 ---
-v1-v6:
-  + Not present
+v2:
+  + Split evaluation loop, access control hooks,
+    and evaluation loop from policy parser and userspace
+    interface to pass mailing list character limit
 
-v7:
-  Introduced
+v3:
+  + Move ipe_load_properties to patch 04.
+  + Remove useless 0-initializations
+  + Prefix extern variables with ipe_
+  + Remove kernel module parameters, as these are
+    exposed through sysctls.
+  + Add more prose to the IPE base config option
+    help text.
+  + Use GFP_KERNEL for audit_log_start.
+  + Remove unnecessary caching system.
+  + Remove comments from headers
+  + Use rcu_access_pointer for rcu-pointer null check
+  + Remove usage of reqprot; use prot only.
+  + Move policy load and activation audit event to 03/12
 
-v8:
-  * Undo squash of 08/12, 10/12 - separating drivers/md/ from security/
-  * Use common-audit function for fsverity_signature.
-  + Change fsverity implementation to use fsverity_get_digest
-  + prevent unnecessary copy of fs-verity signature data, instead
-    just check for presence of signature data.
-  + Remove free_inode_security hook, as the digest is now acquired
-    at runtime instead of via LSM blob.
+v4:
+  + Remove sysctls in favor of securityfs nodes
+  + Re-add kernel module parameters, as these are now
+    exposed through securityfs.
+  + Refactor property audit loop to a separate function.
 
-v9:
-  + Adapt to the new parser
+v5:
+  + fix minor grammatical errors
+  + do not group rule by curly-brace in audit record,
+    reconstruct the exact rule.
 
-v10:
-  + Update the fsverity get digest call
-
-v11:
+v6:
   + No changes
 
+v7:
+  + Further split lsm creation into a separate commit from the
+    evaluation loop and audit system, for easier review.
+  + Propagating changes to support the new ipe_context structure in the
+    evaluation loop.
+  + Split out permissive functionality into a separate patch for easier
+    review.
+  + Remove permissive switch compile-time configuration option - this
+    is trivial to add later.
+
+v8:
+  + Remove "IPE" prefix from permissive audit record
+  + align fields to the linux-audit field dictionary. This causes the
+    following fields to change:
+      enforce -> permissive
+
+  + Remove duplicated information correlated with syscall record, that
+    will always be present in the audit event.
+  + Change audit types:
+    + AUDIT_TRUST_STATUS -> AUDIT_MAC_STATUS
+      + There is no significant difference in meaning between
+        these types.
+
+v9:
+  + Clean up ipe_context related code
+
+v10:
+  + Change audit format to comform with the existing format selinux is
+    using
+  + Remove the audit record emission during init to align with selinux,
+    which does not perform this action.
+
+v11:
+  + Remove redundant code
+
 v12:
-  + Fix audit format
-  + Simplify property evaluation
+  + Remove redundant code
 
 v13:
-  + Remove the CONFIG_IPE_PROP_FS_VERITY dependency inside the parser
-    to make the policy grammar independent of the kernel config.
+  + Remove audit format macro
 
 v14:
   + No changes
 
 v15:
-  + Fix on grammar issue in Kconfig
-  + Switch hook to security_inode_setintegrity()
+  + No changes
 ---
- security/ipe/Kconfig         |  13 +++++
- security/ipe/audit.c         |  17 ++++++
- security/ipe/eval.c          | 108 ++++++++++++++++++++++++++++++++++-
- security/ipe/eval.h          |  10 ++++
- security/ipe/hooks.c         |  28 +++++++++
- security/ipe/hooks.h         |   6 ++
- security/ipe/ipe.c           |  13 +++++
- security/ipe/ipe.h           |   3 +
- security/ipe/policy.h        |   3 +
- security/ipe/policy_parser.c |   6 ++
- 10 files changed, 206 insertions(+), 1 deletion(-)
+ security/ipe/audit.c | 27 ++++++++++++++++--
+ security/ipe/audit.h |  1 +
+ security/ipe/eval.c  | 11 +++++--
+ security/ipe/eval.h  |  1 +
+ security/ipe/fs.c    | 68 ++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 104 insertions(+), 4 deletions(-)
 
-diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
-index 5433ca3fc855..2003c01767ad 100644
---- a/security/ipe/Kconfig
-+++ b/security/ipe/Kconfig
-@@ -30,6 +30,19 @@ config IPE_PROP_DM_VERITY
- 	  that was mounted with a signed root-hash or the volume's
- 	  root hash matches the supplied value in the policy.
- 
-+	  If unsure, answer Y.
-+
-+config IPE_PROP_FS_VERITY
-+	bool "Enable property for fs-verity files"
-+	depends on FS_VERITY && FS_VERITY_BUILTIN_SIGNATURES
-+	help
-+	  This option enables the usage of properties "fsverity_signature"
-+	  and "fsverity_digest". These properties evaluate to TRUE when
-+	  a file is fsverity enabled and with a signed digest or its
-+	  digest matches the supplied value in the policy.
-+
-+	  if unsure, answer Y.
-+
- endmenu
- 
- endif
 diff --git a/security/ipe/audit.c b/security/ipe/audit.c
-index 3acbfecc9f43..f508944a3ed1 100644
+index f167fdc87986..a480f27278df 100644
 --- a/security/ipe/audit.c
 +++ b/security/ipe/audit.c
-@@ -53,6 +53,9 @@ static const char *const audit_prop_names[__IPE_PROP_MAX] = {
- 	"dmverity_roothash=",
- 	"dmverity_signature=FALSE",
- 	"dmverity_signature=TRUE",
-+	"fsverity_digest=",
-+	"fsverity_signature=FALSE",
-+	"fsverity_signature=TRUE",
- };
+@@ -93,8 +93,8 @@ void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
+ 	if (!ab)
+ 		return;
  
- /**
-@@ -66,6 +69,17 @@ static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
- 	ipe_digest_audit(ab, rh);
+-	audit_log_format(ab, "ipe_op=%s ipe_hook=%s pid=%d comm=",
+-			 op, audit_hook_names[ctx->hook],
++	audit_log_format(ab, "ipe_op=%s ipe_hook=%s enforcing=%d pid=%d comm=",
++			 op, audit_hook_names[ctx->hook], READ_ONCE(enforce),
+ 			 task_tgid_nr(current));
+ 	audit_log_untrustedstring(ab, get_task_comm(comm, current));
+ 
+@@ -212,3 +212,26 @@ void ipe_audit_policy_load(const struct ipe_policy *const p)
+ 
+ 	audit_log_end(ab);
  }
- 
-+/**
-+ * audit_fsv_digest - audit the digest of a fsverity_digest property.
-+ * @ab: Supplies a pointer to the audit_buffer to append to.
-+ * @d: Supplies a pointer to the digest structure.
-+ */
-+static void audit_fsv_digest(struct audit_buffer *ab, const void *d)
-+{
-+	audit_log_format(ab, "%s", audit_prop_names[IPE_PROP_FSV_DIGEST]);
-+	ipe_digest_audit(ab, d);
-+}
 +
- /**
-  * audit_rule - audit an IPE policy rule approximation.
-  * @ab: Supplies a pointer to the audit_buffer to append to.
-@@ -82,6 +96,9 @@ static void audit_rule(struct audit_buffer *ab, const struct ipe_rule *r)
- 		case IPE_PROP_DMV_ROOTHASH:
- 			audit_dmv_roothash(ab, ptr->value);
- 			break;
-+		case IPE_PROP_FSV_DIGEST:
-+			audit_fsv_digest(ab, ptr->value);
-+			break;
- 		default:
- 			audit_log_format(ab, "%s", audit_prop_names[ptr->type]);
- 			break;
++/**
++ * ipe_audit_enforce - Audit a change in IPE's enforcement state.
++ * @new_enforce: The new value enforce to be set.
++ * @old_enforce: The old value currently in enforce.
++ */
++void ipe_audit_enforce(bool new_enforce, bool old_enforce)
++{
++	struct audit_buffer *ab;
++
++	ab = audit_log_start(audit_context(), GFP_KERNEL, AUDIT_MAC_STATUS);
++	if (!ab)
++		return;
++
++	audit_log(audit_context(), GFP_KERNEL, AUDIT_MAC_STATUS,
++		  "enforcing=%d old_enforcing=%d auid=%u ses=%u"
++		  " enabled=1 old-enabled=1 lsm=ipe res=1",
++		  new_enforce, old_enforce,
++		  from_kuid(&init_user_ns, audit_get_loginuid(current)),
++		  audit_get_sessionid(current));
++
++	audit_log_end(ab);
++}
+diff --git a/security/ipe/audit.h b/security/ipe/audit.h
+index 0ff5a06808de..914f001e5286 100644
+--- a/security/ipe/audit.h
++++ b/security/ipe/audit.h
+@@ -14,5 +14,6 @@ void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
+ void ipe_audit_policy_load(const struct ipe_policy *const p);
+ void ipe_audit_policy_activation(const struct ipe_policy *const op,
+ 				 const struct ipe_policy *const np);
++void ipe_audit_enforce(bool new_enforce, bool old_enforce);
+ 
+ #endif /* _IPE_AUDIT_H */
 diff --git a/security/ipe/eval.c b/security/ipe/eval.c
-index 8dcf7809c9fc..8cb8c64221e0 100644
+index 274f7346ef42..3f3125478dd0 100644
 --- a/security/ipe/eval.c
 +++ b/security/ipe/eval.c
-@@ -10,6 +10,7 @@
- #include <linux/sched.h>
- #include <linux/rcupdate.h>
- #include <linux/moduleparam.h>
-+#include <linux/fsverity.h>
+@@ -18,6 +18,7 @@
  
- #include "ipe.h"
- #include "eval.h"
-@@ -51,6 +52,23 @@ static void build_ipe_bdev_ctx(struct ipe_eval_ctx *ctx, const struct inode *con
- }
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
+ struct ipe_policy __rcu *ipe_active_policy;
+ bool success_audit;
++bool enforce = true;
  
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+/**
-+ * build_ipe_inode_ctx - Build inode fields of an evaluation context.
-+ * @ctx: Supplies a pointer to the context to be populated.
-+ * @ino: Supplies the inode struct of the file triggered IPE event.
-+ */
-+static void build_ipe_inode_ctx(struct ipe_eval_ctx *ctx, const struct inode *const ino)
-+{
-+	ctx->ino = ino;
-+	ctx->ipe_inode = ipe_inode(ctx->ino);
-+}
-+#else
-+static void build_ipe_inode_ctx(struct ipe_eval_ctx *ctx, const struct inode *const ino)
-+{
-+}
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
+ #define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
+ 
+@@ -106,6 +107,7 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
+ 	const struct ipe_rule *rule = NULL;
+ 	const struct ipe_op_table *rules = NULL;
+ 	struct ipe_prop *prop = NULL;
++	int rc = 0;
+ 
+ 	rcu_read_lock();
+ 
+@@ -158,9 +160,12 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
+ 	ipe_audit_match(ctx, match_type, action, rule);
+ 
+ 	if (action == IPE_ACTION_DENY)
+-		return -EACCES;
++		rc = -EACCES;
+ 
+-	return 0;
++	if (!READ_ONCE(enforce))
++		rc = 0;
 +
- /**
-  * build_eval_ctx - Build an evaluation context.
-  * @ctx: Supplies a pointer to the context to be populated.
-@@ -63,13 +81,17 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
- 		    enum ipe_op_type op,
- 		    enum ipe_hook_type hook)
- {
-+	struct inode *ino;
-+
- 	ctx->file = file;
- 	ctx->op = op;
- 	ctx->hook = hook;
- 
- 	if (file) {
- 		build_ipe_sb_ctx(ctx, file);
--		build_ipe_bdev_ctx(ctx, d_real_inode(file->f_path.dentry));
-+		ino = d_real_inode(file->f_path.dentry);
-+		build_ipe_bdev_ctx(ctx, ino);
-+		build_ipe_inode_ctx(ctx, ino);
- 	}
++	return rc;
  }
  
-@@ -148,6 +170,84 @@ static bool evaluate_dmv_sig_true(const struct ipe_eval_ctx *const ctx)
- }
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
+ /* Set the right module name */
+@@ -171,3 +176,5 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
  
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+/**
-+ * evaluate_fsv_digest - Analyze @ctx against a fsv digest property.
-+ * @ctx: Supplies a pointer to the context being evaluated.
-+ * @p: Supplies a pointer to the property being evaluated.
-+ *
-+ * Return:
-+ * * true	- The current @ctx match the @p
-+ * * false	- The current @ctx doesn't match the @p
-+ */
-+static bool evaluate_fsv_digest(const struct ipe_eval_ctx *const ctx,
-+				struct ipe_prop *p)
-+{
-+	enum hash_algo alg;
-+	u8 digest[FS_VERITY_MAX_DIGEST_SIZE];
-+	struct digest_info info;
-+
-+	if (!ctx->ino)
-+		return false;
-+	if (!fsverity_get_digest((struct inode *)ctx->ino,
-+				 digest,
-+				 NULL,
-+				 &alg))
-+		return false;
-+
-+	info.alg = hash_algo_name[alg];
-+	info.digest = digest;
-+	info.digest_len = hash_digest_size[alg];
-+
-+	return ipe_digest_eval(p->value, &info);
-+}
-+
-+/**
-+ * evaluate_fsv_sig_false - Analyze @ctx against a fsv sig false property.
-+ * @ctx: Supplies a pointer to the context being evaluated.
-+ *
-+ * Return:
-+ * * true	- The current @ctx match the property
-+ * * false	- The current @ctx doesn't match the property
-+ */
-+static bool evaluate_fsv_sig_false(const struct ipe_eval_ctx *const ctx)
-+{
-+	return !ctx->ino ||
-+	       !IS_VERITY(ctx->ino) ||
-+	       !ctx->ipe_inode ||
-+	       !ctx->ipe_inode->fs_verity_signed;
-+}
-+
-+/**
-+ * evaluate_fsv_sig_true - Analyze @ctx against a fsv sig true property.
-+ * @ctx: Supplies a pointer to the context being evaluated.
-+ *
-+ * Return:
-+ * * true - The current @ctx match the property
-+ * * false - The current @ctx doesn't match the property
-+ */
-+static bool evaluate_fsv_sig_true(const struct ipe_eval_ctx *const ctx)
-+{
-+	return !evaluate_fsv_sig_false(ctx);
-+}
-+#else
-+static bool evaluate_fsv_digest(const struct ipe_eval_ctx *const ctx,
-+				struct ipe_prop *p)
-+{
-+	return false;
-+}
-+
-+static bool evaluate_fsv_sig_false(const struct ipe_eval_ctx *const ctx)
-+{
-+	return false;
-+}
-+
-+static bool evaluate_fsv_sig_true(const struct ipe_eval_ctx *const ctx)
-+{
-+	return false;
-+}
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
-+
- /**
-  * evaluate_property - Analyze @ctx against a property.
-  * @ctx: Supplies a pointer to the context to be evaluated.
-@@ -171,6 +271,12 @@ static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
- 		return evaluate_dmv_sig_false(ctx);
- 	case IPE_PROP_DMV_SIG_TRUE:
- 		return evaluate_dmv_sig_true(ctx);
-+	case IPE_PROP_FSV_DIGEST:
-+		return evaluate_fsv_digest(ctx, p);
-+	case IPE_PROP_FSV_SIG_FALSE:
-+		return evaluate_fsv_sig_false(ctx);
-+	case IPE_PROP_FSV_SIG_TRUE:
-+		return evaluate_fsv_sig_true(ctx);
- 	default:
- 		return false;
- 	}
+ module_param(success_audit, bool, 0400);
+ MODULE_PARM_DESC(success_audit, "Start IPE with success auditing enabled");
++module_param(enforce, bool, 0400);
++MODULE_PARM_DESC(enforce, "Start IPE in enforce or permissive mode");
 diff --git a/security/ipe/eval.h b/security/ipe/eval.h
-index 494c0754f512..73ac905dc97d 100644
+index 4631b236358e..0b50302611a4 100644
 --- a/security/ipe/eval.h
 +++ b/security/ipe/eval.h
-@@ -29,6 +29,12 @@ struct ipe_bdev {
- };
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
+@@ -16,6 +16,7 @@
  
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+struct ipe_inode {
-+	bool fs_verity_signed;
-+};
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
-+
- struct ipe_eval_ctx {
- 	enum ipe_op_type op;
- 	enum ipe_hook_type hook;
-@@ -38,6 +44,10 @@ struct ipe_eval_ctx {
- #ifdef CONFIG_IPE_PROP_DM_VERITY
- 	const struct ipe_bdev *ipe_bdev;
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+	const struct inode *ino;
-+	const struct ipe_inode *ipe_inode;
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
- };
+ extern struct ipe_policy __rcu *ipe_active_policy;
+ extern bool success_audit;
++extern bool enforce;
  
- enum ipe_match {
-diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
-index 1abddd6e1e7f..b9dc23047463 100644
---- a/security/ipe/hooks.c
-+++ b/security/ipe/hooks.c
-@@ -254,3 +254,31 @@ int ipe_bdev_setintegrity(struct block_device *bdev, enum lsm_intgr_type type,
- 	return 0;
- }
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
-+
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+/**
-+ * ipe_inode_setintegrity - save integrity data from a inode to IPE's LSM blob.
-+ * @inode: The inode to source the security blob from.
-+ * @type: Supplies the integrity type.
-+ * @value: The value to be stored.
-+ * @size: The size of @value.
-+ *
-+ * Saves fsverity signature into inode security blob
-+ *
-+ * Return:
-+ * * 0	- OK
-+ * * !0	- Error
-+ */
-+int ipe_inode_setintegrity(struct inode *inode, enum lsm_intgr_type type,
-+			   const void *value, size_t size)
-+{
-+	struct ipe_inode *inode_sec = ipe_inode(inode);
-+
-+	if (type == LSM_INTGR_FSV_SIG) {
-+		inode_sec->fs_verity_signed = size > 0 && value;
-+		return 0;
-+	}
-+
-+	return 0;
-+}
-+#endif /* CONFIG_CONFIG_IPE_PROP_FS_VERITY */
-diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
-index 6b735aac4028..cfa9920aa2e5 100644
---- a/security/ipe/hooks.h
-+++ b/security/ipe/hooks.h
-@@ -9,6 +9,7 @@
- #include <linux/binfmts.h>
- #include <linux/security.h>
- #include <linux/blk_types.h>
-+#include <linux/fsverity.h>
- 
- enum ipe_hook_type {
- 	IPE_HOOK_BPRM_CHECK = 0,
-@@ -43,4 +44,9 @@ int ipe_bdev_setintegrity(struct block_device *bdev, enum lsm_intgr_type type,
- 			  const void *value, size_t len);
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
- 
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+int ipe_inode_setintegrity(struct inode *inode, enum lsm_intgr_type type,
-+			   const void *value, size_t size);
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
-+
- #endif /* _IPE_HOOKS_H */
-diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
-index 3d63e9672f12..86b87e287b69 100644
---- a/security/ipe/ipe.c
-+++ b/security/ipe/ipe.c
-@@ -16,6 +16,9 @@ static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
- #ifdef CONFIG_IPE_PROP_DM_VERITY
- 	.lbs_bdev = sizeof(struct ipe_bdev),
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+	.lbs_inode = sizeof(struct ipe_inode),
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
- };
- 
- static const struct lsm_id ipe_lsmid = {
-@@ -35,6 +38,13 @@ struct ipe_bdev *ipe_bdev(struct block_device *b)
- }
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
- 
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+struct ipe_inode *ipe_inode(const struct inode *inode)
-+{
-+	return inode->i_security + ipe_blobs.lbs_inode;
-+}
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
-+
- static struct security_hook_list ipe_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(bprm_check_security, ipe_bprm_check_security),
- 	LSM_HOOK_INIT(mmap_file, ipe_mmap_file),
-@@ -46,6 +56,9 @@ static struct security_hook_list ipe_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(bdev_free_security, ipe_bdev_free_security),
- 	LSM_HOOK_INIT(bdev_setintegrity, ipe_bdev_setintegrity),
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+	LSM_HOOK_INIT(inode_setintegrity, ipe_inode_setintegrity),
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
- };
+ struct ipe_superblock {
+ 	bool initramfs;
+diff --git a/security/ipe/fs.c b/security/ipe/fs.c
+index 95407997cf0c..b16d87443a3b 100644
+--- a/security/ipe/fs.c
++++ b/security/ipe/fs.c
+@@ -16,6 +16,7 @@ static struct dentry *np __ro_after_init;
+ static struct dentry *root __ro_after_init;
+ struct dentry *policy_root __ro_after_init;
+ static struct dentry *audit_node __ro_after_init;
++static struct dentry *enforce_node __ro_after_init;
  
  /**
-diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
-index 64626702b689..57d3fc22fe10 100644
---- a/security/ipe/ipe.h
-+++ b/security/ipe/ipe.h
-@@ -19,5 +19,8 @@ extern bool ipe_enabled;
- #ifdef CONFIG_IPE_PROP_DM_VERITY
- struct ipe_bdev *ipe_bdev(struct block_device *b);
- #endif /* CONFIG_IPE_PROP_DM_VERITY */
-+#ifdef CONFIG_IPE_PROP_FS_VERITY
-+struct ipe_inode *ipe_inode(const struct inode *inode);
-+#endif /* CONFIG_IPE_PROP_FS_VERITY */
+  * setaudit - Write handler for the securityfs node, "ipe/success_audit"
+@@ -67,6 +68,60 @@ static ssize_t getaudit(struct file *f, char __user *data,
+ 	return simple_read_from_buffer(data, len, offset, result, 1);
+ }
  
- #endif /* _IPE_H */
-diff --git a/security/ipe/policy.h b/security/ipe/policy.h
-index 35629e9699f7..ae6264874fd3 100644
---- a/security/ipe/policy.h
-+++ b/security/ipe/policy.h
-@@ -36,6 +36,9 @@ enum ipe_prop_type {
- 	IPE_PROP_DMV_ROOTHASH,
- 	IPE_PROP_DMV_SIG_FALSE,
- 	IPE_PROP_DMV_SIG_TRUE,
-+	IPE_PROP_FSV_DIGEST,
-+	IPE_PROP_FSV_SIG_FALSE,
-+	IPE_PROP_FSV_SIG_TRUE,
- 	__IPE_PROP_MAX
++/**
++ * setenforce - Write handler for the securityfs node, "ipe/enforce"
++ * @f: Supplies a file structure representing the securityfs node.
++ * @data: Supplies a buffer passed to the write syscall.
++ * @len: Supplies the length of @data.
++ * @offset: unused.
++ *
++ * Return:
++ * * >0	- Success, Length of buffer written
++ * * <0	- Error
++ */
++static ssize_t setenforce(struct file *f, const char __user *data,
++			  size_t len, loff_t *offset)
++{
++	int rc = 0;
++	bool new_value, old_value;
++
++	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
++		return -EPERM;
++
++	old_value = READ_ONCE(enforce);
++	rc = kstrtobool_from_user(data, len, &new_value);
++	if (rc)
++		return rc;
++
++	if (new_value != old_value) {
++		ipe_audit_enforce(new_value, old_value);
++		WRITE_ONCE(enforce, new_value);
++	}
++
++	return len;
++}
++
++/**
++ * getenforce - Read handler for the securityfs node, "ipe/enforce"
++ * @f: Supplies a file structure representing the securityfs node.
++ * @data: Supplies a buffer passed to the read syscall.
++ * @len: Supplies the length of @data.
++ * @offset: unused.
++ *
++ * Return:
++ * * >0	- Success, Length of buffer written
++ * * <0	- Error
++ */
++static ssize_t getenforce(struct file *f, char __user *data,
++			  size_t len, loff_t *offset)
++{
++	const char *result;
++
++	result = ((READ_ONCE(enforce)) ? "1" : "0");
++
++	return simple_read_from_buffer(data, len, offset, result, 1);
++}
++
+ /**
+  * new_policy - Write handler for the securityfs node, "ipe/new_policy".
+  * @f: Supplies a file structure representing the securityfs node.
+@@ -120,6 +175,11 @@ static const struct file_operations audit_fops = {
+ 	.read = getaudit,
  };
  
-diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
-index 802e31f14b22..48dc11739072 100644
---- a/security/ipe/policy_parser.c
-+++ b/security/ipe/policy_parser.c
-@@ -273,6 +273,9 @@ static const match_table_t property_tokens = {
- 	{IPE_PROP_DMV_ROOTHASH,		"dmverity_roothash=%s"},
- 	{IPE_PROP_DMV_SIG_FALSE,	"dmverity_signature=FALSE"},
- 	{IPE_PROP_DMV_SIG_TRUE,		"dmverity_signature=TRUE"},
-+	{IPE_PROP_FSV_DIGEST,		"fsverity_digest=%s"},
-+	{IPE_PROP_FSV_SIG_FALSE,	"fsverity_signature=FALSE"},
-+	{IPE_PROP_FSV_SIG_TRUE,		"fsverity_signature=TRUE"},
- 	{IPE_PROP_INVALID,		NULL}
- };
++static const struct file_operations enforce_fops = {
++	.write = setenforce,
++	.read = getenforce,
++};
++
+ /**
+  * ipe_init_securityfs - Initialize IPE's securityfs tree at fsinit.
+  *
+@@ -147,6 +207,13 @@ static int __init ipe_init_securityfs(void)
+ 		goto err;
+ 	}
  
-@@ -302,6 +305,7 @@ static int parse_property(char *t, struct ipe_rule *r)
- 
- 	switch (token) {
- 	case IPE_PROP_DMV_ROOTHASH:
-+	case IPE_PROP_FSV_DIGEST:
- 		dup = match_strdup(&args[0]);
- 		if (!dup) {
- 			rc = -ENOMEM;
-@@ -317,6 +321,8 @@ static int parse_property(char *t, struct ipe_rule *r)
- 	case IPE_PROP_BOOT_VERIFIED_TRUE:
- 	case IPE_PROP_DMV_SIG_FALSE:
- 	case IPE_PROP_DMV_SIG_TRUE:
-+	case IPE_PROP_FSV_SIG_FALSE:
-+	case IPE_PROP_FSV_SIG_TRUE:
- 		p->type = token;
- 		break;
- 	default:
++	enforce_node = securityfs_create_file("enforce", 0600, root, NULL,
++					      &enforce_fops);
++	if (IS_ERR(enforce_node)) {
++		rc = PTR_ERR(enforce_node);
++		goto err;
++	}
++
+ 	policy_root = securityfs_create_dir("policies", root);
+ 	if (IS_ERR(policy_root)) {
+ 		rc = PTR_ERR(policy_root);
+@@ -163,6 +230,7 @@ static int __init ipe_init_securityfs(void)
+ err:
+ 	securityfs_remove(np);
+ 	securityfs_remove(policy_root);
++	securityfs_remove(enforce_node);
+ 	securityfs_remove(audit_node);
+ 	securityfs_remove(root);
+ 	return rc;
 -- 
 2.44.0
 
