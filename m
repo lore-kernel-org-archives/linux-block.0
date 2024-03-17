@@ -1,104 +1,134 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D47320B35;
-	Sun, 17 Mar 2024 21:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B121F21345;
+	Sun, 17 Mar 2024 21:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710711257; cv=none; b=tzgTcYuqIdEU+ZsAk4WywFkErjKLYdngzHabjY6FSmeQRWdLNoo1SvwNsNogaGL7F/WyMAbhJWC/uJZz+P1DLw90ydVbSMZAj+a1SZ6wp8vU0Hr5zyxGBPltHbMSCRklh862tQie8wXW8r8y9h/bG8ASggy0/rvqBaft087OYYw=
+	t=1710711364; cv=none; b=BqQA3fhyiOYuV9oi2o5YXXkTe2kKecX2HHCRudQZHq5EhGdsotmjv8DZwioVocQYbaHRf2jPBkA6PsnzUuCuWCZIekwW9wPCo266VGBlTQozhjMO89o6r185VfhnHbCxqzVXKG4Qhjk7lhg/MV2N7lFqRMl+j0aKkc5jnyRcMBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710711257; c=relaxed/simple;
-	bh=JL4f9CkTc1PhMvDJqtVSNWVDRsuHiAIaDHnKNLauDrw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=enX4jrTDhiLUdXmBu31tU2xPCdq8CIUP7g/MzLyVJ+SKJmreUv3MZUV9qazuoh58inKRl21pLalVYw0lwzrYFmu/cANC1Ei6m7xMnp1wcgUy77weHdf+jFTh+9+f6nIQOBHiAvhR1qQZvbApby7cRh+IyYNP4hlI1ABLXQ/NfQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GTvPGMUA; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1710711364; c=relaxed/simple;
+	bh=T2vucFIna7OCbzpU13th+is/7PIi3PsIKeZ/PNgkwk4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kRu9AI7JauF0TIq5ptIxFNgBQ/wN/kHbONBC7I+WqRWQ/eXQ2AkTQbGxj0rLIRfkavOQBlIXFMya2vLJ8583mhGY+KzCiz0bCgqtgLkuDZvi64A5SMSf3WGbtZCIUqAtZzrZtnEWd9BEHcqzIdStOJqDhybwV935MnNWKVXGkIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DgM4XYG5; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GTvPGMUA"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=mhmd4DQYdANeIXg1gAXPMMRysX1z3GDQw6kVU6mRTr0=; b=GTvPGMUANvAVfkSRGVTb9VOlGV
-	LRmBd/rJHeORLF/hpnwFvVXYQ8IzeOFBmhW6ipeXMalh2qVUJeeX2HcLXblOxP+Zvi9TUF2CqvxBZ
-	HX1Jf/9BLDdHOWcTuqdXXVSuuda74pmfKU/VDdbsKnMvh9+kIOU3JTUyV06ozqohwWWgxbMEDymBD
-	x8E1j5UeBFZlyU0ojq437+xL0u+c3r9NOYgxZccJvEoB/iHdQntQoQ792/XOVEH7Sq9390GzPo44W
-	cBZYUgdhveX0D3ffJEf1fp/tbI2zm7Id7MxH0Hto9FWfr5zQSFCym8nL7HYi2kBMagTPvnWZLA7Gt
-	avc6qhtA==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rly8n-0000000Fe5u-2tqR;
-	Sun, 17 Mar 2024 21:34:01 +0000
-Date: Sun, 17 Mar 2024 21:34:01 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Andreas Hindborg <nmi@metaspace.dk>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Andreas Hindborg <a.hindborg@samsung.com>,
-	Niklas Cassel <Niklas.Cassel@wdc.com>,
-	Greg KH <gregkh@linuxfoundation.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Yexuan Yang <1182282462@bupt.edu.cn>,
-	Sergio =?iso-8859-1?Q?Gonz=E1lez?= Collado <sergio.collado@gmail.com>,
-	Joel Granados <j.granados@samsung.com>,
-	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	"gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 0/5] Rust block device driver API and null block
- driver
-Message-ID: <ZfdhyfLWBIFtKO81@casper.infradead.org>
-References: <20240313110515.70088-1-nmi@metaspace.dk>
- <ZfZajb_vcRwLacfH@casper.infradead.org>
- <874jd5qqpq.fsf@metaspace.dk>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DgM4XYG5"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a46805cd977so341975466b.0;
+        Sun, 17 Mar 2024 14:36:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710711361; x=1711316161; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5j/xzgAgUsQh1o7BgyqmtZcXvdnxs0+nKwK1/4wXzrw=;
+        b=DgM4XYG5RWUT2bLvIRLHF9sk/PTcsd+Aw2FCfSgyhstTpJXni6IsEL5VMpC9Pt2vKi
+         enNoKsnv/r/UaaBhnrQVkFWJu5vR3Dc/0HaThqnpxQs0ufaPGu4fYW9P716W5dVV9Y/0
+         YZUOR9ylTaqKI58UxO8wVrGgCa7My++uuxxxDwU+9b3zmx6LRlooDXnijQKCjXgl3QiC
+         j7LYAdnJei/1XCcFg8IgaYu/iIIfdkXQhJrAK35aQ3O3vt2UxS7Q2x8whlH1SMTPAoiX
+         xg7hAK3ZqQdL5dexpLozwn+hamMkv1nDB96X2tT/wQL8+Qse8a9axdalbXvL2FpcxFZo
+         +W3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710711361; x=1711316161;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5j/xzgAgUsQh1o7BgyqmtZcXvdnxs0+nKwK1/4wXzrw=;
+        b=JSqvN/mSfbU5NGvTxUbgVHFspJ49vqudF86faPoPpC/0zeOXznXmUr76f/420RULUC
+         B922tc/JEEFYKlThe33YcC6Rk9jC/bYJiAhGt0Ge1v3NmUnAHaLZhTg//9H5pYKoQEMb
+         2Nz6clB0MyeL/ZQth3PfKn15v4AlGDTaFOWr2y+zeAtc9/3a+zooqmlZmRmCKz7VyK62
+         aKaa3HM62mVRdoLuQH9I368M2HUZkSGW5h6s26boQUH24FGS/AClM3CQxzjbMf7FIp2o
+         B+My/JzC1ykUeeF80lx5glYPa8gRsEYmPphFkdzKeZCDCUZ6XzTaEdLHSkP0nEX7meqS
+         GSjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXiyoQgU6L+KejyABtzVZrVeAcYL6bdi8wU+LBnpiBpZM3c/NU7hLYrH8gA7npkXaqfAX//GY1NZ9kuzBGxINQ4PPvFveKTFplCVDQ=
+X-Gm-Message-State: AOJu0YxyJhEwCeLw9q6L+2RjFGQZS1DtgZ4roZJZSa6LznC9ejSxGDth
+	apIeYf3WkTnLTYLYQrJHRvCbAHQq64/i8dzae1mEStEe4/AhHq+MUC8OjofZ
+X-Google-Smtp-Source: AGHT+IF8DS295/79hZmLSNTYz+gyv8VHIA+lU55O7F6sT7bo2/GvELoIeMMv792HS4e+C6tTzbpiyg==
+X-Received: by 2002:a17:906:bc94:b0:a46:bba6:b06a with SMTP id lv20-20020a170906bc9400b00a46bba6b06amr1095433ejb.12.1710711361015;
+        Sun, 17 Mar 2024 14:36:01 -0700 (PDT)
+Received: from [192.168.8.100] ([85.255.232.181])
+        by smtp.gmail.com with ESMTPSA id wp12-20020a170907060c00b00a3edb758561sm4098340ejb.129.2024.03.17.14.36.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Mar 2024 14:36:00 -0700 (PDT)
+Message-ID: <6dea0285-254d-4985-982b-39f3897bf064@gmail.com>
+Date: Sun, 17 Mar 2024 21:34:45 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874jd5qqpq.fsf@metaspace.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: (subset) [PATCH 00/11] remove aux CQE caches
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+ Kanchan Joshi <joshi.k@samsung.com>
+References: <cover.1710514702.git.asml.silence@gmail.com>
+ <171054320158.386037.13510354610893597382.b4-ty@kernel.dk>
+ <ZfWIFOkN/X9uyJJe@fedora> <29b950aa-d3c3-4237-a146-c6abd7b68b8f@gmail.com>
+ <ZfWk9Pp0zJ1i1JAE@fedora> <1132db8f-829f-4ea8-bdee-8f592b5e3c19@gmail.com>
+ <e25412ba-916c-4de7-8ed2-18268f656731@kernel.dk>
+ <d3beeb72-c4cf-4fad-80bc-10ca1f035fff@gmail.com>
+ <4787bb12-bb89-490a-9d30-40b4f54a19ad@kernel.dk>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <4787bb12-bb89-490a-9d30-40b4f54a19ad@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 17, 2024 at 08:09:53AM +0100, Andreas Hindborg wrote:
-> I was under the impression that using folios also give the advantage
-> that handles are always head pages. No need to worry about head/tail
-> pages. If the driver moves to use higher order pages for larger block
-> sizes, would it then make sense with folios, or are page still
-> preferred?
+On 3/17/24 21:32, Jens Axboe wrote:
+> On 3/17/24 3:29 PM, Pavel Begunkov wrote:
+>> On 3/17/24 21:24, Jens Axboe wrote:
+>>> On 3/17/24 2:55 PM, Pavel Begunkov wrote:
+>>>> On 3/16/24 13:56, Ming Lei wrote:
+>>>>> On Sat, Mar 16, 2024 at 01:27:17PM +0000, Pavel Begunkov wrote:
+>>>>>> On 3/16/24 11:52, Ming Lei wrote:
+>>>>>>> On Fri, Mar 15, 2024 at 04:53:21PM -0600, Jens Axboe wrote:
+>>>>>
+>>>>> ...
+>>>>>
+>>>>>>> The following two error can be triggered with this patchset
+>>>>>>> when running some ublk stress test(io vs. deletion). And not see
+>>>>>>> such failures after reverting the 11 patches.
+>>>>>>
+>>>>>> I suppose it's with the fix from yesterday. How can I
+>>>>>> reproduce it, blktests?
+>>>>>
+>>>>> Yeah, it needs yesterday's fix.
+>>>>>
+>>>>> You may need to run this test multiple times for triggering the problem:
+>>>>
+>>>> Thanks for all the testing. I've tried it, all ublk/generic tests hang
+>>>> in userspace waiting for CQEs but no complaints from the kernel.
+>>>> However, it seems the branch is buggy even without my patches, I
+>>>> consistently (5-15 minutes of running in a slow VM) hit page underflow
+>>>> by running liburing tests. Not sure what is that yet, but might also
+>>>> be the reason.
+>>>
+>>> Hmm odd, there's nothing in there but your series and then the
+>>> io_uring-6.9 bits pulled in. Maybe it hit an unfortunate point in the
+>>> merge window -git cycle? Does it happen with io_uring-6.9 as well? I
+>>> haven't seen anything odd.
+>>
+>> Need to test io_uring-6.9. I actually checked the branch twice, both
+>> with the issue, and by full recompilation and config prompts I assumed
+>> you pulled something in between (maybe not).
+>>
+>> And yeah, I can't confirm it's specifically an io_uring bug, the
+>> stack trace is usually some unmap or task exit, sometimes it only
+>> shows when you try to shutdown the VM after tests.
+> 
+> Funky. I just ran a bunch of loops of liburing tests and Ming's ublksrv
+> test case as well on io_uring-6.9 and it all worked fine. Trying
+> liburing tests on for-6.10/io_uring as well now, but didn't see anything
+> the other times I ran it. In any case, once you repost I'll rebase and
+> then let's see if it hits again.
+> 
+> Did you run with KASAN enabled
 
-This is a good question.
+Yes, it's a debug kernel, full on KASANs, lockdeps and so
 
-If you do enhance this driver to support larger block sizes, I would
-recommend indexing the xarray by sector number instead of page number.
-You would allocate a compound page, but at no point would you need to
-ask the page what order it is (you already know), you don't need to
-change the page flags, etc, etc.
-
-The page cache is in a bit of a different spot.  It has to support
-multiple folio sizes for the same file; it has to support folios being
-split, it has to support lookup from users who don't know what the folio
-size is, etc, etc.
-
-I don't think there's ever a point at which you'd need to call
-compound_head() because you'd always look up the head page.  You'd still
-want an iterator of some kind to copy to a compound page (because you
-can only map one at a time).  And that might look a lot like the folio
-copying code.  Probably the right way to handle this is for the folio
-copying code to call the page copying code since a folio is always
-composed of pages.
+-- 
+Pavel Begunkov
