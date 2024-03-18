@@ -1,43 +1,53 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B4C17547
-	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 02:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC1E1CFA9
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 02:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710728304; cv=none; b=tP1IdRkSLUpt95FKeoNi/W+mDMIwMQy7BG9e4qLRLLnYZr+sdcy75uV8RU+dInmk0k4DyblYN1IZx77LmHan2jyQTomm51ekVkmrzU4/GsAIlCng3qZ5eBM9QhPAbXkYQ7vU05hFiLIBCqC17KzeuMBEH9HoR9SQodeklyd2rI8=
+	t=1710728650; cv=none; b=uHe1Vg+9uiQno63ck2Xdm6JGH7QopRc3XTdZek5m/sw3WRuMF4Ksn8kei8DMt5wbvTFY8nGML5V73fKb1VEey+tzm+4BYiHWU8lBP1yMbWhpl9AxS6+O0pafsE4rbaVHu6BRRKvQ2BpCk0T8BrtNo3V++L26MCOgQbWODZnNu/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710728304; c=relaxed/simple;
-	bh=oZVsozu7jxsoMpL03TB6T3o7YkYMxMLbBsrTCZa95b8=;
+	s=arc-20240116; t=1710728650; c=relaxed/simple;
+	bh=jKjP2bqDPmdsFrqGmc4MTPFGukfFKXRch6I00JIiiwY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Je0L4jyp/+Ty3xuj8OTrONYBHNgb55B6hGuNGjnU2UQfNLMCDhCkq9qQAPIpAX9L8bv2HL9ghbm0coZYs3ItwQauK3Rub5egAVA9eqwL5rBVn6lJG6mjwysG9em6X5vt61QaC5HJbftmhn0QM3beiNW4duQb0LRHsJjh8GtxMYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Lo2Tq+t9; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=plYIFSmrKnZh1Wd1tTZ276UH6dAIGp/zH/64KiJPup6L+Vc5tPGkDmQGiqMo92Cq7YkF6SKJwIUyw5p0+9wyTNR9KW/3uSZUatslzdsL5JRFSAlURcT/P0TzV/AazWP3LgBZtA7lPU/us4QuhweGRdKA0kvRSf91zMktsZiL4I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DfTbtSUw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lo2Tq+t9"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Ie9Ap0Vg8rzZC4lIOYHUtldkDGU569+6gIelLh9GLyA=; b=Lo2Tq+t9TmA9pzy3UHmVNN5/gE
-	bYayE5ei88cQNrpATshbGGci0TwNTzlygYlcXR4puH3SUzkCbX6wMjNni8tmP+PSQoItdQRrPVxkM
-	4Oh/Whl8FmKmarHfAbRAxdw+XDBk9MXHCJj9UY8++SUjzFb0/vS9mS+ljBN2epFU/sCLAGVVsjYuU
-	l2qG295ZSyss7wFcPR9IkErCasYGJEAce9BepS8QdvlVRBABBvX6IIj6mGraB8AojsVMDGkrQdeUD
-	jhBXB/72ymeBF4pCW0lplwz8p8u9+2MMuavo5u1WFaaO7lYql2wjuclzFEGgLJpgQn+1IQj0Oazcb
-	F5WeocVg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rm2Zx-000000071NT-3n7C;
-	Mon, 18 Mar 2024 02:18:21 +0000
-Date: Sun, 17 Mar 2024 19:18:21 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@kernel.org>,
-	axboe@fb.com, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, Gregory Joyce <gjoyce@ibm.com>
-Subject: Re: [Bug Report] nvme-cli fails re-formatting NVMe namespace
-Message-ID: <Zfekbf0V5Dpsk_nf@infradead.org>
-References: <7a3b35dd-7365-4427-95a0-929b28c64e73@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfTbtSUw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710728647;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9gjdsxvTZUD6Hghn9xLz17EHLsKM0MoxD1cbu4FIL2E=;
+	b=DfTbtSUw7uuD+qU5Az5+M3GLD7MeD2M5HWqothfi/efUkw4fmuBXHTRclDYPhnglVbRnko
+	JrEQreKIHSwuBrE7ZqxFDUSpzqdyrS0LPjQbR4tDz0wSFaE3fYIAjS8ZkYCTeuMgvl6vFb
+	W9RmQCTQwYmbNF91P+n1XdEMPdPVVRo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-rDaiI7ufOWOIAfCjx8fnQA-1; Sun, 17 Mar 2024 22:24:04 -0400
+X-MC-Unique: rDaiI7ufOWOIAfCjx8fnQA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D6312800264;
+	Mon, 18 Mar 2024 02:24:03 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 951A22166B33;
+	Mon, 18 Mar 2024 02:24:00 +0000 (UTC)
+Date: Mon, 18 Mar 2024 10:23:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v2 02/14] io_uring/cmd: fix tw <-> issue_flags conversion
+Message-ID: <Zfelt6mbVA0moyq6@fedora>
+References: <cover.1710720150.git.asml.silence@gmail.com>
+ <c48a7f3919eecbee0319020fd640e6b3d2e60e5f.1710720150.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,35 +56,55 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7a3b35dd-7365-4427-95a0-929b28c64e73@linux.ibm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <c48a7f3919eecbee0319020fd640e6b3d2e60e5f.1710720150.git.asml.silence@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Hi Nilay,
+On Mon, Mar 18, 2024 at 12:41:47AM +0000, Pavel Begunkov wrote:
+> !IO_URING_F_UNLOCKED does not translate to availability of the deferred
+> completion infra, IO_URING_F_COMPLETE_DEFER does, that what we should
+> pass and look for to use io_req_complete_defer() and other variants.
+> 
+> Luckily, it's not a real problem as two wrongs actually made it right,
+> at least as far as io_uring_cmd_work() goes.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Link: https://lore.kernel.org/r/eb08e72e837106963bc7bc7dccfd93d646cc7f36.1710514702.git.asml.silence@gmail.com
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  io_uring/uring_cmd.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+> index f197e8c22965..ec38a8d4836d 100644
+> --- a/io_uring/uring_cmd.c
+> +++ b/io_uring/uring_cmd.c
+> @@ -56,7 +56,11 @@ EXPORT_SYMBOL_GPL(io_uring_cmd_mark_cancelable);
+>  static void io_uring_cmd_work(struct io_kiocb *req, struct io_tw_state *ts)
+>  {
+>  	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+> -	unsigned issue_flags = ts->locked ? 0 : IO_URING_F_UNLOCKED;
+> +	unsigned issue_flags = IO_URING_F_UNLOCKED;
+> +
+> +	/* locked task_work executor checks the deffered list completion */
+> +	if (ts->locked)
+> +		issue_flags = IO_URING_F_COMPLETE_DEFER;
+>  
+>  	ioucmd->task_work_cb(ioucmd, issue_flags);
+>  }
+> @@ -100,7 +104,9 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2,
+>  	if (req->ctx->flags & IORING_SETUP_IOPOLL) {
+>  		/* order with io_iopoll_req_issued() checking ->iopoll_complete */
+>  		smp_store_release(&req->iopoll_completed, 1);
+> -	} else if (!(issue_flags & IO_URING_F_UNLOCKED)) {
+> +	} else if (issue_flags & IO_URING_F_COMPLETE_DEFER) {
+> +		if (WARN_ON_ONCE(issue_flags & IO_URING_F_UNLOCKED))
+> +			return;
+>  		io_req_complete_defer(req);
+>  	} else {
+>  		req->io_task_work.func = io_req_task_complete;
 
-thanks for the report!
+'git-bisect' shows the reported warning starts from this patch.
 
-I'm currently travelling without easy hardware access, but can you try
-the patch below?  This simply rebuilds the limits from scratch.  It
-probably wants a bit of a cleanup if it works, but this should be
-fine for testing:
+Thanks,
+Ming
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 00864a63447099..9ef41e65fc83bd 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2215,10 +2215,13 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_ns_info *info)
- 		set_disk_ro(ns->head->disk, nvme_ns_is_readonly(ns, info));
- 		nvme_mpath_revalidate_paths(ns);
- 
--		lim = queue_limits_start_update(ns->head->disk->queue);
-+		blk_set_stacking_limits(&lim);
-+		lim.dma_alignment = 3;
-+		if (info->ids.csi != NVME_CSI_ZNS)
-+			lim.max_zone_append_sectors = 0;
- 		queue_limits_stack_bdev(&lim, ns->disk->part0, 0,
- 					ns->head->disk->disk_name);
--		ret = queue_limits_commit_update(ns->head->disk->queue, &lim);
-+		ret = queue_limits_set(ns->head->disk->queue, &lim);
- 		blk_mq_unfreeze_queue(ns->head->disk->queue);
- 	}
- 
