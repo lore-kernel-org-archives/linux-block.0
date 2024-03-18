@@ -1,196 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838DB1E864
-	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 06:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D512233E;
+	Mon, 18 Mar 2024 07:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710745197; cv=none; b=Wky3MJlgAWHTh2guASg3gP3fJ4ir5QudTbcrZKy3xLi2AhHS3RZj7nt3wix7qjTQ7SRiSf22gYYrMz29Vm+1ygIT21w6kEzL0XLTGSpr8dpdOr3SauyRMnNQ+URvMAh208B/mSM73YDH4Ew5r/jOT9HJeFxt5LAUzogt/5rRmr0=
+	t=1710746353; cv=none; b=cEjJRQiQx+CD4TJsPIRzMgYEdTbFszIjIP56t5MpE4+JODdwIgK8Kn50G2xFiNcUaQF+QUKmKjNvg6uDLbdY35eIqDYwWeeo/H1eTTLXtXwnfVnv5Sc3dm6h4LDQgIWjTzqcuf1UoE9G6qH3d24ehe3iwSHBnqA1sys98M5m9lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710745197; c=relaxed/simple;
-	bh=wl3/XG5JAIlWJxTNN/fd+QFNCCH72jFS4QT092uYOik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DFiYOenuQGFfFG0rb3VNeOzCQojKBqR4+2Oc21iIDY38Pzu/Onoc9sG7VLqKLcfdCuibPCXkkgql2OaYRh0/1n8bNtZr00/Gqx++ReoqtsI+lxsY8Ip/UOTjAsB24D+wWIWALsGUchMm5mE6djHL7dW8YjsECYPeUzGyQplmjR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RXSf645c; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RXSf645c"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710745194;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lwWTigDHY4YfpllhhJIyOzsLhhMoCQZ+UCmJ5X7Z9fg=;
-	b=RXSf645cPksc0RcSCRyOh4qhv+GRvfO4vxegE/r2WzbLzmGhAWR+CLwhFNZKfEH2Xo35ve
-	H3D+9ZKfYJFHlF6SY66HrLhV+zVDQaUG8ny6d5Ksx5HqT0fXaMUvONZQkhrrmvCKszI51W
-	pdYs9ydyPVz+uKyceWJEJkjGeA+a2sc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-0jjVWMCEO9GIPFCAxylJRA-1; Mon, 18 Mar 2024 02:59:50 -0400
-X-MC-Unique: 0jjVWMCEO9GIPFCAxylJRA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26E4F101A552;
-	Mon, 18 Mar 2024 06:59:50 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 883A4492BD0;
-	Mon, 18 Mar 2024 06:59:46 +0000 (UTC)
-Date: Mon, 18 Mar 2024 14:59:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v2 02/14] io_uring/cmd: fix tw <-> issue_flags conversion
-Message-ID: <ZffmWuGsNH/QVC/O@fedora>
-References: <cover.1710720150.git.asml.silence@gmail.com>
- <c48a7f3919eecbee0319020fd640e6b3d2e60e5f.1710720150.git.asml.silence@gmail.com>
- <Zfelt6mbVA0moyq6@fedora>
- <e987d48d-09c9-4b7d-9ddc-1d90f15a1bfe@kernel.dk>
- <e2167849-8034-4649-9d35-3ab266c8d0d5@gmail.com>
- <6291a6f9-61e0-4e3f-b070-b61e8764fb63@kernel.dk>
- <ZferOJCWcWoN2Qzf@fedora>
- <ed73a4de-0b3b-4812-8345-40ea7fa39587@kernel.dk>
+	s=arc-20240116; t=1710746353; c=relaxed/simple;
+	bh=T9rR11fKbyEXYx5AZtCFHklQYWM3C/yUh98/aYPFuxM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=hXaUTqD9a8WZG8HO6NlA1GSRwmckuOqVwGMT5G6WD5rhrzXfPffY2VjVjEcTNRxYgVfXdwVDRH2+AAsQ8drfUhy75Ri2G7Qub2j9eeQ8lOWTyiWAUlHVMDI4U+vXLidO9FA2TTP1JI2C/ceWPov+9oEhKsAxXMcdPJBy6FkfeO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TymS55gszz4f3k6Y;
+	Mon, 18 Mar 2024 15:19:01 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 98FE71A0E2A;
+	Mon, 18 Mar 2024 15:19:05 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxDn6vdlBmg_HQ--.26754S3;
+	Mon, 18 Mar 2024 15:19:05 +0800 (CST)
+Subject: Re: [RFC v4 linux-next 19/19] fs & block: remove bdev->bd_inode
+To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>
+Cc: jack@suse.cz, brauner@kernel.org, axboe@kernel.dk,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
+ <20240222124555.2049140-20-yukuai1@huaweicloud.com>
+ <20240317213847.GD10665@lst.de>
+ <022204e6-c387-b4b2-5982-970fd1ed5b5b@huaweicloud.com>
+ <20240318013208.GA23711@lst.de>
+ <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ea4774db-188e-6744-6a5b-0096f6206112@huaweicloud.com>
+Date: Mon, 18 Mar 2024 15:19:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed73a4de-0b3b-4812-8345-40ea7fa39587@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+In-Reply-To: <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDHlxDn6vdlBmg_HQ--.26754S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw4xGrykuw45Xr4xtFW7CFg_yoW8XryDpa
+	98JFWUKr4kGryDK3Wvv3WUJr4Fkr13trW5X34SqryfC3yDC39agFWSgrn8CF1DG39rCr40
+	va1UWry5Xr1rAr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sun, Mar 17, 2024 at 09:11:27PM -0600, Jens Axboe wrote:
-> On 3/17/24 8:47 PM, Ming Lei wrote:
-> > On Sun, Mar 17, 2024 at 08:40:59PM -0600, Jens Axboe wrote:
-> >> On 3/17/24 8:32 PM, Pavel Begunkov wrote:
-> >>> On 3/18/24 02:25, Jens Axboe wrote:
-> >>>> On 3/17/24 8:23 PM, Ming Lei wrote:
-> >>>>> On Mon, Mar 18, 2024 at 12:41:47AM +0000, Pavel Begunkov wrote:
-> >>>>>> !IO_URING_F_UNLOCKED does not translate to availability of the deferred
-> >>>>>> completion infra, IO_URING_F_COMPLETE_DEFER does, that what we should
-> >>>>>> pass and look for to use io_req_complete_defer() and other variants.
-> >>>>>>
-> >>>>>> Luckily, it's not a real problem as two wrongs actually made it right,
-> >>>>>> at least as far as io_uring_cmd_work() goes.
-> >>>>>>
-> >>>>>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> >>>>>> Link: https://lore.kernel.org/r/eb08e72e837106963bc7bc7dccfd93d646cc7f36.1710514702.git.asml.silence@gmail.com
-> >>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> >>>
-> >>> oops, I should've removed all the signed-offs
-> >>>
-> >>>>>> ---
-> >>>>>>   io_uring/uring_cmd.c | 10 ++++++++--
-> >>>>>>   1 file changed, 8 insertions(+), 2 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> >>>>>> index f197e8c22965..ec38a8d4836d 100644
-> >>>>>> --- a/io_uring/uring_cmd.c
-> >>>>>> +++ b/io_uring/uring_cmd.c
-> >>>>>> @@ -56,7 +56,11 @@ EXPORT_SYMBOL_GPL(io_uring_cmd_mark_cancelable);
-> >>>>>>   static void io_uring_cmd_work(struct io_kiocb *req, struct io_tw_state *ts)
-> >>>>>>   {
-> >>>>>>       struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
-> >>>>>> -    unsigned issue_flags = ts->locked ? 0 : IO_URING_F_UNLOCKED;
-> >>>>>> +    unsigned issue_flags = IO_URING_F_UNLOCKED;
-> >>>>>> +
-> >>>>>> +    /* locked task_work executor checks the deffered list completion */
-> >>>>>> +    if (ts->locked)
-> >>>>>> +        issue_flags = IO_URING_F_COMPLETE_DEFER;
-> >>>>>>         ioucmd->task_work_cb(ioucmd, issue_flags);
-> >>>>>>   }
-> >>>>>> @@ -100,7 +104,9 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2,
-> >>>>>>       if (req->ctx->flags & IORING_SETUP_IOPOLL) {
-> >>>>>>           /* order with io_iopoll_req_issued() checking ->iopoll_complete */
-> >>>>>>           smp_store_release(&req->iopoll_completed, 1);
-> >>>>>> -    } else if (!(issue_flags & IO_URING_F_UNLOCKED)) {
-> >>>>>> +    } else if (issue_flags & IO_URING_F_COMPLETE_DEFER) {
-> >>>>>> +        if (WARN_ON_ONCE(issue_flags & IO_URING_F_UNLOCKED))
-> >>>>>> +            return;
-> >>>>>>           io_req_complete_defer(req);
-> >>>>>>       } else {
-> >>>>>>           req->io_task_work.func = io_req_task_complete;
-> >>>>>
-> >>>>> 'git-bisect' shows the reported warning starts from this patch.
-> >>>
-> >>> Thanks Ming
-> >>>
-> >>>>
-> >>>> That does make sense, as probably:
-> >>>>
-> >>>> +    /* locked task_work executor checks the deffered list completion */
-> >>>> +    if (ts->locked)
-> >>>> +        issue_flags = IO_URING_F_COMPLETE_DEFER;
-> >>>>
-> >>>> this assumption isn't true, and that would mess with the task management
-> >>>> (which is in your oops).
-> >>>
-> >>> I'm missing it, how it's not true?
-> >>>
-> >>>
-> >>> static void ctx_flush_and_put(struct io_ring_ctx *ctx, struct io_tw_state *ts)
-> >>> {
-> >>>     ...
-> >>>     if (ts->locked) {
-> >>>         io_submit_flush_completions(ctx);
-> >>>         ...
-> >>>     }
-> >>> }
-> >>>
-> >>> static __cold void io_fallback_req_func(struct work_struct *work)
-> >>> {
-> >>>     ...
-> >>>     mutex_lock(&ctx->uring_lock);
-> >>>     llist_for_each_entry_safe(req, tmp, node, io_task_work.node)
-> >>>         req->io_task_work.func(req, &ts);
-> >>>     io_submit_flush_completions(ctx);
-> >>>     mutex_unlock(&ctx->uring_lock);
-> >>>     ...
-> >>> }
-> >>
-> >> I took a look too, and don't immediately see it. Those are also the two
-> >> only cases I found, and before the patches, looks fine too.
-> >>
-> >> So no immediate answer there... But I can confirm that before this
-> >> patch, test passes fine. With the patch, it goes boom pretty quick.
-> >> Either directly off putting the task, or an unrelated memory crash
-> >> instead.
-> > 
-> > In ublk, the translated 'issue_flags' is passed to io_uring_cmd_done()
-> > from ioucmd->task_work_cb()(__ublk_rq_task_work()). That might be
-> > related with the reason.
+Hi, Christoph!
+
+在 2024/03/18 9:51, Yu Kuai 写道:
+> Hi,
 > 
-> Or maybe ublk is doing multiple invocations of task_work completions? I
-> added this:
+> 在 2024/03/18 9:32, Christoph Hellwig 写道:
+>> On Mon, Mar 18, 2024 at 09:26:48AM +0800, Yu Kuai wrote:
+>>> Because there is a real filesystem(devtmpfs) used for raw block devcie
+>>> file operations, open syscall to devtmpfs:
+>>>
+>>> blkdev_open
+>>>   bdev = blkdev_get_no_open
+>>>   bdev_open -> pass in file is from devtmpfs
+>>>   -> in this case, file inode is from devtmpfs,
+>>
+>> But file->f_mapping->host should still point to the bdevfs inode,
+>> and file->f_mapping->host is what everything in the I/O path should
+>> be using.
+>>
+>>> Then later, in blkdev_iomap_begin(), bd_inode is passed in and there is
+>>> no access to the devtmpfs file, we can't use s_bdev_file() as other
+>>> filesystems here.
+>>
+>> We can just pass the file down in iomap_iter.private
+> 
+> I can do this for blkdev_read_folio(), however, for other ops like
+> blkdev_writepages(), I can't find a way to pass the file to
+> iomap_iter.private yet.
+> 
+> Any suggestions?
 
-Yes, your debug log & point does help.
+I come up with an ideal:
 
-This patch convert zero flag(!IO_URING_F_UNLOCKED) into IO_URING_F_COMPLETE_DEFER,
-and somewhere is easily ignored, and follows the fix, which need to be
-folded into patch 2.
+While opening the block_device the first time, store the generated new
+file in "bd_inode->i_private". And release it after the last opener
+close the block_device.
 
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index 5d4b448fdc50..22f2b52390a9 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -3259,7 +3259,8 @@ static bool io_uring_try_cancel_uring_cmd(struct io_ring_ctx *ctx,
-                        /* ->sqe isn't available if no async data */
-                        if (!req_has_async_data(req))
-                                cmd->sqe = NULL;
--                       file->f_op->uring_cmd(cmd, IO_URING_F_CANCEL);
-+                       file->f_op->uring_cmd(cmd, IO_URING_F_CANCEL |
-+                                       IO_URING_F_COMPLETE_DEFER);
-                        ret = true;
-                }
-        }
+The advantages are:
+  - multiple openers can share the same bdev_file;
+  - raw block device ops can use the bdev_file as well, and there is no
+need to distinguish iomap/buffer_head for raw block_device;
 
+Please let me know what do you think?
 
 Thanks,
-Ming
+Kuai
+> 
+> Thanks,
+> Kuai
+>> .
+>>
+> 
+> .
+> 
 
