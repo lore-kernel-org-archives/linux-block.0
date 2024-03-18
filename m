@@ -1,156 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C40B35F0C;
-	Mon, 18 Mar 2024 10:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30002C85D
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 11:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710758777; cv=none; b=Hk2T3KDhBxV154LSQJnaqgNec2QD4HkHS67owd2771w7X9hLSQTyf/GMS3vPf3mT9lWGkIvkKZzKtXShIgXrIk6KqfTDPZCBM8htMNgLLgpk1a2FkVtfrYmThzBv/DKx9Tpm3kGKNqFMgohV1L2fm9QXx8re2X1UMdVwWEWYQzY=
+	t=1710760921; cv=none; b=ja+s1roATjrquGIgA0BQkxTp2rlcrP7QZEYkYaWrKA39yxB147OdQjspervR76tZEoJ5j4cP4Zhng+NFYvp8MZARcogyzBWGU1n0SgqLiXCM9SDWuebmpWR24OLi5Pf26IppP8mGxHy6tQmc6qSRojpssKGdx28Tg+exkMw1uDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710758777; c=relaxed/simple;
-	bh=rBPRSsaHskqwYUUIxxFfRl0uy2m7svrk3m7gCM2JP1g=;
+	s=arc-20240116; t=1710760921; c=relaxed/simple;
+	bh=xyDiAoO1HQWO4tJreiq3N0r6YS1UZX2dwO6bh5L6qhY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jCehK/MtLGVlcJe0b/LMSYbDH4sS7QetMlZxZNQ9XvtdfOVE4o5icxrkWNK5V+kC2Xts9/rk4VGq5lFXjizliHsB5LjP6LCnEYCOrn8Cs1qHFnhiEPynqMRTPSiOUHd/maBlJfFeDFoyMbQmeMsIoiSSwElEB7VS/paZbGXvJXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hxadk7Aj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=KkBWYUyTbIh+9HY++2Ec8U10sa2q8axVW0ciGyvFOXVXX24I4m40KDLSqv0WRK2u3ZmuXwIq087tDW9Io7PY0kMwwuxbvy7XR57dZKNMx4K8pnJnlua4fo7uRiPEU3iC9OZbx8ycmhepClmjntgSLIgg2A5PX8AH5gMXq8VOoCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Olz9khKr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MN9oiW/+; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Olz9khKr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MN9oiW/+; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hxadk7Aj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AECFC433C7;
-	Mon, 18 Mar 2024 10:46:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710758776;
-	bh=rBPRSsaHskqwYUUIxxFfRl0uy2m7svrk3m7gCM2JP1g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hxadk7AjNmDDW5nuuMcJHskN/wDdDop842onzbEh7B3WRNzgmSQ/yqsguMCSCTowB
-	 N+F5dF5GPPcMGPuClgJSy2VUwImQCo6q0+1p0uwz9AmGK3IhPU0JlfDjDvZI2V9NPU
-	 pNzFfUlc+6c1f2WpPJr5qYOfaqXeN2vva2f4Rf9LrfwaL8ElOpRh8t40GOjAV2ZEsZ
-	 5wMTw6kSO9FPaEmwZbrQjtxeFypd4hTRahBGjztDodZpBJNvzmk3A0C3UyfdYg7loS
-	 TO5VQFQE8odfAUwhJoAdzfg7ifde+qkn2rRv9YBbfNfQtM1YC/eyCtcInY1K1I/Lmf
-	 Oh80ctP9Le77Q==
-Date: Mon, 18 Mar 2024 11:46:11 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@lst.de>, jack@suse.cz, axboe@kernel.dk, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, yi.zhang@huawei.com, 
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [RFC v4 linux-next 19/19] fs & block: remove bdev->bd_inode
-Message-ID: <20240318-darauf-lachhaft-b7a510575d87@brauner>
-References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
- <20240222124555.2049140-20-yukuai1@huaweicloud.com>
- <20240317213847.GD10665@lst.de>
- <022204e6-c387-b4b2-5982-970fd1ed5b5b@huaweicloud.com>
- <20240318013208.GA23711@lst.de>
- <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
- <ea4774db-188e-6744-6a5b-0096f6206112@huaweicloud.com>
- <20240318-umwirbt-fotowettbewerb-63176f9d75f3@brauner>
- <20240318-fassen-xylofon-1d50d573a196@brauner>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Olz9khKr";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MN9oiW/+";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Olz9khKr";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MN9oiW/+"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id F34055C45E;
+	Mon, 18 Mar 2024 11:21:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710760918; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xyDiAoO1HQWO4tJreiq3N0r6YS1UZX2dwO6bh5L6qhY=;
+	b=Olz9khKrXFnF9txCih6MQ95RWJzqLlYSK+ZcOI8SPlZBZLX5etRL4C39D70rV/kIOFnvcx
+	/FBuqej3G1EMsxWdnHsQDpb7V46V9NmfOEwHxvT4XE1kJR1WDxaVe+mWApvOHAAp4QEbYe
+	JECp8PI1dyEuf/BKrpdkYYvmklfaAss=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710760918;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xyDiAoO1HQWO4tJreiq3N0r6YS1UZX2dwO6bh5L6qhY=;
+	b=MN9oiW/+FDRFZACWRmG8yJ67lVFwqibh4jCa50abYV0OPESR0+gbmXLiKKu59Luwdbthph
+	xWw8IXGEGgyp6iBg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710760918; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xyDiAoO1HQWO4tJreiq3N0r6YS1UZX2dwO6bh5L6qhY=;
+	b=Olz9khKrXFnF9txCih6MQ95RWJzqLlYSK+ZcOI8SPlZBZLX5etRL4C39D70rV/kIOFnvcx
+	/FBuqej3G1EMsxWdnHsQDpb7V46V9NmfOEwHxvT4XE1kJR1WDxaVe+mWApvOHAAp4QEbYe
+	JECp8PI1dyEuf/BKrpdkYYvmklfaAss=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710760918;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xyDiAoO1HQWO4tJreiq3N0r6YS1UZX2dwO6bh5L6qhY=;
+	b=MN9oiW/+FDRFZACWRmG8yJ67lVFwqibh4jCa50abYV0OPESR0+gbmXLiKKu59Luwdbthph
+	xWw8IXGEGgyp6iBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A92061349D;
+	Mon, 18 Mar 2024 11:21:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id VwTgJ9Uj+GWkdAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Mon, 18 Mar 2024 11:21:57 +0000
+Date: Mon, 18 Mar 2024 12:21:57 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [RFC blktests v1 00/10] Add support to run against real target
+Message-ID: <bve2fx5ywd2efqgakhgtzhyc6tbthfoiqjcsgurdoapv6qisgr@5r4bus3ipqnh>
+References: <20240318093856.22307-1-dwagner@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240318-fassen-xylofon-1d50d573a196@brauner>
+In-Reply-To: <20240318093856.22307-1-dwagner@suse.de>
+X-Spam-Score: 5.92
+X-Spamd-Result: default: False [5.92 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_SPAM_SHORT(3.00)[0.999];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCPT_COUNT_FIVE(0.00)[5];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_SPAM_LONG(3.50)[1.000];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-0.97)[86.87%]
+X-Spam-Level: *****
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Flag: NO
 
-On Mon, Mar 18, 2024 at 11:29:22AM +0100, Christian Brauner wrote:
-> On Mon, Mar 18, 2024 at 11:07:49AM +0100, Christian Brauner wrote:
-> > On Mon, Mar 18, 2024 at 03:19:03PM +0800, Yu Kuai wrote:
-> > > Hi, Christoph!
-> > > 
-> > > 在 2024/03/18 9:51, Yu Kuai 写道:
-> > > > Hi,
-> > > > 
-> > > > 在 2024/03/18 9:32, Christoph Hellwig 写道:
-> > > > > On Mon, Mar 18, 2024 at 09:26:48AM +0800, Yu Kuai wrote:
-> > > > > > Because there is a real filesystem(devtmpfs) used for raw block devcie
-> > > > > > file operations, open syscall to devtmpfs:
-> 
-> Don't forget:
-> 
-> mknod /my/xfs/file/system b 8 0
-> 
-> which means you're not opening it via devtmpfs but via xfs. IOW, the
-> inode for that file is from xfs.
-> 
-> > > > > > 
-> > > > > > blkdev_open
-> > > > > >   bdev = blkdev_get_no_open
-> > > > > >   bdev_open -> pass in file is from devtmpfs
-> > > > > >   -> in this case, file inode is from devtmpfs,
-> > > > > 
-> > > > > But file->f_mapping->host should still point to the bdevfs inode,
-> > > > > and file->f_mapping->host is what everything in the I/O path should
-> > > > > be using.
-> > 
-> > I mentioned this in
-> > https://lore.kernel.org/r/20240118-gemustert-aalen-ee71d0c69826@brauner
-> > 
-> > "[...] if we want to have all code pass a file and we have code in
-> > fs/buffer.c like iomap_to_bh():
-> > 
-> > iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
-> >         loff_t offset = block << inode->i_blkbits;
-> > 
-> >         bh->b_bdev = iomap->bdev;
-> > +       bh->f_b_bdev = iomap->f_bdev;
-> > 
-> > While that works for every single filesystem that uses block devices
-> > because they stash them somewhere (like s_bdev_file) it doesn't work for
-> > the bdev filesystem itself. So if the bdev filesystem calls into helpers
-> > that expect e.g., buffer_head->s_f_bdev to have been initialized from
-> > iomap->f_bdev this wouldn't work.
-> > 
-> > So if we want to remove b_bdev from struct buffer_head and fully rely on
-> > f_b_bdev - and similar in iomap - then we need a story for the bdev fs
-> > itself. And I wasn't clear on what that would be."
-> > 
-> > > > > 
-> > > > > > Then later, in blkdev_iomap_begin(), bd_inode is passed in and there is
-> > > > > > no access to the devtmpfs file, we can't use s_bdev_file() as other
-> > > > > > filesystems here.
-> > > > > 
-> > > > > We can just pass the file down in iomap_iter.private
-> > > > 
-> > > > I can do this for blkdev_read_folio(), however, for other ops like
-> > > > blkdev_writepages(), I can't find a way to pass the file to
-> > > > iomap_iter.private yet.
-> > > > 
-> > > > Any suggestions?
-> > > 
-> > > I come up with an ideal:
-> > > 
-> > > While opening the block_device the first time, store the generated new
-> > > file in "bd_inode->i_private". And release it after the last opener
-> > > close the block_device.
-> > > 
-> > > The advantages are:
-> > >  - multiple openers can share the same bdev_file;
-> > 
-> > You mean use the file stashed in bdev_inode->i_private only to retrieve
-> > the inode/mapping in the block layer ops.
-> > 
-> > >  - raw block device ops can use the bdev_file as well, and there is no
-> > > need to distinguish iomap/buffer_head for raw block_device;
-> > > 
-> > > Please let me know what do you think?
-> > 
-> > It's equally ugly but probably slightly less error prone than the union
-> > approach. But please make that separate patches on top of the series.
+On Mon, Mar 18, 2024 at 10:38:45AM +0100, Daniel Wagner wrote:
+> [1] https://lore.kernel.org/linux-nvme/23fhu43orn5yyi6jytsyez3f3d7liocp4cat5gfswtan33m3au@iyxhcwee6wvk/
+> [2] https://github.com/hreinecke/nvmetcli/tree/rpc
 
-The other issue with this on-demand inode->i_private allocation will be
-lifetime management. If you're doing some sort of writeback initiated
-from the filesystem then you're guaranteed that the file stashed in
-sb->bdev_file is aligned with the lifetime of the filesystem. All
-writeback related stuff that relies on inode's can rely on the
-superblock being valid while it is doing stuff.
+The series is also available here:
 
-In your approach that guarantee can't be given easily. If someone opens
-a block device /dev/sda does some buffered writes and then closes it the
-file might be cleaned up while there's still operations ongoing that
-rely on the file stashed in inode->i_private to be valid.
+https://github.com/igaw/blktests/commits/ext-hw/
 
-If on the other hand you allocate a stub file on-demand during
-bdev_open() and stash it in inode->i_private you need to make sure to
-avoid creating reference count cycles that keep the inode alive.
+which includes the mentioned Python script. As indicated it's just a WIP:
+
+https://github.com/igaw/blktests/commit/ca1fe59b5ed67198228bcc017cfbbd25b797b868
