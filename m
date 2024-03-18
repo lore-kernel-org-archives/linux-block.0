@@ -1,95 +1,95 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56D854F8F;
-	Mon, 18 Mar 2024 17:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7969B200A0
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 20:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710781738; cv=none; b=jrg5vkmgNqKoYNswJHJq7Zm821DWJnA6NXHDjqT3ZX3ZE1ug+t3Ijve7N8nySrIoylepM1McWPPQ8EhkNXOUXHHqvyIdR4K5d4s6ApVoDzABdZ7cukvkFf4/0QSbYM2+YOW9x/pjtA2YIIR1E4gR2vKqX8ghkA9bdY2DJRo4gKE=
+	t=1710794253; cv=none; b=cmXR0d21R1RU2Q/vHKdrJg/GgQmIlF9w+aV60fKRQey9AXt56vu/zvVm2x6jMH2GePfcXfzEM5J3oj8dMsV7bhn339LXOcTJKn4MPz3X+GTZCZGdTtX2LoPwyyCFF4YbzYf3UP4lwEkTmF5EnDEbO+o3pAYXWe64jmkRX2jUJfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710781738; c=relaxed/simple;
-	bh=QwHWQ9oVAKrUXIiDOCxt+dC+IBc22Hj8eUU9ks1tmGw=;
+	s=arc-20240116; t=1710794253; c=relaxed/simple;
+	bh=VqUdaK9/7+tpHdN2FO3ZgGi4B31q9n8BjGi0tpzECok=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HbQRmVgDR2Nql+gSiAxynZlIPmYm0NFawBkUMC2s2Y8fmGhICxbfOWe/vEmf9P0BAMCZ+jq4QM9JEKO22ta3BoY+P/DSbcqGfSc4mZaBHEjLbGh/BsH9MBrRSDUV8tGTZYwg4bJvvIFWaqOaVErvTeBYCe8ZRsHpEIGzIv0G3+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-221b9142995so525913fac.1;
-        Mon, 18 Mar 2024 10:08:56 -0700 (PDT)
+	 To:Cc:Content-Type; b=UAjTfzMOtgZjGEbDaGDl4RUP+Dphv2YAEW7F0ghXbBqwr+wtQXvPDPju3rnzy0HIwqRXXMBXmU9d6L15d1KCx7HEyu/5Yuj/0w+tx8ZPl2D4c1V5qDnNmL0uZbFG4A9OckrPGWV5Hy622fpugsGVMFLDmUHryRlQ51CMzIVp65Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=icPyJZhl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="icPyJZhl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710794250;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VqUdaK9/7+tpHdN2FO3ZgGi4B31q9n8BjGi0tpzECok=;
+	b=icPyJZhlvxQlbGaxCO+BAoM/xd2LvLcnGRRHtKZYQDfr2O3Gif/AVPvMdgYVp8FdKyZhTc
+	rSb+zAkQKRTE1oWEg4HhGWHCwhNOuEBoMj08785ZKkKZ7cdPvFFZOc8wn+Fb69hTr6ij1O
+	Dj1ANWfbIbYX549am3V8MxQ6lKoQT7w=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-605-vkcEEIzqP3aDuh7g7S6tDA-1; Mon, 18 Mar 2024 16:37:28 -0400
+X-MC-Unique: vkcEEIzqP3aDuh7g7S6tDA-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5cf555b2a53so3581051a12.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 13:37:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710781736; x=1711386536;
+        d=1e100.net; s=20230601; t=1710794248; x=1711399048;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QwHWQ9oVAKrUXIiDOCxt+dC+IBc22Hj8eUU9ks1tmGw=;
-        b=qanlWHQgAwhm4UzeZG1ztlFrRnwJllDTU162hcWORirEfYaBwkGWMPMMVWQVWRmvrM
-         2aM56pqE718MhFNE9zZpll0XUBrAseiAdoiMn3n7oU4us2Hmgcuy2EDChI63jo8rjrV+
-         e2oAHmaO4Pi4epuA/GMpNj8RSiedRLL3Y2yibn6DaJpjD7owDjEOxVOjIjc7bvUrAvYy
-         +ll/Co8PYdwbYj4NJFWlo6MR9X01MZQ6s23pHqUT90zmY/6Dt9ZcRO5dX/0bOxKPEBT1
-         2WD9nXxVoLaBnIjStMgphFEEw4y9skFdopgGTRU/v5qRTh7HojzigLYA33sBkffjpYNC
-         dMew==
-X-Forwarded-Encrypted: i=1; AJvYcCVp9ctzUUrjZW9rmfzkSyC9NLexWzwXNyoqjo2/9BHnCHqBGiuR8OLTsKQBoHYA0QpCZQ56doRixLBPGzXDCjpIkhzb+DHSteto0k59yS24oF60MTu7NKjlyn7KoTZst9r9Uei7iLoHdqFcMdF3ytRQlA+TaHa6I7W/C/z7EcUdzMJ537j9XKhSqf1sVfCGlOmkO8CGwfDdD8Nb573K
-X-Gm-Message-State: AOJu0YxHcQg9/HYJsa/1AOG+m42BSeOGLvVQxRo/faa4YO7XDD/e7QWw
-	jzyzYx+HhORSDuYJFnoAaTxrLu3qdW59hIjC6rSAl9jEdEGT34+KEh3W0vZkrj2vWIsvb1khk/F
-	n7LcnaxwP0agde6zooz+b3S6kOKI=
-X-Google-Smtp-Source: AGHT+IFU7ySp2yA6a3YBxEXR8mYGdkkkJdvrmABYe/2rvHFZsvnVOljrXQU7zyXiegNEzdjFq+wOCy/iFGzXd3MpLKs=
-X-Received: by 2002:a05:6871:5b14:b0:220:bd4d:674d with SMTP id
- op20-20020a0568715b1400b00220bd4d674dmr12937170oac.5.1710781735835; Mon, 18
- Mar 2024 10:08:55 -0700 (PDT)
+        bh=VqUdaK9/7+tpHdN2FO3ZgGi4B31q9n8BjGi0tpzECok=;
+        b=FeNfSS7deWHBniOGKhVD9etzkhAtSL1lH9vytTD8PHrbTD8VMD7Q/PsxbuL3+Lf9U5
+         qJ6Uy27qYk9fq0F8iWz0xw6jn30hMZT6YXMQpGB/h+9nx4T+pCVaoeoQIMtN3jUj2Dn4
+         WYzy7oFkjOWBmKKIEFzXhCcjA04b7MyAxjgr4cOafYepAxQEuJa0iz90uzTdjtgS7pqY
+         gvwVos0MecZu81glVilfU/QTIDUKC5Vb0pZMr5IWvU+NzM8/zGPqXf4BT0SJfUhZz7gx
+         WNSp3OQy27yXS8FTQ9iy1sSrCLNeYAlksSxT/EfDQIYtZeXsmKdzlmvMfdkr+5+yuNxx
+         31zw==
+X-Forwarded-Encrypted: i=1; AJvYcCUeu8LLANsnn2T7VcWVWCZ5bkRqa84COyYdGnTe0SSRBOJB07hbUcRDrd0p/xlK8D27K8muH+vN7GrptCBlwMJLhAJi00fRns+2Stg=
+X-Gm-Message-State: AOJu0YxuG10LG9GXCzaMBySGCCdQvX3zEPlJsZg6xxmk6qk9bdWDpYrW
+	J4HWGK7ANtdiTYbbnmduTrY2u3PyW09rDWB9CtvsxnwFMjWwKY9b/4QESsqPrpTa34Mmng8Myuh
+	0YKo1PrRDK/NVib/63IvQuAXlCd6xp9O9kc0rFM8WZ4j31XIAdED0uiYba3OVrYAWdt/m34s1wW
+	0RasXoe4XYxBQOIkU3LEfHK+7Su9cw8OUMg14=
+X-Received: by 2002:a17:903:2285:b0:1de:de7d:d3a6 with SMTP id b5-20020a170903228500b001dede7dd3a6mr950731plh.30.1710794247657;
+        Mon, 18 Mar 2024 13:37:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGUpJT89xQZSz/cFtms6kcfogrMTsC4m5Y7X5MeMjfbSKTJ5CS05UfZSjgpqv3UDTtTeSBtK4dXFOToCokSiKQ=
+X-Received: by 2002:a17:903:2285:b0:1de:de7d:d3a6 with SMTP id
+ b5-20020a170903228500b001dede7dd3a6mr950715plh.30.1710794247359; Mon, 18 Mar
+ 2024 13:37:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240304201625.100619-1-christian.loehle@arm.com>
- <20240304201625.100619-3-christian.loehle@arm.com> <CAJZ5v0gMni0QJTBJXoVOav=kOtQ9W--NyXAgq+dXA+m-bciG8w@mail.gmail.com>
- <5060c335-e90a-430f-bca5-c0ee46a49249@arm.com>
-In-Reply-To: <5060c335-e90a-430f-bca5-c0ee46a49249@arm.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 18 Mar 2024 18:08:44 +0100
-Message-ID: <CAJZ5v0janPrWRkjcLkFeP9gmTC-nVRF-NQCh6CTET6ENy-_knQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/2] cpufreq/schedutil: Remove iowait boost
-To: Christian Loehle <christian.loehle@arm.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-kernel@vger.kernel.org, peterz@infradead.org, 
-	juri.lelli@redhat.com, mingo@redhat.com, dietmar.eggemann@arm.com, 
-	vschneid@redhat.com, vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com, 
-	adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de, 
-	asml.silence@gmail.com, linux-pm@vger.kernel.org, linux-block@vger.kernel.org, 
-	io-uring@vger.kernel.org
+References: <20231026214136.1067410-1-msakai@redhat.com> <20231026214136.1067410-3-msakai@redhat.com>
+ <ea57f231-f78e-4a55-bf85-c5d50e17237e@roeck-us.net>
+In-Reply-To: <ea57f231-f78e-4a55-bf85-c5d50e17237e@roeck-us.net>
+From: Kenneth Raeburn <raeburn@redhat.com>
+Date: Mon, 18 Mar 2024 16:37:15 -0400
+Message-ID: <CAK1Ur38jAmWo35HTNrDDAaN5Awiie9wRiPDMVrNUg6+ZM8mJ7A@mail.gmail.com>
+Subject: Re: [PATCH v4 02/39] dm vdo: add the MurmurHash3 fast hashing algorithm
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Matthew Sakai <msakai@redhat.com>, dm-devel@lists.linux.dev, 
+	linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 18, 2024 at 5:40=E2=80=AFPM Christian Loehle
-<christian.loehle@arm.com> wrote:
+(resend because of accidental HTML lossage)
+
+On Thu, Mar 14, 2024 at 7:38=E2=80=AFPM Guenter Roeck <linux@roeck-us.net> =
+wrote:
+> On sparc64, with gcc 11.4, the above code results in:
 >
-> On 18/03/2024 14:07, Rafael J. Wysocki wrote:
-> > On Mon, Mar 4, 2024 at 9:17=E2=80=AFPM Christian Loehle
-> > <christian.loehle@arm.com> wrote:
-> >>
-> >> The previous commit provides a new cpu_util_cfs_boost_io interface for
-> >> schedutil which uses the io boosted utilization of the per-task
-> >> tracking strategy. Schedutil iowait boosting is therefore no longer
-> >> necessary so remove it.
-> >
-> > I'm wondering about the cases when schedutil is used without EAS.
-> >
-> > Are they still going to be handled as before after this change?
+> ERROR: modpost: "__bswapdi2" [drivers/md/dm-vdo/dm-vdo.ko] undefined!
 >
-> Well they should still get boosted (under the new conditions) and accordi=
-ng
-> to my tests that does work.
+> Guenter
 
-OK
+Thanks for catching that. I don't think our team has any sparc
+machines readily available for testing.
+This is an artifact of our having imported user-mode code to use in
+the kernel. We should probably be using le64_to_cpup and friends, as
+we do elsewhere, so it doesn't try to pull in libgcc support routines.
 
-> Anything in particular you're worried about?
+Ken
 
-It is not particularly clear to me how exactly the boost is taken into
-account without EAS.
-
-> So in terms of throughput I see similar results with EAS and CAS+sugov.
-> I'm happy including numbers in the cover letter for future versions, too.
-> So far my intuition was that nobody would care enough to include them
-> (as long as it generally still works).
-
-Well, IMV clear understanding of the changes is more important.
