@@ -1,115 +1,179 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA031E862
-	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 01:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1B928E2
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 01:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710726282; cv=none; b=SmbXW9sKXkr7SZzHlPgm/myZk4k4Os+qeIGzzQoasOiLUVi9MjU4sAt1g7w16mN9E9i61BcTHHFM3YeWhnPCjcNZ6hPbCZnl67mCCcJSipZS9JDAiACayDCS3u7lgy++PL7F9fou3YkdzdpMyAkSCGekzhvcX54a8Fr2/khhs7w=
+	t=1710726559; cv=none; b=D+l5rZEVNoxuKzsPxxQ8IO4pnsoEyDi9qnu6Iv6yV/dHCQoLQ9JSF2GUPh6ZJU3G0v+G4bi8yHfMYDuHNhU46WRU0CEYsfaJIpteo9dmcIbvmaOy/N6uJQ1uvgg6ac8vEO9kbHzs9MWJuRghpSmJ/drb9FFveSor/o0WD3XwuAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710726282; c=relaxed/simple;
-	bh=rtA8ZUTIJYaC6R1zalhcSpBER873U0eff7rcVHja1go=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dO8+Qlwy2eNueq+zwGKvhMCKb3uEGa0kNNAAuedsKGKgWlC9l7RuARcudMger6ZvPWViijmtnkpqtEh+K0PvUIgilAySWEmxo/33u3haJgzVyYjpHrZnxslkEeZMrDgDsacSys8ehA67fuHqLavsBcahvqR97pVCXU8RRnl9Zt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HizMpIAc; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1710726559; c=relaxed/simple;
+	bh=jG3xS6FB14/BqpnkTLu7XTnaVi6tPktlEZIbV9PseDA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aEdJNsU1Ye2zCEhjvqQK3XxeWW0c2JE086M+6X3Tp5cKac3tjFDq8BUGg3W6MxPTSreMJ6KKdhr9xXb14giG1S+X/nfyH5VzPRg39sfMVAlbTvzTT8kXVvFg6HGeJ6mKSQplpquZJelfTZhilRRehShqchv6LzSeHPxY+Tctfug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gVNvpeTh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HizMpIAc"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so532370a12.0
-        for <linux-block@vger.kernel.org>; Sun, 17 Mar 2024 18:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710726280; x=1711331080; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=erQIF4gtsdJ33BKlPp1h5bCJ8dKeX6YK7T5I6H13fWo=;
-        b=HizMpIAcX8AZ1BmZ8K4mhVaWM8gKM/Md1cu5m5WgVQnleDgDwcNx1jhWzmmZkCoQPO
-         4vlVQacFQsbtSSlgLrV22nC29UlRypE9bNAv1uY/4hNdDIpbMrlq1N0x3LPui3IJL2Kc
-         0pK9E3TRwg0VZn0Fa0hCubbc+WE7PSJCNemC1sExHlDKF4RkXU1ZKiriBteLlGNk+uWs
-         mHYK1PvBSjMeqboIxxGt3dBCYct2kuRAJqoPmxtYHPRrC92jiEJfqhUD/xOry1hDgIqQ
-         Jzdr7JQH9AZArvgWZZFJX9wqDg/hjL4xuYm31tGDJXbaP/KAj3iGnr7XWcyfcz2dst8O
-         ewkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710726280; x=1711331080;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=erQIF4gtsdJ33BKlPp1h5bCJ8dKeX6YK7T5I6H13fWo=;
-        b=vpR4PlyhAvkUL9P635+f81l50SlFH2Jt/yFzFyELDOX/7uP6cQGIxMQcUfaCflT7wZ
-         uwP+Pb4kvGXLlcCBqFIPpbT55svj6DsrGOWqmcXoba3IqDx7yQxpfl8i/1B1rXZBZCNY
-         3mg7NPYrQfP8LsHrdNSq8QyqFat8PY1wMJTAikMHjmnPw3eoIT9i63ZKrCDtE/JxKTOz
-         E3Js2Dngb2XNd1pPG0tls/BbMgO+kBVdHpTBUL1mnIsw88w/UXnPcLw82/3g0uh6d0wv
-         CF1VOPUV76qf1tfUsoHfQiRl3jrYC8jgCfGfKxr+66EjrUQdqaI4Sa/I9E1sMZ+Czx0r
-         K6EA==
-X-Forwarded-Encrypted: i=1; AJvYcCVrIyE3kqlCUgn/21I5LaybAk3j0DbZ+xJyjuxrtIbfuY1mvpiLpWUV888Fmb7cQP440ZjsNlSg2j4olBXXQ4jz8Sscwol1we/XP+g=
-X-Gm-Message-State: AOJu0YzU3wnamutKbYRX0HQQcB9lv5Y6HwxN3ZV+CxHkOJ2nu8YCYL2a
-	oPtyT9/c/aM5OMGbDT4zIkzREIJxhSosi9nmq/cTPHDVP5LNOEpGE4I2jYbXZ3M=
-X-Google-Smtp-Source: AGHT+IGYtF/52nUBWbGRvZ/0/ZqpOO3sJ8L6+HBbH55XFAGEH8QGl6Ea3MxrgapKqWQj1qwB1Uo4Gg==
-X-Received: by 2002:a17:902:d4d0:b0:1de:e8ce:9d7a with SMTP id o16-20020a170902d4d000b001dee8ce9d7amr11208296plg.5.1710726280019;
-        Sun, 17 Mar 2024 18:44:40 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id o19-20020a170902e29300b001dd8d298693sm7921870plc.23.2024.03.17.18.44.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Mar 2024 18:44:39 -0700 (PDT)
-Message-ID: <6d0d7b97-e0cc-473b-b9ca-5cf5f2c52973@kernel.dk>
-Date: Sun, 17 Mar 2024 19:44:38 -0600
-Precedence: bulk
-X-Mailing-List: linux-block@vger.kernel.org
-List-Id: <linux-block.vger.kernel.org>
-List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: (subset) [PATCH 00/11] remove aux CQE caches
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gVNvpeTh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710726556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+ctfX1Pcy3C62ECD/GzywN9cG0bYGgeVBmlLdHU0fSU=;
+	b=gVNvpeThAf3UXLCPN43UhwagNMvSKg6iHKwVrZdqBwb+udAdva18Cl9WNPftQvVoZx5XGQ
+	BZPiSLhbWxRhU+VlntLpZxWPQZ94MU/OXMsZ/ZRySmv8oHKKKuLcPzaqaR5kZ52lptg3o/
+	9acG6ccxh/Y7aQ9pGfKFX2yPjhe5VqY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-170-tvWW_aEPMSuIUPvXf4YhQw-1; Sun,
+ 17 Mar 2024 21:49:12 -0400
+X-MC-Unique: tvWW_aEPMSuIUPvXf4YhQw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A9D11285F99C;
+	Mon, 18 Mar 2024 01:49:11 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D8E8112132A;
+	Mon, 18 Mar 2024 01:49:08 +0000 (UTC)
+Date: Mon, 18 Mar 2024 09:49:00 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-References: <ZfWk9Pp0zJ1i1JAE@fedora>
- <1132db8f-829f-4ea8-bdee-8f592b5e3c19@gmail.com>
- <e25412ba-916c-4de7-8ed2-18268f656731@kernel.dk>
+	linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: (subset) [PATCH 00/11] remove aux CQE caches
+Message-ID: <ZfedjMPDXp7q8t/D@fedora>
+References: <e25412ba-916c-4de7-8ed2-18268f656731@kernel.dk>
  <d3beeb72-c4cf-4fad-80bc-10ca1f035fff@gmail.com>
  <4787bb12-bb89-490a-9d30-40b4f54a19ad@kernel.dk>
  <6dea0285-254d-4985-982b-39f3897bf064@gmail.com>
  <2091c056-d5ed-44e3-a163-b95680cece27@gmail.com>
  <d016a590-d7a9-405f-a2e4-d7c4ffa80fce@kernel.dk>
  <4c47f80f-df74-4b27-b1e7-ce30d5c959f9@kernel.dk>
- <4320d059-0308-42c3-b01f-18107885ffbd@kernel.dk> <ZfeHmNtoTo9nvTaV@fedora>
+ <4320d059-0308-42c3-b01f-18107885ffbd@kernel.dk>
+ <ZfeHmNtoTo9nvTaV@fedora>
  <1e05aee5-4166-4e5d-9b76-94e1d833ab17@kernel.dk>
+Precedence: bulk
+X-Mailing-List: linux-block@vger.kernel.org
+List-Id: <linux-block.vger.kernel.org>
+List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <1e05aee5-4166-4e5d-9b76-94e1d833ab17@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On 3/17/24 7:34 PM, Jens Axboe wrote:
->>> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
->>> index a2cb8da3cc33..f1d3c5e065e9 100644
->>> --- a/io_uring/io_uring.c
->>> +++ b/io_uring/io_uring.c
->>> @@ -3242,6 +3242,8 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
->>>  	ret |= io_kill_timeouts(ctx, task, cancel_all);
->>>  	if (task)
->>>  		ret |= io_run_task_work() > 0;
->>> +	else if (ret)
->>> +		flush_delayed_work(&ctx->fallback_work);
->>>  	return ret;
->>>  }
->>
->> Still can trigger the warning with above patch:
->>
->> [  446.275975] ------------[ cut here ]------------
->> [  446.276340] WARNING: CPU: 8 PID: 731 at kernel/fork.c:969 __put_task_struct+0x10c/0x180
+On Sun, Mar 17, 2024 at 07:34:30PM -0600, Jens Axboe wrote:
+> On 3/17/24 6:15 PM, Ming Lei wrote:
+> > On Sun, Mar 17, 2024 at 04:24:07PM -0600, Jens Axboe wrote:
+> >> On 3/17/24 4:07 PM, Jens Axboe wrote:
+> >>> On 3/17/24 3:51 PM, Jens Axboe wrote:
+> >>>> On 3/17/24 3:47 PM, Pavel Begunkov wrote:
+> >>>>> On 3/17/24 21:34, Pavel Begunkov wrote:
+> >>>>>> On 3/17/24 21:32, Jens Axboe wrote:
+> >>>>>>> On 3/17/24 3:29 PM, Pavel Begunkov wrote:
+> >>>>>>>> On 3/17/24 21:24, Jens Axboe wrote:
+> >>>>>>>>> On 3/17/24 2:55 PM, Pavel Begunkov wrote:
+> >>>>>>>>>> On 3/16/24 13:56, Ming Lei wrote:
+> >>>>>>>>>>> On Sat, Mar 16, 2024 at 01:27:17PM +0000, Pavel Begunkov wrote:
+> >>>>>>>>>>>> On 3/16/24 11:52, Ming Lei wrote:
+> >>>>>>>>>>>>> On Fri, Mar 15, 2024 at 04:53:21PM -0600, Jens Axboe wrote:
+> >>>>>>>>>>>
+> >>>>>>>>>>> ...
+> >>>>>>>>>>>
+> >>>>>>>>>>>>> The following two error can be triggered with this patchset
+> >>>>>>>>>>>>> when running some ublk stress test(io vs. deletion). And not see
+> >>>>>>>>>>>>> such failures after reverting the 11 patches.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> I suppose it's with the fix from yesterday. How can I
+> >>>>>>>>>>>> reproduce it, blktests?
+> >>>>>>>>>>>
+> >>>>>>>>>>> Yeah, it needs yesterday's fix.
+> >>>>>>>>>>>
+> >>>>>>>>>>> You may need to run this test multiple times for triggering the problem:
+> >>>>>>>>>>
+> >>>>>>>>>> Thanks for all the testing. I've tried it, all ublk/generic tests hang
+> >>>>>>>>>> in userspace waiting for CQEs but no complaints from the kernel.
+> >>>>>>>>>> However, it seems the branch is buggy even without my patches, I
+> >>>>>>>>>> consistently (5-15 minutes of running in a slow VM) hit page underflow
+> >>>>>>>>>> by running liburing tests. Not sure what is that yet, but might also
+> >>>>>>>>>> be the reason.
+> >>>>>>>>>
+> >>>>>>>>> Hmm odd, there's nothing in there but your series and then the
+> >>>>>>>>> io_uring-6.9 bits pulled in. Maybe it hit an unfortunate point in the
+> >>>>>>>>> merge window -git cycle? Does it happen with io_uring-6.9 as well? I
+> >>>>>>>>> haven't seen anything odd.
+> >>>>>>>>
+> >>>>>>>> Need to test io_uring-6.9. I actually checked the branch twice, both
+> >>>>>>>> with the issue, and by full recompilation and config prompts I assumed
+> >>>>>>>> you pulled something in between (maybe not).
+> >>>>>>>>
+> >>>>>>>> And yeah, I can't confirm it's specifically an io_uring bug, the
+> >>>>>>>> stack trace is usually some unmap or task exit, sometimes it only
+> >>>>>>>> shows when you try to shutdown the VM after tests.
+> >>>>>>>
+> >>>>>>> Funky. I just ran a bunch of loops of liburing tests and Ming's ublksrv
+> >>>>>>> test case as well on io_uring-6.9 and it all worked fine. Trying
+> >>>>>>> liburing tests on for-6.10/io_uring as well now, but didn't see anything
+> >>>>>>> the other times I ran it. In any case, once you repost I'll rebase and
+> >>>>>>> then let's see if it hits again.
+> >>>>>>>
+> >>>>>>> Did you run with KASAN enabled
+> >>>>>>
+> >>>>>> Yes, it's a debug kernel, full on KASANs, lockdeps and so
+> >>>>>
+> >>>>> And another note, I triggered it once (IIRC on shutdown) with ublk
+> >>>>> tests only w/o liburing/tests, likely limits it to either the core
+> >>>>> io_uring infra or non-io_uring bugs.
+> >>>>
+> >>>> Been running on for-6.10/io_uring, and the only odd thing I see is that
+> >>>> the test output tends to stall here:
+> >>>>
+> >>>> Running test read-before-exit.t
+> >>>>
+> >>>> which then either leads to a connection disconnect from my ssh into that
+> >>>> vm, or just a long delay and then it picks up again. This did not happen
+> >>>> with io_uring-6.9.
+> >>>>
+> >>>> Maybe related? At least it's something new. Just checked again, and yeah
+> >>>> it seems to totally lock up the vm while that is running. Will try a
+> >>>> quick bisect of that series.
+> >>>
+> >>> Seems to be triggered by the top of branch patch in there, my poll and
+> >>> timeout special casing. While the above test case runs with that commit,
+> >>> it'll freeze the host.
+> >>
+> >> Had a feeling this was the busy looping off cancelations, and flushing
+> >> the fallback task_work seems to fix it. I'll check more tomorrow.
+> >>
+> >>
+> >> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> >> index a2cb8da3cc33..f1d3c5e065e9 100644
+> >> --- a/io_uring/io_uring.c
+> >> +++ b/io_uring/io_uring.c
+> >> @@ -3242,6 +3242,8 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
+> >>  	ret |= io_kill_timeouts(ctx, task, cancel_all);
+> >>  	if (task)
+> >>  		ret |= io_run_task_work() > 0;
+> >> +	else if (ret)
+> >> +		flush_delayed_work(&ctx->fallback_work);
+> >>  	return ret;
+> >>  }
+> > 
+> > Still can trigger the warning with above patch:
+> > 
+> > [  446.275975] ------------[ cut here ]------------
+> > [  446.276340] WARNING: CPU: 8 PID: 731 at kernel/fork.c:969 __put_task_struct+0x10c/0x180
 > 
 > And this is running that test case you referenced? I'll take a look, as
 > it seems related to the poll kill rather than the other patchset.
 
-I can reproduce with that test too, and it triggers with v2 of the
-patchset on top of io_uring-6.9, with and without that poll patch. Which
-makes sense, as I doubt you're doing any poll or timeouts in there.
+Yeah, and now I am running 'git bisect' on Pavel's V2.
 
-Pavel, passing that one to you then :)
-
--- 
-Jens Axboe
+thanks,
+Ming
 
