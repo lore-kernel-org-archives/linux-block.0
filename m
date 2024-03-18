@@ -1,409 +1,154 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0791847F7E;
-	Mon, 18 Mar 2024 13:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADAF2D605;
+	Mon, 18 Mar 2024 13:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710769100; cv=none; b=oHv/LAI3G/QYInnn2SJdFBcCK3cmdVey6WhrfEG10uFRIeJhMmNucNfE9MvixMsZNpacbE2EfuxmPkZN/2r1q8FzHWKxhzUDh5Sfsj44izI3SIFcEMNXmvHO+OLARjKeC2KE7LY2yaa9jVgsClzwqR6RA2RmU5mFvgRdqESw7xE=
+	t=1710769144; cv=none; b=H1yTMPwDhTRolFr3FL6NVKT+l5al728CvgqQTc2YHFQqeFjdHkAGS24CPMn0RXmp/vburrNYuW9uv0BDyKDTPO7zZhDI/V5szUa7PnbXqXL1+I8UAccf/PCEsXLTz1NhXRejm8B6bmqr5Qe3U9p+2B9r3d1EZrKynFTtLKBSvT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710769100; c=relaxed/simple;
-	bh=TW+nNoyK9VLr9DvfFuI7Dm6Kw7KGHKM+2cAyAWlem9c=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=KGukCYoO7kyFVnJUHnchdkdvk5BhCDhLwgvJ4fUVsOVjv1nD91UwNFOWkRpxHLkmewLR92IS3QBnrOH1YIRjD+AySva5UvIlMJCu6NiiM3GKalESx2bfCbRRF+dvTlqTwQJfvAzoPCdmJZVRz/G5KeTljEHL8VS8sY733QSEBxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TywsT5zlYz4f3jJ8;
-	Mon, 18 Mar 2024 21:38:05 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id A288E1A01A7;
-	Mon, 18 Mar 2024 21:38:09 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBHZQ6_Q_hlYp5aHQ--.21653S3;
-	Mon, 18 Mar 2024 21:38:09 +0800 (CST)
-Subject: Re: [RFC v4 linux-next 17/19] dm-vdo: prevent direct access of
- bd_inode
-To: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
- <20240222124555.2049140-18-yukuai1@huaweicloud.com>
- <20240318091958.u3yqy2ab7rbqbroq@quack3>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b7642487-3349-76b1-bd16-e870d4ce37e0@huaweicloud.com>
-Date: Mon, 18 Mar 2024 21:38:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1710769144; c=relaxed/simple;
+	bh=J/rmBMCkirwgLwFEI7PUbVNSUtCuP1vgDBgK5fnmoik=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ctboi4gdOYmYLtntSRPv3+1ZEihqc3Gb/c46RaT0P7PiQfEe1KfFBT/n5H6AkswEGwfZ4D19TbTHKQeNIJtGP1yIzk8eFdEMdgfCozUu2hOrcPfomz3Hf1cVgnU8lYbfB+Y6pL2ISQQTAVSmiiGh1sRPntEFfv+G4bOb+qIdir4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DabtLnii; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DabtLnii"
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-568107a9ff2so5156484a12.3;
+        Mon, 18 Mar 2024 06:39:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710769141; x=1711373941; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BXPf5P7bZxEIvp1uqSPX1bqHyj8zpD6Mu7CRQm23nJI=;
+        b=DabtLniiQx+HhLlGsR7dIYIOZlKL9te5IfEeLnXQ6vE4TmsO0LMbN5avUQhuJtkSdK
+         xHgt+pZAT7Je5EL6XAmWSZffLdplbbxHlF7aP21FexX6dXVsYkTTDnLP6Z551Bopv5Yp
+         IdaToi7jRrdxhPFRm6/uSLDc1YJAI5LeLK03Z2+dz97XzCSX1iISdZ6xLOsYXIiZvLVQ
+         j/oyyVihRNSod/B/A8D05ePv7cWJGpfjilAb37gcFYiJTvXAcL3XchT/iurS91ZRuYDT
+         Ymh+uEHWhe+4IVZg0cSIZH6YJd/bwddmiT4EBEXd3VPc5MTMFohiyiqqFoxbexWQxCQR
+         f6Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710769141; x=1711373941;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BXPf5P7bZxEIvp1uqSPX1bqHyj8zpD6Mu7CRQm23nJI=;
+        b=wXbm4mG/RIQpA/ab5/D7WcA4lzMhkNVxggMJ1HSIaLxwdG4sxFSrPh3oSmNV/o+RZl
+         2qtL6bsPc6u1SqfcJ++J+EI1JR6LRDWJjJO7l1s7+iTF1QSNuJ21wA4dYls9sGOcJGG4
+         JEmUpBg1soCKOTtf2AepZkm3hEHZwDbPKPGk5Sx/QQrfHNxVcfL6dw4JXkKRJWaMlxSv
+         KmnWBdvjF1Nf5nurB2TreZFw18QMVAfYngCSsumGSJv+CJTgFVP0FBxf6EvTVkHx8vXk
+         BOXPO2txKHzB4RdbLhZrdqG7dqTmvcfEImoyPzHlic00uvxWbM2EQLXBWhlBekQkmoQM
+         lbWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVyyNeFpFCbAghTCoAKa9elsZz+SqJWjyS4TAjegX6c+yJPnRl3GDuctXdzF4Jfulg3BF7DXMG1PBguOEpiQEJjzRr6QqRs4P1f09Y=
+X-Gm-Message-State: AOJu0YxoRcSFa3PuuH2YXBu+Ul1IqoUlZ2THbCl4AStrqBdpOflBCsi+
+	Puh9uHe84sarrwerlx8lcWjkDJgCEKSWmjquWOSjhR67XEP8LHC3
+X-Google-Smtp-Source: AGHT+IEpHPe5s/OEC+5u0A9PHQWCvYGpGLSIU8N9vVLh9GukQnLT2REfMfturGVh8srxV6itpo0iYA==
+X-Received: by 2002:a05:6402:5306:b0:568:a9f3:b3fb with SMTP id eo6-20020a056402530600b00568a9f3b3fbmr6681990edb.8.1710769141088;
+        Mon, 18 Mar 2024 06:39:01 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:310::2181? ([2620:10d:c092:600::1:429a])
+        by smtp.gmail.com with ESMTPSA id g38-20020a056402322600b0056b8cc4d6a7sm47915eda.43.2024.03.18.06.38.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Mar 2024 06:38:59 -0700 (PDT)
+Message-ID: <2095ac3e-5e5f-4ea2-a906-a924a25c121a@gmail.com>
+Date: Mon, 18 Mar 2024 13:37:23 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240318091958.u3yqy2ab7rbqbroq@quack3>
-Content-Type: text/plain; charset=gbk; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/14] ublk: don't hard code IO_URING_F_UNLOCKED
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>
+References: <cover.1710720150.git.asml.silence@gmail.com>
+ <a3928d3de14d2569efc2edd7fb654a4795ae7f86.1710720150.git.asml.silence@gmail.com>
+ <Zff4ShMEcL1WKZ1Q@fedora> <61b29658-e6a9-449f-a850-1881af1ecbee@gmail.com>
+In-Reply-To: <61b29658-e6a9-449f-a850-1881af1ecbee@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHZQ6_Q_hlYp5aHQ--.21653S3
-X-Coremail-Antispam: 1UD129KBjvAXoW3tr48GrWDJr4DZrykGFyUKFg_yoW8Xr13Zo
-	WaqrW3Wa18Jwn5JFWrJas7JFyavayDAw45Ca1rZFZxXw4Uta15JF47Jw15XF13tF10qFs8
-	ZryxG3srtFWUXFs8n29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UjIYCTnIWjp_UUUYq7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20xva
-	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
-	x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8
-	JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
-
-�� 2024/03/18 17:19, Jan Kara д��:
-> On Thu 22-02-24 20:45:53, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
+On 3/18/24 12:52, Pavel Begunkov wrote:
+> On 3/18/24 08:16, Ming Lei wrote:
+>> On Mon, Mar 18, 2024 at 12:41:50AM +0000, Pavel Begunkov wrote:
+>>> uring_cmd implementations should not try to guess issue_flags, just use
+>>> a newly added io_uring_cmd_complete(). We're loosing an optimisation in
+>>> the cancellation path in ublk_uring_cmd_cancel_fn(), but the assumption
+>>> is that we don't care that much about it.
+>>>
+>>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>>> Link: https://lore.kernel.org/r/2f7bc9fbc98b11412d10b8fd88e58e35614e3147.1710514702.git.asml.silence@gmail.com
+>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>> ---
+>>>   drivers/block/ublk_drv.c | 18 ++++++++----------
+>>>   1 file changed, 8 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+>>> index bea3d5cf8a83..97dceecadab2 100644
+>>> --- a/drivers/block/ublk_drv.c
+>>> +++ b/drivers/block/ublk_drv.c
+>>> @@ -1417,8 +1417,7 @@ static bool ublk_abort_requests(struct ublk_device *ub, struct ublk_queue *ubq)
+>>>       return true;
+>>>   }
+>>> -static void ublk_cancel_cmd(struct ublk_queue *ubq, struct ublk_io *io,
+>>> -        unsigned int issue_flags)
+>>> +static void ublk_cancel_cmd(struct ublk_queue *ubq, struct ublk_io *io)
+>>>   {
+>>>       bool done;
+>>> @@ -1432,15 +1431,14 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq, struct ublk_io *io,
+>>>       spin_unlock(&ubq->cancel_lock);
+>>>       if (!done)
+>>> -        io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0, issue_flags);
+>>> +        io_uring_cmd_complete(io->cmd, UBLK_IO_RES_ABORT, 0);
+>>>   }
+>>>   /*
+>>>    * The ublk char device won't be closed when calling cancel fn, so both
+>>>    * ublk device and queue are guaranteed to be live
+>>>    */
+>>> -static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd,
+>>> -        unsigned int issue_flags)
+>>> +static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd)
+>>>   {
+>>>       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+>>>       struct ublk_queue *ubq = pdu->ubq;
+>>> @@ -1464,7 +1462,7 @@ static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd,
+>>>       io = &ubq->ios[pdu->tag];
+>>>       WARN_ON_ONCE(io->cmd != cmd);
+>>> -    ublk_cancel_cmd(ubq, io, issue_flags);
+>>> +    ublk_cancel_cmd(ubq, io);
 >>
->> Now that dm upper layer already statsh the file of opened device in
->> 'dm_dev->bdev_file', it's ok to get inode from the file.
->>
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> .cancel_fn is always called with .uring_lock held, so this 'issue_flags' can't
+>> be removed, otherwise double task run is caused because .cancel_fn
+>> can be called multiple times if the request stays in ctx->cancelable_uring_cmd.
 > 
-> Given there are like three real uses of ->bdev in dm-vdo, I suspect it
-> might be better to just replace bdev with bdev_file in struct io_factory
-> and in struct uds_parameters.
+> I see, that's exactly why I was asking whether it can be deferred
+> to tw. Let me see if I can get by without that patch, but honestly
+> it's a horrible abuse of the ring state. Any ideas how that can be
+> cleaned up?
 
-Yes, this make sense.
+I assume io_uring_try_cancel_uring_cmd() can run in parallel with
+completions, so there can be two parallel calls calls to ->uring_cmd
+(e.g. io-wq + cancel), which gives me shivers. Also, I'd rather
+no cancel in place requests of another task, io_submit_flush_completions()
+but it complicates things.
 
-Thanks for the review!
-Kuai
+Is there any argument against removing requests from the cancellation
+list in io_uring_try_cancel_uring_cmd() before calling ->uring_cmd?
 
-> 
-> 								Honza
-> 
->> ---
->>   drivers/md/dm-vdo/dedupe.c                |  3 ++-
->>   drivers/md/dm-vdo/dm-vdo-target.c         |  5 +++--
->>   drivers/md/dm-vdo/indexer/config.c        |  1 +
->>   drivers/md/dm-vdo/indexer/config.h        |  3 +++
->>   drivers/md/dm-vdo/indexer/index-layout.c  |  6 +++---
->>   drivers/md/dm-vdo/indexer/index-layout.h  |  2 +-
->>   drivers/md/dm-vdo/indexer/index-session.c | 13 +++++++------
->>   drivers/md/dm-vdo/indexer/index.c         |  4 ++--
->>   drivers/md/dm-vdo/indexer/index.h         |  2 +-
->>   drivers/md/dm-vdo/indexer/indexer.h       |  4 +++-
->>   drivers/md/dm-vdo/indexer/io-factory.c    | 13 ++++++++-----
->>   drivers/md/dm-vdo/indexer/io-factory.h    |  4 ++--
->>   drivers/md/dm-vdo/indexer/volume.c        |  4 ++--
->>   drivers/md/dm-vdo/indexer/volume.h        |  2 +-
->>   14 files changed, 39 insertions(+), 27 deletions(-)
->>
->> diff --git a/drivers/md/dm-vdo/dedupe.c b/drivers/md/dm-vdo/dedupe.c
->> index a9b189395592..532294a15174 100644
->> --- a/drivers/md/dm-vdo/dedupe.c
->> +++ b/drivers/md/dm-vdo/dedupe.c
->> @@ -2592,7 +2592,8 @@ static void resume_index(void *context, struct vdo_completion *parent)
->>   	int result;
->>   
->>   	zones->parameters.bdev = config->owned_device->bdev;
->> -	result = uds_resume_index_session(zones->index_session, zones->parameters.bdev);
->> +	zones->parameters.bdev_file = config->owned_device->bdev_file;
->> +	result = uds_resume_index_session(zones->index_session, zones->parameters.bdev_file);
->>   	if (result != UDS_SUCCESS)
->>   		vdo_log_error_strerror(result, "Error resuming dedupe index");
->>   
->> diff --git a/drivers/md/dm-vdo/dm-vdo-target.c b/drivers/md/dm-vdo/dm-vdo-target.c
->> index 89d00be9f075..b2d7f68e70be 100644
->> --- a/drivers/md/dm-vdo/dm-vdo-target.c
->> +++ b/drivers/md/dm-vdo/dm-vdo-target.c
->> @@ -883,7 +883,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
->>   	}
->>   
->>   	if (config->version == 0) {
->> -		u64 device_size = i_size_read(config->owned_device->bdev->bd_inode);
->> +		u64 device_size = i_size_read(file_inode(config->owned_device->bdev_file));
->>   
->>   		config->physical_blocks = device_size / VDO_BLOCK_SIZE;
->>   	}
->> @@ -1018,7 +1018,8 @@ static void vdo_status(struct dm_target *ti, status_type_t status_type,
->>   
->>   static block_count_t __must_check get_underlying_device_block_count(const struct vdo *vdo)
->>   {
->> -	return i_size_read(vdo_get_backing_device(vdo)->bd_inode) / VDO_BLOCK_SIZE;
->> +	return i_size_read(file_inode(vdo->device_config->owned_device->bdev_file)) /
->> +		VDO_BLOCK_SIZE;
->>   }
->>   
->>   static int __must_check process_vdo_message_locked(struct vdo *vdo, unsigned int argc,
->> diff --git a/drivers/md/dm-vdo/indexer/config.c b/drivers/md/dm-vdo/indexer/config.c
->> index 260993ce1944..f1f66e232b54 100644
->> --- a/drivers/md/dm-vdo/indexer/config.c
->> +++ b/drivers/md/dm-vdo/indexer/config.c
->> @@ -347,6 +347,7 @@ int uds_make_configuration(const struct uds_parameters *params,
->>   	config->sparse_sample_rate = (params->sparse ? DEFAULT_SPARSE_SAMPLE_RATE : 0);
->>   	config->nonce = params->nonce;
->>   	config->bdev = params->bdev;
->> +	config->bdev_file = params->bdev_file;
->>   	config->offset = params->offset;
->>   	config->size = params->size;
->>   
->> diff --git a/drivers/md/dm-vdo/indexer/config.h b/drivers/md/dm-vdo/indexer/config.h
->> index fe7958263ed6..688f7450183e 100644
->> --- a/drivers/md/dm-vdo/indexer/config.h
->> +++ b/drivers/md/dm-vdo/indexer/config.h
->> @@ -28,6 +28,9 @@ struct uds_configuration {
->>   	/* Storage device for the index */
->>   	struct block_device *bdev;
->>   
->> +	/* Opened device fot the index */
->> +	struct file *bdev_file;
->> +
->>   	/* The maximum allowable size of the index */
->>   	size_t size;
->>   
->> diff --git a/drivers/md/dm-vdo/indexer/index-layout.c b/drivers/md/dm-vdo/indexer/index-layout.c
->> index 1453fddaa656..6dd80a432fe5 100644
->> --- a/drivers/md/dm-vdo/indexer/index-layout.c
->> +++ b/drivers/md/dm-vdo/indexer/index-layout.c
->> @@ -1672,7 +1672,7 @@ static int create_layout_factory(struct index_layout *layout,
->>   	size_t writable_size;
->>   	struct io_factory *factory = NULL;
->>   
->> -	result = uds_make_io_factory(config->bdev, &factory);
->> +	result = uds_make_io_factory(config->bdev_file, &factory);
->>   	if (result != UDS_SUCCESS)
->>   		return result;
->>   
->> @@ -1745,9 +1745,9 @@ void vdo_free_index_layout(struct index_layout *layout)
->>   }
->>   
->>   int uds_replace_index_layout_storage(struct index_layout *layout,
->> -				     struct block_device *bdev)
->> +				     struct file *bdev_file)
->>   {
->> -	return uds_replace_storage(layout->factory, bdev);
->> +	return uds_replace_storage(layout->factory, bdev_file);
->>   }
->>   
->>   /* Obtain a dm_bufio_client for the volume region. */
->> diff --git a/drivers/md/dm-vdo/indexer/index-layout.h b/drivers/md/dm-vdo/indexer/index-layout.h
->> index bd9b90c84a70..9b0c850fe9a7 100644
->> --- a/drivers/md/dm-vdo/indexer/index-layout.h
->> +++ b/drivers/md/dm-vdo/indexer/index-layout.h
->> @@ -24,7 +24,7 @@ int __must_check uds_make_index_layout(struct uds_configuration *config, bool ne
->>   void vdo_free_index_layout(struct index_layout *layout);
->>   
->>   int __must_check uds_replace_index_layout_storage(struct index_layout *layout,
->> -						  struct block_device *bdev);
->> +						  struct file *bdev_file);
->>   
->>   int __must_check uds_load_index_state(struct index_layout *layout,
->>   				      struct uds_index *index);
->> diff --git a/drivers/md/dm-vdo/indexer/index-session.c b/drivers/md/dm-vdo/indexer/index-session.c
->> index 1949a2598656..df8f8122a22d 100644
->> --- a/drivers/md/dm-vdo/indexer/index-session.c
->> +++ b/drivers/md/dm-vdo/indexer/index-session.c
->> @@ -460,15 +460,16 @@ int uds_suspend_index_session(struct uds_index_session *session, bool save)
->>   	return uds_status_to_errno(result);
->>   }
->>   
->> -static int replace_device(struct uds_index_session *session, struct block_device *bdev)
->> +static int replace_device(struct uds_index_session *session, struct file *bdev_file)
->>   {
->>   	int result;
->>   
->> -	result = uds_replace_index_storage(session->index, bdev);
->> +	result = uds_replace_index_storage(session->index, bdev_file);
->>   	if (result != UDS_SUCCESS)
->>   		return result;
->>   
->> -	session->parameters.bdev = bdev;
->> +	session->parameters.bdev = file_bdev(bdev_file);
->> +	session->parameters.bdev_file = bdev_file;
->>   	return UDS_SUCCESS;
->>   }
->>   
->> @@ -477,7 +478,7 @@ static int replace_device(struct uds_index_session *session, struct block_device
->>    * device differs from the current backing store, the index will start using the new backing store.
->>    */
->>   int uds_resume_index_session(struct uds_index_session *session,
->> -			     struct block_device *bdev)
->> +			     struct file *bdev_file)
->>   {
->>   	int result = UDS_SUCCESS;
->>   	bool no_work = false;
->> @@ -502,8 +503,8 @@ int uds_resume_index_session(struct uds_index_session *session,
->>   	if (no_work)
->>   		return result;
->>   
->> -	if ((session->index != NULL) && (bdev != session->parameters.bdev)) {
->> -		result = replace_device(session, bdev);
->> +	if ((session->index != NULL) && (bdev_file != session->parameters.bdev_file)) {
->> +		result = replace_device(session, bdev_file);
->>   		if (result != UDS_SUCCESS) {
->>   			mutex_lock(&session->request_mutex);
->>   			session->state &= ~IS_FLAG_WAITING;
->> diff --git a/drivers/md/dm-vdo/indexer/index.c b/drivers/md/dm-vdo/indexer/index.c
->> index bd2405738c50..3600a169ca98 100644
->> --- a/drivers/md/dm-vdo/indexer/index.c
->> +++ b/drivers/md/dm-vdo/indexer/index.c
->> @@ -1334,9 +1334,9 @@ int uds_save_index(struct uds_index *index)
->>   	return result;
->>   }
->>   
->> -int uds_replace_index_storage(struct uds_index *index, struct block_device *bdev)
->> +int uds_replace_index_storage(struct uds_index *index, struct file *bdev_file)
->>   {
->> -	return uds_replace_volume_storage(index->volume, index->layout, bdev);
->> +	return uds_replace_volume_storage(index->volume, index->layout, bdev_file);
->>   }
->>   
->>   /* Accessing statistics should be safe from any thread. */
->> diff --git a/drivers/md/dm-vdo/indexer/index.h b/drivers/md/dm-vdo/indexer/index.h
->> index 7fbc63db4131..9428ee025cda 100644
->> --- a/drivers/md/dm-vdo/indexer/index.h
->> +++ b/drivers/md/dm-vdo/indexer/index.h
->> @@ -72,7 +72,7 @@ int __must_check uds_save_index(struct uds_index *index);
->>   void vdo_free_index(struct uds_index *index);
->>   
->>   int __must_check uds_replace_index_storage(struct uds_index *index,
->> -					   struct block_device *bdev);
->> +					   struct file *bdev_file);
->>   
->>   void uds_get_index_stats(struct uds_index *index, struct uds_index_stats *counters);
->>   
->> diff --git a/drivers/md/dm-vdo/indexer/indexer.h b/drivers/md/dm-vdo/indexer/indexer.h
->> index a832a34d9436..5dd2c93f12c2 100644
->> --- a/drivers/md/dm-vdo/indexer/indexer.h
->> +++ b/drivers/md/dm-vdo/indexer/indexer.h
->> @@ -130,6 +130,8 @@ struct uds_volume_record {
->>   struct uds_parameters {
->>   	/* The block_device used for storage */
->>   	struct block_device *bdev;
->> +	/* Then opened block_device */
->> +	struct file *bdev_file;
->>   	/* The maximum allowable size of the index on storage */
->>   	size_t size;
->>   	/* The offset where the index should start */
->> @@ -314,7 +316,7 @@ int __must_check uds_suspend_index_session(struct uds_index_session *session, bo
->>    * start using the new backing store instead.
->>    */
->>   int __must_check uds_resume_index_session(struct uds_index_session *session,
->> -					  struct block_device *bdev);
->> +					  struct file *bdev_file);
->>   
->>   /* Wait until all outstanding index operations are complete. */
->>   int __must_check uds_flush_index_session(struct uds_index_session *session);
->> diff --git a/drivers/md/dm-vdo/indexer/io-factory.c b/drivers/md/dm-vdo/indexer/io-factory.c
->> index 61104d5ccd61..a855c3ac73bc 100644
->> --- a/drivers/md/dm-vdo/indexer/io-factory.c
->> +++ b/drivers/md/dm-vdo/indexer/io-factory.c
->> @@ -23,6 +23,7 @@
->>    */
->>   struct io_factory {
->>   	struct block_device *bdev;
->> +	struct file *bdev_file;
->>   	atomic_t ref_count;
->>   };
->>   
->> @@ -59,7 +60,7 @@ static void uds_get_io_factory(struct io_factory *factory)
->>   	atomic_inc(&factory->ref_count);
->>   }
->>   
->> -int uds_make_io_factory(struct block_device *bdev, struct io_factory **factory_ptr)
->> +int uds_make_io_factory(struct file *bdev_file, struct io_factory **factory_ptr)
->>   {
->>   	int result;
->>   	struct io_factory *factory;
->> @@ -68,16 +69,18 @@ int uds_make_io_factory(struct block_device *bdev, struct io_factory **factory_p
->>   	if (result != VDO_SUCCESS)
->>   		return result;
->>   
->> -	factory->bdev = bdev;
->> +	factory->bdev = file_bdev(bdev_file);
->> +	factory->bdev_file = bdev_file;
->>   	atomic_set_release(&factory->ref_count, 1);
->>   
->>   	*factory_ptr = factory;
->>   	return UDS_SUCCESS;
->>   }
->>   
->> -int uds_replace_storage(struct io_factory *factory, struct block_device *bdev)
->> +int uds_replace_storage(struct io_factory *factory, struct file *bdev_file)
->>   {
->> -	factory->bdev = bdev;
->> +	factory->bdev = file_bdev(bdev_file);
->> +	factory->bdev_file = bdev_file;
->>   	return UDS_SUCCESS;
->>   }
->>   
->> @@ -90,7 +93,7 @@ void uds_put_io_factory(struct io_factory *factory)
->>   
->>   size_t uds_get_writable_size(struct io_factory *factory)
->>   {
->> -	return i_size_read(factory->bdev->bd_inode);
->> +	return i_size_read(file_inode(factory->bdev_file));
->>   }
->>   
->>   /* Create a struct dm_bufio_client for an index region starting at offset. */
->> diff --git a/drivers/md/dm-vdo/indexer/io-factory.h b/drivers/md/dm-vdo/indexer/io-factory.h
->> index 60749a9ff756..e5100ab57754 100644
->> --- a/drivers/md/dm-vdo/indexer/io-factory.h
->> +++ b/drivers/md/dm-vdo/indexer/io-factory.h
->> @@ -24,11 +24,11 @@ enum {
->>   	SECTORS_PER_BLOCK = UDS_BLOCK_SIZE >> SECTOR_SHIFT,
->>   };
->>   
->> -int __must_check uds_make_io_factory(struct block_device *bdev,
->> +int __must_check uds_make_io_factory(struct file *bdev_file,
->>   				     struct io_factory **factory_ptr);
->>   
->>   int __must_check uds_replace_storage(struct io_factory *factory,
->> -				     struct block_device *bdev);
->> +				     struct file *bdev_file);
->>   
->>   void uds_put_io_factory(struct io_factory *factory);
->>   
->> diff --git a/drivers/md/dm-vdo/indexer/volume.c b/drivers/md/dm-vdo/indexer/volume.c
->> index 8b21ec93f3bc..a292840a83e3 100644
->> --- a/drivers/md/dm-vdo/indexer/volume.c
->> +++ b/drivers/md/dm-vdo/indexer/volume.c
->> @@ -1467,12 +1467,12 @@ int uds_find_volume_chapter_boundaries(struct volume *volume, u64 *lowest_vcn,
->>   
->>   int __must_check uds_replace_volume_storage(struct volume *volume,
->>   					    struct index_layout *layout,
->> -					    struct block_device *bdev)
->> +					    struct file *bdev_file)
->>   {
->>   	int result;
->>   	u32 i;
->>   
->> -	result = uds_replace_index_layout_storage(layout, bdev);
->> +	result = uds_replace_index_layout_storage(layout, bdev_file);
->>   	if (result != UDS_SUCCESS)
->>   		return result;
->>   
->> diff --git a/drivers/md/dm-vdo/indexer/volume.h b/drivers/md/dm-vdo/indexer/volume.h
->> index 7fdd44464db2..5861654d837e 100644
->> --- a/drivers/md/dm-vdo/indexer/volume.h
->> +++ b/drivers/md/dm-vdo/indexer/volume.h
->> @@ -131,7 +131,7 @@ void vdo_free_volume(struct volume *volume);
->>   
->>   int __must_check uds_replace_volume_storage(struct volume *volume,
->>   					    struct index_layout *layout,
->> -					    struct block_device *bdev);
->> +					    struct file *bdev_file);
->>   
->>   int __must_check uds_find_volume_chapter_boundaries(struct volume *volume,
->>   						    u64 *lowest_vcn, u64 *highest_vcn,
->> -- 
->> 2.39.2
->>
+io_uring_try_cancel_uring_cmd() {
+	lock();
+	for_each_req() {
+		remove_req_from_cancel_list(req);
+		req->file->uring_cmd();
+	}
+	unlock();
+}
 
+-- 
+Pavel Begunkov
