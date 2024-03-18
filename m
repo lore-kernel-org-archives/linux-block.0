@@ -1,68 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8D728DA5;
-	Mon, 18 Mar 2024 08:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3760E28DA5;
+	Mon, 18 Mar 2024 08:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710750821; cv=none; b=QZIRFND+6HV7q4pPCowZ/MDP2Z1yyh1DHgbd380s7nbvKWO0QckDoHlrSHjxj+Hp/dO2cjIoDYc2lYdi6wOzQBW4DmkDFNI4PB4wt5klth9oDY+7GRM/u35N5oVLnnaLbcy10ZJU6vzi1A56Xonog3mCryZ5nWgMWtHeUCVnIWg=
+	t=1710750875; cv=none; b=ocoZ7OTOv9p3sBI1jLf2K2FA2g8JydPsw9n3iYK7dPvD9lO+tMl7yEX6yAthlqpol5usQgTvydZ+zbu4WABPQ1kTfB0dQOhQE6lT4vnMO2gxGjQYpbHPf7eYGdygEVKVMY3Vf+nihGM7Eulm3n5rH7I/K7g3uJZtkM7cGH8ifBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710750821; c=relaxed/simple;
-	bh=SbMAD9hclS7MZ4xz6LIJyGsFZIeKU1ChXipgW5RrNPg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PIsMkf58R3sZwGPb/5wsAU0GzebM7gXvpTXCAT5XKse2HOraKmfi6iCEDJWM93JUjvohTIWfmvi/tvSpqhwA70xz87Xf0q5gJ3epUVctY1bgdKXLMfzP8ALQY/ZyZpVjGLRcXxOlyf1hET04hiFw14EzDVAfi8Z38tkMeVzSnoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gB0QabqU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gB0QabqU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C233AC433C7;
-	Mon, 18 Mar 2024 08:33:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710750820;
-	bh=SbMAD9hclS7MZ4xz6LIJyGsFZIeKU1ChXipgW5RrNPg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gB0QabqU2SmgnpTReDDuanCy7H+rVHXPDj/tQMNWrBvav9yhNXNHzewu/jxoZ34hL
-	 U3dSNHoTCSBUazjBaT+KTKYFEpgoT3tgk1+P8zNMvgXbsvc2GJbFp/pskitO9Bu007
-	 Uf3bOD6E9WRbiy6Ma/XJ2AmiBsFuUM2iiR2EXCf8QaabWgqHfV1FA8fBKctuzdgRKb
-	 ulhXnl/EUVgoL3uFGkQ3hf1SHk+JEEgyV6mMNm9OgEO8n+NewVHy38E01kYVICRo0r
-	 /tTxdZEuiDZwHWy70oLiSxqcscMEiuXkZchThRMgAapp4pVShlXYpeGDSKOqH4nm8/
-	 ejv41k7sMcO2A==
-Date: Mon, 18 Mar 2024 09:33:35 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] fs,block: get holder during claim
-Message-ID: <20240318-begierde-ehedrama-a3b57393e496@brauner>
-References: <20240314165814.tne3leyfmb4sqk2t@quack3>
- <20240315-freibad-annehmbar-ca68c375af91@brauner>
- <ZfdYX3-_53txEYTa@infradead.org>
+	s=arc-20240116; t=1710750875; c=relaxed/simple;
+	bh=GsSIX3/CTa3M1g8uCjDs57wTL5NgRRrzEvE8JpLC1fo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o/B4OuhmY99QKRUb9No/k89+hTGBKMn/Ro+K2OmEaxFNDkoDitg+YJMcqO8JK10pDvAjOAoyYckVZ7gItjWEXoYbIBtUIzPyndKe39EhLBzthRc1G8H3r+9QujMfrq6GwNePhro4fKNfQCA9kDTW1Uy1Pl9OurvCmcD8WjwkP0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c213690558so2066500b6e.0;
+        Mon, 18 Mar 2024 01:34:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710750873; x=1711355673;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CvZQxWeSLOGmfnR+hu9jNLf/b2B+AxMGzTGTFwxzF5I=;
+        b=r9JOi+YXdcP+O4/DEU3jCw3elX3i1qg5WGBVAyzRB3A1jMgGjWQLanWF6XXExWmGPy
+         UuSQVo1QCalrRryabrBscjq328twg4rKSBbuof6tLdrfmvrF2c1GHC6rZryawQMffBrB
+         wZl5UFb5w7ttgQeoaqw7o8MutRk+T/b9oYIms0nkIY5faQQ89pvQXB6ZYVirDDrftvKK
+         MfoOUUhYI5Ry0Y/3KLTFuRard96R5h12pPj64S+UUl+iISipsb1+aEgIY2Zo8NEUrX9a
+         P00pPdnxQetdP/zmNXuVwTLnKy9CA3kn8u1kOsCCcuE0G+Giahf6vfI/YqRaJ54DJror
+         kTDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGB0KDrzSZ/yfzm3U0VytxH+Wekg5QRpqOni8Zbb7JoJIQUUiZBepP/a2VEtMF+meLKA0rbgRyjfBRxbSxHI47tWuwknRwM/1Stq0kuvD0jNQyplHcBfWcRVdNoChRU94wGDtnn/uAvgM=
+X-Gm-Message-State: AOJu0Yz2Y3QuIMPwiOOGQyHshTXGB/c1zWPbDqtOV0tYOKc6qI5Oztx8
+	QqOYMYpuySf1ywZYjOmy4wYgtJtMol9sNE0jEAUvgztPkfW9BEr2cXY2ej45
+X-Google-Smtp-Source: AGHT+IGCTIYygH5ykNVKGapiN9rp8xjMRzpLhbU6cnFH/ODSTdenylh9aj9/DXgQizVHZfFwtpUnFQ==
+X-Received: by 2002:a05:6808:20a9:b0:3c3:7434:78be with SMTP id s41-20020a05680820a900b003c3743478bemr11360013oiw.27.1710750873353;
+        Mon, 18 Mar 2024 01:34:33 -0700 (PDT)
+Received: from [10.16.0.238] ([5.32.53.86])
+        by smtp.gmail.com with ESMTPSA id v2-20020aa78082000000b006e6b39e040esm7385003pff.165.2024.03.18.01.34.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Mar 2024 01:34:32 -0700 (PDT)
+Message-ID: <7ce0d4b7-2e4d-44a7-b268-3e2505e01abe@linux.com>
+Date: Mon, 18 Mar 2024 12:34:24 +0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZfdYX3-_53txEYTa@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] floppy: remove duplicated code, unlock_fdc() function has
+ the same code "do_floppy = NULL" inside.
+Content-Language: en-US
+To: Yufeng Wang <wangyufeng@kylinos.cn>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org
+References: <20240318060756.18649-1-wangyufeng@kylinos.cn>
+From: Denis Efremov <efremov@linux.com>
+In-Reply-To: <20240318060756.18649-1-wangyufeng@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 17, 2024 at 01:53:51PM -0700, Christoph Hellwig wrote:
-> On Fri, Mar 15, 2024 at 02:23:07PM +0100, Christian Brauner wrote:
-> > Now that we open block devices as files we need to deal with the
-> > realities that closing is a deferred operation. An operation on the
-> > block device such as e.g., freeze, thaw, or removal that runs
-> > concurrently with umount, tries to acquire a stable reference on the
-> > holder. The holder might already be gone though. Make that reliable by
-> > grabbing a passive reference to the holder during bdev_open() and
-> > releasing it during bdev_release().
-> 
-> Looks good:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> does bcachefs also need a fix for it's holder ops?  Or does it get to
-> keep the pieces as it has it's own NULL holder_ops and obviously doens't
-> care about getting any of this right?
+Hello,
 
-It has empty holder ops and so is behaving equivalent too having NULL
-holder ops. IOW, the block layer cannot access the holder.
+Please, add a small commit message to the patch. The commit title
+is too long and can be reduced to something like "floppy: remove duplicated
+code in redo_fd_request()". Rest can be added to the commit message.
+
+On 3/18/24 10:07, Yufeng Wang wrote:
+> Cc: stable@vger.kernel.org
+
+We don't need to send this patch to stable. It's not a bugfix.
+
+Please, send v2 with commit message and new title.
+The change looks good to me.
+
+> Signed-off-by: Yufeng Wang <wangyufeng@kylinos.cn>
+> ---
+>  drivers/block/floppy.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index 1b399ec8c07d..25c9d85667f1 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -2787,7 +2787,6 @@ static void redo_fd_request(void)
+>  		pending = set_next_request();
+>  		spin_unlock_irq(&floppy_lock);
+>  		if (!pending) {
+> -			do_floppy = NULL;
+>  			unlock_fdc();
+>  			return;
+>  		}
+
+Thanks,
+Denis
