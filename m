@@ -1,179 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1B928E2
-	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 01:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1419F18029;
+	Mon, 18 Mar 2024 01:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710726559; cv=none; b=D+l5rZEVNoxuKzsPxxQ8IO4pnsoEyDi9qnu6Iv6yV/dHCQoLQ9JSF2GUPh6ZJU3G0v+G4bi8yHfMYDuHNhU46WRU0CEYsfaJIpteo9dmcIbvmaOy/N6uJQ1uvgg6ac8vEO9kbHzs9MWJuRghpSmJ/drb9FFveSor/o0WD3XwuAc=
+	t=1710726716; cv=none; b=QF/t++r1zm7U1qRW3ajzba32HBI0GXIoKHnPDMnPvgjsPOTpmxISwkzc3g0lgGRJQuRndiHe5vVe88t9HXhm5U3awmysd6ts+CMlBi0+mqGrlOB36/DVL6VkC853quHhQiee3KgFc9sVZHD4GJ0kQ6H2PFcHP/oaxnGHeHRVz7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710726559; c=relaxed/simple;
-	bh=jG3xS6FB14/BqpnkTLu7XTnaVi6tPktlEZIbV9PseDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aEdJNsU1Ye2zCEhjvqQK3XxeWW0c2JE086M+6X3Tp5cKac3tjFDq8BUGg3W6MxPTSreMJ6KKdhr9xXb14giG1S+X/nfyH5VzPRg39sfMVAlbTvzTT8kXVvFg6HGeJ6mKSQplpquZJelfTZhilRRehShqchv6LzSeHPxY+Tctfug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gVNvpeTh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gVNvpeTh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710726556;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+ctfX1Pcy3C62ECD/GzywN9cG0bYGgeVBmlLdHU0fSU=;
-	b=gVNvpeThAf3UXLCPN43UhwagNMvSKg6iHKwVrZdqBwb+udAdva18Cl9WNPftQvVoZx5XGQ
-	BZPiSLhbWxRhU+VlntLpZxWPQZ94MU/OXMsZ/ZRySmv8oHKKKuLcPzaqaR5kZ52lptg3o/
-	9acG6ccxh/Y7aQ9pGfKFX2yPjhe5VqY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-170-tvWW_aEPMSuIUPvXf4YhQw-1; Sun,
- 17 Mar 2024 21:49:12 -0400
-X-MC-Unique: tvWW_aEPMSuIUPvXf4YhQw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A9D11285F99C;
-	Mon, 18 Mar 2024 01:49:11 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D8E8112132A;
-	Mon, 18 Mar 2024 01:49:08 +0000 (UTC)
-Date: Mon, 18 Mar 2024 09:49:00 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: (subset) [PATCH 00/11] remove aux CQE caches
-Message-ID: <ZfedjMPDXp7q8t/D@fedora>
-References: <e25412ba-916c-4de7-8ed2-18268f656731@kernel.dk>
- <d3beeb72-c4cf-4fad-80bc-10ca1f035fff@gmail.com>
- <4787bb12-bb89-490a-9d30-40b4f54a19ad@kernel.dk>
- <6dea0285-254d-4985-982b-39f3897bf064@gmail.com>
- <2091c056-d5ed-44e3-a163-b95680cece27@gmail.com>
- <d016a590-d7a9-405f-a2e4-d7c4ffa80fce@kernel.dk>
- <4c47f80f-df74-4b27-b1e7-ce30d5c959f9@kernel.dk>
- <4320d059-0308-42c3-b01f-18107885ffbd@kernel.dk>
- <ZfeHmNtoTo9nvTaV@fedora>
- <1e05aee5-4166-4e5d-9b76-94e1d833ab17@kernel.dk>
+	s=arc-20240116; t=1710726716; c=relaxed/simple;
+	bh=rt5UEDmjpcrw9t+vzPWK0p09J3W1a+ME8M12KLx2kTg=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=WLP+fATkoQ8QFjl+PTD5NdIgFPrftopXFbPDMBNslNcia5gykMG/9IO3XP5PRuBlseSWQWFr1cqjT5cmejJGhv8i+3MZ69d+jZBLsozcLJMezgvedLQWYKispikQqpBYAICrurdT4WZAmQKft8JgNre3x4hmSBWFV3MeKGwosIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TydBS4BKxz4f3kFN;
+	Mon, 18 Mar 2024 09:51:44 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 79E311A01A7;
+	Mon, 18 Mar 2024 09:51:50 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBXKBE0nvdlSrsnHQ--.20502S3;
+	Mon, 18 Mar 2024 09:51:50 +0800 (CST)
+Subject: Re: [RFC v4 linux-next 19/19] fs & block: remove bdev->bd_inode
+To: Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, brauner@kernel.org, axboe@kernel.dk,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
+ <20240222124555.2049140-20-yukuai1@huaweicloud.com>
+ <20240317213847.GD10665@lst.de>
+ <022204e6-c387-b4b2-5982-970fd1ed5b5b@huaweicloud.com>
+ <20240318013208.GA23711@lst.de>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
+Date: Mon, 18 Mar 2024 09:51:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e05aee5-4166-4e5d-9b76-94e1d833ab17@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+In-Reply-To: <20240318013208.GA23711@lst.de>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBXKBE0nvdlSrsnHQ--.20502S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruF18tF4xGry8WFWxWry3urg_yoWfuFXE93
+	y7uw1kJr4UX3s2yF4S9F17GrZ7JFyDWry3tF9Yqay2vw13tan5uFZ3J34xAr18tr1xKr45
+	CF1rXr98Jry7KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE
+	3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
+	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
+	ACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkI
+	wI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1U
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sun, Mar 17, 2024 at 07:34:30PM -0600, Jens Axboe wrote:
-> On 3/17/24 6:15 PM, Ming Lei wrote:
-> > On Sun, Mar 17, 2024 at 04:24:07PM -0600, Jens Axboe wrote:
-> >> On 3/17/24 4:07 PM, Jens Axboe wrote:
-> >>> On 3/17/24 3:51 PM, Jens Axboe wrote:
-> >>>> On 3/17/24 3:47 PM, Pavel Begunkov wrote:
-> >>>>> On 3/17/24 21:34, Pavel Begunkov wrote:
-> >>>>>> On 3/17/24 21:32, Jens Axboe wrote:
-> >>>>>>> On 3/17/24 3:29 PM, Pavel Begunkov wrote:
-> >>>>>>>> On 3/17/24 21:24, Jens Axboe wrote:
-> >>>>>>>>> On 3/17/24 2:55 PM, Pavel Begunkov wrote:
-> >>>>>>>>>> On 3/16/24 13:56, Ming Lei wrote:
-> >>>>>>>>>>> On Sat, Mar 16, 2024 at 01:27:17PM +0000, Pavel Begunkov wrote:
-> >>>>>>>>>>>> On 3/16/24 11:52, Ming Lei wrote:
-> >>>>>>>>>>>>> On Fri, Mar 15, 2024 at 04:53:21PM -0600, Jens Axboe wrote:
-> >>>>>>>>>>>
-> >>>>>>>>>>> ...
-> >>>>>>>>>>>
-> >>>>>>>>>>>>> The following two error can be triggered with this patchset
-> >>>>>>>>>>>>> when running some ublk stress test(io vs. deletion). And not see
-> >>>>>>>>>>>>> such failures after reverting the 11 patches.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> I suppose it's with the fix from yesterday. How can I
-> >>>>>>>>>>>> reproduce it, blktests?
-> >>>>>>>>>>>
-> >>>>>>>>>>> Yeah, it needs yesterday's fix.
-> >>>>>>>>>>>
-> >>>>>>>>>>> You may need to run this test multiple times for triggering the problem:
-> >>>>>>>>>>
-> >>>>>>>>>> Thanks for all the testing. I've tried it, all ublk/generic tests hang
-> >>>>>>>>>> in userspace waiting for CQEs but no complaints from the kernel.
-> >>>>>>>>>> However, it seems the branch is buggy even without my patches, I
-> >>>>>>>>>> consistently (5-15 minutes of running in a slow VM) hit page underflow
-> >>>>>>>>>> by running liburing tests. Not sure what is that yet, but might also
-> >>>>>>>>>> be the reason.
-> >>>>>>>>>
-> >>>>>>>>> Hmm odd, there's nothing in there but your series and then the
-> >>>>>>>>> io_uring-6.9 bits pulled in. Maybe it hit an unfortunate point in the
-> >>>>>>>>> merge window -git cycle? Does it happen with io_uring-6.9 as well? I
-> >>>>>>>>> haven't seen anything odd.
-> >>>>>>>>
-> >>>>>>>> Need to test io_uring-6.9. I actually checked the branch twice, both
-> >>>>>>>> with the issue, and by full recompilation and config prompts I assumed
-> >>>>>>>> you pulled something in between (maybe not).
-> >>>>>>>>
-> >>>>>>>> And yeah, I can't confirm it's specifically an io_uring bug, the
-> >>>>>>>> stack trace is usually some unmap or task exit, sometimes it only
-> >>>>>>>> shows when you try to shutdown the VM after tests.
-> >>>>>>>
-> >>>>>>> Funky. I just ran a bunch of loops of liburing tests and Ming's ublksrv
-> >>>>>>> test case as well on io_uring-6.9 and it all worked fine. Trying
-> >>>>>>> liburing tests on for-6.10/io_uring as well now, but didn't see anything
-> >>>>>>> the other times I ran it. In any case, once you repost I'll rebase and
-> >>>>>>> then let's see if it hits again.
-> >>>>>>>
-> >>>>>>> Did you run with KASAN enabled
-> >>>>>>
-> >>>>>> Yes, it's a debug kernel, full on KASANs, lockdeps and so
-> >>>>>
-> >>>>> And another note, I triggered it once (IIRC on shutdown) with ublk
-> >>>>> tests only w/o liburing/tests, likely limits it to either the core
-> >>>>> io_uring infra or non-io_uring bugs.
-> >>>>
-> >>>> Been running on for-6.10/io_uring, and the only odd thing I see is that
-> >>>> the test output tends to stall here:
-> >>>>
-> >>>> Running test read-before-exit.t
-> >>>>
-> >>>> which then either leads to a connection disconnect from my ssh into that
-> >>>> vm, or just a long delay and then it picks up again. This did not happen
-> >>>> with io_uring-6.9.
-> >>>>
-> >>>> Maybe related? At least it's something new. Just checked again, and yeah
-> >>>> it seems to totally lock up the vm while that is running. Will try a
-> >>>> quick bisect of that series.
-> >>>
-> >>> Seems to be triggered by the top of branch patch in there, my poll and
-> >>> timeout special casing. While the above test case runs with that commit,
-> >>> it'll freeze the host.
-> >>
-> >> Had a feeling this was the busy looping off cancelations, and flushing
-> >> the fallback task_work seems to fix it. I'll check more tomorrow.
-> >>
-> >>
-> >> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-> >> index a2cb8da3cc33..f1d3c5e065e9 100644
-> >> --- a/io_uring/io_uring.c
-> >> +++ b/io_uring/io_uring.c
-> >> @@ -3242,6 +3242,8 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
-> >>  	ret |= io_kill_timeouts(ctx, task, cancel_all);
-> >>  	if (task)
-> >>  		ret |= io_run_task_work() > 0;
-> >> +	else if (ret)
-> >> +		flush_delayed_work(&ctx->fallback_work);
-> >>  	return ret;
-> >>  }
-> > 
-> > Still can trigger the warning with above patch:
-> > 
-> > [  446.275975] ------------[ cut here ]------------
-> > [  446.276340] WARNING: CPU: 8 PID: 731 at kernel/fork.c:969 __put_task_struct+0x10c/0x180
+Hi,
+
+ÔÚ 2024/03/18 9:32, Christoph Hellwig Ð´µÀ:
+> On Mon, Mar 18, 2024 at 09:26:48AM +0800, Yu Kuai wrote:
+>> Because there is a real filesystem(devtmpfs) used for raw block devcie
+>> file operations, open syscall to devtmpfs:
+>>
+>> blkdev_open
+>>   bdev = blkdev_get_no_open
+>>   bdev_open -> pass in file is from devtmpfs
+>>   -> in this case, file inode is from devtmpfs,
 > 
-> And this is running that test case you referenced? I'll take a look, as
-> it seems related to the poll kill rather than the other patchset.
+> But file->f_mapping->host should still point to the bdevfs inode,
+> and file->f_mapping->host is what everything in the I/O path should
+> be using.
+> 
+>> Then later, in blkdev_iomap_begin(), bd_inode is passed in and there is
+>> no access to the devtmpfs file, we can't use s_bdev_file() as other
+>> filesystems here.
+> 
+> We can just pass the file down in iomap_iter.private
 
-Yeah, and now I am running 'git bisect' on Pavel's V2.
+I can do this for blkdev_read_folio(), however, for other ops like
+blkdev_writepages(), I can't find a way to pass the file to
+iomap_iter.private yet.
 
-thanks,
-Ming
+Any suggestions?
+
+Thanks,
+Kuai
+> .
+> 
 
