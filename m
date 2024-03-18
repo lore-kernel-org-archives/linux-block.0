@@ -1,87 +1,68 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C8B25761;
-	Mon, 18 Mar 2024 08:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8D728DA5;
+	Mon, 18 Mar 2024 08:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710750375; cv=none; b=KJ5/rihAIfhXwcyAjcZAcjr/KFUEsCyH5H15MMSpkiu9lLmApCW8jdliwKotzMBOLpRLVe1BbcBs4Pk3J+FwqnczIQaUbdgO5hk/P/TcGlJMTXfFxdjeL+sWOV7N4f5jtT4tKjxZkompDSeGXLMSyCcMqxw7nFiR3LeFKDNO5v8=
+	t=1710750821; cv=none; b=QZIRFND+6HV7q4pPCowZ/MDP2Z1yyh1DHgbd380s7nbvKWO0QckDoHlrSHjxj+Hp/dO2cjIoDYc2lYdi6wOzQBW4DmkDFNI4PB4wt5klth9oDY+7GRM/u35N5oVLnnaLbcy10ZJU6vzi1A56Xonog3mCryZ5nWgMWtHeUCVnIWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710750375; c=relaxed/simple;
-	bh=n/+BUC7RfmYBK8x7pBrx9xX40ouKwNH/toP128a3gAM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NmH0adGXYh9LTouv48c4VrQNITt9U8nP8kx652le3gV4pOLbxpKmgQN5K0Qzd0EHozjlvsiV3wd1dGVr4AYo+QEa9f2bLkKc+hal5ehMQS71T7nTFkotZNA+C7r9MQMC7fORyaenFQ0YlTdk6ZzoOu09UqoWVSrgl6ceHEg2uLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34175878e3cso332100f8f.0;
-        Mon, 18 Mar 2024 01:26:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710750369; x=1711355169;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a9kyHu1UWlkDyox3goz2HfEhPT5QiJkRChK6QBLxt3w=;
-        b=AINyOZrWcz0UuTgZuzYZ8a1y1lEKANBQjz1QFetq7VihZHbXDDha9JJ6Wxu9NdFgbs
-         TedidoqcgDB/l8x61aLLVbCXvKXjlQgYbYJLr9MTI8LZ/KJRyCwag8FdfHhzwzTr8GNN
-         O+ptu0tSRsMCqNwhj1C2otjwz4lII5QTIhLgDLiREu5Drc7ZP+DDzj/H4477IqF5dvuw
-         8k7ewIJ5cbrbxLu4GtYgHwcjQ5t39khEQQbl5stI4GF222GLuQd1YkN3CHfy4HNc/hVQ
-         MC5fKs7BkTLdHW7/P9cUtB4ZKSL8nxQOeA/zyHB2llQpIjkAIkUWetx7Ac49a0ai2XtH
-         dn+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVA+qOVFH+8X7yJmpqiBeBrkf5aujyhdgx7juK2Ej2eUs/Hr5oqR8+HMgqilGsUJm4JTOQt/inL6oNk/JF0O+v3VVvmQ7MAgLdjfyNvdulluJTtyXk0zDV+lVbma9nHgX9Dw4pUvf9f7a/RQK6jabePUsmYiWMN3bYuEWBD4foKhPM=
-X-Gm-Message-State: AOJu0Yz/eu0EChZfI1jnIYrzwp/ILxqr3+y6T+Yzj+6o2o85ttCO9w2T
-	HWPL6sMQCIdbhGqid69jmk0jsSxfThKaQfVzucqpy0Zql9IihDybeY8oTx/p
-X-Google-Smtp-Source: AGHT+IHDewQohYECkFvf872qtt3onRjjtDOZf4w7eiCEgZ9ol4tMs/dOGH40E5nWYdXZI0jREKc84w==
-X-Received: by 2002:a05:6000:22d:b0:33d:d4c2:8ba5 with SMTP id l13-20020a056000022d00b0033dd4c28ba5mr6717194wrz.5.1710750368888;
-        Mon, 18 Mar 2024 01:26:08 -0700 (PDT)
-Received: from [10.16.0.238] ([5.32.53.74])
-        by smtp.gmail.com with ESMTPSA id f1-20020a5d4dc1000000b0033e99b7cfa8sm4062318wru.13.2024.03.18.01.26.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Mar 2024 01:26:08 -0700 (PDT)
-Message-ID: <f1be501c-51fa-4a0b-a11f-893b185571c5@linux.com>
-Date: Mon, 18 Mar 2024 12:26:05 +0400
+	s=arc-20240116; t=1710750821; c=relaxed/simple;
+	bh=SbMAD9hclS7MZ4xz6LIJyGsFZIeKU1ChXipgW5RrNPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PIsMkf58R3sZwGPb/5wsAU0GzebM7gXvpTXCAT5XKse2HOraKmfi6iCEDJWM93JUjvohTIWfmvi/tvSpqhwA70xz87Xf0q5gJ3epUVctY1bgdKXLMfzP8ALQY/ZyZpVjGLRcXxOlyf1hET04hiFw14EzDVAfi8Z38tkMeVzSnoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gB0QabqU; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gB0QabqU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C233AC433C7;
+	Mon, 18 Mar 2024 08:33:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710750820;
+	bh=SbMAD9hclS7MZ4xz6LIJyGsFZIeKU1ChXipgW5RrNPg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gB0QabqU2SmgnpTReDDuanCy7H+rVHXPDj/tQMNWrBvav9yhNXNHzewu/jxoZ34hL
+	 U3dSNHoTCSBUazjBaT+KTKYFEpgoT3tgk1+P8zNMvgXbsvc2GJbFp/pskitO9Bu007
+	 Uf3bOD6E9WRbiy6Ma/XJ2AmiBsFuUM2iiR2EXCf8QaabWgqHfV1FA8fBKctuzdgRKb
+	 ulhXnl/EUVgoL3uFGkQ3hf1SHk+JEEgyV6mMNm9OgEO8n+NewVHy38E01kYVICRo0r
+	 /tTxdZEuiDZwHWy70oLiSxqcscMEiuXkZchThRMgAapp4pVShlXYpeGDSKOqH4nm8/
+	 ejv41k7sMcO2A==
+Date: Mon, 18 Mar 2024 09:33:35 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
+	"Darrick J. Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] fs,block: get holder during claim
+Message-ID: <20240318-begierde-ehedrama-a3b57393e496@brauner>
+References: <20240314165814.tne3leyfmb4sqk2t@quack3>
+ <20240315-freibad-annehmbar-ca68c375af91@brauner>
+ <ZfdYX3-_53txEYTa@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] floppy: remove duplicated code, unlock_fdc() function has
- the same code "do_floppy = NULL" inside.
-Content-Language: en-US
-To: Yufeng Wang <wangyufeng@kylinos.cn>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: inux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20240318060453.18538-1-wangyufeng@kylinos.cn>
-From: Denis Efremov <efremov@linux.com>
-In-Reply-To: <20240318060453.18538-1-wangyufeng@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZfdYX3-_53txEYTa@infradead.org>
 
-Hello,
-
-On 3/18/24 10:04, Yufeng Wang wrote:
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Yufeng Wang <wangyufeng@kylinos.cn>
-> ---
->  drivers/block/floppy.c | 1 -
->  1 file changed, 1 deletion(-)
+On Sun, Mar 17, 2024 at 01:53:51PM -0700, Christoph Hellwig wrote:
+> On Fri, Mar 15, 2024 at 02:23:07PM +0100, Christian Brauner wrote:
+> > Now that we open block devices as files we need to deal with the
+> > realities that closing is a deferred operation. An operation on the
+> > block device such as e.g., freeze, thaw, or removal that runs
+> > concurrently with umount, tries to acquire a stable reference on the
+> > holder. The holder might already be gone though. Make that reliable by
+> > grabbing a passive reference to the holder during bdev_open() and
+> > releasing it during bdev_release().
 > 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index 1b399ec8c07d..25c9d85667f1 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -2787,7 +2787,6 @@ static void redo_fd_request(void)
->  		pending = set_next_request();
->  		spin_unlock_irq(&floppy_lock);
->  		if (!pending) {
-> -			do_floppy = NULL;
->  			unlock_fdc();
->  			return;
->  		}
+> Looks good:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> does bcachefs also need a fix for it's holder ops?  Or does it get to
+> keep the pieces as it has it's own NULL holder_ops and obviously doens't
+> care about getting any of this right?
 
-I'll answer to the 2nd email.
-
-Thanks,
-Denis
+It has empty holder ops and so is behaving equivalent too having NULL
+holder ops. IOW, the block layer cannot access the holder.
