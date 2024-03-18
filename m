@@ -1,302 +1,192 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic304-28.consmr.mail.ne1.yahoo.com (sonic304-28.consmr.mail.ne1.yahoo.com [66.163.191.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2532EAD7
-	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 00:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C0DEEB9
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 00:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.191.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710720941; cv=none; b=Cbdn6ewxpVCrUJEYGC3gbEQtXmjqj39wNxqMxk9TyqR3Xm2pYVufzoYM/dj1vdeUR9JJMhoFkyjye+OS7BOubVjy9dQZQaly/7rfasQnxMSyzFXpxlOoJGlMGnewOEzihGaIbeAZUxwywp2KtcjDFIWQqdwpKhg32Hit1wn6LGg=
+	t=1710721771; cv=none; b=czwGus4P+Wo1poQzTwyKz8Bnz9ZJneP3NVfbSZfLEQTRQIeW5p7lxRooZM6sPOHyt+3/fH8oA0gBu8ypYZo/bXv3WMw80uUNNBC+pRmhL8Du31a3cplGWsw2nP6fpn0URBKttR9Frq/Y9nj57YVyWNyuyVJHboUEDn99DOtkYns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710720941; c=relaxed/simple;
-	bh=+G/dQ7yuWAv0ahkX0i8IM7SJf+VB6Vc9F96WuRoLw8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kXMIhOW4Y3hcIbBwak9QYngUqUYbJswJ56eY48wffSM1zAH4lOfP8xgLwV0EeVMQEh2JcrtpioXUU1jacF3gqsoYAcYIKXukOk0Ox/yEnGmPeJjhyOWnMX9gpiZ9/Qfx4P/YkmoM6aLb2zwacWYk44jatr5AV2LbzJShlQYQG3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AT4p9V5E; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1710721771; c=relaxed/simple;
+	bh=XDO8/d0iz2V7sZELfeXZrkyddM4LNSpiyQLIYgDR2lU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=txbOIp8Bwt3P2C1m1dSIPK4m9tr4MPGdqR2OyNe0SPOlnHq9AlDD269f6XngUQ8cyMDLWnXg1s+UXdfjfQ80nKS6WHc5EqVv6kn2e4FTri9ct907Y5+Ov96VyCbgkXj8uxT1hanL+e4J2fTZK93GYdll/B78+cBBUfIALDAAc4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=AvS44cfC; arc=none smtp.client-ip=66.163.191.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AT4p9V5E"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710720936;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PqwaXJjYjcz/inqfowogBWtplAA1tSXC42/ejL1ujUQ=;
-	b=AT4p9V5E1PZMOnT+uiaMUOrKz94iitOHkIuy3Kad8BfHlXpN5+k+CwQOcShBWcyj19G1kJ
-	gNvKEpWfeb7n6s53jEs/sXtuep216G8yBd2vLeFYQGSst3/AWAS9rhSS5X4Dt/bekG9LiV
-	rR4XmpxDcKhWlRUM+djc/UoDEO1GzQE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-Y3QkjVxEMrmoiujZfne_VA-1; Sun, 17 Mar 2024 20:15:33 -0400
-X-MC-Unique: Y3QkjVxEMrmoiujZfne_VA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C83A58007A1;
-	Mon, 18 Mar 2024 00:15:32 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D24F10F43;
-	Mon, 18 Mar 2024 00:15:28 +0000 (UTC)
-Date: Mon, 18 Mar 2024 08:15:20 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: (subset) [PATCH 00/11] remove aux CQE caches
-Message-ID: <ZfeHmNtoTo9nvTaV@fedora>
-References: <ZfWk9Pp0zJ1i1JAE@fedora>
- <1132db8f-829f-4ea8-bdee-8f592b5e3c19@gmail.com>
- <e25412ba-916c-4de7-8ed2-18268f656731@kernel.dk>
- <d3beeb72-c4cf-4fad-80bc-10ca1f035fff@gmail.com>
- <4787bb12-bb89-490a-9d30-40b4f54a19ad@kernel.dk>
- <6dea0285-254d-4985-982b-39f3897bf064@gmail.com>
- <2091c056-d5ed-44e3-a163-b95680cece27@gmail.com>
- <d016a590-d7a9-405f-a2e4-d7c4ffa80fce@kernel.dk>
- <4c47f80f-df74-4b27-b1e7-ce30d5c959f9@kernel.dk>
- <4320d059-0308-42c3-b01f-18107885ffbd@kernel.dk>
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="AvS44cfC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1710721762; bh=ur7+Dkhuv0fZsBGL1hE8C24/tID4EaLfwPGhqZvAJgY=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=AvS44cfChNQDHKTVOFAQfgNG/A8vna6dU8MYOobY0i7HWjfsR5ZMJglv9F0HU5ocfGpqL+AphJoq0uEjrJ4calYHiMv5L/ViYpBMf+MVOH2RaCEL9D/GKBinNvbavW/A/gaieH+ncH+oZRzSL+0+mRztn/10xVg90HNGRzx4P/Dj4bZEte5eVQxA+DdQu3cWOFAmx71BOMG2r53m/1MDGp9vlIxJESSrGkbuuaXk8F8vo6yci/4rb6dbgGFS8Uz+qMYV2h0Rsq8itRFfIXtujyLXNQ6tiSEoH3/byld8U9bz7RpGCt8hZeUjELNsRzxrm8VDCavJ9n1YQg1mmOuR3Q==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1710721762; bh=7OGIpH70jZ/hB8P3wZb0f6KkrqJ6y5lJnl9p6axDTmd=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=SHqSvTJ9C5caI+YU7dNEocpRu3399l41rC85PBn/yVVdmx5//RmRtJHAmH+WDFE4v0eUPMl2OMRkOs962kgJV1u/3XsG/P6Ns8qN9SMPi2n8gAQVwVqd5PZZPBkXKxjGuwthR2XUbdQ9oMWXiRpzPmx0CIWg/6xLd56o62RR5mNGyKmHefDX19CLRMdoV9BL3zuiLYUgmLOC43PrvSkYRbzPlf5y9Misk2txdlTV63uYNH0BD+qS7CCKWguaHrXApaJqqUQwWhiM/y2v3K24hssAEO6PMfZUwovnAZvQZZAmNCPX5iHKva7Tcp3AbqLWsxl23uj7tgEoSMY2+K0hjw==
+X-YMail-OSG: waeWX9kVM1kChxFe64VzLjBz9sv1R5rKfCT4V4ptBO_lda.ol45fdlkGTy4P.OF
+ R_XhFht3m6K3UV48QOjt6dEAoCP.Dj9OPDxGhOjGduy9aIb6VqvOlnhfrExAiCgx_dNwGbqV6nHI
+ Lg8w0pp30_Y6lJ2VeONHYhP8Cook_pd3dQhO46cazukTHlIZMIk15fbyUbvYFe4W7i98cPs7T7Kp
+ cxvt19FBYl4zpq5N5p0xYuGo6nsTm__jR68eAhbVlqJ_RNMUP2aEHYCLWU9JHeP7Z7Yj2KPiVC4E
+ YCCOyK7Qrx9ZAPAW4luxpPVE7YBStWoYIIa6vocGCvAoFzjL9egXHHZkxfpIokU_Am7IszUpIpQp
+ Oyiu50lSC69OZEHQe_uWJfx80CFNOtnvcKAe0GhH3AJmHVZDuLPp4RFvBm3RKmJ2VZ4fik5jX1u8
+ 5t5BU8twOWTH0efac3HItgKZoiar2ppGdGZNWVAaJjOlLxuqOa_.fAPfFtHAjTxxCOm.xfJ38HNL
+ vD4SQBkPEUAqL2Odddm0ueAY9TXmRtMhnCNOxxGNSITMsUuXjDqPL89Vrw98NCWB2vvzu7AQjxtj
+ iVwb6tLBm9dxPmA6qga92Zmpy0z3U5O442u0174wwkDp3cLJ5EmXIyMOiOU8g1fdxrfXbuv7PSTn
+ O9ktdwD4Rfhasl0eVEd.voxNeKM9y8qKFQOSH2wfTRPbSBPwgDcx_GT_Xner9ucrxHL8kdHWFH8p
+ lj8vOAL5m.nld3q4ttrbE5o5V.H84Q9OWWqo9g39AKO5iJ3Mxb_7WcczrAUZFBFRqoSaVeFkdoFt
+ iIcpr2FXyIuXbv89Z2CB8u6uGaybvpS5r723teOZR8_E0jTu8xmvTSI4AjMHm6CVmjOGCJKsxXlr
+ r.K2rSYi1v2HSBbkjXdZabje1U5FyHx11Xmawf4dbCuioxWl97Yz6yGSanhTK137dZCkD5o8RESa
+ CgzvSt7EpaETOB97_BX.FgDjMzm.A8oldcjPgExI5YTvU1j.fQXrw5iKq2Lo_RLSvG2q.lr0D2zN
+ iWB5HBS3mdB5joadSS7EskB7sxTu6utUh83PGP3nFm0gwJ8fM63MkCMJ7r4_MHTJvhmEpZ5FWjjf
+ kMrSPcs0imyt22ooV5TS7GEv1CiNbDCpCSdATLTkJ04tIwLGzK0bDPlK_ZiVXsYK3QNrilg8AwxF
+ ePr9PsjzID5nxknkl_ym.LH6m03Rm_s8gzWejnPxmFUQ4a48UIUip2NRQSviAZLSUFfh_PgtbA_r
+ 4lYWGYuwZbH48x8Qr.iXy5FKJq4I_UcCcXVHtrJ9S010mewL4EO0svvggqnL24MDjXRr0C497XWR
+ F31dag4KTXx0jmixitgWWH4vSbh3644OV6PmwDkiBKQTKuF.o5JOzDP05z0HkOGsKQuRCz8yoDkV
+ YdpROOgrKpgLr8JN2YI5eTf84JKZx9gDPu0BZ61oPHK7q9AYkX59I5ll1AoXKPUfp0m6XReh6t6g
+ XZph7HyV8E0.IAF5LelBFRJMRrcUwcYPaQRf2k1jfvHGYSAAmQVfbY8U1SFnpHhzsSpzwoSIFJuX
+ WnXZ5kKxYqJBjasw6diSqxtjEGwdOVVNk52wUoFtfGSC5qIvJIEagVpxqRhsIbj3jPxi2f.qRpwY
+ bqMqGXwoIP12aACemy5DL5ZcrTelzxdnird.IwcF9BDiznxtD28xRqSME3l8VLxRN9T_coOVIhYT
+ 4NVfsF8AJtP9QP319kQBIilJsFJLDG7Eb9fdaWW8RG.LEdZWSrEihSND.FwYdt_bUG5ClNCUHxFx
+ QeCS1t3zl7F6MiBKPyx2Z5nlufBfrTjVyqFafmNERLWYFT2r.mlSrfvRbnvQ0fLwbShFs1xpMuVU
+ cW3vSrTLj3ayjOOAL2F7KDmFOJ_lEmVgSa.cpFXttipQPRsgeeyzkZJB_yE6vDrApYbYheIF5sPz
+ 1efZ2e_rLD9dHgNLFUSdEKu4OjB8odHU6tJpATafJwMmLb_LGrme2uX2cBg_kGhCdaPp.tJWOmLv
+ e5FRdNMFANZYjUFIXRPLeIhs4eal7j4jwY1GcUDorn2t8UB0jlN1_PNFrk1o93yRiPV5bhDylEgJ
+ 1fLlExIQyyI0x0f_Vull_IWVjNfyIUC1qwA3gyWcSD6WvDpmEGwejsw4MP7oWNC0xP.vE3wPAeGk
+ gsWyOU1OfqXuoPuKaCFOAWtb.pQqspU7GjJ_61IhRL7lLGIoCP.InxJfhPChgU4wkKbzTjWu7L8D
+ KpqzGwiJKwRR9vU2ds6GlhM5cW1pwm427KEqbEgVV9J8rM5mV6HA5st1YDa57qCg-
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 4dceb0cb-286e-4bb1-86ec-98cee84315d7
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.ne1.yahoo.com with HTTP; Mon, 18 Mar 2024 00:29:22 +0000
+Received: by hermes--production-gq1-5c57879fdf-p26ct (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID a7bd0b665c9e1192bb72e35953a758c0;
+          Mon, 18 Mar 2024 00:29:16 +0000 (UTC)
+Message-ID: <43958767-32db-4c53-8408-8367cfc14d2f@schaufler-ca.com>
+Date: Sun, 17 Mar 2024 17:29:14 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4320d059-0308-42c3-b01f-18107885ffbd@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v15 05/21] initramfs|security: Add a security hook to
+ do_populate_rootfs()
+Content-Language: en-US
+To: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com,
+ jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+ axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com,
+ paul@paul-moore.com
+Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+ linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <1710560151-28904-1-git-send-email-wufan@linux.microsoft.com>
+ <1710560151-28904-6-git-send-email-wufan@linux.microsoft.com>
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <1710560151-28904-6-git-send-email-wufan@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.22129 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On Sun, Mar 17, 2024 at 04:24:07PM -0600, Jens Axboe wrote:
-> On 3/17/24 4:07 PM, Jens Axboe wrote:
-> > On 3/17/24 3:51 PM, Jens Axboe wrote:
-> >> On 3/17/24 3:47 PM, Pavel Begunkov wrote:
-> >>> On 3/17/24 21:34, Pavel Begunkov wrote:
-> >>>> On 3/17/24 21:32, Jens Axboe wrote:
-> >>>>> On 3/17/24 3:29 PM, Pavel Begunkov wrote:
-> >>>>>> On 3/17/24 21:24, Jens Axboe wrote:
-> >>>>>>> On 3/17/24 2:55 PM, Pavel Begunkov wrote:
-> >>>>>>>> On 3/16/24 13:56, Ming Lei wrote:
-> >>>>>>>>> On Sat, Mar 16, 2024 at 01:27:17PM +0000, Pavel Begunkov wrote:
-> >>>>>>>>>> On 3/16/24 11:52, Ming Lei wrote:
-> >>>>>>>>>>> On Fri, Mar 15, 2024 at 04:53:21PM -0600, Jens Axboe wrote:
-> >>>>>>>>>
-> >>>>>>>>> ...
-> >>>>>>>>>
-> >>>>>>>>>>> The following two error can be triggered with this patchset
-> >>>>>>>>>>> when running some ublk stress test(io vs. deletion). And not see
-> >>>>>>>>>>> such failures after reverting the 11 patches.
-> >>>>>>>>>>
-> >>>>>>>>>> I suppose it's with the fix from yesterday. How can I
-> >>>>>>>>>> reproduce it, blktests?
-> >>>>>>>>>
-> >>>>>>>>> Yeah, it needs yesterday's fix.
-> >>>>>>>>>
-> >>>>>>>>> You may need to run this test multiple times for triggering the problem:
-> >>>>>>>>
-> >>>>>>>> Thanks for all the testing. I've tried it, all ublk/generic tests hang
-> >>>>>>>> in userspace waiting for CQEs but no complaints from the kernel.
-> >>>>>>>> However, it seems the branch is buggy even without my patches, I
-> >>>>>>>> consistently (5-15 minutes of running in a slow VM) hit page underflow
-> >>>>>>>> by running liburing tests. Not sure what is that yet, but might also
-> >>>>>>>> be the reason.
-> >>>>>>>
-> >>>>>>> Hmm odd, there's nothing in there but your series and then the
-> >>>>>>> io_uring-6.9 bits pulled in. Maybe it hit an unfortunate point in the
-> >>>>>>> merge window -git cycle? Does it happen with io_uring-6.9 as well? I
-> >>>>>>> haven't seen anything odd.
-> >>>>>>
-> >>>>>> Need to test io_uring-6.9. I actually checked the branch twice, both
-> >>>>>> with the issue, and by full recompilation and config prompts I assumed
-> >>>>>> you pulled something in between (maybe not).
-> >>>>>>
-> >>>>>> And yeah, I can't confirm it's specifically an io_uring bug, the
-> >>>>>> stack trace is usually some unmap or task exit, sometimes it only
-> >>>>>> shows when you try to shutdown the VM after tests.
-> >>>>>
-> >>>>> Funky. I just ran a bunch of loops of liburing tests and Ming's ublksrv
-> >>>>> test case as well on io_uring-6.9 and it all worked fine. Trying
-> >>>>> liburing tests on for-6.10/io_uring as well now, but didn't see anything
-> >>>>> the other times I ran it. In any case, once you repost I'll rebase and
-> >>>>> then let's see if it hits again.
-> >>>>>
-> >>>>> Did you run with KASAN enabled
-> >>>>
-> >>>> Yes, it's a debug kernel, full on KASANs, lockdeps and so
-> >>>
-> >>> And another note, I triggered it once (IIRC on shutdown) with ublk
-> >>> tests only w/o liburing/tests, likely limits it to either the core
-> >>> io_uring infra or non-io_uring bugs.
-> >>
-> >> Been running on for-6.10/io_uring, and the only odd thing I see is that
-> >> the test output tends to stall here:
-> >>
-> >> Running test read-before-exit.t
-> >>
-> >> which then either leads to a connection disconnect from my ssh into that
-> >> vm, or just a long delay and then it picks up again. This did not happen
-> >> with io_uring-6.9.
-> >>
-> >> Maybe related? At least it's something new. Just checked again, and yeah
-> >> it seems to totally lock up the vm while that is running. Will try a
-> >> quick bisect of that series.
-> > 
-> > Seems to be triggered by the top of branch patch in there, my poll and
-> > timeout special casing. While the above test case runs with that commit,
-> > it'll freeze the host.
-> 
-> Had a feeling this was the busy looping off cancelations, and flushing
-> the fallback task_work seems to fix it. I'll check more tomorrow.
-> 
-> 
-> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-> index a2cb8da3cc33..f1d3c5e065e9 100644
-> --- a/io_uring/io_uring.c
-> +++ b/io_uring/io_uring.c
-> @@ -3242,6 +3242,8 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
->  	ret |= io_kill_timeouts(ctx, task, cancel_all);
->  	if (task)
->  		ret |= io_run_task_work() > 0;
-> +	else if (ret)
-> +		flush_delayed_work(&ctx->fallback_work);
->  	return ret;
+On 3/15/2024 8:35 PM, Fan Wu wrote:
+> This patch introduces a new hook to notify security system that the
+> content of initramfs has been unpacked into the rootfs.
+>
+> Upon receiving this notification, the security system can activate
+> a policy to allow only files that originated from the initramfs to
+> execute or load into kernel during the early stages of booting.
+>
+> This approach is crucial for minimizing the attack surface by
+> ensuring that only trusted files from the initramfs are operational
+> in the critical boot phase.
+>
+> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+>
+> ---
+> v1-v11:
+>   + Not present
+>
+> v12:
+>   + Introduced
+>
+> v13:
+>   + Rename the hook name to initramfs_populated()
+>
+> v14:
+>   + No changes
+>
+> v15:
+>   + No changes
+> ---
+>  include/linux/lsm_hook_defs.h |  2 ++
+>  include/linux/security.h      |  8 ++++++++
+>  init/initramfs.c              |  3 +++
+>  security/security.c           | 10 ++++++++++
+>  4 files changed, 23 insertions(+)
+>
+> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+> index 334e00efbde4..7db99ae75651 100644
+> --- a/include/linux/lsm_hook_defs.h
+> +++ b/include/linux/lsm_hook_defs.h
+> @@ -450,3 +450,5 @@ LSM_HOOK(int, 0, uring_override_creds, const struct cred *new)
+>  LSM_HOOK(int, 0, uring_sqpoll, void)
+>  LSM_HOOK(int, 0, uring_cmd, struct io_uring_cmd *ioucmd)
+>  #endif /* CONFIG_IO_URING */
+> +
+> +LSM_HOOK(void, LSM_RET_VOID, initramfs_populated, void)
+
+This is an awfully expensive way to set a flag. Adding a LSM hook list
+isn't free. Isn't there a way to capture this state change through one of
+the mount hooks?
+
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 41a8f667bdfa..14fff542f2e3 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -2255,4 +2255,12 @@ static inline int security_uring_cmd(struct io_uring_cmd *ioucmd)
+>  #endif /* CONFIG_SECURITY */
+>  #endif /* CONFIG_IO_URING */
+>  
+> +#ifdef CONFIG_SECURITY
+> +extern void security_initramfs_populated(void);
+> +#else
+> +static inline void security_initramfs_populated(void)
+> +{
+> +}
+> +#endif /* CONFIG_SECURITY */
+> +
+>  #endif /* ! __LINUX_SECURITY_H */
+> diff --git a/init/initramfs.c b/init/initramfs.c
+> index da79760b8be3..cc9115117896 100644
+> --- a/init/initramfs.c
+> +++ b/init/initramfs.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/namei.h>
+>  #include <linux/init_syscalls.h>
+>  #include <linux/umh.h>
+> +#include <linux/security.h>
+>  
+>  #include "do_mounts.h"
+>  
+> @@ -719,6 +720,8 @@ static void __init do_populate_rootfs(void *unused, async_cookie_t cookie)
+>  #endif
+>  	}
+>  
+> +	security_initramfs_populated();
+> +
+>  done:
+>  	/*
+>  	 * If the initrd region is overlapped with crashkernel reserved region,
+> diff --git a/security/security.c b/security/security.c
+> index 287bfac6b471..b10230c51c0b 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -5675,3 +5675,13 @@ int security_uring_cmd(struct io_uring_cmd *ioucmd)
+>  	return call_int_hook(uring_cmd, ioucmd);
 >  }
-
-Still can trigger the warning with above patch:
-
-[  446.275975] ------------[ cut here ]------------
-[  446.276340] WARNING: CPU: 8 PID: 731 at kernel/fork.c:969 __put_task_struct+0x10c/0x180
-[  446.276931] Modules linked in: isofs binfmt_misc xfs vfat fat raid0 iTCO_wdt intel_pmc_bxt iTCO_vendor_support virtio_net i2c_i801 net_fag
-[  446.278608] CPU: 8 PID: 731 Comm: kworker/8:2 Not tainted 6.8.0_io_uring_6.10+ #20
-[  446.279535] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37 04/01/2014
-[  446.280440] Workqueue: events io_fallback_req_func
-[  446.280971] RIP: 0010:__put_task_struct+0x10c/0x180
-[  446.281485] Code: 48 85 d2 74 05 f0 ff 0a 74 44 48 8b 3d b5 83 c7 02 48 89 ee e8 a5 f6 2e 00 eb ac be 03 00 00 00 48 89 ef e8 26 9f 72 002
-[  446.282727] RSP: 0018:ffffb325c06bfdf8 EFLAGS: 00010246
-[  446.283099] RAX: 0000000000000000 RBX: ffff92717cabaf40 RCX: 0000000000000000
-[  446.283578] RDX: 0000000000000001 RSI: 0000000000000246 RDI: ffff92717cabaf40
-[  446.284062] RBP: ffff92710cab4800 R08: 0000000000000000 R09: 0000000000000000
-[  446.284545] R10: ffffb325c06bfdb0 R11: 0000000000000100 R12: ffff92717aedc580
-[  446.285233] R13: ffff92717aedc580 R14: ffff927151ee5a00 R15: 0000000000000000
-[  446.285840] FS:  0000000000000000(0000) GS:ffff927667c00000(0000) knlGS:0000000000000000
-[  446.286412] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  446.286819] CR2: 00007feacac32000 CR3: 0000000618020002 CR4: 0000000000770ef0
-[  446.287310] PKRU: 55555554
-[  446.287534] Call Trace:
-[  446.287752]  <TASK>
-[  446.287941]  ? __warn+0x80/0x120
-[  446.288206]  ? __put_task_struct+0x10c/0x180
-[  446.288524]  ? report_bug+0x164/0x190
-[  446.288816]  ? handle_bug+0x41/0x70
-[  446.289098]  ? exc_invalid_op+0x17/0x70
-[  446.289392]  ? asm_exc_invalid_op+0x1a/0x20
-[  446.289715]  ? __put_task_struct+0x10c/0x180
-[  446.290038]  ? io_put_task_remote+0x80/0x90
-[  446.290372]  __io_submit_flush_completions+0x2d6/0x390
-[  446.290761]  io_fallback_req_func+0xad/0x140
-[  446.291088]  process_one_work+0x189/0x3b0
-[  446.291403]  worker_thread+0x277/0x390
-[  446.291700]  ? __pfx_worker_thread+0x10/0x10
-[  446.292018]  kthread+0xcf/0x100
-[  446.292278]  ? __pfx_kthread+0x10/0x10
-[  446.292562]  ret_from_fork+0x31/0x50
-[  446.292848]  ? __pfx_kthread+0x10/0x10
-[  446.293143]  ret_from_fork_asm+0x1a/0x30
-[  446.293576]  </TASK>
-[  446.293919] ---[ end trace 0000000000000000 ]---
-[  446.294460] ------------[ cut here ]------------
-[  446.294808] WARNING: CPU: 8 PID: 731 at kernel/fork.c:601 free_task+0x61/0x70
-[  446.295294] Modules linked in: isofs binfmt_misc xfs vfat fat raid0 iTCO_wdt intel_pmc_bxt iTCO_vendor_support virtio_net i2c_i801 net_fag
-[  446.296901] CPU: 8 PID: 731 Comm: kworker/8:2 Tainted: G        W          6.8.0_io_uring_6.10+ #20
-[  446.297521] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37 04/01/2014
-[  446.298110] Workqueue: events io_fallback_req_func
-[  446.298455] RIP: 0010:free_task+0x61/0x70
-[  446.298756] Code: f3 ff f6 43 2e 20 75 18 48 89 df e8 49 7b 20 00 48 8b 3d e2 84 c7 02 48 89 de 5b e9 c9 f7 2e 00 48 89 df e8 61 70 03 000
-[  446.303360] RSP: 0018:ffffb325c06bfe00 EFLAGS: 00010202
-[  446.303745] RAX: 0000000000000001 RBX: ffff92717cabaf40 RCX: 0000000009a40008
-[  446.304226] RDX: 0000000009a3e008 RSI: 000000000003b060 RDI: 6810a90e7192ffff
-[  446.304763] RBP: ffff92710cab4800 R08: 0000000000000000 R09: 00000000820001df
-[  446.305288] R10: 00000000820001df R11: 000000000000000d R12: ffff92717aedc580
-[  446.305769] R13: ffff92717aedc580 R14: ffff927151ee5a00 R15: 0000000000000000
-[  446.306251] FS:  0000000000000000(0000) GS:ffff927667c00000(0000) knlGS:0000000000000000
-[  446.306815] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  446.307220] CR2: 00007feacac32000 CR3: 0000000618020002 CR4: 0000000000770ef0
-[  446.307702] PKRU: 55555554
-[  446.307924] Call Trace:
-[  446.308135]  <TASK>
-[  446.308322]  ? __warn+0x80/0x120
-[  446.308637]  ? free_task+0x61/0x70
-[  446.308926]  ? report_bug+0x164/0x190
-[  446.309207]  ? handle_bug+0x41/0x70
-[  446.309474]  ? exc_invalid_op+0x17/0x70
-[  446.309767]  ? asm_exc_invalid_op+0x1a/0x20
-[  446.310076]  ? free_task+0x61/0x70
-[  446.310340]  __io_submit_flush_completions+0x2d6/0x390
-[  446.310711]  io_fallback_req_func+0xad/0x140
-[  446.311067]  process_one_work+0x189/0x3b0
-[  446.311492]  worker_thread+0x277/0x390
-[  446.311881]  ? __pfx_worker_thread+0x10/0x10
-[  446.312205]  kthread+0xcf/0x100
-[  446.312457]  ? __pfx_kthread+0x10/0x10
-[  446.312750]  ret_from_fork+0x31/0x50
-[  446.313028]  ? __pfx_kthread+0x10/0x10
-[  446.313320]  ret_from_fork_asm+0x1a/0x30
-[  446.313616]  </TASK>
-[  446.313812] ---[ end trace 0000000000000000 ]---
-[  446.314171] BUG: kernel NULL pointer dereference, address: 0000000000000098
-[  446.314184] ------------[ cut here ]------------
-[  446.314495] #PF: supervisor read access in kernel mode
-[  446.314747] kernel BUG at mm/slub.c:553!
-[  446.314986] #PF: error_code(0x0000) - not-present page
-[  446.316032] PGD 0 P4D 0
-[  446.316253] Oops: 0000 [#1] PREEMPT SMP NOPTI
-[  446.316573] CPU: 8 PID: 9914 Comm: ublk Tainted: G        W          6.8.0_io_uring_6.10+ #20
-[  446.317167] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37 04/01/2014
-[  446.317763] RIP: 0010:release_task+0x3b/0x560
-[  446.318089] Code: 55 53 48 89 fb 48 83 ec 28 65 48 8b 04 25 28 00 00 00 48 89 44 24 20 31 c0 e8 d1 17 0b 00 e8 cc 17 0b 00 48 8b 83 b8 0bf
-[  446.319301] RSP: 0018:ffffb325cdb2bca8 EFLAGS: 00010202
-[  446.319672] RAX: 0000000000000000 RBX: ffff92717cabaf40 RCX: ffffb325cdb2bd18
-[  446.320151] RDX: ffff92717cabaf40 RSI: ffff92717cabb948 RDI: ffff92717cabaf40
-[  446.320628] RBP: ffffb325cdb2bd18 R08: ffffb325cdb2bd18 R09: 0000000000000000
-[  446.321122] R10: 0000000000000001 R11: 0000000000000100 R12: ffffb325cdb2bd18
-[  446.321706] R13: ffffb325cdb2b310 R14: ffffb325cdb2b310 R15: 0000000000000000
-[  446.322188] FS:  0000000000000000(0000) GS:ffff927667c00000(0000) knlGS:0000000000000000
-[  446.322742] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  446.323169] CR2: 0000000000000098 CR3: 0000000618020002 CR4: 0000000000770ef0
-[  446.324013] PKRU: 55555554
-[  446.324267] Call Trace:
-[  446.324466]  <TASK>
-[  446.324646]  ? __die+0x23/0x70
-[  446.324881]  ? page_fault_oops+0x173/0x4f0
-[  446.325175]  ? _raw_spin_unlock_irq+0xe/0x30
-[  446.325475]  ? exc_page_fault+0x76/0x170
-[  446.325752]  ? asm_exc_page_fault+0x26/0x30
-[  446.326048]  ? release_task+0x3b/0x560
-[  446.326321]  ? release_task+0x34/0x560
-[  446.326589]  do_exit+0x6fd/0xad0
-[  446.326832]  do_group_exit+0x30/0x80
-[  446.327100]  get_signal+0x8de/0x8e0
-[  446.327355]  arch_do_signal_or_restart+0x3e/0x240
-[  446.327680]  syscall_exit_to_user_mode+0x167/0x210
-[  446.328008]  do_syscall_64+0x96/0x170
-[  446.328361]  ? syscall_exit_to_user_mode+0x60/0x210
-[  446.328879]  ? do_syscall_64+0x96/0x170
-[  446.329173]  entry_SYSCALL_64_after_hwframe+0x6c/0x74
-[  446.329524] RIP: 0033:0x7feadc57e445
-[  446.329796] Code: Unable to access opcode bytes at 0x7feadc57e41b.
-[  446.330208] RSP: 002b:00007feadb3ffd38 EFLAGS: 00000202 ORIG_RAX: 00000000000001aa
-[  446.330717] RAX: 0000000000000078 RBX: 0000000000000000 RCX: 00007feadc57e445
-[  446.331184] RDX: 0000000000000001 RSI: 0000000000000078 RDI: 0000000000000000
-[  446.331642] RBP: 00007feacc002ff8 R08: 00007feadb3ffd70 R09: 0000000000000018
-[  446.332107] R10: 0000000000000019 R11: 0000000000000202 R12: 00007feadb3ffd90
-[  446.332564] R13: 0000000000000000 R14: 0000000000000000 R15: 00000000000001aa
-[  446.333022]  </TASK>
-[  446.333208] Modules linked in: isofs binfmt_misc xfs vfat fat raid0 iTCO_wdt intel_pmc_bxt iTCO_vendor_support virtio_net i2c_i801 net_fag
-[  446.334744] CR2: 0000000000000098
-[  446.335008] ---[ end trace 0000000000000000 ]---
-
-
-
-Thanks, 
-Ming
-
+>  #endif /* CONFIG_IO_URING */
+> +
+> +/**
+> + * security_initramfs_populated() - Notify LSMs that initramfs has been loaded
+> + *
+> + * Tells the LSMs the initramfs has been unpacked into the rootfs.
+> + */
+> +void security_initramfs_populated(void)
+> +{
+> +	call_void_hook(initramfs_populated);
+> +}
