@@ -1,121 +1,87 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AD224A12
-	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 08:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C8B25761;
+	Mon, 18 Mar 2024 08:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710749790; cv=none; b=al1pnL/EpFzOp+I6kXp3I9GZPEyGOgjNfALmEvhG3unuv47b9HQVvGg5QC0gh7oSE4ccapaIdPTMUexKrwYc5NnZxK2lwKGoy2TG9T9EmC7BmUb3dEjFcYXtHfQV3Uq33hwl2Moa82Dl6PL3ZPTkXCE7O4oe+EKwncULx24YTk0=
+	t=1710750375; cv=none; b=KJ5/rihAIfhXwcyAjcZAcjr/KFUEsCyH5H15MMSpkiu9lLmApCW8jdliwKotzMBOLpRLVe1BbcBs4Pk3J+FwqnczIQaUbdgO5hk/P/TcGlJMTXfFxdjeL+sWOV7N4f5jtT4tKjxZkompDSeGXLMSyCcMqxw7nFiR3LeFKDNO5v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710749790; c=relaxed/simple;
-	bh=mKrxp3truYVmDmpSkN2ScxD2wMgfS4EoRtDZY1NDc48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aRgi6VUMdDxc/9NhWQlHwglnCbOlLKqBd1x80hK1aNeWu6f8GTmcIFXHbiLNAy+ZuZATgOJl6zxK5bX3L+Goyq4F6ARtMY9RCVI30Vj0ZKL6kxMnfajKCHbV5ihrGl0Evy9lUx9tk7HWXVFT4HExIiMALamuGRSbJgYA1K6b3kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AGENdfiC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AGENdfiC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710749787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SuatqHknr3M7MI3gKLtEOBpSnUIgE6yeZH2RkY5PI1I=;
-	b=AGENdfiCCM6+gG64MhDeRwjtTpP04Tz5GkFNuRHs4f2pm1MBkrpX8SFnlvhZRWxABXDUSN
-	YdImo/leEGqN6BXCU9oyxpoyvO2geLvxLxMI0xbS4LBoeYNZ56QFBF9uMYic+UWj/fbS2E
-	Id72YVCZ11a4SvryIumIJtoe8EFudCY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-qQz0KaRTMRK9nduzQ9JXYw-1; Mon, 18 Mar 2024 04:16:23 -0400
-X-MC-Unique: qQz0KaRTMRK9nduzQ9JXYw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CE6A9800262;
-	Mon, 18 Mar 2024 08:16:22 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 96544C017A0;
-	Mon, 18 Mar 2024 08:16:19 +0000 (UTC)
-Date: Mon, 18 Mar 2024 16:16:10 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v2 05/14] ublk: don't hard code IO_URING_F_UNLOCKED
-Message-ID: <Zff4ShMEcL1WKZ1Q@fedora>
-References: <cover.1710720150.git.asml.silence@gmail.com>
- <a3928d3de14d2569efc2edd7fb654a4795ae7f86.1710720150.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1710750375; c=relaxed/simple;
+	bh=n/+BUC7RfmYBK8x7pBrx9xX40ouKwNH/toP128a3gAM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NmH0adGXYh9LTouv48c4VrQNITt9U8nP8kx652le3gV4pOLbxpKmgQN5K0Qzd0EHozjlvsiV3wd1dGVr4AYo+QEa9f2bLkKc+hal5ehMQS71T7nTFkotZNA+C7r9MQMC7fORyaenFQ0YlTdk6ZzoOu09UqoWVSrgl6ceHEg2uLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34175878e3cso332100f8f.0;
+        Mon, 18 Mar 2024 01:26:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710750369; x=1711355169;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a9kyHu1UWlkDyox3goz2HfEhPT5QiJkRChK6QBLxt3w=;
+        b=AINyOZrWcz0UuTgZuzYZ8a1y1lEKANBQjz1QFetq7VihZHbXDDha9JJ6Wxu9NdFgbs
+         TedidoqcgDB/l8x61aLLVbCXvKXjlQgYbYJLr9MTI8LZ/KJRyCwag8FdfHhzwzTr8GNN
+         O+ptu0tSRsMCqNwhj1C2otjwz4lII5QTIhLgDLiREu5Drc7ZP+DDzj/H4477IqF5dvuw
+         8k7ewIJ5cbrbxLu4GtYgHwcjQ5t39khEQQbl5stI4GF222GLuQd1YkN3CHfy4HNc/hVQ
+         MC5fKs7BkTLdHW7/P9cUtB4ZKSL8nxQOeA/zyHB2llQpIjkAIkUWetx7Ac49a0ai2XtH
+         dn+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVA+qOVFH+8X7yJmpqiBeBrkf5aujyhdgx7juK2Ej2eUs/Hr5oqR8+HMgqilGsUJm4JTOQt/inL6oNk/JF0O+v3VVvmQ7MAgLdjfyNvdulluJTtyXk0zDV+lVbma9nHgX9Dw4pUvf9f7a/RQK6jabePUsmYiWMN3bYuEWBD4foKhPM=
+X-Gm-Message-State: AOJu0Yz/eu0EChZfI1jnIYrzwp/ILxqr3+y6T+Yzj+6o2o85ttCO9w2T
+	HWPL6sMQCIdbhGqid69jmk0jsSxfThKaQfVzucqpy0Zql9IihDybeY8oTx/p
+X-Google-Smtp-Source: AGHT+IHDewQohYECkFvf872qtt3onRjjtDOZf4w7eiCEgZ9ol4tMs/dOGH40E5nWYdXZI0jREKc84w==
+X-Received: by 2002:a05:6000:22d:b0:33d:d4c2:8ba5 with SMTP id l13-20020a056000022d00b0033dd4c28ba5mr6717194wrz.5.1710750368888;
+        Mon, 18 Mar 2024 01:26:08 -0700 (PDT)
+Received: from [10.16.0.238] ([5.32.53.74])
+        by smtp.gmail.com with ESMTPSA id f1-20020a5d4dc1000000b0033e99b7cfa8sm4062318wru.13.2024.03.18.01.26.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Mar 2024 01:26:08 -0700 (PDT)
+Message-ID: <f1be501c-51fa-4a0b-a11f-893b185571c5@linux.com>
+Date: Mon, 18 Mar 2024 12:26:05 +0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a3928d3de14d2569efc2edd7fb654a4795ae7f86.1710720150.git.asml.silence@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] floppy: remove duplicated code, unlock_fdc() function has
+ the same code "do_floppy = NULL" inside.
+Content-Language: en-US
+To: Yufeng Wang <wangyufeng@kylinos.cn>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: inux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20240318060453.18538-1-wangyufeng@kylinos.cn>
+From: Denis Efremov <efremov@linux.com>
+In-Reply-To: <20240318060453.18538-1-wangyufeng@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 18, 2024 at 12:41:50AM +0000, Pavel Begunkov wrote:
-> uring_cmd implementations should not try to guess issue_flags, just use
-> a newly added io_uring_cmd_complete(). We're loosing an optimisation in
-> the cancellation path in ublk_uring_cmd_cancel_fn(), but the assumption
-> is that we don't care that much about it.
-> 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Link: https://lore.kernel.org/r/2f7bc9fbc98b11412d10b8fd88e58e35614e3147.1710514702.git.asml.silence@gmail.com
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Hello,
+
+On 3/18/24 10:04, Yufeng Wang wrote:
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Yufeng Wang <wangyufeng@kylinos.cn>
 > ---
->  drivers/block/ublk_drv.c | 18 ++++++++----------
->  1 file changed, 8 insertions(+), 10 deletions(-)
+>  drivers/block/floppy.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index bea3d5cf8a83..97dceecadab2 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1417,8 +1417,7 @@ static bool ublk_abort_requests(struct ublk_device *ub, struct ublk_queue *ubq)
->  	return true;
->  }
->  
-> -static void ublk_cancel_cmd(struct ublk_queue *ubq, struct ublk_io *io,
-> -		unsigned int issue_flags)
-> +static void ublk_cancel_cmd(struct ublk_queue *ubq, struct ublk_io *io)
->  {
->  	bool done;
->  
-> @@ -1432,15 +1431,14 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq, struct ublk_io *io,
->  	spin_unlock(&ubq->cancel_lock);
->  
->  	if (!done)
-> -		io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0, issue_flags);
-> +		io_uring_cmd_complete(io->cmd, UBLK_IO_RES_ABORT, 0);
->  }
->  
->  /*
->   * The ublk char device won't be closed when calling cancel fn, so both
->   * ublk device and queue are guaranteed to be live
->   */
-> -static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd,
-> -		unsigned int issue_flags)
-> +static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd)
->  {
->  	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
->  	struct ublk_queue *ubq = pdu->ubq;
-> @@ -1464,7 +1462,7 @@ static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd,
->  
->  	io = &ubq->ios[pdu->tag];
->  	WARN_ON_ONCE(io->cmd != cmd);
-> -	ublk_cancel_cmd(ubq, io, issue_flags);
-> +	ublk_cancel_cmd(ubq, io);
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index 1b399ec8c07d..25c9d85667f1 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -2787,7 +2787,6 @@ static void redo_fd_request(void)
+>  		pending = set_next_request();
+>  		spin_unlock_irq(&floppy_lock);
+>  		if (!pending) {
+> -			do_floppy = NULL;
+>  			unlock_fdc();
+>  			return;
+>  		}
 
-.cancel_fn is always called with .uring_lock held, so this 'issue_flags' can't
-be removed, otherwise double task run is caused because .cancel_fn
-can be called multiple times if the request stays in ctx->cancelable_uring_cmd.
-
+I'll answer to the 2nd email.
 
 Thanks,
-Ming
-
+Denis
