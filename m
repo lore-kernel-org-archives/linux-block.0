@@ -1,146 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655003BBEC
-	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 13:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EFB46448
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 13:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710767366; cv=none; b=t7YgK3R6t8PDM3qK8djlegGfQToexLPO+aEJ6/VN7cb0jP8J2nv3ndLlej7Zok1Yhg1ImxO/yQ9TboCep1836xRAaMNPSugd0w+fgmvxdbabWHtd8awbbXESOz7TrvSOYlUWm60UZ41Ulcaug050V5v85kvjDf/LwX84Dto2bj0=
+	t=1710768398; cv=none; b=YlCO9oEcCOZABj4ZfwX98JeNXnYEbkDBmeA1vSZ8H7Vivcjn2M4J6+HRnaoGxoyAtQFIY+pNfyoYdidKWgHCXLRR0fFBIcefllwtFS9numQfsaILp8jmG4QHwx83LioAflakUcwtp0fTWK/GpzkLg7v0ftqqY+CAnIj96/Af4hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710767366; c=relaxed/simple;
-	bh=hJElC500Oh1Bze9bUIMFtwY5VkHf28yG0Rl9qY2GJCs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aOUhHvkKzjApOIAEBNOuB+DFVyIAadUfIu7RXomG1NDTX1hUERqt2mAz+biXlUmsDAoQ+CCUa9XI3tmH+l2xFnAF93o+DcrViZ/46i//CytbdsJ42fTQQCCNkF46bOVuy9Usrj8gkVQ6REYcq1m9jCA0tRUmTXoRMWq0wZlrE+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IJA6lbFE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1710768398; c=relaxed/simple;
+	bh=KBawqmx5ROMf0Pxv/ZnkwVrxI83Je3L3VlDjZ4KJsVo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=SoVNfRDpDXADzuR7qQgpSYqnJxtyzHZvMxaR3G7SOxVqLPwaD4ajGi9+BneOI4oIG9jw5AkJcOKf66Xszwt6o2uOGiw4xQPGlzggQtXNmeQU26M31jz1UDzsnSJb7yMLCm1M0HVyvYylVX0qBmlaUHLjrD84Y5lyxnX+mrX7uj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=MAA12Nud; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJA6lbFE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710767363;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uY1lsgNsf7yDMTJWeqSlsz30bRR/907IGKcgLNq2lx8=;
-	b=IJA6lbFEXEt6mQKafhzLMgp5lxKsKuoXD1sJTbtrknIRClG520NRr7yK6JEmlEz2m+gAIj
-	aQYanHvKh3ycDgjvAMYaTmkpOOmO9A/LXFSjVXgsixYvhJdYQzRWoGprrOmD3YjbohqdaN
-	b4pk9AFteZ+ovxuw4PfLLDm+dd80sBc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-195-6Hpz_UPtNLuckTpbncqqJA-1; Mon, 18 Mar 2024 09:09:18 -0400
-X-MC-Unique: 6Hpz_UPtNLuckTpbncqqJA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 417CE185A784;
-	Mon, 18 Mar 2024 13:09:18 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2722D2166B32;
-	Mon, 18 Mar 2024 13:09:14 +0000 (UTC)
-Date: Mon, 18 Mar 2024 21:09:06 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v2 03/14] io_uring/cmd: make io_uring_cmd_done irq safe
-Message-ID: <Zfg88tNCwevp5cHj@fedora>
-References: <cover.1710720150.git.asml.silence@gmail.com>
- <faeec0d1e7c740a582f51f80626f61c745ed9a52.1710720150.git.asml.silence@gmail.com>
- <Zff25z0fPGBPfJs1@fedora>
- <4c6a5b55-2833-4ef7-a514-577fe61160dd@gmail.com>
- <Zfgsk8mND0cah3DP@fedora>
- <1f5c02ad-f25a-46ea-96e6-649997aea3c2@gmail.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="MAA12Nud"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240318132633epoutp02da774d2066625c3cd24885a45ab32339~93sobXPbh0430304303epoutp02Z
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 13:26:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240318132633epoutp02da774d2066625c3cd24885a45ab32339~93sobXPbh0430304303epoutp02Z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1710768393;
+	bh=KBawqmx5ROMf0Pxv/ZnkwVrxI83Je3L3VlDjZ4KJsVo=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=MAA12NudkcBYwMUhclUDG/qgjga5y3FoN63Z+ilU2ZZtq4AS/GiRBGaJ1oYNc1Dug
+	 g1v3byT8yYAytEhAOcgdLEqSrh4At7GenXQmJFFdd2GhTmusMvgz3+2OCVzlac38VN
+	 /AXRvyZvFrXg8vAad2V4E8MIwGiB4QbLnvanCKCQ=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240318132632epcas5p48223bf2917a1bad4fb5a7b37a3940e18~93snsJzkY1066410664epcas5p4A;
+	Mon, 18 Mar 2024 13:26:32 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.178]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4Tywc64CPSz4x9Pt; Mon, 18 Mar
+	2024 13:26:30 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	BF.76.08600.60148F56; Mon, 18 Mar 2024 22:26:30 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20240318132630epcas5p306a62941c18a9620e5245f551956c787~93sl0pEjT2004020040epcas5p3Z;
+	Mon, 18 Mar 2024 13:26:30 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240318132630epsmtrp14c9867b8372c25f23992e0867c773fb5~93sl0E1wm1771517715epsmtrp1N;
+	Mon, 18 Mar 2024 13:26:30 +0000 (GMT)
+X-AuditID: b6c32a44-921fa70000002198-77-65f84106e76f
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	DF.F4.19234.60148F56; Mon, 18 Mar 2024 22:26:30 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240318132629epsmtip1de5b434ec2950cf60bac895c6e7398c6~93sk8KWo80842408424epsmtip1G;
+	Mon, 18 Mar 2024 13:26:29 +0000 (GMT)
+Message-ID: <7a89d6f5-1c8f-2549-f435-61d334837934@samsung.com>
+Date: Mon, 18 Mar 2024 18:56:28 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f5c02ad-f25a-46ea-96e6-649997aea3c2@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v2 06/14] nvme/io_uring: don't hard code
+ IO_URING_F_UNLOCKED
+Content-Language: en-US
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Ming Lei
+	<ming.lei@redhat.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <e2939a17b63f9347ba3c1c193c4a9306c3ba0845.1710720150.git.asml.silence@gmail.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjk+LIzCtJLcpLzFFi42LZdlhTU5fN8UeqwceZ8hZzVm1jtFh9t5/N
+	4l3rORaLvbe0LQ5NbmZyYPXYOesuu8fls6Ue7/ddZfP4vEkugCUq2yYjNTEltUghNS85PyUz
+	L91WyTs43jne1MzAUNfQ0sJcSSEvMTfVVsnFJ0DXLTMHaKuSQlliTilQKCCxuFhJ386mKL+0
+	JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtjxp/lLAXtTBXnvr5ga2C8
+	x9jFyMEhIWAiMeuMRBcjF4eQwG5GiZmvtjJCOJ8YJR50HWWGc67On8HWxcgJ1rF4xk4WEFtI
+	YCejxKynchBFbxklJjx6zQqS4BWwk3h+qIsJxGYRUJVoOd3CAhEXlDg58wmYLSqQLPGz6wDY
+	UGGBIIk1zQvAbGYBcYlbT+YzgZwnIuAqseKTCojJLBAv0XJLD8RkE9CUuDC5FKSYUyBWYuue
+	bnaIRnmJ7W/ngJ0sIfCSXWLJlS+MECe7SHy+uw7qfGGJV8e3sEPYUhIv+9ug7GSJSzPPMUHY
+	JRKP9xyEsu0lWk/1M0OcoCmxfpc+xC4+id7fT5ggYcgr0dEmBFGtKHFv0lNWCFtc4uGMJVC2
+	h8TFV0uZIAH1gFHix+WLTBMYFWYhhcksJL/PQvLOLITNCxhZVjFKphYU56anJpsWGOallsMj
+	Ozk/dxMjOEFquexgvDH/n94hRiYOxkOMEhzMSiK8rmJfU4V4UxIrq1KL8uOLSnNSiw8xmgIj
+	ZyKzlGhyPjBF55XEG5pYGpiYmZmZWBqbGSqJ875unZsiJJCeWJKanZpakFoE08fEwSnVwKQk
+	Mz3yoyj76wbn5wru9wI550yMDS5l+f5twbnLIZ8FbbYcl7LY97TfQuqlhvAX58s5r1g/N6zW
+	yAz4bOTaIvbyQOPR4Kep6yaLveacxPxtrsW35/1b56QxapaX5aR8mHfOk9n3Vtzn1irBt9L/
+	0t9L7Ln+wd1csCilxfToSXO2o2nuUnXJk55/lJ0Wxuq+yYBFKEyCafXBPypV6S2GHMvfmjkm
+	ZRk4Sbpt3qjv9kzwVs2c/I9LTohenHWPy+qATN+ZeSnbPWq2nWLUaFDJ5DdcZchWfOrXGV6l
+	rFOHTj/aJqtXfEzk6LS/v3/d21gousp2J9ehpgdfdrJZ3Vz3QPyXgZPq6rDC07sU56l13VBi
+	Kc5INNRiLipOBACU0tzFGQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrILMWRmVeSWpSXmKPExsWy7bCSnC6b449Ug49buCzmrNrGaLH6bj+b
+	xbvWcywWe29pWxya3MzkwOqxc9Zddo/LZ0s93u+7yubxeZNcAEsUl01Kak5mWWqRvl0CV8aM
+	P8tZCtqZKs59fcHWwHiPsYuRk0NCwERi8YydLF2MXBxCAtsZJabOaGGHSIhLNF/7AWULS6z8
+	95wdoug1o8SnbWtZQRK8AnYSzw91MYHYLAKqEi2nW1gg4oISJ2c+AbNFBZIlXv6ZCDZIWCBI
+	Yk3zAjYQmxlowa0n84F6OThEBFwlVnxSgQjHS6x63MoMsesBo8S57g5mkBo2AU2JC5NLQWo4
+	BWIltu7pZoeoN5Po2trFCGHLS2x/O4d5AqPQLCRXzEKybRaSlllIWhYwsqxiFE0tKM5Nz00u
+	MNQrTswtLs1L10vOz93ECI4FraAdjMvW/9U7xMjEwXiIUYKDWUmE11Xsa6oQb0piZVVqUX58
+	UWlOavEhRmkOFiVxXuWczhQhgfTEktTs1NSC1CKYLBMHp1QDk8kDsycKvnOWrLH6mT/tdOdy
+	/3t/en/P5/z0+c6BDRI2AhY7Ai3T96snZu9du5+1lP0R38PzWz48W1Zy4FjSdnVDr29VYZd2
+	tBRMimG9b+vyliXvQ9+KKyJsXavO7Y4/+ex1scXvXzaNZyoWxGy/3flS4G7Ju+qZz4w51dV1
+	/94rdt9+KuWwS+a0lcxaJ0I0lP+KsQVYdkac4woueJEqejc/yXdD8PypLG8DYlUZlaZekX8/
+	U1Z1X4Nrm90N04hnqqGJT9LfNiyXW6xnUsqn+MOC4RvbNb2e/wetOc/un+ZZqp6x6oBB1Ept
+	xao3JvFdj3fW3yxyE/tr9lHn3pmHBwLe3GiRCNj5XYCt98mbBUosxRmJhlrMRcWJAGRtzwz0
+	AgAA
+X-CMS-MailID: 20240318132630epcas5p306a62941c18a9620e5245f551956c787
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240318004348epcas5p43e669407fc4400bbc403c670104ba796
+References: <cover.1710720150.git.asml.silence@gmail.com>
+	<CGME20240318004348epcas5p43e669407fc4400bbc403c670104ba796@epcas5p4.samsung.com>
+	<e2939a17b63f9347ba3c1c193c4a9306c3ba0845.1710720150.git.asml.silence@gmail.com>
 
-On Mon, Mar 18, 2024 at 12:46:25PM +0000, Pavel Begunkov wrote:
-> On 3/18/24 11:59, Ming Lei wrote:
-> > On Mon, Mar 18, 2024 at 11:50:32AM +0000, Pavel Begunkov wrote:
-> > > On 3/18/24 08:10, Ming Lei wrote:
-> > > > On Mon, Mar 18, 2024 at 12:41:48AM +0000, Pavel Begunkov wrote:
-> > > > > io_uring_cmd_done() is called from the irq context and is considered to
-> > > > > be irq safe, however that's not the case if the driver requires
-> > > > > cancellations because io_uring_cmd_del_cancelable() could try to take
-> > > > > the uring_lock mutex.
-> > > > > 
-> > > > > Clean up the confusion, by deferring cancellation handling to
-> > > > > locked task_work if we came into io_uring_cmd_done() from iowq
-> > > > > or other IO_URING_F_UNLOCKED path.
-> > > > > 
-> > > > > Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> > > > > ---
-> > > > >    io_uring/uring_cmd.c | 24 +++++++++++++++++-------
-> > > > >    1 file changed, 17 insertions(+), 7 deletions(-)
-> > > > > 
-> > > > > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> > > > > index ec38a8d4836d..9590081feb2d 100644
-> > > > > --- a/io_uring/uring_cmd.c
-> > > > > +++ b/io_uring/uring_cmd.c
-> > > > > @@ -14,19 +14,18 @@
-> > > > >    #include "rsrc.h"on   #include "uring_cmd.h"
-> > > > > -static void io_uring_cmd_del_cancelable(struct io_uring_cmd *cmd,
-> > > > > -		unsigned int issue_flags)
-> > > > > +static void io_uring_cmd_del_cancelable(struct io_uring_cmd *cmd)
-> > > > >    {
-> > > > >    	struct io_kiocb *req = cmd_to_io_kiocb(cmd);
-> > > > >    	struct io_ring_ctx *ctx = req->ctx;
-> > > > > +	lockdep_assert_held(&ctx->uring_lock);
-> > > > > +
-> > > > >    	if (!(cmd->flags & IORING_URING_CMD_CANCELABLE))
-> > > > >    		return;
-> > > > >    	cmd->flags &= ~IORING_URING_CMD_CANCELABLE;
-> > > > > -	io_ring_submit_lock(ctx, issue_flags);
-> > > > >    	hlist_del(&req->hash_node);
-> > > > > -	io_ring_submit_unlock(ctx, issue_flags);
-> > > > >    }
-> > > > >    /*
-> > > > > @@ -44,6 +43,9 @@ void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-> > > > >    	struct io_kiocb *req = cmd_to_io_kiocb(cmd);
-> > > > >    	struct io_ring_ctx *ctx = req->ctx;
-> > > > > +	if (WARN_ON_ONCE(ctx->flags & IORING_SETUP_IOPOLL))
-> > > > > +		return;
-> > > > > +
-> > > > 
-> > > > This way limits cancelable command can't be used in iopoll context, and
-> > > > it isn't reasonable, and supporting iopoll has been in ublk todo list,
-> > > > especially single ring context is shared for both command and normal IO.
-> > > 
-> > > That's something that can be solved when it's needed, and hence the
-> > > warning so it's not missed. That would need del_cancelable on the
-> > > ->iopoll side, but depends on the "leaving in cancel queue"
-> > > problem resolution.
-> > 
-> > The current code is actually working with iopoll, so adding the warning
-> > can be one regression. Maybe someone has been using ublk with iopoll.
-> 
-> Hmm, I don't see ->uring_cmd_iopoll implemented anywhere, and w/o
-> it io_uring should fail the request:
-> 
-> int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
-> {
-> 	...
-> 	if (ctx->flags & IORING_SETUP_IOPOLL) {
-> 		if (!file->f_op->uring_cmd_iopoll)
-> 			return -EOPNOTSUPP;
-> 		issue_flags |= IO_URING_F_IOPOLL;
-> 	}
-> }
-> 
-> Did I miss it somewhere?
+On 3/18/2024 6:11 AM, Pavel Begunkov wrote:
+> uring_cmd implementations should not try to guess issue_flags, use a
+> freshly added helper io_uring_cmd_complete() instead.
 
-Looks I missed the point, now the WARN() is fine.
+NVMe interactions look/work fine.
 
-
-Thanks,
-Ming
-
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
