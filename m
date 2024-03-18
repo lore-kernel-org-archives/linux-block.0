@@ -1,101 +1,143 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1419F18029;
-	Mon, 18 Mar 2024 01:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B501CD23
+	for <linux-block@vger.kernel.org>; Mon, 18 Mar 2024 01:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710726716; cv=none; b=QF/t++r1zm7U1qRW3ajzba32HBI0GXIoKHnPDMnPvgjsPOTpmxISwkzc3g0lgGRJQuRndiHe5vVe88t9HXhm5U3awmysd6ts+CMlBi0+mqGrlOB36/DVL6VkC853quHhQiee3KgFc9sVZHD4GJ0kQ6H2PFcHP/oaxnGHeHRVz7k=
+	t=1710727152; cv=none; b=qqQq7sMxLSmyUJnB2fa3HdlaiNzBSx8gwKosFt8o9asTupUgawQSCAYfVgk205wcFPZzl2t8nGQcaUYsdJm0CyrFsp1Vj1r7Rw31pc6Rfu2mGCkghlIPOW10hLCSeHNWIENH33/Dw+gy+NkasaR7pm6P5ypU6Wzy8NduOB/PoKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710726716; c=relaxed/simple;
-	bh=rt5UEDmjpcrw9t+vzPWK0p09J3W1a+ME8M12KLx2kTg=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=WLP+fATkoQ8QFjl+PTD5NdIgFPrftopXFbPDMBNslNcia5gykMG/9IO3XP5PRuBlseSWQWFr1cqjT5cmejJGhv8i+3MZ69d+jZBLsozcLJMezgvedLQWYKispikQqpBYAICrurdT4WZAmQKft8JgNre3x4hmSBWFV3MeKGwosIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TydBS4BKxz4f3kFN;
-	Mon, 18 Mar 2024 09:51:44 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 79E311A01A7;
-	Mon, 18 Mar 2024 09:51:50 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBXKBE0nvdlSrsnHQ--.20502S3;
-	Mon, 18 Mar 2024 09:51:50 +0800 (CST)
-Subject: Re: [RFC v4 linux-next 19/19] fs & block: remove bdev->bd_inode
-To: Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: jack@suse.cz, brauner@kernel.org, axboe@kernel.dk,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
- <20240222124555.2049140-20-yukuai1@huaweicloud.com>
- <20240317213847.GD10665@lst.de>
- <022204e6-c387-b4b2-5982-970fd1ed5b5b@huaweicloud.com>
- <20240318013208.GA23711@lst.de>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
-Date: Mon, 18 Mar 2024 09:51:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1710727152; c=relaxed/simple;
+	bh=FqUgQgxrfZtI2qk5V+CbuvudPfEzb8SHu5+APKjhAeY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ic4tFSKcWd73kA0nrK5HZgr6A9Sn0Tj0bV2qDezHZ7SRtxgNihVMWvyDNkEcPqcGkhDHFGtZM6m4rXeL5vrmF1vFs7CBWU5jND9yVIzdQDRWOnO97bBjpP6vIVVBnBQ8MbKm04j3mV3uC7VqrpSOcK+VzgRXNZRh8UErTAhgenE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ff5Rlm0O; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ff5Rlm0O"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dcbef31a9dbso2479983276.1
+        for <linux-block@vger.kernel.org>; Sun, 17 Mar 2024 18:59:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1710727149; x=1711331949; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k+xmMKXEK467msfGN/zI+NTXm1eyrFZs4w/DgUrLeb0=;
+        b=ff5Rlm0OqJGTFufoNSAdBwVZgv7YQzDUK9LuTVsnWNeAxL5/lYtce8A5c+meoj3Obz
+         uqGggRKfDFZv/PGw4gSjeiFY4IeYNS+bzjThDxuKBKdBCmepGBkqQjkPw5dBgHQ8+Xsj
+         sbBqjbKUEDYtsoLeCJsyIz0qz3ZgGK4uJV7oN1ATAtVkXc5VQaW33doPJSa06C0Zdvwj
+         6JKSm4lwAVu6uEBacnUqjWkYDSa2SezmIIKE5ILy4z9ydb0MXrvDwuCGtltbZ5wNbzB4
+         n1/ovTasoLwc74tmSXWCVB1HimrCWeQVlnqVT2nbZeAn6eWRVNUMjKX/ZYD4J1K5qH0x
+         fzsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710727149; x=1711331949;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k+xmMKXEK467msfGN/zI+NTXm1eyrFZs4w/DgUrLeb0=;
+        b=JJw8cmeg0hFwbQ2imeZ62t5DmBNUZePeydLxAocwDqq0C6zn7Lgg/RIgs7Pzf06i4W
+         MatLYZ3g05T74TpDchXsI0F4cF5ghv/envI3HVQO0UV+jaReZkqOQuJOLF8vW99vRfnh
+         Dis6C1Dfjsdu5fOqZJjy0PhbqZ+Ji5pvdr+Pem5TgKblYZfF32ehxy6q4zlKXXngZy1H
+         wJb4bAgvdSOpY28INnr5ElTdrJw6eJH+gHlIVZ8rabsSYoCQJ89QYshirvXuy55g5ZTL
+         sxAWraAjrExEoI7//e3oc2WUG1nwJn5S4llqDhw2famj+HotzOLBT6GxzFI9+UrH4X4F
+         iaTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQCmXT66V6yVF3Bw/m2aBuvdzb6jVEwpGnKk+zI1wyeIo36f4OKnBnCzAf2jWWOptLe854oCTEEOww5QWSMDALd9Vs8skIB7eNjfU=
+X-Gm-Message-State: AOJu0YzMTlSaw9LPuNb3iLcj/AzA7wALNkZO1SDmYPYt4PjgeUfygVAW
+	235TWD3KgXKNkqZ2N8imeRWeTX/oSxE3LIsdhzWa4UsdpW/nKC1yi7fmb5fMNdnAlt8zIY9E5vY
+	Dwv9YeDcC/oQr4Bk+Q438qp0SCEeNRN3S7kRg
+X-Google-Smtp-Source: AGHT+IFvxqCFh/zzQZhmtHVeJ4wKXtt8mxhTmxAcg93TKyWxNqDHIDARX3X+xrhcmbPvVzgaKwOoMXL4saPB2bh9WMY=
+X-Received: by 2002:a25:abef:0:b0:dcc:e854:d454 with SMTP id
+ v102-20020a25abef000000b00dcce854d454mr8541158ybi.14.1710727148753; Sun, 17
+ Mar 2024 18:59:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240318013208.GA23711@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBXKBE0nvdlSrsnHQ--.20502S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruF18tF4xGry8WFWxWry3urg_yoWfuFXE93
-	y7uw1kJr4UX3s2yF4S9F17GrZ7JFyDWry3tF9Yqay2vw13tan5uFZ3J34xAr18tr1xKr45
-	CF1rXr98Jry7KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE
-	3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
-	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
-	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
-	ACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkI
-	wI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1U
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <1710560151-28904-1-git-send-email-wufan@linux.microsoft.com>
+ <1710560151-28904-6-git-send-email-wufan@linux.microsoft.com> <43958767-32db-4c53-8408-8367cfc14d2f@schaufler-ca.com>
+In-Reply-To: <43958767-32db-4c53-8408-8367cfc14d2f@schaufler-ca.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Sun, 17 Mar 2024 21:58:58 -0400
+Message-ID: <CAHC9VhRsOp8-C+bEH+NnRrBu_NRjJongAXZu_P2+c_OkDBs9rw@mail.gmail.com>
+Subject: Re: [RFC PATCH v15 05/21] initramfs|security: Add a security hook to do_populate_rootfs()
+To: Casey Schaufler <casey@schaufler-ca.com>
+Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, 
+	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org, 
+	axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com, 
+	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Sun, Mar 17, 2024 at 8:29=E2=80=AFPM Casey Schaufler <casey@schaufler-ca=
+.com> wrote:
+> On 3/15/2024 8:35 PM, Fan Wu wrote:
+> > This patch introduces a new hook to notify security system that the
+> > content of initramfs has been unpacked into the rootfs.
+> >
+> > Upon receiving this notification, the security system can activate
+> > a policy to allow only files that originated from the initramfs to
+> > execute or load into kernel during the early stages of booting.
+> >
+> > This approach is crucial for minimizing the attack surface by
+> > ensuring that only trusted files from the initramfs are operational
+> > in the critical boot phase.
+> >
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> >
+> > ---
+> > v1-v11:
+> >   + Not present
+> >
+> > v12:
+> >   + Introduced
+> >
+> > v13:
+> >   + Rename the hook name to initramfs_populated()
+> >
+> > v14:
+> >   + No changes
+> >
+> > v15:
+> >   + No changes
+> > ---
+> >  include/linux/lsm_hook_defs.h |  2 ++
+> >  include/linux/security.h      |  8 ++++++++
+> >  init/initramfs.c              |  3 +++
+> >  security/security.c           | 10 ++++++++++
+> >  4 files changed, 23 insertions(+)
+> >
+> > diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_def=
+s.h
+> > index 334e00efbde4..7db99ae75651 100644
+> > --- a/include/linux/lsm_hook_defs.h
+> > +++ b/include/linux/lsm_hook_defs.h
+> > @@ -450,3 +450,5 @@ LSM_HOOK(int, 0, uring_override_creds, const struct=
+ cred *new)
+> >  LSM_HOOK(int, 0, uring_sqpoll, void)
+> >  LSM_HOOK(int, 0, uring_cmd, struct io_uring_cmd *ioucmd)
+> >  #endif /* CONFIG_IO_URING */
+> > +
+> > +LSM_HOOK(void, LSM_RET_VOID, initramfs_populated, void)
+>
+> This is an awfully expensive way to set a flag. Adding a LSM hook list
+> isn't free. Isn't there a way to capture this state change through one of
+> the mount hooks?
 
-ÔÚ 2024/03/18 9:32, Christoph Hellwig Ð´µÀ:
-> On Mon, Mar 18, 2024 at 09:26:48AM +0800, Yu Kuai wrote:
->> Because there is a real filesystem(devtmpfs) used for raw block devcie
->> file operations, open syscall to devtmpfs:
->>
->> blkdev_open
->>   bdev = blkdev_get_no_open
->>   bdev_open -> pass in file is from devtmpfs
->>   -> in this case, file inode is from devtmpfs,
-> 
-> But file->f_mapping->host should still point to the bdevfs inode,
-> and file->f_mapping->host is what everything in the I/O path should
-> be using.
-> 
->> Then later, in blkdev_iomap_begin(), bd_inode is passed in and there is
->> no access to the devtmpfs file, we can't use s_bdev_file() as other
->> filesystems here.
-> 
-> We can just pass the file down in iomap_iter.private
+Unfortunately no, the initramfs isn't mounted like a traditional
+filesystem, it is "populated" by unpacking the cpio into the initramfs
+at early boot.  This LSM hook should be called exactly once during
+boot, and the performance impact should be minimal; I should also be
+wildly more performant than earlier revisions of this patchset that
+required grabbing a single spinlock on every file access.
 
-I can do this for blkdev_read_folio(), however, for other ops like
-blkdev_writepages(), I can't find a way to pass the file to
-iomap_iter.private yet.
+Of course if you have an idea on how this could be done
+differently/better I think we're all open to new ideas ...
 
-Any suggestions?
-
-Thanks,
-Kuai
-> .
-> 
-
+--=20
+paul-moore.com
