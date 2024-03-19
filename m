@@ -1,79 +1,117 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E72A381B1
-	for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 01:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F8E2F22;
+	Tue, 19 Mar 2024 01:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710812565; cv=none; b=T8Ll7Yry6O4dY+xwy4Pz9uXmUMl1SSFcUIGQYCmMbAyNn6k0WKJBdhdZ2ToeR9qQthJu1OQfrNkgJ8uCEgjCbeyHsZpJfVJI9Aym7XIWRxZZEGcmdJCGa71gzs+PP0maNQEqOuvGiK8/cv1jmo+mO+e1kn/oSDuw8vyXAce0SHQ=
+	t=1710812610; cv=none; b=oB8PaPSDQ+yUBhQ+mUd8frDmnNZis4bFqArd7eQFUY0CEzSWfIusoZs1lQUDfDjlg8UwexOTGFZ9A8utVviQIs0ZWr+lmuEGT4asR+CtW7y6Oks15ibJ96OR3g1SdSAhU7N5reE6n0BVaks8f3AbDYC7u2dfF1XtQUac/HJ7lCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710812565; c=relaxed/simple;
-	bh=xsccCYRBTxi+L3b5gS1kmw03qUdGeBWnLSPXHNmALBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JRhxCF2lcQKgbNwdR076QozGKJaTIwYGL+8YbftuE3XSLCxIXeJAdFN/9a3zSuCzXjWqngdGyIoK9sCRb50jgWVKSK3+2AQ7e/Q9jgD/6nqvFqB9oYN3Deu9NRASkMP3brxfrs/jGulqFxiN2Qj2kDDEGuKqJm0R0GoEd1rujFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SLMbdX33; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLMbdX33"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710812563;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R5aJQW0eAXgLvqMmyvs8gwyLF6UUG5gyvsg1YOINB3s=;
-	b=SLMbdX33jLXCp43DT7FxaNO+0nlXxcBnit1bDRZpOJAuL6NB9s2zh/m9/FvjPZoYqMJsjP
-	3DpUlmInqiXpoi25j9sl1cNeLAy82Z3/8moae1k7ywSUIg5xjIBeJIClP6eBTcMC3V4eH/
-	PAWN5D/uCMZ/L3jFrmbx166vHELiPMA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-WZ7bafERPYOb_DZTnbx9uw-1; Mon, 18 Mar 2024 21:42:39 -0400
-X-MC-Unique: WZ7bafERPYOb_DZTnbx9uw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E465184B163;
-	Tue, 19 Mar 2024 01:42:38 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.95])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D196C1121306;
-	Tue, 19 Mar 2024 01:42:35 +0000 (UTC)
-Date: Tue, 19 Mar 2024 09:42:26 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v3 00/13] Remove aux CQE caches
-Message-ID: <ZfjtgmBuNFmznj9O@fedora>
-References: <cover.1710799188.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1710812610; c=relaxed/simple;
+	bh=em3g8D9JGmpkhCEW6BubAq2pSMb2nx+ivC79uAbHsD0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=extBTRTUdCmdbLHAr0J61FeYTU7EJJQtP/B61SdPmKLfOrDjpVMIOur9iJGpaThpEYdIN4TdFCIBdnopzdm/VLWFTzQbArrcwujTBA/6WBsUFGUnFxw16LMvYkm1j0pjar+pA1QoRtOuupELO8aWS3c269b0whYCRdCDRcSUI/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TzDyF4SWNz4f3mHp;
+	Tue, 19 Mar 2024 09:43:17 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 7E40F1A09EB;
+	Tue, 19 Mar 2024 09:43:25 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBnOBG77fhl_lSPHQ--.38859S3;
+	Tue, 19 Mar 2024 09:43:25 +0800 (CST)
+Subject: Re: [RFC v4 linux-next 00/19] fs & block: remove bdev->bd_inode
+To: Yu Kuai <yukuai1@huaweicloud.com>, Christian Brauner <brauner@kernel.org>
+Cc: jack@suse.cz, hch@lst.de, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
+ <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
+ <20240315-assoziieren-hacken-b43f24f78970@brauner>
+ <ac0eb132-c604-9761-bce5-69158e73f256@huaweicloud.com>
+ <20240318-mythisch-pittoresk-1c57af743061@brauner>
+ <c9bfba49-9611-c965-713c-1ef0b1e305ce@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <dd4e443a-696d-b02f-44ff-4649b585ef17@huaweicloud.com>
+Date: Tue, 19 Mar 2024 09:43:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1710799188.git.asml.silence@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+In-Reply-To: <c9bfba49-9611-c965-713c-1ef0b1e305ce@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBnOBG77fhl_lSPHQ--.38859S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw1DCF1UGw17AF48uF1ftFb_yoWkXFgEvw
+	sIkas7G34DZw1jqanxtrs0yrWvkFy3Jry5t345JF13Xa1kXFyDGF4kJ3s2vwn8G3W3tF1S
+	kF4qqFy5ZrWfGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUba8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
+	Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Mar 18, 2024 at 10:00:22PM +0000, Pavel Begunkov wrote:
-> Mandate ctx locking for task_work. Then, remove aux CQE caches mostly
-> used by multishot requests and post them directly into the CQ.
+Hi,
+
+在 2024/03/19 9:18, Yu Kuai 写道:
+> Hi,
 > 
-> It's leaving some of the pre existing issue_flags and state conversion
-> non conformant chunks, which will need to clean up later.
+> 在 2024/03/18 17:39, Christian Brauner 写道:
+>> On Sat, Mar 16, 2024 at 10:49:33AM +0800, Yu Kuai wrote:
+>>> Hi, Christian
+>>>
+>>> 在 2024/03/15 21:54, Christian Brauner 写道:
+>>>> On Fri, Mar 15, 2024 at 08:08:49PM +0800, Yu Kuai wrote:
+>>>>> Hi, Christian
+>>>>> Hi, Christoph
+>>>>> Hi, Jan
+>>>>>
+>>>>> Perhaps now is a good time to send a formal version of this set.
+>>>>> However, I'm not sure yet what branch should I rebase and send this 
+>>>>> set.
+>>>>> Should I send to the vfs tree?
+>>>>
+>>>> Nearly all of it is in fs/ so I'd say yes.
+>>>> .
+>>>
+>>> I see that you just create a new branch vfs.fixes, perhaps can I rebase
+>>> this set against this branch?
+>>
+>> Please base it on vfs.super. I'll rebase it to v6.9-rc1 on Sunday.
 > 
-> v3: pass IO_URING_F_COMPLETE_DEFER to the cmd cancellation path
->     drop patch moving request cancellation list removal to tw 
->     drop all other ublk changes
+> Okay, I just see that vfs.super doesn't contain commit
+> 1cdeac6da33f("btrfs: pass btrfs_device to btrfs_scratch_superblocks()"),
+> and you might need to fix the conflict at some point.
 
-For the series, pass ublksrv test.
-
-Tested-by: Ming Lei <ming.lei@redhat.com>
-
+And there is another problem, dm-vdo doesn't exist in vfs.super yet. Do
+you still want me to rebase here?
 
 Thanks,
-Ming
+Kuai
+
+> 
+> Thanks,
+> Kuai
+> 
+>> .
+>>
+> 
+> .
+> 
 
