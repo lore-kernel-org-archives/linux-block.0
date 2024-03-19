@@ -1,78 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADF8612F6
-	for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 01:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4F4626CD;
+	Tue, 19 Mar 2024 01:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710812056; cv=none; b=rOwVS/55SIKbARzMWsa0GUrUwAqYKTs9tAT49+UFJRgou6i8Ux97Z8/CM5GPCRRsH8Gvgy20iuc/mKYlV2ZFFQsXA2+cPI2OSVqFPvKj9te/owtzPa7biqCAyjhY6XIqnrKRulHoCFiemj07eTIRP8mRSViqtcVjwIGna7PzfoA=
+	t=1710812179; cv=none; b=aUkUDyslrixPSdh1xJusZbjplTG5HNHZWsAcMpAuIl2G/tn9r4yQTq/O5pRQK7MSsmjcdC0J9/+QocFU1XyV8aklnPofx9S9Bnkaj7bWF3XyUE28X+sP1+qYi0j00EoTJtnRWXJj6TIpr/Q1HnH3t2La/UpA2VefIhSfZF29d/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710812056; c=relaxed/simple;
-	bh=8V9k8lXgPNAHSwbbO7zcFZqhQO3pjZt+ju7YG7abVnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Go8Ap5ETp851+baJc4vvxaERrLIj4M7tAV98tjMsEzxj+GGPwS2K1Di7+aleAth8dld6dTMat2Xr4icv7pvk+gdOgKgV6NckRPVKIpL3V5oQAT6Nq0+Trbw6Btu7SpvmScdWcP3iaG0zVHc0Iue2P0fJpBB3ok6cdB3G2TUlCtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dmmxM0OY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmmxM0OY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710812053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CiL47lsaFfqKLmgurxyE3/xGahJ90wedsyL49MP/HU0=;
-	b=dmmxM0OY0xwdVUehTWA36FCfv4hJwO7ip/bYZidVtjP0AIZJey1ijcpeVv1V6MuM6Jqgzg
-	Ry8AmEQRFxHJATYyXz31been1vKDmpg/hqQLQ18+mDd9IuP94yQ69gH1uEPck12OHqxlzq
-	CfG0lz5cWQ2FLbDCg5RUOoILWfMyIoY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-_39Uz9zIM-a-5qKfTjq6xQ-1; Mon, 18 Mar 2024 21:34:08 -0400
-X-MC-Unique: _39Uz9zIM-a-5qKfTjq6xQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 04D03185A781;
-	Tue, 19 Mar 2024 01:34:08 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.95])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DCF08492BC8;
-	Tue, 19 Mar 2024 01:34:04 +0000 (UTC)
-Date: Tue, 19 Mar 2024 09:33:56 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v3 02/13] io_uring/cmd: kill one issue_flags to tw
- conversion
-Message-ID: <ZfjrhIRnSD0ksbeh@fedora>
-References: <cover.1710799188.git.asml.silence@gmail.com>
- <c53fa3df749752bd058cf6f824a90704822d6bcc.1710799188.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1710812179; c=relaxed/simple;
+	bh=GzEBhKZ4LIu43FoyVX7+dAaGHt5sdgp1AOcuREBzOt0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=opGO0HTUWGQ21sSOcPAJlcz2UBuIlGG0u1Ya/sqYuKpKCaBd9oR3XIu3fjyHmH2PBBN87MxNvKDT0BOWsLziXlQtd7uRrhEI0eagSFWK7DIzmQWCoyGwPbp3o7t95+rtQdg8OJVijTeuyuvJCQVvnKxGfca8Km0Q2+Ftz+Eu2Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TzDPc5kTGz4f3kJq;
+	Tue, 19 Mar 2024 09:18:28 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 9BE671A0172;
+	Tue, 19 Mar 2024 09:18:32 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxDm5_hltIiNHQ--.22830S3;
+	Tue, 19 Mar 2024 09:18:32 +0800 (CST)
+Subject: Re: [RFC v4 linux-next 00/19] fs & block: remove bdev->bd_inode
+To: Christian Brauner <brauner@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, hch@lst.de, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
+ <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
+ <20240315-assoziieren-hacken-b43f24f78970@brauner>
+ <ac0eb132-c604-9761-bce5-69158e73f256@huaweicloud.com>
+ <20240318-mythisch-pittoresk-1c57af743061@brauner>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <c9bfba49-9611-c965-713c-1ef0b1e305ce@huaweicloud.com>
+Date: Tue, 19 Mar 2024 09:18:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c53fa3df749752bd058cf6f824a90704822d6bcc.1710799188.git.asml.silence@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+In-Reply-To: <20240318-mythisch-pittoresk-1c57af743061@brauner>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDHlxDm5_hltIiNHQ--.22830S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Wr47CFW3WF13JFWrWF48Zwb_yoWfCrgEvw
+	4akFykG34DZw1jqanxKrs0yrWDCFy3Jry5JryrJF13XayDXF98GF4kJw1kZwnxGa13KF1f
+	Cr4qqFy5ZrWfGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Mar 18, 2024 at 10:00:24PM +0000, Pavel Begunkov wrote:
-> io_uring cmd converts struct io_tw_state to issue_flags and later back
-> to io_tw_state, it's awfully ill-fated, not to mention that intermediate
-> issue_flags state is not correct.
-> 
-> Get rid of the last conversion, drag through tw everything that came
-> with IO_URING_F_UNLOCKED, and replace io_req_complete_defer() with a
-> direct call to io_req_complete_defer(), at least for the time being.
-> 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Hi,
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+在 2024/03/18 17:39, Christian Brauner 写道:
+> On Sat, Mar 16, 2024 at 10:49:33AM +0800, Yu Kuai wrote:
+>> Hi, Christian
+>>
+>> 在 2024/03/15 21:54, Christian Brauner 写道:
+>>> On Fri, Mar 15, 2024 at 08:08:49PM +0800, Yu Kuai wrote:
+>>>> Hi, Christian
+>>>> Hi, Christoph
+>>>> Hi, Jan
+>>>>
+>>>> Perhaps now is a good time to send a formal version of this set.
+>>>> However, I'm not sure yet what branch should I rebase and send this set.
+>>>> Should I send to the vfs tree?
+>>>
+>>> Nearly all of it is in fs/ so I'd say yes.
+>>> .
+>>
+>> I see that you just create a new branch vfs.fixes, perhaps can I rebase
+>> this set against this branch?
+> 
+> Please base it on vfs.super. I'll rebase it to v6.9-rc1 on Sunday.
+
+Okay, I just see that vfs.super doesn't contain commit
+1cdeac6da33f("btrfs: pass btrfs_device to btrfs_scratch_superblocks()"),
+and you might need to fix the conflict at some point.
 
 Thanks,
-Ming
+Kuai
+
+> .
+> 
 
