@@ -1,185 +1,201 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AFB208D4
-	for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 17:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B8F5FB97
+	for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 23:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710870870; cv=none; b=t91ncBaEx2GpzZNDt1jtF4Rnz3x8nkp0CL5fpoAaWAubMmEKIH99aD9b1VyPJ9fHHisJBqPC/Td+7zSjdSApKYb4GLwE4cxceqF2PWYflN486mJfjDUoL7oz8go9nD5l7TjDKCBgFD/zio5aPZuHzOT6wVFU5V4CV0l/Ded1iWY=
+	t=1710889241; cv=none; b=kIy/LTWreR5y0FH3IsFVXIDAQsEIEajIPTDJJeMhNR4Apbb1kxUlTdGrDpSeW2vVE8TeZy39KaI5aSV6aKOiwcP6jfp4/G/ky9Wy6lS/JOo2RyOfGrRmHQDdDcgwdS51/9NxeoUVP6I22pKwCFHTOSFBmH93NFPjPDcjDMz+Qgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710870870; c=relaxed/simple;
-	bh=Ao9hwGJl4g/w2wap7dwa291kK0JPcDjzl89BAK46zVI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rlcqCx4Z6NjIOcR2RdkzbZwJaLmG/XKopeq+Auo9ht3wIKFSh6zed9sX9iR9pUeftQG9bWCvXObaTMxQWCaREHPUt8+Sd/q5I8324fgtKu+LHSdfrBcnTPYzr7HeRIecDfVwWoEkmVjPPKt5xU6WHHNVc2w6w9DbnB3MND4jTDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fiSQBkCC; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1710889241; c=relaxed/simple;
+	bh=bmttXQsn7ePJrS3RSsRzViZwsDiwqJQZqSCfH7XcvBo=;
+	h=Date:Message-ID:MIME-Version:Content-Type:Content-Disposition:
+	 From:To:Cc:Subject:References:In-Reply-To; b=lWf3DkvUNYRp55GVCypSt5iDX7hMcE+H4pf4tgc00i6zzy/D+3FU0xJQDyMdjdZ7R/dvt0I8eoSqXexO3yCoB0WWCBd3nRbUC1CAFpNAdpi0Rv8ZAcXSo3D6AMAl9Ptu9Zoi2pNJcKQMl3wp9/in7czHC50fVq2Z8sIr8duvhyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ZjATGIlj; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fiSQBkCC"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3bd72353d9fso3479128b6e.3
-        for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 10:54:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ZjATGIlj"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6e674136ba4so3895334a34.2
+        for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 16:00:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1710870867; x=1711475667; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D7H3WfkclcieHpBg89GTkZxaS3r7II1qq9xezXi0hVM=;
-        b=fiSQBkCCoYVMvJ7hKOIWrIUIQtWnudcxCwuRJ3SDAmfcoUJ3LKW/OSOt0XJv0ppBom
-         r1b7EUVzGEU34UNgXl0Xub2wg6VFMC2Ly8xIcAY78NHYVcXijpAahLq3KrnWiEfepI+P
-         K3bumXlIk6qPY69qQGjZxTur6D4Xb2RFW85NT0G9m4KZ2ko8G/knkqvxD72SooihwK+Z
-         WaMPr00ehDA2unHvbCRW9HCn68HsloTpQ5rMYa4Uyj9mIfkuCzQfSnPQejaSEhgNZfAo
-         vO51olQglynGFY2d82cFKRUtHCtTWvMs7dccTYup7df0Q48rdZL147340AdvneF3HcRw
-         D7dA==
+        d=paul-moore.com; s=google; t=1710889238; x=1711494038; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=B1lUfZg/s5mLlW6pu+C9FV0f0xOiWFAgmrfGrW7+FU8=;
+        b=ZjATGIljivVKYYgwMgGMIWB8z+sQBX6k+j5wY/UdbOLwZNqYXQtQB+u8GX7wbcUz3c
+         yyG181UcJsN8akPkxvSBPlpq+Wm7yzjzOH9fxGsEXTuHdDRkl1fg3xxV3c6mt6EEy3qO
+         flasldwlS2DaSRo6xP74o3BIze2fU7/4fKCf6XGntIz+n3HjpgsgqWRLvCv4GDGzaAuB
+         6bPv4mn7C8z8pi4L0X9V/jzxVHWmzgOOr8fBWDyV67MZgmKZTmlz9poKUK86yt49af+a
+         +miRssM+ZalwSP/5FLfVo1ohugUWowN5gpnn44H/x8R0tJGQKO0pHqtbdFENRWbjnorO
+         KtGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710870867; x=1711475667;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D7H3WfkclcieHpBg89GTkZxaS3r7II1qq9xezXi0hVM=;
-        b=wJGpEI/e3QH55Rtfq3Z7sVlOqmpk/159fVnQUlHqdr+BUq7pvhi/h4RzNhpzm3EBsJ
-         xDLlCJm9xkuO2RN+m3NNkXfDIrNhuqIlRUFsVdl40u9QBP6cBgKZWx3r9Spokhp0JLvK
-         aVHOvCoUlpbTNjmKhGnhd5X6wbuWzpWRH1jvcWgK/wvahtGXioi2EjHxHkj9iidI12Q8
-         VR0TLITfmiVZfqVWKf6bge0/20/dWYqYaJq11YiFXpzE5VPpRSj3NWdrj0TxjeErfPVs
-         p+mJ0Yi0PXvOa4mSqXHxTiMFkWrDrjELZq2l03Mx5GJb6gvtnnWExpNjKnwdG4Mh2hvr
-         kPDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuiHy3x97MwhTG7R81urml8bXHK8EYcTbLoU1kjVxuky7QluvLDgkKaXg8c8jSDh3Ge8nOOTBzGPf0Equ7TykKZ9ALpHmRtXjomZs=
-X-Gm-Message-State: AOJu0YwGdu/+BaFlnmielyBMP2WtuNhzKcchIB3Qkumxsx7vPIZtJL+m
-	iyhJNgEeCV5Yd6Qda45/T4OnulLjbJvAFL7+c/TMKlHMIP5jkLEaZaX1QpIuago=
-X-Google-Smtp-Source: AGHT+IFEKHu8FJxVRb4YxsELWM46dNSxNuN3njm0tBeD+R+fEyp1j8c0yaDa2gTZMCaYT5fxKBzgBQ==
-X-Received: by 2002:a05:6870:d20e:b0:222:99cb:2215 with SMTP id g14-20020a056870d20e00b0022299cb2215mr3580439oac.28.1710870867581;
-        Tue, 19 Mar 2024 10:54:27 -0700 (PDT)
-Received: from ziepe.ca ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id gh11-20020a056638698b00b00477716fcbb8sm2429986jab.40.2024.03.19.10.54.26
+        d=1e100.net; s=20230601; t=1710889238; x=1711494038;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B1lUfZg/s5mLlW6pu+C9FV0f0xOiWFAgmrfGrW7+FU8=;
+        b=SOmcNnwGj1emIrS2V4ySF29/uzK+YT7IbCglwmd6qM2J517l1/ZmD/WTukM/0QgH6z
+         0itpLZ3H/PMK1e7wAlTijBcHehoH8Rij+YaJjS3Gp+fa2+AWdD2f0t7//vHgPZDkKrBe
+         4FoF5YK6al7CzmcK5qcrpqpzkbz8rH1GyXapZTunnTEKh0cTSWimUUhPoZqbJ5Tj0vax
+         10XwWnNfHdl39Nasy74uewCnwv2g6rQAgrSrviTMPrVmP/gHNfmd0lz4mntlBqdjjVRh
+         9zUJ0vr570GNT52xXg5rscBY+DVYyO4wJ7kyOF9jX8VlUH9kM39jCZCi54G20ep204rH
+         ejvA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8aDHayCrFU3kcKXpLMzmRvRLHB03TYwfvIRseD5TSS/haP7IAb9IAvR0BYhXC/bMw+8KNgdlQU5xYFzN6ZujSuJ1+VxGKePGn6AE=
+X-Gm-Message-State: AOJu0YwoM0/Ok4clrTi/1KYvsKKhU0IyaE+89lvZfDnYfRMgWCO37WGD
+	I39mvCBN2tX1KAZPZUGRD0EnxH9+kSPIURu2ptjTdC/f8oq4O7ojSx+Wev/USg==
+X-Google-Smtp-Source: AGHT+IH2BedFErXZvc/MdlUeUrWLnHnhWM0nrDa4rkAsKAMXW5C+nK0wePxGkm9DoXwZPu+DqNui8g==
+X-Received: by 2002:a9d:7f94:0:b0:6e6:7a82:5cf with SMTP id t20-20020a9d7f94000000b006e67a8205cfmr4422911otp.33.1710889237766;
+        Tue, 19 Mar 2024 16:00:37 -0700 (PDT)
+Received: from localhost ([70.22.175.108])
+        by smtp.gmail.com with ESMTPSA id dc33-20020a05620a522100b007885cd1c058sm5972263qkb.103.2024.03.19.16.00.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 10:54:26 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rmbVk-001elO-4L;
-	Tue, 19 Mar 2024 12:36:20 -0300
-Date: Tue, 19 Mar 2024 12:36:20 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240319153620.GB66976@ziepe.ca>
-References: <20240306154328.GM9225@ziepe.ca>
- <20240306162022.GB28427@lst.de>
- <20240306174456.GO9225@ziepe.ca>
- <20240306221400.GA8663@lst.de>
- <20240307000036.GP9225@ziepe.ca>
- <20240307150505.GA28978@lst.de>
- <20240307210116.GQ9225@ziepe.ca>
- <20240308164920.GA17991@lst.de>
- <20240308202342.GZ9225@ziepe.ca>
- <20240309161418.GA27113@lst.de>
+        Tue, 19 Mar 2024 16:00:37 -0700 (PDT)
+Date: Tue, 19 Mar 2024 19:00:36 -0400
+Message-ID: <f5cf9d285bd5f09bbc3f79b0800d37fc@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240309161418.GA27113@lst.de>
+MIME-Version: 1.0 
+Content-Type: text/plain; charset=utf-8 
+Content-Disposition: inline 
+Content-Transfer-Encoding: 8bit
+From: Paul Moore <paul@paul-moore.com>
+To: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
+Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, Fan Wu <wufan@linux.microsoft.com>
+Subject: Re: [PATCH RFC v15 12/21] security: add security_bdev_setintegrity()  hook
+References: <1710560151-28904-13-git-send-email-wufan@linux.microsoft.com>
+In-Reply-To: <1710560151-28904-13-git-send-email-wufan@linux.microsoft.com>
 
-On Sat, Mar 09, 2024 at 05:14:18PM +0100, Christoph Hellwig wrote:
-> On Fri, Mar 08, 2024 at 04:23:42PM -0400, Jason Gunthorpe wrote:
-> > > The DMA API callers really need to know what is P2P or not for
-> > > various reasons.  And they should generally have that information
-> > > available, either from pin_user_pages that needs to special case
-> > > it or from the in-kernel I/O submitter that build it from P2P and
-> > > normal memory.
-> > 
-> > I think that is a BIO thing. RDMA just calls with FOLL_PCI_P2PDMA and
-> > shoves the resulting page list into in a scattertable. It never checks
-> > if any returned page is P2P - it has no reason to care. dma_map_sg()
-> > does all the work.
+On Mar 15, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
 > 
-> Right now it does, but that's not really a good interface.  If we have
-> a pin_user_pages variant that only pins until the next relevant P2P
-> boundary and tells you about we can significantly simplify the overall
-> interface.
+> This patch introduces a new hook to save block device's integrity
+> data. For example, for dm-verity, LSMs can use this hook to save
+> the roothash signature of a dm-verity into the security blob,
+> and LSMs can make access decisions based on the data inside
+> the signature, like the signer certificate.
+> 
+> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> 
+> --
+> v1-v14:
+>   + Not present
+> 
+> v15:
+>   + Introduced
+> 
+> ---
+>  include/linux/lsm_hook_defs.h |  2 ++
+>  include/linux/security.h      | 14 ++++++++++++++
+>  security/security.c           | 28 ++++++++++++++++++++++++++++
+>  3 files changed, 44 insertions(+)
 
-Sorry for the delay, I was away..
+I'm not sure why you made this a separate patch, help?  If there is
+no significant reason why this is separate, please squash it together
+with patch 11/21.
 
-I kind of understand your thinking on the DMA side, but I don't see
-how this is good for users of the API beyond BIO.
+> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+> index c335404470dc..6808ae763913 100644
+> --- a/include/linux/lsm_hook_defs.h
+> +++ b/include/linux/lsm_hook_defs.h
+> @@ -455,4 +455,6 @@ LSM_HOOK(void, LSM_RET_VOID, initramfs_populated, void)
+>  
+>  LSM_HOOK(int, 0, bdev_alloc_security, struct block_device *bdev)
+>  LSM_HOOK(void, LSM_RET_VOID, bdev_free_security, struct block_device *bdev)
+> +LSM_HOOK(int, 0, bdev_setintegrity, struct block_device *bdev,
+> +	 enum lsm_intgr_type type, const void *value, size_t size)
+>  
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 9965b5c50df4..eaff8868766a 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -83,6 +83,10 @@ enum lsm_event {
+>  	LSM_POLICY_CHANGE,
+>  };
+>  
+> +enum lsm_intgr_type {
+> +	__LSM_INTGR_MAX
+> +};
+> +
+>  /*
+>   * These are reasons that can be passed to the security_locked_down()
+>   * LSM hook. Lockdown reasons that protect kernel integrity (ie, the
+> @@ -511,6 +515,9 @@ int lsm_fill_user_ctx(struct lsm_ctx __user *uctx, u32 *uctx_len,
+>  		      void *val, size_t val_len, u64 id, u64 flags);
+>  int security_bdev_alloc(struct block_device *bdev);
+>  void security_bdev_free(struct block_device *bdev);
+> +int security_bdev_setintegrity(struct block_device *bdev,
+> +			       enum lsm_intgr_type type, const void *value,
+> +			       size_t size);
+>  #else /* CONFIG_SECURITY */
+>  
+>  static inline int call_blocking_lsm_notifier(enum lsm_event event, void *data)
+> @@ -1495,6 +1502,13 @@ static inline void security_bdev_free(struct block_device *bdev)
+>  {
+>  }
+>  
+> +static inline int security_bdev_setintegrity(struct block_device *bdev,
+> +					     enum lsm_intgr_type, type,
+> +					     const void *value, size_t size)
+> +{
+> +	return 0;
+> +}
+> +
+>  #endif	/* CONFIG_SECURITY */
+>  
+>  #if defined(CONFIG_SECURITY) && defined(CONFIG_WATCH_QUEUE)
+> diff --git a/security/security.c b/security/security.c
+> index 4274bbee40d0..8d88529ac904 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -5637,6 +5637,34 @@ void security_bdev_free(struct block_device *bdev)
+>  }
+>  EXPORT_SYMBOL(security_bdev_free);
+>  
+> +/**
+> + * security_bdev_setintegrity() - Set the bdev's integrity data
 
-How will this make RDMA better? We have one MR, the MR has pages, the
-HW doesn't care about the SW distinction of p2p, swiotlb, direct,
-encrypted, iommu, etc. It needs to create one HW page list for
-whatever user VA range was given.
+Let's just say "Set the device's integrity data" and not ask people to
+figure out "bdev", although I will admit it should be fairly obvious :)
 
-Or worse, whatever thing is inside a DMABUF from a DRM
-driver. DMABUF's can have a (dynamic!) mixture of P2P and regular
-AFAIK based on the GPU's migration behavior.
+> + * @bdev: block device
+> + * @type: type of integrity, e.g. hash digest, signature, etc
+> + * @value: the integrity value
+> + * @size: size of the integrity value
+> + *
+> + * Register a verified integrity measurement of a bdev with the LSM.
+> + *
+> + * Return: Returns 0 on success, negative values on failure.
+> + */
+> +int security_bdev_setintegrity(struct block_device *bdev,
+> +			       enum lsm_intgr_type type, const void *value,
+> +			       size_t size)
+> +{
+> +	int rc = 0;
+> +	struct security_hook_list *p;
+> +
+> +	hlist_for_each_entry(p, &security_hook_heads.bdev_setintegrity, list) {
+> +		rc = p->hook.bdev_setintegrity(bdev, type, value, size);
+> +		if (rc)
+> +			return rc;
+> +	}
+> +
+> +	return LSM_RET_DEFAULT(bdev_setintegrity);
 
-Or triple worse, ODP can dynamically change on a page by page basis
-the type depending on what hmm_range_fault() returns.
+We can just use the call_int_hook() macro here instead of open coding
+everything, right?
 
-So I take it as a requirement that RDMA MUST make single MR's out of a
-hodgepodge of page types. RDMA MRs cannot be split. Multiple MR's are
-not a functional replacement for a single MR.
+> +}
+> +EXPORT_SYMBOL(security_bdev_setintegrity);
+> +
+>  #ifdef CONFIG_PERF_EVENTS
+>  /**
+>   * security_perf_event_open() - Check if a perf event open is allowed
+> -- 
+> 2.44.0
 
-Go back to the start of what are we trying to do here:
- 1) Make a DMA API that can support hmm_range_fault() users in a
-    sensible and performant way
- 2) Make a DMA API that can support RDMA MR's backed by DMABUF's, and
-    user VA's without restriction
- 3) Allow to remove scatterlist from BIO paths
- 4) Provide a DMABUF API that is not scatterlist that can feed into
-    the new DMA API - again supporting DMABUF's hodgepodge of types.
-
-I'd like to do all of these things. I know 3 is your highest priority,
-but it is my lowest :)
-
-So, if the new API can only do uniformity I immediately loose #1 -
-hmm_range_fault() can't guarentee anything, so it looses the IOVA
-optimization that Leon's patches illustrate.
-
-For uniformity #2 probably needs multiple DMA API "transactions". This
-is doable, but it is less performant than one "transaction".
-
-#3 is perfectly happy because BIO already creates uniformity
-
-#4 is like #2, there is not guarenteed uniformity inside DMABUF so
-every DMABUF importer needs to take some complexity to deal with
-it. There are many DMABUF importers so this feels like a poor API
-abstraction if we force everyone there to take on complexity.
-
-So I'm just not seeing why this would be better. I think Leon's series
-shows the cost of non-uniformity support is actually pretty
-small. Still, we could do better, if the caller can optionally
-indicate it knows it has uniformity then that can be optimized futher.
-
-I'd like to find something that works well for all of the above, and I
-think abstracting non-uniformity at the API level is important for the
-above reasons.
-
-Can we tweak what Leon has done to keep the hmm_range_fault support
-and non-uniformity for RDMA but add a uniformity optimized flow for
-BIO?
-
-Jason
+--
+paul-moore.com
