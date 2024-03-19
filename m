@@ -1,166 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021E664CE1
-	for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 02:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA2764CF3;
+	Tue, 19 Mar 2024 02:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710814980; cv=none; b=QenL/lGMOyZxNw1gnTIEjF2+uyxeYJDzpeh5cPlKXDsxLediShk1BzuBAAxpcgeCqAduBYKtwteKyXkgEZf83FRBFoE6TlNeP/yw9VQTkbrkFmrcFKeK9fmCS8U1HzSoAm+15KXufKq4zj4N/KyOI+9ppy1s2EdkeIYi8o42GfI=
+	t=1710815268; cv=none; b=FMunqHrHT8/FoamhLBWzV4kmHQebVwpIc6Zat/JOaTBELNFRlmnz/0mlA//No4mgVVP+iPloOyOU99ss78mddU4oDfzqQhaBqH66ZIj+gE7EGjw/mEShtk/HnM3HhEmdTcSSMVUL6phtHWqSGbBZCQ9UpsO/zZveVTs1VFV5v2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710814980; c=relaxed/simple;
-	bh=9E9Mm1HUrBSC34QY5qjUm6nKWfEs8EDhBnP3Z7GzAHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=VOdETYc11A19vQerGmUGjKh9ylEETZ25rU8kD6hiH3riBW/IqSouJv62AuQUsAmn+ipDvkppMxdJ7FUcNMbQQrE9j7+tjs36I0X58bwqCNSysR2bWyGrXTXPa8Zuh8Jn8tLrHcYjRV1V2y2LqgX5HwpneHFFwXxaSMfGM8NShqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WctUnj5N; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WctUnj5N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2C65C433F1;
-	Tue, 19 Mar 2024 02:22:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710814979;
-	bh=9E9Mm1HUrBSC34QY5qjUm6nKWfEs8EDhBnP3Z7GzAHQ=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=WctUnj5NTfNGhERrZWKCpj0ubA4ajr2YTSBjJnZUAFzEmtQQRavcduhLwEj23rotS
-	 i0iSOMpRhKOUfSNpyG8lv/PaQV5H5DnIQkVGWgULuYI4AOIwSfWJmXzp3OzTuxs4dc
-	 +b3XB9ei6fVLMCK8fqQHw7cR6V5Lo7OMF0vbfGoXXYC8WcpKlJTbGK4f+rM/uLSwpW
-	 h2++MYIkRQImeOlgbJ0RnAmaZMgE5khBkEYin2apWm1nWen2ewD/ILzPiwKeXRJW0k
-	 weMW101IpPJ3c8wSFOaSnMPzWnbuIBVbXFvndAALiASrkUgqSx3fUJ/YzkTQuLaf1J
-	 VhwbPsaauceow==
-Message-ID: <f4f1cfac-8520-47a1-ad18-b9922aa0545d@kernel.org>
-Date: Tue, 19 Mar 2024 10:22:54 +0800
+	s=arc-20240116; t=1710815268; c=relaxed/simple;
+	bh=KlK6RRY+rznZ+X+XX2ZR9KnlLvHxiYkumw+UmKTdxzM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=i2Obn7Ah07erqBOeRGJjEkY/bePCuBHYJrGJJy9AAtZ3T6x7rml1SdQcG4wSMqKmTWrzTaZZZQ6Nd7x1tGLV70sr4TnQx7uuWcfUyBG7Y4Ts0wTo0M2k/u7fThDwxHINjgKHWGJA9PcF+ygBla70oIbMDeaOr6os3sC8afTw3CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TzFxQ3kYjz4f3jZm;
+	Tue, 19 Mar 2024 10:27:38 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 5DC121A09D0;
+	Tue, 19 Mar 2024 10:27:42 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgAX6REc+PhlGo6SHQ--.49153S3;
+	Tue, 19 Mar 2024 10:27:42 +0800 (CST)
+Subject: Re: [RFC v4 linux-next 00/19] fs & block: remove bdev->bd_inode
+To: Matthew Sakai <msakai@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ Christian Brauner <brauner@kernel.org>
+Cc: jack@suse.cz, hch@lst.de, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ dm-devel@lists.linux.dev, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
+ <1324ffb5-28b6-34fb-014e-3f57df714095@huawei.com>
+ <20240315-assoziieren-hacken-b43f24f78970@brauner>
+ <ac0eb132-c604-9761-bce5-69158e73f256@huaweicloud.com>
+ <20240318-mythisch-pittoresk-1c57af743061@brauner>
+ <c9bfba49-9611-c965-713c-1ef0b1e305ce@huaweicloud.com>
+ <dd4e443a-696d-b02f-44ff-4649b585ef17@huaweicloud.com>
+ <0665f6a6-39d9-e730-9403-0348c181dd55@redhat.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <7210daac-4c0b-ce98-fe61-1c5e7c33b289@huaweicloud.com>
+Date: Tue, 19 Mar 2024 10:27:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [f2fs-dev] [bug report]WARNING: CPU: 22 PID: 44011 at
- fs/iomap/iter.c:51 iomap_iter+0x32b observed with blktests zbd/010
-Content-Language: en-US
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Yi Zhang <yi.zhang@redhat.com>, linux-block <linux-block@vger.kernel.org>,
- Jaegeuk Kim <jaegeuk@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
- "linux-f2fs-devel@lists.sourceforge.net"
- <linux-f2fs-devel@lists.sourceforge.net>
-References: <CAHj4cs-kfojYC9i0G73PRkYzcxCTex=-vugRFeP40g_URGvnfQ@mail.gmail.com>
- <esesb6dg5omj7e5sdnltnapuuzgmbdfmezcz6owsx2waqayc5q@36yhz4dmrxh6>
- <CAHj4cs874FivTdmw=VMJwTzzLFZWb4OKqvNGRN0R0O+Oiv4aYA@mail.gmail.com>
- <CAHj4cs_eOSafp0=cbwjNPR6X2342GF_cnUTcXf6RjrMnoOHSmQ@mail.gmail.com>
- <msec3wnqtvlsnfsw34uyrircyco3j3y7yb4gj75ofz5gnn57mg@qzcq5eumjwy5>
- <CAHj4cs-DC7QQH1W3KSzXS8ERMPW-6XQ9-w_Mzr1zEGF7ZZ=K3w@mail.gmail.com>
- <d6vi6aq44c4a7ekhck6zxxy4woa5q7v5bnvn5qmad7nqk7egms@ptc72tum4bks>
- <gngdj77k4picagsfdtiaa7gpgnup6fsgwzsltx6milmhegmjff@iax2n4wvrqye>
-From: Chao Yu <chao@kernel.org>
-In-Reply-To: <gngdj77k4picagsfdtiaa7gpgnup6fsgwzsltx6milmhegmjff@iax2n4wvrqye>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <0665f6a6-39d9-e730-9403-0348c181dd55@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAX6REc+PhlGo6SHQ--.49153S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJryUZryfur4xuF43uFW3KFg_yoW8Aw18p3
+	4qyFsxKr4Dtr1DA34Syw18Xw1Fyw45Xr1rXw15Xr12vryktry3tr4xKrn0kryDXrsrZr17
+	uF48t3yfXas5ZrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
+	Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 2024/3/18 13:47, Shinichiro Kawasaki via Linux-f2fs-devel wrote:
-> I confirmed that the trigger commit is dbf8e63f48af as Yi reported. I took a
-> look in the commit, but it looks fine to me. So I thought the cause is not
-> in the commit diff.
-> 
-> I found the WARN is printed when the f2fs is set up with multiple devices,
-> and read requests are mapped to the very first block of the second device in the
-> direct read path. In this case, f2fs_map_blocks() and f2fs_map_blocks_cached()
-> modify map->m_pblk as the physical block address from each block device. It
-> becomes zero when it is mapped to the first block of the device. However,
-> f2fs_iomap_begin() assumes that map->m_pblk is the physical block address of the
-> whole f2fs, across the all block devices. It compares map->m_pblk against
-> NULL_ADDR == 0, then go into the unexpected branch and sets the invalid
-> iomap->length. The WARN catches the invalid iomap->length.
-> 
-> This WARN is printed even for non-zoned block devices, by following steps.
-> 
->   - Create two (non-zoned) null_blk devices memory backed with 128MB size each:
->     nullb0 and nullb1.
->   # mkfs.f2fs /dev/nullb0 -c /dev/nullb1
->   # mount -t f2fs /dev/nullb0 "${mount_dir}"
->   # dd if=/dev/zero of="${mount_dir}/test.dat" bs=1M count=192
->   # dd if="${mount_dir}/test.dat" of=/dev/null bs=1M count=192 iflag=direct
-> 
-> I created a fix candidate patch [1]. It modifies f2fs_iomap_begin() to handle
-> map->m_pblk as the physical block address from each device start, not the
-> address of whole f2fs. I confirmed it avoids the WARN.
-> 
-> But I'm not so sure if the fix is good enough. map->m_pblk has dual meanings.
-> Sometimes it holds the physical block address of each device, and sometimes
-> the address of the whole f2fs. I'm not sure what is the condition for
-> map->m_pblk to have which meaning. I guess F2FS_GET_BLOCK_DIO flag is the
-> condition, but f2fs_map_blocks_cached() does not ensure it.
-> 
-> Also, I noticed that map->m_pblk is referred to in other functions below, and
-> not sure if they need the similar change as I did for f2fs_iomap_begin().
-> 
->    f2fs_fiemap()
->    f2fs_read_single_page()
->    f2fs_bmap()
->    check_swap_activate()
-> 
-> I would like to hear advices from f2fs experts for the fix.
-> 
-> 
-> [1]
-> 
-> diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-> index 26e317696b33..5232223a69e5 100644
-> --- a/fs/f2fs/data.c
-> +++ b/fs/f2fs/data.c
-> @@ -1569,6 +1569,7 @@ static bool f2fs_map_blocks_cached(struct inode *inode,
->   		int bidx = f2fs_target_device_index(sbi, map->m_pblk);
->   		struct f2fs_dev_info *dev = &sbi->devs[bidx];
->   
-> +		map->m_multidev_dio = true;
->   		map->m_bdev = dev->bdev;
->   		map->m_pblk -= dev->start_blk;
->   		map->m_len = min(map->m_len, dev->end_blk + 1 - map->m_pblk);
-> @@ -4211,9 +4212,11 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->   			    unsigned int flags, struct iomap *iomap,
->   			    struct iomap *srcmap)
->   {
-> +	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
->   	struct f2fs_map_blocks map = {};
->   	pgoff_t next_pgofs = 0;
-> -	int err;
-> +	block_t pblk;
-> +	int err, i;
->   
->   	map.m_lblk = bytes_to_blks(inode, offset);
->   	map.m_len = bytes_to_blks(inode, offset + length - 1) - map.m_lblk + 1;
-> @@ -4239,12 +4242,17 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->   	 * We should never see delalloc or compressed extents here based on
->   	 * prior flushing and checks.
->   	 */
-> -	if (WARN_ON_ONCE(map.m_pblk == NEW_ADDR))
-> +	pblk = map.m_pblk;
-> +	if (map.m_multidev_dio && map.m_flags & F2FS_MAP_MAPPED)
-> +		for (i = 0; i < sbi->s_ndevs; i++)
-> +			if (FDEV(i).bdev == map.m_bdev)
-> +				pblk += FDEV(i).start_blk;
-> +	if (WARN_ON_ONCE(pblk == NEW_ADDR))
->   		return -EINVAL;
-> -	if (WARN_ON_ONCE(map.m_pblk == COMPRESS_ADDR))
-> +	if (WARN_ON_ONCE(pblk == COMPRESS_ADDR))
->   		return -EINVAL;
+Hi,
 
-Shoudn't we check NEW_ADDR and COMPRESS_ADDR before multiple-device
-block address conversion?
+在 2024/03/19 10:13, Matthew Sakai 写道:
+> 
+> On 3/18/24 21:43, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2024/03/19 9:18, Yu Kuai 写道:
+>>> Hi,
+>>>
+>>> 在 2024/03/18 17:39, Christian Brauner 写道:
+>>>> On Sat, Mar 16, 2024 at 10:49:33AM +0800, Yu Kuai wrote:
+>>>>> Hi, Christian
+>>>>>
+>>>>> 在 2024/03/15 21:54, Christian Brauner 写道:
+>>>>>> On Fri, Mar 15, 2024 at 08:08:49PM +0800, Yu Kuai wrote:
+>>>>>>> Hi, Christian
+>>>>>>> Hi, Christoph
+>>>>>>> Hi, Jan
+>>>>>>>
+>>>>>>> Perhaps now is a good time to send a formal version of this set.
+>>>>>>> However, I'm not sure yet what branch should I rebase and send 
+>>>>>>> this set.
+>>>>>>> Should I send to the vfs tree?
+>>>>>>
+>>>>>> Nearly all of it is in fs/ so I'd say yes.
+>>>>>> .
+>>>>>
+>>>>> I see that you just create a new branch vfs.fixes, perhaps can I 
+>>>>> rebase
+>>>>> this set against this branch?
+>>>>
+>>>> Please base it on vfs.super. I'll rebase it to v6.9-rc1 on Sunday.
+>>>
+>>> Okay, I just see that vfs.super doesn't contain commit
+>>> 1cdeac6da33f("btrfs: pass btrfs_device to btrfs_scratch_superblocks()"),
+>>> and you might need to fix the conflict at some point.
+>>
+>> And there is another problem, dm-vdo doesn't exist in vfs.super yet. Do
+>> you still want me to rebase here?
+>>
+> 
+> The dm-vdo changes don't appear to rely on earlier patches in the 
+> series, so I think dm-vdo could incorporate the dm-vdo patch 
+> independently from the rest of the series, if that would be helpful. (I 
+> don't want to confuse things too much.) In that case it would go through 
+> the dm tree with the rest of dm-vdo.
 
->   
-> -	if (map.m_pblk != NULL_ADDR) {
-> +	if (pblk != NULL_ADDR) {
+We want to remove the 'bd_inode' field in this set. And if we want to go
+through dm tree for dm-vdo changes, we must keep the field for now.
 
-How to distinguish NULL_ADDR and valid blkaddr 0? I guess it should
-check F2FS_MAP_MAPPED flag first?
+I don't have preference, Christian will make the decision. 😉
 
 Thanks,
+Kuai
 
->   		iomap->length = blks_to_bytes(inode, map.m_len);
->   		iomap->type = IOMAP_MAPPED;
->   		iomap->flags |= IOMAP_F_MERGED;
 > 
-> _______________________________________________
-> Linux-f2fs-devel mailing list
-> Linux-f2fs-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel
+> Matt
+> 
+> .
+> 
+
