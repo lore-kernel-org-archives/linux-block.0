@@ -1,111 +1,118 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3673B1B7F5;
-	Wed, 20 Mar 2024 20:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B2312B97
+	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 21:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710966668; cv=none; b=ntTHjbstj7TqGtgJZBpKW4Gpa4iJgDUw0NILCb6BWSxva7cuYba3T96zf2JJGYPAOGa2quL59a4+jU6XDvHK5FvJ62H8WsceP6L9sVY7zSot96sxKYyYTpCc66YjYxmh8hKjDMAPGALXLAAdHQZjWb8N+DLQyvTFyBK3ChqOafA=
+	t=1710971089; cv=none; b=V2Io8WGsu6oa5oUFwoFSxpgg0lPiYhy+9a0qElNG/qO7fKaqLVIfVUYeu7oOZpi/M13eSodz+UdUNcXDC12l37UI+CONw3ZvpUzdeFOJYh9iIlsSAswWuJEFYPPS36MnKZ3+LaCKAIcEa0fdekxr+sz+lx6Qjj658a4eA11+p+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710966668; c=relaxed/simple;
-	bh=ftELp+AQpN+pT8FlMdTcA2etrhKsXPl9MtAA44puBeI=;
+	s=arc-20240116; t=1710971089; c=relaxed/simple;
+	bh=z0NFGlaV5tIEpB4HlebxDCtYtKtcVNp96Ib+g8JphIw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ijefk5s138sULWnYRdKFBJPfsky3ggqrF5mLjv+rdtxpIQqBEQ++OTUaBQUo0NNdZgYO9x45uMoPQqGzHN8+mwA+JUESfiUGBLWOOJCuirFPh7Igjpu12A6rpm6Twt7AEFA18sx0Jpx5BAwpVVck4A3MyT9/QYzwx/Lg5w5/ufg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=eJR6sbSR; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	 In-Reply-To:Content-Type; b=stEEUhkE75ZZ6rIb2FmeJ/uUjgKT9mHGd2be8Nw7WjhXio8brG+id63qlBXQ0dtBxEPzTjFju5riJYn8gD01MESvh2VmrGy7Qr3lQAWfNz7tj0C8Fi8R8sdrZj26+89abFDXs41g4LM57MABfLsnXep/8OBFp3++Nl/KJDnOM4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dsYHLFVY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="eJR6sbSR"
-Received: from [10.137.106.151] (unknown [167.220.2.23])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 8A6A720B74C3;
-	Wed, 20 Mar 2024 13:31:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8A6A720B74C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1710966666;
-	bh=LjNajcTf5mT64oJtdPlWYXohXjlD7KHbVX6iVtTNaxM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eJR6sbSRnr7jKg1NOAoDHQjhMsLt2lbwNoUurE8453RHuwOP/lav2yod0rrGbe9p7
-	 245ClYUHJ3mecsRXR37rNvTVNg31oEz2ju7BzIZHeIZvg4e6hxTcCVU/+vwVA50149
-	 LDRtRn74I/Tmd9JYCYNcR6ERNpSTh8T0MVBo+5G8=
-Message-ID: <a69805c7-7b8a-44ee-9b32-f9314b5a9763@linux.microsoft.com>
-Date: Wed, 20 Mar 2024 13:31:06 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dsYHLFVY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710971086;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9zE1ffGdRT/wxohThmFP46bxQ8xBTgdpn15gU6MCDWs=;
+	b=dsYHLFVYdDZqWrze9woTgVV9Yfs+kERUGENzltjsBL0oWDdX1X6o3Rqm7V3ev6/FFRUf1i
+	rHZZbIoXnnd9WICrZIXIBaoTYfZ6bzMl19rQ8atyLMZolsY9XV7iUKPwQbpIL/nFrNZeb1
+	b9Ncgg2wFoWLXhxFAO2PnGYlWPgWtss=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-571-WJir9G5wPqKxsN0lG7dFRw-1; Wed, 20 Mar 2024 17:44:45 -0400
+X-MC-Unique: WJir9G5wPqKxsN0lG7dFRw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6958320e157so3969386d6.1
+        for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 14:44:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710971084; x=1711575884;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9zE1ffGdRT/wxohThmFP46bxQ8xBTgdpn15gU6MCDWs=;
+        b=lTfITO0l/J9JMKzxSBxHHuLGruAyDIjvNCquZNV9SB+caBC2xT+EKYxxLC+i3eMgAs
+         YGhktMn7GD35cymeolsUsMDRFsAoB0qr35k+iqD/e4Ow/7NqGK5QAc3CZS+OqixVRRR2
+         ULmbH0mAdRQfd+EuQNCMeU9YXE5+CbBTWB4O2ELwOXkvB6hVvTeGwXB2aK0LvHT2ax0M
+         R0m+u3N8E6Y0le9pgzP1bBB1o7Ql7Sk2Pl3xSnkdik9AGH35HJGNPou2T5vITAb4LEn9
+         zVx2NW7tFXVX01VRJEdP/y3ZcgWM3IP6+/2CE/A04SL0zptlG02RWt9qF7szhTVLuo69
+         oH/w==
+X-Forwarded-Encrypted: i=1; AJvYcCWiEeLpQHvPz2y8eheOsFXj5+o0y9JQSmCQ/f2lgQebNnNXM+dHhO6zBveLxI7/hjK8gt0dnh99m3hg+M5/7Ld/3rN2b340kFk9RFc=
+X-Gm-Message-State: AOJu0Yw8hjhO10xEAwuwpIaCUtlsogME9tGkgg0mlg2LCYl30xuaK+jb
+	jyZ1gyJPBzpTouLfQfa9Ml8PxERm2pYadwUZPVd+Xm+G6OSfZPjzqYCvnLiTRaTtTjf7/OmKhyo
+	ai2BoY0I8kQk3febZ97Q6fFPbYTwIJtLnaFz6Us9QdoDQToh9NSTQ1T+4D1AapAFB/DZmaNs=
+X-Received: by 2002:a05:6214:ccf:b0:690:bde1:ab85 with SMTP id 15-20020a0562140ccf00b00690bde1ab85mr84751qvx.50.1710971084575;
+        Wed, 20 Mar 2024 14:44:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0PeKTXX7ttL8y1bFVmoRX8me9F2X6p93pvAZqvMgm2b3qfA7f6gvGdNqS3e0OOGHJdfNH9w==
+X-Received: by 2002:a05:6214:ccf:b0:690:bde1:ab85 with SMTP id 15-20020a0562140ccf00b00690bde1ab85mr84736qvx.50.1710971084252;
+        Wed, 20 Mar 2024 14:44:44 -0700 (PDT)
+Received: from [192.168.1.164] ([70.22.187.239])
+        by smtp.gmail.com with ESMTPSA id im6-20020a056214246600b0068fdb03a3a3sm8243841qvb.95.2024.03.20.14.44.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Mar 2024 14:44:43 -0700 (PDT)
+Message-ID: <cee6169f-f635-e3fb-29a7-e68829cdf1db@redhat.com>
+Date: Wed, 20 Mar 2024 17:44:43 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v15 12/21] security: add security_bdev_setintegrity()
- hook
-Content-Language: en-CA
-To: Jarkko Sakkinen <jarkko@kernel.org>, Paul Moore <paul@paul-moore.com>,
- corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
- tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com,
- snitzer@kernel.org, eparis@redhat.com
-Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
- linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- audit@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1710560151-28904-13-git-send-email-wufan@linux.microsoft.com>
- <f5cf9d285bd5f09bbc3f79b0800d37fc@paul-moore.com>
- <CZYFP5S04YTK.23AJMKWQWVCR8@kernel.org>
- <CZYFR8LEEQB1.8C0J9KCTF8CB@kernel.org>
-From: Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <CZYFR8LEEQB1.8C0J9KCTF8CB@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v4 02/39] dm vdo: add the MurmurHash3 fast hashing
+ algorithm
+Content-Language: en-US
+To: Guenter Roeck <linux@roeck-us.net>, Kenneth Raeburn <raeburn@redhat.com>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+References: <20231026214136.1067410-1-msakai@redhat.com>
+ <20231026214136.1067410-3-msakai@redhat.com>
+ <ea57f231-f78e-4a55-bf85-c5d50e17237e@roeck-us.net>
+ <CAK1Ur38jAmWo35HTNrDDAaN5Awiie9wRiPDMVrNUg6+ZM8mJ7A@mail.gmail.com>
+ <28a88525-6b06-4215-9e78-2b3d8c0d8657@roeck-us.net>
+From: Matthew Sakai <msakai@redhat.com>
+In-Reply-To: <28a88525-6b06-4215-9e78-2b3d8c0d8657@roeck-us.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
-
-On 3/20/2024 1:31 AM, Jarkko Sakkinen wrote:
-> On Wed Mar 20, 2024 at 10:28 AM EET, Jarkko Sakkinen wrote:
->> On Wed Mar 20, 2024 at 1:00 AM EET, Paul Moore wrote:
->>> On Mar 15, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
->>>>
->>>> This patch introduces a new hook to save block device's integrity
->>>> data. For example, for dm-verity, LSMs can use this hook to save
->>>> the roothash signature of a dm-verity into the security blob,
->>>> and LSMs can make access decisions based on the data inside
->>>> the signature, like the signer certificate.
->>>>
->>>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
->>>>
->>>> --
->>>> v1-v14:
->>>>    + Not present
->>>>
->>>> v15:
->>>>    + Introduced
->>>>
->>>> ---
->>>>   include/linux/lsm_hook_defs.h |  2 ++
->>>>   include/linux/security.h      | 14 ++++++++++++++
->>>>   security/security.c           | 28 ++++++++++++++++++++++++++++
->>>>   3 files changed, 44 insertions(+)
+On 3/18/24 16:54, Guenter Roeck wrote:
+> On 3/18/24 13:37, Kenneth Raeburn wrote:
+>> (resend because of accidental HTML lossage)
+>>
+>> On Thu, Mar 14, 2024 at 7:38 PM Guenter Roeck <linux@roeck-us.net> wrote:
+>>> On sparc64, with gcc 11.4, the above code results in:
 >>>
->>> I'm not sure why you made this a separate patch, help?  If there is
->>> no significant reason why this is separate, please squash it together
->>> with patch 11/21.
+>>> ERROR: modpost: "__bswapdi2" [drivers/md/dm-vdo/dm-vdo.ko] undefined!
+>>>
+>>> Guenter
 >>
->> Off-topic: it is weird to have *RFC* patch set at v15.
+>> Thanks for catching that. I don't think our team has any sparc
+>> machines readily available for testing.
+>> This is an artifact of our having imported user-mode code to use in
+>> the kernel. We should probably be using le64_to_cpup and friends, as
+>> we do elsewhere, so it doesn't try to pull in libgcc support routines.
 >>
->> RFC by de-facto is something that can be safely ignored if you don't
->> have bandwidth. 15 versions of anything that can be safely ignored
->> is by definition spamming :-) I mean just conceptually.
->>
->> So does the RFC still hold or what the heck is going on with this one?
->>
->> Haven't followed for some time now...
 > 
-> I mean if this RFC trend continues I'll just put auto-filter for this
-> thread to put straight to the bin.  There's enough non-RFC patch sets
-> to review.
+> I am kind of getting wary about reporting such issues. Should I drop
+> building dm-vdo images for sparc ? Would it be possible to add
+> "depends on BROKEN if SPARC" configuration option to indicate that
+> the code isn't expected to be buildable on sparc, much less work ?
 > 
-> BR, Jarkko
+> Thanks,
+> Guenter
+> 
 
-Sorry about the confusion with the RFC tag – I wasn't fully aware of its 
-conventional meaning and how it's perceived in terms of importance and 
-urgency. Point taken, and I'll make sure to remove the RFC tag for 
-future submissions. Definitely not my intention to clog up the workflow 
-or seem like I'm spamming.
+Could you try out the patch I just sent to see if it fixes your build 
+problem?
 
--Fan
+Matt
+
