@@ -1,237 +1,166 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A2417573
-	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 05:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E041CD07
+	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 06:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710914038; cv=none; b=fYateZE0CsZgnhc0udRLGujVs11IMvMsK1FPg9L89nOANS+gUHMfPjLgkfhjZxUK1ja4GvtFqzNFJ2QaY72ZfNu2bXnoEaDFUmlYI9KS4shhH1yjROOAfhIP9yJoZaTn77fnxC7z04EnWzezvMNonsRA4AzE9LvxcGwnO+CwvWQ=
+	t=1710915157; cv=none; b=VZvaiAF9cHaL4XImQPc0l+OvH5sknMr4PDAUqinhVYRJUED9rbGZlPU9Ay6axjqPxY06nOHkLtAHKU394Vr+xvu5XB3/IkorY5MDWAq6fjqPhis0zqcwzknn3TASQD4NnYDPEmEaPWZYWSkHFnoxpY3pAU/S5cKQSV8dW9EZMV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710914038; c=relaxed/simple;
-	bh=kC72Q3h4tUXy546tULB2wZzDaTwr0k7BoXSf5/CSh4A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PnF0Ky6fW+cZlPv/DRE63oOqDaEC093bsItMpCaUmjTQP1EkvpKvWQGYKr39Dz0np1n+P/30/T/wwwQF0nprAHbb1p5359SoBxLvGRofj8G8KQMjwl+0NvRrpc6wGXwIV73I0ovtZB1oBk19fF+SlIJn3qC//8AgFOGfW9DmZOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FKwQzHAJ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1710915157; c=relaxed/simple;
+	bh=PAlzpOmPHhJQkzIkjyKQW2X0ghWZHjtukXp/5NQquI4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pMkpMB3hDQXxm9TwHv89VnUN+H9HziZGz1Cz7WdvcMUNhbErL3einp6GR7RFM/09btyOX6Qk72KePR+eFX31wCxsxq3g5RemzKeEG/jI+wuj8b9m7RBL7u3rFdNYefLCZ4Htksg6ZvoL8CmRQ9gRSqVoMhZrMDb343bbdUzAe8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jBOhE101; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FKwQzHAJ"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42K3a71i021816;
-	Wed, 20 Mar 2024 05:53:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=EXlaoKWpgN6Av4BFc/ZP6+DVfwrVmD9nyb3gs1nY39w=;
- b=FKwQzHAJPI6TrFwNdtuLOxF247XTkpYCbdemW+08QhUc2InqxDB3T2FI+lvQNbaYLYmB
- 0mCe096UYkZuKtnFIFpr3xX/LNomIqLzMO/v729JujyBJBAnKG+74atpBiHqsAQz0KL9
- xbnFjnYn3IaWTs2TY2512T9hFr/8PygqmPPiMjzeseAlGF70Nuo2bEqXPBNhACVlhQrT
- r81qR3LGnhRCdL2qnm6hmdrGIfbZDKj2Wz/rxDkYRaZsR9+osR1x+Sd/kUQdhbST9OV9
- 3+FfbCHr019kpW4w5g0XCDpEKb2U7h/+nWh8hQrCRCzKnqGLqiCzL9H0duOzqSSywElb KQ== 
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wynmv8cpv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 05:53:34 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42K41XQd015792;
-	Wed, 20 Mar 2024 05:53:34 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wwp504ksn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 05:53:33 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42K5rV2424773322
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 20 Mar 2024 05:53:33 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3983058052;
-	Wed, 20 Mar 2024 05:53:31 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1407A5806E;
-	Wed, 20 Mar 2024 05:53:29 +0000 (GMT)
-Received: from [9.109.198.202] (unknown [9.109.198.202])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 20 Mar 2024 05:53:28 +0000 (GMT)
-Message-ID: <239228ec-6c8d-432c-905d-b477014deee3@linux.ibm.com>
-Date: Wed, 20 Mar 2024 11:23:27 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jBOhE101"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710915154;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tOt1VMPLZYO5tSSJqFsSyTEHCMG43Tcfx3+OESpeYlg=;
+	b=jBOhE101J5AaeEYuYa6JZvKF/MQgDnOO/ZCa7w8oHRA5+Sj1RFKBGoTpgSfiH7FmrtdRSh
+	XKbkYFHsmKBCfxSiFmTkVdILozHCCjBT1fUo2DEwdSH64wBNvobXCyTwqgcm7TKttdM5NQ
+	7MjgTxN80VJsEoduU4piR8LTP7YcPSg=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-371-2y5s5kfaMXmw2iguWDy3IQ-1; Wed, 20 Mar 2024 02:12:31 -0400
+X-MC-Unique: 2y5s5kfaMXmw2iguWDy3IQ-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-29df180bedcso4186257a91.3
+        for <linux-block@vger.kernel.org>; Tue, 19 Mar 2024 23:12:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710915150; x=1711519950;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tOt1VMPLZYO5tSSJqFsSyTEHCMG43Tcfx3+OESpeYlg=;
+        b=AibzoBL1c4mrDPkFt0qzoTAqIs7+k8+taXLfLzS7SivE+43QX4dDdHXzfwvg5x8j7j
+         wQY3ptehrWlGvrNnAg7HJT63zQzg/Y2KLrIBoxlaXQlsSSKLetDOipuyeHGEnGiA0tCP
+         s/S8xMnyKrp/AAos5qKM21BEUaiuXxwCJWjpQQFWdbG2R2dJVok3awqets9vuMARxA8s
+         gUOggeWRvaSRaG6+U8Pk4lqcMtHoip1sIxJGTieiK18fkt/K/NGBwxdUGM83q6xTpk2s
+         xjm71yjItd+rMQXmBaZiYDbvq84vuRIBM6UrpLJuc3T4lCdEoj1rOX1abjG694UyTKj6
+         sdnw==
+X-Gm-Message-State: AOJu0YyHplsWJSdDDtcv92EQkFSbumq3RIP1k3HOtIqRBeFcs27hus2i
+	y5yCfYnKxg6RhDGfpp6B6I0gNLbQFVA6a6fFLdOg7Vf2NDKQMglzZfe9mQfSR9Mh7LkGHvXdMSb
+	0TUNxzJgKEoUTQpp5X37oJ5C6eUFA0XmjBa+5Ac8/QKVU4/tMXJhqSSx4CeZOL0CnkehYjBVLwl
+	DvpgOsXK7XCSmWiLjQZdtJh3q/wiG55/EF3dcAhh8hTm9sbl0HHjs=
+X-Received: by 2002:a17:90b:314:b0:29d:fefa:258d with SMTP id ay20-20020a17090b031400b0029dfefa258dmr1063207pjb.2.1710915149815;
+        Tue, 19 Mar 2024 23:12:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGWeQ01gLM51NigHHGFW1PDJ7PILlwZy435IzaruK18tTgVs16+TKPhFyh55Q8DGjMSQthHtUL/+A9PEMamVxo=
+X-Received: by 2002:a17:90b:314:b0:29d:fefa:258d with SMTP id
+ ay20-20020a17090b031400b0029dfefa258dmr1063200pjb.2.1710915149439; Tue, 19
+ Mar 2024 23:12:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bug Report] nvme-cli fails re-formatting NVMe namespace
-Content-Language: en-US
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Keith Busch <kbusch@kernel.org>, axboe@fb.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Gregory Joyce <gjoyce@ibm.com>
-References: <7a3b35dd-7365-4427-95a0-929b28c64e73@linux.ibm.com>
- <Zfekbf0V5Dpsk_nf@infradead.org>
- <1a37aea5-616c-445c-a166-e2dc6fa5b8f5@linux.ibm.com>
- <ZfjLyfptPVT7wa0_@infradead.org> <ZfpHvyjT6kbQKrPF@infradead.org>
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <ZfpHvyjT6kbQKrPF@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 69DDn7EcV-b1ECi-aJBnjFSgviqqXVNX
-X-Proofpoint-GUID: 69DDn7EcV-b1ECi-aJBnjFSgviqqXVNX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-20_02,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 adultscore=0 spamscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 mlxscore=0 suspectscore=0 bulkscore=0
- mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2403140000 definitions=main-2403200042
+References: <20240319085015.3901051-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20240319085015.3901051-1-shinichiro.kawasaki@wdc.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Wed, 20 Mar 2024 14:12:17 +0800
+Message-ID: <CAHj4cs_Z_qsiAtDgX9ZK=tXmF9CJXCtXYL5qMWWhQvrAdmTRXg@mail.gmail.com>
+Subject: Re: [PATCH blktests] nbd/rc: check nbd connection with nbd-client
+ -check command
+To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Shinichiro
+
+Thanks for the fix, with this change, the issue still can be
+reproduced, here is the log:
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D98
+nbd/002 (tests on partition handling for an nbd device)      [failed]
+    runtime  1.436s  ...  0.917s
+    --- tests/nbd/002.out 2024-03-19 04:51:34.051614893 +0100
+    +++ /root/blktests/results/nodev/nbd/002.out.bad 2024-03-20
+07:01:28.769392087 +0100
+    @@ -1,4 +1,4 @@
+     Running nbd/002
+     Testing IOCTL path
+     Testing the netlink path
+    -Test complete
+    +Didn't have partition on the netlink path
+
+dmesg:
+[  737.405376] run blktests nbd/002 at 2024-03-20 07:01:27
+[  738.102997] nbd0: detected capacity change from 0 to 20971520
+[  738.122439]  nbd0:
+[  738.157483] block nbd0: NBD_DISCONNECT
+[  738.157742] block nbd0: Disconnected due to user request.
+[  738.158094] block nbd0: shutting down sockets
+[  738.206999] nbd0: detected capacity change from 0 to 20971520
+[  738.208587]  nbd0: p1
+[  738.246641] block nbd0: NBD_DISCONNECT
+[  738.246893] block nbd0: Disconnected due to user request.
+[  738.247217] block nbd0: shutting down sockets
+[  738.313979] nbd0: detected capacity change from 0 to 20971520
+[  738.315450]  nbd0: p1
+[  738.319949] block nbd0: NBD_DISCONNECT
+[  738.320244] block nbd0: Disconnected due to user request.
+[  738.320535] block nbd0: shutting down sockets
+[  738.321276] blk_print_req_error: 4 callbacks suppressed
+[  738.321280] I/O error, dev nbd0, sector 272 op 0x0:(READ) flags
+0x80700 phys_seg 30 prio class 0
+[  738.322466] I/O error, dev nbd0, sector 272 op 0x0:(READ) flags 0x0
+phys_seg 1 prio class 0
+[  738.322901] buffer_io_error: 4 callbacks suppressed
+[  738.322903] Buffer I/O error on dev nbd0, logical block 34, async page r=
+ead
+[  738.326007] I/O error, dev nbd0, sector 16 op 0x0:(READ) flags
+0x80700 phys_seg 1 prio class 0
+[  738.326916] I/O error, dev nbd0, sector 16 op 0x0:(READ) flags 0x0
+phys_seg 1 prio class 0
+[  738.327381] Buffer I/O error on dev nbd0, logical block 2, async page re=
+ad
+
+On Tue, Mar 19, 2024 at 4:50=E2=80=AFPM Shin'ichiro Kawasaki
+<shinichiro.kawasaki@wdc.com> wrote:
+>
+> _wait_for_nbd_connect() checks nbd connections by checking the existence
+> of a debugfs attribute file. However, even when the file exists, nbd
+> connections are not fully ready, and the stat command for the nbd device
+> file in the test case nbd/002 may fail with unexpected I/O errors.
+>
+> To avoid the failure, check the nbd connections not only by the debugfs
+> attribute file, but also by "nbd-client -check" command.
+>
+> Link: https://github.com/osandov/blktests/pull/134
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> ---
+>  tests/nbd/rc | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/tests/nbd/rc b/tests/nbd/rc
+> index 9c1c15b..266befd 100644
+> --- a/tests/nbd/rc
+> +++ b/tests/nbd/rc
+> @@ -43,7 +43,8 @@ _have_nbd_netlink() {
+>
+>  _wait_for_nbd_connect() {
+>         for ((i =3D 0; i < 3; i++)); do
+> -               if [[ -e /sys/kernel/debug/nbd/nbd0/tasks ]]; then
+> +               if [[ -e /sys/kernel/debug/nbd/nbd0/tasks ]] && \
+> +                          nbd-client -check /dev/nbd0 &> /dev/null; then
+>                         return 0
+>                 fi
+>                 sleep 1
+> --
+> 2.44.0
+>
 
 
-
-On 3/20/24 07:49, Christoph Hellwig wrote:
-> Can you try this patch instead?
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 00864a63447099..4bac54d4e0015b 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -2204,6 +2204,7 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_ns_info *info)
->  	}
->  
->  	if (!ret && nvme_ns_head_multipath(ns->head)) {
-> +		struct queue_limits *ns_lim = &ns->disk->queue->limits;
->  		struct queue_limits lim;
->  
->  		blk_mq_freeze_queue(ns->head->disk->queue);
-> @@ -2215,7 +2216,26 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_ns_info *info)
->  		set_disk_ro(ns->head->disk, nvme_ns_is_readonly(ns, info));
->  		nvme_mpath_revalidate_paths(ns);
->  
-> +		/*
-> +		 * queue_limits mixes values that are the hardware limitations
-> +		 * for bio splitting with what is the device configuration.
-> +		 *
-> +		 * For NVMe the device configuration can change after e.g. a
-> +		 * Format command, and we really want to pick up the new format
-> +		 * value here.  But we must still stack the queue limits to the
-> +		 * least common denominator for multipathing to split the bios
-> +		 * properly.
-> +		 *
-> +		 * To work around this, we explicitly set the device
-> +		 * configuration to those that we just queried, but only stack
-> +		 * the splitting limits in to make sure we still obey possibly
-> +		 * lower limitations of other controllers.
-> +		 */
->  		lim = queue_limits_start_update(ns->head->disk->queue);
-> +		lim.logical_block_size = ns_lim->logical_block_size;
-> +		lim.physical_block_size = ns_lim->physical_block_size;
-> +		lim.io_min = ns_lim->io_min;
-> +		lim.io_opt = ns_lim->io_opt;
->  		queue_limits_stack_bdev(&lim, ns->disk->part0, 0,
->  					ns->head->disk->disk_name);
->  		ret = queue_limits_commit_update(ns->head->disk->queue, &lim);
-> 
-
-I have just tested the above patch and it's working as expected. With the above patch,
-I don't see any issue formatting the NVMe disk with block-size of 512. Looks good to me.
-
-Thanks,
---Nilay
-
-PS: For reference, please find below test result obtained using the above patch.
---------------------------------------------------------------------------------
-
-# lspci 
-0018:01:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller PM173X
-
-# nvme list 
-Node                  Generic               SN                   Model                                    Namespace  Usage                      Format           FW Rev  
---------------------- --------------------- -------------------- ---------------------------------------- ---------- -------------------------- ---------------- --------
-/dev/nvme0n1          /dev/ng0n1            S6EUNA0R500358       1.6TB NVMe Gen4 U.2 SSD                  0x1          1.60  TB /   1.60  TB      4 KiB +  0 B   REV.SN49
-
-# nvme id-ns /dev/nvme0n1 -H 
-NVME Identify Namespace 1:
-nsze    : 0xba4d4ab0
-ncap    : 0xba4d4ab0
-nuse    : 0xba4d4ab0
-nsfeat  : 0
-  [4:4] : 0	NPWG, NPWA, NPDG, NPDA, and NOWS are Not Supported
-  [3:3] : 0	NGUID and EUI64 fields if non-zero, Reused
-  [2:2] : 0	Deallocated or Unwritten Logical Block error Not Supported
-  [1:1] : 0	Namespace uses AWUN, AWUPF, and ACWU
-  [0:0] : 0	Thin Provisioning Not Supported
-
-<snip>
-<snip>
-
-nlbaf   : 4
-flbas   : 0
-  [6:5] : 0	Most significant 2 bits of Current LBA Format Selected
-  [4:4] : 0	Metadata Transferred in Separate Contiguous Buffer
-  [3:0] : 0	Least significant 4 bits of Current LBA Format Selected
-  
-<snip>
-<snip>  
-
-LBA Format  0 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0 Best (in use)
-LBA Format  1 : Metadata Size: 8   bytes - Data Size: 4096 bytes - Relative Performance: 0x2 Good 
-LBA Format  2 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0x1 Better 
-LBA Format  3 : Metadata Size: 8   bytes - Data Size: 512 bytes - Relative Performance: 0x3 Degraded 
-LBA Format  4 : Metadata Size: 64  bytes - Data Size: 4096 bytes - Relative Performance: 0x3 Degraded 
-
-# lsblk -t /dev/nvme0n1 
-NAME    ALIGNMENT MIN-IO OPT-IO PHY-SEC LOG-SEC ROTA SCHED RQ-SIZE  RA WSAME
-nvme0n1         0   4096      0    4096    4096    0               128    0B
-                                   ^^^     ^^^ 	
-
-<< The nvme disk has block size of 4096; now format it with block size of 512
-
-# nvme format /dev/nvme0n1 --lbaf=2 --pil=0 --ms=0 --pi=0 -f 
-Success formatting namespace:1
-
->> Success formatting; no error seen
-
-# lsblk -t /dev/nvme0n1 
-NAME    ALIGNMENT MIN-IO OPT-IO PHY-SEC LOG-SEC ROTA SCHED RQ-SIZE  RA WSAME
-nvme0n1         0    512      0     512     512    0               128    0B
-                                    ^^^     ^^^
-# cat /sys/block/nvme0n1/queue/logical_block_size:512
-# cat /sys/block/nvme0n1/queue/physical_block_size:512
-# cat /sys/block/nvme0n1/queue/optimal_io_size:0
-# cat /sys/block/nvme0n1/queue/minimum_io_size:512
-
-# cat /sys/block/nvme0c0n1/queue/logical_block_size:512
-# cat /sys/block/nvme0c0n1/queue/physical_block_size:512
-# cat /sys/block/nvme0c0n1/queue/optimal_io_size:0
-# cat /sys/block/nvme0c0n1/queue/minimum_io_size:512
-
-# nvme id-ns /dev/nvme0n1 -H 
-NVME Identify Namespace 1:
-nsze    : 0xba4d4ab0
-ncap    : 0xba4d4ab0
-nuse    : 0xba4d4ab0
-nsfeat  : 0
-  [4:4] : 0	NPWG, NPWA, NPDG, NPDA, and NOWS are Not Supported
-  [3:3] : 0	NGUID and EUI64 fields if non-zero, Reused
-  [2:2] : 0	Deallocated or Unwritten Logical Block error Not Supported
-  [1:1] : 0	Namespace uses AWUN, AWUPF, and ACWU
-  [0:0] : 0	Thin Provisioning Not Supported
-
-<snip>
-<snip>
-
-nlbaf   : 4
-flbas   : 0x2
-  [6:5] : 0	Most significant 2 bits of Current LBA Format Selected
-  [4:4] : 0	Metadata Transferred in Separate Contiguous Buffer
-  [3:0] : 0x2	Least significant 4 bits of Current LBA Format Selected
-
-<snip>
-<snip>
-
-LBA Format  0 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0 Best 
-LBA Format  1 : Metadata Size: 8   bytes - Data Size: 4096 bytes - Relative Performance: 0x2 Good 
-LBA Format  2 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0x1 Better (in use)
-LBA Format  3 : Metadata Size: 8   bytes - Data Size: 512 bytes - Relative Performance: 0x3 Degraded 
-LBA Format  4 : Metadata Size: 64  bytes - Data Size: 4096 bytes - Relative Performance: 0x3 Degraded 
+--=20
+Best Regards,
+  Yi Zhang
 
