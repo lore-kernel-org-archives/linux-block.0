@@ -1,207 +1,237 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EFDF9D3
-	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 02:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A2417573
+	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 05:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710902106; cv=none; b=HJgaioUdInQ8CM+0XNHvHZ3tyexdI4MiEwlb6pomtXlDm4JkmDC17xk2WHpamzk+51CSvaBCqKgo0dtWCcAM6XhKeUxU9dQWBJ+u/t3AIskyk7FGRI41upZFp1gtaCbBxA7ewMqOVAgmxWchDyzAMZb+l7q0heZBcaarkmA0gBk=
+	t=1710914038; cv=none; b=fYateZE0CsZgnhc0udRLGujVs11IMvMsK1FPg9L89nOANS+gUHMfPjLgkfhjZxUK1ja4GvtFqzNFJ2QaY72ZfNu2bXnoEaDFUmlYI9KS4shhH1yjROOAfhIP9yJoZaTn77fnxC7z04EnWzezvMNonsRA4AzE9LvxcGwnO+CwvWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710902106; c=relaxed/simple;
-	bh=+FtuJcZDjYoxsHOkuHssLwtOO/q/pOEiv8h2bj3wQ3s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dlohffZ6JTWqrgnwIHoPeIUoz9cLYd6MfK8gKYwAeMi9a3ur4s47FuaFP/AQRvE40OYVBzSlv05RhqdKEhbJCGtAOJKy5InCC1yTs6fZ2OBEWbGwUQ4ujJeS9EdEFvRbfJ9+9auIPQrVzjONhe+zvl+nBGKt+0EduAs6RG8ydGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I+CvgoHt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1710914038; c=relaxed/simple;
+	bh=kC72Q3h4tUXy546tULB2wZzDaTwr0k7BoXSf5/CSh4A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PnF0Ky6fW+cZlPv/DRE63oOqDaEC093bsItMpCaUmjTQP1EkvpKvWQGYKr39Dz0np1n+P/30/T/wwwQF0nprAHbb1p5359SoBxLvGRofj8G8KQMjwl+0NvRrpc6wGXwIV73I0ovtZB1oBk19fF+SlIJn3qC//8AgFOGfW9DmZOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FKwQzHAJ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I+CvgoHt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710902104;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=iVOnpgBiHQNqWMYuUycLlmKFbOhzuiuFaGVkmq39BWM=;
-	b=I+CvgoHtUUDKdT0yFNVrbJFduB7RJLWD7aVfyxYgYQb6dwPi4oYDfHpeypJxIxZYwO9GCt
-	BUU7PgNWiGlUnjG62vH0HFddllyWN3HltKO1SNBPXRZFaZYzUywn8PFi9nNFBLPzU5+Q9w
-	z5KEK+YXQRr4SZYmCu0oqOuZHLorlo4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-385-OXVIwTu-PCOkEDm8GDOAyw-1; Tue, 19 Mar 2024 22:35:00 -0400
-X-MC-Unique: OXVIwTu-PCOkEDm8GDOAyw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7A938007A1;
-	Wed, 20 Mar 2024 02:34:59 +0000 (UTC)
-Received: from localhost (hp-dl380g10-01.lab.eng.pek2.redhat.com [10.73.196.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8CED5492BD3;
-	Wed, 20 Mar 2024 02:34:58 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Andrew Theurer <atheurer@redhat.com>,
-	Joe Mario <jmario@redhat.com>,
-	Sebastian Jug <sejug@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH V4] blk-mq: don't schedule block kworker on isolated CPUs
-Date: Wed, 20 Mar 2024 10:34:46 +0800
-Message-ID: <20240320023446.882006-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FKwQzHAJ"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42K3a71i021816;
+	Wed, 20 Mar 2024 05:53:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=EXlaoKWpgN6Av4BFc/ZP6+DVfwrVmD9nyb3gs1nY39w=;
+ b=FKwQzHAJPI6TrFwNdtuLOxF247XTkpYCbdemW+08QhUc2InqxDB3T2FI+lvQNbaYLYmB
+ 0mCe096UYkZuKtnFIFpr3xX/LNomIqLzMO/v729JujyBJBAnKG+74atpBiHqsAQz0KL9
+ xbnFjnYn3IaWTs2TY2512T9hFr/8PygqmPPiMjzeseAlGF70Nuo2bEqXPBNhACVlhQrT
+ r81qR3LGnhRCdL2qnm6hmdrGIfbZDKj2Wz/rxDkYRaZsR9+osR1x+Sd/kUQdhbST9OV9
+ 3+FfbCHr019kpW4w5g0XCDpEKb2U7h/+nWh8hQrCRCzKnqGLqiCzL9H0duOzqSSywElb KQ== 
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wynmv8cpv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Mar 2024 05:53:34 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42K41XQd015792;
+	Wed, 20 Mar 2024 05:53:34 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wwp504ksn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Mar 2024 05:53:33 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42K5rV2424773322
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Mar 2024 05:53:33 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3983058052;
+	Wed, 20 Mar 2024 05:53:31 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1407A5806E;
+	Wed, 20 Mar 2024 05:53:29 +0000 (GMT)
+Received: from [9.109.198.202] (unknown [9.109.198.202])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 20 Mar 2024 05:53:28 +0000 (GMT)
+Message-ID: <239228ec-6c8d-432c-905d-b477014deee3@linux.ibm.com>
+Date: Wed, 20 Mar 2024 11:23:27 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Bug Report] nvme-cli fails re-formatting NVMe namespace
+Content-Language: en-US
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <kbusch@kernel.org>, axboe@fb.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Gregory Joyce <gjoyce@ibm.com>
+References: <7a3b35dd-7365-4427-95a0-929b28c64e73@linux.ibm.com>
+ <Zfekbf0V5Dpsk_nf@infradead.org>
+ <1a37aea5-616c-445c-a166-e2dc6fa5b8f5@linux.ibm.com>
+ <ZfjLyfptPVT7wa0_@infradead.org> <ZfpHvyjT6kbQKrPF@infradead.org>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <ZfpHvyjT6kbQKrPF@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 69DDn7EcV-b1ECi-aJBnjFSgviqqXVNX
+X-Proofpoint-GUID: 69DDn7EcV-b1ECi-aJBnjFSgviqqXVNX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-20_02,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 spamscore=0 impostorscore=0
+ priorityscore=1501 phishscore=0 mlxscore=0 suspectscore=0 bulkscore=0
+ mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2403140000 definitions=main-2403200042
 
-Kernel parameter of `isolcpus=` or 'nohz_full=' are used to isolate CPUs
-for specific task, and it isn't expected to let block IO disturb these CPUs.
-blk-mq kworker shouldn't be scheduled on isolated CPUs. Also if isolated
-CPUs is run for blk-mq kworker, long block IO latency can be caused.
 
-Kernel workqueue only respects CPU isolation for WQ_UNBOUND, for bound
-WQ, the responsibility is on user because CPU is specified as WQ API
-parameter, such as mod_delayed_work_on(cpu), queue_delayed_work_on(cpu)
-and queue_work_on(cpu).
 
-So not run blk-mq kworker on isolated CPUs by removing isolated CPUs
-from hctx->cpumask. Meantime use queue map to check if all CPUs in this
-hw queue are offline instead of hctx->cpumask, this way can avoid any
-cost in fast IO code path, and is safe since hctx->cpumask are only
-used in the two cases.
+On 3/20/24 07:49, Christoph Hellwig wrote:
+> Can you try this patch instead?
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 00864a63447099..4bac54d4e0015b 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2204,6 +2204,7 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_ns_info *info)
+>  	}
+>  
+>  	if (!ret && nvme_ns_head_multipath(ns->head)) {
+> +		struct queue_limits *ns_lim = &ns->disk->queue->limits;
+>  		struct queue_limits lim;
+>  
+>  		blk_mq_freeze_queue(ns->head->disk->queue);
+> @@ -2215,7 +2216,26 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_ns_info *info)
+>  		set_disk_ro(ns->head->disk, nvme_ns_is_readonly(ns, info));
+>  		nvme_mpath_revalidate_paths(ns);
+>  
+> +		/*
+> +		 * queue_limits mixes values that are the hardware limitations
+> +		 * for bio splitting with what is the device configuration.
+> +		 *
+> +		 * For NVMe the device configuration can change after e.g. a
+> +		 * Format command, and we really want to pick up the new format
+> +		 * value here.  But we must still stack the queue limits to the
+> +		 * least common denominator for multipathing to split the bios
+> +		 * properly.
+> +		 *
+> +		 * To work around this, we explicitly set the device
+> +		 * configuration to those that we just queried, but only stack
+> +		 * the splitting limits in to make sure we still obey possibly
+> +		 * lower limitations of other controllers.
+> +		 */
+>  		lim = queue_limits_start_update(ns->head->disk->queue);
+> +		lim.logical_block_size = ns_lim->logical_block_size;
+> +		lim.physical_block_size = ns_lim->physical_block_size;
+> +		lim.io_min = ns_lim->io_min;
+> +		lim.io_opt = ns_lim->io_opt;
+>  		queue_limits_stack_bdev(&lim, ns->disk->part0, 0,
+>  					ns->head->disk->disk_name);
+>  		ret = queue_limits_commit_update(ns->head->disk->queue, &lim);
+> 
 
-Cc: Tim Chen <tim.c.chen@linux.intel.com>
-Cc: Juri Lelli <juri.lelli@redhat.com>
-Cc: Andrew Theurer <atheurer@redhat.com>
-Cc: Joe Mario <jmario@redhat.com>
-Cc: Sebastian Jug <sejug@redhat.com>
-Cc: Frederic Weisbecker <frederic@kernel.org>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Tejun Heo <tj@kernel.org>
-Tested-by: Joe Mario <jmario@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V4:
-	- improve comment & commit log as suggested by Tim
-V3:
-	- avoid to check invalid cpu as reported by Bart
-	- take current cpu(to be offline, not done yet) into account
-	- simplify blk_mq_hctx_has_online_cpu()
+I have just tested the above patch and it's working as expected. With the above patch,
+I don't see any issue formatting the NVMe disk with block-size of 512. Looks good to me.
 
-V2:
-	- remove module parameter, meantime use queue map to check if
-	all cpus in one hctx are offline
+Thanks,
+--Nilay
 
- block/blk-mq.c | 51 ++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 41 insertions(+), 10 deletions(-)
+PS: For reference, please find below test result obtained using the above patch.
+--------------------------------------------------------------------------------
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 555ada922cf0..187fbfacb397 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -28,6 +28,7 @@
- #include <linux/prefetch.h>
- #include <linux/blk-crypto.h>
- #include <linux/part_stat.h>
-+#include <linux/sched/isolation.h>
- 
- #include <trace/events/block.h>
- 
-@@ -2179,7 +2180,11 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 	bool tried = false;
- 	int next_cpu = hctx->next_cpu;
- 
--	if (hctx->queue->nr_hw_queues == 1)
-+	/*
-+	 * Switch to unbound work if all CPUs in this hw queue fall
-+	 * into isolated CPUs
-+	 */
-+	if (hctx->queue->nr_hw_queues == 1 || next_cpu >= nr_cpu_ids)
- 		return WORK_CPU_UNBOUND;
- 
- 	if (--hctx->next_cpu_batch <= 0) {
-@@ -3488,14 +3493,30 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
- 	return data.has_rq;
- }
- 
--static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
--		struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
-+		unsigned int this_cpu)
- {
--	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) != cpu)
--		return false;
--	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
--		return false;
--	return true;
-+	enum hctx_type type = hctx->type;
-+	int cpu;
-+
-+	/*
-+	 * hctx->cpumask has rule out isolated CPUs, but userspace still
-+	 * might submit IOs on these isolated CPUs, so use queue map to
-+	 * check if all CPUs mapped to this hctx are offline
-+	 */
-+	for_each_online_cpu(cpu) {
-+		struct blk_mq_hw_ctx *h = blk_mq_map_queue_type(hctx->queue,
-+				type, cpu);
-+
-+		if (h != hctx)
-+			continue;
-+
-+		/* this hctx has at least one online CPU */
-+		if (this_cpu != cpu)
-+			return true;
-+	}
-+
-+	return false;
- }
- 
- static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
-@@ -3503,8 +3524,7 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
- 			struct blk_mq_hw_ctx, cpuhp_online);
- 
--	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
--	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
-+	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
- 		return 0;
- 
- 	/*
-@@ -3912,6 +3932,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 	}
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
-+		int cpu;
-+
- 		/*
- 		 * If no software queues are mapped to this hardware queue,
- 		 * disable it and free the request entries.
-@@ -3938,6 +3960,15 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 		 */
- 		sbitmap_resize(&hctx->ctx_map, hctx->nr_ctx);
- 
-+		/*
-+		 * Rule out isolated CPUs from hctx->cpumask to avoid
-+		 * running run wq worker on isolated CPU
-+		 */
-+		for_each_cpu(cpu, hctx->cpumask) {
-+			if (cpu_is_isolated(cpu))
-+				cpumask_clear_cpu(cpu, hctx->cpumask);
-+		}
-+
- 		/*
- 		 * Initialize batch roundrobin counts
- 		 */
--- 
-2.41.0
+# lspci 
+0018:01:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller PM173X
+
+# nvme list 
+Node                  Generic               SN                   Model                                    Namespace  Usage                      Format           FW Rev  
+--------------------- --------------------- -------------------- ---------------------------------------- ---------- -------------------------- ---------------- --------
+/dev/nvme0n1          /dev/ng0n1            S6EUNA0R500358       1.6TB NVMe Gen4 U.2 SSD                  0x1          1.60  TB /   1.60  TB      4 KiB +  0 B   REV.SN49
+
+# nvme id-ns /dev/nvme0n1 -H 
+NVME Identify Namespace 1:
+nsze    : 0xba4d4ab0
+ncap    : 0xba4d4ab0
+nuse    : 0xba4d4ab0
+nsfeat  : 0
+  [4:4] : 0	NPWG, NPWA, NPDG, NPDA, and NOWS are Not Supported
+  [3:3] : 0	NGUID and EUI64 fields if non-zero, Reused
+  [2:2] : 0	Deallocated or Unwritten Logical Block error Not Supported
+  [1:1] : 0	Namespace uses AWUN, AWUPF, and ACWU
+  [0:0] : 0	Thin Provisioning Not Supported
+
+<snip>
+<snip>
+
+nlbaf   : 4
+flbas   : 0
+  [6:5] : 0	Most significant 2 bits of Current LBA Format Selected
+  [4:4] : 0	Metadata Transferred in Separate Contiguous Buffer
+  [3:0] : 0	Least significant 4 bits of Current LBA Format Selected
+  
+<snip>
+<snip>  
+
+LBA Format  0 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0 Best (in use)
+LBA Format  1 : Metadata Size: 8   bytes - Data Size: 4096 bytes - Relative Performance: 0x2 Good 
+LBA Format  2 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0x1 Better 
+LBA Format  3 : Metadata Size: 8   bytes - Data Size: 512 bytes - Relative Performance: 0x3 Degraded 
+LBA Format  4 : Metadata Size: 64  bytes - Data Size: 4096 bytes - Relative Performance: 0x3 Degraded 
+
+# lsblk -t /dev/nvme0n1 
+NAME    ALIGNMENT MIN-IO OPT-IO PHY-SEC LOG-SEC ROTA SCHED RQ-SIZE  RA WSAME
+nvme0n1         0   4096      0    4096    4096    0               128    0B
+                                   ^^^     ^^^ 	
+
+<< The nvme disk has block size of 4096; now format it with block size of 512
+
+# nvme format /dev/nvme0n1 --lbaf=2 --pil=0 --ms=0 --pi=0 -f 
+Success formatting namespace:1
+
+>> Success formatting; no error seen
+
+# lsblk -t /dev/nvme0n1 
+NAME    ALIGNMENT MIN-IO OPT-IO PHY-SEC LOG-SEC ROTA SCHED RQ-SIZE  RA WSAME
+nvme0n1         0    512      0     512     512    0               128    0B
+                                    ^^^     ^^^
+# cat /sys/block/nvme0n1/queue/logical_block_size:512
+# cat /sys/block/nvme0n1/queue/physical_block_size:512
+# cat /sys/block/nvme0n1/queue/optimal_io_size:0
+# cat /sys/block/nvme0n1/queue/minimum_io_size:512
+
+# cat /sys/block/nvme0c0n1/queue/logical_block_size:512
+# cat /sys/block/nvme0c0n1/queue/physical_block_size:512
+# cat /sys/block/nvme0c0n1/queue/optimal_io_size:0
+# cat /sys/block/nvme0c0n1/queue/minimum_io_size:512
+
+# nvme id-ns /dev/nvme0n1 -H 
+NVME Identify Namespace 1:
+nsze    : 0xba4d4ab0
+ncap    : 0xba4d4ab0
+nuse    : 0xba4d4ab0
+nsfeat  : 0
+  [4:4] : 0	NPWG, NPWA, NPDG, NPDA, and NOWS are Not Supported
+  [3:3] : 0	NGUID and EUI64 fields if non-zero, Reused
+  [2:2] : 0	Deallocated or Unwritten Logical Block error Not Supported
+  [1:1] : 0	Namespace uses AWUN, AWUPF, and ACWU
+  [0:0] : 0	Thin Provisioning Not Supported
+
+<snip>
+<snip>
+
+nlbaf   : 4
+flbas   : 0x2
+  [6:5] : 0	Most significant 2 bits of Current LBA Format Selected
+  [4:4] : 0	Metadata Transferred in Separate Contiguous Buffer
+  [3:0] : 0x2	Least significant 4 bits of Current LBA Format Selected
+
+<snip>
+<snip>
+
+LBA Format  0 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0 Best 
+LBA Format  1 : Metadata Size: 8   bytes - Data Size: 4096 bytes - Relative Performance: 0x2 Good 
+LBA Format  2 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0x1 Better (in use)
+LBA Format  3 : Metadata Size: 8   bytes - Data Size: 512 bytes - Relative Performance: 0x3 Degraded 
+LBA Format  4 : Metadata Size: 64  bytes - Data Size: 4096 bytes - Relative Performance: 0x3 Degraded 
 
