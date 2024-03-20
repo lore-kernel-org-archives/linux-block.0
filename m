@@ -1,101 +1,240 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38A4374D1;
-	Wed, 20 Mar 2024 08:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF7838DED;
+	Wed, 20 Mar 2024 08:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710923487; cv=none; b=kAhXX2VgJ5N2XeI+u7raujJISqegPsM2XumTnGuTK00HElmotvgTYPvDGGmqlPv+ILe6l0HRoIynh2QJDBmfiK05yb1yHaUnq7Q7cJw1uxsLzx1tdaLNFgWC71Dx7HmzYGNEAJx6EawVfCtD9s9aA/WSbqfqbo9uK6CqWgAVHeA=
+	t=1710924941; cv=none; b=UHdM1Hg8r1muRhWJkYOF3F2Dex7naIiCUMny0+Nu8k4vZ+gbYU6DEHZUQ4ra8hx8y5mk8O0pDC3gUJTsbj+NtZMeIoB9DvWxqkWc7QZQ6iI51NTfy0NHJwQ6EnTLmpxnPLC8jfK5l4h8MQxPd4P1dVlXBekNSasw6jONQ1D7gkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710923487; c=relaxed/simple;
-	bh=uYuOLvaXC5zSq3rbHgQsBek5irtHYbjs7ZmCE5k/uss=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=gVa19b7jQc023Q3T8xaD8kRSecTfXwrkxmBT5fUL7zItTBBxVzvfduegmp1mLGJ/bKwGLrg8HDQWHOvAfTXuVK2GuuPN5lQWtRIMxSNSJQ8gTe4ZpFau5SQX2IOEfHlb/av9+5Qey/QC+rnXvxX6alwtCJAe5jR7ROwi/Xhcr5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sKpWsAr4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710924941; c=relaxed/simple;
+	bh=gdJJxHO47QTHX7IJIQn/yNoS/qXqccMa+6/0bsPpjEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BYL9g3lml6ieP4sXRl2bvE2Za2nD+nGZDMxw5YERMPe9wGS+63JyLTVqK1R9wfq4DMIbLxdZ/MzYetllVDTFe/nRcDNc4s+BNj+HFsyZcW7fvkqlsl7i1/Y1Uzj9nj64r7HfRZmCMjKdsMgynY7dQsXxUVRSnXrG29huU0w3wBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/LiyTzX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sKpWsAr4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C74C43390;
-	Wed, 20 Mar 2024 08:31:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/LiyTzX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66867C433C7;
+	Wed, 20 Mar 2024 08:55:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710923487;
-	bh=uYuOLvaXC5zSq3rbHgQsBek5irtHYbjs7ZmCE5k/uss=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=sKpWsAr4TQ5rJV1WPhGCeqlhhUwoMVPpLdKthHy3bJrVYHFHZts4lMprouJz0I6eG
-	 WSGIgnXJVxT2yfrbfqjWJwR1xQEMd2bfzn/sDtwPtTcRYCpsC/4aSdhmgqdmtuXSUP
-	 RjYeeVQPvPM6kmVEPMwynycGLfB/KvylQNpUeg+wYzGwmk+nRJGdtS7P2hSeh1Mksa
-	 Qc/GE9Gl9vV/KQf1tCmkv6fplFpS1ArvtJEcwM/jiuI6DZdG96JI9uu2n+cBbZcDkH
-	 TdC5SArIBmgJEFk1ouTq9JnFB5BNeXKwDSPGREG7Mi92MVJy0RomdjJKSOuaX7IqOt
-	 CE+j33cNYxpbw==
+	s=k20201202; t=1710924941;
+	bh=gdJJxHO47QTHX7IJIQn/yNoS/qXqccMa+6/0bsPpjEQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k/LiyTzXOZm/bpwg/R7K7z83777XKyGQEoOkmI0+JirTc+A3Irgqqlo/MTqIaHAuT
+	 LaDz5/N89UQYLdibXxPlCFj22TikvtLMQmCsrzfiu9c8ExWvxD7lgnlxbCUAnPTxSu
+	 ovGWRjpBoZtNhTrQF2nDJYdWAWTZvyEET/dz7cc/V7Of5+KdYPv3eTw24b9yYI6Vth
+	 LvOmZtFkDBkj+IBOqsu96vPj5qqCbR/FSCbJ8WT6U9SUo/vlTPTqZ2qWSWdndiAJJg
+	 HA55nQnMV03il6CwCvqo9aY5LSDVcJcESBRt/qQPtJTao2MeNigIFRqvGlKDldCtwy
+	 dX0egkjrYM2eg==
+Date: Wed, 20 Mar 2024 10:55:36 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240320085536.GA14887@unreal>
+References: <20240306162022.GB28427@lst.de>
+ <20240306174456.GO9225@ziepe.ca>
+ <20240306221400.GA8663@lst.de>
+ <20240307000036.GP9225@ziepe.ca>
+ <20240307150505.GA28978@lst.de>
+ <20240307210116.GQ9225@ziepe.ca>
+ <20240308164920.GA17991@lst.de>
+ <20240308202342.GZ9225@ziepe.ca>
+ <20240309161418.GA27113@lst.de>
+ <20240319153620.GB66976@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 20 Mar 2024 10:31:21 +0200
-Message-Id: <CZYFR8LEEQB1.8C0J9KCTF8CB@kernel.org>
-Cc: <linux-doc@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
- <linux-security-module@vger.kernel.org>, <fsverity@lists.linux.dev>,
- <linux-block@vger.kernel.org>, <dm-devel@lists.linux.dev>,
- <audit@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC v15 12/21] security: add
- security_bdev_setintegrity() hook
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Paul Moore"
- <paul@paul-moore.com>, "Fan Wu" <wufan@linux.microsoft.com>,
- <corbet@lwn.net>, <zohar@linux.ibm.com>, <jmorris@namei.org>,
- <serge@hallyn.com>, <tytso@mit.edu>, <ebiggers@kernel.org>,
- <axboe@kernel.dk>, <agk@redhat.com>, <snitzer@kernel.org>,
- <eparis@redhat.com>
-X-Mailer: aerc 0.15.2
-References: <1710560151-28904-13-git-send-email-wufan@linux.microsoft.com>
- <f5cf9d285bd5f09bbc3f79b0800d37fc@paul-moore.com>
- <CZYFP5S04YTK.23AJMKWQWVCR8@kernel.org>
-In-Reply-To: <CZYFP5S04YTK.23AJMKWQWVCR8@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240319153620.GB66976@ziepe.ca>
 
-On Wed Mar 20, 2024 at 10:28 AM EET, Jarkko Sakkinen wrote:
-> On Wed Mar 20, 2024 at 1:00 AM EET, Paul Moore wrote:
-> > On Mar 15, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
-> > >=20
-> > > This patch introduces a new hook to save block device's integrity
-> > > data. For example, for dm-verity, LSMs can use this hook to save
-> > > the roothash signature of a dm-verity into the security blob,
-> > > and LSMs can make access decisions based on the data inside
-> > > the signature, like the signer certificate.
-> > >=20
-> > > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> > >=20
-> > > --
-> > > v1-v14:
-> > >   + Not present
-> > >=20
-> > > v15:
-> > >   + Introduced
-> > >=20
-> > > ---
-> > >  include/linux/lsm_hook_defs.h |  2 ++
-> > >  include/linux/security.h      | 14 ++++++++++++++
-> > >  security/security.c           | 28 ++++++++++++++++++++++++++++
-> > >  3 files changed, 44 insertions(+)
-> >
-> > I'm not sure why you made this a separate patch, help?  If there is
-> > no significant reason why this is separate, please squash it together
-> > with patch 11/21.
->
-> Off-topic: it is weird to have *RFC* patch set at v15.
->
-> RFC by de-facto is something that can be safely ignored if you don't
-> have bandwidth. 15 versions of anything that can be safely ignored
-> is by definition spamming :-) I mean just conceptually.
->
-> So does the RFC still hold or what the heck is going on with this one?
->
-> Haven't followed for some time now...
+On Tue, Mar 19, 2024 at 12:36:20PM -0300, Jason Gunthorpe wrote:
+> On Sat, Mar 09, 2024 at 05:14:18PM +0100, Christoph Hellwig wrote:
+> > On Fri, Mar 08, 2024 at 04:23:42PM -0400, Jason Gunthorpe wrote:
+> > > > The DMA API callers really need to know what is P2P or not for
+> > > > various reasons.  And they should generally have that information
+> > > > available, either from pin_user_pages that needs to special case
+> > > > it or from the in-kernel I/O submitter that build it from P2P and
+> > > > normal memory.
+> > > 
+> > > I think that is a BIO thing. RDMA just calls with FOLL_PCI_P2PDMA and
+> > > shoves the resulting page list into in a scattertable. It never checks
+> > > if any returned page is P2P - it has no reason to care. dma_map_sg()
+> > > does all the work.
+> > 
+> > Right now it does, but that's not really a good interface.  If we have
+> > a pin_user_pages variant that only pins until the next relevant P2P
+> > boundary and tells you about we can significantly simplify the overall
+> > interface.
+> 
+> Sorry for the delay, I was away..
 
-I mean if this RFC trend continues I'll just put auto-filter for this
-thread to put straight to the bin.  There's enough non-RFC patch sets
-to review.
+<...>
 
-BR, Jarkko
+> Can we tweak what Leon has done to keep the hmm_range_fault support
+> and non-uniformity for RDMA but add a uniformity optimized flow for
+> BIO?
+
+Something like this will do the trick.
+
+From 45e739e7073fb04bc168624f77320130bb3f9267 Mon Sep 17 00:00:00 2001
+Message-ID: <45e739e7073fb04bc168624f77320130bb3f9267.1710924764.git.leonro@nvidia.com>
+From: Leon Romanovsky <leonro@nvidia.com>
+Date: Mon, 18 Mar 2024 11:16:41 +0200
+Subject: [PATCH] mm/gup: add strict interface to pin user pages according to
+ FOLL flag
+
+All pin_user_pages*() and get_user_pages*() callbacks allocate user
+pages by partially taking into account their p2p vs. non-p2p properties.
+
+In case, user sets FOLL_PCI_P2PDMA flag, the allocated pages will include
+both p2p and "regular" pages, while if FOLL_PCI_P2PDMA flag is not provided,
+only regular pages are returned.
+
+In order to make sure that with FOLL_PCI_P2PDMA flag, only p2p pages are
+returned, let's introduce new internal FOLL_STRICT flag and provide special
+pin_user_pages_fast_strict() API call.
+
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+---
+ include/linux/mm.h |  3 +++
+ mm/gup.c           | 36 +++++++++++++++++++++++++++++++++++-
+ mm/internal.h      |  4 +++-
+ 3 files changed, 41 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index f5a97dec5169..910b65dde24a 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2491,6 +2491,9 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
+ 			unsigned int gup_flags, struct page **pages);
+ void folio_add_pin(struct folio *folio);
+ 
++int pin_user_pages_fast_strict(unsigned long start, int nr_pages,
++			       unsigned int gup_flags, struct page **pages);
++
+ int account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc);
+ int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
+ 			struct task_struct *task, bool bypass_rlim);
+diff --git a/mm/gup.c b/mm/gup.c
+index df83182ec72d..11b5c626a4ab 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -133,6 +133,10 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
+ 	if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)))
+ 		return NULL;
+ 
++	if (flags & FOLL_STRICT)
++		if (flags & FOLL_PCI_P2PDMA && !is_pci_p2pdma_page(page))
++			return NULL;
++
+ 	if (flags & FOLL_GET)
+ 		return try_get_folio(page, refs);
+ 
+@@ -232,6 +236,10 @@ int __must_check try_grab_page(struct page *page, unsigned int flags)
+ 	if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)))
+ 		return -EREMOTEIO;
+ 
++	if (flags & FOLL_STRICT)
++		if (flags & FOLL_PCI_P2PDMA && !is_pci_p2pdma_page(page))
++			return -EREMOTEIO;
++
+ 	if (flags & FOLL_GET)
+ 		folio_ref_inc(folio);
+ 	else if (flags & FOLL_PIN) {
+@@ -2243,6 +2251,8 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
+ 	 * - FOLL_TOUCH/FOLL_PIN/FOLL_TRIED/FOLL_FAST_ONLY are internal only
+ 	 * - FOLL_REMOTE is internal only and used on follow_page()
+ 	 * - FOLL_UNLOCKABLE is internal only and used if locked is !NULL
++	 * - FOLL_STRICT is internal only and used to distinguish between p2p
++	 *   and "regular" pages.
+ 	 */
+ 	if (WARN_ON_ONCE(gup_flags & INTERNAL_GUP_FLAGS))
+ 		return false;
+@@ -3187,7 +3197,8 @@ static int internal_get_user_pages_fast(unsigned long start,
+ 	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
+ 				       FOLL_FORCE | FOLL_PIN | FOLL_GET |
+ 				       FOLL_FAST_ONLY | FOLL_NOFAULT |
+-				       FOLL_PCI_P2PDMA | FOLL_HONOR_NUMA_FAULT)))
++				       FOLL_PCI_P2PDMA | FOLL_HONOR_NUMA_FAULT |
++				       FOLL_STRICT)))
+ 		return -EINVAL;
+ 
+ 	if (gup_flags & FOLL_PIN)
+@@ -3322,6 +3333,29 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
+ }
+ EXPORT_SYMBOL_GPL(pin_user_pages_fast);
+ 
++/**
++ * pin_user_pages_fast_strict() - this is pin_user_pages_fast() variant, which
++ * makes sure that only pages with same properties are pinned.
++ *
++ * @start:      starting user address
++ * @nr_pages:   number of pages from start to pin
++ * @gup_flags:  flags modifying pin behaviour
++ * @pages:      array that receives pointers to the pages pinned.
++ *              Should be at least nr_pages long.
++ *
++ * Nearly the same as pin_user_pages_fastt(), except that FOLL_STRICT is set.
++ *
++ * FOLL_STRICT means that the pages are allocated with specific FOLL_* properties.
++ */
++int pin_user_pages_fast_strict(unsigned long start, int nr_pages,
++			       unsigned int gup_flags, struct page **pages)
++{
++	if (!is_valid_gup_args(pages, NULL, &gup_flags, FOLL_PIN | FOLL_STRICT))
++		return -EINVAL;
++	return internal_get_user_pages_fast(start, nr_pages, gup_flags, pages);
++}
++EXPORT_SYMBOL_GPL(pin_user_pages_fast_strict);
++
+ /**
+  * pin_user_pages_remote() - pin pages of a remote process
+  *
+diff --git a/mm/internal.h b/mm/internal.h
+index f309a010d50f..7578837a0444 100644
+--- a/mm/internal.h
++++ b/mm/internal.h
+@@ -1031,10 +1031,12 @@ enum {
+ 	FOLL_FAST_ONLY = 1 << 20,
+ 	/* allow unlocking the mmap lock */
+ 	FOLL_UNLOCKABLE = 1 << 21,
++	/* don't mix pages with different properties, e.g. p2p with "regular" ones */
++	FOLL_STRICT = 1 << 22,
+ };
+ 
+ #define INTERNAL_GUP_FLAGS (FOLL_TOUCH | FOLL_TRIED | FOLL_REMOTE | FOLL_PIN | \
+-			    FOLL_FAST_ONLY | FOLL_UNLOCKABLE)
++			    FOLL_FAST_ONLY | FOLL_UNLOCKABLE | FOLL_STRICT)
+ 
+ /*
+  * Indicates for which pages that are write-protected in the page table,
+-- 
+2.44.0
