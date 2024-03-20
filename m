@@ -1,240 +1,361 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF7838DED;
-	Wed, 20 Mar 2024 08:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC6E6A34D
+	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 17:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710924941; cv=none; b=UHdM1Hg8r1muRhWJkYOF3F2Dex7naIiCUMny0+Nu8k4vZ+gbYU6DEHZUQ4ra8hx8y5mk8O0pDC3gUJTsbj+NtZMeIoB9DvWxqkWc7QZQ6iI51NTfy0NHJwQ6EnTLmpxnPLC8jfK5l4h8MQxPd4P1dVlXBekNSasw6jONQ1D7gkc=
+	t=1710955413; cv=none; b=TLSBfiGPj7FQZncYSZz9KDUGoAITH2J4Ki2l4wAR81btA0ZuP8LWNCphDr4DHEJEMDjQ3mNbjFD9+GPmlfBuri65GEG8svKBsH9Im49qAB+kp172MPWc4drjOkzTqwZiJh9G7Yc6Tv61AujCFChWi0K5mXkCjoYNThH4BlF3Fxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710924941; c=relaxed/simple;
-	bh=gdJJxHO47QTHX7IJIQn/yNoS/qXqccMa+6/0bsPpjEQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BYL9g3lml6ieP4sXRl2bvE2Za2nD+nGZDMxw5YERMPe9wGS+63JyLTVqK1R9wfq4DMIbLxdZ/MzYetllVDTFe/nRcDNc4s+BNj+HFsyZcW7fvkqlsl7i1/Y1Uzj9nj64r7HfRZmCMjKdsMgynY7dQsXxUVRSnXrG29huU0w3wBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/LiyTzX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710955413; c=relaxed/simple;
+	bh=OktSo1wzw1/Tkeb7gXpxEk9VZSpYD0XVPWVaHlIfXLc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OjM7xIlvuZyD3wDA/oLrblq3P+ZexoTFLqjoQDIyo0R7kaXf4ri8agNTOXqpq4Bw3p1DUPrDKaqI3Mb8LdnxsV7hYHblAPsFxPM+cEmvZ4fJZFkXyCJgctetPiF4TUI4mNLuy5rziUczX82KGG7lnsKZjF57wMm8fQNnvVXxN/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=H15/vG7q; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/LiyTzX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66867C433C7;
-	Wed, 20 Mar 2024 08:55:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710924941;
-	bh=gdJJxHO47QTHX7IJIQn/yNoS/qXqccMa+6/0bsPpjEQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k/LiyTzXOZm/bpwg/R7K7z83777XKyGQEoOkmI0+JirTc+A3Irgqqlo/MTqIaHAuT
-	 LaDz5/N89UQYLdibXxPlCFj22TikvtLMQmCsrzfiu9c8ExWvxD7lgnlxbCUAnPTxSu
-	 ovGWRjpBoZtNhTrQF2nDJYdWAWTZvyEET/dz7cc/V7Of5+KdYPv3eTw24b9yYI6Vth
-	 LvOmZtFkDBkj+IBOqsu96vPj5qqCbR/FSCbJ8WT6U9SUo/vlTPTqZ2qWSWdndiAJJg
-	 HA55nQnMV03il6CwCvqo9aY5LSDVcJcESBRt/qQPtJTao2MeNigIFRqvGlKDldCtwy
-	 dX0egkjrYM2eg==
-Date: Wed, 20 Mar 2024 10:55:36 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240320085536.GA14887@unreal>
-References: <20240306162022.GB28427@lst.de>
- <20240306174456.GO9225@ziepe.ca>
- <20240306221400.GA8663@lst.de>
- <20240307000036.GP9225@ziepe.ca>
- <20240307150505.GA28978@lst.de>
- <20240307210116.GQ9225@ziepe.ca>
- <20240308164920.GA17991@lst.de>
- <20240308202342.GZ9225@ziepe.ca>
- <20240309161418.GA27113@lst.de>
- <20240319153620.GB66976@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="H15/vG7q"
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dc6dcd9124bso19031276.1
+        for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 10:23:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1710955408; x=1711560208; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zL+b5IqSmT+yiak0XO4i+W4JtR/sEZzsL6gRjLnV0bw=;
+        b=H15/vG7qa1BJl+WAVEBXvPDOZEyqOItjukuwuyfXqo45SrRqeRnCg+c/A9XcU4Igx5
+         Xia2L1XUdWfzbAqia0bi1F6JzvRrdP4YcyjOSucD2Pw5f4ItzGdTCHwTD9Lxnb0VdPMw
+         Yty+rprYSuGl6HQeUSPdzVCEUY69UtLgXPtnuTRiq2qk0Fiywr/EtuF22UumK05cilb+
+         eC+TbJBGBnp3yOt3bvTCL3knu6x1qxMysTgBXS3MMR4/Ai8LbaslK+XCUp6sDFL7paBL
+         2Cz51FJIspcDZv28d83d0ZysY5dd2mXEFMWz0LFi2BWVn92abrHHwnteqQkEDpl1Vr1q
+         1kSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710955408; x=1711560208;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zL+b5IqSmT+yiak0XO4i+W4JtR/sEZzsL6gRjLnV0bw=;
+        b=nTMUxgphsWrgipSbgerVUrzEc4rk1td9IvOpfF0H0fwRzb+NRVQ4JwYc/lhe3ZmsCV
+         1NqVVlyGM2AwOA7NAyMS+p9tT7CCMiYoSkLYv6euvlnP+xszrD65VL0FfaO3eFhggPwV
+         nz/jSBY/qAS1SvrCgZbv1TD5PUhqWLwjYGVdSHPCioHTV+x17VRX1K84YhY1sltshLm8
+         s9qKXpalG1Qkw/FkAVpjHn8P7Xeamlvw2kkUJiBKxvx6M61X8W4wS6RhtspHFFDioGDe
+         8Q8XZepAPKqRQJPc/tpgL/BTIj4jknIMzSBHRNZy0l6Lz9fm4x/V/69jp5yD6KlxTOmU
+         FWyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXSjK+rH/hXwtZ+M+jX6wEZE0xppEOHTk0RvT7Hjf8aASW7QmflEYqXF2tItplLKrbGQ0MkWkUx+4mG/qgcZMW8WxgkrOyyk+bFMxA=
+X-Gm-Message-State: AOJu0YzhzQ8ekrBZy10O3J//uenhAMMlTRgD1Yeb8t2jr3SOaKD2igI6
+	DAX+qb5eVU9FPQA8mWclH3f0so2w7dH6Ef1mu/ZTIaHMm4W1xPK4DVaiQ9IQ+O8eEqcGnpTBQeC
+	vbeigDvCfY8PmYhZTu0qO8MDnRr7oAQ0VuTi+
+X-Google-Smtp-Source: AGHT+IGisQjCjQt12sXnN9Jt9UbAiCVuocXkhWkDVU4b8Sz//Q1jqxXIMt0rNAmfp/Y8hIDNuFGtuTe2UbVFtwFiUv0=
+X-Received: by 2002:a25:6fc5:0:b0:dd1:2f58:292b with SMTP id
+ k188-20020a256fc5000000b00dd12f58292bmr13153934ybc.9.1710955408153; Wed, 20
+ Mar 2024 10:23:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240319153620.GB66976@ziepe.ca>
+References: <1710560151-28904-15-git-send-email-wufan@linux.microsoft.com>
+ <657b73a0cf531fd4291a0f780d2fcf78@paul-moore.com> <ZfpHxkmRy0oqxZVF@redhat.com>
+In-Reply-To: <ZfpHxkmRy0oqxZVF@redhat.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 20 Mar 2024 13:23:17 -0400
+Message-ID: <CAHC9VhTkpSa665tesTEs8gBjaD3ahUMATGMXuGy+-unt7WL-UQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v15 14/21] dm verity: consume root hash digest and
+ signature data via LSM hook
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, 
+	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org, 
+	axboe@kernel.dk, agk@redhat.com, eparis@redhat.com, linux-doc@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	fsverity@lists.linux.dev, linux-block@vger.kernel.org, 
+	dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Deven Bowers <deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 19, 2024 at 12:36:20PM -0300, Jason Gunthorpe wrote:
-> On Sat, Mar 09, 2024 at 05:14:18PM +0100, Christoph Hellwig wrote:
-> > On Fri, Mar 08, 2024 at 04:23:42PM -0400, Jason Gunthorpe wrote:
-> > > > The DMA API callers really need to know what is P2P or not for
-> > > > various reasons.  And they should generally have that information
-> > > > available, either from pin_user_pages that needs to special case
-> > > > it or from the in-kernel I/O submitter that build it from P2P and
-> > > > normal memory.
-> > > 
-> > > I think that is a BIO thing. RDMA just calls with FOLL_PCI_P2PDMA and
-> > > shoves the resulting page list into in a scattertable. It never checks
-> > > if any returned page is P2P - it has no reason to care. dma_map_sg()
-> > > does all the work.
-> > 
-> > Right now it does, but that's not really a good interface.  If we have
-> > a pin_user_pages variant that only pins until the next relevant P2P
-> > boundary and tells you about we can significantly simplify the overall
-> > interface.
-> 
-> Sorry for the delay, I was away..
+On Tue, Mar 19, 2024 at 10:19=E2=80=AFPM Mike Snitzer <snitzer@kernel.org> =
+wrote:
+> On Tue, Mar 19 2024 at  7:00P -0400,
+> Paul Moore <paul@paul-moore.com> wrote:
+> > On Mar 15, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
+> > >
+> > > dm-verity provides a strong guarantee of a block device's integrity. =
+As
+> > > a generic way to check the integrity of a block device, it provides
+> > > those integrity guarantees to its higher layers, including the filesy=
+stem
+> > > level.
+> > >
+> > > An LSM that control access to a resource on the system based on the
+> > > available integrity claims can use this transitive property of
+> > > dm-verity, by querying the underlying block_device of a particular
+> > > file.
+> > >
+> > > The digest and signature information need to be stored in the block
+> > > device to fulfill the next requirement of authorization via LSM polic=
+y.
+> > > This will enable the LSM to perform revocation of devices that are st=
+ill
+> > > mounted, prohibiting execution of files that are no longer authorized
+> > > by the LSM in question.
+> > >
+> > > This patch adds two security hook calls in dm-verity to save the
+> > > dm-verity roothash and the roothash signature to the block device's
+> > > LSM blobs. The hook calls are depended on CONFIG_IPE_PROP_DM_VERITY,
+> > > which will be introduced in the next commit.
+> > >
+> > > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > > ---
+> > > v2:
+> > >   + No Changes
+> > >
+> > > v3:
+> > >   + No changes
+> > >
+> > > v4:
+> > >   + No changes
+> > >
+> > > v5:
+> > >   + No changes
+> > >
+> > > v6:
+> > >   + Fix an improper cleanup that can result in
+> > >     a leak
+> > >
+> > > v7:
+> > >   + Squash patch 08/12, 10/12 to [11/16]
+> > >   + Use part0 for block_device, to retrieve the block_device, when
+> > >     calling security_bdev_setsecurity
+> > >
+> > > v8:
+> > >   + Undo squash of 08/12, 10/12 - separating drivers/md/ from
+> > >     security/ & block/
+> > >   + Use common-audit function for dmverity_signature.
+> > >   + Change implementation for storing the dm-verity digest to use the
+> > >     newly introduced dm_verity_digest structure introduced in patch
+> > >     14/20.
+> > >   + Create new structure, dm_verity_digest, containing digest algorit=
+hm,
+> > >     size, and digest itself to pass to the LSM layer. V7 was missing =
+the
+> > >     algorithm.
+> > >   + Create an associated public header containing this new structure =
+and
+> > >     the key values for the LSM hook, specific to dm-verity.
+> > >   + Additional information added to commit, discussing the layering o=
+f
+> > >     the changes and how the information passed will be used.
+> > >
+> > > v9:
+> > >   + No changes
+> > >
+> > > v10:
+> > >   + No changes
+> > >
+> > > v11:
+> > >   + Add an optional field to save signature
+> > >   + Move the security hook call to the new finalize hook
+> > >
+> > > v12:
+> > >   + No changes
+> > >
+> > > v13:
+> > >   + No changes
+> > >
+> > > v14:
+> > >   + Correct code format
+> > >   + Remove unnecessary header and switch to dm_disk()
+> > >
+> > > v15:
+> > >   + Refactor security_bdev_setsecurity() to security_bdev_setintegrit=
+y()
+> > >   + Remove unnecessary headers
+> > > ---
+> > >  drivers/md/dm-verity-target.c | 73 +++++++++++++++++++++++++++++++++=
+++
+> > >  drivers/md/dm-verity.h        |  6 +++
+> > >  include/linux/dm-verity.h     | 12 ++++++
+> > >  include/linux/security.h      |  2 +
+> > >  4 files changed, 93 insertions(+)
+> > >  create mode 100644 include/linux/dm-verity.h
+> > >
+> > > diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-tar=
+get.c
+> > > index bb5da66da4c1..e94cc6a755d5 100644
+> > > --- a/drivers/md/dm-verity-target.c
+> > > +++ b/drivers/md/dm-verity-target.c
+> > > @@ -22,6 +22,8 @@
+> > >  #include <linux/scatterlist.h>
+> > >  #include <linux/string.h>
+> > >  #include <linux/jump_label.h>
+> > > +#include <linux/security.h>
+> > > +#include <linux/dm-verity.h>
+> > >
+> > >  #define DM_MSG_PREFIX                      "verity"
+> > >
+> > > @@ -1017,6 +1019,38 @@ static void verity_io_hints(struct dm_target *=
+ti, struct queue_limits *limits)
+> > >     blk_limits_io_min(limits, limits->logical_block_size);
+> > >  }
+> > >
+> > > +#ifdef CONFIG_IPE_PROP_DM_VERITY
+> > > +
+> > > +static int verity_init_sig(struct dm_verity *v, const void *sig,
+> > > +                      size_t sig_size)
+> > > +{
+> > > +   v->sig_size =3D sig_size;
+> > > +   v->root_digest_sig =3D kmalloc(v->sig_size, GFP_KERNEL);
+> > > +   if (!v->root_digest)
+> > > +           return -ENOMEM;
+> >
+> > Either you meant to copy @sig into @v->root_digest_sig and forgot to
+> > add the code for that, or we don't need to include @sig as a parameter
+> > to this function.  I'm guessing it is the former as it wouldn't make
+> > sense to even have dm_verity::root_digest_sig if we weren't stashing
+> > it here.
+> >
+> > I'd also suggest looking at kmemdup() instead of a kmalloc()/memcpy()
+> > combo.
+> >
+> > > +   return 0;
+> > > +}
+> > > +
+> > > +static void verity_free_sig(struct dm_verity *v)
+> > > +{
+> > > +   kfree(v->root_digest_sig);
+> > > +}
+> > > +#else
+> > > +
+> > > +static inline int verity_init_sig(struct dm_verity *v, const void *s=
+ig,
+> > > +                             size_t sig_size)
+> > > +{
+> > > +   return 0;
+> > > +}
+> > > +
+> > > +static inline void verity_free_sig(struct dm_verity *v)
+> > > +{
+> > > +}
+> > > +
+> > > +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+> >
+> > It's been a while since I looked at this patch in the patchset, so
+> > maybe I'm missing something, but in general we don't want CONFIG_XXX
+> > checks in the kernel, outside of security/, that are specific to a
+> > particular LSM (what happens when multiple LSMs need this?).  Please
+> > use CONFIG_SECURITY instead.
+> >
+> > >  static void verity_dtr(struct dm_target *ti)
+> > >  {
+> > >     struct dm_verity *v =3D ti->private;
+> > > @@ -1035,6 +1069,7 @@ static void verity_dtr(struct dm_target *ti)
+> > >     kfree(v->salt);
+> > >     kfree(v->root_digest);
+> > >     kfree(v->zero_digest);
+> > > +   verity_free_sig(v);
+> > >
+> > >     if (v->tfm)
+> > >             crypto_free_ahash(v->tfm);
+> > > @@ -1434,6 +1469,13 @@ static int verity_ctr(struct dm_target *ti, un=
+signed int argc, char **argv)
+> > >             ti->error =3D "Root hash verification failed";
+> > >             goto bad;
+> > >     }
+> > > +
+> > > +   r =3D verity_init_sig(v, verify_args.sig, verify_args.sig_size);
+> > > +   if (r < 0) {
+> > > +           ti->error =3D "Cannot allocate root digest signature";
+> > > +           goto bad;
+> > > +   }
+> > > +
+> > >     v->hash_per_block_bits =3D
+> > >             __fls((1 << v->hash_dev_block_bits) / v->digest_size);
+> > >
+> > > @@ -1584,6 +1626,34 @@ int dm_verity_get_root_digest(struct dm_target=
+ *ti, u8 **root_digest, unsigned i
+> > >     return 0;
+> > >  }
+> > >
+> > > +#ifdef CONFIG_IPE_PROP_DM_VERITY
+> > > +
+> > > +static int verity_finalize(struct dm_target *ti)
+> > > +{
+> > > +   struct block_device *bdev;
+> > > +   struct dm_verity_digest root_digest;
+> > > +   struct dm_verity *v;
+> > > +   int r;
+> > > +
+> > > +   v =3D ti->private;
+> > > +   bdev =3D dm_disk(dm_table_get_md(ti->table))->part0;
+> > > +   root_digest.digest =3D v->root_digest;
+> > > +   root_digest.digest_len =3D v->digest_size;
+> > > +   root_digest.alg =3D v->alg_name;
+> > > +
+> > > +   r =3D security_bdev_setintegrity(bdev, LSM_INTGR_DMV_ROOTHASH, &r=
+oot_digest,
+> > > +                                  sizeof(root_digest));
+> > > +   if (r)
+> > > +           return r;
+> > > +
+> > > +   return security_bdev_setintegrity(bdev,
+> > > +                                     LSM_INTGR_DMV_SIG,
+> > > +                                     v->root_digest_sig,
+> > > +                                     v->sig_size);
+> >
+> > What happens if the second call fails, should we clear the
+> > LSM_INTGR_DMV_ROOTHASH state in the LSM?
+> >
+> > > +}
+> > > +
+> > > +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+> >
+> > See my comments about CONFIG_SECURITY above.  In fact, I would suggest
+> > moving this up into that part of the file so you only need one #ifdef
+> > block relating to CONFIG_SECURITY.
+> >
+> > I would also recommend making a dummy function so we can get rid of
+> > the conditional compilation in @verity_target below.  For example:
+> >
+> >   #ifdef CONFIG_SECURITY
+> >   static int verity_finalize(struct dm_target *ti)
+> >   {
+> >     /* real implementation */
+> >   }
+> >   #else
+> >   static int verity_finalize(struct dm_target *ti)
+> >   {
+> >     return 0;
+> >   }
+> >   #endif /* CONFIG_SECURITY */
+> >
+> > >  static struct target_type verity_target =3D {
+> > >     .name           =3D "verity",
+> > >     .features       =3D DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
+> > > @@ -1596,6 +1666,9 @@ static struct target_type verity_target =3D {
+> > >     .prepare_ioctl  =3D verity_prepare_ioctl,
+> > >     .iterate_devices =3D verity_iterate_devices,
+> > >     .io_hints       =3D verity_io_hints,
+> > > +#ifdef CONFIG_IPE_PROP_DM_VERITY
+> > > +   .finalize       =3D verity_finalize,
+> > > +#endif /* CONFIG_IPE_PROP_DM_VERITY */
+> > >  };
+> > >  module_dm(verity);
+> >
+> > If you create a dummy verity_finalize() function like above you can
+> > get rid of the #ifdef checks.
+>
+> Think it is better to leave it as-is, to avoid calling the .finalize
+> hook if it isn't actually needed.
 
-<...>
+Fair enough, my personal preference is to minimize Kconfig conditional
+code flow changes such as this, but I understand your point of view
+and device-mapper is your code after all.
 
-> Can we tweak what Leon has done to keep the hmm_range_fault support
-> and non-uniformity for RDMA but add a uniformity optimized flow for
-> BIO?
+I believe the other issues still need to be addressed, but other than
+that are you generally okay with the new "finalize" hook approach?
 
-Something like this will do the trick.
-
-From 45e739e7073fb04bc168624f77320130bb3f9267 Mon Sep 17 00:00:00 2001
-Message-ID: <45e739e7073fb04bc168624f77320130bb3f9267.1710924764.git.leonro@nvidia.com>
-From: Leon Romanovsky <leonro@nvidia.com>
-Date: Mon, 18 Mar 2024 11:16:41 +0200
-Subject: [PATCH] mm/gup: add strict interface to pin user pages according to
- FOLL flag
-
-All pin_user_pages*() and get_user_pages*() callbacks allocate user
-pages by partially taking into account their p2p vs. non-p2p properties.
-
-In case, user sets FOLL_PCI_P2PDMA flag, the allocated pages will include
-both p2p and "regular" pages, while if FOLL_PCI_P2PDMA flag is not provided,
-only regular pages are returned.
-
-In order to make sure that with FOLL_PCI_P2PDMA flag, only p2p pages are
-returned, let's introduce new internal FOLL_STRICT flag and provide special
-pin_user_pages_fast_strict() API call.
-
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- include/linux/mm.h |  3 +++
- mm/gup.c           | 36 +++++++++++++++++++++++++++++++++++-
- mm/internal.h      |  4 +++-
- 3 files changed, 41 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index f5a97dec5169..910b65dde24a 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2491,6 +2491,9 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
- 			unsigned int gup_flags, struct page **pages);
- void folio_add_pin(struct folio *folio);
- 
-+int pin_user_pages_fast_strict(unsigned long start, int nr_pages,
-+			       unsigned int gup_flags, struct page **pages);
-+
- int account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc);
- int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
- 			struct task_struct *task, bool bypass_rlim);
-diff --git a/mm/gup.c b/mm/gup.c
-index df83182ec72d..11b5c626a4ab 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -133,6 +133,10 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
- 	if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)))
- 		return NULL;
- 
-+	if (flags & FOLL_STRICT)
-+		if (flags & FOLL_PCI_P2PDMA && !is_pci_p2pdma_page(page))
-+			return NULL;
-+
- 	if (flags & FOLL_GET)
- 		return try_get_folio(page, refs);
- 
-@@ -232,6 +236,10 @@ int __must_check try_grab_page(struct page *page, unsigned int flags)
- 	if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)))
- 		return -EREMOTEIO;
- 
-+	if (flags & FOLL_STRICT)
-+		if (flags & FOLL_PCI_P2PDMA && !is_pci_p2pdma_page(page))
-+			return -EREMOTEIO;
-+
- 	if (flags & FOLL_GET)
- 		folio_ref_inc(folio);
- 	else if (flags & FOLL_PIN) {
-@@ -2243,6 +2251,8 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
- 	 * - FOLL_TOUCH/FOLL_PIN/FOLL_TRIED/FOLL_FAST_ONLY are internal only
- 	 * - FOLL_REMOTE is internal only and used on follow_page()
- 	 * - FOLL_UNLOCKABLE is internal only and used if locked is !NULL
-+	 * - FOLL_STRICT is internal only and used to distinguish between p2p
-+	 *   and "regular" pages.
- 	 */
- 	if (WARN_ON_ONCE(gup_flags & INTERNAL_GUP_FLAGS))
- 		return false;
-@@ -3187,7 +3197,8 @@ static int internal_get_user_pages_fast(unsigned long start,
- 	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
- 				       FOLL_FORCE | FOLL_PIN | FOLL_GET |
- 				       FOLL_FAST_ONLY | FOLL_NOFAULT |
--				       FOLL_PCI_P2PDMA | FOLL_HONOR_NUMA_FAULT)))
-+				       FOLL_PCI_P2PDMA | FOLL_HONOR_NUMA_FAULT |
-+				       FOLL_STRICT)))
- 		return -EINVAL;
- 
- 	if (gup_flags & FOLL_PIN)
-@@ -3322,6 +3333,29 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
- }
- EXPORT_SYMBOL_GPL(pin_user_pages_fast);
- 
-+/**
-+ * pin_user_pages_fast_strict() - this is pin_user_pages_fast() variant, which
-+ * makes sure that only pages with same properties are pinned.
-+ *
-+ * @start:      starting user address
-+ * @nr_pages:   number of pages from start to pin
-+ * @gup_flags:  flags modifying pin behaviour
-+ * @pages:      array that receives pointers to the pages pinned.
-+ *              Should be at least nr_pages long.
-+ *
-+ * Nearly the same as pin_user_pages_fastt(), except that FOLL_STRICT is set.
-+ *
-+ * FOLL_STRICT means that the pages are allocated with specific FOLL_* properties.
-+ */
-+int pin_user_pages_fast_strict(unsigned long start, int nr_pages,
-+			       unsigned int gup_flags, struct page **pages)
-+{
-+	if (!is_valid_gup_args(pages, NULL, &gup_flags, FOLL_PIN | FOLL_STRICT))
-+		return -EINVAL;
-+	return internal_get_user_pages_fast(start, nr_pages, gup_flags, pages);
-+}
-+EXPORT_SYMBOL_GPL(pin_user_pages_fast_strict);
-+
- /**
-  * pin_user_pages_remote() - pin pages of a remote process
-  *
-diff --git a/mm/internal.h b/mm/internal.h
-index f309a010d50f..7578837a0444 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -1031,10 +1031,12 @@ enum {
- 	FOLL_FAST_ONLY = 1 << 20,
- 	/* allow unlocking the mmap lock */
- 	FOLL_UNLOCKABLE = 1 << 21,
-+	/* don't mix pages with different properties, e.g. p2p with "regular" ones */
-+	FOLL_STRICT = 1 << 22,
- };
- 
- #define INTERNAL_GUP_FLAGS (FOLL_TOUCH | FOLL_TRIED | FOLL_REMOTE | FOLL_PIN | \
--			    FOLL_FAST_ONLY | FOLL_UNLOCKABLE)
-+			    FOLL_FAST_ONLY | FOLL_UNLOCKABLE | FOLL_STRICT)
- 
- /*
-  * Indicates for which pages that are write-protected in the page table,
--- 
-2.44.0
+--=20
+paul-moore.com
