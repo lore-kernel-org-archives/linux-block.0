@@ -1,114 +1,160 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C07A85C41
-	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 21:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF9712B7D
+	for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 23:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710971781; cv=none; b=RmgBQO4Svs4+OS57KErwZF9ArxR5kOBQxa7Y0zR22pfYgZBPj5N0vxdzujYzfTRpHHUyQBO96O8/8uZVLSZTPyvXr4gYpkiE2NfRWpRBYTk1ztA17IiurQ336Dw/CHkBYmaCSyfgRwJJlCFenZXrLiJ2wJ4f71Cm4p5mPCKV/hY=
+	t=1710975950; cv=none; b=K09FaklWBoZrTMFp5t1692EiVmmyUp89ogh66P1bVhabXlKErEb+tvsZ99dzJbPhqE1XDSikO9PH0VglvNlEHZ63X2m/Z0c2A1+bLr2E1Ufbl1R3/aslwPDY+Qdgo/04K0F+EQnqHqUFhbJaE09hTYfulk0Om+wPsfe56NhVE0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710971781; c=relaxed/simple;
-	bh=3Y9zpf1wfvY5KLBzI213sJGWxjZ+o1dGQveIv1ywB5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=akgWo1kZ91BEIPLvLFOZC/PLK8LIhUhs65NvM6bDvY3SN7sJcmGoGeMQHA0+rzoiHl78pMAhDPc/YwrlGMDAmU4CsiUELR7WpRrL/lNYAR26oDm2fzjqWRAkTBWD1GivoaFtKx/qr/I0onmS4hMyzJuQUP4U21oe78CUvNEcpgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=efficientek.com; spf=pass smtp.mailfrom=efficientek.com; dkim=pass (2048-bit key) header.d=efficientek-com.20230601.gappssmtp.com header.i=@efficientek-com.20230601.gappssmtp.com header.b=HKyvxAZx; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=efficientek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=efficientek.com
+	s=arc-20240116; t=1710975950; c=relaxed/simple;
+	bh=URyBNehh5FHPeA708CvC5QL2Y4pAndNBi/OFiiEv+is=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Et4whXCWuYftb9nuFi8eVsrAUpN6smemTzQBmTaTk1dwVxlWPb6s2sz9dYmdq+IoP2eJ05TP7jT75xUxuLuV2D1Gpk1KownF/yfxXGIDlIZfQAu5e/3N+OlL4UWb1wv4W/EObCscZ3Hm3JGncPv5kkslLi8dR1t6JFHBpfGTBrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OwXzGZgt; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=efficientek-com.20230601.gappssmtp.com header.i=@efficientek-com.20230601.gappssmtp.com header.b="HKyvxAZx"
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3c3aa9ca414so147797b6e.2
-        for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 14:56:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OwXzGZgt"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc236729a2bso313217276.0
+        for <linux-block@vger.kernel.org>; Wed, 20 Mar 2024 16:05:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=efficientek-com.20230601.gappssmtp.com; s=20230601; t=1710971779; x=1711576579; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:reply-to:message-id:subject
-         :cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NwLRl82njW9qOCI08DiI0Mi6Z9GVC805nkZi5Fy+J9U=;
-        b=HKyvxAZxTSMEeUfFujy9WMqCQfTdS/hXv6tZfmJlVLwreIfFN38Nx5vfGkDYSQBdJB
-         NBNHVQBnz8aPgPl1ZDy0xFiZZhqr+btDSva6F8RC3XmVyzhnPkS0XtdMxCLiS3OdhSUm
-         RaSY0LiuZyB1mQBKCiiZqRSlH2HBzHcjprFDWPXbcCB1k+Zz5mzoHDTIH2TYo+g4znyL
-         3zqXWHTVcBbTLYaTSmlS+GRVbcAb1R3rtD2wL2BAzTwxF4EuFXKGSYQzLJdv5HG4tE2a
-         GzrABiUSGfEEUNXh7BKpGGUEbySQEJDnBm7aGjqvwHnbkLJP/hQxXnyB+ywddSzOSV4I
-         eLQA==
+        d=gmail.com; s=20230601; t=1710975948; x=1711580748; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=5eTt7UUDllSUVmKD/yHguOkA5EaAJt6qoyfAGitCm0U=;
+        b=OwXzGZgtDQ15N+go5OvQVpXddVg1UPjcvNlvNnX/nLo+Th+DxlK64hkX7SMnE5TMgV
+         WpF9k33SW0thFiKJljenpROu1k84sdTXEHOeqdMeiESSeHY86BhrHEPN7FFDcq/iXXVL
+         Kosf9awn4G4GLGe304omJvtlGMT9x7QxQLmwxtXblrqHoXL3eGoKPAXwQPfXXLe2xgsk
+         cBDY9W9eiwLpnuF1TKzFwYt8sLv7uWkYrfWmOxf+GNYoxX//GZWN2vAZzWY5cq7nY4Ll
+         wBSOICIYw4tudlIshgW8HYn4J9y6a8QvKICdjGQaEG4c5xpIqnb/y/c+1OTD6wVfUW/t
+         8RKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710971779; x=1711576579;
-        h=content-transfer-encoding:mime-version:reply-to:message-id:subject
-         :cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NwLRl82njW9qOCI08DiI0Mi6Z9GVC805nkZi5Fy+J9U=;
-        b=UxPbuOGbdMaJ+t0NnBdBpvMuMUEe/V+sPb0QhN54Vi0IaHbl2khBSGrUZGmaeGn6Wb
-         QwQVg31S/o+TPLn6pBM2LjnhYkr5rP9e/p5yPfPju5soizrpqw6XKap3WL6eYx9R2nDe
-         xYbeBht55M6hTthJPnCGXa7E1ePCDwuC6O5jZWwNtGk2tgmUUDEtQj8S3y2o8Wp7ir+E
-         J9wnQQXsLf2nstP8JR7aysw8CuOVS+pkVXUggYSiRKM79iAuIPnz/g0mu+HYz3G/HWz3
-         OjOLA/INRc1Q8oFSFaVL5vnIh/aG2c0VD+o/mYiV+cNar6+3hy9HXdr/do0V/fXJ9ukC
-         XgCw==
-X-Forwarded-Encrypted: i=1; AJvYcCVzxS96CsNlkd3YJ2Vuzqbm6bIs4Uz+UMcQAeHBgINq3Jl4rhPafwLwGZI3LBULPoym1jlOQyI6ecKfe2znbx6gz60wMNPaXCKcZk0=
-X-Gm-Message-State: AOJu0YzFTk/h2CR+HW0zvnphxdRQh4UiW6rTq0UdaxeBuhj/SVJ5usCU
-	fKUOWwN5Te88zPkP3yHGIkhUWbKDowd0Ki3tDQ1ElQm4ZW7rKKtFbDNgvSjSSDIf6nNCOPVqcIM
-	=
-X-Google-Smtp-Source: AGHT+IERVnHDyCRKMbKQ1CvMqRQ1iTEgmI48bTHDG/oAkD5At/lDqY2l5505tlZOZPPXI9jhbAQZAQ==
-X-Received: by 2002:a05:6870:6195:b0:220:99bf:c26d with SMTP id a21-20020a056870619500b0022099bfc26dmr397339oah.9.1710971779086;
-        Wed, 20 Mar 2024 14:56:19 -0700 (PDT)
-Received: from crass-HP-ZBook-15-G2 ([204.13.164.84])
-        by smtp.gmail.com with ESMTPSA id lb3-20020a056a004f0300b006e664031f10sm12270964pfb.51.2024.03.20.14.56.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Mar 2024 14:56:18 -0700 (PDT)
-Date: Wed, 20 Mar 2024 16:56:09 -0500
-From: Glenn Washburn <development@efficientek.com>
-To: Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>, Mike
- Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Cannot create dm-linear or dm-crypt mapping on scsi or mmc block
- device if mapping already exists on partition of device
-Message-ID: <20240320165339.1c6b4d39@crass-HP-ZBook-15-G2>
-Reply-To: development@efficientek.com
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-pc-linux-gnu)
+        d=1e100.net; s=20230601; t=1710975948; x=1711580748;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5eTt7UUDllSUVmKD/yHguOkA5EaAJt6qoyfAGitCm0U=;
+        b=KEXVdVvpOaQnu8prGSdlJKAUXzk/aqa05Hku6/3XjSj+QXnO8SPvUznIb2y/Mb9PBU
+         yYmf5UtPuqSPR7PQjC9RdETxhqL/Jk6piAj9nkrf3mWoNuDS+D+K8U2C8yt6wsMj+6Gq
+         LDS13dQei7mdDAHyKPftkZlAh9xDRHLFmSeNLXmFE2ZUpi9WThogoSq0QFzes8p0C0eD
+         HH5tSujmbTxRM2GCaY2rjcEcYE8dEE2+HeLUHwGUcJsulWY7lV3xlEnDVeGYJ9l3rS//
+         7ANhF0FQdlsRliXc2QfRYHEkGbKtALwboW4Bh2W4ovkRImrMc1qD3h1srbZEZrWinB/Z
+         CvNg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7yf74+uc42Z0TgG2W453H2A80nvDwxAryHxcFPKdfx2/kQXbnA0cSuT9Tkrr26YQ/+6rM9vcldr86E1fgfS9tTLCb0ebx2b7NAJU=
+X-Gm-Message-State: AOJu0YzoBIp7WKVZ2gGSjInSGg3y5ZQOybjsYT6wuZperNm2wGtfjmLW
+	z8XDz62RODeHEdaMdaA0LIFBtHpvp7iYGpiltMuCSKqejjY9BOBLj+Ht2l0d
+X-Google-Smtp-Source: AGHT+IFQTPJqcPR8a0zg2ePxpabCXTVdgsEwrlCwy+wMkqfDQmLe97PK2YSs2eeIzJzJtO3puIfcDQ==
+X-Received: by 2002:a05:6a21:9209:b0:1a3:4204:2529 with SMTP id tl9-20020a056a21920900b001a342042529mr20912400pzb.31.1710975577795;
+        Wed, 20 Mar 2024 15:59:37 -0700 (PDT)
+Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id l3-20020a170902f68300b001dd9090a37bsm11946137plg.197.2024.03.20.15.59.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Mar 2024 15:59:36 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <b61ce2b5-c291-4f99-a459-1f9a056ccca1@roeck-us.net>
+Date: Wed, 20 Mar 2024 15:59:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/39] dm vdo: add the MurmurHash3 fast hashing
+ algorithm
+Content-Language: en-US
+To: Matthew Sakai <msakai@redhat.com>, Kenneth Raeburn <raeburn@redhat.com>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+References: <20231026214136.1067410-1-msakai@redhat.com>
+ <20231026214136.1067410-3-msakai@redhat.com>
+ <ea57f231-f78e-4a55-bf85-c5d50e17237e@roeck-us.net>
+ <CAK1Ur38jAmWo35HTNrDDAaN5Awiie9wRiPDMVrNUg6+ZM8mJ7A@mail.gmail.com>
+ <28a88525-6b06-4215-9e78-2b3d8c0d8657@roeck-us.net>
+ <cee6169f-f635-e3fb-29a7-e68829cdf1db@redhat.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+In-Reply-To: <cee6169f-f635-e3fb-29a7-e68829cdf1db@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Saludos,
+On 3/20/24 14:44, Matthew Sakai wrote:
+> 
+> On 3/18/24 16:54, Guenter Roeck wrote:
+>> On 3/18/24 13:37, Kenneth Raeburn wrote:
+>>> (resend because of accidental HTML lossage)
+>>>
+>>> On Thu, Mar 14, 2024 at 7:38 PM Guenter Roeck <linux@roeck-us.net> wrote:
+>>>> On sparc64, with gcc 11.4, the above code results in:
+>>>>
+>>>> ERROR: modpost: "__bswapdi2" [drivers/md/dm-vdo/dm-vdo.ko] undefined!
+>>>>
+>>>> Guenter
+>>>
+>>> Thanks for catching that. I don't think our team has any sparc
+>>> machines readily available for testing.
+>>> This is an artifact of our having imported user-mode code to use in
+>>> the kernel. We should probably be using le64_to_cpup and friends, as
+>>> we do elsewhere, so it doesn't try to pull in libgcc support routines.
+>>>
+>>
+>> I am kind of getting wary about reporting such issues. Should I drop
+>> building dm-vdo images for sparc ? Would it be possible to add
+>> "depends on BROKEN if SPARC" configuration option to indicate that
+>> the code isn't expected to be buildable on sparc, much less work ?
+>>
+>> Thanks,
+>> Guenter
+>>
+> 
+> Could you try out the patch I just sent to see if it fixes your build problem?
+> 
+Sure, will do.
 
-I've hit some unexpected behavior that is not intuitive and might be
-considered a bug. A dm-linear or dm-crypt (possibly others) mapping is
-attempted to be created on a scsi or mmc block device (again, possibly
-others) when there already exists a mapping on a sub block device, the
-mapping creation will fail with EBUSY.  Here's a concrete example:
+Guenter
 
-# dmsetup create --concise "dm-test,,,ro,0 8 linear /dev/sda1 0"
-# dmsetup create --concise "dm-test2,,,ro,0 4 linear /dev/sda1 2"
-# dmsetup create --concise "dm-test3,,,ro,0 4 linear /dev/sda 2"
-[  968.046906] device-mapper: table: 252:2: linear: Device lookup failed (-EBUSY)
-[  968.047305] device-mapper: ioctl: error adding target to table
-device-mapper: reload ioctl on dm-test3 (252:2) failed: Device or resource busy
-Command failed.
-# dmsetup create --concise "dm-test4,,,ro,0 4 linear ${DEV}2 8"
-# dmsetup table --show
-dm-test: 0 8 linear 8:1 0
-dm-test2: 0 4 linear 8:1 2
-dm-test4: 0 4 linear 8:2 8
 
-The second command shows that dm-linear has no issues with creating an
-overlapping mapping on the same device. It makes little sense that the
-third command fails where the second and fourth succeed. Further testing
-shows that if there is an existing linear mapping on the full block device,
-then mappings fail to be created on any partition block devices. This has
-been tested on scsi and mmc devices. It is also true for the dm-crypt
-target and mixing dm-linear and dm-crypt mappings. I've tested on Ubuntu's
-6.8.1 test kernel. I doubt this is affected by any Ubuntu patching, but
-perhaps someone could confirm this on a vanilla kernel.
-
-I noticed this because I tried to create a dm-linear mapping of a scsi
-device to capture sectors not contained in a partition, but it failed
-because I already had a dm-crypt mapping on a partition of the device.
-
-Any ideas what's going on? Are there good reasons for this behavior that
-I'm unaware of? I've done some searching but haven't found it having been
-reported anywhere. If this has been discussed, please point me in that
-direction.
-
-Glenn
