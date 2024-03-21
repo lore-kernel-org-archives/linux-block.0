@@ -1,188 +1,199 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5815C58232;
-	Thu, 21 Mar 2024 12:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC33383CB1
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 12:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711023315; cv=none; b=iALvGp2zKy15zNFGInmabJG/mXYRC9G+h+yQd+l+L0pIcUZlyb/fSdf7OgKA4VZUYFXN2Bnx/qxyEo1y+rytUBEyaPjWe4h3JAUjTwF05fzBJ9rfPMhF8K8rFVazakrShaj0IDO0BNjK/ErLcCB91jyuMrKbp5npxcamWaYfuow=
+	t=1711024780; cv=none; b=pO/uA4+Bff0nnxB7a75+6Ee2ROFTflpkMBdM6g5/X2YWeNhVIZArw1n6AL1I5avlVCKxaxl2UGBrmgI+XhSaJMaI6Tkw0HxKvtjvXqbu5bfvEcx1CDUR9/MOxa7Vt5L4xA9SWQMV0FF+W7VJ+jhvVpXwYHNJ3BM/jc8fIat3hSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711023315; c=relaxed/simple;
-	bh=DAh40+uz6rrjbgwmew9a6AMozhKZLl/upM31no81vHI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=db9vcm0Z5gqqFzp4XqFiuHQhpd97uzOstZJs4c1COZvDbhcXQfqIbZvOZYf50P7QQ5bJF//DadoDO6p+nOa8PsODDFFxcvxGv2LSxfYWU2ZvmqAnDq+7ZK35l4hmBkBi+PBWagb57HFRIvrlwpopyqU0hBQtupL3OTfGBBq9JWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V0ktJ4zhkz4f3kq2;
-	Thu, 21 Mar 2024 20:15:04 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 8F21E1A0172;
-	Thu, 21 Mar 2024 20:15:08 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBHZQ7KJPxlrKiKHg--.63152S3;
-	Thu, 21 Mar 2024 20:15:08 +0800 (CST)
-Subject: Re: [RFC v4 linux-next 19/19] fs & block: remove bdev->bd_inode
-To: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@lst.de>, brauner@kernel.org, axboe@kernel.dk,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240222124555.2049140-1-yukuai1@huaweicloud.com>
- <20240222124555.2049140-20-yukuai1@huaweicloud.com>
- <20240317213847.GD10665@lst.de>
- <022204e6-c387-b4b2-5982-970fd1ed5b5b@huaweicloud.com>
- <20240318013208.GA23711@lst.de>
- <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
- <ea4774db-188e-6744-6a5b-0096f6206112@huaweicloud.com>
- <20240318232245.GA17831@lst.de>
- <c62dac0e-666f-9cc9-cffe-f3d985029d6a@huaweicloud.com>
- <20240321112737.33xuxfttrahtvbej@quack3>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <240b78df-257e-a97c-31ff-a8b1b1882e80@huaweicloud.com>
-Date: Thu, 21 Mar 2024 20:15:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1711024780; c=relaxed/simple;
+	bh=Kmu3zbPUyay6XlM8mJYmGLdGinxyCQPn1imK7hIxqtg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pbBa90RaIhpVsBapeDuHlDkmMpq3ExK+u7u3DUqWxlCDDZBOoB/rloM0zNoh9fbkcBmFuxL7ayVSq/+UR+JykIaaJrI4fvMHR9w8Kf3UVlRPRdnPg37b81Allm20G48CYm5mOE/tJEpvy+sZRAdmkj6JQDD5b9Rdi3DD9k1cLYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=MDPFzU9Y; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="MDPFzU9Y"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-414701303f7so8865565e9.2
+        for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 05:39:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1711024777; x=1711629577; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zNZ7vhsdbmv3tsfRVkzmFnvT+rAuDkFFXFyABvgWN9Y=;
+        b=MDPFzU9YaM+C6XhbqR3xXXjhLmOsVF9+I887J+A/xBplZIuDh6mFQqFEB3iD37Lt4p
+         uYM0JyS5Bfsbl5TVOjvIcGhwwhE8F2FDcN+5fgSwjG81XD9jPhAtPfS7wWhXFf6aHo79
+         7bSB0SfICDUTq9bEz5UVNl/XbdRWWoxc1Cv2WJtLjkCGaMRRTDCuyprUx7foY+3ApO3X
+         7kL7J6csWopnhUouhNMHLhBoaIojUZwwaz9BUVZwcvgdF+8wCJ+ZC8JABLa7Iv6M7n9w
+         dXsh5VVj1IrCpNC43Nw2VGRlZGC3wXFXU4XOn1H8sJ+EPEAIiA8pv1pN9vvf7uI6Uf+J
+         ot5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711024777; x=1711629577;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zNZ7vhsdbmv3tsfRVkzmFnvT+rAuDkFFXFyABvgWN9Y=;
+        b=v6zuZVc5WI1nUP4lOHUCGJEMs6aHpcUgI4CWt6eq/kCu3KYS2rUVS5iwZkmVzVu6Us
+         fhTsnfL9nU8awvGDNmRFWmPkCIQiby3p7X2KHYWWAn8bpn6/rELrm71Hs2Q3qb1V8rJ7
+         nqhmtzAQaJZ3YMiUmzvDjNkjaz6O/85QQI3NPIoRXjXFSxhsJZamx/thaU2OQgyx6vxl
+         cYrZoTx7OBTc1dHuXfkN13igzjsKaZKO47bGEwbuOVAiVnwUQktokGLJvmMd7KNNMyTF
+         Hqzsqh7CFlCpAL770K2GhkeOXnNIkXJnoj+e05jolamk33l3Pg0Jma1H4YdKBpALvtKh
+         nyKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXaKbPgvG2g1MWJvKsMQL3PCFXxUc0moYkQjPpBeR5LCr/iCU38pPrO943r1bYDWVBP/4mK9cHhHOYiZaNCIgmrVq9PGwKOKcp4woc=
+X-Gm-Message-State: AOJu0YwcA5e6Cc/qbnGCbOMR7NuOlAcqSzKyCpzcWHq+nw7K2M4To5+t
+	RPDTSEzZ+AvJuEVkM1iKEsRXjiG/V9DhCAqQuqYJPNL9X68oxor4YK6CrESyQ3o=
+X-Google-Smtp-Source: AGHT+IGt57g28ARi2T1iW4asSHhR0gQbNaXQuJ3XP+Q0+k/8e4PFX+HjmNPJHcwMpW1JipVFYQAjyA==
+X-Received: by 2002:a05:600c:4254:b0:414:5e91:124f with SMTP id r20-20020a05600c425400b004145e91124fmr1979948wmm.23.1711024777073;
+        Thu, 21 Mar 2024 05:39:37 -0700 (PDT)
+Received: from airbuntu (host81-157-90-255.range81-157.btcentralplus.com. [81.157.90.255])
+        by smtp.gmail.com with ESMTPSA id h13-20020a05600c314d00b004146d736fcdsm4938670wmo.36.2024.03.21.05.39.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Mar 2024 05:39:36 -0700 (PDT)
+Date: Thu, 21 Mar 2024 12:39:35 +0000
+From: Qais Yousef <qyousef@layalina.io>
+To: Christian Loehle <christian.loehle@arm.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, linux-kernel@vger.kernel.org,
+	peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
+	rafael@kernel.org, dietmar.eggemann@arm.com, vschneid@redhat.com,
+	vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
+	adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de,
+	asml.silence@gmail.com, linux-pm@vger.kernel.org,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [RFC PATCH 0/2] Introduce per-task io utilization boost
+Message-ID: <20240321123935.zqscwi2aom7lfhts@airbuntu>
+References: <20240304201625.100619-1-christian.loehle@arm.com>
+ <86f0af00-8765-4481-9245-1819fb2c6379@acm.org>
+ <0dc6a839-2922-40ac-8854-2884196da9b9@arm.com>
+ <c5b7fc1f-f233-4d25-952b-539607c2a0cc@acm.org>
+ <2784c093-eea1-4b73-87da-1a45f14013c8@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240321112737.33xuxfttrahtvbej@quack3>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHZQ7KJPxlrKiKHg--.63152S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXr4xWFW5ur15Gw1xXFW7twb_yoWrJrWUpF
-	Z8JFWYyF48GryqgFs2qwsrXr1Fk3WUtrW8Z348Wa4rCrWqyrna9Fy8GF1Yka4Yvr4kGr4q
-	vr1jgry3urySk3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2784c093-eea1-4b73-87da-1a45f14013c8@arm.com>
 
-Hi, Jan!
+(Thanks for the CC Bart)
 
-在 2024/03/21 19:27, Jan Kara 写道:
-> Hello!
+On 03/06/24 10:49, Christian Loehle wrote:
+> Hi Bart,
 > 
-> On Tue 19-03-24 16:26:19, Yu Kuai wrote:
->> 在 2024/03/19 7:22, Christoph Hellwig 写道:
->>> On Mon, Mar 18, 2024 at 03:19:03PM +0800, Yu Kuai wrote:
->>>> I come up with an ideal:
->>>>
->>>> While opening the block_device the first time, store the generated new
->>>> file in "bd_inode->i_private". And release it after the last opener
->>>> close the block_device.
->>>>
->>>> The advantages are:
->>>>    - multiple openers can share the same bdev_file;
->>>>    - raw block device ops can use the bdev_file as well, and there is no
->>>> need to distinguish iomap/buffer_head for raw block_device;
->>>>
->>>> Please let me know what do you think?
->>>
->>> That does sound very reasonable to me.
->>>
->> I just implement the ideal with following patch(not fully tested, just
->> boot and some blktests)
+> On 05/03/2024 18:36, Bart Van Assche wrote:
+> > On 3/5/24 01:13, Christian Loehle wrote:
+> >> On 05/03/2024 00:20, Bart Van Assche wrote:
+> >>> On 3/4/24 12:16, Christian Loehle wrote:
+> >>>> - Higher cap is not always beneficial, we might place the task away
+> >>>> from the CPU where the interrupt handler is running, making it run
+> >>>> on an unboosted CPU which may have a bigger impact than the difference
+> >>>> between the CPU's capacity the task moved to. (Of course the boost will
+> >>>> then be reverted again, but a ping-pong every interval is possible).
+> >>>
+> >>> In the above I see "the interrupt handler". Does this mean that the NVMe
+> >>> controller in the test setup only supports one completion interrupt for
+> >>> all completion queues instead of one completion interrupt per completion
+> >>> queue? There are already Android phones and developer boards available
+> >>> that support the latter, namely the boards equipped with a UFSHCI 4.0 controller.
+> >>
+> >> No, both NVMe test setups have one completion interrupt per completion queue,
+> >> so this caveat doesn't affect them, higher capacity CPU is strictly better.
+> >> The UFS and both mmc setups (eMMC with CQE and sdcard) only have one completion
+> >> interrupt (on CPU0 on my setup).
+> > 
+> > I think that measurements should be provided in the cover letter for the
+> > two types of storage controllers: one series of measurements for a
+> > storage controller with a single completion interrupt and a second
+> > series of measurements for storage controllers with one completion
+> > interrupt per CPU.
 > 
-> So I was looking into this and I'm not sure I 100% understand the problem.
-> I understand that the inode you get e.g. in blkdev_get_block(),
-> blkdev_iomap_begin() etc. may be an arbitrary filesystem block device
-> inode. But why can't you use I_BDEV(inode->i_mapping->host) to get to the
-> block device instead of your file_bdev(inode->i_private)? I don't see any
-> advantage in stashing away that special bdev_file into inode->i_private but
-> perhaps I'm missing something...
+> Of the same type of storage controller? Or what is missing for you in
+> the cover letter exactly (ufs/emmc: single completion interrupt,
+> nvme: one completion interrupt per CPU).
 > 
-
-Because we're goning to remove the 'block_device' from iomap and
-buffer_head, and replace it with a 'bdev_file'.
-
-patch 19 from this set is using a union of block_device and bdev_file,
-this can work as well.
-
-Thanks,
-Kuai
-
-> 								Honza
+> > 
+> >> FWIW you do gain an additional ~20% (in my specific setup) if you move the ufshcd
+> >> interrupt to a big CPU, too. Similarly for the mmc.
+> >> Unfortunately the infrastructure is far from being there for the scheduler to move the
+> >> interrupt to the same performance domain as the task, which is often optimal both in
+> >> terms of throughput and in terms of power.
+> >> I'll go looking for a stable testing platform with UFS as you mentioned, benefits of this
+> >> patch will of course be greatly increased.
+> > 
+> > I'm not sure whether making the completion interrupt follow the workload
+> > is a good solution. I'm concerned that this would increase energy
+> > consumption by keeping the big cores active longer than necessary. I
+> > like this solution better (improves storage performance on at least
+> > devices with a UFSHCI 3.0 controller): "[PATCH v2 0/2] sched: blk:
+> > Handle HMP systems when completing IO"
+> > (https://lore.kernel.org/linux-block/20240223155749.2958009-1-qyousef@layalina.io/).
 > 
->> diff --git a/block/fops.c b/block/fops.c
->> index 4037ae72a919..059f6c7d3c09 100644
->> --- a/block/fops.c
->> +++ b/block/fops.c
->> @@ -382,7 +382,7 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb,
->> struct iov_iter *iter)
->>   static int blkdev_iomap_begin(struct inode *inode, loff_t offset, loff_t
->> length,
->>                  unsigned int flags, struct iomap *iomap, struct iomap
->> *srcmap)
->>   {
->> -       struct block_device *bdev = I_BDEV(inode);
->> +       struct block_device *bdev = file_bdev(inode->i_private);
->>          loff_t isize = i_size_read(inode);
->>
->>          iomap->bdev = bdev;
->> @@ -404,7 +404,7 @@ static const struct iomap_ops blkdev_iomap_ops = {
->>   static int blkdev_get_block(struct inode *inode, sector_t iblock,
->>                  struct buffer_head *bh, int create)
->>   {
->> -       bh->b_bdev = I_BDEV(inode);
->> +       bh->b_bdev = file_bdev(inode->i_private);
->>          bh->b_blocknr = iblock;
->>          set_buffer_mapped(bh);
->>          return 0;
->> @@ -598,6 +598,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
->>
->>   static int blkdev_open(struct inode *inode, struct file *filp)
->>   {
->> +       struct file *bdev_file;
->>          struct block_device *bdev;
->>          blk_mode_t mode;
->>          int ret;
->> @@ -614,9 +615,28 @@ static int blkdev_open(struct inode *inode, struct file
->> *filp)
->>          if (!bdev)
->>                  return -ENXIO;
->>
->> +       bdev_file = alloc_and_init_bdev_file(bdev,
->> +                       BLK_OPEN_READ | BLK_OPEN_WRITE, NULL);
->> +       if (IS_ERR(bdev_file)) {
->> +               blkdev_put_no_open(bdev);
->> +               return PTR_ERR(bdev_file);
->> +       }
->> +
->> +       bdev_file->private_data = ERR_PTR(-EINVAL);
->> +       get_bdev_file(bdev, bdev_file);
->>          ret = bdev_open(bdev, mode, filp->private_data, NULL, filp);
->> -       if (ret)
->> +       if (ret) {
->> +               put_bdev_file(bdev);
->>                  blkdev_put_no_open(bdev);
->> +       } else {
->> +               filp->f_flags |= O_LARGEFILE;
->> +               filp->f_mode |= FMODE_BUF_RASYNC | FMODE_CAN_ODIRECT;
->> +               if (bdev_nowait(bdev))
->> +                       filp->f_mode |= FMODE_NOWAIT;
->> +               filp->f_mapping = bdev_mapping(bdev);
->> +               filp->f_wb_err =
->> filemap_sample_wb_err(bdev_file->f_mapping);
->> +       }
->> +
->>          return ret;
->>   }
->>
->>> .
->>>
->>
+> That patch is good, don't get me wrong, but you still lose out by running everything
+> up to blk_mq_complete_request() on (potentially) a LITTlE (that might be run on a low OPP),
+> while having a big CPU available at a high OPP anyway ("for free").
+> It is only adjacent to the series but I've done some measurements (Pixel6 again, same device
+> as cover letter, Base is Android 6.6 mainline kernel (so without my series, but I somewhat forced
+> the effects by task pinning), Applied is with both of sched: blk: Handle HMP systems when completing IO):
 
+So you want the hardirq to move to the big core? Unlike softirq, there will be
+a single hardirq for the controller (to my limited knowledge), so if there are
+multiple requests I'm not sure we can easily match which one relates to which
+before it triggers. So we can end up waking up the wrong core.
+
+Generally this should be a userspace policy. If there's a scenario where the
+throughput is that important they can easily move the hardirq to the big core
+unconditionally and move it back again once this high throughput scenario is no
+longer important.
+
+Or where you describing a different problem?
+
+Glad to see your series by the way :-) I'll get a chance to review it over the
+weekend hopefully.
+
+
+Cheers
+
+--
+Qais Yousef
+
+> 
+> Pretty numbers (IOPS):
+> Base irq@CPU0 median: 6969
+> Base irq@CPU6 median: 8407 (+20.6%)
+> Applied irq@CPU0 median: 7144 (+2.5%)
+> Applied irq@CPU6 median: 8288 (18.9%)
+> 
+> This is with psyncx1 4K Random Read again, of course anything with queue depth
+> takes advantage of batch completions to significantly reduce irq pressure.
+> 
+> Not so pretty numbers and full list commands used:
+> 
+> w/o patch:
+> irq on CPU0 (default):
+> psyncx1: 7000 6969 7025 6954 6964
+> io_uring4x128: 28766 28280 28339 28310 28349
+> irq on CPU6:
+> psyncx1: 8342 8492 8355 8407 8532
+> io_uring4x128: 28641 28356 25908 25787 25853
+> 
+> with patch:
+> irq on CPU0:
+> psyncx1: 7672 7144 7301 6976 6889
+> io_uring4x128: 28266 26314 27648 24482 25301
+> irq on CPU6:
+> psyncx1: 8208 8401 8351 8221 8288
+> io_uring4x128: 25603 25438 25453 25514 25402
+> 
+> 
+> for i in $(seq 0 4); do taskset c0 /data/local/tmp/fio_aosp_build --name=test --rw=randread --bs=4k --runtime=30 --time_based --filename=/dev/block/sda --minimal | awk -F ";" '{print $8}'; sleep 30; done
+> 
+> for i in $(seq 0 4); do taskset c0 /data/local/tmp/fio_aosp_build --name=test --rw=randread --bs=4k --runtime=30 --time_based --filename=/dev/block/sda --ioengine=io_uring --iodepth=128 --numjobs=4 --group_reporting --minimal | awk -F ";" '{print $8}'; sleep 30; done
+> 
+> echo 6 > /proc/irq/296/smp_affinity_list
+> 
+> 
+> Kind Regards,
+> Christian
