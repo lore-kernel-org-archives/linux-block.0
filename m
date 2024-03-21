@@ -1,113 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D45C84A28
-	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 13:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7573A1DD
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 15:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711027033; cv=none; b=uWs3qor8Hc7veifF6430hLekDX4k4fUlsHM3jCabvM5mgXeftiU5BYG91VHUMi49DCLGA7BOhY9UMvkYNZtCZTXLF4utVoSZQRip8zfAUHGjt9cOvImtJxQuVKVxquvuuIX6zfEhg4MdNRO0yqi5I1SAAHwKUVHIlZZV5Ok9AvI=
+	t=1711034075; cv=none; b=P3MXhPzql3gKRz4Fcx7x0TnQnbgKLY9mEHQOVbP+4RE8pQgmUp8ZAl7hdeXkOyphH5zHyk/smSOlZUvqfl5GmXfwK6HzKwzKbB5SFS4QU96uym9bs7j/zwqJwMY4jjLiO+wgNyeVp11WaaMcHcsCBQxfy1R4KfO8N6Nls1VkXt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711027033; c=relaxed/simple;
-	bh=zD4+8tbohlFHEzb5tUKTT4uUf+A/sI7eu8ositg8s7s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VXA42tbwEHcNPKPeGiPizkPO64/bxkciResZQ200SEyrjcROKc7m89IfW8OLvjBX0JtdGEHCkz7VhkrrpT+VG9Eh1CSoUqc5tYkZDcCyF0BXEAC8Pu/YXc3i0IveQeLC55VbgwW147BjaPKagrsrMjtW3nLmNNx43mkkH/47ny0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKYcT80M; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711034075; c=relaxed/simple;
+	bh=BrrXHbOSXDh63teeiqeae+Af53OWWaTWwF9nUIWy12k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cn3/pjYg8mycjNYidjfMMBScCk6h5nISwkFFRo4MH9uDxLvPtuLreypOB9n8TYyHPj8ei5LkeASGZg+pR4r+9O7tcXgs9NlQAwZb87f3PFouy1VVf93o5NPZPvjRbaYre9lfniAuE6FlAvnvIheLv/GoVQX6LevIHwd9IaZqOjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=mQhM4vej; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKYcT80M"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711027031;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Rn8bNMSccEmumn94xJf1/fEqHPHw726f5zCZC/Xe6Hk=;
-	b=NKYcT80MYHxuNheGXu+eD4vrKqXYO71bN2YKit+Xy5te0sJp1P4m/QcybB1bf8FVns6hWZ
-	3uOzpviKV7WveTXA3LDERXApm/5jFKwLg/KMU96s5bTrCDFmV52nP0PSjybrnp2zRARhWJ
-	CG+HymOLOAovu6l7ZSAMI4nuy4leui4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-6hZ5FRbMOwC7J4XXbTSc2A-1; Thu, 21 Mar 2024 09:17:06 -0400
-X-MC-Unique: 6hZ5FRbMOwC7J4XXbTSc2A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="mQhM4vej"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V0psH5K3qzlgVnF;
+	Thu, 21 Mar 2024 15:14:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1711034065; x=1713626066; bh=d35xmSAYJbXKIuDNltVbTuJN
+	jfh6Lvk5FYE1ru9SH1U=; b=mQhM4vejm6zP3zjXOt5RDASqrqsXPsH3vYKGEX8e
+	QsdT8q/RFmjg/Hx9m+NWnQteUTOcLadbWBuUgEii8zbTvwUMv/rMDT8gEO5bT51s
+	0MDx2OW5GMxhUfZ0y69BJWRsWlxpC9Ap2roPZE0zBM88yPrY/RtJCgy1YJy4vXjL
+	u5A/QE/teCpKGNfmx7HRxo3MPJwP1XKnKFrox7bxFGlaOVrJvTlfXJtwbEZXWXht
+	c5paUuZ/BMQEAFIyBJDJHimu+nR2g9TYxmBqf3KbgSBmkMWV0Fdl39Kg98JgXoGU
+	qrfumkBOuh2bKmEFMwVHiNbMpJuj/cBnUqud1rf8/l+1rQ==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id JdmysMsFmNQ8; Thu, 21 Mar 2024 15:14:25 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78FB6101A526;
-	Thu, 21 Mar 2024 13:17:06 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 82BF33C85;
-	Thu, 21 Mar 2024 13:17:05 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>
-Subject: [PATCH] block: fail unaligned bio from submit_bio_noacct()
-Date: Thu, 21 Mar 2024 21:16:34 +0800
-Message-ID: <20240321131634.1009972-1-ming.lei@redhat.com>
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V0psD5v07zlgTGW;
+	Thu, 21 Mar 2024 15:14:24 +0000 (UTC)
+Message-ID: <36a990dd-589c-4da8-a41b-783a834c3797@acm.org>
+Date: Thu, 21 Mar 2024 08:14:24 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: fail unaligned bio from submit_bio_noacct()
+Content-Language: en-US
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>
+References: <20240321131634.1009972-1-ming.lei@redhat.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240321131634.1009972-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-For any bio with data, its start sector and size have to be aligned with
-the queue's logical block size.
+On 3/21/24 06:16, Ming Lei wrote:
+> +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
+> +{
+> +	unsigned int bs = q->limits.logical_block_size;
+> +	unsigned int size = bio->bi_iter.bi_size;
+> +
+> +	if (size & (bs - 1))
+> +		return false;
+> +
+> +	if (size && ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1)))
+> +		return false;
+Why "size &&"? It doesn't harm to reject unaligned bios if size == 0 and
+it will reduce the number of if-tests in the hot path.
 
-This rule is obvious, but there is still user which may send unaligned
-bio to block layer, and it is observed that dm-integrity can do that,
-and cause double free of driver's dma meta buffer.
+Why to shift bio->bi_iter.bi_sector left instead of shifting (bs - 1)
+right?
 
-So failfast unaligned bio from submit_bio_noacct() for avoiding more
-troubles.
+Thanks,
 
-Cc: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Mike Snitzer <snitzer@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a16b5abdbbf5..b1a10187ef74 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -729,6 +729,20 @@ void submit_bio_noacct_nocheck(struct bio *bio)
- 		__submit_bio_noacct(bio);
- }
- 
-+static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
-+{
-+	unsigned int bs = q->limits.logical_block_size;
-+	unsigned int size = bio->bi_iter.bi_size;
-+
-+	if (size & (bs - 1))
-+		return false;
-+
-+	if (size && ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1)))
-+		return false;
-+
-+	return true;
-+}
-+
- /**
-  * submit_bio_noacct - re-submit a bio to the block device layer for I/O
-  * @bio:  The bio describing the location in memory and on the device.
-@@ -780,6 +794,9 @@ void submit_bio_noacct(struct bio *bio)
- 		}
- 	}
- 
-+	if (WARN_ON_ONCE(!bio_check_alignment(bio, q)))
-+		goto end_io;
-+
- 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
- 		bio_clear_polled(bio);
- 
--- 
-2.41.0
-
+Bart.
