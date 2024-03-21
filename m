@@ -1,48 +1,76 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C91A1878
-	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 22:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EDB5231
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 22:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711061301; cv=none; b=Q0RiXnTEvWt5Jvvr5sYxgG/j55UnuImhBalF2r38Pfn8zqV1I2SVJG+mi/MCTzciYPAPxZtQTWLdWgciqF/QmXnPHfvy5cB/fiYucxbzwdllUEtkY5Y6XL7R4ugPJkT/Pq1SwtBi8kIhHQ1pFbgngYnHBLhlpIhv7tmWmOd7dx0=
+	t=1711061833; cv=none; b=dPziCs4w9aYErgZcZRC3Qho+MD+OYgtWaPnRMFznX2UO4x6ag7IJchYDKgUxXqRemJIjOX7AFGoK+HeooD8VkRRQLo/5eXRqVoKvLJg/fr9N8R862T3K3+/J2CP9Tihrs7BO40E35It7eZe8f81G4zCNNKrhprT3emi1QfAtPos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711061301; c=relaxed/simple;
-	bh=7qCO0zl0f/ql1MOJu32WauD5ZQp9MezYcW1otTb3heQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MaYlYYtQ5iQMpMc/KInAGYKsileBM3RZkVE3gOYYpEPXE28sVvt6D7r/Z2T4JTUA4m0/Qj1Z5G1p7VU6z2tSVrS18ihXRcjDOaP4n5t25Cf7TSlvqbhgvrFB2R987XgS6n/mCRM0cxKgdnwSe0eXbjw6ht5nvGZNof7AbY8oJ0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 2E2A968B05; Thu, 21 Mar 2024 23:48:15 +0100 (CET)
-Date: Thu, 21 Mar 2024 23:48:14 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai3@huawei.com>
-Subject: Re: [PATCH] block: Improve IOPS by removing the fairness code
-Message-ID: <20240321224814.GA23127@lst.de>
-References: <20240321224605.107783-1-bvanassche@acm.org>
+	s=arc-20240116; t=1711061833; c=relaxed/simple;
+	bh=iM2qeI+ui3Vbrt27py8b64OKLBb2MmCyRQfCRIKf4iM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WXTnd7JctfrA3IhRP1123UUz0fJiDZFNpYAB3L2b5TKgneHkj0LBsExzqSsD0o+2xamAnIM3kJNSzJi+GXfdHHfyz/ivDpSZtg9kyBkiBXwAmkGmpgvjpObM30EOdq5b4VnJ2Ka3cm9GoicrH1xDSGv7UO9SivZtnC+AStQGi4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=FuKmzHxw; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="FuKmzHxw"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V117C3XMtz6Cnk8s;
+	Thu, 21 Mar 2024 22:57:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1711061829; x=1713653830; bh=iM2qeI+ui3Vbrt27py8b64OK
+	LBb2MmCyRQfCRIKf4iM=; b=FuKmzHxw5Jxjk4rPcul7KSeqGFDAQpT5K5GDIi5e
+	B70s7YAde0Pjs8Heccm789nqwqZ1rsljO0blxb32XOHHS/rxGaX+XbIlsxOpr+aW
+	HUyG0gSsUAugyuKx2WjlfhSqceAtyJwObmDkVJJtUZMEGTK8bKUSBe50aJCgmsSs
+	Tsri80UCDmMHS9EopksxTRs7CCfouevmoAzZN4bVEHxysmmjvR9ufzYixlcofr2d
+	AJTrXMuNJ90RbuQRDjLXl4Bry8LQMr6/uFEFhoORp+5XG5uCzsj2GnxsDulBpg7h
+	vQoNR28d/uoXzYuzdE88IxzTS4d9muss0aGqvJgWPZlykw==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id XusnDFQ3gysA; Thu, 21 Mar 2024 22:57:09 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V11775CY9z6Cnk8m;
+	Thu, 21 Mar 2024 22:57:07 +0000 (UTC)
+Message-ID: <e50d7215-3abe-48a7-82e7-0eb775484829@acm.org>
+Date: Thu, 21 Mar 2024 15:57:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Improve IOPS by removing the fairness code
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+ Yu Kuai <yukuai3@huawei.com>
+References: <20240321224605.107783-1-bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
 In-Reply-To: <20240321224605.107783-1-bvanassche@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 21, 2024 at 03:46:05PM -0700, Bart Van Assche wrote:
+On 3/21/24 15:46, Bart Van Assche wrote:
 > There is an algorithm in the block layer for maintaining fairness
 > across queues that share a tag set. The sbitmap implementation has
 > improved so much that we don't need the block layer fairness algorithm
 > anymore and that we can rely on the sbitmap implementation to guarantee
 > fairness.
 
-IFF that was true it would be awesome.  But do you have proof for that
-assertation?
+A regression test is available here:
+https://github.com/osandov/blktests/pull/135
+
+Bart.
 
