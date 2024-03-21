@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1AD134412;
-	Thu, 21 Mar 2024 19:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377BC132C37;
+	Thu, 21 Mar 2024 19:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711049644; cv=none; b=tD/PbiJ89EFLsGGQ8BmAltuaqb3JFizdkzCkU9W5AqJacBdHmxV0Rze1dxQh46AsMEh6+J/V9OMOZ8LEUTThiePE7WqmT+F6qy9AmY6luCTSORSRY52rALvNM6GO/uheL2feOMm1beH7I9z1elvOqRV2zjkWnJ/OqGviKB50WGc=
+	t=1711049658; cv=none; b=MTIRbaIyGguKAZ5EZFxDNsHbz1lx3nvwhZYllMR4edrXciTEv0yIwXmmNxqtGU/AKgF7hezkBWXi436Yog91lCGiOx0PpNlCa75MiiHirYJHAXR0vjP7ZSLN8dCPGEmZ6aEwKuar84OVOdvQJzYykxJWrCIW+ENO8wDqf5QMPds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711049644; c=relaxed/simple;
-	bh=iNGDld9u54N94elt2btzH/2NeaV6UoMBtCRIT7nPB8o=;
+	s=arc-20240116; t=1711049658; c=relaxed/simple;
+	bh=riNJOLS1PDkHeYFfgxlyU2hpU4+11KYkJC8sj8wJoVw=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OAZTa5AST99eDdc9EEsr9KatyR2fHmwe/qIWQ532bTKAmYvdfca2RxT7U22LZg5eUdKJGKihnf27NS24jX7wGolGn5wa9Nw4q8kLDyn7rsyKbL+mhe6e+lp0xoTiEt7/mERb30Wn9CcPW8ssep1UHh1a+9KMXAi2PXC+FF2ikic=
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBnRT1fSOg6UQFuQwR6lXwuJ9EDf6VqJr6afi62135KFoDK7KzdcMkO7W+gnkci/9dneScer+LWGqUmQ5p+vSA+4SOg+J3nKPQKl2zOB8+Ec4Q4sOtN88uZBlubNfRorSpLpa/UwfRaV5epfS0UpQrXyGMHOqdWAMJNCcRNcvRU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1rnOAZ-0000ER-2y;
-	Thu, 21 Mar 2024 19:33:44 +0000
-Date: Thu, 21 Mar 2024 19:33:39 +0000
+	id 1rnOAj-0000Ex-2q;
+	Thu, 21 Mar 2024 19:33:54 +0000
+Date: Thu, 21 Mar 2024 19:33:49 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -44,8 +44,8 @@ To: Rob Herring <robh@kernel.org>,
 	"Ricardo B. Marliere" <ricardo@marliere.net>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 2/8] block: partitions: populate fwnode
-Message-ID: <3a6ed620b0c2fef2fc2bab0cc4991c62796acd99.1711048433.git.daniel@makrotopia.org>
+Subject: [PATCH 3/8] block: add new genhd flag GENHD_FL_NVMEM
+Message-ID: <89abd9ab93783da0e8934ebc03d66559f78f6060.1711048433.git.daniel@makrotopia.org>
 References: <cover.1711048433.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -57,79 +57,31 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1711048433.git.daniel@makrotopia.org>
 
-Let block partitions to be represented by a firmware node and hence
-allow them to being referenced e.g. for use with blk-nvmem.
+Add new flag to destinguish block devices which may act as an NVMEM
+provider.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- block/partitions/core.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ include/linux/blkdev.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index b11e88c82c8cf..c40ba88837373 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -10,6 +10,8 @@
- #include <linux/ctype.h>
- #include <linux/vmalloc.h>
- #include <linux/raid/detect.h>
-+#include <linux/property.h>
-+
- #include "check.h"
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c3e8f7cf96be9..f2c4f280d7619 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -81,11 +81,13 @@ struct partition_meta_info {
+  * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
+  * scan for partitions from add_disk, and users can't add partitions manually.
+  *
++ * ``GENHD_FL_NVMEM``: the block device should be considered as NVMEM provider.
+  */
+ enum {
+ 	GENHD_FL_REMOVABLE			= 1 << 0,
+ 	GENHD_FL_HIDDEN				= 1 << 1,
+ 	GENHD_FL_NO_PART			= 1 << 2,
++	GENHD_FL_NVMEM				= 1 << 3,
+ };
  
- static int (*const check_part[])(struct parsed_partitions *) = {
-@@ -281,6 +283,43 @@ static ssize_t whole_disk_show(struct device *dev,
- }
- static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
- 
-+static struct fwnode_handle *find_partition_fwnode(struct block_device *bdev)
-+{
-+	struct fwnode_handle *fw_parts, *fw_part;
-+	struct device *ddev = disk_to_dev(bdev->bd_disk);
-+	const char *partname, *partuuid;
-+	u32 partno;
-+
-+	fw_parts = device_get_named_child_node(ddev, "partitions");
-+	if (!fw_parts)
-+		fw_parts = device_get_named_child_node(ddev->parent, "partitions");
-+
-+	if (!fw_parts)
-+		return NULL;
-+
-+	fwnode_for_each_child_node(fw_parts, fw_part) {
-+		if (!fwnode_property_read_string(fw_part, "partuuid", &partuuid) &&
-+		    (!bdev->bd_meta_info || strncmp(partuuid,
-+						    bdev->bd_meta_info->uuid,
-+						    PARTITION_META_INFO_UUIDLTH)))
-+			continue;
-+
-+		if (!fwnode_property_read_string(fw_part, "partname", &partname) &&
-+		    (!bdev->bd_meta_info || strncmp(partname,
-+						    bdev->bd_meta_info->volname,
-+						    PARTITION_META_INFO_VOLNAMELTH)))
-+			continue;
-+
-+		if (!fwnode_property_read_u32(fw_part, "partno", &partno) &&
-+		    bdev->bd_partno != partno)
-+			continue;
-+
-+		return fw_part;
-+	}
-+
-+	return NULL;
-+}
-+
- /*
-  * Must be called either with open_mutex held, before a disk can be opened or
-  * after all disk users are gone.
-@@ -355,6 +394,8 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 			goto out_put;
- 	}
- 
-+	device_set_node(pdev, find_partition_fwnode(bdev));
-+
- 	/* delay uevent until 'holders' subdir is created */
- 	dev_set_uevent_suppress(pdev, 1);
- 	err = device_add(pdev);
+ enum {
 -- 
 2.44.0
