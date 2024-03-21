@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6183D13442F;
-	Thu, 21 Mar 2024 19:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BBC13442F;
+	Thu, 21 Mar 2024 19:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711049671; cv=none; b=CmwRJFfT/Dv+fqGS6BqITLmT9hNC7ULkayfFLTPt2yMAE+t7HdfcT52Ls8dGiOeDRwuifc+6EWFhOm4iiDAIHm/CpmzzeTIK0B8oYWw9D4nfoox6AtEkViVGWOEhIIgbr6KxkCitZNzbjKZIf9lzidpck7EeqikVxmjSt8BSf7U=
+	t=1711049676; cv=none; b=RwoT3qAEvNIb3QwNFag/1V7ldnD3ExeiyNfhZf90OWF7dBsA8jVwoNGuoO7jLcjmIX7TJ90Z3Nv8lEwX+qHaBoY36hJ3sdDBZisn2qaZSe4KXjSS3wo1k89spNfBALAyYao0P94eERbVUI6DcqKxqn6qPt0ByB/d9mBKg3v+c6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711049671; c=relaxed/simple;
-	bh=2znTf4TvUOVXG3srG4NVYvSOtJ1j3xaikOmb5ufQK+M=;
+	s=arc-20240116; t=1711049676; c=relaxed/simple;
+	bh=VQOLGE5b1WT05ny2MJKIquB+OOdiTR6lMQ9qYMzFM0I=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=quh2ubw0bLy9QEVdha5mjVGleMjyT/ErzcFNIBSsDTPTE8AyymnOq7CMBKCx4So8i8KYyVXBVCj+9QJdjeq8AtYF+ZrhDwg7M5e7gbCOecCHQPNwSIMRIYdxIP4wAf0NNrV82xzYbrdWfuW+VX3ub/vjRcM1YR6iSWBWZbIlbn4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ksk7hU5+OvOHWxYpvmhJB050C/rZ0cQ7uXIclYqJuOcKv20rSHSF9NL8VlZYJBqs0WguzDpzMgGSW7TgQgPlYEF2xlqJ9vPqhbVysqeq1LDZyn2+16+7nF4Lo47YpufwxvGZlCC3XHZM3OC+uIa1nNDmtW8T8RV0oumFwjCsLvI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1rnOAu-0000Fp-13;
-	Thu, 21 Mar 2024 19:34:04 +0000
-Date: Thu, 21 Mar 2024 19:34:00 +0000
+	id 1rnOB5-0000GQ-0D;
+	Thu, 21 Mar 2024 19:34:15 +0000
+Date: Thu, 21 Mar 2024 19:34:11 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -44,8 +44,8 @@ To: Rob Herring <robh@kernel.org>,
 	"Ricardo B. Marliere" <ricardo@marliere.net>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 4/8] block: implement NVMEM provider
-Message-ID: <7555db6eb71d4ccb2b9d5ebe3b41dc34088c6316.1711048433.git.daniel@makrotopia.org>
+Subject: [PATCH 5/8] dt-bindings: mmc: mmc-card: add block device nodes
+Message-ID: <8d837b883de9f9d745819c5304cfb8aed9a6085c.1711048433.git.daniel@makrotopia.org>
 References: <cover.1711048433.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -57,242 +57,76 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1711048433.git.daniel@makrotopia.org>
 
-On embedded devices using an eMMC it is common that one or more partitions
-on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
-data. Allow referencing the partition in device tree for the kernel and
-Wi-Fi drivers accessing it via the NVMEM layer.
+Add nodes representing the block devices exposed by an MMC device
+including an example involving nvmem-cells.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- MAINTAINERS       |   5 ++
- block/Kconfig     |   9 +++
- block/Makefile    |   1 +
- block/blk-nvmem.c | 169 ++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 184 insertions(+)
- create mode 100644 block/blk-nvmem.c
+ .../devicetree/bindings/mmc/mmc-card.yaml     | 45 +++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8c88f362feb55..242a0a139c00a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3662,6 +3662,11 @@ L:	linux-mtd@lists.infradead.org
- S:	Maintained
- F:	drivers/mtd/devices/block2mtd.c
+diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+index fd347126449ac..95ccbda871d24 100644
+--- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
++++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+@@ -26,6 +26,18 @@ properties:
+       Use this to indicate that the mmc-card has a broken hpi
+       implementation, and that hpi should not be used.
  
-+BLOCK NVMEM DRIVER
-+M:	Daniel Golle <daniel@makrotopia.org>
-+S:	Maintained
-+F:	block/blk-nvmem.c
++  block:
++    $ref: /schemas/block/block-device.yaml#
++    description:
++      Represents the block storage provided by an SD card or the
++      main hardware partition of an eMMC.
 +
- BLUETOOTH DRIVERS
- M:	Marcel Holtmann <marcel@holtmann.org>
- M:	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-diff --git a/block/Kconfig b/block/Kconfig
-index 1de4682d48ccb..b1d4c88c70040 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -229,6 +229,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
- 	  by falling back to the kernel crypto API when inline
- 	  encryption hardware is not present.
++patternProperties:
++  '^boot[0-9]+':
++    $ref: /schemas/block/block-device.yaml#
++    description:
++      Represents a boot hardware partition on an eMMC.
++
+ required:
+   - compatible
+   - reg
+@@ -42,6 +54,39 @@ examples:
+             compatible = "mmc-card";
+             reg = <0>;
+             broken-hpi;
++
++            block {
++                partitions {
++                    cal_data: block-partition-rf {
++                        partnum = <3>;
++                        partname = "rf";
++
++                        nvmem-layout {
++                            compatible = "fixed-layout";
++                            #address-cells = <1>;
++                            #size-cells = <1>;
++
++                            eeprom@0 {
++                                reg = <0x0 0x1000>;
++                            };
++                        };
++                    };
++                };
++            };
++
++            boot1 {
++                nvmem-layout {
++                    compatible = "fixed-layout";
++                    #address-cells = <1>;
++                    #size-cells = <1>;
++
++                    macaddr: macaddr@a {
++                        compatible = "mac-base";
++                        reg = <0xa 0x6>;
++                        #nvmem-cell-cells = <1>;
++                    };
++                };
++            };
+         };
+     };
  
-+config BLK_NVMEM
-+	bool "Block device NVMEM provider"
-+	depends on OF
-+	depends on NVMEM
-+	help
-+	  Allow block devices (or partitions) to act as NVMEM prodivers,
-+	  typically used with eMMC to store MAC addresses or Wi-Fi
-+	  calibration data on embedded devices.
-+
- source "block/partitions/Kconfig"
- 
- config BLK_MQ_PCI
-diff --git a/block/Makefile b/block/Makefile
-index 46ada9dc8bbfe..03c0bfa8642df 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -34,6 +34,7 @@ obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
- obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
- obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
- obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
-+obj-$(CONFIG_BLK_NVMEM)		+= blk-nvmem.o
- obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
- obj-$(CONFIG_BLK_PM)		+= blk-pm.o
- obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
-diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
-new file mode 100644
-index 0000000000000..29f8ac041d76e
---- /dev/null
-+++ b/block/blk-nvmem.c
-@@ -0,0 +1,169 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * block device NVMEM provider
-+ *
-+ * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
-+ *
-+ * Useful on devices using a partition on an eMMC for MAC addresses or
-+ * Wi-Fi calibration EEPROM data.
-+ */
-+
-+#include "blk.h"
-+#include <linux/nvmem-provider.h>
-+#include <linux/of.h>
-+#include <linux/pagemap.h>
-+#include <linux/property.h>
-+
-+/* List of all NVMEM devices */
-+static LIST_HEAD(nvmem_devices);
-+static DEFINE_MUTEX(devices_mutex);
-+
-+struct blk_nvmem {
-+	struct nvmem_device	*nvmem;
-+	struct device		*dev;
-+	struct list_head	list;
-+};
-+
-+static int blk_nvmem_reg_read(void *priv, unsigned int from,
-+			      void *val, size_t bytes)
-+{
-+	blk_mode_t mode = BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
-+	unsigned long offs = from & ~PAGE_MASK, to_read;
-+	pgoff_t f_index = from >> PAGE_SHIFT;
-+	struct blk_nvmem *bnv = priv;
-+	size_t bytes_left = bytes;
-+	struct file *bdev_file;
-+	struct folio *folio;
-+	void *p;
-+	int ret = 0;
-+
-+	bdev_file = bdev_file_open_by_dev(bnv->dev->devt, mode, priv, NULL);
-+	if (!bdev_file)
-+		return -ENODEV;
-+
-+	if (IS_ERR(bdev_file))
-+		return PTR_ERR(bdev_file);
-+
-+	while (bytes_left) {
-+		folio = read_mapping_folio(bdev_file->f_mapping, f_index++, NULL);
-+		if (IS_ERR(folio)) {
-+			ret = PTR_ERR(folio);
-+			goto err_release_bdev;
-+		}
-+		to_read = min_t(unsigned long, bytes_left, PAGE_SIZE - offs);
-+		p = folio_address(folio) + offset_in_folio(folio, offs);
-+		memcpy(val, p, to_read);
-+		offs = 0;
-+		bytes_left -= to_read;
-+		val += to_read;
-+		folio_put(folio);
-+	}
-+
-+err_release_bdev:
-+	fput(bdev_file);
-+
-+	return ret;
-+}
-+
-+static int blk_nvmem_register(struct device *dev)
-+{
-+	struct device_node *np = dev_of_node(dev);
-+	struct block_device *bdev = dev_to_bdev(dev);
-+	struct nvmem_config config = {};
-+	struct blk_nvmem *bnv;
-+
-+	/* skip devices which do not have a device tree node */
-+	if (!np)
-+		return 0;
-+
-+	/* skip devices without an nvmem layout defined */
-+	if (!of_get_child_by_name(np, "nvmem-layout"))
-+		return 0;
-+
-+	/*
-+	 * skip devices which don't have GENHD_FL_NVMEM set
-+	 *
-+	 * This flag is used for mtdblock and ubiblock devices because
-+	 * both, MTD and UBI already implement their own NVMEM provider.
-+	 * To avoid registering multiple NVMEM providers for the same
-+	 * device node, don't register the block NVMEM provider for them.
-+	 */
-+	if (!(bdev->bd_disk->flags & GENHD_FL_NVMEM))
-+		return 0;
-+
-+	/*
-+	 * skip block device too large to be represented as NVMEM devices
-+	 * which are using an 'int' as address
-+	 */
-+	if (bdev_nr_bytes(bdev) > INT_MAX)
-+		return -EFBIG;
-+
-+	bnv = kzalloc(sizeof(struct blk_nvmem), GFP_KERNEL);
-+	if (!bnv)
-+		return -ENOMEM;
-+
-+	config.id = NVMEM_DEVID_NONE;
-+	config.dev = &bdev->bd_device;
-+	config.name = dev_name(&bdev->bd_device);
-+	config.owner = THIS_MODULE;
-+	config.priv = bnv;
-+	config.reg_read = blk_nvmem_reg_read;
-+	config.size = bdev_nr_bytes(bdev);
-+	config.word_size = 1;
-+	config.stride = 1;
-+	config.read_only = true;
-+	config.root_only = true;
-+	config.ignore_wp = true;
-+	config.of_node = to_of_node(dev->fwnode);
-+
-+	bnv->dev = &bdev->bd_device;
-+	bnv->nvmem = nvmem_register(&config);
-+	if (IS_ERR(bnv->nvmem)) {
-+		dev_err_probe(&bdev->bd_device, PTR_ERR(bnv->nvmem),
-+			      "Failed to register NVMEM device\n");
-+
-+		kfree(bnv);
-+		return PTR_ERR(bnv->nvmem);
-+	}
-+
-+	mutex_lock(&devices_mutex);
-+	list_add_tail(&bnv->list, &nvmem_devices);
-+	mutex_unlock(&devices_mutex);
-+
-+	return 0;
-+}
-+
-+static void blk_nvmem_unregister(struct device *dev)
-+{
-+	struct blk_nvmem *bnv_c, *bnv = NULL;
-+
-+	mutex_lock(&devices_mutex);
-+	list_for_each_entry(bnv_c, &nvmem_devices, list) {
-+		if (bnv_c->dev == dev) {
-+			bnv = bnv_c;
-+			break;
-+		}
-+	}
-+
-+	if (!bnv) {
-+		mutex_unlock(&devices_mutex);
-+		return;
-+	}
-+
-+	list_del(&bnv->list);
-+	mutex_unlock(&devices_mutex);
-+	nvmem_unregister(bnv->nvmem);
-+	kfree(bnv);
-+}
-+
-+static struct class_interface blk_nvmem_bus_interface __refdata = {
-+	.class = &block_class,
-+	.add_dev = &blk_nvmem_register,
-+	.remove_dev = &blk_nvmem_unregister,
-+};
-+
-+static int __init blk_nvmem_init(void)
-+{
-+	return class_interface_register(&blk_nvmem_bus_interface);
-+}
-+device_initcall(blk_nvmem_init);
 -- 
 2.44.0
