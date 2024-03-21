@@ -1,126 +1,151 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAF0224F2
-	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 15:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD211332B7
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 17:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711035823; cv=none; b=Mf9uBS/USWowzQABq7L80+A47MvtY3yw1eU7RqdfTyAIevJM1Dfk7YdNK1LiT2oSRzcwMo0wzfIKjw3xc++5dZu0nBQagJeOZTtDTvmbyQCHEdExTweoS++MljHAFHmtJiU8nlw2GY758Z1ZwzKq001f9YIOCdPR3TDcEXx4xeg=
+	t=1711040511; cv=none; b=PUjTuWTcVtavNL9ZuQ23YzKkEMpg/RLiJhG0/jriHS7TAEyZlaObhyB8cHLRMIWUybbNY/ByxWkYSvALBZhisvZZVwIwczdsO683IU1oIwTKCZxXD5l9siv1/vawtJXynTgawXMfP4JsuA4IhEmNB0hec8WVwFl9ffUA45HwM6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711035823; c=relaxed/simple;
-	bh=gSp680xC0RNeeCCoc2FA1eULmEXUePFkSX+nZqEsKYQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fv+hSYxOtOwPCqiURFfSGWJ8L4LqMQh80z4Ko6V5b9g9orWG0LQidEyvxAk45oMwRiUzTC0SBrWumqantd9hTA/iIcL5nbDMHh2xK3JU1xAz0TvqFA3w0McoS6YNLvPeEjx357R69LBarhChtwqWagFlYhXkBxZVhq6ntlyjfRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	s=arc-20240116; t=1711040511; c=relaxed/simple;
+	bh=rI2zlEUIdfdoDPN9bKT55fECDTqGDJHYDO2COwILZw4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=VT8XFwGn0PaNkzOPLZ+RLtplwBdeql50rDi9Z7eajuuDjyKQjVLyqWBcgwHDQXpI5WZdaoQgN2Iti28utbpUJltzQd1ydwGfndoIdGqCjmi28X+/jlwpYZLWYuY4IoKjt69bQsYT0Ph9rRa5jRAZAp2A5yhnQ5DSZVwCqmpvb18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ecFH4e79; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-78a06e38527so77541685a.2
-        for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 08:43:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711035820; x=1711640620;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SohwRnzAY7/EKReYuxq0+bkMgOj6Nes6Rrl9hVyegXg=;
-        b=SN/ZdpqIcTKJuyJbJ6a6pRkoSY8kDuJcYFRTZum93bKauKOH1Gi9zJl5tkvTtqD1v+
-         E4haxgQYClVL7doD3UivNuF/9rjQBL5z71ogWA4KzxJERB+NXarmCglOfZ8OonmTtCNe
-         bpNmF7lqXXFTHnLtu8+EXX4dT9HGxl3GnG38NHrWU5fp0evVwzfi/QEksS1DiDsTMygH
-         w3DJVSnQGLMWTSFKQsNhSCk8Q9ANcQU7RIla1WrbS8ux3aMSeFkmlbgj8S5a/e/3iuXz
-         3ZCOiMYakGYyf5wR8HYjqwGzu3tDJjtyI6dV2bIYMlotSthPmMrn7iFKHegIZZTK8NQr
-         dDjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUFoJkfNqYNgr4sHc0pxJtfp3nSa69HHnUieboCC4aEUYVztgX+QqUYWxA7riiV3W/jMrNv2Hc1Voa5+ibqNG0vOGcQNexJZS2GzSc=
-X-Gm-Message-State: AOJu0Yyc+thuCFWoW1iWUEwSjWRo5WCLOaItJB225N/18H5QRxy2hoL3
-	YBkm5stpV5g49WYVFp/baBrfryZBLU+bzwuS7RlBXS4tRS876fgEBDI9fw7tXQ==
-X-Google-Smtp-Source: AGHT+IFbHWz05LF/nva7rcl0B2EAVlFxIwvlT0fktJgaSa2L139gfknj3NqDLkJFUgJMqZ3TXPPqnQ==
-X-Received: by 2002:a05:620a:841:b0:789:e987:61f6 with SMTP id u1-20020a05620a084100b00789e98761f6mr8670140qku.1.1711035819857;
-        Thu, 21 Mar 2024 08:43:39 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id sq25-20020a05620a4ad900b0078a0774d1basm3435426qkn.15.2024.03.21.08.43.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 08:43:39 -0700 (PDT)
-Date: Thu, 21 Mar 2024 11:43:38 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ecFH4e79"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711040508;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6z3Ui1R9gRt1exubAt23J/56jSQjv0u0d+ss6rezH6k=;
+	b=ecFH4e79jRcSnYFV6QRa2wGbJUDh91i0bZu49BqsmPNiO05FWUshOm1yOL+/bwlBIpTYEr
+	j5Cjv3O/E2af1GaaVB4GEwjnFhYpWiH4mICC576wXVpdi6dzTDKQ3GfM9dJcw9hfqQ87p8
+	iuBsQl+S3p4m4mHQhNfaveit4M5O5CA=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-86-Sa-xBGS9PTadSWi7Hd1chQ-1; Thu,
+ 21 Mar 2024 13:01:42 -0400
+X-MC-Unique: Sa-xBGS9PTadSWi7Hd1chQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 03C1C282478E;
+	Thu, 21 Mar 2024 17:01:42 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B4764492BDA;
+	Thu, 21 Mar 2024 17:01:41 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id 7011830BFECA; Thu, 21 Mar 2024 17:01:41 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 6E1F53FB4A;
+	Thu, 21 Mar 2024 18:01:41 +0100 (CET)
+Date: Thu, 21 Mar 2024 18:01:41 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Mike Snitzer <snitzer@kernel.org>
+cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+    linux-block@vger.kernel.org, dm-devel@lists.linux.dev
 Subject: Re: block: fail unaligned bio from submit_bio_noacct()
-Message-ID: <ZfxVqkniO-6jFFH5@redhat.com>
-References: <20240321131634.1009972-1-ming.lei@redhat.com>
+In-Reply-To: <ZfxVqkniO-6jFFH5@redhat.com>
+Message-ID: <ea8a13c-ee40-47f9-a7be-17b84bd1f686@redhat.com>
+References: <20240321131634.1009972-1-ming.lei@redhat.com> <ZfxVqkniO-6jFFH5@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240321131634.1009972-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On Thu, Mar 21 2024 at  9:16P -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
 
-> For any bio with data, its start sector and size have to be aligned with
-> the queue's logical block size.
-> 
-> This rule is obvious, but there is still user which may send unaligned
-> bio to block layer, and it is observed that dm-integrity can do that,
-> and cause double free of driver's dma meta buffer.
-> 
-> So failfast unaligned bio from submit_bio_noacct() for avoiding more
-> troubles.
-> 
-> Cc: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: Mike Snitzer <snitzer@kernel.org>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index a16b5abdbbf5..b1a10187ef74 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -729,6 +729,20 @@ void submit_bio_noacct_nocheck(struct bio *bio)
->  		__submit_bio_noacct(bio);
->  }
->  
-> +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
-> +{
-> +	unsigned int bs = q->limits.logical_block_size;
-> +	unsigned int size = bio->bi_iter.bi_size;
-> +
-> +	if (size & (bs - 1))
-> +		return false;
-> +
-> +	if (size && ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1)))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  /**
->   * submit_bio_noacct - re-submit a bio to the block device layer for I/O
->   * @bio:  The bio describing the location in memory and on the device.
-> @@ -780,6 +794,9 @@ void submit_bio_noacct(struct bio *bio)
->  		}
->  	}
->  
-> +	if (WARN_ON_ONCE(!bio_check_alignment(bio, q)))
-> +		goto end_io;
-> +
->  	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
->  		bio_clear_polled(bio);
->  
-> -- 
-> 2.41.0
-> 
-> 
 
-This check would really help more quickly find buggy code, but it
-would be unfortunate for these extra checks to be required in
-production.  It feels like this is the type of check that should be
-wrapped by a debug CONFIG option (so only debug kernels have it).
+On Thu, 21 Mar 2024, Mike Snitzer wrote:
 
-Do we already have an appropriate CONFIG option to use?
+> On Thu, Mar 21 2024 at  9:16P -0400,
+> Ming Lei <ming.lei@redhat.com> wrote:
+> 
+> > For any bio with data, its start sector and size have to be aligned with
+> > the queue's logical block size.
+> > 
+> > This rule is obvious, but there is still user which may send unaligned
+> > bio to block layer, and it is observed that dm-integrity can do that,
+> > and cause double free of driver's dma meta buffer.
+> > 
+> > So failfast unaligned bio from submit_bio_noacct() for avoiding more
+> > troubles.
+> > 
+> > Cc: Mikulas Patocka <mpatocka@redhat.com>
+> > Cc: Mike Snitzer <snitzer@kernel.org>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-core.c | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
+> > 
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index a16b5abdbbf5..b1a10187ef74 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -729,6 +729,20 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+> >  		__submit_bio_noacct(bio);
+> >  }
+> >  
+> > +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
+> > +{
+> > +	unsigned int bs = q->limits.logical_block_size;
+> > +	unsigned int size = bio->bi_iter.bi_size;
+> > +
+> > +	if (size & (bs - 1))
+> > +		return false;
+> > +
+> > +	if (size && ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1)))
+> > +		return false;
+> > +
+> > +	return true;
+> > +}
 
-Mike
+I would change it to
+
+if (unlikely(((bi_iter.bi_sector | bio_sectors(bio)) & ((queue_logical_block_size(q) >> 9) - 1)) != 0))
+	return false;
+
+> >  /**
+> >   * submit_bio_noacct - re-submit a bio to the block device layer for I/O
+> >   * @bio:  The bio describing the location in memory and on the device.
+> > @@ -780,6 +794,9 @@ void submit_bio_noacct(struct bio *bio)
+> >  		}
+> >  	}
+> >  
+> > +	if (WARN_ON_ONCE(!bio_check_alignment(bio, q)))
+> > +		goto end_io;
+> > +
+> >  	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+> >  		bio_clear_polled(bio);
+> >  
+> > -- 
+> > 2.41.0
+> > 
+> > 
+> 
+> This check would really help more quickly find buggy code, but it
+> would be unfortunate for these extra checks to be required in
+> production.  It feels like this is the type of check that should be
+> wrapped by a debug CONFIG option (so only debug kernels have it).
+> 
+> Do we already have an appropriate CONFIG option to use?
+> 
+> Mike
+
+But then, the system would crash with the config option being 'n' and 
+return an error with the config option being 'y' - which would be 
+unfortunate.
+
+We could remove the check from the drivers and add it to the generic I/O 
+path - this wouldn't add extra overhead.
+
+Mikulas
+
