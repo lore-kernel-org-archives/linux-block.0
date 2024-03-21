@@ -1,48 +1,48 @@
 Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880A31E500;
-	Thu, 21 Mar 2024 19:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E302132C38;
+	Thu, 21 Mar 2024 19:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711049993; cv=none; b=o7lb6V3BlciJvvc5zFDEBT1RvgvyVihkU367BKM9hneApVmjlHt5rl+VEFSFLri9Pb6xB5IneuNEC/7Mz/nk9ZB/1SstPir3/ORO+t9HQHVu3YCIrdDx8ATol3ADg7knz+qW0OQ1lggfFrN5WXYpnnUbXB+MQwr3l+7oj/5zMtY=
+	t=1711050274; cv=none; b=NR7imQrWVqHJdc+qWPC2yToodQ2wuba9b+GdfKKCvPELw5nS2BeUX8/W05L3wComR/dhl3M8Q6IvMLxQLQgpcNGNAN6tRpTqtBEjIcabC4jFe7F5EV9hEi1WQV7dS7sJJDOMBpMQJZEHZMZNAYKZ7Wk6bRNOSpKU8dDVDFFEUdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711049993; c=relaxed/simple;
-	bh=GjHlfCNvLtLaYhBRLOZv2mrE5/DNMisJ2TJ1GxHA2ZM=;
+	s=arc-20240116; t=1711050274; c=relaxed/simple;
+	bh=rbdZgAx5OMc44/b4taFIydsj3IvyxH7jHFsK3TNL/BQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=tTP+1U0wpWZoOEwQ4KKZncKTPCYtMVPGp+HnuU03+PmTfGfzeon5mAilev6KpOfHoCjHLGkgUC3Gd5q2L8rERoOcLLIq6TRxVhQlNU4U6oai1uvPuwzSQoh30eOgP7bvie7ns528Sdvlvr5mGI02ry2jLpLtCcSpleNnOreLLmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=EgrRMSNc; arc=none smtp.client-ip=199.89.1.12
+	 In-Reply-To:Content-Type; b=HqMlrV3QkZ9hjlTfoWpFvKWwTbma28aFpmlHk2SeXoZw1+QJHfXlla2lhf8qDBqhUPwZgHTqGiEzr1uaYtIKQ2PzkG10Bv4+oJqk9x5m5TruX2m8RpipXh15+hwfNdfov1A2XmyX6tNxnnt2++4XQGceSwSGtu0n681gSyg4jmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=rUgkUQ4p; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="EgrRMSNc"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="rUgkUQ4p"
 Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V0wlV4m5XzlgVnF;
-	Thu, 21 Mar 2024 19:39:50 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V0wrw3Y7ZzlgVnF;
+	Thu, 21 Mar 2024 19:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:references:content-language:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711049980; x=1713641981; bh=ZwBvmeDuFy6qzsqAXoJIv3bY
-	FPMnT5rPGXQS2NHLAx4=; b=EgrRMSNcPkgZtJmWOb+uXikse00Y/vshM3pH52aX
-	MaEiEf0WCgJKPshbGc7+vad8a5qYbW5MwOfh8P9qegGUsccTrc166O9UrcxL4rX3
-	YPl7sb1VYdOCrYOJI7yyRPOncHhVrISycbdmD5dYhcHpZ1ofkXfiyXHNuc/YPYRP
-	fPdB1ei66eutNFDhXZlUHhgvV/pjvSYHcfEPGU8tgF/qcTkcY0idWYKoKl2Rs/ik
-	8vy8fn4b84k2jNc2RkQeiIl9TRF5hGWw1sc4jlbY9s9nuTZu4SWjX603enthCDXk
-	ZoTzAnQFaxdCcmRXWr/WJ4kJsziZfRJs3/yLDnyHnE2fyw==
+	 s=mr01; t=1711050263; x=1713642264; bh=SpVSKe2FDWsZA6RlvkSY8fUG
+	PrZo8UAPmj+w+wT8abY=; b=rUgkUQ4pKvRo0MnKMv8HBajk8pKVG9x3IEojHuPf
+	Ksp0ApJU9+XRXIEOYNl6KEdaEMhGZ/HAPli/vwcHJ3F/ghYkYIZmqZYQpzGkFLLA
+	KQNMM5bw3tVq5qbSjO5ztqkqXkvgQCTZNc+088HlNcasrDeXjnZve3u8diVNwnkL
+	hqJNbyih6MHR/86S2+cBdrEg2Lg1vIrbZBqbl6jo4MUNgw6ifBWs8Avsmr7CmB/Z
+	Y4dzECXDa+aqHwSnkL0rh3mcnM2CcTQRtqwjCDZM4KtwTr9JukhvizlTlTjxqfv9
+	+ai3/saCPjc9cNvBevTZo+ZGjgvVBRGjnFcymG1fT4BU2w==
 X-Virus-Scanned: by MailRoute
 Received: from 009.lax.mailroute.net ([127.0.0.1])
  by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id VNP5YjymPFIX; Thu, 21 Mar 2024 19:39:40 +0000 (UTC)
+ id TjaQfJAj6kku; Thu, 21 Mar 2024 19:44:23 +0000 (UTC)
 Received: from [100.96.154.173] (unknown [104.132.1.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V0wlF4WF9zlgTGW;
-	Thu, 21 Mar 2024 19:39:37 +0000 (UTC)
-Message-ID: <38efd4e4-0421-4318-8b2d-ca2603d482f5@acm.org>
-Date: Thu, 21 Mar 2024 12:39:33 -0700
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V0wrh4tZhzlgTGW;
+	Thu, 21 Mar 2024 19:44:20 +0000 (UTC)
+Message-ID: <e170642d-9ae8-4d5a-90d9-2837f1bcef9b@acm.org>
+Date: Thu, 21 Mar 2024 12:44:19 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,8 +50,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/8] dt-bindings: block: add basic bindings for block
- devices
+Subject: Re: [PATCH 4/8] block: implement NVMEM provider
 Content-Language: en-US
 To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -71,54 +70,37 @@ To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
  linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
  linux-block@vger.kernel.org
 References: <cover.1711048433.git.daniel@makrotopia.org>
- <28dcc69ecf9d55e95991d8f2a8e19f71bbd32af0.1711048433.git.daniel@makrotopia.org>
+ <7555db6eb71d4ccb2b9d5ebe3b41dc34088c6316.1711048433.git.daniel@makrotopia.org>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <28dcc69ecf9d55e95991d8f2a8e19f71bbd32af0.1711048433.git.daniel@makrotopia.org>
+In-Reply-To: <7555db6eb71d4ccb2b9d5ebe3b41dc34088c6316.1711048433.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/21/24 12:32, Daniel Golle wrote:
-> +$id: http://devicetree.org/schemas/block/partition.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Partition on a block device
-> +
-> +description: |
-> +  This binding describes a partition on a block device.
-> +  Partitions may be matched by a combination of partition number, name,
-> +  and UUID.
-> +
-> +maintainers:
-> +  - Daniel Golle <daniel@makrotopia.org>
-> +
-> +properties:
-> +  $nodename:
-> +    pattern: '^block-partition-.+$'
-> +
-> +  partnum:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description:
-> +      Matches partition by number if present.
-> +
-> +  partname:
-> +    $ref: /schemas/types.yaml#/definitions/string
-> +    description:
-> +      Matches partition by PARTNAME if present.
-> +
-> +  partuuid:
-> +    $ref: /schemas/types.yaml#/definitions/string
-> +    description:
-> +      Matches partition by PARTUUID if present.
-> +
-> +  nvmem-layout:
-> +    $ref: /schemas/nvmem/layouts/nvmem-layout.yaml#
-> +    description:
-> +      This container may reference an NVMEM layout parser.
+On 3/21/24 12:34, Daniel Golle wrote:
+> On embedded devices using an eMMC it is common that one or more partitions
+> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
+> data. Allow referencing the partition in device tree for the kernel and
+> Wi-Fi drivers accessing it via the NVMEM layer.
 
-Does the above imply that only systems with a single block device are
-supported?
+Why to store calibration data in a partition instead of in a file on a
+filesystem?
 
-Supporting partition numbers seems unfortunate to me. Partition numbers
-will change if the partition scheme changes.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8c88f362feb55..242a0a139c00a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3662,6 +3662,11 @@ L:	linux-mtd@lists.infradead.org
+>   S:	Maintained
+>   F:	drivers/mtd/devices/block2mtd.c
+>   
+> +BLOCK NVMEM DRIVER
+> +M:	Daniel Golle <daniel@makrotopia.org>
+> +S:	Maintained
+> +F:	block/blk-nvmem.c
+
+Why to add this functionality to the block layer instead of somewhere
+in the drivers/ directory?
+
+Thanks,
 
 Bart.
