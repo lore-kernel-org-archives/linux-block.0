@@ -1,55 +1,43 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C96F134CC6;
-	Thu, 21 Mar 2024 20:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8307C136665
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 22:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711052795; cv=none; b=imXAEXKiuIKwXFPPpttxVBdHH1VTez4vu1wRkN87xs0UlETV8ggI99u1osOHOWe6SvyfQ2wPyxUHYZfgaLtd8p7HIp2rTDsEHgryW5hiN+A04dWJ3rIQPeSegigQeMh67iBhzhusRnocGmqJUIiyCBJ9nf6Nag36rmsf8nIKEBg=
+	t=1711058796; cv=none; b=Z+3asrEzb+R0ywVcmrbN5jVPY7u9OadGGBR1ewWZeTinsWnhe9aIeUVlYtLNcXgUSA/hzNa9uKIwoZglA0Cvbbxxa//8uRDM2fz51AWalALJjnCba2sdmOUnIwW73AlyHFikCh6bvV7pcLevmQ7KCa7uxlwWzy2+g74Jmg/C6Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711052795; c=relaxed/simple;
-	bh=N64rGhvs2KBoM27OkS7eZxDXNsg40ICyXB3VDM12Icc=;
+	s=arc-20240116; t=1711058796; c=relaxed/simple;
+	bh=KfpF+a6+4mm3/s4tVOICTjq4PLP2bKJ15yhSQaDB4JI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=loM5sa3WVA4pZLdqePuXSP2AiYTQ5seG+NHB0hrmneq/4cCzZxjR/J/LULYKHs7PcdYyUwLgGDXghQ1Cp3Df+KsOJ7Udgb97I18vmLrisa3ouzwACDfjx275gMNZhFQSv/a0AVbREa+jasUw3AYfQZgjPWMMfE0CUc62Zk1fGcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rnOzL-0000Zb-2X;
-	Thu, 21 Mar 2024 20:26:11 +0000
-Date: Thu, 21 Mar 2024 20:26:07 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
-	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Li Lingfeng <lilingfeng3@huawei.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Christian Heusel <christian@heusel.eu>,
-	Min Li <min15.li@samsung.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Avri Altman <avri.altman@wdc.com>, Hannes Reinecke <hare@suse.de>,
-	Christian Loehle <CLoehle@hyperstone.com>,
-	Bean Huo <beanhuo@micron.com>, Yeqi Fu <asuk4.q@gmail.com>,
-	Victor Shih <victor.shih@genesyslogic.com.tw>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Dominique Martinet <dominique.martinet@atmark-techno.com>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/8] dt-bindings: block: add basic bindings for block
- devices
-Message-ID: <ZfyX36JH0NdqS1AW@makrotopia.org>
-References: <cover.1711048433.git.daniel@makrotopia.org>
- <28dcc69ecf9d55e95991d8f2a8e19f71bbd32af0.1711048433.git.daniel@makrotopia.org>
- <38efd4e4-0421-4318-8b2d-ca2603d482f5@acm.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oPW3uZe5l4Mk/dPsgivU1hYEfG94VtcU9pkYxzLiPMh0LSeP3UDNTB3OeDjMDcKH/u0uFsSWTiDrAFsEcbcmvEA4iIWWxYfE9BGpdv1St1AauVOgbENpw1yobqivlPczqLKyahY3cC/tPa7NcglUGbdjqasmwW1sMqW86ri0Pnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Lh129NPY; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lh129NPY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=tA2PrzgLK4+8KTgRQ8IZhbM+gZkF2hVK0c+GgUhcVOA=; b=Lh129NPYPR3eULKDE+6U0xzf7T
+	r8meDyW5cRMRaLzUWQHO/HMc+KAoUTUsj3vxYSlVMrK8VskSRp+taa8fhArCqdwC6r/a3JQkAOXiE
+	pcxXFgIjUykYNHoGARpMouKc7DjkHIjwnwHYDr95pobYphnCEiWO3swuA56nSPx2HhDvt8oN9dBJ8
+	iOTc4GY/oPylPd6zljNQLjNvpFoMDTd6esVX8tGokBMieFQhSNkFTlrbltKcuWpm0eze8ZS/017K4
+	r7GWr+x82W13u4a30nAaDHo6lbLRASv70leFVDm2Jnd+9yzyjGAN1nurgAsQNjWevo7zlHR/dKMaw
+	x7cENDjw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rnQYV-00000004pcM-0KRu;
+	Thu, 21 Mar 2024 22:06:35 +0000
+Date: Thu, 21 Mar 2024 15:06:35 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH] block: fail unaligned bio from submit_bio_noacct()
+Message-ID: <Zfyva1pnrDEE5c6D@infradead.org>
+References: <20240321131634.1009972-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,62 +46,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <38efd4e4-0421-4318-8b2d-ca2603d482f5@acm.org>
+In-Reply-To: <20240321131634.1009972-1-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Mar 21, 2024 at 12:39:33PM -0700, Bart Van Assche wrote:
-> On 3/21/24 12:32, Daniel Golle wrote:
-> > +$id: http://devicetree.org/schemas/block/partition.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Partition on a block device
-> > +
-> > +description: |
-> > +  This binding describes a partition on a block device.
-> > +  Partitions may be matched by a combination of partition number, name,
-> > +  and UUID.
-> > +
-> > +maintainers:
-> > +  - Daniel Golle <daniel@makrotopia.org>
-> > +
-> > +properties:
-> > +  $nodename:
-> > +    pattern: '^block-partition-.+$'
-> > +
-> > +  partnum:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description:
-> > +      Matches partition by number if present.
-> > +
-> > +  partname:
-> > +    $ref: /schemas/types.yaml#/definitions/string
-> > +    description:
-> > +      Matches partition by PARTNAME if present.
-> > +
-> > +  partuuid:
-> > +    $ref: /schemas/types.yaml#/definitions/string
-> > +    description:
-> > +      Matches partition by PARTUUID if present.
-> > +
-> > +  nvmem-layout:
-> > +    $ref: /schemas/nvmem/layouts/nvmem-layout.yaml#
-> > +    description:
-> > +      This container may reference an NVMEM layout parser.
+On Thu, Mar 21, 2024 at 09:16:34PM +0800, Ming Lei wrote:
+> For any bio with data, its start sector and size have to be aligned with
+> the queue's logical block size.
 > 
-> Does the above imply that only systems with a single block device are
-> supported?
-
-Absolutely not. Of course also such devices often have multiple block
-devices, typically eMMC, NVMe and SD card are supported, some also
-come with SATA ports. The block device(s) relevant as NVMEM providers
-has/have to be referenced and the 'partitions' node is a child node of
-a specific block device, of course.
-
+> This rule is obvious, but there is still user which may send unaligned
+> bio to block layer, and it is observed that dm-integrity can do that,
+> and cause double free of driver's dma meta buffer.
 > 
-> Supporting partition numbers seems unfortunate to me. Partition numbers
-> will change if the partition scheme changes.
+> So failfast unaligned bio from submit_bio_noacct() for avoiding more
+> troubles.
 
-I fully argee with that, and using partnum as an identifier is not
-very smart. However, this is what some vendors are doing (in custom
-downstream drivers or scripts running in early userland) and hence the
-kernel implementation should allow to identify the relevant location
-in exactly the same way to be sure we are always compatible.
+I've been wanting to do that for the next merge window, as the lack of
+this check is kinda stunning.  Note that we have open coded versions
+of it in __blkdev_issue_dicard and blkdev_issue_zeroout that can go
+away now.
+
+> +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
+> +{
+> +	unsigned int bs = q->limits.logical_block_size;
+> +	unsigned int size = bio->bi_iter.bi_size;
+
+This should just use bdev_logical_block_size() on bio->bi_bdev.
