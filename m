@@ -1,48 +1,48 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E302132C38;
-	Thu, 21 Mar 2024 19:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73A013441C;
+	Thu, 21 Mar 2024 19:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711050274; cv=none; b=NR7imQrWVqHJdc+qWPC2yToodQ2wuba9b+GdfKKCvPELw5nS2BeUX8/W05L3wComR/dhl3M8Q6IvMLxQLQgpcNGNAN6tRpTqtBEjIcabC4jFe7F5EV9hEi1WQV7dS7sJJDOMBpMQJZEHZMZNAYKZ7Wk6bRNOSpKU8dDVDFFEUdo=
+	t=1711050758; cv=none; b=hXefctsERmg/rGDyIKgzQwEmT5ao/aFovphGLwvbltkayWXAG4rJRCM9elGHW4BtlJeP+V3iKtBnKBo9LYdzgQS6IkDPVqzlZTsEVZBPMW+/txRGkRBIKRq3WtBf4x1U8FanB/qmQonhWHsonyP0/UT4r751n8SzWQ3G8/vL7O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711050274; c=relaxed/simple;
-	bh=rbdZgAx5OMc44/b4taFIydsj3IvyxH7jHFsK3TNL/BQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=HqMlrV3QkZ9hjlTfoWpFvKWwTbma28aFpmlHk2SeXoZw1+QJHfXlla2lhf8qDBqhUPwZgHTqGiEzr1uaYtIKQ2PzkG10Bv4+oJqk9x5m5TruX2m8RpipXh15+hwfNdfov1A2XmyX6tNxnnt2++4XQGceSwSGtu0n681gSyg4jmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=rUgkUQ4p; arc=none smtp.client-ip=199.89.1.12
+	s=arc-20240116; t=1711050758; c=relaxed/simple;
+	bh=x9bF2GlKwBQBROkfQn8ZkL7g6dXhyRklXjeoJ7+o78Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=digEmqud/333ip89ZWFL+akeJYEsI6svcZK1rTirFmnTYZ3UPUt1J+gIBiwzd4uhtgDaT3Hn7SeKnAz2x1E+KFjnJSAHNC8l9IxmVFXK/eeJR0+sNlpHwRW6uXHJIU8mLJmvIhXhmeAQIzNqOZaLBospZWYBwGoHOkIO8+P9Kv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=qNIH0Hs0; arc=none smtp.client-ip=199.89.1.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="rUgkUQ4p"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="qNIH0Hs0"
 Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V0wrw3Y7ZzlgVnF;
-	Thu, 21 Mar 2024 19:44:32 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V0x2648xpz6Cnk8t;
+	Thu, 21 Mar 2024 19:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:references:content-language:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711050263; x=1713642264; bh=SpVSKe2FDWsZA6RlvkSY8fUG
-	PrZo8UAPmj+w+wT8abY=; b=rUgkUQ4pKvRo0MnKMv8HBajk8pKVG9x3IEojHuPf
-	Ksp0ApJU9+XRXIEOYNl6KEdaEMhGZ/HAPli/vwcHJ3F/ghYkYIZmqZYQpzGkFLLA
-	KQNMM5bw3tVq5qbSjO5ztqkqXkvgQCTZNc+088HlNcasrDeXjnZve3u8diVNwnkL
-	hqJNbyih6MHR/86S2+cBdrEg2Lg1vIrbZBqbl6jo4MUNgw6ifBWs8Avsmr7CmB/Z
-	Y4dzECXDa+aqHwSnkL0rh3mcnM2CcTQRtqwjCDZM4KtwTr9JukhvizlTlTjxqfv9
-	+ai3/saCPjc9cNvBevTZo+ZGjgvVBRGjnFcymG1fT4BU2w==
+	 s=mr01; t=1711050744; x=1713642745; bh=x9bF2GlKwBQBROkfQn8ZkL7g
+	6dXhyRklXjeoJ7+o78Q=; b=qNIH0Hs0SVRamEYXBAlL3R8NxsWmvf0F4PHIjKf0
+	F60nOEwPPcs2nTqPPLGPAeHFPtUzTP6Gn/OMprkUlSoJNy9qyrZ8EQP9EEbKbDE3
+	fzs1DTU8ZQ9+lUVJySklU4z4ygGuvWVyGt7wdARk8OSbRif15zuiBgLWp7TybU3x
+	SHFhiEEKk5utahJQerMtwOg/siqOA/ra7Dv0RUUsykNAop28QxZ9yiN9XwThYUNR
+	h3/qESF2JBeIi/VOWiSVka58EbJP8YElNcTrBbA1FAAuHrVOAPItSZZSCv//fA+1
+	VJc9C1fmGJfgByVbHanmDRv0f5BxU3hZK8bUKEbHUhHPUA==
 X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id TjaQfJAj6kku; Thu, 21 Mar 2024 19:44:23 +0000 (UTC)
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id daY4BxjVFOom; Thu, 21 Mar 2024 19:52:24 +0000 (UTC)
 Received: from [100.96.154.173] (unknown [104.132.1.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V0wrh4tZhzlgTGW;
-	Thu, 21 Mar 2024 19:44:20 +0000 (UTC)
-Message-ID: <e170642d-9ae8-4d5a-90d9-2837f1bcef9b@acm.org>
-Date: Thu, 21 Mar 2024 12:44:19 -0700
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V0x1w433Qz6Cnk8s;
+	Thu, 21 Mar 2024 19:52:20 +0000 (UTC)
+Message-ID: <2ed2dadc-bdc4-4a21-8aca-a2aac0c6479a@acm.org>
+Date: Thu, 21 Mar 2024 12:52:19 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,57 +50,39 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/8] block: implement NVMEM provider
+Subject: Re: [RFC PATCH 0/2] Introduce per-task io utilization boost
 Content-Language: en-US
-To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Jens Axboe <axboe@kernel.dk>, Dave Chinner <dchinner@redhat.com>,
- Jan Kara <jack@suse.cz>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
- <linux@weissschuh.net>, Damien Le Moal <dlemoal@kernel.org>,
- Li Lingfeng <lilingfeng3@huawei.com>, Christian Brauner
- <brauner@kernel.org>, Christian Heusel <christian@heusel.eu>,
- Min Li <min15.li@samsung.com>, Adrian Hunter <adrian.hunter@intel.com>,
- Avri Altman <avri.altman@wdc.com>, Hannes Reinecke <hare@suse.de>,
- Christian Loehle <CLoehle@hyperstone.com>, Bean Huo <beanhuo@micron.com>,
- Yeqi Fu <asuk4.q@gmail.com>, Victor Shih <victor.shih@genesyslogic.com.tw>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Dominique Martinet <dominique.martinet@atmark-techno.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <cover.1711048433.git.daniel@makrotopia.org>
- <7555db6eb71d4ccb2b9d5ebe3b41dc34088c6316.1711048433.git.daniel@makrotopia.org>
+To: Christian Loehle <christian.loehle@arm.com>,
+ Qais Yousef <qyousef@layalina.io>
+Cc: linux-kernel@vger.kernel.org, peterz@infradead.org,
+ juri.lelli@redhat.com, mingo@redhat.com, rafael@kernel.org,
+ dietmar.eggemann@arm.com, vschneid@redhat.com, vincent.guittot@linaro.org,
+ Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com, ulf.hansson@linaro.org,
+ andres@anarazel.de, asml.silence@gmail.com, linux-pm@vger.kernel.org,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-mmc@vger.kernel.org
+References: <20240304201625.100619-1-christian.loehle@arm.com>
+ <86f0af00-8765-4481-9245-1819fb2c6379@acm.org>
+ <0dc6a839-2922-40ac-8854-2884196da9b9@arm.com>
+ <c5b7fc1f-f233-4d25-952b-539607c2a0cc@acm.org>
+ <2784c093-eea1-4b73-87da-1a45f14013c8@arm.com>
+ <20240321123935.zqscwi2aom7lfhts@airbuntu>
+ <1ff973fc-66a4-446e-8590-ec655c686c90@arm.com>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <7555db6eb71d4ccb2b9d5ebe3b41dc34088c6316.1711048433.git.daniel@makrotopia.org>
+In-Reply-To: <1ff973fc-66a4-446e-8590-ec655c686c90@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/21/24 12:34, Daniel Golle wrote:
-> On embedded devices using an eMMC it is common that one or more partitions
-> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
-> data. Allow referencing the partition in device tree for the kernel and
-> Wi-Fi drivers accessing it via the NVMEM layer.
+On 3/21/24 10:57, Christian Loehle wrote:
+> In the long-term it looks like for UFS the problem will disappear as we are
+> expected to get one queue/hardirq per CPU (as Bart mentioned), on NVMe that
+> is already the case.
 
-Why to store calibration data in a partition instead of in a file on a
-filesystem?
-
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8c88f362feb55..242a0a139c00a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3662,6 +3662,11 @@ L:	linux-mtd@lists.infradead.org
->   S:	Maintained
->   F:	drivers/mtd/devices/block2mtd.c
->   
-> +BLOCK NVMEM DRIVER
-> +M:	Daniel Golle <daniel@makrotopia.org>
-> +S:	Maintained
-> +F:	block/blk-nvmem.c
-
-Why to add this functionality to the block layer instead of somewhere
-in the drivers/ directory?
+Why the focus on storage controllers with a single completion interrupt?
+It probably won't take long (one year?) until all new high-end
+smartphones may have support for multiple completion interrupts.
 
 Thanks,
 
 Bart.
+
