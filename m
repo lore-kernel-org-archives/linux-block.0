@@ -1,43 +1,53 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B927136678;
-	Thu, 21 Mar 2024 22:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD498F41;
+	Thu, 21 Mar 2024 22:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711059480; cv=none; b=N1emJFYIdJU+4EOLVoT8EhAR7D8cwBrGIMAk9V4zf8UOt/OlOoIrSVyDmYWdY6DnWWBD5AyCJkOCCNzfhem8BlcZTjlt1wDHLlcH/uzfpW+zkbsVtf7uaYtUymG64H3pBoWcRF5Rr0IAyQPDP/GMlB06USCbaKNPyjjcT79f+tk=
+	t=1711060765; cv=none; b=HW/jKfpcOAIwjGqwFBlCdQx0BsBs7/VFCA6mxzyeSMxYBlsNgRYE0v0jasIxqhTp92QCJLoZHdmt+MflhJNdr7dyUJJTmEYrTpySGSg4OBSam5INugG/nEBsvra6bxZLHVie6p+4zPbPTBpIO2mnF5xv6Ax8RmlOO+LhJ82GHF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711059480; c=relaxed/simple;
-	bh=TWPywZmYQfSzaaVw6MlOvZjfhCLwaTpQvIshNj2rZ18=;
+	s=arc-20240116; t=1711060765; c=relaxed/simple;
+	bh=jl9wIcbi+M6xIcqdg2/AXtdvAbhe18vrLYJvJlJmxKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eVm5ymMbyqv/Vv6evQbrRpqOIGIZYIhQyiye3nGQDwwv0WJyopdP5kb72CqfpxFL1o4+nvc9bf6LKnMyfGapPNlhISc4qK+dgI5tR+hs+Ey/RWlEQ5fNJlWpdczOUVjJ2c4PzhgythcRAn0dZCaVEpN5I30mKGyqD66AIFGHNvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pyiM6dG8; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pyiM6dG8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=7boV6kwIyDNNQcD+l25f0yRaiDI5TrZ7g7lLnA+hpMU=; b=pyiM6dG8hRPG2lbz4s25X7e/ox
-	7vEpbt9QViv6ANHZpKZkenkbFID0zYN3EQJXQMJ/ihjyA4itJst/O82ZcspaW/ca9juj+y8/bdYVz
-	ZLb+HBUijkCpjc4G19REQKhBujQvYdPoyf/efP1Zi50xiOn0f3uAhqDGNJgPnt9gztpwpiydS+vnB
-	5ZpDebkQlkvB4/Y0UJm5HKc4k5SSgSlMrFC86qzUsSlQvyrhv6ZntA4xD+hqXZtDFF2ZbQ2RanWbs
-	qxmXzl3N5qlveYUEY86O7nfLUxO4E7JavpJR3adg0f8D2euBlH4ZrsWz/NyAQKHakbiAOLnayNWuY
-	wKXH29cA==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rnQjT-00000007ifl-0yqY;
-	Thu, 21 Mar 2024 22:17:55 +0000
-Date: Thu, 21 Mar 2024 22:17:55 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 00/34] Open block devices as files
-Message-ID: <ZfyyEwu9Uq5Pgb94@casper.infradead.org>
-References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BqTDSMff75xPBCKjlj+IVhW5VSR7NWsmwYkDlNc8FJM647YMnXS+RMEYvbjPIRSvGDMo+I3lbpv/TtS76b9h1QpO90WP/tBRk8oiuND6VpG/HqUxlLznvRuKNCxyXztTU9cJEStVOjstpMWLSOCTKJx77FOugCHMaT8i6umNul0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 879B968BEB; Thu, 21 Mar 2024 23:39:11 +0100 (CET)
+Date: Thu, 21 Mar 2024 23:39:10 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
+ steps
+Message-ID: <20240321223910.GA22663@lst.de>
+References: <20240306162022.GB28427@lst.de> <20240306174456.GO9225@ziepe.ca> <20240306221400.GA8663@lst.de> <20240307000036.GP9225@ziepe.ca> <20240307150505.GA28978@lst.de> <20240307210116.GQ9225@ziepe.ca> <20240308164920.GA17991@lst.de> <20240308202342.GZ9225@ziepe.ca> <20240309161418.GA27113@lst.de> <20240319153620.GB66976@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,39 +56,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
+In-Reply-To: <20240319153620.GB66976@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Jan 23, 2024 at 02:26:17PM +0100, Christian Brauner wrote:
-> This opens block devices as files. Instead of introducing a separate
-> indirection into bdev_open_by_*() vis struct bdev_handle we can just
-> make bdev_file_open_by_*() return a struct file. Opening and closing a
-> block device from setup_bdev_super() and in all other places just
-> becomes equivalent to opening and closing a file.
+On Tue, Mar 19, 2024 at 12:36:20PM -0300, Jason Gunthorpe wrote:
+> I kind of understand your thinking on the DMA side, but I don't see
+> how this is good for users of the API beyond BIO.
 > 
-> This has held up in xfstests and in blktests so far and it seems stable
-> and clean. The equivalence of opening and closing block devices to
-> regular files is a win in and of itself imho. Added to that is the
-> ability to do away with struct bdev_handle completely and make various
-> low-level helpers private to the block layer.
+> How will this make RDMA better? We have one MR, the MR has pages, the
+> HW doesn't care about the SW distinction of p2p, swiotlb, direct,
+> encrypted, iommu, etc. It needs to create one HW page list for
+> whatever user VA range was given.
 
-It fails to hold up in xfstests for me.
+Well, the hardware (as in the PCIe card) never cares.  But the setup
+path for the IOMMU does, and something in the OS needs to know about
+it.  So unless we want to stash away a 'is this P2P' flag in every
+page / SG entry / bvec, or a do a lookup to find that out for each
+of them we need to manage chunks at these boundaries.  And that's
+what I'm proposing.
 
-git bisect leads to:
+> Or worse, whatever thing is inside a DMABUF from a DRM
+> driver. DMABUF's can have a (dynamic!) mixture of P2P and regular
+> AFAIK based on the GPU's migration behavior.
 
-commit 321de651fa565dcf76c017b257bdf15ec7fff45d
-Author: Christian Brauner <brauner@kernel.org>
-Date:   Tue Jan 23 14:26:48 2024 +0100
+And that's fine.  We just need to track it efficiently.
 
-    block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access
+> 
+> Or triple worse, ODP can dynamically change on a page by page basis
+> the type depending on what hmm_range_fault() returns.
 
-QA output created by 015
-mkfs failed
-(see /ktest-out/xfstests/generic/015.full for details)
-umount: /dev/vdc: not mounted.
+Same.  If this changes all the time you need to track it.  And we
+should find a way to shared the code if we have multiple users for it.
 
-** mkfs failed with extra mkfs options added to "-m reflink=1,rmapbt=1 -i sparse=1,nrext64=1" by test 015 **
-** attempting to mkfs using only test 015 options: -d size=268435456 -b size=4096 **
-mkfs.xfs: cannot open /dev/vdc: Device or resource busy
-mkfs failed
+But most DMA API consumers will never see P2P, and when they see it
+it will be static.  So don't build the DMA API to automically do
+the (not exactly super cheap) checks and add complexity for it.
 
-About half the xfstests fail this way (722 of 1387 tests)
+> So I take it as a requirement that RDMA MUST make single MR's out of a
+> hodgepodge of page types. RDMA MRs cannot be split. Multiple MR's are
+> not a functional replacement for a single MR.
+
+But MRs consolidate multiple dma addresses anyway.
+
+> Go back to the start of what are we trying to do here:
+>  1) Make a DMA API that can support hmm_range_fault() users in a
+>     sensible and performant way
+>  2) Make a DMA API that can support RDMA MR's backed by DMABUF's, and
+>     user VA's without restriction
+>  3) Allow to remove scatterlist from BIO paths
+>  4) Provide a DMABUF API that is not scatterlist that can feed into
+>     the new DMA API - again supporting DMABUF's hodgepodge of types.
+> 
+> I'd like to do all of these things. I know 3 is your highest priority,
+> but it is my lowest :)
+
+Well, 3 an 4.  And 3 is not just limited to bio, but all the other
+pointless scatterlist uses.
+
