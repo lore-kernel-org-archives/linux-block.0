@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A58133422;
-	Thu, 21 Mar 2024 19:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54019134412;
+	Thu, 21 Mar 2024 19:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711049594; cv=none; b=ryITxzUdfJx3jeZCe/RC6Kck6UZqYgN+XucNGrEIWcMmlS6sWxhcmB30e+la5gtnDx+o8+ahCBDkpQypaX8cccQddqiXJghs+RhumizlI84ycFbmIQFO/4jAEXVfGwM+p8dXaaXuOQkeMy50SfQFDuZ5i/u2I802ex9mDiEqjIc=
+	t=1711049628; cv=none; b=rAMKIDS6XygnD/+vQmeEBlA4NCBYzbOKen5g5rF8K3OTW2YcTtn07sHk9Js8AbA6zwmc+/6xvyWaGWwueJSvS8C5CPPJenF2yp8eHW1YMMEOfAnd+4eYxGyz32AOpwzoqrPl0hstNKH6IIiWjYNpD93t/Np3yHUmTVYD3xJmhyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711049594; c=relaxed/simple;
-	bh=xXa4FF7nQG3CwW6ptYwxB1tD6/Yh0AKEy2Pi0Dfq8GU=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ANwf1zngs/Np/yvc7/UYXQjVhFuisgFIbZ+AVgckrIixMgkQsDmQ9pj860Ma0DuRMPzkkxjhF4uvAnOXfbkyJstOP5YmDc1fC6mTTjuHVB2CZqxiGfZGtXBgKVDwhCaPCIojrQVeC1t+5qpcJMqbvNwh2TkgjDG5C2/3W+/1U+Y=
+	s=arc-20240116; t=1711049628; c=relaxed/simple;
+	bh=xWOwvbPZgST6WT++t4v3lHbMbLvITOiRaYTKtbxJdgw=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y8GzDDoenjgb0ZCY1xJy32n1jfTkSbSSxQHGlKTYn5VBBi9rkZymjlJDaioU/otAelHnxwpXuyvT/ShXiRkxFMLp1/TSK4GGNDgp0g/4Wq0HinJA2pAzWN5gYRoBya5h1I2REOT/6JTcaVhpbKqK3vIa2ULZX9ESqXmI5PdjZwc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1rnO9R-0000Cf-2Z;
-	Thu, 21 Mar 2024 19:32:33 +0000
-Date: Thu, 21 Mar 2024 19:31:48 +0000
+	id 1rnOAE-0000Db-2U;
+	Thu, 21 Mar 2024 19:33:22 +0000
+Date: Thu, 21 Mar 2024 19:32:48 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -44,8 +44,9 @@ To: Rob Herring <robh@kernel.org>,
 	"Ricardo B. Marliere" <ricardo@marliere.net>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 0/8] block: implement NVMEM provider
-Message-ID: <cover.1711048433.git.daniel@makrotopia.org>
+Subject: [PATCH 1/8] dt-bindings: block: add basic bindings for block devices
+Message-ID: <28dcc69ecf9d55e95991d8f2a8e19f71bbd32af0.1711048433.git.daniel@makrotopia.org>
+References: <cover.1711048433.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,67 +55,131 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1711048433.git.daniel@makrotopia.org>
 
-On embedded devices using an eMMC it is common that one or more (hw/sw)
-partitions on the eMMC are used to store MAC addresses and Wi-Fi
-calibration EEPROM data.
+Add bindings for block devices which are used to allow referencing
+nvmem bits on them.
 
-Implement an NVMEM provider backed by a block device as typically the
-NVMEM framework is used to have kernel drivers read and use binary data
-from EEPROMs, efuses, flash memory (MTD), ...
-
-In order to be able to reference hardware partitions on an eMMC, add code
-to bind each hardware partition to a specific firmware subnode.
-
-Overall, this enables uniform handling across practially all flash
-storage types used for this purpose (MTD, UBI, and now also MMC).
-
-As part of this series it was necessary to define a device tree schema
-for block devices and partitions on them, which (similar to how it now
-works also for UBI volumes) can be matched by one or more properties.
-
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-This series has previously been submitted as RFC on July 19th 2023[1]
-and most of the basic idea did not change since. Another round of RFC
-was submitted on March 5th 2024[2] which has received overall positive
-feedback and only minor corrections have been done since (see
-changelog below).
-
-[1]: https://patchwork.kernel.org/project/linux-block/list/?series=767565
-[2]: https://patchwork.kernel.org/project/linux-block/list/?series=832705
-
-Changes since RFC:
- * Use 'partuuid' instead of reserved 'uuid' keyword to match against
-   PARTUUID.
- * Simplify blk_nvmem_init(void) function.
-
-Daniel Golle (8):
-  dt-bindings: block: add basic bindings for block devices
-  block: partitions: populate fwnode
-  block: add new genhd flag GENHD_FL_NVMEM
-  block: implement NVMEM provider
-  dt-bindings: mmc: mmc-card: add block device nodes
-  mmc: core: set card fwnode_handle
-  mmc: block: set fwnode of disk devices
-  mmc: block: set GENHD_FL_NVMEM
-
- .../bindings/block/block-device.yaml          |  22 +++
- .../devicetree/bindings/block/partition.yaml  |  51 ++++++
- .../devicetree/bindings/block/partitions.yaml |  20 +++
- .../devicetree/bindings/mmc/mmc-card.yaml     |  45 +++++
- MAINTAINERS                                   |   5 +
- block/Kconfig                                 |   9 +
- block/Makefile                                |   1 +
- block/blk-nvmem.c                             | 169 ++++++++++++++++++
- block/partitions/core.c                       |  41 +++++
- drivers/mmc/core/block.c                      |   8 +
- drivers/mmc/core/bus.c                        |   2 +
- include/linux/blkdev.h                        |   2 +
- 12 files changed, 375 insertions(+)
+ .../bindings/block/block-device.yaml          | 22 ++++++++
+ .../devicetree/bindings/block/partition.yaml  | 51 +++++++++++++++++++
+ .../devicetree/bindings/block/partitions.yaml | 20 ++++++++
+ 3 files changed, 93 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/block/block-device.yaml
  create mode 100644 Documentation/devicetree/bindings/block/partition.yaml
  create mode 100644 Documentation/devicetree/bindings/block/partitions.yaml
- create mode 100644 block/blk-nvmem.c
 
+diff --git a/Documentation/devicetree/bindings/block/block-device.yaml b/Documentation/devicetree/bindings/block/block-device.yaml
+new file mode 100644
+index 0000000000000..c83ea525650ba
+--- /dev/null
++++ b/Documentation/devicetree/bindings/block/block-device.yaml
+@@ -0,0 +1,22 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/block/block-device.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: block storage device
++
++description: |
++  This binding is generic and describes a block-oriented storage device.
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++properties:
++  partitions:
++    $ref: /schemas/block/partitions.yaml
++
++  nvmem-layout:
++    $ref: /schemas/nvmem/layouts/nvmem-layout.yaml#
++
++unevaluatedProperties: false
+diff --git a/Documentation/devicetree/bindings/block/partition.yaml b/Documentation/devicetree/bindings/block/partition.yaml
+new file mode 100644
+index 0000000000000..86b61e30f9a41
+--- /dev/null
++++ b/Documentation/devicetree/bindings/block/partition.yaml
+@@ -0,0 +1,51 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/block/partition.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Partition on a block device
++
++description: |
++  This binding describes a partition on a block device.
++  Partitions may be matched by a combination of partition number, name,
++  and UUID.
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++properties:
++  $nodename:
++    pattern: '^block-partition-.+$'
++
++  partnum:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      Matches partition by number if present.
++
++  partname:
++    $ref: /schemas/types.yaml#/definitions/string
++    description:
++      Matches partition by PARTNAME if present.
++
++  partuuid:
++    $ref: /schemas/types.yaml#/definitions/string
++    description:
++      Matches partition by PARTUUID if present.
++
++  nvmem-layout:
++    $ref: /schemas/nvmem/layouts/nvmem-layout.yaml#
++    description:
++      This container may reference an NVMEM layout parser.
++
++anyOf:
++  - required:
++      - partnum
++
++  - required:
++      - partname
++
++  - required:
++      - partuuid
++
++unevaluatedProperties: false
+diff --git a/Documentation/devicetree/bindings/block/partitions.yaml b/Documentation/devicetree/bindings/block/partitions.yaml
+new file mode 100644
+index 0000000000000..fd84c3ba8493b
+--- /dev/null
++++ b/Documentation/devicetree/bindings/block/partitions.yaml
+@@ -0,0 +1,20 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/block/partitions.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Partitions on block devices
++
++description: |
++  This binding is generic and describes the content of the partitions container
++  node.
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++patternProperties:
++  "^block-partition-.+$":
++    $ref: partition.yaml
++
++unevaluatedProperties: false
 -- 
 2.44.0
