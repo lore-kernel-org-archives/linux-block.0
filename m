@@ -1,76 +1,76 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACD32C86A
-	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 09:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA7F4597E
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 09:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711014455; cv=none; b=VjdnEWav06WM4gr4B/lqyU/vmo/iKwKZ2avM8BeVQyHlTmN01tazYPJlPBE2pZU9WbxI2eMihD60Oxq9esHQRAYc03Hwhe5L6qgJaqkpxMEP32ek1uXnGPWLvlRQB87ZkAUsexd9hlmTtJAY0++7rCvbumb+qYRPY4gLnpah+KM=
+	t=1711014456; cv=none; b=Da+6MLumT4wex8jkUsHuZZQ5rTFa7vXDQvsfbAxXhRK0Q37zDMfMYp7p2syzgGe+hmsiub090aIdKoS1iTzocFMyCsKuKWeRV1LDw6/KS+kQlwl0ROVLmP8oY+Xx6q93enO9vXBe35Rzb69kCww7YPfsk0FYQNHnkyHd7KzARCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711014455; c=relaxed/simple;
-	bh=SjZcFet/FLu8HamUQkkJ6VtXMgQWFzDYulQx1wTodk4=;
+	s=arc-20240116; t=1711014456; c=relaxed/simple;
+	bh=YCIGqzbnuxgRiH5eRqLpdZkhi+BH1RJ1HrRmb/vej8A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eB7uSmIMDX2UPxsuHzAUdd+7RVm/A7DJ6mP7m+4vj2GCjoIrNIiQRCzZ5or4TvgPJVcVFjhdrFebpnjnHtgPJBDkEQIffMX9Ddn1IP1guy6DDdkuJFIsqINcTWPVejDjeXueeasXh7MZQdRXoUhEofDBBfeHtJeIxdWeyRYLiN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ukkdw13T; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J5TuhvC2; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ukkdw13T; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J5TuhvC2; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=kymJPwEocfvkzxl4bZaPiejwaP0r14gmT20NAb1JYdFZx5FnXgACCdBupXolygHHSaY09A9q8lOVNC12GYd46aB4SnVCViW5XFrjUAf6HCXZgsnj7rZzy3piLS8+w9oaF0KZw2gZyCrbN0G8JsQpejccG9qyqJpnuCLEWQdFo2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zImkQgyX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+rKSb46n; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zImkQgyX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+rKSb46n; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ukkdw13T";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J5TuhvC2";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ukkdw13T";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J5TuhvC2"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zImkQgyX";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+rKSb46n";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zImkQgyX";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+rKSb46n"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 969551FBF9;
-	Thu, 21 Mar 2024 09:47:31 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C886D5CBC2;
+	Thu, 21 Mar 2024 09:47:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711014451; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1711014452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
-	b=ukkdw13TY8Z8/KJ2TpVf8lc5z86Uf1yT310HRyu/Y4nSNxjrOsUpT3PCPY0GKqSN7LWuxv
-	JOhIGWaQvvvVaa+RcBGuDP7wc5yI+YS7F21LvCxvaWO3f2V/0HnRZSszRWJuSfNQaFwXxf
-	63PSjKV7klV8Yh8b3LtKAYGKEbPt/ag=
+	bh=YI2CBx8BIa8CSsKBnOyhZ/dTKMZfvGnVLkV71KB7Krk=;
+	b=zImkQgyXuNgEIsK4dEuJYU9OWaxKLPpUt59G4H/1J2Dvh6fRKo2lR2E5NUxePRzY/dLNrH
+	RRINRHWOdWwPeBjh3ujpHxRoAG6KYk13NTkYbycZZb5Wjpnu6nvqQaBacZ7xmm6qc9nzh/
+	//SgOB1UXo0sWcazyIvIBZwSk5c4Eo4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711014451;
+	s=susede2_ed25519; t=1711014452;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
-	b=J5TuhvC20ceq+u7RdLVTtteGmE2Z+MwU6dVxC4zWD92+SlZHs4CrIafv205pgEBLQXzMVo
-	D4u7MbHmjJxFhLDA==
+	bh=YI2CBx8BIa8CSsKBnOyhZ/dTKMZfvGnVLkV71KB7Krk=;
+	b=+rKSb46n2bTU1hma/zw5eVhHXeVTAN4EztnhPtFoyLxBE24zJ8HT3YyyKDH9bm5nIvZt8U
+	jxXOt4YdTACz7/Bg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711014451; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1711014452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
-	b=ukkdw13TY8Z8/KJ2TpVf8lc5z86Uf1yT310HRyu/Y4nSNxjrOsUpT3PCPY0GKqSN7LWuxv
-	JOhIGWaQvvvVaa+RcBGuDP7wc5yI+YS7F21LvCxvaWO3f2V/0HnRZSszRWJuSfNQaFwXxf
-	63PSjKV7klV8Yh8b3LtKAYGKEbPt/ag=
+	bh=YI2CBx8BIa8CSsKBnOyhZ/dTKMZfvGnVLkV71KB7Krk=;
+	b=zImkQgyXuNgEIsK4dEuJYU9OWaxKLPpUt59G4H/1J2Dvh6fRKo2lR2E5NUxePRzY/dLNrH
+	RRINRHWOdWwPeBjh3ujpHxRoAG6KYk13NTkYbycZZb5Wjpnu6nvqQaBacZ7xmm6qc9nzh/
+	//SgOB1UXo0sWcazyIvIBZwSk5c4Eo4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711014451;
+	s=susede2_ed25519; t=1711014452;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
-	b=J5TuhvC20ceq+u7RdLVTtteGmE2Z+MwU6dVxC4zWD92+SlZHs4CrIafv205pgEBLQXzMVo
-	D4u7MbHmjJxFhLDA==
+	bh=YI2CBx8BIa8CSsKBnOyhZ/dTKMZfvGnVLkV71KB7Krk=;
+	b=+rKSb46n2bTU1hma/zw5eVhHXeVTAN4EztnhPtFoyLxBE24zJ8HT3YyyKDH9bm5nIvZt8U
+	jxXOt4YdTACz7/Bg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7BE3913976;
-	Thu, 21 Mar 2024 09:47:31 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B6B7B13976;
+	Thu, 21 Mar 2024 09:47:32 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id TcjbHDMC/GW5DwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Thu, 21 Mar 2024 09:47:31 +0000
+	id 7KgyKzQC/GW/DwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 21 Mar 2024 09:47:32 +0000
 From: Daniel Wagner <dwagner@suse.de>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc: linux-block@vger.kernel.org,
@@ -78,9 +78,9 @@ Cc: linux-block@vger.kernel.org,
 	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
 	Hannes Reinecke <hare@suse.de>,
 	Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v1 02/18] nvme/rc: silence fcloop cleanup failures
-Date: Thu, 21 Mar 2024 10:47:11 +0100
-Message-ID: <20240321094727.6503-3-dwagner@suse.de>
+Subject: [PATCH blktests v1 04/18] common/xfs: propagate errors from _xfs_run_fio_verify_io
+Date: Thu, 21 Mar 2024 10:47:13 +0100
+Message-ID: <20240321094727.6503-5-dwagner@suse.de>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240321094727.6503-1-dwagner@suse.de>
 References: <20240321094727.6503-1-dwagner@suse.de>
@@ -91,13 +91,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: 3.49
+X-Spam-Score: 2.43
 X-Spam-Flag: NO
-X-Spamd-Bar: +++
+X-Spamd-Bar: ++
 Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ukkdw13T;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=J5TuhvC2
-X-Spamd-Result: default: False [3.49 / 50.00];
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=zImkQgyX;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=+rKSb46n
+X-Spamd-Result: default: False [2.43 / 50.00];
 	 ARC_NA(0.00)[];
 	 RCVD_VIA_SMTP_AUTH(0.00)[];
 	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
@@ -121,66 +121,59 @@ X-Spamd-Result: default: False [3.49 / 50.00];
 	 MIME_TRACE(0.00)[0:+];
 	 RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[43.05%];
+	 BAYES_HAM(-1.06)[87.80%];
 	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from]
-X-Spam-Level: ***
+X-Spam-Level: **
 X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 969551FBF9
+X-Rspamd-Queue-Id: C886D5CBC2
 
-When the ctl file is missing we are logging
+If _xfs_mkfs_and_mount fails _xfs_run_fio_verify_io will continue to
+execute and fio will run against the local file system instead against
+the block device.
 
-  tests/nvme/rc: line 265: /sys/class/fcloop/ctl/del_target_port: No such file or directory
-  tests/nvme/rc: line 257: /sys/class/fcloop/ctl/del_local_port: No such file or directory
-  tests/nvme/rc: line 249: /sys/class/fcloop/ctl/del_remote_port: No such file or directory
-
-because the first redirect operator fails. Thus first check if the ctl
-file exists.
+Propagate all errors back to the caller.
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
- tests/nvme/rc | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ common/xfs | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 78d84af72e73..53fa54e64cb2 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -234,7 +234,10 @@ _nvme_fcloop_del_rport() {
- 	local remote_wwpn="$4"
- 	local loopctl=/sys/class/fcloop/ctl
+diff --git a/common/xfs b/common/xfs
+index 37ce85878df2..569770fecd53 100644
+--- a/common/xfs
++++ b/common/xfs
+@@ -16,7 +16,7 @@ _xfs_mkfs_and_mount() {
  
--	echo "wwnn=${remote_wwnn},wwpn=${remote_wwpn}" > ${loopctl}/del_remote_port 2> /dev/null
-+	if [[ ! -f "${loopctrl}" ]]; then
-+		return
-+	fi
-+	echo "wwnn=${remote_wwnn},wwpn=${remote_wwpn}" > ${loopctl}/del_remote_port > /dev/null 2>&1
+ 	mkdir -p "${mount_dir}"
+ 	umount "${mount_dir}"
+-	mkfs.xfs -l size=64m -f "${bdev}"
++	mkfs.xfs -l size=64m -f "${bdev}" || return $?
+ 	mount "${bdev}" "${mount_dir}"
  }
  
- _nvme_fcloop_del_lport() {
-@@ -242,7 +245,10 @@ _nvme_fcloop_del_lport() {
- 	local wwpn="$2"
- 	local loopctl=/sys/class/fcloop/ctl
+@@ -27,8 +27,10 @@ _xfs_run_fio_verify_io() {
+ 	local sz_mb
+ 	local avail
+ 	local avail_mb
++	local rc
  
--	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_local_port 2> /dev/null
-+	if [[ ! -f "${loopctrl}" ]]; then
-+		return
-+	fi
-+	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_local_port > /dev/null > /dev/null 2>&1
+-	_xfs_mkfs_and_mount "${bdev}" "${mount_dir}" >> "${FULL}" 2>&1
++	_xfs_mkfs_and_mount "${bdev}" "${mount_dir}" \
++		>>"${FULL}" 2>&1 || return $?
+ 
+ 	avail="$(df --output=avail "${mount_dir}" | tail -1)"
+ 	avail_mb="$((avail / 1024))"
+@@ -43,7 +45,10 @@ _xfs_run_fio_verify_io() {
+ 	fi
+ 
+ 	_run_fio_verify_io --size="${sz_mb}m" --directory="${mount_dir}/"
++	rc=$?
+ 
+ 	umount "${mount_dir}" >> "${FULL}" 2>&1
+ 	rm -fr "${mount_dir}"
++
++	return "${rc}"
  }
- 
- _nvme_fcloop_del_tport() {
-@@ -250,7 +256,10 @@ _nvme_fcloop_del_tport() {
- 	local wwpn="$2"
- 	local loopctl=/sys/class/fcloop/ctl
- 
--	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_target_port 2> /dev/null
-+	if [[ ! -f "${loopctrl}" ]]; then
-+		return
-+	fi
-+	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_target_port > /dev/null 2&>1
- }
- 
- _cleanup_fcloop() {
 -- 
 2.44.0
 
