@@ -1,134 +1,121 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF368BE7
-	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 17:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3FD79E0;
+	Thu, 21 Mar 2024 17:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711040968; cv=none; b=MQQRQnFIJcgeQrROjTRYF1QKy30/Rhv5mw5WjAPyPV1nTBct5SBIzqByByQ7Kwn7QLUkhxubcjpI/KMAh53NU3Al+J3Yxr2ml6xrKU46ECmJn/MH5pE4Mb15vEkA800sw1h+50RDpjtOBl17CRe2CdYIUkYOJlTiGUM4Gtan2tI=
+	t=1711041927; cv=none; b=MDqT6UoiLqk/wN1WQ1KdpMdhqihyZOGCtNURRbC83n2Q3vmmL6QofefPZPh+UFGJ2E+WeZmF/031n0ALV9+x7uLZSvQrxzkw7GcTlXSNGbN0XNCaOw8RBERjEbWcJ/Oa01qlvBdKpU+947CK04FYlvaS4f62VO/amVhSjM2hp4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711040968; c=relaxed/simple;
-	bh=md9ybH5ys3RExgWiyiE9Dp2TT+NQkjbn4RaBPSzujwU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sG/P9ooaZwH3KFFOyveDAVEzD6NOPpglNkLyz1D4HloBPK9Sxh9JuQ6wGibNfpw6UXm+U1vChr4U++4+scDWfetbdrpFyBjLWrRHFmjYA+7zr7nRLQeCgs32EL2dlNQ7ZjKR/JsITHU3Gaf9+9eRD95tiFBWaVyPBjpLAHbEOAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Qq1ly2iX; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1711041927; c=relaxed/simple;
+	bh=iNXaAGwm6iS6DNKISF6dlrJY5wNVKnpnm8REwy4rDho=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=ZlrxG4ckuZ8goLtQ3Em9Yp1/x2MZLfQKcZBNJJRM1Mb3vNory2jOJCXysSu0vJiZhxeJA0sblwHWyEal53rf1STgifO0GY5glb7rHOIhY0wEzcByhjLfmSBat936BVoHSNLC+bg6+vk5KVlv6Cm5OI7VSc+5oY2gGUDKiB9Amaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQevDAax; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Qq1ly2iX"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-36699ee4007so1242465ab.0
-        for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 10:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1711040966; x=1711645766; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VTmaYD+N8oG27MmCeLZ2fD5OgdR8oN/GLBC9LDdyTZ8=;
-        b=Qq1ly2iXLDRg8xEev9FTbC/XKihGjKuYWBCfOX7XAYWT9pxM2yCwJItL9zfWEitAN7
-         Ysr7Su0dfgsXFWWjVM4L2K+e6BJfOY8EPdulREaNShYTDTQZuypM+uaqUHQTAytbq3TZ
-         k+rwnxEajjf7No2rF9OeLQuo9dacRVwWlgKSmJK354CkamMBaabEgyYnf/jEu+CtGBgY
-         7gw/cEWscp35xqQaSBZLz3AaDoQHHLR0HwAONjK2sg0SfEgCgNXKsnvesKMxwhq8EqCU
-         kQcRS9YoIlm6ueCqUgsLoR5YZqWOVbVo7y1jPTv0Q97OF2pGaEENZjeJMObviiG5t284
-         je+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711040966; x=1711645766;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VTmaYD+N8oG27MmCeLZ2fD5OgdR8oN/GLBC9LDdyTZ8=;
-        b=f43kJtbmt+ZKfS3N+AWRSrUF4lAvSDDVxXLg0VB8U2ZsQod6MpcdX8YrBZwItFDq3H
-         e4XICA0mRLLRgpHGiQ4xhEetqqf7t1kF6DN59mcSMPG1wxrmBfIklOkkMrYAN81BzULK
-         7z33K6V/13p7rG7yQDUlRu/ap3pk9eGz8xdrtUC0vdXODFukFAvp4RQAq5eH18Gp3KXt
-         uBqo+VngkUKyVqKG5Tidh5sJZxWtyJVZqqKQb8jvVqx2ICLsIOEeRy7Ru5gHk4PCAipL
-         ytJccRc7CLdKPwZUYbKedbI9fEnYPd59KbmyHsiT0V+2mEAOqMKm29yqCcaqZpzEDnLU
-         2z4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUym+sTwEvL9UstEvTdqoGgbs71lyTihqHhCO+gRcKyYKo7fCMzPcJnjGo4XewF4+1xtN4J/MMQE7RTAPc8DpPBLjhmUBEmZWGZedc=
-X-Gm-Message-State: AOJu0YzkBcXdRWNEXGBxVx8RZ1UAaWoqWultmlBo2XdPFokEab+0p4wl
-	yRKt4P8pSPT3PofI/0aWfiRiFg59+aOfbexRTSfqzUGVo+naSyyFZZoKVL3lw75RGP/RZEqJd4/
-	m
-X-Google-Smtp-Source: AGHT+IGx0N24mNhlF+eY9GWvenaOQMUViUvkFXW2Uy5KcdeGm5jedAxps8BLrWXjdAyxA0Q6BAtYYw==
-X-Received: by 2002:a6b:c848:0:b0:7d0:2b91:45e8 with SMTP id y69-20020a6bc848000000b007d02b9145e8mr40167iof.2.1711040965897;
-        Thu, 21 Mar 2024 10:09:25 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id p20-20020a056602259400b007cc7c30e70esm41525ioo.46.2024.03.21.10.09.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Mar 2024 10:09:25 -0700 (PDT)
-Message-ID: <979af2db-7482-4123-8a8b-e0354eb0bd45@kernel.dk>
-Date: Thu, 21 Mar 2024 11:09:25 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQevDAax"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 073E2C433C7;
+	Thu, 21 Mar 2024 17:25:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711041927;
+	bh=iNXaAGwm6iS6DNKISF6dlrJY5wNVKnpnm8REwy4rDho=;
+	h=Date:To:Cc:Subject:From:References:In-Reply-To:From;
+	b=uQevDAaxSvs1weuPxAVtTq79oE8xNAAlm00KgUZtg+SF0ZCpdazoYqldu4ms40wTI
+	 KdBcq8uWAD47/rKzsT59SMSEtZvXIWGj+5CJdnbpCRBT7JEP/03D/qAdLGr6V1WR1O
+	 tKmQl20Xe9j84FJNztEGGULdS8/DLACS1ZZirVT9+YuBlMkeNH6yshOtZFYcoGOQ7c
+	 I87pEcsouNJ2soJeKDqyYmUarFAbdb9NjQvdlnXKq82l4NPh+I1KSlj5wGFMn4Ze0w
+	 1SfpgXrWpNJ2W3SvSXv2vZ0wLvpr77vGmkJjpJhw4mdXecJniydVNE2PwYSrO+l75f
+	 cX/eY3iu0uHhg==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: fail unaligned bio from submit_bio_noacct()
-Content-Language: en-US
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>
-References: <20240321131634.1009972-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240321131634.1009972-1-ming.lei@redhat.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Thu, 21 Mar 2024 19:25:21 +0200
+Message-Id: <CZZLQN9CUN2E.5PNZ0C2JHP42@kernel.org>
+To: "Fan Wu" <wufan@linux.microsoft.com>, "Paul Moore"
+ <paul@paul-moore.com>, <corbet@lwn.net>, <zohar@linux.ibm.com>,
+ <jmorris@namei.org>, <serge@hallyn.com>, <tytso@mit.edu>,
+ <ebiggers@kernel.org>, <axboe@kernel.dk>, <agk@redhat.com>,
+ <snitzer@kernel.org>, <eparis@redhat.com>
+Cc: <linux-doc@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
+ <linux-security-module@vger.kernel.org>, <fsverity@lists.linux.dev>,
+ <linux-block@vger.kernel.org>, <dm-devel@lists.linux.dev>,
+ <audit@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC v15 12/21] security: add
+ security_bdev_setintegrity() hook
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+X-Mailer: aerc 0.17.0
+References: <1710560151-28904-13-git-send-email-wufan@linux.microsoft.com>
+ <f5cf9d285bd5f09bbc3f79b0800d37fc@paul-moore.com>
+ <CZYFP5S04YTK.23AJMKWQWVCR8@kernel.org>
+ <CZYFR8LEEQB1.8C0J9KCTF8CB@kernel.org>
+ <a69805c7-7b8a-44ee-9b32-f9314b5a9763@linux.microsoft.com>
+In-Reply-To: <a69805c7-7b8a-44ee-9b32-f9314b5a9763@linux.microsoft.com>
 
-On 3/21/24 7:16 AM, Ming Lei wrote:
-> For any bio with data, its start sector and size have to be aligned with
-> the queue's logical block size.
-> 
-> This rule is obvious, but there is still user which may send unaligned
-> bio to block layer, and it is observed that dm-integrity can do that,
-> and cause double free of driver's dma meta buffer.
-> 
-> So failfast unaligned bio from submit_bio_noacct() for avoiding more
-> troubles.
-> 
-> Cc: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: Mike Snitzer <snitzer@kernel.org>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index a16b5abdbbf5..b1a10187ef74 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -729,6 +729,20 @@ void submit_bio_noacct_nocheck(struct bio *bio)
->  		__submit_bio_noacct(bio);
->  }
->  
-> +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
-> +{
-> +	unsigned int bs = q->limits.logical_block_size;
-> +	unsigned int size = bio->bi_iter.bi_size;
-> +
-> +	if (size & (bs - 1))
-> +		return false;
-> +
-> +	if (size && ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1)))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  /**
->   * submit_bio_noacct - re-submit a bio to the block device layer for I/O
->   * @bio:  The bio describing the location in memory and on the device.
-> @@ -780,6 +794,9 @@ void submit_bio_noacct(struct bio *bio)
->  		}
->  	}
->  
-> +	if (WARN_ON_ONCE(!bio_check_alignment(bio, q)))
-> +		goto end_io;
-> +
->  	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
->  		bio_clear_polled(bio);
+On Wed Mar 20, 2024 at 10:31 PM EET, Fan Wu wrote:
+>
+>
+> On 3/20/2024 1:31 AM, Jarkko Sakkinen wrote:
+> > On Wed Mar 20, 2024 at 10:28 AM EET, Jarkko Sakkinen wrote:
+> >> On Wed Mar 20, 2024 at 1:00 AM EET, Paul Moore wrote:
+> >>> On Mar 15, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
+> >>>>
+> >>>> This patch introduces a new hook to save block device's integrity
+> >>>> data. For example, for dm-verity, LSMs can use this hook to save
+> >>>> the roothash signature of a dm-verity into the security blob,
+> >>>> and LSMs can make access decisions based on the data inside
+> >>>> the signature, like the signer certificate.
+> >>>>
+> >>>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> >>>>
+> >>>> --
+> >>>> v1-v14:
+> >>>>    + Not present
+> >>>>
+> >>>> v15:
+> >>>>    + Introduced
+> >>>>
+> >>>> ---
+> >>>>   include/linux/lsm_hook_defs.h |  2 ++
+> >>>>   include/linux/security.h      | 14 ++++++++++++++
+> >>>>   security/security.c           | 28 ++++++++++++++++++++++++++++
+> >>>>   3 files changed, 44 insertions(+)
+> >>>
+> >>> I'm not sure why you made this a separate patch, help?  If there is
+> >>> no significant reason why this is separate, please squash it together
+> >>> with patch 11/21.
+> >>
+> >> Off-topic: it is weird to have *RFC* patch set at v15.
+> >>
+> >> RFC by de-facto is something that can be safely ignored if you don't
+> >> have bandwidth. 15 versions of anything that can be safely ignored
+> >> is by definition spamming :-) I mean just conceptually.
+> >>
+> >> So does the RFC still hold or what the heck is going on with this one?
+> >>
+> >> Haven't followed for some time now...
+> >=20
+> > I mean if this RFC trend continues I'll just put auto-filter for this
+> > thread to put straight to the bin.  There's enough non-RFC patch sets
+> > to review.
+> >=20
+> > BR, Jarkko
+>
+> Sorry about the confusion with the RFC tag =E2=80=93 I wasn't fully aware=
+ of its=20
+> conventional meaning and how it's perceived in terms of importance and=20
+> urgency. Point taken, and I'll make sure to remove the RFC tag for=20
+> future submissions. Definitely not my intention to clog up the workflow=
+=20
+> or seem like I'm spamming.
 
-Where is this IO coming from? The normal block level dio has checks. And
-in fact they are expensive... If we add this one, then we should be able
-to kill the block/fops.c checks, no?
+OK cool! Just wanted to point this out also because it already looks
+good enough not to be considered as RFC in my eyes :-) If you keep RFC
+it is by definition "look into if you have the bandwidth but please
+do not take this to mainline". No means to nitpick here...
 
--- 
-Jens Axboe
-
+BR, Jarkko
