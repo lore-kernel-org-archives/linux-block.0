@@ -1,81 +1,186 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9CD6FB9;
-	Thu, 21 Mar 2024 02:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACD32C86A
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 09:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710987263; cv=none; b=Ef3MR8T4qlpWux7PwKug0vMP1w6ak0Id/7/g4lCM3oVuSC+DU8HjSUmlRsAXbGWfUWazj0QdHzROVzGHh34jKbvfXEpnI62N6WEWxI9jsbgIXaTobXiKC9ULP+F9EGQlm9+iDM11mgPGpNcT1BoUJzsD0Mn3ZJn1TCy6YndiOnU=
+	t=1711014455; cv=none; b=VjdnEWav06WM4gr4B/lqyU/vmo/iKwKZ2avM8BeVQyHlTmN01tazYPJlPBE2pZU9WbxI2eMihD60Oxq9esHQRAYc03Hwhe5L6qgJaqkpxMEP32ek1uXnGPWLvlRQB87ZkAUsexd9hlmTtJAY0++7rCvbumb+qYRPY4gLnpah+KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710987263; c=relaxed/simple;
-	bh=jfvCeLIg+canj1YOabyHCZY32Y5la91we5Z1XUDvdkc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ddb7ibvh1IDQDwFt6FXBZwTyM+r3274mOAiJPcWw1YzwdiQbRZTFO8Od5S7rMO5/oTK0w0Dk7ogqOXZoPcIycb7KQ9h1EhPb4hQFbBqHBVPLUKHsIGvnCKZgXr4XrxYCwsc/NetmKfKRZV6vKEozrDQoGjBL+qTcmhaAvZ1Hrjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=elhsWbcB; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1711014455; c=relaxed/simple;
+	bh=SjZcFet/FLu8HamUQkkJ6VtXMgQWFzDYulQx1wTodk4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eB7uSmIMDX2UPxsuHzAUdd+7RVm/A7DJ6mP7m+4vj2GCjoIrNIiQRCzZ5or4TvgPJVcVFjhdrFebpnjnHtgPJBDkEQIffMX9Ddn1IP1guy6DDdkuJFIsqINcTWPVejDjeXueeasXh7MZQdRXoUhEofDBBfeHtJeIxdWeyRYLiN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ukkdw13T; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J5TuhvC2; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ukkdw13T; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J5TuhvC2; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="elhsWbcB"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V0TY902pTz6Cnk8y;
-	Thu, 21 Mar 2024 02:14:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:references:content-language:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1710987258; x=1713579259; bh=bYq+oUDZUpDI/pMzlQv8q7N+
-	w8/crdOYLwn0HTneqtY=; b=elhsWbcBTPwtjGsPM4L4hGm3L4I4yocByWau3xoq
-	z23GYI0sR2owMGt6ydD330kIdaPCT5LlAapQrWWMQKTGp0UAx29SNghjRkU+pRWW
-	0ZRwPL/NGof/zUL31XnSB6eJZEM/szbz8tPUUPcNPuZIvdurZkPZ4Cfxkb7zyf2J
-	32trLH2A5XSuDB9V2Ria8o184JyqV5du0TH3pzZ+yuHpdHyUtAf/r/ftoIjHUJ9o
-	rnv44qvJyjjhjcfErw9P8fJMhxCBDgwvFzpdxNy4IknUAXtAF1cC7vgB8aSNOSs+
-	R27xMjqikQsF/i7LI0gjznh4bFZng+3wdiBddj2o870IdQ==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id gOfMeMs7eDlS; Thu, 21 Mar 2024 02:14:18 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ukkdw13T";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J5TuhvC2";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ukkdw13T";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J5TuhvC2"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V0TY60Thsz6Cnk90;
-	Thu, 21 Mar 2024 02:14:17 +0000 (UTC)
-Message-ID: <2489eb85-747d-441b-b19b-4e4c5ef1c478@acm.org>
-Date: Wed, 20 Mar 2024 19:14:16 -0700
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 969551FBF9;
+	Thu, 21 Mar 2024 09:47:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711014451; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
+	b=ukkdw13TY8Z8/KJ2TpVf8lc5z86Uf1yT310HRyu/Y4nSNxjrOsUpT3PCPY0GKqSN7LWuxv
+	JOhIGWaQvvvVaa+RcBGuDP7wc5yI+YS7F21LvCxvaWO3f2V/0HnRZSszRWJuSfNQaFwXxf
+	63PSjKV7klV8Yh8b3LtKAYGKEbPt/ag=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711014451;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
+	b=J5TuhvC20ceq+u7RdLVTtteGmE2Z+MwU6dVxC4zWD92+SlZHs4CrIafv205pgEBLQXzMVo
+	D4u7MbHmjJxFhLDA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711014451; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
+	b=ukkdw13TY8Z8/KJ2TpVf8lc5z86Uf1yT310HRyu/Y4nSNxjrOsUpT3PCPY0GKqSN7LWuxv
+	JOhIGWaQvvvVaa+RcBGuDP7wc5yI+YS7F21LvCxvaWO3f2V/0HnRZSszRWJuSfNQaFwXxf
+	63PSjKV7klV8Yh8b3LtKAYGKEbPt/ag=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711014451;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XSwWBqWUSD8+M7SAylRtgq7n47f1ZHfkI43qiK/fNIs=;
+	b=J5TuhvC20ceq+u7RdLVTtteGmE2Z+MwU6dVxC4zWD92+SlZHs4CrIafv205pgEBLQXzMVo
+	D4u7MbHmjJxFhLDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7BE3913976;
+	Thu, 21 Mar 2024 09:47:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TcjbHDMC/GW5DwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 21 Mar 2024 09:47:31 +0000
+From: Daniel Wagner <dwagner@suse.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v1 02/18] nvme/rc: silence fcloop cleanup failures
+Date: Thu, 21 Mar 2024 10:47:11 +0100
+Message-ID: <20240321094727.6503-3-dwagner@suse.de>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240321094727.6503-1-dwagner@suse.de>
+References: <20240321094727.6503-1-dwagner@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: WARNING: CPU: 45 PID: 84967 at ../block/mq-deadline.c:659
- dd_exit_sched+0xce/0xe0
-Content-Language: en-US
-To: Xose Vazquez Perez <xose.vazquez@gmail.com>,
- Martin Wilck <mwilck@suse.com>, Hannes Reinecke <hare@suse.com>,
- Jens Axboe <axboe@kernel.dk>, BLOCK ML <linux-block@vger.kernel.org>,
- SCSI ML <linux-scsi@vger.kernel.org>
-References: <cc8d00fa-9ffb-441e-9483-7ef4a581e9d2@gmail.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <cc8d00fa-9ffb-441e-9483-7ef4a581e9d2@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: 3.49
+X-Spam-Flag: NO
+X-Spamd-Bar: +++
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ukkdw13T;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=J5TuhvC2
+X-Spamd-Result: default: False [3.49 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 R_MISSING_CHARSET(2.50)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 BROKEN_CONTENT_TYPE(1.50)[];
+	 RCPT_COUNT_FIVE(0.00)[6];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 MID_CONTAINS_FROM(1.00)[];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-0.00)[43.05%];
+	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from]
+X-Spam-Level: ***
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 969551FBF9
 
-On 3/8/24 07:24, Xose Vazquez Perez wrote:
-> This warning arose in the middle of a lpfc bug.
-> The block/mq-deadline.c file of this SUSE kernel is synchronized with
-> the latest version, and perhaps the bug is relevant for upstream.
->=20
->  =C2=A0statistics for priority 1: i 219 m 0 d 219 c 218
->  =C2=A0WARNING: CPU: 45 PID: 84967 at ../block/mq-deadline.c:659=20
-> dd_exit_sched+0xce/0xe0
+When the ctl file is missing we are logging
 
-I think this indicates a bug in the block layer core - a bug that has
-been fixed in the latest kernels by the blk-flush.c rewrite. I fixed
-this bug for the Android 6.1 kernel. Please let me know if it would help
-if I make my fix available for inclusion in the stable trees.
+  tests/nvme/rc: line 265: /sys/class/fcloop/ctl/del_target_port: No such file or directory
+  tests/nvme/rc: line 257: /sys/class/fcloop/ctl/del_local_port: No such file or directory
+  tests/nvme/rc: line 249: /sys/class/fcloop/ctl/del_remote_port: No such file or directory
 
-Bart.
+because the first redirect operator fails. Thus first check if the ctl
+file exists.
+
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+ tests/nvme/rc | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 78d84af72e73..53fa54e64cb2 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -234,7 +234,10 @@ _nvme_fcloop_del_rport() {
+ 	local remote_wwpn="$4"
+ 	local loopctl=/sys/class/fcloop/ctl
+ 
+-	echo "wwnn=${remote_wwnn},wwpn=${remote_wwpn}" > ${loopctl}/del_remote_port 2> /dev/null
++	if [[ ! -f "${loopctrl}" ]]; then
++		return
++	fi
++	echo "wwnn=${remote_wwnn},wwpn=${remote_wwpn}" > ${loopctl}/del_remote_port > /dev/null 2>&1
+ }
+ 
+ _nvme_fcloop_del_lport() {
+@@ -242,7 +245,10 @@ _nvme_fcloop_del_lport() {
+ 	local wwpn="$2"
+ 	local loopctl=/sys/class/fcloop/ctl
+ 
+-	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_local_port 2> /dev/null
++	if [[ ! -f "${loopctrl}" ]]; then
++		return
++	fi
++	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_local_port > /dev/null > /dev/null 2>&1
+ }
+ 
+ _nvme_fcloop_del_tport() {
+@@ -250,7 +256,10 @@ _nvme_fcloop_del_tport() {
+ 	local wwpn="$2"
+ 	local loopctl=/sys/class/fcloop/ctl
+ 
+-	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_target_port 2> /dev/null
++	if [[ ! -f "${loopctrl}" ]]; then
++		return
++	fi
++	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_target_port > /dev/null 2&>1
+ }
+ 
+ _cleanup_fcloop() {
+-- 
+2.44.0
 
