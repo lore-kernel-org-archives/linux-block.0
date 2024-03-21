@@ -1,151 +1,160 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD211332B7
-	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 17:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1530212CD86
+	for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 17:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711040511; cv=none; b=PUjTuWTcVtavNL9ZuQ23YzKkEMpg/RLiJhG0/jriHS7TAEyZlaObhyB8cHLRMIWUybbNY/ByxWkYSvALBZhisvZZVwIwczdsO683IU1oIwTKCZxXD5l9siv1/vawtJXynTgawXMfP4JsuA4IhEmNB0hec8WVwFl9ffUA45HwM6g=
+	t=1711040877; cv=none; b=RbJKXZlxh17Ki+t9qzTiegF40hrQ8vOpWKAqXNG3RJvKpGAX9ncfPOvGTozhcsDEHHcNKlvSQQ7r/Z+4FJ2tsD+M+52dxp940hgJg8nVtPFx2mPSYBrNh52n24t0adAhVX9qAN1gi+xkJQLJWGb8RICoNYW7+oemfLeVJ1qCMlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711040511; c=relaxed/simple;
-	bh=rI2zlEUIdfdoDPN9bKT55fECDTqGDJHYDO2COwILZw4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=VT8XFwGn0PaNkzOPLZ+RLtplwBdeql50rDi9Z7eajuuDjyKQjVLyqWBcgwHDQXpI5WZdaoQgN2Iti28utbpUJltzQd1ydwGfndoIdGqCjmi28X+/jlwpYZLWYuY4IoKjt69bQsYT0Ph9rRa5jRAZAp2A5yhnQ5DSZVwCqmpvb18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ecFH4e79; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711040877; c=relaxed/simple;
+	bh=3WBnor6WJgfPl3DPHdrh85aZZqZFmWdCne9/wH+6a4E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c+I+7Hz/BpEekiDVvj1EBOfmvTOk3Bo6No8l0iXsc4GkTNtB6Hy4oEfyoPZFw1rhEaUQvGeN5+OWiQO1Lap48lJ9xm0TUy8Roc+O/KsWbDOOGvRjAdzhyX1VbCdosutMPLASemUi8nLX/OosXnqmwI12ASCS3Lfaq+85M7/Hle8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=L+ANQnyd; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ecFH4e79"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711040508;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6z3Ui1R9gRt1exubAt23J/56jSQjv0u0d+ss6rezH6k=;
-	b=ecFH4e79jRcSnYFV6QRa2wGbJUDh91i0bZu49BqsmPNiO05FWUshOm1yOL+/bwlBIpTYEr
-	j5Cjv3O/E2af1GaaVB4GEwjnFhYpWiH4mICC576wXVpdi6dzTDKQ3GfM9dJcw9hfqQ87p8
-	iuBsQl+S3p4m4mHQhNfaveit4M5O5CA=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-86-Sa-xBGS9PTadSWi7Hd1chQ-1; Thu,
- 21 Mar 2024 13:01:42 -0400
-X-MC-Unique: Sa-xBGS9PTadSWi7Hd1chQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 03C1C282478E;
-	Thu, 21 Mar 2024 17:01:42 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B4764492BDA;
-	Thu, 21 Mar 2024 17:01:41 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id 7011830BFECA; Thu, 21 Mar 2024 17:01:41 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 6E1F53FB4A;
-	Thu, 21 Mar 2024 18:01:41 +0100 (CET)
-Date: Thu, 21 Mar 2024 18:01:41 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Mike Snitzer <snitzer@kernel.org>
-cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-    linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: block: fail unaligned bio from submit_bio_noacct()
-In-Reply-To: <ZfxVqkniO-6jFFH5@redhat.com>
-Message-ID: <ea8a13c-ee40-47f9-a7be-17b84bd1f686@redhat.com>
-References: <20240321131634.1009972-1-ming.lei@redhat.com> <ZfxVqkniO-6jFFH5@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="L+ANQnyd"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3685ee47bb9so246625ab.0
+        for <linux-block@vger.kernel.org>; Thu, 21 Mar 2024 10:07:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1711040874; x=1711645674; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N6T+oMJ0+P4cLh/OUo/3VM4bK5uTH8gupmfqcG+HjPc=;
+        b=L+ANQnydjYUFeURiLDvFWvaKxfUexrdrq1r+3PovSnbcJZbMllcg/57jx5dZ6u67y3
+         dmNNerAHpIo0/dpg9NSXFXHeB7kRhjiuvJmDlXTJ6XTbQV3d3wIcz7FdWJauG0zmdR+v
+         WWwz9zNMu2wPKjZqIto2h6RvxpunTmhJ0CqfPIZA8tSOZ+p98P0xUpkaQxuk3dwJjCXI
+         Lu7mT6DsGXjZ+4237ED+4UDfRGETSk9AQptUWq2on4Nuw0x6Q93zX4obuuyRws4F1O1R
+         vs6rCgg36bNQ0T4keUw8myJ2wWKzpSlH/WC1gle1fRhK1m/2bMyYWiHcojHhNIcOjLMh
+         NKQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711040874; x=1711645674;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N6T+oMJ0+P4cLh/OUo/3VM4bK5uTH8gupmfqcG+HjPc=;
+        b=AlRZ8GgvJa/naPJOVFrwZ08UUhmVgucXomcG2+5b084+eW4OK62NwwNZa/KzUq/JH4
+         9b4WORXa3chjAUzswwaPbuSC5EiD/50vF3kLLV6lLzgYin7v7qqjeukQVQrrSVeB9i0x
+         uQCY/cxqm3vew9pO67yj5ehAQEEJlOjVbBLf+Znn7ip5scJkpfXCVuGLjCBvJ5ulSUwY
+         0eqzxU+lIwBKqs4frSZqybHUuF0MxnjFFH701W3LbF46odirh7sX9w/7mnw+SE1NthBw
+         h0nHp/eJjiSm51GvrzwTQ7wRW1fnDfHDOpdJ7p5TWJS7qQNBxy4HtkLr4QHq0ggvhECM
+         p/QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWe+oGtUoUpIwgxzU+4v9uW4q4sAAIWUkqb+055vFfF6LfLUseE/3rL/Co8E1OjYUmH+jdTf80vqQfSgVtlQuupulJTftpVBYUFJtw=
+X-Gm-Message-State: AOJu0YzjBBbExbF/MshDTqW6Vwuvp5ItD5B7R77IWJN4v17DoSCCLoDe
+	CJ4lhEzZEIbjxAXIfJdUrrBW5OSHIDIHG/fP5zhZr2OXMo+xkMG24JK8Lptp+bBwS5feoBRCP7T
+	a
+X-Google-Smtp-Source: AGHT+IGEj4mLeTaGQBLx3ZFAbk4pCOdJvwFEq0RASeoatbWso8RuxS2mXPKUJ+CEwLv1JmMT6FNvug==
+X-Received: by 2002:a5d:9ec7:0:b0:7cc:7327:5b40 with SMTP id a7-20020a5d9ec7000000b007cc73275b40mr32118ioe.2.1711040874168;
+        Thu, 21 Mar 2024 10:07:54 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id p20-20020a056602259400b007cc7c30e70esm41525ioo.46.2024.03.21.10.07.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Mar 2024 10:07:53 -0700 (PDT)
+Message-ID: <05c44354-1c48-409e-827f-910d1e3c2db9@kernel.dk>
+Date: Thu, 21 Mar 2024 11:07:52 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V4] blk-mq: don't schedule block kworker on isolated CPUs
+Content-Language: en-US
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Tim Chen <tim.c.chen@linux.intel.com>,
+ Juri Lelli <juri.lelli@redhat.com>, Andrew Theurer <atheurer@redhat.com>,
+ Joe Mario <jmario@redhat.com>, Sebastian Jug <sejug@redhat.com>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Bart Van Assche <bvanassche@acm.org>, Tejun Heo <tj@kernel.org>
+References: <20240320023446.882006-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240320023446.882006-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On Thu, 21 Mar 2024, Mike Snitzer wrote:
-
-> On Thu, Mar 21 2024 at  9:16P -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
+On 3/19/24 8:34 PM, Ming Lei wrote:
+> Kernel parameter of `isolcpus=` or 'nohz_full=' are used to isolate CPUs
+> for specific task, and it isn't expected to let block IO disturb these CPUs.
+> blk-mq kworker shouldn't be scheduled on isolated CPUs. Also if isolated
+> CPUs is run for blk-mq kworker, long block IO latency can be caused.
 > 
-> > For any bio with data, its start sector and size have to be aligned with
-> > the queue's logical block size.
-> > 
-> > This rule is obvious, but there is still user which may send unaligned
-> > bio to block layer, and it is observed that dm-integrity can do that,
-> > and cause double free of driver's dma meta buffer.
-> > 
-> > So failfast unaligned bio from submit_bio_noacct() for avoiding more
-> > troubles.
-> > 
-> > Cc: Mikulas Patocka <mpatocka@redhat.com>
-> > Cc: Mike Snitzer <snitzer@kernel.org>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-core.c | 17 +++++++++++++++++
-> >  1 file changed, 17 insertions(+)
-> > 
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index a16b5abdbbf5..b1a10187ef74 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -729,6 +729,20 @@ void submit_bio_noacct_nocheck(struct bio *bio)
-> >  		__submit_bio_noacct(bio);
-> >  }
-> >  
-> > +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
-> > +{
-> > +	unsigned int bs = q->limits.logical_block_size;
-> > +	unsigned int size = bio->bi_iter.bi_size;
-> > +
-> > +	if (size & (bs - 1))
-> > +		return false;
-> > +
-> > +	if (size && ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1)))
-> > +		return false;
-> > +
-> > +	return true;
-> > +}
-
-I would change it to
-
-if (unlikely(((bi_iter.bi_sector | bio_sectors(bio)) & ((queue_logical_block_size(q) >> 9) - 1)) != 0))
-	return false;
-
-> >  /**
-> >   * submit_bio_noacct - re-submit a bio to the block device layer for I/O
-> >   * @bio:  The bio describing the location in memory and on the device.
-> > @@ -780,6 +794,9 @@ void submit_bio_noacct(struct bio *bio)
-> >  		}
-> >  	}
-> >  
-> > +	if (WARN_ON_ONCE(!bio_check_alignment(bio, q)))
-> > +		goto end_io;
-> > +
-> >  	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-> >  		bio_clear_polled(bio);
-> >  
-> > -- 
-> > 2.41.0
-> > 
-> > 
+> Kernel workqueue only respects CPU isolation for WQ_UNBOUND, for bound
+> WQ, the responsibility is on user because CPU is specified as WQ API
+> parameter, such as mod_delayed_work_on(cpu), queue_delayed_work_on(cpu)
+> and queue_work_on(cpu).
 > 
-> This check would really help more quickly find buggy code, but it
-> would be unfortunate for these extra checks to be required in
-> production.  It feels like this is the type of check that should be
-> wrapped by a debug CONFIG option (so only debug kernels have it).
-> 
-> Do we already have an appropriate CONFIG option to use?
-> 
-> Mike
+> So not run blk-mq kworker on isolated CPUs by removing isolated CPUs
+> from hctx->cpumask. Meantime use queue map to check if all CPUs in this
+> hw queue are offline instead of hctx->cpumask, this way can avoid any
+> cost in fast IO code path, and is safe since hctx->cpumask are only
+> used in the two cases.
 
-But then, the system would crash with the config option being 'n' and 
-return an error with the config option being 'y' - which would be 
-unfortunate.
+In general, I think the fix is fine. Only thing that's a bit odd is:
 
-We could remove the check from the drivers and add it to the generic I/O 
-path - this wouldn't add extra overhead.
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 555ada922cf0..187fbfacb397 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/prefetch.h>
+>  #include <linux/blk-crypto.h>
+>  #include <linux/part_stat.h>
+> +#include <linux/sched/isolation.h>
+>  
+>  #include <trace/events/block.h>
+>  
+> @@ -2179,7 +2180,11 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+>  	bool tried = false;
+>  	int next_cpu = hctx->next_cpu;
+>  
+> -	if (hctx->queue->nr_hw_queues == 1)
+> +	/*
+> +	 * Switch to unbound work if all CPUs in this hw queue fall
+> +	 * into isolated CPUs
+> +	 */
+> +	if (hctx->queue->nr_hw_queues == 1 || next_cpu >= nr_cpu_ids)
+>  		return WORK_CPU_UNBOUND;
 
-Mikulas
+This relies on find_next_foo() returning >= nr_cpu_ids if the set is
+empty, which is a lower level implementation detail that someone reading
+this code may not know.
+
+>  	if (--hctx->next_cpu_batch <= 0) {
+> @@ -3488,14 +3493,30 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
+>  	return data.has_rq;
+>  }
+>  
+> -static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
+> -		struct blk_mq_hw_ctx *hctx)
+> +static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
+> +		unsigned int this_cpu)
+>  {
+> -	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) != cpu)
+> -		return false;
+> -	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
+> -		return false;
+> -	return true;
+> +	enum hctx_type type = hctx->type;
+> +	int cpu;
+> +
+> +	/*
+> +	 * hctx->cpumask has rule out isolated CPUs, but userspace still
+                            ^^
+
+has to
+
+> +	 * might submit IOs on these isolated CPUs, so use queue map to
+							  ^^
+
+use the queue map
+
+> +	 * check if all CPUs mapped to this hctx are offline
+> +	 */
+
+-- 
+Jens Axboe
 
