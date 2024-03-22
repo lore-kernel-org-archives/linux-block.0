@@ -1,46 +1,59 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC93383
-	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 00:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC71765C
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 01:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711067509; cv=none; b=a7YKbeTkOY+TCFDHyPjR/xb163t6YLyHi5c9KRSVnyDDFbGk1cJgu/dCQSrpUXGuZMo9vmfMbYWXPXmsJEQVBBXfkRosLlm4WT2086bMvH5rO6TH0ftN04wJJBCIH4jvneK2kMBM8aDSgLL2gP9M9Ps7vOgVKe55+X9A2ItRJkg=
+	t=1711069886; cv=none; b=nQ0ogkwqsWLXiqH6eQiE0+Bc28akahi8O0Isrh3qxmG06rJ+kUlk4+YjQxUwF0mAFZOlfxllIR82nB4E/MGg6kifXnQpo1Q0PLwvbLTKVAusC/Q387VAvMLhVvdg5xiS2jzQGpxslVeJJcjvUbGeQE9FFrVVDVmYuMXqaluSQmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711067509; c=relaxed/simple;
-	bh=9PH63nFUIq/57ewGTluRtlDJkAbEOUBlk70jxwjkggk=;
+	s=arc-20240116; t=1711069886; c=relaxed/simple;
+	bh=96SAwPUUiUG9ICvo3SfW48QSZaBuN3QaPXtcsiTzUXY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tKe9kfqKZZqXko3L5Z/nHXxf7P+O9ZQwTqZndMl60hjiFULallExjjPQssxsMhi03+3IfALBYTRnTdpQo8UfzmRgI/FTwqYkofE/HZIjSmEImVCZsMjAlIaalxORNUujZizZezagwdLl1MmKjaMg/p4HPOOJdZyU4leOANM85lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W8vfxg9/; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=sDEopGVR6lNuNN4UZ1ULp5Lgo3EermfuRvkf9iF9UM8XMAKm6Aw5+6tFmn1KwT3AMAGXKROI29DdodTBjBS2XZxHxac2fmw3I6z1KHDEOuu3f0dULfAG0Aj361vKefkjzlyTQ04vF0cduKBAzrXvYpAftltglHdRJV4864TTycA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WMyvcjck; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W8vfxg9/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Z9KExEvarTqwFybJG/uUm/gGhgkeHBZ9ThipJLUJgdQ=; b=W8vfxg9/c6tMGKRDDv/hO4VP4C
-	4UNCNu7fUNupeGF6D0kTbHtARUrt0hT9yWN7aqSWyTZRxYr0pL2hdKm2iaUmKhZooMSj+RNsqH+Dm
-	Fk+4gx6jPX5NmZILOVej6UWkiU11HKz/UbcdUK7FLWONRFl1PqMZp++ADspfteOD1diTq/AiccW5P
-	R6ScfUfIAVHzyCMd1A1CVhyVMrox0WDMHKkAfk/oEdx/Or09R20pCBKGnFSe5B40YDrO/hmLMw3OX
-	+ODBQuYnu1S2ssKzIKQ8xTZorqug1Y5SzDi24AhGxdeVei4r45BYBvBcneKUK1XTFadUwyoFwdHhT
-	qHD7/MoQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rnSoz-00000005G5H-2Z1h;
-	Fri, 22 Mar 2024 00:31:45 +0000
-Date: Thu, 21 Mar 2024 17:31:45 -0700
-From: Christoph Hellwig <hch@infradead.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMyvcjck"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711069882;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F4jtIXZkeEsKNNOM9A/oT110PaXa8dHoTnPtjKKPkd0=;
+	b=WMyvcjckZsqDNYiZ7W72SJEP6RRKT6UWm9oQ9lQIHVIvh2jfuglscIc9EpF1amIiRVKdhf
+	zz+ZsVgXXmZffkv+ZsPh0vhc6S3LI+InL06yXSPCRuLYepV83KUzi3DyYFT+zwHZAnv5ZG
+	0BWC5+2RqdTtl1mrX8QfYpDN7ueeqGE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-46-20ayKDrdPue-iedqHk-R1w-1; Thu, 21 Mar 2024 21:11:18 -0400
+X-MC-Unique: 20ayKDrdPue-iedqHk-R1w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 19A1685A58C;
+	Fri, 22 Mar 2024 01:11:18 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.75])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C4D123C20;
+	Fri, 22 Mar 2024 01:11:11 +0000 (UTC)
+Date: Fri, 22 Mar 2024 09:10:47 +0800
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>
-Subject: Re: [PATCH] block: fail unaligned bio from submit_bio_noacct()
-Message-ID: <ZfzRceN0-_ij6wcP@infradead.org>
-References: <20240321131634.1009972-1-ming.lei@redhat.com>
- <979af2db-7482-4123-8a8b-e0354eb0bd45@kernel.dk>
- <ZfywBU9IRHGdqVqo@infradead.org>
- <1a0ac357-49e4-41fa-b0c3-f038ec995a00@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Andrew Theurer <atheurer@redhat.com>, Joe Mario <jmario@redhat.com>,
+	Sebastian Jug <sejug@redhat.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>, Tejun Heo <tj@kernel.org>,
+	ming.lei@redhat.com
+Subject: Re: [PATCH V4] blk-mq: don't schedule block kworker on isolated CPUs
+Message-ID: <Zfzal65zM3u+1qXc@fedora>
+References: <20240320023446.882006-1-ming.lei@redhat.com>
+ <05c44354-1c48-409e-827f-910d1e3c2db9@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,21 +62,100 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1a0ac357-49e4-41fa-b0c3-f038ec995a00@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <05c44354-1c48-409e-827f-910d1e3c2db9@kernel.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On Thu, Mar 21, 2024 at 04:50:44PM -0600, Jens Axboe wrote:
-> On 3/21/24 4:09 PM, Christoph Hellwig wrote:
-> > On Thu, Mar 21, 2024 at 11:09:25AM -0600, Jens Axboe wrote:
-> >> Where is this IO coming from? The normal block level dio has checks. And
-> >> in fact they are expensive...
+On Thu, Mar 21, 2024 at 11:07:52AM -0600, Jens Axboe wrote:
+> On 3/19/24 8:34 PM, Ming Lei wrote:
+> > Kernel parameter of `isolcpus=` or 'nohz_full=' are used to isolate CPUs
+> > for specific task, and it isn't expected to let block IO disturb these CPUs.
+> > blk-mq kworker shouldn't be scheduled on isolated CPUs. Also if isolated
+> > CPUs is run for blk-mq kworker, long block IO latency can be caused.
 > > 
-> > How is this expensive when we need the bio cache lines all the time
-> > during I/O submission which follows instantly?
+> > Kernel workqueue only respects CPU isolation for WQ_UNBOUND, for bound
+> > WQ, the responsibility is on user because CPU is specified as WQ API
+> > parameter, such as mod_delayed_work_on(cpu), queue_delayed_work_on(cpu)
+> > and queue_work_on(cpu).
+> > 
+> > So not run blk-mq kworker on isolated CPUs by removing isolated CPUs
+> > from hctx->cpumask. Meantime use queue map to check if all CPUs in this
+> > hw queue are offline instead of hctx->cpumask, this way can avoid any
+> > cost in fast IO code path, and is safe since hctx->cpumask are only
+> > used in the two cases.
 > 
-> This part isn't expensive, it's the general dio checks that are which
-> check memory alignment as well.
+> In general, I think the fix is fine. Only thing that's a bit odd is:
 
-Well, the memory alignment has to walk over the whole iterator, so it
-definitively is way more expensive.
+Thanks for the review!
+
+> 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 555ada922cf0..187fbfacb397 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -28,6 +28,7 @@
+> >  #include <linux/prefetch.h>
+> >  #include <linux/blk-crypto.h>
+> >  #include <linux/part_stat.h>
+> > +#include <linux/sched/isolation.h>
+> >  
+> >  #include <trace/events/block.h>
+> >  
+> > @@ -2179,7 +2180,11 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+> >  	bool tried = false;
+> >  	int next_cpu = hctx->next_cpu;
+> >  
+> > -	if (hctx->queue->nr_hw_queues == 1)
+> > +	/*
+> > +	 * Switch to unbound work if all CPUs in this hw queue fall
+> > +	 * into isolated CPUs
+> > +	 */
+> > +	if (hctx->queue->nr_hw_queues == 1 || next_cpu >= nr_cpu_ids)
+> >  		return WORK_CPU_UNBOUND;
+> 
+> This relies on find_next_foo() returning >= nr_cpu_ids if the set is
+> empty, which is a lower level implementation detail that someone reading
+> this code may not know.
+
+Indeed, looks it is more readable to add one helper:
+
+static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
+{
+	return hctx->next_cpu >= nr_cpu_ids;
+}
+
+> 
+> >  	if (--hctx->next_cpu_batch <= 0) {
+> > @@ -3488,14 +3493,30 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
+> >  	return data.has_rq;
+> >  }
+> >  
+> > -static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
+> > -		struct blk_mq_hw_ctx *hctx)
+> > +static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
+> > +		unsigned int this_cpu)
+> >  {
+> > -	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) != cpu)
+> > -		return false;
+> > -	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
+> > -		return false;
+> > -	return true;
+> > +	enum hctx_type type = hctx->type;
+> > +	int cpu;
+> > +
+> > +	/*
+> > +	 * hctx->cpumask has rule out isolated CPUs, but userspace still
+>                             ^^
+> 
+> has to
+> 
+> > +	 * might submit IOs on these isolated CPUs, so use queue map to
+> 							  ^^
+> 
+> use the queue map
+
+OK, will fix them in V5.
+
+
+thanks,
+Ming
 
