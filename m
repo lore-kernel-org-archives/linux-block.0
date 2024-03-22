@@ -1,48 +1,48 @@
 Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9002F57312
-	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 16:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B5857312
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 16:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711123803; cv=none; b=RyrDSqM362bgH6BavZE0sNu8qMkGBaKo/45jp4VER7RTGXGsHHL0CS6Uo9hdeO61lISlZN6puiMXYkSZlUrQ/bMcD3dy5lM19KmzCKWVklpOIekdeshPl5rdu/2LypLDAl2XanPS42SVsyrqV+6x6KmZAJVcfCYMeXGtG5Pb43Y=
+	t=1711123886; cv=none; b=dEfi1oRhD6V5pKPLMOjwFrShVDAx/cbu7GJDJjbFjUKGY0Kv4ZfaHrEqDNwryk6vZWPRwmte3WYpgmXc/3xw0UB/d2nj7lYuTba9iSYg3wuzYcfMr6OzH0I37dSaWni/ZHVKMEWjIRGeXB3qRyGQArszlyCAuQa2vxpbK8U3pbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711123803; c=relaxed/simple;
-	bh=qVR+Ewrk6qALPK3irfI4lfsChegLx2HE4lfftUl9l4k=;
+	s=arc-20240116; t=1711123886; c=relaxed/simple;
+	bh=rLojx5TSaEUfPG7H5Rmd3Nykze0nj+uAA/pJp8TCAyc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q1wCc3uLa6/Si/L7qrxdm9RlyiEaxyiqvrD+sYdGzHVv1sdhBkk487koswAand4RYPSLa3T+3/l7apCOdpVcKtNpD76AK9rTwMFR/mwXz6CZ1Lpj8Rt7tcuzoyr/7DfqdxaH2XCtb22Ge1cbJaJaPLqXKM1kmZnZjJ/NOgvotGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Y5RU0lW1; arc=none smtp.client-ip=199.89.1.12
+	 In-Reply-To:Content-Type; b=HfhSFdkygIAvu3pEyv6xCn0eB2yEEqzn+LvRtvcyLYIsIM558P8faQD/NTwf6uN3zDkLIQzWF/Sh7umNxvHTnCpFY14sG0cKLK1d71WI24IFm35doTXzi4QUeC9nMNzW88JA0illdwzNJgmtC11e/Z8WjDx9svnIOOOmrgUwSEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=LHyXaPcB; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Y5RU0lW1"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="LHyXaPcB"
 Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V1S2q1D9DzlgVnK;
-	Fri, 22 Mar 2024 16:09:55 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V1S4X5P98zlgVnF;
+	Fri, 22 Mar 2024 16:11:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:references:content-language:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711123792; x=1713715793; bh=qVR+Ewrk6qALPK3irfI4lfsC
-	hegLx2HE4lfftUl9l4k=; b=Y5RU0lW1iNBx/6rTUMXZhOhwvSfWlNf7fEpTID/l
-	Hp5oheeG9bjHmYSnZvJdLrQat/8bWWFgqAkz7J8Qoe2jlhDICb4ymbQ/5lI/F34Y
-	GteFxb8AnAtTnXmnhwa+fMUI++qeOEY4lmZkgvS4rRzDHp7yTbLdV+q4CGEAVsw8
-	Zz7QKIpylGPQ/NQwazeAlUTvSqXsZhyV8hDm4Kv8P8Dm9cPIqIsgX54U+jFC3yzn
-	XIT8kQPk/SpwoZEOwchV279yXXRxzQj0T57RZortGNT55HxVnB2dUtnPFBBphbrQ
-	iEB6Nasmopp4u39EBhfMRDSNVJA2ijJdc68U+pNPxKz1BA==
+	 s=mr01; t=1711123882; x=1713715883; bh=rLojx5TSaEUfPG7H5Rmd3Nyk
+	ze0nj+uAA/pJp8TCAyc=; b=LHyXaPcB+MjNdpYFWj9PDd0aXq9AnwNqzdTGS3zz
+	oXhaIQmvPAn2ZUJTnxnjA3YwoU9+J+DtwA/SSCIkA7z1vYlI9BDM5QFvBtWM+DsM
+	URjpWEOybkQ52WCquenMUHFbzECHvHce90yitZXxaX8C1oxCRCQRRM5qU05GxY6s
+	nZjY3rfIX3TlyigBRdTBvAcETvyxz0bkAd8UAncHY6q/aBbf2UzsUexwoU282Oti
+	mzqMed1c8apVyuwD8dpeih8n27Qhp+q/4HM9M82t7mBd2xLrj2xKBCmxMt8JV9WY
+	LUeZZC6EA5OCC3HKeIWd6Pv93n2g/l4aZWRR/kwNqQdtsA==
 X-Virus-Scanned: by MailRoute
 Received: from 009.lax.mailroute.net ([127.0.0.1])
  by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 2pHSBe3ipPCt; Fri, 22 Mar 2024 16:09:52 +0000 (UTC)
+ id bzNljYDr_elW; Fri, 22 Mar 2024 16:11:22 +0000 (UTC)
 Received: from [100.96.154.173] (unknown [104.132.1.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V1S2l468gzlgTGW;
-	Fri, 22 Mar 2024 16:09:51 +0000 (UTC)
-Message-ID: <c5b72b14-b523-4665-9499-4528e94c5b58@acm.org>
-Date: Fri, 22 Mar 2024 09:09:50 -0700
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V1S4T6TnYzlgTGW;
+	Fri, 22 Mar 2024 16:11:21 +0000 (UTC)
+Message-ID: <1b01dfd7-82cf-49a6-8fa4-dc90ba350595@acm.org>
+Date: Fri, 22 Mar 2024 09:11:20 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,49 +52,27 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] block: Improve IOPS by removing the fairness code
 Content-Language: en-US
-To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
- "yukuai (C)" <yukuai3@huawei.com>
+ Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+ Yu Kuai <yukuai3@huawei.com>
 References: <20240321224605.107783-1-bvanassche@acm.org>
- <20240321224814.GA23127@lst.de>
- <13f47d63-2140-4927-8933-009dae21f7e6@acm.org>
- <33581b6a-c350-b523-b31e-787f74d97e71@huaweicloud.com>
+ <ZfzsMIGnaGhWCw80@fedora>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <33581b6a-c350-b523-b31e-787f74d97e71@huaweicloud.com>
+In-Reply-To: <ZfzsMIGnaGhWCw80@fedora>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On 3/21/24 18:14, Yu Kuai wrote:
-> =E5=9C=A8 2024/03/22 7:03, Bart Van Assche =E5=86=99=E9=81=93:
->> That test does the following:
->> * Create two request queues with a shared tag set and with different
->> =C2=A0=C2=A0 completion times (1 ms and 100 ms).
->> * Submit I/O to both request queues simultaneously and set the queue
->> =C2=A0=C2=A0 depth for both tests to the number of tags. This creates =
-contention
->> =C2=A0=C2=A0 on tag allocation.
->> * After I/O finished, check that the fio job with the shortest
->> =C2=A0=C2=A0 completion time submitted the most requests.
->=20
-> This test is a little one-sided, I'm curious how the following test
-> shows as well:
->=20
-> - some queue is under heavy IO pressure with lots of thread, and they
-> can use up all the drivers tags;
-> - one queue only issue one IO at a time, then how does IO latency shows
-> for this queue? I assume this can be bad with this patch because sbitma=
-p
-> implementation can't gurantee this.
+On 3/21/24 19:25, Ming Lei wrote:
+> But the code you removed is actually for providing fairness over multi-LUN,
+> do you have multi-LUN test result for supporting the change?
 
-Are these use cases realistic? The sbitmap implementation guarantees
-forward progress for all IO submitters in both cases and I think that's
-sufficient. Let's optimize the block layer performance for the common
-cases instead of keeping features that help rare workloads. If users
-really want to improve fairness for the two workloads mentioned above
-they can use e.g. the blk-iocost controller and give a higher weight to
-low-latency workloads.
+Hi Ming,
+
+Please take a look at the blktest in this pull request
+(tests/block/035): https://github.com/osandov/blktests/pull/135.
 
 Thanks,
 
 Bart.
+
