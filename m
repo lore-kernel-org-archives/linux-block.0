@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7AE482F3;
-	Fri, 22 Mar 2024 18:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88255A0EE;
+	Fri, 22 Mar 2024 18:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711130618; cv=none; b=EiL1XxL4sGmMXTGIsah5F/5ftQy6XP3xPMhgS6mgtdeqjlwEg6IxRUKb6HIHItVPZGdyabfaGn3Pmm5HOivXwu+i0wFzmiCsc2vxLTyeHRm+JmivzZoU/s5BA/7NhSizEXkn1B6HBJqEjB9x6joDmyitptyZvSD5r2B0nf7W74M=
+	t=1711130888; cv=none; b=bph+S9D8eZMwMvVY6bA1JnCHAUUtOPszp/HAu85TGTr4zuc7vXhqbfnjv4/rUjy+WlbfGtRdbAmQI+lNsrVcR4L5kNKaPkSs/Xa/PGLxr6hgFkUtu0XZD/ZsdPtaKj/05eYbJ/0ujSCDFnHa8C/WnNi5GKT7NthACx+bjKTEMbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711130618; c=relaxed/simple;
-	bh=D1Ns2DV3olSdUJGSgYWDvM4g0A1SnXxonjtZR/pjfd0=;
+	s=arc-20240116; t=1711130888; c=relaxed/simple;
+	bh=KiwcN6OXG4cAG14WcslHNhcajsRkQ9j3y5Cu1CHHcik=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RPXGKmK3PIuyfkfBiUTZaViRJQ4ioJak0y3U1x/W/jzpQw+n606aXasdCc9FV3YukHn/7Rup9Fntpm4ay4SD6zfTncozPAEQjSLUEdG90fGQRc67VXM5h+Tqa/uktRBKZVk8qC7U96c07hjA+lICAscZI4fF+bHh0NdS2xlqu2U=
+	 Content-Type:Content-Disposition:In-Reply-To; b=mye19LDdG+7+l2epbCG44/PXoyURjsXoSNT32uenVF+y4AoQUvl0ltV4U0vPXAPj7nqZo8u+NuOo4SsxPorsnkvCqu/34oRRkD49KKCoWIfUbtYoXXvCl1kCtmss9nT/GTwFcTzG3xOtmnaHQnKFz+OGUXua4D3ySnHHoVd+PJ8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1rnjEH-0005YL-1W;
-	Fri, 22 Mar 2024 18:02:57 +0000
-Date: Fri, 22 Mar 2024 18:02:50 +0000
+	id 1rnjIq-0005aI-0F;
+	Fri, 22 Mar 2024 18:07:40 +0000
+Date: Fri, 22 Mar 2024 18:07:36 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: Rob Herring <robh@kernel.org>,
@@ -44,10 +44,11 @@ Cc: Rob Herring <robh@kernel.org>,
 	"Ricardo B. Marliere" <ricardo@marliere.net>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/8] block: implement NVMEM provider
-Message-ID: <Zf3HylHNrrj20mBO@makrotopia.org>
+Subject: Re: [PATCH 3/8] block: add new genhd flag GENHD_FL_NVMEM
+Message-ID: <Zf3I6DDqqyd924Ks@makrotopia.org>
 References: <cover.1711048433.git.daniel@makrotopia.org>
- <e5fb3e70-8f3c-4dda-b642-401d9d047a03@acm.org>
+ <89abd9ab93783da0e8934ebc03d66559f78f6060.1711048433.git.daniel@makrotopia.org>
+ <7027ccdc-878a-420e-a7ea-5156e1d67b8a@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,38 +57,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e5fb3e70-8f3c-4dda-b642-401d9d047a03@acm.org>
+In-Reply-To: <7027ccdc-878a-420e-a7ea-5156e1d67b8a@acm.org>
 
-On Fri, Mar 22, 2024 at 10:52:17AM -0700, Bart Van Assche wrote:
-> On 3/21/24 12:31, Daniel Golle wrote:
-> > On embedded devices using an eMMC it is common that one or more (hw/sw)
-> > partitions on the eMMC are used to store MAC addresses and Wi-Fi
-> > calibration EEPROM data.
+On Fri, Mar 22, 2024 at 10:49:48AM -0700, Bart Van Assche wrote:
+> On 3/21/24 12:33, Daniel Golle wrote:
+> > Add new flag to destinguish block devices which may act as an NVMEM
+> > provider.
 > > 
-> > Implement an NVMEM provider backed by a block device as typically the
-> > NVMEM framework is used to have kernel drivers read and use binary data
-> > from EEPROMs, efuses, flash memory (MTD), ...
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >   include/linux/blkdev.h | 2 ++
+> >   1 file changed, 2 insertions(+)
 > > 
-> > In order to be able to reference hardware partitions on an eMMC, add code
-> > to bind each hardware partition to a specific firmware subnode.
-> > 
-> > Overall, this enables uniform handling across practially all flash
-> > storage types used for this purpose (MTD, UBI, and now also MMC).
-> > 
-> > As part of this series it was necessary to define a device tree schema
-> > for block devices and partitions on them, which (similar to how it now
-> > works also for UBI volumes) can be matched by one or more properties.
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index c3e8f7cf96be9..f2c4f280d7619 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -81,11 +81,13 @@ struct partition_meta_info {
+> >    * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
+> >    * scan for partitions from add_disk, and users can't add partitions manually.
+> >    *
+> > + * ``GENHD_FL_NVMEM``: the block device should be considered as NVMEM provider.
+> >    */
+> >   enum {
+> >   	GENHD_FL_REMOVABLE			= 1 << 0,
+> >   	GENHD_FL_HIDDEN				= 1 << 1,
+> >   	GENHD_FL_NO_PART			= 1 << 2,
+> > +	GENHD_FL_NVMEM				= 1 << 3,
+> >   };
 > 
-> Since this patch series adds code that opens partitions and reads
-> from partitions, can that part of the functionality be implemented in
-> user space? There is already a mechanism for notifying user space about
-> block device changes, namely udev.
+> What would break if this flag wouldn't exist?
 
-No. Because it has to happen (e.g. for nfsroot to work) before
-userland gets initiated: Without Ethernet MAC address (which if often
-stored at some raw offset on a partition or hw-partition of an eMMC),
-we don't have a way to use nfsroot (because that requires functional
-Ethernet), hence userland won't come up. It's a circular dependency
-problem which can only be addressed by making sure that everything
-needed for Ethernet to come up is provided by the kernel **before**
-rootfs (which can be nfsroot) is mounted.
+As both, MTD and UBI already act as NVMEM providers themselves, once
+the user creates a ubiblock device or got CONFIG_MTD_BLOCK=y set in their
+kernel configuration, we would run into problems because both, the block
+layer as well as MTD or UBI would try to be an NVMEM provider for the same
+device tree node.
+
+I intially suggested the invert of this flag, GENHD_FL_NO_NVMEM which
+would be set only for mtdblock and ubiblock devices to opt-out of acting
+as NVMEM proviers. However, in a previous comment [1] on the RFC it was
+requested to make this opt-in instead.
+
+[1]: https://patchwork.kernel.org/comment/25432948/
