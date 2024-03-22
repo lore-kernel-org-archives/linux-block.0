@@ -1,92 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B2E5FDDD;
-	Fri, 22 Mar 2024 17:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804D5604A6;
+	Fri, 22 Mar 2024 17:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711129581; cv=none; b=oHQQzj2pe6g0c89w0nZB+6tgP87sT3/zpcVGkG/2Du8ys3O16yuYdAwjeb4gxPo3fJK06eLFTHIsKiDIIeSZxQwmnsD4uaKIVNq84tLpgzIRoRa9KoRJZJYkDsTn9UJTPH6xYqT+pWtUrQhB77AYYUanjex9kc+JNp8Y1nYWzHU=
+	t=1711129811; cv=none; b=E36O6beB75Cz2TVsAV/6FjcJUlVgAns/PbxEZYNLLZ2NboFWGmKzNME8GGLWYCQMiOvrs+m9GcS/02xloLSGBNQJxCTJEdcPfQwlUHgZ8+cF3qeXleat3xGXsdvoE4mEqucnLgMQ6hHC0Lq8r8JvpCmuKwX3AMk27xQxq6LNhrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711129581; c=relaxed/simple;
-	bh=tPnSfU7iDXbv5Aanu3qQZ/bdHhZW5HEkKrMaj/r/t3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t1fFWZ00mlSUzvKAV2Tn9hcnz8Hhk9dbnHULQI5Hs4Z3yauEUBxYICPy43tNMnRh7j0PLSM8RCDZI4N4DIvdTAzciqqvPetms2v/8nzV4IjiNj+ki2T+ou3zyNZHNryywghdwYmcNkLL5VHz8FzEK4vJzXD9/rdjt6Rb2NKYB3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHS5yTT4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711129811; c=relaxed/simple;
+	bh=tlaxGcQqSo4rsMaZE0sbNHeXStqfwgVpWciJkli4y+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=pUdmeTAQO5IdjmOQ9QU9XcsGdDjoTvA6OADnPdZRhI4Lr4xzq23GpEGoGCR81dpjPu+FHn93Cz7d1ClkNDpWQ43cyvHjLvXo00BnHdy2YHqAJpT+0WTIpPIlDcYwV9Hj4MrPIAsPQP9/pzIvFP7GwZ00tUENYPEfyYFI+MG5cNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Qpsv8DC7; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHS5yTT4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B06FDC43390;
-	Fri, 22 Mar 2024 17:46:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711129581;
-	bh=tPnSfU7iDXbv5Aanu3qQZ/bdHhZW5HEkKrMaj/r/t3E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZHS5yTT4bbaMRlgftNPH4s3/BHy6Y/pMfuNyl8v8f5cbM9wT0nJywOThE9XO9o+Yo
-	 sQrbBVvHpfJ/GkmHADMgsyejjED5TS3WA9xA7CAd8LGMMBj72qkOP6L4xJgAnibISZ
-	 qNFyWWuGRtKqmNbYceSiJMbEfqG1Js9LGbaa9G2SXsAMGNlvbn99etRqhzGPHQquR2
-	 /pbuuEEFXd6WzmZyO515+46vj9pZRkjqcnsndSlqoffLvES8FRzNSO3QY42zxkNADr
-	 DC5hb9KvKEkeYTKUZ64FdwpBihsRuGbAw0oCeOVQ5Q/D7ca6clZI9B8s4YtiHLB9rj
-	 nO/n9c2+vHn/w==
-Date: Fri, 22 Mar 2024 19:46:17 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240322174617.GD14887@unreal>
-References: <20240306221400.GA8663@lst.de>
- <20240307000036.GP9225@ziepe.ca>
- <20240307150505.GA28978@lst.de>
- <20240307210116.GQ9225@ziepe.ca>
- <20240308164920.GA17991@lst.de>
- <20240308202342.GZ9225@ziepe.ca>
- <20240309161418.GA27113@lst.de>
- <20240319153620.GB66976@ziepe.ca>
- <20240320085536.GA14887@unreal>
- <20240321224013.GB22663@lst.de>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Qpsv8DC7"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V1VGR4j9Yz6Cnk95;
+	Fri, 22 Mar 2024 17:50:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1711129797; x=1713721798; bh=afZlcm9O07bvpHWZp13m44cg
+	Mjqanzjz1tGTAZQ/1YM=; b=Qpsv8DC7mL/Qcs4xoiwBfXcBY4Y5RAIaatVQz7e0
+	NmTdbhx1Xsns+fOdYL4hRE0TSmqH/tkSqTJUfxTbNyGRIE37amKlWJ4sOG/4J9Rq
+	E1OlRyafw/bvMN6lPbKPVjJOARn9tI5lwiLNOWFpPp3xY18La+U79Q21j3TRjlFW
+	lTuANy7O79bywNMmr3DDk5u73ZNtChsWQ2S637Yrcdw2tU2esITNy61wtZSVyDwF
+	auUIvSZmBhD9AD/zmrt+L8xNEeGCgA27jur2s4MC/uU795KGEP3p1XkAOuDP9PvO
+	6b4Q0VUPCVm6smHq/cZwoEBSZdEwWvG4HyveTE0u6aEm8g==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id WDCEdahPUwBV; Fri, 22 Mar 2024 17:49:57 +0000 (UTC)
+Received: from [100.96.154.173] (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V1VG64fZqz6Cnk8t;
+	Fri, 22 Mar 2024 17:49:50 +0000 (UTC)
+Message-ID: <7027ccdc-878a-420e-a7ea-5156e1d67b8a@acm.org>
+Date: Fri, 22 Mar 2024 10:49:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240321224013.GB22663@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/8] block: add new genhd flag GENHD_FL_NVMEM
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Jens Axboe <axboe@kernel.dk>, Dave Chinner <dchinner@redhat.com>,
+ Jan Kara <jack@suse.cz>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
+ <linux@weissschuh.net>, Damien Le Moal <dlemoal@kernel.org>,
+ Li Lingfeng <lilingfeng3@huawei.com>, Christian Brauner
+ <brauner@kernel.org>, Christian Heusel <christian@heusel.eu>,
+ Min Li <min15.li@samsung.com>, Adrian Hunter <adrian.hunter@intel.com>,
+ Avri Altman <avri.altman@wdc.com>, Hannes Reinecke <hare@suse.de>,
+ Christian Loehle <CLoehle@hyperstone.com>, Bean Huo <beanhuo@micron.com>,
+ Yeqi Fu <asuk4.q@gmail.com>, Victor Shih <victor.shih@genesyslogic.com.tw>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ Dominique Martinet <dominique.martinet@atmark-techno.com>,
+ "Ricardo B. Marliere" <ricardo@marliere.net>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <cover.1711048433.git.daniel@makrotopia.org>
+ <89abd9ab93783da0e8934ebc03d66559f78f6060.1711048433.git.daniel@makrotopia.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <89abd9ab93783da0e8934ebc03d66559f78f6060.1711048433.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 21, 2024 at 11:40:13PM +0100, Christoph Hellwig wrote:
-> On Wed, Mar 20, 2024 at 10:55:36AM +0200, Leon Romanovsky wrote:
-> > Something like this will do the trick.
+On 3/21/24 12:33, Daniel Golle wrote:
+> Add new flag to destinguish block devices which may act as an NVMEM
+> provider.
 > 
-> As far as I can tell it totally misses the point.  Which is not to never
-> return non-P2P if the flag is set, but to return either all P2P or non-P2
-> P and not create a boundary in the single call.
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>   include/linux/blkdev.h | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index c3e8f7cf96be9..f2c4f280d7619 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -81,11 +81,13 @@ struct partition_meta_info {
+>    * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
+>    * scan for partitions from add_disk, and users can't add partitions manually.
+>    *
+> + * ``GENHD_FL_NVMEM``: the block device should be considered as NVMEM provider.
+>    */
+>   enum {
+>   	GENHD_FL_REMOVABLE			= 1 << 0,
+>   	GENHD_FL_HIDDEN				= 1 << 1,
+>   	GENHD_FL_NO_PART			= 1 << 2,
+> +	GENHD_FL_NVMEM				= 1 << 3,
+>   };
 
-You are treating FOLL_PCI_P2PDMA as a hint, but in iov_iter_extract_user_pages()
-you set it only for p2p queues. I was under impression that you want only p2p pages
-in these queues.
+What would break if this flag wouldn't exist?
 
-Anyway, I can prepare other patch that will return or p2p or non-p2p pages in one shot.
+Thanks,
 
-Thanks
+Bart.
+
