@@ -1,48 +1,48 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804D5604A6;
-	Fri, 22 Mar 2024 17:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860F0605C4;
+	Fri, 22 Mar 2024 17:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711129811; cv=none; b=E36O6beB75Cz2TVsAV/6FjcJUlVgAns/PbxEZYNLLZ2NboFWGmKzNME8GGLWYCQMiOvrs+m9GcS/02xloLSGBNQJxCTJEdcPfQwlUHgZ8+cF3qeXleat3xGXsdvoE4mEqucnLgMQ6hHC0Lq8r8JvpCmuKwX3AMk27xQxq6LNhrI=
+	t=1711129958; cv=none; b=KTqx1Mm3eF3sn2kuLrDC019N8ibn9/u3SCEQ4n+I+YcybRpXJwofVLuJq/Ijsj4zrnUeozNflHCR+vv0cFydy79s0LgZ6kW/rhZeMt6NaEpA+ZytDTl4m5EvrluffACPE42PpqRWgVrstrQgqD2RUFSuAQ3qo/vuaC9Xm5ALGAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711129811; c=relaxed/simple;
-	bh=tlaxGcQqSo4rsMaZE0sbNHeXStqfwgVpWciJkli4y+E=;
+	s=arc-20240116; t=1711129958; c=relaxed/simple;
+	bh=R0UTVnALN8i9q7pNCS16NuGrIkRzqq6HAnmbMi4W1E4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=pUdmeTAQO5IdjmOQ9QU9XcsGdDjoTvA6OADnPdZRhI4Lr4xzq23GpEGoGCR81dpjPu+FHn93Cz7d1ClkNDpWQ43cyvHjLvXo00BnHdy2YHqAJpT+0WTIpPIlDcYwV9Hj4MrPIAsPQP9/pzIvFP7GwZ00tUENYPEfyYFI+MG5cNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Qpsv8DC7; arc=none smtp.client-ip=199.89.1.11
+	 In-Reply-To:Content-Type; b=Zw7OnKHR90TgA1Zwu20XS5tXz0xFzlg26BWtt5UamyB29OrGHlsqCR1toP84RP3PzCKemDG9sYJissf5+oVK6FrtYEzcnQ/XPxeAHL9U3mVrHltnMqw1Xbdxx2Oz7XfAGxxWH04NQSKKRzD3aIZW16vZadFlu0HMQ2JV6bMZTN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=i8YqWF2a; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Qpsv8DC7"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="i8YqWF2a"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V1VGR4j9Yz6Cnk95;
-	Fri, 22 Mar 2024 17:50:07 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V1VKH3s1vzlgVnF;
+	Fri, 22 Mar 2024 17:52:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:references:content-language:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711129797; x=1713721798; bh=afZlcm9O07bvpHWZp13m44cg
-	Mjqanzjz1tGTAZQ/1YM=; b=Qpsv8DC7mL/Qcs4xoiwBfXcBY4Y5RAIaatVQz7e0
-	NmTdbhx1Xsns+fOdYL4hRE0TSmqH/tkSqTJUfxTbNyGRIE37amKlWJ4sOG/4J9Rq
-	E1OlRyafw/bvMN6lPbKPVjJOARn9tI5lwiLNOWFpPp3xY18La+U79Q21j3TRjlFW
-	lTuANy7O79bywNMmr3DDk5u73ZNtChsWQ2S637Yrcdw2tU2esITNy61wtZSVyDwF
-	auUIvSZmBhD9AD/zmrt+L8xNEeGCgA27jur2s4MC/uU795KGEP3p1XkAOuDP9PvO
-	6b4Q0VUPCVm6smHq/cZwoEBSZdEwWvG4HyveTE0u6aEm8g==
+	 s=mr01; t=1711129946; x=1713721947; bh=oMF6dspJ5VT6lz5tMGmJgcgm
+	xGvVlF09dV4q3ULAEJo=; b=i8YqWF2a34cnY8+MS2u2uegVHxWozoKH+EkzvC5+
+	ze98H9gxaXVknCmeKi3eF7QOBjv3dy5K1TA0ocdV5dIcl8cIab3g44y9BZlPJ+uP
+	NkKqEECYrJ45BG31z2v6hUlJZG2dHvK+cA0IN3teiSqU4r1p1PNJkXe+XS4Zui8c
+	5wk8M7IhYbS/uDiKJ0nK+tBgxg79El1pT9YOPoFziWha9yONtz8sCzN0wU43u93H
+	WqUId6LuvBLYjT7/6kwus8mCOSkS0TcsLEVe3q3/Ave2TMRY1HD2ACiZnjWE65gp
+	qVzZv/MoloXjUa3AiG84fS15AJHFkXJX0sm5kOTczSr7Jw==
 X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id WDCEdahPUwBV; Fri, 22 Mar 2024 17:49:57 +0000 (UTC)
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id RFjf4buQCww8; Fri, 22 Mar 2024 17:52:26 +0000 (UTC)
 Received: from [100.96.154.173] (unknown [104.132.1.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V1VG64fZqz6Cnk8t;
-	Fri, 22 Mar 2024 17:49:50 +0000 (UTC)
-Message-ID: <7027ccdc-878a-420e-a7ea-5156e1d67b8a@acm.org>
-Date: Fri, 22 Mar 2024 10:49:48 -0700
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V1VK021NJzlgTGW;
+	Fri, 22 Mar 2024 17:52:19 +0000 (UTC)
+Message-ID: <e5fb3e70-8f3c-4dda-b642-401d9d047a03@acm.org>
+Date: Fri, 22 Mar 2024 10:52:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/8] block: add new genhd flag GENHD_FL_NVMEM
+Subject: Re: [PATCH 0/8] block: implement NVMEM provider
 Content-Language: en-US
 To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -70,41 +70,35 @@ To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
  linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
  linux-block@vger.kernel.org
 References: <cover.1711048433.git.daniel@makrotopia.org>
- <89abd9ab93783da0e8934ebc03d66559f78f6060.1711048433.git.daniel@makrotopia.org>
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <89abd9ab93783da0e8934ebc03d66559f78f6060.1711048433.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1711048433.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/21/24 12:33, Daniel Golle wrote:
-> Add new flag to destinguish block devices which may act as an NVMEM
-> provider.
+On 3/21/24 12:31, Daniel Golle wrote:
+> On embedded devices using an eMMC it is common that one or more (hw/sw)
+> partitions on the eMMC are used to store MAC addresses and Wi-Fi
+> calibration EEPROM data.
 > 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->   include/linux/blkdev.h | 2 ++
->   1 file changed, 2 insertions(+)
+> Implement an NVMEM provider backed by a block device as typically the
+> NVMEM framework is used to have kernel drivers read and use binary data
+> from EEPROMs, efuses, flash memory (MTD), ...
 > 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index c3e8f7cf96be9..f2c4f280d7619 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -81,11 +81,13 @@ struct partition_meta_info {
->    * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
->    * scan for partitions from add_disk, and users can't add partitions manually.
->    *
-> + * ``GENHD_FL_NVMEM``: the block device should be considered as NVMEM provider.
->    */
->   enum {
->   	GENHD_FL_REMOVABLE			= 1 << 0,
->   	GENHD_FL_HIDDEN				= 1 << 1,
->   	GENHD_FL_NO_PART			= 1 << 2,
-> +	GENHD_FL_NVMEM				= 1 << 3,
->   };
+> In order to be able to reference hardware partitions on an eMMC, add code
+> to bind each hardware partition to a specific firmware subnode.
+> 
+> Overall, this enables uniform handling across practially all flash
+> storage types used for this purpose (MTD, UBI, and now also MMC).
+> 
+> As part of this series it was necessary to define a device tree schema
+> for block devices and partitions on them, which (similar to how it now
+> works also for UBI volumes) can be matched by one or more properties.
 
-What would break if this flag wouldn't exist?
+Since this patch series adds code that opens partitions and reads
+from partitions, can that part of the functionality be implemented in
+user space? There is already a mechanism for notifying user space about
+block device changes, namely udev.
 
 Thanks,
 
 Bart.
-
