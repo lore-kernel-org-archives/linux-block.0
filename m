@@ -1,99 +1,93 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B167F60874;
-	Fri, 22 Mar 2024 17:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7AE482F3;
+	Fri, 22 Mar 2024 18:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711129973; cv=none; b=ZzxaFD25HmVAFQ55JuamBChNoIlBrOYBGCCQd4U/RIPhGjwhU4z99XemAeyNdCF6blHU1RMVXEJXeas98ZJ5i41zSijHFGXecXnbOSLVzfBUQax26O6aVBEND7ezq6oOwY8+tx+WhM3/06qAjHFl4HiXY+aL0vmg2WBefgtS2AI=
+	t=1711130618; cv=none; b=EiL1XxL4sGmMXTGIsah5F/5ftQy6XP3xPMhgS6mgtdeqjlwEg6IxRUKb6HIHItVPZGdyabfaGn3Pmm5HOivXwu+i0wFzmiCsc2vxLTyeHRm+JmivzZoU/s5BA/7NhSizEXkn1B6HBJqEjB9x6joDmyitptyZvSD5r2B0nf7W74M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711129973; c=relaxed/simple;
-	bh=cPpzkL33TNc8EjbO22UOd0Waan/BeO74C1s1p9UZ/a4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=unCVsHDHhDwrfiiN/OPEFwVNN4kZgZqK5I9mfspxzcj2Nr+J/nZ4/HLJC0h0dGdSZgdfriIF/H+Hw3tMCy6XYwOVgjYzDPsac9HupfDn0tSzw5gRusThwD51Brhe++GQSJZ6gniq3Hd2xx98RWa05h5jaeqIashznQTqj4mtr3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=kgwNwn08; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="kgwNwn08"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V1VKb22wkzlgVnF;
-	Fri, 22 Mar 2024 17:52:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:references:content-language:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711129964; x=1713721965; bh=VmpsveN1Jy+pI79mJoSzX1Tm
-	iWIgqpdMBcYQ0YCsro8=; b=kgwNwn08fqIrxHP5H264S72bIhZb5jOd5P/pAbWr
-	10b43ql298Ll0OdhuZl6sZ+SQPHzPNFSfKJjYVXeh9BY1K2zegzA7vH1mnjPnfjM
-	FKBzy4bDVWu7O8eMuV1EPQBWHCtKrcSWoLPpktF66AS4wUAC/1kJzufGMdnNs7t6
-	q62nT2xTeE0UTqel4BxzJFRA2elLKTNpfbKk1uNTklo+TMPgN4CM2FgMOUT58Z91
-	m4vAdjX7Pgn88NAymF5V6woD9zN7GrsuQ+lc29MAkDz8NIJN+P0kxHny8Mi/8bc1
-	i7RXpEKlbNBrfk2dtM5LEP+NrJzjyXCBIiVKPjVpX+ndeg==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id CnWJKX_Ztm_X; Fri, 22 Mar 2024 17:52:44 +0000 (UTC)
-Received: from [100.96.154.173] (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V1VKK1wLtzlgTGW;
-	Fri, 22 Mar 2024 17:52:36 +0000 (UTC)
-Message-ID: <99874d1e-ff5c-4e8a-9922-752207119147@acm.org>
-Date: Fri, 22 Mar 2024 10:52:36 -0700
+	s=arc-20240116; t=1711130618; c=relaxed/simple;
+	bh=D1Ns2DV3olSdUJGSgYWDvM4g0A1SnXxonjtZR/pjfd0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RPXGKmK3PIuyfkfBiUTZaViRJQ4ioJak0y3U1x/W/jzpQw+n606aXasdCc9FV3YukHn/7Rup9Fntpm4ay4SD6zfTncozPAEQjSLUEdG90fGQRc67VXM5h+Tqa/uktRBKZVk8qC7U96c07hjA+lICAscZI4fF+bHh0NdS2xlqu2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rnjEH-0005YL-1W;
+	Fri, 22 Mar 2024 18:02:57 +0000
+Date: Fri, 22 Mar 2024 18:02:50 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Christian Heusel <christian@heusel.eu>,
+	Min Li <min15.li@samsung.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Avri Altman <avri.altman@wdc.com>, Hannes Reinecke <hare@suse.de>,
+	Christian Loehle <CLoehle@hyperstone.com>,
+	Bean Huo <beanhuo@micron.com>, Yeqi Fu <asuk4.q@gmail.com>,
+	Victor Shih <victor.shih@genesyslogic.com.tw>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Dominique Martinet <dominique.martinet@atmark-techno.com>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/8] block: implement NVMEM provider
+Message-ID: <Zf3HylHNrrj20mBO@makrotopia.org>
+References: <cover.1711048433.git.daniel@makrotopia.org>
+ <e5fb3e70-8f3c-4dda-b642-401d9d047a03@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/8] block: implement NVMEM provider
-Content-Language: en-US
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Jens Axboe <axboe@kernel.dk>, Dave Chinner <dchinner@redhat.com>,
- Jan Kara <jack@suse.cz>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
- <linux@weissschuh.net>, Damien Le Moal <dlemoal@kernel.org>,
- Li Lingfeng <lilingfeng3@huawei.com>, Christian Brauner
- <brauner@kernel.org>, Christian Heusel <christian@heusel.eu>,
- Min Li <min15.li@samsung.com>, Adrian Hunter <adrian.hunter@intel.com>,
- Avri Altman <avri.altman@wdc.com>, Hannes Reinecke <hare@suse.de>,
- Christian Loehle <CLoehle@hyperstone.com>, Bean Huo <beanhuo@micron.com>,
- Yeqi Fu <asuk4.q@gmail.com>, Victor Shih <victor.shih@genesyslogic.com.tw>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Dominique Martinet <dominique.martinet@atmark-techno.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <cover.1711048433.git.daniel@makrotopia.org>
- <7555db6eb71d4ccb2b9d5ebe3b41dc34088c6316.1711048433.git.daniel@makrotopia.org>
- <e170642d-9ae8-4d5a-90d9-2837f1bcef9b@acm.org>
- <ZfyW8jTAgclicAWd@makrotopia.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ZfyW8jTAgclicAWd@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e5fb3e70-8f3c-4dda-b642-401d9d047a03@acm.org>
 
-On 3/21/24 13:22, Daniel Golle wrote:
-> On Thu, Mar 21, 2024 at 12:44:19PM -0700, Bart Van Assche wrote:
->> Why to add this functionality to the block layer instead of somewhere
->> in the drivers/ directory?
+On Fri, Mar 22, 2024 at 10:52:17AM -0700, Bart Van Assche wrote:
+> On 3/21/24 12:31, Daniel Golle wrote:
+> > On embedded devices using an eMMC it is common that one or more (hw/sw)
+> > partitions on the eMMC are used to store MAC addresses and Wi-Fi
+> > calibration EEPROM data.
+> > 
+> > Implement an NVMEM provider backed by a block device as typically the
+> > NVMEM framework is used to have kernel drivers read and use binary data
+> > from EEPROMs, efuses, flash memory (MTD), ...
+> > 
+> > In order to be able to reference hardware partitions on an eMMC, add code
+> > to bind each hardware partition to a specific firmware subnode.
+> > 
+> > Overall, this enables uniform handling across practially all flash
+> > storage types used for this purpose (MTD, UBI, and now also MMC).
+> > 
+> > As part of this series it was necessary to define a device tree schema
+> > for block devices and partitions on them, which (similar to how it now
+> > works also for UBI volumes) can be matched by one or more properties.
 > 
-> Simply because we need notifications about appearing and disappearing
-> block devices, or a way to iterate over all block devices in a system.
-> For both there isn't currently any other interface than using a
-> class_interface for that, and that requires access to &block_class
-> which is considered a block subsystem internal.
+> Since this patch series adds code that opens partitions and reads
+> from partitions, can that part of the functionality be implemented in
+> user space? There is already a mechanism for notifying user space about
+> block device changes, namely udev.
 
-That's an argument for adding an interface to the block layer that
-implements this functionality but not for adding this code in the block
-layer.
-
-Thanks,
-
-Bart.
+No. Because it has to happen (e.g. for nfsroot to work) before
+userland gets initiated: Without Ethernet MAC address (which if often
+stored at some raw offset on a partition or hw-partition of an eMMC),
+we don't have a way to use nfsroot (because that requires functional
+Ethernet), hence userland won't come up. It's a circular dependency
+problem which can only be addressed by making sure that everything
+needed for Ethernet to come up is provided by the kernel **before**
+rootfs (which can be nfsroot) is mounted.
