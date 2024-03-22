@@ -1,62 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932AE3F8F7;
-	Fri, 22 Mar 2024 13:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8A64CE04;
+	Fri, 22 Mar 2024 14:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711115867; cv=none; b=KRuu3hCD4px6lLz8xjkhxMj7rQM8AijcqM03wRTpbTRWbC8kPzPvoH4F9xrcxp87lkGBlMYLvV0rUwrMvicHlEbf4Gkrczb2rDanKrtbcbE3vJqB5L7pKfTjUCyfNGABogYxti+Qk213gwQL9bNO6x8CfLeabyVn/htlEKmBJ98=
+	t=1711119466; cv=none; b=HuJf3DdBCIk4+a0l6+cbXvsVH0M2UkOjgDiiuH2iXgrIRP0ou/az6hURSk86S0rAd5tlWESNNSOXDAD0T6COyJ1L4H1FhQH2oAvW1eInMLl8Qu3tMc+spIpoYFcoFrxN7bzLQRFZYJZBRcvEdbMOa8664+IUfCp2tzNOB6P6A+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711115867; c=relaxed/simple;
-	bh=Js9co96eGqEjZBrOp/79tcRIasSwidzlgGY09Q9Tvsk=;
+	s=arc-20240116; t=1711119466; c=relaxed/simple;
+	bh=cnjz/pdPrArb3OD0ALvV5aoLfVc+0EoXGRKf2726D+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R70wkRgoX9lemvNVlID/jXOGuyxBaZf3lFPzm+yZXGAGH9hop7vZYe8LfWgcNeKj7vEGSiXKdjBGVY+o72a5Pick3GDQ1cOt7GFE/mvK+jkzwYeI31hfiS8nq583aLvhC+4mAon9MLx9BLP8ibQ7Kl1nDMSm8Cs/TffMnxV2Jcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L4akKLQc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=RYtRaCfQ7bdQ+HnRxfya1na6u2XYcjj9rXANzh6QsZ5ZFXMqJjGMuJpyFT7rsZ3OXiTDGNZY4XrApnqatnDDyexeYN+Xu+L99T1us8pfx0BuDzvRMlU5pEtIUQqXJlPY+4+Bl34O9MxKWw6YNGn6ZWnT6MGEtpwlNB9JY+56FVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=gYnXLvjU; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L4akKLQc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A22E4C433C7;
-	Fri, 22 Mar 2024 13:57:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711115867;
-	bh=Js9co96eGqEjZBrOp/79tcRIasSwidzlgGY09Q9Tvsk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L4akKLQcATzeOK7VwTduDoLlDz05vnQojHzdXe4skXSmeNqay+OjIuOVnU8zq8OEq
-	 GLt1dy+P4FSPlSg9paqzSZy+WWfaF2nlk7dZ51hhvci4yOfgUqcdwhXrk6sdHqYXOL
-	 aG0bK/xqxOY2RWfUBr5h7lFVNoqjLRBWyMDZFBUFmEsSiWtYEUsKveciT6cFO7Esot
-	 paR7fGq80GcEIoUcA64/QpWXw7uKCHDnOkkdXcX0dbGvLHR2Q6khhfi1s1iogK4srD
-	 dcuMOE32KbIZRzI8uUv7FLNL5yD+D5JZ5CeH17p+TDlGHjKijDsP+/3qw9LUQXBH7H
-	 Emt7GgxljVe9Q==
-Date: Fri, 22 Mar 2024 14:57:42 +0100
-From: Christian Brauner <brauner@kernel.org>
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="gYnXLvjU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=4G+UacrO2zoPfV1aUMFyQbLZLPEMouTLqH7eFTxvzN8=; b=gYnXLvjUYdgYp2FeX4Jgb8pY+P
+	AnVOKfuz4FXAN3pjqPykAWHM4aPGh9aOrhIdvX0rg+bOywpbYDd2XNfOIgjfCDAxrmg3GLaOLbhUn
+	5ApulJUDICCY1YPhRirGi3iVJktrKzkphQ7PE2qWJfNousRWpAkEySXnjEKpzdZXghBXXTrM4kUaT
+	p32Q8ZkvhC6uDqMz1xIJhxWnQuV+wvqAmZtbxBG4Pt5KN5tbDt6dvcEPlVW1Q0b4xoeKCx1bY3JTM
+	FeJE1oqQO9ovQeDoAGyyLdDYELTnO1YaoPytGVQ01pK7ZJqVGNYsH880pWhQbjG3lL6uEkM0BfTft
+	QWiimd3g==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rngKm-00EaAI-32;
+	Fri, 22 Mar 2024 14:57:29 +0000
+Date: Fri, 22 Mar 2024 14:57:28 +0000
+From: Al Viro <viro@zeniv.linux.org.uk>
 To: Jan Kara <jack@suse.cz>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
-	"yukuai (C)" <yukuai3@huawei.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>,
+	brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
 Subject: Re: [RFC v4 linux-next 19/19] fs & block: remove bdev->bd_inode
-Message-ID: <20240322-zerfiel-dolch-0faceaf399d2@brauner>
-References: <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
+Message-ID: <20240322145728.GN538574@ZenIV>
+References: <20240222124555.2049140-20-yukuai1@huaweicloud.com>
+ <20240317213847.GD10665@lst.de>
+ <022204e6-c387-b4b2-5982-970fd1ed5b5b@huaweicloud.com>
+ <20240318013208.GA23711@lst.de>
+ <5c231b60-a2bf-383e-e641-371e7e57da67@huaweicloud.com>
  <ea4774db-188e-6744-6a5b-0096f6206112@huaweicloud.com>
  <20240318232245.GA17831@lst.de>
  <c62dac0e-666f-9cc9-cffe-f3d985029d6a@huaweicloud.com>
- <20240321112737.33xuxfttrahtvbej@quack3>
- <240b78df-257e-a97c-31ff-a8b1b1882e80@huaweicloud.com>
- <20240322063718.GC3404528@ZenIV>
- <20240322063955.GM538574@ZenIV>
- <170c544c-164e-368c-474a-74ae4055d55f@huaweicloud.com>
- <20240322125750.jov4f3alsrkmqnq7@quack3>
+ <20240322063346.GB3404528@ZenIV>
+ <20240322131030.pxbvtubien2t27zw@quack3>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240322125750.jov4f3alsrkmqnq7@quack3>
+In-Reply-To: <20240322131030.pxbvtubien2t27zw@quack3>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-> Do you mean for operations like bread(), getblk(), or similar, don't you?
-> Frankly I don't find a huge value in this and seeing how clumsy it is
-> getting I'm not convinced it is worth it at this point.
+On Fri, Mar 22, 2024 at 02:10:30PM +0100, Jan Kara wrote:
+> > End result:
+> > 
+> > * old ->i_private leaked (already grabbed by your get_bdev_file())
+> > * ->bd_openers at 1 (after your bdev_open() gets through)
+> > * ->i_private left NULL.
+> > 
+> > Christoph, could we please get rid of that atomic_t nonsense?
+> > It only confuses people into brainos like that.  It really
+> > needs ->open_mutex for any kind of atomicity.
+> 
+> Well, there are a couple of places where we end up reading bd_openers
+> without ->open_mutex. Sure these places are racy wrt other opens / closes
+> so they need to be careful but we want to make sure we read back at least
+> some sane value which is not guaranteed with normal int and compiler
+> possily playing weird tricks when updating it. But yes, we could convert
+> the atomic_t to using READ_ONCE + WRITE_ONCE in appropriate places to avoid
+> these issues and make it more obvious bd_openers are not really handled in
+> an atomic way.
 
-Yes, I agree.
+What WRITE_ONE()?  We really shouldn't modify it without ->open_mutex; do
+we ever do that?  In current mainline:
+
+in blkdev_get_whole(), both callers under ->open_mutex:
+block/bdev.c:671:       if (!atomic_read(&bdev->bd_openers))
+block/bdev.c:675:       atomic_inc(&bdev->bd_openers);
+
+in blkdev_put_whole(), the sole caller under ->open_mutex:
+block_mutex/bdev.c:681:       if (atomic_dec_and_test(&bdev->bd_openers))
+
+in blkdev_get_part(), both callers under ->open_mutex:
+block/bdev.c:700:       if (!atomic_read(&part->bd_openers)) {
+block/bdev.c:704:       atomic_inc(&part->bd_openers);
+
+in blkdev_put_whole(), the sole caller under ->open_mutex:
+block/bdev.c:741:       if (atomic_dec_and_test(&part->bd_openers)) {
+
+in bdev_release(), a deliberately racy reader, commented as such:
+block/bdev.c:1032:      if (atomic_read(&bdev->bd_openers) == 1)
+
+in sync_bdevs(), under ->open_mutex:
+block/bdev.c:1163:              if (!atomic_read(&bdev->bd_openers)) {
+
+in bdev_del_partition(), under ->open_mutex:
+block/partitions/core.c:460:    if (atomic_read(&part->bd_openers))
+
+and finally, in disk_openers(), a racy reader:
+include/linux/blkdev.h:231:     return atomic_read(&disk->part0->bd_openers);
+
+So that's two READ_ONCE() and a bunch of reads and writes under ->open_mutex.
+Callers of disk_openers() need to be careful and looking through those...
+Some of them are under ->open_mutex (either explicitly, or as e.g. lo_release()
+called only via bdev ->release(), which comes only under ->open_mutex), but
+four of them are not:
+
+arch/um/drivers/ubd_kern.c:1023:                if (disk_openers(ubd_dev->disk))
+in ubd_remove().  Racy, possibly a bug.  AFAICS, it's accessible through UML
+console and there's nothing to stop it from racing with open().
+
+drivers/block/loop.c:1245:      if (disk_openers(lo->lo_disk) > 1) {
+in loop_clr_fd().  Under loop's private lock, but that's likely to
+be a race - ->bd_openers updates are not under that.  Note that
+there's no ->open() for /dev/loop, BTW...
+
+drivers/block/loop.c:2161:      if (lo->lo_state != Lo_unbound || disk_openers(lo->lo_disk) > 0) {
+in loop_control_remove().  Similar to the previous one, except that
+it's done out of band *and* it doesn't have the "autoclean" logics
+to work around udev, lovingly described in the comment before the
+call in loop_clr_fd().
+
+drivers/block/nbd.c:1279:       if (disk_openers(nbd->disk) > 1)
+in nbd_bdev_reset().  Under nbd private mutex (->config_lock),
+so there's some exclusion with nbd_open(), but ->bd_openers change
+comes outside of that.  Might or might not be a bug - I need to wake
+up properly to look through that.
