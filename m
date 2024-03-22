@@ -1,225 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A2A3D9E
-	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 02:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B445917FD
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 02:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711073587; cv=none; b=m3/kWRC5IfeUoInDxZSRI3tG31jNpAjD35EhQugDVdtapwa1D/ulixvdKihRtnAWZDIihA6SzIyYCScxaU2ZFbjuuv+RoJ0mSlnsjhlvNGYkcIKepzpL78WBdKecWq/Q46Wwbp5P9Nre9X5VvK/Rl3Kl6Vpuf58uZUNs7fOXxE0=
+	t=1711074374; cv=none; b=AOEPgCQGNAD3TepKr0PMT0rjNKH1xp5lM212bCGouNxRzzDZnZME6CoimLnWoZOPnr7aKoH6g7fD8zlWVwrP7Xua2a6/HysygL82pOEJeqqTozqI8Pn8nU2wnk9nM/EjDvg5un1H6dO1Ig7fbo8Si5Voww6UeEs70Lpp/C8WuZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711073587; c=relaxed/simple;
-	bh=rmNODrghnbesIeDPV/RTWbbPsoPevkCrra+Ef1UEf/g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HzF8vktTW/pd0LdiBOcpAEEKSsqgknQUdSuw2dZHKI+IroDS+9vch4WJLq1o/XIeDfAP1KEASdVpBnhedV9fzNXbTLChk79iVKDXYqLxrO+F2fckojjX4udEwPG/veO5JuePzb/PUesb+Nc0SCoXQr+9cBX3vXW97D1oDqPHwWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hMJt+3gA; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1711074374; c=relaxed/simple;
+	bh=AOzOD8RBDmM8Y1KPrUT9j6lSvGC1LXyXz2s4GV0oIjg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GDkeNWS4eOxioWQnzP0NAd0hI/r6YNrfqFuNGYPe4aYVVbD1aNLV7IWrpeGUNQ2+q9dRte2/sYbhdMXjvrtom5bBFpEopE5e5fOQIn5XsYkWUEtew/JYJyu74284FKRE/dCtyDyxKh/c3Zud2iichgH9IS86UH9IjbQgQ9/o4Io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V1wyOiEQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hMJt+3gA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V1wyOiEQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711073584;
+	s=mimecast20190719; t=1711074371;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=u24w++o8Fciu+sjJN4D74nc+aztaWjGLyppfVLTmswY=;
-	b=hMJt+3gAIE0j0X0BX1FF677R0XiICByQQ7lIkiIhsJb2d+FNh4egYmoggwnLmyopWxuRmd
-	ADzRmuSvoJ++FHORmlUHdJ0IiWjFRobShf/CtEFMVKyHpVFAV2o8Ggln5m/OOIu94EHmee
-	JpxTtJ2r4EKosAlBZJc7ETR+x17K2ko=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N7746ZU4FoSSPfS7xv/0h+o6rQB3qDPk+tHdE5cymGc=;
+	b=V1wyOiEQ69YHUhQGuq4eP6bgd8klAw26fUxIwub9kd6Nyo3Bmy414giZEiP8Cigq2DoKSg
+	Y2cEGheEaz+43+b9tv/2fs4QCVwCMtq07pCgrBI966yQAAheSd1o5+omJm9v9ikA4vd5sZ
+	vcvBZx3DeDIEoAQ0pZtvBX4LZyMadpo=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-664-bbBtsjmNMqywz7c-g3W3Pw-1; Thu, 21 Mar 2024 22:12:59 -0400
-X-MC-Unique: bbBtsjmNMqywz7c-g3W3Pw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-149-ncHV1_6CPv6jR1cbCmUpgA-1; Thu, 21 Mar 2024 22:26:06 -0400
+X-MC-Unique: ncHV1_6CPv6jR1cbCmUpgA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 100698007A2;
-	Fri, 22 Mar 2024 02:12:59 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B72C4107AA;
-	Fri, 22 Mar 2024 02:12:57 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BBA2C800265;
+	Fri, 22 Mar 2024 02:26:05 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.75])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A747EC041F0;
+	Fri, 22 Mar 2024 02:26:00 +0000 (UTC)
+Date: Fri, 22 Mar 2024 10:25:52 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Andrew Theurer <atheurer@redhat.com>,
-	Joe Mario <jmario@redhat.com>,
-	Sebastian Jug <sejug@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH V5] blk-mq: don't schedule block kworker on isolated CPUs
-Date: Fri, 22 Mar 2024 10:12:44 +0800
-Message-ID: <20240322021244.1056223-1-ming.lei@redhat.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+	Yu Kuai <yukuai3@huawei.com>, ming.lei@redhat.com
+Subject: Re: [PATCH] block: Improve IOPS by removing the fairness code
+Message-ID: <ZfzsMIGnaGhWCw80@fedora>
+References: <20240321224605.107783-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240321224605.107783-1-bvanassche@acm.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Kernel parameter of `isolcpus=` or 'nohz_full=' are used to isolate CPUs
-for specific task, and it isn't expected to let block IO disturb these CPUs.
-blk-mq kworker shouldn't be scheduled on isolated CPUs. Also if isolated
-CPUs is run for blk-mq kworker, long block IO latency can be caused.
+On Thu, Mar 21, 2024 at 03:46:05PM -0700, Bart Van Assche wrote:
+> There is an algorithm in the block layer for maintaining fairness
+> across queues that share a tag set. The sbitmap implementation has
+> improved so much that we don't need the block layer fairness algorithm
+> anymore and that we can rely on the sbitmap implementation to guarantee
+> fairness.
+> 
+> This patch removes the following code and structure members:
+> - The function hctx_may_queue().
+> - blk_mq_hw_ctx.nr_active and request_queue.nr_active_requests_shared_tags
+>   and also all the code that modifies these two member variables.
+> 
+> On my test setup (x86 VM with 72 CPU cores) this patch results in 2.9% more
+> IOPS. IOPS have been measured as follows:
+> 
+> $ modprobe null_blk nr_devices=1 completion_nsec=0
+> $ fio --bs=4096 --disable_clat=1 --disable_slat=1 --group_reporting=1 \
+>       --gtod_reduce=1 --invalidate=1 --ioengine=psync --ioscheduler=none \
+>       --norandommap --runtime=60 --rw=randread --thread --time_based=1 \
+>       --buffered=0 --numjobs=64 --name=/dev/nullb0 --filename=/dev/nullb0
 
-Kernel workqueue only respects CPU isolation for WQ_UNBOUND, for bound
-WQ, the responsibility is on user because CPU is specified as WQ API
-parameter, such as mod_delayed_work_on(cpu), queue_delayed_work_on(cpu)
-and queue_work_on(cpu).
+The above test just covers single LUN test.
 
-So not run blk-mq kworker on isolated CPUs by removing isolated CPUs
-from hctx->cpumask. Meantime use queue map to check if all CPUs in this
-hw queue are offline instead of hctx->cpumask, this way can avoid any
-cost in fast IO code path, and is safe since hctx->cpumask are only
-used in the two cases.
+But the code you removed is actually for providing fairness over multi-LUN,
+do you have multi-LUN test result for supporting the change?
 
-Cc: Tim Chen <tim.c.chen@linux.intel.com>
-Cc: Juri Lelli <juri.lelli@redhat.com>
-Cc: Andrew Theurer <atheurer@redhat.com>
-Cc: Joe Mario <jmario@redhat.com>
-Cc: Sebastian Jug <sejug@redhat.com>
-Cc: Frederic Weisbecker <frederic@kernel.org>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Tejun Heo <tj@kernel.org>
-Tesed-by: Joe Mario <jmario@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V5:
-	- fix comment
-	- add one helper for document benefit
-	- all are suggested by Jens
-V4:
-	- improve comment & commit log as suggested by Tim
-V3:
-	- avoid to check invalid cpu as reported by Bart
-	- take current cpu(to be offline, not done yet) into account
-	- simplify blk_mq_hctx_has_online_cpu()
-
-V2:
-	- remove module parameter, meantime use queue map to check if
-	all cpus in one hctx are offline
-
-
- block/blk-mq.c | 57 +++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 47 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 555ada922cf0..06cd9c8068fc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -28,6 +28,7 @@
- #include <linux/prefetch.h>
- #include <linux/blk-crypto.h>
- #include <linux/part_stat.h>
-+#include <linux/sched/isolation.h>
- 
- #include <trace/events/block.h>
- 
-@@ -2168,6 +2169,15 @@ static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
- 	return cpu;
- }
- 
-+/*
-+ * ->next_cpu is always calculated from hctx->cpumask, so simply use
-+ * it for speeding up the check
-+ */
-+static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
-+{
-+        return hctx->next_cpu >= nr_cpu_ids;
-+}
-+
- /*
-  * It'd be great if the workqueue API had a way to pass
-  * in a mask and had some smarts for more clever placement.
-@@ -2179,7 +2189,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 	bool tried = false;
- 	int next_cpu = hctx->next_cpu;
- 
--	if (hctx->queue->nr_hw_queues == 1)
-+	/* Switch to unbound if no allowable CPUs in this hctx */
-+	if (hctx->queue->nr_hw_queues == 1 || blk_mq_hctx_empty_cpumask(hctx))
- 		return WORK_CPU_UNBOUND;
- 
- 	if (--hctx->next_cpu_batch <= 0) {
-@@ -3488,14 +3499,30 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
- 	return data.has_rq;
- }
- 
--static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
--		struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
-+		unsigned int this_cpu)
- {
--	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) != cpu)
--		return false;
--	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
--		return false;
--	return true;
-+	enum hctx_type type = hctx->type;
-+	int cpu;
-+
-+	/*
-+	 * hctx->cpumask has to rule out isolated CPUs, but userspace still
-+	 * might submit IOs on these isolated CPUs, so use the queue map to
-+	 * check if all CPUs mapped to this hctx are offline
-+	 */
-+	for_each_online_cpu(cpu) {
-+		struct blk_mq_hw_ctx *h = blk_mq_map_queue_type(hctx->queue,
-+				type, cpu);
-+
-+		if (h != hctx)
-+			continue;
-+
-+		/* this hctx has at least one online CPU */
-+		if (this_cpu != cpu)
-+			return true;
-+	}
-+
-+	return false;
- }
- 
- static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
-@@ -3503,8 +3530,7 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
- 			struct blk_mq_hw_ctx, cpuhp_online);
- 
--	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
--	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
-+	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
- 		return 0;
- 
- 	/*
-@@ -3912,6 +3938,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 	}
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
-+		int cpu;
-+
- 		/*
- 		 * If no software queues are mapped to this hardware queue,
- 		 * disable it and free the request entries.
-@@ -3938,6 +3966,15 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 		 */
- 		sbitmap_resize(&hctx->ctx_map, hctx->nr_ctx);
- 
-+		/*
-+		 * Rule out isolated CPUs from hctx->cpumask to avoid
-+		 * running block kworker on isolated CPUs
-+		 */
-+		for_each_cpu(cpu, hctx->cpumask) {
-+			if (cpu_is_isolated(cpu))
-+				cpumask_clear_cpu(cpu, hctx->cpumask);
-+		}
-+
- 		/*
- 		 * Initialize batch roundrobin counts
- 		 */
--- 
-2.41.0
+Thanks,
+Ming
 
