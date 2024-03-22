@@ -1,43 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F1B4A07;
-	Fri, 22 Mar 2024 02:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866DF4A07
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 03:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711075149; cv=none; b=ZtfXnc8NB3mwtvcTjhCqA7cymYhhZqRNlnO3J6nxKXa7trgRRyWsrQxOpExmMZH+mdiyLK8TwF73CM/rJnUJgbxpvybODdZGgRTiwl3kMyXw7kIaIrfN6pYu/HPoEqDfpXagxHT7Jb6QN1kU5GbKqxl53xSvMnSEjrghJ2caarU=
+	t=1711078694; cv=none; b=EvOG9hcki0Anlfh08LQ+VJlO94DuBrLCdXKOZ6wHDX17+xy5nJZcIAdgxx5/0XjvH5a6L8YLQBaeoPpUgPGfqcdrBn9fJNNDczm9xXn8FrvHv2tn4MfZUAF1VYTFRrJ5YnQFZefvpwglonF4acFM1iY5i4c/w25y85DugGR8ueI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711075149; c=relaxed/simple;
-	bh=Mi7NaBek0aMBNBMcyXiE2xZDu39mqx6MXKwzwjxGtes=;
+	s=arc-20240116; t=1711078694; c=relaxed/simple;
+	bh=aXzEcMgK03ktUtjli7dv3iU6kR7ZuJbzmnLZD27piCQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HEwPV2Z4La6j07mNpRMNojRFAXDPpFmBlGtWpkUMI51kyVhpTHKQ1WtcoLebkUZOAv6ruSsM63RJlRnQFBL9J8hAxdJWENEBMx5sGlWU9M7EoIaROKUpEA1W7fWf8yLkMaX5vnWjh/v5iTC54CMbAu+d/+pRbt2dhkjnE/GDoNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dq2eeCAF; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=EZOxiwvyFUvWi4FuUkNQdDUfA5kugdMpmlRL3BpVSZSU2xlDYvKYCKCglO0w9Xn+kvkgDPK6ledFNl5109SnjTm7jNrBvBGEIid0M4+/KOaS/HMZ1g3+zKG3dTzP6Gv8PEejy/yllYfgY4Ies0NTQfvuiF7H+lsShqO2NlW1kGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=izV6NGCH; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dq2eeCAF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5EEEC433F1;
-	Fri, 22 Mar 2024 02:39:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711075149;
-	bh=Mi7NaBek0aMBNBMcyXiE2xZDu39mqx6MXKwzwjxGtes=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dq2eeCAFLbrGS1T9jufZislIDhi8tgq5Bq7ylrcrYUcWS6j0krtBfWVxfHTuqOZn6
-	 uscgI02k3DyRK8h3/c65EIaWWOkJicWrHKApQPpKffEuWXJa2H64dKSm3T/pPmQOT6
-	 Z8FVPFE86JqL0DpKK/uFg1C+MXcFM1+tylQUATVV2UWn262upHEY1wM13tgsXZeAFt
-	 t5P2nUuGJmXIpWbF2aPJ3pg4KUNh8baS6BOVquMvU6Zlpo32fMlMTfeDID8CmDxvxO
-	 ZZI+GnmbazuslIAqiECkjdr2B7zpPztTUmgVkH4lCARWbdqH/XS6oMuAyIlTWnL8Y/
-	 ywWgknjeB3tlw==
-Date: Thu, 21 Mar 2024 20:39:06 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: block: fail unaligned bio from submit_bio_noacct()
-Message-ID: <ZfzvSguRii37MErS@kbusch-mbp>
-References: <20240321131634.1009972-1-ming.lei@redhat.com>
- <ZfxVqkniO-6jFFH5@redhat.com>
- <ea8a13c-ee40-47f9-a7be-17b84bd1f686@redhat.com>
- <ZfzoC/V07nExJ+0x@fedora>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="izV6NGCH"
+Date: Thu, 21 Mar 2024 23:38:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711078690;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O+cKT4Y2w8MQNTOtlTHhMaKct7Pv7j1Qvo20xK7Y1P0=;
+	b=izV6NGCHxuCG5cHJrBUMwHn0SJg+5jShzUomDyWp2ugpd3dAZfVZ84mFrnG+XQ0AgN++HQ
+	vuempKm6FxDhknslJ1Hq7QS/eZqrnJEbfmGV5qGHCTTrw/5Iy8Os0BS+QcNPdpRjxHqMSX
+	6jctNsSPDjZzVwyPfR88MRpV6UHwb7o=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
+	"Darrick J. Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 00/34] Open block devices as files
+Message-ID: <62e6oefgpa5gj4xipmu6jjohkyl3bqcufcvfa2vn3tnyfwpmi2@oh6c2svzixxl>
+References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
+ <ZfyyEwu9Uq5Pgb94@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,20 +44,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZfzoC/V07nExJ+0x@fedora>
+In-Reply-To: <ZfyyEwu9Uq5Pgb94@casper.infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 22, 2024 at 10:08:11AM +0800, Ming Lei wrote:
-> On Thu, Mar 21, 2024 at 06:01:41PM +0100, Mikulas Patocka wrote:
-> > I would change it to
+On Thu, Mar 21, 2024 at 10:17:55PM +0000, Matthew Wilcox wrote:
+> On Tue, Jan 23, 2024 at 02:26:17PM +0100, Christian Brauner wrote:
+> > This opens block devices as files. Instead of introducing a separate
+> > indirection into bdev_open_by_*() vis struct bdev_handle we can just
+> > make bdev_file_open_by_*() return a struct file. Opening and closing a
+> > block device from setup_bdev_super() and in all other places just
+> > becomes equivalent to opening and closing a file.
 > > 
-> > if (unlikely(((bi_iter.bi_sector | bio_sectors(bio)) & ((queue_logical_block_size(q) >> 9) - 1)) != 0))
-> > 	return false;
+> > This has held up in xfstests and in blktests so far and it seems stable
+> > and clean. The equivalence of opening and closing block devices to
+> > regular files is a win in and of itself imho. Added to that is the
+> > ability to do away with struct bdev_handle completely and make various
+> > low-level helpers private to the block layer.
 > 
-> What if bio->bi_iter.bi_size isn't aligned with 512? The above check
-> can't find that at all.
+> It fails to hold up in xfstests for me.
+> 
+> git bisect leads to:
+> 
+> commit 321de651fa565dcf76c017b257bdf15ec7fff45d
+> Author: Christian Brauner <brauner@kernel.org>
+> Date:   Tue Jan 23 14:26:48 2024 +0100
+> 
+>     block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access
+> 
+> QA output created by 015
+> mkfs failed
+> (see /ktest-out/xfstests/generic/015.full for details)
+> umount: /dev/vdc: not mounted.
+> 
+> ** mkfs failed with extra mkfs options added to "-m reflink=1,rmapbt=1 -i sparse=1,nrext64=1" by test 015 **
+> ** attempting to mkfs using only test 015 options: -d size=268435456 -b size=4096 **
+> mkfs.xfs: cannot open /dev/vdc: Device or resource busy
+> mkfs failed
+> 
+> About half the xfstests fail this way (722 of 1387 tests)
 
-Shouldn't that mean this check doesn't apply to REQ_OP_DRV_IN/OUT?
-Those ops don't necessarily imply any alignment requirements. It may not
-matter here since it looks like all existing users go through
-blk_execute_rq() instead of submit_bio(), but there are other checks for
-DRV_IN/OUT in this path, so I guess it is supposed to be supported?
+Christain, let's chat about testing at LSF - I was looking at this too
+because we thought it was a ktest update that broke at first, but if we
+can get you using the automated test infrastructure I built this could
+get caught before hitting -next
