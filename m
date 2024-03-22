@@ -1,73 +1,92 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7504F5FB86;
-	Fri, 22 Mar 2024 17:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B2E5FDDD;
+	Fri, 22 Mar 2024 17:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711129426; cv=none; b=qPivCtDzBzIGgw8pe17mSwZ68V5V72YJTwwE5A6fzULmPp2NUfVGCL2hhApwKRupR2t1YooQztnsNkZlpH7u+G3yYrCtj6dQU+Az+7GOaZKwweiguhktTVawyeINwTJZ2iFDVXWdrRWvxqYIdEHwlV9xR+Bnf6VjSVBeXUxNhk8=
+	t=1711129581; cv=none; b=oHQQzj2pe6g0c89w0nZB+6tgP87sT3/zpcVGkG/2Du8ys3O16yuYdAwjeb4gxPo3fJK06eLFTHIsKiDIIeSZxQwmnsD4uaKIVNq84tLpgzIRoRa9KoRJZJYkDsTn9UJTPH6xYqT+pWtUrQhB77AYYUanjex9kc+JNp8Y1nYWzHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711129426; c=relaxed/simple;
-	bh=m1fXwgDw423d9JzS0yBSZigM7s0TBgzERWcrWJKbcF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u1qjV7sxgKRg7IcLHFUEYz/gHAdOLVZ7O1HNAJoZtov5Dg/eDy1/sSW1tx4rQnOpJRfME1Kp2ENiL+OGhph2JM0g72IHloXPSM38KvrS4scFO6YVPiKA+fJfw/89OTcPDgmfbCu9EiRG24iljMRTneFn0E+dM/BJHEHMvpDqjdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=NxNje5Gu; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1711129581; c=relaxed/simple;
+	bh=tPnSfU7iDXbv5Aanu3qQZ/bdHhZW5HEkKrMaj/r/t3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1fFWZ00mlSUzvKAV2Tn9hcnz8Hhk9dbnHULQI5Hs4Z3yauEUBxYICPy43tNMnRh7j0PLSM8RCDZI4N4DIvdTAzciqqvPetms2v/8nzV4IjiNj+ki2T+ou3zyNZHNryywghdwYmcNkLL5VHz8FzEK4vJzXD9/rdjt6Rb2NKYB3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHS5yTT4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="NxNje5Gu"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V1V735c8Pz6Cnk97;
-	Fri, 22 Mar 2024 17:43:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:references:content-language:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711129421; x=1713721422; bh=m1fXwgDw423d9JzS0yBSZigM
-	7s0TBgzERWcrWJKbcF4=; b=NxNje5GuPdUeDVDZEa4YOvg0810jP1POFixvSx6O
-	4ucnANDOlp3BYs1xBoYhG2ssyXfnXaLxT3X2BZ2SnC4sLjopvYlIllWr5sv6RAyi
-	Yf7PxnxlooeezS8D5yjpQRieP5/M3mgJp+04CXctwYz+3yppB9/nYip+vax14CrL
-	YzW+z51qsBAaobiFTe6hboQZi3oHcCwog2zTAqLdblTWa58ah8nx803EjwfaKq2J
-	UBxuZgEFFUBGJelJ2rshxbK6WFCXJcPG88dUi2j3mLmU+YrzKBNclE9aq9qXWrjY
-	Y3k5jUpORLQ3BhJwA0VNTK40EquVnPeT3yCvr0dQuNzmWg==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id wu843SBdYDpB; Fri, 22 Mar 2024 17:43:41 +0000 (UTC)
-Received: from [100.96.154.173] (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V1V700q1jz6Cnk95;
-	Fri, 22 Mar 2024 17:43:39 +0000 (UTC)
-Message-ID: <f02c32a3-ef59-46d0-bc62-e1f3e1a45406@acm.org>
-Date: Fri, 22 Mar 2024 10:43:37 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHS5yTT4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B06FDC43390;
+	Fri, 22 Mar 2024 17:46:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711129581;
+	bh=tPnSfU7iDXbv5Aanu3qQZ/bdHhZW5HEkKrMaj/r/t3E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZHS5yTT4bbaMRlgftNPH4s3/BHy6Y/pMfuNyl8v8f5cbM9wT0nJywOThE9XO9o+Yo
+	 sQrbBVvHpfJ/GkmHADMgsyejjED5TS3WA9xA7CAd8LGMMBj72qkOP6L4xJgAnibISZ
+	 qNFyWWuGRtKqmNbYceSiJMbEfqG1Js9LGbaa9G2SXsAMGNlvbn99etRqhzGPHQquR2
+	 /pbuuEEFXd6WzmZyO515+46vj9pZRkjqcnsndSlqoffLvES8FRzNSO3QY42zxkNADr
+	 DC5hb9KvKEkeYTKUZ64FdwpBihsRuGbAw0oCeOVQ5Q/D7ca6clZI9B8s4YtiHLB9rj
+	 nO/n9c2+vHn/w==
+Date: Fri, 22 Mar 2024 19:46:17 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240322174617.GD14887@unreal>
+References: <20240306221400.GA8663@lst.de>
+ <20240307000036.GP9225@ziepe.ca>
+ <20240307150505.GA28978@lst.de>
+ <20240307210116.GQ9225@ziepe.ca>
+ <20240308164920.GA17991@lst.de>
+ <20240308202342.GZ9225@ziepe.ca>
+ <20240309161418.GA27113@lst.de>
+ <20240319153620.GB66976@ziepe.ca>
+ <20240320085536.GA14887@unreal>
+ <20240321224013.GB22663@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: release scheduler resource when request completes
-Content-Language: en-US
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jens Axboe <axboe@kernel.dk>, stable@vger.kernel.org,
- linux-block@vger.kernel.org, Chengming Zhou <zhouchengming@bytedance.com>,
- kernel test robot <oliver.sang@intel.com>,
- Chuck Lever <chuck.lever@oracle.com>
-References: <20240322174014.373323-1-bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240322174014.373323-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240321224013.GB22663@lst.de>
 
-On 3/22/24 10:40, Bart Van Assche wrote:
-> commit e5c0ca13659e9d18f53368d651ed7e6e433ec1cf upstream.
+On Thu, Mar 21, 2024 at 11:40:13PM +0100, Christoph Hellwig wrote:
+> On Wed, Mar 20, 2024 at 10:55:36AM +0200, Leon Romanovsky wrote:
+> > Something like this will do the trick.
+> 
+> As far as I can tell it totally misses the point.  Which is not to never
+> return non-P2P if the flag is set, but to return either all P2P or non-P2
+> P and not create a boundary in the single call.
 
-This backport is intended for the 6.1 stable kernel series.
+You are treating FOLL_PCI_P2PDMA as a hint, but in iov_iter_extract_user_pages()
+you set it only for p2p queues. I was under impression that you want only p2p pages
+in these queues.
 
-Thanks,
+Anyway, I can prepare other patch that will return or p2p or non-p2p pages in one shot.
 
-Bart.
+Thanks
