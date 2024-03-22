@@ -1,160 +1,152 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D02D5DF3B
-	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 17:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF7C5FDA8
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 17:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711127298; cv=none; b=dRsVegqr4yJWeE5mzimU3cthEO4M2uV4O5z8PxY0qA/XU0tpu8WgLY8wubSGj4IxFiUuR/1/PgiPcg4H05fMl7szI5h55gwxLFe8MM2J7CYgs2WLvUB650jpFwJua0WL4b8zXunpz0cUobnY7bwBy/avtoXo3HDBapVOlcY36/E=
+	t=1711127355; cv=none; b=T63JVwo31XeW6g4v7mxMdMJ3vM9gnUcSzVblEzJEqQG1bFJl1KeZtlr8blWTsfVcoNTNL1Mqyym2c88IJsit13Q5ELma+LtPLJLC2ZCfWl5HgvgK1MWvSdK65RE/SP37XE9CBR+vn0JIYCBwWdNW6R2XcE9E98GGx+xjVFryfl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711127298; c=relaxed/simple;
-	bh=MStsiHuxKT7RzAYQDZAqC4Q6/q5satus9SSDaLkFTz4=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FaZa/aj6HGWoyAUctcouHJ1BNNPBe8UKuf6llJGHZfPLdbDX0br6N0UUSC8CJ2i50U5p82UsaIrQ5CPeFQSw9dl6xByGwGqIUvH1DoxhBQN2N+R0LBPfuDGHSw+nSsH02bGvA90z2l915jdwtcB8t940rCPYAqtsqg1izUugdUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MEnJvbE7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711127355; c=relaxed/simple;
+	bh=5Ah7jRJ4r6/H52gSplca+UCBjE4DsbRQYEM2nkK3Kmo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=hpEiANDyh6RGQyzWPc6OSW1RiAUbo3kJQRrjSHduVh5QlEj47/DSp4OLDmMSI5k44NJV9klWZPqphHPqtcAM4FEsFwopNgwdj2GPK0/5NZNlQGC8VcQm9OiS2CD5A8ZOJBmUMWD67okYxK9VVICN7R5F3pkKMeyxfo7tSJoa12c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bGo8M6eM; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MEnJvbE7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711127295;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JFiXaqd6f1uWGUV0QRwS/e77pWnj3eGKo9DHtynberk=;
-	b=MEnJvbE7tWfANJd7uw3mOPw8tF4SOVAIEO3iZBnCUetPqABbZHA05kfNz7o8pJm48P4JLi
-	6i/q3GOH0+vLwSn9pAp/C5WihZzkV4ftcdn68vvZe3jHd+Iel/4PFjKguFpQuJPmU1tmv5
-	z0JY5CJUS9bUBUtu36K5CeZKkxfm5v4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-338-5t454_41PsGYDj4lteffZg-1; Fri,
- 22 Mar 2024 13:08:13 -0400
-X-MC-Unique: 5t454_41PsGYDj4lteffZg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E548329AC022
-	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 17:08:12 +0000 (UTC)
-Received: from bfoster (unknown [10.22.16.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C67ED404392A
-	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 17:08:12 +0000 (UTC)
-Date: Fri, 22 Mar 2024 13:09:51 -0400
-From: Brian Foster <bfoster@redhat.com>
-To: linux-block@vger.kernel.org
-Subject: Re: pktcdvd ->open_mutex lockdep splat
-Message-ID: <Zf27X6ZNOwkXjc6A@bfoster>
-References: <Zf20dfwIdayItxsO@bfoster>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bGo8M6eM"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7cc0e831e11so39644939f.1
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 10:09:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1711127351; x=1711732151; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YLSydQEqVPdVgqVpIN5j9BaMxUkbqoWH3WCxEHs6B7Y=;
+        b=bGo8M6eMCPoso7AvQImTeo/07n8U40aXWUPkCU8EMoSBQL8VJPXJlhX6HWHiSo++Pu
+         HwEoeQ0BNdbu4KEErIAPyeRXziJlRShgTOWbWRxerH0Xk9PGXiDsqTpS1HuvOvKkJxMg
+         V5Hg2yy30IFa/Qpdxm1UxtWDrfo5Wot0IpGGeDcYsKsDkxjOVLcoInHj3BiWaF+YjGkG
+         UtOjWXLCV5Z+ORuxBpkJl30ebknnbQRyUQ76G+Cy9DENQ2iiNOBBZwEbWmIWBIYe99yB
+         tzIUV+m13U/V6FuXtLK/58XbFa0JTSAvPImmB2iXAWJAxEXkLhR01e+JrmnBkeK7C+0f
+         Y29w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711127351; x=1711732151;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YLSydQEqVPdVgqVpIN5j9BaMxUkbqoWH3WCxEHs6B7Y=;
+        b=snIXiESaq0fAsDLGH94a+Z7xovRK6QhQXsCon5jB9GP3pW7tdgNvVFRx1KZUi5EKi0
+         C0kwpvt5bTT0UCp7kK2JPUE/IMZDAOWOJXzZT/GEDg/nIQ5irEoJKBmY5K25M4FSCnup
+         jzHpvaD4E7sZ0+PwkxcHi07dkFR+oh9425U5tSsJh3o/UkL+uvU2q9yu+1C+7YqsWDs7
+         foctBsavujqU6w04TYVlz3nIZqSX7AjHb0igGvFYF/lZKKFffN02+hm42x+QYghA6msP
+         mYxo+N7RyPiDFEMqHswLJtTZeTyaE4JXdiYbwxDqz8+cgcZLhWiAkRl1U3USNLnCxDJ7
+         OYnQ==
+X-Gm-Message-State: AOJu0YxCfnAl2jZaYx6mWwp/uMaX7WaD8M3cmTK70pwcCJF8YoCFEfEc
+	QtHXJ7dSVfWc7J1miaNMKIYrqoqsLRutWxdPuY/kSfULHUoszVb/dJdUoyCYH1Q=
+X-Google-Smtp-Source: AGHT+IGcdgW2fbLyqk3qr5IkMtXkWO89PDYcIgeR9YzwRKf6YDeY20kC9JlqouSnQ6o+u56ZyGCdQQ==
+X-Received: by 2002:a05:6602:335a:b0:7d0:32b0:5764 with SMTP id c26-20020a056602335a00b007d032b05764mr119781ioz.0.1711127351621;
+        Fri, 22 Mar 2024 10:09:11 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id g4-20020a0566380bc400b0047be3be32ebsm606779jad.113.2024.03.22.10.09.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Mar 2024 10:09:11 -0700 (PDT)
+Message-ID: <64206ee9-68fc-4ff4-8b28-a9fd0e09aad5@kernel.dk>
+Date: Fri, 22 Mar 2024 11:09:10 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zf20dfwIdayItxsO@bfoster>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.9-rc1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 22, 2024 at 12:40:21PM -0400, Brian Foster wrote:
-> Hi all,
-> 
-> I noticed the splat below on one of my test VMs when running latest
-> upstream with lockdep enabled. I'm not really sure why this occurs
-> because I'm not actually using this device for anything I'm aware of. I
-> suppose it's possible this has a busted userspace or kvm config, as this
-> is just one of a handful of scratch VMs I have around for development
-> purposes. I'm happy to try and dig further into it or just expunge it if
-> this is of little interest.
-> 
+Hi Linus,
 
-Ok, I guess the reason I was only seeing this in one particular VM is
-that for whatever reason, something happens to invoke pktsetup during
-boot on that guest. If I boot up a separate VM/distro and run 'pktsetup
-0 /dev/sr0,' I see the same splat..
+Followup fixes for the block area:
 
-Brian
+- NVMe pull request via Keith
+	- Make an informative message less ominous (Keith)
+	- Enhanced trace decoding (Guixin)
+	- TCP updates (Hannes, Li)
+	- Fabrics connect deadlock fix (Chunguang)
+	- Platform API migration update (Uwe)
+	- A new device quirk (Jiawei)"
+- Remove dead assignment in fd (Yufeng)
 
-> FWIW, the splat itself reproduces back before ->open_mutex was created
-> from bd_mutex by commit a8698707a183 ("block: move bd_mutex to struct
-> gendisk"). I went as far back as v5.10 and still observed it.
-> 
-> Brian
-> 
-> --- 8< ---
-> 
-> [   11.667694] block (null): writer mapped to sr0
-> 
-> [   11.677407] ============================================
-> [   11.680650] WARNING: possible recursive locking detected
-> [   11.683581] 6.8.0+ #346 Tainted: G            E     
-> [   11.686246] --------------------------------------------
-> [   11.689075] systemd-udevd/1438 is trying to acquire lock:
-> [   11.690607] ffff8bb78f553cc8 (&disk->open_mutex){+.+.}-{3:3}, at: bdev_open+0x60/0x3e0
-> [   11.692504] 
->                but task is already holding lock:
-> [   11.693921] ffff8bb786b39cc8 (&disk->open_mutex){+.+.}-{3:3}, at: bdev_open+0x239/0x3e0
-> [   11.695806] 
->                other info that might help us debug this:
-> [   11.697362]  Possible unsafe locking scenario:
-> 
-> [   11.698779]        CPU0
-> [   11.699397]        ----
-> [   11.699994]   lock(&disk->open_mutex);
-> [   11.700923]   lock(&disk->open_mutex);
-> [   11.701849] 
->                 *** DEADLOCK ***
-> 
-> [   11.703273]  May be due to missing lock nesting notation
-> 
-> [   11.704878] 3 locks held by systemd-udevd/1438:
-> [   11.705967]  #0: ffff8bb786b39cc8 (&disk->open_mutex){+.+.}-{3:3}, at: bdev_open+0x239/0x3e0
-> [   11.707966]  #1: ffffffffc085c768 (pktcdvd_mutex){+.+.}-{3:3}, at: pkt_open+0x2b/0x630 [pktcdvd]
-> [   11.710080]  #2: ffffffffc085d868 (&ctl_mutex#2){+.+.}-{3:3}, at: pkt_open+0x39/0x630 [pktcdvd]
-> [   11.712164] 
->                stack backtrace:
-> [   11.713200] CPU: 3 PID: 1438 Comm: systemd-udevd Tainted: G            E      6.8.0+ #346
-> [   11.715122] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014
-> [   11.717123] Call Trace:
-> [   11.717741]  <TASK>
-> [   11.718271]  dump_stack_lvl+0x79/0xb0
-> [   11.719194]  __lock_acquire+0x1228/0x2170
-> [   11.720172]  lock_acquire+0xbb/0x2c0
-> [   11.721030]  ? bdev_open+0x60/0x3e0
-> [   11.721869]  __mutex_lock+0x77/0xd40
-> [   11.722724]  ? bdev_open+0x60/0x3e0
-> [   11.723558]  ? find_held_lock+0x2b/0x80
-> [   11.724470]  ? bdev_open+0x56/0x3e0
-> [   11.725324]  ? bdev_open+0x60/0x3e0
-> [   11.726173]  ? bdev_open+0x60/0x3e0
-> [   11.727031]  bdev_open+0x60/0x3e0
-> [   11.727844]  bdev_file_open_by_dev+0xbf/0x120
-> [   11.728909]  pkt_open+0x10e/0x630 [pktcdvd]
-> [   11.729944]  ? bdev_open+0x22f/0x3e0
-> [   11.730815]  ? lock_release+0xb8/0x270
-> [   11.731729]  ? bdev_open+0x239/0x3e0
-> [   11.732605]  blkdev_get_whole+0x25/0x90
-> [   11.733544]  bdev_open+0x29f/0x3e0
-> [   11.734380]  ? iput.part.0+0x34/0x260
-> [   11.735277]  ? __pfx_blkdev_open+0x10/0x10
-> [   11.736282]  blkdev_open+0x8b/0xc0
-> [   11.737090]  do_dentry_open+0x172/0x580
-> [   11.738002]  path_openat+0x3a9/0xa30
-> [   11.738864]  do_filp_open+0xa1/0x130
-> [   11.739731]  ? _raw_spin_unlock+0x23/0x40
-> [   11.740700]  do_sys_openat2+0x82/0xb0
-> [   11.741596]  __x64_sys_openat+0x49/0x80
-> [   11.742529]  do_syscall_64+0x7c/0x190
-> [   11.743406]  entry_SYSCALL_64_after_hwframe+0x6c/0x74
-> [   11.744599] RIP: 0033:0x7f30e4afd70b
-> [   11.745450] Code: 25 00 00 41 00 3d 00 00 41 00 74 4b 64 8b 04 25 18 00 00 00 85 c0 75 67 44 89 e2 48 89 ee bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 91 00 00 00 48 8b 54 24 28 64 48 2b 14 25
-> [   11.749817] RSP: 002b:00007ffdafd13250 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-> [   11.751633] RAX: ffffffffffffffda RBX: 0000000000006000 RCX: 00007f30e4afd70b
-> [   11.753306] RDX: 0000000000080900 RSI: 00007ffdafd132d0 RDI: 00000000ffffff9c
-> [   11.754966] RBP: 00007ffdafd132d0 R08: 0000000000000000 R09: 00007ffdafd13160
-> [   11.756624] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000080900
-> [   11.758311] R13: 0000000000080900 R14: 0000000000000006 R15: 00007ffdafd13470
-> [   11.760041]  </TASK>
-> 
-> 
+Please pull!
+
+
+The following changes since commit 4c4ab8ae416350ce817339f239bdaaf351212f15:
+
+  block: fix mismatched kerneldoc function name (2024-03-14 09:40:47 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.9-20240322
+
+for you to fetch changes up to 07602678091c0096e79f04aea8a148b76eee0d7e:
+
+  Merge tag 'nvme-6.9-2024-03-21' of git://git.infradead.org/nvme into block-6.9 (2024-03-21 13:23:07 -0600)
+
+----------------------------------------------------------------
+block-6.9-20240322
+
+----------------------------------------------------------------
+Chunguang Xu (1):
+      nvme: fix reconnection fail due to reserved tag allocation
+
+Guixin Liu (8):
+      nvmet: add tracing of authentication commands
+      nvmet: add tracing of zns commands
+      nvme: use nvme_disk_is_ns_head helper
+      nvme: parse zns command's zsa and zrasf to string
+      nvme: add tracing of reservation commands
+      nvme: parse format command's lbafu when tracing
+      nvme: remove redundant BUILD_BUG_ON check
+      nvmet-rdma: remove NVMET_RDMA_REQ_INVALIDATE_RKEY flag
+
+Hannes Reinecke (1):
+      nvmet-tcp: do not continue for invalid icreq
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.9-2024-03-21' of git://git.infradead.org/nvme into block-6.9
+
+Jiawei Fu (iBug) (1):
+      drivers/nvme: Add quirks for device 126f:2262
+
+Keith Busch (1):
+      nvme: change shutdown timeout setting message
+
+Li Feng (2):
+      nvme-tcp: Export the nvme_tcp_wq to sysfs
+      nvme/tcp: Add wq_unbound modparam for nvme_tcp_wq
+
+Uwe Kleine-König (1):
+      nvme-apple: Convert to platform remove callback returning void
+
+Yufeng Wang (1):
+      floppy: remove duplicated code in redo_fd_request()
+
+ drivers/block/floppy.c      |   1 -
+ drivers/nvme/host/apple.c   |   6 +--
+ drivers/nvme/host/core.c    |  11 +++--
+ drivers/nvme/host/fabrics.h |   7 ---
+ drivers/nvme/host/pci.c     |   3 ++
+ drivers/nvme/host/pr.c      |   3 +-
+ drivers/nvme/host/sysfs.c   |   3 +-
+ drivers/nvme/host/tcp.c     |  21 +++++++--
+ drivers/nvme/host/trace.c   | 105 ++++++++++++++++++++++++++++++++++++++++++--
+ drivers/nvme/target/rdma.c  |   8 ++--
+ drivers/nvme/target/tcp.c   |   1 +
+ drivers/nvme/target/trace.c |  98 +++++++++++++++++++++++++++++++++++++++++
+ 12 files changed, 233 insertions(+), 34 deletions(-)
+-- 
+Jens Axboe
 
