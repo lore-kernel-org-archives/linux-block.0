@@ -1,161 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC71765C
-	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 01:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F7915BB
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 01:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711069886; cv=none; b=nQ0ogkwqsWLXiqH6eQiE0+Bc28akahi8O0Isrh3qxmG06rJ+kUlk4+YjQxUwF0mAFZOlfxllIR82nB4E/MGg6kifXnQpo1Q0PLwvbLTKVAusC/Q387VAvMLhVvdg5xiS2jzQGpxslVeJJcjvUbGeQE9FFrVVDVmYuMXqaluSQmQ=
+	t=1711070094; cv=none; b=AC4So8fYIT0WVl+M2WJl46o/bZicYVF3DKalfyT5fN+GjVWnI5ykPGIUM6+8IRK4kcToGr/3REJEm3hzJJyAH6/JqMBvjSarnBNhv6TIo7v2mYyMu70nPyaRfJNVPVnaa+uqJxzNlJSOO6g/PWfnKY9oldBeTMrszIvRDoHB5MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711069886; c=relaxed/simple;
-	bh=96SAwPUUiUG9ICvo3SfW48QSZaBuN3QaPXtcsiTzUXY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sDEopGVR6lNuNN4UZ1ULp5Lgo3EermfuRvkf9iF9UM8XMAKm6Aw5+6tFmn1KwT3AMAGXKROI29DdodTBjBS2XZxHxac2fmw3I6z1KHDEOuu3f0dULfAG0Aj361vKefkjzlyTQ04vF0cduKBAzrXvYpAftltglHdRJV4864TTycA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WMyvcjck; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMyvcjck"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711069882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F4jtIXZkeEsKNNOM9A/oT110PaXa8dHoTnPtjKKPkd0=;
-	b=WMyvcjckZsqDNYiZ7W72SJEP6RRKT6UWm9oQ9lQIHVIvh2jfuglscIc9EpF1amIiRVKdhf
-	zz+ZsVgXXmZffkv+ZsPh0vhc6S3LI+InL06yXSPCRuLYepV83KUzi3DyYFT+zwHZAnv5ZG
-	0BWC5+2RqdTtl1mrX8QfYpDN7ueeqGE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-46-20ayKDrdPue-iedqHk-R1w-1; Thu, 21 Mar 2024 21:11:18 -0400
-X-MC-Unique: 20ayKDrdPue-iedqHk-R1w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 19A1685A58C;
-	Fri, 22 Mar 2024 01:11:18 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C4D123C20;
-	Fri, 22 Mar 2024 01:11:11 +0000 (UTC)
-Date: Fri, 22 Mar 2024 09:10:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Andrew Theurer <atheurer@redhat.com>, Joe Mario <jmario@redhat.com>,
-	Sebastian Jug <sejug@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>, Tejun Heo <tj@kernel.org>,
-	ming.lei@redhat.com
-Subject: Re: [PATCH V4] blk-mq: don't schedule block kworker on isolated CPUs
-Message-ID: <Zfzal65zM3u+1qXc@fedora>
-References: <20240320023446.882006-1-ming.lei@redhat.com>
- <05c44354-1c48-409e-827f-910d1e3c2db9@kernel.dk>
+	s=arc-20240116; t=1711070094; c=relaxed/simple;
+	bh=2JFQktj5AWgoOBK9SGTojkeJLTtfyLcUoUngn8N0N2Y=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=jduiLvJGKD5EbUOnG8gXfPjn9rjrCo+ZPcjSB9UfiUcNqxm5QV3sIKFdTQsrv4cTm+Rlb4OuuO08DxnsCkoylb9HLGtFvdyxO3Z/OS+8vFzCLPEt7igqRB8EB4nLVWtrzogiQKxz1p/hk0OSqVsLzyIEC4df0jYPZgL74LPEWJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4V149t0xw5z4f3l6h
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 09:14:42 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 2F4F51A0DC7
+	for <linux-block@vger.kernel.org>; Fri, 22 Mar 2024 09:14:48 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgAX5g6G2_xlZpXCHg--.14849S3;
+	Fri, 22 Mar 2024 09:14:48 +0800 (CST)
+Subject: Re: [PATCH] block: Improve IOPS by removing the fairness code
+To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240321224605.107783-1-bvanassche@acm.org>
+ <20240321224814.GA23127@lst.de>
+ <13f47d63-2140-4927-8933-009dae21f7e6@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <33581b6a-c350-b523-b31e-787f74d97e71@huaweicloud.com>
+Date: Fri, 22 Mar 2024 09:14:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <05c44354-1c48-409e-827f-910d1e3c2db9@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+In-Reply-To: <13f47d63-2140-4927-8933-009dae21f7e6@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAX5g6G2_xlZpXCHg--.14849S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJF1rZryUKrWfZr17XF4ktFb_yoW8Xw43pF
+	WUKa1jkw4kGan8Xw4xGwsrXr1Sywn7Jr17GrnYqwnYkr98ZrnIvr93KF4UWF1IvFn3Z34U
+	uayS93sxWr1jvaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Thu, Mar 21, 2024 at 11:07:52AM -0600, Jens Axboe wrote:
-> On 3/19/24 8:34 PM, Ming Lei wrote:
-> > Kernel parameter of `isolcpus=` or 'nohz_full=' are used to isolate CPUs
-> > for specific task, and it isn't expected to let block IO disturb these CPUs.
-> > blk-mq kworker shouldn't be scheduled on isolated CPUs. Also if isolated
-> > CPUs is run for blk-mq kworker, long block IO latency can be caused.
-> > 
-> > Kernel workqueue only respects CPU isolation for WQ_UNBOUND, for bound
-> > WQ, the responsibility is on user because CPU is specified as WQ API
-> > parameter, such as mod_delayed_work_on(cpu), queue_delayed_work_on(cpu)
-> > and queue_work_on(cpu).
-> > 
-> > So not run blk-mq kworker on isolated CPUs by removing isolated CPUs
-> > from hctx->cpumask. Meantime use queue map to check if all CPUs in this
-> > hw queue are offline instead of hctx->cpumask, this way can avoid any
-> > cost in fast IO code path, and is safe since hctx->cpumask are only
-> > used in the two cases.
+Hi,
+
+在 2024/03/22 7:03, Bart Van Assche 写道:
+> On 3/21/24 15:48, Christoph Hellwig wrote:
+>> On Thu, Mar 21, 2024 at 03:46:05PM -0700, Bart Van Assche wrote:
+>>> There is an algorithm in the block layer for maintaining fairness
+>>> across queues that share a tag set. The sbitmap implementation has
+>>> improved so much that we don't need the block layer fairness algorithm
+>>> anymore and that we can rely on the sbitmap implementation to guarantee
+>>> fairness.
+>>
+>> IFF that was true it would be awesome.  But do you have proof for that
+>> assertation?
 > 
-> In general, I think the fix is fine. Only thing that's a bit odd is:
+> Hi Christoph,
+> 
+> Is the test in this pull request sufficient as evidence that we don't
+> need the request queue fairness code anymore:
+> https://github.com/osandov/blktests/pull/135?
+> 
+> That test does the following:
+> * Create two request queues with a shared tag set and with different
+>    completion times (1 ms and 100 ms).
+> * Submit I/O to both request queues simultaneously and set the queue
+>    depth for both tests to the number of tags. This creates contention
+>    on tag allocation.
+> * After I/O finished, check that the fio job with the shortest
+>    completion time submitted the most requests.
 
-Thanks for the review!
+This test is a little one-sided, I'm curious how the following test
+shows as well:
+
+- some queue is under heavy IO pressure with lots of thread, and they
+can use up all the drivers tags;
+- one queue only issue one IO at a time, then how does IO latency shows
+for this queue? I assume this can be bad with this patch because sbitmap
+implementation can't gurantee this.
+
+Thanks,
+Kuai
 
 > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 555ada922cf0..187fbfacb397 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -28,6 +28,7 @@
-> >  #include <linux/prefetch.h>
-> >  #include <linux/blk-crypto.h>
-> >  #include <linux/part_stat.h>
-> > +#include <linux/sched/isolation.h>
-> >  
-> >  #include <trace/events/block.h>
-> >  
-> > @@ -2179,7 +2180,11 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
-> >  	bool tried = false;
-> >  	int next_cpu = hctx->next_cpu;
-> >  
-> > -	if (hctx->queue->nr_hw_queues == 1)
-> > +	/*
-> > +	 * Switch to unbound work if all CPUs in this hw queue fall
-> > +	 * into isolated CPUs
-> > +	 */
-> > +	if (hctx->queue->nr_hw_queues == 1 || next_cpu >= nr_cpu_ids)
-> >  		return WORK_CPU_UNBOUND;
+> Thanks,
 > 
-> This relies on find_next_foo() returning >= nr_cpu_ids if the set is
-> empty, which is a lower level implementation detail that someone reading
-> this code may not know.
-
-Indeed, looks it is more readable to add one helper:
-
-static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
-{
-	return hctx->next_cpu >= nr_cpu_ids;
-}
-
+> Bart.
 > 
-> >  	if (--hctx->next_cpu_batch <= 0) {
-> > @@ -3488,14 +3493,30 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
-> >  	return data.has_rq;
-> >  }
-> >  
-> > -static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
-> > -		struct blk_mq_hw_ctx *hctx)
-> > +static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
-> > +		unsigned int this_cpu)
-> >  {
-> > -	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) != cpu)
-> > -		return false;
-> > -	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
-> > -		return false;
-> > -	return true;
-> > +	enum hctx_type type = hctx->type;
-> > +	int cpu;
-> > +
-> > +	/*
-> > +	 * hctx->cpumask has rule out isolated CPUs, but userspace still
->                             ^^
+> .
 > 
-> has to
-> 
-> > +	 * might submit IOs on these isolated CPUs, so use queue map to
-> 							  ^^
-> 
-> use the queue map
-
-OK, will fix them in V5.
-
-
-thanks,
-Ming
 
