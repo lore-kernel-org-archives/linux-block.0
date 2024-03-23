@@ -1,81 +1,132 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE631EB34
-	for <linux-block@vger.kernel.org>; Sat, 23 Mar 2024 16:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85CB1EB34
+	for <linux-block@vger.kernel.org>; Sat, 23 Mar 2024 16:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711209927; cv=none; b=Az0Jz24VfPyDcW0PvRfOAdjd6UOC7KRHmUxRwOMlh/Ppk77E03CmzHZPRlGhPZiCrDzDUltFPLflKxSwBmW4jo3qjWN3mf9iyxxc9coLQ10O9O2DFAJZ+MaI+5dfT4KLH5BtlSARX8wH0s9WT2BIGK2nq8oWvgzHLGuow9a/Tpc=
+	t=1711210291; cv=none; b=nFti2RaiqFZ3HoQYqZIp6cFrrDtlG8eS5IdMdghh2I4ZivbJgPJRMTSctjVnJFCrX+KUEPcYyqIdHgzqEGdeoA0JXleNT0+/ulSjyH3zkIY0ESTaKc4Bke+LbtV7SlngZJby80OjmtXGyO7lt7iClIAxbyjk6ov5XDv9D1NCzfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711209927; c=relaxed/simple;
-	bh=UTIcrrwXNx/qWXkxlQfJF7yP5zzW0DBI70wtwcfgnt0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ERIm8UxIdgxBti0+NQgwsL8Lu+AVHzev3H5MbmhaCNypvWb+NaPO5/XLme+2MAqWJ1Cdt5KurZcSN6BN6zFZS1b6NdLlJWpOXBSuFMB+hu/MNjieTJMLacQY3qfyrmIgjFH13lC2rt38hRTFl7D38vMwQMUf5CCYD23ujylM5NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-69629b4ae2bso26997876d6.3
-        for <linux-block@vger.kernel.org>; Sat, 23 Mar 2024 09:05:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711209924; x=1711814724;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LwgP8PLLhEZ4I/JPIIVutoqihwAKeS31/sLLIs4EdsA=;
-        b=IMt7YYJg/z067PzZQmEDn2BVJCqWNBqMrNlCkLqx9YM88noM9+rsZh6ShK1xW1LQHc
-         FULw6n++jMUqaUgO8FWyh6ZmWh/PoQq42yH8FR39CGbuCV5hALZxX+9ZXcG5Lv7Io8lN
-         B4XSw9EXgESgaqkQ8jo3BB/vK+eF5h8kaCFn8p8sKUO+e/cFvSJ7Cuuy5h3kk9oj1oTf
-         XTbmkUbznbmwk0vQfDhLkKbUZWTVyh8dbTWckq/fmoDF951NXU252GSRv+SWeXoUarpY
-         96L9xF8+IXVsorIqEd0iaecwAjcc6WOyW4XNLSNYWVj91YG/ley/k9ZZHhP7fduKTOir
-         eJqg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6D70d6i8yoUIjn0hWTdmz/uETfernU6Zh/uBdtIjo6JCHuy5rwwnwIVkb5nK47QXQXph0gq5YIIhD0q1Qhfo0fq9QwTbSwKQWd8c=
-X-Gm-Message-State: AOJu0Yz8DJVifotEv2z4brJsTzzDDbZQqlrzJSdcIhTqdWzdDdSMc56Z
-	707dgUfmCJOU1oRg3E6ZkNp0+IomuL5qHeSxFfgUkZD/EOt0WN+Q8D3V/ql8Dg==
-X-Google-Smtp-Source: AGHT+IEshk/dc6HBbutRsVAeN/yLgWxtrdsdReob4esfZAV/w/UrsUWSizBnvhEbX0jZww+wWyWm2A==
-X-Received: by 2002:ad4:4ea8:0:b0:691:1fcc:e26d with SMTP id ed8-20020ad44ea8000000b006911fcce26dmr2460772qvb.31.1711209924582;
-        Sat, 23 Mar 2024 09:05:24 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id jr9-20020a0562142a8900b0069186a078b3sm2170108qvb.143.2024.03.23.09.05.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Mar 2024 09:05:24 -0700 (PDT)
-Date: Sat, 23 Mar 2024 12:05:23 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
-	mpatocka@redhat.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH 2/2] block: remove blk_mq_in_flight() and
- blk_mq_in_flight_rw()
-Message-ID: <Zf79w4Ip3fzSMCWh@redhat.com>
-References: <20240323035959.1397382-1-yukuai1@huaweicloud.com>
- <20240323035959.1397382-3-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1711210291; c=relaxed/simple;
+	bh=rWhcbzwQd6R9rS3x+dE1gyVxbOyZBip+qIheG8D5z2U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SNjqfjqNRZMCBO6wjdefmMXnMA88bhpg2ZeR1quwuBSrr1ro5GpdEWKO6TIwAStNvFRW/tRFUXxJIHA7+deDLM+QJRnAoeW9gJ9v+NrTUNoxb1lm6MUG204OWJGwmQZR1PmH3bmKjcc3huuQATD64jB61fnDE8tKzsOFvzWpC2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Izm74HTH; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Izm74HTH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1713C433F1;
+	Sat, 23 Mar 2024 16:11:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711210291;
+	bh=rWhcbzwQd6R9rS3x+dE1gyVxbOyZBip+qIheG8D5z2U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Izm74HTHhPVFR9dmYxdt5p7QSPmWITKRW87lYsZMyTx8y8iTGlJZKD3pfLnMDJJaO
+	 8EBzVJH0y9DTwGEvq6cbC1bIfgf9rxLWXrUgeDhNVyjUZ+lKdwYj+hOIOFdQJXTvzC
+	 FcRjNXO8gmO1YhxRAQVggtVaLpFw7u+yEyjKswLflahIZPuoni6VJrT/04JnzVyU7K
+	 OaDSf9e61Kxl+z7v9ggkaFLQZcvN2qT4PZQDDq2hWmjkcaEp+yPWybFK3RVvggu5Xo
+	 AyAVNX5JT4EkHWOfdzLnUCPjLmJXyRL3DjtcTJ8DjIjNVs5g1rerCyX0F6RFnslVA6
+	 r/fowQoydAU9Q==
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@lst.de>,
+	Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
+Date: Sat, 23 Mar 2024 17:11:19 +0100
+Message-ID: <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240323-seide-erbrachten-5c60873fadc1@brauner>
+References: <20240323-seide-erbrachten-5c60873fadc1@brauner> 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240323035959.1397382-3-yukuai1@huaweicloud.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2999; i=brauner@kernel.org; h=from:subject:message-id; bh=rWhcbzwQd6R9rS3x+dE1gyVxbOyZBip+qIheG8D5z2U=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaT++69RdiCmdMZ87rbTUy9MVFujNXczy13d0GzH1ic5d 4pPcfGf7yhlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZiIsy3DX0HH7gvbJW+w7W+J VNt7sdcteRbTS5XYbSE/krzv8kx5/omR4VI5Tw7f4QPSj7b4t6yV1ijck/ScZeriqed39h4+6p0 jxQ8A
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 22 2024 at 11:59P -0400,
-Yu Kuai <yukuai1@huaweicloud.com> wrote:
+Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
+default this option is set. When it is set the long-standing behavior
+of being able to write to mounted block devices is enabled.
 
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Now that blk-mq also use per_cpu counter to trace inflight as bio-based
-> device, they can be replaced by part_in_flight() and part_in_flight_rw()
-> directly.
+But in order to guard against unintended corruption by writing to the
+block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
+off. In that case it isn't possible to write to mounted block devices
+anymore.
 
-Please reference the commit that enabled this, e.g.:
+A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
+which disallows concurrent BLK_OPEN_WRITE access. When we still had the
+bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
+the mode was passed around. Since we managed to get rid of the bdev
+handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
+on whether the file was opened writable and writes to that block device
+are blocked. That logic doesn't work because we do allow
+BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
 
-With commit XXXXX ("commit subject") blk-mq was updated to use per_cpu
-counters to track inflight IO same as bio-based devices, so replace
-blk_mq_in_flight* with part_in_flight() and part_in_flight_rw()
-accordingly.
+So fix the detection logic. Use O_EXCL as an indicator that
+BLK_OPEN_RESTRICT_WRITES has been requested. We do the exact same thing
+for pidfds where O_EXCL means that this is a pidfd that refers to a
+thread. For userspace open paths O_EXCL will never be retained but for
+internal opens where we open files that are never installed into a file
+descriptor table this is fine.
 
-(I'm not seeing the commit in question, but I only took a quick look).
+Note that BLK_OPEN_RESTRICT_WRITES is an internal only flag that cannot
+directly be raised by userspace. It is implicitly raised during
+mounting.
 
-Mike
+Passes xftests and blktests with CONFIG_BLK_DEV_WRITE_MOUNTED set and
+unset.
+
+Fixes: 321de651fa56 ("block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access")
+Reported-by: Matthew Wilcox <willy@infradead.org>
+Link: https://lore.kernel.org/r/ZfyyEwu9Uq5Pgb94@casper.infradead.org
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+ block/bdev.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index 7a5f611c3d2e..f819f3086905 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -821,13 +821,12 @@ static void bdev_yield_write_access(struct file *bdev_file)
+ 		return;
+ 
+ 	bdev = file_bdev(bdev_file);
+-	/* Yield exclusive or shared write access. */
+-	if (bdev_file->f_mode & FMODE_WRITE) {
+-		if (bdev_writes_blocked(bdev))
+-			bdev_unblock_writes(bdev);
+-		else
+-			bdev->bd_writers--;
+-	}
++
++	/* O_EXCL is only set for internal BLK_OPEN_RESTRICT_WRITES. */
++	if (bdev_file->f_flags & O_EXCL)
++		bdev_unblock_writes(bdev);
++	else if (bdev_file->f_mode & FMODE_WRITE)
++		bdev->bd_writers--;
+ }
+ 
+ /**
+@@ -946,6 +945,13 @@ static unsigned blk_to_file_flags(blk_mode_t mode)
+ 	else
+ 		WARN_ON_ONCE(true);
+ 
++	/*
++	 * BLK_OPEN_RESTRICT_WRITES is never set from userspace and
++	 * O_EXCL is stripped from userspace.
++	 */
++	if (mode & BLK_OPEN_RESTRICT_WRITES)
++		flags |= O_EXCL;
++
+ 	if (mode & BLK_OPEN_NDELAY)
+ 		flags |= O_NDELAY;
+ 
+-- 
+2.43.0
+
