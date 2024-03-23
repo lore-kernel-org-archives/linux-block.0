@@ -1,93 +1,82 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDB41362;
-	Sat, 23 Mar 2024 03:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0B83212;
+	Sat, 23 Mar 2024 04:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711163858; cv=none; b=doV4LKx1+tRAG4tmPpnabiwlz6N+MF+nNNLtf+p83yZtSuctkSb/Eq6Dbpfe5HKNmZVc9/eeataMTIg4MEH8SMysIoy3plriav7s2V/zb6wkYCiZIAIByMyH/N9DmgjvkUSTj8yuFaS6999N60lk5ZRQM8qvj/aFK7f40ZgFiqw=
+	t=1711166845; cv=none; b=X4osUGSl3KnmD+3wsBtKx0xXdo+gIuW66R8yzWS0ysKCtb7QaV8pfIVCQhumvSbweUSDQQ8BbpV4gtn4whJfErWP4agVyKoSjhU2fIDPWcklz9REOxrjvcNns6/OyInjOSwaZj4OlLp4RcCtosyRDjedWMTi0PZ/moy4McRtczw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711163858; c=relaxed/simple;
-	bh=HstrJLs9qezvI3wb0xdII2caCNCSQrsje9f24JVu5m8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WtuPVaihSOz2W4zcoRKpZQbiuJmmBSj5mMpa6Ft/cW49br0J6tZUnTE9i9PubLfa4TwBi3GKkNkEMHw+7aGXvjKh3j4Gbyt8WgovtYhbNJAQegS7tzZR+p8OU3Jsq35r5r8xsqAjHKV2NzqcmhNigyr+RPqxYJluEoiqu0opvPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lAyeo7Oq; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lAyeo7Oq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=kPanuUPmB0BXN/f8Xx3i3XBoQ2rItQS2/Ad+tn9F05I=; b=lAyeo7OqJ7uXzggwgtsRCKRrFk
-	QkgQllyUYVBASYCEvFKpRgPxAVj/k5eBSPzpllezso36AkGujf8dER7lbeRIrYTKfHSzgwkWi3vKV
-	lIRJUidQ0qB9J69Zt5CaYYDvEL0C6lemizOmCBHulq5PZKVAUkiUdh7dxMF6rnFOYwisY3hK4Ve9F
-	ok9/XSJzd74gVCXYIap1P8dUAxRYn5ICnFpS0tr3OT4/OW9LMqHPQkUF0htPAwUYDrIoQgUKjPpVL
-	t/NDZMTf0lfMgRfBTjMCW+auSqXzUQv7c+sMEaq0RptgNNiDxbJM/THx6prIzsNx5NzBLHkzgXamO
-	u4H4Qw+w==;
-Received: from [50.53.2.121] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rnrsu-00000009KHR-1fpG;
-	Sat, 23 Mar 2024 03:17:28 +0000
-Message-ID: <bf3715e1-bf44-44e6-8877-4bbcfe5f3f98@infradead.org>
-Date: Fri, 22 Mar 2024 20:17:26 -0700
+	s=arc-20240116; t=1711166845; c=relaxed/simple;
+	bh=53+HDN4Gu4DKIzm6NKYD884OFkgcG1uX5jRvgTqedSA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tFajyNPyOPKff9WmPpq1nNZRgez2v3qxmkhwmaxyBmbjn3uZZfRnNs6Oa6KXOD5FLtBpptftH5WO6hQr7OMeyWNuTyVgLzPTcww+fwyZbo/rIDXgoiG5u087p5j3nMZ+w9eY+UIN33ECgPKmd7nhb6Yw2/YEnVHQAmtdSUIucOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4V1lyT3SP3z4f3jdt;
+	Sat, 23 Mar 2024 12:07:13 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 8D0161A06DD;
+	Sat, 23 Mar 2024 12:07:19 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgAX5g51Vf5lhTs2Hw--.40826S4;
+	Sat, 23 Mar 2024 12:07:19 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: ming.lei@redhat.com,
+	hch@lst.de,
+	bvanassche@acm.org,
+	axboe@kernel.dk,
+	mpatocka@redhat.com,
+	snitzer@redhat.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH 0/2] block: support to account io_ticks precisely
+Date: Sat, 23 Mar 2024 11:59:54 +0800
+Message-Id: <20240323035959.1397382-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next RFC] blk-throttle: remove
- CONFIG_BLK_DEV_THROTTLING_LOW
-Content-Language: en-US
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, tj@kernel.org,
- hch@lst.de, ming.lei@redhat.com, josef@toxicpanda.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- cgroups@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
- yangerkun@huawei.com
-References: <20240323025322.1310935-1-yukuai1@huaweicloud.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240323025322.1310935-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAX5g51Vf5lhTs2Hw--.40826S4
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYc7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
+	M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI
+	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
+	evJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi--
+From: Yu Kuai <yukuai3@huawei.com>
 
-On 3/22/24 19:53, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> One the one hand, it's marked EXPERIMENTAL since 2017, and looks like
-> there are no users since then, and no testers and no developers, it's
-> just not active at all.
-> 
-> On the other hand, even if the config is disabled, there are still many
-> fields in throtl_grp and throtl_data and many functions that are only
-> used for throtl low.
-> 
-> At last, currently blk-throtl is initialized during disk initialization,
-> and destroyed during disk removal, and it exposes many functions to be
-> called directly from block layer. Hence I'm planning to optimize
-> blk-throtl and finially support building it as kernel module. Remove
-> throtl low will make the work much easier.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/Kconfig        |  11 -
->  block/bio.c          |   1 -
->  block/blk-stat.c     |   3 -
->  block/blk-sysfs.c    |   7 -
->  block/blk-throttle.c | 901 ++-----------------------------------------
->  block/blk-throttle.h |  26 +-
->  block/blk.h          |  11 -
->  7 files changed, 45 insertions(+), 915 deletions(-)
+Yu Kuai (2):
+  block: support to account io_ticks precisely
+  block: remove blk_mq_in_flight() and blk_mq_in_flight_rw()
 
-Here are 2 more places to patch:
-
-Documentation/ABI/stable/sysfs-block:           CONFIG_BLK_DEV_THROTTLING_LOW is enabled.
-arch/loongarch/configs/loongson3_defconfig:CONFIG_BLK_DEV_THROTTLING_LOW=y
-
+ block/blk-core.c  |  9 +++++----
+ block/blk-merge.c |  2 ++
+ block/blk-mq.c    | 36 ++++--------------------------------
+ block/blk-mq.h    |  5 -----
+ block/blk.h       |  1 +
+ block/genhd.c     | 20 ++++----------------
+ 6 files changed, 16 insertions(+), 57 deletions(-)
 
 -- 
-#Randy
+2.39.2
+
