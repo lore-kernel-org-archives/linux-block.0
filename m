@@ -1,88 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8926A6BFCE;
-	Sun, 24 Mar 2024 17:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBCB749A
+	for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 21:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711300066; cv=none; b=mqs7sbK3+wNCBZUX8ZhI6Vj+T3Pa4yjq1JsyjiE2W45NTv7cvKVkdkyqhjVBYgTrgD8Bjkz+cjij9ZZ6z2kcQjDVCcRdDcJfQHxhPCt7fSJgxZwrsdUtc7DwV8tNWVuPLKT1ObRnMFGwCEyoZOwfILMvHuEF3alQVX65yQ744jA=
+	t=1711316934; cv=none; b=dozKA6yMoHRwYqCrldCBPnp+/u+nJqAm5FIKtkoxzJ76ikyXJZ1+m7OBNIBH426JaP9FG3q1JIBEJdGr6n7ANlZ6z1on+l3t5Q34m6X1C369ZmT54Xre2iRhCCYJAJSLwyFmdRo1JcFjwea+xim+VL+noS5H7duMs6LSKuIbLqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711300066; c=relaxed/simple;
-	bh=fwh2m7sCn29cG90OCu3PIuTxTxnWk5RXZjAseQsIl/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j5oz+2eGikJDgpe6xS2hs++XCSSIxhQewuZaKql9ZbKg31SmBwqO8LcSi21VpBzrsDUMPK6xWSnwOp+8LunZ17T13uvlBDmD0yfYcW6PelZ7qb+3wHjKvPmWwStI4MOLKOT20aMXWqM1LyUUZJhp/PdhLjhnjBwzhp8PcWvgr7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VVhSEMVl; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VVhSEMVl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92380C433A6;
-	Sun, 24 Mar 2024 17:07:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711300066;
-	bh=fwh2m7sCn29cG90OCu3PIuTxTxnWk5RXZjAseQsIl/Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VVhSEMVlezb5LZIrxLbfT+qdL7l9a8+wo8/Z/ZzXhhf8w6T6QB9e6w02CYViDMM/C
-	 aIW7pmISbfdz1rv2IeOfQzXTzm+vLvqv8nq1Li/bMDIa7B5i3figc4iGQsKDnkr8vY
-	 3tk4+i+FQoAmzxcNJX4iQWZowKDd1rBnEl8vSg8Rk3hZX4SA8y2+rG61m1smA+keyE
-	 1Rc8bp+U1jnMQ5ksMR2W91Y2QcBSVP3drTxSLHalCbajWebZ5T/oN/1BHpev289vCu
-	 +/Q1rRbj7Lrb8I030a3hKVjT5epiQrztsYs/Op05WViiRCMARhqdmSBYZvvi52wL2u
-	 lBkNtpoLwJIrg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Roman Smirnov <r.smirnov@omp.ru>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 2/2] block: prevent division by zero in blk_rq_stat_sum()
-Date: Sun, 24 Mar 2024 13:07:41 -0400
-Message-ID: <20240324170743.546858-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240324170743.546858-1-sashal@kernel.org>
-References: <20240324170743.546858-1-sashal@kernel.org>
+	s=arc-20240116; t=1711316934; c=relaxed/simple;
+	bh=3Ast2CrmJbetUoKupZJ0xPcufqlarszHYH7/2n/qlg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kaLOtBpnQDiqGRwXh42u9AHpu+HHXQqa1WjAj6pQIaSd+9IwrCBXkhY1eqFJKgUXbUR5V6gJm3B3OXhFw/pTrun+JeTxPZLdlNh5m6Ua1yOBeiLnmGJhOR2oWfXG8IbbMppH75Qny8kVkJXjAMIdzgxy4buTOXEa1tblWD8RJng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6918781a913so33906146d6.3
+        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 14:48:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711316932; x=1711921732;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tQClB/OlLB3Zz9sLCishbIZaPtgYfBjnjrx1cp3mZb0=;
+        b=EqAGEpG6cpEqKlRHubV2usV4O6AwwAuGf3nZUu8mxlK6I4sACBLJEyHGOgkrjVlR67
+         iRzZ6Di/TXdleZZ6fKlZMck7Sn82FmDEYSY4FgKmuTpQeTQuwnPphE42KjyJ3jfP4Iez
+         mZqMen7/KIgoAClt04kfxHwzn429W8qSRtC3Dxpyp0XcvPM03ft8kCFRhlbLTbOwC3OX
+         MQE5yH43/j6FLAnpuFMbjDD9dQiSj6qno6iwqjcb57MaURpymoDP/Aayyhb8W6MFduiy
+         GnDaIpDmNMQ06shz1itpehgSDXRjn+3IdALCGTmD1LKcwzi5eI54nBvhpelqccUqoVY5
+         n1fQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXeR8ePUMtNtZH2tx7OHC/IOArbM4jKeDmZoUmj2XG0Nd/twIfdqHgUTBhvdZOn9xR/LwMXosAASvJ/l2lUaOC3q78m/2JA5Y+Icuc=
+X-Gm-Message-State: AOJu0YyvyN69QjePjpR4o8W8w5R+OWznzu64Fc4sPD2yacVHSTE7dGIU
+	qLVB5LpHDeqH8nrsuLqrxITK7w/Qx04nSKq2R8UuB7nC9EN8TPKJvFfnDaU50w==
+X-Google-Smtp-Source: AGHT+IHwxCvzR6MAh4bjzMWcr+MSZGB7sFIjse/JkghXPSKnNyRC4kYYtoUtnWn8o5xc+CM0AhHM9w==
+X-Received: by 2002:a05:6214:1308:b0:691:e21:736c with SMTP id pn8-20020a056214130800b006910e21736cmr7131454qvb.30.1711316931864;
+        Sun, 24 Mar 2024 14:48:51 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id i11-20020ad45c6b000000b0069068161388sm3388777qvh.131.2024.03.24.14.48.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Mar 2024 14:48:51 -0700 (PDT)
+Date: Sun, 24 Mar 2024 17:48:50 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: [PATCH V2] block: fail unaligned bio from submit_bio_noacct()
+Message-ID: <ZgCfwkb8wMKBcshm@redhat.com>
+References: <20240324133702.1328237-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.310
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240324133702.1328237-1-ming.lei@redhat.com>
 
-From: Roman Smirnov <r.smirnov@omp.ru>
+On Sun, Mar 24 2024 at  9:37P -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-[ Upstream commit 93f52fbeaf4b676b21acfe42a5152620e6770d02 ]
+> For any FS bio, its start sector and size have to be aligned with the
+> queue's logical block size from beginning, because bio split code can't
+> make one aligned bio.
+> 
+> This rule is obvious, but there is still user which may send unaligned
+> bio to block layer, and it is observed that dm-integrity can do that,
+> and cause double free of driver's dma meta buffer.
+> 
+> So failfast unaligned bio from submit_bio_noacct() for avoiding more
+> troubles.
+> 
+> Meantime remove this kind of check in dio and discard code path.
+> 
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Mikulas Patocka <mpatocka@redhat.com>
+> Cc: Mike Snitzer <snitzer@kernel.org>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+> 	- remove the check in dio and discard code path
+> 	- check .bi_sector with (logical_block_size >> 9) - 1
+> 
+>  block/blk-core.c | 16 ++++++++++++++++
+>  block/blk-lib.c  | 17 -----------------
+>  block/fops.c     |  3 +--
+>  3 files changed, 17 insertions(+), 19 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index a16b5abdbbf5..2d86922f95e3 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -729,6 +729,19 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+>  		__submit_bio_noacct(bio);
+>  }
+>  
+> +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
+> +{
+> +	unsigned int bs = q->limits.logical_block_size;
+> +
+> +	if (bio->bi_iter.bi_size & (bs - 1))
+> +		return false;
+> +
+> +	if (bio->bi_iter.bi_sector & ((bs >> SECTOR_SHIFT) - 1))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
 
-The expression dst->nr_samples + src->nr_samples may
-have zero value on overflow. It is necessary to add
-a check to avoid division by zero.
+You missed Christoph's reply to v1 where he offered:
+"This should just use bdev_logical_block_size() on bio->bi_bdev."
 
-Found by Linux Verification Center (linuxtesting.org) with Svace.
+Otherwise, looks good.
 
-Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Link: https://lore.kernel.org/r/20240305134509.23108-1-r.smirnov@omp.ru
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-stat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 7587b1c3caaf5..507ac714423bd 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -27,7 +27,7 @@ void blk_rq_stat_init(struct blk_rq_stat *stat)
- /* src is a per-cpu stat, mean isn't initialized */
- void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- {
--	if (!src->nr_samples)
-+	if (dst->nr_samples + src->nr_samples <= dst->nr_samples)
- 		return;
- 
- 	dst->min = min(dst->min, src->min);
--- 
-2.43.0
-
+Mike
