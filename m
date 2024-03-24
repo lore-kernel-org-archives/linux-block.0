@@ -1,309 +1,201 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C3117736
-	for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 12:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6312107
+	for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 13:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711282433; cv=none; b=rZdtnniJZYqaqSCGT0cexULaZUPAtBOdDE55QIHkVbUR3AxuM8qBFQ6uvkJVp78TjFCZ9DB8b45KlZaZso9ATEHKbKCIEw/1JT1cGzg5RUWMxwGYM9ic3oL7QNJjLAbbjARlZDsBS6wQT7J3TQDG/Nouy0LjpNRPzfpwPMY6bQk=
+	t=1711287438; cv=none; b=EJ5hxiaVKUfBPOlhuruifQq6OddIfk6BIPMByJLMizxyOL2k9BST8qQDuYudIr2pxkBp4ho/VpUto0pG7NLkQ1fQgzw48/WDRvCiBNFUPCets0fqAuCFSrSBtnzEvRv6Kp3J2RJi5tGRvWBtNG53R0XIYDW3qG4fTvFWEeHf/lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711282433; c=relaxed/simple;
-	bh=j0tdVAvKCmjLmpL5K4bMh/Z7e2Vn9xGCnyoFaVM+/tk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PVA4jznA/Vg5Nvg0C354G+abOnxSejT+8uebp5MG1OiWlLgbIxnZSVaOhmioFM31+FH/ASvXGXwcZxQQgClzo7nnC/KlOrzRQeFsGKFQFE38CD4aeSm8qFLyuIG1J14zqNjqDEY7l9C4o55bXMEzrQT+Gs++sQdKGe149xEUwaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WlazkfrD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711287438; c=relaxed/simple;
+	bh=obkzoISKFME38mMoUpqyesSPf80Bew847m7FkWr3SLU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L3OPkZfHBKkZdk0swE2Rcu4tu2PLyJ5EPvLrmZFPpsdpXjR6OuHtpuJsvgQtvSBCwh0U1QHcAK24EhCQD75xozniZ8sTpiJbl6Kc+SvFq9gqI0SjHVzJb13wZ1PW5kNt7puusYz8On5zKUjcCa02/zyNfHIlXQkHST7+QMyhhwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gNfJTUn6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WlazkfrD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0C82C433F1;
-	Sun, 24 Mar 2024 12:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711282433;
-	bh=j0tdVAvKCmjLmpL5K4bMh/Z7e2Vn9xGCnyoFaVM+/tk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WlazkfrDr3ZR417qjKbKMg7dtYS6LU/jgKc2e3Vd3eOv5NKe47/PSE+Plnerg8CzC
-	 7SSBJYAFJOoaxSaOibaKsQo4Zyn/oLqN1kUc5WIpghu1EMxfRUhHID+uO1Uy+zP0k0
-	 VAGz1V+mODn5iLjYFRksBe5PuJRwJ7DwaOzus4DTlW7uUzfNn/urf2t1ez17sI8ZyQ
-	 NXkZzu9puqjPUJZXPOgghrHw3P4wR9gmfkr0J5DQ18/vsbT8yH+h7gpy7o+CIe6vfB
-	 grKYehpregRQVYPu3LxhSWyOZv13CxGiqMyP/ECAIkvUx/UWOm4RxVSzk/PFyGhB4I
-	 Ji75gqaVcOCTA==
-Message-ID: <cd11bff9-46cc-4148-9dcf-4087e1621985@kernel.org>
-Date: Sun, 24 Mar 2024 20:13:50 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gNfJTUn6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711287435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6cKByn2OBPklE8PuGDNeAk8hrhzrul4zFIiRsckPUlE=;
+	b=gNfJTUn6Ivr1V52SPEqW7nwloJpX6iWCv5R0fm1N8yX97WQbT8rS3uOqNy51ob6UmSrxTK
+	OxapjjF0lZccgxKih+Eu6qelTFdyoVO2qdyvFcfmsm7Aj7Zlc4ZTsplO+0U6JDtYkD3tgJ
+	//EvHCY8Alzk2jc56Kzb+R11Mq+ZPT4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-471-QzpZgfpuPx6untMmSuhPKw-1; Sun,
+ 24 Mar 2024 09:37:12 -0400
+X-MC-Unique: QzpZgfpuPx6untMmSuhPKw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1E3C3C01DB4;
+	Sun, 24 Mar 2024 13:37:11 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B024A1121306;
+	Sun, 24 Mar 2024 13:37:10 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>
+Subject: [PATCH V2] block: fail unaligned bio from submit_bio_noacct()
+Date: Sun, 24 Mar 2024 21:37:02 +0800
+Message-ID: <20240324133702.1328237-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [f2fs-dev] [bug report]WARNING: CPU: 22 PID: 44011 at
- fs/iomap/iter.c:51 iomap_iter+0x32b observed with blktests zbd/010
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Yi Zhang <yi.zhang@redhat.com>, linux-block
- <linux-block@vger.kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
- Bart Van Assche <bvanassche@acm.org>,
- "linux-f2fs-devel@lists.sourceforge.net"
- <linux-f2fs-devel@lists.sourceforge.net>
-References: <CAHj4cs-kfojYC9i0G73PRkYzcxCTex=-vugRFeP40g_URGvnfQ@mail.gmail.com>
- <esesb6dg5omj7e5sdnltnapuuzgmbdfmezcz6owsx2waqayc5q@36yhz4dmrxh6>
- <CAHj4cs874FivTdmw=VMJwTzzLFZWb4OKqvNGRN0R0O+Oiv4aYA@mail.gmail.com>
- <CAHj4cs_eOSafp0=cbwjNPR6X2342GF_cnUTcXf6RjrMnoOHSmQ@mail.gmail.com>
- <msec3wnqtvlsnfsw34uyrircyco3j3y7yb4gj75ofz5gnn57mg@qzcq5eumjwy5>
- <CAHj4cs-DC7QQH1W3KSzXS8ERMPW-6XQ9-w_Mzr1zEGF7ZZ=K3w@mail.gmail.com>
- <d6vi6aq44c4a7ekhck6zxxy4woa5q7v5bnvn5qmad7nqk7egms@ptc72tum4bks>
- <gngdj77k4picagsfdtiaa7gpgnup6fsgwzsltx6milmhegmjff@iax2n4wvrqye>
- <f4f1cfac-8520-47a1-ad18-b9922aa0545d@kernel.org>
- <jpgro32y5r3mpyh24hoqnwkbcg67twbmcxeicoa5qt723u7ehk@4imddarhtt74>
-Content-Language: en-US
-From: Chao Yu <chao@kernel.org>
-Autocrypt: addr=chao@kernel.org; keydata=
- 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
-In-Reply-To: <jpgro32y5r3mpyh24hoqnwkbcg67twbmcxeicoa5qt723u7ehk@4imddarhtt74>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On 2024/3/19 19:13, Shinichiro Kawasaki wrote:
-> On Mar 19, 2024 / 10:22, Chao Yu wrote:
->> On 2024/3/18 13:47, Shinichiro Kawasaki via Linux-f2fs-devel wrote:
->>> I confirmed that the trigger commit is dbf8e63f48af as Yi reported. I took a
->>> look in the commit, but it looks fine to me. So I thought the cause is not
->>> in the commit diff.
->>>
->>> I found the WARN is printed when the f2fs is set up with multiple devices,
->>> and read requests are mapped to the very first block of the second device in the
->>> direct read path. In this case, f2fs_map_blocks() and f2fs_map_blocks_cached()
->>> modify map->m_pblk as the physical block address from each block device. It
->>> becomes zero when it is mapped to the first block of the device. However,
->>> f2fs_iomap_begin() assumes that map->m_pblk is the physical block address of the
->>> whole f2fs, across the all block devices. It compares map->m_pblk against
->>> NULL_ADDR == 0, then go into the unexpected branch and sets the invalid
->>> iomap->length. The WARN catches the invalid iomap->length.
->>>
->>> This WARN is printed even for non-zoned block devices, by following steps.
->>>
->>>    - Create two (non-zoned) null_blk devices memory backed with 128MB size each:
->>>      nullb0 and nullb1.
->>>    # mkfs.f2fs /dev/nullb0 -c /dev/nullb1
->>>    # mount -t f2fs /dev/nullb0 "${mount_dir}"
->>>    # dd if=/dev/zero of="${mount_dir}/test.dat" bs=1M count=192
->>>    # dd if="${mount_dir}/test.dat" of=/dev/null bs=1M count=192 iflag=direct
->>>
->>> I created a fix candidate patch [1]. It modifies f2fs_iomap_begin() to handle
->>> map->m_pblk as the physical block address from each device start, not the
->>> address of whole f2fs. I confirmed it avoids the WARN.
->>>
->>> But I'm not so sure if the fix is good enough. map->m_pblk has dual meanings.
->>> Sometimes it holds the physical block address of each device, and sometimes
->>> the address of the whole f2fs. I'm not sure what is the condition for
->>> map->m_pblk to have which meaning. I guess F2FS_GET_BLOCK_DIO flag is the
->>> condition, but f2fs_map_blocks_cached() does not ensure it.
->>>
->>> Also, I noticed that map->m_pblk is referred to in other functions below, and
->>> not sure if they need the similar change as I did for f2fs_iomap_begin().
->>>
->>>     f2fs_fiemap()
->>>     f2fs_read_single_page()
->>>     f2fs_bmap()
->>>     check_swap_activate()
->>>
->>> I would like to hear advices from f2fs experts for the fix.
->>>
->>>
->>> [1]
->>>
->>> diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
->>> index 26e317696b33..5232223a69e5 100644
->>> --- a/fs/f2fs/data.c
->>> +++ b/fs/f2fs/data.c
->>> @@ -1569,6 +1569,7 @@ static bool f2fs_map_blocks_cached(struct inode *inode,
->>>    		int bidx = f2fs_target_device_index(sbi, map->m_pblk);
->>>    		struct f2fs_dev_info *dev = &sbi->devs[bidx];
->>> +		map->m_multidev_dio = true;
->>>    		map->m_bdev = dev->bdev;
->>>    		map->m_pblk -= dev->start_blk;
->>>    		map->m_len = min(map->m_len, dev->end_blk + 1 - map->m_pblk);
->>> @@ -4211,9 +4212,11 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->>>    			    unsigned int flags, struct iomap *iomap,
->>>    			    struct iomap *srcmap)
->>>    {
->>> +	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
->>>    	struct f2fs_map_blocks map = {};
->>>    	pgoff_t next_pgofs = 0;
->>> -	int err;
->>> +	block_t pblk;
->>> +	int err, i;
->>>    	map.m_lblk = bytes_to_blks(inode, offset);
->>>    	map.m_len = bytes_to_blks(inode, offset + length - 1) - map.m_lblk + 1;
->>> @@ -4239,12 +4242,17 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->>>    	 * We should never see delalloc or compressed extents here based on
->>>    	 * prior flushing and checks.
->>>    	 */
->>> -	if (WARN_ON_ONCE(map.m_pblk == NEW_ADDR))
->>> +	pblk = map.m_pblk;
->>> +	if (map.m_multidev_dio && map.m_flags & F2FS_MAP_MAPPED)
->>> +		for (i = 0; i < sbi->s_ndevs; i++)
->>> +			if (FDEV(i).bdev == map.m_bdev)
->>> +				pblk += FDEV(i).start_blk;
->>> +	if (WARN_ON_ONCE(pblk == NEW_ADDR))
->>>    		return -EINVAL;
->>> -	if (WARN_ON_ONCE(map.m_pblk == COMPRESS_ADDR))
->>> +	if (WARN_ON_ONCE(pblk == COMPRESS_ADDR))
->>>    		return -EINVAL;
->>
->> Shoudn't we check NEW_ADDR and COMPRESS_ADDR before multiple-device
->> block address conversion?
-> 
-> As far as I understand, NEW_ADDR and COMPRESS_ADDR in map.m_pblk can be
-> target of "map->m_pblk -= FDEV(bidx).start_blk;" in f2fs_map_blocks(),
-> so I guessed that the address conversion should come first.
-> 
->>
->>> -	if (map.m_pblk != NULL_ADDR) {
->>> +	if (pblk != NULL_ADDR) {
->>
->> How to distinguish NULL_ADDR and valid blkaddr 0? I guess it should
->> check F2FS_MAP_MAPPED flag first?
-> 
-> I guessed that physical block address for the whole f2fs (pblk) can not be 0, so
-> the NULL_ADDR can have zero value. As for the physical block address of each
-> device (map->m_pblk) can be 0. But this is still my *guess*, and I'm not sure.
-> 
-> 
-> The comments from you and Daeho made me rethink. It looks problematic for me
-> that map->m_pblk has two meanings as I had described: "1) physical block address
-> from each device start", and "2) physical block address of whole f2fs". So how
-> about to make it have only one meaning "2) physical block address address of
-> whole f2fs"? I created another patch below [2]. It removes the
-> 
->     map->m_pblk -= FDEV(bidx).start_blk;
-> 
-> lines in f2fs_map_blocks_cached() and f2fs_map_blocks() so that map->m_pblk do
-> not have the meaning 1). Instead, the subtraction is done in f2fs_iomap_begin().
-> I confirmed that this patch also avoids the WARN. I can have more confidence in
-> this patch, and I hope it is easier to review.
-> 
-> P.S. If anyone has better solution idea, feel free to provide patches. I'm
->       willing to test them :)
-> 
-> 
-> [2]
-> 
-> diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-> index 26e317696b33..7404b4fbcba3 100644
-> --- a/fs/f2fs/data.c
-> +++ b/fs/f2fs/data.c
-> @@ -1569,8 +1569,8 @@ static bool f2fs_map_blocks_cached(struct inode *inode,
->   		int bidx = f2fs_target_device_index(sbi, map->m_pblk);
->   		struct f2fs_dev_info *dev = &sbi->devs[bidx];
->   
-> +		map->m_multidev_dio = true;
->   		map->m_bdev = dev->bdev;
-> -		map->m_pblk -= dev->start_blk;
->   		map->m_len = min(map->m_len, dev->end_blk + 1 - map->m_pblk);
->   	} else {
->   		map->m_bdev = inode->i_sb->s_bdev;
-> @@ -1793,11 +1793,8 @@ int f2fs_map_blocks(struct inode *inode, struct f2fs_map_blocks *map, int flag)
->   
->   		if (map->m_multidev_dio) {
->   			block_t blk_addr = map->m_pblk;
-> -
->   			bidx = f2fs_target_device_index(sbi, map->m_pblk);
-> -
->   			map->m_bdev = FDEV(bidx).bdev;
-> -			map->m_pblk -= FDEV(bidx).start_blk;
->   
->   			if (map->m_may_create)
->   				f2fs_update_device_state(sbi, inode->i_ino,
-> @@ -4211,9 +4208,11 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->   			    unsigned int flags, struct iomap *iomap,
->   			    struct iomap *srcmap)
->   {
-> +	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
->   	struct f2fs_map_blocks map = {};
->   	pgoff_t next_pgofs = 0;
-> -	int err;
-> +	block_t pblk;
-> +	int err, bidx;
->   
->   	map.m_lblk = bytes_to_blks(inode, offset);
->   	map.m_len = bytes_to_blks(inode, offset + length - 1) - map.m_lblk + 1;
-> @@ -4249,7 +4248,12 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->   		iomap->type = IOMAP_MAPPED;
->   		iomap->flags |= IOMAP_F_MERGED;
->   		iomap->bdev = map.m_bdev;
-> -		iomap->addr = blks_to_bytes(inode, map.m_pblk);
-> +		pblk = map.m_pblk;
-> +		if (map.m_multidev_dio && map.m_flags & F2FS_MAP_MAPPED) {
-> +			bidx = f2fs_target_device_index(sbi, map.m_pblk);
-> +			pblk -= FDEV(bidx).start_blk;
-> +		}
-> +		iomap->addr = blks_to_bytes(inode, pblk);
->   	} else {
->   		if (flags & IOMAP_WRITE)
->   			return -ENOTBLK;
+For any FS bio, its start sector and size have to be aligned with the
+queue's logical block size from beginning, because bio split code can't
+make one aligned bio.
 
-Hi Shinichiro,
+This rule is obvious, but there is still user which may send unaligned
+bio to block layer, and it is observed that dm-integrity can do that,
+and cause double free of driver's dma meta buffer.
 
-Can you please check below diff? IIUC, for the case: f2fs_map_blocks()
-returns zero blkaddr in non-primary device, which is a verified valid
-block address, we'd better to check m_flags & F2FS_MAP_MAPPED instead
-of map.m_pblk != NULL_ADDR to decide whether tagging IOMAP_MAPPED flag
-or not.
+So failfast unaligned bio from submit_bio_noacct() for avoiding more
+troubles.
 
+Meantime remove this kind of check in dio and discard code path.
+
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Mike Snitzer <snitzer@kernel.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
-  fs/f2fs/data.c | 2 +-
-  1 file changed, 1 insertion(+), 1 deletion(-)
+V2:
+	- remove the check in dio and discard code path
+	- check .bi_sector with (logical_block_size >> 9) - 1
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 6f66e3e4221a..41a56d4298c8 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -4203,7 +4203,7 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
-  	if (WARN_ON_ONCE(map.m_pblk == COMPRESS_ADDR))
-  		return -EINVAL;
+ block/blk-core.c | 16 ++++++++++++++++
+ block/blk-lib.c  | 17 -----------------
+ block/fops.c     |  3 +--
+ 3 files changed, 17 insertions(+), 19 deletions(-)
 
--	if (map.m_pblk != NULL_ADDR) {
-+	if (map.m_flags & F2FS_MAP_MAPPED) {
-  		iomap->length = blks_to_bytes(inode, map.m_len);
-  		iomap->type = IOMAP_MAPPED;
-  		iomap->flags |= IOMAP_F_MERGED;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a16b5abdbbf5..2d86922f95e3 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -729,6 +729,19 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+ 		__submit_bio_noacct(bio);
+ }
+ 
++static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
++{
++	unsigned int bs = q->limits.logical_block_size;
++
++	if (bio->bi_iter.bi_size & (bs - 1))
++		return false;
++
++	if (bio->bi_iter.bi_sector & ((bs >> SECTOR_SHIFT) - 1))
++		return false;
++
++	return true;
++}
++
+ /**
+  * submit_bio_noacct - re-submit a bio to the block device layer for I/O
+  * @bio:  The bio describing the location in memory and on the device.
+@@ -780,6 +793,9 @@ void submit_bio_noacct(struct bio *bio)
+ 		}
+ 	}
+ 
++	if (WARN_ON_ONCE(!bio_check_alignment(bio, q)))
++		goto end_io;
++
+ 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+ 		bio_clear_polled(bio);
+ 
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index a6954eafb8c8..ea1a7d16ffdf 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -39,7 +39,6 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop)
+ {
+ 	struct bio *bio = *biop;
+-	sector_t bs_mask;
+ 
+ 	if (bdev_read_only(bdev))
+ 		return -EPERM;
+@@ -53,10 +52,6 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+-	if ((sector | nr_sects) & bs_mask)
+-		return -EINVAL;
+-
+ 	if (!nr_sects)
+ 		return -EINVAL;
+ 
+@@ -217,11 +212,6 @@ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 		unsigned flags)
+ {
+ 	int ret;
+-	sector_t bs_mask;
+-
+-	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+-	if ((sector | nr_sects) & bs_mask)
+-		return -EINVAL;
+ 
+ 	ret = __blkdev_issue_write_zeroes(bdev, sector, nr_sects, gfp_mask,
+ 			biop, flags);
+@@ -250,15 +240,10 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, unsigned flags)
+ {
+ 	int ret = 0;
+-	sector_t bs_mask;
+ 	struct bio *bio;
+ 	struct blk_plug plug;
+ 	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev);
+ 
+-	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+-	if ((sector | nr_sects) & bs_mask)
+-		return -EINVAL;
+-
+ retry:
+ 	bio = NULL;
+ 	blk_start_plug(&plug);
+@@ -313,8 +298,6 @@ int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
+ 
+ 	if (max_sectors == 0)
+ 		return -EOPNOTSUPP;
+-	if ((sector | nr_sects) & bs_mask)
+-		return -EINVAL;
+ 	if (bdev_read_only(bdev))
+ 		return -EPERM;
+ 
+diff --git a/block/fops.c b/block/fops.c
+index 679d9b752fe8..75595c728190 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -37,8 +37,7 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
+ static bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
+ 			      struct iov_iter *iter)
+ {
+-	return pos & (bdev_logical_block_size(bdev) - 1) ||
+-		!bdev_iter_is_aligned(bdev, iter);
++	return !bdev_iter_is_aligned(bdev, iter);
+ }
+ 
+ #define DIO_INLINE_BIO_VECS 4
+-- 
+2.41.0
 
