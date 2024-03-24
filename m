@@ -1,112 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EAB1EB34
-	for <linux-block@vger.kernel.org>; Sat, 23 Mar 2024 16:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CA717C8;
+	Sun, 24 Mar 2024 02:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711210295; cv=none; b=fe7W1DV/RmsiGk0l2WSeoL9fUtJtR79Ky9cOta0zpd1SIQKjRFYtD/HlUyxCXgyP7f560ziwlgmJJzjupV7hLJf0zr778Mbk5qQYuTlL+4xHF81/C14+J4bt/OlNnHu9OoGB4DlLzpg2QY/BNYU4Q/dMq0SJwto/71CziKsjbDQ=
+	t=1711246281; cv=none; b=tJKGz2jwVwj5tDyYc3Ibyc7HgBeYH8qpKaxbuwDWoimNyYMhogx7DUOhBi5rtbCnKyk8FXmS+WIFHSluSCZU2r6t18eui2kXP9fx763GXjopV3pbyGteKpeU/nk5YFSTecMCYr/mXQYLW7BYO0KpKVfQc72O7s0lpywPkJ+T/po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711210295; c=relaxed/simple;
-	bh=72k07Vg0UKLZ4eCoZd/amAxTFixToiDtGZ28b+Er4cI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F5xjMgERYWZMW+1WD6LVNgiVkWxIiJu9byZv2VVKiOOE1uXe2G+UXf7SzP0rpLORtW8VWNfbOucb6TWUJdjlQd8tA0+SnAS0JY0TmKr3+cpr3lPW73plzFqplg7Z1SMy5cMnWqAbw/GLTEMNZmtJhCzhpSGNECMh/z7hZjh9lMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWFmuQdR; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWFmuQdR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAABBC433F1;
-	Sat, 23 Mar 2024 16:11:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711210295;
-	bh=72k07Vg0UKLZ4eCoZd/amAxTFixToiDtGZ28b+Er4cI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SWFmuQdRsmkMgk2Of/GJ5TGMMjbEEeKEhKjn1BdQQqFqtnDujG0ASq+pahdFugSdc
-	 ikvWbAZ6dphQRGy1RPd4PyWBHI2iZqh5/CFDpcg4u+TPilTrUo3zZLNPExC2Awz33u
-	 B4esPfHeu8D2qd8MaCfry+965BiR2YJ5/5bVZ+CnY2AM8CT/0rJ3K+udHrVrlAey5m
-	 TQ3o1lYS7k/7hNu9qEsXoiiHdYLz155Ue3y3TYLZ0ciQCjX019a3uk1UBEPoMdtqNH
-	 ueQTLnTf9sruASZv9rwPa/lQYKes4A6trVFY/lMQQaUWLEb1ZqbKaEz3x/lV060tEJ
-	 ghrNTmzA+KL+A==
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] [RFC]: block: count BLK_OPEN_RESTRICT_WRITES openers
-Date: Sat, 23 Mar 2024 17:11:20 +0100
-Message-ID: <20240323-abtauchen-klauen-c2953810082d@brauner>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
-References: <20240323-seide-erbrachten-5c60873fadc1@brauner> 
- <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
+	s=arc-20240116; t=1711246281; c=relaxed/simple;
+	bh=NDITpm+Io5eF73wa40dDzJ4n6hWGDX3M2JytLekCKDc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=PCr8slMkFFMyVazJyhm6zzzyUPzs45weePZhse/4xwGj0XTZZRc9tstVd1urzYzM+aR3Ykaf7BQoUByfpojD/RcXoj7AHdlZ/q5zMhwtLxvniSmr2fPWkxE1Ck1LsnOotzzD/rsC9KUcZkilZKttsOnewwCRbSLcqMWe4MgZ+b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V2KL63s7Sz4f3jYg;
+	Sun, 24 Mar 2024 10:11:10 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 7C7E91A0C00;
+	Sun, 24 Mar 2024 10:11:14 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxDAi_9l6YOUHw--.39150S3;
+	Sun, 24 Mar 2024 10:11:14 +0800 (CST)
+Subject: Re: [PATCH 2/2] block: remove blk_mq_in_flight() and
+ blk_mq_in_flight_rw()
+To: Mike Snitzer <snitzer@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
+ mpatocka@redhat.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240323035959.1397382-1-yukuai1@huaweicloud.com>
+ <20240323035959.1397382-3-yukuai1@huaweicloud.com>
+ <Zf79w4Ip3fzSMCWh@redhat.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <abb0af09-e9bb-4781-176b-b4b98726c211@huaweicloud.com>
+Date: Sun, 24 Mar 2024 10:11:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2132; i=brauner@kernel.org; h=from:subject:message-id; bh=72k07Vg0UKLZ4eCoZd/amAxTFixToiDtGZ28b+Er4cI=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaT++6+Z9mVitUr5spTTlR35kue2iU235Jj5+Hagv33sp yQ/6/PTOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACZS68vI0K27Zdd//mqDKq3L y8W2znXTn3zj8v8pLE/WT73kniyiuoHhr1ihusyV8LfFpU3Gfx7UL1gc9Vj9HStHcYLI6+nnCuN ZWQE=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+In-Reply-To: <Zf79w4Ip3fzSMCWh@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDHlxDAi_9l6YOUHw--.39150S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xw4DGF4Dur17tryxAw4xJFb_yoW3AFX_ur
+	yv9a4UJ3W7JF1aq3WUGF1fZrZrG34fGrZxX3y7XFWUAr1kXFWSgFs5Kas7uF45Aa1jqF1S
+	k34ftF4xArW2gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-The original changes in v6.8 do allow for a block device to be reopened
-with BLK_OPEN_RESTRICT_WRITES provided the same holder is used as per
-bdev_may_open(). I think that may have a bug.
+Hi,
 
-The first opener @f1 of that block device will set bdev->bd_writers to
--1. The second opener @f2 using the same holder will pass the check in
-bdev_may_open() that bdev->bd_writers must not be greater than zero.
+ÔÚ 2024/03/24 0:05, Mike Snitzer Ð´µÀ:
+> On Fri, Mar 22 2024 at 11:59P -0400,
+> Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> 
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Now that blk-mq also use per_cpu counter to trace inflight as bio-based
+>> device, they can be replaced by part_in_flight() and part_in_flight_rw()
+>> directly.
+> 
+> Please reference the commit that enabled this, e.g.:
+> 
+> With commit XXXXX ("commit subject") blk-mq was updated to use per_cpu
+> counters to track inflight IO same as bio-based devices, so replace
+> blk_mq_in_flight* with part_in_flight() and part_in_flight_rw()
+> accordingly.
 
-The first opener @f1 now closes the block device and in bdev_release()
-will end up calling bdev_yield_write_access() which calls
-bdev_writes_blocked() and sets bdev->bd_writers to 0 again.
+Patch 1 in this set do this, so there is no commit xxx yet.
 
-Now @f2 holds a file to that block device which was opened with
-exclusive write access but bdev->bd_writers has been reset to 0.
+Thanks,
+Kuai
 
-So now @f3 comes along and succeeds in opening the block device with
-BLK_OPEN_WRITE betraying @f2's request to have exclusive write access.
-
-This isn't a practical issue yet because afaict there's no codepath
-inside the kernel that reopenes the same block device with
-BLK_OPEN_RESTRICT_WRITES but it will be if there is.
-
-If that's right then fix this by counting the number of
-BLK_OPEN_RESTRICT_WRITES openers. So we only allow writes again once all
-BLK_OPEN_RESTRICT_WRITES openers are done.
-
-Fixes: ed5cc702d311 ("block: Add config option to not allow writing to mounted devices")
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- block/bdev.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/bdev.c b/block/bdev.c
-index f819f3086905..42f84692404c 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -776,17 +776,17 @@ void blkdev_put_no_open(struct block_device *bdev)
- 
- static bool bdev_writes_blocked(struct block_device *bdev)
- {
--	return bdev->bd_writers == -1;
-+	return bdev->bd_writers < 0;
- }
- 
- static void bdev_block_writes(struct block_device *bdev)
- {
--	bdev->bd_writers = -1;
-+	bdev->bd_writers--;
- }
- 
- static void bdev_unblock_writes(struct block_device *bdev)
- {
--	bdev->bd_writers = 0;
-+	bdev->bd_writers++;
- }
- 
- static bool bdev_may_open(struct block_device *bdev, blk_mode_t mode)
--- 
-2.43.0
+> 
+> (I'm not seeing the commit in question, but I only took a quick look).
+> 
+> Mike
+> .
+> 
 
