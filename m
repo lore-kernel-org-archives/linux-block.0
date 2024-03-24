@@ -1,95 +1,73 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA053D962
-	for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 21:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8B322C67A;
+	Sun, 24 Mar 2024 23:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711317454; cv=none; b=i31Xul2cQNoYNeJoyLsy3uRgpgwbGj7oydoWrqSOuycDf0t0ymzG3s4ZEnZuCJZvI846i8Vuj4Bcax1jhKv9WjWAg3cvbJjgVXnu1nFxv9oS4bnMugfxdZG/u8dj8K990z/5x1rycdF0tZRAGt0U6tZcyWmJhW+i5JooPeCbtQY=
+	t=1711322183; cv=none; b=X4pk5lmunbzPoVLepS9OineUMiLnm3zpXuUC8JN3gWIJNW+v5+hn/3nSmZxb2jwWO0Wf5EWIxP2ZToRAbgxuYTRxjGHWUsaa9iKP0CQhoEzsIK21m55lJh7Jz1sr/mXYIFgOXt1pvWcTADLPyo1M01LVG4DeRjSd/aOWkY1zCfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711317454; c=relaxed/simple;
-	bh=BOkYCK2qQtPHq4L14VfaTwZ/r9VLhpWaboZSzmJjo0E=;
+	s=arc-20240116; t=1711322183; c=relaxed/simple;
+	bh=Y+++sfCOOqMd/jN8jYmvU8/LoJkxzD+F97Ejdpsn/YE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EnUK64fW/z8eDp+eAduc/4B/fU/rRuC83RF+HKDOUF/u7ka13ZUpfw7XJklZE+BgmFYNMAbt2aMInQTQDLXP989wxD79bv35nIEjXq1K2eSm8s5b0fQlAShVPqpvogbZVtUnpLmf2ITQWePyC1/dMrpafGxewrjl9RozWk/KHPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-430b870163eso45000711cf.1
-        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 14:57:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711317452; x=1711922252;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aW1uYlxzmK0CTtcm9QtkmtxOoxLLB7jXV7c/ndwCr2g=;
-        b=dBZDGfBIIc2TzovTpKw/1J5/hYW/OUWkk5wecGa9sUJwR1/HwxzDukzWLKxRvE4sOe
-         uUQr+NoKuFhd3M/+TVc3IHdSY0S4EkhWlTvSo28vCiBe3sY7V2mhAOVN8o3O0ZkvaiYB
-         pUhgXlaPzG29hH4e9mTD/asTuQCCbPQUjk6p+Sb1ZREE1szowGLm8BJFsL0V4Y8NgLkk
-         hRzfVrR9X2bFNPeCYTpumeozjE/32BIVEaId6ieY2M7sfpW8h0wtzt9GhNKQRhZxoPPP
-         JV1Nkf/ZWjtlNyQkUbsJ3OGjBhRFpejDNni43IubcxV1YEaoRI9JK8CsP07pkcVLgXj+
-         7P+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ9/7VfgFAIa51ot0rdUQsxWtQX0sbyBNsVt2903YY9XsKEAwkdqHXkdIKlHsRvcdZY/8P9SsYolN7nIdrEQxn6FMHc82f6pbc+zM=
-X-Gm-Message-State: AOJu0YxCCB3kMWN3Na5yA63PxQcO9fzOMng0AvmSCgqp8eDxmCJ6LWWf
-	DClb+CqoXLTtHfpmMQrVST4QcwBQkjWUDAK4esmAZ3R24q/tvtkbgV8h9gcRkQ==
-X-Google-Smtp-Source: AGHT+IGGMBnbwmlHZ1ViBESOWV4M56q0VRQdJ2XXd4ey16lzyfQzewIYJf/bLSJRR3q4cCsSThMoSQ==
-X-Received: by 2002:ad4:5aaf:0:b0:696:3e05:9c21 with SMTP id u15-20020ad45aaf000000b006963e059c21mr7295157qvg.18.1711317451878;
-        Sun, 24 Mar 2024 14:57:31 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id h14-20020a0562140dae00b00691732938a8sm3410147qvh.73.2024.03.24.14.57.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Mar 2024 14:57:31 -0700 (PDT)
-Date: Sun, 24 Mar 2024 17:57:30 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
-	mpatocka@redhat.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 2/2] block: remove blk_mq_in_flight() and
- blk_mq_in_flight_rw()
-Message-ID: <ZgChym1BEpxUm_bL@redhat.com>
-References: <20240323035959.1397382-1-yukuai1@huaweicloud.com>
- <20240323035959.1397382-3-yukuai1@huaweicloud.com>
- <Zf79w4Ip3fzSMCWh@redhat.com>
- <abb0af09-e9bb-4781-176b-b4b98726c211@huaweicloud.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WwxPxILKIWVA2R1Af8w4R6k3ZMRwx3nHwKdX5oSl6h81dA6Fbg6Ops6MmakhhCwpIMH2zvWRZGM2DFebVlvKm6sPR+PJEat/CCS1jkuq8saX8RvgAPdC80ZZ6KiImXBomssTKTVAHc1rB3PoiRCsnrgzcrlE5UREMC/6MiGMJTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 38CAF68D13; Mon, 25 Mar 2024 00:16:12 +0100 (CET)
+Date: Mon, 25 Mar 2024 00:16:11 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
+ steps
+Message-ID: <20240324231611.GB20765@lst.de>
+References: <20240307000036.GP9225@ziepe.ca> <20240307150505.GA28978@lst.de> <20240307210116.GQ9225@ziepe.ca> <20240308164920.GA17991@lst.de> <20240308202342.GZ9225@ziepe.ca> <20240309161418.GA27113@lst.de> <20240319153620.GB66976@ziepe.ca> <20240320085536.GA14887@unreal> <20240321224013.GB22663@lst.de> <20240322174617.GD14887@unreal>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <abb0af09-e9bb-4781-176b-b4b98726c211@huaweicloud.com>
+In-Reply-To: <20240322174617.GD14887@unreal>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sat, Mar 23 2024 at 10:11P -0400,
-Yu Kuai <yukuai1@huaweicloud.com> wrote:
-
-> Hi,
+On Fri, Mar 22, 2024 at 07:46:17PM +0200, Leon Romanovsky wrote:
+> > As far as I can tell it totally misses the point.  Which is not to never
+> > return non-P2P if the flag is set, but to return either all P2P or non-P2
+> > P and not create a boundary in the single call.
 > 
-> 在 2024/03/24 0:05, Mike Snitzer 写道:
-> > On Fri, Mar 22 2024 at 11:59P -0400,
-> > Yu Kuai <yukuai1@huaweicloud.com> wrote:
-> > 
-> > > From: Yu Kuai <yukuai3@huawei.com>
-> > > 
-> > > Now that blk-mq also use per_cpu counter to trace inflight as bio-based
-> > > device, they can be replaced by part_in_flight() and part_in_flight_rw()
-> > > directly.
-> > 
-> > Please reference the commit that enabled this, e.g.:
-> > 
-> > With commit XXXXX ("commit subject") blk-mq was updated to use per_cpu
-> > counters to track inflight IO same as bio-based devices, so replace
-> > blk_mq_in_flight* with part_in_flight() and part_in_flight_rw()
-> > accordingly.
-> 
-> Patch 1 in this set do this, so there is no commit xxx yet.
-> 
-> Thanks,
-> Kuai
+> You are treating FOLL_PCI_P2PDMA as a hint, but in iov_iter_extract_user_pages()
+> you set it only for p2p queues. I was under impression that you want only p2p pages
+> in these queues.
 
-Would've helped if I looked at 1/2, but please say:
+FOLL_PCI_P2PDMA is an indicator that the caller can cope with P2P
+pages.  Most callers simply can't.
 
-With the previous commit blk-mq was updated to use per_cpu ...
