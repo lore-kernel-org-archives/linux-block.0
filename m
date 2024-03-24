@@ -1,121 +1,95 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBCB749A
-	for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 21:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA053D962
+	for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 21:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711316934; cv=none; b=dozKA6yMoHRwYqCrldCBPnp+/u+nJqAm5FIKtkoxzJ76ikyXJZ1+m7OBNIBH426JaP9FG3q1JIBEJdGr6n7ANlZ6z1on+l3t5Q34m6X1C369ZmT54Xre2iRhCCYJAJSLwyFmdRo1JcFjwea+xim+VL+noS5H7duMs6LSKuIbLqs=
+	t=1711317454; cv=none; b=i31Xul2cQNoYNeJoyLsy3uRgpgwbGj7oydoWrqSOuycDf0t0ymzG3s4ZEnZuCJZvI846i8Vuj4Bcax1jhKv9WjWAg3cvbJjgVXnu1nFxv9oS4bnMugfxdZG/u8dj8K990z/5x1rycdF0tZRAGt0U6tZcyWmJhW+i5JooPeCbtQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711316934; c=relaxed/simple;
-	bh=3Ast2CrmJbetUoKupZJ0xPcufqlarszHYH7/2n/qlg8=;
+	s=arc-20240116; t=1711317454; c=relaxed/simple;
+	bh=BOkYCK2qQtPHq4L14VfaTwZ/r9VLhpWaboZSzmJjo0E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kaLOtBpnQDiqGRwXh42u9AHpu+HHXQqa1WjAj6pQIaSd+9IwrCBXkhY1eqFJKgUXbUR5V6gJm3B3OXhFw/pTrun+JeTxPZLdlNh5m6Ua1yOBeiLnmGJhOR2oWfXG8IbbMppH75Qny8kVkJXjAMIdzgxy4buTOXEa1tblWD8RJng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=EnUK64fW/z8eDp+eAduc/4B/fU/rRuC83RF+HKDOUF/u7ka13ZUpfw7XJklZE+BgmFYNMAbt2aMInQTQDLXP989wxD79bv35nIEjXq1K2eSm8s5b0fQlAShVPqpvogbZVtUnpLmf2ITQWePyC1/dMrpafGxewrjl9RozWk/KHPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6918781a913so33906146d6.3
-        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 14:48:52 -0700 (PDT)
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-430b870163eso45000711cf.1
+        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 14:57:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711316932; x=1711921732;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tQClB/OlLB3Zz9sLCishbIZaPtgYfBjnjrx1cp3mZb0=;
-        b=EqAGEpG6cpEqKlRHubV2usV4O6AwwAuGf3nZUu8mxlK6I4sACBLJEyHGOgkrjVlR67
-         iRzZ6Di/TXdleZZ6fKlZMck7Sn82FmDEYSY4FgKmuTpQeTQuwnPphE42KjyJ3jfP4Iez
-         mZqMen7/KIgoAClt04kfxHwzn429W8qSRtC3Dxpyp0XcvPM03ft8kCFRhlbLTbOwC3OX
-         MQE5yH43/j6FLAnpuFMbjDD9dQiSj6qno6iwqjcb57MaURpymoDP/Aayyhb8W6MFduiy
-         GnDaIpDmNMQ06shz1itpehgSDXRjn+3IdALCGTmD1LKcwzi5eI54nBvhpelqccUqoVY5
-         n1fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeR8ePUMtNtZH2tx7OHC/IOArbM4jKeDmZoUmj2XG0Nd/twIfdqHgUTBhvdZOn9xR/LwMXosAASvJ/l2lUaOC3q78m/2JA5Y+Icuc=
-X-Gm-Message-State: AOJu0YyvyN69QjePjpR4o8W8w5R+OWznzu64Fc4sPD2yacVHSTE7dGIU
-	qLVB5LpHDeqH8nrsuLqrxITK7w/Qx04nSKq2R8UuB7nC9EN8TPKJvFfnDaU50w==
-X-Google-Smtp-Source: AGHT+IHwxCvzR6MAh4bjzMWcr+MSZGB7sFIjse/JkghXPSKnNyRC4kYYtoUtnWn8o5xc+CM0AhHM9w==
-X-Received: by 2002:a05:6214:1308:b0:691:e21:736c with SMTP id pn8-20020a056214130800b006910e21736cmr7131454qvb.30.1711316931864;
-        Sun, 24 Mar 2024 14:48:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711317452; x=1711922252;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aW1uYlxzmK0CTtcm9QtkmtxOoxLLB7jXV7c/ndwCr2g=;
+        b=dBZDGfBIIc2TzovTpKw/1J5/hYW/OUWkk5wecGa9sUJwR1/HwxzDukzWLKxRvE4sOe
+         uUQr+NoKuFhd3M/+TVc3IHdSY0S4EkhWlTvSo28vCiBe3sY7V2mhAOVN8o3O0ZkvaiYB
+         pUhgXlaPzG29hH4e9mTD/asTuQCCbPQUjk6p+Sb1ZREE1szowGLm8BJFsL0V4Y8NgLkk
+         hRzfVrR9X2bFNPeCYTpumeozjE/32BIVEaId6ieY2M7sfpW8h0wtzt9GhNKQRhZxoPPP
+         JV1Nkf/ZWjtlNyQkUbsJ3OGjBhRFpejDNni43IubcxV1YEaoRI9JK8CsP07pkcVLgXj+
+         7P+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ9/7VfgFAIa51ot0rdUQsxWtQX0sbyBNsVt2903YY9XsKEAwkdqHXkdIKlHsRvcdZY/8P9SsYolN7nIdrEQxn6FMHc82f6pbc+zM=
+X-Gm-Message-State: AOJu0YxCCB3kMWN3Na5yA63PxQcO9fzOMng0AvmSCgqp8eDxmCJ6LWWf
+	DClb+CqoXLTtHfpmMQrVST4QcwBQkjWUDAK4esmAZ3R24q/tvtkbgV8h9gcRkQ==
+X-Google-Smtp-Source: AGHT+IGGMBnbwmlHZ1ViBESOWV4M56q0VRQdJ2XXd4ey16lzyfQzewIYJf/bLSJRR3q4cCsSThMoSQ==
+X-Received: by 2002:ad4:5aaf:0:b0:696:3e05:9c21 with SMTP id u15-20020ad45aaf000000b006963e059c21mr7295157qvg.18.1711317451878;
+        Sun, 24 Mar 2024 14:57:31 -0700 (PDT)
 Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id i11-20020ad45c6b000000b0069068161388sm3388777qvh.131.2024.03.24.14.48.51
+        by smtp.gmail.com with ESMTPSA id h14-20020a0562140dae00b00691732938a8sm3410147qvh.73.2024.03.24.14.57.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Mar 2024 14:48:51 -0700 (PDT)
-Date: Sun, 24 Mar 2024 17:48:50 -0400
+        Sun, 24 Mar 2024 14:57:31 -0700 (PDT)
+Date: Sun, 24 Mar 2024 17:57:30 -0400
 From: Mike Snitzer <snitzer@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: [PATCH V2] block: fail unaligned bio from submit_bio_noacct()
-Message-ID: <ZgCfwkb8wMKBcshm@redhat.com>
-References: <20240324133702.1328237-1-ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
+	mpatocka@redhat.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 2/2] block: remove blk_mq_in_flight() and
+ blk_mq_in_flight_rw()
+Message-ID: <ZgChym1BEpxUm_bL@redhat.com>
+References: <20240323035959.1397382-1-yukuai1@huaweicloud.com>
+ <20240323035959.1397382-3-yukuai1@huaweicloud.com>
+ <Zf79w4Ip3fzSMCWh@redhat.com>
+ <abb0af09-e9bb-4781-176b-b4b98726c211@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240324133702.1328237-1-ming.lei@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <abb0af09-e9bb-4781-176b-b4b98726c211@huaweicloud.com>
 
-On Sun, Mar 24 2024 at  9:37P -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+On Sat, Mar 23 2024 at 10:11P -0400,
+Yu Kuai <yukuai1@huaweicloud.com> wrote:
 
-> For any FS bio, its start sector and size have to be aligned with the
-> queue's logical block size from beginning, because bio split code can't
-> make one aligned bio.
+> Hi,
 > 
-> This rule is obvious, but there is still user which may send unaligned
-> bio to block layer, and it is observed that dm-integrity can do that,
-> and cause double free of driver's dma meta buffer.
+> 在 2024/03/24 0:05, Mike Snitzer 写道:
+> > On Fri, Mar 22 2024 at 11:59P -0400,
+> > Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> > 
+> > > From: Yu Kuai <yukuai3@huawei.com>
+> > > 
+> > > Now that blk-mq also use per_cpu counter to trace inflight as bio-based
+> > > device, they can be replaced by part_in_flight() and part_in_flight_rw()
+> > > directly.
+> > 
+> > Please reference the commit that enabled this, e.g.:
+> > 
+> > With commit XXXXX ("commit subject") blk-mq was updated to use per_cpu
+> > counters to track inflight IO same as bio-based devices, so replace
+> > blk_mq_in_flight* with part_in_flight() and part_in_flight_rw()
+> > accordingly.
 > 
-> So failfast unaligned bio from submit_bio_noacct() for avoiding more
-> troubles.
+> Patch 1 in this set do this, so there is no commit xxx yet.
 > 
-> Meantime remove this kind of check in dio and discard code path.
-> 
-> Cc: Keith Busch <kbusch@kernel.org>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: Mike Snitzer <snitzer@kernel.org>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
-> 	- remove the check in dio and discard code path
-> 	- check .bi_sector with (logical_block_size >> 9) - 1
-> 
->  block/blk-core.c | 16 ++++++++++++++++
->  block/blk-lib.c  | 17 -----------------
->  block/fops.c     |  3 +--
->  3 files changed, 17 insertions(+), 19 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index a16b5abdbbf5..2d86922f95e3 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -729,6 +729,19 @@ void submit_bio_noacct_nocheck(struct bio *bio)
->  		__submit_bio_noacct(bio);
->  }
->  
-> +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
-> +{
-> +	unsigned int bs = q->limits.logical_block_size;
-> +
-> +	if (bio->bi_iter.bi_size & (bs - 1))
-> +		return false;
-> +
-> +	if (bio->bi_iter.bi_sector & ((bs >> SECTOR_SHIFT) - 1))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
+> Thanks,
+> Kuai
 
-You missed Christoph's reply to v1 where he offered:
-"This should just use bdev_logical_block_size() on bio->bi_bdev."
+Would've helped if I looked at 1/2, but please say:
 
-Otherwise, looks good.
-
-Mike
+With the previous commit blk-mq was updated to use per_cpu ...
