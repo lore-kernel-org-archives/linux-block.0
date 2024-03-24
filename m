@@ -1,99 +1,95 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CA717C8;
-	Sun, 24 Mar 2024 02:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F118831
+	for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 08:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711246281; cv=none; b=tJKGz2jwVwj5tDyYc3Ibyc7HgBeYH8qpKaxbuwDWoimNyYMhogx7DUOhBi5rtbCnKyk8FXmS+WIFHSluSCZU2r6t18eui2kXP9fx763GXjopV3pbyGteKpeU/nk5YFSTecMCYr/mXQYLW7BYO0KpKVfQc72O7s0lpywPkJ+T/po=
+	t=1711267395; cv=none; b=GxU/MiwzO/SyoSF4m8o6IOVMgQkFPlDDVlZ1XGxT79bHPenCBJhZlSm/OFMCq8PZHyA3V0JjcHy2K6rYIB0ih5hJI/WpbKJnunT/qRS2d5+SP5HU0+IfswX69NZ0FDyLpDsg6hVFEKqWXe1tesK7FnlgzlXX4k3fyJg6UETzbII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711246281; c=relaxed/simple;
-	bh=NDITpm+Io5eF73wa40dDzJ4n6hWGDX3M2JytLekCKDc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=PCr8slMkFFMyVazJyhm6zzzyUPzs45weePZhse/4xwGj0XTZZRc9tstVd1urzYzM+aR3Ykaf7BQoUByfpojD/RcXoj7AHdlZ/q5zMhwtLxvniSmr2fPWkxE1Ck1LsnOotzzD/rsC9KUcZkilZKttsOnewwCRbSLcqMWe4MgZ+b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V2KL63s7Sz4f3jYg;
-	Sun, 24 Mar 2024 10:11:10 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 7C7E91A0C00;
-	Sun, 24 Mar 2024 10:11:14 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgDHlxDAi_9l6YOUHw--.39150S3;
-	Sun, 24 Mar 2024 10:11:14 +0800 (CST)
-Subject: Re: [PATCH 2/2] block: remove blk_mq_in_flight() and
- blk_mq_in_flight_rw()
-To: Mike Snitzer <snitzer@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org, axboe@kernel.dk,
- mpatocka@redhat.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240323035959.1397382-1-yukuai1@huaweicloud.com>
- <20240323035959.1397382-3-yukuai1@huaweicloud.com>
- <Zf79w4Ip3fzSMCWh@redhat.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <abb0af09-e9bb-4781-176b-b4b98726c211@huaweicloud.com>
-Date: Sun, 24 Mar 2024 10:11:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1711267395; c=relaxed/simple;
+	bh=65S+d45kVYZvk0Qta65nEn3nPVBb4+ElYSARNub73tw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LHeZW5hj8Zg+IubjjxNI9GLbqwHuJTZ/VJrH9mdf5ZXn77bTQNsPxFlt1oQYEvW7Vfx6yT+VqIoITFTRcgqTrjtTxtuP1OkPZ6VEakS0N/sMir8DUF16HCb7uuN7vmJQoU0xXHGXXbNti/7JRQCfBOVAe6GQzhSv+kp1iN8jkWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W9DnCUec; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W9DnCUec"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711267392;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UkH7axQg1FEwje/Ll8aBk0BQmG+q/xLnYe921Xz2l0M=;
+	b=W9DnCUec1Xqajhgn0RVybd/IHGYK81eA120GkFyIpv8/Ta4EbQLu6PBmzyjC/GTqH+yLZ2
+	d+pMzl+B5pcF4RwdxJxM1VyLNIbVNJtzNqD+K1JtF4M56ZLFRNfzVSgIIUMTXah3Jsa02j
+	SH2NJy5NSOwBBqSJlCnexmx1yGBrFJs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-412-ZCYTEYcEOii1TZxjTT-2YA-1; Sun, 24 Mar 2024 04:03:08 -0400
+X-MC-Unique: ZCYTEYcEOii1TZxjTT-2YA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 61EF7185A781;
+	Sun, 24 Mar 2024 08:03:08 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C05D5492BD3;
+	Sun, 24 Mar 2024 08:03:04 +0000 (UTC)
+Date: Sun, 24 Mar 2024 16:02:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: block: fail unaligned bio from submit_bio_noacct()
+Message-ID: <Zf/eMPDG2uotSg4M@fedora>
+References: <20240321131634.1009972-1-ming.lei@redhat.com>
+ <ZfxVqkniO-6jFFH5@redhat.com>
+ <ea8a13c-ee40-47f9-a7be-17b84bd1f686@redhat.com>
+ <ZfzoC/V07nExJ+0x@fedora>
+ <ZfzvSguRii37MErS@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Zf79w4Ip3fzSMCWh@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDHlxDAi_9l6YOUHw--.39150S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xw4DGF4Dur17tryxAw4xJFb_yoW3AFX_ur
-	yv9a4UJ3W7JF1aq3WUGF1fZrZrG34fGrZxX3y7XFWUAr1kXFWSgFs5Kas7uF45Aa1jqF1S
-	k34ftF4xArW2gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZfzvSguRii37MErS@kbusch-mbp>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-Hi,
+On Thu, Mar 21, 2024 at 08:39:06PM -0600, Keith Busch wrote:
+> On Fri, Mar 22, 2024 at 10:08:11AM +0800, Ming Lei wrote:
+> > On Thu, Mar 21, 2024 at 06:01:41PM +0100, Mikulas Patocka wrote:
+> > > I would change it to
+> > > 
+> > > if (unlikely(((bi_iter.bi_sector | bio_sectors(bio)) & ((queue_logical_block_size(q) >> 9) - 1)) != 0))
+> > > 	return false;
+> > 
+> > What if bio->bi_iter.bi_size isn't aligned with 512? The above check
+> > can't find that at all.
+> 
+> Shouldn't that mean this check doesn't apply to REQ_OP_DRV_IN/OUT?
 
-ÔÚ 2024/03/24 0:05, Mike Snitzer Ð´µÀ:
-> On Fri, Mar 22 2024 at 11:59P -0400,
-> Yu Kuai <yukuai1@huaweicloud.com> wrote:
-> 
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Now that blk-mq also use per_cpu counter to trace inflight as bio-based
->> device, they can be replaced by part_in_flight() and part_in_flight_rw()
->> directly.
-> 
-> Please reference the commit that enabled this, e.g.:
-> 
-> With commit XXXXX ("commit subject") blk-mq was updated to use per_cpu
-> counters to track inflight IO same as bio-based devices, so replace
-> blk_mq_in_flight* with part_in_flight() and part_in_flight_rw()
-> accordingly.
+For REQ_OP_DRV_IN/OUT, only the real user IO command may need the check,
+and others needn't this check, maybe they don't use .bi_sector or
+.bi_size at all.
 
-Patch 1 in this set do this, so there is no commit xxx yet.
+> Those ops don't necessarily imply any alignment requirements. It may not
+> matter here since it looks like all existing users go through
+> blk_execute_rq() instead of submit_bio(), but there are other checks for
+> DRV_IN/OUT in this path, so I guess it is supposed to be supported?
 
-Thanks,
-Kuai
+This patch focuses on FS bio, and passthough request case is more
+complicated, and we even don't have central entry for real user pt IO
+request only.
 
-> 
-> (I'm not seeing the commit in question, but I only took a quick look).
-> 
-> Mike
-> .
-> 
+
+Thanks, 
+Ming
 
