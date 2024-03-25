@@ -1,196 +1,214 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E963B149DEE
-	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 02:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711332865; cv=fail; b=P2VE49VJEQb27V4r1Lr8BsKCXyA/b2wttyA2b6YpVMWlt1zsfoC9J6jGxF1q3VnJv5vDhjXR9Z/IexGm9lCYeaMcwRIItO9GOtsYUf1n2lK/grnMTRkRUkoE4tZanzp5WVVaa/NmbAiZY5wz7lrkMSXyxbcV8yGFrh4RC7ERa18=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711332865; c=relaxed/simple;
-	bh=uNC6WR+ZaorGaW8kYW8AVdrxzRjdSw2GIE01g7q27WA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=usdajzRWQNZ782UY1xosGFdpeo59zQT3MPofVGo88g4wwzgQiwQB7ILvr7yKrY0CybFO1y+OLMRAI967aY0ndq65KuIriR/mFS/jZ9Grao+6swQm9q0OLk2Y6/JKB/6y/JU6TkmPKE856yR05awd6d2BJ2zTy9XMdXjGz1IU7ZM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=SwQ0EmCc; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=IGZqQg91; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650F2155737
+	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 02:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711333258; cv=none; b=gN9UHlqCPbWOFMWdax1Jc0X1p4GOPihmjZhZd5+brN9GEFGfnNc2+8OxrMGKlP3Pl9gcQefdnE+OuA5eSGp59T2/SVbP3RRucuZEAZpNdqp6BGI1vbzcUj62x/JpftY0iWvLuUKYNsrJWFhSrA6bm6v1AGs5KdK0M7jYWPTIrro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711333258; c=relaxed/simple;
+	bh=a+5IO4bzkKk2FkrhKzrSPkAfIMWaw9+PBv6OhA8Vg0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pK5iXiDvB/dltBlXvb0+DmcEUnCiwQRycL32PeEz5T1Q2dQKLh+FsQ+ry6PlS4zmzkxgEtdB2H6wvwM3AGy7PF8pl2AYhjbwosrXLTbcm5yaANw/zk4Zjf3ar+IPCchJtzOEs2hnS4tL/bug8WWVf++GDwpJoWsyvnhm/fXY0eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=WILBVUsc; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SwQ0EmCc";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="IGZqQg91"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1711332864; x=1742868864;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=uNC6WR+ZaorGaW8kYW8AVdrxzRjdSw2GIE01g7q27WA=;
-  b=SwQ0EmCcOe7BEGo88gHoooqq5Xq+yHmKeGTY1CVO0ZcnBevOSPv41oW1
-   Rj7mpUcKnyBWWa/XrHmDjHRjUtRaruxKSQflvXxVxIhaFXArQ6ORMp4Oy
-   aMNELT5pjKf/dcI9UgrLrr7fl84cA0GUVJ7X7ZOW6RlHXDzou2fDRDOx+
-   KM0LwStOOWBin7EJPv7b2NbB7WHSxwZ5z2cELG6gJcQlsPv+i0T+AJQGR
-   6JNcibwp/gJnbT5ZhiZky14coYHoEGJO8ZOtSGkY3JX8i9h+VU7Krwm0n
-   OStcJv0fd7+dZe68NNJHgEgBZKUhRDKV4pnnQHKvLrl1Bpgonu8m2Zoa/
-   Q==;
-X-CSE-ConnectionGUID: qsrYIfDbRSaa//kkHAkB7w==
-X-CSE-MsgGUID: 1S1J7XAySgywreUwJW9FKg==
-X-IronPort-AV: E=Sophos;i="6.07,152,1708358400"; 
-   d="scan'208";a="11878584"
-Received: from mail-bn8nam04lp2040.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.40])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2024 10:14:16 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WqWuCOcMAfbr/mnIteJm5pZliKivN+vr08jLyTNjLgLAlJS49Lf6wznFu9scYLeSaJtmHLAKM2Rjdexmy6hoSoV9w/DkluBVp3jrWJI0bjr1rLODzS9AwxJjL+OXgj7+CnamGpMpST/dJ1dOqB65Oxsi1GudePfqKev4VZYjpYTb+eTQAPZGW4qstqSk7x7whI2wVUeBQ8FqY+Dr1ka6AH3shO+/eZtBrtX3s2k16yEQlvfCIRO4X0GZfCfds7W2uSmfyjoC4cGF2bB6y1joF0vjQonyZ4E5oCCoqJzs0pGLqX9KiLDqGBc5z+PkXMGfpEremOXxr8BshwkVdwswNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0YtnQkOhPWODY3p7Jv132YanV+riTbbVccwQcOpB2Ck=;
- b=l650zuXak7yITz7jjnTkc35jz8NyvErLjerVlThYXemfXrGqncHlkohlHj5Rxf6q/Jc7uVt7K3lkQjuTDQJqTXzh9qhQ3SZH2JKytjdzrHHPaGJjIx3SkWPSA7EFt6RKAR5nboIFb34+S2Qiqw+35Pff4dGfYArmXEuTr1NLJuOggEYEYM5eFN+f6vT0wGkcHVKJF8qf5QDtU6JeIy9kWgmaeDyCziuAuTKyD0CxyJcwooQTcKyR6pNBHu/3vJo9SLfDjH8c8Uux6NmVECzfhUCUO+79I/5sGesE3ly8RP8TMOCj1mh90qmPEtsbW3Kp3k9lPRpvpSTP89y4WNlQWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="WILBVUsc"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33edbc5932bso2777820f8f.3
+        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 19:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0YtnQkOhPWODY3p7Jv132YanV+riTbbVccwQcOpB2Ck=;
- b=IGZqQg91bacsERq0GOQz6EXb1Vxf7tgEG8Kz1403HieJrHqdAHcfyTgZV6Qa8RVeY6WMTgRQe/+E9nP8QgNQiYiyBXxONVYU0EA0MDQ3AKCCPvBTvMjMdlWgk72O8O0kdyrgSa/ToTbUhGOfZo5eK9uViVZB00GJwubeGwDMrJ8=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DM6PR04MB6716.namprd04.prod.outlook.com (2603:10b6:5:22a::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.31; Mon, 25 Mar 2024 02:14:14 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::c75d:c682:da15:14f]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::c75d:c682:da15:14f%2]) with mapi id 15.20.7409.028; Mon, 25 Mar 2024
- 02:14:14 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Chao Yu <chao@kernel.org>
-CC: Yi Zhang <yi.zhang@redhat.com>, linux-block <linux-block@vger.kernel.org>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-	"linux-f2fs-devel@lists.sourceforge.net"
-	<linux-f2fs-devel@lists.sourceforge.net>
-Subject: Re: [f2fs-dev] [bug report]WARNING: CPU: 22 PID: 44011 at
- fs/iomap/iter.c:51 iomap_iter+0x32b observed with blktests zbd/010
-Thread-Topic: [f2fs-dev] [bug report]WARNING: CPU: 22 PID: 44011 at
- fs/iomap/iter.c:51 iomap_iter+0x32b observed with blktests zbd/010
-Thread-Index:
- AQHaYovQw4Cp4i7GhUK8xyPo7C3fjLEfp86AgAAQ4ICAAtxGAIAQ9nqAgAAi6wCAAE15gIAJLoeAgAFZQQCAAJQmAIAH7J0AgADqy4A=
-Date: Mon, 25 Mar 2024 02:14:14 +0000
-Message-ID: <l7n5vbvpfmeutotnznxubhdr3migk5kpxgm6j5n265dnfgdtzo@iod4gcsfy5om>
-References: <esesb6dg5omj7e5sdnltnapuuzgmbdfmezcz6owsx2waqayc5q@36yhz4dmrxh6>
- <CAHj4cs874FivTdmw=VMJwTzzLFZWb4OKqvNGRN0R0O+Oiv4aYA@mail.gmail.com>
- <CAHj4cs_eOSafp0=cbwjNPR6X2342GF_cnUTcXf6RjrMnoOHSmQ@mail.gmail.com>
- <msec3wnqtvlsnfsw34uyrircyco3j3y7yb4gj75ofz5gnn57mg@qzcq5eumjwy5>
- <CAHj4cs-DC7QQH1W3KSzXS8ERMPW-6XQ9-w_Mzr1zEGF7ZZ=K3w@mail.gmail.com>
- <d6vi6aq44c4a7ekhck6zxxy4woa5q7v5bnvn5qmad7nqk7egms@ptc72tum4bks>
- <gngdj77k4picagsfdtiaa7gpgnup6fsgwzsltx6milmhegmjff@iax2n4wvrqye>
- <f4f1cfac-8520-47a1-ad18-b9922aa0545d@kernel.org>
- <jpgro32y5r3mpyh24hoqnwkbcg67twbmcxeicoa5qt723u7ehk@4imddarhtt74>
- <cd11bff9-46cc-4148-9dcf-4087e1621985@kernel.org>
-In-Reply-To: <cd11bff9-46cc-4148-9dcf-4087e1621985@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DM6PR04MB6716:EE_
-x-ms-office365-filtering-correlation-id: bad69cd3-dd2c-46b8-28d4-08dc4c714491
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- GfA1XCSTdqWgnDCIHy10Ttxp920mzpqC7Q6PScKNrpCjCX6qXRVX9z+5saKMzCU6U3i8v2ROK/gwlIKg9u167LgI/8GFJeHgfxf+rxygOcrGs+NfeUNDuUFJyC3FbsqpjVBjs0xdmzKA4NfpeQpidjXNejNG5fFozdITFRpTWUP5Yf0RjSVr3ZF89b1gJelFziVdXaLhAOY9o5PVt+/hSRKNf/5u7SyBLiqv862aS8sU4Jt6k3+Xk7hGACtcmXLMYqFQr06SFwy/B08PTm5+VQlnboo7ncpCm8AZjWTA1Xf7bWOSKSTbkrO0wigUTj6duyJP/xU2nFX4PxitjH/hMqa8Czo+jm0GPckCxpGAGhFYMzT6AJ7XGlNxU+qloQiplnGnX6KleD8vrjT4mr0AueGs/QpP5z4y67ySkyEuX0NE9mjch2dKlWd4HlWh6e0FN5AB1yQQznWh1AmiInTM53ilCevdPbkNakBAwQHqgef/0+w8r1kiP29xChPR//OSo1cmoFYOLhUYH4DosWFG39TF5kGerrQ70vUSLNPKaWPh0n83xXyl5eBoXqSSOI6zE4iXfu9dMgX8pltFs5K8JbipDm0GEotSbYPawLGWAORDY5qODY0lroW0HLEk/RTWQscgmOkLZymF7PQ1hh+DmeV9oEQDszweP0NQNoCt2FBY1v/ppIadnuAEJ/AOZQjbKJf8+W4gnzYP1Tse0XYuAg==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Xwl+nauyK1IbatAF2xkTqf9Cb300DYbPFjojn37FI+WbAASZlB4EHkE05u5/?=
- =?us-ascii?Q?oWCSHPb7vIe7+v8TWYFImgnMDU4vKa113csmPwgjjdaDz2gijBqV57NUtWKR?=
- =?us-ascii?Q?RJ3QRpirgAWMUsplcrlr2NxqW01LCF4PLJ8W2bVTFsFu6bTYguKGvd8ax5P/?=
- =?us-ascii?Q?/RGFzBmQhzqGu1duNAOkY2XbWzTVZmzPJSJbr9OczBpm3HKhuqBSXGUjkbKw?=
- =?us-ascii?Q?RMFRbSnq8Jrf/BnUtEsmNUliYyZEzOGUgcmtiP4IgO+A+LcwXlaDXvkgu9gp?=
- =?us-ascii?Q?DH1VlOXq4r7vjTtu9mWAdueYVhL1lriw+68H5n57GY/iapweYQmQkALUecuK?=
- =?us-ascii?Q?74Clak4Pm9RzsMSJEgOiszxeVCgM9LWdYXeII+evN7tAVpN8ylpKUOt332EA?=
- =?us-ascii?Q?5kbkwjr1zvdSH2yQ9mZyIj1c5WoW8cO0aMWmBmTujO/c/bBKjmH4w0vq70a6?=
- =?us-ascii?Q?bUkQNNtesxlngXuAamtbQ+PetrgAz0bf0a85PROiu+KWm/FfF1T7cqAnvxQN?=
- =?us-ascii?Q?RdaLv6e9i3zsrxfJTMt7+2BpBcJr3fJVg/5Ji3IiTAYO64RQNuO3mphdz3XF?=
- =?us-ascii?Q?0+UO4uJFarKlDwDVpJeHNRVP7ckO45QbebfErQ4CsiY7pO/+9GEiYUhbD2Sy?=
- =?us-ascii?Q?mnuEz++rQfMDlxmGute6pPucn5SLLZ8oowImFqeuvbuVgVMCacFVmHQ3pLc9?=
- =?us-ascii?Q?58xAn24R7PpnmXhcv3l98hmMt2rGCVy1SdsCQlNxPgTfSj8U+uGIRRpaweVC?=
- =?us-ascii?Q?b+rGkX6GGwKMNIMk8fIqvMUOsvF0/7JyUPsnXm/Bl9EjoqPPqy6Fxk8JUQQb?=
- =?us-ascii?Q?36f1qlSBCSr/MLiWH4wPv0PcVOLT/Vu9dVItpYtx4sfKfEbR9BXbJ+jTNRUP?=
- =?us-ascii?Q?uQss3WelfOnbhIIDbcLu3eOktg86k2vCusAZBA7fC3BH9MkvNFI15PbvGio5?=
- =?us-ascii?Q?gDVmQPs3tZaGkxuZQptChgrjZ2ppx46k05BN2j/HZCOL6XCjyI4A6rdvXP6j?=
- =?us-ascii?Q?zyDNDThOatrUyWT5QKrcPD+gpJ4YABqzVSWqrCmmcpAqbEPTTXYW4iWbGqs8?=
- =?us-ascii?Q?WJO9xCjxcq9Sl+OscVotcoxXgNpViDn5wFJO7AVa4eIVUUBNt+3Dl19jd3in?=
- =?us-ascii?Q?GAVmN15lAqSw41SSKkrIGshpryDCx38rBvxT6Gt1TQmsXT2UL1K7Z7HuePmp?=
- =?us-ascii?Q?26+y0GsKeCMbBjFEwen6P/AeFY1HFWbspMXu8IrbRPtNAnzvB9MseMgxYGDk?=
- =?us-ascii?Q?uq8Fz+s6Ss+6/lew0l5N+mFKVCWsXP8K1mzUYan7uy/6lInuRoqgbQSxZcpt?=
- =?us-ascii?Q?x7XwT794/5F7gh8cmdgM0ilL0k1q4MiRqb+OLIh68N489hbX12/qj5Z7FtlR?=
- =?us-ascii?Q?HGbhKZbzs/YmwU4vhhyR4ekVyi/AsCfBBTcINOc7xAEDxqjUaidp0rg1l9Zj?=
- =?us-ascii?Q?16cj142I9X2TQ5J1t9eKK4CNy+W83ZAZLcmVvJGo7uX6yTFneiWzvmV3DQeU?=
- =?us-ascii?Q?4rbWI34FG0GwSzuYcuydr45mHCpFCdHIOwb5DWKD14Nl/96qzy4Fpua7C/4p?=
- =?us-ascii?Q?+IpyciE0NoYLi8OYH6lin16imct370mHtXQ/UPhfxIFq+kO8hy56p6tW5vRZ?=
- =?us-ascii?Q?FtWQI5ElQpz3SsXCwEIwwuc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <DD14CA048A6CB24684715931F2E01C4E@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1711333253; x=1711938053; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3KYX5sN4/DQ0Ca+C7M+8tiNgEQ0vWfJgF6O4xHUhDV4=;
+        b=WILBVUschp4CuVlN7IxfSSbcekKRUxY843c89N9f2TXzUAxcWfnvMLRYTeQyhll7UU
+         fCEgVNTdjGNu3DzFmMDtsctqbTWpbgMTn73fXjf0alNQEHwUD41hmK3tVxa4UYRJOUo+
+         m/jg4z0sXsuTfv4Cipozh/mGU8iH2flLHKj5ivZ7iiFqKTN9oZGGDupI7GTCaF3AsQKD
+         d/WpSTOTL8kgJDsYCm7gB8gAlVcLID3ax6mFZVt/g0/v3Os0fepbMdbVh1OWrTCwlP9T
+         2Ze4VF067ykKFmEdba6UQSixO1BJ2zZ7/f2bY11gN9fFq8DU60UYMiz1wQ98k12imiTs
+         ijYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711333253; x=1711938053;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3KYX5sN4/DQ0Ca+C7M+8tiNgEQ0vWfJgF6O4xHUhDV4=;
+        b=o4WUTF06niJijuDH9VvMzqG/MhFThjsXrthezr3MO9B2QAWfHcrJ2dR+XRO56SWNMK
+         rlo81KRqrQGSJFKyVf8janohQvB4rm/crrWoGhtdVGJDPkCppMhizOFCOZCsIINf1k8N
+         36Nc3Vb/eKtIoy/erqz0uX/scC5colsZPHRarHOPZyZVRVSQpZxzbPHNz4/GZgm6OpF5
+         MRE6GkrcYTRhZksIZBw8THUCzcxY9JMlLlHFGJYCEvzTOUAkDUGCCO6rj+qH+Og5x6DD
+         6/hHnW711uf/z/xJTLKXrmw0iCVIKA8Qhqcz2/O0dd1uyCjbhkQhMi9oV7Ni1DrVCAg4
+         xAiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXrFcBRRZNP1zt5yfFDZmozbiUFGInUXBD2+ws/wjOHfYWG5eAuap073OoyUWaygE7abTtuA90U74evP/9Q2S2FuwJ5jlzyU5ccTmo=
+X-Gm-Message-State: AOJu0YxdJfa4LCtaZci+Hxaje8ZPCzlDTWRH65sFPG3etnh7NEVmVnGC
+	E4faNhE3YcVmm3wSXYUrBUw4sEQPvh94LJv8zOB5J8otcvPhZF9D6qCIrPER28Y=
+X-Google-Smtp-Source: AGHT+IEGylOZLmAkTa4hEo69V3BZPeCBsFyo1QAQu5pjIFuYSIkRj6IiZDL9UF3nVTOfhI5RA3UbGw==
+X-Received: by 2002:adf:f241:0:b0:33e:78c4:3738 with SMTP id b1-20020adff241000000b0033e78c43738mr3519996wrp.54.1711333253412;
+        Sun, 24 Mar 2024 19:20:53 -0700 (PDT)
+Received: from airbuntu (host81-157-90-255.range81-157.btcentralplus.com. [81.157.90.255])
+        by smtp.gmail.com with ESMTPSA id t17-20020a0560001a5100b0033dd2c3131fsm8095566wry.65.2024.03.24.19.20.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Mar 2024 19:20:52 -0700 (PDT)
+Date: Mon, 25 Mar 2024 02:20:51 +0000
+From: Qais Yousef <qyousef@layalina.io>
+To: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: Christian Loehle <christian.loehle@arm.com>,
+	linux-kernel@vger.kernel.org, peterz@infradead.org,
+	juri.lelli@redhat.com, mingo@redhat.com, rafael@kernel.org,
+	dietmar.eggemann@arm.com, vschneid@redhat.com,
+	Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com,
+	ulf.hansson@linaro.org, andres@anarazel.de, asml.silence@gmail.com,
+	linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+	io-uring@vger.kernel.org
+Subject: Re: [RFC PATCH 0/2] Introduce per-task io utilization boost
+Message-ID: <20240325022051.73mfzap7hlwpsydx@airbuntu>
+References: <20240304201625.100619-1-christian.loehle@arm.com>
+ <CAKfTPtDcTXBosFpu6vYW_cXLGwnqJqYCUW19XyxRmAc233irqA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	kgjM0/i/4VRf2w3DSY8kpmZFY+yrL5RjIaCE6brJOPUPykozI0s9YLjN5VmD1ZJ0fT2mO4D2p6QKR+Q3krlALHs14NsFr8MhpkPW0eT7iBPw1zQL7Z/4mgpt6teBXKioRz3am2PM+tsrlP28rbblKnoRXuPQ33TCt2kEY29B7MdJ5Tg4TpTrdM+SI7+qQileHuszjv0lZjkYdy3Ftl2SoIuXPha3+VMjKQBVH5vh9xzRxpV2nSDM66/hn1SGvG+WaE5ngD4oxYL6CJX82rocF4qxAV8s7Lqoq5/XTsZJ6P7VpN6M5cYu+hWI5NLJk8OqzLC1FDFzxwGtVjoNBw/jho0IYSxGixQH5HMRmalFaEeVdozUoBNH1iHu/LNEQm4CY0zcrnrZMR4Qg5X5Xgb7giCQW4lZvcmANuMUiA2Q3cEDewNYS9Yk95zbZX6I3E5lSNMe5+SxsVjgM0hVlX5Gaw96pLNY2ZOkCUOoby6UZ7RGg9wTmJazZPxQ8FrFZmf9MWCKR5lOhxBmG37UtFLbfmJTJrLItN3FXezaRJc+OBVpPgQClE4xei91RG/Hqoo/kQD2DLjCRaIZ72yx9YVOJP/0IEY9sAPi8QO+HmJaGE1IpgOuStr0mROScP40gLZB
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bad69cd3-dd2c-46b8-28d4-08dc4c714491
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2024 02:14:14.4917
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lsoS2GW1UU91t+9zHrjr+T5br2ffmJeHifcVN1AwP0eYT3GwtppaMBUxVSNGXFEJOln7ATX5pOuqUSAs2Lagntl8FRUnFW2v3wdXL0j24oE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6716
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKfTPtDcTXBosFpu6vYW_cXLGwnqJqYCUW19XyxRmAc233irqA@mail.gmail.com>
 
-On Mar 24, 2024 / 20:13, Chao Yu wrote:
-...
-> Hi Shinichiro,
->=20
-> Can you please check below diff? IIUC, for the case: f2fs_map_blocks()
-> returns zero blkaddr in non-primary device, which is a verified valid
-> block address, we'd better to check m_flags & F2FS_MAP_MAPPED instead
-> of map.m_pblk !=3D NULL_ADDR to decide whether tagging IOMAP_MAPPED flag
-> or not.
->=20
-> ---
->  fs/f2fs/data.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-> index 6f66e3e4221a..41a56d4298c8 100644
-> --- a/fs/f2fs/data.c
-> +++ b/fs/f2fs/data.c
-> @@ -4203,7 +4203,7 @@ static int f2fs_iomap_begin(struct inode *inode, lo=
-ff_t offset, loff_t length,
->  	if (WARN_ON_ONCE(map.m_pblk =3D=3D COMPRESS_ADDR))
->  		return -EINVAL;
->=20
-> -	if (map.m_pblk !=3D NULL_ADDR) {
-> +	if (map.m_flags & F2FS_MAP_MAPPED) {
->  		iomap->length =3D blks_to_bytes(inode, map.m_len);
->  		iomap->type =3D IOMAP_MAPPED;
->  		iomap->flags |=3D IOMAP_F_MERGED;
->=20
+(piggy backing on this reply)
 
-Thanks Chao, I confirmed that the diff above avoids the WARN and zbd/010
-failure. From that point of view, it looks good.
+On 03/22/24 19:08, Vincent Guittot wrote:
+> Hi Christian,
+> 
+> On Mon, 4 Mar 2024 at 21:17, Christian Loehle <christian.loehle@arm.com> wrote:
+> >
+> > There is a feature inside of both schedutil and intel_pstate called
+> > iowait boosting which tries to prevent selecting a low frequency
+> > during IO workloads when it impacts throughput.
+> > The feature is implemented by checking for task wakeups that have
+> > the in_iowait flag set and boost the CPU of the rq accordingly
+> > (implemented through cpufreq_update_util(rq, SCHED_CPUFREQ_IOWAIT)).
+> >
+> > The necessity of the feature is argued with the potentially low
+> > utilization of a task being frequently in_iowait (i.e. most of the
+> > time not enqueued on any rq and cannot build up utilization).
+> >
+> > The RFC focuses on the schedutil implementation.
+> > intel_pstate frequency selection isn't touched for now, suggestions are
+> > very welcome.
+> > Current schedutil iowait boosting has several issues:
+> > 1. Boosting happens even in scenarios where it doesn't improve
+> > throughput. [1]
+> > 2. The boost is not accounted for in EAS: a) feec() will only consider
+> >  the actual utilization for task placement, but another CPU might be
+> >  more energy-efficient at that capacity than the boosted one.)
+> >  b) When placing a non-IO task while a CPU is boosted compute_energy()
+> >  will not consider the (potentially 'free') boosted capacity, but the
+> >  one it would have without the boost (since the boost is only applied
+> >  in sugov).
+> > 3. Actual IO heavy workloads are hardly distinguished from infrequent
+> > in_iowait wakeups.
+> > 4. The boost isn't associated with a task, it therefore isn't considered
+> > for task placement, potentially missing out on higher capacity CPUs on
+> > heterogeneous CPU topologies.
+> > 5. The boost isn't associated with a task, it therefore lingers on the
+> > rq even after the responsible task has migrated / stopped.
+> > 6. The boost isn't associated with a task, it therefore needs to ramp
+> > up again when migrated.
+> > 7. Since schedutil doesn't know which task is getting woken up,
+> > multiple unrelated in_iowait tasks might lead to boosting.
 
-One thing I noticed is that the commit message of 8d3c1fa3fa5ea ("f2fs:
-don't rely on F2FS_MAP_* in f2fs_iomap_begin") says that f2fs_map_blocks()
-might be setting F2FS_MAP_* flag on a hole, and that's why the commit
-avoided the F2FS_MAP_MAPPED flag check. So I was not sure if it is the
-right thing to reintroduce the flag check.=
+You forgot an important problem which what was the main request from Android
+when this first came up few years back. iowait boost is a power hungry
+feature and not all tasks require iowait boost. By having it per task we want
+to be able to prevent tasks from causing frequency spikes due to iowait boost
+when it is not warranted.
+
+> >
+> > We attempt to mitigate all of the above by reworking the way the
+> > iowait boosting (io boosting from here on) works in two major ways:
+> > - Carry the boost in task_struct, so it is a per-task attribute and
+> > behaves similar to utilization of the task in some ways.
+> > - Employ a counting-based tracking strategy that only boosts as long
+> > as it sees benefits and returns to no boosting dynamically.
+> 
+> Thanks for working on improving IO boosting. I have started to read
+> your patchset and have few comments about your proposal:
+> 
+> The main one is that the io boosting decision should remain a cpufreq
+> governor decision and so the io boosting value should be applied by
+> the governor like in sugov_effective_cpu_perf() as an example instead
+> of everywhere in the scheduler code.
+
+I have similar thoughts.
+
+I think we want the scheduler to treat iowait boost like uclamp_min, but
+requested by block subsystem rather than by the user.
+
+I think we should create a new task_min/max_perf() and replace all current
+callers in scheduler to uclamp_eff_value() with task_min/max_perf() where
+task_min/max_perf()
+
+unsigned long task_min_perf(struct task_struct *p)
+{
+	return max(uclamp_eff_value(p, UCLAMP_MIN), p->iowait_boost);
+}
+
+unsigned long task_max_perf(struct task_struct *p)
+{
+	return uclamp_eff_value(p, UCLAMP_MAX);
+}
+
+then all users of uclamp_min in the scheduler will see the request for boost
+from iowait and do the correct task placement decision. Including under thermal
+pressure and ensuring that they don't accidentally escape uclamp_max which I am
+not sure if your series caters for with the open coding it. You're missing the
+load balancer paths from what I see.
+
+It will also solve the problem I mention above. The tasks that should not use
+iowait boost are likely restricted with uclamp_max already. If we treat iowait
+boost as an additional source of min_perf request, then uclamp_max will prevent
+it from going above a certain perf level and give us the desired impact without
+any additional hint. I don't think it is important to disable it completely but
+rather have a way to prevent tasks from consuming too much resources when not
+needed, which we already have from uclamp_max.
+
+I am not sure it makes sense to have a separate control where a task can run
+fast due to util but can't have iowait boost or vice versa. I think existing
+uclamp_max should be enough to restrict tasks from exceeding a performance
+limit.
+
+> 
+> Then, the algorithm to track the right interval bucket and the mapping
+> of intervals into utilization really looks like a policy which has
+> been defined with heuristics and as a result further seems to be a
+> governor decision
+
+Hmm do you think this should not be a per-task value then Vincent?
+
+Or oh, I think I see what you mean. Make effective_cpu_util() set min parameter
+correctly. I think that would work too, yes. iowait boost is just another min
+perf request and as long as it is treated as such, it is good for me. We'll
+just need to add a new parameter for the task like I did in remove uclamp max
+aggregation serires.
+
+Generally I think it's better to split the patches so that the conversion to
+iowait boost with current algorithm to being per-task as a separate patch. And
+then look at improving the algorithm logic on top. These are two different
+problems IMHO.
+
+One major problem and big difference in per-task iowait that I see Christian
+alluded to is that the CPU will no longer be boosted when the task is sleeping.
+I think there will be cases out there where some users relied on that for the
+BLOCK softirq to run faster too. We need an additional way to ensure that the
+softirq runs at a similar performance level to the task that initiated the
+request. So we need a way to hold the cpufreq policy's min perf until the
+softirq is serviced. Or just keep the CPU boosted until the task is migrated.
+I'm not sure what is better yet.
+
+> 
+> Finally adding some atomic operation in the fast path is not really desirable
+
+Yes I was thinking if we can apply the value when we set the p->in_iowait flag
+instead?
