@@ -1,223 +1,168 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2804E13C3DF;
-	Mon, 25 Mar 2024 09:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711359014; cv=fail; b=SPeVRuxSHeUy6aAJ4BcJs+Lfq/MeW5fKj3L+16c/wq8MmyWqFc+K+ZfF220mE/fB7lZSfnGGXmI/Dc9rIYHgH2AqkjeRtE6p49XEdQGtjCYOKku1MAoN+VdzsZQu3Lr1B4Jc04Zjfk8q1Ab7NGTRaUbNHcWJcDqHPN5T+T12dWg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711359014; c=relaxed/simple;
-	bh=lw5VqAdbwZr8RRkykZfjgCI2WEUwopmHMhvdDqa1Frc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MIKO3lfiEH35j+2wLnfDwlXrdnxMCnMGCcbejSo7+T2QKaDyYoAFmi0JpPt1pt+yigoqNIi4bkVs02tuhLQQasKqhs35IgLNtYpAvfDpZeeCK6juAML9r44cCOFw3auNE/xFHL3abVwL+CIBl/Vz8QUC1+POONOj9k1Liv6xK+E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=QplFjFgW; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=YItzt9jB; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QplFjFgW";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="YItzt9jB"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42P8qXP5027657;
-	Mon, 25 Mar 2024 09:28:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=Hx/C1Zegb0+T9phhOwLELzKCTyIZF2k+thwCFtbRIrc=;
- b=QplFjFgWF8bDvLnap9+leT+6nI8vYoCe9vuKjNxCvYERqcCH+NTSURMG6mLw14Kyef8X
- hGFVuS6fw5ZMzTmKeC24qWEgr23ojian34RhCkGctJxq265qXBwgojgfkGLX5D9coboi
- tULfJOPHcki+clJr5yhaKSJz9HgTGJj8UO8BLQnRCkpuSVBYR/yWreRncm81JSwsn7ls
- w0AcZYotVjJQ8qQH1kVwPUaKXF1Np/M1vI3/dld70IavZfnrhPfEVmn0rgpAARSBkVO9
- KuHHgSzdUrD6j++TR+oI7fsgikYWBDFmLbLCkBmk6HuCE0D9zD9hbxISLMOGoqrCb+VT 4w== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3x1q4dta0g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 25 Mar 2024 09:28:55 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42P9OsbQ033151;
-	Mon, 25 Mar 2024 09:28:54 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3x1nhbg88m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 25 Mar 2024 09:28:54 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zb6NpU+hkeRCmUwnehJffJIwOhFX1Q1JlSPYVn/KhsG2x2yKAajlF9MeCACCR9f0xYNlztIyVyhgdIEjja78auWKMf/8rkQuhdL8strM+pfR2Mdy73WM1VNkwVGCjgF9zkBEHqkSig+SNhZsYWmneVwG9vZ1yLZht8/XAROaEX0aLiXc7wxOmDUQATQxwnJcS8lKnW4Vbm8lclt1C4wsO+N/zxlzpg4kDREOZsNqy/j9wGAdJI5ca6a1XmehCyKeYIqLAF3+/AqjcXi5LF2hwGpttTTLMS7NfdNoc8Rx0kNBGrdo4yHXWuRq3gYhAVx6h2zI9uCFqZCAKJjr9qzOnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hx/C1Zegb0+T9phhOwLELzKCTyIZF2k+thwCFtbRIrc=;
- b=dis16m1ugufIJ0dthl82MbvlpeuVWEm9FNeG0p4XkUnD3x0e06/Fcbil92bWsIsM8PuUCCO3TLPI3+9n+VanRQ5c9jSap024JRZ0f+Ie5SxtR/yaU7/CcTg4Ka1kVp5y0CS6/Yd22IjczdZh2sGV1qO/Q9HQKe+lFWbgn1p1y/dnlGob9vNcGnpSDbVCcnKPBG2jNv1+9Bzo5ZGfwAF6oJ26o1pr7Bc2A4+MxUXP5eI6fukdskriA0zXiZNispqsuRQjcCgPGslvuZxv6pH9GO54NLO75nLf+JjOLxGw2ncq3f+cLTBQppZiVuK9IQuGOVANSJuxKG27gr1/JTKxZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hx/C1Zegb0+T9phhOwLELzKCTyIZF2k+thwCFtbRIrc=;
- b=YItzt9jBwuLzhA3MToO8V7FMgSHhK/pPA/V7LX8W4g3Pb9qJ+1mthN8EUqNlaswz0cqgQuoqvQWb+17qrCm/DQiarFHmp85rz6OKnO0j7LKrXn1ccKES23nHluays48xGne4M1oQwpmk8nsP1jjQUX35hTfkF2+Ru/Ioal6sEmA=
-Received: from CH2PR10MB4312.namprd10.prod.outlook.com (2603:10b6:610:7b::9)
- by BLAPR10MB5041.namprd10.prod.outlook.com (2603:10b6:208:30e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.31; Mon, 25 Mar
- 2024 09:28:52 +0000
-Received: from CH2PR10MB4312.namprd10.prod.outlook.com
- ([fe80::3dc4:7751:97e:42a1]) by CH2PR10MB4312.namprd10.prod.outlook.com
- ([fe80::3dc4:7751:97e:42a1%6]) with mapi id 15.20.7409.031; Mon, 25 Mar 2024
- 09:28:52 +0000
-Message-ID: <515ae87e-745c-42b8-8e1d-2697bf343c01@oracle.com>
-Date: Mon, 25 Mar 2024 09:28:28 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/23] block: don't reject too large max_user_setors in
- blk_validate_limits
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
-        Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-        "Juergen E. Fischer" <fischer@norbit.de>,
-        Xiang Chen <chenxiang66@hisilicon.com>,
-        HighPoint Linux Team <linux@highpoint-tech.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>, Brian King <brking@us.ibm.com>,
-        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        Jason Yan
- <yanaijie@huawei.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Chandrakanth patil <chandrakanth.patil@broadcom.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Nilesh Javali <njavali@marvell.com>,
-        GR-QLogic-Storage-Upstream@marvell.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-        open-iscsi@googlegroups.com, megaraidlinux.pdl@broadcom.com,
-        mpi3mr-linuxdrv.pdl@broadcom.com, linux-samsung-soc@vger.kernel.org,
-        linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
-References: <20240324235448.2039074-1-hch@lst.de>
- <20240324235448.2039074-2-hch@lst.de>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20240324235448.2039074-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR06CA0086.eurprd06.prod.outlook.com
- (2603:10a6:208:fa::27) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFC117F228
+	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 11:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711367497; cv=none; b=M/WSlORZgmmarQarbcuyI7mtlE79BWfrW5y8g6lSU/pDdsQcdg+cqW2QLctBl45qURxhPA2eIu9pYYWRIfApIEHun99Rg88uUjPcEP7lh6XGr4oviqXIi04CL2aAHzg6PYAlpH6b7PzTdT69C1/mfaBqMDMrhuYpWce63Vw+5Ag=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711367497; c=relaxed/simple;
+	bh=kpfw1Hggq2UoaSOxeNsMqMzOhmme72jPbvB7+uYkO38=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=XfJ4cZAEfVrVZ+I0wj7OZP8jearEQ6pu3TJGxgzAtUupKeROdpuIkWlpbjLFjv7Wrd9PNGJK7fRZaO5Q1BFV8VJFvCJ7Gv7Ps/NxzrhPE547lvz8PRmTDWKcNQp3z3vpGL5DiYVygDoft7jFdRsqOuzfrmis0h1LJ0DQ+2+GLok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4V3B984fD3z4f3jsf
+	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 19:51:24 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id C81D01A0BEC
+	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 19:51:30 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgAn+RE_ZQFm7X8kIA--.64532S3;
+	Mon, 25 Mar 2024 19:51:29 +0800 (CST)
+Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
+To: Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Cc: Matthew Wilcox <willy@infradead.org>, linux-block@vger.kernel.org,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240323-seide-erbrachten-5c60873fadc1@brauner>
+ <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <3594bd44-4c6b-d079-1209-f069353ccd58@huaweicloud.com>
+Date: Mon, 25 Mar 2024 19:51:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4312:EE_|BLAPR10MB5041:EE_
-X-MS-Office365-Filtering-Correlation-Id: 223a0081-2c75-4889-fc0c-08dc4cadf4dc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	zwxvBmdkfk1UdpwMA1/eh37HecbyQLLBkC4F934imKAXfUQblJ0Kd5o4oI7UQ0ALHpnxSaCCcWyiL6zr85TvvYgbSNpPz3hV1jng+51Y/nIfTfYIiO1bvE55G606bMpWJdXtNtv/yRCqZaQRyGquM9hFlpBVi9vsLocoskRusZTzfZicXTr7LL30d4G9Uwm/wpMGc4BdD9sVqXUg8U50hgH5cKZegRZh1rHI1o0tOxuuf/9AOyfD+3Tkz4GkjfJ6CCuzo1uZYkb2wzl1s+ZvIbl+RJdOnczAaASx6Gg7Di/RrdPNNMGhMFd3oaVuqQtHpgN3WTlytr2ROy0gOpFZtjjo1gbQVnFzdF3mLzVNz7nEaN1V1JVB+GMC79DoJjr1lbrxuouffrGUGT0VN+Fq4+8N95Xvh0y3wadmghxDlcs2qjFUsKxhm8b91qIKDO5ucTQAfMZyCIp10pzzyUVkCf4SVklJiKhMj39z/uiW6ViE55CrBG/bNXOguAky2zu/StPtjU4r9M5U9+X7BKyPlWSV3bSp8ujcsl02omwVczd9XPrhBmH5qWUb0dWagHB5orTuohidCruWR98YYgzd3+E31VKNhAYN4veVqNIzRf18MeCZKlmhBtnG4NJCd+SjJtS9lDqEzt9C8xXai7e3wgj4uX9+06Ihx6cgRgu0brE=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4312.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?SFRHOExVbXZjNWRLTzgwZ2NvQUdKdkRKMmhGcU52VnlOSmpVOGlYaCtQWnpB?=
- =?utf-8?B?b2srR1dVWWttdGgxa2FYNEkwMkFtL2RUb0lEdzFFaWJjRzBUSjZaK21QZS9S?=
- =?utf-8?B?UzB4TWhtU3V2RDh0TTJMai9ra3krQ2tzYkM3U0FGYUFkQkNWS2s1VXRoT2VS?=
- =?utf-8?B?aTA4NFdWczV1L0NpQTlrakNDRmtoY2wrcXRZZzRGcS9IOXFRc3FSa01DbkZy?=
- =?utf-8?B?d2dEUXI0ZzYwbzREUE5wRW94WTZnaHh6dXQ4N1ZVdzcraThjNnFxNmd3b3J2?=
- =?utf-8?B?aW9abldtVk40MGVlNmtrY1pxQ2dMSVJtaXNIWmg2c1BZZVRZWVBUdE0yTzll?=
- =?utf-8?B?Mlo4MnA5MHVxTXJFNFhKbjNqZFJVR0ZJcVc3S2NHZ2M2TGJHWEtBb09scFZ6?=
- =?utf-8?B?eXp3WFFHR3FudlJtNTk3MUlBN3BDc2VoUVh4MUNKNWdzTzI1VjkvM1Zxdkov?=
- =?utf-8?B?a0pyWUFML2IwaHJVdGNxU0NZMkRlanNoQzZPTzl3dXRydnV5aXRIVFkxOE9h?=
- =?utf-8?B?NXNqTzlvZ25oakpHK253K1MvK2Z1VzRpSk9NZm92czlzVHQ3UC9QbUJOeWtp?=
- =?utf-8?B?Uml5c1p4bG1YNVJJc2dZV2FuQU5hVUFXaVdkYVMzNWs1STVKYk5TdUxPNE56?=
- =?utf-8?B?Znlrc3JrTDc2RXgxQWVrNDJNeFRlL2pUb0MvVDkxWVpNRHFUaStQZE9STWhE?=
- =?utf-8?B?QzBNR3dLQml3NHd5TE5tNWQrRldNd2NUcHdZbXlUWHE2WWdRU2UvaFBxMGtN?=
- =?utf-8?B?LzhwTGxXZE5Xais3T3U4Z3VLT1ZNeUtlMlNDMFFpZy9KUExPTzJOT2lPT1Rz?=
- =?utf-8?B?OVlpSVJjQ1hCV3B5NlF2WGFFM0xoV3pJVW15VEdvRjN0RlRTMVZpSllCK21y?=
- =?utf-8?B?Q3NIWUZCZEErcE5nblVsQW9aZ3p1V1puRWN5ZDBxUEdzZTRlU2N5TjRvSXFw?=
- =?utf-8?B?WjlpeU9wSDR1bGhlMzJNR09xWEowcW5KaitMdmp6aEI3bFNTc3c4dlU2Yzhn?=
- =?utf-8?B?Mlg4ZjN0WFVRUlpkSlBNeXJQQUtLOEVoaGp1aVVpb2RoQkFIZ2lXSEVzUE9h?=
- =?utf-8?B?TlNDMHQ5d0VBYktqQWJCcUNnaW93NjVjQm0vOTZlSzZMTWJZYjhYdUdEaGNX?=
- =?utf-8?B?UXN4cllIT1I1WUxwVUR6TmRrd2lPcTRaNFdJQ3d6UUxSN0M2TzNqZ3h4SjRy?=
- =?utf-8?B?R2lsdEltcXM1UXdwOG9SZWtJVlVyVGhHSmszNHNLZXBXdVk4NFpRQnVtbmRO?=
- =?utf-8?B?Y21hSEtjVW9nN1cyL1QrdWt2SXptS212d3V2YmNKRFluQ3ZDRE9nbjhtNGc5?=
- =?utf-8?B?ZGs4S3c3bUJYTXVkdURlWEY5UnprOFZiUHNxRlk0TDZDZ0RBYk9JTnIvZjZU?=
- =?utf-8?B?SVpYRVJ5US96Y0ZZcGNWdEVBVEpYNU1KQkVLS1gyU2dHYmQ5clRIU3RiQ3pQ?=
- =?utf-8?B?VG15U1lyQkUrU3dyNmhZQUZyZlhqSFV5N3FTZEd2TDhncllkL1J2K1dxUys3?=
- =?utf-8?B?MExLQnBONFUxT0dyZkFmRkI5QlhwRUVkL3lzN25UUS9TeG14N1JkNngveHY1?=
- =?utf-8?B?T3hYWE5FT3lUbnAra3F1QzRTQWZZRGFlVlpHNlNiWTNlaXBFak9xYitZdmUz?=
- =?utf-8?B?ZG1JbnJ6R1UxaXNMM1ZSdXdtM2U5dCtRaTM1NkNVbTNNRUNCQmZ6cUNqajE1?=
- =?utf-8?B?ZWNPa3JFSFJpa2NjWlh4UWhFZzRIdkUyclhmWG01SkgvWXBLS1paWDRzbURj?=
- =?utf-8?B?bHA2dENQSmtUQ1ZoMVhDNWYrT2p4NXFwWGo3YXZMMGJXekNHWFFTb2pGczc5?=
- =?utf-8?B?MVhVd0h1MFEzeG83N0wwWWprc3lkbkxJVTVlUVAwbllkWTJxTVlESXVvR3Rw?=
- =?utf-8?B?N1hlaGJUQXR4NG9xSnF0NlFJdFU5WWtVanRzZFBOV1QwRUZYVG4zU2JhMW1S?=
- =?utf-8?B?ZnJ2WWJmUjdDdFpxZ05WN3B2MGdhYVBoVldUNjRwdlRUTEphbVJreGFZVXg0?=
- =?utf-8?B?d3NqNkE2eWZRUVQ1MmdjSEtaS3lndHdLMEtYNjJvZ21JYUVBUVBEWExKeHBL?=
- =?utf-8?B?Ky8wQkNCRGZFL0wwZWVobjlnS2tvZDY5QjRON3FVQlBkaXVsVkxtdmtBODZN?=
- =?utf-8?Q?51AHUqdw6ZdrlG7YGRL98+2np?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	v8WUGr4rnc5QNx00megueM8IqedRgqD6nqMfnhSfSzIQvmHc/mehvnpVWjBD/+jlrKfppdOVuFFS4+9Fi3j4xNQJ2Mrd0WbYt6DONBLMlOR43rBL3UCQgvaWI02OSUor0+qWFqi2maX+nk8TWj/CWAAZtcojumHiJMcHdJoUUy7buM3yHM9Y/LQhiThpcOK376jmAikSQZHJisPYqTL1bMfTnJg/jPwGccyf4fbmnrhFgYT+zVLtcvU9FfoLOQOUlx+CKxkuVSBhK52JVMPOxdmzFOIq8Ue6mpxO8uwMRXPnUSBLxQch2VReo9t4iRz9aEeuX1TTiaRicqQrmCQ4f08n71iucw8OIpnRYpus4xcOU6N8oxnjHJVi4S3414y1v3oTL0eOu9mQ4w30wuvm5bJrl09sRRsVMMKJ7Mmm3g02H1OkiyMbAeheATHOUh5b144QKU0bJtlNdhyAGHfwlwDtxOktXSAkWeInUsiPS1+jD+q8qfxBZ70Te1LUJEoC1Dzz3DYwNHrRA+cQTh7x1OXXqXVdg5gDqTZpedgYSmNoeBT57OIQSGTpC1lelKaME4nOQ8fk5SyS38UWjeW00kv0XpqhfMpHRZajPGg+Xz0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 223a0081-2c75-4889-fc0c-08dc4cadf4dc
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2024 09:28:51.9816
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eNEIrXQBvjjCJMEoF1+YXMRgZ9Fd2FeNWpYWxqgAHT6rqkRxvNFqnI2rqTMEf4lFIijmcNb2UFWq+UoO/O5MLQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR10MB5041
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-25_06,2024-03-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 spamscore=0 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2403210000
- definitions=main-2403250051
-X-Proofpoint-ORIG-GUID: fILqErsKxVwLgKOgV2tarigl7JlrnW98
-X-Proofpoint-GUID: fILqErsKxVwLgKOgV2tarigl7JlrnW98
+In-Reply-To: <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAn+RE_ZQFm7X8kIA--.64532S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZr47JF1fGFW5WryUXw48tFb_yoWrGF1Upr
+	WruFsxXr90kF1kKanru3WxXF15ur4ktw13ua4qgr9rZay5Arn7KanFgry3uFyjyr4xXa1j
+	qFs5CFyUXFySk37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+	wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+	k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 24/03/2024 23:54, Christoph Hellwig wrote:
+Hi,
 
-/s/max_user_setors/max_user_sectors/
-
-> We already cap down the actual max_sectors to the max of the hardware
-> and user limit, so don't reject the configuration.
+ÔÚ 2024/03/24 0:11, Christian Brauner Ð´µÀ:
+> Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
+> default this option is set. When it is set the long-standing behavior
+> of being able to write to mounted block devices is enabled.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> But in order to guard against unintended corruption by writing to the
+> block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
+> off. In that case it isn't possible to write to mounted block devices
+> anymore.
+> 
+> A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
+> which disallows concurrent BLK_OPEN_WRITE access. When we still had the
+> bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
+> the mode was passed around. Since we managed to get rid of the bdev
+> handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
+> on whether the file was opened writable and writes to that block device
+> are blocked. That logic doesn't work because we do allow
+> BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
 
-Reviewed-by: John Garry <john.g.garry@oracle.com>
+I don't get it here, looks like there are no such use case. All users
+passed in BLK_OPEN_RESTRICT_WRITES together with BLK_OPEN_WRITE.
 
+Is the following root cause here?
+
+1) t1 open with BLK_OPEN_WRITE
+2) t2 open with BLK_OPEN_RESTRICT_WRITES, with bdev_block_writes(), yes
+we don't wait for t1 to close;
+3) t1 close, after the commit, bdev_unblock_writes() is called
+unexpected.
+
+Following openers will succeed although t2 doesn't close;
+> 
+> So fix the detection logic. Use O_EXCL as an indicator that
+> BLK_OPEN_RESTRICT_WRITES has been requested. We do the exact same thing
+> for pidfds where O_EXCL means that this is a pidfd that refers to a
+> thread. For userspace open paths O_EXCL will never be retained but for
+> internal opens where we open files that are never installed into a file
+> descriptor table this is fine.
+
+ From the path blkdev_open(), the file is from devtmpfs, and user can
+pass in O_EXCL for that file, and that file will be used later in
+blkdev_release() -> bdev_release() -> bdev_yield_write_access().
+
+Thanks,
+Kuai
+
+> 
+> Note that BLK_OPEN_RESTRICT_WRITES is an internal only flag that cannot
+> directly be raised by userspace. It is implicitly raised during
+> mounting.
+> 
+> Passes xftests and blktests with CONFIG_BLK_DEV_WRITE_MOUNTED set and
+> unset.
+> 
+> Fixes: 321de651fa56 ("block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access")
+> Reported-by: Matthew Wilcox <willy@infradead.org>
+> Link: https://lore.kernel.org/r/ZfyyEwu9Uq5Pgb94@casper.infradead.org
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 > ---
->   block/blk-settings.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+>   block/bdev.c | 20 +++++++++++++-------
+>   1 file changed, 13 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 3c7d8d638ab59d..cdbaef159c4bc3 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -146,8 +146,7 @@ static int blk_validate_limits(struct queue_limits *lim)
->   	max_hw_sectors = min_not_zero(lim->max_hw_sectors,
->   				lim->max_dev_sectors);
->   	if (lim->max_user_sectors) {
-> -		if (lim->max_user_sectors > max_hw_sectors ||
-> -		    lim->max_user_sectors < PAGE_SIZE / SECTOR_SIZE)
-> +		if (lim->max_user_sectors < PAGE_SIZE / SECTOR_SIZE)
->   			return -EINVAL;
->   		lim->max_sectors = min(max_hw_sectors, lim->max_user_sectors);
->   	} else {
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 7a5f611c3d2e..f819f3086905 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -821,13 +821,12 @@ static void bdev_yield_write_access(struct file *bdev_file)
+>   		return;
+>   
+>   	bdev = file_bdev(bdev_file);
+> -	/* Yield exclusive or shared write access. */
+> -	if (bdev_file->f_mode & FMODE_WRITE) {
+> -		if (bdev_writes_blocked(bdev))
+> -			bdev_unblock_writes(bdev);
+> -		else
+> -			bdev->bd_writers--;
+> -	}
+> +
+> +	/* O_EXCL is only set for internal BLK_OPEN_RESTRICT_WRITES. */
+> +	if (bdev_file->f_flags & O_EXCL)
+> +		bdev_unblock_writes(bdev);
+> +	else if (bdev_file->f_mode & FMODE_WRITE)
+> +		bdev->bd_writers--;
+>   }
+>   
+>   /**
+> @@ -946,6 +945,13 @@ static unsigned blk_to_file_flags(blk_mode_t mode)
+>   	else
+>   		WARN_ON_ONCE(true);
+>   
+> +	/*
+> +	 * BLK_OPEN_RESTRICT_WRITES is never set from userspace and
+> +	 * O_EXCL is stripped from userspace.
+> +	 */
+> +	if (mode & BLK_OPEN_RESTRICT_WRITES)
+> +		flags |= O_EXCL;
+> +
+>   	if (mode & BLK_OPEN_NDELAY)
+>   		flags |= O_NDELAY;
+>   
+> 
 
