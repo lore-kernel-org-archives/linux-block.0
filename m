@@ -1,80 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B844185F1E
-	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 12:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942095D731;
+	Mon, 25 Mar 2024 12:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711368288; cv=none; b=mUorwCdJsH+fPfl/RM+JPXdozYI1nrQy8WZsbAtugqFyKT3d0fiLq+Ukimk4mShlwwEEzynbWe2z0TEfj6mcF1rCzYEQ2IDVgvg2qE8NCskHS6Tns/PKi3o58686sRuxGr4RZ1UkK6Jcv9Q6exaM458lottNCa6hELZBrKymFOY=
+	t=1711368387; cv=none; b=amN3wMMKBM6R7th5n2yqIs7xKudbaP/lPS2NJ6+05zXzdRQDp2V9fISJoalpEYyA/4kRmPIlrTg5TozilRXHQnMnc2sq6kufB7h2OQ6qk1XYqjINN8CdBgVGEU5V5zoVvem5mxoSesjA2fad/h/Z/8CuNfyuHU+UKdhNRDrk0T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711368288; c=relaxed/simple;
-	bh=/0X400qwFTGF9UIcSFiQsNbtuW6H0hcxktCEq2j7qdQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZKiAqIvESE7qmpA036oQCcu/noeXNOzNoj08dXie6yWjjqxs1pDT0/i7Ixr7sjPtgpbiESL6Aarp/xZBppVUKRKYtrUY+PV7Pt6AC+1PG1Gw9AuqdrkETXrgIZoHgEPUKrLdg/xI6YrIdP9NEl0p+lS/JAruwfv7f0GEjA+GpG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ccMRnjCZ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ccMRnjCZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F1A2C433F1;
-	Mon, 25 Mar 2024 12:04:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711368287;
-	bh=/0X400qwFTGF9UIcSFiQsNbtuW6H0hcxktCEq2j7qdQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ccMRnjCZPKiUznsK8XE5YuxgBcNLftGVkix7NTpRM3DIs8GFaqThRsNnZXh2it7og
-	 yjpXdLb+bTHTYOm0GevsK0ClbEGv3yTAPvCybJMCLw0aSkwBQGxO05KceggKFQVVpS
-	 zoYkPxetW+N/f6Ehx1ZHTsneKFLUkFtyo812m/Uie/nqv64TP/NW65eh0SHqd9cL2x
-	 MQ2onJx/kShe6J3AnLKzJxDNj+zA0sqpHRKswMyltPKScBIijG0pBMK1TjvP1pfgpN
-	 fBMh/FHHuxEDeoKL8pQjATZ5E8cQjoHE4DY4LmyhRiBLhzo0PTRdTEH8wokhK8q9Qr
-	 jPUpsPC5vGq/g==
-Date: Mon, 25 Mar 2024 13:04:42 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>, 
-	Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>, 
-	linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
-Message-ID: <20240325-ziehung-angetan-2703b0225ae5@brauner>
-References: <20240323-seide-erbrachten-5c60873fadc1@brauner>
- <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
- <3594bd44-4c6b-d079-1209-f069353ccd58@huaweicloud.com>
+	s=arc-20240116; t=1711368387; c=relaxed/simple;
+	bh=yPtmna4ptGgXfkbENYERn+NKzVLez4o/N3DCc/GmLKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h72srGKs/T4g7uwvsBa8cWauYTkJoEsvPUqtLGVWP/voNF6jNcFcOXWb13JclTySmn/7BljPaz8umAXfbRgEM/SI+3KI/dW6hVrFDnh4JxAg9v3xo5OHDBPr4rL9iW/BFX/Ngu0MsUtbNuk+W8Kiqu8McWKbelaNkm/9SUnXTGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 347BF1FB;
+	Mon, 25 Mar 2024 05:06:55 -0700 (PDT)
+Received: from [10.1.25.33] (e133047.arm.com [10.1.25.33])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 330623F67D;
+	Mon, 25 Mar 2024 05:06:18 -0700 (PDT)
+Message-ID: <de1eba3c-2453-4c5c-bd80-dd7d7b33f60d@arm.com>
+Date: Mon, 25 Mar 2024 12:06:16 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3594bd44-4c6b-d079-1209-f069353ccd58@huaweicloud.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/2] Introduce per-task io utilization boost
+Content-Language: en-US
+To: Bart Van Assche <bvanassche@acm.org>, Qais Yousef <qyousef@layalina.io>
+Cc: linux-kernel@vger.kernel.org, peterz@infradead.org,
+ juri.lelli@redhat.com, mingo@redhat.com, rafael@kernel.org,
+ dietmar.eggemann@arm.com, vschneid@redhat.com, vincent.guittot@linaro.org,
+ Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com, ulf.hansson@linaro.org,
+ andres@anarazel.de, asml.silence@gmail.com, linux-pm@vger.kernel.org,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-mmc@vger.kernel.org
+References: <20240304201625.100619-1-christian.loehle@arm.com>
+ <86f0af00-8765-4481-9245-1819fb2c6379@acm.org>
+ <0dc6a839-2922-40ac-8854-2884196da9b9@arm.com>
+ <c5b7fc1f-f233-4d25-952b-539607c2a0cc@acm.org>
+ <2784c093-eea1-4b73-87da-1a45f14013c8@arm.com>
+ <20240321123935.zqscwi2aom7lfhts@airbuntu>
+ <1ff973fc-66a4-446e-8590-ec655c686c90@arm.com>
+ <2ed2dadc-bdc4-4a21-8aca-a2aac0c6479a@acm.org>
+From: Christian Loehle <christian.loehle@arm.com>
+In-Reply-To: <2ed2dadc-bdc4-4a21-8aca-a2aac0c6479a@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 25, 2024 at 07:51:27PM +0800, Yu Kuai wrote:
-> Hi,
+On 21/03/2024 19:52, Bart Van Assche wrote:
+> On 3/21/24 10:57, Christian Loehle wrote:
+>> In the long-term it looks like for UFS the problem will disappear as we are
+>> expected to get one queue/hardirq per CPU (as Bart mentioned), on NVMe that
+>> is already the case.
 > 
-> 在 2024/03/24 0:11, Christian Brauner 写道:
-> > Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
-> > default this option is set. When it is set the long-standing behavior
-> > of being able to write to mounted block devices is enabled.
-> > 
-> > But in order to guard against unintended corruption by writing to the
-> > block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
-> > off. In that case it isn't possible to write to mounted block devices
-> > anymore.
-> > 
-> > A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
-> > which disallows concurrent BLK_OPEN_WRITE access. When we still had the
-> > bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
-> > the mode was passed around. Since we managed to get rid of the bdev
-> > handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
-> > on whether the file was opened writable and writes to that block device
-> > are blocked. That logic doesn't work because we do allow
-> > BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
+> Why the focus on storage controllers with a single completion interrupt?
+> It probably won't take long (one year?) until all new high-end
+> smartphones may have support for multiple completion interrupts.
 > 
-> I don't get it here, looks like there are no such use case. All users
-> passed in BLK_OPEN_RESTRICT_WRITES together with BLK_OPEN_WRITE.
+> Thanks,
+> 
+> Bart.
+> 
 
-sb_open_mode() does
+Apart from going to "This patch shows significant performance improvements on
+hardware that runs mainline today" to "This patch will have significant
+performance improvements on devices running mainline in a couple years"
+nothing in particular.
+I'm fine with leaving it with having acknowledged the problem.
+Maybe I would just gate the task placement on the task having been in
+UFS (with multiple completion interrupts) or NVMe submission recently to
+avoid regressions to current behavior in future versions. I did have that
+already at some point, although it was a bit hacky.
+Anyway, thank you for your input on that, it is what I wanted to hear!
 
-#define sb_open_mode(flags) \
-        (BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES | \
-         (((flags) & SB_RDONLY) ? 0 : BLK_OPEN_WRITE))
+Kind Regards,
+Christian
