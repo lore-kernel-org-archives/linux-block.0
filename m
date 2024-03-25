@@ -1,118 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5AD38D595
-	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 03:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92943AF2E2
+	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 03:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711335841; cv=none; b=h/tutczqauEhW0xqNNirOYwAhJ/Tk9k3dDW/b7Hq5nDswBQ/g5wciGyWfsFR5ULTLhUF0HvqYtYsr3ADTLykLaIpISUBTb4j766JrMilrLUIHuWahEjkYLVrkGdrGumvAVijCqbYgrCUZhn2FcpvYmERjFtCUkqpio9TdNJmsX0=
+	t=1711337536; cv=none; b=X8NTVn8gfVEMOIevX/HONetiUg0GDTcFbPCjLu35U6rBzu09Ut6VwRVWh1otNZrYbtk/WbA1usaqqUF917vCo8voVyIjAZQ2AWakUUyrrehgeVkIjxepkMNnJq6ksm01iv/kMCYsVBTu3S6DfIraKtaAQIKDOn+jUukAo74okLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711335841; c=relaxed/simple;
-	bh=SsZwsTQPGoRq8DsmOf3FwZDrEyxPF4BuacI8iAHPR7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pc9qnDwnKzPrYFUoCbWdyYDG7lkGtNnwsNl1rHx6Fno7hsTDOQ/eitKuML0vzV9D/JN6ad+uCh7ukOsj8P5qfKYD7DtomD0oP8pPZTlqCFDSxUBlkq7yDIffsHpcm4IX3R3SBF4Qkds8uJh3j385bdeAiX1zuDvTX2hGau79idA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NhwDc5PM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhwDc5PM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711335837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EuYBp3K/1LYyLHtThZ4W9rOXrFo+oIhHa5mqOmi1rMo=;
-	b=NhwDc5PM469K8KVvdu99vH3ybwrHkGEftGpH2eEtTlX+ArtgISubLi2UNZl+Z4VRop4XPw
-	+gub3mrTn+qzmkMhZK+85Q2BwOaJhLUgXI537rIfayncPobunxt/wldaiJDpESIce0hk9u
-	TE9VkvkFBn/7ymt2NjkcGaAcVubZ23M=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-224-Ye4iJ2KKPiaQSEcJkNgvpQ-1; Sun,
- 24 Mar 2024 23:03:53 -0400
-X-MC-Unique: Ye4iJ2KKPiaQSEcJkNgvpQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 471402801E5B;
-	Mon, 25 Mar 2024 03:03:53 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.37])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 314923C54;
-	Mon, 25 Mar 2024 03:03:48 +0000 (UTC)
-Date: Mon, 25 Mar 2024 11:03:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>, ming.lei@redhat.com
-Subject: Re: [PATCH V2] block: fail unaligned bio from submit_bio_noacct()
-Message-ID: <ZgDpfW8HRHrZgQYv@fedora>
-References: <20240324133702.1328237-1-ming.lei@redhat.com>
- <ZgC2UPEBOSLW9Xdz@infradead.org>
+	s=arc-20240116; t=1711337536; c=relaxed/simple;
+	bh=XIt5W1lDG/OYW9mBP/9gKBdaolxrEqGuDk835KRuYWg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WmQD5AiTMr+29kzjey4B87ENqwl4E8E8md07DzAQoFM1B2nKNkdtKWTYmEBs530AEwoiCf2alXgOXmt0nCr3f4bQOAEeOq95JYs3baxmhBCl+QaHCmj+39+2BwsUOa4ZXMyHcT198ejOga4fxQeKjRLm2WLnSGYjl9sOk+U5gxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V2z4T5kXMz1GCwy;
+	Mon, 25 Mar 2024 11:31:37 +0800 (CST)
+Received: from dggpemm100001.china.huawei.com (unknown [7.185.36.93])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2E947140153;
+	Mon, 25 Mar 2024 11:32:06 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ dggpemm100001.china.huawei.com (7.185.36.93) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 25 Mar 2024 11:32:05 +0800
+From: Kefeng Wang <wangkefeng.wang@huawei.com>
+To: Jens Axboe <axboe@kernel.dk>, Dennis Zhou <dennis@kernel.org>
+CC: <linux-block@vger.kernel.org>, Kefeng Wang <wangkefeng.wang@huawei.com>
+Subject: [PATCH] blk-cgroup: use group allocation/free of per-cpu counters API
+Date: Mon, 25 Mar 2024 11:59:55 +0800
+Message-ID: <20240325035955.50019-1-wangkefeng.wang@huawei.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZgC2UPEBOSLW9Xdz@infradead.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm100001.china.huawei.com (7.185.36.93)
 
-On Sun, Mar 24, 2024 at 04:25:04PM -0700, Christoph Hellwig wrote:
-> On Sun, Mar 24, 2024 at 09:37:02PM +0800, Ming Lei wrote:
-> > +static bool bio_check_alignment(struct bio *bio, struct request_queue *q)
-> > +{
-> > +	unsigned int bs = q->limits.logical_block_size;
-> > +
-> > +	if (bio->bi_iter.bi_size & (bs - 1))
-> > +		return false;
-> > +
-> > +	if (bio->bi_iter.bi_sector & ((bs >> SECTOR_SHIFT) - 1))
-> > +		return false;
-> > +
-> > +	return true;
-> > +}
-> 
-> 
-> This should still use bdev_logic_block_size.  And maybe it's just me,
-> but I think dropping thelines after the false returns would actually
-> make it more readle.
+Use group allocation/free of per-cpu counters api to accelerate
+blkg_rwstat_init/exit() and simplify code.
 
-OK, will remove the blank line.
+Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+---
+ block/blk-cgroup-rwstat.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-> 
-> > diff --git a/block/fops.c b/block/fops.c
-> > index 679d9b752fe8..75595c728190 100644
-> > --- a/block/fops.c
-> > +++ b/block/fops.c
-> > @@ -37,8 +37,7 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
-> >  static bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
-> >  			      struct iov_iter *iter)
-> >  {
-> > -	return pos & (bdev_logical_block_size(bdev) - 1) ||
-> > -		!bdev_iter_is_aligned(bdev, iter);
-> > +	return !bdev_iter_is_aligned(bdev, iter);
-> 
-> If you drop this:
-> 
->  - we now actually go all the way down to building and submiting a
->    bio for a trivial bounds check.
->  - your get a trivial to trigger WARN_ON.
-> 
-> I'd strongly advise against dropping this check.
-
-OK.
-
-Also only q->limits.logical_block_size is fetched for small BS IO
-fast path, I think log(lbs) can be cached in request_queue for avoiding the
-extra fetch of q.limits. Especially, it could be easier to do so
-with your recent queue limit atomic update changes.
-
-
-Thanks, 
-Ming
+diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
+index 3304e841df7c..a55fb0c53558 100644
+--- a/block/blk-cgroup-rwstat.c
++++ b/block/blk-cgroup-rwstat.c
+@@ -9,25 +9,19 @@ int blkg_rwstat_init(struct blkg_rwstat *rwstat, gfp_t gfp)
+ {
+ 	int i, ret;
+ 
+-	for (i = 0; i < BLKG_RWSTAT_NR; i++) {
+-		ret = percpu_counter_init(&rwstat->cpu_cnt[i], 0, gfp);
+-		if (ret) {
+-			while (--i >= 0)
+-				percpu_counter_destroy(&rwstat->cpu_cnt[i]);
+-			return ret;
+-		}
++	ret = percpu_counter_init_many(rwstat->cpu_cnt, 0, gfp, BLKG_RWSTAT_NR);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < BLKG_RWSTAT_NR; i++)
+ 		atomic64_set(&rwstat->aux_cnt[i], 0);
+-	}
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(blkg_rwstat_init);
+ 
+ void blkg_rwstat_exit(struct blkg_rwstat *rwstat)
+ {
+-	int i;
+-
+-	for (i = 0; i < BLKG_RWSTAT_NR; i++)
+-		percpu_counter_destroy(&rwstat->cpu_cnt[i]);
++	percpu_counter_destroy_many(rwstat->cpu_cnt, BLKG_RWSTAT_NR);
+ }
+ EXPORT_SYMBOL_GPL(blkg_rwstat_exit);
+ 
+-- 
+2.41.0
 
