@@ -1,86 +1,91 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BCA15E812
-	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 03:50:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D77F185F20;
+	Mon, 25 Mar 2024 07:16:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711338661; cv=none; b=F+PrOqZ0WfrVTd/kStO9LqcYkr5OyhH8ujT4BMFckXMSMVuTh9cuuOizhWlLrwyly/f6wjeWlk1b7nPOoVeM7pYotkwS5adtqrMo5J4YwtQ+2moilnYOyFdbEqLKq41GcMc/ZdbXnKcxunsSkGcENPa68y2lRCaIS41VcyRFO0E=
+	t=1711351020; cv=none; b=PQRmOB3pw1MXlg/PS7If05WsAgQ/+Z81DNpuZS5NwJTU7G4te11VIfQ1ujUPYRf9Da+t3trzuIa7pUPZFoGKkRJ2EreemxMAAWXK1Ah+MNdVhuF3fuKFYSfLPg8PwnVVouw9zN9o0uBntIbQvAAkm+4LaDkhfbzLgC5b6uRtAsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711338661; c=relaxed/simple;
-	bh=JTl2GthtGeVE+TzWv4mL3q1IBZWCwFN1cvvndRbca1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=auJsn8pYMx5Fn6X2NvvuGTAMXaWTZ5tFVUarBFdzzLGYtlJt0sN9hxZQTf0RfpYtv9oLxgYTMkQ9IWex7+vOKaWhYnguFMeuwzW4NdOnAz9kEG4pxtye2yvqGL5BQSs4mxyReDlGHEUyJCyMkBtNtTlb693gQ/G8NaWeRNF9NNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dcPvLP4N; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711351020; c=relaxed/simple;
+	bh=jRFQXMqk2mr54MVNPz8FLEo+v0iOrBwd2zWx2qG45N4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=df8X8qHeDZHx4rWfoF0Jp3XpKc5FPLpLugqq1GgYavP8OVe50QUcQCZ7gjHwQWz2eOEky1SCfxLzlOEFl82qL8ILRgsymyPqnkqWYUCtOMU38wrPl0IZAb3AHwQBVqDwypRUsM3LeGAdN5tcE8fWtFJUyPc2wsEV8gj/HXuy/hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iSghu8mR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dcPvLP4N"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711338658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=afn8OOUI6B9CD/RsJZlQWcCmyXXiQNf58j5J5nr28n4=;
-	b=dcPvLP4Nq/AYp85Rdc/+fLKfMF7Fx0VLe5Atr83f8LUSqThg2Z4hHCePFb3JNJ1B2NIWIC
-	d5jnbOKmlKi9/wT84oho8uPMbaYWa8HvneXeF1YUwfOj8/ZzIJhWb/lqcRQfNJvBQaiv/2
-	aSpI6JrrvHVHBjyrSi2HhR5LCYogXvs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-119-t_tmNl7JO7qu2gWNkOJUSA-1; Sun, 24 Mar 2024 23:50:54 -0400
-X-MC-Unique: t_tmNl7JO7qu2gWNkOJUSA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C2CE2185A786;
-	Mon, 25 Mar 2024 03:50:53 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.37])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CD371121312;
-	Mon, 25 Mar 2024 03:50:49 +0000 (UTC)
-Date: Mon, 25 Mar 2024 11:50:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>
-Subject: Re: [PATCH V2] block: fail unaligned bio from submit_bio_noacct()
-Message-ID: <ZgD0kQCCQtu34q/D@fedora>
-References: <20240324133702.1328237-1-ming.lei@redhat.com>
- <ZgC2UPEBOSLW9Xdz@infradead.org>
- <ZgDpfW8HRHrZgQYv@fedora>
- <ZgDrgTymGnW3KGuk@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iSghu8mR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 153FEC43390;
+	Mon, 25 Mar 2024 07:16:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711351018;
+	bh=jRFQXMqk2mr54MVNPz8FLEo+v0iOrBwd2zWx2qG45N4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iSghu8mRQGF5IJ+vZYOrgRCs0MbHfMU1nH/utJwHMeTBTyM/1H1+L/n7V8M1vdgfm
+	 jZYIAt9zw/BGq/gn15hf71O59Pp+daLKFacfmNTnexvB2mDEwsrYzgQ7O2LPJBoNce
+	 ZlbKPLyERP+NpfjrBsU2cFN5FQ4g4ukcMHaqboDPd19LZyVTAE6VI+Jwnmg27PmVXF
+	 1vU1AnJtShxBVRvdo6OpHr1sjw6W1n5w3dziWvrnMQ799B3YYb1GVrRCaQR7BUYyw4
+	 sKOL/yeaYy+4Bhjkbve6hrb0pKKmDBagN+MRg3tASNji/iAqgitihTNp4S5UtDDTvN
+	 ceCqRblm0YWRg==
+Message-ID: <c9070d06-3095-4bc9-8b9e-ce292404362c@kernel.org>
+Date: Mon, 25 Mar 2024 16:16:50 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZgDrgTymGnW3KGuk@infradead.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/23] bsg: pass queue_limits to bsg_setup_queue
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Niklas Cassel <cassel@kernel.org>,
+ Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Sathya Prakash <sathya.prakash@broadcom.com>,
+ Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+ Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+ "Juergen E. Fischer" <fischer@norbit.de>,
+ Xiang Chen <chenxiang66@hisilicon.com>,
+ HighPoint Linux Team <linux@highpoint-tech.com>,
+ Tyrel Datwyler <tyreld@linux.ibm.com>, Brian King <brking@us.ibm.com>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ Mike Christie <michael.christie@oracle.com>,
+ John Garry <john.g.garry@oracle.com>, Jason Yan <yanaijie@huawei.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Sumit Saxena <sumit.saxena@broadcom.com>,
+ Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+ Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Nilesh Javali <njavali@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
+ Bart Van Assche <bvanassche@acm.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+ MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+ open-iscsi@googlegroups.com, megaraidlinux.pdl@broadcom.com,
+ mpi3mr-linuxdrv.pdl@broadcom.com, linux-samsung-soc@vger.kernel.org,
+ linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
+References: <20240324235448.2039074-1-hch@lst.de>
+ <20240324235448.2039074-3-hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20240324235448.2039074-3-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 24, 2024 at 08:12:01PM -0700, Christoph Hellwig wrote:
-> On Mon, Mar 25, 2024 at 11:03:25AM +0800, Ming Lei wrote:
-> > Also only q->limits.logical_block_size is fetched for small BS IO
-> > fast path, I think log(lbs) can be cached in request_queue for avoiding the
-> > extra fetch of q.limits. Especially, it could be easier to do so
-> > with your recent queue limit atomic update changes.
+On 3/25/24 08:54, Christoph Hellwig wrote:
+> This allows bsg_setup_queue to pass them to blk_mq_alloc_queue and thus
+> set up the limits at queue allocation time.
 > 
-> So.  One thing I've been thinking of for a while (and which Bart also
-> mentioned) is tht queue_limits currently is a bit of a mess between
-> the actual queue limits, and the gneidks configuration.   The logical
-> block size is firmly in the latter, and we should probably move it
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-lbs and pbs belong to disk, but some others may not be very obvious.
+Looks OK to me.
 
-Strictly speaking elevator/blkcg belong to disk too, but still stay in
-request_queue, :-)
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Thanks, 
-Ming
+-- 
+Damien Le Moal
+Western Digital Research
 
