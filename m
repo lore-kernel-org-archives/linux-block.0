@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AAF7181B91;
-	Mon, 25 Mar 2024 04:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33519181B8E;
+	Mon, 25 Mar 2024 04:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711341939; cv=none; b=rEvzG2qIdk6IYnLgOI/8iZUftxMZL/ZSWW3whkOq5zHkZSSbfPjT3up2ISgSh35dD0eWD4rCp0BllyfkFpK6sPPIcIRwRi/IkAbLeioraNxklD2QbG3cKP6IKrojGxOhYVM0tq5zoLGaFPgePmMMBB6Haq6Z1Z6kZ+NEWOUizN4=
+	t=1711341935; cv=none; b=b6J3ihAbOEDA4OeLrXVo7vbrXD37lEB58V5jmaNCRFuYPVOXiMzRIuQroqMTN8EAHw4gTU44TXJMZ5YKwS1XAYuW8LpNudvrm8r6WZAbGAOAlnLk7GAMXYn25QXPXhn34E54afLPuGBalmA0prsUavFKYIlG52HbQWBn3IdGIbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711341939; c=relaxed/simple;
-	bh=3ZvoBtiQeBGYm5zSAkkBddhfdz5kCTqejobXH5IUrKY=;
+	s=arc-20240116; t=1711341935; c=relaxed/simple;
+	bh=V/HArnF7N7105JDPX06faeHAb6qzPAvwf0w9L6HcECA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqe+Q4u9Gzb14JUm+sun4cIbBqbCEawQHwhT3Sm/hb2L9xyYnKFmb7WzejPTEDqkfwMexLdVeUiKQ+bJtz6OFyeGcHgBY58pt/aye99v74/jGsYp33T7c0TTi61uc0RQ5IlN8cAaL4qVUl/6YsSXo/PIj0796VxoDoOONoT0nro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOwZWFfb; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=FVASb0caRBJk1aKxA5yCbG3BdNgwi7jH1tP6tHc3n0118TPdNOEC5n698lvPDUz3vM/qVqfu59ce2zwRx2C7rr9EEg5zgar9lZb2gGNC2ARX1rQb/TcpVyeAslzcHmVmTlAUKTt5TA6MqESuCmClm8guaOWRxIvGW/A7yZtqsmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZL0xaxMu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOwZWFfb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A384C433C7;
-	Mon, 25 Mar 2024 04:45:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZL0xaxMu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3461C433F1;
+	Mon, 25 Mar 2024 04:45:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711341939;
-	bh=3ZvoBtiQeBGYm5zSAkkBddhfdz5kCTqejobXH5IUrKY=;
+	s=k20201202; t=1711341935;
+	bh=V/HArnF7N7105JDPX06faeHAb6qzPAvwf0w9L6HcECA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hOwZWFfb0BlNqR5qxznHoJ12UNjLdtdPCWX4rHkAU2SAcZzGzuXYgQDfnS9XOshZh
-	 FrXr5REHpUBEj1z08kYjOzeyAXGbAeD6qg9WCA8AGzsrfnsH2i3fY9IFvk34nHvDbQ
-	 gr0Fo55U19nET79AEjAAX6s4X4y5BxzQlS2TGCiy1CHBXIP6wz+kosCheyNnB1cr6M
-	 Gx8GxXo6q33BWZad9qBMc0cguO1NWIR98gfDweTonlN5i9Mc1dyGTQpY3hPNV/eFvG
-	 w5Ifl7h/dtmfqeYy2cKM1U156ey67JAjlmHAQGs6LXSy6i0Z2u59tkwKFUr79EHmAM
-	 jbxdmI1dfOTmw==
+	b=ZL0xaxMu9tE9B5G7egbmkIiZjqeCbWPb4hn970MUU3AUwfhT7eSRka76LLpR2kTtV
+	 pV/5ZLkiBoxSGHKRXt4l1gKUiuj0pmjimmw4WOXQKUwWyACuLyXNdor04U9jv42br9
+	 ca9scA1EK8GsEhOTaL31yyEtaJElqYTMz1AKlH6CS9p26ujk3UWEutsml62Ijg84w5
+	 ZVd6PeS6bjbpIfZuyGwHBJrOI24dcYjoeslQje3u/LGKUqzEMtn/Zg8fs3OXwgBhlJ
+	 YoXREl1DDUAeWXBvW/hU2GK3iiUsi15iwCLGLq9W08kJ6MPm2FSVjIfVx2TkePKweq
+	 CfZ7FoTUxi2Cg==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: linux-block@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>,
@@ -34,9 +34,9 @@ To: linux-block@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	Mike Snitzer <snitzer@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 24/28] block: Do not check zone type in blk_check_zone_append()
-Date: Mon, 25 Mar 2024 13:44:48 +0900
-Message-ID: <20240325044452.3125418-25-dlemoal@kernel.org>
+Subject: [PATCH v2 21/28] block: Simplify blk_revalidate_disk_zones() interface
+Date: Mon, 25 Mar 2024 13:44:45 +0900
+Message-ID: <20240325044452.3125418-22-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240325044452.3125418-1-dlemoal@kernel.org>
 References: <20240325044452.3125418-1-dlemoal@kernel.org>
@@ -48,41 +48,157 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Zone append operations are only allowed to target sequential write
-required zones. blk_check_zone_append() uses bio_zone_is_seq() to check
-this. However, this check is not necessary because:
-1) For NVMe ZNS namespace devices, only sequential write required zones
-   exist, making the zone type check useless.
-2) For null_blk, the driver will fail the request anyway, thus notifying
-   the user that a conventional zone was targeted.
-3) For all other zoned devices, zone append is now emulated using zone
-   write plugging, which checks that a zone append operation does not
-   target a conventional zone.
-
-In preparation for the removal of zone write locking and its
-conventional zone bitmap (used by bio_zone_is_seq()), remove the
-bio_zone_is_seq() call from blk_check_zone_append().
+The only user of blk_revalidate_disk_zones() second argument was the
+SCSI disk driver (sd). Now that this driver does not require this
+update_driver_data argument, remove it to simplify the interface of
+blk_revalidate_disk_zones(). Also update the function kdoc comment to
+be more accurate (i.e. there is no gendisk ->revalidate method).
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- block/blk-core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/blk-zoned.c              | 16 +++++-----------
+ drivers/block/null_blk/zoned.c |  2 +-
+ drivers/block/ublk_drv.c       |  2 +-
+ drivers/block/virtio_blk.c     |  2 +-
+ drivers/md/dm-zone.c           |  2 +-
+ drivers/nvme/host/core.c       |  2 +-
+ drivers/scsi/sd_zbc.c          |  2 +-
+ include/linux/blkdev.h         |  3 +--
+ 8 files changed, 12 insertions(+), 19 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c6d41e1c7a0a..64eb135c7501 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -589,8 +589,7 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
- 		return BLK_STS_NOTSUPP;
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 8dc7cdc539c6..03222314d649 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1645,21 +1645,17 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+ /**
+  * blk_revalidate_disk_zones - (re)allocate and initialize zone bitmaps
+  * @disk:	Target disk
+- * @update_driver_data:	Callback to update driver data on the frozen disk
+  *
+- * Helper function for low-level device drivers to check and (re) allocate and
+- * initialize a disk request queue zone bitmaps. This functions should normally
+- * be called within the disk ->revalidate method for blk-mq based drivers.
++ * Helper function for low-level device drivers to check, (re) allocate and
++ * initialize resources used for managing zoned disks. This function should
++ * normally be called by blk-mq based drivers when a zoned gendisk is probed
++ * and when the zone configuration of the gendisk changes (e.g. after a format).
+  * Before calling this function, the device driver must already have set the
+  * device zone size (chunk_sector limit) and the max zone append limit.
+  * BIO based drivers can also use this function as long as the device queue
+  * can be safely frozen.
+- * If the @update_driver_data callback function is not NULL, the callback is
+- * executed with the device request queue frozen after all zones have been
+- * checked.
+  */
+-int blk_revalidate_disk_zones(struct gendisk *disk,
+-			      void (*update_driver_data)(struct gendisk *disk))
++int blk_revalidate_disk_zones(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	sector_t zone_sectors = q->limits.chunk_sectors;
+@@ -1731,8 +1727,6 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+ 		disk->zone_capacity = args.zone_capacity;
+ 		swap(disk->seq_zones_wlock, args.seq_zones_wlock);
+ 		swap(disk->conv_zones_bitmap, args.conv_zones_bitmap);
+-		if (update_driver_data)
+-			update_driver_data(disk);
+ 		ret = 0;
+ 	} else {
+ 		pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
+diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+index 159746b0661c..34f4d273df38 100644
+--- a/drivers/block/null_blk/zoned.c
++++ b/drivers/block/null_blk/zoned.c
+@@ -179,7 +179,7 @@ int null_register_zoned_dev(struct nullb *nullb)
+ 		disk->disk_name,
+ 		queue_emulates_zone_append(q) ? "emulated" : "native");
  
- 	/* The bio sector must point to the start of a sequential zone */
--	if (!bdev_is_zone_start(bio->bi_bdev, bio->bi_iter.bi_sector) ||
--	    !bio_zone_is_seq(bio))
-+	if (!bdev_is_zone_start(bio->bi_bdev, bio->bi_iter.bi_sector))
- 		return BLK_STS_IOERR;
+-	return blk_revalidate_disk_zones(disk, NULL);
++	return blk_revalidate_disk_zones(disk);
+ }
  
- 	/*
+ void null_free_zoned_dev(struct nullb_device *dev)
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index ab6af84e327c..851c78913de2 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -221,7 +221,7 @@ static int ublk_get_nr_zones(const struct ublk_device *ub)
+ 
+ static int ublk_revalidate_disk_zones(struct ublk_device *ub)
+ {
+-	return blk_revalidate_disk_zones(ub->ub_disk, NULL);
++	return blk_revalidate_disk_zones(ub->ub_disk);
+ }
+ 
+ static int ublk_dev_param_zoned_validate(const struct ublk_device *ub)
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 42dea7601d87..c1af0a7d56c8 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -1543,7 +1543,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	 */
+ 	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) && lim.zoned) {
+ 		blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, vblk->disk->queue);
+-		err = blk_revalidate_disk_zones(vblk->disk, NULL);
++		err = blk_revalidate_disk_zones(vblk->disk);
+ 		if (err)
+ 			goto out_cleanup_disk;
+ 	}
+diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+index 174fda0a301c..99d27fba01d3 100644
+--- a/drivers/md/dm-zone.c
++++ b/drivers/md/dm-zone.c
+@@ -169,7 +169,7 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
+ 	 * our table for dm_blk_report_zones() to use directly.
+ 	 */
+ 	md->zone_revalidate_map = t;
+-	ret = blk_revalidate_disk_zones(disk, NULL);
++	ret = blk_revalidate_disk_zones(disk);
+ 	md->zone_revalidate_map = NULL;
+ 
+ 	if (ret) {
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 943d72bdd794..c9955ecd1790 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2150,7 +2150,7 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
+ 	blk_mq_unfreeze_queue(ns->disk->queue);
+ 
+ 	if (blk_queue_is_zoned(ns->queue)) {
+-		ret = blk_revalidate_disk_zones(ns->disk, NULL);
++		ret = blk_revalidate_disk_zones(ns->disk);
+ 		if (ret && !nvme_first_scan(ns->disk))
+ 			goto out;
+ 	}
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index d0ead9858954..806036e48abe 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -572,7 +572,7 @@ int sd_zbc_revalidate_zones(struct scsi_disk *sdkp)
+ 	blk_queue_max_zone_append_sectors(q, 0);
+ 
+ 	flags = memalloc_noio_save();
+-	ret = blk_revalidate_disk_zones(disk, NULL);
++	ret = blk_revalidate_disk_zones(disk);
+ 	memalloc_noio_restore(flags);
+ 	if (ret) {
+ 		sdkp->zone_info = (struct zoned_disk_info){ };
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 916334f173a2..2e0087b4c37d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -339,8 +339,7 @@ int blkdev_report_zones(struct block_device *bdev, sector_t sector,
+ 		unsigned int nr_zones, report_zones_cb cb, void *data);
+ int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
+ 		sector_t sectors, sector_t nr_sectors);
+-int blk_revalidate_disk_zones(struct gendisk *disk,
+-		void (*update_driver_data)(struct gendisk *disk));
++int blk_revalidate_disk_zones(struct gendisk *disk);
+ 
+ /*
+  * Independent access ranges: struct blk_independent_access_range describes
 -- 
 2.44.0
 
