@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54587174F;
-	Mon, 25 Mar 2024 15:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6A913E8BF;
+	Mon, 25 Mar 2024 15:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711381153; cv=none; b=lhHuHyRzJ9d7LZ3iBN1RO5fNH0mCxXil1TLptS/SGulIaWsd4b4hk323FoEFjD2KzpWzGENSIbLQMKenP+VtPCoJ/nLDEYCr7hpUJczrCN+frRSPIBwqy1UXfq3kJE+qSM4ignWjD9DQSKk0Ic8kdDnMo/qDkgsT7B16xRlxv24=
+	t=1711381612; cv=none; b=mtNQeHaOcepL3ocX67vPqH0whnWw5fViBf4Lds2aNBZhKVEmkyul7QrMT6anHjAfgW6cM/Ljgdc6DLZ/aknd1S9tQ0/tipN1bH3TMXY4LOQUT/mStUJCFByvLWSuzotBIdWA1Dzk1ISnf6kEwTAtwJY63aGN3gczSWdQF2g14Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711381153; c=relaxed/simple;
-	bh=nknJYIONB75PX2/X0Pvf2Ghs0Wtg0AtN05Shf/1SaGE=;
+	s=arc-20240116; t=1711381612; c=relaxed/simple;
+	bh=GzSXXAtn+MG9MXEBydJA28ph4fycU10z4qRFnMd2PPg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eBqO8PXjDNvYRvYykTDeP3FCp0Fq9CWMKVxTflo/nCevpOlMKiFJgTWA7zVAdiHSFpzvkLymDlVwHZ43a+1ApPBlGwb8JAePIf4KrlKibESQJ/7N7aRLPnzzL3mRA7c4GsdnUKjPoktfuWM0HYU45hvxnyDEn2dAovPCGoK/1MU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=f0UA+8jHgSaJssZqSmpm77krzrTugaU/1e27IlVe9WSSpMcE9R5lP/zrT1g4VfhC2BmJ2+g117YtIoWmrXDkYs4OrTDMBFV4m0e1U0oHa0T0oEzYnfLR6XISKcmoxXnN4rxjcL5mec8Oa+LnU04E6wkfTE5pmXDXrqxL9iopprg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1romP3-0002bd-2M;
-	Mon, 25 Mar 2024 15:38:25 +0000
-Date: Mon, 25 Mar 2024 15:38:19 +0000
+	id 1romWj-0002mZ-1Y;
+	Mon, 25 Mar 2024 15:46:21 +0000
+Date: Mon, 25 Mar 2024 15:46:17 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>
 Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -44,20 +44,21 @@ Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 0/8] block: implement NVMEM provider
-Message-ID: <ZgGaay6bLFAcCo2E@makrotopia.org>
+Message-ID: <ZgGcSclcPMlXiPLV@makrotopia.org>
 References: <cover.1711048433.git.daniel@makrotopia.org>
- <20240325151046.GA3591150-robh@kernel.org>
+ <20240325151259.GB3591150-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240325151046.GA3591150-robh@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240325151259.GB3591150-robh@kernel.org>
 
-On Mon, Mar 25, 2024 at 10:10:46AM -0500, Rob Herring wrote:
+On Mon, Mar 25, 2024 at 10:12:59AM -0500, Rob Herring wrote:
 > On Thu, Mar 21, 2024 at 07:31:48PM +0000, Daniel Golle wrote:
 > > On embedded devices using an eMMC it is common that one or more (hw/sw)
 > > partitions on the eMMC are used to store MAC addresses and Wi-Fi
@@ -84,48 +85,24 @@ On Mon, Mar 25, 2024 at 10:10:46AM -0500, Rob Herring wrote:
 > > feedback and only minor corrections have been done since (see
 > > changelog below).
 > 
-> I don't recall giving positive feedback.
-> 
-> I still think this should use offsets rather than partition specific 
-> information. Not wanting to have to update the offsets if they change is 
-> not reason enough to not use them.
+> Also, please version your patches. 'RFC' is a tag, not a version. v1 was
+> July. v2 was March 5th. This is v3.
 
-Using raw offsets on the block device (rather than the partition)
-won't work for most existing devices and boot firmware out there. They
-always reference the partition, usually by the name of a GPT
-partition (but sometimes also PARTUUID or even PARTNO) which is then
-used in the exact same way as an MTD partition or UBI volume would be
-on devices with NOR or NAND flash. Just on eMMC we usually use a GPT
-or MBR partition table rather than defining partitions in DT or cmdline,
-which is rather rare (for historic reasons, I suppose, but it is what it
-is now).
+According to "Submitting patches: the essential guide to getting your
+code into the kernel" [1] a version is also a tag.
 
-Depending on the eMMC chip used, that partition may not even be at the
-same offset for different batches of the same device and hence I'd
-like to just do it in the same way vendor firmware does it as well.
+Quote:
+ Common tags might include a version descriptor if the [sic] multiple
+ versions of the patch have been sent out in response to comments
+ (i.e., “v1, v2, v3”), or “RFC” to indicate a request for comments.
 
-Chad of Adtran has previously confirmed that [1], which was the
-positive feedback I was refering to. Other vendors like GL-iNet or
-Netgear are doing the exact same thing.
+Maybe this should be clarified, exclusive or inclusive "or" is up to
+the reader to interpret at this point, and I've often seen RFC, RFCv2,
+v1, v2, ... as a sequence of tags applied for the same series, which
+is why I followed what I used to believe was the most common
+interpretation of the guidelines.
 
-As of now, we support this in OpenWrt by adding a lot of
-board-specific knowledge to userland, which is ugly and also prevents
-using things like PXE-initiated nfsroot on those devices.
+In any way, thank you for pointing it out, I assume the next iteration
+should then be v4.
 
-The purpose of this series is to be able to properly support such devices
-(ie. practially all consumer-grade routers out there using an eMMC for
-storing firmware).
-
-Also, those devices have enough resources to run a general purpose
-distribution like Debian instead of OpenWrt, and all the userland
-hacks to set MAC addresses and extract WiFi-EEPROM-data in a
-board-specific ways will most certainly never find their way into
-Debian. It's just not how embedded Linux works, unless you are looking
-only at the RaspberryPi which got that data stored in a textfile
-which is shipped by the distribution -- something very weird and very
-different from literally all of-the-shelf routers, access-points or
-switches I have ever seen (and I've seen many). Maybe Felix who has
-seen even more of them can tell us more about that.
-
-
-[1]: https://patchwork.kernel.org/project/linux-block/patch/f70bb480aef6f55228a25ce20ff0e88e670e1b70.1709667858.git.daniel@makrotopia.org/#25756072
+[1]: https://docs.kernel.org/process/submitting-patches.html
