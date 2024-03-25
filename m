@@ -1,71 +1,79 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4B11E534;
-	Mon, 25 Mar 2024 18:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB57F2F37
+	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 18:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711392799; cv=none; b=LCazxIP/xdolaWI4RcFUDrfW3kie3/MuVdchdV1Nx1yqZGBY2Oge6z9vWlVccF6HbUNsiAJ+GkNMpkKdb5zhQ2RwnxvRW2UOU9jWbopi4P4eQS2aX2MCpg12C3QIMlWvjUaMfqpHaL0HwgaATMFFl1/HoR0Q3J9Uqn5D+SPjVN8=
+	t=1711392827; cv=none; b=ba1GfAxUbtu8bFBCUncWibazS9zhRpKNHKI5UbNP7pFnNwl50CVh3NH+MBrct6GMk9uo15ZJomuBJBt1cl0RGdCQGZ4U3iO6bMUUt1vqHWBHZEEGpHXEEx2HJvXgMS6Bw9aZKVuEkYcO+yFxoPFucZ96o3Gwvc/j70gKr42y/f8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711392799; c=relaxed/simple;
-	bh=8HB8T+9QKi2BsmxvgtUg7ciBvTzwZx/p4zyHvH2zcwQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=oFqOxqzr1A0//DLjfGByX0xqaZnxZGbg2+a4eTV4wrApFELx1X+xwhnrKdfKga2Ub+photn0Mfj8Hic5i43HRtwtN3Cqd8REJ7tz4miiyM7wCDDhA83ZHv6tJou3azo/RW1ZJTyHXaSPnnldCkiD9OhPS1k2IdKQsa7HAaxIgKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=QK5Jma2m; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1711392827; c=relaxed/simple;
+	bh=rWvmIay/qmvcUbfGLILflE9sZ0+7UoLq6Acz0IT/LFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n93pabb/R0k5fRrMlP3lccqkiJat+xPd4NNv7R/gXal8JY1tnIqtY2uK3+qq4FJBtxyYXT3XezUM+jjEsf7oD31UgHS2P4G3bHIAJZitHQc8QtlxkKDFq+DMAbXFKdqPU+2kD8cdIJMBtZpGfEProon1YB+dDfeLcm+2Sv13WeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gVkDnsTV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="QK5Jma2m"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V3MWx3rNrzlgVnN;
-	Mon, 25 Mar 2024 18:53:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:content-language:references:subject:subject:from:from
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711392795; x=1713984796; bh=8HB8T+9QKi2BsmxvgtUg7ciB
-	vTzwZx/p4zyHvH2zcwQ=; b=QK5Jma2mZGZFG0tWntSYAtsNFNzQTTKSGofdu3nN
-	ASu72DGM2Mvuz/o8wDWrS3lkflhOmfqemdIhBxRIBMOt/pROSHJQPeQe0NJIWCCC
-	j0wSPixsWb3uBI8CcBzCKEe8GVBTz5izmQne2MRhLMad8QV+k4Y2vBQhs5DtP5jC
-	UrQ0zwtvEt1LfARPoLZCYuzPBh27vTfyGUieTm6ouPUxyvqJqizElTLuODjv4dWA
-	INCewET+kzqXFcmxiZekooZezaOZWs+FxeLPcPaDsPH2intQO2ViNW7O7jkL3p5G
-	CMkkBx/+kAgCW/qwZ6BwlUN2EWJO8J/65sA2IATb2pu+4g==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id O8IPN_-Z7MKH; Mon, 25 Mar 2024 18:53:15 +0000 (UTC)
-Received: from [100.96.154.173] (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V3MWt3k88zlgTGW;
-	Mon, 25 Mar 2024 18:53:14 +0000 (UTC)
-Message-ID: <1159bc83-f252-49fe-a15a-e0d0eb18661f@acm.org>
-Date: Mon, 25 Mar 2024 11:53:13 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gVkDnsTV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B0BFC433F1;
+	Mon, 25 Mar 2024 18:53:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711392827;
+	bh=rWvmIay/qmvcUbfGLILflE9sZ0+7UoLq6Acz0IT/LFs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gVkDnsTVzVykuLCAb/1h0PaSTYv5gqpWFV/YJoGaZ9YwFxRxp87SWilZ4ZzIRJyyq
+	 gypwP3PCRzYfebv5/NOAzo+gF+kI5hmQIh8a65WZ5BFSnbiUA8PkQpYh6eyEoSoY6e
+	 ++S3PyjvodtkZ+oKfJ7kziiirzLrjiKLQaG5NtQnTvz70K9e45S6MY5U7ZXZNU6vDI
+	 Q/yEErM1q86W3v6VKt7p47hG+3Dgb7DCwuTGDpzF1FA0thMVO8EwrLmTVibE4KF0kr
+	 eJmBJUAyRIauQ8zdKOctm+M8n7gf/QWBRFVaVJ6atSGv+xgfH7OzI8cb1UUrVtOgxR
+	 3f8k6k+u+wX+Q==
+Date: Mon, 25 Mar 2024 11:53:45 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH V2] block: fail unaligned bio from submit_bio_noacct()
+Message-ID: <ZgHIOUpZB78uVxAm@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240324133702.1328237-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH 02/23] bsg: pass queue_limits to bsg_setup_queue
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, MPT-FusionLinux.pdl@broadcom.com,
- linux-scsi@vger.kernel.org, open-iscsi@googlegroups.com
-References: <20240324235448.2039074-1-hch@lst.de>
- <20240324235448.2039074-3-hch@lst.de>
-Content-Language: en-US
-In-Reply-To: <20240324235448.2039074-3-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240324133702.1328237-1-ming.lei@redhat.com>
 
-On 3/24/24 16:54, Christoph Hellwig wrote:
-> This allows bsg_setup_queue to pass them to blk_mq_alloc_queue and thus
-> set up the limits at queue allocation time.
+On Sun, Mar 24, 2024 at 09:37:02PM +0800, Ming Lei wrote:
+> @@ -780,6 +793,9 @@ void submit_bio_noacct(struct bio *bio)
+>  		}
+>  	}
+>  
+> +	if (WARN_ON_ONCE(!bio_check_alignment(bio, q)))
+> +		goto end_io;
+> +
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+The "status" at this point is "BLK_STS_IOERR", so user space would see
+EIO, but the existing checks return EINVAL. I'm not sure if that's "ok",
+but assuming it is, I think the user visible different behavior should
+be mentioned in the changelog.
+
+Alternatively, maybe we want an asynchronous way to return EINVAL for
+these conditions. It's more informative to a user where the problem is
+than a generic EIO. There is no BLK_STS_ value that translates to
+EINVAL, though, so maybe we need a new block status code like
+BLK_STS_INVALID_REQUEST.
+
+> @@ -53,10 +52,6 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  		return -EOPNOTSUPP;
+>  	}
+>  
+> -	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+> -	if ((sector | nr_sects) & bs_mask)
+> -		return -EINVAL;
+> -
+>  	if (!nr_sects)
+>  		return -EINVAL;
