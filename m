@@ -1,71 +1,76 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650F2155737
-	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 02:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D4D15216F
+	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 02:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711333258; cv=none; b=gN9UHlqCPbWOFMWdax1Jc0X1p4GOPihmjZhZd5+brN9GEFGfnNc2+8OxrMGKlP3Pl9gcQefdnE+OuA5eSGp59T2/SVbP3RRucuZEAZpNdqp6BGI1vbzcUj62x/JpftY0iWvLuUKYNsrJWFhSrA6bm6v1AGs5KdK0M7jYWPTIrro=
+	t=1711335195; cv=none; b=Gn6j87Bk7Od9VEPQ7b/WyIIstEG4LqE+tTdqPWxC5DET43kCi86lHQjOPXHVCxtvtLjcEK9OT7/JFivAtA+EnQhf1KNctvEvaIulPCqBLADmhXoANEPtojXY5jqx7Sec/eAP1iZZWCWI/Fp90Gzo1ENdgnwVcfmgwW8X87/YMIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711333258; c=relaxed/simple;
-	bh=a+5IO4bzkKk2FkrhKzrSPkAfIMWaw9+PBv6OhA8Vg0Y=;
+	s=arc-20240116; t=1711335195; c=relaxed/simple;
+	bh=Iwy35WEKGQaZWaKUprvpCF3gybVRdIbsl3SsAExl21c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pK5iXiDvB/dltBlXvb0+DmcEUnCiwQRycL32PeEz5T1Q2dQKLh+FsQ+ry6PlS4zmzkxgEtdB2H6wvwM3AGy7PF8pl2AYhjbwosrXLTbcm5yaANw/zk4Zjf3ar+IPCchJtzOEs2hnS4tL/bug8WWVf++GDwpJoWsyvnhm/fXY0eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=WILBVUsc; arc=none smtp.client-ip=209.85.221.43
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dde5srmqZrumkHoNne1TeRbmVTf8o0UlXhHcMsq0YxXY8Wcx9eYTKwuVvqb9N1ljFKXwiTVy/Y1fjJ7SnMDXlQK+6cjmnJhUv9HqEzVMbM3LHlqOO+mMxemsLnADl5/7Yj89EsUkLyh151NrXcNl/CpFOkWwi4bHBjc3bWukBDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=f+W+83Kz; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="WILBVUsc"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33edbc5932bso2777820f8f.3
-        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 19:20:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="f+W+83Kz"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33ec7e1d542so2726604f8f.1
+        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2024 19:53:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1711333253; x=1711938053; darn=vger.kernel.org;
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1711335190; x=1711939990; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3KYX5sN4/DQ0Ca+C7M+8tiNgEQ0vWfJgF6O4xHUhDV4=;
-        b=WILBVUschp4CuVlN7IxfSSbcekKRUxY843c89N9f2TXzUAxcWfnvMLRYTeQyhll7UU
-         fCEgVNTdjGNu3DzFmMDtsctqbTWpbgMTn73fXjf0alNQEHwUD41hmK3tVxa4UYRJOUo+
-         m/jg4z0sXsuTfv4Cipozh/mGU8iH2flLHKj5ivZ7iiFqKTN9oZGGDupI7GTCaF3AsQKD
-         d/WpSTOTL8kgJDsYCm7gB8gAlVcLID3ax6mFZVt/g0/v3Os0fepbMdbVh1OWrTCwlP9T
-         2Ze4VF067ykKFmEdba6UQSixO1BJ2zZ7/f2bY11gN9fFq8DU60UYMiz1wQ98k12imiTs
-         ijYg==
+        bh=IQSoGNn9foRvk9xNgJy3vvfi1aDXWec9jix0W40tVdQ=;
+        b=f+W+83KzVcFgOnBIYaWOsLNSTXRgX51IOnmNuCNUJmS/2G7HN6h2q2KVBH81do868A
+         TOmAPiVO1AGVIF62bokjqbMA/KLKbR5PYslQgnzkLoBBrjOuTdHNvSWnQazK4Hu0Yvns
+         Tgwss8zuyfX7MPLtdKvSiwV9nP1+OIHceTc3cb2Zzno9rzb7PiCmTQDEqp8SatcPatLe
+         CtYkuXTESqoTwsnpSystKMCNBRpN0TOalAu965meiWNZ4LQOQYKTuDC298uBvHsaDBbJ
+         AHLPidWzdNIvUmy/EQMM3MW4rgPgcms49zh+u9gUAd6q9bOZ+fD/Unisf8TQb+TUEe1d
+         m3cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711333253; x=1711938053;
+        d=1e100.net; s=20230601; t=1711335190; x=1711939990;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3KYX5sN4/DQ0Ca+C7M+8tiNgEQ0vWfJgF6O4xHUhDV4=;
-        b=o4WUTF06niJijuDH9VvMzqG/MhFThjsXrthezr3MO9B2QAWfHcrJ2dR+XRO56SWNMK
-         rlo81KRqrQGSJFKyVf8janohQvB4rm/crrWoGhtdVGJDPkCppMhizOFCOZCsIINf1k8N
-         36Nc3Vb/eKtIoy/erqz0uX/scC5colsZPHRarHOPZyZVRVSQpZxzbPHNz4/GZgm6OpF5
-         MRE6GkrcYTRhZksIZBw8THUCzcxY9JMlLlHFGJYCEvzTOUAkDUGCCO6rj+qH+Og5x6DD
-         6/hHnW711uf/z/xJTLKXrmw0iCVIKA8Qhqcz2/O0dd1uyCjbhkQhMi9oV7Ni1DrVCAg4
-         xAiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXrFcBRRZNP1zt5yfFDZmozbiUFGInUXBD2+ws/wjOHfYWG5eAuap073OoyUWaygE7abTtuA90U74evP/9Q2S2FuwJ5jlzyU5ccTmo=
-X-Gm-Message-State: AOJu0YxdJfa4LCtaZci+Hxaje8ZPCzlDTWRH65sFPG3etnh7NEVmVnGC
-	E4faNhE3YcVmm3wSXYUrBUw4sEQPvh94LJv8zOB5J8otcvPhZF9D6qCIrPER28Y=
-X-Google-Smtp-Source: AGHT+IEGylOZLmAkTa4hEo69V3BZPeCBsFyo1QAQu5pjIFuYSIkRj6IiZDL9UF3nVTOfhI5RA3UbGw==
-X-Received: by 2002:adf:f241:0:b0:33e:78c4:3738 with SMTP id b1-20020adff241000000b0033e78c43738mr3519996wrp.54.1711333253412;
-        Sun, 24 Mar 2024 19:20:53 -0700 (PDT)
+        bh=IQSoGNn9foRvk9xNgJy3vvfi1aDXWec9jix0W40tVdQ=;
+        b=erCzZ92rJov7Q1EOQG7psGfMrEN0lh62xexKn4m8+Aw+HGafvdXoHz7AgfTZLloFxF
+         NSnjyvB78OjAVwYZ2ouhB7vjjb0QOoGOsLA4RnM8lywglc+saGuZrfAyTDh8GcjjGXcZ
+         jRL1cZu9+BpCy7OP5fsdDOyPBx8t6mY6bZesgtyOwDwiZh/CipBEHfDY/vx4XnyDfHKt
+         y7XYV2L4h5qHT4nktCIl9LwF/Fl6d+79DjAp3u2jzP/NXh030g5dT8H1uenSSNhR0Wvn
+         evVaBTOIJNfZe/6F/zwjiS0RPfx0o/2PlfiywExxSa2PQNI+uKn+p8z5qwrT73qo8//j
+         517g==
+X-Forwarded-Encrypted: i=1; AJvYcCU+Hj6+CRhXLHVEmWRoCHu9SaHpE4wazo505uNyOINUxbk+UWngxl/9ByRT93yeRvjpkg4L+UOgsUW1efncGe8gr6aEQGaTKJQjg5A=
+X-Gm-Message-State: AOJu0YxmkiiJVQw5gJrLn6bIqvI9Wi7rbvdrsHDX3i6AvIEKaQXsC01Y
+	OQrRlxDIahaPyuY3eMqDUNulS/uKMoiXtyx9IARC5KM4/OdaehR8adBVBd/TzFk=
+X-Google-Smtp-Source: AGHT+IG59/Ky716HurdeTVFpnSrvFsweZy84YJGoZ4Hi4NSc7jmRa3TENi3PZTobj8KmtDnOKAn23Q==
+X-Received: by 2002:a05:6000:d8c:b0:33e:7ae6:6f4a with SMTP id dv12-20020a0560000d8c00b0033e7ae66f4amr4380793wrb.23.1711335190261;
+        Sun, 24 Mar 2024 19:53:10 -0700 (PDT)
 Received: from airbuntu (host81-157-90-255.range81-157.btcentralplus.com. [81.157.90.255])
-        by smtp.gmail.com with ESMTPSA id t17-20020a0560001a5100b0033dd2c3131fsm8095566wry.65.2024.03.24.19.20.52
+        by smtp.gmail.com with ESMTPSA id t15-20020a5d690f000000b0033e95bf4796sm8123808wru.27.2024.03.24.19.53.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Mar 2024 19:20:52 -0700 (PDT)
-Date: Mon, 25 Mar 2024 02:20:51 +0000
+        Sun, 24 Mar 2024 19:53:09 -0700 (PDT)
+Date: Mon, 25 Mar 2024 02:53:08 +0000
 From: Qais Yousef <qyousef@layalina.io>
-To: Vincent Guittot <vincent.guittot@linaro.org>
-Cc: Christian Loehle <christian.loehle@arm.com>,
-	linux-kernel@vger.kernel.org, peterz@infradead.org,
-	juri.lelli@redhat.com, mingo@redhat.com, rafael@kernel.org,
-	dietmar.eggemann@arm.com, vschneid@redhat.com,
-	Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com,
-	ulf.hansson@linaro.org, andres@anarazel.de, asml.silence@gmail.com,
-	linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org
+To: Christian Loehle <christian.loehle@arm.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, linux-kernel@vger.kernel.org,
+	peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
+	rafael@kernel.org, dietmar.eggemann@arm.com, vschneid@redhat.com,
+	vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
+	adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de,
+	asml.silence@gmail.com, linux-pm@vger.kernel.org,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+	linux-mmc@vger.kernel.org
 Subject: Re: [RFC PATCH 0/2] Introduce per-task io utilization boost
-Message-ID: <20240325022051.73mfzap7hlwpsydx@airbuntu>
+Message-ID: <20240325025308.6uqkhpyba6moxntl@airbuntu>
 References: <20240304201625.100619-1-christian.loehle@arm.com>
- <CAKfTPtDcTXBosFpu6vYW_cXLGwnqJqYCUW19XyxRmAc233irqA@mail.gmail.com>
+ <86f0af00-8765-4481-9245-1819fb2c6379@acm.org>
+ <0dc6a839-2922-40ac-8854-2884196da9b9@arm.com>
+ <c5b7fc1f-f233-4d25-952b-539607c2a0cc@acm.org>
+ <2784c093-eea1-4b73-87da-1a45f14013c8@arm.com>
+ <20240321123935.zqscwi2aom7lfhts@airbuntu>
+ <1ff973fc-66a4-446e-8590-ec655c686c90@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,141 +79,166 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAKfTPtDcTXBosFpu6vYW_cXLGwnqJqYCUW19XyxRmAc233irqA@mail.gmail.com>
+In-Reply-To: <1ff973fc-66a4-446e-8590-ec655c686c90@arm.com>
 
-(piggy backing on this reply)
+On 03/21/24 17:57, Christian Loehle wrote:
 
-On 03/22/24 19:08, Vincent Guittot wrote:
-> Hi Christian,
+> > So you want the hardirq to move to the big core? Unlike softirq, there will be
+> > a single hardirq for the controller (to my limited knowledge), so if there are
+> > multiple requests I'm not sure we can easily match which one relates to which
+> > before it triggers. So we can end up waking up the wrong core.
 > 
-> On Mon, 4 Mar 2024 at 21:17, Christian Loehle <christian.loehle@arm.com> wrote:
-> >
-> > There is a feature inside of both schedutil and intel_pstate called
-> > iowait boosting which tries to prevent selecting a low frequency
-> > during IO workloads when it impacts throughput.
-> > The feature is implemented by checking for task wakeups that have
-> > the in_iowait flag set and boost the CPU of the rq accordingly
-> > (implemented through cpufreq_update_util(rq, SCHED_CPUFREQ_IOWAIT)).
-> >
-> > The necessity of the feature is argued with the potentially low
-> > utilization of a task being frequently in_iowait (i.e. most of the
-> > time not enqueued on any rq and cannot build up utilization).
-> >
-> > The RFC focuses on the schedutil implementation.
-> > intel_pstate frequency selection isn't touched for now, suggestions are
-> > very welcome.
-> > Current schedutil iowait boosting has several issues:
-> > 1. Boosting happens even in scenarios where it doesn't improve
-> > throughput. [1]
-> > 2. The boost is not accounted for in EAS: a) feec() will only consider
-> >  the actual utilization for task placement, but another CPU might be
-> >  more energy-efficient at that capacity than the boosted one.)
-> >  b) When placing a non-IO task while a CPU is boosted compute_energy()
-> >  will not consider the (potentially 'free') boosted capacity, but the
-> >  one it would have without the boost (since the boost is only applied
-> >  in sugov).
-> > 3. Actual IO heavy workloads are hardly distinguished from infrequent
-> > in_iowait wakeups.
-> > 4. The boost isn't associated with a task, it therefore isn't considered
-> > for task placement, potentially missing out on higher capacity CPUs on
-> > heterogeneous CPU topologies.
-> > 5. The boost isn't associated with a task, it therefore lingers on the
-> > rq even after the responsible task has migrated / stopped.
-> > 6. The boost isn't associated with a task, it therefore needs to ramp
-> > up again when migrated.
-> > 7. Since schedutil doesn't know which task is getting woken up,
-> > multiple unrelated in_iowait tasks might lead to boosting.
+> It would be beneficial to move the hardirq to a big core if the IO task
+> is using it anyway.
+> I'm not sure I actually want to. There are quite a few pitfalls (like you
 
-You forgot an important problem which what was the main request from Android
-when this first came up few years back. iowait boost is a power hungry
-feature and not all tasks require iowait boost. By having it per task we want
-to be able to prevent tasks from causing frequency spikes due to iowait boost
-when it is not warranted.
+I'm actually against it. I think it's too much complexity for not necessasrily
+a big gain. FWIW, one of the design request to get per task iowait boost so
+that we can *disable* it. It wastes power when only a handful of tasks actually
+care about perf.
 
-> >
-> > We attempt to mitigate all of the above by reworking the way the
-> > iowait boosting (io boosting from here on) works in two major ways:
-> > - Carry the boost in task_struct, so it is a per-task attribute and
-> > behaves similar to utilization of the task in some ways.
-> > - Employ a counting-based tracking strategy that only boosts as long
-> > as it sees benefits and returns to no boosting dynamically.
+Caring where the hardirq run for perf is unlikely a problem in practice.
+Softirq should follow the requester already when it matters.
+
+> mentioned) that the scheduler really shouldn't be concerned about.
+> Moving the hardirq, if implemented in the kernel, would have to be done by the
+> host controller driver anyway, which would explode this series.
+> (host controller drivers are quite fragmented e.g. on mmc)
 > 
-> Thanks for working on improving IO boosting. I have started to read
-> your patchset and have few comments about your proposal:
+> The fact that having a higher capacity CPU available ("running faster") for an
+> IO task doesn't (always) imply higher throughput because of the hardirq staying
+> on some LITTLE CPU is bothering (for this series), though.
 > 
-> The main one is that the io boosting decision should remain a cpufreq
-> governor decision and so the io boosting value should be applied by
-> the governor like in sugov_effective_cpu_perf() as an example instead
-> of everywhere in the scheduler code.
+> > 
+> > Generally this should be a userspace policy. If there's a scenario where the
+> > throughput is that important they can easily move the hardirq to the big core
+> > unconditionally and move it back again once this high throughput scenario is no
+> > longer important.
+> 
+> It also feels wrong to let this be a userspace policy, as the hardirq must be
+> migrated to the perf domain of the task, which userspace isn't aware of.
+> Unless you expect userspace to do
 
-I have similar thoughts.
+irq balancer is a userspace policy. For kernel to make an automatic decision
+there are a lot of ifs must be present. Again, I don't see on such system
+maximizing throughput is a concern. And userspace can fix the problem simply
+- they know after all when the throughput really matters to the point where the
+hardirq runs is a bottleneck. In practice, I don't think it is a bottleneck.
+But this is my handwavy judgement. The experts know better. And note, I mean
+use cases that are not benchmarks ;-)
 
-I think we want the scheduler to treat iowait boost like uclamp_min, but
-requested by block subsystem rather than by the user.
+> CPU_affinity_task=big_perf_domain_0 && hardirq_affinity=big_perf_domain_0
+> but then you could just as well ask them to set performance governor for
+> big_perf_domain_0 (or uclamp_min=1024) and need neither this series nor
+> any iowait boosting.
+> 
+> Furthermore you can't generally expect userspace to know if their IO will lead
+> to any interrupt at all, much less which one. They ideally don't even know if
+> the file IO they are doing is backed by any physical storage in the first place.
+> (Or even further, that they are doing file IO at all, they might just be
+> e.g. page-faulting.)
 
-I think we should create a new task_min/max_perf() and replace all current
-callers in scheduler to uclamp_eff_value() with task_min/max_perf() where
-task_min/max_perf()
-
-unsigned long task_min_perf(struct task_struct *p)
-{
-	return max(uclamp_eff_value(p, UCLAMP_MIN), p->iowait_boost);
-}
-
-unsigned long task_max_perf(struct task_struct *p)
-{
-	return uclamp_eff_value(p, UCLAMP_MAX);
-}
-
-then all users of uclamp_min in the scheduler will see the request for boost
-from iowait and do the correct task placement decision. Including under thermal
-pressure and ensuring that they don't accidentally escape uclamp_max which I am
-not sure if your series caters for with the open coding it. You're missing the
-load balancer paths from what I see.
-
-It will also solve the problem I mention above. The tasks that should not use
-iowait boost are likely restricted with uclamp_max already. If we treat iowait
-boost as an additional source of min_perf request, then uclamp_max will prevent
-it from going above a certain perf level and give us the desired impact without
-any additional hint. I don't think it is important to disable it completely but
-rather have a way to prevent tasks from consuming too much resources when not
-needed, which we already have from uclamp_max.
-
-I am not sure it makes sense to have a separate control where a task can run
-fast due to util but can't have iowait boost or vice versa. I think existing
-uclamp_max should be enough to restrict tasks from exceeding a performance
-limit.
+The way I see it, it's like gigabit networking. The hardirq will matter once
+you reach such high throughput scenarios. Which are corner cases and not the
+norm?
 
 > 
-> Then, the algorithm to track the right interval bucket and the mapping
-> of intervals into utilization really looks like a policy which has
-> been defined with heuristics and as a result further seems to be a
-> governor decision
+> > 
+> > Or where you describing a different problem?
+> 
+> That is the problem I mentioned in the series and Bart and I were discussing.
+> It's a problem of the series as in "the numbers aren't that impressive".
+> Current iowait boosting on embedded/mobile systems will perform quite well by
+> chance, as the (low util) task will often be on the same perf domain the hardirq
+> will be run on. As can be seen in the cover letter the benefit of running the
+> task on a (2xLITTLE capacity) big CPU therefore are practically non-existent,
+> for tri-gear systems where big CPU is more like 10xLITTLE capacity the benefit
+> will be much greater.
+> I just wanted to point this out. We might just acknowledge the problem and say
+> "don't care" about the potential performance benefits of those scenarios that
+> would require hardirq moving.
 
-Hmm do you think this should not be a per-task value then Vincent?
+I thought the softirq does the bulk of the work. hardirq being such
+a bottleneck is (naively maybe) a red flag for me that it's doing too much than
+a simple interrupt servicing.
 
-Or oh, I think I see what you mean. Make effective_cpu_util() set min parameter
-correctly. I think that would work too, yes. iowait boost is just another min
-perf request and as long as it is treated as such, it is good for me. We'll
-just need to add a new parameter for the task like I did in remove uclamp max
-aggregation serires.
+You don't boost when the task is sleeping, right? I think this is likely
+a cause of the problem where softirq is not running as fast - where before the
+series the CPU will be iowait boosted regardless the task is blocked or not.
 
-Generally I think it's better to split the patches so that the conversion to
-iowait boost with current algorithm to being per-task as a separate patch. And
-then look at improving the algorithm logic on top. These are two different
-problems IMHO.
+> In the long-term it looks like for UFS the problem will disappear as we are
+> expected to get one queue/hardirq per CPU (as Bart mentioned), on NVMe that
+> is already the case.
+> 
+> I CC'd Uffe and Adrian for mmc, to my knowledge the only subsystem where
+> 'fast' (let's say >10K IOPS) devices are common, but only one queue/hardirq
+> is available (and it doesn't look like this is changing anytime soon).
+> I would also love to hear what Bart or other UFS folks think about it.
+> Furthermore if I forgot any storage subsystem with the same behavior in that
+> regards do tell me.
+> 
+> Lastly, you could consider the IO workload:
+> IO task being in iowait very frequently [1] with just a single IO inflight [2]
+> and only very little time being spent on the CPU in-between iowaits[3],
+> therefore the interrupt handler being on the critical path for IO throughput
+> to a non-negligible degree, to be niche, but it's precisely the use-case where
+> iowait boosting shows it's biggest benefit.
+> 
+> Sorry for the abomination of a sentence, see footnotes for the reasons.
+> 
+> [1] If sugov doesn't see significantly more than 1 iowait per TICK_NSEC it
+> won't apply any significant boost currently.
 
-One major problem and big difference in per-task iowait that I see Christian
-alluded to is that the CPU will no longer be boosted when the task is sleeping.
-I think there will be cases out there where some users relied on that for the
-BLOCK softirq to run faster too. We need an additional way to ensure that the
-softirq runs at a similar performance level to the task that initiated the
-request. So we need a way to hold the cpufreq policy's min perf until the
-softirq is serviced. Or just keep the CPU boosted until the task is migrated.
-I'm not sure what is better yet.
+I CCed you to a patch where I fix this. I've been sleeping on it for too long.
+Maybe I should have split this fix out of the consolidation patch.
+
+> [2] If the storage devices has enough in-flight requests to serve, iowait
+> boosting is unnecessary/wasteful, see cover letter.
+> [3] If the task actually uses the CPU in-between iowaits, it will build up
+> utilization, iowait boosting benefit diminishes.
+
+The current mechanism is very aggressive. It needs to evolve for sure.
 
 > 
-> Finally adding some atomic operation in the fast path is not really desirable
+> > 
+> > Glad to see your series by the way :-) I'll get a chance to review it over the
+> > weekend hopefully.
+> 
+> Thank you!
+> Apologies for not CCing you in the first place, I am curious about your opinion
+> on the concept!
 
-Yes I was thinking if we can apply the value when we set the p->in_iowait flag
-instead?
+I actually had a patch that implements iowait boost per-task (on top of my
+remove uclamp max aggregation series) where I did actually take the extra step
+to remove iowait from intel_pstate. Can share the patches if you think you'll
+find them useful.
+
+Just want to note that this mechanism can end up waste power and this is an
+important direction to consider. It's not about perf only (which matters too).
+
+> 
+> FWIW I did mess up a last-minute, what was supposed to be, cosmetic change that
+> only received a quick smoke test, so 1/2 needs the following:
+> 
+> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+> index 4aaf64023b03..2b6f521be658 100644
+> --- a/kernel/sched/fair.c
+> +++ b/kernel/sched/fair.c
+> @@ -6824,7 +6824,7 @@ static void dequeue_io_boost(struct cfs_rq *cfs_rq, struct task_struct *p)
+>         } else if (p->io_boost_curr_ios < p->io_boost_threshold_down) {
+>                 /* Reduce boost */
+>                 if (p->io_boost_level > 1)
+> -                       io_boost_scale_interval(p, true);
+> +                       io_boost_scale_interval(p, false);
+>                 else
+>                         p->io_boost_level = 0;
+>         } else if (p->io_boost_level == IO_BOOST_LEVELS) {
+> 
+> 
+> I'll probably send a v2 rebased on 6.9 when it's out anyway, but so far the
+> changes are mostly cosmetic and addressing Bart's comments about the benchmark
+> numbers in the cover letter.
+
+I didn't spend a lot of time on the series, but I can see a number of problems.
+Let us discuss them first and plan a future direction. No need to v2 if it's
+just for this fix IMO.
