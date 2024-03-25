@@ -1,99 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DCD54917
-	for <linux-block@vger.kernel.org>; Mon, 25 Mar 2024 13:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7E671756;
+	Mon, 25 Mar 2024 15:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711374861; cv=none; b=U3cPYBYxMVsQoSyKNSQh1/83HfqfvJU45wKAxcCYsQPDUbwhEkc3FqYPW+XQ/YJsp+YhBe2EM+nUXvyvzePnMpAg3GgyaJu89J06hUwk4yJukP99Snh02XH4lQY27Wp6Hi5+1mkulUfZmkUVtHYLv6j7A1/roec38PpnbkWULOk=
+	t=1711379449; cv=none; b=cNZYygfF5ZBNRvxnhE6jRC+s6DMxNBvI+Ss+wBq9XLpaOVfGORtQ7uP4WmvdOnq5zlT65ezjp3VnecLtWB0ei4ENERgSRs3VOQvPzD6Go5reoLIZmlTBRl55/aXMIFwO00ShKH1x1J8X0gt7aPOJx5AsrP3/75MKOkRtWrsE4fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711374861; c=relaxed/simple;
-	bh=DFTfl5tkIsDcJwJrvgPEwpjNvKiXx2TUe37YzwNItrk=;
+	s=arc-20240116; t=1711379449; c=relaxed/simple;
+	bh=trg7U+nLMFYCvy+OFlT2yFQrUXZMi1r0QsFIeOhyV5c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NK0gOt+dSRKkuX1G6WXU3Os2w8AX1WLYdNwmWRA6idkE9AAxHx5ge7hcVNziQTyJA7UIeX8vIFVDGDIqC0yR0KJ6n6Yt17VufcWafWG4eT09gp87xXSchFdgJ6t2IvMZ8Yox0/c2TCiXV3hBOfw9ps8O3g6XvXvdj1D1BuHp4qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiygy+yl; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=D0kYSbKQk2fP5FaT3jculc6kAKEUAIcrqKIYuhq4YPx14A+VTMndrWjauzSprrNnRJhR7rcRACFC2ar/sdxhUmaIZQCk8sp4rJCvbAGGLv9ENQ2HIYxD6VQMCmZoadbTC058UNj5oycTHGUFOdaZMD46d4K8+gifWsftW9+SxOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ti6eVYIn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiygy+yl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31844C433C7;
-	Mon, 25 Mar 2024 13:54:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ti6eVYIn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A7E0C433F1;
+	Mon, 25 Mar 2024 15:10:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711374861;
-	bh=DFTfl5tkIsDcJwJrvgPEwpjNvKiXx2TUe37YzwNItrk=;
+	s=k20201202; t=1711379448;
+	bh=trg7U+nLMFYCvy+OFlT2yFQrUXZMi1r0QsFIeOhyV5c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aiygy+ylnx3of+L6m8b7Ik5TNTkaIN5TXAS4zk3PTcV2SrUBx/lVsYlVwALDFgyhf
-	 6iQKH6uv1iJYBeQltdNyCRPl7UjKHn05va1Q05oo0G7n+P6jFOQSk/4Dzxw4MwYBjY
-	 /AbKnLcwTmXsJP2pwvDVfZ7ZUo3GyJ0LmcCqEIzaJJbYhw7biBdKP8KFrGS68zkBLG
-	 5A0uFicJ9ypBGjFp369VNSwPDgZ8tIw9sZDHAdPTWctaG9XKtjL7Q9tvJVyTtFqoUg
-	 0RxBV9dZksELD+xdHtwaKthv6Vph26OvI+UHdlq3cbpbbvz/lqGYP6nycLycDrvCxM
-	 4NjH3JRfIbqpA==
-Date: Mon, 25 Mar 2024 14:54:15 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>, 
-	Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>, 
-	linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
-Message-ID: <20240325-entsolidarisierung-kapital-5897091cdd25@brauner>
-References: <20240323-seide-erbrachten-5c60873fadc1@brauner>
- <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
- <3594bd44-4c6b-d079-1209-f069353ccd58@huaweicloud.com>
+	b=ti6eVYInJXHAVKyP7Tfo6+ocS313pVhZ7NHgFubN1R5Sf2kgudJg7yL0C6tCZ+uvt
+	 zKcnghy9yia6BSRKb0mRE01TkhMQrTMAVYcZfpPEII2Kdwu/TZjHhbALDFWa0SktA0
+	 YJR013P3yI0NaC77QGV/AO97/pUvRlkzHbPA7Fe6+PutVXjFP8gc2qCaYlZr6/axlv
+	 HdRws+E6gi+1llflUZpe8pjiKto71vgtm1/8K2GbmoA2Tpmm+NAfwh+UYOEPxEsnRU
+	 cAmRpvvMpMtOJEmZUrSlo3XTnjnpUJMluFEHASxdOMjkngO9wLm/ORZgP/XCYJtX9I
+	 UnLnmod4B0sSw==
+Date: Mon, 25 Mar 2024 10:10:46 -0500
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Christian Heusel <christian@heusel.eu>,
+	Min Li <min15.li@samsung.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Avri Altman <avri.altman@wdc.com>, Hannes Reinecke <hare@suse.de>,
+	Christian Loehle <CLoehle@hyperstone.com>,
+	Bean Huo <beanhuo@micron.com>, Yeqi Fu <asuk4.q@gmail.com>,
+	Victor Shih <victor.shih@genesyslogic.com.tw>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Dominique Martinet <dominique.martinet@atmark-techno.com>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/8] block: implement NVMEM provider
+Message-ID: <20240325151046.GA3591150-robh@kernel.org>
+References: <cover.1711048433.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3594bd44-4c6b-d079-1209-f069353ccd58@huaweicloud.com>
+In-Reply-To: <cover.1711048433.git.daniel@makrotopia.org>
 
-On Mon, Mar 25, 2024 at 07:51:27PM +0800, Yu Kuai wrote:
-> Hi,
+On Thu, Mar 21, 2024 at 07:31:48PM +0000, Daniel Golle wrote:
+> On embedded devices using an eMMC it is common that one or more (hw/sw)
+> partitions on the eMMC are used to store MAC addresses and Wi-Fi
+> calibration EEPROM data.
 > 
-> 在 2024/03/24 0:11, Christian Brauner 写道:
-> > Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
-> > default this option is set. When it is set the long-standing behavior
-> > of being able to write to mounted block devices is enabled.
-> > 
-> > But in order to guard against unintended corruption by writing to the
-> > block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
-> > off. In that case it isn't possible to write to mounted block devices
-> > anymore.
-> > 
-> > A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
-> > which disallows concurrent BLK_OPEN_WRITE access. When we still had the
-> > bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
-> > the mode was passed around. Since we managed to get rid of the bdev
-> > handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
-> > on whether the file was opened writable and writes to that block device
-> > are blocked. That logic doesn't work because we do allow
-> > BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
+> Implement an NVMEM provider backed by a block device as typically the
+> NVMEM framework is used to have kernel drivers read and use binary data
+> from EEPROMs, efuses, flash memory (MTD), ...
 > 
-> I don't get it here, looks like there are no such use case. All users
-> passed in BLK_OPEN_RESTRICT_WRITES together with BLK_OPEN_WRITE.
+> In order to be able to reference hardware partitions on an eMMC, add code
+> to bind each hardware partition to a specific firmware subnode.
 > 
-> Is the following root cause here?
+> Overall, this enables uniform handling across practially all flash
+> storage types used for this purpose (MTD, UBI, and now also MMC).
 > 
-> 1) t1 open with BLK_OPEN_WRITE
-> 2) t2 open with BLK_OPEN_RESTRICT_WRITES, with bdev_block_writes(), yes
-> we don't wait for t1 to close;
-> 3) t1 close, after the commit, bdev_unblock_writes() is called
-> unexpected.
+> As part of this series it was necessary to define a device tree schema
+> for block devices and partitions on them, which (similar to how it now
+> works also for UBI volumes) can be matched by one or more properties.
 > 
-> Following openers will succeed although t2 doesn't close;
-> > 
-> > So fix the detection logic. Use O_EXCL as an indicator that
-> > BLK_OPEN_RESTRICT_WRITES has been requested. We do the exact same thing
-> > for pidfds where O_EXCL means that this is a pidfd that refers to a
-> > thread. For userspace open paths O_EXCL will never be retained but for
-> > internal opens where we open files that are never installed into a file
-> > descriptor table this is fine.
-> 
-> From the path blkdev_open(), the file is from devtmpfs, and user can
-> pass in O_EXCL for that file, and that file will be used later in
-> blkdev_release() -> bdev_release() -> bdev_yield_write_access().
+> ---
+> This series has previously been submitted as RFC on July 19th 2023[1]
+> and most of the basic idea did not change since. Another round of RFC
+> was submitted on March 5th 2024[2] which has received overall positive
+> feedback and only minor corrections have been done since (see
+> changelog below).
 
-It can't because the VFS strips O_EXCL after the file has been opened.
-Only internal opens can retain this flag. See do_dentry_open(). Or do
-you mean something else?
+I don't recall giving positive feedback.
+
+I still think this should use offsets rather than partition specific 
+information. Not wanting to have to update the offsets if they change is 
+not reason enough to not use them.
+
+Rob
