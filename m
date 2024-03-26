@@ -1,452 +1,219 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664975C8EE;
-	Tue, 26 Mar 2024 12:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E8164A9F
+	for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 12:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711457411; cv=none; b=i2WMSt6RXMSgKhHgfS+lTp+JINsoF9Ej7TFvDVS6xS3FlIciEvOl1fsZM4unjKzUFEW0dW8KFzaujBvbLYZcHbvHH6sgLIf5fvj3AyjKHsUm0C0iWWOQ5KLpPBpIcjAtTwzqmW5JP1eCYhNl362WEn2g9JGlKmPGv2LHaPjjn10=
+	t=1711457840; cv=none; b=Opy4LN3Z8xP/miRJ0a33JDodLQBbUxOZGxP5P7vdFCf4kGU+I0XoF/b4ouSsNdvpvirOeI4GGhNEEB164eyrN/wdc1CcG49SWIG6T1acta5QorFznNFjp93hLCSwSAk+8g3k49o/gu/tozW4+02sBODbXpt29yqqzOq5cupBKp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711457411; c=relaxed/simple;
-	bh=frHFooI/Li/Rd2bWfenvxO8uaYNOMlR/rBbZ8mTpVZo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ne4u54GSnznCTSfjnDthSy2kCWRYpjFOPmUMNcdU8ss6T6Aq62x+I9mK0HwzkL049ReHt1NSTcE5Ncc9lNEhhEr3vIIybhV/gM7qMFD1vjxR0LRAd3wrm/by7FBkupo/3zt09OuBNkyxT5JXpuNUH+pZQVxlOygkl+e28LNxAWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYEVzhZ0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711457840; c=relaxed/simple;
+	bh=X4Sn+Ji5RYTTBmrJEvr5G7vX/WA6/h2K6W5uumloRcM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Aep6vyPjfKSuOKFds2D7sg21y2cKCaVRwK0BjvJLPrnivmlJgZBT4Azw3V712flsE1dhFQDGgoORFfePDdFVg9w+ODY5YhiqoajgeeXtu/WBgJwp8C3KSzeYjmQgKusifZVzIQqOpcQ7lpIeZP6SRYdPAJR0oZVf49WR0fGwb3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lmY3QUjQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=SJxB7YAX; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lmY3QUjQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=SJxB7YAX; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYEVzhZ0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61395C433C7;
-	Tue, 26 Mar 2024 12:50:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711457410;
-	bh=frHFooI/Li/Rd2bWfenvxO8uaYNOMlR/rBbZ8mTpVZo=;
-	h=From:Date:Subject:To:Cc:From;
-	b=YYEVzhZ052cZJ35C9yCJ+EEIdRGpDGf30DJRF44FDLVTzpm+lgGbVmA7zMUe7i1uO
-	 ktOVu3RBT+pSQ0PokZGWMqmVaAwNMHfw+/r9Ekk5jP0ljNDhIBZMX+fJbDS5HVzSgE
-	 qUpolANnd+rccwjbzt7sObHdA4HZt9IMokb3uflv++xxMlUywpWdNTK34k+zIRRPQw
-	 TbOGKYbhf7Sq1IKA/GSYk1euWmlrY29qttURylqMtKYCV4Q2TlXJ97nYVsZ6f/QTBW
-	 GfhMGGNTxfjgqLfXWnERKB7R+rKyT4Z1QXHjJypruLrPt1xtHl3PqBeJCZ3K+p0Zp1
-	 uXtQ6bvFVyRrg==
-From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 26 Mar 2024 13:47:22 +0100
-Subject: [PATCH] fs,block: yield devices early
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lmY3QUjQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="SJxB7YAX";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lmY3QUjQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="SJxB7YAX"
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 2086D37BFB;
+	Tue, 26 Mar 2024 12:57:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1711457836; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Y324XKHx8TmrRge2LPwQsMuxtlSPgulhco40KkeEh4=;
+	b=lmY3QUjQloAHPeR86ssextfLZ6qKa4Y/AFw8pndg/V7FDnnvKF8iGJh1ORVvZYu0la3jiK
+	E7FdlTxJcQPt98tR7ers+IMrxW5JU9KrwtBLDn65BTUVJZAsjJNZpQKtRWdCevAZoytexX
+	lIScPiHVM+hZGxA07v1SkJvJuT39BbM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1711457836;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Y324XKHx8TmrRge2LPwQsMuxtlSPgulhco40KkeEh4=;
+	b=SJxB7YAXV4g72DFei5/9U+95Bu402U1jNrWHlxqa6fg+SMXK7RS4dte3Ox8P6YZo1IQhlq
+	plVaZgdm5qYz/6AA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1711457836; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Y324XKHx8TmrRge2LPwQsMuxtlSPgulhco40KkeEh4=;
+	b=lmY3QUjQloAHPeR86ssextfLZ6qKa4Y/AFw8pndg/V7FDnnvKF8iGJh1ORVvZYu0la3jiK
+	E7FdlTxJcQPt98tR7ers+IMrxW5JU9KrwtBLDn65BTUVJZAsjJNZpQKtRWdCevAZoytexX
+	lIScPiHVM+hZGxA07v1SkJvJuT39BbM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1711457836;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Y324XKHx8TmrRge2LPwQsMuxtlSPgulhco40KkeEh4=;
+	b=SJxB7YAXV4g72DFei5/9U+95Bu402U1jNrWHlxqa6fg+SMXK7RS4dte3Ox8P6YZo1IQhlq
+	plVaZgdm5qYz/6AA==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 12C0113215;
+	Tue, 26 Mar 2024 12:57:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id kOWOBCzGAmaAMgAAn2gu4w
+	(envelope-from <jack@suse.cz>); Tue, 26 Mar 2024 12:57:16 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id B5B96A0812; Tue, 26 Mar 2024 13:57:15 +0100 (CET)
+Date: Tue, 26 Mar 2024 13:57:15 +0100
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
+Message-ID: <20240326125715.i23eo6sh5223tdmc@quack3>
+References: <20240323-seide-erbrachten-5c60873fadc1@brauner>
+ <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240326-vfs-bdev-end_holder-v1-1-20af85202918@kernel.org>
-X-B4-Tracking: v=1; b=H4sIANnDAmYC/x3MTQqDMBBA4avIrDsSU4nYqxQp+RmbATuWCYSCe
- PemXX6L9w4opEwFbt0BSpUL79IwXDqI2cuTkFMzWGNHc7UO61owJKpIkh553xIpTsal2U2ztWO
- EVr6VVv78r/elOfhCGNRLzL/Xy7NsLNRX18+ocYDz/AKr4zc6iQAAAA==
-To: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- Linus Torvalds <torvalds@linux-foundation.org>, 
- Christian Brauner <brauner@kernel.org>
-X-Mailer: b4 0.13-dev-2d940
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11708; i=brauner@kernel.org;
- h=from:subject:message-id; bh=frHFooI/Li/Rd2bWfenvxO8uaYNOMlR/rBbZ8mTpVZo=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQxHWlwuvnMZ1ll5dnFny0XHI6MkGvQ7Aqscm5cUyqc/
- J2bcfXjjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIm07mL4Kz9zXvijWeJv5dbl
- aqrfPPK45l8Jh1TVu7U1DnpCHq33rjAy9D++JXPnl51A4ekV8nvW5e5kC/xpcFFxVZaeVs8KpgQ
- HZgA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=lmY3QUjQ;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=SJxB7YAX
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCPT_COUNT_FIVE(0.00)[6];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.cz:+];
+	 MX_GOOD(-0.01)[];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,suse.cz:dkim,suse.cz:email,suse.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Spam-Score: -4.01
+X-Rspamd-Queue-Id: 2086D37BFB
+X-Spam-Flag: NO
 
-Currently a device is only really released once the umount returns to
-userspace due to how file closing works. That ultimately could cause
-an old umount assumption to be violated that concurrent umount and mount
-don't fail. So an exclusively held device with a temporary holder should
-be yielded before the filesystem is gone. Add a helper that allows
-callers to do that. This also allows us to remove the two holder ops
-that Linus wasn't excited about.
+On Sat 23-03-24 17:11:19, Christian Brauner wrote:
+> Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
+> default this option is set. When it is set the long-standing behavior
+> of being able to write to mounted block devices is enabled.
+> 
+> But in order to guard against unintended corruption by writing to the
+> block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
+> off. In that case it isn't possible to write to mounted block devices
+> anymore.
+> 
+> A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
+> which disallows concurrent BLK_OPEN_WRITE access. When we still had the
+> bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
+> the mode was passed around. Since we managed to get rid of the bdev
+> handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
+> on whether the file was opened writable and writes to that block device
+> are blocked. That logic doesn't work because we do allow
+> BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
+> 
+> So fix the detection logic. Use O_EXCL as an indicator that
+> BLK_OPEN_RESTRICT_WRITES has been requested. We do the exact same thing
+> for pidfds where O_EXCL means that this is a pidfd that refers to a
+> thread. For userspace open paths O_EXCL will never be retained but for
+> internal opens where we open files that are never installed into a file
+> descriptor table this is fine.
+> 
+> Note that BLK_OPEN_RESTRICT_WRITES is an internal only flag that cannot
+> directly be raised by userspace. It is implicitly raised during
+> mounting.
+> 
+> Passes xftests and blktests with CONFIG_BLK_DEV_WRITE_MOUNTED set and
+> unset.
+> 
+> Fixes: 321de651fa56 ("block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access")
+> Reported-by: Matthew Wilcox <willy@infradead.org>
+> Link: https://lore.kernel.org/r/ZfyyEwu9Uq5Pgb94@casper.infradead.org
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-Fixes: f3a608827d1f ("bdev: open block device as files") # mainline only
-Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- block/bdev.c           | 62 ++++++++++++++++++++++++++++++++++++++++++--------
- fs/bcachefs/super-io.c |  2 +-
- fs/cramfs/inode.c      |  2 +-
- fs/ext4/super.c        |  8 +++----
- fs/f2fs/super.c        |  2 +-
- fs/jfs/jfs_logmgr.c    |  4 ++--
- fs/reiserfs/journal.c  |  2 +-
- fs/romfs/super.c       |  2 +-
- fs/super.c             | 24 +++----------------
- fs/xfs/xfs_buf.c       |  2 +-
- fs/xfs/xfs_super.c     |  6 ++---
- include/linux/blkdev.h | 11 +--------
- 12 files changed, 71 insertions(+), 56 deletions(-)
+The fix looks correct but admittedly it looks a bit hacky. I'd prefer
+storing the needed information in some other flag, preferably one that does
+not already have a special meaning with block devices. But FMODE_ space is
+exhausted and don't see another easy solution. So I guess:
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 7a5f611c3d2e..070890667563 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -583,9 +583,6 @@ static void bd_finish_claiming(struct block_device *bdev, void *holder,
- 	mutex_unlock(&bdev->bd_holder_lock);
- 	bd_clear_claiming(whole, holder);
- 	mutex_unlock(&bdev_lock);
--
--	if (hops && hops->get_holder)
--		hops->get_holder(holder);
- }
- 
- /**
-@@ -608,7 +605,6 @@ EXPORT_SYMBOL(bd_abort_claiming);
- static void bd_end_claim(struct block_device *bdev, void *holder)
- {
- 	struct block_device *whole = bdev_whole(bdev);
--	const struct blk_holder_ops *hops = bdev->bd_holder_ops;
- 	bool unblock = false;
- 
- 	/*
-@@ -631,9 +627,6 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
- 		whole->bd_holder = NULL;
- 	mutex_unlock(&bdev_lock);
- 
--	if (hops && hops->put_holder)
--		hops->put_holder(holder);
--
- 	/*
- 	 * If this was the last claim, remove holder link and unblock evpoll if
- 	 * it was a write holder.
-@@ -1012,6 +1005,29 @@ struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
- }
- EXPORT_SYMBOL(bdev_file_open_by_path);
- 
-+static inline void bd_yield_claim(struct file *bdev_file)
-+{
-+	struct block_device *bdev = file_bdev(bdev_file);
-+	struct bdev_inode *bd_inode = BDEV_I(bdev_file->f_mapping->host);
-+	void *holder = bdev_file->private_data;
-+
-+	lockdep_assert_held(&bdev->bd_disk->open_mutex);
-+
-+	if (WARN_ON_ONCE(IS_ERR_OR_NULL(holder)))
-+		return;
-+
-+	if (holder != bd_inode) {
-+		bdev_yield_write_access(bdev_file);
-+		bd_end_claim(bdev, holder);
-+		/*
-+		 * Tell release we already gave up our hold on the
-+		 * device and if write restrictions are available that
-+		 * we already gave up write access to the device.
-+		 */
-+		bdev_file->private_data = bd_inode;
-+	}
-+}
-+
- void bdev_release(struct file *bdev_file)
- {
- 	struct block_device *bdev = file_bdev(bdev_file);
-@@ -1033,10 +1049,10 @@ void bdev_release(struct file *bdev_file)
- 		sync_blockdev(bdev);
- 
- 	mutex_lock(&disk->open_mutex);
--	bdev_yield_write_access(bdev_file);
--
- 	if (holder)
--		bd_end_claim(bdev, holder);
-+		bd_yield_claim(bdev_file);
-+	else
-+		bdev_yield_write_access(bdev_file);
- 
- 	/*
- 	 * Trigger event checking and tell drivers to flush MEDIA_CHANGE
-@@ -1056,6 +1072,32 @@ void bdev_release(struct file *bdev_file)
- 	blkdev_put_no_open(bdev);
- }
- 
-+/**
-+ * bdev_fput - yield claim to the block device and put the file
-+ * @bdev_file: open block device
-+ *
-+ * Yield claim on the block device and put the file. Ensure that the
-+ * block device can be reclaimed before the file is closed which is a
-+ * deferred operation.
-+ */
-+void bdev_fput(struct file *bdev_file)
-+{
-+	if (WARN_ON_ONCE(bdev_file->f_op != &def_blk_fops))
-+		return;
-+
-+	if (bdev_file->private_data) {
-+		struct block_device *bdev = file_bdev(bdev_file);
-+		struct gendisk *disk = bdev->bd_disk;
-+
-+		mutex_lock(&disk->open_mutex);
-+		bd_yield_claim(bdev_file);
-+		mutex_unlock(&disk->open_mutex);
-+	}
-+
-+	fput(bdev_file);
-+}
-+EXPORT_SYMBOL(bdev_fput);
-+
- /**
-  * lookup_bdev() - Look up a struct block_device by name.
-  * @pathname: Name of the block device in the filesystem.
-diff --git a/fs/bcachefs/super-io.c b/fs/bcachefs/super-io.c
-index ad28e370b640..cb7b4de11a49 100644
---- a/fs/bcachefs/super-io.c
-+++ b/fs/bcachefs/super-io.c
-@@ -143,7 +143,7 @@ void bch2_free_super(struct bch_sb_handle *sb)
- {
- 	kfree(sb->bio);
- 	if (!IS_ERR_OR_NULL(sb->s_bdev_file))
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	kfree(sb->holder);
- 	kfree(sb->sb_name);
- 
-diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
-index 39e75131fd5a..9901057a15ba 100644
---- a/fs/cramfs/inode.c
-+++ b/fs/cramfs/inode.c
-@@ -495,7 +495,7 @@ static void cramfs_kill_sb(struct super_block *sb)
- 		sb->s_mtd = NULL;
- 	} else if (IS_ENABLED(CONFIG_CRAMFS_BLOCKDEV) && sb->s_bdev) {
- 		sync_blockdev(sb->s_bdev);
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	}
- 	kfree(sbi);
- }
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index cfb8449c731f..044135796f2b 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -5668,7 +5668,7 @@ failed_mount9: __maybe_unused
- 	brelse(sbi->s_sbh);
- 	if (sbi->s_journal_bdev_file) {
- 		invalidate_bdev(file_bdev(sbi->s_journal_bdev_file));
--		fput(sbi->s_journal_bdev_file);
-+		bdev_fput(sbi->s_journal_bdev_file);
- 	}
- out_fail:
- 	invalidate_bdev(sb->s_bdev);
-@@ -5913,7 +5913,7 @@ static struct file *ext4_get_journal_blkdev(struct super_block *sb,
- out_bh:
- 	brelse(bh);
- out_bdev:
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 	return ERR_PTR(errno);
- }
- 
-@@ -5952,7 +5952,7 @@ static journal_t *ext4_open_dev_journal(struct super_block *sb,
- out_journal:
- 	jbd2_journal_destroy(journal);
- out_bdev:
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 	return ERR_PTR(errno);
- }
- 
-@@ -7327,7 +7327,7 @@ static void ext4_kill_sb(struct super_block *sb)
- 	kill_block_super(sb);
- 
- 	if (bdev_file)
--		fput(bdev_file);
-+		bdev_fput(bdev_file);
- }
- 
- static struct file_system_type ext4_fs_type = {
-diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-index a6867f26f141..a4bc26dfdb1a 100644
---- a/fs/f2fs/super.c
-+++ b/fs/f2fs/super.c
-@@ -1558,7 +1558,7 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
- 
- 	for (i = 0; i < sbi->s_ndevs; i++) {
- 		if (i > 0)
--			fput(FDEV(i).bdev_file);
-+			bdev_fput(FDEV(i).bdev_file);
- #ifdef CONFIG_BLK_DEV_ZONED
- 		kvfree(FDEV(i).blkz_seq);
- #endif
-diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
-index 73389c68e251..9609349e92e5 100644
---- a/fs/jfs/jfs_logmgr.c
-+++ b/fs/jfs/jfs_logmgr.c
-@@ -1141,7 +1141,7 @@ int lmLogOpen(struct super_block *sb)
- 	lbmLogShutdown(log);
- 
-       close:		/* close external log device */
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 
-       free:		/* free log descriptor */
- 	mutex_unlock(&jfs_log_mutex);
-@@ -1485,7 +1485,7 @@ int lmLogClose(struct super_block *sb)
- 	bdev_file = log->bdev_file;
- 	rc = lmLogShutdown(log);
- 
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 
- 	kfree(log);
- 
-diff --git a/fs/reiserfs/journal.c b/fs/reiserfs/journal.c
-index 6474529c4253..e539ccd39e1e 100644
---- a/fs/reiserfs/journal.c
-+++ b/fs/reiserfs/journal.c
-@@ -2589,7 +2589,7 @@ static void journal_list_init(struct super_block *sb)
- static void release_journal_dev(struct reiserfs_journal *journal)
- {
- 	if (journal->j_bdev_file) {
--		fput(journal->j_bdev_file);
-+		bdev_fput(journal->j_bdev_file);
- 		journal->j_bdev_file = NULL;
- 	}
- }
-diff --git a/fs/romfs/super.c b/fs/romfs/super.c
-index 2be227532f39..2cbb92462074 100644
---- a/fs/romfs/super.c
-+++ b/fs/romfs/super.c
-@@ -594,7 +594,7 @@ static void romfs_kill_sb(struct super_block *sb)
- #ifdef CONFIG_ROMFS_ON_BLOCK
- 	if (sb->s_bdev) {
- 		sync_blockdev(sb->s_bdev);
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	}
- #endif
- }
-diff --git a/fs/super.c b/fs/super.c
-index 71d9779c42b1..69ce6c600968 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1515,29 +1515,11 @@ static int fs_bdev_thaw(struct block_device *bdev)
- 	return error;
- }
- 
--static void fs_bdev_super_get(void *data)
--{
--	struct super_block *sb = data;
--
--	spin_lock(&sb_lock);
--	sb->s_count++;
--	spin_unlock(&sb_lock);
--}
--
--static void fs_bdev_super_put(void *data)
--{
--	struct super_block *sb = data;
--
--	put_super(sb);
--}
--
- const struct blk_holder_ops fs_holder_ops = {
- 	.mark_dead		= fs_bdev_mark_dead,
- 	.sync			= fs_bdev_sync,
- 	.freeze			= fs_bdev_freeze,
- 	.thaw			= fs_bdev_thaw,
--	.get_holder		= fs_bdev_super_get,
--	.put_holder		= fs_bdev_super_put,
- };
- EXPORT_SYMBOL_GPL(fs_holder_ops);
- 
-@@ -1562,7 +1544,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
- 	 * writable from userspace even for a read-only block device.
- 	 */
- 	if ((mode & BLK_OPEN_WRITE) && bdev_read_only(bdev)) {
--		fput(bdev_file);
-+		bdev_fput(bdev_file);
- 		return -EACCES;
- 	}
- 
-@@ -1573,7 +1555,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
- 	if (atomic_read(&bdev->bd_fsfreeze_count) > 0) {
- 		if (fc)
- 			warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
--		fput(bdev_file);
-+		bdev_fput(bdev_file);
- 		return -EBUSY;
- 	}
- 	spin_lock(&sb_lock);
-@@ -1693,7 +1675,7 @@ void kill_block_super(struct super_block *sb)
- 	generic_shutdown_super(sb);
- 	if (bdev) {
- 		sync_blockdev(bdev);
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	}
- }
- 
-diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index 1a18c381127e..f0fa02264eda 100644
---- a/fs/xfs/xfs_buf.c
-+++ b/fs/xfs/xfs_buf.c
-@@ -2030,7 +2030,7 @@ xfs_free_buftarg(
- 	fs_put_dax(btp->bt_daxdev, btp->bt_mount);
- 	/* the main block device is closed by kill_block_super */
- 	if (btp->bt_bdev != btp->bt_mount->m_super->s_bdev)
--		fput(btp->bt_bdev_file);
-+		bdev_fput(btp->bt_bdev_file);
- 	kfree(btp);
- }
- 
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index c21f10ab0f5d..bce020374c5e 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -485,7 +485,7 @@ xfs_open_devices(
- 		mp->m_logdev_targp = mp->m_ddev_targp;
- 		/* Handle won't be used, drop it */
- 		if (logdev_file)
--			fput(logdev_file);
-+			bdev_fput(logdev_file);
- 	}
- 
- 	return 0;
-@@ -497,10 +497,10 @@ xfs_open_devices(
- 	xfs_free_buftarg(mp->m_ddev_targp);
-  out_close_rtdev:
- 	 if (rtdev_file)
--		fput(rtdev_file);
-+		bdev_fput(rtdev_file);
-  out_close_logdev:
- 	if (logdev_file)
--		fput(logdev_file);
-+		bdev_fput(logdev_file);
- 	return error;
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c3e8f7cf96be..172c91879999 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1505,16 +1505,6 @@ struct blk_holder_ops {
- 	 * Thaw the file system mounted on the block device.
- 	 */
- 	int (*thaw)(struct block_device *bdev);
--
--	/*
--	 * If needed, get a reference to the holder.
--	 */
--	void (*get_holder)(void *holder);
--
--	/*
--	 * Release the holder.
--	 */
--	void (*put_holder)(void *holder);
- };
- 
- /*
-@@ -1585,6 +1575,7 @@ static inline int early_lookup_bdev(const char *pathname, dev_t *dev)
- 
- int bdev_freeze(struct block_device *bdev);
- int bdev_thaw(struct block_device *bdev);
-+void bdev_fput(struct file *bdev_file);
- 
- struct io_comp_batch {
- 	struct request *req_list;
+Reviewed-by: Jan Kara <jack@suse.cz>
 
----
-base-commit: 4cece764965020c22cff7665b18a012006359095
-change-id: 20240326-vfs-bdev-end_holder-706d9679224c
+Thanks for looking into this!
 
+								Honza
+
+> ---
+>  block/bdev.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 7a5f611c3d2e..f819f3086905 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -821,13 +821,12 @@ static void bdev_yield_write_access(struct file *bdev_file)
+>  		return;
+>  
+>  	bdev = file_bdev(bdev_file);
+> -	/* Yield exclusive or shared write access. */
+> -	if (bdev_file->f_mode & FMODE_WRITE) {
+> -		if (bdev_writes_blocked(bdev))
+> -			bdev_unblock_writes(bdev);
+> -		else
+> -			bdev->bd_writers--;
+> -	}
+> +
+> +	/* O_EXCL is only set for internal BLK_OPEN_RESTRICT_WRITES. */
+> +	if (bdev_file->f_flags & O_EXCL)
+> +		bdev_unblock_writes(bdev);
+> +	else if (bdev_file->f_mode & FMODE_WRITE)
+> +		bdev->bd_writers--;
+>  }
+>  
+>  /**
+> @@ -946,6 +945,13 @@ static unsigned blk_to_file_flags(blk_mode_t mode)
+>  	else
+>  		WARN_ON_ONCE(true);
+>  
+> +	/*
+> +	 * BLK_OPEN_RESTRICT_WRITES is never set from userspace and
+> +	 * O_EXCL is stripped from userspace.
+> +	 */
+> +	if (mode & BLK_OPEN_RESTRICT_WRITES)
+> +		flags |= O_EXCL;
+> +
+>  	if (mode & BLK_OPEN_NDELAY)
+>  		flags |= O_NDELAY;
+>  
+> -- 
+> 2.43.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
