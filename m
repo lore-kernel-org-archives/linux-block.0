@@ -1,42 +1,33 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B84874BEB;
-	Tue, 26 Mar 2024 07:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B19B129A71;
+	Tue, 26 Mar 2024 07:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711436601; cv=none; b=DO0AhfLZkI7fETKNHiUDbMuMmqDKq1xkepuVaxksK5fB1kLXJrjb+4IWVKQzxQW7FpykqXbprFE/31uNHRLiM7/D3fgSxi4SS7MvtAfGsfyoOA7TNBgTH6EsIWzM+t8ssuQ/2dlm6PTzsmWDwLftmPXz77d/GoTODPyjIxbID14=
+	t=1711436930; cv=none; b=Oe9cWHBX+/v16CD8cGAh903ARwp9WYrSU5wVBCXdCZAwhwD022uSwkrFAd0CZMXbl99p4BuqaE/zXQ9fLnRpUACL1+04R/PyXvM123W/HRryq58OBK2PGkcis9UVXqJANHz4uSVrz1MID+mSIPLpZv7X2gTUYxNMFNGfaQiH9lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711436601; c=relaxed/simple;
-	bh=VGr3FDo/oYXSp1d6WH2kvnzXbMf8dssaiyFWAFBM1RA=;
+	s=arc-20240116; t=1711436930; c=relaxed/simple;
+	bh=2pybxWgI9/v8JH1oxbOlq0Vrixo/FGASPZm0L+AgdPU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uePT9IJAQls8woFsIRJNMRaJkvbsVD9Ctipg/9ahq2U9EvoyEsd6OkdR4lSMid1Ep+v7oy6PYr6yP0ldpjNUT09yDOk3upAVJR02U7zLkkFPWGfokyob8knRV4oT1EVYTjQlbtZGBqgVaeQZFeAIrGnYnRzdDjINALwQzgF05dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=prY4l82T; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="prY4l82T"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=VGr3FDo/oYXSp1d6WH2kvnzXbMf8dssaiyFWAFBM1RA=; b=prY4l82TLRac5Rr1M9sNv3AFdx
-	Eo77z0FVY6/ivknfk+7Mmg/Pjp3fIUz/Qyxj6K9/QyiLQwMy/ZrAL6d6LkKp/C7vrbadH0vwj0gwy
-	qLIBQfgYYtXP1HRt92mQqiqtMAWnj34HEW0SScQymAKHE4hjUKFYLMxRLmFs20znuLN8+0aiCKiis
-	kNRDtOYAoECFxAHJiAIBXNYAEL2Gu4KIs3rD5CAwhIgB6sT5gR+q1n6vkvW+yE+g/KxEc+TYmjBKn
-	z7GAjyu6bV1AFI1WVLDi2MkX1RlqtKjxheOUQI4EpuHQJJb2zcmh3dYM+hz3xLhZs17yHKpJ5Clfc
-	jnKshCJA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rp0q6-00000003N85-1ki6;
-	Tue, 26 Mar 2024 07:03:18 +0000
-Date: Tue, 26 Mar 2024 00:03:18 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: tj@kernel.org, axboe@kernel.dk, josef@toxicpanda.com, shli@fb.com,
-	linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Subject: Re: [PATCH] blk-throttle: Fix W=1 build issue in tg_prfill_limit()
-Message-ID: <ZgJzNvN4nQqKnhk5@infradead.org>
-References: <20240325121905.2869271-1-john.g.garry@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7eYP/v4A1klHsKPo14bBc9c0D2X9l8E0ymmI5E6QtY+sFWHn5iGd8W2pL+gPEKJ7hxb+PwXMDAaJRxWgEX7UESy22nRXaNOjTI8fI8tyIzUcoyeGbk/xzuYue7ljzBeuE2nRUJtslGyWfZefM9K7TTPQhwBdzPhcmlU4SDhle8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 3EE9768D45; Tue, 26 Mar 2024 08:08:40 +0100 (CET)
+Date: Tue, 26 Mar 2024 08:08:38 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 12/28] block: Allow BIO-based drivers to use
+ blk_revalidate_disk_zones()
+Message-ID: <20240326070838.GA8402@lst.de>
+References: <20240325044452.3125418-1-dlemoal@kernel.org> <20240325044452.3125418-13-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,13 +36,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240325121905.2869271-1-john.g.garry@oracle.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20240325044452.3125418-13-dlemoal@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Mar 25, 2024 at 12:19:05PM +0000, John Garry wrote:
-> For when using gcc 8 and above, the following warnings can be seen when
-> compiling blk-throttle.c with W=1:
+> +	/*
+> +	 * For devices using a BIO-based driver, we need zone resources only
+> +	 * if zone append emulation is required.
+> +	 */
+> +	if (!queue_is_mq(disk->queue) &&
+> +	    !queue_emulates_zone_append(disk->queue))
+> +		return 0;
+> +
 
-Why is this function even using these local buffers vs a sequence
-of separate seq_printf calls that would get rid of these pointless
-on-stack buffers?
+This code and the comment is duplicated in two places.  It also fails
+to capture why bio drivers don't need zoned resources - that is that
+we can't enforce QD=1 per zone for them.  Maybe add a little helper
+to encapsulate this check and expand the comment a little?
+
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
