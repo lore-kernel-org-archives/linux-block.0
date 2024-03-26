@@ -1,65 +1,67 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40044127B4D
-	for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 17:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C891F60A
+	for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 17:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711474118; cv=none; b=qdxh+m4h/eGUR9o+3NjgerON5mv8fqKDjMT0PWgX6eVkoCAfxJZ9qKXaJ5O+NDNHcCbPZzUI3XADkDqx+8niz29Bp3mxJDjqSNJispqSHkzUCRq4p29IEe30c71ZM9iPxJAAzz5E5HzB2wPK6kv6hRYeMp50/9Eq2Fw2VaTwd0g=
+	t=1711474152; cv=none; b=Vsci3+RwwF8Tn/dNOhuUYlGq6vK+uHb8gEsoXzqIAHFawEFgUEFgDSSDlInwd2Hyck9ovHd+Xae/EcpmcwzezZYfuZivVObvfk1q5UWH44Z4pz0owQ6laKvHCVpXJ8MXWjFof7r8qOYzT/0XXwgYSGJm2CGeg/armaQaP59H4rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711474118; c=relaxed/simple;
-	bh=ZPf56q26AE3nGu/wiRL+08bLZVXaHvS5JISPV7WHgJk=;
+	s=arc-20240116; t=1711474152; c=relaxed/simple;
+	bh=PmT1bXaEGXuYIXmNIcWK7TaM3XWK/lYGtLFo9j2ydL4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=aQ/O0B0UbHojfHgJ4EqaMPsd4OQ4DwMiUzC0IZRLzYkEo04jEcsUtxYfcKQiY/dtYNdMvAEJ58DSaaeGHNhKT4AqF/e4jIfQOeuowqilDXrn2HWu0E0ndTo+mICDAiy2lpwEm0uuyxqkr+Wm6iWIxdZx3J8BPC+CpdCyjMMZ8Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LLvMLU7i; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version:Content-Type; b=ge02p+ToZviT+xKxEDPgNBVYTKluUgJTMEEPRBTG97Wv5nQ18acK4HxzWtZOQS0BPKeeAHzeg0arDDfqUhmyEUREf424azZFjqfNggOz6oBnMNDnm9iUnyeL+GvGrXkGt4lzHPahqNqXTwCC4wE4WJ0gpVA1iTsEu4nKTKjBGic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AcbC3N/R; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LLvMLU7i"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ea7eff5f3cso505547b3a.0
-        for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 10:28:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AcbC3N/R"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-29f6b6d184cso354918a91.0
+        for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 10:29:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1711474113; x=1712078913; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1711474148; x=1712078948; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ewYIYBjwfNQiqXgzT2gd2jUMPtUAq4sgj9b7IZgioUw=;
-        b=LLvMLU7inIk3KnNTC7wUv9p9UOOHU8cR+VymMf+BQ/x5HltoRixtz0A8sFscLTVpL4
-         sRIS6yQF4HdnH8af32YZNQudB/GfW+rudjpU5gGF5S+8sxLa1aa04EKIr3cARkx81Fm6
-         b64FF4+SPSXbjmVKeOLEyn64Pcr/cVC4+S3AELcKAj4mmx8yKQzVHq0FodZZb/kGqaK+
-         ufjjaL29ybfghVN0jh9XFDA0KkEShR9oQYY4F0U5PMx48DsorCxOi9CQKmVDHQEzDQJT
-         V7OUPAHPBXkUE243OgLrcyPVFs4HHRHOkJzv9e+W500XjotUL4zBmyvdq+UOzVDWgk9W
-         RYkA==
+        bh=0Vi5BLiHhEJ6zwu2yudGVDTTaXeANZZRz/gw55tufE0=;
+        b=AcbC3N/RJWIwAhMJ5WIl0mqs4KB0Bhcczt2cggyKlMPl2KAeRWcBFTtWBGQtIpMwTx
+         g7Si1mKrfmcjfgayIayTTXLRBAkgWZFxZTaHVhbZWHt6iGXhZYU9IQmvGX/WdoSFQUop
+         DTvPcHs37cbcugUCO8nbhqznAMvzJIKweTs393xBGNpaJ4afD+QKGqyxny43qEVU2urt
+         SESrVDYM3/Qrlj2X5HEuP9bScWpyxWRudVQ/MD0D+Y8TJ1baovbLzABJc9nHrRa7POEP
+         1hmeeFAC5/0uH2G/Rl/jOjWJKmU0bTOXu5BCBeWoPFBP8nnZcKEfwZT/kg52Wy0MEAmy
+         SEdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711474113; x=1712078913;
+        d=1e100.net; s=20230601; t=1711474148; x=1712078948;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ewYIYBjwfNQiqXgzT2gd2jUMPtUAq4sgj9b7IZgioUw=;
-        b=fZ4dsjHqCTcnWH04/arkwh8DAHiYuh268oINaHEIz0666ynXgo6BcAXmweb6jDHj5l
-         BLglEg/Hkf+oqv9HiN5TAicOJZeaiGAIGKH1mOGBesgFrzXl64hss/Z2QxtIe785DIQO
-         oKLfhcfh+Zk5bOVnYKD3MiZWKXga821du/GlUr9/c2cNv/zXGcIlaFCnanepXZV3IPz7
-         XAATtekWVJowuUgHamlpvpbl5lb3r/qSSS4ctyFKiNuZRt1yUvW1xQUeXUqgQ8UfXBdy
-         woZq0DqHYXVWv4n1C0Z++bq2+yNuWjUtg3tmv84zKX5A45Eh2mb8gna2FLJXepQ1SPz3
-         B8sg==
-X-Gm-Message-State: AOJu0Yw6nFsPUzI836h1s19ZN0/ubVUqdnRDTFSC05BPRz7SR2iNf+Pr
-	MqhPuobr1f9aomUIGUD/qnuS8aPV2ZVcomddf1bYrAY9UX94gZqXkwB+Qiix7kC7DXCN8a/MuvS
-	r
-X-Google-Smtp-Source: AGHT+IHaWorleqBWjKw8oRInCpUSbOgHmou9L5F1jvIF0Q+1QgztJqx0HYpiEjTMsxH80tem3VYGIg==
-X-Received: by 2002:a05:6a20:8403:b0:1a3:c3e6:aef9 with SMTP id c3-20020a056a20840300b001a3c3e6aef9mr9553218pzd.1.1711474112815;
-        Tue, 26 Mar 2024 10:28:32 -0700 (PDT)
+        bh=0Vi5BLiHhEJ6zwu2yudGVDTTaXeANZZRz/gw55tufE0=;
+        b=vPt5Levyp2l9S1CmYa5ka8gCpkpcRcfP5eGGz0FbJT0ljmNL2iTJo3SW3huExT6BJT
+         CvJANf/8nfQORzAqptqZmIiAMp1O6V+IKgTLr/NLzk6dAzCwi5pxfDlGfEL7JZcGyqLr
+         0bTI701v/hclz+wj3D6dwtNgwNZb387QMYv44ueQfrHj/v3JQx+rXgEJ3sMN617CONIU
+         i73id37oIKpEtC2SZo5mZr5hmSnBqudl0PSDrDg0LnXNppNw0Akjg9fyEqIGOjGY70MS
+         asDaeLYLPihNOShPMOMSKT/S0uUTxrMo4XBFApFILzpsYeF6M/Ub5j23pmOC18GUueIB
+         vgiA==
+X-Gm-Message-State: AOJu0YwdkASmZVXs7CATxQz5oudfc7BNWHrjBkrCQOmnWbjuMCr27wLb
+	G5EJS/0fUI2SLJJ7mgXrDIAjoZppArD/ju6iaXNhsSzzsN6OkE14druvZ7UNZ+nRpw8aLl/yHFy
+	V
+X-Google-Smtp-Source: AGHT+IFr+f+0NSJG/2tvijpvSqIrvMTS6fiJeOs2YSIjZ7991QfAPN/oXpoiBe7dOi17pkaDI10F6Q==
+X-Received: by 2002:a17:90a:7108:b0:29b:f9be:6b51 with SMTP id h8-20020a17090a710800b0029bf9be6b51mr9258592pjk.4.1711474148345;
+        Tue, 26 Mar 2024 10:29:08 -0700 (PDT)
 Received: from [127.0.0.1] ([2620:10d:c090:600::1:163c])
-        by smtp.gmail.com with ESMTPSA id q9-20020a63e209000000b005eb4d24e809sm7889602pgh.34.2024.03.26.10.28.32
+        by smtp.gmail.com with ESMTPSA id sl3-20020a17090b2e0300b002a0304e158bsm7534394pjb.41.2024.03.26.10.29.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 10:28:32 -0700 (PDT)
+        Tue, 26 Mar 2024 10:29:07 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20240325083501.2816408-1-john.g.garry@oracle.com>
-References: <20240325083501.2816408-1-john.g.garry@oracle.com>
-Subject: Re: [PATCH] block: Make blk_rq_set_mixed_merge() static
-Message-Id: <171147411211.366811.14324273045067456736.b4-ty@kernel.dk>
-Date: Tue, 26 Mar 2024 11:28:32 -0600
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, John Garry <john.g.garry@oracle.com>, 
+ Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20240326060745.2349154-1-hch@lst.de>
+References: <20240326060745.2349154-1-hch@lst.de>
+Subject: Re: [PATCH] block: don't reject too large max_user_sectors in
+ blk_validate_limits
+Message-Id: <171147414761.366972.8993940739344220182.b4-ty@kernel.dk>
+Date: Tue, 26 Mar 2024 11:29:07 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,17 +73,16 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Mon, 25 Mar 2024 08:35:01 +0000, John Garry wrote:
-> Since commit 8e756373d7c8 ("block: Move bio merge related functions into
-> blk-merge.c"), blk_rq_set_mixed_merge() has only been referenced in
-> blk-merge.c, so make it static.
+On Tue, 26 Mar 2024 07:07:45 +0100, Christoph Hellwig wrote:
+> We already cap down the actual max_sectors to the max of the hardware
+> and user limit, so don't reject the configuration.
 > 
 > 
 
 Applied, thanks!
 
-[1/1] block: Make blk_rq_set_mixed_merge() static
-      commit: dc53d9eac1db76fd27b1fcee1f64c840cf82b468
+[1/1] block: don't reject too large max_user_sectors in blk_validate_limits
+      commit: 038105a200689ae07eb9e804ca2295e628a45820
 
 Best regards,
 -- 
