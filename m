@@ -1,76 +1,82 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45E512AAD7
-	for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 06:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E2A43AC2;
+	Tue, 26 Mar 2024 06:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711433271; cv=none; b=BqSzbRGSGBEIV0b35wMakpby8hWciI2a5MpRu8T1QP5wHAeuqhZupV1ihHftDf9G8EoprleV6a/XdtrIMizZ66g15uDCCUKUqWhj1kN2iR0rr9gcoDs3h6SxvdZ+DleUykiwudCdO/AW4SBG8M3DazZbqC44VHGQu5SBBWGaJ0M=
+	t=1711433366; cv=none; b=hGdJzzF0TMbVWA62vWsBkSm+b2kpuBnsxHWIDDSMjBEWsFE5kLRDX1LeL10SswQFdq/1dSuI3IzdWYi1VNiegOB5M/VkbL3z9ibzqfcuSJ7vcM4Ak53clnEhmffSIwHZipQ9ANSZIk+8sv4z0wqZXDSiSTtqsOqXJilX8dLT9y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711433271; c=relaxed/simple;
-	bh=6DMUaFcRyIInJRqmVPSjfAdGUz9nPQHMawqBpdivlzw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gnh5oiISMjupu3luxC6a7In9sg/xfQph8a0C6jVZhLcIpOK3AtjfFGjauefwcCTprRjFIF49llzNdmpR3ogR1+wCxfM+P6SSi7eUwkO38xFfkG9Hifq7dQH9Hfaggxm+DeSZ2JTiGSmlsN9/8FqF3+lyZszV1QcfoS9AfOQY6h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Rdl0G3/6; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1711433366; c=relaxed/simple;
+	bh=PAyVBORsJOf54MDJupr82WTTfEjRiH2MrJbR32SeU3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CwGbmbCHfo8GC1sIlBm330eYpCo0guCAkh2R63y7Yu91C74Eb9aG8qMmiirCdCLuy3LhhmAEG8tJWzTc5DNxVc1qYobNHrDTppKMTGEWF4aYPKmLxMGIQT59IMt9M8Qtayzqq1erqmX85USUANu2OOLLh+YozBR0cV0vx6Y4C4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Rdl0G3/6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=2kTXl0MJ252W5PIw2oaR1WDM5TZ+byNd5dZslXKOJgI=; b=Rdl0G3/6dmiJqrpLXDHOfMFif/
-	aZ8AZvJ5QKWnztV/lwgxd2hCpXs9fGrCP8u1m1Qerob0r+y4cLKC3DjehjEyLiIYa627wmCnI8QB5
-	TCWdQxFqvFw9aIwuilDauFpeSAdw1rfycIQQwP4zpRzfMqvu48AAiUsrwFVv3cCEkdRrqtQLkub0v
-	L+0DzOJbKpTTHhUzazdxqw7vQj6oIRNTI8i/LEeKLWP19wzZif9RCq/4E9gD4+w0j0u4cV/zOK500
-	HNFDSbNyp0gra8qlfrghK6FLGup86qIi4gd71BeQlY17tXk8U1FbLP+rqlSL6Sb3YvNPuaEHlE8gY
-	NgRYHGdw==;
-Received: from [88.128.92.114] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rozyO-00000003ETC-0V4l;
-	Tue, 26 Mar 2024 06:07:48 +0000
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A28C568D42; Tue, 26 Mar 2024 07:09:17 +0100 (CET)
+Date: Tue, 26 Mar 2024 07:09:17 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Niklas Cassel <cassel@kernel.org>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Sathya Prakash <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	"Juergen E. Fischer" <fischer@norbit.de>,
+	Xiang Chen <chenxiang66@hisilicon.com>,
+	HighPoint Linux Team <linux@highpoint-tech.com>,
+	Tyrel Datwyler <tyreld@linux.ibm.com>,
+	Brian King <brking@us.ibm.com>, Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
 	John Garry <john.g.garry@oracle.com>,
-	Damien Le Moal <dlemoal@kernel.org>
-Subject: [PATCH] block: don't reject too large max_user_sectors in blk_validate_limits
-Date: Tue, 26 Mar 2024 07:07:45 +0100
-Message-Id: <20240326060745.2349154-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+	Jason Yan <yanaijie@huawei.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+	MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+	open-iscsi@googlegroups.com, megaraidlinux.pdl@broadcom.com,
+	mpi3mr-linuxdrv.pdl@broadcom.com, linux-samsung-soc@vger.kernel.org,
+	linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
+Subject: Re: [PATCH 06/23] scsi: add a no_highmem flag to struct Scsi_Host
+Message-ID: <20240326060917.GC7108@lst.de>
+References: <20240324235448.2039074-1-hch@lst.de> <20240324235448.2039074-7-hch@lst.de> <80162a6e-12d1-4fd4-ac74-dc5388853323@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <80162a6e-12d1-4fd4-ac74-dc5388853323@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-We already cap down the actual max_sectors to the max of the hardware
-and user limit, so don't reject the configuration.
+On Mon, Mar 25, 2024 at 04:26:55PM +0900, Damien Le Moal wrote:
+> On 3/25/24 08:54, Christoph Hellwig wrote:
+> > While we really should be killing the block layer bounce buffering ASAP,
+> > I even more urgently need to stop the drivers to fiddle with the limits
+> > from ->slave_configure.  Add a no_highmem flag to the Scsi_Host to
+> > centralize this setting and switch the remaining four drivers that use
+> > block layer bounce buffering to it.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> 
+> The USB hunks could probably be moved to their own patch following this one ?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: John Garry <john.g.garry@oracle.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
- block/blk-settings.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 3c7d8d638ab59d..cdbaef159c4bc3 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -146,8 +146,7 @@ static int blk_validate_limits(struct queue_limits *lim)
- 	max_hw_sectors = min_not_zero(lim->max_hw_sectors,
- 				lim->max_dev_sectors);
- 	if (lim->max_user_sectors) {
--		if (lim->max_user_sectors > max_hw_sectors ||
--		    lim->max_user_sectors < PAGE_SIZE / SECTOR_SIZE)
-+		if (lim->max_user_sectors < PAGE_SIZE / SECTOR_SIZE)
- 			return -EINVAL;
- 		lim->max_sectors = min(max_hw_sectors, lim->max_user_sectors);
- 	} else {
--- 
-2.39.2
-
+Seems like a bit too much churn to me.
