@@ -1,200 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CAD13D24B
-	for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 15:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E2AFC0E;
+	Tue, 26 Mar 2024 15:46:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711467350; cv=none; b=PJdzSFD0oO+xyt0WX+mdINoQWosSvbXVd5Lmvg/44D2hXD8/38aq8Mkj2WYXM7MSOudYY2eectPT9tDJKUoPqNlv4JrvJYtBASJoYLtdibNR1FSJ1wHvGk21RRMBk8qAxUQCI5DnL9aKhWlJ8DjX/O9MjWx7SqX/tR0U++ayVIQ=
+	t=1711467995; cv=none; b=N/FuM6vt/zsXXFFSWS1vAUIwMToVS+wth2DTelLNSeLEbwyxSQfzBV8jij6I+hkU0ZvB4zn7F4KfiuUe4tq4zURHMXQjTp76ZI/piy4DdKvzNSOJD7KyIeqauzRTYsyrWBVX7h0saJlA9o26T5XPuxwHgyxGjO0go+9Db1+0daw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711467350; c=relaxed/simple;
-	bh=Kv3YRl9LzbqPnD2/oDibTM2oci8Eutg/qoRbtzgs828=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bCMYqKDyf+WZIL2io1I7vgA69rqTAmgJ9x2nCZjgFphLW4WxDJ83uM4zO04Cl1FIRngvM7Qhxxf5VvPb0MGDfPKuHVLFpYB2wzO5JExq5kCSh7mmD2kRHXF2A6icfAPOg4DOEM9/XBmT2D2wEK5AlCbQHx08LjmsCjHJzbWf0Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZsJrxt9i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711467995; c=relaxed/simple;
+	bh=GNKUnehNUWWq14j2h7gVQLCTnR8U3oHCcrr43xdM+qw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XEOnhPubYIusPy9asaWY6cN/Gbm6uaZOcefA/OagfOY7f6HAdJUX6FAiT1UpiD7RT8FOYzwrN2BYpPhub+3jeKTuuVVxSirFlMYBi1j2ZR3z3aYT9ZWsg5GkJcXpwpJgHOvWtAYyRUrWBGmJMXDJ/GemHWBCOkgrw0LnZwtLXW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nr3YSTrf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsJrxt9i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1047C433A6;
-	Tue, 26 Mar 2024 15:35:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nr3YSTrf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39534C433A6;
+	Tue, 26 Mar 2024 15:46:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711467349;
-	bh=Kv3YRl9LzbqPnD2/oDibTM2oci8Eutg/qoRbtzgs828=;
+	s=k20201202; t=1711467994;
+	bh=GNKUnehNUWWq14j2h7gVQLCTnR8U3oHCcrr43xdM+qw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZsJrxt9i2hYTM70fk9u7DQLbMHqTRZZSu8c2ZaI5y/5Rb9se05rzO76XQ8eYkjiO7
-	 VGU0j0KHCq27NO36QiLDYX5FkuwC2oiDZtS+sB3YeoaGrBSq63e9oAY7GDvohmEJRm
-	 4KT4m86fF5OEztFbueLf3Z/wymNLzvUFqaowU4LUnRyQ/WXGXCOWU6LGe0bydQerNu
-	 OINXv+hdOrtUCbAy5dWgADmfrAc4mlcI76/fu/K8F8nSyQQxAHE2HSEJ9jvT8uK6kY
-	 yzRe2P63UgQ0mAs4I4IZT4hFRC61g+kQuWXa+8HG3UiJiv5WvEd64qFKxcInEYVCvk
-	 kZWb8+UDis7uw==
-From: Hannes Reinecke <hare@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>,
+	b=Nr3YSTrfH5duhoQKB+iYXcVk2dXD9crtjbBjthK2U/f3FNA3Mjyf35AXnoUemV7j8
+	 zKq/NTTOQI5kE23FU+wH8SUYOCVOFqf7Wgyc6gErzGzKd46DBeKZUqWiJ03ryiOsbc
+	 OUnjG/Zsq7LRkC3xxGEHGySJfqWNuQKYOm48Njs+QMj6MBGgdfQI9TSm7Tpv/F4/US
+	 iixX2aAiTg0QVNOqCz0ZFIfZoJgpLd2zq/aXe10DDRunZKrzcSMsXUKTUlmwBKaHT5
+	 E9BRx4Et0Gr2HmXm5KLOucCGgWhcByOcYhuzG4QK5P/ZUaR76LKoNJNqkcaL5ZzJ4B
+	 R2zAjvudRJQNQ==
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Christian Brauner <brauner@kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
+	Matthew Wilcox <willy@infradead.org>,
 	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 2/2] nvme: add 'latency' iopolicy
-Date: Tue, 26 Mar 2024 16:35:29 +0100
-Message-Id: <20240326153529.75989-3-hare@kernel.org>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20240326153529.75989-1-hare@kernel.org>
-References: <20240326153529.75989-1-hare@kernel.org>
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH v2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
+Date: Tue, 26 Mar 2024 16:46:19 +0100
+Message-ID: <20240326-lehrkraft-messwerte-e3895039e63b@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240326133107.bnjx2rjf5l6yijgz@quack3>
+References: <20240326133107.bnjx2rjf5l6yijgz@quack3>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3888; i=brauner@kernel.org; h=from:subject:message-id; bh=GNKUnehNUWWq14j2h7gVQLCTnR8U3oHCcrr43xdM+qw=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQxvT2fGMYok8m4XsUyrNGyq1NAWl/yq375EsvO7ndHf QoyP/p0lLIwiHExyIopsji0m4TLLeep2GyUqQEzh5UJZAgDF6cATGSOMMN/F7v4DFfZms5r/daZ z3qcjgqU3Qx/IrNu1qot8fe5J8toMvwPzH92Loj16qOovCNyau2iS6Zlnffie/PmtblV2nXVrCk MAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-From: Hannes Reinecke <hare@suse.de>
+Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
+default this option is set. When it is set the long-standing behavior
+of being able to write to mounted block devices is enabled.
 
-Add a latency-based I/O policy for multipathing. It uses the blk-nodelat
-latency tracker to provide latencies for each node, and schedules
-I/O on the path with the least latency for the submitting node.
+But in order to guard against unintended corruption by writing to the
+block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
+off. In that case it isn't possible to write to mounted block devices
+anymore.
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
+A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
+which disallows concurrent BLK_OPEN_WRITE access. When we still had the
+bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
+the mode was passed around. Since we managed to get rid of the bdev
+handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
+on whether the file was opened writable and writes to that block device
+are blocked. That logic doesn't work because we do allow
+BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
+
+Fix the detection logic and use one of the FMODE_* bits we freed up a
+while ago. We could've also abused O_EXCL as an indicator that
+BLK_OPEN_RESTRICT_WRITES has been requested. For userspace open paths
+O_EXCL will never be retained but for internal opens where we open files
+that are never installed into a file descriptor table this is fine. But
+it would be a gamble that this doesn't cause bugs. Note that
+BLK_OPEN_RESTRICT_WRITES is an internal only flag that cannot directly
+be raised by userspace. It is implicitly raised during mounting.
+
+Passes xftests and blktests with CONFIG_BLK_DEV_WRITE_MOUNTED set and
+unset.
+
+Link: https://lore.kernel.org/r/ZfyyEwu9Uq5Pgb94@casper.infradead.org
+Link: https://lore.kernel.org/r/20240323-zielbereich-mittragen-6fdf14876c3e@brauner
+Fixes: 321de651fa56 ("block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access")
+Reported-by: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Christian Brauner <brauner@kernel.org>
 ---
- drivers/nvme/host/multipath.c | 46 ++++++++++++++++++++++++++++++++---
- drivers/nvme/host/nvme.h      |  2 ++
- 2 files changed, 44 insertions(+), 4 deletions(-)
+ block/bdev.c       | 14 +++++++-------
+ include/linux/fs.h |  2 ++
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 5397fb428b24..fd3bda6f8543 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -17,6 +17,7 @@ MODULE_PARM_DESC(multipath,
- static const char *nvme_iopolicy_names[] = {
- 	[NVME_IOPOLICY_NUMA]	= "numa",
- 	[NVME_IOPOLICY_RR]	= "round-robin",
-+	[NVME_IOPOLICY_LAT]	= "latency",
- };
+diff --git a/block/bdev.c b/block/bdev.c
+index 070890667563..6955693e4bcd 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -814,13 +814,11 @@ static void bdev_yield_write_access(struct file *bdev_file)
+ 		return;
  
- static int iopolicy = NVME_IOPOLICY_NUMA;
-@@ -29,6 +30,10 @@ static int nvme_set_iopolicy(const char *val, const struct kernel_param *kp)
- 		iopolicy = NVME_IOPOLICY_NUMA;
- 	else if (!strncmp(val, "round-robin", 11))
- 		iopolicy = NVME_IOPOLICY_RR;
-+#ifdef CONFIG_BLK_NODE_LATENCY
-+	else if (!strncmp(val, "latency", 7))
-+		iopolicy = NVME_IOPOLICY_LAT;
-+#endif
- 	else
- 		return -EINVAL;
- 
-@@ -40,6 +45,26 @@ static int nvme_get_iopolicy(char *buf, const struct kernel_param *kp)
- 	return sprintf(buf, "%s\n", nvme_iopolicy_names[iopolicy]);
+ 	bdev = file_bdev(bdev_file);
+-	/* Yield exclusive or shared write access. */
+-	if (bdev_file->f_mode & FMODE_WRITE) {
+-		if (bdev_writes_blocked(bdev))
+-			bdev_unblock_writes(bdev);
+-		else
+-			bdev->bd_writers--;
+-	}
++
++	if (bdev_file->f_mode & FMODE_WRITE_RESTRICTED)
++		bdev_unblock_writes(bdev);
++	else if (bdev_file->f_mode & FMODE_WRITE)
++		bdev->bd_writers--;
  }
  
-+static void nvme_activate_iopolicy(struct nvme_subsystem *subsys, int iopolicy)
-+{
-+	struct nvme_ns_head *h;
-+	struct nvme_ns *ns;
-+	bool enable = iopolicy == NVME_IOPOLICY_LAT;
-+
-+	mutex_lock(&subsys->lock);
-+	list_for_each_entry(h, &subsys->nsheads, entry) {
-+		list_for_each_entry_rcu(ns, &h->list, siblings) {
-+			if (!test_bit(NVME_NS_NLAT, &ns->flags))
-+				continue;
-+			if (enable)
-+				blk_nodelat_enable(ns->queue);
-+			else
-+				blk_nodelat_disable(ns->queue);
-+		}
-+	}
-+	mutex_unlock(&subsys->lock);
-+}
-+
- module_param_call(iopolicy, nvme_set_iopolicy, nvme_get_iopolicy,
- 	&iopolicy, 0644);
- MODULE_PARM_DESC(iopolicy,
-@@ -242,13 +267,16 @@ static struct nvme_ns *__nvme_find_path(struct nvme_ns_head *head, int node)
- {
- 	int found_distance = INT_MAX, fallback_distance = INT_MAX, distance;
- 	struct nvme_ns *found = NULL, *fallback = NULL, *ns;
-+	int iopolicy = READ_ONCE(head->subsys->iopolicy);
- 
- 	list_for_each_entry_rcu(ns, &head->list, siblings) {
- 		if (nvme_path_is_disabled(ns))
- 			continue;
- 
--		if (READ_ONCE(head->subsys->iopolicy) == NVME_IOPOLICY_NUMA)
-+		if (iopolicy == NVME_IOPOLICY_NUMA)
- 			distance = node_distance(node, ns->ctrl->numa_node);
-+		else if (iopolicy == NVME_IOPOLICY_LAT)
-+			distance = blk_nodelat_latency(ns->queue, node);
- 		else
- 			distance = LOCAL_DISTANCE;
- 
-@@ -339,15 +367,17 @@ static inline bool nvme_path_is_optimized(struct nvme_ns *ns)
- inline struct nvme_ns *nvme_find_path(struct nvme_ns_head *head)
- {
- 	int node = numa_node_id();
-+	int iopolicy = READ_ONCE(head->subsys->iopolicy);
- 	struct nvme_ns *ns;
- 
- 	ns = srcu_dereference(head->current_path[node], &head->srcu);
- 	if (unlikely(!ns))
- 		return __nvme_find_path(head, node);
- 
--	if (READ_ONCE(head->subsys->iopolicy) == NVME_IOPOLICY_RR)
-+	if (iopolicy == NVME_IOPOLICY_RR)
- 		return nvme_round_robin_path(head, node, ns);
--	if (unlikely(!nvme_path_is_optimized(ns)))
-+	if (iopolicy == NVME_IOPOLICY_LAT ||
-+	    unlikely(!nvme_path_is_optimized(ns)))
- 		return __nvme_find_path(head, node);
- 	return ns;
- }
-@@ -808,10 +838,10 @@ static ssize_t nvme_subsys_iopolicy_store(struct device *dev,
- 	for (i = 0; i < ARRAY_SIZE(nvme_iopolicy_names); i++) {
- 		if (sysfs_streq(buf, nvme_iopolicy_names[i])) {
- 			WRITE_ONCE(subsys->iopolicy, i);
-+			nvme_activate_iopolicy(subsys, i);
- 			return count;
- 		}
- 	}
--
- 	return -EINVAL;
- }
- SUBSYS_ATTR_RW(iopolicy, S_IRUGO | S_IWUSR,
-@@ -847,6 +877,14 @@ static int nvme_lookup_ana_group_desc(struct nvme_ctrl *ctrl,
- 
- void nvme_mpath_add_disk(struct nvme_ns *ns, __le32 anagrpid)
- {
-+	if (!blk_nodelat_init(ns->disk)) {
-+		int iopolicy = READ_ONCE(ns->head->subsys->iopolicy);
-+
-+		set_bit(NVME_NS_NLAT, &ns->flags);
-+		if (iopolicy == NVME_IOPOLICY_LAT)
-+			blk_nodelat_enable(ns->queue);
-+	}
-+
- 	if (nvme_ctrl_use_ana(ns->ctrl)) {
- 		struct nvme_ana_group_desc desc = {
- 			.grpid = anagrpid,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 27397f8404d6..83c3870d5ed0 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -402,6 +402,7 @@ static inline enum nvme_ctrl_state nvme_ctrl_state(struct nvme_ctrl *ctrl)
- enum nvme_iopolicy {
- 	NVME_IOPOLICY_NUMA,
- 	NVME_IOPOLICY_RR,
-+	NVME_IOPOLICY_LAT,
- };
- 
- struct nvme_subsystem {
-@@ -519,6 +520,7 @@ struct nvme_ns {
- #define NVME_NS_ANA_PENDING	2
- #define NVME_NS_FORCE_RO	3
- #define NVME_NS_READY		4
-+#define NVME_NS_NLAT		5
- 
- 	struct cdev		cdev;
- 	struct device		cdev_device;
+ /**
+@@ -900,6 +898,8 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
+ 	bdev_file->f_mode |= FMODE_BUF_RASYNC | FMODE_CAN_ODIRECT;
+ 	if (bdev_nowait(bdev))
+ 		bdev_file->f_mode |= FMODE_NOWAIT;
++	if (mode & BLK_OPEN_RESTRICT_WRITES)
++		bdev_file->f_mode |= FMODE_WRITE_RESTRICTED;
+ 	bdev_file->f_mapping = bdev->bd_inode->i_mapping;
+ 	bdev_file->f_wb_err = filemap_sample_wb_err(bdev_file->f_mapping);
+ 	bdev_file->private_data = holder;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 00fc429b0af0..8dfd53b52744 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -121,6 +121,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+ #define FMODE_PWRITE		((__force fmode_t)0x10)
+ /* File is opened for execution with sys_execve / sys_uselib */
+ #define FMODE_EXEC		((__force fmode_t)0x20)
++/* File writes are restricted (block device specific) */
++#define FMODE_WRITE_RESTRICTED  ((__force fmode_t)0x40)
+ /* 32bit hashes as llseek() offset (for directories) */
+ #define FMODE_32BITHASH         ((__force fmode_t)0x200)
+ /* 64bit hashes as llseek() offset (for directories) */
 -- 
-2.35.3
+2.43.0
 
