@@ -1,45 +1,60 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3432A13C676;
-	Tue, 26 Mar 2024 14:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E97E13C812;
+	Tue, 26 Mar 2024 14:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464573; cv=none; b=gt1smlJiqmaNwOWSDBzq4GeAKTbahGNSRUHv8d+P8hRFWsqZLTXI7ph2XLfdWIJF4q1BQz26EfousDlVdQ5DgEHVNlI3MAeC/AprNSla9XGxsmdyOag2bn1I11FwcGsIr3fa31nj3+YI+4wUv4wmPOM2k23KjuKPkLPBqOYPk+g=
+	t=1711464643; cv=none; b=gSK/YFcYuWw2XDoq9gxJ+vek7X7n6QFZloU4A4+AGqeZVRyE8FnEShAC0vKo9HZOKCRiXLdPTdsLZJYd+UnYv4D5fOP0c/D3PuiB/jM7cXeT06KizDZyxw4fBD/EuZQ0tqXtmWjG0e3Ygeto94o1rZFrW8kM3NU5tOVlhISYjzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464573; c=relaxed/simple;
-	bh=GVGvmRJhymKmC0l2GbjNVQ644MTQSv4xnJfPdfhHeb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PF7e3BJ9Mr3hlzulOAd2xAtI+1wHmN6EiEMNmQsW2oYFcfP/aaKDKKY4hoiVRPUTYmwNNMUZSysvqPF9oMnSrqZS1535JWfU5zi/Ca3pcaR80xoX9hO7q0PPsxX6XZFpW1sTPQcCKfbaAdgVB6jWVvWpjqWfTH9fV+Do3SIIBpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4RMjlMmG; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4RMjlMmG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=RmMUNinGi0pwqpldZMIlWpRQ7pU3yfyst3NQo0xdBJg=; b=4RMjlMmG/iGsVQ/k0CJn/gip4m
-	U9NhvcpcyOtZG2RXOZDqXgkAwisEl+Nhq+/pjavaiWUnF3AJErERxmhA3vadEY4EuXoNCi3UwYWH9
-	PxDPRIwA9q8UmOnu1HC+mvip7CJAgXYm+qbssIuSrSjsU30fz+shYEMjNnEZJvSCzFfEdfJd8DRDn
-	WFuBP+duqVEnzo1qq7CFFHbhbryw/eCLDD0F8xCRA/3jBcEmtpK4CbKsqYujBX5+n4pGiQkrCel6t
-	c1lyTZ+QZtfE769XeWZhDOCpKWjwK/G4HvX2m6lSCW+h1042WdudNvGx+t0H5n+UqFm1R6IgAc+pX
-	R0cZwNRQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rp87F-00000004zTQ-3aks;
-	Tue, 26 Mar 2024 14:49:29 +0000
-Date: Tue, 26 Mar 2024 07:49:29 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>, tj@kernel.org, axboe@kernel.dk,
-	josef@toxicpanda.com, shli@fb.com, linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org
-Subject: Re: [PATCH] blk-throttle: Fix W=1 build issue in tg_prfill_limit()
-Message-ID: <ZgLgedPipnZuyHCA@infradead.org>
-References: <20240325121905.2869271-1-john.g.garry@oracle.com>
- <ZgJzNvN4nQqKnhk5@infradead.org>
- <a4d8b56e-1814-4834-9d25-ef61ff6f1248@oracle.com>
+	s=arc-20240116; t=1711464643; c=relaxed/simple;
+	bh=BMaWtReNcW0SfbPcKNR6e7oETiRCsXGbYLmLZs2SAGM=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p6RQFG+DsgbAIKFpGhjjB25wPE577s16sbzqzmMaCcPzohwRGJwT8hppKuWiRPvPumhN737lpAN6fbymiF3v9rbN7GPamZiuv5eWkkUpixeC2ysUmnlqdZkX+q2maGYa2AlntdaKPRbYN5IdZEYiLh4LmNCA1UuOkjOpxsJDQMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 848FA68D37; Tue, 26 Mar 2024 15:50:33 +0100 (CET)
+Date: Tue, 26 Mar 2024 15:50:33 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Sathya Prakash <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	"Juergen E. Fischer" <fischer@norbit.de>,
+	Xiang Chen <chenxiang66@hisilicon.com>,
+	HighPoint Linux Team <linux@highpoint-tech.com>,
+	Tyrel Datwyler <tyreld@linux.ibm.com>,
+	Brian King <brking@us.ibm.com>, Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Jason Yan <yanaijie@huawei.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+	MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+	open-iscsi@googlegroups.com, megaraidlinux.pdl@broadcom.com,
+	mpi3mr-linuxdrv.pdl@broadcom.com, linux-samsung-soc@vger.kernel.org,
+	linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
+Subject: Re: [PATCH 13/23] sbp2: switch to using ->device_configure
+Message-ID: <20240326145033.GA22360@lst.de>
+References: <20240324235448.2039074-1-hch@lst.de> <20240324235448.2039074-14-hch@lst.de> <20240326093045.GA139274@workstation.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,24 +63,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a4d8b56e-1814-4834-9d25-ef61ff6f1248@oracle.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20240326093045.GA139274@workstation.local>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Mar 26, 2024 at 08:46:24AM +0000, John Garry wrote:
-> On 26/03/2024 07:03, Christoph Hellwig wrote:
-> > On Mon, Mar 25, 2024 at 12:19:05PM +0000, John Garry wrote:
-> > > For when using gcc 8 and above, the following warnings can be seen when
-> > > compiling blk-throttle.c with W=1:
-> > 
-> > Why is this function even using these local buffers vs a sequence
-> > of separate seq_printf calls that would get rid of these pointless
-> > on-stack buffers?
+On Tue, Mar 26, 2024 at 06:30:45PM +0900, Takashi Sakamoto wrote:
+> >  drivers/firewire/sbp2.c | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> Currently a combo of snprintf and seq_printf is used, a strategy which seems
-> to go as far back as 2ee867dcfa2ea (2015), when it was a much simpler print.
-> All the other code in this area only uses seq_printf, so it seems that the
-> author(s) prefer this way here.
-> 
-> Here's how the current code could look (using only seq_printf):
+> I'm not good at any kind of storage protocol, thus execute me not to
+> review it. My concern is which subsystem provides the change to mainline.
+> I don't mind it is your subsystem.
 
-That looks much better, thanks.
+The whole series should go in together, probably through the scsi tree.
+
