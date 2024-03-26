@@ -1,37 +1,45 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1F617BA0;
-	Tue, 26 Mar 2024 17:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D351CAA0;
+	Tue, 26 Mar 2024 17:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711473121; cv=none; b=YNLFIn08pMYtrt5xNK6nVw24BpXHJjs4mb5NX6zBxsxmuWafU3THlU4uQqP6EbTVYMhbVPynIqsck7k4NCD7ETxUSir2UIqshH2tMpAmQ9/Gx9yarl0hhAxVr6EXhouAM2VZ9xeLwOzFsZ51GSQrTytYgXorGKfciwVT8Q3m0M4=
+	t=1711473832; cv=none; b=UtH9OT2SrMhx5FKHNysQPHrSHD/rs4q6DLh8Yq9vpVeIwSoNTFrQ/6a4reYKGEAKXihspA5uqQvCL6kIPbX7OMK2t64TfhjaNyGaWKokZZtonbAAKiAunCdu9nYLWNNKRIASXcKLy50x+8sZ9yyQEbXuX4ilgWpvEYlH7ZpXycM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711473121; c=relaxed/simple;
-	bh=31wGWIPo+c/oEpudO5XMXBMQ2M8snO+1qTCP8lP1PGw=;
+	s=arc-20240116; t=1711473832; c=relaxed/simple;
+	bh=y+Jn18BZvFtNR884rHy0vrdkGll6bE/d3iE32Yv6pyM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SCPuSMet0V/1vkZVHOikSpowLpbgp14Spx9I575uSD7e+Ytt4DRu2pLHqhV4icdHVA8QodGWbaRzUjtiTCosO1tW3MmtJ4G+SaJVAI7xuc83OPxfrwnJgiWYPDCXg1lsmEqAoAPOvQlaizmAVCKb8mQGEi6UYLOzDnLrOkN7clE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LmNciYel; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LmNciYel"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=2DVDjn14jcmXI06omFunOWKNfCuEsxTlBPssx+oZvkM=; b=LmNciYel9AIIAuzc17ceAVCp4g
-	SbWXMbuqF6BpYr+UBRhH6+7v138c15rv0K1vu4kkMs/Yv2xP1GTKqnU9ETniAAOycQJ8800JZOd4E
-	g6YdRztEFr1RkREzfq9RTioqjtEH/RpE0qVk7dNPc9S2sDl3NH43rPuPsEk9Bpi+lHsv900qmgpp3
-	Dx1FtKrUU9PByLpEOW4IprjBfozF7Ot5IDSA0GXlfV9QDGSVo89HjFptoGs6cmLnaM1ByvE2LoMOe
-	z9xp6yo4C3CN+GitFK6P7RyI0kS05Q0L7D8yb9YRmKu/s1OrZnEARY49fPZ2moMzKJhZDisXprzPw
-	ZUIgocCw==;
-Received: from [50.53.2.121] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rpAL2-00000005fKX-32AV;
-	Tue, 26 Mar 2024 17:11:52 +0000
-Message-ID: <0a9fb564-7129-4153-97d6-76e9b3a1b6c1@infradead.org>
-Date: Tue, 26 Mar 2024 10:11:50 -0700
+	 In-Reply-To:Content-Type; b=m7/xXIU9qUAr8XOg/5nLgR0eFkoDkrRttszwzRhpZl8FtTGOQZa/4g+QqA4jQ/xHfxnfdanpf5gAbJxdEQQgpqCk3PZcxo9cvj7hZyNTCtjJS0wNN2NSFC/Zs+IS0JpCErMI+WzXUzVXGDr0+0VADqKZP7Pv1FbDqjaeUq+91c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e88e4c8500so4107437b3a.2;
+        Tue, 26 Mar 2024 10:23:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711473830; x=1712078630;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CbK5+D93ipMvgDtby/SY/DONORImvPAeAXEdkHS1+b8=;
+        b=TgowYE51yh0Mw4USGwqhYZ2y6ANiE1NPJ5iBQNk9cvwIxH6E9eNyNaEU4cAWgZpR4E
+         HMKtllE63ctGagxcffPn/vMB1CjuZpv3lx3U+oKcaEBb6UQ4SBKiIWF9dZsqJU71qr5J
+         WbO5tFWoClhk5KlPTvcQcaYxIpaZPNAWhG44yQ0pLQXO/dY07ZJaznGDUY/z/uK95QRG
+         mCIsxooEoVBCSZRtY//hdOE4ZpkyDxAdYUXCYfY5HljJY8LVRyZIIV5qxFLq7HKLMumb
+         1f9VByxSQz+1EdzAPpYdopm1y9Ln45eMsuylc84e6GtEIGIMoLX3KCzSIxpgmPrbi+RV
+         pmxw==
+X-Forwarded-Encrypted: i=1; AJvYcCXw+v4kopAUrxc/9KKO0HfvCSxLCfpUGo7cew3fDSRgQjrDVzzybiBqT68WeMFCDCeTtYWnp2UhaUMU4qwuQW7CZZzZ5F/aQBrwYSLSGa/xiw03nzXMGUVZh23ZPnjxuG8SZEK6bc7e
+X-Gm-Message-State: AOJu0YyNTezKvzaAcW3wti9tjFuej7Ia7XuieZpQmzyoewUOLza1N+3V
+	5xJg4yo2Dytn+PaOMa7rvknwvrPsuH4pVhQwIoSOjfHWNL916fix
+X-Google-Smtp-Source: AGHT+IF1a1+CI+nTKVQ/ChEFscp+C7hhSiLHGv8wry4HV4h8dI0yWHSfHNCPewRPVIDM7JHJjuoSRA==
+X-Received: by 2002:a05:6a00:2d15:b0:6e7:30b0:9cc7 with SMTP id fa21-20020a056a002d1500b006e730b09cc7mr3703390pfb.15.1711473830487;
+        Tue, 26 Mar 2024 10:23:50 -0700 (PDT)
+Received: from ?IPV6:2620:0:1000:8411:262:e41e:a4dd:81c6? ([2620:0:1000:8411:262:e41e:a4dd:81c6])
+        by smtp.gmail.com with ESMTPSA id x21-20020a056a00271500b006e7309d9831sm3908204pfv.39.2024.03.26.10.23.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Mar 2024 10:23:49 -0700 (PDT)
+Message-ID: <c50dc0a4-190a-4780-91b7-ceedfb1aa926@acm.org>
+Date: Tue, 26 Mar 2024 10:23:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,93 +47,64 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 05/10] block: Add core atomic write support
+Subject: Re: [PATCH v2 07/28] block: Introduce zone write plugging
 Content-Language: en-US
-To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, kbusch@kernel.org,
- hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
- martin.petersen@oracle.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
- brauner@kernel.org, dchinner@redhat.com, jack@suse.cz
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
- ojaswin@linux.ibm.com, linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
- io-uring@vger.kernel.org, nilay@linux.ibm.com, ritesh.list@gmail.com,
- willy@infradead.org, Himanshu Madhani <himanshu.madhani@oracle.com>
-References: <20240326133813.3224593-1-john.g.garry@oracle.com>
- <20240326133813.3224593-6-john.g.garry@oracle.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240326133813.3224593-6-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20240325044452.3125418-1-dlemoal@kernel.org>
+ <20240325044452.3125418-8-dlemoal@kernel.org>
+ <f3b298bb-b68a-4375-a3b4-fc91229740c1@acm.org>
+ <839ebf2a-4dc6-433b-bc47-fd7915ed0ecf@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <839ebf2a-4dc6-433b-bc47-fd7915ed0ecf@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
+On 3/25/24 20:12, Damien Le Moal wrote:
+> On 3/26/24 06:53, Bart Van Assche wrote:
+>> On 3/24/24 21:44, Damien Le Moal wrote:
+>>> -void disk_free_zone_bitmaps(struct gendisk *disk)
+>>> +static bool disk_insert_zone_wplug(struct gendisk *disk,
+>>> +				   struct blk_zone_wplug *zwplug)
+>>> +{
+>>> +	struct blk_zone_wplug *zwplg;
+>>> +	unsigned long flags;
+>>> +	unsigned int idx =
+>>> +		hash_32(zwplug->zone_no, disk->zone_wplugs_hash_bits);
+>>> +
+>>> +	/*
+>>> +	 * Add the new zone write plug to the hash table, but carefully as we
+>>> +	 * are racing with other submission context, so we may already have a
+>>> +	 * zone write plug for the same zone.
+>>> +	 */
+>>> +	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
+>>> +	hlist_for_each_entry_rcu(zwplg, &disk->zone_wplugs_hash[idx], node) {
+>>> +		if (zwplg->zone_no == zwplug->zone_no) {
+>>> +			spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
+>>> +			return false;
+>>> +		}
+>>> +	}
+>>> +	hlist_add_head_rcu(&zwplug->node, &disk->zone_wplugs_hash[idx]);
+>>> +	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
+>>> +
+>>> +	return true;
+>>> +}
+>>
+>> Since this function inserts an element into disk->zone_wplugs_hash[],
+>> can it happen that another thread removes that element from the hash
+>> list before this function returns?
+> 
+> No, that cannot happen. Both insertion and deletion of plugs in the hash table
+> are serialized with disk->zone_wplugs_lock. See disk_remove_zone_wplug().
 
-On 3/26/24 06:38, John Garry wrote:
-> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-> index 1fe9a553c37b..4c775f4bdefe 100644
-> --- a/Documentation/ABI/stable/sysfs-block
-> +++ b/Documentation/ABI/stable/sysfs-block
-> @@ -21,6 +21,58 @@ Description:
->  		device is offset from the internal allocation unit's
->  		natural alignment.
->  
-> +What:		/sys/block/<disk>/atomic_write_max_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] This parameter specifies the maximum atomic write
-> +		size reported by the device. This parameter is relevant
-> +		for merging of writes, where a merged atomic write
-> +		operation must not exceed this number of bytes.
-> +		This parameter may be greater to the value in
+I think that documenting locking assumptions with lockdep_assert_held()
+would make this patch easier to review.
 
-		                              than
+Thanks,
 
-> +		atomic_write_unit_max_bytes as
-> +		atomic_write_unit_max_bytes will be rounded down to a
-> +		power-of-two and atomic_write_unit_max_bytes may also be
-> +		limited by some other queue limits, such as max_segments.
-> +		This parameter - along with atomic_write_unit_min_bytes
-> +		and atomic_write_unit_max_bytes - will not be larger than
-> +		max_hw_sectors_kb, but may be larger than max_sectors_kb.
-> +
-> +
-> +What:		/sys/block/<disk>/atomic_write_unit_min_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] This parameter specifies the smallest block which can
-> +		be written atomically with an atomic write operation. All
-> +		atomic write operations must begin at a
-> +		atomic_write_unit_min boundary and must be multiples of
-> +		atomic_write_unit_min. This value must be a power-of-two.
-> +
-> +
-> +What:		/sys/block/<disk>/atomic_write_unit_max_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] This parameter defines the largest block which can be
-> +		written atomically with an atomic write operation. This
-> +		value must be a multiple of atomic_write_unit_min and must
-> +		be a power-of-two. This value will not be larger than
-> +		atomic_write_max_bytes.
-> +
-> +
-> +What:		/sys/block/<disk>/atomic_write_boundary_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] A device may need to internally split I/Os which
-> +		straddle a given logical block address boundary. In that
-> +		case a single atomic write operation will be processed as
-> +		one of more sub-operations which each complete atomically.
+Bart.
 
-		    or
 
-> +		This parameter specifies the size in bytes of the atomic
-> +		boundary if one is reported by the device. This value must
-> +		be a power-of-two.
-
--- 
-#Randy
