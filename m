@@ -1,108 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF1213C9C8
-	for <linux-block@vger.kernel.org>; Tue, 26 Mar 2024 15:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1F617BA0;
+	Tue, 26 Mar 2024 17:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711468031; cv=none; b=XxCX09suNwgSrgjdS0n2iCCjrqbhhaVIDKXfWgUEQzXjbINNvI8rttEzmnkEA0N16oiUDFsbRwFv9ZWUnrqexfog6u+NePPdJOtM5ky/QdZwow3rwtybthAx4GdXtei6TZVCSQWGqhsux0v9NOTHENwK4br6mVcsEefBoTjsK9g=
+	t=1711473121; cv=none; b=YNLFIn08pMYtrt5xNK6nVw24BpXHJjs4mb5NX6zBxsxmuWafU3THlU4uQqP6EbTVYMhbVPynIqsck7k4NCD7ETxUSir2UIqshH2tMpAmQ9/Gx9yarl0hhAxVr6EXhouAM2VZ9xeLwOzFsZ51GSQrTytYgXorGKfciwVT8Q3m0M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711468031; c=relaxed/simple;
-	bh=ml262YuBryeikooYLLhnj5Q4jMLb6ulf2IcDiifuBo8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P7+QodLvfSZUFGS41OwfkCA8iDSiUyNMw72Popv8IC3Y7z/BnmspSCLTFIKpU69P0NxzZpEOlRalgnCfltMJueijJWAX/QhFbD1irqXk4Dqjhgmu6ESbgiqf2QfH8JUAfjY+zllCbb2kYReuDpTy9YkvFe1Sa/4On4lqQxvL014=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lCWfGNGD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711473121; c=relaxed/simple;
+	bh=31wGWIPo+c/oEpudO5XMXBMQ2M8snO+1qTCP8lP1PGw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SCPuSMet0V/1vkZVHOikSpowLpbgp14Spx9I575uSD7e+Ytt4DRu2pLHqhV4icdHVA8QodGWbaRzUjtiTCosO1tW3MmtJ4G+SaJVAI7xuc83OPxfrwnJgiWYPDCXg1lsmEqAoAPOvQlaizmAVCKb8mQGEi6UYLOzDnLrOkN7clE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LmNciYel; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lCWfGNGD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19E14C43399;
-	Tue, 26 Mar 2024 15:47:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711468031;
-	bh=ml262YuBryeikooYLLhnj5Q4jMLb6ulf2IcDiifuBo8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lCWfGNGDR3DrxpDMXP0lY52PqycTzru4JpKCYSbssSlZVC4HcpAziavSUJzhPR8vY
-	 LEZ3OTlDOm1Ts5k7Jmyq925h/9bjagdnf4/JlXwV3gbmROTI7/gk562xCoDgsj6p/L
-	 uKnucHZt+RzGUPvAKk4dkB8kHv3Fw4Mnxx3wUS2ZtsIhuLRAqXOG6dwQRBBTuSbcGv
-	 V5Tg1mbV+JubWek+tBDIaR+U4lVas3nId7SIs39to4AqckZ9NpJ9ILU8yFCKcxaZtS
-	 QeH0XrhZbvQChB6TVh7COgi+c5mIB4SPCkpyQ4AvrM/KUgOokZa9tZcWcXhoG+D5W+
-	 4/W2S7wPi9P9g==
-Date: Tue, 26 Mar 2024 16:47:07 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
-	Matthew Wilcox <willy@infradead.org>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
-Message-ID: <20240326-langanhaltend-anbot-1c1e74cc198f@brauner>
-References: <20240323-seide-erbrachten-5c60873fadc1@brauner>
- <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
- <20240326125715.i23eo6sh5223tdmc@quack3>
- <20240326-eidesstattlich-abwahl-ddfb1c75c05e@brauner>
- <20240326133107.bnjx2rjf5l6yijgz@quack3>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LmNciYel"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=2DVDjn14jcmXI06omFunOWKNfCuEsxTlBPssx+oZvkM=; b=LmNciYel9AIIAuzc17ceAVCp4g
+	SbWXMbuqF6BpYr+UBRhH6+7v138c15rv0K1vu4kkMs/Yv2xP1GTKqnU9ETniAAOycQJ8800JZOd4E
+	g6YdRztEFr1RkREzfq9RTioqjtEH/RpE0qVk7dNPc9S2sDl3NH43rPuPsEk9Bpi+lHsv900qmgpp3
+	Dx1FtKrUU9PByLpEOW4IprjBfozF7Ot5IDSA0GXlfV9QDGSVo89HjFptoGs6cmLnaM1ByvE2LoMOe
+	z9xp6yo4C3CN+GitFK6P7RyI0kS05Q0L7D8yb9YRmKu/s1OrZnEARY49fPZ2moMzKJhZDisXprzPw
+	ZUIgocCw==;
+Received: from [50.53.2.121] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rpAL2-00000005fKX-32AV;
+	Tue, 26 Mar 2024 17:11:52 +0000
+Message-ID: <0a9fb564-7129-4153-97d6-76e9b3a1b6c1@infradead.org>
+Date: Tue, 26 Mar 2024 10:11:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240326133107.bnjx2rjf5l6yijgz@quack3>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 05/10] block: Add core atomic write support
+Content-Language: en-US
+To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
+ martin.petersen@oracle.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, dchinner@redhat.com, jack@suse.cz
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+ ojaswin@linux.ibm.com, linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+ io-uring@vger.kernel.org, nilay@linux.ibm.com, ritesh.list@gmail.com,
+ willy@infradead.org, Himanshu Madhani <himanshu.madhani@oracle.com>
+References: <20240326133813.3224593-1-john.g.garry@oracle.com>
+ <20240326133813.3224593-6-john.g.garry@oracle.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240326133813.3224593-6-john.g.garry@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 26, 2024 at 02:31:07PM +0100, Jan Kara wrote:
-> On Tue 26-03-24 14:17:20, Christian Brauner wrote:
-> > On Tue, Mar 26, 2024 at 01:57:15PM +0100, Jan Kara wrote:
-> > > On Sat 23-03-24 17:11:19, Christian Brauner wrote:
-> > > > Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
-> > > > default this option is set. When it is set the long-standing behavior
-> > > > of being able to write to mounted block devices is enabled.
-> > > > 
-> > > > But in order to guard against unintended corruption by writing to the
-> > > > block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
-> > > > off. In that case it isn't possible to write to mounted block devices
-> > > > anymore.
-> > > > 
-> > > > A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
-> > > > which disallows concurrent BLK_OPEN_WRITE access. When we still had the
-> > > > bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
-> > > > the mode was passed around. Since we managed to get rid of the bdev
-> > > > handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
-> > > > on whether the file was opened writable and writes to that block device
-> > > > are blocked. That logic doesn't work because we do allow
-> > > > BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
-> > > > 
-> > > > So fix the detection logic. Use O_EXCL as an indicator that
-> > > > BLK_OPEN_RESTRICT_WRITES has been requested. We do the exact same thing
-> > > > for pidfds where O_EXCL means that this is a pidfd that refers to a
-> > > > thread. For userspace open paths O_EXCL will never be retained but for
-> > > > internal opens where we open files that are never installed into a file
-> > > > descriptor table this is fine.
-> > > > 
-> > > > Note that BLK_OPEN_RESTRICT_WRITES is an internal only flag that cannot
-> > > > directly be raised by userspace. It is implicitly raised during
-> > > > mounting.
-> > > > 
-> > > > Passes xftests and blktests with CONFIG_BLK_DEV_WRITE_MOUNTED set and
-> > > > unset.
-> > > > 
-> > > > Fixes: 321de651fa56 ("block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access")
-> > > > Reported-by: Matthew Wilcox <willy@infradead.org>
-> > > > Link: https://lore.kernel.org/r/ZfyyEwu9Uq5Pgb94@casper.infradead.org
-> > > > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > > 
-> > > The fix looks correct but admittedly it looks a bit hacky. I'd prefer
-> > > storing the needed information in some other flag, preferably one that does
-> > > not already have a special meaning with block devices. But FMODE_ space is
-> > > exhausted and don't see another easy solution. So I guess:
-> > 
-> > Admittedly, it's not pretty but we're abusing O_EXCL already for block
-> > devices. We do have FMODE_* available. We could add
-> > FMODE_WRITE_RESTRICTED because we have two bits left.
-> 
-> Yeah, I'm mostly afraid that a few years down the road someone comes and
-> adds code thinking that file->f_flags & O_EXCL means this is exclusive bdev
-> open. Which will be kind of natural assumption but subtly wrong... So to
-> make the code more robust, I'd prefer burning a fmode flag for this rather
-> than abusing O_EXCL.
+Hi,
 
-Ok, done and resend. Thanks for the feedback! I was rather focussed on
-not using a bit but I agree it's likely the right thing to do!
+On 3/26/24 06:38, John Garry wrote:
+> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+> index 1fe9a553c37b..4c775f4bdefe 100644
+> --- a/Documentation/ABI/stable/sysfs-block
+> +++ b/Documentation/ABI/stable/sysfs-block
+> @@ -21,6 +21,58 @@ Description:
+>  		device is offset from the internal allocation unit's
+>  		natural alignment.
+>  
+> +What:		/sys/block/<disk>/atomic_write_max_bytes
+> +Date:		February 2024
+> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
+> +Description:
+> +		[RO] This parameter specifies the maximum atomic write
+> +		size reported by the device. This parameter is relevant
+> +		for merging of writes, where a merged atomic write
+> +		operation must not exceed this number of bytes.
+> +		This parameter may be greater to the value in
+
+		                              than
+
+> +		atomic_write_unit_max_bytes as
+> +		atomic_write_unit_max_bytes will be rounded down to a
+> +		power-of-two and atomic_write_unit_max_bytes may also be
+> +		limited by some other queue limits, such as max_segments.
+> +		This parameter - along with atomic_write_unit_min_bytes
+> +		and atomic_write_unit_max_bytes - will not be larger than
+> +		max_hw_sectors_kb, but may be larger than max_sectors_kb.
+> +
+> +
+> +What:		/sys/block/<disk>/atomic_write_unit_min_bytes
+> +Date:		February 2024
+> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
+> +Description:
+> +		[RO] This parameter specifies the smallest block which can
+> +		be written atomically with an atomic write operation. All
+> +		atomic write operations must begin at a
+> +		atomic_write_unit_min boundary and must be multiples of
+> +		atomic_write_unit_min. This value must be a power-of-two.
+> +
+> +
+> +What:		/sys/block/<disk>/atomic_write_unit_max_bytes
+> +Date:		February 2024
+> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
+> +Description:
+> +		[RO] This parameter defines the largest block which can be
+> +		written atomically with an atomic write operation. This
+> +		value must be a multiple of atomic_write_unit_min and must
+> +		be a power-of-two. This value will not be larger than
+> +		atomic_write_max_bytes.
+> +
+> +
+> +What:		/sys/block/<disk>/atomic_write_boundary_bytes
+> +Date:		February 2024
+> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
+> +Description:
+> +		[RO] A device may need to internally split I/Os which
+> +		straddle a given logical block address boundary. In that
+> +		case a single atomic write operation will be processed as
+> +		one of more sub-operations which each complete atomically.
+
+		    or
+
+> +		This parameter specifies the size in bytes of the atomic
+> +		boundary if one is reported by the device. This value must
+> +		be a power-of-two.
+
+-- 
+#Randy
