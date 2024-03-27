@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B204312BEA0;
-	Wed, 27 Mar 2024 12:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC0912C552
+	for <linux-block@vger.kernel.org>; Wed, 27 Mar 2024 12:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711540871; cv=none; b=Gclzl3piGiJZS1SLzI53dF4m9aZtQE3o768dc7nA3Uxu9DfR5495z/i5VjwGFmxdRGJC9BNyLAz2TznB9tWCzUoxgWxdXozAMeHKC+7KlX4XqbWewXiTGhVYe+jN67rSWC9HYoKfT3UszVBHElwvljcMHf7ApWGyr96ref5EkaI=
+	t=1711540977; cv=none; b=m1h3dgZSqXOxmpbggI4hg196NAFSxryJy5gqDiVB0hNVtgMcBvozHwuj9KAVDgr5KII2VbmJSn5lh7+zkqK5McVDdlsTqevVOTz2BRTw6raIXZmOCznUqKg7rjAmW+PZJ2EUfFxBcezInpx0rC/+frtlBJT7wwvetm8i4suJ1CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711540871; c=relaxed/simple;
-	bh=05DlvcN6hxaPe1d6B3GmNcfk54T45nmDC3R6/0xzCow=;
+	s=arc-20240116; t=1711540977; c=relaxed/simple;
+	bh=9Y6hny7Fqm89gQoRno25OblsD8PHFXcmc2vUPvLN3aU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mRE34lsGMN3hENKFnTh4E9W/fT+RLkgnEhjlIOSzv7QfCLxKguWglsvGFpd6xJeGnmCO2PBkDbMtPEAEhTREGsRuyVmvTBa7mxC9N0FsdbDH9QneAYRat7O9eF1Wz8Ln/sCjKHhb++U+xnATewO4GQ/aL1NAwCiE2yvZTd1pUUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A/F3Z3Vv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=WyrwYeC2ArP+UjRYLGtx/eakMlcESCinF1i4/VvemIhnA2L0/S93V7D5PQM8YoAJpRttSZhiPfxFGg0nJPmsvN2wN1tdWwRKtkIV1i3YzMYV/9ktJIcOYnWfPLZ3SlOmKuxav6+TdoVXBRupYgz1g800kVSxTn40nlqmm7GvZbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pApGdc65; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A/F3Z3Vv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE3A2C433F1;
-	Wed, 27 Mar 2024 12:01:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pApGdc65"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E76DC433F1;
+	Wed, 27 Mar 2024 12:02:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711540870;
-	bh=05DlvcN6hxaPe1d6B3GmNcfk54T45nmDC3R6/0xzCow=;
+	s=k20201202; t=1711540976;
+	bh=9Y6hny7Fqm89gQoRno25OblsD8PHFXcmc2vUPvLN3aU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A/F3Z3VvLKELHyNKDs6pmwZoPMz7xZ3yoI6ctZ/7fuJ4V6T4SZU7VzVsZMxZqPsIb
-	 CWtg9aX42zRGw7MQhmMdSY/ymVYgg0hOIrQiFAt6gvzvNTRHP3Dtf3ULiM8udQFDhx
-	 /IMRfZsiSOgBju7Qyaf0Q5L8RKokG4vdw/IesRLX0Xfc+vlMYYBs+W1DiPKGKo+lta
-	 NPPU10D7lbohT03395DY4Y5Blyqa5BGsd6kYOFR68cFzR590Ldtw+WxGpXcO8zrx6s
-	 kTk2jNDdp6YQKJpYnfmcN/WfjxgMAxFac5HZ5NxK9o4vdf4zv1xJMW8+08al3suoZV
-	 z/jy3s1xoXpmQ==
+	b=pApGdc65Au7zBaaHsl0G6uGVAhh04W6UXb/umZMCMhbfKHhQ1chs1SSXJbPOQ+8Pa
+	 cTh3YDQCBsFfz9+fiOdZGGozVwXQ7roIeLuud68dQySwQzWmhZrMqKLu/nzEIDw4Cq
+	 b9kKKv/iKrFHwA1lDioO2S/sXE0rxdp+KL7BS/5bPJaw/5fMtlcJMNQK1LPyQQXRrf
+	 7jS15wO1r26rSqTvld7IIf0O0bj79j6fP4FYxlxYR35ZLTR3pwBSbUiQWYscn0360B
+	 VNmt3/J3m6IdatmqMtOwcedBckXKqwmGk1XSQI6w+TJVTcC+TrbfoyGec6dNZjeC6p
+	 vlYJoPUlJ0ZZw==
 From: Christian Brauner <brauner@kernel.org>
 To: Christian Brauner <brauner@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
+Cc: Matthew Wilcox <willy@infradead.org>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
 	Jan Kara <jack@suse.cz>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] fs,block: yield devices early
-Date: Wed, 27 Mar 2024 13:00:55 +0100
-Message-ID: <20240327-desorientiert-validieren-88b2582491f7@brauner>
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
+Date: Wed, 27 Mar 2024 13:01:30 +0100
+Message-ID: <20240327-lichter-flutwelle-72ed40da1d48@brauner>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240326-vfs-bdev-end_holder-v1-1-20af85202918@kernel.org>
-References: <20240326-vfs-bdev-end_holder-v1-1-20af85202918@kernel.org>
+In-Reply-To: <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
+References: <20240323-seide-erbrachten-5c60873fadc1@brauner> <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,18 +46,19 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1294; i=brauner@kernel.org; h=from:subject:message-id; bh=05DlvcN6hxaPe1d6B3GmNcfk54T45nmDC3R6/0xzCow=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSxcDXsvHn0mvo5paAU55SlNzrdzu8Lc7U61JM59c+GK x/1fynIdpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEzknzrDX7G8pdoTV2zmL7+7 QGWOHdPr49Jbreee0lxoZO/sHG/oIM7IsPTHy9/sx+bdkJC7mFwizffpvKSl95G/jw9/Or/wh4n QPV4A
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1383; i=brauner@kernel.org; h=from:subject:message-id; bh=9Y6hny7Fqm89gQoRno25OblsD8PHFXcmc2vUPvLN3aU=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSxcL3YfV9oMsv6O8LcituuX1uha5xxas2ScxOjHa0Tb GZyfzzK0VHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjAR7i5Ghu9z2CuqQmX2Tk+/ v3pHnJDdreUO+xomxnc4bH9uWGu4fyUjw6ddv/mk1I7qbp3O7JW1XH/p1IsnZb9/ZTpc1ud7m1H BkhcA
 X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-On Tue, 26 Mar 2024 13:47:22 +0100, Christian Brauner wrote:
-> Currently a device is only really released once the umount returns to
-> userspace due to how file closing works. That ultimately could cause
-> an old umount assumption to be violated that concurrent umount and mount
-> don't fail. So an exclusively held device with a temporary holder should
-> be yielded before the filesystem is gone. Add a helper that allows
-> callers to do that. This also allows us to remove the two holder ops
-> that Linus wasn't excited about.
+On Sat, 23 Mar 2024 17:11:19 +0100, Christian Brauner wrote:
+> Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
+> default this option is set. When it is set the long-standing behavior
+> of being able to write to mounted block devices is enabled.
+> 
+> But in order to guard against unintended corruption by writing to the
+> block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
+> off. In that case it isn't possible to write to mounted block devices
+> anymore.
 > 
 > [...]
 
@@ -76,5 +77,7 @@ trailer updates or similar. If in doubt, please check the listed branch.
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
 branch: vfs.fixes
 
-[1/1] fs,block: yield devices early
-      https://git.kernel.org/vfs/vfs/c/482496f606a1
+[1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
+      https://git.kernel.org/vfs/vfs/c/ddd65e19c601
+[2/2] block: count BLK_OPEN_RESTRICT_WRITES openers
+      https://git.kernel.org/vfs/vfs/c/3ff56e285de5
