@@ -1,83 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC0912C552
-	for <linux-block@vger.kernel.org>; Wed, 27 Mar 2024 12:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF4A14B084;
+	Wed, 27 Mar 2024 12:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711540977; cv=none; b=m1h3dgZSqXOxmpbggI4hg196NAFSxryJy5gqDiVB0hNVtgMcBvozHwuj9KAVDgr5KII2VbmJSn5lh7+zkqK5McVDdlsTqevVOTz2BRTw6raIXZmOCznUqKg7rjAmW+PZJ2EUfFxBcezInpx0rC/+frtlBJT7wwvetm8i4suJ1CY=
+	t=1711541611; cv=none; b=Do18rkHCjzfRecJhNaobrXzjir07AeJxEDp8t75vRpayasmJHIGMKL2r9TQ2lthD5UYyWU52Uh3IdZKCb43JGaNlUVhXoNiVMi5bAXw6eLL3iJ0Cug8OaFSub6kyh5K/ESxG5fPhGbpruz0XB1WFByWi1khyR3xRiOpIkuhX/Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711540977; c=relaxed/simple;
-	bh=9Y6hny7Fqm89gQoRno25OblsD8PHFXcmc2vUPvLN3aU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WyrwYeC2ArP+UjRYLGtx/eakMlcESCinF1i4/VvemIhnA2L0/S93V7D5PQM8YoAJpRttSZhiPfxFGg0nJPmsvN2wN1tdWwRKtkIV1i3YzMYV/9ktJIcOYnWfPLZ3SlOmKuxav6+TdoVXBRupYgz1g800kVSxTn40nlqmm7GvZbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pApGdc65; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711541611; c=relaxed/simple;
+	bh=QEwF2XE5idcMAAjTSgYHtTfXAGylf/zZN1BFmlqvKtM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RMV4WKdg0LrmUdM1JSYKe8OsUbcmsV/HIEMcMFmEWfR/ENfLsDSEBxZV4jASr7YydoTWWNvdLoiGjq3r72M/1GM11sF4jTtvs7cDna5Y5YwknyozKwXg0gDR53iCkqDi9V2udK/7A7/vdUOSdJgX2CRV5GGpk0a6WZE87M6EjVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFb2SMm3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pApGdc65"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E76DC433F1;
-	Wed, 27 Mar 2024 12:02:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFb2SMm3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A2AC433C7;
+	Wed, 27 Mar 2024 12:13:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711540976;
-	bh=9Y6hny7Fqm89gQoRno25OblsD8PHFXcmc2vUPvLN3aU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pApGdc65Au7zBaaHsl0G6uGVAhh04W6UXb/umZMCMhbfKHhQ1chs1SSXJbPOQ+8Pa
-	 cTh3YDQCBsFfz9+fiOdZGGozVwXQ7roIeLuud68dQySwQzWmhZrMqKLu/nzEIDw4Cq
-	 b9kKKv/iKrFHwA1lDioO2S/sXE0rxdp+KL7BS/5bPJaw/5fMtlcJMNQK1LPyQQXRrf
-	 7jS15wO1r26rSqTvld7IIf0O0bj79j6fP4FYxlxYR35ZLTR3pwBSbUiQWYscn0360B
-	 VNmt3/J3m6IdatmqMtOwcedBckXKqwmGk1XSQI6w+TJVTcC+TrbfoyGec6dNZjeC6p
-	 vlYJoPUlJ0ZZw==
-From: Christian Brauner <brauner@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Matthew Wilcox <willy@infradead.org>,
+	s=k20201202; t=1711541611;
+	bh=QEwF2XE5idcMAAjTSgYHtTfXAGylf/zZN1BFmlqvKtM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gFb2SMm3l1PvSuZR+1h1RoEADSS5iDjH0jf1VfVaZpFwofC79uHqojchv5sgn67Xh
+	 z6514h5W4lsr3UQyBtiw1HdMz8OSFBnXU927jah30Yzr2C+xNDheQEZG9QAkEBXrXa
+	 rA5In2lz3oCxCTjTJfmMnVy0csBZEK3qiNaE2o2aiNYryith3E8u3zBi9wbPBtC05b
+	 r8up2e5JqHix92cuzwi4XadJCoH6UpAMVRmv7HKgY5q0uvcLfZA5EXa6VkHlu66x9R
+	 J2pRqtbGtWVrCPvhCVJ8gHM7icUFwsMQ4tNpYUe/iwM63P4Z5qx48ACZR2x4x2LLlU
+	 yyk5MFFp9JutA==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	tonyb@cybernetics.com
+Cc: Greg Edwards <gedwards@ddn.com>,
+	Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
-Date: Wed, 27 Mar 2024 13:01:30 +0100
-Message-ID: <20240327-lichter-flutwelle-72ed40da1d48@brauner>
+	linux-kernel@vger.kernel.org
+Subject: FAILED: Patch "block: Fix page refcounts for unaligned buffers in __bio_release_pages()" failed to apply to 6.1-stable tree
+Date: Wed, 27 Mar 2024 08:13:29 -0400
+Message-ID: <20240327121329.2830355-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
-References: <20240323-seide-erbrachten-5c60873fadc1@brauner> <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1383; i=brauner@kernel.org; h=from:subject:message-id; bh=9Y6hny7Fqm89gQoRno25OblsD8PHFXcmc2vUPvLN3aU=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSxcL3YfV9oMsv6O8LcituuX1uha5xxas2ScxOjHa0Tb GZyfzzK0VHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjAR7i5Ghu9z2CuqQmX2Tk+/ v3pHnJDdreUO+xomxnc4bH9uWGu4fyUjw6ddv/mk1I7qbp3O7JW1XH/p1IsnZb9/ZTpc1ud7m1H BkhcA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+X-Patchwork-Hint: ignore
+X-stable: review
 Content-Transfer-Encoding: 8bit
 
-On Sat, 23 Mar 2024 17:11:19 +0100, Christian Brauner wrote:
-> Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
-> default this option is set. When it is set the long-standing behavior
-> of being able to write to mounted block devices is enabled.
-> 
-> But in order to guard against unintended corruption by writing to the
-> block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
-> off. In that case it isn't possible to write to mounted block devices
-> anymore.
-> 
-> [...]
+The patch below does not apply to the 6.1-stable tree.
+If someone wants it applied there, or to any other stable or longterm
+tree, then please email the backport, including the original git commit
+id to <stable@vger.kernel.org>.
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Thanks,
+Sasha
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+------------------ original commit in Linus's tree ------------------
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+From 38b43539d64b2fa020b3b9a752a986769f87f7a6 Mon Sep 17 00:00:00 2001
+From: Tony Battersby <tonyb@cybernetics.com>
+Date: Thu, 29 Feb 2024 13:08:09 -0500
+Subject: [PATCH] block: Fix page refcounts for unaligned buffers in
+ __bio_release_pages()
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+Fix an incorrect number of pages being released for buffers that do not
+start at the beginning of a page.
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
+Fixes: 1b151e2435fc ("block: Remove special-casing of compound pages")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tony Battersby <tonyb@cybernetics.com>
+Tested-by: Greg Edwards <gedwards@ddn.com>
+Link: https://lore.kernel.org/r/86e592a9-98d4-4cff-a646-0c0084328356@cybernetics.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/bio.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-[1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
-      https://git.kernel.org/vfs/vfs/c/ddd65e19c601
-[2/2] block: count BLK_OPEN_RESTRICT_WRITES openers
-      https://git.kernel.org/vfs/vfs/c/3ff56e285de5
+diff --git a/block/bio.c b/block/bio.c
+index 496867b51609f..a8b6919400270 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1153,7 +1153,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ 
+ 	bio_for_each_folio_all(fi, bio) {
+ 		struct page *page;
+-		size_t done = 0;
++		size_t nr_pages;
+ 
+ 		if (mark_dirty) {
+ 			folio_lock(fi.folio);
+@@ -1161,10 +1161,11 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ 			folio_unlock(fi.folio);
+ 		}
+ 		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
++		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
++			   fi.offset / PAGE_SIZE + 1;
+ 		do {
+ 			bio_release_page(bio, page++);
+-			done += PAGE_SIZE;
+-		} while (done < fi.length);
++		} while (--nr_pages != 0);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__bio_release_pages);
+-- 
+2.43.0
+
+
+
+
