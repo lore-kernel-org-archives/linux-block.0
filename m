@@ -1,514 +1,240 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CEB24205;
-	Wed, 27 Mar 2024 08:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711529824; cv=none; b=WB8CpRRZ5Kbqs0sj70Xhv3ljThFJ0CO5XeMt3KZ7bSGTWFfd03TDrdXe66QoR8e3+z6m4+Cl1NnLFjAcddiIr4P8A2k6fY4clz1FTmBnmkaeCmXEGzrWD13ahKaFSFyTQxXSFaA5ZF6wgJMmdYRj4boJCvnj1WzdStx2E2SDtAs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711529824; c=relaxed/simple;
-	bh=CPyt8dOdJgPOfXoxtqI4K1qh0sy7SN32hWmqkLuhppo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hk111ryq3zHSzVlk8tBVUrO5lwDhK7M3kiypIPkjEYbW/RsGYeyTR3ufN1GwJrPyhpPYR657xiQwwthN4Qe1cJ5HokZ0LIvSygkUmmGeJNNCbNQQ9a83SOSwmSCfM3pbU2AGGiNqXTfbZxMfDaFDETDnSNMzX1OPcFaHw5M8/yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rN3+gpdK; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5BF250F8;
+	Wed, 27 Mar 2024 09:40:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711532451; cv=fail; b=MOoLAcghblWfkeAsnex8M5NvEzXum1Zn58LmgP0jv5fPexoQi8i7BR4BpXycuwjMvQCRghzXyJuIU4cOBsq0FzkS3Db61gUQ09LyMvfg4It2e/CThFIxxjMNrJed9kUtdUO8gUFFtVqOlvSF5SotospGjMplQUMD3qV86J+dXIQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711532451; c=relaxed/simple;
+	bh=M6/uElKeFj991kp4oUJLEtdRDxwbHun0G2QX3xIRl2g=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=iedTFDYF3HsfkpfQClqDP4rOfaevgUnrEkU0FZ7zhgaOPTv3i09GtWe+TrMQE/tcBDFpw2vkEy8lk9cZEYhwmWPKrH6f30vNI24qHBKFybPHhsHUWfjk0gdeBO+ut6xFVJx3s0or4E7elm2N7krVNbvbbQinu+B2y2JWvmRO2rY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=P3T+XEQl; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=MfogU/tT; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rN3+gpdK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68624C433C7;
-	Wed, 27 Mar 2024 08:57:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711529824;
-	bh=CPyt8dOdJgPOfXoxtqI4K1qh0sy7SN32hWmqkLuhppo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rN3+gpdKsuQyrfEKh2lnr9CBilSBTnzNu4+Q/RFGDBZzWUu6gdMo7XAZg1kU0xq/+
-	 FQHc/CQ9N3GaOgl4fELb2/woyzLBFnf1O4KCQG+Jv7IcVAK6pS3LHl3EG3O49k1s9B
-	 7W/NLaDfg4+1zPds50ZE6Nx1R8DsoHFQxD68l0HbtSPb1SZRyowmDlQ5Em+NuEZ6kk
-	 TVoTD3Gw4p5RdH9O+HW1U0NnM1ENf+oAw4/9OshF2z7sxx4drf8lz2hv8qwlFLBxJx
-	 EjBuxTz6OT9W70TP0CKAIfNu05c0/m9g0vxxf76W1e9uCjJjr2kSyTKCE3hGuEG0Sy
-	 5ObkMzZsDlliQ==
-Date: Wed, 27 Mar 2024 09:56:59 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH] fs,block: yield devices early
-Message-ID: <20240327-befanden-morsen-9f691f5624f9@brauner>
-References: <20240326-vfs-bdev-end_holder-v1-1-20af85202918@kernel.org>
- <20240326223213.ytrsxxjsq3twfsxy@quack3>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="P3T+XEQl";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="MfogU/tT"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42R87poc020072;
+	Wed, 27 Mar 2024 09:40:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=corp-2023-11-20;
+ bh=t13SVpey1+758vD9d+TsN2cwv6lVOfVT0b5QuIFkSRM=;
+ b=P3T+XEQleB/LGldp1zAtsC7OJF30bRYUSiV9+fy5YzpHqPz+HdYQpTfRTW+ZBfUMWvvx
+ Y0eeta8Z9H3+JIjLJQnSbvWyIh+bHkrHsDcJL73sYUjrxIqQ8jh1ZsHWoogijeTFHlfb
+ VjHLf938iaE1P1I4OvKNt17dtxSXLF73Lo/eVM7NWVfbLTjNn4zcL8SaIz50ORW+ryqf
+ 4RMzzjndORWJ6LW5f0DrmFZ0P3pQPrE46WKwsbYfZ2U4cvdgQwPEn4hTB4pMm1GXmau5
+ i/cH2ps94rl4RQz03WaRAi4kIJa1QERJwao409mOLTAoF2ikFinfVGzygG0nfo+1HzEH 3Q== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3x1pybpx4x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 27 Mar 2024 09:40:39 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42R81EB2011583;
+	Wed, 27 Mar 2024 09:40:37 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2168.outbound.protection.outlook.com [104.47.55.168])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3x1nh89h34-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 27 Mar 2024 09:40:37 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gof9EwsfhRrXhpWH4T2EtTJj4Lx89hBWQnFkwMj6Y1SxelBA863mXzOWHXQGOTLE0NCIP7X2m8EpYd9HafTRzTpfJZ6xAUGzAdtqrWtivB9kHuTwsjvIHxD+qM8G6wE+O1GwPO8SNISn0XlCgvTHCv6pmlj4bb/4CsxNCtiFe5BjaX725vVUlxIXGvPcS2f0fcLwfZwGM6aasMzG5d2hjDAiilpWYyQLzJPib983GAEBv8nVEzoFoZuQxk5VpMaRCaN3RCuGElWhwac6zj30juma2kcKf2UZcD4A2NNQbw91UiYWjks+mKcNGAIvzcdQwmP1cKd3EE1ZPLbAJzhPtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=t13SVpey1+758vD9d+TsN2cwv6lVOfVT0b5QuIFkSRM=;
+ b=Xb11U2lLY0P41J27E4gUkhHJo6GC9V1jFj9wIFR3BFrcdgU7dyYv1X/99RAfKsBwsG60loRCo1h0+1X5rejiLijrK5u/jfLWhbjydJ/0xhLOe+akiBULNq2IysgG4YzSHbhVqj1h/tVEO1r6suzm6EJBrp9evg3V6GKgytqLweaUGgIls6gXl5SdyABh+DX5rTy44zzgueWlmWxYLsLPusk8etYw2szIwmuZ35ZdS36HP7mj6CRU7VFAJeMeW3YAqR0nBue7C1fYqO3Stv1Ccr9Pm5q3p+pnfH6ZyJzPY3YDvh7clXJbDTpQO6WNlid8SpT7iFwKA6Kx2cOz8SIzug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=t13SVpey1+758vD9d+TsN2cwv6lVOfVT0b5QuIFkSRM=;
+ b=MfogU/tTi1Sb8G/TyDKggjnEP0b+HprajdNEo8tg+TqbobnXU/1PvXG4z3y/P2a0vrD5+FMmMTXr6Wt6/IjeLiOP+OZHDVtKJ9omRS3cWo8bMElwk3DtXWNrsKNzRLFeBTHDIpr1i+n2wbOoJsUH/Bjrjw31gIdRPwA/VrhdNK0=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by SA3PR10MB7000.namprd10.prod.outlook.com (2603:10b6:806:316::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Wed, 27 Mar
+ 2024 09:40:35 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::ae68:7d51:133f:324]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::ae68:7d51:133f:324%4]) with mapi id 15.20.7409.031; Wed, 27 Mar 2024
+ 09:40:35 +0000
+From: John Garry <john.g.garry@oracle.com>
+To: tj@kernel.org, axboe@kernel.dk, josef@toxicpanda.com, shli@fb.com,
+        hch@lst.de
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        John Garry <john.g.garry@oracle.com>
+Subject: [PATCH] blk-throttle: Only use seq_printf() in tg_prfill_limit()
+Date: Wed, 27 Mar 2024 09:40:20 +0000
+Message-Id: <20240327094020.3505514-1-john.g.garry@oracle.com>
+X-Mailer: git-send-email 2.31.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR05CA0003.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b::8) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="gzws4rsal6aab534"
-Content-Disposition: inline
-In-Reply-To: <20240326223213.ytrsxxjsq3twfsxy@quack3>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|SA3PR10MB7000:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0faddb41-548c-451d-4769-08dc4e41f408
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	vHQu8KUMtUtcRxvkF+t71TB8UKCkPi2+GhXMy99D/5LvhL3dfwKwVPPfdHYtWdpaaPcU25azF28ly9iMWJfs2g7J4IzM0ULkAVcj2WtEog/kbeaoQ1hIgKlR8imDT9d8eiMLU3V6grUhIXLqfRWlDDkZ5k/dWJTIXdJLyYOOBeSCVEgUYjlgEZZVNlScUEUgRQReEow5ZjEktpJfDmWfiV070wBh9D5oNbR3o3DfxBDrYpnP93/NYBKcF2Sj4rVKhKhpMYGyG92Em7bvBqR0FBNg/DFjeFkDttAz4yruqrMDFmuolyoxbQEN1U7MJ5phVmRZ/Eap9bF89vFuAFwgRVZjId5+LaL3C/XK5s5gi3cuV6Y9dnEoO/RTVsQpGWTdBx5cO5bF3L9sy+/pJDoPVt97h6rihWQbmw6HNGo3ZV/TYTiLR0kDcJjIwW4oStY27ueNM8Qu5uvHDJvlM9u7zxDOnZKyPIpEiv8FH6MzvbvknPyhiSn68oxKyqfCx00ptoe6psToJYNScX5CI/wHOFXmCjL/+GOIrN4nxIc//KbtaLTVOce5juss1ywZTOgkLPoFGOZ8zBgXb3og1My6F8lS6ZKaFx6giF2dRCO2AIkIHfNngprCirenZoMsVmUcc9ZD1kXj3uPpGRVMrgm2i5FWXtQVELoBbnPlieVGvo0=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?us-ascii?Q?Hyuu82Xam1gqitWRBP/uvPu4CrnIK0KAPc5zAiXzkbdUeHZF+qiMwxtoAFzb?=
+ =?us-ascii?Q?jHi0xoaexYGnItF6nSweW31nT294uJRTy9BKtQzI2WJKfhTIZEinCRULIMeS?=
+ =?us-ascii?Q?znIokqFx8TIZR1O+BGjjKk6vbIjKZCIAaGPHdCqGhrENDwObGm0OYSbDlsi+?=
+ =?us-ascii?Q?zvnsangsjRurQsevGAbCLgyvj+i/FlfMcqO/1rJO7GrQNC2AH+VDrdE7PeKV?=
+ =?us-ascii?Q?TFhOVFWMCv/eBX6aqUxCJZ5JwZILVKSNtK7XmZv6h4lyDuLnO4aL/v2N2jAt?=
+ =?us-ascii?Q?aXxTUX2bJgzEU8Lb+pbMeu4i0ddakZoQX1oamMRFpRNQTZn1KqCFeCNHqDbf?=
+ =?us-ascii?Q?Ft3qKRWlag0Ysm7XLkDZJb4qMaTVOamwK7vYDeYGZR/W8fomoarqLnZhDPqe?=
+ =?us-ascii?Q?QlKQJ2RmuUvFEihBp1WqTOXDcfnDD/yCnvCy8ZewX0NrxJTcX4CM7GXt+III?=
+ =?us-ascii?Q?Z9A+Ons39NiW+SwbZiqQPZeVyMPq6I5XK1oz4JH/sheJ+rWA9s9r9974KJEM?=
+ =?us-ascii?Q?PBhClouFPYNYOdShwea7gTtu4eahk/KBHq8YBKx/CLSL/CsNBtqgTRkXAEHQ?=
+ =?us-ascii?Q?v/zvQmK2BQfxTwYYNCcLt602XCiceG9bB8KGEDfe0QkIqtAJyuhRkjrz4EKE?=
+ =?us-ascii?Q?YQGFsxDL7LJl/MqhqsL15BSbezTNW7hr/E8zWFPYdYw0XaxvEXPIbEzCYFGr?=
+ =?us-ascii?Q?eVtKJaE2CbkznMqtudL7rIN+Ec8yMReS6XSO3w1moQRP+SfDeuwgBT3Y/1rI?=
+ =?us-ascii?Q?Q2pjPt58r0WacO9Evo/F1CoSGsjY3DGty5+EestuCOTizO6U5TYMWnDV4yhs?=
+ =?us-ascii?Q?bvPsJFeWEJfciUOo5TGKL55N0UsanJYsoNHUSssAOfENgOL2FPdBfisxioch?=
+ =?us-ascii?Q?gC8jqlJYpn1LAJ8x31Wt0pIXpmYCUuvERhO/uj1pG3AhWLhM7N9pfoDYrYaD?=
+ =?us-ascii?Q?EmbrOEDMdqHETZwk7vmaeT7f58qaQySKbJA4xs6tzGbKloUfiCJym64CNhZt?=
+ =?us-ascii?Q?PWrxXZKKlM9HAmPEvIAp2Uq6lfYcKDJGhX2xgLz4h6T4+mBhFxrGHWUmKSMD?=
+ =?us-ascii?Q?7TT9QChx6b9iat8tTMCVlnlbke82TB5UDOCWpE6MEh+0sDKPtIi1ZvSAzILl?=
+ =?us-ascii?Q?7OkNKQ2oMKGPFEJ8er7bGOJiUkJVs2uaTHs0PQ56c8VdTSry19pqhpy8VUX6?=
+ =?us-ascii?Q?IxxJheP1v5cifUpLw14KS9+hl3cU/uOcGzaTf2xkxCNRJEttPP3el46nREvy?=
+ =?us-ascii?Q?/xJ8+4LGV4h3dQaa7gp52KcJpt2CncH3gr2Yw+evX99W5GD74VlnDtP8NIPF?=
+ =?us-ascii?Q?BXDSWT2/p9EMGRMYJDkUNZt5MP3DmWyVuj1/CRXqijYZfQR5BDSgVzGT0kib?=
+ =?us-ascii?Q?xtjRuDE9UDVlVYp6Y7Tjr6SPSDSriN5m8EAFB2fxiIO29tUbLsiyI3nepdaF?=
+ =?us-ascii?Q?HDuo7QPLuDfx+A0lxQ7vegVkgOUzhnriOmjYhoTXere3KJdcUqQI6ZnbbnoX?=
+ =?us-ascii?Q?OxiYf4wqwdGOVslZ0WBHCUQy6EMj67QRoIvaxhDZbNMLnyxz/ZH8Vdih9FFA?=
+ =?us-ascii?Q?aWUkH3kHyrjv0p3l25a8lNBsD6Q+byYN77zKg1jBGFDexzQ/ikSB4gLT9Yoq?=
+ =?us-ascii?Q?pA=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	0WYdovSZLc0qCz9qM0QSsCQj+hbirXARZKweXFB/0InTyhgfuWJRYLkkCjPx3uRd9eabVUb4c2wGL2HIGFEBDixLCrZmdf3nR2xVtStwdmxn6RIMh5v/2GeF20NI7PUJAQDMGUl+geKX5R38CekZcU6S08MyynOQToKBMt0mYQH5HiTHtTsjHM9k5Shuupa8JKOLAjanFUs0AKL/P1dYeeFbHNy36ZicUJsvayFFYs5mAW/KhVOA0XwDcGkO1g4vse1wHKX6uB2KpVmUz5vDyAFPk2vWqKTorqd3cFx030TVTTbk8Jf/StQEW0rMdUYeWDNwZUJ8Pln117DTf0kWFowwz95n6S1mzEba22M0lpL6UUJQqGENQVeQ34EeRx54ptN7DzCUbLuGr0pDNirjKMY7CUtrhn4Xa2lSBvZfDV4Mf6t1YyGZYJZTUbIhWjcTIo3XIso+E2XClqpZSrQoQ30dH7aABBdGFIirCENZEfGAbytMnNZn11gIXIU7jw6BzyjyEmLS9a5CKwBP3gdMrjYjglAg3OaCzJ1axO7TQXk4RA/u5YIE+/KtPE88l6ltfHUOIfrPhSuapErSLuDVEFPGrIH9EiTO9tLcXkJ9d7U=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0faddb41-548c-451d-4769-08dc4e41f408
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2024 09:40:35.5686
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8Gm4B4+8f8mZ2+MoG8hPQPCNkw3bdExNdndO4wgIbdU1EHxE2JAPDNkdQVvPXzIpJVH2cBHULTIIsGJidKn5eQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR10MB7000
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-27_05,2024-03-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
+ phishscore=0 mlxscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2403270065
+X-Proofpoint-GUID: 1cye4obpclOcxakD_1zENCx7ebGx27Zg
+X-Proofpoint-ORIG-GUID: 1cye4obpclOcxakD_1zENCx7ebGx27Zg
 
+Currently tg_prfill_limit() uses a combination of snprintf() and strcpy()
+to generate the values parts of the limits string, before passing them as
+arguments to seq_printf().
 
---gzws4rsal6aab534
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Convert to use only a sequence of seq_printf() calls per argument, which is
+simpler.
 
-On Tue, Mar 26, 2024 at 11:32:13PM +0100, Jan Kara wrote:
-> On Tue 26-03-24 13:47:22, Christian Brauner wrote:
-> > Currently a device is only really released once the umount returns to
-> > userspace due to how file closing works. That ultimately could cause
-> > an old umount assumption to be violated that concurrent umount and mount
-> > don't fail. So an exclusively held device with a temporary holder should
-> > be yielded before the filesystem is gone. Add a helper that allows
-> > callers to do that. This also allows us to remove the two holder ops
-> > that Linus wasn't excited about.
-> > 
-> > Fixes: f3a608827d1f ("bdev: open block device as files") # mainline only
-> > Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ...
-> > @@ -1012,6 +1005,29 @@ struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
-> >  }
-> >  EXPORT_SYMBOL(bdev_file_open_by_path);
-> >  
-> > +static inline void bd_yield_claim(struct file *bdev_file)
-> > +{
-> > +	struct block_device *bdev = file_bdev(bdev_file);
-> > +	struct bdev_inode *bd_inode = BDEV_I(bdev_file->f_mapping->host);
-> > +	void *holder = bdev_file->private_data;
-> > +
-> > +	lockdep_assert_held(&bdev->bd_disk->open_mutex);
-> > +
-> > +	if (WARN_ON_ONCE(IS_ERR_OR_NULL(holder)))
-> > +		return;
-> > +
-> > +	if (holder != bd_inode) {
-> > +		bdev_yield_write_access(bdev_file);
-> 
-> Hum, what if we teached bdev_yield_write_access() about special bd_inode
-> holder and kept bdev_yield_write_access() and bd_yield_claim() separate as
-> they were before this patch? IMHO it would make code a bit more
-> understandable. Otherwise the patch looks good.
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: John Garry <john.g.garry@oracle.com>
 
-Ok, see appended patch where I folded in your suggestion.
-
---gzws4rsal6aab534
-Content-Type: text/x-diff; charset=utf-8
-Content-Disposition: attachment;
-	filename="0001-fs-block-yield-devices-early.patch"
-
-From 817d36e90a009dc63e28f9b3440b9c9f6a97fe6f Mon Sep 17 00:00:00 2001
-From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 26 Mar 2024 13:47:22 +0100
-Subject: [PATCH] fs,block: yield devices early
-
-Currently a device is only really released once the umount returns to
-userspace due to how file closing works. That ultimately could cause
-an old umount assumption to be violated that concurrent umount and mount
-don't fail. So an exclusively held device with a temporary holder should
-be yielded before the filesystem is gone. Add a helper that allows
-callers to do that. This also allows us to remove the two holder ops
-that Linus wasn't excited about.
-
-Link: https://lore.kernel.org/r/20240326-vfs-bdev-end_holder-v1-1-20af85202918@kernel.org
-Fixes: f3a608827d1f ("bdev: open block device as files") # mainline only
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- block/bdev.c           | 64 ++++++++++++++++++++++++++++++++++++------
- fs/bcachefs/super-io.c |  2 +-
- fs/cramfs/inode.c      |  2 +-
- fs/ext4/super.c        |  8 +++---
- fs/f2fs/super.c        |  2 +-
- fs/jfs/jfs_logmgr.c    |  4 +--
- fs/reiserfs/journal.c  |  2 +-
- fs/romfs/super.c       |  2 +-
- fs/super.c             | 24 ++--------------
- fs/xfs/xfs_buf.c       |  2 +-
- fs/xfs/xfs_super.c     |  6 ++--
- include/linux/blkdev.h | 11 +-------
- 12 files changed, 75 insertions(+), 54 deletions(-)
-
-diff --git a/block/bdev.c b/block/bdev.c
-index a1946a902df3..b8e32d933a63 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -583,9 +583,6 @@ static void bd_finish_claiming(struct block_device *bdev, void *holder,
- 	mutex_unlock(&bdev->bd_holder_lock);
- 	bd_clear_claiming(whole, holder);
- 	mutex_unlock(&bdev_lock);
--
--	if (hops && hops->get_holder)
--		hops->get_holder(holder);
- }
- 
- /**
-@@ -608,7 +605,6 @@ EXPORT_SYMBOL(bd_abort_claiming);
- static void bd_end_claim(struct block_device *bdev, void *holder)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index f4850a6f860b..c515e1a96fad 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1494,11 +1494,8 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
  {
- 	struct block_device *whole = bdev_whole(bdev);
--	const struct blk_holder_ops *hops = bdev->bd_holder_ops;
- 	bool unblock = false;
+ 	struct throtl_grp *tg = pd_to_tg(pd);
+ 	const char *dname = blkg_dev_name(pd->blkg);
+-	char bufs[4][21] = { "max", "max", "max", "max" };
+ 	u64 bps_dft;
+ 	unsigned int iops_dft;
+-	char idle_time[26] = "";
+-	char latency_time[26] = "";
  
- 	/*
-@@ -631,9 +627,6 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
- 		whole->bd_holder = NULL;
- 	mutex_unlock(&bdev_lock);
+ 	if (!dname)
+ 		return 0;
+@@ -1520,35 +1517,39 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	      tg->latency_target_conf == DFL_LATENCY_TARGET)))
+ 		return 0;
  
--	if (hops && hops->put_holder)
--		hops->put_holder(holder);
+-	if (tg->bps_conf[READ][off] != U64_MAX)
+-		snprintf(bufs[0], sizeof(bufs[0]), "%llu",
+-			tg->bps_conf[READ][off]);
+-	if (tg->bps_conf[WRITE][off] != U64_MAX)
+-		snprintf(bufs[1], sizeof(bufs[1]), "%llu",
+-			tg->bps_conf[WRITE][off]);
+-	if (tg->iops_conf[READ][off] != UINT_MAX)
+-		snprintf(bufs[2], sizeof(bufs[2]), "%u",
+-			tg->iops_conf[READ][off]);
+-	if (tg->iops_conf[WRITE][off] != UINT_MAX)
+-		snprintf(bufs[3], sizeof(bufs[3]), "%u",
+-			tg->iops_conf[WRITE][off]);
++	seq_printf(sf, "%s", dname);
++	if (tg->bps_conf[READ][off] == U64_MAX)
++		seq_printf(sf, " rbps=max");
++	else
++		seq_printf(sf, " rbps=%llu", tg->bps_conf[READ][off]);
++
++	if (tg->bps_conf[WRITE][off] == U64_MAX)
++		seq_printf(sf, " wbps=max");
++	else
++		seq_printf(sf, " wbps=%llu", tg->bps_conf[WRITE][off]);
++
++	if (tg->iops_conf[READ][off] == UINT_MAX)
++		seq_printf(sf, " riops=max");
++	else
++		seq_printf(sf, " riops=%u", tg->iops_conf[READ][off]);
++
++	if (tg->iops_conf[WRITE][off] == UINT_MAX)
++		seq_printf(sf, " wiops=max");
++	else
++		seq_printf(sf, " wiops=%u", tg->iops_conf[WRITE][off]);
++
+ 	if (off == LIMIT_LOW) {
+ 		if (tg->idletime_threshold_conf == ULONG_MAX)
+-			strcpy(idle_time, " idle=max");
++			seq_printf(sf, " idle=max");
+ 		else
+-			snprintf(idle_time, sizeof(idle_time), " idle=%lu",
+-				tg->idletime_threshold_conf);
++			seq_printf(sf, " idle=%lu", tg->idletime_threshold_conf);
+ 
+ 		if (tg->latency_target_conf == ULONG_MAX)
+-			strcpy(latency_time, " latency=max");
++			seq_printf(sf, " latency=max");
+ 		else
+-			snprintf(latency_time, sizeof(latency_time),
+-				" latency=%lu", tg->latency_target_conf);
++			seq_printf(sf, " latency=%lu", tg->latency_target_conf);
+ 	}
 -
- 	/*
- 	 * If this was the last claim, remove holder link and unblock evpoll if
- 	 * it was a write holder.
-@@ -813,6 +806,11 @@ static void bdev_claim_write_access(struct block_device *bdev, blk_mode_t mode)
- 		bdev->bd_writers++;
- }
- 
-+static inline bool bdev_unclaimed(const struct file *bdev_file)
-+{
-+	return bdev_file->private_data == BDEV_I(bdev_file->f_mapping->host);
-+}
-+
- static void bdev_yield_write_access(struct file *bdev_file)
- {
- 	struct block_device *bdev;
-@@ -820,6 +818,9 @@ static void bdev_yield_write_access(struct file *bdev_file)
- 	if (bdev_allow_write_mounted)
- 		return;
- 
-+	if (bdev_unclaimed(bdev_file))
-+		return;
-+
- 	bdev = file_bdev(bdev_file);
- 
- 	if (bdev_file->f_mode & FMODE_WRITE_RESTRICTED)
-@@ -1012,6 +1013,20 @@ struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
- }
- EXPORT_SYMBOL(bdev_file_open_by_path);
- 
-+static inline void bd_yield_claim(struct file *bdev_file)
-+{
-+	struct block_device *bdev = file_bdev(bdev_file);
-+	void *holder = bdev_file->private_data;
-+
-+	lockdep_assert_held(&bdev->bd_disk->open_mutex);
-+
-+	if (WARN_ON_ONCE(IS_ERR_OR_NULL(holder)))
-+		return;
-+
-+	if (!bdev_unclaimed(bdev_file))
-+		bd_end_claim(bdev, holder);
-+}
-+
- void bdev_release(struct file *bdev_file)
- {
- 	struct block_device *bdev = file_bdev(bdev_file);
-@@ -1036,7 +1051,7 @@ void bdev_release(struct file *bdev_file)
- 	bdev_yield_write_access(bdev_file);
- 
- 	if (holder)
--		bd_end_claim(bdev, holder);
-+		bd_yield_claim(bdev_file);
- 
- 	/*
- 	 * Trigger event checking and tell drivers to flush MEDIA_CHANGE
-@@ -1056,6 +1071,39 @@ void bdev_release(struct file *bdev_file)
- 	blkdev_put_no_open(bdev);
- }
- 
-+/**
-+ * bdev_fput - yield claim to the block device and put the file
-+ * @bdev_file: open block device
-+ *
-+ * Yield claim on the block device and put the file. Ensure that the
-+ * block device can be reclaimed before the file is closed which is a
-+ * deferred operation.
-+ */
-+void bdev_fput(struct file *bdev_file)
-+{
-+	if (WARN_ON_ONCE(bdev_file->f_op != &def_blk_fops))
-+		return;
-+
-+	if (bdev_file->private_data) {
-+		struct block_device *bdev = file_bdev(bdev_file);
-+		struct gendisk *disk = bdev->bd_disk;
-+
-+		mutex_lock(&disk->open_mutex);
-+		bdev_yield_write_access(bdev_file);
-+		bd_yield_claim(bdev_file);
-+		/*
-+		 * Tell release we already gave up our hold on the
-+		 * device and if write restrictions are available that
-+		 * we already gave up write access to the device.
-+		 */
-+		bdev_file->private_data = BDEV_I(bdev_file->f_mapping->host);
-+		mutex_unlock(&disk->open_mutex);
-+	}
-+
-+	fput(bdev_file);
-+}
-+EXPORT_SYMBOL(bdev_fput);
-+
- /**
-  * lookup_bdev() - Look up a struct block_device by name.
-  * @pathname: Name of the block device in the filesystem.
-diff --git a/fs/bcachefs/super-io.c b/fs/bcachefs/super-io.c
-index ad28e370b640..cb7b4de11a49 100644
---- a/fs/bcachefs/super-io.c
-+++ b/fs/bcachefs/super-io.c
-@@ -143,7 +143,7 @@ void bch2_free_super(struct bch_sb_handle *sb)
- {
- 	kfree(sb->bio);
- 	if (!IS_ERR_OR_NULL(sb->s_bdev_file))
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	kfree(sb->holder);
- 	kfree(sb->sb_name);
- 
-diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
-index 39e75131fd5a..9901057a15ba 100644
---- a/fs/cramfs/inode.c
-+++ b/fs/cramfs/inode.c
-@@ -495,7 +495,7 @@ static void cramfs_kill_sb(struct super_block *sb)
- 		sb->s_mtd = NULL;
- 	} else if (IS_ENABLED(CONFIG_CRAMFS_BLOCKDEV) && sb->s_bdev) {
- 		sync_blockdev(sb->s_bdev);
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	}
- 	kfree(sbi);
- }
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index cfb8449c731f..044135796f2b 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -5668,7 +5668,7 @@ failed_mount9: __maybe_unused
- 	brelse(sbi->s_sbh);
- 	if (sbi->s_journal_bdev_file) {
- 		invalidate_bdev(file_bdev(sbi->s_journal_bdev_file));
--		fput(sbi->s_journal_bdev_file);
-+		bdev_fput(sbi->s_journal_bdev_file);
- 	}
- out_fail:
- 	invalidate_bdev(sb->s_bdev);
-@@ -5913,7 +5913,7 @@ static struct file *ext4_get_journal_blkdev(struct super_block *sb,
- out_bh:
- 	brelse(bh);
- out_bdev:
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 	return ERR_PTR(errno);
- }
- 
-@@ -5952,7 +5952,7 @@ static journal_t *ext4_open_dev_journal(struct super_block *sb,
- out_journal:
- 	jbd2_journal_destroy(journal);
- out_bdev:
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 	return ERR_PTR(errno);
- }
- 
-@@ -7327,7 +7327,7 @@ static void ext4_kill_sb(struct super_block *sb)
- 	kill_block_super(sb);
- 
- 	if (bdev_file)
--		fput(bdev_file);
-+		bdev_fput(bdev_file);
- }
- 
- static struct file_system_type ext4_fs_type = {
-diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-index a6867f26f141..a4bc26dfdb1a 100644
---- a/fs/f2fs/super.c
-+++ b/fs/f2fs/super.c
-@@ -1558,7 +1558,7 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
- 
- 	for (i = 0; i < sbi->s_ndevs; i++) {
- 		if (i > 0)
--			fput(FDEV(i).bdev_file);
-+			bdev_fput(FDEV(i).bdev_file);
- #ifdef CONFIG_BLK_DEV_ZONED
- 		kvfree(FDEV(i).blkz_seq);
- #endif
-diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
-index 73389c68e251..9609349e92e5 100644
---- a/fs/jfs/jfs_logmgr.c
-+++ b/fs/jfs/jfs_logmgr.c
-@@ -1141,7 +1141,7 @@ int lmLogOpen(struct super_block *sb)
- 	lbmLogShutdown(log);
- 
-       close:		/* close external log device */
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 
-       free:		/* free log descriptor */
- 	mutex_unlock(&jfs_log_mutex);
-@@ -1485,7 +1485,7 @@ int lmLogClose(struct super_block *sb)
- 	bdev_file = log->bdev_file;
- 	rc = lmLogShutdown(log);
- 
--	fput(bdev_file);
-+	bdev_fput(bdev_file);
- 
- 	kfree(log);
- 
-diff --git a/fs/reiserfs/journal.c b/fs/reiserfs/journal.c
-index 6474529c4253..e539ccd39e1e 100644
---- a/fs/reiserfs/journal.c
-+++ b/fs/reiserfs/journal.c
-@@ -2589,7 +2589,7 @@ static void journal_list_init(struct super_block *sb)
- static void release_journal_dev(struct reiserfs_journal *journal)
- {
- 	if (journal->j_bdev_file) {
--		fput(journal->j_bdev_file);
-+		bdev_fput(journal->j_bdev_file);
- 		journal->j_bdev_file = NULL;
- 	}
- }
-diff --git a/fs/romfs/super.c b/fs/romfs/super.c
-index 2be227532f39..2cbb92462074 100644
---- a/fs/romfs/super.c
-+++ b/fs/romfs/super.c
-@@ -594,7 +594,7 @@ static void romfs_kill_sb(struct super_block *sb)
- #ifdef CONFIG_ROMFS_ON_BLOCK
- 	if (sb->s_bdev) {
- 		sync_blockdev(sb->s_bdev);
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	}
- #endif
- }
-diff --git a/fs/super.c b/fs/super.c
-index 71d9779c42b1..69ce6c600968 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1515,29 +1515,11 @@ static int fs_bdev_thaw(struct block_device *bdev)
- 	return error;
- }
- 
--static void fs_bdev_super_get(void *data)
--{
--	struct super_block *sb = data;
--
--	spin_lock(&sb_lock);
--	sb->s_count++;
--	spin_unlock(&sb_lock);
--}
--
--static void fs_bdev_super_put(void *data)
--{
--	struct super_block *sb = data;
--
--	put_super(sb);
--}
--
- const struct blk_holder_ops fs_holder_ops = {
- 	.mark_dead		= fs_bdev_mark_dead,
- 	.sync			= fs_bdev_sync,
- 	.freeze			= fs_bdev_freeze,
- 	.thaw			= fs_bdev_thaw,
--	.get_holder		= fs_bdev_super_get,
--	.put_holder		= fs_bdev_super_put,
- };
- EXPORT_SYMBOL_GPL(fs_holder_ops);
- 
-@@ -1562,7 +1544,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
- 	 * writable from userspace even for a read-only block device.
- 	 */
- 	if ((mode & BLK_OPEN_WRITE) && bdev_read_only(bdev)) {
--		fput(bdev_file);
-+		bdev_fput(bdev_file);
- 		return -EACCES;
- 	}
- 
-@@ -1573,7 +1555,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
- 	if (atomic_read(&bdev->bd_fsfreeze_count) > 0) {
- 		if (fc)
- 			warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
--		fput(bdev_file);
-+		bdev_fput(bdev_file);
- 		return -EBUSY;
- 	}
- 	spin_lock(&sb_lock);
-@@ -1693,7 +1675,7 @@ void kill_block_super(struct super_block *sb)
- 	generic_shutdown_super(sb);
- 	if (bdev) {
- 		sync_blockdev(bdev);
--		fput(sb->s_bdev_file);
-+		bdev_fput(sb->s_bdev_file);
- 	}
- }
- 
-diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index 1a18c381127e..f0fa02264eda 100644
---- a/fs/xfs/xfs_buf.c
-+++ b/fs/xfs/xfs_buf.c
-@@ -2030,7 +2030,7 @@ xfs_free_buftarg(
- 	fs_put_dax(btp->bt_daxdev, btp->bt_mount);
- 	/* the main block device is closed by kill_block_super */
- 	if (btp->bt_bdev != btp->bt_mount->m_super->s_bdev)
--		fput(btp->bt_bdev_file);
-+		bdev_fput(btp->bt_bdev_file);
- 	kfree(btp);
- }
- 
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index c21f10ab0f5d..bce020374c5e 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -485,7 +485,7 @@ xfs_open_devices(
- 		mp->m_logdev_targp = mp->m_ddev_targp;
- 		/* Handle won't be used, drop it */
- 		if (logdev_file)
--			fput(logdev_file);
-+			bdev_fput(logdev_file);
- 	}
- 
+-	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s%s%s\n",
+-		   dname, bufs[0], bufs[1], bufs[2], bufs[3], idle_time,
+-		   latency_time);
++	seq_printf(sf, "\n");
  	return 0;
-@@ -497,10 +497,10 @@ xfs_open_devices(
- 	xfs_free_buftarg(mp->m_ddev_targp);
-  out_close_rtdev:
- 	 if (rtdev_file)
--		fput(rtdev_file);
-+		bdev_fput(rtdev_file);
-  out_close_logdev:
- 	if (logdev_file)
--		fput(logdev_file);
-+		bdev_fput(logdev_file);
- 	return error;
  }
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c3e8f7cf96be..172c91879999 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1505,16 +1505,6 @@ struct blk_holder_ops {
- 	 * Thaw the file system mounted on the block device.
- 	 */
- 	int (*thaw)(struct block_device *bdev);
--
--	/*
--	 * If needed, get a reference to the holder.
--	 */
--	void (*get_holder)(void *holder);
--
--	/*
--	 * Release the holder.
--	 */
--	void (*put_holder)(void *holder);
- };
- 
- /*
-@@ -1585,6 +1575,7 @@ static inline int early_lookup_bdev(const char *pathname, dev_t *dev)
- 
- int bdev_freeze(struct block_device *bdev);
- int bdev_thaw(struct block_device *bdev);
-+void bdev_fput(struct file *bdev_file);
- 
- struct io_comp_batch {
- 	struct request *req_list;
 -- 
-2.43.0
+2.31.1
 
-
---gzws4rsal6aab534--
