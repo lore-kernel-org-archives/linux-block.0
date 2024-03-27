@@ -1,301 +1,210 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80182131197;
-	Wed, 27 Mar 2024 12:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C6B145322
+	for <linux-block@vger.kernel.org>; Wed, 27 Mar 2024 12:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542867; cv=none; b=BLznJS4ZJhs9ecvlhNBQsEWiMCz7nh1MjSYaO6F1P1RIcWTfK1W5MzitgdwLHNW+dyMby/EBp3zZgBrjXNWx+z/aJjmclAV+Zdy3FNlg2GbAirfvnIIxpqwjccIB1W3O3WrKKjk0T4LPUkKNH09c6IBMCjv78AIZ3dkuyffPbOs=
+	t=1711543303; cv=none; b=G6dvOpBFqnQ/ZqD8VTyf1KGSJdSXbQUpWuDM1e4573mB8w6tod+FNyz6Ai5EL0bo9NjzNkTj5cGDbjGKfJTIunMf97Idr69NBncEp3XaeBsH+LZ23//+TAy4ZO6Xeo7/xPvtahsGrbGERhjGG7r+e4kJ1ydN64gJ23xo6fSaR+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542867; c=relaxed/simple;
-	bh=8N3t+CDdKY3YFlH7oaNZFASNnUeM1RCAwnipRrhwJuU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GEusRmpZCL1wWq/9uu0RzKCGRqYlS5pAV8jLolZ/VXMEKxaPOg2/iHvSAtLI8Kn6em1hpukb/LyZk4rourhTqoZDNGbAV7tSOHuuUpv/saR79yzbjSs+h66UH/rEprv5Am7YIKrexqzNjV4kmhLgJb/l2HFu5kH7KoJZx8K0Htg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHsjI+Fn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711543303; c=relaxed/simple;
+	bh=ZqxqBePx9O0aSeYwWfac5JC18N8WH4wazKZPUDWtyb4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=q4dWkbC/+RBkmBC+qnTRkmbEmEmGCgvQuOJvqOLBLII2M1szX4IAXYQHv9skE2oEc9IZRAurVwv/cDt+q01LZGecsXyZHYnuqmOdYv5SorebHiLGV4TQsIb5AUhqzOJqbBisDpMz2xelqtSI/m1ippmmBJ106nvhvHO+YkuQFQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YmjO+wGu; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHsjI+Fn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE5FEC433C7;
-	Wed, 27 Mar 2024 12:34:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711542866;
-	bh=8N3t+CDdKY3YFlH7oaNZFASNnUeM1RCAwnipRrhwJuU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=WHsjI+FniF8Z7sOkWvPE0p9O+aVYavDYf9XPeV+3iciywX8W/lv4HDbwn4U8bXqdu
-	 t9UThFGat5QWDAEEdFSDMdFCP+83xuy0zQYv+kRkzTdAUSUPpaI5Pwo0PcGqXN7Z4h
-	 AiB7QOBGfU1jUIPntJBDlxdKY36aoV9onQus2N40KzBrrZ00RAxG6NPutLTmiTOPev
-	 VeDRcgqc0Urq5VRNUdFh2PRbE0Z4kFog0dNgD+pLz1Iu5FUQyT7hp8s860+MoyZIjp
-	 J5r4PQuj6zm5I8zJ3F8uHkn5Bg43XW56RDrJFuL6Sk0ZKXbDmtENJM2UsCnTU4AlRW
-	 VWyG3wXjQ1waQ==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d24a727f78so75601501fa.0;
-        Wed, 27 Mar 2024 05:34:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUPwcHeuTqI3GlLvlIDIoabS3WCBMTUbJ3LII8X/g5vUQDySb+fWRA9ya77tfpuYxt/ems9Ky2H+lDYMqueD0pIAPHr+ILruJtthgQpo8oC8BxKRxKOhcLNTKaJa3kFQIZrsFOuJs/7oADqmbEQJ6/U1cWZO9eY3MN24v5XZAvOdiii6MInvWx1g3FKkpzEFau/XDPjckdwBn7GXyYEBKOx
-X-Gm-Message-State: AOJu0YwWZLs/t9gxnH/Fwzc0nHblwnaIU+hvWv2HqaGZ1ygtSv4D31v4
-	i12aME69sRK24vw1MsHkylnxKZMrKMzRkXwxhGG8ViExQT/PMh80eURKzS5u/jfJ5Y1NjD3jT4G
-	QFbhoHHa4LrcRmADsi+wNjz712w==
-X-Google-Smtp-Source: AGHT+IGb/tvDk7BPc5ooPMe3vs21TSV/CGNkWTr1j3kZGhTSowTUtnyhhb9eTVfWHGXwW0jFHOVQ8E43Udn54x9e++k=
-X-Received: by 2002:a2e:9c55:0:b0:2d6:c7e5:34d0 with SMTP id
- t21-20020a2e9c55000000b002d6c7e534d0mr4128198ljj.41.1711542844882; Wed, 27
- Mar 2024 05:34:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YmjO+wGu"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d700beb60bso1586081fa.1
+        for <linux-block@vger.kernel.org>; Wed, 27 Mar 2024 05:41:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711543298; x=1712148098; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AFaFw1OZuXizkw4uNoNpzMqxfCxSvA28jWrn6rdqU5M=;
+        b=YmjO+wGuctwvzU8ZNUZDLFidgP/qW/gIe+e/+u4PRXpt9aiaCueYVHxxQlnquEf7wo
+         6MyMimKon6o+3zr83QHAolDCtbiRJMHQv0jm8UKyy8FzdMI/X3wY0G/Hz3/vV0CzydiL
+         yWCuUl8kd9sCC8Ij7Bol3c8a1BC7xup4GJ32Z0UBIfzqzoS1GOAtXwMC0UYO/LLSI6iK
+         RvtDXOXNSC/Fe8BGekmHqP/S7ATCiIzBkHVqGsLX3qejNAy2BJ/wPs4Hiu1C6o67xezY
+         xW0UY+GJG8n23TR5q8R6KRDFbbgl11ZZg/l7GMMAsdIIFzQci+jZohdP7rpB6CULoHWT
+         TP7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711543298; x=1712148098;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AFaFw1OZuXizkw4uNoNpzMqxfCxSvA28jWrn6rdqU5M=;
+        b=nhTcyAs6HsqiW6sVveOxoUMmfipXzWYvfm/eLqS19V0WM1/MMEzHtf9Ox1jHpqZyDi
+         E89S4ZJkGdCkJyL7KG8VwpmgTl2mW1XH6uBFFUi7QPln55+z6OxbZ9wHEtxP1POowIqg
+         pAR6fBq+U5mAMr5lrLSsMx4Kn7yb1c7nfknBCbI6DoW4gHTwwkofuYbgfaTpOA8AW/3W
+         4Q4r8Y+4wmwnrS+FKKxXOdc1Tus2rlOY8LKheP72dPCoa/0v8vHg0auqLVUf6YjrjuOo
+         aAM6N1I8kgcxMmxFXTiFZUBPujHT6Al3wThP6BZWlelV0iedev0dLanmnqK88q9Jaf2p
+         AQ5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWTGxA4zDHE4S4lM5eFnSgq9P96z1/jd9sG26N8bdVrYxO0tnfTaYsYcd8WB5BfPuh334VThnlkwjFQ+VC9imEBkxj4mgdSXT0PdCc=
+X-Gm-Message-State: AOJu0Yy5J1OTQp8FInu/9nSt/TeLTW5HmYdsXfHe4lsCOCOoZj4i0XFD
+	pPoq0u/FUw+D3kbuESpjzJyHOfI5GA+YrnlpEFkBLmIYfXiQTmt9r2dSlfvjIz8=
+X-Google-Smtp-Source: AGHT+IFS1x7gpjA7jUKSh2w40PflGxs4LWIU8D0QvTuDe3IphcKfLGKJ6nGMGd9SaTSRJh693GFsRg==
+X-Received: by 2002:a2e:3a1a:0:b0:2d6:e148:2463 with SMTP id h26-20020a2e3a1a000000b002d6e1482463mr2074785lja.24.1711543298562;
+        Wed, 27 Mar 2024 05:41:38 -0700 (PDT)
+Received: from [127.0.1.1] ([178.197.206.205])
+        by smtp.gmail.com with ESMTPSA id gx16-20020a170906f1d000b00a4707ec7c34sm5379175ejb.166.2024.03.27.05.41.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 05:41:38 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 00/22] virtio: store owner from modules with
+ register_virtio_driver()
+Date: Wed, 27 Mar 2024 13:40:53 +0100
+Message-Id: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1711048433.git.daniel@makrotopia.org> <20240325151046.GA3591150-robh@kernel.org>
- <ZgGaay6bLFAcCo2E@makrotopia.org> <20240326202449.GA3255378-robh@kernel.org> <ZgM-AR1BFU_FPaXh@makrotopia.org>
-In-Reply-To: <ZgM-AR1BFU_FPaXh@makrotopia.org>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 27 Mar 2024 07:33:51 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqKkr6Nnfwa5HevMhqmgsHDXvXMzMFSzw8tiu6Zwe353dg@mail.gmail.com>
-Message-ID: <CAL_JsqKkr6Nnfwa5HevMhqmgsHDXvXMzMFSzw8tiu6Zwe353dg@mail.gmail.com>
-Subject: Re: [PATCH 0/8] block: implement NVMEM provider
-To: Daniel Golle <daniel@makrotopia.org>, 
-	Architecture Mailman List <boot-architecture@lists.linaro.org>
-Cc: Diping Zhang <diping.zhang@gl-inet.com>, Jianhui Zhao <zhaojh329@gmail.com>, 
-	Jieying Zeng <jieying.zeng@gl-inet.com>, Chad Monroe <chad.monroe@adtran.com>, 
-	Adam Fox <adam.fox@adtran.com>, John Crispin <john@phrozen.org>, Felix Fietkau <nbd@nbd.name>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>, 
-	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	Damien Le Moal <dlemoal@kernel.org>, Li Lingfeng <lilingfeng3@huawei.com>, 
-	Christian Brauner <brauner@kernel.org>, Christian Heusel <christian@heusel.eu>, Min Li <min15.li@samsung.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Avri Altman <avri.altman@wdc.com>, 
-	Hannes Reinecke <hare@suse.de>, Christian Loehle <CLoehle@hyperstone.com>, Bean Huo <beanhuo@micron.com>, 
-	Yeqi Fu <asuk4.q@gmail.com>, Victor Shih <victor.shih@genesyslogic.com.tw>, 
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	Dominique Martinet <dominique.martinet@atmark-techno.com>, 
-	"Ricardo B. Marliere" <ricardo@marliere.net>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANUTBGYC/x3MSQqAMAxA0atI1gY0dQCvIi4coga0ldQJxLtbX
+ L7F/w94VmEPVfSA8ilenA1I4wj6ubUTowzBQAlliaESVzccC6O7LCueors4zLOiLExn+pYIQrk
+ pj3L/17p53w9578lCZQAAAA==
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+ Johannes Berg <johannes@sipsolutions.net>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, 
+ Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
+ Gerd Hoffmann <kraxel@redhat.com>, 
+ Gurchetan Singh <gurchetansingh@chromium.org>, 
+ Chia-I Wu <olvaffe@gmail.com>, 
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+ Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
+ Ira Weiny <ira.weiny@intel.com>, 
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+ Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-um@lists.infradead.org, 
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+ linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+ linux-sound@vger.kernel.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3506;
+ i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
+ bh=ZqxqBePx9O0aSeYwWfac5JC18N8WH4wazKZPUDWtyb4=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmBBPZS5yGoH1UVP3T0Npm8blJRoVKIHSae5kBq
+ HxYGiIbwMaJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgQT2QAKCRDBN2bmhouD
+ 12zhD/9C6ukv+8iXJ63iu65KAxWO0209no/Zk8V5PPOIg8YWF23fhUh5Tg2IbxFs1SDSIqOKCGf
+ 078xrARdl7OLN91lsOjjrbjnZZrO+3UXwHxBg6rRfwtkp+kgAzLzR84hoSWqyqlq+JpiqE73Ex1
+ fNyOEu1Il2sVbtLvNN9ZvBBGDNN/h7JC9ywVxJ0Fa0LD8kwtsV8pUIgsVva8ILQKkMQBTP09QPM
+ 7DW97OEmYao/IN0z9JQ8xmwCXf08ciDibfQZ884ZF4dVW/paLFkgw4OyR+22WTqneeBTsJKdlH1
+ Os9//BH9zlvxyZG6vpAg3g6NvH7MxigyNbztqSw7Uqw1jx1u1032qs/yjWHbs7c4pNm32w5Sc2U
+ BWMIQlsiyt2Gg33SxWybhDqMfp72LBlT04SmQHYDlMTlPA4vvgeUK/H/oYmg/uzy5MM/kx9WGtR
+ pNCFFDPI2B6EAqAvrzZWEGv2PVNujF5tHSLKVqxYwXHWIDIqg8LnCgQeizyqp/tqjoQFY7vGlzI
+ B3wE5riIQuaCN41Id+3PH7pVc6tEQlepaRhz7jRIFh+JEA53CORhQ62m1PpLMq7z8zNhn+Igsh+
+ AB69huA3C3eKILpuFw33OXJybFczTX0Vd0F95nDwyWCahIwaUlrRfoO1JQlJFdOgChtyx0ws9Uf
+ xOnSxyBfnZ9hbow==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
+ fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-On Tue, Mar 26, 2024 at 4:29=E2=80=AFPM Daniel Golle <daniel@makrotopia.org=
-> wrote:
->
-> Hi Rob,
->
-> On Tue, Mar 26, 2024 at 03:24:49PM -0500, Rob Herring wrote:
-> > +boot-architecture list
->
-> Good idea, thank you :)
+Merging
+=======
+All further patches depend on the first virtio patch, therefore please ack
+and this should go via one tree: virtio?
 
-Now really adding it. :(
+Description
+===========
+Modules registering driver with register_virtio_driver() often forget to
+set .owner field.
 
-Will reply to rest later.
+Solve the problem by moving this task away from the drivers to the core
+amba bus code, just like we did for platform_driver in commit
+9447057eaff8 ("platform_device: use a macro instead of
+platform_driver_register").
 
-> >
-> > On Mon, Mar 25, 2024 at 03:38:19PM +0000, Daniel Golle wrote:
-> > > On Mon, Mar 25, 2024 at 10:10:46AM -0500, Rob Herring wrote:
-> > > > On Thu, Mar 21, 2024 at 07:31:48PM +0000, Daniel Golle wrote:
-> > > > > On embedded devices using an eMMC it is common that one or more (=
-hw/sw)
-> > > > > partitions on the eMMC are used to store MAC addresses and Wi-Fi
-> > > > > calibration EEPROM data.
-> > > > >
-> > > > > Implement an NVMEM provider backed by a block device as typically=
- the
-> > > > > NVMEM framework is used to have kernel drivers read and use binar=
-y data
-> > > > > from EEPROMs, efuses, flash memory (MTD), ...
-> > > > >
-> > > > > In order to be able to reference hardware partitions on an eMMC, =
-add code
-> > > > > to bind each hardware partition to a specific firmware subnode.
-> > > > >
-> > > > > Overall, this enables uniform handling across practially all flas=
-h
-> > > > > storage types used for this purpose (MTD, UBI, and now also MMC).
-> > > > >
-> > > > > As part of this series it was necessary to define a device tree s=
-chema
-> > > > > for block devices and partitions on them, which (similar to how i=
-t now
-> > > > > works also for UBI volumes) can be matched by one or more propert=
-ies.
-> > > > >
-> > > > > ---
-> > > > > This series has previously been submitted as RFC on July 19th 202=
-3[1]
-> > > > > and most of the basic idea did not change since. Another round of=
- RFC
-> > > > > was submitted on March 5th 2024[2] which has received overall pos=
-itive
-> > > > > feedback and only minor corrections have been done since (see
-> > > > > changelog below).
-> > > >
-> > > > I don't recall giving positive feedback.
-> > > >
-> > > > I still think this should use offsets rather than partition specifi=
-c
-> > > > information. Not wanting to have to update the offsets if they chan=
-ge is
-> > > > not reason enough to not use them.
-> > >
-> > > Using raw offsets on the block device (rather than the partition)
-> > > won't work for most existing devices and boot firmware out there. The=
-y
-> > > always reference the partition, usually by the name of a GPT
-> > > partition (but sometimes also PARTUUID or even PARTNO) which is then
-> > > used in the exact same way as an MTD partition or UBI volume would be
-> > > on devices with NOR or NAND flash.
-> >
-> > MTD normally uses offsets hence why I'd like some alignment. UBI is
-> > special because raw NAND is, well, special.
->
-> I get the point and in a way this is also already intended and
-> supported by this series. You can already just add an 'nvmem-layout'
-> node directly to a disk device rather than to a partition and define a
-> layout in this way.
->
-> Making this useful in practice will require some improvements to the
-> nvmem system in Linux though, because that currently uses signed 32-bit
-> integers as addresses which is not sufficient for the size of the
-> user-part of an eMMC. However, that needs to be done then and should
-> of course not be read as an excuse.
->
-> >
-> > > Just on eMMC we usually use a GPT
-> > > or MBR partition table rather than defining partitions in DT or cmdli=
-ne,
-> > > which is rather rare (for historic reasons, I suppose, but it is what=
- it
-> > > is now).
-> >
-> > Yes, I understand how eMMC works. I don't understand why if you have
-> > part #, uuid, or name you can't get to the offset or vice-versa. You
-> > need only 1 piece of identification to map partition table entries to D=
-T
-> > nodes.
->
-> Yes, either of them (or a combination) is fine. In practise I've mostly
-> seen PARTNAME as identifier used in userland scripts, and only adding
-> this for now will probably cover most devices (and existing boot firmware=
-)
-> out there. Notable exceptions are devices which are using MBR partitions
-> because the BootROM expects the bootloader to be at the same block as
-> we would usually have the primary GPT. In this case we can only use the
-> PARTNO, of course, and it stinks.
-> MediaTek's MT7623A/N is such an example, but it's a slingly outdated
-> and pretty weird niche SoC I admit.
->
-> > Sure, offsets can change, but surely the firmware can handle
-> > adjusting the DT?
->
-> Future firmware may be able to do this, of course. Current existing
-> firmware already out there on devices such as the quite popular
-> GL.iNet MT-6000, Netgear's Orbi and Orbi Pro series as well as all
-> Adtran SmartRG devices does not. Updating or changing the boot
-> firmware of devices already out there is not intended and quite
-> challenging, and will make the device incompatible with its vendor
-> firmware. Hence it would be better to support replacing only the
-> Linux-based firmware (eg. with OpenWrt or even Debian or any
-> general-purpose Linux, the eMMC is large enough...) while not having
-> to touch the boot firmware (and risking to brick the device if that
-> goes wrong).
->
-> Personally, I'm rather burdened and unhappy with vendor attempts to
-> have the boot firmware mess around too much in (highly customized,
-> downstream) DT, it may look like a good solution at the moment, but
-> can totally become an obstacle in an unpredictable future (no offense
-> ASUS...)
->
-> >
-> > An offset would also work for the case of random firmware data on the
-> > disk that may or may not have a partition associated with it. There are
-> > certainly cases of that. I don't think we have much of a solution for
-> > that other than trying to educate vendors to not do that or OS
-> > installers only supporting installing to something other than eMMC. Thi=
-s
-> > is something EBBR[1] is trying to address.
->
-> Absolutely. Actually *early* GL-iNet devices did exactly that: Use the
-> eMMC boot hw-partitions to store boot firmware as well as MAC
-> addresses and potentially also Wi-Fi calibration data.
->
-> The MT-2500 is the example I'm aware of and got sitting on my desk for
-> testing with this very series (which allows to also reference eMMC
-> hardware partitions, see "[7/8] mmc: block: set fwnode of disk
-> devices").
-> Unfortunately later devices such the the flag-ship MT-6000 moved MAC
-> addresses and WiFi-EEPROMs into a GPT partition on the user-part of
-> the eMMC.
->
-> >
-> > > Depending on the eMMC chip used, that partition may not even be at th=
-e
-> > > same offset for different batches of the same device and hence I'd
-> > > like to just do it in the same way vendor firmware does it as well.
-> >
-> > Often vendor firmware is not a model to follow...
->
-> I totally agree. However, I don't see a good reason for not supporting
-> those network-appliance-type embedded devices which even ship with
-> (outdated, downstream) Linux by default while going through great
-> lengths for things like broken ACPI tables in many laptops which
-> require lots of work-arounds to have features like suspend-to-disk
-> working, or even be able to run Linux at all.
->
-> >
-> > > Chad of Adtran has previously confirmed that [1], which was the
-> > > positive feedback I was refering to. Other vendors like GL-iNet or
-> > > Netgear are doing the exact same thing.
-> > >
-> > > As of now, we support this in OpenWrt by adding a lot of
-> > > board-specific knowledge to userland, which is ugly and also prevents
-> > > using things like PXE-initiated nfsroot on those devices.
-> > >
-> > > The purpose of this series is to be able to properly support such dev=
-ices
-> > > (ie. practially all consumer-grade routers out there using an eMMC fo=
-r
-> > > storing firmware).
-> > >
-> > > Also, those devices have enough resources to run a general purpose
-> > > distribution like Debian instead of OpenWrt, and all the userland
-> > > hacks to set MAC addresses and extract WiFi-EEPROM-data in a
-> > > board-specific ways will most certainly never find their way into
-> > > Debian. It's just not how embedded Linux works, unless you are lookin=
-g
-> > > only at the RaspberryPi which got that data stored in a textfile
-> > > which is shipped by the distribution -- something very weird and very
-> > > different from literally all of-the-shelf routers, access-points or
-> > > switches I have ever seen (and I've seen many). Maybe Felix who has
-> > > seen even more of them can tell us more about that.
-> >
-> > General purpose distros want to partition the disk themselves. Adding
-> > anything to the DT for disk partitions would require the installer to b=
-e
-> > aware of it. There's various distro folks on the boot-arch list, so
-> > maybe one of them can comment.
->
-> Usually the installers are already aware to not touch partitions when
-> unaware of their purpose. Repartitioning the disk from scratch is not
-> what (modern) distributions are doing, at least the EFI System
-> partition is kept, as well as typical rescue/recovery partitions many
-> vendors put on their (Windows, Mac) laptops to allow to "factory
-> reset" them.
->
-> Installers usually offer to replace (or resize) the "large" partition
-> used by the currently installed OS instead.
->
-> And well, the DT reference to a partition holding e.g. MAC addresses
-> does make the installer aware of it, obviously.
->
->
-> Thank you for the constructive debate!
->
->
-> Cheers
->
->
-> Daniel
->
->
-> >
-> > Rob
-> >
-> > [1] https://arm-software.github.io/ebbr/index.html#document-chapter4-fi=
-rmware-media
+Best regards,
+Krzysztof
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+Krzysztof Kozlowski (22):
+      virtio: store owner from modules with register_virtio_driver()
+      um: virt-pci: drop owner assignment
+      virtio_blk: drop owner assignment
+      bluetooth: virtio: drop owner assignment
+      hwrng: virtio: drop owner assignment
+      virtio_console: drop owner assignment
+      crypto: virtio - drop owner assignment
+      firmware: arm_scmi: virtio: drop owner assignment
+      gpio: virtio: drop owner assignment
+      drm/virtio: drop owner assignment
+      iommu: virtio: drop owner assignment
+      misc: nsm: drop owner assignment
+      net: caif: virtio: drop owner assignment
+      net: virtio: drop owner assignment
+      net: 9p: virtio: drop owner assignment
+      net: vmw_vsock: virtio: drop owner assignment
+      wireless: mac80211_hwsim: drop owner assignment
+      nvdimm: virtio_pmem: drop owner assignment
+      rpmsg: virtio: drop owner assignment
+      scsi: virtio: drop owner assignment
+      fuse: virtio: drop owner assignment
+      sound: virtio: drop owner assignment
+
+ Documentation/driver-api/virtio/writing_virtio_drivers.rst | 1 -
+ arch/um/drivers/virt-pci.c                                 | 1 -
+ drivers/block/virtio_blk.c                                 | 1 -
+ drivers/bluetooth/virtio_bt.c                              | 1 -
+ drivers/char/hw_random/virtio-rng.c                        | 1 -
+ drivers/char/virtio_console.c                              | 2 --
+ drivers/crypto/virtio/virtio_crypto_core.c                 | 1 -
+ drivers/firmware/arm_scmi/virtio.c                         | 1 -
+ drivers/gpio/gpio-virtio.c                                 | 1 -
+ drivers/gpu/drm/virtio/virtgpu_drv.c                       | 1 -
+ drivers/iommu/virtio-iommu.c                               | 1 -
+ drivers/misc/nsm.c                                         | 1 -
+ drivers/net/caif/caif_virtio.c                             | 1 -
+ drivers/net/virtio_net.c                                   | 1 -
+ drivers/net/wireless/virtual/mac80211_hwsim.c              | 1 -
+ drivers/nvdimm/virtio_pmem.c                               | 1 -
+ drivers/rpmsg/virtio_rpmsg_bus.c                           | 1 -
+ drivers/scsi/virtio_scsi.c                                 | 1 -
+ drivers/virtio/virtio.c                                    | 6 ++++--
+ fs/fuse/virtio_fs.c                                        | 1 -
+ include/linux/virtio.h                                     | 7 +++++--
+ net/9p/trans_virtio.c                                      | 1 -
+ net/vmw_vsock/virtio_transport.c                           | 1 -
+ sound/virtio/virtio_card.c                                 | 1 -
+ 24 files changed, 9 insertions(+), 27 deletions(-)
+---
+base-commit: 7fdcff3312e16ba8d1419f8a18f465c5cc235ecf
+change-id: 20240327-module-owner-virtio-546763b3ca22
+
+Best regards,
+-- 
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
