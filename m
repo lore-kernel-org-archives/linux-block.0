@@ -1,152 +1,120 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F20982D66
-	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 15:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE501CD24;
+	Thu, 28 Mar 2024 18:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711640362; cv=none; b=BNPeFkQZ1Oaj6rrgkPgF4cHjy/pGDav2PYS/8iDZuqhw0VxFk8L4bwISA49FqzI+yeiwfjo3hCaIDY4kxl/4kJml1iSXCty1wIL7oPuec2TQfnNT73fOBkzYtxBJ4stMEBqjDnIbd1XxTaG0JShOhJMn1wOPLXrPY/3GaRBXUec=
+	t=1711649659; cv=none; b=bWDscat1RWlDU4xRnpeYBe+W2GOO3gQ2WVBnbOQsW5Ji317iFtsd4nquTaYYOJfuWgojMbYRCmegZEOGSqjmv/xSW19oL7ux+dIAIhm8ZRxeIJLDMqVBN2cs7qChn2HRdM4/znss6hEv86GTKvqB1H+fWsysIjj/rosfSsnKF00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711640362; c=relaxed/simple;
-	bh=G1iRW2zHIY2/EiULrJ1nqfVUKDfTimjQj7b8q3dHoFc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rIDmEyNGI82Y+27KVdKTKAGTsHDr76NqBxPJggvlYBfMTX+F+VzS3H4RNmNaAfJOy/Zt3wtFfrUa7ZjoT9r3J8APpP7Y9jruUXR5OS63VFnjM7yxJio1o9AMmB/aM/XHPRbWtUW/XoI+uSNCN/a+sI4LSHYqxJgVeumNrq3j+6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yiXFFCxU; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1711649659; c=relaxed/simple;
+	bh=gLygC9Vp66UvWQw2Yi8ZCQFXKYiU/tkZw+C8jULcJF0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=r7Nc5yqD9FTYsEmq/J15Mt8wB26wIdIRVE/tP4VBqPWHBZXhrFyFa9zngsgSdI+pY3+NkQaUE3Jj3tswYCwVx/anNR7XwpkqJsI5Rc5yL1LqSTyW9koSKKpMFPXGF4+qyyJqshhtGRbnl/zOXwEsgED74YEfHSrzGRZlcckobU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=iuwosM9K; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yiXFFCxU"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6e782e955adso1042466b3a.3
-        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 08:39:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711640358; x=1712245158; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mPjQD/vT8EW8FIsS5EhEUvjw7Yq2DPw74odbleQjQC0=;
-        b=yiXFFCxUidOur1Yje4vLUgh6HPAPLTa0A8Jr+L02ErZCnLUGyA5cbWRfLbW2anYSXf
-         OBw4ySIQT0uhUbGcSG01jSnXmA99UGDz+ieVFtksloTDysGebITCGl5U79aib5tRot4U
-         R4S1ExbeBqVsmWInB4bb8zRKX9QyP7Ax6Eh5Ma6rjz8KpZ8v4vKS3+LuOQnifxodUaJY
-         zzOk4VHwBPO7tnFwFYmLG1MzB7aHaa3xKXAwElEJjPQS4p0yDYFN/Ey+1PpWehd8HZdj
-         vYgMf7EihG/MeLThCAKSbALwA7sdiXDqthcdvgmkCW/VSJ7MQdHCJb7IT9nDNTdo6+e8
-         nNWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711640358; x=1712245158;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mPjQD/vT8EW8FIsS5EhEUvjw7Yq2DPw74odbleQjQC0=;
-        b=P+yPoJ98osk5QrASSmH2lrIU5bl06FVzqhHEQWJxOMmESxxu1iXHobpFGb8K0Hsfgk
-         UA3y/2zlwtj05bZWGZMCyTl7nPyFx/iBAQd0VnbQzc6Y3IVl41Bc/FxzPqQg4UUCwUrr
-         +PnaxAI+Xdq4XE8GRK8DyYp+OBCgpJgwgUf8s/5bom5wiBjvzvl9KfKpf+AZ83djTe2V
-         if+/8vXoSumQpmz/8NgnrDJitW92kZjGIYMPy2UaKaG4ZOWElrd7exwWBmeD6oHjuF3H
-         6u3e/JqXRQ/DYduSo42tLvA5hWrD4zR1jn6PM2CKwytCLmfSgrYewnzsAyW52Hd2915Y
-         Ohyw==
-X-Forwarded-Encrypted: i=1; AJvYcCXvxndtxi4q1B+ZgjcRzi6XuWH1KMiqDb8hevjKiIkMxOpR0SVN1h/BZNxF0J/J+9Y4Px53uN39lCQ91HyBtLQ0o6NetsQdSLUskQ0=
-X-Gm-Message-State: AOJu0YyOSyrAQcNo+u3OVVW/l6ZMLMFvp+yy8UnXj4ef/Y0+aQmfsSmC
-	7Id0F/zcd43QSqgGhl5x04L3EELCYlEnGpJtqcP+rxrf7HBbinDBslsg0KyKNOE=
-X-Google-Smtp-Source: AGHT+IGhUQYINGDQ7hWfiGCoXweY10vLCz/e/x+HjJ8dVvYs43ivIcKXZCgoqnZGIv+19J3DIwIpug==
-X-Received: by 2002:a05:6a00:a12:b0:6ea:92a7:fb82 with SMTP id p18-20020a056a000a1200b006ea92a7fb82mr3800870pfh.27.1711640357806;
-        Thu, 28 Mar 2024 08:39:17 -0700 (PDT)
-Received: from p14s ([2604:3d09:148c:c800:ff63:c57b:4625:b68c])
-        by smtp.gmail.com with ESMTPSA id e2-20020aa798c2000000b006ea923678a6sm1505830pfm.137.2024.03.28.08.39.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 08:39:17 -0700 (PDT)
-Date: Thu, 28 Mar 2024 09:39:10 -0600
-From: Mathieu Poirier <mathieu.poirier@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 19/22] rpmsg: virtio: drop owner assignment
-Message-ID: <ZgWPHntosUk+5qac@p14s>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-19-0feffab77d99@linaro.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="iuwosM9K"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V5BWR50w5zlgTGW;
+	Thu, 28 Mar 2024 18:14:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1711649647; x=1714241648; bh=FMpIw+4/bg5d5JM200rhY7E6
+	bZSeI+7NplMoHYYK1Tw=; b=iuwosM9KdXWsyq1U30xWAJpj9J7ys9QDClYZFUv7
+	zwclHQgfVB3/WXjHtwTvtqmF4Fl24fpxZ+LuVbvrTG8E04kr0zJYBo/jUI4qZTLr
+	Cc0u4SHampfYpUNGkRcJgBF2bEDbRAFDzDlxq2A+/VpcrXYs4VJ5GQq+jNXjW3Gw
+	A+OGYyYtSbpE0kdvzObZZKFpxrFcTPb17zUN/xbP7XPGpGGAwHz8V82ejRMexCBm
+	Wl/XEo7MzOS++EWAaJOOa+vLo3dL+Elwor9hiJVF5vgfFNp5VFsTHcZ0y7mK+5a8
+	93Yji5qC9N8GEucum+kH+PKgQnTvHLpKLwbZZuyBP1ntUg==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id FpCBlwONxWxa; Thu, 28 Mar 2024 18:14:07 +0000 (UTC)
+Received: from [100.96.154.173] (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V5BWJ1T3tzlgTHp;
+	Thu, 28 Mar 2024 18:14:03 +0000 (UTC)
+Message-ID: <a474bae3-e505-4d17-a5e4-ed9928b6cbb3@acm.org>
+Date: Thu, 28 Mar 2024 11:14:02 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-19-0feffab77d99@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/30] block: Do not force full zone append completion
+ in req_bio_endio()
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>,
+ linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <20240328004409.594888-1-dlemoal@kernel.org>
+ <20240328004409.594888-2-dlemoal@kernel.org>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240328004409.594888-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 27, 2024 at 01:41:12PM +0100, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
+On 3/27/24 17:43, Damien Le Moal wrote:
+> This reverts commit 748dc0b65ec2b4b7b3dbd7befcc4a54fdcac7988.
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Partial zone append completions cannot be supported as there is no
+> guarantees that the fragmented data will be written sequentially in the
+> same manner as with a full command. Commit 748dc0b65ec2 ("block: fix
+> partial zone append completion handling in req_bio_endio()") changed
+> req_bio_endio() to always advance a partially failed BIO by its full
+> length, but this can lead to incorrect accounting. So revert this
+> change and let low level device drivers handle this case by always
+> failing completely zone append operations. With this revert, users will
+> still see an IO error for a partially completed zone append BIO.
 > 
+> Fixes: 748dc0b65ec2 ("block: fix partial zone append completion handling in req_bio_endio()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 > ---
+>   block/blk-mq.c | 9 ++-------
+>   1 file changed, 2 insertions(+), 7 deletions(-)
 > 
-> Depends on the first patch.
-> ---
->  drivers/rpmsg/virtio_rpmsg_bus.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
-> index 1062939c3264..e9e8c1f7829f 100644
-> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
-> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
-> @@ -1053,7 +1053,6 @@ static struct virtio_driver virtio_ipc_driver = {
->  	.feature_table	= features,
->  	.feature_table_size = ARRAY_SIZE(features),
->  	.driver.name	= KBUILD_MODNAME,
-> -	.driver.owner	= THIS_MODULE,
->  	.id_table	= id_table,
->  	.probe		= rpmsg_probe,
->  	.remove		= rpmsg_remove,
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 555ada922cf0..32afb87efbd0 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -770,16 +770,11 @@ static void req_bio_endio(struct request *rq, struct bio *bio,
+>   		/*
+>   		 * Partial zone append completions cannot be supported as the
+>   		 * BIO fragments may end up not being written sequentially.
+> -		 * For such case, force the completed nbytes to be equal to
+> -		 * the BIO size so that bio_advance() sets the BIO remaining
+> -		 * size to 0 and we end up calling bio_endio() before returning.
+>   		 */
+> -		if (bio->bi_iter.bi_size != nbytes) {
+> +		if (bio->bi_iter.bi_size != nbytes)
+>   			bio->bi_status = BLK_STS_IOERR;
+> -			nbytes = bio->bi_iter.bi_size;
+> -		} else {
+> +		else
+>   			bio->bi_iter.bi_sector = rq->__sector;
+> -		}
+>   	}
+>   
+>   	bio_advance(bio, nbytes);
 
-Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+Hi Damien,
 
-> 
-> -- 
-> 2.34.1
-> 
+This patch looks good to me but shouldn't it be separated from this
+patch series? I think that will help this patch to get merged sooner.
+
+Thanks,
+
+Bart.
