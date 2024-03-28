@@ -1,164 +1,191 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9F054737;
-	Thu, 28 Mar 2024 10:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711622997; cv=fail; b=Tj3rmQcjjqwBt2vkzyNBg8Jcu8CXFCDrjk77iAVd8m+vaASDcRQ6SBMaWVDoqfiV4SBtUShxndsjihABje5x/tid2QShp4PySv8va5AA0ZAhhnG1O/6rCbnEByGHiVHVG6pZ6AIJ7obkHaq9lvpi7OecNFClVrWyqZ9ImHrPf54=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711622997; c=relaxed/simple;
-	bh=K1+pa0NiXNZ+2tKXS0j4vKO396sYu27Df8Q5ilJpxGo=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=G07+FZDbv1A7ismFowO50bZKxpevp5DYZNqKRUJT9Zs4LOoCpiRpIPn+5IZE2GCD4PNdlpEOZ9pkmp2sOEJxaS2UlOsfF7qTJN/9QdKryuRZhRzO53eAe6nCyqMAja7pJfATJvFcfEWb5D97yxFZNBzube+pnEwltCY9fZ5tJHw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=VMb75prs; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=guK0pFMl; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72557D096
+	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 11:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711625529; cv=none; b=ix1MKmapN9Mv/fmRogD7JKmB7emXNTWLqZo8DO4QubhyHmpvwWa+7vW1p6nKsVweyfyJRwXSi3ZToFnJimwS+xVVsY8L7JkQ7w6LTn1hJ39hzyj8ReUqxzcfB+26LCICYNvdDeIcf0cQzVeKqwy7jUfVAWPokEU8hH3AWn3dBpk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711625529; c=relaxed/simple;
+	bh=fv8yM5rN/C0Y77Kw5Klv/jH4Oz3++7wImo5EAXNiMwE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yk2F81cgy+XaiuNE5IoKrtgHR+AxsVX7tuWLXC9ZsgfLhgKqk5WLoE9bzSoPZpWgMlwMOOIN1yOFSl8HOu8NTBrch4GlFAlHQU1ubLw3oT2pwP4MI8Zn53NDN6hMSs3JWem6WltjvqAEg5AoxgoP6ydemIEkIq7Jyvwl/W9ekaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DRzMMwGl; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dHn4V7iR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wP7uUpiF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=S6lMdoZN; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VMb75prs";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="guK0pFMl"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1711622996; x=1743158996;
-  h=from:to:subject:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version;
-  bh=K1+pa0NiXNZ+2tKXS0j4vKO396sYu27Df8Q5ilJpxGo=;
-  b=VMb75prs6/+qKsIWOwrGMrL0bqs46j16ZQLpJXMQGOCs13c3zBwfJb46
-   ZGUjAnHxisvNGri8jJQ5qhHYgLau2n2gJRxKuFCcWQlAscm9MVgFKYd8D
-   5Oq445BeTltGq2HWBOYsOSsKHIUw6STQ55lBIAGNsMypbRjcK7U5ii8I+
-   wIqbeUtRUf1O+WUpdPkZUso47eBVMjc7AISMBoBMW1js/q3+sYnFk6u/1
-   cDLN8pGQflptTZO9wjsar1LCw9DcjRnCbCfpFQWu2l5Di2zDwnKGBjBvj
-   UkDgMQpy9/aD7nC/bJq9y9v6ZL3O3mkitirV0h2f3xAZqJfM1wQLa1DWm
-   A==;
-X-CSE-ConnectionGUID: zkcfab4uSfmRAlFKSKtD+Q==
-X-CSE-MsgGUID: itVyNgTpSI+N3ysJQSbe2g==
-X-IronPort-AV: E=Sophos;i="6.07,161,1708358400"; 
-   d="scan'208";a="12529466"
-Received: from mail-co1nam11lp2169.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.169])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Mar 2024 18:49:49 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XFNV1cyJKmzyoX/0jF9pex3xWighlScn/idbWub0uNWUKpCIluqUn7+MKKpUZSMqLsoA2CvxczuzIk70WdR9Zh3OVM3iZ6mIGj9//bVwogKdwmpMFafL+GldZrmr/vCR4bEXGGBtPjNyfbtB9qkOYfEMy3bcMkG8Bs9PzQ76NRTQBjDc1E3iPvR7qx4fOC424A9FgIUZhgo8F1FD1IsbsO2h67RI5lKUMDUWizxlaBz9xN2o1+2RZgdK/w9Lz+sOuVTiFGc3qPIPm266CJXnttDQHQQm8qrSCETaGxk/vUccZUhfJsBaOg25Xnx7tO6u7mYfR4UrkQb8QLwrMlglLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K1+pa0NiXNZ+2tKXS0j4vKO396sYu27Df8Q5ilJpxGo=;
- b=lnFZvKtqmfuILaMDX4LuEJi6Vwd5s8d70MzQb3AIXVKxzS9rFYIesVZmkrQKMHl/LJnHjNz0Azn7RmR3XTlLLUJjBktBci7aV6XDBXtv/o2AfFuxOJj4n8vy2gCQxtBlfxMU1343lwmGCVIuWs8guJnw+bcxM+BiZvLaZpLBOkyDLSw1CzHLJtC8lYkEnGAhM6SFOBYjHZbwdfBOx3U6r1c68xLAwRGvrniH1GzWDswwAQ3LnlnYFdEuczwXVk2ORsgfKG6z1ad+I58yPDfan7x4BEFQVzwjPOuU5zGD1JW2kld75MpXCVQ71bLww1ww0bGjexDCodu4bG+UlqRGgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K1+pa0NiXNZ+2tKXS0j4vKO396sYu27Df8Q5ilJpxGo=;
- b=guK0pFMl49C+q0LFNfrJE2AWJq3u73G+aQ4keEXSnjDLT65vBP6wmokgu6RoJQ7nbQFdfKaxlgQDYKW7+tGVrNGYOOAvvjDsQ1rSKS186OFeq4SpyL2o4iiZn0pmxo3wcRwGeaXVN4IVD+MDjKUQcsuqhfRY3w0eK8TahDQnfdM=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by CH2PR04MB6807.namprd04.prod.outlook.com (2603:10b6:610:a2::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Thu, 28 Mar
- 2024 10:49:46 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::a814:67f1:24ab:508e]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::a814:67f1:24ab:508e%7]) with mapi id 15.20.7409.031; Thu, 28 Mar 2024
- 10:49:46 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: Damien Le Moal <dlemoal@kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "Martin K .
- Petersen" <martin.petersen@oracle.com>, "dm-devel@lists.linux.dev"
-	<dm-devel@lists.linux.dev>, Mike Snitzer <snitzer@redhat.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Keith
- Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v3 15/30] scsi: sd: Use the block layer zone append
- emulation
-Thread-Topic: [PATCH v3 15/30] scsi: sd: Use the block layer zone append
- emulation
-Thread-Index: AQHagKld2jDUZjEjbUOTHT1sWCBzqrFM+feA
-Date: Thu, 28 Mar 2024 10:49:46 +0000
-Message-ID: <cc6b06a0-9343-45c7-a1e5-031a03307108@wdc.com>
-References: <20240328004409.594888-1-dlemoal@kernel.org>
- <20240328004409.594888-16-dlemoal@kernel.org>
-In-Reply-To: <20240328004409.594888-16-dlemoal@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|CH2PR04MB6807:EE_
-x-ms-office365-filtering-correlation-id: 7a8fb1b3-057a-4c26-4a60-08dc4f14c886
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 1k7tPO6GODmmNpuOsQUwCFdnLCyCRYuA7+mpYMnq5dxOS2tlfITk56vANDPAmMb82GygyAp16oKsbaYv7EGi7Fecd9wQZQbic6vB16ALZ4yF0tT92JIoQzDfCTUIt/c8DdzcIVmpEjvcImF6aX8LIT52QUw2seoLIyrHdKLmdtJc9RZ6Wpuu7EGseKF5f4S9Npe3dC5U1XUMZL1R2I93E1YylChfNdM+oAik1Trcpcn3KLk73aCHqfVQSc8BQdmymV3eIMpYJT6CbW2+zvbvWt6ibho7R3vSCDhvNplUBXDSj4hcoiTXqQOF6jWHGsTjX2d7Lohs9aJUmBGp0ltPi+r7RmJum3SR301d/9rkTFD9X2lq/qbCR1gUHqGNq+PnaA20lrmMDtT/dIhBuKFqgHsw11K3JB6W6158TDH2XdMEyK1AjD3TjOMKyzGudh+SMK2DRUhZo6ItTGG+Gmh6nHSIidqA0AYc3A7BFhSOk9nq3RMeS7D63hEvuhpKBaWzJ17cg9SGY6zMWqmiV8x8H8jiJBlCZLCIrLiCH/3SmJ9Ub2/BP57R0ZbRlWbrnGjaVmrS84K8jRm4RDaJNtAVPjxDqxD1B9KoxspOHI15QHy7v2FeG6byYfMqCGE4IJegx2AjViNfJzeS18iekJTDCtSH1of/gXW5PbcuZyUHASzhuNuTTh5VQbTuYi8YNKqTcNTUfxoB5OQHX3Wc3H84j01UppH0ycBQ9JlCcziKlBM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(366007)(38070700009)(921011);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WU9MUWZlQXhCZTBCdEc1bGlZMlZqZTJ2ZHkvL3hoVDhBQzBnZHRMaDNCSkt1?=
- =?utf-8?B?bTZOOVovenBDZlhSZ1orT1BTbWtkbzltdS9vRytTak9COHRUdytaMzlwbGJU?=
- =?utf-8?B?ZldWYWZ4aTh4QkRVVHZZVnRzWEc5ZFNmWWFZamZESlVuVm5lL3ZiWTY4L1I5?=
- =?utf-8?B?MWszTXovM2tGaHltK2tQTWQ4L0JKUnJxVDRLRm9xMmFkem9zZnc2djhVS1BU?=
- =?utf-8?B?Q2VDRjM5ZlJDTm42clI5NURRcFRxRHZJSlRSeWVrTjQ5cllyd2JSdTJQVVpa?=
- =?utf-8?B?REpMWXcvc01DU3NCdkUrN3FYV2VuV2Vrc2hZRWp2UzdMYS9iZGVqVkw0R1dJ?=
- =?utf-8?B?d1V0bDlmV1U0U281UnNseDJ3My9KbTZMYjVvUndNSWZDWGVTMGh2YjhSZkFK?=
- =?utf-8?B?Q1g1dGZqN2pjY3M2RTQzZGR4VzB4cWFIWEJxRkcrZUJSa0o2ZlJ1R3IzNHhw?=
- =?utf-8?B?OElrSHNldGEzaGkzZWt6V3hTMDhOZzdFeGU0SmIzeEkwZHZXc2JEcy9raExK?=
- =?utf-8?B?c0d0QWRSVlJlUDIvdzFDZlN0NFpEVUF0czZWWkNqZjRrR3dxSTBvZ212UzMw?=
- =?utf-8?B?QTUvRXdPTFphVytpVnB2L0t0UC9ERk55bk83TTFtNGhyT0Y4b2F1RUZPQVJH?=
- =?utf-8?B?aDB5S3NsRk1uNWo2QytVTisydDc2c2hqdE1DN3BiR3BlbU5NVkVzSENheXZq?=
- =?utf-8?B?Vys5bHBlVFZ1UTFRT0Y0VU5Uemtva0xOc0tjMGY0ZUNXQ0JNbWhXckovRGpB?=
- =?utf-8?B?aytabStaajYzY2dYN2FhMmg1eVBiRTlyQjl5TGx3TkRQQ1VCa1VEWkpwS1RV?=
- =?utf-8?B?RDZDUDB6QzRrU1JaUzVLSDkyT0p0MFJWb0l1STFZSEZXUzIzT2dIN2xsVVJk?=
- =?utf-8?B?MEhpMnY2Y1dMQzgwOWVOZ1FPdEdsTlFlMGFsNGYwVmZwa3AxYS9uSVhYdk94?=
- =?utf-8?B?UCtiWTUxdFZxdy94cGVEZVRlWCswMFZuTGlUZS9KZmlPNWNpcVdBU21Wdnpz?=
- =?utf-8?B?cGJ1SE9KR1ZQMnBhSXI0T0VnMnhGdit2S0tOVzdHMDNrMCswK2FZSTBKUXdl?=
- =?utf-8?B?WHY4cHRxU1FMNEY2cm4zVGNCY3N4K285Tm5SUld2b3RPN0hHLzZ5dDdmR2JP?=
- =?utf-8?B?SEtqTFcwZmhRVVRxZjlvY2xmK2wxZTF0dk1kL3IrZ0NLQ3drWDZKcWJjV2ZR?=
- =?utf-8?B?cTNlU0VIdVlpTERDcUFtY3NpUHBZQ010TjBWV08vc3h3bEtkR1VwM212WFJl?=
- =?utf-8?B?Qnh3NzZXbEwxazJyd2pzcjFDQW42cVpyb25BT2ZFKy9TYXd4UXVlSEFCejBT?=
- =?utf-8?B?U2xjTHNPU2FkNSt5YXdZY3ZVUWtpRDlnak05eGllL2FSaGZZQVNUZWExb0Qz?=
- =?utf-8?B?c3FZYlFDSCtYSVVta3ZMdnM4a2o2QS82UlJ0OExLVmNQY0tFNlltL2p0aFJs?=
- =?utf-8?B?ZmFNVTg2eVFlUlJEOHpGQnpxQm9BY3pBbC91T1dLTXdDdWtYYVd0WWNSYy94?=
- =?utf-8?B?cUhDcGdHd2pEWGYwRDBneWxnSm93MWdGVm80ZXdXbUdlcVZYelJ1K1QxbHZX?=
- =?utf-8?B?QmticHBBME9SeVNnSnBaTkl0WTdYNlJna20vQ1dvek45VkZpTXdsRnFiZ05j?=
- =?utf-8?B?TlFtRnZVcDZWVm1yZ3BBVnA4OCtuK1VoRGdjRjlYK2lGdE1qRXZ5OXR2cGhs?=
- =?utf-8?B?b1Nscmt3OE5BQ0pSTjB4U1NkQ1RxMXdiYzY5bTVVMW5kMGVKbTZJTzRaNlBo?=
- =?utf-8?B?dGpoRHFMUjNHYnNyMGtrWXQ5bEo2anRPSzJPWUdRdk1FV0RvNlBiWUh3MTdV?=
- =?utf-8?B?SGZQQ2tNRFk4QlhuaS9DWUxLbmNRVVRITkNtbFZOeE9KbU5RRkJTbDZQRnE4?=
- =?utf-8?B?RXFXQ0w5V0pmVUhlR3NMY1EyVU55ZHNNNDJkU3VuRlMxN1dhYXBsUHVTWkJu?=
- =?utf-8?B?S1ZVeTFIenpEZ1RqemJBWW9ZeWRIWG9JWFcybGFDejBXN2dTdUIrc3JvL1Bu?=
- =?utf-8?B?Z01ubGtpeHVxbFRRMWM1ZFpWbzlDMDd0RCtMZ0JmWVhPU1NBTzhoUzljRmU2?=
- =?utf-8?B?dFFJWk1YNmc1VExFTm9GUzZzbVR3ZFFUc0gzRGFRRUpDSWFST3RHZjN4UlFC?=
- =?utf-8?B?SjBPWDhFM0dsdUpQQmlTc1hvM00zN0RxU1l3bEpOTU5ha1Q3V2JCa1lqcElQ?=
- =?utf-8?B?K3dkd0RURkh2ZmZ3RFU0QWpkbmkwdzBPYnBNR2hUaFl4WnhIQ05NenBKSW5m?=
- =?utf-8?B?WjFleitaMDc0MlV4NldQVUlYVnlBPT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <09145227C2694A46BE7A82047D5B95E6@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DRzMMwGl";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dHn4V7iR";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wP7uUpiF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="S6lMdoZN"
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id EA38920807;
+	Thu, 28 Mar 2024 11:32:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711625526; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f6X0T0QvsvPcleLoF5b3AzTy2619Cz/nMq7hoZ7FRjo=;
+	b=DRzMMwGly/4s/Qnqw0Rudt6U9az8fANjYFHG2KHeMaoizJ35bPA+U7zaks9ndOrfbV4dxD
+	T5gdC4B7TGaiKiwusqYNYKKxYQASGeT0pdvsTgsKlzwMhJZoaDsiClaBI6aFIxUBiSUOuv
+	1CKWC8m9vhhutUAJpAlejFZT5slQRw8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711625526;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f6X0T0QvsvPcleLoF5b3AzTy2619Cz/nMq7hoZ7FRjo=;
+	b=dHn4V7iRB1rFqvVEFx681erfCExeSMwjuACIkGMPyHAGlYP4565/Q2tiEERVbgHvyIRTov
+	zZpHOeuIDMx0rYCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711625525; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f6X0T0QvsvPcleLoF5b3AzTy2619Cz/nMq7hoZ7FRjo=;
+	b=wP7uUpiFqKyvBDk1TZUXs9paUNMcahGyrJWrtJzfEI7zvm8oZEPmXzqpx60LpEdYhGgwjT
+	bC43HerEnuOejR1LOH/O86orbzPrhwqhG07gJJmbrKCcoo7zx0LXjdVfzpQi9WLZQkCM02
+	mzoP7vJNqf85+E+1g4PwvR72ICdZkZo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711625525;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f6X0T0QvsvPcleLoF5b3AzTy2619Cz/nMq7hoZ7FRjo=;
+	b=S6lMdoZNjcYre+Kh3yhGhKUhwGE0YyneqooJHbFax6R9ExAqViso03vPc+3gaKxiMxDtd4
+	/Fuj4dJYyhJAT9Cw==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id B0D3513AF7;
+	Thu, 28 Mar 2024 11:32:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id EeGyKjVVBWbvGQAAn2gu4w
+	(envelope-from <hare@suse.de>); Thu, 28 Mar 2024 11:32:05 +0000
+Message-ID: <ef07c956-23cd-4de4-8a4c-c796c743d8f1@suse.de>
+Date: Thu, 28 Mar 2024 12:32:05 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	70rZ0BT/a48S1aqcisIvvpe3Uk7QhnqGQhhog91k9iGKHIf2cr/2eLPJcuM/GaOPGIFPlTPSA5tiA0M7CMc4AvcEWsh7J2sRZXpD0OTkjX1kDbvoba7kNpWzWru7mXkq2VYMd8nL7fUuDLjWldmmaz/uQxaH2ip5VHJxCXeDYEpotPfmQ+lHSOjNr/0BEfHt98QpYRoKMBtWqodn0Dvtbvv3A6f6+l1tM1mschU9ilpVM1obAmV0lNUkpf2cu0F43iTXFDN29aWR6ohX3Ehfxy+YC2djF7KNbRpgU/exz6DDd28YmRFFwpr+STzvtjvGgsZiI5MVICIIgDOtPFkOhQWRq+6AVGIFA6LbEPYQouL4KBxm1O39CmlqNjxTdohcjSHbEPZzWpzBZ7vNdsoRssIkzV0CTozJifce+LoyksYz/AjNt6HzpHyamVPkzkUNjJKZGPDHLpN09l8bz5cH/YaqrJGiIAebL5VnWpQA/hL8AeaBYYPlAgvZbbfb7aM85bb4iRrE3IpOAuVRl8FVYGwlmljV0NquxPFCYT1/+DDXvo6J5ORWs8tcghFK8NxQCF+o3lEBDlX0kOfIIKXsmgU97Pn4TID6iTm6TOVn59QXNFdjiQImEosUIowWBPVZ
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a8fb1b3-057a-4c26-4a60-08dc4f14c886
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Mar 2024 10:49:46.1633
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rbaJ6H+NdF7ME99u4KIs2VZjXK7MbRqBEK9rnWWmWFwBNMz902+2CzlxgsNcZz14XZzmAYzf7rfkr6Ht2iYuuVQVfir6NTBi2WlDH+yeLyk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB6807
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 0/2] block,nvme: latency-based I/O scheduler
+Content-Language: en-US
+To: Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+References: <20240326153529.75989-1-hare@kernel.org>
+ <5cade4b4-f19f-422d-ab93-bc853b1563d1@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <5cade4b4-f19f-422d-ab93-bc853b1563d1@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.50
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	 BAYES_HAM(-3.00)[100.00%];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[];
+	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:98:from]
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wP7uUpiF;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=S6lMdoZN
+X-Rspamd-Queue-Id: EA38920807
 
-U28gbG9uZyBhbmQgdGhhbmtzIGZvciBhbGwgdGhlIGZpc2ggOyggOkQNCg0KUmV2aWV3ZWQtYnk6
-IEpvaGFubmVzIFRodW1zaGlybiA8am9oYW5uZXMudGh1bXNoaXJuQHdkYy5jb20+DQo=
+On 3/28/24 11:38, Sagi Grimberg wrote:
+> 
+> 
+> On 26/03/2024 17:35, Hannes Reinecke wrote:
+>> Hi all,
+>>
+>> there had been several attempts to implement a latency-based I/O
+>> scheduler for native nvme multipath, all of which had its issues.
+>>
+>> So time to start afresh, this time using the QoS framework
+>> already present in the block layer.
+>> It consists of two parts:
+>> - a new 'blk-nodelat' QoS module, which is just a simple per-node
+>>    latency tracker
+>> - a 'latency' nvme I/O policy
+>>
+>> Using the 'tiobench' fio script I'm getting:
+>>    WRITE: bw=531MiB/s (556MB/s), 33.2MiB/s-52.4MiB/s
+>>    (34.8MB/s-54.9MB/s), io=4096MiB (4295MB), run=4888-7718msec
+>>      WRITE: bw=539MiB/s (566MB/s), 33.7MiB/s-50.9MiB/s
+>>    (35.3MB/s-53.3MB/s), io=4096MiB (4295MB), run=5033-7594msec
+>>       READ: bw=898MiB/s (942MB/s), 56.1MiB/s-75.4MiB/s
+>>    (58.9MB/s-79.0MB/s), io=4096MiB (4295MB), run=3397-4560msec
+>>       READ: bw=1023MiB/s (1072MB/s), 63.9MiB/s-75.1MiB/s
+>>    (67.0MB/s-78.8MB/s), io=4096MiB (4295MB), run=3408-4005msec
+>>
+>> for 'round-robin' and
+>>
+>>    WRITE: bw=574MiB/s (601MB/s), 35.8MiB/s-45.5MiB/s
+>>    (37.6MB/s-47.7MB/s), io=4096MiB (4295MB), run=5629-7142msec
+>>      WRITE: bw=639MiB/s (670MB/s), 39.9MiB/s-47.5MiB/s
+>>    (41.9MB/s-49.8MB/s), io=4096MiB (4295MB), run=5388-6408msec
+>>       READ: bw=1024MiB/s (1074MB/s), 64.0MiB/s-73.7MiB/s
+>>    (67.1MB/s-77.2MB/s), io=4096MiB (4295MB), run=3475-4000msec
+>>       READ: bw=1013MiB/s (1063MB/s), 63.3MiB/s-72.6MiB/s
+>>    (66.4MB/s-76.2MB/s), io=4096MiB (4295MB), run=3524-4042msec
+>> for 'latency' with 'decay' set to 10.
+>> That's on a 32G FC testbed running against a brd target,
+>> fio running with 16 thread.
+> 
+> Can you quantify the improvement? Also, the name latency suggest
+> that latency should be improved no?
+> 
+'latency' refers to 'latency-based' I/O scheduler, ie it selects
+the path with the least latency. It does not necessarily _improve_
+the latency. Eg for truly symmetric fabrics it doesn't.
+It _does_ improve matters when running on asymmetric fabrics
+(eg on a two socket system with two PCI HBAs, each connected to one
+socket, or like the example above with one path via 'loop', and the
+other via 'tcp' and address '127.0.0.1').
+And, of course, if you have congested fabrics, where it should be
+able to direct I/O to the least congested path.
+
+But I'll see to extract the latency numbers, too.
+
+What I really wanted to show is that we _can_ track latency without
+harming performance.
+
+Cheers,
+
+Hannes
+
