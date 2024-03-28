@@ -1,79 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85CA171AB;
-	Thu, 28 Mar 2024 23:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323E07F471
+	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 23:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711667594; cv=none; b=RzgosJpnkV0undM4wU4t9w13mOX4u41WiU2XhgypVcJh9Sm11FtTJRSHRogHbp/xB73mF66FbmeR/H8Cc857j0uqjHjT0UR+PRIlyBBVdKTUoYxG8j3r3mOE/n/nukCCpYRsjuuzWA+aJpJBkv5SJYelpvtxr3dajPlqjLx6fso=
+	t=1711668301; cv=none; b=oySY/lZAL86kVTvM1oCtCvSuAmk3VTu0bO45Dyu43ukP5CI5s/gqR3otZbnrl7sWSeDpS7r8mj3BQvsSa1rHkrH/eTQ72ANyzYwjY6WnnMAKwX4lk57DtRWK4i8NYeWukcUlcKyTgvGh/vAFLJrIqepVvRGLLcunPJ1lV6x0Akw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711667594; c=relaxed/simple;
-	bh=v+SHLoICanV0vkiVj8XhdUNtq5t4L5mpSMibAdWlRH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=TPCII32Mh4H3pZBGZOqfBj2E0ocZ4Qx2ywYyLXBU5njUIiMibSIXTrkS+HElKoSnWwAGPQ5wHXJgbItVQD0A3k+fGye9NCaKG8W3tRwfEqfsWFfkmAlyZOwNrilvdnIg1UdQvACBNdYQXDpVRQIjDojcZnvGmPFch9tOJxvntUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cT8prdCZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711668301; c=relaxed/simple;
+	bh=wXfg/+AxvkOnFrYF3BJt/cT/EGxwBVaS6XpJy/hWFFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f4KuPZNzIiFAKv+q/KIQrV7ZM4d/KwwQmIEF9y1ZMRbRX8rrtPvYCe9KA8PZIfeSmhllZvSYNr0XjLgfKGaOcCcXrO1+Lf76kKcneYa8R4nO28BdgTxbRT674e/Pf6iAihAKKwT1IjZK6JBMFc4ZdsFwyGUKZee2lIz7xv9edrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fslp7Mww; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cT8prdCZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05F74C433C7;
-	Thu, 28 Mar 2024 23:13:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711667594;
-	bh=v+SHLoICanV0vkiVj8XhdUNtq5t4L5mpSMibAdWlRH4=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=cT8prdCZz9XivJJApdhCvLOJ4goauShlKHJaLq+b+uICqNBuGR/Lvh3EdSaGF/pd8
-	 gzBthPKPLoLB/TlURkx6cxIoTBD27fAd6pN+oU94Mt1Sdk+VL8oplTwFepRbPZRt0E
-	 6suPEZcEUciCk7M/VLtccqTHwBzVsLXcC+NTX0aiNv4LDVj6Lsvf4DqrPb7tunyDkz
-	 gJAFZkDeeCFPP1N0pdTkjJwwsEZ6l7b5NWlwI6QyGpiWKuaMtQmcbb+UdU2fir7izu
-	 VhmW2VOdknu8yV+b8mEEHyNDK52tg9xxgU+qjkdoOMaZsJfu9SnCne7X7XQA6LSVtp
-	 svINZGsMXOuqw==
-Message-ID: <67a6eeea-253f-4568-b73d-aa05173cdb41@kernel.org>
-Date: Fri, 29 Mar 2024 08:13:11 +0900
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fslp7Mww"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7cc5fdb0148so59237439f.3
+        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 16:25:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711668299; x=1712273099; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/qNXZWa7ff+gZO9/7qJdAv1MXiheIN0/3fR3ZzkSZyM=;
+        b=Fslp7MwwrIxxIMJnOJTvA6zxB4REFHZxdCr3XoHBqqm7DH2VVCTOZWES3LC0T0NdMd
+         UDjlyzUQcHrOmWC6v+KCIs7+JGgDRLoHSRSsLzDwWQ+XqjdfA/Ct5eY3TVJrycSiC9rw
+         ZhcBF8Z8gXiE417zpi17qtvaVBdneGcQ3BfaLx31Ar8S/TqqrZVRKh4ikgDdgr1COqum
+         ugD6FBHoRLtLN/vUoRdJhSsqBgp5SaGFqis1I4shN25SVMH8XLZ3DHdZKMJlxRSYzLeM
+         YA08FETKMRCik3wPo83TqidqOu1L+I8+Ffc9WeX+lL9UM73+NLYvR0sgbKvTrPAplFnk
+         7IgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711668299; x=1712273099;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/qNXZWa7ff+gZO9/7qJdAv1MXiheIN0/3fR3ZzkSZyM=;
+        b=LMmsna+H3YkV7sR6iYahpADJAvQCRpEUWAKd2VdQJIEqmGTN5CjJD0TkBzatSB+WZ6
+         5vM1DRpxfPzCTmQO2Z96NK2hhscxaJ0OoP5PqgTrTBMjxrdIwZAmvTc2dqzhfR0lYyYT
+         icseMid6nEUK0IYvmky4dipHug5Y6UGeRkDy2M7uSpSxo8Prgw5Vzbok6/dBWktsgs5y
+         9MzbHN24aYlcudAvI6hQSFQHsapi28+GNbpnPQWKstZIeo2Z0BHjZQY5bhUV30SvjneN
+         kOW6O+3mA3QmPs9mn4hyKdg11OZFQLM/1IKt7WMwQGynlnzhdS5WceyOFCRiSoaVHBIl
+         RHkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrsX2slMu5RU5bbB0YHaK71ZNRJYygI72pdQPUcvaPoIS1Xy6ZuWJbBn3dAbLG7ZvE7MgCjD58fG2144eBN1/ANoMKdLWDHHizoHs=
+X-Gm-Message-State: AOJu0Ywp1D1hUq1tXpxIqhEr0n/IdGvG9oA1RKzs3sBef+PXzPp8E8by
+	jseTUIxYdF3OW8weHPQGSQjJTRh00BefiW9UzXrkc7N66rUIvd3D4J3r54PagQ==
+X-Google-Smtp-Source: AGHT+IH/359JmtRlhVfnHXRBxGMxdiBxsOXPtiJP+s9PFPDvBB1vfKbmbWpup/GqtPGDEEuv8/wGDQ==
+X-Received: by 2002:a5d:8454:0:b0:7d0:807d:33dc with SMTP id w20-20020a5d8454000000b007d0807d33dcmr699533ior.15.1711668299282;
+        Thu, 28 Mar 2024 16:24:59 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id x15-20020a6bda0f000000b007d06ef8020bsm669877iob.40.2024.03.28.16.24.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 16:24:58 -0700 (PDT)
+Date: Thu, 28 Mar 2024 23:24:56 +0000
+From: Justin Stitt <justinstitt@google.com>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+	"Richard Russon (FlatCap)" <ldm@flatcap.org>, Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>, 
+	linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org
+Subject: Re: [PATCH 07/11] block/partitions/ldm: convert strncpy() to
+ strscpy()
+Message-ID: <a5vkpjykxex64vti4wvx7h64jthw7inc23uelol5s3beezoiuz@scl2uhf6pkl7>
+References: <20240328140512.4148825-1-arnd@kernel.org>
+ <20240328140512.4148825-8-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: (subset) [PATCH v3 00/30] Zone write plugging
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@redhat.com>, linux-nvme@lists.infradead.org,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <20240328004409.594888-1-dlemoal@kernel.org>
- <171166712406.796545.15002324421306835511.b4-ty@kernel.dk>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <171166712406.796545.15002324421306835511.b4-ty@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240328140512.4148825-8-arnd@kernel.org>
 
-On 3/29/24 08:05, Jens Axboe wrote:
-> 
-> On Thu, 28 Mar 2024 09:43:39 +0900, Damien Le Moal wrote:
->> The patch series introduces zone write plugging (ZWP) as the new
->> mechanism to control the ordering of writes to zoned block devices.
->> ZWP replaces zone write locking (ZWL) which is implemented only by
->> mq-deadline today. ZWP also allows emulating zone append operations
->> using regular writes for zoned devices that do not natively support this
->> operation (e.g. SMR HDDs). This patch series removes the scsi disk
->> driver and device mapper zone append emulation to use ZWP emulation.
->>
->> [...]
-> 
-> Applied, thanks!
-> 
-> [01/30] block: Do not force full zone append completion in req_bio_endio()
->         commit: 55251fbdf0146c252ceff146a1bb145546f3e034
-> 
-> Best regards,
+Hi,
 
-Thanks Jens. Will this also be in your block/for-next branch ?
-Otherwise, the series will have a conflict in patch 3.
+On Thu, Mar 28, 2024 at 03:04:51PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The strncpy() here can cause a non-terminated string, which older gcc
+> versions such as gcc-9 warn about:
+> 
+> In function 'ldm_parse_tocblock',
+>     inlined from 'ldm_validate_tocblocks' at block/partitions/ldm.c:386:7,
+>     inlined from 'ldm_partition' at block/partitions/ldm.c:1457:7:
+> block/partitions/ldm.c:134:2: error: 'strncpy' specified bound 16 equals destination size [-Werror=stringop-truncation]
+>   134 |  strncpy (toc->bitmap1_name, data + 0x24, sizeof (toc->bitmap1_name));
+>       |  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> block/partitions/ldm.c:145:2: error: 'strncpy' specified bound 16 equals destination size [-Werror=stringop-truncation]
+>   145 |  strncpy (toc->bitmap2_name, data + 0x46, sizeof (toc->bitmap2_name));
+>       |  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> New versions notice that the code is correct after all because of the
+> following termination, but replacing the strncpy() with strscpy_pad()
+> or strcpy() avoids the warning and simplifies the code at the same time.
+> 
+> Use the padding version here to keep the existing behavior, in case
+> the code relies on not including uninitialized data.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
--- 
-Damien Le Moal
-Western Digital Research
+Thanks for the patch!
 
+This helps towards: https://github.com/KSPP/linux/issues/90
+
+Reviewed-by: Justin Stitt <justinstitt@google.com>
+
+> ---
+>  block/partitions/ldm.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+> index 38e58960ae03..2bd42fedb907 100644
+> --- a/block/partitions/ldm.c
+> +++ b/block/partitions/ldm.c
+> @@ -131,8 +131,7 @@ static bool ldm_parse_tocblock (const u8 *data, struct tocblock *toc)
+>  		ldm_crit ("Cannot find TOCBLOCK, database may be corrupt.");
+>  		return false;
+>  	}
+> -	strncpy (toc->bitmap1_name, data + 0x24, sizeof (toc->bitmap1_name));
+> -	toc->bitmap1_name[sizeof (toc->bitmap1_name) - 1] = 0;
+> +	strscpy_pad(toc->bitmap1_name, data + 0x24, sizeof(toc->bitmap1_name));
+>  	toc->bitmap1_start = get_unaligned_be64(data + 0x2E);
+>  	toc->bitmap1_size  = get_unaligned_be64(data + 0x36);
+>  
+> @@ -142,8 +141,7 @@ static bool ldm_parse_tocblock (const u8 *data, struct tocblock *toc)
+>  				TOC_BITMAP1, toc->bitmap1_name);
+>  		return false;
+>  	}
+> -	strncpy (toc->bitmap2_name, data + 0x46, sizeof (toc->bitmap2_name));
+> -	toc->bitmap2_name[sizeof (toc->bitmap2_name) - 1] = 0;
+> +	strscpy_pad(toc->bitmap2_name, data + 0x46, sizeof(toc->bitmap2_name));
+>  	toc->bitmap2_start = get_unaligned_be64(data + 0x50);
+>  	toc->bitmap2_size  = get_unaligned_be64(data + 0x58);
+>  	if (strncmp (toc->bitmap2_name, TOC_BITMAP2,
+> -- 
+> 2.39.2
+> 
+
+Thanks
+Justin
