@@ -1,45 +1,45 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0AA13A879
-	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 20:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B38A13A250
+	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 20:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711658392; cv=none; b=EUYaNcss7MwNrGn6M41xgJrgiayf7RJveIjdDqozflsNH6/7XScHYGfDeDaKFdzVwRRPr2wjfaUqq3DOCKsv+jvfzlfqalDyR4wQEz7/bck/1EXDyuMqAxjc4X12qFqswU+5nqFhh/WYqm4jrvvKM/0toR9/8bG02JfC4ALzXdc=
+	t=1711658400; cv=none; b=SZn3YxTcf3VbtrgiKHaVT+c2r2xGOfKLA91neywKa4XCC4q6bZ7JXxaGtayxcOIcJQ5I9p+cVhekhGZqXUbON5yjnfmOr1RqGE2gSsukmFQGB+I0br6Lawooi1rN1ko3AACArpnrKWML87s/B5gGRqUXfEVv1L2UESjQuZUtzRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711658392; c=relaxed/simple;
-	bh=Z/9BALdmqq/q3tmjj2QgJEd4wnfZA9Ii706QeBSvW/w=;
+	s=arc-20240116; t=1711658400; c=relaxed/simple;
+	bh=9TzmnhsUKTbqm3MBDZcbvUahak/Gsv0zqkL0N7t7Zn8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OP7/qXmP4+oay8DazXwVvCCkuUJF9p5Vy18cFKDPeGAmupgCmwcDTL/oktW6sM8L2a4qMRvHri11UprAw6XTM7FRlU3CUXt+q9SA7gh2papT6XYJTwjt96/CToNeDy+eJlkErz0PjwGNsebCkRCpX+OhQlLYb1TXhbhhOVndobg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QEZ1G5FZ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=EJ/5NSYRtgBTZFnEIpvKaUnUoLpkx7lo+UONfXzfD/GLXgOwLer7n8KMrtyEtM3WH1GR5QU+rqLwbiLFYwWG1niM+4a4BzPmtirpUVR1chVHqZbX2bfoIQpmRUgwrZqv5grJ92W1wv9IIOeHEyhIt3li/dW2Jq3H598j/Xd4Zi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ilbJisdy; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QEZ1G5FZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ilbJisdy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711658390;
+	s=mimecast20190719; t=1711658397;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ifdaXHJafNhgJEodv1uxro7ZmRQAOz8+u7BNkXOalBo=;
-	b=QEZ1G5FZ2vWF9jfR84zg1Rvli180LBl1uvUGYmw5BbSAGIQvdphmUSZUiJOnQFok0DweJB
-	autHHgHYoPl8HVi8ooQuWy/uLT9FqAf1p76ymFeiWxMCKKVwCIqRFxXf8eERfxccchhnLX
-	4FYv46cyIND5SRki7Gzvvk7hR473rFI=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-492-EC1kfjvMNx-NTQDJ-Tmc6A-1; Thu,
- 28 Mar 2024 16:39:46 -0400
-X-MC-Unique: EC1kfjvMNx-NTQDJ-Tmc6A-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	bh=g4rLC5S75oEgMAlRnRiGxyXHyD4Dy8z12uj2IyMw9Nc=;
+	b=ilbJisdy4NpmxD3zqpl77476xQADEaJ/CT0ytc/wYAJ+razz4XqMF+LCQU57e8FWpar90H
+	Bm4V62gxSTwIkkE/Ds1ymJj3URd0py1af0Ck4+12DbMfLsCejQtw02HpavdMGi3nsRtYZV
+	ScBcgSimNoiEPWDjx/Gb2S6V5JYk+a0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-TPsvWD4yNkqI23cHGTHb_Q-1; Thu, 28 Mar 2024 16:39:52 -0400
+X-MC-Unique: TPsvWD4yNkqI23cHGTHb_Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CAC9A1C2CDF2;
-	Thu, 28 Mar 2024 20:39:45 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5D8DF185A786;
+	Thu, 28 Mar 2024 20:39:52 +0000 (UTC)
 Received: from localhost (unknown [10.39.194.117])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C12A3492BDA;
-	Thu, 28 Mar 2024 20:39:44 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B501E1C060DC;
+	Thu, 28 Mar 2024 20:39:50 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: linux-block@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Joe Thornber <ejt@redhat.com>,
 	Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [RFC 1/9] block: add llseek(SEEK_HOLE/SEEK_DATA) support
-Date: Thu, 28 Mar 2024 16:39:02 -0400
-Message-ID: <20240328203910.2370087-2-stefanha@redhat.com>
+Subject: [RFC 2/9] loop: add llseek(SEEK_HOLE/SEEK_DATA) support
+Date: Thu, 28 Mar 2024 16:39:03 -0400
+Message-ID: <20240328203910.2370087-3-stefanha@redhat.com>
 In-Reply-To: <20240328203910.2370087-1-stefanha@redhat.com>
 References: <20240328203910.2370087-1-stefanha@redhat.com>
 Precedence: bulk
@@ -65,110 +65,82 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
-
-The SEEK_HOLE/SEEK_DATA interface is used by userspace applications to
-detect sparseness. This makes copying and backup applications faster and
-reduces space consumption because only ranges that do not contain data
-can be skipped.
-
-Handle SEEK_HOLE/SEEK_DATA for block devices. No block drivers implement
-the new callback yet so the entire block device will appear to contain
-data. Later patches will add support to drivers so this actually becomes
-useful.
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/linux/blkdev.h |  7 +++++++
- block/fops.c           | 43 +++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 49 insertions(+), 1 deletion(-)
+Open issues:
+- The file offset is updated on both the blkdev file and the backing
+  file. Is there a way to avoid updating the backing file offset so the
+  file opened by userspace is not affected?
+- Should this run in the worker or use the cgroups?
+---
+ drivers/block/loop.c | 36 ++++++++++++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c3e8f7cf96be9..eecfbf9c27fc4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -332,6 +332,9 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
- int blk_revalidate_disk_zones(struct gendisk *disk,
- 		void (*update_driver_data)(struct gendisk *disk));
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 28a95fd366fea..6a89375de82e8 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -750,6 +750,29 @@ static void loop_sysfs_exit(struct loop_device *lo)
+ 				   &loop_attribute_group);
+ }
  
-+loff_t blkdev_seek_hole_data(struct block_device *bdev, loff_t offset,
-+		int whence);
-+
- /*
-  * Independent access ranges: struct blk_independent_access_range describes
-  * a range of contiguous sectors that can be accessed using device command
-@@ -1432,6 +1435,10 @@ struct block_device_operations {
- 	 * driver.
- 	 */
- 	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
-+
-+	/* Like llseek(SEEK_HOLE/SEEK_DATA). This callback may be NULL. */
-+	loff_t (*seek_hole_data)(struct block_device *bdev, loff_t offset,
-+			int whence);
- };
- 
- #ifdef CONFIG_COMPAT
-diff --git a/block/fops.c b/block/fops.c
-index 679d9b752fe82..8ffbfec6b4c25 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -523,6 +523,43 @@ const struct address_space_operations def_blk_aops = {
- };
- #endif /* CONFIG_BUFFER_HEAD */
- 
-+/* Like llseek(SEEK_HOLE/SEEK_DATA) */
-+loff_t blkdev_seek_hole_data(struct block_device *bdev, loff_t offset,
++static loff_t lo_seek_hole_data(struct block_device *bdev, loff_t offset,
 +		int whence)
 +{
-+	const struct block_device_operations *fops = bdev->bd_disk->fops;
-+	loff_t size;
++	/* TODO need to activate cgroups or use worker? */
++	/* TODO locking? */
++	struct loop_device *lo = bdev->bd_disk->private_data;
++	struct file *file = lo->lo_backing_file;
 +
-+	if (fops->seek_hole_data)
-+		return fops->seek_hole_data(bdev, offset, whence);
++	if (lo->lo_offset > 0)
++		offset += lo->lo_offset; /* TODO underflow/overflow? */
 +
-+	size = bdev_nr_bytes(bdev);
-+
-+	switch (whence) {
-+	case SEEK_DATA:
-+		if ((unsigned long long)offset >= size)
-+			return -ENXIO;
++	/* TODO backing file offset is modified! */
++	offset = vfs_llseek(file, offset, whence);
++	if (offset < 0)
 +		return offset;
-+	case SEEK_HOLE:
-+		if ((unsigned long long)offset >= size)
-+			return -ENXIO;
-+		return size;
-+	default:
-+		return -EINVAL;
-+	}
-+}
 +
-+static loff_t blkdev_llseek_hole_data(struct file *file, loff_t offset,
-+		int whence)
-+{
-+	struct block_device *bdev = file_bdev(file);
-+
-+	offset = blkdev_seek_hole_data(bdev, offset, whence);
-+	if (offset >= 0)
-+		offset = vfs_setpos(file, offset, bdev_nr_bytes(bdev));
++	if (lo->lo_offset > 0)
++		offset -= lo->lo_offset; /* TODO underflow/overflow? */
++	if (lo->lo_sizelimit > 0 && offset > lo->lo_sizelimit)
++		offset = lo->lo_sizelimit;
 +	return offset;
 +}
 +
- /*
-  * for a block special file file_inode(file)->i_size is zero
-  * so we compute the size by hand (just as in block_read/write above)
-@@ -533,7 +570,11 @@ static loff_t blkdev_llseek(struct file *file, loff_t offset, int whence)
- 	loff_t retval;
- 
- 	inode_lock(bd_inode);
--	retval = fixed_size_llseek(file, offset, whence, i_size_read(bd_inode));
-+	if (whence == SEEK_HOLE || whence == SEEK_DATA)
-+		retval = blkdev_llseek_hole_data(file, offset, whence);
-+	else
-+		retval = fixed_size_llseek(file, offset, whence,
-+					   i_size_read(bd_inode));
- 	inode_unlock(bd_inode);
- 	return retval;
+ static void loop_config_discard(struct loop_device *lo,
+ 		struct queue_limits *lim)
+ {
+@@ -1751,13 +1774,14 @@ static void lo_free_disk(struct gendisk *disk)
  }
+ 
+ static const struct block_device_operations lo_fops = {
+-	.owner =	THIS_MODULE,
+-	.release =	lo_release,
+-	.ioctl =	lo_ioctl,
++	.owner =		THIS_MODULE,
++	.release =		lo_release,
++	.ioctl =		lo_ioctl,
+ #ifdef CONFIG_COMPAT
+-	.compat_ioctl =	lo_compat_ioctl,
++	.compat_ioctl =		lo_compat_ioctl,
+ #endif
+-	.free_disk =	lo_free_disk,
++	.free_disk =		lo_free_disk,
++	.seek_hole_data =	lo_seek_hole_data,
+ };
+ 
+ /*
+@@ -2140,7 +2164,7 @@ static int loop_control_remove(int idx)
+ 		pr_warn_once("deleting an unspecified loop device is not supported.\n");
+ 		return -EINVAL;
+ 	}
+-		
++
+ 	/* Hide this loop device for serialization. */
+ 	ret = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (ret)
 -- 
 2.44.0
 
