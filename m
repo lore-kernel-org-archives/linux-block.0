@@ -1,48 +1,37 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2431311AC;
-	Thu, 28 Mar 2024 21:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C87E13B795;
+	Thu, 28 Mar 2024 22:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711661893; cv=none; b=ZGrvL65mH989FYhufw0hLCv1iyAVal8gqQqOWhQnrPywvNEyetcUuOWTI+L5N2Y/BtwHv41qcOtBFdPirOqVpUo2dYGI13jfUMZIi+INEzlFCdYq00EZsbDQdDZVIPaa/M7/6H+eSsa8zWNGhiVw04xr21uOrw+5j5Fv2LtxVa4=
+	t=1711663875; cv=none; b=gYDnPeRwWDAiw010+aaNRme+hUw9d48G4cccWYVNA0UN2lk8KNw/J606svMds958LXcCelqUTE0TID9y/T53FrllDTumrisQFY2YjRFl1iNUNK7nkdtDTFGxzHjNe6Vqdwbgj+q9kUQNyouB+1wUYuyvBXLZzuJFU3m+B+u4pQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711661893; c=relaxed/simple;
-	bh=jQx77FV08xvh7ws9/FrSTIde127vGI6Xw/+HIcCmXFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=EgKWVxCnTaZbyLlmtlRotWmP3s8wAm5YB7c2U516GApGUzTTiSaN/Mkb3isrk4u+9V+eG7HsZsiJlofSGM/JNw2b071+1r99PL0g1wRPIBTCTK9H2eA2rF/npXeetCGEoNE9PBOPsSvR+/RIk/G0kA2ro5T2I4kF9Psci79SWog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=qT4k6f3J; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1711663875; c=relaxed/simple;
+	bh=JVuXWZU7ypGWL4ciDE6dFgx2siJQMrXVakqC0WXbnd0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WjeDCmuy1zQEgYuBc0cmLt/E+KI2gpzycBQwmosnnTAi1GhqDTKRxyMBaBVgIdj5LgyPaMP4UK4C2itEHA0ipl6v8GxdaIBpg23DCtvsyP8WeEGWkGgoV7m+6ziOAZVXgdApHJGz+vp7swO6jKbWcA/5IzPtklv4RE9Ral8R39o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NbJm49eL; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="qT4k6f3J"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V5H2q5dwJz6Cnk8t;
-	Thu, 28 Mar 2024 21:38:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711661888; x=1714253889; bh=66AKkG3PE4cQTzggRWxgRNhO
-	M7zTlOgr921WiYgCRQ4=; b=qT4k6f3JyJQBxUXRjsL8Om0gTzhKGsfTk957Swks
-	qpxzTuUT94giBQhW8CqaEn0Vjbz1Y3cpmdRVqDzAWyi9IMZ/uY2MkZ0Fb3HC+WPr
-	inVs0AGA65ZoFlINUUv+oJBh7IAAjoOMIPIjlv4OykZeK6Uk3XdxMahObbP2RGVz
-	GW7NxcgQ/tbYFFoPhxUrXQ8+Y76khG0lVS8Qh4dlksmOKwL5L3nDqGzX6D01JjY2
-	cSknGsp2sbwYlu1ynId+ndtgKYfqpTtsUvGwKo1sEg+Q+HV7tfnwLH+2RJ+6qN+e
-	OiZVsud85jc7WJqDeMZmw3H0JBbRJ1O2DuDgdLxIXEwTJg==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id t-6wXCmN5Kaw; Thu, 28 Mar 2024 21:38:08 +0000 (UTC)
-Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V5H2k69fwz6Cnk8m;
-	Thu, 28 Mar 2024 21:38:06 +0000 (UTC)
-Message-ID: <38575b90-7cd1-48f9-8c86-a77ef372900d@acm.org>
-Date: Thu, 28 Mar 2024 14:38:06 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NbJm49eL"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=HnoWopqeEhgUSDrAxtnUhuDZR8QdjUiaKbpLIYgV22M=; b=NbJm49eLsaBJIDmaaGUPIwTP6s
+	RdCdHdp9gJrWgLOyWIaGiU2iEa3h0mDLeFNu8MpWBCcjIt+F1mBI8g082Y+IpFySLM/hEsNJi6SK1
+	JBk39TG18J9OCNVQporM5qOQ71kG0TDUjkZcnc4dAvsUfuM70hJvQAllMyhnggYK0MKVKGnTD8s/J
+	pwz0gob9RjN5DyrV1KCIE79TcNpQT0Fn18OWvlWWNJjye4FkmJFqE0E/qDklUsVta8jWE3bO374Mz
+	wFZ7SPWQCxzZ1K0xUYogPf2vhybumDglajK78Iq4x/BmSLLRdWq0eNniSqEvN8UThtFfomA7d21P3
+	PMZSsxhQ==;
+Received: from [50.53.2.121] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rpxxf-0000000Fs9X-3pVK;
+	Thu, 28 Mar 2024 22:11:04 +0000
+Message-ID: <cde3dc6e-ca77-445e-a4b7-fc21a934999a@infradead.org>
+Date: Thu, 28 Mar 2024 15:11:03 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,38 +39,48 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/30] block: Remember zone capacity when revalidating
- zones
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>,
- linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>
-References: <20240328004409.594888-1-dlemoal@kernel.org>
- <20240328004409.594888-8-dlemoal@kernel.org>
+Subject: Re: [PATCH v16 01/20] security: add ipe lsm
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240328004409.594888-8-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Jarkko Sakkinen <jarkko@kernel.org>, Fan Wu <wufan@linux.microsoft.com>,
+ corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+ tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com,
+ snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com
+Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+ linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1711657047-10526-1-git-send-email-wufan@linux.microsoft.com>
+ <1711657047-10526-2-git-send-email-wufan@linux.microsoft.com>
+ <D05ODONHFJ9O.3VG0HLFPA1OB0@kernel.org>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <D05ODONHFJ9O.3VG0HLFPA1OB0@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/27/24 5:43 PM, Damien Le Moal wrote:
-> +		/*
-> +		 * Remember the capacity of the first sequential zone and check
-> +		 * if it is constant for all zones.
-> +		 */
-> +		if (!args->zone_capacity)
-> +			args->zone_capacity = zone->capacity;
-> +		if (zone->capacity != args->zone_capacity) {
-> +			pr_warn("%s: Invalid variable zone capacity\n",
-> +				disk->disk_name);
-> +			return -ENODEV;
-> +		}
 
-SMR disks may have a smaller last zone. Does the above code handle such
-SMR disks correctly?
 
-Thanks,
+On 3/28/24 13:45, Jarkko Sakkinen wrote:
+>> +/**
+>> + * ipe_init - Entry point of IPE.
+>> + *
+>> + * This is called at LSM init, which happens occurs early during kernel
+>> + * start up. During this phase, IPE registers its hooks and loads the
+>> + * builtin boot policy.
+>> + * Return:
+>> + * * 0		- OK
+>> + * * -ENOMEM	- Out of memory
+> Just a suggestion:
+> 
+> * 0:		OK
+> * -ENOMEM:	Out of memory (OOM)
+> 
+> Rationale being more readable (less convoluted).
+> 
+> And also sort of symmetrical how parameters are formatted in kdoc.
 
-Bart.
+It needs the " * *" to make a formatted list in the generated output.
+Otherwise the use of '- or ':' as a separator doesn't matter AFAIK.
+
+-- 
+#Randy
