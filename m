@@ -1,187 +1,163 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6655443ABE
-	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 12:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711627397; cv=none; b=gNcXD6S76NrHychWjll43X0Hn/pSP5wfb36JE8twfNMdLJJGwRYsoQHY33jTsqcqaCsHoJ5+y6iNvj1qDrhX1xaTaT7cPW+DPtc2sP2Sj9aQ5YGtCBzBScUrRmcBhzE7fTJLMrebDLEeuv62V6M8pcYe0cr5F1igS00V1BS7u8A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711627397; c=relaxed/simple;
-	bh=njPfMt1yaE+k+q/O6YcP/r0RuDhf65Bw2LUvLU6CX/I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=nBUJtLfiXbgJLs2t0hTA+FGduH4SYGJspylAXSdSUrHFZfoiryI5fhmGe351l/SVlCDG7Tgxl3JS4VuG2ncCBm3H5cS6TqITK1Cmp0D+apDzL4Mvhu1iK/Gu8JyQGtNvt1SCfU8SRpaXMI2hsayQva4Vwpv5Mb91hckTYvGtZn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=YJIuEFJ1; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96B1405FF;
+	Thu, 28 Mar 2024 12:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711628473; cv=fail; b=KPYhpt6d3mkjRDKXMJNUfPiVL6Y5XkrXmhPUGcFVXiN7ktzPqGFy7C2g8yI7CgDsM427vrdTEdo+MdC/o3WmrTn7wQVV6CI9Cwz0lHAz/S2XmNfRSKoVOQ6Kg++ZyRKEXSmxr+XilZYtjB01FKEIq2C4xVdT6NFF99FbY6dk9ZM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711628473; c=relaxed/simple;
+	bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PQ0oIsCseEzm2I7RTXqcJpL3sURJzBMUqQB2l28LFz2vNg4/vshw2yF/yBD+HDY1ARIlplZZWN27WkFfQIgL2SQ0cKBoeVs2XlirAsmmQ7fii+UyVi63vD8eZCcnryBsfFK5eZb1yiP8XiXR5C8x2xCyXjOzX/zLxU+FZXqA6vA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=cZmC3IVO; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=t/XFWuMg; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YJIuEFJ1"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240328120311epoutp0322007c1cb37f8fbeac32ae534e0bf6ba~A7Ast9qZ_2189621896epoutp03A
-	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 12:03:11 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240328120311epoutp0322007c1cb37f8fbeac32ae534e0bf6ba~A7Ast9qZ_2189621896epoutp03A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1711627391;
-	bh=jeB9b7uMs5CCou5gNYnr4L+NZgPfGDPzOJrwNBiNxJ0=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=YJIuEFJ1hGnkzQNt2f0svZOhKjnI3+Wrx/UZ01i3muvq9ma7u6S1Nj11EdNsDCRUk
-	 Y3AnxmQPyyCrTqHZO5NrHMwcDRA6Xe3aM7D58Y/OHZjBcFgJFzsFKIbtm5xkqCIzdO
-	 EQeuSYz4m2rJb12q9e2n1C93HsvabyTgEQT9tILU=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20240328120310epcas5p3f239c228b9276a17b0a267b61c0e3732~A7AsYypi21200412004epcas5p3o;
-	Thu, 28 Mar 2024 12:03:10 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4V52HK0Mgxz4x9Px; Thu, 28 Mar
-	2024 12:03:09 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	8E.0A.09688.C7C55066; Thu, 28 Mar 2024 21:03:08 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240328120308epcas5p38f61bfb37c2e5fa2b600822b3470bc8c~A7AqUpvVp1063710637epcas5p3r;
-	Thu, 28 Mar 2024 12:03:08 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240328120308epsmtrp265e8c6a89415ee2cb7d92839b183ca70~A7AqT-D1O1690816908epsmtrp2B;
-	Thu, 28 Mar 2024 12:03:08 +0000 (GMT)
-X-AuditID: b6c32a4a-837fa700000025d8-9f-66055c7c3926
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	E2.9B.08390.C7C55066; Thu, 28 Mar 2024 21:03:08 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240328120307epsmtip125b510cd061ae5b88cdc668fdaa97307~A7ApElG7r0146001460epsmtip1b;
-	Thu, 28 Mar 2024 12:03:07 +0000 (GMT)
-Message-ID: <ef272148-9905-bcdf-89ee-9f6bd4a948a6@samsung.com>
-Date: Thu, 28 Mar 2024 17:33:06 +0530
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cZmC3IVO";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="t/XFWuMg"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1711628471; x=1743164471;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+  b=cZmC3IVOh7W3tXXLW7A/6NYJXTAxaBHrDkjAUa3aFs2V0MfrW9GyXGNB
+   GMxShPsRxuwFkd/JCJK2cLohBb584Bjy4WaKqGjYDeYS+AfEsUmSHd8ku
+   ypm+xckoj1hL6v2GO8su+B8zvWq5w6o97zmuPIoIlrIUGBvFX167jiI2e
+   TB9tFXPECArciNfuNP4VN1TTc8FDSq0u15jfsGQ2T+1yIGx/KI+vXadcG
+   y68MR9v5UecLHNCNcSYBEFfqnVEpCJKqDAV2byp+WMc6XqRTFU8lCzfKz
+   lFq5h+eXVwfYceqo8puwQUTl/7qPocK7Ehilq3BO6X+wyfELLMZd4I6/E
+   A==;
+X-CSE-ConnectionGUID: ebIO6gpCQraLvEkas3Q0kg==
+X-CSE-MsgGUID: Yu0sxhy9Qnu7/gTAbyEy6A==
+X-IronPort-AV: E=Sophos;i="6.07,161,1708358400"; 
+   d="scan'208";a="12690025"
+Received: from mail-co1nam11lp2169.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.169])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Mar 2024 20:21:08 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G4P5lNv6HWn+UiEeVpAw0L5X9lv2Tq+JYC5yQzLN5RPDiSo6QJ/NojT7+D86ZWuz9AOwJgDVpguKAF+zDAPJgQITr75aKUEKxv0JrJjMYSVROCkoGPD3ZBtixDbdTth6w9tsPBXPILeRExwaZRXP5dIJ+ZOGOWH3nwNNJ61Uuv5ClxuaF3U6P7LNUAauL4HBO2YQywUN/ZA+0Gi115PYtc1QywchomP8qoOyT9WhIT2/UqZRF3nfYmODYJWxco6Mhp7uLt1p2OaWrFcZ5rc80yixiV/uRoOFHzuJ6jC9lyBfofqg5sHij+L/TLiUcul1yDyK0oJ9qud6UjIrHwKqaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+ b=Imh5IIeb8Iu+QjSlKe4L2PkJQRcJp5lZUSGijM4bg/93ebyHh7F0JmxjACl1oybgLL/Oi0LIzkmYObp0gTATnglXt/7Ve5ADZv8vwd6Q82Z4xT7ejnlPeKkUVy3G2/ukxMjJSODQPS5t/eAHyyEQCcxXf1UrXCYwKQttiQ0L+TL0CTVIR8Nz0kNGmmXByqMR9k9d4VLVbgAk4CVkJvpD3/AKSVaftz1GRYnnhV9woKLlcyYctUvS6BnDPJ8gTD/+7BEDWr2e40v740Ygs/+MMFcUNUHjO1dpvTXgi2J7Ci9Iwx3FcVqa1VWlqaBP+MNvx5gp1EMYY6gsd5C0zXjNJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+ b=t/XFWuMgN0QsyVyW/WjU1Ka9r9CQ95gUfywNKmv7TSWrrIFvp/KvH2iFeGtpL0oAX5wGpmaXul5KI3YNJFMgvL7e8w6zohbZZnvqXndt3LCr5KOmQb6gdiISL6Lwwqcjfw4E01D1Ue1MDQbSsQ47OBwQKUONB6OR5GuwYS/yiwI=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by MN2PR04MB6813.namprd04.prod.outlook.com (2603:10b6:208:19f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Thu, 28 Mar
+ 2024 12:21:07 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::a814:67f1:24ab:508e]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::a814:67f1:24ab:508e%7]) with mapi id 15.20.7409.031; Thu, 28 Mar 2024
+ 12:21:07 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, Mike
+ Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Matthew
+ Sakai <msakai@redhat.com>, Chris Mason <clm@fb.com>, David Sterba
+	<dsterba@suse.com>, "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+	"cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
+Subject: Re: add a bio_list_merge_init helper
+Thread-Topic: add a bio_list_merge_init helper
+Thread-Index: AQHagOvSjpDiA5VFG0SahBsX4A1BvLFNEvgA
+Date: Thu, 28 Mar 2024 12:21:07 +0000
+Message-ID: <5ed8e2ad-1ed5-4988-a625-b0a67f800d9f@wdc.com>
+References: <20240328084147.2954434-1-hch@lst.de>
+In-Reply-To: <20240328084147.2954434-1-hch@lst.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|MN2PR04MB6813:EE_
+x-ms-office365-filtering-correlation-id: f5dc80f4-75c1-4867-f76f-08dc4f218b65
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ NdvP8M1WqvHzwhOjjNbTIC6aVK45u/VurONf0sFLx/rinxwY92RHbBEhfJPmHVq/t9vGjJTOQSgPxfKi+QpVTNoMU3kwCJ5eKFm92htU3BS6R+kyOpTQOodIOxQZG+Vh8j2pPV8nB2l0agEKazY8syh4OVGjOdK/kabqHOrbmXLEgHhW4UnEJOf4RY+QGf11+vIxz+/7/v6iO2dD4vLb4TsWzlS3X+8ya0CViQV6Aen6GapZPA34qZ3SdYqusC8uBMellLJjeji2GlWFBjOJ5zWcytJ0nnwYCDQi1laC34T9ReePhr4MN5N17xOBLUhROdAs1N/6sZKKCGYTdbAFaic4KGmRDVHWFNIwqz5m2cZG+RJBTasuxGOmPQbHqTx4ltjQsC/FaOO2VjTMF9Zbj8TfWyaOGA3UwfG77iYmpRC/auoRjsjpeLtYpOXO2Sp3T3h7JT3OWYWcnSd18YD+rCoGHpTa92zMEi/IS+Uv+KGK8jBzdrVXRlF6B+CUmJyP4bl5rfGdb5MIvpsB8fzeNBHDpCoTbFc2ri16jYpIXihLGcfI+jDb+Asfdket2n7Iu+NQgvB9eD0Ej63LigKvjmAjBt91mJqaTKGy/1PI+bSMoHyJAEUyE9LV7+dLbQCF979oYT8GbZ+6G8SmLf0IPKa1qnX40ExCFUgQO+pxfdKdutYrl7KV4h3DhIJ03G8U+kX4RlhSYkl8piJTe6anfTMDiyNOgUxudV0izZsOoSQ=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bHlzSGVjZEhwcGxnaVlJbDlLck9vLzFTZXlzcXhjV1pVV0lyT1lVZTVVdXFV?=
+ =?utf-8?B?MXV6SGU2NUtWT0Ewd1pqTy83ZnlwU29qSEc2MGZrNDZVamc0eGM3Q3EwajFp?=
+ =?utf-8?B?YzhpNUlkdS93UUhDVk4vY1lsaS9KUm5lWHV4Tk9FWjBDdWdGOHd1bXI3cmxK?=
+ =?utf-8?B?VGVHQW1zMFprNit5c3YxWXZnVHZzU3drQm5icm14YnNQWFBsY2Jvd2lITU40?=
+ =?utf-8?B?T3BKSFpnWmNWL3VNU3ZRU0U2ZGszRWkxQTFiekk2dHNNbFZBRTlGMVNPZmdO?=
+ =?utf-8?B?ZmJyZ3NoWmMzTzEySGdqOEF3WTJhV2E3V2daWTRFaUY2dGRhcXA5bE96N21R?=
+ =?utf-8?B?RFE1RWZvMXBHeSt3bFhzcE5GK1hyTERRTmZxRWFjQWJtQTBzVXdSOFlXVFRZ?=
+ =?utf-8?B?TlJRdStxZ3ZqdHJhN0d4MGlYSmh2U29pUHZpQUZSRDgrZTZGSG1DR2g2ZnR4?=
+ =?utf-8?B?a1FGQW9MQWxocjl3YVA3TEtiOHR3bEVFVXZxQWdqS09VK1dOOUovdzQxc1c5?=
+ =?utf-8?B?cVJoakR5V25lTHJpZ0o4bjJZM1hvQ2pwZURFejlFR00yOWNGRnB5aTR0cFVO?=
+ =?utf-8?B?em12N1RUOGNVYkJwWVRVRk1ja2plQ1ZkS2E1NmFXYlU3TkVOR2VxemVGY2dX?=
+ =?utf-8?B?Y1JlWmFEc21FdCtzMEQ1SDFuLzZuaFBFM1d6ZVVJVmxmSldjWDQ5RGZDMnV4?=
+ =?utf-8?B?Nld2VEduWk01ODk1L3pROFhsQXZyZW1JempmL2VHMG1JeGNtMkM2K0tCM0R3?=
+ =?utf-8?B?bjNTMkQvei9BYVZkNUJxWHVMMDFNVmU3ZEo2NThEWE9udTRNZEx6UHIzUHFr?=
+ =?utf-8?B?bHl6QXRiZlhYNkNOSWZXS3U4WjBjVmVtYm50ZElYcEZZdXZLM1RLaWdmUG5F?=
+ =?utf-8?B?azNtZWFIMTFjMksxVFRIYVhjU25Fd3dOamt4dkNRWWdTblMzaVpVdWlSMHhM?=
+ =?utf-8?B?Q3o4c0dhT01leWVIUDN6ZGh4eTFja3RDS0NLcEh3bTUvdmNJeEkxQ0ZNdjJ5?=
+ =?utf-8?B?NUZXSlRSWEZQdzl1YS95cGI5NHFsNnYvaXlnNmJlakw4UFdxbGNQNjFXSHhp?=
+ =?utf-8?B?UGF6NUJzWEZUZ0JnNVJ5YnJxU1hrQzgvUGYxUk94VERRbTlhaXVMVjl2a1ZG?=
+ =?utf-8?B?dS9kay82bDkrdEl0NlNlTVJRM1UyLytMam5vMUFaMkRicnhvckhOcHlOdHdB?=
+ =?utf-8?B?QldLcEhqN2tzeDVCMTdvWFpzeFBYWXNPZ05VcnFJa0VMd1l6TTQ3Q3JZN3FV?=
+ =?utf-8?B?OW1Zb2NOcHplM1hFZmNOUzZ4WjdnT0Z6cHpvRmpOc2FEWHlLV2l5RkF4MGhM?=
+ =?utf-8?B?cUh4ZWx4RTRaM1BwcTFmdG9CSjNFakZTSENMMWlkQkRFb0RwT2hidmROZ2NE?=
+ =?utf-8?B?aW9jRjRuVURmejNqYnZkWGd0dEp3Wlk1RlJqaHBUYkNMa1dEVkVEVitpekI3?=
+ =?utf-8?B?Tm5WSE1sUjh5RndYV3dYS0gzRjBWcy9aTGFVYzFDa241K2pnNmtWcWxjWVln?=
+ =?utf-8?B?QmNpYkYxcjV2QVZ2QTVjalVrNEZNeDBlT0RZVDREWFF4Q3VOMHJCR05Oemg2?=
+ =?utf-8?B?aHlWSDBHSEpIQmdvV0dkMjJwTHdScGtjdGxNYW9WY29tV0dPdVJrWnllZEg0?=
+ =?utf-8?B?Q3ZmUzBXN1dUOHhHL2NxdDVUSHA5Z0Voekw3ci8rc3pWRFFNVUdkbUk2MzN4?=
+ =?utf-8?B?OTcrNnpnaXFMcTdhKzQ3bVVDZ0JibzhlWkR6YndBOFRkSUlEN3IrQkdLOFBh?=
+ =?utf-8?B?d2dGUlZwNDJySUJzRGVIa2N4Rk9lNDlFWmpYUHJCNEFFazJ2Y2x6WUx3dmFs?=
+ =?utf-8?B?amdpLzFGS21Ob3RlbDgyU0plMFAzU2FvUUZxcWZLdFpoU1VoUmxKNzd1cUhG?=
+ =?utf-8?B?ZHRpK0NSV0phcWI4S2lpVTdrMDFGc1dlQVptY2kraDFyT2wyTFh3M3lFY09G?=
+ =?utf-8?B?Nk5DaU1pZmxVdEVsc3NsSFY4TzNsb1psTktMT2x6d0pIV3NyRFo4WkRBbjV2?=
+ =?utf-8?B?K1U0ZitVMUdDWXFLWUNLNUh4dTRlMGRoQ0p3Y01hcFE5SllISy9iNGgyUjdO?=
+ =?utf-8?B?MjFDd0w1bTJRMFFFZDk2d1JWSnROd0s5WXFuK1J1TjJyc2dqMForZlJ4NVR3?=
+ =?utf-8?B?bjlQRXBKeFRXT29BNmYwOEM1ekRRYW9YN0wvMC96dHVhcmdNUDJjd05NUk5D?=
+ =?utf-8?B?Q21UWUQ3NjUvNHdyMElMYzRBcVFqSXErMkQ3OGtzcmJjcmVyQ0RRZUtNTlpV?=
+ =?utf-8?B?KzNMNmNCeE53UUlLa25ncWJaR3BBPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A3D8253A0299694D9E976A6F298ADB5D@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [RFC PATCH 0/4] Read/Write with meta buffer
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, martin.petersen@oracle.com,
-	kbusch@kernel.org, hch@lst.de
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	anuj1072538@gmail.com
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <aa6530b9-6c85-44ef-b3d7-8017655725c5@kernel.dk>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNJsWRmVeSWpSXmKPExsWy7bCmum5NDGuawZZJ1hYfv/5msVh9t5/N
-	YuXqo0wW71rPsVhMOnSN0WLvLW2L5cf/MTmwe+ycdZfd4/LZUo9NqzrZPHbfbGDz+Pj0FovH
-	501yAWxR2TYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5
-	QJcoKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgpMCvSKE3OLS/PS9fJSS6wMDQyM
-	TIEKE7Iz3i67x1QwSaxi4lGdBsajQl2MnBwSAiYSK1++Yu9i5OIQEtjNKNHcdZkVwvnEKLFh
-	z2mozDdGiYVnvrDBtNz/cQEqsZdRYn3TBCYI5y2jROu2F2BVvAJ2EhOeNDCB2CwCqhLbb8xi
-	gYgLSpyc+QTMFhVIlvjZdQConoNDWMBC4tolR5Aws4C4xK0n88FaRQRiJb5tXMcOEQ+SePmm
-	BaycTUBT4sLkUpAwp4CtRM+U2UwQJfIS29/OYQY5R0Kgl0Pix8wOZpB6CQEXiXcLnSDuF5Z4
-	dXwLO4QtJfH53V6ov5IlLs08xwRhl0g83nMQyraXaD3VDzaGGWjt+l36EKv4JHp/P2GCmM4r
-	0dEGDVBFiXuTnrJC2OISD2csgbI9JBpewQLqAKPE4W13mScwKsxCCpNZSJ6fheSbWQibFzCy
-	rGKUTC0ozk1PLTYtMMpLLYfHdnJ+7iZGcCrV8trB+PDBB71DjEwcjIcYJTiYlUR4dx5lSRPi
-	TUmsrEotyo8vKs1JLT7EaAqMnInMUqLJ+cBknlcSb2hiaWBiZmZmYmlsZqgkzvu6dW6KkEB6
-	YklqdmpqQWoRTB8TB6dUA5OgZKff1oiL90SVrl6Zp1w4T52Tv/VKZ8t893+xt6bKxzybm7Jk
-	wvRLuu+ONz9/pH51ja4d87H+afbvDhdU7tI943xRZ8PM9mPhzvIPP3qcPvhja/WqmIyMgxI3
-	HNJ9rFtPlj9c6rj107LO03VLXp2WZ2awv6V1IMVl0XZ+j65ye4v+pIh3HhMa9dpj/ngH/1Wp
-	LYqdk7z4l+hB9WU8awsfzr2ilXfgf8K+AMVfE++d6JnAaPCth8t4Ecf2dTueFvbsy7X2+Wru
-	eMhq195jOT8tlmfJle9fIPxUcekZJsbk+xFMzaEuTiaH3xTJbCs5pT0paUnacfXaB3Fsu9Sr
-	VX8zODF4ODWwbQp2XcaxV0OJpTgj0VCLuag4EQBOZ7zXLgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOLMWRmVeSWpSXmKPExsWy7bCSnG5NDGuawc6tYhYfv/5msVh9t5/N
-	YuXqo0wW71rPsVhMOnSN0WLvLW2L5cf/MTmwe+ycdZfd4/LZUo9NqzrZPHbfbGDz+Pj0FovH
-	501yAWxRXDYpqTmZZalF+nYJXBlvl91jKpgkVjHxqE4D41GhLkZODgkBE4n7Py6wdzFycQgJ
-	7GaUaJh3gx0iIS7RfO0HlC0ssfLfc6ii14wSq29sYwJJ8ArYSUx40gBmswioSmy/MYsFIi4o
-	cXLmEzBbVCBZ4uWfiUDNHBzCAhYS1y45goSZgebfejKfCSQsIhArsbMjHyIcJDHrKcgUkFUH
-	GCWe921nAalhE9CUuDC5FKSGU8BWomfKbCaIejOJrq1djBC2vMT2t3OYJzAKzUJyxCwk22Yh
-	aZmFpGUBI8sqRsnUguLc9NxiwwKjvNRyveLE3OLSvHS95PzcTYzguNHS2sG4Z9UHvUOMTByM
-	hxglOJiVRHh3HmVJE+JNSaysSi3Kjy8qzUktPsQozcGiJM777XVvipBAemJJanZqakFqEUyW
-	iYNTqoHJYP62Do7ZQonHD1mIfDxd/6ZCm11w4mT9wPJDp+VL7j8wDLDI2/TDX7F/7+146+BX
-	izw5BM7EMis/2jkl0tbp5QOT+ydY5ut9kv90aNnP1YdYIl2XnFroUrScp2HOUtvzm9a6nvPm
-	XcI02WGRf/Rd++MrtNYuMFnzu7L/+E6NFf/XvFmewPjj4fGN6ae0fHp4jWekmXYs/e58emqU
-	U/ScBY91KytPPzyYEeC6/tKkp1+tVyma1/6qsZfOO6TYvCudZ5fD02bu358fls/a531x/69M
-	vg+T80zXHrnU1DnhSWi2RKTrvQs3lR08H/PoaV3NOHztpJuX4o9lB6R6Tr9cKto35WrhgsXb
-	VI4ucfbju6jEUpyRaKjFXFScCACPNpDdCgMAAA==
-X-CMS-MailID: 20240328120308epcas5p38f61bfb37c2e5fa2b600822b3470bc8c
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240322185729epcas5p350c5054b5b519a6aa9d1b35ba3709563
-References: <CGME20240322185729epcas5p350c5054b5b519a6aa9d1b35ba3709563@epcas5p3.samsung.com>
-	<20240322185023.131697-1-joshi.k@samsung.com>
-	<aa6530b9-6c85-44ef-b3d7-8017655725c5@kernel.dk>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	Onco7K0wNNwjeQOdA7eKrKIQiwnVpckn6tDbXsAWBgUjmaqsOz8dTk+1hJ6hDr0jMsD9u5P2QDXpjc2NKMVFUd8pC+trMldPbTvP0rdXud3z3GzjIpRAMCff+khvn1jwXjM3mWllnHFgAHGWFe+WHCM888OiovWQC9PDiI4BCT+sE36K47biYbxv/DNAIy1w/WyOaIa+FWqnwhB7xJ2GQZkL4Fu6p0CsvEjMdo46V8cBdQ6J68qsC9TWIZz1ENIfjevfF+JFje6MY5Zi8bg9exyZritd98xjOYuzngnDcUrg2sjbG1I13Zmsh7/xpkkhjJMkDfs/DqKOSJ7fIgzKXONJlUWgWHzOk9gyho5/f1r8iAOQ670EY6GPLZbBqn77RjN5K74/eKubDQnkQcjLrco8JhLKPFZu0ZtdNemQy/8gBRNMcZuTZZv+7ov4wvYSccBI2kgvXRmJJU0zDi+UmZKN/g0TxwhGPdhQ0r+oOc17/N7dzvpOMVJhmirQktos3P22G5Q+uV207fv9X39moZUga++t2t+dMf4wcnUbJNZlGerjOtvrvWUChKbUTr7nCNwY64khiSJafmO8120l7aJyo5Bb5SdN9AUhRC1asvF8liPTOl9thVqIxEGhl1Dn
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5dc80f4-75c1-4867-f76f-08dc4f218b65
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Mar 2024 12:21:07.0623
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zw5TTTTPguKN6+Cu9uY4GS0thtrh0a3CRcnEgNerjiEH9/DVJxcBaP8+jQoQRFujF+1Nm0A1GlqfLKb83AtnLh1Jqwbu1tAbF5K34AaV7Zw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6813
 
-On 3/28/2024 5:08 AM, Jens Axboe wrote:
-
-> This patchset should look cleaner if you rebase it on top of the current
-> for-6.10/io_uring branch, as it gets rid of the async nastiness. Since
-> that'll need doing anyway, could you repost a v2 where it's rebased on
-> top of that?
-
-Yes, next iteration will use that as the base.
-
-> Also in terms of the cover letter, would be good with a bit more of a
-> description of what this enables. It's a bit scant on detail on what
-> exactly this gives you.
-
-Will fix that.
-But currently the only thing it gives is - pass meta buffer to/from the 
-block-device.
-
-It keeps things simple, and fine for PI type 0 (normal unprotected IO).
-For other PI types, exposing few knobs may help. Using "sqe->rw_flags" 
-if there is no other way.
-
->> taskset -c 2,5 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 /dev/nvme0n1 /dev/nvme1n1
->> submitter=1, tid=2453, file=/dev/nvme1n1, node=-1
->> submitter=0, tid=2452, file=/dev/nvme0n1, node=-1
->> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
->> Engine=io_uring, sq_ring=128, cq_ring=128
->> IOPS=10.02M, BW=4.89GiB/s, IOS/call=31/31
->> IOPS=10.04M, BW=4.90GiB/s, IOS/call=31/31
->>
->> With this:
->> taskset -c 2,5 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 /dev/nvme0n1 /dev/nvme1n1
->> submitter=1, tid=2453, file=/dev/nvme1n1, node=-1
->> submitter=0, tid=2452, file=/dev/nvme0n1, node=-1
->> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
->> Engine=io_uring, sq_ring=128, cq_ring=128
->> IOPS=10.02M, BW=4.89GiB/s, IOS/call=31/31
->> IOPS=10.04M, BW=4.90GiB/s, IOS/call=31/31
-> 
-> Not that I don't believe you, but that looks like you pasted the same
-> stuff in there twice? It's the exact same perf and pids.
-
-Indeed :-(
-Made a goof-up while pasting stuff [1] to the cover letter.
-
-[1]
-Before the patch:
-# taskset -c 2,5 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 
-/dev/nvme0n1 /dev/nvme1n1
-submitter=1, tid=2453, file=/dev/nvme1n1, node=-1
-submitter=0, tid=2452, file=/dev/nvme0n1, node=-1
-polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-Engine=io_uring, sq_ring=128, cq_ring=128
-IOPS=10.02M, BW=4.89GiB/s, IOS/call=31/31
-IOPS=10.04M, BW=4.90GiB/s, IOS/call=31/31
-IOPS=10.04M, BW=4.90GiB/s, IOS/call=31/31
-Exiting on timeout
-Maximum IOPS=10.04M
-
-After the patch:
-# taskset -c 2,5 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 
-/dev/nvme0n1 /dev/nvme1n1
-submitter=1, tid=2412, file=/dev/nvme1n1, node=-1
-submitter=0, tid=2411, file=/dev/nvme0n1, node=-1
-polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-Engine=io_uring, sq_ring=128, cq_ring=128
-IOPS=10.02M, BW=4.89GiB/s, IOS/call=31/31
-IOPS=10.03M, BW=4.90GiB/s, IOS/call=31/31
-IOPS=10.04M, BW=4.90GiB/s, IOS/call=31/31
-Exiting on timeout
-Maximum IOPS=10.04M
+TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
+dW1zaGlybkB3ZGMuY29tPg0K
