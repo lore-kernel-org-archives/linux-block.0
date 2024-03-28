@@ -1,56 +1,76 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3EC22EED
-	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 07:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A0951C3F;
+	Thu, 28 Mar 2024 08:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711610158; cv=none; b=lm88MjrxDuH0VM4rdKLDbjp8R/RgqD8GWHW9i+HH58JEiOAUfRu2nT3INkZEU98kffV3NjHZlj061wc7el7jUhP0hu3KeGTm1QEHEoYWEs40HA95IFtWayFWKNh+S1Qyr6zIeTAaJdCqDBh73H1SElQJE3dDNfvvGMTRz/grOLw=
+	t=1711615316; cv=none; b=Hag8G+l+Te1kw7ls4JRg/gDvESbq4OE6zZxkF4EDYQGKFLBjv+m8ZFxMGw2yOXN6hjZZrC3XFFPKq84JMBeHAfgolBL+p0llPQAPl17MBx5Ol2mRjmIZqB0LXDUeHZNXXxS20lEei0JssyhvwycaKRUA7PXfb3ASu2oAN4tVTlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711610158; c=relaxed/simple;
-	bh=yKhldeN3EJtKzhgZNtoLqqrqn5JXVC90ecM1aDun/Xc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VL/VaRbDZbvkASxPnswOo4vFUWD02MoQ2QiVmwXM3hpxOyMqLwJg3InoiuS9opmQN1bPQAoeUUEl2dAUzyZ25kaxmymGtVAvqHsz1Go1pWInTrAfxqemperBjvx7W/5f+8RaT+Er3AQ2w9n6PNOhSDLPjzoVNdM3j+ua1XlFqCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+	s=arc-20240116; t=1711615316; c=relaxed/simple;
+	bh=bQ6sIDaWMZnS1ZxvvWFcBbL5BnIX1t941zeHWT/pefY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SzVLSDQFYcmRmfB1P0QReiDAbCqwwmaMSunKNJ/Lm7igJfbEuPxweCeN1ifBhfnqxo8QbSKqglBNuqRy9N3Fq4k2RaDPKufWQhRFHA6/UuV2OdssnMDJ8rkSMh/Dh1bYYD+yq62P1KdzvqTNTrn1QrO54fnPjcZ0w6AztOH108g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FNO/h73+; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 65B7768B05; Thu, 28 Mar 2024 08:15:52 +0100 (CET)
-Date: Thu, 28 Mar 2024 08:15:52 +0100
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FNO/h73+"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=uqofCw0wgdNvDhJdTyh0peuy864HLYBQRj9COQ6fL8I=; b=FNO/h73+2XhZZpmv5mEMkXsUwE
+	dgf6fdSz3xofIvGEfsT1qOxGsW3DNCh4PJqtKLM60WAJO64V0mIoG0XhrfzQtsGpoCz4PrMpS0ikD
+	jg7LWbK3kM0MaYIEl2uaNYQw3I+YPFHbFLSFnlevQVZLG9rpYDE9gozFOwGZffARFB0+dq0kQeSq9
+	9peS9FYveEKjHNCkAW0BrMNQ8jHd7ojP52hzRVGOCXWUVv6ZVrV0Idxs+O6GUHxsXKvhQDgevHqMN
+	Kj6gCkPoN3o01PHVol2uprTvub0ZB3DPonn/ZQgnDaaNid6lRBvH3HS+9fsAoq9CptQriunJMDHKw
+	Eh69Hjrg==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rplKY-0000000D7YK-3FKD;
+	Thu, 28 Mar 2024 08:41:51 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	axboe@fb.com, Gregory Joyce <gjoyce@ibm.com>
-Subject: Re: [Bug Report] nvme-cli commands fails to open head disk node
- and print error
-Message-ID: <20240328071552.GA18319@lst.de>
-References: <c0750d96-6bae-46b5-a1cc-2ff9d36eccb3@linux.ibm.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Matthew Sakai <msakai@redhat.com>,
+	Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	dm-devel@lists.linux.dev,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org
+Subject: add a bio_list_merge_init helper
+Date: Thu, 28 Mar 2024 09:41:43 +0100
+Message-Id: <20240328084147.2954434-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0750d96-6bae-46b5-a1cc-2ff9d36eccb3@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Mar 28, 2024 at 12:00:07PM +0530, Nilay Shroff wrote:
-> One of namespaces has zero disk capacity:
-> 
-> # nvme id-ns /dev/nvme0 -n 0x3
-> NVME Identify Namespace 3:
-> nsze    : 0
-> ncap    : 0
-> nuse    : 0
-> nsfeat  : 0x14
-> nlbaf   : 4
-> flbas   : 0
-> <snip>
+Hi Jens,
 
-How can you have a namespace with a zero capacity?  NCAP is used
-as the check for legacy pre-ns scan controllers to check that
-the namespace exists.
+the bio_list API is missing a helper that reinitializes the list
+spliced onto another one.  Add one to simplify the code similar
+to what the normal list.h can do.
 
+Diffstat:
+ block/blk-cgroup.c            |    3 +--
+ drivers/md/dm-bio-prison-v2.c |    3 +--
+ drivers/md/dm-cache-target.c  |   12 ++++--------
+ drivers/md/dm-clone-target.c  |   14 +++++---------
+ drivers/md/dm-era-target.c    |    3 +--
+ drivers/md/dm-mpath.c         |    3 +--
+ drivers/md/dm-thin.c          |   12 +++---------
+ drivers/md/dm-vdo/data-vio.c  |    3 +--
+ drivers/md/dm-vdo/flush.c     |    3 +--
+ fs/btrfs/raid56.c             |    3 +--
+ include/linux/bio.h           |    7 +++++++
+ 11 files changed, 26 insertions(+), 40 deletions(-)
