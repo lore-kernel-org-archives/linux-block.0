@@ -1,129 +1,152 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECDE12D1FC
-	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 14:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F20982D66
+	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 15:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711637642; cv=none; b=EFGTD7+AGdlxPFXQy4l9BC/mh/R7sL2bqkjsyI7SFXnOVPDpDPBxI2cEid4fu55rERUeuUWB8isbvUt484oSmdDOXeB0lU30kzRk4VOe7R3IOIi6Eg1YI6OU+B5J+EgxDCDHW7IbIG+KBsjipH0v/+KidQ4BuQcUe3nuHGmvmvg=
+	t=1711640362; cv=none; b=BNPeFkQZ1Oaj6rrgkPgF4cHjy/pGDav2PYS/8iDZuqhw0VxFk8L4bwISA49FqzI+yeiwfjo3hCaIDY4kxl/4kJml1iSXCty1wIL7oPuec2TQfnNT73fOBkzYtxBJ4stMEBqjDnIbd1XxTaG0JShOhJMn1wOPLXrPY/3GaRBXUec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711637642; c=relaxed/simple;
-	bh=iZIfvRAXPiN1hUOqhcrIgulJC/h0qg4G0zbfy7UTFog=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y/FSdLCgKPZ9Sav1vJ2EkDanabvRxI8JVXLOWDTXNOYVIIVLRDwxBpzwrZYR0R4CMOtjuMnEeu9deQ++lKH1qmBnFoBHUIXcsXZYKBzZ29imsmmf4wuEJQjX714vsBGfN3YhOEWetcB6ndj2d2UIEExUIs0kUpZWfsgBcIaQKEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=gafSkfD4; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+	s=arc-20240116; t=1711640362; c=relaxed/simple;
+	bh=G1iRW2zHIY2/EiULrJ1nqfVUKDfTimjQj7b8q3dHoFc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rIDmEyNGI82Y+27KVdKTKAGTsHDr76NqBxPJggvlYBfMTX+F+VzS3H4RNmNaAfJOy/Zt3wtFfrUa7ZjoT9r3J8APpP7Y9jruUXR5OS63VFnjM7yxJio1o9AMmB/aM/XHPRbWtUW/XoI+uSNCN/a+sI4LSHYqxJgVeumNrq3j+6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yiXFFCxU; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="gafSkfD4"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-696719f8dfcso5340846d6.0
-        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 07:53:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yiXFFCxU"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6e782e955adso1042466b3a.3
+        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 08:39:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1711637638; x=1712242438; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ch1rSN60qRNe5jZReHI5Y78NslDtRUbpHN7Kv6Yk4Rs=;
-        b=gafSkfD4I9UUsl7v479VXMwpQfzA11f7ivm4sjOBEbRWuFRyiSmT1MZbdowifcrVd6
-         kFEXvPwaA9xgqLNj18mmuAo5rTyLYjRmGgj30qY9c5m0+gUm+KCbnGM+FqGZFQGcZIjN
-         0SJKUFYFxNUFLVfAW+tJnv7KFHDXI5d5kWdeY=
+        d=linaro.org; s=google; t=1711640358; x=1712245158; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mPjQD/vT8EW8FIsS5EhEUvjw7Yq2DPw74odbleQjQC0=;
+        b=yiXFFCxUidOur1Yje4vLUgh6HPAPLTa0A8Jr+L02ErZCnLUGyA5cbWRfLbW2anYSXf
+         OBw4ySIQT0uhUbGcSG01jSnXmA99UGDz+ieVFtksloTDysGebITCGl5U79aib5tRot4U
+         R4S1ExbeBqVsmWInB4bb8zRKX9QyP7Ax6Eh5Ma6rjz8KpZ8v4vKS3+LuOQnifxodUaJY
+         zzOk4VHwBPO7tnFwFYmLG1MzB7aHaa3xKXAwElEJjPQS4p0yDYFN/Ey+1PpWehd8HZdj
+         vYgMf7EihG/MeLThCAKSbALwA7sdiXDqthcdvgmkCW/VSJ7MQdHCJb7IT9nDNTdo6+e8
+         nNWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711637638; x=1712242438;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ch1rSN60qRNe5jZReHI5Y78NslDtRUbpHN7Kv6Yk4Rs=;
-        b=utFJUdk4tF1vDD8BE8aLB6uTkgLEAkmRCRhdafqveSEexfOkZnNTqXpYItWI+9/Cx9
-         lE2N3w8d5/NWx88++XLJJ3byfK6nRfHRnOiLJwO7tFdHbnz85XVm63g9sgDg+Q6cFrfZ
-         55Pr6KbhHv3Baz+pyWlvtOJrMVBcSDYQrq0c1gHw5GJ3AePDA8AckLuEoTEIfOmPnuHI
-         uZfdpjBC7jO07XbsH5JtsltwOn+isu0j1nqdVAbUWkQbIWSkOHVbkjLJ7B/VtjIQBaaE
-         MmnQm/6SEnvkhvQk6S9F6PSIndmvDdbyzeJ87nCJr+zTs8rCUjDGZi7toQugFXELTI8F
-         iwgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVg+//MM/VQgavzn5bdFVmGdUGZBLEGKWpp48AqgsPEuwfEjuY6vqfTG00MHKl3ZWxDbBzT7Kl1bbtL0FGmqx0RrMBI10JtevGKDbs=
-X-Gm-Message-State: AOJu0YyzO7vDlZYduiVXQSVkX3riXJgCUGuX4mx2s/vKWG4o98qMv/l2
-	bwpWf6FC+nGOZFhSMctrkARe0HqULpbaINqkn1EVx9IO5DKBQH4FTDoro6ox4A==
-X-Google-Smtp-Source: AGHT+IEnRGCY/sQi9y+ccYFEbyJVObyHWpdhYti3ZYxnNsR7GFx/Tq+iuzOTlBR8697MpFQbDAmQmg==
-X-Received: by 2002:ad4:5507:0:b0:696:990b:dfeb with SMTP id pz7-20020ad45507000000b00696990bdfebmr2685430qvb.16.1711637638145;
-        Thu, 28 Mar 2024 07:53:58 -0700 (PDT)
-Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.googlemail.com with ESMTPSA id jf11-20020a0562142a4b00b006987272f5cbsm399690qvb.71.2024.03.28.07.53.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Mar 2024 07:53:57 -0700 (PDT)
-Message-ID: <b8e848fe-96d8-4f75-a2e9-2ed5c11a2fd7@ieee.org>
-Date: Thu, 28 Mar 2024 09:53:55 -0500
+        d=1e100.net; s=20230601; t=1711640358; x=1712245158;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mPjQD/vT8EW8FIsS5EhEUvjw7Yq2DPw74odbleQjQC0=;
+        b=P+yPoJ98osk5QrASSmH2lrIU5bl06FVzqhHEQWJxOMmESxxu1iXHobpFGb8K0Hsfgk
+         UA3y/2zlwtj05bZWGZMCyTl7nPyFx/iBAQd0VnbQzc6Y3IVl41Bc/FxzPqQg4UUCwUrr
+         +PnaxAI+Xdq4XE8GRK8DyYp+OBCgpJgwgUf8s/5bom5wiBjvzvl9KfKpf+AZ83djTe2V
+         if+/8vXoSumQpmz/8NgnrDJitW92kZjGIYMPy2UaKaG4ZOWElrd7exwWBmeD6oHjuF3H
+         6u3e/JqXRQ/DYduSo42tLvA5hWrD4zR1jn6PM2CKwytCLmfSgrYewnzsAyW52Hd2915Y
+         Ohyw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvxndtxi4q1B+ZgjcRzi6XuWH1KMiqDb8hevjKiIkMxOpR0SVN1h/BZNxF0J/J+9Y4Px53uN39lCQ91HyBtLQ0o6NetsQdSLUskQ0=
+X-Gm-Message-State: AOJu0YyOSyrAQcNo+u3OVVW/l6ZMLMFvp+yy8UnXj4ef/Y0+aQmfsSmC
+	7Id0F/zcd43QSqgGhl5x04L3EELCYlEnGpJtqcP+rxrf7HBbinDBslsg0KyKNOE=
+X-Google-Smtp-Source: AGHT+IGhUQYINGDQ7hWfiGCoXweY10vLCz/e/x+HjJ8dVvYs43ivIcKXZCgoqnZGIv+19J3DIwIpug==
+X-Received: by 2002:a05:6a00:a12:b0:6ea:92a7:fb82 with SMTP id p18-20020a056a000a1200b006ea92a7fb82mr3800870pfh.27.1711640357806;
+        Thu, 28 Mar 2024 08:39:17 -0700 (PDT)
+Received: from p14s ([2604:3d09:148c:c800:ff63:c57b:4625:b68c])
+        by smtp.gmail.com with ESMTPSA id e2-20020aa798c2000000b006ea923678a6sm1505830pfm.137.2024.03.28.08.39.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 08:39:17 -0700 (PDT)
+Date: Thu, 28 Mar 2024 09:39:10 -0600
+From: Mathieu Poirier <mathieu.poirier@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Viresh Kumar <vireshk@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	David Airlie <airlied@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 19/22] rpmsg: virtio: drop owner assignment
+Message-ID: <ZgWPHntosUk+5qac@p14s>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-19-0feffab77d99@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/9] rbd: avoid out-of-range warning
-Content-Language: en-US
-To: Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org,
- Ilya Dryomov <idryomov@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Nathan Chancellor <nathan@kernel.org>, Alex Elder <elder@inktank.com>,
- Josh Durgin <josh.durgin@inktank.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Hannes Reinecke <hare@suse.de>, Christian Brauner <brauner@kernel.org>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- "Ricardo B. Marliere" <ricardo@marliere.net>,
- Jinjie Ruan <ruanjinjie@huawei.com>, Alex Elder <elder@linaro.org>,
- ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, llvm@lists.linux.dev
-References: <20240328143051.1069575-1-arnd@kernel.org>
- <20240328143051.1069575-4-arnd@kernel.org>
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20240328143051.1069575-4-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327-module-owner-virtio-v1-19-0feffab77d99@linaro.org>
 
-On 3/28/24 9:30 AM, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Mar 27, 2024 at 01:41:12PM +0100, Krzysztof Kozlowski wrote:
+> virtio core already sets the .owner, so driver does not need to.
 > 
-> clang-14 points out that the range check is always true on 64-bit
-> architectures since a u32 is not greater than the allowed size:
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 > 
-> drivers/block/rbd.c:6079:17: error: result of comparison of constant 2305843009213693948 with expression of type 'u32' (aka 'unsigned int') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
-w
->              ~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> This is harmless, so just change the type of the temporary to size_t
-> to shut up that warning.
-
-This fixes the warning, but then the now size_t value is passed
-to ceph_decode_32_safe(), which implies a different type conversion.
-That too is not harmful, but...
-
-Could we just cast the value in the comparison instead?
-
-   if ((size_t)snap_count > (SIZE_MAX - sizeof (struct ceph_snap_context))
-
-You could drop the space between sizeof and ( while
-you're at it (I always used the space back then).
-
-					-Alex
-
-> 
-> Fixes: bb23e37acb2a ("rbd: refactor rbd_header_from_disk()")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->   drivers/block/rbd.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index 26ff5cd2bf0a..cb25ee513ada 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -6062,7 +6062,7 @@ static int rbd_dev_v2_snap_context(struct rbd_device *rbd_dev,
->   	void *p;
->   	void *end;
->   	u64 seq;
-> -	u32 snap_count;
-> +	size_t snap_count;
->   	struct ceph_snap_context *snapc;
->   	u32 i;
->   
+> Depends on the first patch.
+> ---
+>  drivers/rpmsg/virtio_rpmsg_bus.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
+> index 1062939c3264..e9e8c1f7829f 100644
+> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
+> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
+> @@ -1053,7 +1053,6 @@ static struct virtio_driver virtio_ipc_driver = {
+>  	.feature_table	= features,
+>  	.feature_table_size = ARRAY_SIZE(features),
+>  	.driver.name	= KBUILD_MODNAME,
+> -	.driver.owner	= THIS_MODULE,
+>  	.id_table	= id_table,
+>  	.probe		= rpmsg_probe,
+>  	.remove		= rpmsg_remove,
 
+Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+
+> 
+> -- 
+> 2.34.1
+> 
