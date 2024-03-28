@@ -1,122 +1,84 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1A4381B8
-	for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 08:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBE457895;
+	Thu, 28 Mar 2024 09:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711615504; cv=none; b=GobG7+s8NMSJKMvsUfEEHdq++cGEUaDsIQAde1T88wAAqjPzQcoyPlo/rZH/RymDU7aQec8nZNJTTIb+iSo+0YnwsMXfFqYvb9aheOAnjuSP9OeYhKJrQnpAkDzMtKkTbweBO1Ydl+USDQy1wnSUeLT0ZZNxWCRZ2zb49QCEeTM=
+	t=1711616452; cv=none; b=VNTYiE1x01GSFBeXLoFvP4UyL42y+QjuV96aT4P5pdF1SKmAMUXjnDjIUcRIcSuzNs9tkJKuf6F84SNxVNwXpJ2MjwhgRVlGyOOY0CmETsvkhp+RoN3xT73V7VeozYEG8qFvmZq8uyQOhHqOCOLjEbwgHXMRBdAQHI66l9d/cwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711615504; c=relaxed/simple;
-	bh=QKx4lvGTWdM9+DUt6HhjW8b1FOxsYTLDmhNmQWsa3FA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cgVZ9sGaFQ8OTSmvC66DW77U3EfZmUK5QDQtI1Vdq/TpZxPl3a0DqXkSY7qksC0x0xcp1GBR8v8xGr/vFHLeBmHCWU42PLek0cXo5Vp+p7IR5CJh0XDRGy7CzZ3pDVDKnyk/AIu/QOGXK9o534LyWgqGPuoF6LKw1eT2sTeX0jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sDkWEKgP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=W22wfyJw; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sDkWEKgP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=W22wfyJw; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1711616452; c=relaxed/simple;
+	bh=jwTb8m5Oxe0QJQMbCTgIs+0b0zIc3iCLsTfVp5oVSUU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r49e4w+RmgdamlumwQUgXm8XWHU1xC4neAGKYLaWSBwnnAJOwhR1YEpKtzt8uPvshDKAxhT8wEoRb0AA2y64hJOf5XgpKcNBlo63ZwjWeGj3bobdtXvuP6zzeINNa63RDnQJrublTDL0K1X5Qz79SUTnP9Sj3AuICFrNtxaLPkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWsMcYla; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sDkWEKgP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="W22wfyJw";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sDkWEKgP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="W22wfyJw"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D36C922C35;
-	Thu, 28 Mar 2024 08:45:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711615500; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=McjNzVbWLVcLMxAv9J45iM+3v24Kb1Qbrj8kZmKwJbU=;
-	b=sDkWEKgPoWPM6iPzsp6NxY7riDSaDf7gKl7PiUgFWKY0Ot73XKYsgXZEfWSbqpJbH+ZLjk
-	6UWSqA9iMynSSZSJ0SWtbCVzMiDnZ3e579ywcNeivgJx2jgk9cbe2cydKInX2GlutAT1HZ
-	LQtZ7ITSXOjDvRhMzvk/UDH/z0GhPz4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711615500;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=McjNzVbWLVcLMxAv9J45iM+3v24Kb1Qbrj8kZmKwJbU=;
-	b=W22wfyJwT/Fgk21CCM5gvBoGM7ichP3k53BVwxb5icZByBSNySyjih53s9CYiHQMVeK7ud
-	kdeRLkpaCwWyK9Cg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711615500; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=McjNzVbWLVcLMxAv9J45iM+3v24Kb1Qbrj8kZmKwJbU=;
-	b=sDkWEKgPoWPM6iPzsp6NxY7riDSaDf7gKl7PiUgFWKY0Ot73XKYsgXZEfWSbqpJbH+ZLjk
-	6UWSqA9iMynSSZSJ0SWtbCVzMiDnZ3e579ywcNeivgJx2jgk9cbe2cydKInX2GlutAT1HZ
-	LQtZ7ITSXOjDvRhMzvk/UDH/z0GhPz4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711615500;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=McjNzVbWLVcLMxAv9J45iM+3v24Kb1Qbrj8kZmKwJbU=;
-	b=W22wfyJwT/Fgk21CCM5gvBoGM7ichP3k53BVwxb5icZByBSNySyjih53s9CYiHQMVeK7ud
-	kdeRLkpaCwWyK9Cg==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id BEA1713AB3;
-	Thu, 28 Mar 2024 08:45:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id tJ8SLQwuBWbpYAAAn2gu4w
-	(envelope-from <dwagner@suse.de>); Thu, 28 Mar 2024 08:45:00 +0000
-Date: Thu, 28 Mar 2024 09:45:00 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, 
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, axboe@fb.com, 
-	Gregory Joyce <gjoyce@ibm.com>
-Subject: Re: [Bug Report] nvme-cli commands fails to open head disk node and
- print error
-Message-ID: <j37ytzci46pqr4n7juugxyykd3w6jlwegwhfduh6jlp3lgmud4@xhlvuquadge4>
-References: <c0750d96-6bae-46b5-a1cc-2ff9d36eccb3@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWsMcYla"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35ADFC433C7;
+	Thu, 28 Mar 2024 09:00:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711616452;
+	bh=jwTb8m5Oxe0QJQMbCTgIs+0b0zIc3iCLsTfVp5oVSUU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZWsMcYlayNfOsP/+4zGuyJXY4ZKA4nmAZuH6gcY84qt21yrqh3yAYO3R2NBgl94QU
+	 2a62Su8yLQ+ifGGfc9QZyGO9cKnf//lzgt8go0DJedTuCc+/gwKE+0DMUv6F9j9TK0
+	 U74senp5eC7oqgoeEt+kE72HjBXnpKmKU2nPYC8++olZ0q4Ld1e+J8YvKlu/732vgo
+	 kf50L1XGCz7oxm4h9KBi+OqNs4MN1YEkIgC4SBj6m8d1nLC5U6aPF6EcZXV4K7+IRS
+	 Bk2UzH9C2Ixe+NIvwpJAISo/0OqJHv+rQpn27xzKuW+Uub43pG2smTpPw0RGvpBHye
+	 GkMzf76zIHjrA==
+Message-ID: <cee45f5f-8004-4b3f-b347-d297be761bd6@kernel.org>
+Date: Thu, 28 Mar 2024 18:00:48 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0750d96-6bae-46b5-a1cc-2ff9d36eccb3@linux.ibm.com>
-X-Spam-Score: -2.47
-X-Spamd-Result: default: False [-2.47 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-1.67)[92.93%]
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: add a bio_list_merge_init helper
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Matthew Sakai <msakai@redhat.com>, Chris Mason <clm@fb.com>,
+ David Sterba <dsterba@suse.com>, dm-devel@lists.linux.dev,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-btrfs@vger.kernel.org
+References: <20240328084147.2954434-1-hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20240328084147.2954434-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 28, 2024 at 12:00:07PM +0530, Nilay Shroff wrote:
-> From the above output it's evident that nvme-cli attempts to open the disk node /dev/nvme0n3
-> however that entry doesn't exist. Apparently, on 6.9-rc1 kernel though head disk node /dev/nvme0n3
-> doesn't exit, the relevant entries /sys/block/nvme0c0n3 and /sys/block/nvme0n3 are present. 
+On 3/28/24 17:41, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> the bio_list API is missing a helper that reinitializes the list
+> spliced onto another one.  Add one to simplify the code similar
+> to what the normal list.h can do.
 
-I assume you are using not latest version of nvme-cli/libnvme. The
-latest version does not try to open any block devices when scanning the
-sysfs topology.
+For the series:
 
-What does `nvme version` say?
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+> 
+> Diffstat:
+>  block/blk-cgroup.c            |    3 +--
+>  drivers/md/dm-bio-prison-v2.c |    3 +--
+>  drivers/md/dm-cache-target.c  |   12 ++++--------
+>  drivers/md/dm-clone-target.c  |   14 +++++---------
+>  drivers/md/dm-era-target.c    |    3 +--
+>  drivers/md/dm-mpath.c         |    3 +--
+>  drivers/md/dm-thin.c          |   12 +++---------
+>  drivers/md/dm-vdo/data-vio.c  |    3 +--
+>  drivers/md/dm-vdo/flush.c     |    3 +--
+>  fs/btrfs/raid56.c             |    3 +--
+>  include/linux/bio.h           |    7 +++++++
+>  11 files changed, 26 insertions(+), 40 deletions(-)
+> 
+
+-- 
+Damien Le Moal
+Western Digital Research
+
