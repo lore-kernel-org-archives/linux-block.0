@@ -1,28 +1,28 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E6413A3E5;
-	Thu, 28 Mar 2024 20:17:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F2C13B5B6;
+	Thu, 28 Mar 2024 20:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711657058; cv=none; b=KRdTTL4PYOllVjOZpENRqe8esENtpDGhfGxr6NM0KZtFLXX0L4676PcCpc+WRNGilMg1q+/UVbYloScj7uCTHLCsM81rd6MDlh7qHgFRIgia8/i3mDFx1VhrB/WFI/01pjpDTCyON+GvtdYnesnjEJpvJc9rAV0lXS3HjkxbZ5c=
+	t=1711657059; cv=none; b=u8WkMh2YTKIFDskXcM10v8FkGg9S4Lh14NMk+1onoB3dkVdjGjNg7wvA0zOMzNP4iYeLOTcFIhQLf2u+wSyy8Bj7r3zot1WGjxWeovtF+haL02kHX6vAXSeaH8QPFrL4qU0eqpA1nZx892rKljaRvM8Ngq5M7s1LDqpL0S/T4lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711657058; c=relaxed/simple;
-	bh=ERtVd4c+JTIOe6n+GNIMs+hsdgt4u+Qnlx/zLKgYdg4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=lWG0vSBU/sUDDbU7lOzrSYHz5HWY/F+dt2vU+S/OR9FEn0uw/vyo4a5aFRvcs71I503xoflmprCcA++H9KDc3wfB9GSm7vcfK5PqClcdRUgp6M5Q/VJPyLMrT7SF4EpcwZlUTjZ76PIjnuztXR64AEhvJ3dQXwBreOfskwGeC4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=RJFz0xO3; arc=none smtp.client-ip=13.77.154.182
+	s=arc-20240116; t=1711657059; c=relaxed/simple;
+	bh=ARiRxxuVyr+vbKM3ydOg12oQ0YEQPRPKAj0P9h0/QIA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=gbYObR5LJPGWxWeiIAsbT69DfqMzbVviIfhAyF4N3J4JsA5Pe1bYhX8nG4jTvsgwx2Wa315jeWxVCO2YrvXck1Onq0TILWncUbFtvasK6YrhXeP5NAz4q8jURjwUe1nmSqI5wYYmAeXL7CGswiPNyWwP62LbLwCvgosvd+91XvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=tA0CfvT1; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="RJFz0xO3"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="tA0CfvT1"
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-	id C0DCE20E6F25; Thu, 28 Mar 2024 13:17:28 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C0DCE20E6F25
+	id 7F51620E6F74; Thu, 28 Mar 2024 13:17:28 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7F51620E6F74
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1711657048;
-	bh=/WSEDQnY3jfJtaJ7pIJVTHdQDsHKQKIwG6cPA6bswW0=;
+	s=default; t=1711657049;
+	bh=uxlCDqRb4F3Oof+1xfxuOJlAyhVWfZAYDSkIsCBbV/c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RJFz0xO3799FtV64Fbre1NHLaTFroEek5MySWwH9cB/KNkrd0exsjaaNRUjAXfIOb
-	 6Bua2oxhn5/hZw8TDz9rymv3YhKbuvlw3umChV8ecpnBo7rh3Eq111LdtnaSMj6WxT
-	 cKatK9/Z8/CLVFEw4waA0d6eRmSOvKxnKk3vbtkI=
+	b=tA0CfvT1YiPfigdQZPsgWv+B86vw00YypFUMptKGv0jLRk2uyo4I1XqG1Xn3I3JRq
+	 RmrG4meQWTCNSS8j5LQibtj3SaYYZ9c2f8BMgXeUAMRX/7H0piFnlnqXHcNmR0VG+L
+	 +2BA3LqZiUROr84A5pgrO8J85EyJwM4rUJe4MxAw=
 From: Fan Wu <wufan@linux.microsoft.com>
 To: corbet@lwn.net,
 	zohar@linux.ibm.com,
@@ -43,10 +43,11 @@ Cc: linux-doc@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	audit@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	Deven Bowers <deven.desai@linux.microsoft.com>,
 	Fan Wu <wufan@linux.microsoft.com>
-Subject: [PATCH v16 07/20] security: add new securityfs delete function
-Date: Thu, 28 Mar 2024 13:17:14 -0700
-Message-Id: <1711657047-10526-8-git-send-email-wufan@linux.microsoft.com>
+Subject: [PATCH v16 19/20] ipe: kunit test for parser
+Date: Thu, 28 Mar 2024 13:17:26 -0700
+Message-Id: <1711657047-10526-20-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1711657047-10526-1-git-send-email-wufan@linux.microsoft.com>
 References: <1711657047-10526-1-git-send-email-wufan@linux.microsoft.com>
@@ -56,30 +57,36 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-When deleting a directory in the security file system, the existing
-securityfs_remove requires the directory to be empty, otherwise
-it will do nothing. This leads to a potential risk that the security
-file system might be in an unclean state when the intended deletion
-did not happen.
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-This commit introduces a new function securityfs_recursive_remove
-to recursively delete a directory without leaving an unclean state.
+Add various happy/unhappy unit tests for both IPE's policy parser.
 
-Co-developed-by: Christian Brauner (Microsoft) <brauner@kernel.org>
+Besides, a test suite for IPE functionality is available at
+https://github.com/microsoft/ipe/tree/test-suite
+
+Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 
 ---
-v1-v8:
+v1-v6:
   + Not present
 
+v7:
+  Introduced
+
+v8:
+  + Remove the kunit tests with respect to the fsverity digest, as these
+    require significant changes to work with the new method of acquiring
+    the digest at runtime.
+
 v9:
-  + Introduced
+  + Remove the kunit tests related to ipe_context
 
 v10:
   + No changes
 
 v11:
-  + Fix code style issues
+  + No changes
 
 v12:
   + No changes
@@ -96,58 +103,349 @@ v15:
 v16:
   + No changes
 ---
- include/linux/security.h |  1 +
- security/inode.c         | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ security/ipe/Kconfig        |  17 +++
+ security/ipe/Makefile       |   3 +
+ security/ipe/policy_tests.c | 294 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 314 insertions(+)
+ create mode 100644 security/ipe/policy_tests.c
 
-diff --git a/include/linux/security.h b/include/linux/security.h
-index 14fff542f2e3..f35af7b6cfba 100644
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@ -2089,6 +2089,7 @@ struct dentry *securityfs_create_symlink(const char *name,
- 					 const char *target,
- 					 const struct inode_operations *iops);
- extern void securityfs_remove(struct dentry *dentry);
-+extern void securityfs_recursive_remove(struct dentry *dentry);
+diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+index 5c7c773ed84f..82aa8255662b 100644
+--- a/security/ipe/Kconfig
++++ b/security/ipe/Kconfig
+@@ -56,4 +56,21 @@ config IPE_PROP_FS_VERITY
  
- #else /* CONFIG_SECURITYFS */
+ endmenu
  
-diff --git a/security/inode.c b/security/inode.c
-index 9e7cde913667..f21847badb7d 100644
---- a/security/inode.c
-+++ b/security/inode.c
-@@ -313,6 +313,31 @@ void securityfs_remove(struct dentry *dentry)
- }
- EXPORT_SYMBOL_GPL(securityfs_remove);
++config SECURITY_IPE_KUNIT_TEST
++	bool "Build KUnit tests for IPE" if !KUNIT_ALL_TESTS
++	depends on KUNIT=y
++	default KUNIT_ALL_TESTS
++	help
++	  This builds the IPE KUnit tests.
++
++	  KUnit tests run during boot and output the results to the debug log
++	  in TAP format (https://testanything.org/). Only useful for kernel devs
++	  running KUnit test harness and are not for inclusion into a
++	  production build.
++
++	  For more information on KUnit and unit tests in general please refer
++	  to the KUnit documentation in Documentation/dev-tools/kunit/.
++
++	  If unsure, say N.
++
+ endif
+diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+index ce23101b66ba..def674e09e84 100644
+--- a/security/ipe/Makefile
++++ b/security/ipe/Makefile
+@@ -26,3 +26,6 @@ obj-$(CONFIG_SECURITY_IPE) += \
+ 	audit.o \
  
-+static void remove_one(struct dentry *victim)
+ clean-files := boot-policy.c \
++
++obj-$(CONFIG_SECURITY_IPE_KUNIT_TEST) += \
++	policy_tests.o \
+diff --git a/security/ipe/policy_tests.c b/security/ipe/policy_tests.c
+new file mode 100644
+index 000000000000..d67c42c9ca59
+--- /dev/null
++++ b/security/ipe/policy_tests.c
+@@ -0,0 +1,294 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <linux/list.h>
++#include <kunit/test.h>
++#include "policy.h"
++struct policy_case {
++	const char *const policy;
++	int errno;
++	const char *const desc;
++};
++
++static const struct policy_case policy_cases[] = {
++	{
++		"policy_name=allowall policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW",
++		0,
++		"basic",
++	},
++	{
++		"policy_name=trailing_comment policy_version=152.0.0 #This is comment\n"
++		"DEFAULT action=ALLOW",
++		0,
++		"trailing comment",
++	},
++	{
++		"policy_name=allowallnewline policy_version=0.2.0\n"
++		"DEFAULT action=ALLOW\n"
++		"\n",
++		0,
++		"trailing newline",
++	},
++	{
++		"policy_name=carriagereturnlinefeed policy_version=0.0.1\n"
++		"DEFAULT action=ALLOW\n"
++		"\r\n",
++		0,
++		"clrf newline",
++	},
++	{
++		"policy_name=whitespace policy_version=0.0.0\n"
++		"DEFAULT\taction=ALLOW\n"
++		"     \t     DEFAULT \t    op=EXECUTE      action=DENY\n"
++		"op=EXECUTE boot_verified=TRUE action=ALLOW\n"
++		"# this is a\tcomment\t\t\t\t\n"
++		"DEFAULT \t op=KMODULE\t\t\t  action=DENY\r\n"
++		"op=KMODULE boot_verified=TRUE action=ALLOW\n",
++		0,
++		"various whitespaces and nested default",
++	},
++	{
++		"policy_name=boot_verified policy_version=-1236.0.0\n"
++		"DEFAULT\taction=ALLOW\n",
++		-EINVAL,
++		"negative version",
++	},
++	{
++		"policy_name=$@!*&^%%\\:;{}() policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW",
++		0,
++		"special characters",
++	},
++	{
++		"policy_name=test policy_version=999999.0.0\n"
++		"DEFAULT action=ALLOW",
++		-ERANGE,
++		"overflow version",
++	},
++	{
++		"policy_name=test policy_version=255.0\n"
++		"DEFAULT action=ALLOW",
++		-EBADMSG,
++		"incomplete version",
++	},
++	{
++		"policy_name=test policy_version=111.0.0.0\n"
++		"DEFAULT action=ALLOW",
++		-EBADMSG,
++		"extra version",
++	},
++	{
++		"",
++		-EBADMSG,
++		"0-length policy",
++	},
++	{
++		"policy_name=test\0policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW",
++		-EBADMSG,
++		"random null in header",
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"\0DEFAULT action=ALLOW",
++		-EBADMSG,
++		"incomplete policy from NULL",
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=DENY\n\0"
++		"op=EXECUTE dmverity_signature=TRUE action=ALLOW\n",
++		0,
++		"NULL truncates policy",
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"op=EXECUTE dmverity_signature=abc action=ALLOW",
++		-EBADMSG,
++		"invalid property type",
++	},
++	{
++		"DEFAULT action=ALLOW",
++		-EBADMSG,
++		"missing policy header",
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n",
++		-EBADMSG,
++		"missing default definition",
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"dmverity_signature=TRUE op=EXECUTE action=ALLOW",
++		-EBADMSG,
++		"invalid rule ordering"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"action=ALLOW op=EXECUTE dmverity_signature=TRUE",
++		-EBADMSG,
++		"invalid rule ordering (2)",
++	},
++	{
++		"policy_name=test policy_version=0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"op=EXECUTE dmverity_signature=TRUE action=ALLOW",
++		-EBADMSG,
++		"invalid version",
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"op=UNKNOWN dmverity_signature=TRUE action=ALLOW",
++		-EBADMSG,
++		"unknown operation",
++	},
++	{
++		"policy_name=asdvpolicy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n",
++		-EBADMSG,
++		"missing space after policy name",
++	},
++	{
++		"policy_name=test\xFF\xEF policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"op=EXECUTE dmverity_signature=TRUE action=ALLOW",
++		0,
++		"expanded ascii",
++	},
++	{
++		"policy_name=test\xFF\xEF policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"op=EXECUTE dmverity_roothash=GOOD_DOG action=ALLOW",
++		-EBADMSG,
++		"invalid property value (2)",
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"policy_name=test policy_version=0.1.0\n"
++		"DEFAULT action=ALLOW",
++		-EBADMSG,
++		"double header"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"DEFAULT action=ALLOW\n",
++		-EBADMSG,
++		"double default"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"DEFAULT op=EXECUTE action=DENY\n"
++		"DEFAULT op=EXECUTE action=ALLOW\n",
++		-EBADMSG,
++		"double operation default"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"DEFAULT op=EXECUTE action=DEN\n",
++		-EBADMSG,
++		"invalid action value"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"DEFAULT op=EXECUTE action\n",
++		-EBADMSG,
++		"invalid action value (2)"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"UNKNOWN value=true\n",
++		-EBADMSG,
++		"unrecognized statement"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"op=EXECUTE dmverity_roothash=1c0d7ee1f8343b7fbe418378e8eb22c061d7dec7 action=DENY\n",
++		-EBADMSG,
++		"old-style digest"
++	},
++	{
++		"policy_name=test policy_version=0.0.0\n"
++		"DEFAULT action=ALLOW\n"
++		"op=EXECUTE fsverity_digest=1c0d7ee1f8343b7fbe418378e8eb22c061d7dec7 action=DENY\n",
++		-EBADMSG,
++		"old-style digest"
++	}
++};
++
++static void pol_to_desc(const struct policy_case *c, char *desc)
 +{
-+	simple_release_fs(&mount, &mount_count);
++	strscpy(desc, c->desc, KUNIT_PARAM_DESC_SIZE);
++}
++
++KUNIT_ARRAY_PARAM(ipe_policies, policy_cases, pol_to_desc);
++
++/**
++ * ipe_parser_unsigned_test - Test the parser by passing unsigned policies.
++ * @test: Supplies a pointer to a kunit structure.
++ *
++ * This is called by the kunit harness. This test does not check the correctness
++ * of the policy, but ensures that errors are handled correctly.
++ */
++static void ipe_parser_unsigned_test(struct kunit *test)
++{
++	const struct policy_case *p = test->param_value;
++	struct ipe_policy *pol = ipe_new_policy(p->policy, strlen(p->policy), NULL, 0);
++
++	if (p->errno) {
++		KUNIT_EXPECT_EQ(test, PTR_ERR(pol), p->errno);
++		return;
++	}
++
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, pol);
++	KUNIT_EXPECT_NOT_ERR_OR_NULL(test, pol->parsed);
++	KUNIT_EXPECT_STREQ(test, pol->text, p->policy);
++	KUNIT_EXPECT_PTR_EQ(test, NULL, pol->pkcs7);
++	KUNIT_EXPECT_EQ(test, 0, pol->pkcs7len);
++
++	ipe_free_policy(pol);
 +}
 +
 +/**
-+ * securityfs_recursive_remove - recursively removes a file or directory
++ * ipe_parser_widestring_test - Ensure parser fail on a wide string policy.
++ * @test: Supplies a pointer to a kunit structure.
 + *
-+ * @dentry: a pointer to a the dentry of the file or directory to be removed.
-+ *
-+ * This function recursively removes a file or directory in securityfs that was
-+ * previously created with a call to another securityfs function (like
-+ * securityfs_create_file() or variants thereof.)
++ * This is called by the kunit harness.
 + */
-+void securityfs_recursive_remove(struct dentry *dentry)
++static void ipe_parser_widestring_test(struct kunit *test)
 +{
-+	if (IS_ERR_OR_NULL(dentry))
-+		return;
++	struct ipe_policy *pol = NULL;
++	const unsigned short policy[] = L"policy_name=Test policy_version=0.0.0\n"
++					L"DEFAULT action=ALLOW";
 +
-+	simple_pin_fs(&fs_type, &mount, &mount_count);
-+	simple_recursive_removal(dentry, remove_one);
-+	simple_release_fs(&mount, &mount_count);
++	pol = ipe_new_policy((const char *)policy, (ARRAY_SIZE(policy) - 1) * 2, NULL, 0);
++	KUNIT_EXPECT_TRUE(test, IS_ERR_OR_NULL(pol));
++
++	ipe_free_policy(pol);
 +}
-+EXPORT_SYMBOL_GPL(securityfs_recursive_remove);
 +
- #ifdef CONFIG_SECURITY
- static struct dentry *lsm_dentry;
- static ssize_t lsm_read(struct file *filp, char __user *buf, size_t count,
++static struct kunit_case ipe_parser_test_cases[] = {
++	KUNIT_CASE_PARAM(ipe_parser_unsigned_test, ipe_policies_gen_params),
++	KUNIT_CASE(ipe_parser_widestring_test),
++};
++
++static struct kunit_suite ipe_parser_test_suite = {
++	.name = "ipe-parser",
++	.test_cases = ipe_parser_test_cases,
++};
++
++kunit_test_suite(ipe_parser_test_suite);
 -- 
 2.44.0
 
