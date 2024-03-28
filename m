@@ -1,28 +1,28 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F2C13B5B6;
-	Thu, 28 Mar 2024 20:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4078013B293;
+	Thu, 28 Mar 2024 20:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711657059; cv=none; b=u8WkMh2YTKIFDskXcM10v8FkGg9S4Lh14NMk+1onoB3dkVdjGjNg7wvA0zOMzNP4iYeLOTcFIhQLf2u+wSyy8Bj7r3zot1WGjxWeovtF+haL02kHX6vAXSeaH8QPFrL4qU0eqpA1nZx892rKljaRvM8Ngq5M7s1LDqpL0S/T4lw=
+	t=1711657059; cv=none; b=rqouSV483lXvUntoUBJnKx6ZfB3hbefhQ03fKcQ8D5IWI2uKyLqGHDaSiHsIyZy+FTE1LGaQ51aEg1Zz6El4moCclZKVCLncFMt8fa9nQwk2lwCb9j4yF2zyvwx2RBEvU2id8PDg/swbRLLpULZfmSGnZHHLrxOCHhAvcngzBZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711657059; c=relaxed/simple;
-	bh=ARiRxxuVyr+vbKM3ydOg12oQ0YEQPRPKAj0P9h0/QIA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=gbYObR5LJPGWxWeiIAsbT69DfqMzbVviIfhAyF4N3J4JsA5Pe1bYhX8nG4jTvsgwx2Wa315jeWxVCO2YrvXck1Onq0TILWncUbFtvasK6YrhXeP5NAz4q8jURjwUe1nmSqI5wYYmAeXL7CGswiPNyWwP62LbLwCvgosvd+91XvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=tA0CfvT1; arc=none smtp.client-ip=13.77.154.182
+	bh=caP4bpaKqglPgXav4RnvcwvlAU1cMPCWzAxPUwPGpSQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Z5OQ+ccbK6LqREKsBlDPRjCX2TYkwesWF/t1SDkGmZrYdN4Quk+UGwn+t4zXNzICeu97ONmov8m4FERJ91Nud0Nq6tFOH78VLARguNk72/F9w+3LlKtXslZt9GawqS0uMqvfQY0fximkW7FLe2nES2xn5Uy5gaf23Yhz5QXRImo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IK9Y1slg; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="tA0CfvT1"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IK9Y1slg"
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-	id 7F51620E6F74; Thu, 28 Mar 2024 13:17:28 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7F51620E6F74
+	id 5304220E6F69; Thu, 28 Mar 2024 13:17:28 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5304220E6F69
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
 	s=default; t=1711657049;
-	bh=uxlCDqRb4F3Oof+1xfxuOJlAyhVWfZAYDSkIsCBbV/c=;
+	bh=8jmgwxISKaQSGukG4xV/5fVhVS212zhpvhSeVEXEd2M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tA0CfvT1YiPfigdQZPsgWv+B86vw00YypFUMptKGv0jLRk2uyo4I1XqG1Xn3I3JRq
-	 RmrG4meQWTCNSS8j5LQibtj3SaYYZ9c2f8BMgXeUAMRX/7H0piFnlnqXHcNmR0VG+L
-	 +2BA3LqZiUROr84A5pgrO8J85EyJwM4rUJe4MxAw=
+	b=IK9Y1slgBmokI2f3UVzZkhK/23aPhXaXE3iPqSYv9vDAukYYOcO98lkchmsdhYPHF
+	 i+6UalvN1pBqR11v9cnt4ssYcsGV23YMVFfygE417xmT/BPSruGgPGTdFM4OT++nOF
+	 1lq+CpoMXaeTu1YOpfz8Px9ccflDXZoIAzeknLxs=
 From: Fan Wu <wufan@linux.microsoft.com>
 To: corbet@lwn.net,
 	zohar@linux.ibm.com,
@@ -43,11 +43,11 @@ Cc: linux-doc@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	audit@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>,
-	Fan Wu <wufan@linux.microsoft.com>
-Subject: [PATCH v16 19/20] ipe: kunit test for parser
-Date: Thu, 28 Mar 2024 13:17:26 -0700
-Message-Id: <1711657047-10526-20-git-send-email-wufan@linux.microsoft.com>
+	Fan Wu <wufan@linux.microsoft.com>,
+	Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: [PATCH v16 16/20] fsverity: consume fsverity built-in signatures via LSM hook
+Date: Thu, 28 Mar 2024 13:17:23 -0700
+Message-Id: <1711657047-10526-17-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1711657047-10526-1-git-send-email-wufan@linux.microsoft.com>
 References: <1711657047-10526-1-git-send-email-wufan@linux.microsoft.com>
@@ -57,12 +57,28 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-From: Deven Bowers <deven.desai@linux.microsoft.com>
+This patch enhances fsverity's capabilities to support both integrity and
+authenticity protection by introducing the consumption of built-in
+signatures through a new LSM hook. This functionality allows LSMs,
+e.g. IPE, to enforce policies based on the authenticity and integrity of
+files, specifically focusing on built-in fsverity signatures. It enables
+a policy enforcement layer within LSMs for fsverity, offering granular
+control over the usage of authenticity claims. For instance, a policy
+could be established to permit the execution of all files with built-in
+fsverity signatures while restricting kernel module loading to specified
+hashes.
 
-Add various happy/unhappy unit tests for both IPE's policy parser.
+The introduction of a security_inode_setintegrity() hook call within
+fsverity's workflow ensures that the verified built-in signature of a file
+is stored in the inode's LSM blobs. This hook is invoked subsequent to
+the fsverity_verify_signature() process, guaranteeing the signature's
+verification against fsverity's keyring. This mechanism is crucial for
+maintaining system security, as it operates in kernel space, effectively
+thwarting attempts by malicious binaries to bypass user space stack
+interactions.
 
-Besides, a test suite for IPE functionality is available at
-https://github.com/microsoft/ipe/tree/test-suite
+The last commit in this patch set will add a link to the IPE
+documentation in fsverity.rst.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
@@ -75,377 +91,209 @@ v7:
   Introduced
 
 v8:
-  + Remove the kunit tests with respect to the fsverity digest, as these
-    require significant changes to work with the new method of acquiring
-    the digest at runtime.
+  + Split fs/verity/ changes and security/ changes into separate patches
+  + Change signature of fsverity_create_info to accept non-const inode
+  + Change signature of fsverity_verify_signature to accept non-const inode
+  + Don't cast-away const from inode.
+  + Digest functionality dropped in favor of:
+    ("fs-verity: define a function to return the integrity protected
+      file digest")
+  + Reworded commit description and title to match changes.
+  + Fix a bug wherein no LSM implements the particular fsverity @name
+    (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
 
 v9:
-  + Remove the kunit tests related to ipe_context
+  + No changes
 
 v10:
-  + No changes
+  + Rename the signature blob key
+  + Cleanup redundant code
+  + Make the hook call depends on CONFIG_FS_VERITY_BUILTIN_SIGNATURES
 
 v11:
   + No changes
 
 v12:
-  + No changes
+  + Add constification to the hook call
 
 v13:
   + No changes
 
 v14:
-  + No changes
+  + Add doc/comment to built-in signature verification
 
 v15:
-  + No changes
+  + Add more docs related to IPE
+  + Switch the hook call to security_inode_setintegrity()
 
 v16:
-  + No changes
+  + Explicitly mention "fsverity builtin signatures" in the commit
+    message
+  + Amend documentation in fsverity.rst
+  + Fix format issue
+  + Change enum name
 ---
- security/ipe/Kconfig        |  17 +++
- security/ipe/Makefile       |   3 +
- security/ipe/policy_tests.c | 294 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 314 insertions(+)
- create mode 100644 security/ipe/policy_tests.c
+ Documentation/filesystems/fsverity.rst | 27 ++++++++++++++++++++++++--
+ fs/verity/fsverity_private.h           |  2 +-
+ fs/verity/open.c                       | 23 +++++++++++++++++++++-
+ fs/verity/signature.c                  |  6 +++++-
+ include/linux/security.h               |  1 +
+ 5 files changed, 54 insertions(+), 5 deletions(-)
 
-diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
-index 5c7c773ed84f..82aa8255662b 100644
---- a/security/ipe/Kconfig
-+++ b/security/ipe/Kconfig
-@@ -56,4 +56,21 @@ config IPE_PROP_FS_VERITY
+diff --git a/Documentation/filesystems/fsverity.rst b/Documentation/filesystems/fsverity.rst
+index 13e4b18e5dbb..e13cf10211c8 100644
+--- a/Documentation/filesystems/fsverity.rst
++++ b/Documentation/filesystems/fsverity.rst
+@@ -86,6 +86,19 @@ authenticating fs-verity file hashes include:
+   signature in their "security.ima" extended attribute, as controlled
+   by the IMA policy.  For more information, see the IMA documentation.
  
- endmenu
++- Integrity Policy Enforcement (IPE).  IPE supports enforcing access
++  control decisions based on immutable security properties of files,
++  including those protected by fs-verity's built-in signatures.
++  "IPE policy" specifically allows for the authorization of fs-verity
++  files using properties such as ``fsverity_digest`` for identifying
++  files by their verity digest, and ``fsverity_signature`` to validate
++  files signed with fs-verity's built-in signature mechanism. This
++  integration enhances security by ensuring the integrity and
++  authenticity of files on a per-file basis, leveraging fs-verity's
++  robust protection capabilities in conjunction with IPE's policy-driven
++  access control. For details on configuring IPE policies and
++  understanding its operational modes, see the IPE documentation.
++
+ - Trusted userspace code in combination with `Built-in signature
+   verification`_.  This approach should be used only with great care.
  
-+config SECURITY_IPE_KUNIT_TEST
-+	bool "Build KUnit tests for IPE" if !KUNIT_ALL_TESTS
-+	depends on KUNIT=y
-+	default KUNIT_ALL_TESTS
-+	help
-+	  This builds the IPE KUnit tests.
-+
-+	  KUnit tests run during boot and output the results to the debug log
-+	  in TAP format (https://testanything.org/). Only useful for kernel devs
-+	  running KUnit test harness and are not for inclusion into a
-+	  production build.
-+
-+	  For more information on KUnit and unit tests in general please refer
-+	  to the KUnit documentation in Documentation/dev-tools/kunit/.
-+
-+	  If unsure, say N.
-+
- endif
-diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-index ce23101b66ba..def674e09e84 100644
---- a/security/ipe/Makefile
-+++ b/security/ipe/Makefile
-@@ -26,3 +26,6 @@ obj-$(CONFIG_SECURITY_IPE) += \
- 	audit.o \
+@@ -457,7 +470,10 @@ Enabling this option adds the following:
+    On success, the ioctl persists the signature alongside the Merkle
+    tree.  Then, any time the file is opened, the kernel verifies the
+    file's actual digest against this signature, using the certificates
+-   in the ".fs-verity" keyring.
++   in the ".fs-verity" keyring. This verification happens as long as the
++   file's signature exists, regardless of the state of the sysctl variable
++   "fs.verity.require_signatures" described in the next item. The IPE LSM
++   relies on this behavior to save verified signatures into LSM blobs.
  
- clean-files := boot-policy.c \
+ 3. A new sysctl "fs.verity.require_signatures" is made available.
+    When set to 1, the kernel requires that all verity files have a
+@@ -481,7 +497,7 @@ be carefully considered before using them:
+ 
+ - Builtin signature verification does *not* make the kernel enforce
+   that any files actually have fs-verity enabled.  Thus, it is not a
+-  complete authentication policy.  Currently, if it is used, the only
++  complete authentication policy.  Currently, if it is used, one
+   way to complete the authentication policy is for trusted userspace
+   code to explicitly check whether files have fs-verity enabled with a
+   signature before they are accessed.  (With
+@@ -490,6 +506,13 @@ be carefully considered before using them:
+   could just store the signature alongside the file and verify it
+   itself using a cryptographic library, instead of using this feature.
+ 
++- Another approach is to utilize fs-verity builtin signature
++  verification in conjunction with the IPE LSM, which supports defining
++  a kernel-enforced, system-wide authentication policy that allows only
++  files with an fs-verity builtin signature enabled to perform certain
++  operations, such as execution. Note that IPE doesn't require
++  fs.verity.require_signatures=1.
 +
-+obj-$(CONFIG_SECURITY_IPE_KUNIT_TEST) += \
-+	policy_tests.o \
-diff --git a/security/ipe/policy_tests.c b/security/ipe/policy_tests.c
-new file mode 100644
-index 000000000000..d67c42c9ca59
---- /dev/null
-+++ b/security/ipe/policy_tests.c
-@@ -0,0 +1,294 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+#include <linux/list.h>
-+#include <kunit/test.h>
-+#include "policy.h"
-+struct policy_case {
-+	const char *const policy;
-+	int errno;
-+	const char *const desc;
-+};
-+
-+static const struct policy_case policy_cases[] = {
-+	{
-+		"policy_name=allowall policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW",
-+		0,
-+		"basic",
-+	},
-+	{
-+		"policy_name=trailing_comment policy_version=152.0.0 #This is comment\n"
-+		"DEFAULT action=ALLOW",
-+		0,
-+		"trailing comment",
-+	},
-+	{
-+		"policy_name=allowallnewline policy_version=0.2.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"\n",
-+		0,
-+		"trailing newline",
-+	},
-+	{
-+		"policy_name=carriagereturnlinefeed policy_version=0.0.1\n"
-+		"DEFAULT action=ALLOW\n"
-+		"\r\n",
-+		0,
-+		"clrf newline",
-+	},
-+	{
-+		"policy_name=whitespace policy_version=0.0.0\n"
-+		"DEFAULT\taction=ALLOW\n"
-+		"     \t     DEFAULT \t    op=EXECUTE      action=DENY\n"
-+		"op=EXECUTE boot_verified=TRUE action=ALLOW\n"
-+		"# this is a\tcomment\t\t\t\t\n"
-+		"DEFAULT \t op=KMODULE\t\t\t  action=DENY\r\n"
-+		"op=KMODULE boot_verified=TRUE action=ALLOW\n",
-+		0,
-+		"various whitespaces and nested default",
-+	},
-+	{
-+		"policy_name=boot_verified policy_version=-1236.0.0\n"
-+		"DEFAULT\taction=ALLOW\n",
-+		-EINVAL,
-+		"negative version",
-+	},
-+	{
-+		"policy_name=$@!*&^%%\\:;{}() policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW",
-+		0,
-+		"special characters",
-+	},
-+	{
-+		"policy_name=test policy_version=999999.0.0\n"
-+		"DEFAULT action=ALLOW",
-+		-ERANGE,
-+		"overflow version",
-+	},
-+	{
-+		"policy_name=test policy_version=255.0\n"
-+		"DEFAULT action=ALLOW",
-+		-EBADMSG,
-+		"incomplete version",
-+	},
-+	{
-+		"policy_name=test policy_version=111.0.0.0\n"
-+		"DEFAULT action=ALLOW",
-+		-EBADMSG,
-+		"extra version",
-+	},
-+	{
-+		"",
-+		-EBADMSG,
-+		"0-length policy",
-+	},
-+	{
-+		"policy_name=test\0policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW",
-+		-EBADMSG,
-+		"random null in header",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"\0DEFAULT action=ALLOW",
-+		-EBADMSG,
-+		"incomplete policy from NULL",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=DENY\n\0"
-+		"op=EXECUTE dmverity_signature=TRUE action=ALLOW\n",
-+		0,
-+		"NULL truncates policy",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"op=EXECUTE dmverity_signature=abc action=ALLOW",
-+		-EBADMSG,
-+		"invalid property type",
-+	},
-+	{
-+		"DEFAULT action=ALLOW",
-+		-EBADMSG,
-+		"missing policy header",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n",
-+		-EBADMSG,
-+		"missing default definition",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"dmverity_signature=TRUE op=EXECUTE action=ALLOW",
-+		-EBADMSG,
-+		"invalid rule ordering"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"action=ALLOW op=EXECUTE dmverity_signature=TRUE",
-+		-EBADMSG,
-+		"invalid rule ordering (2)",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"op=EXECUTE dmverity_signature=TRUE action=ALLOW",
-+		-EBADMSG,
-+		"invalid version",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"op=UNKNOWN dmverity_signature=TRUE action=ALLOW",
-+		-EBADMSG,
-+		"unknown operation",
-+	},
-+	{
-+		"policy_name=asdvpolicy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n",
-+		-EBADMSG,
-+		"missing space after policy name",
-+	},
-+	{
-+		"policy_name=test\xFF\xEF policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"op=EXECUTE dmverity_signature=TRUE action=ALLOW",
-+		0,
-+		"expanded ascii",
-+	},
-+	{
-+		"policy_name=test\xFF\xEF policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"op=EXECUTE dmverity_roothash=GOOD_DOG action=ALLOW",
-+		-EBADMSG,
-+		"invalid property value (2)",
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"policy_name=test policy_version=0.1.0\n"
-+		"DEFAULT action=ALLOW",
-+		-EBADMSG,
-+		"double header"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"DEFAULT action=ALLOW\n",
-+		-EBADMSG,
-+		"double default"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"DEFAULT op=EXECUTE action=DENY\n"
-+		"DEFAULT op=EXECUTE action=ALLOW\n",
-+		-EBADMSG,
-+		"double operation default"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"DEFAULT op=EXECUTE action=DEN\n",
-+		-EBADMSG,
-+		"invalid action value"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"DEFAULT op=EXECUTE action\n",
-+		-EBADMSG,
-+		"invalid action value (2)"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"UNKNOWN value=true\n",
-+		-EBADMSG,
-+		"unrecognized statement"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"op=EXECUTE dmverity_roothash=1c0d7ee1f8343b7fbe418378e8eb22c061d7dec7 action=DENY\n",
-+		-EBADMSG,
-+		"old-style digest"
-+	},
-+	{
-+		"policy_name=test policy_version=0.0.0\n"
-+		"DEFAULT action=ALLOW\n"
-+		"op=EXECUTE fsverity_digest=1c0d7ee1f8343b7fbe418378e8eb22c061d7dec7 action=DENY\n",
-+		-EBADMSG,
-+		"old-style digest"
-+	}
-+};
-+
-+static void pol_to_desc(const struct policy_case *c, char *desc)
+ - A file's builtin signature can only be set at the same time that
+   fs-verity is being enabled on the file.  Changing or deleting the
+   builtin signature later requires re-creating the file.
+diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
+index b3506f56e180..a0e786c611c9 100644
+--- a/fs/verity/fsverity_private.h
++++ b/fs/verity/fsverity_private.h
+@@ -117,7 +117,7 @@ int fsverity_init_merkle_tree_params(struct merkle_tree_params *params,
+ 				     unsigned int log_blocksize,
+ 				     const u8 *salt, size_t salt_size);
+ 
+-struct fsverity_info *fsverity_create_info(const struct inode *inode,
++struct fsverity_info *fsverity_create_info(struct inode *inode,
+ 					   struct fsverity_descriptor *desc);
+ 
+ void fsverity_set_info(struct inode *inode, struct fsverity_info *vi);
+diff --git a/fs/verity/open.c b/fs/verity/open.c
+index fdeb95eca3af..dfe66b60b4ec 100644
+--- a/fs/verity/open.c
++++ b/fs/verity/open.c
+@@ -8,6 +8,7 @@
+ #include "fsverity_private.h"
+ 
+ #include <linux/mm.h>
++#include <linux/security.h>
+ #include <linux/slab.h>
+ 
+ static struct kmem_cache *fsverity_info_cachep;
+@@ -172,12 +173,28 @@ static int compute_file_digest(const struct fsverity_hash_alg *hash_alg,
+ 	return err;
+ }
+ 
++#ifdef CONFIG_FS_VERITY_BUILTIN_SIGNATURES
++static int fsverity_inode_setintegrity(struct inode *inode,
++				       const struct fsverity_descriptor *desc)
 +{
-+	strscpy(desc, c->desc, KUNIT_PARAM_DESC_SIZE);
++	return security_inode_setintegrity(inode, LSM_INT_FSVERITY_BUILTINSIG,
++					   desc->signature,
++					   le32_to_cpu(desc->sig_size));
 +}
-+
-+KUNIT_ARRAY_PARAM(ipe_policies, policy_cases, pol_to_desc);
-+
-+/**
-+ * ipe_parser_unsigned_test - Test the parser by passing unsigned policies.
-+ * @test: Supplies a pointer to a kunit structure.
-+ *
-+ * This is called by the kunit harness. This test does not check the correctness
-+ * of the policy, but ensures that errors are handled correctly.
-+ */
-+static void ipe_parser_unsigned_test(struct kunit *test)
++#else
++static inline int fsverity_inode_setintegrity(struct inode *inode,
++					      const struct fsverity_descriptor *desc)
 +{
-+	const struct policy_case *p = test->param_value;
-+	struct ipe_policy *pol = ipe_new_policy(p->policy, strlen(p->policy), NULL, 0);
-+
-+	if (p->errno) {
-+		KUNIT_EXPECT_EQ(test, PTR_ERR(pol), p->errno);
-+		return;
-+	}
-+
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, pol);
-+	KUNIT_EXPECT_NOT_ERR_OR_NULL(test, pol->parsed);
-+	KUNIT_EXPECT_STREQ(test, pol->text, p->policy);
-+	KUNIT_EXPECT_PTR_EQ(test, NULL, pol->pkcs7);
-+	KUNIT_EXPECT_EQ(test, 0, pol->pkcs7len);
-+
-+	ipe_free_policy(pol);
++	return 0;
 +}
++#endif /* CONFIG_FS_VERITY_BUILTIN_SIGNATURES */
 +
-+/**
-+ * ipe_parser_widestring_test - Ensure parser fail on a wide string policy.
-+ * @test: Supplies a pointer to a kunit structure.
-+ *
-+ * This is called by the kunit harness.
-+ */
-+static void ipe_parser_widestring_test(struct kunit *test)
-+{
-+	struct ipe_policy *pol = NULL;
-+	const unsigned short policy[] = L"policy_name=Test policy_version=0.0.0\n"
-+					L"DEFAULT action=ALLOW";
+ /*
+  * Create a new fsverity_info from the given fsverity_descriptor (with optional
+  * appended builtin signature), and check the signature if present.  The
+  * fsverity_descriptor must have already undergone basic validation.
+  */
+-struct fsverity_info *fsverity_create_info(const struct inode *inode,
++struct fsverity_info *fsverity_create_info(struct inode *inode,
+ 					   struct fsverity_descriptor *desc)
+ {
+ 	struct fsverity_info *vi;
+@@ -241,6 +258,10 @@ struct fsverity_info *fsverity_create_info(const struct inode *inode,
+ 		}
+ 	}
+ 
++	err = fsverity_inode_setintegrity(inode, desc);
++	if (err)
++		goto fail;
 +
-+	pol = ipe_new_policy((const char *)policy, (ARRAY_SIZE(policy) - 1) * 2, NULL, 0);
-+	KUNIT_EXPECT_TRUE(test, IS_ERR_OR_NULL(pol));
-+
-+	ipe_free_policy(pol);
-+}
-+
-+static struct kunit_case ipe_parser_test_cases[] = {
-+	KUNIT_CASE_PARAM(ipe_parser_unsigned_test, ipe_policies_gen_params),
-+	KUNIT_CASE(ipe_parser_widestring_test),
-+};
-+
-+static struct kunit_suite ipe_parser_test_suite = {
-+	.name = "ipe-parser",
-+	.test_cases = ipe_parser_test_cases,
-+};
-+
-+kunit_test_suite(ipe_parser_test_suite);
+ 	return vi;
+ 
+ fail:
+diff --git a/fs/verity/signature.c b/fs/verity/signature.c
+index 90c07573dd77..fd60e9704e78 100644
+--- a/fs/verity/signature.c
++++ b/fs/verity/signature.c
+@@ -41,7 +41,11 @@ static struct key *fsverity_keyring;
+  * @sig_size: size of signature in bytes, or 0 if no signature
+  *
+  * If the file includes a signature of its fs-verity file digest, verify it
+- * against the certificates in the fs-verity keyring.
++ * against the certificates in the fs-verity keyring. Note that signatures
++ * are verified regardless of the state of the 'fsverity_require_signatures'
++ * variable and the LSM subsystem relies on this behavior to help enforce
++ * file integrity policies. Please discuss changes with the LSM list
++ * (thank you!).
+  *
+  * Return: 0 on success (signature valid or not required); -errno on failure
+  */
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 22612058b903..3d4ff2c9a430 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -86,6 +86,7 @@ enum lsm_event {
+ enum lsm_integrity_type {
+ 	LSM_INT_DMVERITY_SIG,
+ 	LSM_INT_DMVERITY_ROOTHASH,
++	LSM_INT_FSVERITY_BUILTINSIG,
+ };
+ 
+ /*
 -- 
 2.44.0
 
