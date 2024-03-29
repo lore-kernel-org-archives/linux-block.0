@@ -1,63 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4303213B59A
-	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 19:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1920A131E59;
+	Fri, 29 Mar 2024 20:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711740458; cv=none; b=RfKRph0ARlN9Z12jw3/clLGkwM2Wins1RnB2JIglKBtZ8EOKMT5JodP8Pzq41UiiApvdBZ6QTXDd9H2XA+/uiMqilT+R2TuhcTHdqM/8hqC/CNPdhgKi2jSXzwC0KKp9FznRgIkF/GiKtc1KC9WlsgPjPXahLjsvqBH8t9q8Crw=
+	t=1711742437; cv=none; b=U+/SbMjZXFFV5DmCRmBAAN7gMYg3DReVOIIFVGEM1/cPwThxnzy9A03wNDMZOl2vR/DoXWfFAdUBgB23VhlT62a39SDnxtql4Y26Z8m+28xFqzSUgkFDLruM3/R0yMGgzHhPoE2hvwd96fiOjGyCXt+1v9kNkndBXOn8oEd2nZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711740458; c=relaxed/simple;
-	bh=1g9mW8lW82MoLUXbHlkWvtykfN4GyQGYOC1WLnCr/1s=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=hB59LmjlXv8tfShEdnrHUJzAfjsPb9JNiUX6S5MV4LweGCR97ROe67XZAX/zB1sE50SVHDS+LiWkemfctkoC32Yd73s+IlVvpzuglYRJ093IJRbU9CCEEtGubbby0KPoRdqNwgVs2LPaxApDygcOqj8J00EcbrgJzmrxobdGnE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drzZdW6V; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711742437; c=relaxed/simple;
+	bh=O10HO98LXxHRjwwegetD1LC2QarBz8wOkuidkGTxkic=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PnBmFAmNiNutZAk0OAiRfOfj4Z2HD6NoW97nrh2+lO5n6JMkXzTn3Ihn7SnnGPbDb9SMGZsG4adEqxuLnV30VfuxMDc4fgkYIMiyQCOsPWJT8o7iIwlxXVMZY4IqORrEwr2MotYud95+XXa7IkqNz6Nheiojtzqm8ru8lXqtTjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibdChtO/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drzZdW6V"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BD703C43390;
-	Fri, 29 Mar 2024 19:27:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibdChtO/"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88958C43399;
+	Fri, 29 Mar 2024 20:00:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711740457;
-	bh=1g9mW8lW82MoLUXbHlkWvtykfN4GyQGYOC1WLnCr/1s=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=drzZdW6V2RUauhOUBGcQosHfnGvc7g/jClVvwg4I4Ou+CCgFM1tcZtraJAdlWtMFe
-	 cLMfsG6BR/0Ec8NT5i5F5nHMzheOvJn066Aaia2TaxBDsOoaAojvI1TaN8737LG65x
-	 lp01gML2OzKCOy5549g8F3j7wu4l4xOwJoh3SJ6M0Id0vF3xvpvrDVZpqe8h/BXMbA
-	 l2KAyDpTfLK9EoF09PbHKe8ZsV5xSW6X2UE48QbIM/UN2HvW6jcqCddmJPFMLlmWmQ
-	 qP5CZRc3VglobbGN21I00QNuKwh4EQezVGeXE6Lp8zmUEG2RtntxeGTzf90OAJIF6r
-	 0BxT0u7y0ggmw==
+	s=k20201202; t=1711742436;
+	bh=O10HO98LXxHRjwwegetD1LC2QarBz8wOkuidkGTxkic=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ibdChtO/bXootBctSxklNeA7bYCBts1UgwUFhft4x2sjMGXGiyQ6xGf96V2e0eOA1
+	 ODq9Ia/6579epCaP4lnUDfDLkut5fsOWeaFbJF7me6TstZSBLf3BMrkYDf55Adi731
+	 zHrMkkINKMdPiMUb6gLSoTWBG++DiMupsV5KEmKMPytdOQEZ4kBSph0dMZLkdeLFkK
+	 EbluA1me7aURKnJpRkImBfuddbCDZ41vUC7YUj2cCjTbvsHIIgprJTvRvr6boPp1Ff
+	 UJoxCMbUZIsBcLic6mF8suqylfUb00h7TTGot8oyp8sxfTR9PMGMw0bRiDFpkQ8O6Y
+	 waG7vYyhosOoA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5016D2D0EB;
-	Fri, 29 Mar 2024 19:27:37 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.9-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <eed6cd8f-58fa-41b7-b442-141752d16237@kernel.dk>
-References: <eed6cd8f-58fa-41b7-b442-141752d16237@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <eed6cd8f-58fa-41b7-b442-141752d16237@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.9-20240329
-X-PR-Tracked-Commit-Id: 55251fbdf0146c252ceff146a1bb145546f3e034
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 033e8088a41a0871231cbf09fc6fd534830dbae1
-Message-Id: <171174045773.16736.2904768378216926785.pr-tracker-bot@kernel.org>
-Date: Fri, 29 Mar 2024 19:27:37 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B142D84BAF;
+	Fri, 29 Mar 2024 20:00:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/9] address remaining
+ -Wtautological-constant-out-of-range-compare
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171174243650.4906.1760676317968487901.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 20:00:36 +0000
+References: <20240328143051.1069575-1-arnd@kernel.org>
+In-Reply-To: <20240328143051.1069575-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, arnd@arndb.de, idryomov@gmail.com,
+ dongsheng.yang@easystack.cn, axboe@kernel.dk, jgg@ziepe.ca, leon@kernel.org,
+ agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
+ dm-devel@lists.linux.dev, saeedm@nvidia.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, xiubli@redhat.com,
+ jlayton@kernel.org, konishi.ryusuke@gmail.com, dvyukov@google.com,
+ andreyknvl@gmail.com, dsahern@kernel.org, masahiroy@kernel.org,
+ nathan@kernel.org, nicolas@fjasle.eu, ndesaulniers@google.com,
+ morbo@google.com, justinstitt@google.com, keescook@chromium.org,
+ gustavoars@kernel.org, tariqt@nvidia.com, ceph-devel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, linux-nilfs@vger.kernel.org,
+ kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org,
+ llvm@lists.linux.dev
 
-The pull request you sent on Fri, 29 Mar 2024 09:28:29 -0600:
+Hello:
 
-> git://git.kernel.dk/linux.git tags/block-6.9-20240329
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/033e8088a41a0871231cbf09fc6fd534830dbae1
+On Thu, 28 Mar 2024 15:30:38 +0100 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The warning option was introduced a few years ago but left disabled
+> by default. All of the actual bugs that this has found have been
+> fixed in the meantime, and this series should address the remaining
+> false-positives, as tested on arm/arm64/x86 randconfigs as well as
+> allmodconfig builds for all architectures supported by clang.
+> 
+> [...]
 
-Thank you!
+Here is the summary with links:
+  - [2/9] libceph: avoid clang out-of-range warning
+    (no matching commit)
+  - [5/9] ipv4: tcp_output: avoid warning about NET_ADD_STATS
+    (no matching commit)
+  - [8/9] mlx5: stop warning for 64KB pages
+    https://git.kernel.org/netdev/net-next/c/a5535e533694
 
+You are awesome, thank you!
 -- 
 Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
