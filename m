@@ -1,102 +1,192 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468AF17576;
-	Fri, 29 Mar 2024 01:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1034C179B7
+	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 01:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711675876; cv=none; b=Zv8Xzcx5Q0JKzYdIDu2IgXuCuZedHExrwLe/NdWV+IvKZmL42gQMtWsrKKkuDFL5Mh76iwbYuBJtwURE/BzSmc9V5pq/64ghxY6ONnWhGClMk1c+b4cOOJxBW54W8m8iJ80HuPoBumqr8+hKLq6izfW08B718icuP6UGVgfgbzk=
+	t=1711675896; cv=none; b=amBp5S0pP/AXZEsBWSo86dYN5DNyTdVGrvkXHFgEnTX+oygWtnRoQOxvfANu5wJWR7jhAmt/rB33W6qGpUHcHwcgNmdFi0Qn3UzS8oREx0fp7CiuYrM04ieEUQYLvh9ELx22sS9/0XYjmotJsWQatTaDCrn+iX2sUxZoEDW0ibk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711675876; c=relaxed/simple;
-	bh=dUzneKDmKI2/ZqHcy7SUm51OUjy4WueE8rOc8uA+kn8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aHaVQTtPabRh65fR59s0SZPfX/v6ersH6g9bx6G4FTE4RG39MKXXBPJblSOdVYGSeRFrs6YGQJFmE6YrVDH2EvQATizC5JbE6mNWFw9UsuHhOBSOMtLoBsetv0PeVTq/Z7w1YRXKopsipoDJbrrzGCIRumGsk+gpDnLz4biKfGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V5NCX2pmWz4f3kKj;
-	Fri, 29 Mar 2024 09:31:04 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 7459B1A0232;
-	Fri, 29 Mar 2024 09:31:08 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+RHSGQZm1waRIQ--.26612S4;
-	Fri, 29 Mar 2024 09:31:00 +0800 (CST)
-From: linan666@huaweicloud.com
-To: axboe@kernel.dk
-Cc: hch@lst.de,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linan666@huaweicloud.com,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	houtao1@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH] block: fix overflow in blk_ioctl_discard()
-Date: Fri, 29 Mar 2024 09:23:19 +0800
-Message-Id: <20240329012319.2034550-1-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1711675896; c=relaxed/simple;
+	bh=x8+vLQdDl6AWLoiYfzSQzCyhpD0rGFbo8zT8dGRPxYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tZ566S4uTQ9UtjNIET9aI0DsFOzWmu4LSl2cu5Q5/UXYihB2EGU35aiSeaoeifnTQcTvUWYJRGQrYytWCJ8tT6jQnExXtys5xDDs6SMo/uoJYAAE27g02Vd8KvB0hg5DKj0gszBUotkDbyDzwcwU5ZuhnbJXkdrGrC+zpGOjWXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ia7+oGwy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ia7+oGwy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711675893;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iN3x73gOojteLy+t/0nbZ2MLb4v3F8mbntSlr0U9MPo=;
+	b=Ia7+oGwyiHH/klHKwuK3X1DS3lqcY5P5k+5Zmu0th3ZGcvfQqyKbGmYmKEoNBn/WNeWrtD
+	dDVvhURbcqxwwGq6ZSUxHb6qK2MZj2eOzQdBgC9R72CD/klDcBYHpBQIEllwD0GiAz0Fdd
+	/P+503S/qUBCX6PNQ4ZqEH5H4IyNWBs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-135-nvf4v4vsOuaHEJmj2ejAuQ-1; Thu,
+ 28 Mar 2024 21:31:30 -0400
+X-MC-Unique: nvf4v4vsOuaHEJmj2ejAuQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AD5512804805;
+	Fri, 29 Mar 2024 01:31:29 +0000 (UTC)
+Received: from redhat.com (unknown [10.2.16.33])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 15559492BD7;
+	Fri, 29 Mar 2024 01:31:27 +0000 (UTC)
+Date: Thu, 28 Mar 2024 20:31:21 -0500
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alasdair Kergon <agk@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
+	David Teigland <teigland@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@lst.de>, Joe Thornber <ejt@redhat.com>
+Subject: Re: [RFC 8/9] dm thin: add llseek(SEEK_HOLE/SEEK_DATA) support
+Message-ID: <c4pit5qf3sgiynx3jcnngdj7d3m62c5fdsgmla7twxynh6wfai@7jvhgxya4xo6>
+References: <20240328203910.2370087-1-stefanha@redhat.com>
+ <20240328203910.2370087-9-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+RHSGQZm1waRIQ--.26612S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrZw18WryUXF4xtr15ZFWxXrb_yoWkJFX_Wr
-	yFvrykKrWrAF93Crs0kF15XrnY9rs7Cr1Ikr1rGry2qF47JF1rAryxXFnrZr4DXFW8uay3
-	ZFsxXF4vvr1S9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbsAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-	rcIFxwAKzVCY07xG64k0F24l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvE
-	x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnU
-	UI43ZEXa7VUbSApUUUUUU==
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240328203910.2370087-9-stefanha@redhat.com>
+User-Agent: NeoMutt/20240201
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-From: Li Nan <linan122@huawei.com>
+On Thu, Mar 28, 2024 at 04:39:09PM -0400, Stefan Hajnoczi wrote:
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> Open issues:
+> - Locking?
+> - thin_seek_hole_data() does not run as a bio or request. This patch
+>   assumes dm_thin_find_mapped_range() synchronously performs I/O if
+>   metadata needs to be loaded from disk. Is that a valid assumption?
+> ---
+>  drivers/md/dm-thin.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 77 insertions(+)
+> 
+> diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+> index 4793ad2aa1f7e..3c5dc4f0fe8a3 100644
+> --- a/drivers/md/dm-thin.c
+> +++ b/drivers/md/dm-thin.c
+> @@ -4501,6 +4501,82 @@ static void thin_io_hints(struct dm_target *ti, struct queue_limits *limits)
+>  	}
+>  }
+>  
+> +static dm_block_t loff_to_block(struct pool *pool, loff_t offset)
+> +{
+> +	sector_t offset_sectors = offset >> SECTOR_SHIFT;
+> +	dm_block_t ret;
+> +
+> +	if (block_size_is_power_of_two(pool))
+> +		ret = offset_sectors >> pool->sectors_per_block_shift;
+> +	else {
+> +		ret = offset_sectors;
+> +		(void) sector_div(ret, pool->sectors_per_block);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static loff_t block_to_loff(struct pool *pool, dm_block_t block)
+> +{
+> +	return block_to_sectors(pool, block) << SECTOR_SHIFT;
+> +}
+> +
+> +static loff_t thin_seek_hole_data(struct dm_target *ti, loff_t offset,
+> +		int whence)
+> +{
+> +	struct thin_c *tc = ti->private;
+> +	struct dm_thin_device *td = tc->td;
+> +	struct pool *pool = tc->pool;
+> +	dm_block_t begin;
+> +	dm_block_t end;
+> +	dm_block_t mapped_begin;
+> +	dm_block_t mapped_end;
+> +	dm_block_t pool_begin;
+> +	bool maybe_shared;
+> +	int ret;
+> +
+> +	/* TODO locking? */
+> +
+> +	if (block_size_is_power_of_two(pool))
+> +		end = ti->len >> pool->sectors_per_block_shift;
+> +	else {
+> +		end = ti->len;
+> +		(void) sector_div(end, pool->sectors_per_block);
+> +	}
+> +
+> +	offset -= ti->begin << SECTOR_SHIFT;
+> +
+> +	while (true) {
+> +		begin = loff_to_block(pool, offset);
+> +		ret = dm_thin_find_mapped_range(td, begin, end,
+> +						&mapped_begin, &mapped_end,
+> +						&pool_begin, &maybe_shared);
+> +		if (ret == -ENODATA) {
+> +			if (whence == SEEK_DATA)
+> +				return -ENXIO;
+> +			break;
+> +		} else if (ret < 0) {
+> +			/* TODO handle EWOULDBLOCK? */
+> +			return -ENXIO;
 
-There is no check for overflow of 'start + len' in blk_ioctl_discard().
-Hung task occurs if submit an discard ioctl with the following param:
-  start = 0x80000000000ff000, len = 0x8000000000fff000;
-Add the overflow validation now.
+This should probably be -EIO, not -ENXIO.
 
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- block/ioctl.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> +		}
+> +
+> +		/* SEEK_DATA finishes here... */
+> +		if (whence == SEEK_DATA) {
+> +			if (mapped_begin != begin)
+> +				offset = block_to_loff(pool, mapped_begin);
+> +			break;
+> +		}
+> +
+> +		/* ...while SEEK_HOLE may need to look further */
+> +		if (mapped_begin != begin)
+> +			break; /* offset is in a hole */
+> +
+> +		offset = block_to_loff(pool, mapped_end);
+> +	}
+> +
+> +	return offset + (ti->begin << SECTOR_SHIFT);
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 0c76137adcaa..a9028a2c2db5 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -96,7 +96,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
- 		unsigned long arg)
- {
- 	uint64_t range[2];
--	uint64_t start, len;
-+	uint64_t start, len, end;
- 	struct inode *inode = bdev->bd_inode;
- 	int err;
- 
-@@ -117,7 +117,8 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
- 	if (len & 511)
- 		return -EINVAL;
- 
--	if (start + len > bdev_nr_bytes(bdev))
-+	if (check_add_overflow(start, len, &end) ||
-+	    end > bdev_nr_bytes(bdev))
- 		return -EINVAL;
- 
- 	filemap_invalidate_lock(inode->i_mapping);
+It's hard to follow, but I'm fairly certain that if whence ==
+SEEK_HOLE, you end up returning ti->begin + ti->len instead of -ENXIO
+if the range from begin to end is fully mapped; which is inconsistent
+with the semantics you have in 4/9 (although in 6/9 I argue that
+having all of the dm callbacks return ti->begin + ti->len instead of
+-ENXIO might make logic easier for iterating through consecutive ti,
+and then convert to -ENXIO only in the caller).
+
+> +}
+> +
+>  static struct target_type thin_target = {
+>  	.name = "thin",
+>  	.version = {1, 23, 0},
+> @@ -4515,6 +4591,7 @@ static struct target_type thin_target = {
+>  	.status = thin_status,
+>  	.iterate_devices = thin_iterate_devices,
+>  	.io_hints = thin_io_hints,
+> +	.seek_hole_data = thin_seek_hole_data,
+>  };
+>  
+>  /*----------------------------------------------------------------*/
+> -- 
+> 2.44.0
+> 
+
 -- 
-2.39.2
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.
+Virtualization:  qemu.org | libguestfs.org
 
