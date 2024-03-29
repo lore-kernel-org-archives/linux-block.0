@@ -1,79 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CE813664E;
-	Fri, 29 Mar 2024 12:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FBE114883F;
+	Fri, 29 Mar 2024 12:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715931; cv=none; b=hKyXHQ203bPVFeDCFalPnUK59cQ2+Vm4g9JV3uCiUcmUU1lk+mpvve4APMlj4PRsK0Sb1yzPRMU1sJbRmB0X/b0/abaV4szq39VRnwo3+WVKX+LdqjA4+cOejIETOcewXrz8AygxgBSP+5qJbCIqWlKfW14GBkRAGgKNRNorLzU=
+	t=1711716150; cv=none; b=AeQN3AVjrht6k9dPHw+cNxxRU1Q2YhKO8GUFv4dgG72fmQV2EXsAdBuWGkmkG1cP+lpC96u+uwmtPmXEhbKEFGikeUZnL9KyU/CmKDfTge/SfAGv62PSRxTnRuC0rsi1NwarwHxSQTraoRGCWINjNdwZS/cC4x+quOea9P/PqTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715931; c=relaxed/simple;
-	bh=7OCE6E+V/uRCmyJIcNCPSK5hYqaC8YBhEdwTeGxys3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UcnvqbLis9BVhgBtwhzKOPNr2KELtBeKKKPe/Pp1yRi6y7vrOwY50dqO9kbWf1U98NKdKzEgygC7wNsY6fBeBEFckNhyyqgi9w428QsS8orU6eyUPfeCxE1v7uJnGHBHDcpMPxPwkOzSR7WNUwyUHFVgoKpzexAZRTwSmgTNlQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=aIwAwshY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711716150; c=relaxed/simple;
+	bh=0pqNxaLcbkQ7KCRmakADyDfAYk41/fLh/4lRyyT542Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mpjKDcv+oV2pwnWNPu1cDdFi5zxDG86FF72NF48rRSP1CqG+JKp/SpoOKbAya6XWDCdxZOLO5AgYzNo0OiSsL/rm3xktgkKnkqsfZ3RCHdhSQdbMLR6LehqM3K4prk2yvqx8TnRALazDluWniuaoS16W1TLELaoSsWQ5dt8Z/kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T59y7KB1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="aIwAwshY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED5EFC433C7;
-	Fri, 29 Mar 2024 12:38:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711715931;
-	bh=7OCE6E+V/uRCmyJIcNCPSK5hYqaC8YBhEdwTeGxys3M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aIwAwshYuhXNwu5+OKWbn6PPzRD2Q1fuTJPxJF5b6wNOFJ0B1iC69LpdDDWMfqi/Y
-	 OJkKAH3fz/dAmmchsiOtbPx9n6ux59ANT3v0YZHBVtbgCaH+N69RYgaXibPVb16NP/
-	 0NhzBe0hDWb3cT9OoO+gYoillLKprEn8qXLMNYxk=
-Date: Fri, 29 Mar 2024 13:38:48 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: genjian zhang <zhanggenjian@126.com>
-Cc: stable@vger.kernel.org, axboe@kernel.dk, stable@kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	zhanggenjian123@gmail.com, Genjian Zhang <zhanggenjian@kylinos.cn>
-Subject: Re: Re: [PATCH 4.19.y 0/9] Fix the UAF issue caused by the loop
- driver
-Message-ID: <2024032938-preface-reassure-a1f4@gregkh>
-References: <20240301013028.2293831-1-zhanggenjian@126.com>
- <2024030421-obedient-unbalance-a728@gregkh>
- <1d74f009.2179.18e16c2d99f.Coremail.zhanggenjian@126.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T59y7KB1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31E21C43390;
+	Fri, 29 Mar 2024 12:42:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711716150;
+	bh=0pqNxaLcbkQ7KCRmakADyDfAYk41/fLh/4lRyyT542Y=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=T59y7KB1uYxG+ABIogCK8Kne1cNVYI0DDJu/wyOqXnz/UPS6egWPRMkf1TSEltdCr
+	 hY/ZkqfOJws5YUA2BYfBSUHRsygQo1eSYMQTKL+Cln+1rswRTTpyOtiLjw8e/gWTs5
+	 N2tPi+FdKpCS2IvSPjDUYzbH0cejLXe39jjbviX8Kq2rBaoeSCkwLNi97XJdGNLJti
+	 yH1fVKRdDwMd5BBTa37nzrHQDhMoE8KaKnuS3EP4QczAjIZu9O9GiAjBXQMwV6QnRF
+	 StfdcGX+Rx73LnJDK9azrt5B8uAL9fddMb5yBJkPRYDCsBoetqU6HQr5ZSINx57X/e
+	 HQcCpKqdnSHkA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Roman Smirnov <r.smirnov@omp.ru>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 84/98] block: prevent division by zero in blk_rq_stat_sum()
+Date: Fri, 29 Mar 2024 08:37:55 -0400
+Message-ID: <20240329123919.3087149-84-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240329123919.3087149-1-sashal@kernel.org>
+References: <20240329123919.3087149-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.8.2
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1d74f009.2179.18e16c2d99f.Coremail.zhanggenjian@126.com>
 
-On Thu, Mar 07, 2024 at 10:34:12AM +0800, genjian zhang wrote:
-> 
-> At 2024-03-04 21:31:20, "Greg KH" <gregkh@linuxfoundation.org> wrote:
-> >On Fri, Mar 01, 2024 at 09:30:19AM +0800, Genjian wrote:
-> >> From: Genjian Zhang <zhanggenjian@kylinos.cn>
-> >> 
-> >> Hello!
-> >> 
-> >> We found that 2035c770bfdb ("loop: Check for overflow while configuring loop") lost a unlock loop_ctl_mutex in loop_get_status(...).
-> >> which caused syzbot to report a UAF issue. However, the upstream patch does not have this issue.
-> >> So, we revert this patch and directly apply the unmodified upstream patch.
-> >> 
-> >> Risk use-after-free as reported by syzbot：
-> >
-> >This looks good, but you are backporting commits that are NOT in newer
-> >stable releases (i.e. from 5.8 but the commit is not in 5.4.y), is that
-> >intentional?
-> >
-> >Does 5.4.y also have this problem?  If so, can you send a series that
-> >fixes that up so I can take both of them at the same time?
-> >
-> >thanks,
-> >
-> >greg k-h
-> 
-> Thank you for your advice. This problem also exists in 5.4.y. 
-> I will send a series of patches for 5.4.y.
+From: Roman Smirnov <r.smirnov@omp.ru>
 
-All now queued up, thanks!
+[ Upstream commit 93f52fbeaf4b676b21acfe42a5152620e6770d02 ]
 
-greg k-h
+The expression dst->nr_samples + src->nr_samples may
+have zero value on overflow. It is necessary to add
+a check to avoid division by zero.
+
+Found by Linux Verification Center (linuxtesting.org) with Svace.
+
+Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Link: https://lore.kernel.org/r/20240305134509.23108-1-r.smirnov@omp.ru
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-stat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index 7ff76ae6c76a9..e42c263e53fb9 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -27,7 +27,7 @@ void blk_rq_stat_init(struct blk_rq_stat *stat)
+ /* src is a per-cpu stat, mean isn't initialized */
+ void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
+ {
+-	if (!src->nr_samples)
++	if (dst->nr_samples + src->nr_samples <= dst->nr_samples)
+ 		return;
+ 
+ 	dst->min = min(dst->min, src->min);
+-- 
+2.43.0
+
