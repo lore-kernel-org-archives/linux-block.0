@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE471A33BF;
-	Fri, 29 Mar 2024 12:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A45D1AB1FE;
+	Fri, 29 Mar 2024 12:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711716441; cv=none; b=W2s/X1ZdqvKXQ0ZV/UJElCHyY9u8FZ4KyrP3ssNOgLfHJBRhUepTfhURy7N0c31B490nCVisleu/JvCi6N+YoQOHu6s68jtHtxzh7BOwxHnuwmebXCNMEkYJX47RBQFC1A5OmQzdqvvAYI/jEgrdx5hHzmO6lvNo+VQAjOxrldU=
+	t=1711716518; cv=none; b=tZZSvimbJ3TvAlp3C1sNt/TCIEBbWuPaf9/Y4Xii5PhJ0VBzjFKtvkI8B/5MPJuMA25SMktHQPAzjuxgjKzdD0BkWfplC3ugrh9B2GjL0+SrAHW1LLYXez7q3SDLe01yfxpIthrjYcllDBPsQKr4qw2yPdiUaAcQXwSYqz1J4qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711716441; c=relaxed/simple;
-	bh=Yx4z1c+Bu5s+V0sWrTPLA22MMO08Ob0bgjwlHnhaN5k=;
+	s=arc-20240116; t=1711716518; c=relaxed/simple;
+	bh=8wYWk+lnFSA1f2NjZ4HWprJzO1phQiGDLipkeklGi8o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nRnieWKjGmv805vYHA69xDH8P90effrPKomgElb6ex8/8jsddFdX87PYKmAy+hKS02/TCJk2aWxMEtF/yvobbDDL2GFNoBjrONs2NKR2BhGQbkcqCG/t294k9wKdSTXag0pi6951cB6Tga81dntJf5SuQeukZCRfkYk/AyUs6P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QSyjNtUk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=qGHm/fbey4poW9VZhBiKoJ9vU8yVhmdLpnETr6BH9ANYh6761Rn4cvvYI3/IAovlMByp4jwEASFb8Nw4PL3dv55TnCzvehnQqIFS+v1fr8XLt19ZP4b+ptd3qc28fSd77LfzbcXJcg9WvTxJn2+9ielPPNcLQgzjAhiTOA9vdh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ue8VvAXd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSyjNtUk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A39FC43330;
-	Fri, 29 Mar 2024 12:47:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ue8VvAXd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED07C43399;
+	Fri, 29 Mar 2024 12:48:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711716441;
-	bh=Yx4z1c+Bu5s+V0sWrTPLA22MMO08Ob0bgjwlHnhaN5k=;
+	s=k20201202; t=1711716518;
+	bh=8wYWk+lnFSA1f2NjZ4HWprJzO1phQiGDLipkeklGi8o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QSyjNtUkO5NPXkWufLgjgmhXxI5TEQ3T4jKj8KlamkU5RB2GlJCiudK5IfbzvaoMi
-	 66xUuOkL1DS52e8PtCSTKtlqF75sxoLSlvf2tNyH2NHECGJbRn/BBUD0ER/cdjbfYn
-	 EEYAcPY6FlbaTPY6q0hm5BZFdfW+XwaANRZtz7k/1D4aQuH+4vBPJm4/nHm/v/tthV
-	 qdXg8+TfNhim1rTWj3oPKVIHnowzU+e7umbBjvHQj4n6aUkV3zwR5HJNdfPlvFtpNU
-	 NAexU79Bmo1Sug8LM9pyCl5wpfwN4Qwtj1Co/lID6gl3Mhp6BbYtBtIqvNzQN4rALD
-	 uoSZRD5I2EclQ==
+	b=ue8VvAXdGUYKEp0byyc+LljIHECrgwyow6ELNCSQ1CU0dz4nTiQaOsSemfZjNYIqH
+	 lGBuO/H820CkK/zPzU+0gzCPtKiIuJGGPcH6Z4DChZf4bdGD1pogWa3RunWP5dzylu
+	 N3UtF+DVLOmXckMzEcTIaIDXr97MEdYGGpjybsorFvxYYUDs+FT4POOWgowuCVKA5s
+	 eHFXyPaDQaenaJg/rns/5SztsxHSeUjvhYXZmInxFOcQnpbEC72m/sihthNmWUc8Ef
+	 TETDC5diguG+8B4PMhDdbrFKkj4ZW28M16ePZUs/XDhWU0wvAdqMusOCabJ1C+nLiv
+	 V3mn6uqBoE/1Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -34,12 +34,12 @@ Cc: Roman Smirnov <r.smirnov@omp.ru>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 43/52] block: prevent division by zero in blk_rq_stat_sum()
-Date: Fri, 29 Mar 2024 08:45:37 -0400
-Message-ID: <20240329124605.3091273-43-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 28/34] block: prevent division by zero in blk_rq_stat_sum()
+Date: Fri, 29 Mar 2024 08:47:29 -0400
+Message-ID: <20240329124750.3092394-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240329124605.3091273-1-sashal@kernel.org>
-References: <20240329124605.3091273-1-sashal@kernel.org>
+In-Reply-To: <20240329124750.3092394-1-sashal@kernel.org>
+References: <20240329124750.3092394-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,7 +48,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.83
+X-stable-base: Linux 5.15.153
 Content-Transfer-Encoding: 8bit
 
 From: Roman Smirnov <r.smirnov@omp.ru>
@@ -71,7 +71,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-stat.c b/block/blk-stat.c
-index da9407b7d4abf..41be89ecaf20e 100644
+index ae3dd1fb8e61d..6e602f9b966e4 100644
 --- a/block/blk-stat.c
 +++ b/block/blk-stat.c
 @@ -28,7 +28,7 @@ void blk_rq_stat_init(struct blk_rq_stat *stat)
