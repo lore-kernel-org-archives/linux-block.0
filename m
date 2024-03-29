@@ -1,112 +1,63 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D471327E8
-	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 19:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E356E13A89E;
+	Fri, 29 Mar 2024 19:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711739581; cv=none; b=ZojZgu05SY3zdO323a10B5VIDRNKDCSfl6FrJ/9f1Ar1gIPwClmQ6G8XtBNtgRoH5L0GZ0ZyoswcwhWvCYLT5bMtRb08QwUzWUAgbPYJG4dKDTS2k7X1DSbdFlkCC6KA6xaIHVf9t65yrzKjiXFVmn//n3HM51658smuwrrLWFk=
+	t=1711740451; cv=none; b=hJ1dJTLHRCGTrP65E0OYNZorHOj7bZSoSbeIFWc0kxSOhE5Z4gdc+vj8hmFfqNz75GBRsacPyWgbVSObYs0UYAkNZ8HQPn8ZA6FHTt1ZBw/7hoTyD+3w4EH4Xtmvp0XbI/WUlalb6udcF9pbLlkDPbS1FmO8vqYsr3N5338areE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711739581; c=relaxed/simple;
-	bh=hkDPtZAj4mEBH+E2ODm/oYL9vxFp6ZkJdLxiGUQwOf8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KHfR11GpdGWNRrg6ew75YJqdPGn3dRXDuVsl4I67f6H/ghVWMbXvikrVzUAlWduWsEpvNc8jD/oPoVwsVqYw93oqDuBzh1cUEF31Rb7KF7OYLRrUUpDxNtpXbtnBxBzH3wfQNi9CgUKZ5DhxI1g/YgXBxSAsgw+YHqqjzAUaNAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zVLXaclt; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1711740451; c=relaxed/simple;
+	bh=zQx6slfbQwkr5CxuDiu9WPG+iL7RXOVvhowcv+VoKpc=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=AW+MS9JqKexlsX8nvWV0/g4ltHPsnl8ORjQ147BLvRIZ+RPz3mq6XwUok66o7QajLZKffPQCY0q3hn82lRq1RnHCP5D3DrlLMrK+nmk4A1nF4ZDv1OjN6IO20AUt6vsoxj9xq1jnSzwG5iFu+FOaKOmwwbEAyUXURDLSi9lT+Ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DX+MlK3g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zVLXaclt"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6e694337fffso459370b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 12:12:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1711739578; x=1712344378; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5VBNKvDbVSXWscDx2hlPOat6rwmlhFUpp4tFOtD03l0=;
-        b=zVLXacltvY79RZB0AiZ2AWaSCTOJvw4mLG/Vi4nVOMt+q6bOnvvZEJd+/HDf8yS/pm
-         QfPNtlOSqHda0W6iaXAxccRmtJXsEcfd9cKpkthVomlls2kLTPZ64Ee2nkfChu81A3hp
-         eRi1546q9wPaywzBa5OjisqOKkvD8bfK4A/ECC3B/T03pz6kN74zHlMf/9DxuAUmL2zD
-         iLRONFuFq5xXWFR8YfAKL3Kk0n2EmqYwQMpc3eSPxq9WIEetn0uSaUdd2ANtNBgbiFO2
-         mFGYNdlUgZRNXul4j9uyp1U0dDkRfoMfEPB0WNMbzdC6ViKOVppr3SBhUHVk7QlaE9S+
-         gPcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711739578; x=1712344378;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5VBNKvDbVSXWscDx2hlPOat6rwmlhFUpp4tFOtD03l0=;
-        b=KGG6P5XDq0vlXlYarKkObzaugVzMG4pOBcf/jSO4lYMOHUR4LFShf7tjAsiMXI+wwT
-         6NQ62hqUHZkd5y9q3I+Lijd+e3aeS3PLauLMzfmYrChOO0vsbjZG0mnAmqCcdJmFTwJh
-         UY00eNr+ckbDm78QM4osKoRrhOHNG4/iNYYzKOfXV015AHQaStA6aCTCfNK2Nt7SWU5a
-         Fjd24lPULg90ta91QbMW8xjtZr0yRvMiV8BNpos85WgEjwPJ+BieYjWel3DcOHuxQ+rc
-         Om5xMuNvjg0/CGKxB8fvwkgFlcPuq2RgEl9GDBJz73DlsMttzmuv/OgT4N5K38gUjWtt
-         Stxg==
-X-Forwarded-Encrypted: i=1; AJvYcCXim7XJzTQYUt1yIx3k88AWY56BhvdgLDTNJbl/sff+GQ5wayh1dp4k0nKjMRKffkAtSfIuLEbbG/6zuWRp5cEy5ulH2XJS8pbfnUQ=
-X-Gm-Message-State: AOJu0YzND6mQ+Idq1oV6iZCnGMuQYgCVRBhbKaLH+3ZZ6kZUIRk28QoJ
-	m57NlMwRsOaVPR/sWLSG7Q93efQshA+43nKU1LNXhCvUY9g88PEzlaas9JZxqiw=
-X-Google-Smtp-Source: AGHT+IHzrTpKVu3zpcysw/Cf0jw8pV9XJkpAzWgws7EQo9UlGHeDEs00hxVoRGiuAfLZi4CwVuuaIA==
-X-Received: by 2002:a17:902:ed46:b0:1dd:7c4c:c6b6 with SMTP id y6-20020a170902ed4600b001dd7c4cc6b6mr3221673plb.5.1711739577898;
-        Fri, 29 Mar 2024 12:12:57 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:122::1:2343? ([2620:10d:c090:600::1:a5ff])
-        by smtp.gmail.com with ESMTPSA id n12-20020a170902e54c00b001e0a7e5a34dsm3806504plf.81.2024.03.29.12.12.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Mar 2024 12:12:57 -0700 (PDT)
-Message-ID: <be8e14ec-3d46-4d67-88b0-f3dbf7ff22b2@kernel.dk>
-Date: Fri, 29 Mar 2024 13:12:56 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DX+MlK3g"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C24D0C433F1;
+	Fri, 29 Mar 2024 19:27:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711740450;
+	bh=zQx6slfbQwkr5CxuDiu9WPG+iL7RXOVvhowcv+VoKpc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=DX+MlK3gA5Sh5nKxM0bF97DFO9+mNrdgtyQvJeDvRm0tHPtV2LOflMyPUOxqUoBfa
+	 8nhUOJO2jdvPT0YBiwmazYZRemwc4D1oedy+WpiBmbRXL+VzHGNKFrhkIMAUagfbaj
+	 lMXiYhQ67ZmRjs1buVF5JYVjpNtXrxQ1b7aASjsk1InPhWT4/vLU7Uq7n+xPQ18vts
+	 MRaw/c8hnRcBrStFXwx6PZAM+lQqJL1a0X/cjgXXGTHjAMHu8NgbnicnSwRV361P9F
+	 OuP0m0TCZpIT3qlGhvN35KMJGL42CZo5JN8ai8N0moEi77vStUtBkfYTdqiMbyN4i8
+	 ZEA5Zd8F3R6Dg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BAC8ED2D0EB;
+	Fri, 29 Mar 2024 19:27:30 +0000 (UTC)
+Subject: Re: [git pull] device mapper fixes for 6.9-rc2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <ZgbOJlMv2nYOEbWe@redhat.com>
+References: <ZgbOJlMv2nYOEbWe@redhat.com>
+X-PR-Tracked-List-Id: <dm-devel.lists.linux.dev>
+X-PR-Tracked-Message-Id: <ZgbOJlMv2nYOEbWe@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.9/dm-fixes-2
+X-PR-Tracked-Commit-Id: 8e91c2342351e0f5ef6c0a704384a7f6fc70c3b2
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3508f318a1dbbc6a19cc873bb312c7d221550ba0
+Message-Id: <171174045076.16736.10562119489660838087.pr-tracker-bot@kernel.org>
+Date: Fri, 29 Mar 2024 19:27:30 +0000
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, dm-devel@lists.linux.dev, linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, Kuan-Wei Chiu <visitorckw@gmail.com>, Ken Raeburn <raeburn@redhat.com>, Arnd Bergmann <arnd@arndb.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-wbt: Speed up integer square root in rwb_arm_timer
-To: Bart Van Assche <bvanassche@acm.org>,
- I Hsin Cheng <richard120310@gmail.com>
-Cc: akpm@linux-foundation.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240329091245.135216-1-richard120310@gmail.com>
- <848d1259-ff6e-4732-b840-a02a5e5fe2cb@acm.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <848d1259-ff6e-4732-b840-a02a5e5fe2cb@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 3/29/24 12:15 PM, Bart Van Assche wrote:
-> On 3/29/24 2:12 AM, I Hsin Cheng wrote:
->> As the result shown, the origin version of integer square root, which is
->> "int_sqrt" takes 35.37 msec task-clock, 1,2181,3348 cycles, 1,6095,3665
->> instructions, 2551,2990 branches and causes 1,0616 branch-misses.
->>
->> At the same time, the variant version of integer square root, which is
->> "int_fastsqrt" takes 33.96 msec task-clock, 1,1645,7487 cyclces,
->> 5621,0086 instructions, 321,0409 branches and causes 2407 branch-misses.
->> We can clearly see that "int_fastsqrt" performs faster and better result
->> so it's indeed a faster invariant of integer square root.
-> 
-> I'm not sure that a 4% performance improvement is sufficient to
-> replace the int_sqrt() implementation. Additionally, why to add a
-> second implementation of int_sqrt() instead of replacing the
-> int_sqrt() implementation in lib/math/int_sqrt.c?
+The pull request you sent on Fri, 29 Mar 2024 10:20:22 -0400:
 
-That's the real question imho - if provides the same numbers and is
-faster, why have two?
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.9/dm-fixes-2
 
-I ran a quick test because I was curious, and the precision is
-definitely worse. The claim that it is floor(sqrt(val)) is not true.
-Trivial example:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3508f318a1dbbc6a19cc873bb312c7d221550ba0
 
-1005117225
-	sqrt()		31703.58
-	int_sqrt()	30703
-	int_fastsqrt()	30821
-
-whether this matters, probably not, but then again it's hard to care
-about a slow path sqrt calculation. I'd certainly err on the side of
-precision for that.
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
