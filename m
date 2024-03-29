@@ -1,151 +1,124 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705CB394
-	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 00:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A9EA3F
+	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 00:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711670738; cv=none; b=S8MyUogF7v5W1jYxBF1HB4MDkICXAmgPKwv9CWRMa896UgsSSc2M0KY1KDf0SoFICQ/0PLuQUeebQqDs60/ZGF4GIYV4ecQTM0+1jXkycbEPYvcXxAltQKxHmyN0qsO2XrAaLk4/nR90L4NdJ8b/pDYTbqFjjlIYYHQzAtyRsFw=
+	t=1711671121; cv=none; b=FfRQsbUMsQSprKkaP21eDynjFgpYDwgJBbv0hIqpIMEKr7zUVwUroVBYTy2EG/L42ZB8JShMru27QL1aDD1QRwnpBzTiRiLSpNU8PwIHqtmiZR3KkJ75aSwC3FH5O+onux4lrAmG17bxT39fSvq1TjwFlojMbFfpZpht4gQHuaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711670738; c=relaxed/simple;
-	bh=cjxm1Ryfb5Z9F4sbSdTRXRhffmjVd0tmVnxtg9IiFvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=utywLtsrJGnD99nPZfRk+weUn2ytsutOjorTUJB0Nlz/3N+hmO3KDoz2b1AG0QnjX7Gw56Xoi0pT7MP8z5mugdccxVQpjz65SHmdza1ETK6CEq1G6himuOtqcGJMfTlL7tpttCpdzxoS5eml3aneOoxI8zes5EAhBHDNJwUllK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i3bTekP7; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1711671121; c=relaxed/simple;
+	bh=6wtHnx5aHAflr5DF9YkYkeu6eoyg/MQpUEZgak5DzX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JcnxoS6GaITurdZlui8oT8a6M6RqvZxrlfVBIYTIbrnpVldjxgUXgMCyVJTwhrIWViuRMplFE/oXp6Pv3KiXO5gkYUzqEva+2WaxqJQZeT37TSAg8e5vfSwrPGM7Btfme7buQA9d3YHTciwmj7/6IHfHR+M560azRJ8b27hd7fQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SFdSDuyM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i3bTekP7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFdSDuyM"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711670736;
+	s=mimecast20190719; t=1711671118;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oquIsO/B8A2Gk2EwI1tx+d6zNaq8dTKXgOE1D72BOIw=;
-	b=i3bTekP7uHuTkj6ouHBfEKGr8LYAO9pNQDW0BfyP/03t49V2PPgG25WWQDROoKbNz9xbCm
-	DFBCsbYVKXopkWbFIIX1TaJ9JlwHkX1X/KXZR3qDwUvmcQwl+LaU+X+ruTLu0AWzRq3jr6
-	U45UX+ggdQjXbK+mH5JLW4dYeW+8fAs=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-597-fApw6pzSNPqKhi4RRMJhZg-1; Thu, 28 Mar 2024 20:05:34 -0400
-X-MC-Unique: fApw6pzSNPqKhi4RRMJhZg-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-22a1dbcf8e6so1222772fac.2
-        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2024 17:05:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711670734; x=1712275534;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oquIsO/B8A2Gk2EwI1tx+d6zNaq8dTKXgOE1D72BOIw=;
-        b=dDHIzwQYwTWZEShkMTXTZWKd9CAA0uRWdO/ewZCSE5XYHkZeGygDwU0ZTBkofRDY7h
-         GGcmNHjkLhPV+M0d7WWE6LkjM863nriiwSF87HhHpgA3uEOMWfE1hvLDtLLh2/rB7hZR
-         IskWGfWaOXzgAu7MU5Dywwl4WU+6pMk+A4dvb7ILkW/ElC3j3p/m9hewddGmLZ9YF4ZO
-         DtKDJzi3bJeXXF2pxWy9AqsFD3nVtCZ5yljb3Rffa2GK4fuxCLCLJKHHpyDwIYcszFtD
-         0Y/SpnwNTO7teDsBoeMtSpzukTv6b11HlAWqjFGzU93Q1RJE66ZOKox2ENGU3nmly2sz
-         baQg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCsJJUDLNWGHwQy3GaDrj+8VqjzmaRr7CZOh0MpAH/BXoMrAdMX3j3dgo40CgDCm62F8ZPnAP9zIvGHtNEqRibRifGjH4giNAYmbw=
-X-Gm-Message-State: AOJu0YzlCQRHsNjBiPlxAAHH8zO/FuN2pYPzWEaeB5/PThgBUJ/GvNee
-	VYtFjvZOwuFz63gE/DdFSTNpJnfr+tjkkDCNkARhT8hrRMa1hSK6uOZfg1+Spcu+o/9CaSc7SMM
-	o0YBbHpJzkAbbw1Y5EplkEEIZVXUrPMmBSDeQ+D8J961Fpt8Kb5nujNciAQaC
-X-Received: by 2002:a05:6870:9213:b0:22a:e91:2d9c with SMTP id e19-20020a056870921300b0022a0e912d9cmr744890oaf.56.1711670733968;
-        Thu, 28 Mar 2024 17:05:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGnEoQrZF39Z3vBtcbSJQo0k22y/TmSjLE13uEQmcKttgsZxV4Si5B4aokUcJRse8C4U5UT1g==
-X-Received: by 2002:a05:6870:9213:b0:22a:e91:2d9c with SMTP id e19-20020a056870921300b0022a0e912d9cmr744867oaf.56.1711670733707;
-        Thu, 28 Mar 2024 17:05:33 -0700 (PDT)
-Received: from [10.72.112.41] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id j23-20020aa78d17000000b006e681769ee0sm2020583pfe.145.2024.03.28.17.05.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Mar 2024 17:05:33 -0700 (PDT)
-Message-ID: <93fc9138-7498-4268-9bd2-d5b87f215963@redhat.com>
-Date: Fri, 29 Mar 2024 08:05:20 +0800
+	bh=ehgSCj3GfjkXw0aHOEvtMuIGQ4Ldvig/G2OmaVA7+S0=;
+	b=SFdSDuyM81PRDNm0wvzL5cc2/dHtfQa3Q+rXO7rGu1A/DHrSasSYhwArzNt5CSWoympwWI
+	7ETGVaFBe93Lk3VNk4ODSV0DzRcOFCMG5zR8W8yUyJq3379VYPGjl5SFjnF7jjClcn0Xzw
+	/A72wa0dw1U0UK9USstaNw0qAvtRENI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-125-3jGYByT2MzOhp1gl9WdmJQ-1; Thu,
+ 28 Mar 2024 20:11:55 -0400
+X-MC-Unique: 3jGYByT2MzOhp1gl9WdmJQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D490A3801F4C;
+	Fri, 29 Mar 2024 00:11:54 +0000 (UTC)
+Received: from redhat.com (unknown [10.2.16.33])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A32D40C6DAD;
+	Fri, 29 Mar 2024 00:11:52 +0000 (UTC)
+Date: Thu, 28 Mar 2024 19:11:30 -0500
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alasdair Kergon <agk@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
+	David Teigland <teigland@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@lst.de>, Joe Thornber <ejt@redhat.com>
+Subject: Re: [RFC 3/9] selftests: block_seek_hole: add loop block driver tests
+Message-ID: <xh2nqmndk4rfnvghhmv6xlueleb4mdfa6v5vvamnxfyxb3eomb@yz5u2nldqewf>
+References: <20240328203910.2370087-1-stefanha@redhat.com>
+ <20240328203910.2370087-4-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/9] rbd: avoid out-of-range warning
-Content-Language: en-US
-To: Alex Elder <elder@ieee.org>, Arnd Bergmann <arnd@kernel.org>,
- linux-kernel@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
- Jens Axboe <axboe@kernel.dk>, Nathan Chancellor <nathan@kernel.org>,
- Alex Elder <elder@inktank.com>, Josh Durgin <josh.durgin@inktank.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Hannes Reinecke <hare@suse.de>, Christian Brauner <brauner@kernel.org>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- "Ricardo B. Marliere" <ricardo@marliere.net>,
- Jinjie Ruan <ruanjinjie@huawei.com>, Alex Elder <elder@linaro.org>,
- ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, llvm@lists.linux.dev
-References: <20240328143051.1069575-1-arnd@kernel.org>
- <20240328143051.1069575-4-arnd@kernel.org>
- <b8e848fe-96d8-4f75-a2e9-2ed5c11a2fd7@ieee.org>
-From: Xiubo Li <xiubli@redhat.com>
-In-Reply-To: <b8e848fe-96d8-4f75-a2e9-2ed5c11a2fd7@ieee.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240328203910.2370087-4-stefanha@redhat.com>
+User-Agent: NeoMutt/20240201
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
+On Thu, Mar 28, 2024 at 04:39:04PM -0400, Stefan Hajnoczi wrote:
+> Run the tests with:
+> 
+>   $ make TARGETS=block_seek_hole -C tools/selftests run_tests
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tools/testing/selftests/Makefile              |   1 +
+>  .../selftests/block_seek_hole/Makefile        |  17 +++
+>  .../testing/selftests/block_seek_hole/config  |   1 +
+>  .../selftests/block_seek_hole/map_holes.py    |  37 +++++++
+>  .../testing/selftests/block_seek_hole/test.py | 103 ++++++++++++++++++
+>  5 files changed, 159 insertions(+)
+>  create mode 100644 tools/testing/selftests/block_seek_hole/Makefile
+>  create mode 100644 tools/testing/selftests/block_seek_hole/config
+>  create mode 100755 tools/testing/selftests/block_seek_hole/map_holes.py
+>  create mode 100755 tools/testing/selftests/block_seek_hole/test.py
+> 
+> +++ b/tools/testing/selftests/block_seek_hole/test.py
 
-On 3/28/24 22:53, Alex Elder wrote:
-> On 3/28/24 9:30 AM, Arnd Bergmann wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->>
->> clang-14 points out that the range check is always true on 64-bit
->> architectures since a u32 is not greater than the allowed size:
->>
->> drivers/block/rbd.c:6079:17: error: result of comparison of constant 
->> 2305843009213693948 with expression of type 'u32' (aka 'unsigned 
->> int') is always false 
->> [-Werror,-Wtautological-constant-out-of-range-compare]
-> w
->>              ~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>
->> This is harmless, so just change the type of the temporary to size_t
->> to shut up that warning.
->
-> This fixes the warning, but then the now size_t value is passed
-> to ceph_decode_32_safe(), which implies a different type conversion.
-> That too is not harmful, but...
->
-> Could we just cast the value in the comparison instead?
->
->   if ((size_t)snap_count > (SIZE_MAX - sizeof (struct ceph_snap_context))
->
-> You could drop the space between sizeof and ( while
-> you're at it (I always used the space back then).
->
-Agree.
+> +
+> +# Different data layouts to test
+> +
+> +def data_at_beginning_and_end(f):
+> +    f.write(b'A' * 4 * KB)
+> +    f.seek(256 * MB)
+> +
+> +    f.write(b'B' * 64 * KB)
+> +
+> +    f.seek(1024 * MB - KB)
+> +    f.write(b'C' * KB)
+> +
+> +def holes_at_beginning_and_end(f):
+> +    f.seek(128 * MB)
+> +    f.write(b'A' * 4 * KB)
+> +
+> +    f.seek(512 * MB)
+> +    f.write(b'B' * 64 * KB)
+> +
+> +    f.truncate(1024 * MB)
+> +
+> +def no_holes(f):
+> +    # Just 1 MB so test file generation is quick
+> +    mb = b'A' * MB
+> +    f.write(mb)
+> +
+> +def empty_file(f):
+> +    f.truncate(1024 * MB)
 
-- Xiubo
+Is it also worth attempting to test a (necessarily sparse!) file
+larger than 2GiB to prove that we are 64-bit clean, even on a 32-bit
+system where lseek is different than lseek64?  (I honestly have no
+idea if python always uses 64-bit seek even on 32-bit systems,
+although I would be surprised if it were not)
 
-
-> -Alex
->
->>
->> Fixes: bb23e37acb2a ("rbd: refactor rbd_header_from_disk()")
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->> ---
->>   drivers/block/rbd.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
->> index 26ff5cd2bf0a..cb25ee513ada 100644
->> --- a/drivers/block/rbd.c
->> +++ b/drivers/block/rbd.c
->> @@ -6062,7 +6062,7 @@ static int rbd_dev_v2_snap_context(struct 
->> rbd_device *rbd_dev,
->>       void *p;
->>       void *end;
->>       u64 seq;
->> -    u32 snap_count;
->> +    size_t snap_count;
->>       struct ceph_snap_context *snapc;
->>       u32 i;
->
->
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.
+Virtualization:  qemu.org | libguestfs.org
 
