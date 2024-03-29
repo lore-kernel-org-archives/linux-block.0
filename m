@@ -1,175 +1,148 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA9E44C6A
-	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 08:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711699587; cv=fail; b=T2dSyxtGSICUa917bSqbcTux3Whz5EW0i3G59PVAeAl5Y/PHI9i+eIoPnHxVv88OPpEFQ9tjKS9DnUprSKhE27MwpLnN5dnxs7iFPhM4N7FzsDirBphfLJDeaGNwy6407Qpl4Nl21wm08iCG4Mr5KiIC5IO6uIwgdfdR0WDh98M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711699587; c=relaxed/simple;
-	bh=PHjAv20Qr90tQTDIFzjRVL7I4heaLJiMsH0nneD4vnA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uDIpGro0uCUutZ0pUXdeiyMOBlHqJbmemlbelfE62JkaUa9lSORgqBqjjvpu/nTricXGn1k4P5ibTAgSL2i3U9iC5H6X9nwPsiguz+iPF1WdfACAQ9hndH5zwToMurBy5z0g10swcmV/d+mioAgoCPrUbjpl6R0vFicBtZspJ9U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=O/qTE8yW; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=SS9KB+U8; arc=fail smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFBF25569
+	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 09:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711703240; cv=none; b=RKBfiM1nLG3gassf6wDmjZ5CBGet/7isFYVckoLF1XItWIPm6C4SAsVbSG/88WcoRxURmOsuTj//TEZxwMrv7PnLMGjzBvM/hWC2iYCyNhXR5Qf5GwHwT8GUUPSG9Q5Hqp0MHgQinlsU0mftVNCDIg37bi1o7r78fUdQSiv3bzk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711703240; c=relaxed/simple;
+	bh=It/GX+ReBBYX1AKiBl4D9EMBAtHpYKikCFSIkseXHaE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bXQgJg9TIiUERe4IQxsQ8XjdoPQdX7Ho6kbQ+zjmdSVeIpVGV0yfE74XZfG14XUbCf16CfxKlL97pl1ynHUfqMYWljgvkdtFwowyhieYnOJb/d18gRNe7UUdGnj3sAjsuo009mQqFHkqTkAkuU1dfROeWJsRMhxfv7UtCECocd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=WwOJgg9e; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="O/qTE8yW";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="SS9KB+U8"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1711699585; x=1743235585;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=PHjAv20Qr90tQTDIFzjRVL7I4heaLJiMsH0nneD4vnA=;
-  b=O/qTE8yWEeFXfAiSBib/Se92QFbOr+tKk76QbBRstaB9PL3Ola/RJ0q8
-   iiKYk0x2EEUsgJMTSFAnz8L9IOI/5IJHmkCNy4fki8CPCCZt76Xbos7H7
-   OGXZI6d615H+Z6kY+eiGGDdxpzWbXwY0y1486l1MSaS/2mCsaHG3CeaVZ
-   gayyR1x152f1Caj1unpBHMxuZjySmGGoz3AOJBw1Kh8bh+vx0NHWSwST1
-   S9tSWXRO31OLj+DH+3u9ATyiDUFm7oI378j/GirSU/XfEStdGlF+3GY3V
-   WMTPgrvsllXz2aOOLQa4wdOtwysm2XVZIX9EmoJIm/g0CPLJ6TqPdUvV+
-   Q==;
-X-CSE-ConnectionGUID: LST+WlO+TpS2ewbMqYubgQ==
-X-CSE-MsgGUID: wu2rCGJXSoKTk1eonP3KWA==
-X-IronPort-AV: E=Sophos;i="6.07,164,1708358400"; 
-   d="scan'208";a="12784243"
-Received: from mail-dm6nam11lp2169.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.169])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Mar 2024 16:05:10 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RJl8xrm9cYxIbw2vVt2IaRRpZpLdKhWGSS9awbXzClGRtsXO4+bXNWGdPKOKP4MJw+ZHZsGlHtbKu6DehyI06z9msqKqQJiHmAZ2+HJDu8tAljq3lIhsCcr3yQP9rWOBk1avAxeQq6vOBY6uhUlTGXWp81Ii9nZG+y3shh6+7FO7WAShpACmdU4qrIBE3BYI464HzWiDaoYiwW9XBMPxPbudHF+M0Fp2dtDnLVEgQD1t7k4C7nI37E0GjWkpHZwQs713zUbi4HtPHhBhQEbYvrX2FI+JiPybY9rSsn56j000/FhERLYR4rKHwcHEwQKqtC+FHyUKCw7bJCTk2yXh6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Eon6ll+sjgS7HNhXN1L5jXvNEP5E2FWUOmLYX+sNHv4=;
- b=IopYWYf+1pf76Y+CAN9qY8pLMT5ELlBJG2SpzfzPaPcSXXIoC50XnjLkNtP11jPQDxevBfsXoce07TN+aGt6GYYy9ykCGLt8Z68pY10pqwDXglPYXrUjceg0587NyDjj33DHbiC2o8jWQqRBBxnuPtspejgTHsMR/6ALXgAJhdV5mtsKSv3f/aN1kOXItv3MPsUqYvhG/tRNHNAXgB8/73EqDaG9i+ep3IK5l/GJcX0xbdS8e+ejSBOjX8eJ1oZgtyeV68hLDkU2sGTDhdhSh6nvdPocAoYsF+DTvsYbJJ/gRhYzXCvI27DvZYihseA68IpmWIaHJuu4huEKIYHp3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WwOJgg9e"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e0fa980d55so15776525ad.3
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 02:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Eon6ll+sjgS7HNhXN1L5jXvNEP5E2FWUOmLYX+sNHv4=;
- b=SS9KB+U8Sbzvz9MUpkJJSUmycyY7jweNo7NZuuuwBxIPLBhZQMroj3Zhhbqq/BB6Mm74IeBvhlO8DJglY39MVr+yQkNmYXiwaJSVBaCADB07InwMVMD2os981Cq0VTu7nHVH1y9Ahjmp4AnZ2kDgT2iPde0HHvBEzglG1gHjz9Q=
-Received: from BN0PR04MB8048.namprd04.prod.outlook.com (2603:10b6:408:15f::17)
- by CO6PR04MB7876.namprd04.prod.outlook.com (2603:10b6:303:138::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 Mar
- 2024 08:05:09 +0000
-Received: from BN0PR04MB8048.namprd04.prod.outlook.com
- ([fe80::602e:e063:814:c285]) by BN0PR04MB8048.namprd04.prod.outlook.com
- ([fe80::602e:e063:814:c285%4]) with mapi id 15.20.7409.038; Fri, 29 Mar 2024
- 08:05:08 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Daniel Wagner <dwagner@suse.de>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Chaitanya
- Kulkarni <chaitanyak@nvidia.com>, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests v3 16/20] nvme: drop default subsysnqn argument
- from _nvme_passthru_target_{setup|cleanup}
-Thread-Topic: [PATCH blktests v3 16/20] nvme: drop default subsysnqn argument
- from _nvme_passthru_target_{setup|cleanup}
-Thread-Index: AQHaf3+DzlsgXUYrGECE5jrsKNHZELFOYJ8A
-Date: Fri, 29 Mar 2024 08:05:08 +0000
-Message-ID: <b4ihfmeeiwlcwdfv5lpkkqhdtyjwqzd7vfd5izoajpppvra3n4@hpnwbh6pkmex>
-References: <20240326131402.5092-1-dwagner@suse.de>
- <20240326131402.5092-17-dwagner@suse.de>
-In-Reply-To: <20240326131402.5092-17-dwagner@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR04MB8048:EE_|CO6PR04MB7876:EE_
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- NgAxnnVdzKa8wE3YkqE4eljf8RnBjn3e8XzeKMEpTMTR024ungvw84nwQ+/lOeGWzQD45qIqVFBURhrbbgDNM5T0nDrKspeTWsaJkwMz9edR3iS1ypXTCctGTeIvc3lehSvPoiXm0JvDP0QkEypNyrkOBWxXjTDQOugDegYTDsmqXOjL/cbDsxp+WtTI9hl1Y3TjDCCcCJP86RKI8Oym2VqZkZehDa6KwnHFVJpz/1JoG9Mgg3jw1SNiCfQ3/bg9Qtafd2FR0mJuIoXEonouYPBUM2a3ED4GKMnmA00E7vGSmYEaTEuOm5rQywUbMpZKBmijfwoocjcqYkjZdlEVxZX/C3lHwfvKHp7w3bWhiEUyoR2kEbHStUtPtEhlfkg41WcS8cbTZxg3/35zDzD9yxh9dMBFFvfKLHKWXYeK9N4uPbzfS5jntLidMYUW+AGQGFsN/U5bQEJYa5dKN1n06lTksTlyCS4CfRFmaRcWm2xEWyzFIbkD2W3bXiXlh4N9veC2tmZqUJPdyxQR2IRYmxcJwPXOgvOXTNwQGw0Nd6m+fW1YM07ulNLgy+OlVJNBC6qQ/lblkNfsbn5OCnuAUD1SgShhcMTl2/caZxUiAw669nBbo+PkzS/8twO2yISASNGtIw2h9y3hYM3bpxm8fRKVAFCEHwOfBq+wyyDhZb0=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR04MB8048.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?P4pQPt6AJ2ZwMVtKqndJKE53YidnKBk1dM8palboCbV+zG+z/n5eW/6K2lKs?=
- =?us-ascii?Q?sOPIT3Zp4oIxfDeAOhpMFsVedU28oEgH+2sYQqh0piiAOLQ1NQ08j3z2ng6n?=
- =?us-ascii?Q?vgNyGh5gDHcGhLluAjxYtW2SlRUiSaJOn/d0MA9mstyYzmv8wixUimRZmdD5?=
- =?us-ascii?Q?jreRpx0ukM/WlyNCYDt5Hp82N38Ks6US6OaC9FDJYe/uSyVRl4p88Eeiuk7g?=
- =?us-ascii?Q?1vW5e5ckZSRcoviyWlGgZTbDqS6uDVwfOYHVFtRNf02Z/hXNI1XsJn3uWH2r?=
- =?us-ascii?Q?V7UA/wwqym38IT5q4qfsrWk3tk+c0G6q9pM2J9Xo9nls2CVB5AcHQi3iGg42?=
- =?us-ascii?Q?63qFmk856uhQ2WUxCfaTtXIukEfopOr0D9vPCaFwS6xLxZ7te7hosh+3Rg6V?=
- =?us-ascii?Q?wiQURCfC9yA3R1tVUpxpGIS7x8jnxYgmibwL1O+Tt7p03CylkoAVhelu0csv?=
- =?us-ascii?Q?5h7RiuxlriWCAnjzcTpYA3LZeTd7fhQZnvxlWh+UTWRqP4jjL6rbrJwViC5P?=
- =?us-ascii?Q?nSibVBPu9g46c0+JnpBA0mgpyCcz5lHjTC8Jt/rKJEIfRvDrWDSROk4NRUm3?=
- =?us-ascii?Q?6yWGwUZpwHzdUuuIHIzQAOqdGLnIMNH3qa3rCOmYGHdkWSn48tiJF+spoxYa?=
- =?us-ascii?Q?A7ygToUgbaa+mc46uFrkUB99dL4fOxTHDzXYf4HahuO6SWFj8tA1Ik2OQSB3?=
- =?us-ascii?Q?EY3koL983QNzyL0osclS97h8/btivxm7i4qfKf81+nwHoS8/yEll+OKD1mlA?=
- =?us-ascii?Q?0SqTFUjwPrIx+/I3Gr6/bzdAjD+XVEmulfsOjKkbrfYsQ/uXD9nQDD6Vyv7O?=
- =?us-ascii?Q?P72jZX/Iscj5qMDfRg/ltASNOQ4HKIDLMv8MiY0P3XmLjEpBogLXwps1FY0I?=
- =?us-ascii?Q?NhNnb8oQoF9QAchkHMCJCRiGnoncXZZuSg744gJ1Is5ftYCyk8Fbl19/AMpR?=
- =?us-ascii?Q?ZpA8C3dFGUzVpq08oOjTvrXwrctayf0Sc+CoWwSFxGWCgKK7uKmzDl2Mr0lV?=
- =?us-ascii?Q?BbYH3mwsou/63URIHyEd+l2Md2pU2WfJnbzvUnsDmXPT0PU+OknPmBG5sYSH?=
- =?us-ascii?Q?T0M9Vxa+JAy+VHAgL4kFnaR9u3qtJKDsRis066lTpbVtpPeiiLn+T/SNqosY?=
- =?us-ascii?Q?9tftAu4ycHnmTEqdu1HcCedrsYGEcQXKkvHen/dNKTqTMDvaXZNcym+PnMl/?=
- =?us-ascii?Q?r5h4WaofWb+vuRMkd8xXV4yDZsmRQQS/4EmLd7Dud3G499xdnqxTtDJtWZpv?=
- =?us-ascii?Q?QI2plVFum8OykHUfWhPmZTzP4BZB8ekXlikOr3A90CK3olUJTDOtTGeD91qb?=
- =?us-ascii?Q?FviRU18RXvIR+UlSjibFPPdz0NlF8AIDfdzHL6AtAKOS/XXX5R/E+6UUiKnh?=
- =?us-ascii?Q?s54eH1jCW6aQmO+HHc9bHjKBJLXyNvvkHIYPf04/UX6oxVzh41vHoPjpDsFk?=
- =?us-ascii?Q?UBG0mmPW53sm5WU1STLi7dygb0iaGSIY0Eis3XPK6eWTYSDj4eCbDvcdc5T1?=
- =?us-ascii?Q?rgRUQV+WTyFu5JM416AlxQSLvkvrgfzheJRtGnXBLw9wXmH8wiOo7CwkZ1fS?=
- =?us-ascii?Q?kjpSGjFOP8DKOS8izD6kWFqYOYtsQ16b7vS7AQ7NY8OqKiLdEi6EZtxiFGQa?=
- =?us-ascii?Q?0OKPSUREueyb1XxiP1rx+Os=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <95C3A91C415F2645B056A2A1187D5A25@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=chromium.org; s=google; t=1711703238; x=1712308038; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=trqMODpsIhhm8jYppx91hSLinbtKoTmnbiwFELvPFk0=;
+        b=WwOJgg9eVte0maMaH7PFWXurb2GL308tKYIJubT42EoWVJHmNMjJux/uj4xd6nm7iT
+         vUosIsu5LXCXdGvtVgm3RF99pTUct/Pk5grFa5FQh7GHk6eYbqd5e/4izC15wDYkTPNn
+         87BOEbOzvmCZGu4fMCviHZ2LCTxbgol0S0cXA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711703238; x=1712308038;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=trqMODpsIhhm8jYppx91hSLinbtKoTmnbiwFELvPFk0=;
+        b=CEo6TKCEPPE62wSpAQXjkql1q7CChIpF6p1qS6Q1gwcka6sCVfwk27vPZAmKDwBEdS
+         iH+x2PfPjP7y9EfMobFP+5+idC9I7M7bOoYeIqY9YShEiPhSPCpNrI6Nrz7l4esawvt2
+         XsL2Tp6O2WH1RyWHpcjfZbkKnVbFinq4bLKcIpCRCM93QgqZ+W1Bk8wnzb9hlvZuOJvD
+         xPGdEZBBG8j+ce13bpxp21mtrZ/EBhTEFM6kHmuKbSSkI6/Z2SVMr/ENyTHIFdyatpTu
+         kXha5FJyNm3G7vhWVaxgyoq3BucFXz/IDyt4PRTM5+bqvI4+2cxGPzakbG+sQEdMY679
+         K+GA==
+X-Forwarded-Encrypted: i=1; AJvYcCVB+XPNi5qvukjR7e4ZyYnWMqiMH4Fp6OpWt6Tl/2YO/usQ9zPTbSD0Sj2B6K/fk63l8Zww1eB/AOVhtW9FblOASfUvS0qaiXGf/Ag=
+X-Gm-Message-State: AOJu0YzF7qr0T9eipXrY+NkIoRIL7Er1IxT5jwgu+za0dWzJcwY1gR04
+	CQCm8YpWUd0DZGZp8/PelOZm44GUoFS6WkP45e7h9JbG2UFiwXodTxzk3UsSEeM8HcCovIGHkCU
+	=
+X-Google-Smtp-Source: AGHT+IFjV84gXiP/i/Evod+K04pCptnzt8bY2N+jkT5KFPFU1TVRG+7hC1lnO6hvyrpk4aINbKcrXQ==
+X-Received: by 2002:a17:902:a3ca:b0:1e2:179d:66d1 with SMTP id q10-20020a170902a3ca00b001e2179d66d1mr1760681plb.19.1711703238474;
+        Fri, 29 Mar 2024 02:07:18 -0700 (PDT)
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:889e:22ed:efac:44b6])
+        by smtp.gmail.com with ESMTPSA id m9-20020a170902db0900b001e0fdc6e4e7sm3008108plx.173.2024.03.29.02.07.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 02:07:18 -0700 (PDT)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>
+Cc: Brian Geffon <bgeffon@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH] zram: add limit to recompression
+Date: Fri, 29 Mar 2024 18:06:44 +0900
+Message-ID: <20240329090700.2799449-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MOZ5refEX7akbPA8IESFQW+6DFYQm53y8CPocSIJOpNs3rbjW+gL6CpcmIUNJL4Hte6Iik6xg7umrhbhbMJHz63/+g+tp9GtQDBmH0/gB/yZfnjPiU2WtF+tJThmuzYkZBZ14dKmts1IC4OAUBImGZHgn7K5Hyhy9Vp/Q6t7twmPpZE1vq8ZvCpr520hSQqG5noauXijuCd75sJ3hEhMkaKqNNfULITHqZupnc3/DYSNa4YJjEnkXV8EnjoYlrZp1wyV6FC2s5MxcEo3bMncpmMHL9tX0NSxBWE7GooZKxI+vGs9imfZ8Z1kbKK1cEMglZ3IukRMfgofPXpPeHTga+7271tWBv0ZE/7SSTxhv1TrfMiG/r1T/28Rc3D3Yai4RMkgaET9/4fkrFAlTWvMqkSlT3iwBbwB495rzck9a8206NA8GGGDjOcuB97FvP7u84Iqmy8UlgbMtUMCwLo7SGkFkrHnRt5LlHiEhlBJlC78cLKYSjk0YV/aWoNtl5RB1UXqMr4uc+V7e/DsmTnyjWCEh0s7KYCIZ7vcHR/+3KJywFDFRBlX18O1H6+7+rl+C2bHPIRrlMMAWNi/rUh4K9hhS4/QZT8xJvtXd2Ghq/2MFUxuUeg6/SHnaE6KY3jh
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR04MB8048.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd12e674-2ccc-4acb-289e-08dc4fc6f388
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Mar 2024 08:05:08.7146
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: otfT81OUj1Donr1MqVZn0/sL+W2ojEkVVB4Z6IJd7xLrGR3CxHGbXhaxjbvV9F+ZuzfBvqi0J//0ELI3LB799pFp8G3xGhfc7SREgGgWzHw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7876
+Content-Transfer-Encoding: 8bit
 
-On Mar 26, 2024 / 14:13, Daniel Wagner wrote:
-> Remove the last positional argument for
-> _nvme_passthrue_target_{setup|cleanup} which most test pass in the
-> default subsysnqn anyway. There is little point in cluttering all the
-> test textual noise.
->=20
-> While at it, also use subsysnqn as variable name everywhere, instead of
-> subsys_name.
-...
-> diff --git a/tests/nvme/037 b/tests/nvme/037
-> index 159d9d990bb7..2fe37a7a7340 100755
-> --- a/tests/nvme/037
-> +++ b/tests/nvme/037
-> @@ -22,12 +22,13 @@ test_device() {
->  	local ctrldev
-> =20
->  	for ((i =3D 0; i < iterations; i++)); do
-> -		_nvmet_passthru_target_setup "${subsys}${i}"
-> +		_nvmet_passthru_target_setup --subsysnqn "${subsys}${i}"
->  		nsdev=3D$(_nvmet_passthru_target_connect "${subsys}${i}")
-> =20
->  		_nvme_disconnect_subsys \
->  			--subsysnqn "${subsys}${i}" >>"${FULL}" 2>&1
-> -		_nvmet_passthru_target_cleanup "${subsys}${i}"
-> +		_nvme_disconnect_subsys "${subsys}${i}" >>"${FULL}" 2>&1
+Introduce "max_pages" param to recompression device attribute
+which sets the upper limit on the number of entries (pages) zram
+attempts to recompress.
 
-I believe that the line above is unnecessary. I took the liberty to remove =
-it
-when I applied this patch.
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ Documentation/admin-guide/blockdev/zram.rst |  5 +++++
+ drivers/block/zram/zram_drv.c               | 18 ++++++++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
+index ee2b0030d416..091e8bb38887 100644
+--- a/Documentation/admin-guide/blockdev/zram.rst
++++ b/Documentation/admin-guide/blockdev/zram.rst
+@@ -466,6 +466,11 @@ of equal or greater size:::
+ 	#recompress idle pages larger than 2000 bytes
+ 	echo "type=idle threshold=2000" > /sys/block/zramX/recompress
+ 
++It is also possible to limit the number of pages zram re-compression will
++attempt to recompress:::
++
++	echo "type=huge_idle max_pages=42" > /sys/block/zramX/recompress
++
+ Recompression of idle pages requires memory tracking.
+ 
+ During re-compression for every page, that matches re-compression criteria,
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index f0639df6cd18..a97986c52476 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1710,6 +1710,7 @@ static ssize_t recompress_store(struct device *dev,
+ 	struct zram *zram = dev_to_zram(dev);
+ 	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+ 	char *args, *param, *val, *algo = NULL;
++	u64 recomp_limit = ULLONG_MAX;
+ 	u32 mode = 0, threshold = 0;
+ 	unsigned long index;
+ 	struct page *page;
+@@ -1732,6 +1733,17 @@ static ssize_t recompress_store(struct device *dev,
+ 			continue;
+ 		}
+ 
++		if (!strcmp(param, "max_pages")) {
++			/*
++			 * Limit the number of entries (pages) we attempt to
++			 * recompress.
++			 */
++			ret = kstrtoull(val, 10, &recomp_limit);
++			if (ret)
++				return ret;
++			continue;
++		}
++
+ 		if (!strcmp(param, "threshold")) {
+ 			/*
+ 			 * We will re-compress only idle objects equal or
+@@ -1788,6 +1800,9 @@ static ssize_t recompress_store(struct device *dev,
+ 	for (index = 0; index < nr_pages; index++) {
+ 		int err = 0;
+ 
++		if (!recomp_limit)
++			break;
++
+ 		zram_slot_lock(zram, index);
+ 
+ 		if (!zram_allocated(zram, index))
+@@ -1816,6 +1831,9 @@ static ssize_t recompress_store(struct device *dev,
+ 			break;
+ 		}
+ 
++		if (recomp_limit > 0)
++			recomp_limit--;
++
+ 		cond_resched();
+ 	}
+ 
+-- 
+2.44.0.478.gd926399ef9-goog
+
