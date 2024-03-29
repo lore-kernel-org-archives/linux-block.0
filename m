@@ -1,48 +1,48 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AC31C0DF8;
-	Fri, 29 Mar 2024 18:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC32541206;
+	Fri, 29 Mar 2024 18:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711736147; cv=none; b=DMrddVbHut9ODmv3adBkbfh8DB4x+kY4PXwaUCtJxDwS61H7TXLb0S8FWw/1i8caO2J95315cicyrontXypHb2tklV9G5wE5YoRhY1LM7C63JCxNaXn8361903r72dZOJWWZFX0Z7gdZlRzd7cwZriHC7ulmiZMvxKCCVglUvkA=
+	t=1711736475; cv=none; b=m2aQfWdtG90Ma3Osc8OMWe85mh+Zo8cTXejZVRery3N3XbQnUUlkr/ZDXsJlIlf56m6K1Ltk5oyRFHruHyM7UDLd8OofFMF1nRznPtqG/Ws5Zs38hwRtDgTU6jjInPE1vQCOcEJ6cc2CCiE61qGioMMQrC7z1OYmFAQLv15hTCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711736147; c=relaxed/simple;
-	bh=Fl9+3J1/oK8uIQd+22QFYM3vM+ksNaxIpZgRdfXlHss=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M3wAdddjNyfgxui/q2f27mtQY+y6iP3IT34RHrczVKoZ91P4t0xygicZSa5pFE2mw1kpAmzdTdNblygaulNBUDayyEyXsHNKzYaAeAFM9eAENQGxafMKteJ1/5m1L/v3YT/QU3R53mxjhtI5aC3D+YVe9i2Ta+5fpurjrGKUm3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=EVHvlatA; arc=none smtp.client-ip=199.89.1.11
+	s=arc-20240116; t=1711736475; c=relaxed/simple;
+	bh=RG69lixKT8XbHVx5HThaYvbNC0wFCvDkG/GNVyevG1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=O/34wJbYDrLXfw3zYzCOAyuwxEuE+/FYLkJvz6a6tre/AGJA13yUMIP28Bm0+yF5XUGMShFfFYLzavYvrxvXcuAl3y0hvr+K6fvXiFlNK+W7DM8y6wtZKrbjuLS1G5e1Cm5wAvEXbISsp6h+Ihi7dg31gEo5suGt8EK54mahp38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4P5rAMbb; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="EVHvlatA"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4P5rAMbb"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V5pVm1Xhhz6Cnk8t;
-	Fri, 29 Mar 2024 18:15:44 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V5pcz3t92zlgTGW;
+	Fri, 29 Mar 2024 18:21:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1711736142; x=1714328143; bh=GJ1n1WrpcfiZuAd5K78JZW56
-	w27mzJMFDvMl1ypxNfo=; b=EVHvlatAQ0Onhm0tvAY+Ilus/cLiH5tBciX2URyt
-	jbGm+N21P4uFTFm2zx2mpCV1MGlNoAxwVfQ+dSctIXdxFhz4QgG5KM+Sa2g7X1Vh
-	vVxUwsqSCzPVoL631xc6237Y7na2uz0nQXSBMuohasLAY4rWTqrPW2AB0Jzfc/4R
-	bOZNvmhhj/1rKMrdba66xnOx2fWmACoklmDZigwpUxpg2tZcPMos5Dtehu/5IIwP
-	cJV6KryuCi0OoVYtpN43kH7WsTKsrWEG6rNwTZaYIQi2RlG/s9NC+aIhwSTafgMj
-	qvEbLMykeM9NQ2ToVQfw8R+e9wGscpMu0YIxeHLH/vJ/hQ==
+	 s=mr01; t=1711736464; x=1714328465; bh=oWd4mKvBTfHIVdJ4XtrugL3T
+	fCRZQd98PpL66KZWPK0=; b=4P5rAMbbzABVDZwOK+CHiFKZhkTEmN/S0+pJT6Ol
+	GtbQhk5zaXO0QOt+nUoepPnvpBK0GVK8XuBUcMKlTHwL+wsKsfNgBCKuWJirpxNo
+	TPQ8DfnCfBJCgePs+2Ft8yWtPWc8pSv0VdTt9PPCK0xzUAPXiYwOmblN9AONmiA5
+	iIdvFh52Q2QozPqSVGJRv4hP8YoWn9xkwEJ1yT31mHyKCSpMj1WXixfm0dz7CI3K
+	92vCDLxlH465cgNF6Nu/5EyXQoGiPq7C35T/Qfe2bCiGmZVVOM9tqoz2/+n5712u
+	+GOsye2JpFffvjG+x6fUfkBqqTUUiT7m1660D2m2f2i6ww==
 X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id H5vHcGFKJvpK; Fri, 29 Mar 2024 18:15:42 +0000 (UTC)
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id SOWuDXWEU5aM; Fri, 29 Mar 2024 18:21:04 +0000 (UTC)
 Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V5pVh58M5z6Cnk8m;
-	Fri, 29 Mar 2024 18:15:40 +0000 (UTC)
-Message-ID: <848d1259-ff6e-4732-b840-a02a5e5fe2cb@acm.org>
-Date: Fri, 29 Mar 2024 11:15:38 -0700
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V5pcs5YCJzlgTHp;
+	Fri, 29 Mar 2024 18:21:01 +0000 (UTC)
+Message-ID: <e36aac15-1090-4e3c-a402-cff56b4d1961@acm.org>
+Date: Fri, 29 Mar 2024 11:20:59 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,40 +50,42 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-wbt: Speed up integer square root in rwb_arm_timer
-To: I Hsin Cheng <richard120310@gmail.com>, axboe@kernel.dk
-Cc: akpm@linux-foundation.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240329091245.135216-1-richard120310@gmail.com>
+Subject: Re: [PATCH v3 08/30] block: Introduce zone write plugging
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>,
+ linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <20240328004409.594888-1-dlemoal@kernel.org>
+ <20240328004409.594888-9-dlemoal@kernel.org>
+ <688607d9-6dfe-4c37-81e8-4fea91ec8da8@acm.org>
+ <caf50c25-8f3d-4eb1-85bc-cc3499d5b107@kernel.org>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240329091245.135216-1-richard120310@gmail.com>
+In-Reply-To: <caf50c25-8f3d-4eb1-85bc-cc3499d5b107@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/29/24 2:12 AM, I Hsin Cheng wrote:
-> As the result shown, the origin version of integer square root, which is
-> "int_sqrt" takes 35.37 msec task-clock, 1,2181,3348 cycles, 1,6095,3665
-> instructions, 2551,2990 branches and causes 1,0616 branch-misses.
+On 3/28/24 3:38 PM, Damien Le Moal wrote:
+> On 3/29/24 07:20, Bart Van Assche wrote:
+>>> +	/* Wait for the zone write plugs to be RCU-freed. */
+>>> +	rcu_barrier();
+>>> +}
+>>
+>> It is not clear to me why the above rcu_barrier() call is necessary? I'm
+>> not aware of any other kernel code where kfree_rcu() is followed by an
+>> rcu_barrier() call.
 > 
-> At the same time, the variant version of integer square root, which is
-> "int_fastsqrt" takes 33.96 msec task-clock, 1,1645,7487 cyclces,
-> 5621,0086 instructions, 321,0409 branches and causes 2407 branch-misses.
-> We can clearly see that "int_fastsqrt" performs faster and better result
-> so it's indeed a faster invariant of integer square root.
+> Right after that, the mempool (in v4, free list here) is destroyed. So the
+> rcu_barrier() is needed to ensure that the grace period is past and that all
+> plugs are back in the pool/freelist. Without this, I saw problems/crashes when
+> removing devices.
 
-I'm not sure that a 4% performance improvement is sufficient to replace
-the int_sqrt() implementation. Additionally, why to add a second 
-implementation of int_sqrt() instead of replacing the int_sqrt()
-implementation in lib/math/int_sqrt.c?
-
- > The experiments runs on x86_64 GNU/Linux Architecture and the CPU is
- > Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz.
-
-Since int_sqrt() does not use divisions and since int_fastsqrt() uses
-divisions, can all CPUs supported by the Linux kernel divide numbers as
-quickly as the CPU mentioned above?
+This patch would be easier to read if the rcu_barrier() call would be
+moved out of disk_free_zone_wplugs() and into its caller.
 
 Thanks,
 
 Bart.
+
