@@ -1,165 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD806A028
-	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 12:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4958593B
+	for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 12:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711714262; cv=none; b=WwzJgtiJOx/uVgguDnKYUu2FuPbaW1HMx+NoTYMMEA+xQQH1GvWI2q3TEmjLsjT9Ej7FtY0W2evgz6zV4VjU2z0wcGZDlpreoH7m5oXDZC0wzF48gJBlpR+MU/iGTlcQiGQ/O7Iw3LiQHTUuBHV7r0sx+h0YYutFnroRZZwzTYI=
+	t=1711714950; cv=none; b=tyIc/sI0ZEUN6sbAbywVUxGhglrviMsbtAimuRNkUnJt7otRn8D7/fV2Anl9TjDQQ4aTh8QXY5GhOiy5psu4LlbsYyckZ5Y4Qy1ZcrNQf1W72jPy6absgARs/PhiSg9WwzkJQwKS5n+Yn7LIxGwkT9PblTy0RJ2Oy/k5wJaY1MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711714262; c=relaxed/simple;
-	bh=vXY+PY67OBmXbY1HgggxRR0X80dVFyU4YNIRC/YglVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uorEIrFz9kCadGdgWEnoikboe8JGqBNW0xItpVKG+rurqoFmmBliNf1LnCqevhZbD+N1kUQGmmtZivAcKGZXEMgKl9ZhvxE5hV5TjyfiZRBGrsaENRA3mhEKIDDGm/pVJvFezGZmyIN0cVkz0kAJ317pyxeZkRa045jd4ylaLpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sa4kVYZh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711714950; c=relaxed/simple;
+	bh=leo+Yi4AfSnMVg8mcM4Xju1MFqd5FSUEovb4t8XjI+U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FbdqctJPyp6cmM1IS76vK+SW4Rq5N6ifCdOwn3LURT/9Nn5qjtJFOpYJTc4lRCasV+P6gfY3TJ5ibEISnmaCQ2OY16fZPqzvqn5Mjg/epimTPzbyYS6DibZmzCRzEOTE2zIhA89IYuOAcFlmCcL5L7eNGwc+Qg3MaD4pKeeW5qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=O7Fi0g/C; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sa4kVYZh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F290C433C7;
-	Fri, 29 Mar 2024 12:11:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711714262;
-	bh=vXY+PY67OBmXbY1HgggxRR0X80dVFyU4YNIRC/YglVU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sa4kVYZhi1wlo8u1o7/G7g2ZkNa4SSGyTi/yaRrYbeNJ3I/9BizRISg/XidCTBYCi
-	 H8VEnrayfi7A/iq6dkLPHw5I7pFFlkJzt3KIJR7eIxnyEcVb1Z46QXmOn0VLsTatUF
-	 ASS9RrB7av+o4wvrclwC8J9z6LFYcQKhir1h07di7Gr8DvqWtFFlhyKPRd8krs5Q+r
-	 rA8qhUyrx5ttGFjnWfm2Vhh2x9+wEw2DG+B+IA8Lw8BS8/QqStmfOfTStcvYkJgTs9
-	 BJoW+R4ofqLdO5uRRtvJWpnNp0kGgqXK3vyJZHxAh5nTdmidXSzJcMquY6MTSyDmw+
-	 SfREZdQfC0fDw==
-Date: Fri, 29 Mar 2024 13:10:57 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>, 
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
-Message-ID: <20240329-erosion-zerreden-c65a45286fae@brauner>
-References: <20240323-seide-erbrachten-5c60873fadc1@brauner>
- <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
- <ZgZJ54rW2JcWsYPA@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="O7Fi0g/C"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so19048021fa.0
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2024 05:22:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711714946; x=1712319746; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
+        b=O7Fi0g/C5yTqgLj7PJ0zyXIg+iImbY+SKVFGN4a9Zq5xCNky6TjQyYrzlUaERurNpf
+         7LwKDBDW9EciAYhebOlUrfpp7gkwdxw3ffcHgzjAsYvU5YXkkSuF6xm7T7Dgu9iSQ5kl
+         +qqXXyD8PAwdjUTX/VSPOgkEthVy/fYMcmg7/Pdkk27h8K4cpeyzmcdoVIWAeGJYcA4p
+         vgxV5p/AfEY+VZYpyf4uBNc2jICO/cR9owEcZUd+mnQwV27PeBiF08/M0whYSW9XQNrn
+         V/j9jsc5tyhLkFsz1U2crr4Z9BGHhaJ+fjWQ7temGRIJI9xLKbhip75WdFHFUSwGtyRq
+         rj0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711714946; x=1712319746;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
+        b=rFy53+1NAfuzSI4HPfx6vttWnZ8bbtex/nbb0jccw3Vtvkhl9ohW1IdhotxemOyfRD
+         sxscp6Kmuqwe+ITLZL9v9DiX7LfNleo+DXdcAtHC+F6BF0EKCE2vgrF/Vlkaj+QAyGp0
+         0VvoaawL6v9d3J30TGF7lPniSzSw97ZOrUHSsAlMjbMZurAKxkra68WTMxPRClsASEw1
+         pl62XM3fkkpyXhWSNl0dOkUP+gqSPQ/irtf/wb8GtHQHCuZ1rnOnlFORi/b9UpfOz7re
+         JbBdCH/S2eaFRi+7+WSMmYeaMyaNvWMak89ppYWJowatEqU84rgEACmQ/H0LQTNVJehR
+         tqcg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/JWqIrM8ApbmmAzCPcBv/PSrs5x+AWoFIRpSXyt0Qvnj62cn17scm9RCQ8Dbrn+r8D9zaojHLvW8tOPSL35yMP2wD9rW9gc1YwWQ=
+X-Gm-Message-State: AOJu0YzskpOX6SD2otkI0HS2KrLc9inORkSdhzW9uskVjfl3f9QnoPsI
+	yq6IpZy4PNp+55kmQlAgfXOr3MR42Kb7Tt6EhAuAGPPC8vPc186+n6PGyvw1V+QuQ/srBBiIdPV
+	LaFKnu8tT1s8oW1hdmk/jpGWWBPAan7OuQfD8tg==
+X-Google-Smtp-Source: AGHT+IE+HnSCJL2quawa1K1lMrp38Nm79TgJqcEd/z4x+7H7IfVDrdpUOVuBJN0I2Fw0lOyMRLNfqEQZZUdPpNwT2ZM=
+X-Received: by 2002:a2e:8350:0:b0:2d3:5480:92aa with SMTP id
+ l16-20020a2e8350000000b002d3548092aamr644831ljh.25.1711714946358; Fri, 29 Mar
+ 2024 05:22:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZgZJ54rW2JcWsYPA@casper.infradead.org>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+ <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com> <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
+In-Reply-To: <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 29 Mar 2024 13:22:15 +0100
+Message-ID: <CAMRc=Mfeez9kXkkVxdmUk5dy=L=rbnYkYujO6jSCT5WAyUw2HA@mail.gmail.com>
+Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
+	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
+	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
+	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 29, 2024 at 04:56:07AM +0000, Matthew Wilcox wrote:
-> On Sat, Mar 23, 2024 at 05:11:19PM +0100, Christian Brauner wrote:
-> > Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
-> > default this option is set. When it is set the long-standing behavior
-> > of being able to write to mounted block devices is enabled.
-> > 
-> > But in order to guard against unintended corruption by writing to the
-> > block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
-> > off. In that case it isn't possible to write to mounted block devices
-> > anymore.
-> > 
-> > A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
-> > which disallows concurrent BLK_OPEN_WRITE access. When we still had the
-> > bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
-> > the mode was passed around. Since we managed to get rid of the bdev
-> > handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
-> > on whether the file was opened writable and writes to that block device
-> > are blocked. That logic doesn't work because we do allow
-> > BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
-> > 
-> > So fix the detection logic. Use O_EXCL as an indicator that
-> > BLK_OPEN_RESTRICT_WRITES has been requested. We do the exact same thing
-> > for pidfds where O_EXCL means that this is a pidfd that refers to a
-> > thread. For userspace open paths O_EXCL will never be retained but for
-> > internal opens where we open files that are never installed into a file
-> > descriptor table this is fine.
-> > 
-> > Note that BLK_OPEN_RESTRICT_WRITES is an internal only flag that cannot
-> > directly be raised by userspace. It is implicitly raised during
-> > mounting.
-> > 
-> > Passes xftests and blktests with CONFIG_BLK_DEV_WRITE_MOUNTED set and
-> > unset.
-> > 
-> > Fixes: 321de651fa56 ("block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access")
-> > Reported-by: Matthew Wilcox <willy@infradead.org>
-> > Link: https://lore.kernel.org/r/ZfyyEwu9Uq5Pgb94@casper.infradead.org
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> 
-> So v1 of this patch works fine.  I just got round to testing v2, and it
-> does not.  Indeed, applying 2/2 causes root to fail to mount:
-> 
-> /dev/root: Can't open blockdev
-> List of all bdev filesystems:
->  ext3
->  ext2
->  ext4
->  xfs
-> 
-> Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(254,0)
-> 
-> Applying only 1/2 boots but fails to fix the bug.
+On Fri, Mar 29, 2024 at 12:35=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> On 29/03/2024 11:27, Bartosz Golaszewski wrote:
+> > On Wed, Mar 27, 2024 at 1:45=E2=80=AFPM Krzysztof Kozlowski
+> > <krzysztof.kozlowski@linaro.org> wrote:
+> >>
+> >> virtio core already sets the .owner, so driver does not need to.
+> >>
+> >> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> >>
+> >> ---
+> >>
+> >> Depends on the first patch.
+> >> ---
+> >>  drivers/gpio/gpio-virtio.c | 1 -
+> >>  1 file changed, 1 deletion(-)
+> >>
+> >> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+> >> index fcc5e8c08973..9fae8e396c58 100644
+> >> --- a/drivers/gpio/gpio-virtio.c
+> >> +++ b/drivers/gpio/gpio-virtio.c
+> >> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver =3D=
+ {
+> >>         .remove                 =3D virtio_gpio_remove,
+> >>         .driver                 =3D {
+> >>                 .name           =3D KBUILD_MODNAME,
+> >> -               .owner          =3D THIS_MODULE,
+> >>         },
+> >>  };
+> >>  module_virtio_driver(virtio_gpio_driver);
+> >>
+> >> --
+> >> 2.34.1
+> >>
+> >
+> > Applied, thanks!
+>
+> I expressed dependency in two places: cover letter and this patch.
+> Please drop it, because without dependency this won't work. Patch could
+> go with the dependency and with your ack or next cycle.
+>
+> Best regards,
+> Krzysztof
+>
 
-Thanks for testing this. This is odd because I tested with the setup you
-provided.
+Dropped, and:
 
-I used the kernel config you sent to me in [2] with an xfs root device
-with direct kernel boot and the following xfstests config in [3]. I'm
-booting the vm with:
-
-qemu-system-x86_64 -machine type=q35 -smp 1 -m 4G -accel kvm -cpu max -nographic -nodefaults \
-        -chardev stdio,mux=on,id=console,signal=off -serial chardev:console -mon console \
-        -kernel /home/ubuntu/data/mkosi-kernel2/mkosi.output.debian/image.vmlinuz \
-        -drive file=/home/ubuntu/data/mkosi-kernel2/mkosi.output.debian/image.raw,format=raw,if=virtio \
-        -append "console=ttyS0 root=/dev/vda2 module_blacklist=vmw_vmci systemd.tty.term.ttyS0=screen-256color systemd.tty.columns.ttyS0=96 systemd.tty.rows.ttyS0=46 debug loglevel=4 SYSTEMD_"
-
-Note that the config you gave me in [2] didn't include
-CONFIG_SCSI_VIRTIO=y which means I got the splat you did. I added this
-missing config option and everything worked fine for me.
-
-Can you please test what's in the vfs.fixes branch on
-https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git so we're
-sure that we're testing the same thing?
-
-The failures that I see are:
-
-Failures: generic/042 generic/645 generic/682 generic/689 xfs/014
-xfs/017 xfs/049 xfs/129 xfs/176 xfs/206 xfs/216 xfs/234 xfs/250 xfs/289
-xfs/558 xfs/559
-Failed 16 of 930 tests
-
-* generic/645 fails because it requires an unrelated fix to fstests
-  because we changed idmapped mounts to not not allow empty idmappings.
-* generic/689 fails because the providec config doesn't compile tmpfs with POSIX ACL support
-* xfs/558 and xfs/559 complain about missing logging
-  about iomap validation and are unrelated
-* All other failures are caused by loop devices which is expected unil
-  a util-linux is released that contains Jan's fix in [1] so that
-  mount(8) doesn't hold a writable fd to the loop device anymore and
-  instead simply uses a read-only one.
-
-[1]: https://github.com/util-linux/util-linux/commit/1cde32f323e0970f6c7f35940dcc0aea97b821e5
-[2]: https://lore.kernel.org/r/Zf18I2UOGQxeN-Z1@casper.infradead.org
-[3]:
-#! /bin/bash
-
-set -x
-
-cd ~/src/git/xfstests-dev/
-FIRST_DEV=/dev/vda3
-SECOND_DEV=/dev/vda4
-THIRD_DEV=/dev/vda5
-
-echo "Testing xfs"
-cat <<EOF >local.config
-FSTYP=xfs
-export TEST_DEV=${FIRST_DEV}
-export SCRATCH_DEV=${SECOND_DEV}
-export LOGWRITE_DEV=${THIRD_DEV}
-export TEST_DIR=/mnt/test
-export SCRATCH_MNT=/mnt/scratch
-EOF
-
-sudo mkfs.xfs -f ${FIRST_DEV}
-sudo mkfs.xfs -f ${SECOND_DEV}
-sudo mkfs.xfs -f ${THIRD_DEV}
-sudo ./check -g quick
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
