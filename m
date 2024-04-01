@@ -1,120 +1,198 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D330B623;
-	Mon,  1 Apr 2024 00:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37CF3FB1F
+	for <linux-block@vger.kernel.org>; Mon,  1 Apr 2024 13:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711933098; cv=none; b=twPzO28ayDoth9mMOUpDaDcxEBbKr+BjRvx5Ox0zWghnPP5saU1uBoBw83owIzX+hWno1NNbKV/IDFNaeIQ7ELCquOfRmEqEdCgHBMreAVcUPpNoCkppWeMGQefvloPrQr5hzidHp6CGSIZqjZ+4Ht8WCxkYPtdsFpldm4Uhf4s=
+	t=1711978163; cv=none; b=Lmtsl/+c14n2UA519b5lHFKzSlipnAeSIXyq6ioWphiYwHhDTyEJDizT3NqNNoV5qEmRAFkNua0tYp6dXrcuA7LhDkDV1PjxjQFta6+p6CRbNNmTsg9bYEnfFhpdnCYpzMex/Wl9OBsw+LwPEXnbaYarYZRsw+ffjmpljf31PH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711933098; c=relaxed/simple;
-	bh=7ec8tLzayKz/i3ICOnmxgEe8M2qYShQ4ccWZtm2xZPM=;
+	s=arc-20240116; t=1711978163; c=relaxed/simple;
+	bh=4M4MuUubQSIRKLZKPgzJza5Yg3ff1EyhRlATBvU5lQY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=el9WAh7xAwwDEkhlcAsLHbBccXdjqPOdHqofAK9N+0a9dSQiZaaswfFr9VFEIQVYxOnPPZlFHVwxdT8n83KPo70nnzSGKtomn8RX01GgfDPDYiWX4Yf9wu5C1CuAZ4vWcnPeHH3u01FCxUZ8Wy+qE6uCXmZETYEJo/0S+VaU/ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dY5jGM/v; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=VHm3k7Y1egug4mr7uqJjtBsH4yf17cnPpkjCEfrbcH0SO1uro++KbxWSWCqSLAeM9GaNTbf3Q0lPVHdVCV/sVuOdmyCIR8qDfQfbemEKqaJeNLk9kqJ1L+g24yT4RllcaYFzLI/dcCmfPhJHJTtpOd9dSiT5RiQIucYtmNokA/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nN+Zhx0/; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dY5jGM/v"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-41569f28ac7so241645e9.1;
-        Sun, 31 Mar 2024 17:58:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nN+Zhx0/"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-29deb7e2f7aso2545610a91.1
+        for <linux-block@vger.kernel.org>; Mon, 01 Apr 2024 06:29:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711933095; x=1712537895; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1711978161; x=1712582961; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tKCbnU5V2ussTHQYPVGho5TNL75Ygsv7wl5gKI6gMsc=;
-        b=dY5jGM/vMyXZcE9FY+ixOoBWbrHNzQg47LLg6vS6ZTmGsDATcSavusCDLhg2NS5Gr3
-         c2WhmO21aag9/s0O/nTG1W9KK9jfVnblPtCMMH5uHRpfg7gyn1ngy5EtqokwbmpM6Tbc
-         RQ2CT7Z1QnGNSGK4HsdQwM5/Jw954a0Z94BnNZuFPICxis+1P685Gclm0f78IpiSR9SG
-         3GlTf2vNx+bscqGBEtQO3InrGL9xRGlhpYFfsZD9fSBBcpwlIfm+/wcEP69iZh02zg+C
-         7FZ3g7YRtKfj061qFSPP8CM+aw4addB9eKyIMIEwkPdhhOT2K7RB71fmm0Cu9rn0baN8
-         PEOQ==
+        bh=igZz4DG2aBo5XlteLJPBb/+8rJIvsiKaHb3GZJV4VP8=;
+        b=nN+Zhx0/mUn6v0AT9QHxjp28ti4s2HWrU1GY3x3O6yk3kbom7aBS0JBJmaZUdKufvq
+         plthsoBvzFVyA1fjBxenWvAGQcHuPFofJ/5SnVlRBrp4bcQVQAumf+x7YytfShTko4O7
+         tfLCI7uYjoJdfmdQY4UH1p29TlllMNdDB7njaPsRVwFqMR739RCsY/dHJysPBPKOLHqt
+         8Nm+lIz00jhJrubxNWXrdSjJRol4pC+PN+gfjJvtg2prsamgDf88JOIM8E840Zmsd977
+         DP305iCtsqhqA0/wvri0zzsuE1HTNZui9sLzQS0iONYnES5iTXJiJ9kLrOaPnx4z/NP5
+         ++RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711933095; x=1712537895;
+        d=1e100.net; s=20230601; t=1711978161; x=1712582961;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tKCbnU5V2ussTHQYPVGho5TNL75Ygsv7wl5gKI6gMsc=;
-        b=ejkQYvYMkZ3w6xeigdgh2jGABPs+ulwURULk7G7WTxe36/biad3qK4EVbIGtA4kSbu
-         NvUx6+yMO7ArJkb/4fXMLEZD+tXbn8wtqsz28NjK6RrgC6P7YyVWPN7U5XJ17ccjUrit
-         3WjBL2ag+Z8MDbyb4jDm/UN5N+5Ba0G5nocO2bOSqa1m8fTWB6ICYrJ2m1NYTVdIjE8a
-         0fSmfM4/30v886J+fZx4oNcKHbullO/p8P4vI+OXp073aE5FXiJWDe1S0XXyBp6tLMN6
-         d/abNdypwfhzLCOHgXRfiafNGNlczTp+zEhojgACZ+/LRwIYlfkgeAJxRgCuzj4zqWtt
-         2R2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUJzr/DDfWdQah3/uJcWf/WDdsaKwmktws/eqpA550VUq2NMPx/vrNjArK2x9qzznjYIsqvy4UXdL738LxuPA6Y8jLRkm4OtYn1MAeh/KKFfOCy//rtQvryDq+Be5FYO++ddnqUvnUBdrM=
-X-Gm-Message-State: AOJu0Yxq3r/WVqJN8wD6We3vPwhq2kHP6O6HTj5td42KgbGPZ7HwpRnZ
-	oDIyJne46RSZmGbfgM1+ScARnSWqXARcvTNRN1ommz+X59g+LvsTRhdBGghDssvAljyWuVgWRUj
-	jJeICu5tD7zkmgX8H70Nts+r7cZCnfM4YxMw=
-X-Google-Smtp-Source: AGHT+IH4ZVSFRhShOQbM9PPFDMzGfjdnw8Kzs3ViXAtO82P5FiP4dmhmb4ZGnbfET5ou0r5FR1slYuMlSlVNCNe2JQY=
-X-Received: by 2002:a05:600c:1c07:b0:414:6865:b5bc with SMTP id
- j7-20020a05600c1c0700b004146865b5bcmr5279380wms.28.1711933095081; Sun, 31 Mar
- 2024 17:58:15 -0700 (PDT)
+        bh=igZz4DG2aBo5XlteLJPBb/+8rJIvsiKaHb3GZJV4VP8=;
+        b=LvdwWCwHg5gWF0SlJFw2/rJpRqlTUelEPs9a6ivIE0Nz9iQDlYSS3tdSArkTYFCgEX
+         pcOER8ZXoyQvKMAhr6jMQCQO+TtUnbCF9e1BQWEBNa3inK4aIigVI1wZywOpUmbKh9v6
+         hTyBvgemPEMkCtN2/jVNwbKfqIdzy4I7VTpmTy8KomU4Iws563Cmp55Q3f8hZLbUJG7t
+         rgCaHdTwZurFsoh2aFWRJ9XPCssRLOjiDv18/Fj0rcL2atTMQ8SA2w9/CGFupJN2UN3i
+         6uMSLdqt3didejzK20NuB/ghYgl4OG6yqbrc4SES8J/iqoPNEMlwAZK7e8hvV4AUH0uZ
+         IWAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfiwnYqNvm+9P73fh1alr+jmSz7w144neoNs1J/5PbSWvhFRC/BOZ9BZ2wk4uz2z5S60b16cYUmrDdrk3oFygoi5wjF/zZKFLbwTs=
+X-Gm-Message-State: AOJu0Yz59qCFMmIXcUbjyAAH4bQp4jXE5HkomY6Z7EDyviC8Oo1HhS1G
+	l4nIQyiM3ztI84/SJyThBBkgz8Ahl0jb0DRr4C5SfhDG48+uTxaWsTNc6+JI0CQelPHHbDHecL/
+	28atHjcZUzhVv7auABtN9zh1PLYoPmtTrx4rZ
+X-Google-Smtp-Source: AGHT+IEBPxB5PgFKwWlCsDWhkUrlsbgYprPrx312H7gGuiVcbcCCEQOB9REDtm9NTjOiD8q99cvt+KkK7MiZtFt0GOM=
+X-Received: by 2002:a17:90b:4b04:b0:2a2:2dad:8026 with SMTP id
+ lx4-20020a17090b4b0400b002a22dad8026mr3558868pjb.20.1711978160771; Mon, 01
+ Apr 2024 06:29:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1711680261-5789-1-git-send-email-zhiguo.niu@unisoc.com> <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org>
-In-Reply-To: <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org>
-From: Zhiguo Niu <niuzhiguo84@gmail.com>
-Date: Mon, 1 Apr 2024 08:58:04 +0800
-Message-ID: <CAHJ8P3K9OL6MHNrSrqmf0esbr2h1HJ3mVRmxDNVpf95ZMHQcqg@mail.gmail.com>
-Subject: Re: [PATCH] block/mq-deadline: Fix WARN when set async_depth by sysfs
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, ke.wang@unisoc.com, hongyu.jin@unisoc.com, 
-	Damien Le Moal <dlemoal@kernel.org>
+References: <20240329094050.2815699-1-senozhatsky@chromium.org>
+In-Reply-To: <20240329094050.2815699-1-senozhatsky@chromium.org>
+From: Brian Geffon <bgeffon@google.com>
+Date: Mon, 1 Apr 2024 09:28:42 -0400
+Message-ID: <CADyq12weZHtQaV_muEOe-gggu07hiun+xDuMJmqaxv8oyz9pLA@mail.gmail.com>
+Subject: Re: [PATCHv2] zram: add max_pages param to recompression
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 30, 2024 at 2:08=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
-> wrote:
+On Fri, Mar 29, 2024 at 5:40=E2=80=AFAM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
 >
-> On 3/28/24 7:44 PM, Zhiguo Niu wrote:
-> > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> > index 02a916b..89c516e 100644
-> > --- a/block/mq-deadline.c
-> > +++ b/block/mq-deadline.c
-> > @@ -646,10 +646,12 @@ static void dd_depth_updated(struct blk_mq_hw_ctx=
- *hctx)
-> >       struct request_queue *q =3D hctx->queue;
-> >       struct deadline_data *dd =3D q->elevator->elevator_data;
-> >       struct blk_mq_tags *tags =3D hctx->sched_tags;
-> > +     unsigned int shift =3D tags->bitmap_tags.sb.shift;
-> > +     unsigned int dd_min_depth =3D max(1U, 3 * (1U << shift)  / 4);
-> >
-> >       dd->async_depth =3D max(1UL, 3 * q->nr_requests / 4);
-> >
-> > -     sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_dep=
-th);
-> > +     sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd_min_depth)=
-;
-> >   }
+> Introduce "max_pages" param to recompress device attribute
+> which sets an upper limit on the number of entries (pages)
+> zram attempts to recompress (in this particular recompression
+> call). S/W recompression can be quite expensive so limiting
+> the number of pages recompress touches can be quite helpful.
 >
-> The above patch sets min_shallow_depth to the same value as commit
-> d47f9717e5cf ("block/mq-deadline: use correct way to throttling write
-> requests"). That commit got reverted because it was causing performance
-> problems. So the above patch reintroduces the performance problem that
-> has been fixed by commit 256aab46e316 ("Revert "block/mq-deadline: use
-> correct way to throttling write requests"").
-Hi Bart Van Assche,
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 
-This  patch only modifies the initial minimum value of
-min_shallow_depth and does not change "dd->async_depth",
-so it will not cause performance problems like the previous patch
-(d47f9717e5cf ("block/mq-deadline: use correct way to throttling write
-> requests")).
->
-> Thank you for attempting to reintroduce a problem that just got fixed
-> without even mentioning that this is an attempt to reintroduce a
-> performance problem.
+Acked-by: Brian Geffon <bgeffon@google.com>
 
-So what are your suggestions for fixing the warning shown in commit
-msg if dd->async_depth is set by the user from sysfs?
-thanks
 >
-> Bart.
+> ---
+>  Documentation/admin-guide/blockdev/zram.rst |  5 ++++
+>  drivers/block/zram/zram_drv.c               | 31 +++++++++++++++++++--
+>  2 files changed, 33 insertions(+), 3 deletions(-)
 >
+> diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/=
+admin-guide/blockdev/zram.rst
+> index ee2b0030d416..091e8bb38887 100644
+> --- a/Documentation/admin-guide/blockdev/zram.rst
+> +++ b/Documentation/admin-guide/blockdev/zram.rst
+> @@ -466,6 +466,11 @@ of equal or greater size:::
+>         #recompress idle pages larger than 2000 bytes
+>         echo "type=3Didle threshold=3D2000" > /sys/block/zramX/recompress
+>
+> +It is also possible to limit the number of pages zram re-compression wil=
+l
+> +attempt to recompress:::
+> +
+> +       echo "type=3Dhuge_idle max_pages=3D42" > /sys/block/zramX/recompr=
+ess
+> +
+>  Recompression of idle pages requires memory tracking.
+>
+>  During re-compression for every page, that matches re-compression criter=
+ia,
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
+c
+> index f0639df6cd18..4cf38f7d3e0a 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -1568,7 +1568,8 @@ static int zram_bvec_write(struct zram *zram, struc=
+t bio_vec *bvec,
+>   * Corresponding ZRAM slot should be locked.
+>   */
+>  static int zram_recompress(struct zram *zram, u32 index, struct page *pa=
+ge,
+> -                          u32 threshold, u32 prio, u32 prio_max)
+> +                          u64 *num_recomp_pages, u32 threshold, u32 prio=
+,
+> +                          u32 prio_max)
+>  {
+>         struct zcomp_strm *zstrm =3D NULL;
+>         unsigned long handle_old;
+> @@ -1645,6 +1646,15 @@ static int zram_recompress(struct zram *zram, u32 =
+index, struct page *page,
+>         if (!zstrm)
+>                 return 0;
+>
+> +       /*
+> +        * Decrement the limit (if set) on pages we can recompress, even
+> +        * when current recompression was unsuccessful or did not compres=
+s
+> +        * the page below the threshold, because we still spent resources
+> +        * on it.
+> +        */
+> +       if (*num_recomp_pages)
+> +               *num_recomp_pages -=3D 1;
+> +
+>         if (class_index_new >=3D class_index_old) {
+>                 /*
+>                  * Secondary algorithms failed to re-compress the page
+> @@ -1710,6 +1720,7 @@ static ssize_t recompress_store(struct device *dev,
+>         struct zram *zram =3D dev_to_zram(dev);
+>         unsigned long nr_pages =3D zram->disksize >> PAGE_SHIFT;
+>         char *args, *param, *val, *algo =3D NULL;
+> +       u64 num_recomp_pages =3D ULLONG_MAX;
+>         u32 mode =3D 0, threshold =3D 0;
+>         unsigned long index;
+>         struct page *page;
+> @@ -1732,6 +1743,17 @@ static ssize_t recompress_store(struct device *dev=
+,
+>                         continue;
+>                 }
+>
+> +               if (!strcmp(param, "max_pages")) {
+> +                       /*
+> +                        * Limit the number of entries (pages) we attempt=
+ to
+> +                        * recompress.
+> +                        */
+> +                       ret =3D kstrtoull(val, 10, &num_recomp_pages);
+> +                       if (ret)
+> +                               return ret;
+> +                       continue;
+> +               }
+> +
+>                 if (!strcmp(param, "threshold")) {
+>                         /*
+>                          * We will re-compress only idle objects equal or
+> @@ -1788,6 +1810,9 @@ static ssize_t recompress_store(struct device *dev,
+>         for (index =3D 0; index < nr_pages; index++) {
+>                 int err =3D 0;
+>
+> +               if (!num_recomp_pages)
+> +                       break;
+> +
+>                 zram_slot_lock(zram, index);
+>
+>                 if (!zram_allocated(zram, index))
+> @@ -1807,8 +1832,8 @@ static ssize_t recompress_store(struct device *dev,
+>                     zram_test_flag(zram, index, ZRAM_INCOMPRESSIBLE))
+>                         goto next;
+>
+> -               err =3D zram_recompress(zram, index, page, threshold,
+> -                                     prio, prio_max);
+> +               err =3D zram_recompress(zram, index, page, &num_recomp_pa=
+ges,
+> +                                     threshold, prio, prio_max);
+>  next:
+>                 zram_slot_unlock(zram, index);
+>                 if (err) {
+> --
+> 2.44.0.478.gd926399ef9-goog
 >
