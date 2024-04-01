@@ -1,110 +1,120 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336FC146D65;
-	Sun, 31 Mar 2024 19:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D330B623;
+	Mon,  1 Apr 2024 00:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711912498; cv=none; b=oh+O+MSTwZtz3rMb9RxAFvq0sd4dbREus/XhsuLVEwvCpQTa0MIRGF+UqVrNnoG30Se8RLjt/9svBVLIQwSTcs6ROPMAXbuJC66+3LztDAslqTJ1cUR2nFJYUhQR2BjAkgUW4+ulifnQrROPEpGN6KQR+M1bNjHp4Si+w5qw9Ro=
+	t=1711933098; cv=none; b=twPzO28ayDoth9mMOUpDaDcxEBbKr+BjRvx5Ox0zWghnPP5saU1uBoBw83owIzX+hWno1NNbKV/IDFNaeIQ7ELCquOfRmEqEdCgHBMreAVcUPpNoCkppWeMGQefvloPrQr5hzidHp6CGSIZqjZ+4Ht8WCxkYPtdsFpldm4Uhf4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711912498; c=relaxed/simple;
-	bh=aisnBOSe6twHW7ZdfD8orcM1pcSwRgzSY+oaCtUg+fQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oaddLqaYhj38gbrRb+5S3E5fETBJnjBr6Oe8of6qM/G6vVUMM4YKHovxK8jjaJ5u8XfTSP/sRu6lpDw+EPm4+VjfIZjT9vV5i8mEol4eG4BPW189xl1Goget4l0Sw2IT2c6Bhe7+Do/Gopoy8uSbiQcDrmAxvXRg7IVmEiAF0+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA63713D5;
-	Sun, 31 Mar 2024 12:15:20 -0700 (PDT)
-Received: from bogus (unknown [10.57.81.195])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E84A3F64C;
-	Sun, 31 Mar 2024 12:14:34 -0700 (PDT)
-Date: Sun, 31 Mar 2024 20:14:32 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	David Hildenbrand <david@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Cristian Marussi <cristian.marussi@arm.com>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Sudeep Holla <sudeep.holla@arm.com>, alsa-devel@alsa-project.org,
-	linux-sound@vger.kernel.org
-Subject: Re: [PATCH v2 11/25] firmware: arm_scmi: virtio: drop owner
- assignment
-Message-ID: <20240331191432.sfp5dq6nyvf4yf34@bogus>
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
- <20240331-module-owner-virtio-v2-11-98f04bfaf46a@linaro.org>
+	s=arc-20240116; t=1711933098; c=relaxed/simple;
+	bh=7ec8tLzayKz/i3ICOnmxgEe8M2qYShQ4ccWZtm2xZPM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=el9WAh7xAwwDEkhlcAsLHbBccXdjqPOdHqofAK9N+0a9dSQiZaaswfFr9VFEIQVYxOnPPZlFHVwxdT8n83KPo70nnzSGKtomn8RX01GgfDPDYiWX4Yf9wu5C1CuAZ4vWcnPeHH3u01FCxUZ8Wy+qE6uCXmZETYEJo/0S+VaU/ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dY5jGM/v; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dY5jGM/v"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-41569f28ac7so241645e9.1;
+        Sun, 31 Mar 2024 17:58:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711933095; x=1712537895; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tKCbnU5V2ussTHQYPVGho5TNL75Ygsv7wl5gKI6gMsc=;
+        b=dY5jGM/vMyXZcE9FY+ixOoBWbrHNzQg47LLg6vS6ZTmGsDATcSavusCDLhg2NS5Gr3
+         c2WhmO21aag9/s0O/nTG1W9KK9jfVnblPtCMMH5uHRpfg7gyn1ngy5EtqokwbmpM6Tbc
+         RQ2CT7Z1QnGNSGK4HsdQwM5/Jw954a0Z94BnNZuFPICxis+1P685Gclm0f78IpiSR9SG
+         3GlTf2vNx+bscqGBEtQO3InrGL9xRGlhpYFfsZD9fSBBcpwlIfm+/wcEP69iZh02zg+C
+         7FZ3g7YRtKfj061qFSPP8CM+aw4addB9eKyIMIEwkPdhhOT2K7RB71fmm0Cu9rn0baN8
+         PEOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711933095; x=1712537895;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tKCbnU5V2ussTHQYPVGho5TNL75Ygsv7wl5gKI6gMsc=;
+        b=ejkQYvYMkZ3w6xeigdgh2jGABPs+ulwURULk7G7WTxe36/biad3qK4EVbIGtA4kSbu
+         NvUx6+yMO7ArJkb/4fXMLEZD+tXbn8wtqsz28NjK6RrgC6P7YyVWPN7U5XJ17ccjUrit
+         3WjBL2ag+Z8MDbyb4jDm/UN5N+5Ba0G5nocO2bOSqa1m8fTWB6ICYrJ2m1NYTVdIjE8a
+         0fSmfM4/30v886J+fZx4oNcKHbullO/p8P4vI+OXp073aE5FXiJWDe1S0XXyBp6tLMN6
+         d/abNdypwfhzLCOHgXRfiafNGNlczTp+zEhojgACZ+/LRwIYlfkgeAJxRgCuzj4zqWtt
+         2R2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUJzr/DDfWdQah3/uJcWf/WDdsaKwmktws/eqpA550VUq2NMPx/vrNjArK2x9qzznjYIsqvy4UXdL738LxuPA6Y8jLRkm4OtYn1MAeh/KKFfOCy//rtQvryDq+Be5FYO++ddnqUvnUBdrM=
+X-Gm-Message-State: AOJu0Yxq3r/WVqJN8wD6We3vPwhq2kHP6O6HTj5td42KgbGPZ7HwpRnZ
+	oDIyJne46RSZmGbfgM1+ScARnSWqXARcvTNRN1ommz+X59g+LvsTRhdBGghDssvAljyWuVgWRUj
+	jJeICu5tD7zkmgX8H70Nts+r7cZCnfM4YxMw=
+X-Google-Smtp-Source: AGHT+IH4ZVSFRhShOQbM9PPFDMzGfjdnw8Kzs3ViXAtO82P5FiP4dmhmb4ZGnbfET5ou0r5FR1slYuMlSlVNCNe2JQY=
+X-Received: by 2002:a05:600c:1c07:b0:414:6865:b5bc with SMTP id
+ j7-20020a05600c1c0700b004146865b5bcmr5279380wms.28.1711933095081; Sun, 31 Mar
+ 2024 17:58:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240331-module-owner-virtio-v2-11-98f04bfaf46a@linaro.org>
+References: <1711680261-5789-1-git-send-email-zhiguo.niu@unisoc.com> <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org>
+In-Reply-To: <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org>
+From: Zhiguo Niu <niuzhiguo84@gmail.com>
+Date: Mon, 1 Apr 2024 08:58:04 +0800
+Message-ID: <CAHJ8P3K9OL6MHNrSrqmf0esbr2h1HJ3mVRmxDNVpf95ZMHQcqg@mail.gmail.com>
+Subject: Re: [PATCH] block/mq-deadline: Fix WARN when set async_depth by sysfs
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, ke.wang@unisoc.com, hongyu.jin@unisoc.com, 
+	Damien Le Moal <dlemoal@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 31, 2024 at 10:43:58AM +0200, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
+On Sat, Mar 30, 2024 at 2:08=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
+> wrote:
 >
+> On 3/28/24 7:44 PM, Zhiguo Niu wrote:
+> > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> > index 02a916b..89c516e 100644
+> > --- a/block/mq-deadline.c
+> > +++ b/block/mq-deadline.c
+> > @@ -646,10 +646,12 @@ static void dd_depth_updated(struct blk_mq_hw_ctx=
+ *hctx)
+> >       struct request_queue *q =3D hctx->queue;
+> >       struct deadline_data *dd =3D q->elevator->elevator_data;
+> >       struct blk_mq_tags *tags =3D hctx->sched_tags;
+> > +     unsigned int shift =3D tags->bitmap_tags.sb.shift;
+> > +     unsigned int dd_min_depth =3D max(1U, 3 * (1U << shift)  / 4);
+> >
+> >       dd->async_depth =3D max(1UL, 3 * q->nr_requests / 4);
+> >
+> > -     sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_dep=
+th);
+> > +     sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd_min_depth)=
+;
+> >   }
+>
+> The above patch sets min_shallow_depth to the same value as commit
+> d47f9717e5cf ("block/mq-deadline: use correct way to throttling write
+> requests"). That commit got reverted because it was causing performance
+> problems. So the above patch reintroduces the performance problem that
+> has been fixed by commit 256aab46e316 ("Revert "block/mq-deadline: use
+> correct way to throttling write requests"").
+Hi Bart Van Assche,
 
-Acked-by: Sudeep Holla <sudeep.holla@arm.com>
+This  patch only modifies the initial minimum value of
+min_shallow_depth and does not change "dd->async_depth",
+so it will not cause performance problems like the previous patch
+(d47f9717e5cf ("block/mq-deadline: use correct way to throttling write
+> requests")).
+>
+> Thank you for attempting to reintroduce a problem that just got fixed
+> without even mentioning that this is an attempt to reintroduce a
+> performance problem.
 
--- 
-Regards,
-Sudeep
+So what are your suggestions for fixing the warning shown in commit
+msg if dd->async_depth is set by the user from sysfs?
+thanks
+>
+> Bart.
+>
+>
