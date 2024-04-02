@@ -1,192 +1,267 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CB315AAA7
-	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 22:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712095651; cv=fail; b=bRYFPPzeBNJKdO+wVxnMyhzPMZFgCCbQTGn2tbFINWAVCNgU82FnvpEvJ1g5lEr3xmrsHVwKZgrRF+4vJhDk2ibztRoFcQ8Z/ddX+tXY2IOMRZn2M1OmThbxifvvB6fqCfCbfqQvPwd2askl1xRtd7rEGC2b5f5kCs+OamOWZsg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712095651; c=relaxed/simple;
-	bh=ng2alNZUfkIA2vUR4lY0okC6jdt1pQIu5gStDLxLy50=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sCzYtpsyH/jfDo/3dIdX7TVEqrr/C+57LrG3gQAPN1M4GJG9tVKoqImcTYgem1yEZ0ZkOdU87nDfZgnvQR083dn40r01EdLsRbKRQ5IxTb+aQRITyucRdfY9AbXQ893d13Ylmh1ASzgtd8cRguKiW8BkHi5Dojs0LRpX3+MZMEU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=npNO5l4j; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=qt3U5NSR; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39011EB2B;
+	Tue,  2 Apr 2024 22:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712097347; cv=none; b=NkYOVngHUJUh8hT20AOrE4kRHs52wael3+oTbvYI/Y39W1wPyqtDb+UO7VUBFhq//zj2LwJX91RCQW/00YxL/rif16THWYoip06tOc3dZb9yR/9wjAvNQGCuGQLn22wSNjv0dr07UtHOYVN/qCVORK8B8KFiYykQpwUcCGHTbBg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712097347; c=relaxed/simple;
+	bh=jkjZO7jwr0PCImAu66df4aVlb2K6kWhUeVLD66IVeD8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bwvNCN7cryhpU27XcOOCZT8TAi1GRxM90UhCx4sdExTfIFzaAzK04MgF6F/nMYlH7SNRdMiGQbB6iQq8d5unAS8dk0jeWXOsxpffjipT5TKzCtuot/Bo9awjFo1ws389adOv6UxKb9ym0wW+fC4nSWR+fsVR/wAZwObYOmNJXVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Y6alFi2P; arc=none smtp.client-ip=185.70.40.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="npNO5l4j";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="qt3U5NSR"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1712095649; x=1743631649;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ng2alNZUfkIA2vUR4lY0okC6jdt1pQIu5gStDLxLy50=;
-  b=npNO5l4jKn+Ppd/GWN5Zx6qyMxPhbKSxZpbgWCRATFUFuCYdlCcDHHi+
-   I55DKuzHIH456abRoO7BMgdMMTM6Mhr5Lnkq0YLEQWgXbeYMsaNXecnbr
-   dsWf3Gy3vK2ypkYdl6Ou213nBdfy10yN8nlBEXfqgG0NxJqOMWFfyBCum
-   KzdRcEz+JDQuJFsFhVmi9dLCvVtEuS369o/u88/e6Vu+TMMlSJXih+eOd
-   8bcLgMpLc6gOyPyFc1V0s3rVbPU+Tc1LA6NfcR55AKlLEEsx9k9GU9dzU
-   XuKsFpArCVfmXVjlzuq3YOzt+/U0ll7LbguBgDsOE83Lvcit5S83hpyF9
-   w==;
-X-CSE-ConnectionGUID: 9CvmF6+VRHSszNQ/SgRZ0g==
-X-CSE-MsgGUID: D0+TNpDDSzqX/UMXxUHM4Q==
-X-IronPort-AV: E=Sophos;i="6.07,176,1708358400"; 
-   d="scan'208";a="12574924"
-Received: from mail-co1nam11lp2169.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.169])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Apr 2024 06:07:27 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aAynnTQO7yx5b2B0HFYY3NbUKZMAePFYKfiBaV6s0ogtLNphKfIVjl43qYBTZv+5Rt1MujAc8AWwbii/+HtIlzxkBeO2n9zvIU437vUfI8vo61XeTMdGhA4CgXJQ1xOTDfkHZi1TvA3Ok95oLbSixgoRDN9S5Gr6bpzrbv9VJQG0XZpCOHwTUSsQpXibNf7HuOZ+ZPGMzE32exTdgOpagWr9RVvI4hLxFwBsrPJVcoc5Pk+aIC+ZZg4aA3PZ1W5Sa9eX5cq/5/4AXw5XOR+2vKnDIbbe/BvRmW5qr6NjrZnq3X0AP/CQpf43zHQ5/KMU8nd2AXqP/xYE1VP+L84bhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ng2alNZUfkIA2vUR4lY0okC6jdt1pQIu5gStDLxLy50=;
- b=OAtJM6H6Y7CaGPP+BPl6TKufnAEIm2FKekTZk5ATc+sJTGaIr+Jk5IW13ZCwTTKtZ7hJOO9rozKR5L1ypy2uqBtOWXxKdl9Wr0L7omzt2VPMuSP33PMzKwAUqhL/q+BoscZQKtPUzCpX/iLaGVxwtGod2ztKST8cJxlCp9YKYTS3650e1K6d9kNShh4ZwC1w6yynpqhyFaOO1nTamF2g6JrON9ZNRxxOb+vfv1rPmH974t7sFZt1zFM9r+gZrWAaRcNjPWBLfKDFddeKhqgt0yiYnIA9ZI0ufA3dd2iooosUm+pqBj4N8JkAugb9uHdvNJYvRRjFHoFNX+tvRQHX4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ng2alNZUfkIA2vUR4lY0okC6jdt1pQIu5gStDLxLy50=;
- b=qt3U5NSRSSDzhD/LusazaEKkQYVgtgOpF2mfx18XF1fAJUumg5yhuudQZmTAIS2dXKJ57YsebR6GBM7R1Cpsussc/bcq6YDr9oJViz+oPtaXPJtGMk+BE26VosskWOE3uN8Waxqx1Ppnu9mb275l5l0LcmZE+Wpa2iJlyS9VkkI=
-Received: from BYAPR04MB4151.namprd04.prod.outlook.com (2603:10b6:a02:ef::28)
- by SJ2PR04MB8849.namprd04.prod.outlook.com (2603:10b6:a03:53c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
- 2024 22:07:25 +0000
-Received: from BYAPR04MB4151.namprd04.prod.outlook.com
- ([fe80::3fff:8c2f:81ff:c80]) by BYAPR04MB4151.namprd04.prod.outlook.com
- ([fe80::3fff:8c2f:81ff:c80%4]) with mapi id 15.20.7409.042; Tue, 2 Apr 2024
- 22:07:25 +0000
-From: Kamaljit Singh <Kamaljit.Singh1@wdc.com>
-To: Daniel Wagner <dwagner@suse.de>
-CC: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "axboe@fb.com"
-	<axboe@fb.com>, Gregory Joyce <gjoyce@ibm.com>, Nilay Shroff
-	<nilay@linux.ibm.com>
-Subject: Re: [Bug Report] nvme-cli commands fails to open head disk node and
- print error
-Thread-Topic: [Bug Report] nvme-cli commands fails to open head disk node and
- print error
-Thread-Index: AQHagNmYyeiTj8p8fEeiO2lJ5Vj4zrFM1rwAgAiqCvw=
-Date: Tue, 2 Apr 2024 22:07:25 +0000
-Message-ID:
- <BYAPR04MB415105995F0F45BFCFE48FEBBC3E2@BYAPR04MB4151.namprd04.prod.outlook.com>
-References: <c0750d96-6bae-46b5-a1cc-2ff9d36eccb3@linux.ibm.com>
- <j37ytzci46pqr4n7juugxyykd3w6jlwegwhfduh6jlp3lgmud4@xhlvuquadge4>
-In-Reply-To: <j37ytzci46pqr4n7juugxyykd3w6jlwegwhfduh6jlp3lgmud4@xhlvuquadge4>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR04MB4151:EE_|SJ2PR04MB8849:EE_
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- WjnsNEuzyBwcnMskezWgKp7uCcVEWW6+xQ9NIPlq3h5TtXJ6O4/YXC5/a1NGmdEVrUfmSIGAM+EXJRxoxjLwbcXkL1YBOjJJlEnRgx886S23rZrDLCHOD1x5EBAuRA8PvndZSZPDlB4+LyjOVuD3aB6wKJohjJffQWm5vmKlJwMWiiFEkjNTu/PfG++l4uK9iKPF2uMI/CJGl38GBKqF5EJ/j81YtUBQkhdiIUkWspa5JlHaviX2SzPjjT0I4MH/TOv61yjYnBhWBKqonoXP+e4vjgejHI+sKWhFXErwTr4Vj5gnMExSb6y7g/9xOaQkEj1jR7q70jUCcJ5Xs0xMs38WqxLCh44RkCtbpHZHpa0vm+JPvmmficJyujwo4E4PC4JGN5meKpiTo+zCzLtvkGe6ryrooAIkbTawfiPrPn5B2FvGJP9XYUHYCZzWSeMeMnB13GJ4WJJyGh2d2lt0LY5Uvqck96ets0p5+kBr8j0kE4TYx1xQoY8UJVUsz3hHp84V8icUs7ZNZYdZo80gLlIMnql82OlNcQhIupqKp9CcWP2QziuSB/TiRG/qO7MNIHhvbKpM8kTCJZoJW9Lxlgoa7TFOwzWsgAi2ZW8DD0P3r+90HVDXP/px7LpJ3rUeaTMLZd+c7Bb+c76bB4Pey5Ndo6owElcLUnSOUyCpgO0=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4151.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?aO7oWOEBfZQZFShaGVpZRmHUfoKHU4yRP5kcqfXYCiavTH5p5gFSDnA1/0?=
- =?iso-8859-1?Q?2GhIfU2h/OMB/lXUV2xKifTW7qWM/rHKcvQQl/qvi5z4I4rLTSoHKQuamS?=
- =?iso-8859-1?Q?2TLjSwM+eM9Wy92n3SWl7rF0jpGgsRAI2b4I5ASndc+M/a99wyEu0PdvR2?=
- =?iso-8859-1?Q?yW39mdGWkdk6NImUPn95EfZ7lCZp/wbQxmORYbEnr3WHN4uBKA/8OLZuD/?=
- =?iso-8859-1?Q?rtW5tTKpTBdQ0KOBgUs+T8StVfd/MmDUuxrJC6wH4JEFhCl3ZWZjGCXsYD?=
- =?iso-8859-1?Q?uPQytRkZORf3wCGY2ZrxcU2siz2OZ9z+TfNxGKnm26SxfWy946sgEZDnmA?=
- =?iso-8859-1?Q?IxQKVmFBfA6rflRWBybqioggZGLfJsWgh4DKhSMWT+TXhmbaXnYYVvy5gp?=
- =?iso-8859-1?Q?Yrg4ilmI/eJhzTO6UI4nkKY3XAACEY22xSX3Ho8KJymlSoZrNxstE9uR9P?=
- =?iso-8859-1?Q?37DWfbTPECKFtmSjiYcw1f7e5WnFYPKFtR6EATH2xtXFtxCLkMhwWpXu0/?=
- =?iso-8859-1?Q?oyarcWVCIe/QgDuV9OhKZwhuBlDj6lKMpWjnr9wsqPAfuGs/zxTBZj9Ah6?=
- =?iso-8859-1?Q?IbKWUrVb0w31eeyb1E9kkFozsCC7rMyntyXt4tvMWcicZH6DP+9zkyc3B8?=
- =?iso-8859-1?Q?LpREHLQiOBjwBjXBkXzu+G53oIc+ZvYToUxJSa9CvyNJBJ0vkxxNfD1rna?=
- =?iso-8859-1?Q?RmpNj25zmbQ6db6PfqpO8RDODUSJgu2r/8pirs15rrrXalXFqsUS7O8VBo?=
- =?iso-8859-1?Q?AtjRWdm6AbMT/HesNwmeYFaheULbparY8yaa4o4qJW6Yq+Cc0+R63TSJIa?=
- =?iso-8859-1?Q?J9A+0i2viW2mCU78IMosSYH9KIp9h2QP5+bFeTfdomRH8j6sZn7oI5BqVA?=
- =?iso-8859-1?Q?R2k1S9Zz1bsNCflzthAiFuNGsNpcEFSx0wa+V+SG/IiD9rPIrC+44ncNZZ?=
- =?iso-8859-1?Q?gbdxug1gnfk5rdXB/w/Vmhg5s5b6GhkM89hWj1rOStnDqyc1uRpHAtbwky?=
- =?iso-8859-1?Q?5ICFp38oGqsabaZxYxCW/i0Q5YL+oFW8Be12UUithsZXTny2qkweEHLV3w?=
- =?iso-8859-1?Q?YU/eZzg8q0xZrsl1uI8qeq2zH+7XrYFkQbfWdu2fF90yF+3C746t3X7elw?=
- =?iso-8859-1?Q?x0PIO9vd1y+T60DX4/9QHYkYNQ+M8kL3eJqzOkR4lNfZgrHVZL0yOiAuYl?=
- =?iso-8859-1?Q?Wyu06D70jMdOHrh2a+JVY5Qpit20UF36Vn7QdsUA9Gy/LlOvP/VrFI8d+N?=
- =?iso-8859-1?Q?2LOouMICztkVQKWbbz3WVTlYLZBLlecuMA526IjL3P4MbQzBp4YIlnkZiV?=
- =?iso-8859-1?Q?e6+7SHtuhEViPiJ1Cq4aJifA41VGAW+Vd+X08WPZqcHT0YJekQxZFmJdZ7?=
- =?iso-8859-1?Q?5u+avQK9HWasNDNyeA/rhmfpJOCfHWvh/RIrY8cPcfKOd/ghBW7Xwdtp0r?=
- =?iso-8859-1?Q?KwuP/suhpHHHrq58nY+InQq6K+uIPiYSulqnOuR/ImeftKdluKNgKHcx0s?=
- =?iso-8859-1?Q?dSkLii0ktGJUJu3Y/JrkryXYj5ZCUZGK+2ZXpBtUIU7EpNDSLw1DhTfTS7?=
- =?iso-8859-1?Q?L0mG/i0/6ZZps5BZ3Uk1oz/3tT0V0yFnNalU5YJw82vFGE8hsX0+xGQ+Ha?=
- =?iso-8859-1?Q?11Ya2PALiFV++B36tVdDaaNNRmxezNwwM8?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Y6alFi2P"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1712097336; x=1712356536;
+	bh=ZR6oanZJrjCoyu/0f+lqsJmEQvmkfNvERkB55FpMbLg=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Y6alFi2PVO8tJG/+5EOowTtK6yQ+6aIb1zfjGhrRz4XFdszTaso4nG7qq2q1l6LY+
+	 UjBcXlcQgC1v+9CJIw/VhW9joS+lqyz4GMBIHL+jlObSUxBQAQqya602hokAIoiUFP
+	 b3kQoeWnN5BPVxHGvKa9kLXAs+T3zKIyP7HzmNWETIAH/pB1V+ulitRQKT7+3/s908
+	 1Czkrja20NNZrbd02NDy4tBSDb1XkLEWJ4/0CKsw0hbl36F8YidFnW6vrLaLG0HK0N
+	 S+03aHDnbdVnBf9lFuYk+FA4/L2msRvXoAopXACBRbWwZTCzalO59KEDknT+nycfxA
+	 l2Dax32bzBzbA==
+Date: Tue, 02 Apr 2024 22:35:32 +0000
+To: Andreas Hindborg <nmi@metaspace.dk>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
+	<da.gomez@samsung.com>, open list <linux-kernel@vger.kernel.org>, "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 4/5] rust: block: add rnull, Rust null_blk implementation
+Message-ID: <1e8a2a1f-abbf-44ba-8344-705a9cbb1627@proton.me>
+In-Reply-To: <87msqc3p0e.fsf@metaspace.dk>
+References: <20240313110515.70088-1-nmi@metaspace.dk> <20240313110515.70088-5-nmi@metaspace.dk> <QqpNcEOxhslSB7-34znxmQK_prPJfe2GT0ejWLesj-Dlse1ueCacbzsJOM0LK3YmgQsUWAR58ZFPPh1MUCliionIXrvLNsOqTS_Ee3bXEuQ=@proton.me> <87msqc3p0e.fsf@metaspace.dk>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	TmXrfHtwuQta3z+pz8CnQh1ldLfmL5fPKpzrbG9pXw0g6kbZ2ipXoOsiNPhApICIz6lt8MKNnRgFn9mEGm6ANQsaUSpPpScedAzkgNgYzUG2GrICftzoNSp4ONnVNS3cZMP80s5uuTCq8dqJO3AMtG2/BJzv9xvV1REAiMvXtZ9InMTuvbF1KSFdMeiqci/XwEXj0RXnSArnreCwEOuQ7p4x5ucLaiJmcpLgwkq/3NdLNApz5aloW/1VM3b6ioWxY+ac618lcMMrhroZQ5WYqPPSUf6ErHnEanFh4G/WURXRafR2WpKAutwZ/7Wl5ydGNsYg+Rqpd9qv50yNmpV0iKP/7rIQ3dTVw4a3fO9RlwixSldGt47zdSTjb6M92H/6XrQOKr1N9DNQQKOM36E+xc0elFWugwHqvjxFZ7n4GnSdgu2UH+sQYxSEcjco+/vZnvUhZN0Zra+S8j2tGgzqabTKq+5cQSAbJ/ReZv/ZcvteWE3blQtGdqy0jKVFXmfIvrGAJWmYSHW0ZuCzz8VwqulG73U/tv8ykRrklNdTgxg2+r/7dPOVGZxD2mCH67HHoC7wgYnWKCl615d5xQr/2ZVjGmsuwIy4W7khAajlvd8kmIj1CFwBTXWC3oGJd/po
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4151.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c85e9671-cba2-45e0-4e5d-08dc5361475f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2024 22:07:25.3610
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TaX0UncLokbxtBbKVYRVFn+iYFMoC+hw/I5l6fNODKpaXMj9S8nTFSNySFvYxQUPKXbFAw3AIgTGOQ4C0R8fBw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR04MB8849
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-=0A=
-Hi Daniel,=0A=
-Your question about the nvme-cli version makes me wonder if there is a vers=
-ion compatibility matrix (nvme-cli vs kernel) somewhere you could point me =
-to? I didn't see such info in the nvme-cli release notes.=0A=
-=0A=
-For example, I've seen issues with newer than nvme-cli v1.16 on Ubuntu 22.0=
-4 (stock & newer kernels). From a compatibility perspective I do wonder whe=
-ther circumventing a distro's package manager and directly installing newer=
- nvme-cli versions might be a bad idea. This could possibly become dire if =
-there were intentional version dependencies across the stack.=0A=
-=A0=0A=
-Thanks,=0A=
-Kamaljit=0A=
-=A0=0A=
-=0A=
-From: Linux-nvme <linux-nvme-bounces@lists.infradead.org> on behalf of Dani=
-el Wagner <dwagner@suse.de>=0A=
-Date: Thursday, March 28, 2024 at 01:46=0A=
-To: Nilay Shroff <nilay@linux.ibm.com>=0A=
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, linux-=
-nvme@lists.infradead.org <linux-nvme@lists.infradead.org>, linux-block@vger=
-.kernel.org <linux-block@vger.kernel.org>, axboe@fb.com <axboe@fb.com>, Gre=
-gory Joyce <gjoyce@ibm.com>=0A=
-Subject: Re: [Bug Report] nvme-cli commands fails to open head disk node an=
-d print error=0A=
-CAUTION: This email originated from outside of Western Digital. Do not clic=
-k on links or open attachments unless you recognize the sender and know tha=
-t the content is safe.=0A=
-=0A=
-=0A=
-On Thu, Mar 28, 2024 at 12:00:07PM +0530, Nilay Shroff wrote:=0A=
-> From the above output it's evident that nvme-cli attempts to open the dis=
-k node /dev/nvme0n3=0A=
-> however that entry doesn't exist. Apparently, on 6.9-rc1 kernel though he=
-ad disk node /dev/nvme0n3=0A=
-> doesn't exit, the relevant entries /sys/block/nvme0c0n3 and /sys/block/nv=
-me0n3 are present.=0A=
-=0A=
-I assume you are using not latest version of nvme-cli/libnvme. The=0A=
-latest version does not try to open any block devices when scanning the=0A=
-sysfs topology.=0A=
-=0A=
-What does `nvme version` say?=
+On 02.04.24 14:52, Andreas Hindborg wrote:
+> Benno Lossin <benno.lossin@proton.me> writes:
+>=20
+>> On 3/13/24 12:05, Andreas Hindborg wrote:
+>>> +module! {
+>>> +    type: NullBlkModule,
+>>> +    name: "rnull_mod",
+>>> +    author: "Andreas Hindborg",
+>>> +    license: "GPL v2",
+>>> +    params: {
+>>> +        param_memory_backed: bool {
+>>> +            default: true,
+>>> +            permissions: 0,
+>>> +            description: "Use memory backing",
+>>> +        },
+>>> +        // Problems with pin_init when `irq_mode`
+>>
+>> Can you elaborate?
+>=20
+> I think we discussed this before, but I do not recall what you decided
+> was the issue.
+
+Ah I vaguely remember.
+
+> It is probably easier if you can apply the patches and try to build with
+> this on top:
+>=20
+> diff --git a/drivers/block/rnull.rs b/drivers/block/rnull.rs
+> index 04bdb6668558..bd089c5e6e89 100644
+> --- a/drivers/block/rnull.rs
+> +++ b/drivers/block/rnull.rs
+> @@ -48,7 +48,7 @@
+>              description: "Use memory backing",
+>          },
+>          // Problems with pin_init when `irq_mode`
+> -        param_irq_mode: u8 {
+> +        irq_mode: u8 {
+>              default: 0,
+>              permissions: 0,
+>              description: "IRQ Mode (0: None, 1: Soft, 2: Timer)",
+> @@ -101,7 +101,7 @@ fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Re=
+sult<GenDisk<NullBlkDevice>
+>          return Err(kernel::error::code::EINVAL);
+>      }
+>=20
+> -    let irq_mode =3D (*param_irq_mode.read()).try_into()?;
+> +    let irq_mode =3D (*irq_mode.read()).try_into()?;
+>=20
+>      let queue_data =3D Box::pin_init(pin_init!(
+>          QueueData {
+>=20
+> ---
+>=20
+> There is some kind of name clash issue when using `pin_init!` in the expr=
+ession on
+> line 106:
+>=20
+>     let queue_data =3D Box::pin_init(pin_init!(
+>         QueueData {
+>             tree <- TreeContainer::new(),
+>             completion_time_nsec: *param_completion_time_nsec.read(),
+>             irq_mode,
+>             memory_backed: *param_memory_backed.read(),
+>             block_size,
+>         }
+>     ))?;
+>=20
+> I cannot immediately decipher the error message:
+>=20
+>   RUSTC [M] drivers/block/rnull.o
+> error[E0277]: the trait bound `__rnull_mod_irq_mode: From<u8>` is not sat=
+isfied
+>    --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:104:39
+>     |
+> 104 |     let irq_mode =3D (*irq_mode.read()).try_into()?;
+>     |                                       ^^^^^^^^ the trait `From<u8>`=
+ is not implemented for `__rnull_mod_irq_mode`
+>     |
+>     =3D note: required for `u8` to implement `Into<__rnull_mod_irq_mode>`
+>     =3D note: required for `__rnull_mod_irq_mode` to implement `TryFrom<u=
+8>`
+>     =3D note: required for `u8` to implement `TryInto<__rnull_mod_irq_mod=
+e>`
+>=20
+> error[E0308]: mismatched types
+>     --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
+>      |
+> 106  |       let queue_data =3D Box::pin_init(pin_init!(
+>      |  ____________________________________^
+> 107  | |         QueueData {
+> 108  | |             tree <- TreeContainer::new(),
+> 109  | |             completion_time_nsec: *param_completion_time_nsec.re=
+ad(),
+> ...    |
+> 113  | |         }
+> 114  | |     ))?;
+>      | |     ^
+>      | |     |
+>      | |_____expected `IRQMode`, found `__rnull_mod_irq_mode`
+>      |       arguments to this function are incorrect
+>      |
+> note: function defined here
+>     --> /home/aeh/.rustup/toolchains/1.74.1-x86_64-unknown-linux-gnu/lib/=
+rustlib/src/rust/library/core/src/ptr/mod.rs:1365:21
+>      |
+> 1365 | pub const unsafe fn write<T>(dst: *mut T, src: T) {
+>      |                     ^^^^^
+>      =3D note: this error originates in the macro `$crate::__init_interna=
+l` which comes from the expansion of the macro `pin_init` (in Nightly build=
+s, run with -Z macro-backtrace for more info)
+>=20
+> error[E0308]: mismatched types
+>    --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
+>     |
+> 39  | / module! {
+> 40  | |     type: NullBlkModule,
+> 41  | |     name: "rnull_mod",
+> 42  | |     author: "Andreas Hindborg",
+> ...   |
+> 71  | |     },
+> 72  | | }
+>     | |_- constant defined here
+> ...
+> 106 |       let queue_data =3D Box::pin_init(pin_init!(
+>     |  ____________________________________^
+>     | |____________________________________|
+>     | |____________________________________|
+>     | |____________________________________|
+>     | |
+> 107 | |         QueueData {
+> 108 | |             tree <- TreeContainer::new(),
+> 109 | |             completion_time_nsec: *param_completion_time_nsec.rea=
+d(),
+> ...   |
+> 113 | |         }
+> 114 | |     ))?;
+>     | |     ^
+>     | |_____|
+>     | |_____expected `DropGuard<IRQMode>`, found `__rnull_mod_irq_mode`
+>     | |_____this expression has type `DropGuard<IRQMode>`
+>     | |_____`irq_mode` is interpreted as a constant, not a new binding
+>     |       help: introduce a new binding instead: `other_irq_mode`
+>     |
+>     =3D note: expected struct `DropGuard<IRQMode>`
+>                found struct `__rnull_mod_irq_mode`
+>     =3D note: this error originates in the macro `$crate::__init_internal=
+` which comes from the expansion of the macro `pin_init` (in Nightly builds=
+, run with -Z macro-backtrace for more info)
+>=20
+> error: aborting due to 3 previous errors
+>=20
+> Some errors have detailed explanations: E0277, E0308.
+> For more information about an error, try `rustc --explain E0277`.
+> make[5]: *** [/home/aeh/src/linux-rust/linux/scripts/Makefile.build:293: =
+drivers/block/rnull.o] Error 1
+
+
+So I did some digging and there are multiple things at play. I am going
+to explain the second error first, since that one might be a problem
+with `pin_init`:
+- the `params` extension of the `module!` macro creates constants with
+   snake case names.
+- your `QueueData` struct has the same name as a field.
+- `pin_init!` generates `let $field_name =3D ...` statements for each
+   field you initialize
+
+Now when you define a constant in Rust, you are able to pattern-match
+with that constant, eg:
+
+     const FOO: u8 =3D 0;
+    =20
+     fn main() {
+         match 10 {
+             FOO =3D> println!("foo"),
+             _ =3D> {}
+         }
+     }
+
+So when you do `let FOO =3D x;`, then it interprets `FOO` as the constant.
+This is still true if the constant has a snake case name.
+Since the expression in the `pin_init!` macro has type
+`DropGuard<$field_type>`, we get the error "expected
+`DropGuard<IRQMode>`, found `__rnull_mod_irq_mode`".
+
+Now to the first error, this is a problem with the parameter handling of
+`module`. By the same argument above, your let binding in line 104:
+
+     let irq_mode =3D (*irq_mode.read()).try_into()?;
+
+Tries to pattern-match the `irq_mode` constant with the right
+expression. Since you use the `try_into` function, it tries to search
+for a `TryInto` implementation for the type of `irq_mode` which is
+generated by the `module!` macro. The type is named
+__rnull_mod_irq_mode.
+
+
+Now what to do about this. For the second error (the one related to
+`pin_init`), I could create a patch that fixes it by adding the suffix
+`_guard` to those let bindings, preventing the issue. Not sure if we
+need that though, since it will not get rid of the first issue.
+
+For the first issue, I think there is no other way than to use a
+different name for either the field or the constant. Since constants are
+usually named using screaming snake case, I think it should be renamed.
+I believe your reason for using a snake case name is that these names
+are used directly as the names for the parameters when loading the
+module and there the convention is to use snake case, right?
+In that case I think we could expect people to write the screaming snake
+case name in rust and have it automatically be lower-cased by the
+`module!` macro when it creates the names that the parameters are shown
+with.
+
+Hope this helps!
+
+--=20
+Cheers,
+Benno
+
