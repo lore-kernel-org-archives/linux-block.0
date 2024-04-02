@@ -1,70 +1,64 @@
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com [209.85.210.66])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805FC56B95
-	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 08:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B1558AAF
+	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 10:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712047817; cv=none; b=BCu2fB3Pr3ygk1Rdz8pIn4cI9N5TN+IDGvwp5EOGQ12fjKog1Ydoz7kDj8l0Qe0e/o/hy2aEcjlDjENBGEJ1LIJ9pd9VCdbtobVdGE6jD2Ub0SvehzHJHBwyopgICevL1emmgF4clU/SJuI3ed7dNHgUo3Ohkh2tHcOvplmRASY=
+	t=1712052209; cv=none; b=UGsEtOKQmLs8IKvkJMacXWv4rYVXrmdTTIFRQ+kZNDVVhcT8Z8c4OWfr0+YjlFuZgopAAGSiIYY2mPXT4BQqkso5bm+yCx/zuwu69cff2LLai873GzQ2Q8nqNKFDmzwFUBTNOLl+mm9r9pkyaxj8LkOmvTwzDFYUPYujwKHb0Ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712047817; c=relaxed/simple;
-	bh=/4YkSTRdE7M7Xu8XMpog4hak/3PlwZ+3b3bqKoB55qo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=usFZtWdsFks47iMvwqRRV3Gdziu6uLBuUVku9MKzgGZdl6ars/OY8qwApcscKMsw3eMBXeypXaNKX8iiPdY4SB5F8RyYqVr+YlhQxtxVSwVOkfyUQTuYG9oeoLtql2HzIHnySuM5kYahE/o9j2iSUGzq10jhKlRmgG/k1tyrgME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PGVqg6pX; arc=none smtp.client-ip=209.85.210.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+	s=arc-20240116; t=1712052209; c=relaxed/simple;
+	bh=W8EMzt/O2eaAwpCquPGi+SUm2Mo8/N3plw63XqazPLQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fmT+KUmEYJAlSbovjNNkTwaI9Ca+FFcQCDBwXM9cQrxeUOl9iBjOqT2dugiK7KXl05kXIRXOpxnWgTi/7FhG0Tpp+DUfMxxles1KvRty403xDQt6Kf9ja2NPgDkQ2lgfmPHoFNGpBem2f1JjVFlJ2LTTJk8loF2zPi/peGWvY7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Yzqcq4l8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/NHW3jlW; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PGVqg6pX"
-Received: by mail-ot1-f66.google.com with SMTP id 46e09a7af769-6e0f43074edso3305872a34.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2024 01:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1712047814; x=1712652614; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jc5qKirKkUEsGA81ePv/IEQCmdT5wmxUd63NYwufXHA=;
-        b=PGVqg6pX2i8bDe9YZ1wt+ROkmooz+OIQQkoUp6QqTud2NrbhSJihFvtaBLO4Nb38wR
-         QgLI1MZTkP1H5QWRNainq3fv7PcM1+6gApBwjOnC2MqYXJtRtzP2XM8bl9p+yce9Inhb
-         hT/9jQfUsEkqAkg5qxx8IePJwuQ52FnJdQan8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712047814; x=1712652614;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jc5qKirKkUEsGA81ePv/IEQCmdT5wmxUd63NYwufXHA=;
-        b=Qs92iXGV6ciWADVSkqxipkT+FOrz30eMPJAwmBY/4KPCi4VsyM4+xnxFdyF29YHAUS
-         3TL+RWw09rdubHco1eKmaTOZZ/z2mC+ZvefX7LyP1EBvNB+Cr6MF1DQeyKdZg8iidz5B
-         Oc6t2hbI9MwYPDsLbFXPLxPKpziqoJ7gcwDZbXWGuxxlwfxvS3SouTEJkoJWlhwmjK12
-         5QUTIZumxOy0/N+SV5vjaid60dxl42jFvMP6GbKqIY6hTzHCcizpSk2pDwG9kyX8y0nt
-         gRNTXAiQWymsTPpbknAC85qsng+JDhAZA1lTJAKc/yxTbfMeGXyWjacKy2waAu3MBoKX
-         dMlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWERSvUX86Gvtf+UG5EjU0RLNQBQY8xxTqhM/dQpXAVebXiGRXIjX+W7IWheYQpkKGjK6Kz0XXNZe6fi6zkIuY2Ce5lu3m1/knT3kA=
-X-Gm-Message-State: AOJu0YxfL6O0fCbDlwIRGtNLn+AaZH450nRvjLO8e6PmzaCa9qgOKS+V
-	89x7VRYnlpLJZXLhPox47x9jhyYaJVAhYgBKXgWELcMKpkOqD5cV0eOsWa+AIQ==
-X-Google-Smtp-Source: AGHT+IGAeogQj7OWBty6lfzImr9aptLfny9tqOJXUIZvSX740VF/rVNywUCKCnybxk/NBzbcGcioMQ==
-X-Received: by 2002:a54:4004:0:b0:3c3:de8b:7bdf with SMTP id x4-20020a544004000000b003c3de8b7bdfmr9601570oie.57.1712047814503;
-        Tue, 02 Apr 2024 01:50:14 -0700 (PDT)
-Received: from kashwindayan-virtual-machine.eng.vmware.com ([152.65.205.51])
-        by smtp.gmail.com with ESMTPSA id a5-20020a63e405000000b005dc36761ad1sm9193042pgi.33.2024.04.02.01.50.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 01:50:14 -0700 (PDT)
-From: Ashwin Dayanand Kamat <ashwin.kamat@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	Min Li <min15.li@samsung.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Ashwin Dayanand Kamat <ashwin.kamat@broadcom.com>
-Subject: [PATCH v5.10] block: add check that partition length needs to be aligned with block size
-Date: Tue,  2 Apr 2024 14:19:55 +0530
-Message-Id: <20240402084955.82273-1-ashwin.kamat@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Yzqcq4l8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/NHW3jlW"
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6CFFE20F22;
+	Tue,  2 Apr 2024 10:03:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712052204; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=BtH0JQusNt/m2acAX0Gmxhgcf2jNVxYa++5QTX/0eY0=;
+	b=Yzqcq4l8FeaP1xYTTN7LN7cOm0GMP9WoewrI3fuBvpTA+1vE8Vg2pA149fDxwDgXvNeWoY
+	erdXzXbskOM+woJanEM2rlkWToJI2djT07NzMUOdpLl3/KnzgAS0NJbPME0jzjVe2VqQ/J
+	SLQc2l1HKXlGRULUCc52zSobPqjX0tY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712052204;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=BtH0JQusNt/m2acAX0Gmxhgcf2jNVxYa++5QTX/0eY0=;
+	b=/NHW3jlWEQmvr2zmdJAg4F68KciB6ozBaL3xqK5UVFV6XWoBmqCR0O3UNjaOZ1oGIVXhWk
+	N5yRKxhbOVrJslDw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=none
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 5AB5413A90;
+	Tue,  2 Apr 2024 10:03:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id gT2zFOzXC2bxCQAAn2gu4w
+	(envelope-from <dwagner@suse.de>); Tue, 02 Apr 2024 10:03:24 +0000
+From: Daniel Wagner <dwagner@suse.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v1 0/3] add blkdev type environment variable
+Date: Tue,  2 Apr 2024 12:03:19 +0200
+Message-ID: <20240402100322.17673-1-dwagner@suse.de>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,68 +66,99 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 6CFFE20F22
+X-Spamd-Result: default: False [-1.81 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap2.dmz-prg2.suse.org:rdns,imap2.dmz-prg2.suse.org:helo];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_TLS_ALL(0.00)[]
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Score: -1.81
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-From: Min Li <min15.li@samsung.com>
+During the last batch of refactoring I noticed that we could reduce the number
+of tests a bit. There are tests which are almost identically except how the
+target is configured, file vs block device backend.
 
-[ Upstream commit 6f64f866aa1ae6975c95d805ed51d7e9433a0016]
+By introducing a configure knob, we can drop the duplicates and even make some
+of the tests a bit more versatile. Not all tests exists in file and block device
+backend version. Thus we increase the test coverage with this series. And not
+really surprising, there is a fallout. The nvme/028 test with file backend is
+failing in my setup but I was not able to figure out where things go wrong yet.
+I'll provide some logs later.
 
-Before calling add partition or resize partition, there is no check
-on whether the length is aligned with the logical block size.
-If the logical block size of the disk is larger than 512 bytes,
-then the partition size maybe not the multiple of the logical block size,
-and when the last sector is read, bio_truncate() will adjust the bio size,
-resulting in an IO error if the size of the read command is smaller than
-the logical block size.If integrity data is supported, this will also
-result in a null pointer dereference when calling bio_integrity_free.
+Daniel Wagner (3):
+  nvme/rc: add blkdev type environment variable
+  nvme/{007,009,011,013,015,020,024}: drop duplicate nvmet blkdev type
+    tests
+  nvme/{021,022,025,026,027,028}: do not hard code target blkdev type
 
-Cc:  <stable@vger.kernel.org>
-Signed-off-by: Min Li <min15.li@samsung.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20230629142517.121241-1-min15.li@samsung.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Ashwin Dayanand Kamat <ashwin.kamat@broadcom.com>
----
- block/ioctl.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ Documentation/running-tests.md |  2 ++
+ tests/nvme/006                 |  5 ++--
+ tests/nvme/007                 | 28 --------------------
+ tests/nvme/007.out             |  2 --
+ tests/nvme/008                 |  4 +--
+ tests/nvme/009                 | 36 -------------------------
+ tests/nvme/009.out             |  3 ---
+ tests/nvme/010                 |  4 +--
+ tests/nvme/011                 | 39 ---------------------------
+ tests/nvme/011.out             |  3 ---
+ tests/nvme/012                 |  4 +--
+ tests/nvme/013                 | 43 ------------------------------
+ tests/nvme/013.out             |  3 ---
+ tests/nvme/014                 |  4 +--
+ tests/nvme/015                 | 48 ----------------------------------
+ tests/nvme/015.out             |  4 ---
+ tests/nvme/019                 |  4 +--
+ tests/nvme/020                 | 40 ----------------------------
+ tests/nvme/020.out             |  4 ---
+ tests/nvme/021                 |  6 ++---
+ tests/nvme/022                 |  6 ++---
+ tests/nvme/023                 |  4 +--
+ tests/nvme/024                 | 40 ----------------------------
+ tests/nvme/024.out             |  2 --
+ tests/nvme/025                 |  6 ++---
+ tests/nvme/026                 |  6 ++---
+ tests/nvme/027                 |  6 ++---
+ tests/nvme/028                 |  6 ++---
+ tests/nvme/rc                  |  3 ++-
+ 29 files changed, 36 insertions(+), 329 deletions(-)
+ delete mode 100755 tests/nvme/007
+ delete mode 100644 tests/nvme/007.out
+ delete mode 100755 tests/nvme/009
+ delete mode 100644 tests/nvme/009.out
+ delete mode 100755 tests/nvme/011
+ delete mode 100644 tests/nvme/011.out
+ delete mode 100755 tests/nvme/013
+ delete mode 100644 tests/nvme/013.out
+ delete mode 100755 tests/nvme/015
+ delete mode 100644 tests/nvme/015.out
+ delete mode 100755 tests/nvme/020
+ delete mode 100644 tests/nvme/020.out
+ delete mode 100755 tests/nvme/024
+ delete mode 100644 tests/nvme/024.out
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index e7eed7dad..c490d67fe 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -17,7 +17,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 			  struct blkpg_partition __user *upart, int op)
- {
- 	struct blkpg_partition p;
--	long long start, length;
-+	sector_t start, length;
- 
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
-@@ -32,6 +32,12 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 	if (op == BLKPG_DEL_PARTITION)
- 		return bdev_del_partition(bdev, p.pno);
- 
-+	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
-+		return -EINVAL;
-+	/* Check that the partition is aligned to the block size */
-+	if (!IS_ALIGNED(p.start | p.length, bdev_logical_block_size(bdev)))
-+		return -EINVAL;
-+
- 	start = p.start >> SECTOR_SHIFT;
- 	length = p.length >> SECTOR_SHIFT;
- 
-@@ -46,9 +52,6 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 
- 	switch (op) {
- 	case BLKPG_ADD_PARTITION:
--		/* check if partition is aligned to blocksize */
--		if (p.start & (bdev_logical_block_size(bdev) - 1))
--			return -EINVAL;
- 		return bdev_add_partition(bdev, p.pno, start, length);
- 	case BLKPG_RESIZE_PARTITION:
- 		return bdev_resize_partition(bdev, p.pno, start, length);
 -- 
-2.35.6
+2.44.0
 
