@@ -1,267 +1,200 @@
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39011EB2B;
-	Tue,  2 Apr 2024 22:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A8F225CB
+	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 22:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712097347; cv=none; b=NkYOVngHUJUh8hT20AOrE4kRHs52wael3+oTbvYI/Y39W1wPyqtDb+UO7VUBFhq//zj2LwJX91RCQW/00YxL/rif16THWYoip06tOc3dZb9yR/9wjAvNQGCuGQLn22wSNjv0dr07UtHOYVN/qCVORK8B8KFiYykQpwUcCGHTbBg=
+	t=1712097824; cv=none; b=gDQ5qm3hUnMuc+xXiPnPwZ8sIE9TlNDeN4tac7iIcELfslHm8VUXI4dL0R+oW+CYNG1a+B7tmxvu88kJeGnaWBIO7Ij1PhDR5jEH+Awzq4Tzxd+c+XEz0eTzQFfqtOQSHDY+NXMpiSQGmMeyZcsde+urpL3/rWu+pLeyGWWaJQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712097347; c=relaxed/simple;
-	bh=jkjZO7jwr0PCImAu66df4aVlb2K6kWhUeVLD66IVeD8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bwvNCN7cryhpU27XcOOCZT8TAi1GRxM90UhCx4sdExTfIFzaAzK04MgF6F/nMYlH7SNRdMiGQbB6iQq8d5unAS8dk0jeWXOsxpffjipT5TKzCtuot/Bo9awjFo1ws389adOv6UxKb9ym0wW+fC4nSWR+fsVR/wAZwObYOmNJXVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Y6alFi2P; arc=none smtp.client-ip=185.70.40.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1712097824; c=relaxed/simple;
+	bh=GFiAxf8pniOzwSAvuUeMYccfrTRaFyoxF8AIEedOUNk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dcOpOhBFXfJeEYLUbI6EAWfKDSIEkx8TYH6V+Jjw9sTjtZS+Bb9ElAWyqJMBPaaq4WN58mcF7sBXuFy6rQyPL8ZJYpdgkuvjAxmQ1HI6oPNIYn5tLHzmk/8iZxb4vVfLMjtiYk31nTZhq2syL9IgbpzOaC5s0n6M2ArvldlE2GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JZDYQxIk; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Y6alFi2P"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1712097336; x=1712356536;
-	bh=ZR6oanZJrjCoyu/0f+lqsJmEQvmkfNvERkB55FpMbLg=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Y6alFi2PVO8tJG/+5EOowTtK6yQ+6aIb1zfjGhrRz4XFdszTaso4nG7qq2q1l6LY+
-	 UjBcXlcQgC1v+9CJIw/VhW9joS+lqyz4GMBIHL+jlObSUxBQAQqya602hokAIoiUFP
-	 b3kQoeWnN5BPVxHGvKa9kLXAs+T3zKIyP7HzmNWETIAH/pB1V+ulitRQKT7+3/s908
-	 1Czkrja20NNZrbd02NDy4tBSDb1XkLEWJ4/0CKsw0hbl36F8YidFnW6vrLaLG0HK0N
-	 S+03aHDnbdVnBf9lFuYk+FA4/L2msRvXoAopXACBRbWwZTCzalO59KEDknT+nycfxA
-	 l2Dax32bzBzbA==
-Date: Tue, 02 Apr 2024 22:35:32 +0000
-To: Andreas Hindborg <nmi@metaspace.dk>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
-	<da.gomez@samsung.com>, open list <linux-kernel@vger.kernel.org>, "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 4/5] rust: block: add rnull, Rust null_blk implementation
-Message-ID: <1e8a2a1f-abbf-44ba-8344-705a9cbb1627@proton.me>
-In-Reply-To: <87msqc3p0e.fsf@metaspace.dk>
-References: <20240313110515.70088-1-nmi@metaspace.dk> <20240313110515.70088-5-nmi@metaspace.dk> <QqpNcEOxhslSB7-34znxmQK_prPJfe2GT0ejWLesj-Dlse1ueCacbzsJOM0LK3YmgQsUWAR58ZFPPh1MUCliionIXrvLNsOqTS_Ee3bXEuQ=@proton.me> <87msqc3p0e.fsf@metaspace.dk>
-Feedback-ID: 71780778:user:proton
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JZDYQxIk"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc236729a2bso5330420276.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2024 15:43:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1712097822; x=1712702622; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nhKj52ntP3jIznJn9tpCxnFtv47wZoK6aLt2OwfcE7g=;
+        b=JZDYQxIkc+vY2vBc6EpgU4T1A37Yb7IyxHTd23xr1zhuV4DV4Vyk9+LocUIkjaeoqC
+         8ROSp0XsfS0sS1Q1ZJuD+kh9VHk0lDqjrXyYIuxllxdI3Xy1DAC5Ur373JoFe6i/iFkN
+         BjXbYpr5OQSblBCt6HMpS4oSXesGm6CnShK5U4u8gTRA0WAbOuOs3z38FIjvLLt+mACJ
+         kptdYwYzrlpUhzRUJK1bfkINcb0YK+ZF9MU/+KFs4ukDK7HxI+FFokHFKxKkpIXp1tzQ
+         K9ZPDquP0CmonCUenbC2Eg/rOxllUPhnUYJQMr+GTcCvfhe0BV1gcKtiqH6Dsyh+bsh1
+         U3NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712097822; x=1712702622;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nhKj52ntP3jIznJn9tpCxnFtv47wZoK6aLt2OwfcE7g=;
+        b=POZW5wFQgETiTE/AJ13WVxKzeInoqJhWmRhP9pSCahdyU7tmvG/oBr1p4TPKiYU9QV
+         a23x8MWCb1EQ8q2/073rPQwBdaP2dcKFZgmwAbq//sQPcN/UXK6sIE97c7sXB2PG+Aqu
+         3SI/PqYdR6MoJrrSWDTHfWXZ+SYJferiZuzKK01B02YEoqmKsntmXG8Ox5LVxVBGILLB
+         0kBZ5vpqbJIZan09WcYygG4s0c+eK9BW8Wgsg79ErdQJj9RFLr2fgoXPIuC58BXzrzY8
+         9vCAmYofeHYMitzTpS1nE0mhNFLFXXm32UC67AxoEMSqQ97vXUuQvGyl6M0SZsl7jUlj
+         Dy9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUL/ihCBV0Prf9Aqn8wVh3Hu3ha3Xenf7oJJbShnOoR/51Nss3LFqWwgI7jViVCSTaW6lHhMuF68Ag2JIdyHU6VQRYj7qtrtv8NVnw=
+X-Gm-Message-State: AOJu0YzqlqFPne061trDHb4YvyCCK7j57NtnMwU0bs0GkFLA2OGLRog8
+	TVJiXaiQHMy2uuR6abUv2lpy6NtvqqzROb4Jh8vnC/1lkBHQTSJuyXyT3ZS2PsGJMRw6ppNiMAL
+	oZLP+tettKcvcm7/4TY255OmlyrszMrDEezG3cQ==
+X-Google-Smtp-Source: AGHT+IGlgswx8znnfO3JxpaKsCVBFLcxqzWxCF2p/CGD6pZpo4KXa3L3gnmft1HCkz80Blu4QCQq/VSoRuINJuFvafs=
+X-Received: by 2002:a05:6902:f8a:b0:dc6:4d0c:e9de with SMTP id
+ ft10-20020a0569020f8a00b00dc64d0ce9demr1276842ybb.0.1712097821924; Tue, 02
+ Apr 2024 15:43:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240306232052.21317-1-semen.protsenko@linaro.org> <8896bcc5-09b1-4886-9081-c8ce0afc1c40@app.fastmail.com>
+In-Reply-To: <8896bcc5-09b1-4886-9081-c8ce0afc1c40@app.fastmail.com>
+From: Sam Protsenko <semen.protsenko@linaro.org>
+Date: Tue, 2 Apr 2024 17:43:31 -0500
+Message-ID: <CAPLW+4mu3K38_sPnTDj-gkvdsnfN3OKXwfDSBUg_jUj+f122cA@mail.gmail.com>
+Subject: Re: [PATCH] mmc: dw_mmc: Fix IDMAC operation with pages bigger than 4K
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
+	Christoph Hellwig <hch@lst.de>, Chris Ball <cjb@laptop.org>, Will Newton <will.newton@gmail.com>, 
+	Matt Fleming <matt@console-pimps.org>, Christian Brauner <brauner@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
+	Naresh Kamboju <naresh.kamboju@linaro.org>, 
+	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 02.04.24 14:52, Andreas Hindborg wrote:
-> Benno Lossin <benno.lossin@proton.me> writes:
->=20
->> On 3/13/24 12:05, Andreas Hindborg wrote:
->>> +module! {
->>> +    type: NullBlkModule,
->>> +    name: "rnull_mod",
->>> +    author: "Andreas Hindborg",
->>> +    license: "GPL v2",
->>> +    params: {
->>> +        param_memory_backed: bool {
->>> +            default: true,
->>> +            permissions: 0,
->>> +            description: "Use memory backing",
->>> +        },
->>> +        // Problems with pin_init when `irq_mode`
->>
->> Can you elaborate?
->=20
-> I think we discussed this before, but I do not recall what you decided
-> was the issue.
+On Thu, Mar 7, 2024 at 1:52=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Thu, Mar 7, 2024, at 00:20, Sam Protsenko wrote:
+> > Commit 616f87661792 ("mmc: pass queue_limits to blk_mq_alloc_disk") [1]
+> > revealed the long living issue in dw_mmc.c driver, existing since the
+> > time when it was first introduced in commit f95f3850f7a9 ("mmc: dw_mmc:
+> > Add Synopsys DesignWare mmc host driver."), also making kernel boot
+> > broken on platforms using dw_mmc driver with 16K or 64K pages enabled,
+> > with this message in dmesg:
+> >
+> >     mmcblk: probe of mmc0:0001 failed with error -22
+> >
+> > That's happening because mmc_blk_probe() fails when it calls
+> > blk_validate_limits() consequently, which returns the error due to
+> > failed max_segment_size check in this code:
+> >
+> >     /*
+> >      * The maximum segment size has an odd historic 64k default that
+> >      * drivers probably should override.  Just like the I/O size we
+> >      * require drivers to at least handle a full page per segment.
+> >      */
+> >     ...
+> >     if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
+> >         return -EINVAL;
+> >
+> > In case when IDMAC (Internal DMA Controller) is used, dw_mmc.c always
+> > sets .max_seg_size to 4 KiB:
+> >
+> >     mmc->max_seg_size =3D 0x1000;
+> >
+> > The comment in the code above explains why it's incorrect. Arnd
+> > suggested setting .max_seg_size to .max_req_size to fix it, which is
+> > also what some other drivers are doing:
+> >
+> >    $ grep -rl 'max_seg_size.*=3D.*max_req_size' drivers/mmc/host/ | \
+> >      wc -l
+> >    18
+>
+> Nice summary!
+>
+> > This change is not only fixing the boot with 16K/64K pages, but also
+> > leads to a better MMC performance. The linear write performance was
+> > tested on E850-96 board (eMMC only), before commit [1] (where it's
+> > possible to boot with 16K/64K pages without this fix, to be able to do
+> > a comparison). It was tested with this command:
+> >
+> >     # dd if=3D/dev/zero of=3Dsomefile bs=3D1M count=3D500 oflag=3Dsync
+> >
+> > Test results are as follows:
+> >
+> >   - 4K pages,  .max_seg_size =3D 4 KiB:                   94.2 MB/s
+> >   - 4K pages,  .max_seg_size =3D .max_req_size =3D 512 KiB: 96.9 MB/s
+> >   - 16K pages, .max_seg_size =3D 4 KiB:                   126 MB/s
+> >   - 16K pages, .max_seg_size =3D .max_req_size =3D 2 MiB:   128 MB/s
+> >   - 64K pages, .max_seg_size =3D 4 KiB:                   138 MB/s
+> >   - 64K pages, .max_seg_size =3D .max_req_size =3D 8 MiB:   138 MB/s
+>
+> Thanks for sharing these results. From what I can see here, the
+> performance changes significantly with the page size, but barely
+> with the max_seg_size, so this does not have the effect I was
+> hoping for. On a more positive note this likely means that we
+> don't have to urgently backport your fix.
+>
+> This could mean that either there is not much coalescing across
+> pages after all, or that the bottleneck is somewhere else.
+>
+> > diff --git a/drivers/mmc/host/dw_mmc.c b/drivers/mmc/host/dw_mmc.c
+> > index 8e2d676b9239..cccd5633ff40 100644
+> > --- a/drivers/mmc/host/dw_mmc.c
+> > +++ b/drivers/mmc/host/dw_mmc.c
+> > @@ -2951,8 +2951,8 @@ static int dw_mci_init_slot(struct dw_mci *host)
+> >       if (host->use_dma =3D=3D TRANS_MODE_IDMAC) {
+> >               mmc->max_segs =3D host->ring_size;
+> >               mmc->max_blk_size =3D 65535;
+> > -             mmc->max_seg_size =3D 0x1000;
+> > -             mmc->max_req_size =3D mmc->max_seg_size * host->ring_size=
+;
+> > +             mmc->max_req_size =3D DW_MCI_DESC_DATA_LENGTH * host->rin=
+g_size;
+> > +             mmc->max_seg_size =3D mmc->max_req_size;
+>
+> The change looks good to me.
+>
+> I see that the host->ring_size depends on PAGE_SIZE as well:
+>
+> #define DESC_RING_BUF_SZ        PAGE_SIZE
+> host->ring_size =3D DESC_RING_BUF_SZ / sizeof(struct idmac_desc_64addr);
+> host->sg_cpu =3D dmam_alloc_coherent(host->dev,
+>                DESC_RING_BUF_SZ, &host->sg_dma, GFP_KERNEL);
+>
+> I don't see any reason for the ring buffer size to be tied to
+> PAGE_SIZE at all, it was probably picked as a reasonable
+> default in the initial driver but isn't necessarily ideal.
+>
+> From what I can see, the number of 4KB elements in the
+> ring can be as small as 128 (4KB pages, 64-bit addresses)
+> or as big as 4096 (64KB pages, 32-bit addresses), which is
+> quite a difference. If you are still motivated to drill
+> down into this, could you try changing DESC_RING_BUF_SZ
+> to a fixed size of either 4KB or 64KB and test again
+> with the opposite page size, to see if that changes the
+> throughput?
+>
 
-Ah I vaguely remember.
+Hi Arnd,
 
-> It is probably easier if you can apply the patches and try to build with
-> this on top:
->=20
-> diff --git a/drivers/block/rnull.rs b/drivers/block/rnull.rs
-> index 04bdb6668558..bd089c5e6e89 100644
-> --- a/drivers/block/rnull.rs
-> +++ b/drivers/block/rnull.rs
-> @@ -48,7 +48,7 @@
->              description: "Use memory backing",
->          },
->          // Problems with pin_init when `irq_mode`
-> -        param_irq_mode: u8 {
-> +        irq_mode: u8 {
->              default: 0,
->              permissions: 0,
->              description: "IRQ Mode (0: None, 1: Soft, 2: Timer)",
-> @@ -101,7 +101,7 @@ fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Re=
-sult<GenDisk<NullBlkDevice>
->          return Err(kernel::error::code::EINVAL);
->      }
->=20
-> -    let irq_mode =3D (*param_irq_mode.read()).try_into()?;
-> +    let irq_mode =3D (*irq_mode.read()).try_into()?;
->=20
->      let queue_data =3D Box::pin_init(pin_init!(
->          QueueData {
->=20
-> ---
->=20
-> There is some kind of name clash issue when using `pin_init!` in the expr=
-ession on
-> line 106:
->=20
->     let queue_data =3D Box::pin_init(pin_init!(
->         QueueData {
->             tree <- TreeContainer::new(),
->             completion_time_nsec: *param_completion_time_nsec.read(),
->             irq_mode,
->             memory_backed: *param_memory_backed.read(),
->             block_size,
->         }
->     ))?;
->=20
-> I cannot immediately decipher the error message:
->=20
->   RUSTC [M] drivers/block/rnull.o
-> error[E0277]: the trait bound `__rnull_mod_irq_mode: From<u8>` is not sat=
-isfied
->    --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:104:39
->     |
-> 104 |     let irq_mode =3D (*irq_mode.read()).try_into()?;
->     |                                       ^^^^^^^^ the trait `From<u8>`=
- is not implemented for `__rnull_mod_irq_mode`
->     |
->     =3D note: required for `u8` to implement `Into<__rnull_mod_irq_mode>`
->     =3D note: required for `__rnull_mod_irq_mode` to implement `TryFrom<u=
-8>`
->     =3D note: required for `u8` to implement `TryInto<__rnull_mod_irq_mod=
-e>`
->=20
-> error[E0308]: mismatched types
->     --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
->      |
-> 106  |       let queue_data =3D Box::pin_init(pin_init!(
->      |  ____________________________________^
-> 107  | |         QueueData {
-> 108  | |             tree <- TreeContainer::new(),
-> 109  | |             completion_time_nsec: *param_completion_time_nsec.re=
-ad(),
-> ...    |
-> 113  | |         }
-> 114  | |     ))?;
->      | |     ^
->      | |     |
->      | |_____expected `IRQMode`, found `__rnull_mod_irq_mode`
->      |       arguments to this function are incorrect
->      |
-> note: function defined here
->     --> /home/aeh/.rustup/toolchains/1.74.1-x86_64-unknown-linux-gnu/lib/=
-rustlib/src/rust/library/core/src/ptr/mod.rs:1365:21
->      |
-> 1365 | pub const unsafe fn write<T>(dst: *mut T, src: T) {
->      |                     ^^^^^
->      =3D note: this error originates in the macro `$crate::__init_interna=
-l` which comes from the expansion of the macro `pin_init` (in Nightly build=
-s, run with -Z macro-backtrace for more info)
->=20
-> error[E0308]: mismatched types
->    --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
->     |
-> 39  | / module! {
-> 40  | |     type: NullBlkModule,
-> 41  | |     name: "rnull_mod",
-> 42  | |     author: "Andreas Hindborg",
-> ...   |
-> 71  | |     },
-> 72  | | }
->     | |_- constant defined here
-> ...
-> 106 |       let queue_data =3D Box::pin_init(pin_init!(
->     |  ____________________________________^
->     | |____________________________________|
->     | |____________________________________|
->     | |____________________________________|
->     | |
-> 107 | |         QueueData {
-> 108 | |             tree <- TreeContainer::new(),
-> 109 | |             completion_time_nsec: *param_completion_time_nsec.rea=
-d(),
-> ...   |
-> 113 | |         }
-> 114 | |     ))?;
->     | |     ^
->     | |_____|
->     | |_____expected `DropGuard<IRQMode>`, found `__rnull_mod_irq_mode`
->     | |_____this expression has type `DropGuard<IRQMode>`
->     | |_____`irq_mode` is interpreted as a constant, not a new binding
->     |       help: introduce a new binding instead: `other_irq_mode`
->     |
->     =3D note: expected struct `DropGuard<IRQMode>`
->                found struct `__rnull_mod_irq_mode`
->     =3D note: this error originates in the macro `$crate::__init_internal=
-` which comes from the expansion of the macro `pin_init` (in Nightly builds=
-, run with -Z macro-backtrace for more info)
->=20
-> error: aborting due to 3 previous errors
->=20
-> Some errors have detailed explanations: E0277, E0308.
-> For more information about an error, try `rustc --explain E0277`.
-> make[5]: *** [/home/aeh/src/linux-rust/linux/scripts/Makefile.build:293: =
-drivers/block/rnull.o] Error 1
+Sorry for the late reply. I'm a bit of busy with something else right
+now (trying to enable this same driver for Exynos850 in U-Boot, hehe),
+I'll try to carve out some time later and tinker with
+DESC_RING_BUF_SZ. But for now, can we just apply this patch as is? As
+I understand, it's fixing quite a major issue (at least from what I
+heard), so it would be nice to have it in -next and -stable. Does that
+sound reasonable?
 
+Thanks!
 
-So I did some digging and there are multiple things at play. I am going
-to explain the second error first, since that one might be a problem
-with `pin_init`:
-- the `params` extension of the `module!` macro creates constants with
-   snake case names.
-- your `QueueData` struct has the same name as a field.
-- `pin_init!` generates `let $field_name =3D ...` statements for each
-   field you initialize
-
-Now when you define a constant in Rust, you are able to pattern-match
-with that constant, eg:
-
-     const FOO: u8 =3D 0;
-    =20
-     fn main() {
-         match 10 {
-             FOO =3D> println!("foo"),
-             _ =3D> {}
-         }
-     }
-
-So when you do `let FOO =3D x;`, then it interprets `FOO` as the constant.
-This is still true if the constant has a snake case name.
-Since the expression in the `pin_init!` macro has type
-`DropGuard<$field_type>`, we get the error "expected
-`DropGuard<IRQMode>`, found `__rnull_mod_irq_mode`".
-
-Now to the first error, this is a problem with the parameter handling of
-`module`. By the same argument above, your let binding in line 104:
-
-     let irq_mode =3D (*irq_mode.read()).try_into()?;
-
-Tries to pattern-match the `irq_mode` constant with the right
-expression. Since you use the `try_into` function, it tries to search
-for a `TryInto` implementation for the type of `irq_mode` which is
-generated by the `module!` macro. The type is named
-__rnull_mod_irq_mode.
-
-
-Now what to do about this. For the second error (the one related to
-`pin_init`), I could create a patch that fixes it by adding the suffix
-`_guard` to those let bindings, preventing the issue. Not sure if we
-need that though, since it will not get rid of the first issue.
-
-For the first issue, I think there is no other way than to use a
-different name for either the field or the constant. Since constants are
-usually named using screaming snake case, I think it should be renamed.
-I believe your reason for using a snake case name is that these names
-are used directly as the names for the parameters when loading the
-module and there the convention is to use snake case, right?
-In that case I think we could expect people to write the screaming snake
-case name in rust and have it automatically be lower-cased by the
-`module!` macro when it creates the names that the parameters are shown
-with.
-
-Hope this helps!
-
---=20
-Cheers,
-Benno
-
+> If a larger ring buffer gives us significantly better
+> throughput, we may want to always use a higher number
+> independent of page size. On the other hand, if the
+> 64KB number (the 138MB/s) does not change with a smaller
+> ring, we may as well reduce that in order to limit the
+> maximum latency that is caused by a single I/O operation.
+>
+>      Arnd
