@@ -1,239 +1,220 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E89D4683;
-	Mon,  1 Apr 2024 21:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054D48BF1
+	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 01:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712006609; cv=none; b=ZfCSM3BTp0pCp+MhbxfNlD+aw5k1gVfUG21UnXhXZvMtQkOPepktsW8yFAXa/PHUGpvqDUO8q+z8uUPaq+AA5N9uRXrw3m9sL414wHM3bknb9QFppg/lqcmJ7sERsdQtzjkSEVawRQdKLAAhfXQIMJ2lRyq+sTyKdpWhhYYcRkc=
+	t=1712021206; cv=none; b=VuQMu0KP2abe6szPnmx8M2mn+r+wt9+TfbfqUarUXEHhPtL2rUy6QUKDI+LVhbhuGU1NEhRSCwRQcKWwD9zqQWFF5yacFIN2mLLB6PuyMQjbKlq3Jw+vCycMnJlpXG6iNx3IIHTdsS98NV690PCBqXzQ/RAGzF0Xk/CqoYiRcjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712006609; c=relaxed/simple;
-	bh=CFKYD9nVhCS3d3jWxKqwf7HPx0PmDPX0G8/hDBXf/TY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hFU73TokmuH6tG0CfLcHvth1/h0RyDB/eb9Uqck55t9uhfdK6PfQDw9hQ5QIvVzC+Ca9rlnhNPKWJmBJT1TtBWOXMEteAoqvDbQpqmebi65zqPDtlKg2lGl6YyVwyZKRZDnQOPkx6D0J+nUnN1RSzh6juBoV5SDyuEitkRUCoT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=fWgc6Hib; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1712021206; c=relaxed/simple;
+	bh=aVxgl65qe63F9RG61q5/c/8ucEYTRdx9vtPoLeH3Y2k=;
+	h=Date:Message-ID:MIME-Version:Content-Type:Content-Disposition:
+	 From:To:Cc:Subject:References:In-Reply-To; b=lMHT4BJKGQ+Uj8AfEk/c/LATNdzdiFeNzIhLDLFO1KO4TW+sZ8WgnswWWfjuIgN6RgtRvMjPfoR8vPRATivMfQw3atj/LZkh9ySN7zWCSdOdnBIbp/6RnrMbft4fNpADF6hH0rhp4OSM6c/b0Fl0poEOg0NAIDEqAO5pbu9fop8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Wk/I++s7; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="fWgc6Hib"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V7kWs2kdzz6Cnk8t;
-	Mon,  1 Apr 2024 21:23:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:references:content-language:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1712006594; x=1714598595; bh=O7oKmKUsBp2UuDlgNH+Fc49v
-	eA1RbMZi5k1upyKoAng=; b=fWgc6Hib+t0Pg/8cg55FNrqGHd74DX17FAgsa/vj
-	AS2i44wlI4OLpu7D/OJEZL7Jr6+A4rZ8QwA1l9D8IjPZn7G5POE4MzrcsHjlRLvL
-	u7laJHFI8AzgDAmqqB9ukKzxstt3BXHEk5mPpUZ5Bs2Dy8InWoNt8Oar/xm0VMOV
-	YrOFFvWfXWcyP+MFptn3a2Rw7KVakN2bqup95uqW/oGqgrCtS5Wpqhzj5msACk1m
-	CD9G4XtHV/j95g7Sl9d+pDJ9G2T7rnWyEsgpbqNeY8UMnpKWvdLKYRGeZkg1jsKr
-	Z2AFV8hM2qJxdlADI0Jt+qkoIEVjbUPUiicCDUQYeJHaCw==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id h-yZf0CWai33; Mon,  1 Apr 2024 21:23:14 +0000 (UTC)
-Received: from [100.96.154.173] (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V7kWh3FJ5z6Cnk8m;
-	Mon,  1 Apr 2024 21:23:12 +0000 (UTC)
-Message-ID: <92e45c93-e2ff-4d34-b70f-7772f0596e68@acm.org>
-Date: Mon, 1 Apr 2024 14:23:10 -0700
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Wk/I++s7"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-78a2093cd44so338595785a.0
+        for <linux-block@vger.kernel.org>; Mon, 01 Apr 2024 18:26:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1712021203; x=1712626003; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=R2O8HEb1FethHT20zhCThThb/BGPO8YtMtgX7GfGVZI=;
+        b=Wk/I++s7wtaQ/2FeEcZ38+tZpZp1W1jPudHa22FhK2Udi6xUU0Le9ilyyu2e5ca56f
+         sZTeM6lKEGBaGNN6qmjKv/gxRA/e9dyIusCcDaQecnFRRuaPBnOTM1f6AwUwx42CHzxJ
+         y9F1LJdJWwMi5lAOcrviZfuMxaFFZkTMFcasPSWmm2+EP1815JEJYvnWVIHaMIutXqC+
+         V+LO/zNlbCsDVTxq9eWDgi3zYUXBfHSstT9HigmwXnzVYxh8lZioolkSoZsEojV1wGGX
+         cmR7yfv2ajFGhqAr2iC9CZNS/dUs0WQY07vlVDXKGDxd2tqQb6v89ncIc/NNvWJcyByx
+         FYhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712021203; x=1712626003;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=R2O8HEb1FethHT20zhCThThb/BGPO8YtMtgX7GfGVZI=;
+        b=usSeDoUJxP8Z7bj/Cl4qtT+itdQuEVQMtqmOUtleWHWdToHSyzWADObcOHkqf/tvFS
+         co+vMVFIyKoYFLzjO4X7DF2HwPBjmeZp6H9J/cR/nCuD3t2g57i+Ys7i9alM99hsbNuM
+         IAwe6exVBxbdBiG6PTz5AObjC7AGPr2c4n1+15PXStBAVIk5qLVEBdGjC2tOAaPSJU2X
+         WYYbEQHRyODoJgA3trQsLxXPOdxN04rdzdBz2Vo08UvxGqMnksRSQvBgFQy+SxzBKPIF
+         DelVah5I9qidfkHHcH/2fQELfRyyEi6C+f1E5A42KrkOiQtQBCLW6zVAsC43poegQLJg
+         f4+g==
+X-Forwarded-Encrypted: i=1; AJvYcCWSThk4k/L8FHWLf4okGakfgSexlyt092nFfABBalOT4jljEbTliRbU74oqr7S7PkmC6KUfbSHTSzeBbz7KQzOrBFJFPdWrGbpE/P0=
+X-Gm-Message-State: AOJu0YwnCFvzIk0aagsk63n86xXdJxY/mts404K/ZwaCWVOnBP80nJKP
+	36BkaqZ5GNcdFjDd1IRmjf34cJNQrIxzOmfw8C0ITPpu+q+2zznTtGLql5FZuA==
+X-Google-Smtp-Source: AGHT+IE++PDnPsCAN5ZlJzJBCsY9VL8rWCNTNagzE8bvtbG+6yPqmGk0WcKC3DLF/KWvtXLzI6otLg==
+X-Received: by 2002:ad4:404f:0:b0:699:1026:c0a4 with SMTP id r15-20020ad4404f000000b006991026c0a4mr2755001qvp.38.1712021202974;
+        Mon, 01 Apr 2024 18:26:42 -0700 (PDT)
+Received: from localhost ([70.22.175.108])
+        by smtp.gmail.com with ESMTPSA id fn3-20020ad45d63000000b00696934de5f7sm4964016qvb.62.2024.04.01.18.26.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Apr 2024 18:26:42 -0700 (PDT)
+Date: Mon, 01 Apr 2024 21:26:42 -0400
+Message-ID: <18dfbc23f04422e88993a13ff15b6229@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block/mq-deadline: Fix WARN when set async_depth by sysfs
-Content-Language: en-US
-To: Zhiguo Niu <niuzhiguo84@gmail.com>
-Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>, axboe@kernel.dk,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- ke.wang@unisoc.com, hongyu.jin@unisoc.com,
- Damien Le Moal <dlemoal@kernel.org>
-References: <1711680261-5789-1-git-send-email-zhiguo.niu@unisoc.com>
- <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org>
- <CAHJ8P3K9OL6MHNrSrqmf0esbr2h1HJ3mVRmxDNVpf95ZMHQcqg@mail.gmail.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAHJ8P3K9OL6MHNrSrqmf0esbr2h1HJ3mVRmxDNVpf95ZMHQcqg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 
+Content-Type: text/plain; charset=utf-8 
+Content-Disposition: inline 
+Content-Transfer-Encoding: 8bit
+From: Paul Moore <paul@paul-moore.com>
+To: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
+Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>, Fan Wu <wufan@linux.microsoft.com>
+Subject: Re: [PATCH v16 11/20] block|security: add LSM blob to block_device
+References: <1711657047-10526-12-git-send-email-wufan@linux.microsoft.com>
+In-Reply-To: <1711657047-10526-12-git-send-email-wufan@linux.microsoft.com>
 
-On 3/31/24 17:58, Zhiguo Niu wrote:
-> On Sat, Mar 30, 2024 at 2:08=E2=80=AFAM Bart Van Assche <bvanassche@acm=
-.org> wrote:
->>
->> On 3/28/24 7:44 PM, Zhiguo Niu wrote:
->>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
->>> index 02a916b..89c516e 100644
->>> --- a/block/mq-deadline.c
->>> +++ b/block/mq-deadline.c
->>> @@ -646,10 +646,12 @@ static void dd_depth_updated(struct blk_mq_hw_c=
-tx *hctx)
->>>        struct request_queue *q =3D hctx->queue;
->>>        struct deadline_data *dd =3D q->elevator->elevator_data;
->>>        struct blk_mq_tags *tags =3D hctx->sched_tags;
->>> +     unsigned int shift =3D tags->bitmap_tags.sb.shift;
->>> +     unsigned int dd_min_depth =3D max(1U, 3 * (1U << shift)  / 4);
->>>
->>>        dd->async_depth =3D max(1UL, 3 * q->nr_requests / 4);
->>>
->>> -     sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_d=
-epth);
->>> +     sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd_min_dept=
-h);
->>>    }
->>
->> The above patch sets min_shallow_depth to the same value as commit
->> d47f9717e5cf ("block/mq-deadline: use correct way to throttling write
->> requests"). That commit got reverted because it was causing performanc=
-e
->> problems. So the above patch reintroduces the performance problem that
->> has been fixed by commit 256aab46e316 ("Revert "block/mq-deadline: use
->> correct way to throttling write requests"").
-> Hi Bart Van Assche,
->=20
-> This  patch only modifies the initial minimum value of
-> min_shallow_depth and does not change "dd->async_depth",
-> so it will not cause performance problems like the previous patch
-> (d47f9717e5cf ("block/mq-deadline: use correct way to throttling write
-> requests")).
+On Mar 28, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
+> 
+> Some block devices have valuable security properties that is only
+> accessible during the creation time.
 
-Oops, I misread your patch. After having taken another look, my
-conclusions are as follows:
-* sbitmap_queue_min_shallow_depth() is called. This causes
-   sbq->wake_batch to be modified but I don't think that it is a proper
-   fix for dd_limit_depth().
-* dd_limit_depth() still assigns a number in the range 1..nr_requests to
-   data->shallow_depth while a number in the range 1..(1<<bt->sb.shift)
-   should be assigned.
+You should mention the new hook in the subject line, something like
+the following: "block,lsm: add LSM blob and new LSM hook for block
+devices".
 
-> So what are your suggestions for fixing the warning shown in commit
-> msg if dd->async_depth is set by the user from sysfs?
-> thanks
-
-How about the two untested patches below?
-
-Thanks,
-
-Bart.
-
-
-Subject: [PATCH 1/2] block: Call .limit_depth() after .hctx has been set
-
-Prepare for using .hctx in dd_limit_depth().
-
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
-  block/blk-mq.c | 8 +++++---
-  1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 34060d885c5a..d0db9252bb71 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -435,6 +435,7 @@ __blk_mq_alloc_requests_batch(struct=20
-blk_mq_alloc_data *data)
-  static struct request *__blk_mq_alloc_requests(struct=20
-blk_mq_alloc_data *data)
-  {
-  	struct request_queue *q =3D data->q;
-+	struct elevator_mq_ops *ops =3D NULL;
-  	u64 alloc_time_ns =3D 0;
-  	struct request *rq;
-  	unsigned int tag;
-@@ -459,13 +460,11 @@ static struct request=20
-*__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
-  		 */
-  		if ((data->cmd_flags & REQ_OP_MASK) !=3D REQ_OP_FLUSH &&
-  		    !blk_op_is_passthrough(data->cmd_flags)) {
--			struct elevator_mq_ops *ops =3D &q->elevator->type->ops;
-+			ops =3D &q->elevator->type->ops;
-
-  			WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
-
-  			data->rq_flags |=3D RQF_USE_SCHED;
--			if (ops->limit_depth)
--				ops->limit_depth(data->cmd_flags, data);
-  		}
-  	}
-
-@@ -478,6 +477,9 @@ static struct request=20
-*__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
-  	if (data->flags & BLK_MQ_REQ_RESERVED)
-  		data->rq_flags |=3D RQF_RESV;
-
-+	if (ops && ops->limit_depth)
-+		ops->limit_depth(data->cmd_flags, data);
-+
-  	/*
-  	 * Try batched alloc if we want more than 1 tag.
-  	 */
+> For example, when creating a dm-verity block device, the dm-verity's
+> roothash and roothash signature, which are extreme important security
+> metadata, are passed to the kernel. However, the roothash will be saved
+> privately in dm-verity, which prevents the security subsystem to easily
+> access that information. Worse, in the current implementation the
+> roothash signature will be discarded after the verification, making it
+> impossible to utilize the roothash signature by the security subsystem.
+> 
+> With this patch, an LSM blob is added to the block_device structure.
+> This enables the security subsystem to store security-sensitive data
+> related to block devices within the security blob. For example, LSM can
+> use the new LSM blob to save the roothash signature of a dm-verity,
+> and LSM can make access decision based on the data inside the signature,
+> like the signer certificate.
+> 
+> The implementation follows the same approach used for security blobs in
+> other structures like struct file, struct inode, and struct superblock.
+> The initialization of the security blob occurs after the creation of the
+> struct block_device, performed by the security subsystem. Similarly, the
+> security blob is freed by the security subsystem before the struct
+> block_device is deallocated or freed.
+> 
+> This patch also introduces a new hook to save block device's integrity
+> data. For example, for dm-verity, LSMs can use this hook to save
+> the roothash signature of a dm-verity into the security blob,
+> and LSMs can make access decisions based on the data inside
+> the signature, like the signer certificate.
+> 
+> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> ---
+> v2:
+>   + No Changes
+> 
+> v3:
+>   + Minor style changes from checkpatch --strict
+> 
+> v4:
+>   + No Changes
+> 
+> v5:
+>   + Allow multiple callers to call security_bdev_setsecurity
+> 
+> v6:
+>   + Simplify security_bdev_setsecurity break condition
+> 
+> v7:
+>   + Squash all dm-verity related patches to two patches,
+>     the additions to dm-verity/fs, and the consumption of
+>     the additions.
+> 
+> v8:
+>   + Split dm-verity related patches squashed in v7 to 3 commits based on
+>     topic:
+>       + New LSM hook
+>       + Consumption of hook outside LSM
+>       + Consumption of hook inside LSM.
+> 
+>   + change return of security_bdev_alloc / security_bdev_setsecurity
+>     to LSM_RET_DEFAULT instead of 0.
+> 
+>   + Change return code to -EOPNOTSUPP, bring inline with other
+>     setsecurity hooks.
+> 
+> v9:
+>   + Add Reviewed-by: Casey Schaufler <casey@schaufler-ca.com>
+>   + Remove unlikely when calling LSM hook
+>   + Make the security field dependent on CONFIG_SECURITY
+> 
+> v10:
+>   + No changes
+> 
+> v11:
+>   + No changes
+> 
+> v12:
+>   + No changes
+> 
+> v13:
+>   + No changes
+> 
+> v14:
+>   + No changes
+> 
+> v15:
+>   + Drop security_bdev_setsecurity() for new hook
+>     security_bdev_setintegrity() in the next commit
+>   + Update call_int_hook() for 260017f
+> 
+> v16:
+>   + Drop Reviewed-by tag for the new changes
+>   + Squash the security_bdev_setintegrity() into this commit
+>   + Rename enum from lsm_intgr_type to lsm_integrity_type
+>   + Switch to use call_int_hook() for bdev_setintegrity()
+>   + Correct comment
+>   + Fix return in security_bdev_alloc()
+> ---
+>  block/bdev.c                  |  7 +++
+>  include/linux/blk_types.h     |  3 ++
+>  include/linux/lsm_hook_defs.h |  5 ++
+>  include/linux/lsm_hooks.h     |  1 +
+>  include/linux/security.h      | 26 ++++++++++
+>  security/security.c           | 89 +++++++++++++++++++++++++++++++++++
+>  6 files changed, 131 insertions(+)
 
 
 
-Subject: [PATCH 2/2] block/mq-deadline: Fix the tag reservation code
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index f35af7b6cfba..8e646189740e 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -1483,6 +1492,23 @@ static inline int lsm_fill_user_ctx(struct lsm_ctx __user *uctx,
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+> +
+> +static inline int security_bdev_alloc(struct block_device *bdev)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void security_bdev_free(struct block_device *bdev)
+> +{
+> +}
+> +
+> +static inline int security_bdev_setintegrity(struct block_device *bdev,
+> +					     enum lsm_integrity_type, type,
 
-Fixes: 07757588e507 ("block/mq-deadline: Reserve 25% of scheduler tags=20
-for synchronous requests")
----
-  block/mq-deadline.c | 18 ++++++++++++++++--
-  1 file changed, 16 insertions(+), 2 deletions(-)
+I'm sure by now you've seen the reports about the errant comma ...
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 02a916ba62ee..8e780069d91b 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -621,6 +621,20 @@ static struct request *dd_dispatch_request(struct=20
-blk_mq_hw_ctx *hctx)
-  	return rq;
-  }
+> +					     const void *value, size_t size)
+> +{
+> +	return 0;
+> +}
+> +
+>  #endif	/* CONFIG_SECURITY */
 
-+/*
-+ * 'depth' is a number in the range 0..q->nr_requests. Convert it to a=20
-number
-+ * in the range 0..(1 << bt->sb.shift) since that is the range expected =
-by
-+ * sbitmap_get_shallow().
-+ */
-+static int dd_to_word_depth(struct blk_mq_hw_ctx *hctx, unsigned int=20
-qdepth)
-+{
-+	struct sbitmap_queue *bt =3D &hctx->sched_tags->bitmap_tags;
-+	const unsigned int nrr =3D hctx->queue->nr_requests;
-+
-+	return max(((qdepth << bt->sb.shift) + nrr - 1) / nrr,
-+		   bt->min_shallow_depth);
-+}
-+
-  /*
-   * Called by __blk_mq_alloc_request(). The shallow_depth value set by t=
-his
-   * function is used by __blk_mq_get_tag().
-@@ -637,7 +651,7 @@ static void dd_limit_depth(blk_opf_t opf, struct=20
-blk_mq_alloc_data *data)
-  	 * Throttle asynchronous requests and writes such that these requests
-  	 * do not block the allocation of synchronous requests.
-  	 */
--	data->shallow_depth =3D dd->async_depth;
-+	data->shallow_depth =3D dd_to_word_depth(data->hctx, dd->async_depth);
-  }
-
-  /* Called by blk_mq_update_nr_requests(). */
-@@ -649,7 +663,7 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hc=
-tx)
-
-  	dd->async_depth =3D max(1UL, 3 * q->nr_requests / 4);
-
--	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
-+	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
-  }
-
-  /* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
-
+--
+paul-moore.com
