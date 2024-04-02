@@ -1,1047 +1,336 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E90C634E5
-	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 12:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1A21DFD0;
+	Tue,  2 Apr 2024 12:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712061319; cv=none; b=PpLOpGc0yGkfuXh6OdlGc5MSYHgpo+NLoQfo9JPDtUK40G9PL3/lKw32XRaxqtmRoB1vGBTiIAulnh01CIA023PbLUBxUc/kKQyrMl5VJnmR/3EN10hod/VTI0MyJYfNUkpTt1j9/7IE5AM9t8kr59+NycL1gPcKWhBIooBcZrc=
+	t=1712061551; cv=none; b=NacmAz2U23qmYhY8gNvsDGuZz+SFFsMLnOi7e9sqG7jqpTg57f9XagwMVRWoRAlf8zB4lrTEe0kCkgiBsjyHsdoQHtKcFT/Bd4PyR7DZmLlrJqihxRapWWmuluvGsQ4TskItMHJCEETkysn1GCRM/jQpDkPO0x/pOvPC9TaZTcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712061319; c=relaxed/simple;
-	bh=Tep4S1Q715UFOx/wLk4+C1NCgjCpeAjutGDVVwux6e0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:References:Message-ID:
-	 MIME-Version:Content-Type; b=ETSmcL3KbaK0PScl4E0Rx+X558bzF+3xxqfTFv46x/RPf5qKacCA87FW6w7w8ic0AbTbX7N2/I18P4wPA2I9/nvQj8PyqdhU60DlIQq6OmFIyKZ/bRIfnnkbfPf3G05WEtv2kcenasLtgh9QHvzRxtTTanb07KLo5r7C6mNoqEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=YQVNpIMO; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1712061551; c=relaxed/simple;
+	bh=gyzQ1IUpOZ/Jx5C8eFPM6DJV6Bu8lAoyMT3fGp7Tx2s=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LLKgeA6LIO7Zlvrvmg0CMGJA1XlG2PwRXHZFZHsiiDDaUrvUq0+//FCuYKdG02PgrCwHM0NCyAzZDq7YjG45zDIc69NmOKGozjUFAVxZh4V/jT26BUjKPjlOCyiR17AFPsdD1uI9rn3AZgZtRIw6YDpcMPchfw3G9W8v/gJBkko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FMwH77oO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="YQVNpIMO"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-415a84ea9bbso8442265e9.2
-        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2024 05:35:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712061313; x=1712666113; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:user-agent
-         :references:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=94NmtpISCe1DyOWRxAt9pd/Vy2VYBeZeRAEqDACXBAQ=;
-        b=YQVNpIMO2UHck47200xVZgKKQkNxm31UIfAbKjXr1oHZ7lHxTk+1q+3IpTImZMPi+t
-         Q7gX8rPe6IsflUIbpRfro0iD48usyhrHwEj6/Sb1UveA9K+uxVnKyN0oAnZkuQozxaiJ
-         rD9v+KByWN712YmbRiVQHHMt3kMNZMCQc6YhfDHtY6TWwwM2BV/L/uNOakpQpwKA+gbG
-         3+Sa5oz6tidI6ajWIFt6CZYQccR8wIyco+d5quzZVM9XuNWF0SBvCSlWUKPVkrRK/SMN
-         5nshFFJ2+Y0JyBkuHzw+DzNSXtGjR9ZHgHR+zk8qQTGqyCME9yVbaEY6SHDhAmR4Azo6
-         W9Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712061313; x=1712666113;
-        h=content-transfer-encoding:mime-version:message-id:user-agent
-         :references:date:in-reply-to:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=94NmtpISCe1DyOWRxAt9pd/Vy2VYBeZeRAEqDACXBAQ=;
-        b=XjALS7D9DquaxnuTfQgLzKGJN1viEP7EyO1ztzznYc8i+kZZpv0n7A8YGd9+74cOxJ
-         vHR3AHSFLGzD4g3OR5lYMIGsTv9im4pcWVyS5xfCqG/LPR0UDECD2mxO3nYByPzfXAEm
-         Sc/F+3IwygGeM6jCns3iz1LmWcJyYAlIFU2EPfwBlNzc3F8x7JCI0eEOKu6GN0/wnLFj
-         jWVZFnsxp2/Qu2xJ4/N4+Y7QMJNm3OicB0kEv4hjrIm41/rhUGij7IF6T3RtGCOJL1jo
-         76BaGjgXNLHnQ2rVvssPZTe/+IFK1K/qI2I4O0ENkNeP0IVMkWTvovJXZ4UssTzPaWyM
-         3bSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWEHGUtFAn2uix2C+mrGWMUyYARmaf840VfWjEIqRxDytWpnj5pVtzABQWFjwIRK5kTFqGApw3+0h/Gc4VPQQO4BQw3XzfrvH9YHh0=
-X-Gm-Message-State: AOJu0Yzpa6qZCge88UbAP+WLcAiiVsVT/xZ646QHKefhvfn4DnMjDNsT
-	/xiRZ/Ll6HR5GZhow6Wc56Bxa+oBqn7Yc+pZ65zbxOUn+YLXgYZCLW3N9FUJD0c=
-X-Google-Smtp-Source: AGHT+IHcieVheldqhM4UoWK5vICzNsoxsy4JvMAL43HoaZQG5XxVSRSnhuJd6A8CWg5rElbDAvsNOw==
-X-Received: by 2002:a05:600c:17c7:b0:414:392:38d2 with SMTP id y7-20020a05600c17c700b00414039238d2mr1359936wmo.24.1712061313040;
-        Tue, 02 Apr 2024 05:35:13 -0700 (PDT)
-Received: from localhost ([165.225.194.196])
-        by smtp.gmail.com with ESMTPSA id k4-20020a5d6e84000000b0033ea499c645sm14159661wrz.4.2024.04.02.05.35.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 05:35:12 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
- Busch <kbusch@kernel.org>,  Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart
- Van Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
-  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
- Hindborg <a.hindborg@samsung.com>,  Wedson Almeida Filho
- <wedsonaf@gmail.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,  Greg KH
- <gregkh@linuxfoundation.org>,  Matthew Wilcox <willy@infradead.org>,
-  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
-  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?=
- Roy Baron <bjorn3_gh@protonmail.com>,  Alice Ryhl <aliceryhl@google.com>,
-  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
- <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
- =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
- Granados
- <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
- <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
- list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
- <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
- <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
-In-Reply-To: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me> (Benno Lossin's
-	message of "Fri, 22 Mar 2024 23:40:37 +0000")
-Date: Sat, 23 Mar 2024 07:32:35 +0100
-References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me>
-User-Agent: mu4e 1.12.0; emacs 29.2
-Message-ID: <871q7o54el.fsf@metaspace.dk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FMwH77oO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 735AFC433C7;
+	Tue,  2 Apr 2024 12:39:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712061550;
+	bh=gyzQ1IUpOZ/Jx5C8eFPM6DJV6Bu8lAoyMT3fGp7Tx2s=;
+	h=From:To:Subject:Date:From;
+	b=FMwH77oOXzBbCrLhKLxSwhimMe0ZvvX0BrVANjRPyOqNCJr4o3ezZeylpkKEjuZMy
+	 iU3cgmYn39fCVxdGGUkHJRkE7LzI4kVf3WemHMxWpf9biyhpFAZE6k0cbzOJhFrMpr
+	 7rgov9g9FKqisF7gjT3v2Oo5pIOvbUYGFvqCvhu/2rbwzrW+InuiNS2gDXB/N6sp00
+	 7lT/MZG3oXJZxHSEAQODlWAnnHgfZaRYJGhIWOByvdL9Q2uynoa2qpdGdIV7Q1Fl6k
+	 j9hU0lEls6xzndjSykTyIANWvPK70oTtyW13Vv49BeYX9OVT/u3ZYtfsCExcUVPIBc
+	 jY4O5rlFmV2SQ==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@lists.linux.dev,
+	Mike Snitzer <snitzer@redhat.com>,
+	linux-nvme@lists.infradead.org,
+	Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v4 00/28] Zone write plugging
+Date: Tue,  2 Apr 2024 21:38:39 +0900
+Message-ID: <20240402123907.512027-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Benno Lossin <benno.lossin@proton.me> writes:
+The patch series introduces zone write plugging (ZWP) as the new
+mechanism to control the ordering of writes to zoned block devices.
+ZWP replaces zone write locking (ZWL) which is implemented only by
+mq-deadline today. ZWP also allows emulating zone append operations
+using regular writes for zoned devices that do not natively support this
+operation (e.g. SMR HDDs). This patch series removes the scsi disk
+driver and device mapper zone append emulation to use ZWP emulation.
 
-> On 3/13/24 12:05, Andreas Hindborg wrote:
->> From: Andreas Hindborg <a.hindborg@samsung.com>
->>=20
->> Add initial abstractions for working with blk-mq.
->>=20
->> This patch is a maintained, refactored subset of code originally publish=
-ed by
->> Wedson Almeida Filho <wedsonaf@gmail.com> [1].
->>=20
->> [1] https://github.com/wedsonaf/linux/tree/f2cfd2fe0e2ca4e90994f96afe268=
-bbd4382a891/rust/kernel/blk/mq.rs
->>=20
->> Cc: Wedson Almeida Filho <wedsonaf@gmail.com>
->> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
->> ---
->>   block/blk-mq.c                     |   3 +-
->>   include/linux/blk-mq.h             |   1 +
->>   rust/bindings/bindings_helper.h    |   2 +
->>   rust/helpers.c                     |  45 ++++
->>   rust/kernel/block.rs               |   5 +
->>   rust/kernel/block/mq.rs            | 131 +++++++++++
->>   rust/kernel/block/mq/gen_disk.rs   | 174 +++++++++++++++
->>   rust/kernel/block/mq/operations.rs | 346 +++++++++++++++++++++++++++++
->>   rust/kernel/block/mq/raw_writer.rs |  60 +++++
->>   rust/kernel/block/mq/request.rs    | 182 +++++++++++++++
->>   rust/kernel/block/mq/tag_set.rs    | 117 ++++++++++
->>   rust/kernel/error.rs               |   5 +
->>   rust/kernel/lib.rs                 |   1 +
->>   13 files changed, 1071 insertions(+), 1 deletion(-)
->
-> Do you think that it's possible to split this into smaller
-> patches? It would make review a lot easier.
+Unlike ZWL which operates on requests, ZWP operates on BIOs. A zone
+write plug is simply a BIO list that is atomically manipulated using a
+spinlock and a kblockd submission work. A write BIO to a zone is
+"plugged" to delay its execution if a write BIO for the same zone was
+already issued, that is, if a write request for the same zone is being
+executed. The next plugged BIO is unplugged and issued once the write
+request completes.
 
-Probably, I'll look into that.
+This mechanism allows to:
+ - Untangle zone write ordering from the block IO schedulers. This
+   allows removing the restriction on using only mq-deadline for zoned
+   block devices. Any block IO scheduler, including "none" can be used.
+ - Zone write plugging operates on BIOs instead of requests. Plugged
+   BIOs waiting for execution thus do not hold scheduling tags and thus
+   do not prevent other BIOs from being submitted to the device (reads
+   or writes to other zones). Depending on the workload, this can
+   significantly improve the device use and the performance.
+ - Both blk-mq (request) based zoned devices and BIO-based devices (e.g.
+   device mapper) can use ZWP. It is mandatory for the
+   former but optional for the latter: BIO-based driver can use zone
+   write plugging to implement write ordering guarantees, or the drivers
+   can implement their own if needed.
+ - The code is less invasive in the block layer and in device drivers.
+   ZWP implementation is mostly limited to blk-zoned.c, with some small
+   changes in blk-mq.c, blk-merge.c and bio.c.
 
->
->>   create mode 100644 rust/kernel/block.rs
->>   create mode 100644 rust/kernel/block/mq.rs
->>   create mode 100644 rust/kernel/block/mq/gen_disk.rs
->>   create mode 100644 rust/kernel/block/mq/operations.rs
->>   create mode 100644 rust/kernel/block/mq/raw_writer.rs
->>   create mode 100644 rust/kernel/block/mq/request.rs
->>   create mode 100644 rust/kernel/block/mq/tag_set.rs
->
-> [...]
->
->> diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
->> new file mode 100644
->> index 000000000000..4c93317a568a
->> --- /dev/null
->> +++ b/rust/kernel/block.rs
->> @@ -0,0 +1,5 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +//! Types for working with the block layer
->
-> Missing '.'.
+Performance evaluation results are shown below.
 
-=F0=9F=91=8D
+The series is based on block/for-next and organized as follows:
 
->
->> +
->> +pub mod mq;
->> diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
->> new file mode 100644
->> index 000000000000..08de1cc114ff
->> --- /dev/null
->> +++ b/rust/kernel/block/mq.rs
->> @@ -0,0 +1,131 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +//! This module provides types for implementing block drivers that inte=
-rface the
->> +//! blk-mq subsystem.
->> +//!
->> +//! To implement a block device driver, a Rust module must do the follo=
-wing:
->> +//!
->> +//! - Implement [`Operations`] for a type `T`
->
-> I think it would be nicer to use `Driver` (or `MyBlkDevice`) instead of
-> `T`.
+ - Patch 1 to 6 are preparatory changes for patch 7.
+ - Patch 7 and 8 introduce ZWP
+ - Patch 9 and 10 add zone append emulation to ZWP.
+ - Patch 11 to 18 modify zoned block device drivers to use ZWP and
+   prepare for the removal of ZWL.
+ - Patch 19 to 28 remove zone write locking
 
-I think I like `T` better, because it signals placeholder more
-effectively.
+Overall, these changes do not significantly increase the amount of code
+(the higher number of addition shown by diff-stat is in fact due to a
+larger amount of comments in the code).
 
->
->> +//! - Create a [`TagSet<T>`]
->> +//! - Create a [`GenDisk<T>`], passing in the `TagSet` reference
->> +//! - Add the disk to the system by calling [`GenDisk::add`]
->> +//!
->> +//! The types available in this module that have direct C counterparts =
-are:
->> +//!
->> +//! - The `TagSet` type that abstracts the C type `struct tag_set`.
->> +//! - The `GenDisk` type that abstracts the C type `struct gendisk`.
->> +//! - The `Request` type that abstracts the C type `struct request`.
->> +//!
->> +//! Many of the C types that this module abstracts allow a driver to ca=
-rry
->> +//! private data, either embedded in the stuct directly, or as a C `voi=
-d*`. In
->> +//! these abstractions, this data is typed. The types of the data is de=
-fined by
->> +//! associated types in `Operations`, see [`Operations::RequestData`] f=
-or an
->> +//! example.
->> +//!
->> +//! The kernel will interface with the block evice driver by calling th=
-e method
->
-> Typo: "block evice driver"
+Many thanks must go to Christoph Hellwig for comments and suggestions
+he provided on earlier versions of these patches.
 
-Thanks.
+Performance evaluation results
+==============================
 
->
->> +//! implementations of the `Operations` trait.
->> +//!
->> +//! IO requests are passed to the driver as [`Request`] references. The
->> +//! `Request` type is a wrapper around the C `struct request`. The driv=
-er must
->> +//! mark start of request processing by calling [`Request::start`] and =
-end of
->> +//! processing by calling one of the [`Request::end`], methods. Failure=
- to do so
->> +//! can lead to IO failures.
->
-> I am unfamiliar with this, what are "IO failures"?
-> Do you think that it might be better to change the API to use a
-> callback? So instead of calling start and end, you would do
->
->      request.handle(|req| {
->          // do the stuff that would be done between start and end
->      });
->
-> I took a quick look at the rnull driver and there you are calling
-> `Request::end_ok` from a different function. So my suggestion might not
-> be possible, since you really need the freedom.
->
-> Do you think that a guard approach might work better? ie `start` returns
-> a guard that when dropped will call `end` and you need the guard to
-> operate on the request.
+Environments:
+ - Intel Xeon 16-cores/32-threads, 128GB of RAM
+ - Kernel:
+   - ZWL (baseline): block/for-next (based on 6.9.0-rc2)
+   - ZWP: block/for-next patched kernel to add zone write plugging
+     (both kernels were compiled with the same configuration turning
+     off most heavy debug features)
 
-I don't think that would fit, since the driver might not complete the
-request immediately. We might be able to call `start` on behalf of the
-driver.
+Workoads:
+ - seqw4K1: 4KB sequential write, qd=1
+ - seqw4K16: 4KB sequential write, qd=16
+ - seqw1M16: 1MB sequential write, qd=16
+ - rndw4K16: 4KB random write, qd=16
+ - rndw128K16: 128KB random write, qd=16
+ - btrfs workoad: Single fio job writing 128 MB files using 128 KB
+   direct IOs at qd=16.
 
-At any rate, since the request is reference counted now, we can
-automatically fail a request when the last reference is dropped and it
-was not marked successfully completed. I would need to measure the
-performance implications of such a feature.
+Devices:
+ - nullblk (zoned): 4096 zones of 256 MB, 128 max open zones.
+ - NVMe ZNS drive: 1 TB ZNS drive with 2GB zone size, 14 max open and
+   active zones.
+ - SMR HDD: 20 TB disk with 256MB zone size, 128 max open zones.
 
-The comment needs update too. Failure to complete requests will lead to
-either deadlock or timeout errors, depending on configuration.
+For ZWP, the result show the performance percentage increase (or
+decrease) against ZWL (baseline) case.
 
->
->> +//!
->> +//! The `TagSet` is responsible for creating and maintaining a mapping =
-between
->> +//! `Request`s and integer ids as well as carrying a pointer to the vta=
-ble
->> +//! generated by `Operations`. This mapping is useful for associating
->> +//! completions from hardware with the correct `Request` instance. The =
-`TagSet`
->> +//! determines the maximum queue depth by setting the number of `Reques=
-t`
->> +//! instances available to the driver, and it determines the number of =
-queues to
->> +//! instantiate for the driver. If possible, a driver should allocate o=
-ne queue
->> +//! per core, to keep queue data local to a core.
->> +//!
->> +//! One `TagSet` instance can be shared between multiple `GenDisk` inst=
-ances.
->> +//! This can be useful when implementing drivers where one piece of har=
-dware
->> +//! with one set of IO resources are represented to the user as multipl=
-e disks.
->> +//!
->> +//! One significant difference between block device drivers implemented=
- with
->> +//! these Rust abstractions and drivers implemented in C, is that the R=
-ust
->> +//! drivers have to own a reference count on the `Request` type when th=
-e IO is
->> +//! in flight. This is to ensure that the C `struct request` instances =
-backing
->> +//! the Rust `Request` instances are live while the Rust driver holds a
->> +//! reference to the `Request`. In addition, the conversion of an inege=
-r tag to
->
-> Typo: "of an ineger tag"
+1) null_blk zoned device:
 
-Thanks. Looks like I need to properly configure my editor to spell check
-in comments.
+             +--------+--------+-------+--------+---------+---------+
+             |seqw4K1 |seqw4K16|seqw1M1|seqw1M16|rndw4K16|rndw128K16|
+             |(MB/s)  | (MB/s) |(MB/s) | (MB/s) | (KIOPS)| (KIOPS)  |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWL    | 940    | 840    | 18550 | 14400  | 424    | 167      |
+ |mq-deadline|        |        |       |        |        |          |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWP    | 943    | 845    | 18660 | 14770  | 461    | 165      |
+ |mq-deadline| (+0%)  | (+0%)  | (+0%) | (+1%)  | (+8%)  | (-1%)    |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWP    | 756    | 668    | 16020 | 12980  | 135    | 101      |
+ |    bfq    | (-19%) | (-20%) | (-13%)| (-9%)  | (-68%) | (-39%)   |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWP    | 2639   | 1715   | 28190 | 19760  | 344    | 150      |
+ |   none    | (+180%)| (+104%)| (+51%)| (+37%) | (-18%) | (-10%)   |
+ +-----------+--------+--------+-------+--------+--------+----------+
 
->
->> +//! a `Request` via the `TagSet` would not be sound without this bookke=
-eping.
->> +//!
->> +//! # =E2=9A=A0 Note
->> +//!
->> +//! For Rust block device drivers, the point in time where a request
->> +//! is freed and made available for recycling is usualy at the point in=
- time
->> +//! when the last `ARef<Request>` is dropped. For C drivers, this event=
- usually
->> +//! occurs when `bindings::blk_mq_end_request` is called.
->> +//!
->> +//! # Example
->> +//!
->> +//! ```rust
->> +//! use kernel::{
->> +//!     block::mq::*,
->> +//!     new_mutex,
->> +//!     prelude::*,
->> +//!     sync::{Arc, Mutex},
->> +//!     types::{ARef, ForeignOwnable},
->> +//! };
->> +//!
->> +//! struct MyBlkDevice;
->> +//!
->> +//! #[vtable]
->> +//! impl Operations for MyBlkDevice {
->> +//!     type RequestData =3D ();
->> +//!     type RequestDataInit =3D impl PinInit<()>;
->> +//!     type QueueData =3D ();
->> +//!     type HwData =3D ();
->> +//!     type TagSetData =3D ();
->> +//!
->> +//!     fn new_request_data(
->> +//!         _tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowe=
-d<'_>,
->> +//!     ) -> Self::RequestDataInit {
->> +//!         kernel::init::zeroed()
->> +//!     }
->> +//!
->> +//!     fn queue_rq(_hw_data: (), _queue_data: (), rq: ARef<Request<Sel=
-f>>, _is_last: bool) -> Result {
->> +//!         rq.start();
->> +//!         rq.end_ok();
->> +//!         Ok(())
->> +//!     }
->> +//!
->> +//!     fn commit_rqs(
->> +//!         _hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>,
->> +//!         _queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<=
-'_>,
->> +//!     ) {
->> +//!     }
->> +//!
->> +//!     fn complete(rq: &Request<Self>) {
->> +//!         rq.end_ok();
->> +//!     }
->> +//!
->> +//!     fn init_hctx(
->> +//!         _tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowe=
-d<'_>,
->> +//!         _hctx_idx: u32,
->> +//!     ) -> Result<Self::HwData> {
->> +//!         Ok(())
->> +//!     }
->> +//! }
->> +//!
->> +//! let tagset: Arc<TagSet<MyBlkDevice>> =3D Arc::pin_init(TagSet::try_=
-new(1, (), 256, 1))?;
->> +//! let mut disk =3D GenDisk::try_new(tagset, ())?;
->> +//! disk.set_name(format_args!("myblk"))?;
->> +//! disk.set_capacity_sectors(4096);
->> +//! disk.add()?;
->> +//!
->> +//! # Ok::<(), kernel::error::Error>(())
->> +//! ```
->
-> This piece of documentation is **really** valuable, thanks a lot for
-> taking the time to write it.
+ZWP with mq-deadline gives performance very similar to zone write
+locking, showing that zone write plugging overhead is acceptable.
+But ZWP ability to run fast block devices with the none scheduler
+shows brings all the benefits of zone write plugging and results in
+significant performance increase for all workloads. The exception to
+this are random write workloads with multiple jobs: for these, the
+faster request submission rate achieved by zone write plugging results
+in higher contention on null-blk zone spinlock, which degrades
+performance.
 
-Great!
+2) NVMe ZNS drive:
 
->
->> +
->> +mod gen_disk;
->> +mod operations;
->> +mod raw_writer;
->> +mod request;
->> +mod tag_set;
->> +
->> +pub use gen_disk::GenDisk;
->> +pub use operations::Operations;
->> +pub use request::{Request, RequestDataRef};
->> +pub use tag_set::TagSet;
->> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen=
-_disk.rs
->> new file mode 100644
->> index 000000000000..b7845fc9e39f
->> --- /dev/null
->> +++ b/rust/kernel/block/mq/gen_disk.rs
->> @@ -0,0 +1,174 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +//! Generic disk abstraction.
->> +//!
->> +//! C header: [`include/linux/blkdev.h`](srctree/include/linux/blkdev.h)
->> +//! C header: [`include/linux/blk_mq.h`](srctree/include/linux/blk_mq.h)
->> +
->> +use crate::block::mq::{raw_writer::RawWriter, Operations, TagSet};
->> +use crate::{
->> +    bindings, error::from_err_ptr, error::Result, sync::Arc, types::For=
-eignOwnable,
->> +    types::ScopeGuard,
->> +};
->> +use core::fmt::{self, Write};
->> +
->> +/// A generic block device
->> +///
->> +/// # Invariants
->> +///
->> +///  - `gendisk` must always point to an initialized and valid `struct =
-gendisk`.
->> +pub struct GenDisk<T: Operations> {
->> +    _tagset: Arc<TagSet<T>>,
->> +    gendisk: *mut bindings::gendisk,
->> +}
->> +
->> +// SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `=
-Arc` to a
->> +// `TagSet` It is safe to send this to other threads as long as T is Se=
-nd.
->> +unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
->> +
->> +impl<T: Operations> GenDisk<T> {
->> +    /// Try to create a new `GenDisk`
->> +    pub fn try_new(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) ->=
- Result<Self> {
->> +        let data =3D queue_data.into_foreign();
->> +        let recover_data =3D ScopeGuard::new(|| {
->> +            // SAFETY: T::QueueData was created by the call to `into_fo=
-reign()` above
->> +            unsafe { T::QueueData::from_foreign(data) };
->> +        });
->> +
->> +        let lock_class_key =3D crate::sync::LockClassKey::new();
->> +
->> +        // SAFETY: `tagset.raw_tag_set()` points to a valid and initial=
-ized tag set
->> +        let gendisk =3D from_err_ptr(unsafe {
->> +            bindings::__blk_mq_alloc_disk(
->> +                tagset.raw_tag_set(),
->> +                data.cast_mut(),
->> +                lock_class_key.as_ptr(),
->> +            )
->> +        })?;
->> +
->> +        const TABLE: bindings::block_device_operations =3D bindings::bl=
-ock_device_operations {
->> +            submit_bio: None,
->> +            open: None,
->> +            release: None,
->> +            ioctl: None,
->> +            compat_ioctl: None,
->> +            check_events: None,
->> +            unlock_native_capacity: None,
->> +            getgeo: None,
->> +            set_read_only: None,
->> +            swap_slot_free_notify: None,
->> +            report_zones: None,
->> +            devnode: None,
->> +            alternative_gpt_sector: None,
->> +            get_unique_id: None,
->> +            // TODO: Set to THIS_MODULE. Waiting for const_refs_to_stat=
-ic feature to be merged
->> +            // https://github.com/rust-lang/rust/issues/119618
->> +            owner: core::ptr::null_mut(),
->> +            pr_ops: core::ptr::null_mut(),
->> +            free_disk: None,
->> +            poll_bio: None,
->> +        };
->> +
->> +        // SAFETY: gendisk is a valid pointer as we initialized it above
->> +        unsafe { (*gendisk).fops =3D &TABLE };
->> +
->> +        recover_data.dismiss();
->> +        Ok(Self {
->> +            _tagset: tagset,
->> +            gendisk,
->
-> Missing INVARIANT comment.
+             +--------+--------+-------+--------+--------+----------+
+             |seqw4K1 |seqw4K16|seqw1M1|seqw1M16|rndw4K16|rndw128K16|
+             |(MB/s)  | (MB/s) |(MB/s) | (MB/s) | (KIOPS)|  (KIOPS) |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWL    | 183    | 702    | 1066  | 1103   | 53.5   | 14.5     |
+ |mq-deadline|        |        |       |        |        |          |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWP    | 183    | 719    | 1086  | 1108   | 55.6   | 14.7     |
+ |mq-deadline| (-0%)  | (+1%)  | (+0%) | (+0%)  | (+3%)  | (+1%)    |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWP    | 178    | 691    | 1082  | 1106   | 30.8   | 11.5     |
+ |    bfq    | (-3%)  | (-2%)  | (-0%) | (+0%)  | (-42%) | (-20%)   |
+ +-----------+--------+--------+-------+--------+--------+----------+
+ |    ZWP    | 190    | 666    | 1083  | 1108   | 51.4   | 14.7     |
+ |   none    | (+4%)  | (-5%)  | (+0%) | (+0%)  | (-4%)  | (+0%)    |
+ +-----------+--------+--------+-------+--------+--------+----------+
 
-Will fix.
+Zone write plugging overhead does not significantly impact performance.
+Similar to nullblk, using the none scheduler leads to performance
+increase for most workloads.
 
->
->> +        })
->> +    }
->> +
->> +    /// Set the name of the device
->
-> Missing '.'.
+3) SMR SATA HDD:
 
-Thanks.
+             +-------+--------+-------+--------+--------+----------+
+             |seqw4K1|seqw4K16|seqw1M1|seqw1M16|rndw4K16|rndw128K16|
+             |(MB/s) | (MB/s) |(MB/s) | (MB/s) | (KIOPS)|  (KIOPS) |
+ +-----------+-------+--------+-------+--------+--------+----------+
+ |    ZWL    | 107   | 243    | 245   | 246    | 2.2    | 0.763    |
+ |mq-deadline|       |        |       |        |        |          |
+ +-----------+-------+--------+-------+--------+--------+----------+
+ |    ZWP    | 107   | 242    | 245   | 245    | 2.2    | 0.772    |
+ |mq-deadline| (+0%) | (-0%)  | (+0%) | (-0%)  | (+0%)  | (+0%)    |
+ +-----------+-------+--------+-------+--------+--------+----------+
+ |    ZWP    | 104   | 241    | 246   | 242    | 2.2    | 0.765    |
+ |    bfq    | (-2%) | (-0%)  | (+0%) | (-0%)  | (+0%)  | (+0%)    |
+ +-----------+-------+--------+-------+--------+--------+----------+
+ |    ZWP    | 115   | 235    | 249   | 242    | 2.2    | 0.763    |
+ |   none    | (+7%) | (-3%)  | (+1%) | (-1%)  | (+0%)  | (+0%)    |
+ +-----------+-------+--------+-------+--------+--------+----------+
 
->
->> +    pub fn set_name(&mut self, args: fmt::Arguments<'_>) -> Result {
->> +        let mut raw_writer =3D RawWriter::from_array(
->> +            // SAFETY: By type invariant `self.gendisk` points to a val=
-id and initialized instance
->> +            unsafe { &mut (*self.gendisk).disk_name },
->
-> To create a `&mut` reference, you need exclusive access, it should be
-> sufficient to add to the invariant that `gendisk` is owned/unique.
+Performance with purely sequential write workloads at high queue depth
+somewhat decrease a little when using zone write plugging. This is due
+to the different IO pattern that ZWP generates where the first writes to
+a zone start being issued when the end of the previous zone are still
+being written. Depending on how the disk handles queued commands, seek
+may be generated, slightly impacting the throughput achieved. Such pure
+sequential write workloads are however rare with SMR drives.
 
-Hmm, we don't actually _always_ have unique ownership of this string
-buffer. I will change the API to only allow configuration of the
-instance before it is hooked in. Thanks for spotting this.
+4) Zone append tests using btrfs:
 
->
->> +        );
->> +        raw_writer.write_fmt(args)?;
->> +        raw_writer.write_char('\0')?;
->> +        Ok(())
->> +    }
->
-> [...]
->
->> +impl<T: Operations> Drop for GenDisk<T> {
->> +    fn drop(&mut self) {
->> +        // SAFETY: By type invariant of `Self`, `self.gendisk` points t=
-o a valid
->> +        // and initialized instance of `struct gendisk`. As such, `queu=
-edata`
->> +        // was initialized by the initializer returned by `try_new` wit=
-h a call
->> +        // to `ForeignOwnable::into_foreign`.
->
-> This should also be an invariant of `GenDisk`.
+             +-------------+-------------+-----------+-------------+
+             |  null-blk   |  null_blk   |    ZNS    |     SMR     |
+             |  native ZA  | emulated ZA | native ZA | emulated ZA |
+             |    (MB/s)   |   (MB/s)    |   (MB/s)  |    (MB/s)   |
+ +-----------+-------------+-------------+-----------+-------------+
+ |    ZWL    | 2441        | N/A         | 1081      | 243         |
+ |mq-deadline|             |             |           |             |
+ +-----------+-------------+-------------+-----------+-------------+
+ |    ZWP    | 2361        | 2999        | 1085      | 239         |
+ |mq-deadline| (-1%)       |             | (+0%)     | (-2%)       |
+ +-----------+-------------+-------------+-----------+-------------+
+ |    ZWP    | 2299        | 2730        | 1080      | 240         |
+ |    bfq    | (-4%)       |             | (+0%)     | (-2%)       |
+ +-----------+-------------+-------------+-----------+-------------+
+ |    ZWP    | 2443        | 3152        | 1083      | 240         |
+ |    none   | (+0%)       |             | (+0%)     | (-1%)       |
+ +-----------+-------------+-------------+-----------+-------------+
 
-Ok.
+With a more realistic use of the device though a file system, ZWP does
+not introduce significant performance differences, except for SMR for
+the same reason as with the fio sequential workloads at high queue
+depth.
 
->
->> +        let queue_data =3D unsafe { (*(*self.gendisk).queue).queuedata =
-};
->> +
->> +        // SAFETY: By type invariant, `self.gendisk` points to a valid =
-and
->> +        // initialized instance of `struct gendisk`
->> +        unsafe { bindings::del_gendisk(self.gendisk) };
->> +
->> +        // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()=
-` with a
->> +        // call to `ForeignOwnable::into_pointer()` to create `queuedat=
-a`.
->> +        // `ForeignOwnable::from_foreign()` is only called here.
->> +        let _queue_data =3D unsafe { T::QueueData::from_foreign(queue_d=
-ata) };
->> +    }
->> +}
->> diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/o=
-perations.rs
->> new file mode 100644
->> index 000000000000..53c6ad663208
->> --- /dev/null
->> +++ b/rust/kernel/block/mq/operations.rs
->> @@ -0,0 +1,346 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +//! This module provides an interface for blk-mq drivers to implement.
->> +//!
->> +//! C header: [`include/linux/blk-mq.h`](srctree/include/linux/blk-mq.h)
->> +
->> +use crate::{
->> +    bindings,
->> +    block::mq::Request,
->> +    error::{from_result, Result},
->> +    init::PinInit,
->> +    types::{ARef, ForeignOwnable},
->> +};
->> +use core::{marker::PhantomData, ptr::NonNull};
->> +
->> +use super::TagSet;
->> +
->> +/// Implement this trait to interface blk-mq as block devices
->> +#[macros::vtable]
->> +pub trait Operations: Sized {
->> +    /// Data associated with a request. This data is located next to th=
-e request
->> +    /// structure.
->> +    ///
->> +    /// To be able to handle accessing this data from interrupt context=
-, this
->> +    /// data must be `Sync`.
->> +    type RequestData: Sized + Sync;
->> +
->> +    /// Initializer for `Self::RequestDta`. Used to initialize private =
-data area
->> +    /// when requst structure is allocated.
->> +    type RequestDataInit: PinInit<Self::RequestData>;
->
-> Just to let you know, this dance with the associated types is not needed
-> any longer. RPITIT (return position impl trait in trait) has been
-> stabilized in 1.75 and you should be able to just write this:
->
->      fn new_request_data(
->          //rq: ARef<Request<Self>>,
->          tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
->      ) -> impl PinInit<Self::RequestData>;
->
+Changes from v3:
+ - Rebase on block/for-next
+ - Removed old patch 1 as it is already applied
+ - Addressed Bart and Christoph comment in patch 4
+ - Merged former patch 8 and 9 together and changed the zone write plug
+   allocation to use a mempool
+ - Removed the zone_wplugs_mempool_size filed from patch 8 and instead
+   directly reference mempool->min_nr
+ - Added review tags
 
-Thanks =F0=9F=91=8D
+Changes from v2:
+ - Added Patch 1 (Christoph's comment)
+ - Fixed error code setup in Patch 3 (Bart's comment)
+ - Split former patch 26 into patches 27 and 28
+ - Modified patch 8 (zone write plugging) introduction to remove the
+   kmem_cache use and address Bart's and Christoph comments.
+ - Changed from using a mempool of zone write plugs to using a simple
+   free-list (patch 9)
+ - Simplified patch 10 as suggested by Christoph
+ - Moved common code to a helper in patch 13 as suggested by Christoph
 
->
->> +
->> +    /// Data associated with the `struct request_queue` that is allocat=
-ed for
->> +    /// the `GenDisk` associated with this `Operations` implementation.
->> +    type QueueData: ForeignOwnable;
->> +
->> +    /// Data associated with a dispatch queue. This is stored as a poin=
-ter in
->> +    /// the C `struct blk_mq_hw_ctx` that represents a hardware queue.
->> +    type HwData: ForeignOwnable;
->> +
->> +    /// Data associated with a `TagSet`. This is stored as a pointer in=
- `struct
->> +    /// blk_mq_tag_set`.
->> +    type TagSetData: ForeignOwnable;
->> +
->> +    /// Called by the kernel to get an initializer for a `Pin<&mut Requ=
-estData>`.
->> +    fn new_request_data(
->> +        //rq: ARef<Request<Self>>,
->> +        tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
->
-> Since you need to use this pattern a lot, it might be a good idea to
-> introduce a type alias to help with this:
->
->      type ForeignBorrowed<'a, T> =3D <T as ForeignOwnable>::Borrowed<'a>;
->
-> What do the others think?
->
-> The function would then become (with the RPITIT improvement as well):
->
->      fn new_request_data(
->          //rq: ARef<Request<Self>>,
->          tagset_data: ForeignBorrowed<'_, Self::TagSetData>,
->      ) -> impl PinInit<Self::RequestData>;
+Changes from v1:
+ - Added patch 6
+ - Rewrite of patch 7 to use a hash table of dynamically allocated zone
+   write plugs. This results in changes in patch 11 and the addition of
+   patch 8 and 9.
+ - Rebased everything on 6.9.0-rc1
+ - Added review tags for patches that did not change
 
-A bit more concise, I think it is better. I'll go ahead and kill that
-commented out argument that sneaked into the patch as well :)
+Damien Le Moal (28):
+  block: Restore sector of flush requests
+  block: Remove req_bio_endio()
+  block: Introduce blk_zone_update_request_bio()
+  block: Introduce bio_straddles_zones() and bio_offset_from_zone_start()
+  block: Allow using bio_attempt_back_merge() internally
+  block: Remember zone capacity when revalidating zones
+  block: Introduce zone write plugging
+  block: Fake max open zones limit when there is no limit
+  block: Allow zero value of max_zone_append_sectors queue limit
+  block: Implement zone append emulation
+  block: Allow BIO-based drivers to use blk_revalidate_disk_zones()
+  dm: Use the block layer zone append emulation
+  scsi: sd: Use the block layer zone append emulation
+  ublk_drv: Do not request ELEVATOR_F_ZBD_SEQ_WRITE elevator feature
+  null_blk: Do not request ELEVATOR_F_ZBD_SEQ_WRITE elevator feature
+  null_blk: Introduce zone_append_max_sectors attribute
+  null_blk: Introduce fua attribute
+  nvmet: zns: Do not reference the gendisk conv_zones_bitmap
+  block: Remove BLK_STS_ZONE_RESOURCE
+  block: Simplify blk_revalidate_disk_zones() interface
+  block: mq-deadline: Remove support for zone write locking
+  block: Remove elevator required features
+  block: Do not check zone type in blk_check_zone_append()
+  block: Move zone related debugfs attribute to blk-zoned.c
+  block: Replace zone_wlock debugfs entry with zone_wplugs entry
+  block: Remove zone write locking
+  block: Do not force select mq-deadline with CONFIG_BLK_DEV_ZONED
+  block: Do not special-case plugging of zone write operations
 
->
->
->> +    ) -> Self::RequestDataInit;
->> +
->> +    /// Called by the kernel to queue a request with the driver. If `is=
-_last` is
->> +    /// `false`, the driver is allowed to defer commiting the request.
->> +    fn queue_rq(
->> +        hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>,
->> +        queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<'_>,
->> +        rq: ARef<Request<Self>>,
->> +        is_last: bool,
->> +    ) -> Result;
->> +
->> +    /// Called by the kernel to indicate that queued requests should be=
- submitted
->> +    fn commit_rqs(
->> +        hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>,
->> +        queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<'_>,
->> +    );
->> +
->> +    /// Called by the kernel when the request is completed
->> +    fn complete(_rq: &Request<Self>);
->> +
->> +    /// Called by the kernel to allocate and initialize a driver specif=
-ic hardware context data
->> +    fn init_hctx(
->> +        tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
->> +        hctx_idx: u32,
->> +    ) -> Result<Self::HwData>;
->> +
->> +    /// Called by the kernel to poll the device for completed requests.=
- Only
->> +    /// used for poll queues.
->> +    fn poll(_hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>) -=
-> bool {
->> +        crate::build_error(crate::error::VTABLE_DEFAULT_ERROR)
->> +    }
->> +
->> +    /// Called by the kernel to map submission queues to CPU cores.
->> +    fn map_queues(_tag_set: &TagSet<Self>) {
->> +        crate::build_error(crate::error::VTABLE_DEFAULT_ERROR)
->> +    }
->> +
->> +    // There is no need for exit_request() because `drop` will be calle=
-d.
->
-> I think it would be a good idea to mention this in the documentation of
-> the trait.
+ block/Kconfig                     |    5 -
+ block/Makefile                    |    1 -
+ block/bio.c                       |    7 +
+ block/blk-core.c                  |   11 +-
+ block/blk-flush.c                 |    1 +
+ block/blk-merge.c                 |   22 +-
+ block/blk-mq-debugfs-zoned.c      |   22 -
+ block/blk-mq-debugfs.c            |    3 +-
+ block/blk-mq-debugfs.h            |    6 +-
+ block/blk-mq.c                    |  131 ++-
+ block/blk-mq.h                    |   31 -
+ block/blk-settings.c              |   46 +-
+ block/blk-sysfs.c                 |    2 +-
+ block/blk-zoned.c                 | 1353 +++++++++++++++++++++++++++--
+ block/blk.h                       |   69 +-
+ block/elevator.c                  |   46 +-
+ block/elevator.h                  |    1 -
+ block/genhd.c                     |    3 +-
+ block/mq-deadline.c               |  176 +---
+ drivers/block/null_blk/main.c     |   22 +-
+ drivers/block/null_blk/null_blk.h |    2 +
+ drivers/block/null_blk/zoned.c    |   23 +-
+ drivers/block/ublk_drv.c          |    5 +-
+ drivers/block/virtio_blk.c        |    2 +-
+ drivers/md/dm-core.h              |    2 +-
+ drivers/md/dm-zone.c              |  476 +---------
+ drivers/md/dm.c                   |   75 +-
+ drivers/md/dm.h                   |    4 +-
+ drivers/nvme/host/core.c          |    2 +-
+ drivers/nvme/target/zns.c         |   10 +-
+ drivers/scsi/scsi_lib.c           |    1 -
+ drivers/scsi/sd.c                 |    8 -
+ drivers/scsi/sd.h                 |   19 -
+ drivers/scsi/sd_zbc.c             |  335 +------
+ include/linux/blk-mq.h            |   85 +-
+ include/linux/blk_types.h         |   30 +-
+ include/linux/blkdev.h            |  104 ++-
+ 37 files changed, 1677 insertions(+), 1464 deletions(-)
+ delete mode 100644 block/blk-mq-debugfs-zoned.c
 
-Yes.
-
->
->> +}
->
-> [...]
->
->> diff --git a/rust/kernel/block/mq/raw_writer.rs b/rust/kernel/block/mq/r=
-aw_writer.rs
->> new file mode 100644
->> index 000000000000..f7857740af29
->> --- /dev/null
->> +++ b/rust/kernel/block/mq/raw_writer.rs
->> @@ -0,0 +1,60 @@
->> +use core::{
->> +    fmt::{self, Write},
->> +    marker::PhantomData,
->> +};
->> +
->> +/// A mutable reference to a byte buffer where a string can be written =
-into
->> +///
->> +/// # Invariants
->> +///
->> +/// * `ptr` is not aliased and valid for read and write for `len` bytes
->
-> You probably also want to add "for the duration of `'a`".
-
-=F0=9F=91=8D
-
->
->> +///
->> +pub(crate) struct RawWriter<'a> {
->> +    ptr: *mut u8,
->> +    len: usize,
->> +    _p: PhantomData<&'a ()>,
->> +}
->> +
->> +impl<'a> RawWriter<'a> {
->> +    /// Create a new `RawWriter` instance.
->> +    ///
->> +    /// # Safety
->> +    ///
->> +    /// * `ptr` must be valid for read and write for `len` consecutive =
-`u8` elements
->> +    /// * `ptr` must not be aliased
->> +    unsafe fn new(ptr: *mut u8, len: usize) -> RawWriter<'a> {
->> +        Self {
->> +            ptr,
->> +            len,
->> +            _p: PhantomData,
->> +        }
->> +    }
->
-> Since this function is not used (except in the function below), what is
-> the reason for using a raw pointer?
-> I looked in your other patches, but did not find another user, so could
-> this be improved by using mutable references?
-
-I am not sure. But I think the code could benefit from getting passed a
-mutable slice instead, move the safety comment to the call site. I will
-try that.
-
->
->> +
->> +    pub(crate) fn from_array<const N: usize>(a: &'a mut [core::ffi::c_c=
-har; N]) -> RawWriter<'a> {
->> +        // SAFETY: the buffer of `a` is valid for read and write for at=
- least `N` bytes
->> +        unsafe { Self::new(a.as_mut_ptr().cast::<u8>(), N) }
->> +    }
->> +}
->> +
->> +impl Write for RawWriter<'_> {
->> +    fn write_str(&mut self, s: &str) -> fmt::Result {
->> +        let bytes =3D s.as_bytes();
->> +        let len =3D bytes.len();
->> +        if len > self.len {
->> +            return Err(fmt::Error);
->> +        }
->> +
->> +        // SAFETY:
->> +        // * `bytes` is valid for reads of `bytes.len()` size because w=
-e hold a shared reference to `s`
->> +        // * By type invariant `self.ptr` is valid for writes for at le=
-st `self.len` bytes
->> +        // * The regions are not overlapping as `ptr` is not aliased
->> +        unsafe { core::ptr::copy_nonoverlapping(&bytes[0], self.ptr, le=
-n) };
->> +
->> +        // SAFETY: By type invariant of `Self`, `ptr` is in bounds of an
->> +        // allocation. Also by type invariant, the pointer resulting fr=
-om this
->> +        // addition is also in bounds.
->> +        self.ptr =3D unsafe { self.ptr.add(len) };
->> +        self.len -=3D len;
->> +        Ok(())
->> +    }
->> +}
->> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/requ=
-est.rs
->> new file mode 100644
->> index 000000000000..b4dacac5e091
->> --- /dev/null
->> +++ b/rust/kernel/block/mq/request.rs
->> @@ -0,0 +1,182 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +//! This module provides a wrapper for the C `struct request` type.
->> +//!
->> +//! C header: [`include/linux/blk-mq.h`](srctree/include/linux/blk-mq.h)
->> +
->> +use crate::{
->> +    bindings,
->> +    block::mq::Operations,
->> +    error::{Error, Result},
->> +    types::{ARef, AlwaysRefCounted, Opaque},
->> +};
->> +use core::{ffi::c_void, marker::PhantomData, ops::Deref};
->> +
->> +/// A wrapper around a blk-mq `struct request`. This represents an IO r=
-equest.
->> +///
->> +/// # Invariants
->> +///
->> +/// * `self.0` is a valid `struct request` created by the C portion of =
-the kernel
->> +/// * `self` is reference counted. a call to `req_ref_inc_not_zero` kee=
-ps the
->> +///    instance alive at least until a matching call to `req_ref_put_an=
-d_test`
->> +///
->> +#[repr(transparent)]
->> +pub struct Request<T: Operations>(Opaque<bindings::request>, PhantomDat=
-a<T>);
->> +
->> +impl<T: Operations> Request<T> {
->> +    /// Create a `&mut Request` from a `bindings::request` pointer
->> +    ///
->> +    /// # Safety
->> +    ///
->> +    /// * `ptr` must be aligned and point to a valid `bindings::request=
-` instance
->> +    /// * Caller must ensure that the pointee of `ptr` is live and owned
->> +    ///   exclusively by caller for at least `'a`
->> +    ///
->> +    pub(crate) unsafe fn from_ptr_mut<'a>(ptr: *mut bindings::request) =
--> &'a mut Self {
->> +        // SAFETY:
->> +        // * The cast is valid as `Self` is transparent.
->> +        // * By safety requirements of this function, the reference wil=
-l be
->> +        //   valid for 'a.
->> +        unsafe { &mut *(ptr.cast::<Self>()) }
->> +    }
->> +
->> +    /// Get the command identifier for the request
->> +    pub fn command(&self) -> u32 {
->> +        // SAFETY: By C API contract and type invariant, `cmd_flags` is=
- valid for read
->> +        unsafe { (*self.0.get()).cmd_flags & ((1 << bindings::REQ_OP_BI=
-TS) - 1) }
->> +    }
->> +
->> +    /// Call this to indicate to the kernel that the request has been i=
-ssued by the driver
->
-> I am a bit confused, is this not supposed to signal that the processing
-> of the request is going to start now? cf C documentation:
->
->      /**
->       * blk_mq_start_request - Start processing a request
->       * @rq: Pointer to request to be started
->       *
->       * Function used by device drivers to notify the block layer that a =
-request
->       * is going to be processed now, so blk layer can do proper initiali=
-zations
->       * such as starting the timeout timer.
->       */
-
-Yes, it is to indicate that the request is now considered in-flight by
-the driver. I'll change the wording a bit.
-
->
->> +    pub fn start(&self) {
->> +        // SAFETY: By type invariant, `self.0` is a valid `struct reque=
-st`. By
->> +        // existence of `&mut self` we have exclusive access.
->> +        unsafe { bindings::blk_mq_start_request(self.0.get()) };
->> +    }
->> +
->> +    /// Call this to indicate to the kernel that the request has been c=
-ompleted without errors
->
-> I dislike the "Call this", it feels redundant, what about "Signal the
-> block layer that the request has been completed without errors.".
->
-> Also with the other functions below.
-
-I agree.
-
->
->> +    pub fn end_ok(&self) {
->> +        // SAFETY: By type invariant, `self.0` is a valid `struct reque=
-st`. By
->> +        // existence of `&mut self` we have exclusive access.
->> +        unsafe { bindings::blk_mq_end_request(self.0.get(), bindings::B=
-LK_STS_OK as _) };
->> +    }
->> +
->> +    /// Call this to indicate to the kernel that the request completed =
-with an error
->> +    pub fn end_err(&self, err: Error) {
->> +        // SAFETY: By type invariant, `self.0` is a valid `struct reque=
-st`. By
->> +        // existence of `&mut self` we have exclusive access.
->> +        unsafe { bindings::blk_mq_end_request(self.0.get(), err.to_blk_=
-status()) };
->> +    }
->> +
->> +    /// Call this to indicate that the request completed with the statu=
-s indicated by `status`
->> +    pub fn end(&self, status: Result) {
->> +        if let Err(e) =3D status {
->> +            self.end_err(e);
->> +        } else {
->> +            self.end_ok();
->> +        }
->> +    }
->> +
->> +    /// Call this to schedule defered completion of the request
->> +    pub fn complete(&self) {
->> +        // SAFETY: By type invariant, `self.0` is a valid `struct reque=
-st`
->> +        if !unsafe { bindings::blk_mq_complete_request_remote(self.0.ge=
-t()) } {
->> +            T::complete(self);
->> +        }
->> +    }
->> +
->> +    /// Get the target sector for the request
->> +    #[inline(always)]
->> +    pub fn sector(&self) -> usize {
->> +        // SAFETY: By type invariant of `Self`, `self.0` is valid and l=
-ive.
->> +        unsafe { (*self.0.get()).__sector as usize }
->> +    }
->> +
->> +    /// Returns an owned reference to the per-request data associated w=
-ith this
->> +    /// request
->> +    pub fn owned_data_ref(request: ARef<Self>) -> RequestDataRef<T> {
->> +        RequestDataRef::new(request)
->> +    }
->> +
->> +    /// Returns a reference to the oer-request data associated with thi=
-s request
->
-> Typo: "the oer-request"
-
-Thanks.
-
->
->> +    pub fn data_ref(&self) -> &T::RequestData {
->> +        let request_ptr =3D self.0.get().cast::<bindings::request>();
->> +
->> +        // SAFETY: `request_ptr` is a valid `struct request` because `A=
-Ref` is
->> +        // `repr(transparent)`
->> +        let p: *mut c_void =3D unsafe { bindings::blk_mq_rq_to_pdu(requ=
-est_ptr) };
->> +
->> +        let p =3D p.cast::<T::RequestData>();
->> +
->> +        // SAFETY: By C API contract, `p` is initialized by a call to
->> +        // `OperationsVTable::init_request_callback()`. By existence of=
- `&self`
->> +        // it must be valid for use as a shared reference.
->> +        unsafe { &*p }
->> +    }
->> +}
->> +
->> +// SAFETY: It is impossible to obtain an owned or mutable `Request`, so=
- we can
->
-> What do you mean by "mutable `Request`"? There is the function to obtain
-> a `&mut Request`.
-
-The idea behind this comment is that it is not possible to have an owned
-`Request` instance. You can only ever have something that will deref
-(shared) to `Request`. Construction of the `Request` type is not
-possible in safe driver code. At least that is the intention.
-
-The `from_ptr_mut` is unsafe, and could be downgraded to
-`from_ptr`, since `Operations::complete` takes a shared reference
-anyway. Bottom line is that user code does not handle `&mut Request`.
-
-> Also this should probably be an invariant if you use it as a
-> justification here.
-
-Ok.
-
->
->> +// mark it `Send`.
->> +unsafe impl<T: Operations> Send for Request<T> {}
->> +
->> +// SAFETY: `Request` references can be shared across threads.
->
-> Does not explain why that is the case.
-
-Will add.
-
->
->> +unsafe impl<T: Operations> Sync for Request<T> {}
->> +
->> +/// An owned reference to a `Request<T>`
->> +#[repr(transparent)]
->> +pub struct RequestDataRef<T: Operations> {
->> +    request: ARef<Request<T>>,
->> +}
->
-> Is this extra type really needed? I have not yet taken a look at patch 3,
-> which uses this. But would it hurt if you implemented the traits
-> there directly on `ARef<Request<T>>`?
-
-Yes, thanks :) Way better with just `ARef<Request<T>>`.
-
->
->> +
->> +impl<T> RequestDataRef<T>
->> +where
->> +    T: Operations,
->> +{
->> +    /// Create a new instance.
->> +    fn new(request: ARef<Request<T>>) -> Self {
->> +        Self { request }
->> +    }
->> +
->> +    /// Get a reference to the underlying request
->> +    pub fn request(&self) -> &Request<T> {
->> +        &self.request
->> +    }
->> +}
->
-> I really like how you improved the safety comments and documentation. It
-> was a lot easier to wrap my head around this time (might also me getting
-> more experienced, but I think it helped a lot).
-
-That's great!
-
-Best regards,
-Andreas
+-- 
+2.44.0
 
