@@ -1,56 +1,56 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B11E2A8E5
-	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 12:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598547E788
+	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 12:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712062385; cv=none; b=Au7CMPWSi7CR9VEN+qF4x8/r+YFsR7gCaFFBRTvTvOp1QIHylTJbgZdsAgUxRdn6wdi030wMbAvBw/oQeHDKG4XXJEdHjmUsgTRttvCFnJ+XLbVNINj2JSEvronyCttH/ZJ8NreMGRx9xupmpHccJBc+gFQIMVEFmo0RMV3atEA=
+	t=1712062393; cv=none; b=G12Ou9Y/N4JIt1L5kDMS48Am9TYMgxAR4OHEeJvQvc5aLNWILFJ0TtCAgih4GmIixcuE0ir+3cQfe6kgpOZcvpROaIz0jZeMO30lrz8ciSu8VHtH0ejxTZO61p/YYEcjZ8wky9DG0LjRC1383XRsFeDNwEEZNZu+gvowSQBErXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712062385; c=relaxed/simple;
-	bh=q2kPt6yjl30JqIa0seZEYYNUi+H5nFnRONvscP4kMok=;
+	s=arc-20240116; t=1712062393; c=relaxed/simple;
+	bh=LPp1LoXc/iUZYcuArnYpygWNYI02olIHB5JtN31wm9k=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PQHUcO1qZ6tjnTb2WPTCbBgXNXMJmdDXgBSNUzFunp+PUxISwp3/oMhEZgqOzZAov5FR16VCLdQ5LgSRpVzec4efhn7L3W19FYJRmFTxnq1z2yl6bQqSp22JYYy5wZIOr203ueWHtHa/PQHzvmBkAycUaZ1TC3UsKZq/dmK1ehU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=xsN/iSMT; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version:Content-Type; b=nBthZ4fqPEH9aiOMS3SdBu+gd/55MX3X1W4qYSmP04KT/MwcF+sYijVfbX/HwFE00XkyP5qjcaptCMPvBz7YbYspXB5OfAViSfx07VOEqoLHVUosc1iLmwfQa1kcc98HugXFyCpS7WgNQx7hGM+AAELUJQyXPrk0LRSJoW79Oic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=o4c2yRDJ; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="xsN/iSMT"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4156e5c1c7eso6426845e9.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2024 05:53:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="o4c2yRDJ"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-415446af364so25578305e9.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2024 05:53:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712062381; x=1712667181; darn=vger.kernel.org;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712062389; x=1712667189; darn=vger.kernel.org;
         h=mime-version:message-id:date:user-agent:references:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqmgY3xDOiui/wAdPFJWohuj9sT1khau6i6swSwlQYg=;
-        b=xsN/iSMTp1Fw4B3kEnTv+4/c5Mg8t2aHZZ2rBQZ716ZHggBOC4rwk7vqVbbCFuuCGV
-         VSqBfdMjHvowHhLNcM1OHSqyUDNQ98jycbzU/jb1kQm4TVuxF9ba40KIRv8L02DVJDqe
-         e3x40fSJbz4jnN+gr3vMN1BiM1dPq4g1oO6WlGDjH8B6Hmg8krrdsCrWsotgDhcXyu/W
-         gOQTKJNuQ1BIPU0jVhszdRCMAmOPtSATybE3ETVGZ41a+4OKtleKYPNbAUpOhIt2PHN+
-         wYoRjvMaybQnUotFdue/k9OJ+PseknpnrjhCfgRRP9TFblRF+NBRvaIUVgHFbHvIRwkw
-         eKow==
+        bh=hvhw9LsqhxNzOOOcCfIt2sSk317Q3WM4yG9zmNorI5c=;
+        b=o4c2yRDJgM3FdYuyKdOtPkrfHXHH1na/mQ97sp3uQABI3rP/3C4O/Rj15z0p87Weh/
+         LWUS8CEbpCpQbI/BFouhOaeWciwdti4frjfPtQvfXRlgmhN60XeiyjOakE8vBLqglaLs
+         TcObTXber3pmshpfrz46coJ4htxtYTihGX27qcSDP5kFw/dMm6kYWJ6XP1tsX5ILF1U0
+         QmKAVskJuYGrA+BQYvzDRg9qCD/ZyqbsCjFXcREXrhz1d0lBQ6SKKQx8QtlVbcxfRhW5
+         8O1bYnBxj+9hLWNyyDDtnTTf+ZbBOIaZJJBTQqqEFZWDMns5tYEsxiaHVPDSqP01i3I5
+         xxIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712062381; x=1712667181;
+        d=1e100.net; s=20230601; t=1712062389; x=1712667189;
         h=mime-version:message-id:date:user-agent:references:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cqmgY3xDOiui/wAdPFJWohuj9sT1khau6i6swSwlQYg=;
-        b=lKdpqhLDezkBmHN/xebkwZiR+OK/l8XwOPmMfpL961b+QzlnQ75Njke6x4Qa8YD1TH
-         Um05B1xS8vTw4LnSQWaLS+ykOooo0hskLJzXIPk3pnYel8wct50fXXUScnbXaQtr2lys
-         DUjov8KbCXHKxAi6qHzMqM2KnUPUA7EZvcMjivOGRkPMhNHFafnyN+f86lzenPbafG9E
-         UOZzDwIrDdvr0CrOWtJ5XlNj2lVjpvzOZRmF24NBT9we8PbVOqQuf7ivksyGnKkFiyoK
-         LFaQp9qOsNASxSV7pv7ua8vEoPSDDfZtaXvXP+0p8OVza3IUyTk49rRcL7rjGBH9qWz1
-         G9Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCWwi9tsggZyY5OOj980OhiVxWags66QPOUiifYp12QsJvWA0EImJbDir2VURZ0PjC69+9ZkMPfYyqduLBxgpxloJv+075R3ZmmtsB0=
-X-Gm-Message-State: AOJu0YwbTJn4VwaYZrRbFvE2+XoQPq/J9h1FtYN/Wk2F/Az4Ze+i+Et6
-	0ae0lae6lRgxGA3d262n70+g90gmpT78upPtDRmsv5pCP7tF/vbNOcUYJGZFIkE=
-X-Google-Smtp-Source: AGHT+IHxclVsDENAUON4rVhcSkQFjbXUsDazPWYbGOXYd0gI08wkjR8X6U1Z5rM/JUvg32AMwQso8g==
-X-Received: by 2002:a05:600c:5188:b0:415:6e79:91dc with SMTP id fa8-20020a05600c518800b004156e7991dcmr2655357wmb.15.1712062380823;
-        Tue, 02 Apr 2024 05:53:00 -0700 (PDT)
+        bh=hvhw9LsqhxNzOOOcCfIt2sSk317Q3WM4yG9zmNorI5c=;
+        b=ecn1tIbs6mjHku/Gakis/3Rog1S0x/H4xjE4IIzLlyNN4ob/HDlnZlYh2xzEhKYB90
+         zMHiuRpfOOt+FnAsWi5Sfx5IjgVjEB0WLg/VHYCTK1tGN+9CtzE4/wRlNFqUUCHb7Ypo
+         mUZEIkKdp5iD49yCROXVm1LleWuy0o21OW/JQLMJHwJ2zsmaRED7Yuxx6/qwjQUWsUxq
+         Di4ZDepDQMGPkXccYOdFNG7KOJPYTUuBK0ffTHule/G/CrJu78tcjx7T8vD5QFCpQfAD
+         GukiQpht8JYdIPxbZB5TqdLDzWRF1WwVt67eUbY1Cbb05882nVWQ0agpYWjaA+7VR0tk
+         fIPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWcvHUvjHOkIMhG8VXgdjUXU3+fq+j4RMtWB/voKvXUKb1dtqnYEsKU8NRlMpRQd1YN82P9z3QoQ1AkJe1CbtOQ8tlXgxYkqyLGZaM=
+X-Gm-Message-State: AOJu0Yxx7ZWth6LTGmNk7r25N6SbP5Wo6aNZNV2cZQxwdmohND/a3L9h
+	n2FFZeum69Jk03oDzdzN1W2jJKmuIA8HZQ0XvO7v+gkNoshOanrsI8SEMMxNl14=
+X-Google-Smtp-Source: AGHT+IEFz3AepeyAQxN36Z0IfK+JwdPVjtp4Sb8ReYgZAqLDYPFoVzfevNH+l3YXMt9M9NS/Rc5Www==
+X-Received: by 2002:a05:600c:310f:b0:415:6bd7:96a0 with SMTP id g15-20020a05600c310f00b004156bd796a0mr3331124wmo.20.1712062388718;
+        Tue, 02 Apr 2024 05:53:08 -0700 (PDT)
 Received: from localhost ([147.161.155.112])
-        by smtp.gmail.com with ESMTPSA id l13-20020a05600c4f0d00b004161af729f4sm2029727wmq.31.2024.04.02.05.53.00
+        by smtp.gmail.com with ESMTPSA id l20-20020a05600c1d1400b004146a304863sm21200277wms.34.2024.04.02.05.53.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 05:53:00 -0700 (PDT)
+        Tue, 02 Apr 2024 05:53:08 -0700 (PDT)
 From: Andreas Hindborg <nmi@metaspace.dk>
 To: Benno Lossin <benno.lossin@proton.me>
 Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
@@ -74,16 +74,16 @@ Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
  <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
  <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
  <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 4/5] rust: block: add rnull, Rust null_blk
- implementation
-In-Reply-To: <QqpNcEOxhslSB7-34znxmQK_prPJfe2GT0ejWLesj-Dlse1ueCacbzsJOM0LK3YmgQsUWAR58ZFPPh1MUCliionIXrvLNsOqTS_Ee3bXEuQ=@proton.me>
-	(Benno Lossin's message of "Sat, 23 Mar 2024 11:33:26 +0000")
+Subject: Re: [RFC PATCH 3/5] rust: block: allow `hrtimer::Timer` in
+ `RequestData`
+In-Reply-To: <sHRsbsEAgQZOgBjItL1A-a1BOEGTeH4CWqZsrdny4vCI06o56pmKluCTbY_EwRDO1hCjEp9Cuq9_8S8Co2I9c8wquHWZH_KGjOpmbF1YiJc=@proton.me>
+	(Benno Lossin's message of "Sat, 23 Mar 2024 10:51:57 +0000")
 References: <20240313110515.70088-1-nmi@metaspace.dk>
-	<20240313110515.70088-5-nmi@metaspace.dk>
-	<QqpNcEOxhslSB7-34znxmQK_prPJfe2GT0ejWLesj-Dlse1ueCacbzsJOM0LK3YmgQsUWAR58ZFPPh1MUCliionIXrvLNsOqTS_Ee3bXEuQ=@proton.me>
+	<20240313110515.70088-4-nmi@metaspace.dk>
+	<sHRsbsEAgQZOgBjItL1A-a1BOEGTeH4CWqZsrdny4vCI06o56pmKluCTbY_EwRDO1hCjEp9Cuq9_8S8Co2I9c8wquHWZH_KGjOpmbF1YiJc=@proton.me>
 User-Agent: mu4e 1.12.0; emacs 29.2
-Date: Tue, 02 Apr 2024 14:52:49 +0200
-Message-ID: <87msqc3p0e.fsf@metaspace.dk>
+Date: Tue, 02 Apr 2024 14:43:51 +0200
+Message-ID: <87sf043pfc.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -94,139 +94,83 @@ Content-Type: text/plain
 
 Benno Lossin <benno.lossin@proton.me> writes:
 
-> On 3/13/24 12:05, Andreas Hindborg wrote:
->> +module! {
->> +    type: NullBlkModule,
->> +    name: "rnull_mod",
->> +    author: "Andreas Hindborg",
->> +    license: "GPL v2",
->> +    params: {
->> +        param_memory_backed: bool {
->> +            default: true,
->> +            permissions: 0,
->> +            description: "Use memory backing",
->> +        },
->> +        // Problems with pin_init when `irq_mode`
+> On 3/13/24 12:05, Andreas Hindborg wrote:> From: Andreas Hindborg <a.hindborg@samsung.com>
+>> 
+>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>> ---
+>>   rust/kernel/block/mq/request.rs | 67 ++++++++++++++++++++++++++++++++-
+>>   1 file changed, 66 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+>> index cccffde45981..8b7f08f894be 100644
+>> --- a/rust/kernel/block/mq/request.rs
+>> +++ b/rust/kernel/block/mq/request.rs
+>> @@ -4,13 +4,16 @@
+>>   //!
+>>   //! C header: [`include/linux/blk-mq.h`](srctree/include/linux/blk-mq.h)
+>> 
+>> +use kernel::hrtimer::RawTimer;
+>> +
+>>   use crate::{
+>>       bindings,
+>>       block::mq::Operations,
+>>       error::{Error, Result},
+>> +    hrtimer::{HasTimer, TimerCallback},
+>>       types::{ARef, AlwaysRefCounted, Opaque},
+>>   };
+>> -use core::{ffi::c_void, marker::PhantomData, ops::Deref};
+>> +use core::{ffi::c_void, marker::PhantomData, ops::Deref, ptr::NonNull};
+>> 
+>>   use crate::block::bio::Bio;
+>>   use crate::block::bio::BioIterator;
+>> @@ -175,6 +178,68 @@ fn deref(&self) -> &Self::Target {
+>>       }
+>>   }
+>> 
+>> +impl<T> RawTimer for RequestDataRef<T>
+>> +where
+>> +    T: Operations,
+>> +    T::RequestData: HasTimer<T::RequestData>,
+>> +    T::RequestData: Sync,
+>> +{
+>> +    fn schedule(self, expires: u64) {
+>> +        let self_ptr = self.deref() as *const T::RequestData;
+>> +        core::mem::forget(self);
+>> +
+>> +        // SAFETY: `self_ptr` is a valid pointer to a `T::RequestData`
+>> +        let timer_ptr = unsafe { T::RequestData::raw_get_timer(self_ptr) };
+>> +
+>> +        // `Timer` is `repr(transparent)`
+>> +        let c_timer_ptr = timer_ptr.cast::<bindings::hrtimer>();
+>> +
+>> +        // Schedule the timer - if it is already scheduled it is removed and
+>> +        // inserted
+>> +
+>> +        // SAFETY: c_timer_ptr points to a valid hrtimer instance that was
+>> +        // initialized by `hrtimer_init`
+>> +        unsafe {
+>> +            bindings::hrtimer_start_range_ns(
+>> +                c_timer_ptr as *mut _,
+>> +                expires as i64,
+>> +                0,
+>> +                bindings::hrtimer_mode_HRTIMER_MODE_REL,
+>> +            );
+>> +        }
+>> +    }
+>> +}
+>> +
+>> +impl<T> kernel::hrtimer::RawTimerCallback for RequestDataRef<T>
+>> +where
+>> +    T: Operations,
+>> +    T: Sync,
 >
-> Can you elaborate?
+> Why is this needed? Shouldn't this be `T::RequestData: Sync`?
+>
+> Is the `run` function below executed on a different thread compared to
+> the `schedule` function above?
+> If yes, then `T::RequestData` probably also needs to be `Send`.
+> You also would need to adjust the bounds in the impl above.
 
-I think we discussed this before, but I do not recall what you decided
-was the issue.
+It's a typo, thanks for spotting. It should be `T::RequestData: Sync`.
 
-It is probably easier if you can apply the patches and try to build with
-this on top:
-
-diff --git a/drivers/block/rnull.rs b/drivers/block/rnull.rs
-index 04bdb6668558..bd089c5e6e89 100644
---- a/drivers/block/rnull.rs
-+++ b/drivers/block/rnull.rs
-@@ -48,7 +48,7 @@
-             description: "Use memory backing",
-         },
-         // Problems with pin_init when `irq_mode`
--        param_irq_mode: u8 {
-+        irq_mode: u8 {
-             default: 0,
-             permissions: 0,
-             description: "IRQ Mode (0: None, 1: Soft, 2: Timer)",
-@@ -101,7 +101,7 @@ fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Result<GenDisk<NullBlkDevice>
-         return Err(kernel::error::code::EINVAL);
-     }
- 
--    let irq_mode = (*param_irq_mode.read()).try_into()?;
-+    let irq_mode = (*irq_mode.read()).try_into()?;
- 
-     let queue_data = Box::pin_init(pin_init!(
-         QueueData {
-
----
-
-There is some kind of name clash issue when using `pin_init!` in the expression on
-line 106:
-
-    let queue_data = Box::pin_init(pin_init!(
-        QueueData {
-            tree <- TreeContainer::new(),
-            completion_time_nsec: *param_completion_time_nsec.read(),
-            irq_mode,
-            memory_backed: *param_memory_backed.read(),
-            block_size,
-        }
-    ))?;
-
-I cannot immediately decipher the error message:
-
-  RUSTC [M] drivers/block/rnull.o
-error[E0277]: the trait bound `__rnull_mod_irq_mode: From<u8>` is not satisfied
-   --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:104:39
-    |
-104 |     let irq_mode = (*irq_mode.read()).try_into()?;
-    |                                       ^^^^^^^^ the trait `From<u8>` is not implemented for `__rnull_mod_irq_mode`
-    |
-    = note: required for `u8` to implement `Into<__rnull_mod_irq_mode>`
-    = note: required for `__rnull_mod_irq_mode` to implement `TryFrom<u8>`
-    = note: required for `u8` to implement `TryInto<__rnull_mod_irq_mode>`
-
-error[E0308]: mismatched types
-    --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
-     |
-106  |       let queue_data = Box::pin_init(pin_init!(
-     |  ____________________________________^
-107  | |         QueueData {
-108  | |             tree <- TreeContainer::new(),
-109  | |             completion_time_nsec: *param_completion_time_nsec.read(),
-...    |
-113  | |         }
-114  | |     ))?;
-     | |     ^
-     | |     |
-     | |_____expected `IRQMode`, found `__rnull_mod_irq_mode`
-     |       arguments to this function are incorrect
-     |
-note: function defined here
-    --> /home/aeh/.rustup/toolchains/1.74.1-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ptr/mod.rs:1365:21
-     |
-1365 | pub const unsafe fn write<T>(dst: *mut T, src: T) {
-     |                     ^^^^^
-     = note: this error originates in the macro `$crate::__init_internal` which comes from the expansion of the macro `pin_init` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error[E0308]: mismatched types
-   --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
-    |
-39  | / module! {
-40  | |     type: NullBlkModule,
-41  | |     name: "rnull_mod",
-42  | |     author: "Andreas Hindborg",
-...   |
-71  | |     },
-72  | | }
-    | |_- constant defined here
-...
-106 |       let queue_data = Box::pin_init(pin_init!(
-    |  ____________________________________^
-    | |____________________________________|
-    | |____________________________________|
-    | |____________________________________|
-    | |
-107 | |         QueueData {
-108 | |             tree <- TreeContainer::new(),
-109 | |             completion_time_nsec: *param_completion_time_nsec.read(),
-...   |
-113 | |         }
-114 | |     ))?;
-    | |     ^
-    | |_____|
-    | |_____expected `DropGuard<IRQMode>`, found `__rnull_mod_irq_mode`
-    | |_____this expression has type `DropGuard<IRQMode>`
-    | |_____`irq_mode` is interpreted as a constant, not a new binding
-    |       help: introduce a new binding instead: `other_irq_mode`
-    |
-    = note: expected struct `DropGuard<IRQMode>`
-               found struct `__rnull_mod_irq_mode`
-    = note: this error originates in the macro `$crate::__init_internal` which comes from the expansion of the macro `pin_init` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error: aborting due to 3 previous errors
-
-Some errors have detailed explanations: E0277, E0308.
-For more information about an error, try `rustc --explain E0277`.
-make[5]: *** [/home/aeh/src/linux-rust/linux/scripts/Makefile.build:293: drivers/block/rnull.o] Error 1
+BR Andreas
