@@ -1,199 +1,232 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AB67A151;
-	Tue,  2 Apr 2024 12:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B11E2A8E5
+	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 12:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712061589; cv=none; b=lAfLz8puLFwpVS3NwZXh9e6gcWDNx6mPPdQ737yoLli2sLYXzfN0csCwo7m18FIOEdNOawHrIaEHE6vKxeLgWthrp7JKkHkjhFHPtlVMN8sOH0CqkGFhYnrZ+55oNq0ntiWcSlW909SnQ8YaYmhmTMt80VR/PD6oixfYXATU5DM=
+	t=1712062385; cv=none; b=Au7CMPWSi7CR9VEN+qF4x8/r+YFsR7gCaFFBRTvTvOp1QIHylTJbgZdsAgUxRdn6wdi030wMbAvBw/oQeHDKG4XXJEdHjmUsgTRttvCFnJ+XLbVNINj2JSEvronyCttH/ZJ8NreMGRx9xupmpHccJBc+gFQIMVEFmo0RMV3atEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712061589; c=relaxed/simple;
-	bh=I/kfomac+HfU+6TqAibNGPZkKFgGudZZ6kHMd4uDmxg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bg9B1V5P2RUlDozLXkb/ARB2vYddcI30uXmTvAOHp0sIjtIdY3pbryFVLl8slYd6W8XfU1ansjLcAunYTYbALBWkkRFtQ4Okc0Bl+B1VRATIRqpcj7aC2V22NzhimvQ87vD3zyhWWcXi1A10diyboG0i2frf2IhKx3sm056ocD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fxPJmJPR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712062385; c=relaxed/simple;
+	bh=q2kPt6yjl30JqIa0seZEYYNUi+H5nFnRONvscP4kMok=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PQHUcO1qZ6tjnTb2WPTCbBgXNXMJmdDXgBSNUzFunp+PUxISwp3/oMhEZgqOzZAov5FR16VCLdQ5LgSRpVzec4efhn7L3W19FYJRmFTxnq1z2yl6bQqSp22JYYy5wZIOr203ueWHtHa/PQHzvmBkAycUaZ1TC3UsKZq/dmK1ehU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=xsN/iSMT; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxPJmJPR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44874C43394;
-	Tue,  2 Apr 2024 12:39:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712061589;
-	bh=I/kfomac+HfU+6TqAibNGPZkKFgGudZZ6kHMd4uDmxg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=fxPJmJPRiMFDx+utnhtGpuLsQNe7ccZebfJyPhrXidah2dgDegKho5mkNm5kiae49
-	 FJ12+DN6Dlaq6PSrktL1pJBaKXdcVp4UC601DhPIX1UweTRbJ2jSm7XkUH/cE20GzB
-	 qMOPKhgXF08LQx1geWdVI9dyHvqjUj4AdeQQdCIJjNyatZkouY/awruaBPDqLPpCkR
-	 yNBwKwHIIguTub+HJKgpAYDujGzSdsRt5sZzCGPNHHnz/Tg7t1Rbet10/qqqGXvkgI
-	 vIRIEIFI/rT89kYybyvGfduFTzWvDf8U5EOc5AV1PSFvT/nG8J2/a/5Ar8PcBu+qHF
-	 +NmR8fvMf+GDw==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@lists.linux.dev,
-	Mike Snitzer <snitzer@redhat.com>,
-	linux-nvme@lists.infradead.org,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v4 28/28] block: Do not special-case plugging of zone write operations
-Date: Tue,  2 Apr 2024 21:39:07 +0900
-Message-ID: <20240402123907.512027-29-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240402123907.512027-1-dlemoal@kernel.org>
-References: <20240402123907.512027-1-dlemoal@kernel.org>
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="xsN/iSMT"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4156e5c1c7eso6426845e9.1
+        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2024 05:53:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712062381; x=1712667181; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cqmgY3xDOiui/wAdPFJWohuj9sT1khau6i6swSwlQYg=;
+        b=xsN/iSMTp1Fw4B3kEnTv+4/c5Mg8t2aHZZ2rBQZ716ZHggBOC4rwk7vqVbbCFuuCGV
+         VSqBfdMjHvowHhLNcM1OHSqyUDNQ98jycbzU/jb1kQm4TVuxF9ba40KIRv8L02DVJDqe
+         e3x40fSJbz4jnN+gr3vMN1BiM1dPq4g1oO6WlGDjH8B6Hmg8krrdsCrWsotgDhcXyu/W
+         gOQTKJNuQ1BIPU0jVhszdRCMAmOPtSATybE3ETVGZ41a+4OKtleKYPNbAUpOhIt2PHN+
+         wYoRjvMaybQnUotFdue/k9OJ+PseknpnrjhCfgRRP9TFblRF+NBRvaIUVgHFbHvIRwkw
+         eKow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712062381; x=1712667181;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cqmgY3xDOiui/wAdPFJWohuj9sT1khau6i6swSwlQYg=;
+        b=lKdpqhLDezkBmHN/xebkwZiR+OK/l8XwOPmMfpL961b+QzlnQ75Njke6x4Qa8YD1TH
+         Um05B1xS8vTw4LnSQWaLS+ykOooo0hskLJzXIPk3pnYel8wct50fXXUScnbXaQtr2lys
+         DUjov8KbCXHKxAi6qHzMqM2KnUPUA7EZvcMjivOGRkPMhNHFafnyN+f86lzenPbafG9E
+         UOZzDwIrDdvr0CrOWtJ5XlNj2lVjpvzOZRmF24NBT9we8PbVOqQuf7ivksyGnKkFiyoK
+         LFaQp9qOsNASxSV7pv7ua8vEoPSDDfZtaXvXP+0p8OVza3IUyTk49rRcL7rjGBH9qWz1
+         G9Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWwi9tsggZyY5OOj980OhiVxWags66QPOUiifYp12QsJvWA0EImJbDir2VURZ0PjC69+9ZkMPfYyqduLBxgpxloJv+075R3ZmmtsB0=
+X-Gm-Message-State: AOJu0YwbTJn4VwaYZrRbFvE2+XoQPq/J9h1FtYN/Wk2F/Az4Ze+i+Et6
+	0ae0lae6lRgxGA3d262n70+g90gmpT78upPtDRmsv5pCP7tF/vbNOcUYJGZFIkE=
+X-Google-Smtp-Source: AGHT+IHxclVsDENAUON4rVhcSkQFjbXUsDazPWYbGOXYd0gI08wkjR8X6U1Z5rM/JUvg32AMwQso8g==
+X-Received: by 2002:a05:600c:5188:b0:415:6e79:91dc with SMTP id fa8-20020a05600c518800b004156e7991dcmr2655357wmb.15.1712062380823;
+        Tue, 02 Apr 2024 05:53:00 -0700 (PDT)
+Received: from localhost ([147.161.155.112])
+        by smtp.gmail.com with ESMTPSA id l13-20020a05600c4f0d00b004161af729f4sm2029727wmq.31.2024.04.02.05.53.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 05:53:00 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
+ Busch <kbusch@kernel.org>,  Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart
+ Van Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
+  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
+ Hindborg <a.hindborg@samsung.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,
+  Greg KH <gregkh@linuxfoundation.org>,  Matthew Wilcox
+ <willy@infradead.org>,  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor
+ <alex.gaynor@gmail.com>,  Wedson Almeida Filho <wedsonaf@gmail.com>,
+  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
+  =?utf-8?Q?Bj=C3=B6rn?=
+ Roy Baron <bjorn3_gh@protonmail.com>,  Alice Ryhl <aliceryhl@google.com>,
+  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
+ <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
+ =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
+ Granados
+ <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
+ <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
+ list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
+ <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
+ <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
+ <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 4/5] rust: block: add rnull, Rust null_blk
+ implementation
+In-Reply-To: <QqpNcEOxhslSB7-34znxmQK_prPJfe2GT0ejWLesj-Dlse1ueCacbzsJOM0LK3YmgQsUWAR58ZFPPh1MUCliionIXrvLNsOqTS_Ee3bXEuQ=@proton.me>
+	(Benno Lossin's message of "Sat, 23 Mar 2024 11:33:26 +0000")
+References: <20240313110515.70088-1-nmi@metaspace.dk>
+	<20240313110515.70088-5-nmi@metaspace.dk>
+	<QqpNcEOxhslSB7-34znxmQK_prPJfe2GT0ejWLesj-Dlse1ueCacbzsJOM0LK3YmgQsUWAR58ZFPPh1MUCliionIXrvLNsOqTS_Ee3bXEuQ=@proton.me>
+User-Agent: mu4e 1.12.0; emacs 29.2
+Date: Tue, 02 Apr 2024 14:52:49 +0200
+Message-ID: <87msqc3p0e.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-With the block layer zone write plugging being automatically done for
-any write operation to a zone of a zoned block device, a regular request
-plugging handled through current->plug can only ever see at most a
-single write request per zone. In such case, any potential reordering
-of the plugged requests will be harmless. We can thus remove the special
-casing for write operations to zones and have these requests plugged as
-well. This allows removing the function blk_mq_plug and instead directly
-using current->plug where needed.
+Benno Lossin <benno.lossin@proton.me> writes:
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> On 3/13/24 12:05, Andreas Hindborg wrote:
+>> +module! {
+>> +    type: NullBlkModule,
+>> +    name: "rnull_mod",
+>> +    author: "Andreas Hindborg",
+>> +    license: "GPL v2",
+>> +    params: {
+>> +        param_memory_backed: bool {
+>> +            default: true,
+>> +            permissions: 0,
+>> +            description: "Use memory backing",
+>> +        },
+>> +        // Problems with pin_init when `irq_mode`
+>
+> Can you elaborate?
+
+I think we discussed this before, but I do not recall what you decided
+was the issue.
+
+It is probably easier if you can apply the patches and try to build with
+this on top:
+
+diff --git a/drivers/block/rnull.rs b/drivers/block/rnull.rs
+index 04bdb6668558..bd089c5e6e89 100644
+--- a/drivers/block/rnull.rs
++++ b/drivers/block/rnull.rs
+@@ -48,7 +48,7 @@
+             description: "Use memory backing",
+         },
+         // Problems with pin_init when `irq_mode`
+-        param_irq_mode: u8 {
++        irq_mode: u8 {
+             default: 0,
+             permissions: 0,
+             description: "IRQ Mode (0: None, 1: Soft, 2: Timer)",
+@@ -101,7 +101,7 @@ fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Result<GenDisk<NullBlkDevice>
+         return Err(kernel::error::code::EINVAL);
+     }
+ 
+-    let irq_mode = (*param_irq_mode.read()).try_into()?;
++    let irq_mode = (*irq_mode.read()).try_into()?;
+ 
+     let queue_data = Box::pin_init(pin_init!(
+         QueueData {
+
 ---
- block/blk-core.c       |  6 ------
- block/blk-merge.c      |  3 +--
- block/blk-mq.c         |  7 +------
- block/blk-mq.h         | 31 -------------------------------
- include/linux/blkdev.h | 12 ------------
- 5 files changed, 2 insertions(+), 57 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e1a5344c2257..47400a4fe851 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -907,12 +907,6 @@ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
- 	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
- 		return 0;
- 
--	/*
--	 * As the requests that require a zone lock are not plugged in the
--	 * first place, directly accessing the plug instead of using
--	 * blk_mq_plug() should not have any consequences during flushing for
--	 * zoned devices.
--	 */
- 	blk_flush_plug(current->plug, false);
- 
- 	/*
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 7a9f8187ea62..3228868283a4 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -1112,10 +1112,9 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
- bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
- 		unsigned int nr_segs)
- {
--	struct blk_plug *plug;
-+	struct blk_plug *plug = current->plug;
- 	struct request *rq;
- 
--	plug = blk_mq_plug(bio);
- 	if (!plug || rq_list_empty(plug->mq_list))
- 		return false;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 66dc289f5bee..9eda4d8413f4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1333,11 +1333,6 @@ void blk_execute_rq_nowait(struct request *rq, bool at_head)
- 
- 	blk_account_io_start(rq);
- 
--	/*
--	 * As plugging can be enabled for passthrough requests on a zoned
--	 * device, directly accessing the plug instead of using blk_mq_plug()
--	 * should not have any consequences.
--	 */
- 	if (current->plug && !at_head) {
- 		blk_add_rq_to_plug(current->plug, rq);
- 		return;
-@@ -2935,7 +2930,7 @@ static void blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
- void blk_mq_submit_bio(struct bio *bio)
- {
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
--	struct blk_plug *plug = blk_mq_plug(bio);
-+	struct blk_plug *plug = current->plug;
- 	const int is_sync = op_is_sync(bio->bi_opf);
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned int nr_segs = 1;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index f75a9ecfebde..260beea8e332 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -365,37 +365,6 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
- 		qmap->mq_map[cpu] = 0;
- }
- 
--/*
-- * blk_mq_plug() - Get caller context plug
-- * @bio : the bio being submitted by the caller context
-- *
-- * Plugging, by design, may delay the insertion of BIOs into the elevator in
-- * order to increase BIO merging opportunities. This however can cause BIO
-- * insertion order to change from the order in which submit_bio() is being
-- * executed in the case of multiple contexts concurrently issuing BIOs to a
-- * device, even if these context are synchronized to tightly control BIO issuing
-- * order. While this is not a problem with regular block devices, this ordering
-- * change can cause write BIO failures with zoned block devices as these
-- * require sequential write patterns to zones. Prevent this from happening by
-- * ignoring the plug state of a BIO issuing context if it is for a zoned block
-- * device and the BIO to plug is a write operation.
-- *
-- * Return current->plug if the bio can be plugged and NULL otherwise
-- */
--static inline struct blk_plug *blk_mq_plug( struct bio *bio)
--{
--	/* Zoned block device write operation case: do not plug the BIO */
--	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
--	    bdev_op_is_zoned_write(bio->bi_bdev, bio_op(bio)))
--		return NULL;
--
--	/*
--	 * For regular block devices or read operations, use the context plug
--	 * which may be NULL if blk_start_plug() was not executed.
--	 */
--	return current->plug;
--}
--
- /* Free all requests on the list */
- static inline void blk_mq_free_requests(struct list_head *list)
- {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index faacc9853e0b..79ed07bd652a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1301,18 +1301,6 @@ static inline unsigned int bdev_zone_no(struct block_device *bdev, sector_t sec)
- 	return disk_zone_no(bdev->bd_disk, sec);
- }
- 
--/* Whether write serialization is required for @op on zoned devices. */
--static inline bool op_needs_zoned_write_locking(enum req_op op)
--{
--	return op == REQ_OP_WRITE || op == REQ_OP_WRITE_ZEROES;
--}
--
--static inline bool bdev_op_is_zoned_write(struct block_device *bdev,
--					  enum req_op op)
--{
--	return bdev_is_zoned(bdev) && op_needs_zoned_write_locking(op);
--}
--
- static inline sector_t bdev_zone_sectors(struct block_device *bdev)
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
--- 
-2.44.0
+There is some kind of name clash issue when using `pin_init!` in the expression on
+line 106:
 
+    let queue_data = Box::pin_init(pin_init!(
+        QueueData {
+            tree <- TreeContainer::new(),
+            completion_time_nsec: *param_completion_time_nsec.read(),
+            irq_mode,
+            memory_backed: *param_memory_backed.read(),
+            block_size,
+        }
+    ))?;
+
+I cannot immediately decipher the error message:
+
+  RUSTC [M] drivers/block/rnull.o
+error[E0277]: the trait bound `__rnull_mod_irq_mode: From<u8>` is not satisfied
+   --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:104:39
+    |
+104 |     let irq_mode = (*irq_mode.read()).try_into()?;
+    |                                       ^^^^^^^^ the trait `From<u8>` is not implemented for `__rnull_mod_irq_mode`
+    |
+    = note: required for `u8` to implement `Into<__rnull_mod_irq_mode>`
+    = note: required for `__rnull_mod_irq_mode` to implement `TryFrom<u8>`
+    = note: required for `u8` to implement `TryInto<__rnull_mod_irq_mode>`
+
+error[E0308]: mismatched types
+    --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
+     |
+106  |       let queue_data = Box::pin_init(pin_init!(
+     |  ____________________________________^
+107  | |         QueueData {
+108  | |             tree <- TreeContainer::new(),
+109  | |             completion_time_nsec: *param_completion_time_nsec.read(),
+...    |
+113  | |         }
+114  | |     ))?;
+     | |     ^
+     | |     |
+     | |_____expected `IRQMode`, found `__rnull_mod_irq_mode`
+     |       arguments to this function are incorrect
+     |
+note: function defined here
+    --> /home/aeh/.rustup/toolchains/1.74.1-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ptr/mod.rs:1365:21
+     |
+1365 | pub const unsafe fn write<T>(dst: *mut T, src: T) {
+     |                     ^^^^^
+     = note: this error originates in the macro `$crate::__init_internal` which comes from the expansion of the macro `pin_init` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+   --> /home/aeh/src/linux-rust/linux/drivers/block/rnull.rs:106:36
+    |
+39  | / module! {
+40  | |     type: NullBlkModule,
+41  | |     name: "rnull_mod",
+42  | |     author: "Andreas Hindborg",
+...   |
+71  | |     },
+72  | | }
+    | |_- constant defined here
+...
+106 |       let queue_data = Box::pin_init(pin_init!(
+    |  ____________________________________^
+    | |____________________________________|
+    | |____________________________________|
+    | |____________________________________|
+    | |
+107 | |         QueueData {
+108 | |             tree <- TreeContainer::new(),
+109 | |             completion_time_nsec: *param_completion_time_nsec.read(),
+...   |
+113 | |         }
+114 | |     ))?;
+    | |     ^
+    | |_____|
+    | |_____expected `DropGuard<IRQMode>`, found `__rnull_mod_irq_mode`
+    | |_____this expression has type `DropGuard<IRQMode>`
+    | |_____`irq_mode` is interpreted as a constant, not a new binding
+    |       help: introduce a new binding instead: `other_irq_mode`
+    |
+    = note: expected struct `DropGuard<IRQMode>`
+               found struct `__rnull_mod_irq_mode`
+    = note: this error originates in the macro `$crate::__init_internal` which comes from the expansion of the macro `pin_init` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.
+make[5]: *** [/home/aeh/src/linux-rust/linux/scripts/Makefile.build:293: drivers/block/rnull.o] Error 1
