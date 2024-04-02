@@ -1,176 +1,110 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598547E788
-	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 12:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E386A7F7E2
+	for <linux-block@vger.kernel.org>; Tue,  2 Apr 2024 13:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712062393; cv=none; b=G12Ou9Y/N4JIt1L5kDMS48Am9TYMgxAR4OHEeJvQvc5aLNWILFJ0TtCAgih4GmIixcuE0ir+3cQfe6kgpOZcvpROaIz0jZeMO30lrz8ciSu8VHtH0ejxTZO61p/YYEcjZ8wky9DG0LjRC1383XRsFeDNwEEZNZu+gvowSQBErXI=
+	t=1712063101; cv=none; b=iV5AyLBWGX8RCV/7TFZA2JfiXLdmlBbyFlUZSxzVPg1u2bgp//tT5oxr4RJJv8axFdB8J5R9tqbZZh1EqF+6VVjtw2a791LZC4F26t6H93oZmPpoOWfcO56gI1iH8GhlyBLju3rKg+1TEOpvLaNA8daWBZzeeu6v6LzVPdusiAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712062393; c=relaxed/simple;
-	bh=LPp1LoXc/iUZYcuArnYpygWNYI02olIHB5JtN31wm9k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nBthZ4fqPEH9aiOMS3SdBu+gd/55MX3X1W4qYSmP04KT/MwcF+sYijVfbX/HwFE00XkyP5qjcaptCMPvBz7YbYspXB5OfAViSfx07VOEqoLHVUosc1iLmwfQa1kcc98HugXFyCpS7WgNQx7hGM+AAELUJQyXPrk0LRSJoW79Oic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=o4c2yRDJ; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1712063101; c=relaxed/simple;
+	bh=7ah2VuBYWEmWHWPyFP68b6yoTO91npOyV7LilgwLJqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hzcdEtVCIG6KB+jhsVWM5UkTouKscbZSR9uaYCi4YsFyBVAtbDmaJbuHbd8919YaT3GPHPUEixmSrOmxiZSw4zfmSazX+GcCfZUzNeTBx3lJDcBxUtlNWItCEHf4FV5UiZf9BOvmnABbaK3k40QiTD7XcmOhrpedXPnpsESxFSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ky4McLlu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="o4c2yRDJ"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-415446af364so25578305e9.0
-        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2024 05:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712062389; x=1712667189; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hvhw9LsqhxNzOOOcCfIt2sSk317Q3WM4yG9zmNorI5c=;
-        b=o4c2yRDJgM3FdYuyKdOtPkrfHXHH1na/mQ97sp3uQABI3rP/3C4O/Rj15z0p87Weh/
-         LWUS8CEbpCpQbI/BFouhOaeWciwdti4frjfPtQvfXRlgmhN60XeiyjOakE8vBLqglaLs
-         TcObTXber3pmshpfrz46coJ4htxtYTihGX27qcSDP5kFw/dMm6kYWJ6XP1tsX5ILF1U0
-         QmKAVskJuYGrA+BQYvzDRg9qCD/ZyqbsCjFXcREXrhz1d0lBQ6SKKQx8QtlVbcxfRhW5
-         8O1bYnBxj+9hLWNyyDDtnTTf+ZbBOIaZJJBTQqqEFZWDMns5tYEsxiaHVPDSqP01i3I5
-         xxIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712062389; x=1712667189;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hvhw9LsqhxNzOOOcCfIt2sSk317Q3WM4yG9zmNorI5c=;
-        b=ecn1tIbs6mjHku/Gakis/3Rog1S0x/H4xjE4IIzLlyNN4ob/HDlnZlYh2xzEhKYB90
-         zMHiuRpfOOt+FnAsWi5Sfx5IjgVjEB0WLg/VHYCTK1tGN+9CtzE4/wRlNFqUUCHb7Ypo
-         mUZEIkKdp5iD49yCROXVm1LleWuy0o21OW/JQLMJHwJ2zsmaRED7Yuxx6/qwjQUWsUxq
-         Di4ZDepDQMGPkXccYOdFNG7KOJPYTUuBK0ffTHule/G/CrJu78tcjx7T8vD5QFCpQfAD
-         GukiQpht8JYdIPxbZB5TqdLDzWRF1WwVt67eUbY1Cbb05882nVWQ0agpYWjaA+7VR0tk
-         fIPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWcvHUvjHOkIMhG8VXgdjUXU3+fq+j4RMtWB/voKvXUKb1dtqnYEsKU8NRlMpRQd1YN82P9z3QoQ1AkJe1CbtOQ8tlXgxYkqyLGZaM=
-X-Gm-Message-State: AOJu0Yxx7ZWth6LTGmNk7r25N6SbP5Wo6aNZNV2cZQxwdmohND/a3L9h
-	n2FFZeum69Jk03oDzdzN1W2jJKmuIA8HZQ0XvO7v+gkNoshOanrsI8SEMMxNl14=
-X-Google-Smtp-Source: AGHT+IEFz3AepeyAQxN36Z0IfK+JwdPVjtp4Sb8ReYgZAqLDYPFoVzfevNH+l3YXMt9M9NS/Rc5Www==
-X-Received: by 2002:a05:600c:310f:b0:415:6bd7:96a0 with SMTP id g15-20020a05600c310f00b004156bd796a0mr3331124wmo.20.1712062388718;
-        Tue, 02 Apr 2024 05:53:08 -0700 (PDT)
-Received: from localhost ([147.161.155.112])
-        by smtp.gmail.com with ESMTPSA id l20-20020a05600c1d1400b004146a304863sm21200277wms.34.2024.04.02.05.53.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 05:53:08 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
- Busch <kbusch@kernel.org>,  Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart
- Van Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
-  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
- Hindborg <a.hindborg@samsung.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,
-  Greg KH <gregkh@linuxfoundation.org>,  Matthew Wilcox
- <willy@infradead.org>,  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor
- <alex.gaynor@gmail.com>,  Wedson Almeida Filho <wedsonaf@gmail.com>,
-  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?=
- Roy Baron <bjorn3_gh@protonmail.com>,  Alice Ryhl <aliceryhl@google.com>,
-  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
- <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
- =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
- Granados
- <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
- <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
- list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
- <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
- <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 3/5] rust: block: allow `hrtimer::Timer` in
- `RequestData`
-In-Reply-To: <sHRsbsEAgQZOgBjItL1A-a1BOEGTeH4CWqZsrdny4vCI06o56pmKluCTbY_EwRDO1hCjEp9Cuq9_8S8Co2I9c8wquHWZH_KGjOpmbF1YiJc=@proton.me>
-	(Benno Lossin's message of "Sat, 23 Mar 2024 10:51:57 +0000")
-References: <20240313110515.70088-1-nmi@metaspace.dk>
-	<20240313110515.70088-4-nmi@metaspace.dk>
-	<sHRsbsEAgQZOgBjItL1A-a1BOEGTeH4CWqZsrdny4vCI06o56pmKluCTbY_EwRDO1hCjEp9Cuq9_8S8Co2I9c8wquHWZH_KGjOpmbF1YiJc=@proton.me>
-User-Agent: mu4e 1.12.0; emacs 29.2
-Date: Tue, 02 Apr 2024 14:43:51 +0200
-Message-ID: <87sf043pfc.fsf@metaspace.dk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ky4McLlu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712063098;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OvSWXFalEF6OU22DUvBZWFYn2B7uDOAlKG6m5QBQYIk=;
+	b=Ky4McLlu1CegBZcflHdn/wM175LEb4xmNP12ttahkdri3+Ep8PRHIcv7+9XTuSVKA2nqXY
+	vHXRbp7sXpEovWexCYadq9cmdg/wOjVyqNZzHiJBkPvOlKlM3Si/yvaSqXpvM6mrWGUE1P
+	39qRGIgHvxuUE1EiuDK9Sc/ts/AY/HE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-NI3dA4XqNgaoiilj5Na5TA-1; Tue, 02 Apr 2024 09:04:54 -0400
+X-MC-Unique: NI3dA4XqNgaoiilj5Na5TA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 141C3101A520;
+	Tue,  2 Apr 2024 13:04:54 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2134E492BCD;
+	Tue,  2 Apr 2024 13:04:52 +0000 (UTC)
+Date: Tue, 2 Apr 2024 09:04:46 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	eblake@redhat.com, Alasdair Kergon <agk@redhat.com>,
+	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
+	David Teigland <teigland@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Joe Thornber <ejt@redhat.com>
+Subject: Re: [RFC 0/9] block: add llseek(SEEK_HOLE/SEEK_DATA) support
+Message-ID: <20240402130446.GA2496428@fedora>
+References: <20240328203910.2370087-1-stefanha@redhat.com>
+ <20240402122617.GA30720@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="RDsvgnmIpxDRfcPA"
+Content-Disposition: inline
+In-Reply-To: <20240402122617.GA30720@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Benno Lossin <benno.lossin@proton.me> writes:
 
-> On 3/13/24 12:05, Andreas Hindborg wrote:> From: Andreas Hindborg <a.hindborg@samsung.com>
->> 
->> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
->> ---
->>   rust/kernel/block/mq/request.rs | 67 ++++++++++++++++++++++++++++++++-
->>   1 file changed, 66 insertions(+), 1 deletion(-)
->> 
->> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
->> index cccffde45981..8b7f08f894be 100644
->> --- a/rust/kernel/block/mq/request.rs
->> +++ b/rust/kernel/block/mq/request.rs
->> @@ -4,13 +4,16 @@
->>   //!
->>   //! C header: [`include/linux/blk-mq.h`](srctree/include/linux/blk-mq.h)
->> 
->> +use kernel::hrtimer::RawTimer;
->> +
->>   use crate::{
->>       bindings,
->>       block::mq::Operations,
->>       error::{Error, Result},
->> +    hrtimer::{HasTimer, TimerCallback},
->>       types::{ARef, AlwaysRefCounted, Opaque},
->>   };
->> -use core::{ffi::c_void, marker::PhantomData, ops::Deref};
->> +use core::{ffi::c_void, marker::PhantomData, ops::Deref, ptr::NonNull};
->> 
->>   use crate::block::bio::Bio;
->>   use crate::block::bio::BioIterator;
->> @@ -175,6 +178,68 @@ fn deref(&self) -> &Self::Target {
->>       }
->>   }
->> 
->> +impl<T> RawTimer for RequestDataRef<T>
->> +where
->> +    T: Operations,
->> +    T::RequestData: HasTimer<T::RequestData>,
->> +    T::RequestData: Sync,
->> +{
->> +    fn schedule(self, expires: u64) {
->> +        let self_ptr = self.deref() as *const T::RequestData;
->> +        core::mem::forget(self);
->> +
->> +        // SAFETY: `self_ptr` is a valid pointer to a `T::RequestData`
->> +        let timer_ptr = unsafe { T::RequestData::raw_get_timer(self_ptr) };
->> +
->> +        // `Timer` is `repr(transparent)`
->> +        let c_timer_ptr = timer_ptr.cast::<bindings::hrtimer>();
->> +
->> +        // Schedule the timer - if it is already scheduled it is removed and
->> +        // inserted
->> +
->> +        // SAFETY: c_timer_ptr points to a valid hrtimer instance that was
->> +        // initialized by `hrtimer_init`
->> +        unsafe {
->> +            bindings::hrtimer_start_range_ns(
->> +                c_timer_ptr as *mut _,
->> +                expires as i64,
->> +                0,
->> +                bindings::hrtimer_mode_HRTIMER_MODE_REL,
->> +            );
->> +        }
->> +    }
->> +}
->> +
->> +impl<T> kernel::hrtimer::RawTimerCallback for RequestDataRef<T>
->> +where
->> +    T: Operations,
->> +    T: Sync,
->
-> Why is this needed? Shouldn't this be `T::RequestData: Sync`?
->
-> Is the `run` function below executed on a different thread compared to
-> the `schedule` function above?
-> If yes, then `T::RequestData` probably also needs to be `Send`.
-> You also would need to adjust the bounds in the impl above.
+--RDsvgnmIpxDRfcPA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It's a typo, thanks for spotting. It should be `T::RequestData: Sync`.
+On Tue, Apr 02, 2024 at 02:26:17PM +0200, Christoph Hellwig wrote:
+> On Thu, Mar 28, 2024 at 04:39:01PM -0400, Stefan Hajnoczi wrote:
+> > In the block device world there are similar concepts to holes:
+> > - SCSI has Logical Block Provisioning where the "mapped" state would be
+> >   considered data and other states would be considered holes.
+>=20
+> But for SCSI (and ATA and NVMe) unmapped/delallocated/etc blocks do
+> not have to return zeroes.  They could also return some other
+> initialization pattern pattern.  So they are (unfortunately) not a 1:1
+> mapping to holes in sparse files.
 
-BR Andreas
+Hi Christoph,
+There is a 1:1 mapping when when the Logical Block Provisioning Read
+Zeroes (LBPRZ) field is set to xx1b in the Logical Block Provisioning
+VPD page.
+
+Otherwise SEEK_HOLE/SEEK_DATA has to treat the device as filled with
+data because it doesn't know where the holes are.
+
+Stefan
+
+--RDsvgnmIpxDRfcPA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmYMAm4ACgkQnKSrs4Gr
+c8hVxQf6Ai3HCf81vk9Zfg0wnaREk8TJeBtQghYd36C8nr5bX1BpwXAQog0wnYbZ
+VK0zB5aL/xDtzp+Vs69+Dn7ouGRxk48H5h1Xk8o9UD2XWSoS4f+bb7b5nSKeF45y
+gQd/tdgI+ch4AqbpByYz6Cgc3ZqJ03Tcm+zm9Vj4xUiXw1Hhj1V/09vVzif9X5tw
+3/80Yd4JLU1W/7cznhTTAIrpz8L+NAclZkQFVtfbvV0aXQfAXGvV8Kl82ddmKBmL
++ovnir/EbVpxUcg4veYJCme1B8D6ALU4znM2krhnz6g5jBynLN+av88weJErNfox
+34X6JufpJpSZUzfyTIA6PB7z5eS3Lg==
+=cwzD
+-----END PGP SIGNATURE-----
+
+--RDsvgnmIpxDRfcPA--
+
