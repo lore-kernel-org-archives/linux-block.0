@@ -1,142 +1,120 @@
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A115F2260B;
-	Tue,  2 Apr 2024 23:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958434205F;
+	Tue,  2 Apr 2024 23:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712099397; cv=none; b=mtR6/02H1ZFSJgWPWRtPQ2aSHrp2dd/Ua+4e4h7IneOFdNnAwaI2PCgbU/rf4ZcauYEA6udAzrJABajjZg8mmOKMVQWC5hPh2RabGs0QgOgfJtXseOt+9taYIRj73vpvJCYnL4DoPp0Y9nTORlPPLNw64HlDoKF801c/6+hADTY=
+	t=1712100039; cv=none; b=lyF9xBUIf11x1XhLQeak90mMIcZoBTG5l7jp/kIl0b+GFCFMK0OCFt2ZaxWX5N6mmkMp2+Lt1EQRwGKrItCdRbHyKLrrnPBOUsNSyDGyEjJz9JAC4eRX/lS1vofCrdPvlcCFM3UGzWwSqPY8Qcd4ltmNx9YzAaMTJhgUQuzMd7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712099397; c=relaxed/simple;
-	bh=zTNnWCsplfyp5T2nWgn8oJWZzr3uiuiOLHN2o/GFkwI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NjM/oh1p4yx5Yq6SOjpfypoCtqMA/hSz3Di83iuwSUDRqB0hNC8CyD8zeJXP5WlfXmr102V+5dDIJ6rDQx6AhZkooNZtrumyUI+F5bOgXYLaKxGcuXd/5PqZAUsjnpGjrSobal4zH7/UWRyQYnSiVNd+hGeebIkmwD3V9Fl8erk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Hm+6z5W0; arc=none smtp.client-ip=185.70.43.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1712100039; c=relaxed/simple;
+	bh=rNRsMENYdMf0E/dZdciD6PG8aHTONVFr4fPxjmhlAOc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gFgLvzRTO+vpt5FfgPQ135SBIw4oLHBLO59X9qtzX5NCUNKpopsRe0mmV1R53YgHc/RnPWXHaWt+PKoa7J979XVPd6bShp1qu1xKw77tNUCdUlk9nxXMSgzrLChUAcyk5edCa7z6QurzijjDOobhuZo9c8LH03y+y7IKJcAX5oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=lBdxX7h/; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Hm+6z5W0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1712099393; x=1712358593;
-	bh=BwgrpotDzagmgWcu+/Ta2cDFG0k8Ub+uczrR9L3a+SM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Hm+6z5W0XCTQzxG2hgNVqDN4l5wIcESAC+yGWiBo+D23KLk/IzuDXJdtVKuz5Iojy
-	 WQWi7fF+4z+QblXHDa1kYZ5f2Cu07vffSRhyv6PU/yRnarmWYAf29en3TpGwGsiDrX
-	 /nAlwoz6+ObdcnhSSBjdWSL4SYdJ+iS82Onom7XgVMaP5lTo/fekdAuTMlPpLkPUxT
-	 SVoNMLSCgpABTMGlsCbH09H4QfXVVgEFrx8l3rM+q3Zu+4WwMgZKPrCuAvCkJvFC+L
-	 25BMpu2Bo4SOwUi52YT31oYfQ85VJHeVFDo1z+pljh6Cr2rOgtp19+wHBFpL0KnvI1
-	 RJgdZHXLSuFjQ==
-Date: Tue, 02 Apr 2024 23:09:49 +0000
-To: Andreas Hindborg <nmi@metaspace.dk>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
-	<da.gomez@samsung.com>, open list <linux-kernel@vger.kernel.org>, "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
-Message-ID: <7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me>
-In-Reply-To: <871q7o54el.fsf@metaspace.dk>
-References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me> <871q7o54el.fsf@metaspace.dk>
-Feedback-ID: 71780778:user:proton
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="lBdxX7h/"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4V8P4Z6wr8z6Cnk8s;
+	Tue,  2 Apr 2024 23:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1712100027; x=1714692028; bh=mNK0VmkJz6J6xiyneJZ80sBK
+	QSOoXTWzA0U3O29ARB0=; b=lBdxX7h/BB4QtMNRc4va8Uo6qo/F8h/EvnOIBy0I
+	qq/1TKKJJx+t6Ur6lOCKNwtMEFq0g8OWA9JIy2UnvpRZxNYklgyYA33wxnNTVB19
+	Ad5TPGnvK649+u9p2nBWA/zK/g/gjaLVuZZR2viqnWH4KlyoPGT6lAN6A6F3aDXr
+	SzOg9PHlRuyj8383HTYDM8zc2JD2kFYEkaB3n5ukBIyIA6/EggID1w0rFXbZULVE
+	W+kAN9s743TqWTlv9sKa9uOfbOxzoqrZaZnM1lkyIHNGl7QbGe6QpjdgLAGm7Lwe
+	Eeiv9r1h/TyKX2t4SQ+CVbdIayXlU8zBk28w6wOLaYQMaw==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id pRb1OrAT1Uhl; Tue,  2 Apr 2024 23:20:27 +0000 (UTC)
+Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4V8P4S6SlGz6Cnk8m;
+	Tue,  2 Apr 2024 23:20:24 +0000 (UTC)
+Message-ID: <c56a1d54-6d7d-4105-8109-d6a81bc1adbc@acm.org>
+Date: Tue, 2 Apr 2024 16:20:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block/mq-deadline: Fix WARN when set async_depth by sysfs
+To: Zhiguo Niu <niuzhiguo84@gmail.com>
+Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>, axboe@kernel.dk,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ ke.wang@unisoc.com, hongyu.jin@unisoc.com,
+ Damien Le Moal <dlemoal@kernel.org>
+References: <1711680261-5789-1-git-send-email-zhiguo.niu@unisoc.com>
+ <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org>
+ <CAHJ8P3K9OL6MHNrSrqmf0esbr2h1HJ3mVRmxDNVpf95ZMHQcqg@mail.gmail.com>
+ <92e45c93-e2ff-4d34-b70f-7772f0596e68@acm.org>
+ <CAHJ8P3KgU-tFDAgCNc5GcPbUBtDDyFmcfza2HsoD9TJ3h1DS=Q@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAHJ8P3KgU-tFDAgCNc5GcPbUBtDDyFmcfza2HsoD9TJ3h1DS=Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-On 23.03.24 07:32, Andreas Hindborg wrote:
-> Benno Lossin <benno.lossin@proton.me> writes:
->> On 3/13/24 12:05, Andreas Hindborg wrote:
->>> +//! implementations of the `Operations` trait.
->>> +//!
->>> +//! IO requests are passed to the driver as [`Request`] references. Th=
-e
->>> +//! `Request` type is a wrapper around the C `struct request`. The dri=
-ver must
->>> +//! mark start of request processing by calling [`Request::start`] and=
- end of
->>> +//! processing by calling one of the [`Request::end`], methods. Failur=
-e to do so
->>> +//! can lead to IO failures.
->>
->> I am unfamiliar with this, what are "IO failures"?
->> Do you think that it might be better to change the API to use a
->> callback? So instead of calling start and end, you would do
->>
->>       request.handle(|req| {
->>           // do the stuff that would be done between start and end
->>       });
->>
->> I took a quick look at the rnull driver and there you are calling
->> `Request::end_ok` from a different function. So my suggestion might not
->> be possible, since you really need the freedom.
->>
->> Do you think that a guard approach might work better? ie `start` returns
->> a guard that when dropped will call `end` and you need the guard to
->> operate on the request.
->=20
-> I don't think that would fit, since the driver might not complete the
-> request immediately. We might be able to call `start` on behalf of the
-> driver.
->=20
-> At any rate, since the request is reference counted now, we can
-> automatically fail a request when the last reference is dropped and it
-> was not marked successfully completed. I would need to measure the
-> performance implications of such a feature.
+On 4/1/24 10:44 PM, Zhiguo Niu wrote:
+> On Tue, Apr 2, 2024 at 5:23=E2=80=AFAM Bart Van Assche <bvanassche@acm.=
+org> wrote:
+>> Oops, I misread your patch. After having taken another look, my
+>> conclusions are as follows:
+>> * sbitmap_queue_min_shallow_depth() is called. This causes
+>>     sbq->wake_batch to be modified but I don't think that it is a prop=
+er
+>>     fix for dd_limit_depth().
+> yes, it will affect sbq->wake_batch,  But judging from the following co=
+de:
+> [ ... ]
 
-Are there cases where you still need access to the request after you
-have called `end`? If no, I think it would be better for the request to
-be consumed by the `end` function.
-This is a bit difficult with `ARef`, since the user can just clone it
-though... Do you think that it might be necessary to clone requests?
+If we want to allow small values of dd->async_depth, min_shallow_depth
+must be 1. The BFQ I/O scheduler also follows this approach.
 
-Also what happens if I call `end_ok` and then `end_err` or vice versa?
+>> * dd_limit_depth() still assigns a number in the range 1..nr_requests =
+to
+>>     data->shallow_depth while a number in the range 1..(1<<bt->sb.shif=
+t)
+>>     should be assigned.
+> yes, In order to avoid the performance regression problem that Harshit
+> Mogalapalli reported, this patch will not directly modify
+> dd->async_depth,
+> but user can modify dd->async_depth from sysfs according to user's
+> request. which will modify data->shallow_depth after user modify it by
+> sysfs.
 
->>> +    pub fn data_ref(&self) -> &T::RequestData {
->>> +        let request_ptr =3D self.0.get().cast::<bindings::request>();
->>> +
->>> +        // SAFETY: `request_ptr` is a valid `struct request` because `=
-ARef` is
->>> +        // `repr(transparent)`
->>> +        let p: *mut c_void =3D unsafe { bindings::blk_mq_rq_to_pdu(req=
-uest_ptr) };
->>> +
->>> +        let p =3D p.cast::<T::RequestData>();
->>> +
->>> +        // SAFETY: By C API contract, `p` is initialized by a call to
->>> +        // `OperationsVTable::init_request_callback()`. By existence o=
-f `&self`
->>> +        // it must be valid for use as a shared reference.
->>> +        unsafe { &*p }
->>> +    }
->>> +}
->>> +
->>> +// SAFETY: It is impossible to obtain an owned or mutable `Request`, s=
-o we can
->>
->> What do you mean by "mutable `Request`"? There is the function to obtain
->> a `&mut Request`.
->=20
-> The idea behind this comment is that it is not possible to have an owned
-> `Request` instance. You can only ever have something that will deref
-> (shared) to `Request`. Construction of the `Request` type is not
-> possible in safe driver code. At least that is the intention.
->=20
-> The `from_ptr_mut` is unsafe, and could be downgraded to
-> `from_ptr`, since `Operations::complete` takes a shared reference
-> anyway. Bottom line is that user code does not handle `&mut Request`.
+It seems like there is no other option than keeping the current default
+depth limit for async requests ...
 
-Ah I see what you mean. But the user is able to have an `ARef<Request>`.
-Which you own, if it is the only refcount currently held on that
-request. When you drop it, you will run the destructor of the request.
+> My personal opinion is to keep the current dd->aync_depth unchanged to
+> avoid causing performance regression,
+> but it should  allow users to set it by sysfs, and the WARN mentioned
+> best to be solved.
+> and just only change this part?
+>   -       sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async=
+_depth);
+>   +       sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
+> thanks!
 
-A more suitable safety comment would be "SAFETY: A `struct request` may
-be destroyed from any thread.".
+The above change will suppress the kernel warning. I think the other
+changes from patch 2/2 are also necessary. Otherwise the unit of
+"async_depth" will depend on sbitmap word shift parameter. I don't think
+that users should have to worry about which shift value has been chosen
+by the sbitmap implementation.
 
---=20
-Cheers,
-Benno
+Thanks,
+
+Bart.
 
