@@ -1,437 +1,148 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2104.outbound.protection.outlook.com [40.107.236.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206F715686D
-	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 21:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712179541; cv=none; b=k7VCfEGy3wgSu42tDK0pMQ005RB21TndnUR3ti8yFad73mss+w5aHU4D69kgZTm50fqy1pjYiIs/CysPBk6/rqEHxQ/D1TlnIitsJTPtKegV6zun8KCQ10OdSflRaRupmIgRlLe/fj9n54z7f3GSmf5MHgFzntopGNSOSzYIwJY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712179541; c=relaxed/simple;
-	bh=oVB1hnJA0ypOGxexUDfWPmnRPoMfKVfcCCvOHrEGQW4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N4PslmfWWR6Tuev8jE0JRLC1S+CMBLIycJYMMOmOfmZ77y9Xswb1wtIc/kL7WglwW7SBhf8Z9OhgGNMgBhdTEzdKI+GpmlrZmGmhvqLGgsBYmV/o1IHf+uSY4Ezizv6wgMC7UPmBzyitkHmYXeAtEDHZAAjqyFQAB1CNWbmXAto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=1q3r6jxY; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596E915688D
+	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 22:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.104
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712183274; cv=fail; b=N/8Zy0s/FZXQRIy1rL8xLaWPZ+jro7A33QJzltEV+9dONaxaHEnyLfCpLXYuacAx/NuEK6DGIZ1QVMY/HxoIQQZbxOImiXkm6b26embOTvDwt4a1p1YzMuarXzMTk4dTRTvqa1cjA867wS9TBl3moiXFgZlWfToxknBRLwn1JTI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712183274; c=relaxed/simple;
+	bh=yf+rayQDMMsfBuhrf81d6opqOskMTzKYoCI4fRZBf8o=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KHhNST429mq04NQTfKHjIzzBjeZ6tleyctgQ+umPum2JfVfAY0FASaztvCTf9KA4NShkgH6CLdmujOuLOZcnF1SLKmay1QRe87XjpVlY+yD1KBAqQLHAyE8ZnVTgZyo9kLxNhaaUPq1BLntczX9Y9TQO3Fw0tghnT1sjBs115dg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=W/WDWAR9; arc=fail smtp.client-ip=40.107.236.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="1q3r6jxY"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V8yTb4Mp2zlgTGW;
-	Wed,  3 Apr 2024 21:25:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1712179531; x=1714771532; bh=9zFlVMWpKDoF3SJqYYOk3fbuQdwD3ipz3/m
-	aVOyj2Jc=; b=1q3r6jxY/xh6H9/hdSNzcbzuEKGrKUOgZOgB2Zf8LDm2qAq+J7g
-	Qs7he7toE8p/f6rLUaXq4SQBIOVKXs62Or9Hgj0OsYmVmgEYer3ht3XPu/IMbDpL
-	9/Kpj3lufSLn6Wvc7/qNQxNhXUYQXPXBGTcfMxUhKx3DyHHrN1UrS9Eu9HNwzOTa
-	mT+k3b3B3dW3R3Eqflu9nWUtCIPP35FXdRyjbAH7Nj9+SugvHj6oiEAE/Yd0dSPA
-	WwQxwgnB56f4RUKIb+gKp50tOqJv3hPSSwCrA2iB6lnIXKKvLxqXaZKTFgH+lcHS
-	+4EOBiOBquoAdTBmxsjzZIcZopRTe3NR/oQ==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ns4rt2qCKKjP; Wed,  3 Apr 2024 21:25:31 +0000 (UTC)
-Received: from bvanassche-linux.mtv.corp.google.com (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V8yTQ5pdLzlgTHp;
-	Wed,  3 Apr 2024 21:25:30 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH v4] block: Improve IOPS by removing the fairness code
-Date: Wed,  3 Apr 2024 14:25:24 -0700
-Message-ID: <20240403212524.524952-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W/WDWAR9"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fJapUjjWGAoCQ9WRie861CEv65NFHW5XjE2qZ4j/xSxF2bLujgtpIzjTIu9fZNWMTEpIoS7nsJLn3utpdP/XytcO+zABTSnL1xRpwWAgjS0Dw2eKtJF6wPuJdw9sgM//a8ora91aEwEd0yyhlKjdIPLeSZfvhKFYIu/1tG+5lu8x6j3Uuno0Fo7zHAM3vCLxdUtG1U22qPhPkatZPuJQOtPrkaObXVKH65MpMDb3ObB05/H0+0b80YayWKML/fGEgFqDGslH843nVK+B7DyiDne3HHY8R1+YPlRVbbmun8BBpqxJCOlnUQx0VA2CTjVeoQE8v/nPGYhrwvbRshK95Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yf+rayQDMMsfBuhrf81d6opqOskMTzKYoCI4fRZBf8o=;
+ b=JAmsTAWLilLLKsQzptvp8Vt8Ku0YCIycxTFsVrdE1F0aQ5muGnZRI3J5R4yHzccUz7TZyrqeBPcRes2u8HqPCN5raHEyLvj66HVZFeeoDhKuQwQ6/BAHDZH+9SKFsRAw1nEEF6G0TXgF7RSUxJ8xJGfwxHRWoeRa1oaCc4+zkqz2OKXaB2XqlWmngvI3jttzlS2n6LGuxDcULwrIGFB8ZikVqVbqnzB0ntbsqN+mm2Oa9GA5hYGEOOElCYEwjcvAn1deeFVjbuboARlVVYGymNQTzDJ41U6fxKjnosQlAkrfSyUU4A/A25JsBXaCRsBcU6rnRjoMIZIxEuCDu+C5IQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yf+rayQDMMsfBuhrf81d6opqOskMTzKYoCI4fRZBf8o=;
+ b=W/WDWAR9H7lpIGE4BmOx+KuJ7e8EwWGUxKINshyru8FKQiPacFPFLOAPkXTln0mI27LW+iQFBBO8gXd1wVyahvVpQzTw3o66SENjbzXMTrQbQFtm9wJXFUfvrWiqAhioHJggfFEmSaqKgUB+A9gpGU2bQ42bQu0Gb6463dgMs4DhIK++dSF4xAIQgB9Zlnz1HNV8+BEgmXFWYT7MoErTBnS0yvKoYXK61pM1YjLHxn8YQTahEIkCFbuRco9Wqf3OHXMz4zcZeVMdqzHh5EFIf83cpaKvf7T2igCiq+pBxLhF0JDO8FsDkZuc/+hEj5XTBLHy+sANvHPAPfb8fSlC6w==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by MW4PR12MB6684.namprd12.prod.outlook.com (2603:10b6:303:1ee::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 3 Apr
+ 2024 22:27:49 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::a1:5ecd:3681:16f2]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::a1:5ecd:3681:16f2%7]) with mapi id 15.20.7409.042; Wed, 3 Apr 2024
+ 22:27:48 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Daniel Wagner <dwagner@suse.de>, Shinichiro Kawasaki
+	<shinichiro.kawasaki@wdc.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Hannes
+ Reinecke <hare@suse.de>
+Subject: Re: [PATCH blktests v1 0/3] add blkdev type environment variable
+Thread-Topic: [PATCH blktests v1 0/3] add blkdev type environment variable
+Thread-Index: AQHahOUCNelU9FCOvkKppFZwzQhLY7FV/DkAgABEnwCAAOGuAA==
+Date: Wed, 3 Apr 2024 22:27:48 +0000
+Message-ID: <5aa4ebdd-5800-4701-9a80-c737b2760ec8@nvidia.com>
+References: <20240402100322.17673-1-dwagner@suse.de>
+ <mqpuf2a7obybtw42ydte2wq7ktema5odvc3dqm32hknjmamgdb@rbo3i6lqqkld>
+ <j6awxljufwg6r5rs5kojwsnatfb4aj3vnqsq43hkuuhgvcflvh@u6l5cf2ponaw>
+In-Reply-To: <j6awxljufwg6r5rs5kojwsnatfb4aj3vnqsq43hkuuhgvcflvh@u6l5cf2ponaw>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|MW4PR12MB6684:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ HpaXgVSazJGaSemGjaIToTszqUvxJ8l0j5RFCUVLL4rhG7BmFzXGiRSPKzOAez/jtI6TeB7HSnNXkimeh5wvYkZvObfHWzTVO4iZrpepG8AsFzmt7AlhN7g1altdW29Ux6MHx6tjjPO8w5fGrFrA64R7CLfYvBIx4o3JCmB8/jb1G8m5hJHxyzzLYpd3q1XG0PUGpGBEhZn5QTBtPKsB5Y2eQHQCqfIR69regBF9BKRcJlCCSGj1LNkEpDwByU++9+2Rc1rAQMfu+fuzNsuqp/eaHKwk9zyB+BbuTgO+QRrvY6QVcJtkX+PMdRX0fhA2R9NggCWcULBqvQ4w57My2C4S3XuTDQpHa7YrWJvzUqmibmZkUbTNbiPxeylUfg/DV8eOabji+Em6Oyp6vHVWgjun5w7RHkqXXs9bAcCTJqDhOWesDDawvSCSm4d863jy1FyEkqEAJAXh+MEi7Qt9sJzLH0ImCJ9FqdmnrfyiYvnO+9xubnmB+gfeIHQLFU7WarLjlOzO3MZ3lKIrSOY6THEau6Z9GayiLHx0VoRjQKb7KJYnsWxun99+bMDjmF6cPBhBCMaXEt3MuB680h+6tnrsDdebWwwaOPtmTS3rm9zFtzRjhXd5crrxqSud9BuVW84EXeCzUHSsfGnq22cDL7ezLadSem8STvEKGpVKUXE=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?TkJNbmlZK0ZPWFNjWDJUZUpjeEhWdUdSVUpBQTYxMW9md1RicmZMTkdMNmxi?=
+ =?utf-8?B?a2dWc0pOTnUwSW9hSHcyWldtQmJyc3hHcnRXZVdnUWQ3QlhEd3hVSlpZQ1hD?=
+ =?utf-8?B?S3pFOE9jZi9aZUk4Z0Y3SUFZNVNiQmVNcVNJNkFDMU5Ja1ZiYkxGRERkbFlH?=
+ =?utf-8?B?M2M1SDVWZVJOR2hKcXd2eGhwYm9GMG4xT01xZkdNZ1N4ZEwwUDVsd0dBcHZr?=
+ =?utf-8?B?QTJnY0hZNWNPMGZFcEk0RGhPbkZBOFlxTGcvMjIyVzV0c2FNMFZhTG15MC9J?=
+ =?utf-8?B?WHBqRFdVMUZ6YzhralZvUXd2NjNySjBTVnR1cFdTQ1pQYWJUOHNoM2cxR1ho?=
+ =?utf-8?B?c0ZYYmJ6T1V0QkVIVTE4VmwvWERRLzFlT0ZCcU9QNlA0YlVJY05RT0lOZHdP?=
+ =?utf-8?B?VUlKNDM1OTE0N2Z1cG1peXJ6YjkydXoybndzdmxDcU8zZ3BsTDRCU0ZZcmlN?=
+ =?utf-8?B?SnE2WHgwRDZqZzZlVWhBcTBNaXZXN3JpZkxsVjZlakorZGZ5STNXdGNzUXln?=
+ =?utf-8?B?Vm9PREVVa3B0NWZCSFBLc2tpZmRTM2VYMGtjclpBK3Z1ZWxVQ3BVWTZjWW1t?=
+ =?utf-8?B?blJ2ek54ZXp3Q0ZmdElWb09UNzMrRGNhUkFJS0dDeGJEOFF5TGNtZ0ZjVG52?=
+ =?utf-8?B?QUJOZUloeVM0S05pOTBSZHRUeVFQYW9qYTRvWkJ4TXhWTXlNZExRQzlReDNz?=
+ =?utf-8?B?Z2ZrSmowTDJnTGZQRlp2eEU2RU02OUViM1UzQWpheEVTbS9GMXdTZzRLUWFZ?=
+ =?utf-8?B?NzhGcHhpblpGVEw5d2FuSHhVTDZRYmZRZmRsU0pDTjd2Q1Mvb09jek9GUHpl?=
+ =?utf-8?B?bno1VDFUbjNyUWM4ZVVnWTVJTzNuTjFxV2srRVdaMmJtRWZ1U2d0TDEzazZR?=
+ =?utf-8?B?YjY5K2UxY0VDY2R1OWVOeWxUQWErMG9QYWxBVlk0M2dydzd6NHZLM3ZnbUJM?=
+ =?utf-8?B?ZkR4MWhOa1p6RTU3ekNZVVRPbXlHMXpobFMzZHRNRGdxckhRUUp1TEhzVVZz?=
+ =?utf-8?B?NWwwTHQwZ1BUMjVBTFdvL01VNzc4ZVBpQmRlK3l2YlNVcGRENVNwblE3akNq?=
+ =?utf-8?B?dXJmQ1RvcHFHNm80S002NWl1d09iSjVybS91WTU4dXI2MWM4Rm92YUxDYUNG?=
+ =?utf-8?B?SkZFWmhxWko1amtFYVpQQ2ovRDBjY2dyMEZoQkRYUmtlNkIwbFRWb0ptNWdZ?=
+ =?utf-8?B?b1hSTVlHN2ptd1REZG5qYWVQUDc0WnYwQ1RJSVpnclVmRTdPT2dXcXNoc3ZS?=
+ =?utf-8?B?RENSTlVzUVZhZkhYbHRwNTF5WFNSNVVUQVIvRnBCcnNIK3dLb3BQbDExa2lD?=
+ =?utf-8?B?UVNpcmFXeVV6UkNTYXkrY2hIWklMK3ltOEwxYXRlS3FETGg1Y2hOZ29ocG10?=
+ =?utf-8?B?Tlk5NThzRzlPKy9WMW1VU2g1QXhIcFZSNzdZNW1zTWoxSHpXUjBoc1ZjZ2RE?=
+ =?utf-8?B?NEc0ZE1INHhwYUwyS3UyL0RPNTcxUXVlSS95U1hqZFZERWpISWYxeGtOMUcv?=
+ =?utf-8?B?UlFpbVIwQWkvajYybzllMGdTVS9Nd0hOMXc2cjkrb0hiU0dQTzB4K1M2V0kr?=
+ =?utf-8?B?RW4reFBoZDROYnJSZVIraThkMXkxWTg0ZVFUSW83eFV6c3pJdkV4dzVRM1l6?=
+ =?utf-8?B?YUVDd2hDL0E0ZElCYjJmUjhLbmQ2Z0RGWHRPZGJmdEE3aFgwOHZ6SkdEN0FE?=
+ =?utf-8?B?Y0s4OUdLNnFLaEVXcnpTdXpoL281OW5uMWh6OEUxUGRxU0x0OWs3RU1uKy9t?=
+ =?utf-8?B?UFUrUSt2bmZOS3hWNVRXdzJrWUlPMFJuTWIvM2N5VTRPcVVsMHBSTDNQYnNX?=
+ =?utf-8?B?ZTZORHFreE1yMkF2NjBEWGtFMSs1TGRVdHd2RmU0anFrQzhLRTdIN0NjWjBM?=
+ =?utf-8?B?UVVneFdDV2ZnL2ZjbGFMa254S0xnbmY0elZ2dy9iVUlIZURFeHlJN0xmYXFG?=
+ =?utf-8?B?TkVCOVdVQ0RUS3QwMFE3blJpQnJGWEg5cFo5WHI0Z3VtZ2VuMTZ4RlBYcWNi?=
+ =?utf-8?B?eVJVTkZ0K1N1WWhvZFR0NStFd1o2TkpvRlI0MVFlMEh1dW8wMHpmYUdTQXJs?=
+ =?utf-8?B?V1JrUUltaSthcW8vRHRyYzF1d2JncXhDRUNuK1FaV3RqZVpzQzUwOHZITXAv?=
+ =?utf-8?B?Q0U2K1cybkFWOHlRN3dQWmRVZnRSUVJRdVpWTnpjc0JmbEFHVlE1NFRIL3JC?=
+ =?utf-8?Q?Z5iYS3yBG43xavcByVJiVfx0mvXARcOvMDN12Qjnex5Y?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <352C643175D7E64982CE92896DCCAB58@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 333c4bcd-7210-4684-de41-08dc542d4b0b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2024 22:27:48.8651
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Rufnpvlr+8536TfE1m21ogXJ/Z8A3shDC6nTfIs+SeoXtalGMPbL9l9QDKbndNZSQh3HnC/7f5pdfAzLov0gAw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6684
 
-There is an algorithm in the block layer for maintaining fairness
-across queues that share a tag set. The sbitmap implementation has
-improved so much that we don't need the block layer fairness algorithm
-anymore and that we can rely on the sbitmap implementation to guarantee
-fairness.
-
-On my test setup (x86 VM with 72 CPU cores) this patch results in 2.9% mo=
-re
-IOPS. IOPS have been measured as follows:
-
-$ modprobe null_blk nr_devices=3D1 completion_nsec=3D0
-$ fio --bs=3D4096 --disable_clat=3D1 --disable_slat=3D1 --group_reporting=
-=3D1 \
-      --gtod_reduce=3D1 --invalidate=3D1 --ioengine=3Dpsync --ioscheduler=
-=3Dnone \
-      --norandommap --runtime=3D60 --rw=3Drandread --thread --time_based=3D=
-1 \
-      --buffered=3D0 --numjobs=3D64 --name=3D/dev/nullb0 --filename=3D/de=
-v/nullb0
-
-It has been verified as follows that all request queues that share a tag
-set process I/O even if the completion times are different:
-- Create a first request queue with completion time 1 ms and queue
-  depth 64.
-- Create a second request queue with completion time 100 ms and that
-  shares the tag set of the first request queue.
-- Submit I/O to both request queues with fio.
-
-Tests have shown that the IOPS for this test case are 29859 and 318 or a
-ratio of about 94. This ratio is close to the completion time ratio.
-While this is unfair, both request queues make progress at a consistent
-pace.
-
-This patch removes the following code and structure members:
-- The function hctx_may_queue().
-- blk_mq_hw_ctx.nr_active and request_queue.nr_active_requests_shared_tag=
-s
-  and also all the code that modifies these two member variables.
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Yu Kuai <yukuai3@huawei.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-core.c       |   2 -
- block/blk-mq-debugfs.c |  22 ++++++++-
- block/blk-mq-tag.c     |   4 --
- block/blk-mq.c         |  17 +------
- block/blk-mq.h         | 100 -----------------------------------------
- include/linux/blk-mq.h |   6 ---
- include/linux/blkdev.h |   2 -
- 7 files changed, 22 insertions(+), 131 deletions(-)
-
-
-Changes compared to v3: removed a "Fixes:" tag that got added accidentall=
-y.
-Changes compared to v2: improved patch description.
-Changes compared to v1: improved the debugfs code.
-
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a16b5abdbbf5..57dfa4612b43 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -425,8 +425,6 @@ struct request_queue *blk_alloc_queue(struct queue_li=
-mits *lim, int node_id)
-=20
- 	q->node =3D node_id;
-=20
--	atomic_set(&q->nr_active_requests_shared_tags, 0);
--
- 	timer_setup(&q->timeout, blk_rq_timed_out_timer, 0);
- 	INIT_WORK(&q->timeout_work, blk_timeout_work);
- 	INIT_LIST_HEAD(&q->icq_list);
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 94668e72ab09..8e0c7774d6ec 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -479,11 +479,31 @@ static int hctx_sched_tags_bitmap_show(void *data, =
-struct seq_file *m)
- 	return res;
- }
-=20
-+struct count_active_params {
-+	struct blk_mq_hw_ctx	*hctx;
-+	int			*active;
-+};
-+
-+static bool hctx_count_active(struct request *rq, void *data)
-+{
-+	const struct count_active_params *params =3D data;
-+
-+	if (rq->mq_hctx =3D=3D params->hctx)
-+		(*params->active)++;
-+
-+	return true;
-+}
-+
- static int hctx_active_show(void *data, struct seq_file *m)
- {
- 	struct blk_mq_hw_ctx *hctx =3D data;
-+	int active =3D 0;
-+	struct count_active_params params =3D { .hctx =3D hctx, .active =3D &ac=
-tive };
-+
-+	blk_mq_all_tag_iter(hctx->sched_tags ?: hctx->tags, hctx_count_active,
-+			    &params);
-=20
--	seq_printf(m, "%d\n", __blk_mq_active_requests(hctx));
-+	seq_printf(m, "%d\n", active);
- 	return 0;
- }
-=20
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index cc57e2dd9a0b..25334bfcabf8 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -105,10 +105,6 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- 			    struct sbitmap_queue *bt)
- {
--	if (!data->q->elevator && !(data->flags & BLK_MQ_REQ_RESERVED) &&
--			!hctx_may_queue(data->hctx, bt))
--		return BLK_MQ_NO_TAG;
--
- 	if (data->shallow_depth)
- 		return sbitmap_queue_get_shallow(bt, data->shallow_depth);
- 	else
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b8dbfed8b28b..34060d885c5a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -425,8 +425,6 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_dat=
-a *data)
- 		rq_list_add(data->cached_rq, rq);
- 		nr++;
- 	}
--	if (!(data->rq_flags & RQF_SCHED_TAGS))
--		blk_mq_add_active_requests(data->hctx, nr);
- 	/* caller already holds a reference, add for remainder */
- 	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
- 	data->nr_tags -=3D nr;
-@@ -511,8 +509,6 @@ static struct request *__blk_mq_alloc_requests(struct=
- blk_mq_alloc_data *data)
- 		goto retry;
- 	}
-=20
--	if (!(data->rq_flags & RQF_SCHED_TAGS))
--		blk_mq_inc_active_requests(data->hctx);
- 	rq =3D blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag);
- 	blk_mq_rq_time_init(rq, alloc_time_ns);
- 	return rq;
-@@ -672,8 +668,6 @@ struct request *blk_mq_alloc_request_hctx(struct requ=
-est_queue *q,
- 	tag =3D blk_mq_get_tag(&data);
- 	if (tag =3D=3D BLK_MQ_NO_TAG)
- 		goto out_queue_exit;
--	if (!(data.rq_flags & RQF_SCHED_TAGS))
--		blk_mq_inc_active_requests(data.hctx);
- 	rq =3D blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag);
- 	blk_mq_rq_time_init(rq, alloc_time_ns);
- 	rq->__data_len =3D 0;
-@@ -713,10 +707,8 @@ static void __blk_mq_free_request(struct request *rq=
-)
- 	blk_pm_mark_last_busy(rq);
- 	rq->mq_hctx =3D NULL;
-=20
--	if (rq->tag !=3D BLK_MQ_NO_TAG) {
--		blk_mq_dec_active_requests(hctx);
-+	if (rq->tag !=3D BLK_MQ_NO_TAG)
- 		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
--	}
- 	if (sched_tag !=3D BLK_MQ_NO_TAG)
- 		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
- 	blk_mq_sched_restart(hctx);
-@@ -1065,8 +1057,6 @@ static inline void blk_mq_flush_tag_batch(struct bl=
-k_mq_hw_ctx *hctx,
- {
- 	struct request_queue *q =3D hctx->queue;
-=20
--	blk_mq_sub_active_requests(hctx, nr_tags);
--
- 	blk_mq_put_tags(hctx->tags, tag_array, nr_tags);
- 	percpu_ref_put_many(&q->q_usage_counter, nr_tags);
- }
-@@ -1761,9 +1751,6 @@ bool __blk_mq_alloc_driver_tag(struct request *rq)
- 	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) =
-{
- 		bt =3D &rq->mq_hctx->tags->breserved_tags;
- 		tag_offset =3D 0;
--	} else {
--		if (!hctx_may_queue(rq->mq_hctx, bt))
--			return false;
- 	}
-=20
- 	tag =3D __sbitmap_queue_get(bt);
-@@ -1771,7 +1758,6 @@ bool __blk_mq_alloc_driver_tag(struct request *rq)
- 		return false;
-=20
- 	rq->tag =3D tag + tag_offset;
--	blk_mq_inc_active_requests(rq->mq_hctx);
- 	return true;
- }
-=20
-@@ -3729,7 +3715,6 @@ blk_mq_alloc_hctx(struct request_queue *q, struct b=
-lk_mq_tag_set *set,
- 	if (!zalloc_cpumask_var_node(&hctx->cpumask, gfp, node))
- 		goto free_hctx;
-=20
--	atomic_set(&hctx->nr_active, 0);
- 	if (node =3D=3D NUMA_NO_NODE)
- 		node =3D set->numa_node;
- 	hctx->numa_node =3D node;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index f75a9ecfebde..ac29a30e4322 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -271,70 +271,9 @@ static inline int blk_mq_get_rq_budget_token(struct =
-request *rq)
- 	return -1;
- }
-=20
--static inline void __blk_mq_add_active_requests(struct blk_mq_hw_ctx *hc=
-tx,
--						int val)
--{
--	if (blk_mq_is_shared_tags(hctx->flags))
--		atomic_add(val, &hctx->queue->nr_active_requests_shared_tags);
--	else
--		atomic_add(val, &hctx->nr_active);
--}
--
--static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hc=
-tx)
--{
--	__blk_mq_add_active_requests(hctx, 1);
--}
--
--static inline void __blk_mq_sub_active_requests(struct blk_mq_hw_ctx *hc=
-tx,
--		int val)
--{
--	if (blk_mq_is_shared_tags(hctx->flags))
--		atomic_sub(val, &hctx->queue->nr_active_requests_shared_tags);
--	else
--		atomic_sub(val, &hctx->nr_active);
--}
--
--static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hc=
-tx)
--{
--	__blk_mq_sub_active_requests(hctx, 1);
--}
--
--static inline void blk_mq_add_active_requests(struct blk_mq_hw_ctx *hctx=
-,
--					      int val)
--{
--	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
--		__blk_mq_add_active_requests(hctx, val);
--}
--
--static inline void blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx=
-)
--{
--	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
--		__blk_mq_inc_active_requests(hctx);
--}
--
--static inline void blk_mq_sub_active_requests(struct blk_mq_hw_ctx *hctx=
-,
--					      int val)
--{
--	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
--		__blk_mq_sub_active_requests(hctx, val);
--}
--
--static inline void blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx=
-)
--{
--	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
--		__blk_mq_dec_active_requests(hctx);
--}
--
--static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
--{
--	if (blk_mq_is_shared_tags(hctx->flags))
--		return atomic_read(&hctx->queue->nr_active_requests_shared_tags);
--	return atomic_read(&hctx->nr_active);
--}
- static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
- 					   struct request *rq)
- {
--	blk_mq_dec_active_requests(hctx);
- 	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
- 	rq->tag =3D BLK_MQ_NO_TAG;
- }
-@@ -407,45 +346,6 @@ static inline void blk_mq_free_requests(struct list_=
-head *list)
- 	}
- }
-=20
--/*
-- * For shared tag users, we track the number of currently active users
-- * and attempt to provide a fair share of the tag depth for each of them=
-.
-- */
--static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
--				  struct sbitmap_queue *bt)
--{
--	unsigned int depth, users;
--
--	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
--		return true;
--
--	/*
--	 * Don't try dividing an ant
--	 */
--	if (bt->sb.depth =3D=3D 1)
--		return true;
--
--	if (blk_mq_is_shared_tags(hctx->flags)) {
--		struct request_queue *q =3D hctx->queue;
--
--		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
--			return true;
--	} else {
--		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
--			return true;
--	}
--
--	users =3D READ_ONCE(hctx->tags->active_queues);
--	if (!users)
--		return true;
--
--	/*
--	 * Allow at least some tags
--	 */
--	depth =3D max((bt->sb.depth + users - 1) / users, 4U);
--	return __blk_mq_active_requests(hctx) < depth;
--}
--
- /* run the code block in @dispatch_ops with rcu/srcu read lock held */
- #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
- do {								\
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d3d8fd8e229b..a066ea77148f 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -398,12 +398,6 @@ struct blk_mq_hw_ctx {
- 	/** @queue_num: Index of this hardware queue. */
- 	unsigned int		queue_num;
-=20
--	/**
--	 * @nr_active: Number of active requests. Only used when a tag set is
--	 * shared across request queues.
--	 */
--	atomic_t		nr_active;
--
- 	/** @cpuhp_online: List to store request if CPU is going to die */
- 	struct hlist_node	cpuhp_online;
- 	/** @cpuhp_dead: List to store request if some CPU die. */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c3e8f7cf96be..ed1e807f42a2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -445,8 +445,6 @@ struct request_queue {
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
-=20
--	atomic_t		nr_active_requests_shared_tags;
--
- 	unsigned int		required_elevator_features;
-=20
- 	struct blk_mq_tags	*sched_shared_tags;
+U2hpbmljaGlyby9EYW5pZWwsDQoNCk9uIDQvMy8yNCAwMjowMCwgRGFuaWVsIFdhZ25lciB3cm90
+ZToNCj4gSGkgU2hpbmljaGlybywNCj4NCj4gT24gV2VkLCBBcHIgMDMsIDIwMjQgYXQgMDQ6NTQ6
+MjhBTSArMDAwMCwgU2hpbmljaGlybyBLYXdhc2FraSB3cm90ZToNCj4+IE9uIHRoZSBvdGhlciBo
+YW5kLCBJIHNlZSB0aGF0IHRoZSBzZXJpZXMgaGFzIGEgY291cGxlIG9mIGRyYXdiYWNrczoNCj4+
+DQo+PiAxKSBXaGVuIGJsa3Rlc3RzIHVzZXJzIHJ1biB3aXRoIHRoZSBkZWZhdWx0IGtub2Igb25s
+eSwgdGhlIHRlc3QgY292ZXJhZ2Ugd2lsbCBiZQ0KPj4gICAgIHNtYWxsZXIuIFRvIGtlZXAgdGhl
+IGN1cnJlbnQgdGVzdCBjb3ZlcmFnZSwgdGhlIHVzZXJzIG5lZWQgdG8gcnVuIHRoZSBjaGVjaw0K
+Pj4gICAgIHNjcmlwdCB0d2ljZTogbnZtZXRfYmxrZGV2X3R5cGU9ZmlsZSBhbmQgbnZtZXRfYmxr
+ZGV2X3R5cGU9ZGV2aWNlLiBTb21lIHVzZXJzDQo+PiAgICAgbWF5IG5vdCBkbyBpdCBhbmQgbG9z
+ZSB0aGUgdGVzdCBjb3ZlcmFnZS4gQW5kIHNvbWUgdXNlcnMsIGUuZy4sIENLSSBwcm9qZWN0LA0K
+Pj4gICAgIG5lZWQgdG8gYWRqdXN0IHRoZWlyIHNjcmlwdCBmb3IgdGhpcyBjaGFuZ2UuDQoNCnJl
+ZHVjaW5nIGNvZGUgaXMgYWx3YXlzIGVuY291cmFnZWQsIGJ1dCBwbGVhc2UgZG9uJ3QgY2hhbmdl
+IHRoZSB0ZXN0IA0KY292ZXJhZ2UgYW5kDQptYWtlIHVzZXIgYWRkIGFkZGl0aW9uYWwgc3RlcHMg
+dG8gcnVuIHRoZSB0ZXN0cywgSU9XIC4vY2hlY2sgbnZtZSBzaG91bGQgDQpydW4gYWxsDQp0aGUg
+dGVzdHMgY2FzZSBieSBkZWZhdWx0IGFzIGl0IGRvc2UgdG9kYXksIHRoaXMgd2lsbCBrZWVwIHlv
+dXIgY2hhbmdlcyANCmJhY2t3YXJkDQpjb21wYXRpYmxlIC4uDQoNCkkgYmVsaWV2ZSB0aGF0IGlz
+IG5vdCB0b28gaGFyZCB0byBhY2hpZXZlID8NCg0KLWNrDQoNCg0K
