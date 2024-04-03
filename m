@@ -1,170 +1,173 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3265153BED
-	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 19:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95983524DC;
+	Wed,  3 Apr 2024 19:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712172501; cv=none; b=rz0VFNzO4T9Z26pZbeJBN55c76HUK9hWCr/ofURVozkoyYFXGkcfuaP/TT/t6N0zgCXlKrmrVpISxmnh6RsF2HDn0TBT36lQZ7UU9aAltTN0BY3L8+Rs0xEhRiuh12JDHZ/OTk81/U6IXSZTiBa+a8HxlpeGwg9nRtqKj04yV20=
+	t=1712173074; cv=none; b=oIhomqI3guofSDFqhCfWShSNAcvk/6UMczAiLR/OihQgCLb82vLO/4s6bIwrxI596mBixNIIzMHAjw4nvIMRjMp+4xhAABFCGtJij9mKaB0wt3EoKcXKfBp1aZmM+neggbKse6ugEOQUMGU8KwdTsO4wVRQ9Q1LA+2Al3j2SFts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712172501; c=relaxed/simple;
-	bh=OwALeF5nmzCNK8ItJ0qnf5QvnZqP/OUnt88OHcvEQWM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ODOMtnwg1dyn4Pm9QWpwemWNxR1dLtRiyeeQow3degoCD41OF+w4UYkov9Qjdpf7ioIfWtanpmvlp2xh94dmE/QkuSlcUTJzIjkKMraibqwnc02ASWuK+02qkQb8krG+kAGyG07xhrS83o/bVFGXnWYzBpZ5VW2MWKpEzP27Mk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZqKks3rL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712173074; c=relaxed/simple;
+	bh=dXEOpxiE2RCJ9FBYM438Z1FVC+BmQcHQgxYhuc5OAqM=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rMrWqSuapPKQpJPaXvLSU5IVw7MuDLDmZ7ls65pMN5H9Rtt0UY5/4weA0D61c9cBQ6QH022jMI2h03CaVZ7jbbTCnqrfOeWNN+40bvkeMdQArjTJZNYc71DrTALPzoC/NH/tei/DyfVvADF6IgRQ+7Vd4IvQpwFm48BU95ceiVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=eRTf/YaV; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZqKks3rL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712172498;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l8IjLsOFjETxQxIF6yNyiEpLyzn4wdWa1ib2f+sE/pY=;
-	b=ZqKks3rLMWL9FdCjOSrkSGqDufkuOXFTPAZpKppBR8uxOACQJZ223tyhf7zNy3BbcrIusi
-	BWpWu0eN3akvKpej2vrZS9JJh9dPgtXI79v/CCYEnMJjnuNT1ueZQZCD6dc0W9jayJuJ9w
-	+fK2VX3ozASb+vik8xHgM9MEnFRujIk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-247-Ng9pcfDpMWumDdRch7iYhg-1; Wed,
- 03 Apr 2024 15:28:16 -0400
-X-MC-Unique: Ng9pcfDpMWumDdRch7iYhg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7D413800086;
-	Wed,  3 Apr 2024 19:28:15 +0000 (UTC)
-Received: from redhat.com (unknown [10.2.16.181])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BDC22024517;
-	Wed,  3 Apr 2024 19:28:13 +0000 (UTC)
-Date: Wed, 3 Apr 2024 14:28:07 -0500
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alasdair Kergon <agk@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
-	David Teigland <teigland@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Joe Thornber <ejt@redhat.com>
-Subject: Re: [RFC 4/9] dm: add llseek(SEEK_HOLE/SEEK_DATA) support
-Message-ID: <usjvvltfh6lk4ummqh3qyvd4gp3vzbmclvbcp2zqjhdwrswv7f@mmjwmfoyavxg>
-References: <20240328203910.2370087-1-stefanha@redhat.com>
- <20240328203910.2370087-5-stefanha@redhat.com>
- <6awt5gq36kzwhuobabtye5vhnexc6cufuamy4frymehuv57ky5@esel3f5naqyu>
- <20240403141147.GD2524049@fedora>
- <mi3yp4kel6junjk2corv4hi56s56pmwilnm2bb4gg2tbbvyq2n@zmzaqpdq2rlq>
- <20240403175838.GB2534900@fedora>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="eRTf/YaV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1712173069; x=1712432269;
+	bh=vLw1EUqqXu0E0eV8EO0iY5ZyKumQlE4AJba1Jz1x2ok=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=eRTf/YaVgrIkJNR0WTMp4U/nw7/iMQrP+XEuzQm95Y6Cbc0k5V8oyCBAXcj0uwPg2
+	 JrZ2mrYoc8XBDwj9LyX3Ovhz9XVubhjCTrQZBXMMrPrLG+hOSxKqjBYODcxhwtBks6
+	 PFCf3LWUNfdeWlv4+xxO0GZdsC6Zev7ge0xZZBzk5D+kYVjRx05iXRU4HGd1h/1RH0
+	 qZ+Oa2anQp9jKemSCTS8RtOZ7JnZVVH0aZjGVsKHXBu+XEI9ytSajehXXIv+9SQhIq
+	 Dy5WlMhBwmmY5/UlVzj+p0gRP5nmF0uRI0Jky7TMOrrNnshpAg6+mqEe1tJ5+E3jgT
+	 nb7KeDofat4RQ==
+Date: Wed, 03 Apr 2024 19:37:44 +0000
+To: Andreas Hindborg <nmi@metaspace.dk>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
+	<da.gomez@samsung.com>, open list <linux-kernel@vger.kernel.org>, "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+Message-ID: <f405ff55-fcb0-4592-ae4b-e1188eae9953@proton.me>
+In-Reply-To: <87v84ysujo.fsf@metaspace.dk>
+References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me> <871q7o54el.fsf@metaspace.dk> <7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me> <87v84ysujo.fsf@metaspace.dk>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240403175838.GB2534900@fedora>
-User-Agent: NeoMutt/20240201
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 03, 2024 at 01:58:38PM -0400, Stefan Hajnoczi wrote:
-> > Yes, we want to ensure that:
-> > 
-> > off1 = lseek(fd, -1, SEEK_END);
-> > off2 = off1 + 1; // == lseek(fd, 0, SEEK_END)
-> > 
-> > if off1 belongs to a data extent:
-> >   - lseek(fd, off1, SEEK_DATA) == off1
-> >   - lseek(fd, off1, SEEK_HOLE) == off2
-> >   - lseek(fd, off2, SEEK_DATA) == -ENXIO
-> >   - lseek(fd, off2, SEEK_HOLE) == -ENXIO
-> 
-> Agreed.
-> 
-> > if off1 belongs to a hole:
-> >   - lseek(fd, off1, SEEK_DATA) == -ENXIO
-> >   - lseek(fd, off1, SEEK_HOLE) == off1
-> >   - lseek(fd, off2, SEEK_DATA) == -ENXIO
-> >   - lseek(fd, off2, SEEK_HOLE) == -ENXIO
-> 
-> Agreed.
-> 
-...
-> > 
-> > That is, we can never pass in off2 (beyond the bounds of the table),
-> > and when passing in off1, I think this interface may be easier to work
-> > with in the intermediate layers, even though it differs from the
-> > lseek() interface above.  For off1 in data:
-> >   - dm_blk_do_seek_hole_data(dm, off1, SEEK_DATA) == off1
-> >   - dm_blk_do_seek_hole_data(dm, off1, SEEK_HOLE) == off2
-> > and for a hole:
-> >   - dm_blk_do_seek_hole_data(dm, off1, SEEK_DATA) == off2
-> >   - dm_blk_do_seek_hole_data(dm, off1, SEEK_HOLE) == off1
->
+On 03.04.24 10:46, Andreas Hindborg wrote:
+> Benno Lossin <benno.lossin@proton.me> writes:
+>=20
+>> On 23.03.24 07:32, Andreas Hindborg wrote:
+>>> Benno Lossin <benno.lossin@proton.me> writes:
+>>>> On 3/13/24 12:05, Andreas Hindborg wrote:
+>>>>> +//! implementations of the `Operations` trait.
+>>>>> +//!
+>>>>> +//! IO requests are passed to the driver as [`Request`] references. =
+The
+>>>>> +//! `Request` type is a wrapper around the C `struct request`. The d=
+river must
+>>>>> +//! mark start of request processing by calling [`Request::start`] a=
+nd end of
+>>>>> +//! processing by calling one of the [`Request::end`], methods. Fail=
+ure to do so
+>>>>> +//! can lead to IO failures.
+>>>>
+>>>> I am unfamiliar with this, what are "IO failures"?
+>>>> Do you think that it might be better to change the API to use a
+>>>> callback? So instead of calling start and end, you would do
+>>>>
+>>>>        request.handle(|req| {
+>>>>            // do the stuff that would be done between start and end
+>>>>        });
+>>>>
+>>>> I took a quick look at the rnull driver and there you are calling
+>>>> `Request::end_ok` from a different function. So my suggestion might no=
+t
+>>>> be possible, since you really need the freedom.
+>>>>
+>>>> Do you think that a guard approach might work better? ie `start` retur=
+ns
+>>>> a guard that when dropped will call `end` and you need the guard to
+>>>> operate on the request.
+>>>
+>>> I don't think that would fit, since the driver might not complete the
+>>> request immediately. We might be able to call `start` on behalf of the
+>>> driver.
+>>>
+>>> At any rate, since the request is reference counted now, we can
+>>> automatically fail a request when the last reference is dropped and it
+>>> was not marked successfully completed. I would need to measure the
+>>> performance implications of such a feature.
+>>
+>> Are there cases where you still need access to the request after you
+>> have called `end`?
+>=20
+> In general no, there is no need to handle the request after calling end.
+> C drivers are not allowed to, because this transfers ownership of the
+> request back to the block layer. This patch series defer the transfer of
+> ownership to the point when the ARef<Request> refcount goes to zero, so
+> there should be no danger associated with touching the `Request` after
+> end.
+>=20
+>> If no, I think it would be better for the request to
+>> be consumed by the `end` function.
+>> This is a bit difficult with `ARef`, since the user can just clone it
+>> though... Do you think that it might be necessary to clone requests?
+>=20
+> Looking into the details now I see that calling `Request::end` more than
+> once will trigger UAF, because C code decrements the refcount on the
+> request. When we have `ARef<Request>` around, that is a problem. It
+> probably also messes with other things in C land. Good catch.
+>=20
+> I did implement `Request::end` to consume the request at one point
+> before I fell back on reference counting. It works fine for simple
+> drivers. However, most drivers will need to use the block layer tag set
+> service, that allows conversion of an integer id to a request pointer.
+> The abstraction for this feature is not part of this patch set. But the
+> block layer manages a mapping of integer to request mapping, and drivers
+> typically use this to identify the request that corresponds to
+> completion messages that arrive from hardware. When drivers are able to
+> turn integers into requests like this, consuming the request in the call
+> to `end` makes little sense (because we can just construct more).
 
-In the caller, we already need to know both off1 and off2 (that is,
-the offset we are asking about, AND the offset at which the underlying
-component ends its map at, since that is where we are then in charge
-of whether to concatenate that with the next component or give the
-overall result).
+How do you ensure that this is fine?:
 
-If we already guarantee that we never call into a lower layer with
-off2 (because it was beyond bounds), then the only difference between
-the two semantics is whether SEEK_DATA in a final hole returns -ENXIO
-or off2; and it looks like we can do a conversion from either style
-into the other.
+     let r1 =3D tagset.get(0);
+     let r2 =3D tagset.get(0);
+     r1.end_ok();
+     r2.do_something_that_would_only_be_done_while_active();
 
-So designing the caller logic, it looks like I would want:
+One thing that comes to my mind would be to only give out `&Request`
+from the tag set. And to destroy, you could have a separate operation
+that also removes the request from the tag set. (I am thinking of a tag
+set as a `HashMap<u64, Request>`.
 
-if off1 >= EOF return -ENXIO (out of bounds)
+>=20
+> What I do now is issue the an `Option<ARef<Request>>` with
+> `bindings::req_ref_inc_not_zero(rq_ptr)`, to make sure that the request
+> is currently owned by the driver.
+>=20
+> I guess we can check the absolute value of the refcount, and only issue
+> a request handle if the count matches what we expect. Then we can be cert=
+ain
+> that the handle is unique, and we can require transfer of ownership of
+> the handle to `Request::end` to make sure it can never be called more
+> than once.
+>=20
+> Another option is to error out in `Request::end` if the
+> refcount is not what we expect.
 
-while off1 < EOF:
+I am a bit confused, why does the refcount matter in this case? Can't
+the user just have multiple `ARef`s?
 
-  determine off2 of current lower region
-  at this point, we are guaranteed off1 < off2
-  we also know that off2 < EOF unless we are on last lower region
-  call result=lower_layer(off1, SEEK_X)
-  it is a bug if result is non-negative but < off1, or if result > off2
+I think it would be weird to use `ARef<Request>` if you expect the
+refcount to be 1. Maybe the API should be different?
+As I understand it, a request has the following life cycle (please
+correct me if I am wrong):
+1. A new request is created, it is given to the driver via `queue_rq`.
+2. The driver can now decide what to do with it (theoretically it can
+    store it somewhere and later do something with it), but it should at
+    some point call `Request::start`.
+3. Work happens and eventually the driver calls `Request::end`.
 
-  if result == off1, return result (we are already in the right HOLE
-  or DATA)
+To me this does not seem like something where we need a refcount (we
+still might need one for safety, but it does not need to be exposed to
+the user).
 
-  if result > off1 and < off2, return result (we had to advance to get
-  to the right region, but the right region was within the lower
-  layer, and we don't need to inspect further layers)
-
-  Note - the above two paragraphs can be collapsed into one: if result
-  < off2, return result (the current subregion gave us an adequate
-  answer)
-
-  if result == off2, continue to the next region with off1=result (in
-  first semantics, this is only possible for SEEK_HOLE for a lower
-  region ending in data; in the second semantics, it is possible for
-  either SEEK_HOLE or SEEK_DATA for a lower region ending in the type
-  opposite of the request)
-
-  if result == -ENXIO, continue to the next region by using off1=off2
-  (only possible in the first semantics for SEEK_DATA on a lower
-  region ending in a hole)
-
-  any other result is necessarily a negative errno like -EIO; return it
-
-if the loop completes without an early return, we are out of lower
-regions, and we should be left with off1 == EOF.  Because we advanced,
-we know now to:
-return whence == SEEK_HOLE ? off1 : -ENXIO
-
-> I'll take a look again starting from block/fops.c, through dm.c, and
-> into dm-linear.c to see how to make things clearest. Although I would
-> like to have the same semantics for every seek function, maybe in the
-> end your suggestion will make the code clearer. Let's see.
-
-Keeping lseek semantics may require a couple more lines of code
-duplicated at each layer, but less maintainer headaches in the long
-run of converting between slightly different semantics depending on
-which layer you are at.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.
-Virtualization:  qemu.org | libguestfs.org
+--=20
+Cheers,
+Benno
 
