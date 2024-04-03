@@ -1,121 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9852210A0D;
-	Wed,  3 Apr 2024 01:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E33CD29B;
+	Wed,  3 Apr 2024 01:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712106155; cv=none; b=vBZQAeH8ow2zT3Hpak9WzYcCHpKlX4v/VbvvPIIcIEiT8QlLAVQtmIpUkt+D7MOk7smVc2su3VjD0ZNPPQHWESo1GmL22QyxRi3nL9LHj2dGPQgfpUgS0aSWu2NhVdaeVoZCUIh6Tya6woUPQgea057eujqaZ5v+8sp4DAvQKhA=
+	t=1712107723; cv=none; b=AmfB5rhLOufPIR3Fkw4crDcZ3JecnKI66oACdynyaAsn2zjKuffz9/FkAalDvffSOkDQBhBS0yPGDgjFfBHehga2uD6ni7gpsskk/33CNqdXr/W0HVJ4L460Fn7iiTrM737WMIFF8UBwhflnrR/cAezUtxvBof7GUXefwECt2SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712106155; c=relaxed/simple;
-	bh=kzgwLdsL4OudUwPrRRSPRtFvw3mEHVc9aO/Nux6tJOs=;
+	s=arc-20240116; t=1712107723; c=relaxed/simple;
+	bh=g7L/dsjT2ViXz/CbUqBPecXOmedIMkcOlsCJD1zHtJg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R6Zxpq97ErgTiP+Klh2RxD+iXIOYrnl5iGnafno5fv2DX2bWq2cpvES44yKq8HqpwslAdFV3pWX1FbsG6Yghe2FuCm9rFOnrnqg+aIUjuGdSrTimmmv2WlW4taNVB3KEzouBdoviBHzuASoR9Di1T+xVEMFo0B5SPl9qThGRmPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/WsTKmG; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/WsTKmG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A71CEC433C7;
-	Wed,  3 Apr 2024 01:02:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712106155;
-	bh=kzgwLdsL4OudUwPrRRSPRtFvw3mEHVc9aO/Nux6tJOs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=j/WsTKmGI70YaCEBXfrg3yAAQyr/QbNeES4W3bPqzfs9wnji+dRQOlTQD4J9k7sRY
-	 nwlo+vB34Za3Oo5kUbWjbf8xQGMBV8PlGB+2HQLqLQnuJlnWFjJH7UVFJRigzc+9BS
-	 zFtRiDHycscQNh6GCixrP5TOx/ezsYoLPxoYdi4MYfXf5OikeDpWNr2AO2WJzLMQak
-	 LXAC3824kBL9t6F/UcWVng3ePi1HK6RrbKEmVN8OpB3VbcxLjME1FPMtZnf4mOvjD4
-	 c9huh4rdbqqgwyl4EUlZDwfQfuZfEMpe6txECbCWhxO2/mQqqMHouksQ3V9qQetZYe
-	 rgBlfwhN8sO2A==
-Message-ID: <084cc8bd-bbc7-491f-b196-51ccd3d97620@kernel.org>
-Date: Wed, 3 Apr 2024 10:02:32 +0900
+	 In-Reply-To:Content-Type; b=Z3wPcCQ3fw19zcGfopsco/69iQldzw6ENdYCwbodqMDHDykKrVduem3uqC3A7N0jzTWXjfPKBg3tog8slzYh7nEAzWljaEeEpb6nP0md1tgA6mO7pW3q8pG9FcP3iW5/xqq3NP55uiDdSxARZm1w3468cr09xXGsM0sPK2Fgnwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4V8RwG4MvDz4f3kGH;
+	Wed,  3 Apr 2024 09:28:30 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 1F0B31A016E;
+	Wed,  3 Apr 2024 09:28:37 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP2 (Coremail) with SMTP id Syh0CgC32w7EsAxmy_tMJA--.49612S3;
+	Wed, 03 Apr 2024 09:28:36 +0800 (CST)
+Message-ID: <cd04226f-4fa8-4e43-70d0-b8707d50f4a3@huaweicloud.com>
+Date: Wed, 3 Apr 2024 09:28:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 07/28] block: Introduce zone write plugging
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>,
- linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>
-References: <20240402123907.512027-1-dlemoal@kernel.org>
- <20240402123907.512027-8-dlemoal@kernel.org> <20240402161213.GB3527@lst.de>
- <e923b1cf-9683-4029-8a39-c66aa8fb2647@kernel.org>
- <a68d7e70-d82f-4a09-8b9c-db5e902a3663@kernel.dk>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <a68d7e70-d82f-4a09-8b9c-db5e902a3663@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] block: fix overflow in blk_ioctl_discard()
+To: Christoph Hellwig <hch@lst.de>, linan666@huaweicloud.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+ houtao1@huawei.com, yangerkun@huawei.com
+References: <20240329012319.2034550-1-linan666@huaweicloud.com>
+ <20240402123245.GA30793@lst.de>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <20240402123245.GA30793@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgC32w7EsAxmy_tMJA--.49612S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY67AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvE
+	ncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I
+	8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0E
+	jII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I
+	8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AK
+	xVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcV
+	AFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8I
+	cIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
+	0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VU1c4S5UUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On 4/3/24 10:01, Jens Axboe wrote:
-> On 4/2/24 5:38 PM, Damien Le Moal wrote:
->> On 4/3/24 01:12, Christoph Hellwig wrote:
->>>> +static inline struct blk_zone_wplug *
->>>> +disk_lookup_zone_wplug(struct gendisk *disk, sector_t sector)
->>>> +{
->>>> +	unsigned int zno = disk_zone_no(disk, sector);
->>>> +	unsigned int idx = hash_32(zno, disk->zone_wplugs_hash_bits);
->>>> +	struct blk_zone_wplug *zwplug;
->>>> +
->>>> +	rcu_read_lock();
->>>> +	hlist_for_each_entry_rcu(zwplug, &disk->zone_wplugs_hash[idx], node) {
->>>> +		if (zwplug->zone_no == zno)
->>>> +			goto unlock;
->>>> +	}
->>>> +	zwplug = NULL;
->>>> +
->>>> +unlock:
->>>> +	rcu_read_unlock();
->>>> +	return zwplug;
->>>> +}
->>>
->>> Did we lose an atomic_inc_unless_zero here?  This now just does a lookup
->>> under RCU, but nothing to prevent the zwplug from beeing freed?
+
+
+在 2024/4/2 20:32, Christoph Hellwig 写道:
+> On Fri, Mar 29, 2024 at 09:23:19AM +0800, linan666@huaweicloud.com wrote:
+>> From: Li Nan <linan122@huawei.com>
 >>
->> Nope. When disk_lookup_zone_wplug() is called directly, it is always
->> for handling requests/bios which are holding a reference on the plug
->> and because there are requests/BIOs in-flight, the plug is marked as
->> busy (BLK_ZONE_WPLUG_PLUGGED or BLK_ZONE_WPLUG_ERROR are set). In such
->> state, the plug is always hashed given that
->> disk_should_remove_zone_wplug() retturns false for busy plugs. So
->> there is no reference increase here. The atomic_inc_not_zero() is in
->> disk_get_zone_wplug() which calls disk_lookup_zone_wplug() +
->> atomic_inc_not_zero() within an rcu_read_lock()/rcu_read_unlock()
->> section.
+>> There is no check for overflow of 'start + len' in blk_ioctl_discard().
+>> Hung task occurs if submit an discard ioctl with the following param:
+>>    start = 0x80000000000ff000, len = 0x8000000000fff000;
+>> Add the overflow validation now.
 > 
-> But doing a lookup under rcu, dropping it, and then returning the unit
-> without an increment is just a horrible pattern. Regardless of whether
-> it's safe or not. And as most callers do the atomic_inc anyway, some of
-> then outside rcu lock, this looks horrible buggy.
+> Looks good:
 > 
-> Please just unify it all and have it follow the idiomatic rcu lookup
-> pattern, which is:
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
-> rcu_read_lock();
-> item = lookup();
-> if (atomic_inc_not_zero(item->ref)) {
-> 	rcu_read_unlock();
-> 	return item;
-> }
+> Can you wire up a testcase in blktests for this condition?
 > 
-> rcu_read_unlock();
-> return NULL;
-> 
-> as that is well understood, and your code most certainly does not look
-> safe nor sane in that regard.
-> 
-> And probably kill that atomic_inc() helper you have as well while at it.
 
-OK.
+It's my pleasure, I will add testcase later.
 
 > 
+> .
 
 -- 
-Damien Le Moal
-Western Digital Research
+Thanks,
+Nan
 
