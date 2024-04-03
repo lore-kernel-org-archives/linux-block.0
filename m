@@ -1,79 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D021E1B950
-	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 03:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755351C280;
+	Wed,  3 Apr 2024 03:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712113678; cv=none; b=jJup04kSOrfyNU94dAlRLPbC7vkkIdKkQFYQiHQyIro15kmn/V5p60p82MsLMFaK+FZQO+xRFvrTZkqtpURICSpl7HCdVoSyb0fOQXRO3WCNemfbuJR/hfIUxYgmVmDb/LFlZ2pUX75aZ7sEg/oLYcwjSHvUCAnu8q4D+W73nf4=
+	t=1712116603; cv=none; b=WOlPEVkUSH1MmX97FOsuC8AN/T3uDZeIFDY2tsOMk//+mY4AzRKfyEpUPm0V8ni9/8zY5NPL4mnubusw6i7JNesc2KkZRh09c1wWNKhNhaZFtNCAkDLs/XDP+WWxnfbppiNR/qXaGuF22ChjlAy5VWnE6jljJ9d8dONibvhdSos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712113678; c=relaxed/simple;
-	bh=6KCuRKqfBSyUGD9wEHT51sa9m5PJxRwSYfOSb1tiW3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ucQotws0PgYamx2E+kbCV1apOY9zJok8JJLLV7Ku3inUojCrjlxxbPQge5BYwu6vSF0D1Cm7Gb+x/n/l7buyKiKLH8K8OeBnyCZS9UF8n2dd6JO55WEfckqgvit2afR2axWDZdLJW6bt1y5txU1Dw2UN0DGUVxrnSuoVijvUEWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mb0X0Vj+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712116603; c=relaxed/simple;
+	bh=YYCPVBA3375GF5Ph5qAHEvIAw0hfx7yA1qo6ZRkPtrM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=gWbmP6rzSpIsqKS+4xsUjB/18zi75zSlbiJHfLzfyk8uYMPjpmXokycYCjpNQ24Zb6RqEfQUma7Sr33tM8K13JEtfaQ4muS9jjRS30Up5JL+GhPipOntmLZJw71zekXH1/B5+ak8jrFnnbo2CM5vN1YQQ4Z+zZkMIPZvaqXRhdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pg/lxft2; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mb0X0Vj+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D8FC433C7;
-	Wed,  3 Apr 2024 03:07:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712113678;
-	bh=6KCuRKqfBSyUGD9wEHT51sa9m5PJxRwSYfOSb1tiW3E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Mb0X0Vj+U+f8ypJ33tvkOQomGTgWl9750eufi9XP6zXX6ANDmep652ynV7zUOvqzX
-	 5Dsvz3MDFO1PGF1BC+IjpR7DYg5KS14JfpY4K0UIpI793TjOnDCndRnxqgf+rfl4Pa
-	 wW3fjxu/mbwis+LqboxFJ1Q8fYaieQMX/dOeY+g89YAiBweyS5/oSue7Ik/YHEaQHw
-	 PJih4yS3uTLcLTaoHmgfKoP8vcFh02iEAasgWuz10O1xxDaGpR9uGVyWsklAsZh5c/
-	 Buc+py1iOZo0TifIBi67c19X7/OIpH2xZCrcK79mOros6gZyWGfETtYbjZq32L5iFy
-	 IDelnkdpztiAQ==
-Date: Tue, 2 Apr 2024 21:07:55 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Kamaljit Singh <Kamaljit.Singh1@wdc.com>
-Cc: Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@fb.com" <axboe@fb.com>, Gregory Joyce <gjoyce@ibm.com>,
-	Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [Bug Report] nvme-cli commands fails to open head disk node and
- print error
-Message-ID: <ZgzIC-9buT_UKaeW@kbusch-mbp.dhcp.thefacebook.com>
-References: <c0750d96-6bae-46b5-a1cc-2ff9d36eccb3@linux.ibm.com>
- <j37ytzci46pqr4n7juugxyykd3w6jlwegwhfduh6jlp3lgmud4@xhlvuquadge4>
- <BYAPR04MB415105995F0F45BFCFE48FEBBC3E2@BYAPR04MB4151.namprd04.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pg/lxft2"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5e4613f2b56so4313245a12.1;
+        Tue, 02 Apr 2024 20:56:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712116601; x=1712721401; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:cc:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fugzhJcIxXGAO0ssTnR0bYZbKaxEwSQa+2J5+v83xpo=;
+        b=Pg/lxft2SE4VQOVfWwAujBP9fUHZSc3I4lGUOGZ2724giISNejJ8NoGsU4qDb4h3Wd
+         1L+kLXQ4M9uvg026+Fe8TuA9C6kEZfYg5Txgzk4urh7AKY5Ay9jhJ1/tdLnWEjZWX1W0
+         Gqt1VCRJ9WBTSOzubTNSMSOkZr9+oVEnsSPLx2+w+LaUEOhf/6zz4Z0zc7VxHfU3jZZ9
+         25bLBdUv/SRbScFKgGepacfD10qhRr+PB4ce2YfttwXOPu3PNxSolXmiWNC9VVx/cvWC
+         aiUzB0RqkEpzs6AY3XdvjPtoM6NyP2yb/DB6adITFwt0P1VNhYkET80SPpAdmxFWBQsT
+         kdBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712116601; x=1712721401;
+        h=content-transfer-encoding:in-reply-to:cc:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fugzhJcIxXGAO0ssTnR0bYZbKaxEwSQa+2J5+v83xpo=;
+        b=G/fjPNRKFttz8eTzCDDMJqx1HZQX8umRB2no/puTMx3649TnzKBEt6x1YFR1OrgtVg
+         sUATc8mFx82rEKu3vPh6E5MYzWA747Yb/hy2thbZbBNVt/kU/9UgHt7nYfRy3AwNwlEl
+         Qmd4JzdkooT7mVXeR/vQ2hFpLmpe596Y8kh8MIsdD6FNWgb9NKGZjU+ohlGwGw7r34Lj
+         KHj9vxidvuMqbUyrQZnLmwzJiHID0eevll7U0lpAonZ3pRlpSTTCsWf/BeKUPvzO4yM3
+         hao2HlU1D4Px+Sy3dOicOOO6xA9qqbvMwBGRhDAU7X/iMC0SbYw6THmLR5/Xyatj2833
+         I/ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwV4iGrVJEtvNNFLqOymabOBma0XtQyq+rrw1W8OuQ7DF3IFK8KcMAd3W9EfFx766kcRGjjIhvSRiq0+Bf52dL+Zxiq5gKqKzLEQ==
+X-Gm-Message-State: AOJu0Yy+nNVdiIRpzhXPLns6TlQNZHYrnyLhz8a9cRg4FC2Wjq9qN2hM
+	SugDzhLlkRNjDPora5MFTgZjIgQ0/bdJIQJDKS5Pge1dOIzkwUgz
+X-Google-Smtp-Source: AGHT+IHfoJxdwg1KatKMqIm6Uh/xcA1bx9qJJajW01kM2Vir6+vvULrmKk55dbcD4GRCoM8/BWI30w==
+X-Received: by 2002:a05:6a21:6d8e:b0:1a5:6c73:74b9 with SMTP id wl14-20020a056a216d8e00b001a56c7374b9mr14589743pzb.48.1712116601569;
+        Tue, 02 Apr 2024 20:56:41 -0700 (PDT)
+Received: from ?IPV6:2600:8802:3800:75a0:159f:e332:af97:bfba? ([2600:8802:3800:75a0:159f:e332:af97:bfba])
+        by smtp.gmail.com with ESMTPSA id i13-20020a17090adc0d00b002a29160df67sm531650pjv.27.2024.04.02.20.56.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Apr 2024 20:56:41 -0700 (PDT)
+Message-ID: <7a3be43c-39d9-472a-9593-89a1c4e03004@gmail.com>
+Date: Tue, 2 Apr 2024 20:56:40 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB415105995F0F45BFCFE48FEBBC3E2@BYAPR04MB4151.namprd04.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 17/28] null_blk: Introduce fua attribute
+To: Damien Le Moal <dlemoal@kernel.org>
+References: <20240402123907.512027-1-dlemoal@kernel.org>
+ <20240402123907.512027-18-dlemoal@kernel.org>
+Content-Language: en-US
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ linux-scsi@vger.kernel.org, "Martin K . Petersen"
+ <martin.petersen@oracle.com>, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@redhat.com>, linux-nvme@lists.infradead.org,
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20240402123907.512027-18-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 02, 2024 at 10:07:25PM +0000, Kamaljit Singh wrote:
-> 
-> Hi Daniel,
-> Your question about the nvme-cli version makes me wonder if there is a
-> version compatibility matrix (nvme-cli vs kernel) somewhere you could
-> point me to? I didn't see such info in the nvme-cli release notes.
+Damien,
 
-I don't believe there's ever been an intentional incompatibility for
-nvme-cli vs. kernel versions. Most of the incompatibility problems come
-from sysfs dependencies, but those should not be necessary for the core
-passthrough commands on any version pairing.
+On 4/2/24 05:38, Damien Le Moal wrote:
+>   
+> +static bool g_fua = true;
+> +module_param_named(fua, g_fua, bool, S_IRUGO);
+> +MODULE_PARM_DESC(zoned, "Enable/disable FUA support when cache_size is used. Default: true");
+> +
 
-And yeah, there should be sane fallbacks for older kernels in case a new
-feature introduces a regression, but it's not always perfect. We try to
-fix them as we learn about them, so bug reports on the github are useful
-for tracking that.
+checkpatch is generating warning on this patch, please check :-
 
-> For example, I've seen issues with newer than nvme-cli v1.16 on Ubuntu
-> 22.04 (stock & newer kernels). From a compatibility perspective I do
-> wonder whether circumventing a distro's package manager and directly
-> installing newer nvme-cli versions might be a bad idea. This could
-> possibly become dire if there were intentional version dependencies
-> across the stack.
+WARNING: Symbolic permissions 'S_IRUGO' are not preferred. Consider 
+using octal permissions '0444'.
+#31: FILE: drivers/block/null_blk/main.c:229:
++module_param_named(fua, g_fua, bool, S_IRUGO);
 
-The struggle is real, isn't it? New protocol features are added upstream
-faster than distro package updates provide their users. On the other
-hand, distros may be cautious to potential instability.
+Also, I noticed that for zone_append_max_sectors attribute patch
+you are using 0444 but for fua you are using S_IRUGO, any specific
+reason ?
+
+-ck
+
+
