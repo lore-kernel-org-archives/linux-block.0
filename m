@@ -1,111 +1,102 @@
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF1817C98;
-	Wed,  3 Apr 2024 18:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBB63D60;
+	Wed,  3 Apr 2024 18:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712167821; cv=none; b=JMAyEABFvEiLLubMo3OIpFSpfQUd4uzl9nL7F7H2VZHFCKg6fEI2aF+SAt39rXO1SU3NL+pto/wpTsj5/8ONz3+hn62fxYI+/1Ve7YhOLeWWQbn7WAgFnjQdbeaC2P3APTh05zBdW8io/XAh7YARyBcOv4y/pJ+Fr2KPlsT+oQY=
+	t=1712169609; cv=none; b=X+5s3LUgijZ3+giboivTlkoJzVB4Axzv/wtAQHcRerD3lrUt7IPCDv/+4CaIvwBb2aV9wctigDpeNykQHlXkNEE+6DwtK7diYDwgFyD5SqRBvRL49CTnGI7IzPE7XVGK4yPKC9ExzpwEu3hC4i7sVcLjl1rtd9fQT2Z/KujfbXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712167821; c=relaxed/simple;
-	bh=uOWennQkUOPuwn8gwTvr4tVH8UUda4SVjW7W5jff4CM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TWmhsk5qh4Y24AYWdqgYXiIoDS7v0RQpc0zyjjpcU11ch/XLbNiNap6bSaYi1yRoDAV1AGqVlxrf+Lk7CaMXnMvYXXB8SBIer3HNM2DsPqy8UQYuhjSQgUH+E+J1IK90gOB4qjrDnqOONU8KO0U6iF/KztUz7LMAZWEmfdvBWbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=P5lp7Zfm; arc=none smtp.client-ip=185.125.188.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1712169609; c=relaxed/simple;
+	bh=mKkzeEBBqz/gTib0prGhwYPBjEjT54fc9L8qJ/6eNa4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HnI9BfYzaeYnXjGeLMqgOwVtYKkyRymfFZUPA7Hl0pQ3goHEnRyIUdVGppK7UtHWFfBluCsC0aVWJjjrrcvH3SpDm2UbPtt1nNcdjg0YrtVrSCVIReMsU/34WjgQyVSN9+jqsuRpmqdKvhK2rvZVfuOvi5sbFDkNytST5z65K0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=aHZAKSuQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="P5lp7Zfm"
-Received: from [10.172.66.188] (1.general.jsalisbury.us.vpn [10.172.66.188])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 9FC983F2F9;
-	Wed,  3 Apr 2024 18:10:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1712167818;
-	bh=AVCRfVvSKO0IO7YLIfyO05ThGqrBf2jTRKl0XcMO2a8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=P5lp7ZfmUxIQ5syPtqfd2asTVdkr9EGyJinDFnluL63mE66jtwEfoLwaU2MI1LBiK
-	 vv1LkCPuNRzmk0ay5WGP97BqaI5MsnUVRy1wmByKq9aOdvYTiN5cFrve+vUjLhmzf+
-	 Aa07T59NPR7AcORoRg8gyCfUl8ydYWEU4GjzuICwZudzNFOlQrrBLWQFZRuoFFZu7S
-	 bQeocmIXLwYZr7sgTA5U7KR99jMqD8YQGo2IVpTAwohkH2tPVvJgxkuYQlcqdbfpb6
-	 QVlta3wjQ0sYL5LVW9RFP/rRpRc1BEPbkWtq4W86h2498WkH1rK4L6lJ0rg0xVFasQ
-	 sHR5K0t8Vj6lw==
-Message-ID: <3ecbdd00-151b-4cec-9a61-c6d340b2e147@canonical.com>
-Date: Wed, 3 Apr 2024 14:10:16 -0400
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="aHZAKSuQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D9DBC43390;
+	Wed,  3 Apr 2024 18:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1712169608;
+	bh=mKkzeEBBqz/gTib0prGhwYPBjEjT54fc9L8qJ/6eNa4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aHZAKSuQLrIMeawocgg7tTb81IdEGpoLVz2877APmYB6mWEaK/+7np/LYaTVDWZ0P
+	 5lJVwlG/isNM3Xpc2E/EngdydGC/JakmnkqCQZMptz/L9LctvaWGyFycnQdd2IwDh+
+	 MoDjVrNlb95usgW8HiCH/Uc8erJaxCiFzrcsyoGM=
+Date: Wed, 3 Apr 2024 20:40:00 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Joseph Salisbury <joseph.salisbury@canonical.com>
+Cc: hch@lst.de, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	axboe@kernel.dk, sashal@kernel.org, stable@vger.kernel.org,
+	Francis Ginther <francis.ginther@canonical.com>
+Subject: Re: [v5.15 Regression] block: rename GENHD_FL_NO_PART_SCAN to
+ GENHD_FL_NO_PART
+Message-ID: <2024040306-putdown-grain-daf7@gregkh>
+References: <924449dc-9b1f-4943-afe3-a68c03aedbb5@canonical.com>
+ <2024040329-unstopped-spelling-64c8@gregkh>
+ <a0819f54-7469-4c94-b567-71f634c84ac1@canonical.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [v5.15 Regression] block: rename GENHD_FL_NO_PART_SCAN to
- GENHD_FL_NO_PART
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- axboe@kernel.dk, gregkh@linuxfoundation.org, sashal@kernel.org,
- stable@vger.kernel.org, Francis Ginther <francis.ginther@canonical.com>
-References: <924449dc-9b1f-4943-afe3-a68c03aedbb5@canonical.com>
- <20240403180512.GA3411@lst.de>
-Content-Language: en-US
-From: Joseph Salisbury <joseph.salisbury@canonical.com>
-Autocrypt: addr=joseph.salisbury@canonical.com; keydata=
- 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
- p24lPxLL08SuCEzuBw==
-In-Reply-To: <20240403180512.GA3411@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a0819f54-7469-4c94-b567-71f634c84ac1@canonical.com>
 
+On Wed, Apr 03, 2024 at 02:06:28PM -0400, Joseph Salisbury wrote:
+> 
+> 
+> On 4/3/24 13:54, Greg KH wrote:
+> > On Wed, Apr 03, 2024 at 01:50:09PM -0400, Joseph Salisbury wrote:
+> > > Hi Christoph,
+> > > 
+> > > A kernel bug report was opened against Ubuntu [0].  This bug is a regression
+> > > introduced in mainline version v5.17-rc1 and made it's way into v5.15 stable
+> > > updates.
+> > > 
+> > > The following commit was identified as the cause of the regression in 5.15:
+> > > 
+> > > c6ce1c5dd327 ("block: rename GENHD_FL_NO_PART_SCAN to GENHD_FL_NO_PART")
+> > How is renaming a define a "regression"?
+> The "regression" is experienced after upgrading to the kernel to the version
+> that introduced this commit.
+> The v5.15.131 kernel works as expected, upgrading the kernel to v5.15.132
+> breaks behavior that worked in a prior kernel version.
+> Reverting commit c6ce1c5dd327 in v5.15.132 allows the experience to be as
+> before in v5.15.131.
 
+What "experience" are you talking about here?  Please be specific.  What
+exactly "broke", what is the build error that happens?
 
-On 4/3/24 14:05, Christoph Hellwig wrote:
-> Hi Joseph.
->
-> given that Canonical ignores our kernel licensing rules and tries to
-> get away with it I'm not going to offer any help to Canonical at all.
+> > > I was hoping to get your feedback, since you are the patch author. Is the
+> > > best approach to revert this commit, since many third parties rely on the
+> > > name being GENHD_FL_NO_PART_SCAN in kernel headers?
+> > External kernel modules are never an issue.  Is this a userspace thing?
+> > 
+> > >   Is there a specific need that you know of that requires this commit
+> > > in the 5.15 and earlier stable kernels?
+> > Yes.  And Christoph did not do the backport, so I doubt he cares :)
+> > 
+> > Again, what in-kernel issue is caused by this?
+> 
+> Third party code that relies on the kernel-headers will no longer compile
+> due to the name change.  Should we not care if we break things, even in
+> userspace?
 
-Sorry, I was trying to help the community since this is affecting 
-upstream stable kernels.
+Is this userspace, or is it kernel drivers?
+
+If kernel drivers, you know that there  s no stable kernel api, we
+rename and change things all the time, even in stable kernel trees, for
+good reasons (see the set of patches that were applied that contained
+this change.)  Do you want to have unfixed security issues, or do you
+want a secure kernel that happens to rename variables at times?
+
+If userspace, please point me at this and why hasn't it broken in newer
+kernel releases where this change came from?
+
+thanks,
+
+greg k-h
