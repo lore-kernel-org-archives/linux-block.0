@@ -1,38 +1,62 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE25B66E;
-	Wed,  3 Apr 2024 12:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DDA1482E1;
+	Wed,  3 Apr 2024 12:51:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712148180; cv=none; b=HHTGNEcmptx253Le4I1YbcGUGdf1Ruof74WA1fc9mnJ7/mFP/rzMKlz0P1PPP3OXmI4MhrRbSVvDN7njam4eieDTRs7lBH8mZYRrF7+PPy1XhOUYlJ+/jMyAevEikqf57bUkc37rWVGU5YwzrFKNFSTOzsO1wD3MVZMRfJ6Zibg=
+	t=1712148685; cv=none; b=Q5qzi4JZej61xCM8tarOjMd7tLC3zc61Y90H6HwA299vTa0cmS31ZbSl18ZQvF1CuXC8JIZ8RW4xVPm6/4D1ETOW46YhK4CUODhf8yCgyy7FfzdoMzpdO0PqA3PSe7kvNhNBQzX5Y82pl1Uy2LGL27upV34y/s7dkgrMtNe9yrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712148180; c=relaxed/simple;
-	bh=+2kamjfwtkFt0LAAmEoSTRJDAwg1G6K9WUXA14RcVnM=;
+	s=arc-20240116; t=1712148685; c=relaxed/simple;
+	bh=CgSXcFQFrSihOoQEs9+0mpaB+A0EeYhWLs6ajpOaRXA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HS8j9Rzxwf3w6lvdz7lh5cHrFDTiPA2hUoUa/x8Lc/54Xk5wkcwwhb/zSAE9d3cH8y6aFfx4fRFZ4uBoBg0LozYD3dtH12vkX7NIfpSVAM3yA4lHdnudI5dh4XRWfHxG47qPe5BQ7pV4g50h4NFZhRpHly06BDe0vfjrmI0L2qM=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZKOO/i4z5Xkd8dfIlTslABedttyxPTCqR3vkSRedFpNnusl6DYycyUtZrlFY/q2xnSROG7HorD21iQuV7ooWL6x2tBGo4+YOCqho5WL5IQGutLXm/EYMzo/5vGDR4r7W8KzYOtbn6up2HkKuawyV7fGe7oWlRVnIQo1YGziqHH8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8DB5D68BFE; Wed,  3 Apr 2024 14:42:55 +0200 (CEST)
-Date: Wed, 3 Apr 2024 14:42:55 +0200
-From: "hch@lst.de" <hch@lst.de>
-To: Dongyang Li <dongyangli@ddn.com>
-Cc: "joshi.k@samsung.com" <joshi.k@samsung.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"hch@lst.de" <hch@lst.de>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	"kbusch@kernel.org" <kbusch@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [Lsf-pc] [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC]
- Meta/Integrity/PI improvements
-Message-ID: <20240403124255.GA19272@lst.de>
-References: <CGME20240222193304epcas5p318426c5267ee520e6b5710164c533b7d@epcas5p3.samsung.com> <aca1e970-9785-5ff4-807b-9f892af71741@samsung.com> <yq14jdu7t2u.fsf@ca-mkp.ca.oracle.com> <ab32d8be16bf9fd5862e50b9a01018aa634c946a.camel@ddn.com> <0c54aed5-c1f1-ef83-9da9-626fdf399731@samsung.com> <d442fe43e7b43d9e00c168f91dcfddd5a240b366.camel@ddn.com>
+	id 574DA68D05; Wed,  3 Apr 2024 14:51:17 +0200 (CEST)
+Date: Wed, 3 Apr 2024 14:51:16 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Sathya Prakash <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	"Juergen E. Fischer" <fischer@norbit.de>,
+	Xiang Chen <chenxiang66@hisilicon.com>,
+	HighPoint Linux Team <linux@highpoint-tech.com>,
+	Tyrel Datwyler <tyreld@linux.ibm.com>,
+	Brian King <brking@us.ibm.com>, Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Jason Yan <yanaijie@huawei.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+	MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+	linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+	usb-storage@lists.one-eyed-alien.net
+Subject: Re: [PATCH 01/23] block: add a helper to cancel atomic queue limit
+ updates
+Message-ID: <20240403125116.GA19332@lst.de>
+References: <20240402130645.653507-1-hch@lst.de> <20240402130645.653507-2-hch@lst.de> <fd99a58b-37c4-45dd-a738-cd2b49341c70@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,9 +65,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d442fe43e7b43d9e00c168f91dcfddd5a240b366.camel@ddn.com>
+In-Reply-To: <fd99a58b-37c4-45dd-a738-cd2b49341c70@oracle.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-In kernel use is easy, we can do that as soon as the first in-kernel
-user comes along.  Which one do you have in mind?
+On Wed, Apr 03, 2024 at 08:38:42AM +0100, John Garry wrote:
+>> + */
+>> +static inline void queue_limits_cancel_update(struct request_queue *q)
+>
+> Just curious, why no __releases() annotation, like what we have in 
+> queue_limits_commit_update()?
+
+Mostly because sparse doesn't seem to actually need it on inline
+functins.  At least I don't seem to get a sparse warning without it.
 
