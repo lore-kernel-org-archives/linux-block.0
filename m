@@ -1,224 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A4A148FF5
-	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 14:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F44168BD
+	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 14:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712153531; cv=none; b=ZUcmeL6IKS4F7q9i0shJWDyOKv/43+b8z/KPpVwqntv2eb3gcCyP50HYxmBvh4vHQ33i6ozBtG8SWxWG42GyzhvNRRTIq3g2sCWl3GQrsShq+AvguM4N/WGNOoS5Cu5GQhx6MrkMTp76F/jXPmbiqp+gabGzmN/L+OqGEgYanKE=
+	t=1712153887; cv=none; b=QzWEUVhyN8c6apefrl1QcAZarlsEDPv+D2GdpGFDwHcK9u87x1/OUzykCNaKvPzt9QPsQV/5VSEMTB/XmjAfafMaRWWtC3tJmkEB1qTDW4k1V6VsZR1ySrOPqJKgtZEqN6enBMEEtbF46VlbPCgQnYjBTfsD4QGnUebuhZ/rXew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712153531; c=relaxed/simple;
-	bh=/fDWm8esWJBJi3kmg8ERGpkeInWqby7ydHB7ZhiRVlI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=koTmgoBkM7ur6Tnm3z/+pYglsEzfLbn8zvhGwr/Js5wBc4lXgb45PU46vFe933itjiGFNQZy43pvTpJPuVgOHnQDK1dQPVfNYlE9c6hvwNNfUKtUJagOB1+ajtgVMDR7WszfrHc5+Bnq+sA8LifpjhZILOTpGVx2m/S3/VmqqLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LeQXs/9G; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712153887; c=relaxed/simple;
+	bh=5WLxOnkBJjo+0/yjmhaPs0wdHBWPf/7+izSo8rpQdYc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PduksuO0yv8hNiM1d0FiufXYR3GxoOhOgAuvyG06cz0vfdmxh+dgl6SFcoOaOgMplZ2JJJ+21sDjcBeR2k0kArSlLfmZp7tIXiM/kXf/A2ZAXYjoU6oHCji9XnsqbI5rUPuCi9qWEgIiLTdEkTagmwLwTCMGP7olCsKH3NKZ3q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuWtTg5K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LeQXs/9G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712153528;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i2sn3zuLpcX9s0qaTltEbf78p6kZvbUqe87t+xT18Y4=;
-	b=LeQXs/9G4fYGKIDmYsZuCtugWoxsrl7+61m9BfT9Mjd+YakIeZW+E2zALHJEMVJ7TpY7t1
-	JLKxkvyXdTyxJibT3s0JSv9jsZGf0za1mTxTArwEEKKpZnLBIUGIUtbIHNP/dkClu54rhp
-	2vn4jWzKQH6Vm/iqnZMGdflPtHd2zKE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-32-rP2PObr8MBeSc1RLyRmLww-1; Wed, 03 Apr 2024 10:11:54 -0400
-X-MC-Unique: rP2PObr8MBeSc1RLyRmLww-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D962D185A788;
-	Wed,  3 Apr 2024 14:11:53 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.118])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 22D512024517;
-	Wed,  3 Apr 2024 14:11:52 +0000 (UTC)
-Date: Wed, 3 Apr 2024 10:11:47 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alasdair Kergon <agk@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
-	David Teigland <teigland@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Joe Thornber <ejt@redhat.com>
-Subject: Re: [RFC 4/9] dm: add llseek(SEEK_HOLE/SEEK_DATA) support
-Message-ID: <20240403141147.GD2524049@fedora>
-References: <20240328203910.2370087-1-stefanha@redhat.com>
- <20240328203910.2370087-5-stefanha@redhat.com>
- <6awt5gq36kzwhuobabtye5vhnexc6cufuamy4frymehuv57ky5@esel3f5naqyu>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuWtTg5K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 443F0C433C7;
+	Wed,  3 Apr 2024 14:18:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712153886;
+	bh=5WLxOnkBJjo+0/yjmhaPs0wdHBWPf/7+izSo8rpQdYc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NuWtTg5KxYV2VyFxLPwASt9nk5SyyAAczmPsX6EqVXaE+uy0yZTf+Qg14SSrtFhH/
+	 1d64qMKMjSK6F6ho+1suRE9a6BymHSKdGfGlPSwlfjp0aTEW1/9Bke0R3hT06E+ADy
+	 5RyCeU8DMjya/pZ1QOkZXgyZvUXLR6+29DC854Ek5hDLigHSKd3ulX5Z/Kccpip8Ey
+	 SU33r1KwSqFZB4lTwdPKTkF9+zBoq4t3wx4aNRC23KNx5W8ZbFyRnqT/wSdxAwi6qW
+	 re/WQP81gDnWrsC3vUSqpkH5bJL/wFzsiSAYf6TI5n1Abd9qN5qP4WOQA7QQBmiNis
+	 BfRRRHp4HlgMw==
+From: Hannes Reinecke <hare@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@kernel.org>
+Subject: [PATCHv2 0/2] block,nvme: latency-based I/O scheduler
+Date: Wed,  3 Apr 2024 16:17:54 +0200
+Message-Id: <20240403141756.88233-1-hare@kernel.org>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="E298U7bhRnuOmnTB"
-Content-Disposition: inline
-In-Reply-To: <6awt5gq36kzwhuobabtye5vhnexc6cufuamy4frymehuv57ky5@esel3f5naqyu>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
 
+Hi all,
 
---E298U7bhRnuOmnTB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+there had been several attempts to implement a latency-based I/O
+scheduler for native nvme multipath, all of which had its issues.
 
-On Thu, Mar 28, 2024 at 07:38:20PM -0500, Eric Blake wrote:
-> On Thu, Mar 28, 2024 at 04:39:05PM -0400, Stefan Hajnoczi wrote:
-> > Delegate SEEK_HOLE/SEEK_DATA to device-mapper targets. The new
-> > dm_seek_hole_data() callback allows target types to customize behavior.
-> > The default implementation treats the target as all data with no holes.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  include/linux/device-mapper.h |  5 +++
-> >  drivers/md/dm.c               | 68 +++++++++++++++++++++++++++++++++++
-> >  2 files changed, 73 insertions(+)
-> >=20
->=20
-> > +/* Default implementation for targets that do not implement the callba=
-ck */
-> > +static loff_t dm_blk_seek_hole_data_default(loff_t offset, int whence,
-> > +		loff_t size)
-> > +{
-> > +	switch (whence) {
-> > +	case SEEK_DATA:
-> > +		if ((unsigned long long)offset >=3D size)
-> > +			return -ENXIO;
-> > +		return offset;
-> > +	case SEEK_HOLE:
-> > +		if ((unsigned long long)offset >=3D size)
-> > +			return -ENXIO;
-> > +		return size;
->=20
-> These fail with -ENXIO if offset =3D=3D size (matching what we do on file=
-s)...
->=20
-> > +	default:
-> > +		return -EINVAL;
-> > +	}
-> > +}
-> > +
-> > +static loff_t dm_blk_do_seek_hole_data(struct dm_table *table, loff_t =
-offset,
-> > +		int whence)
-> > +{
-> > +	struct dm_target *ti;
-> > +	loff_t end;
-> > +
-> > +	/* Loop when the end of a target is reached */
-> > +	do {
-> > +		ti =3D dm_table_find_target(table, offset >> SECTOR_SHIFT);
-> > +		if (!ti)
-> > +			return whence =3D=3D SEEK_DATA ? -ENXIO : offset;
->=20
-> ...but this blindly returns offset for SEEK_HOLE, even when offset is
-> beyond the end of the dm.  I think you want 'return -ENXIO;'
-> unconditionally here.
+So time to start afresh, this time using the QoS framework
+already present in the block layer.
+It consists of two parts:
+- a new 'blk-nlatency' QoS module, which is just a simple per-node
+  latency tracker
+- a 'latency' nvme I/O policy
 
-If the initial offset is beyond the end of the table, then SEEK_HOLE
-should return -ENXIO. I agree that the code doesn't handle this case.
+Using the 'tiobench' fio script with 512 byte blocksize I'm getting
+the following latencies (in usecs) as a baseline:
+- seq write: avg 186 stddev 331
+- rand write: avg 4598 stddev 7903
+- seq read: avg 149 stddev 65
+- rand read: avg 150 stddev 68
 
-However, returning offset here is correct when there is data at the end
-with SEEK_HOLE.
+Enabling the 'latency' iopolicy:
+- seq write: avg 178 stddev 113
+- rand write: avg 3427 stddev 6703
+- seq read: avg 140 stddev 59
+- rand read: avg 141 stddev 58
 
-I'll update the code to address the out-of-bounds offset case, perhaps
-by checking the initial offset before entering the loop.
+Setting the 'decay' parameter to 10:
+- seq write: avg 182 stddev 65
+- rand write: avg 2619 stddev 5894
+- seq read: avg 142 stddev 57
+- rand read: avg 140 stddev 57  
 
->=20
-> > +
-> > +		end =3D (ti->begin + ti->len) << SECTOR_SHIFT;
-> > +
-> > +		if (ti->type->seek_hole_data)
-> > +			offset =3D ti->type->seek_hole_data(ti, offset, whence);
->=20
-> Are we guaranteed that ti->type->seek_hole_data will not return a
-> value exceeding end?  Or can dm be used to truncate the view of an
-> underlying device, and the underlying seek_hold_data can now return an
-> answer beyond where dm_table_find_target should look for the next part
-> of the dm's view?
+That's on a 32G FC testbed running against a brd target,
+fio running with 48 threads. So promises are met: latency
+goes down, and we're even able to control the standard
+deviation via the 'decay' parameter.
 
-ti->type->seek_hole_data() must not return a value larger than
-(ti->begin + ti->len) << SECTOR_SHIFT.
+As usual, comments and reviews are welcome.
 
->=20
-> In which case, should the blkdev_seek_hole_data callback be passed a
-> max size parameter everywhere, similar to how fixed_size_llseek does
-> things?
->=20
-> > +		else
-> > +			offset =3D dm_blk_seek_hole_data_default(offset, whence, end);
-> > +
-> > +		if (whence =3D=3D SEEK_DATA && offset =3D=3D -ENXIO)
-> > +			offset =3D end;
->=20
-> You have a bug here.  If I have a dm contructed of two underlying targets:
->=20
-> |A  |B  |
->=20
-> and A is all data, then whence =3D=3D SEEK_HOLE will have offset =3D -ENX=
-IO
-> at this point, and you fail to check whether B is also data.  That is,
-> you have silently treated the rest of the block device as data, which
-> is semantically not wrong (as that is always a safe fallback), but not
-> optimal.
->=20
-> I think the correct logic is s/whence =3D=3D SEEK_DATA &&//.
+Changes to the original version:
+- split the rqos debugfs entries
+- Modify commit message to indicate latency
+- rename to blk-nlatency
 
-No, with whence =3D=3D SEEK_HOLE and an initial offset in A, the new offset
-will be (A->begin + A->end) << SECTOR_SHIFT. The loop will iterate and
-continue seeking into B.
+Hannes Reinecke (2):
+  block: track per-node I/O latency
+  nvme: add 'latency' iopolicy
 
-The if statement you commented on ensures that we also continue looping
-with whence =3D=3D SEEK_DATA, because that would otherwise prematurely end
-with the new offset =3D -ENXIO.
+ block/Kconfig                 |   6 +
+ block/Makefile                |   1 +
+ block/blk-mq-debugfs.c        |   2 +
+ block/blk-nlatency.c          | 388 ++++++++++++++++++++++++++++++++++
+ block/blk-rq-qos.h            |   6 +
+ drivers/nvme/host/multipath.c |  57 ++++-
+ drivers/nvme/host/nvme.h      |   1 +
+ include/linux/blk-mq.h        |  11 +
+ 8 files changed, 465 insertions(+), 7 deletions(-)
+ create mode 100644 block/blk-nlatency.c
 
->=20
-> > +	} while (offset =3D=3D end);
->=20
-> I'm trying to make sure that we can never return the equivalent of
-> lseek(dm, 0, SEEK_END).  If you make my above suggested changes, we
-> will iterate through the do loop once more at EOF, and
-> dm_table_find_target() will then fail to match at which point we do
-> get the desired -ENXIO for both SEEK_HOLE and SEEK_DATA.
-
-Wait, lseek() is supposed to return the equivalent of lseek(dm, 0,
-SEEK_END) when whence =3D=3D SEEK_HOLE and there is data at the end.
-
->=20
-> > +
-> > +	return offset;
-> > +}
-> > +
->=20
-> --=20
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.
-> Virtualization:  qemu.org | libguestfs.org
->=20
-
---E298U7bhRnuOmnTB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmYNY6MACgkQnKSrs4Gr
-c8gBswgAsiZbKgKf/rUbBd/QxPkUDKRRu5h1oBb9KBNejG7yN/VQcqp6C8r2WEWW
-yCWdhJL87dnNse32Xp/D1cTfaFgtVnzks86igf6ddN29a1rymvQh0SPNh4JfW3dH
-K8nAzdxUoisgkWRrY/C97heynyP3Emo5aq2qoiVLSErtnQ7VpBkVvicpiW9aE2SJ
-GasNYWTEx7g8qm+DGXU1fyxMBjOER63LseF73nnT2ec8nkd7TO4fyMzeEP5y3mCu
-so8Sbz9yTJkWHaaEBTjLi+ryzOJmFOthldB/Syt7m+oFQAFkA1BGaC2Fmrzdlvcw
-P2TW46BErnxJv4nH7LRbF4e6D5mfwg==
-=W3tR
------END PGP SIGNATURE-----
-
---E298U7bhRnuOmnTB--
+-- 
+2.35.3
 
