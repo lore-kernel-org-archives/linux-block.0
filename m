@@ -1,222 +1,166 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CDE26286
-	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 08:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF826F083
+	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 09:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712133990; cv=none; b=iRKjcNU+3j6WxcuuusVKCJcLmvcjvPj//+tdjk1ghbYUiCz8WrP8ZbTneS1p4Dtf4comq3fgb6XUy1vt677vfmhTK5jLxByO9aI1OUiUawsCd9YHCurFpwHhfx0rWpql8VHgPYRdFGyZDL7Pe+1pb+TFs7FFxxyYV9DiwpPz2f0=
+	t=1712134810; cv=none; b=VtkChxzKEqDw6XcS3RW1i7UY6np5ILxxyBXIYA1MrDw9rknQVvmmtwzTic0EqitYtyv36ivqJwXyIdHMzyehnLcK8tbnuIjbyqRzoPu4x1WwtLuab/AAyciRmSxOychKETZ6B1hfoa+6ueva0CdFfPaO2T3hVTBEeHVUi1bpZRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712133990; c=relaxed/simple;
-	bh=CnCNaZzl5rEH+QwH0mfl8Hi6Yca+JPC01k5/o/eFevs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oP2W1hm7jDM1IxDFVBwwwSTJgWoWo3llriOE6jswzbJeHAEl//QVO/R0WC+A0XGGzRv6XUMT6TJrIVP8h2J8DBX0GxmM5MrxHTtSRk/9DxDnrSNlBRjRMq3oln/3ociIJBGPSq3RH77FjDf8R5ATqWD+02N9JwuwfrwRxinsue4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=vHlPntHc; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1712134810; c=relaxed/simple;
+	bh=B41HFjbDE5YiJxazNQSS+PvnASuG0x/2aPsnBnbzAh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bYtdGGlNYJ3ob2nSSeQudjEsJ2EbaUmPpkMn9Zp0WRjYTmhMvfbPPwoMNxHpVfTuVEsadTvXV3NJf8TAjPdtSloFS1dalkdiLgHz780/IFE+D8PAhsGXgJl8vU83F0Tfi5DW0XVifiDAjrlZ0fcHYQ/oAnaoeLLzDOldVq6/wXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vdolQ4xJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LoAsumvZ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="vHlPntHc"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56df1dbb15dso1860687a12.3
-        for <linux-block@vger.kernel.org>; Wed, 03 Apr 2024 01:46:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712133986; x=1712738786; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=H/ZMejo28/LllyfJA5g9nwz3RGVzU+8WXzt/3Z5s4wA=;
-        b=vHlPntHcV3neZhL+d8OrTCOLohiXlSLDh6Ra9sMTNc/vREXX/2C8ev4B4JSlnbhxjw
-         7q99LKyw+CQwZgwgfxvpYj/Z2jC8AWtDwit42nVn30QyrGlALTCn/uU6SXAAXTSpO7wu
-         AzRjlzfPHsNuhEf/fvPQNw3wGEI9gpY1jzl1/3wM5Woba0opiuM9QPP29BVSICxe/+HW
-         NKusdeTNiQzpDBrxf6EgL3XRrdWH/Z7mGEpqJ0NECyJxhoid0vf5rAjQB6ZcPo+fpFb3
-         rEIAg5TTKGf03lbbWbumZl1KRp369qZm7IbtweUgAWuN0owAwYpoaFc9W0Q9d9M3kf2k
-         WK9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712133986; x=1712738786;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H/ZMejo28/LllyfJA5g9nwz3RGVzU+8WXzt/3Z5s4wA=;
-        b=eqW2/5VnIAeA0+JOC9H3SeFo9kKv0o/NDGUuL1BkUeph4Z2VWu1P6DnjJ2Pgh2QJ+y
-         rNZZGOTwtGJ04tulvcAnzWcpyvH6eyVNdPlt4Y0IzVrLhlq77zQmFEbJJtpQhCietfU3
-         MUt2UqvOa8cTzS2ly6l1yKp5SYUpxVU9Jxy6NV2I2QCV5RHXx16ru2YplydzoKPDDizF
-         yzSw55l1ZV4dojPa7lIG9DSruup24un+b1fGfGQmZ+ZR9pM+gdrF1ZZ/h7k+43kYg4Iw
-         Q3DivEkEc8kapQ6kqHZE/wuzeELD0l0js32ssvbxCM82YCvP4xXJJNSIqCEoGdS96Cr0
-         fS4g==
-X-Forwarded-Encrypted: i=1; AJvYcCXLxoIWZG0YL6Zodu81ppgdsM8BHGC7C8ncEq6AkzUN5LsC07UHR2Imxklrg5kw+/5Tz5NKnieBpONlM92yrkCYeesAddUBiFYKnRg=
-X-Gm-Message-State: AOJu0YxLEu4VLKERzcTsJVKsXMh+IRfhPELC7OefYGA8ZTynNBD+OIgw
-	pExDxSTxjBEcOWIhee2FZ+KkoiCWsf9SBQ/dX+DnG3KzAX6K22GQycIilT2lCOw=
-X-Google-Smtp-Source: AGHT+IGo0b98RS6TrT3TIulpj9uf0OgGe9HgqnWXsEMXgCAc3KB/kjdbiHGYBrypbUj2L0uEeH3M1A==
-X-Received: by 2002:a05:6402:5111:b0:56e:447:1e44 with SMTP id m17-20020a056402511100b0056e04471e44mr1297850edd.8.1712133985643;
-        Wed, 03 Apr 2024 01:46:25 -0700 (PDT)
-Received: from localhost ([194.62.217.1])
-        by smtp.gmail.com with ESMTPSA id l24-20020aa7cad8000000b00562d908daf4sm7753421edt.84.2024.04.03.01.46.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 01:46:25 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
- Busch <kbusch@kernel.org>,  Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart
- Van Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
-  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
- Hindborg <a.hindborg@samsung.com>,  Wedson Almeida Filho
- <wedsonaf@gmail.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,  Greg KH
- <gregkh@linuxfoundation.org>,  Matthew Wilcox <willy@infradead.org>,
-  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
-  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?=
- Roy Baron <bjorn3_gh@protonmail.com>,  Alice Ryhl <aliceryhl@google.com>,
-  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
- <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
- =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
- Granados
- <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
- <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
- list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
- <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
- <gost.dev@samsung.com>, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
-In-Reply-To: <7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me> (Benno Lossin's
-	message of "Tue, 02 Apr 2024 23:09:49 +0000")
-References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me>
-	<871q7o54el.fsf@metaspace.dk>
-	<7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me>
-User-Agent: mu4e 1.12.2; emacs 29.3
-Date: Wed, 03 Apr 2024 10:46:19 +0200
-Message-ID: <87v84ysujo.fsf@metaspace.dk>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vdolQ4xJ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LoAsumvZ"
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 729412174C;
+	Wed,  3 Apr 2024 09:00:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712134805; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uj3ZK2qaxJqUha5DMBX9muFYXtessbM4SY4bEyWSKQg=;
+	b=vdolQ4xJ22KQ7clven2QzFmbxIDVJ6VveNv/xS50wribLM/fbRoLkJwlAaLzT7dVax8DvI
+	QU9/3AuK9I6ETcy9npCl6KWx38zNhdrnq9+yJ43CjTOR9l7SeMljEXq8/7MITJfq3qtVV1
+	KeIUkgrlYfbRdG5ahrYcwXIwCIfWKaY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712134805;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uj3ZK2qaxJqUha5DMBX9muFYXtessbM4SY4bEyWSKQg=;
+	b=LoAsumvZF6I0mqjmvWYQpvK7uvYtbBrQgaEbL3Yw5ufKUNtgHqo3xLqGS8tT+TqlpkjeCO
+	HGpbshXmxMCJS1Dw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 5FE5A13357;
+	Wed,  3 Apr 2024 09:00:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id +nC+FZUaDWYebgAAn2gu4w
+	(envelope-from <dwagner@suse.de>); Wed, 03 Apr 2024 09:00:05 +0000
+Date: Wed, 3 Apr 2024 11:00:04 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH blktests v1 0/3] add blkdev type environment variable
+Message-ID: <j6awxljufwg6r5rs5kojwsnatfb4aj3vnqsq43hkuuhgvcflvh@u6l5cf2ponaw>
+References: <20240402100322.17673-1-dwagner@suse.de>
+ <mqpuf2a7obybtw42ydte2wq7ktema5odvc3dqm32hknjmamgdb@rbo3i6lqqkld>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <mqpuf2a7obybtw42ydte2wq7ktema5odvc3dqm32hknjmamgdb@rbo3i6lqqkld>
+X-Spam-Score: -3.80
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	 ARC_NA(0.00)[];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCPT_COUNT_FIVE(0.00)[5];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-0.998];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-Benno Lossin <benno.lossin@proton.me> writes:
+Hi Shinichiro,
 
-> On 23.03.24 07:32, Andreas Hindborg wrote:
->> Benno Lossin <benno.lossin@proton.me> writes:
->>> On 3/13/24 12:05, Andreas Hindborg wrote:
->>>> +//! implementations of the `Operations` trait.
->>>> +//!
->>>> +//! IO requests are passed to the driver as [`Request`] references. The
->>>> +//! `Request` type is a wrapper around the C `struct request`. The driver must
->>>> +//! mark start of request processing by calling [`Request::start`] and end of
->>>> +//! processing by calling one of the [`Request::end`], methods. Failure to do so
->>>> +//! can lead to IO failures.
->>>
->>> I am unfamiliar with this, what are "IO failures"?
->>> Do you think that it might be better to change the API to use a
->>> callback? So instead of calling start and end, you would do
->>>
->>>       request.handle(|req| {
->>>           // do the stuff that would be done between start and end
->>>       });
->>>
->>> I took a quick look at the rnull driver and there you are calling
->>> `Request::end_ok` from a different function. So my suggestion might not
->>> be possible, since you really need the freedom.
->>>
->>> Do you think that a guard approach might work better? ie `start` returns
->>> a guard that when dropped will call `end` and you need the guard to
->>> operate on the request.
->> 
->> I don't think that would fit, since the driver might not complete the
->> request immediately. We might be able to call `start` on behalf of the
->> driver.
->> 
->> At any rate, since the request is reference counted now, we can
->> automatically fail a request when the last reference is dropped and it
->> was not marked successfully completed. I would need to measure the
->> performance implications of such a feature.
->
-> Are there cases where you still need access to the request after you
-> have called `end`?
+On Wed, Apr 03, 2024 at 04:54:28AM +0000, Shinichiro Kawasaki wrote:
+> On the other hand, I see that the series has a couple of drawbacks:
+> 
+> 1) When blktests users run with the default knob only, the test coverage will be
+>    smaller. To keep the current test coverage, the users need to run the check
+>    script twice: nvmet_blkdev_type=file and nvmet_blkdev_type=device. Some users
+>    may not do it and lose the test coverage. And some users, e.g., CKI project,
+>    need to adjust their script for this change.
+> 
+> 2) When the users run the check script twice to keep the test coverage, some
+>    test cases are executed twice under the exact same test conditions. This
+>    will waste some of the test run effort.
 
-In general no, there is no need to handle the request after calling end.
-C drivers are not allowed to, because this transfers ownership of the
-request back to the block layer. This patch series defer the transfer of
-ownership to the point when the ARef<Request> refcount goes to zero, so
-there should be no danger associated with touching the `Request` after
-end.
+Yes, I agree. These drawbacks should be addressed somehow.
 
-> If no, I think it would be better for the request to
-> be consumed by the `end` function.
-> This is a bit difficult with `ARef`, since the user can just clone it
-> though... Do you think that it might be necessary to clone requests?
+> To avoid the drawbacks, how about this?
+> 
+> - Do not provide nvmet_blkdev_type as a knob for users. Keep it as just a global
+>   variable in tests/nvme/rc. (It should be renamed to clarify that it is not for
+>   users.)
+> 
+> - Introduce a helper function to do the same test twice for nvmet_blkdev_type=
+>   file and nvmet_blkdev_type=device. Call this helper function from a single
+>   test case to cover both the blkdev types.
+> 
+> I attach a patch at the end of this email to show the ideas above. It applies
+> the idea to nvme/006 as an example. What do you think?
 
-Looking into the details now I see that calling `Request::end` more than
-once will trigger UAF, because C code decrements the refcount on the
-request. When we have `ARef<Request>` around, that is a problem. It
-probably also messes with other things in C land. Good catch.
+Ideally we don't have to introduce additional common setup logic into
+each test. Also for debugging purpose it might sense to run a test only
+in one configuration. So it might make sense still to have user visible
+environment variable
 
-I did implement `Request::end` to consume the request at one point
-before I fell back on reference counting. It works fine for simple
-drivers. However, most drivers will need to use the block layer tag set
-service, that allows conversion of an integer id to a request pointer.
-The abstraction for this feature is not part of this patch set. But the
-block layer manages a mapping of integer to request mapping, and drivers
-typically use this to identify the request that corresponds to
-completion messages that arrive from hardware. When drivers are able to
-turn integers into requests like this, consuming the request in the call
-to `end` makes little sense (because we can just construct more).
+  nvmet_blkdev_types="file device"
 
-What I do now is issue the an `Option<ARef<Request>>` with
-`bindings::req_ref_inc_not_zero(rq_ptr)`, to make sure that the request
-is currently owned by the driver.
+as default.
 
-I guess we can check the absolute value of the refcount, and only issue
-a request handle if the count matches what we expect. Then we can be certain
-that the handle is unique, and we can require transfer of ownership of
-the handle to `Request::end` to make sure it can never be called more
-than once.
+> -test() {
+> -	echo "Running ${TEST_NAME}"
+> -
+> +do_test() {
+>  	_setup_nvmet
+>  
+>  	_nvmet_target_setup
+>  
+>  	_nvmet_target_cleanup
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	_nvmet_run_for_each_blkdev_type do_test
 
-Another option is to error out in `Request::end` if the
-refcount is not what we expect.
+I was wondering if the nvmet_run_for_each_blkdev_type logic could be in
+common code, so we don't have to add a do_test function. Basically
+having a common code for a bunch of configuration variables (matrix
+tests). This could also be useful for nvmet_trtype etc.
 
->
-> Also what happens if I call `end_ok` and then `end_err` or vice versa?
+The generic setup could be requested via the require hook.
 
-That would be similar to calling end twice.
+requires() = {
 
->
->>>> +    pub fn data_ref(&self) -> &T::RequestData {
->>>> +        let request_ptr = self.0.get().cast::<bindings::request>();
->>>> +
->>>> +        // SAFETY: `request_ptr` is a valid `struct request` because `ARef` is
->>>> +        // `repr(transparent)`
->>>> +        let p: *mut c_void = unsafe { bindings::blk_mq_rq_to_pdu(request_ptr) };
->>>> +
->>>> +        let p = p.cast::<T::RequestData>();
->>>> +
->>>> +        // SAFETY: By C API contract, `p` is initialized by a call to
->>>> +        // `OperationsVTable::init_request_callback()`. By existence of `&self`
->>>> +        // it must be valid for use as a shared reference.
->>>> +        unsafe { &*p }
->>>> +    }
->>>> +}
->>>> +
->>>> +// SAFETY: It is impossible to obtain an owned or mutable `Request`, so we can
->>>
->>> What do you mean by "mutable `Request`"? There is the function to obtain
->>> a `&mut Request`.
->> 
->> The idea behind this comment is that it is not possible to have an owned
->> `Request` instance. You can only ever have something that will deref
->> (shared) to `Request`. Construction of the `Request` type is not
->> possible in safe driver code. At least that is the intention.
->> 
->> The `from_ptr_mut` is unsafe, and could be downgraded to
->> `from_ptr`, since `Operations::complete` takes a shared reference
->> anyway. Bottom line is that user code does not handle `&mut Request`.
->
-> Ah I see what you mean. But the user is able to have an `ARef<Request>`.
-> Which you own, if it is the only refcount currently held on that
-> request. When you drop it, you will run the destructor of the request.
->
-> A more suitable safety comment would be "SAFETY: A `struct request` may
-> be destroyed from any thread.".
+ _nvmet_setup_target
+}
 
-I see, I will update the comment.
+What do you think about this idea?
 
-
-BR Andreas
+Thanks,
+Daniel
