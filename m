@@ -1,40 +1,40 @@
 Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D746A152E11;
-	Wed,  3 Apr 2024 18:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF1817C98;
+	Wed,  3 Apr 2024 18:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712167594; cv=none; b=oBcMQz/fTtwoXavhPujNh29Mu2RrIezW1Jd1Nyn6XGMiYx348tDKR26gBYNaL7fA9CD9xQH+KyVWvj+F2C1DyyRl3GwFhbUH4fiCh/4PnGCk2yMk5ym5MqYLmvMh7XE0VlSqO4/Yco8fru/DXetQptKYt4ITbOAsdtXsHgj+8s8=
+	t=1712167821; cv=none; b=JMAyEABFvEiLLubMo3OIpFSpfQUd4uzl9nL7F7H2VZHFCKg6fEI2aF+SAt39rXO1SU3NL+pto/wpTsj5/8ONz3+hn62fxYI+/1Ve7YhOLeWWQbn7WAgFnjQdbeaC2P3APTh05zBdW8io/XAh7YARyBcOv4y/pJ+Fr2KPlsT+oQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712167594; c=relaxed/simple;
-	bh=5m6VOcgHOe4SYB/rSBcchnqgOUDENpQXobQNyZKgX0Y=;
+	s=arc-20240116; t=1712167821; c=relaxed/simple;
+	bh=uOWennQkUOPuwn8gwTvr4tVH8UUda4SVjW7W5jff4CM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZqQ/Lq0nSzoQagDMmzj6Pp6W8MJdnbpKTPy9OiBnQRPQbp/yELiObFluRdJrk3vNF3NYZQcXRusezmKvdgaP7/mDdipaoefVmX6z7XRFc0b+nzqk8xkxrCTHOwkkDDeMBkNTYFT+nWAYi2u7bbWWQkvatEyePTX6QJA5+y4AJQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=U3Xj5F9W; arc=none smtp.client-ip=185.125.188.120
+	 In-Reply-To:Content-Type; b=TWmhsk5qh4Y24AYWdqgYXiIoDS7v0RQpc0zyjjpcU11ch/XLbNiNap6bSaYi1yRoDAV1AGqVlxrf+Lk7CaMXnMvYXXB8SBIer3HNM2DsPqy8UQYuhjSQgUH+E+J1IK90gOB4qjrDnqOONU8KO0U6iF/KztUz7LMAZWEmfdvBWbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=P5lp7Zfm; arc=none smtp.client-ip=185.125.188.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="U3Xj5F9W"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="P5lp7Zfm"
 Received: from [10.172.66.188] (1.general.jsalisbury.us.vpn [10.172.66.188])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 32C6E3F2F9;
-	Wed,  3 Apr 2024 18:06:29 +0000 (UTC)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 9FC983F2F9;
+	Wed,  3 Apr 2024 18:10:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1712167589;
-	bh=ddwEN/UnUOz25J/Hbmt3w3pE4mBozWKhgJVvL8PNpBM=;
+	s=20210705; t=1712167818;
+	bh=AVCRfVvSKO0IO7YLIfyO05ThGqrBf2jTRKl0XcMO2a8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
 	 In-Reply-To:Content-Type;
-	b=U3Xj5F9WCYs+sEEOcYorfKeikV608XJApffKe6tDz41ykVkOSRrgKjZh+tZ0q7prH
-	 DzUj352Ltg6r0LPtug6GzJEgtMgUlhw9jrBu8X12lUwp8M2Sds3nWL1f9ZIEFKc+f3
-	 22lnaYwHjDbnSji/+Hi1ARrDF7O3Evwqw9v/lxUCNbqlC9qFYx/D82oGLQQ6sKsbFi
-	 ebzMTJcfJ2ntsIckVV1MMlIBhyVUY2Lmcj4ORt2B6f6CTjsSWw2IDXpJn7moH2Rox0
-	 osZVuE5Hto0hcdMw9ufa5n4M4TIp4GqWY+FEltZ3FS5K3/gR39hKUl1pP4Nb8IGf7t
-	 dvHm6r1yIXRNg==
-Message-ID: <a0819f54-7469-4c94-b567-71f634c84ac1@canonical.com>
-Date: Wed, 3 Apr 2024 14:06:28 -0400
+	b=P5lp7ZfmUxIQ5syPtqfd2asTVdkr9EGyJinDFnluL63mE66jtwEfoLwaU2MI1LBiK
+	 vv1LkCPuNRzmk0ay5WGP97BqaI5MsnUVRy1wmByKq9aOdvYTiN5cFrve+vUjLhmzf+
+	 Aa07T59NPR7AcORoRg8gyCfUl8ydYWEU4GjzuICwZudzNFOlQrrBLWQFZRuoFFZu7S
+	 bQeocmIXLwYZr7sgTA5U7KR99jMqD8YQGo2IVpTAwohkH2tPVvJgxkuYQlcqdbfpb6
+	 QVlta3wjQ0sYL5LVW9RFP/rRpRc1BEPbkWtq4W86h2498WkH1rK4L6lJ0rg0xVFasQ
+	 sHR5K0t8Vj6lw==
+Message-ID: <3ecbdd00-151b-4cec-9a61-c6d340b2e147@canonical.com>
+Date: Wed, 3 Apr 2024 14:10:16 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,12 +44,12 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [v5.15 Regression] block: rename GENHD_FL_NO_PART_SCAN to
  GENHD_FL_NO_PART
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: hch@lst.de, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- axboe@kernel.dk, sashal@kernel.org, stable@vger.kernel.org,
- Francis Ginther <francis.ginther@canonical.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ axboe@kernel.dk, gregkh@linuxfoundation.org, sashal@kernel.org,
+ stable@vger.kernel.org, Francis Ginther <francis.ginther@canonical.com>
 References: <924449dc-9b1f-4943-afe3-a68c03aedbb5@canonical.com>
- <2024040329-unstopped-spelling-64c8@gregkh>
+ <20240403180512.GA3411@lst.de>
 Content-Language: en-US
 From: Joseph Salisbury <joseph.salisbury@canonical.com>
 Autocrypt: addr=joseph.salisbury@canonical.com; keydata=
@@ -95,49 +95,17 @@ Autocrypt: addr=joseph.salisbury@canonical.com; keydata=
  Xlz7bDhQT9knp59txei2Z9rWsLbLTpS2ZuRcy3KovqY93u3QHPSlRe7z8TdXzCwkqcGw0LEm
  Qu4cewutDo+3U3cY+lRPoPed+HevHlkmy1DAbYzFD3b7UUEZ5f4chuewWhpwQ2uC1fCfFMU0
  p24lPxLL08SuCEzuBw==
-In-Reply-To: <2024040329-unstopped-spelling-64c8@gregkh>
+In-Reply-To: <20240403180512.GA3411@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
-On 4/3/24 13:54, Greg KH wrote:
-> On Wed, Apr 03, 2024 at 01:50:09PM -0400, Joseph Salisbury wrote:
->> Hi Christoph,
->>
->> A kernel bug report was opened against Ubuntu [0].  This bug is a regression
->> introduced in mainline version v5.17-rc1 and made it's way into v5.15 stable
->> updates.
->>
->> The following commit was identified as the cause of the regression in 5.15:
->>
->> c6ce1c5dd327 ("block: rename GENHD_FL_NO_PART_SCAN to GENHD_FL_NO_PART")
-> How is renaming a define a "regression"?
-The "regression" is experienced after upgrading to the kernel to the 
-version that introduced this commit.
-The v5.15.131 kernel works as expected, upgrading the kernel to 
-v5.15.132 breaks behavior that worked in a prior kernel version.
-Reverting commit c6ce1c5dd327 in v5.15.132 allows the experience to be 
-as before in v5.15.131.
-
+On 4/3/24 14:05, Christoph Hellwig wrote:
+> Hi Joseph.
 >
->> I was hoping to get your feedback, since you are the patch author. Is the
->> best approach to revert this commit, since many third parties rely on the
->> name being GENHD_FL_NO_PART_SCAN in kernel headers?
-> External kernel modules are never an issue.  Is this a userspace thing?
->
->>   Is there a specific need that you know of that requires this commit
->> in the 5.15 and earlier stable kernels?
-> Yes.  And Christoph did not do the backport, so I doubt he cares :)
->
-> Again, what in-kernel issue is caused by this?
+> given that Canonical ignores our kernel licensing rules and tries to
+> get away with it I'm not going to offer any help to Canonical at all.
 
-Third party code that relies on the kernel-headers will no longer 
-compile due to the name change.  Should we not care if we break things, 
-even in userspace?
-
->
-> thanks,
->
-> greg k-h
-
+Sorry, I was trying to help the community since this is affecting 
+upstream stable kernels.
