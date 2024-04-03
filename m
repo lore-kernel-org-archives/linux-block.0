@@ -1,212 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF9B152199
-	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 17:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED1815381D;
+	Wed,  3 Apr 2024 17:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712163754; cv=none; b=Yq6m5Z11BQ9OmILEPoGjyhts8eoElD0Hy/8W6+LIb9lcdtCwjWqh/WgcCdQg/nN/BRLDYs2cuUjSWc9JSSlcU8VqvlZ8j0kQRjYU2TeaALlkAiZ//3ZLNN505IZcTraOCB/P06dlRngvBqEV4C/lgjhCvcUHe71V5mGFV20qLEA=
+	t=1712166621; cv=none; b=TMvRFNeUOJlfemDwh69Fz678dye5rsVCE2XRXHqO9ZfpnLMP0CRFmkHYF0fKCac2DpGhhQMdKueiUffWdyEKyPByC/rG+10NnqG0AC9VQLTlViwc2oPzP6Iuf65rtiY85KonlNDNoBqJqlg1fWbDnc9ZDhHJJKIDFbaqLgnFfbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712163754; c=relaxed/simple;
-	bh=Ka2XBtHojXmQUntIvVIeiS+w7Alxi2joEQy4FL+ruYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XBvGFNGYtW8vgON5opjBZbD965Glt8bm0DGphWYl1KOXiNtio6ZRQpeTnW4FhKq4BJ5spigUYp1tXCTW7I1fuqe3OjMJG3Agr8zcefdtY7j7Du8lD6dqvVHjmDLMS6qAqmhFZs7Kz3Gm0Yd9BIHm4s0M/1E3hnWRM1BVCIbE66U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FDjf9hK6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712166621; c=relaxed/simple;
+	bh=xThGk9GOmc0kEc37JvvM5e3AjKZI5HcghdoTOYWVKuE=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=uW0yGQP+42ImfWG9BcquETBjlW/2OWhlQD9u2g+YBfYlFtHoRLQGVfSWX5JpKM4nKidEAso5WBWbIi1y1jtCTlL+o5qyqNz9dEH1P5P+Gv3G/56pqTTQ6ZsEXGC9eGp7HRrJZ0LgoaYMFfndWiK2W2mXLmPeJKaiVBTEQAnhoE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=byqrfGdz; arc=none smtp.client-ip=185.125.188.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDjf9hK6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712163752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PvD24Gz3vP6mwRZR6roKTP8B0DvgtjySY7yBjOsMWK0=;
-	b=FDjf9hK6idBS8hUkFivVix3BvvME8qb+VEpOHZ0V2mDQIcOP6dhcwkly+9bDqUHdZJNSaH
-	ec+hQY3DF+0obYH2OPFZ9mUg6mjoKGS2IgkgzjlZrz0O5Mrw4nf1tQiqioR54PS/Agl1LV
-	oPj955SBh6oKjlXUMtSfQ+j2vw5P22Y=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-185-NA0bh8ygOJGTWGJDE_96tA-1; Wed, 03 Apr 2024 13:02:28 -0400
-X-MC-Unique: NA0bh8ygOJGTWGJDE_96tA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="byqrfGdz"
+Received: from [10.172.66.188] (1.general.jsalisbury.us.vpn [10.172.66.188])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 048F4101A56D;
-	Wed,  3 Apr 2024 17:02:28 +0000 (UTC)
-Received: from redhat.com (unknown [10.2.16.181])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 42AA9C15778;
-	Wed,  3 Apr 2024 17:02:24 +0000 (UTC)
-Date: Wed, 3 Apr 2024 12:02:19 -0500
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alasdair Kergon <agk@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
-	David Teigland <teigland@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Joe Thornber <ejt@redhat.com>
-Subject: Re: [RFC 4/9] dm: add llseek(SEEK_HOLE/SEEK_DATA) support
-Message-ID: <mi3yp4kel6junjk2corv4hi56s56pmwilnm2bb4gg2tbbvyq2n@zmzaqpdq2rlq>
-References: <20240328203910.2370087-1-stefanha@redhat.com>
- <20240328203910.2370087-5-stefanha@redhat.com>
- <6awt5gq36kzwhuobabtye5vhnexc6cufuamy4frymehuv57ky5@esel3f5naqyu>
- <20240403141147.GD2524049@fedora>
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 515673F4BE;
+	Wed,  3 Apr 2024 17:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1712166611;
+	bh=wq4bNQuFQG7/CBFmbK5g+avAGt7oXuzR3zJRSf//+Sc=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type;
+	b=byqrfGdz7SrAezctMlZ0ByVWKjKaQmIYsNJBPx0qYGyUUiG5dzH6xrPb1HcPH3zxH
+	 DHI/PSen+qT9HFWo7rZPOfu5zg1rx04ZhgvkN/uKUlOV8ctlGSFpN3cQQfSQwZLiZO
+	 tFvmn1jo5FAiyroOiZmmpE//9JWBFP9SrfvPUgSPGmsetxnZDDE0+Zcxc000loDYj9
+	 6xQiTV9o6O85uXQ/UhRjEI7uFu34S3qs2Z7uEc31IAIDCD5on3xHZVcoyL5eI7N3xg
+	 t8NCacW+Luk8PiJeQcQ2lgdHXCG4uRnYIwvhIRuc91tMhxl9XcVEQNuHq5wvkYpSxp
+	 akFE3SEDDRD9w==
+Message-ID: <924449dc-9b1f-4943-afe3-a68c03aedbb5@canonical.com>
+Date: Wed, 3 Apr 2024 13:50:09 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240403141147.GD2524049@fedora>
-User-Agent: NeoMutt/20240201
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: hch@lst.de
+From: Joseph Salisbury <joseph.salisbury@canonical.com>
+Subject: [v5.15 Regression] block: rename GENHD_FL_NO_PART_SCAN to
+ GENHD_FL_NO_PART
+Autocrypt: addr=joseph.salisbury@canonical.com; keydata=
+ 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
+ p24lPxLL08SuCEzuBw==
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ axboe@kernel.dk, gregkh@linuxfoundation.org, sashal@kernel.org,
+ stable@vger.kernel.org, Francis Ginther <francis.ginther@canonical.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 03, 2024 at 10:11:47AM -0400, Stefan Hajnoczi wrote:
-...
-> > > +static loff_t dm_blk_do_seek_hole_data(struct dm_table *table, loff_t offset,
-> > > +		int whence)
-> > > +{
-> > > +	struct dm_target *ti;
-> > > +	loff_t end;
-> > > +
-> > > +	/* Loop when the end of a target is reached */
-> > > +	do {
-> > > +		ti = dm_table_find_target(table, offset >> SECTOR_SHIFT);
-> > > +		if (!ti)
-> > > +			return whence == SEEK_DATA ? -ENXIO : offset;
-> > 
-> > ...but this blindly returns offset for SEEK_HOLE, even when offset is
-> > beyond the end of the dm.  I think you want 'return -ENXIO;'
-> > unconditionally here.
-> 
-> If the initial offset is beyond the end of the table, then SEEK_HOLE
-> should return -ENXIO. I agree that the code doesn't handle this case.
-> 
-> However, returning offset here is correct when there is data at the end
-> with SEEK_HOLE.
-> 
-> I'll update the code to address the out-of-bounds offset case, perhaps
-> by checking the initial offset before entering the loop.
+Hi Christoph,
 
-You are correct that if we are on the second loop iteration of
-SEEK_HOLE (because the first iteration saw all data), then we have
-found the offset of the start of a hole and should return that offset,
-not -ENXIO.  This may be a case where we just have to be careful on
-whether the initial pass might have any corner cases different from
-later times through the loop, and that we end the loop with correct
-results for both SEEK_HOLE and SEEK_DATA.
+A kernel bug report was opened against Ubuntu [0].  This bug is a 
+regression introduced in mainline version v5.17-rc1 and made it's way 
+into v5.15 stable updates.
 
-> 
-> > 
-> > > +
-> > > +		end = (ti->begin + ti->len) << SECTOR_SHIFT;
-> > > +
-> > > +		if (ti->type->seek_hole_data)
-> > > +			offset = ti->type->seek_hole_data(ti, offset, whence);
-> > 
-> > Are we guaranteed that ti->type->seek_hole_data will not return a
-> > value exceeding end?  Or can dm be used to truncate the view of an
-> > underlying device, and the underlying seek_hold_data can now return an
-> > answer beyond where dm_table_find_target should look for the next part
-> > of the dm's view?
-> 
-> ti->type->seek_hole_data() must not return a value larger than
-> (ti->begin + ti->len) << SECTOR_SHIFT.
+The following commit was identified as the cause of the regression in 5.15:
 
-Worth adding as documentation then.
+c6ce1c5dd327 ("block: rename GENHD_FL_NO_PART_SCAN to GENHD_FL_NO_PART")
 
-> 
-> > 
-> > In which case, should the blkdev_seek_hole_data callback be passed a
-> > max size parameter everywhere, similar to how fixed_size_llseek does
-> > things?
-> > 
-> > > +		else
-> > > +			offset = dm_blk_seek_hole_data_default(offset, whence, end);
-> > > +
-> > > +		if (whence == SEEK_DATA && offset == -ENXIO)
-> > > +			offset = end;
-> > 
-> > You have a bug here.  If I have a dm contructed of two underlying targets:
-> > 
-> > |A  |B  |
-> > 
-> > and A is all data, then whence == SEEK_HOLE will have offset = -ENXIO
-> > at this point, and you fail to check whether B is also data.  That is,
-> > you have silently treated the rest of the block device as data, which
-> > is semantically not wrong (as that is always a safe fallback), but not
-> > optimal.
-> > 
-> > I think the correct logic is s/whence == SEEK_DATA &&//.
-> 
-> No, with whence == SEEK_HOLE and an initial offset in A, the new offset
-> will be (A->begin + A->end) << SECTOR_SHIFT. The loop will iterate and
-> continue seeking into B.
-> 
-> The if statement you commented on ensures that we also continue looping
-> with whence == SEEK_DATA, because that would otherwise prematurely end
-> with the new offset = -ENXIO.
-> 
-> > 
-> > > +	} while (offset == end);
-> > 
-> > I'm trying to make sure that we can never return the equivalent of
-> > lseek(dm, 0, SEEK_END).  If you make my above suggested changes, we
-> > will iterate through the do loop once more at EOF, and
-> > dm_table_find_target() will then fail to match at which point we do
-> > get the desired -ENXIO for both SEEK_HOLE and SEEK_DATA.
-> 
-> Wait, lseek() is supposed to return the equivalent of lseek(dm, 0,
-> SEEK_END) when whence == SEEK_HOLE and there is data at the end.
+I was hoping to get your feedback, since you are the patch author. Is 
+the best approach to revert this commit, since many third parties rely 
+on the name being GENHD_FL_NO_PART_SCAN in kernel headers?  Is there a 
+specific need that you know of that requires this commit in the 5.15 and 
+earlier stable kernels?
 
-It was confusing enough for me to write my initial review, I apologize
-if I'm making it harder for you.  Yes, we want to ensure that:
+Thanks,
 
-off1 = lseek(fd, -1, SEEK_END);
-off2 = off1 + 1; // == lseek(fd, 0, SEEK_END)
+Joe
 
-if off1 belongs to a data extent:
-  - lseek(fd, off1, SEEK_DATA) == off1
-  - lseek(fd, off1, SEEK_HOLE) == off2
-  - lseek(fd, off2, SEEK_DATA) == -ENXIO
-  - lseek(fd, off2, SEEK_HOLE) == -ENXIO
 
-if off1 belongs to a hole:
-  - lseek(fd, off1, SEEK_DATA) == -ENXIO
-  - lseek(fd, off1, SEEK_HOLE) == off1
-  - lseek(fd, off2, SEEK_DATA) == -ENXIO
-  - lseek(fd, off2, SEEK_HOLE) == -ENXIO
-
-Anything in my wall of text from the earlier message inconsistent with
-this table can be ignored; but at the same time, I was not able to
-quickly convince myself that your code properly had those properties,
-even after writing up the table.
-
-Reiterating what I said elsewhere, it may be smarter to document that
-for callbacks, it is wiser to require intermediate behavior that the
-input value 'offset' is always between the half-open range
-[ti->begin<<SECTOR_SHIFT, (ti->begin+ti->len)<<SECTOR_SHIFT), and on
-success, the output must be in the fully-closed range [offset,
-(ti->begin+ti->len)<<SECTOR_SHIFT], errors like -EIO are permitted but
--ENXIO should not be returned; and let the caller worry about
-synthesizing -ENXIO from that (since the caller knows whether or not
-there is a successor ti where adjacency concerns come into play).
-
-That is, we can never pass in off2 (beyond the bounds of the table),
-and when passing in off1, I think this interface may be easier to work
-with in the intermediate layers, even though it differs from the
-lseek() interface above.  For off1 in data:
-  - dm_blk_do_seek_hole_data(dm, off1, SEEK_DATA) == off1
-  - dm_blk_do_seek_hole_data(dm, off1, SEEK_HOLE) == off2
-and for a hole:
-  - dm_blk_do_seek_hole_data(dm, off1, SEEK_DATA) == off2
-  - dm_blk_do_seek_hole_data(dm, off1, SEEK_HOLE) == off1
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.
-Virtualization:  qemu.org | libguestfs.org
-
+[0] http://pad.lv/2053101
