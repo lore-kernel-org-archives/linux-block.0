@@ -1,173 +1,437 @@
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95983524DC;
-	Wed,  3 Apr 2024 19:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2995C2F24
+	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 21:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712173074; cv=none; b=oIhomqI3guofSDFqhCfWShSNAcvk/6UMczAiLR/OihQgCLb82vLO/4s6bIwrxI596mBixNIIzMHAjw4nvIMRjMp+4xhAABFCGtJij9mKaB0wt3EoKcXKfBp1aZmM+neggbKse6ugEOQUMGU8KwdTsO4wVRQ9Q1LA+2Al3j2SFts=
+	t=1712178695; cv=none; b=cN2KAsrulZAyXps6qoHwpXkejurhez2CrfXOnLWpD0yIZIP/ljpZ81iucJO68KmPb19MC7r+WGCNw98k1K650fSQZVKuqAIT1yXaNSAnEsd+p1OS0r09OZkTogC8xv5f7pp/fErR9gI2I5Yr+V6XyEcsmnIk7L943yp87CPFw1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712173074; c=relaxed/simple;
-	bh=dXEOpxiE2RCJ9FBYM438Z1FVC+BmQcHQgxYhuc5OAqM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rMrWqSuapPKQpJPaXvLSU5IVw7MuDLDmZ7ls65pMN5H9Rtt0UY5/4weA0D61c9cBQ6QH022jMI2h03CaVZ7jbbTCnqrfOeWNN+40bvkeMdQArjTJZNYc71DrTALPzoC/NH/tei/DyfVvADF6IgRQ+7Vd4IvQpwFm48BU95ceiVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=eRTf/YaV; arc=none smtp.client-ip=185.70.43.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1712178695; c=relaxed/simple;
+	bh=SxeTMCToELafZFw9UnwemDREIU0cmjBCyvkui1g5Mrs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I6nqfLXs1zAKhD2CFPfRSHVQsq46yWlNtZSeDVkrNZvCDIdwRkJ6Nbe7X2GVT1cTU9nQ/gqfx10ZwiJkOng6SVnz6ZrBQF75D5wXvjAAFg7JlAkob+fgnqipkRy7l9f2+f1Lu5yblKx8z12I70V5xq9pKSKorrQ/sjyA6wsa7LY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=CtI2VzEP; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="eRTf/YaV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1712173069; x=1712432269;
-	bh=vLw1EUqqXu0E0eV8EO0iY5ZyKumQlE4AJba1Jz1x2ok=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=eRTf/YaVgrIkJNR0WTMp4U/nw7/iMQrP+XEuzQm95Y6Cbc0k5V8oyCBAXcj0uwPg2
-	 JrZ2mrYoc8XBDwj9LyX3Ovhz9XVubhjCTrQZBXMMrPrLG+hOSxKqjBYODcxhwtBks6
-	 PFCf3LWUNfdeWlv4+xxO0GZdsC6Zev7ge0xZZBzk5D+kYVjRx05iXRU4HGd1h/1RH0
-	 qZ+Oa2anQp9jKemSCTS8RtOZ7JnZVVH0aZjGVsKHXBu+XEI9ytSajehXXIv+9SQhIq
-	 Dy5WlMhBwmmY5/UlVzj+p0gRP5nmF0uRI0Jky7TMOrrNnshpAg6+mqEe1tJ5+E3jgT
-	 nb7KeDofat4RQ==
-Date: Wed, 03 Apr 2024 19:37:44 +0000
-To: Andreas Hindborg <nmi@metaspace.dk>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
-	<da.gomez@samsung.com>, open list <linux-kernel@vger.kernel.org>, "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
-Message-ID: <f405ff55-fcb0-4592-ae4b-e1188eae9953@proton.me>
-In-Reply-To: <87v84ysujo.fsf@metaspace.dk>
-References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me> <871q7o54el.fsf@metaspace.dk> <7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me> <87v84ysujo.fsf@metaspace.dk>
-Feedback-ID: 71780778:user:proton
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="CtI2VzEP"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V8y9B2nXwzlgTGW;
+	Wed,  3 Apr 2024 21:11:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1712178678; x=1714770679; bh=7IB/cVQ5YcNdwD5fc1SGDEIUx7WwFOe8r+o
+	hpPVdfgw=; b=CtI2VzEPE0VeZn1dASTAHE59SyyFku9W9s87wioinqq1J3JqOrN
+	djJuhTco4F0so7m2KqKvSCRvyoBk/WomU0S9kTZ2p00ep/UMYZM9vBs3FIQnZ5Tf
+	DNcbzqWIOQQsfTVdOtTl1/jTjq1aWn83RrJY7TDE1TiARiLjbEnlT4e8iglX6FeL
+	CKGrnlRTEoysxTWomJCVNxcSj/EQIWwykYU8o+8SdijeMzixEFnX5v1kQ32X57Qx
+	7HXUJQwgCO0VnNFlbzdo2KEjoEQwU07JzHHHspQ84U1LnipvZ+gokdsKHkZIbPPo
+	LWorKbj2wJJzo+1X5toZWI5UIpcjWBZvF7A==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id XwqwLMph6qQj; Wed,  3 Apr 2024 21:11:18 +0000 (UTC)
+Received: from bvanassche-linux.mtv.corp.google.com (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V8y912ZVQzlgTHp;
+	Wed,  3 Apr 2024 21:11:17 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	Yu Kuai <yukuai3@huawei.com>
+Subject: [PATCH v3] block: Improve IOPS by removing the fairness code
+Date: Wed,  3 Apr 2024 14:10:44 -0700
+Message-ID: <20240403211044.434916-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 03.04.24 10:46, Andreas Hindborg wrote:
-> Benno Lossin <benno.lossin@proton.me> writes:
->=20
->> On 23.03.24 07:32, Andreas Hindborg wrote:
->>> Benno Lossin <benno.lossin@proton.me> writes:
->>>> On 3/13/24 12:05, Andreas Hindborg wrote:
->>>>> +//! implementations of the `Operations` trait.
->>>>> +//!
->>>>> +//! IO requests are passed to the driver as [`Request`] references. =
-The
->>>>> +//! `Request` type is a wrapper around the C `struct request`. The d=
-river must
->>>>> +//! mark start of request processing by calling [`Request::start`] a=
-nd end of
->>>>> +//! processing by calling one of the [`Request::end`], methods. Fail=
-ure to do so
->>>>> +//! can lead to IO failures.
->>>>
->>>> I am unfamiliar with this, what are "IO failures"?
->>>> Do you think that it might be better to change the API to use a
->>>> callback? So instead of calling start and end, you would do
->>>>
->>>>        request.handle(|req| {
->>>>            // do the stuff that would be done between start and end
->>>>        });
->>>>
->>>> I took a quick look at the rnull driver and there you are calling
->>>> `Request::end_ok` from a different function. So my suggestion might no=
-t
->>>> be possible, since you really need the freedom.
->>>>
->>>> Do you think that a guard approach might work better? ie `start` retur=
-ns
->>>> a guard that when dropped will call `end` and you need the guard to
->>>> operate on the request.
->>>
->>> I don't think that would fit, since the driver might not complete the
->>> request immediately. We might be able to call `start` on behalf of the
->>> driver.
->>>
->>> At any rate, since the request is reference counted now, we can
->>> automatically fail a request when the last reference is dropped and it
->>> was not marked successfully completed. I would need to measure the
->>> performance implications of such a feature.
->>
->> Are there cases where you still need access to the request after you
->> have called `end`?
->=20
-> In general no, there is no need to handle the request after calling end.
-> C drivers are not allowed to, because this transfers ownership of the
-> request back to the block layer. This patch series defer the transfer of
-> ownership to the point when the ARef<Request> refcount goes to zero, so
-> there should be no danger associated with touching the `Request` after
-> end.
->=20
->> If no, I think it would be better for the request to
->> be consumed by the `end` function.
->> This is a bit difficult with `ARef`, since the user can just clone it
->> though... Do you think that it might be necessary to clone requests?
->=20
-> Looking into the details now I see that calling `Request::end` more than
-> once will trigger UAF, because C code decrements the refcount on the
-> request. When we have `ARef<Request>` around, that is a problem. It
-> probably also messes with other things in C land. Good catch.
->=20
-> I did implement `Request::end` to consume the request at one point
-> before I fell back on reference counting. It works fine for simple
-> drivers. However, most drivers will need to use the block layer tag set
-> service, that allows conversion of an integer id to a request pointer.
-> The abstraction for this feature is not part of this patch set. But the
-> block layer manages a mapping of integer to request mapping, and drivers
-> typically use this to identify the request that corresponds to
-> completion messages that arrive from hardware. When drivers are able to
-> turn integers into requests like this, consuming the request in the call
-> to `end` makes little sense (because we can just construct more).
+There is an algorithm in the block layer for maintaining fairness
+across queues that share a tag set. The sbitmap implementation has
+improved so much that we don't need the block layer fairness algorithm
+anymore and that we can rely on the sbitmap implementation to guarantee
+fairness.
 
-How do you ensure that this is fine?:
+On my test setup (x86 VM with 72 CPU cores) this patch results in 2.9% mo=
+re
+IOPS. IOPS have been measured as follows:
 
-     let r1 =3D tagset.get(0);
-     let r2 =3D tagset.get(0);
-     r1.end_ok();
-     r2.do_something_that_would_only_be_done_while_active();
+$ modprobe null_blk nr_devices=3D1 completion_nsec=3D0
+$ fio --bs=3D4096 --disable_clat=3D1 --disable_slat=3D1 --group_reporting=
+=3D1 \
+      --gtod_reduce=3D1 --invalidate=3D1 --ioengine=3Dpsync --ioscheduler=
+=3Dnone \
+      --norandommap --runtime=3D60 --rw=3Drandread --thread --time_based=3D=
+1 \
+      --buffered=3D0 --numjobs=3D64 --name=3D/dev/nullb0 --filename=3D/de=
+v/nullb0
 
-One thing that comes to my mind would be to only give out `&Request`
-from the tag set. And to destroy, you could have a separate operation
-that also removes the request from the tag set. (I am thinking of a tag
-set as a `HashMap<u64, Request>`.
+It has been verified as follows that all request queues that share a tag
+set process I/O even if the completion times are different:
+- Create a first request queue with completion time 1 ms and queue
+  depth 64.
+- Create a second request queue with completion time 100 ms and that
+  shares the tag set of the first request queue.
+- Submit I/O to both request queues with fio.
 
->=20
-> What I do now is issue the an `Option<ARef<Request>>` with
-> `bindings::req_ref_inc_not_zero(rq_ptr)`, to make sure that the request
-> is currently owned by the driver.
->=20
-> I guess we can check the absolute value of the refcount, and only issue
-> a request handle if the count matches what we expect. Then we can be cert=
-ain
-> that the handle is unique, and we can require transfer of ownership of
-> the handle to `Request::end` to make sure it can never be called more
-> than once.
->=20
-> Another option is to error out in `Request::end` if the
-> refcount is not what we expect.
+Tests have shown that the IOPS for this test case are 29859 and 318 or a
+ratio of about 94. This ratio is close to the completion time ratio.
+While this is unfair, both request queues make progress at a consistent
+pace.
 
-I am a bit confused, why does the refcount matter in this case? Can't
-the user just have multiple `ARef`s?
+This patch removes the following code and structure members:
+- The function hctx_may_queue().
+- blk_mq_hw_ctx.nr_active and request_queue.nr_active_requests_shared_tag=
+s
+  and also all the code that modifies these two member variables.
 
-I think it would be weird to use `ARef<Request>` if you expect the
-refcount to be 1. Maybe the API should be different?
-As I understand it, a request has the following life cycle (please
-correct me if I am wrong):
-1. A new request is created, it is given to the driver via `queue_rq`.
-2. The driver can now decide what to do with it (theoretically it can
-    store it somewhere and later do something with it), but it should at
-    some point call `Request::start`.
-3. Work happens and eventually the driver calls `Request::end`.
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Yu Kuai <yukuai3@huawei.com>
+Fixes: 07757588e507 ("block/mq-deadline: Reserve 25% of scheduler tags fo=
+r synchronous requests")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-core.c       |   2 -
+ block/blk-mq-debugfs.c |  22 ++++++++-
+ block/blk-mq-tag.c     |   4 --
+ block/blk-mq.c         |  17 +------
+ block/blk-mq.h         | 100 -----------------------------------------
+ include/linux/blk-mq.h |   6 ---
+ include/linux/blkdev.h |   2 -
+ 7 files changed, 22 insertions(+), 131 deletions(-)
 
-To me this does not seem like something where we need a refcount (we
-still might need one for safety, but it does not need to be exposed to
-the user).
 
---=20
-Cheers,
-Benno
+Changes compared to v2: improved patch description.
+Changes compared to v1: improved the debugfs code.
 
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a16b5abdbbf5..57dfa4612b43 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -425,8 +425,6 @@ struct request_queue *blk_alloc_queue(struct queue_li=
+mits *lim, int node_id)
+=20
+ 	q->node =3D node_id;
+=20
+-	atomic_set(&q->nr_active_requests_shared_tags, 0);
+-
+ 	timer_setup(&q->timeout, blk_rq_timed_out_timer, 0);
+ 	INIT_WORK(&q->timeout_work, blk_timeout_work);
+ 	INIT_LIST_HEAD(&q->icq_list);
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 94668e72ab09..8e0c7774d6ec 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -479,11 +479,31 @@ static int hctx_sched_tags_bitmap_show(void *data, =
+struct seq_file *m)
+ 	return res;
+ }
+=20
++struct count_active_params {
++	struct blk_mq_hw_ctx	*hctx;
++	int			*active;
++};
++
++static bool hctx_count_active(struct request *rq, void *data)
++{
++	const struct count_active_params *params =3D data;
++
++	if (rq->mq_hctx =3D=3D params->hctx)
++		(*params->active)++;
++
++	return true;
++}
++
+ static int hctx_active_show(void *data, struct seq_file *m)
+ {
+ 	struct blk_mq_hw_ctx *hctx =3D data;
++	int active =3D 0;
++	struct count_active_params params =3D { .hctx =3D hctx, .active =3D &ac=
+tive };
++
++	blk_mq_all_tag_iter(hctx->sched_tags ?: hctx->tags, hctx_count_active,
++			    &params);
+=20
+-	seq_printf(m, "%d\n", __blk_mq_active_requests(hctx));
++	seq_printf(m, "%d\n", active);
+ 	return 0;
+ }
+=20
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index cc57e2dd9a0b..25334bfcabf8 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -105,10 +105,6 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 			    struct sbitmap_queue *bt)
+ {
+-	if (!data->q->elevator && !(data->flags & BLK_MQ_REQ_RESERVED) &&
+-			!hctx_may_queue(data->hctx, bt))
+-		return BLK_MQ_NO_TAG;
+-
+ 	if (data->shallow_depth)
+ 		return sbitmap_queue_get_shallow(bt, data->shallow_depth);
+ 	else
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b8dbfed8b28b..34060d885c5a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -425,8 +425,6 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_dat=
+a *data)
+ 		rq_list_add(data->cached_rq, rq);
+ 		nr++;
+ 	}
+-	if (!(data->rq_flags & RQF_SCHED_TAGS))
+-		blk_mq_add_active_requests(data->hctx, nr);
+ 	/* caller already holds a reference, add for remainder */
+ 	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
+ 	data->nr_tags -=3D nr;
+@@ -511,8 +509,6 @@ static struct request *__blk_mq_alloc_requests(struct=
+ blk_mq_alloc_data *data)
+ 		goto retry;
+ 	}
+=20
+-	if (!(data->rq_flags & RQF_SCHED_TAGS))
+-		blk_mq_inc_active_requests(data->hctx);
+ 	rq =3D blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag);
+ 	blk_mq_rq_time_init(rq, alloc_time_ns);
+ 	return rq;
+@@ -672,8 +668,6 @@ struct request *blk_mq_alloc_request_hctx(struct requ=
+est_queue *q,
+ 	tag =3D blk_mq_get_tag(&data);
+ 	if (tag =3D=3D BLK_MQ_NO_TAG)
+ 		goto out_queue_exit;
+-	if (!(data.rq_flags & RQF_SCHED_TAGS))
+-		blk_mq_inc_active_requests(data.hctx);
+ 	rq =3D blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag);
+ 	blk_mq_rq_time_init(rq, alloc_time_ns);
+ 	rq->__data_len =3D 0;
+@@ -713,10 +707,8 @@ static void __blk_mq_free_request(struct request *rq=
+)
+ 	blk_pm_mark_last_busy(rq);
+ 	rq->mq_hctx =3D NULL;
+=20
+-	if (rq->tag !=3D BLK_MQ_NO_TAG) {
+-		blk_mq_dec_active_requests(hctx);
++	if (rq->tag !=3D BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+-	}
+ 	if (sched_tag !=3D BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
+ 	blk_mq_sched_restart(hctx);
+@@ -1065,8 +1057,6 @@ static inline void blk_mq_flush_tag_batch(struct bl=
+k_mq_hw_ctx *hctx,
+ {
+ 	struct request_queue *q =3D hctx->queue;
+=20
+-	blk_mq_sub_active_requests(hctx, nr_tags);
+-
+ 	blk_mq_put_tags(hctx->tags, tag_array, nr_tags);
+ 	percpu_ref_put_many(&q->q_usage_counter, nr_tags);
+ }
+@@ -1761,9 +1751,6 @@ bool __blk_mq_alloc_driver_tag(struct request *rq)
+ 	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) =
+{
+ 		bt =3D &rq->mq_hctx->tags->breserved_tags;
+ 		tag_offset =3D 0;
+-	} else {
+-		if (!hctx_may_queue(rq->mq_hctx, bt))
+-			return false;
+ 	}
+=20
+ 	tag =3D __sbitmap_queue_get(bt);
+@@ -1771,7 +1758,6 @@ bool __blk_mq_alloc_driver_tag(struct request *rq)
+ 		return false;
+=20
+ 	rq->tag =3D tag + tag_offset;
+-	blk_mq_inc_active_requests(rq->mq_hctx);
+ 	return true;
+ }
+=20
+@@ -3729,7 +3715,6 @@ blk_mq_alloc_hctx(struct request_queue *q, struct b=
+lk_mq_tag_set *set,
+ 	if (!zalloc_cpumask_var_node(&hctx->cpumask, gfp, node))
+ 		goto free_hctx;
+=20
+-	atomic_set(&hctx->nr_active, 0);
+ 	if (node =3D=3D NUMA_NO_NODE)
+ 		node =3D set->numa_node;
+ 	hctx->numa_node =3D node;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index f75a9ecfebde..ac29a30e4322 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -271,70 +271,9 @@ static inline int blk_mq_get_rq_budget_token(struct =
+request *rq)
+ 	return -1;
+ }
+=20
+-static inline void __blk_mq_add_active_requests(struct blk_mq_hw_ctx *hc=
+tx,
+-						int val)
+-{
+-	if (blk_mq_is_shared_tags(hctx->flags))
+-		atomic_add(val, &hctx->queue->nr_active_requests_shared_tags);
+-	else
+-		atomic_add(val, &hctx->nr_active);
+-}
+-
+-static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hc=
+tx)
+-{
+-	__blk_mq_add_active_requests(hctx, 1);
+-}
+-
+-static inline void __blk_mq_sub_active_requests(struct blk_mq_hw_ctx *hc=
+tx,
+-		int val)
+-{
+-	if (blk_mq_is_shared_tags(hctx->flags))
+-		atomic_sub(val, &hctx->queue->nr_active_requests_shared_tags);
+-	else
+-		atomic_sub(val, &hctx->nr_active);
+-}
+-
+-static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hc=
+tx)
+-{
+-	__blk_mq_sub_active_requests(hctx, 1);
+-}
+-
+-static inline void blk_mq_add_active_requests(struct blk_mq_hw_ctx *hctx=
+,
+-					      int val)
+-{
+-	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+-		__blk_mq_add_active_requests(hctx, val);
+-}
+-
+-static inline void blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx=
+)
+-{
+-	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+-		__blk_mq_inc_active_requests(hctx);
+-}
+-
+-static inline void blk_mq_sub_active_requests(struct blk_mq_hw_ctx *hctx=
+,
+-					      int val)
+-{
+-	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+-		__blk_mq_sub_active_requests(hctx, val);
+-}
+-
+-static inline void blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx=
+)
+-{
+-	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+-		__blk_mq_dec_active_requests(hctx);
+-}
+-
+-static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
+-{
+-	if (blk_mq_is_shared_tags(hctx->flags))
+-		return atomic_read(&hctx->queue->nr_active_requests_shared_tags);
+-	return atomic_read(&hctx->nr_active);
+-}
+ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
+ {
+-	blk_mq_dec_active_requests(hctx);
+ 	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+ 	rq->tag =3D BLK_MQ_NO_TAG;
+ }
+@@ -407,45 +346,6 @@ static inline void blk_mq_free_requests(struct list_=
+head *list)
+ 	}
+ }
+=20
+-/*
+- * For shared tag users, we track the number of currently active users
+- * and attempt to provide a fair share of the tag depth for each of them=
+.
+- */
+-static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+-				  struct sbitmap_queue *bt)
+-{
+-	unsigned int depth, users;
+-
+-	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+-		return true;
+-
+-	/*
+-	 * Don't try dividing an ant
+-	 */
+-	if (bt->sb.depth =3D=3D 1)
+-		return true;
+-
+-	if (blk_mq_is_shared_tags(hctx->flags)) {
+-		struct request_queue *q =3D hctx->queue;
+-
+-		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+-			return true;
+-	} else {
+-		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+-			return true;
+-	}
+-
+-	users =3D READ_ONCE(hctx->tags->active_queues);
+-	if (!users)
+-		return true;
+-
+-	/*
+-	 * Allow at least some tags
+-	 */
+-	depth =3D max((bt->sb.depth + users - 1) / users, 4U);
+-	return __blk_mq_active_requests(hctx) < depth;
+-}
+-
+ /* run the code block in @dispatch_ops with rcu/srcu read lock held */
+ #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
+ do {								\
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index d3d8fd8e229b..a066ea77148f 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -398,12 +398,6 @@ struct blk_mq_hw_ctx {
+ 	/** @queue_num: Index of this hardware queue. */
+ 	unsigned int		queue_num;
+=20
+-	/**
+-	 * @nr_active: Number of active requests. Only used when a tag set is
+-	 * shared across request queues.
+-	 */
+-	atomic_t		nr_active;
+-
+ 	/** @cpuhp_online: List to store request if CPU is going to die */
+ 	struct hlist_node	cpuhp_online;
+ 	/** @cpuhp_dead: List to store request if some CPU die. */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c3e8f7cf96be..ed1e807f42a2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -445,8 +445,6 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+=20
+-	atomic_t		nr_active_requests_shared_tags;
+-
+ 	unsigned int		required_elevator_features;
+=20
+ 	struct blk_mq_tags	*sched_shared_tags;
