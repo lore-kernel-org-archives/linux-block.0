@@ -1,60 +1,59 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFE24D13B;
-	Wed,  3 Apr 2024 07:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7A917BC2
+	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 07:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712127658; cv=none; b=WWYB6myH7VhJh2RJzYTHa54vMgY5EEHoWeQWsRAbCghY0Jr9NnQPk6MFZcA5LcPD40ciwx3IinpC1DHH1F35IGncvlI4FIOh/CuvU6cSEmBe23yCwGR/npuo39+9HvfbGJ8YKW24Yu6S6flXAzwv2p/iBjbIWjGsDNUKdfzUefo=
+	t=1712127803; cv=none; b=Xe5b5TpYZrNHR6UW+gt/xzzrPAWnzW8J0s/7WecKG7xSr7gZIZb/jnKhM6XXyTAaKRw7AdtUGa9CtZKs3DMagp1FTI+BQLWAX7A4gUgNp5UcPZuoysueiYa9XWLNlfdFN9xC6hbQibwBPVPCxXczoxsIUcLTmZvjYUHxM9gy2U4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712127658; c=relaxed/simple;
-	bh=WvhA3jEbtippXSoVcbWJaNBfh5cjyeHSowgQPJHGOzw=;
+	s=arc-20240116; t=1712127803; c=relaxed/simple;
+	bh=YBylnFIrRYTYF2c6lCVlnmZSgPH3NUn+uUMcAmwRAVU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NxYSLeO/rI+gabkAlN4FtRvD2qM3W/5UNT9cv8/75nV50yiDT0WqvSi+0JIiOwo0jpKEWLHh046MxNyjY/DSWiaKSF4QovoTJ4ihsMSF27madB8SAR3EkOE/6PNQz0KSoH9IIYJkJTNq3lcSvVNhxa5lVsTlKNnL43TnVLlHs1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QB3hsxew; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bnvnFsWx; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 In-Reply-To:Content-Type; b=c5UCGlhYYigfIhHSM6beBjv2JqhGCCPsTjWdxYPP7idJeEFpudj+Q61GKstbOYlPCSHwuW5IJ9JET6UmD9QMMlNBAxeoCXckZduyvV0+fgMkiDDFs/BDQ/vOVt+2QjOGWhllqCy0KIy9moxxNcPjjC94uTFNuV45V//CvjnFB70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZZqenvK2; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QB3hsxew";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bnvnFsWx"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id EE9E935023;
-	Wed,  3 Apr 2024 07:00:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712127655; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VStNnPFhhkcWzvAWZLJlbNI7t7EFEcfNzWUOZ1J8U2A=;
-	b=QB3hsxewMMgKhr30NMiUm/00T3O4w/lnehX3R2SryCUDnolMz89vM3Wer0qQOHsktaoNW4
-	LfSKAC1fkd7rdnZRpoJ8KJ6AbpjIdlHdFc9QZX3ovNSUKJNJ9wirDdIgSorddTvH4MN3E1
-	H0aRdRfM4oCqMbCSD9SnJf7HA9mvr8E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712127655;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VStNnPFhhkcWzvAWZLJlbNI7t7EFEcfNzWUOZ1J8U2A=;
-	b=bnvnFsWxlcqj/t4M+LaObN7H9y9n1E4PTw9UKBPok51GCuLDMzXgyXC4rGIQTWdtpKuyJf
-	smu/MDUDwNbr4UDQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=none
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 0914413357;
-	Wed,  3 Apr 2024 07:00:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id e5qXOqP+DGalDgAAn2gu4w
-	(envelope-from <hare@suse.de>); Wed, 03 Apr 2024 07:00:51 +0000
-Message-ID: <d6e7fe8a-4677-4ca8-8db1-d186dbdbb461@suse.de>
-Date: Wed, 3 Apr 2024 09:00:51 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZZqenvK2"
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43370Rvp016397;
+	Wed, 3 Apr 2024 07:03:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=hQZxVUExsv+856nPD5Ou3ZQ1TBRAOMCLVmmsu+x3CWY=;
+ b=ZZqenvK2ICo/6xRVSFpfnIZzte/h2duLCl+bBu7FFWBHquP/YRB1zOB0qxSto2K3o+YU
+ Fvczg/bMcskjjC3UH1rzqfdkKyCRwo010xkLE4WBfOGti+Ooltuiosq/70xcBQ65MSdC
+ soTJkNqihs/J8F6436w8eycCuvLc9z2H7J//gQudHxcjEN/8akTGx/7hRCEGhzVHSNwG
+ UC1pklXxOA7g4wI7KdfqgXHVmgkA99U0hhojHJ73mBt4NqYQFbvC+h1Ge3DL7jkgUGD+
+ 2V9FizGO+PgHFvF0Fl9qulHcjXoq2C17lUpjkBSkLe8X7Aw7dhN/oM4Q2PvKMwFLBWSD mQ== 
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x927m00nf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 07:03:12 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4334YXOO027151;
+	Wed, 3 Apr 2024 07:03:11 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x6wf0bxb8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 07:03:11 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4337389C16122524
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 3 Apr 2024 07:03:10 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 85B1558078;
+	Wed,  3 Apr 2024 07:03:08 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 783C95807A;
+	Wed,  3 Apr 2024 07:03:06 +0000 (GMT)
+Received: from [9.109.198.231] (unknown [9.109.198.231])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  3 Apr 2024 07:03:06 +0000 (GMT)
+Message-ID: <ff149ec9-9664-4d72-bbe5-1db2520df33b@linux.ibm.com>
+Date: Wed, 3 Apr 2024 12:33:05 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,102 +61,67 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/23] scsi: add a device_configure method to the host
- template
+Subject: Re: [Bug Report] nvme-cli commands fails to open head disk node and
+ print error
 Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>,
- Sathya Prakash <sathya.prakash@broadcom.com>,
- Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
- Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
- "Juergen E. Fischer" <fischer@norbit.de>,
- Xiang Chen <chenxiang66@hisilicon.com>,
- HighPoint Linux Team <linux@highpoint-tech.com>,
- Tyrel Datwyler <tyreld@linux.ibm.com>, Brian King <brking@us.ibm.com>,
- Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
- Mike Christie <michael.christie@oracle.com>,
- John Garry <john.g.garry@oracle.com>, Jason Yan <yanaijie@huawei.com>,
- Kashyap Desai <kashyap.desai@broadcom.com>,
- Sumit Saxena <sumit.saxena@broadcom.com>,
- Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
- Chandrakanth patil <chandrakanth.patil@broadcom.com>,
- Jack Wang <jinpu.wang@cloud.ionos.com>, Nilesh Javali <njavali@marvell.com>,
- GR-QLogic-Storage-Upstream@marvell.com,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
- Bart Van Assche <bvanassche@acm.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
- linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
- MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
- megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
- linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
- usb-storage@lists.one-eyed-alien.net
-References: <20240402130645.653507-1-hch@lst.de>
- <20240402130645.653507-11-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20240402130645.653507-11-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: 2.52
-X-Spam-Flag: NO
-X-Spamd-Bar: ++
-X-Spamd-Result: default: False [2.52 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 TO_DN_SOME(0.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 MX_GOOD(-0.01)[];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 R_DKIM_NA(2.20)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_MATCH_FROM(0.00)[];
-	 BAYES_HAM(-0.07)[62.73%];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_SPAM_LONG(0.70)[0.199];
-	 RCPT_COUNT_TWELVE(0.00)[42];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_TLS_ALL(0.00)[]
-X-Spam-Level: **
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: EE9E935023
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, axboe@fb.com,
+        Gregory Joyce <gjoyce@ibm.com>
+References: <c0750d96-6bae-46b5-a1cc-2ff9d36eccb3@linux.ibm.com>
+ <20240402150446.GB1916@lst.de>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20240402150446.GB1916@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: scVKc_ct3q5yfhkq6_EyU8j4pav3UnDH
+X-Proofpoint-ORIG-GUID: scVKc_ct3q5yfhkq6_EyU8j4pav3UnDH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-03_06,2024-04-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 impostorscore=0
+ spamscore=0 clxscore=1011 mlxlogscore=999 suspectscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2404030047
 
-On 4/2/24 15:06, Christoph Hellwig wrote:
-> This is a version of ->slave_configure that also takes a queue_limits
-> structure that the caller applies, and thus allows drivers to reconfigure
-> the queue using the atomic queue limits API.
+
+Hi Christoph,
+
+On 4/2/24 20:34, Christoph Hellwig wrote:
+> Hi Nilay,
 > 
-> In the long run it should also replace ->slave_configure entirely as
-> there is no need to have two different methods here, and the slave
-> name in addition to being politically charged also has no basis in
-> the SCSI standards or the kernel code.
+> can you see if this patch makes a different for your weird controller
+> with the listed but zero capacity namespaces?
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   drivers/scsi/scsi_scan.c | 47 ++++++++++++++++++++++------------------
->   include/scsi/scsi_host.h |  4 ++++
->   2 files changed, 30 insertions(+), 21 deletions(-)
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 3b0498f320e6b9..ad60cf5581a419 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2089,7 +2089,7 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
+>  	if (id->ncap == 0) {
+>  		/* namespace not allocated or attached */
+>  		info->is_removed = true;
+> -		ret = -ENODEV;
+> +		ret = -ENXIO;
+>  		goto out;
+>  	}
+>  	lbaf = nvme_lbaf_index(id->flbas);
 > 
-I would have loved to move all drivers over to ->device_configure, but I 
-guess that can be done at a later time.
+I have just tested the above patch on my controller which has zero 
+capacity namespaces. The patch works as expected and I don't encounter
+any errors while using nvme-cli commands. Please note that I am using 
+here the old version of nvme-cli (nvme version 2.6 / libnvme version 1.6).
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Furthermore, with this patch, I no longer find any hidden disk nodes 
+(i.e. nvmeXcYnZ or nvmeXnY) created for namespaces with zero capacity 
+under /sys/block. So the behavior is similar to that of kernel v6.8.
 
-Cheers,
+IMO, we should upstream this patch.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Thanks,
+--Nilay
 
+
+ 
