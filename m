@@ -1,96 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10621645;
-	Wed,  3 Apr 2024 05:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760EF2EB11;
+	Wed,  3 Apr 2024 05:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712121034; cv=none; b=bUhjD2qiR7A0/SHq8RqHayu9F5rIFF4n1T0rVvbyp8jnCeplTPTUy8E0WJb7FM1GmcAZZh3qrTvwTE/WvEqQIodzrYbuqGxizFGcoT01H9UgqTIxSjdSzIfzfoZwdWRSGBm+s1hmIW6qH5WvTi3yRX47FtcVVZrBplAcFKimQxw=
+	t=1712122899; cv=none; b=GRkIJ72nZgK7kmGOKiURZDjCB7BjlqvN0xg38FBa11syaxRXyqcexkunqWxi756jb2K8rNXSxtjb9jo/JEEcnQBV9IATU+d01fCYgK2R9J2xsybUYodbB0s1oqcg9XyAI4bbbVnvf1tj8cgL97y9uZ52UR2OD0uDhkOhg8Wh0ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712121034; c=relaxed/simple;
-	bh=nfMida/fwtgf6d9g/VzEFa7bAK2MwKc03M85xVMKpXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pKymvtannxk9XJlgHLrOs8gdl87w/uFZUq2gsOAj5uujrkzrZYRF4W8VcOq2CBRL91HsfimzSDze5dLWxfsRlHGBVXZ5Qh9w7FldsO++ceKorPH1Onj4CNmfdok9CR53g7UznoIOVOP0ld2E1atQsnB1KeD6T/1X6jOOOB6LuGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=soGyJg5H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712122899; c=relaxed/simple;
+	bh=+t545PBypOguN6hjXWN9AkW/8XTtIWVXgoDys9wwB5o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uQY6dbKp9tksbyCzolwNGqyUU9LSYBcgGBiK3dpAe2Z2FNqVUF0RyFgMT6yrtvY4TP6WeZHBqXlqQzq96GZFdny77wjnA3HGRLqvgewLY8Ca9BpMMo1ItcynUJxE9Do1rTAT0iBQsyUEEuW9XXuO+OYdmDmUBgOE4TWXzPIzkiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=geUH5JVY; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="soGyJg5H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAB17C433C7;
-	Wed,  3 Apr 2024 05:10:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712121033;
-	bh=nfMida/fwtgf6d9g/VzEFa7bAK2MwKc03M85xVMKpXk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=soGyJg5HUoztDgHwRzno02g7VWNaNwjWE8EJzeGEFWvEqlVnOv95t66xg0dFWdDsm
-	 XAyyRG+qzesHn2tUz00OrC8EBuSOOGB8YyksVmIn7+nywRPuIf+tkY3I0hVwccgAxB
-	 LV88ts4IKuLJSsyu0WKfjKSGMvjPvCMN492RMBmIu4Q/8cJmNTiJJGiIVXkenEVkZ+
-	 sCeBB21FhOWGjrmkCpF9fIG1wagU4e6GcznzodJOxTWZGajmhmZALzUfbeaXMCoGRK
-	 gmK4lsXCF7oQ3Jggov2yJLLgeFfSirdE24WLJvYSx2shbC8HMygRJyjY0PKghRN881
-	 OMWLkAXEj4jUA==
-Date: Tue, 2 Apr 2024 22:10:31 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-	serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk, agk@redhat.com,
-	snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com,
-	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	audit@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH v16 17/20] ipe: enable support for fs-verity as a trust
- provider
-Message-ID: <20240403051031.GK2576@sol.localdomain>
-References: <1711657047-10526-1-git-send-email-wufan@linux.microsoft.com>
- <1711657047-10526-18-git-send-email-wufan@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="geUH5JVY"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3438d7a05aaso161653f8f.0;
+        Tue, 02 Apr 2024 22:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712122896; x=1712727696; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jwTy49e6dNHcCmFsMWwFiFthRuOhI2Gcyw/tIENnsdY=;
+        b=geUH5JVY7XGs/CdU4PkKIZkm+W6Ecsoo638BxG9NfMLWqXNrH8kOL5rNf2V4rmfkxN
+         NC/sLA7ADfsG8O70wM/tiGZjtdwVy9s0o8MZ4vz0duOls0+75nQ1YwQr3DyBBUK/SrsW
+         Vq4txiyKSuKRRvi3DT7+LbyY2MlWVMZMQ4NzMn3kS5uE8d9pLw3pAXZ4Xpj5OSHUcVDK
+         +eyqLsOLP3hFI60ibRR7SBXyW9VYy+SrPjVxPqLMjZ3EhtzoLETk9dgepNu9ZY8+AIPT
+         i9gBGARjO3AeE8bZEb5fPQQ6dBuwiy74EzKuosaRQdrRu+MGP7CKLoKsUPlAAa1n0c2g
+         nV9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712122896; x=1712727696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jwTy49e6dNHcCmFsMWwFiFthRuOhI2Gcyw/tIENnsdY=;
+        b=VNJoVUKbnaXFltsE8KtZ5Lv/NDfUbEGImBVrPBwfS74h7uEe0LdUCYxTlyDOkp8/Ue
+         aKHbKU5G+Ec0Brt0wbRl28aAlc3BdfkXJeivlN0+yVRest9JlPC3lotnpiZj+9+ZLlec
+         rtbFerzfIDujLWqE6LEupkIufMUFl5vYv6+SJBqek+y6CuUee2wfkSPf7h/0ga83IDPj
+         0SwvUKUaIMCKxbIOxo024attW0Bayi7fn27vp2/Dhb/h7M/E0hUZ0GHwn9EcaduQWYRH
+         aLf0pL1dHbbN1W+UTtCom9DH3iT1yYoYK2A8pSvLoEqQbZKT5BQVSg4jBzdglLgxTqyy
+         S9SQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkXTa8UZ+Yb1MJ9fcuZmOZ/08RHx967EozdS8N3NIe9zQChcVav3SL5lt5mKOSpsH1bdmA0kthk1HP4a6eutzocThn3OPgYVp84uWet4bb5n+k5wy8QDgL7z+1pB036DMn9zsPcsWHJks=
+X-Gm-Message-State: AOJu0YwftG6EovzTfAe0eWh+A82qoBks1gZIj3+0LE21Gufynfu599UE
+	bRcbaVA6pYRxxcQ7EwQ6KSaUteSNqqzcQjFzAfUMRhgZ4Gbk4Kfb6P0xZcIRTEV/9ohx1r/0PtT
+	K1HXXZZ/d9irfqaSWWtdB+xGajNI=
+X-Google-Smtp-Source: AGHT+IE+WI7YVu7qLj99K1PWwbBfQZV3Bw3Ncz06Hw0+Y5x6S5aUU96tI6utzWMjZs43wbmEUVjiOXGlRtRsWO/sCf0=
+X-Received: by 2002:a5d:4007:0:b0:33e:9f3d:6910 with SMTP id
+ n7-20020a5d4007000000b0033e9f3d6910mr1278315wrp.31.1712122895363; Tue, 02 Apr
+ 2024 22:41:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1711657047-10526-18-git-send-email-wufan@linux.microsoft.com>
+References: <1711680261-5789-1-git-send-email-zhiguo.niu@unisoc.com>
+ <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org> <CAHJ8P3K9OL6MHNrSrqmf0esbr2h1HJ3mVRmxDNVpf95ZMHQcqg@mail.gmail.com>
+ <92e45c93-e2ff-4d34-b70f-7772f0596e68@acm.org> <CAHJ8P3KgU-tFDAgCNc5GcPbUBtDDyFmcfza2HsoD9TJ3h1DS=Q@mail.gmail.com>
+ <c56a1d54-6d7d-4105-8109-d6a81bc1adbc@acm.org>
+In-Reply-To: <c56a1d54-6d7d-4105-8109-d6a81bc1adbc@acm.org>
+From: Zhiguo Niu <niuzhiguo84@gmail.com>
+Date: Wed, 3 Apr 2024 13:41:24 +0800
+Message-ID: <CAHJ8P3JYXA4VGfgXLMesuuUOUivc1EKwxGce4P5MWDHn1K675Q@mail.gmail.com>
+Subject: Re: [PATCH] block/mq-deadline: Fix WARN when set async_depth by sysfs
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, ke.wang@unisoc.com, hongyu.jin@unisoc.com, 
+	Damien Le Moal <dlemoal@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 28, 2024 at 01:17:24PM -0700, Fan Wu wrote:
-> Enable IPE policy authors to indicate trust for a singular fsverity
-> file, identified by the digest information, through "fsverity_digest"
-> and all files using fsverity's builtin signatures via
-> "fsverity_signature".
+On Wed, Apr 3, 2024 at 7:20=E2=80=AFAM Bart Van Assche <bvanassche@acm.org>=
+ wrote:
+>
+> On 4/1/24 10:44 PM, Zhiguo Niu wrote:
+> > On Tue, Apr 2, 2024 at 5:23=E2=80=AFAM Bart Van Assche <bvanassche@acm.=
+org> wrote:
+> >> Oops, I misread your patch. After having taken another look, my
+> >> conclusions are as follows:
+> >> * sbitmap_queue_min_shallow_depth() is called. This causes
+> >>     sbq->wake_batch to be modified but I don't think that it is a prop=
+er
+> >>     fix for dd_limit_depth().
+> > yes, it will affect sbq->wake_batch,  But judging from the following co=
+de:
+> > [ ... ]
+>
+> If we want to allow small values of dd->async_depth, min_shallow_depth
+> must be 1. The BFQ I/O scheduler also follows this approach.
+>
+> >> * dd_limit_depth() still assigns a number in the range 1..nr_requests =
+to
+> >>     data->shallow_depth while a number in the range 1..(1<<bt->sb.shif=
+t)
+> >>     should be assigned.
+> > yes, In order to avoid the performance regression problem that Harshit
+> > Mogalapalli reported, this patch will not directly modify
+> > dd->async_depth,
+> > but user can modify dd->async_depth from sysfs according to user's
+> > request. which will modify data->shallow_depth after user modify it by
+> > sysfs.
+>
+> It seems like there is no other option than keeping the current default
+> depth limit for async requests ...
+>
+> > My personal opinion is to keep the current dd->aync_depth unchanged to
+> > avoid causing performance regression,
+> > but it should  allow users to set it by sysfs, and the WARN mentioned
+> > best to be solved.
+> > and just only change this part?
+> >   -       sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async=
+_depth);
+> >   +       sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
+> > thanks!
+>
+> The above change will suppress the kernel warning. I think the other
+> changes from patch 2/2 are also necessary. Otherwise the unit of
+> "async_depth" will depend on sbitmap word shift parameter. I don't think
+> that users should have to worry about which shift value has been chosen
+> by the sbitmap implementation.
+Hi Bart Van Assche,
+So will you help do an  official patch version about patch 1 and patch 2?
 
-Again, I'm pretty sure you actually care about all files with *valid* builtin
-signatures, not simply all files with builtin signatures...
-
-> +/**
-> + * ipe_inode_setintegrity - save integrity data from a inode to IPE's LSM blob.
-> + * @inode: The inode to source the security blob from.
-> + * @type: Supplies the integrity type.
-> + * @value: The value to be stored.
-> + * @size: The size of @value.
-> + *
-> + * Saves fsverity signature into inode security blob
-> + *
-> + * Return:
-> + * * 0	- OK
-> + * * !0	- Error
-> + */
-> +int ipe_inode_setintegrity(struct inode *inode, enum lsm_integrity_type type,
-> +			   const void *value, size_t size)
-> +{
-> +	struct ipe_inode *inode_sec = ipe_inode(inode);
-> +
-> +	if (type == LSM_INT_FSVERITY_BUILTINSIG) {
-> +		inode_sec->fs_verity_signed = size > 0 && value;
-> +		return 0;
-> +	}
-> +
-> +	return 0;
-
-This is the actual code, and it's *still* documented incorrectly.  No, it
-doesn't "Save fsverity signature into inode security blob".  All it actually
-does is save a flag saying that there was a valid signature.
-
-The flag also should be called something like fsverity_sig_valid, indicating
-that there is a builtin signature *and* it's valid.
-
-- Eric
+Besides, I am not sure  that  the following part will cause
+performance regression or not?
++static int dd_to_word_depth(struct blk_mq_hw_ctx *hctx, unsigned int
+qdepth)
++{
++       struct sbitmap_queue *bt =3D &hctx->sched_tags->bitmap_tags;
++       const unsigned int nrr =3D hctx->queue->nr_requests;
++
++       return max(((qdepth << bt->sb.shift) + nrr - 1) / nrr,
++                  bt->min_shallow_depth);
++}
++
+which is somewhat similar to the previous commit d47f9717e5cf
+("block/mq-deadline: use correct way to throttling write
+requests"). just an example
+hw conditions:  8 cpus,emmc flash, one hw queue, and queue_depth=3D64,
+sched_tag/nr_request=3D128, init dd->async_depth=3D96
+ bt->sb.shift=3D5,
+so max(((qdepth << bt->sb.shift) + nrr - 1) / nrr,bt->min_shallow_depth);
+will get 24 and commit d47f9717e5cf ("block/mq-deadline: use correct
+way to throttling write
+requests") also get 24, but your revert commit 256aab46e316 ("Revert
+"block/mq-deadline: use
+correct way to throttling write requests"") will get 96,
+or am I missing something else?
+thanks!
+>
+> Thanks,
+>
+> Bart.
+>
