@@ -1,157 +1,173 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760EF2EB11;
-	Wed,  3 Apr 2024 05:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3D64D13B
+	for <linux-block@vger.kernel.org>; Wed,  3 Apr 2024 06:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712122899; cv=none; b=GRkIJ72nZgK7kmGOKiURZDjCB7BjlqvN0xg38FBa11syaxRXyqcexkunqWxi756jb2K8rNXSxtjb9jo/JEEcnQBV9IATU+d01fCYgK2R9J2xsybUYodbB0s1oqcg9XyAI4bbbVnvf1tj8cgL97y9uZ52UR2OD0uDhkOhg8Wh0ow=
+	t=1712124262; cv=none; b=XQe+HMOxPgDLVSA1GZbTPIBEgI81zf9cffWaYYpzwOK52X622Cx+ncoZ8dxpPRuXlEaodMhIDVov5l87+1o1gZNSG5gdHTpte7cMEnBQ88T5aXCNPhLRMc98zQjryfbfEDsHqsaCij+ZS6SlIt157QIZnxTi7qFutQpVR3YMTWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712122899; c=relaxed/simple;
-	bh=+t545PBypOguN6hjXWN9AkW/8XTtIWVXgoDys9wwB5o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uQY6dbKp9tksbyCzolwNGqyUU9LSYBcgGBiK3dpAe2Z2FNqVUF0RyFgMT6yrtvY4TP6WeZHBqXlqQzq96GZFdny77wjnA3HGRLqvgewLY8Ca9BpMMo1ItcynUJxE9Do1rTAT0iBQsyUEEuW9XXuO+OYdmDmUBgOE4TWXzPIzkiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=geUH5JVY; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712124262; c=relaxed/simple;
+	bh=h33aPukBZyfvMYglL1YIqoVJfOrFquOXlbE8pVl5ifc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KTDSufjHdXPPoqNMkvvnbxMV/br63AJwbmmP49WxFpw8K2ocRrPZHhtYLXSch3oQIKpfRVSTokdKZczLGKkas09qYyP54VQfawn3bxIGdOvqRpGNYsUnI9g9yXS2+Xq3NrROrv4BaqtIcgdQs7YuYImwQZqAYAehhntK1ULfW+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDIpWUhg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="geUH5JVY"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3438d7a05aaso161653f8f.0;
-        Tue, 02 Apr 2024 22:41:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712122896; x=1712727696; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jwTy49e6dNHcCmFsMWwFiFthRuOhI2Gcyw/tIENnsdY=;
-        b=geUH5JVY7XGs/CdU4PkKIZkm+W6Ecsoo638BxG9NfMLWqXNrH8kOL5rNf2V4rmfkxN
-         NC/sLA7ADfsG8O70wM/tiGZjtdwVy9s0o8MZ4vz0duOls0+75nQ1YwQr3DyBBUK/SrsW
-         Vq4txiyKSuKRRvi3DT7+LbyY2MlWVMZMQ4NzMn3kS5uE8d9pLw3pAXZ4Xpj5OSHUcVDK
-         +eyqLsOLP3hFI60ibRR7SBXyW9VYy+SrPjVxPqLMjZ3EhtzoLETk9dgepNu9ZY8+AIPT
-         i9gBGARjO3AeE8bZEb5fPQQ6dBuwiy74EzKuosaRQdrRu+MGP7CKLoKsUPlAAa1n0c2g
-         nV9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712122896; x=1712727696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jwTy49e6dNHcCmFsMWwFiFthRuOhI2Gcyw/tIENnsdY=;
-        b=VNJoVUKbnaXFltsE8KtZ5Lv/NDfUbEGImBVrPBwfS74h7uEe0LdUCYxTlyDOkp8/Ue
-         aKHbKU5G+Ec0Brt0wbRl28aAlc3BdfkXJeivlN0+yVRest9JlPC3lotnpiZj+9+ZLlec
-         rtbFerzfIDujLWqE6LEupkIufMUFl5vYv6+SJBqek+y6CuUee2wfkSPf7h/0ga83IDPj
-         0SwvUKUaIMCKxbIOxo024attW0Bayi7fn27vp2/Dhb/h7M/E0hUZ0GHwn9EcaduQWYRH
-         aLf0pL1dHbbN1W+UTtCom9DH3iT1yYoYK2A8pSvLoEqQbZKT5BQVSg4jBzdglLgxTqyy
-         S9SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkXTa8UZ+Yb1MJ9fcuZmOZ/08RHx967EozdS8N3NIe9zQChcVav3SL5lt5mKOSpsH1bdmA0kthk1HP4a6eutzocThn3OPgYVp84uWet4bb5n+k5wy8QDgL7z+1pB036DMn9zsPcsWHJks=
-X-Gm-Message-State: AOJu0YwftG6EovzTfAe0eWh+A82qoBks1gZIj3+0LE21Gufynfu599UE
-	bRcbaVA6pYRxxcQ7EwQ6KSaUteSNqqzcQjFzAfUMRhgZ4Gbk4Kfb6P0xZcIRTEV/9ohx1r/0PtT
-	K1HXXZZ/d9irfqaSWWtdB+xGajNI=
-X-Google-Smtp-Source: AGHT+IE+WI7YVu7qLj99K1PWwbBfQZV3Bw3Ncz06Hw0+Y5x6S5aUU96tI6utzWMjZs43wbmEUVjiOXGlRtRsWO/sCf0=
-X-Received: by 2002:a5d:4007:0:b0:33e:9f3d:6910 with SMTP id
- n7-20020a5d4007000000b0033e9f3d6910mr1278315wrp.31.1712122895363; Tue, 02 Apr
- 2024 22:41:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDIpWUhg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B61B6C433C7;
+	Wed,  3 Apr 2024 06:04:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712124261;
+	bh=h33aPukBZyfvMYglL1YIqoVJfOrFquOXlbE8pVl5ifc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BDIpWUhge20e378KhJn7K/073xicmi9171uJwOhYTiE1LMkOM0uab4uYBjl6YbYNg
+	 MRVAfFm8SqJ79x2WLBEEyC8fk3kT8Peu/ncluDEmlVH9maPcmISyeGzkYUL1dWCghk
+	 PyPTrJuTaQLkeyfNUik7lgH2Hk4C+tfptDXJPCJgyzvLdx6xhWIPY92MBjMkbcWMFb
+	 RaJ0PjZ2a0Uw3XiO0/DhKh4AmCPsJxge0dn3/pguLkuQw8VBLOPfBZ4CajIyFGt0hE
+	 SYffOUvnRu8cwzpkj3Ky5PXHRn1Au7SabZBnIF9VEnNc790UVCsssCJmS+fDE+snvN
+	 I4ggnia8fAK3w==
+Date: Wed, 3 Apr 2024 08:04:16 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>, 
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: handle BLK_OPEN_RESTRICT_WRITES correctly
+Message-ID: <20240403-notsituation-verpfiffen-606e13449a54@brauner>
+References: <20240323-seide-erbrachten-5c60873fadc1@brauner>
+ <20240323-zielbereich-mittragen-6fdf14876c3e@brauner>
+ <ZgZJ54rW2JcWsYPA@casper.infradead.org>
+ <20240329-erosion-zerreden-c65a45286fae@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1711680261-5789-1-git-send-email-zhiguo.niu@unisoc.com>
- <890bd06d-2a94-4138-9854-4a7ed74e0e51@acm.org> <CAHJ8P3K9OL6MHNrSrqmf0esbr2h1HJ3mVRmxDNVpf95ZMHQcqg@mail.gmail.com>
- <92e45c93-e2ff-4d34-b70f-7772f0596e68@acm.org> <CAHJ8P3KgU-tFDAgCNc5GcPbUBtDDyFmcfza2HsoD9TJ3h1DS=Q@mail.gmail.com>
- <c56a1d54-6d7d-4105-8109-d6a81bc1adbc@acm.org>
-In-Reply-To: <c56a1d54-6d7d-4105-8109-d6a81bc1adbc@acm.org>
-From: Zhiguo Niu <niuzhiguo84@gmail.com>
-Date: Wed, 3 Apr 2024 13:41:24 +0800
-Message-ID: <CAHJ8P3JYXA4VGfgXLMesuuUOUivc1EKwxGce4P5MWDHn1K675Q@mail.gmail.com>
-Subject: Re: [PATCH] block/mq-deadline: Fix WARN when set async_depth by sysfs
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, ke.wang@unisoc.com, hongyu.jin@unisoc.com, 
-	Damien Le Moal <dlemoal@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240329-erosion-zerreden-c65a45286fae@brauner>
 
-On Wed, Apr 3, 2024 at 7:20=E2=80=AFAM Bart Van Assche <bvanassche@acm.org>=
- wrote:
->
-> On 4/1/24 10:44 PM, Zhiguo Niu wrote:
-> > On Tue, Apr 2, 2024 at 5:23=E2=80=AFAM Bart Van Assche <bvanassche@acm.=
-org> wrote:
-> >> Oops, I misread your patch. After having taken another look, my
-> >> conclusions are as follows:
-> >> * sbitmap_queue_min_shallow_depth() is called. This causes
-> >>     sbq->wake_batch to be modified but I don't think that it is a prop=
-er
-> >>     fix for dd_limit_depth().
-> > yes, it will affect sbq->wake_batch,  But judging from the following co=
-de:
-> > [ ... ]
->
-> If we want to allow small values of dd->async_depth, min_shallow_depth
-> must be 1. The BFQ I/O scheduler also follows this approach.
->
-> >> * dd_limit_depth() still assigns a number in the range 1..nr_requests =
-to
-> >>     data->shallow_depth while a number in the range 1..(1<<bt->sb.shif=
-t)
-> >>     should be assigned.
-> > yes, In order to avoid the performance regression problem that Harshit
-> > Mogalapalli reported, this patch will not directly modify
-> > dd->async_depth,
-> > but user can modify dd->async_depth from sysfs according to user's
-> > request. which will modify data->shallow_depth after user modify it by
-> > sysfs.
->
-> It seems like there is no other option than keeping the current default
-> depth limit for async requests ...
->
-> > My personal opinion is to keep the current dd->aync_depth unchanged to
-> > avoid causing performance regression,
-> > but it should  allow users to set it by sysfs, and the WARN mentioned
-> > best to be solved.
-> > and just only change this part?
-> >   -       sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async=
-_depth);
-> >   +       sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
-> > thanks!
->
-> The above change will suppress the kernel warning. I think the other
-> changes from patch 2/2 are also necessary. Otherwise the unit of
-> "async_depth" will depend on sbitmap word shift parameter. I don't think
-> that users should have to worry about which shift value has been chosen
-> by the sbitmap implementation.
-Hi Bart Van Assche,
-So will you help do an  official patch version about patch 1 and patch 2?
+On Fri, Mar 29, 2024 at 01:10:57PM +0100, Christian Brauner wrote:
+> On Fri, Mar 29, 2024 at 04:56:07AM +0000, Matthew Wilcox wrote:
+> > On Sat, Mar 23, 2024 at 05:11:19PM +0100, Christian Brauner wrote:
+> > > Last kernel release we introduce CONFIG_BLK_DEV_WRITE_MOUNTED. By
+> > > default this option is set. When it is set the long-standing behavior
+> > > of being able to write to mounted block devices is enabled.
+> > > 
+> > > But in order to guard against unintended corruption by writing to the
+> > > block device buffer cache CONFIG_BLK_DEV_WRITE_MOUNTED can be turned
+> > > off. In that case it isn't possible to write to mounted block devices
+> > > anymore.
+> > > 
+> > > A filesystem may open its block devices with BLK_OPEN_RESTRICT_WRITES
+> > > which disallows concurrent BLK_OPEN_WRITE access. When we still had the
+> > > bdev handle around we could recognize BLK_OPEN_RESTRICT_WRITES because
+> > > the mode was passed around. Since we managed to get rid of the bdev
+> > > handle we changed that logic to recognize BLK_OPEN_RESTRICT_WRITES based
+> > > on whether the file was opened writable and writes to that block device
+> > > are blocked. That logic doesn't work because we do allow
+> > > BLK_OPEN_RESTRICT_WRITES to be specified without BLK_OPEN_WRITE.
+> > > 
+> > > So fix the detection logic. Use O_EXCL as an indicator that
+> > > BLK_OPEN_RESTRICT_WRITES has been requested. We do the exact same thing
+> > > for pidfds where O_EXCL means that this is a pidfd that refers to a
+> > > thread. For userspace open paths O_EXCL will never be retained but for
+> > > internal opens where we open files that are never installed into a file
+> > > descriptor table this is fine.
+> > > 
+> > > Note that BLK_OPEN_RESTRICT_WRITES is an internal only flag that cannot
+> > > directly be raised by userspace. It is implicitly raised during
+> > > mounting.
+> > > 
+> > > Passes xftests and blktests with CONFIG_BLK_DEV_WRITE_MOUNTED set and
+> > > unset.
+> > > 
+> > > Fixes: 321de651fa56 ("block: don't rely on BLK_OPEN_RESTRICT_WRITES when yielding write access")
+> > > Reported-by: Matthew Wilcox <willy@infradead.org>
+> > > Link: https://lore.kernel.org/r/ZfyyEwu9Uq5Pgb94@casper.infradead.org
+> > > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> > 
+> > So v1 of this patch works fine.  I just got round to testing v2, and it
+> > does not.  Indeed, applying 2/2 causes root to fail to mount:
+> > 
+> > /dev/root: Can't open blockdev
+> > List of all bdev filesystems:
+> >  ext3
+> >  ext2
+> >  ext4
+> >  xfs
+> > 
+> > Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(254,0)
+> > 
+> > Applying only 1/2 boots but fails to fix the bug.
+> 
+> Thanks for testing this. This is odd because I tested with the setup you
+> provided.
+> 
+> I used the kernel config you sent to me in [2] with an xfs root device
+> with direct kernel boot and the following xfstests config in [3]. I'm
+> booting the vm with:
+> 
+> qemu-system-x86_64 -machine type=q35 -smp 1 -m 4G -accel kvm -cpu max -nographic -nodefaults \
+>         -chardev stdio,mux=on,id=console,signal=off -serial chardev:console -mon console \
+>         -kernel /home/ubuntu/data/mkosi-kernel2/mkosi.output.debian/image.vmlinuz \
+>         -drive file=/home/ubuntu/data/mkosi-kernel2/mkosi.output.debian/image.raw,format=raw,if=virtio \
+>         -append "console=ttyS0 root=/dev/vda2 module_blacklist=vmw_vmci systemd.tty.term.ttyS0=screen-256color systemd.tty.columns.ttyS0=96 systemd.tty.rows.ttyS0=46 debug loglevel=4 SYSTEMD_"
+> 
+> Note that the config you gave me in [2] didn't include
+> CONFIG_SCSI_VIRTIO=y which means I got the splat you did. I added this
+> missing config option and everything worked fine for me.
+> 
+> Can you please test what's in the vfs.fixes branch on
+> https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git so we're
+> sure that we're testing the same thing?
 
-Besides, I am not sure  that  the following part will cause
-performance regression or not?
-+static int dd_to_word_depth(struct blk_mq_hw_ctx *hctx, unsigned int
-qdepth)
-+{
-+       struct sbitmap_queue *bt =3D &hctx->sched_tags->bitmap_tags;
-+       const unsigned int nrr =3D hctx->queue->nr_requests;
-+
-+       return max(((qdepth << bt->sb.shift) + nrr - 1) / nrr,
-+                  bt->min_shallow_depth);
-+}
-+
-which is somewhat similar to the previous commit d47f9717e5cf
-("block/mq-deadline: use correct way to throttling write
-requests"). just an example
-hw conditions:  8 cpus,emmc flash, one hw queue, and queue_depth=3D64,
-sched_tag/nr_request=3D128, init dd->async_depth=3D96
- bt->sb.shift=3D5,
-so max(((qdepth << bt->sb.shift) + nrr - 1) / nrr,bt->min_shallow_depth);
-will get 24 and commit d47f9717e5cf ("block/mq-deadline: use correct
-way to throttling write
-requests") also get 24, but your revert commit 256aab46e316 ("Revert
-"block/mq-deadline: use
-correct way to throttling write requests"") will get 96,
-or am I missing something else?
-thanks!
->
-> Thanks,
->
-> Bart.
->
+Willy, can you still reproduce this? I've been delaying the pull request
+to give you time to verify this but I would really like to send it
+before Friday. So it'd be really great if you could get back to me on
+this.
+
+> 
+> The failures that I see are:
+> 
+> Failures: generic/042 generic/645 generic/682 generic/689 xfs/014
+> xfs/017 xfs/049 xfs/129 xfs/176 xfs/206 xfs/216 xfs/234 xfs/250 xfs/289
+> xfs/558 xfs/559
+> Failed 16 of 930 tests
+> 
+> * generic/645 fails because it requires an unrelated fix to fstests
+>   because we changed idmapped mounts to not not allow empty idmappings.
+> * generic/689 fails because the providec config doesn't compile tmpfs with POSIX ACL support
+> * xfs/558 and xfs/559 complain about missing logging
+>   about iomap validation and are unrelated
+> * All other failures are caused by loop devices which is expected unil
+>   a util-linux is released that contains Jan's fix in [1] so that
+>   mount(8) doesn't hold a writable fd to the loop device anymore and
+>   instead simply uses a read-only one.
+> 
+> [1]: https://github.com/util-linux/util-linux/commit/1cde32f323e0970f6c7f35940dcc0aea97b821e5
+> [2]: https://lore.kernel.org/r/Zf18I2UOGQxeN-Z1@casper.infradead.org
+> [3]:
+> #! /bin/bash
+> 
+> set -x
+> 
+> cd ~/src/git/xfstests-dev/
+> FIRST_DEV=/dev/vda3
+> SECOND_DEV=/dev/vda4
+> THIRD_DEV=/dev/vda5
+> 
+> echo "Testing xfs"
+> cat <<EOF >local.config
+> FSTYP=xfs
+> export TEST_DEV=${FIRST_DEV}
+> export SCRATCH_DEV=${SECOND_DEV}
+> export LOGWRITE_DEV=${THIRD_DEV}
+> export TEST_DIR=/mnt/test
+> export SCRATCH_MNT=/mnt/scratch
+> EOF
+> 
+> sudo mkfs.xfs -f ${FIRST_DEV}
+> sudo mkfs.xfs -f ${SECOND_DEV}
+> sudo mkfs.xfs -f ${THIRD_DEV}
+> sudo ./check -g quick
