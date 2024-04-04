@@ -1,221 +1,302 @@
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CC271B27
-	for <linux-block@vger.kernel.org>; Thu,  4 Apr 2024 09:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD85745C0
+	for <linux-block@vger.kernel.org>; Thu,  4 Apr 2024 09:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712222976; cv=none; b=MWauPBnrnGjP1iCYX4tngS/Ay8bLO65mJ248G2gfSPcjnLnWVyfXVrI/xapOAsP5Dcsqxd0d6WpIO/BWILGlBFe/bmBrhd/H8Sz6m2QWUPyczFNpYqrlcqD0JZErQmNwJqBHxDaEPxU0g95AsqdWISYCqqgYTWpcHqtQtMjOf74=
+	t=1712223011; cv=none; b=erJ9AABhe/hxRnIZbd6P1DGqKfwCkOq3kRKJ+S6/7f8/lFz9cKGw3HlLzWOW6+2GG++uyfbSnerIJv8elZdn+TP7s8j2ncYoIcRFWyoQ7NBx36NGpMJXsEaxJ1ovs7LOpHADfx6o/pmtON0/5JTCkuxGFx5GnvMds4pzYy6B7nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712222976; c=relaxed/simple;
-	bh=99E4HG7gzVmYikL3IhYBrGsNdGq09JueIkPk+dyBQHw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ufRAqtmMmgbrXRIZm5t6stuGrfwFRHbal8ikbNoo/I2+oQM76D9W+7vPD5q9AaUpJAokZm3hZx/sVfw6dDw4WoQ1q3n+Y5OlRjt412kz83XEQv4BQg8Hycfmn6HqnO0aghbHmq34nYmrBunH5VWm11tk0A6KrdyWhx1MBIa5EPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZlkmF29g; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1712223011; c=relaxed/simple;
+	bh=keVQ+JSmIRyUsmJ3etfQZLWjCiaykGuXkUV8XCETcG0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=C5PZh3mL3m5/cyrlkCXbxrhYOTTXfgYQjvvo8HApURbtvM5Mn0sdLakRvSyUf9po2qVcSZDvSI7an0Pr+1wEcfOo5g21/IRcSjIf079I8NxEC0yj6l2PRJfzEXzes+QYFgblnJ2XdXuqmX2nmg3o3e5KcGgX99RUqqrDHrcQa80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=P+Ygndtu; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZlkmF29g"
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dcd7c526cc0so779424276.1
-        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2024 02:29:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="P+Ygndtu"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a4e62f3e63dso92102066b.0
+        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2024 02:30:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712222972; x=1712827772; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hOEdb/OWzmz8JqwZJnI/08OTrl5N7pe653ZiOSh3hP4=;
-        b=ZlkmF29g/bdzOvcVW0b0FUTsUAzcLlurbNMRIeiBVsq/rFx7jjwmo5RyzlRt2VJbwF
-         8nSH1NOwZdSd+/FBpouyHqZIyjL/DM2eeMkGWfJ00F+Vq40DU3g3H/mwf6FotVLpt8LE
-         jMscFdcmWc2aAI/Y19M1fnUPTVj5+bm4LQ0Lmzt8HfoKYj2sAW4lSBK1vBd3hw5tsIXi
-         GOujJX8oIQAJ8J5eCIxU3ZCwccSg1EMgaXG4/BsdJSC2whq1EDIXI9PZoBf72Gm+5e3o
-         J8C5AMUfhSJBtaZER8hHDYZZe+bUpjYlSfoS/ijr4dff0HUtO1/u3KubHWsrs5KXfta0
-         crcQ==
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712223007; x=1712827807; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XeqgpKrVGgo+XJxZmR7xCB2JIcBDNuq70r821JTeGtM=;
+        b=P+YgndtuKfQVdBivCzZsVolpK40DBwrU7UBKAwNQH1ZZKxK0jFF+jzbX2NXrlNbxjn
+         mnKnzskby1Y0oc/ksvx0sNhJyA/S4+O00OFGS1F19gXVyTTmYIaiPLQMCHgNhhtSIHme
+         TjAoDDS4vFCbRNLKZCSbo0vqzCkt+2zzy6B8iEZ00S1uPPBCDjo0sZUi6WS/jlSt2p4r
+         EhAps93QZaBAc+U8hjY5RJ9HgLmOpS8u18WwYifwFM/Oa+dManuRSrzM0YwiqHuFiwBp
+         tBQqZRN2pUODLfeG/wNzIq9Qz7CEOTXWutDKW7PEFcz+XAEprbPT5hrvj8BROuFQgLjf
+         1xhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712222972; x=1712827772;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hOEdb/OWzmz8JqwZJnI/08OTrl5N7pe653ZiOSh3hP4=;
-        b=Zv/G2LYc7Etq8x4Kya0hAVdZlmrB1JpMSQ21tgVDFbhtT7J+SFn2E+MwgcHjvjAIeK
-         MO8kg+v8H3ZFBRklSbcdqjGBW69EepiP3xB+n8KQcmyxRvaHGSzf9DQmYjMS12Ov/Ryk
-         RGZJ/nqybDVZ+HJTtpU+a7thu1GTPLRXxwMEAY51lfCNy3tKIxTwMc/ZIRk6Ac/LU69m
-         rS4Sso2TZBRf9o61yAEksRNs4BguY2wwF2tGEb/ulhuqsqZUZYmDdgIZb0+vVQ2WPAm9
-         s9MTIImYOX3baIr4eTlu37f29fpvY3lGvfw5qL9JqUelGjnQxZxgVjMMwgSdz1mwYm+n
-         OAlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVN2NC6UVv88YJZyaZL2jABICvQbfEr3rfNGc1LAAxjJyZqsezKDwlpoUlONar3KiKrrzzRDtK2THEhvrEyUlPwG91CWlnpvVNb56Y=
-X-Gm-Message-State: AOJu0YxahISivz+lQPjWdBH1oanwpwE86/QPXuED2eTZuhpc0cptu669
-	PYytyGbLAZv34craJOe06K/QWT1YMOCknAH2XWJCOEboCELcHrgD5pTS6qK2YY1zN3fk8w3+TLY
-	G8ihlndnPZOJZW20+2SzFtHKdjaaBDyD/jtSftg==
-X-Google-Smtp-Source: AGHT+IEJZ6xOy8uL7K7v48vhoxukNtRZ0YN8Iqho231EFU66OmF4NH8X0iYgBBX9Pgy1/61AdDVdjz5dkHUDRWNwCo8=
-X-Received: by 2002:a25:9111:0:b0:dc7:4f61:5723 with SMTP id
- v17-20020a259111000000b00dc74f615723mr1778216ybl.39.1712222972517; Thu, 04
- Apr 2024 02:29:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712223007; x=1712827807;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XeqgpKrVGgo+XJxZmR7xCB2JIcBDNuq70r821JTeGtM=;
+        b=Q0El3XFyONBPKNG7llbwSsC9OE4rsbLMXVh/f2MKFfNNoa5zPsiGaF0SdgfzWf1ooO
+         aTWlGB9WjNsxzB2sb/N154tBy1AbXerLg4L0EU12JYHmSQG3hRT+y8Rz60jvadbisbsa
+         CshBI3uvc5d6X2d+n1YkLSP38sYBQP4ODB0CxQR35UyPJa1WN6+7Vm17BOQ3jvsCDYJ2
+         zJC2BOporMTIWefJbZZ0KdXN3oTUucOvATExlLTNlJfkd3/cK8ipMCfzrgF5DGcg9iv7
+         0xNB1AUwXtfDV0jn2hG2dkOdf/xPDS++uG1xAsXbE1mZHVCGRaKUC2vNTkKmaIrrolPr
+         1cWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWHABqWpvzSBZ7r9GI4Zv/ItkQY0Ec7mhpogXyWR272ne7DIH64zG0Fvfy9Pe0uIyMRJRSk7/MUJgHusbWNqZccHbEQCoQOIYft+sk=
+X-Gm-Message-State: AOJu0Yy+wNFuSKscXO6HXHPZQ5YvWRX76UJAWP8YYcOvTV8NF/RQmPPf
+	EHbOtDNqienz1wM0dmBeOJulR3tg9NXeUJ6814RQvjMlr2M5dS3syY9U+gsgMtk=
+X-Google-Smtp-Source: AGHT+IEjf5p0vSM1n/RGUVqe4WwmoH/DSpG8tUJ7wWJkOCQSE5JqeKFCqEKO6XKiwsuKwW7FZ+FsDw==
+X-Received: by 2002:a17:906:abc5:b0:a51:84bf:8ba6 with SMTP id kq5-20020a170906abc500b00a5184bf8ba6mr1092612ejb.17.1712223007264;
+        Thu, 04 Apr 2024 02:30:07 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id p6-20020a170906a00600b00a46d04b6117sm8851210ejy.64.2024.04.04.02.30.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 02:30:06 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
+ Busch <kbusch@kernel.org>,  Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart
+ Van Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
+  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
+ Hindborg <a.hindborg@samsung.com>,  Wedson Almeida Filho
+ <wedsonaf@gmail.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,  Greg KH
+ <gregkh@linuxfoundation.org>,  Matthew Wilcox <willy@infradead.org>,
+  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
+  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
+  =?utf-8?Q?Bj=C3=B6rn?=
+ Roy Baron <bjorn3_gh@protonmail.com>,  Alice Ryhl <aliceryhl@google.com>,
+  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
+ <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
+ =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
+ Granados
+ <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
+ <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
+ list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
+ <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
+ <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
+ <gost.dev@samsung.com>,  Ming Lei <ming.lei@redhat.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+In-Reply-To: <3478efc2-7e81-4688-a115-5d33c70a24aa@proton.me> (Benno Lossin's
+	message of "Thu, 04 Apr 2024 08:46:52 +0000")
+References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me>
+	<871q7o54el.fsf@metaspace.dk>
+	<7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me>
+	<87v84ysujo.fsf@metaspace.dk>
+	<f405ff55-fcb0-4592-ae4b-e1188eae9953@proton.me>
+	<87zfu9r8be.fsf@metaspace.dk>
+	<3478efc2-7e81-4688-a115-5d33c70a24aa@proton.me>
+User-Agent: mu4e 1.12.2; emacs 29.3
+Date: Thu, 04 Apr 2024 11:30:00 +0200
+Message-ID: <87frw1qxuv.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240306232052.21317-1-semen.protsenko@linaro.org>
- <8896bcc5-09b1-4886-9081-c8ce0afc1c40@app.fastmail.com> <CAPLW+4mu3K38_sPnTDj-gkvdsnfN3OKXwfDSBUg_jUj+f122cA@mail.gmail.com>
-In-Reply-To: <CAPLW+4mu3K38_sPnTDj-gkvdsnfN3OKXwfDSBUg_jUj+f122cA@mail.gmail.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 4 Apr 2024 11:28:55 +0200
-Message-ID: <CAPDyKFoKmOf__GP3tx4fU_qGcDn5je-8cuLoCiCUzGLz=HdoDg@mail.gmail.com>
-Subject: Re: [PATCH] mmc: dw_mmc: Fix IDMAC operation with pages bigger than 4K
-To: Sam Protsenko <semen.protsenko@linaro.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Jaehoon Chung <jh80.chung@samsung.com>, 
-	Christoph Hellwig <hch@lst.de>, Chris Ball <cjb@laptop.org>, Will Newton <will.newton@gmail.com>, 
-	Matt Fleming <matt@console-pimps.org>, Christian Brauner <brauner@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Naresh Kamboju <naresh.kamboju@linaro.org>, 
-	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, 3 Apr 2024 at 00:43, Sam Protsenko <semen.protsenko@linaro.org> wro=
-te:
->
-> On Thu, Mar 7, 2024 at 1:52=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> wrot=
-e:
-> >
-> > On Thu, Mar 7, 2024, at 00:20, Sam Protsenko wrote:
-> > > Commit 616f87661792 ("mmc: pass queue_limits to blk_mq_alloc_disk") [=
-1]
-> > > revealed the long living issue in dw_mmc.c driver, existing since the
-> > > time when it was first introduced in commit f95f3850f7a9 ("mmc: dw_mm=
-c:
-> > > Add Synopsys DesignWare mmc host driver."), also making kernel boot
-> > > broken on platforms using dw_mmc driver with 16K or 64K pages enabled=
-,
-> > > with this message in dmesg:
-> > >
-> > >     mmcblk: probe of mmc0:0001 failed with error -22
-> > >
-> > > That's happening because mmc_blk_probe() fails when it calls
-> > > blk_validate_limits() consequently, which returns the error due to
-> > > failed max_segment_size check in this code:
-> > >
-> > >     /*
-> > >      * The maximum segment size has an odd historic 64k default that
-> > >      * drivers probably should override.  Just like the I/O size we
-> > >      * require drivers to at least handle a full page per segment.
-> > >      */
-> > >     ...
-> > >     if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
-> > >         return -EINVAL;
-> > >
-> > > In case when IDMAC (Internal DMA Controller) is used, dw_mmc.c always
-> > > sets .max_seg_size to 4 KiB:
-> > >
-> > >     mmc->max_seg_size =3D 0x1000;
-> > >
-> > > The comment in the code above explains why it's incorrect. Arnd
-> > > suggested setting .max_seg_size to .max_req_size to fix it, which is
-> > > also what some other drivers are doing:
-> > >
-> > >    $ grep -rl 'max_seg_size.*=3D.*max_req_size' drivers/mmc/host/ | \
-> > >      wc -l
-> > >    18
-> >
-> > Nice summary!
-> >
-> > > This change is not only fixing the boot with 16K/64K pages, but also
-> > > leads to a better MMC performance. The linear write performance was
-> > > tested on E850-96 board (eMMC only), before commit [1] (where it's
-> > > possible to boot with 16K/64K pages without this fix, to be able to d=
-o
-> > > a comparison). It was tested with this command:
-> > >
-> > >     # dd if=3D/dev/zero of=3Dsomefile bs=3D1M count=3D500 oflag=3Dsyn=
-c
-> > >
-> > > Test results are as follows:
-> > >
-> > >   - 4K pages,  .max_seg_size =3D 4 KiB:                   94.2 MB/s
-> > >   - 4K pages,  .max_seg_size =3D .max_req_size =3D 512 KiB: 96.9 MB/s
-> > >   - 16K pages, .max_seg_size =3D 4 KiB:                   126 MB/s
-> > >   - 16K pages, .max_seg_size =3D .max_req_size =3D 2 MiB:   128 MB/s
-> > >   - 64K pages, .max_seg_size =3D 4 KiB:                   138 MB/s
-> > >   - 64K pages, .max_seg_size =3D .max_req_size =3D 8 MiB:   138 MB/s
-> >
-> > Thanks for sharing these results. From what I can see here, the
-> > performance changes significantly with the page size, but barely
-> > with the max_seg_size, so this does not have the effect I was
-> > hoping for. On a more positive note this likely means that we
-> > don't have to urgently backport your fix.
-> >
-> > This could mean that either there is not much coalescing across
-> > pages after all, or that the bottleneck is somewhere else.
-> >
-> > > diff --git a/drivers/mmc/host/dw_mmc.c b/drivers/mmc/host/dw_mmc.c
-> > > index 8e2d676b9239..cccd5633ff40 100644
-> > > --- a/drivers/mmc/host/dw_mmc.c
-> > > +++ b/drivers/mmc/host/dw_mmc.c
-> > > @@ -2951,8 +2951,8 @@ static int dw_mci_init_slot(struct dw_mci *host=
-)
-> > >       if (host->use_dma =3D=3D TRANS_MODE_IDMAC) {
-> > >               mmc->max_segs =3D host->ring_size;
-> > >               mmc->max_blk_size =3D 65535;
-> > > -             mmc->max_seg_size =3D 0x1000;
-> > > -             mmc->max_req_size =3D mmc->max_seg_size * host->ring_si=
-ze;
-> > > +             mmc->max_req_size =3D DW_MCI_DESC_DATA_LENGTH * host->r=
-ing_size;
-> > > +             mmc->max_seg_size =3D mmc->max_req_size;
-> >
-> > The change looks good to me.
-> >
-> > I see that the host->ring_size depends on PAGE_SIZE as well:
-> >
-> > #define DESC_RING_BUF_SZ        PAGE_SIZE
-> > host->ring_size =3D DESC_RING_BUF_SZ / sizeof(struct idmac_desc_64addr)=
-;
-> > host->sg_cpu =3D dmam_alloc_coherent(host->dev,
-> >                DESC_RING_BUF_SZ, &host->sg_dma, GFP_KERNEL);
-> >
-> > I don't see any reason for the ring buffer size to be tied to
-> > PAGE_SIZE at all, it was probably picked as a reasonable
-> > default in the initial driver but isn't necessarily ideal.
-> >
-> > From what I can see, the number of 4KB elements in the
-> > ring can be as small as 128 (4KB pages, 64-bit addresses)
-> > or as big as 4096 (64KB pages, 32-bit addresses), which is
-> > quite a difference. If you are still motivated to drill
-> > down into this, could you try changing DESC_RING_BUF_SZ
-> > to a fixed size of either 4KB or 64KB and test again
-> > with the opposite page size, to see if that changes the
-> > throughput?
-> >
->
-> Hi Arnd,
->
-> Sorry for the late reply. I'm a bit of busy with something else right
-> now (trying to enable this same driver for Exynos850 in U-Boot, hehe),
-> I'll try to carve out some time later and tinker with
-> DESC_RING_BUF_SZ. But for now, can we just apply this patch as is? As
-> I understand, it's fixing quite a major issue (at least from what I
-> heard), so it would be nice to have it in -next and -stable. Does that
-> sound reasonable?
+Benno Lossin <benno.lossin@proton.me> writes:
 
-Ideally, I would prefer it if you could try out Arnd's proposal,
-unless you think that's too far ahead for you, of course? The point
-is, that I would rather avoid us from messing around with these kinds
-of configurations.
+> On 04.04.24 07:44, Andreas Hindborg wrote:
+>> Benno Lossin <benno.lossin@proton.me> writes:
+>> 
+>>> On 03.04.24 10:46, Andreas Hindborg wrote:
+>>>> Benno Lossin <benno.lossin@proton.me> writes:
+>>>>
+>>>>> On 23.03.24 07:32, Andreas Hindborg wrote:
+>>>>>> Benno Lossin <benno.lossin@proton.me> writes:
+>>>>>>> On 3/13/24 12:05, Andreas Hindborg wrote:
+>>>>>>>> +//! implementations of the `Operations` trait.
+>>>>>>>> +//!
+>>>>>>>> +//! IO requests are passed to the driver as [`Request`] references. The
+>>>>>>>> +//! `Request` type is a wrapper around the C `struct request`. The driver must
+>>>>>>>> +//! mark start of request processing by calling [`Request::start`] and end of
+>>>>>>>> +//! processing by calling one of the [`Request::end`], methods. Failure to do so
+>>>>>>>> +//! can lead to IO failures.
+>>>>>>>
+>>>>>>> I am unfamiliar with this, what are "IO failures"?
+>>>>>>> Do you think that it might be better to change the API to use a
+>>>>>>> callback? So instead of calling start and end, you would do
+>>>>>>>
+>>>>>>>         request.handle(|req| {
+>>>>>>>             // do the stuff that would be done between start and end
+>>>>>>>         });
+>>>>>>>
+>>>>>>> I took a quick look at the rnull driver and there you are calling
+>>>>>>> `Request::end_ok` from a different function. So my suggestion might not
+>>>>>>> be possible, since you really need the freedom.
+>>>>>>>
+>>>>>>> Do you think that a guard approach might work better? ie `start` returns
+>>>>>>> a guard that when dropped will call `end` and you need the guard to
+>>>>>>> operate on the request.
+>>>>>>
+>>>>>> I don't think that would fit, since the driver might not complete the
+>>>>>> request immediately. We might be able to call `start` on behalf of the
+>>>>>> driver.
+>>>>>>
+>>>>>> At any rate, since the request is reference counted now, we can
+>>>>>> automatically fail a request when the last reference is dropped and it
+>>>>>> was not marked successfully completed. I would need to measure the
+>>>>>> performance implications of such a feature.
+>>>>>
+>>>>> Are there cases where you still need access to the request after you
+>>>>> have called `end`?
+>>>>
+>>>> In general no, there is no need to handle the request after calling end.
+>>>> C drivers are not allowed to, because this transfers ownership of the
+>>>> request back to the block layer. This patch series defer the transfer of
+>>>> ownership to the point when the ARef<Request> refcount goes to zero, so
+>>>> there should be no danger associated with touching the `Request` after
+>>>> end.
+>>>>
+>>>>> If no, I think it would be better for the request to
+>>>>> be consumed by the `end` function.
+>>>>> This is a bit difficult with `ARef`, since the user can just clone it
+>>>>> though... Do you think that it might be necessary to clone requests?
+>>>>
+>>>> Looking into the details now I see that calling `Request::end` more than
+>>>> once will trigger UAF, because C code decrements the refcount on the
+>>>> request. When we have `ARef<Request>` around, that is a problem. It
+>>>> probably also messes with other things in C land. Good catch.
+>>>>
+>>>> I did implement `Request::end` to consume the request at one point
+>>>> before I fell back on reference counting. It works fine for simple
+>>>> drivers. However, most drivers will need to use the block layer tag set
+>>>> service, that allows conversion of an integer id to a request pointer.
+>>>> The abstraction for this feature is not part of this patch set. But the
+>>>> block layer manages a mapping of integer to request mapping, and drivers
+>>>> typically use this to identify the request that corresponds to
+>>>> completion messages that arrive from hardware. When drivers are able to
+>>>> turn integers into requests like this, consuming the request in the call
+>>>> to `end` makes little sense (because we can just construct more).
+>>>
+>>> How do you ensure that this is fine?:
+>>>
+>>>       let r1 = tagset.get(0);
+>>>       let r2 = tagset.get(0);
+>>>       r1.end_ok();
+>>>       r2.do_something_that_would_only_be_done_while_active();
+>>>
+>>> One thing that comes to my mind would be to only give out `&Request`
+>>> from the tag set. And to destroy, you could have a separate operation
+>>> that also removes the request from the tag set. (I am thinking of a tag
+>>> set as a `HashMap<u64, Request>`.
+>> 
+>> This would be similar to
+>> 
+>>    let r1 = tagset.get(0)?;
+>>    ler r2 = r1.clone();
+>>    r1.end_ok();
+>>    r2.do_something_requires_active();
+>> 
+>> but it is not a problem because we do not implement any actions that are
+>> illegal in that position (outside of `end` - that _is_ a problem).
+>
+> Makes sense, but I think it's a bit weird to still be able to access it
+> after `end`ing.
+
+Yes, that is true.
 
 >
-> Thanks!
+>> 
+>> 
+>>>>
+>>>> What I do now is issue the an `Option<ARef<Request>>` with
+>>>> `bindings::req_ref_inc_not_zero(rq_ptr)`, to make sure that the request
+>>>> is currently owned by the driver.
+>>>>
+>>>> I guess we can check the absolute value of the refcount, and only issue
+>>>> a request handle if the count matches what we expect. Then we can be certain
+>>>> that the handle is unique, and we can require transfer of ownership of
+>>>> the handle to `Request::end` to make sure it can never be called more
+>>>> than once.
+>>>>
+>>>> Another option is to error out in `Request::end` if the
+>>>> refcount is not what we expect.
+>>>
+>>> I am a bit confused, why does the refcount matter in this case? Can't
+>>> the user just have multiple `ARef`s?
+>> 
+>> Because we want to assert that we are consuming the last handle to the
+>> request. After we do that, the user cannot call `Request::end` again.
+>> `TagSet::get` will not issue a request reference if the request is not
+>> in flight. Although there might be a race condition to watch out for.
+>> 
+>> When the block layer hands over ownership to Rust, the reference count
+>> is 1. The first `ARef<Request>` we create increments the count to 2. To
+>> complete the request, we must have ownership of all reference counts
+>> above 1. The block layer takes the last reference count when it takes
+>> back ownership of the request.
+>> 
+>>> I think it would be weird to use `ARef<Request>` if you expect the
+>>> refcount to be 1.
+>> 
+>> Yes, that would require a custom smart pointer with a `try_into_unique`
+>> method that succeeds when the refcount is exactly 2. It would consume
+>> the instance and decrement the refcount to 1. But as I said, there is a
+>> potential race with `TagSet::get` when the refcount is 1 that needs to
+>> be handled.
+>> 
+>>> Maybe the API should be different?
+>> 
+>> I needs to change a little, yes.
+>> 
+>>> As I understand it, a request has the following life cycle (please
+>>> correct me if I am wrong):
+>>> 1. A new request is created, it is given to the driver via `queue_rq`.
+>>> 2. The driver can now decide what to do with it (theoretically it can
+>>>      store it somewhere and later do something with it), but it should at
+>>>      some point call `Request::start`.
+>>> 3. Work happens and eventually the driver calls `Request::end`.
+>>>
+>>> To me this does not seem like something where we need a refcount (we
+>>> still might need one for safety, but it does not need to be exposed to
+>>> the user).
+>> 
+>> It would not need to be exposed to the user, other than a) ending a request
+>> can fail OR b) `TagSet::get` can fail.
+>> 
+>> a) would require that ending a request must be done with a unique
+>> reference. This could be done by the user by the user calling
+>> `try_into_unique` or by making the `end` method fallible.
+>> 
+>> b) would make the reference handle `!Clone` and add a failure mode to
+>> `TagSet::get`, so it fails to construct a `Request` handle if there are
+>> already one in existence.
+>> 
+>> I gravitate towards a) because it allows the user to clone the Request
+>> reference without adding an additional `Arc`.
 >
-> > If a larger ring buffer gives us significantly better
-> > throughput, we may want to always use a higher number
-> > independent of page size. On the other hand, if the
-> > 64KB number (the 138MB/s) does not change with a smaller
-> > ring, we may as well reduce that in order to limit the
-> > maximum latency that is caused by a single I/O operation.
-> >
-> >      Arnd
+> This confuses me a little, since I thought that `TagSet::get` returns
+> `Option<ARef<Request>>`.
 
-Kind regards
-Uffe
+It does, but in the current implementation the failure mode returning
+`None` is triggered when the refcount is zero, meaning that the request
+corresponding to that tag is not currently owned by the driver. For
+solution b) we would change the type to be
+`Option<CustomSmartPointerHandleThing<Request>>`.
+
+> (I tried to find the abstractions in your
+> github, but I did not find them)
+
+It's here [1]. It was introduced in the `rnvme-v6.8` branch.
+
+> I think that this could work: `queue_rq` takes a `OwnedRequest`, which
+> the user can store in a `TagSet`, transferring ownership. `TagSet::get`
+> returns `Option<&Request>` and you can call `TagSet::remove` to get
+> `Option<OwnedRequest>`. `OwnedRequest::end` consumes `self`.
+> With this pattern we also do not need to take an additional refcount.
+
+It would, but the `TagSet` is just a wrapper for the C block layer
+`strugt blk_mq_tag_set`. This is a highly optimized data structure and
+tag mapping is done before the driver sees the request. I would like to
+reuse that logic.
+
+We could implement what you suggest anyhow, but I would not want to that
+additional logic to the hot path.
+
+
+BR Andreas
+
+
+[1] https://github.com/metaspace/linux/blob/0976c869fbfae13f6d475a287ade776c730cc029/rust/kernel/block/mq/tag_set.rs#L102
