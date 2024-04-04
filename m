@@ -1,162 +1,246 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9367A101E6
-	for <linux-block@vger.kernel.org>; Thu,  4 Apr 2024 08:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB477175F
+	for <linux-block@vger.kernel.org>; Thu,  4 Apr 2024 08:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712219352; cv=none; b=kcdiktKnC/8AaRnqyaxN41rI3ABzyOqm1egthN9BYa1+4PxtcE8k9qFPc4gtYLvSCd3OdfakRCM+A138wG13LqWE3ch4LLcDnDCv2Fv8eOTnNF+jzMGsAcdQ35YhqDSQ6JlAlxvIbYSmCGPefs9POyPXv6tnj+oO+Olz7covGOg=
+	t=1712220429; cv=none; b=R82IeezKkEnOduOcySLQm7zDsx5mXwqCOb4pWkJwjKiYkMucLZlBergn+o9kp971jW9BsaoK0oq+jXyfbHpf3n+Zby2mBVxGWrHdZXqlBtOT3MmcBzKZM/lwbpMpfkL4rRLf3MOrHBhC6AgqbAmjkKQU8VVWHHIlUzEhbTo6sYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712219352; c=relaxed/simple;
-	bh=6nwarV4e5MDKSB4SPAyX/nhToz0kRKlU/5c8o6FRUuw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ui2o2nlZIUsxx3TTSo278OWveUgwTjdFKiRBdN77bUB8KPB6Y8fvsW1spNGCVNOQ21g0nZAnyGMvHDYffQQ9yGoH3vk+Od6jgmkf57Bp6eOj/9T985+QUOP2fSEoFXyTy3Xs07kMocgWaW/Y25mluJ0X2JYW4Iv94R7JPtu9QmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uidFzKy6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=91gAsNjj; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1712220429; c=relaxed/simple;
+	bh=dTtYCaA88jy1yxVN3Bo2zdVxAyBtmja3Ix2xgLkI2q4=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CMVHD8YQaqAKDjmyo28Ly7ESo0ZAYSP+2zkZ3a++2m+lZEZl6a9aSp1XDss2qD4GquPAnBV39onrx/Rkt7wN1lclGKQ4yBbAPNtjsvzuBp/Ykkl+urKJUFP5orenV72DA2IFiWek9zmOSG+NRWp0d3Hg7R3ySpwOdS8IlbUa0a8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=iuUGggj5; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uidFzKy6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="91gAsNjj"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D8B8B37712;
-	Thu,  4 Apr 2024 08:29:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712219348; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aOCHfZV2to3mP9ulNHVH8wnZcCwje64b6rHU6KARrEU=;
-	b=uidFzKy6N75OzaBZMpY/shM1UkBze+Ow1P07dBbgPdMN+Elvcii0FzCPbKVfd+E8K8gEZ3
-	XaFbq1qR0BJTyqpllvW44b3IMyiN8BzBOhnux7F+5O04nWKm5rxpOyyricIy9HemgD45fu
-	5KMHAXEIMnThLMdAPCfhluCLFYfWv8A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712219348;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aOCHfZV2to3mP9ulNHVH8wnZcCwje64b6rHU6KARrEU=;
-	b=91gAsNjjmgvrTqfsJjCpkTX2w9dnMBSUNMW2b/Q4nnK8cblm/E0GvN5gynshjiE58fK9e6
-	9JDM9rpv5/rwCiAA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id C686A13298;
-	Thu,  4 Apr 2024 08:29:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id PekAL9RkDmbyDwAAn2gu4w
-	(envelope-from <dwagner@suse.de>); Thu, 04 Apr 2024 08:29:08 +0000
-Date: Thu, 4 Apr 2024 10:29:08 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests v1 0/3] add blkdev type environment variable
-Message-ID: <j47jtsnraylush4xlxu6sng5frrawim5j2vjwt7zgei7jwi7ke@7ga6dd5sssur>
-References: <20240402100322.17673-1-dwagner@suse.de>
- <mqpuf2a7obybtw42ydte2wq7ktema5odvc3dqm32hknjmamgdb@rbo3i6lqqkld>
- <j6awxljufwg6r5rs5kojwsnatfb4aj3vnqsq43hkuuhgvcflvh@u6l5cf2ponaw>
- <w2eaegjopbah5qbjsvpnrwln2t5dr7mv3v4n2e63m5tjqiochm@uonrjm2i2g72>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="iuUGggj5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1712220418; x=1712479618;
+	bh=jdijZk8d4uuXnvdJJa2bllkyRHxcvx5fC5fcDsEwyek=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=iuUGggj5XhOMUgyGMEGGhCcxTaQcQ2yVm+ZU7xjZ98uXs1H18o7oAoVZXMkOuZMu/
+	 4iVKvbeHUdwGk1YxvCUPQ+PZhXPckYifRtcP4iIsB1lfs+11TzLQ+H3JLM8RsZUrep
+	 AujgmfEaJlRwnAZwVvAddSWzbnabvTWTbcacn0s6QcD1fX7O4efO+GIthSzTb10e9R
+	 8VTrFZSfsUS8Ul8pbnRpzwlrsbRbwW8ZadMY7YEEHfQi4MBZldM7yenqGUKbvPIzN8
+	 Zj2NP2CNNldjwX30KQBNqUhQyRrat6Nc18QwNNnhOS+tisNyADmiKLKiCzTfi06RAJ
+	 DQoqC6/UUzGwg==
+Date: Thu, 04 Apr 2024 08:46:52 +0000
+To: Andreas Hindborg <nmi@metaspace.dk>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
+	<da.gomez@samsung.com>, open list <linux-kernel@vger.kernel.org>, "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
+Message-ID: <3478efc2-7e81-4688-a115-5d33c70a24aa@proton.me>
+In-Reply-To: <87zfu9r8be.fsf@metaspace.dk>
+References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me> <871q7o54el.fsf@metaspace.dk> <7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me> <87v84ysujo.fsf@metaspace.dk> <f405ff55-fcb0-4592-ae4b-e1188eae9953@proton.me> <87zfu9r8be.fsf@metaspace.dk>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w2eaegjopbah5qbjsvpnrwln2t5dr7mv3v4n2e63m5tjqiochm@uonrjm2i2g72>
-X-Spam-Score: -3.80
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	 ARC_NA(0.00)[];
-	 TO_DN_EQ_ADDR_SOME(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCPT_COUNT_FIVE(0.00)[5];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-0.996];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%]
-X-Spam-Level: 
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 04, 2024 at 07:43:28AM +0000, Shinichiro Kawasaki wrote:
-> Actually, similar feature is implemented in the common code so that some
-> test case can be run twice, once for regular the block device, and one more
-> time for the zoned block device. You can find test cases with CAN_BE_ZONED=1
-> flag. They are run twice when RUN_ZONED_TESTS is set in the config.
-> 
->    To be precise, this applies to the test cases with test() function.
->    CAN_BE_ZONED has different meaning for test cases with test_device().
-> 
-> Now we want to run some of test cases twice for the two nvmet block device
-> types. This is essentially common feature as the repeated runs for the
-> CAN_BE_ZONED test cases. I think it's time to generalize these two uses cases
-> and support "repeated test case runs with different test conditions".
+On 04.04.24 07:44, Andreas Hindborg wrote:
+> Benno Lossin <benno.lossin@proton.me> writes:
+>=20
+>> On 03.04.24 10:46, Andreas Hindborg wrote:
+>>> Benno Lossin <benno.lossin@proton.me> writes:
+>>>
+>>>> On 23.03.24 07:32, Andreas Hindborg wrote:
+>>>>> Benno Lossin <benno.lossin@proton.me> writes:
+>>>>>> On 3/13/24 12:05, Andreas Hindborg wrote:
+>>>>>>> +//! implementations of the `Operations` trait.
+>>>>>>> +//!
+>>>>>>> +//! IO requests are passed to the driver as [`Request`] references=
+. The
+>>>>>>> +//! `Request` type is a wrapper around the C `struct request`. The=
+ driver must
+>>>>>>> +//! mark start of request processing by calling [`Request::start`]=
+ and end of
+>>>>>>> +//! processing by calling one of the [`Request::end`], methods. Fa=
+ilure to do so
+>>>>>>> +//! can lead to IO failures.
+>>>>>>
+>>>>>> I am unfamiliar with this, what are "IO failures"?
+>>>>>> Do you think that it might be better to change the API to use a
+>>>>>> callback? So instead of calling start and end, you would do
+>>>>>>
+>>>>>>         request.handle(|req| {
+>>>>>>             // do the stuff that would be done between start and end
+>>>>>>         });
+>>>>>>
+>>>>>> I took a quick look at the rnull driver and there you are calling
+>>>>>> `Request::end_ok` from a different function. So my suggestion might =
+not
+>>>>>> be possible, since you really need the freedom.
+>>>>>>
+>>>>>> Do you think that a guard approach might work better? ie `start` ret=
+urns
+>>>>>> a guard that when dropped will call `end` and you need the guard to
+>>>>>> operate on the request.
+>>>>>
+>>>>> I don't think that would fit, since the driver might not complete the
+>>>>> request immediately. We might be able to call `start` on behalf of th=
+e
+>>>>> driver.
+>>>>>
+>>>>> At any rate, since the request is reference counted now, we can
+>>>>> automatically fail a request when the last reference is dropped and i=
+t
+>>>>> was not marked successfully completed. I would need to measure the
+>>>>> performance implications of such a feature.
+>>>>
+>>>> Are there cases where you still need access to the request after you
+>>>> have called `end`?
+>>>
+>>> In general no, there is no need to handle the request after calling end=
+.
+>>> C drivers are not allowed to, because this transfers ownership of the
+>>> request back to the block layer. This patch series defer the transfer o=
+f
+>>> ownership to the point when the ARef<Request> refcount goes to zero, so
+>>> there should be no danger associated with touching the `Request` after
+>>> end.
+>>>
+>>>> If no, I think it would be better for the request to
+>>>> be consumed by the `end` function.
+>>>> This is a bit difficult with `ARef`, since the user can just clone it
+>>>> though... Do you think that it might be necessary to clone requests?
+>>>
+>>> Looking into the details now I see that calling `Request::end` more tha=
+n
+>>> once will trigger UAF, because C code decrements the refcount on the
+>>> request. When we have `ARef<Request>` around, that is a problem. It
+>>> probably also messes with other things in C land. Good catch.
+>>>
+>>> I did implement `Request::end` to consume the request at one point
+>>> before I fell back on reference counting. It works fine for simple
+>>> drivers. However, most drivers will need to use the block layer tag set
+>>> service, that allows conversion of an integer id to a request pointer.
+>>> The abstraction for this feature is not part of this patch set. But the
+>>> block layer manages a mapping of integer to request mapping, and driver=
+s
+>>> typically use this to identify the request that corresponds to
+>>> completion messages that arrive from hardware. When drivers are able to
+>>> turn integers into requests like this, consuming the request in the cal=
+l
+>>> to `end` makes little sense (because we can just construct more).
+>>
+>> How do you ensure that this is fine?:
+>>
+>>       let r1 =3D tagset.get(0);
+>>       let r2 =3D tagset.get(0);
+>>       r1.end_ok();
+>>       r2.do_something_that_would_only_be_done_while_active();
+>>
+>> One thing that comes to my mind would be to only give out `&Request`
+>> from the tag set. And to destroy, you could have a separate operation
+>> that also removes the request from the tag set. (I am thinking of a tag
+>> set as a `HashMap<u64, Request>`.
+>=20
+> This would be similar to
+>=20
+>    let r1 =3D tagset.get(0)?;
+>    ler r2 =3D r1.clone();
+>    r1.end_ok();
+>    r2.do_something_requires_active();
+>=20
+> but it is not a problem because we do not implement any actions that are
+> illegal in that position (outside of `end` - that _is_ a problem).
 
-Sounds reasonable.
+Makes sense, but I think it's a bit weird to still be able to access it
+after `end`ing.
 
-> > requires() = {
-> > 
-> >  _nvmet_setup_target
-> > }
-> 
-> Hmm, I think this abuses the hook. IMO, it's the better to introduce a new hook.
+>=20
+>=20
+>>>
+>>> What I do now is issue the an `Option<ARef<Request>>` with
+>>> `bindings::req_ref_inc_not_zero(rq_ptr)`, to make sure that the request
+>>> is currently owned by the driver.
+>>>
+>>> I guess we can check the absolute value of the refcount, and only issue
+>>> a request handle if the count matches what we expect. Then we can be ce=
+rtain
+>>> that the handle is unique, and we can require transfer of ownership of
+>>> the handle to `Request::end` to make sure it can never be called more
+>>> than once.
+>>>
+>>> Another option is to error out in `Request::end` if the
+>>> refcount is not what we expect.
+>>
+>> I am a bit confused, why does the refcount matter in this case? Can't
+>> the user just have multiple `ARef`s?
+>=20
+> Because we want to assert that we are consuming the last handle to the
+> request. After we do that, the user cannot call `Request::end` again.
+> `TagSet::get` will not issue a request reference if the request is not
+> in flight. Although there might be a race condition to watch out for.
+>=20
+> When the block layer hands over ownership to Rust, the reference count
+> is 1. The first `ARef<Request>` we create increments the count to 2. To
+> complete the request, we must have ownership of all reference counts
+> above 1. The block layer takes the last reference count when it takes
+> back ownership of the request.
+>=20
+>> I think it would be weird to use `ARef<Request>` if you expect the
+>> refcount to be 1.
+>=20
+> Yes, that would require a custom smart pointer with a `try_into_unique`
+> method that succeeds when the refcount is exactly 2. It would consume
+> the instance and decrement the refcount to 1. But as I said, there is a
+> potential race with `TagSet::get` when the refcount is 1 that needs to
+> be handled.
+>=20
+>> Maybe the API should be different?
+>=20
+> I needs to change a little, yes.
+>=20
+>> As I understand it, a request has the following life cycle (please
+>> correct me if I am wrong):
+>> 1. A new request is created, it is given to the driver via `queue_rq`.
+>> 2. The driver can now decide what to do with it (theoretically it can
+>>      store it somewhere and later do something with it), but it should a=
+t
+>>      some point call `Request::start`.
+>> 3. Work happens and eventually the driver calls `Request::end`.
+>>
+>> To me this does not seem like something where we need a refcount (we
+>> still might need one for safety, but it does not need to be exposed to
+>> the user).
+>=20
+> It would not need to be exposed to the user, other than a) ending a reque=
+st
+> can fail OR b) `TagSet::get` can fail.
+>=20
+> a) would require that ending a request must be done with a unique
+> reference. This could be done by the user by the user calling
+> `try_into_unique` or by making the `end` method fallible.
+>=20
+> b) would make the reference handle `!Clone` and add a failure mode to
+> `TagSet::get`, so it fails to construct a `Request` handle if there are
+> already one in existence.
+>=20
+> I gravitate towards a) because it allows the user to clone the Request
+> reference without adding an additional `Arc`.
 
-Indeed :)
+This confuses me a little, since I thought that `TagSet::get` returns
+`Option<ARef<Request>>`. (I tried to find the abstractions in your
+github, but I did not find them)
 
-> >
-> > What do you think about this idea?
-> 
-> It sounds an interesting idea :) I prototyped the common code change based on
-> the idea and shared it on GitHub [*]. It introduces two new config arrays
-> NVMET_BLKDEV_TYPES and NVMET_TR_TYPES. When these two are set in config file as
-> follows,
-> 
->   NVMET_BLKDEV_TYPES=(device file)
->   NVMET_TR_TYPES=(loop rdma tcp)
-> 
-> it will run a single test case as follows. 2 x 3 = 6 times repeptitions.
-> 
-> $ sudo ./check nvme/006
-> nvme/006(nvmet dev=device tr=loop)(create an NVMeOF target)  [passed]
->     runtime  0.090s  ...  0.091s
-> nvme/006(nvmet dev=device tr=rdma)(create an NVMeOF target)  [passed]
->     runtime  0.310s  ...  0.305s
-> nvme/006(nvmet dev=device tr=tcp)(create an NVMeOF target)   [passed]
->     runtime  0.149s  ...  0.153s
-> nvme/006(nvmet dev=file tr=loop)(create an NVMeOF target)    [passed]
->     runtime  0.138s  ...  0.135s
-> nvme/006(nvmet dev=file tr=rdma)(create an NVMeOF target)    [passed]
->     runtime  0.300s  ...  0.305s
-> nvme/006(nvmet dev=file tr=tcp)(create an NVMeOF target)     [passed]
->     runtime  0.141s  ...  0.147s
-> 
-> I hope this meets your needs.
+I think that this could work: `queue_rq` takes a `OwnedRequest`, which
+the user can store in a `TagSet`, transferring ownership. `TagSet::get`
+returns `Option<&Request>` and you can call `TagSet::remove` to get
+`Option<OwnedRequest>`. `OwnedRequest::end` consumes `self`.
+With this pattern we also do not need to take an additional refcount.
 
-Yes, this is very useful.
+--=20
+Cheers,
+Benno
 
-> [*] https://github.com/kawasaki/blktests/tree/conditions
-
- I quickly looked into the changes. The only thing I'd say it looks a
- bit hard to extend if we have yet another variable. But maybe I'd make
- it too complex. I don't think we have to be too future proof here,
- because we can change this part without problems, it is all 'under the
- hood' and doesn't change the 'user interface'.
-
-Great stuff!
