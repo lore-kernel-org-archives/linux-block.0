@@ -1,101 +1,154 @@
-Received: from shelob.surriel.com (shelob.surriel.com [96.67.55.147])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20451BDCD;
-	Thu,  4 Apr 2024 16:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.67.55.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38CFE1C6A5;
+	Thu,  4 Apr 2024 16:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712248987; cv=none; b=WAYQmbBJ6QaQpwy1W2r5Ye+7ceC72mlOQ9R5woIbqmQA7M/6K7mBOs+96Cir2nlGZP/cTLwF2CRiDbg0ZBFUNtncXOiqvMRWHEz8150Xq4AXPgTAYxCbAAThM1cNCWRFgBnnKPRYQ8MTLRFQ/0Pl77L5Sy39184M5n3+Fae94f0=
+	t=1712249327; cv=none; b=fTfPXjgtTs8ZqZFLuF/qb61Dnf3nGehB6sFWZa0CtK9znNpO3TPOYCgaATl0e/A6yhL8UDfD7xJ5emXynPnEQlc/6av1x5my8qB4p2G23HsZ5ancVftxTgUkXht+xO781iIGagv25BoagP77uAykj5OyyoJIL3Zi8o/FYOFgYwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712248987; c=relaxed/simple;
-	bh=0/AY5cwJn+NnaRDfFReLrDnqEtoagxXGfDMh+lQhRsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=EDELAQQ7JSraQ3BlG7lmHLkk84pJJyQktkyugUVGQPrfVw/R3w2rFsFvL2feoa9Mygtm4qLuRJfq227+EjpH4JySF0RJcmLi3CWD9BE/cQ9lbrqfcmZOhGXBGkazI1fQMTFM3MGqlKfH4bD1bibbdwqH8AN/fzo9TGrNSB4Jgfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=surriel.com; spf=pass smtp.mailfrom=shelob.surriel.com; arc=none smtp.client-ip=96.67.55.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=surriel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shelob.surriel.com
-Received: from [2601:18c:9101:a8b6:6e0b:84ff:fee2:98bb] (helo=imladris.surriel.com)
-	by shelob.surriel.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <riel@shelob.surriel.com>)
-	id 1rsQ1N-000000002sp-3xIF;
-	Thu, 04 Apr 2024 12:33:01 -0400
-Date: Thu, 4 Apr 2024 12:32:53 -0400
-From: Rik van Riel <riel@surriel.com>
-To: linux-kernel@vger.kernel.org
-Cc: kernel-team@meta.com, Tejun Heo <tj@kernel.org>, Jens Axboe
- <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH] blk-iocost: avoid out of bounds shift
-Message-ID: <20240404123253.0f58010f@imladris.surriel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1712249327; c=relaxed/simple;
+	bh=FItxQKIKnB6xDpTy4OuJ7+aJw2KPqlzMNdwMCbAlF6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pfb4GXbGLAP+qyUJNa2wieeOPLptd8Z4YYw3zuZgD7n29dHChK1SW3jjPGbo8yGq6W/aJKHm0EITRFQIPE9UmmeYGU8JZZxmFdVCFdlkviCaQ7cNpkxNcLVmO0af8wPyYfCtwQYBtbvQEu7sNwsYXWa8PyhH86W1wRxM4iu+zCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mZVvZ5Qt; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mZVvZ5Qt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=IAcMzbwzMSdGjUZJwsigBkmbiIdxzP3w50+Ad4sa5UQ=; b=mZVvZ5QtSrlprrhnUVhWEWIU7E
+	sphdhQo7g/IJfa+/FvwlZsRFYmJ5wkNkd4AWif4Utjy+vMZEnwOad5hHf+SRbN7FGKw+i0FGqJBM4
+	yF2PaxBkNGMpqYBfoujAS+qFScyAlz3vNlovdCRtdSYfHINucazB4MwtfIsMPo5qEa0NQKwlFZIUA
+	VfRN+/hUWdkFBdAGtszp5axo9ZNsq2cyjqNAFaNh3mFRGcmLETrtGXGf3qXwEZGqMoZx63OmbHyON
+	JugVn8XGevOpUa3bOez65lUMoibZGmnJJ93pBOBTs99hw8DRim6xKVB8Vqfk/oU+BU912iDFwt/nX
+	hMyfZDfA==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rsQGP-00000008SrU-2u2m;
+	Thu, 04 Apr 2024 16:48:33 +0000
+Date: Thu, 4 Apr 2024 17:48:33 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
+	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+	io-uring@vger.kernel.org, nilay@linux.ibm.com,
+	ritesh.list@gmail.com
+Subject: Re: [PATCH v6 00/10] block atomic writes
+Message-ID: <Zg7Z4aJtn3SxY5w1@casper.infradead.org>
+References: <20240326133813.3224593-1-john.g.garry@oracle.com>
+ <ZgOXb_oZjsUU12YL@casper.infradead.org>
+ <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Sender: riel@surriel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
 
-UBSAN catches undefined behavior in blk-iocost, where sometimes
-iocg->delay is shifted right by a number that is too large,
-resulting in undefined behavior on some architectures.
+On Wed, Mar 27, 2024 at 01:37:41PM +0000, John Garry wrote:
+> On 27/03/2024 03:50, Matthew Wilcox wrote:
+> > On Tue, Mar 26, 2024 at 01:38:03PM +0000, John Garry wrote:
+> > > The goal here is to provide an interface that allows applications use
+> > > application-specific block sizes larger than logical block size
+> > > reported by the storage device or larger than filesystem block size as
+> > > reported by stat().
+> > > 
+> > > With this new interface, application blocks will never be torn or
+> > > fractured when written. For a power fail, for each individual application
+> > > block, all or none of the data to be written. A racing atomic write and
+> > > read will mean that the read sees all the old data or all the new data,
+> > > but never a mix of old and new.
+> > > 
+> > > Three new fields are added to struct statx - atomic_write_unit_min,
+> > > atomic_write_unit_max, and atomic_write_segments_max. For each atomic
+> > > individual write, the total length of a write must be a between
+> > > atomic_write_unit_min and atomic_write_unit_max, inclusive, and a
+> > > power-of-2. The write must also be at a natural offset in the file
+> > > wrt the write length. For pwritev2, iovcnt is limited by
+> > > atomic_write_segments_max.
+> > > 
+> > > There has been some discussion on supporting buffered IO and whether the
+> > > API is suitable, like:
+> > > https://lore.kernel.org/linux-nvme/ZeembVG-ygFal6Eb@casper.infradead.org/
+> > > 
+> > > Specifically the concern is that supporting a range of sizes of atomic IO
+> > > in the pagecache is complex to support. For this, my idea is that FSes can
+> > > fix atomic_write_unit_min and atomic_write_unit_max at the same size, the
+> > > extent alignment size, which should be easier to support. We may need to
+> > > implement O_ATOMIC to avoid mixing atomic and non-atomic IOs for this. I
+> > > have no proposed solution for atomic write buffered IO for bdev file
+> > > operations, but I know of no requirement for this.
+> > 
+> > The thing is that there's no requirement for an interface as complex as
+> > the one you're proposing here.  I've talked to a few database people
+> > and all they want is to increase the untorn write boundary from "one
+> > disc block" to one database block, typically 8kB or 16kB.
+> > 
+> > So they would be quite happy with a much simpler interface where they
+> > set the inode block size at inode creation time,
+> 
+> We want to support untorn writes for bdev file operations - how can we set
+> the inode block size there? Currently it is based on logical block size.
 
-[  186.556576] ------------[ cut here ]------------
-UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
-shift exponent 64 is too large for 64-bit type 'u64' (aka 'unsigned long long')
-CPU: 16 PID: 0 Comm: swapper/16 Tainted: G S          E    N 6.9.0-0_fbk700_debug_rc2_kbuilder_0_gc85af715cac0 #1
-Hardware name: Quanta Twin Lakes MP/Twin Lakes Passive MP, BIOS F09_3A23 12/08/2020
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x8f/0xe0
- __ubsan_handle_shift_out_of_bounds+0x22c/0x280
- iocg_kick_delay+0x30b/0x310
- ioc_timer_fn+0x2fb/0x1f80
- __run_timer_base+0x1b6/0x250
-...
+ioctl(BLKBSZSET), I guess?  That currently limits to PAGE_SIZE, but I
+think we can remove that limitation with the bs>PS patches.
 
-Avoid that undefined behavior by simply taking the
-"delay = 0" branch if the shift is too large.
+> > and then all writes to
+> > that inode were guaranteed to be untorn.  This would also be simpler to
+> > implement for buffered writes.
+> 
+> We did consider that. Won't that lead to the possibility of breaking
+> existing applications which want to do regular unaligned writes to these
+> files? We do know that mysql/innodb does have some "compressed" mode of
+> operation, which involves regular writes to the same file which wants untorn
+> writes.
 
-I am not sure what the symptoms of an undefined value
-delay will be, but I suspect it could be more than a
-little annoying to debug.
+If you're talking about "regular unaligned buffered writes", then that
+won't break.  If you cross a folio boundary, the result may be torn,
+but if you're crossing a block boundary you expect that.
 
-Signed-off-by: Rik van Riel <riel@surriel.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
-Cc: Jens Axboe <axboe@kernel.dk>
----
- block/blk-iocost.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+> Furthermore, untorn writes in HW are expensive - for SCSI anyway. Do we
+> always want these for such a file?
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 9a85bfbbc45a..baa20c85799d 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1347,7 +1347,7 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
- {
- 	struct ioc *ioc = iocg->ioc;
- 	struct blkcg_gq *blkg = iocg_to_blkg(iocg);
--	u64 tdelta, delay, new_delay;
-+	u64 tdelta, delay, new_delay, shift;
- 	s64 vover, vover_pct;
- 	u32 hwa;
- 
-@@ -1362,8 +1362,9 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
- 
- 	/* calculate the current delay in effect - 1/2 every second */
- 	tdelta = now->now - iocg->delay_at;
--	if (iocg->delay)
--		delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
-+	shift = div64_u64(tdelta, USEC_PER_SEC);
-+	if (iocg->delay && shift < BITS_PER_LONG)
-+		delay = iocg->delay >> shift;
- 	else
- 		delay = 0;
- 
--- 
-2.42.0
+Do untorn writes actually exist in SCSI?  I was under the impression
+nobody had actually implemented them in SCSI hardware.
 
+> We saw untorn writes as not being a property of the file or even the inode
+> itself, but rather an attribute of the specific IO being issued from the
+> userspace application.
+
+The problem is that keeping track of that is expensive for buffered
+writes.  It's a model that only works for direct IO.  Arguably we
+could make it work for O_SYNC buffered IO, but that'll require some
+surgery.
+
+> > Who's asking for this more complex interface?
+> 
+> It's not a case of someone specifically asking for this interface. This is
+> just a proposal to satisfy userspace requirement to do untorn writes in a
+> generic way.
+> 
+> From a user point-of-view, untorn writes for a regular file can be enabled
+> for up to a specific size* with FS_IOC_SETFLAGS API. Then they need to
+> follow alignment and size rules for issuing untorn writes, but they would
+> always need to do this. In addition, the user may still issue regular
+> (tearable) writes to the file.
+> 
+> * I think that we could change this to only allow writes for that specific
+> size, which was my proposal for buffered IO.
+> 
+> Thanks,
+> John
+> 
