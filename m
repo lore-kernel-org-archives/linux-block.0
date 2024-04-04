@@ -1,259 +1,200 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2090.outbound.protection.outlook.com [40.107.96.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44981CFBD
-	for <linux-block@vger.kernel.org>; Thu,  4 Apr 2024 05:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712209457; cv=none; b=JzhfVDDdpdcutGEUMqo6ynPogB0jJKlrHbF7usSPembx0cLz6aVtGvtQwIH26ADjpvz86hNW+AbujJ5vjSOx5pLd7bug0sjKAFsJMkB+TrrTr2HYHEXIILe2iysZZvezX0qdm/aaPkvzYmxmeNRuO1o5gqOVvvCmGH5nVzEY0Xc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712209457; c=relaxed/simple;
-	bh=7sHm5NYQwlFhuVIj8dvs4XxZaD5hjWm1LfC24QUL4eU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Uo+i24HVHLq6qjKEtu3r+GgFlIFhZ88IuYU5Ks6/FO8NESKz5bjnauOFBwfaU2/DVV+bm6ayM3zO4ey/i330WdPrZBlqd4fPzrxf1KBZUI63vmRcEgv/Sdl1lqU1A5TUsX4FSM1H1XB1Ifi4kEBxb3md6D/KveKZghXoQYdDebA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=iie1t1+n; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532AB4E1C1;
+	Thu,  4 Apr 2024 06:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.90
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712211526; cv=fail; b=RUIMoM8LQS1OvChcv9ACRTqUwIHxN9QGIKiSDUgzp460N+bVWatZnxbx5O4nz1W0NzsJ0uOt0LGrq8HrTouQ88eUuu37/Pqrfo/65ANpQm4vjpnK6nTsh6BwqU8dw2Iy9pjK6nQozQjO5TU2lMs+YQqtGhL0YerIPXiHeFLj67A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712211526; c=relaxed/simple;
+	bh=5iTFWYeYYgk3kmHc88d3wERfQdd7HrN64KnxhFxbULs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rNLe8A7gxEBw8awvHcs9QveqweNVFnmyq0EBUgDR5sRG+cerjx5Ez3iU+2jpYDoO1DgWUtYVWiYxl5Xn1PMqguiRQBBsADQ2lGo0uD4uzjL6j9VvEjGfS/9CBVfaUO85hINqZUG7rh8uylIuYZh2MooGCpwpbrMKxfrZLbqT9Z4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ti4QNbMG; arc=fail smtp.client-ip=40.107.96.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="iie1t1+n"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56c197d042fso562734a12.0
-        for <linux-block@vger.kernel.org>; Wed, 03 Apr 2024 22:44:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1712209453; x=1712814253; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=p6A4SiGWNYJMmN29Xh0xcoVvXDLons2as90jPZGp2Y0=;
-        b=iie1t1+nL+95R5TC2+ZmU/mpbzBGwrPvfbH4QgDaj09Bnnt2tEiZXVhXpZpNbDD9lU
-         b6JAX606gKAJvX5IVcx+os0giMLqC2VsVi0/2heFrf7fBrpsj8AzkgktA1sgfRN5GKP9
-         dhOP1XnkQoBusUkXbqp3b+NMFsVBLHmZaMnFKgGIqPFTk22ViOesLXRVNDyONHeIFsc4
-         s1SzYSCwOsRwcMuWyJQfHFvoIv44nNoPxa0izlZ/ERmTj7ESchQiCp4P8tec8P+ibrIQ
-         XuqbTrzVzJT9eaf0VsJA12Qmdm5aKVdIqCDb4OZS7gf1fhcXGnakOJ0L44OmR5rz3swM
-         jmwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712209453; x=1712814253;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p6A4SiGWNYJMmN29Xh0xcoVvXDLons2as90jPZGp2Y0=;
-        b=rwTBBGNvl/usiLKPv+S4eg9Sz1/vvtAkaAoqMhNrokUufBe+f0rEdsoY9otfCAxzgC
-         Fma/rT6PEzxpOYMAPR51TlTIc596OtERyFipwVwaqEjq+aDtHN2FzPLpz0HMVjEVOefx
-         XdbIL2nL5SwDuTa4wUViglYiU2G2NtUQCfX/cp9aL6PEVHt8HK5aHaSSZyriB+oYkkWh
-         Cmyww1kH28e4dPJIn4kvRuujLS+EFv95aN8F2FeROHo98bNaHegZMZT7bEo6WO2MTnB7
-         36QzOEjNTR0cXGXjLrx6WVsGOw7yn5UTxXxJdU/7hbroHi7sRlI3AtNj0hPyvmfCdV0V
-         LgQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrrJwIUFysTzEYgY+Gg4d3f5uuuPppJQrMx2bvliX5YYjvMzt8Dmiqe3BJ/vsjwJ5X+UpCDLZK3swbJHq7sglC3nSRPOpe5q6THR8=
-X-Gm-Message-State: AOJu0YyTq3iRBWKgViNsFgGChWQXmwqKtCvLjT9e4CA39cR6icqO/Ec9
-	IAKWNftiynJDz9Th8wW0KerxwPz/59BqImeUNtSOZakCAWdjNIbo6Z7KLRQ/aMM=
-X-Google-Smtp-Source: AGHT+IG8Q2Hn5mRYO5tL7zfow15NKsys0JcI5LAjTqTjlU0wZarWU62w2QGZcCj00l5DA8sG/3twTw==
-X-Received: by 2002:a50:9f67:0:b0:568:b48e:bb2 with SMTP id b94-20020a509f67000000b00568b48e0bb2mr780512edf.25.1712209452758;
-        Wed, 03 Apr 2024 22:44:12 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id ec47-20020a0564020d6f00b0056e0badec02sm1277154edb.38.2024.04.03.22.44.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 22:44:12 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
- Busch <kbusch@kernel.org>,  Damien Le Moal <Damien.LeMoal@wdc.com>,  Bart
- Van Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
-  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
- Hindborg <a.hindborg@samsung.com>,  Wedson Almeida Filho
- <wedsonaf@gmail.com>,  Niklas Cassel <Niklas.Cassel@wdc.com>,  Greg KH
- <gregkh@linuxfoundation.org>,  Matthew Wilcox <willy@infradead.org>,
-  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
-  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?=
- Roy Baron <bjorn3_gh@protonmail.com>,  Alice Ryhl <aliceryhl@google.com>,
-  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
- <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
- =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
- Granados
- <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
- <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  open
- list <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
- <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
- <gost.dev@samsung.com>,  Ming Lei <ming.lei@redhat.com>
-Subject: Re: [RFC PATCH 1/5] rust: block: introduce `kernel::block::mq` module
-In-Reply-To: <f405ff55-fcb0-4592-ae4b-e1188eae9953@proton.me> (Benno Lossin's
-	message of "Wed, 03 Apr 2024 19:37:44 +0000")
-References: <86cd5566-5f1b-434a-9163-2b2d60a759d1@proton.me>
-	<871q7o54el.fsf@metaspace.dk>
-	<7ed2a8df-3088-42a1-b257-dba3c2c9fc92@proton.me>
-	<87v84ysujo.fsf@metaspace.dk>
-	<f405ff55-fcb0-4592-ae4b-e1188eae9953@proton.me>
-User-Agent: mu4e 1.12.2; emacs 29.3
-Date: Thu, 04 Apr 2024 07:44:05 +0200
-Message-ID: <87zfu9r8be.fsf@metaspace.dk>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ti4QNbMG"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RtjhKVM57qU5y5mv21WhFCs5hmRlaWNCq448k1bPzi2WieaYQjYn1woTffeSgIKpkiDamD0jmhHDh0as/gRP28zjdAqdqq24V6kBdBZDQz72sU8LZMbItfS/0uJiZSJAG2n3KNiOl7zIOegIrfTlwwNmYHCtyhl0VLPX6ce9surd4HyHY+G8Tgz4hvV6KjfBsgP3qIRRhKzUj98RvcZFsq+12j6iktqgyxbCJ8WNwTX3hc/uGwAoaWzvi5fng3eckMR/WR687u/62af4VdtGNl4M9o7g44HlVdOFfUHaezvAkoDBCkRzhK3/V/d5esxm9udd9QxI9loChKJaGgPNoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sGUygyizDVzBGCSeklfWFqq/09oRo1P3p2+NVZdNwPw=;
+ b=C839bf3+/3gt/v0gNUXxnJ+SAWf/4Q5FmBDU830qwOvuSZhImOxKK6oGv3z2Bnlglcla1b3ep4zxoLnlDtb2G1CZmAmz0mc7zipgXVxQD2Fo5gxnuMEwN7R1hndGLzfq8blvBSK+/hax1WAhUmvyJiefJz7RX7su5k+xX0SG2Msulwcxp41GzkTJahYTA7cqIAFdwNz6qLGoruLZIbyPtBsKFLoqWn3YvdNJmUDIOqMmQy7CZp2ls/6gjiSGIDigEpzrs625RG/RJTWd3g7e9r3YwAfepq3pgB5lFppjZ0dbk6pHJcAsN0NbotriUsW2GGWdYsa7TtvwniRW6Yv58A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sGUygyizDVzBGCSeklfWFqq/09oRo1P3p2+NVZdNwPw=;
+ b=ti4QNbMGBNM11dvPdJwSfVherCTjHD0M9T0gh6aiVYmr24jCJLM2CmPr83JHE6sLvLd1PaOFrEeWjo2lbC5T/D+tRUL2YVGt42dDvRqMQH7RP/VzI1G3q0giXgFk/KH9oEjlZ20JyP4BIaqx+MWELaJUbl6Q14dS9WSfz6zS3Pg=
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
+ CY8PR12MB8216.namprd12.prod.outlook.com (2603:10b6:930:78::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.46; Thu, 4 Apr 2024 06:18:39 +0000
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::2385:dab8:fddf:bcba]) by DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::2385:dab8:fddf:bcba%6]) with mapi id 15.20.7409.042; Thu, 4 Apr 2024
+ 06:18:39 +0000
+Message-ID: <a30d9ff5-638b-9d81-2c4e-8afd585d437c@amd.com>
+Date: Thu, 4 Apr 2024 08:17:48 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 21/25] nvdimm: virtio_pmem: drop owner assignment
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
+ David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Cristian Marussi <cristian.marussi@arm.com>,
+ Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
+ Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
+ <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Daniel Vetter <daniel@ffwll.ch>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
+ Latchesar Ionkov <lucho@ionkov.net>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Christian Schoenebeck <linux_oss@crudebyte.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
+ <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+ Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+ kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
+ linux-sound@vger.kernel.org
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+ <20240331-module-owner-virtio-v2-21-98f04bfaf46a@linaro.org>
+From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <20240331-module-owner-virtio-v2-21-98f04bfaf46a@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR09CA0091.eurprd09.prod.outlook.com
+ (2603:10a6:803:78::14) To DM6PR12MB2810.namprd12.prod.outlook.com
+ (2603:10b6:5:41::21)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|CY8PR12MB8216:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	3FffiHvmVY5igagMS6HFuehymN9LrxeNdbbBXpvUSfgEfgdxTVr0Vaf8j89Wo8MTcHWDcxWZuXHqaQWzC1xGreHIwkQlKqYXP9K7Jf7Wof4aSKqaqFpgwFQ9pQFNmtJgSNcCi1l/QrZu/BXkxbkpkcXTZVQKZzZlJ75zkWDe0uKewVkzQF73JuHopJGJ/oG/PGDIKlFOVfi+jY2fd95vjvx3qRqLKO7nvsq9tGlZPBZU44UyYxtaRAmrND6VASBbbEoCSgjURHO3hOPqVBOk45UDBVERXWbgA9/TzPvbujnAbXaLrPKMcZDlkgJpuBl99f7JLPU3TT2tJgZTIhzMLAEw9RCd40ZkAw8Arls5SKlJJ0HDaxPia21Hpca5K3yAOdPSTkqewkBt/ZmPBdAdXfP2N4HAWcTdfHVfeOZFOz3iJHYOUFV/+qaxiYXtZVQtj7HcfBKhMc8z9oofKCUT+Dj4N4Wo0WXh/Z+GqdXb8GIWmjQc1ZIS2cT9OdMzqyDqY0yLuI484nGakhcP/Xxxj9ufPCoTzeBwrqQDhQEeP30d1ju7hOSFKoMMthe43blFzVzkVvVoeFXV+tq4uY882/gIhOInvww+65Md4boluQociatlug6mB0lKm+osdQJp/aVYOSkrbIGG4z+Pq1AqaYF5jLjOXprj4ECvWOZAMer2ZmrxLsYz7Y/k50YLQlPmvbCl1RnyW9hLOwJuRdw8Mg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005)(921011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NldqM0VrbkFNditIdUI3c2JSakkrOEJHbnczZUpuTzFvVWxZaTdsUTlvejZ6?=
+ =?utf-8?B?c0VKVjE1eUo5VWkycTRoOWVlc3ZQMjFkMHZrREJMSFEzNWhJa0E5bkh5bFpt?=
+ =?utf-8?B?TDdISlpPcXBvRTYwQ3RZLzRiK1hUcmZBcUNFai9ka0dGUWtvbHNJdWcySEw0?=
+ =?utf-8?B?M1RKU2YwdFVnZE41M3pxanYxSmZwdXZ4dHRSQlRCc3V6dTllY3FIeUdpTjUz?=
+ =?utf-8?B?aWU2eVltcU9uWnV5YlRPdDdOZTRlNkRIQU4xV3daTjRDWVIrenBFWHg3SEVK?=
+ =?utf-8?B?OE5ERmx1ZHNwSUZGWTFSMG5TQnJ1eTcyZGx2UXhWTTJtNDIrTHpmeW50eExm?=
+ =?utf-8?B?blhZMjNlZFU5NEpYdEVrc3Z2WlgxOU8xTHlwTHVwa2RLTnFuOVhiQUNnREtj?=
+ =?utf-8?B?Rm9VUW5vcnZ6R1ZJU1FNeE9hRXJzQnhDQ205dUw3RFVsck5KNjV4enVXY2J4?=
+ =?utf-8?B?cGhxZ3QvWHJkbHM4Ry9iTDBxWFBVNG9kZmhHbVhWZlNDdFlCQ0xmNGRYSmN1?=
+ =?utf-8?B?WHJ4Ullidm9QWTFZdmQvNkVrRCt5cVAwcGJDNC85NTE4UHQ2LzNVOGNPYk1T?=
+ =?utf-8?B?ZmhsWlcvQ21yb21YREhSOGlCSDVTajZXV3cxOUlpTGxlQTQvT21WeHM0REFU?=
+ =?utf-8?B?Q0ZlV2I0UGJUZ3hVbU8wVTcrd0pBejhtNzlobVp4emJFN1RvVU94REYxRWxP?=
+ =?utf-8?B?a0VTbnBYZzh5NUxwTnNMamxnSjUvdkNXUHpyRC9Nenl1SGVpNkQzeGEvZGtY?=
+ =?utf-8?B?cWptOVQ3dXVENXNiY3FNK3d4TWFqSFpGTkFiQmFHNHB3bHlBeGpQaUovMEoy?=
+ =?utf-8?B?Z2h3d3NzN1JMNkRaSDB4WHIrMTA5b3dSbGdhSHh0bWZKVjRrakMxM3FlNmF6?=
+ =?utf-8?B?Y01rYzZJUWMxRysxTkwzTmRjYjB3SitiMXhySHdYdVRYN3BvMWJmZkJQNmsz?=
+ =?utf-8?B?RkdTeGg1eUg4Q1R6Y1BUdFlOclBvRXdVdGRPRDh0TUphSXYwdnRSc1J0bDI3?=
+ =?utf-8?B?dldxWlNLTy9ld2tUSFB0QlE5MTEzN3QyL1B3NHQ3c095MEtQNjNkMmdxcGVS?=
+ =?utf-8?B?MDhqSGwwakNLaHQwbWQ5NzRHR2FHR290azFDaWUwVHpsSm5qdWpnelMwNzc0?=
+ =?utf-8?B?RHV0SUVoWEtRK1E0S1AwaENQVWxqOG94eCtrejI0aEpReFlNRENaRUlxN0NS?=
+ =?utf-8?B?dk5zK3Fua1NPZlFTNjUyRlhtVjVPcG85dHVnVDV2Q29NK0lVRWMxeS9GMk9D?=
+ =?utf-8?B?QXQ3b29wUjZaWUpnYlNMS1VRdERibzB4MHoyamVNV3dEbWlZQlNIYzBpemlE?=
+ =?utf-8?B?TG9yZTVZaW0wY2RPQXovVDdhMkpZNUVhcVVCYm0vaDNYNExjdms0MUtWL2tq?=
+ =?utf-8?B?cm5vY3REcFJ6T1F4S0swb0wrVHhPVG5Xc0pPa1dnNHBNbmljZjdBa0g1SkNv?=
+ =?utf-8?B?dmFwL29VTU5FRnVXNFJ2dDdXYUpOa0JLTVh4Tk9WUWo1d0pnRUJzejhRQ3o5?=
+ =?utf-8?B?anJKTkpIV3FvNG9pWEtEaUhHNGl4bm5WL0U5VTMxQnJkb2xuZTBxOUsvTzly?=
+ =?utf-8?B?a3dlRlU1WTVnWWpPV21SK0xpZEpnZEZpeDIwaTk4MFk5MjdSVFJGckF1QXln?=
+ =?utf-8?B?QWNJZk42OFloK3crUUtxZndXbDVOWUZMUm4zRlBFM0ZIbmF2SzhpU250TlpP?=
+ =?utf-8?B?c0ZJK1JhUWFQVDdsUnZBSE9YcGt5N3lCVGNLUGYzVTlVNnF5aHlnbm5sQVNJ?=
+ =?utf-8?B?czRtNlI2UGxUbzdkSFN3NUZKSkNmTEJxL3ljakRLYjJ0dElxQzlwR2hjL1p1?=
+ =?utf-8?B?MnNacDJuTE1CRWg4QUMvY2hZb0RkbFluclR2QVo1ektwTUNwK2g3eDdVM0t4?=
+ =?utf-8?B?K0Z4cDlYaFpqZmtBNXl3NkdLMmNRQTNYeVNFcEhpV0Y0ZjBmRVZwSDN5dzFZ?=
+ =?utf-8?B?Y09RcXZodG5iZkg2bFpCcVlHRUp2UmhNWVRFSU9uM0YyaWQ0a1c3VFZ3eGt1?=
+ =?utf-8?B?dGpMa3JqTG1XSEc2NjBlLy96SVRkL2pEOUlpOWViTWZLVjNOZDUyMXY1cGpZ?=
+ =?utf-8?B?RGREaWpOcUxFbkVBMXZHaVVZNlpmbDlJRkllOUIwbTV1MENhR1AzdTBpem1s?=
+ =?utf-8?Q?qw2qYdOwELcIKPD9IK3bVT7xj?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0fc5c03-d3f1-407b-10f4-08dc546f0ca4
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 06:18:31.3112
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tdOgk2JHQ+D4pOlbMfhFDQrfxUTlXRzHE0L+I38/h/takAwhkipgrCqw8gQk6S20PrFBvpBv4UbElXDU4YfCTw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8216
 
-Benno Lossin <benno.lossin@proton.me> writes:
+On 3/31/2024 10:44 AM, Krzysztof Kozlowski wrote:
+> virtio core already sets the .owner, so driver does not need to.
+> 
+> Acked-by: Dave Jiang <dave.jiang@intel.com>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+> 
+> Depends on the first patch.
+> ---
+>   drivers/nvdimm/virtio_pmem.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+> index 4ceced5cefcf..c9b97aeabf85 100644
+> --- a/drivers/nvdimm/virtio_pmem.c
+> +++ b/drivers/nvdimm/virtio_pmem.c
+> @@ -151,7 +151,6 @@ static struct virtio_driver virtio_pmem_driver = {
+>   	.feature_table		= features,
+>   	.feature_table_size	= ARRAY_SIZE(features),
+>   	.driver.name		= KBUILD_MODNAME,
+> -	.driver.owner		= THIS_MODULE,
+>   	.id_table		= id_table,
+>   	.validate		= virtio_pmem_validate,
+>   	.probe			= virtio_pmem_probe,
+> 
 
-> On 03.04.24 10:46, Andreas Hindborg wrote:
->> Benno Lossin <benno.lossin@proton.me> writes:
->> 
->>> On 23.03.24 07:32, Andreas Hindborg wrote:
->>>> Benno Lossin <benno.lossin@proton.me> writes:
->>>>> On 3/13/24 12:05, Andreas Hindborg wrote:
->>>>>> +//! implementations of the `Operations` trait.
->>>>>> +//!
->>>>>> +//! IO requests are passed to the driver as [`Request`] references. The
->>>>>> +//! `Request` type is a wrapper around the C `struct request`. The driver must
->>>>>> +//! mark start of request processing by calling [`Request::start`] and end of
->>>>>> +//! processing by calling one of the [`Request::end`], methods. Failure to do so
->>>>>> +//! can lead to IO failures.
->>>>>
->>>>> I am unfamiliar with this, what are "IO failures"?
->>>>> Do you think that it might be better to change the API to use a
->>>>> callback? So instead of calling start and end, you would do
->>>>>
->>>>>        request.handle(|req| {
->>>>>            // do the stuff that would be done between start and end
->>>>>        });
->>>>>
->>>>> I took a quick look at the rnull driver and there you are calling
->>>>> `Request::end_ok` from a different function. So my suggestion might not
->>>>> be possible, since you really need the freedom.
->>>>>
->>>>> Do you think that a guard approach might work better? ie `start` returns
->>>>> a guard that when dropped will call `end` and you need the guard to
->>>>> operate on the request.
->>>>
->>>> I don't think that would fit, since the driver might not complete the
->>>> request immediately. We might be able to call `start` on behalf of the
->>>> driver.
->>>>
->>>> At any rate, since the request is reference counted now, we can
->>>> automatically fail a request when the last reference is dropped and it
->>>> was not marked successfully completed. I would need to measure the
->>>> performance implications of such a feature.
->>>
->>> Are there cases where you still need access to the request after you
->>> have called `end`?
->> 
->> In general no, there is no need to handle the request after calling end.
->> C drivers are not allowed to, because this transfers ownership of the
->> request back to the block layer. This patch series defer the transfer of
->> ownership to the point when the ARef<Request> refcount goes to zero, so
->> there should be no danger associated with touching the `Request` after
->> end.
->> 
->>> If no, I think it would be better for the request to
->>> be consumed by the `end` function.
->>> This is a bit difficult with `ARef`, since the user can just clone it
->>> though... Do you think that it might be necessary to clone requests?
->> 
->> Looking into the details now I see that calling `Request::end` more than
->> once will trigger UAF, because C code decrements the refcount on the
->> request. When we have `ARef<Request>` around, that is a problem. It
->> probably also messes with other things in C land. Good catch.
->> 
->> I did implement `Request::end` to consume the request at one point
->> before I fell back on reference counting. It works fine for simple
->> drivers. However, most drivers will need to use the block layer tag set
->> service, that allows conversion of an integer id to a request pointer.
->> The abstraction for this feature is not part of this patch set. But the
->> block layer manages a mapping of integer to request mapping, and drivers
->> typically use this to identify the request that corresponds to
->> completion messages that arrive from hardware. When drivers are able to
->> turn integers into requests like this, consuming the request in the call
->> to `end` makes little sense (because we can just construct more).
->
-> How do you ensure that this is fine?:
->
->      let r1 = tagset.get(0);
->      let r2 = tagset.get(0);
->      r1.end_ok();
->      r2.do_something_that_would_only_be_done_while_active();
->
-> One thing that comes to my mind would be to only give out `&Request`
-> from the tag set. And to destroy, you could have a separate operation
-> that also removes the request from the tag set. (I am thinking of a tag
-> set as a `HashMap<u64, Request>`.
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
 
-This would be similar to
-
-  let r1 = tagset.get(0)?;
-  ler r2 = r1.clone();
-  r1.end_ok();
-  r2.do_something_requires_active();
-
-but it is not a problem because we do not implement any actions that are
-illegal in that position (outside of `end` - that _is_ a problem).
-
-
->> 
->> What I do now is issue the an `Option<ARef<Request>>` with
->> `bindings::req_ref_inc_not_zero(rq_ptr)`, to make sure that the request
->> is currently owned by the driver.
->> 
->> I guess we can check the absolute value of the refcount, and only issue
->> a request handle if the count matches what we expect. Then we can be certain
->> that the handle is unique, and we can require transfer of ownership of
->> the handle to `Request::end` to make sure it can never be called more
->> than once.
->> 
->> Another option is to error out in `Request::end` if the
->> refcount is not what we expect.
->
-> I am a bit confused, why does the refcount matter in this case? Can't
-> the user just have multiple `ARef`s?
-
-Because we want to assert that we are consuming the last handle to the
-request. After we do that, the user cannot call `Request::end` again.
-`TagSet::get` will not issue a request reference if the request is not
-in flight. Although there might be a race condition to watch out for.
-
-When the block layer hands over ownership to Rust, the reference count
-is 1. The first `ARef<Request>` we create increments the count to 2. To
-complete the request, we must have ownership of all reference counts
-above 1. The block layer takes the last reference count when it takes
-back ownership of the request.
-
-> I think it would be weird to use `ARef<Request>` if you expect the
-> refcount to be 1.
-
-Yes, that would require a custom smart pointer with a `try_into_unique`
-method that succeeds when the refcount is exactly 2. It would consume
-the instance and decrement the refcount to 1. But as I said, there is a
-potential race with `TagSet::get` when the refcount is 1 that needs to
-be handled.
-
-> Maybe the API should be different?
-
-I needs to change a little, yes.
-
-> As I understand it, a request has the following life cycle (please
-> correct me if I am wrong):
-> 1. A new request is created, it is given to the driver via `queue_rq`.
-> 2. The driver can now decide what to do with it (theoretically it can
->     store it somewhere and later do something with it), but it should at
->     some point call `Request::start`.
-> 3. Work happens and eventually the driver calls `Request::end`.
->
-> To me this does not seem like something where we need a refcount (we
-> still might need one for safety, but it does not need to be exposed to
-> the user).
-
-It would not need to be exposed to the user, other than a) ending a request
-can fail OR b) `TagSet::get` can fail.
-
-a) would require that ending a request must be done with a unique
-reference. This could be done by the user by the user calling
-`try_into_unique` or by making the `end` method fallible.
-
-b) would make the reference handle `!Clone` and add a failure mode to
-`TagSet::get`, so it fails to construct a `Request` handle if there are
-already one in existence.
-
-I gravitate towards a) because it allows the user to clone the Request
-reference without adding an additional `Arc`.
-
-
-BR Andreas
