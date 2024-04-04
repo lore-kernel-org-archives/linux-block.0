@@ -1,212 +1,120 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEA221353;
-	Thu,  4 Apr 2024 18:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2111C6AF
+	for <linux-block@vger.kernel.org>; Thu,  4 Apr 2024 18:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712255491; cv=none; b=YZiPZEHtrghS69DhKmmW/BNEKNKGbPASEvDGCH8g8Iqt+LdRhIQlI1vrxjSflm4xB/7C9gMlLG6wDSINLoxsmycUV6U247wYDe5wEYLLSVmAv+hM7r0VT/J6O+mCE4mdMPNixO3S6jBXZQvPdtGaP4lomZ4iUV3yzXgr1oLiZ04=
+	t=1712256549; cv=none; b=QT22k0FNKT8ID6fzWkVXPyH7/I3v8j2mL/jel2wOC0MyMjzNWIf82TuLVi0ae6HA4jYhHj8FL5ROfp67YUpbRSCbBXybYMPKNu2tihtvihlfyHmthyu9cN/HsCaM//UuJTM15B3Yw8JywxXN+I80qF88t1gMHzlmvb0nxvhC7bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712255491; c=relaxed/simple;
-	bh=PcvChjU+05hYidr0P74zTR3IkHY+RRkfWeJpG2/V8HY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NFHAwQUHU++WbQrS6GkhrJSKYuzO+A9EZiLtCTTEdxc3FD8KKJbiWPsLVci/nLX8XDAOzbnEIaV+Iy+sipyw6kNhML2XNKZwwyZg9FstEY8iadM4Fd4i3mdKlGkLBMCQ7UJeOad1Lvgk+wrhVNbinRXbiBnbRchmmz5HvVlUyoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=izqsw0No; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1712256549; c=relaxed/simple;
+	bh=O1yHR13LMvqMhssupELkMLJy9srd8c4LfjZpuES3zNQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IX4P8tzbSHbhOskHJmLqU2PC1efOgKDGjlJEGd5hhzVZFsXSFl92H7u4CTeL884JgK4PsNsOpxaFsTQXaFcpI1YGzRDpAxsj4Se4IlKJDu/m6SqMZ6g5FHXntx33dJa0eZB4kUSIU79QQ/kxm/bJ6PEGdCqZaiR/h66nA5rwHDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LCybFS4/; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="izqsw0No"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V9VZ94bCjzlgTGW;
-	Thu,  4 Apr 2024 18:31:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:references:content-language:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1712255483; x=1714847484; bh=9U54RUAdkZyZ07sY4j66HIye
-	Ac7HfOdJglXCmF2TRzg=; b=izqsw0Noej8uUBNstBrjtyH+0urCNSIw0S3CK18n
-	WBmYIdk43WSKrLOY4KYgxGqu/kfQAQcCK4OnyzhT2D/pKJ7mi9J8JrYZzWl3mH2f
-	eVK/aWiYUHyjx+8Mzm/V5OvxrajFu6S8jD8I05cBM9dWryHEiUiX8Ft7TbVXizzU
-	0G29GahTVaquUzqsvCCLS2tH5uPrtDIYY2zFRHrqZF5A0DS0UndVS3NZftFIPup4
-	/VBJjdHcNcQ4bL7NmvM7LYiBIVc+HHRQirm1qASzNrRoxTsiABe1AapuU4hLy4r2
-	2+BpDpOSIQtbfx27rTejCdfz/hXCraYjKr6v1MfXKlJHfw==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id vAwPbDjo4E8x; Thu,  4 Apr 2024 18:31:23 +0000 (UTC)
-Received: from [100.96.154.173] (unknown [104.132.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V9VZ073Q0zlgTHp;
-	Thu,  4 Apr 2024 18:31:20 +0000 (UTC)
-Message-ID: <c3bbe9ac-690c-43a7-bc75-3634af5cfe7a@acm.org>
-Date: Thu, 4 Apr 2024 11:31:19 -0700
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LCybFS4/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712256548; x=1743792548;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=O1yHR13LMvqMhssupELkMLJy9srd8c4LfjZpuES3zNQ=;
+  b=LCybFS4/xAdTpuJpxpQxmAn2YvsJODkCv7mky42j6tt3E1jyTcLu80Z4
+   l9sPgtx5j8Go/UlRnVVhbLmW7PgcGfj8zao+SIDtbpLuzVuY9Q17CLZvt
+   Hw3SAMlSXE7jwKthczrPC4OJsDI3rE5fR0s9Zb/EB0ke0mI2wXOrtbFrt
+   2i60htFpekgCjlJZSA4g+1fWcthRJSmt0mj16zZHe7zAioNaUZVv3XdES
+   mcJm2HyUgHnNWN6+PDPkRMA3JdKi5Lf1vk6+4IiNstcwC5x5jX+txIL0M
+   Y7WFaIcnvZOkluLBSjn3AojA3VLSyI8WfCB95BgBdkP3UjHdvP7wjfu8r
+   Q==;
+X-CSE-ConnectionGUID: 1sxcgAzwTySmNboJkmdpoA==
+X-CSE-MsgGUID: /aDwWz7pSBS91q5Q2kLHAA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="7800049"
+X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
+   d="scan'208";a="7800049"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 11:49:07 -0700
+X-CSE-ConnectionGUID: Gjwf6HfMTtKWRqxdtEmlOA==
+X-CSE-MsgGUID: ZplNi7DnQimuLodTgr0YUw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
+   d="scan'208";a="23542046"
+Received: from lkp-server01.sh.intel.com (HELO e61807b1d151) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 04 Apr 2024 11:49:05 -0700
+Received: from kbuild by e61807b1d151 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rsS91-0001O2-0K;
+	Thu, 04 Apr 2024 18:49:03 +0000
+Date: Fri, 5 Apr 2024 02:47:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: oe-kbuild-all@lists.linux.dev, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@kernel.org>
+Subject: Re: [PATCH 1/2] block: track per-node I/O latency
+Message-ID: <202404050222.vYNG4y3i-lkp@intel.com>
+References: <20240403141756.88233-2-hare@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/28] block: Introduce zone write plugging
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>,
- linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>
-References: <20240403084247.856481-1-dlemoal@kernel.org>
- <20240403084247.856481-8-dlemoal@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240403084247.856481-8-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403141756.88233-2-hare@kernel.org>
 
-On 4/3/24 01:42, Damien Le Moal wrote:
-> diff --git a/block/bio.c b/block/bio.c
-> index d24420ed1c4c..127c06443bca 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1576,6 +1576,12 @@ void bio_endio(struct bio *bio)
->   	if (!bio_integrity_endio(bio))
->   		return;
->   
-> +	/*
-> +	 * For write BIOs to zoned devices, signal the completion of the BIO so
-> +	 * that the next write BIO can be submitted by zone write plugging.
-> +	 */
-> +	blk_zone_write_bio_endio(bio);
-> +
->   	rq_qos_done_bio(bio);
+Hi Hannes,
 
-The function name "blk_zone_write_bio_endio()" is misleading since that
-function is called for all bio operation types and not only for zoned
-write bios. How about renaming blk_zone_write_bio_endio() into 
-blk_zone_bio_endio()? If that function is renamed the above comment is
-no longer necessary in bio_endio() and can be moved to above the
-blk_zone_bio_endio() definition.
+kernel test robot noticed the following build errors:
 
-> @@ -1003,6 +1007,13 @@ static enum bio_merge_status bio_attempt_front_merge(struct request *req,
-> +	/*
-> +	 * A front merge for zone writes can happen only if the user submitted
-> +	 * writes out of order. Do not attempt this to let the write fail.
-> +	 */
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.9-rc2 next-20240404]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-"zone writes" -> "zoned writes"?
+url:    https://github.com/intel-lab-lkp/linux/commits/Hannes-Reinecke/block-track-per-node-I-O-latency/20240403-222254
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20240403141756.88233-2-hare%40kernel.org
+patch subject: [PATCH 1/2] block: track per-node I/O latency
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20240405/202404050222.vYNG4y3i-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240405/202404050222.vYNG4y3i-lkp@intel.com/reproduce)
 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 88b541e8873f..2c6a317bef7c 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -828,6 +828,8 @@ static void blk_complete_request(struct request *req)
->   		bio = next;
->   	} while (bio);
->   
-> +	blk_zone_write_complete_request(req);
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404050222.vYNG4y3i-lkp@intel.com/
 
-Same comment here as above: the function name 
-blk_zone_write_complete_request() is misleading since that function is
-called for all request types and not only for zoned writes. Please
-rename blk_zone_write_complete_request() into
-blk_zone_complete_request().
+All errors (new ones prefixed by >>):
 
-> +	/*
-> +	 * If the plug has a cached request for this queue, try use it.
-> +	 */
+   In file included from drivers/block/loop.c:36:
+   include/linux/blk-mq.h:1242:5: warning: no previous prototype for 'blk_nlat_latency' [-Wmissing-prototypes]
+    1242 | u64 blk_nlat_latency(struct gendisk *disk, int node) { return 0; }
+         |     ^~~~~~~~~~~~~~~~
+>> include/linux/blk-mq.h:1243:15: error: unknown type name 'in'
+    1243 | static inline in blk_nlat_init(struct gendisk *disk) { return -ENOTSUPP; }
+         |               ^~
 
-try use it -> try to use it (I know this comes from upstream code).
 
-> +	if (blk_queue_is_zoned(q) && blk_zone_write_plug_bio(bio, nr_segs))
-> +		goto queue_exit;
+vim +/in +1243 include/linux/blk-mq.h
 
-The order of words in the blk_zone_write_plug_bio() function name seems
-unusual to me. How about renaming that function into
-blk_zone_plug_write_bio()?
+  1233	
+  1234	#ifdef CONFIG_BLK_NODE_LATENCY
+  1235	int blk_nlat_enable(struct gendisk *disk);
+  1236	void blk_nlat_disable(struct gendisk *disk);
+  1237	u64 blk_nlat_latency(struct gendisk *disk, int node);
+  1238	int blk_nlat_init(struct gendisk *disk);
+  1239	#else
+  1240	static inline int blk_nlat_enable(struct gendisk *disk) { return 0; }
+  1241	static inline void blk_nlat_disable(struct gendisk *disk) {}
+  1242	u64 blk_nlat_latency(struct gendisk *disk, int node) { return 0; }
+> 1243	static inline in blk_nlat_init(struct gendisk *disk) { return -ENOTSUPP; }
 
-> +/*
-> + * Zone write plug flags bits:
-
-Zone write -> zoned write
-
-> + *  - BLK_ZONE_WPLUG_PLUGGED: Indicate that the zone write plug is plugged,
-
-Indicate -> Indicates
-
-> +static bool disk_insert_zone_wplug(struct gendisk *disk,
-> +				   struct blk_zone_wplug *zwplug)
-> +{
-> +	struct blk_zone_wplug *zwplg;
-> +	unsigned long flags;
-> +	unsigned int idx =
-> +		hash_32(zwplug->zone_no, disk->zone_wplugs_hash_bits);
-> +
-> +	/*
-> +	 * Add the new zone write plug to the hash table, but carefully as we
-> +	 * are racing with other submission context, so we may already have a
-> +	 * zone write plug for the same zone.
-> +	 */
-> +	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
-> +	hlist_for_each_entry_rcu(zwplg, &disk->zone_wplugs_hash[idx], node) {
-> +		if (zwplg->zone_no == zwplug->zone_no) {
-> +			spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
-> +			return false;
-> +		}
-> +	}
-> +	hlist_add_head_rcu(&zwplug->node, &disk->zone_wplugs_hash[idx]);
-> +	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
-> +
-> +	return true;
-> +}
-
-The above code can be made easier to read and more compact by using
-guard(spinlock_irqsave)(...) instead of spin_lock_irqsave() + 
-spin_unlock_irqrestore().
-
-> +static struct blk_zone_wplug *disk_get_zone_wplug(struct gendisk *disk,
-> +						  sector_t sector)
-> +{
-> +	unsigned int zno = disk_zone_no(disk, sector);
-> +	unsigned int idx = hash_32(zno, disk->zone_wplugs_hash_bits);
-> +	struct blk_zone_wplug *zwplug;
-> +
-> +	rcu_read_lock();
-> +
-> +	hlist_for_each_entry_rcu(zwplug, &disk->zone_wplugs_hash[idx], node) {
-> +		if (zwplug->zone_no == zno &&
-> +		    atomic_inc_not_zero(&zwplug->ref)) {
-> +			rcu_read_unlock();
-> +			return zwplug;
-> +		}
-> +	}
-> +
-> +	rcu_read_unlock();
-> +
-> +	return NULL;
-> +}
-
-The above code can also be made more compact by using guard(rcu)()
-instead of rcu_read_lock() + rcu_read_unlock().
-
-> +/*
-> + * Get a reference on the write plug for the zone containing @sector.
-> + * If the plug does not exist, it is allocated and hashed.
-> + * Return a pointer to the zone write plug with the plug spinlock held.
-> + */
-
-Holding a spinlock upon return is not my favorite approach. Has the
-following alternative been considered?
-- Remove the spinlock flags argument from this function and instead add
-   two other arguments: prev_plug_flags and new_plug_flags.
-- If a zone plug is found or allocated, copy the existing zone plug
-   flags into *prev_plug_flags and set the zone plug flags that have been
-   passed in new_plug_flags (logical or).
-- From blk_revalidate_zone_cb(), pass 0 as the new_plug_flags argument.
-- From blk_zone_wplug_handle_write, pass BLK_ZONE_WPLUG_PLUGGED as the
-   new_plug_flags argument.
-
-Thanks,
-
-Bart.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
