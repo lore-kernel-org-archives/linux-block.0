@@ -1,111 +1,135 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F481CA84;
-	Thu,  4 Apr 2024 16:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E5E127B70;
+	Thu,  4 Apr 2024 16:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712249515; cv=none; b=geZy/lTAnCk7AKmllpwX+uIpoZT4Gi2bPz0M9faB6JBYtYRhrEqB26aK1Vm6Chw4XDRw3rFI1QrUg35xdjipKizRCnE6kPi2wVh4cin6ImaFU5ZFvEoTKPRyjS1FHTTno+nsSCr8PfJ3K701fbLw9C7d+ewwWYdQiQNM9yTLgbA=
+	t=1712249606; cv=none; b=Nrki/NpXSJzIcszwFT/lATM0SOGWhp+BRik9Mqm09s3E6kO18Z4nz1k/v/bhR9ynyErfW83HyY+UnhW9/hksvbrlPAqy8CZDwDazuSIT8OxGN+YNA/s7/OCsM22C/OOHwaNgO0AvJABGFdVIzrcu0huso7p9aouNqXAO3rpEtkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712249515; c=relaxed/simple;
-	bh=V2lamvqHqNnSBRfVpeT+opmreN/o/daYr1FfZVfNalI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VWpcSXXD+6P5/693RsiuArRUrQlkUeo82ljs0rqwDl2aR6ptMr1aMuE0XExsh9WuZxZ3FJ5jQgUFf+LyaTUoRiqEJRC8YMKqI97xulCLK/QCA9KslOy9mDN8yEXrrylYEoiu2TachNto4yZFv5KzmilF5wCpkfqeWZAWI1xlLUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePLEgrRq; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712249606; c=relaxed/simple;
+	bh=SdH54DHBbllrzcbHGYDWtbkgYem6p5gDUyIgqd2Vsy0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JpjEpXvC4hZcuR7GUJ9XHYw+k47luaqN5lO69PWAKqqF5rEr22kLB4qpWSK+5H8nprwGzP4xGaEVhpma7YQwG6aY6dTqrEwY6r/k2ie4auPtLb28KcABbuqJQXNibXDIikuYIrOT19TWdUXUOwMAJgkpZiAJjA/eKNijV2NdwjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=x6xybBpb; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePLEgrRq"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e703e0e5deso1074052b3a.3;
-        Thu, 04 Apr 2024 09:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712249513; x=1712854313; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u+doro/JaQHck4vMp7NZSZdSbRh8luRKNIbrvkM3+ZI=;
-        b=ePLEgrRq5qS2l4/W9QrhuGCXcuKF/PDZ+HG32kP/okLEZ1utsP5OABkrfgRq+sPQIn
-         bem5E/E8izaYjVrlxxEpdPhdThzBomhv/TUylPyW1Q2MeMDDCF9mu0uFZ+RsNtU2j5FK
-         NjjA+5T8+lT3+iC9ZjDcUTbFAZ8Mig/B1LHsUTmQDlSBLcRiCNdKYDKO3Ht4g1SHeOSV
-         GNaovkpA/tzaN1QLy3I5yST+NsFzvLr9npixawAhAkFjYXDNr7h5oaqEARSYxOQv5g9w
-         jouEICDSgpxov4fRjMmPwA8jOqaKtU9zDKsebJWCvF3OFo/BiIUrosXS/PaNULEalN7e
-         rVwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712249513; x=1712854313;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u+doro/JaQHck4vMp7NZSZdSbRh8luRKNIbrvkM3+ZI=;
-        b=YludtTOWiBTCPT1SfmWaPDPUYXBUhf3wYDsa/CQS9yaNsioxNd0wGra6AKPyf2U2jn
-         RbkiuscqqI/DdowH4smuq+9DZbhWagVJnYcfsUhqZFZxdrsduXLYXo2vdfGQdg7IbhYb
-         a9axav37xc4+9KT8pU7B17LPXJwELvfrvS6yMC1RTkYsENNtvrfDpSjcTF+zScEbigXw
-         LWWxM1EZV25D/ImHwWdQo5SfWolW65dSAmE2ERipk5UNuDB5Tb2Rtd99HoLfW2d0M4SA
-         JqFQUlV750k8e3AZuWRYZjeptbpNDamcyPzgBX2SmBrzFg9yOBw04Tjwl6tyI4AJ66A8
-         dW4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWCVskRZf+SOavQ+qHVU7fKw9y7wVoXE99wsUpVXs3O3vIRAUMyW1aNd37iFUSR+sXQ6jU00kHLE+wR8Zu+INcax6nrSs/Ffo8zWB+/diBFoX3L3+C//c4xL6cJnM9r035yXbK4
-X-Gm-Message-State: AOJu0YzWFUbSm4XmQAksIOcz1w7wL/c1Nhcrs799hIuJTYHi9uOeNwsg
-	1+qMZ0wVo5Wrbprdq3xHabL/avfXPcze1dRJ+9Ja+AwPfoKAoDm3K8Pjp3VY
-X-Google-Smtp-Source: AGHT+IHO91XJgg9Py+SH6nyLb4g4A9fUHSX9PzzPupdHWaVU0vzre6mAwZ4s5/CobU8rlBWztNbPNw==
-X-Received: by 2002:a05:6a21:3403:b0:1a3:32e5:f38a with SMTP id yn3-20020a056a21340300b001a332e5f38amr2842687pzb.45.1712249513321;
-        Thu, 04 Apr 2024 09:51:53 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:25ab])
-        by smtp.gmail.com with ESMTPSA id x7-20020aa784c7000000b006eae2f3c7d4sm12497975pfn.102.2024.04.04.09.51.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 09:51:52 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 4 Apr 2024 06:51:51 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Rik van Riel <riel@surriel.com>
-Cc: linux-kernel@vger.kernel.org, kernel-team@meta.com,
-	Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-iocost: avoid out of bounds shift
-Message-ID: <Zg7apyOjjGCdsMu8@slm.duckdns.org>
-References: <20240404123253.0f58010f@imladris.surriel.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="x6xybBpb"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4V9SP00GDKzlgTGW;
+	Thu,  4 Apr 2024 16:53:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1712249589; x=1714841590; bh=ZDHIypNAZMTo+VzP8iaJudcx
+	+oAEkGDyDOLcGqvzK2U=; b=x6xybBpbU7doAbetK6BxrMB/jZL/nTWFcpNORO6H
+	io8W0ddeWENBxGFBRtHAfTjBs5gbFUi91BTmwYOOuEDu5ZOKKgkFX59QF8J7/Odd
+	TPrhccLRXWXF5Trlh6f8oErGIRlojrsu6je9HsPPp0emWSd2pomXeVn2Aa0WMaVI
+	R0mfEVdUDbdMXY3EbwFF3ALOIc2NpQ6hWf7LbAyfd+ULeIvuQyFdS/bAoLFv14LB
+	HbkWbG/veVURXO256b47z/ScW3gmmSeaBDvg82/5/HihGZF29+nIKgEF9da+8S99
+	ivJ7tZl5BmbmlXX0jWkmH9elXjPqz1wouAxTXsQtwdmr7w==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id O2BQcxkjvo_y; Thu,  4 Apr 2024 16:53:09 +0000 (UTC)
+Received: from [100.96.154.173] (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4V9SNd04btzlgTHp;
+	Thu,  4 Apr 2024 16:53:04 +0000 (UTC)
+Message-ID: <bb458d47-5b5a-43c0-8cae-211b82b16309@acm.org>
+Date: Thu, 4 Apr 2024 09:53:03 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240404123253.0f58010f@imladris.surriel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/23] block: add a helper to cancel atomic queue limit
+ updates
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Sathya Prakash <sathya.prakash@broadcom.com>,
+ Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+ Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+ "Juergen E. Fischer" <fischer@norbit.de>,
+ Xiang Chen <chenxiang66@hisilicon.com>,
+ HighPoint Linux Team <linux@highpoint-tech.com>,
+ Tyrel Datwyler <tyreld@linux.ibm.com>, Brian King <brking@us.ibm.com>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ Mike Christie <michael.christie@oracle.com>,
+ John Garry <john.g.garry@oracle.com>, Jason Yan <yanaijie@huawei.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Sumit Saxena <sumit.saxena@broadcom.com>,
+ Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+ Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Nilesh Javali <njavali@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+ MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+ megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+ linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+ usb-storage@lists.one-eyed-alien.net
+References: <20240402130645.653507-1-hch@lst.de>
+ <20240402130645.653507-2-hch@lst.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240402130645.653507-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 04, 2024 at 12:32:53PM -0400, Rik van Riel wrote:
-> UBSAN catches undefined behavior in blk-iocost, where sometimes
-> iocg->delay is shifted right by a number that is too large,
-> resulting in undefined behavior on some architectures.
+On 4/2/24 06:06, Christoph Hellwig wrote:
+> Drivers might have to perform complex actions to determine queue limits,
+> and those might fail.  Add a helper to cancel a queue limit update
+> that can be called in those cases.
 > 
-> [  186.556576] ------------[ cut here ]------------
-> UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
-> shift exponent 64 is too large for 64-bit type 'u64' (aka 'unsigned long long')
-> CPU: 16 PID: 0 Comm: swapper/16 Tainted: G S          E    N 6.9.0-0_fbk700_debug_rc2_kbuilder_0_gc85af715cac0 #1
-> Hardware name: Quanta Twin Lakes MP/Twin Lakes Passive MP, BIOS F09_3A23 12/08/2020
-> Call Trace:
->  <IRQ>
->  dump_stack_lvl+0x8f/0xe0
->  __ubsan_handle_shift_out_of_bounds+0x22c/0x280
->  iocg_kick_delay+0x30b/0x310
->  ioc_timer_fn+0x2fb/0x1f80
->  __run_timer_base+0x1b6/0x250
-> ...
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   include/linux/blkdev.h | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
 > 
-> Avoid that undefined behavior by simply taking the
-> "delay = 0" branch if the shift is too large.
-> 
-> I am not sure what the symptoms of an undefined value
-> delay will be, but I suspect it could be more than a
-> little annoying to debug.
-> 
-> Signed-off-by: Rik van Riel <riel@surriel.com>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: Josef Bacik <josef@toxicpanda.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index c3e8f7cf96be9e..ded7f66dc4b964 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -892,6 +892,19 @@ int queue_limits_commit_update(struct request_queue *q,
+>   		struct queue_limits *lim);
+>   int queue_limits_set(struct request_queue *q, struct queue_limits *lim);
+>   
+> +/**
+> + * queue_limits_cancel_update - cancel an atomic update of queue limits
+> + * @q:		queue to update
+> + *
+> + * This functions cancels an atomic update of the queue limits started by
+> + * queue_limits_start_update() and should be used when an error occurs after
+> + * starting update.
+> + */
+> +static inline void queue_limits_cancel_update(struct request_queue *q)
+> +{
+> +	mutex_unlock(&q->limits_lock);
+> +}
 
-Acked-by: Tejun Heo <tj@kernel.org>
+At least in scsi_add_lun() there are multiple statements between
+queue_limits_start_update(), queue_limits_cancel_update() and
+queue_limits_commit_update(). Has it been considered to use __cleanup()
+to invoke queue_limits_commit_update() when the end of the current scope
+is reached? I think that would make code that uses the
+queue_limits_*_update() functions easier to verify. For an example of
+how to use the __cleanup() macro, see e.g. the __free() and
+no_free_ptr() macros in <linux/cleanup.h>.
 
-Thanks.
+Thanks,
 
--- 
-tejun
+Bart.
+
