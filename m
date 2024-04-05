@@ -1,136 +1,96 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A975174EDF
-	for <linux-block@vger.kernel.org>; Fri,  5 Apr 2024 20:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1783175550
+	for <linux-block@vger.kernel.org>; Fri,  5 Apr 2024 21:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712350028; cv=none; b=Ok283FmiWIQPyNMzE7pHauSWTPnLYTwYilLdnbd5ZoThnSBxL5AcUShX09E+zrmBcOngqgfI09gEUzq3JAi/JB6wA54c2aRfh7rCJtqt5C1/jPgk7inIxa47Dn4r90DP/DXSyVi8nip3TKinsw052Nhh4Q7juLDfsy5oagCuMN0=
+	t=1712352301; cv=none; b=Yaijf8o0UdlQb6MWG3xwPwq0gCMV5u17iQ1NwssmJo5aK+snFVNOzI6OrRjHas7Ro5k720IOu9BK8/lsjDXvLVUDNbkG2zBOpQtRI/hAPyqtT6RWyKusIDHOc0t/kXC4/fLr23kyVLiMpUM0DR8LdfMGSLbR7zyM0VA5myGzr1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712350028; c=relaxed/simple;
-	bh=Dxk9J99fPNN1HvHxdsa1ZGsLoGkREeDshYRW4RvSnyQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=q0F/5X1yIsmHa6OVpX2cGGjac1qWlsI2nX9pG6HndAEF2kYRcNOKFSL6YEuJQoPOab5lFdsVm9LH6VmAftGH7G5Cw3ozTGnueG8fvESemjUTW0OWO1KNI3PmogSEUY1X/wEpst9m1OR8EqgKh70QJ6V8Zo9Ml8VUUw+eOQ9RcoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=M6DmylrA; arc=none smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1712352301; c=relaxed/simple;
+	bh=EObJSk1gTozIYXoylC4wrkj5Oyx+bgYarnIhKmB7X20=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ebly+Gf1J8VeuKuVlKYUKFsOgLNB9WpziYiJr7a2aMprgymXGmQecbIWdOTQH+a/n+z4W5arM67Cvl2XHes07nXS9edLY4XygVUcG6DNv7LZJYFOzorHPBu7fIvXJM5yhNwq9jmqszSlC2xnN5X/928UAX1gx0saD1/umK0ke9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OppOowoY; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="M6DmylrA"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-479e0a14464so154343137.1
-        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2024 13:47:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OppOowoY"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6eced6fd98aso2135977b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2024 14:24:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712350024; x=1712954824; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oC2T1JOqldmuASLofTfn4PyLCHG+OnD0sH6etOVSHog=;
-        b=M6DmylrA8bX6F2rKO4VUf1M9wr9NdVTtIA5t66VbQ0NVKvTb9dmD/tjlnVGPCZVyEL
-         O3P3cacKt8AzcmL4AuqrMSk+ohNE6b0lkozESbMPHfsn2eunCClUbt4rwwHBQhVA4Uk9
-         rgVLOeikyNQR52VJTQWA0adA8S28RGE/T3AlpeU2CCPIRsackT5og8w4Q3jD9/MnUYYq
-         7JGN2pjhIba/sEMnc0Wj4T7sgGsUnSHk8QRocCB6w0mhvu3tQ+BcCRaVHIQ6D0Rd7aKo
-         WYTxJD6AID6+6JCQcd9mX4pUWNvm/hJi+AmbHqb+SUc2hYy4KLiQbizGUYKdp092yomV
-         qxTA==
+        d=gmail.com; s=20230601; t=1712352299; x=1712957099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdVYLNH8KuqKJ8kDiPrCytZdr5cNufr6nL8DEmtEIDk=;
+        b=OppOowoYpqZ0wSppn6Tiqtg+BdUbgeChnk7d/dIQ/1rdqEpo8bgup3r7XTpO+izn6v
+         OgyEbb2gDfpkY8YGs5h5KYSVjr9m7CKZosglIsJNoPTozn9Kx2IC7GM8PtaAQWDKPtT2
+         pKv72ULVQzn9tZ01ApizgxEaKA5ex/tO0PxIkPtgF3mDpdqbZUWszQW7DXZ682NMUd7T
+         gO5vlvhnboN2jK/IM2VOZFjeuWkx6+C/AT2b9Aqr+l9iIeIq66sYQk0pfUoduiZ/dGXW
+         vEYBMhQuQ/zGddWKgn5mgSbw+ShbjWx4KGjjcs4wFTlBFL0WLx5+ilgnGWFsmp+C8tRz
+         EEvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712350024; x=1712954824;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oC2T1JOqldmuASLofTfn4PyLCHG+OnD0sH6etOVSHog=;
-        b=OmOqjg81RU+qeOrCZ8hCLrLLnUxliltzb6XSA7gT1wlbXz5PtviqH65LFp34CCjRMw
-         j6LLRw2rTJZot6vek/bmTcExUkHnogaCGkmG5UYIuxaLaLvv4FSM+XdEgRLRYmY2C3Im
-         lxCxxSN08O8ZO//lQlkGysaanZ2feGUgOFQAjysW2Z3eDp3wdbvRg567ydL/KOnn8O8r
-         W2/ZHBJvXZgXMadvYrBVR1KanR8JTWdUKgpKfhrzpeBsOl/2N/e+FwMiEWUDzknp/AP6
-         NaKsiaD6SkzmOh+FigRhC9Y9A3z2ZiMQIjKbO4yCQWsEzBN0cjdxorILb6AQec90J1Hq
-         C0CA==
-X-Gm-Message-State: AOJu0Yz9kGBSDyz1E+rlLm1318Ysrrk60ZIqaBQX/C9rvOiQdLX+Ctry
-	PtNLzMJWgnziKQIJJxEjSJa7Nj5uQNwvEuYGzA48AdtkiPIgU3hyyv17CHOK2ijf0DQzG9fQh+w
-	/
-X-Google-Smtp-Source: AGHT+IFdMR2bzQFQTTvSbbxhRQ9E05hgOFENUVmCMAycgeiYWdl6/9GsCsL9ksCGpG3voGzxkmzHeg==
-X-Received: by 2002:a05:6102:464e:b0:479:ce5c:213d with SMTP id jt14-20020a056102464e00b00479ce5c213dmr2669761vsb.1.1712350024098;
-        Fri, 05 Apr 2024 13:47:04 -0700 (PDT)
-Received: from [172.16.25.96] ([12.168.1.234])
-        by smtp.gmail.com with ESMTPSA id do18-20020a056214097200b0069942d4cc06sm587601qvb.115.2024.04.05.13.47.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 13:47:03 -0700 (PDT)
-Message-ID: <8b66a441-b45f-4b86-a8f1-5b6afb61cf92@kernel.dk>
-Date: Fri, 5 Apr 2024 14:47:03 -0600
+        d=1e100.net; s=20230601; t=1712352299; x=1712957099;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gdVYLNH8KuqKJ8kDiPrCytZdr5cNufr6nL8DEmtEIDk=;
+        b=srCDFS3QSxGC/zkho6kRrPpwH0pjlfSqzr0IL6K4JGoqo/8MPL1ljdC8aVXbgq58CX
+         LQrhrGxglof0anGRvPCLqBdeh/Y6y3Q/wxZLmErytBZXwke/M2bC4Wm54cAbywo+xpAD
+         iV44qgskFFm8x0L+ntEwdPanjc00RL/WGnxK77ygjqeVSus3wkscCn+WZcmh9VtwbuXh
+         /vZ9xPr12XuKmORSIOCY1BWpXcQZaSVhSlJktC3T0DgWizXEJdgc1wC1OuPJqUmC38jJ
+         99blH+4qVUYh9c/s6bQsJmrMsQ95NH/zrRUHfvbh/mUPDSflNdBv+iL52z2VgDDm5/Eg
+         saUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZqLjyWl4Z5IER0sgH0EA7hATNA6sYnZli23whCprhyRM1XH7jYFe/LsRn0dgM/p4MGVDKHx07VI9ZWu9xMyjBvU8FYvV1RPnp57g=
+X-Gm-Message-State: AOJu0Yxef6QE8qDIYAxFVgb7qLTfoQ503J3MMCv3MLnKEQ2DuHZ3twLz
+	RtHU7aZEXo5TUBUs9KMOk4Gp6YVigPJGJY3IgdKgueJL9VtxPRSQtHIwY5jizwQ=
+X-Google-Smtp-Source: AGHT+IHtk1bP6Q3y5vSA9cfQINaX1qDHkDIQWa0SCyqDlsMPwzR+p22yU8q4+gwRstc4SKKUw2xDgA==
+X-Received: by 2002:a05:6a21:a5a6:b0:1a3:aecb:db60 with SMTP id gd38-20020a056a21a5a600b001a3aecbdb60mr3557654pzc.9.1712352299030;
+        Fri, 05 Apr 2024 14:24:59 -0700 (PDT)
+Received: from tokunori-desktop.flets-east.jp ([240b:10:2720:5500:c6c4:352b:b00b:887c])
+        by smtp.gmail.com with ESMTPSA id r3-20020aa78b83000000b006eae6c8d2c3sm1965726pfd.106.2024.04.05.14.24.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 14:24:58 -0700 (PDT)
+From: Tokunori Ikegami <ikegami.t@gmail.com>
+To: Bart Van Assche <bvanassche@acm.org>,
+	linux-block@vger.kernel.org
+Cc: Tokunori Ikegami <ikegami.t@gmail.com>
+Subject: [PATCH v2] docs: sysfs-block: document size sysfs entry
+Date: Sat,  6 Apr 2024 06:24:48 +0900
+Message-Id: <20240405212448.6062-1-ikegami.t@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.9-rc3
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Linus,
+Document it since /sys/block/<disk>/size is undocumented.
 
-Block related fixes that should go into the 6.9 kernel release:
+Signed-off-by: Tokunori Ikegami <ikegami.t@gmail.com>
+---
+ Documentation/ABI/stable/sysfs-block | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-- NVMe pull request via Keith:
-	- Atomic queue limits fixes (Christoph)
-	- Fabrics fixes (Hannes, Daniel)
-
-- Discard overflow fix (Li)
-
-- Cleanup fix for null_blk (Damien) 
-
-Please pull!
-
-
-The following changes since commit 39cd87c4eb2b893354f3b850f916353f2658ae6f:
-
-  Linux 6.9-rc2 (2024-03-31 14:32:39 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.9-20240405
-
-for you to fetch changes up to 9d0e8524204484702234e972a7e9f3015080987c:
-
-  Merge tag 'nvme-6.9-2024-04-04' of git://git.infradead.org/nvme into block-6.9 (2024-04-04 13:23:21 -0600)
-
-----------------------------------------------------------------
-block-6.9-20240405
-
-----------------------------------------------------------------
-Christoph Hellwig (3):
-      nvme-multipath: don't inherit LBA-related fields for the multipath node
-      nvme: split nvme_update_zone_info
-      nvme: don't create a multipath node for zero capacity devices
-
-Damien Le Moal (1):
-      nullblk: Fix cleanup order in null_add_dev() error path
-
-Daniel Wagner (2):
-      nvmet-fc: move RCU read lock to nvmet_fc_assoc_exists
-      nvme-fc: rename free_ctrl callback to match name pattern
-
-Hannes Reinecke (1):
-      nvmet: implement unique discovery NQN
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.9-2024-04-04' of git://git.infradead.org/nvme into block-6.9
-
-Li Nan (1):
-      block: fix overflow in blk_ioctl_discard()
-
- block/ioctl.c                  |  5 +++--
- drivers/block/null_blk/main.c  |  4 ++--
- drivers/nvme/host/core.c       | 41 ++++++++++++++++++++++++++++--------
- drivers/nvme/host/fc.c         |  4 ++--
- drivers/nvme/host/nvme.h       | 12 +++++++++--
- drivers/nvme/host/zns.c        | 33 +++++++++++++++++------------
- drivers/nvme/target/configfs.c | 47 ++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/target/core.c     |  7 +++++++
- drivers/nvme/target/fc.c       | 17 ++++++++-------
- 9 files changed, 133 insertions(+), 37 deletions(-)
-
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index 7718ed34777e..5b7ef093b60a 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -707,6 +707,13 @@ Description:
+ 		zoned will report "none".
+ 
+ 
++What:		/sys/block/<disk>/size
++Date:		April 2024
++Contact:	linux-block@vger.kernel.org
++Description:
++		[RO] Size of the block device in units of 512 bytes.
++
++
+ What:		/sys/block/<disk>/stat
+ Date:		February 2008
+ Contact:	Jerome Marchand <jmarchan@redhat.com>
 -- 
-Jens Axboe
+2.40.1
 
