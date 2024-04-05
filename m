@@ -1,162 +1,84 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B264249F5
-	for <linux-block@vger.kernel.org>; Fri,  5 Apr 2024 06:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E16C1370;
+	Fri,  5 Apr 2024 06:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712298079; cv=none; b=mAucg3jp5csaXa9CvyPSTsfU3cfn27hTi0e5WctDgt1dH4swaqQg3mOr4MnaDAHKE4aY9rdLY0hpH1ODFRk4xb78P1xDttsSyyui/uHZrMEakg/2Kx9wLE3K/tymbUHFZkjhI4hG3h9rdUEtIx5VxQA17Q++xOSgv9So675Eh94=
+	t=1712298748; cv=none; b=NxpoNBdto+R2848b+tWsqT267zBYh3wV5FmPKZczrBt9BjzhAfadFkgUyyS7T3e4uGWi5Xf+y6adO3FOYclB+KADSzgtmPc1CfBYO/SxCqL8u/8VtYKiFBH9BJAWRVMxS7J7xDVgX+9CdCju1mzzX/KMzkWlgxHYxVv0p79+6mI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712298079; c=relaxed/simple;
-	bh=Tu4YhthFeJyH0ZSfiRTQZK9Do5VSEphsSyS9xRej/ec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=si0hhB56NNPn273zskmKdQ95zVdxaH2fc836OV0mO6QF3sdhD3ieQ2alNJwvb85g+uxWHNUFGkBmE/ohQvF/+n1aIx+4dVN5LU9uBDAdM2wND9Gmc+cmSNgUD+nWYRVObHxiEkNgxbgmCZQTASKjv8jIq0KrpiHwnc0QiMSy7rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Um3syScX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=z8UU39gg; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Um3syScX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=z8UU39gg; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Um3syScX";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="z8UU39gg";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Um3syScX";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="z8UU39gg"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4F98821A19;
-	Fri,  5 Apr 2024 06:21:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712298075; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6hQsz3NqchbdZqSfV77YRkvQmXrwp64p0MbAvfWY+jU=;
-	b=Um3syScXlKMw2NkjDej/hWudhNtKE4lxorTKH25WmbDXGQJn8shG3ZrcH8zMDj+4JPGtRA
-	iD35KR7oZyhEZY2mFEut+uuDRvB+O0rLkBrixHAuLBVwuurgs+egH3LG74zVmJjwl3lV0U
-	UrlZqaTfMnb7SElIOsvsYZzBLFiz5qI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712298075;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6hQsz3NqchbdZqSfV77YRkvQmXrwp64p0MbAvfWY+jU=;
-	b=z8UU39gg8t45t7A5h+kWrLmAHPhKcNm6/Lr7/4y+R8LA/U7wwerrifMxb6vcpCScPxEQck
-	lch6A4tg1hv3C6BQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Um3syScX;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=z8UU39gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712298075; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6hQsz3NqchbdZqSfV77YRkvQmXrwp64p0MbAvfWY+jU=;
-	b=Um3syScXlKMw2NkjDej/hWudhNtKE4lxorTKH25WmbDXGQJn8shG3ZrcH8zMDj+4JPGtRA
-	iD35KR7oZyhEZY2mFEut+uuDRvB+O0rLkBrixHAuLBVwuurgs+egH3LG74zVmJjwl3lV0U
-	UrlZqaTfMnb7SElIOsvsYZzBLFiz5qI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712298075;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6hQsz3NqchbdZqSfV77YRkvQmXrwp64p0MbAvfWY+jU=;
-	b=z8UU39gg8t45t7A5h+kWrLmAHPhKcNm6/Lr7/4y+R8LA/U7wwerrifMxb6vcpCScPxEQck
-	lch6A4tg1hv3C6BQ==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id B141E139E8;
-	Fri,  5 Apr 2024 06:21:14 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id CifVJ1qYD2a7GQAAn2gu4w
-	(envelope-from <hare@suse.de>); Fri, 05 Apr 2024 06:21:14 +0000
-Message-ID: <b255fca4-a9da-4364-a3af-eb699eeb4160@suse.de>
-Date: Fri, 5 Apr 2024 08:21:14 +0200
+	s=arc-20240116; t=1712298748; c=relaxed/simple;
+	bh=dCGIzkI2WWywAAD+bVC9mLePlWvKEyEDzpXJWUUjq34=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oure3q9VhY+1O1/Rk2ExlDSFOt/PbQmJKXccdA5pQ6NK4RAPzp9CDSyjMPpZYqK1MPyF6oobOXeRpkg7liMzADux5Cb4TGHBM3kHRp0dR5MCoGs8Cu3Z7Rxzg6JHrjKF1gOh+RBHAvXUjXE0TGZETw4tcVp2bwj+UVMmuDJwdIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5E9A268D07; Fri,  5 Apr 2024 08:32:20 +0200 (CEST)
+Date: Fri, 5 Apr 2024 08:32:20 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Sathya Prakash <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	"Juergen E. Fischer" <fischer@norbit.de>,
+	Xiang Chen <chenxiang66@hisilicon.com>,
+	HighPoint Linux Team <linux@highpoint-tech.com>,
+	Tyrel Datwyler <tyreld@linux.ibm.com>,
+	Brian King <brking@us.ibm.com>, Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Jason Yan <yanaijie@huawei.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+	MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+	linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+	usb-storage@lists.one-eyed-alien.net
+Subject: Re: [PATCH 01/23] block: add a helper to cancel atomic queue limit
+ updates
+Message-ID: <20240405063220.GA3480@lst.de>
+References: <20240402130645.653507-1-hch@lst.de> <20240402130645.653507-2-hch@lst.de> <bb458d47-5b5a-43c0-8cae-211b82b16309@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 0/2] block,nvme: latency-based I/O scheduler
-Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
-References: <20240403141756.88233-1-hare@kernel.org>
- <Zg8YNrSnZPjR4kan@kbusch-mbp.dhcp.thefacebook.com>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <Zg8YNrSnZPjR4kan@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.50 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap2.dmz-prg2.suse.org:helo,imap2.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 4F98821A19
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Score: -4.50
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bb458d47-5b5a-43c0-8cae-211b82b16309@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 4/4/24 23:14, Keith Busch wrote:
-> On Wed, Apr 03, 2024 at 04:17:54PM +0200, Hannes Reinecke wrote:
->> Hi all,
->>
->> there had been several attempts to implement a latency-based I/O
->> scheduler for native nvme multipath, all of which had its issues.
->>
->> So time to start afresh, this time using the QoS framework
->> already present in the block layer.
->> It consists of two parts:
->> - a new 'blk-nlatency' QoS module, which is just a simple per-node
->>    latency tracker
->> - a 'latency' nvme I/O policy
->   
-> Whatever happened with the io-depth based path selector? That should
-> naturally align with the lower latency path, and that metric is cheaper
-> to track.
+On Thu, Apr 04, 2024 at 09:53:03AM -0700, Bart Van Assche wrote:
+> At least in scsi_add_lun() there are multiple statements between
+> queue_limits_start_update(), queue_limits_cancel_update() and
+> queue_limits_commit_update(). Has it been considered to use __cleanup()
+> to invoke queue_limits_commit_update() when the end of the current scope
+> is reached? I think that would make code that uses the
+> queue_limits_*_update() functions easier to verify. For an example of
+> how to use the __cleanup() macro, see e.g. the __free() and
+> no_free_ptr() macros in <linux/cleanup.h>.
 
-Turns out that tracking queue depth (on the NVMe level) always requires
-an atomic, and with that a performance impact.
-The qos/blk-stat framework is already present, and as the numbers show
-actually leads to a performance improvement.
-
-So I'm not quite sure what the argument 'cheaper to track' buys us here...
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+It has been considered and rejected as this syntactic sugar might make
+teenagers with attention deficit syndrome happy, but otherwise just
+horribly obfuscates the code.
 
