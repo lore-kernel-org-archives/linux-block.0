@@ -1,55 +1,92 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8351E494
-	for <linux-block@vger.kernel.org>; Fri,  5 Apr 2024 17:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C95C16C858
+	for <linux-block@vger.kernel.org>; Fri,  5 Apr 2024 17:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712337217; cv=none; b=jqSUg7sjjS5YwsAoCezTBbKU9846SnYRDBwd2ZPUHuuxTaVke3hY1f7+OcKmk+nk0n0czf3YUiD/+3pBAL8Gq0da5FWQNzgzXzQwc8/X4LwDOVvtBq8GtFLvPyjUwSuhxRLX3sv0MEsN9v6IPtWj67I95hmoMLM+zUhAf9eVOgw=
+	t=1712338955; cv=none; b=jcx4BMIznhb6ULHSz7zaXVNItO4qxuwMXHdBQwB75oA2JJwltnqH0dUmSo6ou9WOy516InqcpjTIWaM+/OPOJX9KdpsPKLOWogQq/T/iLe5IClnzeDkFsGaTwCGmeo3X3y+BBEjZQ0cFdfrv7K1ij+SdtEQ3iorl5TAsNhYJcQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712337217; c=relaxed/simple;
-	bh=/c1i91tfehnhcGwwlOCvCRhSnov7dufo1WIlHa/kSqI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lOfhr83k6v8iIV8D7Ae77vD/sqOaVXOeO6pQA6EfjKHH63H0mPiFWgp0YJA2cYX1V73tkqheut9KW6ifQK7wUfdm3dCorNz5llqtBsiM5vHSCryIcHY8YgYru77/mthGKLlVHYJSR3lwt+P9mwejtukZu0j+rM86EVGHg/XmpJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id EB4F168D07; Fri,  5 Apr 2024 19:13:30 +0200 (CEST)
-Date: Fri, 5 Apr 2024 19:13:30 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: work around sparse in queue_limits_commit_update
-Message-ID: <20240405171330.GA16914@lst.de>
-References: <20240405085018.243260-1-hch@lst.de> <65a7c6b1-ad4e-4b27-b8b1-44d94a66bf7a@oracle.com> <20240405143856.GA6008@lst.de> <343cc769-b318-4c2d-b08a-0bc752f41f78@oracle.com>
+	s=arc-20240116; t=1712338955; c=relaxed/simple;
+	bh=q/t2qHAdejz1vkqTfeF6sfeW1vRNFkF5MWaJrSLZSSI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=fNzDVFIJTlaRwsthu17wkaYe4Ip1egMzcvcsskN5GEK8dwHAoUJWwRun7SO9P2fQa7lJatY1C5YYnghmXo/p7roOdPQfSrvcBCVWpi6X57q+ECBtK6Y2p99eZfvITeC/+Xwks691CpdCp+0x/WaHIps7NibrtOypI+UcfY3Eojg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=exfKbLoh; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="exfKbLoh"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VB5RF2TYWz6CkbBM;
+	Fri,  5 Apr 2024 17:42:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:references:content-language:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1712338952; x=1714930953; bh=Iup0wHytOIYxNxU8CEc4IJRl
+	N6GAUd5Z7lQdgSAcOGY=; b=exfKbLoh0xBpVYujv3ktjfyiPrDpXDeibcZ+qeWu
+	RMzrY/ygXgm3s/X7IQu/hbYfmy+IzhuLXV7MnGZcj4FE+PmXTb8Ly3YF7RlrlzA9
+	5Xx26DEjBTL37h7Ce0wZ0u5yBgEM8xayC3beuZRXsIYMj9L1YeXGzPE1JeANpKG+
+	JOhL6RrblexJDwIuhvyM03XTul6gdO6d4jRbUwP/inbekU5tPSoVgzUH9iLWtQZk
+	iBy+L3wbs6eYihWm+I6ycGlzNHNdWmAV8BbeCrracjuwSpJEk3+N+pI7PAQbzAbm
+	ASZ28A2NEUl7Uj0gLev5x5UGW5P3DUSpr+BTmwW5GuIycg==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id PS28SUSFAfbt; Fri,  5 Apr 2024 17:42:32 +0000 (UTC)
+Received: from [100.96.154.173] (unknown [104.132.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VB5RC3Zf9z6CkbBQ;
+	Fri,  5 Apr 2024 17:42:31 +0000 (UTC)
+Message-ID: <be24545e-55b9-4fa5-8189-263f981f50d2@acm.org>
+Date: Fri, 5 Apr 2024 10:42:29 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <343cc769-b318-4c2d-b08a-0bc752f41f78@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] docs: sysfs-block: document size sysfs entry
+Content-Language: en-US
+To: Tokunori Ikegami <ikegami.t@gmail.com>, linux-block@vger.kernel.org
+References: <20240405165434.12673-1-ikegami.t@gmail.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240405165434.12673-1-ikegami.t@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 05, 2024 at 05:43:24PM +0100, John Garry wrote:
-> This actually looks like a kernel issue - that being that the mutex API is 
-> not annotated for lock checking.
+On 4/5/24 09:54, Tokunori Ikegami wrote:
+> Document it since /sys/block/<disk>/size is undocumented.
+> 
+> Signed-off-by: Tokunori Ikegami <ikegami.t@gmail.com>
+> ---
+>   Documentation/ABI/stable/sysfs-block | 7 +++++++
+>   1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+> index 7718ed34777e..881049419054 100644
+> --- a/Documentation/ABI/stable/sysfs-block
+> +++ b/Documentation/ABI/stable/sysfs-block
+> @@ -707,6 +707,13 @@ Description:
+>   		zoned will report "none".
+>   
+>   
+> +What:		/sys/block/<disk>/size
+> +Date:		April 2024
+> +Contact:	linux-block@vger.kernel.org
+> +Description:
+> +		[RO] This is the 512 bytes size sector number.
 
-Oh.  Yeah, that would explain the weird behavior.
+What is a "sector number"? Please change the description into something 
+like the following:
 
-> I would need to investigate further for any progress in adding that lock 
-> checking to the mutex API, but it did not look promising from that 
-> patchset. For now I suppose you can either:
-> a. remove current annotation.
+   [RO] Size of the block device in units of 512 bytes.
 
-I can send a patch for that.
+Thanks,
 
-> b. change to a spinlock - I don't think that anything requiring scheduling 
-> is happening when updating the limits, but would need to audit to be sure.
+Bart.
 
-With SCSI we'll hold it over the new ->device_configure, which must
-be able to sleep.
