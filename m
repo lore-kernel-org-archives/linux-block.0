@@ -1,60 +1,60 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E2D79E3
-	for <linux-block@vger.kernel.org>; Fri,  5 Apr 2024 16:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CB879E3
+	for <linux-block@vger.kernel.org>; Fri,  5 Apr 2024 16:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712336049; cv=none; b=UiCMqDCrOtqC79ZrqGwGoqT6Q2+IxmWDeaRHzj0upcZQpMw0DX6Bh7Jde7IftzKov3tNtxMYX3S3X87Mpr3QHxjReMiUTCewgSdkdz3Dbu+pAktXp+4baKmn773ZDTKZsoHfMfhHXZ4Q7vvOdqhSHLAKo65wooU8VyJ1jLyPvns=
+	t=1712336083; cv=none; b=NdX6Sr4CbdPqi/5VFldpPfmOnQWDgc9/vJfEuUTB5/OxG1ax0JGvtlHAclnJIrCN1lECRo46v1z+ddfl9jzwH/dW3SSqZIr7zDIKnQzn8XIDt624WvZLaPNkW990XoqhtFbwGJO73aO0f0Ar7pzVAo08nC2qLcPgp/sEfMUr/yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712336049; c=relaxed/simple;
-	bh=0fjcQnLqusZfsdTC0rqdibqpq9ZpiGpUwYGDbMI51bQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=PMWD9L01J4y/SMB/AYpyLDTYd33KBvUwOeVKfpSjiA47eL6ltfo4TDdD95ilLVyK33UXgLaDKc5edL+shiOO7VefnakTfOm9o/1nWmhKDpSvjbmfeXRNKLzOR0MqTZQ2gwu6YLDNJkooyxYUAgwcW4Z5w4FHu84O1lKAK71mp0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NZHmpUIC; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1712336083; c=relaxed/simple;
+	bh=QmMGc4lZNnal1xrlpffavXZQOLh5Y2mZyE/7fa+sy5Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qdWj4uZRj2GTk2/W4jOstuEjMSvkcPj7qhkSPYfb3MUzjlSNC2rmxp6zbYsG78qxe1oCYynb+kMnEUSM2A+BZUyHxyoA/WE4lXDa6iwPadseYztztEqve480LdJFrEebvUgniK7khT2T2hGIS8gkC2WWshax8n/4ijjifApZDzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DOMoaGOX; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZHmpUIC"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e2bbc2048eso17184715ad.3
-        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2024 09:54:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DOMoaGOX"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ecff9df447so965820b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2024 09:54:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712336047; x=1712940847; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712336081; x=1712940881; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nZ2PSbpWVu5URvpzPkpOvHrMnaNC1YMZnjtTV8rnnpQ=;
-        b=NZHmpUIC/0gqZc4uxpwGh0TC+UyT01B9b4PG0b0wZpOXDoT5xEoF5EYx+faGaC0i+H
-         jxb7Ch+54k7Y2O7Ov/6dceja6K4HgqAFqb3lUom/VlCrlaWYn22EmqFjm177tPBnUMDs
-         dAFUSvwbmIDSdrkjtevNqvctfcvf62bSa8nMFvz3xAnDLog8X6hKJ4JMS3m5GBwXT/VT
-         Z9C5QIcPk0tXe4fwePO+28iC35fk8d7ccYBmFZA0XJnruJgLxnGUgldcEylphxCyoq9z
-         6wYaeSt2p+YQ/FS8IhFl543XqeX+VbCnxpoEuhnMrsTJ1QHDujsw2VIfadQlZVeLm1pB
-         0i3Q==
+        bh=6CzOFu2vYoKJKFl0BkpF69L1Nr9SowKahxiD3QPgAQs=;
+        b=DOMoaGOXMC/np76bMWbk0asixnfmqZrFC22ug24gJrjujpCXKZOfBhVpt57hxALwyf
+         tHsakIKbG0tMIk4wKGP3zQff6xarPRw3+pyq1/pze3iRRBayKOvTP58IRq/eDM+aVrUd
+         UcEvnB/sM9/Byvv5Hu5GRftY0qJnfTCqR5o7mVaDeYZ9GeIRas4/aA66hLUNo4NNvEPp
+         OJpPouukjcSA9Zic4OIlzcqhD2P7wcXOfT/o3nXWh9QyQOzb0OS8AYBxIbCgXGlJxD6Y
+         p/WWxrYJvkymBxSbrrONhxS5AJxW9tc/+lEIzm3hd0HkEFI6co2qRADeWWGo7R2rPDxb
+         et7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712336047; x=1712940847;
+        d=1e100.net; s=20230601; t=1712336081; x=1712940881;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nZ2PSbpWVu5URvpzPkpOvHrMnaNC1YMZnjtTV8rnnpQ=;
-        b=K7uFTO4a/UeB8MwYkwer9zW4MuwyXhB74QILx+vNadSYvH+4AEKBAtZqkbJl4tTyws
-         O6wV7lmjX9uF2JtzH8TPD4zRMUofDMXnJBlGTzVDmJN6CwqTqyQ0DXF35ZeYZNpwIScN
-         lv8agyo1JegEvLTHGhDiHhEgh/KsarRh3szkNdZO8f88EyCFr+PVnGMlSfjZGQBx3JWf
-         t+FYuaMCxSX9Yf4v5fq6t2XRVXj0L14N+MgAIkRjRhGItN/lmR7hTG5qJ7K+6h4l4PNM
-         eQubCQOyv092tcHQ8LG720aEgqFVX+fI9v0xyQnMSeAdiJWA4lo7maTXYUAen3I+yC8L
-         o/IA==
-X-Gm-Message-State: AOJu0YwlZcqeqdJJKCR2lsAfTio1SP6g8H8eytzf/0LMKlt6qGCdGZj0
-	el9qpTlzdUXpza5Oczluro98WJes6xkmKK/jZMSpqZZci8VFqEiP3JtTu8SrgA0=
-X-Google-Smtp-Source: AGHT+IF+j9BTMX4+Y3x2FNgOTqXDzIe2Ya+JROFH/R5iGlcJv7rTwUPWhpqlWeux/MLzYF1X3lOElg==
-X-Received: by 2002:a17:903:41c7:b0:1e0:9ee1:d4cf with SMTP id u7-20020a17090341c700b001e09ee1d4cfmr1669426ple.41.1712336046758;
-        Fri, 05 Apr 2024 09:54:06 -0700 (PDT)
+        bh=6CzOFu2vYoKJKFl0BkpF69L1Nr9SowKahxiD3QPgAQs=;
+        b=b53z/6B8xPFGFff2j5+5lIxtzyggBekpvy1zs27MQ/uzy+h570kQgQO5yOwWDosyrv
+         XyYBLe9aOmTu6YXMBH1+GTpJpBhGZheEqMF0OImUJJ69W6f4df+9MXKyM4GaNFbIdFRA
+         OmMTjpDuyJUxt8UF3wnY/t1V5YrDxk3m5ka9KtiB7s3r+LnNZH8k+d84shSt4ImnFTGg
+         Guu6LhztISdHgGFrfO/iCfm2BC+yPCTwLPdsRbmuyzkXlvPBsngzuwKucyafHnv/W/Oc
+         2+o/iFE+Ftzqf3LmM15pQhfSUodd1Cd6YFZTgUe5kKq8KFO+4bbfhwd5jwTuiMRrs+Rb
+         haKA==
+X-Gm-Message-State: AOJu0Yypqu3OvlWClWR4uLDCzzlYReQ0LiKIK2UMiy9ZxYgyRJLC9fLI
+	QSaFzNl/mMQP6bQJ/s1LxGyq3Dtmpb/tWQhXrwI9b8fpjEa/P3A6fCdDa0smwmg=
+X-Google-Smtp-Source: AGHT+IHf7lPnrYPRlgBJQwQAepP395s/Vk3i8T4l0VjMhG9A5+DVaM2Zgr8ciNDmiHej3MG2V4WR/g==
+X-Received: by 2002:a05:6a21:7894:b0:1a3:8984:b334 with SMTP id bf20-20020a056a21789400b001a38984b334mr2485816pzc.22.1712336081076;
+        Fri, 05 Apr 2024 09:54:41 -0700 (PDT)
 Received: from tokunori-desktop.flets-east.jp ([240b:10:2720:5500:6bf8:8d28:8374:5b7d])
-        by smtp.gmail.com with ESMTPSA id h13-20020a170902eecd00b001e2c1740264sm1803242plb.252.2024.04.05.09.54.05
+        by smtp.gmail.com with ESMTPSA id hq8-20020a056a00680800b006eaf186e078sm1717692pfb.132.2024.04.05.09.54.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 09:54:06 -0700 (PDT)
+        Fri, 05 Apr 2024 09:54:40 -0700 (PDT)
 From: Tokunori Ikegami <ikegami.t@gmail.com>
 To: linux-block@vger.kernel.org
 Cc: Tokunori Ikegami <ikegami.t@gmail.com>
-Subject: [PATCH] docs: sysfs-block: change hidden sysfs entry listing order
-Date: Sat,  6 Apr 2024 01:54:01 +0900
-Message-Id: <20240405165401.12637-1-ikegami.t@gmail.com>
+Subject: [PATCH] docs: sysfs-block: document size sysfs entry
+Date: Sat,  6 Apr 2024 01:54:34 +0900
+Message-Id: <20240405165434.12673-1-ikegami.t@gmail.com>
 X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -62,49 +62,30 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-List entries in alphabetical order.
+Document it since /sys/block/<disk>/size is undocumented.
 
 Signed-off-by: Tokunori Ikegami <ikegami.t@gmail.com>
 ---
- Documentation/ABI/stable/sysfs-block | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ Documentation/ABI/stable/sysfs-block | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 1fe9a553c37b..7718ed34777e 100644
+index 7718ed34777e..881049419054 100644
 --- a/Documentation/ABI/stable/sysfs-block
 +++ b/Documentation/ABI/stable/sysfs-block
-@@ -34,6 +34,15 @@ Description:
- 		The value type is 64 bit unsigned.
- 
- 
-+What:		/sys/block/<disk>/hidden
-+Date:		March 2023
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RO] the block device is hidden. it doesn’t produce events, and
-+		can’t be opened from userspace or using blkdev_get*.
-+		Used for the underlying components of multipath devices.
-+
-+
- What:		/sys/block/<disk>/inflight
- Date:		October 2009
- Contact:	Jens Axboe <axboe@kernel.dk>, Nikanth Karthikesan <knikanth@suse.de>
-@@ -698,15 +707,6 @@ Description:
+@@ -707,6 +707,13 @@ Description:
  		zoned will report "none".
  
  
--What:		/sys/block/<disk>/hidden
--Date:		March 2023
--Contact:	linux-block@vger.kernel.org
--Description:
--		[RO] the block device is hidden. it doesn’t produce events, and
--		can’t be opened from userspace or using blkdev_get*.
--		Used for the underlying components of multipath devices.
--
--
++What:		/sys/block/<disk>/size
++Date:		April 2024
++Contact:	linux-block@vger.kernel.org
++Description:
++		[RO] This is the 512 bytes size sector number.
++
++
  What:		/sys/block/<disk>/stat
  Date:		February 2008
  Contact:	Jerome Marchand <jmarchan@redhat.com>
