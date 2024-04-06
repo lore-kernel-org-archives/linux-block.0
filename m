@@ -1,107 +1,195 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45033C00
-	for <linux-block@vger.kernel.org>; Sat,  6 Apr 2024 02:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161BB12E55
+	for <linux-block@vger.kernel.org>; Sat,  6 Apr 2024 04:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712369280; cv=none; b=W58NuzqNDXAiaaIjuZZHd60WyNuYFvFhgL7On7HQWxIT73dNPNiYsoR4FJnPGNfX+ia3810oxgfyGZjWWm2/hoEBocGPEPMNEHLNr7vuSyef2/8alkb4CZ7BKDbFL4Rb/IHsj0Yb2BUn+I1W6KiO3XzXqm11h3SsNUm2hStZQtU=
+	t=1712378796; cv=none; b=JY4TkuNjxYvi/7RfA8dewATawHbCp/j4yEOci0J0hVZstfPb0RdEr8jlTZgaIJ977oYtCQa/uKU3pnCOuFZfFfxdzP9bNFJzg1abZuZ8rAEEVDn7ryc1qsaxCxTAFts1tdrTCctNdBlf9/WR0QOaN0kukvQ42Zl6sVRH2xtc6JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712369280; c=relaxed/simple;
-	bh=NRDSrd//lw3VipjgP/KmiM8Kzaxra2OkM66vbPYRZmY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=q5IEg7IAi/YVdPi4s98+rdTyRDwiBkarO5r4grLp0dvZrtmfh/bvkfn/7IfLfXf6M0ZLFZcAmsX76tcbR8o7tnn8SVc26k9QfAt16nT1O5cn/623lrP6YuBtmwBC1Z1aZNd4nAAsghX1sIJBf/G8E34O2xt6i4so47gOtraYn4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kMDveTdA; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1712378796; c=relaxed/simple;
+	bh=eSY8SmjSJBFEPTR1UEk8BIaMiQsyj/GGwQBveHVgSeU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OvZiG/q5QaHrssmtPwPCnEytmVA3XQWV74rnBNg2+xII0qRi7rwFJYoHnoC1MHzzAg/j0nlEGifd6oNv0Sp0/C+sEGhuh0fvzSf8TU3CFz37nEwQgF+nZGDsOUKYmxKW/v5JhL7mR8nynFNfJMLlktuw2u3u/sWbZ2Xg1p94OoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--saranyamohan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bosuaZKW; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--saranyamohan.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kMDveTdA"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7cc0e831e11so56977339f.1
-        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2024 19:07:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bosuaZKW"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ecf5c622c2so1460138b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2024 21:46:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712369278; x=1712974078; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sfyeTnbUOHjE4JfMs0wGJdvVcv7mV0yWrczNYacKGfg=;
-        b=kMDveTdARaGNPMxjo/wgLDzNKK55H8YINc2kt5VgWqq6U0fbw9YT20kEtmCfjdQr0A
-         sDLgSXC4mVWvKO5aO1dp6LMkYCIpS17Zyao3612UoUYYkoZ+R0FapHF8v4I24LHzti+y
-         tsnJHSDOhXVFfoZ1sNRq1aXs0cPQIBaLiGwD7pFp9GhvrVucx8Fhg9OzW19wDEyu8Df2
-         SuLoxm5aSsQuaUkAlk0uce/MctYeiP5RX98KjGHg+goXS6ETe2fh8FOg6xHx1Uqviu5b
-         5Qk3CyMijFGt34L4JWzkXAS6diePL6Hx5gnj7FvoAptxDa0dlBvULwRlri5lqdS+C0PK
-         YcQw==
+        d=google.com; s=20230601; t=1712378794; x=1712983594; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5IXfZlUVne5nh2CnHBJTI4+/aPzxiLXmE9xgPPBEMbk=;
+        b=bosuaZKWIzGzeXvypNcyyNuyhLkr0VNTe5fRVB+y9+iRVGc2nxm6G/sSiBiBRwpIm2
+         FaYlErAWa8RYn2Vo9acXhKWdyZAxZdranwdoJu45Wgkvk3q3L2bliL0ivgA8uqwIdH9W
+         h6B202hzk3kQfIW3sePRe7+tY2gTCtTkmx0+bfNgQF0NOQQolBZceT07CIXrKAHC1Lqa
+         7bUYBNn7OPIOnX3+iyssP0GxYsRIR7w4H1/bpsG3QI2lMrEhWvkKshDjZl/VMcmWX8ac
+         LbYUcMYBe4DZvNZkF0pkSzw7Giu8EES4NSbqR6tPrUyvmxm9QcC6lvipz/eat+PistZD
+         rm1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712369278; x=1712974078;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sfyeTnbUOHjE4JfMs0wGJdvVcv7mV0yWrczNYacKGfg=;
-        b=Hs/cE0fT8ohY7XlvdVKti0PjoI4GoWVeJmDEBmx5rl+/XuZN+4GSheUUgHV06qoayQ
-         uJgXrFKMYiC3DKSag4FvSwZiUcfs/SOfZUAOWWLrk6gnAaly3fsNvodsg9cbHsV80LE9
-         bwv3p/RkrqSuOgG/TdG6qkziArEjYEkdashx7axdH+lg6xTtnOvh2BYmgCfFBa9U7G8w
-         KT8ArwezlH4VjOJXzDp+WB10ZAIqmmlMxbJmfOiPFabU4w+U3wGOL170ddvaFy3Sxc33
-         NYws5wTb24/Yp3WJeX97nC943G7qOtbzMXRhggE3SRUn9eXkyhhSMpTSSfuEK9eg9kiD
-         xwBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXB4MYoRyQRDIIpYWbEyhLZzAf2CXhUayfQpL6IMm6QmaX7vIfS+NVYvr0pHKLDHBrLb+46v+DTB2qTPncT/yZOYw4xVAD8I0AvWyI=
-X-Gm-Message-State: AOJu0YwhxTi55WJra1R7U5chhXbb7wdmFCuJFviMXrkMRdzG7nQr7J8g
-	yY+nqSVKswbV7JigX1DDHVWia+bu1CX/G004Ef8P5c4XL0sXRybfd6oJ5pGMzxs=
-X-Google-Smtp-Source: AGHT+IH/HsleWvwHw/pVrctaalvVy7+rmbzL5bu+lHTyu0TKoHSuajK+U2MSGalABMhK3FGF/GMHVA==
-X-Received: by 2002:a05:6602:1644:b0:7d5:cc9e:9d96 with SMTP id y4-20020a056602164400b007d5cc9e9d96mr501025iow.1.1712369277985;
-        Fri, 05 Apr 2024 19:07:57 -0700 (PDT)
-Received: from [127.0.0.1] ([99.196.135.167])
-        by smtp.gmail.com with ESMTPSA id jb6-20020a05663888c600b004827f5def6bsm28853jab.4.2024.04.05.19.07.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 19:07:57 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-kernel@vger.kernel.org, Rik van Riel <riel@surriel.com>
-Cc: kernel-team@meta.com, Tejun Heo <tj@kernel.org>, 
- Josef Bacik <josef@toxicpanda.com>, cgroups@vger.kernel.org, 
- linux-block@vger.kernel.org
-In-Reply-To: <20240404123253.0f58010f@imladris.surriel.com>
-References: <20240404123253.0f58010f@imladris.surriel.com>
-Subject: Re: [PATCH] blk-iocost: avoid out of bounds shift
-Message-Id: <171236927113.2455316.5665277976518467416.b4-ty@kernel.dk>
-Date: Fri, 05 Apr 2024 20:07:51 -0600
+        d=1e100.net; s=20230601; t=1712378794; x=1712983594;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5IXfZlUVne5nh2CnHBJTI4+/aPzxiLXmE9xgPPBEMbk=;
+        b=W6oeJF8fPS+SD45JXy6puz+F3zfwGuDambvnOO3uH4AsjzM1s/msmzjhYGm1lU75OD
+         xJMMhJY6ETYmAGuYpAgV6jp4NE+DnJvOzjJqZ1k4O+/IPHIW4Qh8Rife7h6+9hkst20h
+         10TFKfr12Pq79e2igSBhJehy3sUMcemFLNLCr+aeFkP3V7jwfEns45UXFnB2WTPs/34e
+         iDYU1Ea6BKy0unNqw4vIIYhfbrEItG05SCe7C8aLa7IzE+0mwAweRifWcBrI3dNYd4zn
+         BB4dSadf8Xg4B86Ic/gn1kRXpZPrhP241C5UTi9f5CoHsTtsfCdXHc4vskyRkSb7uifn
+         3iHw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvaalx6lrOot1pxdgTOO0APsz/UtkG9S006u8f3SS1lWWuAggyOxqH7XFVjp+pqUZTBOro1mS9AalYZ+8RHzdNYMzLA1Br3+mHdiY=
+X-Gm-Message-State: AOJu0YxdRiiL+0Is55tv0rlMDmCV28rrImZomxZm+Wjt0fEGB4c9Za4u
+	pmVzz1NsWr66zn55XcS82vlASGOZcFGdpZJsogUo1kIqNmem+6Z/dgJWP46OAcUkXSaUGXlazrr
+	OqojhDzeqsH1yP9aMJic/woitoQ==
+X-Google-Smtp-Source: AGHT+IHCQR6WZEjGNVySq5kpIgX0OQ1AhvwNbxadV2MZ6ziIhew6QARQ8RcHwAgPERgN+/7kMQfFm5mjCSb03Vr8qLo=
+X-Received: from srnym.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2728])
+ (user=saranyamohan job=sendgmr) by 2002:a05:6a00:991:b0:6ea:8ece:3b3a with
+ SMTP id u17-20020a056a00099100b006ea8ece3b3amr394605pfg.4.1712378794294; Fri,
+ 05 Apr 2024 21:46:34 -0700 (PDT)
+Date: Sat,  6 Apr 2024 04:46:31 +0000
+In-Reply-To: <2ac46686-5fec-42c7-b267-128cedcc73eb@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Mime-Version: 1.0
+References: <2ac46686-5fec-42c7-b267-128cedcc73eb@nvidia.com>
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240406044631.2474947-1-saranyamohan@google.com>
+Subject: [PATCH blktests] block/035: test return EIO from BLKRRPART
+From: Saranya Muruganandam <saranyamohan@google.com>
+To: chaitanyak@nvidia.com
+Cc: hch@lst.de, linux-block@vger.kernel.org, saranyamohan@google.com, 
+	shinichiro.kawasaki@wdc.com
+Content-Type: text/plain; charset="UTF-8"
 
+When we fail to reread the partition superblock from the disk, due to
+bad sector or bad disk etc, BLKRRPART should fail with EIO.
+Simulate failure for the entire block device and run
+"blockdev --rereadpt" and expect it to fail and return EIO instead of
+pass.
 
-On Thu, 04 Apr 2024 12:32:53 -0400, Rik van Riel wrote:
-> UBSAN catches undefined behavior in blk-iocost, where sometimes
-> iocg->delay is shifted right by a number that is too large,
-> resulting in undefined behavior on some architectures.
-> 
-> [  186.556576] ------------[ cut here ]------------
-> UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
-> shift exponent 64 is too large for 64-bit type 'u64' (aka 'unsigned long long')
-> CPU: 16 PID: 0 Comm: swapper/16 Tainted: G S          E    N 6.9.0-0_fbk700_debug_rc2_kbuilder_0_gc85af715cac0 #1
-> Hardware name: Quanta Twin Lakes MP/Twin Lakes Passive MP, BIOS F09_3A23 12/08/2020
-> Call Trace:
->  <IRQ>
->  dump_stack_lvl+0x8f/0xe0
->  __ubsan_handle_shift_out_of_bounds+0x22c/0x280
->  iocg_kick_delay+0x30b/0x310
->  ioc_timer_fn+0x2fb/0x1f80
->  __run_timer_base+0x1b6/0x250
-> ...
-> 
-> [...]
+Link: https://lore.kernel.org/all/20240405014253.748627-1-saranyamohan@google.com/
+Signed-off-by: Saranya Muruganandam <saranyamohan@google.com>
+---
+ tests/block/035     | 93 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/035.out |  3 ++
+ 2 files changed, 96 insertions(+)
+ create mode 100755 tests/block/035
+ create mode 100644 tests/block/035.out
 
-Applied, thanks!
-
-[1/1] blk-iocost: avoid out of bounds shift
-      commit: beaa51b36012fad5a4d3c18b88a617aea7a9b96d
-
-Best regards,
+diff --git a/tests/block/035 b/tests/block/035
+new file mode 100755
+index 0000000..67896ea
+--- /dev/null
++++ b/tests/block/035
+@@ -0,0 +1,93 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Google LLC
++#
++# Regression test for BLKRRPART.
++#
++# If we fail to read the partition table due to bad sector or other IO
++# failures, running "blockdev --rereadpt" should fail and return
++# -EIO.  On a buggy kernel, it passes unexpectedly.
++
++. tests/block/rc
++
++DESCRIPTION="test return EIO from BLKRRPART for whole-dev"
++QUICK=1
++DEBUGFS_MNT="/sys/kernel/debug/fail_make_request"
++
++PROBABILITY=0
++TIMES=0
++VERBOSE=0
++MAKE_FAIL=0
++
++_have_debugfs() {
++
++	if [[ ! -d "${DEBUGFS_MNT}" ]]; then
++		SKIP_REASONS+=("debugfs does not exist")
++		return 1
++	fi
++	return 0
++}
++
++requires() {
++	_have_debugfs
++}
++
++save_fail_make_request()
++{
++	# Save existing global fail_make_request settings
++	PROBABILITY=$(cat "${DEBUGFS_MNT}"/probability)
++	TIMES=$(cat "${DEBUGFS_MNT}"/times)
++	VERBOSE=$(cat "${DEBUGFS_MNT}"/verbose)
++
++	# Save TEST_DEV make-it-fail setting
++	MAKE_FAIL=$(cat /sys/block/$(basename "${TEST_DEV}")/make-it-fail)
++
++}
++
++allow_fail_make_request()
++{
++	# Allow global fail_make_request feature
++	echo 100 > "${DEBUGFS_MNT}"/probability
++	echo 9999999 > "${DEBUGFS_MNT}"/times
++	echo 0 > "${DEBUGFS_MNT}"/verbose
++
++	# Force TEST_DEV device failure
++	echo 1 > /sys/block/$(basename "${TEST_DEV}")/make-it-fail
++
++}
++
++restore_fail_make_request()
++{
++	echo "${MAKE_FAIL}" > /sys/block/$(basename "${TEST_DEV}")/make-it-fail
++
++	# Disallow global fail_make_request feature
++	echo "${PROBABILITY}" > "${DEBUGFS_MNT}"/probability
++	echo "${TIMES}" > "${DEBUGFS_MNT}"/times
++	echo "${VERBOSE}" > "${DEBUGFS_MNT}"/verbose
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++
++	# Save configuration
++	save_fail_make_request
++
++	# set up device for failure
++	allow_fail_make_request
++
++	# Check rereading partitions on bad disk cannot open /dev/sdc: Input/output error
++	local out=$(blockdev --rereadpt "${TEST_DEV}" 2>&1)
++	if [[ $(echo "${out}" | grep -q "Input/output error") -eq 0 ]]; then
++		echo "Return EIO for BLKRRPART on bad disk"
++	else
++		echo "Did not return EIO for BLKRRPART on bad disk"
++	fi
++
++	echo "${out}" >> "$FULL"
++
++	# Restore TEST_DEV device to original state
++	restore_fail_make_request
++
++	echo "Test complete"
++}
++
+diff --git a/tests/block/035.out b/tests/block/035.out
+new file mode 100644
+index 0000000..0f97f6b
+--- /dev/null
++++ b/tests/block/035.out
+@@ -0,0 +1,3 @@
++Running block/035
++Return EIO for BLKRRPART on bad disk
++Test complete
 -- 
-Jens Axboe
-
-
+2.44.0.478.gd926399ef9-goog
 
